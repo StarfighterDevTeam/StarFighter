@@ -84,7 +84,11 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StarFighter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Ship.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
