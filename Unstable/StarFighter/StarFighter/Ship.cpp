@@ -6,6 +6,7 @@ Ship::Ship()
 	speed.y = 0;
 	moving = false;	
 	this->animatedSprite = AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
+	this->animatedSprite.setOrigin(SHIP_WIDTH/2, SHIP_HEIGHT/2);
 }
 
 void Ship::Init(int x, int y)
