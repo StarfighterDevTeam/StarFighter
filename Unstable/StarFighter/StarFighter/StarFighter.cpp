@@ -10,13 +10,9 @@
 int main()
 {
 	window = new sf::RenderWindow( sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter" );
-	window.setFramerateLimit(60);
-	// window( new sf::RenderWindow( sf::VideoMode(800,600), "Test" ) );
 
 	Ship myShip;
 	Background myBackground;
-
-
 	
 	myBackground.Init(0,0);
 	myShip.laser.Init(0,0);

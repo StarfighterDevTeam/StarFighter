@@ -7,7 +7,7 @@
 #include "AnimatedSprite.hpp"
 
 
-#define SHIP_FILENAME				"Assets/2D/player.png"
+#define SHIP_FILENAME				"Assets/2D/player_sprite.png"
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
 #define SHIP_ACCELERATION_X         10.0f
