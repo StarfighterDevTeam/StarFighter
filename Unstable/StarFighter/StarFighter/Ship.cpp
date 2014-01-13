@@ -108,7 +108,5 @@ void Ship::Update(sf::Time deltaTime)
 			speed.y = 0;
 	}
 
-	animatedSprite.update(deltaTime);
-
 	printf("%f %f / %f \n", animatedSprite.getPosition().x, animatedSprite.getPosition().y, deltaTime.asSeconds() );	
 }

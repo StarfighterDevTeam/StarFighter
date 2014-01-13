@@ -24,13 +24,14 @@
 
 class Ship : public sf::Drawable
 {
+
 public :
 	Ship();
 	void Init(int x, int y);
 	void Update(sf::Time deltaTime);
 	void Display();
-
 	Weapon laser;
+
 private:
 	sf::Vector2f speed;
 	bool moving;
