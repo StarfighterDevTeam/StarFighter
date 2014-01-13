@@ -3,15 +3,18 @@
 #include <stdio.h>
 #include <cmath>
 #include "Ship.h"
+#include "Background.h"
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
 
 	Ship myShip;
-
+	Background myBackground;
 
 	myShip.Init(0,0);
+	myBackground.Init(0,0);
+
 
 	//update
 	sf::Time dt;
@@ -37,6 +40,7 @@ int main()
 
 		//display
         window.clear();
+		window.draw(myBackground);
 		window.draw(myShip);
 		
         window.display();
