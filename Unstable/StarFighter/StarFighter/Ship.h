@@ -8,11 +8,13 @@
 #define SHIP_START_Y                0
 #define SHIP_ACCELERATION_X         10.0f
 #define SHIP_ACCELERATION_Y         10.0f
-#define SHIP_DECCELERATION_COEF		200.0f
+#define SHIP_DECCELERATION_COEF		500.0f
 #define SHIP_MAX_SPEED_X            1000.0f
 #define SHIP_MAX_SPEED_Y            1000.0f
 #define SHIP_MIN_SPEED_X            50.0f
 #define SHIP_MIN_SPEED_Y            50.0f
+#define SHIP_WIDTH					64
+#define SHIP_HEIGHT					64
 
 struct Ship : sf::Sprite
 {

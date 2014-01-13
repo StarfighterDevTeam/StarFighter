@@ -42,7 +42,6 @@ int main()
         window.clear();
 		window.draw(myBackground);
 		window.draw(myShip);
-		
         window.display();
     }
 
