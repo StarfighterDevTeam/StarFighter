@@ -7,14 +7,17 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
+	//We hardcode the windows size here, TBD later
+	sf::Vector2i screenDimensions(800,600);
+    sf::RenderWindow window(sf::VideoMode(screenDimensions.x, screenDimensions.y), "StarFighter");
+	window.setFramerateLimit(60);
 
 	Ship myShip;
 	Background myBackground;
 
-	myShip.Init(0,0);
+	
 	myBackground.Init(0,0);
-
+	myShip.Init(0,0);
 
 	//update
 	sf::Time dt;
@@ -35,7 +38,7 @@ int main()
 			window.close();
 
 		dt = deltaClock.restart();
-		myShip.Update(dt.asSeconds());
+		myShip.Update(dt);
 
 
 		//display

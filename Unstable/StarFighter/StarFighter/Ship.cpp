@@ -5,19 +5,28 @@ Ship::Ship()
 	speed.x = 0;
 	speed.y = 0;
 	moving = false;
+
+	super::AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
 }
 
 void Ship::Init(int x, int y)
 {
 	static sf::Texture texture;
-	if (!texture.loadFromFile(SHIP_FILENAME, sf::IntRect(x, y, 64, 64)))
+	if (!texture.loadFromFile(SHIP_FILENAME, sf::IntRect(x, y, 192, 64)))
 	{
 		printf("error loading ship");
 	}
-	this->setTexture(texture);
+	//Loading ship animation
+	animation.setSpriteSheet(texture);
+	animation.addFrame(sf::IntRect(0, 0, 64, 64));
+    animation.addFrame(sf::IntRect(64, 0, 64, 64));
+    animation.addFrame(sf::IntRect(128, 0, 64, 64));
+
+    this->setPosition(x,y);
+	this->play(animation);
 }
 
-void Ship::Update(float seconds)
+void Ship::Update(sf::Time deltaTime)
 {
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
@@ -50,12 +59,12 @@ void Ship::Update(float seconds)
 		speed.y = speed.y > 0 ? SHIP_MAX_SPEED_Y : -SHIP_MAX_SPEED_Y;
 	}
 
-	this->setPosition(this->getPosition().x + (speed.x)*seconds, this->getPosition().y + (speed.y)*seconds);
+	this->setPosition(this->getPosition().x + (speed.x)*deltaTime.asSeconds(), this->getPosition().y + (speed.y)*deltaTime.asSeconds());
 
 	if(!moving)
 	{
-		speed.x -= (speed.x)*seconds*(SHIP_DECCELERATION_COEF/100);
-		speed.y -= (speed.y)*seconds*(SHIP_DECCELERATION_COEF/100);
+		speed.x -= (speed.x)*deltaTime.asSeconds()*(SHIP_DECCELERATION_COEF/100);
+		speed.y -= (speed.y)*deltaTime.asSeconds()*(SHIP_DECCELERATION_COEF/100);
 
 		if(abs(speed.x) < SHIP_MIN_SPEED_X)
 			speed.x = 0;
@@ -64,6 +73,8 @@ void Ship::Update(float seconds)
 			speed.y = 0;
 	}
 
-	printf("%f %f / %f \n", speed.x, speed.y, seconds );	
+	super::update(deltaTime);
+
+	printf("%f %f / %f \n", this->getPosition().x, this->getPosition().y, deltaTime.asSeconds() );	
 }
 
