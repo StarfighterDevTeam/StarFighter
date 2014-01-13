@@ -1,5 +1,6 @@
 #include "Ship.h"
 
+
 Ship::Ship()
 {
 	speed.x = 0;
@@ -17,6 +18,7 @@ void Ship::Init(int x, int y)
 	this->setTexture(texture);
 	setOrigin(SHIP_WIDTH/2,SHIP_HEIGHT/2);
 	setPosition(400,500);
+
 }
 
 void Ship::Update(float seconds)
@@ -43,6 +45,11 @@ void Ship::Update(float seconds)
 		speed.y += SHIP_ACCELERATION_Y;
 	}
 
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	{
+		laser.setPosition(getPosition().x, getPosition().y - (SHIP_HEIGHT/2) - LASER_HEIGHT/2);
+	}
+
 	//max speed constraints
 	if(abs(speed.x) > SHIP_MAX_SPEED_X)
 	{
@@ -60,9 +67,9 @@ void Ship::Update(float seconds)
 			speed.x = 0;
 		}
 
-	if (getPosition().x > 800-(SHIP_WIDTH/2))
+	if (getPosition().x > WINDOW_RESOLUTION_X - (SHIP_WIDTH/2))
 		{
-			setPosition(800-(SHIP_WIDTH/2), getPosition().y);
+			setPosition(WINDOW_RESOLUTION_X-(SHIP_WIDTH/2), getPosition().y);
 			speed.x = 0;
 		}
 
@@ -72,9 +79,9 @@ void Ship::Update(float seconds)
 			speed.y = 0;
 		}
 
-	if (getPosition().y > 600-(SHIP_HEIGHT/2))
+	if (getPosition().y > WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2))
 		{
-			setPosition(getPosition().x, 600-(SHIP_HEIGHT/2));
+			setPosition(getPosition().x, WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2));
 			speed.y = 0;
 		}
 	
@@ -92,12 +99,14 @@ void Ship::Update(float seconds)
 
 		if(abs(speed.y) < SHIP_MIN_SPEED_Y)
 			speed.y = 0;
-
 	
-
-		
 	}
 
 	//printf("%f %f / %f \n", getPosition().x, getPosition().y, seconds );	
+}
+
+void Ship::Display()
+{
+	//*window->draw(this);
 }
 

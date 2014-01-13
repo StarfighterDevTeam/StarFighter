@@ -2,6 +2,10 @@
 #define SHIP_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include "Globals.h"
+#include "Weapon.h"
+
+
 
 #define SHIP_FILENAME				"Assets/2D/player.png"
 #define SHIP_START_X                0
@@ -16,6 +20,7 @@
 #define SHIP_WIDTH					64
 #define SHIP_HEIGHT					64
 
+
 struct Ship : sf::Sprite
 {
 	sf::Vector2f speed;
@@ -24,6 +29,9 @@ struct Ship : sf::Sprite
     Ship();
 	void Init(int x, int y);
     void Update(float seconds);
+	void Display();
+
+	Weapon laser;
 };
 
 
