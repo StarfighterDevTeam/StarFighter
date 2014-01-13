@@ -51,6 +51,12 @@ void Ship::Update(sf::Time deltaTime)
 		speed.y += SHIP_ACCELERATION_Y;
 	}
 
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	{
+		laser.setPosition(getPosition().x, getPosition().y - (SHIP_HEIGHT/2) - LASER_HEIGHT/2);
+	}
+
+	//max speed constraints
 	if(abs(speed.x) > SHIP_MAX_SPEED_X)
 	{
 		speed.x = speed.x > 0 ? SHIP_MAX_SPEED_X : -SHIP_MAX_SPEED_X;
@@ -60,8 +66,35 @@ void Ship::Update(sf::Time deltaTime)
 		speed.y = speed.y > 0 ? SHIP_MAX_SPEED_Y : -SHIP_MAX_SPEED_Y;
 	}
 
-	animatedSprite.setPosition(animatedSprite.getPosition().x + (speed.x)*deltaTime.asSeconds(), animatedSprite.getPosition().y + (speed.y)*deltaTime.asSeconds());
+	//screen borders contraints	
+	if (getPosition().x < SHIP_WIDTH/2)
+		{
+			setPosition(SHIP_WIDTH/2, getPosition().y);
+			speed.x = 0;
+		}
 
+	if (getPosition().x > WINDOW_RESOLUTION_X - (SHIP_WIDTH/2))
+		{
+			setPosition(WINDOW_RESOLUTION_X-(SHIP_WIDTH/2), getPosition().y);
+			speed.x = 0;
+		}
+
+	if (getPosition().y < SHIP_HEIGHT/2)
+		{
+			setPosition(getPosition().x, SHIP_HEIGHT/2);
+			speed.y = 0;
+		}
+
+	if (getPosition().y > WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2))
+		{
+			setPosition(getPosition().x, WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2));
+			speed.y = 0;
+		}
+	
+	//moving stuff
+	this->setPosition(this->getPosition().x + (speed.x)*seconds, this->getPosition().y + (speed.y)*seconds);
+
+	//idle decceleration
 	if(!moving)
 	{
 		speed.x -= (speed.x)*deltaTime.asSeconds()*(SHIP_DECCELERATION_COEF/100);

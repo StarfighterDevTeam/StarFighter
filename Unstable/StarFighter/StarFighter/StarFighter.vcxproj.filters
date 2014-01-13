@@ -27,6 +27,9 @@
     <ClCompile Include="Background.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
     <ClCompile Include="Animation.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -39,6 +42,12 @@
       <Filter>Fichiers sources</Filter>
     </ClInclude>
     <ClInclude Include="Background.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
     <ClInclude Include="Animation.hpp">
