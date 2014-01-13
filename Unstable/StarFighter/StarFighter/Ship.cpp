@@ -4,9 +4,8 @@ Ship::Ship()
 {
 	speed.x = 0;
 	speed.y = 0;
-	moving = false;
-
-	super::AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
+	moving = false;	
+	this->animatedSprite = AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
 }
 
 void Ship::Init(int x, int y)
@@ -17,13 +16,15 @@ void Ship::Init(int x, int y)
 		printf("error loading ship");
 	}
 	//Loading ship animation
-	animation.setSpriteSheet(texture);
-	animation.addFrame(sf::IntRect(0, 0, 64, 64));
-    animation.addFrame(sf::IntRect(64, 0, 64, 64));
-    animation.addFrame(sf::IntRect(128, 0, 64, 64));
+	static Animation shipDefaultAnimation;
+	shipDefaultAnimation.setSpriteSheet(texture);
+	shipDefaultAnimation.addFrame(sf::IntRect(0, 0, 64, 64));
+    shipDefaultAnimation.addFrame(sf::IntRect(64, 0, 64, 64));
+    shipDefaultAnimation.addFrame(sf::IntRect(128, 0, 64, 64));
 
-    this->setPosition(x,y);
-	this->play(animation);
+	Animation* currentAnimation = &shipDefaultAnimation;
+    this->animatedSprite.setPosition(x,y);
+	this->animatedSprite.play(*currentAnimation);
 }
 
 void Ship::Update(sf::Time deltaTime)
@@ -59,7 +60,7 @@ void Ship::Update(sf::Time deltaTime)
 		speed.y = speed.y > 0 ? SHIP_MAX_SPEED_Y : -SHIP_MAX_SPEED_Y;
 	}
 
-	this->setPosition(this->getPosition().x + (speed.x)*deltaTime.asSeconds(), this->getPosition().y + (speed.y)*deltaTime.asSeconds());
+	animatedSprite.setPosition(animatedSprite.getPosition().x + (speed.x)*deltaTime.asSeconds(), animatedSprite.getPosition().y + (speed.y)*deltaTime.asSeconds());
 
 	if(!moving)
 	{
@@ -73,8 +74,7 @@ void Ship::Update(sf::Time deltaTime)
 			speed.y = 0;
 	}
 
-	super::update(deltaTime);
+	animatedSprite.update(deltaTime);
 
-	printf("%f %f / %f \n", this->getPosition().x, this->getPosition().y, deltaTime.asSeconds() );	
+	printf("%f %f / %f \n", animatedSprite.getPosition().x, animatedSprite.getPosition().y, deltaTime.asSeconds() );	
 }
-

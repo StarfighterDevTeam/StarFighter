@@ -16,17 +16,23 @@
 #define SHIP_MIN_SPEED_Y            50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
-class Ship : public AnimatedSprite
+class Ship : public sf::Drawable
 {
 public :
 	typedef AnimatedSprite super;
 	Ship();
 	void Init(int x, int y);
 	void Update(sf::Time deltaTime);
+
 private:
 	sf::Vector2f speed;
 	bool moving;
+	Animation* currentAnimation;
 	Animation animation;
+	AnimatedSprite animatedSprite;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
+		target.draw(animatedSprite, states);
+	}
 };
 
 
