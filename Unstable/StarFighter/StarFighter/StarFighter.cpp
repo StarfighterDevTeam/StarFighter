@@ -15,7 +15,10 @@ int main()
 	Background myBackground;
 	
 	myBackground.Init(0,0);
-	myShip.laser.Init(0,0);
+	for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
+	{
+		myShip.laser[i].Init(0,0);
+	}
 	myShip.Init(0,0);
 
 	//update
@@ -39,13 +42,21 @@ int main()
 		dt = deltaClock.restart();
 
 		myShip.Update(dt);
-		myShip.laser.Update(dt.asSeconds());
+
+		for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
+		{
+			myShip.laser[i].Update(dt.asSeconds());
+		}
 
 		//display
         window->clear();
 		window->draw(myBackground);
 		window->draw(myShip);
-		window->draw(myShip.laser);
+
+		for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
+		{
+			window->draw(myShip.laser[i]);
+		}
         window->display();
     }
 

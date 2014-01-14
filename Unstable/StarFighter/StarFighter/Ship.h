@@ -30,7 +30,11 @@ public :
 	void Init(int x, int y);
 	void Update(sf::Time deltaTime);
 	void Display();
-	Weapon laser;
+
+	Weapon laser[10];
+	int index_laser;
+	sf::Clock deltaClock_laser;
+	bool firing_ready;
 
 private:
 	sf::Vector2f speed;
