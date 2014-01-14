@@ -1,10 +1,11 @@
 #ifndef SHIP_H_INCLUDED
 #define SHIP_H_INCLUDED
 
-#include <SFML/Graphics.hpp>
 #include "Globals.h"
+#include <SFML/Graphics.hpp>
 #include "Weapon.h"
 #include "AnimatedSprite.hpp"
+#include "TextureLoader.h"
 
 
 #define SHIP_FILENAME				"Assets/2D/player_sprite.png"

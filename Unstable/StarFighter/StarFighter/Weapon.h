@@ -2,6 +2,7 @@
 #define WEAPON_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include "Globals.h"
 
 #define LASER_FILENAME				"Assets/2D/laser.png"
 #define LASER_WIDTH					4

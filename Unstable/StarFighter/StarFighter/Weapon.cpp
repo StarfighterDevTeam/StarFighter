@@ -9,12 +9,11 @@ Weapon::Weapon()
 
 void Weapon::Init(int x, int y)
 {
-	static sf::Texture texture;
-	if (!texture.loadFromFile(LASER_FILENAME, sf::IntRect(x, y, LASER_WIDTH, LASER_HEIGHT)))
-	{
-		printf("error loading ship");
-	}
-	this->setTexture(texture);
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance ();
+	sf::Texture* texture = loader->loadTexture(LASER_FILENAME,LASER_WIDTH,LASER_HEIGHT);
+
+	this->setTexture(*texture);
 	setOrigin(LASER_WIDTH/2, LASER_HEIGHT/2);
 }
 

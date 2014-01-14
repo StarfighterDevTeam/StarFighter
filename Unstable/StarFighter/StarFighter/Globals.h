@@ -2,6 +2,7 @@
 #define GLOBALS_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include "TextureLoader.h"
 
 #define	WINDOW_RESOLUTION_X						800
 #define WINDOW_RESOLUTION_Y						600

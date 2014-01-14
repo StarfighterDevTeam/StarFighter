@@ -13,14 +13,13 @@ Ship::Ship()
 
 void Ship::Init(int x, int y)
 {
-	static sf::Texture texture;
-	if (!texture.loadFromFile(SHIP_FILENAME, sf::IntRect(x, y, 192, 64)))
-	{
-		printf("error loading ship");
-	}
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance ();
+	sf::Texture* texture = loader->loadTexture(SHIP_FILENAME,192,64);
+
 	//Loading ship animation
 	static Animation shipDefaultAnimation;
-	shipDefaultAnimation.setSpriteSheet(texture);
+	shipDefaultAnimation.setSpriteSheet(*texture);
 	shipDefaultAnimation.addFrame(sf::IntRect(0, 0, 64, 64));
     shipDefaultAnimation.addFrame(sf::IntRect(64, 0, 64, 64));
     shipDefaultAnimation.addFrame(sf::IntRect(128, 0, 64, 64));

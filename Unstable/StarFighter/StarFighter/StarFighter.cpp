@@ -1,11 +1,4 @@
-#include <SFML/Graphics.hpp>
-#include <tuple>
-#include <stdio.h>
-#include <cmath>
-#include "Globals.h"
-#include "Ship.h"
-#include "Background.h"
-#include "Weapon.h"
+#include "StarFighter.h"
 
 int main()
 {
