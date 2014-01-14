@@ -6,6 +6,8 @@
 #define LASER_FILENAME				"Assets/2D/laser.png"
 #define LASER_WIDTH					4
 #define LASER_HEIGHT				12
+#define LASER_RATE_OF_FIRE			0.3f
+#define LASER_MAX_AMMO_PER_STAGE	10
 
 struct Weapon : sf::Sprite
 
