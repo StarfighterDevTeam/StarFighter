@@ -7,6 +7,7 @@
 #include "Ship.h"
 #include "Background.h"
 #include "Weapon.h"
+#include "Ammo.h"
 #include "TextureLoader.h"
 
 //Initialize TextureLoader Singleton

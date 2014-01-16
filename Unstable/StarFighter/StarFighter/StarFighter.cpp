@@ -10,7 +10,7 @@ int main()
 	myBackground.Init(0,0);
 	for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
 	{
-		myShip.laser[i].Init(0,0);
+		myShip.weapon.ammo[i].Init(0,0);
 	}
 	myShip.Init(0,0);
 
@@ -36,11 +36,6 @@ int main()
 
 		myShip.Update(dt);
 
-		for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
-		{
-			myShip.laser[i].Update(dt.asSeconds());
-		}
-
 		//display
         window->clear();
 		window->draw(myBackground);
@@ -48,7 +43,7 @@ int main()
 
 		for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
 		{
-			window->draw(myShip.laser[i]);
+			window->draw(myShip.weapon.ammo[i]);
 		}
         window->display();
     }

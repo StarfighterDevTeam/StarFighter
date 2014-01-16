@@ -4,8 +4,6 @@ Ship::Ship()
 {
 	speed.x = 0;
 	speed.y = 0;
-	index_laser = 0;
-	firing_ready = true;
 	moving = false;	
 	this->animatedSprite = AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
 	this->animatedSprite.setOrigin(SHIP_WIDTH/2, SHIP_HEIGHT/2);
@@ -55,29 +53,10 @@ void Ship::Update(sf::Time deltaTime)
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		//Timer_laser = deltaClock_laser.getElapsedTime();
-		if (deltaClock_laser.getElapsedTime() > sf::seconds(LASER_RATE_OF_FIRE))
-		{
-			firing_ready = true;
-		}
-
-		if (firing_ready)
-		{
-			if (index_laser > (LASER_MAX_AMMO_PER_STAGE-1))
-			{
-				index_laser = 0;
-			}
-			printf("index laser : %d \n", index_laser);
-			laser[index_laser].setPosition(animatedSprite.getPosition().x, animatedSprite.getPosition().y - (SHIP_HEIGHT/2) - LASER_HEIGHT/2);
-			index_laser++;
-			deltaClock_laser.restart();
-			firing_ready = false;
-			
-		}
-		//printf("index laser : %f \n", deltaClock_laser.getElapsedTime() );
-		//deltaClock_laser.restart();
-		//deltaClock_laser.restart();
-
+		weapon.setPosition(animatedSprite.getPosition().x, (animatedSprite.getPosition().y - (SHIP_HEIGHT/2)) );
+		//weapon.setPosition((animatedSprite.getPosition().x, animatedSprite.getPosition().y) - (SHIP_HEIGHT/2);
+		weapon.Fire();
+		
 	}
 
 	//max speed constraints
@@ -132,6 +111,11 @@ void Ship::Update(sf::Time deltaTime)
 	}
 
 	animatedSprite.update(deltaTime);
+
+	for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
+	{
+		weapon.ammo[i].Update(deltaTime);
+	}
 
 	//printf("%f %f / %f \n", animatedSprite.getPosition().x, animatedSprite.getPosition().y, deltaTime.asSeconds() );	
 }
