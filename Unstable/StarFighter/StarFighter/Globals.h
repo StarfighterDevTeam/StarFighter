@@ -3,10 +3,10 @@
 
 #include <SFML/Graphics.hpp>
 #include "TextureLoader.h"
+#include "Independant.h"
+#include "Game.h"
 
 #define	WINDOW_RESOLUTION_X						800
 #define WINDOW_RESOLUTION_Y						600
-
-extern sf::RenderWindow *window;
 
 #endif // GLOBALS_H_INCLUDED

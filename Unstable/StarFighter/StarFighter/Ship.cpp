@@ -1,5 +1,7 @@
 #include "Ship.h"
 
+extern Game* CurrentGame;
+
 Ship::Ship()
 {
 	speed.x = 0;
@@ -23,7 +25,7 @@ void Ship::Init(int x, int y)
     shipDefaultAnimation.addFrame(sf::IntRect(128, 0, 64, 64));
 
 	Animation* currentAnimation = &shipDefaultAnimation;
-    this->animatedSprite.setPosition(x,y);
+    this->animatedSprite.setPosition((float)x,(float)y);
 	this->animatedSprite.play(*currentAnimation);
 }
 
@@ -111,11 +113,6 @@ void Ship::Update(sf::Time deltaTime)
 	}
 
 	animatedSprite.update(deltaTime);
-
-	for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
-	{
-		weapon.ammo[i].Update(deltaTime);
-	}
 
 	//printf("%f %f / %f \n", animatedSprite.getPosition().x, animatedSprite.getPosition().y, deltaTime.asSeconds() );	
 }

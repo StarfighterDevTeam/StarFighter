@@ -88,23 +88,25 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Ammo.cpp" />
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="Independant.cpp" />
     <ClCompile Include="StarFighter.cpp" />
-    <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="TextureLoader.h" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Ammo.h" />
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="Assets.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Independant.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="Weapon.h" />

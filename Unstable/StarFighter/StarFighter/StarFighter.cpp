@@ -1,32 +1,34 @@
 #include "StarFighter.h"
 
+Game* CurrentGame;
+
 int main()
 {
-	window = new sf::RenderWindow( sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter" );
+	sf::RenderWindow*	window = new sf::RenderWindow( sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter" );
+
+	CurrentGame = new Game();
+	(*CurrentGame).init(window);
+
+	//adding background
+	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,600),Vector2f(0,0));
+	(*CurrentGame).addToScene(bg);
 
 	Ship myShip;
-	Background myBackground;
-	
-	myBackground.Init(0,0);
-	for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
-	{
-		myShip.weapon.ammo[i].Init(0,0);
-	}
 	myShip.Init(0,0);
 
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
 
-    while (window->isOpen())
-    {
+	while (window->isOpen())
+	{
 
 		bool moving = false;
 		sf::Event event;
-        while (window->pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window->close();
+		while (window->pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window->close();
 		}
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -34,19 +36,17 @@ int main()
 
 		dt = deltaClock.restart();
 
+		(*CurrentGame).updateScene(dt);
 		myShip.Update(dt);
 
 		//display
-        window->clear();
-		window->draw(myBackground);
+		window->clear();
+
+		(*CurrentGame).drawScene();
 		window->draw(myShip);
 
-		for (int i=0; i<LASER_MAX_AMMO_PER_STAGE; i++)
-		{
-			window->draw(myShip.weapon.ammo[i]);
-		}
-        window->display();
-    }
+		window->display();
+	}
 
-    return 0;
+	return 0;
 }

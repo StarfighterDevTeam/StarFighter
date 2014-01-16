@@ -42,10 +42,10 @@
     <ClCompile Include="TextureLoader.h">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="TextureLoader.cpp">
+    <ClCompile Include="Independant.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Ammo.cpp">
+    <ClCompile Include="Game.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,7 +71,13 @@
     <ClInclude Include="StarFighter.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
-    <ClInclude Include="Ammo.h">
+    <ClInclude Include="Independant.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
   </ItemGroup>
