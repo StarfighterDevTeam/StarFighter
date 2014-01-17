@@ -32,3 +32,5 @@ void Game::drawScene()
 		this->window->draw((*(*it)));
 	}
 }
+
+

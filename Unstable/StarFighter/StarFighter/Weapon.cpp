@@ -29,6 +29,8 @@ void Weapon::Fire()
 	if (firing_ready)
 	{
 		Independant* laser = new Independant(sf::Vector2f(getPosition().x,getPosition().y- (LASER_HEIGHT/2)),sf::Vector2f(0,-500), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT));
+		laser->setVisible(true);
+		laser->collider_type=2; // 0=bg; 1=ship ; 2=fire ; 3= enemy;
 		(*CurrentGame).addToScene(laser);
 
 		printf("Tir de laser \n");

@@ -14,6 +14,8 @@ public:
 	void addToScene(Independant *object);
 	void updateScene(Time deltaTime);
 	void drawScene();
+
+	
 	//TODO : remove from scene 
 	//TODO : scene position checker <=> remove an item which is no more on the scene
 private:

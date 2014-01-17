@@ -12,9 +12,14 @@ public:
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 
 	virtual void update(sf::Time deltaTime);
-
+	bool visible;
+	int collider_type;
+	void setVisible(bool visible);
+	bool collide_with (const Independant& independant);
 private:
 	sf::Vector2f speed;
+	sf::Vector2f m_size;
+	
 };
 
 
