@@ -57,7 +57,22 @@ bool Independant::collide_with (const Independant& independant)
 	// If not visibe, let's not even bother with the collision
 	if (!visible)
         return false;
-    // Preliminary test : are the two sprites even aligned ?
+	
+	// Some types of independant don't colide with each others
+	// 0=bg; 1=ship ; 2=friendly fire ; 3= enemy fire ; 4=enemy;	
+	else if (   (independant.collider_type==0) 
+		
+			|| (independant.collider_type==1 && (collider_type==0 || collider_type==2)) 
+		
+			|| (independant.collider_type==2 && (collider_type==0 || collider_type==1 || collider_type==3)) 
+
+			|| (independant.collider_type==3 && (collider_type==0 || collider_type==2 || collider_type==4)) 
+		
+			|| (independant.collider_type==4 && (collider_type==0 || collider_type==2 || collider_type==3))	)		
+
+		return false;
+
+	 // Preliminary test : are the two sprites even aligned ?
     else if (independant.getPosition().x - (independant.m_size.x/2) > getPosition().x + (m_size.x/2)
 
 		|| independant.getPosition().x + (independant.m_size.x/2) < getPosition().x - (m_size.x/2)
