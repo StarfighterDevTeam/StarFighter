@@ -10,7 +10,7 @@ int main()
 	(*CurrentGame).init(window);
 
 	//adding background
-	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,600),Vector2f(0,0));
+	Independant* bg = new Independant(sf::Vector2f(0,1200),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,0));
 	(*CurrentGame).addToScene(bg);
 
 	Independant* badguy = new Independant(sf::Vector2f(400,100),sf::Vector2f(0,+20),ENEMYX_FILENAME,Vector2f(32,32),Vector2f(0,0));

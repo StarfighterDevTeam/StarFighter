@@ -21,7 +21,8 @@ void Game::updateScene(Time deltaTime)
 {
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-	(*(*it)).update(deltaTime);
+		(*(*it)).update(deltaTime);
+		
 	}
 }
 
