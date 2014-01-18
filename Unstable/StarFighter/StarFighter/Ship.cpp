@@ -2,6 +2,29 @@
 
 extern Game* CurrentGame;
 
+
+ShipConfig::ShipConfig()
+{
+	this->max_speed.x = 10.0f;
+	this->max_speed.y = 10.0f;
+	this->texturename = SHIP_FILENAME;
+}
+
+
+void ShipConfig::Init(sf::Vector2f m_max_speed, std::string m_texturename)
+{
+	this->max_speed.x = m_max_speed.x;
+	this->max_speed.y = m_max_speed.y;
+	this->texturename = m_texturename;
+}
+
+void Ship::getShipConfig(ShipConfig m_ship_config)
+{
+	ship_config = m_ship_config;
+	max_speed.x = ship_config.max_speed.x;
+	max_speed.y = ship_config.max_speed.y;
+}
+
 Ship::Ship()
 {
 	speed.x = 0;
@@ -62,13 +85,13 @@ void Ship::Update(sf::Time deltaTime)
 	}
 
 	//max speed constraints
-	if(abs(speed.x) > SHIP_MAX_SPEED_X)
+	if(abs(speed.x) > max_speed.x)
 	{
-		speed.x = speed.x > 0 ? SHIP_MAX_SPEED_X : -SHIP_MAX_SPEED_X;
+		speed.x = speed.x > 0 ? max_speed.x : -max_speed.x;
 	}
-	if(abs(speed.y) > SHIP_MAX_SPEED_Y)
+	if(abs(speed.y) > max_speed.y)
 	{
-		speed.y = speed.y > 0 ? SHIP_MAX_SPEED_Y : -SHIP_MAX_SPEED_Y;
+		speed.y = speed.y > 0 ? max_speed.y : -max_speed.y;
 	}
 
 	//screen borders contraints	
@@ -116,3 +139,4 @@ void Ship::Update(sf::Time deltaTime)
 
 	//printf("%f %f / %f \n", animatedSprite.getPosition().x, animatedSprite.getPosition().y, deltaTime.asSeconds() );	
 }
+

@@ -20,6 +20,14 @@
 
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
+class ShipConfig
+{
+public:
+	void Init(sf::Vector2f m_max_speed, std::string m_textureName);
+	ShipConfig();
+	std::string texturename;
+	sf::Vector2f max_speed;
+};
 
 class Ship : public sf::Drawable
 {
@@ -30,9 +38,12 @@ public :
 	void Update(sf::Time deltaTime);
 	void Display();
 	Weapon weapon;
+	ShipConfig ship_config;
+	void getShipConfig(ShipConfig m_ship_config);
 
 private:
 	sf::Vector2f speed;
+	sf::Vector2f max_speed;
 	bool moving;
 	Animation* currentAnimation;
 	Animation animation;
@@ -42,6 +53,8 @@ private:
 	}
 
 };
+
+
 
 
 #endif // SHIP_H_INCLUDED
