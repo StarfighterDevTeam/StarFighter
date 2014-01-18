@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include "TextureLoader.h"
 
+#define ENEMYX_FILENAME				"Assets/2D/enemyX.png"
+
 class Independant : public sf::Sprite
 {
 public:

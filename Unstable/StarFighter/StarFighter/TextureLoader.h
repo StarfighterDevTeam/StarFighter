@@ -77,6 +77,7 @@ public:
 		//Load all the TExtures:
 		this->getInstance()->loadTexture("Assets/2D/laser.png",4,12);
 		this->getInstance()->loadTexture("Assets/2D/player_sprite.png",192,64);
+		this->getInstance()->loadTexture("Assets/2D/enemyX.png",32,32);
 	}
 
 	// Fonctions de création et destruction du singleton

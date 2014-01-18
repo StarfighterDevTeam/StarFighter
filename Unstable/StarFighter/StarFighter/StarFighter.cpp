@@ -13,8 +13,11 @@ int main()
 	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,600),Vector2f(0,0));
 	(*CurrentGame).addToScene(bg);
 
+	Independant* badguy = new Independant(sf::Vector2f(400,100),sf::Vector2f(0,+20),ENEMYX_FILENAME,Vector2f(32,32),Vector2f(0,0));
+	(*CurrentGame).addToScene(badguy);
+
 	Ship myShip;
-	myShip.Init(0,0);
+	myShip.Init(400,500);
 
 	//update
 	sf::Time dt;

@@ -1,6 +1,5 @@
 #include "Independant.h"
 
-
 Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin)  : Sprite()
 {
 	TextureLoader *loader;
