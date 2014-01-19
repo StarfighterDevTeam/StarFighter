@@ -21,9 +21,8 @@ void Weapon::Fire(IndependantType collider_type)
 		Independant* laser = new Independant(sf::Vector2f(getPosition().x,getPosition().y- ((LASER_HEIGHT/2)*(fire_direction.y))),sf::Vector2f(0*(fire_direction.x),-500*(fire_direction.y)), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT));
 		laser->setVisible(true);
 		laser->collider_type = collider_type;
+		laser->isOnScene = true;
 		(*CurrentGame).addToScene(laser,1);
-
-		printf("Tir de laser %f %f \n", laser->getPosition().x, laser->getPosition().y);
 
 		deltaClock.restart();
 		firing_ready = false;		

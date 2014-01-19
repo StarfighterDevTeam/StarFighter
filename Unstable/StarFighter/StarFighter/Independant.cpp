@@ -40,7 +40,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->speed = speed;
 	this->setPosition(position.x,position.y);
 	this->visible = false;
-
+	this->isOnScene = false;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber)
@@ -54,7 +54,11 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 	Init(position,speed,texture,frameNumber);
 }
 
+Independant::~Independant()
+{
+	//Unload Texture
 
+}
 
 
 void Independant::update(sf::Time deltaTime)
@@ -83,6 +87,9 @@ bool Independant::collide_with (const Independant& independant)
 	if (!visible || !(independant.visible))
 		return false;
 
+	if (!isOnScene || !(independant.isOnScene))
+		return false;
+
 	// Some types of independant don't colide with each others
 	// 0=bg; 1=ship ; 2=friendly fire ; 3= enemy fire ; 4=enemy;	
 	else if (   (independant.collider_type==IndependantType::Background || collider_type==IndependantType::Background ) 
@@ -91,9 +98,9 @@ bool Independant::collide_with (const Independant& independant)
 
 		|| (independant.collider_type==IndependantType::FriendlyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::PlayerShip || collider_type==IndependantType::EnemyFire)) 
 
-		|| (independant.collider_type==IndependantType::EnemyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire || collider_type==IndependantType::EnemyObject)) 
+		|| (independant.collider_type==IndependantType::EnemyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire || collider_type==IndependantType::EnemyObject  || collider_type==IndependantType::EnemyFire)) 
 
-		|| (independant.collider_type==IndependantType::EnemyObject && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire || collider_type==IndependantType::EnemyFire))	)		
+		|| (independant.collider_type==IndependantType::EnemyObject && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire  || collider_type==IndependantType::EnemyObject || collider_type==IndependantType::EnemyFire))	)		
 
 		return false;
 

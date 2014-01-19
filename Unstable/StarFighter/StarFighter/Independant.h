@@ -22,17 +22,20 @@ public:
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
+	~Independant();
 
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
+	bool isOnScene;
 	IndependantType collider_type;
 	void setVisible(bool visible);
 	bool collide_with (const Independant& independant);
+	sf::Vector2f m_size;
 
 protected:
-	sf::Vector2f m_size;
 	sf::Vector2f speed;
+	std::string textureName;
 	Animation defaultAnimation;
 	Animation* currentAnimation;
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);

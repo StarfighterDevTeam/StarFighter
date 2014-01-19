@@ -18,6 +18,7 @@ void Game::init(RenderWindow* window)
 	{
 		sceneIndependantsLayered[i] = new std::list<Independant*>;
 	}
+
 }
 
 
@@ -42,13 +43,21 @@ void Game::addToScene(Independant *object, int layer /* 0 */)
 
 void Game::updateScene(Time deltaTime)
 {
+
+	printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
+
+	//Collect & clean garbage
+	collectGarbage();
+	cleanGarbage();
+
 	//Checking colisions
-	colisionChecks(deltaTime);
+	colisionChecks();
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
 		(*(*it)).update(deltaTime);
 	}
+
 }
 
 void Game::drawScene()
@@ -63,7 +72,7 @@ void Game::drawScene()
 	}
 }
 
-void Game::colisionChecks(Time deltaTime)
+void Game::colisionChecks()
 {
 	for (std::list<Independant*>::iterator it1 = (this->sceneIndependants).begin(); it1 != std::prev((this->sceneIndependants).end()); it1++)
 	{
@@ -73,10 +82,16 @@ void Game::colisionChecks(Time deltaTime)
 			if((*(*it1)).collide_with((*(*it2))))
 			{
 				if((*(*it1)).collider_type == FriendlyFire || (*(*it1)).collider_type == EnemyFire)
+				{
 					(*(*it1)).setVisible(false);
+					this->garbage.push_back(*it1);
+				}
 
 				if((*(*it2)).collider_type == FriendlyFire || (*(*it2)).collider_type == EnemyFire)
+				{
 					(*(*it2)).setVisible(false);
+					this->garbage.push_back(*it2);
+				}
 
 				printf("boom [%s vs %s]\n", IndependantTypeValues[(*(*it1)).collider_type], IndependantTypeValues[(*(*it2)).collider_type]);
 			}
@@ -84,4 +99,47 @@ void Game::colisionChecks(Time deltaTime)
 	}
 }
 
+void Game::cleanGarbage()
+{
 
+	for (std::vector<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
+	{
+		this->sceneIndependants.remove(*it);
+		for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
+		{
+			(*(this->sceneIndependantsLayered[i])).remove(*it);
+		}
+		(*it)->~Independant();
+	}
+
+	this->garbage.clear();
+
+}
+
+void Game::collectGarbage()
+{
+	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
+	{
+		//isOnScene -> true
+		if(!(**it).isOnScene)
+		{
+			if(((**it).getPosition().x + ((**it).m_size.x)/2 >= 0 && (**it).getPosition().x - ((**it).m_size.x)/2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y)/2 >= 0 && (**it).getPosition().y - ((**it).m_size.y)/2 <= SCENE_SIZE_Y))
+			{
+				(**it).isOnScene = true;
+			}
+		}
+
+		if((**it).collider_type == Background || !(**it).isOnScene)
+		{
+			continue;
+		}
+
+		//Out of scene content
+		if((**it).getPosition().x < 0 + ((**it).m_size.x)/2 < 0 ||  (**it).getPosition().x - ((**it).m_size.x)/2 > SCENE_SIZE_X ||(**it).getPosition().y + ((**it).m_size.y)/2 < 0 || (**it).getPosition().y - ((**it).m_size.y)/2 > SCENE_SIZE_Y)
+		{
+			this->garbage.push_back(*it);
+			continue;
+		}
+
+	}
+}

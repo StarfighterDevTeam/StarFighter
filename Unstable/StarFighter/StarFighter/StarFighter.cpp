@@ -6,6 +6,8 @@ int main()
 {
 	sf::RenderWindow*	window = new sf::RenderWindow( sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter" );
 
+	window->setKeyRepeatEnabled(false);
+
 	CurrentGame = new Game();
 	(*CurrentGame).init(window);
 
@@ -14,10 +16,7 @@ int main()
 	bg->setVisible(true);
 	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer);
 
-	Enemy* badguy = new Enemy(sf::Vector2f(400,100),sf::Vector2f(0,+20),ENEMYX_FILENAME,Vector2f(32,32));
-	badguy->collider_type = IndependantType::EnemyObject;
-	badguy->setVisible(true);
-	(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer);
+	srand (time(NULL));
 
 	ShipConfig* shipA;
 	shipA = new ShipConfig();
@@ -53,6 +52,14 @@ int main()
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();
+
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+		{
+			Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32));
+			badguy->collider_type = IndependantType::EnemyObject;
+			badguy->setVisible(true);
+			(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer);
+		}
 
 		dt = deltaClock.restart();
 
