@@ -2,6 +2,7 @@
 #define GLOBALS_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 #include "TextureLoader.h"
 #include "Independant.h"
 #include "Game.h"

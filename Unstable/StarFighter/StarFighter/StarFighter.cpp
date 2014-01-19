@@ -5,7 +5,7 @@ Game* CurrentGame;
 int main()
 {
 	sf::RenderWindow*	window = new sf::RenderWindow( sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter" );
-
+	glEnable(GL_TEXTURE_2D);
 	window->setKeyRepeatEnabled(false);
 
 	CurrentGame = new Game();
