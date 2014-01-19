@@ -14,6 +14,7 @@ struct Weapon : public sf::Sprite
     Weapon();
 	bool firing_ready;
 	void Fire();
+	sf::Vector2u fire_direction;
 
 	sf::Clock deltaClock;
 };

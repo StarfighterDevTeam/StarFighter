@@ -7,6 +7,7 @@ Weapon::Weapon()
 	speed.x = 0;
 	speed.y = 0;
 	firing_ready = true;
+	fire_direction = sf::Vector2u(0, 1);
 }
 /*
 void Weapon::Init(int x, int y)
@@ -28,7 +29,7 @@ void Weapon::Fire()
 
 	if (firing_ready)
 	{
-		Independant* laser = new Independant(sf::Vector2f(getPosition().x,getPosition().y- (LASER_HEIGHT/2)),sf::Vector2f(0,-500), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT));
+		Independant* laser = new Independant(sf::Vector2f(getPosition().x,getPosition().y- ((LASER_HEIGHT/2)*fire_direction.y)),sf::Vector2f(0*fire_direction.x,-500*fire_direction.y), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT));
 		laser->setVisible(true);
 		laser->collider_type = 2; // 0=bg; 1=ship ; 2=friendly fire ; 3= enemy fire ; 4=enemy;
 		(*CurrentGame).addToScene(laser);
