@@ -11,10 +11,13 @@ int main()
 
 	//adding background
 	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1200));
-	(*CurrentGame).addToScene(bg);
+	bg->setVisible(true);
+	(*CurrentGame).addToScene(bg,0);
 
-	Independant* badguy = new Independant(sf::Vector2f(400,100),sf::Vector2f(0,+20),ENEMYX_FILENAME,Vector2f(32,32),Vector2f(0,0));
-	(*CurrentGame).addToScene(badguy);
+	Enemy* badguy = new Enemy(sf::Vector2f(400,100),sf::Vector2f(0,+20),ENEMYX_FILENAME,Vector2f(32,32));
+	badguy->collider_type = 4;
+	badguy->setVisible(true);
+	(*CurrentGame).addToScene(badguy,6);
 
 	ShipConfig* shipA;
 	shipA = new ShipConfig();
@@ -23,9 +26,8 @@ int main()
 	shipB = new ShipConfig();
 	shipB->Init(sf::Vector2f(200.0f, 200.0f), SHIP_FILENAME);
 
-	Ship myShip;
-	myShip.Init(400,500);
-	myShip.getShipConfig(*shipA);
+	Ship myShip(Vector2f(400,500),*shipA);
+	(*CurrentGame).addToScene(&myShip,7);
 
 	//update
 	sf::Time dt;
@@ -40,14 +42,14 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window->close();
-			
+
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
-				myShip.getShipConfig(*shipA);
+			myShip.setShipConfig(*shipA);
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
-				myShip.getShipConfig(*shipB);
+			myShip.setShipConfig(*shipB);
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();
@@ -55,13 +57,13 @@ int main()
 		dt = deltaClock.restart();
 
 		(*CurrentGame).updateScene(dt);
-		myShip.Update(dt);
+		//myShip.Update(dt);
 
 		//display
 		window->clear();
 
 		(*CurrentGame).drawScene();
-		window->draw(myShip);
+		//window->draw(myShip);
 
 		window->display();
 	}

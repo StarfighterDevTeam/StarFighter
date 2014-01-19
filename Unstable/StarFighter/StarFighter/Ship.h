@@ -29,28 +29,27 @@ public:
 	sf::Vector2f max_speed;
 };
 
-class Ship : public sf::Drawable
+class Ship : public Independant
 {
 
 public :
-	Ship();
+	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init(int x, int y);
-	void Update(sf::Time deltaTime);
-	void Display();
+	void update(sf::Time deltaTime) override;
 	Weapon weapon;
-	ShipConfig ship_config;
-	void getShipConfig(ShipConfig m_ship_config);
+	void setShipConfig(ShipConfig m_ship_config);
 
 private:
-	sf::Vector2f speed;
-	sf::Vector2f max_speed;
 	bool moving;
-	Animation* currentAnimation;
-	Animation animation;
-	AnimatedSprite animatedSprite;
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
-		target.draw(animatedSprite, states);
-	}
+	ShipConfig ship_config;
+
+	//Independant* shipSprite;
+	//Animation* currentAnimation;
+	//Animation animation;
+	//AnimatedSprite animatedSprite;
+	/*virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	target.draw(*shipSprite, states);
+	}*/
 
 };
 

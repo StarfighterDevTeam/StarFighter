@@ -11,10 +11,10 @@
 struct Weapon : public sf::Sprite
 {
 	sf::Vector2f speed;
-    Weapon();
+	Weapon();
 	bool firing_ready;
-	void Fire();
-	sf::Vector2u fire_direction;
+	void Fire(int collider_type = 2);
+	sf::Vector2i fire_direction;
 
 	sf::Clock deltaClock;
 };

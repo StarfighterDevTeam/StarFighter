@@ -2,6 +2,7 @@
 
 extern Game* CurrentGame;
 
+using namespace sf;
 
 ShipConfig::ShipConfig()
 {
@@ -18,41 +19,41 @@ void ShipConfig::Init(sf::Vector2f m_max_speed, std::string m_texturename)
 	this->texturename = m_texturename;
 }
 
-void Ship::getShipConfig(ShipConfig m_ship_config)
+
+Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.texturename, Vector2f(192,64),Vector2f(32,32),3)
 {
-	ship_config = m_ship_config;
-	max_speed.x = ship_config.max_speed.x;
-	max_speed.y = ship_config.max_speed.y;
+	this->collider_type = 1;
+	this->ship_config = m_ship_config;
+	moving = false;	
+	this->visible = true;
+	//this->animatedSprite = AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
+	//this->animatedSprite.setOrigin(SHIP_WIDTH/2, SHIP_HEIGHT/2);
 }
 
-Ship::Ship()
+void Ship::setShipConfig(ShipConfig m_ship_config)
 {
-	speed.x = 0;
-	speed.y = 0;
-	moving = false;	
-	this->animatedSprite = AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
-	this->animatedSprite.setOrigin(SHIP_WIDTH/2, SHIP_HEIGHT/2);
+	this->ship_config = m_ship_config;
 }
 
 void Ship::Init(int x, int y)
 {
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance ();
-	sf::Texture* texture = loader->loadTexture(SHIP_FILENAME,192,64);
+	//this->shipSprite = new Independant(Vector2f(x,y), Vector2f(speed.x,speed.y), SHIP_FILENAME, Vector2f(192,64),Vector2f(32,32),3);
+	//(*CurrentGame).addToScene(shipSprite,7);
 
+	/*
 	//Loading ship animation
 	static Animation shipDefaultAnimation;
 	shipDefaultAnimation.setSpriteSheet(*texture);
 	shipDefaultAnimation.addFrame(sf::IntRect(0, 0, 64, 64));
-    shipDefaultAnimation.addFrame(sf::IntRect(64, 0, 64, 64));
-    shipDefaultAnimation.addFrame(sf::IntRect(128, 0, 64, 64));
+	shipDefaultAnimation.addFrame(sf::IntRect(64, 0, 64, 64));
+	shipDefaultAnimation.addFrame(sf::IntRect(128, 0, 64, 64));
 
 	Animation* currentAnimation = &shipDefaultAnimation;
-    this->animatedSprite.setPosition((float)x,(float)y);
-	this->animatedSprite.play(*currentAnimation);
+	this->animatedSprite.setPosition((float)x,(float)y);
+	this->animatedSprite.play(*currentAnimation);*/
 }
 
-void Ship::Update(sf::Time deltaTime)
+void Ship::update(sf::Time deltaTime)
 {
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
@@ -78,49 +79,49 @@ void Ship::Update(sf::Time deltaTime)
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		weapon.setPosition(animatedSprite.getPosition().x, (animatedSprite.getPosition().y - (SHIP_HEIGHT/2)) );
+		weapon.setPosition(this->getPosition().x, (this->getPosition().y - (SHIP_HEIGHT/2)) );
 		//weapon.setPosition((animatedSprite.getPosition().x, animatedSprite.getPosition().y) - (SHIP_HEIGHT/2);
 		weapon.Fire();
-		
+
 	}
 
 	//max speed constraints
-	if(abs(speed.x) > max_speed.x)
+	if(abs(speed.x) > this->ship_config.max_speed.x)
 	{
-		speed.x = speed.x > 0 ? max_speed.x : -max_speed.x;
+		speed.x = speed.x > 0 ?  this->ship_config.max_speed.x : - this->ship_config.max_speed.x;
 	}
-	if(abs(speed.y) > max_speed.y)
+	if(abs(speed.y) >  this->ship_config.max_speed.y)
 	{
-		speed.y = speed.y > 0 ? max_speed.y : -max_speed.y;
+		speed.y = speed.y > 0 ?  this->ship_config.max_speed.y : - this->ship_config.max_speed.y;
 	}
 
 	//screen borders contraints	
-	if (animatedSprite.getPosition().x < SHIP_WIDTH/2)
-		{
-			animatedSprite.setPosition(SHIP_WIDTH/2, animatedSprite.getPosition().y);
-			speed.x = 0;
-		}
+	if (this->getPosition().x < SHIP_WIDTH/2)
+	{
+		this->setPosition(SHIP_WIDTH/2, this->getPosition().y);
+		speed.x = 0;
+	}
 
-	if (animatedSprite.getPosition().x > WINDOW_RESOLUTION_X - (SHIP_WIDTH/2))
-		{
-			animatedSprite.setPosition(WINDOW_RESOLUTION_X-(SHIP_WIDTH/2), animatedSprite.getPosition().y);
-			speed.x = 0;
-		}
+	if (this->getPosition().x > WINDOW_RESOLUTION_X - (SHIP_WIDTH/2))
+	{
+		this->setPosition(WINDOW_RESOLUTION_X-(SHIP_WIDTH/2), this->getPosition().y);
+		speed.x = 0;
+	}
 
-	if (animatedSprite.getPosition().y < SHIP_HEIGHT/2)
-		{
-			animatedSprite.setPosition(animatedSprite.getPosition().x, SHIP_HEIGHT/2);
-			speed.y = 0;
-		}
+	if (this->getPosition().y < SHIP_HEIGHT/2)
+	{
+		this->setPosition(this->getPosition().x, SHIP_HEIGHT/2);
+		speed.y = 0;
+	}
 
-	if (animatedSprite.getPosition().y > WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2))
-		{
-			animatedSprite.setPosition(animatedSprite.getPosition().x, WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2));
-			speed.y = 0;
-		}
-	
+	if (this->getPosition().y > WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2))
+	{
+		this->setPosition(this->getPosition().x, WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2));
+		speed.y = 0;
+	}
+
 	//moving stuff
-	animatedSprite.setPosition(animatedSprite.getPosition().x + (speed.x)*deltaTime.asSeconds(), animatedSprite.getPosition().y + (speed.y)*deltaTime.asSeconds());
+	//this->setPosition(this->getPosition().x + (speed.x)*deltaTime.asSeconds(), this->getPosition().y + (speed.y)*deltaTime.asSeconds());
 
 	//idle decceleration
 	if(!moving)
@@ -135,8 +136,6 @@ void Ship::Update(sf::Time deltaTime)
 			speed.y = 0;
 	}
 
-	animatedSprite.update(deltaTime);
-
-	//printf("%f %f / %f \n", animatedSprite.getPosition().x, animatedSprite.getPosition().y, deltaTime.asSeconds() );	
+	Independant::update(deltaTime);
 }
 
