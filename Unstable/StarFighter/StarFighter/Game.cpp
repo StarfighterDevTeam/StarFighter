@@ -44,7 +44,7 @@ void Game::addToScene(Independant *object, int layer /* 0 */)
 void Game::updateScene(Time deltaTime)
 {
 
-	printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
+	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
 	//Collect & clean garbage
 	collectGarbage();
@@ -53,11 +53,15 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecks();
 
+	sf::Clock dt;
+	dt.restart();
+
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
 		(*(*it)).update(deltaTime);
 	}
 
+	printf("| Updates: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::drawScene()
@@ -74,6 +78,9 @@ void Game::drawScene()
 
 void Game::colisionChecks()
 {
+	sf::Clock dt;
+	dt.restart();
+
 	for (std::list<Independant*>::iterator it1 = (this->sceneIndependants).begin(); it1 != std::prev((this->sceneIndependants).end()); it1++)
 	{
 		for (std::list<Independant*>::iterator it2 = std::next(it1); it2 != (this->sceneIndependants).end(); it2++)
@@ -93,14 +100,18 @@ void Game::colisionChecks()
 					this->garbage.push_back(*it2);
 				}
 
-				printf("boom [%s vs %s]\n", IndependantTypeValues[(*(*it1)).collider_type], IndependantTypeValues[(*(*it2)).collider_type]);
+				//printf("boom [%s vs %s]\n", IndependantTypeValues[(*(*it1)).collider_type], IndependantTypeValues[(*(*it2)).collider_type]);
 			}
 		}
 	}
+
+	printf("| Colisions: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::cleanGarbage()
 {
+	sf::Clock dt;
+	dt.restart();
 
 	for (std::vector<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
 	{
@@ -114,10 +125,14 @@ void Game::cleanGarbage()
 
 	this->garbage.clear();
 
+	printf("| CleanG: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::collectGarbage()
 {
+	sf::Clock dt;
+	dt.restart();
+
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
 		//isOnScene -> true
@@ -142,4 +157,7 @@ void Game::collectGarbage()
 		}
 
 	}
+
+	printf("CollectG: %d ",dt.getElapsedTime().asMilliseconds());
+
 }
