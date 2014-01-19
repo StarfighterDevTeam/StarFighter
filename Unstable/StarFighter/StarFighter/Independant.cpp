@@ -27,7 +27,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->m_size.x = ((*texture).getSize().x/frameNumber);
 	this->m_size.y = ((*texture).getSize().y);
 
-	this->collider_type = 0;
+	this->collider_type = IndependantType::Background;
 	this->defaultAnimation.setSpriteSheet(*texture);
 	for(int i=0; i< frameNumber;i++)
 	{
@@ -85,15 +85,15 @@ bool Independant::collide_with (const Independant& independant)
 
 	// Some types of independant don't colide with each others
 	// 0=bg; 1=ship ; 2=friendly fire ; 3= enemy fire ; 4=enemy;	
-	else if (   (independant.collider_type==0) 
+	else if (   (independant.collider_type==IndependantType::Background || collider_type==IndependantType::Background ) 
 
-		|| (independant.collider_type==1 && (collider_type==0 || collider_type==2)) 
+		|| (independant.collider_type==IndependantType::PlayerShip && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire)) 
 
-		|| (independant.collider_type==2 && (collider_type==0 || collider_type==1 || collider_type==3)) 
+		|| (independant.collider_type==IndependantType::FriendlyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::PlayerShip || collider_type==IndependantType::EnemyFire)) 
 
-		|| (independant.collider_type==3 && (collider_type==0 || collider_type==2 || collider_type==4)) 
+		|| (independant.collider_type==IndependantType::EnemyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire || collider_type==IndependantType::EnemyObject)) 
 
-		|| (independant.collider_type==4 && (collider_type==0 || collider_type==2 || collider_type==3))	)		
+		|| (independant.collider_type==IndependantType::EnemyObject && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire || collider_type==IndependantType::EnemyFire))	)		
 
 		return false;
 

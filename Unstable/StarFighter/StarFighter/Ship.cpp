@@ -22,35 +22,15 @@ void ShipConfig::Init(sf::Vector2f m_max_speed, std::string m_texturename)
 
 Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.texturename, Vector2f(192,64),Vector2f(32,32),3)
 {
-	this->collider_type = 1;
+	this->collider_type =  IndependantType::PlayerShip;
 	this->ship_config = m_ship_config;
 	moving = false;	
 	this->visible = true;
-	//this->animatedSprite = AnimatedSprite(sf::seconds(SHIP_SPRITE_RATE_SEC), false, true);
-	//this->animatedSprite.setOrigin(SHIP_WIDTH/2, SHIP_HEIGHT/2);
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
 {
 	this->ship_config = m_ship_config;
-}
-
-void Ship::Init(int x, int y)
-{
-	//this->shipSprite = new Independant(Vector2f(x,y), Vector2f(speed.x,speed.y), SHIP_FILENAME, Vector2f(192,64),Vector2f(32,32),3);
-	//(*CurrentGame).addToScene(shipSprite,7);
-
-	/*
-	//Loading ship animation
-	static Animation shipDefaultAnimation;
-	shipDefaultAnimation.setSpriteSheet(*texture);
-	shipDefaultAnimation.addFrame(sf::IntRect(0, 0, 64, 64));
-	shipDefaultAnimation.addFrame(sf::IntRect(64, 0, 64, 64));
-	shipDefaultAnimation.addFrame(sf::IntRect(128, 0, 64, 64));
-
-	Animation* currentAnimation = &shipDefaultAnimation;
-	this->animatedSprite.setPosition((float)x,(float)y);
-	this->animatedSprite.play(*currentAnimation);*/
 }
 
 void Ship::update(sf::Time deltaTime)
@@ -81,7 +61,7 @@ void Ship::update(sf::Time deltaTime)
 	{
 		weapon.setPosition(this->getPosition().x, (this->getPosition().y - (SHIP_HEIGHT/2)) );
 		//weapon.setPosition((animatedSprite.getPosition().x, animatedSprite.getPosition().y) - (SHIP_HEIGHT/2);
-		weapon.Fire();
+		weapon.Fire(FriendlyFire);
 
 	}
 

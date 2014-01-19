@@ -13,7 +13,7 @@ struct Weapon : public sf::Sprite
 	sf::Vector2f speed;
 	Weapon();
 	bool firing_ready;
-	void Fire(int collider_type = 2);
+	void Fire(IndependantType collider_type);
 	sf::Vector2i fire_direction;
 
 	sf::Clock deltaClock;

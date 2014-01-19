@@ -1,4 +1,14 @@
 #include "Game.h"
+#define stringify(x)  #x
+
+const char* IndependantTypeValues[] = 
+{
+	stringify( Background ),
+	stringify( PlayerShip ),
+	stringify( FriendlyFire ),
+	stringify( EnemyFire ),
+	stringify( EnemyObject )
+};
 
 void Game::init(RenderWindow* window)
 {
@@ -59,17 +69,16 @@ void Game::colisionChecks(Time deltaTime)
 	{
 		for (std::list<Independant*>::iterator it2 = std::next(it1); it2 != (this->sceneIndependants).end(); it2++)
 		{
-
 			//Bullets are invisible after impact
 			if((*(*it1)).collide_with((*(*it2))))
 			{
-				if((*(*it1)).collider_type == 2 || (*(*it1)).collider_type == 3)
+				if((*(*it1)).collider_type == FriendlyFire || (*(*it1)).collider_type == EnemyFire)
 					(*(*it1)).setVisible(false);
 
-				if((*(*it2)).collider_type == 2 || (*(*it2)).collider_type == 3)
+				if((*(*it2)).collider_type == FriendlyFire || (*(*it2)).collider_type == EnemyFire)
 					(*(*it2)).setVisible(false);
 
-				printf("boom [%d vs %d]\n", (*(*it1)).collider_type, (*(*it2)).collider_type);
+				printf("boom [%s vs %s]\n", IndependantTypeValues[(*(*it1)).collider_type], IndependantTypeValues[(*(*it2)).collider_type]);
 			}
 		}
 	}

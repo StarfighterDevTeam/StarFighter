@@ -6,6 +6,15 @@
 
 using namespace sf;
 
+enum LayerType {
+	BackgroundLayer,
+	PlayerShipLayer,
+	FriendlyFireLayer,
+	EnemyFireLayer,
+	EnemyObjectLayer,
+	NBVAL_Layer
+};
+
 struct Game 
 {
 public:
@@ -21,7 +30,7 @@ public:
 private:
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
-	std::list<Independant*>* sceneIndependantsLayered[8];
+	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];
 };
 
 #endif // GAME_H_INCLUDED

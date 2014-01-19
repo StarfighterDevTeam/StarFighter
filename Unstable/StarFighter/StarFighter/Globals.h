@@ -9,4 +9,5 @@
 #define	WINDOW_RESOLUTION_X						800
 #define WINDOW_RESOLUTION_Y						600
 
+
 #endif // GLOBALS_H_INCLUDED

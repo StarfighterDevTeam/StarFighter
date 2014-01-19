@@ -12,12 +12,12 @@ int main()
 	//adding background
 	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1200));
 	bg->setVisible(true);
-	(*CurrentGame).addToScene(bg,0);
+	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer);
 
 	Enemy* badguy = new Enemy(sf::Vector2f(400,100),sf::Vector2f(0,+20),ENEMYX_FILENAME,Vector2f(32,32));
-	badguy->collider_type = 4;
+	badguy->collider_type = IndependantType::EnemyObject;
 	badguy->setVisible(true);
-	(*CurrentGame).addToScene(badguy,6);
+	(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer);
 
 	ShipConfig* shipA;
 	shipA = new ShipConfig();
@@ -27,7 +27,7 @@ int main()
 	shipB->Init(sf::Vector2f(200.0f, 200.0f), SHIP_FILENAME);
 
 	Ship myShip(Vector2f(400,500),*shipA);
-	(*CurrentGame).addToScene(&myShip,7);
+	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer);
 
 	//update
 	sf::Time dt;

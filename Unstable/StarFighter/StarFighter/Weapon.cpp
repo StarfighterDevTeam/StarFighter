@@ -9,18 +9,7 @@ Weapon::Weapon()
 	firing_ready = true;
 	fire_direction = sf::Vector2i(0, 1);
 }
-/*
-void Weapon::Init(int x, int y)
-{
-TextureLoader *loader;
-loader = TextureLoader::getInstance ();
-sf::Texture* texture = loader->loadTexture(LASER_FILENAME,LASER_WIDTH,LASER_HEIGHT);
-
-this->setTexture(*texture);
-setOrigin(LASER_WIDTH/2, LASER_HEIGHT/2);
-}
-*/
-void Weapon::Fire(int collider_type)
+void Weapon::Fire(IndependantType collider_type)
 {
 	if (deltaClock.getElapsedTime() > sf::seconds(LASER_RATE_OF_FIRE))
 	{
@@ -31,7 +20,7 @@ void Weapon::Fire(int collider_type)
 	{
 		Independant* laser = new Independant(sf::Vector2f(getPosition().x,getPosition().y- ((LASER_HEIGHT/2)*(fire_direction.y))),sf::Vector2f(0*(fire_direction.x),-500*(fire_direction.y)), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT));
 		laser->setVisible(true);
-		laser->collider_type = collider_type; // 0=bg; 1=ship ; 2=friendly fire ; 3= enemy fire ; 4=enemy;
+		laser->collider_type = collider_type;
 		(*CurrentGame).addToScene(laser,1);
 
 		printf("Tir de laser %f %f \n", laser->getPosition().x, laser->getPosition().y);

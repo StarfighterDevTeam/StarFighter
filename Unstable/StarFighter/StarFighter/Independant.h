@@ -7,6 +7,14 @@
 
 #define ENEMYX_FILENAME				"Assets/2D/enemyX.png"
 
+enum IndependantType {
+	Background,
+	PlayerShip,
+	FriendlyFire,
+	EnemyFire,
+	EnemyObject
+};
+
 class Independant : public AnimatedSprite
 {
 public:
@@ -18,7 +26,7 @@ public:
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
-	int collider_type;
+	IndependantType collider_type;
 	void setVisible(bool visible);
 	bool collide_with (const Independant& independant);
 
