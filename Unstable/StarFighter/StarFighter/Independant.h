@@ -12,7 +12,8 @@ enum IndependantType {
 	PlayerShip,
 	FriendlyFire,
 	EnemyFire,
-	EnemyObject
+	EnemyObject,
+	NBVAL_Independant
 };
 
 class Independant : public AnimatedSprite

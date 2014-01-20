@@ -22,7 +22,7 @@ void Weapon::Fire(IndependantType collider_type)
 		laser->setVisible(true);
 		laser->collider_type = collider_type;
 		laser->isOnScene = true;
-		(*CurrentGame).addToScene(laser,1);
+		(*CurrentGame).addToScene(laser,PlayerShipLayer,collider_type);
 
 		deltaClock.restart();
 		firing_ready = false;		

@@ -14,9 +14,14 @@ void Game::init(RenderWindow* window)
 {
 	this->window = window;
 	TextureLoader::getInstance ()->loadAll();
+
 	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
 	{
 		sceneIndependantsLayered[i] = new std::list<Independant*>;
+	}
+	for(int i =0; i< (sizeof(sceneIndependantsTyped)/sizeof(*sceneIndependantsTyped));i++)
+	{
+		sceneIndependantsTyped[i] = new std::list<Independant*>;
 	}
 
 }
@@ -27,10 +32,11 @@ sf::RenderWindow* Game::getMainWindow()
 	return this->window;
 }
 
-void Game::addToScene(Independant *object, int layer /* 0 */)
+void Game::addToScene(Independant *object, int layer, IndependantType type)
 {
 	if(layer >= 0 && layer < (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered)))
 	{
+		(*(sceneIndependantsTyped[(int)type])).push_back(object);
 		(*(sceneIndependantsLayered[layer])).push_back(object); 
 		this->sceneIndependants.push_back(object);
 	}
@@ -51,7 +57,7 @@ void Game::updateScene(Time deltaTime)
 	cleanGarbage();
 
 	//Checking colisions
-	colisionChecks();
+	colisionChecksV2();
 
 	sf::Clock dt;
 	dt.restart();
@@ -110,6 +116,63 @@ void Game::colisionChecks()
 	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
+void Game::colisionChecksV2()
+{
+	sf::Clock dt;
+	dt.restart();
+	int i= 0;
+
+	//First, Checks if the ship has been touched by an enemy/enemy bullet
+	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); it1++)
+	{
+		//Enemy bullets
+		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).end(); it2++)
+		{
+			i++;
+			//Bullets are invisible after impact
+			if((*(*it1)).collide_with((*(*it2))))
+			{
+				if((*it2)->collider_type == EnemyFire)
+				{
+					(*it2)->setVisible(false);
+					this->garbage.push_back(*it2);
+					//Do something (like, kill ship)
+				}
+			}
+		}
+
+		//Enemy objects
+		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it2++)
+		{
+			i++;
+			if((*(*it1)).collide_with((*(*it2))))
+			{
+				//Do something (like, kill ship)
+			}
+		}
+	}
+
+	//Then, check if any allied bullet collide with any enemy
+	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).end(); it1++)
+	{
+		//Enemy objects
+		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it2++)
+		{
+			i++;
+			//Bullets are invisible after impact
+			if((*(*it1)).collide_with((*(*it2))))
+			{
+				(*it1)->setVisible(false);
+				this->garbage.push_back(*it1);
+
+				//Do something (like, kill the enemy ship ?)
+			}
+		}
+	}
+
+	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
+}
+
 void Game::cleanGarbage()
 {
 	sf::Clock dt;
@@ -121,6 +184,10 @@ void Game::cleanGarbage()
 		for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
 		{
 			(*(this->sceneIndependantsLayered[i])).remove(*it);
+		}
+		for(int i =0; i< (sizeof(sceneIndependantsTyped)/sizeof(*sceneIndependantsTyped));i++)
+		{
+			(*(this->sceneIndependantsTyped[i])).remove(*it);
 		}
 		(*it)->~Independant();
 	}

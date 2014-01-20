@@ -22,10 +22,11 @@ struct Game
 public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	void addToScene(Independant *object, int layer = 4);
+	void addToScene(Independant *object, int layer, IndependantType type);
 	void updateScene(Time deltaTime);
 	void drawScene();
 	void colisionChecks();
+	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
 
@@ -35,6 +36,7 @@ private:
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];
+	std::list<Independant*>* sceneIndependantsTyped[NBVAL_Independant];
 	std::vector<Independant*> garbage;
 };
 

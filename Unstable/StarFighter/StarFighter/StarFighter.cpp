@@ -14,7 +14,7 @@ int main()
 	//adding background
 	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1200));
 	bg->setVisible(true);
-	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer);
+	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
 
 	srand (time(NULL));
 
@@ -26,7 +26,7 @@ int main()
 	shipB->Init(sf::Vector2f(200.0f, 200.0f), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 
 	Ship myShip(Vector2f(400,500),*shipB);
-	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer);
+	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer,IndependantType::PlayerShip);
 
 	//update
 	sf::Time dt;
@@ -58,7 +58,7 @@ int main()
 			Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32));
 			badguy->collider_type = IndependantType::EnemyObject;
 			badguy->setVisible(true);
-			(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer);
+			(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
 		}
 
 		dt = deltaClock.restart();
