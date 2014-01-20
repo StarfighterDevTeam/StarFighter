@@ -61,7 +61,7 @@ void Game::updateScene(Time deltaTime)
 		(*(*it)).update(deltaTime);
 	}
 
-	printf("| Updates: %d \n",dt.getElapsedTime().asMilliseconds());
+	printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::drawScene()
@@ -80,11 +80,13 @@ void Game::colisionChecks()
 {
 	sf::Clock dt;
 	dt.restart();
+	int i= 0;
 
 	for (std::list<Independant*>::iterator it1 = (this->sceneIndependants).begin(); it1 != std::prev((this->sceneIndependants).end()); it1++)
 	{
 		for (std::list<Independant*>::iterator it2 = std::next(it1); it2 != (this->sceneIndependants).end(); it2++)
 		{
+			i++;
 			//Bullets are invisible after impact
 			if((*(*it1)).collide_with((*(*it2))))
 			{
@@ -105,7 +107,7 @@ void Game::colisionChecks()
 		}
 	}
 
-	printf("| Colisions: %d ",dt.getElapsedTime().asMilliseconds());
+	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
 void Game::cleanGarbage()
@@ -125,7 +127,7 @@ void Game::cleanGarbage()
 
 	this->garbage.clear();
 
-	printf("| CleanG: %d ",dt.getElapsedTime().asMilliseconds());
+	printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::collectGarbage()
@@ -158,6 +160,6 @@ void Game::collectGarbage()
 
 	}
 
-	printf("CollectG: %d ",dt.getElapsedTime().asMilliseconds());
+	printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
 }
