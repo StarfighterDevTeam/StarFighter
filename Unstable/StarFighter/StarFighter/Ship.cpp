@@ -8,19 +8,27 @@ ShipConfig::ShipConfig()
 {
 	this->max_speed.x = 10.0f;
 	this->max_speed.y = 10.0f;
-	this->texturename = SHIP_FILENAME;
+	this->decceleration = 200.0f;
+	this->size.x = SHIP_WIDTH;
+	this->size.y = SHIP_HEIGHT;
+	this->textureName = SHIP_FILENAME;
+	this->frameNumber = SHIP_NB_FRAMES;
 }
 
 
-void ShipConfig::Init(sf::Vector2f m_max_speed, std::string m_texturename)
+void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
-	this->texturename = m_texturename;
+	this->decceleration = m_decceleration;
+	this->size.x = m_size.x;
+	this->size.y = m_size.y;
+	this->textureName = m_textureName;
+	this->frameNumber = m_frameNumber;
 }
 
 
-Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.texturename, Vector2f(192,64),Vector2f(32,32),3)
+Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x/2),(m_ship_config.size.y/2)), m_ship_config.frameNumber)
 {
 	this->collider_type =  IndependantType::PlayerShip;
 	this->ship_config = m_ship_config;
@@ -59,7 +67,7 @@ void Ship::update(sf::Time deltaTime)
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		weapon.setPosition(this->getPosition().x, (this->getPosition().y - (SHIP_HEIGHT/2)) );
+		weapon.setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
 		//weapon.setPosition((animatedSprite.getPosition().x, animatedSprite.getPosition().y) - (SHIP_HEIGHT/2);
 		weapon.Fire(FriendlyFire);
 
@@ -76,27 +84,27 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	//screen borders contraints	
-	if (this->getPosition().x < SHIP_WIDTH/2)
+	if (this->getPosition().x < ship_config.size.x/2)
 	{
-		this->setPosition(SHIP_WIDTH/2, this->getPosition().y);
+		this->setPosition(ship_config.size.x/2, this->getPosition().y);
 		speed.x = 0;
 	}
 
-	if (this->getPosition().x > WINDOW_RESOLUTION_X - (SHIP_WIDTH/2))
+	if (this->getPosition().x > WINDOW_RESOLUTION_X - (ship_config.size.x/2))
 	{
-		this->setPosition(WINDOW_RESOLUTION_X-(SHIP_WIDTH/2), this->getPosition().y);
+		this->setPosition(WINDOW_RESOLUTION_X-(ship_config.size.x/2), this->getPosition().y);
 		speed.x = 0;
 	}
 
-	if (this->getPosition().y < SHIP_HEIGHT/2)
+	if (this->getPosition().y < ship_config.size.y/2)
 	{
-		this->setPosition(this->getPosition().x, SHIP_HEIGHT/2);
+		this->setPosition(this->getPosition().x, ship_config.size.y/2);
 		speed.y = 0;
 	}
 
-	if (this->getPosition().y > WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2))
+	if (this->getPosition().y > WINDOW_RESOLUTION_Y-(ship_config.size.y/2))
 	{
-		this->setPosition(this->getPosition().x, WINDOW_RESOLUTION_Y-(SHIP_HEIGHT/2));
+		this->setPosition(this->getPosition().x, WINDOW_RESOLUTION_Y-(ship_config.size.y/2));
 		speed.y = 0;
 	}
 
@@ -106,8 +114,8 @@ void Ship::update(sf::Time deltaTime)
 	//idle decceleration
 	if(!moving)
 	{
-		speed.x -= (speed.x)*deltaTime.asSeconds()*(SHIP_DECCELERATION_COEF/100);
-		speed.y -= (speed.y)*deltaTime.asSeconds()*(SHIP_DECCELERATION_COEF/100);
+		speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.decceleration/100);
+		speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.decceleration/100);
 
 		if(abs(speed.x) < SHIP_MIN_SPEED_X)
 			speed.x = 0;

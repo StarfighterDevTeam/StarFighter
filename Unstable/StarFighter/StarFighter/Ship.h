@@ -23,10 +23,13 @@
 class ShipConfig
 {
 public:
-	void Init(sf::Vector2f m_max_speed, std::string m_textureName);
+	void Init(sf::Vector2f m_max_speed, float m_decceleration, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
 	ShipConfig();
-	std::string texturename;
+	std::string textureName;
 	sf::Vector2f max_speed;
+	sf::Vector2f size;
+	float decceleration;
+	int frameNumber;
 };
 
 class Ship : public Independant

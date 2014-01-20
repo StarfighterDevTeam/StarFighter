@@ -20,12 +20,12 @@ int main()
 
 	ShipConfig* shipA;
 	shipA = new ShipConfig();
-	shipA->Init(sf::Vector2f(1000.0f, 1000.0f), SHIP_FILENAME);
+	shipA->Init(sf::Vector2f(1000.0f, 1000.0f), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 	ShipConfig* shipB;
 	shipB = new ShipConfig();
-	shipB->Init(sf::Vector2f(200.0f, 200.0f), SHIP_FILENAME);
+	shipB->Init(sf::Vector2f(200.0f, 200.0f), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 
-	Ship myShip(Vector2f(400,500),*shipA);
+	Ship myShip(Vector2f(400,500),*shipB);
 	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer);
 
 	//update

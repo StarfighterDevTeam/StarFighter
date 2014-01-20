@@ -6,6 +6,7 @@
 #define SHIP_FILENAME		"Assets/2D/player_sprite.png"
 #define SHIP_WIDTH			64
 #define SHIP_HEIGHT			64
+#define SHIP_NB_FRAMES		3
 
 #define LASER_FILENAME				"Assets/2D/laser.png"
 #define LASER_WIDTH					4
