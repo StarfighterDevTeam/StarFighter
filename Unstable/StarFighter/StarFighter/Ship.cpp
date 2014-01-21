@@ -174,10 +174,10 @@ void ShipConfig::setEquipment(Equipment* m_equipment)
 {
 	// TODO : pas exact, on peut avoir des types d'armes identiques dans différents slots... mais bon pour l'instant.
 	this->equipment[m_equipment->equipmentType] = m_equipment;
-	max_speed = getShipConfigMaxSpeed();
-	decceleration = getShipConfigDecceleration();
-	armor = getShipConfigArmor();
-	shield = getShipConfigShield();
+	this->max_speed = getShipConfigMaxSpeed();
+	this->decceleration = getShipConfigDecceleration();
+	this->armor = getShipConfigArmor();
+	this->shield = getShipConfigShield();
 	printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", this->getShipConfigMaxSpeed().x, this->ship_model->getShipModelMaxSpeed().x, this->equipment[Engine]->getEquipmentMaxSpeed().x);
 	printf ("\nShipConfig Deccel: %f <ShipModel: %f | Airbrake: %f>\n", this->getShipConfigDecceleration(), this->ship_model->getShipModelDecceleration(), this->equipment[Airbrake]->getEquipmentDecceleration());
 	printf ("\nShipConfig Armor: %d <ShipModel: %d | Armor: %d>\n", this->getShipConfigArmor(), this->ship_model->getShipModelArmor(), this->equipment[Armor]->getEquipmentArmor());
