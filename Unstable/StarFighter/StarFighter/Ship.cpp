@@ -3,24 +3,99 @@
 extern Game* CurrentGame;
 
 using namespace sf;
+#define stringify(x)  #x
+
+const char* EquipmentTypeValues[] = 
+{
+	stringify( Empty ),
+	stringify( Airbrake ),
+	stringify( Engine ),
+};
+
+ShipModel::ShipModel()
+{
+	this->max_speed.x = SHIP_MAX_SPEED_X;
+	this->max_speed.y = SHIP_MAX_SPEED_Y;
+	this->decceleration = SHIP_DECCELERATION_COEF;
+}
+
+//various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
+sf::Vector2f ShipModel::getShipModelMaxSpeed()
+{
+	return this->max_speed;
+}
+
+float ShipModel::getShipModelDecceleration()
+{
+	return this->decceleration;
+}
+	
+sf::Vector2f Equipment::getEquipmentMaxSpeed()
+{
+	return this->max_speed;
+}
+
+float Equipment::getEquipmentDecceleration()
+{
+	return this->decceleration;
+}
+
+sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
+{
+	sf::Vector2f new_max_speed;
+	new_max_speed.x = 0;
+	new_max_speed.y = 0;
+
+	new_max_speed.x += ship_model->getShipModelMaxSpeed().x + equipment[0]->getEquipmentMaxSpeed().x;
+	new_max_speed.y += ship_model->getShipModelMaxSpeed().y + equipment[0]->getEquipmentMaxSpeed().y;
+	return sf::Vector2f (new_max_speed.x, new_max_speed.y);
+}
+
+float ShipConfig::getShipConfigDecceleration()
+{
+	return this->ship_model->getShipModelDecceleration();
+}
+
+
+Equipment::Equipment()
+{
+	this->max_speed.x = 20.0f;
+	this->max_speed.y = 20.0f;
+	this->decceleration = 500.0f;
+	this->size.x = EQUIPMENT_WIDTH;
+	this->size.y = EQUIPMENT_HEIGHT;
+	this->textureName = EQUIPMENT_FILENAME;
+	this->equipmentType = EquipmentType::Empty;
+}
+
+void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , std::string m_textureName, sf::Vector2f m_size)
+{
+	this->max_speed.x = m_max_speed.x;
+	this->max_speed.y = m_max_speed.y;
+	this->decceleration = m_decceleration;
+	this->size.x = m_size.x;
+	this->size.y = m_size.y;
+	this->textureName = m_textureName;
+	this->equipmentType = m_equipmentType;
+};
 
 ShipConfig::ShipConfig()
 {
 	this->max_speed.x = 10.0f;
 	this->max_speed.y = 10.0f;
-	this->decceleration = 200.0f;
+	this->decceleration = 0.0f;
 	this->size.x = SHIP_WIDTH;
 	this->size.y = SHIP_HEIGHT;
 	this->textureName = SHIP_FILENAME;
 	this->frameNumber = SHIP_NB_FRAMES;
+	this->new_equipment = false;
 }
-
 
 void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
 {
-	this->max_speed.x = m_max_speed.x;
-	this->max_speed.y = m_max_speed.y;
-	this->decceleration = m_decceleration;
+	
+	this->max_speed = getShipConfigMaxSpeed();
+	this->decceleration = getShipConfigDecceleration();
 	this->size.x = m_size.x;
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
@@ -41,8 +116,30 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->ship_config = m_ship_config;
 }
 
+void ShipConfig::setEquipment(Equipment* m_equipment)
+{
+	// TODO : pas exact, on peut avoir des types d'armes identiques dans différents slots... mais bon pour l'instant.
+	this->equipment[m_equipment->equipmentType] = m_equipment;
+	this->new_equipment = true;
+	printf ("\nSet equipment: %s\n", EquipmentTypeValues[m_equipment->equipmentType]);
+}
+
+void ShipConfig::updateShipConfig()
+{
+	max_speed = getShipConfigMaxSpeed();
+	decceleration = getShipConfigDecceleration();
+}
+
 void Ship::update(sf::Time deltaTime)
 {
+	
+	if (this->ship_config.new_equipment)
+	{
+		ship_config.updateShipConfig();
+		printf ("\nEquipment updated");
+		ship_config.new_equipment=false;
+	}
+	
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{	
@@ -68,7 +165,6 @@ void Ship::update(sf::Time deltaTime)
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
 		weapon.setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
-		//weapon.setPosition((animatedSprite.getPosition().x, animatedSprite.getPosition().y) - (SHIP_HEIGHT/2);
 		weapon.Fire(FriendlyFire);
 
 	}

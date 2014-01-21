@@ -17,23 +17,58 @@ int main()
 	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer);
 
 	srand (time(NULL));
+	
+	ShipModel* shipModelDefault;
+	shipModelDefault = new ShipModel();
+
+	Equipment* airbrakeDefault;
+	airbrakeDefault = new Equipment();
+	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
+
+	Equipment* engineDefault;
+	engineDefault = new Equipment();
+	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
+
+	Equipment* airbrakeZ;
+	airbrakeZ = new Equipment();
+	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , AIRBRAKE_FILENAME);
+
+	Equipment* engineZ;
+	engineZ = new Equipment();
+	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , AIRBRAKE_FILENAME);
+
+	Equipment* emptyEquipment;
+	emptyEquipment = new Equipment();
+	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
 
 	ShipConfig* shipA;
 	shipA = new ShipConfig();
-	shipA->Init(sf::Vector2f(1000.0f, 1000.0f), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
-	ShipConfig* shipB;
-	shipB = new ShipConfig();
-	shipB->Init(sf::Vector2f(200.0f, 200.0f), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
-
-	Ship myShip(Vector2f(400,500),*shipB);
+	//hardcoded for now, to be built in constructor or in Init() function...
+	shipA->equipment[0] = emptyEquipment;
+	shipA->equipment[1] = airbrakeDefault;
+	shipA->equipment[2] = engineDefault;
+	shipA->ship_model = shipModelDefault;
+	//...until this point
+	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES/*, [aibrakeZ, engineZ]*/);
+	
+	Ship myShip(Vector2f(400,500),*shipA);
 	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer);
 
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
+	bool keyrepeat = false;
 
 	while (window->isOpen())
 	{
+		//to erase later...
+		sf::Clock deltaClockKeyPressed;
+		
+		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(1.0f))
+		{
+			keyrepeat = false;
+		}
+		// ... until here (avoiding key repeatition)
 
 		bool moving = false;
 		sf::Event event;
@@ -41,14 +76,51 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window->close();
-
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
-			myShip.setShipConfig(*shipA);
+			{
+				if (!keyrepeat)
+				{
+					myShip.ship_config.setEquipment(engineZ);
+					printf ("\nEngine Z mounted. \n");
+					keyrepeat = true;
+					deltaClockKeyPressed.restart();
+				}
+			}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+			{				
+				if (!keyrepeat)
+				{
+					myShip.ship_config.setEquipment(airbrakeZ);
+					printf ("\nAirbrake Z mounted. \n");
+					keyrepeat = true;
+					deltaClockKeyPressed.restart();
+				}
+			}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+			{				
+				if (!keyrepeat)
+				{
+					myShip.ship_config.setEquipment(engineDefault);
+					printf ("\nEngine default mounted. \n");
+					keyrepeat = true;
+					deltaClockKeyPressed.restart();
+				}
+			}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
-			myShip.setShipConfig(*shipB);
+			{			
+				if (!keyrepeat)
+				{
+					myShip.ship_config.setEquipment(airbrakeDefault);
+					printf ("\nAirbrake default mounted. \n");
+					keyrepeat = true;
+					deltaClockKeyPressed.restart();
+				}
+			}
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();
