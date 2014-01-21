@@ -37,7 +37,7 @@ void Game::addToScene(Independant *object, int layer /* 0 */)
 	else
 	{
 		//throw ?
-		printf("Erreur, mauvais layer, connard\n");
+		//printf("Erreur, mauvais layer, connard\n");
 	}
 }
 
@@ -61,7 +61,7 @@ void Game::updateScene(Time deltaTime)
 		(*(*it)).update(deltaTime);
 	}
 
-	printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
+	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::drawScene()
@@ -107,7 +107,7 @@ void Game::colisionChecks()
 		}
 	}
 
-	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
+	//printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
 void Game::cleanGarbage()
@@ -127,7 +127,7 @@ void Game::cleanGarbage()
 
 	this->garbage.clear();
 
-	printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
+	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::collectGarbage()
@@ -160,6 +160,6 @@ void Game::collectGarbage()
 
 	}
 
-	printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
+	//printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
 }

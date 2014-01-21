@@ -3,14 +3,6 @@
 extern Game* CurrentGame;
 
 using namespace sf;
-#define stringify(x)  #x
-
-const char* EquipmentTypeValues[] = 
-{
-	stringify( Empty ),
-	stringify( Airbrake ),
-	stringify( Engine ),
-};
 
 ShipModel::ShipModel()
 {
@@ -50,7 +42,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 	equipment_max_speed.x = 0;
 	equipment_max_speed.y = 0;
 
-	for (int i=0; i<3; i++)
+	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
 	{
 		equipment_max_speed.x += equipment[i]->getEquipmentMaxSpeed().x;
 		equipment_max_speed.y += equipment[i]->getEquipmentMaxSpeed().y;
@@ -67,7 +59,7 @@ float ShipConfig::getShipConfigDecceleration()
 	float new_decceleration = 0.0f;
 	float equipment_decceleration = 0.0f;
 
-	for (int i=0; i<3; i++)
+	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
 	{
 		equipment_decceleration += equipment[i]->getEquipmentDecceleration();
 	}
@@ -75,7 +67,6 @@ float ShipConfig::getShipConfigDecceleration()
 	new_decceleration = ship_model->getShipModelDecceleration() + equipment_decceleration;
 	return new_decceleration;
 }
-
 
 Equipment::Equipment()
 {
@@ -108,7 +99,6 @@ ShipConfig::ShipConfig()
 	this->size.y = SHIP_HEIGHT;
 	this->textureName = SHIP_FILENAME;
 	this->frameNumber = SHIP_NB_FRAMES;
-	this->new_equipment = false;
 }
 
 void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
@@ -126,14 +116,10 @@ void ShipConfig::setEquipment(Equipment* m_equipment)
 {
 	// TODO : pas exact, on peut avoir des types d'armes identiques dans différents slots... mais bon pour l'instant.
 	this->equipment[m_equipment->equipmentType] = m_equipment;
-	this->new_equipment = true;
-	//printf ("\nSet equipment: %s\n", EquipmentTypeValues[m_equipment->equipmentType]);
-}
-
-void ShipConfig::updateShipConfig()
-{
 	max_speed = getShipConfigMaxSpeed();
 	decceleration = getShipConfigDecceleration();
+	printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", this->getShipConfigMaxSpeed().x, this->ship_model->getShipModelMaxSpeed().x, this->equipment[Engine]->getEquipmentMaxSpeed().x);
+	printf ("\nShipConfig Deccel: %f <ShipModel: %f | Airbrake: %f>\n\n", this->getShipConfigDecceleration(), this->ship_model->getShipModelDecceleration(), this->equipment[Airbrake]->getEquipmentDecceleration());		
 }
 
 Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x/2),(m_ship_config.size.y/2)), m_ship_config.frameNumber)
@@ -151,16 +137,6 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 
 void Ship::update(sf::Time deltaTime)
 {
-	
-	if (this->ship_config.new_equipment)
-	{
-		ship_config.updateShipConfig();
-		//printf ("\nEquipment updated\n");
-		printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", ship_config.getShipConfigMaxSpeed().x, ship_config.ship_model->getShipModelMaxSpeed().x, ship_config.equipment[Engine]->getEquipmentMaxSpeed().x);
-		printf ("\nShipConfig Deccel: %f <ShipModel: %f | Airbrake: %f>\n\n", ship_config.getShipConfigDecceleration(), ship_config.ship_model->getShipModelDecceleration(), ship_config.equipment[Airbrake]->getEquipmentDecceleration());
-		ship_config.new_equipment=false;
-	}
-	
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{	

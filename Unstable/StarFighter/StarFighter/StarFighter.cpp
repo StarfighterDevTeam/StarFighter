@@ -41,6 +41,10 @@ int main()
 	emptyEquipment = new Equipment();
 	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
 
+	Equipment* stabsDefault;
+	stabsDefault = new Equipment();
+	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
+
 	ShipConfig* shipA;
 	shipA = new ShipConfig();
 	//hardcoded for now, to be built in constructor or in Init() function...
@@ -67,7 +71,7 @@ int main()
 	{
 		
 		//to erase later...
-		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(2))
+		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(1))
 		{
 			keyrepeat = false;
 		}

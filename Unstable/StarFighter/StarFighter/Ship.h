@@ -24,6 +24,8 @@ enum EquipmentType {
 	Empty,
 	Airbrake,
 	Engine,
+	Stabs,
+	NBVAL_EQUIPMENT
 };
 
 class ShipModel
@@ -65,9 +67,7 @@ public:
 	void setEquipment(Equipment* m_equipment);
 	sf::Vector2f getShipConfigMaxSpeed();
 	float getShipConfigDecceleration();
-	void updateShipConfig();
-	bool new_equipment;
-	Equipment* equipment[3];
+	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
 
 private:
