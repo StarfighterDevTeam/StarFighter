@@ -18,40 +18,54 @@ int main()
 
 	srand (time(NULL));
 	
+	//default setting
 	ShipModel* shipModelDefault;
 	shipModelDefault = new ShipModel();
 
 	Equipment* airbrakeDefault;
 	airbrakeDefault = new Equipment();
-	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
+	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
 
 	Equipment* engineDefault;
 	engineDefault = new Equipment();
-	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
+	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
 
-	Equipment* airbrakeZ;
-	airbrakeZ = new Equipment();
-	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , AIRBRAKE_FILENAME);
+	Equipment* armorDefault;
+	armorDefault = new Equipment();
+	armorDefault->Init(EquipmentType::Armor, sf::Vector2f (0,0), 0.0f , 100, 0, AIRBRAKE_FILENAME);
 
-	Equipment* engineZ;
-	engineZ = new Equipment();
-	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , AIRBRAKE_FILENAME);
-
-	Equipment* emptyEquipment;
-	emptyEquipment = new Equipment();
-	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
+	Equipment* shieldDefault;
+	shieldDefault = new Equipment();
+	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, AIRBRAKE_FILENAME);
 
 	Equipment* stabsDefault;
 	stabsDefault = new Equipment();
-	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , AIRBRAKE_FILENAME);
+	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
 
+	//bonus setting
+	Equipment* airbrakeZ;
+	airbrakeZ = new Equipment();
+	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , 0, 0, AIRBRAKE_FILENAME);
+
+	Equipment* engineZ;
+	engineZ = new Equipment();
+	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , 0, 0, AIRBRAKE_FILENAME);
+
+	Equipment* emptyEquipment;
+	emptyEquipment = new Equipment();
+	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
+
+	//ship config
 	ShipConfig* shipA;
 	shipA = new ShipConfig();
 	//hardcoded for now, to be built in constructor or in Init() function...
-	shipA->equipment[0] = emptyEquipment;
-	shipA->equipment[1] = airbrakeDefault;
-	shipA->equipment[2] = engineDefault;
 	shipA->ship_model = shipModelDefault;
+	shipA->equipment[Empty] = emptyEquipment;
+	shipA->equipment[Airbrake] = airbrakeDefault;
+	shipA->equipment[Engine] = engineDefault;
+	shipA->equipment[Stabs] = stabsDefault;
+	shipA->equipment[Armor] = armorDefault;
+	shipA->equipment[Shield] = shieldDefault;
 	//...until this point
 	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES/*, [aibrakeZ, engineZ]*/);
 	
