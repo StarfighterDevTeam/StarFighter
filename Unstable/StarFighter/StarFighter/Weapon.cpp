@@ -6,6 +6,7 @@ Weapon::Weapon()
 {
 	speed.x = 0;
 	speed.y = 0;
+	damage = LASER_DAMAGE;
 	firing_ready = true;
 	fire_direction = sf::Vector2i(0, 1);
 }
