@@ -57,14 +57,17 @@ int main()
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
+	
+	//to erase later...
+	sf::Clock deltaClockKeyPressed;
 	bool keyrepeat = false;
+	///...until here (avoiding key repeition)
 
 	while (window->isOpen())
 	{
-		//to erase later...
-		sf::Clock deltaClockKeyPressed;
 		
-		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(1.0f))
+		//to erase later...
+		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(2))
 		{
 			keyrepeat = false;
 		}
@@ -78,12 +81,13 @@ int main()
 				window->close();
 		}
 
+		//to refactor later...
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
 			{
 				if (!keyrepeat)
 				{
 					myShip.ship_config.setEquipment(engineZ);
-					printf ("\nEngine Z mounted. \n");
+					printf ("Engine Z mounted.\n");
 					keyrepeat = true;
 					deltaClockKeyPressed.restart();
 				}
@@ -94,7 +98,7 @@ int main()
 				if (!keyrepeat)
 				{
 					myShip.ship_config.setEquipment(airbrakeZ);
-					printf ("\nAirbrake Z mounted. \n");
+					printf ("Airbrake Z mounted.\n");
 					keyrepeat = true;
 					deltaClockKeyPressed.restart();
 				}
@@ -105,7 +109,7 @@ int main()
 				if (!keyrepeat)
 				{
 					myShip.ship_config.setEquipment(engineDefault);
-					printf ("\nEngine default mounted. \n");
+					printf ("Engine default mounted.\n");
 					keyrepeat = true;
 					deltaClockKeyPressed.restart();
 				}
@@ -116,11 +120,12 @@ int main()
 				if (!keyrepeat)
 				{
 					myShip.ship_config.setEquipment(airbrakeDefault);
-					printf ("\nAirbrake default mounted. \n");
+					printf ("Airbrake default mounted.\n");
 					keyrepeat = true;
 					deltaClockKeyPressed.restart();
 				}
 			}
+		//...until here (test equipment)
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();

@@ -46,14 +46,34 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 	new_max_speed.x = 0;
 	new_max_speed.y = 0;
 
-	new_max_speed.x += ship_model->getShipModelMaxSpeed().x + equipment[0]->getEquipmentMaxSpeed().x;
-	new_max_speed.y += ship_model->getShipModelMaxSpeed().y + equipment[0]->getEquipmentMaxSpeed().y;
-	return sf::Vector2f (new_max_speed.x, new_max_speed.y);
+	sf::Vector2f equipment_max_speed;
+	equipment_max_speed.x = 0;
+	equipment_max_speed.y = 0;
+
+	for (int i=0; i<3; i++)
+	{
+		equipment_max_speed.x += equipment[i]->getEquipmentMaxSpeed().x;
+		equipment_max_speed.y += equipment[i]->getEquipmentMaxSpeed().y;
+	}
+
+	new_max_speed.x = ship_model->getShipModelMaxSpeed().x + equipment_max_speed.x;
+	new_max_speed.y = ship_model->getShipModelMaxSpeed().y + equipment_max_speed.y;
+
+	return new_max_speed;
 }
 
 float ShipConfig::getShipConfigDecceleration()
 {
-	return this->ship_model->getShipModelDecceleration();
+	float new_decceleration = 0.0f;
+	float equipment_decceleration = 0.0f;
+
+	for (int i=0; i<3; i++)
+	{
+		equipment_decceleration += equipment[i]->getEquipmentDecceleration();
+	}
+
+	new_decceleration = ship_model->getShipModelDecceleration() + equipment_decceleration;
+	return new_decceleration;
 }
 
 
@@ -102,6 +122,19 @@ void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::stri
 	this->frameNumber = m_frameNumber;
 }
 
+void ShipConfig::setEquipment(Equipment* m_equipment)
+{
+	// TODO : pas exact, on peut avoir des types d'armes identiques dans différents slots... mais bon pour l'instant.
+	this->equipment[m_equipment->equipmentType] = m_equipment;
+	this->new_equipment = true;
+	//printf ("\nSet equipment: %s\n", EquipmentTypeValues[m_equipment->equipmentType]);
+}
+
+void ShipConfig::updateShipConfig()
+{
+	max_speed = getShipConfigMaxSpeed();
+	decceleration = getShipConfigDecceleration();
+}
 
 Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x/2),(m_ship_config.size.y/2)), m_ship_config.frameNumber)
 {
@@ -116,27 +149,15 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->ship_config = m_ship_config;
 }
 
-void ShipConfig::setEquipment(Equipment* m_equipment)
-{
-	// TODO : pas exact, on peut avoir des types d'armes identiques dans différents slots... mais bon pour l'instant.
-	this->equipment[m_equipment->equipmentType] = m_equipment;
-	this->new_equipment = true;
-	printf ("\nSet equipment: %s\n", EquipmentTypeValues[m_equipment->equipmentType]);
-}
-
-void ShipConfig::updateShipConfig()
-{
-	max_speed = getShipConfigMaxSpeed();
-	decceleration = getShipConfigDecceleration();
-}
-
 void Ship::update(sf::Time deltaTime)
 {
 	
 	if (this->ship_config.new_equipment)
 	{
 		ship_config.updateShipConfig();
-		printf ("\nEquipment updated");
+		//printf ("\nEquipment updated\n");
+		printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", ship_config.getShipConfigMaxSpeed().x, ship_config.ship_model->getShipModelMaxSpeed().x, ship_config.equipment[Engine]->getEquipmentMaxSpeed().x);
+		printf ("\nShipConfig Deccel: %f <ShipModel: %f | Airbrake: %f>\n\n", ship_config.getShipConfigDecceleration(), ship_config.ship_model->getShipModelDecceleration(), ship_config.equipment[Airbrake]->getEquipmentDecceleration());
 		ship_config.new_equipment=false;
 	}
 	
