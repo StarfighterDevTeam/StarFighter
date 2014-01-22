@@ -146,7 +146,7 @@ void Game::colisionChecksV2()
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
 						(*it1)->setVisible(false);
-						this->garbage.push_back(*it1);
+						//this->garbage.push_back(*it1);
 					}
 
 				}
@@ -165,7 +165,7 @@ void Game::colisionChecksV2()
 				if ((*it1)->getIndependantArmor() <= 0)
 				{
 					(*it1)->setVisible(false);
-					this->garbage.push_back(*it1);
+					//this->garbage.push_back(*it1);
 				}
 
 

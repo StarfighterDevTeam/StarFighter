@@ -67,7 +67,6 @@ Independant::~Independant()
 
 }
 
-
 void Independant::update(sf::Time deltaTime)
 {
 	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();

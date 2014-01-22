@@ -163,12 +163,15 @@ int main()
 		dt = deltaClock.restart();
 
 		(*CurrentGame).updateScene(dt);
+		myShip.ship_hud.update(myShip.getIndependantArmor(), myShip.getIndependantShield());
 		//myShip.Update(dt);
 
 		//display
 		window->clear();
 
 		(*CurrentGame).drawScene();
+		window->draw(myShip.ship_hud.armorBar);
+		window->draw(myShip.ship_hud.shieldBar);
 		//window->draw(hud.armorBar);
 		//window->draw(hud.shieldBar);
 		//window->draw(myShip);
