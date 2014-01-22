@@ -67,7 +67,7 @@ int main()
 	shipA->equipment[Armor] = armorDefault;
 	shipA->equipment[Shield] = shieldDefault;
 	//...until this point
-	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES/*, [aibrakeZ, engineZ]*/);
+	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 	
 	Ship myShip(Vector2f(400,500),*shipA);
 	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);

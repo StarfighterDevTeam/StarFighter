@@ -73,10 +73,7 @@ public:
 	ShipConfig();
 	std::string textureName;
 	sf::Vector2f size;
-	sf::Vector2f max_speed;
-	float decceleration;
-	int armor;
-	int shield;
+	
 	int frameNumber;
 	void setEquipment(Equipment* m_equipment);
 	sf::Vector2f getShipConfigMaxSpeed();
@@ -85,14 +82,15 @@ public:
 	int getShipConfigShield();
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
-	
-
 private:
+	sf::Vector2f max_speed;
+	float decceleration;
+	int armor;
+	int shield;
 };
 
 class Ship : public Independant
 {
-
 public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init(int x, int y);
