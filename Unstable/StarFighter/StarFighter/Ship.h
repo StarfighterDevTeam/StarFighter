@@ -85,6 +85,7 @@ public:
 	int getShipConfigShield();
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
+	
 
 private:
 };
@@ -99,7 +100,6 @@ public :
 	Weapon weapon;
 	void setShipConfig(ShipConfig m_ship_config);
 	ShipConfig ship_config;
-	
 
 private:
 	bool moving;

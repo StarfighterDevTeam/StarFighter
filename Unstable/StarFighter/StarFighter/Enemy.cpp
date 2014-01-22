@@ -6,6 +6,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	this->weapon.fire_direction = Vector2i(0,(int)(-1));
 	this->armor = 20;
 	this->shield = 0;
+	this->damage = 1;
 }
 
 void Enemy::update(sf::Time deltaTime)

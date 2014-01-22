@@ -7,7 +7,7 @@
 
 #define LASER_RATE_OF_FIRE			0.3f
 #define LASER_MAX_AMMO_PER_STAGE	10
-#define LASER_DAMAGE	10
+#define LASER_DAMAGE				10
 
 struct Weapon : public sf::Sprite
 {
@@ -15,7 +15,7 @@ struct Weapon : public sf::Sprite
 	int damage;
 	Weapon();
 	bool firing_ready;
-	void Fire(IndependantType collider_type);
+	void Fire(IndependantType m_collider_type);
 	sf::Vector2i fire_direction;
 
 	sf::Clock deltaClock;

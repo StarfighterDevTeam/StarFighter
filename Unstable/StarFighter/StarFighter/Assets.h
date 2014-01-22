@@ -19,6 +19,7 @@
 #define LASER_FILENAME				"Assets/2D/laser.png"
 #define LASER_WIDTH					4
 #define LASER_HEIGHT				12
+#define LASER_FRAME_NUMBER			1
 
 #endif // ASSETS_H_INCLUDED
 

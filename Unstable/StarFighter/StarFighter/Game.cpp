@@ -50,7 +50,7 @@ void Game::addToScene(Independant *object, int layer, IndependantType type)
 void Game::updateScene(Time deltaTime)
 {
 
-	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
+	printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
 	//Collect & clean garbage
 	collectGarbage();
@@ -67,7 +67,7 @@ void Game::updateScene(Time deltaTime)
 		(*(*it)).update(deltaTime);
 	}
 
-	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
+	printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::drawScene()
@@ -113,7 +113,7 @@ void Game::colisionChecks()
 		}
 	}
 
-	//printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
+	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
 void Game::colisionChecksV2()
@@ -121,11 +121,11 @@ void Game::colisionChecksV2()
 	sf::Clock dt;
 	dt.restart();
 	int i= 0;
-
+	
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
 	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); it1++)
 	{
-		//Enemy bullets
+		//Enemy bullets hitting the player
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).end(); it2++)
 		{
 			i++;
@@ -136,7 +136,15 @@ void Game::colisionChecksV2()
 				{
 					(*it2)->setVisible(false);
 					this->garbage.push_back(*it2);
-					//Do something (like, kill ship)
+
+					//Do something (like, kill ship) -> OK
+					(*it1)->damage_from(*(*it2));
+					if ((*it1)->getIndependantArmor() <= 0)
+					{
+						(*it1)->setVisible(false);
+						this->garbage.push_back(*it1);
+					}
+
 				}
 			}
 		}
@@ -148,28 +156,47 @@ void Game::colisionChecksV2()
 			if((*(*it1)).collide_with((*(*it2))))
 			{
 				//Do something (like, kill ship)
+				(*it1)->damage_from(*(*it2));
+
+				if ((*it1)->getIndependantArmor() <= 0)
+				{
+					(*it1)->setVisible(false);
+					this->garbage.push_back(*it1);
+				}
+
+
 			}
 		}
 	}
 
 	//Then, check if any allied bullet collide with any enemy
-	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).end(); it1++)
+	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it1++)
 	{
 		//Enemy objects
-		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it2++)
+		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).end(); it2++)
 		{
 			i++;
 			//Bullets are invisible after impact
 			if((*(*it1)).collide_with((*(*it2))))
 			{
-				(*it1)->setVisible(false);
-				this->garbage.push_back(*it1);
+				if((*it2)->collider_type == FriendlyFire)
+				{
+					(*it2)->setVisible(false);
+					this->garbage.push_back(*it2);
 
-				//Do something (like, kill the enemy ship ?)
+					//Do something (like, kill the enemy ship ?)
+					(*it1)->damage_from(*(*it2));
+					if ((*it1)->getIndependantArmor() <= 0)
+					{
+						(*it1)->setVisible(false);
+						this->garbage.push_back(*it1);
+					}
+
+				}
 			}
 		}
 	}
-
+	
 	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
@@ -194,7 +221,7 @@ void Game::cleanGarbage()
 
 	this->garbage.clear();
 
-	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
+	printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::collectGarbage()
@@ -227,6 +254,6 @@ void Game::collectGarbage()
 
 	}
 
-	//printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
+	printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
 }

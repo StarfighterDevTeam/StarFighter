@@ -178,10 +178,11 @@ void ShipConfig::setEquipment(Equipment* m_equipment)
 	this->decceleration = getShipConfigDecceleration();
 	this->armor = getShipConfigArmor();
 	this->shield = getShipConfigShield();
-	printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", this->getShipConfigMaxSpeed().x, this->ship_model->getShipModelMaxSpeed().x, this->equipment[Engine]->getEquipmentMaxSpeed().x);
+	/*printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", this->getShipConfigMaxSpeed().x, this->ship_model->getShipModelMaxSpeed().x, this->equipment[Engine]->getEquipmentMaxSpeed().x);
 	printf ("\nShipConfig Deccel: %f <ShipModel: %f | Airbrake: %f>\n", this->getShipConfigDecceleration(), this->ship_model->getShipModelDecceleration(), this->equipment[Airbrake]->getEquipmentDecceleration());
 	printf ("\nShipConfig Armor: %d <ShipModel: %d | Armor: %d>\n", this->getShipConfigArmor(), this->ship_model->getShipModelArmor(), this->equipment[Armor]->getEquipmentArmor());
 	printf ("\nShipConfig Shield: %d <ShipModel: %d | Shield: %d>\n\n", this->getShipConfigShield(), this->ship_model->getShipModelShield(), this->equipment[Shield]->getEquipmentShield());
+	*/
 }
 
 Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x/2),(m_ship_config.size.y/2)), m_ship_config.frameNumber)
@@ -190,6 +191,11 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->ship_config = m_ship_config;
 	moving = false;	
 	this->visible = true;
+	this->damage = 0;
+	this->armor = 1;
+	this->shield = 1;
+	this->armor = ship_config.getShipConfigArmor();
+	this->shield = ship_config.getShipConfigShield();
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -225,7 +231,6 @@ void Ship::update(sf::Time deltaTime)
 	{
 		weapon.setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
 		weapon.Fire(FriendlyFire);
-
 	}
 
 	//max speed constraints

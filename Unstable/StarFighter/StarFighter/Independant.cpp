@@ -1,5 +1,12 @@
 #include "Independant.h"
 
+Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int m_damage)  : AnimatedSprite()
+{
+	Init(position,speed,textureName,size,frameNumber);
+	this->setOrigin(origin.x, origin.y);
+	this->damage = m_damage;
+}
+
 Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber)  : AnimatedSprite()
 {
 	Init(position,speed,textureName,size,frameNumber);
@@ -81,6 +88,34 @@ void Independant::setVisible(bool m_visible)
 	this->visible=m_visible;
 }
 
+void Independant::damage_from (const Independant& independant)
+{
+	if (independant.damage > shield)
+	{
+		armor -= (independant.damage - shield);
+		shield = 0;
+	}
+	else
+	{
+		shield -= independant.damage;
+	}
+}
+
+int Independant::getIndependantDamage()
+{
+	return this->damage;
+}
+
+int Independant::getIndependantShield()
+{
+	return this->shield;
+}
+
+int Independant::getIndependantArmor()
+{
+	return this->armor;
+}
+	
 bool Independant::collide_with (const Independant& independant)
 {
 	// If not visibe, let's not even bother with the collision

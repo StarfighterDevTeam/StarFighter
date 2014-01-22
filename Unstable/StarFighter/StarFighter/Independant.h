@@ -19,6 +19,7 @@ enum IndependantType {
 class Independant : public AnimatedSprite
 {
 public:
+	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int m_damage);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
@@ -32,10 +33,17 @@ public:
 	IndependantType collider_type;
 	void setVisible(bool visible);
 	bool collide_with (const Independant& independant);
+	void damage_from (const Independant& independant);
 	sf::Vector2f m_size;
+	int getIndependantDamage();
+	int getIndependantArmor();
+	int getIndependantShield();
 
 protected:
 	sf::Vector2f speed;
+	int damage;
+	int armor;
+	int shield;
 	std::string textureName;
 	Animation defaultAnimation;
 	Animation* currentAnimation;

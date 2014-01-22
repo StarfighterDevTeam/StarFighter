@@ -12,8 +12,6 @@ class Enemy : public Independant
 public:
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	void update(sf::Time deltaTime) override;
-	int armor;
-	int shield;
 private:
 	Weapon weapon;
 };
