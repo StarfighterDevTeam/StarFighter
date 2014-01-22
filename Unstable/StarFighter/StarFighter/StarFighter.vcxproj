@@ -94,6 +94,7 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Hud.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Independant.cpp" />
     <ClCompile Include="StarFighter.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Hud.h" />
     <ClInclude Include="Independant.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />

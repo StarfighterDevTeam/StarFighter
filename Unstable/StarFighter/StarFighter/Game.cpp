@@ -23,7 +23,9 @@ void Game::init(RenderWindow* window)
 	{
 		sceneIndependantsTyped[i] = new std::list<Independant*>;
 	}
-
+	
+	//ship_hud = new PlayerHud();
+	//ship_hud->Init();
 }
 
 
@@ -66,7 +68,7 @@ void Game::updateScene(Time deltaTime)
 	{
 		(*(*it)).update(deltaTime);
 	}
-
+	//ship_hud->update(deltaTime, sceneIndependantsTyped[IndependantType::PlayerShip].begin().getIndependantArmor(), sceneIndependantsTyped[IndependantType::PlayerShip].begin().getIndependantShield());
 	printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -80,6 +82,8 @@ void Game::drawScene()
 				this->window->draw((*(*it)));
 		}
 	}
+	//window->draw(ship_hud->armorBar);
+	//window->draw(ship_hud->shieldBar);
 }
 
 void Game::colisionChecks()
@@ -157,7 +161,7 @@ void Game::colisionChecksV2()
 			{
 				//Do something (like, kill ship)
 				(*it1)->damage_from(*(*it2));
-
+				//ship_hud->update((*it1)->getIndependantArmor(), (*it1)->getIndependantShield());
 				if ((*it1)->getIndependantArmor() <= 0)
 				{
 					(*it1)->setVisible(false);

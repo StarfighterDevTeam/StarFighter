@@ -22,6 +22,7 @@ struct Game
 public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
+	//PlayerHud* ship_hud;
 	void addToScene(Independant *object, int layer, IndependantType type);
 	void updateScene(Time deltaTime);
 	void drawScene();

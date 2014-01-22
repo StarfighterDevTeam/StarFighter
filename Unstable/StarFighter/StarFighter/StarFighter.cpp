@@ -69,8 +69,12 @@ int main()
 	//...until this point
 	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 	
+	//Ship
 	Ship myShip(Vector2f(400,500),*shipA);
 	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
+
+	//Hud
+	PlayerHud hud;
 
 	//update
 	sf::Time dt;
@@ -165,6 +169,8 @@ int main()
 		window->clear();
 
 		(*CurrentGame).drawScene();
+		//window->draw(hud.armorBar);
+		//window->draw(hud.shieldBar);
 		//window->draw(myShip);
 
 		window->display();

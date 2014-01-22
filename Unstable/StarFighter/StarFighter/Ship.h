@@ -7,6 +7,7 @@
 #include "AnimatedSprite.hpp"
 #include "TextureLoader.h"
 #include "Assets.h"
+#include "Hud.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -98,7 +99,7 @@ public :
 	Weapon weapon;
 	void setShipConfig(ShipConfig m_ship_config);
 	ShipConfig ship_config;
-
+	PlayerHud ship_hud;
 private:
 	bool moving;
 };

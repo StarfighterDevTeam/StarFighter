@@ -128,7 +128,7 @@ void ShipConfig::setEquipment(Equipment* m_equipment)
 int ShipConfig::getShipConfigArmor()
 {
 	int new_armor = 0;
-	int equipment_armor = 0.;
+	int equipment_armor = 0;
 
 	for (int i=0; i<NBVAL_EQUIPMENT; i++)
 	{
@@ -202,6 +202,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->shield = 1;
 	this->armor = ship_config.getShipConfigArmor();
 	this->shield = ship_config.getShipConfigShield();
+	ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -211,6 +212,8 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 
 void Ship::update(sf::Time deltaTime)
 {
+	//ship_hud.update(this->getIndependantArmor(), this->getIndependantShield());
+
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{	
