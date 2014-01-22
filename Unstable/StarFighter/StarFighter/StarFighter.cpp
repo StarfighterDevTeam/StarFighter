@@ -24,36 +24,36 @@ int main()
 
 	Equipment* airbrakeDefault;
 	airbrakeDefault = new Equipment();
-	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
+	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
 
 	Equipment* engineDefault;
 	engineDefault = new Equipment();
-	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
+	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
 
 	Equipment* armorDefault;
 	armorDefault = new Equipment();
-	armorDefault->Init(EquipmentType::Armor, sf::Vector2f (0,0), 0.0f , 100, 0, AIRBRAKE_FILENAME);
+	armorDefault->Init(EquipmentType::Armor, sf::Vector2f (0,0), 0.0f , 100, 0, 0, AIRBRAKE_FILENAME);
 
 	Equipment* shieldDefault;
 	shieldDefault = new Equipment();
-	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, AIRBRAKE_FILENAME);
+	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, 1, AIRBRAKE_FILENAME);
 
 	Equipment* stabsDefault;
 	stabsDefault = new Equipment();
-	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
+	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
 
 	//bonus setting
 	Equipment* airbrakeZ;
 	airbrakeZ = new Equipment();
-	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , 0, 0, AIRBRAKE_FILENAME);
+	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , 0, 0, 0, AIRBRAKE_FILENAME);
 
 	Equipment* engineZ;
 	engineZ = new Equipment();
-	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , 0, 0, AIRBRAKE_FILENAME);
+	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
 
 	Equipment* emptyEquipment;
 	emptyEquipment = new Equipment();
-	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , 0, 0, AIRBRAKE_FILENAME);
+	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
 
 	//ship config
 	ShipConfig* shipA;

@@ -20,6 +20,7 @@
 #define SHIP_MIN_SPEED_Y            50.0f
 #define SHIP_ARMOR					100
 #define SHIP_SHIELD					50
+#define SHIP_SHIELD_REGEN			1
 
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
@@ -41,17 +42,19 @@ public:
 	float getShipModelDecceleration();
 	int getShipModelArmor();
 	int getShipModelShield();
+	int getShipModelShieldRegen();
 private:
 	float decceleration;
 	sf::Vector2f max_speed;
 	int armor;
 	int shield;
+	int shield_regen;
 };
 
 class Equipment
 {
 public:
-	void Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , int m_armor, int m_shield, std::string m_textureName, sf::Vector2f m_size = sf::Vector2f(256,256));
+	void Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size = sf::Vector2f(256,256));
 	Equipment();
 	std::string textureName;
 	sf::Vector2f size;
@@ -60,11 +63,13 @@ public:
 	float getEquipmentDecceleration();
 	int getEquipmentArmor();
 	int getEquipmentShield();
+	int getEquipmentShieldRegen();
 private:
 	float decceleration;
 	sf::Vector2f max_speed;
 	int armor;
 	int shield;
+	int shield_regen;
 };
 
 class ShipConfig
@@ -81,6 +86,7 @@ public:
 	float getShipConfigDecceleration();
 	int getShipConfigArmor();
 	int getShipConfigShield();
+	int getShipConfigShieldRegen();
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
 private:
@@ -88,6 +94,7 @@ private:
 	float decceleration;
 	int armor;
 	int shield;
+	int shield_regen;
 };
 
 class Ship : public Independant

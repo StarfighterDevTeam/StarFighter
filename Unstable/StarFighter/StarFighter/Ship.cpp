@@ -13,6 +13,7 @@ ShipModel::ShipModel()
 	this->decceleration = SHIP_DECCELERATION_COEF;
 	this->armor = SHIP_ARMOR;
 	this->shield = SHIP_SHIELD;
+	this->shield_regen = SHIP_SHIELD_REGEN;
 }
 
 //various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
@@ -36,6 +37,11 @@ int ShipModel::getShipModelShield()
 	return this->shield;
 }
 
+int ShipModel::getShipModelShieldRegen()
+{
+	return this->shield_regen;
+}
+
 // ----------------EQUIPMENT ---------------
 
 Equipment::Equipment()
@@ -45,19 +51,21 @@ Equipment::Equipment()
 	this->decceleration = 500.0f;
 	this->armor = 100;
 	this->shield = 100;
+	this->shield_regen = 0;
 	this->size.x = EQUIPMENT_WIDTH;
 	this->size.y = EQUIPMENT_HEIGHT;
 	this->textureName = EQUIPMENT_FILENAME;
 	this->equipmentType = EquipmentType::Empty;
 }
 
-void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , int m_armor, int m_shield, std::string m_textureName, sf::Vector2f m_size)
+void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
 	this->decceleration = m_decceleration;
 	this->armor = m_armor;
 	this->shield = m_shield;
+	this->shield_regen = m_shield_regen;
 	this->size.x = m_size.x;
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
@@ -82,6 +90,11 @@ int Equipment::getEquipmentArmor()
 int Equipment::getEquipmentShield()
 {
 	return this->shield;
+}
+
+int Equipment::getEquipmentShieldRegen()
+{
+	return this->shield_regen;
 }
 
 // ----------------SHIP CONFIG ---------------
@@ -153,6 +166,20 @@ int ShipConfig::getShipConfigShield()
 	return new_shield;
 }
 
+int ShipConfig::getShipConfigShieldRegen()
+{
+	int new_shield_regen = 0;
+	int equipment_shield_regen = 0.;
+
+	for (int i=0; i<NBVAL_EQUIPMENT; i++)
+	{
+		equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
+	}
+
+	new_shield_regen = ship_model->getShipModelShieldRegen() + equipment_shield_regen;
+	return new_shield_regen;
+}
+
 sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 {
 	sf::Vector2f new_max_speed;
@@ -212,8 +239,18 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 
 void Ship::update(sf::Time deltaTime)
 {
-	//ship_hud.update(this->getIndependantArmor(), this->getIndependantShield());
-
+	//sheld regen if not maximum
+	if (shield < ship_config.getShipConfigShield())
+	{
+		shield += ship_config.getShipConfigShieldRegen(); // !!
+		//canceling over-regen
+		if (shield > ship_config.getShipConfigShield())
+		{
+			shield = ship_config.getShipConfigShield();
+		}
+	}
+	
+	//move
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{	
