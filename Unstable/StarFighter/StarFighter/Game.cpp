@@ -52,7 +52,7 @@ void Game::addToScene(Independant *object, int layer, IndependantType type)
 void Game::updateScene(Time deltaTime)
 {
 
-	printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
+	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
 	//Collect & clean garbage
 	collectGarbage();
@@ -69,7 +69,7 @@ void Game::updateScene(Time deltaTime)
 		(*(*it)).update(deltaTime);
 	}
 	//ship_hud->update(deltaTime, sceneIndependantsTyped[IndependantType::PlayerShip].begin().getIndependantArmor(), sceneIndependantsTyped[IndependantType::PlayerShip].begin().getIndependantShield());
-	printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
+	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::drawScene()
@@ -117,7 +117,7 @@ void Game::colisionChecks()
 		}
 	}
 
-	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
+	//printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
 void Game::colisionChecksV2()
@@ -225,7 +225,7 @@ void Game::cleanGarbage()
 
 	this->garbage.clear();
 
-	printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
+	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::collectGarbage()
@@ -258,6 +258,6 @@ void Game::collectGarbage()
 
 	}
 
-	printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
+	//printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
 }

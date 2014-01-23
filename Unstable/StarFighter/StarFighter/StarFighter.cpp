@@ -73,9 +73,6 @@ int main()
 	Ship myShip(Vector2f(400,500),*shipA);
 	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
 
-	//Hud
-	PlayerHud hud;
-
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
@@ -154,7 +151,7 @@ int main()
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::K))
 		{
-			Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32));
+			Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32), ENEMYX_DAMAGE);
 			badguy->collider_type = IndependantType::EnemyObject;
 			badguy->setVisible(true);
 			(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
@@ -163,7 +160,7 @@ int main()
 		dt = deltaClock.restart();
 
 		(*CurrentGame).updateScene(dt);
-		myShip.ship_hud.update(myShip.getIndependantArmor(), myShip.getIndependantShield());
+		//myShip.ship_hud.update(myShip.getIndependantArmor(), myShip.getIndependantShield());
 		//myShip.Update(dt);
 
 		//display

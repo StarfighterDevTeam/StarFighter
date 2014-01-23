@@ -46,11 +46,11 @@ int ShipModel::getShipModelShieldRegen()
 
 Equipment::Equipment()
 {
-	this->max_speed.x = 20.0f;
-	this->max_speed.y = 20.0f;
-	this->decceleration = 500.0f;
-	this->armor = 100;
-	this->shield = 100;
+	this->max_speed.x = 0.0f;
+	this->max_speed.y = 0.0f;
+	this->decceleration = 0.0f;
+	this->armor = 0;
+	this->shield = 0;
 	this->shield_regen = 0;
 	this->size.x = EQUIPMENT_WIDTH;
 	this->size.y = EQUIPMENT_HEIGHT;
@@ -101,15 +101,7 @@ int Equipment::getEquipmentShieldRegen()
 
 ShipConfig::ShipConfig()
 {
-	this->max_speed.x = 10.0f;
-	this->max_speed.y = 10.0f;
-	this->decceleration = 0.0f;
-	this->armor = 50;
-	this->shield = 50;
-	this->size.x = SHIP_WIDTH;
-	this->size.y = SHIP_HEIGHT;
-	this->textureName = SHIP_FILENAME;
-	this->frameNumber = SHIP_NB_FRAMES;
+
 }
 
 void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
@@ -117,6 +109,9 @@ void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::stri
 	
 	this->max_speed = getShipConfigMaxSpeed();
 	this->decceleration = getShipConfigDecceleration();
+	this->armor = getShipConfigArmor();
+	this->shield = getShipConfigShield();
+	this->shield_regen = getShipConfigShieldRegen();
 	this->size.x = m_size.x;
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
@@ -131,6 +126,7 @@ void ShipConfig::setEquipment(Equipment* m_equipment)
 	this->decceleration = getShipConfigDecceleration();
 	this->armor = getShipConfigArmor();
 	this->shield = getShipConfigShield();
+	this->shield_regen = getShipConfigShieldRegen();
 	/*printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", this->getShipConfigMaxSpeed().x, this->ship_model->getShipModelMaxSpeed().x, this->equipment[Engine]->getEquipmentMaxSpeed().x);
 	printf ("\nShipConfig Deccel: %f <ShipModel: %f | Airbrake: %f>\n", this->getShipConfigDecceleration(), this->ship_model->getShipModelDecceleration(), this->equipment[Airbrake]->getEquipmentDecceleration());
 	printf ("\nShipConfig Armor: %d <ShipModel: %d | Armor: %d>\n", this->getShipConfigArmor(), this->ship_model->getShipModelArmor(), this->equipment[Armor]->getEquipmentArmor());
@@ -169,7 +165,7 @@ int ShipConfig::getShipConfigShield()
 int ShipConfig::getShipConfigShieldRegen()
 {
 	int new_shield_regen = 0;
-	int equipment_shield_regen = 0.;
+	int equipment_shield_regen = 0;
 
 	for (int i=0; i<NBVAL_EQUIPMENT; i++)
 	{
@@ -229,6 +225,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->shield = 1;
 	this->armor = ship_config.getShipConfigArmor();
 	this->shield = ship_config.getShipConfigShield();
+	this->shield_regen = ship_config.getShipConfigShieldRegen();
 	ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
 }
 
@@ -237,20 +234,33 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->ship_config = m_ship_config;
 }
 
+void Ship::damage_from (Independant& independant) 
+{
+	if (independant.getIndependantDamage() > shield)
+	{
+
+		armor -= (independant.getIndependantDamage()-shield);
+		shield = 0;
+	}
+	else
+	{
+		shield -= independant.getIndependantDamage();
+	}
+}
+
 void Ship::update(sf::Time deltaTime)
 {
 	//sheld regen if not maximum
 	if (shield < ship_config.getShipConfigShield())
 	{
-		shield += ship_config.getShipConfigShieldRegen(); // !!
+		shield += shield_regen;
 		//canceling over-regen
 		if (shield > ship_config.getShipConfigShield())
 		{
 			shield = ship_config.getShipConfigShield();
 		}
 	}
-	
-	//move
+	this->ship_hud.update(armor/3, shield/3);//will do for now... but we'll need to scale it to the max value later
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{	

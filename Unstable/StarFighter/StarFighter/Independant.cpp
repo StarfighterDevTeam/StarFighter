@@ -1,11 +1,5 @@
 #include "Independant.h"
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int m_damage)  : AnimatedSprite()
-{
-	Init(position,speed,textureName,size,frameNumber);
-	this->setOrigin(origin.x, origin.y);
-	this->damage = m_damage;
-}
 
 Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber)  : AnimatedSprite()
 {
@@ -87,7 +81,7 @@ void Independant::setVisible(bool m_visible)
 	this->visible=m_visible;
 }
 
-void Independant::damage_from (const Independant& independant)
+void Independant::damage_from (Independant& independant)
 {
 	if (independant.damage > shield)
 	{
@@ -102,17 +96,17 @@ void Independant::damage_from (const Independant& independant)
 
 int Independant::getIndependantDamage()
 {
-	return this->damage;
+	return damage;
 }
 
 int Independant::getIndependantShield()
 {
-	return this->shield;
+	return shield;
 }
 
 int Independant::getIndependantArmor()
 {
-	return this->armor;
+	return armor;
 }
 	
 bool Independant::collide_with (const Independant& independant)

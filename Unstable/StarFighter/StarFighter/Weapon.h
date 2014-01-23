@@ -4,10 +4,10 @@
 #include <SFML/Graphics.hpp>
 #include "Globals.h"
 #include "Assets.h"
+#include "Ammo.h"
 
 #define LASER_RATE_OF_FIRE			0.3f
-#define LASER_MAX_AMMO_PER_STAGE	10
-#define LASER_DAMAGE				10
+#define LASER_DAMAGE				100
 
 struct Weapon : public sf::Sprite
 {

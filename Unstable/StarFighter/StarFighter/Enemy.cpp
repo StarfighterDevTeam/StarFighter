@@ -1,12 +1,13 @@
 #include "Enemy.h"
 
 
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : Independant(position, speed,  textureName, size) 
+Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage)  : Independant(position, speed,  textureName, size) 
 {
 	this->weapon.fire_direction = Vector2i(0,(int)(-1));
-	this->armor = 20;
-	this->shield = 0;
-	this->damage = 1;
+	this->armor = ENEMYX_ARMOR;
+	this->shield = ENEMYX_SHIELD;
+	this->shield_regen = ENEMYX_SHIELD_REGEN;
+	this->damage = m_damage;
 }
 
 void Enemy::update(sf::Time deltaTime)
@@ -15,6 +16,17 @@ void Enemy::update(sf::Time deltaTime)
 	{
 		weapon.setPosition(this->getPosition().x, (this->getPosition().y - ((this->m_size.y)/2)) );
 		this->weapon.Fire(IndependantType::EnemyFire);
+
+		//sheld regen if not maximum
+		if (shield < this->getIndependantShield())
+		{
+			shield += shield_regen; // !!
+			//canceling over-regen
+			if (shield > getIndependantShield())
+			{
+				shield = getIndependantShield();
+			}
+		}
 	}
 	Independant::update(deltaTime);
 }

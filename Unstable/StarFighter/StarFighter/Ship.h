@@ -8,6 +8,7 @@
 #include "TextureLoader.h"
 #include "Assets.h"
 #include "Hud.h"
+#include "Independant.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -18,8 +19,8 @@
 #define SHIP_MAX_SPEED_Y            200.0f
 #define SHIP_MIN_SPEED_X            50.0f
 #define SHIP_MIN_SPEED_Y            50.0f
-#define SHIP_ARMOR					100
-#define SHIP_SHIELD					50
+#define SHIP_ARMOR					600
+#define SHIP_SHIELD					1000
 #define SHIP_SHIELD_REGEN			1
 
 #define SHIP_SPRITE_RATE_SEC        0.2f
@@ -105,6 +106,7 @@ public :
 	void update(sf::Time deltaTime) override;
 	Weapon weapon;
 	void setShipConfig(ShipConfig m_ship_config);
+	void damage_from (Independant& independant) override;
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
 private:

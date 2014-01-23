@@ -19,7 +19,7 @@ void Weapon::Fire(IndependantType m_collider_type)
 
 	if (firing_ready)
 	{
-		Independant* laser = new Independant(sf::Vector2f(getPosition().x,getPosition().y- ((LASER_HEIGHT/2)*(fire_direction.y))),sf::Vector2f(0*(fire_direction.x),-500*(fire_direction.y)), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT), sf::Vector2f(LASER_WIDTH/2,LASER_HEIGHT/2), LASER_FRAME_NUMBER, LASER_DAMAGE);
+		Ammo* laser = new Ammo(sf::Vector2f(getPosition().x,getPosition().y- ((LASER_HEIGHT/2)*(fire_direction.y))),sf::Vector2f(0*(fire_direction.x),-500*(fire_direction.y)), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT)/*, sf::Vector2f(LASER_WIDTH/2,LASER_HEIGHT/2), LASER_FRAME_NUMBER*/ ,LASER_DAMAGE);
 		
 		laser->setVisible(true);
 		laser->collider_type = m_collider_type;
