@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "Globals.h"
 #include "Assets.h"
-#include "Ammo.h"
+#include "FX.h"
 
 #define LASER_RATE_OF_FIRE			0.3f
 #define LASER_DAMAGE				100

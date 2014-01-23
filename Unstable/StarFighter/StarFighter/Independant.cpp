@@ -81,6 +81,7 @@ void Independant::setVisible(bool m_visible)
 	this->visible=m_visible;
 }
 
+
 void Independant::damage_from (Independant& independant)
 {
 	if (independant.damage > shield)
@@ -92,6 +93,8 @@ void Independant::damage_from (Independant& independant)
 	{
 		shield -= independant.damage;
 	}
+
+	
 }
 
 int Independant::getIndependantDamage()

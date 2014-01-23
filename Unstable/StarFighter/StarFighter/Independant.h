@@ -9,6 +9,7 @@
 
 enum IndependantType {
 	Background,
+	LootObject,
 	PlayerShip,
 	FriendlyFire,
 	EnemyFire,

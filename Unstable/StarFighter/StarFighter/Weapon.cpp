@@ -10,6 +10,7 @@ Weapon::Weapon()
 	this->firing_ready = true;
 	this->fire_direction = sf::Vector2i(0, 1);
 }
+
 void Weapon::Fire(IndependantType m_collider_type)
 {
 	if (deltaClock.getElapsedTime() > sf::seconds(LASER_RATE_OF_FIRE))
@@ -25,6 +26,13 @@ void Weapon::Fire(IndependantType m_collider_type)
 		laser->collider_type = m_collider_type;
 		laser->isOnScene = true;
 		(*CurrentGame).addToScene(laser,PlayerShipLayer, m_collider_type);
+
+		FX* explosion = new FX (sf::Vector2f(150, 500),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(1));
+		
+		explosion->setVisible(true);
+		explosion->collider_type = IndependantType::Background;
+		explosion->isOnScene = true;
+		(*CurrentGame).addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Background);
 
 		deltaClock.restart();
 		firing_ready = false;		

@@ -190,6 +190,8 @@ void Game::colisionChecksV2()
 
 					//Do something (like, kill the enemy ship ?)
 					(*it1)->damage_from(*(*it2));
+					
+					//death
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
 						(*it1)->setVisible(false);

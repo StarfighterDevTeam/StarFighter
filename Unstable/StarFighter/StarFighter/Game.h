@@ -2,7 +2,7 @@
 #define GAME_H_INCLUDED
 
 #include "Globals.h"
-#include "Independant.h"
+#include "FX.h"
 #include <list>
 #include <vector>
 
@@ -10,6 +10,7 @@ using namespace sf;
 
 enum LayerType {
 	BackgroundLayer,
+	ExplosionLayer,
 	PlayerShipLayer,
 	FriendlyFireLayer,
 	EnemyFireLayer,

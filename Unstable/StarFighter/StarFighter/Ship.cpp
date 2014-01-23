@@ -234,6 +234,7 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->ship_config = m_ship_config;
 }
 
+/*
 void Ship::damage_from (Independant& independant) 
 {
 	if (independant.getIndependantDamage() > shield)
@@ -246,7 +247,7 @@ void Ship::damage_from (Independant& independant)
 	{
 		shield -= independant.getIndependantDamage();
 	}
-}
+}*/
 
 void Ship::update(sf::Time deltaTime)
 {
@@ -342,4 +343,3 @@ void Ship::update(sf::Time deltaTime)
 
 	Independant::update(deltaTime);
 }
-

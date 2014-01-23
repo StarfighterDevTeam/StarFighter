@@ -106,9 +106,10 @@ public :
 	void update(sf::Time deltaTime) override;
 	Weapon weapon;
 	void setShipConfig(ShipConfig m_ship_config);
-	void damage_from (Independant& independant) override;
+	//void damage_from (Independant& independant) override;
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
+
 private:
 	bool moving;
 };

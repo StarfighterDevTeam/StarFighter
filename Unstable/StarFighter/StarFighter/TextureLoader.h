@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <tuple>
+#include "Assets.h"
 
 //NB: this is a singleton
 class TextureLoader
@@ -78,6 +79,8 @@ public:
 		this->getInstance()->loadTexture("Assets/2D/laser.png",4,12);
 		this->getInstance()->loadTexture("Assets/2D/player_sprite.png",192,64);
 		this->getInstance()->loadTexture("Assets/2D/enemyX.png",32,32);
+		this->getInstance()->loadTexture("Assets/2D/FX_explosion.png",1280,236);
+		this->getInstance()->loadTexture("Assets/2D/background.png",800,1800);
 	}
 
 	// Fonctions de création et destruction du singleton

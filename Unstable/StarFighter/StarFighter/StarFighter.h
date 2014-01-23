@@ -12,6 +12,7 @@
 #include "Assets.h"
 #include "Enemy.h"
 #include "Ammo.h"
+#include "FX.h"
 
 //Initialize TextureLoader Singleton
 TextureLoader *TextureLoader::_singleton = NULL;

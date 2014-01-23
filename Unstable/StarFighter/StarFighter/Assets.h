@@ -21,5 +21,11 @@
 #define LASER_HEIGHT				12
 #define LASER_FRAME_NUMBER			1
 
+#define FX_EXPLOSION_FILENAME				"Assets/2D/FX_explosion.png"
+#define FX_EXPLOSION_WIDTH					320
+#define FX_EXPLOSION_HEIGHT					236
+#define FX_EXPLOSION_FRAME_NUMBER			4
+
+
 #endif // ASSETS_H_INCLUDED
 
