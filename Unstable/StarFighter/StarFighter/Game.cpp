@@ -143,6 +143,14 @@ void Game::colisionChecksV2()
 
 					//Do something (like, kill ship) -> OK
 					(*it1)->damage_from(*(*it2));
+					//explosion
+					FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
+		
+					explosion->setVisible(true);
+					explosion->collider_type = IndependantType::Background;
+					explosion->isOnScene = true;
+					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Background);
+					//hide destroyed item
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
 						(*it1)->setVisible(false);
@@ -161,6 +169,13 @@ void Game::colisionChecksV2()
 			{
 				//Do something (like, kill ship)
 				(*it1)->damage_from(*(*it2));
+				//explosion
+				FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
+		
+					explosion->setVisible(true);
+					explosion->collider_type = IndependantType::Background;
+					explosion->isOnScene = true;
+					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Background);
 				//ship_hud->update((*it1)->getIndependantArmor(), (*it1)->getIndependantShield());
 				if ((*it1)->getIndependantArmor() <= 0)
 				{
@@ -190,6 +205,13 @@ void Game::colisionChecksV2()
 
 					//Do something (like, kill the enemy ship ?)
 					(*it1)->damage_from(*(*it2));
+					//explosion
+					FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
+		
+					explosion->setVisible(true);
+					explosion->collider_type = IndependantType::Background;
+					explosion->isOnScene = true;
+					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Background);
 					
 					//death
 					if ((*it1)->getIndependantArmor() <= 0)
