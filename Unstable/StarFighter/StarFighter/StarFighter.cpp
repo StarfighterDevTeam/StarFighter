@@ -100,12 +100,22 @@ int main()
 		}
 		if (enemy_spawn)
 		{
-			Enemy* badguyR = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32), ENEMYX_DAMAGE);
-			
-			badguyR->setVisible(true);
-			(*CurrentGame).addToScene(badguyR,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
-			deltaClockEnemySpawn.restart();
-			enemy_spawn = false;
+			int randomEnemyType = rand() % EnemyType::NBVAL_Enemy;
+			if (randomEnemyType==EnemyType::EnemyX)
+			{
+				Enemy* badguyR = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(ENEMYX_WIDTH,ENEMYX_HEIGHT), randomEnemyType);
+				(*CurrentGame).addToScene(badguyR,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
+				deltaClockEnemySpawn.restart();
+				enemy_spawn = false;
+			}
+
+			if (randomEnemyType==EnemyType::EnemyY)
+			{
+				Enemy* badguyR = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYY_FILENAME,Vector2f(ENEMYY_WIDTH,ENEMYY_HEIGHT), randomEnemyType);
+				(*CurrentGame).addToScene(badguyR,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
+				deltaClockEnemySpawn.restart();
+				enemy_spawn = false;
+			}
 		}
 
 
@@ -170,7 +180,7 @@ int main()
 		{
 			if(++enemyGeneration % 3 == 0)
 			{
-				Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32), ENEMYX_DAMAGE);
+				Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(ENEMYX_WIDTH,ENEMYX_HEIGHT));
 				badguy->collider_type = IndependantType::EnemyObject;
 				badguy->setVisible(true);
 				(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
@@ -194,7 +204,7 @@ int main()
 		//window->draw(hud.shieldBar);
 		//window->draw(myShip);
 
-		window->display();
+ 		window->display();
 	}
 
 	return 0;

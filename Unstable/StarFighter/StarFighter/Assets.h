@@ -31,5 +31,14 @@
 #define LOOT_WIDTH					64
 #define LOOT_HEIGHT					64
 
+#define ENEMYX_FILENAME				"Assets/2D/enemyX.png"
+#define ENEMYX_WIDTH				32
+#define ENEMYX_HEIGHT				32
+
+#define ENEMYY_FILENAME				"Assets/2D/enemyY.png"
+#define ENEMYY_WIDTH				32
+#define ENEMYY_HEIGHT				32
+
+
 #endif // ASSETS_H_INCLUDED
 

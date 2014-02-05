@@ -6,17 +6,29 @@
 #include "Independant.h"
 #include "Weapon.h"
 
-#define	ENEMYX_DAMAGE			10
-#define	ENEMYX_ARMOR			200
+#define	ENEMYX_DAMAGE			5
+#define	ENEMYX_ARMOR			100
 #define	ENEMYX_SHIELD			100
 #define	ENEMYX_SHIELD_REGEN		1
+
+#define	ENEMYY_DAMAGE			5
+#define	ENEMYY_ARMOR			200
+#define	ENEMYY_SHIELD			200
+#define	ENEMYY_SHIELD_REGEN		3
+
+enum EnemyType {
+	EnemyX,
+	EnemyY,
+	NBVAL_Enemy
+};
 
 class Enemy : public Independant
 {
 
 public:
-	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage);
+	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_enemy_type=0);
 	void update(sf::Time deltaTime) override;
+	int enemy_type;
 private:
 	Weapon weapon;
 };

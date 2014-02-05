@@ -131,7 +131,7 @@ bool Independant::collide_with (const Independant& independant)
 
 	if (!isOnScene || !(independant.isOnScene))
 		return false;
-
+	/*
 	// Some types of independant don't colide with each others
 	// 0=bg; 1=ship ; 2=friendly fire ; 3= enemy fire ; 4=enemy;	
 	else if (   (independant.collider_type==IndependantType::Background || collider_type==IndependantType::Background ) 
@@ -145,9 +145,9 @@ bool Independant::collide_with (const Independant& independant)
 		|| (independant.collider_type==IndependantType::EnemyObject && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire  || collider_type==IndependantType::EnemyObject || collider_type==IndependantType::EnemyFire))	)		
 
 		return false;
-
+	*/
 	// Preliminary test : are the two sprites even aligned ?
-	else if (independant.getPosition().x - (independant.m_size.x/2) > getPosition().x + (m_size.x/2)
+	if (independant.getPosition().x - (independant.m_size.x/2) > getPosition().x + (m_size.x/2)
 
 		|| independant.getPosition().x + (independant.m_size.x/2) < getPosition().x - (m_size.x/2)
 

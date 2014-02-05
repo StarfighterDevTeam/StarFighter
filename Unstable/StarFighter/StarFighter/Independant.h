@@ -5,8 +5,6 @@
 #include "TextureLoader.h"
 #include "AnimatedSprite.hpp"
 
-#define ENEMYX_FILENAME				"Assets/2D/enemyX.png"
-
 enum IndependantType {
 	Background,
 	LootObject,
@@ -41,6 +39,8 @@ public:
 	int getIndependantArmor();
 	int getIndependantShield();
 	virtual void Respawn();
+
+	
 
 protected:
 	sf::Vector2f speed;

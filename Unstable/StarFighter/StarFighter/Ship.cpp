@@ -234,21 +234,6 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->ship_config = m_ship_config;
 }
 
-/*
-void Ship::damage_from (Independant& independant) 
-{
-	if (independant.getIndependantDamage() > shield)
-	{
-
-		armor -= (independant.getIndependantDamage()-shield);
-		shield = 0;
-	}
-	else
-	{
-		shield -= independant.getIndependantDamage();
-	}
-}*/
-
 void Ship::update(sf::Time deltaTime)
 {
 	//immunity frames after death
@@ -271,6 +256,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 	this->ship_hud.update(armor/3, shield/3);//will do for now... but we'll need to scale it to the max value later
+
 	moving = false;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{	
