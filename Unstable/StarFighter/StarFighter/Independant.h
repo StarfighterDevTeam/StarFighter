@@ -40,6 +40,7 @@ public:
 	int getIndependantDamage();
 	int getIndependantArmor();
 	int getIndependantShield();
+	virtual void Respawn();
 
 protected:
 	sf::Vector2f speed;
@@ -53,6 +54,10 @@ protected:
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1);
+	
+	bool immune;
+	sf::Clock immunityTimer;
+	
 
 };
 

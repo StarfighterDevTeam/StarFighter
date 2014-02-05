@@ -42,6 +42,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->setPosition(position.x,position.y);
 	this->visible = false;
 	this->isOnScene = false;
+	this->immune = false;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber)
@@ -81,20 +82,25 @@ void Independant::setVisible(bool m_visible)
 	this->visible=m_visible;
 }
 
+void Independant::Respawn()
+{
+
+}
 
 void Independant::damage_from (Independant& independant)
 {
-	if (independant.damage > shield)
+	if (!immune)
 	{
-		armor -= (independant.damage - shield);
-		shield = 0;
+		if (independant.damage > shield)
+		{
+			armor -= (independant.damage - shield);
+			shield = 0;
+		}
+		else
+		{
+			shield -= independant.damage;
+		}
 	}
-	else
-	{
-		shield -= independant.damage;
-	}
-
-	
 }
 
 int Independant::getIndependantDamage()

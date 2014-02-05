@@ -251,6 +251,15 @@ void Ship::damage_from (Independant& independant)
 
 void Ship::update(sf::Time deltaTime)
 {
+	//immunity frames after death
+	if (immune)
+	{
+		if (immunityTimer.getElapsedTime() > sf::seconds(2))
+		{
+			immune = false;
+		}
+	}
+
 	//sheld regen if not maximum
 	if (shield < ship_config.getShipConfigShield())
 	{
@@ -342,4 +351,18 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	Independant::update(deltaTime);
+}
+
+void Ship::Respawn()
+{
+	armor = ship_config.getShipConfigArmor();
+	shield = ship_config.getShipConfigShield();
+	speed.x = 0;
+	speed.y = 0;
+	this->setVisible(true);
+	isOnScene = true;
+	this->setPosition(400, 500);
+
+	immune = true;
+	immunityTimer.restart();
 }

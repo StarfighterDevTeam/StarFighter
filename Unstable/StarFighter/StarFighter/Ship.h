@@ -9,6 +9,7 @@
 #include "Assets.h"
 #include "Hud.h"
 #include "Independant.h"
+#include <cmath>
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -109,6 +110,7 @@ public :
 	//void damage_from (Independant& independant) override;
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
+	void Respawn() override;
 
 private:
 	bool moving;
