@@ -17,7 +17,7 @@ int main()
 	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
 
 	srand (time(NULL));
-	
+
 	//default setting
 	ShipModel* shipModelDefault;
 	shipModelDefault = new ShipModel();
@@ -68,7 +68,7 @@ int main()
 	shipA->equipment[Shield] = shieldDefault;
 	//...until this point
 	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
-	
+
 	//Ship
 	Ship myShip(Vector2f(400,500),*shipA);
 	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
@@ -76,15 +76,16 @@ int main()
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
-	
+
 	//to erase later...
 	sf::Clock deltaClockKeyPressed;
 	bool keyrepeat = false;
 	///...until here (avoiding key repeition)
 
+	int enemyGeneration = 0;
 	while (window->isOpen())
 	{
-		
+
 		//to erase later...
 		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(1))
 		{
@@ -102,48 +103,48 @@ int main()
 
 		//to refactor later...
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
+		{
+			if (!keyrepeat)
 			{
-				if (!keyrepeat)
-				{
-					myShip.ship_config.setEquipment(engineZ);
-					printf ("Engine Z mounted.\n");
-					keyrepeat = true;
-					deltaClockKeyPressed.restart();
-				}
+				myShip.ship_config.setEquipment(engineZ);
+				printf ("Engine Z mounted.\n");
+				keyrepeat = true;
+				deltaClockKeyPressed.restart();
 			}
+		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-			{				
-				if (!keyrepeat)
-				{
-					myShip.ship_config.setEquipment(airbrakeZ);
-					printf ("Airbrake Z mounted.\n");
-					keyrepeat = true;
-					deltaClockKeyPressed.restart();
-				}
+		{				
+			if (!keyrepeat)
+			{
+				myShip.ship_config.setEquipment(airbrakeZ);
+				printf ("Airbrake Z mounted.\n");
+				keyrepeat = true;
+				deltaClockKeyPressed.restart();
 			}
+		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
-			{				
-				if (!keyrepeat)
-				{
-					myShip.ship_config.setEquipment(engineDefault);
-					printf ("Engine default mounted.\n");
-					keyrepeat = true;
-					deltaClockKeyPressed.restart();
-				}
+		{				
+			if (!keyrepeat)
+			{
+				myShip.ship_config.setEquipment(engineDefault);
+				printf ("Engine default mounted.\n");
+				keyrepeat = true;
+				deltaClockKeyPressed.restart();
 			}
+		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
-			{			
-				if (!keyrepeat)
-				{
-					myShip.ship_config.setEquipment(airbrakeDefault);
-					printf ("Airbrake default mounted.\n");
-					keyrepeat = true;
-					deltaClockKeyPressed.restart();
-				}
+		{			
+			if (!keyrepeat)
+			{
+				myShip.ship_config.setEquipment(airbrakeDefault);
+				printf ("Airbrake default mounted.\n");
+				keyrepeat = true;
+				deltaClockKeyPressed.restart();
 			}
+		}
 		//...until here (test equipment)
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -151,10 +152,14 @@ int main()
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::K))
 		{
-			Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32), ENEMYX_DAMAGE);
-			badguy->collider_type = IndependantType::EnemyObject;
-			badguy->setVisible(true);
-			(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
+			if(++enemyGeneration % 3 == 0)
+			{
+				Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32), ENEMYX_DAMAGE);
+				badguy->collider_type = IndependantType::EnemyObject;
+				badguy->setVisible(true);
+				(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
+				enemyGeneration = 0;
+			}
 		}
 
 		dt = deltaClock.restart();
