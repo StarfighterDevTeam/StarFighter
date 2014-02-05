@@ -27,6 +27,9 @@
 #define FX_EXPLOSION_FRAME_NUMBER			4
 #define FX_EXPLOSION_DURATION				0.6f
 
+#define LOOT_FILENAME				"Assets/2D/AirBrake.png"
+#define LOOT_WIDTH					64
+#define LOOT_HEIGHT					64
 
 #endif // ASSETS_H_INCLUDED
 

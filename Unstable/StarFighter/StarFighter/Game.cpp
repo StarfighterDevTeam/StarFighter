@@ -144,19 +144,14 @@ void Game::colisionChecksV2()
 					//Do something (like, kill ship) -> OK
 					(*it1)->damage_from(*(*it2));
 					//explosion
-					FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
-		
-					explosion->setVisible(true);
-					explosion->collider_type = IndependantType::Background;
-					explosion->isOnScene = true;
-					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Background);
+					FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
+					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 					//hide destroyed item
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
 						(*it1)->setVisible(false);
 						//this->garbage.push_back(*it1);
 					}
-
 				}
 			}
 		}
@@ -170,20 +165,31 @@ void Game::colisionChecksV2()
 				//Do something (like, kill ship)
 				(*it1)->damage_from(*(*it2));
 				//explosion
-				FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
-		
-					explosion->setVisible(true);
-					explosion->collider_type = IndependantType::Background;
-					explosion->isOnScene = true;
-					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Background);
-				//ship_hud->update((*it1)->getIndependantArmor(), (*it1)->getIndependantShield());
+				FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));	
+				this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
+
+				//death
 				if ((*it1)->getIndependantArmor() <= 0)
 				{
 					(*it1)->setVisible(false);
+					
 					//this->garbage.push_back(*it1);
 				}
 
 
+			}
+		}
+
+		//Loot
+		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::LootObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::LootObject]).end(); it2++)
+		{
+			i++;
+			if((*(*it1)).collide_with((*(*it2))))
+			{
+				//Do something (like, take the loot)
+				(*it2)->setVisible(false);
+				(*it2)->isOnScene = false;
+				this->garbage.push_back(*it2);
 			}
 		}
 	}
@@ -206,17 +212,20 @@ void Game::colisionChecksV2()
 					//Do something (like, kill the enemy ship ?)
 					(*it1)->damage_from(*(*it2));
 					//explosion
-					FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
-		
-					explosion->setVisible(true);
-					explosion->collider_type = IndependantType::Background;
-					explosion->isOnScene = true;
-					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Background);
+					FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
+					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
+
 					
 					//death
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
 						(*it1)->setVisible(false);
+						FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));	
+						this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
+						//Loot
+						Loot* loot = new Loot (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0, (*it1)->getIndependantSpeed().y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
+						this->addToScene(loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+						//sent to garbage collector
 						this->garbage.push_back(*it1);
 					}
 
@@ -259,13 +268,24 @@ void Game::collectGarbage()
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-		//isOnScene -> true
+	
 		if(!(**it).isOnScene)
 		{
-			if(((**it).getPosition().x + ((**it).m_size.x)/2 >= 0 && (**it).getPosition().x - ((**it).m_size.x)/2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y)/2 >= 0 && (**it).getPosition().y - ((**it).m_size.y)/2 <= SCENE_SIZE_Y))
+			//ended FX and loot objets
+			if ((**it).collider_type == IndependantType::LootObject || (**it).collider_type == IndependantType::Neutral)
 			{
-				(**it).isOnScene = true;
+				this->garbage.push_back(*it);
 			}
+
+			//out of screen objets
+			else
+			{
+				if(((**it).getPosition().x + ((**it).m_size.x)/2 >= 0 && (**it).getPosition().x - ((**it).m_size.x)/2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y)/2 >= 0 && (**it).getPosition().y - ((**it).m_size.y)/2 <= SCENE_SIZE_Y))
+				{
+					(**it).isOnScene = true;
+				}
+			}
+			
 		}
 
 		if((**it).collider_type == Background || !(**it).isOnScene)
@@ -279,7 +299,6 @@ void Game::collectGarbage()
 			this->garbage.push_back(*it);
 			continue;
 		}
-
 	}
 
 	//printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());

@@ -1,8 +1,10 @@
 #include "Loot.h"
 
-Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : Independant(position, speed, textureName, size)
+Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : Independant(position, speed, textureName, size)
 {
-	 this->visible = true;
+	 visible = true;
+	 isOnScene = true;
+	 collider_type = IndependantType::LootObject;
 }
 
 

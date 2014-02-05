@@ -81,6 +81,7 @@ public:
 		this->getInstance()->loadTexture("Assets/2D/enemyX.png",32,32);
 		this->getInstance()->loadTexture("Assets/2D/FX_explosion.png",1280,236);
 		this->getInstance()->loadTexture("Assets/2D/background.png",800,1800);
+		this->getInstance()->loadTexture("Assets/2D/AirBrake.png",64,64);
 	}
 
 	// Fonctions de création et destruction du singleton

@@ -112,6 +112,11 @@ int Independant::getIndependantArmor()
 	return armor;
 }
 	
+sf::Vector2f Independant::getIndependantSpeed()
+{
+	return sf::Vector2f(speed.x, speed.y);
+}
+
 bool Independant::collide_with (const Independant& independant)
 {
 	// If not visibe, let's not even bother with the collision

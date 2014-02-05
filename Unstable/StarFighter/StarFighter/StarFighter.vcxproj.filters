@@ -60,6 +60,9 @@
     <ClCompile Include="FX.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Loot.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ship.h">
@@ -102,6 +105,9 @@
       <Filter>Fichiers sources</Filter>
     </ClInclude>
     <ClInclude Include="FX.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Loot.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
   </ItemGroup>

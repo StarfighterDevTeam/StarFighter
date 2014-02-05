@@ -3,6 +3,7 @@
 
 #include "Globals.h"
 #include "FX.h"
+#include "Loot.h"
 #include <list>
 #include <vector>
 
