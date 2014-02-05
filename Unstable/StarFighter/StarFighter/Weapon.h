@@ -17,7 +17,7 @@ struct Weapon : public sf::Sprite
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);
 	sf::Vector2i fire_direction;
-
+	float rate_of_fire;
 	sf::Clock deltaClock;
 };
 

@@ -81,6 +81,8 @@ int main()
 	sf::Clock deltaClockKeyPressed;
 	bool keyrepeat = false;
 	///...until here (avoiding key repeition)
+	sf::Clock deltaClockEnemySpawn;
+	bool enemy_spawn = true;
 
 	int enemyGeneration = 0;
 	while (window->isOpen())
@@ -92,6 +94,20 @@ int main()
 			keyrepeat = false;
 		}
 		// ... until here (avoiding key repeatition)
+		if (deltaClockEnemySpawn.getElapsedTime() > sf::seconds(1))
+		{
+			enemy_spawn = true;
+		}
+		if (enemy_spawn)
+		{
+			Enemy* badguyR = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(32,32), ENEMYX_DAMAGE);
+			
+			badguyR->setVisible(true);
+			(*CurrentGame).addToScene(badguyR,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
+			deltaClockEnemySpawn.restart();
+			enemy_spawn = false;
+		}
+
 
 		bool moving = false;
 		sf::Event event;

@@ -4,16 +4,17 @@ extern Game* CurrentGame;
 
 Weapon::Weapon()
 {
-	this->speed.x = 0;
-	this->speed.y = 0;
-	this->damage = LASER_DAMAGE;
-	this->firing_ready = true;
-	this->fire_direction = sf::Vector2i(0, 1);
+	speed.x = 0;
+	speed.y = 0;
+	rate_of_fire = LASER_RATE_OF_FIRE;
+	damage = LASER_DAMAGE;
+	firing_ready = true;
+	fire_direction = sf::Vector2i(0, 1);
 }
 
 void Weapon::Fire(IndependantType m_collider_type)
 {
-	if (deltaClock.getElapsedTime() > sf::seconds(LASER_RATE_OF_FIRE))
+	if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
 	{
 		firing_ready = true;
 	}

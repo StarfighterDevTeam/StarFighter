@@ -6,7 +6,7 @@
 #include "Independant.h"
 #include "Weapon.h"
 
-#define	ENEMYX_DAMAGE			100
+#define	ENEMYX_DAMAGE			10
 #define	ENEMYX_ARMOR			200
 #define	ENEMYX_SHIELD			100
 #define	ENEMYX_SHIELD_REGEN		1
