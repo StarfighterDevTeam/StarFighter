@@ -21,11 +21,18 @@
 #define LASER_HEIGHT				12
 #define LASER_FRAME_NUMBER			1
 
+#define LASERBLUE_FILENAME				"Assets/2D/laser_blue.png"
+#define LASERBLUE_WIDTH					4
+#define LASERBLUE_HEIGHT				16
+#define LASERBLUE_FRAME_NUMBER			1
+
 #define FX_EXPLOSION_FILENAME				"Assets/2D/FX_explosion.png"
 #define FX_EXPLOSION_WIDTH					320
 #define FX_EXPLOSION_HEIGHT					236
 #define FX_EXPLOSION_FRAME_NUMBER			4
-#define FX_EXPLOSION_DURATION				0.6f
+#define FX_LITTLE_EXPLOSION_DURATION		0.1f
+#define FX_MEDIUM_EXPLOSION_DURATION		0.2f
+#define FX_LARGE_EXPLOSION_DURATION			0.8f
 
 #define LOOT_FILENAME				"Assets/2D/AirBrake.png"
 #define LOOT_WIDTH					64

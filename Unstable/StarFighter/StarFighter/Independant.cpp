@@ -113,6 +113,16 @@ int Independant::getIndependantShield()
 	return shield;
 }
 
+int Independant::getIndependantShieldMax()
+{
+	return shield_max;
+}
+
+int Independant::getIndependantShieldRegen()
+{
+	return shield_regen;
+}
+
 int Independant::getIndependantArmor()
 {
 	return armor;

@@ -13,11 +13,11 @@
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
-#define SHIP_ACCELERATION_X         10.0f
-#define SHIP_ACCELERATION_Y         10.0f
-#define SHIP_DECCELERATION_COEF		200.0f
-#define SHIP_MAX_SPEED_X            200.0f
-#define SHIP_MAX_SPEED_Y            200.0f
+#define SHIP_ACCELERATION_X         30.0f
+#define SHIP_ACCELERATION_Y         30.0f
+#define SHIP_DECCELERATION_COEF		1000.0f
+#define SHIP_MAX_SPEED_X            500.0f
+#define SHIP_MAX_SPEED_Y            500.0f
 #define SHIP_MIN_SPEED_X            50.0f
 #define SHIP_MIN_SPEED_Y            50.0f
 #define SHIP_ARMOR					600
@@ -91,6 +91,7 @@ public:
 	int getShipConfigShieldRegen();
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
+	Weapon* weapon;
 private:
 	sf::Vector2f max_speed;
 	float decceleration;
@@ -105,7 +106,6 @@ public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init(int x, int y);
 	void update(sf::Time deltaTime) override;
-	Weapon weapon;
 	void setShipConfig(ShipConfig m_ship_config);
 	//void damage_from (Independant& independant) override;
 	ShipConfig ship_config;

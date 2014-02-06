@@ -116,6 +116,8 @@ void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::stri
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
 	this->frameNumber = m_frameNumber;
+	
+	weapon = new Weapon(WeaponType::LaserFast);
 }
 
 void ShipConfig::setEquipment(Equipment* m_equipment)
@@ -281,8 +283,8 @@ void Ship::update(sf::Time deltaTime)
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		weapon.setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
-		weapon.Fire(FriendlyFire);
+		ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
+		ship_config.weapon->Fire(FriendlyFire);
 	}
 
 	//max speed constraints

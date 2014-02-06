@@ -6,19 +6,30 @@
 #include "Assets.h"
 #include "FX.h"
 
-#define LASER_RATE_OF_FIRE			0.3f
+#define LASER_RATE_OF_FIRE			0.4f
 #define LASER_DAMAGE				100
+
+#define LASERFAST_RATE_OF_FIRE			0.2f
+#define LASERFAST_DAMAGE				50
+
+enum WeaponType {
+	Laser,
+	LaserFast,
+	NBVAL_Weapon
+};
 
 struct Weapon : public sf::Sprite
 {
 	sf::Vector2f speed;
 	int damage;
-	Weapon();
+	Weapon(int m_weapon_type = 0);
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
 	sf::Clock deltaClock;
+	int weapon_type;
+	int ammo_type;
 };
 
 

@@ -2,11 +2,17 @@
 
 Game* CurrentGame;
 
+
 int main()
 {
 	sf::RenderWindow*	window = new sf::RenderWindow( sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter" );
 	glEnable(GL_TEXTURE_2D);
 	window->setKeyRepeatEnabled(false);
+
+	//sf::Music Rebecca;
+	//if (!Rebecca.openFromFile("Assets/Music/Rebecca.ogg"))
+    //return -1; // erreur
+	//music.play();
 
 	CurrentGame = new Game();
 	(*CurrentGame).init(window);

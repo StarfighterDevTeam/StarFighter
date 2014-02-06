@@ -38,6 +38,8 @@ public:
 	int getIndependantDamage();
 	int getIndependantArmor();
 	int getIndependantShield();
+	int getIndependantShieldMax();
+	int getIndependantShieldRegen();
 	virtual void Respawn();
 
 	
@@ -47,6 +49,7 @@ protected:
 	int damage;
 	int armor;
 	int shield;
+	int shield_max;
 	int shield_regen;
 	std::string textureName;
 	Animation defaultAnimation;

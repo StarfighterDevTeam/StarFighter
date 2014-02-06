@@ -144,12 +144,14 @@ void Game::colisionChecksV2()
 					//Do something (like, kill ship) -> OK
 					(*it1)->damage_from(*(*it2));
 					//explosion
-					FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
+					FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
 					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 					//hide destroyed item
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
 						(*it1)->setVisible(false);
+						FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LARGE_EXPLOSION_DURATION));	
+						this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 						//we all deserve another chance...
 						(*it1)->Respawn();
 						//this->garbage.push_back(*it1);
@@ -167,13 +169,15 @@ void Game::colisionChecksV2()
 				//Do something (like, kill ship)
 				(*it1)->damage_from(*(*it2));
 				//explosion
-				FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));	
+				FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LITTLE_EXPLOSION_DURATION));	
 				this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 
 				//death
 				if ((*it1)->getIndependantArmor() <= 0)
 				{
 					(*it1)->setVisible(false);
+					FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LARGE_EXPLOSION_DURATION));	
+					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 					//we all deserve another chance...
 					(*it1)->Respawn();
 					//this->garbage.push_back(*it1);
@@ -215,7 +219,7 @@ void Game::colisionChecksV2()
 					//Do something (like, kill the enemy ship ?)
 					(*it1)->damage_from(*(*it2));
 					//explosion
-					FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));
+					FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
 					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 
 					
@@ -223,7 +227,7 @@ void Game::colisionChecksV2()
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
 						(*it1)->setVisible(false);
-						FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_DURATION));	
+						FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LARGE_EXPLOSION_DURATION));	
 						this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 						//Loot
 						Loot* loot = new Loot (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0, (*it1)->getIndependantSpeed().y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));

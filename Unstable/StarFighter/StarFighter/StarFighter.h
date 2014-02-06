@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
+#include <SFML/Audio.hpp>
 #include "Globals.h"
 #include "Ship.h"
 #include "Background.h"

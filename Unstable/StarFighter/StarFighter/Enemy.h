@@ -14,7 +14,7 @@
 #define	ENEMYY_DAMAGE			5
 #define	ENEMYY_ARMOR			200
 #define	ENEMYY_SHIELD			200
-#define	ENEMYY_SHIELD_REGEN		3
+#define	ENEMYY_SHIELD_REGEN		1
 
 enum EnemyType {
 	EnemyX,
@@ -30,7 +30,7 @@ public:
 	void update(sf::Time deltaTime) override;
 	int enemy_type;
 private:
-	Weapon weapon;
+	Weapon* weapon;
 };
 
 #endif // INDEPENDANT_H_INCLUDED
