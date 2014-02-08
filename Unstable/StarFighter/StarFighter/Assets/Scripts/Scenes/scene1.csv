@@ -1,0 +1,3 @@
+bg,Assets/2D/background.png,800,1800
+#enemies_name,probability
+enemy,robert,0.5

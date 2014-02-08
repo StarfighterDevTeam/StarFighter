@@ -75,7 +75,7 @@ public:
 
 	void TextureLoader::loadAll()
 	{
-		//Load all the TExtures:
+		//Load all the Textures:
 		this->getInstance()->loadTexture("Assets/2D/laser.png",4,12);
 		this->getInstance()->loadTexture("Assets/2D/laser_blue.png",4,16);
 		this->getInstance()->loadTexture("Assets/2D/player_sprite.png",192,64);

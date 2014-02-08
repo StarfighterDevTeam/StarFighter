@@ -1,0 +1,2 @@
+#enemy_name,armor,shield,shield_regen,damage,weapon_name,image,width,height,frames,vspeed
+robert,100,100,1,5,laser,Assets/2D/enemyX.png,32,32,1,70

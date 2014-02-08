@@ -2,7 +2,6 @@
 
 Game* CurrentGame;
 
-
 int main()
 {
 	sf::RenderWindow*	window = new sf::RenderWindow( sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter" );
@@ -12,17 +11,19 @@ int main()
 	sf::Music Rebecca;
 	if (!Rebecca.openFromFile("Assets/Music/Rebecca.ogg"))
 		return -1; // erreur
-	Rebecca.play();
+	//Rebecca.play();
 
 	CurrentGame = new Game();
 	(*CurrentGame).init(window);
 
 	//adding background
-	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1200));
+	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1800-WINDOW_RESOLUTION_Y));
 	bg->setVisible(true);
 	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
 
 	srand (time(NULL));
+
+	
 
 	//default setting
 	ShipModel* shipModelDefault;
@@ -86,7 +87,10 @@ int main()
 	//to erase later...
 	sf::Clock deltaClockKeyPressed;
 	bool keyrepeat = false;
-	///...until here (avoiding key repeition)
+	///...until here (avoiding key repetition)
+
+	Scene level1("Assets/Scripts/Scenes/scene1.csv");
+
 	sf::Clock deltaClockEnemySpawn;
 	bool enemy_spawn = true;
 

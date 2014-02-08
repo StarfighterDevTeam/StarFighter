@@ -30,6 +30,9 @@ struct Weapon : public sf::Sprite
 	sf::Clock deltaClock;
 	int weapon_type;
 	int ammo_type;
+	Ammo* ammunition;
+
+	Weapon* Clone();
 };
 
 

@@ -13,4 +13,9 @@
 #define	SCENE_SIZE_X							800
 #define SCENE_SIZE_Y							600
 
+
+#define ENEMY_FILE	"Assets/Scripts/Enemies.csv"
+#define WEAPON_FILE	"Assets/Scripts/Weapons.csv"
+#define AMMO_FILE "Assets/Scripts/Ammo.csv"
+
 #endif // GLOBALS_H_INCLUDED

@@ -42,15 +42,15 @@ public:
 	int getIndependantShieldRegen();
 	virtual void Respawn();
 
-	
-
-protected:
-	sf::Vector2f speed;
 	int damage;
 	int armor;
 	int shield;
 	int shield_max;
 	int shield_regen;
+
+protected:
+	sf::Vector2f speed;
+
 	std::string textureName;
 	Animation defaultAnimation;
 	Animation* currentAnimation;

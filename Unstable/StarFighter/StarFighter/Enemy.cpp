@@ -7,7 +7,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
 	//damage = ENEMYX_DAMAGE;
-
+	//TODO remove this
 	if (m_enemy_type == EnemyType::EnemyX)
 	{
 		armor = ENEMYX_ARMOR;
@@ -60,4 +60,19 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 	Independant::update(deltaTime);
+}
+
+Enemy* Enemy::Clone()
+{
+	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, 0);
+
+	enemy->probability = this->probability;
+
+	((Independant*)enemy)->armor = this->getIndependantArmor();
+	((Independant*)enemy)->shield = this->getIndependantShield();
+	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
+	((Independant*)enemy)->damage = this->getIndependantDamage();
+	enemy->weapon = this->weapon->Clone();
+
+	return enemy;
 }

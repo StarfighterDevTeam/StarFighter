@@ -49,4 +49,14 @@ void Weapon::Fire(IndependantType m_collider_type)
 	}
 }
 
+Weapon* Weapon::Clone()
+{
+	Weapon* weapon = new Weapon();
+	weapon->fire_direction = this->fire_direction;
+	weapon->rate_of_fire = this->rate_of_fire;
+	weapon->damage = this->damage;
+	weapon->ammunition = this->ammunition->Clone();
+	return weapon;
+}
+
 
