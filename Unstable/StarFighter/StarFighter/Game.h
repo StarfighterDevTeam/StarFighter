@@ -6,6 +6,7 @@
 #include "Loot.h"
 #include <list>
 #include <vector>
+#include "TextUtils.h"
 
 using namespace sf;
 

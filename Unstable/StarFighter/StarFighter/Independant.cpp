@@ -23,6 +23,12 @@ Independant::Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture 
 	Init(position,speed,texture,1);
 }
 
+string Independant::getName()
+{
+	vector<string> s1 = TextUtils::split(this->textureName,'/');
+	return *(s1.end()-1);
+}
+
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber)
 {
 	this->m_size.x = ((*texture).getSize().x/frameNumber);
@@ -128,7 +134,7 @@ int Independant::getIndependantArmor()
 {
 	return armor;
 }
-	
+
 sf::Vector2f Independant::getIndependantSpeed()
 {
 	return sf::Vector2f(speed.x, speed.y);
@@ -147,15 +153,15 @@ bool Independant::collide_with (const Independant& independant)
 	// 0=bg; 1=ship ; 2=friendly fire ; 3= enemy fire ; 4=enemy;	
 	else if (   (independant.collider_type==IndependantType::Background || collider_type==IndependantType::Background ) 
 
-		|| (independant.collider_type==IndependantType::PlayerShip && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire)) 
+	|| (independant.collider_type==IndependantType::PlayerShip && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire)) 
 
-		|| (independant.collider_type==IndependantType::FriendlyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::PlayerShip || collider_type==IndependantType::EnemyFire)) 
+	|| (independant.collider_type==IndependantType::FriendlyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::PlayerShip || collider_type==IndependantType::EnemyFire)) 
 
-		|| (independant.collider_type==IndependantType::EnemyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire || collider_type==IndependantType::EnemyObject  || collider_type==IndependantType::EnemyFire)) 
+	|| (independant.collider_type==IndependantType::EnemyFire && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire || collider_type==IndependantType::EnemyObject  || collider_type==IndependantType::EnemyFire)) 
 
-		|| (independant.collider_type==IndependantType::EnemyObject && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire  || collider_type==IndependantType::EnemyObject || collider_type==IndependantType::EnemyFire))	)		
+	|| (independant.collider_type==IndependantType::EnemyObject && (collider_type==IndependantType::Background || collider_type==IndependantType::FriendlyFire  || collider_type==IndependantType::EnemyObject || collider_type==IndependantType::EnemyFire))	)		
 
-		return false;
+	return false;
 	*/
 	// Preliminary test : are the two sprites even aligned ?
 	if (independant.getPosition().x - (independant.m_size.x/2) > getPosition().x + (m_size.x/2)

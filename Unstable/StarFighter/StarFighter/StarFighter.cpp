@@ -14,17 +14,9 @@ int main()
 	//Rebecca.play();
 
 	CurrentGame = new Game();
-	//(*CurrentGame).init(window);
-
-	//adding background
-	//Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1800-WINDOW_RESOLUTION_Y));
-	//bg->setVisible(true);
-	//(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
-
 	srand (time(NULL));
 
 	
-
 	//default setting
 	ShipModel* shipModelDefault;
 	shipModelDefault = new ShipModel();
@@ -76,10 +68,6 @@ int main()
 	//...until this point
 	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 
-	//Ship
-	//Ship myShip(Vector2f(400,500),*shipA);
-	//(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
-
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
@@ -88,10 +76,6 @@ int main()
 	sf::Clock deltaClockKeyPressed;
 	bool keyrepeat = false;
 	///...until here (avoiding key repetition)
-
-	
-
-	bool enemy_spawn = true;
 
 	Scene level1("Assets/Scripts/Scenes/scene1.csv",shipA);
 	level1.StartGame(window);
@@ -107,8 +91,6 @@ int main()
 		}
 		// ... until here (avoiding key repeatition)
 
-
-		bool moving = false;
 		sf::Event event;
 		while (window->pollEvent(event))
 		{
@@ -167,22 +149,6 @@ int main()
 
 		dt = deltaClock.restart();
 		level1.Update(dt);
-
-		//(*CurrentGame).updateScene(dt);
-		//myShip.ship_hud.update(myShip.getIndependantArmor(), myShip.getIndependantShield());
-		//myShip.Update(dt);
-
-		//display
-		//window->clear();
-
-		//(*CurrentGame).drawScene();
-		//window->draw(myShip.ship_hud.armorBar);
-		//window->draw(myShip.ship_hud.shieldBar);
-		//window->draw(hud.armorBar);
-		//window->draw(hud.shieldBar);
-		//window->draw(myShip);
-
- 		//window->display();
 	}
 
 	return 0;

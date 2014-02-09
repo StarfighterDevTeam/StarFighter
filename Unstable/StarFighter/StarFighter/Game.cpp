@@ -13,7 +13,6 @@ const char* IndependantTypeValues[] =
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
-	//TextureLoader::getInstance ()->loadAll();
 
 	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
 	{
@@ -23,9 +22,6 @@ void Game::init(RenderWindow* window)
 	{
 		sceneIndependantsTyped[i] = new std::list<Independant*>;
 	}
-	
-	//ship_hud = new PlayerHud();
-	//ship_hud->Init();
 }
 
 
@@ -44,8 +40,7 @@ void Game::addToScene(Independant *object, int layer, IndependantType type)
 	}
 	else
 	{
-		//throw ?
-		//printf("Erreur, mauvais layer, connard\n");
+		throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::FatalError,ExceptionUtils::format("Game eror: Unable to add Independant '%s' to layer '%d'", object->getName().c_str(), layer)));
 	}
 }
 
@@ -68,7 +63,7 @@ void Game::updateScene(Time deltaTime)
 	{
 		(*(*it)).update(deltaTime);
 	}
-	//ship_hud->update(deltaTime, sceneIndependantsTyped[IndependantType::PlayerShip].begin().getIndependantArmor(), sceneIndependantsTyped[IndependantType::PlayerShip].begin().getIndependantShield());
+
 	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -125,7 +120,7 @@ void Game::colisionChecksV2()
 	sf::Clock dt;
 	dt.restart();
 	int i= 0;
-	
+
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
 	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); it1++)
 	{
@@ -222,7 +217,7 @@ void Game::colisionChecksV2()
 					FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
 					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 
-					
+
 					//death
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
@@ -240,7 +235,7 @@ void Game::colisionChecksV2()
 			}
 		}
 	}
-	
+
 	//printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
@@ -275,7 +270,7 @@ void Game::collectGarbage()
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-	
+
 		if(!(**it).isOnScene)
 		{
 			//ended FX and loot objets
@@ -292,7 +287,7 @@ void Game::collectGarbage()
 					(**it).isOnScene = true;
 				}
 			}
-			
+
 		}
 
 		if((**it).collider_type == Background || !(**it).isOnScene)

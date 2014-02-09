@@ -6,6 +6,8 @@
 #include "TextureLoader.h"
 #include "Independant.h"
 #include "Game.h"
+#include "Exceptions.h"
+
 
 #define	WINDOW_RESOLUTION_X						800
 #define WINDOW_RESOLUTION_Y						600

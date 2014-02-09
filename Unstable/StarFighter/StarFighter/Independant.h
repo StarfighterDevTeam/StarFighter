@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include "TextureLoader.h"
 #include "AnimatedSprite.hpp"
+#include "TextUtils.h";
+#include <vector>
 
 enum IndependantType {
 	Background,
@@ -40,6 +42,7 @@ public:
 	int getIndependantShield();
 	int getIndependantShieldMax();
 	int getIndependantShieldRegen();
+	string getName();
 	virtual void Respawn();
 
 	int damage;
@@ -50,7 +53,6 @@ public:
 	sf::Vector2f speed;
 
 protected:
-	
 
 	std::string textureName;
 	Animation defaultAnimation;
@@ -58,10 +60,10 @@ protected:
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1);
-	
+
 	bool immune;
 	sf::Clock immunityTimer;
-	
+
 
 };
 

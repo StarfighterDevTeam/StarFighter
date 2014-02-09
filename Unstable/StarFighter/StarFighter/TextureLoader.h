@@ -40,7 +40,7 @@ public:
 
 		if (!(*texture).loadFromFile(filename, sf::IntRect(0, 0, sizeX, sizeY)))
 		{
-			throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::Error,ExceptionUtils::format("TextureLoad error: Unable to load texture from file '%s'",filename)));
+			throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::FatalError,ExceptionUtils::format("TextureLoad error: Unable to load texture from file '%s'",filename)));
 		}
 
 		//Add the texture
