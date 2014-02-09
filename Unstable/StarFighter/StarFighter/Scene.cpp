@@ -32,6 +32,20 @@ Scene::Scene(string name, ShipConfig* shipConf)
 				this->enemies.push_back(*e);
 			}
 		}
+
+		//Loading font for framerate
+		//TODO : refactor this
+		sf::Font* font = new sf::Font();
+		if (!font->loadFromFile("Assets/Fonts/arial.ttf"))
+		{
+			// error
+			//TODO: font loader
+		}
+		this->framerate = new sf::Text("00", *font, 15);
+		this->framerate->setColor(sf::Color::Yellow);
+		this->framerate->setStyle(sf::Text::Bold);
+		this->framerate->setPosition(WINDOW_RESOLUTION_X-80,WINDOW_RESOLUTION_Y-30);
+
 	}
 	catch( const std::exception & ex ) {
 
@@ -63,9 +77,14 @@ void Scene::Update(Time deltaTime)
 	mainWindow->clear();
 	(*CurrentGame).drawScene();
 
-	//TODO: refactor this
+	//TODO: refactor these
 	mainWindow->draw(this->playerShip->ship_hud.armorBar);
 	mainWindow->draw(this->playerShip->ship_hud.shieldBar);
+
+
+	//Show framerate
+	this->framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
+	mainWindow->draw(*(this->framerate));
 
 	mainWindow->display();
 }
@@ -178,7 +197,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 		for (std::list<EnemyBase>::iterator it = (this->enemies).begin(); it != (this->enemies).end(); it++)
 		{
-			if(it->probability < random_number && it->poolsize > 0)
+			if(it->probability > random_number && it->poolsize > 0)
 			{
 				//spawn (where on screen ?)
 				Enemy* n = it->enemy->Clone();

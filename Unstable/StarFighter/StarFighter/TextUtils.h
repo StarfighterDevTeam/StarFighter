@@ -47,6 +47,13 @@ public:
 		return ret;
 	}
 
+	static string float2string(float f)
+	{
+		ostringstream os;
+		os << f;
+		return os.str();
+	}
+
 };
 
 #endif // EXCEPTIONS_H_INCLUDED

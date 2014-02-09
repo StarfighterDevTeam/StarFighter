@@ -33,6 +33,7 @@ private:
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
 
+
 	list<vector<string>>* Scene::FileLoader(string name);
 
 	Ship* playerShip;
@@ -43,6 +44,8 @@ private:
 	list<vector<string>> ammoConfig;
 	Independant* bg;
 	sf::RenderWindow* mainWindow;
+
+	sf::Text* framerate;
 };
 
 #endif // STARFIGHTER_H_INCLUDED

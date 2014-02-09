@@ -80,10 +80,10 @@ int main()
 	bool keyrepeat = false;
 	///...until here (avoiding key repetition)
 
+	//Loading Scene
 	Scene level1("Assets/Scripts/Scenes/scene1.csv",shipA);
 	level1.StartGame(window);
 
-	int enemyGeneration = 0;
 	while (window->isOpen())
 	{
 
@@ -150,8 +150,10 @@ int main()
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();
 
+
 		dt = deltaClock.restart();
 		level1.Update(dt);
+
 	}
 
 	return 0;
