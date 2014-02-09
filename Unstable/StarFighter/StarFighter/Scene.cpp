@@ -27,7 +27,7 @@ Scene::Scene(string name, ShipConfig* shipConf)
 
 			if((*it)[0].compare("enemy") == 0)
 			{
-				EnemyBase* e = LoadEnemy((*it)[1],atof((*it)[2].c_str()),stoi((*it)[3]));
+				EnemyBase* e = LoadEnemy((*it)[SceneData::ENEMY],atof((*it)[SceneData::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneData::ENEMY_POOLSIZE]), stoi((*it)[SceneData::ENEMY_CLASS]));
 				this->enemies.push_back(*e);
 			}
 		}
@@ -94,23 +94,24 @@ Ship* Scene::GetPlayerShip()
 }
 
 
-EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize)
+EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass)
 {
 	for (std::list<vector<string>>::iterator it = (this->enemyConfig).begin(); it != (this->enemyConfig).end(); it++)
 	{
 		if((*it)[0].compare(name) == 0)
 		{
 			EnemyBase* base = new EnemyBase;
-			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(0,stoi((*it)[11])),(*it)[7],sf::Vector2f(stoi((*it)[8]),stoi((*it)[9])));
+			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(0,stoi((*it)[EnemyData::ENEMY_SPEED])),(*it)[EnemyData::ENEMY_IMAGE_NAME],sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]),stoi((*it)[EnemyData::ENEMY_HEIGHT])));
 			base->probability = probability;
 			base->poolsize = poolSize;
+			base->enemyclass = enemyClass;
 
-			((Independant*)base->enemy)->armor = stoi((*it)[1]);
-			((Independant*)base->enemy)->shield = ((Independant*)base->enemy)->shield_max = stoi((*it)[2]);
-			((Independant*)base->enemy)->shield_regen = stoi((*it)[3]);
-			((Independant*)base->enemy)->damage = stoi((*it)[4]);
+			((Independant*)base->enemy)->armor = stoi((*it)[EnemyData::ENEMY_ARMOR]);
+			((Independant*)base->enemy)->shield = ((Independant*)base->enemy)->shield_max = stoi((*it)[EnemyData::ENEMY_SHIELD]);
+			((Independant*)base->enemy)->shield_regen = stoi((*it)[EnemyData::ENEMY_SHIELD_REGEN]);
+			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
 
-			base->enemy->weapon = LoadWeapon((*it)[5], -1, LoadAmmo((*it)[6]));
+			base->enemy->weapon = LoadWeapon((*it)[EnemyData::WEAPON], -1, LoadAmmo((*it)[EnemyData::AMMO]));
 
 			return base;
 		}
@@ -127,7 +128,7 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		{
 			Weapon* weapon = new Weapon(ammo);
 			weapon->fire_direction = Vector2i(0,fire_direction);
-			weapon->rate_of_fire = atof((*it)[1].c_str());
+			weapon->rate_of_fire = atof((*it)[WeaponData::RATE_OF_FIRE].c_str());
 
 			return weapon;
 		}
@@ -143,7 +144,7 @@ Ammo* Scene::LoadAmmo(string name)
 	{
 		if((*it)[0].compare(name) == 0)
 		{
-			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[2])), (*it)[3], Vector2f(stoi((*it)[4]),stoi((*it)[4])), stoi((*it)[1]));
+			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_WIDTH])), stoi((*it)[AmmoData::AMMO_DAMAGE]));
 		}
 	}
 
@@ -204,7 +205,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 				n->setVisible(true);
 				it->poolsize--;
 
-				LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("spawning enemy '%s' (x=%.1f) [pool=%d]",it->enemy->getName().c_str(),n->getPosition().x,it->poolsize));
+				LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("spawning enemy '%s' (x=%.1f) [pool=%d] (class=%d)",it->enemy->getName().c_str(),n->getPosition().x,it->poolsize, it->enemyclass));
 
 				(*CurrentGame).addToScene((Independant*)n,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
 			}

@@ -11,11 +11,57 @@
 
 using namespace std;
 
+enum SceneData
+{
+	SCENE_COMPARE_TYPE,//0
+	ENEMY,//1
+	ENEMY_PROBABILITY,//2
+	ENEMY_POOLSIZE,//3
+	ENEMY_CLASS//4
+};
+
+enum EnemyData
+{
+	ENEMY_NAME,//0
+	ENEMY_ARMOR,//1
+	ENEMY_SHIELD,//2
+	ENEMY_SHIELD_REGEN,//3
+	ENEMY_DAMAGE,//4
+	WEAPON,//5
+	AMMO,//6
+	ENEMY_IMAGE_NAME,//7
+	ENEMY_WIDTH,//8
+	ENEMY_HEIGHT,//9
+	ENEMY_FRAMES,//10
+	ENEMY_SPEED//11
+};
+
+enum WeaponData
+{
+	WEAPON_NAME,//0
+	RATE_OF_FIRE,//1
+	WEAPON_IMAGE_NAME,//2
+	WEAPON_WIDTH,//3
+	WEAPON_HEIGHT//4
+};
+
+enum AmmoData
+{
+	AMMO_NAME,//0
+	AMMO_DAMAGE,//1
+	AMMO_SPEED,//2
+	AMMO_IMAGE_NAME,//3
+	AMMO_WIDTH,//4
+	AMMO_HEIGHT,//5
+	AMMO_FRAMES//6
+};
+
 struct EnemyBase
 {
 	Enemy* enemy;
 	float probability;
 	int poolsize;
+	int enemyclass;
 };
 
 class Scene
@@ -29,7 +75,7 @@ public:
 	void Scene::GenerateEnemies(Time deltaTime);
 
 private:
-	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize);
+	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass);
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
 
