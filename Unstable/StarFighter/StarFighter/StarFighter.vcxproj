@@ -112,6 +112,7 @@
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="FX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Globals.h" />

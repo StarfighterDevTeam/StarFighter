@@ -8,6 +8,7 @@
 #include "Globals.h"
 #include "Enemy.h"
 #include "Ship.h"
+#include "Exceptions.h"
 
 using namespace std;
 

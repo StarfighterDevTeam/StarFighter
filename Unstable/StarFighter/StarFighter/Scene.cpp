@@ -8,24 +8,31 @@ Scene::Scene(string name, ShipConfig* shipConf)
 	loader = TextureLoader::getInstance ();
 	loader->loadAll();
 
-	this->config = *(FileLoader(name));
-	this->enemyConfig = *(FileLoader(ENEMY_FILE));
-	this->weaponConfig = *(FileLoader(WEAPON_FILE));
-	this->ammoConfig = *(FileLoader(AMMO_FILE));
+	try {
 
-	for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
-	{
-		if((*it)[0].compare("bg") == 0)
-		{
-			this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),(*it)[1],Vector2f(stoi((*it)[2]),stoi((*it)[3])),Vector2f(0,stoi((*it)[3])-WINDOW_RESOLUTION_Y));
-			bg->setVisible(true);
-		}
+		this->config = *(FileLoader(name));
+		this->enemyConfig = *(FileLoader(ENEMY_FILE));
+		this->weaponConfig = *(FileLoader(WEAPON_FILE));
+		this->ammoConfig = *(FileLoader(AMMO_FILE));
 
-		if((*it)[0].compare("enemy") == 0)
+		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
-			EnemyBase* e = LoadEnemy((*it)[1],atof((*it)[2].c_str()),stoi((*it)[3]));
-			this->enemies.push_back(*e);
+			if((*it)[0].compare("bg") == 0)
+			{
+				this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),(*it)[1],Vector2f(stoi((*it)[2]),stoi((*it)[3])),Vector2f(0,stoi((*it)[3])-WINDOW_RESOLUTION_Y));
+				bg->setVisible(true);
+			}
+
+			if((*it)[0].compare("enemy") == 0)
+			{
+				EnemyBase* e = LoadEnemy((*it)[1],atof((*it)[2].c_str()),stoi((*it)[3]));
+				this->enemies.push_back(*e);
+			}
 		}
+	}
+	catch( const std::exception & ex ) {
+		//An error occured
+		cerr << ex.what() << endl;
 	}
 
 	//Player ship
@@ -87,7 +94,7 @@ EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize)
 		}
 	}
 
-	return NULL;
+	throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::Error,ExceptionUtils::format("Config file error: Unable to find Enemy '%s'. Please check the config file",name)));
 }
 
 Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
@@ -103,7 +110,9 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			return weapon;
 		}
 	}
-	return NULL;
+
+	throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::Error,ExceptionUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file",name)));
+
 }
 
 Ammo* Scene::LoadAmmo(string name)
@@ -115,7 +124,9 @@ Ammo* Scene::LoadAmmo(string name)
 			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[2])), (*it)[3], Vector2f(stoi((*it)[4]),stoi((*it)[4])), stoi((*it)[1]));
 		}
 	}
-	return NULL;
+
+	throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::Error,ExceptionUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file",name)));
+
 }
 
 list<vector<string>>* Scene::FileLoader(string name)
