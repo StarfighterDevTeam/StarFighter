@@ -87,6 +87,10 @@ int main()
 	while (window->isOpen())
 	{
 
+		//Sampling
+		if(deltaClock.getElapsedTime().asMilliseconds() < LOOP_SAMPLING_MS)
+			continue;
+
 		//to erase later...
 		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(1))
 		{
@@ -149,7 +153,6 @@ int main()
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();
-
 
 		dt = deltaClock.restart();
 		level1.Update(dt);

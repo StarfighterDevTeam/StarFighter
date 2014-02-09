@@ -8,7 +8,6 @@ Scene::Scene(string name, ShipConfig* shipConf)
 	loader = TextureLoader::getInstance ();
 	loader->loadAll();
 
-	//Logger::Log(Logger::Priority::DEBUG,"Loading Scene");
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
 
 	try {

@@ -16,6 +16,7 @@
 #define	SCENE_SIZE_X							800
 #define SCENE_SIZE_Y							600
 
+#define LOOP_SAMPLING_MS						12	//12ms ~ 80 Hz
 
 #define ENEMY_FILE	"Assets/Scripts/Enemies.csv"
 #define WEAPON_FILE	"Assets/Scripts/Weapons.csv"
