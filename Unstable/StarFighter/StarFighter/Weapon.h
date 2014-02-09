@@ -20,16 +20,14 @@ enum WeaponType {
 
 struct Weapon : public sf::Sprite
 {
+	Weapon(Ammo* Ammunition);
+
 	sf::Vector2f speed;
-	int damage;
-	Weapon(int m_weapon_type = 0);
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
 	sf::Clock deltaClock;
-	int weapon_type;
-	int ammo_type;
 	Ammo* ammunition;
 
 	Weapon* Clone();

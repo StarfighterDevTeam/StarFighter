@@ -26,12 +26,9 @@ class Enemy : public Independant
 {
 
 public:
-	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_enemy_type=0);
+	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	void update(sf::Time deltaTime) override;
-
 	Weapon* weapon;
-	int enemy_type;
-	float probability;
 
 	Enemy* Clone();
 private:

@@ -14,12 +14,12 @@ int main()
 	//Rebecca.play();
 
 	CurrentGame = new Game();
-	(*CurrentGame).init(window);
+	//(*CurrentGame).init(window);
 
 	//adding background
-	Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1800-WINDOW_RESOLUTION_Y));
-	bg->setVisible(true);
-	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
+	//Independant* bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),BACKGROUND_FILENAME,Vector2f(800,1800),Vector2f(0,1800-WINDOW_RESOLUTION_Y));
+	//bg->setVisible(true);
+	//(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
 
 	srand (time(NULL));
 
@@ -43,7 +43,7 @@ int main()
 
 	Equipment* shieldDefault;
 	shieldDefault = new Equipment();
-	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, 1, AIRBRAKE_FILENAME);
+	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, 100, AIRBRAKE_FILENAME);
 
 	Equipment* stabsDefault;
 	stabsDefault = new Equipment();
@@ -77,8 +77,8 @@ int main()
 	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 
 	//Ship
-	Ship myShip(Vector2f(400,500),*shipA);
-	(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
+	//Ship myShip(Vector2f(400,500),*shipA);
+	//(*CurrentGame).addToScene(&myShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
 
 	//update
 	sf::Time dt;
@@ -89,10 +89,12 @@ int main()
 	bool keyrepeat = false;
 	///...until here (avoiding key repetition)
 
-	Scene level1("Assets/Scripts/Scenes/scene1.csv");
+	
 
-	sf::Clock deltaClockEnemySpawn;
 	bool enemy_spawn = true;
+
+	Scene level1("Assets/Scripts/Scenes/scene1.csv",shipA);
+	level1.StartGame(window);
 
 	int enemyGeneration = 0;
 	while (window->isOpen())
@@ -104,29 +106,6 @@ int main()
 			keyrepeat = false;
 		}
 		// ... until here (avoiding key repeatition)
-		if (deltaClockEnemySpawn.getElapsedTime() > sf::seconds(1))
-		{
-			enemy_spawn = true;
-		}
-		if (enemy_spawn)
-		{
-			int randomEnemyType = rand() % EnemyType::NBVAL_Enemy;
-			if (randomEnemyType==EnemyType::EnemyX)
-			{
-				Enemy* badguyR = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(ENEMYX_WIDTH,ENEMYX_HEIGHT), randomEnemyType);
-				(*CurrentGame).addToScene(badguyR,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
-				deltaClockEnemySpawn.restart();
-				enemy_spawn = false;
-			}
-
-			if (randomEnemyType==EnemyType::EnemyY)
-			{
-				Enemy* badguyR = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYY_FILENAME,Vector2f(ENEMYY_WIDTH,ENEMYY_HEIGHT), randomEnemyType);
-				(*CurrentGame).addToScene(badguyR,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
-				deltaClockEnemySpawn.restart();
-				enemy_spawn = false;
-			}
-		}
 
 
 		bool moving = false;
@@ -142,7 +121,7 @@ int main()
 		{
 			if (!keyrepeat)
 			{
-				myShip.ship_config.setEquipment(engineZ);
+				level1.GetPlayerShip()->ship_config.setEquipment(engineZ);
 				printf ("Engine Z mounted.\n");
 				keyrepeat = true;
 				deltaClockKeyPressed.restart();
@@ -153,7 +132,7 @@ int main()
 		{				
 			if (!keyrepeat)
 			{
-				myShip.ship_config.setEquipment(airbrakeZ);
+				level1.GetPlayerShip()->ship_config.setEquipment(airbrakeZ);
 				printf ("Airbrake Z mounted.\n");
 				keyrepeat = true;
 				deltaClockKeyPressed.restart();
@@ -164,7 +143,7 @@ int main()
 		{				
 			if (!keyrepeat)
 			{
-				myShip.ship_config.setEquipment(engineDefault);
+				level1.GetPlayerShip()->ship_config.setEquipment(engineDefault);
 				printf ("Engine default mounted.\n");
 				keyrepeat = true;
 				deltaClockKeyPressed.restart();
@@ -175,7 +154,7 @@ int main()
 		{			
 			if (!keyrepeat)
 			{
-				myShip.ship_config.setEquipment(airbrakeDefault);
+				level1.GetPlayerShip()->ship_config.setEquipment(airbrakeDefault);
 				printf ("Airbrake default mounted.\n");
 				keyrepeat = true;
 				deltaClockKeyPressed.restart();
@@ -199,22 +178,23 @@ int main()
 		}
 
 		dt = deltaClock.restart();
+		level1.Update(dt);
 
-		(*CurrentGame).updateScene(dt);
+		//(*CurrentGame).updateScene(dt);
 		//myShip.ship_hud.update(myShip.getIndependantArmor(), myShip.getIndependantShield());
 		//myShip.Update(dt);
 
 		//display
-		window->clear();
+		//window->clear();
 
-		(*CurrentGame).drawScene();
-		window->draw(myShip.ship_hud.armorBar);
-		window->draw(myShip.ship_hud.shieldBar);
+		//(*CurrentGame).drawScene();
+		//window->draw(myShip.ship_hud.armorBar);
+		//window->draw(myShip.ship_hud.shieldBar);
 		//window->draw(hud.armorBar);
 		//window->draw(hud.shieldBar);
 		//window->draw(myShip);
 
- 		window->display();
+ 		//window->display();
 	}
 
 	return 0;

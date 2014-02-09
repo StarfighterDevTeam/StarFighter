@@ -1,14 +1,13 @@
 #include "Enemy.h"
 
 
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_enemy_type)  : Independant(position, speed,  textureName, size) 
+Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : Independant(position, speed,  textureName, size) 
 {
-	enemy_type = m_enemy_type;
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
 	//damage = ENEMYX_DAMAGE;
 	//TODO remove this
-	if (m_enemy_type == EnemyType::EnemyX)
+	/*if (m_enemy_type == EnemyType::EnemyX)
 	{
 		armor = ENEMYX_ARMOR;
 		shield = shield_max = ENEMYX_SHIELD;
@@ -26,7 +25,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 		damage = ENEMYY_DAMAGE;
 		weapon = new Weapon(WeaponType::LaserFast);
 		weapon->fire_direction = Vector2i(0,(int)(-1));
-	}
+	}*/
 }
 
 void Enemy::update(sf::Time deltaTime)
@@ -64,9 +63,9 @@ void Enemy::update(sf::Time deltaTime)
 
 Enemy* Enemy::Clone()
 {
-	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, 0);
+	sf::Vector2f s = this->speed;
 
-	enemy->probability = this->probability;
+	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size);
 
 	((Independant*)enemy)->armor = this->getIndependantArmor();
 	((Independant*)enemy)->shield = this->getIndependantShield();

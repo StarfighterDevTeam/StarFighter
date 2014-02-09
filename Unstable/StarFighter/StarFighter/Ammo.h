@@ -15,8 +15,7 @@ class Ammo : public Independant
 {
 
 public:
-	Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, int m_ammo_type=0);
-	int ammo_type;
+	Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage);
 	Ammo* Clone();
 
 	//void update(sf::Time deltaTime) override;

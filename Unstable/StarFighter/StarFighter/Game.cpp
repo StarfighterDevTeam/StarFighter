@@ -13,7 +13,7 @@ const char* IndependantTypeValues[] =
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
-	TextureLoader::getInstance ()->loadAll();
+	//TextureLoader::getInstance ()->loadAll();
 
 	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
 	{
@@ -241,7 +241,7 @@ void Game::colisionChecksV2()
 		}
 	}
 	
-	printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
+	//printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
 void Game::cleanGarbage()

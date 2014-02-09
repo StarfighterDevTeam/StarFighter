@@ -17,25 +17,24 @@ private:
 	~TextureLoader () { }
 
 	//Loaded textures with counter
-	std::map<std::string, std::tuple<int, sf::Texture>> _loadedTextures;
+	std::map<std::string, sf::Texture> _loadedTextures;
 
 public:
 	// Interface publique
 	sf::Texture* TextureLoader::loadTexture (std::string filename, int sizeX, int sizeY)
 	{ 
 		//Do we already have this loaded ?
-		std::map<std::string, std::tuple<int, sf::Texture>>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture>::iterator it = this->_loadedTextures.find(filename);
 
 		if(it != this->_loadedTextures.end())
 		{
 			//element found;
-			std::get<0>(it->second)++;		//Increment its counter
-			return &(std::get<1>(it->second));	//Return the texture
+			return &(it->second);	//Return the texture
 		}
 
 		//Not found, load the texture
 		//Allocating memory
-		sf::Texture *texture;
+		sf::Texture* texture;
 		texture = (sf::Texture *)malloc(sizeof (*texture));
 
 		if (!(*texture).loadFromFile(filename, sf::IntRect(0, 0, sizeX, sizeY)))
@@ -45,30 +44,23 @@ public:
 		}
 
 		//Add the texture
-		this->_loadedTextures[filename] = std::make_tuple(1,*texture);
-
+		this->_loadedTextures[filename] = *texture;
 		return texture;
 	}
 
 	void TextureLoader::unloadTexture (std::string filename)
 	{ 
 		//Do we already have this loaded ?
-		std::map<std::string, std::tuple<int, sf::Texture>>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture>::iterator it = this->_loadedTextures.find(filename);
 
 		if(it != this->_loadedTextures.end())
 		{
 			//element found;
-			std::get<0>(it->second)--;		//Decrement its counter
-			if(std::get<0>(it->second) == 0)
-			{
-				sf::Texture *texture = &(std::get<1>(it->second));
-
-				//Removing it from the array
-				this->_loadedTextures.erase (filename);     
-				//Cleaning memory
-				free(texture);
-			}
-
+			sf::Texture* texture = &(it->second);
+			//Removing it from the array
+			this->_loadedTextures.erase (filename);     
+			//Cleaning memory
+			free(texture);
 		}
 
 	}

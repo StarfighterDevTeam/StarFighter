@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Weapon::Weapon(int m_weapon_type)
+Weapon::Weapon(Ammo* Ammunition)
 {
 	speed.x = 0;
 	speed.y = 0;
@@ -10,22 +10,23 @@ Weapon::Weapon(int m_weapon_type)
 	//rate_of_fire = LASER_RATE_OF_FIRE;
 	//damage = LASER_DAMAGE;
 	//fire_direction = sf::Vector2i(0, 1);
+	this->ammunition = Ammunition;
 
-	if (m_weapon_type == WeaponType::Laser)
+	/*if (m_weapon_type == WeaponType::Laser)
 	{
-		rate_of_fire = LASER_RATE_OF_FIRE;
-		damage = LASER_DAMAGE;
-		fire_direction = sf::Vector2i(0, 1);
-		ammo_type = AmmoType::LaserBeam;
+	rate_of_fire = LASER_RATE_OF_FIRE;
+	damage = LASER_DAMAGE;
+	fire_direction = sf::Vector2i(0, 1);
+	ammo_type = AmmoType::LaserBeam;
 	}
 
 	if (m_weapon_type == WeaponType::LaserFast)
 	{
-		rate_of_fire = LASERFAST_RATE_OF_FIRE;
-		damage = LASERFAST_DAMAGE;
-		fire_direction = sf::Vector2i(0, 1);
-		ammo_type = AmmoType::LaserBeamBlue;
-	}
+	rate_of_fire = LASERFAST_RATE_OF_FIRE;
+	damage = LASERFAST_DAMAGE;
+	fire_direction = sf::Vector2i(0, 1);
+	ammo_type = AmmoType::LaserBeamBlue;
+	}*/
 }
 
 void Weapon::Fire(IndependantType m_collider_type)
@@ -37,12 +38,14 @@ void Weapon::Fire(IndependantType m_collider_type)
 
 	if (firing_ready)
 	{
-		Ammo* laser = new Ammo(sf::Vector2f(getPosition().x,getPosition().y- ((LASER_HEIGHT/2)*(fire_direction.y))),sf::Vector2f(0*(fire_direction.x),-500*(fire_direction.y)), LASER_FILENAME, sf::Vector2f(LASER_WIDTH,LASER_HEIGHT), LASER_DAMAGE);
-		//Ammo* laser = new Ammo(sf::Vector2f(getPosition().x,getPosition().y- ((LASER_HEIGHT/2)*(fire_direction.y))),sf::Vector2f(0*(fire_direction.x),-500*(fire_direction.y)), LASER_DAMAGE);
-		laser->setVisible(true);
-		laser->collider_type = m_collider_type;
-		laser->isOnScene = true;
-		(*CurrentGame).addToScene(laser,PlayerShipLayer, m_collider_type);
+		Ammo* bullet = this->ammunition->Clone();
+		bullet->setPosition(getPosition().x,getPosition().y- ((bullet->m_size.y/2)*(fire_direction.y)));
+		bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
+		bullet->setVisible(true);
+		bullet->collider_type = m_collider_type;
+		bullet->isOnScene = true;
+
+		(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
 
 		deltaClock.restart();
 		firing_ready = false;		
@@ -51,11 +54,9 @@ void Weapon::Fire(IndependantType m_collider_type)
 
 Weapon* Weapon::Clone()
 {
-	Weapon* weapon = new Weapon();
+	Weapon* weapon = new Weapon(this->ammunition->Clone());
 	weapon->fire_direction = this->fire_direction;
 	weapon->rate_of_fire = this->rate_of_fire;
-	weapon->damage = this->damage;
-	weapon->ammunition = this->ammunition->Clone();
 	return weapon;
 }
 

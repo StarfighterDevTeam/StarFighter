@@ -26,7 +26,7 @@ float ShipModel::getShipModelDecceleration()
 {
 	return this->decceleration;
 }
-	
+
 int ShipModel::getShipModelArmor()
 {
 	return this->armor;
@@ -106,7 +106,7 @@ ShipConfig::ShipConfig()
 
 void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
 {
-	
+
 	this->max_speed = getShipConfigMaxSpeed();
 	this->decceleration = getShipConfigDecceleration();
 	this->armor = getShipConfigArmor();
@@ -116,8 +116,12 @@ void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::stri
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
 	this->frameNumber = m_frameNumber;
-	
-	weapon = new Weapon(WeaponType::LaserFast);
+
+
+	weapon = new Weapon(new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(4,16), 150));
+	weapon->rate_of_fire = 0.2f;
+	weapon->fire_direction = sf::Vector2i(0, 1);
+
 }
 
 void ShipConfig::setEquipment(Equipment* m_equipment)
@@ -238,6 +242,7 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 
 void Ship::update(sf::Time deltaTime)
 {
+	static double shield_regen_buffer = 0;
 	//immunity frames after death
 	if (immune)
 	{
@@ -250,7 +255,14 @@ void Ship::update(sf::Time deltaTime)
 	//sheld regen if not maximum
 	if (shield < ship_config.getShipConfigShield())
 	{
-		shield += shield_regen;
+		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+		if(shield_regen_buffer > 1)
+		{
+			double intpart;
+			shield_regen_buffer = modf (shield_regen_buffer , &intpart);
+			shield += intpart;
+		}
+
 		//canceling over-regen
 		if (shield > ship_config.getShipConfigShield())
 		{

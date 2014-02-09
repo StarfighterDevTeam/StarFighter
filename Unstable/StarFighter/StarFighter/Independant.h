@@ -47,9 +47,10 @@ public:
 	int shield;
 	int shield_max;
 	int shield_regen;
+	sf::Vector2f speed;
 
 protected:
-	sf::Vector2f speed;
+	
 
 	std::string textureName;
 	Animation defaultAnimation;

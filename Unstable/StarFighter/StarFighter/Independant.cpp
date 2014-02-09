@@ -50,6 +50,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance ();
 	sf::Texture* texture = loader->loadTexture(textureName, size.x, size.y);
+	this->textureName = textureName;
 
 	this->setOrigin(size.x/2, size.y/2);
 

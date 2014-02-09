@@ -1,8 +1,7 @@
 #include "Ammo.h"
 
-Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, int m_ammo_type) : Independant(position, speed,  textureName, size)
+Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage) : Independant(position, speed,  textureName, size)
 {
-	ammo_type = m_ammo_type;
 	damage = m_damage;
 
 	armor = 1;
@@ -10,6 +9,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	shield_regen = 0;
 
 	//TODO: remove this
+	/*
 	if (m_ammo_type == AmmoType::LaserBeam)
 	{
 
@@ -29,12 +29,12 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	m_size_texture.x = LASERBLUE_HEIGHT;
 	Independant(position, speed, LASERBLUE_FILENAME, m_size_texture);
 	}
-	
+	*/
+
 
 }
 
 Ammo* Ammo::Clone()
 {
-	//(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, int m_ammo_type) 
-	return new Ammo(this->getPosition(),this->speed,this->textureName,this->m_size,this->damage,0);
+	return new Ammo(this->getPosition(),this->speed,this->textureName,this->m_size,this->damage);
 }
