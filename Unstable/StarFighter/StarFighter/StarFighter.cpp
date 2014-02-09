@@ -43,7 +43,7 @@ int main()
 
 	Equipment* shieldDefault;
 	shieldDefault = new Equipment();
-	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, 100, AIRBRAKE_FILENAME);
+	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, 300, AIRBRAKE_FILENAME);
 
 	Equipment* stabsDefault;
 	stabsDefault = new Equipment();
@@ -164,18 +164,6 @@ int main()
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();
-
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::K))
-		{
-			if(++enemyGeneration % 3 == 0)
-			{
-				Enemy* badguy = new Enemy(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-180),sf::Vector2f(0,+70),ENEMYX_FILENAME,Vector2f(ENEMYX_WIDTH,ENEMYX_HEIGHT));
-				badguy->collider_type = IndependantType::EnemyObject;
-				badguy->setVisible(true);
-				(*CurrentGame).addToScene(badguy,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
-				enemyGeneration = 0;
-			}
-		}
 
 		dt = deltaClock.restart();
 		level1.Update(dt);
