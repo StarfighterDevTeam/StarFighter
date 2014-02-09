@@ -6,7 +6,8 @@
 #include <map>
 #include <tuple>
 #include "Assets.h"
-#include "Exceptions.h"
+#include "TextUtils.h"
+#include "Logger.h"
 
 //NB: this is a singleton
 class TextureLoader
@@ -40,11 +41,12 @@ public:
 
 		if (!(*texture).loadFromFile(filename, sf::IntRect(0, 0, sizeX, sizeY)))
 		{
-			throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::FatalError,ExceptionUtils::format("TextureLoad error: Unable to load texture from file '%s'",filename)));
+			throw invalid_argument(TextUtils::format("TextureLoad error: Unable to load texture from file '%s'",(char*)filename.c_str()));
 		}
 
 		//Add the texture
 		this->_loadedTextures[filename] = *texture;
+		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
 		return texture;
 	}
 

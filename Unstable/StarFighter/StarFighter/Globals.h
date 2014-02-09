@@ -6,7 +6,8 @@
 #include "TextureLoader.h"
 #include "Independant.h"
 #include "Game.h"
-#include "Exceptions.h"
+#include "TextUtils.h"
+#include "Logger.h"
 
 
 #define	WINDOW_RESOLUTION_X						800

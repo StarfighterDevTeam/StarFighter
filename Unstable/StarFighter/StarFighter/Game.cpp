@@ -40,7 +40,7 @@ void Game::addToScene(Independant *object, int layer, IndependantType type)
 	}
 	else
 	{
-		throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::FatalError,ExceptionUtils::format("Game eror: Unable to add Independant '%s' to layer '%d'", object->getName().c_str(), layer)));
+		throw invalid_argument(TextUtils::format("Game eror: Unable to add Independant '%s' to layer '%d'", object->getName().c_str(), layer));
 	}
 }
 

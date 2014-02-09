@@ -8,6 +8,9 @@ int main()
 	glEnable(GL_TEXTURE_2D);
 	window->setKeyRepeatEnabled(false);
 
+	LOGGER_START(Logger::Priority::DEBUG, "");
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Starting game");
+
 	sf::Music Rebecca;
 	if (!Rebecca.openFromFile("Assets/Music/Rebecca.ogg"))
 		return -1; // erreur
@@ -16,7 +19,7 @@ int main()
 	CurrentGame = new Game();
 	srand (time(NULL));
 
-	
+
 	//default setting
 	ShipModel* shipModelDefault;
 	shipModelDefault = new ShipModel();

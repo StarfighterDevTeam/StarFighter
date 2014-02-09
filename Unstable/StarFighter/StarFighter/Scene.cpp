@@ -8,6 +8,9 @@ Scene::Scene(string name, ShipConfig* shipConf)
 	loader = TextureLoader::getInstance ();
 	loader->loadAll();
 
+	//Logger::Log(Logger::Priority::DEBUG,"Loading Scene");
+	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
+
 	try {
 
 		this->config = *(FileLoader(name));
@@ -31,8 +34,9 @@ Scene::Scene(string name, ShipConfig* shipConf)
 		}
 	}
 	catch( const std::exception & ex ) {
+
 		//An error occured
-		cerr << ex.what() << endl;
+		LOGGER_WRITE(Logger::Priority::LERROR,ex.what());
 	}
 
 	//Player ship
@@ -94,7 +98,7 @@ EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize)
 		}
 	}
 
-	throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::Error,ExceptionUtils::format("Config file error: Unable to find Enemy '%s'. Please check the config file",name)));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Enemy '%s'. Please check the config file",name));
 }
 
 Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
@@ -111,7 +115,7 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		}
 	}
 
-	throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::Error,ExceptionUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file",name)));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file",name));
 
 }
 
@@ -125,7 +129,7 @@ Ammo* Scene::LoadAmmo(string name)
 		}
 	}
 
-	throw invalid_argument(ExceptionUtils::getExceptionMessage(ExceptionLevel::Error,ExceptionUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file",name)));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file",name));
 
 }
 
@@ -176,13 +180,14 @@ void Scene::GenerateEnemies(Time deltaTime)
 		{
 			if(it->probability < random_number && it->poolsize > 0)
 			{
-				printf("spawning enemy (p=%f)\n",it->probability);
-
 				//spawn (where on screen ?)
 				Enemy* n = it->enemy->Clone();
 				n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
 				n->setVisible(true);
 				it->poolsize--;
+
+				LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("spawning enemy '%s' (x=%.1f) [pool=%d]",it->enemy->getName().c_str(),n->getPosition().x,it->poolsize));
+
 				(*CurrentGame).addToScene((Independant*)n,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
 			}
 		}
