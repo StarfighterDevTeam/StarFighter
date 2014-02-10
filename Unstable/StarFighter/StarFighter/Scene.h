@@ -11,13 +11,21 @@
 
 using namespace std;
 
-enum SceneData
+enum SceneDataEnemy
 {
-	SCENE_COMPARE_TYPE,//0
+	SCENE_COMPARE_ENEMY,//0
 	ENEMY,//1
 	ENEMY_PROBABILITY,//2
 	ENEMY_POOLSIZE,//3
 	ENEMY_CLASS//4
+};
+
+enum SceneDataBackground
+{
+	SCENE_COMPARE_BACKGROUND,//0
+	BACKGROUND_NAME,//1
+	BACGKROUND_WIDTH,//2
+	BACKGROUND_HEIGHT,//3
 };
 
 enum EnemyData
@@ -42,7 +50,8 @@ enum WeaponData
 	RATE_OF_FIRE,//1
 	WEAPON_IMAGE_NAME,//2
 	WEAPON_WIDTH,//3
-	WEAPON_HEIGHT//4
+	WEAPON_HEIGHT,//4
+	WEAPON_SOUND//5
 };
 
 enum AmmoData

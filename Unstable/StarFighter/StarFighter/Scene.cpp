@@ -21,13 +21,13 @@ Scene::Scene(string name, ShipConfig* shipConf)
 		{
 			if((*it)[0].compare("bg") == 0)
 			{
-				this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),(*it)[1],Vector2f(stoi((*it)[2]),stoi((*it)[3])),Vector2f(0,stoi((*it)[3])-WINDOW_RESOLUTION_Y));
+				this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])-WINDOW_RESOLUTION_Y));
 				bg->setVisible(true);
 			}
 
 			if((*it)[0].compare("enemy") == 0)
 			{
-				EnemyBase* e = LoadEnemy((*it)[SceneData::ENEMY],atof((*it)[SceneData::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneData::ENEMY_POOLSIZE]), stoi((*it)[SceneData::ENEMY_CLASS]));
+				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 				this->enemies.push_back(*e);
 			}
 		}
