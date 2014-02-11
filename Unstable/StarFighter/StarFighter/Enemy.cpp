@@ -5,31 +5,44 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
-	//damage = ENEMYX_DAMAGE;
-	//TODO remove this
-	/*if (m_enemy_type == EnemyType::EnemyX)
-	{
-		armor = ENEMYX_ARMOR;
-		shield = shield_max = ENEMYX_SHIELD;
-		shield_regen = ENEMYX_SHIELD_REGEN;
-		damage = ENEMYX_DAMAGE;
-		weapon = new Weapon();
-		weapon->fire_direction = Vector2i(0,(int)(-1));
-	}
-
-	if (m_enemy_type == EnemyType::EnemyY)
-	{
-		armor = ENEMYY_ARMOR;
-		shield = shield_max = ENEMYY_SHIELD;
-		shield_regen = ENEMYY_SHIELD_REGEN;
-		damage = ENEMYY_DAMAGE;
-		weapon = new Weapon(WeaponType::LaserFast);
-		weapon->fire_direction = Vector2i(0,(int)(-1));
-	}*/
+	startPattern = false;
 }
 
 void Enemy::update(sf::Time deltaTime)
 {
+	//patterns
+	//static float rad = deltaTime.asMilliseconds();
+	//rad += 1/LOOP_SAMPLING_MS*PI;
+	//printf ("rad = %f\n", rad);
+
+	
+	//begin pattern
+	static float r = 50;
+	static float pi = PI;
+	static float angle_rad = 0.0f;
+	
+	if (!startPattern && this->getPosition().y>300)
+	{
+		startPattern = true;
+		
+		speed.x = 0;
+		speed.y = 0;
+		originPattern.x = getPosition().x - r;//let's place the enemy on the cironference of the circle
+		originPattern.y = getPosition().y;
+	}
+	if (startPattern)
+	{
+		static sf::Clock polarClock;
+		
+		float posX= originPattern.x + r*cos (angle_rad);
+		float posY= originPattern.y + r*sin (angle_rad);
+		this->setPosition(posX, posY);
+		angle_rad = polarClock.getElapsedTime().asSeconds()*pi;
+	
+		printf("polarClock= %f | angle rad= %f  x= %f | y =%f\n", polarClock.getElapsedTime().asSeconds(), angle_rad, this->getPosition().x, this->getPosition().y);
+
+	}
+
 	//sheld regen if not maximum
 	if (shield < shield_max)
 	{

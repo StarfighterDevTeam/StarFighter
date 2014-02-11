@@ -191,7 +191,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 	if(timer > 1)
 	{
 		double intpart;
-		timer = modf (timer , &intpart);
+		timer = modf (timer, &intpart);
 
 		double random_number = ((double) rand() / (RAND_MAX));
 
@@ -211,5 +211,4 @@ void Scene::GenerateEnemies(Time deltaTime)
 			}
 		}
 	}
-
 }

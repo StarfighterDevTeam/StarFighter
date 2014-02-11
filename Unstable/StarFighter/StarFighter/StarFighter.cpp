@@ -86,7 +86,6 @@ int main()
 
 	while (window->isOpen())
 	{
-
 		//Sampling
 		if(deltaClock.getElapsedTime().asMilliseconds() < LOOP_SAMPLING_MS)
 			continue;

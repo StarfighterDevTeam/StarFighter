@@ -5,6 +5,7 @@
 #include "TextureLoader.h"
 #include "Independant.h"
 #include "Weapon.h"
+#include "Globals.h"
 
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR			100
@@ -29,8 +30,9 @@ public:
 	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	void update(sf::Time deltaTime) override;
 	Weapon* weapon;
-
+	bool startPattern;
 	Enemy* Clone();
+	sf::Vector2f originPattern;
 private:
 
 };
