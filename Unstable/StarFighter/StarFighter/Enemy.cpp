@@ -27,15 +27,16 @@ void Enemy::update(sf::Time deltaTime)
 		
 		speed.x = 0;
 		speed.y = 0;
-		originPattern.x = getPosition().x - r;//let's place the enemy on the cironference of the circle
+		originPattern.x = getPosition().x;//let's place the enemy on the cironference of the circle
 		originPattern.y = getPosition().y;
 	}
 	if (startPattern)
 	{
 		static sf::Clock polarClock;
 		
-		float posX= originPattern.x + r*cos (angle_rad);
-		float posY= originPattern.y + r*sin (angle_rad);
+		//papillon !
+		float posX= originPattern.x + r*sin(angle_rad)*2;
+		float posY= originPattern.y + r*sin(angle_rad)*cos(angle_rad);
 		this->setPosition(posX, posY);
 		angle_rad = polarClock.getElapsedTime().asSeconds()*pi;
 	
