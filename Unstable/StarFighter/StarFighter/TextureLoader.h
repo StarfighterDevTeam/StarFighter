@@ -19,33 +19,30 @@ private:
 	~TextureLoader () { }
 
 	//Loaded textures with counter
-	std::map<std::string, sf::Texture> _loadedTextures;
+	std::map<std::string, sf::Texture*> _loadedTextures;
 
 public:
 	// Interface publique
 	sf::Texture* TextureLoader::loadTexture (std::string filename, int sizeX, int sizeY)
 	{ 
 		//Do we already have this loaded ?
-		std::map<std::string, sf::Texture>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
 
 		if(it != this->_loadedTextures.end())
 		{
 			//element found;
-			return &(it->second);	//Return the texture
+			return it->second;	//Return the texture*
 		}
 
 		//Not found, load the texture
-		//Allocating memory
-		sf::Texture* texture;
-		texture = (sf::Texture *)malloc(sizeof (*texture));
-
+		sf::Texture* texture = new sf::Texture;
 		if (!(*texture).loadFromFile(filename, sf::IntRect(0, 0, sizeX, sizeY)))
 		{
 			throw invalid_argument(TextUtils::format("TextureLoad error: Unable to load texture from file '%s'",(char*)filename.c_str()));
 		}
 
 		//Add the texture
-		this->_loadedTextures[filename] = *texture;
+		this->_loadedTextures[filename] = texture;
 		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
 		return texture;
 	}
@@ -53,12 +50,12 @@ public:
 	void TextureLoader::unloadTexture (std::string filename)
 	{ 
 		//Do we already have this loaded ?
-		std::map<std::string, sf::Texture>::iterator it = this->_loadedTextures.find(filename);
+		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
 
 		if(it != this->_loadedTextures.end())
 		{
 			//element found;
-			sf::Texture* texture = &(it->second);
+			sf::Texture* texture = it->second;
 			//Removing it from the array
 			this->_loadedTextures.erase (filename);     
 			//Cleaning memory

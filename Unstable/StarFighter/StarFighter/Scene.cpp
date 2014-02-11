@@ -4,9 +4,6 @@ extern Game* CurrentGame;
 
 Scene::Scene(string name, ShipConfig* shipConf)
 {
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance ();
-	loader->loadAll();
 
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
 
@@ -144,7 +141,7 @@ Ammo* Scene::LoadAmmo(string name)
 	{
 		if((*it)[0].compare(name) == 0)
 		{
-			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_WIDTH])), stoi((*it)[AmmoData::AMMO_DAMAGE]));
+			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]));
 		}
 	}
 
