@@ -11,10 +11,10 @@ int main()
 	LOGGER_START(Logger::Priority::DEBUG, "");
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Starting game");
 
-	sf::Music Rebecca;
-	if (!Rebecca.openFromFile("Assets/Music/Rebecca.ogg"))
+	sf::Music SpaceCowboys;
+	if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
 		return -1; // erreur
-	//Rebecca.play();
+	SpaceCowboys.play();
 
 	CurrentGame = new Game();
 	srand (time(NULL));
