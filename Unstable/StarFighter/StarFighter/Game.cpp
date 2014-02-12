@@ -50,6 +50,9 @@ void Game::updateScene(Time deltaTime)
 
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
+
+	angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
+	printf("angle_rad= %f\n", angle_rad/M_PI);
 	//Collect & clean garbage
 	collectGarbage();
 	cleanGarbage();
@@ -62,7 +65,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-		(*(*it)).update(deltaTime, polarClock);
+		(*(*it)).update(deltaTime, angle_rad);
 	}
 
 	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());

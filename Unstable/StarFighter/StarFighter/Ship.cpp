@@ -240,7 +240,7 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->ship_config = m_ship_config;
 }
 
-void Ship::update(sf::Time deltaTime, sf::Clock polarClock)
+void Ship::update(sf::Time deltaTime, float angle_rad)
 {
 	static double shield_regen_buffer = 0;
 	//immunity frames after death
@@ -350,7 +350,7 @@ void Ship::update(sf::Time deltaTime, sf::Clock polarClock)
 			speed.y = 0;
 	}
 
-	Independant::update(deltaTime, polarClock);
+	Independant::update(deltaTime, angle_rad);
 }
 
 void Ship::Respawn()

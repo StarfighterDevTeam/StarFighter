@@ -9,6 +9,8 @@
 #include "TextUtils.h"
 #include "Includes/PixelPerfectCollision.hpp"
 #include "Includes/SimpleCollision.hpp"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 using namespace sf;
 
@@ -36,6 +38,7 @@ public:
 
 private:
 	Clock polarClock;
+	float angle_rad;
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];

@@ -70,10 +70,8 @@ Independant::~Independant()
 
 }
 
-void Independant::update(sf::Time deltaTime, sf::Clock polarClock)
+void Independant::update(sf::Time deltaTime, float angle_rad)
 {
-	
-	
 	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
 	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 	this->setPosition(x,y);
@@ -84,7 +82,7 @@ void Independant::update(sf::Time deltaTime, sf::Clock polarClock)
 	AnimatedSprite::update(deltaTime);
 }
 
-sf::Vector2f Independant::setMovePattern(sf::Clock polarClock, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
+sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
 {
 	if (getPosition().y > triggerY && !startPattern) //&& collider_type == IndependantType::EnemyObject)
 	{
@@ -92,7 +90,6 @@ sf::Vector2f Independant::setMovePattern(sf::Clock polarClock, float radius, flo
 	}
 	if (startPattern)
 	{
-		float angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
 		switch(pattern_id)
 		{
 			case MovePatternType::NoMove:
@@ -103,9 +100,9 @@ sf::Vector2f Independant::setMovePattern(sf::Clock polarClock, float radius, flo
 			//papillon
 			case MovePatternType::SemiCircle:
 			{
-				float posX= radius*sin(angle_rad);
-				float posY= radius*sin(angle_rad)*cos(angle_rad);
-				speed.x=20*cos(angle_rad/2);;
+				float posX= radius*cos(angle_rad);
+				float posY= radius*sin(angle_rad);
+				speed.x=0;
 				speed.y=0;
 				return sf::Vector2f(posX,posY);
 				break;

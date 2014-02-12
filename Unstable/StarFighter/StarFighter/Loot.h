@@ -9,7 +9,7 @@ class Loot : public Independant
 {
 public:
 	Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
-	void update(sf::Time deltaTime, sf::Clock polarClock) override;
+	void update(sf::Time deltaTime, float angle_rad) override;
 };
 
 #endif // LOOT_H_INCLUDED

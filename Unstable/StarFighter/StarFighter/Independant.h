@@ -35,7 +35,7 @@ public:
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	~Independant();
 
-	virtual void update(sf::Time deltaTime, sf::Clock polarClock);
+	virtual void update(sf::Time deltaTime, float angle_rad);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
 	bool isOnScene;
@@ -52,7 +52,7 @@ public:
 	string getName();
 	virtual void Respawn();
 
-	sf::Vector2f setMovePattern(sf::Clock, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
+	sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 
 	int damage;
 	int armor;
