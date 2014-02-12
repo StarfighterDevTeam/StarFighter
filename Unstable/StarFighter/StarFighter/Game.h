@@ -7,6 +7,8 @@
 #include <list>
 #include <vector>
 #include "TextUtils.h"
+#include "Includes/PixelPerfectCollision.hpp"
+#include "Includes/SimpleCollision.hpp"
 
 using namespace sf;
 

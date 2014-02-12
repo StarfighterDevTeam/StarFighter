@@ -81,40 +81,6 @@ void Game::drawScene()
 	//window->draw(ship_hud->shieldBar);
 }
 
-void Game::colisionChecks()
-{
-	sf::Clock dt;
-	dt.restart();
-	int i= 0;
-
-	for (std::list<Independant*>::iterator it1 = (this->sceneIndependants).begin(); it1 != std::prev((this->sceneIndependants).end()); it1++)
-	{
-		for (std::list<Independant*>::iterator it2 = std::next(it1); it2 != (this->sceneIndependants).end(); it2++)
-		{
-			i++;
-			//Bullets are invisible after impact
-			if((*(*it1)).collide_with((*(*it2))))
-			{
-				if((*(*it1)).collider_type == FriendlyFire || (*(*it1)).collider_type == EnemyFire)
-				{
-					(*(*it1)).setVisible(false);
-					this->garbage.push_back(*it1);
-				}
-
-				if((*(*it2)).collider_type == FriendlyFire || (*(*it2)).collider_type == EnemyFire)
-				{
-					(*(*it2)).setVisible(false);
-					this->garbage.push_back(*it2);
-				}
-
-				//printf("boom [%s vs %s]\n", IndependantTypeValues[(*(*it1)).collider_type], IndependantTypeValues[(*(*it2)).collider_type]);
-			}
-		}
-	}
-
-	//printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
-}
-
 void Game::colisionChecksV2()
 {
 	sf::Clock dt;
@@ -129,7 +95,7 @@ void Game::colisionChecksV2()
 		{
 			i++;
 			//Bullets are invisible after impact
-			if((*(*it1)).collide_with((*(*it2))))
+			if(SimpleCollision::AreColliding((*it1),(*it2)))
 			{
 				if((*it2)->collider_type == EnemyFire)
 				{
@@ -159,7 +125,7 @@ void Game::colisionChecksV2()
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it2++)
 		{
 			i++;
-			if((*(*it1)).collide_with((*(*it2))))
+			if(SimpleCollision::AreColliding((*it1),(*it2)))
 			{
 				//Do something (like, kill ship)
 				(*it1)->damage_from(*(*it2));
@@ -186,7 +152,7 @@ void Game::colisionChecksV2()
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::LootObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::LootObject]).end(); it2++)
 		{
 			i++;
-			if((*(*it1)).collide_with((*(*it2))))
+			if(SimpleCollision::AreColliding((*it1),(*it2)))
 			{
 				//Do something (like, take the loot)
 				(*it2)->setVisible(false);
@@ -204,7 +170,7 @@ void Game::colisionChecksV2()
 		{
 			i++;
 			//Bullets are invisible after impact
-			if((*(*it1)).collide_with((*(*it2))))
+			if(SimpleCollision::AreColliding((*it1),(*it2)))
 			{
 				if((*it2)->collider_type == FriendlyFire)
 				{

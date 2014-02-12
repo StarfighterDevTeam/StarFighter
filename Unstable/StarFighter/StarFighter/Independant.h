@@ -33,7 +33,6 @@ public:
 	bool isOnScene;
 	IndependantType collider_type;
 	void setVisible(bool visible);
-	bool collide_with (const Independant& independant);
 	virtual void damage_from (Independant& independant);
 	sf::Vector2f m_size;
 	sf::Vector2f getIndependantSpeed();
