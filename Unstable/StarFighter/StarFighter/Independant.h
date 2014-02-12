@@ -20,6 +20,12 @@ enum IndependantType {
 	NBVAL_Independant
 };
 
+enum MovePatternType {
+	NoMove,
+	SemiCircle,
+	NBVAL_MovePattern
+};
+
 class Independant : public AnimatedSprite
 {
 public:
@@ -46,7 +52,7 @@ public:
 	string getName();
 	virtual void Respawn();
 
-	sf::Vector2f setMovePattern(sf::Clock, float radius, float triggerY, int pattern_id=0);
+	sf::Vector2f setMovePattern(sf::Clock, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 
 	int damage;
 	int armor;

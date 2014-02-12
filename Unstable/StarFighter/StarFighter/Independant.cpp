@@ -86,7 +86,7 @@ void Independant::update(sf::Time deltaTime, sf::Clock polarClock)
 
 sf::Vector2f Independant::setMovePattern(sf::Clock polarClock, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
 {
-	if (getPosition().y > triggerY) //&& collider_type == IndependantType::EnemyObject)
+	if (getPosition().y > triggerY && !startPattern) //&& collider_type == IndependantType::EnemyObject)
 	{
 		startPattern = true;
 	}
@@ -95,13 +95,13 @@ sf::Vector2f Independant::setMovePattern(sf::Clock polarClock, float radius, flo
 		float angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
 		switch(pattern_id)
 		{
-			case 0:
+			case MovePatternType::NoMove:
 			{
 				return sf::Vector2f(0,0);
 				break;
 			}
 			//papillon
-			case 1:
+			case MovePatternType::SemiCircle:
 			{
 				float posX= radius*sin(angle_rad);
 				float posY= radius*sin(angle_rad)*cos(angle_rad);
