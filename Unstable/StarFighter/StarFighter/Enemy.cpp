@@ -39,6 +39,10 @@ void Enemy::update(sf::Time deltaTime, sf::Clock polarClock)
 			}
 		}
 	}
+
+	float offsetX = this->setMovePattern(polarClock, 5, 300, 1).x;
+	float offsetY = this->setMovePattern(polarClock, 5, 300, 1).y;
+	setPosition(getPosition().x + offsetX, getPosition().y + offsetY);
 	Independant::update(deltaTime, polarClock);
 }
 

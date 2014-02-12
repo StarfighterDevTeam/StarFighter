@@ -72,11 +72,10 @@ Independant::~Independant()
 
 void Independant::update(sf::Time deltaTime, sf::Clock polarClock)
 {
-	float offsetX = this->setMovePattern(polarClock, 5, 300, 1).x;//clock, radius, triggerY, pattern_id
-	float offsetY = this->setMovePattern(polarClock, 5, 300, 1).y;
 	
-	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds() + offsetX;
-	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds() + offsetY;
+	
+	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 	this->setPosition(x,y);
 
 	//printf("polarClock= %f | x= %f, y= %f\n", polarClock.getElapsedTime().asSeconds(), this->getPosition().x, this->getPosition().y);
@@ -87,7 +86,7 @@ void Independant::update(sf::Time deltaTime, sf::Clock polarClock)
 
 sf::Vector2f Independant::setMovePattern(sf::Clock polarClock, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
 {
-	if (getPosition().y > triggerY && collider_type == IndependantType::EnemyObject)
+	if (getPosition().y > triggerY) //&& collider_type == IndependantType::EnemyObject)
 	{
 		startPattern = true;
 	}
