@@ -6,6 +6,8 @@
 #include "Independant.h"
 #include "Weapon.h"
 #include "Globals.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR			100

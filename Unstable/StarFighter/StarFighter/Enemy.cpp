@@ -18,8 +18,7 @@ void Enemy::update(sf::Time deltaTime)
 	
 	//begin pattern
 	static float r = 50;
-	static float pi = PI;
-	static float angle_rad = 0.0f;
+	static float angle_rad;
 	
 	if (!startPattern && this->getPosition().y>300)
 	{
@@ -27,7 +26,7 @@ void Enemy::update(sf::Time deltaTime)
 		
 		speed.x = 0;
 		speed.y = 0;
-		originPattern.x = getPosition().x;//let's place the enemy on the cironference of the circle
+		originPattern.x = getPosition().x;
 		originPattern.y = getPosition().y;
 	}
 	if (startPattern)
@@ -38,7 +37,7 @@ void Enemy::update(sf::Time deltaTime)
 		float posX= originPattern.x + r*sin(angle_rad)*2;
 		float posY= originPattern.y + r*sin(angle_rad)*cos(angle_rad);
 		this->setPosition(posX, posY);
-		angle_rad = polarClock.getElapsedTime().asSeconds()*pi;
+		angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
 	
 		printf("polarClock= %f | angle rad= %f  x= %f | y =%f\n", polarClock.getElapsedTime().asSeconds(), angle_rad, this->getPosition().x, this->getPosition().y);
 
