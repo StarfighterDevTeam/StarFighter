@@ -27,18 +27,15 @@ struct Game
 public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	//PlayerHud* ship_hud;
 	void addToScene(Independant *object, int layer, IndependantType type);
 	void updateScene(Time deltaTime);
 	void drawScene();
-	void colisionChecks();
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
 
-	//TODO : remove from scene 
-	//TODO : scene position checker <=> remove an item which is no more on the scene
 private:
+	Clock polarClock;
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];

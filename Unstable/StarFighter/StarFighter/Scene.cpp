@@ -90,7 +90,6 @@ Ship* Scene::GetPlayerShip()
 	return this->playerShip;
 }
 
-
 EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass)
 {
 	for (std::list<vector<string>>::iterator it = (this->enemyConfig).begin(); it != (this->enemyConfig).end(); it++)

@@ -13,6 +13,7 @@ const char* IndependantTypeValues[] =
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
+	this->polarClock.restart();
 
 	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
 	{
