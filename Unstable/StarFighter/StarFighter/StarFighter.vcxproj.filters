@@ -16,6 +16,9 @@
     <Filter Include="Fichiers de ressources\Objects">
       <UniqueIdentifier>{0cfee51f-0592-47c9-b9ec-582d54d10bdd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\Includes">
+      <UniqueIdentifier>{61d322f2-36ae-492a-836c-f17bbf3a5f67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StarFighter.cpp">
@@ -124,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\PixelPerfectCollision.hpp">
+      <Filter>Fichiers d%27en-tête\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\SimpleCollision.hpp">
+      <Filter>Fichiers d%27en-tête\Includes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
