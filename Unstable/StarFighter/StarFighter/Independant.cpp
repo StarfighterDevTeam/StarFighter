@@ -49,6 +49,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->visible = false;
 	this->isOnScene = false;
 	this->immune = false;
+	this->startPattern = false;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber)
@@ -69,13 +70,58 @@ Independant::~Independant()
 
 }
 
-void Independant::update(sf::Time deltaTime)
+void Independant::update(sf::Time deltaTime, sf::Clock polarClock)
 {
-	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+	float offsetX = this->setMovePattern(polarClock, 5, 300, 1).x;//clock, radius, triggerY, pattern_id
+	float offsetY = this->setMovePattern(polarClock, 5, 300, 1).y;
+	
+	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds() + offsetX;
+	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds() + offsetY;
 	this->setPosition(x,y);
 
+	//printf("polarClock= %f | x= %f, y= %f\n", polarClock.getElapsedTime().asSeconds(), this->getPosition().x, this->getPosition().y);
+	
+
 	AnimatedSprite::update(deltaTime);
+}
+
+sf::Vector2f Independant::setMovePattern(sf::Clock polarClock, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
+{
+	if (getPosition().y > triggerY && collider_type == IndependantType::EnemyObject)
+	{
+		startPattern = true;
+	}
+	if (startPattern)
+	{
+		float angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
+		switch(pattern_id)
+		{
+			case 0:
+			{
+				return sf::Vector2f(0,0);
+				break;
+			}
+			//papillon
+			case 1:
+			{
+				float posX= radius*sin(angle_rad);
+				float posY= radius*sin(angle_rad)*cos(angle_rad);
+				speed.x=20*cos(angle_rad/2);;
+				speed.y=0;
+				return sf::Vector2f(posX,posY);
+				break;
+			}
+
+			default:
+			{
+				return sf::Vector2f(0,0);
+			}
+		}
+	}
+	else
+	{
+		return sf::Vector2f(0,0);
+	}
 }
 
 void Independant::updateAnimation(sf::Time deltaTime)
@@ -138,3 +184,5 @@ sf::Vector2f Independant::getIndependantSpeed()
 {
 	return sf::Vector2f(speed.x, speed.y);
 }
+
+

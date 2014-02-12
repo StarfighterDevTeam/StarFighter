@@ -8,8 +8,8 @@ Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, 
 }
 
 
-void Loot::update(sf::Time deltaTime)
+void Loot::update(sf::Time deltaTime, sf::Clock polarClock)
 {
-	Independant::update(deltaTime);
+	Independant::update(deltaTime, polarClock);
 }
 

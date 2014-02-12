@@ -30,7 +30,7 @@ class Enemy : public Independant
 
 public:
 	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
-	void update(sf::Time deltaTime) override;
+	void update(sf::Time deltaTime, sf::Clock polarClock) override;
 	Weapon* weapon;
 	bool startPattern;
 	Enemy* Clone();

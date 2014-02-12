@@ -9,7 +9,7 @@ class FX : public Independant
 
 public:
 	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration);
-	void update(sf::Time deltaTime) override;
+	void update(sf::Time deltaTime, sf::Clock polarClock) override;
 
 private:
 	sf::Clock deltaClockExploding;

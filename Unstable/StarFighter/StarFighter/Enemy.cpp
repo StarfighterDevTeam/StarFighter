@@ -8,40 +8,8 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	startPattern = false;
 }
 
-void Enemy::update(sf::Time deltaTime)
+void Enemy::update(sf::Time deltaTime, sf::Clock polarClock)
 {
-	//patterns
-	//static float rad = deltaTime.asMilliseconds();
-	//rad += 1/LOOP_SAMPLING_MS*PI;
-	//printf ("rad = %f\n", rad);
-
-	
-	//begin pattern
-	static float r = 50;
-	static float angle_rad;
-	
-	if (!startPattern && this->getPosition().y>300)
-	{
-		startPattern = true;
-		
-		speed.x = 0;
-		speed.y = 0;
-		originPattern.x = getPosition().x;
-		originPattern.y = getPosition().y;
-	}
-	if (startPattern)
-	{
-		static sf::Clock polarClock;
-		
-		//papillon !
-		float posX= originPattern.x + r*sin(angle_rad)*2;
-		float posY= originPattern.y + r*sin(angle_rad)*cos(angle_rad);
-		this->setPosition(posX, posY);
-		angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
-	
-		printf("polarClock= %f | angle rad= %f  x= %f | y =%f\n", polarClock.getElapsedTime().asSeconds(), angle_rad, this->getPosition().x, this->getPosition().y);
-
-	}
 
 	//sheld regen if not maximum
 	if (shield < shield_max)
@@ -71,7 +39,7 @@ void Enemy::update(sf::Time deltaTime)
 			}
 		}
 	}
-	Independant::update(deltaTime);
+	Independant::update(deltaTime, polarClock);
 }
 
 Enemy* Enemy::Clone()

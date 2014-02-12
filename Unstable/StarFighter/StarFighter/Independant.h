@@ -4,8 +4,10 @@
 #include <SFML/Graphics.hpp>
 #include "TextureLoader.h"
 #include "AnimatedSprite.hpp"
-#include "TextUtils.h";
+#include "TextUtils.h"
 #include <vector>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 enum IndependantType {
 	Background,
@@ -27,7 +29,7 @@ public:
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	~Independant();
 
-	virtual void update(sf::Time deltaTime);
+	virtual void update(sf::Time deltaTime, sf::Clock polarClock);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
 	bool isOnScene;
@@ -44,6 +46,8 @@ public:
 	string getName();
 	virtual void Respawn();
 
+	sf::Vector2f setMovePattern(sf::Clock, float radius, float triggerY, int pattern_id=0);
+
 	int damage;
 	int armor;
 	int shield;
@@ -52,7 +56,7 @@ public:
 	sf::Vector2f speed;
 
 protected:
-
+	bool startPattern;
 	std::string textureName;
 	Animation defaultAnimation;
 	Animation* currentAnimation;

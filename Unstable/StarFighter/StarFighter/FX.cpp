@@ -10,9 +10,9 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	collider_type = IndependantType::Neutral;
 }
 
-void FX::update(sf::Time deltaTime)
+void FX::update(sf::Time deltaTime, sf::Clock polarClock)
 {
-	Independant::update(deltaTime);
+	Independant::update(deltaTime, polarClock);
 
 	if (deltaClockExploding.getElapsedTime() > duration)
 	{
