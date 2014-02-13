@@ -97,8 +97,20 @@ sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float tr
 				return sf::Vector2f(0,0);
 				break;
 			}
-			//papillon
-			case MovePatternType::SemiCircle:
+
+			case MovePatternType::SemiCircleDown:
+			{
+				float posX= radius*sin(angle_rad);
+				float posY= radius*sin(angle_rad)*cos(angle_rad);
+				//float posX= radius*cos(angle_rad);
+				//float posY= radius*sin(angle_rad);
+				speed.x=0;
+				speed.y=0;
+				return sf::Vector2f(posX,posY);
+				break;
+			}
+			
+			case MovePatternType::Circle:
 			{
 				float posX= radius*cos(angle_rad);
 				float posY= radius*sin(angle_rad);

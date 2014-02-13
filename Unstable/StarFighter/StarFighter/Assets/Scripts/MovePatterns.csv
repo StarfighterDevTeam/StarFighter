@@ -1,0 +1,3 @@
+#MovePattern name, radius, triggerY
+SemiCircleDown, 5, 200
+Circle, 5, 200

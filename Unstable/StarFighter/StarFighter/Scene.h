@@ -73,6 +73,17 @@ struct EnemyBase
 	int enemyclass;
 };
 
+struct MovePattern
+{
+public:
+	std::string filename;
+	float radius;
+	float triggery;
+
+private:
+
+};
+
 class Scene
 {
 
@@ -87,6 +98,7 @@ private:
 	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass);
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
+	MovePattern* Scene::LoadMovePattern(string name);
 	list<vector<string>>* Scene::FileLoader(string name);
 
 	Ship* playerShip;
@@ -95,6 +107,7 @@ private:
 	list<vector<string>> enemyConfig;
 	list<vector<string>> weaponConfig;
 	list<vector<string>> ammoConfig;
+	list<vector<string>> movepatternConfig;
 	Independant* bg;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

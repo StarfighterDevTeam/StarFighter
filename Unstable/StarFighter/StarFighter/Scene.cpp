@@ -13,6 +13,7 @@ Scene::Scene(string name, ShipConfig* shipConf)
 		this->enemyConfig = *(FileLoader(ENEMY_FILE));
 		this->weaponConfig = *(FileLoader(WEAPON_FILE));
 		this->ammoConfig = *(FileLoader(AMMO_FILE));
+		this->movepatternConfig = *(FileLoader(MOVEPATTERN_FILE));
 
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
@@ -27,6 +28,13 @@ Scene::Scene(string name, ShipConfig* shipConf)
 				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 				this->enemies.push_back(*e);
 			}
+		}
+
+		for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->config).end(); it++)
+		{
+			
+
+
 		}
 
 		//Loading font for framerate
@@ -88,6 +96,11 @@ void Scene::Update(Time deltaTime)
 Ship* Scene::GetPlayerShip()
 {
 	return this->playerShip;
+}
+
+MovePattern* Scene::LoadMovePattern(string name)
+{
+
 }
 
 EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass)

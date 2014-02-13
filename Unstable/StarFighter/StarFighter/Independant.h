@@ -22,7 +22,8 @@ enum IndependantType {
 
 enum MovePatternType {
 	NoMove,
-	SemiCircle,
+	SemiCircleDown,
+	Circle,
 	NBVAL_MovePattern
 };
 
