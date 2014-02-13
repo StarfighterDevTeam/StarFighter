@@ -70,7 +70,7 @@ Independant::~Independant()
 
 }
 
-void Independant::update(sf::Time deltaTime, sf::Vector2f polarOffset)
+void Independant::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
 {	
 	Independant::update(deltaTime);
 }
@@ -83,7 +83,7 @@ void Independant::update(sf::Time deltaTime)
 
 	AnimatedSprite::update(deltaTime);
 }
-
+/*
 sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
 {
 	if (getPosition().y > triggerY && !startPattern) //&& collider_type == IndependantType::EnemyObject)
@@ -133,7 +133,7 @@ sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float tr
 		return sf::Vector2f(0,0);
 	}
 }
-
+*/
 void Independant::updateAnimation(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);

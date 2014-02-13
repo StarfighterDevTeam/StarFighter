@@ -5,9 +5,10 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
+	movepattern_type = 1;
 }
 
-void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset)
+void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
 {
 	if (getPosition().y >200 && !startPattern)
 	{
@@ -19,7 +20,7 @@ void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset)
 	{
 		speed.x = 0;
 		speed.y = 0;
-		setPosition(getPosition().x + polarOffset.x, getPosition().y + polarOffset.y);
+		setPosition(getPosition().x + polarOffset[movepattern_type].x, getPosition().y + polarOffset[movepattern_type].y);
 		Enemy::update(deltaTime);
 	}
 }

@@ -50,9 +50,14 @@ void Game::updateScene(Time deltaTime)
 
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
-
+	//move patterns
 	angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
 	printf("angle_rad= %f\n", angle_rad/M_PI);
+	for(int i=0; i<MovePatternType::NBVAL_MovePattern; i++)
+	{
+		sceneMovePatterns[i] = getPatternOffset(angle_rad, 5, i);
+	}
+
 	//Collect & clean garbage
 	collectGarbage();
 	cleanGarbage();
@@ -65,7 +70,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-		(*(*it)).update(deltaTime, Game::getIndependantOffset(angle_rad, 5, 1));//replace by correct parameters
+		(*(*it)).update(deltaTime, sceneMovePatterns);//replace by correct parameters
 	}
 
 	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
@@ -277,7 +282,7 @@ void Game::collectGarbage()
 
 }
 
-sf::Vector2f Game::getIndependantOffset(float angle_rad, float radius, int movepattern_type)
+sf::Vector2f Game::getPatternOffset(float angle_rad, float radius, int movepattern_type)
 {
 	switch(movepattern_type)
 		{
