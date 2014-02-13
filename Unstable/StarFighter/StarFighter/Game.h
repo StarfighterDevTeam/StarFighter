@@ -12,6 +12,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#define LOOT_SPEED_Y		100.f
+
 using namespace sf;
 
 enum LayerType {
