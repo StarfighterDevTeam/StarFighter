@@ -8,6 +8,7 @@
 #include "Globals.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "MovePattern.h"
 
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR			100
@@ -32,11 +33,14 @@ public:
 	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	void update(sf::Time deltaTime, float angle_rad) override;
 	Weapon* weapon;
-	bool startPattern;
 	Enemy* Clone();
-	sf::Vector2f originPattern;
+	
+	MovePattern* movepattern;
+	bool startPattern;
+	
 private:
-
+	
+	
 };
 
 #endif // INDEPENDANT_H_INCLUDED

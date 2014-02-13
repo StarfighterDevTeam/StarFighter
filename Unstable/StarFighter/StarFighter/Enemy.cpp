@@ -39,12 +39,12 @@ void Enemy::update(sf::Time deltaTime, float angle_rad)
 			}
 		}
 	}
-
+	
 	float offsetX = this->setMovePattern(angle_rad, 5.f, 200.f, MovePatternType::SemiCircleDown).x;
 	float offsetY = this->setMovePattern(angle_rad, 5.f, 200.f, MovePatternType::SemiCircleDown).y;
-	//float offsetX = this->setMovePattern(angle_rad, 5.f, 200.f, MovePatternType::Circle).x;
-	//float offsetY = this->setMovePattern(angle_rad, 5.f, 200.f, MovePatternType::Circle).y;
+	
 	setPosition(getPosition().x + offsetX, getPosition().y + offsetY);
+	
 	Independant::update(deltaTime, angle_rad);
 }
 

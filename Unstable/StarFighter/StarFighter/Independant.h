@@ -8,6 +8,7 @@
 #include <vector>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "MovePattern.h"
 
 enum IndependantType {
 	Background,

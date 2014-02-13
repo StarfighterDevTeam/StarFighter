@@ -15,6 +15,18 @@ Scene::Scene(string name, ShipConfig* shipConf)
 		this->ammoConfig = *(FileLoader(AMMO_FILE));
 		this->movepatternConfig = *(FileLoader(MOVEPATTERN_FILE));
 
+		//move patterns 
+		for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->movepatternConfig).end(); it++)
+		{
+			if((*it)[0] != "")
+			{
+				MovePattern* mpattern = LoadMovePattern((*it)[MovePatternData::MOVEPATTERN_NAME], stoi((*it)[MovePatternData::MOVEPATTERN_RADIUS]),stoi((*it)[MovePatternData::MOVEPATTERN_TRIGGERY]));
+				this->mpatterns.push_back(*mpattern);
+			}
+		}
+		printf ("Move patterns loaded.\n");
+		
+		//enemies
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
 			if((*it)[0].compare("bg") == 0)
@@ -30,13 +42,7 @@ Scene::Scene(string name, ShipConfig* shipConf)
 			}
 		}
 
-		for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->config).end(); it++)
-		{
-			
-
-
-		}
-
+		
 		//Loading font for framerate
 		//TODO : refactor this
 		sf::Font* font = new sf::Font();
@@ -98,9 +104,18 @@ Ship* Scene::GetPlayerShip()
 	return this->playerShip;
 }
 
-MovePattern* Scene::LoadMovePattern(string name)
+MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY)
 {
+	for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->movepatternConfig).end(); it++)
+	{
+		if((*it)[0].compare(name) == 0)
+		{
+			MovePattern* mpattern = new MovePattern(stoi((*it)[MovePatternData::MOVEPATTERN_RADIUS]), stoi((*it)[MovePatternData::MOVEPATTERN_TRIGGERY]));
+			return mpattern;
+		}
+	}
 
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find MovePattern '%s'. Please check the config file",name));
 }
 
 EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass)
@@ -210,6 +225,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 			{
 				//spawn (where on screen ?)
 				Enemy* n = it->enemy->Clone();
+				n->movepattern = mpatterns[1];
 				n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
 				n->setVisible(true);
 				it->poolsize--;
