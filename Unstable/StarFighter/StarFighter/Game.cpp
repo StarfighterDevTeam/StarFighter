@@ -52,7 +52,6 @@ void Game::updateScene(Time deltaTime)
 
 	//move patterns
 	angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
-	printf("angle_rad= %f\n", angle_rad/M_PI);
 	for(int i=0; i<MovePatternType::NBVAL_MovePattern; i++)
 	{
 		sceneMovePatterns[i] = getPatternOffset(angle_rad, 5, i);
@@ -70,7 +69,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-		(*(*it)).update(deltaTime, sceneMovePatterns);//replace by correct parameters
+		(*(*it)).update(deltaTime, sceneMovePatterns);
 	}
 
 	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());

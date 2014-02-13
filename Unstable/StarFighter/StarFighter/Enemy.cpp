@@ -10,7 +10,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 
 void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
 {
-	if (getPosition().y >200 && !startPattern)
+	if (getPosition().y >300 && !startPattern)
 	{
 		startPattern = true;
 	}
@@ -21,7 +21,9 @@ void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType:
 		speed.x = 0;
 		speed.y = 0;
 		setPosition(getPosition().x + polarOffset[movepattern_type].x, getPosition().y + polarOffset[movepattern_type].y);
+		
 		Enemy::update(deltaTime);
+		
 	}
 }
 

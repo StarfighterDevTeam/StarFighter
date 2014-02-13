@@ -10,6 +10,11 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	collider_type = IndependantType::Neutral;
 }
 
+void FX::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
+{
+	FX::update(deltaTime);
+}
+
 void FX::update(sf::Time deltaTime)
 {
 	Independant::update(deltaTime);
