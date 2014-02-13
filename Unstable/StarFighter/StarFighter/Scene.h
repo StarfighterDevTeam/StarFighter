@@ -8,6 +8,7 @@
 #include "Globals.h"
 #include "Enemy.h"
 #include "Ship.h"
+#include "MovePattern.h"
 
 using namespace std;
 
@@ -65,6 +66,13 @@ enum AmmoData
 	AMMO_FRAMES//6
 };
 
+enum MovePatternData
+{
+	MOVEPATTERN_NAME,//0
+	MOVEPATTERN_RADIUS,//1
+	MOVEPATTERN_TRIGGERY,//2
+};
+
 struct EnemyBase
 {
 	Enemy* enemy;
@@ -87,14 +95,17 @@ private:
 	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass);
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
+	MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY);
 	list<vector<string>>* Scene::FileLoader(string name);
 
 	Ship* playerShip;
 	list<EnemyBase> enemies;
+	list<MovePattern> mpatterns;
 	list<vector<string>> config;
 	list<vector<string>> enemyConfig;
 	list<vector<string>> weaponConfig;
 	list<vector<string>> ammoConfig;
+	list<vector<string>> movepatternConfig;
 	Independant* bg;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

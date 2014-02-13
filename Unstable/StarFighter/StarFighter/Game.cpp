@@ -50,9 +50,13 @@ void Game::updateScene(Time deltaTime)
 
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
-
+	//move patterns
 	angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
-	printf("angle_rad= %f\n", angle_rad/M_PI);
+	for(int i=0; i<MovePatternType::NBVAL_MovePattern; i++)
+	{
+		sceneMovePatterns[i] = getPatternOffset(angle_rad, 5, i);
+	}
+
 	//Collect & clean garbage
 	collectGarbage();
 	cleanGarbage();
@@ -65,7 +69,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-		(*(*it)).update(deltaTime, angle_rad);
+		(*(*it)).update(deltaTime, sceneMovePatterns);
 	}
 
 	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
@@ -275,4 +279,44 @@ void Game::collectGarbage()
 
 	//printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
+}
+
+sf::Vector2f Game::getPatternOffset(float angle_rad, float radius, int movepattern_type)
+{
+	switch(movepattern_type)
+		{
+			case MovePatternType::NoMove:
+			{
+				return sf::Vector2f(0,0);
+				break;
+			}
+
+			case MovePatternType::SemiCircleDown:
+			{
+				float posX= radius*sin(angle_rad);
+				float posY= radius*sin(angle_rad)*cos(angle_rad);
+				//float posX= radius*cos(angle_rad);
+				//float posY= radius*sin(angle_rad);
+				//speed.x=0;
+				//speed.y=0;
+				return sf::Vector2f(posX,posY);
+				break;
+			}
+			
+			case MovePatternType::Circle:
+			{
+				float posX= radius*cos(angle_rad);
+				float posY= radius*sin(angle_rad);
+				//speed.x=0;
+				//speed.y=0;
+				return sf::Vector2f(posX,posY);
+				break;
+			}
+
+			default:
+			{
+				return sf::Vector2f(0,0);
+			}
+		}
+	return sf::Vector2f(0,0);
 }

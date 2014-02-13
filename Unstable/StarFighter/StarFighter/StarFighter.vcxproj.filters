@@ -72,6 +72,9 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="MovePattern.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ammo.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="Includes\SimpleCollision.hpp">
       <Filter>Fichiers d%27en-tête\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="MovePattern.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

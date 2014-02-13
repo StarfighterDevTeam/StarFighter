@@ -105,9 +105,9 @@ class Ship : public Independant
 public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init(int x, int y);
-	void update(sf::Time deltaTime, float angle_rad) override;
+	void update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern]) override;
+	void update(sf::Time deltaTime) override;
 	void setShipConfig(ShipConfig m_ship_config);
-	//void damage_from (Independant& independant) override;
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
 	void Respawn() override;

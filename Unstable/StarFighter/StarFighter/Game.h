@@ -35,8 +35,10 @@ public:
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
+	sf::Vector2f sceneMovePatterns[NBVAL_MovePattern];
 
 private:
+	sf::Vector2f getPatternOffset(float angle_rad, float radius, int movepattern_type);
 	Clock polarClock;
 	float angle_rad;
 	RenderWindow *window;
@@ -44,6 +46,7 @@ private:
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];
 	std::list<Independant*>* sceneIndependantsTyped[NBVAL_Independant];
 	std::vector<Independant*> garbage;
+	
 };
 
 #endif // GAME_H_INCLUDED

@@ -8,6 +8,7 @@
 #include <vector>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "MovePattern.h"
 
 enum IndependantType {
 	Background,
@@ -22,7 +23,8 @@ enum IndependantType {
 
 enum MovePatternType {
 	NoMove,
-	SemiCircle,
+	SemiCircleDown,
+	Circle,
 	NBVAL_MovePattern
 };
 
@@ -35,7 +37,8 @@ public:
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	~Independant();
 
-	virtual void update(sf::Time deltaTime, float angle_rad);
+	virtual void update(sf::Time deltaTime);
+	virtual void update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern]);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
 	bool isOnScene;
@@ -52,7 +55,7 @@ public:
 	string getName();
 	virtual void Respawn();
 
-	sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
+	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 
 	int damage;
 	int armor;

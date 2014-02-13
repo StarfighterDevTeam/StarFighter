@@ -5,10 +5,30 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
-	startPattern = false;
+	movepattern_type = 1;
 }
 
-void Enemy::update(sf::Time deltaTime, float angle_rad)
+void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
+{
+	if (getPosition().y >200 && !startPattern)
+	{
+		startPattern = true;
+		printf("prout\n");
+	}
+	
+	//add offset calculated by Game
+	if (startPattern)
+	{
+		speed.x = 0;
+		speed.y = 0;
+		setPosition(getPosition().x + polarOffset[movepattern_type].x, getPosition().y + polarOffset[movepattern_type].y);
+		//printf("pouet\n");
+	}
+	
+	Enemy::update(deltaTime);
+}
+
+void Enemy::update(sf::Time deltaTime)
 {
 
 	//sheld regen if not maximum
@@ -39,11 +59,7 @@ void Enemy::update(sf::Time deltaTime, float angle_rad)
 			}
 		}
 	}
-
-	float offsetX = this->setMovePattern(angle_rad, 5.f, 200.f, MovePatternType::SemiCircle).x;
-	float offsetY = this->setMovePattern(angle_rad, 5.f, 200.f, MovePatternType::SemiCircle).y;
-	setPosition(getPosition().x + offsetX, getPosition().y + offsetY);
-	Independant::update(deltaTime, angle_rad);
+	Independant::update(deltaTime);
 }
 
 Enemy* Enemy::Clone()

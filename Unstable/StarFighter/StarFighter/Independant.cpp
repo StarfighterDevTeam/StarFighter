@@ -70,18 +70,20 @@ Independant::~Independant()
 
 }
 
-void Independant::update(sf::Time deltaTime, float angle_rad)
+void Independant::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
+{	
+	Independant::update(deltaTime);
+}
+
+void Independant::update(sf::Time deltaTime)
 {
 	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
 	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 	this->setPosition(x,y);
 
-	//printf("polarClock= %f | x= %f, y= %f\n", polarClock.getElapsedTime().asSeconds(), this->getPosition().x, this->getPosition().y);
-	
-
 	AnimatedSprite::update(deltaTime);
 }
-
+/*
 sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
 {
 	if (getPosition().y > triggerY && !startPattern) //&& collider_type == IndependantType::EnemyObject)
@@ -97,8 +99,20 @@ sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float tr
 				return sf::Vector2f(0,0);
 				break;
 			}
-			//papillon
-			case MovePatternType::SemiCircle:
+
+			case MovePatternType::SemiCircleDown:
+			{
+				float posX= radius*sin(angle_rad);
+				float posY= radius*sin(angle_rad)*cos(angle_rad);
+				//float posX= radius*cos(angle_rad);
+				//float posY= radius*sin(angle_rad);
+				speed.x=0;
+				speed.y=0;
+				return sf::Vector2f(posX,posY);
+				break;
+			}
+			
+			case MovePatternType::Circle:
 			{
 				float posX= radius*cos(angle_rad);
 				float posY= radius*sin(angle_rad);
@@ -119,7 +133,7 @@ sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float tr
 		return sf::Vector2f(0,0);
 	}
 }
-
+*/
 void Independant::updateAnimation(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
