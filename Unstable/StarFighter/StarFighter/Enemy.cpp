@@ -10,21 +10,22 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 
 void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
 {
-	if (getPosition().y >300 && !startPattern)
+	if (getPosition().y >200 && !startPattern)
 	{
 		startPattern = true;
+		printf("prout\n");
 	}
-
+	
 	//add offset calculated by Game
 	if (startPattern)
 	{
 		speed.x = 0;
 		speed.y = 0;
 		setPosition(getPosition().x + polarOffset[movepattern_type].x, getPosition().y + polarOffset[movepattern_type].y);
-		
-		Enemy::update(deltaTime);
-		
+		//printf("pouet\n");
 	}
+	
+	Enemy::update(deltaTime);
 }
 
 void Enemy::update(sf::Time deltaTime)

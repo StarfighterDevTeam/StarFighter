@@ -37,7 +37,6 @@ public:
 	Enemy* Clone();
 	
 	int movepattern_type;
-	bool startPattern;
 	
 private:
 	
