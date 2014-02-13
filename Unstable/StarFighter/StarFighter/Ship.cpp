@@ -11,6 +11,8 @@ ShipModel::ShipModel()
 	this->max_speed.x = SHIP_MAX_SPEED_X;
 	this->max_speed.y = SHIP_MAX_SPEED_Y;
 	this->decceleration = SHIP_DECCELERATION_COEF;
+	this->acceleration.x = SHIP_ACCELERATION_X;
+	this->acceleration.y = SHIP_ACCELERATION_Y;
 	this->armor = SHIP_ARMOR;
 	this->shield = SHIP_SHIELD;
 	this->shield_regen = SHIP_SHIELD_REGEN;
@@ -25,6 +27,11 @@ sf::Vector2f ShipModel::getShipModelMaxSpeed()
 float ShipModel::getShipModelDecceleration()
 {
 	return this->decceleration;
+}
+
+sf::Vector2f ShipModel::getShipModelAcceleration()
+{
+	return this->acceleration;
 }
 
 int ShipModel::getShipModelArmor()
@@ -49,20 +56,24 @@ Equipment::Equipment()
 	this->max_speed.x = 0.0f;
 	this->max_speed.y = 0.0f;
 	this->decceleration = 0.0f;
+	this->acceleration.x = 0.0f;
+	this->acceleration.y = 0.0f;
 	this->armor = 0;
 	this->shield = 0;
 	this->shield_regen = 0;
-	this->size.x = EQUIPMENT_WIDTH;
-	this->size.y = EQUIPMENT_HEIGHT;
-	this->textureName = EQUIPMENT_FILENAME;
+	this->size.x = SLOT_WIDTH;
+	this->size.y = SLOT_HEIGHT;
+	this->textureName = EMPTYSLOT_FILENAME;
 	this->equipmentType = EquipmentType::Empty;
 }
 
-void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
+void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
 	this->decceleration = m_decceleration;
+	this->acceleration.x = m_acceleration.x;
+	this->acceleration.y = m_acceleration.y;
 	this->armor = m_armor;
 	this->shield = m_shield;
 	this->shield_regen = m_shield_regen;
@@ -80,6 +91,11 @@ sf::Vector2f Equipment::getEquipmentMaxSpeed()
 float Equipment::getEquipmentDecceleration()
 {
 	return this->decceleration;
+}
+
+sf::Vector2f Equipment::getEquipmentAcceleration()
+{
+	return this->acceleration;
 }
 
 int Equipment::getEquipmentArmor()
@@ -104,11 +120,11 @@ ShipConfig::ShipConfig()
 
 }
 
-void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
+void ShipConfig::Init(std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
 {
-
 	this->max_speed = getShipConfigMaxSpeed();
 	this->decceleration = getShipConfigDecceleration();
+	this->acceleration = getShipConfigAcceleration();
 	this->armor = getShipConfigArmor();
 	this->shield = getShipConfigShield();
 	this->shield_regen = getShipConfigShieldRegen();
@@ -118,7 +134,7 @@ void ShipConfig::Init(sf::Vector2f m_max_speed, float m_decceleration, std::stri
 	this->frameNumber = m_frameNumber;
 
 
-	weapon = new Weapon(new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(4,16), 150));
+	weapon = new Weapon(new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(LASERBLUE_WIDTH,LASERBLUE_HEIGHT), 150));
 	weapon->rate_of_fire = 0.2f;
 	weapon->fire_direction = sf::Vector2i(0, 1);
 
@@ -130,14 +146,10 @@ void ShipConfig::setEquipment(Equipment* m_equipment)
 	this->equipment[m_equipment->equipmentType] = m_equipment;
 	this->max_speed = getShipConfigMaxSpeed();
 	this->decceleration = getShipConfigDecceleration();
+	this->acceleration = getShipConfigAcceleration();
 	this->armor = getShipConfigArmor();
 	this->shield = getShipConfigShield();
 	this->shield_regen = getShipConfigShieldRegen();
-	/*printf ("\nShipConfig MaxSpeed: %f <ShipModel: %f | Engine: %f>\n", this->getShipConfigMaxSpeed().x, this->ship_model->getShipModelMaxSpeed().x, this->equipment[Engine]->getEquipmentMaxSpeed().x);
-	printf ("\nShipConfig Deccel: %f <ShipModel: %f | Airbrake: %f>\n", this->getShipConfigDecceleration(), this->ship_model->getShipModelDecceleration(), this->equipment[Airbrake]->getEquipmentDecceleration());
-	printf ("\nShipConfig Armor: %d <ShipModel: %d | Armor: %d>\n", this->getShipConfigArmor(), this->ship_model->getShipModelArmor(), this->equipment[Armor]->getEquipmentArmor());
-	printf ("\nShipConfig Shield: %d <ShipModel: %d | Shield: %d>\n\n", this->getShipConfigShield(), this->ship_model->getShipModelShield(), this->equipment[Shield]->getEquipmentShield());
-	*/
 }
 
 int ShipConfig::getShipConfigArmor()
@@ -184,13 +196,8 @@ int ShipConfig::getShipConfigShieldRegen()
 
 sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 {
-	sf::Vector2f new_max_speed;
-	new_max_speed.x = 0;
-	new_max_speed.y = 0;
-
-	sf::Vector2f equipment_max_speed;
-	equipment_max_speed.x = 0;
-	equipment_max_speed.y = 0;
+	sf::Vector2f new_max_speed = sf::Vector2f(0,0);
+	sf::Vector2f equipment_max_speed = sf::Vector2f(0,0);
 
 	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
 	{
@@ -216,6 +223,22 @@ float ShipConfig::getShipConfigDecceleration()
 
 	new_decceleration = ship_model->getShipModelDecceleration() + equipment_decceleration;
 	return new_decceleration;
+}
+
+sf::Vector2f ShipConfig::getShipConfigAcceleration()
+{
+	sf::Vector2f new_acceleration = sf::Vector2f(0,0);
+	sf::Vector2f equipment_acceleration = sf::Vector2f(0,0);
+
+	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
+	{
+		equipment_acceleration.x += equipment[i]->getEquipmentAcceleration().x;
+		equipment_acceleration.y += equipment[i]->getEquipmentAcceleration().y;
+	}
+
+	new_acceleration.x = ship_model->getShipModelAcceleration().x + equipment_acceleration.x;
+	new_acceleration.y = ship_model->getShipModelAcceleration().y + equipment_acceleration.y;
+	return new_acceleration;
 }
 
 // ----------------SHIP ---------------
@@ -279,22 +302,22 @@ void Ship::update(sf::Time deltaTime)
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{	
 		moving = true;
-		speed.x += SHIP_ACCELERATION_X;
+		speed.x += ship_config.getShipConfigAcceleration().x;
 	}
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 	{
 		moving = true;
-		speed.y -= SHIP_ACCELERATION_Y;
+		speed.y -= ship_config.getShipConfigAcceleration().y;
 	}
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 	{
 		moving = true;
-		speed.x -= SHIP_ACCELERATION_X;
+		speed.x -= ship_config.getShipConfigAcceleration().x;
 	}
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
 		moving = true;
-		speed.y += SHIP_ACCELERATION_Y;
+		speed.y += ship_config.getShipConfigAcceleration().y;
 	}
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))

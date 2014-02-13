@@ -13,7 +13,6 @@ void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType:
 	if (getPosition().y >200 && !startPattern)
 	{
 		startPattern = true;
-		printf("prout\n");
 	}
 	
 	//add offset calculated by Game

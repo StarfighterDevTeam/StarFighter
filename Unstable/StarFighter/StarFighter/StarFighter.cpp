@@ -26,36 +26,41 @@ int main()
 
 	Equipment* airbrakeDefault;
 	airbrakeDefault = new Equipment();
-	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
+	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f ,sf::Vector2f (0,0), 0, 0, 0, AIRBRAKE_FILENAME);
 
 	Equipment* engineDefault;
 	engineDefault = new Equipment();
-	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
+	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, THRUSTER_FILENAME);
 
 	Equipment* armorDefault;
 	armorDefault = new Equipment();
-	armorDefault->Init(EquipmentType::Armor, sf::Vector2f (0,0), 0.0f , 100, 0, 0, AIRBRAKE_FILENAME);
+	armorDefault->Init(EquipmentType::Armor, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 100, 0, 0, ARMOR_FILENAME);
 
 	Equipment* shieldDefault;
 	shieldDefault = new Equipment();
-	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , 0, 100, 300, AIRBRAKE_FILENAME);
+	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 100, 300, SHIELD_FILENAME);
 
 	Equipment* stabsDefault;
 	stabsDefault = new Equipment();
-	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
+	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , sf::Vector2f (20,20), 0, 0, 0, STABS_FILENAME);
+
+	Equipment* moduleDefault;
+	moduleDefault = new Equipment();
+	moduleDefault->Init(EquipmentType::Module, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, MODULE_FILENAME);
 
 	//bonus setting
 	Equipment* airbrakeZ;
 	airbrakeZ = new Equipment();
-	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , 0, 0, 0, AIRBRAKE_FILENAME);
+	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , sf::Vector2f (0,0), 0, 0, 0, AIRBRAKE_Z_FILENAME);
 
 	Equipment* engineZ;
 	engineZ = new Equipment();
-	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
+	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , sf::Vector2f (0,0), 0, 0, 0, THRUSTER_FILENAME);
 
 	Equipment* emptyEquipment;
 	emptyEquipment = new Equipment();
-	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , 0, 0, 0, AIRBRAKE_FILENAME);
+	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME);
+
 
 	//ship config
 	ShipConfig* shipA;
@@ -68,8 +73,9 @@ int main()
 	shipA->equipment[Stabs] = stabsDefault;
 	shipA->equipment[Armor] = armorDefault;
 	shipA->equipment[Shield] = shieldDefault;
+	shipA->equipment[Module] = moduleDefault;
 	//...until this point
-	shipA->Init(sf::Vector2f(SHIP_MAX_SPEED_X, SHIP_MAX_SPEED_Y), SHIP_DECCELERATION_COEF, SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
+	shipA->Init(SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
 
 	//update
 	sf::Time dt;

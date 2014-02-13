@@ -9,12 +9,22 @@
 #define SHIP_NB_FRAMES		3
 
 #define AIRBRAKE_FILENAME		"Assets/2D/AirBrake.png"
-#define SLOT_WIDTH			256
-#define SLOT_HEIGHT			256
+#define ARMOR_FILENAME			"Assets/2D/Armor.png"
+#define LASER_RED_FILENAME		"Assets/2D/laser_red.png"
+#define LASER_BLUE_FILENAME		"Assets/2D/laser_blue1.png"
+#define SHIELD_FILENAME			"Assets/2D/Shield.png"
+#define STABS_FILENAME			"Assets/2D/Stab.png"
+#define THRUSTER_FILENAME		"Assets/2D/Thruster.png"
+#define MODULE_FILENAME			"Assets/2D/Module.png"
+#define AIRBRAKE_Z_FILENAME		"Assets/2D/AirBrakeZ.png"
 
-#define EQUIPMENT_FILENAME		"Assets/2D/AirBrake.png"
-#define EQUIPMENT_WIDTH			256
-#define EQUIPMENT_HEIGHT		256
+#define EMPTYSLOT_FILENAME		"Assets/2D/EmptySlot.png"
+#define SLOT_WIDTH				64
+#define SLOT_HEIGHT				64
+
+#define CRYSTAL_FILENAME		"Assets/2D/crystal.png"
+#define CRYSTAL_WIDTH			32
+#define CRYSTAL_HEIGHT			32
 
 #define LASER_FILENAME				"Assets/2D/laser.png"
 #define LASER_WIDTH					4

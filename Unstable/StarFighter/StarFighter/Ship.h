@@ -13,8 +13,8 @@
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
-#define SHIP_ACCELERATION_X         30.0f
-#define SHIP_ACCELERATION_Y         30.0f
+#define SHIP_ACCELERATION_X         20.0f
+#define SHIP_ACCELERATION_Y         20.0f
 #define SHIP_DECCELERATION_COEF		1000.0f
 #define SHIP_MAX_SPEED_X            500.0f
 #define SHIP_MAX_SPEED_Y            500.0f
@@ -33,6 +33,7 @@ enum EquipmentType {
 	Stabs,
 	Armor,
 	Shield,
+	Module,
 	NBVAL_EQUIPMENT
 };
 
@@ -42,11 +43,13 @@ public:
 	ShipModel();
 	sf::Vector2f getShipModelMaxSpeed();
 	float getShipModelDecceleration();
+	sf::Vector2f getShipModelAcceleration();
 	int getShipModelArmor();
 	int getShipModelShield();
 	int getShipModelShieldRegen();
 private:
 	float decceleration;
+	sf::Vector2f acceleration;
 	sf::Vector2f max_speed;
 	int armor;
 	int shield;
@@ -56,18 +59,20 @@ private:
 class Equipment
 {
 public:
-	void Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size = sf::Vector2f(256,256));
+	void Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size = sf::Vector2f(256,256));
 	Equipment();
 	std::string textureName;
 	sf::Vector2f size;
 	EquipmentType equipmentType;
 	sf::Vector2f getEquipmentMaxSpeed();
 	float getEquipmentDecceleration();
+	sf::Vector2f getEquipmentAcceleration();
 	int getEquipmentArmor();
 	int getEquipmentShield();
 	int getEquipmentShieldRegen();
 private:
 	float decceleration;
+	sf::Vector2f acceleration;
 	sf::Vector2f max_speed;
 	int armor;
 	int shield;
@@ -77,7 +82,7 @@ private:
 class ShipConfig
 {
 public:
-	void Init(sf::Vector2f m_max_speed, float decceleration , std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
+	void Init(std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
 	ShipConfig();
 	std::string textureName;
 	sf::Vector2f size;
@@ -86,6 +91,7 @@ public:
 	void setEquipment(Equipment* m_equipment);
 	sf::Vector2f getShipConfigMaxSpeed();
 	float getShipConfigDecceleration();
+	sf::Vector2f getShipConfigAcceleration();
 	int getShipConfigArmor();
 	int getShipConfigShield();
 	int getShipConfigShieldRegen();
@@ -95,6 +101,7 @@ public:
 private:
 	sf::Vector2f max_speed;
 	float decceleration;
+	sf::Vector2f acceleration;
 	int armor;
 	int shield;
 	int shield_regen;
