@@ -225,7 +225,6 @@ void Scene::GenerateEnemies(Time deltaTime)
 			{
 				//spawn (where on screen ?)
 				Enemy* n = it->enemy->Clone();
-				n->movepattern = mpatterns[1];
 				n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
 				n->setVisible(true);
 				it->poolsize--;

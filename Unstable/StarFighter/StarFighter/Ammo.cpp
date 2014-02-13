@@ -3,10 +3,10 @@
 Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage) : Independant(position, speed,  textureName, size)
 {
 	damage = m_damage;
-
 	armor = 1;
 	shield = 0;
 	shield_regen = 0;
+	startPattern = false;
 
 	//TODO: remove this
 	/*

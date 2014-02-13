@@ -70,14 +70,16 @@ Independant::~Independant()
 
 }
 
-void Independant::update(sf::Time deltaTime, float angle_rad)
+void Independant::update(sf::Time deltaTime, sf::Vector2f polarOffset)
+{	
+	Independant::update(deltaTime);
+}
+
+void Independant::update(sf::Time deltaTime)
 {
 	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
 	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 	this->setPosition(x,y);
-
-	//printf("polarClock= %f | x= %f, y= %f\n", polarClock.getElapsedTime().asSeconds(), this->getPosition().x, this->getPosition().y);
-	
 
 	AnimatedSprite::update(deltaTime);
 }

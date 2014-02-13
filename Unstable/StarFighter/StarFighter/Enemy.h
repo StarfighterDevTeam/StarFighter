@@ -31,7 +31,8 @@ class Enemy : public Independant
 
 public:
 	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
-	void update(sf::Time deltaTime, float angle_rad) override;
+	void update(sf::Time deltaTime, sf::Vector2f polarOffset) override;
+	void update(sf::Time deltaTime) override;
 	Weapon* weapon;
 	Enemy* Clone();
 	

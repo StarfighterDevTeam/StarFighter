@@ -37,7 +37,8 @@ public:
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	~Independant();
 
-	virtual void update(sf::Time deltaTime, float angle_rad);
+	virtual void update(sf::Time deltaTime);
+	virtual void update(sf::Time deltaTime, sf::Vector2f polarOffset);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
 	bool isOnScene;

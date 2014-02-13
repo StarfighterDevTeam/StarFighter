@@ -36,6 +36,8 @@ public:
 	void cleanGarbage();
 	void collectGarbage();
 
+	sf::Vector2f getIndependantOffset(float angle_rad, float radius, int movepattern_type);
+
 private:
 	Clock polarClock;
 	float angle_rad;
