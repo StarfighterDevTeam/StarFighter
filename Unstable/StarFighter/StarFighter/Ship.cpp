@@ -133,8 +133,9 @@ void ShipConfig::Init(std::string m_textureName, sf::Vector2f m_size, int m_fram
 	this->textureName = m_textureName;
 	this->frameNumber = m_frameNumber;
 
-
-	weapon = new Weapon(new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(LASERBLUE_WIDTH,LASERBLUE_HEIGHT), 150));
+	Ammo* player_ammo;
+	player_ammo = new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(LASERBLUE_WIDTH,LASERBLUE_HEIGHT), 150, new FX(Vector2f(0,0), Vector2f(0,0), FX_EXPLOSION_FILENAME, Vector2f(FX_EXPLOSION_WIDTH,FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LITTLE_EXPLOSION_DURATION)));
+	weapon = new Weapon(player_ammo);
 	weapon->rate_of_fire = 0.2f;
 	weapon->fire_direction = sf::Vector2i(0, 1);
 

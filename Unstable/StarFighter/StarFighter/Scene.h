@@ -18,7 +18,7 @@ enum SceneDataEnemy
 	ENEMY,//1
 	ENEMY_PROBABILITY,//2
 	ENEMY_POOLSIZE,//3
-	ENEMY_CLASS//4
+	ENEMY_CLASS,//4
 };
 
 enum SceneDataBackground
@@ -42,7 +42,7 @@ enum EnemyData
 	ENEMY_WIDTH,//8
 	ENEMY_HEIGHT,//9
 	ENEMY_FRAMES,//10
-	ENEMY_SPEED//11
+	ENEMY_SPEED,//11
 };
 
 enum WeaponData
@@ -52,7 +52,7 @@ enum WeaponData
 	WEAPON_IMAGE_NAME,//2
 	WEAPON_WIDTH,//3
 	WEAPON_HEIGHT,//4
-	WEAPON_SOUND//5
+	WEAPON_SOUND,//5
 };
 
 enum AmmoData
@@ -63,7 +63,8 @@ enum AmmoData
 	AMMO_IMAGE_NAME,//3
 	AMMO_WIDTH,//4
 	AMMO_HEIGHT,//5
-	AMMO_FRAMES//6
+	AMMO_FRAMES,//6
+	AMMO_FX,//7
 };
 
 enum MovePatternData
@@ -71,6 +72,17 @@ enum MovePatternData
 	MOVEPATTERN_NAME,//0
 	MOVEPATTERN_RADIUS,//1
 	MOVEPATTERN_TRIGGERY,//2
+};
+
+enum FXData
+{
+	FX_TYPE,//0
+	FX_NAME,//1
+	FX_FILENAME,//2
+	FX_WIDTH,//3
+	FX_HEIGHT,//4
+	FX_FRAMES,//5
+	FX_DURATION,//6
 };
 
 struct EnemyBase
@@ -83,7 +95,6 @@ struct EnemyBase
 
 class Scene
 {
-
 public:
 	Scene(string name, ShipConfig* shipConf);
 	void Scene::StartGame(sf::RenderWindow*	window);
@@ -95,6 +106,7 @@ private:
 	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass);
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
+	FX* Scene::LoadFX(string name);
 	MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY);
 	list<vector<string>>* Scene::FileLoader(string name);
 
@@ -105,6 +117,7 @@ private:
 	list<vector<string>> enemyConfig;
 	list<vector<string>> weaponConfig;
 	list<vector<string>> ammoConfig;
+	list<vector<string>> FXConfig;
 	list<vector<string>> movepatternConfig;
 	Independant* bg;
 	sf::RenderWindow* mainWindow;

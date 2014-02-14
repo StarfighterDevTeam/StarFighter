@@ -1,12 +1,14 @@
 #include "Ammo.h"
 
-Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage) : Independant(position, speed,  textureName, size)
+Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, FX* m_explosion) : Independant(position, speed,  textureName, size)
 {
 	damage = m_damage;
 	armor = 1;
 	shield = 0;
 	shield_regen = 0;
 	startPattern = false;
+
+	this->explosion = m_explosion;
 
 	//TODO: remove this
 	/*
@@ -36,5 +38,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ammo* Ammo::Clone()
 {
-	return new Ammo(this->getPosition(),this->speed,this->textureName,this->m_size,this->damage);
+	Ammo* m_ammo = new Ammo(this->getPosition(),this->speed,this->textureName,this->m_size,this->damage, this->explosion);
+	m_ammo->explosion = this->explosion->Clone();
+	return m_ammo;
 }

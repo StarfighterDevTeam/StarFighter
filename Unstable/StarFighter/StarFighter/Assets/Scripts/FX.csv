@@ -1,0 +1,2 @@
+#explosion, FX_name, asset_adress, width, height, frames, duration
+explosion,explosion,Assets/2D/FX_explosion.png,1280,236,4,0.6f

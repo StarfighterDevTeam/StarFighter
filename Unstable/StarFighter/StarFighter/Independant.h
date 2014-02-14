@@ -56,7 +56,6 @@ public:
 	virtual void Respawn();
 
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
-
 	int damage;
 	int armor;
 	int shield;
@@ -75,8 +74,6 @@ protected:
 
 	bool immune;
 	sf::Clock immunityTimer;
-
-
 };
 
 

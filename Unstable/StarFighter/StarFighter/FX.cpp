@@ -8,6 +8,7 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	visible = true;
 	isOnScene = true;
 	collider_type = IndependantType::Neutral;
+	frameNumber = m_frameNumber;
 }
 
 void FX::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
@@ -29,4 +30,10 @@ void FX::update(sf::Time deltaTime)
 		this->setVisible(false);
 		this->isOnScene = false;
 	}
+}
+
+
+FX* FX::Clone()
+{
+	return new FX(this->getPosition(), this->speed, this->textureName, this->m_size, this->frameNumber, this->duration);
 }

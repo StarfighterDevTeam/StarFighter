@@ -14,6 +14,7 @@ Scene::Scene(string name, ShipConfig* shipConf)
 		this->weaponConfig = *(FileLoader(WEAPON_FILE));
 		this->ammoConfig = *(FileLoader(AMMO_FILE));
 		this->movepatternConfig = *(FileLoader(MOVEPATTERN_FILE));
+		this->FXConfig = *(FileLoader(FX_FILE));
 
 		//move patterns 
 		for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->movepatternConfig).end(); it++)
@@ -24,7 +25,6 @@ Scene::Scene(string name, ShipConfig* shipConf)
 				this->mpatterns.push_back(*mpattern);
 			}
 		}
-		printf ("Move patterns loaded.\n");
 		
 		//enemies
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
@@ -77,6 +77,7 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 	//ship
 	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
+	
 }
 
 void Scene::Update(Time deltaTime)
@@ -168,11 +169,24 @@ Ammo* Scene::LoadAmmo(string name)
 	{
 		if((*it)[0].compare(name) == 0)
 		{
-			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]));
+			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
 		}
 	}
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file",name));
+}
+
+FX* Scene::LoadFX(string name)
+{
+	for (std::list<vector<string>>::iterator it = (this->FXConfig).begin(); it != (this->FXConfig).end(); it++)
+	{
+		if((*it)[0].compare("explosion") == 0)
+		{
+			return new FX(Vector2f(0,0), Vector2f(0,0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]),stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(stoi((*it)[FXData::FX_DURATION])));
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file",name));
 
 }
 
