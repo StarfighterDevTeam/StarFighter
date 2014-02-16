@@ -87,6 +87,7 @@ enum EnemyClass
 	ENEMYPOOL_BETA,//2
 	ENEMYPOOL_DELTA,//3
 	ENEMYPOOL_GAMMA,//4
+	NBVAL_EnemyClass
 };
 
 enum FXData
@@ -166,6 +167,7 @@ private:
 	list<vector<string>> ammoConfig;
 	list<vector<string>> FXConfig;
 	list<vector<string>> enemypoolConfig;
+	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
 	Independant* bg;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

@@ -16,16 +16,6 @@ Scene::Scene(string name, ShipConfig* shipConf)
 		this->enemypoolConfig = *(FileLoader(ENEMYPOOL_FILE));
 		this->FXConfig = *(FileLoader(FX_FILE));
 
-		//enemy pools 
-		/*for (std::list<vector<string>>::iterator it = (this->enemypoolConfig).begin(); it != (this->enemypoolConfig).end(); it++)
-		{
-			if((*it)[0] != "")
-			{
-				MovePattern* mpattern = LoadEnemyPool((*it)[MovePatternData::MOVEPATTERN_NAME], stoi((*it)[MovePatternData::MOVEPATTERN_RADIUS]),stoi((*it)[MovePatternData::MOVEPATTERN_TRIGGERY]));
-				this->mpatterns.push_back(*mpattern);
-			}
-		}
-		*/
 		//enemies
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
@@ -38,6 +28,8 @@ Scene::Scene(string name, ShipConfig* shipConf)
 			if((*it)[0].compare("enemy") == 0)
 			{
 				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
+				//legacy, to delete when pools are done
 				this->enemies.push_back(*e);
 			}
 		}
