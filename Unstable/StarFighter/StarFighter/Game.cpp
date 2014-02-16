@@ -198,6 +198,7 @@ void Game::colisionChecksV2()
 						(*it1)->setVisible(false);
 						FX* explosion = new FX (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LARGE_EXPLOSION_DURATION));	
 						this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
+						//this->addToScene(((Enemy*)(*it1))->death(), LayerType::ExplosionLayer, IndependantType::Neutral);
 						//Loot
 						Loot* loot = new Loot (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
 						this->addToScene(loot, LayerType::PlayerShipLayer, IndependantType::LootObject);

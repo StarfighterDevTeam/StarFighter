@@ -21,7 +21,7 @@
 #define ENEMY_FILE	"Assets/Scripts/Enemies.csv"
 #define WEAPON_FILE	"Assets/Scripts/Weapons.csv"
 #define AMMO_FILE "Assets/Scripts/Ammo.csv"
-#define MOVEPATTERN_FILE "Assets/Scripts/MovePattern.csv"
+#define ENEMYPOOL_FILE "Assets/Scripts/EnemyPool.csv"
 #define FX_FILE "Assets/Scripts/FX.csv"
 
 #endif // GLOBALS_H_INCLUDED

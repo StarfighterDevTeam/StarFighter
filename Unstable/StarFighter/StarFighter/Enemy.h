@@ -40,8 +40,8 @@ public:
 	int movepattern_type;
 	
 private:
-	
-	
+		
 };
+
 
 #endif // INDEPENDANT_H_INCLUDED

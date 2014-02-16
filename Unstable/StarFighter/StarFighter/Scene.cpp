@@ -13,19 +13,19 @@ Scene::Scene(string name, ShipConfig* shipConf)
 		this->enemyConfig = *(FileLoader(ENEMY_FILE));
 		this->weaponConfig = *(FileLoader(WEAPON_FILE));
 		this->ammoConfig = *(FileLoader(AMMO_FILE));
-		this->movepatternConfig = *(FileLoader(MOVEPATTERN_FILE));
+		this->enemypoolConfig = *(FileLoader(ENEMYPOOL_FILE));
 		this->FXConfig = *(FileLoader(FX_FILE));
 
-		//move patterns 
-		for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->movepatternConfig).end(); it++)
+		//enemy pools 
+		/*for (std::list<vector<string>>::iterator it = (this->enemypoolConfig).begin(); it != (this->enemypoolConfig).end(); it++)
 		{
 			if((*it)[0] != "")
 			{
-				MovePattern* mpattern = LoadMovePattern((*it)[MovePatternData::MOVEPATTERN_NAME], stoi((*it)[MovePatternData::MOVEPATTERN_RADIUS]),stoi((*it)[MovePatternData::MOVEPATTERN_TRIGGERY]));
+				MovePattern* mpattern = LoadEnemyPool((*it)[MovePatternData::MOVEPATTERN_NAME], stoi((*it)[MovePatternData::MOVEPATTERN_RADIUS]),stoi((*it)[MovePatternData::MOVEPATTERN_TRIGGERY]));
 				this->mpatterns.push_back(*mpattern);
 			}
 		}
-		
+		*/
 		//enemies
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
@@ -105,7 +105,7 @@ Ship* Scene::GetPlayerShip()
 	return this->playerShip;
 }
 
-MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY)
+/*MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY)
 {
 	for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->movepatternConfig).end(); it++)
 	{
@@ -117,6 +117,20 @@ MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY)
 	}
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find MovePattern '%s'. Please check the config file",name));
+}
+*/
+
+EnemyPool* Scene::LoadEnemyPool(string name)
+{
+	for (std::list<vector<string>>::iterator it = (this->enemypoolConfig).begin(); it != (this->enemypoolConfig).end(); it++)
+	{
+		if((*it)[0].compare(name) == 0)
+		{
+			//TODO
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPool '%s'. Please check the config file",name));
 }
 
 EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass)

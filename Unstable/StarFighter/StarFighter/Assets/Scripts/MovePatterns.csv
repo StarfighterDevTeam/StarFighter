@@ -1,4 +1,0 @@
-#MovePattern name, radius, triggerY
-None, 0, 600
-SemiCircleDown, 5, 200
-Circle, 5, 200

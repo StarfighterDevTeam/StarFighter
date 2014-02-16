@@ -68,11 +68,25 @@ enum AmmoData
 	AMMO_FX,//7
 };
 
-enum MovePatternData
+enum EnemyPoolData
 {
-	MOVEPATTERN_NAME,//0
-	MOVEPATTERN_RADIUS,//1
-	MOVEPATTERN_TRIGGERY,//2
+	ENEMYPOOL_NAME,//0
+	ENEMYPOOL_NB_LINES,//1
+	ENEMYPOOL_NB_ROWS,//2
+	ENEMYPOOL_RADIUSX,//3
+	ENEMYPOOL_RADIUSX,//4
+	ENEMYPOOL_VSPEED,//5
+	ENEMYPOOL_TRIGGERY_PATTERN,//6
+};
+
+
+enum EnemyClass
+{
+	ENEMYPOOL_VOID,//0
+	ENEMYPOOL_ALPHA,//1
+	ENEMYPOOL_BETA,//2
+	ENEMYPOOL_DELTA,//3
+	ENEMYPOOL_GAMMA,//4
 };
 
 enum FXData
@@ -94,6 +108,38 @@ struct EnemyBase
 	int enemyclass;
 };
 
+struct EnemyPoolElement
+{
+	int enemyclass;
+	int movepatternType;
+};
+
+struct EnemyPool
+{
+	EnemyPool(string m_pool_name, int m_nb_lines, int m_nb_rows, float m_radiusX, float m_radiusY, sf::Vector2f size, sf::Vector2f m_position, sf::Vector2f m_speed)
+	{
+		this->pool_name = m_pool_name;
+		this->nb_lines = m_nb_lines;
+		this->nb_rows = m_nb_rows;
+		this->radiusX = m_radiusX;
+		this->radiusY = m_radiusY;
+		this->m_size = size;
+		this->position = m_position;
+		this->speed = m_speed;	
+	};
+
+	string pool_name;
+	int nb_lines;
+	int nb_rows;
+	float radiusX;
+	float radiusY;
+	sf::Vector2f m_size;
+	sf::Vector2f position;
+	sf::Vector2f speed;
+	
+	list<EnemyPoolElement> enemypoolArray;
+};
+
 class Scene
 {
 public:
@@ -105,6 +151,7 @@ public:
 
 private:
 	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass);
+	EnemyPool*  Scene::LoadEnemyPool(string name);
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
 	FX* Scene::LoadFX(string name);
@@ -113,13 +160,12 @@ private:
 
 	Ship* playerShip;
 	list<EnemyBase> enemies;
-	list<MovePattern> mpatterns;
 	list<vector<string>> config;
 	list<vector<string>> enemyConfig;
 	list<vector<string>> weaponConfig;
 	list<vector<string>> ammoConfig;
 	list<vector<string>> FXConfig;
-	list<vector<string>> movepatternConfig;
+	list<vector<string>> enemypoolConfig;
 	Independant* bg;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

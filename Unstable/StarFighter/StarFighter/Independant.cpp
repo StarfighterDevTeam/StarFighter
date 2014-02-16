@@ -195,4 +195,3 @@ sf::Vector2f Independant::getIndependantSpeed()
 	return sf::Vector2f(speed.x, speed.y);
 }
 
-
