@@ -38,7 +38,7 @@ int main()
 
 	Equipment* shieldDefault;
 	shieldDefault = new Equipment();
-	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 100, 300, SHIELD_FILENAME);
+	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 100, 100, SHIELD_FILENAME);
 
 	Equipment* stabsDefault;
 	stabsDefault = new Equipment();

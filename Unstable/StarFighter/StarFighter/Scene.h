@@ -43,6 +43,7 @@ enum EnemyData
 	ENEMY_HEIGHT,//9
 	ENEMY_FRAMES,//10
 	ENEMY_SPEED,//11
+	ENEMY_FX_DEATH,//12
 };
 
 enum WeaponData

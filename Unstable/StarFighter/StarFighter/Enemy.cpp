@@ -1,11 +1,12 @@
 #include "Enemy.h"
 
 
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : Independant(position, speed,  textureName, size) 
+Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death)  : Independant(position, speed,  textureName, size) 
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
 	movepattern_type = 1;
+	FX_death = m_FX_death;
 }
 
 void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
@@ -65,7 +66,7 @@ Enemy* Enemy::Clone()
 {
 	sf::Vector2f s = this->speed;
 
-	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size);
+	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death);
 
 	((Independant*)enemy)->armor = this->getIndependantArmor();
 	((Independant*)enemy)->shield = this->getIndependantShield();
@@ -74,4 +75,11 @@ Enemy* Enemy::Clone()
 	enemy->weapon = this->weapon->Clone();
 
 	return enemy;
+}
+
+Independant* Enemy::death()
+{
+	FX* myFX = this->FX_death->Clone();
+	myFX->setPosition(this->getPosition().x, this->getPosition().y);
+	return (Independant*)myFX;
 }
