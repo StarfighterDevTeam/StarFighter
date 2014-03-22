@@ -9,6 +9,7 @@
 #include "Assets.h"
 #include "Hud.h"
 #include "Independant.h"
+#include "InputGuy.h"
 #include <cmath>
 
 #define SHIP_START_X                0
@@ -86,7 +87,7 @@ public:
 	ShipConfig();
 	std::string textureName;
 	sf::Vector2f size;
-	
+
 	int frameNumber;
 	void setEquipment(Equipment* m_equipment);
 	sf::Vector2f getShipConfigMaxSpeed();

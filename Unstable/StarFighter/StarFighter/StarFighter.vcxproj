@@ -97,6 +97,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hud.cpp" />
+    <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Loot.cpp" />
     <ClCompile Include="MovePattern.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="Includes\PixelPerfectCollision.hpp" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="Independant.h" />
+    <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Loot.h" />
     <ClInclude Include="MovePattern.h" />

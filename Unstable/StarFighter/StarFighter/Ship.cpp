@@ -299,29 +299,12 @@ void Ship::update(sf::Time deltaTime)
 	}
 	this->ship_hud.update(armor/3, shield/3);//will do for now... but we'll need to scale it to the max value later
 
-	moving = false;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{	
-		moving = true;
-		speed.x += ship_config.getShipConfigAcceleration().x;
-	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
-	{
-		moving = true;
-		speed.y -= ship_config.getShipConfigAcceleration().y;
-	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-	{
-		moving = true;
-		speed.x -= ship_config.getShipConfigAcceleration().x;
-	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-	{
-		moving = true;
-		speed.y += ship_config.getShipConfigAcceleration().y;
-	}
+	sf::Vector2f directions = InputGuy::getDirections();
+	moving = directions.x !=0 || directions.y !=0;
+	speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
+	speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	if(InputGuy::isFiring())
 	{
 		ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
 		ship_config.weapon->Fire(FriendlyFire);

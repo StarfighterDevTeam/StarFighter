@@ -75,6 +75,9 @@
     <ClCompile Include="MovePattern.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="InputGuy.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ammo.h">
@@ -138,6 +141,9 @@
       <Filter>Fichiers d%27en-tête\Includes</Filter>
     </ClInclude>
     <ClInclude Include="MovePattern.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="InputGuy.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
