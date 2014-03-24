@@ -1,0 +1,16 @@
+Lionel:  par exemple, quand tu fais :
+for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); it1++)
+ moi:  elle compare les tirs amis aux ennemis
+puis les tirs ennemis aux amis etc.
+ça fait moins de boucles
+ Lionel:  la partie " it1 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); "
+-> elle est faite à chaque itération, alors que tu peux le stocker dans une variable
+
+pour simplifier le passage list <-> vector, le plus simple c'est de faire des typedef
+typedef std::list<Independant*> IndependantList
+et utiliser IndependantList après
+comme ça t'as qu'à changer en un seul endroit
+
+mais ce que tu peux faire très simplemen, c'est stocker independantA->getPosition() et independantB->getPosition() dans des variables posA, posB
+ce qui, non seulement rendrait ton code plus lisible, mais en plus optimiserait tout ça...
+(en debug)
