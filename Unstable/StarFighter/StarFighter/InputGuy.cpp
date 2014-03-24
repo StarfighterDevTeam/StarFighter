@@ -25,19 +25,19 @@ Vector2f InputGuy::getDirections()
 
 
 	//Keyboard inputs
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		dirX++;
 	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		dirY--;
 	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		dirX--;
 	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		dirY++;
 	}
