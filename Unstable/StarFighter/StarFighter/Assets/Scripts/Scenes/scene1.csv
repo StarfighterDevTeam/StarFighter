@@ -1,4 +1,4 @@
 bg,Assets/2D/background.png,800,1800,
 #,enemies_name,probability,pool_size,enemy_class
-enemy,robert,1,5,0
-enemy,roger,0,0,1
+enemy,robert,0.25,20,0
+enemy,roger,0.75,100,1

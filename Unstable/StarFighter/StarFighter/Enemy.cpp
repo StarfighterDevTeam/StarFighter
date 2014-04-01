@@ -5,13 +5,13 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
-	movepattern_type = 1;
+	movepattern_type = 0;//type de pattern hardcodé pour l'instant
 	FX_death = m_FX_death;
 }
 
 void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
 {
-	if (getPosition().y >200 && !startPattern)
+	if (getPosition().y >200 && !startPattern)//hauteur de déclenchement du pattern hardcodée
 	{
 		startPattern = true;
 	}
@@ -19,8 +19,8 @@ void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType:
 	//add offset calculated by Game
 	if (startPattern)
 	{
-		speed.x = 0;
-		speed.y = 0;
+		//speed.x = 0;
+		//speed.y = 0;
 		setPosition(getPosition().x + polarOffset[movepattern_type].x, getPosition().y + polarOffset[movepattern_type].y);
 		//printf("pouet\n");
 	}
