@@ -18,6 +18,7 @@
 
 #define LOOP_SAMPLING_MS						18	//18ms ~ 56 Hz
 
+#define SHIP_FILE "Assets/Scripts/Ship.csv"
 #define ENEMY_FILE	"Assets/Scripts/Enemies.csv"
 #define WEAPON_FILE	"Assets/Scripts/Weapons.csv"
 #define AMMO_FILE "Assets/Scripts/Ammo.csv"

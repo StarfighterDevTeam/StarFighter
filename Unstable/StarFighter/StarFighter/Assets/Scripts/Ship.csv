@@ -1,2 +1,2 @@
-#name_model,texture,width,height,frames,max_speed.x,max_speed.y,decceleration,acceleration.x,acceleration.y,armor,shield,shield_regen
-default,Assets/2D/natalia.png,64,64,3,500,500,1000,20,20,600,1000,1
+#name_model,texture,width,height,frames,max_speed.x,max_speed.y,decceleration,acceleration.x,acceleration.y,armor,shield,shield_regen,weapon,ammo
+default,Assets/2D/natalia.png,64,64,3,500,500,1000,20,20,600,1000,1,laser_fast,laser_blue

@@ -16,40 +16,43 @@ public:
 			return false;
 
 		// Preliminary test : are the two sprites even aligned ?
-		if (independantB->getPosition().x - (independantB->m_size.x/2) > independantA->getPosition().x + (independantA->m_size.x/2)
-			|| independantB->getPosition().x + (independantB->m_size.x/2) < independantA->getPosition().x - (independantA->m_size.x/2)
-			|| independantB->getPosition().y + (independantB->m_size.y/2) < independantA->getPosition().y - (independantA->m_size.y/2)
-			|| independantB->getPosition().y - (independantB->m_size.y/2) > independantA->getPosition().y + (independantA->m_size.y/2))
+		float x = independantB->getPosition().x;
+		float y = independantB->getPosition().y;
+
+		if (x - (independantB->m_size.x/2) > independantA->getPosition().x + (independantA->m_size.x/2)
+			|| x + (independantB->m_size.x/2) < independantA->getPosition().x - (independantA->m_size.x/2)
+			|| y + (independantB->m_size.y/2) < independantA->getPosition().y - (independantA->m_size.y/2)
+			|| y - (independantB->m_size.y/2) > independantA->getPosition().y + (independantA->m_size.y/2))
 			return false;                        
 
 		// Second test : are the corners included in the other sprite, or vice versa ?
 		else
 		{
-			if ( (   ( (independantA->getPosition().x - (independantA->m_size.x/2) < independantB->getPosition().x - (independantB->m_size.x/2)) && (independantB->getPosition().x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // up-left corner
-				&& (independantA->getPosition().y - (independantA->m_size.y/2) < independantB->getPosition().y - (independantB->m_size.y/2)) && (independantB->getPosition().y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) )
+			if ( (   ( (independantA->getPosition().x - (independantA->m_size.x/2) < x - (independantB->m_size.x/2)) && (x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // up-left corner
+				&& (independantA->getPosition().y - (independantA->m_size.y/2) < y - (independantB->m_size.y/2)) && (y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) )
 
-				||  ( (independantA->getPosition().x - (independantA->m_size.x/2) < independantB->getPosition().x + (independantB->m_size.x/2)) && (independantB->getPosition().x + (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // up-right corner
-				&& ( independantA->getPosition().y - (independantA->m_size.y/2) < independantB->getPosition().y - (independantB->m_size.y/2)) && (independantB->getPosition().y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) )
+				||  ( (independantA->getPosition().x - (independantA->m_size.x/2) < x + (independantB->m_size.x/2)) && (x + (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // up-right corner
+				&& ( independantA->getPosition().y - (independantA->m_size.y/2) < y - (independantB->m_size.y/2)) && (y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) )
 
-				||  ( (independantA->getPosition().x - (independantA->m_size.x/2) < independantB->getPosition().x - (independantB->m_size.x/2)) && (independantB->getPosition().x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // down-left corner
-				&& (independantA->getPosition().y - (independantA->m_size.y/2) < independantB->getPosition().y + (independantB->m_size.y/2)) && (independantB->getPosition().y + (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) )
+				||  ( (independantA->getPosition().x - (independantA->m_size.x/2) < x - (independantB->m_size.x/2)) && (x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // down-left corner
+				&& (independantA->getPosition().y - (independantA->m_size.y/2) < y + (independantB->m_size.y/2)) && (y + (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) )
 
-				||  ( (independantA->getPosition().x - (independantA->m_size.x/2) < independantB->getPosition().x + (independantB->m_size.x/2)) && (independantB->getPosition().x + (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // down-right corner
-				&& (independantA->getPosition().y - (independantA->m_size.y/2) < independantB->getPosition().y + (independantB->m_size.y/2)) && (independantB->getPosition().y + (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)))  )
+				||  ( (independantA->getPosition().x - (independantA->m_size.x/2) < x + (independantB->m_size.x/2)) && (x + (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2))   // down-right corner
+				&& (independantA->getPosition().y - (independantA->m_size.y/2) < y + (independantB->m_size.y/2)) && (y + (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)))  )
 
 				||
 
-				(  ((independantB->getPosition().x - (independantB->m_size.x/2) < independantA->getPosition().x - (independantA->m_size.x/2)) && (independantA->getPosition().x - (independantA->m_size.x/2) < independantB->getPosition().x + (independantB->m_size.x/2))   // up-left corner
-				&& (independantB->getPosition().y - (independantB->m_size.y/2) < independantA->getPosition().y - (independantA->m_size.y/2)) && (independantA->getPosition().y - (independantA->m_size.y/2) < independantB->getPosition().y + (independantB->m_size.y/2)) )
+				(  ((x - (independantB->m_size.x/2) < independantA->getPosition().x - (independantA->m_size.x/2)) && (independantA->getPosition().x - (independantA->m_size.x/2) < x + (independantB->m_size.x/2))   // up-left corner
+				&& (y - (independantB->m_size.y/2) < independantA->getPosition().y - (independantA->m_size.y/2)) && (independantA->getPosition().y - (independantA->m_size.y/2) < y + (independantB->m_size.y/2)) )
 				//return true;
-				|| ( (independantB->getPosition().x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2)) && (independantA->getPosition().x + (independantA->m_size.x/2) < independantB->getPosition().x + (independantB->m_size.x/2))  // up-right corner
-				&& (independantB->getPosition().y - (independantB->m_size.y/2) < independantA->getPosition().y - (independantA->m_size.y/2)) && (independantA->getPosition().y - (independantA->m_size.y/2) < independantB->getPosition().y + (independantB->m_size.y/2)) )
+				|| ( (x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2)) && (independantA->getPosition().x + (independantA->m_size.x/2) < x + (independantB->m_size.x/2))  // up-right corner
+				&& (y - (independantB->m_size.y/2) < independantA->getPosition().y - (independantA->m_size.y/2)) && (independantA->getPosition().y - (independantA->m_size.y/2) < y + (independantB->m_size.y/2)) )
 				//return true;
-				|| ( (independantB->getPosition().x - (independantB->m_size.x/2) < independantA->getPosition().x - (independantA->m_size.x/2)) && (independantA->getPosition().x - (independantA->m_size.x/2) < independantB->getPosition().x + (independantB->m_size.x/2))   // down-left corner
-				&& (independantB->getPosition().y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) && (independantA->getPosition().y + (independantA->m_size.y/2) < independantB->getPosition().y + (independantB->m_size.y/2)) )
+				|| ( (x - (independantB->m_size.x/2) < independantA->getPosition().x - (independantA->m_size.x/2)) && (independantA->getPosition().x - (independantA->m_size.x/2) < x + (independantB->m_size.x/2))   // down-left corner
+				&& (y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) && (independantA->getPosition().y + (independantA->m_size.y/2) < y + (independantB->m_size.y/2)) )
 				//return true;
-				|| ( (independantB->getPosition().x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2)) && (independantA->getPosition().x + (independantA->m_size.x/2) < independantB->getPosition().x + (independantB->m_size.x/2))   // down-right corner
-				&& (independantB->getPosition().y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) && (independantA->getPosition().y + (independantA->m_size.y/2) < independantB->getPosition().y + (independantB->m_size.y/2)))  )  )
+				|| ( (x - (independantB->m_size.x/2) < independantA->getPosition().x + (independantA->m_size.x/2)) && (independantA->getPosition().x + (independantA->m_size.x/2) < x + (independantB->m_size.x/2))   // down-right corner
+				&& (y - (independantB->m_size.y/2) < independantA->getPosition().y + (independantA->m_size.y/2)) && (independantA->getPosition().y + (independantA->m_size.y/2) < y + (independantB->m_size.y/2)))  )  )
 
 				return true;
 			else
