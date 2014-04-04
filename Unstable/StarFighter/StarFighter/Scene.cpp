@@ -143,38 +143,10 @@ ShipConfig* Scene::LoadShipConfig(string name)
 		if((*it)[0].compare("default") == 0)
 		{
 			ShipConfig* shipC = new ShipConfig();
-			
-			Equipment* airbrakeDefault = new Equipment();
-			//TODO : LoadEquipment function from Equipment.csv
-			airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f ,sf::Vector2f (0,0), 0, 0, 0, AIRBRAKE_FILENAME);
-
-			Equipment* engineDefault = new Equipment();
-			engineDefault->Init(EquipmentType::Engine, sf::Vector2f (100,100), 0.0f , sf::Vector2f (0,0), 0, 0, 0, THRUSTER_FILENAME);
-
-			Equipment* armorDefault = new Equipment();
-			armorDefault->Init(EquipmentType::Armor, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 100, 0, 0, ARMOR_FILENAME);
-
-			Equipment* shieldDefault = new Equipment();
-			shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 100, 100, SHIELD_FILENAME);
-
-			Equipment* stabsDefault = new Equipment();
-			stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , sf::Vector2f (20,20), 0, 0, 0, STABS_FILENAME);
-
-			Equipment* moduleDefault = new Equipment();
-			moduleDefault->Init(EquipmentType::Module, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, MODULE_FILENAME);
-
-			Equipment* emptyEquipment = new Equipment();
-			emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME);
-
-			shipC->equipment[Empty] = emptyEquipment;
-			shipC->equipment[Airbrake] = airbrakeDefault;
-			shipC->equipment[Engine] = engineDefault;
-			shipC->equipment[Stabs] = stabsDefault;
-			shipC->equipment[Armor] = armorDefault;
-			shipC->equipment[Shield] = shieldDefault;
-			shipC->equipment[Module] = moduleDefault;
 
 			shipC->ship_model = new ShipModel(sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_MAXSPEED_X]),stoi((*it)[ShipModelData::SHIPMODEL_MAXSPEED_X])), sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_ACCELERATION_X]),stoi((*it)[ShipModelData::SHIPMODEL_ACCELERATION_Y])), stoi((*it)[ShipModelData::SHIPMODEL_DECCELERATION]), stoi((*it)[ShipModelData::SHIPMODEL_ARMOR]), stoi((*it)[ShipModelData::SHIPMODEL_SHIELD]), stoi((*it)[ShipModelData::SHIPMODEL_SHIELD_REGEN]));
+			//TODO: LoadEquipment
+			
 			shipC->Init((*it)[ShipModelData::SHIPMODEL_IMAGE_NAME], sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_WIDTH]),stoi((*it)[ShipModelData::SHIPMODEL_HEIGHT])), stoi((*it)[ShipModelData::SHIPMODEL_FRAMES]));
 			
 			shipC->weapon = LoadWeapon((*it)[ShipModelData::SHIPMODEL_WEAPON], 1, LoadAmmo((*it)[ShipModelData::SHIPMODEL_AMMO]));

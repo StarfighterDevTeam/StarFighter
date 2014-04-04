@@ -60,11 +60,11 @@ private:
 class Equipment
 {
 public:
-	void Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size = sf::Vector2f(256,256));
+	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size = sf::Vector2f(256,256));
 	Equipment();
 	std::string textureName;
 	sf::Vector2f size;
-	EquipmentType equipmentType;
+	int equipmentType;
 	sf::Vector2f getEquipmentMaxSpeed();
 	float getEquipmentDecceleration();
 	sf::Vector2f getEquipmentAcceleration();

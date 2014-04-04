@@ -68,7 +68,7 @@ Equipment::Equipment()
 }
 
 
-void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
+void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -119,6 +119,15 @@ int Equipment::getEquipmentShieldRegen()
 
 ShipConfig::ShipConfig()
 {
+		
+	this->ship_model = new ShipModel(sf::Vector2f (0,0), sf::Vector2f (0,0), 0.0f, 0, 0, 0);
+
+	for (int i=0; i<NBVAL_EQUIPMENT; i++)
+	{
+		Equipment* defaultEquipment = new Equipment();
+		defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME);
+		this->equipment[i] = defaultEquipment;
+	}
 
 }
 
