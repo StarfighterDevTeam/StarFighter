@@ -29,6 +29,26 @@ enum SceneDataBackground
 	BACKGROUND_HEIGHT,//3
 };
 
+enum ShipModelData
+{
+	SHIPMODEL_COMPARE,//0
+	SHIPMODEL_NAME,//1
+	SHIPMODEL_IMAGE_NAME,//2
+	SHIPMODEL_WIDTH,//3
+	SHIPMODEL_HEIGHT,//4
+	SHIPMODEL_FRAMES,//5
+	SHIPMODEL_MAXSPEED_X,//6
+	SHIPMODEL_MAXSPEED_Y,//7
+	SHIPMODEL_DECCELERATION,//8
+	SHIPMODEL_ACCELERATION_X,//9
+	SHIPMODEL_ACCELERATION_Y,//10
+	SHIPMODEL_ARMOR,//11
+	SHIPMODEL_SHIELD,//12
+	SHIPMODEL_SHIELD_REGEN,//13
+	SHIPMODEL_WEAPON,//14
+	SHIPMODEL_AMMO,//15
+};
+
 enum EnemyData
 {
 	ENEMY_NAME,//0
@@ -144,13 +164,15 @@ struct EnemyPool
 class Scene
 {
 public:
-	Scene(string name, ShipConfig* shipConf);
+	//Scene(string name, ShipConfig* shipConf);
+	Scene(string name);
 	void Scene::StartGame(sf::RenderWindow*	window);
 	void Scene::Update(Time deltaTime);
 	Ship* Scene::GetPlayerShip();
 	void Scene::GenerateEnemies(Time deltaTime);
 
 private:
+	ShipConfig* Scene::LoadShipConfig(string name);
 	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass);
 	EnemyPool*  Scene::LoadEnemyPool(string name);
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
@@ -167,6 +189,7 @@ private:
 	list<vector<string>> ammoConfig;
 	list<vector<string>> FXConfig;
 	list<vector<string>> enemypoolConfig;
+	list<vector<string>> shipConfig;
 	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
 	Independant* bg;
 	sf::RenderWindow* mainWindow;

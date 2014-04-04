@@ -41,7 +41,7 @@ enum EquipmentType {
 class ShipModel
 {
 public:
-	ShipModel();
+	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen);
 	sf::Vector2f getShipModelMaxSpeed();
 	float getShipModelDecceleration();
 	sf::Vector2f getShipModelAcceleration();

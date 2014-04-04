@@ -6,16 +6,16 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel()
+ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen)
 {
-	this->max_speed.x = SHIP_MAX_SPEED_X;
-	this->max_speed.y = SHIP_MAX_SPEED_Y;
-	this->decceleration = SHIP_DECCELERATION_COEF;
-	this->acceleration.x = SHIP_ACCELERATION_X;
-	this->acceleration.y = SHIP_ACCELERATION_Y;
-	this->armor = SHIP_ARMOR;
-	this->shield = SHIP_SHIELD;
-	this->shield_regen = SHIP_SHIELD_REGEN;
+	this->max_speed.x = m_max_speed.x;
+	this->max_speed.y = m_max_speed.y;
+	this->decceleration = m_decceleration;
+	this->acceleration.x = m_acceleration.x;
+	this->acceleration.y = m_acceleration.y;
+	this->armor = m_armor;
+	this->shield = m_shield;
+	this->shield_regen = m_shield_regen;
 }
 
 //various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
@@ -67,7 +67,8 @@ Equipment::Equipment()
 	this->equipmentType = EquipmentType::Empty;
 }
 
-void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
+
+void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -81,7 +82,8 @@ void Equipment::Init(EquipmentType m_equipmentType, sf::Vector2f m_max_speed, fl
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
 	this->equipmentType = m_equipmentType;
-};
+}
+
 
 sf::Vector2f Equipment::getEquipmentMaxSpeed()
 {
@@ -160,7 +162,14 @@ int ShipConfig::getShipConfigArmor()
 
 	for (int i=0; i<NBVAL_EQUIPMENT; i++)
 	{
-		equipment_armor += equipment[i]->getEquipmentArmor();
+		if (equipment[i] != NULL)
+		{
+			equipment_armor += equipment[i]->getEquipmentArmor();
+		}
+		else
+		{
+			equipment_armor += 0;
+		}
 	}
 
 	new_armor = ship_model->getShipModelArmor() + equipment_armor;
@@ -174,7 +183,14 @@ int ShipConfig::getShipConfigShield()
 
 	for (int i=0; i<NBVAL_EQUIPMENT; i++)
 	{
-		equipment_shield += equipment[i]->getEquipmentShield();
+		if (equipment[i] != NULL)
+		{
+			equipment_shield += equipment[i]->getEquipmentShield();
+		}
+		else
+		{
+			equipment_shield += 0;
+		}
 	}
 
 	new_shield = ship_model->getShipModelShield() + equipment_shield;
@@ -188,7 +204,15 @@ int ShipConfig::getShipConfigShieldRegen()
 
 	for (int i=0; i<NBVAL_EQUIPMENT; i++)
 	{
-		equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
+		if (equipment[i] != NULL)
+		{
+			equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
+	
+		}
+		else
+		{
+			equipment_shield_regen += 0;
+		}
 	}
 
 	new_shield_regen = ship_model->getShipModelShieldRegen() + equipment_shield_regen;
@@ -202,8 +226,16 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 
 	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
 	{
-		equipment_max_speed.x += equipment[i]->getEquipmentMaxSpeed().x;
-		equipment_max_speed.y += equipment[i]->getEquipmentMaxSpeed().y;
+		if (equipment[i] != NULL)
+		{
+			equipment_max_speed.x += equipment[i]->getEquipmentMaxSpeed().x;
+			equipment_max_speed.y += equipment[i]->getEquipmentMaxSpeed().y;
+		}
+		else
+		{
+			equipment_max_speed.x += 0;
+			equipment_max_speed.y += 0;
+		}
 	}
 
 	new_max_speed.x = ship_model->getShipModelMaxSpeed().x + equipment_max_speed.x;
@@ -219,7 +251,14 @@ float ShipConfig::getShipConfigDecceleration()
 
 	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
 	{
-		equipment_decceleration += equipment[i]->getEquipmentDecceleration();
+		if (equipment[i] != NULL)
+		{
+			equipment_decceleration += equipment[i]->getEquipmentDecceleration();
+		}
+		else
+		{
+			equipment_decceleration += 0;
+		}
 	}
 
 	new_decceleration = ship_model->getShipModelDecceleration() + equipment_decceleration;
@@ -233,8 +272,16 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 
 	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
 	{
-		equipment_acceleration.x += equipment[i]->getEquipmentAcceleration().x;
-		equipment_acceleration.y += equipment[i]->getEquipmentAcceleration().y;
+		if (equipment[i] != NULL)
+		{
+			equipment_acceleration.x += equipment[i]->getEquipmentAcceleration().x;
+			equipment_acceleration.y += equipment[i]->getEquipmentAcceleration().y;
+		}
+		else
+		{
+			equipment_acceleration.x += 0;
+			equipment_acceleration.y += 0;
+		}
 	}
 
 	new_acceleration.x = ship_model->getShipModelAcceleration().x + equipment_acceleration.x;

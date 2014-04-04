@@ -21,64 +21,6 @@ int main()
 	CurrentGame = new Game();
 	srand (time(NULL));
 
-
-	//default setting
-	ShipModel* shipModelDefault;
-	shipModelDefault = new ShipModel();
-
-	Equipment* airbrakeDefault;
-	airbrakeDefault = new Equipment();
-	airbrakeDefault->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 0.0f ,sf::Vector2f (0,0), 0, 0, 0, AIRBRAKE_FILENAME);
-
-	Equipment* engineDefault;
-	engineDefault = new Equipment();
-	engineDefault->Init(EquipmentType::Engine, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, THRUSTER_FILENAME);
-
-	Equipment* armorDefault;
-	armorDefault = new Equipment();
-	armorDefault->Init(EquipmentType::Armor, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 100, 0, 0, ARMOR_FILENAME);
-
-	Equipment* shieldDefault;
-	shieldDefault = new Equipment();
-	shieldDefault->Init(EquipmentType::Shield, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 100, 100, SHIELD_FILENAME);
-
-	Equipment* stabsDefault;
-	stabsDefault = new Equipment();
-	stabsDefault->Init(EquipmentType::Stabs, sf::Vector2f (0,0), 0.0f , sf::Vector2f (20,20), 0, 0, 0, STABS_FILENAME);
-
-	Equipment* moduleDefault;
-	moduleDefault = new Equipment();
-	moduleDefault->Init(EquipmentType::Module, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, MODULE_FILENAME);
-
-	//bonus setting
-	Equipment* airbrakeZ;
-	airbrakeZ = new Equipment();
-	airbrakeZ->Init(EquipmentType::Airbrake, sf::Vector2f (0,0), 300.0f , sf::Vector2f (0,0), 0, 0, 0, AIRBRAKE_Z_FILENAME);
-
-	Equipment* engineZ;
-	engineZ = new Equipment();
-	engineZ->Init(EquipmentType::Engine, sf::Vector2f (400,400), 0.0f , sf::Vector2f (0,0), 0, 0, 0, THRUSTER_FILENAME);
-
-	Equipment* emptyEquipment;
-	emptyEquipment = new Equipment();
-	emptyEquipment->Init(EquipmentType::Empty, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME);
-
-
-	//ship config
-	ShipConfig* shipA;
-	shipA = new ShipConfig();
-	//hardcoded for now, to be built in constructor or in Init() function...
-	shipA->ship_model = shipModelDefault;
-	shipA->equipment[Empty] = emptyEquipment;
-	shipA->equipment[Airbrake] = airbrakeDefault;
-	shipA->equipment[Engine] = engineDefault;
-	shipA->equipment[Stabs] = stabsDefault;
-	shipA->equipment[Armor] = armorDefault;
-	shipA->equipment[Shield] = shieldDefault;
-	shipA->equipment[Module] = moduleDefault;
-	//...until this point
-	shipA->Init(SHIP_FILENAME, sf::Vector2f(SHIP_WIDTH,SHIP_HEIGHT), SHIP_NB_FRAMES);
-
 	//update
 	sf::Time dt;
 	sf::Clock deltaClock;
@@ -89,7 +31,7 @@ int main()
 	///...until here (avoiding key repetition)
 
 	//Loading Scene
-	Scene level1("Assets/Scripts/Scenes/scene1.csv",shipA);
+	Scene level1("Assets/Scripts/Scenes/scene1.csv");
 	level1.StartGame(window);
 
 	while (window->isOpen())
@@ -111,52 +53,6 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window->close();
 		}
-
-		//to refactor later...
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
-		{
-			if (!keyrepeat)
-			{
-				level1.GetPlayerShip()->ship_config.setEquipment(engineZ);
-				printf ("Engine Z mounted.\n");
-				keyrepeat = true;
-				deltaClockKeyPressed.restart();
-			}
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-		{				
-			if (!keyrepeat)
-			{
-				level1.GetPlayerShip()->ship_config.setEquipment(airbrakeZ);
-				printf ("Airbrake Z mounted.\n");
-				keyrepeat = true;
-				deltaClockKeyPressed.restart();
-			}
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
-		{				
-			if (!keyrepeat)
-			{
-				level1.GetPlayerShip()->ship_config.setEquipment(engineDefault);
-				printf ("Engine default mounted.\n");
-				keyrepeat = true;
-				deltaClockKeyPressed.restart();
-			}
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
-		{			
-			if (!keyrepeat)
-			{
-				level1.GetPlayerShip()->ship_config.setEquipment(airbrakeDefault);
-				printf ("Airbrake default mounted.\n");
-				keyrepeat = true;
-				deltaClockKeyPressed.restart();
-			}
-		}
-		//...until here (test equipment)
 
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			window->close();
