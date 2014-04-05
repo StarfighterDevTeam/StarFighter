@@ -170,6 +170,10 @@ public:
 	void Scene::Update(Time deltaTime);
 	Ship* Scene::GetPlayerShip();
 	void Scene::GenerateEnemies(Time deltaTime);
+	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
+
+	float vspeed;
+	bool sceneIsOver;
 
 private:
 	ShipConfig* Scene::LoadShipConfig(string name);
@@ -192,6 +196,7 @@ private:
 	list<vector<string>> shipConfig;
 	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
 	Independant* bg;
+	Independant* hub;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
 };

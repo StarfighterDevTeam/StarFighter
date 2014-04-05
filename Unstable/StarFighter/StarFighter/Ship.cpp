@@ -313,6 +313,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->shield = ship_config.getShipConfigShield();
 	this->shield_regen = ship_config.getShipConfigShieldRegen();
 	ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
+	disable_inputs = false;
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -355,15 +356,20 @@ void Ship::update(sf::Time deltaTime)
 	}
 	this->ship_hud.update(armor/3, shield/3);//will do for now... but we'll need to scale it to the max value later
 
-	sf::Vector2f directions = InputGuy::getDirections();
-	moving = directions.x !=0 || directions.y !=0;
-	speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
-	speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
-
-	if(InputGuy::isFiring())
+	
+	if (!disable_inputs)
 	{
-		ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
-		ship_config.weapon->Fire(FriendlyFire);
+		sf::Vector2f directions = InputGuy::getDirections();
+
+		moving = directions.x !=0 || directions.y !=0;
+		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
+		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
+
+		if(InputGuy::isFiring())
+		{
+			ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
+			ship_config.weapon->Fire(FriendlyFire);
+		}
 	}
 
 	//max speed constraints

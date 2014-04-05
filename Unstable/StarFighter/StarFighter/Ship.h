@@ -119,7 +119,8 @@ public :
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
 	void Respawn() override;
-
+	
+	bool disable_inputs;
 private:
 	bool moving;
 };

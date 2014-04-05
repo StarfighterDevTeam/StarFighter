@@ -6,6 +6,9 @@ extern Game* CurrentGame;
 Scene::Scene(string name)
 {
 
+	vspeed = +200;
+	sceneIsOver = false;
+
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
 
 	try {
@@ -18,33 +21,19 @@ Scene::Scene(string name)
 		this->FXConfig = *(FileLoader(FX_FILE));
 		this->shipConfig = *(FileLoader(SHIP_FILE));
 
-		
-		/*
-			for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
-		{
-			if((*it)[0].compare("bg") == 0)
-			{
-				this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])-WINDOW_RESOLUTION_Y));
-				bg->setVisible(true);
-			}
-
-			if((*it)[0].compare("enemy") == 0)
-			{
-				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
-				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
-				//legacy, to delete when pools are done
-				this->enemies.push_back(*e);
-			}
-		}
-		*/
-
 		//enemies
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
 			if((*it)[0].compare("bg") == 0)
 			{
-				this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,+10),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])-WINDOW_RESOLUTION_Y));
+				this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])-WINDOW_RESOLUTION_Y));
 				bg->setVisible(true);
+			}
+
+			if((*it)[0].compare("hub") == 0)
+			{
+				this->hub = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,bg->m_size.y));
+				hub->setVisible(true);
 			}
 
 			if((*it)[0].compare("enemy") == 0)
@@ -56,7 +45,6 @@ Scene::Scene(string name)
 			}
 		}
 
-		
 		//Loading font for framerate
 		//TODO : refactor this
 		sf::Font* font = new sf::Font();
@@ -89,6 +77,7 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 	//bg
 	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
+	(*CurrentGame).addToScene(hub,LayerType::BackgroundLayer,IndependantType::Background);
 
 	//ship
 	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
@@ -97,7 +86,13 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 void Scene::Update(Time deltaTime)
 {
-	this->GenerateEnemies(deltaTime);
+	if (!sceneIsOver && bg->getPosition().y > bg->m_size.y - WINDOW_RESOLUTION_Y)
+	{
+		this->EndSceneAnimation(500, 200);
+	}
+
+	//Random enemy generation
+	//this->GenerateEnemies(deltaTime);
 
 	(*CurrentGame).updateScene(deltaTime);
 	mainWindow->clear();
@@ -302,5 +297,41 @@ void Scene::GenerateEnemies(Time deltaTime)
 				(*CurrentGame).addToScene((Independant*)n,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
 			}
 		}
+	}
+}
+
+void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
+{
+	//setting the last screen of the scene on rails toward the hub
+
+	//phase 1: the BG stops scrolling and the player goes up
+	playerShip->disable_inputs = true;
+	playerShip->disable_inputs = true;
+
+	bg->speed.y = 0;
+	hub->speed.y = 0;
+
+	//TODO: only if the boss is cleared.
+	playerShip->speed.x= 0;
+	playerShip->speed.y= -transition_UP;
+
+	//phase 2: player reached top of the screen, we swap BG and HUB while player goes down to middle of screen
+	if (playerShip->getPosition().y < playerShip->m_size.y)
+	{
+		hub->speed.y = transition_DOWN;
+		bg->speed.y = transition_DOWN;
+		playerShip->speed.x=0;
+		//playerShip->speed.y=0;
+		playerShip->speed.y = transition_DOWN/2;
+	}
+
+	//phase 3: player regain controlin the HUB
+	if (hub->getPosition().y > bg->m_size.y)
+	{
+		hub->speed.y = 0;
+		bg->speed.y = 0;
+		playerShip->disable_inputs = false;
+		playerShip->disable_inputs = false;
+		sceneIsOver = true;
 	}
 }
