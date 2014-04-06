@@ -311,9 +311,9 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 	bg->speed.y = 0;
 	hub->speed.y = 0;
 
-	//TODO: only if the boss is cleared.
 	playerShip->speed.x= 0;
 	playerShip->speed.y= -transition_UP;
+	printf("phase1| speed player: %f, speed bg: %f\n", playerShip->speed.y, bg->speed.y);
 
 	//phase 2: player reached top of the screen, we swap BG and HUB while player goes down to middle of screen
 	if (playerShip->getPosition().y < playerShip->m_size.y)
@@ -322,7 +322,8 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 		bg->speed.y = transition_DOWN;
 		playerShip->speed.x=0;
 		//playerShip->speed.y=0;
-		playerShip->speed.y = transition_DOWN/2;
+		playerShip->speed.y = transition_DOWN;
+		printf("phase2| speed player: %f, speed bg: %f\n", playerShip->speed.y, bg->speed.y);
 	}
 
 	//phase 3: player regain controlin the HUB
