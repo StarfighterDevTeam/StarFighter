@@ -61,6 +61,5 @@ int main()
 		level1.Update(dt);
 
 	}
-
 	return 0;
 }

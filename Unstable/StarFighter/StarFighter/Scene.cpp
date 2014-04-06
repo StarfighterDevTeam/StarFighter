@@ -8,6 +8,10 @@ Scene::Scene(string name)
 
 	vspeed = +200;
 	sceneIsOver = false;
+	endingPhase1isOver = false;
+	endingPhase2isOver = false;
+	endingPhase3isOver = false;
+	endingPhase4isOver = false;
 
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
 
@@ -86,10 +90,37 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 void Scene::Update(Time deltaTime)
 {
-	if (!sceneIsOver && bg->getPosition().y > bg->m_size.y - WINDOW_RESOLUTION_Y)
+
+	//end scene Phase 1: the background reached the end of its size, except one screen size Y
+	if (!endingPhase1isOver && bg->getPosition().y > bg->m_size.y - WINDOW_RESOLUTION_Y)
 	{
-		this->EndSceneAnimation(500, 200);
+		endscenePhase1();
 	}
+
+	//end scene Phase 2: scene is cleared, the player is set on rails towards the top of the screen
+	if (endingPhase1isOver && !endingPhase2isOver  && (*CurrentGame).getNumberOfIndeIndependantsAlive() < 4) // ship, bg and hub are the 3 only alive independants allowed before ending the scene
+	{
+		endscenePhase2(ENDSCENE_TRANSITION_SPEED_UP);//speed of translation towards UP
+
+	}
+
+	//end scene Phase 3: the playership reached the top of the screen, now background and HUB are switching
+	if (endingPhase2isOver && !endingPhase3isOver  && playerShip->getPosition().y < playerShip->ship_config.size.y) //playership reaches the top of the screen
+	{
+		endscenePhase3(ENDSCENE_TRANSITION_SPEED_DOWN);//speed of translation towards DOWN
+	}
+
+	//end scene Phase 4: the HUB is now full screen, the players are given back the control of their ship
+	if (endingPhase3isOver && !endingPhase4isOver && hub->getPosition().y > bg->m_size.y)
+	{
+		endscenePhase4();
+	}
+
+	//end scene OLD
+	//if (!sceneIsOver && bg->getPosition().y > bg->m_size.y - WINDOW_RESOLUTION_Y)
+	//{
+	//	this->EndSceneAnimation(500, 200);
+	//}
 
 	//Random enemy generation
 	//this->GenerateEnemies(deltaTime);
@@ -97,6 +128,7 @@ void Scene::Update(Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 	mainWindow->clear();
 	(*CurrentGame).drawScene();
+
 
 	//TODO: refactor these
 	mainWindow->draw(this->playerShip->ship_hud.armorBar);
@@ -306,7 +338,6 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 
 	//phase 1: the BG stops scrolling and the player goes up
 	playerShip->disable_inputs = true;
-	playerShip->disable_inputs = true;
 
 	bg->speed.y = 0;
 	hub->speed.y = 0;
@@ -332,7 +363,40 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 		hub->speed.y = 0;
 		bg->speed.y = 0;
 		playerShip->disable_inputs = false;
-		playerShip->disable_inputs = false;
 		sceneIsOver = true;
 	}
+}
+
+void Scene::endscenePhase1()
+{
+	bg->speed.y = 0;
+	hub->speed.y = 0;
+	endingPhase1isOver = true;
+}
+
+void Scene::endscenePhase2(float transition_speed_UP)
+{
+		playerShip->disable_inputs = true;
+		playerShip->speed.x = 0;
+		playerShip->speed.y = -transition_speed_UP;
+		endingPhase2isOver = true;
+}
+
+void Scene::endscenePhase3(float transition_speed_DOWN)
+{
+	bg->speed.y = transition_speed_DOWN;
+	hub->speed.y = transition_speed_DOWN;
+
+	//center the player at the required speed i.e. proportionally to the speed at which the background fades out
+	playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X/2) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
+	playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y/2) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+	endingPhase3isOver = true;
+}
+
+void Scene::endscenePhase4()
+{
+	playerShip->disable_inputs = false;
+	hub->speed.y = 0;
+	bg->speed.y = 0;
+	endingPhase4isOver = true;
 }

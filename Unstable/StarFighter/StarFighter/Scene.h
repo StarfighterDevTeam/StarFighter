@@ -199,6 +199,15 @@ private:
 	Independant* hub;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
+
+	bool endingPhase1isOver;
+	bool endingPhase2isOver;
+	bool endingPhase3isOver;
+	bool endingPhase4isOver;
+	void endscenePhase1();
+	void endscenePhase2(float transition_speed_UP);
+	void endscenePhase3(float transition_speed_DOWN);
+	void endscenePhase4();
 };
 
 #endif // STARFIGHTER_H_INCLUDED

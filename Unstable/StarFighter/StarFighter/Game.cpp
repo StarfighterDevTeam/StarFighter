@@ -72,6 +72,8 @@ void Game::updateScene(Time deltaTime)
 		(*(*it)).update(deltaTime, sceneMovePatterns);
 	}
 
+
+
 	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -320,4 +322,9 @@ sf::Vector2f Game::getPatternOffset(float angle_rad, float radius, int movepatte
 			}
 		}
 	return sf::Vector2f(0,0);
+}
+
+int Game::getNumberOfIndeIndependantsAlive()
+{
+	return sceneIndependants.size();
 }

@@ -327,62 +327,77 @@ void Ship::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::
 }
 void Ship::update(sf::Time deltaTime)
 {
-	static double shield_regen_buffer = 0;
-	//immunity frames after death
-	if (immune)
-	{
-		if (immunityTimer.getElapsedTime() > sf::seconds(2))
-		{
-			immune = false;
-		}
-	}
-
-	//sheld regen if not maximum
-	if (shield < ship_config.getShipConfigShield())
-	{
-		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
-		if(shield_regen_buffer > 1)
-		{
-			double intpart;
-			shield_regen_buffer = modf (shield_regen_buffer , &intpart);
-			shield += intpart;
-		}
-
-		//canceling over-regen
-		if (shield > ship_config.getShipConfigShield())
-		{
-			shield = ship_config.getShipConfigShield();
-		}
-	}
-	this->ship_hud.update(armor/3, shield/3);//will do for now... but we'll need to scale it to the max value later
-
-	
 	if (!disable_inputs)
 	{
-		sf::Vector2f directions = InputGuy::getDirections();
-
-		moving = directions.x !=0 || directions.y !=0;
-		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
-		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
-
-		if(InputGuy::isFiring())
+		static double shield_regen_buffer = 0;
+		//immunity frames after death
+		if (immune)
 		{
-			ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
-			ship_config.weapon->Fire(FriendlyFire);
+			if (immunityTimer.getElapsedTime() > sf::seconds(2))
+			{
+				immune = false;
+			}
+		}
+
+		//sheld regen if not maximum
+		if (shield < ship_config.getShipConfigShield())
+		{
+			shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+			if(shield_regen_buffer > 1)
+			{
+				double intpart;
+				shield_regen_buffer = modf (shield_regen_buffer , &intpart);
+				shield += intpart;
+			}
+
+			//canceling over-regen
+			if (shield > ship_config.getShipConfigShield())
+			{
+				shield = ship_config.getShipConfigShield();
+			}
+		}
+		this->ship_hud.update(armor/3, shield/3);//will do for now... but we'll need to scale it to the max value later
+
+	
+	
+			sf::Vector2f directions = InputGuy::getDirections();
+
+			moving = directions.x !=0 || directions.y !=0;
+			speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
+			speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
+
+			if(InputGuy::isFiring())
+			{
+				ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
+				ship_config.weapon->Fire(FriendlyFire);
+			}
+	
+
+		//max speed constraints
+		if(abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
+		{
+			speed.x = speed.x > 0 ?  this->ship_config.getShipConfigMaxSpeed().x : - this->ship_config.getShipConfigMaxSpeed().x;
+		}
+		if(abs(speed.y) >  this->ship_config.getShipConfigMaxSpeed().y)
+		{
+			speed.y = speed.y > 0 ?  this->ship_config.getShipConfigMaxSpeed().y : - this->ship_config.getShipConfigMaxSpeed().y;
+		}
+
+		//idle decceleration
+		if(!moving)
+		{
+			speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
+			speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
+
+			if(abs(speed.x) < SHIP_MIN_SPEED_X)
+				speed.x = 0;
+
+			if(abs(speed.y) < SHIP_MIN_SPEED_Y)
+				speed.y = 0;
 		}
 	}
 
-	//max speed constraints
-	if(abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
-	{
-		speed.x = speed.x > 0 ?  this->ship_config.getShipConfigMaxSpeed().x : - this->ship_config.getShipConfigMaxSpeed().x;
-	}
-	if(abs(speed.y) >  this->ship_config.getShipConfigMaxSpeed().y)
-	{
-		speed.y = speed.y > 0 ?  this->ship_config.getShipConfigMaxSpeed().y : - this->ship_config.getShipConfigMaxSpeed().y;
-	}
-
-	//screen borders contraints	
+	//screen borders contraints	correction
 	if (this->getPosition().x < ship_config.size.x/2)
 	{
 		this->setPosition(ship_config.size.x/2, this->getPosition().y);
@@ -406,24 +421,9 @@ void Ship::update(sf::Time deltaTime)
 		this->setPosition(this->getPosition().x, WINDOW_RESOLUTION_Y-(ship_config.size.y/2));
 		speed.y = 0;
 	}
-
-	//moving stuff
-	//this->setPosition(this->getPosition().x + (speed.x)*deltaTime.asSeconds(), this->getPosition().y + (speed.y)*deltaTime.asSeconds());
-
-	//idle decceleration
-	if(!moving)
-	{
-		speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
-		speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
-
-		if(abs(speed.x) < SHIP_MIN_SPEED_X)
-			speed.x = 0;
-
-		if(abs(speed.y) < SHIP_MIN_SPEED_Y)
-			speed.y = 0;
-	}
-
+	
 	Independant::update(deltaTime);
+	
 }
 
 void Ship::Respawn()

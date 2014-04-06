@@ -39,6 +39,8 @@ public:
 	void collectGarbage();
 	sf::Vector2f sceneMovePatterns[NBVAL_MovePattern];
 
+	int getNumberOfIndeIndependantsAlive();
+
 private:
 	sf::Vector2f getPatternOffset(float angle_rad, float radius, int movepattern_type);
 	Clock polarClock;

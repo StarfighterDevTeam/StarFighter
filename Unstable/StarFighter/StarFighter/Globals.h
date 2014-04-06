@@ -18,6 +18,9 @@
 
 #define LOOP_SAMPLING_MS						18	//18ms ~ 56 Hz
 
+#define ENDSCENE_TRANSITION_SPEED_UP			500
+#define ENDSCENE_TRANSITION_SPEED_DOWN			200	
+
 #define SHIP_FILE "Assets/Scripts/Ship.csv"
 #define ENEMY_FILE	"Assets/Scripts/Enemies.csv"
 #define WEAPON_FILE	"Assets/Scripts/Weapons.csv"
