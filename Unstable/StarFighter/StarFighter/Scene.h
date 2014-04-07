@@ -12,6 +12,15 @@
 
 using namespace std;
 
+enum TransitionList
+{
+	NO_TRANSITION,//0
+	TRANSITION_UP,//1
+	TRANSITION_DOWN,//2
+	TRANSITION_LEFT,//3
+	TRANSITION_RIGHT,//4
+};
+
 enum SceneDataEnemy
 {
 	SCENE_COMPARE_ENEMY,//0
@@ -208,6 +217,15 @@ private:
 	void endscenePhase2(float transition_speed_UP);
 	void endscenePhase3(float transition_speed_DOWN);
 	void endscenePhase4();
+
+	void hubRoaming();
+	sf::Clock clockHubExit;
+	int transitionDestination;
+
+	void hubExitPhase1(float transition_speed_DOWN, int transitionDestination);
+	void hubExitPhase2();
+	bool exitHubPhase1isOver;
+	bool exitHubPhase2isOver;
 };
 
 #endif // STARFIGHTER_H_INCLUDED

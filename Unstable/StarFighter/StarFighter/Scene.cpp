@@ -7,11 +7,13 @@ Scene::Scene(string name)
 {
 
 	vspeed = +200;
-	sceneIsOver = false;
+	transitionDestination = 0;
 	endingPhase1isOver = false;
 	endingPhase2isOver = false;
 	endingPhase3isOver = false;
 	endingPhase4isOver = false;
+	exitHubPhase1isOver = false;
+	exitHubPhase2isOver = false;
 
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
 
@@ -71,7 +73,7 @@ Scene::Scene(string name)
 
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
-	this->playerShip = new Ship(Vector2f(400,500), *LoadShipConfig("default"));
+	this->playerShip = new Ship(Vector2f(WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO,WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
 }
 
 void Scene::StartGame(sf::RenderWindow*	window)
@@ -116,19 +118,35 @@ void Scene::Update(Time deltaTime)
 		endscenePhase4();
 	}
 
-	//end scene OLD
-	//if (!sceneIsOver && bg->getPosition().y > bg->m_size.y - WINDOW_RESOLUTION_Y)
-	//{
-	//	this->EndSceneAnimation(500, 200);
-	//}
+	//Hub roaming
+	if (endingPhase4isOver)
+	{
+		hubRoaming();
+	}
+
+	/*
+	//exit HUB transition
+	if (transitionDestination != TransitionList::NO_TRANSITION && !exitHubPhase1isOver)
+	{
+		hubExitPhase1(ENDSCENE_TRANSITION_SPEED_DOWN, transitionDestination);
+	}
+
+	//end of exit HUB transition
+	if (exitHubPhase1isOver && !exitHubPhase2isOver)
+	{
+		hubExitPhase2();//player regains control
+	}
+	*/
 
 	//Random enemy generation
-	//this->GenerateEnemies(deltaTime);
+	if (!endingPhase1isOver)
+	{
+		this->GenerateEnemies(deltaTime);
+	}
 
 	(*CurrentGame).updateScene(deltaTime);
 	mainWindow->clear();
 	(*CurrentGame).drawScene();
-
 
 	//TODO: refactor these
 	mainWindow->draw(this->playerShip->ship_hud.armorBar);
@@ -332,46 +350,14 @@ void Scene::GenerateEnemies(Time deltaTime)
 	}
 }
 
-void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
-{
-	//setting the last screen of the scene on rails toward the hub
-
-	//phase 1: the BG stops scrolling and the player goes up
-	playerShip->disable_inputs = true;
-
-	bg->speed.y = 0;
-	hub->speed.y = 0;
-
-	playerShip->speed.x= 0;
-	playerShip->speed.y= -transition_UP;
-	printf("phase1| speed player: %f, speed bg: %f\n", playerShip->speed.y, bg->speed.y);
-
-	//phase 2: player reached top of the screen, we swap BG and HUB while player goes down to middle of screen
-	if (playerShip->getPosition().y < playerShip->m_size.y)
-	{
-		hub->speed.y = transition_DOWN;
-		bg->speed.y = transition_DOWN;
-		playerShip->speed.x=0;
-		//playerShip->speed.y=0;
-		playerShip->speed.y = transition_DOWN;
-		printf("phase2| speed player: %f, speed bg: %f\n", playerShip->speed.y, bg->speed.y);
-	}
-
-	//phase 3: player regain controlin the HUB
-	if (hub->getPosition().y > bg->m_size.y)
-	{
-		hub->speed.y = 0;
-		bg->speed.y = 0;
-		playerShip->disable_inputs = false;
-		sceneIsOver = true;
-	}
-}
-
 void Scene::endscenePhase1()
 {
 	bg->speed.y = 0;
 	hub->speed.y = 0;
 	endingPhase1isOver = true;
+	endingPhase2isOver = false;
+	endingPhase3isOver = false;
+	endingPhase4isOver = false;
 }
 
 void Scene::endscenePhase2(float transition_speed_UP)
@@ -400,3 +386,115 @@ void Scene::endscenePhase4()
 	bg->speed.y = 0;
 	endingPhase4isOver = true;
 }
+
+void Scene::hubRoaming()
+{
+	float x = playerShip->getPosition().x;
+	float y = playerShip->getPosition().y;
+
+	float X_min = WINDOW_RESOLUTION_X*HUB_EXIT_X_MIN_RATIO;
+	float X_max = WINDOW_RESOLUTION_X*HUB_EXIT_X_MAX_RATIO;
+	float Y_min = WINDOW_RESOLUTION_Y*HUB_EXIT_Y_MIN_RATIO;
+	float Y_max = WINDOW_RESOLUTION_Y*HUB_EXIT_Y_MAX_RATIO;
+
+	if ((x > X_min && x < X_max && y > Y_min && y < Y_max) || (x<X_min && y<Y_min) || (x<X_min && y >Y_max) || (x>X_max && y >Y_max) || (x>X_max && y <Y_min))
+	{
+		clockHubExit.restart();
+		this->transitionDestination = TransitionList::NO_TRANSITION;
+	}
+	else
+	{
+		sf::Time timer = clockHubExit.getElapsedTime();
+
+		if (y<Y_min && timer.asSeconds() > HUB_EXIT_TIMER)
+		{
+			//go UP
+			printf("DEBUG: Travel UP !\n");
+			this->transitionDestination = TransitionList::TRANSITION_UP;
+			endingPhase4isOver=false;
+		}
+
+		if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
+		{
+			//go LEFT
+			printf("DEBUG: Travel LEFT !\n");
+			this->transitionDestination = TransitionList::TRANSITION_LEFT;
+			endingPhase4isOver=false;
+		}
+
+		if (x>X_max && timer.asSeconds() > HUB_EXIT_TIMER)
+		{
+			//go RIGHT
+			printf("DEBUG: Travel RIGHT !\n");
+			this->transitionDestination = TransitionList::TRANSITION_RIGHT;
+			endingPhase4isOver=false;
+		}
+
+		if (y>Y_max && timer.asSeconds() > HUB_EXIT_TIMER)
+		{
+			//go DOWN
+			printf("DEBUG: Travel DOWN !\n");
+			this->transitionDestination = TransitionList::TRANSITION_DOWN;
+			endingPhase4isOver=false;
+		}
+	}
+}
+
+/*
+void Scene::hubExitPhase1(float transition_speed_DOWN, int transitionDestination)
+{
+	if (transitionDestination != TransitionList::NO_TRANSITION)
+	{
+		//LIGNE DE GROS HACK POUR LE CAS "UP"
+		bg->setPosition(sf::Vector2f(0, hub->getPosition().y+WINDOW_RESOLUTION_Y));
+
+		switch (transitionDestination)
+		{
+			playerShip->disable_inputs = true;
+			exitHubPhase1isOver = true;
+			exitHubPhase2isOver = false;
+
+			case TransitionList::TRANSITION_UP:
+			{
+				playerShip->speed.x = -transition_speed_DOWN * ((WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
+				playerShip->speed.y = -transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+				hub->speed.y = -transition_speed_DOWN;
+				bg->speed.y = -transition_speed_DOWN;
+			}
+			case TransitionList::TRANSITION_DOWN:
+			{
+				playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*(1-STARTSCENE_X_RATIO)) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
+				playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*(1-STARTSCENE_Y_RATIO)) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+				hub->speed.y = - transition_speed_DOWN;
+				bg->speed.y = - transition_speed_DOWN;
+			}
+			case TransitionList::TRANSITION_RIGHT:
+			{
+				playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*(1-STARTSCENE_Y_RATIO)) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
+				playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*(1-STARTSCENE_X_RATIO)) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+				hub->speed.x = transition_speed_DOWN;
+				bg->speed.x = transition_speed_DOWN;
+			}
+			case TransitionList::TRANSITION_LEFT:
+			{
+				playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*STARTSCENE_Y_RATIO) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
+				playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*STARTSCENE_X_RATIO) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+				hub->speed.x = - transition_speed_DOWN;
+				bg->speed.x = - transition_speed_DOWN;
+			}
+		}
+	}
+		
+}
+
+void Scene::hubExitPhase2()
+{
+	playerShip->speed.x = 0;
+	playerShip->speed.y = 0;
+	playerShip->disable_inputs = false;
+	bg->speed.y = vspeed;
+	hub->speed.y = vspeed;
+	exitHubPhase2isOver = true;
+	endingPhase1isOver = false;
+}
+*/
