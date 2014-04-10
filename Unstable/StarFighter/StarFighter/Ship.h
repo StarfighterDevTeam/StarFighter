@@ -121,6 +121,7 @@ public :
 	void Respawn() override;
 	
 	bool disable_inputs;
+	bool disable_fire;
 private:
 	bool moving;
 };

@@ -180,6 +180,7 @@ public:
 	Ship* Scene::GetPlayerShip();
 	void Scene::GenerateEnemies(Time deltaTime);
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
+	void Scene::ExitHubTransition();
 
 	float vspeed;
 	bool sceneIsOver;
@@ -206,6 +207,7 @@ private:
 	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
 	Independant* bg;
 	Independant* hub;
+	Independant* hubClone;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
 

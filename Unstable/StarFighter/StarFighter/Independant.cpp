@@ -195,3 +195,11 @@ sf::Vector2f Independant::getIndependantSpeed()
 	return sf::Vector2f(speed.x, speed.y);
 }
 
+Independant* Independant::Clone()
+{
+	Independant* clone = new Independant(this->getPosition(), this->speed, this->textureName,this->m_size);
+	clone->Init(clone->getPosition(),clone->speed,clone->textureName,clone->m_size);
+
+	return clone;
+}
+

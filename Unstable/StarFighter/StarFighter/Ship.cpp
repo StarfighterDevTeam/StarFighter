@@ -314,6 +314,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->shield_regen = ship_config.getShipConfigShieldRegen();
 	ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
 	disable_inputs = false;
+	disable_fire = false;
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -366,12 +367,14 @@ void Ship::update(sf::Time deltaTime)
 			speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
 			speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
-			if(InputGuy::isFiring())
+			if (!disable_fire)
 			{
-				ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
-				ship_config.weapon->Fire(FriendlyFire);
+				if(InputGuy::isFiring())
+				{
+					ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
+					ship_config.weapon->Fire(FriendlyFire);
+				}
 			}
-	
 
 		//max speed constraints
 		if(abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)

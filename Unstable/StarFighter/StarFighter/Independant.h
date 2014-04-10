@@ -54,6 +54,7 @@ public:
 	int getIndependantShieldRegen();
 	string getName();
 	virtual void Respawn();
+	Independant* Clone();
 
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;
