@@ -6,7 +6,7 @@ extern Game* CurrentGame;
 Scene::Scene(string name)
 {
 
-	vspeed = +200;
+	vspeed = +300;
 	transitionDestination = TransitionList::NO_TRANSITION;
 	endingPhase1isOver = false;
 	endingPhase2isOver = false;
@@ -14,6 +14,7 @@ Scene::Scene(string name)
 	endingPhase4isOver = false;
 	exitHubPhase1isOver = false;
 	exitHubPhase2isOver = false;
+	exitHubPhase3isOver = false;
 
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
 
@@ -99,7 +100,7 @@ void Scene::Update(Time deltaTime)
 	hubRoaming();
 
 	//Exit hub
-	ExitHubTransition();
+	ExitHubTransition(ENDSCENE_TRANSITION_SPEED_UP, ENDSCENE_TRANSITION_SPEED_DOWN);
 
 	/*
 	//exit HUB transition
@@ -337,6 +338,8 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 		endingPhase2isOver = false;
 		endingPhase3isOver = false;
 		endingPhase4isOver = false;
+		//to do better:
+		hub->setPosition(sf::Vector2f(bg->getPosition().x,bg->getPosition().y));
 	}
 
 	//end scene Phase 2: scene is cleared, the player is set on rails towards the top of the screen
@@ -363,10 +366,8 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 	//end scene Phase 4: the HUB is now full screen, the players are given back the control of their ship
 	if (endingPhase3isOver && !endingPhase4isOver && hub->getPosition().y > bg->m_size.y)
 	{
-		
 		hub->speed.y = 0;
-		bg->speed.y = 0;
-		
+		bg->speed.y = 0;	
 		
 		playerShip->disable_inputs = false;
 		endingPhase4isOver = true;
@@ -403,14 +404,10 @@ void Scene::hubRoaming()
 				//go UP
 				printf("DEBUG: Travel UP !\n");
 				this->transitionDestination = TransitionList::TRANSITION_UP;
-				endingPhase4isOver=false;
 				bg->setPosition(sf::Vector2f(hub->getPosition().x,hub->getPosition().y - bg->m_size.y - WINDOW_RESOLUTION_Y));
-				bg->speed.y = vspeed;
-				hub->speed.y=vspeed;
+				endingPhase4isOver=false;
+				exitHubPhase1isOver = true;
 
-				//to do better:
-				hub->setPosition(sf::Vector2f(bg->getPosition().x,bg->getPosition().y));
-				
 			}
 
 			if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
@@ -440,27 +437,50 @@ void Scene::hubRoaming()
 	}
 }
 
-void Scene::ExitHubTransition()
+void Scene::ExitHubTransition (float transition_speed_UP, float transition_speed_DOWN)
 {
-	if (transitionDestination = TransitionList::TRANSITION_UP)
+	if (exitHubPhase1isOver && !exitHubPhase2isOver)
 	{
-		
+		playerShip->disable_inputs = true;
+		playerShip->speed.x = 0;
+		playerShip->speed.y = - transition_speed_UP;
+		exitHubPhase1isOver = false;
+		exitHubPhase2isOver = true;
+		exitHubPhase3isOver = false;
+
+	}
+
+	if (!exitHubPhase1isOver && exitHubPhase2isOver && !exitHubPhase3isOver && playerShip->getPosition().y < playerShip->ship_config.size.y)
+	{
+		bg->speed.y = transition_speed_DOWN;
+		hub->speed.y = transition_speed_DOWN;
+		//playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
+		playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+		exitHubPhase2isOver = false;
+		exitHubPhase3isOver = true;
+	}
+
+	if (!exitHubPhase2isOver && exitHubPhase3isOver && bg->getPosition().y > 0)
+	{
+		bg->speed.y = vspeed;
+		hub->speed.y = vspeed;
+		exitHubPhase3isOver = false;
+		playerShip->speed.x = 0;
+		playerShip->speed.y = 0;
+		playerShip->disable_inputs = false;
+		playerShip->disable_fire = false;
 	}
 }
-
-/*
 void Scene::hubExitPhase1(float transition_speed_DOWN, int transitionDestination)
 {
-	if (transitionDestination != TransitionList::NO_TRANSITION)
+	if (exitHubPhase1isOver && !exitHubPhase2isOver)
 	{
 		//LIGNE DE GROS HACK POUR LE CAS "UP"
-		bg->setPosition(sf::Vector2f(0, hub->getPosition().y+WINDOW_RESOLUTION_Y));
 
 		switch (transitionDestination)
 		{
 			playerShip->disable_inputs = true;
-			exitHubPhase1isOver = true;
-			exitHubPhase2isOver = false;
+			
 
 			case TransitionList::TRANSITION_UP:
 			{
@@ -505,4 +525,3 @@ void Scene::hubExitPhase2()
 	exitHubPhase2isOver = true;
 	endingPhase1isOver = false;
 }
-*/

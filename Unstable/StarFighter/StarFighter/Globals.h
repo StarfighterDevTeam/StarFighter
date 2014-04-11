@@ -21,14 +21,14 @@
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
-#define ENDSCENE_TRANSITION_SPEED_UP			500
-#define ENDSCENE_TRANSITION_SPEED_DOWN			200	
+#define ENDSCENE_TRANSITION_SPEED_UP			600
+#define ENDSCENE_TRANSITION_SPEED_DOWN			400	
 
 #define HUB_EXIT_X_MIN_RATIO					0.1875f
 #define HUB_EXIT_X_MAX_RATIO					0.8125f
 #define HUB_EXIT_Y_MIN_RATIO					0.25f
 #define HUB_EXIT_Y_MAX_RATIO					0.75f
-#define HUB_EXIT_TIMER							2.f
+#define HUB_EXIT_TIMER							1.f
 
 #define SHIP_FILE "Assets/Scripts/Ship.csv"
 #define ENEMY_FILE	"Assets/Scripts/Enemies.csv"

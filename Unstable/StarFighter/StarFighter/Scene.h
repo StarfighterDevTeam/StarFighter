@@ -180,7 +180,7 @@ public:
 	Ship* Scene::GetPlayerShip();
 	void Scene::GenerateEnemies(Time deltaTime);
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
-	void Scene::ExitHubTransition();
+	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
 
 	float vspeed;
 	bool sceneIsOver;
@@ -207,7 +207,7 @@ private:
 	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
 	Independant* bg;
 	Independant* hub;
-	Independant* hubClone;
+	//Independant* hubClone;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
 
@@ -226,8 +226,10 @@ private:
 
 	void hubExitPhase1(float transition_speed_DOWN, int transitionDestination);
 	void hubExitPhase2();
+	void hubExitPhase3();
 	bool exitHubPhase1isOver;
 	bool exitHubPhase2isOver;
+	bool exitHubPhase3isOver;
 };
 
 #endif // STARFIGHTER_H_INCLUDED
