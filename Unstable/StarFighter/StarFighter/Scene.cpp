@@ -346,6 +346,7 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 	if (endingPhase1isOver && !endingPhase2isOver && !endingPhase4isOver && (*CurrentGame).getNumberOfIndeIndependantsAlive() < 4) // ship, bg and hub are the 3 only alive independants allowed before ending the scene
 	{
 		playerShip->disable_inputs = true;
+		playerShip->disable_fire = true;
 		playerShip->speed.x = 0;
 		playerShip->speed.y = -transition_UP;
 		endingPhase2isOver = true;//speed of translation towards UP
@@ -367,7 +368,8 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 	if (endingPhase3isOver && !endingPhase4isOver && hub->getPosition().y > bg->m_size.y)
 	{
 		hub->speed.y = 0;
-		bg->speed.y = 0;	
+		bg->speed.y = 0;
+		hub->setPosition(sf::Vector2f(0, bg->m_size.y));
 		
 		playerShip->disable_inputs = false;
 		endingPhase4isOver = true;
@@ -480,6 +482,7 @@ void Scene::hubExitPhase1(float transition_speed_DOWN, int transitionDestination
 		switch (transitionDestination)
 		{
 			playerShip->disable_inputs = true;
+
 			
 
 			case TransitionList::TRANSITION_UP:

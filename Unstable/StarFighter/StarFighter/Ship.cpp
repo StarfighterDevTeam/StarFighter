@@ -328,8 +328,7 @@ void Ship::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::
 }
 void Ship::update(sf::Time deltaTime)
 {
-	if (!disable_inputs)
-	{
+	
 		static double shield_regen_buffer = 0;
 		//immunity frames after death
 		if (immune)
@@ -362,19 +361,21 @@ void Ship::update(sf::Time deltaTime)
 	
 	
 			sf::Vector2f directions = InputGuy::getDirections();
-
+		if (!disable_inputs)
+		{
 			moving = directions.x !=0 || directions.y !=0;
 			speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
 			speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
+			
+		if(InputGuy::isFiring())
+		{
 			if (!disable_fire)
 			{
-				if(InputGuy::isFiring())
-				{
-					ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
-					ship_config.weapon->Fire(FriendlyFire);
-				}
+				ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
+				ship_config.weapon->Fire(FriendlyFire);
 			}
+		}
 
 		//max speed constraints
 		if(abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
