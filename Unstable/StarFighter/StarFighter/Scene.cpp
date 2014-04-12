@@ -2,11 +2,55 @@
 
 extern Game* CurrentGame;
 
-//Scene::Scene(string name, ShipConfig* shipConf)
+
+void Scene::LoadSceneFromFile(string name)
+{
+	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
+	vspeed = +300;
+
+	try {
+
+			this->config = *(FileLoader(name));
+			this->enemyConfig = *(FileLoader(ENEMY_FILE));
+			this->weaponConfig = *(FileLoader(WEAPON_FILE));
+			this->ammoConfig = *(FileLoader(AMMO_FILE));
+			this->enemypoolConfig = *(FileLoader(ENEMYPOOL_FILE));
+			this->FXConfig = *(FileLoader(FX_FILE));
+			this->shipConfig = *(FileLoader(SHIP_FILE));
+
+			//enemies
+			for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
+			{
+				if((*it)[0].compare("bg") == 0)
+				{
+					this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])-WINDOW_RESOLUTION_Y));
+					bg->setVisible(true);
+				}
+
+				if((*it)[0].compare("hub") == 0)
+				{
+					this->hub = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,bg->m_size.y));
+					hub->setVisible(true);
+				}
+
+				if((*it)[0].compare("enemy") == 0)
+				{
+					EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+					this->sceneIndependantsLayered[e->enemyclass].push_back(e);
+					//legacy, to delete when pools are done
+					this->enemies.push_back(*e);
+				}
+		}
+	}
+	catch( const std::exception & ex ) 
+	{
+		//An error occured
+		LOGGER_WRITE(Logger::Priority::LERROR,ex.what());
+	}
+
+}
 Scene::Scene(string name)
 {
-
-	vspeed = +300;
 	transitionDestination = TransitionList::NO_TRANSITION;
 	endingPhase1isOver = false;
 	endingPhase2isOver = false;
@@ -16,41 +60,14 @@ Scene::Scene(string name)
 	exitHubPhase2isOver = false;
 	exitHubPhase3isOver = false;
 
-	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
+	
+	LoadSceneFromFile(name);
 
-	try {
+	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Ship");
 
-		this->config = *(FileLoader(name));
-		this->enemyConfig = *(FileLoader(ENEMY_FILE));
-		this->weaponConfig = *(FileLoader(WEAPON_FILE));
-		this->ammoConfig = *(FileLoader(AMMO_FILE));
-		this->enemypoolConfig = *(FileLoader(ENEMYPOOL_FILE));
-		this->FXConfig = *(FileLoader(FX_FILE));
+	try 
+	{
 		this->shipConfig = *(FileLoader(SHIP_FILE));
-
-		//enemies
-		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
-		{
-			if((*it)[0].compare("bg") == 0)
-			{
-				this->bg = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])-WINDOW_RESOLUTION_Y));
-				bg->setVisible(true);
-			}
-
-			if((*it)[0].compare("hub") == 0)
-			{
-				this->hub = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,bg->m_size.y));
-				hub->setVisible(true);
-			}
-
-			if((*it)[0].compare("enemy") == 0)
-			{
-				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
-				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
-				//legacy, to delete when pools are done
-				this->enemies.push_back(*e);
-			}
-		}
 
 		//Loading font for framerate
 		//TODO : refactor this
@@ -64,9 +81,10 @@ Scene::Scene(string name)
 		this->framerate->setColor(sf::Color::Yellow);
 		this->framerate->setStyle(sf::Text::Bold);
 		this->framerate->setPosition(WINDOW_RESOLUTION_X-80,WINDOW_RESOLUTION_Y-30);
-
 	}
-	catch( const std::exception & ex ) {
+		
+	catch( const std::exception & ex ) 
+	{
 
 		//An error occured
 		LOGGER_WRITE(Logger::Priority::LERROR,ex.what());
@@ -334,6 +352,7 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 	{
 		bg->speed.y = 0;
 		hub->speed.y = 0;
+		bg->setPosition(sf::Vector2f(0, bg->m_size.y - WINDOW_RESOLUTION_Y));
 		endingPhase1isOver = true;
 		endingPhase2isOver = false;
 		endingPhase3isOver = false;

@@ -181,6 +181,7 @@ public:
 	void Scene::GenerateEnemies(Time deltaTime);
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
 	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
+	void Scene::LoadSceneFromFile(string name);
 
 	float vspeed;
 	bool sceneIsOver;
