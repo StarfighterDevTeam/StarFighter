@@ -1,0 +1,5 @@
+bg,Assets/2D/background2.png,800,1800,
+hub,Assets/2D/HUB_debug2.png,800,600,
+#,enemies_name,probability,pool_size,enemy_class
+enemy,robert,0.25,20,0
+enemy,roger,0.75,100,1
