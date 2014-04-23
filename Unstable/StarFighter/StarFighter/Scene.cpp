@@ -382,9 +382,6 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 		
 		playerShip->disable_inputs = false;
 		phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = true;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
 		//printf("hub pos: %f / %f \n", hubClone->getPosition().x, hubClone->getPosition().y);
 	}
 }
@@ -416,8 +413,12 @@ void Scene::hubRoaming()
 				printf("DEBUG: Travel UP !\n");
 				this->transitionDestination = TransitionList::TRANSITION_UP;
 				bg->setPosition(sf::Vector2f(hub->getPosition().x,hub->getPosition().y - bg->m_size.y - WINDOW_RESOLUTION_Y));
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
-				phaseShifter[SceneBooleans::EXITHUB_PHASE1]=true;
+				
+				phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
+				phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
+				phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
+				phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
+				phaseShifter[SceneBooleans::EXITHUB_PHASE1] = true;
 
 			}
 
