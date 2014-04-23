@@ -6,7 +6,7 @@ extern Game* CurrentGame;
 void Scene::LoadSceneFromFile(string name)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
-	vspeed = +300;
+	vspeed = +80;
 
 	try {
 
@@ -119,24 +119,10 @@ void Scene::Update(Time deltaTime)
 	//Exit hub
 	ExitHubTransition(ENDSCENE_TRANSITION_SPEED_UP, ENDSCENE_TRANSITION_SPEED_DOWN);
 
-	/*
-	//exit HUB transition
-	if (transitionDestination != TransitionList::NO_TRANSITION && !exitHubPhase1isOver)
-	{
-		hubExitPhase1(ENDSCENE_TRANSITION_SPEED_DOWN, transitionDestination);
-	}
-
-	//end of exit HUB transition
-	if (exitHubPhase1isOver && !exitHubPhase2isOver)
-	{
-		hubExitPhase2();//player regains control
-	}
-	*/
-
 	//Random enemy generation
-	if (!endingPhase1isOver)
+	if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1])
 	{
-		//this->GenerateEnemies(deltaTime);
+		this->GenerateEnemies(deltaTime);
 	}
 
 	(*CurrentGame).updateScene(deltaTime);
@@ -500,6 +486,30 @@ void Scene::ExitHubTransition (float transition_speed_UP, float transition_speed
 		playerShip->disable_fire = false;
 	}
 }
+
+bool Scene:: getPhaseShifter(int index)
+{
+	if (index < SceneBooleans::NBVAL_SceneBooleans)
+		return phaseShifter[index];
+	else
+	{
+		printf("\n/!\ERROR: trying to access a Scene Boolean index that does not exist...\n");
+		return false;
+	}
+
+}
+
+void Scene::setPhaseShifter(int index, bool b)
+{
+	if (index < SceneBooleans::NBVAL_SceneBooleans)
+		phaseShifter[index] = b;
+	else
+	{
+		printf("\n/!\ERROR: trying to write in a Scene Boolean index that does not exist...\n");
+	}
+}
+
+/*
 void Scene::hubExitPhase1(float transition_speed_DOWN, int transitionDestination)
 {
 	if (phaseShifter[SceneBooleans::EXITHUB_PHASE1] && !phaseShifter[SceneBooleans::EXITHUB_PHASE2])
@@ -556,24 +566,4 @@ void Scene::hubExitPhase2()
 	phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
 }
 
-bool Scene:: getPhaseShifter(int index)
-{
-	if (index < SceneBooleans::NBVAL_SceneBooleans)
-		return phaseShifter[index];
-	else
-	{
-		printf("\n/!\ERROR: trying to access a Scene Boolean index that does not exist...\n");
-		return false;
-	}
-
-}
-
-void Scene::setPhaseShifter(int index, bool b)
-{
-	if (index < SceneBooleans::NBVAL_SceneBooleans)
-		phaseShifter[index] = b;
-	else
-	{
-		printf("\n/!\ERROR: trying to write in a Scene Boolean index that does not exist...\n");
-	}
-}
+*/
