@@ -12,6 +12,20 @@
 
 using namespace std;
 
+enum SceneBooleans
+{
+	ENDSCENE_PHASE1,
+	ENDSCENE_PHASE2,
+	ENDSCENE_PHASE3,
+	ENDSCENE_PHASE4,
+
+	EXITHUB_PHASE1,
+	EXITHUB_PHASE2,
+	EXITHUB_PHASE3,
+
+	NBVAL_SceneBooleans,
+};
+
 enum TransitionList
 {
 	NO_TRANSITION,//0
@@ -182,6 +196,9 @@ public:
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
 	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
 	void Scene::LoadSceneFromFile(string name);
+	
+	bool getPhaseShifter(int index);
+	void setPhaseShifter(int index, bool b);
 
 	float vspeed;
 	bool sceneIsOver;
@@ -220,6 +237,7 @@ private:
 	void endscenePhase2(float transition_speed_UP);
 	void endscenePhase3(float transition_speed_DOWN);
 	void endscenePhase4();
+	bool phaseShifter[SceneBooleans::NBVAL_SceneBooleans];
 
 	void hubRoaming();
 	sf::Clock clockHubExit;

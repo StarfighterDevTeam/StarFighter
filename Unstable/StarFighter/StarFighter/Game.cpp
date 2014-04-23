@@ -324,7 +324,20 @@ sf::Vector2f Game::getPatternOffset(float angle_rad, float radius, int movepatte
 	return sf::Vector2f(0,0);
 }
 
-int Game::getNumberOfIndeIndependantsAlive()
+bool Game::isLastEnemyDead()
 {
-	return sceneIndependants.size();
+	int n = 0;
+
+	n += sceneIndependantsTyped[IndependantType::LootObject]->size();
+	n += sceneIndependantsTyped[IndependantType::EnemyFire]->size();
+	n += sceneIndependantsTyped[IndependantType::EnemyObject]->size();
+
+	if (n == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
