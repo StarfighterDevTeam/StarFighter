@@ -132,7 +132,7 @@ void Scene::Update(Time deltaTime)
 	//TODO: refactor these
 	mainWindow->draw(this->playerShip->ship_hud.armorBar);
 	mainWindow->draw(this->playerShip->ship_hud.shieldBar);
-
+	mainWindow->draw(this->playerShip->ship_hud.HazardScore);
 
 	//Show framerate
 	this->framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));

@@ -19,9 +19,22 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	shieldBar.setOutlineColor(sf::Color(255, 255, 255));
 	shieldBar.setOrigin(0,0);
 	shieldBar.setPosition((40+ARMOR_BAR_SIZE_X),10);
+
+	sf::Font* font = new sf::Font();
+		if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		{
+			// error
+			//TODO: font loader
+		}
+
+	HazardScore.setFont(*font);
+	HazardScore.setCharacterSize(20);
+	HazardScore.setColor(sf::Color::White);
+	HazardScore.setPosition(50,WINDOW_RESOLUTION_Y-50);
+	HazardScore.setString("00000000");
 }
 
-void PlayerHud::update(int m_armor, int m_shield)
+void PlayerHud::update(int m_armor, int m_shield, int m_money)
 {
 	if (m_armor <=0)
 	{
@@ -39,5 +52,9 @@ void PlayerHud::update(int m_armor, int m_shield)
 	else
 	{
 		shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_shield));	
-	}	
+	}
+
+	ostringstream ss;
+	ss << m_money;
+	HazardScore.setString(ss.str()+"$");
 }

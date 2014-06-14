@@ -355,7 +355,7 @@ void Ship::update(sf::Time deltaTime)
 				shield = ship_config.getShipConfigShield();
 			}
 		}
-		this->ship_hud.update(armor/3, shield/3);//will do for now... but we'll need to scale it to the max value later
+		this->ship_hud.update(armor/3, shield/3, money);//will do for now... but we'll need to scale it to the max value later
 
 	
 	
