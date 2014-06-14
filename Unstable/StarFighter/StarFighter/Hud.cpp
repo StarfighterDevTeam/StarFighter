@@ -40,5 +40,4 @@ void PlayerHud::update(int m_armor, int m_shield)
 	{
 		shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_shield));	
 	}	
-
 }

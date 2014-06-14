@@ -2,6 +2,7 @@
 #define HUD_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include "Globals.h"
 
 #define ARMOR_BAR_SIZE_X		20
 #define ARMOR_BAR_SIZE_Y		200

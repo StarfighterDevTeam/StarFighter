@@ -328,7 +328,6 @@ void Ship::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::
 }
 void Ship::update(sf::Time deltaTime)
 {
-	
 		static double shield_regen_buffer = 0;
 		//immunity frames after death
 		if (immune)
@@ -443,3 +442,4 @@ void Ship::Respawn()
 	immune = true;
 	immunityTimer.restart();
 }
+

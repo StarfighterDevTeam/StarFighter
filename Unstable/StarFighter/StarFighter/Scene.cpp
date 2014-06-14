@@ -215,6 +215,7 @@ EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int en
 			((Independant*)base->enemy)->shield = ((Independant*)base->enemy)->shield_max = stoi((*it)[EnemyData::ENEMY_SHIELD]);
 			((Independant*)base->enemy)->shield_regen = stoi((*it)[EnemyData::ENEMY_SHIELD_REGEN]);
 			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
+			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
 
 			base->enemy->weapon = LoadWeapon((*it)[EnemyData::WEAPON], -1, LoadAmmo((*it)[EnemyData::AMMO]));
 
@@ -318,11 +319,12 @@ void Scene::GenerateEnemies(Time deltaTime)
 			if(it->probability > random_number && it->poolsize > 0)
 			{
 				//spawn (where on screen ?)
+				
 				Enemy* n = it->enemy->Clone();
 				n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
 				n->setVisible(true);
 				it->poolsize--;
-
+				
 				LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("spawning enemy '%s' (x=%.1f) [pool=%d] (class=%d)",it->enemy->getName().c_str(),n->getPosition().x,it->poolsize, it->enemyclass));
 
 				(*CurrentGame).addToScene((Independant*)n,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);

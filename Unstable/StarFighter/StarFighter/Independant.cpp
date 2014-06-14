@@ -50,6 +50,8 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->isOnScene = false;
 	this->immune = false;
 	this->startPattern = false;
+	
+	money=0;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber)
@@ -62,6 +64,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 	this->setOrigin(size.x/2, size.y/2);
 
 	Init(position,speed,texture,frameNumber);
+
 }
 
 Independant::~Independant()
@@ -165,6 +168,19 @@ void Independant::damage_from (Independant& independant)
 	}
 }
 
+void Independant::get_money_from (Independant& independant)
+{
+	int loot_value = independant.getMoney();//give all the money
+	money += loot_value;
+	independant.addMoney(- loot_value);
+}
+
+void Independant::get_money_from (Independant& independant, int loot_value)
+{
+	money += loot_value;
+	independant.addMoney(- loot_value);
+}
+
 int Independant::getIndependantDamage()
 {
 	return damage;
@@ -203,3 +219,17 @@ Independant* Independant::Clone()
 	return clone;
 }
 
+int Independant::getMoney()
+{
+	return money;
+}
+
+void Independant::addMoney(int loot_value)
+{
+	money += loot_value;
+}
+
+void Independant::setMoney(int loot_value)
+{
+	money = loot_value;
+}

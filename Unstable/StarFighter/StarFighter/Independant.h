@@ -55,7 +55,12 @@ public:
 	string getName();
 	virtual void Respawn();
 	Independant* Clone();
-
+	
+	int getMoney();
+	void addMoney(int loot_value);
+	void setMoney(int loot_value);
+	void get_money_from (Independant& independant);
+	void get_money_from (Independant& independant, int loot_value);
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;
 	int armor;
@@ -75,6 +80,7 @@ protected:
 
 	bool immune;
 	sf::Clock immunityTimer;
+	int money;
 };
 
 

@@ -87,6 +87,7 @@ enum EnemyData
 	ENEMY_FRAMES,//10
 	ENEMY_SPEED,//11
 	ENEMY_FX_DEATH,//12
+	ENEMY_VALUE,//13
 };
 
 enum WeaponData

@@ -44,9 +44,9 @@
 #define FX_MEDIUM_EXPLOSION_DURATION		0.2f
 #define FX_LARGE_EXPLOSION_DURATION			0.8f
 
-#define LOOT_FILENAME				"Assets/2D/AirBrake.png"
-#define LOOT_WIDTH					64
-#define LOOT_HEIGHT					64
+#define LOOT_FILENAME				"Assets/2D/crystal.png"
+#define LOOT_WIDTH					32
+#define LOOT_HEIGHT					32
 
 #define ENEMYX_FILENAME				"Assets/2D/enemyX.png"
 #define ENEMYX_WIDTH				32

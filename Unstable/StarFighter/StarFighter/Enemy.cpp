@@ -72,6 +72,7 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->shield = this->getIndependantShield();
 	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
 	((Independant*)enemy)->damage = this->getIndependantDamage();
+	((Independant*)enemy)->addMoney(this->getMoney());
 	enemy->weapon = this->weapon->Clone();
 
 	return enemy;
