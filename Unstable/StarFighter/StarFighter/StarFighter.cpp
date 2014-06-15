@@ -17,7 +17,7 @@ int main()
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
 	if (!SpaceCowboys.openFromFile("Assets/Music/OrientalCrystal.ogg"))
 		return -1; // erreur
-	SpaceCowboys.play();
+	//SpaceCowboys.play();
 	SpaceCowboys.setLoop(true);
 
 	CurrentGame = new Game();

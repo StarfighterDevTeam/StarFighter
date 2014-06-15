@@ -229,6 +229,10 @@ private:
 	//Independant* hubClone;
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
+	int hazard_break_value;
+	sf::RectangleShape hazardBar;
+	sf::RectangleShape hazardBarMax;
+	sf::Text* hazardBreakText;
 
 	bool endingPhase1isOver;
 	bool endingPhase2isOver;

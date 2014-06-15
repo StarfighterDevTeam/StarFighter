@@ -40,11 +40,13 @@ public:
 	sf::Vector2f sceneMovePatterns[NBVAL_MovePattern];
 
 	bool isLastEnemyDead();
+	int getHazard();
 
 private:
 	sf::Vector2f getPatternOffset(float angle_rad, float radius, int movepattern_type);
 	Clock polarClock;
 	float angle_rad;
+	int hazard;
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];

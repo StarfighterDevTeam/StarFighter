@@ -23,6 +23,8 @@ void Game::init(RenderWindow* window)
 	{
 		sceneIndependantsTyped[i] = new std::list<Independant*>;
 	}
+
+	hazard = 0;//initalisation of the scoring system
 }
 
 
@@ -207,6 +209,7 @@ void Game::colisionChecksV2()
 						//Loot
 						Loot* loot = new Loot (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
 						this->addToScene(loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+						hazard += (*it1)->getMoney();
 						loot->get_money_from(*(*it1));
 						//sent to garbage collector
 						this->garbage.push_back(*it1);
@@ -345,4 +348,9 @@ bool Game::isLastEnemyDead()
 	{
 		return false;
 	}
+}
+
+int Game::getHazard()
+{
+	return hazard;
 }

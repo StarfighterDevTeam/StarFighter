@@ -48,7 +48,25 @@ void Scene::LoadSceneFromFile(string name)
 		LOGGER_WRITE(Logger::Priority::LERROR,ex.what());
 	}
 
+	//Hazard feature (scoring system)
+	hazard_break_value = 500;
+
+	hazardBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 0));
+	hazardBar.setFillColor(sf::Color(250, 0, 50));//red
+	hazardBar.setOutlineThickness(4);
+	hazardBar.setOutlineColor(sf::Color(255, 255, 255));
+	hazardBar.setOrigin(0, 0);
+	hazardBar.setPosition(760, 10);
+
+	hazardBarMax.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, hazard_break_value));
+	hazardBarMax.setFillColor(sf::Color(0, 0, 0));//black
+	hazardBarMax.setOutlineThickness(4);
+	hazardBarMax.setOutlineColor(sf::Color(255, 255, 255));
+	hazardBarMax.setOrigin(0, 0);
+	hazardBarMax.setPosition(760, 10);
+
 }
+
 Scene::Scene(string name)
 {
 	transitionDestination = TransitionList::NO_TRANSITION;
@@ -74,10 +92,22 @@ Scene::Scene(string name)
 			// error
 			//TODO: font loader
 		}
+
 		this->framerate = new sf::Text("00", *font, 15);
 		this->framerate->setColor(sf::Color::Yellow);
 		this->framerate->setStyle(sf::Text::Bold);
 		this->framerate->setPosition(WINDOW_RESOLUTION_X-80,WINDOW_RESOLUTION_Y-30);
+
+		sf::Font* font2 = new sf::Font();
+		if (!font2->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		{
+			// error
+			//TODO: font loader
+		}
+		this->hazardBreakText = new sf::Text("Hazard\nBreak", *font2, 12);
+		this->hazardBreakText->setColor(sf::Color::Red);
+		this->hazardBreakText->setStyle(sf::Text::Bold);
+		this->hazardBreakText->setPosition(700,hazard_break_value+20);
 	}
 		
 	catch( const std::exception & ex ) 
@@ -133,6 +163,10 @@ void Scene::Update(Time deltaTime)
 	mainWindow->draw(this->playerShip->ship_hud.armorBar);
 	mainWindow->draw(this->playerShip->ship_hud.shieldBar);
 	mainWindow->draw(this->playerShip->ship_hud.HazardScore);
+	hazardBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, (*CurrentGame).getHazard()));
+	mainWindow->draw(hazardBarMax);
+	mainWindow->draw(hazardBar);
+	mainWindow->draw(*(this->hazardBreakText));
 
 	//Show framerate
 	this->framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
