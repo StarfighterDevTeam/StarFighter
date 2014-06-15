@@ -41,6 +41,7 @@ public:
 
 	bool isLastEnemyDead();
 	int getHazard();
+	void resetHazard(int hazard_overkill = 0);
 
 private:
 	sf::Vector2f getPatternOffset(float angle_rad, float radius, int movepattern_type);

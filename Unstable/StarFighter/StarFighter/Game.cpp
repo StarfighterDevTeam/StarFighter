@@ -127,6 +127,7 @@ void Game::colisionChecksV2()
 						this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 						//we all deserve another chance...
 						(*it1)->Respawn();
+						hazard = 0;
 						//this->garbage.push_back(*it1);
 					}
 				}
@@ -153,6 +154,7 @@ void Game::colisionChecksV2()
 					this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 					//we all deserve another chance...
 					(*it1)->Respawn();
+					hazard = 0;
 					//this->garbage.push_back(*it1);
 				}
 
@@ -168,7 +170,6 @@ void Game::colisionChecksV2()
 			{
 				//Do something (like, take the loot)
 				(*it1)->get_money_from(*(*it2));
-				printf("DEBUG: player money = %d\n", (*it1)->getMoney());
 				(*it2)->setVisible(false);
 				(*it2)->isOnScene = false;
 				this->garbage.push_back(*it2);
@@ -353,4 +354,9 @@ bool Game::isLastEnemyDead()
 int Game::getHazard()
 {
 	return hazard;
+}
+
+void Game::resetHazard(int hazard_overkill)
+{
+	hazard = hazard_overkill;
 }

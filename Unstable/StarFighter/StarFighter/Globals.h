@@ -30,6 +30,12 @@
 #define HUB_EXIT_Y_MAX_RATIO					0.75f
 #define HUB_EXIT_TIMER							1.f
 
+#define HAZARD_BREAK_RATIO						0.15f
+#define HAZARD_BREAK_MULTIPLIER					0.3f
+#define HAZARD_BAR_SIZE_X						20
+#define HAZARD_BAR_SIZE_Y						500
+
+
 #define SHIP_FILE "Assets/Scripts/Ship.csv"
 #define ENEMY_FILE	"Assets/Scripts/Enemies.csv"
 #define WEAPON_FILE	"Assets/Scripts/Weapons.csv"

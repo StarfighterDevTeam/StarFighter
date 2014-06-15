@@ -6,8 +6,8 @@ extern Game* CurrentGame;
 void Scene::LoadSceneFromFile(string name)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
-	vspeed = +80;
-
+	vspeed = +10;
+	hazard_break_value = 0;
 	try {
 
 			this->config = *(FileLoader(name));
@@ -39,7 +39,9 @@ void Scene::LoadSceneFromFile(string name)
 					this->sceneIndependantsLayered[e->enemyclass].push_back(e);
 					//legacy, to delete when pools are done
 					this->enemies.push_back(*e);
+					hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
 				}
+				printf("Hazard Break to reach: %d\n", hazard_break_value);
 		}
 	}
 	catch( const std::exception & ex ) 
@@ -49,8 +51,6 @@ void Scene::LoadSceneFromFile(string name)
 	}
 
 	//Hazard feature (scoring system)
-	hazard_break_value = 500;
-
 	hazardBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 0));
 	hazardBar.setFillColor(sf::Color(250, 0, 50));//red
 	hazardBar.setOutlineThickness(4);
@@ -58,7 +58,8 @@ void Scene::LoadSceneFromFile(string name)
 	hazardBar.setOrigin(0, 0);
 	hazardBar.setPosition(760, 10);
 
-	hazardBarMax.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, hazard_break_value));
+	//hazardBarMax.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, hazard_break_value));
+	hazardBarMax.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
 	hazardBarMax.setFillColor(sf::Color(0, 0, 0));//black
 	hazardBarMax.setOutlineThickness(4);
 	hazardBarMax.setOutlineColor(sf::Color(255, 255, 255));
@@ -107,7 +108,12 @@ Scene::Scene(string name)
 		this->hazardBreakText = new sf::Text("Hazard\nBreak", *font2, 12);
 		this->hazardBreakText->setColor(sf::Color::Red);
 		this->hazardBreakText->setStyle(sf::Text::Bold);
-		this->hazardBreakText->setPosition(700,hazard_break_value+20);
+		this->hazardBreakText->setPosition(700,HAZARD_BAR_SIZE_Y+20);
+
+		this->hazardBreakScore = new sf::Text("", *font2, 15);
+		this->hazardBreakScore->setColor(sf::Color::Red);
+		this->hazardBreakScore->setStyle(sf::Text::Regular);
+		this->hazardBreakScore->setPosition(700,HAZARD_BAR_SIZE_Y+46);
 	}
 		
 	catch( const std::exception & ex ) 
@@ -163,10 +169,29 @@ void Scene::Update(Time deltaTime)
 	mainWindow->draw(this->playerShip->ship_hud.armorBar);
 	mainWindow->draw(this->playerShip->ship_hud.shieldBar);
 	mainWindow->draw(this->playerShip->ship_hud.HazardScore);
-	hazardBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, (*CurrentGame).getHazard()));
+	
+	hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, ((*CurrentGame).getHazard()*HAZARD_BAR_SIZE_Y)/hazard_break_value));
+	ostringstream ss;
+	ostringstream ss2;
+	ss << (*CurrentGame).getHazard();
+	ss2 << hazard_break_value;
+
+	if ((*CurrentGame).getHazard() > hazard_break_value) // max constraint
+	{
+		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
+		ss << hazard_break_value;
+	}
+	
+	hazardBreakScore->setString(ss.str() + "/" + ss2.str());
+	
 	mainWindow->draw(hazardBarMax);
 	mainWindow->draw(hazardBar);
 	mainWindow->draw(*(this->hazardBreakText));
+	mainWindow->draw(*(this->hazardBreakScore));
+	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
+	{
+		HazardBreakEvent();
+	}
 
 	//Show framerate
 	this->framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
@@ -604,3 +629,11 @@ void Scene::hubExitPhase2()
 }
 
 */
+
+
+void Scene::HazardBreakEvent()
+{
+	(*CurrentGame).resetHazard((*CurrentGame).getHazard() - hazard_break_value);
+	printf("DEBUG: HAZARD BREAK!!!\n");
+	hazard_break_value *= (1+ HAZARD_BREAK_MULTIPLIER);
+}

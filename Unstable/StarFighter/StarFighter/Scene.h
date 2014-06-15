@@ -230,9 +230,11 @@ private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
 	int hazard_break_value;
+	int hazard_level;
 	sf::RectangleShape hazardBar;
 	sf::RectangleShape hazardBarMax;
 	sf::Text* hazardBreakText;
+	sf::Text* hazardBreakScore;
 
 	bool endingPhase1isOver;
 	bool endingPhase2isOver;
@@ -254,6 +256,8 @@ private:
 	bool exitHubPhase1isOver;
 	bool exitHubPhase2isOver;
 	bool exitHubPhase3isOver;
+
+	void HazardBreakEvent();
 };
 
 #endif // STARFIGHTER_H_INCLUDED
