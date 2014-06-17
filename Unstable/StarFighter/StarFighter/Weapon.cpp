@@ -39,7 +39,7 @@ void Weapon::Fire(IndependantType m_collider_type)
 	if (firing_ready)
 	{
 		Ammo* bullet = this->ammunition->Clone();
-		bullet->setPosition(getPosition().x,getPosition().y- ((bullet->m_size.y/2)*(fire_direction.y)));
+		bullet->setPosition(getPosition().x,getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
 		bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
 		bullet->setVisible(true);
 		bullet->collider_type = m_collider_type;

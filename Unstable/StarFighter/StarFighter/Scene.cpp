@@ -234,7 +234,7 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			
 			shipC->Init((*it)[ShipModelData::SHIPMODEL_IMAGE_NAME], sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_WIDTH]),stoi((*it)[ShipModelData::SHIPMODEL_HEIGHT])), stoi((*it)[ShipModelData::SHIPMODEL_FRAMES]));
 			
-			shipC->weapon = LoadWeapon((*it)[ShipModelData::SHIPMODEL_WEAPON], 1, LoadAmmo((*it)[ShipModelData::SHIPMODEL_AMMO]));
+			shipC->weapon = LoadWeapon((*it)[ShipModelData::SHIPMODEL_WEAPON], -1, LoadAmmo((*it)[ShipModelData::SHIPMODEL_AMMO]));
 
 			printf("DEBUG: Loaded player ship config.\n");
 			return shipC;
@@ -276,7 +276,7 @@ EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int en
 			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
 
-			base->enemy->weapon = LoadWeapon((*it)[EnemyData::WEAPON], -1, LoadAmmo((*it)[EnemyData::AMMO]));
+			base->enemy->weapon = LoadWeapon((*it)[EnemyData::WEAPON], 1, LoadAmmo((*it)[EnemyData::AMMO]));
 
 			return base;
 		}

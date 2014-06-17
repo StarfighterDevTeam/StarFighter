@@ -12,12 +12,12 @@ int main()
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Starting game");
 
 	sf::Music SpaceCowboys;
-	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
+	if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
-	if (!SpaceCowboys.openFromFile("Assets/Music/OrientalCrystal.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/OrientalCrystal.ogg"))
 		return -1; // erreur
-	//SpaceCowboys.play();
+	SpaceCowboys.play();
 	SpaceCowboys.setLoop(true);
 
 	CurrentGame = new Game();
