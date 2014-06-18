@@ -98,6 +98,8 @@ enum WeaponData
 	WEAPON_WIDTH,//3
 	WEAPON_HEIGHT,//4
 	WEAPON_SOUND,//5
+	WEAPON_MULTISHOT,//6
+	WEAPON_XSPREAD,//7
 };
 
 enum AmmoData

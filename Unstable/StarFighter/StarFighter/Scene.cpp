@@ -294,6 +294,8 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			Weapon* weapon = new Weapon(ammo);
 			weapon->fire_direction = Vector2i(0,fire_direction);
 			weapon->rate_of_fire = atof((*it)[WeaponData::RATE_OF_FIRE].c_str());
+			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
+			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
 
 			return weapon;
 		}
