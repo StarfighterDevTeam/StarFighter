@@ -10,7 +10,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	xspread = 10;
 	alternate = false;
 	shot_index = 0;
-	angle = 0.0f;
+	angle = 0.1f;
 
 	firing_ready = true;
 
@@ -24,7 +24,7 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX)
 	bullet->setPosition(getPosition().x + offsetX, getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
 	bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
 
-	bullet->speed = this->AngleShot(this->angle, bullet->speed);//rotation of the
+	bullet->speed = this->AngleShot(this->angle, bullet->ref_speed * fire_direction.y);
 	bullet->rotate(-180 * this->angle / M_PI);//conversion from degres to radian
 
 	bullet->setVisible(true);
@@ -156,11 +156,11 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 	}
 }
 
-sf::Vector2f Weapon::AngleShot(float angle, sf::Vector2f m_speed)
+sf::Vector2f Weapon::AngleShot(float angle, float m_ref_speed)
 {
 	sf::Vector2f new_speed;
-	new_speed.x = m_speed.y * sin (angle);
-	new_speed.y = m_speed.y * cos (angle);
+	new_speed.x = m_ref_speed * sin (angle);
+	new_speed.y = m_ref_speed * cos (angle);
 	return new_speed;
 }
 

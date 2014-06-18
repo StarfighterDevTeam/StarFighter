@@ -7,7 +7,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	shield = 0;
 	shield_regen = 0;
 	startPattern = false;
-
+	ref_speed = sqrt(pow(speed.x,2)+pow(speed.y,2));
 	this->explosion = m_explosion;
 
 	//TODO: remove this
@@ -32,8 +32,6 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	Independant(position, speed, LASERBLUE_FILENAME, m_size_texture);
 	}
 	*/
-
-
 }
 
 Ammo* Ammo::Clone()
@@ -49,3 +47,16 @@ Independant* Ammo::explode()
 	return (Independant*)myFX;
 }
 
+void Ammo::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
+{	
+	Ammo::update(deltaTime);
+}
+
+void Ammo::update(sf::Time deltaTime)
+{
+	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+	this->setPosition(x,y);
+
+	AnimatedSprite::update(deltaTime);
+}

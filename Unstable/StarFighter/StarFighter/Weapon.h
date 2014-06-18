@@ -30,7 +30,7 @@ struct Weapon : public sf::Sprite
 
 	void FireMultiShot(IndependantType m_collider_type);
 	void FireAlternateShot(IndependantType m_collider_type);
-	sf::Vector2f AngleShot(float angle, sf::Vector2f m_speed);
+	sf::Vector2f AngleShot(float angle, float m_ref_speed);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
 	sf::Clock deltaClock;
