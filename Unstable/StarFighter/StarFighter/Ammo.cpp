@@ -48,3 +48,4 @@ Independant* Ammo::explode()
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
 	return (Independant*)myFX;
 }
+

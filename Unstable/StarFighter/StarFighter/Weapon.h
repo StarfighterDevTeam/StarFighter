@@ -25,8 +25,12 @@ struct Weapon : public sf::Sprite
 	sf::Vector2f speed;
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);
+
+	void CreateBullet(IndependantType m_collider_type, float offsetX=0);
+
 	void FireMultiShot(IndependantType m_collider_type);
 	void FireAlternateShot(IndependantType m_collider_type);
+	sf::Vector2f AngleShot(float angle, sf::Vector2f m_speed);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
 	sf::Clock deltaClock;
@@ -37,6 +41,7 @@ struct Weapon : public sf::Sprite
 	int xspread;
 	bool alternate;
 	int shot_index;
+	float angle;
 
 	Weapon* Clone();
 };
