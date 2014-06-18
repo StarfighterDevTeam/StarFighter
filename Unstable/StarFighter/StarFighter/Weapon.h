@@ -25,13 +25,18 @@ struct Weapon : public sf::Sprite
 	sf::Vector2f speed;
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);
+	void FireMultiShot(IndependantType m_collider_type);
+	void FireAlternateShot(IndependantType m_collider_type);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
 	sf::Clock deltaClock;
 	Ammo* ammunition;
 
+	//special weapon abilities
 	int multishot;
 	int xspread;
+	bool alternate;
+	int shot_index;
 
 	Weapon* Clone();
 };

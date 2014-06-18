@@ -8,34 +8,52 @@ Weapon::Weapon(Ammo* Ammunition)
 	speed.y = 0;
 	multishot = 1;
 	xspread = 10;
+	alternate = false;
+	shot_index = 0;
 	firing_ready = true;
+
 	this->ammunition = Ammunition;
 }
 
-/*void Weapon::Fire(IndependantType m_collider_type)
-{
-	if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
-	{
-		firing_ready = true;
-	}
-
-	if (firing_ready)
-	{
-		Ammo* bullet = this->ammunition->Clone();
-		bullet->setPosition(getPosition().x,getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
-		bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
-		bullet->setVisible(true);
-		bullet->collider_type = m_collider_type;
-		bullet->isOnScene = true;
-
-		(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
-
-		deltaClock.restart();
-		firing_ready = false;		
-	}
-}*/
-
 void Weapon::Fire(IndependantType m_collider_type)
+{
+	if (multishot > 1)
+	{
+		if (!alternate)
+		{
+			FireMultiShot(m_collider_type);
+		}
+		else
+		{
+			FireAlternateShot(m_collider_type);
+		}
+		
+	}
+	else
+	{
+		if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
+		{
+			firing_ready = true;
+		}
+
+		if (firing_ready)
+		{
+			Ammo* bullet = this->ammunition->Clone();
+			bullet->setPosition(getPosition().x,getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
+			bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
+			bullet->setVisible(true);
+			bullet->collider_type = m_collider_type;
+			bullet->isOnScene = true;
+
+			(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
+
+			deltaClock.restart();
+			firing_ready = false;		
+		}
+	}
+}
+
+void Weapon::FireMultiShot(IndependantType m_collider_type)
 {
 	if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
 	{
@@ -101,6 +119,75 @@ void Weapon::Fire(IndependantType m_collider_type)
 	}
 }
 
+void Weapon::FireAlternateShot(IndependantType m_collider_type)
+{
+	if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire / multishot))
+	{
+		firing_ready = true;
+	}
+
+	if (firing_ready)
+	{
+		if (multishot % 2 != 0) //case of an odd number of bullets
+		{
+			if (shot_index % 2 != 0)
+			{
+				Ammo* bullet = this->ammunition->Clone();
+				bullet->setPosition(getPosition().x - (((shot_index-1)/2)+1)*xspread,getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
+				bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
+				bullet->setVisible(true);
+				bullet->collider_type = m_collider_type;
+				bullet->isOnScene = true;
+				(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
+			}
+			else
+			{
+				Ammo* bullet = this->ammunition->Clone();
+				bullet->setPosition(getPosition().x + (shot_index/2)*xspread,getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
+				bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
+				bullet->setVisible(true);
+				bullet->collider_type = m_collider_type;
+				bullet->isOnScene = true;
+				(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
+			}
+		}
+		
+
+		if (multishot % 2 == 0) //case of an even number of bullets
+		{
+			if (shot_index %2 !=0)
+			{
+				Ammo* bullet = this->ammunition->Clone();
+				bullet->setPosition(getPosition().x - (((shot_index/2)+1)*xspread) + (xspread/2),getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
+				bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
+				bullet->setVisible(true);
+				bullet->collider_type = m_collider_type;
+				bullet->isOnScene = true;
+				(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
+			}
+			else
+			{
+				Ammo* bullet = this->ammunition->Clone();
+				bullet->setPosition(getPosition().x + (((shot_index/2)+1)*xspread) - (xspread/2),getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
+				bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
+				bullet->setVisible(true);
+				bullet->collider_type = m_collider_type;
+				bullet->isOnScene = true;
+				(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
+			}
+			
+		}
+
+		if (shot_index < multishot-1)
+			shot_index++;
+		else
+			shot_index = 0;
+
+		deltaClock.restart();
+		firing_ready = false;		
+	}
+}
+
 Weapon* Weapon::Clone()
 {
 	Weapon* weapon = new Weapon(this->ammunition->Clone());
@@ -108,6 +195,8 @@ Weapon* Weapon::Clone()
 	weapon->rate_of_fire = this->rate_of_fire;
 	weapon->multishot = this->multishot;
 	weapon->xspread = this->xspread;
+	weapon->alternate = this->alternate;
+
 	return weapon;
 }
 
