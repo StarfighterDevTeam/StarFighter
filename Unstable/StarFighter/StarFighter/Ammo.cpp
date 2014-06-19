@@ -54,8 +54,22 @@ void Ammo::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::
 
 void Ammo::update(sf::Time deltaTime)
 {
-	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+	/*
+	//Spinning bullet
+	if (collider_type == IndependantType::FriendlyFire)
+	{
+		rotate (100.f * deltaTime.asSeconds());
+	}
+	else
+	{
+		rotate (- 100.f * deltaTime.asSeconds());
+	}
+	*/
+	
+	//float x = this->getPosition().x + ref_speed * cos (a) *deltaTime.asSeconds();
+	//float y = this->getPosition().y + ref_speed * sin (a) *deltaTime.asSeconds();
+	float x = this->getPosition().x + speed.x*deltaTime.asSeconds();
+	float y = this->getPosition().y + speed.y*deltaTime.asSeconds();
 	this->setPosition(x,y);
 
 	AnimatedSprite::update(deltaTime);

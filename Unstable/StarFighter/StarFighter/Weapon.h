@@ -26,7 +26,7 @@ struct Weapon : public sf::Sprite
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);
 
-	void CreateBullet(IndependantType m_collider_type, float offsetX=0);
+	void CreateBullet(IndependantType m_collider_type, float offsetX=0, float dispersion=0);
 
 	void FireMultiShot(IndependantType m_collider_type);
 	void FireAlternateShot(IndependantType m_collider_type);
@@ -42,6 +42,7 @@ struct Weapon : public sf::Sprite
 	bool alternate;
 	int shot_index;
 	float angle;
+	float dispersion;
 
 	Weapon* Clone();
 };

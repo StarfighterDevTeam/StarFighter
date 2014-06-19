@@ -10,23 +10,30 @@ Weapon::Weapon(Ammo* Ammunition)
 	xspread = 10;
 	alternate = false;
 	shot_index = 0;
-	angle = 0.1f;
+	angle = 0.f;
+	dispersion = 90.f;
 
 	firing_ready = true;
 
 	this->ammunition = Ammunition;
 }
 
-void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX)
+void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = this->ammunition->Clone();
 
 	bullet->setPosition(getPosition().x + offsetX, getPosition().y + ((bullet->m_size.y/2)*(fire_direction.y)));
-	bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
+	//bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
 
-	bullet->speed = this->AngleShot(this->angle, bullet->ref_speed * fire_direction.y);
-	bullet->rotate(-180 * this->angle / M_PI);//conversion from degres to radian
-
+	bullet->speed = this->AngleShot(this->angle + dispersion, bullet->ref_speed * fire_direction.y);
+	if (m_collider_type == IndependantType::FriendlyFire)
+	{
+		bullet->rotate(this->angle + dispersion);
+	}
+	else
+	{
+		bullet->rotate(this->angle + dispersion + 180);
+	}
 	bullet->setVisible(true);
 	bullet->collider_type = m_collider_type;
 	bullet->isOnScene = true;
@@ -78,14 +85,15 @@ void Weapon::FireMultiShot(IndependantType m_collider_type)
 			//central bullet
 			CreateBullet(m_collider_type);
 
-			if (multishot >1) // the rest of the bullets are sprea evenly on the left and right of the central bullet
+			// the rest of the bullets are spread evenly on the left and right of the central bullet
+			if (multishot >1) 
 			{
 				for (int i=1 ; i < (((multishot-1)/2)+1) ; i++)
 				{
 					int s = 1;//used for symetry
 					for (int j=0 ; j<2 ; j++)//2 loops: j=1 and then j=-1
 					{
-						CreateBullet(m_collider_type, i*s*xspread);
+						CreateBullet(m_collider_type, i*s*xspread, i*s*dispersion/2/(((multishot-1)/2)+1));
 						s = -s;
 					}
 				}
@@ -99,7 +107,7 @@ void Weapon::FireMultiShot(IndependantType m_collider_type)
 				int s = 1;//used for symetry
 				for (int j=0 ; j<2 ; j++)//2 loops: j=1 and then j=-1
 				{
-					CreateBullet(m_collider_type, (i*s*xspread) - (s*xspread/2));
+					CreateBullet(m_collider_type, (i*s*xspread) - (s*xspread/2), i*s*dispersion/2/multishot/2);
 					s = -s;
 				}
 			}
@@ -125,10 +133,12 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 			if (shot_index % 2 != 0)
 			{
 				CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread);
+				//CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread, - (((shot_index-1)/2)+1)*dispersion/2/((multishot/2)+1));
 			}
 			else
 			{
 				CreateBullet(m_collider_type, (shot_index/2)*xspread);
+				//CreateBullet(m_collider_type, (shot_index/2)*xspread, (shot_index/2)*dispersion/2/((multishot/2)+1));
 			}
 		}
 		
@@ -138,10 +148,14 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 			if (shot_index %2 !=0)
 			{
 				CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2));
+				//bugged
+				//CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2), - (((shot_index/2)+1)*(dispersion/2/multishot/2)) + (dispersion/2/multishot/2) );
 			}
 			else
 			{
 				CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2));
+				//bugged
+				//CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2), (((shot_index/2)+1)*dispersion/multishot/2) - (dispersion/2/multishot/2) );
 			}
 			
 		}
@@ -159,6 +173,7 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 sf::Vector2f Weapon::AngleShot(float angle, float m_ref_speed)
 {
 	sf::Vector2f new_speed;
+	angle = - angle * M_PI / 180;
 	new_speed.x = m_ref_speed * sin (angle);
 	new_speed.y = m_ref_speed * cos (angle);
 	return new_speed;
