@@ -11,7 +11,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	alternate = false;
 	shot_index = 0;
 	angle = 0.f;
-	dispersion = 90.f;
+	dispersion = 180.f;
 
 	firing_ready = true;
 
@@ -93,7 +93,7 @@ void Weapon::FireMultiShot(IndependantType m_collider_type)
 					int s = 1;//used for symetry
 					for (int j=0 ; j<2 ; j++)//2 loops: j=1 and then j=-1
 					{
-						CreateBullet(m_collider_type, i*s*xspread, i*s*dispersion/2/(((multishot-1)/2)+1));
+						CreateBullet(m_collider_type, i*s*xspread, i*s*dispersion/2/((multishot-1)/2));
 						s = -s;
 					}
 				}
@@ -107,7 +107,7 @@ void Weapon::FireMultiShot(IndependantType m_collider_type)
 				int s = 1;//used for symetry
 				for (int j=0 ; j<2 ; j++)//2 loops: j=1 and then j=-1
 				{
-					CreateBullet(m_collider_type, (i*s*xspread) - (s*xspread/2), i*s*dispersion/2/multishot/2);
+					CreateBullet(m_collider_type, (i*s*xspread) - (s*xspread/2), i*s*dispersion/(multishot-1) - s*(dispersion/(multishot-1)/2));
 					s = -s;
 				}
 			}
@@ -132,13 +132,13 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 		{
 			if (shot_index % 2 != 0)
 			{
-				CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread);
-				//CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread, - (((shot_index-1)/2)+1)*dispersion/2/((multishot/2)+1));
+				//CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread);
+				CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread, - (((shot_index-1)/2)+1)*dispersion/2/((multishot-1)/2));
 			}
 			else
 			{
-				CreateBullet(m_collider_type, (shot_index/2)*xspread);
-				//CreateBullet(m_collider_type, (shot_index/2)*xspread, (shot_index/2)*dispersion/2/((multishot/2)+1));
+				//CreateBullet(m_collider_type, (shot_index/2)*xspread);
+				CreateBullet(m_collider_type, (shot_index/2)*xspread, (shot_index/2)*dispersion/2/((multishot-1)/2));
 			}
 		}
 		
@@ -147,15 +147,13 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 		{
 			if (shot_index %2 !=0)
 			{
-				CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2));
-				//bugged
-				//CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2), - (((shot_index/2)+1)*(dispersion/2/multishot/2)) + (dispersion/2/multishot/2) );
+				//CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2));
+				CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2), - ((shot_index/2)+1)*dispersion/(multishot-1) + dispersion/(multishot-1)/2 );
 			}
 			else
 			{
-				CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2));
-				//bugged
-				//CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2), (((shot_index/2)+1)*dispersion/multishot/2) - (dispersion/2/multishot/2) );
+				//CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2));
+				CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2), ((shot_index/2)+1)*dispersion/(multishot-1) - (dispersion/(multishot-1)/2) );
 			}
 			
 		}
