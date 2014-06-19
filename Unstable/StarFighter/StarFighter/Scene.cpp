@@ -296,6 +296,8 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->rate_of_fire = atof((*it)[WeaponData::RATE_OF_FIRE].c_str());
 			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
 			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
+			weapon->alternate = (bool)(stoi((*it)[WeaponData::WEAPON_ALTERNATE]));
+			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
 
 			return weapon;
 		}

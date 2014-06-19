@@ -1,4 +1,4 @@
-#weapon_name,rate,image,width,height,sound_name,multishot,xspread
-laser,0.5,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,2,20
-laser_fast,0.2,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,1,10
-laser_player,0.2,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,7,15
+#weapon_name,rate,image,width,height,sound_name,multishot,xspread,alternate,dispersion
+laser,0.5,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,2,20,1,30
+laser_fast,0.2,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,1,10,0,0
+laser_player,0.2,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,7,15,0,180
