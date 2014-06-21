@@ -22,7 +22,8 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 {
 	Ammo* bullet = this->ammunition->Clone();
 
-	bullet->setPosition(getPosition().x + offsetX, getPosition().y - ((bullet->m_size.y/2)*(fire_direction.y)));
+	bullet->setPosition(getPosition().x + offsetX + OffsetWeapon(dispersion+angle).x, getPosition().y  + OffsetWeapon(dispersion+angle).y);
+	//bullet->setPosition(getPosition().x + offsetX + OffsetWeapon(dispersion+angle).x, getPosition().y - ((bullet->m_size.y/2)*(fire_direction.y)) + OffsetWeapon(dispersion+angle).y);
 	//bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
 
 	bullet->speed = this->AngleShot(this->angle + dispersion, bullet->ref_speed * fire_direction.y);
@@ -191,3 +192,43 @@ Weapon* Weapon::Clone()
 }
 
 
+sf::Vector2f Weapon::OffsetWeapon(float angle)
+{
+	//default values
+	
+	float x = 0;
+	float y = - this->weaponOffset.x;
+	/*
+	if (angle >= -45.f && angle <= 45.f)
+	{
+		x = - weaponOffset.y * tan(angle);
+		y = - weaponOffset.y;
+		printf("OFFSET BONUS X, Y:%f, %f\n",x, y);
+	}
+
+	if (angle > 45.f && angle <= 135.f)
+	{
+		x = weaponOffset.x;
+		y = - weaponOffset.x * tan(angle-45);
+	}
+
+	if (angle > 135.f && angle <= 180.f)
+	{
+		x = - weaponOffset.y * tan(angle-135);
+		y = + weaponOffset.y;
+	}
+
+	if (angle >= -135.f && angle <= -45.f)
+	{
+		x = - weaponOffset.x;
+		y = + weaponOffset.x * tan(angle+45);;
+	}
+
+	if (angle > -180.f && angle < -135.f)
+	{
+		x = - weaponOffset.y * tan(angle+135);
+		y = + weaponOffset.y;
+	}*/
+
+	return sf::Vector2f(x,y);
+}

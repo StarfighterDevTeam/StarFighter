@@ -45,7 +45,9 @@ void Enemy::update(sf::Time deltaTime)
 	//autmatic fire
 	if(isOnScene)
 	{
-		weapon->setPosition(this->getPosition().x, (this->getPosition().y - ((this->m_size.y)/2)) );
+		weapon->weaponOffset = sf::Vector2f((((this->m_size.x)/2) + (weapon->ammunition->m_size.x/2)) ,((this->m_size.y)/2) - (weapon->ammunition->m_size.y/2 *weapon->fire_direction.y)) ;
+		weapon->setPosition(this->getPosition().x, this->getPosition().y);
+		//weapon->setPosition(this->getPosition().x, (this->getPosition().y - ((this->m_size.y)/2)) );
 		weapon->Fire(IndependantType::EnemyFire);
 
 		//sheld regen if not maximum

@@ -371,7 +371,9 @@ void Ship::update(sf::Time deltaTime)
 		{
 			if (!disable_fire)
 			{
-				ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
+				ship_config.weapon->weaponOffset = sf::Vector2f((ship_config.size.x/2) + (ship_config.weapon->ammunition->m_size.y/2), (ship_config.size.y/2) - (ship_config.weapon->ammunition->m_size.y/2) *ship_config.weapon->fire_direction.y );
+				ship_config.weapon->setPosition(this->getPosition().x, this->getPosition().y);
+				//ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
 				ship_config.weapon->Fire(FriendlyFire);
 			}
 		}

@@ -1,3 +1,3 @@
 #ammo_name,damage,vspeed,image,width,height,frames, FX_explosion
-laser_beam,50,500,Assets/2D/laser.png,4,12,1, explosion
-laser_blue,200,300,Assets/2D/laser_blue.png,4,16,1, explosion
+laser_beam,50,250,Assets/2D/laser.png,4,12,1, explosion
+laser_blue,100,300,Assets/2D/laser_blue.png,4,16,1, explosion

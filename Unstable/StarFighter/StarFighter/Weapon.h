@@ -43,6 +43,9 @@ struct Weapon : public sf::Sprite
 	int shot_index;
 	float angle;
 	float dispersion;
+	sf::Vector2f weaponOffset;
+
+	sf::Vector2f OffsetWeapon(float angle);
 
 	Weapon* Clone();
 };
