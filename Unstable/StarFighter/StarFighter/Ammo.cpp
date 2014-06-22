@@ -47,11 +47,6 @@ Independant* Ammo::explode()
 	return (Independant*)myFX;
 }
 
-void Ammo::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
-{	
-	Ammo::update(deltaTime);
-}
-
 void Ammo::update(sf::Time deltaTime)
 {
 	/*

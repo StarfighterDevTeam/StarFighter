@@ -20,7 +20,6 @@ public:
 	FX* explosion;
 	Independant* explode();
 	void update(sf::Time deltaTime) override;
-	void update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern]) override;
 
 	float ref_speed;
 };
