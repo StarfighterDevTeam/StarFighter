@@ -31,6 +31,9 @@ string Independant::getName()
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber)
 {
+	this->movePattern = MovePatternType::NoMovePattern;
+	this->initial_position = sf::Vector2f(position.x,position.y);
+	this->pastTime = sf::Time();
 	this->m_size.x = ((*texture).getSize().x/frameNumber);
 	this->m_size.y = ((*texture).getSize().y);
 
@@ -50,7 +53,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->isOnScene = false;
 	this->immune = false;
 	this->startPattern = false;
-	
+
 	money=0;
 }
 
@@ -67,76 +70,124 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 }
 
+void Independant::ResetInitialPosition()
+{
+	if(this->collider_type == 6)
+	{
+		sf::Vector2f p = this->getPosition();
+		this->initial_position.x = p.x;
+		this->initial_position.y = p.y;
+	}
+}
+
 Independant::~Independant()
 {
 	//Unload Texture
 
 }
 
-void Independant::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
-{	
-	Independant::update(deltaTime);
-}
-
 void Independant::update(sf::Time deltaTime)
 {
-	float x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	float y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
-	this->setPosition(x,y);
+	this->pastTime += deltaTime;
+
+	sf::Vector2f np;
+	//Basic movements
+	np.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+	np.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+
+	//TODO: check move patterns, etc
+	GetPolarMovement(&np);
+
+
+	this->setPosition(np.x,np.y);
 
 	AnimatedSprite::update(deltaTime);
 }
+
+void Independant::GetPolarMovement(sf::Vector2f* np)
+{
+	float t = this->pastTime.asSeconds();
+	switch(this->movePattern)
+	{
+	case MovePatternType::NoMovePattern:
+		{
+			//Nothing to do
+			break;
+		}
+	case MovePatternType::_100Cos15:
+		{
+			//Specific patterns
+			np->x = this->initial_position.x + 150*cos(1.5*t);
+			break;
+		}
+	case MovePatternType::StarFish:
+		{
+			//Specific patterns
+			np->x = this->initial_position.x + 75*cos(t);
+			np->y += 0.5*(cos(2*t) - 5*cos(t));
+			break;
+		}
+	default:
+		{
+			throw invalid_argument(TextUtils::format("Game erro: Unknow pattern # '%d'", this->movePattern));
+		}
+	}
+
+
+}
+
 /*
 sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
 {
-	if (getPosition().y > triggerY && !startPattern) //&& collider_type == IndependantType::EnemyObject)
-	{
-		startPattern = true;
-	}
-	if (startPattern)
-	{
-		switch(pattern_id)
-		{
-			case MovePatternType::NoMove:
-			{
-				return sf::Vector2f(0,0);
-				break;
-			}
+if (getPosition().y > triggerY && !startPattern) //&& collider_type == IndependantType::EnemyObject)
+{
+startPattern = true;
+}
+if (startPattern)
+{
+switch(pattern_id)
+{
+case MovePatternType::NoMove:
+{
+return sf::Vector2f(0,0);
+break;
+}
 
-			case MovePatternType::SemiCircleDown:
-			{
-				float posX= radius*sin(angle_rad);
-				float posY= radius*sin(angle_rad)*cos(angle_rad);
-				//float posX= radius*cos(angle_rad);
-				//float posY= radius*sin(angle_rad);
-				speed.x=0;
-				speed.y=0;
-				return sf::Vector2f(posX,posY);
-				break;
-			}
-			
-			case MovePatternType::Circle:
-			{
-				float posX= radius*cos(angle_rad);
-				float posY= radius*sin(angle_rad);
-				speed.x=0;
-				speed.y=0;
-				return sf::Vector2f(posX,posY);
-				break;
-			}
+case MovePatternType::SemiCircleDown:
+{
+float posX= radius*sin(angle_rad);
+float posY= radius*sin(angle_rad)*cos(angle_rad);
+//float posX= radius*cos(angle_rad);
+//float posY= radius*sin(angle_rad);
+speed.x=0;
+speed.y=0;
+return sf::Vector2f(posX,posY);
+break;
+}
 
-			default:
-			{
-				return sf::Vector2f(0,0);
-			}
-		}
-	}
-	else
-	{
-		return sf::Vector2f(0,0);
-	}
+case MovePatternType::Circle:
+{
+float posX= radius*cos(angle_rad);
+float posY= radius*sin(angle_rad);
+speed.x=0;
+speed.y=0;
+return sf::Vector2f(posX,posY);
+break;
+}
+
+default:
+{
+return sf::Vector2f(0,0);
+}
+}
+}
+else
+{
+return sf::Vector2f(0,0);
+}
 }
 */
+
 void Independant::updateAnimation(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);

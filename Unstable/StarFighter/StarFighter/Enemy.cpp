@@ -9,25 +9,6 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	FX_death = m_FX_death;
 }
 
-void Enemy::update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern])
-{
-	if (getPosition().y >200 && !startPattern)//hauteur de déclenchement du pattern hardcodée
-	{
-		startPattern = true;
-	}
-	
-	//add offset calculated by Game
-	if (startPattern)
-	{
-		//speed.x = 0;
-		//speed.y = 0;
-		setPosition(getPosition().x + polarOffset[movepattern_type].x, getPosition().y + polarOffset[movepattern_type].y);
-		//printf("pouet\n");
-	}
-	
-	Enemy::update(deltaTime);
-}
-
 void Enemy::update(sf::Time deltaTime)
 {
 
@@ -42,7 +23,7 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 
-	//autmatic fire
+	//automatic fire
 	if(isOnScene)
 	{
 		weapon->setPosition(this->getPosition().x, (this->getPosition().y - ((this->m_size.y)/2)) );

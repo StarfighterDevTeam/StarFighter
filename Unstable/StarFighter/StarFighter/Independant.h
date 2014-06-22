@@ -22,9 +22,9 @@ enum IndependantType {
 };
 
 enum MovePatternType {
-	NoMove,
-	SemiCircleDown,
-	Circle,
+	NoMovePattern,
+	_100Cos15,
+	StarFish,
 	NBVAL_MovePattern
 };
 
@@ -38,8 +38,8 @@ public:
 	~Independant();
 
 	virtual void update(sf::Time deltaTime);
-	virtual void update(sf::Time deltaTime, sf::Vector2f polarOffset[MovePatternType::NBVAL_MovePattern]);
 	virtual void updateAnimation(sf::Time deltaTime);
+	void ResetInitialPosition();
 	bool visible;
 	bool isOnScene;
 	IndependantType collider_type;
@@ -55,12 +55,13 @@ public:
 	string getName();
 	virtual void Respawn();
 	Independant* Clone();
-	
+
 	int getMoney();
 	void addMoney(int loot_value);
 	void setMoney(int loot_value);
 	void get_money_from (Independant& independant);
 	void get_money_from (Independant& independant, int loot_value);
+	void Independant::GetPolarMovement(sf::Vector2f* np);
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;
 	int armor;
@@ -68,8 +69,10 @@ public:
 	int shield_max;
 	int shield_regen;
 	sf::Vector2f speed;
+	MovePatternType movePattern;
 
 protected:
+	sf::Vector2f initial_position;
 	bool startPattern;
 	std::string textureName;
 	Animation defaultAnimation;
@@ -81,6 +84,7 @@ protected:
 	bool immune;
 	sf::Clock immunityTimer;
 	int money;
+	sf::Time pastTime;
 };
 
 

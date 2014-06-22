@@ -44,16 +44,16 @@ public:
 	void resetHazard(int hazard_overkill = 0);
 
 private:
-	sf::Vector2f getPatternOffset(float angle_rad, float radius, int movepattern_type);
-	Clock polarClock;
-	float angle_rad;
+	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
+	Clock sceneChronometer;
+	float movementClock;
 	int hazard;
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];
 	std::list<Independant*>* sceneIndependantsTyped[NBVAL_Independant];
 	std::vector<Independant*> garbage;
-	
+
 };
 
 #endif // GAME_H_INCLUDED

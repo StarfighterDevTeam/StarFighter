@@ -13,7 +13,7 @@ const char* IndependantTypeValues[] =
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
-	this->polarClock.restart();
+	this->sceneChronometer.restart();
 
 	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
 	{
@@ -35,6 +35,9 @@ sf::RenderWindow* Game::getMainWindow()
 
 void Game::addToScene(Independant *object, int layer, IndependantType type)
 {
+	object->collider_type = type;
+	object->ResetInitialPosition();
+
 	if(layer >= 0 && layer < (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered)))
 	{
 		(*(sceneIndependantsTyped[(int)type])).push_back(object);
@@ -52,13 +55,6 @@ void Game::updateScene(Time deltaTime)
 
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
-	//move patterns
-	angle_rad = polarClock.getElapsedTime().asSeconds()*M_PI;
-	for(int i=0; i<MovePatternType::NBVAL_MovePattern; i++)
-	{
-		sceneMovePatterns[i] = getPatternOffset(angle_rad, 5, i);
-	}
-
 	//Collect & clean garbage
 	collectGarbage();
 	cleanGarbage();
@@ -66,17 +62,10 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
-	sf::Clock dt;
-	dt.restart();
-
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-		(*(*it)).update(deltaTime, sceneMovePatterns);
+		(*it)->update(deltaTime);
 	}
-
-
-
-	//printf("| Updt: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::drawScene()
@@ -291,46 +280,6 @@ void Game::collectGarbage()
 
 	//printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
-}
-
-sf::Vector2f Game::getPatternOffset(float angle_rad, float radius, int movepattern_type)
-{
-	switch(movepattern_type)
-		{
-			case MovePatternType::NoMove:
-			{
-				return sf::Vector2f(0,0);
-				break;
-			}
-
-			case MovePatternType::SemiCircleDown:
-			{
-				float posX= radius*sin(angle_rad);
-				float posY= radius*sin(angle_rad)*cos(angle_rad);
-				//float posX= radius*cos(angle_rad);
-				//float posY= radius*sin(angle_rad);
-				//speed.x=0;
-				//speed.y=0;
-				return sf::Vector2f(posX,posY);
-				break;
-			}
-			
-			case MovePatternType::Circle:
-			{
-				float posX= radius*cos(angle_rad);
-				float posY= radius*sin(angle_rad);
-				//speed.x=0;
-				//speed.y=0;
-				return sf::Vector2f(posX,posY);
-				break;
-			}
-
-			default:
-			{
-				return sf::Vector2f(0,0);
-			}
-		}
-	return sf::Vector2f(0,0);
 }
 
 bool Game::isLastEnemyDead()
