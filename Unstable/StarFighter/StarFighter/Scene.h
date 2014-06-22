@@ -261,6 +261,11 @@ private:
 	bool exitHubPhase2isOver;
 	bool exitHubPhase3isOver;
 
+	sf::Vector2i scrolling_direction;
+	sf::Vector2f ApplyScrollingDirectionOnPosition(sf::Vector2f position);
+	sf::Vector2f ApplyScrollingDirectionOnSpeed(float vspeed);
+	//float ApplyScrollingDirectionOnRotation();
+
 	void HazardBreakEvent();
 };
 
