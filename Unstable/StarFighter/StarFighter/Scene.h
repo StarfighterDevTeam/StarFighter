@@ -185,7 +185,7 @@ struct EnemyPool
 	sf::Vector2f m_size;
 	sf::Vector2f position;
 	sf::Vector2f speed;
-	
+
 	list<EnemyPoolElement> enemypoolArray;
 };
 
@@ -201,7 +201,7 @@ public:
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
 	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
 	void Scene::LoadSceneFromFile(string name);
-	
+
 	bool getPhaseShifter(int index);
 	void setPhaseShifter(int index, bool b);
 

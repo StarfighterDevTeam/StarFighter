@@ -12,38 +12,38 @@ void Scene::LoadSceneFromFile(string name)
 	hazard_break_value = 0;
 	try {
 
-			this->config = *(FileLoader(name));
-			this->enemyConfig = *(FileLoader(ENEMY_FILE));
-			this->weaponConfig = *(FileLoader(WEAPON_FILE));
-			this->ammoConfig = *(FileLoader(AMMO_FILE));
-			this->enemypoolConfig = *(FileLoader(ENEMYPOOL_FILE));
-			this->FXConfig = *(FileLoader(FX_FILE));
-			this->shipConfig = *(FileLoader(SHIP_FILE));
+		this->config = *(FileLoader(name));
+		this->enemyConfig = *(FileLoader(ENEMY_FILE));
+		this->weaponConfig = *(FileLoader(WEAPON_FILE));
+		this->ammoConfig = *(FileLoader(AMMO_FILE));
+		this->enemypoolConfig = *(FileLoader(ENEMYPOOL_FILE));
+		this->FXConfig = *(FileLoader(FX_FILE));
+		this->shipConfig = *(FileLoader(SHIP_FILE));
 
-			//enemies
-			for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
+		//enemies
+		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
+		{
+			if((*it)[0].compare("bg") == 0)
 			{
-				if((*it)[0].compare("bg") == 0)
-				{
-					this->bg = new Independant(sf::Vector2f(0, -stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),sf::Vector2f(ApplyScrollingDirectionOnSpeed(vspeed)),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
-					bg->setVisible(true);
-				}
+				this->bg = new Independant(sf::Vector2f(0, -stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),sf::Vector2f(ApplyScrollingDirectionOnSpeed(vspeed)),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
+				bg->setVisible(true);
+			}
 
-				if((*it)[0].compare("hub") == 0)
-				{
-					this->hub = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
-					hub->setVisible(true);
-				}
+			if((*it)[0].compare("hub") == 0)
+			{
+				this->hub = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
+				hub->setVisible(true);
+			}
 
-				if((*it)[0].compare("enemy") == 0)
-				{
-					EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
-					this->sceneIndependantsLayered[e->enemyclass].push_back(e);
-					//legacy, to delete when pools are done
-					this->enemies.push_back(*e);
-					hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
-				}
-				printf("Hazard Break to reach: %d\n", hazard_break_value);
+			if((*it)[0].compare("enemy") == 0)
+			{
+				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
+				//legacy, to delete when pools are done
+				this->enemies.push_back(*e);
+				hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
+			}
+			printf("Hazard Break to reach: %d\n", hazard_break_value);
 		}
 	}
 	catch( const std::exception & ex ) 
@@ -232,9 +232,9 @@ ShipConfig* Scene::LoadShipConfig(string name)
 
 			shipC->ship_model = new ShipModel(sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_MAXSPEED_X]),stoi((*it)[ShipModelData::SHIPMODEL_MAXSPEED_X])), sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_ACCELERATION_X]),stoi((*it)[ShipModelData::SHIPMODEL_ACCELERATION_Y])), stoi((*it)[ShipModelData::SHIPMODEL_DECCELERATION]), stoi((*it)[ShipModelData::SHIPMODEL_ARMOR]), stoi((*it)[ShipModelData::SHIPMODEL_SHIELD]), stoi((*it)[ShipModelData::SHIPMODEL_SHIELD_REGEN]));
 			//TODO: LoadEquipment
-			
+
 			shipC->Init((*it)[ShipModelData::SHIPMODEL_IMAGE_NAME], sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_WIDTH]),stoi((*it)[ShipModelData::SHIPMODEL_HEIGHT])), stoi((*it)[ShipModelData::SHIPMODEL_FRAMES]));
-			
+
 			shipC->weapon = LoadWeapon((*it)[ShipModelData::SHIPMODEL_WEAPON], -1, LoadAmmo((*it)[ShipModelData::SHIPMODEL_AMMO]));
 
 			printf("DEBUG: Loaded player ship config.\n");
@@ -382,7 +382,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 			if(it->probability > random_number && it->poolsize > 0)
 			{
 				//spawn (where on screen ?)
-				
+
 				Enemy* n = it->enemy->Clone();
 				n->setPosition(ApplyScrollingDirectionOnPosition(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2)));
 				n->setVisible(true);
@@ -654,21 +654,21 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)
 		x = position.x;
 		y = WINDOW_RESOLUTION_Y - position.y;
 	}
-	
+
 	if (scrolling_direction.y == 0)
+	{
+		if (scrolling_direction.x == 1)
 		{
-			if (scrolling_direction.x == 1)
-			{
-				x = (WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y;
-				y = position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
-			}
-			if (scrolling_direction.x == -1)
-			{
-				x= WINDOW_RESOLUTION_X - ((WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y);
-				y= position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
-			}
+			x = (WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y;
+			y = position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
 		}
-	
+		if (scrolling_direction.x == -1)
+		{
+			x= WINDOW_RESOLUTION_X - ((WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y);
+			y= position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
+		}
+	}
+
 	return sf::Vector2f (x,y);
 }
 
@@ -682,22 +682,22 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
 		x=0;
 		y *= (-1);
 	}
-		
-	
+
+
 	if (scrolling_direction.y == 0)
+	{
+		if (scrolling_direction.x == 1)
 		{
-			if (scrolling_direction.x == 1)
-			{
-				x = - vspeed;
-				y = 0;
-			}
-			if (scrolling_direction.x == -1)
-			{
-				x = vspeed;
-				y = 0;
-			}
+			x = - vspeed;
+			y = 0;
 		}
-	
+		if (scrolling_direction.x == -1)
+		{
+			x = vspeed;
+			y = 0;
+		}
+	}
+
 	return sf::Vector2f (x,y);
 }
 
