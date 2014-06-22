@@ -6,7 +6,9 @@ extern Game* CurrentGame;
 void Scene::LoadSceneFromFile(string name)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
-	vspeed = +10;
+	scrolling_direction.x = 1;
+	scrolling_direction.y = 0;
+	vspeed = + 10;
 	hazard_break_value = 0;
 	try {
 
@@ -23,7 +25,7 @@ void Scene::LoadSceneFromFile(string name)
 			{
 				if((*it)[0].compare("bg") == 0)
 				{
-					this->bg = new Independant(sf::Vector2f(0, -stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
+					this->bg = new Independant(sf::Vector2f(0, -stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),sf::Vector2f(ApplyScrollingDirectionOnSpeed(vspeed)),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
 					bg->setVisible(true);
 				}
 
@@ -125,7 +127,7 @@ Scene::Scene(string name)
 
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
-	this->playerShip = new Ship(Vector2f(WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO,WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
+	this->playerShip = new Ship(Vector2f(ApplyScrollingDirectionOnPosition(Vector2f(WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO,WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO))), *LoadShipConfig("default"));
 }
 
 void Scene::StartGame(sf::RenderWindow*	window)
@@ -265,7 +267,7 @@ EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int en
 		if((*it)[0].compare(name) == 0)
 		{
 			EnemyBase* base = new EnemyBase;
-			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(0,stoi((*it)[EnemyData::ENEMY_SPEED])),(*it)[EnemyData::ENEMY_IMAGE_NAME],sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]),stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]));
+			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(ApplyScrollingDirectionOnSpeed(stoi((*it)[EnemyData::ENEMY_SPEED]))),(*it)[EnemyData::ENEMY_IMAGE_NAME],sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]),stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]));
 			base->probability = probability;
 			base->poolsize = poolSize;
 			base->enemyclass = enemyClass;
@@ -384,7 +386,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 				//spawn (where on screen ?)
 				
 				Enemy* n = it->enemy->Clone();
-				n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
+				n->setPosition(ApplyScrollingDirectionOnPosition(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2)));
 				n->setVisible(true);
 				it->poolsize--;
 				
@@ -641,3 +643,65 @@ void Scene::HazardBreakEvent()
 	printf("DEBUG: HAZARD BREAK!!!\n");
 	hazard_break_value *= (1+ HAZARD_BREAK_MULTIPLIER);
 }
+
+sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)
+{
+	float x = position.x;
+	float y = position.y;
+
+	if (scrolling_direction.y == -1)
+	{
+		x = position.x;
+		y = WINDOW_RESOLUTION_Y - position.y;
+	}
+	
+	if (scrolling_direction.y == 0)
+		{
+			if (scrolling_direction.x == 1)
+			{
+				x = (WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y;
+				y = position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
+			}
+			if (scrolling_direction.x == -1)
+			{
+				x= WINDOW_RESOLUTION_X - ((WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y);
+				y= position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
+			}
+		}
+	
+	return sf::Vector2f (x,y);
+}
+
+sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
+{
+	float x = 0;
+	float y = vspeed;
+
+	if (scrolling_direction.y == -1)
+	{
+		x=0;
+		y *= (-1);
+	}
+		
+	
+	if (scrolling_direction.y == 0)
+		{
+			if (scrolling_direction.x == 1)
+			{
+				x = - vspeed;
+				y = 0;
+			}
+			if (scrolling_direction.x == -1)
+			{
+				x = vspeed;
+				y = 0;
+			}
+		}
+	
+	return sf::Vector2f (x,y);
+}
+
+//float ApplyScrollingDirectionOnRotation()
+//{
+//	return 
+//}
