@@ -230,10 +230,10 @@ ShipConfig* Scene::LoadShipConfig(string name)
 
 			shipC->ship_model = new ShipModel(sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_MAXSPEED_X]),stoi((*it)[ShipModelData::SHIPMODEL_MAXSPEED_X])), sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_ACCELERATION_X]),stoi((*it)[ShipModelData::SHIPMODEL_ACCELERATION_Y])), stoi((*it)[ShipModelData::SHIPMODEL_DECCELERATION]), stoi((*it)[ShipModelData::SHIPMODEL_ARMOR]), stoi((*it)[ShipModelData::SHIPMODEL_SHIELD]), stoi((*it)[ShipModelData::SHIPMODEL_SHIELD_REGEN]));
 			//TODO: LoadEquipment
-
+			
 			shipC->Init((*it)[ShipModelData::SHIPMODEL_IMAGE_NAME], sf::Vector2f(stoi((*it)[ShipModelData::SHIPMODEL_WIDTH]),stoi((*it)[ShipModelData::SHIPMODEL_HEIGHT])), stoi((*it)[ShipModelData::SHIPMODEL_FRAMES]));
-
-			shipC->weapon = LoadWeapon((*it)[ShipModelData::SHIPMODEL_WEAPON], 1, LoadAmmo((*it)[ShipModelData::SHIPMODEL_AMMO]));
+			
+			shipC->weapon = LoadWeapon((*it)[ShipModelData::SHIPMODEL_WEAPON], -1, LoadAmmo((*it)[ShipModelData::SHIPMODEL_AMMO]));
 
 			printf("DEBUG: Loaded player ship config.\n");
 			return shipC;
@@ -274,7 +274,7 @@ EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int en
 			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
 
-			base->enemy->weapon = LoadWeapon((*it)[EnemyData::WEAPON], -1, LoadAmmo((*it)[EnemyData::AMMO]));
+			base->enemy->weapon = LoadWeapon((*it)[EnemyData::WEAPON], 1, LoadAmmo((*it)[EnemyData::AMMO]));
 
 			return base;
 		}
@@ -292,6 +292,10 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			Weapon* weapon = new Weapon(ammo);
 			weapon->fire_direction = Vector2i(0,fire_direction);
 			weapon->rate_of_fire = atof((*it)[WeaponData::RATE_OF_FIRE].c_str());
+			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
+			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
+			weapon->alternate = (bool)(stoi((*it)[WeaponData::WEAPON_ALTERNATE]));
+			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
 
 			return weapon;
 		}
