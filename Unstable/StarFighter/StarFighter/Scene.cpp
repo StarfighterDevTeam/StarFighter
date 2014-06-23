@@ -6,8 +6,8 @@ extern Game* CurrentGame;
 void Scene::LoadSceneFromFile(string name)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
-	scrolling_direction.x = 1;
-	scrolling_direction.y = 0;
+	scrolling_direction.x = 0;
+	scrolling_direction.y = 1;
 	vspeed = + 10;
 	hazard_break_value = 0;
 	try {
@@ -386,9 +386,15 @@ void Scene::GenerateEnemies(Time deltaTime)
 				Enemy* n = it->enemy->Clone();
 				n->setPosition(ApplyScrollingDirectionOnPosition(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2)));
 				n->setVisible(true);
+
+				vector<int>* v = new vector<int>;
+				v->push_back(180); // Longueur
+				v->push_back(60); // Largeur
+				n->Pattern.SetPattern(PatternType::Rectangle_, 60,v);
+
 				it->poolsize--;
 
-				n->movePattern = MovePatternType::StarFish;
+				//n->movePattern = MovePatternType::StarFish;
 
 				LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("spawning enemy '%s' (x=%.1f) [pool=%d] (class=%d)",it->enemy->getName().c_str(),n->getPosition().x,it->poolsize, it->enemyclass));
 

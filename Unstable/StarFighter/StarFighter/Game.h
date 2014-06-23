@@ -37,7 +37,6 @@ public:
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
-	sf::Vector2f sceneMovePatterns[NBVAL_MovePattern];
 
 	bool isLastEnemyDead();
 	int getHazard();

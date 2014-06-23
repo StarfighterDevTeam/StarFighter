@@ -36,7 +36,6 @@ sf::RenderWindow* Game::getMainWindow()
 void Game::addToScene(Independant *object, int layer, IndependantType type)
 {
 	object->collider_type = type;
-	object->ResetInitialPosition();
 
 	if(layer >= 0 && layer < (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered)))
 	{

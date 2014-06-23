@@ -31,9 +31,7 @@ string Independant::getName()
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber)
 {
-	this->movePattern = MovePatternType::NoMovePattern;
 	this->initial_position = sf::Vector2f(position.x,position.y);
-	this->pastTime = sf::Time();
 	this->m_size.x = ((*texture).getSize().x/frameNumber);
 	this->m_size.y = ((*texture).getSize().y);
 
@@ -53,7 +51,6 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->isOnScene = false;
 	this->immune = false;
 	this->startPattern = false;
-
 	money=0;
 }
 
@@ -70,16 +67,6 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 }
 
-void Independant::ResetInitialPosition()
-{
-	if(this->collider_type == 6)
-	{
-		sf::Vector2f p = this->getPosition();
-		this->initial_position.x = p.x;
-		this->initial_position.y = p.y;
-	}
-}
-
 Independant::~Independant()
 {
 	//Unload Texture
@@ -88,52 +75,21 @@ Independant::~Independant()
 
 void Independant::update(sf::Time deltaTime)
 {
-	this->pastTime += deltaTime;
 
-	sf::Vector2f np;
-	//Basic movements
-	np.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	np.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+	static sf::Vector2f movement, offset;
 
-	//TODO: check move patterns, etc
-	GetPolarMovement(&np);
+	//Basic movement (initial vector)
+	movement.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+	movement.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 
+	//call bobbyPattern
+	offset = Pattern.GetOffset(deltaTime.asSeconds());
+	movement.x += offset.x;
+	movement.y += offset.y;
 
-	this->setPosition(np.x,np.y);
+	this->setPosition(movement.x,movement.y);
 
 	AnimatedSprite::update(deltaTime);
-}
-
-void Independant::GetPolarMovement(sf::Vector2f* np)
-{
-	float t = this->pastTime.asSeconds();
-	switch(this->movePattern)
-	{
-	case MovePatternType::NoMovePattern:
-		{
-			//Nothing to do
-			break;
-		}
-	case MovePatternType::_100Cos15:
-		{
-			//Specific patterns
-			np->x = this->initial_position.x + 150*cos(1.5*t);
-			break;
-		}
-	case MovePatternType::StarFish:
-		{
-			//Specific patterns
-			np->x = this->initial_position.x + 75*cos(t);
-			np->y += 0.5*(cos(2*t) - 5*cos(t));
-			break;
-		}
-	default:
-		{
-			throw invalid_argument(TextUtils::format("Game erro: Unknow pattern # '%d'", this->movePattern));
-		}
-	}
-
-
 }
 
 /*

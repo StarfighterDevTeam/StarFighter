@@ -101,6 +101,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Loot.cpp" />
     <ClCompile Include="MovePattern.cpp" />
+    <ClCompile Include="PatternBobby.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Independant.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Loot.h" />
     <ClInclude Include="MovePattern.h" />
+    <ClInclude Include="PatternBobby.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />

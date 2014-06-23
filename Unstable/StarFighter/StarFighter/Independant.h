@@ -9,6 +9,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "MovePattern.h"
+#include "PatternBobby.h"
 
 enum IndependantType {
 	Background,
@@ -19,13 +20,6 @@ enum IndependantType {
 	EnemyFire,
 	EnemyObject,
 	NBVAL_Independant
-};
-
-enum MovePatternType {
-	NoMovePattern,
-	_100Cos15,
-	StarFish,
-	NBVAL_MovePattern
 };
 
 class Independant : public AnimatedSprite
@@ -39,7 +33,6 @@ public:
 
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
-	void ResetInitialPosition();
 	bool visible;
 	bool isOnScene;
 	IndependantType collider_type;
@@ -69,7 +62,7 @@ public:
 	int shield_max;
 	int shield_regen;
 	sf::Vector2f speed;
-	MovePatternType movePattern;
+	PatternBobby Pattern;
 
 protected:
 	sf::Vector2f initial_position;
@@ -84,7 +77,7 @@ protected:
 	bool immune;
 	sf::Clock immunityTimer;
 	int money;
-	sf::Time pastTime;
+
 };
 
 
