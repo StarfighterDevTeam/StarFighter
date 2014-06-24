@@ -373,10 +373,11 @@ void Scene::GenerateEnemies(Time deltaTime)
 				n->setPosition(ApplyScrollingDirectionOnPosition(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2)));
 				n->setVisible(true);
 
-				vector<float>* v = new vector<float>;
-				v->push_back(60); // rayon 60px
-				v->push_back(1);  // clockwise (>)
-				n->Pattern.SetPattern(PatternType::Circle_, 100,v); //vitesse angulaire (degres/s)
+				//Pattern definition snipet
+				//vector<float>* v = new vector<float>;
+				//v->push_back(60); // rayon 60px
+				//v->push_back(1);  // clockwise (>)
+				//n->Pattern.SetPattern(PatternType::Circle_, 100,v); //vitesse angulaire (degres/s)
 
 				it->poolsize--;
 
