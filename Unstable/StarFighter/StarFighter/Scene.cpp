@@ -25,7 +25,7 @@ void Scene::LoadSceneFromFile(string name)
 		{
 			if((*it)[0].compare("bg") == 0)
 			{
-				this->bg = new Independant(sf::Vector2f(0, -stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),sf::Vector2f(ApplyScrollingDirectionOnSpeed(vspeed)),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
+				this->bg = new Independant(sf::Vector2f(0, -stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),sf::Vector2f(0, vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
 				bg->setVisible(true);
 			}
 
@@ -127,7 +127,7 @@ Scene::Scene(string name)
 
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
-	this->playerShip = new Ship(Vector2f(ApplyScrollingDirectionOnPosition(Vector2f(WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO,WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO))), *LoadShipConfig("default"));
+	this->playerShip = new Ship(Vector2f(WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO,WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
 }
 
 void Scene::StartGame(sf::RenderWindow*	window)
@@ -251,7 +251,7 @@ EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int en
 		if((*it)[0].compare(name) == 0)
 		{
 			EnemyBase* base = new EnemyBase;
-			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(ApplyScrollingDirectionOnSpeed(stoi((*it)[EnemyData::ENEMY_SPEED]))),(*it)[EnemyData::ENEMY_IMAGE_NAME],sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]),stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]));
+			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(0, stoi((*it)[EnemyData::ENEMY_SPEED])),(*it)[EnemyData::ENEMY_IMAGE_NAME],sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]),stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]));
 			base->probability = probability;
 			base->poolsize = poolSize;
 			base->enemyclass = enemyClass;
@@ -370,7 +370,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 				//spawn (where on screen ?)
 
 				Enemy* n = it->enemy->Clone();
-				n->setPosition(ApplyScrollingDirectionOnPosition(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2)));
+				n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
 				n->setVisible(true);
 
 				//Pattern definition snipet

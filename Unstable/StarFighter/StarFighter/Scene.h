@@ -240,26 +240,11 @@ private:
 	sf::Text* hazardBreakText;
 	sf::Text* hazardBreakScore;
 
-	bool endingPhase1isOver;
-	bool endingPhase2isOver;
-	bool endingPhase3isOver;
-	bool endingPhase4isOver;
-	void endscenePhase1();
-	void endscenePhase2(float transition_speed_UP);
-	void endscenePhase3(float transition_speed_DOWN);
-	void endscenePhase4();
 	bool phaseShifter[SceneBooleans::NBVAL_SceneBooleans];
 
 	void hubRoaming();
 	sf::Clock clockHubExit;
 	int transitionDestination;
-
-	void hubExitPhase1(float transition_speed_DOWN, int transitionDestination);
-	void hubExitPhase2();
-	void hubExitPhase3();
-	bool exitHubPhase1isOver;
-	bool exitHubPhase2isOver;
-	bool exitHubPhase3isOver;
 
 	sf::Vector2i scrolling_direction;
 	sf::Vector2f ApplyScrollingDirectionOnPosition(sf::Vector2f position);
