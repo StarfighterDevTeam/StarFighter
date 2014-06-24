@@ -39,7 +39,7 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->collider_type = m_collider_type;
 	bullet->isOnScene = true;
 
-	(*CurrentGame).addToScene(bullet,PlayerShipLayer, m_collider_type);
+	(*CurrentGame).addToScene(bullet,LayerType::PlayerShipLayer, m_collider_type);
 }
 
 void Weapon::Fire(IndependantType m_collider_type)

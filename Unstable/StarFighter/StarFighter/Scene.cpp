@@ -356,13 +356,35 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if(timer > 1)
+	if(timer > 5)
 	{
 		double intpart;
 		timer = modf (timer, &intpart);
 
 		double random_number = ((double) rand() / (RAND_MAX));
 
+		// A PASSER EN .CSV :
+		// nb_rows = 4
+		// nb_lines = 3
+		// xspread = 100
+		// y spread = 150
+		// liste d'ennemis : roger, roger, roger, roger, roger -> a remplacer par une classe d'ennemi plus tard
+		// liste de patterns associés : 0, 0, 0, 0, 0, 
+
+		for (int i=0 ; i< 4*3; i++)
+		{
+			//VALEUR A CONF EN .CSV
+			EnemyPoolElement* e = new EnemyPoolElement(enemies.begin()->enemy, PatternType::NoMovePattern);
+
+			cluster.push_back(e);
+		}
+
+		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f (200, 100), 3, 4, 100, 150, cluster);
+		float pos_x = generated_cluster->getClusterPosition().x;
+		float pos_y = generated_cluster->getClusterPosition().y;
+
+		// OLD MAIS FONCTIONNEL = BACKUP
+		/*
 		for (std::list<EnemyBase>::iterator it = (this->enemies).begin(); it != (this->enemies).end(); it++)
 		{
 			if(it->probability > random_number && it->poolsize > 0)
@@ -386,6 +408,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 				(*CurrentGame).addToScene((Independant*)n,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
 			}
 		}
+		*/
 	}
 }
 

@@ -8,7 +8,7 @@
 #include "Globals.h"
 #include "Enemy.h"
 #include "Ship.h"
-#include "MovePattern.h"
+#include "EnemyPool.h"
 
 using namespace std;
 
@@ -157,38 +157,6 @@ struct EnemyBase
 	int enemyclass;
 };
 
-struct EnemyPoolElement
-{
-	int enemyclass;
-	int movepatternType;
-};
-
-struct EnemyPool
-{
-	EnemyPool(string m_pool_name, int m_nb_lines, int m_nb_rows, float m_radiusX, float m_radiusY, sf::Vector2f size, sf::Vector2f m_position, sf::Vector2f m_speed)
-	{
-		this->pool_name = m_pool_name;
-		this->nb_lines = m_nb_lines;
-		this->nb_rows = m_nb_rows;
-		this->radiusX = m_radiusX;
-		this->radiusY = m_radiusY;
-		this->m_size = size;
-		this->position = m_position;
-		this->speed = m_speed;	
-	};
-
-	string pool_name;
-	int nb_lines;
-	int nb_rows;
-	float radiusX;
-	float radiusY;
-	sf::Vector2f m_size;
-	sf::Vector2f position;
-	sf::Vector2f speed;
-
-	list<EnemyPoolElement> enemypoolArray;
-};
-
 class Scene
 {
 public:
@@ -215,11 +183,11 @@ private:
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
 	FX* Scene::LoadFX(string name);
-	MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY);
 	list<vector<string>>* Scene::FileLoader(string name);
 
 	Ship* playerShip;
 	list<EnemyBase> enemies;
+	vector<EnemyPoolElement*> cluster;
 	list<vector<string>> config;
 	list<vector<string>> enemyConfig;
 	list<vector<string>> weaponConfig;
