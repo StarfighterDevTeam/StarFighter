@@ -15,6 +15,7 @@ enum PatternType
 	NoMovePattern,
 	Rectangle_,
 	Circle_,
+	Oscillator,
 	NBVAL_PatternType
 };
 
@@ -28,14 +29,17 @@ public:
 	sf::Vector2f GetOffset(float seconds) override;
 
 private:
-	sf::Vector2f ToCartesianCoords(float theta_degrees, float r);
+	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);
+	void PatternBobby::ToCartesianCoords(sf::Vector2f* polarCoords);
 	void PatternBobby::CheckArgSize(int expected);
 
 	float patternSpeed;
 	PatternType currentPattern;
 	vector<float>*  patternParams;
 	sf::Vector2i _direction;
-	sf::Vector2f _curSandboxPosition;
+	sf::Vector2f _curSandboxPosition_cartesian;
+	sf::Vector2f _curSandboxPosition_polar;
+
 	float _distance_left;
 	float _currTheta;
 

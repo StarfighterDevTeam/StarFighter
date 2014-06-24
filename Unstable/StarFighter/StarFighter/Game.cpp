@@ -209,8 +209,6 @@ void Game::colisionChecksV2()
 			}
 		}
 	}
-
-	//printf("| Colisions: %d (x%d)",dt.getElapsedTime().asMilliseconds(),i);
 }
 
 void Game::cleanGarbage()
@@ -276,8 +274,6 @@ void Game::collectGarbage()
 			continue;
 		}
 	}
-
-	//printf("Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
 }
 

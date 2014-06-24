@@ -374,8 +374,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 				n->setVisible(true);
 
 				vector<float>* v = new vector<float>;
-				v->push_back(60); // rayon
-				v->push_back(1); // clockwise
+				v->push_back(60); // rayon 60px
+				v->push_back(1);  // clockwise (>)
 				n->Pattern.SetPattern(PatternType::Circle_, 100,v); //vitesse angulaire (degres/s)
 
 				it->poolsize--;

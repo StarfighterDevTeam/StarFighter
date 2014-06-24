@@ -38,9 +38,26 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 			// v = vitesse angulaire (degres/s)
 			CheckArgSize(2);
 
-			this->patternSpeed = patternSpeed*M_PI/180; //converting to radians
-			_currTheta = -M_PI_2; //starts on top of the circle
-			this->_curSandboxPosition = ToCartesianCoords(_currTheta,patternParams->at(0));
+			this->patternSpeed = patternSpeed*M_PI/180; //converting speed to radians
+			this->_curSandboxPosition_polar = sf::Vector2f(patternParams->at(0),-M_PI_2); //starts on top of the circle (-pi/2)
+			this->_curSandboxPosition_cartesian = ToCartesianCoords(this->_curSandboxPosition_polar);
+
+			break;
+		}
+	case PatternType::Oscillator:
+		{
+			//ARGS 
+			// 0 = amplitude
+			// 1 = angle (en degres)
+			// v = vitesse en px/sec
+			CheckArgSize(2);
+
+			this->patternSpeed = patternSpeed*2*M_PI/patternParams->at(0); //converting speed to radians (2pi = 1 amplitude)
+
+			this->_curSandboxPosition_polar = sf::Vector2f(patternParams->at(0)/2,patternParams->at(1)*M_PI/180); // r = ampl/2 + converting angle to radians
+			this->_curSandboxPosition_cartesian = ToCartesianCoords(this->_curSandboxPosition_polar);
+
+			this->_currTheta = -M_PI_2; //starting @the middle
 
 			break;
 		}
@@ -118,18 +135,43 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			static sf::Vector2f next;
 
 			//Updating our current theta [modulo 2PI]
-			new_angle = this->_currTheta +  (patternParams->at(1) >= 0 ? seconds*this->patternSpeed : -seconds*this->patternSpeed);
-			this->_currTheta = fmod(new_angle, 2*M_PI);
+			new_angle = this->_curSandboxPosition_polar.y +  (patternParams->at(1) >= 0 ? seconds*this->patternSpeed : -seconds*this->patternSpeed);
+			this->_curSandboxPosition_polar.y = fmod(new_angle, 2*M_PI);
 
 			//Our next position:
-			next = ToCartesianCoords(this->_currTheta,patternParams->at(0));
+			next = ToCartesianCoords(this->_curSandboxPosition_polar);
 
 			//return offset = diff between new and old position
-			offset.x = next.x - this->_curSandboxPosition.x;
-			offset.y = next.y - this->_curSandboxPosition.y;
+			offset.x = next.x - this->_curSandboxPosition_cartesian.x;
+			offset.y = next.y - this->_curSandboxPosition_cartesian.y;
 
-			this->_curSandboxPosition.x = next.x;
-			this->_curSandboxPosition.y = next.y;
+			this->_curSandboxPosition_cartesian.x = next.x;
+			this->_curSandboxPosition_cartesian.y = next.y;
+
+			break;
+		}
+
+	case PatternType::Oscillator:
+		{
+			//ARGS 
+			// 0 = rayon
+			// v = vitesse angulaire (degres/s)
+			static sf::Vector2f next;
+
+			//Updating our current theta [modulo 2PI]
+			this->_currTheta = fmod(this->_currTheta + seconds*this->patternSpeed, 2*M_PI);
+
+			//Our next position (r is updated according to cos(theta))
+			next.x = this->_curSandboxPosition_polar.x*cos(this->_currTheta);
+			next.y = this->_curSandboxPosition_polar.y;
+			ToCartesianCoords(&next);
+
+			//return offset = diff between new and old position
+			offset.x = next.x - this->_curSandboxPosition_cartesian.x;
+			offset.y = next.y - this->_curSandboxPosition_cartesian.y;
+
+			this->_curSandboxPosition_cartesian.x = next.x;
+			this->_curSandboxPosition_cartesian.y = next.y;
 
 			break;
 		}
@@ -143,12 +185,20 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 	return offset;
 }
 
-sf::Vector2f PatternBobby::ToCartesianCoords(float theta_degrees, float r)
+sf::Vector2f PatternBobby::ToCartesianCoords(sf::Vector2f polarCoords)
 {
 	sf::Vector2f v;
-	v.x = r*cos(theta_degrees);
-	v.y = r*sin(theta_degrees);
+	v.x = polarCoords.x*cos(polarCoords.y);
+	v.y = polarCoords.x*sin(polarCoords.y);
 	return v;
+}
+
+void PatternBobby::ToCartesianCoords(sf::Vector2f* polarCoords)
+{
+	static float r;
+	r = polarCoords->x;
+	polarCoords->x = polarCoords->x*cos(polarCoords->y);
+	polarCoords->y = r*sin(polarCoords->y);
 }
 
 void PatternBobby::CheckArgSize(int expected)
