@@ -207,20 +207,6 @@ Ship* Scene::GetPlayerShip()
 	return this->playerShip;
 }
 
-/*MovePattern* Scene::LoadMovePattern(string name, float radius, float triggerY)
-{
-for (std::list<vector<string>>::iterator it = (this->movepatternConfig).begin(); it != (this->movepatternConfig).end(); it++)
-{
-if((*it)[0].compare(name) == 0)
-{
-MovePattern* mpattern = new MovePattern(stoi((*it)[MovePatternData::MOVEPATTERN_RADIUS]), stoi((*it)[MovePatternData::MOVEPATTERN_TRIGGERY]));
-return mpattern;
-}
-}
-
-throw invalid_argument(TextUtils::format("Config file error: Unable to find MovePattern '%s'. Please check the config file",name));
-}
-*/
 
 ShipConfig* Scene::LoadShipConfig(string name)
 {
@@ -387,14 +373,12 @@ void Scene::GenerateEnemies(Time deltaTime)
 				n->setPosition(ApplyScrollingDirectionOnPosition(sf::Vector2f(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2)));
 				n->setVisible(true);
 
-				vector<int>* v = new vector<int>;
-				v->push_back(180); // Longueur
-				v->push_back(60); // Largeur
-				n->Pattern.SetPattern(PatternType::Rectangle_, 60,v);
+				vector<float>* v = new vector<float>;
+				v->push_back(60); // rayon
+				v->push_back(1); // clockwise
+				n->Pattern.SetPattern(PatternType::Circle_, 100,v); //vitesse angulaire (degres/s)
 
 				it->poolsize--;
-
-				//n->movePattern = MovePatternType::StarFish;
 
 				LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("spawning enemy '%s' (x=%.1f) [pool=%d] (class=%d)",it->enemy->getName().c_str(),n->getPosition().x,it->poolsize, it->enemyclass));
 
@@ -583,65 +567,6 @@ void Scene::setPhaseShifter(int index, bool b)
 	}
 }
 
-/*
-void Scene::hubExitPhase1(float transition_speed_DOWN, int transitionDestination)
-{
-if (phaseShifter[SceneBooleans::EXITHUB_PHASE1] && !phaseShifter[SceneBooleans::EXITHUB_PHASE2])
-{
-//LIGNE DE GROS HACK POUR LE CAS "UP"
-
-switch (transitionDestination)
-{
-playerShip->disable_inputs = true;
-
-
-
-case TransitionList::TRANSITION_UP:
-{
-playerShip->speed.x = -transition_speed_DOWN * ((WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
-playerShip->speed.y = -transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
-hub->speed.y = -transition_speed_DOWN;
-bg->speed.y = -transition_speed_DOWN;
-}
-case TransitionList::TRANSITION_DOWN:
-{
-playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*(1-STARTSCENE_X_RATIO)) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
-playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*(1-STARTSCENE_Y_RATIO)) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
-hub->speed.y = - transition_speed_DOWN;
-bg->speed.y = - transition_speed_DOWN;
-}
-case TransitionList::TRANSITION_RIGHT:
-{
-playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*(1-STARTSCENE_Y_RATIO)) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
-playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*(1-STARTSCENE_X_RATIO)) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
-hub->speed.x = transition_speed_DOWN;
-bg->speed.x = transition_speed_DOWN;
-}
-case TransitionList::TRANSITION_LEFT:
-{
-playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*STARTSCENE_Y_RATIO) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
-playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*STARTSCENE_X_RATIO) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
-hub->speed.x = - transition_speed_DOWN;
-bg->speed.x = - transition_speed_DOWN;
-}
-}
-}
-
-}
-
-void Scene::hubExitPhase2()
-{
-playerShip->speed.x = 0;
-playerShip->speed.y = 0;
-playerShip->disable_inputs = false;
-bg->speed.y = vspeed;
-hub->speed.y = vspeed;
-phaseShifter[SceneBooleans::EXITHUB_PHASE2] = true;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
-}
-
-*/
-
 
 void Scene::HazardBreakEvent()
 {
@@ -706,8 +631,3 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
 
 	return sf::Vector2f (x,y);
 }
-
-//float ApplyScrollingDirectionOnRotation()
-//{
-//	return 
-//}

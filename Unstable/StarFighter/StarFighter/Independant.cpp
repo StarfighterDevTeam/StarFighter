@@ -76,73 +76,22 @@ Independant::~Independant()
 void Independant::update(sf::Time deltaTime)
 {
 
-	static sf::Vector2f movement, offset;
+	static sf::Vector2f newposition, offset;
 
 	//Basic movement (initial vector)
-	movement.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	movement.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+
 
 	//call bobbyPattern
 	offset = Pattern.GetOffset(deltaTime.asSeconds());
-	movement.x += offset.x;
-	movement.y += offset.y;
+	newposition.x += offset.x;
+	newposition.y += offset.y;
 
-	this->setPosition(movement.x,movement.y);
+	this->setPosition(newposition.x,newposition.y);
 
 	AnimatedSprite::update(deltaTime);
 }
-
-/*
-sf::Vector2f Independant::setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id)//when y > triggerY, move pattern begins
-{
-if (getPosition().y > triggerY && !startPattern) //&& collider_type == IndependantType::EnemyObject)
-{
-startPattern = true;
-}
-if (startPattern)
-{
-switch(pattern_id)
-{
-case MovePatternType::NoMove:
-{
-return sf::Vector2f(0,0);
-break;
-}
-
-case MovePatternType::SemiCircleDown:
-{
-float posX= radius*sin(angle_rad);
-float posY= radius*sin(angle_rad)*cos(angle_rad);
-//float posX= radius*cos(angle_rad);
-//float posY= radius*sin(angle_rad);
-speed.x=0;
-speed.y=0;
-return sf::Vector2f(posX,posY);
-break;
-}
-
-case MovePatternType::Circle:
-{
-float posX= radius*cos(angle_rad);
-float posY= radius*sin(angle_rad);
-speed.x=0;
-speed.y=0;
-return sf::Vector2f(posX,posY);
-break;
-}
-
-default:
-{
-return sf::Vector2f(0,0);
-}
-}
-}
-else
-{
-return sf::Vector2f(0,0);
-}
-}
-*/
 
 void Independant::updateAnimation(sf::Time deltaTime)
 {

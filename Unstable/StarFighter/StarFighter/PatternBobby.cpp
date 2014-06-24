@@ -5,8 +5,12 @@ PatternBobby::PatternBobby()
 	this->currentPattern = PatternType::NoMovePattern;
 }
 
-void PatternBobby::SetPattern(PatternType pt, int patternSpeed, vector<int>*  args)
+void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*  args)
 {
+	//Note that patternSpeed is 
+	// - px/sec on the canvas for Rectangle
+	// - time to do 360° for the circle
+
 	this->currentPattern = pt;
 	this->patternParams = args;
 	this->patternSpeed = patternSpeed;
@@ -15,13 +19,33 @@ void PatternBobby::SetPattern(PatternType pt, int patternSpeed, vector<int>*  ar
 	{
 	case PatternType::Rectangle_:
 		{
-			_distance_left = args->at(0);
+			//ARGS 
+			// 0 = longueur
+			// 1 = largeur
+			// v = px/sec
+			CheckArgSize(2);
+
+			_distance_left = patternParams->at(0);
 			_direction = sf::Vector2i(1,0);
+
+			break;
+		}
+	case PatternType::Circle_:
+		{
+			//ARGS 
+			// 0 = rayon
+			// 1 = >=0 for clockwise, other anti_clockwise
+			// v = vitesse angulaire (degres/s)
+			CheckArgSize(2);
+
+			this->patternSpeed = patternSpeed*M_PI/180; //converting to radians
+			_currTheta = -M_PI_2; //starts on top of the circle
+			this->_curSandboxPosition = ToCartesianCoords(_currTheta,patternParams->at(0));
+
 			break;
 		}
 	}
 }
-
 
 sf::Vector2f  PatternBobby::GetOffset(float seconds)
 {
@@ -29,12 +53,14 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 
 	switch(this->currentPattern)
 	{
+
 	case PatternType::NoMovePattern:
 		{
 			offset.x=0;
 			offset.y=0;
 			break;
 		}
+
 	case PatternType::Rectangle_:
 		{
 			//ARGS 
@@ -44,7 +70,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			//just move on the line
 			offset.x = _direction.x*patternSpeed*seconds;
 			offset.y = _direction.y*patternSpeed*seconds;
-			float moved= abs(offset.x) + abs(offset.y);
+			static float moved= abs(offset.x) + abs(offset.y);
 
 			if(_distance_left > moved)
 			{
@@ -82,6 +108,31 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			break;
 		}
 
+	case PatternType::Circle_:
+		{
+			//ARGS 
+			// 0 = rayon
+			// v = vitesse angulaire (degres/s)
+
+			static float new_angle;
+			static sf::Vector2f next;
+
+			//Updating our current theta [modulo 2PI]
+			new_angle = this->_currTheta +  (patternParams->at(1) >= 0 ? seconds*this->patternSpeed : -seconds*this->patternSpeed);
+			this->_currTheta = fmod(new_angle, 2*M_PI);
+
+			//Our next position:
+			next = ToCartesianCoords(this->_currTheta,patternParams->at(0));
+
+			//return offset = diff between new and old position
+			offset.x = next.x - this->_curSandboxPosition.x;
+			offset.y = next.y - this->_curSandboxPosition.y;
+
+			this->_curSandboxPosition.x = next.x;
+			this->_curSandboxPosition.y = next.y;
+
+			break;
+		}
 
 	default:
 		{
@@ -90,4 +141,20 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 	}
 
 	return offset;
+}
+
+sf::Vector2f PatternBobby::ToCartesianCoords(float theta_degrees, float r)
+{
+	sf::Vector2f v;
+	v.x = r*cos(theta_degrees);
+	v.y = r*sin(theta_degrees);
+	return v;
+}
+
+void PatternBobby::CheckArgSize(int expected)
+{
+	if(this->patternParams->size() < expected)
+	{
+		throw invalid_argument(TextUtils::format("PatternBobby error: Invalid # or arges for pattern '%d' (received %d, expected %d)", this->currentPattern, this->patternParams->size(),expected));
+	}
 }
