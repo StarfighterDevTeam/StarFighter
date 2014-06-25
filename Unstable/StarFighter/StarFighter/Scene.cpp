@@ -63,7 +63,7 @@ void Scene::LoadSceneFromFile(string name)
 
 	//hazardBarMax.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, hazard_break_value));
 	hazardBarMax.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
-	hazardBarMax.setFillColor(sf::Color(0, 0, 0));//black
+	hazardBarMax.setFillColor(sf::Color::Transparent);//black
 	hazardBarMax.setOutlineThickness(4);
 	hazardBarMax.setOutlineColor(sf::Color(255, 255, 255));
 	hazardBarMax.setOrigin(0, 0);
@@ -365,26 +365,29 @@ void Scene::GenerateEnemies(Time deltaTime)
 		double random_number = ((double) rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
-		int nb_rows = 4;
-		int nb_lines = 2;
+		int nb_rows = 5;
+		int nb_lines = 5;
 		float xspread = 50;
 		float yspread = 80;
 		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
 		// liste de patterns associés : 0, 0, 0, 0, 0, 
+
+		vector<EnemyPoolElement*> cluster;
 
 		for (int i=0 ; i< nb_rows*nb_lines; i++)
 		{
 			//VALEURS A CONF EN .CSV
 			// arg0 = enemy class
 			// arg1 = move pattern 
+			//if arg0 != VOID
 			EnemyPoolElement* e = new EnemyPoolElement(enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->enemy, PatternType::NoMovePattern);
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
+
 			cluster.push_back(e);
 		}
-
 		
-		int size_x = (int)(nb_rows * xspread);
-		float size_y = nb_lines * yspread;
+		int size_x = (int)((nb_rows+1) * xspread);//let's take some margin : +1 row
+		float size_y = (nb_lines+1) * yspread;//let's take some margin : +1 line
 		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (WINDOW_RESOLUTION_X - size_x), - size_y), nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP

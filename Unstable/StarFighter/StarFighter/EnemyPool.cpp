@@ -32,7 +32,7 @@ void EnemyPool::CreateCluster()
 	{
 		Enemy* n = (*it)->enemy->Clone();
 		n->setVisible(true);
-		n->setPosition(sf::Vector2f(this->position.x + (index % nb_rows)*xspread, this->position.y + (index % nb_lines)*yspread));
+		n->setPosition(sf::Vector2f(this->position.x + (index % nb_rows)*xspread, this->position.y + (floor(index / nb_rows)-1)*yspread));
 		index++;
 		(*CurrentGame).addToScene(n,LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
 	}

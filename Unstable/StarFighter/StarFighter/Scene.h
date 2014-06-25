@@ -189,7 +189,6 @@ private:
 	Ship* playerShip;
 	list<EnemyBase> enemies;
 	list<EnemyBase> enemies_ranked_by_class[NBVAL_EnemyClass];
-	vector<EnemyPoolElement*> cluster;
 	list<vector<string>> config;
 	list<vector<string>> enemyConfig;
 	list<vector<string>> weaponConfig;
