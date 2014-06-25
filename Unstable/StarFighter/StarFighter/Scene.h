@@ -135,7 +135,8 @@ enum EnemyClass
 	ENEMYPOOL_BETA,//2
 	ENEMYPOOL_DELTA,//3
 	ENEMYPOOL_GAMMA,//4
-	NBVAL_EnemyClass
+	ENEMYPOOL_ZETA,//5
+	NBVAL_EnemyClass,
 };
 
 enum FXData
@@ -187,6 +188,7 @@ private:
 
 	Ship* playerShip;
 	list<EnemyBase> enemies;
+	list<EnemyBase> enemies_ranked_by_class[NBVAL_EnemyClass];
 	vector<EnemyPoolElement*> cluster;
 	list<vector<string>> config;
 	list<vector<string>> enemyConfig;

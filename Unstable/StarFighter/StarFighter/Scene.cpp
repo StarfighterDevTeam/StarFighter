@@ -41,6 +41,7 @@ void Scene::LoadSceneFromFile(string name)
 				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
 				//legacy, to delete when pools are done
 				this->enemies.push_back(*e);
+				this->enemies_ranked_by_class[e->enemyclass].push_back(*e);
 				hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
 			}
 			printf("Hazard Break to reach: %d\n", hazard_break_value);
@@ -364,24 +365,27 @@ void Scene::GenerateEnemies(Time deltaTime)
 		double random_number = ((double) rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
-		// nb_rows = 4
-		// nb_lines = 3
-		// xspread = 100
-		// y spread = 150
-		// liste d'ennemis : roger, roger, roger, roger, roger -> a remplacer par une classe d'ennemi plus tard
+		int nb_rows = 4;
+		int nb_lines = 2;
+		float xspread = 50;
+		float yspread = 80;
+		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
 		// liste de patterns associés : 0, 0, 0, 0, 0, 
 
-		for (int i=0 ; i< 4*3; i++)
+		for (int i=0 ; i< nb_rows*nb_lines; i++)
 		{
-			//VALEUR A CONF EN .CSV
-			EnemyPoolElement* e = new EnemyPoolElement(enemies.begin()->enemy, PatternType::NoMovePattern);
-
+			//VALEURS A CONF EN .CSV
+			// arg0 = enemy class
+			// arg1 = move pattern 
+			EnemyPoolElement* e = new EnemyPoolElement(enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->enemy, PatternType::NoMovePattern);
+			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
 			cluster.push_back(e);
 		}
 
-		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f (200, 100), 3, 4, 100, 150, cluster);
-		float pos_x = generated_cluster->getClusterPosition().x;
-		float pos_y = generated_cluster->getClusterPosition().y;
+		
+		int size_x = (int)(nb_rows * xspread);
+		float size_y = nb_lines * yspread;
+		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (WINDOW_RESOLUTION_X - size_x), - size_y), nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP
 		/*
