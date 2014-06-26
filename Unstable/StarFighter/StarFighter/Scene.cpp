@@ -357,7 +357,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if(timer > 5)
+	if(timer > 3)
 	{
 		double intpart;
 		timer = modf (timer, &intpart);
@@ -365,10 +365,10 @@ void Scene::GenerateEnemies(Time deltaTime)
 		double random_number = ((double) rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
-		int nb_rows = 5;
-		int nb_lines = 5;
+		int nb_rows = 4;
+		int nb_lines = 4;
 		float xspread = 50;
-		float yspread = 80;
+		float yspread = 50;
 		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
 		// liste de patterns associés : 0, 0, 0, 0, 0, 
 
@@ -380,7 +380,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 			// arg0 = enemy class
 			// arg1 = move pattern 
 			//if arg0 != VOID
-			EnemyPoolElement* e = new EnemyPoolElement(enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->enemy, PatternType::NoMovePattern);
+			EnemyPoolElement* e = new EnemyPoolElement(enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->enemy, EnemyClass::ENEMYPOOL_ALPHA,PatternType::NoMovePattern);
+			
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
 
 			cluster.push_back(e);

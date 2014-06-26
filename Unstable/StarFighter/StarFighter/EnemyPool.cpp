@@ -2,9 +2,10 @@
 
 extern Game* CurrentGame;
 
-EnemyPoolElement::EnemyPoolElement (Enemy* m_enemy, PatternType m_movepatternType)
+EnemyPoolElement::EnemyPoolElement (Enemy* m_enemy, EnemyClass m_enemy_class, PatternType m_movepatternType)
 {
 	this->enemy = m_enemy;
+	this->enemy_class = m_enemy_class;
 	this->movepatternType = m_movepatternType;
 }
 
@@ -30,11 +31,15 @@ void EnemyPool::CreateCluster()
 	int index = 0;
 	for (std::vector<EnemyPoolElement*>::iterator it = enemyCluster.begin() ; it != enemyCluster.end(); ++it)
 	{
-		Enemy* n = (*it)->enemy->Clone();
-		n->setVisible(true);
-		n->setPosition(sf::Vector2f(this->position.x + (index % nb_rows)*xspread, this->position.y + (floor(index / nb_rows)-1)*yspread));
+		if ( (*(*it)).enemy_class != EnemyClass::ENEMYPOOL_VOID)
+		{
+			Enemy* n = (*it)->enemy->Clone();
+			n->setVisible(true);
+			n->setPosition(sf::Vector2f(this->position.x + (index % nb_rows)*xspread, this->position.y + (floor(index / nb_rows)-1)*yspread));
+			
+			(*CurrentGame).addToScene(n,LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
+		}
 		index++;
-		(*CurrentGame).addToScene(n,LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
 	}
 }
 
