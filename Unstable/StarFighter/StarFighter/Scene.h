@@ -127,9 +127,6 @@ enum EnemyPoolData
 	ENEMYPOOL_TRIGGERY_PATTERN,//6
 };
 
-
-
-
 enum FXData
 {
 	FX_TYPE,//0
@@ -144,9 +141,11 @@ enum FXData
 struct EnemyBase
 {
 	Enemy* enemy;
-	float probability;
+	int probability;
 	int poolsize;
 	int enemyclass;
+	int proba_min;//interval of dice roll values for a hit
+	int proba_max;
 };
 
 class Scene
@@ -170,7 +169,7 @@ public:
 
 private:
 	ShipConfig* Scene::LoadShipConfig(string name);
-	EnemyBase*  Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass);
+	EnemyBase*  Scene::LoadEnemy(string name, int probability, int poolSize, int enemyClass);
 	EnemyPool*  Scene::LoadEnemyPool(string name);
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
@@ -180,6 +179,7 @@ private:
 	Ship* playerShip;
 	list<EnemyBase> enemies;
 	list<EnemyBase> enemies_ranked_by_class[NBVAL_EnemyClass];
+	int total_class_probability[NBVAL_EnemyClass];
 	list<vector<string>> config;
 	list<vector<string>> enemyConfig;
 	list<vector<string>> weaponConfig;

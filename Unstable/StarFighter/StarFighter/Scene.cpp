@@ -10,6 +10,10 @@ void Scene::LoadSceneFromFile(string name)
 	scrolling_direction.y = 1;
 	vspeed = + 10;
 	hazard_break_value = 0;
+	for (int i=0; i<EnemyClass::NBVAL_EnemyClass;i++)
+	{
+		this->total_class_probability[i] = 0;
+	}
 	try {
 
 		this->config = *(FileLoader(name));
@@ -20,6 +24,7 @@ void Scene::LoadSceneFromFile(string name)
 		this->FXConfig = *(FileLoader(FX_FILE));
 		this->shipConfig = *(FileLoader(SHIP_FILE));
 
+		int p = 0;
 		//enemies
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
@@ -37,11 +42,19 @@ void Scene::LoadSceneFromFile(string name)
 
 			if((*it)[0].compare("enemy") == 0)
 			{
-				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],atof((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
-				//legacy, to delete when pools are done
-				this->enemies.push_back(*e);
+
+				//giving intervall of hit values for dice rolls
+				p++;
+				e->proba_min = p;
+				p += (e->probability - 1);
+				e->proba_max = p;
+				this->total_class_probability[e->enemyclass] = e->proba_max;
+				
+				this->enemies.push_back(*e);//legacy, to delete when pools are done ?
 				this->enemies_ranked_by_class[e->enemyclass].push_back(*e);
+				//hazard value automatic calculation
 				hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
 			}
 			printf("Hazard Break to reach: %d\n", hazard_break_value);
@@ -245,7 +258,7 @@ EnemyPool* Scene::LoadEnemyPool(string name)
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPool '%s'. Please check the config file",name));
 }
 
-EnemyBase* Scene::LoadEnemy(string name, float probability, int poolSize, int enemyClass)
+EnemyBase* Scene::LoadEnemy(string name, int probability, int poolSize, int enemyClass)
 {
 	for (std::list<vector<string>>::iterator it = (this->enemyConfig).begin(); it != (this->enemyConfig).end(); it++)
 	{
@@ -372,15 +385,36 @@ void Scene::GenerateEnemies(Time deltaTime)
 		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
 		// liste de patterns associés : 0, 0, 0, 0, 0, 
 
-		vector<EnemyPoolElement*> cluster;
+		//chosing a random enemy within a class of enemies
+		Enemy* random_enemy_within_class[EnemyClass::NBVAL_EnemyClass];
+		
+		
+		int dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA]))+1;
+		
+		//for (int i=0; i<EnemyClass::NBVAL_EnemyClass; i++)
+		for (int i=0; i<EnemyClass::NBVAL_EnemyClass; i++)
+		{
+			if (i==1) printf("dice roll: %d\n", dice_roll);
+			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin() ; it != enemies_ranked_by_class[i].end(); ++it)
+			{
+				if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
+				{
+					random_enemy_within_class[i] = (*it).enemy;
+					printf("fork hit: %d - %d\n", (*it).proba_min, (*it).proba_max);
+				}
+			}
+		}
+		
 
+		//preparing the list of enemies to put in the cluster
+		vector<EnemyPoolElement*> cluster;
 		for (int i=0 ; i< nb_rows*nb_lines; i++)
 		{
 			//VALEURS A CONF EN .CSV
 			// arg0 = enemy class
-			// arg1 = move pattern 
+			// arg1 = move pattern
 			//if arg0 != VOID
-			EnemyPoolElement* e = new EnemyPoolElement(enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->enemy, EnemyClass::ENEMYPOOL_ALPHA,PatternType::NoMovePattern);
+			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[EnemyClass::ENEMYPOOL_ALPHA], EnemyClass::ENEMYPOOL_ALPHA,PatternType::NoMovePattern);
 			
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
 
