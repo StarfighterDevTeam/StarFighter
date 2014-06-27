@@ -27,7 +27,8 @@ struct Weapon : public sf::Sprite
 	void Fire(IndependantType m_collider_type);
 
 	void CreateBullet(IndependantType m_collider_type, float offsetX=0, float dispersion=0);
-
+	bool isFireReady();
+	void FireSingleShot(IndependantType m_collider_type);
 	void FireMultiShot(IndependantType m_collider_type);
 	void FireAlternateShot(IndependantType m_collider_type);
 	sf::Vector2f AngleShot(float angle, float m_ref_speed);
@@ -43,6 +44,7 @@ struct Weapon : public sf::Sprite
 	int shot_index;
 	float angle;
 	float dispersion;
+
 	sf::Vector2f weaponOffset;
 
 	sf::Vector2f OffsetWeapon(float angle);

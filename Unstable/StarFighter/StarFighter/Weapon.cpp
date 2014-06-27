@@ -12,7 +12,6 @@ Weapon::Weapon(Ammo* Ammunition)
 	shot_index = 0;
 	angle = 0.f;
 	dispersion = 180.f;
-
 	firing_ready = true;
 
 	this->ammunition = Ammunition;
@@ -42,131 +41,124 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	(*CurrentGame).addToScene(bullet,LayerType::PlayerShipLayer, m_collider_type);
 }
 
-void Weapon::Fire(IndependantType m_collider_type)
+bool Weapon::isFireReady()
 {
-	if (multishot > 1)
+	if (alternate && multishot > 1)
 	{
-		if (!alternate)
-		{
-			FireMultiShot(m_collider_type);
-		}
-		else
-		{
-			FireAlternateShot(m_collider_type);
-		}	
-	}
-	else
-	{
-		if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
+		if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire / multishot))
 		{
 			firing_ready = true;
 		}
-
-		if (firing_ready)
-		{
-			CreateBullet(m_collider_type);
-
-			deltaClock.restart();
-			firing_ready = false;		
-		}
 	}
-}
 
-void Weapon::FireMultiShot(IndependantType m_collider_type)
-{
-	if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
+	else if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
 	{
 		firing_ready = true;
 	}
 
-	if (firing_ready)
-	{
-		if (multishot % 2 != 0) //case of an odd number of bullets
-		{
-			//central bullet
-			CreateBullet(m_collider_type, 0, angle);
+	return firing_ready;
+}
 
-			// the rest of the bullets are spread evenly on the left and right of the central bullet
-			if (multishot >1) 
+void Weapon::Fire(IndependantType m_collider_type)
+{
+	if (isFireReady())
+	{
+		if (multishot > 1)
+		{
+			if (!alternate)
 			{
-				for (int i=1 ; i < (((multishot-1)/2)+1) ; i++)
-				{
-					int s = 1;//used for symetry
-					for (int j=0 ; j<2 ; j++)//2 loops: j=1 and then j=-1
-					{
-						CreateBullet(m_collider_type, i*s*xspread, i*s*dispersion/2/((multishot-1)/2) +angle);
-						s = -s;
-					}
-				}
+				FireMultiShot(m_collider_type);
 			}
+			else
+			{
+				FireAlternateShot(m_collider_type);
+			}	
+		}
+		else
+		{
+			FireSingleShot(m_collider_type);
 		}
 
-		if (multishot % 2 == 0 && multishot != 0) //case of an even number of bullets
+		deltaClock.restart();
+		firing_ready = false;
+	}
+}
+
+void Weapon::FireSingleShot(IndependantType m_collider_type)
+{
+	CreateBullet(m_collider_type);
+}
+void Weapon::FireMultiShot(IndependantType m_collider_type)
+{
+	if (multishot % 2 != 0) //case of an odd number of bullets
+	{
+		//central bullet
+		CreateBullet(m_collider_type, 0, angle);
+
+		// the rest of the bullets are spread evenly on the left and right of the central bullet
+		if (multishot >1) 
 		{
-			for (int i=1 ; i < (((multishot-1)/2)+2) ; i++)
+			for (int i=1 ; i < (((multishot-1)/2)+1) ; i++)
 			{
 				int s = 1;//used for symetry
 				for (int j=0 ; j<2 ; j++)//2 loops: j=1 and then j=-1
 				{
-					CreateBullet(m_collider_type, (i*s*xspread) - (s*xspread/2), i*s*dispersion/(multishot-1) - s*(dispersion/(multishot-1)/2) +angle);
+					CreateBullet(m_collider_type, i*s*xspread, i*s*dispersion/2/((multishot-1)/2) +angle);
 					s = -s;
 				}
 			}
 		}
-
-
-		deltaClock.restart();
-		firing_ready = false;		
 	}
+
+	if (multishot % 2 == 0 && multishot != 0) //case of an even number of bullets
+	{
+		for (int i=1 ; i < (((multishot-1)/2)+2) ; i++)
+		{
+			int s = 1;//used for symetry
+			for (int j=0 ; j<2 ; j++)//2 loops: j=1 and then j=-1
+			{
+				CreateBullet(m_collider_type, (i*s*xspread) - (s*xspread/2), i*s*dispersion/(multishot-1) - s*(dispersion/(multishot-1)/2) +angle);
+				s = -s;
+			}
+		}
+	}	
 }
 
 void Weapon::FireAlternateShot(IndependantType m_collider_type)
 {
-	if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire / multishot))
+	if (multishot % 2 != 0) //case of an odd number of bullets
 	{
-		firing_ready = true;
-	}
-
-	if (firing_ready)
-	{
-		if (multishot % 2 != 0) //case of an odd number of bullets
+		if (shot_index % 2 != 0)
 		{
-			if (shot_index % 2 != 0)
-			{
-				//CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread);
-				CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread, - (((shot_index-1)/2)+1)*dispersion/2/((multishot-1)/2) +angle);
-			}
-			else
-			{
-				//CreateBullet(m_collider_type, (shot_index/2)*xspread);
-				CreateBullet(m_collider_type, (shot_index/2)*xspread, (shot_index/2)*dispersion/2/((multishot-1)/2) +angle);
-			}
+			//CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread);
+			CreateBullet(m_collider_type, - (((shot_index-1)/2)+1)*xspread, - (((shot_index-1)/2)+1)*dispersion/2/((multishot-1)/2) +angle);
 		}
-		
-
-		if (multishot % 2 == 0) //case of an even number of bullets
-		{
-			if (shot_index %2 !=0)
-			{
-				//CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2));
-				CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2), - ((shot_index/2)+1)*dispersion/(multishot-1) + dispersion/(multishot-1)/2 +angle);
-			}
-			else
-			{
-				//CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2));
-				CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2), ((shot_index/2)+1)*dispersion/(multishot-1) - (dispersion/(multishot-1)/2) +angle );
-			}
-			
-		}
-
-		if (shot_index < multishot-1)
-			shot_index++;
 		else
-			shot_index = 0;
-
-		deltaClock.restart();
-		firing_ready = false;		
+		{
+			//CreateBullet(m_collider_type, (shot_index/2)*xspread);
+			CreateBullet(m_collider_type, (shot_index/2)*xspread, (shot_index/2)*dispersion/2/((multishot-1)/2) +angle);
+		}
 	}
+
+	if (multishot % 2 == 0) //case of an even number of bullets
+	{
+		if (shot_index %2 !=0)
+		{
+			//CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2));
+			CreateBullet(m_collider_type, - (((shot_index/2)+1)*xspread) + (xspread/2), - ((shot_index/2)+1)*dispersion/(multishot-1) + dispersion/(multishot-1)/2 +angle);
+		}
+		else
+		{
+			//CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2));
+			CreateBullet(m_collider_type,(((shot_index/2)+1)*xspread) - (xspread/2), ((shot_index/2)+1)*dispersion/(multishot-1) - (dispersion/(multishot-1)/2) +angle );
+		}
+
+	}
+
+	if (shot_index < multishot-1)
+		shot_index++;
+	else
+		shot_index = 0;	
 }
 
 sf::Vector2f Weapon::AngleShot(float angle, float m_ref_speed)
@@ -195,39 +187,39 @@ Weapon* Weapon::Clone()
 sf::Vector2f Weapon::OffsetWeapon(float angle)
 {
 	//default values
-	
+
 	float x = 0;
 	float y = - this->weaponOffset.x;
 	/*
 	if (angle >= -45.f && angle <= 45.f)
 	{
-		x = - weaponOffset.y * tan(angle);
-		y = - weaponOffset.y;
-		printf("OFFSET BONUS X, Y:%f, %f\n",x, y);
+	x = - weaponOffset.y * tan(angle);
+	y = - weaponOffset.y;
+	printf("OFFSET BONUS X, Y:%f, %f\n",x, y);
 	}
 
 	if (angle > 45.f && angle <= 135.f)
 	{
-		x = weaponOffset.x;
-		y = - weaponOffset.x * tan(angle-45);
+	x = weaponOffset.x;
+	y = - weaponOffset.x * tan(angle-45);
 	}
 
 	if (angle > 135.f && angle <= 180.f)
 	{
-		x = - weaponOffset.y * tan(angle-135);
-		y = + weaponOffset.y;
+	x = - weaponOffset.y * tan(angle-135);
+	y = + weaponOffset.y;
 	}
 
 	if (angle >= -135.f && angle <= -45.f)
 	{
-		x = - weaponOffset.x;
-		y = + weaponOffset.x * tan(angle+45);;
+	x = - weaponOffset.x;
+	y = + weaponOffset.x * tan(angle+45);;
 	}
 
 	if (angle > -180.f && angle < -135.f)
 	{
-		x = - weaponOffset.y * tan(angle+135);
-		y = + weaponOffset.y;
+	x = - weaponOffset.y * tan(angle+135);
+	y = + weaponOffset.y;
 	}*/
 
 	return sf::Vector2f(x,y);
