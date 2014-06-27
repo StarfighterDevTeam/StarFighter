@@ -391,16 +391,13 @@ void Scene::GenerateEnemies(Time deltaTime)
 		
 		int dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA]))+1;
 		
-		//for (int i=0; i<EnemyClass::NBVAL_EnemyClass; i++)
 		for (int i=0; i<EnemyClass::NBVAL_EnemyClass; i++)
 		{
-			if (i==1) printf("dice roll: %d\n", dice_roll);
 			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin() ; it != enemies_ranked_by_class[i].end(); ++it)
 			{
 				if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
 				{
 					random_enemy_within_class[i] = (*it).enemy;
-					printf("fork hit: %d - %d\n", (*it).proba_min, (*it).proba_max);
 				}
 			}
 		}
