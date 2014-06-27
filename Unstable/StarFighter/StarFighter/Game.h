@@ -12,6 +12,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+class Ship;
+
 #define LOOT_SPEED_Y		100.f
 
 using namespace sf;
@@ -43,6 +45,7 @@ public:
 	void resetHazard(int hazard_overkill = 0);
 
 private:
+	Ship* playerShip;
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	Clock sceneChronometer;
 	float movementClock;

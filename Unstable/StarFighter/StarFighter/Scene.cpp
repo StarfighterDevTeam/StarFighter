@@ -374,7 +374,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		
 
 		//preparing the list of enemies to put in the cluster
-		vector<EnemyPoolElement*> cluster;
+		vector<EnemyPoolElement*>* cluster = new vector<EnemyPoolElement*>;
 		for (int i=0 ; i< nb_rows*nb_lines; i++)
 		{
 			//VALEURS A CONF EN .CSV
@@ -385,7 +385,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 			
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
 
-			cluster.push_back(e);
+			cluster->push_back(e);
 		}
 		
 		int size_x = (int)((nb_rows+1) * xspread);//let's take some margin : +1 row

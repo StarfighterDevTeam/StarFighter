@@ -30,7 +30,7 @@ struct EnemyPoolElement
 struct EnemyPool
 {
 public:
-	EnemyPool(sf::Vector2f m_position, int m_nb_lines, int m_nb_rows, float m_xspread, float m_yspread, std::vector<EnemyPoolElement*> m_enemyCluster);
+	EnemyPool(sf::Vector2f m_position, int m_nb_lines, int m_nb_rows, float m_xspread, float m_yspread, std::vector<EnemyPoolElement*>* m_enemyCluster);
 
 	int nb_lines;
 	int nb_rows;
@@ -45,7 +45,7 @@ private:
 	sf::Vector2f size;
 	sf::Vector2f position;
 	sf::Vector2f speed;
-	std::vector<EnemyPoolElement*> enemyCluster;
+	std::vector<EnemyPoolElement*>* enemyCluster;
 
 	
 };

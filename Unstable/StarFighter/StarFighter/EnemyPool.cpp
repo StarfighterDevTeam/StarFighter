@@ -10,18 +10,19 @@ EnemyPoolElement::EnemyPoolElement (Enemy* m_enemy, EnemyClass m_enemy_class, Pa
 }
 
 
-EnemyPool::EnemyPool(sf::Vector2f m_position, int m_nb_lines, int m_nb_rows, float m_xspread, float m_yspread, std::vector<EnemyPoolElement*> m_enemyCluster)
+EnemyPool::EnemyPool(sf::Vector2f m_position, int m_nb_lines, int m_nb_rows, float m_xspread, float m_yspread, std::vector<EnemyPoolElement*>* m_enemyCluster)
 {
 	this->position = m_position;
 	this->nb_lines = m_nb_lines;
 	this->nb_rows = m_nb_rows;
 	this->xspread = m_xspread;
 	this->yspread = m_yspread;
+	this->enemyCluster = new std::vector<EnemyPoolElement*>;
 	this->enemyCluster = m_enemyCluster;
 
 	this->size.x = nb_rows * xspread;
 	this->size.y = nb_lines * yspread;
-	this->speed = m_enemyCluster.front()->enemy->speed;
+	this->speed = m_enemyCluster->front()->enemy->speed;
 
 	EnemyPool::CreateCluster();
 };
@@ -29,7 +30,7 @@ EnemyPool::EnemyPool(sf::Vector2f m_position, int m_nb_lines, int m_nb_rows, flo
 void EnemyPool::CreateCluster()
 {
 	int index = 0;
-	for (std::vector<EnemyPoolElement*>::iterator it = enemyCluster.begin() ; it != enemyCluster.end(); ++it)
+	for (std::vector<EnemyPoolElement*>::iterator it = enemyCluster->begin() ; it != enemyCluster->end(); ++it)
 	{
 		if ( (*(*it)).enemy_class != EnemyClass::ENEMYPOOL_VOID)
 		{
