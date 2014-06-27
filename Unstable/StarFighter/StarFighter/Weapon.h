@@ -20,6 +20,8 @@ enum WeaponType {
 
 struct Weapon : public sf::Sprite
 {
+
+public:
 	Weapon(Ammo* Ammunition);
 
 	sf::Vector2f speed;
@@ -27,7 +29,7 @@ struct Weapon : public sf::Sprite
 	void Fire(IndependantType m_collider_type);
 
 	void CreateBullet(IndependantType m_collider_type, float offsetX=0, float dispersion=0);
-	bool isFireReady();
+	bool isFiringReady();
 	void FireSingleShot(IndependantType m_collider_type);
 	void FireMultiShot(IndependantType m_collider_type);
 	void FireAlternateShot(IndependantType m_collider_type);
@@ -44,6 +46,9 @@ struct Weapon : public sf::Sprite
 	int shot_index;
 	float angle;
 	float dispersion;
+	int rafale;
+	int rafale_index;
+	float rafale_cooldown;
 
 	sf::Vector2f weaponOffset;
 

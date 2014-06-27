@@ -298,6 +298,9 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
 			weapon->alternate = (bool)(stoi((*it)[WeaponData::WEAPON_ALTERNATE]));
 			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
+			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
+			if (weapon->rafale != 0)
+				weapon->rafale_cooldown = stoi((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN]);
 
 			return weapon;
 		}
@@ -346,9 +349,9 @@ void Scene::GenerateEnemies(Time deltaTime)
 		double random_number = ((double) rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
-		int nb_rows = 4;
-		int nb_lines = 4;
-		float xspread = 50;
+		int nb_rows = 3;
+		int nb_lines = 2;
+		float xspread = 200;
 		float yspread = 50;
 		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
 		// liste de patterns associés : 0, 0, 0, 0, 0, 
@@ -358,7 +361,6 @@ void Scene::GenerateEnemies(Time deltaTime)
 		
 		
 		int dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA]))+1;
-		
 		for (int i=0; i<EnemyClass::NBVAL_EnemyClass; i++)
 		{
 			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin() ; it != enemies_ranked_by_class[i].end(); ++it)
@@ -388,6 +390,9 @@ void Scene::GenerateEnemies(Time deltaTime)
 		
 		int size_x = (int)((nb_rows+1) * xspread);//let's take some margin : +1 row
 		float size_y = (nb_lines+1) * yspread;//let's take some margin : +1 line
+		if (size_x >= WINDOW_RESOLUTION_X) size_x = WINDOW_RESOLUTION_X-1;//without this, rand() % WINDOW_RESOLUTION_X - size_x may crash if size_x = WINDOW_RESOLUTION_X
+		if (size_y >= WINDOW_RESOLUTION_Y) size_y = WINDOW_RESOLUTION_Y-1;
+
 		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (WINDOW_RESOLUTION_X - size_x), - size_y), nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP

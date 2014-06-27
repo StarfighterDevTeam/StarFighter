@@ -13,6 +13,9 @@ Weapon::Weapon(Ammo* Ammunition)
 	angle = 0.f;
 	dispersion = 180.f;
 	firing_ready = true;
+	rafale_cooldown = 0.8f;
+	rafale = 5;
+	rafale_index = 0;
 
 	this->ammunition = Ammunition;
 }
@@ -41,27 +44,49 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	(*CurrentGame).addToScene(bullet,LayerType::PlayerShipLayer, m_collider_type);
 }
 
-bool Weapon::isFireReady()
+bool Weapon::isFiringReady()
 {
-	if (alternate && multishot > 1)
+	if (rafale > 0 && deltaClock.getElapsedTime() > sf::seconds(rafale_cooldown))//if you wait long enough, you can reset your rafale
 	{
-		if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire / multishot))
+		firing_ready = true;
+		rafale_index = 0;
+		shot_index = 0;
+	}
+
+	if (rafale > 0 && rafale_index > rafale-1)
+	{
+		if (deltaClock.getElapsedTime() > sf::seconds(rafale_cooldown))
+		{
+			firing_ready = true;
+			rafale_index = 0;
+		}
+	}
+	else
+	{
+		if (alternate && multishot > 1)
+		{
+			if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire / multishot))
+			{
+				firing_ready = true;
+				
+			}
+		}
+
+		else if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
 		{
 			firing_ready = true;
 		}
 	}
 
-	else if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
-	{
-		firing_ready = true;
-	}
+	
+
 
 	return firing_ready;
 }
 
 void Weapon::Fire(IndependantType m_collider_type)
 {
-	if (isFireReady())
+	if (isFiringReady())
 	{
 		if (multishot > 1)
 		{
@@ -81,6 +106,9 @@ void Weapon::Fire(IndependantType m_collider_type)
 
 		deltaClock.restart();
 		firing_ready = false;
+
+		if (rafale > 0 && shot_index == 0)
+			rafale_index++;
 	}
 }
 
@@ -158,7 +186,11 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 	if (shot_index < multishot-1)
 		shot_index++;
 	else
+	{
 		shot_index = 0;	
+		printf("lol\n");
+	}
+
 }
 
 sf::Vector2f Weapon::AngleShot(float angle, float m_ref_speed)
@@ -179,6 +211,8 @@ Weapon* Weapon::Clone()
 	weapon->xspread = this->xspread;
 	weapon->alternate = this->alternate;
 	weapon->dispersion = this->dispersion;
+	weapon->rafale = this->rafale;
+	weapon->rafale_cooldown = this->rafale_cooldown;
 
 	return weapon;
 }
