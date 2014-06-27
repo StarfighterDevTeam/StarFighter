@@ -19,6 +19,7 @@
 #include "Logger.h"
 #include "MovePattern.h"
 #include "EnemyPool.h"
+#include "FileLoadUtils.h"
 
 #define LOGGER_START(MIN_PRIORITY, FILE) Logger::Start(MIN_PRIORITY, FILE);
 #define LOGGER_STOP() Logger::Stop();

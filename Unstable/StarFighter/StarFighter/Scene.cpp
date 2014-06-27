@@ -16,13 +16,13 @@ void Scene::LoadSceneFromFile(string name)
 	}
 	try {
 
-		this->config = *(FileLoader(name));
-		this->enemyConfig = *(FileLoader(ENEMY_FILE));
-		this->weaponConfig = *(FileLoader(WEAPON_FILE));
-		this->ammoConfig = *(FileLoader(AMMO_FILE));
-		this->enemypoolConfig = *(FileLoader(ENEMYPOOL_FILE));
-		this->FXConfig = *(FileLoader(FX_FILE));
-		this->shipConfig = *(FileLoader(SHIP_FILE));
+		this->config = *(FileLoaderUtils::FileLoader(name));
+		this->enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
+		this->weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
+		this->ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
+		this->enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
+		this->FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
+		this->shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
 
 		int p = 0;
 		//enemies
@@ -99,7 +99,7 @@ Scene::Scene(string name)
 
 	try 
 	{
-		this->shipConfig = *(FileLoader(SHIP_FILE));
+		this->shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
 
 		//Loading font for framerate
 		//TODO : refactor this
@@ -332,38 +332,6 @@ FX* Scene::LoadFX(string name)
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file",name));
 
-}
-
-list<vector<string>>* Scene::FileLoader(string name)
-{
-
-	list<vector<string>>* fileConfig = new list<vector<string>>;
-
-	std::ifstream  data(name);
-
-	std::string line;
-	while(std::getline(data,line))
-	{
-
-		std::stringstream  lineStream(line);
-		std::string        cell;
-
-		std::vector<string> parameters;
-		while(std::getline(lineStream,cell,','))
-		{
-			if(cell[0] == '#')
-				goto loop_end;
-
-			parameters.push_back(cell);
-		}
-
-		//TODO: check if not empty
-		fileConfig->push_back(parameters);
-loop_end:;
-	}
-	data.close();
-
-	return fileConfig;
 }
 
 void Scene::GenerateEnemies(Time deltaTime)

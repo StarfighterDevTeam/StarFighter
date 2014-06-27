@@ -9,6 +9,7 @@
 #include "Enemy.h"
 #include "Ship.h"
 #include "EnemyPool.h"
+#include "FileLoadUtils.h"
 
 using namespace std;
 
@@ -174,7 +175,6 @@ private:
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
 	FX* Scene::LoadFX(string name);
-	list<vector<string>>* Scene::FileLoader(string name);
 
 	Ship* playerShip;
 	list<EnemyBase> enemies;
