@@ -188,7 +188,6 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 	else
 	{
 		shot_index = 0;	
-		printf("lol\n");
 	}
 
 }
