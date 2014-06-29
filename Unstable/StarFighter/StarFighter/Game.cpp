@@ -77,8 +77,6 @@ void Game::drawScene()
 				this->window->draw((*(*it)));
 		}
 	}
-	//window->draw(ship_hud->armorBar);
-	//window->draw(ship_hud->shieldBar);
 }
 
 void Game::colisionChecksV2()
@@ -100,7 +98,7 @@ void Game::colisionChecksV2()
 				if((*it2)->collider_type == EnemyFire)
 				{
 					(*it2)->setVisible(false);
-					this->garbage.push_back(*it2);
+					(*it2)->GarbageMe = true;
 
 					//Do something (like, kill ship) -> OK
 					(*it1)->damage_from(*(*it2));
@@ -116,7 +114,6 @@ void Game::colisionChecksV2()
 						//we all deserve another chance...
 						(*it1)->Respawn();
 						hazard = 0;
-						//this->garbage.push_back(*it1);
 					}
 				}
 			}
@@ -143,7 +140,6 @@ void Game::colisionChecksV2()
 					//we all deserve another chance...
 					(*it1)->Respawn();
 					hazard = 0;
-					//this->garbage.push_back(*it1);
 				}
 
 
@@ -160,7 +156,7 @@ void Game::colisionChecksV2()
 				(*it1)->get_money_from(*(*it2));
 				(*it2)->setVisible(false);
 				(*it2)->isOnScene = false;
-				this->garbage.push_back(*it2);
+				(*it2)->GarbageMe = true;
 			}
 		}
 	}
@@ -178,7 +174,7 @@ void Game::colisionChecksV2()
 				if((*it2)->collider_type == FriendlyFire)
 				{
 					(*it2)->setVisible(false);
-					this->garbage.push_back(*it2);
+					(*it2)->GarbageMe = true;
 
 					//Do something (like, kill the enemy ship ?)
 					(*it1)->damage_from(*(*it2));
@@ -201,7 +197,7 @@ void Game::colisionChecksV2()
 						hazard += (*it1)->getMoney();
 						loot->get_money_from(*(*it1));
 						//sent to garbage collector
-						this->garbage.push_back(*it1);
+						(*it1)->GarbageMe = true;
 
 					}
 
@@ -209,6 +205,7 @@ void Game::colisionChecksV2()
 			}
 		}
 	}
+	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
 void Game::cleanGarbage()
@@ -228,9 +225,8 @@ void Game::cleanGarbage()
 			(*(this->sceneIndependantsTyped[i])).remove(*it);
 		}
 		(*it)->~Independant();
+		free(*it);
 	}
-
-	this->garbage.clear();
 
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
@@ -240,8 +236,16 @@ void Game::collectGarbage()
 	sf::Clock dt;
 	dt.restart();
 
+	this->garbage.clear();
+
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
+		//Content flagged for deletion
+		if((*it)->GarbageMe)
+		{
+			this->garbage.push_back(*it);
+			continue;
+		}
 
 		if(!(**it).isOnScene)
 		{
@@ -249,11 +253,11 @@ void Game::collectGarbage()
 			if ((**it).collider_type == IndependantType::LootObject || (**it).collider_type == IndependantType::Neutral)
 			{
 				this->garbage.push_back(*it);
-			}
-
-			//out of screen objets
+				continue;
+			}			
 			else
 			{
+				//out of screen objets
 				if(((**it).getPosition().x + ((**it).m_size.x)/2 >= 0 && (**it).getPosition().x - ((**it).m_size.x)/2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y)/2 >= 0 && (**it).getPosition().y - ((**it).m_size.y)/2 <= SCENE_SIZE_Y))
 				{
 					(**it).isOnScene = true;
@@ -274,6 +278,8 @@ void Game::collectGarbage()
 			continue;
 		}
 	}
+
+	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
 }
 

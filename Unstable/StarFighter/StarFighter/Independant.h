@@ -35,6 +35,7 @@ public:
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
 	bool isOnScene;
+	bool GarbageMe;
 	IndependantType collider_type;
 	void setVisible(bool visible);
 	virtual void damage_from (Independant& independant);

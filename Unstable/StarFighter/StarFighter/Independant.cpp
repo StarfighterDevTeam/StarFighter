@@ -51,6 +51,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->isOnScene = false;
 	this->immune = false;
 	this->startPattern = false;
+	this->GarbageMe = false;
 	money=0;
 }
 
@@ -69,7 +70,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 Independant::~Independant()
 {
-	//Unload Texture
+	//todo ?
 
 }
 
