@@ -1,4 +1,4 @@
-bg,Assets/2D/background.png,800,1800,
+bg,Assets/2D/Snow_background.jpg,800,1600,
 hub,Assets/2D/HUB_debug.png,800,600,
 #,enemies_name,probability,pool_size,enemy_class
 enemy,robert,2,20,1

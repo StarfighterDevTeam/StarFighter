@@ -341,7 +341,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if(timer > 3)
+	if(timer > 4)
 	{
 		double intpart;
 		timer = modf (timer, &intpart);
@@ -349,10 +349,10 @@ void Scene::GenerateEnemies(Time deltaTime)
 		double random_number = ((double) rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
-		int nb_rows = 3;
-		int nb_lines = 2;
-		float xspread = 200;
-		float yspread = 50;
+		int nb_rows = 4;
+		int nb_lines = 1;
+		float xspread = 150;
+		float yspread = 100;
 		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
 		// liste de patterns associés : 0, 0, 0, 0, 0, 
 
@@ -388,8 +388,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 			cluster->push_back(e);
 		}
 		
-		int size_x = (int)((nb_rows+1) * xspread);//let's take some margin : +1 row
-		float size_y = (nb_lines+1) * yspread;//let's take some margin : +1 line
+		int size_x = (int)((nb_rows) * xspread);//let's take some margin : +1 row
+		float size_y = (nb_lines) * yspread;//let's take some margin : +1 line
 		if (size_x >= WINDOW_RESOLUTION_X) size_x = WINDOW_RESOLUTION_X-1;//without this, rand() % WINDOW_RESOLUTION_X - size_x may crash if size_x = WINDOW_RESOLUTION_X
 		if (size_y >= WINDOW_RESOLUTION_Y) size_y = WINDOW_RESOLUTION_Y-1;
 
