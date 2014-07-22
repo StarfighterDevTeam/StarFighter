@@ -15,15 +15,25 @@ public:
 		if (!independantA->isOnScene || !(independantB->isOnScene))
 			return false;
 
-		// Preliminary test : are the two sprites even aligned ?
+		
 		float x = independantB->getPosition().x;
 		float y = independantB->getPosition().y;
 
-		if (x - (independantB->m_size.x/2) > independantA->getPosition().x + (independantA->m_size.x/2)
+
+
+		//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
+		if ((pow((independantA->getPosition().x - independantB->getPosition().x),2) + pow((independantA->getPosition().y - independantB->getPosition().y),2)) 
+			> pow(independantA->diag + independantB->diag,2))
+			return false;
+			
+		//alignement check
+		/*if (x - (independantB->m_size.x/2) > independantA->getPosition().x + (independantA->m_size.x/2)
 			|| x + (independantB->m_size.x/2) < independantA->getPosition().x - (independantA->m_size.x/2)
 			|| y + (independantB->m_size.y/2) < independantA->getPosition().y - (independantA->m_size.y/2)
 			|| y - (independantB->m_size.y/2) > independantA->getPosition().y + (independantA->m_size.y/2))
 			return false;                        
+
+		*/
 
 		// Second test : are the corners included in the other sprite, or vice versa ?
 		else

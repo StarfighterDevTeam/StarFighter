@@ -64,6 +64,7 @@ public:
 	int shield_regen;
 	sf::Vector2f speed;
 	PatternBobby Pattern;
+	float diag;
 
 protected:
 	sf::Vector2f initial_position;

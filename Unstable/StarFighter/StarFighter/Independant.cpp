@@ -53,6 +53,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->startPattern = false;
 	this->GarbageMe = false;
 	money=0;
+	this->diag = sqrt(pow(m_size.x,2) + pow(m_size.y,2));
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber)
