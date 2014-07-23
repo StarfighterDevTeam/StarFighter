@@ -52,6 +52,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->immune = false;
 	this->startPattern = false;
 	this->GarbageMe = false;
+	this->DontGarbageMe = false;
 	money=0;
 	this->diag = sqrt(pow(m_size.x/2,2) + pow(m_size.y/2,2));
 }
@@ -84,6 +85,8 @@ void Independant::update(sf::Time deltaTime)
 	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
 	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 
+	//Case of following a target
+
 
 	//call bobbyPattern
 	offset = Pattern.GetOffset(deltaTime.asSeconds());
@@ -109,6 +112,11 @@ void Independant::Respawn()
 {
 
 }
+
+//void Independant::Follow(Independant* target)
+//{
+//	this->setPosition(target->getPosition().x, target->getPosition().x);
+//}
 
 void Independant::damage_from (Independant& independant)
 {

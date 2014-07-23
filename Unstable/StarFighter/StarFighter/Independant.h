@@ -36,6 +36,7 @@ public:
 	bool visible;
 	bool isOnScene;
 	bool GarbageMe;
+	bool DontGarbageMe;
 	IndependantType collider_type;
 	void setVisible(bool visible);
 	virtual void damage_from (Independant& independant);
@@ -65,6 +66,7 @@ public:
 	sf::Vector2f speed;
 	PatternBobby Pattern;
 	float diag;
+
 
 protected:
 	sf::Vector2f initial_position;

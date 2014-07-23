@@ -15,10 +15,8 @@ public:
 		if (!independantA->isOnScene || !(independantB->isOnScene))
 			return false;
 
-		
 		float x = independantB->getPosition().x;
 		float y = independantB->getPosition().y;
-
 
 
 		//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés

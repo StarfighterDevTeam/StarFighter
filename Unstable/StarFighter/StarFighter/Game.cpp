@@ -272,10 +272,14 @@ void Game::collectGarbage()
 		}
 
 		//Out of scene content
-		if((**it).getPosition().x < 0 + ((**it).m_size.x)/2 < 0 ||  (**it).getPosition().x - ((**it).m_size.x)/2 > SCENE_SIZE_X ||(**it).getPosition().y + ((**it).m_size.y)/2 < 0 || (**it).getPosition().y - ((**it).m_size.y)/2 > SCENE_SIZE_Y)
+		if (!(**it).DontGarbageMe)
 		{
-			this->garbage.push_back(*it);
-			continue;
+			if((**it).getPosition().x < 0 + ((**it).m_size.x)/2 < 0 ||  (**it).getPosition().x - ((**it).m_size.x)/2 > SCENE_SIZE_X ||(**it).getPosition().y + ((**it).m_size.y)/2 < 0 || (**it).getPosition().y - ((**it).m_size.y)/2 > SCENE_SIZE_Y)
+			{
+			
+				this->garbage.push_back(*it);
+				continue;
+			}
 		}
 	}
 

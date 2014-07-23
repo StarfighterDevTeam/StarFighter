@@ -63,9 +63,11 @@ void Ammo::update(sf::Time deltaTime)
 	
 	//float x = this->getPosition().x + ref_speed * cos (a) *deltaTime.asSeconds();
 	//float y = this->getPosition().y + ref_speed * sin (a) *deltaTime.asSeconds();
-	float x = this->getPosition().x + speed.x*deltaTime.asSeconds();
-	float y = this->getPosition().y + speed.y*deltaTime.asSeconds();
-	this->setPosition(x,y);
+	//float x = this->getPosition().x + speed.x*deltaTime.asSeconds();
+	//float y = this->getPosition().y + speed.y*deltaTime.asSeconds();
+	//this->setPosition(x,y);
+	//
+	//AnimatedSprite::update(deltaTime);
 
-	AnimatedSprite::update(deltaTime);
+	Independant::update(deltaTime);
 }

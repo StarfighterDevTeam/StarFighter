@@ -11,6 +11,8 @@
 #include "Independant.h"
 #include "InputGuy.h"
 #include <cmath>
+#include "Bot.h"
+#include "PatternBobby.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0

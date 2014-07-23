@@ -57,5 +57,4 @@ public:
 	Weapon* Clone();
 };
 
-
 #endif // WEAPON_H_INCLUDED

@@ -142,6 +142,8 @@ Scene::Scene(string name)
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
 	this->playerShip = new Ship(Vector2f(WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO,WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
+
+	
 }
 
 void Scene::StartGame(sf::RenderWindow*	window)
@@ -157,6 +159,15 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 	//ship
 	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
+
+	//AJOUT DE BOTS HARDCODES POUR LE LOL
+	Bot* gerard = new Bot ((Independant*)playerShip, LoadWeapon("laser_bot", -1, LoadAmmo("laser_beam")), sf::Vector2f (0,0), "Assets/2D/laser_red.png", sf::Vector2f (64,64));
+	//Pattern definition snipet
+	vector<float>* v = new vector<float>;
+	v->push_back(500); // rayon 60px
+	v->push_back(1);  // clockwise (>)
+	gerard->Pattern.SetPattern(PatternType::Circle_,350,v); //vitesse angulaire (degres/s)
+	(*CurrentGame).addToScene(gerard,LayerType::BotLayer, IndependantType::Neutral);
 
 }
 

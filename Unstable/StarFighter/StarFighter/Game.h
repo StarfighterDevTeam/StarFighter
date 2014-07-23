@@ -21,8 +21,9 @@ using namespace sf;
 enum LayerType {
 	BackgroundLayer,
 	ExplosionLayer,
-	PlayerShipLayer,
 	FriendlyFireLayer,
+	BotLayer,
+	PlayerShipLayer,
 	EnemyFireLayer,
 	EnemyObjectLayer,
 	NBVAL_Layer
