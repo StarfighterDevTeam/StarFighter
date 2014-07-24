@@ -72,7 +72,7 @@ void Scene::LoadSceneFromFile(string name)
 	hazardBar.setOutlineThickness(4);
 	hazardBar.setOutlineColor(sf::Color(255, 255, 255));
 	hazardBar.setOrigin(0, 0);
-	hazardBar.setPosition(760, 10);
+	hazardBar.setPosition(WINDOW_RESOLUTION_X-40, 10);
 
 	//hazardBarMax.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, hazard_break_value));
 	hazardBarMax.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
@@ -80,7 +80,7 @@ void Scene::LoadSceneFromFile(string name)
 	hazardBarMax.setOutlineThickness(4);
 	hazardBarMax.setOutlineColor(sf::Color(255, 255, 255));
 	hazardBarMax.setOrigin(0, 0);
-	hazardBarMax.setPosition(760, 10);
+	hazardBarMax.setPosition(WINDOW_RESOLUTION_X-40, 10);
 
 }
 
@@ -124,12 +124,12 @@ Scene::Scene(string name)
 		this->hazardBreakText = new sf::Text("Hazard\nBreak", *font2, 12);
 		this->hazardBreakText->setColor(sf::Color::Red);
 		this->hazardBreakText->setStyle(sf::Text::Bold);
-		this->hazardBreakText->setPosition(700,HAZARD_BAR_SIZE_Y+20);
+		this->hazardBreakText->setPosition(WINDOW_RESOLUTION_X-100,HAZARD_BAR_SIZE_Y+20);
 
 		this->hazardBreakScore = new sf::Text("", *font2, 15);
 		this->hazardBreakScore->setColor(sf::Color::Red);
 		this->hazardBreakScore->setStyle(sf::Text::Regular);
-		this->hazardBreakScore->setPosition(700,HAZARD_BAR_SIZE_Y+46);
+		this->hazardBreakScore->setPosition(SCENE_SIZE_X-100,HAZARD_BAR_SIZE_Y+46);
 	}
 
 	catch( const std::exception & ex ) 
@@ -141,7 +141,7 @@ Scene::Scene(string name)
 
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
-	this->playerShip = new Ship(Vector2f(WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO,WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
+	this->playerShip = new Ship(Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO,SCENE_SIZE_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
 
 	
 }
@@ -152,8 +152,8 @@ void Scene::StartGame(sf::RenderWindow*	window)
 	(*CurrentGame).init(window);
 
 	//bg
-	bg->setPosition(0,bg->getPosition().y + WINDOW_RESOLUTION_Y); // this is an exception for the 1st level of the game only
-	hub->setPosition(0,hub->getPosition().y + WINDOW_RESOLUTION_Y);
+	bg->setPosition(0,bg->getPosition().y + SCENE_SIZE_Y); // this is an exception for the 1st level of the game only
+	hub->setPosition(0,hub->getPosition().y + SCENE_SIZE_Y);
 	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
 	(*CurrentGame).addToScene(hub,LayerType::BackgroundLayer,IndependantType::Background);
 
@@ -401,10 +401,10 @@ void Scene::GenerateEnemies(Time deltaTime)
 		
 		int size_x = (int)((nb_rows+1) * xspread);//let's take some margin : +1 row
 		float size_y = (nb_lines+1) * yspread;//let's take some margin : +1 line
-		if (size_x >= WINDOW_RESOLUTION_X) size_x = WINDOW_RESOLUTION_X-1;//without this, rand() % WINDOW_RESOLUTION_X - size_x may crash if size_x = WINDOW_RESOLUTION_X
-		if (size_y >= WINDOW_RESOLUTION_Y) size_y = WINDOW_RESOLUTION_Y-1;
+		if (size_x >= SCENE_SIZE_X) size_x = SCENE_SIZE_X-1;//without this, rand() % SCENE_SIZE_X - size_x may crash if size_x = SCENE_SIZE_X
+		if (size_y >= SCENE_SIZE_Y) size_y = SCENE_SIZE_Y-1;
 
-		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (WINDOW_RESOLUTION_X - size_x), - size_y), nb_lines, nb_rows, xspread, yspread, cluster);
+		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (SCENE_SIZE_X - size_x), - size_y), nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP
 		/*
@@ -415,7 +415,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 				//spawn (where on screen ?)
 
 				Enemy* n = it->enemy->Clone();
-				n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
+				n->setPosition(rand() % SCENE_SIZE_X,-n->m_size.y*2);
 				n->setVisible(true);
 
 				//Pattern definition snipet
@@ -449,7 +449,7 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 		phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
 		phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
 		//to do better:
-		hub->setPosition(sf::Vector2f(bg->getPosition().x,bg->getPosition().y - WINDOW_RESOLUTION_Y));
+		hub->setPosition(sf::Vector2f(bg->getPosition().x,bg->getPosition().y - SCENE_SIZE_Y));
 
 	}
 
@@ -472,8 +472,8 @@ void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 		playerShip->setPosition(playerShip->getPosition().x, playerShip->ship_config.size.y);
 
 		//center the player at the required speed i.e. proportionally to the speed at which the background fades out
-		playerShip->speed.x = transition_DOWN * ((WINDOW_RESOLUTION_X/2) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
-		playerShip->speed.y = transition_DOWN * ((WINDOW_RESOLUTION_Y/2) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+		playerShip->speed.x = transition_DOWN * ((SCENE_SIZE_X/2) - playerShip->getPosition().x) / SCENE_SIZE_Y;
+		playerShip->speed.y = transition_DOWN * ((SCENE_SIZE_Y/2) - playerShip->getPosition().y) / SCENE_SIZE_Y;
 		phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = true;
 	}
 
@@ -497,10 +497,10 @@ void Scene::hubRoaming()
 		float x = playerShip->getPosition().x;
 		float y = playerShip->getPosition().y;
 
-		float X_min = WINDOW_RESOLUTION_X*HUB_EXIT_X_MIN_RATIO;
-		float X_max = WINDOW_RESOLUTION_X*HUB_EXIT_X_MAX_RATIO;
-		float Y_min = WINDOW_RESOLUTION_Y*HUB_EXIT_Y_MIN_RATIO;
-		float Y_max = WINDOW_RESOLUTION_Y*HUB_EXIT_Y_MAX_RATIO;
+		float X_min = SCENE_SIZE_X*HUB_EXIT_X_MIN_RATIO;
+		float X_max = SCENE_SIZE_X*HUB_EXIT_X_MAX_RATIO;
+		float Y_min = SCENE_SIZE_Y*HUB_EXIT_Y_MIN_RATIO;
+		float Y_max = SCENE_SIZE_Y*HUB_EXIT_Y_MAX_RATIO;
 
 		if ((x > X_min && x < X_max && y > Y_min && y < Y_max) || (x<X_min && y<Y_min) || (x<X_min && y >Y_max) || (x>X_max && y >Y_max) || (x>X_max && y <Y_min))
 		{
@@ -516,7 +516,7 @@ void Scene::hubRoaming()
 				//go UP
 				printf("DEBUG: Travel UP !\n");
 				this->transitionDestination = TransitionList::TRANSITION_UP;
-				bg->setPosition(sf::Vector2f(hub->getPosition().x,hub->getPosition().y - bg->m_size.y - WINDOW_RESOLUTION_Y));
+				bg->setPosition(sf::Vector2f(hub->getPosition().x,hub->getPosition().y - bg->m_size.y - SCENE_SIZE_Y));
 
 				phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
 				phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
@@ -573,15 +573,15 @@ void Scene::ExitHubTransition (float transition_speed_UP, float transition_speed
 		bg->setPosition(0, - bg->m_size.y);
 		bg->speed.y = transition_speed_DOWN;
 		hub->speed.y = transition_speed_DOWN;
-		//playerShip->speed.x = transition_speed_DOWN * ((WINDOW_RESOLUTION_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / WINDOW_RESOLUTION_Y;
-		playerShip->speed.y = transition_speed_DOWN * ((WINDOW_RESOLUTION_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / WINDOW_RESOLUTION_Y;
+		//playerShip->speed.x = transition_speed_DOWN * ((SCENE_SIZE_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / SCENE_SIZE_Y;
+		playerShip->speed.y = transition_speed_DOWN * ((SCENE_SIZE_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / SCENE_SIZE_Y;
 		phaseShifter[SceneBooleans::EXITHUB_PHASE2] = false;
 		phaseShifter[SceneBooleans::EXITHUB_PHASE3] = true;
 	}
 
-	if (!phaseShifter[SceneBooleans::EXITHUB_PHASE2] && phaseShifter[SceneBooleans::EXITHUB_PHASE3] && bg->getPosition().y > - bg->m_size.y + WINDOW_RESOLUTION_Y)
+	if (!phaseShifter[SceneBooleans::EXITHUB_PHASE2] && phaseShifter[SceneBooleans::EXITHUB_PHASE3] && bg->getPosition().y > - bg->m_size.y + SCENE_SIZE_Y)
 	{
-		bg->setPosition(0, - bg->m_size.y + WINDOW_RESOLUTION_Y);
+		bg->setPosition(0, - bg->m_size.y + SCENE_SIZE_Y);
 		bg->speed.y = vspeed;
 		hub->speed.y = vspeed;
 		phaseShifter[SceneBooleans::EXITHUB_PHASE3] = false;
@@ -630,20 +630,20 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)
 	if (scrolling_direction.y == -1)
 	{
 		x = position.x;
-		y = WINDOW_RESOLUTION_Y - position.y;
+		y = SCENE_SIZE_Y - position.y;
 	}
 
 	if (scrolling_direction.y == 0)
 	{
 		if (scrolling_direction.x == 1)
 		{
-			x = (WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y;
-			y = position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
+			x = (SCENE_SIZE_Y - position.y) * SCENE_SIZE_X/SCENE_SIZE_Y;
+			y = position.x * SCENE_SIZE_Y/SCENE_SIZE_X;
 		}
 		if (scrolling_direction.x == -1)
 		{
-			x= WINDOW_RESOLUTION_X - ((WINDOW_RESOLUTION_Y - position.y) * WINDOW_RESOLUTION_X/WINDOW_RESOLUTION_Y);
-			y= position.x * WINDOW_RESOLUTION_Y/WINDOW_RESOLUTION_X;
+			x= SCENE_SIZE_X - ((SCENE_SIZE_Y - position.y) * SCENE_SIZE_X/SCENE_SIZE_Y);
+			y= position.x * SCENE_SIZE_Y/SCENE_SIZE_X;
 		}
 	}
 

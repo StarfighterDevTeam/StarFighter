@@ -44,6 +44,7 @@ public:
 	bool isLastEnemyDead();
 	int getHazard();
 	void resetHazard(int hazard_overkill = 0);
+	sf::Vector2f scale_factor;
 
 private:
 	Ship* playerShip;

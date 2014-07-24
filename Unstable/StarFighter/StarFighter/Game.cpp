@@ -14,6 +14,8 @@ void Game::init(RenderWindow* window)
 {
 	this->window = window;
 	this->sceneChronometer.restart();
+	scale_factor.x = float(WINDOW_RESOLUTION_X)/float(REF_WINDOW_RESOLUTION_X);
+	scale_factor.y = float(WINDOW_RESOLUTION_Y)/float(REF_WINDOW_RESOLUTION_Y);
 
 	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
 	{
@@ -36,6 +38,9 @@ sf::RenderWindow* Game::getMainWindow()
 void Game::addToScene(Independant *object, int layer, IndependantType type)
 {
 	object->collider_type = type;
+
+	//Window resolution adjustements
+	//object->setScale(scale_factor.x, scale_factor.y);
 
 	if(layer >= 0 && layer < (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered)))
 	{
@@ -74,7 +79,9 @@ void Game::drawScene()
 		for (std::list<Independant*>::iterator it = (*(this->sceneIndependantsLayered[i])).begin(); it != (*(this->sceneIndependantsLayered[i])).end(); it++)
 		{
 			if((*(*it)).visible)
+			{
 				this->window->draw((*(*it)));
+			}
 		}
 	}
 }

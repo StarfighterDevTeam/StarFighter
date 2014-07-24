@@ -9,6 +9,8 @@
 #include "TextUtils.h"
 #include "Logger.h"
 
+#define	REF_WINDOW_RESOLUTION_X					800
+#define REF_WINDOW_RESOLUTION_Y					600
 
 #define	WINDOW_RESOLUTION_X						800
 #define WINDOW_RESOLUTION_Y						600

@@ -405,9 +405,9 @@ void Ship::update(sf::Time deltaTime)
 		speed.x = 0;
 	}
 
-	if (this->getPosition().x > WINDOW_RESOLUTION_X - (ship_config.size.x/2))
+	if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x/2))
 	{
-		this->setPosition(WINDOW_RESOLUTION_X-(ship_config.size.x/2), this->getPosition().y);
+		this->setPosition(SCENE_SIZE_X-(ship_config.size.x/2), this->getPosition().y);
 		speed.x = 0;
 	}
 
@@ -417,9 +417,9 @@ void Ship::update(sf::Time deltaTime)
 		speed.y = 0;
 	}
 
-	if (this->getPosition().y > WINDOW_RESOLUTION_Y-(ship_config.size.y/2))
+	if (this->getPosition().y > SCENE_SIZE_Y-(ship_config.size.y/2))
 	{
-		this->setPosition(this->getPosition().x, WINDOW_RESOLUTION_Y-(ship_config.size.y/2));
+		this->setPosition(this->getPosition().x, SCENE_SIZE_Y-(ship_config.size.y/2));
 		speed.y = 0;
 	}
 	
