@@ -6,7 +6,7 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen)
+ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -16,6 +16,9 @@ ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, floa
 	this->armor = m_armor;
 	this->shield = m_shield;
 	this->shield_regen = m_shield_regen;
+	this->textureName = m_textureName;
+	this->size = m_size;
+	this->frameNumber = m_frameNumber;
 }
 
 //various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
@@ -68,7 +71,7 @@ Equipment::Equipment()
 }
 
 
-void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size)
+void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -81,6 +84,7 @@ void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decc
 	this->size.x = m_size.x;
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
+	this->frameNumber = m_frameNumber;
 	this->equipmentType = m_equipmentType;
 }
 
@@ -119,49 +123,64 @@ int Equipment::getEquipmentShieldRegen()
 
 ShipConfig::ShipConfig()
 {
-		
-	this->ship_model = new ShipModel(sf::Vector2f (0,0), sf::Vector2f (0,0), 0.0f, 0, 0, 0);
+	this->ship_model = new ShipModel(sf::Vector2f (0,0), sf::Vector2f (0,0), 0.0f, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1);
 
-	for (int i=0; i<NBVAL_EQUIPMENT; i++)
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		Equipment* defaultEquipment = new Equipment();
-		defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME);
+		defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1);
 		this->equipment[i] = defaultEquipment;
 	}
-
-}
-
-void ShipConfig::Init(std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
-{
-	this->max_speed = getShipConfigMaxSpeed();
-	this->decceleration = getShipConfigDecceleration();
-	this->acceleration = getShipConfigAcceleration();
-	this->armor = getShipConfigArmor();
-	this->shield = getShipConfigShield();
-	this->shield_regen = getShipConfigShieldRegen();
-	this->size.x = m_size.x;
-	this->size.y = m_size.y;
-	this->textureName = m_textureName;
-	this->frameNumber = m_frameNumber;
 
 	Ammo* player_ammo;
 	player_ammo = new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(LASERBLUE_WIDTH,LASERBLUE_HEIGHT), 150, new FX(Vector2f(0,0), Vector2f(0,0), FX_EXPLOSION_FILENAME, Vector2f(FX_EXPLOSION_WIDTH,FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LITTLE_EXPLOSION_DURATION)));
 	weapon = new Weapon(player_ammo);
 	weapon->rate_of_fire = 0.2f;
 	weapon->fire_direction = sf::Vector2i(0, 1);
-
 }
 
-void ShipConfig::setEquipment(Equipment* m_equipment)
+void ShipConfig::Init()
 {
-	// TODO : pas exact, on peut avoir des types d'armes identiques dans différents slots... mais bon pour l'instant.
-	this->equipment[m_equipment->equipmentType] = m_equipment;
 	this->max_speed = getShipConfigMaxSpeed();
 	this->decceleration = getShipConfigDecceleration();
 	this->acceleration = getShipConfigAcceleration();
 	this->armor = getShipConfigArmor();
 	this->shield = getShipConfigShield();
 	this->shield_regen = getShipConfigShieldRegen();
+	this->size.x = ship_model->size.x;
+	this->size.y = ship_model->size.y;
+	this->textureName = ship_model->textureName;
+	this->frameNumber = ship_model->frameNumber;
+	this->textureName = ship_model->textureName;
+}
+
+void ShipConfig::setEquipment(Equipment* m_equipment)
+{
+	this->equipment[m_equipment->equipmentType] = m_equipment;
+	
+	this->max_speed = getShipConfigMaxSpeed();
+	this->decceleration = getShipConfigDecceleration();
+	this->acceleration = getShipConfigAcceleration();
+	this->armor = getShipConfigArmor();
+	this->shield = getShipConfigShield();
+	this->shield_regen = getShipConfigShieldRegen();
+}
+
+void ShipConfig::setShipModel(ShipModel* m_ship_model)
+{
+	this->ship_model = m_ship_model;
+
+	this->max_speed = getShipConfigMaxSpeed();
+	this->decceleration = getShipConfigDecceleration();
+	this->acceleration = getShipConfigAcceleration();
+	this->armor = getShipConfigArmor();
+	this->shield = getShipConfigShield();
+	this->shield_regen = getShipConfigShieldRegen();
+}
+
+void ShipConfig::setShipWeapon(Weapon* m_weapon)
+{
+	this->weapon = m_weapon;
 }
 
 int ShipConfig::getShipConfigArmor()
@@ -169,7 +188,7 @@ int ShipConfig::getShipConfigArmor()
 	int new_armor = 0;
 	int equipment_armor = 0;
 
-	for (int i=0; i<NBVAL_EQUIPMENT; i++)
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (equipment[i] != NULL)
 		{
@@ -190,7 +209,7 @@ int ShipConfig::getShipConfigShield()
 	int new_shield = 0;
 	int equipment_shield = 0.;
 
-	for (int i=0; i<NBVAL_EQUIPMENT; i++)
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (equipment[i] != NULL)
 		{
@@ -211,12 +230,12 @@ int ShipConfig::getShipConfigShieldRegen()
 	int new_shield_regen = 0;
 	int equipment_shield_regen = 0;
 
-	for (int i=0; i<NBVAL_EQUIPMENT; i++)
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (equipment[i] != NULL)
 		{
 			equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
-	
+
 		}
 		else
 		{
@@ -233,7 +252,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 	sf::Vector2f new_max_speed = sf::Vector2f(0,0);
 	sf::Vector2f equipment_max_speed = sf::Vector2f(0,0);
 
-	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (equipment[i] != NULL)
 		{
@@ -250,6 +269,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 	new_max_speed.x = ship_model->getShipModelMaxSpeed().x + equipment_max_speed.x;
 	new_max_speed.y = ship_model->getShipModelMaxSpeed().y + equipment_max_speed.y;
 
+	
 	return new_max_speed;
 }
 
@@ -258,7 +278,7 @@ float ShipConfig::getShipConfigDecceleration()
 	float new_decceleration = 0.0f;
 	float equipment_decceleration = 0.0f;
 
-	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (equipment[i] != NULL)
 		{
@@ -279,7 +299,7 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 	sf::Vector2f new_acceleration = sf::Vector2f(0,0);
 	sf::Vector2f equipment_acceleration = sf::Vector2f(0,0);
 
-	for (int i=0; i<NBVAL_EQUIPMENT-1; i++)
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (equipment[i] != NULL)
 		{
@@ -295,6 +315,7 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 
 	new_acceleration.x = ship_model->getShipModelAcceleration().x + equipment_acceleration.x;
 	new_acceleration.y = ship_model->getShipModelAcceleration().y + equipment_acceleration.y;
+
 	return new_acceleration;
 }
 
@@ -324,45 +345,45 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 
 void Ship::update(sf::Time deltaTime)
 {
-		static double shield_regen_buffer = 0;
-		//immunity frames after death
-		if (immune)
+	static double shield_regen_buffer = 0;
+	//immunity frames after death
+	if (immune)
+	{
+		if (immunityTimer.getElapsedTime() > sf::seconds(2))
 		{
-			if (immunityTimer.getElapsedTime() > sf::seconds(2))
-			{
-				immune = false;
-			}
+			immune = false;
+		}
+	}
+
+	//sheld regen if not maximum
+	if (shield < ship_config.getShipConfigShield())
+	{
+		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+		if(shield_regen_buffer > 1)
+		{
+			double intpart;
+			shield_regen_buffer = modf (shield_regen_buffer , &intpart);
+			shield += intpart;
 		}
 
-		//sheld regen if not maximum
-		if (shield < ship_config.getShipConfigShield())
+		//canceling over-regen
+		if (shield > ship_config.getShipConfigShield())
 		{
-			shield_regen_buffer += shield_regen*deltaTime.asSeconds();
-			if(shield_regen_buffer > 1)
-			{
-				double intpart;
-				shield_regen_buffer = modf (shield_regen_buffer , &intpart);
-				shield += intpart;
-			}
-
-			//canceling over-regen
-			if (shield > ship_config.getShipConfigShield())
-			{
-				shield = ship_config.getShipConfigShield();
-			}
+			shield = ship_config.getShipConfigShield();
 		}
-		this->ship_hud.update(armor/3, shield/3, money);//will do for now... but we'll need to scale it to the max value later
+	}
+	this->ship_hud.update(armor/3, shield/3, money);//will do for now... but we'll need to scale it to the max value later
 
-	
-	
-			sf::Vector2f directions = InputGuy::getDirections();
-		if (!disable_inputs)
-		{
-			moving = directions.x !=0 || directions.y !=0;
-			speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
-			speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
-			
+
+	sf::Vector2f directions = InputGuy::getDirections();
+	if (!disable_inputs)
+	{
+		moving = directions.x !=0 || directions.y !=0;
+		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
+		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
+
+
 		if(InputGuy::isFiring())
 		{
 			if (!disable_fire)
@@ -398,6 +419,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
+	
 	//screen borders contraints	correction
 	if (this->getPosition().x < ship_config.size.x/2)
 	{
@@ -422,9 +444,9 @@ void Ship::update(sf::Time deltaTime)
 		this->setPosition(this->getPosition().x, SCENE_SIZE_Y-(ship_config.size.y/2));
 		speed.y = 0;
 	}
-	
+
 	Independant::update(deltaTime);
-	
+
 }
 
 void Ship::Respawn()

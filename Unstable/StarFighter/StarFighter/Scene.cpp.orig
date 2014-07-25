@@ -18,11 +18,11 @@ void Scene::LoadSceneFromFile(string name)
 
 		this->config = *(FileLoaderUtils::FileLoader(name));
 		this->enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
+		this->FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
 		this->weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
 		this->ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
 		this->enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
-		this->FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
-		this->shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
+
 
 		int p = 0;
 		//enemies
@@ -43,7 +43,7 @@ void Scene::LoadSceneFromFile(string name)
 			if((*it)[0].compare("enemy") == 0)
 			{
 				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
-				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
+				//this->sceneIndependantsLayered[e->enemyclass].push_back(e);
 
 				//giving intervall of hit values for dice rolls
 				p++;
@@ -488,9 +488,15 @@ void Scene::GenerateEnemies(Time deltaTime)
 		{
 		//spawn (where on screen ?)
 
+<<<<<<< HEAD
+				Enemy* n = it->enemy->Clone();
+				n->setPosition(rand() % SCENE_SIZE_X,-n->m_size.y*2);
+				n->setVisible(true);
+=======
 		Enemy* n = it->enemy->Clone();
-		n->setPosition(rand() % SCENE_SIZE_X,-n->m_size.y*2);
+		n->setPosition(rand() % WINDOW_RESOLUTION_X,-n->m_size.y*2);
 		n->setVisible(true);
+>>>>>>> origin/EquipmentLoad
 
 		//Pattern definition snipet
 		//vector<float>* v = new vector<float>;

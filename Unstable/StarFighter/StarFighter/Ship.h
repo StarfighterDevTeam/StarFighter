@@ -30,26 +30,28 @@
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
 enum EquipmentType {
-	Empty,
-	Airbrake,
-	Engine,
-	Stabs,
-	Armor,
-	Shield,
-	Module,
-	NBVAL_EQUIPMENT
+	Empty,//0
+	Airbrake,//1
+	Engine,//2
+	Armor,//3
+	Shield,//4
+	Module,//5
+	NBVAL_EQUIPMENT//6
 };
 
 class ShipModel
 {
 public:
-	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen);
+	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
 	sf::Vector2f getShipModelMaxSpeed();
 	float getShipModelDecceleration();
 	sf::Vector2f getShipModelAcceleration();
 	int getShipModelArmor();
 	int getShipModelShield();
 	int getShipModelShieldRegen();
+	std::string textureName;
+	sf::Vector2f size;
+	int frameNumber;
 private:
 	float decceleration;
 	sf::Vector2f acceleration;
@@ -59,13 +61,14 @@ private:
 	int shield_regen;
 };
 
-class Equipment
+class Equipment : public sf::Sprite
 {
 public:
-	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size = sf::Vector2f(256,256));
+	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
 	Equipment();
 	std::string textureName;
 	sf::Vector2f size;
+	int frameNumber;
 	int equipmentType;
 	sf::Vector2f getEquipmentMaxSpeed();
 	float getEquipmentDecceleration();
@@ -85,13 +88,15 @@ private:
 class ShipConfig
 {
 public:
-	void Init(std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
+	void Init();
 	ShipConfig();
 	std::string textureName;
 	sf::Vector2f size;
 
 	int frameNumber;
 	void setEquipment(Equipment* m_equipment);
+	void setShipModel(ShipModel* m_ship_model);
+	void setShipWeapon(Weapon* m_weapon);
 	sf::Vector2f getShipConfigMaxSpeed();
 	float getShipConfigDecceleration();
 	sf::Vector2f getShipConfigAcceleration();

@@ -53,24 +53,39 @@ enum SceneDataBackground
 	BACKGROUND_HEIGHT,//3
 };
 
-enum ShipModelData
+enum ShipConfigData
 {
-	SHIPMODEL_COMPARE,//0
-	SHIPMODEL_NAME,//1
-	SHIPMODEL_IMAGE_NAME,//2
-	SHIPMODEL_WIDTH,//3
-	SHIPMODEL_HEIGHT,//4
-	SHIPMODEL_FRAMES,//5
-	SHIPMODEL_MAXSPEED_X,//6
-	SHIPMODEL_MAXSPEED_Y,//7
-	SHIPMODEL_DECCELERATION,//8
-	SHIPMODEL_ACCELERATION_X,//9
-	SHIPMODEL_ACCELERATION_Y,//10
-	SHIPMODEL_ARMOR,//11
-	SHIPMODEL_SHIELD,//12
-	SHIPMODEL_SHIELD_REGEN,//13
-	SHIPMODEL_WEAPON,//14
-	SHIPMODEL_AMMO,//15
+	SHIPCONFIG_NAME,//0
+	SHIPCONFIG_AIRBRAKE,//1
+	SHIPCONFIG_ENGINE,//2
+	SHIPCONFIG_ARMOR,//3
+	SHIPCONFIG_SHIELD,//4
+	SHIPCONFIG_MODULE,//5
+	SHIPCONFIG_WEAPON,//6
+	SHIPCONFIG_AMMO,//7
+	SHIPCONFIG_SHIPMODEL,//8
+
+};
+
+enum EquipmentData
+{
+	EQUIPMENT_COMPARE,//0
+	EQUIPMENT_NAME,//1
+	EQUIPMENT_IMAGE_NAME,//2
+	EQUIPMENT_WIDTH,//3
+	EQUIPMENT_HEIGHT,//4
+	EQUIPMENT_FRAMES,//5
+	EQUIPMENT_MAXSPEED_X,//6
+	EQUIPMENT_MAXSPEED_Y,//7
+	EQUIPMENT_DECCELERATION,//8
+	EQUIPMENT_ACCELERATION_X,//9
+	EQUIPMENT_ACCELERATION_Y,//10
+	EQUIPMENT_ARMOR,//11
+	EQUIPMENT_SHIELD,//12
+	EQUIPMENT_SHIELD_REGEN,//13
+	EQUIPMENT_WEAPON,//14
+	EQUIPMENT_AMMO,//15
+	EQUIPMENT_SHIPMODEL,//16
 };
 
 enum EnemyData
@@ -177,6 +192,8 @@ private:
 	Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* Scene::LoadAmmo(string name);
 	FX* Scene::LoadFX(string name);
+	Equipment* Scene::LoadEquipment(string name);
+	ShipModel* Scene::LoadShipModel(string name);
 
 	Ship* playerShip;
 	list<EnemyBase> enemies;
@@ -189,6 +206,7 @@ private:
 	list<vector<string>> FXConfig;
 	list<vector<string>> enemypoolConfig;
 	list<vector<string>> shipConfig;
+	list<vector<string>> equipmentConfig;
 	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
 	Independant* bg;
 	Independant* hub;

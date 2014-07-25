@@ -18,7 +18,7 @@ enum WeaponType {
 	NBVAL_Weapon
 };
 
-struct Weapon : public sf::Sprite
+class Weapon : public sf::Sprite
 {
 
 public:
