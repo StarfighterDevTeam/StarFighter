@@ -113,6 +113,7 @@ public:
 	Weapon* weapon;
 	Bot* bot;
 	vector<Bot*> bot_list;
+	bool hasWeapon;
 
 private:
 	sf::Vector2f max_speed;

@@ -7,6 +7,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	visible = true;
 	movepattern_type = 0;//type de pattern hardcodé pour l'instant
 	FX_death = m_FX_death;
+	hasWeapon = false;
 }
 
 void Enemy::update(sf::Time deltaTime)
@@ -24,7 +25,7 @@ void Enemy::update(sf::Time deltaTime)
 	}
 
 	//automatic fire
-	if(isOnScene)
+	if(isOnScene & hasWeapon)
 	{
 		weapon->weaponOffset = sf::Vector2f((((this->m_size.x)/2) + (weapon->ammunition->m_size.x/2)) ,((this->m_size.y)/2) - (weapon->ammunition->m_size.y/2 *weapon->fire_direction.y)) ;
 		weapon->setPosition(this->getPosition().x, this->getPosition().y);
@@ -56,7 +57,9 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
 	((Independant*)enemy)->damage = this->getIndependantDamage();
 	((Independant*)enemy)->addMoney(this->getMoney());
-	enemy->weapon = this->weapon->Clone();
+	enemy->hasWeapon = this->hasWeapon;
+	if (enemy->hasWeapon)
+		enemy->weapon = this->weapon->Clone();
 
 	return enemy;
 }

@@ -261,8 +261,11 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			//shipC->bot_list.push_back(shipC->equipment[EquipmentType::Airbrake]->bot);
 
 			//Loading weapon
-			printf("DEBUG: Loading ship weapon\n");
-			shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])));
+			if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
+			{
+				printf("DEBUG: Loading ship weapon\n");
+				shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])));
+			}
 
 			//Computing the ship config
 			shipC->Init();
@@ -305,7 +308,11 @@ EnemyBase* Scene::LoadEnemy(string name, int probability, int poolSize, int enem
 			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
 
-			base->enemy->weapon = LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, LoadAmmo((*it)[EnemyData::ENEMY_AMMO]));
+			if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
+			{
+				base->enemy->weapon = LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, LoadAmmo((*it)[EnemyData::ENEMY_AMMO]));
+				base->enemy->hasWeapon = true;
+			}
 
 			return base;
 		}
@@ -457,8 +464,11 @@ Bot* Scene::LoadBot(string name)
 			v->push_back(1);  // clockwise (>)
 			bot->Pattern.SetPattern(PatternType::Circle_,bot->vspeed,v); //vitesse angulaire (degres/s)
 
-			bot->weapon = LoadWeapon((*it)[BotData::BOT_WEAPON], -1, LoadAmmo((*it)[BotData::BOT_AMMO]));
-			bot->hasWeapon=true;
+			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)
+			{
+				bot->weapon = LoadWeapon((*it)[BotData::BOT_WEAPON], -1, LoadAmmo((*it)[BotData::BOT_AMMO]));
+				bot->hasWeapon=true;
+			}
 			
 			return bot;
 		}

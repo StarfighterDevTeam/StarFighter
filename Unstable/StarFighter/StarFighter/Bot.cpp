@@ -60,8 +60,9 @@ Bot* Bot::Clone()
 	bot->radius = this->radius;
 	bot->vspeed = this->vspeed;
 	bot->Pattern = this->Pattern;
-	bot->weapon = this->weapon;
 	bot->hasWeapon = this->hasWeapon;
+	if (bot->hasWeapon)
+		bot->weapon = this->weapon;
 	bot->hasTarget = this->hasTarget;
 
 	return bot;
@@ -72,5 +73,5 @@ void Bot::setRadius(float m_radius, float clockwise)
 	vector<float>* v = new vector<float>;
 	v->push_back(m_radius);
 	v->push_back(clockwise);  // clockwise (>)
-	this->Pattern.SetPattern(PatternType::Circle_,this->vspeed,v); //vitesse angulaire (degres/s)
+	this->Pattern.SetPattern(PatternType::Circle_,this->vspeed,v); //vitesse angulaire (degres/s)in
 }

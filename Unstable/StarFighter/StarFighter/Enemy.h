@@ -37,7 +37,7 @@ public:
 	FX* FX_death;
 	Independant* death();
 	int movepattern_type;
-	
+	bool hasWeapon;
 private:
 		
 };

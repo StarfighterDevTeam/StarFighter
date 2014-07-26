@@ -134,11 +134,14 @@ ShipConfig::ShipConfig()
 		this->equipment[i] = defaultEquipment;
 	}
 
-	Ammo* player_ammo;
+	this->hasWeapon = false;
+	/*Ammo* player_ammo;
 	player_ammo = new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(LASERBLUE_WIDTH,LASERBLUE_HEIGHT), 150, new FX(Vector2f(0,0), Vector2f(0,0), FX_EXPLOSION_FILENAME, Vector2f(FX_EXPLOSION_WIDTH,FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LITTLE_EXPLOSION_DURATION)));
 	weapon = new Weapon(player_ammo);
 	weapon->rate_of_fire = 0.2f;
 	weapon->fire_direction = sf::Vector2i(0, 1);
+	*/
+	
 }
 
 void ShipConfig::Init()
@@ -192,6 +195,7 @@ void ShipConfig::setShipModel(ShipModel* m_ship_model)
 void ShipConfig::setShipWeapon(Weapon* m_weapon)
 {
 	this->weapon = m_weapon;
+	this->hasWeapon = true;
 }
 
 int ShipConfig::getShipConfigArmor()
@@ -431,7 +435,7 @@ void Ship::update(sf::Time deltaTime)
 
 		if(InputGuy::isFiring())
 		{
-			if (!disable_fire)
+			if (!disable_fire && this->ship_config.hasWeapon)
 			{
 				ship_config.weapon->weaponOffset = sf::Vector2f((ship_config.size.x/2) + (ship_config.weapon->ammunition->m_size.y/2), (ship_config.size.y/2) - (ship_config.weapon->ammunition->m_size.y/2) *ship_config.weapon->fire_direction.y );
 				ship_config.weapon->setPosition(this->getPosition().x, this->getPosition().y);
