@@ -24,6 +24,7 @@ public:
 	bool hasTarget;
 	bool hasWeapon;
 	void setTarget (Independant* m_target);
+	void setRadius (float m_radius, float clockwise);
 
 private:
 		

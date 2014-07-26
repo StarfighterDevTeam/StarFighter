@@ -503,6 +503,7 @@ void Ship::Respawn()
 void Ship::GenerateBots(Independant* m_target)
 {
 	Bot* m_bot = ship_config.bot->Clone();
+	m_bot->setRadius(m_bot->radius + this->diag, 1);
 	m_bot->setTarget(m_target);
 	(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
 }
