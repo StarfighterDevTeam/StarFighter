@@ -166,7 +166,7 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 	//ship
 	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
-	playerShip->CreateBot(playerShip);
+	playerShip->GenerateBots(playerShip);
 
 }
 

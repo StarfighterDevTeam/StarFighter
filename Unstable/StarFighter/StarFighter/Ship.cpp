@@ -451,7 +451,8 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
-	
+	Independant::update(deltaTime);
+
 	//screen borders contraints	correction
 	if (this->getPosition().x < ship_config.size.x/2)
 	{
@@ -476,9 +477,6 @@ void Ship::update(sf::Time deltaTime)
 		this->setPosition(this->getPosition().x, SCENE_SIZE_Y-(ship_config.size.y/2));
 		speed.y = 0;
 	}
-
-	Independant::update(deltaTime);
-
 }
 
 void Ship::Respawn()
@@ -489,16 +487,15 @@ void Ship::Respawn()
 	speed.y = 0;
 	this->setVisible(true);
 	isOnScene = true;
-	this->setPosition(400, 500);
+	this->setPosition(SCENE_SIZE_X*STARTSCENE_X_RATIO,SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
 
 	immune = true;
 	immunityTimer.restart();
 }
 
-void Ship::CreateBot(Independant* m_target)
+void Ship::GenerateBots(Independant* m_target)
 {
 	Bot* m_bot = ship_config.bot->Clone();
 	m_bot->setTarget(m_target);
 	(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
-	printf("bot created at pos: %f, %f \n", m_bot->getPosition().x, m_bot->getPosition().y);
 }

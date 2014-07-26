@@ -85,9 +85,6 @@ void Independant::update(sf::Time deltaTime)
 	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
 	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 
-	//Case of following a target
-
-
 	//call bobbyPattern
 	offset = Pattern.GetOffset(deltaTime.asSeconds());
 	newposition.x += offset.x;

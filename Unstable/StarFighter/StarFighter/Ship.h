@@ -129,7 +129,7 @@ public :
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
 	void Respawn() override;
-	void CreateBot(Independant* m_target);
+	void GenerateBots(Independant* m_target);
 
 	bool disable_inputs;
 	bool disable_fire;
