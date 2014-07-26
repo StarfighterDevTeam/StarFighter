@@ -458,11 +458,19 @@ Bot* Scene::LoadBot(string name)
 			((Independant*)bot)->damage = stoi((*it)[BotData::BOT_DAMAGE]);
 			bot->radius = stoi((*it)[BotData::BOT_RADIUS]);
 			bot->vspeed = stoi((*it)[BotData::BOT_SPEED]);
+			bot->spread = Vector2f(stoi((*it)[BotData::BOT_XSPREAD]), stoi((*it)[BotData::BOT_YSPREAD]));
 
 			vector<float>* v = new vector<float>;
 			v->push_back(bot->radius); // rayon 500px
 			v->push_back(1);  // clockwise (>)
-			bot->Pattern.SetPattern(PatternType::Circle_,bot->vspeed,v); //vitesse angulaire (degres/s)
+
+			PatternType pattern_type = PatternType::NoMovePattern;
+			if((*it)[BotData::BOT_PATTERN].compare("circle") == 0)
+				pattern_type = PatternType::Circle_;
+			if((*it)[BotData::BOT_PATTERN].compare("oscillator") == 0)
+				pattern_type = PatternType::Oscillator;
+
+			bot->Pattern.SetPattern(pattern_type,bot->vspeed,v); //vitesse angulaire (degres/s)
 
 			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)
 			{

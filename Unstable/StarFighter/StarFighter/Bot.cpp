@@ -12,6 +12,7 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	vspeed = 0;
 	hasTarget = false;
 	hasWeapon = false;
+	spread = sf::Vector2f(0,0);
 }
 
 void Bot::setTarget (Independant* m_target)
@@ -40,13 +41,16 @@ void Bot::update(sf::Time deltaTime)
 	offset = Pattern.GetOffset(deltaTime.asSeconds());
 	newposition.x += offset.x;
 	newposition.y += offset.y;
+	//bot spread value
+	newposition.x += spread.x;
+	newposition.y += spread.y;
 
 	this->setPosition(newposition.x,newposition.y);
 
 	//automatic fire
 	if(isOnScene && hasWeapon)
 	{
-		weapon->weaponOffset = sf::Vector2f((((this->m_size.x)/2) + (weapon->ammunition->m_size.x/2)) ,((this->m_size.y)/2) - (weapon->ammunition->m_size.y/2 *weapon->fire_direction.y)) ;
+		weapon->weaponOffset = sf::Vector2f((((this->m_size.x)/2) + (weapon->ammunition->m_size.x/2)), ((this->m_size.y)/2) - (weapon->ammunition->m_size.y/2 *weapon->fire_direction.y));
 		weapon->setPosition(this->getPosition().x, this->getPosition().y);
 		weapon->Fire(IndependantType::FriendlyFire);
 	}
@@ -60,10 +64,12 @@ Bot* Bot::Clone()
 	bot->radius = this->radius;
 	bot->vspeed = this->vspeed;
 	bot->Pattern = this->Pattern;
+	bot->spread = this->spread;
 	bot->hasWeapon = this->hasWeapon;
 	if (bot->hasWeapon)
 		bot->weapon = this->weapon;
 	bot->hasTarget = this->hasTarget;
+
 
 	return bot;
 }
@@ -73,5 +79,5 @@ void Bot::setRadius(float m_radius, float clockwise)
 	vector<float>* v = new vector<float>;
 	v->push_back(m_radius);
 	v->push_back(clockwise);  // clockwise (>)
-	this->Pattern.SetPattern(PatternType::Circle_,this->vspeed,v); //vitesse angulaire (degres/s)in
+	this->Pattern.SetPattern(this->Pattern.GetCurrentPatternType(),this->vspeed,v); //vitesse angulaire (degres/s)in
 }

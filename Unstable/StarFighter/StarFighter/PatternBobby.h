@@ -27,6 +27,7 @@ public:
 	PatternBobby();
 	void SetPattern(PatternType pt, float patternSpeed, vector<float>*  args);
 	sf::Vector2f GetOffset(float seconds) override;
+	PatternType GetCurrentPatternType();
 
 private:
 	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);

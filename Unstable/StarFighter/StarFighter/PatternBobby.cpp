@@ -5,6 +5,11 @@ PatternBobby::PatternBobby()
 	this->currentPattern = PatternType::NoMovePattern;
 }
 
+PatternType PatternBobby::GetCurrentPatternType()
+{
+	return this->currentPattern;
+}
+
 void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*  args)
 {
 	//Note that patternSpeed is 
