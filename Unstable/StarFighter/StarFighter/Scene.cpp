@@ -149,7 +149,7 @@ Scene::Scene(string name)
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
 	this->playerShip = new Ship(Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO,SCENE_SIZE_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
 	
-	printf("DEBUG: SHIP LOADED.\n");
+	printf("DEBUG: Ship config loaded\n");
 	
 }
 
@@ -256,7 +256,9 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]));
 
 			//Loading bot
-			shipC->bot = LoadBot(shipC->equipment[EquipmentType::Module]->botName);
+			
+			//shipC->bot_list.push_back(shipC->equipment[EquipmentType::Module]->bot);
+			//shipC->bot_list.push_back(shipC->equipment[EquipmentType::Airbrake]->bot);
 
 			//Loading weapon
 			printf("DEBUG: Loading ship weapon\n");
@@ -378,6 +380,15 @@ Equipment* Scene::LoadEquipment(string name)
 				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
 				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]));
 
+			//if ((*it)[EquipmentData::EQUIPMENT_BOT] != "")
+			//	i->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
+
+			if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
+			{
+				i->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
+				i->hasBot = true;
+			}
+
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
 				i->equipmentType = EquipmentType::Airbrake;
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("engine") == 0)
@@ -387,14 +398,9 @@ Equipment* Scene::LoadEquipment(string name)
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("shield") == 0)
 				i->equipmentType = EquipmentType::Shield;
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("module") == 0)
-			{
 				i->equipmentType = EquipmentType::Module;
-				i->botName = (*it)[EquipmentData::EQUIPMENT_BOT];
-			}
 			if (i->equipmentType == EquipmentType::Empty)
 				LOGGER_WRITE(Logger::Priority::DEBUG,"Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file",name);
-
-			
 
 			return i;
 		}
@@ -415,6 +421,12 @@ ShipModel* Scene::LoadShipModel(string name)
 					Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
 					stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]),
 					(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])), stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]));
+
+				if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
+				{
+					s->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
+					s->hasBot = true;
+				}
 
 				return s;
 

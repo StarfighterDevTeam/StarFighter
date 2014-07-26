@@ -52,6 +52,8 @@ public:
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;
+	Bot* bot;
+	bool hasBot;
 private:
 	float decceleration;
 	sf::Vector2f acceleration;
@@ -76,7 +78,8 @@ public:
 	int getEquipmentArmor();
 	int getEquipmentShield();
 	int getEquipmentShieldRegen();
-	std::string botName;
+	Bot* bot;
+	bool hasBot;
 
 private:
 	float decceleration;
@@ -109,6 +112,7 @@ public:
 	ShipModel* ship_model;
 	Weapon* weapon;
 	Bot* bot;
+	vector<Bot*> bot_list;
 
 private:
 	sf::Vector2f max_speed;

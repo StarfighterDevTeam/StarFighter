@@ -19,6 +19,7 @@ ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, floa
 	this->textureName = m_textureName;
 	this->size = m_size;
 	this->frameNumber = m_frameNumber;
+	this->hasBot = false;
 }
 
 //various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
@@ -68,6 +69,7 @@ Equipment::Equipment()
 	this->size.y = SLOT_HEIGHT;
 	this->textureName = EMPTYSLOT_FILENAME;
 	this->equipmentType = EquipmentType::Empty;
+	this->hasBot = false;
 }
 
 
@@ -152,6 +154,15 @@ void ShipConfig::Init()
 	this->textureName = ship_model->textureName;
 	this->frameNumber = ship_model->frameNumber;
 	this->textureName = ship_model->textureName;
+
+	//Loading bots
+	if (this->ship_model->hasBot)
+		this->bot_list.push_back(this->ship_model->bot);
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	{
+		if (this->equipment[i]->hasBot)
+			this->bot_list.push_back(this->equipment[i]->bot);
+	}
 }
 
 void ShipConfig::setEquipment(Equipment* m_equipment)
@@ -368,7 +379,6 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
 	disable_inputs = false;
 	disable_fire = false;
-	this->ship_config.bot->setPosition(position);
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -502,8 +512,11 @@ void Ship::Respawn()
 
 void Ship::GenerateBots(Independant* m_target)
 {
-	Bot* m_bot = ship_config.bot->Clone();
-	m_bot->setRadius(m_bot->radius + this->diag, 1);
-	m_bot->setTarget(m_target);
-	(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
+	for (std::vector<Bot*>::iterator it = (this->ship_config.bot_list.begin()); it != (this->ship_config.bot_list.end()); it++)
+	{
+		Bot* m_bot = (*it)->Clone();
+		m_bot->setRadius(m_bot->radius + this->diag + (*it)->diag, 1);
+		m_bot->setTarget(m_target);
+		(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
+	}
 }
