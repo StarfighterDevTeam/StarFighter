@@ -1,0 +1,2 @@
+#bot_name,armor,shield,shield_regen,damage,weapon_name,ammo_name,image,width,height,frames,vspeed,explosion,radius,pattern,follower
+gerard,0,0,0,0,laser_bot,laser_blue,Assets/2D/enemyX.png,35,35,1,350,death_explosion,500,circle,1

@@ -67,7 +67,6 @@ public:
 	PatternBobby Pattern;
 	float diag;
 
-
 protected:
 	sf::Vector2f initial_position;
 	bool startPattern;

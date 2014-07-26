@@ -83,9 +83,11 @@ enum EquipmentData
 	EQUIPMENT_ARMOR,//11
 	EQUIPMENT_SHIELD,//12
 	EQUIPMENT_SHIELD_REGEN,//13
-	EQUIPMENT_WEAPON,//14
-	EQUIPMENT_AMMO,//15
-	EQUIPMENT_SHIPMODEL,//16
+	EQUIPMENT_BOT,//14
+	EQUIPMENT_WEAPON,//15
+	EQUIPMENT_AMMO,//16
+	EQUIPMENT_SHIPMODEL,//17
+	
 };
 
 enum EnemyData
@@ -95,8 +97,8 @@ enum EnemyData
 	ENEMY_SHIELD,//2
 	ENEMY_SHIELD_REGEN,//3
 	ENEMY_DAMAGE,//4
-	WEAPON,//5
-	AMMO,//6
+	ENEMY_WEAPON,//5
+	ENEMY_AMMO,//6
 	ENEMY_IMAGE_NAME,//7
 	ENEMY_WIDTH,//8
 	ENEMY_HEIGHT,//9
@@ -109,7 +111,7 @@ enum EnemyData
 enum WeaponData
 {
 	WEAPON_NAME,//0
-	RATE_OF_FIRE,//1
+	WEAPON_RATE_OF_FIRE,//1
 	WEAPON_IMAGE_NAME,//2
 	WEAPON_WIDTH,//3
 	WEAPON_HEIGHT,//4
@@ -156,6 +158,25 @@ enum FXData
 	FX_DURATION,//6
 };
 
+enum BotData
+{
+	BOT_NAME,//0
+	BOT_ARMOR,//1
+	BOT_SHIELD,//2
+	BOT_SHIELD_REGEN,//3
+	BOT_DAMAGE,//4
+	BOT_WEAPON,//5
+	BOT_AMMO,//6
+	BOT_IMAGE_NAME,//7
+	BOT_WIDTH,//8
+	BOT_HEIGHT,//9
+	BOT_FRAMES,//10
+	BOT_SPEED,//11
+	BOT_FX_DEATH,//12
+	BOT_RADIUS,//13
+	BOT_PATTERN,//14
+};
+
 struct EnemyBase
 {
 	Enemy* enemy;
@@ -194,6 +215,7 @@ private:
 	FX* Scene::LoadFX(string name);
 	Equipment* Scene::LoadEquipment(string name);
 	ShipModel* Scene::LoadShipModel(string name);
+	Bot* Scene::LoadBot(string name);
 
 	Ship* playerShip;
 	list<EnemyBase> enemies;
@@ -207,6 +229,7 @@ private:
 	list<vector<string>> enemypoolConfig;
 	list<vector<string>> shipConfig;
 	list<vector<string>> equipmentConfig;
+	list<vector<string>> botConfig;
 	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
 	Independant* bg;
 	Independant* hub;

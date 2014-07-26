@@ -201,6 +201,11 @@ int ShipConfig::getShipConfigArmor()
 	}
 
 	new_armor = ship_model->getShipModelArmor() + equipment_armor;
+
+	//cancelling negative equipment values
+	if (new_armor < ship_model->getShipModelArmor())
+		new_armor = ship_model->getShipModelArmor();
+
 	return new_armor;
 }
 
@@ -222,6 +227,11 @@ int ShipConfig::getShipConfigShield()
 	}
 
 	new_shield = ship_model->getShipModelShield() + equipment_shield;
+
+	//cancelling negative equipment values
+	if (new_shield < ship_model->getShipModelShield())
+		new_shield = ship_model->getShipModelShield();
+
 	return new_shield;
 }
 
@@ -244,6 +254,11 @@ int ShipConfig::getShipConfigShieldRegen()
 	}
 
 	new_shield_regen = ship_model->getShipModelShieldRegen() + equipment_shield_regen;
+
+	//cancelling negative equipment values
+	if (new_shield_regen < ship_model->getShipModelShieldRegen())
+		new_shield_regen = ship_model->getShipModelShieldRegen();
+
 	return new_shield_regen;
 }
 
@@ -269,6 +284,11 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 	new_max_speed.x = ship_model->getShipModelMaxSpeed().x + equipment_max_speed.x;
 	new_max_speed.y = ship_model->getShipModelMaxSpeed().y + equipment_max_speed.y;
 
+	//cancelling negative equipment values
+	if (new_max_speed.x < ship_model->getShipModelMaxSpeed().x)
+		new_max_speed.x = ship_model->getShipModelMaxSpeed().x;
+	if (new_max_speed.y < ship_model->getShipModelMaxSpeed().y)
+		new_max_speed.y = ship_model->getShipModelMaxSpeed().y;
 	
 	return new_max_speed;
 }
@@ -291,6 +311,11 @@ float ShipConfig::getShipConfigDecceleration()
 	}
 
 	new_decceleration = ship_model->getShipModelDecceleration() + equipment_decceleration;
+
+	//cancelling negative equipment values
+	if (new_decceleration < ship_model->getShipModelDecceleration())
+		new_decceleration = ship_model->getShipModelDecceleration();
+
 	return new_decceleration;
 }
 
@@ -316,6 +341,12 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 	new_acceleration.x = ship_model->getShipModelAcceleration().x + equipment_acceleration.x;
 	new_acceleration.y = ship_model->getShipModelAcceleration().y + equipment_acceleration.y;
 
+	//cancelling negative equipment values
+	if (new_acceleration.x < ship_model->getShipModelAcceleration().x)
+		new_acceleration.x = ship_model->getShipModelAcceleration().x;
+	if (new_acceleration.y < ship_model->getShipModelAcceleration().y)
+		new_acceleration.y = ship_model->getShipModelAcceleration().y;
+
 	return new_acceleration;
 }
 
@@ -336,6 +367,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
 	disable_inputs = false;
 	disable_fire = false;
+	this->ship_config.bot->setPosition(position);
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -463,3 +495,10 @@ void Ship::Respawn()
 	immunityTimer.restart();
 }
 
+void Ship::CreateBot(Independant* m_target)
+{
+	Bot* m_bot = ship_config.bot->Clone();
+	m_bot->setTarget(m_target);
+	(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
+	printf("bot created at pos: %f, %f \n", m_bot->getPosition().x, m_bot->getPosition().y);
+}

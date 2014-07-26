@@ -76,6 +76,8 @@ public:
 	int getEquipmentArmor();
 	int getEquipmentShield();
 	int getEquipmentShieldRegen();
+	std::string botName;
+
 private:
 	float decceleration;
 	sf::Vector2f acceleration;
@@ -106,6 +108,8 @@ public:
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
 	Weapon* weapon;
+	Bot* bot;
+
 private:
 	sf::Vector2f max_speed;
 	float decceleration;
@@ -125,7 +129,8 @@ public :
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
 	void Respawn() override;
-	
+	void CreateBot(Independant* m_target);
+
 	bool disable_inputs;
 	bool disable_fire;
 private:

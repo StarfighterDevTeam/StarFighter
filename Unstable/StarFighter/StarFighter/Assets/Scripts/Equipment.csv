@@ -1,7 +1,7 @@
-#type,name_model,texture,width,height,frames,max_speed.x,max_speed.y,decceleration,acceleration.x,acceleration.y,armor,shield,shield_regen
-airbrake,airbrake_default,Assets/2D/AirBrake.png,64,64,1,0,0,1500,0,0,0,0,0
-engine,engine_default,Assets/2D/AirBrake.png,64,64,1,400,400,0,500,500,0,0,0
-armor,armor_default,Assets/2D/AirBrake.png,64,64,1,0,0,0,0,0,0,1000,500
-shield,shield_default,Assets/2D/AirBrake.png,64,64,1,0,0,0,0,0,1000,0,0
-module,module_default,Assets/2D/AirBrake.png,64,64,1,0,0,0,0,0,0,0,0
-shipmodel,shipmodel_default,Assets/2D/Natalia32.png,32,32,3,100,100,100,500,500,100,0,0
+#type,name_model,texture,width,height,frames,max_speed.x,max_speed.y,decceleration,acceleration.x,acceleration.y,armor,shield,shield_regen,bot
+airbrake,airbrake_default,Assets/2D/AirBrake.png,64,64,1,0,0,1500,0,0,0,0,0,
+engine,engine_default,Assets/2D/AirBrake.png,64,64,1,400,400,0,500,500,0,0,0,
+armor,armor_default,Assets/2D/AirBrake.png,64,64,1,0,0,0,0,0,0,1000,500,
+shield,shield_default,Assets/2D/AirBrake.png,64,64,1,0,0,0,0,0,1000,0,0,
+module,module_default,Assets/2D/AirBrake.png,64,64,1,0,0,0,0,0,0,0,0,gerard
+shipmodel,shipmodel_default,Assets/2D/Natalia32.png,32,32,3,100,100,100,500,500,100,0,0,

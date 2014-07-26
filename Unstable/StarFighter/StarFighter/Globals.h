@@ -45,5 +45,6 @@
 #define ENEMYPOOL_FILE "Assets/Scripts/EnemyPool.csv"
 #define FX_FILE "Assets/Scripts/FX.csv"
 #define EQUIPMENT_FILE "Assets/Scripts/Equipment.csv"
+#define BOT_FILE "Assets/Scripts/Bot.csv"
 
 #endif // GLOBALS_H_INCLUDED

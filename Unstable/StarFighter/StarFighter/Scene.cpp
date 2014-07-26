@@ -23,6 +23,7 @@ void Scene::LoadSceneFromFile(string name)
 		this->enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
 		this->FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
 		this->shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
+		this->botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
 
 		int p = 0;
 		//enemies
@@ -103,6 +104,7 @@ Scene::Scene(string name)
 		this->equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
 		this->weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
 		this->ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
+		this->botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
 		this->shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
 
 		//Loading font for framerate
@@ -146,7 +148,8 @@ Scene::Scene(string name)
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
 	this->playerShip = new Ship(Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO,SCENE_SIZE_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
-
+	
+	printf("DEBUG: SHIP LOADED.\n");
 	
 }
 
@@ -163,15 +166,7 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 	//ship
 	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
-
-	//AJOUT DE BOTS HARDCODES POUR LE LOL
-	Bot* gerard = new Bot ((Independant*)playerShip, LoadWeapon("laser_bot", -1, LoadAmmo("laser_beam")), sf::Vector2f (0,0), "Assets/2D/laser_red.png", sf::Vector2f (64,64));
-	//Pattern definition snipet
-	vector<float>* v = new vector<float>;
-	v->push_back(500); // rayon 60px
-	v->push_back(1);  // clockwise (>)
-	gerard->Pattern.SetPattern(PatternType::Circle_,350,v); //vitesse angulaire (degres/s)
-	(*CurrentGame).addToScene(gerard,LayerType::BotLayer, IndependantType::Neutral);
+	playerShip->CreateBot(playerShip);
 
 }
 
@@ -260,6 +255,9 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]));
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]));
 
+			//Loading bot
+			shipC->bot = LoadBot(shipC->equipment[EquipmentType::Module]->botName);
+
 			//Loading weapon
 			printf("DEBUG: Loading ship weapon\n");
 			shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])));
@@ -305,7 +303,7 @@ EnemyBase* Scene::LoadEnemy(string name, int probability, int poolSize, int enem
 			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
 
-			base->enemy->weapon = LoadWeapon((*it)[EnemyData::WEAPON], 1, LoadAmmo((*it)[EnemyData::AMMO]));
+			base->enemy->weapon = LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, LoadAmmo((*it)[EnemyData::ENEMY_AMMO]));
 
 			return base;
 		}
@@ -322,7 +320,7 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		{
 			Weapon* weapon = new Weapon(ammo);
 			weapon->fire_direction = Vector2i(0,fire_direction);
-			weapon->rate_of_fire = atof((*it)[WeaponData::RATE_OF_FIRE].c_str());
+			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
 			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
 			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
 			weapon->alternate = (bool)(stoi((*it)[WeaponData::WEAPON_ALTERNATE]));
@@ -389,9 +387,14 @@ Equipment* Scene::LoadEquipment(string name)
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("shield") == 0)
 				i->equipmentType = EquipmentType::Shield;
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("module") == 0)
+			{
 				i->equipmentType = EquipmentType::Module;
+				i->botName = (*it)[EquipmentData::EQUIPMENT_BOT];
+			}
 			if (i->equipmentType == EquipmentType::Empty)
 				LOGGER_WRITE(Logger::Priority::DEBUG,"Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file",name);
+
+			
 
 			return i;
 		}
@@ -420,6 +423,36 @@ ShipModel* Scene::LoadShipModel(string name)
 	}
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find ShipModel '%s'. Please check the config file",name));
+}
+
+Bot* Scene::LoadBot(string name)
+{
+	for (std::list<vector<string>>::iterator it = (this->botConfig).begin(); it != (this->botConfig).end(); it++)
+	{
+		if((*it)[0].compare(name) == 0)
+		{
+			Bot* bot = new Bot(Vector2f(0,0), Vector2f(0,0),(*it)[BotData::BOT_IMAGE_NAME],sf::Vector2f(stoi((*it)[BotData::BOT_WIDTH]),stoi((*it)[BotData::BOT_HEIGHT])));
+
+			((Independant*)bot)->armor = stoi((*it)[BotData::BOT_ARMOR]);
+			((Independant*)bot)->shield = ((Independant*)bot)->shield_max = stoi((*it)[BotData::BOT_SHIELD]);
+			((Independant*)bot)->shield_regen = stoi((*it)[BotData::BOT_SHIELD_REGEN]);
+			((Independant*)bot)->damage = stoi((*it)[BotData::BOT_DAMAGE]);
+			bot->radius = stoi((*it)[BotData::BOT_RADIUS]);
+			bot->vspeed = stoi((*it)[BotData::BOT_SPEED]);
+
+			vector<float>* v = new vector<float>;
+			v->push_back(bot->radius); // rayon 500px
+			v->push_back(1);  // clockwise (>)
+			bot->Pattern.SetPattern(PatternType::Circle_,bot->vspeed,v); //vitesse angulaire (degres/s)
+
+			bot->weapon = LoadWeapon((*it)[BotData::BOT_WEAPON], -1, LoadAmmo((*it)[BotData::BOT_AMMO]));
+			bot->hasWeapon=true;
+			
+			return bot;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Bot '%s'. Please check the config file",name));
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
