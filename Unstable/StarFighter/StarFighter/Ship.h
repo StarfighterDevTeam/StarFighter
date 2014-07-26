@@ -135,6 +135,8 @@ public :
 	bool disable_fire;
 private:
 	bool moving;
+	bool movingX;
+	bool movingY;
 };
 
 

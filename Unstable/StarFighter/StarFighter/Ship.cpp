@@ -356,7 +356,8 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 {
 	this->collider_type =  IndependantType::PlayerShip;
 	this->ship_config = m_ship_config;
-	moving = false;	
+	moving = false;
+	movingX = movingY = false;
 	this->visible = true;
 	this->damage = 0;
 	this->armor = 1;
@@ -412,6 +413,8 @@ void Ship::update(sf::Time deltaTime)
 	if (!disable_inputs)
 	{
 		moving = directions.x !=0 || directions.y !=0;
+		movingX = directions.x !=0;
+		movingY = directions.y !=0;
 		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
 		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
@@ -438,13 +441,17 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		//idle decceleration
-		if(!moving)
+		if(!movingX)
 		{
 			speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
-			speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
 
 			if(abs(speed.x) < SHIP_MIN_SPEED_X)
 				speed.x = 0;
+		}
+
+		if(!movingY)
+		{
+			speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
 
 			if(abs(speed.y) < SHIP_MIN_SPEED_Y)
 				speed.y = 0;
