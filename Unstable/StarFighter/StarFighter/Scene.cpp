@@ -255,10 +255,8 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]));
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]));
 
-			//Loading bot
-			
-			//shipC->bot_list.push_back(shipC->equipment[EquipmentType::Module]->bot);
-			//shipC->bot_list.push_back(shipC->equipment[EquipmentType::Airbrake]->bot);
+			//Loading FX
+			shipC->FX_death = LoadFX((*it)[ShipConfigData::SHIPCONFIG_DEATH_FX]);
 
 			//Loading weapon
 			if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
@@ -336,7 +334,7 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
 			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
 			if (weapon->rafale != 0)
-				weapon->rafale_cooldown = stoi((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN]);
+				weapon->rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
 
 			return weapon;
 		}
@@ -363,9 +361,15 @@ FX* Scene::LoadFX(string name)
 {
 	for (std::list<vector<string>>::iterator it = (this->FXConfig).begin(); it != (this->FXConfig).end(); it++)
 	{
-		if((*it)[0].compare("explosion") == 0)
+		if((*it)[FXData::FX_TYPE].compare("explosion") == 0)
 		{
-			return new FX(Vector2f(0,0), Vector2f(0,0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]),stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(stoi((*it)[FXData::FX_DURATION])));
+			if((*it)[FXData::FX_NAME].compare(name) == 0)
+			{
+				float duration = atof(((*it)[FXData::FX_DURATION]).c_str());
+				FX* myFX = new FX(Vector2f(0,0), Vector2f(0,0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]),stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(duration));
+				
+				return myFX;
+			}
 		}
 	}
 
@@ -507,7 +511,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		//chosing a random enemy within a class of enemies
 		Enemy* random_enemy_within_class[EnemyClass::NBVAL_EnemyClass];
 
-
+		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige
 		int dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA]))+1;
 		for (int i=0; i<EnemyClass::NBVAL_EnemyClass; i++)
 		{

@@ -50,6 +50,7 @@ public:
 	string getName();
 	virtual void Respawn();
 	Independant* Clone();
+	virtual void Death();
 
 	int getMoney();
 	void addMoney(int loot_value);

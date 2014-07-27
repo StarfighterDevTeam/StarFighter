@@ -524,3 +524,10 @@ void Ship::GenerateBots(Independant* m_target)
 		(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
 	}
 }
+
+void Ship::Death()
+{
+	FX* myFX = this->ship_config.FX_death->Clone();
+	myFX->setPosition(this->getPosition().x, this->getPosition().y);
+    (*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
+}

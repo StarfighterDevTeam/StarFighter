@@ -196,3 +196,8 @@ void Independant::setMoney(int loot_value)
 {
 	money = loot_value;
 }
+
+void Independant::Death()
+{
+
+}

@@ -114,6 +114,7 @@ public:
 	Bot* bot;
 	vector<Bot*> bot_list;
 	bool hasWeapon;
+	FX* FX_death;
 
 private:
 	sf::Vector2f max_speed;
@@ -135,6 +136,7 @@ public :
 	PlayerHud ship_hud;
 	void Respawn() override;
 	void GenerateBots(Independant* m_target);
+	void Death() override;
 
 	bool disable_inputs;
 	bool disable_fire;

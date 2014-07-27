@@ -1,5 +1,7 @@
 #include "Ammo.h"
 
+extern Game* CurrentGame;
+
 Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, FX* m_explosion) : Independant(position, speed,  textureName, size)
 {
 	damage = m_damage;
@@ -40,11 +42,11 @@ Ammo* Ammo::Clone()
 	return m_ammo;
 }
 
-Independant* Ammo::explode()
+void Ammo::Death()
 {
 	FX* myFX = this->explosion->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	return (Independant*)myFX;
+    (*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
 }
 
 void Ammo::update(sf::Time deltaTime)

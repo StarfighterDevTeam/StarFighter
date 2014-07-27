@@ -1,5 +1,5 @@
 #weapon_name,rate,image,width,height,sound_name,multishot,xspread,alternate,dispersion,rafale,rafale_cooldown
 laser,1,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,8,0,1,180,0,0.0f
 laser_fast,0.1,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,2,50,0,0,30,3.f
-laser_player,0.05,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,7,0,0,160,0,2.f
-laser_bot,0.05,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,1,0,0,0,0,1.f
+laser_player,0.1,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,7,0,0,160,0,2.f
+laser_bot,0.1,Assets/2D/AirBrake.png,64,64,Assets/Sounds/laser.ogg,1,0,0,0,0,1.f

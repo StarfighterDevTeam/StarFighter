@@ -1,3 +1,3 @@
 #explosion, FX_name, asset_adress, width, height, frames, duration
-explosion,explosion,Assets/2D/FX_explosion.png,1280,236,4,0.6f
-explosion,death_explosion,Assets/2D/FX_explosion.png,192,64,3,0.6f
+explosion,explosion,Assets/2D/FX_explosion.png,320,236,4,0.8f
+explosion,death_explosion,Assets/2D/FX_explosion.png,320,236,3,0.6f

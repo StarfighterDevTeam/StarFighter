@@ -1,5 +1,6 @@
 #include "Enemy.h"
 
+extern Game* CurrentGame;
 
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death)  : Independant(position, speed,  textureName, size) 
 {
@@ -64,9 +65,9 @@ Enemy* Enemy::Clone()
 	return enemy;
 }
 
-Independant* Enemy::death()
+void Enemy::Death()
 {
 	FX* myFX = this->FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	return (Independant*)myFX;
+    (*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
 }

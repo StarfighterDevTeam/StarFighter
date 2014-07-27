@@ -35,7 +35,7 @@ public:
 	Weapon* weapon;
 	Enemy* Clone();
 	FX* FX_death;
-	Independant* death();
+	void Death() override;
 	int movepattern_type;
 	bool hasWeapon;
 private:
