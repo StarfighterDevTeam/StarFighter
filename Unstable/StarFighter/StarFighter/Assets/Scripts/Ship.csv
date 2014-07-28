@@ -1,2 +1,2 @@
 #shipconfig_name,airbrake,engine,armor,shield,module,weapon,ammo,shipmodel,death_FX
-default,airbrake_default,engine_default,armor_default,shield_default,module_default,laser_default,laser_beam,shipmodel_default,death_explosion
+default,airbrake_default,engine_default,armor_default,shield_default,module_default,laser_player,laser_blue,shipmodel_default,death_explosion
