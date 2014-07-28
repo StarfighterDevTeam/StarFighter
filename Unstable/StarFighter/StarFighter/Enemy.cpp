@@ -71,3 +71,10 @@ void Enemy::Death()
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
     (*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
 }
+
+void Enemy::GenerateLoot()
+{
+	Loot* new_loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
+	new_loot->get_money_from(*this);
+	(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+}

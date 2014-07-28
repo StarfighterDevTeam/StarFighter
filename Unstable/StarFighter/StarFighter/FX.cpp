@@ -24,9 +24,9 @@ void FX::update(sf::Time deltaTime)
 
 	if (!exploding)
 	{
-		//this->setVisible(false);
-		//this->isOnScene = false;
-		this->GarbageMe = true; // plus efficace :)
+		this->setVisible(false);
+		this->isOnScene = false;
+		this->GarbageMe = true;
 	}
 }
 

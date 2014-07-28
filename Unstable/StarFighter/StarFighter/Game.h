@@ -2,10 +2,7 @@
 #define GAME_H_INCLUDED
 
 #include "Globals.h"
-//#include "FX.h"
 #include "Independant.h"
-
-#include "Loot.h"
 #include <list>
 #include <vector>
 #include "TextUtils.h"

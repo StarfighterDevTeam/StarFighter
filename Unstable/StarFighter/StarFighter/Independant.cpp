@@ -201,3 +201,8 @@ void Independant::Death()
 {
 
 }
+
+void Independant::GenerateLoot()
+{
+	
+}

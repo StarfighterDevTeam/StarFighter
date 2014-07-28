@@ -7,9 +7,6 @@
 #include "FX.h"
 #include "Game.h"
 
-//struct Game;
-//enum LayerType;
-
 enum AmmoType {
 	LaserBeam,
 	LaserBeamBlue,

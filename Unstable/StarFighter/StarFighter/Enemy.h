@@ -5,10 +5,11 @@
 #include "TextureLoader.h"
 #include "Independant.h"
 #include "Weapon.h"
-#include "Globals.h"
+#include "Loot.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "MovePattern.h"
+
 
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR			100
@@ -38,6 +39,7 @@ public:
 	void Death() override;
 	int movepattern_type;
 	bool hasWeapon;
+	void GenerateLoot() override;
 private:
 		
 };

@@ -188,19 +188,15 @@ void Game::colisionChecksV2()
 					//death
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
-						(*it1)->setVisible(false);
 						(*it1)->Death();
-
 						//Loot
-						Loot* loot = new Loot (sf::Vector2f((*it1)->getPosition().x, (*it1)->getPosition().y),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
-						this->addToScene(loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+						(*it1)->GenerateLoot();
 						hazard += (*it1)->getMoney();
-						loot->get_money_from(*(*it1));
+
 						//sent to garbage collector
+						(*it1)->setVisible(false);
 						(*it1)->GarbageMe = true;
-
 					}
-
 				}
 			}
 		}

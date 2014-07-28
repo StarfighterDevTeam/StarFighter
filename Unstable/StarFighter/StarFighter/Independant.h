@@ -10,6 +10,7 @@
 #include <math.h>
 #include "MovePattern.h"
 #include "PatternBobby.h"
+#include "Globals.h"
 
 enum IndependantType {
 	Background,
@@ -51,6 +52,7 @@ public:
 	virtual void Respawn();
 	Independant* Clone();
 	virtual void Death();
+	virtual void GenerateLoot();
 
 	int getMoney();
 	void addMoney(int loot_value);

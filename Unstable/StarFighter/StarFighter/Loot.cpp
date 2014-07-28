@@ -13,3 +13,9 @@ Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, 
 	 isOnScene = true;
 	 collider_type = IndependantType::LootObject;
 }
+
+Loot* Loot::Clone()
+{
+	Loot* new_loot = new Loot(this->getPosition(), this->speed, this->textureName, this->m_size);
+	return new_loot;
+}
