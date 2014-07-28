@@ -501,8 +501,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 		double random_number = ((double) rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
-		int nb_rows = 3;
-		int nb_lines = 2;
+		int nb_rows = 1;
+		int nb_lines = 1;
 		float xspread = 200;
 		float yspread = 50;
 		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha

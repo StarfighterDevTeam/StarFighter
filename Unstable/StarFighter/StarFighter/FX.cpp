@@ -15,15 +15,18 @@ void FX::update(sf::Time deltaTime)
 {
 	Independant::update(deltaTime);
 
-	if (deltaClockExploding.getElapsedTime() > duration)
+	//if (deltaClockExploding.getElapsedTime() > duration)
+	if (deltaClockExploding.getElapsedTime() > sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES*this->frameNumber)) 
+		// la duration ne sert à rien pour les explosions : on veut toujours 0,2sec x le nombre de frames. ça évite donc d'avoir à renseigner une duration correcte dans FX.csv
 	{
 		exploding = false;
 	}
 
 	if (!exploding)
 	{
-		this->setVisible(false);
-		this->isOnScene = false;
+		//this->setVisible(false);
+		//this->isOnScene = false;
+		this->GarbageMe = true; // plus efficace :)
 	}
 }
 
