@@ -24,6 +24,9 @@ class Weapon : public sf::Sprite
 public:
 	Weapon(Ammo* Ammunition);
 
+	std::string textureName;
+	sf::Vector2f size;
+	int frameNumber;
 	sf::Vector2f speed;
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);

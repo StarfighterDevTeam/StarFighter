@@ -78,9 +78,6 @@ bool Weapon::isFiringReady()
 		}
 	}
 
-	
-
-
 	return firing_ready;
 }
 
@@ -116,6 +113,7 @@ void Weapon::FireSingleShot(IndependantType m_collider_type)
 {
 	CreateBullet(m_collider_type);
 }
+
 void Weapon::FireMultiShot(IndependantType m_collider_type)
 {
 	if (multishot % 2 != 0) //case of an odd number of bullets

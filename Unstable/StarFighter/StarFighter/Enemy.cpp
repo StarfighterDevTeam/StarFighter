@@ -80,9 +80,34 @@ void Enemy::Death()
 void Enemy::GenerateLoot()
 {
 	//TO DO : générer soit de la money, soit de l'équipment, soit une arme, et la donner à l'ennemi avec setMoney, setEquipmentLoot et setEquipmentWeapon
-	Loot* new_loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
-	new_loot->get_money_from(*this);
-	new_loot->get_equipment_from(*this);
-	new_loot->get_weapon_from(*this);
-	(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+	if (this->hasWeaponLoot)
+	{
+		Loot* new_loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), this->getWeaponLoot()->textureName, sf::Vector2f(this->getWeaponLoot()->size.x, this->getWeaponLoot()->size.y));
+		//new_loot->get_money_from(*this);
+		//new_loot->get_equipment_from(*this);
+		new_loot->get_weapon_from(*this);
+		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+	}
+
+	else if (this->hasEquipmentLoot)
+	{
+		Loot* new_loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), this->getEquipmentLoot()->textureName, sf::Vector2f(this->getEquipmentLoot()->size.x, this->getEquipmentLoot()->size.y));
+		//new_loot->get_money_from(*this);
+		new_loot->get_equipment_from(*this);
+		//new_loot->get_weapon_from(*this);
+		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+	}
+	
+	else if (this->money > 0)
+	{
+		Loot* new_loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
+		new_loot->get_money_from(*this);
+		//new_loot->get_equipment_from(*this);
+		//new_loot->get_weapon_from(*this);
+		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+	}
+	else
+	{
+		//que dalle
+	}
 }

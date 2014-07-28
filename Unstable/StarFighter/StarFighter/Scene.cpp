@@ -335,6 +335,10 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			if (weapon->rafale != 0)
 				weapon->rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
 
+			weapon->textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
+			weapon->size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
+			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
+
 			return weapon;
 		}
 	}
@@ -516,7 +520,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		{
 			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin() ; it != enemies_ranked_by_class[i].end(); ++it)
 			{
-				if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
+          		if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
 				{
 					random_enemy_within_class[i] = (*it).enemy;
 				}
@@ -539,6 +543,10 @@ void Scene::GenerateEnemies(Time deltaTime)
 			//test de loot d'ennemi hardcodé
 			Equipment* loot = LoadEquipment("module_gerard");
 			((Independant*)e->enemy)->setEquipmentLoot(loot);
+
+			//test de loot d'ennemi hardcodé
+			//Weapon* loot = LoadWeapon("laser_player", -1, LoadAmmo("laser_blue"));
+			//((Independant*)e->enemy)->setWeaponLoot(loot);
 
 			cluster->push_back(e);
 		}
