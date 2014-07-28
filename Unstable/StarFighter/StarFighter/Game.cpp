@@ -29,7 +29,6 @@ void Game::init(RenderWindow* window)
 	hazard = 0;//initalisation of the scoring system
 }
 
-
 sf::RenderWindow* Game::getMainWindow()
 {
 	return this->window;
@@ -282,6 +281,16 @@ void Game::collectGarbage()
 
 	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
 
+}
+
+void Game::garbageLayer (LayerType m_layer)
+{
+	for (std::list<Independant*>::iterator it = (this->sceneIndependantsLayered[m_layer])->begin(); it != (this->sceneIndependantsLayered[m_layer])->end(); it++)
+	{
+		(*it)->visible = false;
+		(*it)->isOnScene = false;
+		(*it)->GarbageMe = true;
+	}
 }
 
 bool Game::isLastEnemyDead()

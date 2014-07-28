@@ -333,7 +333,6 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 void ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats)
 {
 	this->equipment[m_equipment->equipmentType] = m_equipment;
-
 	this->hasEquipment[m_equipment->equipmentType] = true;
 
 	if (recomputing_stats)
@@ -374,12 +373,10 @@ void ShipConfig::DestroyBots()
 {
 	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
 	{
-		(*it)->visible = false;
-		(*it)->isOnScene = false;
-		(*it)->GarbageMe = true;
-		
+		free(*it);
 	}
-	//this->bot_list.clear();//done in ship config Init()
+	this->bot_list.clear();
+	(*CurrentGame).garbageLayer(LayerType::BotLayer);
 }
 
 // ----------------SHIP ---------------
@@ -409,21 +406,21 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 
 void Ship::setEquipment(Equipment* m_equipment)
 {
-	//this->ship_config.DestroyBots();
+	this->ship_config.DestroyBots();
 	this->ship_config.setEquipment(m_equipment);
 	this->ship_config.GenerateBots(this);
 }
 
 void Ship::setShipModel(ShipModel* m_ship_model)
 {
-	//this->ship_config.DestroyBots();
+	this->ship_config.DestroyBots();
 	this->ship_config.setShipModel(m_ship_model);
 	this->ship_config.GenerateBots(this);
 }
 
 void Ship::setShipWeapon(Weapon* m_weapon)
 {
-	//this->ship_config.DestroyBots();
+	this->ship_config.DestroyBots();
 	this->ship_config.setShipWeapon(m_weapon);
 	this->ship_config.GenerateBots(this);
 	

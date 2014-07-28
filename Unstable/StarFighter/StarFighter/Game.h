@@ -39,6 +39,7 @@ public:
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
+	void garbageLayer (LayerType m_layer);
 
 	bool isLastEnemyDead();
 	int getHazard();

@@ -541,8 +541,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
 
 			//test de loot d'ennemi hardcodé
-			//Equipment* loot = LoadEquipment("module_gerard");
-			//((Independant*)e->enemy)->setEquipmentLoot(loot);
+			Equipment* loot = LoadEquipment("module_gerard");
+			((Independant*)e->enemy)->setEquipmentLoot(loot);
 
 			//test de loot d'ennemi hardcodé
 			//Weapon* loot = LoadWeapon("laser_player", -1, LoadAmmo("laser_blue"));
