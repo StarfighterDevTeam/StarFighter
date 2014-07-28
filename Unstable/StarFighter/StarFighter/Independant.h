@@ -12,6 +12,9 @@
 #include "PatternBobby.h"
 #include "Globals.h"
 
+class Equipment;
+class Weapon;
+
 enum IndependantType {
 	Background,
 	LootObject,
@@ -59,6 +62,20 @@ public:
 	void setMoney(int loot_value);
 	void get_money_from (Independant& independant);
 	void get_money_from (Independant& independant, int loot_value);
+	virtual void GetLoot (Independant& independant);
+
+	bool hasEquipmentLoot;
+	void get_equipment_from (Independant& independant);
+	void setEquipmentLoot (Equipment* equipment);
+	void releaseEquipmentLoot();
+	Equipment* getEquipmentLoot();
+
+	bool hasWeaponLoot;
+	void get_weapon_from (Independant& independant);
+	void setWeaponLoot (Weapon* weapon);
+	void releaseWeaponLoot();
+	Weapon* getWeaponLoot();
+
 	void Independant::GetPolarMovement(sf::Vector2f* np);
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;
@@ -83,6 +100,8 @@ protected:
 	bool immune;
 	sf::Clock immunityTimer;
 	int money;
+	Equipment* loot_equipment;
+	Weapon* loot_weapon;
 
 };
 

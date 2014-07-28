@@ -11,11 +11,16 @@ Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, 
 {
 	 visible = true;
 	 isOnScene = true;
+	 hasEquipmentLoot = false;
 	 collider_type = IndependantType::LootObject;
+	 money = 0;
 }
 
 Loot* Loot::Clone()
 {
 	Loot* new_loot = new Loot(this->getPosition(), this->speed, this->textureName, this->m_size);
+	new_loot->money = this->getMoney();
+	new_loot->loot_equipment = this->loot_equipment;
+
 	return new_loot;
 }

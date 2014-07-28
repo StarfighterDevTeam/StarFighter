@@ -57,10 +57,15 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->shield = this->getIndependantShield();
 	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
 	((Independant*)enemy)->damage = this->getIndependantDamage();
-	((Independant*)enemy)->addMoney(this->getMoney());
 	enemy->hasWeapon = this->hasWeapon;
 	if (enemy->hasWeapon)
 		enemy->weapon = this->weapon->Clone();
+
+	((Independant*)enemy)->addMoney(this->getMoney());
+	enemy->hasEquipmentLoot = this->hasEquipmentLoot;
+	enemy->loot_equipment = this->getEquipmentLoot();
+	enemy->hasWeaponLoot = this->hasWeaponLoot;
+	enemy->loot_weapon = this->getWeaponLoot();
 
 	return enemy;
 }
@@ -74,7 +79,10 @@ void Enemy::Death()
 
 void Enemy::GenerateLoot()
 {
+	//TO DO : générer soit de la money, soit de l'équipment, soit une arme, et la donner à l'ennemi avec setMoney, setEquipmentLoot et setEquipmentWeapon
 	Loot* new_loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH));
 	new_loot->get_money_from(*this);
+	new_loot->get_equipment_from(*this);
+	new_loot->get_weapon_from(*this);
 	(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
 }

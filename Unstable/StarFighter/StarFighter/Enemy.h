@@ -6,6 +6,7 @@
 #include "Independant.h"
 #include "Weapon.h"
 #include "Loot.h"
+#include "Ship.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "MovePattern.h"

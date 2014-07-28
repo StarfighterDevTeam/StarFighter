@@ -166,8 +166,7 @@ void Scene::StartGame(sf::RenderWindow*	window)
 
 	//ship
 	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
-	playerShip->GenerateBots(playerShip);
-
+	playerShip->ship_config.GenerateBots(playerShip);
 }
 
 void Scene::Update(Time deltaTime)
@@ -249,11 +248,11 @@ ShipConfig* Scene::LoadShipConfig(string name)
 
 			//Loading equipment
 			printf("DEBUG: Loading ship equipment\n");
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]));
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]));
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]));
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]));
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]));
+			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
+			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
+			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
+			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]), false);
+			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
 
 			//Loading FX
 			shipC->FX_death = LoadFX((*it)[ShipConfigData::SHIPCONFIG_DEATH_FX]);
@@ -262,7 +261,7 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
 			{
 				printf("DEBUG: Loading ship weapon\n");
-				shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])));
+				shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
 			}
 
 			//Computing the ship config
@@ -536,6 +535,10 @@ void Scene::GenerateEnemies(Time deltaTime)
 			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[EnemyClass::ENEMYPOOL_ALPHA], EnemyClass::ENEMYPOOL_ALPHA,PatternType::NoMovePattern);
 
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
+
+			//test de loot d'ennemi hardcodé
+			Equipment* loot = LoadEquipment("module_gerard");
+			((Independant*)e->enemy)->setEquipmentLoot(loot);
 
 			cluster->push_back(e);
 		}

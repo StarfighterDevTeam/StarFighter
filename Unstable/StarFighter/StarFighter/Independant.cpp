@@ -54,6 +54,8 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->GarbageMe = false;
 	this->DontGarbageMe = false;
 	money=0;
+	hasEquipmentLoot = false;
+	hasWeaponLoot = false;
 	this->diag = sqrt(pow(m_size.x/2,2) + pow(m_size.y/2,2));
 }
 
@@ -205,4 +207,71 @@ void Independant::Death()
 void Independant::GenerateLoot()
 {
 	
+}
+
+void Independant::GetLoot (Independant& independant)
+{
+	this->get_money_from(independant);
+	if (independant.hasEquipmentLoot)
+	{
+		this->get_equipment_from(independant);
+	}
+	if (independant.hasWeaponLoot)
+	{
+		this->get_weapon_from(independant);
+	}
+}
+
+void Independant::get_equipment_from (Independant& independant)
+{
+	if (independant.hasEquipmentLoot)
+	{
+		this->setEquipmentLoot(independant.getEquipmentLoot());
+		independant.releaseEquipmentLoot();
+	}
+}
+
+void Independant::setEquipmentLoot (Equipment* equipment)
+{
+	this->loot_equipment = equipment;
+	this->hasEquipmentLoot = true;
+}
+
+Equipment* Independant::getEquipmentLoot()
+{
+	return this->loot_equipment;
+}
+
+void Independant::releaseEquipmentLoot()
+{
+	this->loot_equipment = NULL;
+	free(loot_equipment);
+	this->hasEquipmentLoot = false;
+}
+
+void Independant::get_weapon_from (Independant& independant)
+{
+	if (independant.hasWeaponLoot)
+	{
+		this->setWeaponLoot(independant.getWeaponLoot());
+		independant.releaseWeaponLoot();
+	}
+}
+
+void Independant::setWeaponLoot (Weapon* weapon)
+{
+	this->loot_weapon = weapon;
+	this->hasWeaponLoot = true;
+}
+
+Weapon* Independant::getWeaponLoot()
+{
+	return this->loot_weapon;
+}
+
+void Independant::releaseWeaponLoot()
+{
+	this->loot_weapon = NULL;
+	free(loot_weapon);
+	this->hasWeaponLoot = false;
 }

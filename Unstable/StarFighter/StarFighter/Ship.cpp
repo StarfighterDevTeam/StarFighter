@@ -132,16 +132,10 @@ ShipConfig::ShipConfig()
 		Equipment* defaultEquipment = new Equipment();
 		defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1);
 		this->equipment[i] = defaultEquipment;
+		this->hasEquipment[i] = false;
 	}
 
 	this->hasWeapon = false;
-	/*Ammo* player_ammo;
-	player_ammo = new Ammo(Vector2f(0,0), Vector2f(0,-500), LASERBLUE_FILENAME, Vector2f(LASERBLUE_WIDTH,LASERBLUE_HEIGHT), 150, new FX(Vector2f(0,0), Vector2f(0,0), FX_EXPLOSION_FILENAME, Vector2f(FX_EXPLOSION_WIDTH,FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_LITTLE_EXPLOSION_DURATION)));
-	weapon = new Weapon(player_ammo);
-	weapon->rate_of_fire = 0.2f;
-	weapon->fire_direction = sf::Vector2i(0, 1);
-	*/
-	
 }
 
 void ShipConfig::Init()
@@ -159,6 +153,7 @@ void ShipConfig::Init()
 	this->textureName = ship_model->textureName;
 
 	//Loading bots
+	this->bot_list.clear();
 	if (this->ship_model->hasBot)
 		this->bot_list.push_back(this->ship_model->bot);
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
@@ -166,36 +161,6 @@ void ShipConfig::Init()
 		if (this->equipment[i]->hasBot)
 			this->bot_list.push_back(this->equipment[i]->bot);
 	}
-}
-
-void ShipConfig::setEquipment(Equipment* m_equipment)
-{
-	this->equipment[m_equipment->equipmentType] = m_equipment;
-	
-	this->max_speed = getShipConfigMaxSpeed();
-	this->decceleration = getShipConfigDecceleration();
-	this->acceleration = getShipConfigAcceleration();
-	this->armor = getShipConfigArmor();
-	this->shield = getShipConfigShield();
-	this->shield_regen = getShipConfigShieldRegen();
-}
-
-void ShipConfig::setShipModel(ShipModel* m_ship_model)
-{
-	this->ship_model = m_ship_model;
-
-	this->max_speed = getShipConfigMaxSpeed();
-	this->decceleration = getShipConfigDecceleration();
-	this->acceleration = getShipConfigAcceleration();
-	this->armor = getShipConfigArmor();
-	this->shield = getShipConfigShield();
-	this->shield_regen = getShipConfigShieldRegen();
-}
-
-void ShipConfig::setShipWeapon(Weapon* m_weapon)
-{
-	this->weapon = m_weapon;
-	this->hasWeapon = true;
 }
 
 int ShipConfig::getShipConfigArmor()
@@ -365,6 +330,58 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 	return new_acceleration;
 }
 
+void ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats)
+{
+	this->equipment[m_equipment->equipmentType] = m_equipment;
+
+	this->hasEquipment[m_equipment->equipmentType] = true;
+
+	if (recomputing_stats)
+	{
+		this->Init();
+	}
+}
+
+void ShipConfig::setShipModel(ShipModel* m_ship_model)
+{
+	this->ship_model = m_ship_model;
+
+	this->Init();
+}
+
+void ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats)
+{
+	this->weapon = m_weapon;
+	this->hasWeapon = true;
+
+	if (recomputing_stats)
+	{
+		this->Init();
+	}
+}
+
+void ShipConfig::GenerateBots(Independant* m_target)
+{
+	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
+	{
+		Bot* m_bot = (*it)->Clone();
+		m_bot->setTarget(m_target);
+		(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
+	}
+}
+
+void ShipConfig::DestroyBots()
+{
+	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
+	{
+		(*it)->visible = false;
+		(*it)->isOnScene = false;
+		(*it)->GarbageMe = true;
+		
+	}
+	//this->bot_list.clear();//done in ship config Init()
+}
+
 // ----------------SHIP ---------------
 
 Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x/2),(m_ship_config.size.y/2)), m_ship_config.frameNumber)
@@ -388,6 +405,28 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 void Ship::setShipConfig(ShipConfig m_ship_config)
 {
 	this->ship_config = m_ship_config;
+}
+
+void Ship::setEquipment(Equipment* m_equipment)
+{
+	//this->ship_config.DestroyBots();
+	this->ship_config.setEquipment(m_equipment);
+	this->ship_config.GenerateBots(this);
+}
+
+void Ship::setShipModel(ShipModel* m_ship_model)
+{
+	//this->ship_config.DestroyBots();
+	this->ship_config.setShipModel(m_ship_model);
+	this->ship_config.GenerateBots(this);
+}
+
+void Ship::setShipWeapon(Weapon* m_weapon)
+{
+	//this->ship_config.DestroyBots();
+	this->ship_config.setShipWeapon(m_weapon);
+	this->ship_config.GenerateBots(this);
+	
 }
 
 void Ship::update(sf::Time deltaTime)
@@ -514,20 +553,49 @@ void Ship::Respawn()
 	immunityTimer.restart();
 }
 
-void Ship::GenerateBots(Independant* m_target)
-{
-	for (std::vector<Bot*>::iterator it = (this->ship_config.bot_list.begin()); it != (this->ship_config.bot_list.end()); it++)
-	{
-		Bot* m_bot = (*it)->Clone();
-		m_bot->setRadius(m_bot->radius + this->diag + (*it)->diag, 1);
-		m_bot->setTarget(m_target);
-		(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
-	}
-}
-
 void Ship::Death()
 {
 	FX* myFX = this->ship_config.FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
     (*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
+}
+
+void Ship::GetLoot(Independant& independant)
+{
+	this->get_money_from(independant);
+
+	if (independant.hasEquipmentLoot)
+	{
+		this->get_equipment_from(independant);
+		if (!this->ship_config.hasEquipment[loot_equipment->equipmentType])
+		{
+			this->setEquipment(this->loot_equipment);//if the ship config does not have any equipment of this type on, we equip it...
+		}
+		else
+		{
+			//else we put it in the stash
+			//pour l'instant on remplace systématiquement :
+			this->setEquipment(this->loot_equipment);
+		}
+
+		this->releaseEquipmentLoot();
+	}
+
+	if (independant.hasWeaponLoot)
+	{
+		this->get_weapon_from(independant);
+		if (!this->ship_config.hasWeapon)
+		{
+			this->setShipWeapon(this->loot_weapon);//if the ship config does not have any weapon of this type on, we equip it...
+			
+		}
+		else
+		{
+			//else we put it in the stash
+			//pour l'instant on remplace systématiquement :
+			this->setShipWeapon(this->loot_weapon);
+		}
+
+		this->releaseWeaponLoot();
+	}
 }

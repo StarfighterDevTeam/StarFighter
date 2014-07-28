@@ -157,7 +157,8 @@ void Game::colisionChecksV2()
 			if(SimpleCollision::AreColliding((*it1),(*it2)))
 			{
 				//Do something (like, take the loot)
-				(*it1)->get_money_from(*(*it2));
+				//(*it1)->get_money_from(*(*it2));
+				(*it1)->GetLoot((*(*it2)));
 				(*it2)->setVisible(false);
 				(*it2)->isOnScene = false;
 				(*it2)->GarbageMe = true;
@@ -190,8 +191,8 @@ void Game::colisionChecksV2()
 					{
 						(*it1)->Death();
 						//Loot
-						(*it1)->GenerateLoot();
 						hazard += (*it1)->getMoney();
+						(*it1)->GenerateLoot();
 
 						//sent to garbage collector
 						(*it1)->setVisible(false);

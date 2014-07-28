@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "TextureLoader.h"
 #include "Independant.h"
+#include "Ship.h"
 
 class Loot : public Independant
 {

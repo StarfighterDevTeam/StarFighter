@@ -99,22 +99,25 @@ public:
 	sf::Vector2f size;
 
 	int frameNumber;
-	void setEquipment(Equipment* m_equipment);
-	void setShipModel(ShipModel* m_ship_model);
-	void setShipWeapon(Weapon* m_weapon);
 	sf::Vector2f getShipConfigMaxSpeed();
 	float getShipConfigDecceleration();
 	sf::Vector2f getShipConfigAcceleration();
 	int getShipConfigArmor();
 	int getShipConfigShield();
 	int getShipConfigShieldRegen();
+	void setEquipment(Equipment* m_equipment, bool recomputing_stats = true);
+	void setShipModel(ShipModel* m_ship_model);
+	void setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true);
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
 	Weapon* weapon;
 	Bot* bot;
 	vector<Bot*> bot_list;
 	bool hasWeapon;
+	bool hasEquipment[NBVAL_EQUIPMENT];
 	FX* FX_death;
+	void GenerateBots(Independant* m_target);
+	void DestroyBots();
 
 private:
 	sf::Vector2f max_speed;
@@ -135,8 +138,13 @@ public :
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
 	void Respawn() override;
-	void GenerateBots(Independant* m_target);
+	
+	void setEquipment(Equipment* m_equipment);
+	void setShipModel(ShipModel* m_ship_model);
+	void setShipWeapon(Weapon* m_weapon);
+	
 	void Death() override;
+	void GetLoot(Independant& independant) override;
 
 	bool disable_inputs;
 	bool disable_fire;
