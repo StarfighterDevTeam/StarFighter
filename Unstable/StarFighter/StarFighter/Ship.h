@@ -70,7 +70,6 @@ class Equipment : public sf::Sprite
 public:
 	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
-	Equipment* Clone();
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;

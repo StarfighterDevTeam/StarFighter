@@ -91,18 +91,6 @@ void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decc
 	this->equipmentType = m_equipmentType;
 }
 
-Equipment* Equipment::Clone()
-{
-	Equipment* new_equipment = new Equipment();
-	new_equipment->Init(this->equipmentType, this->getEquipmentMaxSpeed(), this->getEquipmentDecceleration(), this->getEquipmentAcceleration(),
-			this->getEquipmentArmor(), this->getEquipmentShield(), this->getEquipmentShieldRegen(), this->textureName, this->size,
-			this->frameNumber, this->display_name);
-	new_equipment->hasBot = this->hasBot;
-	if (new_equipment->hasBot)
-		new_equipment->bot = this->bot;
-
-	return new_equipment;
-}
 sf::Vector2f Equipment::getEquipmentMaxSpeed()
 {
 	return this->max_speed;
