@@ -69,10 +69,9 @@ Equipment::Equipment()
 	this->size.x = SLOT_WIDTH;
 	this->size.y = SLOT_HEIGHT;
 	this->textureName = EMPTYSLOT_FILENAME;
-	this->equipmentType = EquipmentType::Empty;
+	this->equipmentType = EquipmentType::Airbrake;
 	this->hasBot = false;
 }
-
 
 void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
@@ -92,7 +91,18 @@ void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decc
 	this->equipmentType = m_equipmentType;
 }
 
+Equipment* Equipment::Clone()
+{
+	Equipment* new_equipment = new Equipment();
+	new_equipment->Init(this->equipmentType, this->getEquipmentMaxSpeed(), this->getEquipmentDecceleration(), this->getEquipmentAcceleration(),
+			this->getEquipmentArmor(), this->getEquipmentShield(), this->getEquipmentShieldRegen(), this->textureName, this->size,
+			this->frameNumber, this->display_name);
+	new_equipment->hasBot = this->hasBot;
+	if (new_equipment->hasBot)
+		new_equipment->bot = this->bot;
 
+	return new_equipment;
+}
 sf::Vector2f Equipment::getEquipmentMaxSpeed()
 {
 	return this->max_speed;
@@ -132,7 +142,7 @@ ShipConfig::ShipConfig()
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		Equipment* defaultEquipment = new Equipment();
-		defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
+		//defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
 		this->equipment[i] = defaultEquipment;
 		this->hasEquipment[i] = false;
 	}
@@ -152,16 +162,22 @@ void ShipConfig::Init()
 	this->size.y = ship_model->size.y;
 	this->textureName = ship_model->textureName;
 	this->frameNumber = ship_model->frameNumber;
-	this->textureName = ship_model->textureName;
 
 	//Loading bots
 	this->bot_list.clear();
 	if (this->ship_model->hasBot)
+	{
 		this->bot_list.push_back(this->ship_model->bot);
+	}
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->equipment[i]->hasBot)
-			this->bot_list.push_back(this->equipment[i]->bot);
+		if (this->hasEquipment[i])
+		{
+			if (this->equipment[i]->hasBot)
+			{
+				this->bot_list.push_back(this->equipment[i]->bot);
+			}
+		}
 	}
 }
 
@@ -172,7 +188,7 @@ int ShipConfig::getShipConfigArmor()
 
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (equipment[i] != NULL)
+		if (this->hasEquipment[i])
 		{
 			equipment_armor += equipment[i]->getEquipmentArmor();
 		}
@@ -198,7 +214,7 @@ int ShipConfig::getShipConfigShield()
 
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (equipment[i] != NULL)
+		if (this->hasEquipment[i])
 		{
 			equipment_shield += equipment[i]->getEquipmentShield();
 		}
@@ -224,7 +240,7 @@ int ShipConfig::getShipConfigShieldRegen()
 
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (equipment[i] != NULL)
+		if (this->hasEquipment[i])
 		{
 			equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
 
@@ -251,7 +267,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (equipment[i] != NULL)
+		if (this->hasEquipment[i])
 		{
 			equipment_max_speed.x += equipment[i]->getEquipmentMaxSpeed().x;
 			equipment_max_speed.y += equipment[i]->getEquipmentMaxSpeed().y;
@@ -282,7 +298,7 @@ float ShipConfig::getShipConfigDecceleration()
 
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (equipment[i] != NULL)
+		if (this->hasEquipment[i])
 		{
 			equipment_decceleration += equipment[i]->getEquipmentDecceleration();
 		}
@@ -308,7 +324,7 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (equipment[i] != NULL)
+		if (this->hasEquipment[i])
 		{
 			equipment_acceleration.x += equipment[i]->getEquipmentAcceleration().x;
 			equipment_acceleration.y += equipment[i]->getEquipmentAcceleration().y;
@@ -373,10 +389,6 @@ void ShipConfig::GenerateBots(Independant* m_target)
 
 void ShipConfig::DestroyBots()
 {
-	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
-	{
-		free(*it);
-	}
 	this->bot_list.clear();
 	(*CurrentGame).garbageLayer(LayerType::BotLayer);
 }

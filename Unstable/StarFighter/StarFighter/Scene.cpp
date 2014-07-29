@@ -250,8 +250,8 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			printf("DEBUG: Loading ship equipment\n");
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]), false);
+			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
+			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]), false);
 			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
 
 			//Loading FX
@@ -395,14 +395,11 @@ Equipment* Scene::LoadEquipment(string name)
 		{
 			Equipment* i = new Equipment();
 
-			i-> Init(EquipmentType::Empty, Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_X]),stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_Y])), 
+			i-> Init(EquipmentType::Airbrake, Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_X]),stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_Y])), 
 				stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),
 				stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]),
 				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
 				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
-
-			//if ((*it)[EquipmentData::EQUIPMENT_BOT] != "")
-			//	i->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
 
 			if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
 			{
@@ -412,15 +409,15 @@ Equipment* Scene::LoadEquipment(string name)
 
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
 				i->equipmentType = EquipmentType::Airbrake;
-			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("engine") == 0)
+			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("engine") == 0)
 				i->equipmentType = EquipmentType::Engine;
-			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("armor") == 0)
+			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("armor") == 0)
 				i->equipmentType = EquipmentType::Armor;
-			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("shield") == 0)
+			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("shield") == 0)
 				i->equipmentType = EquipmentType::Shield;
-			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("module") == 0)
+			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("module") == 0)
 				i->equipmentType = EquipmentType::Module;
-			if (i->equipmentType == EquipmentType::Empty)
+			else 
 				LOGGER_WRITE(Logger::Priority::DEBUG,"Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file",name);
 
 			return i;

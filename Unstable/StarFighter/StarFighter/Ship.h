@@ -32,13 +32,12 @@
 class Loot;
 
 enum EquipmentType {
-	Empty,//0
-	Airbrake,//1
-	Engine,//2
-	Armor,//3
-	Shield,//4
-	Module,//5
-	NBVAL_EQUIPMENT//6
+	Airbrake,//0
+	Engine,//1
+	Armor,//2
+	Shield,//3
+	Module,//4
+	NBVAL_EQUIPMENT//5
 };
 
 class ShipModel : public sf::Sprite
@@ -71,6 +70,7 @@ class Equipment : public sf::Sprite
 public:
 	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
+	Equipment* Clone();
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;
