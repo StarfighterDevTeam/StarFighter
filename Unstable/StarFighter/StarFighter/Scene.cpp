@@ -304,6 +304,7 @@ EnemyBase* Scene::LoadEnemy(string name, int probability, int poolSize, int enem
 			((Independant*)base->enemy)->shield_regen = stoi((*it)[EnemyData::ENEMY_SHIELD_REGEN]);
 			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
+			((Independant*)base->enemy)->display_name = (*it)[EnemyData::ENEMY_NAME];
 
 			if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
 			{
@@ -325,6 +326,7 @@ Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		if((*it)[0].compare(name) == 0)
 		{
 			Weapon* weapon = new Weapon(ammo);
+			weapon->display_name = (*it)[WeaponData::WEAPON_NAME];
 			weapon->fire_direction = Vector2i(0,fire_direction);
 			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
 			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
@@ -353,7 +355,11 @@ Ammo* Scene::LoadAmmo(string name)
 	{
 		if((*it)[0].compare(name) == 0)
 		{
-			return new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
+			Ammo* new_ammo = new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], 
+				Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
+			new_ammo->display_name = (*it)[AmmoData::AMMO_NAME];
+
+			return new_ammo;
 		}
 	}
 
@@ -370,7 +376,8 @@ FX* Scene::LoadFX(string name)
 			{
 				float duration = atof(((*it)[FXData::FX_DURATION]).c_str());
 				FX* myFX = new FX(Vector2f(0,0), Vector2f(0,0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]),stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(duration));
-				
+				myFX->display_name = (*it)[FXData::FX_NAME];
+
 				return myFX;
 			}
 		}
@@ -392,7 +399,7 @@ Equipment* Scene::LoadEquipment(string name)
 				stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),
 				stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]),
 				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
-				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]));
+				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 
 			//if ((*it)[EquipmentData::EQUIPMENT_BOT] != "")
 			//	i->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
@@ -434,7 +441,8 @@ ShipModel* Scene::LoadShipModel(string name)
 				ShipModel* s = new ShipModel(Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_X]),stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_Y])), 
 					Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
 					stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]),
-					(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])), stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]));
+					(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])), 
+					stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 
 				if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
 				{
@@ -443,7 +451,6 @@ ShipModel* Scene::LoadShipModel(string name)
 				}
 
 				return s;
-
 			}	
 		}
 	}
@@ -459,6 +466,7 @@ Bot* Scene::LoadBot(string name)
 		{
 			Bot* bot = new Bot(Vector2f(0,0), Vector2f(0,0),(*it)[BotData::BOT_IMAGE_NAME],sf::Vector2f(stoi((*it)[BotData::BOT_WIDTH]),stoi((*it)[BotData::BOT_HEIGHT])));
 
+			((Independant*)bot)->display_name = (*it)[BotData::BOT_NAME];
 			((Independant*)bot)->armor = stoi((*it)[BotData::BOT_ARMOR]);
 			((Independant*)bot)->shield = ((Independant*)bot)->shield_max = stoi((*it)[BotData::BOT_SHIELD]);
 			((Independant*)bot)->shield_regen = stoi((*it)[BotData::BOT_SHIELD_REGEN]);

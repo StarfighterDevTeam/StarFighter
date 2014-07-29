@@ -86,6 +86,7 @@ public:
 	sf::Vector2f speed;
 	PatternBobby Pattern;
 	float diag;
+	std::string display_name;
 
 protected:
 	sf::Vector2f initial_position;
@@ -100,8 +101,8 @@ protected:
 	bool immune;
 	sf::Clock immunityTimer;
 	int money;
-	Equipment* loot_equipment;
-	Weapon* loot_weapon;
+	Equipment* equipment_loot;
+	Weapon* weapon_loot;
 
 };
 

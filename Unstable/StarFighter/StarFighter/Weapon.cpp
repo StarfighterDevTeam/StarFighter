@@ -202,6 +202,7 @@ sf::Vector2f Weapon::AngleShot(float angle, float m_ref_speed)
 Weapon* Weapon::Clone()
 {
 	Weapon* weapon = new Weapon(this->ammunition->Clone());
+	weapon->display_name = this->display_name;
 	weapon->fire_direction = this->fire_direction;
 	weapon->rate_of_fire = this->rate_of_fire;
 	weapon->multishot = this->multishot;

@@ -27,6 +27,7 @@ public:
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;
+	std::string display_name;
 	sf::Vector2f speed;
 	bool firing_ready;
 	void Fire(IndependantType m_collider_type);

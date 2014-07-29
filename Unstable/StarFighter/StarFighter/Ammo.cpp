@@ -16,6 +16,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 Ammo* Ammo::Clone()
 {
 	Ammo* m_ammo = new Ammo(this->getPosition(),this->speed,this->textureName,this->m_size,this->damage, this->explosion);
+	m_ammo->display_name = this->display_name;
 	return m_ammo;
 }
 

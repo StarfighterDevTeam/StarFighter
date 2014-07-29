@@ -6,7 +6,7 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
+ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -19,6 +19,7 @@ ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, floa
 	this->textureName = m_textureName;
 	this->size = m_size;
 	this->frameNumber = m_frameNumber;
+	this->display_name = m_display_name;
 	this->hasBot = false;
 }
 
@@ -73,7 +74,7 @@ Equipment::Equipment()
 }
 
 
-void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber)
+void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -87,6 +88,7 @@ void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decc
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
 	this->frameNumber = m_frameNumber;
+	this->display_name = m_display_name;
 	this->equipmentType = m_equipmentType;
 }
 
@@ -125,12 +127,12 @@ int Equipment::getEquipmentShieldRegen()
 
 ShipConfig::ShipConfig()
 {
-	this->ship_model = new ShipModel(sf::Vector2f (0,0), sf::Vector2f (0,0), 0.0f, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1);
+	this->ship_model = new ShipModel(sf::Vector2f (0,0), sf::Vector2f (0,0), 0.0f, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
 
 	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		Equipment* defaultEquipment = new Equipment();
-		defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1);
+		defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
 		this->equipment[i] = defaultEquipment;
 		this->hasEquipment[i] = false;
 	}
@@ -563,36 +565,41 @@ void Ship::GetLoot(Independant& independant)
 
 	if (independant.hasEquipmentLoot)
 	{
-		this->get_equipment_from(independant);
-		if (!this->ship_config.hasEquipment[loot_equipment->equipmentType])
+		if (!this->ship_config.hasEquipment[independant.getEquipmentLoot()->equipmentType])
 		{
-			this->setEquipment(this->loot_equipment);//if the ship config does not have any equipment of this type on, we equip it...
+			//if the ship config does not have any equipment of this type on, we equip it...
+			this->setEquipment(independant.getEquipmentLoot());
+			independant.releaseEquipmentLoot();
 		}
 		else
 		{
-			//else we put it in the stash
-			//pour l'instant on remplace systématiquement :
-			this->setEquipment(this->loot_equipment);
+			//...else we put it in the stash
+			printf("Equipment added to ship stash: '%s'\n",independant.getEquipmentLoot()->display_name.c_str());
+			this->stash.push_back((Loot*)independant.getEquipmentLoot());
+			independant.releaseEquipmentLoot();
+			
 		}
 
-		this->releaseEquipmentLoot();
+		//this->releaseEquipmentLoot();
 	}
 
 	if (independant.hasWeaponLoot)
 	{
-		this->get_weapon_from(independant);
 		if (!this->ship_config.hasWeapon)
 		{
-			this->setShipWeapon(this->loot_weapon);//if the ship config does not have any weapon of this type on, we equip it...
+			//if the ship config does not have any weapon of this type on, we equip it...
 			
+			this->setShipWeapon(independant.getWeaponLoot());
+			independant.releaseWeaponLoot();
 		}
 		else
 		{
-			//else we put it in the stash
-			//pour l'instant on remplace systématiquement :
-			this->setShipWeapon(this->loot_weapon);
+			//...else we add it in stash
+			printf("Weapon added to ship stash: '%s'\n",independant.getWeaponLoot()->display_name.c_str());
+			this->stash.push_back((Loot*)independant.getWeaponLoot());
+			independant.releaseWeaponLoot();
 		}
 
-		this->releaseWeaponLoot();
+		//this->releaseWeaponLoot();
 	}
 }

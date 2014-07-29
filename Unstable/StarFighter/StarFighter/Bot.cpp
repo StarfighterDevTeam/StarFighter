@@ -61,6 +61,7 @@ void Bot::update(sf::Time deltaTime)
 Bot* Bot::Clone()
 {
 	Bot* bot = new Bot(this->getPosition(), this->speed, this->textureName, this->m_size);
+	bot->display_name = this->display_name;
 	bot->radius = this->radius;
 	bot->vspeed = this->vspeed;
 	bot->Pattern = this->Pattern;

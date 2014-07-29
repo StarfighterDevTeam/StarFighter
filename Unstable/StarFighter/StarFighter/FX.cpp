@@ -33,5 +33,7 @@ void FX::update(sf::Time deltaTime)
 
 FX* FX::Clone()
 {
-	return new FX(this->getPosition(), this->speed, this->textureName, this->m_size, this->frameNumber, this->duration);
+	FX* new_FX = new FX(this->getPosition(), this->speed, this->textureName, this->m_size, this->frameNumber, this->duration);
+	new_FX->display_name = this->display_name;
+	return new_FX;
 }

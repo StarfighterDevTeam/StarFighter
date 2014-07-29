@@ -29,6 +29,8 @@
 
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
+class Loot;
+
 enum EquipmentType {
 	Empty,//0
 	Airbrake,//1
@@ -39,10 +41,10 @@ enum EquipmentType {
 	NBVAL_EQUIPMENT//6
 };
 
-class ShipModel
+class ShipModel : public sf::Sprite
 {
 public:
-	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
+	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	sf::Vector2f getShipModelMaxSpeed();
 	float getShipModelDecceleration();
 	sf::Vector2f getShipModelAcceleration();
@@ -52,6 +54,7 @@ public:
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;
+	std::string display_name;
 	Bot* bot;
 	bool hasBot;
 private:
@@ -66,11 +69,12 @@ private:
 class Equipment : public sf::Sprite
 {
 public:
-	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber);
+	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;
+	std::string display_name;
 	int equipmentType;
 	sf::Vector2f getEquipmentMaxSpeed();
 	float getEquipmentDecceleration();
@@ -137,8 +141,9 @@ public :
 	void setShipConfig(ShipConfig m_ship_config);
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
+	vector<Loot*> stash;
+
 	void Respawn() override;
-	
 	void setEquipment(Equipment* m_equipment);
 	void setShipModel(ShipModel* m_ship_model);
 	void setShipWeapon(Weapon* m_weapon);

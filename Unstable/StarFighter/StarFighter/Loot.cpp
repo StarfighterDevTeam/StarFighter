@@ -7,20 +7,21 @@
 #define WEAPON_LOOT_PROBABILITY		30
 #define MODULE_LOOT_PROBABILITY		1
 
-Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : Independant(position, speed, textureName, size)
+Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name) : Independant(position, speed, textureName, size)
 {
-	 visible = true;
-	 isOnScene = true;
-	 hasEquipmentLoot = false;
-	 collider_type = IndependantType::LootObject;
-	 money = 0;
+	 this->visible = true;
+	 this->isOnScene = true;
+	 this->hasEquipmentLoot = false;
+	 this->collider_type = IndependantType::LootObject;
+	 this->money = 0;
+	 this->display_name = m_display_name;
 }
 
 Loot* Loot::Clone()
 {
-	Loot* new_loot = new Loot(this->getPosition(), this->speed, this->textureName, this->m_size);
+	Loot* new_loot = new Loot(this->getPosition(), this->speed, this->textureName, this->m_size, this->display_name);
 	new_loot->money = this->getMoney();
-	new_loot->loot_equipment = this->loot_equipment;
+	new_loot->equipment_loot = this->equipment_loot;
 
 	return new_loot;
 }

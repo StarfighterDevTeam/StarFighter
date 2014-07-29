@@ -212,6 +212,7 @@ void Independant::GenerateLoot()
 void Independant::GetLoot (Independant& independant)
 {
 	this->get_money_from(independant);
+
 	if (independant.hasEquipmentLoot)
 	{
 		this->get_equipment_from(independant);
@@ -233,19 +234,19 @@ void Independant::get_equipment_from (Independant& independant)
 
 void Independant::setEquipmentLoot (Equipment* equipment)
 {
-	this->loot_equipment = equipment;
+	this->equipment_loot = equipment;
 	this->hasEquipmentLoot = true;
 }
 
 Equipment* Independant::getEquipmentLoot()
 {
-	return this->loot_equipment;
+	return this->equipment_loot;
 }
 
 void Independant::releaseEquipmentLoot()
 {
-	this->loot_equipment = NULL;
-	free(loot_equipment);
+	this->equipment_loot = NULL;
+	free(equipment_loot);
 	this->hasEquipmentLoot = false;
 }
 
@@ -260,18 +261,18 @@ void Independant::get_weapon_from (Independant& independant)
 
 void Independant::setWeaponLoot (Weapon* weapon)
 {
-	this->loot_weapon = weapon;
+	this->weapon_loot = weapon;
 	this->hasWeaponLoot = true;
 }
 
 Weapon* Independant::getWeaponLoot()
 {
-	return this->loot_weapon;
+	return this->weapon_loot;
 }
 
 void Independant::releaseWeaponLoot()
 {
-	this->loot_weapon = NULL;
-	free(loot_weapon);
+	this->weapon_loot = NULL;
+	free(weapon_loot);
 	this->hasWeaponLoot = false;
 }
