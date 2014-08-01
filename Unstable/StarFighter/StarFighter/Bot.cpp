@@ -13,6 +13,7 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	hasTarget = false;
 	hasWeapon = false;
 	spread = sf::Vector2f(0,0);
+	this->damage = 0;
 }
 
 void Bot::setTarget (Independant* m_target)
@@ -70,7 +71,7 @@ Bot* Bot::Clone()
 	if (bot->hasWeapon)
 		bot->weapon = this->weapon;
 	bot->hasTarget = this->hasTarget;
-
+	bot->damage = this->damage;
 
 	return bot;
 }

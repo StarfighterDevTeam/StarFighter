@@ -8,7 +8,7 @@ void Scene::LoadSceneFromFile(string name)
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
 	scrolling_direction.x = 0;
 	scrolling_direction.y = 1;
-	vspeed = + 10;
+	vspeed = + 2;
 	hazard_break_value = 0;
 	for (int i=0; i<EnemyClass::NBVAL_EnemyClass;i++)
 	{
@@ -248,11 +248,11 @@ ShipConfig* Scene::LoadShipConfig(string name)
 
 			//Loading equipment
 			printf("DEBUG: Loading ship equipment\n");
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
+			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
+			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
 			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
 			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]), false);
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
+			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
 
 			//Loading FX
 			shipC->FX_death = LoadFX((*it)[ShipConfigData::SHIPCONFIG_DEATH_FX]);
@@ -261,7 +261,7 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
 			{
 				printf("DEBUG: Loading ship weapon\n");
-				shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
+				//shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
 			}
 
 			//Computing the ship config
@@ -501,7 +501,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if(timer > 3)
+	if(timer > 2)
 	{
 		double intpart;
 		timer = modf (timer, &intpart);
@@ -546,8 +546,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
 
 			//test de loot d'ennemi hardcodé
-			Equipment* loot = LoadEquipment("module_gerard");
-			((Independant*)e->enemy)->setEquipmentLoot(loot);
+			//Equipment* loot = LoadEquipment("module_gerard");
+			//((Independant*)e->enemy)->setEquipmentLoot(loot);
 
 			//test de loot d'ennemi hardcodé
 			//Weapon* loot = LoadWeapon("laser_player", -1, LoadAmmo("laser_blue"));

@@ -7,6 +7,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	damage = m_damage;
 	armor = 1;
 	shield = 0;
+	shield_max = 0;
 	shield_regen = 0;
 	startPattern = false;
 	ref_speed = sqrt(pow(speed.x,2)+pow(speed.y,2));

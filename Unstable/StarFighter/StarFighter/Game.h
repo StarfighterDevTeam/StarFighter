@@ -47,7 +47,6 @@ public:
 	sf::Vector2f scale_factor;
 
 private:
-	Ship* playerShip;
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	Clock sceneChronometer;
 	float movementClock;

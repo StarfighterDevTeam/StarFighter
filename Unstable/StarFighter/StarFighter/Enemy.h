@@ -41,6 +41,7 @@ public:
 	int movepattern_type;
 	bool hasWeapon;
 	void GenerateLoot() override;
+	Loot* CreateRandomLoot(int m_value);
 private:
 		
 };

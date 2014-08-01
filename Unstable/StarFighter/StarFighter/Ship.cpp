@@ -401,15 +401,27 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	disable_fire = false;
 }
 
+void Ship::Init()
+{
+	this->armor = this->ship_config.getShipConfigArmor();
+	this->shield_max = this->ship_config.getShipConfigShield();
+	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
+	this->m_size = this->ship_config.ship_model->size;
+	this->textureName = this->ship_config.ship_model->textureName;
+	this->ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
+}
+
 void Ship::setShipConfig(ShipConfig m_ship_config)
 {
 	this->ship_config = m_ship_config;
+	this->Init();
 }
 
 void Ship::setEquipment(Equipment* m_equipment)
 {
 	this->ship_config.DestroyBots();
 	this->ship_config.setEquipment(m_equipment);
+	this->Init();
 	this->ship_config.GenerateBots(this);
 }
 
@@ -417,6 +429,7 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 {
 	this->ship_config.DestroyBots();
 	this->ship_config.setShipModel(m_ship_model);
+	this->Init();
 	this->ship_config.GenerateBots(this);
 }
 
@@ -424,6 +437,7 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 {
 	this->ship_config.DestroyBots();
 	this->ship_config.setShipWeapon(m_weapon);
+	this->Init();
 	this->ship_config.GenerateBots(this);
 	
 }
@@ -457,9 +471,7 @@ void Ship::update(sf::Time deltaTime)
 			shield = ship_config.getShipConfigShield();
 		}
 	}
-	this->ship_hud.update(armor/3, shield/3, money);//will do for now... but we'll need to scale it to the max value later
-
-
+	this->ship_hud.update(this->armor/3, this->shield/3, this->money);//will do for now... but we'll need to scale it to the max value later
 
 	sf::Vector2f directions = InputGuy::getDirections();
 	if (!disable_inputs)
@@ -477,7 +489,6 @@ void Ship::update(sf::Time deltaTime)
 			{
 				ship_config.weapon->weaponOffset = sf::Vector2f((ship_config.size.x/2) + (ship_config.weapon->ammunition->m_size.y/2), (ship_config.size.y/2) - (ship_config.weapon->ammunition->m_size.y/2) *ship_config.weapon->fire_direction.y );
 				ship_config.weapon->setPosition(this->getPosition().x, this->getPosition().y);
-				//ship_config.weapon->setPosition(this->getPosition().x, (this->getPosition().y - (ship_config.size.y/2)) );
 				ship_config.weapon->Fire(FriendlyFire);
 			}
 		}
@@ -574,6 +585,7 @@ void Ship::GetLoot(Independant& independant)
 		else
 		{
 			//...else we put it in the stash
+			
 			printf("Equipment added to ship stash: '%s'\n",independant.getEquipmentLoot()->display_name.c_str());
 			this->stash.push_back((Loot*)independant.getEquipmentLoot());
 			independant.releaseEquipmentLoot();

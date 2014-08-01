@@ -37,6 +37,9 @@ void EnemyPool::CreateCluster()
 			Enemy* n = (*it)->enemy->Clone();
 			n->setVisible(true);
 			n->setPosition(sf::Vector2f(this->position.x + (index % nb_rows)*xspread, this->position.y + (floor(index / nb_rows)-1)*yspread));
+
+			//debug: let's try to create a random loot for this particular felow
+			n->GetLoot((Independant)*(n->CreateRandomLoot(n->getMoney())));
 			
 			(*CurrentGame).addToScene(n,LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
 		}

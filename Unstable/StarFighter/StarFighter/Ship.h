@@ -135,7 +135,7 @@ class Ship : public Independant
 {
 public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
-	void Init(int x, int y);
+	void Init();
 	void update(sf::Time deltaTime) override;
 	void setShipConfig(ShipConfig m_ship_config);
 	ShipConfig ship_config;

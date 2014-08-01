@@ -8,13 +8,14 @@ Weapon::Weapon(Ammo* Ammunition)
 	speed.y = 0;
 	multishot = 1;
 	xspread = 10;
+	rate_of_fire = 0.4f;
 	alternate = false;
 	shot_index = 0;
 	angle = 0.f;
-	dispersion = 180.f;
+	dispersion = 0.f;
 	firing_ready = true;
 	rafale_cooldown = 0.8f;
-	rafale = 5;
+	rafale = 0;
 	rafale_index = 0;
 
 	this->ammunition = Ammunition;
