@@ -26,19 +26,9 @@
 #define SHIP_ARMOR					600
 #define SHIP_SHIELD					1000
 #define SHIP_SHIELD_REGEN			1
-
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
 class Loot;
-
-enum EquipmentType {
-	Airbrake,//0
-	Engine,//1
-	Armor,//2
-	Shield,//3
-	Module,//4
-	NBVAL_EQUIPMENT//5
-};
 
 class ShipModel : public sf::Sprite
 {
@@ -83,6 +73,12 @@ public:
 	int getEquipmentShieldRegen();
 	Bot* bot;
 	bool hasBot;
+
+	void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 
 private:
 	float decceleration;
@@ -157,6 +153,5 @@ private:
 	bool movingX;
 	bool movingY;
 };
-
 
 #endif // SHIP_H_INCLUDED

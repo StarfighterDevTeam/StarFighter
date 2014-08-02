@@ -45,4 +45,30 @@
 #define EQUIPMENT_FILE "Assets/Scripts/Equipment.csv"
 #define BOT_FILE "Assets/Scripts/Bot.csv"
 
+//DROP SYSTEM VARIABLES
+
+#define EQUIPMENT_MIN_MAXSPEED_VALUE					100
+#define EQUIPMENT_MIN_ACCELLERATION_VALUE				100
+#define EQUIPMENT_MIN_DECCELLERATION_VALUE				100
+#define EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BASE		5
+#define EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X		0.01
+#define EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS	2.5
+#define EQUIPMENT_MIN_ARMOR_VALUE						100
+#define EQUIPMENT_MIN_SHIELD_VALUE						100
+#define EQUIPMENT_MIN_SHIELD_REGEN_VALUE				100
+
+#define WEAPON_MIN_DAMAGE_VALUE							50
+#define WEAPON_MIN_VSPEED_VALUE							300
+#define WEAPON_MIN_RATE_OF_FIRE_VALUE					0.5f
+
+#define NUMBER_OF_BEASTSCALE_THRESHOLD					5
+#define NB_MAX_PROPERTIES_FOR_NON_EPIC_EQUIPMENT		3
+
+int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
+float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
+float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);
+int RandomizeIntBetweenValues(int min_value, int max_value);
+int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
+float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
+
 #endif // GLOBALS_H_INCLUDED

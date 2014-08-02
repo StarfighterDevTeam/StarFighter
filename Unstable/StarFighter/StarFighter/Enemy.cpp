@@ -107,156 +107,189 @@ void Enemy::GenerateLoot()
 	}
 }
 
-#define PROBA_OF_DROPPING_SOMETHING			0.70
-#define PROBA_OF_DROPPING_MONEY				0.40
+float LootTable_DroppingSomething[EnemyClass::NBVAL_EnemyClass] =  {0.0, 0.25, 0.5, 0.8, 1.0, 0.0};
+float LootTable_DropIsEquipment[EnemyClass::NBVAL_EnemyClass] = {0.0, 0.1, 0.3, 0.6, 1.0, 0.0};
+sf::Vector2f LootTable_BeastScale[EnemyClass::NBVAL_EnemyClass] =  {sf::Vector2f(0.0, 0.0), sf::Vector2f(0.7,1.3), sf::Vector2f(0.9,1.5), sf::Vector2f(1.1, 1.7),sf::Vector2f (1.5,2.2), sf::Vector2f(0.0, 0.0)};
+float LootTable_BeastScaleThreshold[NUMBER_OF_BEASTSCALE_THRESHOLD] =  {0.0, 1.5, 3.0, 4.5, 6.0};
+const int LootTable_MaxPropertiesPerEquipmentType[EquipmentType::NBVAL_EQUIPMENT+1] =  {1, 2, 1, 2, 4, 4};
 
-#define MIN_DECELLERATION_DROP_STAT			200
-#define DECELLERATION_PER_VALUE_UNIT		20
-
-#define MIN_ACCELLERATION_DROP_STAT			100
-#define ACCELLERATION_PER_VALUE_UNIT		10
-#define MIN_MAX_SPEED_DROP_STAT				50
-#define MAX_SPEED_PER_VALUE_UNIT			10
-
-#define MIN_ARMOR_DROP_STAT					50
-#define ARMOR_PER_VALUE_UNIT				30
-
-#define MIN_SHIELD_DROP_STAT				100
-#define SHIELD_PER_VALUE_UNIT				20
-#define MIN_SHIELD_REGEN_DROP_STAT			100
-#define SHIELD_REGEN_PER_VALUE_UNIT			20
-
-#define MONEY_DROP_MIN_RATE					0.20
-#define MONEY_DROP_MAX_RATE					1.0
-
-#define EQUIPMENT_DROP_MIN_RATE				0.7
-#define EQUIPMENT_DROP_MAX_RATE				1.3
-
-#define WEAPON_BASE_RATE_OF_FIRE_MULTIPLIER		5
-#define WEAPON_DISPERSION_DROP_RATE				0.50
-#define WEAPON_DISPERSION_MAX_VALUE				170
-#define WEAPON_ALTERNATE_DROP_RATE				0.25
-#define WEAPON_MULTISHOT_MIN_VALUE				2
-#define WEAPON_MULTISHOT_MAX_VALUE				10
-#define WEAPON_MULTISHOT_BOT_MAX_VALUE			3
-#define WEAPON_AMMO_SPEED_MIN_MULTIPLIER		1.5
-#define WEAPON_AMMO_SPEED_MAX_MULTIPLIER		5
-#define WEAPON_AMMO_BASE_DAMAGE					100
-#define WEAPON_AMMO_BASE_BOT_DAMAGE				100
-#define WEAPON_AMMO_BASE_VSPEED					300
-#define WEAPON_AMMO_BASE_BOT_VSPEED				300
-#define WEAPON_AMMO_DAMAGE_BASE_MULTIPLIER		3		
-
-int RandomizeIntBetweenRatios(int value, float min_ratio, float max_ratio)
+Loot* Enemy::CreateRandomLoot(int e_value, EnemyClass e_class)
 {
-	double random_rate = ((double) rand() / RAND_MAX);
-	random_rate *= (max_ratio - min_ratio);
-	random_rate += min_ratio;
-	int i = (int) ((random_rate*value) + 0.5);
-
-	return i;
-}
-
-float RandomizeFloatBetweenRatios(float value, float min_ratio, float max_ratio)
-{
-	double random_rate = ((double) rand() / RAND_MAX);
-	random_rate *= (max_ratio - min_ratio);
-	random_rate += min_ratio;
-	float f = (float) (random_rate*value);
-
-	return f;
-}
-
-int RandomizeIntBetweenValues(int min_value, int max_value)
-{
-	int random_value = rand() % (max_value - min_value +1);
-	random_value += min_value;
-
-	return random_value;
-}
-
-int RandomizeFloatBetweenValues(float min_value, float max_value)
-{
-	float random_value = (float) ((double) rand() / RAND_MAX);
-	random_value *= (max_value - min_value);
-	random_value += min_value;
-
-	return random_value;
-}
-
-Loot* Enemy::CreateRandomLoot(int m_value)
-{
-	Loot* loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Empty drop");
 	this->setMoney(0);
+	Loot* loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Empty drop");
 
 	double random_number = (double) rand() / (RAND_MAX);
 
-	if (random_number > PROBA_OF_DROPPING_SOMETHING)
+	if (random_number > LootTable_DroppingSomething[(int)e_class])
 	{	
-		return loot;//empty drop: money = 0
-	}
-	else if (random_number < PROBA_OF_DROPPING_MONEY*PROBA_OF_DROPPING_SOMETHING)
-	{
-		int money = RandomizeIntBetweenRatios(m_value, MONEY_DROP_MIN_RATE, MONEY_DROP_MAX_RATE);
-		loot->addMoney(money);
-
-		return loot;
+		return loot;//empty drop
 	}
 
-	else
+	else if (random_number < LootTable_DropIsEquipment[(int)e_class]*LootTable_DroppingSomething[(int)e_class])
 	{
-		int dice_roll = rand() % ((int)EquipmentType::NBVAL_EQUIPMENT + 1);
+		//-----NUMBER OF PROPERTIES-----
+		float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[(int)e_class]);
+		int number_of_equipment_properties = 0;
+		bool epic_drop = false;
+		for (int i=1; i<NUMBER_OF_BEASTSCALE_THRESHOLD; i++) 
+		{
+			if (BeastScaleScore > LootTable_BeastScaleThreshold[i])
+			{
+				//guaranteed equipment properties
+				number_of_equipment_properties++;
+			}
+			else
+			{
+				//one additional chance of adding a property based on the prorata between the two surrounding threshold values
+				double extra_property_roll = (double) rand() / (RAND_MAX);
+				float prorata = ProrataBetweenThreshold(BeastScaleScore, sf::Vector2f (LootTable_BeastScaleThreshold[i-1],LootTable_BeastScaleThreshold[i]));
+				if (extra_property_roll > prorata)
+				{
+					if (number_of_equipment_properties > NB_MAX_PROPERTIES_FOR_NON_EPIC_EQUIPMENT)
+					{
+						number_of_equipment_properties++;
+					}
+					else
+					{
+						epic_drop = true;//3 guaranteed properties + a winning roll on the 4th trades for an epic drop
+					}
+				}
+				i = NUMBER_OF_BEASTSCALE_THRESHOLD;//end of the loop
+			}
+		}
 
-		float equipment_drop_rate = RandomizeFloatBetweenRatios(1, EQUIPMENT_DROP_MIN_RATE, EQUIPMENT_DROP_MAX_RATE);
-		int value = m_value*equipment_drop_rate;
+		//looting money instead of an equipment with 0 properties
+		if (number_of_equipment_properties == 0)
+		{
+			int money = RandomizeIntBetweenRatios(e_value, LootTable_BeastScale[(int)e_class]);
+			loot->addMoney(money);
 
-		switch (dice_roll)
+			return loot;
+		}
+
+		//-----EQUIPMENT TYPE-----
+		int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_EQUIPMENT + 1);//+1 is for the weapon type
+		equipment_type_roll = 0;
+
+		//-----CHOSING RANDOM PROPERTIES-----
+		int properties_to_choose_from = LootTable_MaxPropertiesPerEquipmentType[equipment_type_roll];
+		int *properties_roll_table;
+		properties_roll_table = new int[properties_to_choose_from];
+		for (int i=0; i<properties_to_choose_from; i++)
+			properties_roll_table[i] = i;
+
+		int chosen_property = 0;
+		if (number_of_equipment_properties > properties_to_choose_from)
+			number_of_equipment_properties = properties_to_choose_from;//on va essayer d'éviter ce cas, car le joueur gaspille des propriétés puisqu'on en a pas conçu suffisamment
+
+		switch (equipment_type_roll)
 		{
 		case (int)EquipmentType::Airbrake:
 			{
+				//Initialisation
 				Equipment* equipment = new Equipment();
-				int m_decelleration = MIN_DECELLERATION_DROP_STAT + (value*DECELLERATION_PER_VALUE_UNIT);
-				equipment->Init((int)EquipmentType::Airbrake, sf::Vector2f(0,0),m_decelleration,sf::Vector2f(0,0),0,0,0,"Assets/2D/Airbrake.png",sf::Vector2f(64,64),1,"Airbrake");
+				float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE;
+				float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X)+1);
+				if (log_multiplier > 0)
+					e_decceleration *= log_multiplier;
 
+				equipment->Init((int)EquipmentType::Airbrake, sf::Vector2f(0,0),e_decceleration,sf::Vector2f(0,0),0,0,0,AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
+
+				//Adding properties
+				for (int p=0; p<number_of_equipment_properties; p++)
+				{
+					chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
+					int a = properties_roll_table[properties_to_choose_from - p];//interversion
+					properties_roll_table[properties_to_choose_from - p] = chosen_property;
+					properties_roll_table[chosen_property] = a;
+
+					equipment->AddAirbrakeProperty(chosen_property, e_value, LootTable_BeastScale[(int)e_class]);
+				}
+				
 				loot->setEquipmentLoot(equipment);
-				return loot;
+				break;
 			}
 
 		case (int)EquipmentType::Engine:
 			{
+				//Initialisation
 				Equipment* equipment = new Equipment();
-				sf::Vector2f m_acceleration = sf::Vector2f(MIN_ACCELLERATION_DROP_STAT + (value*ACCELLERATION_PER_VALUE_UNIT), MIN_ACCELLERATION_DROP_STAT + (value*ACCELLERATION_PER_VALUE_UNIT));
-				sf::Vector2f m_max_speed = sf::Vector2f(MIN_MAX_SPEED_DROP_STAT + (value*MAX_SPEED_PER_VALUE_UNIT), MIN_MAX_SPEED_DROP_STAT + (value*MAX_SPEED_PER_VALUE_UNIT));
-				equipment->Init((int)EquipmentType::Engine, m_max_speed,0,m_acceleration,0,0,0,"Assets/2D/Thruster.png",sf::Vector2f(64,64),1,"Engine");
+				equipment->Init((int)EquipmentType::Engine, sf::Vector2f(EQUIPMENT_MIN_MAXSPEED_VALUE,EQUIPMENT_MIN_MAXSPEED_VALUE),0,
+					sf::Vector2f(EQUIPMENT_MIN_ACCELLERATION_VALUE,EQUIPMENT_MIN_ACCELLERATION_VALUE),0,0,0,THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
+
+				//Scaling with value
+
+
+				//Adding properties
+				for (int p=0; p<number_of_equipment_properties; p++)
+				{
+					chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
+					int a = properties_roll_table[properties_to_choose_from - p];//interversion
+					properties_roll_table[properties_to_choose_from - p] = chosen_property;
+					properties_roll_table[chosen_property] = a;
+
+					equipment->AddEngineProperty(chosen_property, e_value, LootTable_BeastScale[(int)e_class]);
+				}
 
 				loot->setEquipmentLoot(equipment);
-				return loot;
+				break;
 			}
 
 		case (int)EquipmentType::Armor:
 			{
+				//Initialisation
 				Equipment* equipment = new Equipment();
-				int m_armor = MIN_ARMOR_DROP_STAT + (value*ARMOR_PER_VALUE_UNIT);
-				equipment->Init((int)EquipmentType::Armor, sf::Vector2f(0,0),0,sf::Vector2f(0,0),m_armor,0,0,"Assets/2D/Armor.png",sf::Vector2f(64,64),1,"Armor");
+				equipment->Init((int)EquipmentType::Armor, sf::Vector2f(0,0),0,sf::Vector2f(0,0),EQUIPMENT_MIN_ARMOR_VALUE,0,0,ARMOR_FILENAME,sf::Vector2f(64,64),1,"Armor");
+
+				//Scaling with value
+
+
+				//Adding properties
+				for (int p=0; p<number_of_equipment_properties; p++)
+				{
+					chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
+					int a = properties_roll_table[properties_to_choose_from - p];//interversion
+					properties_roll_table[properties_to_choose_from - p] = chosen_property;
+					properties_roll_table[chosen_property] = a;
+
+					equipment->AddArmorProperty(chosen_property, e_value, LootTable_BeastScale[(int)e_class]);
+				}
 
 				loot->setEquipmentLoot(equipment);
-				return loot;
+				break;
 			}
 
 		case (int)EquipmentType::Shield:
 			{
+				//Initialisation
 				Equipment* equipment = new Equipment();
-				int m_shield = MIN_SHIELD_DROP_STAT + (value*SHIELD_PER_VALUE_UNIT);
-				int m_shield_regen = MIN_SHIELD_REGEN_DROP_STAT + (value*SHIELD_REGEN_PER_VALUE_UNIT);
-				equipment->Init((int)EquipmentType::Shield, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,m_shield,m_shield_regen,"Assets/2D/Shield.png",sf::Vector2f(64,64),1,"Shield");
+				equipment->Init((int)EquipmentType::Shield, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,
+					EQUIPMENT_MIN_SHIELD_VALUE,EQUIPMENT_MIN_SHIELD_REGEN_VALUE,SHIELD_FILENAME,sf::Vector2f(64,64),1,"Shield");
+
+				//Scaling with value
+
+
+				//Adding properties
+				for (int p=0; p<number_of_equipment_properties; p++)
+				{
+					chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
+					int a = properties_roll_table[properties_to_choose_from - p];//interversion
+					properties_roll_table[properties_to_choose_from - p] = chosen_property;
+					properties_roll_table[chosen_property] = a;
+
+					equipment->AddShieldProperty(chosen_property, e_value, LootTable_BeastScale[(int)e_class]);
+				}
 
 				loot->setEquipmentLoot(equipment);
-				return loot;
+				break;
 			}
 
 		case (int)EquipmentType::Module:
 			{
+				//Initialisation
 				Equipment* equipment = new Equipment();
+				equipment->Init((int)EquipmentType::Module, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,0,0,MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
+
 				Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/enemyY.png", sf::Vector2f (35,35));
 				bot->display_name = "Bot gerard";
 				bot->radius = 500;
@@ -266,189 +299,87 @@ Loot* Enemy::CreateRandomLoot(int m_value)
 				vector<float>* v = new vector<float>;
 				//v->push_back(bot->radius); // rayon 500px
 				//v->push_back(1);  // clockwise (>)
-
 				PatternType pattern_type = PatternType::NoMovePattern;
 				bot->Pattern.SetPattern(pattern_type,bot->vspeed,v); //vitesse angulaire (degres/s)
 
 				FX* fx = new FX(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f (320,236), 2, sf::seconds(0.4f));
-				Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_AMMO_BASE_BOT_VSPEED),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),WEAPON_AMMO_BASE_BOT_DAMAGE, fx);
-
-				ammo->damage += value * WEAPON_AMMO_DAMAGE_BASE_MULTIPLIER;
-
+				Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),WEAPON_MIN_DAMAGE_VALUE, fx);
 				Weapon* weapon = new Weapon(ammo);
-
-				int random_stat = rand() % (2+1);
-				float combo_drop_rate = equipment_drop_rate;
-				switch (random_stat)
-				{
-				case 0: 
-					{
-						float random_rate_of_fire_rate = RandomizeFloatBetweenRatios(1, EQUIPMENT_DROP_MIN_RATE, EQUIPMENT_DROP_MAX_RATE);
-						weapon->rate_of_fire /= (random_rate_of_fire_rate * WEAPON_BASE_RATE_OF_FIRE_MULTIPLIER);
-						if (combo_drop_rate < 1.5)
-						{
-							break;
-						}
-						else
-						{
-							combo_drop_rate /= 2;
-						}
-
-					}
-				case 1:
-					{
-						weapon->multishot = RandomizeIntBetweenValues(WEAPON_MULTISHOT_MIN_VALUE, WEAPON_MULTISHOT_BOT_MAX_VALUE);
-
-						if (weapon->multishot * weapon->xspread > 32)
-							weapon->xspread = 32 / weapon->multishot;
-
-						double dispersion_drop_rate = (double) rand() / (RAND_MAX);
-						if (dispersion_drop_rate < WEAPON_DISPERSION_DROP_RATE)
-						{
-							int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_VALUE+1);
-							weapon->dispersion = dispersion_roll;
-						}
-
-						double alternate_drop_rate = (double) rand() / (RAND_MAX);
-						if (alternate_drop_rate < WEAPON_ALTERNATE_DROP_RATE)
-						{
-							weapon->alternate = true;
-						}
-
-						if (combo_drop_rate < 1.5)
-						{
-							break;
-						}
-						else
-						{
-							combo_drop_rate /= 2;
-						}
-					}
-				case 2:
-					{
-						float random_ammo_speed_rate = RandomizeFloatBetweenRatios(1, EQUIPMENT_DROP_MIN_RATE, EQUIPMENT_DROP_MAX_RATE);
-						weapon->ammunition->speed.y *= RandomizeFloatBetweenValues(WEAPON_AMMO_SPEED_MIN_MULTIPLIER, WEAPON_AMMO_SPEED_MAX_MULTIPLIER) * random_ammo_speed_rate;
-
-						if (combo_drop_rate < 1.5)
-						{
-							break;
-						}
-						else
-						{
-							combo_drop_rate /= 2;
-						}
-					}
-
-				default: break;
-				}
-				
 				weapon->display_name = "laser_blue";
 				weapon->fire_direction = Vector2i(0,-1);
-
 				weapon->textureName = "Assets/2D/laser_red.png";
 				weapon->size = sf::Vector2f(64,64);
 				weapon->frameNumber = 1;
+				weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
 
 				bot->weapon = weapon;
 				bot->hasWeapon = true;
-
 				equipment->bot = bot;
-				equipment->hasBot = true;
 
-				equipment->Init((int)EquipmentType::Module, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,0,0,"Assets/2D/Module.png",sf::Vector2f(64,64),1,"Module");
+				//Scaling with value
+
+
+				//Adding properties
+				for (int p=0; p<number_of_equipment_properties; p++)
+				{
+					chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
+					int a = properties_roll_table[properties_to_choose_from - p];//interversion
+					properties_roll_table[properties_to_choose_from - p] = chosen_property;
+					properties_roll_table[chosen_property] = a;
+				
+					equipment->AddModuleProperty(chosen_property, e_value, LootTable_BeastScale[(int)e_class]);
+				}
 
 				loot->setEquipmentLoot(equipment);
-				return loot;
+				break;
 			}
 
 		case (int)EquipmentType::NBVAL_EQUIPMENT://weapon drop
 			{
+				// Initialisation
 				FX* fx = new FX(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f (320,236), 2, sf::seconds(0.4f));
-				Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_AMMO_BASE_VSPEED),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),WEAPON_AMMO_BASE_DAMAGE, fx);
-				
-				ammo->damage += value * WEAPON_AMMO_DAMAGE_BASE_MULTIPLIER;
-
+				Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),WEAPON_MIN_DAMAGE_VALUE, fx);
 				Weapon* weapon = new Weapon(ammo);
-
-				int random_stat = rand() % (2+1);
-				float combo_drop_rate = equipment_drop_rate;
-				switch (random_stat)
-				{
-				case 0: 
-					{
-						float random_rate_of_fire_rate = RandomizeFloatBetweenRatios(1, EQUIPMENT_DROP_MIN_RATE, EQUIPMENT_DROP_MAX_RATE);
-						weapon->rate_of_fire /= (random_rate_of_fire_rate * WEAPON_BASE_RATE_OF_FIRE_MULTIPLIER);
-
-						if (combo_drop_rate < 1.5)
-						{
-							break;
-						}
-						else
-						{
-							combo_drop_rate /= 2;
-						}
-
-					}
-				case 1:
-					{
-						weapon->multishot = RandomizeIntBetweenValues(WEAPON_MULTISHOT_MIN_VALUE, WEAPON_MULTISHOT_MAX_VALUE);
-
-						if (weapon->multishot * weapon->xspread > 32)
-							weapon->xspread = 32 / weapon->multishot;
-
-						double dispersion_drop_rate = (double) rand() / (RAND_MAX);
-						if (dispersion_drop_rate < WEAPON_DISPERSION_DROP_RATE)
-						{
-							int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_VALUE+1);
-							weapon->dispersion = dispersion_roll;
-						}
-
-						double alternate_drop_rate = (double) rand() / (RAND_MAX);
-						if (alternate_drop_rate < WEAPON_ALTERNATE_DROP_RATE)
-						{
-							weapon->alternate = true;
-						}
-
-						if (combo_drop_rate < 1.5)
-						{
-							break;
-						}
-						else
-						{
-							combo_drop_rate /= 2;
-						}
-					}
-				case 2:
-					{
-						float random_ammo_speed_rate = RandomizeFloatBetweenRatios(1, EQUIPMENT_DROP_MIN_RATE, EQUIPMENT_DROP_MAX_RATE);
-						weapon->ammunition->speed.y *= RandomizeFloatBetweenValues(WEAPON_AMMO_SPEED_MIN_MULTIPLIER, WEAPON_AMMO_SPEED_MIN_MULTIPLIER) * random_ammo_speed_rate;
-						
-						if (combo_drop_rate < 1.5)
-						{
-							break;
-						}
-						else
-						{
-							combo_drop_rate /= 2;
-						}
-					}
-
-				default: break;
-				}
-
 				weapon->display_name = "laser_blue";
 				weapon->fire_direction = Vector2i(0,-1);
-
 				weapon->textureName = "Assets/2D/laser_red.png";
 				weapon->size = sf::Vector2f(64,64);
 				weapon->frameNumber = 1;
+				weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
 
+				//Scaling with value
+
+
+				//Adding properties
+				for (int p=0; p<number_of_equipment_properties; p++)
+				{
+					chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
+					int a = properties_roll_table[properties_to_choose_from - p];//interversion
+					properties_roll_table[properties_to_choose_from - p] = chosen_property;
+					properties_roll_table[chosen_property] = a;
+				
+					weapon->AddWeaponProperty(chosen_property, e_value, LootTable_BeastScale[(int)e_class]);
+				}
+				
 				loot->setWeaponLoot(weapon);
-				return loot;
+				break;
 			}
 
 		default:
-			return loot;
+			{
+				printf("DEBUG: error: the loot type chosen for this drop does not exist.\n <!> Check if the equipment_type_roll values match with the existing equipment types.\n");
+				break;
+			}
 		}
+
+		return loot;
+	}
+
+	else
+	{
+		int money = RandomizeIntBetweenRatios(e_value, LootTable_BeastScale[(int)e_class]);
+		loot->addMoney(money);
+
+		return loot;//looting money
 	}
 }

@@ -11,9 +11,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-class Ship;
-
 #define LOOT_SPEED_Y		100.f
+
+class Ship;
 
 using namespace sf;
 
@@ -56,7 +56,6 @@ private:
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];
 	std::list<Independant*>* sceneIndependantsTyped[NBVAL_Independant];
 	std::vector<Independant*> garbage;
-
 };
 
 #endif // GAME_H_INCLUDED

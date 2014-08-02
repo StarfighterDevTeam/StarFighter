@@ -69,7 +69,7 @@ bool Weapon::isFiringReady()
 			if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire / multishot))
 			{
 				firing_ready = true;
-				
+
 			}
 		}
 
@@ -256,4 +256,96 @@ sf::Vector2f Weapon::OffsetWeapon(float angle)
 	}*/
 
 	return sf::Vector2f(x,y);
+}
+
+#define WEAPON_RATE_OF_FIRE_MULTIPLIER				5
+#define WEAPON_MULTISHOT_MULTIPLIER					2
+#define WEAPON_CHANCE_OF_DISPERSION					0.50
+#define WEAPON_DISPERSION_MAX_ANGLE					170
+#define WEAPON_CHANCE_OF_ALTERNATE					0.25
+#define WEAPON_VSPEED_LN_MULTIPLIER					20
+
+#define BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER	1
+#define BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER		0.5
+#define BOT_WEAPON_VSPEED_MALUS_MULTIPLIER			1
+#define BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER			1
+
+void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale)
+{
+	switch (chosen_property)
+	{
+	case 0:
+		{
+			this->rate_of_fire /= (RandomizeFloatBetweenValues(BeastScale) * WEAPON_RATE_OF_FIRE_MULTIPLIER);
+			break;
+		}
+	case 1:
+		{
+			this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
+
+			if (this->multishot * this->xspread > 32)
+				this->xspread = (32 / this->multishot);
+
+			double dispersion_chance = (double) rand() / (RAND_MAX);
+			if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)
+			{
+				int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_ANGLE+1);
+				this->dispersion = dispersion_roll;
+			}
+
+			double alternate_chance = (double) rand() / (RAND_MAX);
+			if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE)
+			{
+				this->alternate = true;
+			}
+			break;
+		}
+	case 2:
+		{
+			this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale))+1);
+			break;
+		}
+	case 3:
+		{
+			this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
+			break;
+		}
+	default:
+		{
+			printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
+			break;
+		}
+	}
+}
+
+void Weapon::AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale)
+{
+	switch (chosen_property)
+	{
+	case 0:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER));
+			break;
+		}
+	case 1:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER));
+			break;
+		}
+	case 2:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER));
+			break;
+		}
+	case 3:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER));
+			break;
+		}
+	default:
+		{
+			printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
+			break;
+		}
+	}
 }

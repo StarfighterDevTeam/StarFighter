@@ -8,7 +8,6 @@
 
 #define LASER_RATE_OF_FIRE			0.4f
 #define LASER_DAMAGE				100
-
 #define LASERFAST_RATE_OF_FIRE			0.2f
 #define LASERFAST_DAMAGE				50
 
@@ -57,7 +56,8 @@ public:
 	sf::Vector2f weaponOffset;
 
 	sf::Vector2f OffsetWeapon(float angle);
-
+	void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void Weapon::AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	Weapon* Clone();
 };
 

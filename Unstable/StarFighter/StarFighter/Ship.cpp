@@ -121,6 +121,135 @@ int Equipment::getEquipmentShieldRegen()
 	return this->shield_regen;
 }
 
+#define EQUIPMENT_DECCELERATION_MULTIPLIER		10
+#define EQUIPMENT_ACCELERATION_MULTIPLIER		10
+#define EQUIPMENT_MAXSPEED_MULTIPLIER			10
+#define EQUIPMENT_ARMOR_MULTIPLIER				10
+#define EQUIPMENT_SHIELD_MULTIPLIER				10
+#define EQUIPMENT_SHIELD_REGEN_MULTIPLIER		10
+
+void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale)
+{
+	switch (chosen_property) // 1 case
+	{
+	case 0: 
+		{
+			float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X)+1);
+
+			float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 0)
+				e_decceleration *= log_multiplier;
+
+			this->decceleration += e_decceleration;
+			break;
+		}
+	default:
+		{
+			printf("DEBUG: error: trying to add Airbrake property that does not exit.\n<!> Check that the chosen property for this Airbrake match with the existing properties in the AddAibrakeProperty function.\n");
+			break;
+		}
+	}
+}
+
+void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f BeastScale)
+{
+	switch (chosen_property) // 2 case
+	{
+	case 0:
+		{
+			this->acceleration.x += value * EQUIPMENT_ACCELERATION_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			this->acceleration.y += value * EQUIPMENT_ACCELERATION_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			break;
+		}
+	case 1:
+		{
+			this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			break;
+		}
+	default:
+		{
+			printf("DEBUG: error: trying to add Engine property that does not exit.\n<!> Check that the chosen property for this Engine match with the existing properties in the AddEngineProperty function.\n");
+			break;
+		}
+	}
+}
+
+void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f BeastScale)
+{
+	switch (chosen_property) // 1 case
+	{
+	case 0:
+		{
+			this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			break;
+		}
+	default:
+		{
+			printf("DEBUG: error: trying to add Armor property that does not exit.\n<!> Check that the chosen property for this Armor match with the existing properties in the AddArmorProperty function.\n");
+			break;
+		}
+	}
+}
+
+void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f BeastScale)
+{
+	switch (chosen_property) // 2 case
+	{
+	case 0:
+		{
+			this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
+			break;
+		}
+	case 1:
+		{
+			this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			break;
+		}
+	default:
+		{
+			printf("DEBUG: error: trying to add Shield property that does not exit.\n<!> Check that the chosen property for this Shield match with the existing properties in the AddShieldProperty function.\n");
+			break;
+		}
+	}
+}
+
+void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f BeastScale)
+{
+	switch (chosen_property)
+	{
+	case 0://adding bot
+		{
+			this->hasBot = true;
+			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			break;
+		}
+	case 1://adding bot
+		{
+			this->hasBot = true;
+			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			break;
+		}
+	case 2://adding bot
+		{
+			this->hasBot = true;
+			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			break;
+		}
+	case 3://adding bot
+		{
+			this->hasBot = true;
+			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			break;
+		}
+	default:
+		{
+			printf("DEBUG: error: trying to add Module property that does not exit.\n<!> Check that the chosen property for this Module match with the existing properties in the AddModuleProperty function.\n");
+			break;
+		}
+	}
+}
+
 // ----------------SHIP CONFIG ---------------
 
 ShipConfig::ShipConfig()
@@ -275,7 +404,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 		new_max_speed.x = ship_model->getShipModelMaxSpeed().x;
 	if (new_max_speed.y < ship_model->getShipModelMaxSpeed().y)
 		new_max_speed.y = ship_model->getShipModelMaxSpeed().y;
-	
+
 	return new_max_speed;
 }
 
@@ -439,7 +568,7 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 	this->ship_config.setShipWeapon(m_weapon);
 	this->Init();
 	this->ship_config.GenerateBots(this);
-	
+
 }
 
 void Ship::update(sf::Time deltaTime)
@@ -567,7 +696,7 @@ void Ship::Death()
 {
 	FX* myFX = this->ship_config.FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-    (*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
+	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
 }
 
 void Ship::GetLoot(Independant& independant)
@@ -585,11 +714,11 @@ void Ship::GetLoot(Independant& independant)
 		else
 		{
 			//...else we put it in the stash
-			
+
 			printf("Equipment added to ship stash: '%s'\n",independant.getEquipmentLoot()->display_name.c_str());
 			this->stash.push_back((Loot*)independant.getEquipmentLoot());
 			independant.releaseEquipmentLoot();
-			
+
 		}
 
 		//this->releaseEquipmentLoot();
@@ -600,7 +729,7 @@ void Ship::GetLoot(Independant& independant)
 		if (!this->ship_config.hasWeapon)
 		{
 			//if the ship config does not have any weapon of this type on, we equip it...
-			
+
 			this->setShipWeapon(independant.getWeaponLoot());
 			independant.releaseWeaponLoot();
 		}

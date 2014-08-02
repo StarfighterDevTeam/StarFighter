@@ -22,12 +22,6 @@
 #define	ENEMYY_SHIELD			200
 #define	ENEMYY_SHIELD_REGEN		1
 
-enum EnemyType {
-	EnemyX,
-	EnemyY,
-	NBVAL_Enemy
-};
-
 class Enemy : public Independant
 {
 
@@ -41,7 +35,7 @@ public:
 	int movepattern_type;
 	bool hasWeapon;
 	void GenerateLoot() override;
-	Loot* CreateRandomLoot(int m_value);
+	Loot* CreateRandomLoot(int e_value, EnemyClass e_class);
 private:
 		
 };
