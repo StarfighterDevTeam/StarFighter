@@ -191,6 +191,9 @@ void Game::colisionChecksV2()
 						(*it1)->Death();
 						//Loot
 						hazard += (*it1)->getMoney();
+						(*it1)->CreateRandomLoot();
+						//TODO : 
+						//(*it1)->CreateRandomLoot(BeastScale_HazardLevel + BeastScale_PlayerCombo);
 						(*it1)->GenerateLoot();
 
 						//sent to garbage collector

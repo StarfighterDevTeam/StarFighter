@@ -35,7 +35,8 @@ public:
 	int movepattern_type;
 	bool hasWeapon;
 	void GenerateLoot() override;
-	Loot* CreateRandomLoot(int e_value, EnemyClass e_class);
+	void CreateRandomLoot(float BeastScaleBonus=0) override;
+	EnemyClass enemy_class;
 private:
 		
 };

@@ -141,6 +141,7 @@ void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f
 				e_decceleration *= log_multiplier;
 
 			this->decceleration += e_decceleration;
+			this->decceleration = floor(this->decceleration);
 			break;
 		}
 	default:
@@ -157,14 +158,32 @@ void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f B
 	{
 	case 0:
 		{
-			this->acceleration.x += value * EQUIPMENT_ACCELERATION_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			this->acceleration.y += value * EQUIPMENT_ACCELERATION_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X)+1);
+
+			float e_acceleration = EQUIPMENT_MIN_ACCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 0)
+				e_acceleration *= log_multiplier;
+
+			this->acceleration.x += e_acceleration;
+			this->acceleration.y += e_acceleration;
+			this->acceleration.x = floor(this->acceleration.x);
+			this->acceleration.y = floor(this->acceleration.y);
 			break;
 		}
 	case 1:
 		{
-			this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			//this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			//this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X)+1);
+
+			float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 0)
+				e_maxspeed *= log_multiplier;
+
+			this->max_speed.x += e_maxspeed;
+			this->max_speed.y += e_maxspeed;
+			this->max_speed.x = floor(this->max_speed.x);
+			this->max_speed.y = floor(this->max_speed.y);
 			break;
 		}
 	default:
@@ -181,7 +200,15 @@ void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f Be
 	{
 	case 0:
 		{
-			this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			//this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X)+1);
+
+			float e_armor = EQUIPMENT_MIN_ARMOR_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 0)
+				e_armor *= log_multiplier;
+
+			this->armor += e_armor;
+			this->armor = floor(this->armor);
 			break;
 		}
 	default:
@@ -198,12 +225,28 @@ void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f B
 	{
 	case 0:
 		{
-			this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
+			//this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
+			float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X)+1);
+
+			float e_shield = EQUIPMENT_MIN_SHIELD_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 0)
+				e_shield *= log_multiplier;
+
+			this->shield += e_shield;
+			this->shield = floor(this->shield);
 			break;
 		}
 	case 1:
 		{
-			this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			//this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X)+1);
+
+			float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 0)
+				e_shield_regen *= log_multiplier;
+
+			this->shield_regen += e_shield_regen;
+			this->shield_regen = floor(this->shield_regen);
 			break;
 		}
 	default:

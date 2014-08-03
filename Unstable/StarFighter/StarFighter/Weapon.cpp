@@ -307,7 +307,15 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 		}
 	case 3:
 		{
-			this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
+			//this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
+			float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BONUS * (log(value * WEAPON_DAMAGE_LN_MULTIPLIER_X)+1);
+
+			float e_damage = WEAPON_MIN_DAMAGE_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 0)
+				e_damage *= log_multiplier;
+
+			this->ammunition->damage += e_damage;
+			this->ammunition->damage = floor(this->ammunition->damage);
 			break;
 		}
 	default:
