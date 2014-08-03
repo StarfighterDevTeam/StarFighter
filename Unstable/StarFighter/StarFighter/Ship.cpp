@@ -134,11 +134,13 @@ void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f
 	{
 	case 0: 
 		{
-			float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X)+1);
+			float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
 
 			float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 0)
+			if (log_multiplier > 1)
 				e_decceleration *= log_multiplier;
+			else
+				e_decceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_decceleration));
 
 			this->decceleration += e_decceleration;
 			this->decceleration = floor(this->decceleration);
@@ -158,11 +160,13 @@ void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f B
 	{
 	case 0:
 		{
-			float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X)+1);
+			float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X));
 
 			float e_acceleration = EQUIPMENT_MIN_ACCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 0)
+			if (log_multiplier > 1)
 				e_acceleration *= log_multiplier;
+			else
+				e_acceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_acceleration));
 
 			this->acceleration.x += e_acceleration;
 			this->acceleration.y += e_acceleration;
@@ -174,11 +178,13 @@ void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f B
 		{
 			//this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
 			//this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X)+1);
+			float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
 
 			float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 0)
+			if (log_multiplier > 1)
 				e_maxspeed *= log_multiplier;
+			else
+				e_maxspeed = ProrataBetweenThreshold(value, sf::Vector2f(0, e_maxspeed));
 
 			this->max_speed.x += e_maxspeed;
 			this->max_speed.y += e_maxspeed;
@@ -201,11 +207,13 @@ void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f Be
 	case 0:
 		{
 			//this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X)+1);
+			float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X));
 
 			float e_armor = EQUIPMENT_MIN_ARMOR_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 0)
+			if (log_multiplier > 1)
 				e_armor *= log_multiplier;
+			else
+				e_armor = ProrataBetweenThreshold(value, sf::Vector2f(0, e_armor));
 
 			this->armor += e_armor;
 			this->armor = floor(this->armor);
@@ -226,11 +234,13 @@ void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f B
 	case 0:
 		{
 			//this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
-			float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X)+1);
+			float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X));
 
 			float e_shield = EQUIPMENT_MIN_SHIELD_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 0)
+			if (log_multiplier > 1)
 				e_shield *= log_multiplier;
+			else
+				e_shield = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield));
 
 			this->shield += e_shield;
 			this->shield = floor(this->shield);
@@ -239,11 +249,13 @@ void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f B
 	case 1:
 		{
 			//this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X)+1);
+			float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X));
 
 			float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 0)
+			if (log_multiplier > 1)
 				e_shield_regen *= log_multiplier;
+			else
+				e_shield_regen = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield_regen));
 
 			this->shield_regen += e_shield_regen;
 			this->shield_regen = floor(this->shield_regen);

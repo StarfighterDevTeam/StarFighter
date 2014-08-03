@@ -211,9 +211,10 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Initialisation
 					Equipment* equipment = new Equipment();
 					float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE;
-					float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 						e_decceleration *= log_multiplier;
+
 					e_decceleration = floor(e_decceleration);
 
 					equipment->Init((int)EquipmentType::Airbrake, sf::Vector2f(0,0),e_decceleration,sf::Vector2f(0,0),0,0,0,AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
@@ -238,8 +239,8 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					Equipment* equipment = new Equipment();
 					float e_maxspeed_x = EQUIPMENT_MIN_MAXSPEED_VALUE;
 					float e_maxspeed_y = EQUIPMENT_MIN_MAXSPEED_VALUE;
-					float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 					{
 						e_maxspeed_x *= log_multiplier;
 						e_maxspeed_y *= log_multiplier;
@@ -249,8 +250,8 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					float e_acceleration_x = EQUIPMENT_MIN_ACCELLERATION_VALUE;
 					float e_acceleration_y = EQUIPMENT_MIN_ACCELLERATION_VALUE;
 
-					log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 					{
 						e_acceleration_x *= log_multiplier;
 						e_acceleration_y *= log_multiplier;
@@ -281,9 +282,10 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Initialisation
 					Equipment* equipment = new Equipment();
 					float e_armor = EQUIPMENT_MIN_ARMOR_VALUE;
-					float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 						e_armor *= log_multiplier;
+
 					e_armor = floor(e_armor);
 					equipment->Init((int)EquipmentType::Armor, sf::Vector2f(0,0),0,sf::Vector2f(0,0),e_armor,0,0,ARMOR_FILENAME,sf::Vector2f(64,64),1,"Armor");
 
@@ -307,14 +309,14 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Initialisation
 					Equipment* equipment = new Equipment();
 					float e_shield = EQUIPMENT_MIN_SHIELD_VALUE;
-					float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 						e_shield *= log_multiplier;
 					e_shield = floor(e_shield);
 					float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE;
 
-					log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 						e_shield_regen *= log_multiplier;
 					e_shield_regen = floor(e_shield_regen);
 
@@ -357,8 +359,8 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					FX* fx = new FX(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f (320,236), 2, sf::seconds(0.4f));
 
 					float e_damage = WEAPON_MIN_DAMAGE_VALUE;
-					float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BASE * (log(e_value * WEAPON_DAMAGE_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BASE * (log(e_value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
 					Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),e_damage, fx);
@@ -397,8 +399,8 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					// Initialisation
 					FX* fx = new FX(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f (320,236), 2, sf::seconds(0.4f));
 					float e_damage = WEAPON_MIN_DAMAGE_VALUE;
-					float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BASE * (log(e_value * WEAPON_DAMAGE_LN_MULTIPLIER_X)+1);
-					if (log_multiplier > 0)
+					float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BASE * (log(e_value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
+					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
 					Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),e_damage, fx);
