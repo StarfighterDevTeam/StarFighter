@@ -46,6 +46,7 @@
 #define BOT_FILE "Assets/Scripts/Bot.csv"
 
 #define GRAZE_DISTANCE									30
+#define SHIP_BRAKING_SPEED									180
 
 //DROP SYSTEM VARIABLES
 

@@ -126,6 +126,7 @@ public:
 	FX* FX_death;
 	void GenerateBots(Independant* m_target);
 	void DestroyBots();
+	bool automatic_fire;
 
 private:
 	sf::Vector2f max_speed;
@@ -162,6 +163,9 @@ public :
 	bool disable_inputs;
 	bool disable_fire;
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
+	bool key_repeat;
+
+	
 private:
 	bool moving;
 	bool movingX;

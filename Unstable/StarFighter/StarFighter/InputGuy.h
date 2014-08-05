@@ -13,7 +13,8 @@ class InputGuy
 public:
 	static Vector2f getDirections();
 	static bool isFiring();
-
+	static bool isBraking();
+	static bool setAutomaticFire();
 };
 
 

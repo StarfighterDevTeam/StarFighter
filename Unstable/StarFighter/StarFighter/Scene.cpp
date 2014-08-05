@@ -249,8 +249,8 @@ ShipConfig* Scene::LoadShipConfig(string name)
 
 			//Loading equipment
 			printf("DEBUG: Loading ship equipment\n");
-			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
-			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
+			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
+			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
 			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
 			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]), false);
 			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
@@ -262,7 +262,7 @@ ShipConfig* Scene::LoadShipConfig(string name)
 			if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
 			{
 				printf("DEBUG: Loading ship weapon\n");
-				//shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
+				shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
 			}
 
 			//Computing the ship config

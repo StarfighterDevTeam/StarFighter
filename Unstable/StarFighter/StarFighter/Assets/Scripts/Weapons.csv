@@ -1,6 +1,6 @@
 #weapon_name,rate,image,width,height,frames,sound_name,multishot,xspread,alternate,dispersion,rafale,rafale_cooldown
-laser,1.5,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,8,0,1,180,0,0.0f
-laser_fast,0.5,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,8,0,1,180,5,3.f
+laser,1.5,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,6,0,1,180,0,0.0f
+laser_fast,0.5,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,8,0,1,180,3,3.f
 laser_player,0.1,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,7,0,0,160,0,2.f
 laser_bot,0.1,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,1,0,0,0,0,1.f
 laser_default,0.2,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,3,10,1,0,0,2.f

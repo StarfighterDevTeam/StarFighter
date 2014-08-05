@@ -1,4 +1,4 @@
 #bot_name,armor,shield,shield_regen,damage,weapon_name,ammo_name,image,width,height,frames,explosion,pattern,vspeed,radius,xspread,yspread
-gerard,0,0,0,0,laser_bot,laser_blue,Assets/2D/enemyX.png,35,35,1,death_explosion,circle,500,500,0,0
+gerard,0,0,0,0,laser_bot,laser_blue,Assets/2D/enemyX.png,35,35,1,death_explosion,circle,350,500,0,0
 gerard2,0,0,0,0,laser_bot,laser_blue,Assets/2D/enemyY.png,35,35,1,death_explosion,0,250,800,-50,0
-gerard3,0,0,0,0,laser_bot,laser_blue,Assets/2D/enemyX.png,35,35,1,death_explosion,0,250,800,50,0
+gerard3,0,0,0,0,laser_bot,laser_blue,Assets/2D/enemyY.png,35,35,1,death_explosion,0,250,800,50,0

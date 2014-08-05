@@ -28,8 +28,8 @@ int main()
 	sf::Clock deltaClock;
 
 	//to erase later...
-	sf::Clock deltaClockKeyPressed;
-	bool keyrepeat = false;
+	//sf::Clock deltaClockKeyPressed;
+	//bool keyrepeat = false;
 	///...until here (avoiding key repetition)
 
 	//Loading Scene
@@ -43,10 +43,10 @@ int main()
 			continue;
 
 		//to erase later...
-		if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(1))
-		{
-			keyrepeat = false;
-		}
+		//if (deltaClockKeyPressed.getElapsedTime() > sf::seconds(1))
+		//{
+		//	keyrepeat = false;
+		//}
 		// ... until here (avoiding key repeatition)
 
 		sf::Event event;

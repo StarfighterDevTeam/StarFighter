@@ -317,6 +317,7 @@ ShipConfig::ShipConfig()
 		//defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
 		this->equipment[i] = defaultEquipment;
 		this->hasEquipment[i] = false;
+		this->automatic_fire = false;
 	}
 
 	this->hasWeapon = false;
@@ -588,6 +589,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/Aura_RedGlow.png", sf::Vector2f (50,50), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/Aura_BlueGlow.png", sf::Vector2f (50,50), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/Aura_WhiteGlow.png", sf::Vector2f (50,50), 3);
+	this->key_repeat = false;
 }
 
 void Ship::Init()
@@ -669,11 +671,43 @@ void Ship::update(sf::Time deltaTime)
 		moving = directions.x !=0 || directions.y !=0;
 		movingX = directions.x !=0;
 		movingY = directions.y !=0;
+
 		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
 		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
+		//Braking function
+		if (InputGuy::isBraking())
+		{
+			if (speed.x > SHIP_BRAKING_SPEED)
+				speed.x = SHIP_BRAKING_SPEED;
+			if (speed.x < - SHIP_BRAKING_SPEED)
+				speed.x = - SHIP_BRAKING_SPEED;
+			if (speed.y > SHIP_BRAKING_SPEED)
+				speed.y = SHIP_BRAKING_SPEED;
+			if (speed.y < - SHIP_BRAKING_SPEED)
+				speed.y = - SHIP_BRAKING_SPEED;
+		}
 
-		if(InputGuy::isFiring())
+		//auto fire option (F key)
+		if(InputGuy::setAutomaticFire())
+		{
+			if(!this->key_repeat)
+			{
+				this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
+				this->key_repeat=true;
+				if (this->ship_config.automatic_fire)
+					printf("Auto fire ON\n");
+				else
+					printf("Auto fire OFF\n");
+			}
+		}
+		else
+		{
+			this->key_repeat = false;
+		}
+
+		//Fire function
+		if(InputGuy::isFiring() || this->ship_config.automatic_fire )
 		{
 			if (!disable_fire && this->ship_config.hasWeapon)
 			{
@@ -820,7 +854,6 @@ void Ship::GetGrazing()
 		{
 			//Graze level up
 			graze_level++;
-			printf("GRAZE LEVEL UP: %d. Count for next level: %d\n",this->graze_count, GrazeLevelsThresholds[this->graze_level+1]);
 
 			switch (graze_level)
 			{
@@ -850,8 +883,6 @@ void Ship::GetGrazing()
 			}
 		}
 	}
-
-	printf("Graze count: %d\n",this->graze_count);
 }
 
 int Ship::getGrazeCount()
@@ -881,5 +912,4 @@ void Ship::damage_from (Independant& independant)
 	this->graze_count = 0;
 	this->graze_level = GrazeLevels::GRAZE_LEVEL_NONE;
 	(*CurrentGame).garbageLayer(LayerType::AuraLayer);
-	printf("Graze count: %d\n",this->graze_count);
 }

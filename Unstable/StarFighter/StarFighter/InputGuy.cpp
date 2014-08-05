@@ -18,6 +18,28 @@ bool InputGuy::isFiring()
 	return false;
 }
 
+bool InputGuy::isBraking()
+{
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	{
+		return true;
+	}
+
+	else
+		return false;
+}
+
+bool InputGuy::setAutomaticFire()
+{
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+	{
+		return true;
+	}	
+		
+	else
+		return false;
+}
+
 Vector2f InputGuy::getDirections()
 {
 	short dirX = 0;
