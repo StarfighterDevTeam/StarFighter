@@ -13,6 +13,16 @@
 
 using namespace std;
 
+enum HazardLevels
+{
+	HAZARD_LEVEL_1,//0
+	HAZARD_LEVEL_2,//1
+	HAZARD_LEVEL_3,//2
+	HAZARD_LEVEL_4,//3
+	HAZARD_LEVEL_5,//4
+	NB_HAZARD_LEVELS,//5
+};
+
 enum SceneBooleans
 {
 	ENDSCENE_PHASE1,
@@ -210,6 +220,8 @@ public:
 	float vspeed;
 	bool sceneIsOver;
 
+	float Scene::getSceneBeastScore();
+	
 private:
 	ShipConfig* Scene::LoadShipConfig(string name);
 	EnemyBase*  Scene::LoadEnemy(string name, int probability, int poolSize, int enemyClass);

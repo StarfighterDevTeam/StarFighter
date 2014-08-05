@@ -88,6 +88,7 @@ void Scene::LoadSceneFromFile(string name)
 Scene::Scene(string name)
 {
 	transitionDestination = TransitionList::NO_TRANSITION;
+	hazard_level = 0;
 
 	for (int b=0; b<SceneBooleans::NBVAL_SceneBooleans; b++)
 	{
@@ -772,12 +773,26 @@ void Scene::setPhaseShifter(int index, bool b)
 	}
 }
 
+float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = {0.0, 0.5, 1.0, 1.5, 2.0};
 
 void Scene::HazardBreakEvent()
 {
 	(*CurrentGame).resetHazard((*CurrentGame).getHazard() - hazard_break_value);
 	printf("DEBUG: HAZARD BREAK!!!\n");
 	hazard_break_value *= (1+ HAZARD_BREAK_MULTIPLIER);
+	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS-1)
+		hazard_level ++;
+}
+
+float Scene::getSceneBeastScore()
+{
+	if (this->hazard_level < HazardLevels::NB_HAZARD_LEVELS)
+		return HazardLevelsBeastBonus[this->hazard_level];
+	else
+	{
+		printf("Error: Hazard Level above 5 does not exit. Cannot return the BeastScore of the scene.\n");
+		return 0.0f;
+	}
 }
 
 sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)
