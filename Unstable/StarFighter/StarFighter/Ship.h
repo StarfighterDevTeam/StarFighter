@@ -30,6 +30,15 @@
 
 class Loot;
 
+enum GrazeLevels
+{
+	GRAZE_LEVEL_NONE,//0
+	GRAZE_LEVEL_RED,//1
+	GRAZE_LEVEL_BLUE,//2
+	GRAZE_LEVEL_WHITE,//3
+	NB_GRAZE_LEVELS,//4
+};
+
 class ShipModel : public sf::Sprite
 {
 public:
@@ -145,13 +154,20 @@ public :
 	
 	void Death() override;
 	void GetLoot(Independant& independant) override;
+	void GetGrazing() override;
+	int getGrazeCount();
+	float getShipBeastScore();
+	void Ship::damage_from (Independant& independant) override;
 
 	bool disable_inputs;
 	bool disable_fire;
+	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 private:
 	bool moving;
 	bool movingX;
 	bool movingY;
+	int graze_count;
+	int graze_level;
 };
 
 #endif // SHIP_H_INCLUDED

@@ -571,8 +571,8 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 {
 	this->collider_type =  IndependantType::PlayerShip;
 	this->ship_config = m_ship_config;
-	moving = false;
-	movingX = movingY = false;
+	this->moving = false;
+	this->movingX = movingY = false;
 	this->visible = true;
 	this->damage = 0;
 	this->armor = 1;
@@ -580,9 +580,14 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->armor = ship_config.getShipConfigArmor();
 	this->shield = ship_config.getShipConfigShield();
 	this->shield_regen = ship_config.getShipConfigShieldRegen();
-	ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
-	disable_inputs = false;
-	disable_fire = false;
+	this->ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
+	this->disable_inputs = false;
+	this->disable_fire = false;
+	this->graze_count = 0;
+	this->graze_level = 0;
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/Aura_RedGlow.png", sf::Vector2f (50,50), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/Aura_BlueGlow.png", sf::Vector2f (50,50), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/Aura_WhiteGlow.png", sf::Vector2f (50,50), 3);
 }
 
 void Ship::Init()
@@ -628,6 +633,7 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 
 void Ship::update(sf::Time deltaTime)
 {
+
 	static double shield_regen_buffer = 0;
 	//immunity frames after death
 	if (immune)
@@ -655,7 +661,7 @@ void Ship::update(sf::Time deltaTime)
 			shield = ship_config.getShipConfigShield();
 		}
 	}
-	this->ship_hud.update(this->armor/3, this->shield/3, this->money);//will do for now... but we'll need to scale it to the max value later
+	this->ship_hud.update(this->armor/3, this->shield/3, this->money, this->graze_count);//will do for now... but we'll need to scale it to the max value later
 
 	sf::Vector2f directions = InputGuy::getDirections();
 	if (!disable_inputs)
@@ -798,4 +804,82 @@ void Ship::GetLoot(Independant& independant)
 
 		//this->releaseWeaponLoot();
 	}
+}
+
+
+int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = {0, 10, 40, 70};
+float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = {0.0, 0.2, 0.4, 0.6};
+
+void Ship::GetGrazing()
+{
+	this->graze_count++;
+
+	if (this->graze_level < GrazeLevels::NB_GRAZE_LEVELS-1)
+	{
+		if  (this->graze_count >= GrazeLevelsThresholds[this->graze_level+1])
+		{
+			//Graze level up
+			graze_level++;
+			printf("GRAZE LEVEL UP: %d. Count for next level: %d\n",this->graze_count, GrazeLevelsThresholds[this->graze_level+1]);
+
+			switch (graze_level)
+			{
+			case GrazeLevels::GRAZE_LEVEL_RED:
+				{
+					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
+					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED]->Clone();
+					(*CurrentGame).addToScene(m_combo_aura,LayerType::AuraLayer, IndependantType::Neutral);
+					break;
+				}
+			case GrazeLevels::GRAZE_LEVEL_BLUE:
+				{
+					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
+					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE]->Clone();
+					(*CurrentGame).addToScene(m_combo_aura,LayerType::AuraLayer, IndependantType::Neutral);
+					break;
+				}
+			case GrazeLevels::GRAZE_LEVEL_WHITE:
+				{
+					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
+					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE]->Clone();
+					(*CurrentGame).addToScene(m_combo_aura,LayerType::AuraLayer, IndependantType::Neutral);
+					break;
+				}
+			default:
+				break;
+			}
+		}
+	}
+
+	printf("Graze count: %d\n",this->graze_count);
+}
+
+int Ship::getGrazeCount()
+{
+	return this->graze_count;
+}
+
+float Ship::getShipBeastScore()
+{
+	return GrazeLevelsBeastBonus[this->graze_level];
+}
+
+void Ship::damage_from (Independant& independant)
+{
+	if (!immune)
+	{
+		if (independant.damage > shield)
+		{
+			armor -= (independant.damage - shield);
+			shield = 0;
+		}
+		else
+		{
+			shield -= independant.damage;
+		}
+	}
+	this->graze_count = 0;
+	this->graze_level = GrazeLevels::GRAZE_LEVEL_NONE;
+	(*CurrentGame).garbageLayer(LayerType::AuraLayer);
+	printf("Graze count: %d\n",this->graze_count);
 }

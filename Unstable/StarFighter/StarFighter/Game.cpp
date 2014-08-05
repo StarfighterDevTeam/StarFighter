@@ -98,11 +98,13 @@ void Game::colisionChecksV2()
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).end(); it2++)
 		{
 			i++;
-			//Bullets are invisible after impact
-			if(SimpleCollision::AreColliding((*it1),(*it2)))
+			if(SimpleCollision::IsGrazing((*it1),(*it2)))
 			{
-				if((*it2)->collider_type == EnemyFire)
+				(*it1)->GetGrazing();
+				
+				if(SimpleCollision::AreColliding((*it1),(*it2)))
 				{
+					//Bullets are invisible after impact
 					(*it2)->setVisible(false);
 					(*it2)->GarbageMe = true;
 
@@ -122,6 +124,7 @@ void Game::colisionChecksV2()
 						(*it1)->Respawn();
 						hazard = 0;
 					}
+					
 				}
 			}
 		}

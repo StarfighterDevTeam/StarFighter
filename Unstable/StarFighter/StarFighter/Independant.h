@@ -96,9 +96,9 @@ public:
 	void setWeaponLoot (Weapon* weapon);
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
-
 	virtual void CreateRandomLoot(float BeastScaleBonus=0);
 
+	virtual void GetGrazing();
 	void Independant::GetPolarMovement(sf::Vector2f* np);
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;

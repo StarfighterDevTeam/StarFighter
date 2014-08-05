@@ -18,7 +18,6 @@ public:
 		float x = independantB->getPosition().x;
 		float y = independantB->getPosition().y;
 
-
 		//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
 		if ((pow((independantA->getPosition().x - independantB->getPosition().x),2) + pow((independantA->getPosition().y - independantB->getPosition().y),2)) 
 			> pow(independantA->diag + independantB->diag,2))
@@ -67,6 +66,15 @@ public:
 				return false;
 		}
 		return false;
+	}
+
+	static bool IsGrazing(const Independant* independantA, const Independant* independantB) 
+	{
+		if ((pow((independantA->getPosition().x - independantB->getPosition().x),2) + pow((independantA->getPosition().y - independantB->getPosition().y),2)) 
+			< pow(independantA->diag + independantB->diag + GRAZE_DISTANCE,2))
+			return true;
+		else 
+			return false;
 	}
 };
 

@@ -45,6 +45,8 @@
 #define EQUIPMENT_FILE "Assets/Scripts/Equipment.csv"
 #define BOT_FILE "Assets/Scripts/Bot.csv"
 
+#define GRAZE_DISTANCE									30
+
 //DROP SYSTEM VARIABLES
 
 #define EQUIPMENT_MIN_MAXSPEED_VALUE					100

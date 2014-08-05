@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Independant.h"
+#include "Game.h"
 
 class FX : public Independant
 {
@@ -19,5 +20,18 @@ private:
 	sf::Time duration;
 };
 
+class Aura : public FX
+{
+public:
+	Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber);
+	void update(sf::Time deltaTime) override;
+	Aura* Clone();
+	Independant* target;
+
+private:
+	sf::Clock deltaClockExploding;
+	bool exploding;
+	sf::Time duration;
+};
 
 #endif // FX_H_INCLUDED

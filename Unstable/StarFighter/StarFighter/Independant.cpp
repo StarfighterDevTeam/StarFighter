@@ -281,3 +281,8 @@ void Independant::CreateRandomLoot(float BeastScaleBonus)
 {
 	//-> Enemy::CreateRandomLoot override
 }
+
+void Independant::GetGrazing()
+{
+
+}

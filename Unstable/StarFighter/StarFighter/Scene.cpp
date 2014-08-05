@@ -194,6 +194,7 @@ void Scene::Update(Time deltaTime)
 	mainWindow->draw(this->playerShip->ship_hud.armorBar);
 	mainWindow->draw(this->playerShip->ship_hud.shieldBar);
 	mainWindow->draw(this->playerShip->ship_hud.HazardScore);
+	mainWindow->draw(this->playerShip->ship_hud.GrazeScore);
 
 	if (hazard_break_value != 0)
 		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, ((*CurrentGame).getHazard()*HAZARD_BAR_SIZE_Y)/hazard_break_value));

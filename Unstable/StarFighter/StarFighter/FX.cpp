@@ -1,5 +1,7 @@
 #include "FX.h"
 
+extern Game* CurrentGame;
+
 FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration) : Independant(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), m_frameNumber)
 {
 	exploding = true;
@@ -36,4 +38,28 @@ FX* FX::Clone()
 	FX* new_FX = new FX(this->getPosition(), this->speed, this->textureName, this->m_size, this->frameNumber, this->duration);
 	new_FX->display_name = this->display_name;
 	return new_FX;
+}
+
+Aura::Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber) : FX(m_target->getPosition(), sf::Vector2f (0,0), textureName, size, m_frameNumber, sf::seconds(0))
+{
+	this->target = m_target;
+	visible = true;
+	isOnScene = true;
+}
+
+void Aura::update(sf::Time deltaTime)
+{
+	static sf::Vector2f newposition;
+	newposition.x = target->getPosition().x;
+	newposition.y = target->getPosition().y;
+	this->setPosition(newposition.x,newposition.y);
+
+	AnimatedSprite::update(deltaTime);
+}
+
+Aura* Aura::Clone()
+{
+	Aura* new_aura = new Aura(this->target, this->textureName, this->m_size, this->frameNumber);
+	new_aura->display_name = this->display_name;
+	return new_aura;
 }

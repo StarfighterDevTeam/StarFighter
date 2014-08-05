@@ -12,10 +12,11 @@ class PlayerHud
 public:
 	PlayerHud();
 	void Init(int m_armor, int m_shield);
-	void update(int m_armor, int m_shield, int m_money);
+	void update(int m_armor, int m_shield, int m_money, int m_graze_count);
 	sf::RectangleShape armorBar;
 	sf::RectangleShape shieldBar;
 	sf::Text HazardScore;
+	sf::Text GrazeScore;
 	sf::Font* font;
 };
 
