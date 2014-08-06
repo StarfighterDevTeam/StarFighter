@@ -109,13 +109,6 @@ void Enemy::GenerateLoot()
 	}
 }
 
-float LootTable_DroppingSomething[EnemyClass::NBVAL_EnemyClass] =  {0.0, 0.25, 0.5, 0.8, 1.0, 0.0};
-float LootTable_DropIsEquipment[EnemyClass::NBVAL_EnemyClass] = {0.0, 0.1, 0.3, 0.6, 1.0, 0.0};
-sf::Vector2f LootTable_BeastScale_Base[EnemyClass::NBVAL_EnemyClass] =  {sf::Vector2f(0.0, 0.0), sf::Vector2f(0.7,1.3), sf::Vector2f(0.9,1.5), sf::Vector2f(1.1, 1.7),sf::Vector2f (1.5,2.2), sf::Vector2f(0.0, 0.0)};
-float LootTable_BeastScaleThreshold[NUMBER_OF_BEASTSCALE_THRESHOLD] =  {0.0, 1.5, 3.0, 4.5, 6.0};
-const int LootTable_MaxPropertiesPerEquipmentType[EquipmentType::NBVAL_EQUIPMENT+1] =  {1, 2, 1, 2, 4, 4};
-
-
 void Enemy::CreateRandomLoot(float BeastScaleBonus)
 {
 	int e_value = this->getMoney();
@@ -169,16 +162,16 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					float prorata = ProrataBetweenThreshold(BeastScaleScore, sf::Vector2f (LootTable_BeastScaleThreshold[i-1],LootTable_BeastScaleThreshold[i]));
 					if (extra_property_roll > prorata)
 					{
-						if (number_of_equipment_properties > NB_MAX_PROPERTIES_FOR_NON_EPIC_EQUIPMENT)
+						if (number_of_equipment_properties < NB_MAX_PROPERTIES_FOR_NON_EPIC_EQUIPMENT)
 						{
 							number_of_equipment_properties++;
 						}
 						else
 						{
-							epic_drop = true;//3 guaranteed properties + a winning roll on the 4th trades for an epic drop
+							epic_drop = true; //3 guaranteed properties + a winning roll on the 4th trades for an epic drop
 						}
 					}
-					i = NUMBER_OF_BEASTSCALE_THRESHOLD;//end of the loop
+					break; //end of the loop
 				}
 			}
 
@@ -187,20 +180,19 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 			{
 				int money = RandomizeIntBetweenRatios(e_value, LootTable_BeastScale[e_class]);
 				this->addMoney(money);
+				return;
 			}
 
 			//-----EQUIPMENT TYPE-----
 			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_EQUIPMENT + 1);//+1 is for the weapon type
-			//equipment_type_roll = 4;
 
 			//-----CHOSING RANDOM PROPERTIES-----
 			int properties_to_choose_from = LootTable_MaxPropertiesPerEquipmentType[equipment_type_roll];
-			int *properties_roll_table;
-			properties_roll_table = new int[properties_to_choose_from];
+
+			vector<int> properties_roll_table(properties_to_choose_from);
 			for (int i=0; i<properties_to_choose_from; i++)
 				properties_roll_table[i] = i;
 
-			int chosen_property = 0;
 			if (number_of_equipment_properties > properties_to_choose_from)
 				number_of_equipment_properties = properties_to_choose_from;//on va essayer d'éviter ce cas, car le joueur gaspille des propriétés puisqu'on en a pas conçu suffisamment
 
@@ -222,10 +214,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{
-						chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
-						int a = properties_roll_table[properties_to_choose_from - p];//interversion
-						properties_roll_table[properties_to_choose_from - p] = chosen_property;
-						properties_roll_table[chosen_property] = a;
+						int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
 						equipment->AddAirbrakeProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
 					}
 
@@ -265,11 +254,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{
-						chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
-						int a = properties_roll_table[properties_to_choose_from - p];//interversion
-						properties_roll_table[properties_to_choose_from - p] = chosen_property;
-						properties_roll_table[chosen_property] = a;
-
+						int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
 						equipment->AddEngineProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
 					}
 
@@ -292,11 +277,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{
-						chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
-						int a = properties_roll_table[properties_to_choose_from - p];//interversion
-						properties_roll_table[properties_to_choose_from - p] = chosen_property;
-						properties_roll_table[chosen_property] = a;
-
+						int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
 						equipment->AddArmorProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
 					}
 
@@ -326,11 +307,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{
-						chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
-						int a = properties_roll_table[properties_to_choose_from - p];//interversion
-						properties_roll_table[properties_to_choose_from - p] = chosen_property;
-						properties_roll_table[chosen_property] = a;
-
+						int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
 						equipment->AddShieldProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
 					}
 
@@ -382,11 +359,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{
-						chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
-						int a = properties_roll_table[properties_to_choose_from - p];//interversion
-						properties_roll_table[properties_to_choose_from - p] = chosen_property;
-						properties_roll_table[chosen_property] = a;
-
+						int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
 						equipment->AddModuleProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
 					}
 
@@ -415,11 +388,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{
-						chosen_property = properties_roll_table[rand() % (properties_to_choose_from - p)];
-						int a = properties_roll_table[properties_to_choose_from - p];//interversion
-						properties_roll_table[properties_to_choose_from - p] = chosen_property;
-						properties_roll_table[chosen_property] = a;
-
+						int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
 						weapon->AddWeaponProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
 					}
 
@@ -433,12 +402,25 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 			}
-		}
 
+		}
 		else
 		{
 			int money = RandomizeIntBetweenRatios(e_value, LootTable_BeastScale[e_class]);
 			this->addMoney(money);//looting money
 		}
+
+
 	}
+}
+
+int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p)
+{
+	int index = rand() % (properties_to_choose_from - p);
+	int chosen_property = (*properties_roll_table)[index];
+
+	int a = properties_roll_table->back();
+	(*properties_roll_table)[properties_roll_table->size() - 1] = chosen_property;
+	(*properties_roll_table)[index] = a;
+	return chosen_property;
 }

@@ -39,7 +39,7 @@ void EnemyPool::CreateCluster()
 			n->setPosition(sf::Vector2f(this->position.x + (index % nb_rows)*xspread, this->position.y + (floor(index / nb_rows)-1)*yspread));
 
 			n->enemy_class = (*it)->enemy_class;
-			//n->enemy_class = EnemyClass::ENEMYPOOL_GAMMA;
+			n->enemy_class = EnemyClass::ENEMYPOOL_GAMMA;
 
 			(*CurrentGame).addToScene(n,LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
 		}
