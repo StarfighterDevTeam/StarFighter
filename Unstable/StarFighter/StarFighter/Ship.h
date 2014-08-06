@@ -55,6 +55,12 @@ public:
 	std::string display_name;
 	Bot* bot;
 	bool hasBot;
+	
+	bool hasFake;
+	std::string fake_textureName;
+	sf::Vector2f fake_size;
+	int fake_frameNumber;
+
 private:
 	float decceleration;
 	sf::Vector2f acceleration;
@@ -82,6 +88,12 @@ public:
 	int getEquipmentShieldRegen();
 	Bot* bot;
 	bool hasBot;
+
+	bool hasFake;
+	std::string fake_textureName;
+	sf::Vector2f fake_size;
+	int fake_frameNumber;
+
 
 	void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f BeastScale);
@@ -126,7 +138,9 @@ public:
 	FX* FX_death;
 	void GenerateBots(Independant* m_target);
 	void DestroyBots();
+	void GenerateFakeShip(Independant* m_target);
 	bool automatic_fire;
+	
 
 private:
 	sf::Vector2f max_speed;

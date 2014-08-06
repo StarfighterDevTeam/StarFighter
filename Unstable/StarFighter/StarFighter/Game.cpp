@@ -79,7 +79,10 @@ void Game::drawScene()
 		{
 			if((*(*it)).visible)
 			{
-				this->window->draw((*(*it)));
+				if(!(*(*it)).transparent)
+				{
+					this->window->draw((*(*it)));
+				}
 			}
 		}
 	}

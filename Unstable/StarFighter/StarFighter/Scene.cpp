@@ -149,9 +149,9 @@ Scene::Scene(string name)
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
 	this->playerShip = new Ship(Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO,SCENE_SIZE_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
-	
+
 	printf("DEBUG: Ship config loaded\n");
-	
+
 }
 
 void Scene::StartGame(sf::RenderWindow*	window)
@@ -168,6 +168,7 @@ void Scene::StartGame(sf::RenderWindow*	window)
 	//ship
 	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
 	playerShip->ship_config.GenerateBots(playerShip);
+	playerShip->ship_config.GenerateFakeShip(playerShip);
 }
 
 void Scene::Update(Time deltaTime)
@@ -409,6 +410,15 @@ Equipment* Scene::LoadEquipment(string name)
 				i->hasBot = true;
 			}
 
+			if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0
+				&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
+			{
+				i->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
+				i->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
+				i->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
+				i->hasFake = true;
+			}
+
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
 				i->equipmentType = EquipmentType::Airbrake;
 			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("engine") == 0)
@@ -447,6 +457,15 @@ ShipModel* Scene::LoadShipModel(string name)
 				{
 					s->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
 					s->hasBot = true;
+				}
+
+				if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0
+				&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
+				{
+					s->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
+					s->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
+					s->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
+					s->hasFake = true;
 				}
 
 				return s;
@@ -491,7 +510,7 @@ Bot* Scene::LoadBot(string name)
 				bot->weapon = LoadWeapon((*it)[BotData::BOT_WEAPON], -1, LoadAmmo((*it)[BotData::BOT_AMMO]));
 				bot->hasWeapon=true;
 			}
-			
+
 			return bot;
 		}
 	}
@@ -527,7 +546,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		{
 			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin() ; it != enemies_ranked_by_class[i].end(); ++it)
 			{
-          		if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
+				if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
 				{
 					random_enemy_within_class[i] = (*it).enemy;
 				}

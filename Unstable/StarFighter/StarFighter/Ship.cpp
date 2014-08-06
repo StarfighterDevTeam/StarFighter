@@ -21,6 +21,7 @@ ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, floa
 	this->frameNumber = m_frameNumber;
 	this->display_name = m_display_name;
 	this->hasBot = false;
+	this->hasFake = false;
 }
 
 //various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
@@ -71,6 +72,7 @@ Equipment::Equipment()
 	this->textureName = EMPTYSLOT_FILENAME;
 	this->equipmentType = EquipmentType::Airbrake;
 	this->hasBot = false;
+	this->hasFake = false;
 }
 
 void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
@@ -566,6 +568,24 @@ void ShipConfig::DestroyBots()
 	(*CurrentGame).garbageLayer(LayerType::BotLayer);
 }
 
+void ShipConfig::GenerateFakeShip(Independant* m_target)
+{
+	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	{
+		if (this->ship_model->hasFake)
+		{
+			Aura* fake_ship = new Aura(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber);
+			(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
+		}
+
+		if (this->equipment[i]->hasFake)
+		{
+			Aura* fake_ship = new Aura(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber);
+			(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
+		}
+	}
+}
+
 // ----------------SHIP ---------------
 
 Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x/2),(m_ship_config.size.y/2)), m_ship_config.frameNumber)
@@ -686,6 +706,12 @@ void Ship::update(sf::Time deltaTime)
 				speed.y = SHIP_BRAKING_SPEED;
 			if (speed.y < - SHIP_BRAKING_SPEED)
 				speed.y = - SHIP_BRAKING_SPEED;
+
+			this->transparent = false;
+		}
+		else
+		{
+			this->transparent = true;
 		}
 
 		//auto fire option (F key)

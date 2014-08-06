@@ -23,6 +23,7 @@ enum LayerType {
 	FriendlyFireLayer,
 	AuraLayer,
 	BotLayer,
+	FakeShipLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
 	EnemyObjectLayer,

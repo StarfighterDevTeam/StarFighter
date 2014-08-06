@@ -24,6 +24,7 @@ class Aura : public FX
 {
 public:
 	Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber);
+	void Init(std::string m_textureName, sf::Vector2f dsize, int m_frameNumber);
 	void update(sf::Time deltaTime) override;
 	Aura* Clone();
 	Independant* target;

@@ -47,6 +47,13 @@ Aura::Aura(Independant* m_target, std::string textureName, sf::Vector2f size, in
 	isOnScene = true;
 }
 
+void Aura::Init(std::string m_textureName, sf::Vector2f size, int m_frameNumber)
+{
+	this->textureName = m_textureName;
+	this->m_size = size;
+	this->frameNumber = m_frameNumber;
+}
+
 void Aura::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition;

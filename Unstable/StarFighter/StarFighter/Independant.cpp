@@ -57,6 +57,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->hasEquipmentLoot = false;
 	this->hasWeaponLoot = false;
 	this->diag = sqrt(pow(m_size.x/2,2) + pow(m_size.y/2,2));
+	this->transparent = false;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber)

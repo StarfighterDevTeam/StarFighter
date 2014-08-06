@@ -110,6 +110,7 @@ public:
 	PatternBobby Pattern;
 	float diag;
 	std::string display_name;
+	bool transparent;
 
 protected:
 	sf::Vector2f initial_position;
