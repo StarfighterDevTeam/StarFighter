@@ -47,14 +47,17 @@ public:
 	int getHazard();
 	void resetHazard(int hazard_overkill = 0);
 	sf::Vector2f scale_factor;
+
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
+	void GetBeastScoreBonus (float m_playerShipBeastScore, float m_sceneBeastScore);
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	Clock sceneChronometer;
 	float movementClock;
 	int hazard;
+	float BeastScoreBonus;
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];

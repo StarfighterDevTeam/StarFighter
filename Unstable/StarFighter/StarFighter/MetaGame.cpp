@@ -33,6 +33,7 @@ MetaGame::MetaGame(sf::RenderWindow* window, string m_currentScene_name)
 void MetaGame::Update(Time deltaTime)
 {
 	this->currentScene->Update(deltaTime);
+	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), this->currentScene->getSceneBeastScore());
 	(*CurrentGame).updateScene(deltaTime);
 	this->mainWindow->clear();
 	(*CurrentGame).drawScene();

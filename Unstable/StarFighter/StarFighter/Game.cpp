@@ -26,7 +26,8 @@ void Game::init(RenderWindow* window)
 		sceneIndependantsTyped[i] = new std::list<Independant*>;
 	}
 
-	hazard = 0;//initalisation of the scoring system
+	this->hazard = 0;//initalisation of the scoring system
+	this->BeastScoreBonus = 0.0f;
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -202,7 +203,7 @@ void Game::colisionChecksV2()
 						(*it1)->Death();
 						//Loot
 						hazard += (*it1)->getMoney();
-						(*it1)->CreateRandomLoot();
+						(*it1)->CreateRandomLoot(this->BeastScoreBonus);
 						//TODO : 
 						//(*it1)->CreateRandomLoot(BeastScale_HazardLevel + BeastScale_PlayerCombo);
 						(*it1)->GenerateLoot();
@@ -333,4 +334,9 @@ int Game::getHazard()
 void Game::resetHazard(int hazard_overkill)
 {
 	hazard = hazard_overkill;
+}
+
+void Game::GetBeastScoreBonus (float m_playerShipBeastScore, float m_sceneBeastScore)
+{
+	this->BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
 }

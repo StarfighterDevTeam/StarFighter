@@ -20,7 +20,7 @@ public:
 private:
 	sf::RectangleShape armorBar;
 	sf::RectangleShape shieldBar;
-	sf::Text HazardScore;
+	sf::Text Money;
 	sf::Text GrazeScore;
 
 	sf::Font* font;

@@ -32,24 +32,19 @@ void PlayerHud::Init(int m_armor, int m_shield)
 			//TODO: font loader
 		}
 
-		framerate = new sf::Text("00", *font, 15);
-		framerate->setColor(sf::Color::Yellow);
-		framerate->setStyle(sf::Text::Bold);
-		framerate->setPosition(WINDOW_RESOLUTION_X-80,WINDOW_RESOLUTION_Y-30);
-
 		font2 = new sf::Font();
-		if (!font->loadFromFile("Assets/Fonts/arial.ttf"))
+		if (!font2->loadFromFile("Assets/Fonts/arial.ttf"))
 		{
 			// error
 			//TODO: font loader
 		}
 
-		HazardScore.setFont(*font2);
-		HazardScore.setCharacterSize(20);
-		HazardScore.setColor(sf::Color::White);
-		HazardScore.setPosition(50,WINDOW_RESOLUTION_Y-50);
+		Money.setFont(*font);
+		Money.setCharacterSize(20);
+		Money.setColor(sf::Color::White);
+		Money.setPosition(50,WINDOW_RESOLUTION_Y-50);
 
-		GrazeScore.setFont(*font2);
+		GrazeScore.setFont(*font);
 		GrazeScore.setCharacterSize(14);
 		GrazeScore.setColor(sf::Color::White);
 		GrazeScore.setPosition(50,WINDOW_RESOLUTION_Y-70);
@@ -63,6 +58,11 @@ void PlayerHud::Init(int m_armor, int m_shield)
 		hazardBreakScore->setColor(sf::Color::Red);
 		hazardBreakScore->setStyle(sf::Text::Regular);
 		hazardBreakScore->setPosition(SCENE_SIZE_X-100,HAZARD_BAR_SIZE_Y+46);
+
+		framerate = new sf::Text("00", *font2, 15);
+		framerate->setColor(sf::Color::Yellow);
+		framerate->setStyle(sf::Text::Bold);
+		framerate->setPosition(WINDOW_RESOLUTION_X-80,WINDOW_RESOLUTION_Y-30);
 	}
 
 	catch( const std::exception & ex ) 
@@ -110,32 +110,34 @@ void PlayerHud::update(sf::RenderWindow* window, int m_armor, int m_shield, int 
 	}
 
 	//money
-	ostringstream ss;
-	ss << m_money;
-	HazardScore.setString(ss.str()+"$");
+	ostringstream ss_m;
+	ss_m << m_money;
+	Money.setString(ss_m.str()+"$");
 
 	//graze
-	ss << m_graze_count;
-	GrazeScore.setString("Graze: "+ss.str());
+	ostringstream ss_g;
+	ss_g << m_graze_count;
+	GrazeScore.setString("Graze: "+ss_g.str());
 
 	//hazard break
 	if (m_hazard_break_value != 0)
-		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, (m_hazard_score, HAZARD_BAR_SIZE_Y)/m_hazard_break_value));
+		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, (m_hazard_score*HAZARD_BAR_SIZE_Y)/m_hazard_break_value));
 	else
 		printf("DEBUG: <error> HazardBar cannot be computed because hazard break value = 0)\n");
 
-	ss << m_hazard_score;
+	ostringstream ss_h1;
+	ss_h1 << m_hazard_score;
 
-	ostringstream ss2;
-	ss2 << m_hazard_break_value;
+	ostringstream ss_h2;
+	ss_h2 << m_hazard_break_value;
 
 	if (m_hazard_score > m_hazard_break_value) // max constraint
 	{
 		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
-		ss << m_hazard_break_value;
+		ss_h1 << m_hazard_break_value;
 	}
 
-	hazardBreakScore->setString(ss.str() + "/" + ss2.str());
+	hazardBreakScore->setString(ss_h1.str() + "/" + ss_h2.str());
 
 	//framerate
 	framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
@@ -148,7 +150,7 @@ void PlayerHud::draw(sf::RenderWindow* window)
 	//Draw all
 	window->draw(armorBar);
 	window->draw(shieldBar);
-	window->draw(HazardScore);
+	window->draw(Money);
 	window->draw(GrazeScore);
 	window->draw(hazardBarMax);
 	window->draw(hazardBar);
