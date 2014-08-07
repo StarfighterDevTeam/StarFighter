@@ -601,7 +601,6 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->armor = ship_config.getShipConfigArmor();
 	this->shield = ship_config.getShipConfigShield();
 	this->shield_regen = ship_config.getShipConfigShieldRegen();
-	this->ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
 	this->disable_inputs = false;
 	this->disable_fire = false;
 	this->graze_count = 0;
@@ -619,7 +618,6 @@ void Ship::Init()
 	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
-	this->ship_hud.Init(this->ship_config.getShipConfigArmor(), this->ship_config.getShipConfigShield());
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -683,7 +681,7 @@ void Ship::update(sf::Time deltaTime)
 			shield = ship_config.getShipConfigShield();
 		}
 	}
-	this->ship_hud.update(this->armor/3, this->shield/3, this->money, this->graze_count);//will do for now... but we'll need to scale it to the max value later
+	//this->ship_hud.update(this->armor/3, this->shield/3, this->money, this->graze_count);//will do for now... but we'll need to scale it to the max value later
 
 	sf::Vector2f directions = InputGuy::getDirections();
 	if (!disable_inputs)

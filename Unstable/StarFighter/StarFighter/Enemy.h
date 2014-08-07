@@ -31,7 +31,6 @@ const int LootTable_MaxPropertiesPerEquipmentType[EquipmentType::NBVAL_EQUIPMENT
 
 class Enemy : public Independant
 {
-
 public:
 	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death);
 	void update(sf::Time deltaTime) override;
@@ -45,10 +44,17 @@ public:
 	void CreateRandomLoot(float BeastScaleBonus=0) override;
 	EnemyClass enemy_class;
 private:
-	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);
-	
-
+	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);	
 };
 
+struct EnemyBase
+{
+	Enemy* enemy;
+	int probability;
+	int poolsize;
+	int enemyclass;
+	int proba_min;//interval of dice roll values for a hit
+	int proba_max;
+};
 
 #endif // INDEPENDANT_H_INCLUDED

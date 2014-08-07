@@ -33,8 +33,9 @@ int main()
 	///...until here (avoiding key repetition)
 
 	//Loading Scene
-	Scene level1("Assets/Scripts/Scenes/scene1.csv");
-	level1.StartGame(window);
+	MetaGame metagame(window, "Assets/Scripts/Scenes/scene1.csv");
+	//Scene level1("Assets/Scripts/Scenes/scene1.csv");
+	//level1.StartGame(window);
 
 	while (window->isOpen())
 	{
@@ -60,7 +61,7 @@ int main()
 			window->close();
 
 		dt = deltaClock.restart();
-		level1.Update(dt);
+		metagame.Update(dt);
 
 	}
 

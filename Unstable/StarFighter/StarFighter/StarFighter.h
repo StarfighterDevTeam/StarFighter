@@ -21,6 +21,8 @@
 #include "EnemyPool.h"
 #include "FileLoadUtils.h"
 #include "Bot.h"
+#include "MetaGame.h"
+#include "FileLoader.h"
 
 #define LOGGER_START(MIN_PRIORITY, FILE) Logger::Start(MIN_PRIORITY, FILE);
 #define LOGGER_STOP() Logger::Stop();

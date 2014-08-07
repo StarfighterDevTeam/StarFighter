@@ -17,13 +17,6 @@ void Scene::LoadSceneFromFile(string name)
 	try {
 
 		this->config = *(FileLoaderUtils::FileLoader(name));
-		this->enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
-		this->weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
-		this->ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
-		this->enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
-		this->FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
-		this->shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
-		this->botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
 
 		int p = 0;
 		//enemies
@@ -43,7 +36,7 @@ void Scene::LoadSceneFromFile(string name)
 
 			if((*it)[0].compare("enemy") == 0)
 			{
-				EnemyBase* e = LoadEnemy((*it)[SceneDataEnemy::ENEMY],stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+				EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY],stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
 
 				//giving intervall of hit values for dice rolls
@@ -67,21 +60,7 @@ void Scene::LoadSceneFromFile(string name)
 		LOGGER_WRITE(Logger::Priority::LERROR,ex.what());
 	}
 
-	//Hazard feature (scoring system)
-	hazardBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 0));
-	hazardBar.setFillColor(sf::Color(250, 0, 50));//red
-	hazardBar.setOutlineThickness(4);
-	hazardBar.setOutlineColor(sf::Color(255, 255, 255));
-	hazardBar.setOrigin(0, 0);
-	hazardBar.setPosition(WINDOW_RESOLUTION_X-40, 10);
-
-	//hazardBarMax.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, hazard_break_value));
-	hazardBarMax.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
-	hazardBarMax.setFillColor(sf::Color::Transparent);//black
-	hazardBarMax.setOutlineThickness(4);
-	hazardBarMax.setOutlineColor(sf::Color(255, 255, 255));
-	hazardBarMax.setOrigin(0, 0);
-	hazardBarMax.setPosition(WINDOW_RESOLUTION_X-40, 10);
+	
 
 }
 
@@ -99,58 +78,11 @@ Scene::Scene(string name)
 
 	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading ship config file");
 
-	try 
-	{
-		this->FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
-		this->equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
-		this->weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
-		this->ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
-		this->botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
-		this->shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
-
-		//Loading font for framerate
-		//TODO : refactor this
-		sf::Font* font = new sf::Font();
-		if (!font->loadFromFile("Assets/Fonts/arial.ttf"))
-		{
-			// error
-			//TODO: font loader
-		}
-
-		this->framerate = new sf::Text("00", *font, 15);
-		this->framerate->setColor(sf::Color::Yellow);
-		this->framerate->setStyle(sf::Text::Bold);
-		this->framerate->setPosition(WINDOW_RESOLUTION_X-80,WINDOW_RESOLUTION_Y-30);
-
-		sf::Font* font2 = new sf::Font();
-		if (!font2->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
-		{
-			// error
-			//TODO: font loader
-		}
-		this->hazardBreakText = new sf::Text("Hazard\nBreak", *font2, 12);
-		this->hazardBreakText->setColor(sf::Color::Red);
-		this->hazardBreakText->setStyle(sf::Text::Bold);
-		this->hazardBreakText->setPosition(WINDOW_RESOLUTION_X-100,HAZARD_BAR_SIZE_Y+20);
-
-		this->hazardBreakScore = new sf::Text("", *font2, 15);
-		this->hazardBreakScore->setColor(sf::Color::Red);
-		this->hazardBreakScore->setStyle(sf::Text::Regular);
-		this->hazardBreakScore->setPosition(SCENE_SIZE_X-100,HAZARD_BAR_SIZE_Y+46);
-	}
-
-	catch( const std::exception & ex ) 
-	{
-
-		//An error occured
-		LOGGER_WRITE(Logger::Priority::LERROR,ex.what());
-	}
+	
 
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
-	this->playerShip = new Ship(Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO,SCENE_SIZE_Y*STARTSCENE_Y_RATIO), *LoadShipConfig("default"));
 
-	printf("DEBUG: Ship config loaded\n");
 
 }
 
@@ -187,335 +119,16 @@ void Scene::Update(Time deltaTime)
 	{
 		this->GenerateEnemies(deltaTime);
 	}
-
-	(*CurrentGame).updateScene(deltaTime);
-	mainWindow->clear();
-	(*CurrentGame).drawScene();
-
-	//TODO: refactor these
-	mainWindow->draw(this->playerShip->ship_hud.armorBar);
-	mainWindow->draw(this->playerShip->ship_hud.shieldBar);
-	mainWindow->draw(this->playerShip->ship_hud.HazardScore);
-	mainWindow->draw(this->playerShip->ship_hud.GrazeScore);
-
-	if (hazard_break_value != 0)
-		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, ((*CurrentGame).getHazard()*HAZARD_BAR_SIZE_Y)/hazard_break_value));
-	else
-		printf("DEBUG: <error> HazardBar cannot be computed because hazard break value = 0)\n");
-	ostringstream ss;
-	ostringstream ss2;
-	ss << (*CurrentGame).getHazard();
-	ss2 << hazard_break_value;
-
-	if ((*CurrentGame).getHazard() > hazard_break_value) // max constraint
-	{
-		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
-		ss << hazard_break_value;
-	}
-
-	hazardBreakScore->setString(ss.str() + "/" + ss2.str());
-
-	mainWindow->draw(hazardBarMax);
-	mainWindow->draw(hazardBar);
-	mainWindow->draw(*(this->hazardBreakText));
-	mainWindow->draw(*(this->hazardBreakScore));
+	
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
 	{
 		HazardBreakEvent();
 	}
-
-	//Show framerate
-	this->framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
-	mainWindow->draw(*(this->framerate));
-
-	mainWindow->display();
 }
 
 Ship* Scene::GetPlayerShip()
 {
 	return this->playerShip;
-}
-
-
-ShipConfig* Scene::LoadShipConfig(string name)
-{
-	for (std::list<vector<string>>::iterator it = (this->shipConfig).begin(); it != (this->shipConfig).end(); it++)
-	{
-		if((*it)[ShipConfigData::SHIPCONFIG_NAME].compare(name) == 0)
-		{
-			ShipConfig* shipC = new ShipConfig();
-
-			//Loading Ship Model
-			printf("DEBUG: Loading ship model\n");
-			shipC->setShipModel(LoadShipModel((*it)[ShipConfigData::SHIPCONFIG_SHIPMODEL]));
-
-			//Loading equipment
-			printf("DEBUG: Loading ship equipment\n");
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
-			shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
-			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
-			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]), false);
-			//shipC->setEquipment(LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
-
-			//Loading FX
-			shipC->FX_death = LoadFX((*it)[ShipConfigData::SHIPCONFIG_DEATH_FX]);
-
-			//Loading weapon
-			if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
-			{
-				printf("DEBUG: Loading ship weapon\n");
-				shipC->setShipWeapon(LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
-			}
-
-			//Computing the ship config
-			shipC->Init();
-
-			return shipC;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file",name));
-}
-
-EnemyPool* Scene::LoadEnemyPool(string name)
-{
-	for (std::list<vector<string>>::iterator it = (this->enemypoolConfig).begin(); it != (this->enemypoolConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			//TODO
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPool '%s'. Please check the config file",name));
-}
-
-EnemyBase* Scene::LoadEnemy(string name, int probability, int poolSize, int enemyClass)
-{
-	for (std::list<vector<string>>::iterator it = (this->enemyConfig).begin(); it != (this->enemyConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			EnemyBase* base = new EnemyBase;
-			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(0, stoi((*it)[EnemyData::ENEMY_SPEED])),(*it)[EnemyData::ENEMY_IMAGE_NAME],sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]),stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]));
-			base->probability = probability;
-			base->poolsize = poolSize;
-			base->enemyclass = enemyClass;
-
-			((Independant*)base->enemy)->armor = stoi((*it)[EnemyData::ENEMY_ARMOR]);
-			((Independant*)base->enemy)->shield = ((Independant*)base->enemy)->shield_max = stoi((*it)[EnemyData::ENEMY_SHIELD]);
-			((Independant*)base->enemy)->shield_regen = stoi((*it)[EnemyData::ENEMY_SHIELD_REGEN]);
-			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
-			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
-			((Independant*)base->enemy)->display_name = (*it)[EnemyData::ENEMY_NAME];
-
-			if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
-			{
-				base->enemy->weapon = LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, LoadAmmo((*it)[EnemyData::ENEMY_AMMO]));
-				base->enemy->hasWeapon = true;
-			}
-
-			return base;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Enemy '%s'. Please check the config file",name));
-}
-
-Weapon* Scene::LoadWeapon(string name, int fire_direction, Ammo* ammo)
-{
-	for (std::list<vector<string>>::iterator it = (this->weaponConfig).begin(); it != (this->weaponConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			Weapon* weapon = new Weapon(ammo);
-			weapon->display_name = (*it)[WeaponData::WEAPON_NAME];
-			weapon->fire_direction = Vector2i(0,fire_direction);
-			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
-			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
-			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
-			weapon->alternate = (bool)(stoi((*it)[WeaponData::WEAPON_ALTERNATE]));
-			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
-			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
-			if (weapon->rafale != 0)
-				weapon->rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
-
-			weapon->textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
-			weapon->size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
-			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
-
-			return weapon;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file",name));
-
-}
-
-Ammo* Scene::LoadAmmo(string name)
-{
-	for (std::list<vector<string>>::iterator it = (this->ammoConfig).begin(); it != (this->ammoConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			Ammo* new_ammo = new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], 
-				Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
-			new_ammo->display_name = (*it)[AmmoData::AMMO_NAME];
-
-			return new_ammo;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file",name));
-}
-
-FX* Scene::LoadFX(string name)
-{
-	for (std::list<vector<string>>::iterator it = (this->FXConfig).begin(); it != (this->FXConfig).end(); it++)
-	{
-		if((*it)[FXData::FX_TYPE].compare("explosion") == 0)
-		{
-			if((*it)[FXData::FX_NAME].compare(name) == 0)
-			{
-				float duration = atof(((*it)[FXData::FX_DURATION]).c_str());
-				FX* myFX = new FX(Vector2f(0,0), Vector2f(0,0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]),stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(duration));
-				myFX->display_name = (*it)[FXData::FX_NAME];
-
-				return myFX;
-			}
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file",name));
-
-}
-
-Equipment* Scene::LoadEquipment(string name)
-{
-	for (std::list<vector<string>>::iterator it = (this->equipmentConfig).begin(); it != (this->equipmentConfig).end(); it++)
-	{
-		if((*it)[EquipmentData::EQUIPMENT_NAME].compare(name) == 0)
-		{
-			Equipment* i = new Equipment();
-
-			i-> Init(EquipmentType::Airbrake, Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_X]),stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_Y])), 
-				stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),
-				stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]),
-				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
-				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
-
-			if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
-			{
-				i->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
-				i->hasBot = true;
-			}
-
-			if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0
-				&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
-			{
-				i->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
-				i->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
-				i->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
-				i->hasFake = true;
-			}
-
-			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
-				i->equipmentType = EquipmentType::Airbrake;
-			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("engine") == 0)
-				i->equipmentType = EquipmentType::Engine;
-			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("armor") == 0)
-				i->equipmentType = EquipmentType::Armor;
-			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("shield") == 0)
-				i->equipmentType = EquipmentType::Shield;
-			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("module") == 0)
-				i->equipmentType = EquipmentType::Module;
-			else 
-				LOGGER_WRITE(Logger::Priority::DEBUG,"Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file",name);
-
-			return i;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Equipment '%s'. Please check the config file",name));
-}
-
-ShipModel* Scene::LoadShipModel(string name)
-{
-	for (std::list<vector<string>>::iterator it = (this->equipmentConfig).begin(); it != (this->equipmentConfig).end(); it++)
-	{
-		if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("shipmodel") == 0)
-		{
-			if((*it)[EquipmentData::EQUIPMENT_NAME].compare(name) == 0)
-			{
-				ShipModel* s = new ShipModel(Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_X]),stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_Y])), 
-					Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
-					stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]),
-					(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])), 
-					stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
-
-				if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
-				{
-					s->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
-					s->hasBot = true;
-				}
-
-				if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0
-				&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
-				{
-					s->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
-					s->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
-					s->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
-					s->hasFake = true;
-				}
-
-				return s;
-			}	
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find ShipModel '%s'. Please check the config file",name));
-}
-
-Bot* Scene::LoadBot(string name)
-{
-	for (std::list<vector<string>>::iterator it = (this->botConfig).begin(); it != (this->botConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			Bot* bot = new Bot(Vector2f(0,0), Vector2f(0,0),(*it)[BotData::BOT_IMAGE_NAME],sf::Vector2f(stoi((*it)[BotData::BOT_WIDTH]),stoi((*it)[BotData::BOT_HEIGHT])));
-
-			((Independant*)bot)->display_name = (*it)[BotData::BOT_NAME];
-			((Independant*)bot)->armor = stoi((*it)[BotData::BOT_ARMOR]);
-			((Independant*)bot)->shield = ((Independant*)bot)->shield_max = stoi((*it)[BotData::BOT_SHIELD]);
-			((Independant*)bot)->shield_regen = stoi((*it)[BotData::BOT_SHIELD_REGEN]);
-			((Independant*)bot)->damage = stoi((*it)[BotData::BOT_DAMAGE]);
-			bot->radius = stoi((*it)[BotData::BOT_RADIUS]);
-			bot->vspeed = stoi((*it)[BotData::BOT_SPEED]);
-			bot->spread = Vector2f(stoi((*it)[BotData::BOT_XSPREAD]), stoi((*it)[BotData::BOT_YSPREAD]));
-
-			vector<float>* v = new vector<float>;
-			v->push_back(bot->radius); // rayon 500px
-			v->push_back(1);  // clockwise (>)
-
-			PatternType pattern_type = PatternType::NoMovePattern;
-			if((*it)[BotData::BOT_PATTERN].compare("circle") == 0)
-				pattern_type = PatternType::Circle_;
-			if((*it)[BotData::BOT_PATTERN].compare("oscillator") == 0)
-				pattern_type = PatternType::Oscillator;
-
-			bot->Pattern.SetPattern(pattern_type,bot->vspeed,v); //vitesse angulaire (degres/s)
-
-			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)
-			{
-				bot->weapon = LoadWeapon((*it)[BotData::BOT_WEAPON], -1, LoadAmmo((*it)[BotData::BOT_AMMO]));
-				bot->hasWeapon=true;
-			}
-
-			return bot;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Bot '%s'. Please check the config file",name));
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
@@ -869,4 +482,14 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
 	}
 
 	return sf::Vector2f (x,y);
+}
+
+int Scene::getSceneHazardBreakValue()
+{
+	return this->hazard_break_value;
+}
+
+int Scene::getSceneHazardLevelValue()
+{
+	return this->hazard_level;
 }

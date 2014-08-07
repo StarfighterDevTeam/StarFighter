@@ -47,6 +47,8 @@ public:
 	int getHazard();
 	void resetHazard(int hazard_overkill = 0);
 	sf::Vector2f scale_factor;
+	Ship* playerShip;
+	void SetPlayerShip(Ship* m_playerShip);
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
