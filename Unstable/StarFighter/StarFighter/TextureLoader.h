@@ -63,29 +63,6 @@ public:
 		}
 	}
 
-	void TextureLoader::loadAll()
-	{
-		//Load all the Textures:
-		this->getInstance()->loadTexture("Assets/2D/laser.png",4,12);
-		this->getInstance()->loadTexture("Assets/2D/laser_blue.png",4,16);
-		this->getInstance()->loadTexture("Assets/2D/player_sprite.png",192,64);
-		this->getInstance()->loadTexture("Assets/2D/enemyX.png",32,32);
-		this->getInstance()->loadTexture("Assets/2D/enemyY.png",32,32);
-		this->getInstance()->loadTexture("Assets/2D/FX_explosion.png",1280,236);
-		this->getInstance()->loadTexture("Assets/2D/background.png",800,1800);
-		this->getInstance()->loadTexture("Assets/2D/AirBrake.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/AirBrakeZ.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/Armor.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/Shield.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/laser_blue1.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/laser_red.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/Stab.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/Thruster.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/EmptySlot.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/Module.png",64,64);
-		this->getInstance()->loadTexture("Assets/2D/crystal.png",32,32);
-	}
-
 	// Fonctions de création et destruction du singleton
 	static TextureLoader *getInstance ()
 	{

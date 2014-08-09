@@ -16,8 +16,6 @@
 #define	SCENE_SIZE_X							800
 #define SCENE_SIZE_Y							600
 
-#define LOOP_SAMPLING_MS						18	//18ms ~ 56 Hz
-
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 

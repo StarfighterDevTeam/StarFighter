@@ -88,7 +88,7 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	hazardBarMax.setPosition(WINDOW_RESOLUTION_X-40, 10);
 }
 
-void PlayerHud::update(sf::RenderWindow* window, int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, sf::Time deltaTime)
+void PlayerHud::Update(sf::RenderWindow* window, int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, sf::Time deltaTime)
 {
 	//armor and shield
 	if (m_armor <=0)
@@ -141,11 +141,9 @@ void PlayerHud::update(sf::RenderWindow* window, int m_armor, int m_shield, int 
 
 	//framerate
 	framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
-
-	draw(window);
 }
 
-void PlayerHud::draw(sf::RenderWindow* window)
+void PlayerHud::Draw(sf::RenderWindow* window)
 {
 	//Draw all
 	window->draw(armorBar);

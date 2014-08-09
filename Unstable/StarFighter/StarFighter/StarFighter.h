@@ -6,6 +6,7 @@
 #include <cmath>
 #include <SFML/Audio.hpp>
 #include "Globals.h"
+#include "PrefsManager.h"
 #include "Ship.h"
 #include "Background.h"
 #include "Weapon.h"
@@ -21,8 +22,11 @@
 #include "EnemyPool.h"
 #include "FileLoadUtils.h"
 #include "Bot.h"
-#include "MetaGame.h"
+#include "InGameState.h"
 #include "FileLoader.h"
+#include <SFGUI/SFGUI.hpp>
+#include "GameManager.h"
+#include "Player.h"
 
 #define LOGGER_START(MIN_PRIORITY, FILE) Logger::Start(MIN_PRIORITY, FILE);
 #define LOGGER_STOP() Logger::Stop();

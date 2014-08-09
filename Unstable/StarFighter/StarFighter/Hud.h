@@ -14,8 +14,8 @@ class PlayerHud
 public:
 	PlayerHud::PlayerHud();
 	void Init(int m_armor, int m_shield);
-	void update(sf::RenderWindow* window, int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, sf::Time deltaTime);
-	void draw (sf::RenderWindow* window);
+	void Update(sf::RenderWindow* window, int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, sf::Time deltaTime);
+	void Draw (sf::RenderWindow* window);
 
 private:
 	sf::RectangleShape armorBar;

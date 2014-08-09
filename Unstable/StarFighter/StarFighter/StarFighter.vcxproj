@@ -20,7 +20,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -52,16 +52,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Libraries\SFGUI\include;..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Libraries\SFGUI\lib;..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfgui-d.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>COPY $(ProjectDir)..\..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\* $(TargetDir)\</Command>
+      <Command>COPY $(ProjectDir)..\..\..\Libraries\SFGUI\bin\* $(TargetDir)\
+COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\* $(TargetDir)\</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,14 +99,17 @@
     <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hud.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Loot.cpp" />
-    <ClCompile Include="MetaGame.cpp" />
+    <ClCompile Include="InGameState.cpp" />
     <ClCompile Include="MovePattern.cpp" />
     <ClCompile Include="PatternBobby.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Independant.cpp" />
@@ -126,6 +130,8 @@
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="FX.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hud.h" />
     <ClInclude Include="Includes\PixelPerfectCollision.hpp" />
@@ -134,9 +140,11 @@
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Loot.h" />
-    <ClInclude Include="MetaGame.h" />
+    <ClInclude Include="InGameState.h" />
     <ClInclude Include="MovePattern.h" />
     <ClInclude Include="PatternBobby.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
