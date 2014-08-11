@@ -9,14 +9,14 @@ class Scene
 {
 public:
 	//Scene(string name, ShipConfig* shipConf);
-	Scene(string name);
-	void Scene::StartGame(sf::RenderWindow*	window);
+	Scene(string name, bool reverse_scene=false, bool first_scene=false);
 	void Scene::Update(Time deltaTime);
 	Ship* Scene::GetPlayerShip();
 	void Scene::GenerateEnemies(Time deltaTime);
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
 	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
-	void Scene::LoadSceneFromFile(string name);
+	void Scene::LoadSceneFromFile(string name, bool reverse_scene=false, bool first_scene=false);
+	void Scene::SetScenePositionAndSpeed(sf::Vector2i direction, float vspeed, float w, float h);
 
 	bool getPhaseShifter(int index);
 	void setPhaseShifter(int index, bool b);
@@ -26,9 +26,7 @@ public:
 
 	float Scene::getSceneBeastScore();
 	
-	
 	Independant* bg;
-	Independant* hub;
 
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();

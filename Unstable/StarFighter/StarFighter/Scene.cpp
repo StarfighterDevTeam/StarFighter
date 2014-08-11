@@ -3,14 +3,11 @@
 extern Game* CurrentGame;
 
 
-void Scene::LoadSceneFromFile(string name)
+void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 {
-	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading Scene");
-	scrolling_direction.x = 0;
-	scrolling_direction.y = 1;
-	vspeed = + 2;
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Scene");
 	hazard_break_value = 0;
-	for (int i=0; i<EnemyClass::NBVAL_EnemyClass;i++)
+	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
 		this->total_class_probability[i] = 0;
 	}
@@ -22,21 +19,66 @@ void Scene::LoadSceneFromFile(string name)
 		//enemies
 		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
 		{
-			if((*it)[0].compare("bg") == 0)
+			if ((*it)[0].compare("bg") == 0)
 			{
-				this->bg = new Independant(sf::Vector2f(0, -stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),sf::Vector2f(0, vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
-				bg->setVisible(true);
+				float vspeed = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
+				float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
+				float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
+				sf::Vector2f pos = sf::Vector2f(0, 0);
+				sf::Vector2f speed = sf::Vector2f(0, 0);
+
+				if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("vertical") == 0)
+				{
+					if (!reverse_scene)
+					{
+						speed = sf::Vector2f(0, vspeed);
+						pos = sf::Vector2f(w/2, -h/2);
+						if (first_scene)
+						{
+							pos.y += SCENE_SIZE_Y;
+						}
+					}
+					else
+					{
+						speed = sf::Vector2f(0, -vspeed);
+						pos = sf::Vector2f(w/2, (h/2)+SCENE_SIZE_Y);
+						if (first_scene)
+						{
+							pos.y -= SCENE_SIZE_Y;
+						}
+					}
+				}
+				else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("horizontal") == 0)
+				{
+					if (!reverse_scene)
+					{
+						speed = sf::Vector2f(-vspeed, 0);
+						pos = sf::Vector2f((w/2) + SCENE_SIZE_X, h/2);
+						if (first_scene)
+						{
+							pos.x -= SCENE_SIZE_X;
+						}
+					}
+					else
+					{
+						speed = sf::Vector2f(vspeed, 0);
+						pos = sf::Vector2f(-w/2, h/2);
+						if (first_scene)
+						{
+							pos.x += SCENE_SIZE_X;
+						}
+					}
+				}
+				
+				this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], Vector2f(w, h));
+				this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
+				this->bg->setVisible(true);
+				this->bg->isOnScene = true;
 			}
 
-			if((*it)[0].compare("hub") == 0)
+			if ((*it)[0].compare("enemy") == 0)
 			{
-				this->hub = new Independant(sf::Vector2f(0,0),sf::Vector2f(0,vspeed),(*it)[SceneDataBackground::BACKGROUND_NAME],Vector2f(stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]),stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT])),Vector2f(0,0));
-				hub->setVisible(true);
-			}
-
-			if((*it)[0].compare("enemy") == 0)
-			{
-				EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY],stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()),stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+				EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
 
 				//giving intervall of hit values for dice rolls
@@ -54,31 +96,28 @@ void Scene::LoadSceneFromFile(string name)
 			printf("Hazard Break to reach: %d\n", hazard_break_value);
 		}
 	}
-	catch( const std::exception & ex ) 
+	catch (const std::exception & ex)
 	{
 		//An error occured
-		LOGGER_WRITE(Logger::Priority::LERROR,ex.what());
+		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
 	}
-
-	
-
 }
 
-Scene::Scene(string name)
+Scene::Scene(string name, bool reverse_scene, bool first_scene)
 {
 	transitionDestination = TransitionList::NO_TRANSITION;
 	hazard_level = 0;
-
+	
 	for (int b=0; b<SceneBooleans::NBVAL_SceneBooleans; b++)
 	{
-		phaseShifter[b] = false;
+	phaseShifter[b] = false;
 	}
-
-	LoadSceneFromFile(name);
-
-	LOGGER_WRITE(Logger::Priority::DEBUG,"Loading ship config file");
-
 	
+	LoadSceneFromFile(name, reverse_scene, first_scene);
+
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
+
+
 
 	//Player ship
 	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
@@ -86,25 +125,9 @@ Scene::Scene(string name)
 
 }
 
-void Scene::StartGame(sf::RenderWindow*	window)
-{
-	this->mainWindow = window;
-	(*CurrentGame).init(window);
-
-	//bg
-	bg->setPosition(0,bg->getPosition().y + SCENE_SIZE_Y); // this is an exception for the 1st level of the game only
-	hub->setPosition(0,hub->getPosition().y + SCENE_SIZE_Y);
-	(*CurrentGame).addToScene(bg,LayerType::BackgroundLayer,IndependantType::Background);
-	(*CurrentGame).addToScene(hub,LayerType::BackgroundLayer,IndependantType::Background);
-
-	//ship
-	(*CurrentGame).addToScene(playerShip,LayerType::PlayerShipLayer, IndependantType::PlayerShip);
-	playerShip->ship_config.GenerateBots(playerShip);
-	playerShip->ship_config.GenerateFakeShip(playerShip);
-}
-
 void Scene::Update(Time deltaTime)
 {
+	/*
 	// end scene animation
 	EndSceneAnimation(ENDSCENE_TRANSITION_SPEED_UP, ENDSCENE_TRANSITION_SPEED_DOWN);
 
@@ -113,13 +136,13 @@ void Scene::Update(Time deltaTime)
 
 	//Exit hub
 	ExitHubTransition(ENDSCENE_TRANSITION_SPEED_UP, ENDSCENE_TRANSITION_SPEED_DOWN);
-
+	*/
 	//Random enemy generation
-	if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1])
-	{
-		this->GenerateEnemies(deltaTime);
-	}
-	
+	//if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1])
+	//{
+	this->GenerateEnemies(deltaTime);
+	//}
+
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
 	{
 		HazardBreakEvent();
@@ -135,12 +158,12 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if(timer > 2)
+	if (timer > 2)
 	{
 		double intpart;
-		timer = modf (timer, &intpart);
+		timer = modf(timer, &intpart);
 
-		double random_number = ((double) rand() / (RAND_MAX));
+		double random_number = ((double)rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
 		int nb_rows = 1;
@@ -153,11 +176,16 @@ void Scene::GenerateEnemies(Time deltaTime)
 		//chosing a random enemy within a class of enemies
 		Enemy* random_enemy_within_class[EnemyClass::NBVAL_EnemyClass];
 
-		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige
-		int dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA]))+1;
-		for (int i=0; i<EnemyClass::NBVAL_EnemyClass; i++)
+		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
+		int dice_roll = 0;
+		if (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA] != 0)
 		{
-			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin() ; it != enemies_ranked_by_class[i].end(); ++it)
+			dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA])) + 1;
+		}
+
+		for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
+		{
+			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin(); it != enemies_ranked_by_class[i].end(); ++it)
 			{
 				if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
 				{
@@ -169,15 +197,15 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 		//preparing the list of enemies to put in the cluster
 		vector<EnemyPoolElement*>* cluster = new vector<EnemyPoolElement*>;
-		for (int i=0 ; i< nb_rows*nb_lines; i++)
+		for (int i = 0; i < nb_rows*nb_lines; i++)
 		{
 			//VALEURS A CONF EN .CSV
 			// arg0 = enemy class
 			// arg1 = move pattern
 			//if arg0 != VOID
-			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[EnemyClass::ENEMYPOOL_ALPHA], EnemyClass::ENEMYPOOL_ALPHA,PatternType::NoMovePattern);
+			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[EnemyClass::ENEMYPOOL_ALPHA], EnemyClass::ENEMYPOOL_ALPHA, PatternType::NoMovePattern);
 
-			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize --;
+			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize--;
 
 			//test de loot d'ennemi hardcodé
 			//Equipment* loot = LoadEquipment("module_gerard");
@@ -190,12 +218,12 @@ void Scene::GenerateEnemies(Time deltaTime)
 			cluster->push_back(e);
 		}
 
-		int size_x = (int)((nb_rows+1) * xspread);//let's take some margin : +1 row
-		float size_y = (nb_lines+1) * yspread;//let's take some margin : +1 line
-		if (size_x >= SCENE_SIZE_X) size_x = SCENE_SIZE_X-1;//without this, rand() % SCENE_SIZE_X - size_x may crash if size_x = SCENE_SIZE_X
-		if (size_y >= SCENE_SIZE_Y) size_y = SCENE_SIZE_Y-1;
+		int size_x = (int)((nb_rows + 1) * xspread);//let's take some margin : +1 row
+		float size_y = (nb_lines + 1) * yspread;//let's take some margin : +1 line
+		if (size_x >= SCENE_SIZE_X) size_x = SCENE_SIZE_X - 1;//without this, rand() % SCENE_SIZE_X - size_x may crash if size_x = SCENE_SIZE_X
+		if (size_y >= SCENE_SIZE_Y) size_y = SCENE_SIZE_Y - 1;
 
-		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (SCENE_SIZE_X - size_x), - size_y), nb_lines, nb_rows, xspread, yspread, cluster);
+		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (SCENE_SIZE_X - size_x), -size_y), nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP
 		/*
@@ -225,165 +253,165 @@ void Scene::GenerateEnemies(Time deltaTime)
 		*/
 	}
 }
-
+/*
 void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
 {
-	if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && bg->getPosition().y > 0)
-	{
-		bg->setPosition(sf::Vector2f(0, 0));
+if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && bg->getPosition().y > 0)
+{
+bg->setPosition(sf::Vector2f(0, 0));
 
-		bg->speed.y = 0;
-		hub->speed.y = 0;
+bg->speed.y = 0;
+hub->speed.y = 0;
 
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = true;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
-		//to do better:
-		hub->setPosition(sf::Vector2f(bg->getPosition().x,bg->getPosition().y - SCENE_SIZE_Y));
+phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = true;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
+//to do better:
+hub->setPosition(sf::Vector2f(bg->getPosition().x,bg->getPosition().y - SCENE_SIZE_Y));
 
-	}
+}
 
-	//end scene Phase 2: scene is cleared, the player is set on rails towards the top of the screen
-	if (phaseShifter[SceneBooleans::ENDSCENE_PHASE1] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE2] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && (*CurrentGame).isLastEnemyDead())
-	{
-		playerShip->disable_inputs = true;
-		playerShip->disable_fire = true;
-		playerShip->speed.x = 0;
-		playerShip->speed.y = -transition_UP;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = true;//speed of translation towards UP
-	}
+//end scene Phase 2: scene is cleared, the player is set on rails towards the top of the screen
+if (phaseShifter[SceneBooleans::ENDSCENE_PHASE1] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE2] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && (*CurrentGame).isLastEnemyDead())
+{
+playerShip->disable_inputs = true;
+playerShip->disable_fire = true;
+playerShip->speed.x = 0;
+playerShip->speed.y = -transition_UP;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = true;//speed of translation towards UP
+}
 
-	//end scene Phase 3: the playership reached the top of the screen, now background and HUB are switching
-	if (phaseShifter[SceneBooleans::ENDSCENE_PHASE2] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE3] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && playerShip->getPosition().y < playerShip->ship_config.size.y) //playership reaches the top of the screen
-	{
-		bg->speed.y = transition_DOWN;
-		hub->speed.y = transition_DOWN;
+//end scene Phase 3: the playership reached the top of the screen, now background and HUB are switching
+if (phaseShifter[SceneBooleans::ENDSCENE_PHASE2] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE3] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && playerShip->getPosition().y < playerShip->ship_config.size.y) //playership reaches the top of the screen
+{
+bg->speed.y = transition_DOWN;
+hub->speed.y = transition_DOWN;
 
-		playerShip->setPosition(playerShip->getPosition().x, playerShip->ship_config.size.y);
+playerShip->setPosition(playerShip->getPosition().x, playerShip->ship_config.size.y);
 
-		//center the player at the required speed i.e. proportionally to the speed at which the background fades out
-		playerShip->speed.x = transition_DOWN * ((SCENE_SIZE_X/2) - playerShip->getPosition().x) / SCENE_SIZE_Y;
-		playerShip->speed.y = transition_DOWN * ((SCENE_SIZE_Y/2) - playerShip->getPosition().y) / SCENE_SIZE_Y;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = true;
-	}
+//center the player at the required speed i.e. proportionally to the speed at which the background fades out
+playerShip->speed.x = transition_DOWN * ((SCENE_SIZE_X/2) - playerShip->getPosition().x) / SCENE_SIZE_Y;
+playerShip->speed.y = transition_DOWN * ((SCENE_SIZE_Y/2) - playerShip->getPosition().y) / SCENE_SIZE_Y;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = true;
+}
 
-	//end scene Phase 4: the HUB is now full screen, the players are given back the control of their ship
-	if (phaseShifter[SceneBooleans::ENDSCENE_PHASE3] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && hub->getPosition().y > 0)
-	{
-		hub->speed.y = 0;
-		bg->speed.y = 0;
-		hub->setPosition(sf::Vector2f(0,0));
+//end scene Phase 4: the HUB is now full screen, the players are given back the control of their ship
+if (phaseShifter[SceneBooleans::ENDSCENE_PHASE3] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && hub->getPosition().y > 0)
+{
+hub->speed.y = 0;
+bg->speed.y = 0;
+hub->setPosition(sf::Vector2f(0,0));
 
-		playerShip->disable_inputs = false;
-		phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = true;
-		//printf("hub pos: %f / %f \n", hubClone->getPosition().x, hubClone->getPosition().y);
-	}
+playerShip->disable_inputs = false;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = true;
+//printf("hub pos: %f / %f \n", hubClone->getPosition().x, hubClone->getPosition().y);
+}
 }
 
 void Scene::hubRoaming()
 {
-	if (phaseShifter[SceneBooleans::ENDSCENE_PHASE4])
-	{
-		float x = playerShip->getPosition().x;
-		float y = playerShip->getPosition().y;
+if (phaseShifter[SceneBooleans::ENDSCENE_PHASE4])
+{
+float x = playerShip->getPosition().x;
+float y = playerShip->getPosition().y;
 
-		float X_min = SCENE_SIZE_X*HUB_EXIT_X_MIN_RATIO;
-		float X_max = SCENE_SIZE_X*HUB_EXIT_X_MAX_RATIO;
-		float Y_min = SCENE_SIZE_Y*HUB_EXIT_Y_MIN_RATIO;
-		float Y_max = SCENE_SIZE_Y*HUB_EXIT_Y_MAX_RATIO;
+float X_min = SCENE_SIZE_X*HUB_EXIT_X_MIN_RATIO;
+float X_max = SCENE_SIZE_X*HUB_EXIT_X_MAX_RATIO;
+float Y_min = SCENE_SIZE_Y*HUB_EXIT_Y_MIN_RATIO;
+float Y_max = SCENE_SIZE_Y*HUB_EXIT_Y_MAX_RATIO;
 
-		if ((x > X_min && x < X_max && y > Y_min && y < Y_max) || (x<X_min && y<Y_min) || (x<X_min && y >Y_max) || (x>X_max && y >Y_max) || (x>X_max && y <Y_min))
-		{
-			clockHubExit.restart();
-			this->transitionDestination = TransitionList::NO_TRANSITION;
-		}
-		else
-		{
-			sf::Time timer = clockHubExit.getElapsedTime();
+if ((x > X_min && x < X_max && y > Y_min && y < Y_max) || (x<X_min && y<Y_min) || (x<X_min && y >Y_max) || (x>X_max && y >Y_max) || (x>X_max && y <Y_min))
+{
+clockHubExit.restart();
+this->transitionDestination = TransitionList::NO_TRANSITION;
+}
+else
+{
+sf::Time timer = clockHubExit.getElapsedTime();
 
-			if (y<Y_min && timer.asSeconds() > HUB_EXIT_TIMER)
-			{
-				//go UP
-				printf("DEBUG: Travel UP !\n");
-				this->transitionDestination = TransitionList::TRANSITION_UP;
-				bg->setPosition(sf::Vector2f(hub->getPosition().x,hub->getPosition().y - bg->m_size.y - SCENE_SIZE_Y));
+if (y<Y_min && timer.asSeconds() > HUB_EXIT_TIMER)
+{
+//go UP
+printf("DEBUG: Travel UP !\n");
+this->transitionDestination = TransitionList::TRANSITION_UP;
+bg->setPosition(sf::Vector2f(hub->getPosition().x,hub->getPosition().y - bg->m_size.y - SCENE_SIZE_Y));
 
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
-				phaseShifter[SceneBooleans::EXITHUB_PHASE1] = true;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
+phaseShifter[SceneBooleans::EXITHUB_PHASE1] = true;
 
-			}
+}
 
-			if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
-			{
-				//go LEFT
-				printf("DEBUG: Travel LEFT !\n");
-				this->transitionDestination = TransitionList::TRANSITION_LEFT;
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
-			}
+if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
+{
+//go LEFT
+printf("DEBUG: Travel LEFT !\n");
+this->transitionDestination = TransitionList::TRANSITION_LEFT;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
+}
 
-			if (x>X_max && timer.asSeconds() > HUB_EXIT_TIMER)
-			{
-				//go RIGHT
-				printf("DEBUG: Travel RIGHT !\n");
-				this->transitionDestination = TransitionList::TRANSITION_RIGHT;
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
-			}
+if (x>X_max && timer.asSeconds() > HUB_EXIT_TIMER)
+{
+//go RIGHT
+printf("DEBUG: Travel RIGHT !\n");
+this->transitionDestination = TransitionList::TRANSITION_RIGHT;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
+}
 
-			if (y>Y_max && timer.asSeconds() > HUB_EXIT_TIMER)
-			{
-				//go DOWN
-				printf("DEBUG: Travel DOWN !\n");
-				this->transitionDestination = TransitionList::TRANSITION_DOWN;
-				phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
-			}
-		}
-	}
+if (y>Y_max && timer.asSeconds() > HUB_EXIT_TIMER)
+{
+//go DOWN
+printf("DEBUG: Travel DOWN !\n");
+this->transitionDestination = TransitionList::TRANSITION_DOWN;
+phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
+}
+}
+}
 }
 
 void Scene::ExitHubTransition (float transition_speed_UP, float transition_speed_DOWN)
 {
-	if (phaseShifter[SceneBooleans::EXITHUB_PHASE1] && !phaseShifter[SceneBooleans::EXITHUB_PHASE2])
-	{
-		playerShip->disable_inputs = true;
-		playerShip->speed.x = 0;
-		playerShip->speed.y = - transition_speed_UP;
-		phaseShifter[SceneBooleans::EXITHUB_PHASE1] = false;
-		phaseShifter[SceneBooleans::EXITHUB_PHASE2] = true;
-		phaseShifter[SceneBooleans::EXITHUB_PHASE3] = false;
+if (phaseShifter[SceneBooleans::EXITHUB_PHASE1] && !phaseShifter[SceneBooleans::EXITHUB_PHASE2])
+{
+playerShip->disable_inputs = true;
+playerShip->speed.x = 0;
+playerShip->speed.y = - transition_speed_UP;
+phaseShifter[SceneBooleans::EXITHUB_PHASE1] = false;
+phaseShifter[SceneBooleans::EXITHUB_PHASE2] = true;
+phaseShifter[SceneBooleans::EXITHUB_PHASE3] = false;
 
-	}
-
-	if (!phaseShifter[SceneBooleans::EXITHUB_PHASE1] && phaseShifter[SceneBooleans::EXITHUB_PHASE2] && !phaseShifter[SceneBooleans::EXITHUB_PHASE3] && playerShip->getPosition().y < playerShip->ship_config.size.y)
-	{
-		playerShip->setPosition(playerShip->getPosition().x, playerShip->ship_config.size.y);
-
-		bg->setPosition(0, - bg->m_size.y);
-		bg->speed.y = transition_speed_DOWN;
-		hub->speed.y = transition_speed_DOWN;
-		//playerShip->speed.x = transition_speed_DOWN * ((SCENE_SIZE_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / SCENE_SIZE_Y;
-		playerShip->speed.y = transition_speed_DOWN * ((SCENE_SIZE_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / SCENE_SIZE_Y;
-		phaseShifter[SceneBooleans::EXITHUB_PHASE2] = false;
-		phaseShifter[SceneBooleans::EXITHUB_PHASE3] = true;
-	}
-
-	if (!phaseShifter[SceneBooleans::EXITHUB_PHASE2] && phaseShifter[SceneBooleans::EXITHUB_PHASE3] && bg->getPosition().y > - bg->m_size.y + SCENE_SIZE_Y)
-	{
-		bg->setPosition(0, - bg->m_size.y + SCENE_SIZE_Y);
-		bg->speed.y = vspeed;
-		hub->speed.y = vspeed;
-		phaseShifter[SceneBooleans::EXITHUB_PHASE3] = false;
-		playerShip->speed.x = 0;
-		playerShip->speed.y = 0;
-		playerShip->disable_inputs = false;
-		playerShip->disable_fire = false;
-	}
 }
 
-bool Scene:: getPhaseShifter(int index)
+if (!phaseShifter[SceneBooleans::EXITHUB_PHASE1] && phaseShifter[SceneBooleans::EXITHUB_PHASE2] && !phaseShifter[SceneBooleans::EXITHUB_PHASE3] && playerShip->getPosition().y < playerShip->ship_config.size.y)
+{
+playerShip->setPosition(playerShip->getPosition().x, playerShip->ship_config.size.y);
+
+bg->setPosition(0, - bg->m_size.y);
+bg->speed.y = transition_speed_DOWN;
+hub->speed.y = transition_speed_DOWN;
+//playerShip->speed.x = transition_speed_DOWN * ((SCENE_SIZE_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / SCENE_SIZE_Y;
+playerShip->speed.y = transition_speed_DOWN * ((SCENE_SIZE_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / SCENE_SIZE_Y;
+phaseShifter[SceneBooleans::EXITHUB_PHASE2] = false;
+phaseShifter[SceneBooleans::EXITHUB_PHASE3] = true;
+}
+
+if (!phaseShifter[SceneBooleans::EXITHUB_PHASE2] && phaseShifter[SceneBooleans::EXITHUB_PHASE3] && bg->getPosition().y > - bg->m_size.y + SCENE_SIZE_Y)
+{
+bg->setPosition(0, - bg->m_size.y + SCENE_SIZE_Y);
+bg->speed.y = vspeed;
+hub->speed.y = vspeed;
+phaseShifter[SceneBooleans::EXITHUB_PHASE3] = false;
+playerShip->speed.x = 0;
+playerShip->speed.y = 0;
+playerShip->disable_inputs = false;
+playerShip->disable_fire = false;
+}
+}
+*/
+bool Scene::getPhaseShifter(int index)
 {
 	if (index < SceneBooleans::NBVAL_SceneBooleans)
 		return phaseShifter[index];
@@ -405,15 +433,15 @@ void Scene::setPhaseShifter(int index, bool b)
 	}
 }
 
-float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = {0.0, 0.5, 1.0, 1.5, 2.0};
+float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 1.5, 2.0 };
 
 void Scene::HazardBreakEvent()
 {
 	(*CurrentGame).resetHazard((*CurrentGame).getHazard() - hazard_break_value);
 	printf("DEBUG: HAZARD BREAK!!!\n");
-	hazard_break_value *= (1+ HAZARD_BREAK_MULTIPLIER);
-	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS-1)
-		hazard_level ++;
+	hazard_break_value *= (1 + HAZARD_BREAK_MULTIPLIER);
+	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS - 1)
+		hazard_level++;
 }
 
 float Scene::getSceneBeastScore()
@@ -442,17 +470,17 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)
 	{
 		if (scrolling_direction.x == 1)
 		{
-			x = (SCENE_SIZE_Y - position.y) * SCENE_SIZE_X/SCENE_SIZE_Y;
-			y = position.x * SCENE_SIZE_Y/SCENE_SIZE_X;
+			x = (SCENE_SIZE_Y - position.y) * SCENE_SIZE_X / SCENE_SIZE_Y;
+			y = position.x * SCENE_SIZE_Y / SCENE_SIZE_X;
 		}
 		if (scrolling_direction.x == -1)
 		{
-			x= SCENE_SIZE_X - ((SCENE_SIZE_Y - position.y) * SCENE_SIZE_X/SCENE_SIZE_Y);
-			y= position.x * SCENE_SIZE_Y/SCENE_SIZE_X;
+			x = SCENE_SIZE_X - ((SCENE_SIZE_Y - position.y) * SCENE_SIZE_X / SCENE_SIZE_Y);
+			y = position.x * SCENE_SIZE_Y / SCENE_SIZE_X;
 		}
 	}
 
-	return sf::Vector2f (x,y);
+	return sf::Vector2f(x, y);
 }
 
 sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
@@ -462,7 +490,7 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
 
 	if (scrolling_direction.y == -1)
 	{
-		x=0;
+		x = 0;
 		y *= (-1);
 	}
 
@@ -471,7 +499,7 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
 	{
 		if (scrolling_direction.x == 1)
 		{
-			x = - vspeed;
+			x = -vspeed;
 			y = 0;
 		}
 		if (scrolling_direction.x == -1)
@@ -481,7 +509,7 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
 		}
 	}
 
-	return sf::Vector2f (x,y);
+	return sf::Vector2f(x, y);
 }
 
 int Scene::getSceneHazardBreakValue()

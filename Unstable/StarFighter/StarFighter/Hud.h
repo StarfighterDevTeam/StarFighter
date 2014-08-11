@@ -31,6 +31,8 @@ private:
 	sf::Text* hazardBreakText;
 	sf::Text* hazardBreakScore;
 	sf::Text* framerate;
+
+	bool no_hazard_value;
 };
 
 #endif // HUD_H_INCLUDED

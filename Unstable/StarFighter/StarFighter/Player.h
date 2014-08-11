@@ -13,6 +13,7 @@ public:
 
 	sf::RenderWindow* m_playerWindow;
 	std::string m_currentSceneFile;
+	bool reverse_scene;
 
 };
 

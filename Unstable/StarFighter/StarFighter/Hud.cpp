@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 PlayerHud::PlayerHud()
 {
-
+	this->no_hazard_value = false;
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
@@ -121,9 +121,16 @@ void PlayerHud::Update(sf::RenderWindow* window, int m_armor, int m_shield, int 
 
 	//hazard break
 	if (m_hazard_break_value != 0)
-		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, (m_hazard_score*HAZARD_BAR_SIZE_Y)/m_hazard_break_value));
+	{
+		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, (m_hazard_score*HAZARD_BAR_SIZE_Y) / m_hazard_break_value));
+	}
+		
 	else
+	{
+		no_hazard_value = true;
 		printf("DEBUG: <error> HazardBar cannot be computed because hazard break value = 0)\n");
+	}
+		
 
 	ostringstream ss_h1;
 	ss_h1 << m_hazard_score;
@@ -151,8 +158,12 @@ void PlayerHud::Draw(sf::RenderWindow* window)
 	window->draw(Money);
 	window->draw(GrazeScore);
 	window->draw(hazardBarMax);
-	window->draw(hazardBar);
-	window->draw(*(hazardBreakText));
-	window->draw(*(hazardBreakScore));
+	if (!no_hazard_value)
+	{
+		window->draw(hazardBar);
+		window->draw(*(hazardBreakText));
+		window->draw(*(hazardBreakScore));
+	}
+	
 	window->draw(*(framerate));
 }

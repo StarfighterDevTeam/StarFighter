@@ -7,7 +7,7 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 
-	this->currentScene = new Scene(player.m_currentSceneFile);
+	this->currentScene = new Scene(player.m_currentSceneFile, player.reverse_scene, true);//first_scene = true
 
 	this->playerShip = new Ship(Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO), *FileLoader::LoadShipConfig("default"));
 	(*CurrentGame).SetPlayerShip(this->playerShip);
@@ -15,10 +15,7 @@ void InGameState::Initialize(Player player)
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
 
 	//bg
-	this->currentScene->bg->setPosition(0, this->currentScene->bg->getPosition().y + SCENE_SIZE_Y); // this is an exception for the 1st level of the game only
-	this->currentScene->hub->setPosition(0, this->currentScene->hub->getPosition().y + SCENE_SIZE_Y);
 	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::Background);
-	(*CurrentGame).addToScene(this->currentScene->hub, LayerType::BackgroundLayer, IndependantType::Background);
 
 	//ship
 	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, IndependantType::PlayerShip);
@@ -26,7 +23,6 @@ void InGameState::Initialize(Player player)
 	playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
 
 	hud = new PlayerHud();
-
 	hud->Init(this->playerShip->ship_config.getShipConfigArmor(), this->playerShip->ship_config.getShipConfigShield());
 }
 
