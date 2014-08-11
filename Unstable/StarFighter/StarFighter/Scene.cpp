@@ -7,6 +7,8 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Scene");
 	hazard_break_value = 0;
+	direction = sf::Vector2i(0, 0);
+
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
 		this->total_class_probability[i] = 0;
@@ -24,7 +26,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 				float vspeed = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
 				float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
 				float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
-				sf::Vector2f pos = sf::Vector2f(0, 0);
+				sf::Vector2f pos = sf::Vector2f(w / 2, h / 2);
 				sf::Vector2f speed = sf::Vector2f(0, 0);
 
 				if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("vertical") == 0)
@@ -32,20 +34,22 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 					if (!reverse_scene)
 					{
 						speed = sf::Vector2f(0, vspeed);
-						pos = sf::Vector2f(w/2, -h/2);
+						pos = sf::Vector2f(w / 2, -h / 2);
 						if (first_scene)
 						{
 							pos.y += SCENE_SIZE_Y;
 						}
+						direction = sf::Vector2i(0, 1);
 					}
 					else
 					{
 						speed = sf::Vector2f(0, -vspeed);
-						pos = sf::Vector2f(w/2, (h/2)+SCENE_SIZE_Y);
+						pos = sf::Vector2f(w / 2, (h / 2) + SCENE_SIZE_Y);
 						if (first_scene)
 						{
 							pos.y -= SCENE_SIZE_Y;
 						}
+						direction = sf::Vector2i(0, -1);
 					}
 				}
 				else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("horizontal") == 0)
@@ -53,23 +57,25 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 					if (!reverse_scene)
 					{
 						speed = sf::Vector2f(-vspeed, 0);
-						pos = sf::Vector2f((w/2) + SCENE_SIZE_X, h/2);
+						pos = sf::Vector2f((w / 2) + SCENE_SIZE_X, h / 2);
 						if (first_scene)
 						{
 							pos.x -= SCENE_SIZE_X;
 						}
+						direction = sf::Vector2i(1, 0);
 					}
 					else
 					{
 						speed = sf::Vector2f(vspeed, 0);
-						pos = sf::Vector2f(-w/2, h/2);
+						pos = sf::Vector2f(-w / 2, h / 2);
 						if (first_scene)
 						{
 							pos.x += SCENE_SIZE_X;
 						}
+						direction = sf::Vector2i(-1, 0);
 					}
 				}
-				
+
 				this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], Vector2f(w, h));
 				this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
 				this->bg->setVisible(true);
@@ -107,12 +113,12 @@ Scene::Scene(string name, bool reverse_scene, bool first_scene)
 {
 	transitionDestination = TransitionList::NO_TRANSITION;
 	hazard_level = 0;
-	
-	for (int b=0; b<SceneBooleans::NBVAL_SceneBooleans; b++)
+
+	for (int b = 0; b < SceneBooleans::NBVAL_SceneBooleans; b++)
 	{
-	phaseShifter[b] = false;
+		phaseShifter[b] = false;
 	}
-	
+
 	LoadSceneFromFile(name, reverse_scene, first_scene);
 
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
@@ -140,7 +146,11 @@ void Scene::Update(Time deltaTime)
 	//Random enemy generation
 	//if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1])
 	//{
-	this->GenerateEnemies(deltaTime);
+	if (this->hazard_break_value !=0)//= if enemies are defined for this scene
+	{
+		this->GenerateEnemies(deltaTime);
+	}
+
 	//}
 
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event

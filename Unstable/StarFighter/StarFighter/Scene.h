@@ -27,6 +27,7 @@ public:
 	float Scene::getSceneBeastScore();
 	
 	Independant* bg;
+	sf::Vector2i direction;
 
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();

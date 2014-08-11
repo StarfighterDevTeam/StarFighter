@@ -8,6 +8,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).init(this->mainWindow);
 
 	this->currentScene = new Scene(player.m_currentSceneFile, player.reverse_scene, true);//first_scene = true
+	(*CurrentGame).SetScrollingDirection(this->currentScene->direction);
 
 	this->playerShip = new Ship(Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO), *FileLoader::LoadShipConfig("default"));
 	(*CurrentGame).SetPlayerShip(this->playerShip);

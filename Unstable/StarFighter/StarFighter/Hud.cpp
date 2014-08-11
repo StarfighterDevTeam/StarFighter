@@ -157,9 +157,10 @@ void PlayerHud::Draw(sf::RenderWindow* window)
 	window->draw(shieldBar);
 	window->draw(Money);
 	window->draw(GrazeScore);
-	window->draw(hazardBarMax);
+	
 	if (!no_hazard_value)
 	{
+		window->draw(hazardBarMax);
 		window->draw(hazardBar);
 		window->draw(*(hazardBreakText));
 		window->draw(*(hazardBreakScore));

@@ -1,5 +1,2 @@
-bg,Assets/2D/background2.png,800,1800,
-hub,Assets/2D/HUB_debug2.png,800,600,
-#,enemies_name,probability,pool_size,enemy_class
-enemy,robert,2,20,1
-enemy,roger,3,100,2
+#,filename,display name,width,height,vspeed,vertical
+bg,Assets/2D/HUB.jpg,hub_1,800,600,0,0
