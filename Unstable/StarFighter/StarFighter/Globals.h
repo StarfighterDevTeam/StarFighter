@@ -42,6 +42,7 @@
 #define FX_FILE "Assets/Scripts/FX.csv"
 #define EQUIPMENT_FILE "Assets/Scripts/Equipment.csv"
 #define BOT_FILE "Assets/Scripts/Bot.csv"
+#define SCENES_FILE "Assets/Scripts/Scenes.csv"
 
 #define GRAZE_DISTANCE									30
 #define SHIP_BRAKING_SPEED									180

@@ -11,7 +11,6 @@
 #include "EnemyPool.h"
 #include "FileLoadUtils.h"
 
-
 enum HazardLevels
 {
 	HAZARD_LEVEL_1,//0

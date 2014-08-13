@@ -1,0 +1,3 @@
+#scene_name,filename,link_UP,link_DOWN,link_RIGHT,link_LEFT
+scene1,Assets/Scripts/Scenes/scene1.csv,scene2,0,0,0
+scene2,Assets/Scripts/Scenes/scene2.csv,scene1,0,0,0

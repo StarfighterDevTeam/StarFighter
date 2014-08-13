@@ -5,6 +5,35 @@
 
 using namespace std;
 
+enum InGameStateMachine
+{
+	LOADING,
+	SCROLLING,
+	LAST_SCREEN,
+	TRANSITION_PHASE1_2,
+	TRANSITION_PHASE2_2,
+	HUB_ROAMING,
+};
+
+enum ScenesData
+{
+	SCENE_NAME,
+	SCENE_FILENAME,
+	SCENE_LINK_UP,
+	SCENE_LINK_DOWN,
+	SCENE_LINK_RIGHT,
+	SCENE_LINK_LEFT,
+};
+
+enum Directions
+{
+	DIRECTION_UP,
+	DIRECTION_DOWN,
+	DIRECTION_RIGHT,
+	DIRECTION_LEFT,
+	NB_DIRECTIONS
+};
+
 class Scene
 {
 public:
@@ -28,18 +57,18 @@ public:
 	
 	Independant* bg;
 	sf::Vector2i direction;
+	bool generating_enemies;
 
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();
+	std::string links[Directions::NB_DIRECTIONS];
 
 private:
 	Ship* playerShip;
 	list<EnemyBase> enemies;
 	list<EnemyBase> enemies_ranked_by_class[NBVAL_EnemyClass];
 	int total_class_probability[NBVAL_EnemyClass];
-	list<vector<string>> config;
 	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
-	//Independant* hubClone;
 	sf::RenderWindow* mainWindow;
 	
 	int hazard_break_value;
@@ -49,12 +78,8 @@ private:
 
 	void hubRoaming();
 	sf::Clock clockHubExit;
-	int transitionDestination;
-
-	sf::Vector2i scrolling_direction;
 	sf::Vector2f ApplyScrollingDirectionOnPosition(sf::Vector2f position);
 	sf::Vector2f ApplyScrollingDirectionOnSpeed(float vspeed);
-	//float ApplyScrollingDirectionOnRotation();
 
 	void HazardBreakEvent();
 };

@@ -1,27 +1,27 @@
 #include "Game.h"
 #define stringify(x)  #x
 
-const char* IndependantTypeValues[] = 
+const char* IndependantTypeValues[] =
 {
-	stringify( Background ),
-	stringify( PlayerShip ),
-	stringify( FriendlyFire ),
-	stringify( EnemyFire ),
-	stringify( EnemyObject )
+	stringify(Background),
+	stringify(PlayerShip),
+	stringify(FriendlyFire),
+	stringify(EnemyFire),
+	stringify(EnemyObject)
 };
 
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
 	this->sceneChronometer.restart();
-	scale_factor.x = float(WINDOW_RESOLUTION_X)/float(REF_WINDOW_RESOLUTION_X);
-	scale_factor.y = float(WINDOW_RESOLUTION_Y)/float(REF_WINDOW_RESOLUTION_Y);
+	scale_factor.x = float(WINDOW_RESOLUTION_X) / float(REF_WINDOW_RESOLUTION_X);
+	scale_factor.y = float(WINDOW_RESOLUTION_Y) / float(REF_WINDOW_RESOLUTION_Y);
 
-	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
+	for (int i = 0; i < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)); i++)
 	{
 		sceneIndependantsLayered[i] = new std::list<Independant*>;
 	}
-	for(int i =0; i< (sizeof(sceneIndependantsTyped)/sizeof(*sceneIndependantsTyped));i++)
+	for (int i = 0; i < (sizeof(sceneIndependantsTyped) / sizeof(*sceneIndependantsTyped)); i++)
 	{
 		sceneIndependantsTyped[i] = new std::list<Independant*>;
 	}
@@ -52,10 +52,10 @@ void Game::addToScene(Independant *object, int layer, IndependantType type)
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
-	if(layer >= 0 && layer < (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered)))
+	if (layer >= 0 && layer < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)))
 	{
 		(*(sceneIndependantsTyped[(int)type])).push_back(object);
-		(*(sceneIndependantsLayered[layer])).push_back(object); 
+		(*(sceneIndependantsLayered[layer])).push_back(object);
 		this->sceneIndependants.push_back(object);
 	}
 	else
@@ -80,17 +80,18 @@ void Game::updateScene(Time deltaTime)
 	{
 		(*it)->update(deltaTime);
 	}
+	isLastEnemyDead();
 }
 
 void Game::drawScene()
 {
-	for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
+	for (int i = 0; i < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)); i++)
 	{
 		for (std::list<Independant*>::iterator it = (*(this->sceneIndependantsLayered[i])).begin(); it != (*(this->sceneIndependantsLayered[i])).end(); it++)
 		{
-			if((*(*it)).visible)
+			if ((*(*it)).visible)
 			{
-				if(!(*(*it)).transparent)
+				if (!(*(*it)).transparent)
 				{
 					this->window->draw((*(*it)));
 				}
@@ -103,7 +104,7 @@ void Game::colisionChecksV2()
 {
 	sf::Clock dt;
 	dt.restart();
-	int i= 0;
+	int i = 0;
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
 	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); it1++)
@@ -112,21 +113,22 @@ void Game::colisionChecksV2()
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).end(); it2++)
 		{
 			i++;
-			if(SimpleCollision::IsGrazing((*it1),(*it2)))
+			if (SimpleCollision::IsGrazing((*it1), (*it2)))
 			{
 				(*it1)->GetGrazing();
-				
-				if(SimpleCollision::AreColliding((*it1),(*it2)))
+
+				if (SimpleCollision::AreColliding((*it1), (*it2)))
 				{
 					//Bullets are invisible after impact
 					(*it2)->setVisible(false);
+					(*it2)->isOnScene = false;
 					(*it2)->GarbageMe = true;
 
 					//Do something (like, kill ship) -> OK
 					(*it1)->damage_from(*(*it2));
 					//explosion
 					(*it2)->Death();
-					
+
 					//FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
 					//this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
 					//hide destroyed item
@@ -138,7 +140,7 @@ void Game::colisionChecksV2()
 						(*it1)->Respawn();
 						hazard = 0;
 					}
-					
+
 				}
 			}
 		}
@@ -147,7 +149,7 @@ void Game::colisionChecksV2()
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it2++)
 		{
 			i++;
-			if(SimpleCollision::AreColliding((*it1),(*it2)))
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, kill ship)
 				(*it1)->damage_from(*(*it2));
@@ -170,7 +172,7 @@ void Game::colisionChecksV2()
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::LootObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::LootObject]).end(); it2++)
 		{
 			i++;
-			if(SimpleCollision::AreColliding((*it1),(*it2)))
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, take the loot)
 				//(*it1)->get_money_from(*(*it2));
@@ -190,9 +192,9 @@ void Game::colisionChecksV2()
 		{
 			i++;
 			//Bullets are invisible after impact
-			if(SimpleCollision::AreColliding((*it1),(*it2)))
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				if((*it2)->collider_type == FriendlyFire)
+				if ((*it2)->collider_type == FriendlyFire)
 				{
 					(*it2)->setVisible(false);
 					(*it2)->GarbageMe = true;
@@ -232,11 +234,11 @@ void Game::cleanGarbage()
 	for (std::vector<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
 	{
 		this->sceneIndependants.remove(*it);
-		for(int i =0; i< (sizeof(sceneIndependantsLayered)/sizeof(*sceneIndependantsLayered));i++)
+		for (int i = 0; i < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)); i++)
 		{
 			(*(this->sceneIndependantsLayered[i])).remove(*it);
 		}
-		for(int i =0; i< (sizeof(sceneIndependantsTyped)/sizeof(*sceneIndependantsTyped));i++)
+		for (int i = 0; i < (sizeof(sceneIndependantsTyped) / sizeof(*sceneIndependantsTyped)); i++)
 		{
 			(*(this->sceneIndependantsTyped[i])).remove(*it);
 		}
@@ -257,32 +259,31 @@ void Game::collectGarbage()
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
 		//Content flagged for deletion
-		if((*it)->GarbageMe)
+		if ((**it).GarbageMe)
 		{
 			this->garbage.push_back(*it);
 			continue;
 		}
 
-		if(!(**it).isOnScene)
+		if (!(**it).isOnScene)
 		{
 			//ended FX and loot objets
 			if ((**it).collider_type == IndependantType::LootObject || (**it).collider_type == IndependantType::Neutral)
 			{
 				this->garbage.push_back(*it);
 				continue;
-			}			
+			}
 			else
 			{
-				//out of screen objets
-				if(((**it).getPosition().x + ((**it).m_size.x)/2 >= 0 && (**it).getPosition().x - ((**it).m_size.x)/2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y)/2 >= 0 && (**it).getPosition().y - ((**it).m_size.y)/2 <= SCENE_SIZE_Y))
+				//objects that are spawning out of screen are not deleted
+				if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= SCENE_SIZE_Y))
 				{
 					(**it).isOnScene = true;
 				}
 			}
-
 		}
 
-		if((**it).collider_type == Background || !(**it).isOnScene)
+		if ((**it).collider_type == Background || !(**it).isOnScene)
 		{
 			continue;
 		}
@@ -290,9 +291,9 @@ void Game::collectGarbage()
 		//Out of scene content
 		if (!(**it).DontGarbageMe)
 		{
-			if((**it).getPosition().x < 0 + ((**it).m_size.x)/2 < 0 ||  (**it).getPosition().x - ((**it).m_size.x)/2 > SCENE_SIZE_X ||(**it).getPosition().y + ((**it).m_size.y)/2 < 0 || (**it).getPosition().y - ((**it).m_size.y)/2 > SCENE_SIZE_Y)
+			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > SCENE_SIZE_X
+				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > SCENE_SIZE_Y)
 			{
-			
 				this->garbage.push_back(*it);
 				continue;
 			}
@@ -303,7 +304,7 @@ void Game::collectGarbage()
 
 }
 
-void Game::garbageLayer (LayerType m_layer)
+void Game::garbageLayer(LayerType m_layer)
 {
 	for (std::list<Independant*>::iterator it = (this->sceneIndependantsLayered[m_layer])->begin(); it != (this->sceneIndependantsLayered[m_layer])->end(); it++)
 	{
@@ -341,7 +342,7 @@ void Game::resetHazard(int hazard_overkill)
 	hazard = hazard_overkill;
 }
 
-void Game::GetBeastScoreBonus (float m_playerShipBeastScore, float m_sceneBeastScore)
+void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore)
 {
 	this->BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
 }

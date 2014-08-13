@@ -6,100 +6,120 @@ extern Game* CurrentGame;
 void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Scene");
-	hazard_break_value = 0;
-	direction = sf::Vector2i(0, 0);
+	this->hazard_break_value = 0;
+	this->generating_enemies = false;
+	this->direction = sf::Vector2i(0, 0);
 
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
 		this->total_class_probability[i] = 0;
 	}
 	try {
+		list<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
 
-		this->config = *(FileLoaderUtils::FileLoader(name));
-
-		int p = 0;
-		//enemies
-		for (std::list<vector<string>>::iterator it = (this->config).begin(); it != (this->config).end(); it++)
+		for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 		{
-			if ((*it)[0].compare("bg") == 0)
+			if ((*it)[ScenesData::SCENE_NAME].compare(name) == 0)
 			{
-				float vspeed = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
-				float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
-				float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
-				sf::Vector2f pos = sf::Vector2f(w / 2, h / 2);
-				sf::Vector2f speed = sf::Vector2f(0, 0);
+				this->links[Directions::DIRECTION_UP] = (*it)[ScenesData::SCENE_LINK_UP];
+				this->links[Directions::DIRECTION_DOWN] = (*it)[ScenesData::SCENE_LINK_DOWN];
+				this->links[Directions::DIRECTION_RIGHT] = (*it)[ScenesData::SCENE_LINK_RIGHT];
+				this->links[Directions::DIRECTION_LEFT] = (*it)[ScenesData::SCENE_LINK_LEFT];
 
-				if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("vertical") == 0)
+				list<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
+
+				int p = 0;
+				//enemies
+				for (std::list<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
 				{
-					if (!reverse_scene)
+					if ((*it)[0].compare("bg") == 0)
 					{
-						speed = sf::Vector2f(0, vspeed);
-						pos = sf::Vector2f(w / 2, -h / 2);
-						if (first_scene)
+						float vspeed_ = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
+						this->vspeed = vspeed_;
+
+						float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
+						float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
+						sf::Vector2f pos = sf::Vector2f(w / 2, h / 2);
+						sf::Vector2f speed = sf::Vector2f(0, 0);
+
+						if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("vertical") == 0)
 						{
-							pos.y += SCENE_SIZE_Y;
+							if (!reverse_scene)
+							{
+								speed = sf::Vector2f(0, vspeed_);
+								pos = sf::Vector2f(w / 2, -h / 2);
+								if (first_scene)
+								{
+									pos.y += SCENE_SIZE_Y;
+								}
+								direction = sf::Vector2i(0, 1);
+							}
+							else
+							{
+								speed = sf::Vector2f(0, -vspeed_);
+								pos = sf::Vector2f(w / 2, (h / 2) + SCENE_SIZE_Y);
+								if (first_scene)
+								{
+									pos.y -= SCENE_SIZE_Y;
+								}
+								direction = sf::Vector2i(0, -1);
+							}
 						}
-						direction = sf::Vector2i(0, 1);
+						else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("horizontal") == 0)
+						{
+							if (!reverse_scene)
+							{
+								speed = sf::Vector2f(-vspeed_, 0);
+								pos = sf::Vector2f((w / 2) + SCENE_SIZE_X, h / 2);
+								if (first_scene)
+								{
+									pos.x -= SCENE_SIZE_X;
+								}
+								direction = sf::Vector2i(1, 0);
+							}
+							else
+							{
+								speed = sf::Vector2f(vspeed_, 0);
+								pos = sf::Vector2f(-w / 2, h / 2);
+								if (first_scene)
+								{
+									pos.x += SCENE_SIZE_X;
+								}
+								direction = sf::Vector2i(-1, 0);
+							}
+						}
+
+						this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], Vector2f(w, h));
+						this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
+						this->bg->setVisible(true);
+						this->bg->isOnScene = true;
 					}
-					else
+
+					int enemy_count = 0;
+					if ((*it)[0].compare("enemy") == 0)
 					{
-						speed = sf::Vector2f(0, -vspeed);
-						pos = sf::Vector2f(w / 2, (h / 2) + SCENE_SIZE_Y);
-						if (first_scene)
-						{
-							pos.y -= SCENE_SIZE_Y;
-						}
-						direction = sf::Vector2i(0, -1);
+						EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+						this->sceneIndependantsLayered[e->enemyclass].push_back(e);
+
+						//giving intervall of hit values for dice rolls
+						p++;
+						e->proba_min = p;
+						p += (e->probability - 1);
+						e->proba_max = p;
+						this->total_class_probability[e->enemyclass] = e->proba_max;
+						enemy_count += e->proba_max;
+						//this->enemies.push_back(*e);//legacy, to delete when pools are done ?
+						this->enemies_ranked_by_class[e->enemyclass].push_back(*e);
+						//hazard value automatic calculation
+						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
+					}
+					printf("Hazard Break to reach: %d\n", hazard_break_value);
+					if (enemy_count != 0)
+					{
+						generating_enemies = true;
 					}
 				}
-				else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("horizontal") == 0)
-				{
-					if (!reverse_scene)
-					{
-						speed = sf::Vector2f(-vspeed, 0);
-						pos = sf::Vector2f((w / 2) + SCENE_SIZE_X, h / 2);
-						if (first_scene)
-						{
-							pos.x -= SCENE_SIZE_X;
-						}
-						direction = sf::Vector2i(1, 0);
-					}
-					else
-					{
-						speed = sf::Vector2f(vspeed, 0);
-						pos = sf::Vector2f(-w / 2, h / 2);
-						if (first_scene)
-						{
-							pos.x += SCENE_SIZE_X;
-						}
-						direction = sf::Vector2i(-1, 0);
-					}
-				}
-
-				this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], Vector2f(w, h));
-				this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
-				this->bg->setVisible(true);
-				this->bg->isOnScene = true;
 			}
-
-			if ((*it)[0].compare("enemy") == 0)
-			{
-				EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
-				this->sceneIndependantsLayered[e->enemyclass].push_back(e);
-
-				//giving intervall of hit values for dice rolls
-				p++;
-				e->proba_min = p;
-				p += (e->probability - 1);
-				e->proba_max = p;
-				this->total_class_probability[e->enemyclass] = e->proba_max;
-
-				//this->enemies.push_back(*e);//legacy, to delete when pools are done ?
-				this->enemies_ranked_by_class[e->enemyclass].push_back(*e);
-				//hazard value automatic calculation
-				hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
-			}
-			printf("Hazard Break to reach: %d\n", hazard_break_value);
 		}
 	}
 	catch (const std::exception & ex)
@@ -111,47 +131,18 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 
 Scene::Scene(string name, bool reverse_scene, bool first_scene)
 {
-	transitionDestination = TransitionList::NO_TRANSITION;
 	hazard_level = 0;
-
-	for (int b = 0; b < SceneBooleans::NBVAL_SceneBooleans; b++)
-	{
-		phaseShifter[b] = false;
-	}
-
 	LoadSceneFromFile(name, reverse_scene, first_scene);
 
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
-
-
-
-	//Player ship
-	//this->playerShip = new Ship(Vector2f(400,500), *shipConf);
-
-
 }
 
 void Scene::Update(Time deltaTime)
 {
-	/*
-	// end scene animation
-	EndSceneAnimation(ENDSCENE_TRANSITION_SPEED_UP, ENDSCENE_TRANSITION_SPEED_DOWN);
-
-	//Hub roaming
-	hubRoaming();
-
-	//Exit hub
-	ExitHubTransition(ENDSCENE_TRANSITION_SPEED_UP, ENDSCENE_TRANSITION_SPEED_DOWN);
-	*/
-	//Random enemy generation
-	//if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1])
-	//{
-	if (this->hazard_break_value !=0)//= if enemies are defined for this scene
+	if (this->generating_enemies)
 	{
-		this->GenerateEnemies(deltaTime);
+		//this->GenerateEnemies(deltaTime);
 	}
-
-	//}
 
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
 	{
@@ -187,11 +178,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		Enemy* random_enemy_within_class[EnemyClass::NBVAL_EnemyClass];
 
 		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
-		int dice_roll = 0;
-		if (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA] != 0)
-		{
-			dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA])) + 1;
-		}
+		int dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA])) + 1;
 
 		for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 		{
@@ -464,7 +451,7 @@ float Scene::getSceneBeastScore()
 		return 0.0f;
 	}
 }
-
+/*
 sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)
 {
 	float x = position.x;
@@ -521,6 +508,7 @@ sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
 
 	return sf::Vector2f(x, y);
 }
+*/
 
 int Scene::getSceneHazardBreakValue()
 {

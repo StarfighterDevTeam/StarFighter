@@ -653,7 +653,6 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 
 void Ship::update(sf::Time deltaTime)
 {
-
 	static double shield_regen_buffer = 0;
 	//immunity frames after death
 	if (immune)

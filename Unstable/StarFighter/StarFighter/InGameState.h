@@ -13,12 +13,14 @@ public:
 	Scene* nextScene;
 	PlayerHud* hud;
 
+	InGameStateMachine IG_State;
+
 	void Initialize(Player player);
 	void Update(Time deltaTime);
 	void Draw();
 	void Release();
 
-
+	void InGameStateMachineCheck();
 private:
 	void LoadNextScene(string m_nextScene_name);
 

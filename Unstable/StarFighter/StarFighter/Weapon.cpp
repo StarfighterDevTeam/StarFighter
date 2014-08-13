@@ -41,8 +41,15 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->setVisible(true);
 	bullet->collider_type = m_collider_type;
 	bullet->isOnScene = true;
-
-	(*CurrentGame).addToScene(bullet,LayerType::PlayerShipLayer, m_collider_type);
+	if (m_collider_type == IndependantType::FriendlyFire)
+	{
+		(*CurrentGame).addToScene(bullet, LayerType::FriendlyFireLayer, m_collider_type);
+	}
+	else
+	{
+		(*CurrentGame).addToScene(bullet, LayerType::EnemyFireLayer, m_collider_type);
+	}
+	
 }
 
 bool Weapon::isFiringReady()

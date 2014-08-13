@@ -1,19 +1,21 @@
 #include "Bot.h"
 
+extern Game* CurrentGame;
+
 Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : Independant(position, speed,  textureName, size)
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
 	movepattern_type = 0;//type de pattern hardcodé pour l'instant
-	this->visible = true;
-	this->isOnScene = true;
+	visible = true;
+	isOnScene = true;
 	DontGarbageMe = true;
 	radius = 0;
 	vspeed = 0;
 	hasTarget = false;
 	hasWeapon = false;
 	spread = sf::Vector2f(0,0);
-	this->damage = 0;
+	damage = 0;
 }
 
 void Bot::setTarget (Independant* m_target)
@@ -49,7 +51,7 @@ void Bot::update(sf::Time deltaTime)
 	this->setPosition(newposition.x,newposition.y);
 
 	//automatic fire
-	if(isOnScene && hasWeapon)
+	if (isOnScene && hasWeapon)
 	{
 		weapon->weaponOffset = sf::Vector2f((((this->m_size.x)/2) + (weapon->ammunition->m_size.x/2)), ((this->m_size.y)/2) - (weapon->ammunition->m_size.y/2 *weapon->fire_direction.y));
 		weapon->setPosition(this->getPosition().x, this->getPosition().y);
