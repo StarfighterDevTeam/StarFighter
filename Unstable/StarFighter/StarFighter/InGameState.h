@@ -21,8 +21,14 @@ public:
 	void Release();
 
 	void InGameStateMachineCheck();
+	sf::Clock clockHubExit;
+	
 private:
-	void LoadNextScene(string m_nextScene_name);
+	void InGameState::Scrolling_to_LastScreen();
+	void InGameState::LastScreen_to_Transition();
+	void InGameState::Transition1_2();
+	void InGameState::Transition2_2();
+	sf::Vector2f InGameState::StartingShipPosition(sf::Vector2i direction);
 
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

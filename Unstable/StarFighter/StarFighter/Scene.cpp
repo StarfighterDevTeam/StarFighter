@@ -39,53 +39,73 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 
 						float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
 						float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
-						sf::Vector2f pos = sf::Vector2f(w / 2, h / 2);
+						if (first_scene)
+						{
+
+						}
+
 						sf::Vector2f speed = sf::Vector2f(0, 0);
 
-						if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("vertical") == 0)
+						if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("V") == 0)
 						{
 							if (!reverse_scene)
 							{
 								speed = sf::Vector2f(0, vspeed_);
-								pos = sf::Vector2f(w / 2, -h / 2);
-								if (first_scene)
-								{
-									pos.y += SCENE_SIZE_Y;
-								}
-								direction = sf::Vector2i(0, 1);
+								this->direction = sf::Vector2i(0, 1);
 							}
 							else
 							{
 								speed = sf::Vector2f(0, -vspeed_);
-								pos = sf::Vector2f(w / 2, (h / 2) + SCENE_SIZE_Y);
-								if (first_scene)
-								{
-									pos.y -= SCENE_SIZE_Y;
-								}
-								direction = sf::Vector2i(0, -1);
+								this->direction = sf::Vector2i(0, -1);
 							}
 						}
-						else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("horizontal") == 0)
+						else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("H") == 0)
 						{
 							if (!reverse_scene)
 							{
 								speed = sf::Vector2f(-vspeed_, 0);
-								pos = sf::Vector2f((w / 2) + SCENE_SIZE_X, h / 2);
-								if (first_scene)
-								{
-									pos.x -= SCENE_SIZE_X;
-								}
-								direction = sf::Vector2i(1, 0);
+								this->direction = sf::Vector2i(1, 0);
 							}
 							else
 							{
 								speed = sf::Vector2f(vspeed_, 0);
-								pos = sf::Vector2f(-w / 2, h / 2);
-								if (first_scene)
-								{
-									pos.x += SCENE_SIZE_X;
-								}
-								direction = sf::Vector2i(-1, 0);
+								this->direction = sf::Vector2i(-1, 0);
+							}
+						}
+
+						sf::Vector2f pos = sf::Vector2f(0,0 );
+
+						if ((*CurrentGame).direction == sf::Vector2i(0, 1))
+						{
+							pos = sf::Vector2f(w / 2, -h / 2);
+							if (first_scene)
+							{
+								pos.y += SCENE_SIZE_Y;
+							}
+
+						}
+						else if ((*CurrentGame).direction == sf::Vector2i(0, -1))
+						{
+							pos = sf::Vector2f(w / 2, (h / 2) + SCENE_SIZE_Y);
+							if (first_scene)
+							{
+								pos.y -= SCENE_SIZE_Y;
+							}
+						}
+						else if ((*CurrentGame).direction == sf::Vector2i(1, 0))
+						{
+							pos = sf::Vector2f((w / 2), (h/2));
+							if (first_scene)
+							{
+								pos.x -= SCENE_SIZE_X;
+							}
+						}
+						else if ((*CurrentGame).direction == sf::Vector2i(-1, 0))
+						{
+							pos = sf::Vector2f((-w / 2) + SCENE_SIZE_X, h / 2);
+							if (first_scene)
+							{
+								pos.x += SCENE_SIZE_X;
 							}
 						}
 
