@@ -27,7 +27,7 @@ void Game::init(RenderWindow* window)
 	}
 
 	this->hazard = 0;//initalisation of the scoring system
-	this->BeastScoreBonus = 0.0f;
+	this->BeastScoreBonus = 0;
 }
 
 sf::RenderWindow* Game::getMainWindow()

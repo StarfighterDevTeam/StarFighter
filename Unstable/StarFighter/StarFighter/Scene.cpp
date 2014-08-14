@@ -39,12 +39,9 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 
 						float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
 						float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
-						if (first_scene)
-						{
-
-						}
 
 						sf::Vector2f speed = sf::Vector2f(0, 0);
+						this->direction = sf::Vector2i(0, 0);
 
 						if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("V") == 0)
 						{
@@ -73,7 +70,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 							}
 						}
 
-						sf::Vector2f pos = sf::Vector2f(0,0 );
+						sf::Vector2f pos = sf::Vector2f(w/2,h/2);
 
 						if ((*CurrentGame).direction == sf::Vector2i(0, 1))
 						{
@@ -94,7 +91,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 						}
 						else if ((*CurrentGame).direction == sf::Vector2i(1, 0))
 						{
-							pos = sf::Vector2f((w / 2), (h/2));
+							pos = sf::Vector2f((w / 2) + SCENE_SIZE_X, (h/2));
 							if (first_scene)
 							{
 								pos.x -= SCENE_SIZE_X;
@@ -102,7 +99,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 						}
 						else if ((*CurrentGame).direction == sf::Vector2i(-1, 0))
 						{
-							pos = sf::Vector2f((-w / 2) + SCENE_SIZE_X, h / 2);
+							pos = sf::Vector2f((-w / 2), h / 2);
 							if (first_scene)
 							{
 								pos.x += SCENE_SIZE_X;
@@ -463,13 +460,18 @@ void Scene::HazardBreakEvent()
 
 float Scene::getSceneBeastScore()
 {
-	if (this->hazard_level < HazardLevels::NB_HAZARD_LEVELS)
-		return HazardLevelsBeastBonus[this->hazard_level];
+	float bonus = 0;
+	if (this->hazard_level < HazardLevels::NB_HAZARD_LEVELS && this->hazard_level >= 0)
+	{
+		bonus = HazardLevelsBeastBonus[this->hazard_level];
+	}
 	else
 	{
-		printf("Error: Hazard Level above 5 does not exit. Cannot return the BeastScore of the scene.\n");
-		return 0.0f;
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", this->hazard_level);
+		this->hazard_level = 0;
 	}
+
+	return bonus;
 }
 /*
 sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)

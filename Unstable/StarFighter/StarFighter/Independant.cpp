@@ -285,5 +285,5 @@ void Independant::CreateRandomLoot(float BeastScaleBonus)
 
 void Independant::GetGrazing()
 {
-
+	//see overide function in class Ship
 }

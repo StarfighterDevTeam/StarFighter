@@ -70,6 +70,7 @@ Equipment::Equipment()
 	this->size.x = SLOT_WIDTH;
 	this->size.y = SLOT_HEIGHT;
 	this->textureName = EMPTYSLOT_FILENAME;
+	this->frameNumber = 0;
 	this->equipmentType = EquipmentType::Airbrake;
 	this->hasBot = false;
 	this->hasFake = false;
@@ -134,25 +135,25 @@ void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f
 {
 	switch (chosen_property) // 1 case
 	{
-	case 0: 
-		{
-			float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
+	case 0:
+	{
+			  float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
 
-			float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_decceleration *= log_multiplier;
-			else
-				e_decceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_decceleration));
+			  float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_decceleration *= log_multiplier;
+			  else
+				  e_decceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_decceleration));
 
-			this->decceleration += e_decceleration;
-			this->decceleration = floor(this->decceleration);
-			break;
-		}
+			  this->decceleration += e_decceleration;
+			  this->decceleration = floor(this->decceleration);
+			  break;
+	}
 	default:
-		{
-			printf("DEBUG: error: trying to add Airbrake property that does not exit.\n<!> Check that the chosen property for this Airbrake match with the existing properties in the AddAibrakeProperty function.\n");
-			break;
-		}
+	{
+			   printf("DEBUG: error: trying to add Airbrake property that does not exit.\n<!> Check that the chosen property for this Airbrake match with the existing properties in the AddAibrakeProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -161,44 +162,44 @@ void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f B
 	switch (chosen_property) // 2 case
 	{
 	case 0:
-		{
-			float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X));
+	{
+			  float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X));
 
-			float e_acceleration = EQUIPMENT_MIN_ACCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_acceleration *= log_multiplier;
-			else
-				e_acceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_acceleration));
+			  float e_acceleration = EQUIPMENT_MIN_ACCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_acceleration *= log_multiplier;
+			  else
+				  e_acceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_acceleration));
 
-			this->acceleration.x += e_acceleration;
-			this->acceleration.y += e_acceleration;
-			this->acceleration.x = floor(this->acceleration.x);
-			this->acceleration.y = floor(this->acceleration.y);
-			break;
-		}
+			  this->acceleration.x += e_acceleration;
+			  this->acceleration.y += e_acceleration;
+			  this->acceleration.x = floor(this->acceleration.x);
+			  this->acceleration.y = floor(this->acceleration.y);
+			  break;
+	}
 	case 1:
-		{
-			//this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			//this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
+	{
+			  //this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  //this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
 
-			float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_maxspeed *= log_multiplier;
-			else
-				e_maxspeed = ProrataBetweenThreshold(value, sf::Vector2f(0, e_maxspeed));
+			  float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_maxspeed *= log_multiplier;
+			  else
+				  e_maxspeed = ProrataBetweenThreshold(value, sf::Vector2f(0, e_maxspeed));
 
-			this->max_speed.x += e_maxspeed;
-			this->max_speed.y += e_maxspeed;
-			this->max_speed.x = floor(this->max_speed.x);
-			this->max_speed.y = floor(this->max_speed.y);
-			break;
-		}
+			  this->max_speed.x += e_maxspeed;
+			  this->max_speed.y += e_maxspeed;
+			  this->max_speed.x = floor(this->max_speed.x);
+			  this->max_speed.y = floor(this->max_speed.y);
+			  break;
+	}
 	default:
-		{
-			printf("DEBUG: error: trying to add Engine property that does not exit.\n<!> Check that the chosen property for this Engine match with the existing properties in the AddEngineProperty function.\n");
-			break;
-		}
+	{
+			   printf("DEBUG: error: trying to add Engine property that does not exit.\n<!> Check that the chosen property for this Engine match with the existing properties in the AddEngineProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -207,25 +208,25 @@ void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f Be
 	switch (chosen_property) // 1 case
 	{
 	case 0:
-		{
-			//this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X));
+	{
+			  //this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X));
 
-			float e_armor = EQUIPMENT_MIN_ARMOR_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_armor *= log_multiplier;
-			else
-				e_armor = ProrataBetweenThreshold(value, sf::Vector2f(0, e_armor));
+			  float e_armor = EQUIPMENT_MIN_ARMOR_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_armor *= log_multiplier;
+			  else
+				  e_armor = ProrataBetweenThreshold(value, sf::Vector2f(0, e_armor));
 
-			this->armor += e_armor;
-			this->armor = floor(this->armor);
-			break;
-		}
+			  this->armor += e_armor;
+			  this->armor = floor(this->armor);
+			  break;
+	}
 	default:
-		{
-			printf("DEBUG: error: trying to add Armor property that does not exit.\n<!> Check that the chosen property for this Armor match with the existing properties in the AddArmorProperty function.\n");
-			break;
-		}
+	{
+			   printf("DEBUG: error: trying to add Armor property that does not exit.\n<!> Check that the chosen property for this Armor match with the existing properties in the AddArmorProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -234,40 +235,40 @@ void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f B
 	switch (chosen_property) // 2 case
 	{
 	case 0:
-		{
-			//this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
-			float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X));
+	{
+			  //this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
+			  float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X));
 
-			float e_shield = EQUIPMENT_MIN_SHIELD_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_shield *= log_multiplier;
-			else
-				e_shield = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield));
+			  float e_shield = EQUIPMENT_MIN_SHIELD_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_shield *= log_multiplier;
+			  else
+				  e_shield = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield));
 
-			this->shield += e_shield;
-			this->shield = floor(this->shield);
-			break;
-		}
+			  this->shield += e_shield;
+			  this->shield = floor(this->shield);
+			  break;
+	}
 	case 1:
-		{
-			//this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X));
+	{
+			  //this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X));
 
-			float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_shield_regen *= log_multiplier;
-			else
-				e_shield_regen = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield_regen));
+			  float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_shield_regen *= log_multiplier;
+			  else
+				  e_shield_regen = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield_regen));
 
-			this->shield_regen += e_shield_regen;
-			this->shield_regen = floor(this->shield_regen);
-			break;
-		}
+			  this->shield_regen += e_shield_regen;
+			  this->shield_regen = floor(this->shield_regen);
+			  break;
+	}
 	default:
-		{
-			printf("DEBUG: error: trying to add Shield property that does not exit.\n<!> Check that the chosen property for this Shield match with the existing properties in the AddShieldProperty function.\n");
-			break;
-		}
+	{
+			   printf("DEBUG: error: trying to add Shield property that does not exit.\n<!> Check that the chosen property for this Shield match with the existing properties in the AddShieldProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -276,34 +277,34 @@ void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f B
 	switch (chosen_property)
 	{
 	case 0://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
 	case 1://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
 	case 2://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
 	case 3://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
 	default:
-		{
-			printf("DEBUG: error: trying to add Module property that does not exit.\n<!> Check that the chosen property for this Module match with the existing properties in the AddModuleProperty function.\n");
-			break;
-		}
+	{
+			   printf("DEBUG: error: trying to add Module property that does not exit.\n<!> Check that the chosen property for this Module match with the existing properties in the AddModuleProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -311,9 +312,9 @@ void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f B
 
 ShipConfig::ShipConfig()
 {
-	this->ship_model = new ShipModel(sf::Vector2f (0,0), sf::Vector2f (0,0), 0.0f, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
+	this->ship_model = new ShipModel(sf::Vector2f(0, 0), sf::Vector2f(0, 0), 0.0f, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
 
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		Equipment* defaultEquipment = new Equipment();
 		//defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
@@ -344,7 +345,7 @@ void ShipConfig::Init()
 	{
 		this->bot_list.push_back(this->ship_model->bot);
 	}
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (this->hasEquipment[i])
 		{
@@ -361,7 +362,7 @@ int ShipConfig::getShipConfigArmor()
 	int new_armor = 0;
 	int equipment_armor = 0;
 
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (this->hasEquipment[i])
 		{
@@ -385,9 +386,9 @@ int ShipConfig::getShipConfigArmor()
 int ShipConfig::getShipConfigShield()
 {
 	int new_shield = 0;
-	int equipment_shield = 0.;
+	int equipment_shield = 0;
 
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (this->hasEquipment[i])
 		{
@@ -413,7 +414,7 @@ int ShipConfig::getShipConfigShieldRegen()
 	int new_shield_regen = 0;
 	int equipment_shield_regen = 0;
 
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (this->hasEquipment[i])
 		{
@@ -437,10 +438,10 @@ int ShipConfig::getShipConfigShieldRegen()
 
 sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 {
-	sf::Vector2f new_max_speed = sf::Vector2f(0,0);
-	sf::Vector2f equipment_max_speed = sf::Vector2f(0,0);
+	sf::Vector2f new_max_speed = sf::Vector2f(0, 0);
+	sf::Vector2f equipment_max_speed = sf::Vector2f(0, 0);
 
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (this->hasEquipment[i])
 		{
@@ -471,7 +472,7 @@ float ShipConfig::getShipConfigDecceleration()
 	float new_decceleration = 0.0f;
 	float equipment_decceleration = 0.0f;
 
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (this->hasEquipment[i])
 		{
@@ -494,10 +495,10 @@ float ShipConfig::getShipConfigDecceleration()
 
 sf::Vector2f ShipConfig::getShipConfigAcceleration()
 {
-	sf::Vector2f new_acceleration = sf::Vector2f(0,0);
-	sf::Vector2f equipment_acceleration = sf::Vector2f(0,0);
+	sf::Vector2f new_acceleration = sf::Vector2f(0, 0);
+	sf::Vector2f equipment_acceleration = sf::Vector2f(0, 0);
 
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
 		if (this->hasEquipment[i])
 		{
@@ -558,7 +559,7 @@ void ShipConfig::GenerateBots(Independant* m_target)
 	{
 		Bot* m_bot = (*it)->Clone();
 		m_bot->setTarget(m_target);
-		(*CurrentGame).addToScene(m_bot,LayerType::BotLayer, IndependantType::Neutral);
+		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, IndependantType::Neutral);
 	}
 }
 
@@ -570,14 +571,14 @@ void ShipConfig::DestroyBots()
 
 void ShipConfig::GenerateFakeShip(Independant* m_target)
 {
-	for (int i=0; i<EquipmentType::NBVAL_EQUIPMENT; i++)
+	if (this->ship_model->hasFake)
 	{
-		if (this->ship_model->hasFake)
-		{
-			Aura* fake_ship = new Aura(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber);
-			(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
-		}
+		Aura* fake_ship = new Aura(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber);
+		(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
+	}
 
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	{
 		if (this->equipment[i]->hasFake)
 		{
 			Aura* fake_ship = new Aura(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber);
@@ -588,26 +589,25 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 
 // ----------------SHIP ---------------
 
-Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0,0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x/2),(m_ship_config.size.y/2)), m_ship_config.frameNumber)
+Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0, 0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x / 2), (m_ship_config.size.y / 2)), m_ship_config.frameNumber)
 {
-	this->collider_type =  IndependantType::PlayerShip;
+	this->collider_type = IndependantType::PlayerShip;
 	this->ship_config = m_ship_config;
 	this->moving = false;
 	this->movingX = movingY = false;
 	this->visible = true;
 	this->damage = 0;
 	this->armor = 1;
-	this->shield = 1;
-	this->armor = ship_config.getShipConfigArmor();
-	this->shield = ship_config.getShipConfigShield();
-	this->shield_regen = ship_config.getShipConfigShieldRegen();
+	this->shield = 0;
+	this->shield_max = 0;
+	this->shield_regen = 0;
 	this->disable_inputs = false;
 	this->disable_fire = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/Aura_RedGlow.png", sf::Vector2f (50,50), 3);
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/Aura_BlueGlow.png", sf::Vector2f (50,50), 3);
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/Aura_WhiteGlow.png", sf::Vector2f (50,50), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/Aura_RedGlow.png", sf::Vector2f(50, 50), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/Aura_BlueGlow.png", sf::Vector2f(50, 50), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/Aura_WhiteGlow.png", sf::Vector2f(50, 50), 3);
 	this->key_repeat = false;
 }
 
@@ -667,10 +667,10 @@ void Ship::update(sf::Time deltaTime)
 	if (shield < ship_config.getShipConfigShield())
 	{
 		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
-		if(shield_regen_buffer > 1)
+		if (shield_regen_buffer > 1)
 		{
 			double intpart;
-			shield_regen_buffer = modf (shield_regen_buffer , &intpart);
+			shield_regen_buffer = modf(shield_regen_buffer, &intpart);
 			shield += intpart;
 		}
 
@@ -685,9 +685,9 @@ void Ship::update(sf::Time deltaTime)
 	sf::Vector2f directions = InputGuy::getDirections();
 	if (!disable_inputs)
 	{
-		moving = directions.x !=0 || directions.y !=0;
-		movingX = directions.x !=0;
-		movingY = directions.y !=0;
+		moving = directions.x != 0 || directions.y != 0;
+		movingX = directions.x != 0;
+		movingY = directions.y != 0;
 
 		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
 		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
@@ -697,12 +697,12 @@ void Ship::update(sf::Time deltaTime)
 		{
 			if (speed.x > SHIP_BRAKING_SPEED)
 				speed.x = SHIP_BRAKING_SPEED;
-			if (speed.x < - SHIP_BRAKING_SPEED)
-				speed.x = - SHIP_BRAKING_SPEED;
+			if (speed.x < -SHIP_BRAKING_SPEED)
+				speed.x = -SHIP_BRAKING_SPEED;
 			if (speed.y > SHIP_BRAKING_SPEED)
 				speed.y = SHIP_BRAKING_SPEED;
-			if (speed.y < - SHIP_BRAKING_SPEED)
-				speed.y = - SHIP_BRAKING_SPEED;
+			if (speed.y < -SHIP_BRAKING_SPEED)
+				speed.y = -SHIP_BRAKING_SPEED;
 
 			this->transparent = false;
 		}
@@ -712,12 +712,12 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		//auto fire option (F key)
-		if(InputGuy::setAutomaticFire())
+		if (InputGuy::setAutomaticFire())
 		{
-			if(!this->key_repeat)
+			if (!this->key_repeat)
 			{
 				this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
-				this->key_repeat=true;
+				this->key_repeat = true;
 				if (this->ship_config.automatic_fire)
 					printf("Auto fire ON\n");
 				else
@@ -730,40 +730,40 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		//Fire function
-		if(InputGuy::isFiring() || this->ship_config.automatic_fire )
+		if (InputGuy::isFiring() || this->ship_config.automatic_fire)
 		{
 			if (!disable_fire && this->ship_config.hasWeapon)
 			{
-				ship_config.weapon->weaponOffset = sf::Vector2f((ship_config.size.x/2) + (ship_config.weapon->ammunition->m_size.y/2), (ship_config.size.y/2) - (ship_config.weapon->ammunition->m_size.y/2) *ship_config.weapon->fire_direction.y );
+				ship_config.weapon->weaponOffset = sf::Vector2f((ship_config.size.x / 2) + (ship_config.weapon->ammunition->m_size.y / 2), (ship_config.size.y / 2) - (ship_config.weapon->ammunition->m_size.y / 2) *ship_config.weapon->fire_direction.y);
 				ship_config.weapon->setPosition(this->getPosition().x, this->getPosition().y);
 				ship_config.weapon->Fire(FriendlyFire);
 			}
 		}
 
 		//max speed constraints
-		if(abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
+		if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
 		{
-			speed.x = speed.x > 0 ?  this->ship_config.getShipConfigMaxSpeed().x : - this->ship_config.getShipConfigMaxSpeed().x;
+			speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
 		}
-		if(abs(speed.y) >  this->ship_config.getShipConfigMaxSpeed().y)
+		if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
 		{
-			speed.y = speed.y > 0 ?  this->ship_config.getShipConfigMaxSpeed().y : - this->ship_config.getShipConfigMaxSpeed().y;
+			speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
 		}
 
 		//idle decceleration
-		if(!movingX)
+		if (!movingX)
 		{
-			speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
+			speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
 
-			if(abs(speed.x) < SHIP_MIN_SPEED_X)
+			if (abs(speed.x) < SHIP_MIN_SPEED_X)
 				speed.x = 0;
 		}
 
-		if(!movingY)
+		if (!movingY)
 		{
-			speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration()/100);
+			speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
 
-			if(abs(speed.y) < SHIP_MIN_SPEED_Y)
+			if (abs(speed.y) < SHIP_MIN_SPEED_Y)
 				speed.y = 0;
 		}
 	}
@@ -771,27 +771,27 @@ void Ship::update(sf::Time deltaTime)
 	Independant::update(deltaTime);
 
 	//screen borders contraints	correction
-	if (this->getPosition().x < ship_config.size.x/2)
+	if (this->getPosition().x < ship_config.size.x / 2)
 	{
-		this->setPosition(ship_config.size.x/2, this->getPosition().y);
+		this->setPosition(ship_config.size.x / 2, this->getPosition().y);
 		speed.x = 0;
 	}
 
-	if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x/2))
+	if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x / 2))
 	{
-		this->setPosition(SCENE_SIZE_X-(ship_config.size.x/2), this->getPosition().y);
+		this->setPosition(SCENE_SIZE_X - (ship_config.size.x / 2), this->getPosition().y);
 		speed.x = 0;
 	}
 
-	if (this->getPosition().y < ship_config.size.y/2)
+	if (this->getPosition().y < ship_config.size.y / 2)
 	{
-		this->setPosition(this->getPosition().x, ship_config.size.y/2);
+		this->setPosition(this->getPosition().x, ship_config.size.y / 2);
 		speed.y = 0;
 	}
 
-	if (this->getPosition().y > SCENE_SIZE_Y-(ship_config.size.y/2))
+	if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.size.y / 2))
 	{
-		this->setPosition(this->getPosition().x, SCENE_SIZE_Y-(ship_config.size.y/2));
+		this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.size.y / 2));
 		speed.y = 0;
 	}
 }
@@ -804,7 +804,7 @@ void Ship::Respawn()
 	speed.y = 0;
 	this->setVisible(true);
 	isOnScene = true;
-	this->setPosition(SCENE_SIZE_X*STARTSCENE_X_RATIO,SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
+	this->setPosition(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
 
 	immune = true;
 	immunityTimer.restart();
@@ -814,7 +814,7 @@ void Ship::Death()
 {
 	FX* myFX = this->ship_config.FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
+	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
 }
 
 void Ship::GetLoot(Independant& independant)
@@ -833,7 +833,7 @@ void Ship::GetLoot(Independant& independant)
 		{
 			//...else we put it in the stash
 
-			printf("Equipment added to ship stash: '%s'\n",independant.getEquipmentLoot()->display_name.c_str());
+			printf("Equipment added to ship stash: '%s'\n", independant.getEquipmentLoot()->display_name.c_str());
 			this->stash.push_back((Loot*)independant.getEquipmentLoot());
 			independant.releaseEquipmentLoot();
 
@@ -854,7 +854,7 @@ void Ship::GetLoot(Independant& independant)
 		else
 		{
 			//...else we add it in stash
-			printf("Weapon added to ship stash: '%s'\n",independant.getWeaponLoot()->display_name.c_str());
+			printf("Weapon added to ship stash: '%s'\n", independant.getWeaponLoot()->display_name.c_str());
 			this->stash.push_back((Loot*)independant.getWeaponLoot());
 			independant.releaseWeaponLoot();
 		}
@@ -864,45 +864,49 @@ void Ship::GetLoot(Independant& independant)
 }
 
 
-int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = {0, 10, 40, 70};
-float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = {0.0, 0.2, 0.4, 0.6};
+static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 10, 40, 70 };
+static float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = { 0.0, 0.2, 0.4, 0.6 };
 
 void Ship::GetGrazing()
 {
-	this->graze_count++;
+	graze_count++;
 
-	if (this->graze_level < GrazeLevels::NB_GRAZE_LEVELS-1)
+	if (graze_level < GrazeLevels::NB_GRAZE_LEVELS - 1)
 	{
-		if  (this->graze_count >= GrazeLevelsThresholds[this->graze_level+1])
+		if (graze_count >= GrazeLevelsThresholds[graze_level + 1])
 		{
 			//Graze level up
 			graze_level++;
-
 			switch (graze_level)
 			{
 			case GrazeLevels::GRAZE_LEVEL_RED:
-				{
-					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
-					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED]->Clone();
-					(*CurrentGame).addToScene(m_combo_aura,LayerType::AuraLayer, IndependantType::Neutral);
-					break;
-				}
+			{
+												 (*CurrentGame).garbageLayer(LayerType::AuraLayer);
+												 Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED]->Clone();
+												 (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
+												 break;
+			}
 			case GrazeLevels::GRAZE_LEVEL_BLUE:
-				{
-					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
-					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE]->Clone();
-					(*CurrentGame).addToScene(m_combo_aura,LayerType::AuraLayer, IndependantType::Neutral);
-					break;
-				}
+			{
+												  (*CurrentGame).garbageLayer(LayerType::AuraLayer);
+												  Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE]->Clone();
+												  (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
+												  break;
+			}
 			case GrazeLevels::GRAZE_LEVEL_WHITE:
-				{
-					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
-					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE]->Clone();
-					(*CurrentGame).addToScene(m_combo_aura,LayerType::AuraLayer, IndependantType::Neutral);
-					break;
-				}
+			{
+												   (*CurrentGame).garbageLayer(LayerType::AuraLayer);
+												   Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE]->Clone();
+												   (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
+												   break;
+			}
 			default:
-				break;
+			{
+					   graze_level = 0;
+					   LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
+					   break;
+			}
+
 			}
 		}
 	}
@@ -915,10 +919,22 @@ int Ship::getGrazeCount()
 
 float Ship::getShipBeastScore()
 {
-	return GrazeLevelsBeastBonus[this->graze_level];
+	float bonus = 0;
+	if (graze_level < GrazeLevels::NB_GRAZE_LEVELS && this->graze_level >= 0)
+	{
+		bonus = GrazeLevelsBeastBonus[graze_level];
+	}
+	else
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", this->graze_level);
+		this->graze_count = 0;
+		this->graze_level = 0;
+	}
+
+	return bonus;
 }
 
-void Ship::damage_from (Independant& independant)
+void Ship::damage_from(Independant& independant)
 {
 	if (!immune)
 	{
@@ -932,7 +948,7 @@ void Ship::damage_from (Independant& independant)
 			shield -= independant.damage;
 		}
 	}
-	this->graze_count = 0;
-	this->graze_level = GrazeLevels::GRAZE_LEVEL_NONE;
+	graze_count = 0;
+	graze_level = GrazeLevels::GRAZE_LEVEL_NONE;
 	(*CurrentGame).garbageLayer(LayerType::AuraLayer);
 }

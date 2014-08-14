@@ -179,13 +179,13 @@ public :
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	bool key_repeat;
 
+	int graze_count;
+	int graze_level;
 	
 private:
 	bool moving;
 	bool movingX;
 	bool movingY;
-	int graze_count;
-	int graze_level;
 };
 
 #endif // SHIP_H_INCLUDED
