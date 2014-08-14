@@ -25,15 +25,6 @@ enum ScenesData
 	SCENE_LINK_LEFT,
 };
 
-enum Directions
-{
-	DIRECTION_UP,
-	DIRECTION_DOWN,
-	DIRECTION_RIGHT,
-	DIRECTION_LEFT,
-	NB_DIRECTIONS
-};
-
 class Scene
 {
 public:

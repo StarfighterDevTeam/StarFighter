@@ -27,6 +27,15 @@ enum IndependantType {
 	NBVAL_Independant
 };
 
+enum Directions
+{
+	DIRECTION_UP,
+	DIRECTION_DOWN,
+	DIRECTION_RIGHT,
+	DIRECTION_LEFT,
+	NB_DIRECTIONS
+};
+
 enum EnemyClass
 {
 	ENEMYPOOL_VOID,//0
@@ -111,6 +120,13 @@ public:
 	float diag;
 	std::string display_name;
 	bool transparent;
+
+	static float getDistance_to_SceneBorder(Directions direction, sf::Vector2f coordinates, bool outside_screen);
+	static float getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random = false, float margin_to_screen_border = 0.f);
+
+	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
+	static sf::Vector2f getFirstScreenOffset(Directions direction);
+	static bool isPositionPastDistance_to_ScreenBorder(Directions direction, sf::Vector2f coordinates, sf::Vector2f sprite_position, bool outside_screen, sf::Vector2f position);
 
 protected:
 	sf::Vector2f initial_position;
