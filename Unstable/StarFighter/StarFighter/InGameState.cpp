@@ -20,6 +20,8 @@ void InGameState::Initialize(Player player)
 	}
 
 	sf::Vector2f ship_pos = InGameState::StartingShipPosition(this->currentScene->direction);
+
+	
 	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
 	(*CurrentGame).SetPlayerShip(this->playerShip);
 
@@ -264,7 +266,7 @@ void InGameState::InGameStateMachineCheck()
 													printf("DEBUG: Travel UP !\n");
 													(*CurrentGame).SetScrollingDirection(sf::Vector2i(0, 1));
 													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_UP], false, false);
-													this->IG_State = InGameStateMachine::SCROLLING;
+													this->IG_State = InGameStateMachine::LAST_SCREEN;
 												}
 
 												else if (y > Y_max && timer.asSeconds() > HUB_EXIT_TIMER)
@@ -273,7 +275,7 @@ void InGameState::InGameStateMachineCheck()
 													printf("DEBUG: Travel DOWN !\n");
 													(*CurrentGame).SetScrollingDirection(sf::Vector2i(0, -1));
 													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_DOWN], true, false);
-													this->IG_State = InGameStateMachine::SCROLLING;
+													this->IG_State = InGameStateMachine::LAST_SCREEN;
 												}
 
 												else if (x > X_max && timer.asSeconds() > HUB_EXIT_TIMER)
@@ -282,7 +284,7 @@ void InGameState::InGameStateMachineCheck()
 													printf("DEBUG: Travel RIGHT !\n");
 													(*CurrentGame).SetScrollingDirection(sf::Vector2i(1, 0));
 													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_RIGHT], false, false);
-													this->IG_State = InGameStateMachine::SCROLLING;
+													this->IG_State = InGameStateMachine::LAST_SCREEN;
 												}
 
 												else if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
@@ -291,7 +293,7 @@ void InGameState::InGameStateMachineCheck()
 													printf("DEBUG: Travel LEFT !\n");
 													(*CurrentGame).SetScrollingDirection(sf::Vector2i(-1, 0));
 													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_LEFT], true, false);
-													this->IG_State = InGameStateMachine::SCROLLING;
+													this->IG_State = InGameStateMachine::LAST_SCREEN;
 												}
 											}
 

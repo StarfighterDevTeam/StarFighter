@@ -130,7 +130,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 						//hazard value automatic calculation
 						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
 					}
-					printf("Hazard Break to reach: %d\n", hazard_break_value);
+					//printf("Hazard Break to reach: %d\n", hazard_break_value);
 					if (enemy_count != 0)
 					{
 						generating_enemies = true;
@@ -150,8 +150,6 @@ Scene::Scene(string name, bool reverse_scene, bool first_scene)
 {
 	hazard_level = 0;
 	LoadSceneFromFile(name, reverse_scene, first_scene);
-
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
 }
 
 void Scene::Update(Time deltaTime)

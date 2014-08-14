@@ -2,6 +2,7 @@
 
 ShipConfig* FileLoader::LoadShipConfig(string name)
 {
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
 	try
 	{
 		list<vector<string>> shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
@@ -13,11 +14,11 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 				ShipConfig* shipC = new ShipConfig();
 
 				//Loading Ship Model
-				printf("DEBUG: Loading ship model\n");
+				LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship model\n");
 				shipC->setShipModel(FileLoader::LoadShipModel((*it)[ShipConfigData::SHIPCONFIG_SHIPMODEL]));
 
 				//Loading equipment
-				printf("DEBUG: Loading ship equipment\n");
+				LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship equipment\n");
 				shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
 				shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
 				//shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
@@ -30,7 +31,7 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 				//Loading weapon
 				if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
 				{
-					printf("DEBUG: Loading ship weapon\n");
+					LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship weapon\n");
 					shipC->setShipWeapon(FileLoader::LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
 				}
 
