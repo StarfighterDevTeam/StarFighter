@@ -343,14 +343,14 @@ bool Independant::isPositionPastDistance_to_ScreenBorder(Directions direction, s
 	}
 	else if (direction == Directions::DIRECTION_DOWN)
 	{
-		pos = opposite * (- sprite_position.y);
-		coor = opposite * (- Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene));
+		pos = opposite * (-sprite_position.y);
+		coor = opposite * (-Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene));
 		coor += offset*Independant::getFirstSceneOffset(direction).y;
 	}
 	else if (direction == Directions::DIRECTION_RIGHT)
 	{
-		pos = opposite * (- sprite_position.x);
-		coor = opposite * (- Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene));
+		pos = opposite * (-sprite_position.x);
+		coor = opposite * (-Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene));
 		coor += offset*Independant::getFirstSceneOffset(direction).x;
 	}
 	else if (direction == Directions::DIRECTION_LEFT)
@@ -374,7 +374,7 @@ bool Independant::isPositionPastDistance_to_ScreenBorder(Directions direction, s
 	}
 }
 
-float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random, sf::Vector2f margin_to_screen_border)
+float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random, sf::Vector2f left_margin_to_screen_border, sf::Vector2f right_margin_to_screen_border)
 {
 
 	float mid = 0;
@@ -403,8 +403,8 @@ float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool c
 		float pos = 0;
 		if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
 		{
-			float min_marker = margin_to_screen_border.x;
-			float max_marker = SCENE_SIZE_X - margin_to_screen_border.x;
+			float min_marker = left_margin_to_screen_border.x;
+			float max_marker = SCENE_SIZE_X - right_margin_to_screen_border.x;
 
 			pos = RandomizeFloatBetweenValues(sf::Vector2f(min_marker, max_marker));
 
@@ -412,8 +412,8 @@ float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool c
 		}
 		else if (direction == Directions::DIRECTION_RIGHT || direction == Directions::DIRECTION_LEFT)
 		{
-			float min_marker = margin_to_screen_border.y;
-			float max_marker = SCENE_SIZE_Y - margin_to_screen_border.y;
+			float min_marker = left_margin_to_screen_border.y;
+			float max_marker = SCENE_SIZE_Y - right_margin_to_screen_border.y;
 
 			pos = RandomizeFloatBetweenValues(sf::Vector2f(min_marker, max_marker));
 
@@ -444,7 +444,7 @@ sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vsp
 	}
 	else if (direction == Directions::DIRECTION_DOWN)
 	{
-		speed.y = - vspeed;
+		speed.y = -vspeed;
 	}
 	else if (direction == Directions::DIRECTION_RIGHT)
 	{
@@ -454,7 +454,7 @@ sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vsp
 	{
 		speed.x = vspeed;
 	}
-	
+
 	if (player_side)
 	{
 		speed.x *= -1;
@@ -487,14 +487,14 @@ sf::Vector2f Independant::getFirstSceneOffset(Directions direction)
 	return offset;
 }
 
-sf::Vector2f Independant::getCoordinates_for_Spawn(bool first_scene, Directions direction, sf::Vector2f coordinates, bool outside_screen, bool centered, 
-	bool keep_perpendicular_axis, sf::Vector2f position, bool random, sf::Vector2f margin_to_screen_border)
+sf::Vector2f Independant::getCoordinates_for_Spawn(bool first_scene, Directions direction, sf::Vector2f coordinates, bool outside_screen, bool centered,
+	bool keep_perpendicular_axis, sf::Vector2f position, bool random, sf::Vector2f left_margin_to_screen_border, sf::Vector2f right_margin_to_screen_border)
 {
-	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X/2, SCENE_SIZE_Y/2);
+	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2);
 
 	if (direction != Directions::NO_DIRECTION)
 	{
-		float x = Independant::getPosition_on_PerpendicularAxis(direction, centered, random, margin_to_screen_border);
+		float x = Independant::getPosition_on_PerpendicularAxis(direction, centered, random, left_margin_to_screen_border, right_margin_to_screen_border);
 		float y = Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_screen);
 
 		if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
@@ -520,7 +520,7 @@ sf::Vector2f Independant::getCoordinates_for_Spawn(bool first_scene, Directions 
 			pos.y += Independant::getFirstSceneOffset(direction).y;
 		}
 	}
-	
+
 
 	return pos;
 }
@@ -546,4 +546,76 @@ sf::Vector2f Independant::getSpeed_to_LocationWhileSceneSwap(Directions current_
 	}
 
 	return speed;
+}
+
+sf::Vector2i Independant::getDirectionMultiplier(Directions direction)
+{
+	int x = 1;
+	int y = 1;
+	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_RIGHT)
+	{
+		x *= -1;
+	}
+	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_LEFT)
+	{
+		y *= -1;
+	}
+
+	return sf::Vector2i(x, y);
+}
+
+sf::Vector2f Independant::getSize_for_Direction(Directions direction, sf::Vector2f size)
+{
+	if (direction == Directions::DIRECTION_LEFT || direction == Directions::DIRECTION_RIGHT)
+	{
+		return sf::Vector2f(size.y, size.x);
+	}
+	else
+	{
+		return size;
+	}
+}
+
+sf::Vector2i Independant::getFireDirection(Directions direction, bool player_side)
+{
+	int dirY = 1;
+	int dirX = 0;
+
+	if (player_side)
+	{
+		dirY *= -1;
+	}
+
+	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_LEFT)
+	{
+		dirY *= -1;
+	}
+
+	if (direction == Directions::DIRECTION_RIGHT)
+	{
+		dirX = -dirY;
+		dirY = 0;
+	}
+
+	return sf::Vector2i(dirX, dirY);
+}
+
+float Independant::getRotation_for_Direction(Directions direction)
+{
+	if (direction == Directions::DIRECTION_DOWN)
+	{
+		return 180;
+	}
+	else if (direction == Directions::DIRECTION_RIGHT)
+	{
+		return 90;
+	}
+	else if (direction == Directions::DIRECTION_LEFT)
+	{
+		return 270;
+	}
+	else
+	{
+		return 0;
+	}
 }

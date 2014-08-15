@@ -29,6 +29,7 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	//bullet->setPosition(getPosition().x + offsetX + OffsetWeapon(dispersion+angle).x, getPosition().y - ((bullet->m_size.y/2)*(fire_direction.y)) + OffsetWeapon(dispersion+angle).y);
 	//bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
 
+	
 	bullet->speed = this->AngleShot(this->angle + dispersion, bullet->ref_speed * fire_direction.y);
 	if (m_collider_type == IndependantType::FriendlyFire)
 	{

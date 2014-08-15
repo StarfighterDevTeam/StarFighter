@@ -88,6 +88,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 					if ((*it)[0].compare("enemy") == 0)
 					{
 						EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+						e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
 						this->sceneIndependantsLayered[e->enemyclass].push_back(e);
 
 						//giving intervall of hit values for dice rolls
@@ -128,7 +129,7 @@ void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
-		//this->GenerateEnemies(deltaTime);
+		this->GenerateEnemies(deltaTime);
 	}
 
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
@@ -175,6 +176,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 
 		//preparing the list of enemies to put in the cluster
+		sf::Vector2f max_enemy_size = sf::Vector2f(0, 0);
+
 		vector<EnemyPoolElement*>* cluster = new vector<EnemyPoolElement*>;
 		for (int i = 0; i < nb_rows*nb_lines; i++)
 		{
@@ -183,29 +186,26 @@ void Scene::GenerateEnemies(Time deltaTime)
 			// arg1 = move pattern
 			//if arg0 != VOID
 			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[EnemyClass::ENEMYPOOL_ALPHA], EnemyClass::ENEMYPOOL_ALPHA, PatternType::NoMovePattern);
+			if (e->enemy->m_size.x > max_enemy_size.x)
+			{
+				max_enemy_size.x = e->enemy->m_size.x;
+			}
+			if (e->enemy->m_size.y > max_enemy_size.y)
+			{
+				max_enemy_size.y = e->enemy->m_size.y;
+			}
 
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize--;
 
-			//test de loot d'ennemi hardcodé
-			//Equipment* loot = LoadEquipment("module_gerard");
-			//((Independant*)e->enemy)->setEquipmentLoot(loot);
-
-			//test de loot d'ennemi hardcodé
-			//Weapon* loot = LoadWeapon("laser_player", -1, LoadAmmo("laser_blue"));
-			//((Independant*)e->enemy)->setWeaponLoot(loot);
-
 			cluster->push_back(e);
 		}
+		
+		sf::Vector2f size = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(((nb_rows - 1) * xspread) + (max_enemy_size.x / 2), ((nb_lines - 1) * yspread) + (max_enemy_size.y / 2)));
 
-		int size_x = (int)((nb_rows + 1) * xspread);//let's take some margin : +1 row
-		float size_y = (nb_lines + 1) * yspread;//let's take some margin : +1 line
-		if (size_x >= SCENE_SIZE_X) size_x = SCENE_SIZE_X - 1;//without this, rand() % SCENE_SIZE_X - size_x may crash if size_x = SCENE_SIZE_X
-		if (size_y >= SCENE_SIZE_Y) size_y = SCENE_SIZE_Y - 1;
+		sf::Vector2f pos = Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction, size, true, false, false, sf::Vector2f(0, 0), true, 
+			sf::Vector2f(xspread, yspread), sf::Vector2f(xspread + size.x, yspread + size.y));
 
-		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (SCENE_SIZE_X - size_x), -size_y), nb_lines, nb_rows, xspread, yspread, cluster);
-
-		//sf::Vector2f pos = Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction, sf::Vector2f(xspread, yspread), true, false, false, sf::Vector2f(0, 0), true, sf::Vector2f(xspread, yspread));
-		//EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
+		EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP
 		/*

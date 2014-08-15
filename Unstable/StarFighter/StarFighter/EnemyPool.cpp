@@ -30,13 +30,17 @@ EnemyPool::EnemyPool(sf::Vector2f m_position, int m_nb_lines, int m_nb_rows, flo
 void EnemyPool::CreateCluster()
 {
 	int index = 0;
+
+	int reverse_line = Independant::getDirectionMultiplier((*CurrentGame).direction).x;
+	int reverse_row = Independant::getDirectionMultiplier((*CurrentGame).direction).y;
+
 	for (std::vector<EnemyPoolElement*>::iterator it = enemyCluster->begin() ; it != enemyCluster->end(); ++it)
 	{
 		if ( (*(*it)).enemy_class != EnemyClass::ENEMYPOOL_VOID)
 		{
 			Enemy* n = (*it)->enemy->Clone();
 			n->setVisible(true);
-			n->setPosition(sf::Vector2f(this->position.x + (index % nb_rows)*xspread, this->position.y + (floor(index / nb_rows)-1)*yspread));
+			n->setPosition(sf::Vector2f(this->position.x + reverse_line*(index % nb_rows)*xspread, this->position.y + reverse_row*(floor(index / nb_rows) - 1)*yspread));
 
 			n->enemy_class = (*it)->enemy_class;
 			n->enemy_class = EnemyClass::ENEMYPOOL_GAMMA;

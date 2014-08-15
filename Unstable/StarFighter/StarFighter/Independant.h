@@ -128,18 +128,22 @@ public:
 	// player_side = true if the sprite is a playership
 	static float getPosition_from_SceneBorderOffset(Directions direction, sf::Vector2f offset, bool outside_screen);
 
-	static float getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random = false, sf::Vector2f margin_to_screen_border = sf::Vector2f(0, 0));
+	static float getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random = false, sf::Vector2f left_margin_to_screen_border = sf::Vector2f(0, 0), sf::Vector2f right_margin_to_screen_border = sf::Vector2f(0, 0));
 
 	static sf::Vector2f getFirstSceneOffset(Directions direction);
 
 	static sf::Vector2f getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position);
 
 	static sf::Vector2f getCoordinates_for_Spawn(bool first_scene, Directions direction, sf::Vector2f coordinates, bool outside_screen, bool centered, 
-		bool keep_perpendicular_axis = false, sf::Vector2f position = sf::Vector2f(0, 0), bool random = false, sf::Vector2f margin_to_screen_border = sf::Vector2f(0,0));
+		bool keep_perpendicular_axis = false, sf::Vector2f position = sf::Vector2f(0, 0), bool random = false, sf::Vector2f left_margin_to_screen_border = sf::Vector2f(0, 0), sf::Vector2f right_margin_to_screen_border = sf::Vector2f(0, 0));
 
 	static bool isPositionPastDistance_to_ScreenBorder(Directions direction, sf::Vector2f coordinates, sf::Vector2f sprite_position, bool outside_scene, bool player_side = false);
 
+	static sf::Vector2i getDirectionMultiplier(Directions direction);
+	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);
 	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed, bool player_side = false);
+	static sf::Vector2i Independant::getFireDirection(Directions direction, bool player_side);
+	static float Independant::getRotation_for_Direction(Directions direction);
 
 protected:
 	sf::Vector2f initial_position;
