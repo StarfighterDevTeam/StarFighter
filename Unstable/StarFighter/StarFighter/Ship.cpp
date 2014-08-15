@@ -558,6 +558,7 @@ void ShipConfig::GenerateBots(Independant* m_target)
 	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
 	{
 		Bot* m_bot = (*it)->Clone();
+		m_bot->spread = Independant::getSize_for_Direction((*CurrentGame).direction, m_bot->spread);
 		m_bot->setTarget(m_target);
 		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, IndependantType::Neutral);
 	}
