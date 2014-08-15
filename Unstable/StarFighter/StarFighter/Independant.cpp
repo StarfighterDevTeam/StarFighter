@@ -374,7 +374,7 @@ bool Independant::isPositionPastDistance_to_ScreenBorder(Directions direction, s
 	}
 }
 
-float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random, float margin_to_screen_border)
+float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random, sf::Vector2f margin_to_screen_border)
 {
 
 	float mid = 0;
@@ -403,8 +403,8 @@ float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool c
 		float pos = 0;
 		if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
 		{
-			float min_marker = margin_to_screen_border;
-			float max_marker = SCENE_SIZE_X - margin_to_screen_border;
+			float min_marker = margin_to_screen_border.x;
+			float max_marker = SCENE_SIZE_X - margin_to_screen_border.x;
 
 			pos = RandomizeFloatBetweenValues(sf::Vector2f(min_marker, max_marker));
 
@@ -412,8 +412,8 @@ float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool c
 		}
 		else if (direction == Directions::DIRECTION_RIGHT || direction == Directions::DIRECTION_LEFT)
 		{
-			float min_marker = margin_to_screen_border;
-			float max_marker = SCENE_SIZE_Y - margin_to_screen_border;
+			float min_marker = margin_to_screen_border.y;
+			float max_marker = SCENE_SIZE_Y - margin_to_screen_border.y;
 
 			pos = RandomizeFloatBetweenValues(sf::Vector2f(min_marker, max_marker));
 
@@ -488,7 +488,7 @@ sf::Vector2f Independant::getFirstSceneOffset(Directions direction)
 }
 
 sf::Vector2f Independant::getCoordinates_for_Spawn(bool first_scene, Directions direction, sf::Vector2f coordinates, bool outside_screen, bool centered, 
-	bool keep_perpendicular_axis, sf::Vector2f position, bool random, float margin_to_screen_border)
+	bool keep_perpendicular_axis, sf::Vector2f position, bool random, sf::Vector2f margin_to_screen_border)
 {
 	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X/2, SCENE_SIZE_Y/2);
 

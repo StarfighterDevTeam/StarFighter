@@ -43,8 +43,7 @@ public:
 	float Scene::getSceneBeastScore();
 	
 	Independant* bg;
-	//sf::Vector2i direction;
-	Directions direction_;
+	Directions direction;
 	bool generating_enemies;
 
 	int getSceneHazardBreakValue();

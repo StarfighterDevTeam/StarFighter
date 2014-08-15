@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 
 void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 {
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Scene");
+	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading scene '%s'", (char*)name.c_str()));
 	this->hazard_break_value = 0;
 	this->generating_enemies = false;
 
@@ -33,7 +33,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
-						this->direction_ = Directions::NO_DIRECTION;
+						this->direction = Directions::NO_DIRECTION;
 						bool hub = false;
 						
 						this->vspeed = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
@@ -44,22 +44,22 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 						{
 							if (!reverse_scene)
 							{
-								this->direction_ = Directions::DIRECTION_UP;
+								this->direction = Directions::DIRECTION_UP;
 							}
 							else
 							{
-								this->direction_ = Directions::DIRECTION_DOWN;
+								this->direction = Directions::DIRECTION_DOWN;
 							}
 						}
 						else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("H") == 0)
 						{
 							if (!reverse_scene)
 							{
-								this->direction_ = Directions::DIRECTION_RIGHT;
+								this->direction = Directions::DIRECTION_RIGHT;
 							}
 							else
 							{
-								this->direction_ = Directions::DIRECTION_LEFT;
+								this->direction = Directions::DIRECTION_LEFT;
 							}
 						}
 						else
@@ -67,16 +67,16 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 							if (!first_scene)
 							{
 								hub = true;
-								this->direction_ = (*CurrentGame).direction_;
+								this->direction = (*CurrentGame).direction;
 							}
 						}
 
-						sf::Vector2f pos = Independant::getCoordinates_for_Spawn(first_scene, this->direction_, sf::Vector2f(w / 2, h / 2), true, true);
-						sf::Vector2f speed = Independant::getSpeed_for_Scrolling(this->direction_, this->vspeed);
+						sf::Vector2f pos = Independant::getCoordinates_for_Spawn(first_scene, this->direction, sf::Vector2f(w / 2, h / 2), true, true);
+						sf::Vector2f speed = Independant::getSpeed_for_Scrolling(this->direction, this->vspeed);
 
 						if (hub)
 						{
-							this->direction_ = Directions::NO_DIRECTION;
+							this->direction = Directions::NO_DIRECTION;
 						}
 						this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h));
 						this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
@@ -103,7 +103,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
 					}
 					//printf("Hazard Break to reach: %d\n", hazard_break_value);
-					if (enemy_count != 0)
+					if (enemy_count != 0 && this->direction != Directions::NO_DIRECTION)
 					{
 						generating_enemies = true;
 					}
@@ -128,7 +128,7 @@ void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
-		//this->GenerateEnemies(deltaTime);
+		this->GenerateEnemies(deltaTime);
 	}
 
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
@@ -203,6 +203,9 @@ void Scene::GenerateEnemies(Time deltaTime)
 		if (size_y >= SCENE_SIZE_Y) size_y = SCENE_SIZE_Y - 1;
 
 		EnemyPool* generated_cluster = new EnemyPool(sf::Vector2f(rand() % (SCENE_SIZE_X - size_x), -size_y), nb_lines, nb_rows, xspread, yspread, cluster);
+
+		//sf::Vector2f pos = Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction, sf::Vector2f(xspread, yspread), true, false, false, sf::Vector2f(0, 0), true, sf::Vector2f(xspread, yspread));
+		//EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP
 		/*

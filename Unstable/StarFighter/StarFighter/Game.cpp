@@ -35,11 +35,6 @@ sf::RenderWindow* Game::getMainWindow()
 	return this->window;
 }
 
-void Game::SetScrollingDirection(sf::Vector2i m_direction)
-{
-	this->direction = m_direction;
-}
-
 void Game::SetPlayerShip(Ship* m_playerShip)
 {
 	this->playerShip = m_playerShip;
@@ -66,7 +61,6 @@ void Game::addToScene(Independant *object, int layer, IndependantType type)
 
 void Game::updateScene(Time deltaTime)
 {
-
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
 	//Collect & clean garbage
