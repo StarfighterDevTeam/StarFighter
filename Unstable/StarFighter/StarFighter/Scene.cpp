@@ -128,7 +128,7 @@ void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
-		this->GenerateEnemies(deltaTime);
+		//this->GenerateEnemies(deltaTime);
 	}
 
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event

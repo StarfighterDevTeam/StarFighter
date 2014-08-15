@@ -153,7 +153,7 @@ void InGameState::InGameStateMachineCheck()
 														this->nextScene->bg->setPosition(Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction, sf::Vector2f((wn / 2) - SCENE_SIZE_X, (hn / 2) - SCENE_SIZE_Y),
 															true, true));
 
-														this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, this->nextScene->vspeed, false);
+														this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling(this->nextScene->direction, this->nextScene->vspeed, false);
 
 														if (this->nextScene->direction == Directions::NO_DIRECTION)
 														{
