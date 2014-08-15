@@ -53,8 +53,9 @@ void Bot::update(sf::Time deltaTime)
 	//automatic fire
 	if (isOnScene && hasWeapon)
 	{
-		weapon->weaponOffset = sf::Vector2f((((this->m_size.x)/2) + (weapon->ammunition->m_size.x/2)), ((this->m_size.y)/2) - (weapon->ammunition->m_size.y/2 *weapon->fire_direction.y));
+		weapon->weaponOffset = sf::Vector2f((this->m_size.x / 2) + (weapon->ammunition->m_size.x / 2), (this->m_size.y / 2) - (weapon->ammunition->m_size.y / 2));
 		weapon->setPosition(this->getPosition().x, this->getPosition().y);
+
 		weapon->Fire(IndependantType::FriendlyFire);
 	}
 

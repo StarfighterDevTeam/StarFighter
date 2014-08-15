@@ -308,6 +308,14 @@ void Game::garbageLayer(LayerType m_layer)
 	}
 }
 
+void Game::SetLayerRotation(LayerType m_layer, float angle)
+{
+	for (std::list<Independant*>::iterator it = (this->sceneIndependantsLayered[m_layer])->begin(); it != (this->sceneIndependantsLayered[m_layer])->end(); it++)
+	{
+		(*it)->setRotation(angle);
+	}
+}
+
 bool Game::isLastEnemyDead()
 {
 	int n = 0;

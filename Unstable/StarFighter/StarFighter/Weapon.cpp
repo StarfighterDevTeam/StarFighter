@@ -24,21 +24,28 @@ Weapon::Weapon(Ammo* Ammunition)
 void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = this->ammunition->Clone();
-
-	bullet->setPosition(getPosition().x + offsetX + OffsetWeapon(dispersion+angle).x, getPosition().y  + OffsetWeapon(dispersion+angle).y);
+	
+	sf::Vector2i dir = Independant::getDirectionMultiplier((*CurrentGame).direction);
+	bullet->setPosition(getPosition().x + offsetX + this->fire_direction.x*(OffsetWeapon(dispersion + angle).x), getPosition().y + this->fire_direction.y*(OffsetWeapon(dispersion + angle).y));
 	//bullet->setPosition(getPosition().x + offsetX + OffsetWeapon(dispersion+angle).x, getPosition().y - ((bullet->m_size.y/2)*(fire_direction.y)) + OffsetWeapon(dispersion+angle).y);
 	//bullet->speed = sf::Vector2f(bullet->speed.x*(fire_direction.x),bullet->speed.y*(fire_direction.y));
 
+	bullet->speed = this->AngleShot(this->angle + dispersion, bullet->ref_speed);
 	
-	bullet->speed = this->AngleShot(this->angle + dispersion, bullet->ref_speed * fire_direction.y);
+	//bullet->speed.y *= this->fire_direction.y;
+	bullet->rotate(Independant::getRotation_for_Direction((*CurrentGame).direction));
+	bullet->rotate(this->angle + dispersion);
+
 	if (m_collider_type == IndependantType::FriendlyFire)
 	{
-		bullet->rotate(this->angle + dispersion);
+		bullet->speed = Independant::getSpeed_for_Direction((*CurrentGame).direction, bullet->speed, true);
 	}
 	else
 	{
-		bullet->rotate(this->angle + dispersion + 180);
+		bullet->speed = Independant::getSpeed_for_Direction((*CurrentGame).direction, bullet->speed, false);
+		bullet->rotate(180);
 	}
+
 	bullet->setVisible(true);
 	bullet->collider_type = m_collider_type;
 	bullet->isOnScene = true;
@@ -92,6 +99,14 @@ bool Weapon::isFiringReady()
 
 void Weapon::Fire(IndependantType m_collider_type)
 {
+	if (m_collider_type == IndependantType::FriendlyFire)
+	{
+		this->fire_direction = Independant::getFireDirection((*CurrentGame).direction, true);
+	}
+	else
+	{
+		this->fire_direction = Independant::getFireDirection((*CurrentGame).direction, false);
+	}
 	if (isFiringReady())
 	{
 		if (multishot > 1)
@@ -230,7 +245,7 @@ sf::Vector2f Weapon::OffsetWeapon(float angle)
 	//default values
 
 	float x = 0;
-	float y = - this->weaponOffset.x;
+	float y = - this->weaponOffset.y;
 	/*
 	if (angle >= -45.f && angle <= 45.f)
 	{

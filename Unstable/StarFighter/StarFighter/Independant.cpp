@@ -576,6 +576,26 @@ sf::Vector2f Independant::getSize_for_Direction(Directions direction, sf::Vector
 	}
 }
 
+sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vector2f size, bool player_side)
+{
+	float x = getSize_for_Direction(direction, size).x;
+	float y = getSize_for_Direction(direction, size).y;
+
+	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_RIGHT)
+	{
+		x *= -1;
+		y *= -1;
+	}
+
+	if (player_side)
+	{
+		x *= -1;
+		y *= -1;
+	}
+
+	return sf::Vector2f(x, y);
+}
+
 sf::Vector2i Independant::getFireDirection(Directions direction, bool player_side)
 {
 	int dirY = 1;

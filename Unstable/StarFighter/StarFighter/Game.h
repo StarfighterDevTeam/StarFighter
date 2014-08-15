@@ -42,6 +42,7 @@ public:
 	void cleanGarbage();
 	void collectGarbage();
 	void garbageLayer (LayerType m_layer);
+	void SetLayerRotation(LayerType m_layer, float angle);
 
 	bool isLastEnemyDead();
 	int getHazard();

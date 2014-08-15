@@ -142,7 +142,9 @@ public:
 	static sf::Vector2i getDirectionMultiplier(Directions direction);
 	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);
 	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed, bool player_side = false);
-	static sf::Vector2i Independant::getFireDirection(Directions direction, bool player_side);
+	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f size, bool player_side);
+	static sf::Vector2i getFireDirection(Directions direction, bool player_side);
+
 	static float Independant::getRotation_for_Direction(Directions direction);
 
 protected:

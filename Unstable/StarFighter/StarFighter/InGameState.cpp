@@ -163,6 +163,8 @@ void InGameState::InGameStateMachineCheck()
 														{
 															this->IG_State = InGameStateMachine::SCROLLING;
 															(*CurrentGame).playerShip->disable_fire = false;
+															(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+															(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 														}
 														//Wiping the previous background and swapping with the new one
 														this->currentScene->bg->GarbageMe = true;
@@ -172,10 +174,6 @@ void InGameState::InGameStateMachineCheck()
 														//Giving control back to the player
 														(*CurrentGame).playerShip->disable_inputs = false;
 														(*CurrentGame).playerShip->speed = sf::Vector2f(0, 0);
-														if ((*CurrentGame).direction != Directions::NO_DIRECTION)
-														{
-															(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
-														}
 													}
 
 													break;
