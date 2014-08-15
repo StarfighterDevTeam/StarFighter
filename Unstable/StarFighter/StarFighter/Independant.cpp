@@ -288,7 +288,7 @@ void Independant::GetGrazing()
 	//see overide function in class Ship
 }
 
-float Independant::getDistance_to_SceneBorder(Directions direction, sf::Vector2f coordinates, bool outside_screen)
+float Independant::getPosition_from_SceneBorderOffset(Directions direction, sf::Vector2f offset, bool outside_screen)
 {
 	int reverse = 0;
 	int opposite = 1;
@@ -307,13 +307,13 @@ float Independant::getDistance_to_SceneBorder(Directions direction, sf::Vector2f
 	if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
 	{
 		float y = 0;
-		y = (reverse * SCENE_SIZE_Y) - (opposite*coordinates.y);
+		y = (reverse * SCENE_SIZE_Y) - (opposite*offset.y);
 		return y;
 	}
 	else if (direction == Directions::DIRECTION_RIGHT || direction == Directions::DIRECTION_LEFT)
 	{
 		float x = 0;
-		x = (reverse * SCENE_SIZE_X) - (opposite*coordinates.x);
+		x = (reverse * SCENE_SIZE_X) - (opposite*offset.x);
 		return x;
 	}
 	else
@@ -323,37 +323,48 @@ float Independant::getDistance_to_SceneBorder(Directions direction, sf::Vector2f
 	}
 }
 
-bool isPositionPastDistance_to_ScreenBorder(Directions direction, sf::Vector2f coordinates, sf::Vector2f sprite_position, bool outside_screen, sf::Vector2f position)
+bool Independant::isPositionPastDistance_to_ScreenBorder(Directions direction, sf::Vector2f coordinates, sf::Vector2f sprite_position, bool outside_scene, bool player_side)
 {
 	float pos = 0;
 	float coor = 0;
+	int offset = 0;
+	int opposite = 1;
+
+	if (player_side)
+	{
+		opposite *= -1;
+	}
 
 	if (direction == Directions::DIRECTION_UP)
 	{
-		pos = position.y;
-		coor = Independant::getDistance_to_SceneBorder(direction, coordinates, outside_screen);
+		pos = opposite*sprite_position.y;
+		coor = opposite*Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene);
+		coor += offset*Independant::getFirstSceneOffset(direction).y;
 	}
 	else if (direction == Directions::DIRECTION_DOWN)
 	{
-		pos = -position.y;
-		coor = -Independant::getDistance_to_SceneBorder(direction, coordinates, outside_screen);
+		pos = opposite * (- sprite_position.y);
+		coor = opposite * (- Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene));
+		coor += offset*Independant::getFirstSceneOffset(direction).y;
 	}
 	else if (direction == Directions::DIRECTION_RIGHT)
 	{
-		pos = -position.x;
-		coor = -Independant::getDistance_to_SceneBorder(direction, coordinates, outside_screen);
+		pos = opposite * (- sprite_position.x);
+		coor = opposite * (- Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene));
+		coor += offset*Independant::getFirstSceneOffset(direction).x;
 	}
 	else if (direction == Directions::DIRECTION_LEFT)
 	{
-		pos = position.x;
-		coor = Independant::getDistance_to_SceneBorder(direction, coordinates, outside_screen);
+		pos = opposite * sprite_position.x;
+		coor = opposite * Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_scene);
+		coor += offset*Independant::getFirstSceneOffset(direction).x;
 	}
 	else
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error in Independant::isPositionPastDistance_to_ScreenBorder. Direction given in argument cannot be (0,0)\n");
 	}
 
-	if (pos > coor)
+	if (pos >= coor)
 	{
 		return true;
 	}
@@ -423,7 +434,7 @@ float Independant::getPosition_on_PerpendicularAxis(Directions direction, bool c
 	}
 }
 
-sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vspeed)// /!\ Direction up means the sprite is scrolling down
+sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vspeed, bool player_side)// /!\ Direction up means the sprite is scrolling down, unless it's playerside = true
 {
 	sf::Vector2f speed = sf::Vector2f(0, 0);
 
@@ -444,10 +455,15 @@ sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vsp
 		speed.x = vspeed;
 	}
 	
+	if (player_side)
+	{
+		speed.x *= -1;
+		speed.y *= -1;
+	}
 	return speed;
 }
 
-sf::Vector2f Independant::getFirstScreenOffset(Directions direction)
+sf::Vector2f Independant::getFirstSceneOffset(Directions direction)
 {
 	sf::Vector2f offset = sf::Vector2f(0, 0);
 
@@ -469,4 +485,65 @@ sf::Vector2f Independant::getFirstScreenOffset(Directions direction)
 	}
 
 	return offset;
+}
+
+sf::Vector2f Independant::getCoordinates_for_Spawn(bool first_scene, Directions direction, sf::Vector2f coordinates, bool outside_screen, bool centered, 
+	bool keep_perpendicular_axis, sf::Vector2f position, bool random, float margin_to_screen_border)
+{
+	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X/2, SCENE_SIZE_Y/2);
+
+	if (direction != Directions::NO_DIRECTION)
+	{
+		float x = Independant::getPosition_on_PerpendicularAxis(direction, centered, random, margin_to_screen_border);
+		float y = Independant::getPosition_from_SceneBorderOffset(direction, coordinates, outside_screen);
+
+		if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
+		{
+			pos = sf::Vector2f(x, y);
+			if (keep_perpendicular_axis)
+			{
+				pos.x = position.x;
+			}
+		}
+		else if (direction == Directions::DIRECTION_RIGHT || direction == Directions::DIRECTION_LEFT)
+		{
+			pos = sf::Vector2f(y, x);
+			if (keep_perpendicular_axis)
+			{
+				pos.y = position.y;
+			}
+		}
+
+		if (first_scene)
+		{
+			pos.x += Independant::getFirstSceneOffset(direction).x;
+			pos.y += Independant::getFirstSceneOffset(direction).y;
+		}
+	}
+	
+
+	return pos;
+}
+
+sf::Vector2f Independant::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position)
+{
+	sf::Vector2f speed = sf::Vector2f(0, 0);
+
+	sf::Vector2f future_pos = Independant::getCoordinates_for_Spawn(false, future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_Y_RATIO), (SCENE_SIZE_Y*STARTSCENE_Y_RATIO)), false, true);
+
+	if (current_direction == Directions::DIRECTION_UP || current_direction == Directions::DIRECTION_DOWN
+		|| future_direction == Directions::DIRECTION_UP || future_direction == Directions::DIRECTION_DOWN)
+	{
+		speed.x = vspeed * ((future_pos.x) - sprite_position.x) / SCENE_SIZE_Y;
+		speed.y = vspeed * ((future_pos.y) - sprite_position.y) / SCENE_SIZE_Y;
+	}
+
+	else if (current_direction == Directions::DIRECTION_RIGHT || current_direction == Directions::DIRECTION_LEFT
+		|| future_direction == Directions::DIRECTION_RIGHT || future_direction == Directions::DIRECTION_LEFT)
+	{
+		speed.x = vspeed * ((future_pos.x) - sprite_position.x) / SCENE_SIZE_X;
+		speed.y = vspeed * ((future_pos.y) - sprite_position.y) / SCENE_SIZE_X;
+	}
+
+	return speed;
 }

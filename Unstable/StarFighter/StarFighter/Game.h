@@ -48,6 +48,7 @@ public:
 	void resetHazard(int hazard_overkill = 0);
 	sf::Vector2f scale_factor;
 	sf::Vector2i direction;
+	Directions direction_;
 	void SetScrollingDirection(sf::Vector2i m_direction);
 
 	Ship* playerShip;

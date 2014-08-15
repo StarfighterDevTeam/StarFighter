@@ -33,7 +33,7 @@ enum Directions
 	DIRECTION_DOWN,
 	DIRECTION_RIGHT,
 	DIRECTION_LEFT,
-	NB_DIRECTIONS
+	NO_DIRECTION,
 };
 
 enum EnemyClass
@@ -73,7 +73,7 @@ public:
 	bool DontGarbageMe;
 	IndependantType collider_type;
 	void setVisible(bool visible);
-	virtual void damage_from (Independant& independant);
+	virtual void damage_from(Independant& independant);
 	sf::Vector2f m_size;
 	sf::Vector2f getIndependantSpeed();
 	int getIndependantDamage();
@@ -90,22 +90,22 @@ public:
 	int getMoney();
 	void addMoney(int loot_value);
 	void setMoney(int loot_value);
-	void get_money_from (Independant& independant);
-	void get_money_from (Independant& independant, int loot_value);
-	virtual void GetLoot (Independant& independant);
+	void get_money_from(Independant& independant);
+	void get_money_from(Independant& independant, int loot_value);
+	virtual void GetLoot(Independant& independant);
 
 	bool hasEquipmentLoot;
-	void get_equipment_from (Independant& independant);
-	void setEquipmentLoot (Equipment* equipment);
+	void get_equipment_from(Independant& independant);
+	void setEquipmentLoot(Equipment* equipment);
 	void releaseEquipmentLoot();
 	Equipment* getEquipmentLoot();
 
 	bool hasWeaponLoot;
-	void get_weapon_from (Independant& independant);
-	void setWeaponLoot (Weapon* weapon);
+	void get_weapon_from(Independant& independant);
+	void setWeaponLoot(Weapon* weapon);
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
-	virtual void CreateRandomLoot(float BeastScaleBonus=0);
+	virtual void CreateRandomLoot(float BeastScaleBonus = 0);
 
 	virtual void GetGrazing();
 	void Independant::GetPolarMovement(sf::Vector2f* np);
@@ -121,12 +121,25 @@ public:
 	std::string display_name;
 	bool transparent;
 
-	static float getDistance_to_SceneBorder(Directions direction, sf::Vector2f coordinates, bool outside_screen);
+	//TIPS:
+	// direction = the scene border you refer too
+	// offset = the (positive) distance to that border
+	// outside_screen = true if the sprite is on the outside (example: if direction is UP, if the sprite is northern than the border)
+	// player_side = true if the sprite is a playership
+	static float getPosition_from_SceneBorderOffset(Directions direction, sf::Vector2f offset, bool outside_screen);
+
 	static float getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random = false, float margin_to_screen_border = 0.f);
 
-	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
-	static sf::Vector2f getFirstScreenOffset(Directions direction);
-	static bool isPositionPastDistance_to_ScreenBorder(Directions direction, sf::Vector2f coordinates, sf::Vector2f sprite_position, bool outside_screen, sf::Vector2f position);
+	static sf::Vector2f getFirstSceneOffset(Directions direction);
+
+	static sf::Vector2f getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position);
+
+	static sf::Vector2f getCoordinates_for_Spawn(bool first_scene, Directions direction, sf::Vector2f coordinates, bool outside_screen, bool centered, 
+		bool keep_perpendicular_axis = false, sf::Vector2f position = sf::Vector2f(0, 0), bool random = false, float margin_to_screen_border = 0.f);
+
+	static bool isPositionPastDistance_to_ScreenBorder(Directions direction, sf::Vector2f coordinates, sf::Vector2f sprite_position, bool outside_scene, bool player_side = false);
+
+	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed, bool player_side = false);
 
 protected:
 	sf::Vector2f initial_position;

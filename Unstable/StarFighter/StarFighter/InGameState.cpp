@@ -8,9 +8,10 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).init(this->mainWindow);
 
 	this->nextScene = new Scene(player.m_currentSceneFile, player.reverse_scene, true);//allows to set the right direction for the first current scene
-	(*CurrentGame).SetScrollingDirection(this->nextScene->direction);
+	(*CurrentGame).direction_ = this->nextScene->direction_;
 	this->currentScene = new Scene(player.m_currentSceneFile, player.reverse_scene, true);//first_scene = true
-	if (this->currentScene->direction != sf::Vector2i(0, 0))
+	(*CurrentGame).direction_ = this->currentScene->direction_;
+	if ((*CurrentGame).direction_ != Directions::NO_DIRECTION)
 	{
 		this->IG_State = InGameStateMachine::SCROLLING;
 	}
@@ -19,9 +20,8 @@ void InGameState::Initialize(Player player)
 		this->IG_State = InGameStateMachine::HUB_ROAMING;
 	}
 
-	sf::Vector2f ship_pos = InGameState::StartingShipPosition(this->currentScene->direction);
+	sf::Vector2f ship_pos = Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction_, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_Y_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO), false, true);
 
-	
 	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
 	(*CurrentGame).SetPlayerShip(this->playerShip);
 
@@ -31,7 +31,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::Background);
 
 	//ship
-	
+
 	(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
 	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, IndependantType::PlayerShip);
@@ -77,166 +77,102 @@ void InGameState::InGameStateMachineCheck()
 	{
 	case InGameStateMachine::SCROLLING:
 	{
-										  if ((*CurrentGame).direction == sf::Vector2i(0, 1))
-										  {
-											  if (this->currentScene->bg->getPosition().y >= h / 2)
-											  {
-												  this->currentScene->bg->setPosition(sf::Vector2f(this->currentScene->bg->getPosition().x, h / 2));
-
-												  InGameState::Scrolling_to_LastScreen();
-												  if (this->currentScene->links[Directions::DIRECTION_UP].compare("0") != 0)
-												  {
-													  this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_UP], false, false);
-													  this->IG_State = InGameStateMachine::LAST_SCREEN;
-												  }
-
-											  }
-										  }
-										  else if ((*CurrentGame).direction == sf::Vector2i(0, -1))
-										  {
-											  if (this->currentScene->bg->getPosition().y <= (-h / 2) + SCENE_SIZE_Y)
-											  {
-												  this->currentScene->bg->setPosition(sf::Vector2f(this->currentScene->bg->getPosition().x, (-h / 2) + SCENE_SIZE_Y));
-
-												  InGameState::Scrolling_to_LastScreen();
-												  if (this->currentScene->links[Directions::DIRECTION_DOWN].compare("0") != 0)
-												  {
-													  this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_DOWN], true, false);
-													  this->IG_State = InGameStateMachine::LAST_SCREEN;
-												  }
-											  }
-										  }
-										  else if ((*CurrentGame).direction == sf::Vector2i(1, 0))
-										  {
-											  if (this->currentScene->bg->getPosition().x <= (-w / 2) + SCENE_SIZE_X)
-											  {
-												  this->currentScene->bg->setPosition(sf::Vector2f((-w / 2) + SCENE_SIZE_X, this->currentScene->bg->getPosition().y));
-
-												  InGameState::Scrolling_to_LastScreen();
-												  if (this->currentScene->links[Directions::DIRECTION_RIGHT].compare("0") != 0)
-												  {
-													  this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_RIGHT], false, false);
-													  this->IG_State = InGameStateMachine::LAST_SCREEN;
-												  }
-											  }
-										  }
-										  else if ((*CurrentGame).direction == sf::Vector2i(-1, 0))
-										  {
-											  if (this->currentScene->bg->getPosition().x >= w / 2)
-											  {
-												  this->currentScene->bg->setPosition(sf::Vector2f(w / 2, this->currentScene->bg->getPosition().y));
-
-												  InGameState::Scrolling_to_LastScreen();
-												  if (this->currentScene->links[Directions::DIRECTION_LEFT].compare("0") != 0)
-												  {
-													  this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_LEFT], true, false);
-													  this->IG_State = InGameStateMachine::LAST_SCREEN;
-												  }
-											  }
-										  }
-										  else if ((*CurrentGame).direction == sf::Vector2i(0, 0))
+										  //Scrolling until the background reaches its end
+										  if ((*CurrentGame).direction_ == Directions::NO_DIRECTION)
 										  {
 											  this->IG_State = InGameStateMachine::LAST_SCREEN;
 										  }
+										  else
+										  {
+											  if (Independant::isPositionPastDistance_to_ScreenBorder((*CurrentGame).direction_, sf::Vector2f(w / 2, h / 2), this->currentScene->bg->getPosition(),
+												  false))
+											  {
+												  //Correct the position
+												  this->currentScene->bg->setPosition(Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction_, sf::Vector2f(w / 2, h / 2), false, true));
+												  //Load next scene
+												  if (this->currentScene->links[(*CurrentGame).direction_].compare("0") != 0)
+												  {
+													  this->nextScene->LoadSceneFromFile(this->currentScene->links[(*CurrentGame).direction_], false, false);
+													  this->currentScene->bg->speed = sf::Vector2f(0, 0);
+													  this->currentScene->generating_enemies = false;
+
+													  this->IG_State = InGameStateMachine::LAST_SCREEN;
+												  }
+												  //else: do nothing. The game is likely to be ended.
+											  }
+										  }
+
 										  break;
 	}
 
 	case InGameStateMachine::LAST_SCREEN:
 	{
+											//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
 											if ((*CurrentGame).isLastEnemyDead())
 											{
-												InGameState::LastScreen_to_Transition();
+												//Putting the player on rails
+												(*CurrentGame).playerShip->disable_inputs = true;
+												(*CurrentGame).playerShip->disable_fire = true;
+												(*CurrentGame).playerShip->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction_, ENDSCENE_TRANSITION_SPEED_UP, true);
+
+												this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
 											}
 											break;
 
 	}
 	case InGameStateMachine::TRANSITION_PHASE1_2:
 	{
-													if ((*CurrentGame).direction == sf::Vector2i(0, 1))
+													//When the playership reaches the scene border, we can start the swapping of scenes, while replacing him on the right starting position for the next scene
+													if (Independant::isPositionPastDistance_to_ScreenBorder((*CurrentGame).direction_, sf::Vector2f(w_ / 2, h_ / 2), (*CurrentGame).playerShip->getPosition(), false, true))
 													{
-														if (this->playerShip->getPosition().y <= h_ / 2)
-														{
-															this->playerShip->setPosition(sf::Vector2f(this->playerShip->getPosition().x, h_ / 2));
+														//Correction of playership position
+														(*CurrentGame).playerShip->setPosition(Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction_, sf::Vector2f(w_ / 2, h_ / 2), false, true,
+															true, (*CurrentGame).playerShip->getPosition()));
 
-															this->playerShip->speed.x = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).x) - playerShip->getPosition().x) / SCENE_SIZE_Y;
-															this->playerShip->speed.y = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).y) - playerShip->getPosition().y) / SCENE_SIZE_Y;
-															InGameState::Transition1_2();
-														}
-													}
-													else if ((*CurrentGame).direction == sf::Vector2i(0, -1))
-													{
-														if (this->playerShip->getPosition().y >= SCENE_SIZE_Y - (h_ / 2))
-														{
-															this->playerShip->setPosition(sf::Vector2f(this->playerShip->getPosition().x, SCENE_SIZE_Y - (h_ / 2)));
+														(*CurrentGame).playerShip->speed = Independant::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).direction_, this->nextScene->direction_, ENDSCENE_TRANSITION_SPEED_DOWN,
+															(*CurrentGame).playerShip->getPosition());
 
-															this->playerShip->speed.x = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).x) - playerShip->getPosition().x) / SCENE_SIZE_Y;
-															this->playerShip->speed.y = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).y) - playerShip->getPosition().y) / SCENE_SIZE_Y;
-															InGameState::Transition1_2();
-														}
-													}
-													else if ((*CurrentGame).direction == sf::Vector2i(1, 0))
-													{
-														if (this->playerShip->getPosition().x >= SCENE_SIZE_X - (w_ / 2))
-														{
-															this->playerShip->setPosition(sf::Vector2f(SCENE_SIZE_X - (w_ / 2), this->playerShip->getPosition().y));
+														this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction_, ENDSCENE_TRANSITION_SPEED_DOWN, false);
+														this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction_, ENDSCENE_TRANSITION_SPEED_DOWN, false);
+														(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::Background);
+														(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
+														(*CurrentGame).garbageLayer(LayerType::BotLayer);
 
-															this->playerShip->speed.x = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).x) - playerShip->getPosition().x) / SCENE_SIZE_X;
-															this->playerShip->speed.y = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).y) - playerShip->getPosition().y) / SCENE_SIZE_X;
-															InGameState::Transition1_2();
-														}
+														this->IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
 													}
-													else if ((*CurrentGame).direction == sf::Vector2i(-1, 0))
-													{
-														if (this->playerShip->getPosition().x <= w_ / 2)
-														{
-															this->playerShip->setPosition(sf::Vector2f(w_ / 2, this->playerShip->getPosition().y));
-
-															this->playerShip->speed.x = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).x) - playerShip->getPosition().x) / SCENE_SIZE_X;
-															this->playerShip->speed.y = ENDSCENE_TRANSITION_SPEED_DOWN * ((StartingShipPosition(this->nextScene->direction).y) - playerShip->getPosition().y) / SCENE_SIZE_X;
-															InGameState::Transition1_2();
-														}
-													}
-													
 													break;
 	}
 
 	case InGameStateMachine::TRANSITION_PHASE2_2:
 	{
-													if ((*CurrentGame).direction == sf::Vector2i(0, 1))
+													//When the new scene is completely swapped, we can wrap up the replacement and restart scrolling (or do what the Hubs do if the scene is a Hub)
+													if (Independant::isPositionPastDistance_to_ScreenBorder((*CurrentGame).direction_, sf::Vector2f(SCENE_SIZE_X + (w / 2), SCENE_SIZE_Y + (h / 2)), this->currentScene->bg->getPosition(), false))
 													{
-														if (this->currentScene->bg->getPosition().y >= SCENE_SIZE_Y + (h / 2))
+														//Correction of the scenes position
+														this->currentScene->bg->setPosition(Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction_, sf::Vector2f(SCENE_SIZE_X + (w / 2), SCENE_SIZE_Y + (h / 2)), false, true));
+
+														this->nextScene->bg->setPosition(Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction_, sf::Vector2f((wn / 2) - SCENE_SIZE_X, (hn / 2) - SCENE_SIZE_Y),
+															true, true));
+
+														this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction_, this->nextScene->vspeed, false);
+
+														if (this->nextScene->direction_ == Directions::NO_DIRECTION)
 														{
-															this->currentScene->bg->setPosition(sf::Vector2f(this->currentScene->bg->getPosition().x, SCENE_SIZE_Y + (h / 2)));
-															this->nextScene->bg->setPosition(sf::Vector2f(this->nextScene->bg->getPosition().x, SCENE_SIZE_Y - (hn / 2)));
-															InGameState::Transition2_2();
+															this->IG_State = InGameStateMachine::HUB_ROAMING;
 														}
-													}
-													else if ((*CurrentGame).direction == sf::Vector2i(0, -1))
-													{
-														if (this->currentScene->bg->getPosition().y <= -h / 2)
+														else
 														{
-															this->currentScene->bg->setPosition(sf::Vector2f(this->currentScene->bg->getPosition().x, -h / 2));
-															this->nextScene->bg->setPosition(sf::Vector2f(this->nextScene->bg->getPosition().x, (hn / 2)));
-															InGameState::Transition2_2();
+															this->IG_State = InGameStateMachine::SCROLLING;
+															(*CurrentGame).playerShip->disable_fire = false;
 														}
-													}
-													else if ((*CurrentGame).direction == sf::Vector2i(1, 0))
-													{
-														if (this->currentScene->bg->getPosition().x <= -w / 2)
-														{
-															this->currentScene->bg->setPosition(sf::Vector2f(-w / 2, this->currentScene->bg->getPosition().y));
-															this->nextScene->bg->setPosition(sf::Vector2f((wn / 2), this->nextScene->bg->getPosition().y));
-															InGameState::Transition2_2();
-														}
-													}
-													else if ((*CurrentGame).direction == sf::Vector2i(-1, 0))
-													{
-														if (this->currentScene->bg->getPosition().x >= SCENE_SIZE_X + (w / 2))
-														{
-															this->currentScene->bg->setPosition(sf::Vector2f(SCENE_SIZE_X + (w / 2), this->currentScene->bg->getPosition().y));
-															this->nextScene->bg->setPosition(sf::Vector2f(SCENE_SIZE_X - (wn / 2), this->nextScene->bg->getPosition().y));
-															InGameState::Transition2_2();
-														}
+														//Wiping the previous background and swapping with the new one
+														this->currentScene->bg->GarbageMe = true;
+														*this->currentScene = *this->nextScene;
+														(*CurrentGame).direction_ = this->currentScene->direction_;
+
+														//Giving control back to the player
+														(*CurrentGame).playerShip->disable_inputs = false;
+														(*CurrentGame).playerShip->speed = sf::Vector2f(0, 0);
 													}
 
 													break;
@@ -263,36 +199,31 @@ void InGameState::InGameStateMachineCheck()
 												if (y<Y_min && timer.asSeconds() > HUB_EXIT_TIMER)
 												{
 													//go UP
-													printf("DEBUG: Travel UP !\n");
-													(*CurrentGame).SetScrollingDirection(sf::Vector2i(0, 1));
-													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_UP], false, false);
-													this->IG_State = InGameStateMachine::LAST_SCREEN;
+													(*CurrentGame).direction_ = Directions::DIRECTION_UP;
+
 												}
 
 												else if (y > Y_max && timer.asSeconds() > HUB_EXIT_TIMER)
 												{
 													//go DOWN
-													printf("DEBUG: Travel DOWN !\n");
-													(*CurrentGame).SetScrollingDirection(sf::Vector2i(0, -1));
-													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_DOWN], true, false);
+													(*CurrentGame).direction_ = Directions::DIRECTION_DOWN;
+													this->nextScene->LoadSceneFromFile(this->currentScene->links[(*CurrentGame).direction_], true, false);
 													this->IG_State = InGameStateMachine::LAST_SCREEN;
 												}
 
 												else if (x > X_max && timer.asSeconds() > HUB_EXIT_TIMER)
 												{
 													//go RIGHT
-													printf("DEBUG: Travel RIGHT !\n");
-													(*CurrentGame).SetScrollingDirection(sf::Vector2i(1, 0));
-													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_RIGHT], false, false);
+													(*CurrentGame).direction_ = Directions::DIRECTION_RIGHT;
+													this->nextScene->LoadSceneFromFile(this->currentScene->links[(*CurrentGame).direction_], false, false);
 													this->IG_State = InGameStateMachine::LAST_SCREEN;
 												}
 
 												else if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
 												{
 													//go LEFT
-													printf("DEBUG: Travel LEFT !\n");
-													(*CurrentGame).SetScrollingDirection(sf::Vector2i(-1, 0));
-													this->nextScene->LoadSceneFromFile(this->currentScene->links[Directions::DIRECTION_LEFT], true, false);
+													(*CurrentGame).direction_ = Directions::DIRECTION_LEFT;
+													this->nextScene->LoadSceneFromFile(this->currentScene->links[(*CurrentGame).direction_], true, false);
 													this->IG_State = InGameStateMachine::LAST_SCREEN;
 												}
 											}
@@ -305,88 +236,4 @@ void InGameState::InGameStateMachineCheck()
 			   break;
 	}
 	}
-}
-
-void InGameState::Scrolling_to_LastScreen()
-{
-	this->currentScene->bg->speed = sf::Vector2f(0, 0);
-	this->currentScene->generating_enemies = false;
-}
-
-void InGameState::LastScreen_to_Transition()
-{
-	this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
-
-	this->playerShip->disable_inputs = true;
-	this->playerShip->disable_fire = true;
-
-	this->playerShip->speed.x = (*CurrentGame).direction.x * ENDSCENE_TRANSITION_SPEED_UP;
-	this->playerShip->speed.y = -(*CurrentGame).direction.y * ENDSCENE_TRANSITION_SPEED_UP;
-}
-
-void InGameState::Transition1_2()
-{
-	this->IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
-	this->currentScene->bg->speed.x = -(*CurrentGame).direction.x * ENDSCENE_TRANSITION_SPEED_DOWN;
-	this->currentScene->bg->speed.y = (*CurrentGame).direction.y * ENDSCENE_TRANSITION_SPEED_DOWN;
-	this->nextScene->bg->speed.x = -(*CurrentGame).direction.x * ENDSCENE_TRANSITION_SPEED_DOWN;
-	this->nextScene->bg->speed.y = (*CurrentGame).direction.y * ENDSCENE_TRANSITION_SPEED_DOWN;
-	(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::Background);
-	(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
-	/*if (this->nextScene->direction != sf::Vector2i(0, 0))
-	{
-	(*CurrentGame).SetScrollingDirection(this->nextScene->direction);
-	}
-	*/
-}
-
-void InGameState::Transition2_2()
-{
-	this->currentScene->bg->GarbageMe = true;
-	this->nextScene->bg->speed.x = - this->nextScene->direction.x * this->nextScene->vspeed;
-	this->nextScene->bg->speed.y = this->nextScene->direction.y * this->nextScene->vspeed;
-	this->playerShip->disable_inputs = false;
-	this->playerShip->speed = sf::Vector2f(0, 0);
-	if (this->nextScene->direction == sf::Vector2i(0, 0))
-	{
-		this->IG_State = InGameStateMachine::HUB_ROAMING;
-	}
-	else
-	{
-		this->IG_State = InGameStateMachine::SCROLLING;
-		this->playerShip->disable_fire = false;
-	}
-	*this->currentScene = *this->nextScene;
-	(*CurrentGame).SetScrollingDirection(this->currentScene->direction);
-}
-
-sf::Vector2f InGameState::StartingShipPosition(sf::Vector2i direction)
-{
-	sf::Vector2f pos = sf::Vector2f((SCENE_SIZE_X / 2), (SCENE_SIZE_Y / 2));
-
-	if (direction == sf::Vector2i(0, 1))
-	{
-		pos.x = STARTSCENE_X_RATIO*SCENE_SIZE_X;
-		pos.y = STARTSCENE_Y_RATIO*SCENE_SIZE_Y;
-	}
-
-	else if (direction == sf::Vector2i(0, -1))
-	{
-		pos.x = STARTSCENE_X_RATIO*SCENE_SIZE_X;
-		pos.y = (1 - STARTSCENE_Y_RATIO)*SCENE_SIZE_Y;
-
-	}
-	else if (direction == sf::Vector2i(1, 0))
-	{
-		pos.x = (1 - STARTSCENE_Y_RATIO)*SCENE_SIZE_X;
-		pos.y = STARTSCENE_X_RATIO*SCENE_SIZE_Y;
-
-	}
-	else if (direction == sf::Vector2i(-1, 0))
-	{
-		pos.x = STARTSCENE_Y_RATIO*SCENE_SIZE_X;
-		pos.y = STARTSCENE_X_RATIO*SCENE_SIZE_Y;
-	}
-
-	return pos;
 }

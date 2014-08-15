@@ -8,7 +8,6 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Scene");
 	this->hazard_break_value = 0;
 	this->generating_enemies = false;
-	this->direction = sf::Vector2i(0, 0);
 
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
@@ -34,79 +33,52 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
-						float vspeed_ = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
-						this->vspeed = vspeed_;
-
+						this->direction_ = Directions::NO_DIRECTION;
+						bool hub = false;
+						
+						this->vspeed = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
 						float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
 						float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
-
-						sf::Vector2f speed = sf::Vector2f(0, 0);
-						this->direction = sf::Vector2i(0, 0);
 
 						if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("V") == 0)
 						{
 							if (!reverse_scene)
 							{
-								speed = sf::Vector2f(0, vspeed_);
-								this->direction = sf::Vector2i(0, 1);
+								this->direction_ = Directions::DIRECTION_UP;
 							}
 							else
 							{
-								speed = sf::Vector2f(0, -vspeed_);
-								this->direction = sf::Vector2i(0, -1);
+								this->direction_ = Directions::DIRECTION_DOWN;
 							}
 						}
 						else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("H") == 0)
 						{
 							if (!reverse_scene)
 							{
-								speed = sf::Vector2f(-vspeed_, 0);
-								this->direction = sf::Vector2i(1, 0);
+								this->direction_ = Directions::DIRECTION_RIGHT;
 							}
 							else
 							{
-								speed = sf::Vector2f(vspeed_, 0);
-								this->direction = sf::Vector2i(-1, 0);
+								this->direction_ = Directions::DIRECTION_LEFT;
+							}
+						}
+						else
+						{
+							if (!first_scene)
+							{
+								hub = true;
+								this->direction_ = (*CurrentGame).direction_;
 							}
 						}
 
-						sf::Vector2f pos = sf::Vector2f(w/2,h/2);
+						sf::Vector2f pos = Independant::getCoordinates_for_Spawn(first_scene, this->direction_, sf::Vector2f(w / 2, h / 2), true, true);
+						sf::Vector2f speed = Independant::getSpeed_for_Scrolling(this->direction_, this->vspeed);
 
-						if ((*CurrentGame).direction == sf::Vector2i(0, 1))
+						if (hub)
 						{
-							pos = sf::Vector2f(w / 2, -h / 2);
-							if (first_scene)
-							{
-								pos.y += SCENE_SIZE_Y;
-							}
-
+							this->direction_ = Directions::NO_DIRECTION;
 						}
-						else if ((*CurrentGame).direction == sf::Vector2i(0, -1))
-						{
-							pos = sf::Vector2f(w / 2, (h / 2) + SCENE_SIZE_Y);
-							if (first_scene)
-							{
-								pos.y -= SCENE_SIZE_Y;
-							}
-						}
-						else if ((*CurrentGame).direction == sf::Vector2i(1, 0))
-						{
-							pos = sf::Vector2f((w / 2) + SCENE_SIZE_X, (h/2));
-							if (first_scene)
-							{
-								pos.x -= SCENE_SIZE_X;
-							}
-						}
-						else if ((*CurrentGame).direction == sf::Vector2i(-1, 0))
-						{
-							pos = sf::Vector2f((-w / 2), h / 2);
-							if (first_scene)
-							{
-								pos.x += SCENE_SIZE_X;
-							}
-						}
-
-						this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], Vector2f(w, h));
+						this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h));
 						this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
 						this->bg->setVisible(true);
 						this->bg->isOnScene = true;
@@ -163,11 +135,6 @@ void Scene::Update(Time deltaTime)
 	{
 		HazardBreakEvent();
 	}
-}
-
-Ship* Scene::GetPlayerShip()
-{
-	return this->playerShip;
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
@@ -263,185 +230,6 @@ void Scene::GenerateEnemies(Time deltaTime)
 		}
 		}
 		*/
-	}
-}
-/*
-void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN)
-{
-if (!phaseShifter[SceneBooleans::ENDSCENE_PHASE1] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && bg->getPosition().y > 0)
-{
-bg->setPosition(sf::Vector2f(0, 0));
-
-bg->speed.y = 0;
-hub->speed.y = 0;
-
-phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = true;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
-//to do better:
-hub->setPosition(sf::Vector2f(bg->getPosition().x,bg->getPosition().y - SCENE_SIZE_Y));
-
-}
-
-//end scene Phase 2: scene is cleared, the player is set on rails towards the top of the screen
-if (phaseShifter[SceneBooleans::ENDSCENE_PHASE1] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE2] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && (*CurrentGame).isLastEnemyDead())
-{
-playerShip->disable_inputs = true;
-playerShip->disable_fire = true;
-playerShip->speed.x = 0;
-playerShip->speed.y = -transition_UP;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = true;//speed of translation towards UP
-}
-
-//end scene Phase 3: the playership reached the top of the screen, now background and HUB are switching
-if (phaseShifter[SceneBooleans::ENDSCENE_PHASE2] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE3] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && playerShip->getPosition().y < playerShip->ship_config.size.y) //playership reaches the top of the screen
-{
-bg->speed.y = transition_DOWN;
-hub->speed.y = transition_DOWN;
-
-playerShip->setPosition(playerShip->getPosition().x, playerShip->ship_config.size.y);
-
-//center the player at the required speed i.e. proportionally to the speed at which the background fades out
-playerShip->speed.x = transition_DOWN * ((SCENE_SIZE_X/2) - playerShip->getPosition().x) / SCENE_SIZE_Y;
-playerShip->speed.y = transition_DOWN * ((SCENE_SIZE_Y/2) - playerShip->getPosition().y) / SCENE_SIZE_Y;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = true;
-}
-
-//end scene Phase 4: the HUB is now full screen, the players are given back the control of their ship
-if (phaseShifter[SceneBooleans::ENDSCENE_PHASE3] && !phaseShifter[SceneBooleans::ENDSCENE_PHASE4] && hub->getPosition().y > 0)
-{
-hub->speed.y = 0;
-bg->speed.y = 0;
-hub->setPosition(sf::Vector2f(0,0));
-
-playerShip->disable_inputs = false;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = true;
-//printf("hub pos: %f / %f \n", hubClone->getPosition().x, hubClone->getPosition().y);
-}
-}
-
-void Scene::hubRoaming()
-{
-if (phaseShifter[SceneBooleans::ENDSCENE_PHASE4])
-{
-float x = playerShip->getPosition().x;
-float y = playerShip->getPosition().y;
-
-float X_min = SCENE_SIZE_X*HUB_EXIT_X_MIN_RATIO;
-float X_max = SCENE_SIZE_X*HUB_EXIT_X_MAX_RATIO;
-float Y_min = SCENE_SIZE_Y*HUB_EXIT_Y_MIN_RATIO;
-float Y_max = SCENE_SIZE_Y*HUB_EXIT_Y_MAX_RATIO;
-
-if ((x > X_min && x < X_max && y > Y_min && y < Y_max) || (x<X_min && y<Y_min) || (x<X_min && y >Y_max) || (x>X_max && y >Y_max) || (x>X_max && y <Y_min))
-{
-clockHubExit.restart();
-this->transitionDestination = TransitionList::NO_TRANSITION;
-}
-else
-{
-sf::Time timer = clockHubExit.getElapsedTime();
-
-if (y<Y_min && timer.asSeconds() > HUB_EXIT_TIMER)
-{
-//go UP
-printf("DEBUG: Travel UP !\n");
-this->transitionDestination = TransitionList::TRANSITION_UP;
-bg->setPosition(sf::Vector2f(hub->getPosition().x,hub->getPosition().y - bg->m_size.y - SCENE_SIZE_Y));
-
-phaseShifter[SceneBooleans::ENDSCENE_PHASE1] = false;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE2] = false;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE3] = false;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE4] = false;
-phaseShifter[SceneBooleans::EXITHUB_PHASE1] = true;
-
-}
-
-if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
-{
-//go LEFT
-printf("DEBUG: Travel LEFT !\n");
-this->transitionDestination = TransitionList::TRANSITION_LEFT;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
-}
-
-if (x>X_max && timer.asSeconds() > HUB_EXIT_TIMER)
-{
-//go RIGHT
-printf("DEBUG: Travel RIGHT !\n");
-this->transitionDestination = TransitionList::TRANSITION_RIGHT;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
-}
-
-if (y>Y_max && timer.asSeconds() > HUB_EXIT_TIMER)
-{
-//go DOWN
-printf("DEBUG: Travel DOWN !\n");
-this->transitionDestination = TransitionList::TRANSITION_DOWN;
-phaseShifter[SceneBooleans::ENDSCENE_PHASE4]=false;
-}
-}
-}
-}
-
-void Scene::ExitHubTransition (float transition_speed_UP, float transition_speed_DOWN)
-{
-if (phaseShifter[SceneBooleans::EXITHUB_PHASE1] && !phaseShifter[SceneBooleans::EXITHUB_PHASE2])
-{
-playerShip->disable_inputs = true;
-playerShip->speed.x = 0;
-playerShip->speed.y = - transition_speed_UP;
-phaseShifter[SceneBooleans::EXITHUB_PHASE1] = false;
-phaseShifter[SceneBooleans::EXITHUB_PHASE2] = true;
-phaseShifter[SceneBooleans::EXITHUB_PHASE3] = false;
-
-}
-
-if (!phaseShifter[SceneBooleans::EXITHUB_PHASE1] && phaseShifter[SceneBooleans::EXITHUB_PHASE2] && !phaseShifter[SceneBooleans::EXITHUB_PHASE3] && playerShip->getPosition().y < playerShip->ship_config.size.y)
-{
-playerShip->setPosition(playerShip->getPosition().x, playerShip->ship_config.size.y);
-
-bg->setPosition(0, - bg->m_size.y);
-bg->speed.y = transition_speed_DOWN;
-hub->speed.y = transition_speed_DOWN;
-//playerShip->speed.x = transition_speed_DOWN * ((SCENE_SIZE_X*STARTSCENE_X_RATIO) - playerShip->getPosition().x) / SCENE_SIZE_Y;
-playerShip->speed.y = transition_speed_DOWN * ((SCENE_SIZE_Y*STARTSCENE_Y_RATIO) - playerShip->getPosition().y) / SCENE_SIZE_Y;
-phaseShifter[SceneBooleans::EXITHUB_PHASE2] = false;
-phaseShifter[SceneBooleans::EXITHUB_PHASE3] = true;
-}
-
-if (!phaseShifter[SceneBooleans::EXITHUB_PHASE2] && phaseShifter[SceneBooleans::EXITHUB_PHASE3] && bg->getPosition().y > - bg->m_size.y + SCENE_SIZE_Y)
-{
-bg->setPosition(0, - bg->m_size.y + SCENE_SIZE_Y);
-bg->speed.y = vspeed;
-hub->speed.y = vspeed;
-phaseShifter[SceneBooleans::EXITHUB_PHASE3] = false;
-playerShip->speed.x = 0;
-playerShip->speed.y = 0;
-playerShip->disable_inputs = false;
-playerShip->disable_fire = false;
-}
-}
-*/
-bool Scene::getPhaseShifter(int index)
-{
-	if (index < SceneBooleans::NBVAL_SceneBooleans)
-		return phaseShifter[index];
-	else
-	{
-		printf("\n/!\ERROR: trying to access a Scene Boolean index that does not exist...\n");
-		return false;
-	}
-
-}
-
-void Scene::setPhaseShifter(int index, bool b)
-{
-	if (index < SceneBooleans::NBVAL_SceneBooleans)
-		phaseShifter[index] = b;
-	else
-	{
-		printf("\n/!\ERROR: trying to write in a Scene Boolean index that does not exist...\n");
 	}
 }
 
