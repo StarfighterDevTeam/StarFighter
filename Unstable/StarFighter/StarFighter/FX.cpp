@@ -4,8 +4,7 @@ extern Game* CurrentGame;
 
 FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration) : Independant(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), m_frameNumber)
 {
-	exploding = true;
-	deltaClockExploding.restart();
+	//deltaClockExploding.restart();
 	duration = m_duration;
 	visible = true;
 	isOnScene = true;
@@ -20,11 +19,6 @@ void FX::update(sf::Time deltaTime)
 	//if (deltaClockExploding.getElapsedTime() > duration)
 	if (deltaClockExploding.getElapsedTime() > sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES*this->frameNumber)) 
 		// la duration ne sert à rien pour les explosions : on veut toujours 0,2sec x le nombre de frames. ça évite donc d'avoir à renseigner une duration correcte dans FX.csv
-	{
-		exploding = false;
-	}
-
-	if (!exploding)
 	{
 		this->setVisible(false);
 		this->isOnScene = false;

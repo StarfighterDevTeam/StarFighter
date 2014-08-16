@@ -31,7 +31,6 @@ public:
 
 private:
 	sf::Clock deltaClockExploding;
-	bool exploding;
 	sf::Time duration;
 };
 
