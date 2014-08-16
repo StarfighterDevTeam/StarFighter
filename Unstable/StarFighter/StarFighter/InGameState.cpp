@@ -169,6 +169,7 @@ void InGameState::InGameStateMachineCheck()
 														}
 														//Wiping the previous background and swapping with the new one
 														this->currentScene->bg->GarbageMe = true;
+														(*CurrentGame).resetHazard();
 														*this->currentScene = *this->nextScene;
 														(*CurrentGame).direction = this->currentScene->direction;
 

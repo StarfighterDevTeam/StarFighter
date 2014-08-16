@@ -1,5 +1,5 @@
 #,filename,display name,width,height,vspeed,Vertical/Horizontal
 bg,Assets/2D/background.png,V_scene_1,800,1800,200,V
 #,enemies_name,probability,pool_size,enemy_class,,
-enemy,robert,2,20,1,,
-enemy,roger,3,20,1,,
+enemy,robert,2,2,1,,
+enemy,roger,3,1,1,,

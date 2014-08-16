@@ -122,13 +122,13 @@ void PlayerHud::Update(sf::RenderWindow* window, int m_armor, int m_shield, int 
 	//hazard break
 	if (m_hazard_break_value != 0)
 	{
+		no_hazard_value = false;
 		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, (m_hazard_score*HAZARD_BAR_SIZE_Y) / m_hazard_break_value));
 	}
 		
 	else
 	{
 		no_hazard_value = true;
-		printf("DEBUG: <error> HazardBar cannot be computed because hazard break value = 0)\n");
 	}
 		
 

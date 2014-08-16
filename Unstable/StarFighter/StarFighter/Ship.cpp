@@ -598,10 +598,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->movingX = movingY = false;
 	this->visible = true;
 	this->damage = 0;
-	this->armor = 1;
 	this->shield = 0;
-	this->shield_max = 0;
-	this->shield_regen = 0;
 	this->disable_inputs = false;
 	this->disable_fire = false;
 	this->graze_count = 0;
@@ -610,6 +607,8 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/Aura_BlueGlow.png", sf::Vector2f(50, 50), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/Aura_WhiteGlow.png", sf::Vector2f(50, 50), 3);
 	this->key_repeat = false;
+	
+	this->Init();
 }
 
 void Ship::Init()

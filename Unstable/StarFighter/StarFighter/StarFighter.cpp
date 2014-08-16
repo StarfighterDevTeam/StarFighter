@@ -48,7 +48,6 @@ int main()
 	//Initializing player
 	Player player;
 	player.Init(&renderWindow);
-	//player.m_currentSceneFile = "Assets/Scripts/Scenes/scene1.csv";
 	player.m_currentSceneFile = "scene1";
 
 	//Loading InGame state
@@ -89,7 +88,7 @@ int main()
 
 		//Draw
 		gameManager.GetCurrentState()->Draw();
-		sfgui.Display(renderWindow);
+		//sfgui.Display(renderWindow);
 
 		//Diplay
 		renderWindow.display();

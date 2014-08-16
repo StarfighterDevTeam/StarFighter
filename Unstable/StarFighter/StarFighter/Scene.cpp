@@ -131,7 +131,6 @@ void Scene::Update(Time deltaTime)
 	{
 		this->GenerateEnemies(deltaTime);
 	}
-
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
 	{
 		HazardBreakEvent();
@@ -244,7 +243,9 @@ void Scene::HazardBreakEvent()
 	printf("DEBUG: HAZARD BREAK!!!\n");
 	hazard_break_value *= (1 + HAZARD_BREAK_MULTIPLIER);
 	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS - 1)
+	{
 		hazard_level++;
+	}
 }
 
 float Scene::getSceneBeastScore()
