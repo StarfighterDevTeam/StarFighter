@@ -139,9 +139,8 @@ public:
 	static sf::Vector2i getDirectionMultiplier(Directions direction);
 	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);
 	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
-	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f size, bool player_side);
-	static sf::Vector2i getFireDirection(Directions direction, bool player_side);
-
+	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f speed);
+	
 	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position);
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	void setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);

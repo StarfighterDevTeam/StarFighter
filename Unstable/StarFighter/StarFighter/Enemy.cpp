@@ -29,8 +29,10 @@ void Enemy::update(sf::Time deltaTime)
 	//automatic fire
 	if(isOnScene & hasWeapon)
 	{
-		weapon->weaponOffset = sf::Vector2f((this->m_size.x / 2) + (weapon->ammunition->m_size.x / 2), (this->m_size.y / 2) - (weapon->ammunition->m_size.y / 2));
-		weapon->setPosition(this->getPosition().x, this->getPosition().y);
+		weapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).x,
+			(this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).y);
+
+		weapon->setPosition(this->getPosition().x + weapon->weaponOffset.x, this->getPosition().y + weapon->weaponOffset.y);
 
 		weapon->Fire(IndependantType::EnemyFire);
 
@@ -86,7 +88,6 @@ void Enemy::GenerateLoot()
 
 	if (this->hasWeaponLoot)
 	{
-		
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getWeaponLoot()->textureName, sf::Vector2f(this->getWeaponLoot()->size.x, this->getWeaponLoot()->size.y), this->getWeaponLoot()->display_name);
 		new_loot->get_weapon_from(*this);
 		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);

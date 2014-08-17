@@ -367,48 +367,29 @@ sf::Vector2f Independant::getSize_for_Direction(Directions direction, sf::Vector
 	}
 }
 
-sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vector2f size, bool player_side)
+sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vector2f speed)
 {
-	float x = getSize_for_Direction(direction, size).x;
-	float y = getSize_for_Direction(direction, size).y;
+	speed = Independant::getSize_for_Direction(direction, sf::Vector2f(speed.x, speed.y));
 
-	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_RIGHT)
+	if (direction == DIRECTION_DOWN)
 	{
-		x *= -1;
-		y *= -1;
+		speed.x = - speed.x;
+		speed.y = - speed.y;
 	}
 
-	if (player_side)
+	if (direction == DIRECTION_RIGHT)
 	{
-		x *= -1;
-		y *= -1;
+		speed.x =  speed.x;
+		speed.y = - speed.y;
 	}
 
-	return sf::Vector2f(x, y);
-}
-
-sf::Vector2i Independant::getFireDirection(Directions direction, bool player_side)
-{
-	int dirY = 1;
-	int dirX = 0;
-
-	if (player_side)
+	if (direction == DIRECTION_LEFT)
 	{
-		dirY *= -1;
+		speed.x = -speed.x;
+		speed.y = speed.y;
 	}
 
-	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_LEFT)
-	{
-		dirY *= -1;
-	}
-
-	if (direction == Directions::DIRECTION_RIGHT)
-	{
-		dirX = -dirY;
-		dirY = 0;
-	}
-
-	return sf::Vector2i(dirX, dirY);
+	return sf::Vector2f(speed.x, speed.y);
 }
 
 float Independant::getRotation_for_Direction(Directions direction)

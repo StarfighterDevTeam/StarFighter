@@ -54,7 +54,8 @@ public:
 	float rafale_cooldown;
 
 	sf::Vector2f weaponOffset;
-
+	
+	sf::Vector2i getFireDirection_for_Direction (Directions direction);
 	sf::Vector2f OffsetWeapon(float angle);
 	void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	void Weapon::AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
