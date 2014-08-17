@@ -62,8 +62,6 @@ private:
 	int hazard_level;
 
 	sf::Clock clockHubExit;
-	sf::Vector2f ApplyScrollingDirectionOnPosition(sf::Vector2f position);
-	sf::Vector2f ApplyScrollingDirectionOnSpeed(float vspeed);
 
 	void HazardBreakEvent();
 };

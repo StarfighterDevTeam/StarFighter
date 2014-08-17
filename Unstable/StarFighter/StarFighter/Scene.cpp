@@ -142,11 +142,10 @@ void Scene::Update(Time deltaTime)
 	{
 		this->GenerateEnemies(deltaTime);
 	}
-	if ((*CurrentGame).getHazard() > hazard_break_value - 1)//hazard break event
+	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0)
 	{
 		HazardBreakEvent();
 	}
-	
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
@@ -211,8 +210,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 			cluster->push_back(e);
 		}
 		
-		sf::Vector2f size = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(((nb_rows - 1) * xspread) + (max_enemy_size.x / 2), ((nb_lines - 1) * yspread) + (max_enemy_size.y / 2)));
-		float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(max_enemy_size.x, SCENE_SIZE_X - size.x));
+		sf::Vector2f size = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y));
+		float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(max_enemy_size.x / 2, SCENE_SIZE_X - size.x - (max_enemy_size.x / 2)));
 
 		sf::Vector2f pos = Independant::getPosition_for_Direction((*CurrentGame).direction, sf::Vector2f(random_posX, - (size.y / 2)));
 
@@ -275,64 +274,6 @@ float Scene::getSceneBeastScore()
 
 	return bonus;
 }
-/*
-sf::Vector2f Scene::ApplyScrollingDirectionOnPosition(sf::Vector2f position)
-{
-	float x = position.x;
-	float y = position.y;
-
-	if (scrolling_direction.y == -1)
-	{
-		x = position.x;
-		y = SCENE_SIZE_Y - position.y;
-	}
-
-	if (scrolling_direction.y == 0)
-	{
-		if (scrolling_direction.x == 1)
-		{
-			x = (SCENE_SIZE_Y - position.y) * SCENE_SIZE_X / SCENE_SIZE_Y;
-			y = position.x * SCENE_SIZE_Y / SCENE_SIZE_X;
-		}
-		if (scrolling_direction.x == -1)
-		{
-			x = SCENE_SIZE_X - ((SCENE_SIZE_Y - position.y) * SCENE_SIZE_X / SCENE_SIZE_Y);
-			y = position.x * SCENE_SIZE_Y / SCENE_SIZE_X;
-		}
-	}
-
-	return sf::Vector2f(x, y);
-}
-
-sf::Vector2f Scene::ApplyScrollingDirectionOnSpeed(float vspeed)
-{
-	float x = 0;
-	float y = vspeed;
-
-	if (scrolling_direction.y == -1)
-	{
-		x = 0;
-		y *= (-1);
-	}
-
-
-	if (scrolling_direction.y == 0)
-	{
-		if (scrolling_direction.x == 1)
-		{
-			x = -vspeed;
-			y = 0;
-		}
-		if (scrolling_direction.x == -1)
-		{
-			x = vspeed;
-			y = 0;
-		}
-	}
-
-	return sf::Vector2f(x, y);
-}
-*/
 
 int Scene::getSceneHazardBreakValue()
 {
