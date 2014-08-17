@@ -36,6 +36,13 @@ enum Directions
 	NO_DIRECTION,
 };
 
+enum FloatCompare
+{
+	LESSER_THAN,
+	EQUAL_TO,
+	GREATHER_THAN,
+};
+
 enum EnemyClass
 {
 	ENEMYPOOL_VOID,//0
@@ -126,24 +133,18 @@ public:
 	// offset = the (positive) distance to that border
 	// outside_screen = true if the sprite is on the outside (example: if direction is UP, if the sprite is northern than the border)
 	// player_side = true if the sprite is a playership
-	static float getPosition_from_SceneBorderOffset(Directions direction, sf::Vector2f offset, bool outside_screen);
-
-	static float getPosition_on_PerpendicularAxis(Directions direction, bool centered, bool random = false, sf::Vector2f left_margin_to_screen_border = sf::Vector2f(0, 0), sf::Vector2f right_margin_to_screen_border = sf::Vector2f(0, 0));
-
-	static sf::Vector2f getFirstSceneOffset(Directions direction);
 
 	static sf::Vector2f getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position);
 
-	static sf::Vector2f getCoordinates_for_Spawn(bool first_scene, Directions direction, sf::Vector2f coordinates, bool outside_screen, bool centered, 
-		bool keep_perpendicular_axis = false, sf::Vector2f position = sf::Vector2f(0, 0), bool random = false, sf::Vector2f left_margin_to_screen_border = sf::Vector2f(0, 0), sf::Vector2f right_margin_to_screen_border = sf::Vector2f(0, 0));
-
-	static bool isPositionPastDistance_to_ScreenBorder(Directions direction, sf::Vector2f coordinates, sf::Vector2f sprite_position, bool outside_scene, bool player_side = false);
-
 	static sf::Vector2i getDirectionMultiplier(Directions direction);
 	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);
-	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed, bool player_side = false);
+	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
 	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f size, bool player_side);
 	static sf::Vector2i getFireDirection(Directions direction, bool player_side);
+
+	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position);
+	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
+	void setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
 
 	static float Independant::getRotation_for_Direction(Directions direction);
 

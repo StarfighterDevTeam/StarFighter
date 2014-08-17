@@ -82,7 +82,7 @@ void Enemy::Death()
 
 void Enemy::GenerateLoot()
 {
-	sf::Vector2f speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, LOOT_SPEED_Y, false);
+	sf::Vector2f speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, LOOT_SPEED_Y);
 
 	if (this->hasWeaponLoot)
 	{

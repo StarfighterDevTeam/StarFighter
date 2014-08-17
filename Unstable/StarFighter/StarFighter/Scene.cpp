@@ -71,14 +71,25 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 							}
 						}
 
-						sf::Vector2f pos = Independant::getCoordinates_for_Spawn(first_scene, this->direction, sf::Vector2f(w / 2, h / 2), true, true);
+						float first_screen_offset = 0;
+						if (first_scene)
+						{
+							first_screen_offset = Independant::getSize_for_Direction(this->direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
+						}
+
+						//sf::Vector2f pos = Independant::setPosition_Y_for_Direction(this->direction, sf::Vector2f((w / 2), (-h / 2) + first_screen_offset), true);
+
 						sf::Vector2f speed = Independant::getSpeed_for_Scrolling(this->direction, this->vspeed);
 
 						if (hub)
 						{
 							this->direction = Directions::NO_DIRECTION;
 						}
-						this->bg = new Independant(pos, speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h));
+						this->bg = new Independant(sf::Vector2f (0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h));
+						
+						sf::Vector2f size_for_dir = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(w, h));
+						this->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(size_for_dir.x / 2, ( - size_for_dir.y / 2 ) + first_screen_offset), true);
+						
 						this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
 						this->bg->setVisible(true);
 						this->bg->isOnScene = true;
@@ -135,6 +146,7 @@ void Scene::Update(Time deltaTime)
 	{
 		HazardBreakEvent();
 	}
+	
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
@@ -200,9 +212,9 @@ void Scene::GenerateEnemies(Time deltaTime)
 		}
 		
 		sf::Vector2f size = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(((nb_rows - 1) * xspread) + (max_enemy_size.x / 2), ((nb_lines - 1) * yspread) + (max_enemy_size.y / 2)));
+		float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(max_enemy_size.x, SCENE_SIZE_X - size.x));
 
-		sf::Vector2f pos = Independant::getCoordinates_for_Spawn(false, (*CurrentGame).direction, size, true, false, false, sf::Vector2f(0, 0), true, 
-			sf::Vector2f(xspread, yspread), sf::Vector2f(xspread + size.x, yspread + size.y));
+		sf::Vector2f pos = Independant::getPosition_for_Direction((*CurrentGame).direction, sf::Vector2f(random_posX, - (size.y / 2)));
 
 		EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
 
