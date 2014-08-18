@@ -19,6 +19,7 @@ using namespace sf;
 
 enum LayerType {
 	BackgroundLayer,
+	LinkZoneLayer,
 	ExplosionLayer,
 	FriendlyFireLayer,
 	AuraLayer,

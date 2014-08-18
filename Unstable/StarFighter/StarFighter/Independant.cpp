@@ -29,6 +29,15 @@ string Independant::getName()
 	return *(s1.end() - 1);
 }
 
+Independant::Independant()
+{
+	this->transparent = false;
+	this->visible = false;
+	this->isOnScene = false;
+	this->GarbageMe = false;
+	this->DontGarbageMe = false;
+}
+
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber)
 {
 	this->initial_position = sf::Vector2f(position.x, position.y);
@@ -81,7 +90,6 @@ Independant::~Independant()
 
 void Independant::update(sf::Time deltaTime)
 {
-
 	static sf::Vector2f newposition, offset;
 
 	//Basic movement (initial vector)
@@ -373,14 +381,14 @@ sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vecto
 
 	if (direction == DIRECTION_DOWN)
 	{
-		speed.x = - speed.x;
-		speed.y = - speed.y;
+		speed.x = -speed.x;
+		speed.y = -speed.y;
 	}
 
 	if (direction == DIRECTION_RIGHT)
 	{
-		speed.x =  speed.x;
-		speed.y = - speed.y;
+		speed.x = speed.x;
+		speed.y = -speed.y;
 	}
 
 	if (direction == DIRECTION_LEFT)

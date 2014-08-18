@@ -168,3 +168,14 @@ void PlayerHud::Draw(sf::RenderWindow* window)
 	
 	window->draw(*(framerate));
 }
+
+HudElement::HudElement() : Independant()
+{
+
+}
+
+void HudElement::update(sf::Time deltaTime)
+{
+	Independant::update(deltaTime);
+	this->rect.setPosition(this->getPosition());
+}

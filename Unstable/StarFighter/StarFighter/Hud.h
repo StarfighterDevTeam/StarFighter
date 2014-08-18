@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Globals.h"
+#include "Independant.h"
 
 class Game;
 
@@ -33,6 +34,14 @@ private:
 	sf::Text* framerate;
 
 	bool no_hazard_value;
+};
+
+class HudElement : public Independant
+{
+public:
+	HudElement();
+	sf::RectangleShape rect;
+	void update(sf::Time deltaTime) override;
 };
 
 #endif // HUD_H_INCLUDED

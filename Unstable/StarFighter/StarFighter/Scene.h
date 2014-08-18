@@ -31,11 +31,12 @@ public:
 	//Scene(string name, ShipConfig* shipConf);
 	Scene(string name, bool reverse_scene=false, bool first_scene=false);
 	void Scene::Update(Time deltaTime);
+	void Scene::Draw(sf::RenderWindow* window);
 	void Scene::GenerateEnemies(Time deltaTime);
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
 	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
 	void Scene::LoadSceneFromFile(string name, bool reverse_scene=false, bool first_scene=false);
-	void Scene::SetScenePositionAndSpeed(sf::Vector2i direction, float vspeed, float w, float h);
+	void Scene::SetLinkZone(Directions direction, bool first_scene);
 
 	float vspeed;
 	bool sceneIsOver;
@@ -49,6 +50,7 @@ public:
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();
 	std::string links[Directions::NO_DIRECTION];
+	HudElement link_zone[Directions::NO_DIRECTION];
 
 private:
 	Ship* playerShip;

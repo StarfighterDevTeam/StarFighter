@@ -20,10 +20,12 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 		{
 			if ((*it)[ScenesData::SCENE_NAME].compare(name) == 0)
 			{
+
 				this->links[Directions::DIRECTION_UP] = (*it)[ScenesData::SCENE_LINK_UP];
 				this->links[Directions::DIRECTION_DOWN] = (*it)[ScenesData::SCENE_LINK_DOWN];
 				this->links[Directions::DIRECTION_RIGHT] = (*it)[ScenesData::SCENE_LINK_RIGHT];
 				this->links[Directions::DIRECTION_LEFT] = (*it)[ScenesData::SCENE_LINK_LEFT];
+
 
 				list<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
 
@@ -35,7 +37,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 					{
 						this->direction = Directions::NO_DIRECTION;
 						bool hub = false;
-						
+
 						this->vspeed = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
 						float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
 						float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
@@ -77,22 +79,29 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 							first_screen_offset = Independant::getSize_for_Direction(this->direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
 						}
 
-						//sf::Vector2f pos = Independant::setPosition_Y_for_Direction(this->direction, sf::Vector2f((w / 2), (-h / 2) + first_screen_offset), true);
-
 						sf::Vector2f speed = Independant::getSpeed_for_Scrolling(this->direction, this->vspeed);
 
 						if (hub)
 						{
 							this->direction = Directions::NO_DIRECTION;
 						}
-						this->bg = new Independant(sf::Vector2f (0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h));
-						
+						this->bg = new Independant(sf::Vector2f(0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h));
+
 						sf::Vector2f size_for_dir = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(w, h));
-						this->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(size_for_dir.x / 2, ( - size_for_dir.y / 2 ) + first_screen_offset), true);
-						
+						this->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(size_for_dir.x / 2, (-size_for_dir.y / 2) + first_screen_offset), true);
+
 						this->bg->display_name = (*it)[SceneDataBackground::BACKGROUND_DISPLAYNAME];
 						this->bg->setVisible(true);
 						this->bg->isOnScene = true;
+
+						//drawing link zones
+						for (int i = 0; i < Directions::NO_DIRECTION; i++)
+						{
+							if (this->links[(Directions)i].compare("0") != 0)
+							{
+								this->SetLinkZone((Directions)i, first_scene);
+							}
+						}
 					}
 
 					int enemy_count = 0;
@@ -130,6 +139,25 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 	}
 }
 
+void Scene::SetLinkZone(Directions direction, bool first_scene)
+{
+	float size_x = Independant::getSize_for_Direction(direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).x - (2 * HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X);//circa 550
+	float size_y = HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X;//150
+	this->link_zone[direction].rect.setSize(Independant::getSize_for_Direction(direction, sf::Vector2f(size_x, size_y)));
+	this->link_zone[direction].rect.setFillColor(sf::Color(0, 128, 128, 128));
+	this->link_zone[direction].rect.setOutlineThickness(1);
+	this->link_zone[direction].rect.setOrigin(this->link_zone[direction].rect.getSize().x / 2, this->link_zone[direction].rect.getSize().y / 2);
+	this->link_zone[direction].rect.setOutlineColor(sf::Color(128, 0, 0));
+
+	float first_scene_offset = Independant::getSize_for_Direction(direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
+	sf::Vector2f bg_size = Independant::getSize_for_Direction(direction, this->bg->m_size);
+
+	this->link_zone[direction].setPosition_Y_for_Direction(direction, sf::Vector2f(bg_size.x / 2, -bg_size.y + (size_y / 2) + first_scene_offset), true);
+	this->link_zone[direction].rect.setPosition(this->link_zone[direction].getPosition());
+
+	//(*CurrentGame).addToScene(&this->link_zone[direction], LayerType::LinkZoneLayer, IndependantType::LinkZone);
+}
+
 Scene::Scene(string name, bool reverse_scene, bool first_scene)
 {
 	hazard_level = 0;
@@ -140,12 +168,34 @@ void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
-		this->GenerateEnemies(deltaTime);
+		//this->GenerateEnemies(deltaTime);
 	}
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0)
 	{
 		HazardBreakEvent();
 	}
+
+	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	{
+		if (this->links[(Directions)i].compare("0") != 0)
+		{
+			this->link_zone[i].speed = this->bg->speed;
+			this->link_zone[i].update(deltaTime);
+		}
+	}
+}
+
+void Scene::Draw(sf::RenderWindow* window)
+{
+
+	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	{
+		if (this->links[(Directions)i].compare("0") != 0)
+		{
+			window->draw(this->link_zone[i].rect);
+		}
+	}
+
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
@@ -209,11 +259,11 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 			cluster->push_back(e);
 		}
-		
+
 		sf::Vector2f size = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y));
 		float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(max_enemy_size.x / 2, SCENE_SIZE_X - size.x - (max_enemy_size.x / 2)));
 
-		sf::Vector2f pos = Independant::getPosition_for_Direction((*CurrentGame).direction, sf::Vector2f(random_posX, - (size.y / 2)));
+		sf::Vector2f pos = Independant::getPosition_for_Direction((*CurrentGame).direction, sf::Vector2f(random_posX, -(size.y / 2)));
 
 		EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
 

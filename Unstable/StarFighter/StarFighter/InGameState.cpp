@@ -58,6 +58,10 @@ void InGameState::Update(Time deltaTime)
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
+	
+	//draw link zones
+	this->currentScene->Draw(this->mainWindow);
+	
 	this->hud->Draw(this->mainWindow);
 }
 

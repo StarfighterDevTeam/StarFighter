@@ -18,6 +18,7 @@ class Loot;
 
 enum IndependantType {
 	Background,
+	LinkZone,
 	LootObject,
 	PlayerShip,
 	FriendlyFire,
@@ -70,6 +71,8 @@ public:
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
+	Independant();
+
 	~Independant();
 
 	virtual void update(sf::Time deltaTime);
