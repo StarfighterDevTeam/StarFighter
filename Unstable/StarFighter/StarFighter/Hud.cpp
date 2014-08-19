@@ -10,15 +10,15 @@ PlayerHud::PlayerHud()
 void PlayerHud::Init(int m_armor, int m_shield)
 {
 	armorBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_armor));
-	armorBar.setFillColor(sf::Color(0, 250, 50));//green
-	armorBar.setOutlineThickness(4);
+	armorBar.setFillColor(sf::Color(0, 250, 50, 128));//green
+	armorBar.setOutlineThickness(1);
 	armorBar.setOutlineColor(sf::Color(255, 255, 255));
 	armorBar.setOrigin(0, 0);
 	armorBar.setPosition(20, 10);
 
 	shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_shield));
-	shieldBar.setFillColor(sf::Color(0, 50, 250));//blue
-	shieldBar.setOutlineThickness(4);
+	shieldBar.setFillColor(sf::Color(0, 50, 250, 128));//blue
+	shieldBar.setOutlineThickness(1);
 	shieldBar.setOutlineColor(sf::Color(255, 255, 255));
 	shieldBar.setOrigin(0,0);
 	shieldBar.setPosition((40+ARMOR_BAR_SIZE_X),10);
@@ -73,8 +73,8 @@ void PlayerHud::Init(int m_armor, int m_shield)
 
 	//Hazard feature (scoring system)
 	hazardBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 0));
-	hazardBar.setFillColor(sf::Color(250, 0, 50));//red
-	hazardBar.setOutlineThickness(4);
+	hazardBar.setFillColor(sf::Color(250, 0, 50, 128));//red
+	hazardBar.setOutlineThickness(1);
 	hazardBar.setOutlineColor(sf::Color(255, 255, 255));
 	hazardBar.setOrigin(0, 0);
 	hazardBar.setPosition(WINDOW_RESOLUTION_X-40, 10);
@@ -82,8 +82,8 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	//hazardBarMax.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, hazard_break_value));
 	hazardBarMax.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
 	hazardBarMax.setFillColor(sf::Color::Transparent);//black
-	hazardBarMax.setOutlineThickness(4);
-	hazardBarMax.setOutlineColor(sf::Color(255, 255, 255));
+	hazardBarMax.setOutlineThickness(1);
+	hazardBarMax.setOutlineColor(sf::Color(255, 255, 255, 128));
 	hazardBarMax.setOrigin(0, 0);
 	hazardBarMax.setPosition(WINDOW_RESOLUTION_X-40, 10);
 }

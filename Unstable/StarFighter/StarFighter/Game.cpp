@@ -13,6 +13,9 @@ const char* IndependantTypeValues[] =
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
+	if (!this->offscreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false));
+	this->offscreen.setSmooth(true);
+
 	this->sceneChronometer.restart();
 	scale_factor.x = float(WINDOW_RESOLUTION_X) / float(REF_WINDOW_RESOLUTION_X);
 	scale_factor.y = float(WINDOW_RESOLUTION_Y) / float(REF_WINDOW_RESOLUTION_Y);
@@ -79,6 +82,8 @@ void Game::updateScene(Time deltaTime)
 
 void Game::drawScene()
 {
+	this->offscreen.clear();
+
 	for (int i = 0; i < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)); i++)
 	{
 		for (std::list<Independant*>::iterator it = (*(this->sceneIndependantsLayered[i])).begin(); it != (*(this->sceneIndependantsLayered[i])).end(); it++)
@@ -87,11 +92,18 @@ void Game::drawScene()
 			{
 				if (!(*(*it)).transparent)
 				{
-					this->window->draw((*(*it)));
+					//this->window->draw((*(*it)));
+					this->offscreen.draw((*(*it)));
 				}
 			}
 		}
 	}
+
+	this->offscreen.display();
+	sf::Sprite temp(this->offscreen.getTexture());
+	temp.scale(WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y);
+	//temp.setPosition((WINDOW_RESOLUTION_X - REF_WINDOW_RESOLUTION_X) / 2, (WINDOW_RESOLUTION_Y - REF_WINDOW_RESOLUTION_Y) / 2);
+	this->window->draw(temp);
 }
 
 void Game::colisionChecksV2()

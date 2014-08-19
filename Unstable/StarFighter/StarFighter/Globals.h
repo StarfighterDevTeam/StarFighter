@@ -7,14 +7,16 @@
 #include "TextUtils.h"
 #include "Logger.h"
 
-#define	REF_WINDOW_RESOLUTION_X					800
-#define REF_WINDOW_RESOLUTION_Y					600
+#define	REF_WINDOW_RESOLUTION_X					800.0
+#define REF_WINDOW_RESOLUTION_Y					600.0
 
-#define	WINDOW_RESOLUTION_X						800
-#define WINDOW_RESOLUTION_Y						600
+//#define	WINDOW_RESOLUTION_X					1440.0
+//#define WINDOW_RESOLUTION_Y					1080.0
+#define	WINDOW_RESOLUTION_X						800.0
+#define WINDOW_RESOLUTION_Y						600.0
 
-#define	SCENE_SIZE_X							800
-#define SCENE_SIZE_Y							600
+#define	SCENE_SIZE_X							800.0
+#define SCENE_SIZE_Y							600.0
 
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f

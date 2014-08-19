@@ -44,6 +44,7 @@ public:
 	void collectGarbage();
 	void garbageLayer (LayerType m_layer);
 	void SetLayerRotation(LayerType m_layer, float angle);
+	sf::RenderTexture offscreen;
 
 	bool isLastEnemyDead();
 	int getHazard();

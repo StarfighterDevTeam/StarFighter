@@ -153,7 +153,7 @@ void Scene::SetLinkZone(Directions direction, bool first_scene)
 	sf::Vector2f bg_size = Independant::getSize_for_Direction(direction, this->bg->m_size);
 
 	this->link_zone[direction].setPosition_Y_for_Direction(direction, sf::Vector2f(bg_size.x / 2, -bg_size.y + (size_y / 2) + first_scene_offset), true);
-	this->link_zone[direction].rect.setPosition(this->link_zone[direction].getPosition());
+	this->link_zone[direction].rect.setPosition(this->link_zone[direction].getPosition()); 
 
 	//(*CurrentGame).addToScene(&this->link_zone[direction], LayerType::LinkZoneLayer, IndependantType::LinkZone);
 }
