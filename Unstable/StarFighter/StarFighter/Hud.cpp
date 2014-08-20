@@ -38,17 +38,24 @@ void PlayerHud::Init(int m_armor, int m_shield)
 			// error
 			//TODO: font loader
 		}
-
+		//left part
+		sf::Color _white = sf::Color::Color(255, 255, 255, 200);//semi-transparent white
 		Money.setFont(*font);
 		Money.setCharacterSize(20);
-		Money.setColor(sf::Color::White);
+		Money.setColor(_white);
 		Money.setPosition(50,WINDOW_RESOLUTION_Y-50);
 
 		GrazeScore.setFont(*font);
 		GrazeScore.setCharacterSize(14);
-		GrazeScore.setColor(sf::Color::White);
-		GrazeScore.setPosition(50,WINDOW_RESOLUTION_Y-70);
+		GrazeScore.setColor(_white);
+		GrazeScore.setPosition(50, WINDOW_RESOLUTION_Y - 50 - HUD_SCORES_SPACING);
 
+		SceneName.setFont(*font);
+		SceneName.setCharacterSize(14);
+		SceneName.setColor(_white);
+		SceneName.setPosition(50, WINDOW_RESOLUTION_Y - 50 - 2*HUD_SCORES_SPACING);
+
+		//right part
 		hazardBreakText = new sf::Text("Hazard\nBreak", *font, 12);
 		hazardBreakText->setColor(sf::Color::Red);
 		hazardBreakText->setStyle(sf::Text::Bold);
@@ -88,7 +95,7 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	hazardBarMax.setPosition(WINDOW_RESOLUTION_X-40, 10);
 }
 
-void PlayerHud::Update(sf::RenderWindow* window, int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, sf::Time deltaTime)
+void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, std::string scene_name, sf::Time deltaTime)
 {
 	//armor and shield
 	if (m_armor <=0)
@@ -118,6 +125,11 @@ void PlayerHud::Update(sf::RenderWindow* window, int m_armor, int m_shield, int 
 	ostringstream ss_g;
 	ss_g << m_graze_count;
 	GrazeScore.setString("Graze: "+ss_g.str());
+
+	//scene name
+	ostringstream ss_bg;
+	ss_bg << scene_name;
+	SceneName.setString(ss_bg.str());
 
 	//hazard break
 	if (m_hazard_break_value != 0)
@@ -157,6 +169,7 @@ void PlayerHud::Draw(sf::RenderWindow* window)
 	window->draw(shieldBar);
 	window->draw(Money);
 	window->draw(GrazeScore);
+	window->draw(SceneName);
 	
 	if (!no_hazard_value)
 	{
@@ -171,11 +184,20 @@ void PlayerHud::Draw(sf::RenderWindow* window)
 
 HudElement::HudElement() : Independant()
 {
-
+	this->visible = true;
+	this->isOnScene = true;
 }
 
 void HudElement::update(sf::Time deltaTime)
 {
 	Independant::update(deltaTime);
+
 	this->rect.setPosition(this->getPosition());
+	this->title.setPosition(this->rect.getPosition().x + this->title_offset.x, this->rect.getPosition().y + this->title_offset.y);
+}
+
+void HudElement::Draw(sf::RenderWindow* window)
+{
+	window->draw(this->rect);
+	window->draw(this->title);
 }

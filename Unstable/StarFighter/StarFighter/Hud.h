@@ -15,7 +15,7 @@ class PlayerHud
 public:
 	PlayerHud::PlayerHud();
 	void Init(int m_armor, int m_shield);
-	void Update(sf::RenderWindow* window, int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, sf::Time deltaTime);
+	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, std::string scene_name, sf::Time deltaTime);
 	void Draw (sf::RenderWindow* window);
 
 private:
@@ -23,6 +23,7 @@ private:
 	sf::RectangleShape shieldBar;
 	sf::Text Money;
 	sf::Text GrazeScore;
+	sf::Text SceneName;
 
 	sf::Font* font;
 	sf::Font* font2;
@@ -41,7 +42,10 @@ class HudElement : public Independant
 public:
 	HudElement();
 	sf::RectangleShape rect;
+	sf::Text title;
+	sf::Vector2f title_offset;
 	void update(sf::Time deltaTime) override;
+	void Draw(sf::RenderWindow* window);
 };
 
 #endif // HUD_H_INCLUDED

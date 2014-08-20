@@ -19,6 +19,7 @@ enum ScenesData
 {
 	SCENE_NAME,
 	SCENE_FILENAME,
+	SCENE_DISPLAYNAME,
 	SCENE_LINK_UP,
 	SCENE_LINK_DOWN,
 	SCENE_LINK_RIGHT,
@@ -37,6 +38,7 @@ public:
 	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
 	void Scene::LoadSceneFromFile(string name, bool reverse_scene=false, bool first_scene=false);
 	void Scene::SetLinkZone(Directions direction, bool first_scene);
+	std::string Scene::LoadSceneNameFromFile(string name);
 
 	float vspeed;
 	bool sceneIsOver;
@@ -50,6 +52,7 @@ public:
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();
 	std::string links[Directions::NO_DIRECTION];
+	std::string links_displayname[Directions::NO_DIRECTION];
 	HudElement link_zone[Directions::NO_DIRECTION];
 
 private:

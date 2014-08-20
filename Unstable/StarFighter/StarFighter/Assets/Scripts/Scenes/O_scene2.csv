@@ -1,2 +1,2 @@
-#,filename,display name,width,height,vspeed,Vertical/Horizontal
-bg,Assets/2D/HUB.jpg,O_scene_2,800,600,0,0
+#,filename,width,height,vspeed,Vertical/Horizontal
+bg,Assets/2D/HUB.jpg,800,600,0,0
