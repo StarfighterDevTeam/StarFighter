@@ -225,7 +225,6 @@ void Scene::Update(Time deltaTime)
 
 void Scene::Draw(sf::RenderWindow* window)
 {
-
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
 		if (this->links[(Directions)i].compare("0") != 0)
