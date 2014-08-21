@@ -15,7 +15,7 @@ class PlayerHud
 public:
 	PlayerHud::PlayerHud();
 	void Init(int m_armor, int m_shield);
-	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, std::string scene_name, sf::Time deltaTime);
+	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, int m_hazard_score, int m_hazard_break_value, std::string scene_name, sf::Time deltaTime);
 	void Draw (sf::RenderWindow* window);
 
 private:

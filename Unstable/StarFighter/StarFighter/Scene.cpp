@@ -2,14 +2,19 @@
 
 extern Game* CurrentGame;
 
-void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
+void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene, bool first_scene)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading scene '%s'", (char*)name.c_str()));
-
+	this->m_name = name;
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
 		this->total_class_probability[i] = 0;
 	}
+	this->hazard_break_value = 0;
+	this->generating_enemies = false;
+	this->hazard_level = hazard_level;
+	this->m_hazardbreak_has_occurred = false;
+	int p = 0;
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
 		list<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
@@ -101,18 +106,18 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 								{
 									if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 									{
+										//Getting the name
 										this->links_displayname[(Directions)i] = (*it)[ScenesData::SCENE_DISPLAYNAME];
 									}
-									
+									//And drawing the rect and text accordingly
+									this->SetLinkZone((Directions)i);
 								}
-								//Then drawing the rect and text
-								this->SetLinkZone((Directions)i, first_scene);
+								
 							}
 						}
 					}
 
 					//Loading enemies
-					int p = 0;
 					int enemy_count = 0;
 					if ((*it)[0].compare("enemy") == 0)
 					{
@@ -130,7 +135,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 						//this->enemies.push_back(*e);//legacy, to delete when pools are done ?
 						this->enemies_ranked_by_class[e->enemyclass].push_back(*e);
 						//hazard value automatic calculation
-						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO;
+						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO * (1 + HAZARD_BREAK_MULTIPLIER*this->hazard_level);
 					}
 
 					if (enemy_count != 0 && this->direction != Directions::NO_DIRECTION)
@@ -148,7 +153,7 @@ void Scene::LoadSceneFromFile(string name, bool reverse_scene, bool first_scene)
 	}
 }
 
-void Scene::SetLinkZone(Directions direction, bool first_scene)
+void Scene::SetLinkZone(Directions direction)
 {
 	//Rect
 	float size_x = Independant::getSize_for_Direction(direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).x - (2 * HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X);//circa 550
@@ -175,7 +180,9 @@ void Scene::SetLinkZone(Directions direction, bool first_scene)
 	this->link_zone[direction].title.setFont(*font);
 	this->link_zone[direction].title.setCharacterSize(16);
 	this->link_zone[direction].title.setColor(sf::Color::White);
-	this->link_zone[direction].title.setString(this->links_displayname[direction]);
+	ostringstream ss;
+	ss << this->links_displayname[direction];
+	this->link_zone[direction].title.setString(ss.str());
 	this->link_zone[direction].title.setRotation(0.0);
 
 	float w = this->link_zone[direction].title.getGlobalBounds().width;
@@ -193,22 +200,20 @@ void Scene::SetLinkZone(Directions direction, bool first_scene)
 	//(*CurrentGame).addToScene(&this->link_zone[direction], LayerType::LinkZoneLayer, IndependantType::LinkZone);
 }
 
-Scene::Scene(string name, bool reverse_scene, bool first_scene)
+Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene)
 {
-	this->hazard_break_value = 0;
-	this->generating_enemies = false;
-	this->hazard_level = 0;
+	this->LoadSceneFromFile(name, hazard_level, reverse_scene, first_scene);
 
-	this->LoadSceneFromFile(name, reverse_scene, first_scene);
+	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
 }
 
 void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
-		//this->GenerateEnemies(deltaTime);
+		this->GenerateEnemies(deltaTime);
 	}
-	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0)
+	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
 	{
 		HazardBreakEvent();
 	}
@@ -336,13 +341,14 @@ float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 
 
 void Scene::HazardBreakEvent()
 {
-	(*CurrentGame).resetHazard((*CurrentGame).getHazard() - hazard_break_value);
-	printf("DEBUG: HAZARD BREAK!!!\n");
-	hazard_break_value *= (1 + HAZARD_BREAK_MULTIPLIER);
+	//(*CurrentGame).resetHazard((*CurrentGame).getHazard() - hazard_break_value);
+	//hazard_break_value *= (1 + HAZARD_BREAK_MULTIPLIER);
 	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS - 1)
 	{
 		hazard_level++;
 	}
+	m_hazardbreak_has_occurred = true;
+	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", this->hazard_level + 1));
 }
 
 float Scene::getSceneBeastScore()

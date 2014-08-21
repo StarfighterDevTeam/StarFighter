@@ -12,6 +12,7 @@ public:
 	Scene* currentScene;
 	Scene* nextScene;
 	PlayerHud* hud;
+	map<string, int> knownScenes;
 
 	InGameStateMachine IG_State;
 
@@ -19,7 +20,9 @@ public:
 	void Update(Time deltaTime);
 	void Draw();
 	void Release();
-
+	bool AddToKnownScenes(string scene_name);
+	void SetSceneHazardLevel(string scene_name, int hazard_level);
+	int GetSceneHazardLevel(string scene_name);
 	void InGameStateMachineCheck();
 	sf::Clock clockHubExit;
 	

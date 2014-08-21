@@ -95,7 +95,7 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	hazardBarMax.setPosition(WINDOW_RESOLUTION_X-40, 10);
 }
 
-void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_score, int m_hazard_break_value, std::string scene_name, sf::Time deltaTime)
+void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, int m_hazard_score, int m_hazard_break_value, std::string scene_name, sf::Time deltaTime)
 {
 	//armor and shield
 	if (m_armor <=0)
@@ -126,37 +126,39 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	ss_g << m_graze_count;
 	GrazeScore.setString("Graze: "+ss_g.str());
 
-	//scene name
-	ostringstream ss_bg;
-	ss_bg << scene_name;
-	SceneName.setString(ss_bg.str());
-
 	//hazard break
 	if (m_hazard_break_value != 0)
 	{
 		no_hazard_value = false;
 		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, (m_hazard_score*HAZARD_BAR_SIZE_Y) / m_hazard_break_value));
 	}
-		
+
 	else
 	{
 		no_hazard_value = true;
 	}
-		
 
-	ostringstream ss_h1;
+	ostringstream ss_h1, ss_h2;
 	ss_h1 << m_hazard_score;
-
-	ostringstream ss_h2;
 	ss_h2 << m_hazard_break_value;
 
 	if (m_hazard_score > m_hazard_break_value) // max constraint
 	{
 		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
-		ss_h1 << m_hazard_break_value;
+		hazardBar.setFillColor(sf::Color(255, 255, 255, 128));//black
 	}
 
 	hazardBreakScore->setString(ss_h1.str() + "/" + ss_h2.str());
+
+	//scene name
+	ostringstream ss_bg;
+	ss_bg << scene_name;
+	if (!no_hazard_value)
+	{
+		ss_bg  << " (" << m_hazard_level << ")";
+	} 
+
+	SceneName.setString(ss_bg.str());
 
 	//framerate
 	framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));

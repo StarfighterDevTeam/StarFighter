@@ -7,10 +7,11 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 
-	this->nextScene = new Scene(player.m_currentSceneFile, player.reverse_scene, true);//allows to set the right direction for the first current scene
+	this->nextScene = new Scene(player.m_currentSceneFile, 0, player.reverse_scene, true);//allows to set the right direction for the first current scene
 	(*CurrentGame).direction = this->nextScene->direction;
-	this->currentScene = new Scene(player.m_currentSceneFile, player.reverse_scene, true);//first_scene = true
+	this->currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevel(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
 	(*CurrentGame).direction = this->currentScene->direction;
+	AddToKnownScenes(this->currentScene->m_name);
 
 	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -52,7 +53,7 @@ void InGameState::Update(Time deltaTime)
 	this->mainWindow->clear();
 
 	this->hud->Update((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-		(*CurrentGame).playerShip->graze_count, (*CurrentGame).getHazard(), this->currentScene->getSceneHazardBreakValue(), this->currentScene->bg->display_name, deltaTime);
+		(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), (*CurrentGame).getHazard(), this->currentScene->getSceneHazardBreakValue(), this->currentScene->bg->display_name, deltaTime);
 }
 
 void InGameState::Draw()
@@ -68,6 +69,41 @@ void InGameState::Draw()
 void InGameState::Release()
 {
 	//TODO
+}
+
+bool InGameState::AddToKnownScenes(string scene_name)
+{
+	map<string, int>::iterator it = this->knownScenes.find(scene_name);
+
+	//if scene not already known
+	if (it == this->knownScenes.end())
+	{
+		//add it to the map of known scenes
+		this->knownScenes.insert(pair<string, int>(scene_name, 0));
+		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Adding '%s' to known scenes.\n", (char*)scene_name.c_str()));
+		return true;
+	}
+	return false;
+}
+
+void InGameState::SetSceneHazardLevel(string scene_name, int hazard_level)
+{
+	map<string, int>::iterator it = this->knownScenes.find(scene_name);
+	
+	this->knownScenes[scene_name] = hazard_level;
+}
+
+int InGameState::GetSceneHazardLevel(string scene_name)
+{
+	map<string, int>::iterator it = this->knownScenes.find(scene_name);
+
+	//if scene is known
+	if(it != this->knownScenes.end())
+	{
+		return this->knownScenes[scene_name];
+	}
+	//else
+	return 0;
 }
 
 void InGameState::InGameStateMachineCheck()
@@ -98,7 +134,8 @@ void InGameState::InGameStateMachineCheck()
 												  //Load next scene
 												  if (this->currentScene->links[(*CurrentGame).direction].compare("0") != 0)
 												  {
-													  this->nextScene->LoadSceneFromFile(this->currentScene->links[(*CurrentGame).direction], false, false);
+													  std::string nextScene_filename = this->currentScene->links[(*CurrentGame).direction];
+													  this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), false, false);
 													  this->currentScene->bg->speed = sf::Vector2f(0, 0);
 													  this->currentScene->generating_enemies = false;
 
@@ -178,10 +215,12 @@ void InGameState::InGameStateMachineCheck()
 															(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 														}
 														//Wiping the previous background and swapping with the new one
+														SetSceneHazardLevel(this->currentScene->m_name, this->currentScene->getSceneHazardLevelValue());
 														this->currentScene->bg->GarbageMe = true;
 														(*CurrentGame).resetHazard();
 														*this->currentScene = *this->nextScene;
 														(*CurrentGame).direction = this->currentScene->direction;
+														AddToKnownScenes(this->currentScene->m_name);
 
 														//Giving control back to the player
 														(*CurrentGame).playerShip->disable_inputs = false;
@@ -190,8 +229,6 @@ void InGameState::InGameStateMachineCheck()
 
 													break;
 	}
-
-
 
 	case InGameStateMachine::HUB_ROAMING:
 	{
@@ -243,7 +280,8 @@ void InGameState::InGameStateMachineCheck()
 												{
 													if (this->currentScene->links[(*CurrentGame).direction].compare("0") != 0)
 													{
-														this->nextScene->LoadSceneFromFile(this->currentScene->links[(*CurrentGame).direction], reverse, false);
+														std::string nextScene_filename = this->currentScene->links[(*CurrentGame).direction];
+														this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
 														this->IG_State = InGameStateMachine::LAST_SCREEN;
 													}
 												}
