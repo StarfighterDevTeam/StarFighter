@@ -7,11 +7,12 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 	LoadPlayerSave(player.m_save_file);//update knownScenes and hazard levels from save file
-
-	this->nextScene = new Scene(player.m_currentSceneFile, 0, player.reverse_scene, true);//allows to set the right direction for the first current scene
-	(*CurrentGame).direction = this->nextScene->direction;
+	
+	//Loading current scene
 	this->currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevel(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
 	(*CurrentGame).direction = this->currentScene->direction;
+	//initialisation of a next scene
+	this->nextScene = new Scene(player.m_currentSceneFile);
 	AddToKnownScenes(this->currentScene->m_name);
 
 	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);

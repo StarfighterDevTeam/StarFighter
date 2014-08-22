@@ -13,7 +13,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	this->hazard_break_value = 0;
 	this->generating_enemies = false;
 	this->hazard_level = hazard_level;
-	
+
 	this->m_hazardbreak_has_occurred = false;
 	int p = 0;
 	try {
@@ -113,7 +113,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 									//And drawing the rect and text accordingly
 									this->SetLinkZone((Directions)i);
 								}
-								
+
 							}
 						}
 					}
@@ -169,7 +169,7 @@ void Scene::SetLinkZone(Directions direction)
 	sf::Vector2f bg_size = Independant::getSize_for_Direction(direction, this->bg->m_size);
 
 	this->link_zone[direction].setPosition_Y_for_Direction(direction, sf::Vector2f(bg_size.x / 2, -bg_size.y + (size_y / 2) + first_scene_offset), true);
-	this->link_zone[direction].rect.setPosition(this->link_zone[direction].getPosition()); 
+	this->link_zone[direction].rect.setPosition(this->link_zone[direction].getPosition());
 
 	//Title
 	sf::Font* font = new sf::Font();
@@ -188,10 +188,10 @@ void Scene::SetLinkZone(Directions direction)
 
 	float w = this->link_zone[direction].title.getGlobalBounds().width;
 	float h = this->link_zone[direction].title.getGlobalBounds().height;
-	this->link_zone[direction].title.setOrigin(sf::Vector2f(w/2, h/2));
-	this->link_zone[direction].title_offset = Independant::getSpeed_for_Scrolling(direction, - HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X * HUB_LINK_NAME_OFFSET_RATIO);
+	this->link_zone[direction].title.setOrigin(sf::Vector2f(w / 2, h / 2));
+	this->link_zone[direction].title_offset = Independant::getSpeed_for_Scrolling(direction, -HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X * HUB_LINK_NAME_OFFSET_RATIO);
 	this->link_zone[direction].title.setPosition(this->link_zone[direction].getPosition().x, this->link_zone[direction].getPosition().y);
-	
+
 	if (direction == Directions::DIRECTION_RIGHT || direction == Directions::DIRECTION_LEFT)
 	{
 		this->link_zone[direction].title.setRotation(Independant::getRotation_for_Direction(direction));
@@ -199,6 +199,61 @@ void Scene::SetLinkZone(Directions direction)
 	}
 
 	//(*CurrentGame).addToScene(&this->link_zone[direction], LayerType::LinkZoneLayer, IndependantType::LinkZone);
+}
+
+Scene::Scene(string name)
+{
+	this->m_name = name;
+	try {
+		//Loading the list of all scenes, contained in SCENES_FILE
+		list<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
+
+		for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+		{
+			if ((*it)[ScenesData::SCENE_NAME].compare(name) == 0)
+			{
+				//Loading the linked scene names
+				this->links[Directions::DIRECTION_UP] = (*it)[ScenesData::SCENE_LINK_UP];
+				this->links[Directions::DIRECTION_DOWN] = (*it)[ScenesData::SCENE_LINK_DOWN];
+				this->links[Directions::DIRECTION_RIGHT] = (*it)[ScenesData::SCENE_LINK_RIGHT];
+				this->links[Directions::DIRECTION_LEFT] = (*it)[ScenesData::SCENE_LINK_LEFT];
+				std::string scene_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
+
+				//Loading the particular scene that we want to load
+				list<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
+				for (std::list<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
+				{
+					if ((*it)[0].compare("bg") == 0)
+					{
+						this->bg = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(0, 0));
+						this->bg->display_name = scene_name;
+					}
+				}
+			}
+
+			//Drawing link zones and texts
+			for (int i = 0; i < Directions::NO_DIRECTION; i++)
+			{
+				if (this->links[(Directions)i].compare("0") != 0)
+				{
+					//Getting the string of the "display name" for a each linked scene
+					for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+					{
+						if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
+						{
+							//Getting the name
+							this->links_displayname[(Directions)i] = (*it)[ScenesData::SCENE_DISPLAYNAME];
+						}
+					}
+				}
+			}
+		}
+	}
+	catch (const std::exception & ex)
+	{
+		//An error occured
+		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+	}
 }
 
 Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene)

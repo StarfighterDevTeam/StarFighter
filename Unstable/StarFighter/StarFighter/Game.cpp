@@ -31,6 +31,7 @@ void Game::init(RenderWindow* window)
 
 	this->hazard = 0;//initalisation of the scoring system
 	this->BeastScoreBonus = 0;
+	this->direction = Directions::NO_DIRECTION;
 }
 
 sf::RenderWindow* Game::getMainWindow()
