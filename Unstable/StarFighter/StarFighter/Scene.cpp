@@ -13,6 +13,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	this->hazard_break_value = 0;
 	this->generating_enemies = false;
 	this->hazard_level = hazard_level;
+	
 	this->m_hazardbreak_has_occurred = false;
 	int p = 0;
 	try {

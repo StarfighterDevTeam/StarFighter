@@ -4,6 +4,9 @@
 #include "Scene.h"
 #include "Hud.h"
 #include "GameState.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 class InGameState : public GameState
 {
@@ -20,6 +23,8 @@ public:
 	void Update(Time deltaTime);
 	void Draw();
 	void Release();
+	int SavePlayer(string file);
+	int LoadPlayerSave(string file);
 	bool AddToKnownScenes(string scene_name);
 	void SetSceneHazardLevel(string scene_name, int hazard_level);
 	int GetSceneHazardLevel(string scene_name);

@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <string.h>
+#include "Globals.h"
 
 class Player
 {
@@ -13,6 +14,8 @@ public:
 
 	sf::RenderWindow* m_playerWindow;
 	std::string m_currentSceneFile;
+	std::string m_save_file;
+	
 	bool reverse_scene;
 
 };

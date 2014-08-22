@@ -7,6 +7,8 @@
 #include "TextUtils.h"
 #include "Logger.h"
 
+#define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
+
 #define	REF_WINDOW_RESOLUTION_X					800.0
 #define REF_WINDOW_RESOLUTION_Y					600.0
 

@@ -6,6 +6,7 @@ void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
+	LoadPlayerSave(player.m_save_file);//update knownScenes and hazard levels from save file
 
 	this->nextScene = new Scene(player.m_currentSceneFile, 0, player.reverse_scene, true);//allows to set the right direction for the first current scene
 	(*CurrentGame).direction = this->nextScene->direction;
@@ -59,10 +60,10 @@ void InGameState::Update(Time deltaTime)
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
-	
+
 	//draw link zones
 	this->currentScene->Draw(this->mainWindow);
-	
+
 	this->hud->Draw(this->mainWindow);
 }
 
@@ -89,8 +90,12 @@ bool InGameState::AddToKnownScenes(string scene_name)
 void InGameState::SetSceneHazardLevel(string scene_name, int hazard_level)
 {
 	map<string, int>::iterator it = this->knownScenes.find(scene_name);
-	
+	if (hazard_level > NB_HAZARD_LEVELS - 1)
+	{
+		hazard_level = NB_HAZARD_LEVELS - 1;
+	}
 	this->knownScenes[scene_name] = hazard_level;
+	
 }
 
 int InGameState::GetSceneHazardLevel(string scene_name)
@@ -98,11 +103,61 @@ int InGameState::GetSceneHazardLevel(string scene_name)
 	map<string, int>::iterator it = this->knownScenes.find(scene_name);
 
 	//if scene is known
-	if(it != this->knownScenes.end())
+	if (it != this->knownScenes.end())
 	{
 		return this->knownScenes[scene_name];
 	}
 	//else
+	return 0;
+}
+
+int InGameState::SavePlayer(string file)
+{
+	ofstream data(file.c_str(), ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		// instructions
+		for (map<string, int>::iterator it = this->knownScenes.begin(); it != this->knownScenes.end(); it++)
+		{
+			data << it->first.c_str() << " " << it->second << endl;
+		}
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
+	}
+
+	return 0;
+}
+
+int InGameState::LoadPlayerSave(string file)
+{
+	std::ifstream  data(file, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+		while (std::getline(data, line))
+		{
+			string scene;
+			int level;
+			std::istringstream(line) >> scene >> level;
+			if (level > NB_HAZARD_LEVELS - 1)
+			{
+				level = NB_HAZARD_LEVELS - 1;
+			}
+			this->knownScenes.insert(std::pair<string, int>(scene, level));
+		}
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
+	}
+
 	return 0;
 }
 
@@ -214,13 +269,19 @@ void InGameState::InGameStateMachineCheck()
 															(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 															(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 														}
-														//Wiping the previous background and swapping with the new one
+
+														//Saving the hazard level
 														SetSceneHazardLevel(this->currentScene->m_name, this->currentScene->getSceneHazardLevelValue());
+
+														//Wiping the previous background and swapping with the new one
 														this->currentScene->bg->GarbageMe = true;
 														(*CurrentGame).resetHazard();
 														*this->currentScene = *this->nextScene;
 														(*CurrentGame).direction = this->currentScene->direction;
+
+														//and save the map into the player save file
 														AddToKnownScenes(this->currentScene->m_name);
+														this->SavePlayer(PLAYER_SAVE_FILE);
 
 														//Giving control back to the player
 														(*CurrentGame).playerShip->disable_inputs = false;

@@ -126,7 +126,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	ss_g << m_graze_count;
 	GrazeScore.setString("Graze: "+ss_g.str());
 
-	//hazard break
+	//hazard break bar
 	if (m_hazard_break_value != 0)
 	{
 		no_hazard_value = false;
@@ -141,7 +141,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	ostringstream ss_h1, ss_h2;
 	ss_h1 << m_hazard_score;
 	ss_h2 << m_hazard_break_value;
-
+	hazardBar.setFillColor(sf::Color(250, 0, 50, 128));//red
 	if (m_hazard_score > m_hazard_break_value) // max constraint
 	{
 		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
@@ -155,7 +155,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	ss_bg << scene_name;
 	if (!no_hazard_value)
 	{
-		ss_bg  << " (" << m_hazard_level << ")";
+		ss_bg  << " (" << m_hazard_level+1 << ")";
 	} 
 
 	SceneName.setString(ss_bg.str());
