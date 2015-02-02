@@ -3,6 +3,7 @@
 
 #include "Independant.h"
 #include "Weapon.h"
+#include "InputGuy.h"
 
 //forward declaration
 

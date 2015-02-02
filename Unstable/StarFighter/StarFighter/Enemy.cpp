@@ -324,7 +324,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					Equipment* equipment = new Equipment();
 					equipment->Init((int)EquipmentType::Module, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,0,0,MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
 
-					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/enemyY.png", sf::Vector2f (35,35));
+					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/bot.png", sf::Vector2f (32,32));
 					bot->display_name = "Bot gerard";
 					bot->radius = 500;
 					bot->vspeed = 300;

@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : Independant(position, speed,  textureName, size)
 {
-	collider_type = IndependantType::EnemyObject;
+	collider_type = IndependantType::FriendlyFire;
 	visible = true;
 	movepattern_type = 0;//type de pattern hardcodé pour l'instant
 	visible = true;
@@ -51,7 +51,7 @@ void Bot::update(sf::Time deltaTime)
 	this->setPosition(newposition.x,newposition.y);
 
 	//automatic fire
-	if (isOnScene && hasWeapon)
+	if (isOnScene && hasWeapon && InputGuy::isFiring())
 	{
 		weapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).x, 
 			(this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).y) ;
