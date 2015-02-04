@@ -35,7 +35,7 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->speed.y = bullet->speed.y * this->fire_direction.y;
 
 	bullet->rotate(Independant::getRotation_for_Direction((*CurrentGame).direction));
-	bullet->rotate(this->angle + dispersion);
+	bullet->rotate(this->angle - dispersion);
 
 	bullet->setVisible(true);
 	bullet->collider_type = m_collider_type;

@@ -11,16 +11,6 @@
 #include "EnemyPool.h"
 #include "FileLoadUtils.h"
 
-enum HazardLevels
-{
-	HAZARD_LEVEL_1,//0
-	HAZARD_LEVEL_2,//1
-	HAZARD_LEVEL_3,//2
-	HAZARD_LEVEL_4,//3
-	HAZARD_LEVEL_5,//4
-	NB_HAZARD_LEVELS,//5
-};
-
 enum SceneBooleans
 {
 	ENDSCENE_PHASE1,

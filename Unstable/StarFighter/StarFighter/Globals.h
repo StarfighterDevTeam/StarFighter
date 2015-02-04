@@ -51,7 +51,7 @@
 #define SCENES_FILE "Assets/Scripts/Scenes.csv"
 
 #define GRAZE_DISTANCE									30
-#define SHIP_BRAKING_SPEED									180
+#define SHIP_BRAKING_SPEED								180
 
 //DROP SYSTEM VARIABLES
 
@@ -89,6 +89,16 @@
 
 #define NUMBER_OF_BEASTSCALE_THRESHOLD					5
 #define NB_MAX_PROPERTIES_FOR_NON_EPIC_EQUIPMENT		3
+
+enum HazardLevels
+{
+	HAZARD_LEVEL_1,//0
+	HAZARD_LEVEL_2,//1
+	HAZARD_LEVEL_3,//2
+	HAZARD_LEVEL_4,//3
+	HAZARD_LEVEL_5,//4
+	NB_HAZARD_LEVELS,//5
+};
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

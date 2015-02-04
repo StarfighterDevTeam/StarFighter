@@ -140,9 +140,18 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 
 	ostringstream ss_h1, ss_h2;
 	ss_h1 << m_hazard_score;
-	ss_h2 << m_hazard_break_value;
+	
+	if (m_hazard_level < (HazardLevels::NB_HAZARD_LEVELS - 1))
+	{
+		ss_h2 << m_hazard_break_value;
+	}
+	else
+	{
+		ss_h2 << "..";//max hazard level reached
+	}
+
 	hazardBar.setFillColor(sf::Color(250, 0, 50, 128));//red
-	if (m_hazard_score > m_hazard_break_value) // max constraint
+	if ((m_hazard_score >= m_hazard_break_value) || (m_hazard_level >= (HazardLevels::NB_HAZARD_LEVELS-1))) // max constraint
 	{
 		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
 		hazardBar.setFillColor(sf::Color(255, 255, 255, 128));//black
