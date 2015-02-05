@@ -69,7 +69,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 	}
 }
 
-sf::Vector2f  PatternBobby::GetOffset(float seconds)
+sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 {
 	static sf::Vector2f offset;
 
@@ -98,9 +98,9 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			{
 				//Moving on the edge, like a boss
 				_distance_left -= moved;
-			}else
+			}
+			else
 			{
-
 				offset.x = _direction.x*_distance_left;
 				offset.y = _direction.y*_distance_left;
 
@@ -109,7 +109,8 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 				{
 					_direction.y = _direction.x;
 					_direction.x = 0;
-				}else
+				}
+				else
 				{
 					_direction.x = -_direction.y;
 					_direction.y = 0;
@@ -121,7 +122,8 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 					offset.y += _direction.y*abs(_distance_left-moved);
 
 					_distance_left = (abs(_direction.x==1) ? patternParams->at(0) : patternParams->at(1)) - abs(_distance_left-moved);
-				}else
+				}
+				else
 				{
 					//longueur ou largeur ?
 					_distance_left = abs(_direction.x==1) ? patternParams->at(0) : patternParams->at(1);
@@ -147,8 +149,17 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			next = ToCartesianCoords(this->_curSandboxPosition_polar);
 
 			//return offset = diff between new and old position
-			offset.x = next.x; // -this->_curSandboxPosition_cartesian.x;
-			offset.y = next.y; // -this->_curSandboxPosition_cartesian.y;
+			if (!absolute_coordinate)
+			{
+				offset.x = next.x - this->_curSandboxPosition_cartesian.x;
+				offset.y = next.y - this->_curSandboxPosition_cartesian.y;
+			}
+			//or the new position only:
+			else
+			{
+				offset.x = next.x;
+				offset.y = next.y;
+			}
 
 			this->_curSandboxPosition_cartesian.x = next.x;
 			this->_curSandboxPosition_cartesian.y = next.y;
@@ -172,8 +183,17 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			ToCartesianCoords(&next);
 
 			//return offset = diff between new and old position
-			offset.x = next.x - this->_curSandboxPosition_cartesian.x;
-			offset.y = next.y - this->_curSandboxPosition_cartesian.y;
+			if (!absolute_coordinate)
+			{
+				offset.x = next.x - this->_curSandboxPosition_cartesian.x;
+				offset.y = next.y - this->_curSandboxPosition_cartesian.y;
+			}
+			//or the new position only:
+			else
+			{
+				offset.x = next.x;
+				offset.y = next.y;
+			}
 
 			this->_curSandboxPosition_cartesian.x = next.x;
 			this->_curSandboxPosition_cartesian.y = next.y;
@@ -186,8 +206,10 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			throw invalid_argument(TextUtils::format("Game error: Unknow pattern # '%d'", this->currentPattern));
 		}
 	}
-
+	
 	return offset;
+	
+	
 }
 
 sf::Vector2f PatternBobby::ToCartesianCoords(sf::Vector2f polarCoords)

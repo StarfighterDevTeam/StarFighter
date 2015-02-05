@@ -35,6 +35,7 @@ private:
 	sf::Text* framerate;
 
 	bool no_hazard_value;
+	bool max_hazard_level_reached;
 };
 
 class HudElement : public Independant

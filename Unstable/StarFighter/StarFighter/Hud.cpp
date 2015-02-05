@@ -5,6 +5,7 @@ extern Game* CurrentGame;
 PlayerHud::PlayerHud()
 {
 	this->no_hazard_value = false;
+	this->max_hazard_level_reached = false;
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
@@ -138,26 +139,29 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 		no_hazard_value = true;
 	}
 
-	ostringstream ss_h1, ss_h2;
-	ss_h1 << m_hazard_score;
-	
 	if (m_hazard_level < (HazardLevels::NB_HAZARD_LEVELS - 1))
 	{
+		max_hazard_level_reached = false;
+		ostringstream ss_h1, ss_h2;
+
+		ss_h1 << m_hazard_score;
 		ss_h2 << m_hazard_break_value;
+
+		hazardBar.setFillColor(sf::Color(250, 0, 50, 128));//red
+		if ((m_hazard_score >= m_hazard_break_value)) // max constraint
+		{
+			hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
+			hazardBar.setFillColor(sf::Color(255, 255, 255, 128));//black
+		}
+
+		hazardBreakScore->setString(ss_h1.str() + "/" + ss_h2.str());
 	}
 	else
 	{
-		ss_h2 << "..";//max hazard level reached
+		max_hazard_level_reached = true;
 	}
 
-	hazardBar.setFillColor(sf::Color(250, 0, 50, 128));//red
-	if ((m_hazard_score >= m_hazard_break_value) || (m_hazard_level >= (HazardLevels::NB_HAZARD_LEVELS-1))) // max constraint
-	{
-		hazardBar.setSize(sf::Vector2f(HAZARD_BAR_SIZE_X, HAZARD_BAR_SIZE_Y));
-		hazardBar.setFillColor(sf::Color(255, 255, 255, 128));//black
-	}
-
-	hazardBreakScore->setString(ss_h1.str() + "/" + ss_h2.str());
+	
 
 	//scene name
 	ostringstream ss_bg;
@@ -182,7 +186,7 @@ void PlayerHud::Draw(sf::RenderWindow* window)
 	window->draw(GrazeScore);
 	window->draw(SceneName);
 	
-	if (!no_hazard_value)
+	if (!no_hazard_value && !max_hazard_level_reached)
 	{
 		window->draw(hazardBarMax);
 		window->draw(hazardBar);

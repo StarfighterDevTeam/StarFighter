@@ -41,7 +41,7 @@ void Bot::update(sf::Time deltaTime)
 	}
 	
 	//call bobbyPattern
-	offset = Pattern.GetOffset(deltaTime.asSeconds());
+	offset = Pattern.GetOffset(deltaTime.asSeconds(), true);
 	newposition.x += offset.x;
 	newposition.y += offset.y;
 	//bot spread value

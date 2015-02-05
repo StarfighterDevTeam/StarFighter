@@ -10,7 +10,7 @@ using namespace std;
 class IPatternHandler
 {
 public:
-	virtual sf::Vector2f GetOffset(float seconds) = 0;
+	virtual sf::Vector2f GetOffset(float seconds, bool absolute_coordinate) = 0;
 };
 
 #endif

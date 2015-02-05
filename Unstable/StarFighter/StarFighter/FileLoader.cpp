@@ -286,7 +286,7 @@ Bot* FileLoader::LoadBot(string name)
 			bot->spread = Vector2f(stoi((*it)[BotData::BOT_XSPREAD]), stoi((*it)[BotData::BOT_YSPREAD]));
 
 			vector<float>* v = new vector<float>;
-			v->push_back(bot->radius); // rayon 500px
+			v->push_back(bot->radius); // rayon
 			v->push_back(1);  // clockwise (>)
 
 			PatternType pattern_type = PatternType::NoMovePattern;

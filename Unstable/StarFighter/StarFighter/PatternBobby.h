@@ -26,7 +26,7 @@ class PatternBobby : virtual public IPatternHandler
 public:
 	PatternBobby();
 	void SetPattern(PatternType pt, float patternSpeed, vector<float>*  args);
-	sf::Vector2f GetOffset(float seconds) override;
+	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
 	PatternType GetCurrentPatternType();
 
 private:

@@ -347,12 +347,6 @@ void Scene::GenerateEnemies(Time deltaTime)
 			{
 				max_enemy_size.x = e->enemy->m_size.x;
 			}
-			/*
-			if (e->enemy->m_size.y > max_enemy_size.y)
-			{
-				max_enemy_size.y = e->enemy->m_size.y;
-			}
-			*/
 
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize--;
 
@@ -361,8 +355,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 		sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + (nb_rows * max_enemy_size.x), ((nb_lines - 1) * yspread) + (nb_lines * max_enemy_size.y));
 		
-		//calculation of random coordinates for the spawn of the cluster
-
+		//CALCULATION OF A RANDOM POSITION TO SPAWN THE CLUSTER 
 		//min position
 		sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x/2, -size.y/2);
 		rand_coordinates_min = Independant::getPosition_for_Direction((*CurrentGame).direction, rand_coordinates_min, false);
