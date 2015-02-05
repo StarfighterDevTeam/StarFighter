@@ -147,8 +147,8 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds)
 			next = ToCartesianCoords(this->_curSandboxPosition_polar);
 
 			//return offset = diff between new and old position
-			offset.x = next.x - this->_curSandboxPosition_cartesian.x;
-			offset.y = next.y - this->_curSandboxPosition_cartesian.y;
+			offset.x = next.x; // -this->_curSandboxPosition_cartesian.x;
+			offset.y = next.y; // -this->_curSandboxPosition_cartesian.y;
 
 			this->_curSandboxPosition_cartesian.x = next.x;
 			this->_curSandboxPosition_cartesian.y = next.y;
