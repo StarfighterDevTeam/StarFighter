@@ -375,6 +375,18 @@ sf::Vector2f Independant::getSize_for_Direction(Directions direction, sf::Vector
 	}
 }
 
+sf::Vector2i Independant::getSize_for_Direction(Directions direction, sf::Vector2i size)
+{
+	if (direction == Directions::DIRECTION_LEFT || direction == Directions::DIRECTION_RIGHT)
+	{
+		return sf::Vector2i(size.y, size.x);
+	}
+	else
+	{
+		return size;
+	}
+}
+
 sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vector2f speed)
 {
 	speed = Independant::getSize_for_Direction(direction, sf::Vector2f(speed.x, speed.y));
@@ -420,7 +432,7 @@ float Independant::getRotation_for_Direction(Directions direction)
 	}
 }
 
-sf::Vector2f Independant::getPosition_for_Direction(Directions direction, sf::Vector2f position)
+sf::Vector2f Independant::getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale)
 {
 	float x = position.x;
 	float y = position.y;
@@ -432,16 +444,22 @@ sf::Vector2f Independant::getPosition_for_Direction(Directions direction, sf::Ve
 	}
 	else if (direction == Directions::DIRECTION_RIGHT)
 	{
-		x = x * SCENE_SIZE_Y / SCENE_SIZE_X;
-		y = y * SCENE_SIZE_X / SCENE_SIZE_Y;
+		if (rescale)
+		{
+			x = x * SCENE_SIZE_Y / SCENE_SIZE_X;
+			y = y * SCENE_SIZE_X / SCENE_SIZE_Y;
+		}
 		float x_ = x;
 		x = SCENE_SIZE_X - y;
 		y = x_;
 	}
 	else if (direction == Directions::DIRECTION_LEFT)
 	{
-		x = x * SCENE_SIZE_Y / SCENE_SIZE_X;
-		y = y * SCENE_SIZE_X / SCENE_SIZE_Y;
+		if (rescale)
+		{
+			x = x * SCENE_SIZE_Y / SCENE_SIZE_X;
+			y = y * SCENE_SIZE_X / SCENE_SIZE_Y;
+		}
 		float x_ = x;
 		x = y;
 		y = SCENE_SIZE_Y - x_;

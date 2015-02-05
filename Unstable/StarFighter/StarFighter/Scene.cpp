@@ -307,8 +307,8 @@ void Scene::GenerateEnemies(Time deltaTime)
 		double random_number = ((double)rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
-		int nb_rows = 1;
-		int nb_lines = 1;
+		int nb_rows = 2;
+		int nb_lines = 2;
 		float xspread = 200;
 		float yspread = 50;
 		// liste de classes d'ennemis : alpha, alpha, alpha, alpha, alpha
@@ -347,21 +347,41 @@ void Scene::GenerateEnemies(Time deltaTime)
 			{
 				max_enemy_size.x = e->enemy->m_size.x;
 			}
+			/*
 			if (e->enemy->m_size.y > max_enemy_size.y)
 			{
 				max_enemy_size.y = e->enemy->m_size.y;
 			}
+			*/
 
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize--;
 
 			cluster->push_back(e);
 		}
 
-		sf::Vector2f size = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y));
-		float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(max_enemy_size.x / 2, SCENE_SIZE_X - size.x - (max_enemy_size.x / 2)));
+		sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + (nb_rows * max_enemy_size.x), ((nb_lines - 1) * yspread) + (nb_lines * max_enemy_size.y));
+		
+		//calculation of random coordinates for the spawn of the cluster
 
-		sf::Vector2f pos = Independant::getPosition_for_Direction((*CurrentGame).direction, sf::Vector2f(random_posX, -(size.y / 2)));
+		//min position
+		sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x/2, -size.y/2);
+		rand_coordinates_min = Independant::getPosition_for_Direction((*CurrentGame).direction, rand_coordinates_min, false);
 
+		//length of the allowed spread
+		int i_ = Independant::getDirectionMultiplier((*CurrentGame).direction).y;
+		float allowed_spread = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(i_*(SCENE_SIZE_X - size.x), i_*(SCENE_SIZE_Y - size.x))).x;
+
+		//random value inside the allowed spread
+		float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(0, allowed_spread));
+
+		//getting position coordinates
+		float pos_x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;
+		float pos_y = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(rand_coordinates_min.y, rand_coordinates_min.y + random_posX)).x;
+		sf::Vector2f pos = sf::Vector2f(pos_x, pos_y);
+
+		printf("Random between %f and %f. Chosen: %f.\n", rand_coordinates_min.x, rand_coordinates_min.x + allowed_spread, pos_x);
+
+		//generating the cluster at the given coordinates
 		EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
 
 		// OLD MAIS FONCTIONNEL = BACKUP

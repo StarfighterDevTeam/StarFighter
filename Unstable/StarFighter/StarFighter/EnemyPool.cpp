@@ -34,15 +34,25 @@ void EnemyPool::CreateCluster()
 	int reverse_line = Independant::getDirectionMultiplier((*CurrentGame).direction).x;
 	int reverse_row = Independant::getDirectionMultiplier((*CurrentGame).direction).y;
 
+	int nb_rows_ = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2i(nb_rows, nb_lines)).x;
+	int nb_lines_ = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2i(nb_lines, nb_rows)).x;
+
 	for (std::vector<EnemyPoolElement*>::iterator it = enemyCluster->begin() ; it != enemyCluster->end(); ++it)
 	{
 		if ( (*(*it)).enemy_class != EnemyClass::ENEMYPOOL_VOID)
 		{
 			Enemy* n = (*it)->enemy->Clone();
 			n->setVisible(true);
-			n->setPosition(sf::Vector2f(this->position.x + reverse_line*(index % nb_rows)*xspread, this->position.y + reverse_row*(floor(index / nb_rows) - 1)*yspread));
 
-			n->enemy_class = (*it)->enemy_class;
+			//WIP
+			float offset_x_ = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f((index % nb_rows)*reverse_line*xspread, (floor(index / nb_rows) - 1)*reverse_line*yspread)).x;
+			float offset_y_ = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f((index % nb_rows)*reverse_row*xspread, (floor(index / nb_rows) - 1)*reverse_row*yspread)).y;
+
+			//n->setPosition(sf::Vector2f(this->position.x + reverse_line*(index % nb_rows_)*Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(xspread, yspread)).x,
+			//	this->position.y + reverse_row*(floor(index / nb_lines_) - 1)*Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(xspread, yspread)).y));
+			n->setPosition(sf::Vector2f(this->position.x + offset_x_, this->position.y + offset_y_));
+				
+				n->enemy_class = (*it)->enemy_class;
 			n->enemy_class = EnemyClass::ENEMYPOOL_GAMMA;
 
 			(*CurrentGame).addToScene(n,LayerType::EnemyObjectLayer, IndependantType::EnemyObject);

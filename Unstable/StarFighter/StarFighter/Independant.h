@@ -141,10 +141,11 @@ public:
 
 	static sf::Vector2i getDirectionMultiplier(Directions direction);
 	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);
+	static sf::Vector2i Independant::getSize_for_Direction(Directions direction, sf::Vector2i size);
 	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
 	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f speed);
 	
-	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position);
+	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	void setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
 
