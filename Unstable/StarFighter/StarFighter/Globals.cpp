@@ -63,3 +63,13 @@ float RandomizeFloatBetweenValues(sf::Vector2f min_max_values)
 	return random_value;
 }
 
+float MaxBetweenValues(sf::Vector2f values)
+{
+	float max = values.x;
+	if (values.y > max)
+	{
+		max = values.y;
+	}
+	return max;
+}
+

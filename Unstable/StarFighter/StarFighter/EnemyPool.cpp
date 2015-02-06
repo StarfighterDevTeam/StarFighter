@@ -43,6 +43,7 @@ void EnemyPool::CreateCluster()
 		{
 			Enemy* n = (*it)->enemy->Clone();
 			n->setVisible(true);
+			n->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
 
 			//WIP
 			float offset_x_ = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f((index % nb_rows)*reverse_line*xspread, (floor(index / nb_rows) - 1)*reverse_line*yspread)).x;
