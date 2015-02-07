@@ -299,7 +299,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if (timer > 4)
+	if (timer > 2)
 	{
 		double intpart;
 		timer = modf(timer, &intpart);
@@ -347,13 +347,21 @@ void Scene::GenerateEnemies(Time deltaTime)
 			{
 				max_enemy_size.x = e->enemy->m_size.x;
 			}
+			if (e->enemy->m_size.y > max_enemy_size.y)
+			{
+				max_enemy_size.y = e->enemy->m_size.y;
+			}
 
 			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize--;
 
 			cluster->push_back(e);
 		}
 
-		sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + (nb_rows * max_enemy_size.x), ((nb_lines - 1) * yspread) + (nb_lines * max_enemy_size.y));
+		//SAFE estimate
+		//sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + (nb_rows * max_enemy_size.x), ((nb_lines - 1) * yspread) + (nb_lines * max_enemy_size.y));
+
+		//PIN-POINT estimate
+		sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y);
 
 		//CALCULATION OF A RANDOM POSITION TO SPAWN THE CLUSTER 
 		//min position
@@ -363,12 +371,13 @@ void Scene::GenerateEnemies(Time deltaTime)
 		//length of the allowed spread
 		int i_ = Independant::getDirectionMultiplier((*CurrentGame).direction).y;
 		float allowed_spread = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(i_*(SCENE_SIZE_X - size.x), i_*(SCENE_SIZE_Y - size.x))).x;
+		printf("Allowed spread: %f. Cluster size: %f. Max neemy size: %f\n", allowed_spread, size.x, max_enemy_size.x);
 
 		//cutting clusters bigger than the scene (+ debug message)
-		if (allowed_spread < 0)
+		if ((allowed_spread*Independant::getDirectionMultiplier((*CurrentGame).direction).y) < 0)
 		{
 			LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: No possibility to spawn this enemy cluster within scene size. Spawn skipped. Please check the configuration of enemy sizes and cluster spread values.\n"));
-			//return;
+			return;
 		}
 		
 		//random value inside the allowed spread
@@ -378,6 +387,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		float pos_x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;
 		float pos_y = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(rand_coordinates_min.y, rand_coordinates_min.y + random_posX)).x;
 		sf::Vector2f pos = sf::Vector2f(pos_x, pos_y);
+		printf("Random posX: %f. Spawn pos: %f, %f.\n\n", random_posX, pos_x, pos_y);
 
 		//generating the cluster at the given coordinates
 		EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
