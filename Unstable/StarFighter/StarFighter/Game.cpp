@@ -311,13 +311,26 @@ void Game::collectGarbage()
 
 }
 
-void Game::garbageLayer(LayerType m_layer)
+void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 {
+	int clear_count = 0;
 	for (std::list<Independant*>::iterator it = (this->sceneIndependantsLayered[m_layer])->begin(); it != (this->sceneIndependantsLayered[m_layer])->end(); it++)
 	{
-		(*it)->visible = false;
-		(*it)->isOnScene = false;
-		(*it)->GarbageMe = true;
+		if (only_offscene)
+		{
+			if (!(*it)->isOnScene)
+			{
+				(*it)->GarbageMe = true;
+				clear_count++;
+				printf("Clearing (%d) enemies that have spawned out of scene at the last screen.\n", clear_count);
+			}
+		}
+		else
+		{
+			(*it)->visible = false;
+			(*it)->isOnScene = false;
+			(*it)->GarbageMe = true;
+		}
 	}
 }
 

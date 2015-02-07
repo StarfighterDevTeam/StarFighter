@@ -42,7 +42,7 @@ public:
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
-	void garbageLayer (LayerType m_layer);
+	void garbageLayer (LayerType m_layer, bool only_offscene=false);
 	void SetLayerRotation(LayerType m_layer, float angle);
 	sf::RenderTexture offscreen;
 

@@ -221,6 +221,11 @@ void InGameState::InGameStateMachineCheck()
 
 												this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
 											}
+											//clearing enemies that have spawned out of the scene size
+											else
+											{
+												(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
+											}
 
 											break;
 
