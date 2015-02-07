@@ -778,28 +778,57 @@ void Ship::update(sf::Time deltaTime)
 	Independant::update(deltaTime);
 
 	//screen borders contraints	correction
-	if (this->getPosition().x < ship_config.size.x / 2)
+	if (this->ship_config.ship_model->hasFake)
 	{
-		this->setPosition(ship_config.size.x / 2, this->getPosition().y);
-		speed.x = 0;
-	}
+		if (this->getPosition().x < ship_config.ship_model->fake_size.x / 2)
+		{
+			this->setPosition(ship_config.ship_model->fake_size.x / 2, this->getPosition().y);
+			speed.x = 0;
+		}
 
-	if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x / 2))
-	{
-		this->setPosition(SCENE_SIZE_X - (ship_config.size.x / 2), this->getPosition().y);
-		speed.x = 0;
-	}
+		if (this->getPosition().x > SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2))
+		{
+			this->setPosition(SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2), this->getPosition().y);
+			speed.x = 0;
+		}
 
-	if (this->getPosition().y < ship_config.size.y / 2)
-	{
-		this->setPosition(this->getPosition().x, ship_config.size.y / 2);
-		speed.y = 0;
-	}
+		if (this->getPosition().y < ship_config.ship_model->fake_size.y / 2)
+		{
+			this->setPosition(this->getPosition().x, ship_config.ship_model->fake_size.y / 2);
+			speed.y = 0;
+		}
 
-	if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.size.y / 2))
+		if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2))
+		{
+			this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2));
+			speed.y = 0;
+		}
+	}
+	else
 	{
-		this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.size.y / 2));
-		speed.y = 0;
+		if (this->getPosition().x < ship_config.size.x / 2)
+		{
+			this->setPosition(ship_config.size.x / 2, this->getPosition().y);
+			speed.x = 0;
+		}
+
+		if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x / 2))
+		{
+			this->setPosition(SCENE_SIZE_X - (ship_config.size.x / 2), this->getPosition().y);
+			speed.x = 0;
+		}
+
+		if (this->getPosition().y < ship_config.size.y / 2)
+		{
+			this->setPosition(this->getPosition().x, ship_config.size.y / 2);
+			speed.y = 0;
+		}
+
+		if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.size.y / 2))
+		{
+			this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.size.y / 2));
+			speed.y = 0;
+		}
 	}
 }
 
