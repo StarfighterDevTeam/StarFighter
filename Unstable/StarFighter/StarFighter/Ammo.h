@@ -22,6 +22,8 @@ public:
 	void Death() override;
 	void update(sf::Time deltaTime) override;
 
+	float radius;
+	float angspeed;
 	float ref_speed;
 };
 

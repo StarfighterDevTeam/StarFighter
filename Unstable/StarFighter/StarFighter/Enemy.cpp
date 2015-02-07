@@ -6,7 +6,9 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
-	movepattern_type = 0;//type de pattern hardcodé pour l'instant
+	//movepattern_type = 0;//type de pattern hardcodé pour l'instant
+	angspeed = 0;
+	radius = 0;
 	FX_death = m_FX_death;
 	hasWeapon = false;
 	enemy_class = EnemyClass::ENEMYPOOL_ZETA;
@@ -71,6 +73,10 @@ Enemy* Enemy::Clone()
 	enemy->weapon_loot = this->getWeaponLoot();
 	enemy->display_name = this->display_name;
 	enemy->enemy_class = this->enemy_class;
+
+	enemy->Pattern = this->Pattern;
+	enemy->angspeed = this->angspeed;
+	enemy->radius = this->radius;
 
 	return enemy;
 }

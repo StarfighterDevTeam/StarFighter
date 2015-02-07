@@ -38,7 +38,8 @@ public:
 	Enemy* Clone();
 	FX* FX_death;
 	void Death() override;
-	int movepattern_type;
+	float radius;
+	float angspeed;
 	bool hasWeapon;
 	void GenerateLoot() override;
 	void CreateRandomLoot(float BeastScaleBonus=0) override;

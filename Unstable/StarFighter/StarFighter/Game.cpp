@@ -397,7 +397,6 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 			angle = -angle;
 		}
 	}
-	printf("angle: %f\n", angle);
 
 	return angle;
 }

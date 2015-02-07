@@ -12,12 +12,19 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	startPattern = false;
 	ref_speed = sqrt(pow(speed.x,2)+pow(speed.y,2));
 	this->explosion = m_explosion;
+	this->radius = 0;
+	this->angspeed = 0;
 }
 
 Ammo* Ammo::Clone()
 {
 	Ammo* m_ammo = new Ammo(this->getPosition(),this->speed,this->textureName,this->m_size,this->damage, this->explosion);
 	m_ammo->display_name = this->display_name;
+
+	m_ammo->Pattern = this->Pattern;
+	m_ammo->radius = this->radius;
+	m_ammo->angspeed = this->angspeed;
+
 	return m_ammo;
 }
 

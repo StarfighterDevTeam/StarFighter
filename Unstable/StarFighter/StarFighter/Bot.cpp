@@ -6,11 +6,12 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 {
 	collider_type = IndependantType::FriendlyFire;
 	visible = true;
-	movepattern_type = 0;//type de pattern hardcodé pour l'instant
+	//movepattern_type = 0;//type de pattern hardcodé pour l'instant
 	visible = true;
 	isOnScene = true;
 	DontGarbageMe = true;
 	radius = 0;
+	angspeed = 0;
 	vspeed = 0;
 	hasTarget = false;
 	hasWeapon = false;
@@ -69,6 +70,7 @@ Bot* Bot::Clone()
 	Bot* bot = new Bot(this->getPosition(), this->speed, this->textureName, this->m_size);
 	bot->display_name = this->display_name;
 	bot->radius = this->radius;
+	bot->angspeed = this->angspeed;
 	bot->vspeed = this->vspeed;
 	bot->Pattern = this->Pattern;
 	bot->spread = this->spread;
