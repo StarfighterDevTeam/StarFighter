@@ -361,3 +361,43 @@ void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastSc
 {
 	this->BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
 }
+
+float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position)
+{
+	float angle = 0.f;
+	sf::Vector2f pos;
+	float shortest_distance = -1.f;
+	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[type])->begin(); it != (this->sceneIndependantsTyped[type])->end(); it++)
+	{
+		if ((*it)->isOnScene)
+		{
+
+			float distance_to_ref = (pow((ref_position.x - (*it)->getPosition().x), 2) + pow((ref_position.y - (*it)->getPosition().y), 2));
+			if (distance_to_ref < shortest_distance || shortest_distance < 0)
+			{
+				shortest_distance = distance_to_ref;
+				pos = (*it)->getPosition();
+			}
+		}
+	}
+	if (shortest_distance > 0)
+	{
+		shortest_distance = sqrtf(shortest_distance);
+		//angle = acos((ref_position.y - pos.y) / shortest_distance);
+		sf::Vector2f diff_position = Independant::getSize_for_Direction(this->direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
+		diff_position.x *= Independant::getDirectionMultiplier(this->direction).x;
+		angle = acos(diff_position.x / shortest_distance);
+		angle = angle * 180 / M_PI;
+
+		diff_position.y *= Independant::getDirectionMultiplier(this->direction).y;
+
+		//if (ref_position.x < pos.x)
+		if (diff_position.y < 0)
+		{
+			angle = -angle;
+		}
+	}
+	printf("angle: %f\n", angle);
+
+	return angle;
+}

@@ -299,7 +299,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if (timer > 3)
+	if (timer > 4)
 	{
 		double intpart;
 		timer = modf(timer, &intpart);
@@ -368,7 +368,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		if (allowed_spread < 0)
 		{
 			LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: No possibility to spawn this enemy cluster within scene size. Spawn skipped. Please check the configuration of enemy sizes and cluster spread values.\n"));
-			return;
+			//return;
 		}
 		
 		//random value inside the allowed spread

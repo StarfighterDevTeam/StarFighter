@@ -41,6 +41,8 @@ public:
 	float rate_of_fire;
 	sf::Clock deltaClock;
 	Ammo* ammunition;
+	bool target_seaking;
+	void SeakTarget(IndependantType m_collider_type);
 
 	//special weapon abilities
 	int multishot;

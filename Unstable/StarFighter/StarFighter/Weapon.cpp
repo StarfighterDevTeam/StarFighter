@@ -17,6 +17,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	rafale_cooldown = 0.8f;
 	rafale = 0;
 	rafale_index = 0;
+	target_seaking = false;
 
 	this->ammunition = Ammunition;
 }
@@ -28,14 +29,28 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->setPosition(getPosition().x + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).y)),
 		getPosition().y + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).x)));
 
-	bullet->speed = this->AngleShot(this->angle + dispersion, bullet->ref_speed);
+	float angle_offset = 0;
+	if (target_seaking)
+	{
+		if (m_collider_type == IndependantType::FriendlyFire)
+		{
+			angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition());
+		}
+ 		else if (m_collider_type == IndependantType::EnemyFire)
+		{
+			angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition());
+			angle_offset += 180;
+		}
+	}
+
+	bullet->speed = this->AngleShot(this->angle + dispersion + angle_offset, bullet->ref_speed);
 
 	bullet->speed = Independant::getSpeed_for_Direction((*CurrentGame).direction, bullet->speed);
 	bullet->speed.x = bullet->speed.x * - this->fire_direction.y;
 	bullet->speed.y = bullet->speed.y * this->fire_direction.y;
 
 	bullet->rotate(Independant::getRotation_for_Direction((*CurrentGame).direction));
-	bullet->rotate(this->angle - dispersion);
+	bullet->rotate(this->angle - dispersion - angle_offset);
 
 	bullet->setVisible(true);
 	bullet->collider_type = m_collider_type;
@@ -217,6 +232,7 @@ Weapon* Weapon::Clone()
 	weapon->dispersion = this->dispersion;
 	weapon->rafale = this->rafale;
 	weapon->rafale_cooldown = this->rafale_cooldown;
+	weapon->target_seaking = this->target_seaking;
 
 	return weapon;
 }

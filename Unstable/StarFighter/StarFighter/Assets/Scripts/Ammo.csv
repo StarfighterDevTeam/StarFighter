@@ -1,4 +1,4 @@
 #ammo_name,damage,vspeed,image,width,height,frames,FX_explosion
 laser_beam,50,400,Assets/2D/laser.png,4,12,1,death_explosion
 laser_blue,40,300,Assets/2D/laser_blue.png,4,16,1,explosion_S_blue
-fireball,50,200,Assets/2D/fireball.png,8,8,1,explosion_S
+fireball,50,350,Assets/2D/fireball.png,8,8,1,explosion_S
