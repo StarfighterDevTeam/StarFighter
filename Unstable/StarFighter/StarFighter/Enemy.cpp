@@ -31,12 +31,15 @@ void Enemy::update(sf::Time deltaTime)
 	//automatic fire
 	if(isOnScene & hasWeapon)
 	{
-		weapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).x,
-			(this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).y);
+		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+		{
+			(*it)->weaponOffset = sf::Vector2f((this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).x,
+				(this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).y);
 
-		weapon->setPosition(this->getPosition().x + weapon->weaponOffset.x, this->getPosition().y + weapon->weaponOffset.y);
+			(*it)->setPosition(this->getPosition().x + (*it)->weaponOffset.x, this->getPosition().y + (*it)->weaponOffset.y);
 
-		weapon->Fire(IndependantType::EnemyFire);
+			(*it)->Fire(IndependantType::EnemyFire);
+		}
 
 		//sheld regen if not maximum
 		if (shield < getIndependantShield())
@@ -64,8 +67,13 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->damage = this->getIndependantDamage();
 	enemy->hasWeapon = this->hasWeapon;
 	if (enemy->hasWeapon)
-		enemy->weapon = this->weapon->Clone();
-
+	{
+		//enemy->weapon = this->weapon->Clone();
+		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+		{
+			enemy->weapons_list.push_back((*it)->Clone());
+		}	
+	}
 	((Independant*)enemy)->addMoney(this->getMoney());
 	enemy->hasEquipmentLoot = this->hasEquipmentLoot;
 	enemy->equipment_loot = this->getEquipmentLoot();

@@ -35,6 +35,7 @@ public:
 	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death);
 	void update(sf::Time deltaTime) override;
 	Weapon* weapon;
+	list<Weapon*> weapons_list;
 	Enemy* Clone();
 	FX* FX_death;
 	void Death() override;

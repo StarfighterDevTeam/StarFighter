@@ -90,11 +90,21 @@ EnemyBase* FileLoader::LoadEnemy(string name, int probability, int poolSize, int
 			
 			base->enemy->angspeed = stoi((*it)[EnemyData::ENEMY_ANGSPEED]);
 			base->enemy->radius = stoi((*it)[EnemyData::ENEMY_RADIUS]);
-			
 
 			if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
 			{
-				base->enemy->weapon = FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO]));
+				//base->enemy->weapon = FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO]));
+				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO])));
+				base->enemy->hasWeapon = true;
+			}
+			if ((*it)[EnemyData::ENEMY_WEAPON_2].compare("0") != 0)
+			{
+				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_2], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_2])));
+				base->enemy->hasWeapon = true;
+			}
+			if ((*it)[EnemyData::ENEMY_WEAPON_3].compare("0") != 0)
+			{
+				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_3], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_3])));
 				base->enemy->hasWeapon = true;
 			}
 
