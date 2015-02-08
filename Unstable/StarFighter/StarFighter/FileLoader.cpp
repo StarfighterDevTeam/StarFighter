@@ -121,6 +121,24 @@ EnemyBase* FileLoader::LoadEnemy(string name, int probability, int poolSize, int
 			
 			base->enemy->Pattern.SetPattern(pattern_type, base->enemy->angspeed, v); //vitesse angulaire (degres/s)
 
+			//Loading phases
+			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
+			{
+				base->enemy->phases_list.push_back(FileLoader::LoadPhase((*it)[EnemyData::ENEMY_PHASE]));
+				base->enemy->hasPhases = true;
+				base->enemy->setPhase(FileLoader::LoadPhase((*it)[EnemyData::ENEMY_PHASE]));
+			}
+			if ((*it)[EnemyData::ENEMY_PHASE_2].compare("0") != 0)
+			{
+				base->enemy->phases_list.push_back(FileLoader::LoadPhase((*it)[EnemyData::ENEMY_PHASE_2]));
+				base->enemy->hasPhases = true;
+			}
+			if ((*it)[EnemyData::ENEMY_PHASE_3].compare("0") != 0)
+			{
+				base->enemy->phases_list.push_back(FileLoader::LoadPhase((*it)[EnemyData::ENEMY_PHASE_3]));
+				base->enemy->hasPhases = true;
+			}
+
 			return base;
 		}
 	}
@@ -352,4 +370,56 @@ Bot* FileLoader::LoadBot(string name)
 	}
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find Bot '%s'. Please check the config file",name));
+}
+
+Phase* FileLoader::LoadPhase(string name)
+{
+	list<vector<string>> phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
+
+	for (std::list<vector<string>>::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
+	{
+		if ((*it)[0].compare(name) == 0)
+		{
+			Phase* phase = new Phase();
+
+			phase->display_name = (*it)[EnemyPhaseData::PHASE_NAME];
+			phase->vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
+
+			//loading weapons and ammos
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON].compare("0") != 0)
+			{
+				phase->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO])));
+			}
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
+			{
+				phase->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, FileLoader::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2])));
+			}
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
+			{
+				phase->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, FileLoader::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3])));
+			}
+
+			//loading movement patterns
+			PatternType pattern_type = PatternType::NoMovePattern;
+			if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("circle") == 0)
+			{
+				pattern_type = PatternType::Circle_;
+				phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
+				phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
+			}
+				
+			if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("oscillator") == 0)
+			{
+				pattern_type = PatternType::Oscillator;
+				phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
+				phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
+			}
+
+			phase->pattern = pattern_type;
+
+			return phase;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPhase '%s'. Please check the config file", name));
 }

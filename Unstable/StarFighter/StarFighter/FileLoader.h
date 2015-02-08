@@ -114,6 +114,9 @@ enum EnemyData
 	ENEMY_PATTERN,//18
 	ENEMY_ANGSPEED,//19
 	ENEMY_RADIUS,//20
+	ENEMY_PHASE,//21
+	ENEMY_PHASE_2,//22
+	ENEMY_PHASE_3,//23
 };
 
 enum WeaponData
@@ -192,6 +195,21 @@ enum BotData
 	BOT_YSPREAD,//16
 };
 
+enum EnemyPhaseData
+{
+	PHASE_NAME,//0
+	PHASE_VSPEED,//1
+	PHASE_WEAPON,//2
+	PHASE_AMMO,//3
+	PHASE_WEAPON_2,//4
+	PHASE_AMMO_2,//5
+	PHASE_WEAPON_3,//6
+	PHASE_AMMO_3,//7
+	PHASE_PATTERN,//8
+	PHASE_ANGSPEED,//9
+	PHASE_RADIUS,//10
+};
+
 class FileLoader
 {
 public:
@@ -204,6 +222,7 @@ public:
 	static FX* FileLoader::LoadFX(string name);
 	static Equipment* FileLoader::LoadEquipment(string name);
 	static Bot* FileLoader::LoadBot(string name);
+	static Phase* FileLoader::LoadPhase(string name);
 };
 
 #endif //FILELOADER_H_INCLUDED

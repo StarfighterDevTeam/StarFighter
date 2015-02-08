@@ -29,12 +29,24 @@ const sf::Vector2f LootTable_BeastScale_Base[EnemyClass::NBVAL_EnemyClass] =  {s
 const float LootTable_BeastScaleThreshold[NUMBER_OF_BEASTSCALE_THRESHOLD] =  {0.0, 1.5, 3.0, 4.5, 6.0};
 const int LootTable_MaxPropertiesPerEquipmentType[EquipmentType::NBVAL_EQUIPMENT+1] =  {1, 2, 1, 2, 4, 4};
 
+class Phase
+{
+public:
+	Phase();
+	std::string display_name;
+	list<Weapon*> weapons_list;
+	PatternType pattern;
+	float angspeed;
+	float radius;
+	float vspeed;
+};
+
 class Enemy : public Independant
 {
 public:
 	Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death);
 	void update(sf::Time deltaTime) override;
-	Weapon* weapon;
+	//Weapon* weapon;
 	list<Weapon*> weapons_list;
 	Enemy* Clone();
 	FX* FX_death;
@@ -45,6 +57,10 @@ public:
 	void GenerateLoot() override;
 	void CreateRandomLoot(float BeastScaleBonus=0) override;
 	EnemyClass enemy_class;
+	void setPhase(Phase* phase);
+	list<Phase*> phases_list;
+	bool hasPhases;
+
 private:
 	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);	
 };

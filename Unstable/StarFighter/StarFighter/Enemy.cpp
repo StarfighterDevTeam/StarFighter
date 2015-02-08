@@ -2,6 +2,10 @@
 
 extern Game* CurrentGame;
 
+Phase::Phase()
+{
+}
+
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death)  : Independant(position, speed,  textureName, size) 
 {
 	collider_type = IndependantType::EnemyObject;
@@ -12,10 +16,21 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	FX_death = m_FX_death;
 	hasWeapon = false;
 	enemy_class = EnemyClass::ENEMYPOOL_ZETA;
+	hasPhases = false;
 }
 
 void Enemy::update(sf::Time deltaTime)
 {
+	//TO REMOVE
+	//if (this->hasPhases)
+	//{
+	//	if (this->getPosition().y > 150)
+	//	{
+	//		this->setPhase(this->phases_list.back());
+	//		this->hasPhases = false;
+	//	}
+	//
+	//}
 
 	//sheld regen if not maximum
 	if (shield < shield_max)
@@ -53,6 +68,7 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 	Independant::update(deltaTime);
+	
 }
 
 Enemy* Enemy::Clone()
@@ -66,14 +82,12 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
 	((Independant*)enemy)->damage = this->getIndependantDamage();
 	enemy->hasWeapon = this->hasWeapon;
-	if (enemy->hasWeapon)
+
+	for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 	{
-		//enemy->weapon = this->weapon->Clone();
-		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
-		{
-			enemy->weapons_list.push_back((*it)->Clone());
-		}	
-	}
+		enemy->weapons_list.push_back((*it)->Clone());
+	}	
+	
 	((Independant*)enemy)->addMoney(this->getMoney());
 	enemy->hasEquipmentLoot = this->hasEquipmentLoot;
 	enemy->equipment_loot = this->getEquipmentLoot();
@@ -86,7 +100,33 @@ Enemy* Enemy::Clone()
 	enemy->angspeed = this->angspeed;
 	enemy->radius = this->radius;
 
+	enemy->hasPhases = this->hasPhases;
+	for (std::list<Phase*>::iterator it = (this->phases_list.begin()); it != (this->phases_list.end()); it++)
+	{
+		enemy->phases_list.push_back(*it);
+	}
+
 	return enemy;
+}
+
+void Enemy::setPhase(Phase* phase)
+{
+	//Phase* phase = FileLoader::LoadPhase(phase_name);
+
+	this->speed.y = phase->vspeed;
+
+	//clearing old weapons and setting new ones
+	this->weapons_list.clear();
+	for (std::list<Weapon*>::iterator it = (phase->weapons_list.begin()); it != (phase->weapons_list.end()); it++)
+	{
+		this->weapons_list.push_back((*it)->Clone());
+	}
+
+	//setting new move pattern
+	vector<float>* v = new vector<float>;
+	v->push_back(phase->radius); // rayon
+	v->push_back(1);  // clockwise (>)
+	this->Pattern.SetPattern(phase->pattern, phase->angspeed, v); //vitesse angulaire (degres/s)
 }
 
 void Enemy::Death()

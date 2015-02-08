@@ -1,0 +1,3 @@
+#phase_name,vspeed,weapon_name,ammo_name,weapon2_name,ammo2_name,weapon3_name,ammo3_name,pattern,angspeed,radius
+phase01,80,laser_fast,fireball,0,fireball,0,fireball,0,0,0
+phase02,0,laser,fireball,laser_arc,fireball_blue,0,fireball,oscillator,30,40
