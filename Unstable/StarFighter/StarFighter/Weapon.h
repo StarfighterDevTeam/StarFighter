@@ -11,10 +11,12 @@
 #define LASERFAST_RATE_OF_FIRE			0.2f
 #define LASERFAST_DAMAGE				50
 
-enum WeaponType {
-	Laser,
-	LaserFast,
-	NBVAL_Weapon
+enum ShotMode
+{
+	NoShotMode,//0
+	AlternateShotMode,//1
+	AscendingShotMode,//2
+	DescendingShotMode,//3
 };
 
 class Weapon : public sf::Sprite
@@ -36,6 +38,8 @@ public:
 	void FireSingleShot(IndependantType m_collider_type);
 	void FireMultiShot(IndependantType m_collider_type);
 	void FireAlternateShot(IndependantType m_collider_type);
+	void FireAscendingShot(IndependantType m_collider_type);
+	void FireDescendingShot(IndependantType m_collider_type);
 	sf::Vector2f AngleShot(float angle, float m_ref_speed);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
@@ -47,7 +51,7 @@ public:
 	//special weapon abilities
 	int multishot;
 	int xspread;
-	bool alternate;
+	ShotMode shot_mode;
 	int shot_index;
 	float angle;
 	float dispersion;

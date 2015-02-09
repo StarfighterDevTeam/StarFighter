@@ -697,7 +697,16 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
 			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
 			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
-			weapon->alternate = (bool)(stoi((*it)[WeaponData::WEAPON_ALTERNATE]));
+			weapon->shot_mode = ShotMode::NoShotMode;
+			if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
+			{
+				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
+					weapon->shot_mode = ShotMode::AlternateShotMode;
+				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending") == 0)
+					weapon->shot_mode = ShotMode::AscendingShotMode;
+				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
+					weapon->shot_mode = ShotMode::DescendingShotMode;
+			}
 			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
 			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
 			if (weapon->rafale != 0)
