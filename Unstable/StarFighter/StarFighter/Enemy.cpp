@@ -106,11 +106,7 @@ Enemy* Enemy::Clone()
 
 	enemy->hasPhases = this->hasPhases;
 	enemy->currentPhase = this->currentPhase;
-	for (std::list<Phase*>::iterator it = (this->phases_list.begin()); it != (this->phases_list.end()); it++)
-	{
-		enemy->phases_list.push_back(*it);
-	}
-
+	enemy->enemyClock.restart();
 
 	return enemy;
 }
@@ -129,13 +125,12 @@ bool Enemy::CheckCondition()
 														return true;
 												  }
 													  
-												  else
-													  return false;
+												  break;
 
 
 		}
 		
-		case ConditionType::Clock:{
+		case ConditionType::phaseClock:{
 									  if ((this->phaseClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 									  {
 										  this->setPhase((*it)->nextPhase_name);
@@ -146,13 +141,28 @@ bool Enemy::CheckCondition()
 										  this->setPhase((*it)->nextPhase_name);
 										  return true;
 									  }
-									  else
-										  return false;
-		}
 
-		default: return false;
+									  break;
+		}
+		case ConditionType::enemyClock:{
+										   if ((this->enemyClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+										   {
+											   this->setPhase((*it)->nextPhase_name);
+											   this->enemyClock.restart();
+											   return true;
+										   }
+										   else if ((this->enemyClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+										   {
+											   this->setPhase((*it)->nextPhase_name);
+											   this->enemyClock.restart();
+											   return true;
+										   }
+										   
+										   break;
+		}
 		}
 	}
+	return false;
 }
 
 void Enemy::setPhase(string phase_name)
@@ -235,9 +245,13 @@ Phase* Enemy::LoadPhase(string name)
 				{
 					cond = ConditionType::VerticalPosition;
 				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("time") == 0)
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("phaseClock") == 0)
 				{
-					cond = ConditionType::Clock;
+					cond = ConditionType::phaseClock;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("enemyClock") == 0)
+				{
+					cond = ConditionType::enemyClock;
 				}
 
 				//loading operator type
@@ -275,9 +289,13 @@ Phase* Enemy::LoadPhase(string name)
 				{
 					cond = ConditionType::VerticalPosition;
 				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("time") == 0)
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("phaseClock") == 0)
 				{
-					cond = ConditionType::Clock;
+					cond = ConditionType::phaseClock;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("enemyClock") == 0)
+				{
+					cond = ConditionType::enemyClock;
 				}
 
 				//loading operator type

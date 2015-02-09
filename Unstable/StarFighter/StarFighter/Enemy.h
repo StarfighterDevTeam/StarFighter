@@ -56,7 +56,8 @@ enum ConditionType
 {
 	NoCondition,
 	VerticalPosition,
-	Clock,
+	phaseClock,
+	enemyClock,
 };
 
 class ConditionTransition;
@@ -103,11 +104,11 @@ public:
 
 	//phases
 	void setPhase(string phase_name);
-	list<Phase*> phases_list;
 	Phase* currentPhase;
 	bool hasPhases;
 	bool CheckCondition();
 	sf::Clock phaseClock;
+	sf::Clock enemyClock;
 	Phase* LoadPhase(string name);
 	Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	Ammo* LoadAmmo(string name);

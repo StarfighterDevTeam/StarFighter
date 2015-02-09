@@ -123,19 +123,8 @@ EnemyBase* FileLoader::LoadEnemy(string name, int probability, int poolSize, int
 			//Loading phases
 			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
 			{
-				base->enemy->phases_list.push_back(base->enemy->LoadPhase((*it)[EnemyData::ENEMY_PHASE]));
 				base->enemy->hasPhases = true;
 				base->enemy->setPhase((*it)[EnemyData::ENEMY_PHASE]);
-			}
-			if ((*it)[EnemyData::ENEMY_PHASE_2].compare("0") != 0)
-			{
-				base->enemy->phases_list.push_back(base->enemy->LoadPhase((*it)[EnemyData::ENEMY_PHASE_2]));
-				base->enemy->hasPhases = true;
-			}
-			if ((*it)[EnemyData::ENEMY_PHASE_3].compare("0") != 0)
-			{
-				base->enemy->phases_list.push_back(base->enemy->LoadPhase((*it)[EnemyData::ENEMY_PHASE_3]));
-				base->enemy->hasPhases = true;
 			}
 
 			return base;
