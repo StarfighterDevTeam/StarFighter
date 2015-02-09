@@ -119,38 +119,6 @@ enum EnemyData
 	ENEMY_PHASE_3,//23
 };
 
-enum WeaponData
-{
-	WEAPON_NAME,//0
-	WEAPON_RATE_OF_FIRE,//1
-	WEAPON_IMAGE_NAME,//2
-	WEAPON_WIDTH,//3
-	WEAPON_HEIGHT,//4
-	WEAPON_FRAMES,//5
-	WEAPON_SOUND,//6
-	WEAPON_MULTISHOT,//7
-	WEAPON_XSPREAD,//8
-	WEAPON_ALTERNATE,//9
-	WEAPON_DISPERSION,//10
-	WEAPON_RAFALE,//11
-	WEAPON_RAFALE_COOLDOWN,//12
-	WEAPON_TARGET_SEAKING,//13
-};
-
-enum AmmoData
-{
-	AMMO_NAME,//0
-	AMMO_DAMAGE,//1
-	AMMO_SPEED,//2
-	AMMO_IMAGE_NAME,//3
-	AMMO_WIDTH,//4
-	AMMO_HEIGHT,//5
-	AMMO_FRAMES,//6
-	AMMO_FX,//7
-	AMMO_PATTERN,//8
-	AMMO_ANGSPEED,//9
-	AMMO_RADIUS,//10
-};
 
 enum EnemyPoolData
 {
@@ -163,16 +131,7 @@ enum EnemyPoolData
 	ENEMYPOOL_TRIGGERY_PATTERN,//6
 };
 
-enum FXData
-{
-	FX_TYPE,//0
-	FX_NAME,//1
-	FX_FILENAME,//2
-	FX_WIDTH,//3
-	FX_HEIGHT,//4
-	FX_FRAMES,//5
-	FX_DURATION,//6
-};
+
 
 enum BotData
 {
@@ -195,21 +154,6 @@ enum BotData
 	BOT_YSPREAD,//16
 };
 
-enum EnemyPhaseData
-{
-	PHASE_NAME,//0
-	PHASE_VSPEED,//1
-	PHASE_WEAPON,//2
-	PHASE_AMMO,//3
-	PHASE_WEAPON_2,//4
-	PHASE_AMMO_2,//5
-	PHASE_WEAPON_3,//6
-	PHASE_AMMO_3,//7
-	PHASE_PATTERN,//8
-	PHASE_ANGSPEED,//9
-	PHASE_RADIUS,//10
-};
-
 class FileLoader
 {
 public:
@@ -222,7 +166,6 @@ public:
 	static FX* FileLoader::LoadFX(string name);
 	static Equipment* FileLoader::LoadEquipment(string name);
 	static Bot* FileLoader::LoadBot(string name);
-	static Phase* FileLoader::LoadPhase(string name);
 };
 
 #endif //FILELOADER_H_INCLUDED

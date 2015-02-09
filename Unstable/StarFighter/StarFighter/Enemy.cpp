@@ -4,13 +4,21 @@ extern Game* CurrentGame;
 
 Phase::Phase()
 {
+	this->hasTransition = false;
+}
+
+ConditionTransition::ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, Phase* m_nextPhase)
+{
+	this->condition = m_condition;
+	this->op = m_op;
+	this->value = m_value;
+	this->nextPhase = m_nextPhase;
 }
 
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death)  : Independant(position, speed,  textureName, size) 
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
-	//movepattern_type = 0;//type de pattern hardcodé pour l'instant
 	angspeed = 0;
 	radius = 0;
 	FX_death = m_FX_death;
@@ -22,15 +30,24 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 void Enemy::update(sf::Time deltaTime)
 {
 	//TO REMOVE
-	//if (this->hasPhases)
-	//{
-	//	if (this->getPosition().y > 150)
-	//	{
-	//		this->setPhase(this->phases_list.back());
-	//		this->hasPhases = false;
-	//	}
-	//
-	//}
+	if (this->hasPhases)
+	{
+
+		//ConditionTransition* ph = new ConditionTransition();
+		//ph->nextPhase = new Phase();
+		//ph->condition = ConditionType::VerticalPosition;
+		//ph->op = FloatCompare::GREATHER_THAN;
+		//ph->value = 150;
+		//ph->nextPhase = (this->phases_list.back());
+		//this->currentPhase->transitions_list.push_back(ph);
+
+		if (this->CheckCondition())
+		{
+			printf("BEAU GOSSE\n");
+		}
+		
+	
+	}
 
 	//sheld regen if not maximum
 	if (shield < shield_max)
@@ -101,17 +118,60 @@ Enemy* Enemy::Clone()
 	enemy->radius = this->radius;
 
 	enemy->hasPhases = this->hasPhases;
+	enemy->currentPhase = this->currentPhase;
 	for (std::list<Phase*>::iterator it = (this->phases_list.begin()); it != (this->phases_list.end()); it++)
 	{
 		enemy->phases_list.push_back(*it);
 	}
 
+
 	return enemy;
+}
+
+bool Enemy::CheckCondition()
+{
+	for (std::list<ConditionTransition*>::iterator it = (this->currentPhase->transitions_list.begin()); it != (this->currentPhase->transitions_list.end()); it++)
+	{
+		switch ((*it)->condition)
+		{
+		case ConditionType::VerticalPosition: {
+												  FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y*SCENE_SIZE_X, (*it)->value));
+												  if (result == (*it)->op)
+												  {
+														this->setPhase((*it)->nextPhase);
+														return true;
+												  }
+													  
+												  else
+													  return false;
+
+
+		}
+		
+		case ConditionType::Clock:{
+									  if ((this->phaseClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+									  {
+										  this->setPhase((*it)->nextPhase);
+										  return true;
+									  }
+									  else if ((this->phaseClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+									  {
+										  this->setPhase((*it)->nextPhase);
+										  return true;
+									  }
+									  else
+										  return false;
+		}
+
+		default: return false;
+		}
+	}
 }
 
 void Enemy::setPhase(Phase* phase)
 {
-	//Phase* phase = FileLoader::LoadPhase(phase_name);
+	this->currentPhase = phase;
+	this->phaseClock.restart();
 
 	this->speed.y = phase->vspeed;
 
@@ -127,6 +187,138 @@ void Enemy::setPhase(Phase* phase)
 	v->push_back(phase->radius); // rayon
 	v->push_back(1);  // clockwise (>)
 	this->Pattern.SetPattern(phase->pattern, phase->angspeed, v); //vitesse angulaire (degres/s)
+}
+
+Phase* Enemy::LoadPhase(string name)
+{
+	list<vector<string>> phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
+
+	for (std::list<vector<string>>::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
+	{
+		if ((*it)[0].compare(name) == 0)
+		{
+			Phase* phase = new Phase();
+
+			phase->display_name = (*it)[EnemyPhaseData::PHASE_NAME];
+			phase->vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
+
+			//loading weapons and ammos
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON].compare("0") != 0)
+			{
+				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO])));
+			}
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
+			{
+				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2])));
+			}
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
+			{
+				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3])));
+			}
+
+			//loading movement patterns
+			PatternType pattern_type = PatternType::NoMovePattern;
+			if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("circle") == 0)
+			{
+				pattern_type = PatternType::Circle_;
+				phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
+				phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
+			}
+
+			if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("oscillator") == 0)
+			{
+				pattern_type = PatternType::Oscillator;
+				phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
+				phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
+			}
+
+			phase->pattern = pattern_type;
+
+			//loading transition to next phase
+			if ((*it)[EnemyPhaseData::PHASE_TRANSITION].compare("0") != 0)
+			{
+				phase->hasTransition = true;
+
+				//loading condition type
+				ConditionType cond = ConditionType::NoCondition;
+				if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("positionV") == 0)
+				{
+					cond = ConditionType::VerticalPosition;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("time") == 0)
+				{
+					cond = ConditionType::Clock;
+				}
+
+				//loading operator type
+				FloatCompare op = FloatCompare::ERROR_COMPARE;
+				if ((*it)[EnemyPhaseData::PHASE_OPERATOR].compare("greater") == 0)
+				{
+					op = FloatCompare::GREATHER_THAN;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_OPERATOR].compare("lesser") == 0)
+				{
+					op = FloatCompare::LESSER_THAN;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_OPERATOR].compare("equal") == 0)
+				{
+					op = FloatCompare::EQUAL_TO;
+				}
+				else
+				{
+					LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition 1 of enemy phase named '%s'. Please check config file", name));
+				}
+
+				//and finally wrapping up all of this data in our list of transition conditions
+				ConditionTransition* condition = new ConditionTransition(cond, op, stoi((*it)[EnemyPhaseData::PHASE_VALUE]), this->LoadPhase((*it)[EnemyPhaseData::PHASE_TRANSITION]));
+				phase->transitions_list.push_back(condition);
+			}
+
+			//idem for transition 2
+			if ((*it)[EnemyPhaseData::PHASE_TRANSITION_2].compare("0") != 0)
+			{
+				phase->hasTransition = true;
+
+				//loading condition type
+				ConditionType cond = ConditionType::NoCondition;
+				if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("positionV") == 0)
+				{
+					cond = ConditionType::VerticalPosition;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("time") == 0)
+				{
+					cond = ConditionType::Clock;
+				}
+
+				//loading operator type
+				FloatCompare op = FloatCompare::ERROR_COMPARE;
+				if ((*it)[EnemyPhaseData::PHASE_OPERATOR_2].compare("greater") == 0)
+				{
+					op = FloatCompare::GREATHER_THAN;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_OPERATOR_2].compare("lesser") == 0)
+				{
+					op = FloatCompare::LESSER_THAN;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_OPERATOR_2].compare("equal") == 0)
+				{
+					op = FloatCompare::EQUAL_TO;
+				}
+				else
+				{
+					LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition of enemy phase named '%s'. Please check config file", name));
+				}
+
+				//and finally wrapping up all of this data in our list of transition conditions
+				ConditionTransition* condition = new ConditionTransition(cond, op, stoi((*it)[EnemyPhaseData::PHASE_VALUE_2]), this->LoadPhase((*it)[EnemyPhaseData::PHASE_TRANSITION_2]));
+				phase->transitions_list.push_back(condition);
+			}
+
+			return phase;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPhase '%s'. Please check the config file", name));
 }
 
 void Enemy::Death()
@@ -480,4 +672,95 @@ int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_
 	(*properties_roll_table)[properties_roll_table->size() - 1] = chosen_property;
 	(*properties_roll_table)[index] = a;
 	return chosen_property;
+}
+
+Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
+{
+
+	list<vector<string>> weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
+
+	for (std::list<vector<string>>::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
+	{
+		if ((*it)[0].compare(name) == 0)
+		{
+			Weapon* weapon = new Weapon(ammo);
+			weapon->display_name = (*it)[WeaponData::WEAPON_NAME];
+			weapon->fire_direction = Vector2i(0, fire_direction);
+			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
+			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
+			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
+			weapon->alternate = (bool)(stoi((*it)[WeaponData::WEAPON_ALTERNATE]));
+			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
+			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
+			if (weapon->rafale != 0)
+				weapon->rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
+
+			weapon->textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
+			weapon->size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
+			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
+			weapon->target_seaking = (bool)(stoi((*it)[WeaponData::WEAPON_TARGET_SEAKING]));
+
+			return weapon;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file", name));
+
+}
+
+Ammo* Enemy::LoadAmmo(string name)
+{
+	list<vector<string>> ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
+
+	for (std::list<vector<string>>::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
+	{
+		if ((*it)[0].compare(name) == 0)
+		{
+			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME],
+				Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]), stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
+			new_ammo->display_name = (*it)[AmmoData::AMMO_NAME];
+			new_ammo->radius = stoi((*it)[AmmoData::AMMO_RADIUS]);
+			new_ammo->angspeed = stoi((*it)[AmmoData::AMMO_ANGSPEED]);
+
+			//Loading movement pattern
+			vector<float>* v = new vector<float>;
+			v->push_back(new_ammo->radius); // rayon
+			v->push_back(1);  // clockwise (>)
+
+			PatternType pattern_type = PatternType::NoMovePattern;
+			if ((*it)[AmmoData::AMMO_PATTERN].compare("circle") == 0)
+				pattern_type = PatternType::Circle_;
+			if ((*it)[AmmoData::AMMO_PATTERN].compare("oscillator") == 0)
+				pattern_type = PatternType::Oscillator;
+
+			new_ammo->Pattern.SetPattern(pattern_type, new_ammo->angspeed, v); //vitesse angulaire (degres/s)
+
+			return new_ammo;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file", name));
+}
+
+FX* Enemy::LoadFX(string name)
+{
+	list<vector<string>>FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
+
+	for (std::list<vector<string>>::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
+	{
+		if ((*it)[FXData::FX_TYPE].compare("explosion") == 0)
+		{
+			if ((*it)[FXData::FX_NAME].compare(name) == 0)
+			{
+				float duration = atof(((*it)[FXData::FX_DURATION]).c_str());
+				FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]), stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(duration));
+				myFX->display_name = (*it)[FXData::FX_NAME];
+
+				return myFX;
+			}
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file", name));
+
 }

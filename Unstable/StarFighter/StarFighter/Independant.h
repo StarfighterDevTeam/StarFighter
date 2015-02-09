@@ -42,6 +42,7 @@ enum FloatCompare
 	LESSER_THAN,
 	EQUAL_TO,
 	GREATHER_THAN,
+	ERROR_COMPARE,
 };
 
 enum EnemyClass
@@ -168,7 +169,5 @@ protected:
 	Weapon* weapon_loot;
 
 };
-
-
 
 #endif // INDEPENDANT_H_INCLUDED

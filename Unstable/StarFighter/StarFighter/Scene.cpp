@@ -113,7 +113,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 									//And drawing the rect and text accordingly
 									this->SetLinkZone((Directions)i);
 								}
-
 							}
 						}
 					}

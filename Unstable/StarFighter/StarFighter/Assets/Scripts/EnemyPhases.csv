@@ -1,3 +1,4 @@
-#phase_name,vspeed,weapon_name,ammo_name,weapon2_name,ammo2_name,weapon3_name,ammo3_name,pattern,angspeed,radius
-phase01,80,laser_fast,fireball,0,fireball,0,fireball,0,0,0
-phase02,0,laser,fireball,laser_arc,fireball_blue,0,fireball,oscillator,30,40
+#phase_name,vspeed,weapon_name,ammo_name,weapon2_name,ammo2_name,weapon3_name,ammo3_name,pattern,angspeed,radius,transition,condition,op,value,transition2,condition2,op2,value2
+phase01,80,laser_fast,fireball,0,fireball,0,fireball,0,0,0,phase02,positionV,greater,150,0,0,0,0
+phase02,0,laser,fireball,laser_arc,fireball_blue,0,fireball,oscillator,30,40,phase03,time,greater,5,0,0,0,0
+phase03,150,0,fireball,0,fireball_blue,0,fireball,0,30,40,0,positionV,greater,150,0,0,0,0
