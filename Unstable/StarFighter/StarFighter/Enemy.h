@@ -77,11 +77,12 @@ public:
 class ConditionTransition
 {
 public:
-	ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, Phase* m_nextPhase);
+	ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, std::string m_nextPhase_name);
 	ConditionType condition;
 	FloatCompare op;
 	float value;
 	Phase* nextPhase;
+	std::string nextPhase_name;
 };
 
 class Enemy : public Independant
@@ -101,7 +102,7 @@ public:
 	EnemyClass enemy_class;
 
 	//phases
-	void setPhase(Phase* phase);
+	void setPhase(string phase_name);
 	list<Phase*> phases_list;
 	Phase* currentPhase;
 	bool hasPhases;

@@ -7,12 +7,12 @@ Phase::Phase()
 	this->hasTransition = false;
 }
 
-ConditionTransition::ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, Phase* m_nextPhase)
+ConditionTransition::ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, std::string m_nextPhase_name)
 {
 	this->condition = m_condition;
 	this->op = m_op;
 	this->value = m_value;
-	this->nextPhase = m_nextPhase;
+	this->nextPhase_name = m_nextPhase_name;
 }
 
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death)  : Independant(position, speed,  textureName, size) 
@@ -29,26 +29,6 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 
 void Enemy::update(sf::Time deltaTime)
 {
-	//TO REMOVE
-	if (this->hasPhases)
-	{
-
-		//ConditionTransition* ph = new ConditionTransition();
-		//ph->nextPhase = new Phase();
-		//ph->condition = ConditionType::VerticalPosition;
-		//ph->op = FloatCompare::GREATHER_THAN;
-		//ph->value = 150;
-		//ph->nextPhase = (this->phases_list.back());
-		//this->currentPhase->transitions_list.push_back(ph);
-
-		if (this->CheckCondition())
-		{
-			printf("BEAU GOSSE\n");
-		}
-		
-	
-	}
-
 	//sheld regen if not maximum
 	if (shield < shield_max)
 	{
@@ -85,7 +65,14 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 	Independant::update(deltaTime);
-	
+
+	if (this->hasPhases)
+	{
+		if (this->currentPhase->hasTransition)
+		{
+			this->CheckCondition();
+		}
+	}
 }
 
 Enemy* Enemy::Clone()
@@ -138,7 +125,7 @@ bool Enemy::CheckCondition()
 												  FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y*SCENE_SIZE_X, (*it)->value));
 												  if (result == (*it)->op)
 												  {
-														this->setPhase((*it)->nextPhase);
+														this->setPhase((*it)->nextPhase_name);
 														return true;
 												  }
 													  
@@ -151,12 +138,12 @@ bool Enemy::CheckCondition()
 		case ConditionType::Clock:{
 									  if ((this->phaseClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 									  {
-										  this->setPhase((*it)->nextPhase);
+										  this->setPhase((*it)->nextPhase_name);
 										  return true;
 									  }
 									  else if ((this->phaseClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
 									  {
-										  this->setPhase((*it)->nextPhase);
+										  this->setPhase((*it)->nextPhase_name);
 										  return true;
 									  }
 									  else
@@ -168,8 +155,9 @@ bool Enemy::CheckCondition()
 	}
 }
 
-void Enemy::setPhase(Phase* phase)
+void Enemy::setPhase(string phase_name)
 {
+	Phase* phase = this->LoadPhase(phase_name);
 	this->currentPhase = phase;
 	this->phaseClock.restart();
 
@@ -188,6 +176,8 @@ void Enemy::setPhase(Phase* phase)
 	v->push_back(1);  // clockwise (>)
 	this->Pattern.SetPattern(phase->pattern, phase->angspeed, v); //vitesse angulaire (degres/s)
 }
+
+
 
 Phase* Enemy::LoadPhase(string name)
 {
@@ -270,7 +260,7 @@ Phase* Enemy::LoadPhase(string name)
 				}
 
 				//and finally wrapping up all of this data in our list of transition conditions
-				ConditionTransition* condition = new ConditionTransition(cond, op, stoi((*it)[EnemyPhaseData::PHASE_VALUE]), this->LoadPhase((*it)[EnemyPhaseData::PHASE_TRANSITION]));
+				ConditionTransition* condition = new ConditionTransition(cond, op, stoi((*it)[EnemyPhaseData::PHASE_VALUE]), (*it)[EnemyPhaseData::PHASE_TRANSITION]);
 				phase->transitions_list.push_back(condition);
 			}
 
@@ -310,7 +300,7 @@ Phase* Enemy::LoadPhase(string name)
 				}
 
 				//and finally wrapping up all of this data in our list of transition conditions
-				ConditionTransition* condition = new ConditionTransition(cond, op, stoi((*it)[EnemyPhaseData::PHASE_VALUE_2]), this->LoadPhase((*it)[EnemyPhaseData::PHASE_TRANSITION_2]));
+				ConditionTransition* condition = new ConditionTransition(cond, op, stoi((*it)[EnemyPhaseData::PHASE_VALUE_2]), (*it)[EnemyPhaseData::PHASE_TRANSITION_2]);
 				phase->transitions_list.push_back(condition);
 			}
 
