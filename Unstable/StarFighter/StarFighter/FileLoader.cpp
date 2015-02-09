@@ -82,7 +82,9 @@ EnemyBase* FileLoader::LoadEnemy(string name, int probability, int poolSize, int
 			base->enemyclass = enemyClass;
 
 			((Independant*)base->enemy)->armor = stoi((*it)[EnemyData::ENEMY_ARMOR]);
-			((Independant*)base->enemy)->shield = ((Independant*)base->enemy)->shield_max = stoi((*it)[EnemyData::ENEMY_SHIELD]);
+			((Independant*)base->enemy)->armor_max = stoi((*it)[EnemyData::ENEMY_ARMOR]);
+			((Independant*)base->enemy)->shield = stoi((*it)[EnemyData::ENEMY_SHIELD]);
+			((Independant*)base->enemy)->shield_max = stoi((*it)[EnemyData::ENEMY_SHIELD]);
 			((Independant*)base->enemy)->shield_regen = stoi((*it)[EnemyData::ENEMY_SHIELD_REGEN]);
 			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
@@ -337,7 +339,9 @@ Bot* FileLoader::LoadBot(string name)
 
 			((Independant*)bot)->display_name = (*it)[BotData::BOT_NAME];
 			((Independant*)bot)->armor = stoi((*it)[BotData::BOT_ARMOR]);
-			((Independant*)bot)->shield = ((Independant*)bot)->shield_max = stoi((*it)[BotData::BOT_SHIELD]);
+			((Independant*)bot)->armor_max = stoi((*it)[BotData::BOT_ARMOR]);
+			((Independant*)bot)->shield = stoi((*it)[BotData::BOT_SHIELD]);
+			((Independant*)bot)->shield_max = stoi((*it)[BotData::BOT_SHIELD]);
 			((Independant*)bot)->shield_regen = stoi((*it)[BotData::BOT_SHIELD_REGEN]);
 			((Independant*)bot)->damage = stoi((*it)[BotData::BOT_DAMAGE]);
 			bot->radius = stoi((*it)[BotData::BOT_RADIUS]);

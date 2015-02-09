@@ -2,19 +2,6 @@
 
 extern Game* CurrentGame;
 
-Phase::Phase()
-{
-	this->hasTransition = false;
-}
-
-ConditionTransition::ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, std::string m_nextPhase_name)
-{
-	this->condition = m_condition;
-	this->op = m_op;
-	this->value = m_value;
-	this->nextPhase_name = m_nextPhase_name;
-}
-
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death)  : Independant(position, speed,  textureName, size) 
 {
 	collider_type = IndependantType::EnemyObject;
@@ -82,7 +69,9 @@ Enemy* Enemy::Clone()
 	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death);
 
 	((Independant*)enemy)->armor = this->getIndependantArmor();
+	((Independant*)enemy)->armor_max = this->getIndependantArmorMax();
 	((Independant*)enemy)->shield = this->getIndependantShield();
+	((Independant*)enemy)->shield_max = this->getIndependantShieldMax();
 	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
 	((Independant*)enemy)->damage = this->getIndependantDamage();
 	enemy->hasWeapon = this->hasWeapon;
@@ -159,6 +148,36 @@ bool Enemy::CheckCondition()
 										   }
 										   
 										   break;
+		}
+		case ConditionType::LifePourcentage:{
+												if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+												{
+													this->setPhase((*it)->nextPhase_name);
+
+													return true;
+												}
+												else if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+												{
+													this->setPhase((*it)->nextPhase_name);
+													printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
+													return true;
+												}
+												printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
+												break;
+		}
+		case ConditionType::ShieldPourcentage:{
+												if ((100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+												{
+													this->setPhase((*it)->nextPhase_name);
+													return true;
+												}
+												else if ((100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+												{
+													this->setPhase((*it)->nextPhase_name);
+													return true;
+												}
+
+												break;
 		}
 		}
 	}
@@ -253,6 +272,14 @@ Phase* Enemy::LoadPhase(string name)
 				{
 					cond = ConditionType::enemyClock;
 				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("life") == 0)
+				{
+					cond = ConditionType::LifePourcentage;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("shield") == 0)
+				{
+					cond = ConditionType::ShieldPourcentage;
+				}
 
 				//loading operator type
 				FloatCompare op = FloatCompare::ERROR_COMPARE;
@@ -296,6 +323,14 @@ Phase* Enemy::LoadPhase(string name)
 				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("enemyClock") == 0)
 				{
 					cond = ConditionType::enemyClock;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("life") == 0)
+				{
+					cond = ConditionType::LifePourcentage;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("shield") == 0)
+				{
+					cond = ConditionType::ShieldPourcentage;
 				}
 
 				//loading operator type

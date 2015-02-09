@@ -6,6 +6,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 {
 	damage = m_damage;
 	armor = 1;
+	armor_max = 1;
 	shield = 0;
 	shield_max = 0;
 	shield_regen = 0;

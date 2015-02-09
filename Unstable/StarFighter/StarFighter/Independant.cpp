@@ -180,6 +180,11 @@ int Independant::getIndependantArmor()
 	return armor;
 }
 
+int Independant::getIndependantArmorMax()
+{
+	return armor_max;
+}
+
 sf::Vector2f Independant::getIndependantSpeed()
 {
 	return sf::Vector2f(speed.x, speed.y);

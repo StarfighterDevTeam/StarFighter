@@ -6,7 +6,6 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 {
 	collider_type = IndependantType::FriendlyFire;
 	visible = true;
-	//movepattern_type = 0;//type de pattern hardcodé pour l'instant
 	visible = true;
 	isOnScene = true;
 	DontGarbageMe = true;
@@ -79,6 +78,11 @@ Bot* Bot::Clone()
 		bot->weapon = this->weapon;
 	bot->hasTarget = this->hasTarget;
 	bot->damage = this->damage;
+	bot->armor = this->armor;
+	bot->armor_max = this->armor_max;
+	bot->shield= this->shield;
+	bot->shield_max = this->shield_max;
+	bot->shield_regen = this->shield_regen;
 
 	return bot;
 }

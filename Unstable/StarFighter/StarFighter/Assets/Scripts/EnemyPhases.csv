@@ -1,5 +1,6 @@
 #phase_name,vspeed,weapon_name,ammo_name,weapon2,ammo_2,weapon3,ammo3,pattern,angspeed,radius,transition,condition,op,value,transition2,condition2,op2,value2
-phase01,80,laser_fast,fireball,0,fireball,0,fireball,0,0,0,phase02,positionV,greater,150,0,,,
-phase02,0,laser,fireball,laser_arc,fireball_blue,0,fireball,oscillator,50,60,phase03,phaseClock,greater,2,phase04,enemyClock,greater,8
-phase03,150,0,fireball,0,fire_ball,0,fireball,0,0,0,phase02,phaseClock,greater,1,phase04,enemyClock,greater,8
-phase04,-200,laser_fast,fireball,0,fireball,0,fireball,0,0,0,phase02,positionV,lesser,100,0,,,
+phase01,80,laser_fast,fireball,0,fireball,0,fireball,0,0,0,phase02,positionV,greater,150,phase05,life,lesser,30
+phase02,0,laser,fireball,laser_arc,fireball_blue,0,fireball,oscillator,50,60,phase03,shield,lesser,99,phase05,life,lesser,30
+phase03,150,0,fireball,0,fire_ball,0,fireball,0,0,0,phase04,phaseClock,greater,2,phase05,life,lesser,30
+phase04,-200,laser_fast,fireball,0,fireball,0,fireball,0,0,0,phase02,positionV,lesser,100,phase05,life,lesser,30
+phase05,200,laser_fast,fireball,laser_arc,fireball,0,fireball,0,,,0,,,,0,,,

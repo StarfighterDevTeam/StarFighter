@@ -108,6 +108,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClCompile Include="InGameState.cpp" />
     <ClCompile Include="MovePattern.cpp" />
     <ClCompile Include="PatternBobby.cpp" />
+    <ClCompile Include="Phase.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -143,6 +144,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClInclude Include="InGameState.h" />
     <ClInclude Include="MovePattern.h" />
     <ClInclude Include="PatternBobby.h" />
+    <ClInclude Include="Phase.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="Scene.h" />

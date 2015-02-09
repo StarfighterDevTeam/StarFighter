@@ -12,9 +12,57 @@
 #include "PatternBobby.h"
 #include "Globals.h"
 
+using namespace std;
+using namespace sf;
+
 class Equipment;
 class Weapon;
 class Loot;
+
+
+enum WeaponData
+{
+	WEAPON_NAME,//0
+	WEAPON_RATE_OF_FIRE,//1
+	WEAPON_IMAGE_NAME,//2
+	WEAPON_WIDTH,//3
+	WEAPON_HEIGHT,//4
+	WEAPON_FRAMES,//5
+	WEAPON_SOUND,//6
+	WEAPON_MULTISHOT,//7
+	WEAPON_XSPREAD,//8
+	WEAPON_ALTERNATE,//9
+	WEAPON_DISPERSION,//10
+	WEAPON_RAFALE,//11
+	WEAPON_RAFALE_COOLDOWN,//12
+	WEAPON_TARGET_SEAKING,//13
+};
+
+enum AmmoData
+{
+	AMMO_NAME,//0
+	AMMO_DAMAGE,//1
+	AMMO_SPEED,//2
+	AMMO_IMAGE_NAME,//3
+	AMMO_WIDTH,//4
+	AMMO_HEIGHT,//5
+	AMMO_FRAMES,//6
+	AMMO_FX,//7
+	AMMO_PATTERN,//8
+	AMMO_ANGSPEED,//9
+	AMMO_RADIUS,//10
+};
+
+enum FXData
+{
+	FX_TYPE,//0
+	FX_NAME,//1
+	FX_FILENAME,//2
+	FX_WIDTH,//3
+	FX_HEIGHT,//4
+	FX_FRAMES,//5
+	FX_DURATION,//6
+};
 
 enum IndependantType {
 	Background,
@@ -89,6 +137,7 @@ public:
 	sf::Vector2f getIndependantSpeed();
 	int getIndependantDamage();
 	int getIndependantArmor();
+	int getIndependantArmorMax();
 	int getIndependantShield();
 	int getIndependantShieldMax();
 	int getIndependantShieldRegen();
@@ -123,6 +172,7 @@ public:
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;
 	int armor;
+	int armor_max;
 	int shield;
 	int shield_max;
 	int shield_regen;

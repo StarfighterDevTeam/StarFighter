@@ -614,6 +614,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 void Ship::Init()
 {
 	this->armor = this->ship_config.getShipConfigArmor();
+	this->armor_max = this->ship_config.getShipConfigArmor();
 	this->shield_max = this->ship_config.getShipConfigShield();
 	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
 	this->m_size = this->ship_config.ship_model->size;

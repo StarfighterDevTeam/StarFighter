@@ -13,6 +13,7 @@
 #include "TextureLoader.h"
 #include "Assets.h"
 #include "Enemy.h"
+#include "Phase.h"
 #include "Ammo.h"
 #include "FX.h"
 #include "Loot.h"
