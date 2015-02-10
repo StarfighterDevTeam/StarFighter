@@ -93,9 +93,15 @@ Enemy* Enemy::Clone()
 	enemy->angspeed = this->angspeed;
 	enemy->radius = this->radius;
 
-	enemy->hasPhases = this->hasPhases;
-	enemy->currentPhase = this->currentPhase;
-	enemy->enemyClock.restart();
+	if (this->hasPhases)
+	{
+		enemy->hasPhases = this->hasPhases;
+		enemy->currentPhase = this->currentPhase;
+		enemy->enemyClock.restart();
+	}
+	
+	enemy->immune = this->immune;
+	enemy->ghost = this->ghost;
 
 	return enemy;
 }
@@ -229,11 +235,16 @@ void Enemy::setPhase(string phase_name)
 	{
 	case Modifier::NoModifier:{
 											this->immune = false;
+											this->ghost = false;
 											break;
 	}
 	case Modifier::Immune:{
 											this->immune = true;
 											break;
+	}
+	case Modifier::Ghost:{
+							  this->ghost = true;
+							  break;
 	}
 	}
 
@@ -304,6 +315,10 @@ Phase* Enemy::LoadPhase(string name)
 				if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("immune") == 0)
 				{
 					phase->modifier = Modifier::Immune;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("ghost") == 0)
+				{
+					phase->modifier = Modifier::Ghost;
 				}
 			}
 

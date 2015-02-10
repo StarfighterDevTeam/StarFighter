@@ -181,6 +181,7 @@ public:
 	float diag;
 	std::string display_name;
 	bool transparent;
+	bool ghost;
 
 	//TIPS:
 	// direction = the scene border you refer too

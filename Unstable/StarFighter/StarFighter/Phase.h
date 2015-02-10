@@ -42,6 +42,7 @@ enum Modifier
 {
 	NoModifier,
 	Immune,
+	Ghost,//no collision
 };
 
 //forward declaration

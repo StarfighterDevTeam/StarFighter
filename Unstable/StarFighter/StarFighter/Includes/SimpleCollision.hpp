@@ -12,6 +12,10 @@ public:
 		if (!independantA->visible || !(independantB->visible))
 			return false;
 
+		//ghost is a property that prevents an object from colliding, so by definition we exclude it
+		if (independantA->ghost || (independantB->ghost))
+			return false;
+
 		if (!independantA->isOnScene || !(independantB->isOnScene))
 			return false;
 

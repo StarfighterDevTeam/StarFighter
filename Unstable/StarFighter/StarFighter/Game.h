@@ -21,13 +21,13 @@ enum LayerType {
 	BackgroundLayer,
 	LinkZoneLayer,
 	ExplosionLayer,
-	FriendlyFireLayer,
+	EnemyObjectLayer,
 	AuraLayer,
 	BotLayer,
+	FriendlyFireLayer,
+	EnemyFireLayer,
 	FakeShipLayer,
 	PlayerShipLayer,
-	EnemyFireLayer,
-	EnemyObjectLayer,
 	NBVAL_Layer
 };
 
