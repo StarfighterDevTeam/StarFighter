@@ -194,7 +194,7 @@ void Game::colisionChecksV2()
 	//Then, check if any allied bullet collide with any enemy
 	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it1++)
 	{
-		//Enemy objects
+		//Player bullets on enemy
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).end(); it2++)
 		{
 			i++;
@@ -210,6 +210,39 @@ void Game::colisionChecksV2()
 					(*it1)->damage_from(*(*it2));
 					//explosion
 					(*it2)->Death();
+
+					//death
+					if ((*it1)->getIndependantArmor() <= 0)
+					{
+						(*it1)->Death();
+						//Loot
+						hazard += (*it1)->getMoney();
+						(*it1)->CreateRandomLoot(this->BeastScoreBonus);
+						//TODO : 
+						//(*it1)->CreateRandomLoot(BeastScale_HazardLevel + BeastScale_PlayerCombo);
+						(*it1)->GenerateLoot();
+
+						//sent to garbage collector
+						(*it1)->setVisible(false);
+						(*it1)->GarbageMe = true;
+					}
+				}
+			}
+		}
+
+		//player contact with enemy may deal damage
+		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); it2++)
+		{
+			i++;
+			//Bullets are invisible after impact
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				if ((*it2)->collider_type == PlayerShip)
+				{
+					//Do something (like, kill the enemy ship ?)
+					(*it1)->damage_from(*(*it2));
+					
+					//TODO: display contact feedback (small explosion?)
 
 					//death
 					if ((*it1)->getIndependantArmor() <= 0)

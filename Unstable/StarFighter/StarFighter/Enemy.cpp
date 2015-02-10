@@ -159,10 +159,9 @@ bool Enemy::CheckCondition()
 												else if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
 												{
 													this->setPhase((*it)->nextPhase_name);
-													printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
 													return true;
 												}
-												printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
+												//printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
 												break;
 		}
 		case ConditionType::ShieldPourcentage:{
@@ -501,7 +500,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 
 					e_decceleration = floor(e_decceleration);
 
-					equipment->Init((int)EquipmentType::Airbrake, sf::Vector2f(0,0),e_decceleration,sf::Vector2f(0,0),0,0,0,AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
+					equipment->Init((int)EquipmentType::Airbrake, sf::Vector2f(0,0),e_decceleration,sf::Vector2f(0,0),0,0,0,0, AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -541,7 +540,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					e_acceleration_y = floor(e_acceleration_y);
 
 					equipment->Init((int)EquipmentType::Engine, sf::Vector2f(e_maxspeed_x,e_maxspeed_y),0,
-						sf::Vector2f(e_acceleration_x,e_acceleration_y),0,0,0,THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
+						sf::Vector2f(e_acceleration_x,e_acceleration_y),0,0,0,0, THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -564,7 +563,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 						e_armor *= log_multiplier;
 
 					e_armor = floor(e_armor);
-					equipment->Init((int)EquipmentType::Armor, sf::Vector2f(0,0),0,sf::Vector2f(0,0),e_armor,0,0,ARMOR_FILENAME,sf::Vector2f(64,64),1,"Armor");
+					equipment->Init((int)EquipmentType::Armor, sf::Vector2f(0,0),0,sf::Vector2f(0,0),e_armor,0,0,0, ARMOR_FILENAME,sf::Vector2f(64,64),1,"Armor");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -594,7 +593,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					e_shield_regen = floor(e_shield_regen);
 
 					equipment->Init((int)EquipmentType::Shield, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,
-						e_shield,e_shield_regen,SHIELD_FILENAME,sf::Vector2f(64,64),1,"Shield");
+						e_shield,e_shield_regen,0, SHIELD_FILENAME,sf::Vector2f(64,64),1,"Shield");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -611,7 +610,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
-					equipment->Init((int)EquipmentType::Module, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,0,0,MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
+					equipment->Init((int)EquipmentType::Module, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,0,0,0, MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
 
 					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/bot.png", sf::Vector2f (32,32));
 					bot->display_name = "Bot gerard";

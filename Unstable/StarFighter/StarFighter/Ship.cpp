@@ -6,7 +6,7 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
+ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -16,6 +16,7 @@ ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, floa
 	this->armor = m_armor;
 	this->shield = m_shield;
 	this->shield_regen = m_shield_regen;
+	this->damage = m_damage;
 	this->textureName = m_textureName;
 	this->size = m_size;
 	this->frameNumber = m_frameNumber;
@@ -55,6 +56,11 @@ int ShipModel::getShipModelShieldRegen()
 	return this->shield_regen;
 }
 
+int ShipModel::getShipModelDamage()
+{
+	return this->damage;
+}
+
 // ----------------EQUIPMENT ---------------
 
 Equipment::Equipment()
@@ -67,6 +73,7 @@ Equipment::Equipment()
 	this->armor = 0;
 	this->shield = 0;
 	this->shield_regen = 0;
+	this->damage = 0;
 	this->size.x = SLOT_WIDTH;
 	this->size.y = SLOT_HEIGHT;
 	this->textureName = EMPTYSLOT_FILENAME;
@@ -76,7 +83,7 @@ Equipment::Equipment()
 	this->hasFake = false;
 }
 
-void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
+void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed.x = m_max_speed.x;
 	this->max_speed.y = m_max_speed.y;
@@ -86,6 +93,7 @@ void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decc
 	this->armor = m_armor;
 	this->shield = m_shield;
 	this->shield_regen = m_shield_regen;
+	this->damage = damage;
 	this->size.x = m_size.x;
 	this->size.y = m_size.y;
 	this->textureName = m_textureName;
@@ -124,12 +132,18 @@ int Equipment::getEquipmentShieldRegen()
 	return this->shield_regen;
 }
 
+int Equipment::getEquipmentDamage()
+{
+	return this->damage;
+}
+
 #define EQUIPMENT_DECCELERATION_MULTIPLIER		10
 #define EQUIPMENT_ACCELERATION_MULTIPLIER		10
 #define EQUIPMENT_MAXSPEED_MULTIPLIER			10
 #define EQUIPMENT_ARMOR_MULTIPLIER				10
 #define EQUIPMENT_SHIELD_MULTIPLIER				10
 #define EQUIPMENT_SHIELD_REGEN_MULTIPLIER		10
+#define EQUIPMENT_DAMAGE_MULTIPLIER				10
 
 void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale)
 {
@@ -312,7 +326,7 @@ void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f B
 
 ShipConfig::ShipConfig()
 {
-	this->ship_model = new ShipModel(sf::Vector2f(0, 0), sf::Vector2f(0, 0), 0.0f, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
+	this->ship_model = new ShipModel(sf::Vector2f(0, 0), sf::Vector2f(0, 0), 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
@@ -334,6 +348,7 @@ void ShipConfig::Init()
 	this->armor = getShipConfigArmor();
 	this->shield = getShipConfigShield();
 	this->shield_regen = getShipConfigShieldRegen();
+	this->damage = getShipConfigDamage();
 	this->size.x = ship_model->size.x;
 	this->size.y = ship_model->size.y;
 	this->textureName = ship_model->textureName;
@@ -434,6 +449,32 @@ int ShipConfig::getShipConfigShieldRegen()
 		new_shield_regen = ship_model->getShipModelShieldRegen();
 
 	return new_shield_regen;
+}
+
+int ShipConfig::getShipConfigDamage()
+{
+	int new_damage = 0;
+	int equipment_damage = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	{
+		if (this->hasEquipment[i])
+		{
+			equipment_damage += equipment[i]->getEquipmentDamage();
+		}
+		else
+		{
+			equipment_damage += 0;
+		}
+	}
+
+	new_damage = ship_model->getShipModelDamage() + equipment_damage;
+
+	//cancelling negative equipment values
+	if (new_damage < ship_model->getShipModelDamage())
+		new_damage = ship_model->getShipModelDamage();
+
+	return new_damage;
 }
 
 sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
@@ -617,6 +658,7 @@ void Ship::Init()
 	this->armor_max = this->ship_config.getShipConfigArmor();
 	this->shield_max = this->ship_config.getShipConfigShield();
 	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
+	this->damage = this->ship_config.getShipConfigDamage();
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
 }

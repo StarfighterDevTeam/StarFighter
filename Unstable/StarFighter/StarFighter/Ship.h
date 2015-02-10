@@ -42,13 +42,14 @@ enum GrazeLevels
 class ShipModel : public sf::Sprite
 {
 public:
-	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, float m_armor, float m_shield, float m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
+	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	sf::Vector2f getShipModelMaxSpeed();
 	float getShipModelDecceleration();
 	sf::Vector2f getShipModelAcceleration();
 	int getShipModelArmor();
 	int getShipModelShield();
 	int getShipModelShieldRegen();
+	int getShipModelDamage();
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;
@@ -68,12 +69,13 @@ private:
 	int armor;
 	int shield;
 	int shield_regen;
+	int damage;
 };
 
 class Equipment : public sf::Sprite
 {
 public:
-	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
+	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
 	std::string textureName;
 	sf::Vector2f size;
@@ -86,6 +88,7 @@ public:
 	int getEquipmentArmor();
 	int getEquipmentShield();
 	int getEquipmentShieldRegen();
+	int getEquipmentDamage();
 	Bot* bot;
 	bool hasBot;
 
@@ -93,7 +96,6 @@ public:
 	std::string fake_textureName;
 	sf::Vector2f fake_size;
 	int fake_frameNumber;
-
 
 	void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f BeastScale);
@@ -108,6 +110,7 @@ private:
 	int armor;
 	int shield;
 	int shield_regen;
+	int damage;
 };
 
 class ShipConfig
@@ -125,6 +128,7 @@ public:
 	int getShipConfigArmor();
 	int getShipConfigShield();
 	int getShipConfigShieldRegen();
+	int getShipConfigDamage();
 	void setEquipment(Equipment* m_equipment, bool recomputing_stats = true);
 	void setShipModel(ShipModel* m_ship_model);
 	void setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true);
@@ -149,6 +153,7 @@ private:
 	int armor;
 	int shield;
 	int shield_regen;
+	int damage;
 };
 
 class Ship : public Independant
