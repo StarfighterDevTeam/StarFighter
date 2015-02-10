@@ -17,14 +17,15 @@ enum EnemyPhaseData
 	PHASE_PATTERN,//8
 	PHASE_ANGSPEED,//9
 	PHASE_RADIUS,//10
-	PHASE_TRANSITION,//11
-	PHASE_CONDITION,//12
-	PHASE_OPERATOR,//13
-	PHASE_VALUE,//14
-	PHASE_TRANSITION_2,//15
-	PHASE_CONDITION_2,//16
-	PHASE_OPERATOR_2,//17
-	PHASE_VALUE_2,//18
+	PHASE_MODIFIER,//11
+	PHASE_TRANSITION,//12
+	PHASE_CONDITION,//13
+	PHASE_OPERATOR,//14
+	PHASE_VALUE,//15
+	PHASE_TRANSITION_2,//16
+	PHASE_CONDITION_2,//17
+	PHASE_OPERATOR_2,//18
+	PHASE_VALUE_2,//19
 };
 
 enum ConditionType
@@ -37,6 +38,12 @@ enum ConditionType
 	ShieldPourcentage,
 };
 
+enum Modifier
+{
+	NoModifier,
+	Immune,
+};
+
 //forward declaration
 class ConditionTransition;
 
@@ -47,11 +54,13 @@ public:
 	string display_name;
 	list<Weapon*> weapons_list;
 	PatternType pattern;
+	Modifier modifier;
 	float angspeed;
 	float radius;
 	float vspeed;
 	bool hasTransition;
 	list<ConditionTransition*> transitions_list;
+
 };
 
 class ConditionTransition

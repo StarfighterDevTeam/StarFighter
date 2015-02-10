@@ -161,22 +161,57 @@ bool Enemy::CheckCondition()
 													this->setPhase((*it)->nextPhase_name);
 													return true;
 												}
+												//Debug:
 												//printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
 												break;
 		}
 		case ConditionType::ShieldPourcentage:{
-												if ((100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
-												{
-													this->setPhase((*it)->nextPhase_name);
-													return true;
-												}
-												else if ((100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
-												{
-													this->setPhase((*it)->nextPhase_name);
-													return true;
-												}
-
-												break;
+												  //Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
+												  if ((*it)->op == FloatCompare::GREATHER_THAN)
+												  {
+													  if (this->getIndependantShieldMax() == 0)
+													  {
+														  break;
+													  }
+													  else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value)
+													  {
+														  this->setPhase((*it)->nextPhase_name);
+														  return true;
+													  }
+													  break;
+												  }
+												  else if ((*it)->op == FloatCompare::LESSER_THAN)
+												  {
+													  if (this->getIndependantShieldMax() == 0)
+													  {
+														  this->setPhase((*it)->nextPhase_name);
+														  return true;
+													  }
+													  else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value)
+													  {
+														  this->setPhase((*it)->nextPhase_name);
+														  return true;
+													  }
+													  break;
+												  }
+												  else if ((*it)->op == FloatCompare::EQUAL_TO)
+												  {
+													  if (this->getIndependantShieldMax() == 0)
+													  {
+														  if ((*it)->value == 0)
+														  {
+															  this->setPhase((*it)->nextPhase_name);
+															  return true;
+														  }
+														  break;
+													  }
+													  else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() == (*it)->value)
+													  {
+														  this->setPhase((*it)->nextPhase_name);
+														  return true;
+													  }
+													  break;
+												  }
 		}
 		}
 	}
@@ -190,6 +225,17 @@ void Enemy::setPhase(string phase_name)
 	this->phaseClock.restart();
 
 	this->speed.y = phase->vspeed;
+	switch (phase->modifier)
+	{
+	case Modifier::NoModifier:{
+											this->immune = false;
+											break;
+	}
+	case Modifier::Immune:{
+											this->immune = true;
+											break;
+	}
+	}
 
 	//clearing old weapons and setting new ones
 	this->weapons_list.clear();
@@ -249,8 +295,17 @@ Phase* Enemy::LoadPhase(string name)
 				phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
 				phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
 			}
-
 			phase->pattern = pattern_type;
+
+			//loading modifier (immune to damage, etc.)
+			phase->modifier = Modifier::NoModifier;
+			if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("0") != 0)
+			{
+				if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("immune") == 0)
+				{
+					phase->modifier = Modifier::Immune;
+				}
+			}
 
 			//loading transition to next phase
 			if ((*it)[EnemyPhaseData::PHASE_TRANSITION].compare("0") != 0)
