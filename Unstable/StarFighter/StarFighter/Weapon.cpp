@@ -379,57 +379,57 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 {
 	switch (chosen_property)
 	{
-	case 0:
-	{
-			  this->rate_of_fire /= (RandomizeFloatBetweenValues(BeastScale) * WEAPON_RATE_OF_FIRE_MULTIPLIER);
-			  break;
-	}
-	case 1:
-	{
-			  this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
+		case 0:
+		{
+			this->rate_of_fire /= (RandomizeFloatBetweenValues(BeastScale) * WEAPON_RATE_OF_FIRE_MULTIPLIER);
+			break;
+		}
+		case 1:
+		{
+			this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
 
-			  if (this->multishot * this->xspread > 32)
-				  this->xspread = (32 / this->multishot);
+			if (this->multishot * this->xspread > 32)
+				this->xspread = (32 / this->multishot);
 
-			  double dispersion_chance = (double)rand() / (RAND_MAX);
-			  if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)
-			  {
-				  int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_ANGLE + 1);
-				  this->dispersion = dispersion_roll;
-			  }
+			double dispersion_chance = (double)rand() / (RAND_MAX);
+			if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)
+			{
+				int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_ANGLE + 1);
+				this->dispersion = dispersion_roll;
+			}
 
-			  double alternate_chance = (double)rand() / (RAND_MAX);
-			  if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE)
-			  {
-				  this->shot_mode = ShotMode::AlternateShotMode;
-			  }
-			  break;
-	}
-	case 2:
-	{
-			  this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale)));
-			  break;
-	}
-	case 3:
-	{
-			  //this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
-			  float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BONUS * (log(value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
+			double alternate_chance = (double)rand() / (RAND_MAX);
+			if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE)
+			{
+				this->shot_mode = ShotMode::AlternateShotMode;
+			}
+			break;
+		}
+		case 2:
+		{
+			this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale)));
+			break;
+		}
+		case 3:
+		{
+			//this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
+			float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BONUS * (log(value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
 
-			  float e_damage = WEAPON_MIN_DAMAGE_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			  if (log_multiplier > 1)
-				  e_damage *= log_multiplier;
-			  else
-				  e_damage = ProrataBetweenThreshold(value, sf::Vector2f(0, e_damage));
+			float e_damage = WEAPON_MIN_DAMAGE_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			if (log_multiplier > 1)
+				e_damage *= log_multiplier;
+			else
+				e_damage = ProrataBetweenThreshold(value, sf::Vector2f(0, e_damage));
 
-			  this->ammunition->damage += e_damage;
-			  this->ammunition->damage = floor(this->ammunition->damage);
-			  break;
-	}
-	default:
-	{
-			   printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
-			   break;
-	}
+			this->ammunition->damage += e_damage;
+			this->ammunition->damage = floor(this->ammunition->damage);
+			break;
+		}
+		default:
+		{
+			printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
+			break;
+		}
 	}
 }
 
@@ -437,31 +437,31 @@ void Weapon::AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f B
 {
 	switch (chosen_property)
 	{
-	case 0:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER));
-			  break;
-	}
-	case 1:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER));
-			  break;
-	}
-	case 2:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER));
-			  break;
-	}
-	case 3:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER));
-			  break;
-	}
-	default:
-	{
-			   printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
-			   break;
-	}
+		case 0:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER));
+			break;
+		}
+		case 1:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER));
+			break;
+		}
+		case 2:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER));
+			break;
+		}
+		case 3:
+		{
+			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER));
+			break;
+		}
+		default:
+		{
+			printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
+			break;
+		}
 	}
 }
 

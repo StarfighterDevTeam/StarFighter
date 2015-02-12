@@ -22,7 +22,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 
 	switch(this->currentPattern)
 	{
-	case PatternType::Rectangle_:
+		case PatternType::Rectangle_:
 		{
 			//ARGS 
 			// 0 = longueur
@@ -35,7 +35,8 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 
 			break;
 		}
-	case PatternType::Circle_:
+
+		case PatternType::Circle_:
 		{
 			//ARGS 
 			// 0 = rayon
@@ -49,7 +50,8 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 
 			break;
 		}
-	case PatternType::Oscillator:
+
+		case PatternType::Oscillator:
 		{
 			//ARGS 
 			// 0 = amplitude
@@ -75,15 +77,14 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 
 	switch(this->currentPattern)
 	{
-
-	case PatternType::NoMovePattern:
+		case PatternType::NoMovePattern:
 		{
 			offset.x=0;
 			offset.y=0;
 			break;
 		}
 
-	case PatternType::Rectangle_:
+		case PatternType::Rectangle_:
 		{
 			//ARGS 
 			// 0 = longueur
@@ -132,7 +133,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			break;
 		}
 
-	case PatternType::Circle_:
+		case PatternType::Circle_:
 		{
 			//ARGS 
 			// 0 = rayon
@@ -167,7 +168,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			break;
 		}
 
-	case PatternType::Oscillator:
+		case PatternType::Oscillator:
 		{
 			//ARGS 
 			// 0 = rayon
@@ -201,15 +202,13 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			break;
 		}
 
-	default:
+		default:
 		{
 			throw invalid_argument(TextUtils::format("Game error: Unknow pattern # '%d'", this->currentPattern));
 		}
 	}
 	
 	return offset;
-	
-	
 }
 
 sf::Vector2f PatternBobby::ToCartesianCoords(sf::Vector2f polarCoords)

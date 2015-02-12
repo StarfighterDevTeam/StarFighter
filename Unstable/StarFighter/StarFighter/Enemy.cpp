@@ -112,115 +112,122 @@ bool Enemy::CheckCondition()
 	{
 		switch ((*it)->condition)
 		{
-		case ConditionType::VerticalPosition: {
-												  FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y*SCENE_SIZE_X, (*it)->value));
-												  if (result == (*it)->op)
-												  {
-														this->setPhase((*it)->nextPhase_name);
-														return true;
-												  }
+			case ConditionType::VerticalPosition:
+			{
+				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y*SCENE_SIZE_X, (*it)->value));
+				if (result == (*it)->op)
+				{
+					this->setPhase((*it)->nextPhase_name);
+					return true;
+				}
 													  
-												  break;
-
-
-		}
+				break;
+			}
 		
-		case ConditionType::phaseClock:{
-									  if ((this->phaseClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
-									  {
-										  this->setPhase((*it)->nextPhase_name);
-										  return true;
-									  }
-									  else if ((this->phaseClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
-									  {
-										  this->setPhase((*it)->nextPhase_name);
-										  return true;
-									  }
+			case ConditionType::phaseClock:
+			{
+				if ((this->phaseClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+				{
+					this->setPhase((*it)->nextPhase_name);
+					return true;
+				}
+				else if ((this->phaseClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+				{
+					this->setPhase((*it)->nextPhase_name);
+					return true;
+				}
 
-									  break;
-		}
-		case ConditionType::enemyClock:{
-										   if ((this->enemyClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
-										   {
-											   this->setPhase((*it)->nextPhase_name);
-											   this->enemyClock.restart();
-											   return true;
-										   }
-										   else if ((this->enemyClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
-										   {
-											   this->setPhase((*it)->nextPhase_name);
-											   this->enemyClock.restart();
-											   return true;
-										   }
+				break;
+			}
+		
+			case ConditionType::enemyClock:
+			{
+				if ((this->enemyClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+				{
+					this->setPhase((*it)->nextPhase_name);
+					this->enemyClock.restart();
+					return true;
+				}
+				else if ((this->enemyClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+				{
+					this->setPhase((*it)->nextPhase_name);
+					this->enemyClock.restart();
+					return true;
+				}
 										   
-										   break;
-		}
-		case ConditionType::LifePourcentage:{
-												if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
-												{
-													this->setPhase((*it)->nextPhase_name);
+				break;
+			}
+		
+			case ConditionType::LifePourcentage:
+			{
+				if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+				{
+					this->setPhase((*it)->nextPhase_name);
 
-													return true;
-												}
-												else if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
-												{
-													this->setPhase((*it)->nextPhase_name);
-													return true;
-												}
-												//Debug:
-												//printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
-												break;
-		}
-		case ConditionType::ShieldPourcentage:{
-												  //Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
-												  if ((*it)->op == FloatCompare::GREATHER_THAN)
-												  {
-													  if (this->getIndependantShieldMax() == 0)
-													  {
-														  break;
-													  }
-													  else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value)
-													  {
-														  this->setPhase((*it)->nextPhase_name);
-														  return true;
-													  }
-													  break;
-												  }
-												  else if ((*it)->op == FloatCompare::LESSER_THAN)
-												  {
-													  if (this->getIndependantShieldMax() == 0)
-													  {
-														  this->setPhase((*it)->nextPhase_name);
-														  return true;
-													  }
-													  else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value)
-													  {
-														  this->setPhase((*it)->nextPhase_name);
-														  return true;
-													  }
-													  break;
-												  }
-												  else if ((*it)->op == FloatCompare::EQUAL_TO)
-												  {
-													  if (this->getIndependantShieldMax() == 0)
-													  {
-														  if ((*it)->value == 0)
-														  {
-															  this->setPhase((*it)->nextPhase_name);
-															  return true;
-														  }
-														  break;
-													  }
-													  else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() == (*it)->value)
-													  {
-														  this->setPhase((*it)->nextPhase_name);
-														  return true;
-													  }
-													  break;
-												  }
-		}
+					return true;
+				}
+				else if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+				{
+					this->setPhase((*it)->nextPhase_name);
+					return true;
+				}
+				//Debug:
+				//printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
+				break;
+			}
+		
+			case ConditionType::ShieldPourcentage:
+			{
+				//Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
+				if ((*it)->op == FloatCompare::GREATHER_THAN)
+				{
+					if (this->getIndependantShieldMax() == 0)
+					{
+						break;
+					}
+					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+					break;
+				}
+				else if ((*it)->op == FloatCompare::LESSER_THAN)
+				{
+					if (this->getIndependantShieldMax() == 0)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+					break;
+				}
+				else if ((*it)->op == FloatCompare::EQUAL_TO)
+				{
+					if (this->getIndependantShieldMax() == 0)
+					{
+						if ((*it)->value == 0)
+						{
+							this->setPhase((*it)->nextPhase_name);
+							return true;
+						}
+						break;
+					}
+					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() == (*it)->value)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+					break;
+				}
+			}
 		}
 	}
+
 	return false;
 }
 
@@ -233,19 +240,22 @@ void Enemy::setPhase(string phase_name)
 	this->speed.y = phase->vspeed;
 	switch (phase->modifier)
 	{
-	case Modifier::NoModifier:{
-											this->immune = false;
-											this->ghost = false;
-											break;
-	}
-	case Modifier::Immune:{
-											this->immune = true;
-											break;
-	}
-	case Modifier::Ghost:{
-							  this->ghost = true;
-							  break;
-	}
+		case Modifier::NoModifier:
+		{
+			this->immune = false;
+			this->ghost = false;
+			break;
+		}
+		case Modifier::Immune:
+		{
+			this->immune = true;
+			break;
+		}
+		case Modifier::Ghost:
+		{
+			this->ghost = true;
+			break;
+		}
 	}
 
 	//clearing old weapons and setting new ones
@@ -282,10 +292,12 @@ Phase* Enemy::LoadPhase(string name)
 			{
 				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO])));
 			}
+
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
 			{
 				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2])));
 			}
+
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
 			{
 				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3])));
@@ -559,7 +571,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 
 			switch (equipment_type_roll)
 			{
-			case (int)EquipmentType::Airbrake:
+				case (int)EquipmentType::Airbrake:
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
@@ -583,7 +595,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 
-			case (int)EquipmentType::Engine:
+				case (int)EquipmentType::Engine:
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
@@ -623,7 +635,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 
-			case (int)EquipmentType::Armor:
+				case (int)EquipmentType::Armor:
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
@@ -646,7 +658,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 
-			case (int)EquipmentType::Shield:
+				case (int)EquipmentType::Shield:
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
@@ -676,7 +688,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 
-			case (int)EquipmentType::Module:
+				case (int)EquipmentType::Module:
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
@@ -728,7 +740,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 
-			case (int)EquipmentType::NBVAL_EQUIPMENT://weapon drop
+				case (int)EquipmentType::NBVAL_EQUIPMENT://weapon drop
 				{
 					// Initialisation
 					FX* fx = new FX(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f (320,236), 2, sf::seconds(0.4f));
@@ -757,21 +769,19 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 
-			default:
+				default:
 				{
 					printf("DEBUG: error: the loot type chosen for this drop does not exist.\n <!> Check if the equipment_type_roll values match with the existing equipment types.\n");
 					break;
 				}
 			}
-
 		}
+
 		else
 		{
 			int money = RandomizeIntBetweenRatios(e_value, LootTable_BeastScale[e_class]);
 			this->addMoney(money);//looting money
 		}
-
-
 	}
 }
 
