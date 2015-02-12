@@ -10,7 +10,8 @@ void InGameState::Initialize(Player player)
 	
 	//Loading current scene
 	this->currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevel(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
-	(*CurrentGame).direction = this->currentScene->direction;
+	//(*CurrentGame).direction = this->currentScene->direction;//moved into Scene() when bool "first_scene" is true because we need before loading enemies
+	
 	//initialisation of a next scene
 	this->nextScene = new Scene(player.m_currentSceneFile);
 	AddToKnownScenes(this->currentScene->m_name);

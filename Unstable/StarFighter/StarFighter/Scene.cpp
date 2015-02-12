@@ -80,6 +80,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						float first_screen_offset = 0;
 						if (first_scene)
 						{
+							(*CurrentGame).direction = this->direction;
 							first_screen_offset = Independant::getSize_for_Direction(this->direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
 						}
 
@@ -122,7 +123,13 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					if ((*it)[0].compare("enemy") == 0)
 					{
 						EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
-						e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
+						
+						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we do it here
+						if (!e->enemy->hasPhases)
+						{
+							e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
+						}
+						
 						this->sceneIndependantsLayered[e->enemyclass].push_back(e);
 
 						//giving intervall of hit values for dice rolls
@@ -298,7 +305,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if (timer > 5)
+	if (timer > 4)
 	{
 		double intpart;
 		timer = modf(timer, &intpart);

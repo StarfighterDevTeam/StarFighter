@@ -237,7 +237,9 @@ void Enemy::setPhase(string phase_name)
 	this->currentPhase = phase;
 	this->phaseClock.restart();
 
-	this->speed.y = phase->vspeed;
+	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
+	//this->speed.y = phase->vspeed;
+
 	switch (phase->modifier)
 	{
 		case Modifier::NoModifier:
