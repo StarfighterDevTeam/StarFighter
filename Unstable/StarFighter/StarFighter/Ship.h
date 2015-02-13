@@ -135,7 +135,6 @@ public:
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
 	Weapon* weapon;
-	Bot* bot;
 	vector<Bot*> bot_list;
 	bool hasWeapon;
 	bool hasEquipment[NBVAL_EQUIPMENT];
@@ -180,7 +179,6 @@ public :
 	void Ship::damage_from (Independant& independant) override;
 
 	bool disable_inputs;
-	bool disable_fire;
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	bool key_repeat;
 

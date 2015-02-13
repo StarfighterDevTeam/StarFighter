@@ -183,6 +183,7 @@ public:
 	std::string display_name;
 	bool transparent;
 	bool ghost;
+	bool disable_fire;
 
 	//TIPS:
 	// direction = the scene border you refer too

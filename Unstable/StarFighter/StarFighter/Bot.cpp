@@ -33,6 +33,7 @@ void Bot::update(sf::Time deltaTime)
 	{
 		newposition.x = target->getPosition().x;
 		newposition.y = target->getPosition().y;
+		disable_fire = target->disable_fire;
 	}
 	else
 	{
@@ -52,7 +53,7 @@ void Bot::update(sf::Time deltaTime)
 	this->setPosition(newposition.x,newposition.y);
 
 	//automatic fire
-	if (isOnScene && hasWeapon && InputGuy::isFiring())
+	if (isOnScene && hasWeapon && InputGuy::isFiring() && !disable_fire)
 	{
 		weapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).x, 
 			(this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).y) ;
