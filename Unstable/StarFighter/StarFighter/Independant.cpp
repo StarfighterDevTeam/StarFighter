@@ -126,6 +126,20 @@ void Independant::Respawn()
 
 }
 
+void Independant::setGhost(bool m_ghost)
+{
+	if (m_ghost == true)
+	{
+		this->ghost = true;
+		this->setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
+	}
+	else
+	{
+		this->ghost = false;
+		this->setColor(Color(255, 255, 255, 255));
+	}
+	
+}
 //void Independant::Follow(Independant* target)
 //{
 //	this->setPosition(target->getPosition().x, target->getPosition().x);

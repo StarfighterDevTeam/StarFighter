@@ -154,6 +154,7 @@ public:
 	void get_money_from(Independant& independant);
 	void get_money_from(Independant& independant, int loot_value);
 	virtual void GetLoot(Independant& independant);
+	void setGhost(bool m_ghost);
 
 	bool hasEquipmentLoot;
 	void get_equipment_from(Independant& independant);

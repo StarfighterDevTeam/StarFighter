@@ -33,6 +33,8 @@
 #define HUB_EXIT_TIMER							1.f
 #define HUB_LINK_NAME_OFFSET_RATIO				0.3f
 
+#define	GHOST_ALPHA_VALUE						120
+
 #define HAZARD_BREAK_RATIO						0.50f
 #define HAZARD_BREAK_MULTIPLIER					0.3f
 #define HAZARD_BAR_SIZE_X						20

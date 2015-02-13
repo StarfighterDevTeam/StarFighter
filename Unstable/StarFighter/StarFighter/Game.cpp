@@ -407,9 +407,8 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 	float shortest_distance = -1.f;
 	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[type])->begin(); it != (this->sceneIndependantsTyped[type])->end(); it++)
 	{
-		if ((*it)->isOnScene)
+		if ((*it)->isOnScene && !(*it)->ghost)
 		{
-
 			float distance_to_ref = (pow((ref_position.x - (*it)->getPosition().x), 2) + pow((ref_position.y - (*it)->getPosition().y), 2));
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{

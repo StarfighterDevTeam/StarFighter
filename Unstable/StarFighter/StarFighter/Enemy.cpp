@@ -256,12 +256,14 @@ void Enemy::setPhase(string phase_name)
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
 	//this->speed.y = phase->vspeed;
 
+	this->immune = false;
+	this->setGhost(false);
+
 	switch (phase->modifier)
 	{
 		case Modifier::NoModifier:
 		{
-			this->immune = false;
-			this->ghost = false;
+			//do nothing
 			break;
 		}
 		case Modifier::Immune:
@@ -271,7 +273,7 @@ void Enemy::setPhase(string phase_name)
 		}
 		case Modifier::Ghost:
 		{
-			this->ghost = true;
+			this->setGhost(true);
 			break;
 		}
 	}
