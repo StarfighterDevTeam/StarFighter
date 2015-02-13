@@ -18,6 +18,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	rafale_index = 0;
 	target_seaking = false;
 	shot_mode = ShotMode::NoShotMode;
+	angle_offset = 0;
 
 	this->ammunition = Ammunition;
 }
@@ -29,17 +30,23 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->setPosition(getPosition().x + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).y)),
 		getPosition().y + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).x)));
 
-	float angle_offset = 0;
 	if (target_seaking)
 	{
-		if (m_collider_type == IndependantType::FriendlyFire)
+		if (rafale > 0 && rafale_index > 0)//for rafale shots, we only aim at the first bullet of the rafale. This is a game design decision
 		{
-			angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition());
+			//do nothing
 		}
- 		else if (m_collider_type == IndependantType::EnemyFire)
+		else
 		{
-			angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition());
-			angle_offset += 180;
+			if (m_collider_type == IndependantType::FriendlyFire)
+			{
+				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition());
+			}
+			else if (m_collider_type == IndependantType::EnemyFire)
+			{
+				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition());
+				angle_offset += 180;
+			}
 		}
 	}
 

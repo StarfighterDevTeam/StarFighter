@@ -58,6 +58,7 @@ public:
 	int rafale;
 	int rafale_index;
 	float rafale_cooldown;
+	float angle_offset;
 
 	sf::Vector2f weaponOffset;
 	
