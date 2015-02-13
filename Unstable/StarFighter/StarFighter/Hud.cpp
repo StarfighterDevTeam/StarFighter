@@ -1,7 +1,5 @@
 #include "Hud.h"
 
-extern Game* CurrentGame;
-
 PlayerHud::PlayerHud()
 {
 	this->no_hazard_value = false;

@@ -13,7 +13,6 @@
 #include "FileLoadUtils.h"
 #include "Phase.h"
 
-
 #define	ENEMYX_DAMAGE			5
 #define	ENEMYX_ARMOR			100
 #define	ENEMYX_SHIELD			100

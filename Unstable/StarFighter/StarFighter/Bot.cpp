@@ -42,6 +42,7 @@ void Bot::update(sf::Time deltaTime)
 	
 	//call bobbyPattern
 	offset = Pattern.GetOffset(deltaTime.asSeconds(), true);
+	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
 	newposition.x += offset.x;
 	newposition.y += offset.y;
 	//bot spread value

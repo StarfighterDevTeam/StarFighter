@@ -19,7 +19,6 @@ class Equipment;
 class Weapon;
 class Loot;
 
-
 enum WeaponData
 {
 	WEAPON_NAME,//0
@@ -113,6 +112,8 @@ enum EquipmentType {
 	NBVAL_EQUIPMENT//5
 };
 
+
+
 class Independant : public AnimatedSprite
 {
 public:
@@ -193,7 +194,7 @@ public:
 
 	static sf::Vector2i getDirectionMultiplier(Directions direction);
 	static sf::Vector2f getSize_for_Direction(Directions direction, sf::Vector2f size);
-	static sf::Vector2i Independant::getSize_for_Direction(Directions direction, sf::Vector2i size);
+	static sf::Vector2i getSize_for_Direction(Directions direction, sf::Vector2i size);
 	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
 	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f speed);
 	

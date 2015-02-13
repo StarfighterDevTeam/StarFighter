@@ -38,5 +38,18 @@ void Ammo::Death()
 
 void Ammo::update(sf::Time deltaTime)
 {
-	Independant::update(deltaTime);
+	static sf::Vector2f newposition, offset;
+
+	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+	
+	//call bobbyPattern
+	offset = Pattern.GetOffset(deltaTime.asSeconds());
+	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+	newposition.x += offset.x;
+	newposition.y += offset.y;
+
+	this->setPosition(newposition.x, newposition.y);
+
+	AnimatedSprite::update(deltaTime);
 }

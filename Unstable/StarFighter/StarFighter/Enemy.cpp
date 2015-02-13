@@ -51,8 +51,24 @@ void Enemy::update(sf::Time deltaTime)
 			}
 		}
 	}
-	Independant::update(deltaTime);
 
+	//movement
+	static sf::Vector2f newposition, offset;
+
+	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+
+	//call bobbyPattern
+	offset = Pattern.GetOffset(deltaTime.asSeconds());
+	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+	newposition.x += offset.x;
+	newposition.y += offset.y;
+
+	this->setPosition(newposition.x, newposition.y);
+
+	AnimatedSprite::update(deltaTime);
+
+	//phases
 	if (this->hasPhases)
 	{
 		if (this->currentPhase->hasTransition)

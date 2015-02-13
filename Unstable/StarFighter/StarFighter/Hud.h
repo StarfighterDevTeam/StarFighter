@@ -5,8 +5,6 @@
 #include "Globals.h"
 #include "Independant.h"
 
-class Game;
-
 #define ARMOR_BAR_SIZE_X		20
 #define ARMOR_BAR_SIZE_Y		200
 

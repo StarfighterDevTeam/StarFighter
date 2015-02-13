@@ -1,6 +1,5 @@
 #include "Independant.h"
 
-
 Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, frameNumber);
@@ -99,10 +98,12 @@ void Independant::update(sf::Time deltaTime)
 	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
 	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 
-	//call bobbyPattern
-	offset = Pattern.GetOffset(deltaTime.asSeconds());
-	newposition.x += offset.x;
-	newposition.y += offset.y;
+	//call bobbyPattern 
+		//-> NOP, you need to override it, otherwise no pattern! (because you need CurrentGame->direction, which is not available for a generic Independant item)
+	//offset = Pattern.GetOffset(deltaTime.asSeconds());
+	//offset = Independant::getSpeed_for_Direction( (*CurrentGame).direction, offset);
+	//newposition.x += offset.x;
+	//newposition.y += offset.y;
 
 	this->setPosition(newposition.x, newposition.y);
 
