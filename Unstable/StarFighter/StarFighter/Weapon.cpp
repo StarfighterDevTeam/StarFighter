@@ -16,7 +16,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	rafale_cooldown = 0.8f;
 	rafale = 0;
 	rafale_index = 0;
-	target_seaking = false;
+	target_seaking = TargetSeaking::NO_SEAKING;
 	shot_mode = ShotMode::NoShotMode;
 	angle_offset = 0;
 
@@ -30,9 +30,9 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->setPosition(getPosition().x + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).y)),
 		getPosition().y + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).x)));
 
-	if (target_seaking)
+	if (target_seaking != TargetSeaking::NO_SEAKING)
 	{
-		if (rafale > 0 && rafale_index > 0)//for rafale shots, we only aim at the first bullet of the rafale. This is a game design decision
+		if (rafale > 0 && rafale_index > 0 && target_seaking == TargetSeaking::SEMI_SEAKING)
 		{
 			//do nothing
 		}

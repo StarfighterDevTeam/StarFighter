@@ -849,7 +849,16 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
 			weapon->size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
 			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
-			weapon->target_seaking = (bool)(stoi((*it)[WeaponData::WEAPON_TARGET_SEAKING]));
+
+			if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("0") != 0)
+			{
+				if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
+					weapon->target_seaking = TargetSeaking::SEMI_SEAKING;
+				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("seaking") == 0)
+					weapon->target_seaking = TargetSeaking::SEAKING;
+				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("super_seaking") == 0)
+					weapon->target_seaking = TargetSeaking::SUPER_SEAKING;
+			}
 
 			return weapon;
 		}

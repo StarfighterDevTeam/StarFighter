@@ -37,6 +37,14 @@ enum WeaponData
 	WEAPON_TARGET_SEAKING,//13
 };
 
+enum TargetSeaking
+{
+	NO_SEAKING,
+	SEMI_SEAKING,//aim once every rafale
+	SEAKING,//aim once every bullt
+	SUPER_SEAKING,//bullet follows target
+};
+
 enum AmmoData
 {
 	AMMO_NAME,//0
