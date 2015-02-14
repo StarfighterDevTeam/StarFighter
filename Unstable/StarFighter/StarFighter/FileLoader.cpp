@@ -67,7 +67,7 @@ EnemyPool* FileLoader::LoadEnemyPool(string name)
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPool '%s'. Please check the config file",name));
 }
 
-EnemyBase* FileLoader::LoadEnemy(string name, int probability, int poolSize, int enemyClass)
+EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize, int enemyClass)
 {
 	list<vector<string>> enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
 

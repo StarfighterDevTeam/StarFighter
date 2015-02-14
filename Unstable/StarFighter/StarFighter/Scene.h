@@ -10,6 +10,7 @@ enum InGameStateMachine
 	LOADING,
 	SCROLLING,
 	LAST_SCREEN,
+	BOSS_FIGHT,
 	TRANSITION_PHASE1_2,
 	TRANSITION_PHASE2_2,
 	HUB_ROAMING,
@@ -35,6 +36,7 @@ public:
 	void Scene::Update(Time deltaTime);
 	void Scene::Draw(sf::RenderWindow* window);
 	void Scene::GenerateEnemies(Time deltaTime);
+	void Scene::GenerateBoss();
 	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
 	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
 	void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
@@ -49,6 +51,7 @@ public:
 	Independant* bg;
 	Directions direction;
 	bool generating_enemies;
+	bool generating_boss;
 
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();
@@ -59,9 +62,10 @@ public:
 private:
 	Ship* playerShip;
 	list<EnemyBase> enemies;
+	list<EnemyBase*> boss_list;
 	list<EnemyBase> enemies_ranked_by_class[NBVAL_EnemyClass];
 	int total_class_probability[NBVAL_EnemyClass];
-	list<EnemyBase*> sceneIndependantsLayered[NBVAL_EnemyClass];
+	list<EnemyBase*> sceneEnemyClassesAvailable[NBVAL_EnemyClass];
 	sf::RenderWindow* mainWindow;
 	
 	int hazard_break_value;

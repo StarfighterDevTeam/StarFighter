@@ -709,6 +709,9 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
+	//CHEAT
+	//this->immune = true;
+
 	//sheld regen if not maximum
 	if (shield < ship_config.getShipConfigShield())
 	{

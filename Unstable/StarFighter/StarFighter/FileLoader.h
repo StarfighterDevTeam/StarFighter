@@ -43,6 +43,15 @@ enum SceneDataEnemy
 	ENEMY_CLASS,//4
 };
 
+enum SceneDataBoss
+{
+	SCENE_COMPARE_BOSS,//0
+	BOSS,//1
+	BOSS_CLASS,//2
+	BOSS_SPAWN_X,//3
+	BOSS_SPAWN_Y,//4
+};
+
 enum SceneDataBackground
 {
 	SCENE_COMPARE_BACKGROUND,//0
@@ -158,7 +167,7 @@ class FileLoader
 public:
 	static ShipConfig* FileLoader::LoadShipConfig(string name);
 	static ShipModel* FileLoader::LoadShipModel(string name);
-	static EnemyBase*  FileLoader::LoadEnemy(string name, int probability, int poolSize, int enemyClass);
+	static EnemyBase*  FileLoader::LoadEnemyBase(string name, int probability, int poolSize, int enemyClass);
 	static EnemyPool*  FileLoader::LoadEnemyPool(string name);
 	static Weapon* FileLoader::LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* FileLoader::LoadAmmo(string name);

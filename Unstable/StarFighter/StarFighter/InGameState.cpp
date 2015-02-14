@@ -188,6 +188,7 @@ void InGameState::InGameStateMachineCheck()
 			}
 			else
 			{
+				//when last screen is reached
 				if (this->currentScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::GREATHER_THAN
 					|| this->currentScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::EQUAL_TO)
 				{
@@ -215,17 +216,43 @@ void InGameState::InGameStateMachineCheck()
 			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
 			if ((*CurrentGame).isLastEnemyDead())
 			{
+				if (this->currentScene->m_hazardbreak_has_occurred && this->currentScene->generating_boss)
+				{
+					this->currentScene->GenerateBoss();
+					this->IG_State = InGameStateMachine::BOSS_FIGHT;
+				}
+				else
+				{
+					//Putting the player on rails
+					(*CurrentGame).playerShip->disable_inputs = true;
+					(*CurrentGame).playerShip->disable_fire = true;
+					(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
+
+					this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
+				}
+			}
+			//clearing enemies that have spawned out of the scene size
+			else
+			{
+				(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
+			}
+
+			break;
+		}
+
+		case InGameStateMachine::BOSS_FIGHT:
+		{
+			//is boss dead?
+			if ((*CurrentGame).isLastEnemyDead())
+			{
+				this->currentScene->generating_boss = false;
+
 				//Putting the player on rails
 				(*CurrentGame).playerShip->disable_inputs = true;
 				(*CurrentGame).playerShip->disable_fire = true;
 				(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
 
 				this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
-			}
-			//clearing enemies that have spawned out of the scene size
-			else
-			{
-				(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
 			}
 
 			break;

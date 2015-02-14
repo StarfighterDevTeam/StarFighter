@@ -10,7 +10,6 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	radius = 0;
 	FX_death = m_FX_death;
 	hasWeapon = false;
-	enemy_class = EnemyClass::ENEMYPOOL_ZETA;
 	hasPhases = false;
 }
 
@@ -139,6 +138,18 @@ bool Enemy::CheckCondition()
 													  
 				break;
 			}
+
+			//case ConditionType::HorizontalPosition:
+			//{
+			//	FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y*SCENE_SIZE_X, (*it)->value));
+			//	if (result == (*it)->op)
+			//	{
+			//		this->setPhase((*it)->nextPhase_name);
+			//		return true;
+			//	}
+			//
+			//	break;
+			//}
 		
 			case ConditionType::phaseClock:
 			{
@@ -355,7 +366,7 @@ Phase* Enemy::LoadPhase(string name)
 			}
 
 			//loading transition to next phase
-			if ((*it)[EnemyPhaseData::PHASE_TRANSITION].compare("0") != 0)
+			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
 			{
 				phase->hasTransition = true;
 
@@ -407,7 +418,7 @@ Phase* Enemy::LoadPhase(string name)
 			}
 
 			//idem for transition 2
-			if ((*it)[EnemyPhaseData::PHASE_TRANSITION_2].compare("0") != 0)
+			if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("0") != 0)
 			{
 				phase->hasTransition = true;
 

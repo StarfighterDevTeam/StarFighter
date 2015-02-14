@@ -12,10 +12,13 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	}
 	this->hazard_break_value = 0;
 	this->generating_enemies = false;
+	this->generating_boss = false;
 	this->hazard_level = hazard_level;
-
 	this->m_hazardbreak_has_occurred = false;
+
 	int p = 0;
+	int enemy_count = 0;
+
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
 		list<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
@@ -119,10 +122,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					}
 
 					//Loading enemies
-					int enemy_count = 0;
-					if ((*it)[0].compare("enemy") == 0)
+					else if ((*it)[0].compare("enemy") == 0)
 					{
-						EnemyBase* e = FileLoader::LoadEnemy((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 						
 						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we do it here
 						if (!e->enemy->hasPhases)
@@ -130,7 +132,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 							e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
 						}
 						
-						this->sceneIndependantsLayered[e->enemyclass].push_back(e);
+						this->sceneEnemyClassesAvailable[e->enemyclass].push_back(e);
 
 						//giving intervall of hit values for dice rolls
 						p++;
@@ -143,6 +145,22 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						this->enemies_ranked_by_class[e->enemyclass].push_back(*e);
 						//hazard value automatic calculation
 						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO * (1 + HAZARD_BREAK_MULTIPLIER*this->hazard_level);
+					}
+
+					//loading boss
+					else if ((*it)[0].compare("boss") == 0)
+					{
+						EnemyBase* boss = FileLoader::LoadEnemyBase((*it)[SceneDataBoss::BOSS], 1, 1, stoi((*it)[SceneDataBoss::BOSS_CLASS]));
+						if (!boss->enemy->hasPhases)
+						{
+							boss->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, boss->enemy->speed.y);
+						}
+						sf::Vector2f boss_pos = sf::Vector2f(atof((*it)[SceneDataBoss::BOSS_SPAWN_X].c_str()), atof((*it)[SceneDataBoss::BOSS_SPAWN_Y].c_str()));
+						boss_pos = Independant::getPosition_for_Direction(this->direction, boss_pos);
+						boss->enemy->setPosition(boss_pos);
+
+						this->boss_list.push_back(boss);
+						this->generating_boss = true;
 					}
 
 					if (enemy_count != 0 && this->direction != Directions::NO_DIRECTION)
@@ -275,6 +293,7 @@ void Scene::Update(Time deltaTime)
 	{
 		this->GenerateEnemies(deltaTime);
 	}
+
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
 	{
 		HazardBreakEvent();
@@ -287,6 +306,16 @@ void Scene::Update(Time deltaTime)
 			this->link_zone[i].speed = this->bg->speed;
 			this->link_zone[i].update(deltaTime);
 		}
+	}
+}
+
+void Scene::GenerateBoss()
+{
+	for (std::list<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)
+	{
+		Enemy* m_boss = (*it)->enemy->Clone();
+		m_boss->enemy_class = (EnemyClass)((*it)->enemyclass);
+		(*CurrentGame).addToScene(m_boss, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
 	}
 }
 
@@ -322,6 +351,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 		// liste de patterns associés : 0, 0, 0, 0, 0, 
 
 		//chosing a random enemy within a class of enemies
+		//for each sceneEnemyClassesAvailable[i]
 		Enemy* random_enemy_within_class[EnemyClass::NBVAL_EnemyClass];
 
 		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
@@ -432,8 +462,9 @@ void Scene::HazardBreakEvent()
 	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS - 1)
 	{
 		hazard_level++;
+		m_hazardbreak_has_occurred = true;
 	}
-	m_hazardbreak_has_occurred = true;
+	
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", this->hazard_level + 1));
 }
 
