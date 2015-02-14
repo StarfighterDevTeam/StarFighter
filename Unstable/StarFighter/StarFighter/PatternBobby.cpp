@@ -10,6 +10,51 @@ PatternType PatternBobby::GetCurrentPatternType()
 	return this->currentPattern;
 }
 
+vector<float>* PatternBobby::GetCurrentPatternParams()
+{
+	return this->patternParams;
+}
+
+float PatternBobby::GetCurrentPatternSpeed()
+{
+	return this->patternSpeed;
+}
+
+PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
+{
+	PatternBobby* bobby = new PatternBobby();
+
+	bobby->patternSpeed = stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_SPEED]);//angular speed, horizontal speed
+
+	vector<float>* v = new vector<float>;
+	PatternType pattern_type = PatternType::NoMovePattern;
+
+	if (line_data[index].compare("0") != 0)
+	{
+		if (line_data[index].compare("line") == 0)
+		{
+			pattern_type = PatternType::Line_;
+		}
+		else if (line_data[index].compare("circle") == 0)
+		{
+			pattern_type = PatternType::Circle_;
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
+			v->push_back(1);  // clockwise = 1
+		}
+		else if (line_data[index].compare("oscillator") == 0)
+		{
+			pattern_type = PatternType::Oscillator;
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
+			v->push_back(1);  // clockwise = 1
+		}
+	}
+
+	bobby->currentPattern = pattern_type;
+	bobby->patternParams = v;
+
+	return bobby;
+}
+
 void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*  args)
 {
 	//Note that patternSpeed is 

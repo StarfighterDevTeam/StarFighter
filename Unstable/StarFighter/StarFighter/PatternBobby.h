@@ -20,6 +20,13 @@ enum PatternType
 	NBVAL_PatternType
 };
 
+enum BobbyPatternData
+{
+	BOBBY_PATTERN_TYPE,//0
+	BOBBY_PATTERN_SPEED,//1
+	BOBBY_PATTERN_ARG1,//2
+	BOBBY_PATTERN_ARG2,//3
+};
 
 class PatternBobby : virtual public IPatternHandler
 {
@@ -29,6 +36,9 @@ public:
 	void SetPattern(PatternType pt, float patternSpeed, vector<float>*  args);
 	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
 	PatternType GetCurrentPatternType();
+	vector<float>* GetCurrentPatternParams();
+	float GetCurrentPatternSpeed();
+	static PatternBobby* PatternLoader(vector<string> line_data, int index);
 
 private:
 	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);
