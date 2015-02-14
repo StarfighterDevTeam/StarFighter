@@ -83,6 +83,15 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			offset.y=0;
 			break;
 		}
+	
+		case PatternType::Line_:
+		{
+			//ARGS 
+			// 0 = xspeed
+			offset.x = patternSpeed*seconds;
+			offset.y = 0;
+			break;							
+		}
 
 		case PatternType::Rectangle_:
 		{

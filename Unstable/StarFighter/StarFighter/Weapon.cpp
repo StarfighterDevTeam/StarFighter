@@ -52,9 +52,9 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 
 	bullet->speed = this->AngleShot(this->angle + dispersion + angle_offset, bullet->ref_speed);
 
-	bullet->speed = Independant::getSpeed_for_Direction((*CurrentGame).direction, bullet->speed);
 	bullet->speed.x = bullet->speed.x * - this->fire_direction.y;
 	bullet->speed.y = bullet->speed.y * this->fire_direction.y;
+	bullet->speed = Independant::getSpeed_for_Direction((*CurrentGame).direction, bullet->speed);
 
 	bullet->rotate(Independant::getRotation_for_Direction((*CurrentGame).direction));
 	bullet->rotate(this->angle - dispersion - angle_offset);
