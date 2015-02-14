@@ -97,11 +97,11 @@ public:
 	sf::Vector2f fake_size;
 	int fake_frameNumber;
 
-	void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale);
-	void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f BeastScale);
-	void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f BeastScale);
-	void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f BeastScale);
-	void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void AddEngineProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void AddArmorProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void AddShieldProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void AddModuleProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 
 private:
 	float decceleration;
@@ -176,7 +176,7 @@ public :
 	void GetGrazing() override;
 	int getGrazeCount();
 	float getShipBeastScore();
-	void Ship::damage_from (Independant& independant) override;
+	void damage_from (Independant& independant) override;
 
 	bool disable_inputs;
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];

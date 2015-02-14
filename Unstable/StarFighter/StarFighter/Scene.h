@@ -33,20 +33,20 @@ public:
 	//Scene(string name, ShipConfig* shipConf);
 	Scene(string name, int hazard_level, bool reverse_scene=false, bool first_scene=false);
 	Scene(string name);
-	void Scene::Update(Time deltaTime);
-	void Scene::Draw(sf::RenderWindow* window);
-	void Scene::GenerateEnemies(Time deltaTime);
-	void Scene::GenerateBoss();
-	void Scene::EndSceneAnimation(float transition_UP, float transition_DOWN);
-	void Scene::ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
-	void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
-	void Scene::SetLinkZone(Directions direction);
-	std::string Scene::LoadSceneNameFromFile(string name);
+	void Update(Time deltaTime);
+	void Draw(sf::RenderWindow* window);
+	void GenerateEnemies(Time deltaTime);
+	void GenerateBoss();
+	void EndSceneAnimation(float transition_UP, float transition_DOWN);
+	void ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
+	void LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
+	void SetLinkZone(Directions direction);
+	std::string LoadSceneNameFromFile(string name);
 	string m_name;
 	float vspeed;
 	bool m_hazardbreak_has_occurred;
 
-	float Scene::getSceneBeastScore();
+	float getSceneBeastScore();
 	
 	Independant* bg;
 	Directions direction;

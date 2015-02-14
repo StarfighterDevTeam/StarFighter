@@ -165,15 +165,15 @@ enum BotData
 class FileLoader
 {
 public:
-	static ShipConfig* FileLoader::LoadShipConfig(string name);
-	static ShipModel* FileLoader::LoadShipModel(string name);
-	static EnemyBase*  FileLoader::LoadEnemyBase(string name, int probability, int poolSize, int enemyClass);
-	static EnemyPool*  FileLoader::LoadEnemyPool(string name);
-	static Weapon* FileLoader::LoadWeapon(string name, int fire_direction, Ammo* ammo);
-	static Ammo* FileLoader::LoadAmmo(string name);
-	static FX* FileLoader::LoadFX(string name);
-	static Equipment* FileLoader::LoadEquipment(string name);
-	static Bot* FileLoader::LoadBot(string name);
+	static ShipConfig* LoadShipConfig(string name);
+	static ShipModel* LoadShipModel(string name);
+	static EnemyBase*  LoadEnemyBase(string name, int probability, int poolSize, int enemyClass);
+	static EnemyPool*  LoadEnemyPool(string name);
+	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
+	static Ammo* LoadAmmo(string name);
+	static FX* LoadFX(string name);
+	static Equipment* LoadEquipment(string name);
+	static Bot* LoadBot(string name);
 };
 
 #endif //FILELOADER_H_INCLUDED

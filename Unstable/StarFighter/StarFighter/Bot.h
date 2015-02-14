@@ -14,7 +14,7 @@ struct Weapon;
 class Bot : public Independant
 {
 public:
-	Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
+	Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	void update(sf::Time deltaTime) override;
 	Weapon* weapon;
 	Independant* target;

@@ -178,7 +178,7 @@ public:
 	virtual void CreateRandomLoot(float BeastScaleBonus = 0);
 
 	virtual void GetGrazing();
-	void Independant::GetPolarMovement(sf::Vector2f* np);
+	void GetPolarMovement(sf::Vector2f* np);
 	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;
 	int armor;
@@ -210,10 +210,10 @@ public:
 	
 	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
-	FloatCompare Independant::compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
+	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	void setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
 
-	static float Independant::getRotation_for_Direction(Directions direction);
+	static float getRotation_for_Direction(Directions direction);
 
 protected:
 	sf::Vector2f initial_position;

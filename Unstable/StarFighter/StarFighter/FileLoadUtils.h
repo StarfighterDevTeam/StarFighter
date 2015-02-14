@@ -8,7 +8,7 @@ using namespace std;
 class FileLoaderUtils
 {
 public:
-	static list<vector<string>>* FileLoaderUtils::FileLoader(string name){
+	static list<vector<string>>* FileLoader(string name){
 		list<vector<string>>* fileConfig = new list<vector<string>>;
 
 		std::ifstream  data(name);

@@ -31,8 +31,8 @@ public:
 
 private:
 	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);
-	void PatternBobby::ToCartesianCoords(sf::Vector2f* polarCoords);
-	void PatternBobby::CheckArgSize(int expected);
+	void ToCartesianCoords(sf::Vector2f* polarCoords);
+	void CheckArgSize(int expected);
 
 	float patternSpeed;
 	PatternType currentPattern;

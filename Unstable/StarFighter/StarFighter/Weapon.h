@@ -65,8 +65,8 @@ public:
 	
 	sf::Vector2i getFireDirection_for_Direction (Directions direction);
 	sf::Vector2f OffsetWeapon(float angle);
-	void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
-	void Weapon::AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
+	void AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	Weapon* Clone();
 };
 

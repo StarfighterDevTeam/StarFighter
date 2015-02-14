@@ -23,7 +23,7 @@ private:
 
 public:
 	// Interface publique
-	sf::Texture* TextureLoader::loadTexture (std::string filename, int sizeX, int sizeY)
+	sf::Texture* loadTexture (std::string filename, int sizeX, int sizeY)
 	{ 
 		//Do we already have this loaded ?
 		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
@@ -47,7 +47,7 @@ public:
 		return texture;
 	}
 
-	void TextureLoader::unloadTexture (std::string filename)
+	void unloadTexture (std::string filename)
 	{ 
 		//Do we already have this loaded ?
 		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
