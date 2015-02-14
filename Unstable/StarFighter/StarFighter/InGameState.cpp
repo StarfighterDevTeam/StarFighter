@@ -64,8 +64,11 @@ void InGameState::Draw()
 	(*CurrentGame).drawScene();
 
 	//draw link zones
-	this->currentScene->Draw(this->mainWindow);
-
+	if (this->IG_State != InGameStateMachine::BOSS_FIGHT)
+	{
+		this->currentScene->Draw(this->mainWindow);
+	}
+	
 	this->hud->Draw(this->mainWindow);
 }
 
@@ -201,7 +204,11 @@ void InGameState::InGameStateMachineCheck()
 						this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), false, false);
 						this->currentScene->bg->speed = sf::Vector2f(0, 0);
 						this->currentScene->generating_enemies = false;
-
+						if (this->currentScene->generating_boss)
+						{
+							this->bossSpawnCountdown.restart();
+						}
+						
 						this->IG_State = InGameStateMachine::LAST_SCREEN;
 					}
 					//else: do nothing. The game is likely to be ended.
@@ -218,8 +225,11 @@ void InGameState::InGameStateMachineCheck()
 			{
 				if (this->currentScene->m_hazardbreak_has_occurred && this->currentScene->generating_boss)
 				{
-					this->currentScene->GenerateBoss();
-					this->IG_State = InGameStateMachine::BOSS_FIGHT;
+					if (bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
+					{
+						this->currentScene->GenerateBoss();
+						this->IG_State = InGameStateMachine::BOSS_FIGHT;
+					}
 				}
 				else
 				{
@@ -235,6 +245,10 @@ void InGameState::InGameStateMachineCheck()
 			else
 			{
 				(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
+				if (this->currentScene->generating_boss)
+				{
+					this->bossSpawnCountdown.restart();
+				}
 			}
 
 			break;

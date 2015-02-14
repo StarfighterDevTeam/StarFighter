@@ -129,7 +129,7 @@ bool Enemy::CheckCondition()
 		{
 			case ConditionType::VerticalPosition:
 			{
-				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y*SCENE_SIZE_X, (*it)->value));
+				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->value));
 				if (result == (*it)->op)
 				{
 					this->setPhase((*it)->nextPhase_name);
@@ -139,17 +139,17 @@ bool Enemy::CheckCondition()
 				break;
 			}
 
-			//case ConditionType::HorizontalPosition:
-			//{
-			//	FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y*SCENE_SIZE_X, (*it)->value));
-			//	if (result == (*it)->op)
-			//	{
-			//		this->setPhase((*it)->nextPhase_name);
-			//		return true;
-			//	}
-			//
-			//	break;
-			//}
+			case ConditionType::HorizontalPosition:
+			{
+				FloatCompare result = this->compare_posX_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value, (*it)->value / SCENE_SIZE_X * SCENE_SIZE_Y));
+				if (result == (*it)->op)
+				{
+					this->setPhase((*it)->nextPhase_name);
+					return true;
+				}
+			
+				break;
+			}
 		
 			case ConditionType::phaseClock:
 			{
@@ -376,6 +376,10 @@ Phase* Enemy::LoadPhase(string name)
 				{
 					cond = ConditionType::VerticalPosition;
 				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("positionH") == 0)
+				{
+					cond = ConditionType::HorizontalPosition;
+				}
 				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("phaseClock") == 0)
 				{
 					cond = ConditionType::phaseClock;
@@ -427,6 +431,10 @@ Phase* Enemy::LoadPhase(string name)
 				if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("positionV") == 0)
 				{
 					cond = ConditionType::VerticalPosition;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("positionH") == 0)
+				{
+					cond = ConditionType::HorizontalPosition;
 				}
 				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("phaseClock") == 0)
 				{

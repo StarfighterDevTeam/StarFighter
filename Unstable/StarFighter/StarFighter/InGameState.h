@@ -30,7 +30,8 @@ public:
 	int GetSceneHazardLevel(string scene_name);
 	void InGameStateMachineCheck();
 	sf::Clock clockHubExit;
-	
+	sf::Clock bossSpawnCountdown;
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

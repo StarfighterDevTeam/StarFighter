@@ -32,6 +32,7 @@ enum ConditionType
 {
 	NoCondition,
 	VerticalPosition,
+	HorizontalPosition,
 	phaseClock,
 	enemyClock,
 	LifePourcentage,

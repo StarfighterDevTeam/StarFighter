@@ -559,6 +559,75 @@ FloatCompare Independant::compare_posY_withTarget_for_Direction(Directions direc
 	}
 }
 
+FloatCompare Independant::compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
+{
+	{
+		if (direction == Directions::DIRECTION_UP)
+		{
+			if (this->getPosition().x > target_position.x)
+			{
+				return FloatCompare::GREATHER_THAN;
+			}
+			else if (this->getPosition().x == target_position.x)
+			{
+				return FloatCompare::EQUAL_TO;
+			}
+			else
+			{
+				return FloatCompare::LESSER_THAN;
+			}
+		}
+
+		else if (direction == Directions::DIRECTION_DOWN)
+		{
+			if (this->getPosition().x < SCENE_SIZE_X - target_position.x)
+			{
+				return FloatCompare::GREATHER_THAN;
+			}
+			else if (this->getPosition().x == SCENE_SIZE_X - target_position.x)
+			{
+				return FloatCompare::EQUAL_TO;
+			}
+			else
+			{
+				return FloatCompare::LESSER_THAN;
+			}
+		}
+
+		else if (direction == Directions::DIRECTION_RIGHT)
+		{
+			if (this->getPosition().y > target_position.y)
+			{
+				return FloatCompare::GREATHER_THAN;
+			}
+			if (this->getPosition().y == target_position.y)
+			{
+				return FloatCompare::EQUAL_TO;
+			}
+			else
+			{
+				return FloatCompare::LESSER_THAN;
+			}
+		}
+
+		else if (direction == Directions::DIRECTION_LEFT)
+		{
+			if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
+			{
+				return FloatCompare::GREATHER_THAN;
+			}
+			else if (this->getPosition().y == SCENE_SIZE_Y - target_position.y)
+			{
+				return FloatCompare::EQUAL_TO;
+			}
+			else
+			{
+				return FloatCompare::LESSER_THAN;
+			}
+		}
+	}
+}
+
 void Independant::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
 {
 	if (direction == Directions::DIRECTION_UP || direction == Directions::NO_DIRECTION)
