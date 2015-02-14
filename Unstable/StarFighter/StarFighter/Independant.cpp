@@ -423,14 +423,14 @@ sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vecto
 
 	if (direction == DIRECTION_RIGHT)
 	{
-		speed.x = speed.x;
-		speed.y = -speed.y;
+		speed.x = -speed.x;
+		speed.y = speed.y;
 	}
 
 	if (direction == DIRECTION_LEFT)
 	{
-		speed.x = -speed.x;
-		speed.y = speed.y;
+		speed.x = speed.x;
+		speed.y = -speed.y;
 	}
 
 	return sf::Vector2f(speed.x, speed.y);

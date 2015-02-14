@@ -111,14 +111,27 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 
 			//Loading movement pattern
 			vector<float>* v = new vector<float>;
-			v->push_back(base->enemy->radius); // rayon
-			v->push_back(1);  // clockwise (>)
 			
 			PatternType pattern_type = PatternType::NoMovePattern;
-			if ((*it)[EnemyData::ENEMY_PATTERN].compare("circle") == 0)
-				pattern_type = PatternType::Circle_;
-			if ((*it)[EnemyData::ENEMY_PATTERN].compare("oscillator") == 0)
-				pattern_type = PatternType::Oscillator;
+			if ((*it)[EnemyData::ENEMY_PATTERN].compare("0") != 0)
+			{
+				if ((*it)[EnemyData::ENEMY_PATTERN].compare("line") == 0)
+				{
+					pattern_type = PatternType::Line_;
+				}
+				else if ((*it)[EnemyData::ENEMY_PATTERN].compare("circle") == 0)
+				{
+					pattern_type = PatternType::Circle_;
+					v->push_back(base->enemy->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+				}
+				else if ((*it)[EnemyData::ENEMY_PATTERN].compare("oscillator") == 0)
+				{
+					pattern_type = PatternType::Oscillator;
+					v->push_back(base->enemy->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+				}
+			}
 			
 			base->enemy->Pattern.SetPattern(pattern_type, base->enemy->angspeed, v); //vitesse angulaire (degres/s)
 
@@ -205,14 +218,28 @@ Ammo* FileLoader::LoadAmmo(string name)
 
 			//Loading movement pattern
 			vector<float>* v = new vector<float>;
-			v->push_back(new_ammo->radius); // rayon
-			v->push_back(1);  // clockwise (>)
-
 			PatternType pattern_type = PatternType::NoMovePattern;
-			if ((*it)[AmmoData::AMMO_PATTERN].compare("circle") == 0)
-				pattern_type = PatternType::Circle_;
-			if ((*it)[AmmoData::AMMO_PATTERN].compare("oscillator") == 0)
-				pattern_type = PatternType::Oscillator;
+
+			if ((*it)[AmmoData::AMMO_PATTERN].compare("0") != 0)
+			{
+				if ((*it)[AmmoData::AMMO_PATTERN].compare("line") == 0)
+				{
+					pattern_type = PatternType::Line_;
+				}
+				else if ((*it)[AmmoData::AMMO_PATTERN].compare("oscillator") == 0)
+				{
+					pattern_type = PatternType::Oscillator;
+					v->push_back(new_ammo->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+
+				}
+				else if ((*it)[AmmoData::AMMO_PATTERN].compare("circle") == 0)
+				{
+					pattern_type = PatternType::Circle_;
+					v->push_back(new_ammo->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+				}
+			}
 
 			new_ammo->Pattern.SetPattern(pattern_type, new_ammo->angspeed, v); //vitesse angulaire (degres/s)
 
@@ -359,15 +386,28 @@ Bot* FileLoader::LoadBot(string name)
 
 			//Loading movement pattern
 			vector<float>* v = new vector<float>;
-			v->push_back(bot->radius); // rayon
-			v->push_back(1);  // clockwise (>)
-
 			PatternType pattern_type = PatternType::NoMovePattern;
-			if((*it)[BotData::BOT_PATTERN].compare("circle") == 0)
-				pattern_type = PatternType::Circle_;
-			if((*it)[BotData::BOT_PATTERN].compare("oscillator") == 0)
-				pattern_type = PatternType::Oscillator;
 
+			if ((*it)[BotData::BOT_PATTERN].compare("0") != 0)
+			{
+				if ((*it)[BotData::BOT_PATTERN].compare("line") == 0)
+				{
+					pattern_type = PatternType::Line_;
+				}
+				else if ((*it)[BotData::BOT_PATTERN].compare("circle") == 0)
+				{
+					pattern_type = PatternType::Circle_;
+					v->push_back(bot->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+				}
+				else if ((*it)[BotData::BOT_PATTERN].compare("oscillator") == 0)
+				{
+					pattern_type = PatternType::Oscillator;
+					v->push_back(bot->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+				}
+			}
+				
 			bot->Pattern.SetPattern(pattern_type,bot->angspeed,v); //vitesse angulaire (degres/s)
 
 			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)

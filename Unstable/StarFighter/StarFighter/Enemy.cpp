@@ -298,8 +298,22 @@ void Enemy::setPhase(string phase_name)
 
 	//setting new move pattern
 	vector<float>* v = new vector<float>;
-	v->push_back(phase->radius); // rayon
-	v->push_back(1);  // clockwise (>)
+	switch (phase->pattern)
+	{
+		case PatternType::Circle_:
+		{
+			v->push_back(phase->radius); // rayon
+			v->push_back(1);  // clockwise = 1
+			break;
+		}
+		case PatternType::Oscillator:
+		{
+			v->push_back(phase->radius); // rayon
+			v->push_back(1);  // clockwise = 1
+			break;
+		}
+	}
+	
 	this->Pattern.SetPattern(phase->pattern, phase->angspeed, v); //vitesse angulaire (degres/s)
 }
 
@@ -336,18 +350,27 @@ Phase* Enemy::LoadPhase(string name)
 
 			//loading movement patterns
 			PatternType pattern_type = PatternType::NoMovePattern;
-			if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("circle") == 0)
+			if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("0") != 0)
 			{
-				pattern_type = PatternType::Circle_;
-				phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
-				phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
-			}
+				if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("line") == 0)
+				{
+					pattern_type = PatternType::Line_;
+					phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
+				}
 
-			if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("oscillator") == 0)
-			{
-				pattern_type = PatternType::Oscillator;
-				phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
-				phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
+				else if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("circle") == 0)
+				{
+					pattern_type = PatternType::Circle_;
+					phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
+					phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
+				}
+
+				else if ((*it)[EnemyPhaseData::PHASE_PATTERN].compare("oscillator") == 0)
+				{
+					pattern_type = PatternType::Oscillator;
+					phase->angspeed = stoi((*it)[EnemyPhaseData::PHASE_ANGSPEED]);
+					phase->radius = stoi((*it)[EnemyPhaseData::PHASE_RADIUS]);
+				}
 			}
 			phase->pattern = pattern_type;
 
@@ -903,15 +926,29 @@ Ammo* Enemy::LoadAmmo(string name)
 
 			//Loading movement pattern
 			vector<float>* v = new vector<float>;
-			v->push_back(new_ammo->radius); // rayon
-			v->push_back(1);  // clockwise (>)
-
 			PatternType pattern_type = PatternType::NoMovePattern;
-			if ((*it)[AmmoData::AMMO_PATTERN].compare("circle") == 0)
-				pattern_type = PatternType::Circle_;
-			if ((*it)[AmmoData::AMMO_PATTERN].compare("oscillator") == 0)
-				pattern_type = PatternType::Oscillator;
 
+			if ((*it)[AmmoData::AMMO_PATTERN].compare("0") != 0)
+			{
+				if ((*it)[AmmoData::AMMO_PATTERN].compare("line") == 0)
+				{
+					pattern_type = PatternType::Line_;
+				}
+				else if ((*it)[AmmoData::AMMO_PATTERN].compare("oscillator") == 0)
+				{
+					pattern_type = PatternType::Oscillator;
+					v->push_back(new_ammo->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+
+				}
+				else if ((*it)[AmmoData::AMMO_PATTERN].compare("circle") == 0)
+				{
+					pattern_type = PatternType::Circle_;
+					v->push_back(new_ammo->radius); // rayon
+					v->push_back(1);  // clockwise = 1
+				}
+			}
+				
 			new_ammo->Pattern.SetPattern(pattern_type, new_ammo->angspeed, v); //vitesse angulaire (degres/s)
 
 			return new_ammo;

@@ -72,9 +72,6 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="MovePattern.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="InputGuy.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -166,9 +163,6 @@
     </ClInclude>
     <ClInclude Include="Includes\SimpleCollision.hpp">
       <Filter>Fichiers d%27en-tête\Includes</Filter>
-    </ClInclude>
-    <ClInclude Include="MovePattern.h">
-      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="InputGuy.h">
       <Filter>Fichiers d%27en-tête</Filter>
