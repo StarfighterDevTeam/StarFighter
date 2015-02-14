@@ -13,7 +13,7 @@ const char* IndependantTypeValues[] =
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
-	if (!this->offscreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false));
+	this->offscreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
 	this->offscreen.setSmooth(true);
 
 	this->sceneChronometer.restart();
