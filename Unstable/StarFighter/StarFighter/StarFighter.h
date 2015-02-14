@@ -19,7 +19,6 @@
 #include "Loot.h"
 #include "Scene.h"
 #include "Logger.h"
-#include "MovePattern.h"
 #include "EnemyPool.h"
 #include "FileLoadUtils.h"
 #include "Bot.h"

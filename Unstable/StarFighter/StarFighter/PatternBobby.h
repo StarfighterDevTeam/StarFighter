@@ -13,6 +13,7 @@ using namespace std;
 enum PatternType 
 {
 	NoMovePattern,
+	Line_,
 	Rectangle_,
 	Circle_,
 	Oscillator,
