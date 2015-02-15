@@ -56,6 +56,7 @@ public:
 	void SetPlayerShip(Ship* m_playerShip);
 	void GetBeastScoreBonus (float m_playerShipBeastScore, float m_sceneBeastScore);
 	float GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position);
+	void WakeUpEnemiesWithName(string m_display_name);
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);

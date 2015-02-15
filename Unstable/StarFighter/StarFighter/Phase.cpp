@@ -3,6 +3,7 @@
 Phase::Phase()
 {
 	this->hasTransition = false;
+	this->hasWakeUp = false;
 	this->Pattern = new PatternBobby();
 }
 

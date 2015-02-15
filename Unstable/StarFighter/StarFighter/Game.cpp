@@ -437,3 +437,14 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 
 	return angle;
 }
+
+void Game::WakeUpEnemiesWithName(string m_display_name)
+{
+	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[IndependantType::EnemyObject])->begin(); it != (this->sceneIndependantsTyped[IndependantType::EnemyObject])->end(); it++)
+	{
+		if ((*it)->display_name == m_display_name)
+		{
+			(*it)->wake_up = true;
+		}
+	}
+}

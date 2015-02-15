@@ -192,6 +192,7 @@ public:
 	bool transparent;
 	bool ghost;
 	bool disable_fire;
+	bool wake_up;
 
 	//TIPS:
 	// direction = the scene border you refer too

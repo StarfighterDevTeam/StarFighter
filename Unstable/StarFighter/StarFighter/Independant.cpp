@@ -38,6 +38,7 @@ Independant::Independant()
 	this->GarbageMe = false;
 	this->DontGarbageMe = false;
 	this->disable_fire = false;
+	this->wake_up = true;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber)
