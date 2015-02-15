@@ -35,19 +35,16 @@ public:
 	PatternBobby();
 	void SetPattern(PatternType pt, float patternSpeed, vector<float>*  args);
 	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
-	PatternType GetCurrentPatternType();
-	vector<float>* GetCurrentPatternParams();
-	float GetCurrentPatternSpeed();
 	static PatternBobby* PatternLoader(vector<string> line_data, int index);
+	PatternType currentPattern;
+	vector<float>* patternParams;
+	float patternSpeed;
 
 private:
 	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);
 	void ToCartesianCoords(sf::Vector2f* polarCoords);
 	void CheckArgSize(int expected);
 
-	float patternSpeed;
-	PatternType currentPattern;
-	vector<float>*  patternParams;
 	sf::Vector2i _direction;
 	sf::Vector2f _curSandboxPosition_cartesian;
 	sf::Vector2f _curSandboxPosition_polar;

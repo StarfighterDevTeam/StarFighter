@@ -3,6 +3,7 @@
 Phase::Phase()
 {
 	this->hasTransition = false;
+	this->Pattern = new PatternBobby();
 }
 
 ConditionTransition::ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, std::string m_nextPhase_name)

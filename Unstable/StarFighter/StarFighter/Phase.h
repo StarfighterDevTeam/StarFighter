@@ -55,7 +55,7 @@ public:
 	Phase();
 	string display_name;
 	list<Weapon*> weapons_list;
-	PatternType pattern;
+	PatternBobby* Pattern;
 	Modifier modifier;
 	float angspeed;
 	float radius;

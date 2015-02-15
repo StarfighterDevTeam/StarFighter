@@ -106,35 +106,8 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 				base->enemy->hasWeapon = true;
 			}
 
-			//base->enemy->angspeed = stoi((*it)[EnemyData::ENEMY_ANGSPEED]);
-			//base->enemy->radius = stoi((*it)[EnemyData::ENEMY_RADIUS]);
-			////Loading movement pattern
-			//vector<float>* v = new vector<float>;
-			//
-			//PatternType pattern_type = PatternType::NoMovePattern;
-			//if ((*it)[EnemyData::ENEMY_PATTERN].compare("0") != 0)
-			//{
-			//	if ((*it)[EnemyData::ENEMY_PATTERN].compare("line") == 0)
-			//	{
-			//		pattern_type = PatternType::Line_;
-			//	}
-			//	else if ((*it)[EnemyData::ENEMY_PATTERN].compare("circle") == 0)
-			//	{
-			//		pattern_type = PatternType::Circle_;
-			//		v->push_back(base->enemy->radius); // rayon
-			//		v->push_back(1);  // clockwise = 1
-			//	}
-			//	else if ((*it)[EnemyData::ENEMY_PATTERN].compare("oscillator") == 0)
-			//	{
-			//		pattern_type = PatternType::Oscillator;
-			//		v->push_back(base->enemy->radius); // rayon
-			//		v->push_back(1);  // clockwise = 1
-			//	}
-			//}
-			//base->enemy->Pattern.SetPattern(pattern_type, base->enemy->angspeed, v); //vitesse angulaire (degres/s)
-
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyData::ENEMY_PATTERN);
-			base->enemy->Pattern.SetPattern(m_bobby->GetCurrentPatternType(), m_bobby->GetCurrentPatternSpeed(), m_bobby->GetCurrentPatternParams());
+			base->enemy->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
 
 			//Loading phases
 			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
@@ -215,37 +188,8 @@ Ammo* FileLoader::LoadAmmo(string name)
 				Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
 			new_ammo->display_name = (*it)[AmmoData::AMMO_NAME];
 			
-			//new_ammo->radius = stoi((*it)[AmmoData::AMMO_RADIUS]);
-			//new_ammo->angspeed = stoi((*it)[AmmoData::AMMO_ANGSPEED]);
-			//
-			////Loading movement pattern
-			//vector<float>* v = new vector<float>;
-			//PatternType pattern_type = PatternType::NoMovePattern;
-			//
-			//if ((*it)[AmmoData::AMMO_PATTERN].compare("0") != 0)
-			//{
-			//	if ((*it)[AmmoData::AMMO_PATTERN].compare("line") == 0)
-			//	{
-			//		pattern_type = PatternType::Line_;
-			//	}
-			//	else if ((*it)[AmmoData::AMMO_PATTERN].compare("oscillator") == 0)
-			//	{
-			//		pattern_type = PatternType::Oscillator;
-			//		v->push_back(new_ammo->radius); // rayon
-			//		v->push_back(1);  // clockwise = 1
-			//
-			//	}
-			//	else if ((*it)[AmmoData::AMMO_PATTERN].compare("circle") == 0)
-			//	{
-			//		pattern_type = PatternType::Circle_;
-			//		v->push_back(new_ammo->radius); // rayon
-			//		v->push_back(1);  // clockwise = 1
-			//	}
-			//}
-			//
-			//new_ammo->Pattern.SetPattern(pattern_type, new_ammo->angspeed, v); //vitesse angulaire (degres/s)
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), AmmoData::AMMO_PATTERN);
-			new_ammo->Pattern.SetPattern(m_bobby->GetCurrentPatternType(), m_bobby->GetCurrentPatternSpeed(), m_bobby->GetCurrentPatternParams());
+			new_ammo->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
 
 			return new_ammo;
 		}
@@ -385,38 +329,9 @@ Bot* FileLoader::LoadBot(string name)
 			((Independant*)bot)->shield_regen = stoi((*it)[BotData::BOT_SHIELD_REGEN]);
 			((Independant*)bot)->damage = stoi((*it)[BotData::BOT_DAMAGE]);
 			bot->spread = Vector2f(stoi((*it)[BotData::BOT_XSPREAD]), stoi((*it)[BotData::BOT_YSPREAD]));
-			
-			//bot->radius = stoi((*it)[BotData::BOT_RADIUS]);
-			//bot->angspeed = stoi((*it)[BotData::BOT_ANGSPEED]);
-			//
-			////Loading movement pattern
-			//vector<float>* v = new vector<float>;
-			//PatternType pattern_type = PatternType::NoMovePattern;
-			//
-			//if ((*it)[BotData::BOT_PATTERN].compare("0") != 0)
-			//{
-			//	if ((*it)[BotData::BOT_PATTERN].compare("line") == 0)
-			//	{
-			//		pattern_type = PatternType::Line_;
-			//	}
-			//	else if ((*it)[BotData::BOT_PATTERN].compare("circle") == 0)
-			//	{
-			//		pattern_type = PatternType::Circle_;
-			//		v->push_back(bot->radius); // rayon
-			//		v->push_back(1);  // clockwise = 1
-			//	}
-			//	else if ((*it)[BotData::BOT_PATTERN].compare("oscillator") == 0)
-			//	{
-			//		pattern_type = PatternType::Oscillator;
-			//		v->push_back(bot->radius); // rayon
-			//		v->push_back(1);  // clockwise = 1
-			//	}
-			//}
-			//	
-			//bot->Pattern.SetPattern(pattern_type,bot->angspeed,v); //vitesse angulaire (degres/s)
 
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), BotData::BOT_PATTERN);
-			bot->Pattern.SetPattern(m_bobby->GetCurrentPatternType(), m_bobby->GetCurrentPatternSpeed(), m_bobby->GetCurrentPatternParams());
+			bot->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
 
 			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)
 			{
