@@ -1,4 +1,4 @@
-scene1 3
+scene1 2
 scene2 0
-scene3 4
+scene3 0
 scene4 0

@@ -113,10 +113,10 @@ Enemy* Enemy::Clone()
 		enemy->hasPhases = this->hasPhases;
 		enemy->currentPhase = this->currentPhase;
 		enemy->enemyClock.restart();
+		enemy->wake_up = this->wake_up;
+		enemy->immune = this->immune;
+		enemy->setGhost(this->ghost);
 	}
-	
-	enemy->immune = this->immune;
-	enemy->ghost = this->ghost;
 
 	return enemy;
 }
