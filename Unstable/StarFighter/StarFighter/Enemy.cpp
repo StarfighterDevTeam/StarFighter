@@ -784,6 +784,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
 			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
 			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
+			weapon->angle_offset = stoi((*it)[WeaponData::WEAPON_ANGLE_OFFSET]);
 			weapon->shot_mode = ShotMode::NoShotMode;
 			if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
 			{

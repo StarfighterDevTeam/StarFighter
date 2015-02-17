@@ -30,6 +30,8 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->setPosition(getPosition().x + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).y)),
 		getPosition().y + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).x)));
 
+	//if target seaking (closest enemy)
+	float seaking_angle = 0;
 	if (target_seaking != TargetSeaking::NO_SEAKING)
 	{
 		if (rafale > 0 && rafale_index > 0 && target_seaking == TargetSeaking::SEMI_SEAKING)
@@ -40,18 +42,17 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 		{
 			if (m_collider_type == IndependantType::FriendlyFire)
 			{
-				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition(), bullet->range);
+				seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition(), bullet->range);
 			}
 			else if (m_collider_type == IndependantType::EnemyFire)
 			{
-				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition(), bullet->range);
-				angle_offset += 180;
+				seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition(), bullet->range);
+				seaking_angle += 180;
 			}
 		}
 	}
 
-	bullet->speed = this->AngleShot(this->angle + dispersion + angle_offset, bullet->ref_speed);
-
+	bullet->speed = this->AngleShot(this->angle + dispersion + angle_offset + seaking_angle, bullet->ref_speed);
 	bullet->speed.x = bullet->speed.x * - this->fire_direction.y;
 	bullet->speed.y = bullet->speed.y * this->fire_direction.y;
 	bullet->speed = Independant::getSpeed_for_Direction((*CurrentGame).direction, bullet->speed);
@@ -325,6 +326,7 @@ Weapon* Weapon::Clone()
 	weapon->rafale = this->rafale;
 	weapon->rafale_cooldown = this->rafale_cooldown;
 	weapon->target_seaking = this->target_seaking;
+	weapon->angle_offset = this->angle_offset;
 
 	return weapon;
 }
