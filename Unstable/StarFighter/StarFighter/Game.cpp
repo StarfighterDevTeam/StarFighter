@@ -400,16 +400,17 @@ void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastSc
 	this->BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
 }
 
-float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position)
+float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range)
 {
 	float angle = 0.f;
 	sf::Vector2f pos;
-	float shortest_distance = -1.f;
+	float shortest_distance = -1;
 	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[type])->begin(); it != (this->sceneIndependantsTyped[type])->end(); it++)
 	{
 		if ((*it)->isOnScene && !(*it)->ghost)
 		{
 			float distance_to_ref = (pow((ref_position.x - (*it)->getPosition().x), 2) + pow((ref_position.y - (*it)->getPosition().y), 2));
+			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
 				shortest_distance = distance_to_ref;
@@ -419,19 +420,26 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 	}
 	if (shortest_distance > 0)
 	{
-		shortest_distance = sqrtf(shortest_distance);
-		//angle = acos((ref_position.y - pos.y) / shortest_distance);
-		sf::Vector2f diff_position = Independant::getSize_for_Direction(this->direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
-		diff_position.x *= Independant::getDirectionMultiplier(this->direction).x;
-		angle = acos(diff_position.x / shortest_distance);
-		angle = angle * 180 / M_PI;
-
-		diff_position.y *= Independant::getDirectionMultiplier(this->direction).y;
-
-		//if (ref_position.x < pos.x)
-		if (diff_position.y < 0)
+		if (range > 0 && pow(range, 2) < shortest_distance)//shortest_distance is already squared
 		{
-			angle = -angle;
+			//do nothing: range is too short to reach the target, therefore we don't aim for it.
+		}
+		else
+		{
+			shortest_distance = sqrtf(shortest_distance);
+			//angle = acos((ref_position.y - pos.y) / shortest_distance);
+			sf::Vector2f diff_position = Independant::getSize_for_Direction(this->direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
+			diff_position.x *= Independant::getDirectionMultiplier(this->direction).x;
+			angle = acos(diff_position.x / shortest_distance);
+			angle = angle * 180 / M_PI;
+
+			diff_position.y *= Independant::getDirectionMultiplier(this->direction).y;
+
+			//if (ref_position.x < pos.x)
+			if (diff_position.y < 0)
+			{
+				angle = -angle;
+			}
 		}
 	}
 

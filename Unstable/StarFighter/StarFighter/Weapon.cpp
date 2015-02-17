@@ -40,11 +40,11 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 		{
 			if (m_collider_type == IndependantType::FriendlyFire)
 			{
-				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition());
+				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition(), bullet->range);
 			}
 			else if (m_collider_type == IndependantType::EnemyFire)
 			{
-				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition());
+				angle_offset = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition(), bullet->range);
 				angle_offset += 180;
 			}
 		}

@@ -12,9 +12,11 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	shield_regen = 0;
 	startPattern = false;
 	ref_speed = sqrt(pow(speed.x,2)+pow(speed.y,2));
-	this->explosion = m_explosion;
-	this->radius = 0;
-	this->angspeed = 0;
+	explosion = m_explosion;
+	radius = 0;
+	angspeed = 0;
+	range = 0;
+	current_range = 0;
 }
 
 Ammo* Ammo::Clone()
@@ -25,6 +27,7 @@ Ammo* Ammo::Clone()
 	m_ammo->Pattern = this->Pattern;
 	m_ammo->radius = this->radius;
 	m_ammo->angspeed = this->angspeed;
+	m_ammo->range = this->range;
 
 	return m_ammo;
 }
@@ -38,18 +41,33 @@ void Ammo::Death()
 
 void Ammo::update(sf::Time deltaTime)
 {
-	static sf::Vector2f newposition, offset;
+	//range before bullet extinction (optional. put "0" not to use)
+	if (this->range > 0)
+	{
+		this->current_range += (ref_speed*deltaTime.asSeconds());
+		if (this->current_range > this->range)
+		{
+			this->visible = false;
+			this->GarbageMe;
+		}
+	}
 
-	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
-	
-	//call bobbyPattern
-	offset = Pattern.GetOffset(deltaTime.asSeconds());
-	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
-	newposition.x += offset.x;
-	newposition.y += offset.y;
+	//if not disappeared, move it
+	if (!this->GarbageMe)
+	{
+		static sf::Vector2f newposition, offset;
 
-	this->setPosition(newposition.x, newposition.y);
+		newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
+		newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 
-	AnimatedSprite::update(deltaTime);
+		//call bobbyPattern
+		offset = Pattern.GetOffset(deltaTime.asSeconds());
+		offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+		newposition.x += offset.x;
+		newposition.y += offset.y;
+
+		this->setPosition(newposition.x, newposition.y);
+
+		AnimatedSprite::update(deltaTime);
+	}
 }

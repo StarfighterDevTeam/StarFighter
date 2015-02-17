@@ -125,100 +125,17 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 
 Weapon* FileLoader::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 {
-	
-	list<vector<string>> weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
-
-	for (std::list<vector<string>>::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			Weapon* weapon = new Weapon(ammo);
-			weapon->display_name = (*it)[WeaponData::WEAPON_NAME];
-			weapon->fire_direction = Vector2i(0,fire_direction);
-			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
-			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
-			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
-			weapon->shot_mode = ShotMode::NoShotMode;
-			if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
-			{
-				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
-					weapon->shot_mode = ShotMode::AlternateShotMode;
-				else if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending") == 0)
-					weapon->shot_mode = ShotMode::AscendingShotMode;
-				else if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
-					weapon->shot_mode = ShotMode::DescendingShotMode;
-			}
-
-			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
-			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
-			if (weapon->rafale != 0)
-				weapon->rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
-
-			weapon->textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
-			weapon->size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
-			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
-
-			if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("0") != 0)
-			{
-				if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
-					weapon->target_seaking = TargetSeaking::SEMI_SEAKING;
-				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("seaking") == 0)
-					weapon->target_seaking = TargetSeaking::SEAKING;
-				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("super_seaking") == 0)
-					weapon->target_seaking = TargetSeaking::SUPER_SEAKING;
-			}
-			
-			return weapon;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file",name));
-
+	return Enemy::LoadWeapon(name, fire_direction, ammo);
 }
 
 Ammo* FileLoader::LoadAmmo(string name)
 {
-	list<vector<string>> ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
-
-	for (std::list<vector<string>>::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
-	{
-		if((*it)[0].compare(name) == 0)
-		{
-			Ammo* new_ammo = new Ammo(Vector2f(0,0), Vector2f(0,stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME], 
-				Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]),stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
-			new_ammo->display_name = (*it)[AmmoData::AMMO_NAME];
-			
-			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), AmmoData::AMMO_PATTERN);
-			new_ammo->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
-
-			return new_ammo;
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file",name));
+	return Enemy::LoadAmmo(name);
 }
 
 FX* FileLoader::LoadFX(string name)
 {
-	list<vector<string>>FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
-
-	for (std::list<vector<string>>::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
-	{
-		if((*it)[FXData::FX_TYPE].compare("explosion") == 0)
-		{
-			if((*it)[FXData::FX_NAME].compare(name) == 0)
-			{
-				float duration = atof(((*it)[FXData::FX_DURATION]).c_str());
-				FX* myFX = new FX(Vector2f(0,0), Vector2f(0,0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]),stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(duration));
-				myFX->display_name = (*it)[FXData::FX_NAME];
-
-				return myFX;
-			}
-		}
-	}
-
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file",name));
-
+	return Enemy::LoadFX(name);
 }
 
 Equipment* FileLoader::LoadEquipment(string name)

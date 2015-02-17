@@ -25,6 +25,8 @@ public:
 	float radius;
 	float angspeed;
 	float ref_speed;
+	float range;
+	float current_range;
 };
 
 #endif // AMMO_H_INCLUDED
