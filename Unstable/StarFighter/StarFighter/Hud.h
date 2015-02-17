@@ -34,6 +34,7 @@ private:
 
 	bool no_hazard_value;
 	bool max_hazard_level_reached;
+	bool has_shield;
 };
 
 class HudElement : public Independant

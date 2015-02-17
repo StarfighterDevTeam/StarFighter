@@ -15,10 +15,18 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 
 void Enemy::update(sf::Time deltaTime)
 {
-	//sheld regen if not maximum
+	//shield regen if not maximum
+	static double shield_regen_buffer = 0;
 	if (shield < shield_max)
 	{
-		shield += shield_regen;
+		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+		if (shield_regen_buffer > 1)
+		{
+			double intpart;
+			shield_regen_buffer = modf(shield_regen_buffer, &intpart);
+			shield += intpart;
+		}
+
 		//canceling over-regen
 		if (shield > shield_max)
 		{

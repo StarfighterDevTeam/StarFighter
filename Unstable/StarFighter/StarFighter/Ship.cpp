@@ -700,7 +700,7 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 
 void Ship::update(sf::Time deltaTime)
 {
-	static double shield_regen_buffer = 0;
+	
 	//immunity frames after death
 	if (immune)
 	{
@@ -714,6 +714,7 @@ void Ship::update(sf::Time deltaTime)
 	//this->immune = true;
 
 	//sheld regen if not maximum
+	static double shield_regen_buffer = 0;
 	if (shield < ship_config.getShipConfigShield())
 	{
 		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
@@ -730,7 +731,6 @@ void Ship::update(sf::Time deltaTime)
 			shield = ship_config.getShipConfigShield();
 		}
 	}
-	//this->ship_hud.update(this->armor/3, this->shield/3, this->money, this->graze_count);//will do for now... but we'll need to scale it to the max value later
 
 	sf::Vector2f directions = InputGuy::getDirections();
 	if (!disable_inputs)
@@ -890,7 +890,9 @@ void Ship::Respawn()
 	speed.y = 0;
 	this->setVisible(true);
 	isOnScene = true;
-	this->setPosition(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
+	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
+	pos = Independant::getPosition_for_Direction((*CurrentGame).direction, pos);
+	this->setPosition(pos);
 
 	immune = true;
 	immunityTimer.restart();

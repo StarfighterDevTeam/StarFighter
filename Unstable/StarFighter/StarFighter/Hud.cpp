@@ -15,12 +15,20 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	armorBar.setOrigin(0, 0);
 	armorBar.setPosition(20, 10);
 
-	shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_shield));
-	shieldBar.setFillColor(sf::Color(0, 50, 250, 128));//blue
-	shieldBar.setOutlineThickness(1);
-	shieldBar.setOutlineColor(sf::Color(255, 255, 255));
-	shieldBar.setOrigin(0,0);
-	shieldBar.setPosition((40+ARMOR_BAR_SIZE_X),10);
+	if (m_shield > 0)
+	{
+		shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1 + m_shield));
+		shieldBar.setFillColor(sf::Color(0, 50, 250, 128));//blue
+		shieldBar.setOutlineThickness(1);
+		shieldBar.setOutlineColor(sf::Color(255, 255, 255));
+		shieldBar.setOrigin(0, 0);
+		shieldBar.setPosition((40 + ARMOR_BAR_SIZE_X), 10);
+		this->has_shield = true;
+	}
+	else
+	{
+		this->has_shield = false;
+	}
 
 	try 
 	{
@@ -179,7 +187,10 @@ void PlayerHud::Draw(sf::RenderWindow* window)
 {
 	//Draw all
 	window->draw(armorBar);
-	window->draw(shieldBar);
+	if (this->has_shield)
+	{
+		window->draw(shieldBar);
+	}
 	window->draw(Money);
 	window->draw(GrazeScore);
 	window->draw(SceneName);
