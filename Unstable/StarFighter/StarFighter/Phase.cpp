@@ -48,7 +48,7 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 	{
 		cond = ConditionType::wakeUp;
 	}
-	else if (line_data[index].compare("EnemyProximity") == 0)
+	else if (line_data[index].compare("proximity") == 0)
 	{
 		cond = ConditionType::EnemyProximity;
 	}
