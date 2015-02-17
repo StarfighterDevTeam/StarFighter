@@ -3,6 +3,15 @@
 
 #include "Independant.h"
 #include "Weapon.h"
+#include "TextUtils.h"
+
+enum ConditionData
+{
+	CONDITION_TYPE,//0
+	CONDITION_OPERATOR,//1
+	CONDITION_VALUE,//2
+	CONDITION_TRANSITION,//3
+};
 
 enum EnemyPhaseData
 {
@@ -66,6 +75,7 @@ public:
 	list<ConditionTransition*> transitions_list;
 	string wake_up_name;
 	bool hasWakeUp;
+	static ConditionTransition* ConditionLoader(vector<string> line_data, int index);
 };
 
 class ConditionTransition

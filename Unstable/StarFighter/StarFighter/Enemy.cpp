@@ -393,141 +393,22 @@ Phase* Enemy::LoadPhase(string name)
 				phase->hasWakeUp = true;
 			}
 			
+			//loading transitions to next phase
+			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
+			{
+				phase->hasTransition = true;
+				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
+			}
 			//loading transition to next phase
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
 			{
 				phase->hasTransition = true;
-
-				//loading condition type
-				ConditionType cond = ConditionType::NoCondition;
-				if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("positionV") == 0)
-				{
-					cond = ConditionType::VerticalPosition;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("positionH") == 0)
-				{
-					cond = ConditionType::HorizontalPosition;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("phaseClock") == 0)
-				{
-					cond = ConditionType::phaseClock;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("enemyClock") == 0)
-				{
-					cond = ConditionType::enemyClock;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("life") == 0)
-				{
-					cond = ConditionType::LifePourcentage;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("shield") == 0)
-				{
-					cond = ConditionType::ShieldPourcentage;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("wakeUp") == 0)
-				{
-					cond = ConditionType::wakeUp;
-				}
-
-				//loading operator type
-				FloatCompare op = FloatCompare::ERROR_COMPARE;
-				if (cond != ConditionType::wakeUp)
-				{
-					if ((*it)[EnemyPhaseData::PHASE_OPERATOR].compare("greater") == 0)
-					{
-						op = FloatCompare::GREATHER_THAN;
-					}
-					else if ((*it)[EnemyPhaseData::PHASE_OPERATOR].compare("lesser") == 0)
-					{
-						op = FloatCompare::LESSER_THAN;
-					}
-					else if ((*it)[EnemyPhaseData::PHASE_OPERATOR].compare("equal") == 0)
-					{
-						op = FloatCompare::EQUAL_TO;
-					}
-					else
-					{
-						LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition 1 of enemy phase named '%s'. Please check config file", name));
-					}
-				}
-
-				float value = 0;
-				if (cond != ConditionType::wakeUp)
-				{
-					value = stoi((*it)[EnemyPhaseData::PHASE_VALUE]);
-				}
-				//and finally wrapping up all of this data in our list of transition conditions
-				ConditionTransition* condition = new ConditionTransition(cond, op, value, (*it)[EnemyPhaseData::PHASE_TRANSITION]);
-				phase->transitions_list.push_back(condition);
+				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
 			}
-
-			//idem for transition 2
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("0") != 0)
 			{
 				phase->hasTransition = true;
-
-				//loading condition type
-				ConditionType cond = ConditionType::NoCondition;
-				if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("positionV") == 0)
-				{
-					cond = ConditionType::VerticalPosition;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("positionH") == 0)
-				{
-					cond = ConditionType::HorizontalPosition;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("phaseClock") == 0)
-				{
-					cond = ConditionType::phaseClock;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("enemyClock") == 0)
-				{
-					cond = ConditionType::enemyClock;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("life") == 0)
-				{
-					cond = ConditionType::LifePourcentage;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("shield") == 0)
-				{
-					cond = ConditionType::ShieldPourcentage;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("wakeUp") == 0)
-				{
-					cond = ConditionType::wakeUp;
-				}
-
-				//loading operator type
-				FloatCompare op = FloatCompare::ERROR_COMPARE;
-				if (cond != ConditionType::wakeUp)
-				{
-					if ((*it)[EnemyPhaseData::PHASE_OPERATOR_2].compare("greater") == 0)
-					{
-						op = FloatCompare::GREATHER_THAN;
-					}
-					else if ((*it)[EnemyPhaseData::PHASE_OPERATOR_2].compare("lesser") == 0)
-					{
-						op = FloatCompare::LESSER_THAN;
-					}
-					else if ((*it)[EnemyPhaseData::PHASE_OPERATOR_2].compare("equal") == 0)
-					{
-						op = FloatCompare::EQUAL_TO;
-					}
-					else
-					{
-						LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition of enemy phase named '%s'. Please check config file", name));
-					}
-				}
-
-				float value2 = 0;
-				if (cond != ConditionType::wakeUp)
-				{
-					value2 = stoi((*it)[EnemyPhaseData::PHASE_VALUE_2]);
-				}
-
-				//and finally wrapping up all of this data in our list of transition conditions
-				ConditionTransition* condition = new ConditionTransition(cond, op, value2, (*it)[EnemyPhaseData::PHASE_TRANSITION_2]);
-				phase->transitions_list.push_back(condition);
+				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION_2));
 			}
 
 			return phase;
