@@ -3,14 +3,21 @@
 
 bool InputGuy::isFiring()
 {
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
 		return true;
 	}
 
-	if(sf::Joystick::hasAxis(0,sf::Joystick::Axis::R))
+	if (sf::Joystick::isConnected(0))
 	{
-		if(sf::Joystick::getAxisPosition(0,sf::Joystick::Axis::R) > 5)
+		if (sf::Joystick::hasAxis(0, sf::Joystick::Axis::Z))
+		{
+			if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE)
+			{
+				return true;
+			}
+		}
+		if (sf::Joystick::isButtonPressed(0, 0))
 		{
 			return true;
 		}
@@ -20,24 +27,34 @@ bool InputGuy::isFiring()
 
 bool InputGuy::isBraking()
 {
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 	{
 		return true;
 	}
 
-	else
-		return false;
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 2))
+			return true;
+	}
+
+	return false;
 }
 
 bool InputGuy::setAutomaticFire()
 {
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
 	{
 		return true;
-	}	
-		
-	else
-		return false;
+	}
+
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 5))
+			return true;
+	}
+
+	return false;
 }
 
 Vector2f InputGuy::getDirections()
@@ -47,45 +64,21 @@ Vector2f InputGuy::getDirections()
 
 
 	//Keyboard inputs
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		dirX++;
 	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		dirY--;
 	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		dirX--;
 	}
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		dirY++;
-	}
-
-	//Joystick inputs (if connected)
-	if(sf::Joystick::hasAxis(0,sf::Joystick::Axis::PovX))
-	{
-		if(sf::Joystick::getAxisPosition(0,sf::Joystick::Axis::PovX) > 1)
-		{	
-			dirX++;
-		}
-
-		if(sf::Joystick::getAxisPosition(0,sf::Joystick::Axis::PovX) < 1)
-		{
-			dirX--;
-		}
-
-		if(sf::Joystick::getAxisPosition(0,sf::Joystick::Axis::PovY) > 1)
-		{
-			dirY--;
-		}
-
-		if(sf::Joystick::getAxisPosition(0,sf::Joystick::Axis::PovY) < 1)
-		{
-			dirY++;
-		}
 	}
 
 	//Conputing directions
@@ -95,12 +88,27 @@ Vector2f InputGuy::getDirections()
 	x = dirX > 0 ? 1 : (dirX < 0 ? -1 : 0);
 	y = dirY > 0 ? 1 : (dirY < 0 ? -1 : 0);
 
-	//diagonal movement ? 
-	if( abs(x) == 1 && abs(y) == 1)
+	//Joystick inputs (if connected)
+	if (sf::Joystick::isConnected(0))
 	{
-		x = (x)*SQRT2BY2;
-		y = (y)*SQRT2BY2;
+		if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)) > JOYSTICK_MIN_AXIS_VALUE)
+			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X) / 100.0;
+		else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX)) > JOYSTICK_MIN_AXIS_VALUE)
+			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.0;
+		
+		if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)) > JOYSTICK_MIN_AXIS_VALUE)
+			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) / 100.0;
+		else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY)) > JOYSTICK_MIN_AXIS_VALUE)
+			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0;
 	}
 
-	return Vector2f(x,y);
+	//diagonal movement?
+	if (abs(x) + abs(y) > 1)
+	{
+		float p = (1 / sqrt(pow(x, 2) + pow(y, 2)));
+		x = x*p;
+		y = y*p;
+	}
+
+	return Vector2f(x, y);
 }

@@ -13,7 +13,6 @@ LSuhkoiPhase1,0,laser_fast,fireball,laser,fireball,0,,oscillator,60,100,0,Hatsuk
 RSuhkoiPhase1,0,laser_fast,fireball,laser,fireball,0,,oscillator,60,100,0,Itsukhoi,life,lesser,0,SukhoisDeath,0,,,
 SukhoisDeath,0,0,,0,,0,,0,,,0,Katyusha,0,,,,0,,,
 KatyushaWaiting,0,0,,0,,0,,0,,,ghost,0,wakeUp,,,KatyushaWaiting2,0,,,
-KatyushaWaiting2,0,0,,0,,0,,0,,,ghost,0,wakeUp,,,KatyushaAwaken,0,,,
-KatyushaAwaken,0,0,0,0,0,0,,0,,,0,0,phaseClock,greater,3,KatyushaFullLife,0,,,
+KatyushaWaiting2,0,0,,0,,0,,0,,,ghost,0,wakeUp,,,KatyushaFullLife,0,,,
 KatyushaFullLife,0,laser_fast,fireball,laser_arc,fireball_blue,0,,circle,70,70,0,0,life,lesser,50,KatyushaMidLife,0,,,
 KatyushaMidLife,0,laser_fast,fireball,laser_arc,fireball_blue,laser,fireball,circle,100,100,0,0,0,,,,0,,,

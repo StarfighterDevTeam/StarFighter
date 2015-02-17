@@ -16,6 +16,7 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	hasWeapon = false;
 	spread = sf::Vector2f(0,0);
 	damage = 0;
+	key_repeat = false;
 }
 
 void Bot::setTarget (Independant* m_target)
@@ -52,15 +53,32 @@ void Bot::update(sf::Time deltaTime)
 
 	this->setPosition(newposition.x,newposition.y);
 
-	//automatic fire
-	if (hasWeapon && InputGuy::isFiring() && !disable_fire)
+	//auto fire option (F key)
+	if (InputGuy::setAutomaticFire())
 	{
-		weapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).x, 
-			(this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).y) ;
+		if (!this->key_repeat)
+		{
+			this->automatic_fire = !this->automatic_fire;
+			this->key_repeat = true;
+		}
+	}
+	else
+	{
+		this->key_repeat = false;
+	}
 
-		weapon->setPosition(this->getPosition().x + weapon->weaponOffset.x, this->getPosition().y + weapon->weaponOffset.y);
+	//automatic fire
+	if (hasWeapon && !disable_fire)
+	{
+		if (InputGuy::isFiring() || this->automatic_fire)
+		{
+			weapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).x,
+				(this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).y);
 
-		weapon->Fire(IndependantType::FriendlyFire);
+			weapon->setPosition(this->getPosition().x + weapon->weaponOffset.x, this->getPosition().y + weapon->weaponOffset.y);
+
+			weapon->Fire(IndependantType::FriendlyFire);
+		}
 	}
 
 	AnimatedSprite::update(deltaTime);

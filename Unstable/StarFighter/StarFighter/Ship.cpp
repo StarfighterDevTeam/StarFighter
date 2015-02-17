@@ -602,6 +602,7 @@ void ShipConfig::GenerateBots(Independant* m_target)
 	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
 	{
 		Bot* m_bot = (*it)->Clone();
+		m_bot->automatic_fire = this->automatic_fire;
 		m_bot->spread = Independant::getSize_for_Direction((*CurrentGame).direction, m_bot->spread);
 		m_bot->setTarget(m_target);
 		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, IndependantType::Neutral);
@@ -741,23 +742,14 @@ void Ship::update(sf::Time deltaTime)
 		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
 		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
-		//Braking function
-		if (InputGuy::isBraking())
+		//max speed constraints
+		if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
 		{
-			if (speed.x > SHIP_BRAKING_SPEED)
-				speed.x = SHIP_BRAKING_SPEED;
-			if (speed.x < -SHIP_BRAKING_SPEED)
-				speed.x = -SHIP_BRAKING_SPEED;
-			if (speed.y > SHIP_BRAKING_SPEED)
-				speed.y = SHIP_BRAKING_SPEED;
-			if (speed.y < -SHIP_BRAKING_SPEED)
-				speed.y = -SHIP_BRAKING_SPEED;
-
-			this->transparent = false;
+			speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
 		}
-		else
+		if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
 		{
-			this->transparent = true;
+			speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
 		}
 
 		//auto fire option (F key)
@@ -767,10 +759,6 @@ void Ship::update(sf::Time deltaTime)
 			{
 				this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
 				this->key_repeat = true;
-				if (this->ship_config.automatic_fire)
-					printf("Auto fire ON\n");
-				else
-					printf("Auto fire OFF\n");
 			}
 		}
 		else
@@ -791,19 +779,32 @@ void Ship::update(sf::Time deltaTime)
 
 						ship_config.weapon->setPosition(this->getPosition().x + ship_config.weapon->weaponOffset.x, this->getPosition().y + ship_config.weapon->weaponOffset.y);
 						ship_config.weapon->Fire(FriendlyFire);
+
+						//speed malus when shooting
+						speed.x *= SHIP_SHOOTING_MALUS_SPEED;
+						speed.y *= SHIP_SHOOTING_MALUS_SPEED;
 					}
 				}
 			}
 		}
 
-		//max speed constraints
-		if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
+		//Braking function
+		if (InputGuy::isBraking())
 		{
-			speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
+			if (speed.x > SHIP_BRAKING_SPEED)
+				speed.x = SHIP_BRAKING_SPEED;
+			if (speed.x < -SHIP_BRAKING_SPEED)
+				speed.x = -SHIP_BRAKING_SPEED;
+			if (speed.y > SHIP_BRAKING_SPEED)
+				speed.y = SHIP_BRAKING_SPEED;
+			if (speed.y < -SHIP_BRAKING_SPEED)
+				speed.y = -SHIP_BRAKING_SPEED;
+
+			this->transparent = false;
 		}
-		if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
+		else
 		{
-			speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
+			this->transparent = true;
 		}
 
 		//idle decceleration

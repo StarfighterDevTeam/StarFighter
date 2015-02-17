@@ -2,7 +2,8 @@
 #define INPUTGUY_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include <stdlib.h> 
+#include <stdlib.h>
+#include "Globals.h"
 
 #define SQRT2BY2 0.707 // racine(2) / 2
 

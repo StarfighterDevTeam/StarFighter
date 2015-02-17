@@ -27,6 +27,8 @@ public:
 	void setTarget (Independant* m_target);
 	void setRadius (float m_radius, float clockwise);
 	sf::Vector2f spread;
+	bool automatic_fire;
+	bool key_repeat;
 
 private:
 		

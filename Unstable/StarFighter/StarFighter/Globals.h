@@ -34,6 +34,7 @@
 #define HUB_LINK_NAME_OFFSET_RATIO				0.3f
 
 #define	GHOST_ALPHA_VALUE						120
+#define JOYSTICK_MIN_AXIS_VALUE					25
 
 
 #define HAZARD_BREAK_RATIO						0.50f
@@ -56,6 +57,7 @@
 
 #define GRAZE_DISTANCE									30
 #define SHIP_BRAKING_SPEED								180
+#define SHIP_SHOOTING_MALUS_SPEED						0.65f
 
 //DROP SYSTEM VARIABLES
 

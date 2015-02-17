@@ -143,7 +143,6 @@ public:
 	void DestroyBots();
 	void GenerateFakeShip(Independant* m_target);
 	bool automatic_fire;
-	
 
 private:
 	sf::Vector2f max_speed;
