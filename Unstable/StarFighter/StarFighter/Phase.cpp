@@ -4,6 +4,7 @@ Phase::Phase()
 {
 	this->hasTransition = false;
 	this->hasWakeUp = false;
+	this->hasWelcomeShot = false;
 	this->Pattern = new PatternBobby();
 }
 
@@ -46,6 +47,10 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 	else if (line_data[index].compare("wakeUp") == 0)
 	{
 		cond = ConditionType::wakeUp;
+	}
+	else if (line_data[index].compare("EnemyProximity") == 0)
+	{
+		cond = ConditionType::EnemyProximity;
 	}
 
 	//loading operator type

@@ -270,6 +270,27 @@ bool Enemy::CheckCondition()
 				}
 				break;
 			}
+
+			case ConditionType::EnemyProximity:
+			{
+				if ((*it)->op == FloatCompare::GREATHER_THAN)
+				{
+					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_OUT_OF_RANGE)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+				}
+				else if ((*it)->op == FloatCompare::LESSER_THAN || (*it)->op == FloatCompare::EQUAL_TO)
+				{
+					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_IN_RANGE)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+				}							  
+				break;
+			}
 		}
 	}
 
@@ -283,7 +304,6 @@ void Enemy::setPhase(string phase_name)
 	this->phaseClock.restart();
 
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
-	//this->speed.y = phase->vspeed;
 
 	this->immune = false;
 	this->setGhost(false);
@@ -305,6 +325,11 @@ void Enemy::setPhase(string phase_name)
 			this->setGhost(true);
 			break;
 		}
+		case Modifier::Death:
+		{
+			this->Death();
+			break;
+		}
 	}
 
 	//clearing old weapons and setting new ones
@@ -315,6 +340,17 @@ void Enemy::setPhase(string phase_name)
 	}
 	
 	this->Pattern.SetPattern(phase->Pattern->currentPattern, phase->Pattern->patternSpeed, phase->Pattern->patternParams); //vitesse angulaire (degres/s)
+
+	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
+	if (phase->hasWelcomeShot)
+	{
+		phase->welcomeWeapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * phase->welcomeWeapon->getFireDirection_for_Direction((*CurrentGame).direction).x,
+			(this->m_size.y / 2) * phase->welcomeWeapon->getFireDirection_for_Direction((*CurrentGame).direction).y);
+
+		phase->welcomeWeapon->setPosition(this->getPosition().x + phase->welcomeWeapon->weaponOffset.x, this->getPosition().y + phase->welcomeWeapon->weaponOffset.y);
+
+		phase->welcomeWeapon->Fire(IndependantType::EnemyFire);
+	}
 
 	//setting up wake_up condition
 	bool wake_up_condition_exists = false;
@@ -384,8 +420,19 @@ Phase* Enemy::LoadPhase(string name)
 				{
 					phase->modifier = Modifier::Ghost;
 				}
+				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("death") == 0)
+				{
+					phase->modifier = Modifier::Death;
+				}
 			}
 
+			//loading welcome shot
+			if ((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON].compare("0") != 0)
+			{
+				phase->welcomeWeapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_WELCOME_AMMO]));
+				phase->hasWelcomeShot = true;
+			}
+			
 			//load enemies (by name) to wake up
 			if ((*it)[EnemyPhaseData::PHASE_WAKEUP].compare("0") != 0)
 			{
@@ -423,6 +470,10 @@ void Enemy::Death()
 	FX* myFX = this->FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
 	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
+
+	this->visible = false;
+	this->isOnScene = false;
+	this->GarbageMe = true;
 }
 
 void Enemy::GenerateLoot()

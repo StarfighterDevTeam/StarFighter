@@ -126,11 +126,6 @@ void Game::colisionChecksV2()
 
 				if (SimpleCollision::AreColliding((*it1), (*it2)))
 				{
-					//Bullets are invisible after impact
-					(*it2)->setVisible(false);
-					(*it2)->isOnScene = false;
-					(*it2)->GarbageMe = true;
-
 					//Do something (like, kill ship) -> OK
 					(*it1)->damage_from(*(*it2));
 					//explosion
@@ -185,13 +180,7 @@ void Game::colisionChecksV2()
 					//Loot
 					hazard += (*it2)->getMoney();
 					(*it2)->CreateRandomLoot(this->BeastScoreBonus);
-					//TODO : 
-					//(*it1)->CreateRandomLoot(BeastScale_HazardLevel + BeastScale_PlayerCombo);
 					(*it2)->GenerateLoot();
-
-					//sent to garbage collector
-					(*it2)->setVisible(false);
-					(*it2)->GarbageMe = true;
 				}
 			}
 		}
@@ -224,9 +213,6 @@ void Game::colisionChecksV2()
 			{
 				if ((*it2)->collider_type == FriendlyFire)
 				{
-					(*it2)->setVisible(false);
-					(*it2)->GarbageMe = true;
-
 					//Do something (like, kill the enemy ship ?)
 					(*it1)->damage_from(*(*it2));
 					//explosion
@@ -235,17 +221,12 @@ void Game::colisionChecksV2()
 					//death
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
-						(*it1)->Death();
+						
 						//Loot
 						hazard += (*it1)->getMoney();
 						(*it1)->CreateRandomLoot(this->BeastScoreBonus);
-						//TODO : 
-						//(*it1)->CreateRandomLoot(BeastScale_HazardLevel + BeastScale_PlayerCombo);
 						(*it1)->GenerateLoot();
-
-						//sent to garbage collector
-						(*it1)->setVisible(false);
-						(*it1)->GarbageMe = true;
+						(*it1)->Death();
 					}
 				}
 			}
@@ -398,6 +379,41 @@ void Game::resetHazard(int hazard_overkill)
 void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore)
 {
 	this->BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
+}
+
+TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range)
+{
+	sf::Vector2f pos;
+	float shortest_distance = -1;
+	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[type])->begin(); it != (this->sceneIndependantsTyped[type])->end(); it++)
+	{
+		if ((*it)->isOnScene && !(*it)->ghost)
+		{
+			float distance_to_ref = (pow((ref_position.x - (*it)->getPosition().x), 2) + pow((ref_position.y - (*it)->getPosition().y), 2));
+			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
+			if (distance_to_ref < shortest_distance || shortest_distance < 0)
+			{
+				shortest_distance = distance_to_ref;
+				pos = (*it)->getPosition();
+			}
+		}
+	}
+	if (shortest_distance > 0)
+	{
+		if (range > 0 && pow(range, 2) <= shortest_distance)
+		{
+			return TargetScan::TARGET_OUT_OF_RANGE;
+		}
+		else
+		{
+			return TargetScan::TARGET_IN_RANGE;
+		}
+		
+	}
+	else
+	{
+		return TargetScan::NO_TARGET_FOUND;
+	}
 }
 
 float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range)

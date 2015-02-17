@@ -31,6 +31,13 @@ enum LayerType {
 	NBVAL_Layer
 };
 
+enum TargetScan
+{
+	NO_TARGET_FOUND,//0
+	TARGET_OUT_OF_RANGE,//1
+	TARGET_IN_RANGE,//2
+};
+
 struct Game 
 {
 public:
@@ -55,6 +62,7 @@ public:
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
 	void GetBeastScoreBonus (float m_playerShipBeastScore, float m_sceneBeastScore);
+	TargetScan FoundNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range = 0);
 	float GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range=0);
 	void WakeUpEnemiesWithName(string m_display_name);
 

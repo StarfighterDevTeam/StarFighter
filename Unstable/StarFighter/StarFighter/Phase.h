@@ -28,14 +28,16 @@ enum EnemyPhaseData
 	PHASE_RADIUS,//10
 	PHASE_MODIFIER,//11
 	PHASE_WAKEUP,//12
-	PHASE_CONDITION,//13
-	PHASE_OPERATOR,//14
-	PHASE_VALUE,//15
-	PHASE_TRANSITION,//16
-	PHASE_CONDITION_2,//17
-	PHASE_OPERATOR_2,//18
-	PHASE_VALUE_2,//19
-	PHASE_TRANSITION_2,//20
+	PHASE_WELCOME_WEAPON,//13
+	PHASE_WELCOME_AMMO,//14
+	PHASE_CONDITION,//15
+	PHASE_OPERATOR,//16
+	PHASE_VALUE,//17
+	PHASE_TRANSITION,//18
+	PHASE_CONDITION_2,//19
+	PHASE_OPERATOR_2,//20
+	PHASE_VALUE_2,//21
+	PHASE_TRANSITION_2,//22
 };
 
 enum ConditionType
@@ -48,13 +50,15 @@ enum ConditionType
 	LifePourcentage,
 	ShieldPourcentage,
 	wakeUp,
+	EnemyProximity,
 };
 
 enum Modifier
 {
 	NoModifier,
 	Immune,
-	Ghost,//no collision
+	Ghost,//no collision + alpha mask
+	Death,//suicide
 };
 
 //forward declaration
@@ -72,10 +76,12 @@ public:
 	float radius;
 	float vspeed;
 	bool hasTransition;
+	bool hasWakeUp;
+	bool hasWelcomeShot;
 	list<ConditionTransition*> transitions_list;
 	string wake_up_name;
-	bool hasWakeUp;
 	static ConditionTransition* ConditionLoader(vector<string> line_data, int index);
+	Weapon* welcomeWeapon;
 };
 
 class ConditionTransition

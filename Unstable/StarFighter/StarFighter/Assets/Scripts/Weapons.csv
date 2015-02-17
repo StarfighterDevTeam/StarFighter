@@ -1,6 +1,7 @@
 #weapon_name,image,width,height,frames,sound_name,rate_of_fire,rafale,rafale_cooldown,multishot,xspread,dispersion,angle_offset,alternate,target_seaking
 laser,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.05,3,0.8f,3,15,0,0,0,semi_seaking
 laser_fast,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.5,3,3.f,7,0,120,0,alternate,seaking
+laser_360,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
 laser_player,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
 laser_bot,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.1,0,1.f,1,0,0,0,0,seaking
 laser_default,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.2,0,2.f,3,10,0,0,alternate,0

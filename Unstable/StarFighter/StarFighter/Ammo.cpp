@@ -37,6 +37,10 @@ void Ammo::Death()
 	FX* myFX = this->explosion->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
     (*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
+
+	this->visible = false;
+	this->isOnScene = false;
+	this->GarbageMe = true;
 }
 
 void Ammo::update(sf::Time deltaTime)

@@ -116,6 +116,11 @@ void Weapon::Fire(IndependantType m_collider_type)
 	{
 		if (multishot > 1)
 		{
+			if (dispersion == 360)//treating this particular case to avoid a double bullet on the 360th degree
+			{
+				dispersion *= (1 - (1 / multishot));//ex: 10 shots at 360°, we make it shots at 324° instead (360 - 360/10 to avoid the double bullet)
+			}
+
 			if (this->shot_mode == ShotMode::NoShotMode)
 			{
 				FireMultiShot(m_collider_type);
@@ -329,47 +334,6 @@ Weapon* Weapon::Clone()
 	weapon->angle_offset = this->angle_offset;
 
 	return weapon;
-}
-
-
-sf::Vector2f Weapon::OffsetWeapon(float angle)
-{
-	//default values
-	float x = 0;
-	float y = -this->weaponOffset.y;
-	/*
-	if (angle >= -45.f && angle <= 45.f)
-	{
-	x = - weaponOffset.y * tan(angle);
-	y = - weaponOffset.y;
-	printf("OFFSET BONUS X, Y:%f, %f\n",x, y);
-	}
-
-	if (angle > 45.f && angle <= 135.f)
-	{
-	x = weaponOffset.x;
-	y = - weaponOffset.x * tan(angle-45);
-	}
-
-	if (angle > 135.f && angle <= 180.f)
-	{
-	x = - weaponOffset.y * tan(angle-135);
-	y = + weaponOffset.y;
-	}
-
-	if (angle >= -135.f && angle <= -45.f)
-	{
-	x = - weaponOffset.x;
-	y = + weaponOffset.x * tan(angle+45);;
-	}
-
-	if (angle > -180.f && angle < -135.f)
-	{
-	x = - weaponOffset.y * tan(angle+135);
-	y = + weaponOffset.y;
-	}*/
-
-	return sf::Vector2f(x, y);
 }
 
 #define WEAPON_RATE_OF_FIRE_MULTIPLIER				5
