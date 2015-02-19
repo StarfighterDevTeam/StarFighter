@@ -11,6 +11,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	FX_death = m_FX_death;
 	hasWeapon = false;
 	hasPhases = false;
+	rotation_speed = 0;
 }
 
 void Enemy::update(sf::Time deltaTime)
@@ -73,6 +74,9 @@ void Enemy::update(sf::Time deltaTime)
 
 	this->setPosition(newposition.x, newposition.y);
 
+	//rotation
+	this->rotate(this->rotation_speed*deltaTime.asSeconds());
+
 	AnimatedSprite::update(deltaTime);
 
 	//phases
@@ -115,6 +119,8 @@ Enemy* Enemy::Clone()
 	enemy->Pattern = this->Pattern;
 	enemy->angspeed = this->angspeed;
 	enemy->radius = this->radius;
+
+	enemy->rotation_speed = this->rotation_speed;
 
 	if (this->hasPhases)
 	{
@@ -339,7 +345,9 @@ void Enemy::setPhase(string phase_name)
 		this->weapons_list.push_back((*it)->Clone());
 	}
 	
+	//movement
 	this->Pattern.SetPattern(phase->Pattern->currentPattern, phase->Pattern->patternSpeed, phase->Pattern->patternParams); //vitesse angulaire (degres/s)
+	this->rotation_speed = phase->rotation_speed;
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
 	if (phase->hasWelcomeShot)
@@ -407,6 +415,9 @@ Phase* Enemy::LoadPhase(string name)
 			//loading phases
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyPhaseData::PHASE_PATTERN);
 			phase->Pattern = m_bobby;
+
+			//loading rotation speed
+			phase->rotation_speed = stoi((*it)[EnemyPhaseData::PHASE_ROTATION_SPEED]);
 
 			//loading modifier (immune to damage, etc.)
 			phase->modifier = Modifier::NoModifier;
@@ -888,6 +899,8 @@ Ammo* Enemy::LoadAmmo(string name)
 			
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), AmmoData::AMMO_PATTERN);
 			new_ammo->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
+
+			new_ammo->rotation_speed = stoi((*it)[AmmoData::AMMO_ROTATION_SPEED]);
 
 			return new_ammo;
 		}

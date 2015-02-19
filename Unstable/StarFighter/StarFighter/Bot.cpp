@@ -53,6 +53,9 @@ void Bot::update(sf::Time deltaTime)
 
 	this->setPosition(newposition.x,newposition.y);
 
+	//rotation
+	this->rotate(this->rotation_speed*deltaTime.asSeconds());
+
 	//auto fire option (F key)
 	if (InputGuy::setAutomaticFire())
 	{
@@ -103,6 +106,7 @@ Bot* Bot::Clone()
 	bot->shield= this->shield;
 	bot->shield_max = this->shield_max;
 	bot->shield_regen = this->shield_regen;
+	bot->rotation_speed = this->rotation_speed;
 
 	return bot;
 }

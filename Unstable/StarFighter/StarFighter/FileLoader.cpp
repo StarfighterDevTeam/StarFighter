@@ -109,6 +109,8 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyData::ENEMY_PATTERN);
 			base->enemy->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
 
+			base->enemy->rotation_speed = stoi((*it)[EnemyData::ENEMY_ROTATION_SPEED]);
+
 			//Loading phases
 			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
 			{
@@ -249,6 +251,8 @@ Bot* FileLoader::LoadBot(string name)
 
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), BotData::BOT_PATTERN);
 			bot->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
+
+			bot->rotation_speed = stoi((*it)[BotData::BOT_ROTATION_SPEED]);
 
 			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)
 			{

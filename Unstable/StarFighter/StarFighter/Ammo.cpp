@@ -28,6 +28,7 @@ Ammo* Ammo::Clone()
 	m_ammo->radius = this->radius;
 	m_ammo->angspeed = this->angspeed;
 	m_ammo->range = this->range;
+	m_ammo->rotation_speed = this->rotation_speed;
 
 	return m_ammo;
 }
@@ -71,6 +72,9 @@ void Ammo::update(sf::Time deltaTime)
 		newposition.y += offset.y;
 
 		this->setPosition(newposition.x, newposition.y);
+
+		//rotation
+		this->rotate(this->rotation_speed*deltaTime.asSeconds());
 
 		AnimatedSprite::update(deltaTime);
 	}

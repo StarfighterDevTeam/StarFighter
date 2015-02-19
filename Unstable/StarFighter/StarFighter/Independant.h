@@ -60,6 +60,7 @@ enum AmmoData
 	AMMO_ANGSPEED,//10
 	AMMO_RADIUS,//11
 	AMMO_CLOCKWISE,//12
+	AMMO_ROTATION_SPEED,//13
 };
 
 enum FXData
@@ -196,6 +197,7 @@ public:
 	bool ghost;
 	bool disable_fire;
 	bool wake_up;
+	float rotation_speed;
 
 	//TIPS:
 	// direction = the scene border you refer too

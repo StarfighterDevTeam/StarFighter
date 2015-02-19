@@ -1,6 +1,6 @@
-#enemy_name,armor,shield,shield_regen,damage,weapon_name,ammo_name,weapon2_name,ammo2_name,weapon3_name,ammo3_name,image,width,height,frames,vspeed,explosion_name,value,pattern,angspeed,radius,clockwise,phase
-robert,800,50,1,10,laser_fast,fireball,0,fireball,0,fireball,Assets/2D/SU35.png,82,100,1,90,death_explosion,20,0,0,0,1,0
-roger,500,20,0,5,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,30,oscillator,30,40,1,phase01
-Katyusha,5000,20,1,100,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU35.png,82,100,1,90,death_explosion,10,oscillator,30,40,1,KatyushaIntro
-Itsukhoi,2000,20,1,50,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,LSukhoiIntro
-Hatsuki,2000,20,1,50,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,RSukhoiIntro
+#enemy_name,armor,shield,shield_regen,damage,weapon_name,ammo_name,weapon2_name,ammo2_name,weapon3_name,ammo3_name,image,width,height,frames,vspeed,explosion_name,value,pattern,angspeed,radius,clockwise,rotation_speed,phase
+robert,800,50,1,10,laser_fast,fireball,0,fireball,0,fireball,Assets/2D/SU35.png,82,100,1,90,death_explosion,20,0,0,0,1,0,0
+roger,500,20,0,5,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,30,oscillator,30,40,1,0,phase01
+Katyusha,5000,20,1,100,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU35.png,82,100,1,90,death_explosion,10,oscillator,30,40,1,0,KatyushaIntro
+Itsukhoi,2000,20,1,50,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,0,LSukhoiIntro
+Hatsuki,2000,20,1,50,laser,fireball,laser_arc,fireball_blue,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,0,RSukhoiIntro
