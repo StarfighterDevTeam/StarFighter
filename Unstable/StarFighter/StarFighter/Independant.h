@@ -59,6 +59,7 @@ enum AmmoData
 	AMMO_PATTERN,//9
 	AMMO_ANGSPEED,//10
 	AMMO_RADIUS,//11
+	AMMO_CLOCKWISE,//12
 };
 
 enum FXData

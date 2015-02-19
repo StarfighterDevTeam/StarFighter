@@ -24,13 +24,13 @@ PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
 		{
 			pattern_type = PatternType::Circle_;
 			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
-			v->push_back(1);  // clockwise = 1
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // clockwise = 1
 		}
 		else if (line_data[index].compare("oscillator") == 0)
 		{
 			pattern_type = PatternType::Oscillator;
 			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
-			v->push_back(1);  // clockwise = 1
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // clockwise = 1
 		}
 	}
 
@@ -91,7 +91,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 
 			this->patternSpeed = patternSpeed*2*M_PI/patternParams->at(0); //converting speed to radians (2pi = 1 amplitude)
 
-			this->_curSandboxPosition_polar = sf::Vector2f(patternParams->at(0)/2,patternParams->at(1)*M_PI/180); // r = ampl/2 + converting angle to radians
+ 			this->_curSandboxPosition_polar = sf::Vector2f(patternParams->at(0)/2,patternParams->at(1)*M_PI/180); // r = ampl/2 + converting angle to radians
 			this->_curSandboxPosition_cartesian = ToCartesianCoords(this->_curSandboxPosition_polar);
 
 			this->_currTheta = -M_PI_2; //starting @the middle
@@ -247,7 +247,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 		}
 	}
 	
-	return offset;
+ 	return offset;
 }
 
 sf::Vector2f PatternBobby::ToCartesianCoords(sf::Vector2f polarCoords)

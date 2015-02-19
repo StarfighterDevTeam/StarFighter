@@ -1,5 +1,5 @@
-#ammo_name,damage,vspeed,range,image,width,height,frames,FX_explosion,pattern,angspeed,radius
-laser_beam,30,400,0,Assets/2D/laser.png,4,12,1,death_explosion,0,0,0
-laser_blue,20,600,0,Assets/2D/laser_blue.png,4,16,1,explosion_S_blue,oscillator,60,20
-fireball,50,300,0,Assets/2D/fireball.png,8,8,1,explosion_S,0,0,0
-fireball_blue,50,150,0,Assets/2D/fireball_blue.png,8,8,1,explosion_S,0,0,0
+#ammo_name,damage,vspeed,range,image,width,height,frames,FX_explosion,pattern,angspeed,radius,clockwise
+laser_beam,30,400,0,Assets/2D/laser.png,4,12,1,death_explosion,0,0,0,1
+laser_blue,20,600,0,Assets/2D/laser_blue.png,4,16,1,explosion_S_blue,oscillator,60,20,1
+fireball,50,300,0,Assets/2D/fireball.png,8,8,1,explosion_S,0,0,0,1
+fireball_blue,50,150,0,Assets/2D/fireball_blue.png,8,8,1,explosion_S,0,0,0,1
