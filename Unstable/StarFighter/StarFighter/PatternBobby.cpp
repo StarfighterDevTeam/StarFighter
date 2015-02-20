@@ -32,6 +32,12 @@ PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
 			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
 			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // clockwise = 1
 		}
+		else if (line_data[index].compare("rectangle") == 0)
+		{
+			pattern_type = PatternType::Rectangle_;
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // width
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // height
+		}
 	}
 
 	bobby->currentPattern = pattern_type;
@@ -138,6 +144,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			{
 				//Moving on the edge, like a boss
 				_distance_left -= moved;
+				printf("distance left: %f\n", _distance_left);
 			}
 			else
 			{
@@ -149,11 +156,13 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 				{
 					_direction.y = _direction.x;
 					_direction.x = 0;
+					printf("haut/bas\n");
 				}
 				else
 				{
 					_direction.x = -_direction.y;
 					_direction.y = 0;
+					printf("gauche/droite\n");
 				}
 
 				if(_distance_left < moved)
@@ -161,12 +170,13 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 					offset.x += _direction.x*abs(_distance_left-moved);
 					offset.y += _direction.y*abs(_distance_left-moved);
 
-					_distance_left = (abs(_direction.x==1) ? patternParams->at(0) : patternParams->at(1)) - abs(_distance_left-moved);
+					_distance_left = (abs(_direction.x) == 1 ? patternParams->at(0) : patternParams->at(1)) - abs(_distance_left-moved);
 				}
 				else
 				{
 					//longueur ou largeur ?
 					_distance_left = abs(_direction.x==1) ? patternParams->at(0) : patternParams->at(1);
+					printf("4\n");
 				}				
 			}
 			break;
