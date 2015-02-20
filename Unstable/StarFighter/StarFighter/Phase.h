@@ -61,6 +61,7 @@ enum Modifier
 	Immune,
 	Ghost,//no collision + alpha mask
 	Death,//suicide
+	FaceTarget,//rotate to always face player
 };
 
 //forward declaration

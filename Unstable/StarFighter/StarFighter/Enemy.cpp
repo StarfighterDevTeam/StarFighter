@@ -75,7 +75,44 @@ void Enemy::update(sf::Time deltaTime)
 	this->setPosition(newposition.x, newposition.y);
 
 	//rotation
-	this->rotate(this->rotation_speed*deltaTime.asSeconds());
+	if (!this->faces_nearest_target)
+	{
+		this->rotate(this->rotation_speed*deltaTime.asSeconds());
+	}
+	else
+	{
+		//calculating angle to rotate toward the nearest target
+		float target_angle = fmod(180 - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+		float current_angle = this->getRotation();
+		float delta = current_angle - target_angle;
+		if (delta > 180)
+			delta -= 360;
+		else if (delta < -180)
+			delta += 360;
+	
+		if (delta >= 0)
+		{
+			if (abs(delta) > abs(this->rotation_speed))
+			{
+				this->rotate(-abs(this->rotation_speed)*deltaTime.asSeconds());
+			}
+			else
+			{
+				this->setRotation(target_angle);
+			}
+		}
+		else
+		{
+			if (abs(delta) > abs(this->rotation_speed))
+			{
+				this->rotate(abs(this->rotation_speed)*deltaTime.asSeconds());
+			}	
+			else
+			{
+				this->setRotation(target_angle);
+			}	
+		}
+	}
 
 	AnimatedSprite::update(deltaTime);
 
@@ -130,6 +167,7 @@ Enemy* Enemy::Clone()
 		enemy->wake_up = this->wake_up;
 		enemy->immune = this->immune;
 		enemy->setGhost(this->ghost);
+		enemy->faces_nearest_target = this->faces_nearest_target;
 	}
 
 	return enemy;
@@ -311,9 +349,12 @@ void Enemy::setPhase(string phase_name)
 
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
 
+	//reset old stats
 	this->immune = false;
 	this->setGhost(false);
+	this->faces_nearest_target = false;
 
+	//load new stats
 	switch (phase->modifier)
 	{
 		case Modifier::NoModifier:
@@ -334,6 +375,11 @@ void Enemy::setPhase(string phase_name)
 		case Modifier::Death:
 		{
 			this->Death();
+			break;
+		}
+		case Modifier::FaceTarget:
+		{
+			this->faces_nearest_target = true;
 			break;
 		}
 	}
@@ -434,6 +480,10 @@ Phase* Enemy::LoadPhase(string name)
 				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("death") == 0)
 				{
 					phase->modifier = Modifier::Death;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("face_target") == 0)
+				{
+					phase->modifier = Modifier::FaceTarget;
 				}
 			}
 
