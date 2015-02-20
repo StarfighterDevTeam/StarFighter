@@ -35,31 +35,6 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 
-	//automatic fire
-	if(isOnScene & hasWeapon)
-	{
-		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
-		{
-			(*it)->weaponOffset = sf::Vector2f((this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).x,
-				(this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).y);
-
-			(*it)->setPosition(this->getPosition().x + (*it)->weaponOffset.x, this->getPosition().y + (*it)->weaponOffset.y);
-
-			(*it)->Fire(IndependantType::EnemyFire);
-		}
-
-		//sheld regen if not maximum
-		if (shield < getIndependantShield())
-		{
-			shield += getIndependantShieldRegen();
-			//canceling over-regen
-			if (shield > getIndependantShield())
-			{
-				shield = getIndependantShield();
-			}
-		}
-	}
-
 	//movement
 	static sf::Vector2f newposition, offset;
 
@@ -75,21 +50,21 @@ void Enemy::update(sf::Time deltaTime)
 	this->setPosition(newposition.x, newposition.y);
 
 	//rotation
+	//calculating angle to rotate toward the nearest target
+	float target_angle = fmod(180 - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+	float current_angle = this->getRotation();
+	float delta = current_angle - target_angle;
+	if (delta > 180)
+		delta -= 360;
+	else if (delta < -180)
+		delta += 360;
+
 	if (!this->faces_nearest_target)
 	{
 		this->rotate(this->rotation_speed*deltaTime.asSeconds());
 	}
 	else
 	{
-		//calculating angle to rotate toward the nearest target
-		float target_angle = fmod(180 - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
-		float current_angle = this->getRotation();
-		float delta = current_angle - target_angle;
-		if (delta > 180)
-			delta -= 360;
-		else if (delta < -180)
-			delta += 360;
-	
 		if (delta >= 0)
 		{
 			if (abs(delta) > abs(this->rotation_speed))
@@ -111,6 +86,39 @@ void Enemy::update(sf::Time deltaTime)
 			{
 				this->setRotation(target_angle);
 			}	
+		}
+	}
+
+	//automatic fire
+	if (isOnScene & hasWeapon)
+	{
+		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+		{
+			if ((*it)->angle_constraint > 0 && abs(delta) > (*it)->angle_constraint)
+			{
+				//do nothing
+			}
+			else
+			{
+
+				(*it)->weaponOffset = sf::Vector2f((this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).x,
+					(this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).y);
+
+				(*it)->setPosition(this->getPosition().x + (*it)->weaponOffset.x, this->getPosition().y + (*it)->weaponOffset.y);
+
+				(*it)->Fire(IndependantType::EnemyFire);
+			}
+		}
+
+		//sheld regen if not maximum
+		if (shield < getIndependantShield())
+		{
+			shield += getIndependantShieldRegen();
+			//canceling over-regen
+			if (shield > getIndependantShield())
+			{
+				shield = getIndependantShield();
+			}
 		}
 	}
 
@@ -445,17 +453,23 @@ Phase* Enemy::LoadPhase(string name)
 			//loading weapons and ammos
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON].compare("0") != 0)
 			{
-				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO])));
+				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO]));
+				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT]);
+				phase->weapons_list.push_back(m_weapon);
 			}
 
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
 			{
-				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2])));
+				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2]));
+				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT_2]);
+				phase->weapons_list.push_back(m_weapon);
 			}
 
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
 			{
-				phase->weapons_list.push_back(Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3])));
+				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3]));
+				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT_3]);
+				phase->weapons_list.push_back(m_weapon);
 			}
 
 			//loading phases
