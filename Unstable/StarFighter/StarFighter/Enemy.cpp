@@ -73,14 +73,14 @@ void Enemy::update(sf::Time deltaTime)
 			}
 			else
 			{
-				this->setRotation(target_angle);
+				this->rotate(-abs(delta)*deltaTime.asSeconds());
 			}
 		}
 		else
 		{
 			if (abs(delta) > abs(this->rotation_speed))
 			{
-				this->rotate(abs(this->rotation_speed)*deltaTime.asSeconds());
+				this->rotate(abs(delta)*deltaTime.asSeconds());
 			}	
 			else
 			{
