@@ -175,6 +175,31 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 					_distance_left = abs(_direction.x) == 1 ? patternParams->at(0) : patternParams->at(1);
 				}				
 			}
+
+			if (absolute_coordinate)
+			{
+				if (_direction.x == 1)
+				{
+					offset.x = patternParams->at(0) / 2 - _distance_left;
+					offset.y = - patternParams->at(1) / 2;
+				}
+				else if (_direction.x == -1)
+				{
+					offset.x = - (patternParams->at(0) / 2 - _distance_left);
+					offset.y = patternParams->at(1) / 2;
+				}
+				else if (_direction.y == 1)
+				{
+					offset.x = patternParams->at(0) / 2;
+					offset.y = patternParams->at(1) / 2 - _distance_left;
+				}
+				else if (_direction.y == -1)
+				{
+					offset.x = -(patternParams->at(0) / 2);
+					offset.y = -(patternParams->at(1) / 2 - _distance_left);
+				}	
+			}
+
 			break;
 		}
 
