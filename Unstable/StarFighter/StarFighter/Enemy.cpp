@@ -102,10 +102,10 @@ void Enemy::update(sf::Time deltaTime)
 			else
 			{
 				float theta = this->getRotation() /180 * M_PI;
-				(*it)->weaponOffset.x = - this->m_size.y / 2 * sin(theta);
-				(*it)->weaponOffset.y = this->m_size.y / 2 * cos(theta);
+				float weapon_offset_x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
+				float weapon_offset_y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
-				(*it)->setPosition(this->getPosition().x + (*it)->weaponOffset.x, this->getPosition().y + (*it)->weaponOffset.y);
+				(*it)->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
 				(*it)->shot_angle = theta;
 
 				(*it)->Fire(IndependantType::EnemyFire);
@@ -408,10 +408,12 @@ void Enemy::setPhase(string phase_name)
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
 	if (phase->hasWelcomeShot)
 	{
-		phase->welcomeWeapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * phase->welcomeWeapon->getFireDirection_for_Direction((*CurrentGame).direction).x,
-			(this->m_size.y / 2) * phase->welcomeWeapon->getFireDirection_for_Direction((*CurrentGame).direction).y);
+		float theta = this->getRotation() / 180 * M_PI;
+		float weapon_offset_x = phase->welcomeWeapon->weaponOffset.x - this->m_size.y / 2 * sin(theta);
+		float weapon_offset_y = phase->welcomeWeapon->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
-		phase->welcomeWeapon->setPosition(this->getPosition().x + phase->welcomeWeapon->weaponOffset.x, this->getPosition().y + phase->welcomeWeapon->weaponOffset.y);
+		phase->welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
+		phase->welcomeWeapon->shot_angle = theta;
 
 		phase->welcomeWeapon->Fire(IndependantType::EnemyFire);
 	}
@@ -457,6 +459,7 @@ Phase* Enemy::LoadPhase(string name)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO]));
 				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT]);
+				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET]);
 				phase->weapons_list.push_back(m_weapon);
 			}
 
@@ -464,6 +467,7 @@ Phase* Enemy::LoadPhase(string name)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2]));
 				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT_2]);
+				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_2]);
 				phase->weapons_list.push_back(m_weapon);
 			}
 
@@ -471,6 +475,7 @@ Phase* Enemy::LoadPhase(string name)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3]));
 				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT_3]);
+				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_3]);
 				phase->weapons_list.push_back(m_weapon);
 			}
 

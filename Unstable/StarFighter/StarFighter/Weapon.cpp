@@ -33,16 +33,11 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	//calculation of bullet offset respect to the weapon position
 	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
 	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
-	//player and enemies have opposite bullet offset because of course they have opposite direction
-	if (m_collider_type == IndependantType::EnemyFire)
-	{
-		//bullet_offset_x *= -1;
-		//bullet_offset_y *= -1;
-	}
-	else if (m_collider_type == IndependantType::FriendlyFire)
+
+	//because we don't use fire direction on the X axis, it needs to be changed manually here
+	if (m_collider_type == IndependantType::FriendlyFire)
 	{
 		bullet_offset_x *= -1;
-		//bullet_offset_y *= -1;
 	}
 
  	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
@@ -349,6 +344,7 @@ Weapon* Weapon::Clone()
 	weapon->target_seaking = this->target_seaking;
 	weapon->angle_offset = this->angle_offset;
 	weapon->angle_constraint = this->angle_constraint;
+	weapon->weaponOffset = this->weaponOffset;
 
 	return weapon;
 }
