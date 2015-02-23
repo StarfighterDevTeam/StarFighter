@@ -665,6 +665,10 @@ void Ship::Init()
 	this->damage = this->ship_config.getShipConfigDamage();
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
+	if (this->ship_config.ship_model->hasFake)
+	{
+		this->transparent;
+	}
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -774,10 +778,20 @@ void Ship::update(sf::Time deltaTime)
 				{
 					if (this->ship_config.hasWeapon)
 					{
-						ship_config.weapon->weaponOffset = sf::Vector2f((ship_config.size.y / 2) * ship_config.weapon->getFireDirection_for_Direction((*CurrentGame).direction).x,
-							(ship_config.size.y / 2) * ship_config.weapon->getFireDirection_for_Direction((*CurrentGame).direction).y);
+						float sizeY = this->m_size.y;
+						if (this->ship_config.ship_model->hasFake)
+						{
+							if (this->ship_config.ship_model->fake_size.y > sizeY)
+							{
+								sizeY = this->ship_config.ship_model->fake_size.y;
+							}
+						}
+						
+						float theta = this->getRotation() / 180 * M_PI;
+						float x_weapon_offset = -sizeY / 2 * sin(theta);
+						float y_weapon_offset = sizeY / 2 * cos(theta);
 
-						ship_config.weapon->setPosition(this->getPosition().x + ship_config.weapon->weaponOffset.x, this->getPosition().y + ship_config.weapon->weaponOffset.y);
+						ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
 						ship_config.weapon->Fire(FriendlyFire);
 
 						//speed malus when shooting

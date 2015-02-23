@@ -334,7 +334,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 {
 	static double timer = 0;
 	timer += deltaTime.asSeconds();
-	if (timer > 7)
+	if (timer > 4)
 	{
 		double intpart;
 		timer = modf(timer, &intpart);

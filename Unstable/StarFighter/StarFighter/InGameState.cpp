@@ -36,7 +36,14 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::Background);
 
 	//ship
-	(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
+	{
+		(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+	}
+	else
+	{
+		(*CurrentGame).playerShip->disable_fire = true;
+	}
 	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));

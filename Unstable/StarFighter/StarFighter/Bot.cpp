@@ -75,12 +75,12 @@ void Bot::update(sf::Time deltaTime)
 	{
 		if (InputGuy::isFiring() || this->automatic_fire)
 		{
-			weapon->weaponOffset = sf::Vector2f((this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).x,
-				(this->m_size.y / 2) * weapon->getFireDirection_for_Direction((*CurrentGame).direction).y);
+			float theta = (this->getRotation()+180) / 180 * M_PI;
+			float x_weapon_offset = -this->m_size.y / 2 * sin(theta);
+			float y_weapon_offset = this->m_size.y / 2 * cos(theta);
 
-			weapon->setPosition(this->getPosition().x + weapon->weaponOffset.x, this->getPosition().y + weapon->weaponOffset.y);
-
-			weapon->Fire(IndependantType::FriendlyFire);
+			this->weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
+			this->weapon->Fire(IndependantType::FriendlyFire);
 		}
 	}
 

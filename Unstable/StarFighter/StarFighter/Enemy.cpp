@@ -51,7 +51,8 @@ void Enemy::update(sf::Time deltaTime)
 
 	//rotation
 	//calculating angle to rotate toward the nearest target
-	float target_angle = fmod(180 - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+	
+	float target_angle = fmod(180 + Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
 	float current_angle = this->getRotation();
 	float delta = current_angle - target_angle;
 	if (delta > 180)
@@ -100,11 +101,11 @@ void Enemy::update(sf::Time deltaTime)
 			}
 			else
 			{
+				float theta = this->getRotation() /180 * M_PI;
+				float x_weapon_offset = - this->m_size.y / 2 * sin(theta);
+				float y_weapon_offset = this->m_size.y / 2 * cos(theta);
 
-				(*it)->weaponOffset = sf::Vector2f((this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).x,
-					(this->m_size.y / 2) * (*it)->getFireDirection_for_Direction((*CurrentGame).direction).y);
-
-				(*it)->setPosition(this->getPosition().x + (*it)->weaponOffset.x, this->getPosition().y + (*it)->weaponOffset.y);
+				(*it)->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
 
 				(*it)->Fire(IndependantType::EnemyFire);
 			}
