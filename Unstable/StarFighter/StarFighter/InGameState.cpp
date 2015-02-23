@@ -326,6 +326,7 @@ void InGameState::InGameStateMachineCheck()
 					this->IG_State = InGameStateMachine::SCROLLING;
 					(*CurrentGame).playerShip->disable_fire = false;
 					(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 				}

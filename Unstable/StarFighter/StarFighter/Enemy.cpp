@@ -102,10 +102,11 @@ void Enemy::update(sf::Time deltaTime)
 			else
 			{
 				float theta = this->getRotation() /180 * M_PI;
-				float x_weapon_offset = - this->m_size.y / 2 * sin(theta);
-				float y_weapon_offset = this->m_size.y / 2 * cos(theta);
+				(*it)->weaponOffset.x = - this->m_size.y / 2 * sin(theta);
+				(*it)->weaponOffset.y = this->m_size.y / 2 * cos(theta);
 
-				(*it)->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
+				(*it)->setPosition(this->getPosition().x + (*it)->weaponOffset.x, this->getPosition().y + (*it)->weaponOffset.y);
+				(*it)->shot_angle = theta;
 
 				(*it)->Fire(IndependantType::EnemyFire);
 			}

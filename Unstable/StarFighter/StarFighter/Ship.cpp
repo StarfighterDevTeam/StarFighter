@@ -788,10 +788,12 @@ void Ship::update(sf::Time deltaTime)
 						}
 						
 						float theta = this->getRotation() / 180 * M_PI;
-						float x_weapon_offset = -sizeY / 2 * sin(theta);
-						float y_weapon_offset = sizeY / 2 * cos(theta);
+
+						float x_weapon_offset = sizeY / 2 * sin(theta);
+						float y_weapon_offset = -sizeY / 2 * cos(theta);
 
 						ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
+						ship_config.weapon->shot_angle = theta;
 						ship_config.weapon->Fire(FriendlyFire);
 
 						//speed malus when shooting

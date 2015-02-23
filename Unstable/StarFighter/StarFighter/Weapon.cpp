@@ -21,6 +21,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	angle_offset = 0;
 	angle_constraint = 0;
 	target_seaking_angle = 0;
+	weaponOffset = sf::Vector2f(0, 0);
 
 	this->ammunition = Ammunition;
 }
@@ -29,8 +30,22 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 {
 	Ammo* bullet = this->ammunition->Clone();
 
-	bullet->setPosition(getPosition().x + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).y)),
-		getPosition().y + (offsetX * (-this->getFireDirection_for_Direction((*CurrentGame).direction).x)));
+	//calculation of bullet offset respect to the weapon position
+	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
+	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
+	//player and enemies have opposite bullet offset because of course they have opposite direction
+	if (m_collider_type == IndependantType::EnemyFire)
+	{
+		//bullet_offset_x *= -1;
+		//bullet_offset_y *= -1;
+	}
+	else if (m_collider_type == IndependantType::FriendlyFire)
+	{
+		bullet_offset_x *= -1;
+		//bullet_offset_y *= -1;
+	}
+
+ 	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
 	//if target seaking (closest enemy)
 	if (target_seaking != TargetSeaking::NO_SEAKING)
