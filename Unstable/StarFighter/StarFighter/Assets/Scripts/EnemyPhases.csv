@@ -1,6 +1,6 @@
 #phase_name,vspeed,weapon_name,ammo_name,weapon_constraint,weapon_offsetX,weapon2,ammo_2,weapon_constraint,weapon_offsetX_2,weapon3,ammo3,weapon_constraint,weapon_offsetX_3,pattern,angspeed,radius,clockwise,rotation_speed,modifier,wake_up,welcome_weapon,welcome_ammo,condition,op,value,transitionPhase,condition2,op2,value2,transitionPhase2
 phase01,80,0,fireball,0,0,0,fireball,0,0,0,fireball,0,0,0,0,0,1,0,0,0,0,,positionV,greater,170,phase02,life,lesser,0,phase05
-phase02,0,fireball_sinus,fireball_slalom1,20,20,fireball_sinus,fireball_slalom2,20,-20,0,fireball,20,0,0,50,60,1,50,face_target,0,0,,0,lesser,99,phase03,0,lesser,0,phase05
+phase02,0,fireball_sinus,fireball_slalom1,20,0,fireball_sinus,fireball_slalom2,20,0,0,fireball,20,0,0,50,60,1,50,face_target,0,0,,0,lesser,99,phase03,0,lesser,0,phase05
 phase03,150,0,fireball,0,0,0,fire_ball,0,0,0,fireball,0,0,0,0,0,1,0,0,0,0,,phaseClock,greater,2,phase04,life,lesser,0,phase05
 phase04,-200,laser_fast,fireball,0,0,0,fireball,0,0,0,fireball,0,0,0,0,0,1,0,0,0,0,,positionV,lesser,100,phase02,life,lesser,0,phase05
 phase05,200,0,0,0,0,laser_arc,fireball,0,0,0,fireball,0,0,0,,,1,0,0,0,laser_360,fireball,0,,,,0,,,

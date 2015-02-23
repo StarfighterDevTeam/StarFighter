@@ -222,14 +222,14 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			//return offset = diff between new and old position
 			if (!absolute_coordinate)
 			{
-				offset.x = next.x - this->_curSandboxPosition_cartesian.x;
-				offset.y = next.y - this->_curSandboxPosition_cartesian.y;
+				offset.x = this->patternParams->at(1) * (next.x - this->_curSandboxPosition_cartesian.x);
+				offset.y = this->patternParams->at(1) * (next.y - this->_curSandboxPosition_cartesian.y);
 			}
 			//or the new position only:
 			else
 			{
-				offset.x = next.x;
-				offset.y = next.y;
+				offset.x = this->patternParams->at(1) * next.x;
+				offset.y = this->patternParams->at(1) * next.y;
 			}
 
 			this->_curSandboxPosition_cartesian.x = next.x;
@@ -256,14 +256,14 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			//return offset = diff between new and old position
 			if (!absolute_coordinate)
 			{
-				offset.x = next.x - this->_curSandboxPosition_cartesian.x;
-				offset.y = next.y - this->_curSandboxPosition_cartesian.y;
+				offset.x = this->patternParams->at(1) * (next.x - this->_curSandboxPosition_cartesian.x);
+				offset.y = this->patternParams->at(1) * (next.y - this->_curSandboxPosition_cartesian.y);
 			}
 			//or the new position only:
 			else
 			{
-				offset.x = next.x;
-				offset.y = next.y;
+				offset.x = this->patternParams->at(1) * next.x;
+				offset.y = this->patternParams->at(1) * next.y;
 			}
 
 			this->_curSandboxPosition_cartesian.x = next.x;
