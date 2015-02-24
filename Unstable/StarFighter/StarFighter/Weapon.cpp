@@ -29,10 +29,12 @@ Weapon::Weapon(Ammo* Ammunition)
 void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = this->ammunition->Clone();
+	bullet->shot_angle = this->shot_angle;
 
 	//calculation of bullet offset respect to the weapon position
 	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
 	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
+	
 
 	//because we don't use fire direction on the X axis, it needs to be changed manually here
 	if (m_collider_type == IndependantType::FriendlyFire)

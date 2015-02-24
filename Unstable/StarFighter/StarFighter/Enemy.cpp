@@ -60,33 +60,47 @@ void Enemy::update(sf::Time deltaTime)
 	else if (delta < -180)
 		delta += 360;
 
+	bool isDoneFiringOnLockedTarget = true;
 	if (!this->faces_nearest_target)
 	{
 		this->rotate(this->rotation_speed*deltaTime.asSeconds());
 	}
 	else
 	{
-		if (delta >= 0)
+		//if one of the weapon is semi-seaking and the enemy has to face the target, then it cannot rotate until he's done firing
+		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
-			if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds())
+			if ((*it)->target_seaking == TargetSeaking::SEMI_SEAKING && (*it)->rafale > 0 && (*it)->rafale_index < (*it)->rafale)
 			{
-				this->rotate(-abs(this->rotation_speed)*deltaTime.asSeconds());
-			}
-			else
-			{
-				this->setRotation(target_angle);
+				isDoneFiringOnLockedTarget = false;
 			}
 		}
-		else
+
+		if (isDoneFiringOnLockedTarget)
 		{
-			if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds())
+			//now let's rotate toward the target (the player)
+			if (delta >= 0)
 			{
-				this->rotate(abs(this->rotation_speed)*deltaTime.asSeconds());
-			}	
+				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds())
+				{
+					this->rotate(-abs(this->rotation_speed)*deltaTime.asSeconds());
+				}
+				else
+				{
+					this->setRotation(target_angle);
+				}
+			}
 			else
 			{
-				this->setRotation(target_angle);
-			}	
+				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds())
+				{
+					this->rotate(abs(this->rotation_speed)*deltaTime.asSeconds());
+				}
+				else
+				{
+					this->setRotation(target_angle);
+				}
+			}
 		}
 	}
 
@@ -95,7 +109,7 @@ void Enemy::update(sf::Time deltaTime)
 	{
 		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
-			if ((*it)->angle_constraint > 0 && abs(delta) > (*it)->angle_constraint)
+			if ((*it)->angle_constraint > 0 && abs(delta) > (*it)->angle_constraint && isDoneFiringOnLockedTarget)
 			{
 				//do nothing
 			}

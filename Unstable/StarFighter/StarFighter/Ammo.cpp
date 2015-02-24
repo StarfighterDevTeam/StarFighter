@@ -17,6 +17,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	angspeed = 0;
 	range = 0;
 	current_range = 0;
+	shot_angle = 0;
 }
 
 Ammo* Ammo::Clone()
@@ -60,14 +61,16 @@ void Ammo::update(sf::Time deltaTime)
 	//if not disappeared, move it
 	if (!this->GarbageMe)
 	{
-		static sf::Vector2f newposition, offset;
+		static sf::Vector2f newposition, offset, pattern_offset;
 
 		newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
 		newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
 
 		//call bobbyPattern
-		offset = Pattern.GetOffset(deltaTime.asSeconds());
-		offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+		pattern_offset = Pattern.GetOffset(deltaTime.asSeconds());
+		offset.x = pattern_offset.x * cos(this->shot_angle) + pattern_offset.y * sin(this->shot_angle);
+		offset.y = pattern_offset.x * sin(this->shot_angle) + pattern_offset.y * cos(this->shot_angle);
+		//offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
 		newposition.x += offset.x;
 		newposition.y += offset.y;
 

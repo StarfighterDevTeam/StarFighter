@@ -27,6 +27,7 @@ public:
 	float ref_speed;
 	float range;
 	float current_range;
+	float shot_angle;
 };
 
 #endif // AMMO_H_INCLUDED
