@@ -109,7 +109,7 @@ void Enemy::update(sf::Time deltaTime)
 	{
 		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
-			if (this->faces_nearest_target && delta > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
+			if (this->faces_nearest_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 			{
 				//do nothing
 			}
