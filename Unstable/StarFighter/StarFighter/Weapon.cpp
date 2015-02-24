@@ -21,6 +21,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	angle_offset = 0;
 	target_seaking_angle = 0;
 	weaponOffset = sf::Vector2f(0, 0);
+	face_target = false;
 
 	this->ammunition = Ammunition;
 }
@@ -28,20 +29,6 @@ Weapon::Weapon(Ammo* Ammunition)
 void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = this->ammunition->Clone();
-	bullet->shot_angle = this->shot_angle;
-
-	//calculation of bullet offset respect to the weapon position
-	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
-	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
-	
-
-	//because we don't use fire direction on the X axis, it needs to be changed manually here
-	if (m_collider_type == IndependantType::FriendlyFire)
-	{
-		bullet_offset_x *= -1;
-	}
-
- 	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
 	//if target seaking (closest enemy)
 	if (target_seaking != TargetSeaking::NO_SEAKING)
@@ -63,6 +50,26 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 			}
 		}
 	}
+
+	//calculating the angle of the shot, which will determine how to offset the position of the bullet respect to the weapon position
+	bullet->shot_angle = this->shot_angle - (this->angle_offset / 180 * M_PI);
+	if (!this->face_target)
+	{
+		bullet->shot_angle = this->shot_angle - ((this->angle_offset + this->target_seaking_angle) / 180 * M_PI);
+	}
+
+	//calculation of bullet offset respect to the weapon position
+	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
+	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
+	
+
+	//because we don't use fire direction on the X axis, it needs to be changed manually here
+	if (m_collider_type == IndependantType::FriendlyFire)
+	{
+		bullet_offset_x *= -1;
+	}
+
+ 	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
 	bullet->speed = this->AngleShot(this->angle + dispersion + angle_offset + target_seaking_angle, bullet->ref_speed);
 	bullet->speed.x = bullet->speed.x * - this->fire_direction.y;

@@ -61,7 +61,7 @@ void Enemy::update(sf::Time deltaTime)
 		delta += 360;
 
 	bool isDoneFiringOnLockedTarget = true;
-	if (!this->faces_nearest_target)
+	if (!this->face_target)
 	{
 		this->rotate(this->rotation_speed*deltaTime.asSeconds());
 	}
@@ -109,19 +109,22 @@ void Enemy::update(sf::Time deltaTime)
 	{
 		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
-			if (this->faces_nearest_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
+			if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 			{
 				//do nothing
 			}
 			else
 			{
-				float theta = this->getRotation() /180 * M_PI;
+				float theta = this->getRotation() / 180 * M_PI;
 				float weapon_offset_x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
 				float weapon_offset_y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
 				(*it)->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
-				(*it)->shot_angle = theta;
 
+				//transmitting the angle to the weapon, which will pass it to the bullets
+				(*it)->shot_angle = theta;
+				(*it)->face_target = this->face_target;
+				
 				(*it)->Fire(IndependantType::EnemyFire);
 			}
 		}
@@ -191,7 +194,7 @@ Enemy* Enemy::Clone()
 		enemy->wake_up = this->wake_up;
 		enemy->immune = this->immune;
 		enemy->setGhost(this->ghost);
-		enemy->faces_nearest_target = this->faces_nearest_target;
+		enemy->face_target = this->face_target;
 	}
 
 	return enemy;
@@ -376,7 +379,7 @@ void Enemy::setPhase(string phase_name)
 	//reset old stats
 	this->immune = false;
 	this->setGhost(false);
-	this->faces_nearest_target = false;
+	this->face_target = false;
 
 	//load new stats
 	switch (phase->modifier)
@@ -403,7 +406,7 @@ void Enemy::setPhase(string phase_name)
 		}
 		case Modifier::FaceTarget:
 		{
-			this->faces_nearest_target = true;
+			this->face_target = true;
 			break;
 		}
 	}

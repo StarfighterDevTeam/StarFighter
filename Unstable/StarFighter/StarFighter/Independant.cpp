@@ -40,7 +40,7 @@ Independant::Independant()
 	this->disable_fire = false;
 	this->wake_up = true;
 	this->rotation_speed = 0;
-	this->faces_nearest_target = false;
+	this->face_target = false;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber)

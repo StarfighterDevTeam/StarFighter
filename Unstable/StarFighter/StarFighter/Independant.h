@@ -198,7 +198,7 @@ public:
 	bool disable_fire;
 	bool wake_up;
 	float rotation_speed;
-	bool faces_nearest_target;
+	bool face_target;
 
 	//TIPS:
 	// direction = the scene border you refer too

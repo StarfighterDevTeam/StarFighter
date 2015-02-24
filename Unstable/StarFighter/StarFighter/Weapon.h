@@ -63,6 +63,7 @@ public:
 	float target_seaking_angle;
 	sf::Vector2f weaponOffset;
 	float shot_angle;
+	bool face_target;
 	
 	sf::Vector2i getFireDirection_for_Direction (Directions direction);
 	void AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
