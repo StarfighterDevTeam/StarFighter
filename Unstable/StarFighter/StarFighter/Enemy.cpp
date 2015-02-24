@@ -70,7 +70,7 @@ void Enemy::update(sf::Time deltaTime)
 		//if one of the weapon is semi-seaking and the enemy has to face the target, then it cannot rotate until he's done firing
 		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
-			if ((*it)->target_seaking == TargetSeaking::SEMI_SEAKING && (*it)->rafale > 0 && (*it)->rafale_index < (*it)->rafale)
+			if ((*it)->target_seaking == TargetSeaking::SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
 			{
 				isDoneFiringOnLockedTarget = false;
 			}
@@ -109,7 +109,7 @@ void Enemy::update(sf::Time deltaTime)
 	{
 		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
-			if ((*it)->angle_constraint > 0 && abs(delta) > (*it)->angle_constraint && isDoneFiringOnLockedTarget)
+			if (this->faces_nearest_target && delta > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 			{
 				//do nothing
 			}
@@ -472,7 +472,6 @@ Phase* Enemy::LoadPhase(string name)
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO]));
-				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT]);
 				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET]);
 				phase->weapons_list.push_back(m_weapon);
 			}
@@ -480,7 +479,6 @@ Phase* Enemy::LoadPhase(string name)
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2]));
-				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT_2]);
 				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_2]);
 				phase->weapons_list.push_back(m_weapon);
 			}
@@ -488,7 +486,6 @@ Phase* Enemy::LoadPhase(string name)
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3]));
-				m_weapon->angle_constraint = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_ANGLECONSTRAINT_3]);
 				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_3]);
 				phase->weapons_list.push_back(m_weapon);
 			}

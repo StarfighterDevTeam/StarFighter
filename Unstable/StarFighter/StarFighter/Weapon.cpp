@@ -19,7 +19,6 @@ Weapon::Weapon(Ammo* Ammunition)
 	target_seaking = TargetSeaking::NO_SEAKING;
 	shot_mode = ShotMode::NoShotMode;
 	angle_offset = 0;
-	angle_constraint = 0;
 	target_seaking_angle = 0;
 	weaponOffset = sf::Vector2f(0, 0);
 
@@ -345,7 +344,6 @@ Weapon* Weapon::Clone()
 	weapon->rafale_cooldown = this->rafale_cooldown;
 	weapon->target_seaking = this->target_seaking;
 	weapon->angle_offset = this->angle_offset;
-	weapon->angle_constraint = this->angle_constraint;
 	weapon->weaponOffset = this->weaponOffset;
 
 	return weapon;
