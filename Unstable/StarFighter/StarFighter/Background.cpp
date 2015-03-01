@@ -1,11 +1,5 @@
 #include "Background.h"
 
-Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber) : Independant(position, speed, textureName, size, origin, frameNumber)
-{
-	visible = true;
-	DontGarbageMe = true;
-}
-
 Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
 {
 	visible = true;
@@ -49,11 +43,10 @@ void Background::update(sf::Time deltaTime)
 	}
 }
 
-void Background::updatePortalsPosition()
+void Background::displayPortals()
 {
-	//portals follow the background
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
-		this->portals[(Directions)i]->setPosition(this->getPosition().x + this->portals[(Directions)i]->offset.x, this->getPosition().y + this->portals[(Directions)i]->offset.y);
+		this->portals[(Directions)i]->visible = true;
 	}
 }

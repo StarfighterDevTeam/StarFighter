@@ -97,9 +97,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						this->bg = new Background(sf::Vector2f(0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).direction, first_screen_offset);
 						this->bg->display_name = scene_name;
 
-						//Creating portals
-
-						//Drawing link zones and texts
+						//Getting the display name of the scene and loading it into the scene portals
 						for (int i = 0; i < Directions::NO_DIRECTION; i++)
 						{
 							if (this->links[(Directions)i].compare("0") != 0)
@@ -109,11 +107,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								{
 									if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 									{
-										//Getting the name
-										this->links_displayname[(Directions)i] = (*it)[ScenesData::SCENE_DISPLAYNAME];
+										this->bg->portals[(Directions)i]->destination_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 									}
-									//And drawing the rect and text accordingly
-									this->SetLinkZone((Directions)i);
+									
 									//Creating portals
 									(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::LinkZoneLayer, IndependantType::LinkZone);
 								}
@@ -178,53 +174,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	}
 }
 
-void Scene::SetLinkZone(Directions direction)
-{
-	//Rect
-	float size_x = Independant::getSize_for_Direction(direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).x - (2 * HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X);//circa 550
-	float size_y = HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X;//150
-	this->link_zone[direction].rect.setSize(Independant::getSize_for_Direction(direction, sf::Vector2f(size_x, size_y)));
-	this->link_zone[direction].rect.setFillColor(sf::Color(0, 128, 128, 128));
-	this->link_zone[direction].rect.setOutlineThickness(1);
-	this->link_zone[direction].rect.setOrigin(this->link_zone[direction].rect.getSize().x / 2, this->link_zone[direction].rect.getSize().y / 2);
-	this->link_zone[direction].rect.setOutlineColor(sf::Color(128, 0, 0));
-
-	float first_scene_offset = Independant::getSize_for_Direction(direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
-	sf::Vector2f bg_size = Independant::getSize_for_Direction(direction, this->bg->m_size);
-
-	this->link_zone[direction].setPosition_Y_for_Direction(direction, sf::Vector2f(bg_size.x / 2, -bg_size.y + (size_y / 2) + first_scene_offset), true);
-	this->link_zone[direction].rect.setPosition(this->link_zone[direction].getPosition());
-
-	//Title
-	sf::Font* font = new sf::Font();
-	if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
-	{
-		// error
-		//TODO: font loader
-	}
-	this->link_zone[direction].title.setFont(*font);
-	this->link_zone[direction].title.setCharacterSize(16);
-	this->link_zone[direction].title.setColor(sf::Color::White);
-	ostringstream ss;
-	ss << this->links_displayname[direction];
-	this->link_zone[direction].title.setString(ss.str());
-	this->link_zone[direction].title.setRotation(0.0);
-
-	float w = this->link_zone[direction].title.getGlobalBounds().width;
-	float h = this->link_zone[direction].title.getGlobalBounds().height;
-	this->link_zone[direction].title.setOrigin(sf::Vector2f(w / 2, h / 2));
-	this->link_zone[direction].title_offset = Independant::getSpeed_for_Scrolling(direction, -HUB_EXIT_X_MIN_RATIO * SCENE_SIZE_X * HUB_LINK_NAME_OFFSET_RATIO);
-	this->link_zone[direction].title.setPosition(this->link_zone[direction].getPosition().x, this->link_zone[direction].getPosition().y);
-
-	if (direction == Directions::DIRECTION_RIGHT || direction == Directions::DIRECTION_LEFT)
-	{
-		this->link_zone[direction].title.setRotation(Independant::getRotation_for_Direction(direction));
-		//this->link_zone[direction].title.setRotation(270.0);
-	}
-
-	//(*CurrentGame).addToScene(&this->link_zone[direction], LayerType::LinkZoneLayer, IndependantType::LinkZone);
-}
-
 Scene::Scene(string name)
 {
 	this->m_name = name;
@@ -266,7 +215,7 @@ Scene::Scene(string name)
 						if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 						{
 							//Getting the name
-							this->links_displayname[(Directions)i] = (*it)[ScenesData::SCENE_DISPLAYNAME];
+							this->bg->portals[(Directions)i]->destination_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 						}
 					}
 				}
@@ -297,15 +246,6 @@ void Scene::Update(Time deltaTime)
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
 	{
 		HazardBreakEvent();
-	}
-
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
-	{
-		if (this->links[(Directions)i].compare("0") != 0)
-		{
-			this->link_zone[i].speed = this->bg->speed;
-			this->link_zone[i].update(deltaTime);
-		}
 	}
 }
 

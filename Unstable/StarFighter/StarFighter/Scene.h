@@ -56,8 +56,6 @@ public:
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();
 	std::string links[Directions::NO_DIRECTION];
-	std::string links_displayname[Directions::NO_DIRECTION];
-	HudElement link_zone[Directions::NO_DIRECTION];
 
 private:
 	Ship* playerShip;

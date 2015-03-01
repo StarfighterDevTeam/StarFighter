@@ -34,6 +34,7 @@ void InGameState::Initialize(Player player)
 
 	//bg
 	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
+	this->currentScene->bg->displayPortals();
 
 	//ship
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -294,6 +295,7 @@ void InGameState::InGameStateMachineCheck()
 				this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
+				this->nextScene->bg->displayPortals();
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LayerType::BotLayer);
 
