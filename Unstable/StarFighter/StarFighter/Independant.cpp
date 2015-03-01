@@ -49,7 +49,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->m_size.x = ((*texture).getSize().x / frameNumber);
 	this->m_size.y = ((*texture).getSize().y);
 
-	this->collider_type = IndependantType::Background;
+	this->collider_type = IndependantType::BackgroundObject;
 	this->defaultAnimation.setSpriteSheet(*texture);
 	for (int i = 0; i < frameNumber; i++)
 	{
@@ -631,17 +631,19 @@ FloatCompare Independant::compare_posX_withTarget_for_Direction(Directions direc
 	}
 }
 
-void Independant::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
+sf::Vector2f Independant::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
 {
 	if (direction == Directions::DIRECTION_UP || direction == Directions::NO_DIRECTION)
 	{
 		if (!centered)
 		{
 			this->setPosition(sf::Vector2f(this->getPosition().x, target_position.y));
+			return sf::Vector2f(this->getPosition().x, target_position.y);
 		}
 		else
 		{
 			this->setPosition(sf::Vector2f(target_position.x, target_position.y));
+			return sf::Vector2f(target_position.x, target_position.y);
 		}
 	}
 
@@ -650,10 +652,12 @@ void Independant::setPosition_Y_for_Direction(Directions direction, sf::Vector2f
 		if (!centered)
 		{
 			this->setPosition(sf::Vector2f(this->getPosition().x, SCENE_SIZE_Y - target_position.y));
+			return sf::Vector2f(this->getPosition().x, SCENE_SIZE_Y - target_position.y);
 		}
 		else
 		{
 			this->setPosition(sf::Vector2f(target_position.x, SCENE_SIZE_Y - target_position.y));
+			return sf::Vector2f(target_position.x, SCENE_SIZE_Y - target_position.y);
 		}
 	}
 
@@ -662,10 +666,12 @@ void Independant::setPosition_Y_for_Direction(Directions direction, sf::Vector2f
 		if (!centered)
 		{
 			this->setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.x, this->getPosition().y));
+			return sf::Vector2f(SCENE_SIZE_X - target_position.x, this->getPosition().y);
 		}
 		else
 		{
 			this->setPosition(sf::Vector2f(SCENE_SIZE_X - target_position.y, target_position.x));
+			return sf::Vector2f(SCENE_SIZE_X - target_position.y, target_position.x);
 		}
 	}
 
@@ -674,10 +680,12 @@ void Independant::setPosition_Y_for_Direction(Directions direction, sf::Vector2f
 		if (!centered)
 		{
 			this->setPosition(sf::Vector2f(target_position.x, this->getPosition().y));
+			return sf::Vector2f(target_position.x, this->getPosition().y);
 		}
 		else
 		{
 			this->setPosition(sf::Vector2f(target_position.y, target_position.x));
+			return sf::Vector2f(target_position.y, target_position.x);
 		}
 	}
 }

@@ -3,7 +3,7 @@
 
 const char* IndependantTypeValues[] =
 {
-	stringify(Background),
+	stringify(BackgroundObject),
 	stringify(PlayerShip),
 	stringify(FriendlyFire),
 	stringify(EnemyFire),
@@ -292,7 +292,7 @@ void Game::collectGarbage()
 			}
 		}
 
-		if ((**it).collider_type == Background || !(**it).isOnScene)
+		if ((**it).collider_type == BackgroundObject || !(**it).isOnScene)
 		{
 			continue;
 		}

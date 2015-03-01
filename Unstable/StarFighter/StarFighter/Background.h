@@ -15,10 +15,10 @@ public:
 struct Background : public Independant
 {
 public:
-	Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction);
+	Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset = 0);
 	Portal* portals[Directions::NO_DIRECTION];
-	void Garbage();
 	void update(sf::Time deltaTime) override;
+	void updatePortalsPosition();
 };
 
 #endif // BACKGROUND_H_INCLUDED

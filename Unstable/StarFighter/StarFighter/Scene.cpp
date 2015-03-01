@@ -93,13 +93,11 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							this->direction = Directions::NO_DIRECTION;
 						}
-						this->bg = new Independant(sf::Vector2f(0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h));
-
-						sf::Vector2f size_for_dir = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(w, h));
-						this->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(size_for_dir.x / 2, (-size_for_dir.y / 2) + first_screen_offset), true);
-						this->bg->setVisible(true);
-						this->bg->isOnScene = true;
+						
+						this->bg = new Background(sf::Vector2f(0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).direction, first_screen_offset);
 						this->bg->display_name = scene_name;
+
+						//Creating portals
 
 						//Drawing link zones and texts
 						for (int i = 0; i < Directions::NO_DIRECTION; i++)
@@ -116,6 +114,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 									}
 									//And drawing the rect and text accordingly
 									this->SetLinkZone((Directions)i);
+									//Creating portals
+									(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::LinkZoneLayer, IndependantType::LinkZone);
 								}
 							}
 						}
@@ -249,7 +249,7 @@ Scene::Scene(string name)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
-						this->bg = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(0, 0));
+						this->bg = new Background(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(0, 0), this->direction);
 						this->bg->display_name = scene_name;
 					}
 				}
@@ -325,7 +325,7 @@ void Scene::Draw(sf::RenderWindow* window)
 	{
 		if (this->links[(Directions)i].compare("0") != 0)
 		{
-			this->link_zone[i].Draw(window);
+			//this->link_zone[i].Draw(window);
 		}
 	}
 }

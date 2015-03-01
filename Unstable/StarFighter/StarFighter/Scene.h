@@ -48,7 +48,7 @@ public:
 
 	float getSceneBeastScore();
 	
-	Independant* bg;
+	Background* bg;
 	Directions direction;
 	bool generating_enemies;
 	bool generating_boss;

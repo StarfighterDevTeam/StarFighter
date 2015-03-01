@@ -10,6 +10,7 @@
 #include "Ship.h"
 #include "EnemyPool.h"
 #include "FileLoadUtils.h"
+#include "Background.h"
 
 enum SceneBooleans
 {

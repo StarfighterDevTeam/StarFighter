@@ -75,7 +75,7 @@ enum FXData
 };
 
 enum IndependantType {
-	Background,
+	BackgroundObject,
 	LinkZone,
 	LootObject,
 	PlayerShip,
@@ -217,7 +217,7 @@ public:
 	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
-	void setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
+	sf::Vector2f setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
 
 	static float getRotation_for_Direction(Directions direction);
 

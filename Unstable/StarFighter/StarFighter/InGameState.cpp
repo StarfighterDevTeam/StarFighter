@@ -33,7 +33,7 @@ void InGameState::Initialize(Player player)
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
 
 	//bg
-	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::Background);
+	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
 
 	//ship
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -293,7 +293,7 @@ void InGameState::InGameStateMachineCheck()
 
 				this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
-				(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::Background);
+				(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LayerType::BotLayer);
 

@@ -6,18 +6,24 @@ Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 	DontGarbageMe = true;
 }
 
-Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
+Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
 {
 	visible = true;
+	isOnScene = true;
+
+	sf::Vector2f size_ = Independant::getSize_for_Direction(direction, size);
+	this->setPosition_Y_for_Direction(direction, sf::Vector2f(size_.x / 2, (-size_.y / 2) + first_screen_offset), true);
+
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
 		this->portals[(Directions)i] = new Portal(position, speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), 1);
-
+		sf::Vector2f bg_size = Independant::getSize_for_Direction((Directions)i, size);
 		//applying offset respect to the center of the background, depending on the direction
-		float bg_size = Independant::getSize_for_Direction(direction, size).y;
-		this->portals[(Directions)i]->offset = Independant::getSpeed_for_Scrolling(direction, -bg_size / 2);
-		this->portals[(Directions)i]->setPosition((this->portals[(Directions)i]->getPosition().x + this->portals[(Directions)i]->offset.x), 
-			this->portals[(Directions)i]->getPosition().y + this->portals[(Directions)i]->offset.y);
+		this->portals[(Directions)i]->offset = Independant::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT/2));
+		this->portals[(Directions)i]->setPosition(this->getPosition().x + this->portals[(Directions)i]->offset.x, this->getPosition().y + this->portals[(Directions)i]->offset.y);
+
+		//rotation
+		this->portals[(Directions)i]->setRotation(Independant::getRotation_for_Direction((Directions)i));
 	}
 }
 
@@ -43,13 +49,11 @@ void Background::update(sf::Time deltaTime)
 	}
 }
 
-void Background::Garbage()
+void Background::updatePortalsPosition()
 {
-	this->GarbageMe = true;
+	//portals follow the background
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
-		this->portals[(Directions)i]->visible = false;
-		this->portals[(Directions)i]->DontGarbageMe = false;
-		this->portals[(Directions)i]->GarbageMe = true;
+		this->portals[(Directions)i]->setPosition(this->getPosition().x + this->portals[(Directions)i]->offset.x, this->getPosition().y + this->portals[(Directions)i]->offset.y);
 	}
 }
