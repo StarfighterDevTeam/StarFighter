@@ -8,9 +8,10 @@
 #define SHIP_HEIGHT			64
 #define SHIP_NB_FRAMES		3
 
-#define PORTAL_TEXTURE_NAME		"Assets/2D/Portal.jpg"
-#define PORTAL_WIDTH			200
-#define PORTAL_HEIGHT			75
+#define PORTAL_TEXTURE_NAME		"Assets/2D/Portal.png"
+#define PORTAL_WIDTH			96
+#define PORTAL_HEIGHT			96
+#define PORTAL_FRAMES			4
 
 #define AIRBRAKE_FILENAME		"Assets/2D/AirBrake.png"
 #define ARMOR_FILENAME			"Assets/2D/Armor.png"

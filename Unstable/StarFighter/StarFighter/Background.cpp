@@ -10,7 +10,7 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
-		this->portals[(Directions)i] = new Portal(position, speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), 1);
+		this->portals[(Directions)i] = new Portal(position, speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES);
 		sf::Vector2f bg_size = Independant::getSize_for_Direction((Directions)i, size);
 		//applying offset respect to the center of the background, depending on the direction
 		this->portals[(Directions)i]->offset = Independant::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT/2));
