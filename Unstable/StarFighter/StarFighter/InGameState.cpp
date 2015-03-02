@@ -34,7 +34,7 @@ void InGameState::Initialize(Player player)
 
 	//bg
 	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
-	this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
+	this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
 
 	//ship
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -361,6 +361,7 @@ void InGameState::InGameStateMachineCheck()
 
 		case InGameStateMachine::HUB_ROAMING:
 		{
+			this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
 			//player takes exit?
 			if ((*CurrentGame).playerShip->isUsingPortal)
 			{

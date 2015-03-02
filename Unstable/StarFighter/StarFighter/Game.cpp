@@ -200,7 +200,7 @@ void Game::colisionChecksV2()
 			}
 		}
 
-		//Loot
+		//Portal
 		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::PortalObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::PortalObject]).end(); it2++)
 		{
 			i++;
