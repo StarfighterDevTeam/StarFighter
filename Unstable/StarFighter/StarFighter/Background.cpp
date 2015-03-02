@@ -18,7 +18,12 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 		//rotation
 		this->portals[(Directions)i]->setRotation(Independant::getRotation_for_Direction((Directions)i));
+
+		//direction
+		this->portals[(Directions)i]->direction = (Directions)i;
 	}
+
+	this->SetPortalsState(PortalState::PortalInvisible);
 }
 
 void Background::update(sf::Time deltaTime)
@@ -43,10 +48,34 @@ void Background::update(sf::Time deltaTime)
 	}
 }
 
-void Background::displayPortals()
+void Background::SetPortalsState(PortalState m_state)
 {
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
-		this->portals[(Directions)i]->visible = true;
+		switch (m_state)
+		{
+			case PortalState::PortalGhost:
+			{
+				this->portals[(Directions)i]->state = PortalState::PortalGhost;
+				this->portals[(Directions)i]->visible = true;
+				this->portals[(Directions)i]->setGhost(true);
+				break;
+			}
+
+			case PortalState::PortalOpen:
+			{
+				this->portals[(Directions)i]->state = PortalState::PortalOpen;
+				this->portals[(Directions)i]->visible = true;
+				this->portals[(Directions)i]->setGhost(false);
+				break;
+			}
+
+			case PortalState::PortalInvisible:
+			{
+				this->portals[(Directions)i]->state = PortalState::PortalInvisible;
+				this->portals[(Directions)i]->visible = false;
+				break;
+			}
+		}
 	}
 }

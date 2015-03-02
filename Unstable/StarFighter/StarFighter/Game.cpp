@@ -199,6 +199,16 @@ void Game::colisionChecksV2()
 				(*it2)->GarbageMe = true;
 			}
 		}
+
+		//Loot
+		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::PortalObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::PortalObject]).end(); it2++)
+		{
+			i++;
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				(*it1)->GetPortal((*it2));
+			}
+		}
 	}
 
 	//Then, check if any allied bullet collide with any enemy

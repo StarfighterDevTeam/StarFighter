@@ -259,6 +259,12 @@ void Independant::GetLoot(Independant& independant)
 	}
 }
 
+void Independant::GetPortal(Independant* independant)
+{
+
+}
+
+
 void Independant::get_equipment_from(Independant& independant)
 {
 	if (independant.hasEquipmentLoot)

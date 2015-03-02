@@ -652,6 +652,10 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/Aura_BlueGlow.png", sf::Vector2f(50, 50), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/Aura_WhiteGlow.png", sf::Vector2f(50, 50), 3);
 	this->key_repeat = false;
+	this->isCollindingWithPortal = false;
+	this->isUsingPortal = false;
+	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
+	this->targetPortal = new Portal(sf::Vector2f(0, 0), sf::Vector2f(0, 0), PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_HEIGHT, PORTAL_WIDTH), sf::Vector2f(PORTAL_HEIGHT / 2, PORTAL_WIDTH / 2), 1);
 	
 	this->Init();
 }
@@ -802,6 +806,37 @@ void Ship::update(sf::Time deltaTime)
 					}
 				}
 			}
+		}
+
+		//portals: required to release fire and then press fire while colliding with a portal
+		isUsingPortal = false;
+		if (!isFiringButtonPressed)
+		{
+			if (isCollindingWithPortal)
+			{
+				if (InputGuy::isFiring())
+				{
+					if (this->targetPortal->state == PortalState::PortalOpen)
+					{
+						isUsingPortal = true;
+
+						if (this->targetPortal->destination_name.compare("0") == 0)
+						{
+							LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
+						}
+					}
+				}
+			}
+		}
+		isCollindingWithPortal = false;
+
+		if (InputGuy::isFiring())
+		{
+			isFiringButtonPressed = true;
+		}
+		else
+		{
+			isFiringButtonPressed = false;
 		}
 
 		//Braking function
@@ -967,6 +1002,11 @@ void Ship::GetLoot(Independant& independant)
 	}
 }
 
+void Ship::GetPortal(Independant* independant)
+{
+	this->targetPortal = (Portal*)(independant);
+	this->isCollindingWithPortal = true;
+}
 
 static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 10, 40, 70 };
 static float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = { 0.0, 0.2, 0.4, 0.6 };

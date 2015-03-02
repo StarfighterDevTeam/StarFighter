@@ -102,16 +102,19 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							if (this->links[(Directions)i].compare("0") != 0)
 							{
+								//copying the scene name into the portal, that will be responsible for the loading of the linked scenes
+								this->bg->portals[(Directions)i]->destination_name = this->links[(Directions)i];
+
 								//Getting the string of the "display name" for a each linked scene
 								for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 								{
 									if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 									{
-										this->bg->portals[(Directions)i]->destination_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
+										this->bg->portals[(Directions)i]->display_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 									}
 									
 									//Creating portals
-									(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::LinkZoneLayer, IndependantType::LinkZone);
+									(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::PortalLayer, IndependantType::PortalObject);
 								}
 							}
 						}
@@ -215,7 +218,7 @@ Scene::Scene(string name)
 						if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 						{
 							//Getting the name
-							this->bg->portals[(Directions)i]->destination_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
+							this->bg->portals[(Directions)i]->display_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 						}
 					}
 				}

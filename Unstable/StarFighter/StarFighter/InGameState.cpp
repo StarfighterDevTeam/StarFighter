@@ -34,7 +34,7 @@ void InGameState::Initialize(Player player)
 
 	//bg
 	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
-	this->currentScene->bg->displayPortals();
+	this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
 
 	//ship
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -205,21 +205,14 @@ void InGameState::InGameStateMachineCheck()
 				{
 					//Correct the position
 					this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2));
-					//Load next scene
-					if (this->currentScene->links[(*CurrentGame).direction].compare("0") != 0)
+					this->currentScene->bg->speed = sf::Vector2f(0, 0);
+					this->currentScene->generating_enemies = false;
+					if (this->currentScene->generating_boss)
 					{
-						std::string nextScene_filename = this->currentScene->links[(*CurrentGame).direction];
-						this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), false, false);
-						this->currentScene->bg->speed = sf::Vector2f(0, 0);
-						this->currentScene->generating_enemies = false;
-						if (this->currentScene->generating_boss)
-						{
-							this->bossSpawnCountdown.restart();
-						}
-						
-						this->IG_State = InGameStateMachine::LAST_SCREEN;
+						this->bossSpawnCountdown.restart();
 					}
-					//else: do nothing. The game is likely to be ended.
+					
+					this->IG_State = InGameStateMachine::LAST_SCREEN;
 				}
 			}
 
@@ -227,20 +220,32 @@ void InGameState::InGameStateMachineCheck()
 		}
 
 		case InGameStateMachine::LAST_SCREEN:
-		{
+		{	
 			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
 			if ((*CurrentGame).isLastEnemyDead())
 			{
+				this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
 				if (this->currentScene->m_hazardbreak_has_occurred && this->currentScene->generating_boss)
 				{
 					if (bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
 					{
 						this->currentScene->GenerateBoss();
+						this->currentScene->bg->SetPortalsState(PortalState::PortalInvisible);
 						this->IG_State = InGameStateMachine::BOSS_FIGHT;
 					}
 				}
-				else
+
+				//player takes exit?
+				if ((*CurrentGame).playerShip->isUsingPortal)
 				{
+					bool reverse = false;
+					if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
+					{
+						reverse = true;
+					}
+					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
+					this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), false, false);
+
 					//Putting the player on rails
 					(*CurrentGame).playerShip->disable_inputs = true;
 					(*CurrentGame).playerShip->disable_fire = true;
@@ -274,7 +279,7 @@ void InGameState::InGameStateMachineCheck()
 				(*CurrentGame).playerShip->disable_fire = true;
 				(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
 
-				this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
+				this->IG_State = InGameStateMachine::LAST_SCREEN;
 			}
 
 			break;
@@ -295,7 +300,7 @@ void InGameState::InGameStateMachineCheck()
 				this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
-				this->nextScene->bg->displayPortals();
+				this->nextScene->bg->SetPortalsState(PortalState::PortalGhost);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LayerType::BotLayer);
 
@@ -356,66 +361,27 @@ void InGameState::InGameStateMachineCheck()
 
 		case InGameStateMachine::HUB_ROAMING:
 		{
-			float x = playerShip->getPosition().x;
-			float y = playerShip->getPosition().y;
-
-			float X_min = SCENE_SIZE_X*HUB_EXIT_X_MIN_RATIO;
-			float X_max = SCENE_SIZE_X*HUB_EXIT_X_MAX_RATIO;
-			float Y_min = SCENE_SIZE_Y*HUB_EXIT_Y_MIN_RATIO;
-			float Y_max = SCENE_SIZE_Y*HUB_EXIT_Y_MAX_RATIO;
-
-			if ((x > X_min && x < X_max && y > Y_min && y < Y_max) || (x<X_min && y<Y_min) || (x<X_min && y >Y_max) || (x>X_max && y >Y_max) || (x>X_max && y < Y_min))
+			//player takes exit?
+			if ((*CurrentGame).playerShip->isUsingPortal)
 			{
-				sf::Time timer = clockHubExit.restart();
-			}
-			else
-			{
-				sf::Time timer = clockHubExit.getElapsedTime();
+				this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
 				bool reverse = false;
-
-				if (y<Y_min && timer.asSeconds() > HUB_EXIT_TIMER)
+				if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
 				{
-					//go UP
-					(*CurrentGame).direction = Directions::DIRECTION_UP;
-
-				}
-
-				else if (y > Y_max && timer.asSeconds() > HUB_EXIT_TIMER)
-				{
-					//go DOWN
-					(*CurrentGame).direction = Directions::DIRECTION_DOWN;
 					reverse = true;
 				}
+				string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
+				(*CurrentGame).direction = (*CurrentGame).playerShip->targetPortal->direction;
+				this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
 
-				else if (x > X_max && timer.asSeconds() > HUB_EXIT_TIMER)
-				{
-					//go RIGHT
-					(*CurrentGame).direction = Directions::DIRECTION_RIGHT;
-				}
+				//Putting the player on rails
+				(*CurrentGame).playerShip->disable_inputs = true;
+				(*CurrentGame).playerShip->disable_fire = true;
+				(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
 
-				else if (x<X_min && timer.asSeconds() > HUB_EXIT_TIMER)
-				{
-					//go LEFT
-					(*CurrentGame).direction = Directions::DIRECTION_LEFT;
-					reverse = true;
-				}
-
-				if ((*CurrentGame).direction != Directions::NO_DIRECTION)
-				{
-					if (this->currentScene->links[(*CurrentGame).direction].compare("0") != 0)
-					{
-						std::string nextScene_filename = this->currentScene->links[(*CurrentGame).direction];
-						this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
-						this->IG_State = InGameStateMachine::LAST_SCREEN;
-					}
-				}
+				this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
 			}
 
-			break;
-		}
-
-		default:
-		{
 			break;
 		}
 	}

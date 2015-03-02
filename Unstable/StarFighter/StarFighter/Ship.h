@@ -8,11 +8,12 @@
 #include "TextureLoader.h"
 #include "Assets.h"
 #include "Hud.h"
-#include "Independant.h"
 #include "InputGuy.h"
 #include <cmath>
 #include "Bot.h"
 #include "PatternBobby.h"
+#include "Portal.h"
+//#include "Independant.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -172,6 +173,11 @@ public :
 	
 	void Death() override;
 	void GetLoot(Independant& independant) override;
+	void GetPortal(Independant* independant) override;
+	Portal* targetPortal;
+	bool isCollindingWithPortal;
+	bool isUsingPortal;
+	bool isFiringButtonPressed;
 	void GetGrazing() override;
 	int getGrazeCount();
 	float getShipBeastScore();

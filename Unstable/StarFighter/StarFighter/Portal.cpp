@@ -4,5 +4,16 @@ Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 {
 	visible = false;
 	DontGarbageMe = true;
-	state = PortalState::PortalOpen;
+	state = PortalState::PortalInvisible;
+	setGhost(true);
+	display_name = "0";
+	destination_name = "0";
+}
+
+void Portal::update(sf::Time deltaTime)
+{
+	if (!this->GarbageMe)
+	{
+		AnimatedSprite::update(deltaTime);
+	}
 }

@@ -76,7 +76,7 @@ enum FXData
 
 enum IndependantType {
 	BackgroundObject,
-	LinkZone,
+	PortalObject,
 	LootObject,
 	PlayerShip,
 	FriendlyFire,
@@ -165,6 +165,7 @@ public:
 	void get_money_from(Independant& independant);
 	void get_money_from(Independant& independant, int loot_value);
 	virtual void GetLoot(Independant& independant);
+	virtual void GetPortal(Independant* independant);
 	void setGhost(bool m_ghost);
 
 	bool hasEquipmentLoot;
