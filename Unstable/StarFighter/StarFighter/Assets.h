@@ -12,6 +12,7 @@
 #define PORTAL_WIDTH			96
 #define PORTAL_HEIGHT			96
 #define PORTAL_FRAMES			4
+#define PORTAL_ANIMATIONS		4
 
 #define AIRBRAKE_FILENAME		"Assets/2D/AirBrake.png"
 #define ARMOR_FILENAME			"Assets/2D/Armor.png"

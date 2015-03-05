@@ -31,6 +31,14 @@
 
 class Loot;
 
+enum ShipAnimations
+{
+	ShipIdle,//0
+	ShipTurningLeft,//1
+	ShipTurningRight,//2
+	NB_ShipAnimations,//3
+};
+
 enum GrazeLevels
 {
 	GRAZE_LEVEL_NONE,//0

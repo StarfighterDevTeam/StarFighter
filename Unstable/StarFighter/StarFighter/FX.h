@@ -8,7 +8,7 @@
 class FX : public Independant
 {
 public:
-	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration);
+	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration, int m_animationNumber = 1);
 	void update(sf::Time deltaTime) override;
 
 	FX* Clone();
@@ -23,7 +23,7 @@ private:
 class Aura : public FX
 {
 public:
-	Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber);
+	Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
 	void Init(std::string m_textureName, sf::Vector2f dsize, int m_frameNumber);
 	void update(sf::Time deltaTime) override;
 	Aura* Clone();
@@ -32,6 +32,13 @@ public:
 private:
 	sf::Clock deltaClockExploding;
 	sf::Time duration;
+};
+
+class FakeShip : public Aura
+{
+public:
+	FakeShip(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
+	void update(sf::Time deltaTime) override;
 };
 
 #endif // FX_H_INCLUDED

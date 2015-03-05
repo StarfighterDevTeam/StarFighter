@@ -619,7 +619,7 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 {
 	if (this->ship_model->hasFake)
 	{
-		Aura* fake_ship = new Aura(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber);
+		FakeShip* fake_ship = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
 		(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
 	}
 
@@ -627,7 +627,7 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 	{
 		if (this->equipment[i]->hasFake)
 		{
-			Aura* fake_ship = new Aura(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber);
+			FakeShip* fake_ship = new FakeShip(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
 			(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
 		}
 	}
@@ -655,7 +655,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isCollindingWithPortal = false;
 	this->isUsingPortal = false;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
-	this->targetPortal = new Portal(sf::Vector2f(0, 0), sf::Vector2f(0, 0), PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_HEIGHT, PORTAL_WIDTH), sf::Vector2f(PORTAL_HEIGHT / 2, PORTAL_WIDTH / 2), 1);
+	this->targetPortal = new Portal(sf::Vector2f(0, 0), sf::Vector2f(0, 0), PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_HEIGHT, PORTAL_WIDTH), sf::Vector2f(PORTAL_HEIGHT / 2, PORTAL_WIDTH / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
 	
 	this->Init();
 }
@@ -708,7 +708,6 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 
 void Ship::update(sf::Time deltaTime)
 {
-	
 	//immunity frames after death
 	if (immune)
 	{
@@ -929,6 +928,43 @@ void Ship::update(sf::Time deltaTime)
 		{
 			this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.size.y / 2));
 			speed.y = 0;
+		}
+	}
+
+	//setting animation
+	if (this->speed.x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight)
+	{
+		if (!this->ship_config.ship_model->hasFake)
+		{
+			this->setAnimationLine(ShipAnimations::ShipTurningRight, true);
+		}
+		else
+		{
+			this->currentAnimationIndex = ShipAnimations::ShipTurningRight;
+		}
+	}
+
+	else if (this->speed.x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft)
+	{
+		if (!this->ship_config.ship_model->hasFake)
+		{
+			this->setAnimationLine(ShipAnimations::ShipTurningLeft, true);
+		}
+		else
+		{
+			this->currentAnimationIndex = ShipAnimations::ShipTurningLeft;
+		}
+	}
+
+	else if (this->speed.x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle)
+	{
+		if (!this->ship_config.ship_model->hasFake)
+		{
+			this->setAnimationLine(ShipAnimations::ShipIdle, true);
+		}
+		else
+		{
+			this->currentAnimationIndex = ShipAnimations::ShipIdle;
 		}
 	}
 }

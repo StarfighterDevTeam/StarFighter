@@ -1,8 +1,8 @@
 #include "Independant.h"
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber) : AnimatedSprite()
+Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
 {
-	Init(position, speed, textureName, size, frameNumber);
+	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
 	this->setOrigin(origin.x, origin.y);
 }
 
@@ -39,25 +39,68 @@ Independant::Independant()
 	this->DontGarbageMe = false;
 	this->disable_fire = false;
 	this->wake_up = true;
-	this->rotation_speed = 0;
+	this->rotation_speed = 0.f;
 	this->face_target = false;
 }
 
-void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber)
+void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
 {
+	//bulletproof verifications
+	if (m_animation >= this->animationNumber)
+	{
+		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", m_animation, this->animationNumber);
+		m_animation = this->animationNumber - 1;
+		if (m_animation < 0)
+		{
+			m_animation = 0;
+		}
+	}
+
+	//now let's load the new animation
+	Animation* anim = new Animation();
+	anim->setSpriteSheet(*this->defaultAnimation.getSpriteSheet());
+	for (int j = 0; j < this->defaultAnimation.getSize(); j++)
+	{
+		int n = j / this->frameNumber;
+		//when we have reached out to the correct line of animation frames, we put this line into the animation
+		if (n == m_animation)
+		{
+			anim->addFrame(this->defaultAnimation.getFrame(j));
+		}
+	}
+
+	if (!keep_frame_index)
+	{
+		this->m_currentFrame = 0;
+	}
+
+	this->currentAnimation = anim;
+	this->play(*currentAnimation);
+	this->currentAnimationIndex = m_animation;
+}
+
+void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber)
+{
+	this->animationNumber = m_animationNumber;
+	this->frameNumber = m_frameNumber;
 	this->initial_position = sf::Vector2f(position.x, position.y);
-	this->m_size.x = ((*texture).getSize().x / frameNumber);
-	this->m_size.y = ((*texture).getSize().y);
+	this->m_size.x = ((*texture).getSize().x / m_frameNumber);
+	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
 
 	this->collider_type = IndependantType::BackgroundObject;
 	this->defaultAnimation.setSpriteSheet(*texture);
-	for (int i = 0; i < frameNumber; i++)
+	for (int j = 0; j < m_animationNumber; j++)
 	{
-		int x = ((*texture).getSize().x / frameNumber)*(i);
-		this->defaultAnimation.addFrame(sf::IntRect(x, 0, this->m_size.x, this->m_size.y));
+		for (int i = 0; i < m_frameNumber; i++)
+		{
+			int x = ((*texture).getSize().x / m_frameNumber)*(i);
+			int y = ((*texture).getSize().y / m_animationNumber)*(j);
+			this->defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
+		}
 	}
-	this->currentAnimation = &defaultAnimation;
-	this->play(*currentAnimation);
+	
+	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
+	
 
 	this->speed = speed;
 	this->setPosition(position.x, position.y);
@@ -73,18 +116,19 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->diag = sqrt(pow(m_size.x / 2, 2) + pow(m_size.y / 2, 2));
 	this->transparent = false;
 	this->ghost = false;
+	this->rotation_speed = 0.f;
 }
 
-void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber)
+void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y);
+	sf::Texture* texture = loader->loadTexture(textureName, size.x*m_frameNumber, size.y*m_animationNumber);
 	this->textureName = textureName;
 
 	this->setOrigin(size.x / 2, size.y / 2);
 
-	Init(position, speed, texture, frameNumber);
+	Init(position, speed, texture, m_frameNumber, m_animationNumber);
 
 }
 

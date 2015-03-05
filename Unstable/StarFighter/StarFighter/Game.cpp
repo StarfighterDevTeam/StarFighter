@@ -346,7 +346,7 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 	}
 	if (clear_count > 0)
 	{
-		printf("Clearing (%d) enemies that remained out of the scene (last screen = no spawn anymore).\n", clear_count);
+		printf("DEBUG: Clearing enemies that remained out of the scene (last screen = no spawn anymore) (number: %d).\n", clear_count);
 	}
 }
 

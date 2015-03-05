@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration) : Independant(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), m_frameNumber)
+FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration, int m_animationNumber) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2), m_frameNumber, m_animationNumber)
 {
 	//deltaClockExploding.restart();
 	duration = m_duration;
@@ -34,7 +34,7 @@ FX* FX::Clone()
 	return new_FX;
 }
 
-Aura::Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber) : FX(m_target->getPosition(), sf::Vector2f (0,0), textureName, size, m_frameNumber, sf::seconds(0))
+Aura::Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : FX(m_target->getPosition(), sf::Vector2f(0, 0), textureName, size, m_frameNumber, sf::seconds(0), m_animationNumber)
 {
 	this->target = m_target;
 	visible = true;
@@ -63,4 +63,19 @@ Aura* Aura::Clone()
 	Aura* new_aura = new Aura(this->target, this->textureName, this->m_size, this->frameNumber);
 	new_aura->display_name = this->display_name;
 	return new_aura;
+}
+
+FakeShip::FakeShip(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : Aura(m_target, textureName, size, m_frameNumber, m_animationNumber)
+{
+
+}
+
+void FakeShip::update(sf::Time deltaTime)
+{
+	if (this->target->currentAnimationIndex != this->currentAnimationIndex)
+	{
+		this->setAnimationLine(this->target->currentAnimationIndex, true);
+	}
+
+	Aura::update(deltaTime);
 }

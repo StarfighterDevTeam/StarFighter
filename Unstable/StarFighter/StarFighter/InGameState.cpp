@@ -262,6 +262,7 @@ void InGameState::InGameStateMachineCheck()
 				{
 					this->bossSpawnCountdown.restart();
 				}
+				this->currentScene->bg->SetPortalsState(PortalState::PortalClose);
 			}
 
 			break;

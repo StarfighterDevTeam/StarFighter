@@ -10,7 +10,7 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
-		this->portals[(Directions)i] = new Portal(position, speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES);
+		this->portals[(Directions)i] = new Portal(position, speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
 		sf::Vector2f bg_size = Independant::getSize_for_Direction((Directions)i, size);
 		//applying offset respect to the center of the background, depending on the direction
 		this->portals[(Directions)i]->offset = Independant::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT/2));
@@ -22,8 +22,6 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 		//direction
 		this->portals[(Directions)i]->direction = (Directions)i;
 	}
-
-	this->SetPortalsState(PortalState::PortalInvisible);
 }
 
 void Background::update(sf::Time deltaTime)
@@ -62,18 +60,29 @@ void Background::SetPortalsState(PortalState m_state)
 				break;
 			}
 
+			case PortalState::PortalClose:
+			{
+				this->portals[(Directions)i]->state = PortalState::PortalClose;
+				this->portals[(Directions)i]->visible = true;
+				this->portals[(Directions)i]->setGhost(false);
+				this->portals[(Directions)i]->Close();
+				break;
+			}
+
 			case PortalState::PortalOpen:
 			{
 				this->portals[(Directions)i]->state = PortalState::PortalOpen;
 				this->portals[(Directions)i]->visible = true;
 				this->portals[(Directions)i]->setGhost(false);
+				this->portals[(Directions)i]->Open();
 				break;
 			}
 
 			case PortalState::PortalInvisible:
 			{
 				this->portals[(Directions)i]->state = PortalState::PortalInvisible;
-				this->portals[(Directions)i]->visible = false;
+				this->portals[(Directions)i]->setGhost(false);
+				this->portals[(Directions)i]->Close();
 				break;
 			}
 		}

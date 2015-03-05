@@ -128,7 +128,7 @@ enum EquipmentType {
 class Independant : public AnimatedSprite
 {
 public:
-	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber);
+	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber = 1);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
@@ -200,6 +200,9 @@ public:
 	bool wake_up;
 	float rotation_speed;
 	bool face_target;
+	int animationNumber;
+	int frameNumber;
+	int currentAnimationIndex;
 
 	//TIPS:
 	// direction = the scene border you refer too
@@ -228,9 +231,11 @@ protected:
 	std::string textureName;
 	Animation defaultAnimation;
 	Animation* currentAnimation;
+	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
+
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
-	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber);
-	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1);
+	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber = 1);
+	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber = 1, int m_animationNumber = 1);
 
 	bool immune;
 	sf::Clock immunityTimer;
