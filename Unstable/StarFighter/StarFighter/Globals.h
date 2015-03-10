@@ -44,16 +44,16 @@
 
 #define HUD_SCORES_SPACING						20
 
-#define SHIP_FILE "Assets/Scripts/Ship.csv"
-#define ENEMY_FILE	"Assets/Scripts/Enemies.csv"
-#define WEAPON_FILE	"Assets/Scripts/Weapons.csv"
-#define AMMO_FILE "Assets/Scripts/Ammo.csv"
-#define ENEMYPOOL_FILE "Assets/Scripts/EnemyPool.csv"
-#define FX_FILE "Assets/Scripts/FX.csv"
-#define EQUIPMENT_FILE "Assets/Scripts/Equipment.csv"
-#define BOT_FILE "Assets/Scripts/Bot.csv"
-#define SCENES_FILE "Assets/Scripts/Scenes.csv"
-#define PHASES_FILE	"Assets/Scripts/EnemyPhases.csv"
+#define SHIP_FILE "Assets/Scripts/Generated/Ship.csv"
+#define ENEMY_FILE	"Assets/Scripts/Generated/Enemies.csv"
+#define WEAPON_FILE	"Assets/Scripts/Generated/Weapons.csv"
+#define AMMO_FILE "Assets/Scripts/Generated/Ammo.csv"
+#define ENEMYPOOL_FILE "Assets/Scripts/Generated/EnemyPool.csv"
+#define FX_FILE "Assets/Scripts/Generated/FX.csv"
+#define EQUIPMENT_FILE "Assets/Scripts/Generated/Equipment.csv"
+#define BOT_FILE "Assets/Scripts/Generated/Bot.csv"
+#define SCENES_FILE "Assets/Scripts/Generated/Scenes.csv"
+#define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
 
 #define GRAZE_DISTANCE									30
 #define SHIP_BRAKING_SPEED								180

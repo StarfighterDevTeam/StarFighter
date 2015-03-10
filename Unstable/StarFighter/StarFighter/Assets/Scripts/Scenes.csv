@@ -1,5 +1,0 @@
-#scene_name,filename,display_name,link_UP,link_DOWN,link_RIGHT,link_LEFT
-scene1,Assets/Scripts/Scenes/V_scene1.csv,Vertigo_I,scene2,scene2,0,0
-scene2,Assets/Scripts/Scenes/O_scene2.csv,Station_Eclipse,scene1,scene1,scene3,scene3
-scene3,Assets/Scripts/Scenes/H_scene3.csv,Horizon_IV,0,0,scene2,scene2
-scene4,Assets/Scripts/Scenes/V_scene2.csv,Vertigo_X,scene2,scene1,0,0

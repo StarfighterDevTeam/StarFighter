@@ -3,7 +3,7 @@
 
 #define BACKGROUND_FILENAME "Assets/2D/background.png"
 
-#define SHIP_FILENAME		"Assets/2D/natalia.png"//"Assets/2D/player_sprite.png"
+#define SHIP_FILENAME		"Assets/2D/natalia.png"
 #define SHIP_WIDTH			64
 #define SHIP_HEIGHT			64
 #define SHIP_NB_FRAMES		3
