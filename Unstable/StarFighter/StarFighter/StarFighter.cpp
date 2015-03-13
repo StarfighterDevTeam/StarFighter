@@ -48,7 +48,7 @@ int main()
 	//Initializing player
 	Player player;
 	player.Init(&renderWindow);
-	player.m_currentSceneFile = "scene2";
+	player.m_currentSceneFile = "Vanguard_Hub0";
 
 	//Loading InGame state
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Starting game");
