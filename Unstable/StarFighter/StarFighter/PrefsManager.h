@@ -9,7 +9,7 @@ public:
 	PrefsManager();
 	~PrefsManager();
 
-	int m_gameLoopSampling;
+	unsigned int m_gameRefreshRateHz;
 
 protected:
 	void Init();
