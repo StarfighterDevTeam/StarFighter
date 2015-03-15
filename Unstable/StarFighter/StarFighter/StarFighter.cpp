@@ -8,14 +8,15 @@ int main()
 
 	//Load Configuration
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Configurations");
-	PREFS = &PrefsManager();
+	PREFS = new PrefsManager();
 
 	//Init SFML Window
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing GUI");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
-	glEnable(GL_TEXTURE_2D);
 	renderWindow.setKeyRepeatEnabled(false);
-	renderWindow.resetGLStates();
+	//Refresh rate
+	renderWindow.setVerticalSyncEnabled(true);
+	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
 
 	//Init SFGUI Window
 	sfg::SFGUI sfgui;
@@ -56,23 +57,20 @@ int main()
 	InGameState inGameState;
 	gameManager.PushState(inGameState, player);
 
-
 	while (renderWindow.isOpen())
 	{
 		//Sampling
-		if (deltaClock.getElapsedTime().asMilliseconds() < PREFS->m_gameLoopSampling)
-			continue;
-
+		//if (deltaClock.getElapsedTime().asMilliseconds() < 18)
+		//	continue;
 
 		sf::Event event;
 		while (renderWindow.pollEvent(event))
 		{
-			mainWindow->HandleEvent(event);
-
 			if (event.type == sf::Event::Closed)
 			{
 				renderWindow.close();
 			}
+			mainWindow->HandleEvent(event);
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -92,7 +90,6 @@ int main()
 
 		//Diplay
 		renderWindow.display();
-
 	}
 
 	return 0;
