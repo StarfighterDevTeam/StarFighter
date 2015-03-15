@@ -88,6 +88,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
 
 	this->collider_type = IndependantType::BackgroundObject;
+	this->layer = -1;
 	this->defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < m_animationNumber; j++)
 	{
@@ -331,8 +332,8 @@ Equipment* Independant::getEquipmentLoot()
 
 void Independant::releaseEquipmentLoot()
 {
+	delete this->equipment_loot;
 	this->equipment_loot = NULL;
-	free(equipment_loot);
 	this->hasEquipmentLoot = false;
 }
 
@@ -358,8 +359,8 @@ Weapon* Independant::getWeaponLoot()
 
 void Independant::releaseWeaponLoot()
 {
+	delete this->weapon_loot;
 	this->weapon_loot = NULL;
-	free(weapon_loot);
 	this->hasWeaponLoot = false;
 }
 

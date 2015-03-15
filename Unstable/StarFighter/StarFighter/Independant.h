@@ -143,6 +143,7 @@ public:
 	bool GarbageMe;
 	bool DontGarbageMe;
 	IndependantType collider_type;
+	int layer;
 	void setVisible(bool visible);
 	virtual void damage_from(Independant& independant);
 	sf::Vector2f m_size;

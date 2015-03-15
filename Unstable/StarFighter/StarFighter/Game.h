@@ -74,8 +74,8 @@ private:
 	float BeastScoreBonus;
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;
-	std::list<Independant*>* sceneIndependantsLayered[NBVAL_Layer];
-	std::list<Independant*>* sceneIndependantsTyped[NBVAL_Independant];
+	std::list<Independant*> sceneIndependantsLayered[NBVAL_Layer];
+	std::list<Independant*> sceneIndependantsTyped[NBVAL_Independant];
 	std::vector<Independant*> garbage;
 };
 

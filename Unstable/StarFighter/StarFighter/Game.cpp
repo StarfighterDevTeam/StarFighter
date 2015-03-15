@@ -20,15 +20,6 @@ void Game::init(RenderWindow* window)
 	scale_factor.x = float(WINDOW_RESOLUTION_X) / float(REF_WINDOW_RESOLUTION_X);
 	scale_factor.y = float(WINDOW_RESOLUTION_Y) / float(REF_WINDOW_RESOLUTION_Y);
 
-	for (int i = 0; i < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)); i++)
-	{
-		sceneIndependantsLayered[i] = new std::list<Independant*>;
-	}
-	for (int i = 0; i < (sizeof(sceneIndependantsTyped) / sizeof(*sceneIndependantsTyped)); i++)
-	{
-		sceneIndependantsTyped[i] = new std::list<Independant*>;
-	}
-
 	this->hazard = 0;//initalisation of the scoring system
 	this->BeastScoreBonus = 0;
 	this->direction = Directions::NO_DIRECTION;
@@ -46,15 +37,16 @@ void Game::SetPlayerShip(Ship* m_playerShip)
 
 void Game::addToScene(Independant *object, int layer, IndependantType type)
 {
+	object->layer = layer;
 	object->collider_type = type;
 
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
-	if (layer >= 0 && layer < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)))
+	if (layer >= 0 && layer < NBVAL_Layer)
 	{
-		(*(sceneIndependantsTyped[(int)type])).push_back(object);
-		(*(sceneIndependantsLayered[layer])).push_back(object);
+		sceneIndependantsTyped[(int)type].push_back(object);
+		sceneIndependantsLayered[layer].push_back(object);
 		this->sceneIndependants.push_back(object);
 	}
 	else
@@ -85,9 +77,9 @@ void Game::drawScene()
 {
 	this->offscreen.clear();
 
-	for (int i = 0; i < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)); i++)
+	for (int i = 0; i < NBVAL_Layer ; i++)
 	{
-		for (std::list<Independant*>::iterator it = (*(this->sceneIndependantsLayered[i])).begin(); it != (*(this->sceneIndependantsLayered[i])).end(); it++)
+		for (std::list<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
 		{
 			if ((*(*it)).visible)
 			{
@@ -114,10 +106,10 @@ void Game::colisionChecksV2()
 	int i = 0;
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::PlayerShip]).end(); it1++)
+	for (std::list<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::PlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::PlayerShip].end(); it1++)
 	{
 		//Enemy bullets hitting the player
-		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyFire]).end(); it2++)
+		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyFire].end(); it2++)
 		{
 			i++;
 			if (SimpleCollision::IsGrazing((*it1), (*it2)))
@@ -148,7 +140,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Enemy objects
-		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it2++)
+		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it2++)
 		{
 			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
@@ -186,7 +178,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Loot
-		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::LootObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::LootObject]).end(); it2++)
+		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
 		{
 			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
@@ -201,7 +193,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Portal
-		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::PortalObject]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::PortalObject]).end(); it2++)
+		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::PortalObject].begin(); it2 != sceneIndependantsTyped[IndependantType::PortalObject].end(); it2++)
 		{
 			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
@@ -212,10 +204,10 @@ void Game::colisionChecksV2()
 	}
 
 	//Then, check if any allied bullet collide with any enemy
-	for (std::list<Independant*>::iterator it1 = (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).begin(); it1 != (*this->sceneIndependantsTyped[IndependantType::EnemyObject]).end(); it1++)
+	for (std::list<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it1 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it1++)
 	{
 		//Player bullets on enemy
-		for (std::list<Independant*>::iterator it2 = (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).begin(); it2 != (*this->sceneIndependantsTyped[IndependantType::FriendlyFire]).end(); it2++)
+		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::FriendlyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::FriendlyFire].end(); it2++)
 		{
 			i++;
 			//Bullets are invisible after impact
@@ -252,17 +244,11 @@ void Game::cleanGarbage()
 
 	for (std::vector<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
 	{
-		this->sceneIndependants.remove(*it);
-		for (int i = 0; i < (sizeof(sceneIndependantsLayered) / sizeof(*sceneIndependantsLayered)); i++)
-		{
-			(*(this->sceneIndependantsLayered[i])).remove(*it);
-		}
-		for (int i = 0; i < (sizeof(sceneIndependantsTyped) / sizeof(*sceneIndependantsTyped)); i++)
-		{
-			(*(this->sceneIndependantsTyped[i])).remove(*it);
-		}
-		(*it)->~Independant();
-		free(*it);
+		Independant*	ptr	= *it;
+		this->sceneIndependants.remove(ptr);
+		this->sceneIndependantsLayered[ptr->layer].remove(*it);
+		this->sceneIndependantsTyped[(int)(ptr->collider_type)].remove(*it);
+		delete (*it);
 	}
 
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
@@ -326,7 +312,7 @@ void Game::collectGarbage()
 void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 {
 	int clear_count = 0;
-	for (std::list<Independant*>::iterator it = (this->sceneIndependantsLayered[m_layer])->begin(); it != (this->sceneIndependantsLayered[m_layer])->end(); it++)
+	for (std::list<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
 	{
 		if (only_offscene)
 		{
@@ -352,7 +338,7 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 
 void Game::SetLayerRotation(LayerType m_layer, float angle)
 {
-	for (std::list<Independant*>::iterator it = (this->sceneIndependantsLayered[m_layer])->begin(); it != (this->sceneIndependantsLayered[m_layer])->end(); it++)
+	for (std::list<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
 	{
 		(*it)->setRotation(angle);
 	}
@@ -362,9 +348,9 @@ bool Game::isLastEnemyDead()
 {
 	int n = 0;
 
-	n += sceneIndependantsTyped[IndependantType::LootObject]->size();
-	n += sceneIndependantsTyped[IndependantType::EnemyFire]->size();
-	n += sceneIndependantsTyped[IndependantType::EnemyObject]->size();
+	n += sceneIndependantsTyped[IndependantType::LootObject].size();
+	n += sceneIndependantsTyped[IndependantType::EnemyFire].size();
+	n += sceneIndependantsTyped[IndependantType::EnemyObject].size();
 
 	if (n == 0)
 	{
@@ -395,7 +381,7 @@ TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_
 {
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[type])->begin(); it != (this->sceneIndependantsTyped[type])->end(); it++)
+	for (std::list<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
 	{
 		if ((*it)->isOnScene && !(*it)->ghost)
 		{
@@ -431,7 +417,7 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 	float angle = 0.f;
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[type])->begin(); it != (this->sceneIndependantsTyped[type])->end(); it++)
+	for (std::list<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
 	{
 		if ((*it)->isOnScene && !(*it)->ghost)
 		{
@@ -474,7 +460,7 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 
 void Game::WakeUpEnemiesWithName(string m_display_name)
 {
-	for (std::list<Independant*>::iterator it = (this->sceneIndependantsTyped[IndependantType::EnemyObject])->begin(); it != (this->sceneIndependantsTyped[IndependantType::EnemyObject])->end(); it++)
+	for (std::list<Independant*>::iterator it = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it++)
 	{
 		if ((*it)->display_name == m_display_name)
 		{
