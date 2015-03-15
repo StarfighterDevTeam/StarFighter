@@ -59,10 +59,6 @@ int main()
 
 	while (renderWindow.isOpen())
 	{
-		//Sampling
-		//if (deltaClock.getElapsedTime().asMilliseconds() < 18)
-		//	continue;
-
 		sf::Event event;
 		while (renderWindow.pollEvent(event))
 		{
