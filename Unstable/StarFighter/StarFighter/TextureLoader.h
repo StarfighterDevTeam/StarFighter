@@ -59,7 +59,7 @@ public:
 			//Removing it from the array
 			this->_loadedTextures.erase (filename);     
 			//Cleaning memory
-			free(texture);
+			delete texture;
 		}
 	}
 
