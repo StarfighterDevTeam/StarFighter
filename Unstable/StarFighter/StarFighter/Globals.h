@@ -56,7 +56,7 @@
 #define SCENES_FILE "Assets/Scripts/Generated/Scenes.csv"
 #define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
 
-#define GRAZE_DISTANCE									10
+#define GRAZE_DISTANCE									30
 #define SHIP_BRAKING_SPEED								180
 #define SHIP_SHOOTING_MALUS_SPEED						0.65f
 
