@@ -52,6 +52,7 @@ public:
 	Directions direction;
 	bool generating_enemies;
 	bool generating_boss;
+	sf::Clock spawnClock;
 
 	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();

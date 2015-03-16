@@ -274,13 +274,9 @@ void Scene::Draw(sf::RenderWindow* window)
 
 void Scene::GenerateEnemies(Time deltaTime)
 {
-	static double timer = 0;
-	timer += deltaTime.asSeconds();
-	if (timer > 4)
+	if (spawnClock.getElapsedTime() > sf::seconds(4))
 	{
-		double intpart;
-		timer = modf(timer, &intpart);
-
+		spawnClock.restart();
 		double random_number = ((double)rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
