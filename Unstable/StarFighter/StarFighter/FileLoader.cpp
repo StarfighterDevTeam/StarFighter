@@ -29,7 +29,7 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 				shipC->FX_death = FileLoader::LoadFX((*it)[ShipConfigData::SHIPCONFIG_DEATH_FX]);
 
 				//Loading weapon
-				if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
+				if (!(*it)[ShipConfigData::SHIPCONFIG_WEAPON].empty())
 				{
 					LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship weapon\n");
 					shipC->setShipWeapon(FileLoader::LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
@@ -90,20 +90,17 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
 			((Independant*)base->enemy)->display_name = (*it)[EnemyData::ENEMY_NAME];
 
-			if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
+			if (!(*it)[EnemyData::ENEMY_WEAPON].empty())
 			{
 				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO])));
-				base->enemy->hasWeapon = true;
 			}
-			if ((*it)[EnemyData::ENEMY_WEAPON_2].compare("0") != 0)
+			if (!(*it)[EnemyData::ENEMY_WEAPON_2].empty())
 			{
 				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_2], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_2])));
-				base->enemy->hasWeapon = true;
 			}
-			if ((*it)[EnemyData::ENEMY_WEAPON_3].compare("0") != 0)
+			if (!(*it)[EnemyData::ENEMY_WEAPON_3].empty())
 			{
 				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_3], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_3])));
-				base->enemy->hasWeapon = true;
 			}
 
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyData::ENEMY_PATTERN);
@@ -112,9 +109,8 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 			base->enemy->rotation_speed = stoi((*it)[EnemyData::ENEMY_ROTATION_SPEED]);
 
 			//Loading phases
-			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
+			if (!(*it)[EnemyData::ENEMY_PHASE].empty())
 			{
-				base->enemy->hasPhases = true;
 				base->enemy->setPhase((*it)[EnemyData::ENEMY_PHASE]);
 			}
 
@@ -156,19 +152,17 @@ Equipment* FileLoader::LoadEquipment(string name)
 				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
 				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 
-			if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
+			if (!(*it)[EquipmentData::EQUIPMENT_BOT].empty())
 			{
 				i->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
-				i->hasBot = true;
 			}
 
-			if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0
-				&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
+			if (!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].empty() && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].empty()
+				&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].empty() && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].empty())
 			{
 				i->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
 				i->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
 				i->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
-				i->hasFake = true;
 			}
 
 			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
@@ -207,19 +201,17 @@ ShipModel* FileLoader::LoadShipModel(string name)
 					(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])), 
 					stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 
-				if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
+				if (!(*it)[EquipmentData::EQUIPMENT_BOT].empty())
 				{
 					s->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
-					s->hasBot = true;
 				}
 
-				if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0
-					&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].compare("0") == 0)
+				if (!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].empty() && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].empty()
+					&& !(*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT].empty() && !(*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES].empty())
 				{
 					s->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
 					s->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
 					s->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
-					s->hasFake = true;
 				}
 
 				return s;
@@ -254,10 +246,9 @@ Bot* FileLoader::LoadBot(string name)
 
 			bot->rotation_speed = stoi((*it)[BotData::BOT_ROTATION_SPEED]);
 
-			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)
+			if (!(*it)[BotData::BOT_WEAPON].empty())
 			{
 				bot->weapon = FileLoader::LoadWeapon((*it)[BotData::BOT_WEAPON], -1, FileLoader::LoadAmmo((*it)[BotData::BOT_AMMO]));
-				bot->hasWeapon=true;
 			}
 
 			return bot;

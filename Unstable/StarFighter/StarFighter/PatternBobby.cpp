@@ -12,7 +12,7 @@ PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
 	vector<float>* v = new vector<float>;
 	PatternType pattern_type = PatternType::NoMovePattern;
 
-	if (line_data[index].compare("0") != 0)
+	if (!line_data[index].empty())
 	{
 		bobby->patternSpeed = stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_SPEED]);//angular speed, horizontal speed
 

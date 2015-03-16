@@ -182,7 +182,7 @@ void InGameState::InGameStateMachineCheck()
 	float hn = this->nextScene->bg->m_size.y;
 	float w_ = (*CurrentGame).playerShip->m_size.x;
 	float h_ = (*CurrentGame).playerShip->m_size.y;
-	if ((*CurrentGame).playerShip->ship_config.ship_model->hasFake)
+	if (!(*CurrentGame).playerShip->ship_config.ship_model->fake_textureName.empty())
 	{
 		w_ = (*CurrentGame).playerShip->ship_config.ship_model->fake_size.x;
 		h_ = (*CurrentGame).playerShip->ship_config.ship_model->fake_size.y;

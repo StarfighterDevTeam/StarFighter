@@ -21,8 +21,6 @@ ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, floa
 	this->size = m_size;
 	this->frameNumber = m_frameNumber;
 	this->display_name = m_display_name;
-	this->hasBot = false;
-	this->hasFake = false;
 }
 
 //various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
@@ -79,8 +77,7 @@ Equipment::Equipment()
 	this->textureName = EMPTYSLOT_FILENAME;
 	this->frameNumber = 0;
 	this->equipmentType = EquipmentType::Airbrake;
-	this->hasBot = false;
-	this->hasFake = false;
+	this->bot = NULL;
 }
 
 void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
@@ -295,25 +292,21 @@ void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f B
 	{
 		case 0://adding bot
 		{
-			this->hasBot = true;
 			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
 			break;
 		}
 		case 1://adding bot
 		{
-			this->hasBot = true;
 			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
 			break;
 		}
 		case 2://adding bot
 		{
-			this->hasBot = true;
 			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
 			break;
 		}
 		case 3://adding bot
 		{
-			this->hasBot = true;
 			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
 			break;
 		}
@@ -336,11 +329,8 @@ ShipConfig::ShipConfig()
 		Equipment* defaultEquipment = new Equipment();
 		//defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
 		this->equipment[i] = defaultEquipment;
-		this->hasEquipment[i] = false;
 		this->automatic_fire = false;
 	}
-
-	this->hasWeapon = false;
 }
 
 void ShipConfig::Init()
@@ -359,15 +349,15 @@ void ShipConfig::Init()
 
 	//Loading bots
 	this->bot_list.clear();
-	if (this->ship_model->hasBot)
+	if (this->bot_list.empty())
 	{
 		this->bot_list.push_back(this->ship_model->bot);
 	}
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
-			if (this->equipment[i]->hasBot)
+			if (this->equipment[i]->bot != NULL)
 			{
 				this->bot_list.push_back(this->equipment[i]->bot);
 			}
@@ -382,7 +372,7 @@ int ShipConfig::getShipConfigArmor()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_armor += equipment[i]->getEquipmentArmor();
 		}
@@ -408,7 +398,7 @@ int ShipConfig::getShipConfigShield()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_shield += equipment[i]->getEquipmentShield();
 		}
@@ -434,7 +424,7 @@ int ShipConfig::getShipConfigShieldRegen()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
 
@@ -461,7 +451,7 @@ int ShipConfig::getShipConfigDamage()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_damage += equipment[i]->getEquipmentDamage();
 		}
@@ -487,7 +477,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_max_speed.x += equipment[i]->getEquipmentMaxSpeed().x;
 			equipment_max_speed.y += equipment[i]->getEquipmentMaxSpeed().y;
@@ -518,7 +508,7 @@ float ShipConfig::getShipConfigDecceleration()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_decceleration += equipment[i]->getEquipmentDecceleration();
 		}
@@ -544,7 +534,7 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_acceleration.x += equipment[i]->getEquipmentAcceleration().x;
 			equipment_acceleration.y += equipment[i]->getEquipmentAcceleration().y;
@@ -570,8 +560,8 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 
 void ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats)
 {
+	assert(m_equipment != NULL);
 	this->equipment[m_equipment->equipmentType] = m_equipment;
-	this->hasEquipment[m_equipment->equipmentType] = true;
 
 	if (recomputing_stats)
 	{
@@ -588,8 +578,8 @@ void ShipConfig::setShipModel(ShipModel* m_ship_model)
 
 void ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats)
 {
+	assert(m_weapon != NULL);
 	this->weapon = m_weapon;
-	this->hasWeapon = true;
 
 	if (recomputing_stats)
 	{
@@ -617,7 +607,7 @@ void ShipConfig::DestroyBots()
 
 void ShipConfig::GenerateFakeShip(Independant* m_target)
 {
-	if (this->ship_model->hasFake)
+	if (!this->ship_model->fake_textureName.empty())
 	{
 		FakeShip* fake_ship = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
 		(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
@@ -625,7 +615,7 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->equipment[i]->hasFake)
+		if (!this->equipment[i]->fake_textureName.empty())
 		{
 			FakeShip* fake_ship = new FakeShip(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
 			(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
@@ -669,7 +659,7 @@ void Ship::Init()
 	this->damage = this->ship_config.getShipConfigDamage();
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
-	if (this->ship_config.ship_model->hasFake)
+	if (this->ship_config.ship_model->fake_textureName.empty())
 	{
 		this->transparent;
 	}
@@ -683,6 +673,7 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 
 void Ship::setEquipment(Equipment* m_equipment)
 {
+	assert(m_equipment != NULL);
 	this->ship_config.DestroyBots();
 	this->ship_config.setEquipment(m_equipment);
 	this->Init();
@@ -691,6 +682,7 @@ void Ship::setEquipment(Equipment* m_equipment)
 
 void Ship::setShipModel(ShipModel* m_ship_model)
 {
+	assert(m_ship_model != NULL);
 	this->ship_config.DestroyBots();
 	this->ship_config.setShipModel(m_ship_model);
 	this->Init();
@@ -699,6 +691,7 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 
 void Ship::setShipWeapon(Weapon* m_weapon)
 {
+	assert(m_weapon != NULL);
 	this->ship_config.DestroyBots();
 	this->ship_config.setShipWeapon(m_weapon);
 	this->Init();
@@ -779,10 +772,10 @@ void Ship::update(sf::Time deltaTime)
 			if (InputGuy::isFiring() || this->ship_config.automatic_fire)
 			{
 				{
-					if (this->ship_config.hasWeapon)
+					if (this->ship_config.weapon != NULL)
 					{
 						float sizeY = this->m_size.y;
-						if (this->ship_config.ship_model->hasFake)
+						if (!this->ship_config.ship_model->fake_textureName.empty())
 						{
 							if (this->ship_config.ship_model->fake_size.y > sizeY)
 							{
@@ -878,7 +871,7 @@ void Ship::update(sf::Time deltaTime)
 	Independant::update(deltaTime);
 
 	//screen borders contraints	correction
-	if (this->ship_config.ship_model->hasFake)
+	if (!this->ship_config.ship_model->fake_textureName.empty())
 	{
 		if (this->getPosition().x < ship_config.ship_model->fake_size.x / 2)
 		{
@@ -934,7 +927,7 @@ void Ship::update(sf::Time deltaTime)
 	//setting animation
 	if (this->speed.x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight)
 	{
-		if (!this->ship_config.ship_model->hasFake)
+		if (!this->ship_config.ship_model->fake_textureName.empty())
 		{
 			this->setAnimationLine(ShipAnimations::ShipTurningRight, true);
 		}
@@ -946,7 +939,7 @@ void Ship::update(sf::Time deltaTime)
 
 	else if (this->speed.x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft)
 	{
-		if (!this->ship_config.ship_model->hasFake)
+		if (!this->ship_config.ship_model->fake_textureName.empty())
 		{
 			this->setAnimationLine(ShipAnimations::ShipTurningLeft, true);
 		}
@@ -958,7 +951,7 @@ void Ship::update(sf::Time deltaTime)
 
 	else if (this->speed.x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle)
 	{
-		if (!this->ship_config.ship_model->hasFake)
+		if (!this->ship_config.ship_model->fake_textureName.empty())
 		{
 			this->setAnimationLine(ShipAnimations::ShipIdle, true);
 		}
@@ -996,11 +989,11 @@ void Ship::GetLoot(Independant& independant)
 {
 	this->get_money_from(independant);
 
-	if (independant.hasEquipmentLoot)
+	if (independant.equipment_loot != NULL)
 	{
-		if (!this->ship_config.hasEquipment[independant.getEquipmentLoot()->equipmentType])
+		//if the ship config does not have any equipment of this type on, we equip it...
+		if (this->ship_config.equipment[independant.getEquipmentLoot()->equipmentType] == NULL)
 		{
-			//if the ship config does not have any equipment of this type on, we equip it...
 			this->setEquipment(independant.getEquipmentLoot());
 			independant.releaseEquipmentLoot();
 		}
@@ -1017,18 +1010,17 @@ void Ship::GetLoot(Independant& independant)
 		//this->releaseEquipmentLoot();
 	}
 
-	if (independant.hasWeaponLoot)
+	if (independant.weapon_loot != NULL)
 	{
-		if (!this->ship_config.hasWeapon)
+		//if the ship config does not have any weapon of this type on, we equip it...
+		if (this->ship_config.weapon == NULL)
 		{
-			//if the ship config does not have any weapon of this type on, we equip it...
-
 			this->setShipWeapon(independant.getWeaponLoot());
 			independant.releaseWeaponLoot();
 		}
+		//...else we add it in stash
 		else
 		{
-			//...else we add it in stash
 			printf("Weapon added to ship stash: '%s'\n", independant.getWeaponLoot()->display_name.c_str());
 			this->stash.push_back((Loot*)independant.getWeaponLoot());
 			independant.releaseWeaponLoot();

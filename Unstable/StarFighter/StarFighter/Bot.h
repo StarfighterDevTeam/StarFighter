@@ -22,8 +22,6 @@ public:
 	float radius;
 	float angspeed;
 	float vspeed;
-	bool hasTarget;
-	bool hasWeapon;
 	void setTarget (Independant* m_target);
 	void setRadius (float m_radius, float clockwise);
 	sf::Vector2f spread;

@@ -12,17 +12,15 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	radius = 0;
 	angspeed = 0;
 	vspeed = 0;
-	hasTarget = false;
-	hasWeapon = false;
 	spread = sf::Vector2f(0,0);
 	damage = 0;
 	key_repeat = false;
+	target = NULL;
 }
 
 void Bot::setTarget (Independant* m_target)
 {
 	this->target = m_target;
-	hasTarget = true;
 	this->setPosition(m_target->getPosition());
 }
 
@@ -30,7 +28,7 @@ void Bot::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition, offset;
 
-	if (hasTarget)
+	if (this->target != NULL)
 	{
 		newposition.x = target->getPosition().x;
 		newposition.y = target->getPosition().y;
@@ -71,7 +69,7 @@ void Bot::update(sf::Time deltaTime)
 	}
 
 	//automatic fire
-	if (hasWeapon && !disable_fire)
+	if (this->weapon && !disable_fire)
 	{
 		if (InputGuy::isFiring() || this->automatic_fire)
 		{
@@ -97,10 +95,8 @@ Bot* Bot::Clone()
 	bot->vspeed = this->vspeed;
 	bot->Pattern = this->Pattern;
 	bot->spread = this->spread;
-	bot->hasWeapon = this->hasWeapon;
-	if (bot->hasWeapon)
-		bot->weapon = this->weapon;
-	bot->hasTarget = this->hasTarget;
+	bot->weapon = this->weapon;
+	bot->target = this->target;
 	bot->damage = this->damage;
 	bot->armor = this->armor;
 	bot->armor_max = this->armor_max;

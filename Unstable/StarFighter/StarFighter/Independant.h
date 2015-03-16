@@ -186,13 +186,13 @@ public:
 	virtual void GetPortal(Independant* independant);
 	void setGhost(bool m_ghost);
 
-	bool hasEquipmentLoot;
+	Equipment* equipment_loot;
+	Weapon* weapon_loot;
 	void get_equipment_from(Independant& independant);
 	void setEquipmentLoot(Equipment* equipment);
 	void releaseEquipmentLoot();
 	Equipment* getEquipmentLoot();
 
-	bool hasWeaponLoot;
 	void get_weapon_from(Independant& independant);
 	void setWeaponLoot(Weapon* weapon);
 	void releaseWeaponLoot();
@@ -257,8 +257,7 @@ protected:
 	bool immune;
 	sf::Clock immunityTimer;
 	int money;
-	Equipment* equipment_loot;
-	Weapon* weapon_loot;
+	
 
 };
 

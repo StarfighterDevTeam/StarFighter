@@ -82,9 +82,6 @@ public:
 	float radius;
 	float vspeed;
 	float rotation_speed;
-	bool hasTransition;
-	bool hasWakeUp;
-	bool hasWelcomeShot;
 	list<ConditionTransition*> transitions_list;
 	string wake_up_name;
 	static ConditionTransition* ConditionLoader(vector<string> line_data, int index);

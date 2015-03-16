@@ -2,9 +2,6 @@
 
 Phase::Phase()
 {
-	this->hasTransition = false;
-	this->hasWakeUp = false;
-	this->hasWelcomeShot = false;
 	this->Pattern = new PatternBobby();
 }
 
