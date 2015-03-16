@@ -25,12 +25,12 @@ public:
 		if (!independantA->isOnScene || !(independantB->isOnScene))
 			return false;
 
-		float x = independantB->getPosition().x;
-		float y = independantB->getPosition().y;
-
 		//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
-		if ((pow((independantA->getPosition().x - independantB->getPosition().x),2) + pow((independantA->getPosition().y - independantB->getPosition().y),2)) 
-			> pow(independantA->diag + independantB->diag,2))
+		const float a = independantA->getPosition().x - independantB->getPosition().x;
+		const float b = independantA->getPosition().y - independantB->getPosition().y;
+		const float c = independantA->diag + independantB->diag;
+
+		if (( (a * a) + (b * b)) > (c * c))
 			return false;
 
 		// Second test : are the corners included in the other sprite, or vice versa ?
@@ -45,8 +45,11 @@ public:
 
 	static bool IsGrazing(const Independant* independantA, const Independant* independantB) 
 	{
-		if ((pow((independantA->getPosition().x - independantB->getPosition().x),2) + pow((independantA->getPosition().y - independantB->getPosition().y),2)) 
-			< pow(independantA->diag + independantB->diag + GRAZE_DISTANCE,2))
+		const float a = independantA->getPosition().x - independantB->getPosition().x;
+		const float b = independantA->getPosition().y - independantB->getPosition().y;
+		const float c = independantA->diag + independantB->diag + GRAZE_DISTANCE;
+
+		if (((a * a) + (b * b)) < (c * c))
 			return true;
 		else 
 			return false;

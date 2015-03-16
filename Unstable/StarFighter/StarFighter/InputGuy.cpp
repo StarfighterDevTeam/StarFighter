@@ -105,7 +105,7 @@ Vector2f InputGuy::getDirections()
 	//diagonal movement?
 	if (abs(x) + abs(y) > 1)
 	{
-		float p = (1 / sqrt(pow(x, 2) + pow(y, 2)));
+		float p = (1 / sqrt((x*x) + (y*y)));
 		x = x*p;
 		y = y*p;
 	}

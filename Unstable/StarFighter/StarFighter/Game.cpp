@@ -384,7 +384,10 @@ TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_
 	{
 		if ((*it)->isOnScene && !(*it)->ghost)
 		{
-			float distance_to_ref = (pow((ref_position.x - (*it)->getPosition().x), 2) + pow((ref_position.y - (*it)->getPosition().y), 2));
+			const float a = ref_position.x - (*it)->getPosition().x;
+			const float b = ref_position.y - (*it)->getPosition().y;
+
+			float distance_to_ref = (a * a) + (b * b);
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
@@ -395,7 +398,7 @@ TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_
 	}
 	if (shortest_distance > 0)
 	{
-		if (range > 0 && pow(range, 2) <= shortest_distance)
+		if (range > 0 && (range * range) <= shortest_distance)
 		{
 			return TargetScan::TARGET_OUT_OF_RANGE;
 		}
@@ -420,7 +423,10 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 	{
 		if ((*it)->isOnScene && !(*it)->ghost)
 		{
-			float distance_to_ref = (pow((ref_position.x - (*it)->getPosition().x), 2) + pow((ref_position.y - (*it)->getPosition().y), 2));
+			const float a = ref_position.x - (*it)->getPosition().x;
+			const float b = ref_position.y - (*it)->getPosition().y;
+
+			float distance_to_ref = (a * a) + (b * b);
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
@@ -431,7 +437,7 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 	}
 	if (shortest_distance > 0)
 	{
-		if (range > 0 && pow(range, 2) < shortest_distance)//shortest_distance is already squared
+		if (range > 0 && (range * range) < shortest_distance)//shortest_distance is already squared
 		{
 			//do nothing: range is too short to reach the target, therefore we don't aim for it.
 		}

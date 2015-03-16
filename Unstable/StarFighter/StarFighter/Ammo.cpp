@@ -11,7 +11,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	shield_max = 0;
 	shield_regen = 0;
 	startPattern = false;
-	ref_speed = sqrt(pow(speed.x,2)+pow(speed.y,2));
+	ref_speed = sqrt((speed.x*speed.x) + (speed.y*speed.y));
 	explosion = m_explosion;
 	radius = 0;
 	angspeed = 0;

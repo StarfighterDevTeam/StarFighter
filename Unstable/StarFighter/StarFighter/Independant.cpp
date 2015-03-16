@@ -112,7 +112,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->money = 0;
 	this->hasEquipmentLoot = false;
 	this->hasWeaponLoot = false;
-	this->diag = sqrt(pow(m_size.x / 2, 2) + pow(m_size.y / 2, 2));
+	this->diag = sqrt((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2));
 	this->transparent = false;
 	this->ghost = false;
 	this->rotation_speed = 0.f;
