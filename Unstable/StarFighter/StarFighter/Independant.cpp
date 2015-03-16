@@ -315,14 +315,15 @@ void Independant::get_equipment_from(Independant& independant)
 	if (independant.hasEquipmentLoot)
 	{
 		this->setEquipmentLoot(independant.getEquipmentLoot());
-		independant.setEquipmentLoot(NULL);
+		independant.releaseEquipmentLoot();
 	}
 }
 
 void Independant::setEquipmentLoot(Equipment* equipment)
 {
+	assert(equipment != NULL);
 	this->equipment_loot = equipment;
-	this->hasEquipmentLoot = (equipment != NULL);
+	this->hasEquipmentLoot = true;
 }
 
 Equipment* Independant::getEquipmentLoot()
@@ -332,7 +333,6 @@ Equipment* Independant::getEquipmentLoot()
 
 void Independant::releaseEquipmentLoot()
 {
-	delete this->equipment_loot;
 	this->equipment_loot = NULL;
 	this->hasEquipmentLoot = false;
 }
@@ -342,12 +342,13 @@ void Independant::get_weapon_from(Independant& independant)
 	if (independant.hasWeaponLoot)
 	{
 		this->setWeaponLoot(independant.getWeaponLoot());
-		independant.setWeaponLoot(NULL);
+		independant.releaseWeaponLoot();
 	}
 }
 
 void Independant::setWeaponLoot(Weapon* weapon)
 {
+	assert(weapon != NULL);
 	this->weapon_loot = weapon;
 	this->hasWeaponLoot = (weapon != NULL);
 }
@@ -359,7 +360,6 @@ Weapon* Independant::getWeaponLoot()
 
 void Independant::releaseWeaponLoot()
 {
-	delete this->weapon_loot;
 	this->weapon_loot = NULL;
 	this->hasWeaponLoot = false;
 }

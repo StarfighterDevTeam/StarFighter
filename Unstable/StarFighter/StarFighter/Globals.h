@@ -6,6 +6,7 @@
 #include "TextureLoader.h"
 #include "TextUtils.h"
 #include "Logger.h"
+#include <assert.h>
 
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 
