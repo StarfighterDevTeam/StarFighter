@@ -40,6 +40,7 @@ public:
 	void Death() override;
 	float radius;
 	float angspeed;
+	bool hasWeapon;
 	void GenerateLoot() override;
 	void CreateRandomLoot(float BeastScaleBonus=0) override;
 	EnemyClass enemy_class;
@@ -47,6 +48,7 @@ public:
 	//phases
 	void setPhase(string phase_name);
 	Phase* currentPhase;
+	bool hasPhases;
 	bool CheckCondition();
 	sf::Clock phaseClock;
 	sf::Clock enemyClock;

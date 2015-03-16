@@ -110,8 +110,8 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->GarbageMe = false;
 	this->DontGarbageMe = false;
 	this->money = 0;
-	this->equipment_loot = NULL;
-	this->weapon_loot = NULL;
+	this->hasEquipmentLoot = false;
+	this->hasWeaponLoot = false;
 	this->diag = sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	this->transparent = false;
 	this->ghost = false;
@@ -292,11 +292,11 @@ void Independant::GetLoot(Independant& independant)
 {
 	this->get_money_from(independant);
 
-	if (independant.equipment_loot != NULL)
+	if (independant.hasEquipmentLoot)
 	{
 		this->get_equipment_from(independant);
 	}
-	if (independant.weapon_loot != NULL)
+	if (independant.hasWeaponLoot)
 	{
 		this->get_weapon_from(independant);
 	}
@@ -310,7 +310,7 @@ void Independant::GetPortal(Independant* independant)
 
 void Independant::get_equipment_from(Independant& independant)
 {
-	if (independant.equipment_loot != NULL)
+	if (independant.hasEquipmentLoot)
 	{
 		this->setEquipmentLoot(independant.getEquipmentLoot());
 		independant.releaseEquipmentLoot();
@@ -321,6 +321,7 @@ void Independant::setEquipmentLoot(Equipment* equipment)
 {
 	assert(equipment != NULL);
 	this->equipment_loot = equipment;
+	this->hasEquipmentLoot = true;
 }
 
 Equipment* Independant::getEquipmentLoot()
@@ -331,11 +332,12 @@ Equipment* Independant::getEquipmentLoot()
 void Independant::releaseEquipmentLoot()
 {
 	this->equipment_loot = NULL;
+	this->hasEquipmentLoot = false;
 }
 
 void Independant::get_weapon_from(Independant& independant)
 {
-	if (independant.weapon_loot != NULL)
+	if (independant.hasWeaponLoot)
 	{
 		this->setWeaponLoot(independant.getWeaponLoot());
 		independant.releaseWeaponLoot();
@@ -346,6 +348,7 @@ void Independant::setWeaponLoot(Weapon* weapon)
 {
 	assert(weapon != NULL);
 	this->weapon_loot = weapon;
+	this->hasWeaponLoot = (weapon != NULL);
 }
 
 Weapon* Independant::getWeaponLoot()
@@ -356,6 +359,7 @@ Weapon* Independant::getWeaponLoot()
 void Independant::releaseWeaponLoot()
 {
 	this->weapon_loot = NULL;
+	this->hasWeaponLoot = false;
 }
 
 void Independant::CreateRandomLoot(float BeastScaleBonus)

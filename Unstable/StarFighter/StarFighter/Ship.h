@@ -64,6 +64,9 @@ public:
 	int frameNumber;
 	std::string display_name;
 	Bot* bot;
+	bool hasBot;
+	
+	bool hasFake;
 	std::string fake_textureName;
 	sf::Vector2f fake_size;
 	int fake_frameNumber;
@@ -96,6 +99,9 @@ public:
 	int getEquipmentShieldRegen();
 	int getEquipmentDamage();
 	Bot* bot;
+	bool hasBot;
+
+	bool hasFake;
 	std::string fake_textureName;
 	sf::Vector2f fake_size;
 	int fake_frameNumber;
@@ -139,6 +145,8 @@ public:
 	ShipModel* ship_model;
 	Weapon* weapon;
 	vector<Bot*> bot_list;
+	bool hasWeapon;
+	bool hasEquipment[NBVAL_EQUIPMENT];
 	FX* FX_death;
 	void GenerateBots(Independant* m_target);
 	void DestroyBots();

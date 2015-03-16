@@ -1,11 +1,11 @@
 #weapon_name,image,width,height,frames,sound_name,time_between_shots,rafale,rafale_cooldown,multishot,xspread,dispersion,alternate,angle_offset,target_seaking
-laser,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.05,3,0.8f,3,15,0,,0,semi_seaking
+laser,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.05,3,0.8f,3,15,0,0,0,semi_seaking
 laser_fast,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.5,3,3.f,7,0,120,alternate,0,seaking
-laser_360,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.5,3,3.f,10,0,360,,0,
-laser_player,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.08,0,2.f,7,0,160,,0,
-laser_bot,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.1,0,1.f,3,26,0,,0,seaking
-laser_default,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.2,0,2.f,3,10,0,alternate,0,
-laser_arc,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.8,0,0,7,0,150,,0,seaking
+laser_360,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
+laser_player,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
+laser_bot,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.1,0,1.f,3,26,0,0,0,seaking
+laser_default,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.2,0,2.f,3,10,0,alternate,0,0
+laser_arc,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,seaking
 fireball_sinus,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_seaking
 #,,,,,,,,,,,,,,
 V_Alpha1_laser,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.4285714286,0,0,1,,,0,0,seaking

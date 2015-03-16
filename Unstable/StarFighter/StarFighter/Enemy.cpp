@@ -9,6 +9,8 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	angspeed = 0;
 	radius = 0;
 	FX_death = m_FX_death;
+	hasWeapon = false;
+	hasPhases = false;
 	rotation_speed = 0;
 	face_target = false;
 }
@@ -104,7 +106,7 @@ void Enemy::update(sf::Time deltaTime)
 	}
 
 	//automatic fire
-	if (isOnScene & !this->weapons_list.empty())
+	if (isOnScene & hasWeapon)
 	{
 		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
@@ -143,9 +145,9 @@ void Enemy::update(sf::Time deltaTime)
 	AnimatedSprite::update(deltaTime);
 
 	//phases
-	if (this->currentPhase != NULL)
+	if (this->hasPhases)
 	{
-		if (!this->currentPhase->transitions_list.empty())
+		if (this->currentPhase->hasTransition)
 		{
 			this->CheckCondition();
 		}
@@ -164,6 +166,7 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->shield_max = this->getIndependantShieldMax();
 	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
 	((Independant*)enemy)->damage = this->getIndependantDamage();
+	enemy->hasWeapon = this->hasWeapon;
 
 	for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 	{
@@ -171,7 +174,9 @@ Enemy* Enemy::Clone()
 	}	
 	
 	((Independant*)enemy)->addMoney(this->getMoney());
+	enemy->hasEquipmentLoot = this->hasEquipmentLoot;
 	enemy->equipment_loot = this->getEquipmentLoot();
+	enemy->hasWeaponLoot = this->hasWeaponLoot;
 	enemy->weapon_loot = this->getWeaponLoot();
 	enemy->display_name = this->display_name;
 	enemy->enemy_class = this->enemy_class;
@@ -182,8 +187,9 @@ Enemy* Enemy::Clone()
 
 	enemy->rotation_speed = this->rotation_speed;
 
-	if (this->currentPhase != NULL)
+	if (this->hasPhases)
 	{
+		enemy->hasPhases = this->hasPhases;
 		enemy->currentPhase = this->currentPhase;
 		enemy->enemyClock.restart();
 		enemy->wake_up = this->wake_up;
@@ -365,7 +371,6 @@ bool Enemy::CheckCondition()
 
 void Enemy::setPhase(string phase_name)
 {
-	assert(!phase_name.empty());
 	Phase* phase = this->LoadPhase(phase_name);
 	this->currentPhase = phase;
 	this->phaseClock.restart();
@@ -419,7 +424,7 @@ void Enemy::setPhase(string phase_name)
 	this->rotation_speed = phase->rotation_speed;
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
-	if (phase->welcomeWeapon != NULL)
+	if (phase->hasWelcomeShot)
 	{
 		float theta = this->getRotation() / 180 * M_PI;
 		float weapon_offset_x = phase->welcomeWeapon->weaponOffset.x - this->m_size.y / 2 * sin(theta);
@@ -448,7 +453,7 @@ void Enemy::setPhase(string phase_name)
 	}
 
 	//waking up enemies
-	if (!phase->wake_up_name.empty())
+	if (phase->hasWakeUp)
 	{
 		(*CurrentGame).WakeUpEnemiesWithName(phase->wake_up_name);
 	}
@@ -468,21 +473,21 @@ Phase* Enemy::LoadPhase(string name)
 			phase->vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
 
 			//loading weapons and ammos
-			if (!(*it)[EnemyPhaseData::PHASE_WEAPON].empty() && !(*it)[EnemyPhaseData::PHASE_AMMO].empty())
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO]));
 				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET]);
 				phase->weapons_list.push_back(m_weapon);
 			}
 
-			if (!(*it)[EnemyPhaseData::PHASE_WEAPON_2].empty() && !(*it)[EnemyPhaseData::PHASE_AMMO_2].empty())
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2]));
 				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_2]);
 				phase->weapons_list.push_back(m_weapon);
 			}
 
-			if (!(*it)[EnemyPhaseData::PHASE_WEAPON_3].empty() && !(*it)[EnemyPhaseData::PHASE_AMMO_3].empty())
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3]));
 				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_3]);
@@ -498,7 +503,7 @@ Phase* Enemy::LoadPhase(string name)
 
 			//loading modifier (immune to damage, etc.)
 			phase->modifier = Modifier::NoModifier;
-			if (!(*it)[EnemyPhaseData::PHASE_MODIFIER].empty())
+			if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("0") != 0)
 			{
 				if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("immune") == 0)
 				{
@@ -519,24 +524,34 @@ Phase* Enemy::LoadPhase(string name)
 			}
 
 			//loading welcome shot
-			if (!(*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON].empty() && !(*it)[EnemyPhaseData::PHASE_WELCOME_AMMO].empty())
+			if ((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON].compare("0") != 0)
 			{
 				phase->welcomeWeapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_WELCOME_AMMO]));
+				phase->hasWelcomeShot = true;
 			}
 			
 			//load enemies (by name) to wake up
-			if (!(*it)[EnemyPhaseData::PHASE_WAKEUP].empty())
+			if ((*it)[EnemyPhaseData::PHASE_WAKEUP].compare("0") != 0)
 			{
 				phase->wake_up_name = (*it)[EnemyPhaseData::PHASE_WAKEUP];
+				phase->hasWakeUp = true;
 			}
-
+			
 			//loading transitions to next phase
-			if (!(*it)[EnemyPhaseData::PHASE_CONDITION].empty())
+			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
 			{
+				phase->hasTransition = true;
 				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
 			}
-			if (!(*it)[EnemyPhaseData::PHASE_CONDITION_2].empty())
+			//loading transition to next phase
+			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
 			{
+				phase->hasTransition = true;
+				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
+			}
+			if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("0") != 0)
+			{
+				phase->hasTransition = true;
 				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION_2));
 			}
 
@@ -562,14 +577,14 @@ void Enemy::GenerateLoot()
 {
 	sf::Vector2f speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, LOOT_SPEED_Y);
 
-	if (this->weapon_loot != NULL)
+	if (this->hasWeaponLoot)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getWeaponLoot()->textureName, sf::Vector2f(this->getWeaponLoot()->size.x, this->getWeaponLoot()->size.y), this->getWeaponLoot()->display_name);
 		new_loot->get_weapon_from(*this);
 		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
 	}
 
-	else if (this->equipment_loot != NULL)
+	else if (this->hasEquipmentLoot)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getEquipmentLoot()->textureName, sf::Vector2f(this->getEquipmentLoot()->size.x, this->getEquipmentLoot()->size.y), this->getEquipmentLoot()->display_name);
 		new_loot->get_equipment_from(*this);
@@ -829,6 +844,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
 
 					bot->weapon = weapon;
+					bot->hasWeapon = true;
 					equipment->bot = bot;
 
 					//Scaling with value
@@ -921,7 +937,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			{
 				weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
 				weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
-				if (!(*it)[WeaponData::WEAPON_ALTERNATE].empty())
+				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
 				{
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
 						weapon->shot_mode = ShotMode::AlternateShotMode;
@@ -944,8 +960,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
 			weapon->angle_offset = stoi((*it)[WeaponData::WEAPON_ANGLE_OFFSET]);
 
-			weapon->target_seaking = TargetSeaking::NO_SEAKING;
-			if (!(*it)[WeaponData::WEAPON_TARGET_SEAKING].empty())
+			if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("0") != 0)
 			{
 				if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
 					weapon->target_seaking = TargetSeaking::SEMI_SEAKING;

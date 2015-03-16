@@ -36,7 +36,6 @@ FX* FX::Clone()
 
 Aura::Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : FX(m_target->getPosition(), sf::Vector2f(0, 0), textureName, size, m_frameNumber, sf::seconds(0), m_animationNumber)
 {
-	assert(m_target != NULL);
 	this->target = m_target;
 	visible = true;
 	isOnScene = true;
@@ -68,7 +67,7 @@ Aura* Aura::Clone()
 
 FakeShip::FakeShip(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : Aura(m_target, textureName, size, m_frameNumber, m_animationNumber)
 {
-	assert(m_target != NULL);
+
 }
 
 void FakeShip::update(sf::Time deltaTime)
