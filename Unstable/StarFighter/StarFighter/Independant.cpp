@@ -315,14 +315,14 @@ void Independant::get_equipment_from(Independant& independant)
 	if (independant.hasEquipmentLoot)
 	{
 		this->setEquipmentLoot(independant.getEquipmentLoot());
-		independant.releaseEquipmentLoot();
+		independant.setEquipmentLoot(NULL);
 	}
 }
 
 void Independant::setEquipmentLoot(Equipment* equipment)
 {
 	this->equipment_loot = equipment;
-	this->hasEquipmentLoot = true;
+	this->hasEquipmentLoot = (equipment != NULL);
 }
 
 Equipment* Independant::getEquipmentLoot()
@@ -342,14 +342,14 @@ void Independant::get_weapon_from(Independant& independant)
 	if (independant.hasWeaponLoot)
 	{
 		this->setWeaponLoot(independant.getWeaponLoot());
-		independant.releaseWeaponLoot();
+		independant.setWeaponLoot(NULL);
 	}
 }
 
 void Independant::setWeaponLoot(Weapon* weapon)
 {
 	this->weapon_loot = weapon;
-	this->hasWeaponLoot = true;
+	this->hasWeaponLoot = (weapon != NULL);
 }
 
 Weapon* Independant::getWeaponLoot()
