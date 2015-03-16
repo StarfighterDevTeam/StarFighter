@@ -134,7 +134,6 @@ void Game::colisionChecksV2()
 						(*it1)->Respawn();
 						hazard = 0;
 					}
-
 				}
 			}
 		}

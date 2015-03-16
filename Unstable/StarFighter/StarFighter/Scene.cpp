@@ -112,10 +112,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 									{
 										this->bg->portals[(Directions)i]->display_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 									}
-									
-									//Creating portals
-									(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::PortalLayer, IndependantType::PortalObject);
 								}
+								//Creating portals
+								(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::PortalLayer, IndependantType::PortalObject);
 							}
 						}
 					}
