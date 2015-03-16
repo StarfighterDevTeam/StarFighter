@@ -17,20 +17,6 @@ class Ship;
 
 using namespace sf;
 
-enum LayerType {
-	BackgroundLayer,
-	PortalLayer,
-	ExplosionLayer,
-	EnemyObjectLayer,
-	AuraLayer,
-	BotLayer,
-	FriendlyFireLayer,
-	EnemyFireLayer,
-	FakeShipLayer,
-	PlayerShipLayer,
-	NBVAL_Layer
-};
-
 enum TargetScan
 {
 	NO_TARGET_FOUND,//0
@@ -43,7 +29,7 @@ struct Game
 public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	void addToScene(Independant *object, int layer, IndependantType type);
+	void addToScene(Independant *object, LayerType m_layer, IndependantType type);
 	void updateScene(Time deltaTime);
 	void drawScene();
 	void colisionChecksV2();

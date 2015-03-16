@@ -40,7 +40,6 @@ Independant::Independant()
 	this->disable_fire = false;
 	this->wake_up = true;
 	this->rotation_speed = 0.f;
-	this->face_target = false;
 }
 
 void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
@@ -88,7 +87,6 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
 
 	this->collider_type = IndependantType::BackgroundObject;
-	this->layer = -1;
 	this->defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < m_animationNumber; j++)
 	{

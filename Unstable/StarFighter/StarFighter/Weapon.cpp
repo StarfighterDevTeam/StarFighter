@@ -7,7 +7,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	speed.x = 0;
 	speed.y = 0;
 	multishot = 1;
-	xspread = 10;
+	xspread = 0;
 	rate_of_fire = 0.4f;
 	shot_index = 0;
 	angle = 0.f;

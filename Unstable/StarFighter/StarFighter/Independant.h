@@ -18,6 +18,20 @@ class Equipment;
 class Weapon;
 class Loot;
 
+enum LayerType {
+	BackgroundLayer,
+	PortalLayer,
+	ExplosionLayer,
+	EnemyObjectLayer,
+	AuraLayer,
+	BotLayer,
+	FriendlyFireLayer,
+	EnemyFireLayer,
+	FakeShipLayer,
+	PlayerShipLayer,
+	NBVAL_Layer
+};
+
 enum WeaponData
 {
 	WEAPON_NAME,//0
@@ -32,8 +46,8 @@ enum WeaponData
 	WEAPON_MULTISHOT,//9
 	WEAPON_XSPREAD,//10
 	WEAPON_DISPERSION,//11
-	WEAPON_ANGLE_OFFSET,//12
-	WEAPON_ALTERNATE,//13
+	WEAPON_ALTERNATE,//12
+	WEAPON_ANGLE_OFFSET,//13
 	WEAPON_TARGET_SEAKING,//14
 };
 
@@ -146,7 +160,7 @@ public:
 	bool GarbageMe;
 	bool DontGarbageMe;
 	IndependantType collider_type;
-	int layer;
+	LayerType layer;
 	void setVisible(bool visible);
 	virtual void damage_from(Independant& independant);
 	sf::Vector2f m_size;
@@ -203,7 +217,6 @@ public:
 	bool disable_fire;
 	bool wake_up;
 	float rotation_speed;
-	bool face_target;
 	int animationNumber;
 	int frameNumber;
 	int currentAnimationIndex;

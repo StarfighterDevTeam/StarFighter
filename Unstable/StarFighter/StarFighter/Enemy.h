@@ -56,6 +56,7 @@ public:
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);
+	bool face_target;
 
 private:
 	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);	

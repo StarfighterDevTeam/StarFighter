@@ -5,3 +5,5 @@ fireball,50,300,0,Assets/2D/fireball.png,8,8,1,explosion_S,0,0,0,1,0
 fireball_blue,50,150,0,Assets/2D/fireball_blue.png,8,8,1,explosion_S,0,0,0,1,0
 fireball_slalom1,50,250,0,Assets/2D/fireball.png,8,8,1,explosion_S,oscillator,100,60,1,0
 fireball_slalom2,50,250,0,Assets/2D/fireball.png,8,8,1,explosion_S,oscillator,100,60,-1,0
+#,,,,,,,,,,,,,
+V_laser,50,200,0,Assets/2D/Vanguard/V_laser.png,4,11,1,explosion_S,0,,,,0

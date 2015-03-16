@@ -12,6 +12,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	hasWeapon = false;
 	hasPhases = false;
 	rotation_speed = 0;
+	face_target = false;
 }
 
 void Enemy::update(sf::Time deltaTime)
@@ -929,27 +930,35 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->display_name = (*it)[WeaponData::WEAPON_NAME];
 			weapon->fire_direction = Vector2i(0, fire_direction);
 			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
-			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
-			weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
-			weapon->angle_offset = stoi((*it)[WeaponData::WEAPON_ANGLE_OFFSET]);
 			weapon->shot_mode = ShotMode::NoShotMode;
-			if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
+
+			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
+			if (weapon->multishot > 1)
 			{
-				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
-					weapon->shot_mode = ShotMode::AlternateShotMode;
-				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending") == 0)
-					weapon->shot_mode = ShotMode::AscendingShotMode;
-				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
-					weapon->shot_mode = ShotMode::DescendingShotMode;
+				weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
+				weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
+				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
+				{
+					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
+						weapon->shot_mode = ShotMode::AlternateShotMode;
+					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending") == 0)
+						weapon->shot_mode = ShotMode::AscendingShotMode;
+					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
+						weapon->shot_mode = ShotMode::DescendingShotMode;
+				}
 			}
-			weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
+
+			
 			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
 			if (weapon->rafale != 0)
+			{
 				weapon->rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
-
+			}
+				
 			weapon->textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
 			weapon->size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
 			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
+			weapon->angle_offset = stoi((*it)[WeaponData::WEAPON_ANGLE_OFFSET]);
 
 			if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("0") != 0)
 			{

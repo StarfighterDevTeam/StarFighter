@@ -35,23 +35,23 @@ void Game::SetPlayerShip(Ship* m_playerShip)
 	this->playerShip = m_playerShip;
 }
 
-void Game::addToScene(Independant *object, int layer, IndependantType type)
+void Game::addToScene(Independant *object, LayerType m_layer, IndependantType type)
 {
-	object->layer = layer;
+	object->layer = m_layer;
 	object->collider_type = type;
 
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
-	if (layer >= 0 && layer < NBVAL_Layer)
+	if ((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer)
 	{
 		sceneIndependantsTyped[(int)type].push_back(object);
-		sceneIndependantsLayered[layer].push_back(object);
+		sceneIndependantsLayered[(int)m_layer].push_back(object);
 		this->sceneIndependants.push_back(object);
 	}
 	else
 	{
-		throw invalid_argument(TextUtils::format("Game eror: Unable to add Independant '%s' to layer '%d'", object->getName().c_str(), layer));
+		throw invalid_argument(TextUtils::format("Game eror: Unable to add Independant '%s' to layer '%d'", object->getName().c_str(), (int)m_layer));
 	}
 }
 
