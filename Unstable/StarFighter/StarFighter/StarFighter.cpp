@@ -16,7 +16,7 @@ int main()
 	renderWindow.setKeyRepeatEnabled(false);
 	//Refresh rate
 	renderWindow.setVerticalSyncEnabled(true);
-	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+	//renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
 
 	//Init SFGUI Window
 	sfg::SFGUI sfgui;
