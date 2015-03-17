@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death)  : Independant(position, speed,  textureName, size) 
+Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber, int m_animationNumber) : Independant(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), m_frameNumber, m_animationNumber)
 {
 	collider_type = IndependantType::EnemyObject;
 	visible = true;
@@ -158,7 +158,7 @@ Enemy* Enemy::Clone()
 {
 	sf::Vector2f s = this->speed;
 
-	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death);
+	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death, this->frameNumber, this->animationNumber);
 
 	((Independant*)enemy)->armor = this->getIndependantArmor();
 	((Independant*)enemy)->armor_max = this->getIndependantArmorMax();

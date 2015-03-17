@@ -76,7 +76,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 		if((*it)[0].compare(name) == 0)
 		{
 			EnemyBase* base = new EnemyBase;
-			base->enemy = new Enemy(sf::Vector2f(0,0),sf::Vector2f(0, stoi((*it)[EnemyData::ENEMY_SPEED])),(*it)[EnemyData::ENEMY_IMAGE_NAME],sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]),stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]));
+			base->enemy = new Enemy(sf::Vector2f(0, 0), sf::Vector2f(0, stoi((*it)[EnemyData::ENEMY_SPEED])), (*it)[EnemyData::ENEMY_IMAGE_NAME], sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]), stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]), stoi((*it)[EnemyData::ENEMY_FRAMES]));
 			base->probability = probability;
 			base->poolsize = poolSize;
 			base->enemyclass = enemyClass;
