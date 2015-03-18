@@ -80,6 +80,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 			base->probability = probability;
 			base->poolsize = poolSize;
 			base->enemyclass = enemyClass;
+			base->enemy->enemy_class = (EnemyClass)enemyClass;
 
 			((Independant*)base->enemy)->armor = stoi((*it)[EnemyData::ENEMY_ARMOR]);
 			((Independant*)base->enemy)->armor_max = stoi((*it)[EnemyData::ENEMY_ARMOR]);

@@ -2,4 +2,6 @@
 bg,Assets/2D/background.png,800,1800,15,V
 #,enemies_name,proba,pool_size,enemy_class,
 enemy,V_Alpha1,1,2,1,
+enemy,V_Beta1,1,2,3,
+enemy,V_Delta1,1,2,5,
 #,name,enemy_class,spawnX,spawnY,

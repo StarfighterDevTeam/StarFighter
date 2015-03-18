@@ -2,6 +2,7 @@
 #define SCENE_H_INCLUDED
 
 #include "FileLoader.h"
+#include "EnemyGenerator.h"
 
 using namespace std;
 
@@ -26,6 +27,8 @@ enum ScenesData
 	SCENE_LINK_RIGHT,
 	SCENE_LINK_LEFT,
 };
+
+
 
 class Scene
 {
@@ -58,13 +61,17 @@ public:
 	int getSceneHazardLevelValue();
 	std::string links[Directions::NO_DIRECTION];
 
+	vector <EnemyGenerator*> sceneEnemyGenerators[NBVAL_EnemyClass];
+	void GenerateEnemiesv2();
+	void SpawnEnemy(int enemy_class);
+	void RestartAllGeneratorsClock(int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
+
 private:
 	Ship* playerShip;
-	list<EnemyBase> enemies;
+	list<EnemyBase*> enemies;
 	list<EnemyBase*> boss_list;
-	list<EnemyBase> enemies_ranked_by_class[NBVAL_EnemyClass];
+	vector<EnemyBase*> enemies_ranked_by_class[NBVAL_EnemyClass];
 	int total_class_probability[NBVAL_EnemyClass];
-	list<EnemyBase*> sceneEnemyClassesAvailable[NBVAL_EnemyClass];
 	sf::RenderWindow* mainWindow;
 	
 	int hazard_break_value;

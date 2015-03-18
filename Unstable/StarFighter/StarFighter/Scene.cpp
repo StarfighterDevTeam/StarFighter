@@ -124,23 +124,44 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					{
 						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 						
-						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we do it here
+						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
 						if (!e->enemy->hasPhases)
 						{
 							e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
 						}
 						
-						this->sceneEnemyClassesAvailable[e->enemyclass].push_back(e);
-
-						//giving intervall of hit values for dice rolls
-						p++;
-						e->proba_min = p;
-						p += (e->probability - 1);
-						e->proba_max = p;
+						//setting probabilities of spawn within enemy class
+						e->proba_min = this->total_class_probability[e->enemyclass];
+						e->proba_max = e->proba_min + e->probability;
 						this->total_class_probability[e->enemyclass] = e->proba_max;
 						enemy_count += e->proba_max;
-						//this->enemies.push_back(*e);//legacy, to delete when pools are done ?
-						this->enemies_ranked_by_class[e->enemyclass].push_back(*e);
+
+						this->enemies_ranked_by_class[e->enemyclass].push_back(e);
+						
+						//setting enemy generators
+						switch (e->enemyclass)
+						{
+							case EnemyClass::ENEMYPOOL_ALPHA:
+							{
+								EnemyGenerator* generator = new EnemyGenerator(3, e->enemyclass);
+								this->sceneEnemyGenerators->push_back(generator);
+							}
+							case EnemyClass::ENEMYPOOL_BETA:
+							{
+								EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass);
+								this->sceneEnemyGenerators->push_back(generator);
+								//this->sceneEnemyGenerators[e->enemyclass]->clockCost = 8;
+								//this->sceneEnemyGenerators[e->enemyclass]->currentClock.restart();
+								break;
+							}
+							case EnemyClass::ENEMYPOOL_DELTA:
+							{
+								EnemyGenerator* generator = new EnemyGenerator(20, e->enemyclass);
+								this->sceneEnemyGenerators->push_back(generator);
+								break;
+							}
+						}
+
 						//hazard value automatic calculation
 						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO * (1 + HAZARD_BREAK_MULTIPLIER*this->hazard_level);
 					}
@@ -242,7 +263,8 @@ void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
-		this->GenerateEnemies(deltaTime);
+		//this->GenerateEnemies(deltaTime);
+		this->GenerateEnemiesv2();
 	}
 
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
@@ -272,6 +294,74 @@ void Scene::Draw(sf::RenderWindow* window)
 	}
 }
 
+void Scene::GenerateEnemiesv2()
+{
+	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
+	{
+		if ((*it)->currentClock.getElapsedTime().asSeconds() > (*it)->clockCost)
+		{
+			(*it)->currentClock.restart();
+			this->SpawnEnemy((*it)->enemyClass);
+			//printf("SPAWN: %d\n", (*it)->enemyClass);
+		}
+	}
+}
+
+void Scene::RestartAllGeneratorsClock(int below_enemy_class)
+{
+	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
+	{
+		if ((*it)->enemyClass < below_enemy_class)
+		{
+			(*it)->currentClock.restart();
+		}
+	}
+}
+
+void Scene::SpawnEnemy(int enemy_class)
+{
+	Enemy* enemy = NULL;
+	//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
+	int dice_roll = (rand() % (this->total_class_probability[enemy_class])) + 1;
+
+	for (std::vector<EnemyBase*>::iterator it = enemies_ranked_by_class[enemy_class].begin(); it != enemies_ranked_by_class[enemy_class].end(); ++it)
+	{
+		if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
+		{
+			enemy = (*it)->enemy->Clone();
+			break;
+		}
+	}
+	assert(enemy != NULL);
+
+	//RANDOM POSITION
+	sf::Vector2f rand_coordinates_min = sf::Vector2f(enemy->m_size.x / 2, -enemy->m_size.y / 2);
+	rand_coordinates_min = Independant::getPosition_for_Direction((*CurrentGame).direction, rand_coordinates_min, false);
+	
+	//length of the allowed spread
+	int i_ = Independant::getDirectionMultiplier((*CurrentGame).direction).y;
+	float allowed_spread = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(i_*(SCENE_SIZE_X - enemy->m_size.x / 2), i_*(SCENE_SIZE_Y - enemy->m_size.x / 2))).x;
+	
+	//cutting clusters bigger than the scene (+ debug message)
+	if ((allowed_spread*Independant::getDirectionMultiplier((*CurrentGame).direction).y) < 0)
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
+		return;
+	}
+	
+	//random value inside the allowed spread
+	float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(0, allowed_spread));
+	
+	//getting position coordinates (min + random value)
+	float pos_x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;
+	float pos_y = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(rand_coordinates_min.y, rand_coordinates_min.y + random_posX)).x;
+	sf::Vector2f pos = sf::Vector2f(pos_x, pos_y);
+	
+	//spawning enemy at the chosen random position
+	enemy->setPosition(pos);
+	(*CurrentGame).addToScene(enemy, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
+}
+
 void Scene::GenerateEnemies(Time deltaTime)
 {
 	if (spawnClock.getElapsedTime() > sf::seconds(4))
@@ -297,11 +387,11 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 		for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 		{
-			for (std::list<EnemyBase>::iterator it = enemies_ranked_by_class[i].begin(); it != enemies_ranked_by_class[i].end(); ++it)
+			for (std::vector<EnemyBase*>::iterator it = enemies_ranked_by_class[i].begin(); it != enemies_ranked_by_class[i].end(); ++it)
 			{
-				if (dice_roll >= it->proba_min && dice_roll <= it->proba_max)
+				if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
 				{
-					random_enemy_within_class[i] = (*it).enemy;
+					random_enemy_within_class[i] = (*it)->enemy;
 				}
 			}
 		}
@@ -326,7 +416,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 				max_enemy_size.y = e->enemy->m_size.y;
 			}
 
-			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].begin()->poolsize--;
+			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].front()->poolsize--;
 
 			cluster->push_back(e);
 		}

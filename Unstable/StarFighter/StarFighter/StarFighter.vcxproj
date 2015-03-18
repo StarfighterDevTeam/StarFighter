@@ -95,6 +95,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Bot.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyGenerator.cpp" />
     <ClCompile Include="EnemyPool.cpp" />
     <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="FX.cpp" />
@@ -126,6 +127,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClInclude Include="Background.h" />
     <ClInclude Include="Bot.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyGenerator.h" />
     <ClInclude Include="EnemyPool.h" />
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="FileLoadUtils.h" />

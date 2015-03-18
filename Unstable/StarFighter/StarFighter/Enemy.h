@@ -64,6 +64,7 @@ private:
 
 struct EnemyBase
 {
+public:
 	Enemy* enemy;
 	int probability;
 	int poolsize;
