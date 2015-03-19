@@ -333,9 +333,9 @@ void Scene::GenerateEnemiesv2()
 			else
 			{
 				//Normal event: spawn enemy, pay total cost
-				
 				this->SpawnEnemy((*it)->enemyClass);
-				(*it)->spawnResource = 0;//TODO: randomize between -0.20 and 0.20
+				float n = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_NORMAL_MINIMUM_RESOURCE, SPAWN_NORMAL_MAXIMUM_RESOURCE));
+				(*it)->spawnResource = 0 + (n*(*it)->spawnCost);
 				this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
 			}
 		}
@@ -343,7 +343,7 @@ void Scene::GenerateEnemiesv2()
 		//DEBUG
 		if ((*it)->enemyClass == 1)
 		{
-			//printf("RESSOURCES: %f\n", (*it)->spawnResource);
+			printf("RESSOURCES: %f\n", (*it)->spawnResource);
 		}
 	}
 	
@@ -352,8 +352,6 @@ void Scene::GenerateEnemiesv2()
 
 void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multiplier, int below_enemy_class)
 {
-	//TODO: refactoriser pour passer le max de fonction dans la classe EnemyGenerator
-	//TODO: delete scene pointers on scene switch
 	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
 	{
 		if ((*it)->enemyClass < below_enemy_class)

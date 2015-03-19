@@ -22,5 +22,6 @@ V_Alpha1_Entry,110,V_Alpha1_laser,V_laserS,0,0,,,0,,,0,,,,0,0,0,0,,0,,,,0,,,
 V_Alpha2_Entry,110,V_Alpha2_ball,V_ballM,0,0,,,0,,,0,,,,0,0,0,0,,positionV,greater,250,V_Alpha2_Exit,life,lesser,0,V_Alpha2_Death
 V_Alpha2_Exit,80,V_Alpha2_ball,V_ballM,0,0,,,0,,,circle,8,1000,1,0,0,0,0,,life,lesser,0,V_Alpha2_Death,0,,,
 V_Alpha2_Death,0,0,,,0,,,0,,,0,,,,0,0,0,V_Alpha2_death,V_ballM,0,,,,0,,,
-V_Beta1_Entry,90,V_Beta1_missile,V_missile,0,V_Beta1_fireball,V_fireball,0,0,,,oscillator,70,100,1,0,0,0,0,,0,,,,0,,,
+V_Beta1_Entry,90,V_Beta1_missile,V_missile,0,V_Beta1_fireball,V_fireball,0,0,,,0,,,,0,0,0,0,,0,,,,0,,,
+V_Beta1_backup,90,V_Beta1_missile,V_missile,0,V_Beta1_fireball,V_fireball,0,0,,,oscillator,70,100,1,0,0,0,0,,0,,,,0,,,
 V_Delta1_Entry,50,V_Delta1_laser,V_laserXL,0,V_Delta1_ball,V_ballM,0,0,,,0,,,,0,0,0,0,,0,,,,0,,,
