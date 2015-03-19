@@ -393,7 +393,7 @@ void Scene::SpawnEnemy(int enemy_class)
 	
 	//length of the allowed spread
 	int i_ = Independant::getDirectionMultiplier((*CurrentGame).direction).y;
-	float allowed_spread = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(i_*(SCENE_SIZE_X - enemy->m_size.x / 2), i_*(SCENE_SIZE_Y - enemy->m_size.x / 2))).x;
+	float allowed_spread = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(i_*(SCENE_SIZE_X - enemy->m_size.x), i_*(SCENE_SIZE_Y - enemy->m_size.x))).x;
 	
 	//cutting clusters bigger than the scene (+ debug message)
 	if ((allowed_spread*Independant::getDirectionMultiplier((*CurrentGame).direction).y) < 0)

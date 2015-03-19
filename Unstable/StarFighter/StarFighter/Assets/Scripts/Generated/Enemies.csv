@@ -5,7 +5,7 @@ Katyusha,5000,20,1,100,laser,fireball,laser_arc,fireball,0,fireball,Assets/2D/SU
 Itsukhoi,2000,20,1,50,laser,fireball,laser_arc,fireball,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,0,LSukhoiIntro
 Hatsuki,2000,20,1,50,laser,fireball,laser_arc,fireball,0,fireball,Assets/2D/SU27.png,60,80,1,90,death_explosion,10,oscillator,30,40,1,0,RSukhoiIntro
 #,,,,,,,,,,,,,,,,,,,,,,,
-V_Alpha1,500,0,0,10,V_Alpha1_laser,V_laserS,0,,0,,Assets/2D/Vanguard/V_Alpha1.png,23,28,3,110,death_explosion,10,0,,,,0,0
-V_Alpha2,500,0,0,10,V_Alpha2_ball,V_ballM,0,,0,,Assets/2D/Vanguard/V_Alpha2.png,23,28,3,110,death_explosion,10,0,,,,0,0
+V_Alpha1,500,0,0,10,V_Alpha1_laser,V_laserS,0,,0,,Assets/2D/Vanguard/V_Alpha1.png,23,28,3,110,death_explosion,10,0,,,,0,V_Alpha1_Entry
+V_Alpha2,500,0,0,10,V_Alpha2_ball,V_ballM,0,,0,,Assets/2D/Vanguard/V_Alpha2.png,23,28,3,110,death_explosion,10,0,,,,0,V_Alpha2_Entry
 V_Beta1,1000,20,1,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta1.png,45,52,1,70,death_explosion,20,0,,,,0,V_Beta1_Entry
 V_Delta1,2000,100,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta1.png,96,130,1,50,death_explosion,50,0,,,,0,V_Delta1_Entry
