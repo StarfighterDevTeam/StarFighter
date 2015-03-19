@@ -143,15 +143,14 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							case EnemyClass::ENEMYPOOL_ALPHA:
 							{
-								EnemyGenerator* generator = new EnemyGenerator(3, e->enemyclass);
+								EnemyGenerator* generator = new EnemyGenerator(2, e->enemyclass);
 								this->sceneEnemyGenerators->push_back(generator);
+								break;
 							}
 							case EnemyClass::ENEMYPOOL_BETA:
 							{
 								EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass);
 								this->sceneEnemyGenerators->push_back(generator);
-								//this->sceneEnemyGenerators[e->enemyclass]->clockCost = 8;
-								//this->sceneEnemyGenerators[e->enemyclass]->currentClock.restart();
 								break;
 							}
 							case EnemyClass::ENEMYPOOL_DELTA:
@@ -185,6 +184,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					if (enemy_count != 0 && this->direction != Directions::NO_DIRECTION)
 					{
 						generating_enemies = true;
+						this->spawnClock.restart();
 					}
 				}
 			}
@@ -298,22 +298,44 @@ void Scene::GenerateEnemiesv2()
 {
 	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
 	{
-		if ((*it)->currentClock.getElapsedTime().asSeconds() > (*it)->clockCost)
+		//SOURCES OF INCREMENTATION
+		//Time
+		(*it)->spawnResource += this->spawnClock.getElapsedTime().asSeconds();
+
+		//SPAWN
+		if ((*it)->spawnResource > (*it)->spawnCost)
 		{
-			(*it)->currentClock.restart();
+			(*it)->spawnResource = 0;
 			this->SpawnEnemy((*it)->enemyClass);
-			//printf("SPAWN: %d\n", (*it)->enemyClass);
+
+			//Collateral cost
+			this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
+		}
+
+		//DEBUG
+		if ((*it)->enemyClass == 1)
+		{
+			printf("RESSOURCES: %f\n", (*it)->spawnResource);
 		}
 	}
+	
+	this->spawnClock.restart();
 }
 
-void Scene::RestartAllGeneratorsClock(int below_enemy_class)
+void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multiplier, int below_enemy_class)
 {
 	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
 	{
 		if ((*it)->enemyClass < below_enemy_class)
 		{
-			(*it)->currentClock.restart();
+			if (collateral_multiplier > 0)
+			{
+				(*it)->spawnResource -= (collatefal_cost * collateral_multiplier);
+			}
+			else
+			{
+				(*it)->spawnResource = 0;
+			}
 		}
 	}
 }

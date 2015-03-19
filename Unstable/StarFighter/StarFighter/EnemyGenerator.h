@@ -6,9 +6,10 @@
 class EnemyGenerator
 {
 public:
-	EnemyGenerator::EnemyGenerator(float m_clockCost, int m_enemyClass);
+	EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass);
 	sf::Clock currentClock;
-	float clockCost;
+	float spawnResource;
+	float spawnCost;
 	int enemyClass;
 };
 

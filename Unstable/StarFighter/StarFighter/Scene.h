@@ -64,7 +64,7 @@ public:
 	vector <EnemyGenerator*> sceneEnemyGenerators[NBVAL_EnemyClass];
 	void GenerateEnemiesv2();
 	void SpawnEnemy(int enemy_class);
-	void RestartAllGeneratorsClock(int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
+	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
 
 private:
 	Ship* playerShip;
