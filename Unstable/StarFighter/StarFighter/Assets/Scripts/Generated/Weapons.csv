@@ -9,8 +9,8 @@ laser_arc,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.8,0,0,7,0,15
 fireball_sinus,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_seaking
 #,,,,,,,,,,,,,,
 V_Alpha1_laser,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.4285714286,0,0,1,,,0,0,seaking
-V_Alpha2_ball,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.2142857143,1,2.5714285714,6,0,90,alternate,0,semi_seaking
-V_Beta1_missile,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,1.7142857143,0,0,2,30,0,alternate,0,seaking
+V_Alpha2_ball,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.8571428571,1,2.5714285714,6,0,90,alternate,0,semi_seaking
+V_Beta1_missile,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.8571428571,0,0,2,30,0,alternate,0,seaking
 V_Beta1_fireball,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.2142857143,3,1.7142857143,1,0,0,alternate,0,semi_seaking
 V_Delta1_laser,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.8571428571,0,0,2,40,0,0,0,seaking
 V_Delta1_ball,Assets/2D/laser_red.png,64,64,1,Assets/Sounds/laser.ogg,0.2142857143,2,0.8571428571,8,0,120,0,0,semi_seaking

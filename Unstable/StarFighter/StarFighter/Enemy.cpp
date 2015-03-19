@@ -106,7 +106,7 @@ void Enemy::update(sf::Time deltaTime)
 	}
 
 	//automatic fire
-	if (isOnScene && hasWeapon)
+	if (this->isOnScene && !this->weapons_list.empty())
 	{
 		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
