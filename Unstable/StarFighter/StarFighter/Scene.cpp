@@ -143,19 +143,19 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							case EnemyClass::ENEMYPOOL_ALPHA:
 							{
-								EnemyGenerator* generator = new EnemyGenerator(2, e->enemyclass);
+								EnemyGenerator* generator = new EnemyGenerator(2, e->enemyclass, 0.10, 0.30);
 								this->sceneEnemyGenerators->push_back(generator);
 								break;
 							}
 							case EnemyClass::ENEMYPOOL_BETA:
 							{
-								EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass);
+								EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass, 0.30, 0.10);
 								this->sceneEnemyGenerators->push_back(generator);
 								break;
 							}
 							case EnemyClass::ENEMYPOOL_DELTA:
 							{
-								EnemyGenerator* generator = new EnemyGenerator(20, e->enemyclass);
+								EnemyGenerator* generator = new EnemyGenerator(20, e->enemyclass, 0.20, 0.30);
 								this->sceneEnemyGenerators->push_back(generator);
 								break;
 							}
@@ -305,17 +305,37 @@ void Scene::GenerateEnemiesv2()
 		//SPAWN
 		if ((*it)->spawnResource > (*it)->spawnCost)
 		{
-			(*it)->spawnResource = 0;
-			this->SpawnEnemy((*it)->enemyClass);
-
-			//Collateral cost
-			this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
+			//Randomization of the event
+			float p = RandomizeFloatBetweenValues(sf::Vector2f(0, 1));
+			if (p < (*it)->spawnRepeatProbability)
+			{
+				//Critical event: spawn enemy, pay discount cost
+				float r = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_REPEAT_MINIMUM_RESOURCE, SPAWN_REPEAT_MAXIMUM_RESOURCE));
+				(*it)->spawnResource *= r;
+				this->SpawnEnemy((*it)->enemyClass);
+				this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
+				//printf("CRITICAL REPEAT class %d\n", (*it)->enemyClass);
+			}
+			else if (p > 1 - (*it)->spawnMissProbability)
+			{
+				//Critical event: don't spawn enemy, but still pay a (discount) cost
+				float m = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_MISS_MINIMUM_RESOURCE, SPAWN_MISS_MAXIMUM_RESOURCE));
+				(*it)->spawnResource *= m;
+				//printf("CRITICAL MISS class %d\n", (*it)->enemyClass);
+			}
+			else
+			{
+				//Normal event: spawn enemy, pay total cost
+				this->SpawnEnemy((*it)->enemyClass);
+				(*it)->spawnResource = 0;
+				this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
+			}
 		}
 
 		//DEBUG
 		if ((*it)->enemyClass == 1)
 		{
-			printf("RESSOURCES: %f\n", (*it)->spawnResource);
+			//printf("RESSOURCES: %f\n", (*it)->spawnResource);
 		}
 	}
 	
@@ -324,6 +344,7 @@ void Scene::GenerateEnemiesv2()
 
 void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multiplier, int below_enemy_class)
 {
+	//TODO: refactoriser pour passer le max de fonction dans la classe EnemyGenerator
 	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
 	{
 		if ((*it)->enemyClass < below_enemy_class)

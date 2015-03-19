@@ -6,11 +6,14 @@
 class EnemyGenerator
 {
 public:
-	EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass);
+	EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass, float m_spawnRepeatProbability = 0, float m_spawnMissProbability = 0);
 	sf::Clock currentClock;
 	float spawnResource;
 	float spawnCost;
 	int enemyClass;
+	float spawnRepeatProbability;
+	float spawnMissProbability;
+
 };
 
 
