@@ -352,6 +352,7 @@ Weapon* Weapon::Clone()
 	weapon->target_seaking = this->target_seaking;
 	weapon->angle_offset = this->angle_offset;
 	weapon->weaponOffset = this->weaponOffset;
+	weapon->frameNumber = this->frameNumber;
 
 	return weapon;
 }

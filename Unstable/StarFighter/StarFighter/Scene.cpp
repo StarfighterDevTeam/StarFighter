@@ -5,6 +5,7 @@ extern Game* CurrentGame;
 void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene, bool first_scene)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading scene '%s'", (char*)name.c_str()));
+	srand(time(NULL));
 	this->m_name = name;
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
@@ -130,6 +131,32 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 							e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
 						}
 						
+						//setting enemy generators: we need to create on generator per class
+						if (this->total_class_probability[e->enemyclass] == 0)
+						{
+							switch (e->enemyclass)
+							{
+								case EnemyClass::ENEMYPOOL_ALPHA:
+								{
+									EnemyGenerator* generator = new EnemyGenerator(2, e->enemyclass, 0.10, 0.30);
+									this->sceneEnemyGenerators->push_back(generator);
+									break;
+								}
+								case EnemyClass::ENEMYPOOL_BETA:
+								{
+									EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass, 0.30, 0.10);
+									this->sceneEnemyGenerators->push_back(generator);
+									break;
+								}
+								case EnemyClass::ENEMYPOOL_DELTA:
+								{
+									EnemyGenerator* generator = new EnemyGenerator(20, e->enemyclass, 0.20, 0.30);
+									this->sceneEnemyGenerators->push_back(generator);
+									break;
+								}
+							}
+						}
+
 						//setting probabilities of spawn within enemy class
 						e->proba_min = this->total_class_probability[e->enemyclass];
 						e->proba_max = e->proba_min + e->probability;
@@ -138,28 +165,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 						this->enemies_ranked_by_class[e->enemyclass].push_back(e);
 						
-						//setting enemy generators
-						switch (e->enemyclass)
-						{
-							case EnemyClass::ENEMYPOOL_ALPHA:
-							{
-								EnemyGenerator* generator = new EnemyGenerator(2, e->enemyclass, 0.10, 0.30);
-								this->sceneEnemyGenerators->push_back(generator);
-								break;
-							}
-							case EnemyClass::ENEMYPOOL_BETA:
-							{
-								EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass, 0.30, 0.10);
-								this->sceneEnemyGenerators->push_back(generator);
-								break;
-							}
-							case EnemyClass::ENEMYPOOL_DELTA:
-							{
-								EnemyGenerator* generator = new EnemyGenerator(20, e->enemyclass, 0.20, 0.30);
-								this->sceneEnemyGenerators->push_back(generator);
-								break;
-							}
-						}
+						
 
 						//hazard value automatic calculation
 						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO * (1 + HAZARD_BREAK_MULTIPLIER*this->hazard_level);
@@ -263,6 +269,7 @@ void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
+		
 		//this->GenerateEnemies(deltaTime);
 		this->GenerateEnemiesv2();
 	}
@@ -326,8 +333,9 @@ void Scene::GenerateEnemiesv2()
 			else
 			{
 				//Normal event: spawn enemy, pay total cost
+				
 				this->SpawnEnemy((*it)->enemyClass);
-				(*it)->spawnResource = 0;
+				(*it)->spawnResource = 0;//TODO: randomize between -0.20 and 0.20
 				this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
 			}
 		}
@@ -345,6 +353,7 @@ void Scene::GenerateEnemiesv2()
 void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multiplier, int below_enemy_class)
 {
 	//TODO: refactoriser pour passer le max de fonction dans la classe EnemyGenerator
+	//TODO: delete scene pointers on scene switch
 	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
 	{
 		if ((*it)->enemyClass < below_enemy_class)
@@ -365,8 +374,9 @@ void Scene::SpawnEnemy(int enemy_class)
 {
 	Enemy* enemy = NULL;
 	//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
-	int dice_roll = (rand() % (this->total_class_probability[enemy_class])) + 1;
-
+	//int dice_roll = (rand() % (this->total_class_probability[enemy_class])) + 1;
+	int dice_roll = RandomizeIntBetweenValues(0, this->total_class_probability[enemy_class]);
+	
 	for (std::vector<EnemyBase*>::iterator it = enemies_ranked_by_class[enemy_class].begin(); it != enemies_ranked_by_class[enemy_class].end(); ++it)
 	{
 		if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
