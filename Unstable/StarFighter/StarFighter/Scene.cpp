@@ -343,7 +343,7 @@ void Scene::GenerateEnemiesv2()
 		//DEBUG
 		if ((*it)->enemyClass == 1)
 		{
-			printf("RESSOURCES: %f\n", (*it)->spawnResource);
+			//printf("RESSOURCES: %f\n", (*it)->spawnResource);
 		}
 	}
 	

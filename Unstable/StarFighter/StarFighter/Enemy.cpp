@@ -13,6 +13,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	hasPhases = false;
 	rotation_speed = 0;
 	face_target = false;
+	reset_facing = false;
 }
 
 void Enemy::update(sf::Time deltaTime)
@@ -51,9 +52,17 @@ void Enemy::update(sf::Time deltaTime)
 	this->setPosition(newposition.x, newposition.y);
 
 	//rotation
-	//calculating angle to rotate toward the nearest target
-	
-	float target_angle = fmod(180 + Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+	//calculating the angle we want to face, if any
+	float target_angle = 0;
+	if (this->reset_facing)
+	{
+		target_angle = Independant::getRotation_for_Direction((*CurrentGame).direction);	
+	}
+	else
+	{
+		target_angle = fmod(180 + Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+	}
+
 	float current_angle = this->getRotation();
 	float delta = current_angle - target_angle;
 	if (delta > 180)
@@ -62,7 +71,8 @@ void Enemy::update(sf::Time deltaTime)
 		delta += 360;
 
 	bool isDoneFiringOnLockedTarget = true;
-	if (!this->face_target)
+
+	if (!this->face_target && !this->reset_facing)
 	{
 		this->rotate(this->rotation_speed*deltaTime.asSeconds());
 	}
@@ -196,6 +206,7 @@ Enemy* Enemy::Clone()
 		enemy->immune = this->immune;
 		enemy->setGhost(this->ghost);
 		enemy->face_target = this->face_target;
+		enemy->reset_facing = this->reset_facing;
 	}
 
 	return enemy;
@@ -410,6 +421,11 @@ void Enemy::setPhase(string phase_name)
 			this->face_target = true;
 			break;
 		}
+		case Modifier::ResetFacing:
+		{
+			this->reset_facing = true;
+			break;
+		}
 	}
 
 	//clearing old weapons and setting new ones
@@ -520,6 +536,10 @@ Phase* Enemy::LoadPhase(string name)
 				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("face_target") == 0)
 				{
 					phase->modifier = Modifier::FaceTarget;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("reset_facing") == 0)
+				{
+					phase->modifier = Modifier::ResetFacing;
 				}
 			}
 

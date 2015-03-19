@@ -185,6 +185,7 @@ public:
 	virtual void GetLoot(Independant& independant);
 	virtual void GetPortal(Independant* independant);
 	void setGhost(bool m_ghost);
+	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
 
 	bool hasEquipmentLoot;
 	void get_equipment_from(Independant& independant);
@@ -248,7 +249,6 @@ protected:
 	std::string textureName;
 	Animation defaultAnimation;
 	Animation* currentAnimation;
-	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
 
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber = 1);

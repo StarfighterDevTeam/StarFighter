@@ -935,7 +935,7 @@ void Ship::update(sf::Time deltaTime)
 	const sf::Vector2f f = (sf::Vector2f)Independant::getDirectionMultiplier((*CurrentGame).direction);
 	const float x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(this->speed.x * f.x, this->speed.y * f.y)).x;
 
-	if (x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight)
+	if (x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight && !this->disable_inputs)
 	{
 		if (!this->ship_config.ship_model->hasFake)
 		{
@@ -947,7 +947,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
-	else if (x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft)
+	else if (x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft && !this->disable_inputs)
 	{
 		if (!this->ship_config.ship_model->hasFake)
 		{
@@ -959,7 +959,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
-	else if (x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle)
+	else if ((x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle) || this->disable_inputs)
 	{
 		if (!this->ship_config.ship_model->hasFake)
 		{
