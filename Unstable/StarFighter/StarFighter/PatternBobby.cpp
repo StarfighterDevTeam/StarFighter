@@ -19,18 +19,19 @@ PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
 		if (line_data[index].compare("line") == 0)
 		{
 			pattern_type = PatternType::Line_;
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2])); // opposite speed (-1), random (0), normal (1)
 		}
 		else if (line_data[index].compare("circle") == 0)
 		{
 			pattern_type = PatternType::Circle_;
 			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // clockwise = 1
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
 		}
 		else if (line_data[index].compare("oscillator") == 0)
 		{
 			pattern_type = PatternType::Oscillator;
 			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // clockwise = 1
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
 		}
 		else if (line_data[index].compare("rectangle") == 0)
 		{
@@ -58,12 +59,29 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 
 	switch(this->currentPattern)
 	{
+		case PatternType::Line_:
+		{
+			//ARGS 
+			// 0 = opposite speed ?
+			// v = speed in px/sec
+			CheckArgSize(1);
+
+			if(this->patternParams->at(0) == 0)
+			{
+				srand(time(NULL));
+				//random between 1 and -1
+				this->patternParams->at(0) = ((rand() % 2) * 2) - 1;
+			}
+
+			break;
+		}
+
 		case PatternType::Rectangle_:
 		{
 			//ARGS 
-			// 0 = longueur
-			// 1 = largeur
-			// v = px/sec
+			// 0 = width
+			// 1 = height
+			// v = speed in px/sec
 			CheckArgSize(2);
 
 			_distance_left = patternParams->at(0);
@@ -76,12 +94,18 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 		{
 			//ARGS 
 			// 0 = rayon
-			// 1 = >=0 for clockwise, other anti_clockwise
+			// 1 = counterclockwise (-1), random (0), clockwise (1)
 			// v = vitesse angulaire (degres/s)
 			CheckArgSize(2);
 
+			if (this->patternParams->at(1) == 0)
+			{
+				srand(time(NULL));
+				//random between 1 and -1
+				this->patternParams->at(1) = ((rand() % 2) * 2) - 1;
+			}
 			this->patternSpeed = patternSpeed*M_PI/180; //converting speed to radians
-			this->_curSandboxPosition_polar = sf::Vector2f(patternParams->at(0),-M_PI_2); //starts on top of the circle (-pi/2)
+			this->_curSandboxPosition_polar = sf::Vector2f(patternParams->at(0), -M_PI_2*patternParams->at(1)); //starts on top of the circle (-pi/2)
 			this->_curSandboxPosition_cartesian = ToCartesianCoords(this->_curSandboxPosition_polar);
 
 			break;
@@ -91,9 +115,16 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 		{
 			//ARGS 
 			// 0 = amplitude
-			// 1 = angle (en degres)
-			// v = vitesse en px/sec
+			// 1 = counterclockwise (-1), random (0), clockwise (1)
+			// v = speed of oscillation
 			CheckArgSize(2);
+
+			if (this->patternParams->at(1) == 0)
+			{
+				srand(time(NULL));
+				//random between 1 and -1
+				this->patternParams->at(1) = ((rand() % 2) * 2) - 1;
+			}
 
 			this->patternSpeed = patternSpeed*2*M_PI/patternParams->at(0); //converting speed to radians (2pi = 1 amplitude)
 
@@ -124,7 +155,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 		{
 			//ARGS 
 			// 0 = xspeed
-			offset.x = patternSpeed*seconds;
+			offset.x = patternSpeed*this->patternParams->at(0)*seconds;
 			offset.y = 0;
 			break;							
 		}
