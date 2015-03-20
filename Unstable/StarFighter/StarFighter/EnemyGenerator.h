@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <assert.h>
+#include "Globals.h"
 
 const float spawnCostCollateralMultiplierTable[NB_HAZARD_LEVELS] = { 0.35, 0.30, 0.25, 0.20, 0.15 };
 
