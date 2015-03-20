@@ -1,5 +1,4 @@
 #include "EnemyGenerator.h"
-#include <assert.h>
 
 EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass, float m_spawnRepeatProbability, float m_spawnMissProbability)
 {
@@ -12,4 +11,5 @@ EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass, float m_spaw
 
 	this->currentClock.restart();
 	this->spawnResource = 0;
+	this->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[0];
 }

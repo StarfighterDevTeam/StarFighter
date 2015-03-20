@@ -15,8 +15,8 @@ int main()
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
 	//Refresh rate
-	renderWindow.setVerticalSyncEnabled(true);
-	//renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+	//renderWindow.setVerticalSyncEnabled(true);
+	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
 
 	//Init SFGUI Window
 	sfg::SFGUI sfgui;

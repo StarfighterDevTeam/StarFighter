@@ -16,6 +16,6 @@ PrefsManager::~PrefsManager()
 
 void PrefsManager::Init()
 {
-	m_gameRefreshRateHz = 56; //18ms ~ 56 Hz
+	m_gameRefreshRateHz = 60; //18ms ~ 56 Hz
 }
 

@@ -139,18 +139,21 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								case EnemyClass::ENEMYPOOL_ALPHA:
 								{
 									EnemyGenerator* generator = new EnemyGenerator(2, e->enemyclass, 0.10, 0.30);
+									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
 									this->sceneEnemyGenerators->push_back(generator);
 									break;
 								}
 								case EnemyClass::ENEMYPOOL_BETA:
 								{
 									EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass, 0.30, 0.10);
+									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
 									this->sceneEnemyGenerators->push_back(generator);
 									break;
 								}
 								case EnemyClass::ENEMYPOOL_DELTA:
 								{
 									EnemyGenerator* generator = new EnemyGenerator(20, e->enemyclass, 0.20, 0.30);
+									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
 									this->sceneEnemyGenerators->push_back(generator);
 									break;
 								}
@@ -269,9 +272,8 @@ void Scene::Update(Time deltaTime)
 {
 	if (this->generating_enemies)
 	{
-		
 		//this->GenerateEnemies(deltaTime);
-		this->GenerateEnemiesv2();
+		this->GenerateEnemiesv2(deltaTime);
 	}
 
 	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
@@ -301,13 +303,13 @@ void Scene::Draw(sf::RenderWindow* window)
 	}
 }
 
-void Scene::GenerateEnemiesv2()
+void Scene::GenerateEnemiesv2(Time deltaTime)
 {
 	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
 	{
 		//SOURCES OF INCREMENTATION
 		//Time
-		(*it)->spawnResource += this->spawnClock.getElapsedTime().asSeconds();
+		(*it)->spawnResource += deltaTime.asSeconds();
 
 		//SPAWN
 		if ((*it)->spawnResource > (*it)->spawnCost)
@@ -320,7 +322,7 @@ void Scene::GenerateEnemiesv2()
 				float r = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_REPEAT_MINIMUM_RESOURCE, SPAWN_REPEAT_MAXIMUM_RESOURCE));
 				(*it)->spawnResource *= r;
 				this->SpawnEnemy((*it)->enemyClass);
-				this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
+				this->CollateralSpawnCost((*it)->spawnCost, (*it)->spawnCostCollateralMultiplier, (*it)->enemyClass);
 				//printf("CRITICAL REPEAT class %d\n", (*it)->enemyClass);
 			}
 			else if (p > 1 - (*it)->spawnMissProbability)
@@ -336,7 +338,7 @@ void Scene::GenerateEnemiesv2()
 				this->SpawnEnemy((*it)->enemyClass);
 				float n = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_NORMAL_MINIMUM_RESOURCE, SPAWN_NORMAL_MAXIMUM_RESOURCE));
 				(*it)->spawnResource = 0 + (n*(*it)->spawnCost);
-				this->CollateralSpawnCost((*it)->spawnCost, COLLATERAL_SPAWN_COST_MULTIPLIER, (*it)->enemyClass);
+				this->CollateralSpawnCost((*it)->spawnCost, (*it)->spawnCostCollateralMultiplier, (*it)->enemyClass);
 			}
 		}
 
