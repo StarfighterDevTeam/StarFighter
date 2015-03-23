@@ -31,6 +31,7 @@ public:
 	void InGameStateMachineCheck();
 	sf::Clock clockHubExit;
 	sf::Clock bossSpawnCountdown;
+	bool hasDisplayedDestructionRatio;
 
 private:
 	sf::RenderWindow* mainWindow;

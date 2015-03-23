@@ -66,6 +66,8 @@ public:
 	void SpawnEnemy(int enemy_class);
 	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
 
+	void HazardBreak();
+
 private:
 	Ship* playerShip;
 	list<EnemyBase*> enemies;
@@ -78,8 +80,6 @@ private:
 	int hazard_level;
 
 	sf::Clock clockHubExit;
-
-	void HazardBreakEvent();
 };
 
 #endif // STARFIGHTER_H_INCLUDED

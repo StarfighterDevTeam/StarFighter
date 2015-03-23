@@ -20,7 +20,7 @@ void Game::init(RenderWindow* window)
 	scale_factor.x = float(WINDOW_RESOLUTION_X) / float(REF_WINDOW_RESOLUTION_X);
 	scale_factor.y = float(WINDOW_RESOLUTION_Y) / float(REF_WINDOW_RESOLUTION_Y);
 
-	this->hazard = 0;//initalisation of the scoring system
+	this->resetHazard();;//initalisation of the scoring system
 	this->BeastScoreBonus = 0;
 	this->direction = Directions::NO_DIRECTION;
 }
@@ -132,7 +132,7 @@ void Game::colisionChecksV2()
 						(*it1)->Death();
 						//we all deserve another chance...
 						(*it1)->Respawn();
-						hazard = 0;
+						//hazard = 0;
 					}
 				}
 			}
@@ -329,10 +329,6 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 			(*it)->GarbageMe = true;
 		}
 	}
-	if (clear_count > 0)
-	{
-		printf("DEBUG: Clearing enemies that remained out of the scene (last screen = no spawn anymore) (number: %d).\n", clear_count);
-	}
 }
 
 void Game::SetLayerRotation(LayerType m_layer, float angle)
@@ -369,6 +365,7 @@ int Game::getHazard()
 void Game::resetHazard(int hazard_overkill)
 {
 	hazard = hazard_overkill;
+	hazardSpawned = 0;
 }
 
 void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore)

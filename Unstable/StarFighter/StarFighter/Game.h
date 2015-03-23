@@ -45,6 +45,9 @@ public:
 	sf::Vector2f scale_factor;
 	Directions direction;
 
+	int hazard;
+	int hazardSpawned;
+
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
 	void GetBeastScoreBonus (float m_playerShipBeastScore, float m_sceneBeastScore);
@@ -56,7 +59,6 @@ private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	Clock sceneChronometer;
 	float movementClock;
-	int hazard;
 	float BeastScoreBonus;
 	RenderWindow *window;
 	std::list<Independant*> sceneIndependants;

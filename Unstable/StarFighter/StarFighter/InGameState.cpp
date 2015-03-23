@@ -214,6 +214,7 @@ void InGameState::InGameStateMachineCheck()
 						this->bossSpawnCountdown.restart();
 					}
 					
+					this->hasDisplayedDestructionRatio = false;
 					this->IG_State = InGameStateMachine::LAST_SCREEN;
 				}
 			}
@@ -226,7 +227,33 @@ void InGameState::InGameStateMachineCheck()
 			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
 			if ((*CurrentGame).isLastEnemyDead())
 			{
+				//trigger hazard break event (spawning boss) if destructions are 100.00% and we reached the last scene before a hub
+				if (!this->currentScene->m_hazardbreak_has_occurred && !this->hasDisplayedDestructionRatio && this->currentScene->generating_boss)
+				{
+					//displaying the xx.xx% of destruction
+					//int pourcentage = 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned;
+					printf("Destructions: %d / %d [%.2f%%]. ", (*CurrentGame).getHazard(), (*CurrentGame).hazardSpawned, roundf(100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned));
+					this->hasDisplayedDestructionRatio = true;
+					if ((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0)
+					{
+						this->currentScene->m_hazardbreak_has_occurred = true;
+						printf("SPAWNING BOSS...\n");
+					}
+					else
+					{
+						printf("No hazard break event\n");
+					}
+
+					(*CurrentGame).resetHazard();
+				}
+				else if (!this->hasDisplayedDestructionRatio)
+				{
+					printf("No boss to spawn.\n");
+					this->hasDisplayedDestructionRatio = true;
+				}
+				
 				this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
+
 				if (this->currentScene->m_hazardbreak_has_occurred && this->currentScene->generating_boss)
 				{
 					if (bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
@@ -276,6 +303,7 @@ void InGameState::InGameStateMachineCheck()
 			if ((*CurrentGame).isLastEnemyDead())
 			{
 				this->currentScene->generating_boss = false;
+				this->currentScene->HazardBreak();
 				this->IG_State = InGameStateMachine::LAST_SCREEN;
 			}
 
@@ -346,7 +374,6 @@ void InGameState::InGameStateMachineCheck()
 
 				//Wiping the previous background and swapping with the new one
 				this->currentScene->bg->GarbageMe = true;
-				(*CurrentGame).resetHazard();
 				*this->currentScene = *this->nextScene;
 				(*CurrentGame).direction = this->currentScene->direction;
 

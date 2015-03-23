@@ -255,10 +255,10 @@ void Scene::Update(Time deltaTime)
 		this->GenerateEnemiesv2(deltaTime);
 	}
 
-	if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
-	{
-		HazardBreakEvent();
-	}
+	//if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
+	//{
+	//	HazardBreakEvent();
+	//}
 }
 
 void Scene::GenerateBoss()
@@ -324,7 +324,7 @@ void Scene::GenerateEnemiesv2(Time deltaTime)
 		//DEBUG
 		if ((*it)->enemyClass == 1)
 		{
-			printf("RESSOURCES: %f\n", (*it)->spawnResource);
+			//printf("RESSOURCES: %f / %f\n", (*it)->spawnResource, (*it)->spawnCost);
 		}
 	}
 	
@@ -372,6 +372,9 @@ void Scene::SpawnEnemy(int enemy_class)
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).direction, enemy->m_size);
 	enemy->setPosition(pos);
 	(*CurrentGame).addToScene(enemy, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
+
+	//counting spawned enemies
+	(*CurrentGame).hazardSpawned += enemy->getMoney();
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
@@ -443,14 +446,13 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 1.5, 2.0 };
 
-void Scene::HazardBreakEvent()
+void Scene::HazardBreak()
 {
 	//(*CurrentGame).resetHazard((*CurrentGame).getHazard() - hazard_break_value);
 	//hazard_break_value *= (1 + HAZARD_BREAK_MULTIPLIER);
 	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS - 1)
 	{
 		hazard_level++;
-		m_hazardbreak_has_occurred = true;
 	}
 	
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", this->hazard_level + 1));
