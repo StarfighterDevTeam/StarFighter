@@ -5,5 +5,5 @@ Vanguard_V2 0
 Vertigo_I 0
 scene1 2
 scene2 0
-scene3 0
+scene3 1
 scene4 0

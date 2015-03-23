@@ -49,11 +49,3 @@ void Portal::Close()
 		this->setAnimationLine(PortalAnimation::PortalClosing, false);
 	}
 }
-
-void Portal::Vanish()
-{
-	if (this->currentAnimationIndex != PortalAnimation::PortalClosing && this->currentAnimationIndex != PortalAnimation::PortalCloseIdle)
-	{
-		this->setAnimationLine(PortalAnimation::PortalClosing, false);
-	}
-}

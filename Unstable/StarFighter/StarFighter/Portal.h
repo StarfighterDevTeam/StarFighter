@@ -30,7 +30,6 @@ public:
 	PortalState state;
 	void Open();
 	void Close();
-	void Vanish();
 	Directions direction;
 };
 

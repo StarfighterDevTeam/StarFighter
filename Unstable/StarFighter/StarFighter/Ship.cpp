@@ -781,7 +781,7 @@ void Ship::update(sf::Time deltaTime)
 			{
 				if (InputGuy::isFiring())
 				{
-					if (this->targetPortal->state == PortalState::PortalOpen)
+					if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
 					{
 						isUsingPortal = true;
 
