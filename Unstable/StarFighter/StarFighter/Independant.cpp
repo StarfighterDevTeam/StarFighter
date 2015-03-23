@@ -739,3 +739,35 @@ sf::Vector2f Independant::setPosition_Y_for_Direction(Directions direction, sf::
 		}
 	}
 }
+
+sf::Vector2f Independant::getRandomXSpawnPosition(Directions direction, sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
+{
+	//default argument for cluster dize
+	if (cluster_size == sf::Vector2f(0, 0))
+	{
+		cluster_size = max_enemy_size;
+	}
+
+	//now calculating the starting coordinate (left)
+	sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x / 2, -cluster_size.y / 2);
+	rand_coordinates_min = Independant::getPosition_for_Direction(direction, rand_coordinates_min, false);
+
+	//length of the allowed spread
+	int i_ = Independant::getDirectionMultiplier(direction).y;
+	float allowed_spread = Independant::getSize_for_Direction(direction, sf::Vector2f(i_*(SCENE_SIZE_X - cluster_size.x), i_*(SCENE_SIZE_Y - cluster_size.x))).x;
+
+	//cutting clusters bigger than the scene (+ debug message)
+	if ((allowed_spread*Independant::getDirectionMultiplier(direction).y) < 0)
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
+	}
+
+	//random value inside the allowed spread
+	float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(0, allowed_spread));
+
+	//getting position coordinates (min + random value)
+	float pos_x = Independant::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;
+	float pos_y = Independant::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.y, rand_coordinates_min.y + random_posX)).x;
+
+	return sf::Vector2f(pos_x, pos_y);
+}
