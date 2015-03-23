@@ -67,20 +67,19 @@ EnemyPool* FileLoader::LoadEnemyPool(string name)
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPool '%s'. Please check the config file",name));
 }
 
-EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize, int enemyClass)
+EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_enemyClass)
 {
 	list<vector<string>> enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
 
 	for (std::list<vector<string>>::iterator it = (enemyConfig).begin(); it != (enemyConfig).end(); it++)
 	{
-		if((*it)[0].compare(name) == 0)
+		if ((*it)[0].compare(m_name) == 0)
 		{
 			EnemyBase* base = new EnemyBase;
 			base->enemy = new Enemy(sf::Vector2f(0, 0), sf::Vector2f(0, stoi((*it)[EnemyData::ENEMY_SPEED])), (*it)[EnemyData::ENEMY_IMAGE_NAME], sf::Vector2f(stoi((*it)[EnemyData::ENEMY_WIDTH]), stoi((*it)[EnemyData::ENEMY_HEIGHT])), LoadFX((*it)[EnemyData::ENEMY_FX_DEATH]), stoi((*it)[EnemyData::ENEMY_FRAMES]));
-			base->probability = probability;
-			base->poolsize = poolSize;
-			base->enemyclass = enemyClass;
-			base->enemy->enemy_class = (EnemyClass)enemyClass;
+			base->probability = m_probability;
+			base->enemyclass = m_enemyClass;
+			base->enemy->enemy_class = (EnemyClass)m_enemyClass;
 
 			((Independant*)base->enemy)->armor = stoi((*it)[EnemyData::ENEMY_ARMOR]);
 			((Independant*)base->enemy)->armor_max = stoi((*it)[EnemyData::ENEMY_ARMOR]);
@@ -123,7 +122,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int poolSize,
 		}
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Enemy '%s'. Please check the config file",name));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Enemy '%s'. Please check the config file", m_name));
 }
 
 Weapon* FileLoader::LoadWeapon(string name, int fire_direction, Ammo* ammo)

@@ -40,8 +40,10 @@ enum SceneDataEnemy
 	SCENE_COMPARE_ENEMY,//0
 	ENEMY,//1
 	ENEMY_PROBABILITY,//2
-	ENEMY_POOLSIZE,//3
-	ENEMY_CLASS,//4
+	ENEMY_CLASS,//3
+	ENEMY_CLASS_SPAWNCOST,//4
+	ENEMY_CLASS_REPEAT_CHANCE,//5
+	ENEMY_CLASS_MISS_CHANCE,//6
 };
 
 enum SceneDataBoss
@@ -172,7 +174,7 @@ class FileLoader
 public:
 	static ShipConfig* LoadShipConfig(string name);
 	static ShipModel* LoadShipModel(string name);
-	static EnemyBase*  LoadEnemyBase(string name, int probability, int poolSize, int enemyClass);
+	static EnemyBase*  LoadEnemyBase(string m_name, int m_probability, int m_enemyClass);
 	static EnemyPool*  LoadEnemyPool(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);

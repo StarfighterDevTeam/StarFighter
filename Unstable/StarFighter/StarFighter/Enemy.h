@@ -69,8 +69,10 @@ struct EnemyBase
 public:
 	Enemy* enemy;
 	int probability;
-	int poolsize;
 	int enemyclass;
+	float spawnCost;
+	float repeatChance;
+	float missChance;
 	int proba_min;//interval of dice roll values for a hit
 	int proba_max;
 };

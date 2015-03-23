@@ -124,7 +124,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					//Loading enemies
 					else if ((*it)[0].compare("enemy") == 0)
 					{
-						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_POOLSIZE]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 						
 						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
 						if (!e->enemy->hasPhases)
@@ -135,30 +135,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						//setting enemy generators: we need to create on generator per class
 						if (this->total_class_probability[e->enemyclass] == 0)
 						{
-							switch (e->enemyclass)
-							{
-								case EnemyClass::ENEMYPOOL_ALPHA:
-								{
-									EnemyGenerator* generator = new EnemyGenerator(0.5, e->enemyclass, 0.10, 0.30);
-									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
-									this->sceneEnemyGenerators->push_back(generator);
-									break;
-								}
-								case EnemyClass::ENEMYPOOL_BETA:
-								{
-									EnemyGenerator* generator = new EnemyGenerator(6, e->enemyclass, 0.30, 0.10);
-									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
-									this->sceneEnemyGenerators->push_back(generator);
-									break;
-								}
-								case EnemyClass::ENEMYPOOL_DELTA:
-								{
-									EnemyGenerator* generator = new EnemyGenerator(20, e->enemyclass, 0.20, 0.30);
-									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
-									this->sceneEnemyGenerators->push_back(generator);
-									break;
-								}
-							}
+							EnemyGenerator* generator = new EnemyGenerator(stof((*it)[SceneDataEnemy::ENEMY_CLASS_SPAWNCOST]), e->enemyclass, 
+								stof((*it)[SceneDataEnemy::ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[SceneDataEnemy::ENEMY_CLASS_MISS_CHANCE]));
+							generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
+							this->sceneEnemyGenerators->push_back(generator);
 						}
 
 						//setting probabilities of spawn within enemy class
@@ -168,17 +148,15 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						enemy_count += e->proba_max;
 
 						this->enemies_ranked_by_class[e->enemyclass].push_back(e);
-						
-						
 
 						//hazard value automatic calculation
-						hazard_break_value += e->enemy->getMoney() * e->poolsize * HAZARD_BREAK_RATIO * (1 + HAZARD_BREAK_MULTIPLIER*this->hazard_level);
+						hazard_break_value = 10;
 					}
 
 					//loading boss
 					else if ((*it)[0].compare("boss") == 0)
 					{
-						EnemyBase* boss = FileLoader::LoadEnemyBase((*it)[SceneDataBoss::BOSS], 1, 1, stoi((*it)[SceneDataBoss::BOSS_CLASS]));
+						EnemyBase* boss = FileLoader::LoadEnemyBase((*it)[SceneDataBoss::BOSS], 1, stoi((*it)[SceneDataBoss::BOSS_CLASS]));
 						if (!boss->enemy->hasPhases)
 						{
 							boss->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, boss->enemy->speed.y);
@@ -346,7 +324,7 @@ void Scene::GenerateEnemiesv2(Time deltaTime)
 		//DEBUG
 		if ((*it)->enemyClass == 1)
 		{
-			//printf("RESSOURCES: %f\n", (*it)->spawnResource);
+			printf("RESSOURCES: %f\n", (*it)->spawnResource);
 		}
 	}
 	
@@ -448,49 +426,18 @@ void Scene::GenerateEnemies(Time deltaTime)
 			if (e->enemy->m_size.y > max_enemy_size.y)
 			{
 				max_enemy_size.y = e->enemy->m_size.y;
+
+				cluster->push_back(e);
 			}
 
-			enemies_ranked_by_class[EnemyClass::ENEMYPOOL_ALPHA].front()->poolsize--;
+			sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y);
 
-			cluster->push_back(e);
+			//RANDOM POSITION TO SPAWN THE CLUSTER
+			sf::Vector2f pos = cluster->front()->enemy->getRandomXSpawnPosition((*CurrentGame).direction, max_enemy_size, size);
+
+			//generating the cluster at the given coordinates
+			EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
 		}
-
-		sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y);
-
-		//RANDOM POSITION TO SPAWN THE CLUSTER
-		sf::Vector2f pos = cluster->front()->enemy->getRandomXSpawnPosition((*CurrentGame).direction, max_enemy_size, size);
-		
-		//printf("Random spawn pos: %f, %f.\n\n", pos.x, pos.y);
-
-		//generating the cluster at the given coordinates
-		EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
-
-		// OLD MAIS FONCTIONNEL = BACKUP
-		/*
-		for (std::list<EnemyBase>::iterator it = (this->enemies).begin(); it != (this->enemies).end(); it++)
-		{
-		if(it->probability > random_number && it->poolsize > 0)
-		{
-		//spawn (where on screen ?)
-
-		Enemy* n = it->enemy->Clone();
-		n->setPosition(rand() % SCENE_SIZE_X,-n->m_size.y*2);
-		n->setVisible(true);
-
-		//Pattern definition snipet
-		//vector<float>* v = new vector<float>;
-		//v->push_back(60); // rayon 60px
-		//v->push_back(1);  // clockwise (>)
-		//n->Pattern.SetPattern(PatternType::Circle_, 100,v); //vitesse angulaire (degres/s)
-
-		it->poolsize--;
-
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("spawning enemy '%s' (x=%.1f) [pool=%d] (class=%d)",it->enemy->getName().c_str(),n->getPosition().x,it->poolsize, it->enemyclass));
-
-		(*CurrentGame).addToScene((Independant*)n,LayerType::EnemyObjectLayer,IndependantType::EnemyObject);
-		}
-		}
-		*/
 	}
 }
 
