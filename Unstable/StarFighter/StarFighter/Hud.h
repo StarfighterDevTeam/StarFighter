@@ -13,7 +13,7 @@ class PlayerHud
 public:
 	PlayerHud();
 	void Init(int m_armor, int m_shield);
-	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, int m_hazard_score, int m_hazard_break_value, std::string scene_name, sf::Time deltaTime);
+	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub);
 	void Draw (sf::RenderWindow* window);
 
 private:
@@ -22,17 +22,10 @@ private:
 	sf::Text Money;
 	sf::Text GrazeScore;
 	sf::Text SceneName;
-
 	sf::Font* font;
 	sf::Font* font2;
-
-	sf::RectangleShape hazardBar;
-	sf::RectangleShape hazardBarMax;
-	sf::Text* hazardBreakText;
-	sf::Text* hazardBreakScore;
 	sf::Text* framerate;
 
-	bool no_hazard_value;
 	bool max_hazard_level_reached;
 	bool has_shield;
 };

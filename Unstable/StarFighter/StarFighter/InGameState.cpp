@@ -64,7 +64,7 @@ void InGameState::Update(Time deltaTime)
 	this->mainWindow->clear();
 
 	this->hud->Update((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-		(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), (*CurrentGame).getHazard(), this->currentScene->getSceneHazardBreakValue(), this->currentScene->bg->display_name, deltaTime);
+		(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION);
 }
 
 void InGameState::Draw()

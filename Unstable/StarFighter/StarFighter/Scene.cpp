@@ -11,7 +11,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	{
 		this->total_class_probability[i] = 0;
 	}
-	this->hazard_break_value = 0;
 	this->generating_enemies = false;
 	this->generating_boss = false;
 	this->hazard_level = hazard_level;
@@ -148,9 +147,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						enemy_count += e->proba_max;
 
 						this->enemies_ranked_by_class[e->enemyclass].push_back(e);
-
-						//hazard value automatic calculation
-						hazard_break_value = 10;
 					}
 
 					//loading boss
@@ -254,11 +250,6 @@ void Scene::Update(Time deltaTime)
 		//this->GenerateEnemies(deltaTime);
 		this->GenerateEnemiesv2(deltaTime);
 	}
-
-	//if ((*CurrentGame).getHazard() > hazard_break_value - 1 && hazard_break_value > 0 && !m_hazardbreak_has_occurred)
-	//{
-	//	HazardBreakEvent();
-	//}
 }
 
 void Scene::GenerateBoss()
@@ -448,8 +439,6 @@ float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 
 
 void Scene::HazardBreak()
 {
-	//(*CurrentGame).resetHazard((*CurrentGame).getHazard() - hazard_break_value);
-	//hazard_break_value *= (1 + HAZARD_BREAK_MULTIPLIER);
 	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS - 1)
 	{
 		hazard_level++;
@@ -472,11 +461,6 @@ float Scene::getSceneBeastScore()
 	}
 
 	return bonus;
-}
-
-int Scene::getSceneHazardBreakValue()
-{
-	return this->hazard_break_value;
 }
 
 int Scene::getSceneHazardLevelValue()

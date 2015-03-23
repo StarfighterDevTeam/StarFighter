@@ -57,7 +57,6 @@ public:
 	bool generating_boss;
 	sf::Clock spawnClock;
 
-	int getSceneHazardBreakValue();
 	int getSceneHazardLevelValue();
 	std::string links[Directions::NO_DIRECTION];
 
