@@ -221,6 +221,7 @@ public:
 	int animationNumber;
 	int frameNumber;
 	int currentAnimationIndex;
+	bool isUsingPortal;
 
 	//TIPS:
 	// direction = the scene border you refer too

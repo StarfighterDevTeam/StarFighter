@@ -794,35 +794,33 @@ void Ship::update(sf::Time deltaTime)
 			}
 		}
 		//Fire function
-		else if (!disable_fire)
+		if (!disable_fire && !isUsingPortal)
 		{
 			if (InputGuy::isFiring() || this->ship_config.automatic_fire)
 			{
+				if (this->ship_config.hasWeapon)
 				{
-					if (this->ship_config.hasWeapon)
+					float sizeY = this->m_size.y;
+					if (this->ship_config.ship_model->hasFake)
 					{
-						float sizeY = this->m_size.y;
-						if (this->ship_config.ship_model->hasFake)
+						if (this->ship_config.ship_model->fake_size.y > sizeY)
 						{
-							if (this->ship_config.ship_model->fake_size.y > sizeY)
-							{
-								sizeY = this->ship_config.ship_model->fake_size.y;
-							}
+							sizeY = this->ship_config.ship_model->fake_size.y;
 						}
-						
-						float theta = this->getRotation() / 180 * M_PI;
-
-						float x_weapon_offset = sizeY / 2 * sin(theta);
-						float y_weapon_offset = -sizeY / 2 * cos(theta);
-
-						ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
-						ship_config.weapon->shot_angle = theta;
-						ship_config.weapon->Fire(FriendlyFire);
-
-						//speed malus when shooting
-						speed.x *= SHIP_SHOOTING_MALUS_SPEED;
-						speed.y *= SHIP_SHOOTING_MALUS_SPEED;
 					}
+						
+					float theta = this->getRotation() / 180 * M_PI;
+
+					float x_weapon_offset = sizeY / 2 * sin(theta);
+					float y_weapon_offset = -sizeY / 2 * cos(theta);
+
+					ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
+					ship_config.weapon->shot_angle = theta;
+					ship_config.weapon->Fire(FriendlyFire);
+
+					//speed malus when shooting
+					speed.x *= SHIP_SHOOTING_MALUS_SPEED;
+					speed.y *= SHIP_SHOOTING_MALUS_SPEED;
 				}
 			}
 		}

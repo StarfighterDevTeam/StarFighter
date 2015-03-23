@@ -40,6 +40,7 @@ Independant::Independant()
 	this->disable_fire = false;
 	this->wake_up = true;
 	this->rotation_speed = 0.f;
+	this->isUsingPortal = false;
 }
 
 void Independant::setAnimationLine(int m_animation, bool keep_frame_index)

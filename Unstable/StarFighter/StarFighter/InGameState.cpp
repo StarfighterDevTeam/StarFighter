@@ -299,7 +299,10 @@ void InGameState::InGameStateMachineCheck()
 				(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
 				this->nextScene->bg->SetPortalsState(PortalState::PortalGhost);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
-				(*CurrentGame).garbageLayer(LayerType::BotLayer);
+				if (this->nextScene->direction == Directions::NO_DIRECTION)
+				{
+					(*CurrentGame).garbageLayer(LayerType::BotLayer);
+				}
 
 				this->IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
 			}
@@ -329,7 +332,10 @@ void InGameState::InGameStateMachineCheck()
 				{
 					this->IG_State = InGameStateMachine::SCROLLING;
 					(*CurrentGame).playerShip->disable_fire = false;
-					(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+					if (this->currentScene->direction == Directions::NO_DIRECTION)
+					{
+						(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+					}
 					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));

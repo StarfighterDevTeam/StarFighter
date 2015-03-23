@@ -184,7 +184,6 @@ public :
 	void GetPortal(Independant* independant) override;
 	Portal* targetPortal;
 	bool isCollindingWithPortal;
-	bool isUsingPortal;
 	bool isFiringButtonPressed;
 	void GetGrazing() override;
 	int getGrazeCount();
