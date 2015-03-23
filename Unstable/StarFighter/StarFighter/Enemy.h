@@ -47,6 +47,7 @@ public:
 
 	//phases
 	void setPhase(string phase_name);
+	void setPhase(Phase* m_phase);
 	Phase* currentPhase;
 	bool hasPhases;
 	bool CheckCondition();

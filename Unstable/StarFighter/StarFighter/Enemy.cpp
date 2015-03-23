@@ -201,12 +201,7 @@ Enemy* Enemy::Clone()
 	{
 		enemy->hasPhases = this->hasPhases;
 		enemy->currentPhase = this->currentPhase;
-		enemy->enemyClock.restart();
-		enemy->wake_up = this->wake_up;
-		enemy->immune = this->immune;
-		enemy->setGhost(this->ghost);
-		enemy->face_target = this->face_target;
-		enemy->reset_facing = this->reset_facing;
+		enemy->setPhase(this->currentPhase);
 	}
 
 	return enemy;
@@ -380,13 +375,12 @@ bool Enemy::CheckCondition()
 	return false;
 }
 
-void Enemy::setPhase(string phase_name)
+void Enemy::setPhase(Phase* m_phase)
 {
-	Phase* phase = this->LoadPhase(phase_name);
-	this->currentPhase = phase;
+	this->currentPhase = m_phase;
 	this->phaseClock.restart();
 
-	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
+	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, m_phase->vspeed);
 
 	//reset old stats
 	this->immune = false;
@@ -394,7 +388,7 @@ void Enemy::setPhase(string phase_name)
 	this->face_target = false;
 
 	//load new stats
-	switch (phase->modifier)
+	switch (m_phase->modifier)
 	{
 		case Modifier::NoModifier:
 		{
@@ -430,31 +424,31 @@ void Enemy::setPhase(string phase_name)
 
 	//clearing old weapons and setting new ones
 	this->weapons_list.clear();
-	for (std::list<Weapon*>::iterator it = (phase->weapons_list.begin()); it != (phase->weapons_list.end()); it++)
+	for (std::list<Weapon*>::iterator it = (m_phase->weapons_list.begin()); it != (m_phase->weapons_list.end()); it++)
 	{
 		this->weapons_list.push_back((*it)->Clone());
 	}
-	
+
 	//movement
-	this->Pattern.SetPattern(phase->Pattern->currentPattern, phase->Pattern->patternSpeed, phase->Pattern->patternParams); //vitesse angulaire (degres/s)
-	this->rotation_speed = phase->rotation_speed;
+	this->Pattern.SetPattern(m_phase->Pattern->currentPattern, m_phase->Pattern->patternSpeed, m_phase->Pattern->patternParams); //vitesse angulaire (degres/s)
+	this->rotation_speed = m_phase->rotation_speed;
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
-	if (phase->hasWelcomeShot)
+	if (m_phase->hasWelcomeShot)
 	{
 		float theta = this->getRotation() / 180 * M_PI;
-		float weapon_offset_x = phase->welcomeWeapon->weaponOffset.x - this->m_size.y / 2 * sin(theta);
-		float weapon_offset_y = phase->welcomeWeapon->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+		float weapon_offset_x = m_phase->welcomeWeapon->weaponOffset.x - this->m_size.y / 2 * sin(theta);
+		float weapon_offset_y = m_phase->welcomeWeapon->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
-		phase->welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
-		phase->welcomeWeapon->shot_angle = theta;
+		m_phase->welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
+		m_phase->welcomeWeapon->shot_angle = theta;
 
-		phase->welcomeWeapon->Fire(IndependantType::EnemyFire);
+		m_phase->welcomeWeapon->Fire(IndependantType::EnemyFire);
 	}
 
 	//setting up wake_up condition
 	bool wake_up_condition_exists = false;
-	for (std::list<ConditionTransition*>::iterator it = (phase->transitions_list.begin()); it != (phase->transitions_list.end()); it++)
+	for (std::list<ConditionTransition*>::iterator it = (m_phase->transitions_list.begin()); it != (m_phase->transitions_list.end()); it++)
 	{
 		if ((*it)->condition == ConditionType::wakeUp)
 		{
@@ -469,10 +463,17 @@ void Enemy::setPhase(string phase_name)
 	}
 
 	//waking up enemies
-	if (phase->hasWakeUp)
+	if (m_phase->hasWakeUp)
 	{
-		(*CurrentGame).WakeUpEnemiesWithName(phase->wake_up_name);
+		(*CurrentGame).WakeUpEnemiesWithName(m_phase->wake_up_name);
 	}
+}
+
+void Enemy::setPhase(string phase_name)
+{
+	Phase* phase = this->LoadPhase(phase_name);
+	this->setPhase(phase);
+	
 }
 
 Phase* Enemy::LoadPhase(string name)

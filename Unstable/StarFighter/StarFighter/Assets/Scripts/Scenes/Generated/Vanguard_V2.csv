@@ -1,8 +1,10 @@
 #,filename,width,height,vspeed,Vertical/Horizontal
 bg,Assets/2D/background.png,800,1800,15,V
 #,enemies_name,proba,pool_size,enemy_class,
-enemy,robert,0,2,1,
-enemy,roger,2,1,1,
+enemy,V_Alpha1,1,2,1,
+enemy,V_Alpha2,3,2,1,
+enemy,V_Beta1,1,2,3,
+enemy,V_Delta1,1,2,5,
 #,name,enemy_class,spawnX,spawnY,
 boss,Katyusha,4,900,120,
 boss,Itsukhoi,5,1000,50,

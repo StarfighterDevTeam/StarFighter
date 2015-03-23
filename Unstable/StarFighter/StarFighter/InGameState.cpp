@@ -206,6 +206,8 @@ void InGameState::InGameStateMachineCheck()
 					//Correct the position
 					this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2));
 					this->currentScene->bg->speed = sf::Vector2f(0, 0);
+
+					//Stop spawning enemies
 					this->currentScene->generating_enemies = false;
 					if (this->currentScene->generating_boss)
 					{
@@ -244,7 +246,7 @@ void InGameState::InGameStateMachineCheck()
 						reverse = true;
 					}
 					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
-					this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), false, false);
+					this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
 
 					//Putting the player on rails
 					(*CurrentGame).playerShip->disable_inputs = true;
@@ -274,12 +276,6 @@ void InGameState::InGameStateMachineCheck()
 			if ((*CurrentGame).isLastEnemyDead())
 			{
 				this->currentScene->generating_boss = false;
-
-				//Putting the player on rails
-				(*CurrentGame).playerShip->disable_inputs = true;
-				(*CurrentGame).playerShip->disable_fire = true;
-				(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
-
 				this->IG_State = InGameStateMachine::LAST_SCREEN;
 			}
 

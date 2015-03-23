@@ -18,7 +18,7 @@ KatyushaFullLife,0,laser_fast,fireball,0,laser_arc,fireball_blue,0,0,,0,circle,7
 KatyushaMidLife,0,laser_fast,fireball,0,laser_arc,fireball_blue,0,laser,fireball,0,circle,100,100,1,0,0,0,0,,0,,,,0,,,
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,
-V_Alpha1_Entry,110,V_Alpha1_laser,V_laserS,0,0,,,0,,,0,,,0,0,0,0,0,,0,,,,0,,,
+V_Alpha1_Entry,110,V_Alpha1_laser,V_laserM,0,0,,,0,,,0,,,0,0,0,0,0,,0,,,,0,,,
 V_Alpha2_Entry,110,V_Alpha2_ball,V_ballM,0,0,,,0,,,0,,,0,0,0,0,0,,positionV,greater,250,V_Alpha2_Exit,0,,,
 V_Alpha2_Exit,80,V_Alpha2_ball,V_ballM,0,0,,,0,,,circle,8,1000,0,0,0,0,0,,0,,,,0,,,
 V_Beta1_Entry,90,V_Beta1_missile,V_missile,0,V_Beta1_fireball,V_fireball,0,0,,,0,,,0,0,0,0,0,,0,,,,0,,,

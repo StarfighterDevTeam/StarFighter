@@ -773,8 +773,28 @@ void Ship::update(sf::Time deltaTime)
 			this->key_repeat = false;
 		}
 
+		//portals: required to release fire and then press fire while colliding with a portal
+		isUsingPortal = false;
+		if (!isFiringButtonPressed)
+		{
+			if (isCollindingWithPortal)
+			{
+				if (InputGuy::isFiring())
+				{
+					if (this->targetPortal->state == PortalState::PortalOpen)
+					{
+						isUsingPortal = true;
+
+						if (this->targetPortal->destination_name.compare("0") == 0)
+						{
+							LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
+						}
+					}
+				}
+			}
+		}
 		//Fire function
-		if (!disable_fire)
+		else if (!disable_fire)
 		{
 			if (InputGuy::isFiring() || this->ship_config.automatic_fire)
 			{
@@ -802,27 +822,6 @@ void Ship::update(sf::Time deltaTime)
 						//speed malus when shooting
 						speed.x *= SHIP_SHOOTING_MALUS_SPEED;
 						speed.y *= SHIP_SHOOTING_MALUS_SPEED;
-					}
-				}
-			}
-		}
-
-		//portals: required to release fire and then press fire while colliding with a portal
-		isUsingPortal = false;
-		if (!isFiringButtonPressed)
-		{
-			if (isCollindingWithPortal)
-			{
-				if (InputGuy::isFiring())
-				{
-					if (this->targetPortal->state == PortalState::PortalOpen)
-					{
-						isUsingPortal = true;
-
-						if (this->targetPortal->destination_name.compare("0") == 0)
-						{
-							LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
-						}
 					}
 				}
 			}

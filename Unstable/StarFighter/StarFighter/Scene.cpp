@@ -16,6 +16,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	this->generating_boss = false;
 	this->hazard_level = hazard_level;
 	this->m_hazardbreak_has_occurred = false;
+	this->sceneEnemyGenerators->clear();
 
 	int p = 0;
 	int enemy_count = 0;
@@ -138,14 +139,14 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 							{
 								case EnemyClass::ENEMYPOOL_ALPHA:
 								{
-									EnemyGenerator* generator = new EnemyGenerator(2, e->enemyclass, 0.10, 0.30);
+									EnemyGenerator* generator = new EnemyGenerator(0.5, e->enemyclass, 0.10, 0.30);
 									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
 									this->sceneEnemyGenerators->push_back(generator);
 									break;
 								}
 								case EnemyClass::ENEMYPOOL_BETA:
 								{
-									EnemyGenerator* generator = new EnemyGenerator(8, e->enemyclass, 0.30, 0.10);
+									EnemyGenerator* generator = new EnemyGenerator(6, e->enemyclass, 0.30, 0.10);
 									generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
 									this->sceneEnemyGenerators->push_back(generator);
 									break;
@@ -382,6 +383,8 @@ void Scene::SpawnEnemy(int enemy_class)
 		if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
 		{
 			enemy = (*it)->enemy->Clone();
+			enemy->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
+			
 			break;
 		}
 	}
