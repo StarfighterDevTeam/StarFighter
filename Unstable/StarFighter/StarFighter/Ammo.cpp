@@ -54,7 +54,7 @@ void Ammo::update(sf::Time deltaTime)
 		if (this->current_range > this->range)
 		{
 			this->visible = false;
-			this->GarbageMe;
+			this->GarbageMe = true;
 		}
 	}
 
