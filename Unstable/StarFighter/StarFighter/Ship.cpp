@@ -646,6 +646,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->shield = 0;
 	this->disable_inputs = false;
 	this->disable_fire = false;
+	this->isBraking = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/Aura_RedGlow.png", sf::Vector2f(50, 50), 3);
@@ -656,7 +657,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isUsingPortal = false;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
 	this->targetPortal = new Portal(sf::Vector2f(0, 0), sf::Vector2f(0, 0), PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_HEIGHT, PORTAL_WIDTH), sf::Vector2f(PORTAL_HEIGHT / 2, PORTAL_WIDTH / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
-	
+
 	this->Init();
 }
 
@@ -669,10 +670,7 @@ void Ship::Init()
 	this->damage = this->ship_config.getShipConfigDamage();
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
-	if (this->ship_config.ship_model->hasFake)
-	{
-		this->transparent;
-	}
+	this->transparent = this->ship_config.ship_model->hasFake;
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -708,6 +706,7 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 
 void Ship::update(sf::Time deltaTime)
 {
+	this->isBraking = false;
 	//immunity frames after death
 	if (immune)
 	{
@@ -819,8 +818,12 @@ void Ship::update(sf::Time deltaTime)
 					ship_config.weapon->Fire(FriendlyFire);
 
 					//speed malus when shooting
-					speed.x *= SHIP_SHOOTING_MALUS_SPEED;
-					speed.y *= SHIP_SHOOTING_MALUS_SPEED;
+					if (!this->isBraking)
+					{
+						speed.x *= SHIP_BRAKING_MALUS_SPEED;
+						speed.y *= SHIP_BRAKING_MALUS_SPEED;
+					}
+					this->isBraking = true;
 				}
 			}
 		}
@@ -836,22 +839,11 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		//Braking function
-		if (InputGuy::isBraking())
+		if (InputGuy::isBraking() && !this->isBraking)
 		{
-			if (speed.x > SHIP_BRAKING_SPEED)
-				speed.x = SHIP_BRAKING_SPEED;
-			if (speed.x < -SHIP_BRAKING_SPEED)
-				speed.x = -SHIP_BRAKING_SPEED;
-			if (speed.y > SHIP_BRAKING_SPEED)
-				speed.y = SHIP_BRAKING_SPEED;
-			if (speed.y < -SHIP_BRAKING_SPEED)
-				speed.y = -SHIP_BRAKING_SPEED;
-
-			this->transparent = false;
-		}
-		else
-		{
-			this->transparent = true;
+			speed.x *= SHIP_BRAKING_MALUS_SPEED;
+			speed.y *= SHIP_BRAKING_MALUS_SPEED;
+			this->isBraking = true;
 		}
 
 		//idle decceleration

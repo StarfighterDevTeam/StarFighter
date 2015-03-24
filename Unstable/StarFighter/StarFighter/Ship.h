@@ -193,6 +193,7 @@ public :
 	bool disable_inputs;
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	bool key_repeat;
+	bool isBraking;
 
 	int graze_count;
 	int graze_level;
