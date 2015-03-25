@@ -57,6 +57,22 @@ bool InputGuy::setAutomaticFire()
 	return false;
 }
 
+bool InputGuy::isChangingResolution()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F3))
+	{
+		return true;
+	}
+
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 6))
+			return true;
+	}
+
+	return false;
+}
+
 Vector2f InputGuy::getDirections()
 {
 	short dirX = 0;

@@ -88,7 +88,7 @@ int main()
 		}
 
 		//Resolution switch
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F3))
+		if (InputGuy::isChangingResolution())
 		{
 			resolution = (WindowResolutions)(((int)resolution +1) % (NBVAL_RESOLUTIONS - 1));
 			switch (resolution)

@@ -16,6 +16,7 @@ public:
 	static bool isFiring();
 	static bool isBraking();
 	static bool setAutomaticFire();
+	static bool isChangingResolution();
 };
 
 
