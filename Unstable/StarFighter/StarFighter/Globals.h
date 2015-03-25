@@ -50,7 +50,7 @@
 #define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
 
 #define GRAZE_DISTANCE									30
-#define SHIP_BRAKING_MALUS_SPEED						0.60f
+#define SHIP_BRAKING_MALUS_SPEED						0.50f
 
 //ENEMY GENERATION
 #define SPAWN_NORMAL_MINIMUM_RESOURCE					-0.05f
