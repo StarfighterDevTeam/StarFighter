@@ -14,9 +14,9 @@ public:
 	PlayerHud();
 	void Init(int m_armor, int m_shield);
 	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub);
-	void Draw (sf::RenderWindow* window);
+	void Draw(sf::RenderTexture& offscreen);
 
-private:
+	sf::RectangleShape backgroundColor;
 	sf::RectangleShape armorBar;
 	sf::RectangleShape shieldBar;
 	sf::Text Money;
@@ -28,17 +28,6 @@ private:
 
 	bool max_hazard_level_reached;
 	bool has_shield;
-};
-
-class HudElement : public Independant
-{
-public:
-	HudElement();
-	sf::RectangleShape rect;
-	sf::Text title;
-	sf::Vector2f title_offset;
-	void update(sf::Time deltaTime) override;
-	void Draw(sf::RenderWindow* window);
 };
 
 #endif // HUD_H_INCLUDED

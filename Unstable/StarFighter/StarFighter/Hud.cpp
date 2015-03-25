@@ -7,12 +7,18 @@ PlayerHud::PlayerHud()
 
 void PlayerHud::Init(int m_armor, int m_shield)
 {
+
+	backgroundColor.setSize(sf::Vector2f(SCENE_SIZE_X * 1.0f / 3, SCENE_SIZE_Y));
+	backgroundColor.setFillColor(sf::Color(10, 10, 10, 128));//dark grey
+	backgroundColor.setOrigin(0, 0);
+	backgroundColor.setPosition(0, 0);
+
 	armorBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_armor));
 	armorBar.setFillColor(sf::Color(0, 250, 50, 128));//green
 	armorBar.setOutlineThickness(1);
 	armorBar.setOutlineColor(sf::Color(255, 255, 255));
 	armorBar.setOrigin(0, 0);
-	armorBar.setPosition(20, 10);
+	armorBar.setPosition(HUD_LEFT_MARGIN, 10);
 
 	if (m_shield > 0)
 	{
@@ -21,7 +27,7 @@ void PlayerHud::Init(int m_armor, int m_shield)
 		shieldBar.setOutlineThickness(1);
 		shieldBar.setOutlineColor(sf::Color(255, 255, 255));
 		shieldBar.setOrigin(0, 0);
-		shieldBar.setPosition((40 + ARMOR_BAR_SIZE_X), 10);
+		shieldBar.setPosition((HUD_LEFT_MARGIN + 20 + ARMOR_BAR_SIZE_X), 10);
 		this->has_shield = true;
 	}
 	else
@@ -49,22 +55,22 @@ void PlayerHud::Init(int m_armor, int m_shield)
 		Money.setFont(*font);
 		Money.setCharacterSize(20);
 		Money.setColor(_white);
-		Money.setPosition(50,WINDOW_RESOLUTION_Y-50);
+		Money.setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 50);
 
 		GrazeScore.setFont(*font);
 		GrazeScore.setCharacterSize(14);
 		GrazeScore.setColor(_white);
-		GrazeScore.setPosition(50, WINDOW_RESOLUTION_Y - 50 - HUD_SCORES_SPACING);
+		GrazeScore.setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 50 - HUD_SCORES_SPACING);
 
 		SceneName.setFont(*font);
 		SceneName.setCharacterSize(14);
 		SceneName.setColor(_white);
-		SceneName.setPosition(50, WINDOW_RESOLUTION_Y - 50 - 2*HUD_SCORES_SPACING);
+		SceneName.setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 50 - 2 * HUD_SCORES_SPACING);
 
 		framerate = new sf::Text("00", *font2, 15);
 		framerate->setColor(sf::Color::Yellow);
 		framerate->setStyle(sf::Text::Bold);
-		framerate->setPosition(WINDOW_RESOLUTION_X-80,WINDOW_RESOLUTION_Y-30);
+		framerate->setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 25);
 	}
 
 	catch( const std::exception & ex ) 
@@ -119,37 +125,19 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
 }
 
-void PlayerHud::Draw(sf::RenderWindow* window)
+void PlayerHud::Draw(sf::RenderTexture& offscreen)
 {
 	//Draw all
-	window->draw(armorBar);
+	offscreen.draw(backgroundColor);
+
+	offscreen.draw(armorBar);
 	if (this->has_shield)
 	{
-		window->draw(shieldBar);
+		offscreen.draw(shieldBar);
 	}
-	window->draw(Money);
-	window->draw(GrazeScore);
-	window->draw(SceneName);
+	offscreen.draw(Money);
+	offscreen.draw(GrazeScore);
+	offscreen.draw(SceneName);
 	
-	window->draw(*(framerate));
-}
-
-HudElement::HudElement() : Independant()
-{
-	this->visible = true;
-	this->isOnScene = true;
-}
-
-void HudElement::update(sf::Time deltaTime)
-{
-	Independant::update(deltaTime);
-
-	this->rect.setPosition(this->getPosition());
-	this->title.setPosition(this->rect.getPosition().x + this->title_offset.x, this->rect.getPosition().y + this->title_offset.y);
-}
-
-void HudElement::Draw(sf::RenderWindow* window)
-{
-	window->draw(this->rect);
-	window->draw(this->title);
+	offscreen.draw(*(framerate));
 }

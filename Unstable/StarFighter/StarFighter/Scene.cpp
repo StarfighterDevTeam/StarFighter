@@ -243,15 +243,6 @@ Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
 }
 
-void Scene::Update(Time deltaTime)
-{
-	if (this->generating_enemies)
-	{
-		//this->GenerateEnemies(deltaTime);
-		this->GenerateEnemiesv2(deltaTime);
-	}
-}
-
 void Scene::GenerateBoss()
 {
 	for (std::list<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)

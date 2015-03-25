@@ -10,6 +10,7 @@
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "Hud.h"
 
 #define LOOT_SPEED_Y		100.f
 
@@ -31,13 +32,18 @@ public:
 	RenderWindow* getMainWindow();
 	void addToScene(Independant *object, LayerType m_layer, IndependantType type);
 	void updateScene(Time deltaTime);
+	void updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub);
 	void drawScene();
+	void drawHud();
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
 	void garbageLayer (LayerType m_layer, bool only_offscene=false);
 	void SetLayerRotation(LayerType m_layer, float angle);
-	sf::RenderTexture offscreen;
+	sf::RenderTexture mainScreen;
+	sf::RenderTexture hubScreen;
+	PlayerHud hud;
+	sf::Vector2i screen_size;
 
 	bool isLastEnemyDead();
 	int getHazard();

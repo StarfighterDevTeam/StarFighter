@@ -13,8 +13,8 @@
 #define	REF_WINDOW_RESOLUTION_X					1920.0
 #define REF_WINDOW_RESOLUTION_Y					1080.0
 
-#define	WINDOW_RESOLUTION_X						1920.0
-#define WINDOW_RESOLUTION_Y						1080.0
+#define	WINDOW_RESOLUTION_X						1600.0
+#define WINDOW_RESOLUTION_Y						900.0
 
 #define	SCENE_SIZE_X							1080.0
 #define SCENE_SIZE_Y							1080.0
@@ -36,6 +36,7 @@
 #define JOYSTICK_MIN_AXIS_VALUE					25
 
 #define HUD_SCORES_SPACING						20
+#define HUD_LEFT_MARGIN							20
 
 #define SHIP_FILE "Assets/Scripts/Generated/Ship.csv"
 #define ENEMY_FILE	"Assets/Scripts/Generated/Enemies.csv"

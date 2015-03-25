@@ -2,7 +2,6 @@
 #define METAGAME_H_INCLUDED
 
 #include "Scene.h"
-#include "Hud.h"
 #include "GameState.h"
 #include <fstream>
 #include <iostream>
@@ -14,7 +13,6 @@ public:
 	Ship* playerShip;
 	Scene* currentScene;
 	Scene* nextScene;
-	PlayerHud* hud;
 	map<string, int> knownScenes;
 
 	InGameStateMachine IG_State;
@@ -28,7 +26,7 @@ public:
 	bool AddToKnownScenes(string scene_name);
 	void SetSceneHazardLevel(string scene_name, int hazard_level);
 	int GetSceneHazardLevel(string scene_name);
-	void InGameStateMachineCheck();
+	void InGameStateMachineCheck(sf::Time deltaTime);
 	sf::Clock clockHubExit;
 	sf::Clock bossSpawnCountdown;
 	bool hasDisplayedDestructionRatio;

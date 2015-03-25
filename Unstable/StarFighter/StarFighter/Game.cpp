@@ -13,16 +13,21 @@ const char* IndependantTypeValues[] =
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
-	this->offscreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
-	this->offscreen.setSmooth(true);
+	this->mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	this->mainScreen.setSmooth(true);
+	this->hubScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	this->hubScreen.setSmooth(true);
 
 	this->sceneChronometer.restart();
 	scale_factor.x = float(WINDOW_RESOLUTION_X) / float(REF_WINDOW_RESOLUTION_X);
 	scale_factor.y = float(WINDOW_RESOLUTION_Y) / float(REF_WINDOW_RESOLUTION_Y);
+	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
 
 	this->resetHazard();;//initalisation of the scoring system
 	this->BeastScoreBonus = 0;
 	this->direction = Directions::NO_DIRECTION;
+
+	this->hud.Init(0, 0);
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -59,6 +64,10 @@ void Game::updateScene(Time deltaTime)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
+	//TODO: Updating screen resolution
+	scale_factor.x = float(screen_size.x) / float(REF_WINDOW_RESOLUTION_X);
+	scale_factor.y = float(screen_size.y) / float(REF_WINDOW_RESOLUTION_Y);
+
 	//Collect & clean garbage
 	collectGarbage();
 	cleanGarbage();
@@ -70,12 +79,18 @@ void Game::updateScene(Time deltaTime)
 	{
 		(*it)->update(deltaTime);
 	}
-	isLastEnemyDead();
+	//isLastEnemyDead();
+}
+
+
+void Game::updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub)
+{
+	this->hud.Update(m_armor, m_shield, m_money, m_graze_count, m_hazard_level, scene_name, deltaTime, hub);
 }
 
 void Game::drawScene()
 {
-	this->offscreen.clear();
+	this->mainScreen.clear();
 
 	for (int i = 0; i < NBVAL_Layer ; i++)
 	{
@@ -85,17 +100,28 @@ void Game::drawScene()
 			{
 				if (!(*(*it)).transparent)
 				{
-					//this->window->draw((*(*it)));
-					this->offscreen.draw((*(*it)));
+					this->mainScreen.draw((*(*it)));
 				}
 			}
 		}
 	}
 
-	this->offscreen.display();
-	sf::Sprite temp(this->offscreen.getTexture());
+	this->mainScreen.display();
+	sf::Sprite temp(this->mainScreen.getTexture());
 	temp.scale(scale_factor.x, scale_factor.y);
-	temp.setPosition(sf::Vector2f(scale_factor.x * (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2, 0));
+	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
+	temp.setPosition(sf::Vector2f(scale_factor.x * black_stripe, 0));
+	this->window->draw(temp);
+}
+
+void Game::drawHud()
+{
+	hud.Draw(hubScreen);
+	hubScreen.display();
+	sf::Sprite temp(hubScreen.getTexture());
+	temp.scale(scale_factor.x, scale_factor.y);
+	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
+	temp.setPosition(sf::Vector2f(scale_factor.x * (black_stripe + SCENE_SIZE_X), 0));
 	this->window->draw(temp);
 }
 

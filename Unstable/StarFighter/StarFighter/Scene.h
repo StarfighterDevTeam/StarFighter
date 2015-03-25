@@ -36,7 +36,6 @@ public:
 	//Scene(string name, ShipConfig* shipConf);
 	Scene(string name, int hazard_level, bool reverse_scene=false, bool first_scene=false);
 	Scene(string name);
-	void Update(Time deltaTime);
 	void Draw(sf::RenderWindow* window);
 	void GenerateEnemies(Time deltaTime);
 	void GenerateBoss();
