@@ -55,22 +55,22 @@ void PlayerHud::Init(int m_armor, int m_shield)
 		Money.setFont(*font);
 		Money.setCharacterSize(20);
 		Money.setColor(_white);
-		Money.setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 50);
+		Money.setPosition(HUD_LEFT_MARGIN, REF_WINDOW_RESOLUTION_Y - 50);
 
 		GrazeScore.setFont(*font);
 		GrazeScore.setCharacterSize(14);
 		GrazeScore.setColor(_white);
-		GrazeScore.setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 50 - HUD_SCORES_SPACING);
+		GrazeScore.setPosition(HUD_LEFT_MARGIN, REF_WINDOW_RESOLUTION_Y - 50 - HUD_SCORES_SPACING);
 
 		SceneName.setFont(*font);
 		SceneName.setCharacterSize(14);
 		SceneName.setColor(_white);
-		SceneName.setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 50 - 2 * HUD_SCORES_SPACING);
+		SceneName.setPosition(HUD_LEFT_MARGIN, REF_WINDOW_RESOLUTION_Y - 50 - 2 * HUD_SCORES_SPACING);
 
 		framerate = new sf::Text("00", *font2, 15);
 		framerate->setColor(sf::Color::Yellow);
 		framerate->setStyle(sf::Text::Bold);
-		framerate->setPosition(HUD_LEFT_MARGIN, WINDOW_RESOLUTION_Y - 25);
+		framerate->setPosition(HUD_LEFT_MARGIN, REF_WINDOW_RESOLUTION_Y - 25);
 	}
 
 	catch( const std::exception & ex ) 
