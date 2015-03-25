@@ -94,8 +94,8 @@ void Game::drawScene()
 
 	this->offscreen.display();
 	sf::Sprite temp(this->offscreen.getTexture());
-	temp.scale(WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y);
-	//temp.setPosition((WINDOW_RESOLUTION_X - REF_WINDOW_RESOLUTION_X) / 2, (WINDOW_RESOLUTION_Y - REF_WINDOW_RESOLUTION_Y) / 2);
+	temp.scale(scale_factor.x, scale_factor.y);
+	temp.setPosition(sf::Vector2f(scale_factor.x * (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2, 0));
 	this->window->draw(temp);
 }
 

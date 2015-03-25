@@ -49,6 +49,7 @@
 #define LOOT_FILENAME				"Assets/2D/World/crystal.png"
 #define LOOT_WIDTH					64
 #define LOOT_HEIGHT					64
+#define LOOT_SPEED_Y				100.f
 
 #define ENEMYX_FILENAME				"Assets/2D/enemyX.png"
 #define ENEMYX_WIDTH				32

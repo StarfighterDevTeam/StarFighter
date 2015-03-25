@@ -70,12 +70,6 @@ void InGameState::Update(Time deltaTime)
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
-
-	//draw link zones
-	if (this->IG_State != InGameStateMachine::BOSS_FIGHT)
-	{
-		this->currentScene->Draw(this->mainWindow);
-	}
 	
 	this->hud->Draw(this->mainWindow);
 }
