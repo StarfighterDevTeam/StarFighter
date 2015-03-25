@@ -49,29 +49,25 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, IndependantType::PlayerShip);
-
-	this->hud = new PlayerHud();
-	this->hud->Init((*CurrentGame).playerShip->ship_config.getShipConfigArmor(), (*CurrentGame).playerShip->ship_config.getShipConfigShield());
 }
 
 void InGameState::Update(Time deltaTime)
 {
-	this->currentScene->Update(deltaTime);
-	InGameStateMachineCheck();
+	InGameStateMachineCheck(deltaTime);
 
 	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), this->currentScene->getSceneBeastScore());
-	(*CurrentGame).updateScene(deltaTime);
-	this->mainWindow->clear();
 
-	this->hud->Update((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
+	(*CurrentGame).updateScene(deltaTime);
+	(*CurrentGame).hud.Update((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
 		(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION);
+
+	this->mainWindow->clear();
 }
 
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
-	
-	this->hud->Draw(this->mainWindow);
+	(*CurrentGame).drawHud();
 }
 
 void InGameState::Release()
@@ -168,7 +164,7 @@ int InGameState::LoadPlayerSave(string file)
 	return 0;
 }
 
-void InGameState::InGameStateMachineCheck()
+void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 {
 	float w = this->currentScene->bg->m_size.x;
 	float h = this->currentScene->bg->m_size.y;
@@ -186,6 +182,10 @@ void InGameState::InGameStateMachineCheck()
 	{
 		case InGameStateMachine::SCROLLING:
 		{
+			if (this->currentScene->generating_enemies)
+			{
+				this->currentScene->GenerateEnemiesv2(deltaTime);
+			}
 			//Scrolling until the background reaches its end
 			if ((*CurrentGame).direction == Directions::NO_DIRECTION)
 			{
