@@ -6,13 +6,13 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
+ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
-	this->max_speed.x = m_max_speed.x;
-	this->max_speed.y = m_max_speed.y;
+	this->max_speed.x = m_max_speed;
+	this->max_speed.y = m_max_speed;
 	this->decceleration = m_decceleration;
-	this->acceleration.x = m_acceleration.x;
-	this->acceleration.y = m_acceleration.y;
+	this->acceleration.x = m_acceleration;
+	this->acceleration.y = m_acceleration;
 	this->armor = m_armor;
 	this->shield = m_shield;
 	this->shield_regen = m_shield_regen;
@@ -23,6 +23,7 @@ ShipModel::ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, floa
 	this->display_name = m_display_name;
 	this->hasBot = false;
 	this->hasFake = false;
+	this->hyperspeed = m_hyperspeed;
 }
 
 //various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
@@ -31,14 +32,19 @@ sf::Vector2f ShipModel::getShipModelMaxSpeed()
 	return this->max_speed;
 }
 
+sf::Vector2f ShipModel::getShipModelAcceleration()
+{
+	return this->acceleration;
+}
+
 float ShipModel::getShipModelDecceleration()
 {
 	return this->decceleration;
 }
 
-sf::Vector2f ShipModel::getShipModelAcceleration()
+float ShipModel::getShipModelHyperspeed()
 {
-	return this->acceleration;
+	return this->hyperspeed;
 }
 
 int ShipModel::getShipModelArmor()
@@ -83,13 +89,14 @@ Equipment::Equipment()
 	this->hasFake = false;
 }
 
-void Equipment::Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration, sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
+void Equipment::Init(int m_equipmentType, float  m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
-	this->max_speed.x = m_max_speed.x;
-	this->max_speed.y = m_max_speed.y;
+	this->max_speed.x = m_max_speed;
+	this->max_speed.y = m_max_speed;
 	this->decceleration = m_decceleration;
-	this->acceleration.x = m_acceleration.x;
-	this->acceleration.y = m_acceleration.y;
+	this->acceleration.x = m_acceleration;
+	this->acceleration.y = m_acceleration;
+	this->hyperspeed = m_hyperspeed;
 	this->armor = m_armor;
 	this->shield = m_shield;
 	this->shield_regen = m_shield_regen;
@@ -115,6 +122,11 @@ float Equipment::getEquipmentDecceleration()
 sf::Vector2f Equipment::getEquipmentAcceleration()
 {
 	return this->acceleration;
+}
+
+float Equipment::getEquipmentHyperspeed()
+{
+	return this->hyperspeed;
 }
 
 int Equipment::getEquipmentArmor()
@@ -329,7 +341,7 @@ void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f B
 
 ShipConfig::ShipConfig()
 {
-	this->ship_model = new ShipModel(sf::Vector2f(0, 0), sf::Vector2f(0, 0), 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
+	this->ship_model = new ShipModel(0, 0, 0.0f, 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
@@ -348,6 +360,7 @@ void ShipConfig::Init()
 	this->max_speed = getShipConfigMaxSpeed();
 	this->decceleration = getShipConfigDecceleration();
 	this->acceleration = getShipConfigAcceleration();
+	this->hyperspeed = getShipConfigHyperspeed();
 	this->armor = getShipConfigArmor();
 	this->shield = getShipConfigShield();
 	this->shield_regen = getShipConfigShieldRegen();
@@ -568,6 +581,32 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 	return new_acceleration;
 }
 
+float ShipConfig::getShipConfigHyperspeed()
+{
+	float new_hyperspeed = 0.0f;
+	float equipment_hyperspeed = 0.0f;
+
+	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	{
+		if (this->hasEquipment[i])
+		{
+			equipment_hyperspeed += equipment[i]->getEquipmentHyperspeed();
+		}
+		else
+		{
+			equipment_hyperspeed += 0;
+		}
+	}
+
+	new_hyperspeed = ship_model->getShipModelHyperspeed() + equipment_hyperspeed;
+
+	//cancelling negative equipment values
+	if (new_hyperspeed < ship_model->getShipModelHyperspeed())
+		new_hyperspeed = ship_model->getShipModelHyperspeed();
+
+	return new_hyperspeed;
+}
+
 void ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats)
 {
 	this->equipment[m_equipment->equipmentType] = m_equipment;
@@ -647,6 +686,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->disable_inputs = false;
 	this->disable_fire = false;
 	this->isBraking = false;
+	this->isHyperspeeding = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
@@ -707,6 +747,8 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 void Ship::update(sf::Time deltaTime)
 {
 	this->isBraking = false;
+	this->isHyperspeeding = false;
+
 	//immunity frames after death
 	if (immune)
 	{
@@ -758,6 +800,12 @@ void Ship::update(sf::Time deltaTime)
 			speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
 		}
 
+		//Hyperspeed function
+		if (InputGuy::isHyperspeeding())
+		{
+			this->isHyperspeeding = true;
+		}
+
 		//auto fire option (F key)
 		if (InputGuy::setAutomaticFire())
 		{
@@ -793,7 +841,7 @@ void Ship::update(sf::Time deltaTime)
 			}
 		}
 		//Fire function
-		if (!disable_fire && !isUsingPortal)
+		if (!disable_fire && !isUsingPortal && !isHyperspeeding)
 		{
 			if (InputGuy::isFiring() || this->ship_config.automatic_fire)
 			{
@@ -839,7 +887,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		//Braking function
-		if (InputGuy::isBraking() && !this->isBraking)
+		if (InputGuy::isBraking() && !this->isBraking && this->isHyperspeeding)
 		{
 			speed.x *= SHIP_BRAKING_MALUS_SPEED;
 			speed.y *= SHIP_BRAKING_MALUS_SPEED;

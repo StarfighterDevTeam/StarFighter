@@ -19,8 +19,8 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 
 				//Loading equipment
 				LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship equipment\n");
-				shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
-				shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
+				//shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_AIRBRAKE]), false);
+				//shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ENGINE]), false);
 				//shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_MODULE]), false);
 				//shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_ARMOR]), false);
 				//shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
@@ -150,9 +150,8 @@ Equipment* FileLoader::LoadEquipment(string name)
 		{
 			Equipment* i = new Equipment();
 
-			i-> Init(EquipmentType::Airbrake, Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_X]),stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_Y])), 
-				stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),
-				stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
+			i-> Init(EquipmentType::Airbrake, stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION]), stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
+				stoi((*it)[EquipmentData::EQUIPMENT_HYPERSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
 				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
 				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 
@@ -201,9 +200,8 @@ ShipModel* FileLoader::LoadShipModel(string name)
 		{
 			if((*it)[EquipmentData::EQUIPMENT_NAME].compare(name) == 0)
 			{
-				ShipModel* s = new ShipModel(Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_X]),stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED_Y])), 
-					Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_X]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION_Y])),stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
-					stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
+				ShipModel* s = new ShipModel(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION]), stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
+					stoi((*it)[EquipmentData::EQUIPMENT_HYPERSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
 					(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])), 
 					stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 

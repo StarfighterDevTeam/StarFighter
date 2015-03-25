@@ -17,11 +17,27 @@ bool InputGuy::isFiring()
 				return true;
 			}
 		}
-		if (sf::Joystick::isButtonPressed(0, 0))
+		if (sf::Joystick::isButtonPressed(0, 0)) // A button
 		{
 			return true;
 		}
 	}
+	return false;
+}
+
+bool InputGuy::isHyperspeeding()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+	{
+		return true;
+	}
+
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 3))// Y button
+			return true;
+	}
+
 	return false;
 }
 
@@ -34,7 +50,7 @@ bool InputGuy::isBraking()
 
 	if (sf::Joystick::isConnected(0))
 	{
-		if (sf::Joystick::isButtonPressed(0, 2))
+		if (sf::Joystick::isButtonPressed(0, 2)) // X button
 			return true;
 	}
 

@@ -51,10 +51,11 @@ enum GrazeLevels
 class ShipModel : public sf::Sprite
 {
 public:
-	ShipModel(sf::Vector2f m_max_speed, sf::Vector2f m_acceleration, float m_decceleration, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
+	ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	sf::Vector2f getShipModelMaxSpeed();
-	float getShipModelDecceleration();
 	sf::Vector2f getShipModelAcceleration();
+	float getShipModelDecceleration();
+	float getShipModelHyperspeed();
 	int getShipModelArmor();
 	int getShipModelShield();
 	int getShipModelShieldRegen();
@@ -75,6 +76,7 @@ private:
 	float decceleration;
 	sf::Vector2f acceleration;
 	sf::Vector2f max_speed;
+	float hyperspeed;
 	int armor;
 	int shield;
 	int shield_regen;
@@ -84,7 +86,7 @@ private:
 class Equipment : public sf::Sprite
 {
 public:
-	void Init(int m_equipmentType, sf::Vector2f m_max_speed, float m_decceleration , sf::Vector2f m_acceleration, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
+	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
 	std::string textureName;
 	sf::Vector2f size;
@@ -92,8 +94,9 @@ public:
 	std::string display_name;
 	int equipmentType;
 	sf::Vector2f getEquipmentMaxSpeed();
-	float getEquipmentDecceleration();
 	sf::Vector2f getEquipmentAcceleration();
+	float getEquipmentDecceleration();
+	float getEquipmentHyperspeed();
 	int getEquipmentArmor();
 	int getEquipmentShield();
 	int getEquipmentShieldRegen();
@@ -113,9 +116,10 @@ public:
 	void AddModuleProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 
 private:
-	float decceleration;
-	sf::Vector2f acceleration;
 	sf::Vector2f max_speed;
+	sf::Vector2f acceleration;
+	float decceleration;
+	float hyperspeed;
 	int armor;
 	int shield;
 	int shield_regen;
@@ -132,8 +136,9 @@ public:
 
 	int frameNumber;
 	sf::Vector2f getShipConfigMaxSpeed();
-	float getShipConfigDecceleration();
 	sf::Vector2f getShipConfigAcceleration();
+	float getShipConfigDecceleration();
+	float getShipConfigHyperspeed();
 	int getShipConfigArmor();
 	int getShipConfigShield();
 	int getShipConfigShieldRegen();
@@ -155,8 +160,9 @@ public:
 
 private:
 	sf::Vector2f max_speed;
-	float decceleration;
 	sf::Vector2f acceleration;
+	float decceleration;
+	float hyperspeed;
 	int armor;
 	int shield;
 	int shield_regen;
@@ -194,6 +200,7 @@ public :
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	bool key_repeat;
 	bool isBraking;
+	bool isHyperspeeding;
 
 	int graze_count;
 	int graze_level;

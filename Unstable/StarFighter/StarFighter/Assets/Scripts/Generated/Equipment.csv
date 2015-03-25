@@ -1,7 +1,7 @@
-#type,item_name,texture,width,height,frames,max_speed.x,max_speed.y,decceleration,acceleration.x,acceleration.y,armor,shield,shield_regen,damage,bot,fake_texture,fake_width,fake_height,fake_frames
-airbrake,airbrake_default,Assets/2D/Equipment/AirBrake.png,64,64,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-engine,engine_default,Assets/2D/Equipment/Thruster.png,64,64,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-armor,armor_default,Assets/2D/Equipment/Armor.png,64,64,1,0,0,0,0,0,100,0,0,0,0,0,0,0,0
-shield,shield_default,Assets/2D/Equipment/Shield.png,64,64,1,0,0,0,0,0,0,100,5,0,0,0,0,0,0
-module,module_default,Assets/2D/Equipment/Module.png,64,64,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-shipmodel,shipmodel_default,Assets/2D/Equipment/Natalia.png,16,16,3,800,800,2000,800,800,100,100,2,20,0,Assets/2D/Equipment/ShipModel_default.png,70,80,3
+#type,item_name,texture,width,height,frames,max_speed,decceleration,acceleration,hyperspeed,armor,shield,shield_regen,damage,bot,fake_texture,fake_width,fake_height,fake_frames
+airbrake,airbrake_default,Assets/2D/Equipment/AirBrake.png,64,64,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+engine,engine_default,Assets/2D/Equipment/Thruster.png,64,64,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+armor,armor_default,Assets/2D/Equipment/Armor.png,64,64,1,0,0,0,0,100,0,0,0,0,0,0,0,0
+shield,shield_default,Assets/2D/Equipment/Shield.png,64,64,1,0,0,0,0,0,100,5,0,0,0,0,0,0
+module,module_default,Assets/2D/Equipment/Module.png,64,64,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+shipmodel,shipmodel_default,Assets/2D/Equipment/Natalia.png,16,16,3,800,2000,800,3.0f,100,100,2,20,0,Assets/2D/Equipment/ShipModel_default.png,70,80,3

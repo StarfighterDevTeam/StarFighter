@@ -724,7 +724,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 
 					e_decceleration = floor(e_decceleration);
 
-					equipment->Init((int)EquipmentType::Airbrake, sf::Vector2f(0,0),e_decceleration,sf::Vector2f(0,0),0,0,0,0, AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
+					equipment->Init((int)EquipmentType::Airbrake, 0, 0, e_decceleration, 0.f,0,0,0,0, AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -741,16 +741,13 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
-					float e_maxspeed_x = EQUIPMENT_MIN_MAXSPEED_VALUE;
-					float e_maxspeed_y = EQUIPMENT_MIN_MAXSPEED_VALUE;
+					float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE;
 					float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
 					if (log_multiplier > 1)
 					{
-						e_maxspeed_x *= log_multiplier;
-						e_maxspeed_y *= log_multiplier;
+						e_maxspeed *= log_multiplier;
 					}
-					e_maxspeed_x = floor(e_maxspeed_x);
-					e_maxspeed_y = floor(e_maxspeed_y);
+					e_maxspeed = floor(e_maxspeed);
 					float e_acceleration_x = EQUIPMENT_MIN_ACCELLERATION_VALUE;
 					float e_acceleration_y = EQUIPMENT_MIN_ACCELLERATION_VALUE;
 
@@ -763,8 +760,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					e_acceleration_x = floor(e_acceleration_x);
 					e_acceleration_y = floor(e_acceleration_y);
 
-					equipment->Init((int)EquipmentType::Engine, sf::Vector2f(e_maxspeed_x,e_maxspeed_y),0,
-						sf::Vector2f(e_acceleration_x,e_acceleration_y),0,0,0,0, THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
+					equipment->Init((int)EquipmentType::Engine, e_maxspeed, 0, e_acceleration_x, 0.f,0,0,0,0, THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -787,7 +783,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 						e_armor *= log_multiplier;
 
 					e_armor = floor(e_armor);
-					equipment->Init((int)EquipmentType::Armor, sf::Vector2f(0,0),0,sf::Vector2f(0,0),e_armor,0,0,0, ARMOR_FILENAME,sf::Vector2f(64,64),1,"Armor");
+					equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, e_armor,0,0,0, ARMOR_FILENAME,sf::Vector2f(64,64),1,"Armor");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -816,8 +812,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 						e_shield_regen *= log_multiplier;
 					e_shield_regen = floor(e_shield_regen);
 
-					equipment->Init((int)EquipmentType::Shield, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,
-						e_shield,e_shield_regen,0, SHIELD_FILENAME,sf::Vector2f(64,64),1,"Shield");
+					equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, e_shield, e_shield_regen,0, SHIELD_FILENAME,sf::Vector2f(64,64),1,"Shield");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -834,7 +829,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
-					equipment->Init((int)EquipmentType::Module, sf::Vector2f(0,0),0,sf::Vector2f(0,0),0,0,0,0, MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
+					equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0,0,0,0, MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
 
 					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/bot.png", sf::Vector2f (32,32));
 					bot->display_name = "Bot gerard";
