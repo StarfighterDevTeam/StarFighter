@@ -34,8 +34,8 @@ class Loot;
 enum ShipAnimations
 {
 	ShipIdle,//0
-	ShipTurningLeft,//1
-	ShipTurningRight,//2
+	ShipTurningRight,//1
+	ShipTurningLeft,//2
 	NB_ShipAnimations,//3
 };
 

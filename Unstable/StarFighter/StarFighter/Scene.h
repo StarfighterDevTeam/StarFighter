@@ -68,14 +68,10 @@ public:
 	void HazardBreak();
 
 private:
-	Ship* playerShip;
-	list<EnemyBase*> enemies;
 	list<EnemyBase*> boss_list;
 	vector<EnemyBase*> enemies_ranked_by_class[NBVAL_EnemyClass];
 	int total_class_probability[NBVAL_EnemyClass];
 	sf::RenderWindow* mainWindow;
-	
-	int hazard_break_value;
 	int hazard_level;
 
 	sf::Clock clockHubExit;

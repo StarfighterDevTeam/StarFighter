@@ -3,7 +3,7 @@ scene1,Assets/Scripts/Scenes/Generated/V_scene1.csv,Vertigo_I,Vanguard_Hub0,scen
 scene2,Assets/Scripts/Scenes/Generated/O_scene2.csv,Station_Eclipse,scene1,scene1,scene3,scene3
 scene3,Assets/Scripts/Scenes/Generated/H_scene3.csv,Horizon_IV,0,0,scene2,scene2
 #,,,,,,
-Vanguard_Hub0,Assets/Scripts/Scenes/Generated/Vanguard_Hub0.csv,Vanguard_Hub0,Vanguard_V1,scene1,scene3,scene3
+Vanguard_Hub0,Assets/Scripts/Scenes/Generated/Vanguard_Hub0.csv,Vanguard_Hub0,Vanguard_V1,Vanguard_V1,Vanguard_H1,Vanguard_H1
 Vanguard_Hub1,Assets/Scripts/Scenes/Generated/Vanguard_Hub1.csv,Vanguard_Hub1,Vanguard_V3,Vanguard_V1,Vanguard_H1,0
 Vanguard_Hub2,Assets/Scripts/Scenes/Generated/Vanguard_Hub2.csv,Vanguard_Hub2,Vanguard_V5,Vanguard_V4,Vanguard_H3,0
 Vanguard_Hub3,Assets/Scripts/Scenes/Generated/Vanguard_Hub3.csv,Vanguard_Hub3,0,Vanguard_V7,Vanguard_H5,0

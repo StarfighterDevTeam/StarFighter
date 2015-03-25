@@ -649,9 +649,9 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isBraking = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/Aura_RedGlow.png", sf::Vector2f(50, 50), 3);
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/Aura_BlueGlow.png", sf::Vector2f(50, 50), 3);
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/Aura_WhiteGlow.png", sf::Vector2f(50, 50), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
+	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
 	this->key_repeat = false;
 	this->isCollindingWithPortal = false;
 	this->isUsingPortal = false;
