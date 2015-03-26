@@ -201,6 +201,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2));
 					this->currentScene->bg->speed = sf::Vector2f(0, 0);
 
+					//Disable hyperspeed capacity
+					(*CurrentGame).playerShip->disabledHyperspeed = true;
+
 					//Stop spawning enemies
 					this->currentScene->generating_enemies = false;
 					if (this->currentScene->generating_boss)
@@ -354,6 +357,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					this->IG_State = InGameStateMachine::SCROLLING;
 					(*CurrentGame).playerShip->disable_fire = false;
+					(*CurrentGame).playerShip->disabledHyperspeed = false;
 					if (this->currentScene->direction == Directions::NO_DIRECTION)
 					{
 						(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);

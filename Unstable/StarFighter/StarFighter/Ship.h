@@ -203,6 +203,7 @@ public :
 	bool isBraking;
 	bool isHyperspeeding;
 	bool isSlowMotion;
+	bool disabledHyperspeed;
 
 	int graze_count;
 	int graze_level;

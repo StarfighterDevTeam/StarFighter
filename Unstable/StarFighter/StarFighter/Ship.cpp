@@ -688,6 +688,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isBraking = false;
 	this->isHyperspeeding = false;
 	this->isSlowMotion = false;
+	this->disabledHyperspeed = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
@@ -825,7 +826,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 
 		//Hyperspeed function
-		if (InputGuy::isHyperspeeding() && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion)
+		if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion)
 		{
 			this->isHyperspeeding = true;
 			(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
