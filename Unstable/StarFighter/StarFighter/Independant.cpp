@@ -138,20 +138,20 @@ Independant::~Independant()
 
 }
 
-void Independant::update(sf::Time deltaTime)
+void Independant::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition, offset;
+	static sf::Vector2f newposition, offset, newspeed;
+	newspeed = this->speed;
+
+	if (hyperspeedMultiplier < 1)
+	{
+		newspeed.x = this->speed.x * hyperspeedMultiplier;
+		newspeed.y = this->speed.y * hyperspeedMultiplier;
+	}
 
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
-
-	//call bobbyPattern 
-		//-> NOP, you need to override it, otherwise no pattern! (because you need CurrentGame->direction, which is not available for a generic Independant item)
-	//offset = Pattern.GetOffset(deltaTime.asSeconds());
-	//offset = Independant::getSpeed_for_Direction( (*CurrentGame).direction, offset);
-	//newposition.x += offset.x;
-	//newposition.y += offset.y;
+	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 	this->setPosition(newposition.x, newposition.y);
 
@@ -395,6 +395,21 @@ sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vsp
 	}
 
 	return speed;
+}
+
+sf::Vector2f Independant::getSpeedYMultiplier_for_Direction(Directions direction, float speed_multiplier)
+{
+	sf::Vector2f speed_ = this->speed;
+	if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
+	{
+		speed_.y *= speed_multiplier;
+	}
+	else if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
+	{
+		speed_.x *= speed_multiplier;
+	}
+
+	return speed_;
 }
 
 sf::Vector2f Independant::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position)

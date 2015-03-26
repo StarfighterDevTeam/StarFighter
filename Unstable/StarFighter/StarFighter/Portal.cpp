@@ -10,7 +10,7 @@ Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 	destination_name = "0";
 }
 
-void Portal::update(sf::Time deltaTime)
+void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (!this->GarbageMe)
 	{

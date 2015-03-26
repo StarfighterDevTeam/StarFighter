@@ -45,12 +45,26 @@ void Ammo::Death()
 	this->GarbageMe = true;
 }
 
-void Ammo::update(sf::Time deltaTime)
+void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	sf::Vector2f newspeed = this->speed;
+	float new_ref_speed = ref_speed;
+	if (hyperspeedMultiplier > 1)
+	{
+		newspeed = this->getSpeedYMultiplier_for_Direction((*CurrentGame).direction, hyperspeedMultiplier);
+		new_ref_speed *= hyperspeedMultiplier;
+	}
+	else if (hyperspeedMultiplier < 1)
+	{
+		newspeed.x = this->speed.x * hyperspeedMultiplier;
+		newspeed.y = this->speed.y * hyperspeedMultiplier;
+		new_ref_speed *= hyperspeedMultiplier;
+	}
+
 	//range before bullet extinction (optional. put "0" not to use)
 	if (this->range > 0)
 	{
-		this->current_range += (ref_speed*deltaTime.asSeconds());
+		this->current_range += (new_ref_speed*deltaTime.asSeconds());
 		if (this->current_range > this->range)
 		{
 			this->visible = false;
@@ -62,9 +76,9 @@ void Ammo::update(sf::Time deltaTime)
 	if (!this->GarbageMe)
 	{
 		static sf::Vector2f newposition, offset, pattern_offset;
-
-		newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-		newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+		
+		newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 		//call bobbyPattern
 		pattern_offset = Pattern.GetOffset(deltaTime.asSeconds());

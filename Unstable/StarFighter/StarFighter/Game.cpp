@@ -26,6 +26,7 @@ void Game::init(RenderWindow* window)
 	this->resetHazard();;//initalisation of the scoring system
 	this->BeastScoreBonus = 0;
 	this->direction = Directions::NO_DIRECTION;
+	this->hyperspeedMultiplier = 1.0f;
 
 	this->hud.Init(0, 0);
 }
@@ -77,7 +78,7 @@ void Game::updateScene(Time deltaTime)
 
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
-		(*it)->update(deltaTime);
+		(*it)->update(deltaTime, hyperspeedMultiplier);
 	}
 	//isLastEnemyDead();
 }

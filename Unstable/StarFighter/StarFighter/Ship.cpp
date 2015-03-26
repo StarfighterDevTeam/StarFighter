@@ -687,12 +687,14 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->disable_fire = false;
 	this->isBraking = false;
 	this->isHyperspeeding = false;
+	this->isSlowMotion = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
-	this->key_repeat = false;
+	this->fire_key_repeat = false;
+	this->slowmo_key_repeat = false;
 	this->isCollindingWithPortal = false;
 	this->isUsingPortal = false;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
@@ -744,7 +746,7 @@ void Ship::setShipWeapon(Weapon* m_weapon)
 
 }
 
-void Ship::update(sf::Time deltaTime)
+void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	this->isBraking = false;
 	this->isHyperspeeding = false;
@@ -800,24 +802,51 @@ void Ship::update(sf::Time deltaTime)
 			speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
 		}
 
+		//Slow_motion function
+		if (InputGuy::isSlowMotion())
+		{
+			if (!this->slowmo_key_repeat)
+			{
+				this->isSlowMotion = !this->isSlowMotion;
+				this->slowmo_key_repeat = true;
+				if (this->isSlowMotion)
+				{
+					(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
+				}
+				else
+				{
+					(*CurrentGame).hyperspeedMultiplier = 1.0f;
+				}
+			}
+		}
+		else
+		{
+			this->slowmo_key_repeat = false;
+		}
+
 		//Hyperspeed function
-		if (InputGuy::isHyperspeeding())
+		if (InputGuy::isHyperspeeding() && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion)
 		{
 			this->isHyperspeeding = true;
+			(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
+		}
+		else if (!this->isSlowMotion)
+		{
+			(*CurrentGame).hyperspeedMultiplier = 1.0f;
 		}
 
 		//auto fire option (F key)
 		if (InputGuy::setAutomaticFire())
 		{
-			if (!this->key_repeat)
+			if (!this->fire_key_repeat)
 			{
 				this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
-				this->key_repeat = true;
+				this->fire_key_repeat = true;
 			}
 		}
 		else
 		{
-			this->key_repeat = false;
+			this->fire_key_repeat = false;
 		}
 
 		//portals: required to release fire and then press fire while colliding with a portal
@@ -887,7 +916,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		//Braking function
-		if (InputGuy::isBraking() && !this->isBraking && this->isHyperspeeding)
+		if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding)
 		{
 			speed.x *= SHIP_BRAKING_MALUS_SPEED;
 			speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -912,7 +941,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
-	Independant::update(deltaTime);
+	Independant::update(deltaTime, hyperspeedMultiplier);
 
 	//screen borders contraints	correction
 	if (this->ship_config.ship_model->hasFake)

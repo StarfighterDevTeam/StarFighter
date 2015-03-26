@@ -41,9 +41,25 @@ bool InputGuy::isHyperspeeding()
 	return false;
 }
 
-bool InputGuy::isBraking()
+bool InputGuy::isSlowMotion()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	{
+		return true;
+	}
+
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 1))// B button
+			return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isBraking()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 	{
 		return true;
 	}

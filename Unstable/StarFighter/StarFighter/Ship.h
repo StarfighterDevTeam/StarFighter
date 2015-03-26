@@ -174,7 +174,7 @@ class Ship : public Independant
 public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init();
-	void update(sf::Time deltaTime) override;
+	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void setShipConfig(ShipConfig m_ship_config);
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
@@ -198,9 +198,11 @@ public :
 
 	bool disable_inputs;
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
-	bool key_repeat;
+	bool fire_key_repeat;
+	bool slowmo_key_repeat;
 	bool isBraking;
 	bool isHyperspeeding;
+	bool isSlowMotion;
 
 	int graze_count;
 	int graze_level;

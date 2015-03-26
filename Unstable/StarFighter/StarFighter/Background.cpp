@@ -1,5 +1,7 @@
 #include "Background.h"
 
+extern Game* CurrentGame;
+
 Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
 {
 	visible = true;
@@ -24,15 +26,26 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 	}
 }
 
-void Background::update(sf::Time deltaTime)
+void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//if not disappeared, move it
 	if (!this->GarbageMe)
 	{
-		static sf::Vector2f newposition;
+		static sf::Vector2f newposition, newspeed;
+		newspeed = this->speed;
 
-		newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-		newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+		if (hyperspeedMultiplier > 1)
+		{
+			newspeed = this->getSpeedYMultiplier_for_Direction((*CurrentGame).direction, hyperspeedMultiplier);
+		}
+		else if (hyperspeedMultiplier < 1)
+		{
+			newspeed.x = this->speed.x * hyperspeedMultiplier;
+			newspeed.y = this->speed.y * hyperspeedMultiplier;
+		}
+
+		newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 		this->setPosition(newposition.x, newposition.y);
 

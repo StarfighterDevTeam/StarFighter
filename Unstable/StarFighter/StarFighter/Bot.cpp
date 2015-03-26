@@ -26,9 +26,10 @@ void Bot::setTarget (Independant* m_target)
 	this->setPosition(m_target->getPosition());
 }
 
-void Bot::update(sf::Time deltaTime)
+void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition, offset;
+	static sf::Vector2f newposition, offset, newspeed;
+	newspeed = this->speed;
 
 	if (hasTarget)
 	{
@@ -38,8 +39,18 @@ void Bot::update(sf::Time deltaTime)
 	}
 	else
 	{
-		newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-		newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+		if (hyperspeedMultiplier > 1)
+		{
+			newspeed = this->getSpeedYMultiplier_for_Direction((*CurrentGame).direction, hyperspeedMultiplier);
+		}
+		else if (hyperspeedMultiplier < 1)
+		{
+			newspeed.x = this->speed.x * hyperspeedMultiplier;
+			newspeed.y = this->speed.y * hyperspeedMultiplier;
+		}
+
+		newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 	}
 	
 	//call bobbyPattern

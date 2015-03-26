@@ -270,7 +270,8 @@ void Scene::GenerateEnemiesv2(Time deltaTime)
 	{
 		//SOURCES OF INCREMENTATION
 		//Time
-		(*it)->spawnResource += deltaTime.asSeconds();
+		sf::Time adjusted_time = deltaTime * (*CurrentGame).hyperspeedMultiplier;
+		(*it)->spawnResource += adjusted_time.asSeconds();
 
 		//SPAWN
 		if ((*it)->spawnResource > (*it)->spawnCost)

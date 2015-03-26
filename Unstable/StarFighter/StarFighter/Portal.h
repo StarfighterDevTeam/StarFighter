@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Independant.h"
+#include "Game.h"
 
 enum PortalState
 {
@@ -24,7 +25,7 @@ class Portal : public Independant
 {
 public:
 	Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber);
-	void update(sf::Time deltaTime) override;
+	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	std::string destination_name;
 	sf::Vector2f offset;//respect to the background
 	PortalState state;

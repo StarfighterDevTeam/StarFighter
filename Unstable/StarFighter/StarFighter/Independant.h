@@ -153,7 +153,7 @@ public:
 
 	~Independant();
 
-	virtual void update(sf::Time deltaTime);
+	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
 	bool isOnScene;
@@ -236,14 +236,15 @@ public:
 	static sf::Vector2i getSize_for_Direction(Directions direction, sf::Vector2i size);
 	static sf::Vector2f getSpeed_for_Scrolling(Directions direction, float vspeed);
 	static sf::Vector2f getSpeed_for_Direction(Directions direction, sf::Vector2f speed);
-	
+	static float getRotation_for_Direction(Directions direction);
 	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
+
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
-	sf::Vector2f setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
-	sf::Vector2f getRandomXSpawnPosition(Directions direction, sf::Vector2f max_enemy_size, sf::Vector2f cluster_size = sf::Vector2f(0,0));
 
-	static float getRotation_for_Direction(Directions direction);
+	sf::Vector2f getRandomXSpawnPosition(Directions direction, sf::Vector2f max_enemy_size, sf::Vector2f cluster_size = sf::Vector2f(0, 0));
+	sf::Vector2f getSpeedYMultiplier_for_Direction(Directions direction, float speed_multiplier);
+	sf::Vector2f setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
 
 protected:
 	sf::Vector2f initial_position;

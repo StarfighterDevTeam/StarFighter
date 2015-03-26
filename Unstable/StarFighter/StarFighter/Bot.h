@@ -15,7 +15,7 @@ class Bot : public Independant
 {
 public:
 	Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
-	void update(sf::Time deltaTime) override;
+	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	Weapon* weapon;
 	Independant* target;
 	Bot* Clone();

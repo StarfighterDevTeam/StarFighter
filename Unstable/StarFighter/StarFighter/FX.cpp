@@ -12,9 +12,26 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	frameNumber = m_frameNumber;
 }
 
-void FX::update(sf::Time deltaTime)
+void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	Independant::update(deltaTime);
+	static sf::Vector2f newposition, offset, newspeed;
+	newspeed = this->speed;
+
+	if (hyperspeedMultiplier > 1)
+	{
+		newspeed = this->getSpeedYMultiplier_for_Direction((*CurrentGame).direction, hyperspeedMultiplier);
+	}
+	else if (hyperspeedMultiplier < 1)
+	{
+		newspeed.x = this->speed.x * hyperspeedMultiplier;
+		newspeed.y = this->speed.y * hyperspeedMultiplier;
+	}
+
+	//Basic movement (initial vector)
+	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+
+	this->setPosition(newposition.x, newposition.y);
 
 	//if (deltaClockExploding.getElapsedTime() > duration)
 	if (deltaClockExploding.getElapsedTime() > sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES*this->frameNumber)) 
@@ -24,6 +41,8 @@ void FX::update(sf::Time deltaTime)
 		this->isOnScene = false;
 		this->GarbageMe = true;
 	}
+
+	AnimatedSprite::update(deltaTime);
 }
 
 
@@ -48,7 +67,7 @@ void Aura::Init(std::string m_textureName, sf::Vector2f size, int m_frameNumber)
 	this->frameNumber = m_frameNumber;
 }
 
-void Aura::update(sf::Time deltaTime)
+void Aura::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	static sf::Vector2f newposition;
 	newposition.x = target->getPosition().x;
@@ -70,12 +89,12 @@ FakeShip::FakeShip(Independant* m_target, std::string textureName, sf::Vector2f 
 
 }
 
-void FakeShip::update(sf::Time deltaTime)
+void FakeShip::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (this->target->currentAnimationIndex != this->currentAnimationIndex)
 	{
 		this->setAnimationLine(this->target->currentAnimationIndex, true);
 	}
 
-	Aura::update(deltaTime);
+	Aura::update(deltaTime, hyperspeedMultiplier);
 }

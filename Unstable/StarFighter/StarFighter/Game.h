@@ -44,6 +44,7 @@ public:
 	sf::RenderTexture hubScreen;
 	PlayerHud hud;
 	sf::Vector2i screen_size;
+	float hyperspeedMultiplier;
 
 	bool isLastEnemyDead();
 	int getHazard();

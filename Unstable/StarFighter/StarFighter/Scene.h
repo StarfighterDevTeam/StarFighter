@@ -28,8 +28,6 @@ enum ScenesData
 	SCENE_LINK_LEFT,
 };
 
-
-
 class Scene
 {
 public:

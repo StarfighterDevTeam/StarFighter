@@ -16,7 +16,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	reset_facing = false;
 }
 
-void Enemy::update(sf::Time deltaTime)
+void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//shield regen if not maximum
 	static double shield_regen_buffer = 0;
@@ -38,10 +38,21 @@ void Enemy::update(sf::Time deltaTime)
 	}
 
 	//movement
-	static sf::Vector2f newposition, offset;
+	static sf::Vector2f newposition, offset, newspeed;
+	newspeed = this->speed;
 
-	newposition.x = this->getPosition().x + (this->speed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (this->speed.y)*deltaTime.asSeconds();
+	if (hyperspeedMultiplier > 1)
+	{
+		newspeed = this->getSpeedYMultiplier_for_Direction((*CurrentGame).direction, hyperspeedMultiplier);
+	}
+	else if (hyperspeedMultiplier < 1)
+	{
+		newspeed.x = this->speed.x * hyperspeedMultiplier;
+		newspeed.y = this->speed.y * hyperspeedMultiplier;
+	}
+
+	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 	//call bobbyPattern
 	offset = Pattern.GetOffset(deltaTime.asSeconds());

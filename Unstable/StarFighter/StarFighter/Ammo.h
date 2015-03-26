@@ -20,7 +20,7 @@ public:
 	Ammo* Clone();
 	FX* explosion;
 	void Death() override;
-	void update(sf::Time deltaTime) override;
+	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 
 	float radius;
 	float angspeed;
