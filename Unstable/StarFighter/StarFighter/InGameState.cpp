@@ -168,8 +168,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 {
 	float w = this->currentScene->bg->m_size.x;
 	float h = this->currentScene->bg->m_size.y;
-	float wn = this->nextScene->bg->m_size.x;
-	float hn = this->nextScene->bg->m_size.y;
 	float w_ = (*CurrentGame).playerShip->m_size.x;
 	float h_ = (*CurrentGame).playerShip->m_size.y;
 	if ((*CurrentGame).playerShip->ship_config.ship_model->hasFake)
@@ -270,7 +268,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 						reverse = true;
 					}
 					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
-					this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+					this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
 
 					//Putting the player on rails
 					(*CurrentGame).playerShip->disable_inputs = true;
@@ -337,6 +335,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 		case InGameStateMachine::TRANSITION_PHASE2_2:
 		{
+			float wn = this->nextScene->bg->m_size.x;
+			float hn = this->nextScene->bg->m_size.y;
 			//When the new scene is completely swapped, we can wrap up the replacement and restart scrolling (or do what the Hubs do if the scene is a Hub)
 			if (this->nextScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::GREATHER_THAN
 				|| this->nextScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::EQUAL_TO)
@@ -371,8 +371,10 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				SetSceneHazardLevel(this->currentScene->m_name, this->currentScene->getSceneHazardLevelValue());
 
 				//Wiping the previous background and swapping with the new one
-				this->currentScene->bg->GarbageMe = true;
-				*this->currentScene = *this->nextScene;
+				this->currentScene->DestroyScene();
+				delete this->currentScene;
+				this->currentScene = this->nextScene;
+				this->nextScene = NULL;
 				(*CurrentGame).direction = this->currentScene->direction;
 
 				//and save the map into the player save file
@@ -401,7 +403,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 				string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
 				(*CurrentGame).direction = (*CurrentGame).playerShip->targetPortal->direction;
-				this->nextScene->LoadSceneFromFile(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+				this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
 
 				//Putting the player on rails
 				(*CurrentGame).playerShip->disable_inputs = true;

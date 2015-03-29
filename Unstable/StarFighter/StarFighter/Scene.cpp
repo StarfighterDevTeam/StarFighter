@@ -243,6 +243,17 @@ Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
 }
 
+void Scene::DestroyScene()
+{
+	this->bg->GarbageMe = true;
+	boss_list.clear();
+	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
+	{
+		enemies_ranked_by_class[i].clear();
+		sceneEnemyGenerators[i].clear();
+	}
+}
+
 void Scene::GenerateBoss()
 {
 	for (std::list<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)

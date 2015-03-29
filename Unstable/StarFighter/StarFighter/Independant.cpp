@@ -31,7 +31,7 @@ string Independant::getName()
 Independant::Independant()
 {
 	this->transparent = false;
-	this->visible = false;
+	this->visible = true;
 	this->immune = false;
 	this->ghost = false;
 	this->isOnScene = false;

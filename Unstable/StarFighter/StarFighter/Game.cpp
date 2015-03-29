@@ -298,25 +298,12 @@ void Game::collectGarbage()
 
 		if (!(**it).isOnScene)
 		{
-			//ended FX and loot objets
-			if ((**it).collider_type == IndependantType::LootObject || (**it).collider_type == IndependantType::Neutral)
+			//objects that are spawning out of screen are not deleted
+			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= SCENE_SIZE_Y))
 			{
-				this->garbage.push_back(*it);
-				continue;
+				(**it).isOnScene = true;
 			}
-			else
-			{
-				//objects that are spawning out of screen are not deleted
-				if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= SCENE_SIZE_Y))
-				{
-					(**it).isOnScene = true;
-				}
-			}
-		}
-
-		if ((**it).collider_type == BackgroundObject || !(**it).isOnScene)
-		{
-			continue;
+			
 		}
 
 		//Out of scene content

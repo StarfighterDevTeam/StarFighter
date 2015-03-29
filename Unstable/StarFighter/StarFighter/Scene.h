@@ -48,6 +48,8 @@ public:
 
 	float getSceneBeastScore();
 	
+	void DestroyScene();
+
 	Background* bg;
 	Directions direction;
 	bool generating_enemies;
@@ -68,7 +70,6 @@ private:
 	list<EnemyBase*> boss_list;
 	vector<EnemyBase*> enemies_ranked_by_class[NBVAL_EnemyClass];
 	int total_class_probability[NBVAL_EnemyClass];
-	sf::RenderWindow* mainWindow;
 	int hazard_level;
 
 	sf::Clock clockHubExit;
