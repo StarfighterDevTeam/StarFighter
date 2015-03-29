@@ -76,7 +76,7 @@ class Phase
 public:
 	Phase();
 	string display_name;
-	list<Weapon*> weapons_list;
+	vector<Weapon*> weapons_list;
 	PatternBobby* Pattern;
 	Modifier modifier;
 	float angspeed;
@@ -86,7 +86,7 @@ public:
 	bool hasTransition;
 	bool hasWakeUp;
 	bool hasWelcomeShot;
-	list<ConditionTransition*> transitions_list;
+	vector<ConditionTransition*> transitions_list;
 	string wake_up_name;
 	static ConditionTransition* ConditionLoader(vector<string> line_data, int index);
 	Weapon* welcomeWeapon;

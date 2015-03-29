@@ -22,9 +22,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
-		list<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
+		vector<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
 
-		for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+		for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 		{
 			if ((*it)[ScenesData::SCENE_NAME].compare(name) == 0)
 			{
@@ -36,8 +36,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				std::string scene_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
-				list<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
-				for (std::list<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
+				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
+				for (std::vector<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
@@ -107,7 +107,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								this->bg->portals[(Directions)i]->destination_name = this->links[(Directions)i];
 
 								//Getting the string of the "display name" for a each linked scene
-								for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+								for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 								{
 									if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 									{
@@ -186,9 +186,9 @@ Scene::Scene(string name)
 	this->m_name = name;
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
-		list<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
+		vector<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
 
-		for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+		for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 		{
 			if ((*it)[ScenesData::SCENE_NAME].compare(name) == 0)
 			{
@@ -200,8 +200,8 @@ Scene::Scene(string name)
 				std::string scene_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
-				list<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
-				for (std::list<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
+				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
+				for (std::vector<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
@@ -217,7 +217,7 @@ Scene::Scene(string name)
 				if (this->links[(Directions)i].compare("0") != 0)
 				{
 					//Getting the string of the "display name" for a each linked scene
-					for (std::list<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+					for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 					{
 						if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 						{
@@ -256,22 +256,11 @@ void Scene::DestroyScene()
 
 void Scene::GenerateBoss()
 {
-	for (std::list<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)
+	for (std::vector<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)
 	{
 		Enemy* m_boss = (*it)->enemy->Clone();
 		m_boss->enemy_class = (EnemyClass)((*it)->enemyclass);
 		(*CurrentGame).addToScene(m_boss, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
-	}
-}
-
-void Scene::Draw(sf::RenderWindow* window)
-{
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
-	{
-		if (this->links[(Directions)i].compare("0") != 0)
-		{
-			//this->link_zone[i].Draw(window);
-		}
 	}
 }
 

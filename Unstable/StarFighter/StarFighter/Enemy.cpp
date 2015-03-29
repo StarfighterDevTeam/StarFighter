@@ -90,7 +90,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else
 	{
 		//if one of the weapon is semi-seaking and the enemy has to face the target, then it cannot rotate until he's done firing
-		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+		for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
 			if ((*it)->target_seaking == TargetSeaking::SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
 			{
@@ -129,7 +129,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//automatic fire
 	if (this->isOnScene && !this->weapons_list.empty())
 	{
-		for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+		for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 		{
 			if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 			{
@@ -189,7 +189,7 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->damage = this->getIndependantDamage();
 	enemy->hasWeapon = this->hasWeapon;
 
-	for (std::list<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+	for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 	{
 		enemy->weapons_list.push_back((*it)->Clone());
 	}	
@@ -220,7 +220,7 @@ Enemy* Enemy::Clone()
 
 bool Enemy::CheckCondition()
 {
-	for (std::list<ConditionTransition*>::iterator it = (this->currentPhase->transitions_list.begin()); it != (this->currentPhase->transitions_list.end()); it++)
+	for (std::vector<ConditionTransition*>::iterator it = (this->currentPhase->transitions_list.begin()); it != (this->currentPhase->transitions_list.end()); it++)
 	{
 		switch ((*it)->condition)
 		{
@@ -435,7 +435,7 @@ void Enemy::setPhase(Phase* m_phase)
 
 	//clearing old weapons and setting new ones
 	this->weapons_list.clear();
-	for (std::list<Weapon*>::iterator it = (m_phase->weapons_list.begin()); it != (m_phase->weapons_list.end()); it++)
+	for (std::vector<Weapon*>::iterator it = (m_phase->weapons_list.begin()); it != (m_phase->weapons_list.end()); it++)
 	{
 		this->weapons_list.push_back((*it)->Clone());
 	}
@@ -459,7 +459,7 @@ void Enemy::setPhase(Phase* m_phase)
 
 	//setting up wake_up condition
 	bool wake_up_condition_exists = false;
-	for (std::list<ConditionTransition*>::iterator it = (m_phase->transitions_list.begin()); it != (m_phase->transitions_list.end()); it++)
+	for (std::vector<ConditionTransition*>::iterator it = (m_phase->transitions_list.begin()); it != (m_phase->transitions_list.end()); it++)
 	{
 		if ((*it)->condition == ConditionType::wakeUp)
 		{
@@ -489,9 +489,9 @@ void Enemy::setPhase(string phase_name)
 
 Phase* Enemy::LoadPhase(string name)
 {
-	list<vector<string>> phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
+	vector<vector<string>> phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
 
-	for (std::list<vector<string>>::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
@@ -947,9 +947,9 @@ int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_
 Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 {
 
-	list<vector<string>> weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
+	vector<vector<string>> weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
 
-	for (std::list<vector<string>>::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
@@ -1007,9 +1007,9 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 
 Ammo* Enemy::LoadAmmo(string name)
 {
-	list<vector<string>> ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
+	vector<vector<string>> ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
 
-	for (std::list<vector<string>>::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
@@ -1032,9 +1032,9 @@ Ammo* Enemy::LoadAmmo(string name)
 
 FX* Enemy::LoadFX(string name)
 {
-	list<vector<string>>FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
+	vector<vector<string>>FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
 
-	for (std::list<vector<string>>::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
 	{
 		if ((*it)[FXData::FX_TYPE].compare("explosion") == 0)
 		{

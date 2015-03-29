@@ -161,7 +161,6 @@ public:
 	bool DontGarbageMe;
 	IndependantType collider_type;
 	LayerType layer;
-	void setVisible(bool visible);
 	virtual void damage_from(Independant& independant);
 	sf::Vector2f m_size;
 	sf::Vector2f getIndependantSpeed();

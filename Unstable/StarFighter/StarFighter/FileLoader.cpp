@@ -5,9 +5,9 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
 	try
 	{
-		list<vector<string>> shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
+		vector<vector<string>> shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
 
-		for (std::list<vector<string>>::iterator it = (shipConfig).begin(); it != (shipConfig).end(); it++)
+		for (std::vector<vector<string>>::iterator it = (shipConfig).begin(); it != (shipConfig).end(); it++)
 		{
 			if((*it)[ShipConfigData::SHIPCONFIG_NAME].compare(name) == 0)
 			{
@@ -54,9 +54,9 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 EnemyPool* FileLoader::LoadEnemyPool(string name)
 {
 	
-	list<vector<string>> enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
+	vector<vector<string>> enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
 
-	for (std::list<vector<string>>::iterator it = (enemypoolConfig).begin(); it != (enemypoolConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (enemypoolConfig).begin(); it != (enemypoolConfig).end(); it++)
 	{
 		if((*it)[0].compare(name) == 0)
 		{
@@ -69,9 +69,9 @@ EnemyPool* FileLoader::LoadEnemyPool(string name)
 
 EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_enemyClass)
 {
-	list<vector<string>> enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
+	vector<vector<string>> enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
 
-	for (std::list<vector<string>>::iterator it = (enemyConfig).begin(); it != (enemyConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (enemyConfig).begin(); it != (enemyConfig).end(); it++)
 	{
 		if ((*it)[0].compare(m_name) == 0)
 		{
@@ -142,9 +142,9 @@ FX* FileLoader::LoadFX(string name)
 
 Equipment* FileLoader::LoadEquipment(string name)
 {
-	list<vector<string>>equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
+	vector<vector<string>>equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
 
-	for (std::list<vector<string>>::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
 	{
 		if((*it)[EquipmentData::EQUIPMENT_NAME].compare(name) == 0)
 		{
@@ -192,9 +192,9 @@ Equipment* FileLoader::LoadEquipment(string name)
 
 ShipModel* FileLoader::LoadShipModel(string name)
 {
-	list<vector<string>> equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
+	vector<vector<string>> equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
 
-	for (std::list<vector<string>>::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
 	{
 		if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("shipmodel") == 0)
 		{
@@ -230,9 +230,9 @@ ShipModel* FileLoader::LoadShipModel(string name)
 
 Bot* FileLoader::LoadBot(string name)
 {
-	list<vector<string>>botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
+	vector<vector<string>>botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
 
-	for (std::list<vector<string>>::iterator it = (botConfig).begin(); it != (botConfig).end(); it++)
+	for (std::vector<vector<string>>::iterator it = (botConfig).begin(); it != (botConfig).end(); it++)
 	{
 		if((*it)[0].compare(name) == 0)
 		{

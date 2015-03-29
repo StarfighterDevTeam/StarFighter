@@ -163,11 +163,6 @@ void Independant::updateAnimation(sf::Time deltaTime)
 	AnimatedSprite::update(deltaTime);
 }
 
-void Independant::setVisible(bool m_visible)
-{
-	this->visible = m_visible;
-}
-
 void Independant::Respawn()
 {
 

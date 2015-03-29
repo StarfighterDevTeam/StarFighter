@@ -1045,7 +1045,7 @@ void Ship::Respawn()
 	shield = ship_config.getShipConfigShield();
 	speed.x = 0;
 	speed.y = 0;
-	this->setVisible(true);
+	this->visible = true;
 	isOnScene = true;
 	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
 	pos = Independant::getPosition_for_Direction((*CurrentGame).direction, pos);

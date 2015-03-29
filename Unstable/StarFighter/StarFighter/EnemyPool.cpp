@@ -42,7 +42,7 @@ void EnemyPool::CreateCluster()
 		if ( (*(*it)).enemy_class != EnemyClass::ENEMYPOOL_VOID)
 		{
 			Enemy* n = (*it)->enemy->Clone();
-			n->setVisible(true);
+			n->visible = true;
 			n->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
 
 			//WIP

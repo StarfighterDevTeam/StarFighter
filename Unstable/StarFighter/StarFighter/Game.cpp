@@ -155,7 +155,7 @@ void Game::colisionChecksV2()
 					//hide destroyed item
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
-						(*it1)->setVisible(false);
+						(*it1)->visible = false;
 						(*it1)->Death();
 						//we all deserve another chance...
 						(*it1)->Respawn();
@@ -179,7 +179,7 @@ void Game::colisionChecksV2()
 				//death of player?
 				if ((*it1)->getIndependantArmor() <= 0)
 				{
-					(*it1)->setVisible(false);
+					(*it1)->visible = false;
 					(*it1)->Death();
 					//we all deserve another chance...
 					(*it1)->Respawn();
@@ -212,7 +212,7 @@ void Game::colisionChecksV2()
 				//Do something (like, take the loot)
 				//(*it1)->get_money_from(*(*it2));
 				(*it1)->GetLoot((*(*it2)));
-				(*it2)->setVisible(false);
+				(*it2)->visible = false;
 				(*it2)->isOnScene = false;
 				(*it2)->GarbageMe = true;
 			}
@@ -268,7 +268,7 @@ void Game::cleanGarbage()
 	sf::Clock dt;
 	dt.restart();
 
-	for (std::vector<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
+	for (std::list<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
 	{
 		Independant*	ptr	= *it;
 		this->sceneIndependants.remove(ptr);

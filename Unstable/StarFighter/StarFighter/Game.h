@@ -71,7 +71,7 @@ private:
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*> sceneIndependantsLayered[NBVAL_Layer];
 	std::list<Independant*> sceneIndependantsTyped[NBVAL_Independant];
-	std::vector<Independant*> garbage;
+	std::list<Independant*> garbage;
 };
 
 #endif // GAME_H_INCLUDED

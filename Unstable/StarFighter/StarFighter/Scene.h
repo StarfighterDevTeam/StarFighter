@@ -34,14 +34,9 @@ public:
 	//Scene(string name, ShipConfig* shipConf);
 	Scene(string name, int hazard_level, bool reverse_scene=false, bool first_scene=false);
 	Scene(string name);
-	void Draw(sf::RenderWindow* window);
 	void GenerateEnemies(Time deltaTime);
 	void GenerateBoss();
-	void EndSceneAnimation(float transition_UP, float transition_DOWN);
-	void ExitHubTransition(float transition_speed_UP, float transition_speed_DOWN);
 	void LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
-	void SetLinkZone(Directions direction);
-	std::string LoadSceneNameFromFile(string name);
 	string m_name;
 	float vspeed;
 	bool m_hazardbreak_has_occurred;
@@ -67,12 +62,10 @@ public:
 	void HazardBreak();
 
 private:
-	list<EnemyBase*> boss_list;
+	vector<EnemyBase*> boss_list;
 	vector<EnemyBase*> enemies_ranked_by_class[NBVAL_EnemyClass];
 	int total_class_probability[NBVAL_EnemyClass];
 	int hazard_level;
-
-	sf::Clock clockHubExit;
 };
 
 #endif // STARFIGHTER_H_INCLUDED

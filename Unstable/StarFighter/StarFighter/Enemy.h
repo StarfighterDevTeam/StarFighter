@@ -34,7 +34,7 @@ class Enemy : public Independant
 public:
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber = 1, int m_animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
-	list<Weapon*> weapons_list;
+	vector<Weapon*> weapons_list;
 	Enemy* Clone();
 	FX* FX_death;
 	void Death() override;
