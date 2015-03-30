@@ -6,7 +6,7 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
+ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name) : ObjectData()
 {
 	this->max_speed.x = m_max_speed;
 	this->max_speed.y = m_max_speed;
@@ -69,7 +69,7 @@ int ShipModel::getShipModelDamage()
 
 // ----------------EQUIPMENT ---------------
 
-Equipment::Equipment()
+Equipment::Equipment() : ObjectData()
 {
 	this->max_speed.x = 0.0f;
 	this->max_speed.y = 0.0f;
@@ -1079,7 +1079,9 @@ void Ship::GetLoot(Independant& independant)
 			//...else we put it in the stash
 
 			printf("Equipment added to ship stash: '%s'\n", independant.getEquipmentLoot()->display_name.c_str());
-			this->stash.push_back((Loot*)independant.getEquipmentLoot());
+			(*CurrentGame).hud.equipmentGrid.insertObject(independant);
+			//this->stash.push_back((Loot*)independant.getEquipmentLoot());
+			
 			independant.releaseEquipmentLoot();
 
 		}
@@ -1100,7 +1102,8 @@ void Ship::GetLoot(Independant& independant)
 		{
 			//...else we add it in stash
 			printf("Weapon added to ship stash: '%s'\n", independant.getWeaponLoot()->display_name.c_str());
-			this->stash.push_back((Loot*)independant.getWeaponLoot());
+			(*CurrentGame).hud.equipmentGrid.insertObject(independant);
+			//this->stash.push_back((Loot*)independant.getWeaponLoot());
 			independant.releaseWeaponLoot();
 		}
 

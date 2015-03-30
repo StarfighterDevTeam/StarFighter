@@ -641,7 +641,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 	this->setMoney(0);
 	int e_class = (int)this->enemy_class;
 
-	Loot* loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Empty drop");
+	//Loot* loot = new Loot(this->getPosition(),sf::Vector2f(0, LOOT_SPEED_Y), LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Empty drop");
 
 	double random_number = (double) rand() / (RAND_MAX);
 
@@ -649,7 +649,6 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 	{	
 		//empty drop
 	}
-
 	else 
 	{
 		sf::Vector2f LootTable_BeastScale[EnemyClass::NBVAL_EnemyClass];
@@ -667,11 +666,11 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 			}
 		}
 
-		if (random_number < LootTable_DropIsEquipment[e_class]*LootTable_DroppingSomething[e_class])
+    	if (random_number < LootTable_DropIsEquipment[e_class]*LootTable_DroppingSomething[e_class])
 		{
 
 			//-----NUMBER OF PROPERTIES-----
-			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[e_class]);
+  			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[e_class]);
 			int number_of_equipment_properties = 0;
 			bool epic_drop = false;
 			for (int i=1; i<NUMBER_OF_BEASTSCALE_THRESHOLD; i++) 

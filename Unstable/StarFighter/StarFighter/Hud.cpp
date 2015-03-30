@@ -1,13 +1,86 @@
 #include "Hud.h"
 
+ObjectData::ObjectData()
+{
+
+}
+
+ObjectData::ObjectData(std::string textureName)
+{
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture(textureName, EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE);
+	this->textureName = textureName;
+
+	this->setOrigin(EQUIPMENT_GRID_SLOT_SIZE / 2, EQUIPMENT_GRID_SLOT_SIZE / 2);
+}
+
+ObjectGrid::ObjectGrid()
+{
+	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+	{
+		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+		{
+			grid[i][j] = NULL;
+		}
+	}
+}
+
+void ObjectGrid::fakeGridFill()
+{
+	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+	{
+		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+		{
+			Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE));
+			empty_slot->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_X + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_Y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
+			grid[i][j] = empty_slot;
+		}
+	}
+}
+
+bool ObjectGrid::insertObject(Independant& object)
+{
+	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+	{
+		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+		{
+			if (grid[i][j] == NULL)
+			{
+				*grid[i][j] = object;
+				grid[i][j]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_X + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_Y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
+
+				return true;
+			}
+		}
+	}
+	//no free slot found
+	return false;
+}
+
+void ObjectGrid::Draw(sf::RenderTexture& offscreen)
+{
+	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+	{
+		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+		{
+			if (grid[i][j] != NULL)
+			{
+				offscreen.draw(*grid[i][j]);
+			}
+		}
+	}
+}
+
 PlayerHud::PlayerHud()
 {
 	this->max_hazard_level_reached = false;
+	this->fakeGrid.fakeGridFill();
+	
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
 {
-
 	backgroundColor.setSize(sf::Vector2f(SCENE_SIZE_X * 1.0f / 3, SCENE_SIZE_Y));
 	backgroundColor.setFillColor(sf::Color(10, 10, 10, 128));//dark grey
 	backgroundColor.setOrigin(0, 0);
@@ -140,4 +213,7 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 	offscreen.draw(SceneName);
 	
 	offscreen.draw(*(framerate));
+
+	fakeGrid.Draw(offscreen);
+	equipmentGrid.Draw(offscreen);
 }

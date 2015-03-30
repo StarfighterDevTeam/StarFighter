@@ -8,6 +8,45 @@
 #define ARMOR_BAR_SIZE_X		20
 #define ARMOR_BAR_SIZE_Y		200
 
+class ObjectData : public sf::Sprite
+{
+public:
+	ObjectData();
+	ObjectData(std::string textureName);
+	
+	sf::Vector2f max_speed;
+	sf::Vector2f acceleration;
+	float decceleration;
+	float hyperspeed;
+	int armor;
+	int shield;
+	int shield_regen;
+	int damage;
+	int equipmentType;
+
+	sf::Vector2f size;
+	std::string textureName;
+	int frameNumber;
+	std::string display_name;
+	//Bot* bot;
+	bool hasBot;
+
+	bool hasFake;
+	std::string fake_textureName;
+	int fake_frameNumber;
+	void Draw(sf::RenderTexture& offscreen);
+};
+
+class ObjectGrid
+{
+public:
+	ObjectGrid();
+	void fakeGridFill();
+	bool insertObject(Independant& object);
+	Independant* grid[EQUIPMENT_GRID_NB_LINES][EQUIPMENT_GRID_NB_ROWS];
+	void Draw(sf::RenderTexture& offscreen);
+};
+
 class PlayerHud
 {
 public:
@@ -16,6 +55,8 @@ public:
 	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub);
 	void Draw(sf::RenderTexture& offscreen);
 
+	ObjectGrid equipmentGrid;
+	ObjectGrid fakeGrid;
 	sf::RectangleShape backgroundColor;
 	sf::RectangleShape armorBar;
 	sf::RectangleShape shieldBar;

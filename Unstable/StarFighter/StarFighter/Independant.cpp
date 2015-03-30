@@ -317,7 +317,7 @@ void Independant::setEquipmentLoot(Equipment* equipment)
 {
 	assert(equipment != NULL);
 	this->equipment_loot = equipment;
-	this->hasEquipmentLoot = true;
+	this->hasEquipmentLoot = (equipment != NULL);;
 }
 
 Equipment* Independant::getEquipmentLoot()
