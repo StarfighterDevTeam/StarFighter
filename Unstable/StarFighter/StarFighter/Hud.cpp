@@ -47,7 +47,7 @@ bool ObjectGrid::insertObject(Independant& object)
 		{
 			if (grid[i][j] == NULL)
 			{
-				*grid[i][j] = object;
+				grid[i][j] = &object;
 				grid[i][j]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_X + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_Y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
 
 				return true;

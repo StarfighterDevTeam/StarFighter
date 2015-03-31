@@ -1079,7 +1079,9 @@ void Ship::GetLoot(Independant& independant)
 			//...else we put it in the stash
 
 			printf("Equipment added to ship stash: '%s'\n", independant.getEquipmentLoot()->display_name.c_str());
-			(*CurrentGame).hud.equipmentGrid.insertObject(independant);
+			Independant *i = NULL;
+			i = independant.Clone();
+			(*CurrentGame).hud.equipmentGrid.insertObject(*i);
 			//this->stash.push_back((Loot*)independant.getEquipmentLoot());
 			
 			independant.releaseEquipmentLoot();
@@ -1102,7 +1104,9 @@ void Ship::GetLoot(Independant& independant)
 		{
 			//...else we add it in stash
 			printf("Weapon added to ship stash: '%s'\n", independant.getWeaponLoot()->display_name.c_str());
-			(*CurrentGame).hud.equipmentGrid.insertObject(independant);
+			Independant *i = NULL;
+			i = independant.Clone();
+			(*CurrentGame).hud.equipmentGrid.insertObject(*i);
 			//this->stash.push_back((Loot*)independant.getWeaponLoot());
 			independant.releaseWeaponLoot();
 		}
