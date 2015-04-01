@@ -8,43 +8,16 @@
 #define ARMOR_BAR_SIZE_X		20
 #define ARMOR_BAR_SIZE_Y		200
 
-class ObjectData : public sf::Sprite
-{
-public:
-	ObjectData();
-	ObjectData(std::string textureName);
-	
-	sf::Vector2f max_speed;
-	sf::Vector2f acceleration;
-	float decceleration;
-	float hyperspeed;
-	int armor;
-	int shield;
-	int shield_regen;
-	int damage;
-	int equipmentType;
-
-	sf::Vector2f size;
-	std::string textureName;
-	int frameNumber;
-	std::string display_name;
-	//Bot* bot;
-	bool hasBot;
-
-	bool hasFake;
-	std::string fake_textureName;
-	int fake_frameNumber;
-	void Draw(sf::RenderTexture& offscreen);
-};
-
 class ObjectGrid
 {
 public:
 	ObjectGrid();
-	void fakeGridFill();
-	bool insertObject(Independant& object);
+	ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake = false);
+	bool insertObject(Independant& object, int index = -1);
 	Independant* grid[EQUIPMENT_GRID_NB_LINES][EQUIPMENT_GRID_NB_ROWS];
 	void Draw(sf::RenderTexture& offscreen);
+	sf::Vector2f position;
+	sf::Vector2i squares;
 };
 
 class PlayerHud
@@ -55,11 +28,16 @@ public:
 	void Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub);
 	void Draw(sf::RenderTexture& offscreen);
 
+	ObjectGrid fakeEquipmentGrid;
 	ObjectGrid equipmentGrid;
-	ObjectGrid fakeGrid;
+	ObjectGrid fakeShipGrid;
+	ObjectGrid shipGrid;
+
 	sf::RectangleShape backgroundColor;
 	sf::RectangleShape armorBar;
 	sf::RectangleShape shieldBar;
+	//sf::Text ShipGridTitle;
+	//sf::Text EquipmentGridTitle;
 	sf::Text Money;
 	sf::Text GrazeScore;
 	sf::Text SceneName;

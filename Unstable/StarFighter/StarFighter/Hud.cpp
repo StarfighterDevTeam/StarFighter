@@ -1,68 +1,87 @@
 #include "Hud.h"
 
-ObjectData::ObjectData()
-{
-
-}
-
-ObjectData::ObjectData(std::string textureName)
-{
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE);
-	this->textureName = textureName;
-
-	this->setOrigin(EQUIPMENT_GRID_SLOT_SIZE / 2, EQUIPMENT_GRID_SLOT_SIZE / 2);
-}
-
 ObjectGrid::ObjectGrid()
 {
-	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
-	{
-		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
-		{
-			grid[i][j] = NULL;
-		}
-	}
+	
 }
 
-void ObjectGrid::fakeGridFill()
+ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake)
 {
-	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+	for (size_t i = 0; i < squares.x; i++)
 	{
-		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+		for (size_t j = 0; j < squares.y; j++)
 		{
-			Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE));
-			empty_slot->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_X + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_Y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
-			grid[i][j] = empty_slot;
-		}
-	}
-}
-
-bool ObjectGrid::insertObject(Independant& object)
-{
-	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
-	{
-		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
-		{
-			if (grid[i][j] == NULL)
+			if (fill_with_fake)
 			{
-				grid[i][j] = &object;
-				grid[i][j]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_X + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + EQUIPMENT_GRID_OFFSET_POS_Y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
-
-				return true;
+				Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE));
+				empty_slot->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + position.x + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + position.y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
+				grid[i][j] = empty_slot;
+			}
+			else
+			{
+				grid[i][j] = NULL;
 			}
 		}
 	}
-	//no free slot found
-	return false;
+
+	this->position = position;
+	this->squares = squares;
+}
+
+bool ObjectGrid::insertObject(Independant& object, int index)
+{
+	//if no specific index is provided, we look for the first empty slot...
+	if (index < 0)
+	{
+		for (size_t i = 0; i < this->squares.x; i++)
+		{
+			for (size_t j = 0; j < this->squares.y; j++)
+			{
+				if (grid[i][j] == NULL)
+				{
+					grid[i][j] = &object;
+					grid[i][j]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
+
+					return true;
+				}
+			}
+		}
+		//no free slot found
+		return false;
+	}
+	//...otherwise we head directly to the requested index
+	else
+	{
+		int r = index % squares.y;
+		int l = index / squares.y;
+
+		//case: doesn't fit the number of slots available in the interface
+		if (l > squares.x)
+		{
+			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to add an equipment to the HUD (shipGrid) for an equipment type that has no slot planned.\n");
+			return false;
+		}
+		//case: the requested slot is free
+		else if (grid[l][r] == NULL)
+		{
+			grid[l][r] = &object;
+			grid[l][r]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (r * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (l * EQUIPMENT_GRID_SLOT_SIZE)));
+
+			return true;
+		}
+		else
+		{
+			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to add an equipement on an existing ship equipment slot.\n");
+			return false;
+		}
+	}
 }
 
 void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 {
-	for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+	for (size_t i = 0; i < this->squares.x; i++)
 	{
-		for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+		for (size_t j = 0; j < this->squares.y; j++)
 		{
 			if (grid[i][j] != NULL)
 			{
@@ -75,8 +94,11 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 PlayerHud::PlayerHud()
 {
 	this->max_hazard_level_reached = false;
-	this->fakeGrid.fakeGridFill();
-	
+
+	this->fakeEquipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), true);
+	this->fakeShipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
+	this->equipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false);
+	this->shipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
@@ -144,6 +166,16 @@ void PlayerHud::Init(int m_armor, int m_shield)
 		framerate->setColor(sf::Color::Yellow);
 		framerate->setStyle(sf::Text::Bold);
 		framerate->setPosition(HUD_LEFT_MARGIN, REF_WINDOW_RESOLUTION_Y - 25);
+
+		//ShipGridTitle.setFont(*font);
+		//ShipGridTitle.setCharacterSize(14);
+		//ShipGridTitle.setColor(_white);
+		//ShipGridTitle.setPosition(HUD_LEFT_MARGIN, SHIP_GRID_OFFSET_POS_Y - 20);
+		//
+		//EquipmentGridTitle.setFont(*font);
+		//EquipmentGridTitle.setCharacterSize(14);
+		//EquipmentGridTitle.setColor(_white);
+		//EquipmentGridTitle.setPosition(HUD_LEFT_MARGIN, EQUIPMENT_GRID_OFFSET_POS_Y - 20);
 	}
 
 	catch( const std::exception & ex ) 
@@ -196,6 +228,10 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 
 	//framerate
 	framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
+
+	//grid titles
+	//ShipGridTitle.setString("Ship equipment");
+	//EquipmentGridTitle.setString("Stash");
 }
 
 void PlayerHud::Draw(sf::RenderTexture& offscreen)
@@ -213,7 +249,13 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 	offscreen.draw(SceneName);
 	
 	offscreen.draw(*(framerate));
+	//offscreen.draw(ShipGridTitle);
+	//offscreen.draw(EquipmentGridTitle);
 
-	fakeGrid.Draw(offscreen);
+	fakeEquipmentGrid.Draw(offscreen);
+	fakeShipGrid.Draw(offscreen);
 	equipmentGrid.Draw(offscreen);
+	shipGrid.Draw(offscreen);
+
+	
 }

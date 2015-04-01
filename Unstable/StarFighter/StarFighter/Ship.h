@@ -48,7 +48,7 @@ enum GrazeLevels
 	NB_GRAZE_LEVELS,//4
 };
 
-class ShipModel : public ObjectData
+class ShipModel
 {
 public:
 	ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
@@ -83,7 +83,7 @@ private:
 	int damage;
 };
 
-class Equipment : public ObjectData
+class Equipment
 {
 public:
 	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);

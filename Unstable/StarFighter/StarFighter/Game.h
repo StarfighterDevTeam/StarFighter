@@ -46,6 +46,9 @@ public:
 	sf::Vector2i screen_size;
 	float hyperspeedMultiplier;
 
+	bool InsertObjectInShipGrid(Independant& object, int index = 0);
+	bool InsertObjectInEquipmentGrid(Independant& object);
+
 	bool isLastEnemyDead();
 	int getHazard();
 	void resetHazard(int hazard_overkill = 0);

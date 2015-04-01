@@ -484,3 +484,23 @@ void Game::WakeUpEnemiesWithName(string m_display_name)
 		}
 	}
 }
+
+bool Game::InsertObjectInShipGrid(Independant& object, int index)
+{
+	Independant *i = NULL;
+	i = object.Clone();
+	bool result = hud.shipGrid.insertObject(*i, index);
+	object.releaseWeaponLoot();
+
+	return result;
+}
+
+bool Game::InsertObjectInEquipmentGrid(Independant& object)
+{
+	Independant *i = NULL;
+	i = object.Clone();
+	bool result = hud.equipmentGrid.insertObject(*i);
+	object.releaseWeaponLoot();
+
+	return result;
+}

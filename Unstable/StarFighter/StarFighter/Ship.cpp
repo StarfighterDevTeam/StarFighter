@@ -6,7 +6,7 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name) : ObjectData()
+ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed.x = m_max_speed;
 	this->max_speed.y = m_max_speed;
@@ -69,7 +69,7 @@ int ShipModel::getShipModelDamage()
 
 // ----------------EQUIPMENT ---------------
 
-Equipment::Equipment() : ObjectData()
+Equipment::Equipment()
 {
 	this->max_speed.x = 0.0f;
 	this->max_speed.y = 0.0f;
@@ -84,7 +84,7 @@ Equipment::Equipment() : ObjectData()
 	this->size.y = SLOT_HEIGHT;
 	this->textureName = EMPTYSLOT_FILENAME;
 	this->frameNumber = 0;
-	this->equipmentType = EquipmentType::Airbrake;
+	this->equipmentType = EquipmentType::Armor;
 	this->hasBot = false;
 	this->hasFake = false;
 }
@@ -1072,46 +1072,28 @@ void Ship::GetLoot(Independant& independant)
 		{
 			//if the ship config does not have any equipment of this type on, we equip it...
 			this->setEquipment(independant.getEquipmentLoot());
-			independant.releaseEquipmentLoot();
+			(*CurrentGame).InsertObjectInShipGrid(independant, independant.getEquipmentLoot()->equipmentType);
 		}
 		else
 		{
 			//...else we put it in the stash
-
-			printf("Equipment added to ship stash: '%s'\n", independant.getEquipmentLoot()->display_name.c_str());
-			Independant *i = NULL;
-			i = independant.Clone();
-			(*CurrentGame).hud.equipmentGrid.insertObject(*i);
-			//this->stash.push_back((Loot*)independant.getEquipmentLoot());
-			
-			independant.releaseEquipmentLoot();
-
+			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
-
-		//this->releaseEquipmentLoot();
 	}
 
-	if (independant.hasWeaponLoot)
+	else if (independant.hasWeaponLoot)
 	{
 		if (!this->ship_config.hasWeapon)
 		{
 			//if the ship config does not have any weapon of this type on, we equip it...
-
 			this->setShipWeapon(independant.getWeaponLoot());
-			independant.releaseWeaponLoot();
+			(*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_EQUIPMENT);
 		}
 		else
 		{
-			//...else we add it in stash
-			printf("Weapon added to ship stash: '%s'\n", independant.getWeaponLoot()->display_name.c_str());
-			Independant *i = NULL;
-			i = independant.Clone();
-			(*CurrentGame).hud.equipmentGrid.insertObject(*i);
-			//this->stash.push_back((Loot*)independant.getWeaponLoot());
-			independant.releaseWeaponLoot();
+			//...else we put it in the stash
+			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
-
-		//this->releaseWeaponLoot();
 	}
 }
 
