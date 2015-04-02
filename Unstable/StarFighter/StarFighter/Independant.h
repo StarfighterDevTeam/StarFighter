@@ -132,12 +132,12 @@ enum EnemyClass
 };
 
 enum EquipmentType {
-	Airbrake,//0
-	Engine,//1
-	Armor,//2
-	Shield,//3
-	Module,//4
-	NBVAL_EQUIPMENT//5
+	//Airbrake,//0
+	Engine,//
+	Armor,//1
+	Shield,//2
+	Module,//3
+	NBVAL_EQUIPMENT//4
 };
 
 
@@ -179,29 +179,28 @@ public:
 	int getMoney();
 	void addMoney(int loot_value);
 	void setMoney(int loot_value);
-	void get_money_from(Independant& independant);
-	void get_money_from(Independant& independant, int loot_value);
-	virtual void GetLoot(Independant& independant);
+	bool get_money_from(Independant& independant);
+	bool get_money_from(Independant& independant, int loot_value);
+	virtual bool GetLoot(Independant& independant);
 	virtual void GetPortal(Independant* independant);
 	void setGhost(bool m_ghost);
 	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
 
-	bool hasEquipmentLoot;
-	void get_equipment_from(Independant& independant);
-	void setEquipmentLoot(Equipment* equipment);
+	bool get_equipment_from(Independant& independant);
+	bool setEquipmentLoot(Equipment* equipment);
 	void releaseEquipmentLoot();
 	Equipment* getEquipmentLoot();
 
-	bool hasWeaponLoot;
-	void get_weapon_from(Independant& independant);
-	void setWeaponLoot(Weapon* weapon);
+	bool get_weapon_from(Independant& independant);
+	bool setWeaponLoot(Weapon* weapon);
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
 	virtual void CreateRandomLoot(float BeastScaleBonus = 0);
 
+	
+
 	virtual void GetGrazing();
 	void GetPolarMovement(sf::Vector2f* np);
-	//sf::Vector2f setMovePattern(float angle_rad, float radius, float triggerY, int pattern_id=MovePatternType::NoMove);
 	int damage;
 	int armor;
 	int armor_max;
@@ -261,7 +260,6 @@ protected:
 	int money;
 	Equipment* equipment_loot;
 	Weapon* weapon_loot;
-
 };
 
 #endif // INDEPENDANT_H_INCLUDED

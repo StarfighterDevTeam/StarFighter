@@ -9,7 +9,6 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	angspeed = 0;
 	radius = 0;
 	FX_death = m_FX_death;
-	hasWeapon = false;
 	hasPhases = false;
 	rotation_speed = 0;
 	face_target = false;
@@ -90,7 +89,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else
 	{
 		//if one of the weapon is semi-seaking and the enemy has to face the target, then it cannot rotate until he's done firing
-		for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+		for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 		{
 			if ((*it)->target_seaking == TargetSeaking::SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
 			{
@@ -129,7 +128,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//automatic fire
 	if (this->isOnScene && !this->weapons_list.empty())
 	{
-		for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+		for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 		{
 			if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 			{
@@ -146,7 +145,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				//transmitting the angle to the weapon, which will pass it to the bullets
 				(*it)->shot_angle = theta;
 				(*it)->face_target = this->face_target;
-				
+
 				(*it)->Fire(IndependantType::EnemyFire);
 			}
 		}
@@ -187,7 +186,6 @@ Enemy* Enemy::Clone()
 	((Independant*)enemy)->shield_max = this->getIndependantShieldMax();
 	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
 	((Independant*)enemy)->damage = this->getIndependantDamage();
-	enemy->hasWeapon = this->hasWeapon;
 
 	for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 	{
@@ -195,9 +193,7 @@ Enemy* Enemy::Clone()
 	}	
 	
 	((Independant*)enemy)->addMoney(this->getMoney());
-	enemy->hasEquipmentLoot = this->hasEquipmentLoot;
 	enemy->equipment_loot = this->getEquipmentLoot();
-	enemy->hasWeaponLoot = this->hasWeaponLoot;
 	enemy->weapon_loot = this->getWeaponLoot();
 	enemy->display_name = this->display_name;
 	enemy->enemy_class = this->enemy_class;
@@ -435,7 +431,7 @@ void Enemy::setPhase(Phase* m_phase)
 
 	//clearing old weapons and setting new ones
 	this->weapons_list.clear();
-	for (std::vector<Weapon*>::iterator it = (m_phase->weapons_list.begin()); it != (m_phase->weapons_list.end()); it++)
+	for (std::vector<Weapon*>::iterator it = m_phase->weapons_list.begin(); it != m_phase->weapons_list.end(); it++)
 	{
 		this->weapons_list.push_back((*it)->Clone());
 	}
@@ -609,14 +605,14 @@ void Enemy::GenerateLoot()
 {
 	sf::Vector2f speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, LOOT_SPEED_Y);
 
-	if (this->hasWeaponLoot)
+	if (this->weapon_loot != NULL)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getWeaponLoot()->textureName, sf::Vector2f(this->getWeaponLoot()->size.x, this->getWeaponLoot()->size.y), this->getWeaponLoot()->display_name);
 		new_loot->get_weapon_from(*this);
 		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
 	}
 
-	else if (this->hasEquipmentLoot)
+	else if (this->equipment_loot != NULL)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getEquipmentLoot()->textureName, sf::Vector2f(this->getEquipmentLoot()->size.x, this->getEquipmentLoot()->size.y), this->getEquipmentLoot()->display_name);
 		new_loot->get_equipment_from(*this);
@@ -723,29 +719,29 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 
 			switch (equipment_type_roll)
 			{
-				case (int)EquipmentType::Airbrake:
-				{
-					//Initialisation
-					Equipment* equipment = new Equipment();
-					float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE;
-					float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
-					if (log_multiplier > 1)
-						e_decceleration *= log_multiplier;
-
-					e_decceleration = floor(e_decceleration);
-
-					equipment->Init((int)EquipmentType::Airbrake, 0, 0, e_decceleration, 0.f,0,0,0,0, AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
-
-					//Adding properties
-					for (int p=0; p<number_of_equipment_properties; p++)
-					{
-						int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
-						equipment->AddAirbrakeProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
-					}
-
-					this->setEquipmentLoot(equipment);
-					break;
-				}
+				//case (int)EquipmentType::Airbrake:
+				//{
+				//	//Initialisation
+				//	Equipment* equipment = new Equipment();
+				//	float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE;
+				//	float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BASE * (log(e_value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
+				//	if (log_multiplier > 1)
+				//		e_decceleration *= log_multiplier;
+				//
+				//	e_decceleration = floor(e_decceleration);
+				//
+				//	equipment->Init((int)EquipmentType::Airbrake, 0, 0, e_decceleration, 0.f,0,0,0,0, AIRBRAKE_FILENAME,sf::Vector2f(64,64),1,"Airbrake");
+				//
+				//	//Adding properties
+				//	for (int p=0; p<number_of_equipment_properties; p++)
+				//	{
+				//		int chosen_property = GetChosenProperty(&properties_roll_table,properties_to_choose_from,p);
+				//		equipment->AddAirbrakeProperty(chosen_property, e_value, LootTable_BeastScale[e_class]);
+				//	}
+				//
+				//	this->setEquipmentLoot(equipment);
+				//	break;
+				//}
 
 				case (int)EquipmentType::Engine:
 				{
@@ -870,7 +866,6 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
 
 					bot->weapon = weapon;
-					bot->hasWeapon = true;
 					equipment->bot = bot;
 
 					//Scaling with value

@@ -342,17 +342,14 @@ void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f B
 ShipConfig::ShipConfig()
 {
 	this->ship_model = new ShipModel(0, 0, 0.0f, 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
+	this->automatic_fire = false;
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		Equipment* defaultEquipment = new Equipment();
-		//defaultEquipment->Init(i, sf::Vector2f (0,0), 0.0f , sf::Vector2f (0,0), 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f (64,64), 1, "default");
-		this->equipment[i] = defaultEquipment;
-		this->hasEquipment[i] = false;
-		this->automatic_fire = false;
+		this->equipment[i] = NULL;
 	}
 
-	this->hasWeapon = false;
+	this->weapon = NULL;
 }
 
 void ShipConfig::Init()
@@ -378,7 +375,7 @@ void ShipConfig::Init()
 	}
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			if (this->equipment[i]->hasBot)
 			{
@@ -395,7 +392,7 @@ int ShipConfig::getShipConfigArmor()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_armor += equipment[i]->getEquipmentArmor();
 		}
@@ -421,7 +418,7 @@ int ShipConfig::getShipConfigShield()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_shield += equipment[i]->getEquipmentShield();
 		}
@@ -447,7 +444,7 @@ int ShipConfig::getShipConfigShieldRegen()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
 
@@ -474,7 +471,7 @@ int ShipConfig::getShipConfigDamage()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_damage += equipment[i]->getEquipmentDamage();
 		}
@@ -500,7 +497,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_max_speed.x += equipment[i]->getEquipmentMaxSpeed().x;
 			equipment_max_speed.y += equipment[i]->getEquipmentMaxSpeed().y;
@@ -531,7 +528,7 @@ float ShipConfig::getShipConfigDecceleration()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_decceleration += equipment[i]->getEquipmentDecceleration();
 		}
@@ -557,7 +554,7 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_acceleration.x += equipment[i]->getEquipmentAcceleration().x;
 			equipment_acceleration.y += equipment[i]->getEquipmentAcceleration().y;
@@ -588,7 +585,7 @@ float ShipConfig::getShipConfigHyperspeed()
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->hasEquipment[i])
+		if (this->equipment[i] != NULL)
 		{
 			equipment_hyperspeed += equipment[i]->getEquipmentHyperspeed();
 		}
@@ -607,32 +604,54 @@ float ShipConfig::getShipConfigHyperspeed()
 	return new_hyperspeed;
 }
 
-void ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats)
+bool ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats)
 {
-	this->equipment[m_equipment->equipmentType] = m_equipment;
-	this->hasEquipment[m_equipment->equipmentType] = true;
-
-	if (recomputing_stats)
+	if (this->equipment[m_equipment->equipmentType] == NULL)
 	{
-		this->Init();
+		this->equipment[m_equipment->equipmentType] = m_equipment;
+		if (recomputing_stats)
+		{
+			this->Init();
+		}
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
-void ShipConfig::setShipModel(ShipModel* m_ship_model)
+bool ShipConfig::setShipModel(ShipModel* m_ship_model)
 {
-	this->ship_model = m_ship_model;
+	assert(m_ship_model != NULL);
 
-	this->Init();
+	if (m_ship_model != NULL)
+	{
+		this->ship_model = m_ship_model;
+
+		this->Init();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
-void ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats)
+bool ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats)
 {
-	this->weapon = m_weapon;
-	this->hasWeapon = true;
-
-	if (recomputing_stats)
+	if (this->weapon == NULL)
 	{
-		this->Init();
+		this->weapon = m_weapon;
+		if (recomputing_stats)
+		{
+			this->Init();
+		}
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -656,6 +675,7 @@ void ShipConfig::DestroyBots()
 
 void ShipConfig::GenerateFakeShip(Independant* m_target)
 {
+	assert(this->ship_model != NULL);
 	if (this->ship_model->hasFake)
 	{
 		FakeShip* fake_ship = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
@@ -664,10 +684,13 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 
 	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
 	{
-		if (this->equipment[i]->hasFake)
+		if (this->equipment[i] != NULL)
 		{
-			FakeShip* fake_ship = new FakeShip(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-			(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
+			if(this->equipment[i]->hasFake)
+			{
+				FakeShip* fake_ship = new FakeShip(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
+				(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
+			}
 		}
 	}
 }
@@ -875,7 +898,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			if (InputGuy::isFiring() || this->ship_config.automatic_fire)
 			{
-				if (this->ship_config.hasWeapon)
+				if (this->ship_config.weapon != NULL)
 				{
 					float sizeY = this->m_size.y;
 					if (this->ship_config.ship_model->hasFake)
@@ -1062,39 +1085,58 @@ void Ship::Death()
 	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
 }
 
-void Ship::GetLoot(Independant& independant)
+bool Ship::GetLoot(Independant& independant)
 {
-	this->get_money_from(independant);
+	//MONEY
+	bool hasMoney = this->get_money_from(independant);
 
-	if (independant.hasEquipmentLoot)
+	//EQUIPMENT
+	bool canTakeEquipment = false;
+	if (independant.getEquipmentLoot() != NULL)
 	{
-		if (!this->ship_config.hasEquipment[independant.getEquipmentLoot()->equipmentType])
+		if (this->ship_config.setEquipment(independant.getEquipmentLoot(), true))
 		{
-			//if the ship config does not have any equipment of this type on, we equip it...
-			this->setEquipment(independant.getEquipmentLoot());
-			(*CurrentGame).InsertObjectInShipGrid(independant, independant.getEquipmentLoot()->equipmentType);
+			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
+			canTakeEquipment = (*CurrentGame).InsertObjectInShipGrid(independant, independant.getEquipmentLoot()->equipmentType);
 		}
 		else
 		{
 			//...else we put it in the stash
-			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
+			canTakeEquipment = (*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
 	}
-
-	else if (independant.hasWeaponLoot)
+	
+	if (canTakeEquipment)
 	{
-		if (!this->ship_config.hasWeapon)
+		//if we managed to transfer the item, it can be released from the provider
+		independant.releaseEquipmentLoot();
+	}
+
+	bool canTakeWeapon = false;
+	//WEAPON
+	if (independant.getWeaponLoot() != NULL)
+	{
+		if (this->ship_config.setShipWeapon(independant.getWeaponLoot(), true))
 		{
-			//if the ship config does not have any weapon of this type on, we equip it...
-			this->setShipWeapon(independant.getWeaponLoot());
-			(*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_EQUIPMENT);
+			//if the ship config does not have a weapon already, we equip it and update the HUD
+			canTakeWeapon = (*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_EQUIPMENT);
 		}
 		else
 		{
 			//...else we put it in the stash
-			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
+			canTakeWeapon = (*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
 	}
+	if (canTakeWeapon)
+	{
+		//if we managed to transfer the item, it can be released from the provider
+		independant.releaseWeaponLoot();
+	}
+
+	if (hasMoney || canTakeEquipment || canTakeWeapon)
+		return true;
+	else
+		return false;
 }
 
 void Ship::GetPortal(Independant* independant)

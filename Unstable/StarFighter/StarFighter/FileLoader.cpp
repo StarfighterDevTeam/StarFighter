@@ -93,17 +93,14 @@ EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_ene
 			if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
 			{
 				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO])));
-				base->enemy->hasWeapon = true;
 			}
 			if ((*it)[EnemyData::ENEMY_WEAPON_2].compare("0") != 0)
 			{
 				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_2], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_2])));
-				base->enemy->hasWeapon = true;
 			}
 			if ((*it)[EnemyData::ENEMY_WEAPON_3].compare("0") != 0)
 			{
 				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_3], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_3])));
-				base->enemy->hasWeapon = true;
 			}
 
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyData::ENEMY_PATTERN);
@@ -150,7 +147,7 @@ Equipment* FileLoader::LoadEquipment(string name)
 		{
 			Equipment* i = new Equipment();
 
-			i-> Init(EquipmentType::Airbrake, stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION]), stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
+			i-> Init(EquipmentType::NBVAL_EQUIPMENT, stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION]), stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
 				stoi((*it)[EquipmentData::EQUIPMENT_HYPERSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
 				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
 				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
@@ -170,9 +167,9 @@ Equipment* FileLoader::LoadEquipment(string name)
 				i->hasFake = true;
 			}
 
-			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
-				i->equipmentType = EquipmentType::Airbrake;
-			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("engine") == 0)
+			//if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
+			//	i->equipmentType = EquipmentType::Airbrake;
+			if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("engine") == 0)
 				i->equipmentType = EquipmentType::Engine;
 			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("armor") == 0)
 				i->equipmentType = EquipmentType::Armor;
@@ -255,7 +252,6 @@ Bot* FileLoader::LoadBot(string name)
 			if ((*it)[BotData::BOT_WEAPON].compare("0") != 0)
 			{
 				bot->weapon = FileLoader::LoadWeapon((*it)[BotData::BOT_WEAPON], -1, FileLoader::LoadAmmo((*it)[BotData::BOT_AMMO]));
-				bot->hasWeapon=true;
 			}
 
 			return bot;

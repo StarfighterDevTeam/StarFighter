@@ -30,17 +30,7 @@ string Independant::getName()
 
 Independant::Independant()
 {
-	this->transparent = false;
-	this->visible = true;
-	this->immune = false;
-	this->ghost = false;
-	this->isOnScene = false;
-	this->GarbageMe = false;
-	this->DontGarbageMe = false;
-	this->disable_fire = false;
-	this->wake_up = true;
-	this->rotation_speed = 0.f;
-	this->isUsingPortal = false;
+	
 }
 
 void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
@@ -111,12 +101,15 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->GarbageMe = false;
 	this->DontGarbageMe = false;
 	this->money = 0;
-	this->hasEquipmentLoot = false;
-	this->hasWeaponLoot = false;
 	this->diag = sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	this->transparent = false;
 	this->ghost = false;
 	this->rotation_speed = 0.f;
+	this->disable_fire = false;
+	this->wake_up = true;
+	this->isUsingPortal = false;
+	this->equipment_loot = NULL;
+	this->weapon_loot = NULL;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
@@ -203,17 +196,25 @@ void Independant::damage_from(Independant& independant)
 	}
 }
 
-void Independant::get_money_from(Independant& independant)
+bool Independant::get_money_from(Independant& independant)
 {
 	int loot_value = independant.getMoney();//give all the money
 	money += loot_value;
 	independant.addMoney(-loot_value);
+	if (loot_value > 0)
+		return true;
+	else
+		return false;
 }
 
-void Independant::get_money_from(Independant& independant, int loot_value)
+bool Independant::get_money_from(Independant& independant, int loot_value)
 {
 	money += loot_value;
 	independant.addMoney(-loot_value);
+	if (loot_value > 0)
+		return true;
+	else
+		return false;
 }
 
 int Independant::getIndependantDamage()
@@ -284,18 +285,13 @@ void Independant::GenerateLoot()
 
 }
 
-void Independant::GetLoot(Independant& independant)
+bool Independant::GetLoot(Independant& independant)
 {
-	this->get_money_from(independant);
-
-	if (independant.hasEquipmentLoot)
-	{
-		this->get_equipment_from(independant);
-	}
-	if (independant.hasWeaponLoot)
-	{
-		this->get_weapon_from(independant);
-	}
+	if (this->get_money_from(independant) || this->get_equipment_from(independant) || this->get_weapon_from(independant))
+		return true;
+	else
+		return false;
+	
 }
 
 void Independant::GetPortal(Independant* independant)
@@ -304,20 +300,32 @@ void Independant::GetPortal(Independant* independant)
 }
 
 
-void Independant::get_equipment_from(Independant& independant)
+
+bool Independant::get_equipment_from(Independant& independant)
 {
-	if (independant.hasEquipmentLoot)
+	if (independant.equipment_loot != NULL && this->equipment_loot == NULL)
 	{
-		this->setEquipmentLoot(independant.getEquipmentLoot());
-		independant.releaseEquipmentLoot();
+		this->equipment_loot = independant.getEquipmentLoot();
+		independant.equipment_loot = NULL;
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
-void Independant::setEquipmentLoot(Equipment* equipment)
+bool Independant::setEquipmentLoot(Equipment* equipment)
 {
-	assert(equipment != NULL);
-	this->equipment_loot = equipment;
-	this->hasEquipmentLoot = (equipment != NULL);;
+	if (this->equipment_loot == NULL)
+	{
+		this->equipment_loot = equipment;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 Equipment* Independant::getEquipmentLoot()
@@ -328,23 +336,33 @@ Equipment* Independant::getEquipmentLoot()
 void Independant::releaseEquipmentLoot()
 {
 	this->equipment_loot = NULL;
-	this->hasEquipmentLoot = false;
 }
 
-void Independant::get_weapon_from(Independant& independant)
+bool Independant::get_weapon_from(Independant& independant)
 {
-	if (independant.hasWeaponLoot)
+	if (independant.weapon_loot != NULL && this->weapon_loot == NULL)
 	{
-		this->setWeaponLoot(independant.getWeaponLoot());
-		independant.releaseWeaponLoot();
+		this->weapon_loot = independant.getWeaponLoot();
+		independant.weapon_loot = NULL;
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
-void Independant::setWeaponLoot(Weapon* weapon)
+bool Independant::setWeaponLoot(Weapon* weapon)
 {
-	assert(weapon != NULL);
-	this->weapon_loot = weapon;
-	this->hasWeaponLoot = (weapon != NULL);
+	if (this->weapon_loot == NULL)
+	{
+		this->weapon_loot = weapon;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 Weapon* Independant::getWeaponLoot()
@@ -355,7 +373,6 @@ Weapon* Independant::getWeaponLoot()
 void Independant::releaseWeaponLoot()
 {
 	this->weapon_loot = NULL;
-	this->hasWeaponLoot = false;
 }
 
 void Independant::CreateRandomLoot(float BeastScaleBonus)

@@ -13,7 +13,6 @@ Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, 
 {
 	 this->visible = true;
 	 this->isOnScene = true;
-	 this->hasEquipmentLoot = false;
 	 this->collider_type = IndependantType::LootObject;
 	 this->money = 0;
 	 this->display_name = m_display_name;

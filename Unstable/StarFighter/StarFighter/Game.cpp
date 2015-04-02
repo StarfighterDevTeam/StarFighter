@@ -210,11 +210,12 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, take the loot)
-				//(*it1)->get_money_from(*(*it2));
-				(*it1)->GetLoot((*(*it2)));
-				(*it2)->visible = false;
-				(*it2)->isOnScene = false;
-				(*it2)->GarbageMe = true;
+				if ((*it1)->GetLoot((*(*it2))))
+				{
+					(*it2)->visible = false;
+					(*it2)->isOnScene = false;
+					(*it2)->GarbageMe = true;
+				}
 			}
 		}
 
@@ -249,11 +250,10 @@ void Game::colisionChecksV2()
 					//death
 					if ((*it1)->getIndependantArmor() <= 0)
 					{
-						
 						//Loot
 						hazard += (*it1)->getMoney();
 						(*it1)->CreateRandomLoot(this->BeastScoreBonus);
-						(*it1)->GenerateLoot();
+ 						(*it1)->GenerateLoot();
 						(*it1)->Death();
 					}
 				}

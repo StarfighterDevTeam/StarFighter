@@ -143,15 +143,13 @@ public:
 	int getShipConfigShield();
 	int getShipConfigShieldRegen();
 	int getShipConfigDamage();
-	void setEquipment(Equipment* m_equipment, bool recomputing_stats = true);
-	void setShipModel(ShipModel* m_ship_model);
-	void setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true);
+	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true);
+	bool setShipModel(ShipModel* m_ship_model);
+	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true);
 	Equipment* equipment[NBVAL_EQUIPMENT];
 	ShipModel* ship_model;
 	Weapon* weapon;
 	vector<Bot*> bot_list;
-	bool hasWeapon;
-	bool hasEquipment[NBVAL_EQUIPMENT];
 	FX* FX_death;
 	void GenerateBots(Independant* m_target);
 	void DestroyBots();
@@ -186,7 +184,7 @@ public :
 	void setShipWeapon(Weapon* m_weapon);
 	
 	void Death() override;
-	void GetLoot(Independant& independant) override;
+	bool GetLoot(Independant& independant) override;
 	void GetPortal(Independant* independant) override;
 	Portal* targetPortal;
 	bool isCollindingWithPortal;
