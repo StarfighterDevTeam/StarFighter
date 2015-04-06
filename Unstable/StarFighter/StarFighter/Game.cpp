@@ -53,7 +53,7 @@ void Game::addToScene(Independant *object, LayerType m_layer, IndependantType ty
 	{
 		sceneIndependantsTyped[(int)type].push_back(object);
 		sceneIndependantsLayered[(int)m_layer].push_back(object);
-		this->sceneIndependants.push_back(object);
+		sceneIndependants.push_back(object);
 	}
 	else
 	{

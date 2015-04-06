@@ -6,12 +6,6 @@ Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string 
 	this->setOrigin(origin.x, origin.y);
 }
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin) : AnimatedSprite()
-{
-	Init(position, speed, textureName, size);
-	this->setOrigin(origin.x, origin.y);
-}
-
 Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size);
@@ -256,6 +250,8 @@ Independant* Independant::Clone()
 {
 	Independant* clone = new Independant(this->getPosition(), this->speed, this->textureName, this->m_size);
 	clone->Init(clone->getPosition(), clone->speed, clone->textureName, clone->m_size);
+	clone->equipment_loot = this->equipment_loot;
+	clone->weapon_loot = this->weapon_loot;
 
 	return clone;
 }

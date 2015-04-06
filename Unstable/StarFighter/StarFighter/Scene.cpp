@@ -97,12 +97,26 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						
 						this->bg = new Background(sf::Vector2f(0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).direction, first_screen_offset);
 						this->bg->display_name = scene_name;
+						(*CurrentGame).addToScene(this->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
 
 						//Getting the display name of the scene and loading it into the scene portals
 						for (int i = 0; i < Directions::NO_DIRECTION; i++)
 						{
 							if (this->links[(Directions)i].compare("0") != 0)
 							{
+								//CREATING THE PORTAL
+								this->bg->portals[(Directions)i] = new Portal(sf::Vector2f(0, 0), speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
+								sf::Vector2f bg_size = Independant::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
+								//applying offset respect to the center of the background, depending on the direction
+								this->bg->portals[(Directions)i]->offset = Independant::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
+								this->bg->portals[(Directions)i]->setPosition(this->bg->getPosition().x + this->bg->portals[(Directions)i]->offset.x, this->bg->getPosition().y + this->bg->portals[(Directions)i]->offset.y);
+
+								//rotation
+								this->bg->portals[(Directions)i]->setRotation(Independant::getRotation_for_Direction((Directions)i));
+
+								//direction
+								this->bg->portals[(Directions)i]->direction = (Directions)i;
+
 								//copying the scene name into the portal, that will be responsible for the loading of the linked scenes
 								this->bg->portals[(Directions)i]->destination_name = this->links[(Directions)i];
 
@@ -114,9 +128,19 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 										this->bg->portals[(Directions)i]->display_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 									}
 								}
-								//Creating portals
+
+								//Displaying the portals
 								(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::PortalLayer, IndependantType::PortalObject);
 							}
+						}
+
+						if (first_scene)
+						{
+							this->bg->SetPortalsState(PortalState::PortalOpen);
+						}
+						else
+						{
+							this->bg->SetPortalsState(PortalState::PortalGhost);
 						}
 					}
 
@@ -245,8 +269,18 @@ Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene
 
 void Scene::DestroyScene()
 {
+	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	{
+		if (this->bg->portals[(Directions)i] != NULL)
+		{
+			this->bg->portals[(Directions)i]->GarbageMe = true;
+		}
+	}
+
 	this->bg->GarbageMe = true;
+
 	boss_list.clear();
+
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
 		enemies_ranked_by_class[i].clear();

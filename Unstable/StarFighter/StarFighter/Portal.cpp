@@ -2,12 +2,8 @@
 
 Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Independant(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	visible = false;
 	DontGarbageMe = true;
-	state = PortalState::PortalInvisible;
-	setGhost(true);
-	display_name = "0";
-	destination_name = "0";
+	state = PortalState::PortalOpen;
 }
 
 void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)

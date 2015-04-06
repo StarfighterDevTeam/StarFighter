@@ -10,10 +10,6 @@ void InGameState::Initialize(Player player)
 	
 	//Loading current scene
 	this->currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevel(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
-	//(*CurrentGame).direction = this->currentScene->direction;//moved into Scene() when bool "first_scene" is true because we need before loading enemies
-	
-	//initialisation of a next scene
-	this->nextScene = new Scene(player.m_currentSceneFile);
 	AddToKnownScenes(this->currentScene->m_name);
 
 	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
@@ -31,10 +27,6 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetPlayerShip(this->playerShip);
 
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
-
-	//bg
-	(*CurrentGame).addToScene(this->currentScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
-	this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
 
 	//ship
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -262,13 +254,17 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				//player takes exit?
 				if ((*CurrentGame).playerShip->isUsingPortal)
 				{
+					this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
 					bool reverse = false;
 					if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
 					{
 						reverse = true;
 					}
+
 					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
 					this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+					this->nextScene->bg->speed = sf::Vector2f(0, 0);
+					AddToKnownScenes(nextScene_filename);
 
 					//Putting the player on rails
 					(*CurrentGame).playerShip->disable_inputs = true;
@@ -319,8 +315,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 				this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
-				(*CurrentGame).addToScene(this->nextScene->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
-				this->nextScene->bg->SetPortalsState(PortalState::PortalGhost);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
 				{
@@ -346,7 +340,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f((w / 2), (h / 2)));
 
 				this->nextScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2)));
-
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling(this->nextScene->direction, this->nextScene->vspeed);
 
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
@@ -404,6 +397,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
 				(*CurrentGame).direction = (*CurrentGame).playerShip->targetPortal->direction;
 				this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+				this->nextScene->bg->speed = sf::Vector2f(0, 0);
+
+				AddToKnownScenes(nextScene_filename);
 
 				//Putting the player on rails
 				(*CurrentGame).playerShip->disable_inputs = true;

@@ -723,6 +723,8 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isUsingPortal = false;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
 	this->targetPortal = new Portal(sf::Vector2f(0, 0), sf::Vector2f(0, 0), PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_HEIGHT, PORTAL_WIDTH), sf::Vector2f(PORTAL_HEIGHT / 2, PORTAL_WIDTH / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
+	this->equipment_loot = NULL;
+	this->weapon_loot = NULL;
 
 	this->Init();
 }

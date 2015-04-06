@@ -145,8 +145,7 @@ enum EquipmentType {
 class Independant : public AnimatedSprite
 {
 public:
-	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber = 1);
-	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin);
+	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber = 1, int m_animationNumber = 1);
 	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	Independant();
