@@ -705,7 +705,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 			}
 
 			//-----EQUIPMENT TYPE-----
-			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_EQUIPMENT + 1);//+1 is for the weapon type
+			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
 
 			//-----CHOSING RANDOM PROPERTIES-----
 			int properties_to_choose_from = LootTable_MaxPropertiesPerEquipmentType[equipment_type_roll];
@@ -882,7 +882,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					break;
 				}
 
-				case (int)EquipmentType::NBVAL_EQUIPMENT://weapon drop
+				case (int)EquipmentType::NBVAL_Equipment://weapon drop
 				{
 					// Initialisation
 					FX* fx = new FX(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f (320,236), 2, sf::seconds(0.4f));

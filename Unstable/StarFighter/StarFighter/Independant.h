@@ -137,7 +137,7 @@ enum EquipmentType {
 	Armor,//1
 	Shield,//2
 	Module,//3
-	NBVAL_EQUIPMENT//4
+	NBVAL_Equipment//4
 };
 
 

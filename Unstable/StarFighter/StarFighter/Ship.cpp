@@ -344,7 +344,7 @@ ShipConfig::ShipConfig()
 	this->ship_model = new ShipModel(0, 0, 0.0f, 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
 	this->automatic_fire = false;
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		this->equipment[i] = NULL;
 	}
@@ -373,7 +373,7 @@ void ShipConfig::Init()
 	{
 		this->bot_list.push_back(this->ship_model->bot);
 	}
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -390,7 +390,7 @@ int ShipConfig::getShipConfigArmor()
 	int new_armor = 0;
 	int equipment_armor = 0;
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -416,7 +416,7 @@ int ShipConfig::getShipConfigShield()
 	int new_shield = 0;
 	int equipment_shield = 0;
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -442,7 +442,7 @@ int ShipConfig::getShipConfigShieldRegen()
 	int new_shield_regen = 0;
 	int equipment_shield_regen = 0;
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -469,7 +469,7 @@ int ShipConfig::getShipConfigDamage()
 	int new_damage = 0;
 	int equipment_damage = 0;
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -495,7 +495,7 @@ sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 	sf::Vector2f new_max_speed = sf::Vector2f(0, 0);
 	sf::Vector2f equipment_max_speed = sf::Vector2f(0, 0);
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -526,7 +526,7 @@ float ShipConfig::getShipConfigDecceleration()
 	float new_decceleration = 0.0f;
 	float equipment_decceleration = 0.0f;
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -552,7 +552,7 @@ sf::Vector2f ShipConfig::getShipConfigAcceleration()
 	sf::Vector2f new_acceleration = sf::Vector2f(0, 0);
 	sf::Vector2f equipment_acceleration = sf::Vector2f(0, 0);
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -583,7 +583,7 @@ float ShipConfig::getShipConfigHyperspeed()
 	float new_hyperspeed = 0.0f;
 	float equipment_hyperspeed = 0.0f;
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -682,7 +682,7 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 		(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
 	}
 
-	for (int i = 0; i < EquipmentType::NBVAL_EQUIPMENT; i++)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
@@ -1121,7 +1121,7 @@ bool Ship::GetLoot(Independant& independant)
 		if (this->ship_config.setShipWeapon(independant.getWeaponLoot(), true))
 		{
 			//if the ship config does not have a weapon already, we equip it and update the HUD
-			canTakeWeapon = (*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_EQUIPMENT);
+			canTakeWeapon = (*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_Equipment);
 		}
 		else
 		{

@@ -146,7 +146,7 @@ public:
 	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true);
 	bool setShipModel(ShipModel* m_ship_model);
 	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true);
-	Equipment* equipment[NBVAL_EQUIPMENT];
+	Equipment* equipment[NBVAL_Equipment];
 	ShipModel* ship_model;
 	Weapon* weapon;
 	vector<Bot*> bot_list;

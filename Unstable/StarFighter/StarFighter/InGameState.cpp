@@ -24,6 +24,42 @@ void InGameState::Initialize(Player player)
 	}
 
 	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
+
+	//initalizing equipment in HUD
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");
+	for (int i = 0; i < NBVAL_Equipment; i++)
+	{
+		if (this->playerShip->ship_config.equipment[i] != NULL)
+		{
+			sf::Vector2f size_ = this->playerShip->ship_config.equipment[i]->size;
+			string textureName_ = this->playerShip->ship_config.equipment[i]->textureName;
+			int frameNumber_ = this->playerShip->ship_config.equipment[i]->frameNumber;
+			Independant* new_equipment = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName_, size_, sf::Vector2f(size_.x / 2, size_.y / 2), frameNumber_);
+			new_equipment->setEquipmentLoot(this->playerShip->ship_config.equipment[i]);
+
+			if (!(*CurrentGame).InsertObjectInShipGrid(*new_equipment, i))
+			{
+				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
+			}
+		}
+	}
+	
+	if (this->playerShip->ship_config.weapon != NULL)
+	{
+		sf::Vector2f size_ = this->playerShip->ship_config.weapon->size;
+		string textureName_ = this->playerShip->ship_config.weapon->textureName;
+		int frameNumber_ = this->playerShip->ship_config.weapon->frameNumber;
+		Independant* new_weapon = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName_, size_, sf::Vector2f(size_.x / 2, size_.y / 2), frameNumber_);
+		new_weapon->setWeaponLoot(this->playerShip->ship_config.weapon);
+
+		if (!(*CurrentGame).InsertObjectInShipGrid(*new_weapon, NBVAL_Equipment))
+		{
+			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize a weapon item from the ship config to the HUD Ship grid\n");
+		}
+	}
+	LOGGER_WRITE(Logger::Priority::DEBUG, "HUD initialization completed\n");
+
+	//transmitting a global reference to the ship
 	(*CurrentGame).SetPlayerShip(this->playerShip);
 
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
