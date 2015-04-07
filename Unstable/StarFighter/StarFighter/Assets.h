@@ -18,31 +18,21 @@
 #define HUD_CURSOR_WIDTH			25
 #define HUD_CURSOR_HEIGHT			25
 
-#define AIRBRAKE_FILENAME		"Assets/2D/AirBrake.png"
-#define ARMOR_FILENAME			"Assets/2D/Armor.png"
-#define LASER_RED_FILENAME		"Assets/2D/laser_red.png"
-#define LASER_BLUE_FILENAME		"Assets/2D/laser_blue1.png"
-#define SHIELD_FILENAME			"Assets/2D/Shield.png"
-#define STABS_FILENAME			"Assets/2D/Stab.png"
-#define THRUSTER_FILENAME		"Assets/2D/Thruster.png"
-#define MODULE_FILENAME			"Assets/2D/Module.png"
-#define AIRBRAKE_Z_FILENAME		"Assets/2D/AirBrakeZ.png"
+//#define AIRBRAKE_FILENAME		"Assets/2D/Equipment/AirBrake.png"
+#define ARMOR_FILENAME			"Assets/2D/Equipment/Armor.png"
+#define LASER_RED_FILENAME		"Assets/2D/Equipment/laser_red.png"
+#define LASER_BLUE_FILENAME		"Assets/2D/Equipment/laser_blue1.png"
+#define SHIELD_FILENAME			"Assets/2D/Equipment/Shield.png"
+#define STABS_FILENAME			"Assets/2D/Equipment/Stab.png"
+#define THRUSTER_FILENAME		"Assets/2D/Equipment/Thruster.png"
+#define MODULE_FILENAME			"Assets/2D/Equipment/Module.png"
+#define BOT_FILENAME			"Assets/2D/bot.png"
+//#define AIRBRAKE_Z_FILENAME		"Assets/2D/Equipment/AirBrakeZ.png"
 
 #define EMPTYSLOT_FILENAME				"Assets/2D/HUD/EmptySlot.png"
 #define EMPTYSLOT_ANIMATION_NUMBER		2
 #define SLOT_WIDTH						64
 #define SLOT_HEIGHT						64
-
-
-#define LASER_FILENAME				"Assets/2D/laser.png"
-#define LASER_WIDTH					4
-#define LASER_HEIGHT				12
-#define LASER_FRAME_NUMBER			1
-
-#define LASERBLUE_FILENAME				"Assets/2D/laser_blue.png"
-#define LASERBLUE_WIDTH					4
-#define LASERBLUE_HEIGHT				16
-#define LASERBLUE_FRAME_NUMBER			1
 
 #define FX_EXPLOSION_FILENAME				"Assets/2D/FX_explosion.png"
 #define FX_EXPLOSION_WIDTH					320
@@ -51,6 +41,12 @@
 #define FX_LITTLE_EXPLOSION_DURATION		0.1f
 #define FX_MEDIUM_EXPLOSION_DURATION		0.2f
 #define FX_LARGE_EXPLOSION_DURATION			0.8f
+
+#define FX_EXPLOSION_BLUE_FILENAME			"Assets/2D/FX/FX_explosion_S_blue.png"
+#define FX_EXPLOSION_BLUE_WIDTH				320
+#define FX_EXPLOSION_BLUE_HEIGHT			236
+#define FX_EXPLOSION_BLUE_FRAME_NUMBER		2
+#define FX_EXPLOSION_BLUE_DURATION			0.4f
 
 #define LOOT_FILENAME				"Assets/2D/World/crystal.png"
 #define LOOT_WIDTH					64

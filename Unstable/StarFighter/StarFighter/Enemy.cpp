@@ -837,7 +837,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					Equipment* equipment = new Equipment();
 					equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0,0,0,0, MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
 
-					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/bot.png", sf::Vector2f (32,32));
+					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), BOT_FILENAME, sf::Vector2f (32,32));
 					bot->display_name = "Bot gerard";
 					bot->radius = 500;
 					bot->vspeed = 300;
@@ -849,18 +849,18 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					PatternType pattern_type = PatternType::NoMovePattern;
 					bot->Pattern.SetPattern(pattern_type,bot->vspeed,v); //vitesse angulaire (degres/s)
 
-					FX* fx = new FX(sf::Vector2f (0,0), sf::Vector2f (0,0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f (320,236), 2, sf::seconds(0.4f));
+					FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), FX_EXPLOSION_BLUE_FILENAME, sf::Vector2f(FX_EXPLOSION_BLUE_WIDTH, FX_EXPLOSION_BLUE_HEIGHT), FX_EXPLOSION_BLUE_FRAME_NUMBER, sf::seconds(FX_EXPLOSION_BLUE_DURATION));
 
 					float e_damage = WEAPON_MIN_DAMAGE_VALUE;
 					float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BASE * (log(e_value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
 					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
-					Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),e_damage, fx);
+					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), LASER_BLUE_FILENAME, sf::Vector2f(4, 16), e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
 					weapon->display_name = "laser_blue";
 					weapon->fire_direction = Vector2i(0,-1);
-					weapon->textureName = "Assets/2D/laser_red.png";
+					weapon->textureName = LASER_BLUE_FILENAME;
 					weapon->size = sf::Vector2f(64,64);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
@@ -891,11 +891,11 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
-					Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/laser_blue.png",sf::Vector2f (4,16),e_damage, fx);
+					Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/Equipment/laser_blue1.png",sf::Vector2f (4,16),e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
 					weapon->display_name = "laser_blue";
 					weapon->fire_direction = Vector2i(0,-1);
-					weapon->textureName = "Assets/2D/laser_red.png";
+					weapon->textureName = "Assets/2D/Equipment/laser_red.png";
 					weapon->size = sf::Vector2f(64,64);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
