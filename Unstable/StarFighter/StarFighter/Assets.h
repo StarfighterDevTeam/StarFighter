@@ -28,9 +28,11 @@
 #define MODULE_FILENAME			"Assets/2D/Module.png"
 #define AIRBRAKE_Z_FILENAME		"Assets/2D/AirBrakeZ.png"
 
-#define EMPTYSLOT_FILENAME		"Assets/2D/EmptySlot.png"
-#define SLOT_WIDTH				64
-#define SLOT_HEIGHT				64
+#define EMPTYSLOT_FILENAME				"Assets/2D/HUD/EmptySlot.png"
+#define EMPTYSLOT_ANIMATION_NUMBER		2
+#define SLOT_WIDTH						64
+#define SLOT_HEIGHT						64
+
 
 #define LASER_FILENAME				"Assets/2D/laser.png"
 #define LASER_WIDTH					4

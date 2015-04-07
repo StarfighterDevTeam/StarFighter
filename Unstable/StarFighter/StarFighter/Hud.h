@@ -4,9 +4,16 @@
 #include <SFML/Graphics.hpp>
 #include "Globals.h"
 #include "Independant.h"
+#include "Includes/SimpleCollision.hpp"
 
 #define ARMOR_BAR_SIZE_X		20
 #define ARMOR_BAR_SIZE_Y		200
+
+enum SlotFeedbackStates
+{
+	Slot_NormalState,
+	Slot_HighlightState,
+};
 
 class ObjectGrid
 {
@@ -18,15 +25,10 @@ public:
 	void Draw(sf::RenderTexture& offscreen);
 	sf::Vector2f position;
 	sf::Vector2i squares;
-	int focus;
-};
-
-class Cursor : public Independant
-{
-public:
-	Cursor::Cursor(){};
-	Cursor::Cursor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin);
-	int tryEquipItem();
+	sf::Vector2i focus;
+	int isCursorColling(Independant& cursor);
+	bool HighlightCell(int index);
+	bool CleanFocus();
 };
 
 class PlayerHud
@@ -54,7 +56,7 @@ public:
 	sf::Font* font2;
 	sf::Text* framerate;
 
-	Cursor* hud_cursor;
+	Independant* hud_cursor;
 
 	bool max_hazard_level_reached;
 	bool has_shield;

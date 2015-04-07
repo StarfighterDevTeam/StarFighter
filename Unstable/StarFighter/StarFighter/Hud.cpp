@@ -2,7 +2,7 @@
 
 ObjectGrid::ObjectGrid()
 {
-	this->focus = -1;
+	this->focus = sf::Vector2i(-1, -1);
 }
 
 ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake)
@@ -13,8 +13,11 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 		{
 			if (fill_with_fake)
 			{
-				Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE));
+				Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE), 
+					sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE/2, EQUIPMENT_GRID_SLOT_SIZE/2), 1, EMPTYSLOT_ANIMATION_NUMBER);
+				
 				empty_slot->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + position.x + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + position.y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
+				
 				grid[i][j] = empty_slot;
 			}
 			else
@@ -26,7 +29,7 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 
 	this->position = position;
 	this->squares = squares;
-	this->focus = -1;
+	this->focus = sf::Vector2i(-1, -1);
 }
 
 bool ObjectGrid::insertObject(Independant& object, int index)
@@ -92,29 +95,56 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 	}
 }
 
-Cursor::Cursor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin) : Independant(position, speed, textureName, size, origin)
+int ObjectGrid::isCursorColling(Independant& cursor)
 {
-	
+	for (size_t i = 0; i < this->squares.x; i++)
+	{
+		for (size_t j = 0; j < this->squares.y; j++)
+		{
+			if (grid[i][j] != NULL)
+			{
+				sf::FloatRect rect_ = grid[i][j]->getGlobalBounds();
+				sf::IntRect bounds(sf::IntRect((int)rect_.left, (int)rect_.top, (int)rect_.width, (int)rect_.height));
+				if (bounds.contains(cursor.getPosition().x, cursor.getPosition().y))
+				{
+					int index_ = j + (i * this->squares.y);
+					return index_;
+				}	
+			}
+		}
+	}
+	return -1;
 }
 
-int Cursor::tryEquipItem()
+bool ObjectGrid::HighlightCell(int index)
 {
-	if (this->getPosition().x < HUD_LEFT_MARGIN - (SHIP_GRID_SLOT_SIZE / 2) || this->getPosition().x > HUD_LEFT_MARGIN + ((SHIP_GRID_NB_ROWS + (1 / 2)) * SHIP_GRID_SLOT_SIZE)
-		|| this->getPosition().y < SHIP_GRID_OFFSET_POS_Y - (SHIP_GRID_SLOT_SIZE / 2) || this->getPosition().y > SHIP_GRID_OFFSET_POS_Y + ((EQUIPMENT_GRID_NB_LINES + (1 / 2)) * SHIP_GRID_SLOT_SIZE))
+	int r = index % squares.y;
+	int l = index / squares.y;
+
+	//case: error in index calculation
+	if (l > squares.x)
 	{
-		printf("cursor : not found in ship grid\n");
-			return -1;
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to highlight a grid cell index that doesn't exist.\n");
+		return false;
 	}
-		
+	//case: the requested slot is free
+	else
+	{
+		grid[l][r]->setAnimationLine(Slot_HighlightState);
+		this->focus = sf::Vector2i(r, l);
+		return true;
+	}
+}
 
-	float pos_x = this->getPosition().x - HUD_LEFT_MARGIN - (SHIP_GRID_SLOT_SIZE/2);
-	float pos_y = this->getPosition().y - SHIP_GRID_OFFSET_POS_Y - (SHIP_GRID_SLOT_SIZE / 2);
-
-	//int index_row = pos_x % SHIP_GRID_SLOT_SIZE;
-	//int index_line = pos_y % SHIP_GRID_SLOT_SIZE;
-
-	printf("cursor : found in ship grid\n");
-	return 0;
+bool ObjectGrid::CleanFocus()
+{
+	if (focus.x != -1 || focus.y != -1)
+	{
+		grid[focus.y][focus.x]->setAnimationLine(Slot_NormalState);
+		focus = sf::Vector2i(-1, -1);
+		return true;
+	}
+	return false;
 }
 
 PlayerHud::PlayerHud()
@@ -126,7 +156,7 @@ PlayerHud::PlayerHud()
 	this->equipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false);
 	this->shipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
 
-	this->hud_cursor = new Cursor(sf::Vector2f(0, 0), sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2));
+	this->hud_cursor = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2));
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
@@ -286,7 +316,31 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			hud_cursor->speed.y = 0;
 		}
 	}
+	
+	//clean old focus
+	fakeShipGrid.CleanFocus();
+	fakeEquipmentGrid.CleanFocus();
 
+	//HUD cursor collides with an item?
+	int hovered_index_ = fakeShipGrid.isCursorColling(*hud_cursor);
+	if (hovered_index_ < 0)
+	{
+		//we test the equipment grid
+		hovered_index_ = fakeEquipmentGrid.isCursorColling(*hud_cursor);
+		if (hovered_index_ > -1)
+		{
+			//we focus on the hovered grid cell in equipement grid
+			fakeEquipmentGrid.HighlightCell(hovered_index_);
+		}
+	}
+	else
+	{
+		//we focus the hovered grid cell in ship grid
+		fakeShipGrid.HighlightCell(hovered_index_);
+	}
+
+	
+		
 	//grid titles
 	//ShipGridTitle.setString("Ship equipment");
 	//EquipmentGridTitle.setString("Stash");

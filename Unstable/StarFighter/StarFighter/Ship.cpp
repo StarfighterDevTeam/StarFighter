@@ -983,7 +983,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		else
 		{
 			//movement
-			Cursor* cursor_ = (*CurrentGame).hud.hud_cursor;
+			Independant* cursor_ = (*CurrentGame).hud.hud_cursor;
 			cursor_->speed.x = directions.x * HUD_CURSOR_SPEED;
 			cursor_->speed.y = directions.y * HUD_CURSOR_SPEED;
 
@@ -992,7 +992,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				if (!fire_key_repeat)
 				{
-					cursor_->tryEquipItem();
+					//todo interaction
 					fire_key_repeat = true;
 				}
 			}
