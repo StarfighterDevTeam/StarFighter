@@ -114,7 +114,6 @@ int ObjectGrid::isCursorColling(Independant& cursor)
 					if (bounds.contains(cursor.getPosition().x, cursor.getPosition().y))
 					{
 						int index_ = j + (i * this->squares.y);
-						//cursor.setPosition(grid[i][j]->getPosition());//cursor snapping to center of cells
 						return index_;
 					}
 				}
@@ -156,6 +155,24 @@ bool ObjectGrid::CleanFocus()
 	return false;
 }
 
+Independant* ObjectGrid::getCellPointerFromIntIndex(int index)
+{
+	int r = index % squares.y;
+	int l = index / squares.y;
+
+	//case: error in index calculation
+	if (l > squares.x)
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
+		return false;
+	}
+	//case: return the requested pointer
+	else
+	{
+		return this->grid[r][l];
+	}
+}
+
 PlayerHud::PlayerHud()
 {
 	this->max_hazard_level_reached = false;
@@ -165,7 +182,8 @@ PlayerHud::PlayerHud()
 	this->equipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false);
 	this->shipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
 
-	this->hud_cursor = new Independant(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)), sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2));
+	this->hud_cursor = new Independant(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)), 
+		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, HUD_CURSOR_ANIMATION_NUMBER);
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
@@ -327,8 +345,11 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	}
 	
 	//clean old focus
-	fakeShipGrid.CleanFocus();
-	fakeEquipmentGrid.CleanFocus();
+	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())
+	{
+		//if the focus has been cleaned, that means we must also clean the cursor
+		hud_cursor->setAnimationLine(Cursor_NormalState);
+	}
 
 	//HUD cursor collides with an item?
 	int hovered_index_ = fakeShipGrid.isCursorColling(*hud_cursor);
@@ -340,15 +361,22 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 		{
 			//we focus on the hovered grid cell in equipement grid
 			fakeEquipmentGrid.HighlightCell(hovered_index_);
+			if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
+			{
+				hud_cursor->setAnimationLine(Cursor_ActionState);
+			}
+			else
+			{
+				hud_cursor->setAnimationLine(Cursor_HighlightState);
+			}
 		}
 	}
 	else
 	{
 		//we focus the hovered grid cell in ship grid
 		fakeShipGrid.HighlightCell(hovered_index_);
+		hud_cursor->setAnimationLine(Cursor_HighlightState);
 	}
-
-	
 		
 	//grid titles
 	//ShipGridTitle.setString("Ship equipment");

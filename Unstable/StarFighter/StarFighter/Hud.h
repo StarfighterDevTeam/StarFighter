@@ -15,6 +15,13 @@ enum SlotFeedbackStates
 	Slot_HighlightState,
 };
 
+enum CursorFeedbackStates
+{
+	Cursor_NormalState,
+	Cursor_HighlightState,
+	Cursor_ActionState,
+};
+
 class ObjectGrid
 {
 public:
@@ -29,6 +36,7 @@ public:
 	int isCursorColling(Independant& cursor);
 	bool HighlightCell(int index);
 	bool CleanFocus();
+	Independant* getCellPointerFromIntIndex(int index);
 };
 
 class PlayerHud
