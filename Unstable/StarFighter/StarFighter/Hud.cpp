@@ -97,23 +97,31 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 
 int ObjectGrid::isCursorColling(Independant& cursor)
 {
-	for (size_t i = 0; i < this->squares.x; i++)
+	if (!cursor.visible)
 	{
-		for (size_t j = 0; j < this->squares.y; j++)
+		return -1;
+	}
+	else
+	{
+		for (size_t i = 0; i < this->squares.x; i++)
 		{
-			if (grid[i][j] != NULL)
+			for (size_t j = 0; j < this->squares.y; j++)
 			{
-				sf::FloatRect rect_ = grid[i][j]->getGlobalBounds();
-				sf::IntRect bounds(sf::IntRect((int)rect_.left, (int)rect_.top, (int)rect_.width, (int)rect_.height));
-				if (bounds.contains(cursor.getPosition().x, cursor.getPosition().y))
+				if (grid[i][j] != NULL)
 				{
-					int index_ = j + (i * this->squares.y);
-					return index_;
-				}	
+					sf::FloatRect rect_ = grid[i][j]->getGlobalBounds();
+					sf::IntRect bounds(sf::IntRect((int)rect_.left, (int)rect_.top, (int)rect_.width, (int)rect_.height));
+					if (bounds.contains(cursor.getPosition().x, cursor.getPosition().y))
+					{
+						int index_ = j + (i * this->squares.y);
+						return index_;
+					}
+				}
 			}
 		}
+		return -1;
 	}
-	return -1;
+	
 }
 
 bool ObjectGrid::HighlightCell(int index)

@@ -126,7 +126,6 @@ Vector2f InputGuy::getDirections()
 	short dirX = 0;
 	short dirY = 0;
 
-
 	//Keyboard inputs
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
