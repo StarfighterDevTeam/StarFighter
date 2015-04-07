@@ -29,6 +29,8 @@ enum LayerType {
 	EnemyFireLayer,
 	FakeShipLayer,
 	PlayerShipLayer,
+	HudObject,
+	HudCursor,
 	NBVAL_Layer
 };
 
@@ -152,7 +154,7 @@ public:
 
 	~Independant();
 
-	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier);
+	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier = 1);
 	virtual void updateAnimation(sf::Time deltaTime);
 	bool visible;
 	bool isOnScene;

@@ -719,12 +719,14 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
 	this->fire_key_repeat = false;
 	this->slowmo_key_repeat = false;
+	this->hud_key_repeat = false;
 	this->isCollindingWithPortal = false;
 	this->isUsingPortal = false;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
-	this->targetPortal = new Portal(sf::Vector2f(0, 0), sf::Vector2f(0, 0), PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_HEIGHT, PORTAL_WIDTH), sf::Vector2f(PORTAL_HEIGHT / 2, PORTAL_WIDTH / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
+	this->targetPortal = NULL;
 	this->equipment_loot = NULL;
 	this->weapon_loot = NULL;
+	this->isFocusedOnHud = false;
 
 	this->Init();
 }
@@ -809,148 +811,201 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	sf::Vector2f directions = InputGuy::getDirections();
+
+	//switching controls to the HUD
+	if (InputGuy::isOpeningHud())
+	{
+		if (!this->hud_key_repeat)
+		{
+			isFocusedOnHud = !isFocusedOnHud;
+			hud_key_repeat = true;
+
+			(*CurrentGame).hud.hud_cursor->visible = isFocusedOnHud;
+		}
+	}
+	else
+	{
+		hud_key_repeat = false;
+	}
+
+	//Ship controls
 	if (!disable_inputs)
 	{
 		moving = directions.x != 0 || directions.y != 0;
 		movingX = directions.x != 0;
 		movingY = directions.y != 0;
 
-		speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
-		speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
+		if (!isFocusedOnHud)
+		{
+			speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
+			speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
 
-		//max speed constraints
-		if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
-		{
-			speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
-		}
-		if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
-		{
-			speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
-		}
-
-		//Slow_motion function
-		if (InputGuy::isSlowMotion())
-		{
-			if (!this->slowmo_key_repeat)
+			//max speed constraints
+			if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
 			{
-				this->isSlowMotion = !this->isSlowMotion;
-				this->slowmo_key_repeat = true;
-				if (this->isSlowMotion)
-				{
-					(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
-				}
-				else
-				{
-					(*CurrentGame).hyperspeedMultiplier = 1.0f;
-				}
+				speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
 			}
-		}
-		else
-		{
-			this->slowmo_key_repeat = false;
-		}
-
-		//Hyperspeed function
-		if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion)
-		{
-			this->isHyperspeeding = true;
-			(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
-		}
-		else if (!this->isSlowMotion)
-		{
-			(*CurrentGame).hyperspeedMultiplier = 1.0f;
-		}
-
-		//auto fire option (F key)
-		if (InputGuy::setAutomaticFire())
-		{
-			if (!this->fire_key_repeat)
+			if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
 			{
-				this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
-				this->fire_key_repeat = true;
+				speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
 			}
-		}
-		else
-		{
-			this->fire_key_repeat = false;
-		}
 
-		//portals: required to release fire and then press fire while colliding with a portal
-		isUsingPortal = false;
-		if (!isFiringButtonPressed)
-		{
-			if (isCollindingWithPortal)
+			//Slow_motion function
+			if (InputGuy::isSlowMotion())
 			{
-				if (InputGuy::isFiring())
+				if (!this->slowmo_key_repeat)
 				{
-					if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
+					this->isSlowMotion = !this->isSlowMotion;
+					this->slowmo_key_repeat = true;
+					if (this->isSlowMotion)
 					{
-						isUsingPortal = true;
+						(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
+					}
+					else
+					{
+						(*CurrentGame).hyperspeedMultiplier = 1.0f;
+					}
+				}
+			}
+			else
+			{
+				this->slowmo_key_repeat = false;
+			}
 
-						if (this->targetPortal->destination_name.compare("0") == 0)
+			//Hyperspeed function
+			if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion)
+			{
+				this->isHyperspeeding = true;
+				(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
+			}
+			else if (!this->isSlowMotion)
+			{
+				(*CurrentGame).hyperspeedMultiplier = 1.0f;
+			}
+
+			//auto fire option (F key)
+			if (InputGuy::setAutomaticFire())
+			{
+				if (!this->fire_key_repeat)
+				{
+					this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
+					this->fire_key_repeat = true;
+				}
+			}
+			else
+			{
+				this->fire_key_repeat = false;
+			}
+
+			//portals: required to release fire and then press fire while colliding with a portal
+			isUsingPortal = false;
+			if (!isFiringButtonPressed)
+			{
+				if (isCollindingWithPortal)
+				{
+					if (InputGuy::isFiring())
+					{
+						if (this->targetPortal != NULL)
 						{
-							LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
+							if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
+							{
+								isUsingPortal = true;
+
+								if (this->targetPortal->destination_name.compare("0") == 0)
+								{
+									LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
+								}
+							}
+						}
+						else
+						{
+							LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, Ship::targetPortal still NULL when it should be initialized.\n");
 						}
 					}
 				}
 			}
-		}
-		//Fire function
-		if (!disable_fire && !isUsingPortal && !isHyperspeeding)
-		{
-			if (InputGuy::isFiring() || this->ship_config.automatic_fire)
+			//Fire function
+			if (!disable_fire && !isUsingPortal && !isHyperspeeding)
 			{
-				if (this->ship_config.weapon != NULL)
+				if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 				{
-					float sizeY = this->m_size.y;
-					if (this->ship_config.ship_model->hasFake)
+					if (this->ship_config.weapon != NULL)
 					{
-						if (this->ship_config.ship_model->fake_size.y > sizeY)
+						float sizeY = this->m_size.y;
+						if (this->ship_config.ship_model->hasFake)
 						{
-							sizeY = this->ship_config.ship_model->fake_size.y;
+							if (this->ship_config.ship_model->fake_size.y > sizeY)
+							{
+								sizeY = this->ship_config.ship_model->fake_size.y;
+							}
 						}
+
+						float theta = this->getRotation() / 180 * M_PI;
+
+						float x_weapon_offset = sizeY / 2 * sin(theta);
+						float y_weapon_offset = -sizeY / 2 * cos(theta);
+
+						ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
+						ship_config.weapon->shot_angle = theta;
+						ship_config.weapon->Fire(FriendlyFire);
+
+						//speed malus when shooting
+						if (!this->isBraking)
+						{
+							speed.x *= SHIP_BRAKING_MALUS_SPEED;
+							speed.y *= SHIP_BRAKING_MALUS_SPEED;
+						}
+						this->isBraking = true;
 					}
-						
-					float theta = this->getRotation() / 180 * M_PI;
-
-					float x_weapon_offset = sizeY / 2 * sin(theta);
-					float y_weapon_offset = -sizeY / 2 * cos(theta);
-
-					ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
-					ship_config.weapon->shot_angle = theta;
-					ship_config.weapon->Fire(FriendlyFire);
-
-					//speed malus when shooting
-					if (!this->isBraking)
-					{
-						speed.x *= SHIP_BRAKING_MALUS_SPEED;
-						speed.y *= SHIP_BRAKING_MALUS_SPEED;
-					}
-					this->isBraking = true;
 				}
 			}
-		}
-		isCollindingWithPortal = false;
+			isCollindingWithPortal = false;
 
-		if (InputGuy::isFiring())
-		{
-			isFiringButtonPressed = true;
+			if (InputGuy::isFiring())
+			{
+				isFiringButtonPressed = true;
+			}
+			else
+			{
+				isFiringButtonPressed = false;
+			}
+
+			//Braking function
+			if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding)
+			{
+				speed.x *= SHIP_BRAKING_MALUS_SPEED;
+				speed.y *= SHIP_BRAKING_MALUS_SPEED;
+				this->isBraking = true;
+			}
 		}
+		
+		//HUD controls
 		else
 		{
-			isFiringButtonPressed = false;
-		}
+			//movement
+			Cursor* cursor_ = (*CurrentGame).hud.hud_cursor;
+			cursor_->speed.x = directions.x * HUD_CURSOR_SPEED;
+			cursor_->speed.y = directions.y * HUD_CURSOR_SPEED;
 
-		//Braking function
-		if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding)
-		{
-			speed.x *= SHIP_BRAKING_MALUS_SPEED;
-			speed.y *= SHIP_BRAKING_MALUS_SPEED;
-			this->isBraking = true;
+			//focus
+			if (InputGuy::isFiring())
+			{
+				if (!fire_key_repeat)
+				{
+					cursor_->tryEquipItem();
+					fire_key_repeat = true;
+				}
+			}
+			else
+			{
+				fire_key_repeat = false;
+			}
+
+			cursor_ = NULL;
 		}
 
 		//idle decceleration
-		if (!movingX)
+		if (!movingX || isFocusedOnHud == true)
 		{
 			speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
 
@@ -958,7 +1013,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				speed.x = 0;
 		}
 
-		if (!movingY)
+		if (!movingY || isFocusedOnHud == true)
 		{
 			speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
 

@@ -18,6 +18,15 @@ public:
 	void Draw(sf::RenderTexture& offscreen);
 	sf::Vector2f position;
 	sf::Vector2i squares;
+	int focus;
+};
+
+class Cursor : public Independant
+{
+public:
+	Cursor::Cursor(){};
+	Cursor::Cursor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin);
+	int tryEquipItem();
 };
 
 class PlayerHud
@@ -44,6 +53,8 @@ public:
 	sf::Font* font;
 	sf::Font* font2;
 	sf::Text* framerate;
+
+	Cursor* hud_cursor;
 
 	bool max_hazard_level_reached;
 	bool has_shield;

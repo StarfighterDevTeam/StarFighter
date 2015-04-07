@@ -2,7 +2,7 @@
 
 ObjectGrid::ObjectGrid()
 {
-	
+	this->focus = -1;
 }
 
 ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake)
@@ -26,6 +26,7 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 
 	this->position = position;
 	this->squares = squares;
+	this->focus = -1;
 }
 
 bool ObjectGrid::insertObject(Independant& object, int index)
@@ -91,6 +92,31 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 	}
 }
 
+Cursor::Cursor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin) : Independant(position, speed, textureName, size, origin)
+{
+	
+}
+
+int Cursor::tryEquipItem()
+{
+	if (this->getPosition().x < HUD_LEFT_MARGIN - (SHIP_GRID_SLOT_SIZE / 2) || this->getPosition().x > HUD_LEFT_MARGIN + ((SHIP_GRID_NB_ROWS + (1 / 2)) * SHIP_GRID_SLOT_SIZE)
+		|| this->getPosition().y < SHIP_GRID_OFFSET_POS_Y - (SHIP_GRID_SLOT_SIZE / 2) || this->getPosition().y > SHIP_GRID_OFFSET_POS_Y + ((EQUIPMENT_GRID_NB_LINES + (1 / 2)) * SHIP_GRID_SLOT_SIZE))
+	{
+		printf("cursor : not found in ship grid\n");
+			return -1;
+	}
+		
+
+	float pos_x = this->getPosition().x - HUD_LEFT_MARGIN - (SHIP_GRID_SLOT_SIZE/2);
+	float pos_y = this->getPosition().y - SHIP_GRID_OFFSET_POS_Y - (SHIP_GRID_SLOT_SIZE / 2);
+
+	//int index_row = pos_x % SHIP_GRID_SLOT_SIZE;
+	//int index_line = pos_y % SHIP_GRID_SLOT_SIZE;
+
+	printf("cursor : found in ship grid\n");
+	return 0;
+}
+
 PlayerHud::PlayerHud()
 {
 	this->max_hazard_level_reached = false;
@@ -99,6 +125,8 @@ PlayerHud::PlayerHud()
 	this->fakeShipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
 	this->equipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false);
 	this->shipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
+
+	this->hud_cursor = new Cursor(sf::Vector2f(0, 0), sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2));
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
@@ -229,6 +257,36 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	//framerate
 	framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
 
+	//HUD cursor
+	hud_cursor->update(deltaTime);
+
+	//HUD panel constraints and movement application
+	{
+		if (hud_cursor->getPosition().x < hud_cursor->m_size.x / 2)
+		{
+			hud_cursor->setPosition(hud_cursor->m_size.x / 2, hud_cursor->getPosition().y);
+			hud_cursor->speed.x = 0;
+		}
+
+		if (hud_cursor->getPosition().x >(SCENE_SIZE_X / 3) - (hud_cursor->m_size.x / 2))
+		{
+			hud_cursor->setPosition((SCENE_SIZE_X / 3) - (hud_cursor->m_size.x / 2), hud_cursor->getPosition().y);
+			hud_cursor->speed.x = 0;
+		}
+
+		if (hud_cursor->getPosition().y < hud_cursor->m_size.y / 2)
+		{
+			hud_cursor->setPosition(hud_cursor->getPosition().x, hud_cursor->m_size.y / 2);
+			hud_cursor->speed.y = 0;
+		}
+
+		if (hud_cursor->getPosition().y > SCENE_SIZE_Y - (hud_cursor->m_size.y / 2))
+		{
+			hud_cursor->setPosition(hud_cursor->getPosition().x, SCENE_SIZE_Y - (hud_cursor->m_size.y / 2));
+			hud_cursor->speed.y = 0;
+		}
+	}
+
 	//grid titles
 	//ShipGridTitle.setString("Ship equipment");
 	//EquipmentGridTitle.setString("Stash");
@@ -257,5 +315,8 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 	equipmentGrid.Draw(offscreen);
 	shipGrid.Draw(offscreen);
 
-	
+	if (hud_cursor->visible)
+	{
+		offscreen.draw(*hud_cursor);
+	}
 }

@@ -198,10 +198,13 @@ public :
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	bool fire_key_repeat;
 	bool slowmo_key_repeat;
+	bool hud_key_repeat;
 	bool isBraking;
 	bool isHyperspeeding;
 	bool isSlowMotion;
 	bool disabledHyperspeed;
+
+	bool isFocusedOnHud;
 
 	int graze_count;
 	int graze_level;

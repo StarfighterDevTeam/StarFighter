@@ -38,6 +38,8 @@
 #define HUD_SCORES_SPACING						20
 #define HUD_LEFT_MARGIN							20
 
+#define HUD_CURSOR_SPEED						1000
+
 #define SHIP_FILE "Assets/Scripts/Generated/Ship.csv"
 #define ENEMY_FILE	"Assets/Scripts/Generated/Enemies.csv"
 #define WEAPON_FILE	"Assets/Scripts/Generated/Weapons.csv"
@@ -64,8 +66,6 @@
 #define EQUIPMENT_GRID_SLOT_SIZE						64
 #define EQUIPMENT_GRID_OFFSET_POS_X						20
 #define EQUIPMENT_GRID_OFFSET_POS_Y						370
-
-
 
 //ENEMY GENERATION
 #define SPAWN_NORMAL_MINIMUM_RESOURCE					-0.05f

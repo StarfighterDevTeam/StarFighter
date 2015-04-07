@@ -98,7 +98,23 @@ bool InputGuy::isChangingResolution()
 
 	if (sf::Joystick::isConnected(0))
 	{
-		if (sf::Joystick::isButtonPressed(0, 6))
+		if (sf::Joystick::isButtonPressed(0, 7)) //Start button
+			return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isOpeningHud()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+	{
+		return true;
+	}
+
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 6)) //Select button
 			return true;
 	}
 

@@ -19,6 +19,7 @@ public:
 	static bool isSlowMotion();
 	static bool setAutomaticFire();
 	static bool isChangingResolution();
+	static bool isOpeningHud();
 };
 
 
