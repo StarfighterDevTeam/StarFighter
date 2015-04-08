@@ -1040,6 +1040,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
 								{
 									this->setEquipment(new_equipment, true);
+									delete tmp_equipment;
 								}
 							}
 							else if (tmp_ptr->getWeaponLoot() != NULL)
@@ -1052,8 +1053,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
 								{
-									
 									this->setShipWeapon(new_weapon, true);
+									delete tmp_weapon;
 								}
 							}
 							else

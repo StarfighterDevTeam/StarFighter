@@ -534,11 +534,11 @@ bool Game::InsertObjectInEquipmentGrid(Independant& object)
 
 bool Game::SwapEquipObjectInShipGrid(Independant& object, int index_ship, int index_equipment)
 {
-	Independant& current_object = *hud.shipGrid.getCellPointerFromIntIndex(index_ship);
+	Independant* new_object = object.Clone();
+	Independant* old_object = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
 
-	bool result2 = hud.equipmentGrid.insertObject(current_object, index_equipment, true);
-
-	bool result1 = hud.shipGrid.insertObject(object, index_ship, true);
+	bool result2 = hud.equipmentGrid.insertObject(*old_object, index_equipment, true);
+	bool result1 = hud.shipGrid.insertObject(*new_object, index_ship, true);
 
 	if (!result1)
 	{
