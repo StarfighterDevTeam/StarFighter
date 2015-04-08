@@ -71,14 +71,14 @@ bool ObjectGrid::insertObject(Independant& object, int index, bool overwrite_exi
 			return false;
 		}
 		//case: the requested slot is free
-		else if (grid[l][r] == NULL)
+		else if (grid[l][r] == NULL || overwrite_existing)
 		{
 			grid[l][r] = &object;
 			grid[l][r]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (r * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (l * EQUIPMENT_GRID_SLOT_SIZE)));
 
 			return true;
 		}
-		else if (!overwrite_existing)
+		else
 		{
 			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to add an equipement on an existing ship equipment slot.\n");
 			return false;

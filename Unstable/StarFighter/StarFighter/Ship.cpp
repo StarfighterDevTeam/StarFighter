@@ -766,29 +766,43 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->Init();
 }
 
-void Ship::setEquipment(Equipment* m_equipment)
+void Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing)
 {
-	this->ship_config.DestroyBots();
-	this->ship_config.setEquipment(m_equipment);
+	if (m_equipment->hasBot)
+	{
+		this->ship_config.DestroyBots();
+	}
+	
+	this->ship_config.setEquipment(m_equipment, true, overwrite_existing);
 	this->Init();
-	this->ship_config.GenerateBots(this);
+	if (m_equipment->hasBot)
+	{
+		this->ship_config.GenerateBots(this);
+	}
 }
 
 void Ship::setShipModel(ShipModel* m_ship_model)
 {
-	this->ship_config.DestroyBots();
+	if (m_ship_model->hasBot)
+	{
+		this->ship_config.DestroyBots();
+	}
+	
 	this->ship_config.setShipModel(m_ship_model);
 	this->Init();
-	this->ship_config.GenerateBots(this);
+
+	if (m_ship_model->hasBot)
+	{
+		this->ship_config.GenerateBots(this);
+	}
 }
 
-void Ship::setShipWeapon(Weapon* m_weapon)
+void Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing)
 {
-	this->ship_config.DestroyBots();
-	this->ship_config.setShipWeapon(m_weapon);
+	//this->ship_config.DestroyBots();
+	this->ship_config.setShipWeapon(m_weapon, true, overwrite_existing);
 	this->Init();
-	this->ship_config.GenerateBots(this);
-
+	//this->ship_config.GenerateBots(this);
 }
 
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -830,24 +844,24 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	sf::Vector2f directions = InputGuy::getDirections();
 
 	//switching controls to the HUD
-	if (InputGuy::isOpeningHud())
-	{
-		if (!this->hud_key_repeat)
-		{
-			isFocusedOnHud = !isFocusedOnHud;
-			hud_key_repeat = true;
-
-			(*CurrentGame).hud.hud_cursor->visible = isFocusedOnHud;
-		}
-	}
-	else
-	{
-		hud_key_repeat = false;
-	}
-
 	//Ship controls
 	if (!disable_inputs)
 	{
+		if (InputGuy::isOpeningHud())
+		{
+			if (!this->hud_key_repeat)
+			{
+				isFocusedOnHud = !isFocusedOnHud;
+				hud_key_repeat = true;
+
+				(*CurrentGame).hud.hud_cursor->visible = isFocusedOnHud;
+			}
+		}
+		else
+		{
+			hud_key_repeat = false;
+		}
+
 		moving = directions.x != 0 || directions.y != 0;
 		movingX = directions.x != 0;
 		movingY = directions.y != 0;
@@ -1012,25 +1026,34 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					//interaction
 					if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
 					{
-						Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
+						Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem()->Clone();
 						if (tmp_ptr != NULL)
 						{
 							if (tmp_ptr->getEquipmentLoot() != NULL)
 							{
 								int equip_type_ = tmp_ptr->getEquipmentLoot()->equipmentType;
+								Equipment* new_equipment = tmp_ptr->getEquipmentLoot()->Clone();
+
+								Equipment* tmp_equipment = tmp_ptr->getEquipmentLoot()->Clone();
+								tmp_ptr->setEquipmentLoot(new_equipment);
+
 								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
 								{
-									Equipment* new_equipment = tmp_ptr->getEquipmentLoot()->Clone();
-									this->ship_config.setEquipment(new_equipment, true, true);
+									this->setEquipment(new_equipment, true);
 								}
 							}
 							else if (tmp_ptr->getWeaponLoot() != NULL)
 							{
 								int equip_type_ = NBVAL_Equipment;
+								Weapon* new_weapon = tmp_ptr->getWeaponLoot()->Clone();
+
+								Weapon* tmp_weapon = tmp_ptr->getWeaponLoot()->Clone();
+								tmp_ptr->setWeaponLoot(tmp_weapon);
+
 								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
 								{
-									Weapon* new_weapon = tmp_ptr->getWeaponLoot()->Clone();
-									this->ship_config.setShipWeapon(new_weapon, true, true);
+									
+									this->setShipWeapon(new_weapon, true);
 								}
 							}
 							else
@@ -1038,6 +1061,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 							}
 						}
+						//destroying the now useless container
 						delete tmp_ptr;
 						tmp_ptr = NULL;
 					}
@@ -1069,6 +1093,10 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			if (abs(speed.y) < SHIP_MIN_SPEED_Y)
 				speed.y = 0;
 		}
+	}
+	else
+	{
+		isFocusedOnHud = false;
 	}
 
 	Independant::update(deltaTime, hyperspeedMultiplier);

@@ -534,18 +534,11 @@ bool Game::InsertObjectInEquipmentGrid(Independant& object)
 
 bool Game::SwapEquipObjectInShipGrid(Independant& object, int index_ship, int index_equipment)
 {
-	//copying old equipment before the swap
-	Independant* tmp_ptr = hud.shipGrid.getCellPointerFromIntIndex(index_ship)->Clone();
+	Independant& current_object = *hud.shipGrid.getCellPointerFromIntIndex(index_ship);
 
-	//now overwriting the old equipment with the the one
+	bool result2 = hud.equipmentGrid.insertObject(current_object, index_equipment, true);
+
 	bool result1 = hud.shipGrid.insertObject(object, index_ship, true);
-
-	//and swapping it with the newly equipped one
-	bool result2 = hud.equipmentGrid.insertObject(*tmp_ptr, index_equipment, true);
-
-	//deleting now useless temporary pointer
-	delete tmp_ptr;
-	tmp_ptr = NULL;
 
 	if (!result1)
 	{

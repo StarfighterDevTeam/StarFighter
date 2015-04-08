@@ -198,8 +198,6 @@ public:
 	Weapon* getWeaponLoot();
 	virtual void CreateRandomLoot(float BeastScaleBonus = 0);
 
-	
-
 	virtual void GetGrazing();
 	void GetPolarMovement(sf::Vector2f* np);
 	int damage;
@@ -245,22 +243,24 @@ public:
 	sf::Vector2f getSpeedYMultiplier_for_Direction(Directions direction, float speed_multiplier);
 	sf::Vector2f setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered = false);
 
+	int money;
+	Equipment* equipment_loot;
+	Weapon* weapon_loot;
+	std::string textureName;
+	bool immune;
 protected:
 	sf::Vector2f initial_position;
 	bool startPattern;
-	std::string textureName;
+	
 	Animation defaultAnimation;
 	Animation* currentAnimation;
 
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber = 1);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber = 1, int m_animationNumber = 1);
-
-	bool immune;
+	
 	sf::Clock immunityTimer;
-	int money;
-	Equipment* equipment_loot;
-	Weapon* weapon_loot;
+	
 };
 
 #endif // INDEPENDANT_H_INCLUDED

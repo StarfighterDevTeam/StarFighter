@@ -177,12 +177,11 @@ public :
 	void setShipConfig(ShipConfig m_ship_config);
 	ShipConfig ship_config;
 	PlayerHud ship_hud;
-	vector<Loot*> stash;
 
 	void Respawn() override;
-	void setEquipment(Equipment* m_equipment);
+	void setEquipment(Equipment* m_equipment, bool overwrite = false);
 	void setShipModel(ShipModel* m_ship_model);
-	void setShipWeapon(Weapon* m_weapon);
+	void setShipWeapon(Weapon* m_weapon, bool overwrite = false);
 	
 	void Death() override;
 	bool GetLoot(Independant& independant) override;

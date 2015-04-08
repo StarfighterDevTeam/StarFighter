@@ -893,9 +893,9 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					e_damage = floor(e_damage);
 					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(4, 16), e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
-					weapon->display_name = "laser_red";
+					weapon->display_name = "laser_blue";
 					weapon->fire_direction = Vector2i(0,-1);
-					weapon->textureName = LASER_RED_FILENAME;
+					weapon->textureName = LASER_BLUE_FILENAME;
 					weapon->size = sf::Vector2f(64,64);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
