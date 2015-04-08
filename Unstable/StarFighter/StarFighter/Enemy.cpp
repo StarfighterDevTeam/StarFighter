@@ -766,7 +766,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					e_acceleration_x = floor(e_acceleration_x);
 					e_acceleration_y = floor(e_acceleration_y);
 
-					equipment->Init((int)EquipmentType::Engine, e_maxspeed, 0, e_acceleration_x, 0.f,0,0,0,0, THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
+					equipment->Init((int)EquipmentType::Engine, e_maxspeed, 0, e_acceleration_x, 1.f,0,0,0,0, THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -856,7 +856,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
-					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), LASER_BLUE_FILENAME, sf::Vector2f(4, 16), e_damage, fx);
+					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(4, 16), e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
 					weapon->display_name = "laser_blue";
 					weapon->fire_direction = Vector2i(0,-1);
@@ -891,11 +891,11 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
-					Ammo* ammo = new Ammo(this->getPosition(),sf::Vector2f (0,WEAPON_MIN_VSPEED_VALUE),"Assets/2D/Equipment/laser_blue1.png",sf::Vector2f (4,16),e_damage, fx);
+					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(4, 16), e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
-					weapon->display_name = "laser_blue";
+					weapon->display_name = "laser_red";
 					weapon->fire_direction = Vector2i(0,-1);
-					weapon->textureName = "Assets/2D/Equipment/laser_red.png";
+					weapon->textureName = LASER_RED_FILENAME;
 					weapon->size = sf::Vector2f(64,64);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;

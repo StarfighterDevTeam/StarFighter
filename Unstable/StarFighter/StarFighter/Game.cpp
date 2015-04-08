@@ -126,6 +126,33 @@ void Game::drawHud()
 	this->window->draw(temp);
 }
 
+Independant* Game::getHudFocusedItem()
+{
+	return hud.focused_item;
+}
+
+sf::Vector2i Game::getHudFocusedGridAndIndex()
+{
+	return hud.focused_grid_and_index;
+}
+
+sf::Vector2i Game::getHudFocusedIndexWithinGrid(HudGridsIndex grid_)
+{
+	switch (grid_)
+	{
+		case HudGrid_ShipGrid:
+		{
+			return hud.fakeShipGrid.focus;
+		}
+		case HudGrid_EquipmentGrid:
+		{
+			return hud.fakeEquipmentGrid.focus;
+		}
+	}
+
+	return sf::Vector2i(-1, -1);
+}
+
 void Game::colisionChecksV2()
 {
 	sf::Clock dt;
@@ -503,4 +530,35 @@ bool Game::InsertObjectInEquipmentGrid(Independant& object)
 	object.releaseWeaponLoot();
 
 	return result;
+}
+
+bool Game::SwapEquipObjectInShipGrid(Independant& object, int index_ship, int index_equipment)
+{
+	//copying old equipment before the swap
+	Independant* tmp_ptr = hud.shipGrid.getCellPointerFromIntIndex(index_ship)->Clone();
+
+	//now overwriting the old equipment with the the one
+	bool result1 = hud.shipGrid.insertObject(object, index_ship, true);
+
+	//and swapping it with the newly equipped one
+	bool result2 = hud.equipmentGrid.insertObject(*tmp_ptr, index_equipment, true);
+
+	//deleting now useless temporary pointer
+	delete tmp_ptr;
+	tmp_ptr = NULL;
+
+	if (!result1)
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: while overwritting an item in shipGrid (Swap).\n");
+		return false;
+	}
+	else if (!result2)
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: while inserting previously equipped object in equipmentGrid (Swap).\n");
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }

@@ -32,7 +32,12 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 	this->focus = sf::Vector2i(-1, -1);
 }
 
-bool ObjectGrid::insertObject(Independant& object, int index)
+int ObjectGrid::getFocusIntIndex()
+{
+	return (focus.y + (focus.x * this->squares.y));
+}
+
+bool ObjectGrid::insertObject(Independant& object, int index, bool overwrite_existing)
 {
 	//if no specific index is provided, we look for the first empty slot...
 	if (index < 0)
@@ -41,7 +46,7 @@ bool ObjectGrid::insertObject(Independant& object, int index)
 		{
 			for (size_t j = 0; j < this->squares.y; j++)
 			{
-				if (grid[i][j] == NULL)
+				if (grid[i][j] == NULL || overwrite_existing)
 				{
 					grid[i][j] = &object;
 					grid[i][j]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
@@ -73,7 +78,7 @@ bool ObjectGrid::insertObject(Independant& object, int index)
 
 			return true;
 		}
-		else
+		else if (!overwrite_existing)
 		{
 			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to add an equipement on an existing ship equipment slot.\n");
 			return false;
@@ -144,6 +149,20 @@ bool ObjectGrid::HighlightCell(int index)
 	}
 }
 
+bool ObjectGrid::GarbageCell(int index)
+{
+	Independant* tmp_ptr = getCellPointerFromIntIndex(index);
+	if (tmp_ptr != NULL)
+	{
+		delete tmp_ptr;
+		tmp_ptr = NULL;
+		return true;
+	}
+	tmp_ptr = NULL;
+	LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to garbage an empty grid cell.\n");
+	return false;
+}
+
 bool ObjectGrid::CleanFocus()
 {
 	if (focus.x != -1 || focus.y != -1)
@@ -160,22 +179,19 @@ Independant* ObjectGrid::getCellPointerFromIntIndex(int index)
 	int r = index % squares.y;
 	int l = index / squares.y;
 
-	//case: error in index calculation
 	if (l > squares.x)
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
-		return false;
 	}
-	//case: return the requested pointer
-	else
-	{
-		return this->grid[r][l];
-	}
+
+	return this->grid[l][r];
+	
 }
 
 PlayerHud::PlayerHud()
 {
 	this->max_hazard_level_reached = false;
+	this->focused_item = NULL;
 
 	this->fakeEquipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), true);
 	this->fakeShipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
@@ -345,6 +361,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	}
 	
 	//clean old focus
+	focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, -1);
 	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())
 	{
 		//if the focus has been cleaned, that means we must also clean the cursor
@@ -364,11 +381,18 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
 			{
 				hud_cursor->setAnimationLine(Cursor_ActionState);
+				focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
 			}
 			else
 			{
 				hud_cursor->setAnimationLine(Cursor_HighlightState);
+				focused_item = NULL;
 			}
+			focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
+		}
+		else
+		{
+			//not hovering any of the grids
 		}
 	}
 	else
@@ -376,6 +400,16 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 		//we focus the hovered grid cell in ship grid
 		fakeShipGrid.HighlightCell(hovered_index_);
 		hud_cursor->setAnimationLine(Cursor_HighlightState);
+
+		if (shipGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
+		{
+			focused_item = shipGrid.getCellPointerFromIntIndex(hovered_index_);
+		}
+		else
+		{
+			focused_item = NULL;
+		}
+		focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, hovered_index_);
 	}
 		
 	//grid titles

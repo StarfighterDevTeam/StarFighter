@@ -89,6 +89,15 @@ Equipment::Equipment()
 	this->hasFake = false;
 }
 
+Equipment* Equipment::Clone()
+{
+	Equipment* new_equipment = new Equipment();
+	new_equipment->Init(this->equipmentType, this->max_speed.x, this->acceleration.x, this->decceleration, this->hyperspeed, this->armor, this->shield, this->shield_regen, this->damage, this->textureName, this->size, this->frameNumber, this->display_name);
+	new_equipment->display_name = this->display_name;
+
+	return new_equipment;
+}
+
 void Equipment::Init(int m_equipmentType, float  m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed.x = m_max_speed;
@@ -604,10 +613,14 @@ float ShipConfig::getShipConfigHyperspeed()
 	return new_hyperspeed;
 }
 
-bool ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats)
+bool ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats, bool overwrite)
 {
-	if (this->equipment[m_equipment->equipmentType] == NULL)
+	if (this->equipment[m_equipment->equipmentType] == NULL || overwrite)
 	{
+		if (overwrite)
+		{
+			delete this->equipment[m_equipment->equipmentType];
+		}
 		this->equipment[m_equipment->equipmentType] = m_equipment;
 		if (recomputing_stats)
 		{
@@ -638,10 +651,14 @@ bool ShipConfig::setShipModel(ShipModel* m_ship_model)
 	}
 }
 
-bool ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats)
+bool ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats, bool overwrite)
 {
-	if (this->weapon == NULL)
+	if (this->weapon == NULL || overwrite)
 	{
+		if (overwrite)
+		{
+			delete this->weapon;
+		}
 		this->weapon = m_weapon;
 		if (recomputing_stats)
 		{
@@ -992,7 +1009,39 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				if (!fire_key_repeat)
 				{
-					//todo interaction
+					//interaction
+					if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+					{
+						Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
+						if (tmp_ptr != NULL)
+						{
+							if (tmp_ptr->getEquipmentLoot() != NULL)
+							{
+								int equip_type_ = tmp_ptr->getEquipmentLoot()->equipmentType;
+								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
+								{
+									Equipment* new_equipment = tmp_ptr->getEquipmentLoot()->Clone();
+									this->ship_config.setEquipment(new_equipment, true, true);
+								}
+							}
+							else if (tmp_ptr->getWeaponLoot() != NULL)
+							{
+								int equip_type_ = NBVAL_Equipment;
+								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
+								{
+									Weapon* new_weapon = tmp_ptr->getWeaponLoot()->Clone();
+									this->ship_config.setShipWeapon(new_weapon, true, true);
+								}
+							}
+							else
+							{
+								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+							}
+						}
+						delete tmp_ptr;
+						tmp_ptr = NULL;
+					}
+
 					fire_key_repeat = true;
 				}
 			}

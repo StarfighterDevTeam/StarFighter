@@ -252,6 +252,9 @@ Independant* Independant::Clone()
 	clone->Init(clone->getPosition(), clone->speed, clone->textureName, clone->m_size);
 	clone->equipment_loot = this->equipment_loot;
 	clone->weapon_loot = this->weapon_loot;
+	clone->display_name = this->display_name;
+	clone->collider_type = this->collider_type;
+	clone->layer = this->layer;
 
 	return clone;
 }

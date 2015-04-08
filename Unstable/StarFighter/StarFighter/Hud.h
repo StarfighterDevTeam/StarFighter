@@ -22,12 +22,19 @@ enum CursorFeedbackStates
 	Cursor_ActionState,
 };
 
+enum HudGridsIndex
+{
+	HudGrid_NoFocus,
+	HudGrid_ShipGrid,
+	HudGrid_EquipmentGrid,
+};
+
 class ObjectGrid
 {
 public:
 	ObjectGrid();
 	ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake = false);
-	bool insertObject(Independant& object, int index = -1);
+	bool insertObject(Independant& object, int index = -1, bool overwrite_existing = false);
 	Independant* grid[EQUIPMENT_GRID_NB_LINES][EQUIPMENT_GRID_NB_ROWS];
 	void Draw(sf::RenderTexture& offscreen);
 	sf::Vector2f position;
@@ -35,8 +42,10 @@ public:
 	sf::Vector2i focus;
 	int isCursorColling(Independant& cursor);
 	bool HighlightCell(int index);
+	bool GarbageCell(int index);
 	bool CleanFocus();
 	Independant* getCellPointerFromIntIndex(int index);
+	int getFocusIntIndex();
 };
 
 class PlayerHud
@@ -65,6 +74,8 @@ public:
 	sf::Text* framerate;
 
 	Independant* hud_cursor;
+	Independant* focused_item;
+	sf::Vector2i focused_grid_and_index;
 
 	bool max_hazard_level_reached;
 	bool has_shield;

@@ -88,6 +88,7 @@ class Equipment
 public:
 	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
+	Equipment* Clone();
 	std::string textureName;
 	sf::Vector2f size;
 	int frameNumber;
@@ -143,9 +144,9 @@ public:
 	int getShipConfigShield();
 	int getShipConfigShieldRegen();
 	int getShipConfigDamage();
-	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true);
+	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true, bool overwrite = false);
 	bool setShipModel(ShipModel* m_ship_model);
-	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true);
+	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true, bool overwrite = false);
 	Equipment* equipment[NBVAL_Equipment];
 	ShipModel* ship_model;
 	Weapon* weapon;
