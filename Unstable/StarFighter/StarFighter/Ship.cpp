@@ -1024,11 +1024,11 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				if (!fire_key_repeat)
 				{
 					//interaction
-					if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+					if ((*CurrentGame).getHudFocusedItem() != NULL)
 					{
-						Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem()->Clone();
-						if (tmp_ptr != NULL)
+						if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
 						{
+							Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem()->Clone();
 							if (tmp_ptr->getEquipmentLoot() != NULL)
 							{
 								int equip_type_ = tmp_ptr->getEquipmentLoot()->equipmentType;
@@ -1061,10 +1061,11 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							{
 								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 							}
+							
+							//destroying the now useless container
+							delete tmp_ptr;
+							tmp_ptr = NULL;
 						}
-						//destroying the now useless container
-						delete tmp_ptr;
-						tmp_ptr = NULL;
 					}
 
 					fire_key_repeat = true;

@@ -108,6 +108,17 @@ int ObjectGrid::isCursorColling(Independant& cursor)
 	}
 	else
 	{
+		//1st test
+		
+		sf::FloatRect gridBounds(sf::Vector2f(grid[0][0]->getPosition().x - SHIP_GRID_SLOT_SIZE / 2, grid[0][0]->getPosition().y - SHIP_GRID_SLOT_SIZE / 2),
+			sf::Vector2f(SHIP_GRID_SLOT_SIZE * squares.y, SHIP_GRID_SLOT_SIZE * squares.x));
+
+		if (!gridBounds.contains(cursor.getPosition().x, cursor.getPosition().y))
+		{
+			return -1;
+		}
+
+		//2nd test
 		for (size_t i = 0; i < this->squares.x; i++)
 		{
 			for (size_t j = 0; j < this->squares.y; j++)
