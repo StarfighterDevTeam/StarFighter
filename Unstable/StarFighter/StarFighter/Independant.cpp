@@ -121,8 +121,10 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 Independant::~Independant()
 {
-	//todo ?
+	//TODO
 
+	//delete this->equipment_loot;
+	//delete this->weapon_loot;
 }
 
 void Independant::update(sf::Time deltaTime, float hyperspeedMultiplier)

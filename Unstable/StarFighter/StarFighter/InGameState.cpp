@@ -35,7 +35,7 @@ void InGameState::Initialize(Player player)
 			string textureName_ = this->playerShip->ship_config.equipment[i]->textureName;
 			int frameNumber_ = this->playerShip->ship_config.equipment[i]->frameNumber;
 			Independant* new_equipment = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName_, size_, sf::Vector2f(size_.x / 2, size_.y / 2), frameNumber_);
-			new_equipment->setEquipmentLoot(this->playerShip->ship_config.equipment[i]);
+			new_equipment->setEquipmentLoot(this->playerShip->ship_config.equipment[i]->Clone());
 
 			if (!(*CurrentGame).InsertObjectInShipGrid(*new_equipment, i))
 			{
@@ -52,7 +52,7 @@ void InGameState::Initialize(Player player)
 		Independant* new_weapon = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName_, size_, sf::Vector2f(size_.x / 2, size_.y / 2), frameNumber_);
 		new_weapon->display_name = this->playerShip->ship_config.weapon->display_name;
 
-		new_weapon->setWeaponLoot(this->playerShip->ship_config.weapon);
+		new_weapon->setWeaponLoot(this->playerShip->ship_config.weapon->Clone());
 
 		if (!(*CurrentGame).InsertObjectInShipGrid(*new_weapon, NBVAL_Equipment))
 		{
@@ -88,7 +88,7 @@ void InGameState::Update(Time deltaTime)
 	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), this->currentScene->getSceneBeastScore());
 
 	(*CurrentGame).updateScene(deltaTime);
-	(*CurrentGame).hud.Update((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
+	(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
 		(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION);
 
 	this->mainWindow->clear();

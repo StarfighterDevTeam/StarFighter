@@ -206,3 +206,18 @@ Independant* ObjectGrid::getCellPointerFromIntIndex(int index)
 	return this->grid[l][r];
 
 }
+
+void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant)
+{
+	int r = index % squares.y;
+	int l = index / squares.y;
+
+	if (l > squares.x)
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
+	}
+
+	this->grid[l][r] = independant;
+	this->grid[l][r]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (r * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (l * EQUIPMENT_GRID_SLOT_SIZE)));
+
+}

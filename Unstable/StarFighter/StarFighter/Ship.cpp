@@ -170,26 +170,26 @@ void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f
 {
 	switch (chosen_property) // 1 case
 	{
-		case 0:
-		{
-			float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
+	case 0:
+	{
+			  float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
 
-			float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_decceleration *= log_multiplier;
-			else
-				e_decceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_decceleration));
+			  float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_decceleration *= log_multiplier;
+			  else
+				  e_decceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_decceleration));
 
-			this->decceleration += e_decceleration;
-			this->decceleration = floor(this->decceleration);
-			break;
-		}
+			  this->decceleration += e_decceleration;
+			  this->decceleration = floor(this->decceleration);
+			  break;
+	}
 
-		default:
-		{
-			printf("DEBUG: error: trying to add Airbrake property that does not exit.\n<!> Check that the chosen property for this Airbrake match with the existing properties in the AddAibrakeProperty function.\n");
-			break;
-		}
+	default:
+	{
+			   printf("DEBUG: error: trying to add Airbrake property that does not exit.\n<!> Check that the chosen property for this Airbrake match with the existing properties in the AddAibrakeProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -197,45 +197,45 @@ void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f B
 {
 	switch (chosen_property) // 2 case
 	{
-		case 0:
-		{
-			float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X));
+	case 0:
+	{
+			  float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X));
 
-			float e_acceleration = EQUIPMENT_MIN_ACCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_acceleration *= log_multiplier;
-			else
-				e_acceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_acceleration));
+			  float e_acceleration = EQUIPMENT_MIN_ACCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_acceleration *= log_multiplier;
+			  else
+				  e_acceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_acceleration));
 
-			this->acceleration.x += e_acceleration;
-			this->acceleration.y += e_acceleration;
-			this->acceleration.x = floor(this->acceleration.x);
-			this->acceleration.y = floor(this->acceleration.y);
-			break;
-		}
-		case 1:
-		{
-			//this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			//this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
+			  this->acceleration.x += e_acceleration;
+			  this->acceleration.y += e_acceleration;
+			  this->acceleration.x = floor(this->acceleration.x);
+			  this->acceleration.y = floor(this->acceleration.y);
+			  break;
+	}
+	case 1:
+	{
+			  //this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  //this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
 
-			float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_maxspeed *= log_multiplier;
-			else
-				e_maxspeed = ProrataBetweenThreshold(value, sf::Vector2f(0, e_maxspeed));
+			  float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_maxspeed *= log_multiplier;
+			  else
+				  e_maxspeed = ProrataBetweenThreshold(value, sf::Vector2f(0, e_maxspeed));
 
-			this->max_speed.x += e_maxspeed;
-			this->max_speed.y += e_maxspeed;
-			this->max_speed.x = floor(this->max_speed.x);
-			this->max_speed.y = floor(this->max_speed.y);
-			break;
-		}
-		default:
-		{
-			printf("DEBUG: error: trying to add Engine property that does not exit.\n<!> Check that the chosen property for this Engine match with the existing properties in the AddEngineProperty function.\n");
-			break;
-		}
+			  this->max_speed.x += e_maxspeed;
+			  this->max_speed.y += e_maxspeed;
+			  this->max_speed.x = floor(this->max_speed.x);
+			  this->max_speed.y = floor(this->max_speed.y);
+			  break;
+	}
+	default:
+	{
+			   printf("DEBUG: error: trying to add Engine property that does not exit.\n<!> Check that the chosen property for this Engine match with the existing properties in the AddEngineProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -243,26 +243,26 @@ void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f Be
 {
 	switch (chosen_property) // 1 case
 	{
-		case 0:
-		{
-			//this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X));
+	case 0:
+	{
+			  //this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X));
 
-			float e_armor = EQUIPMENT_MIN_ARMOR_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_armor *= log_multiplier;
-			else
-				e_armor = ProrataBetweenThreshold(value, sf::Vector2f(0, e_armor));
+			  float e_armor = EQUIPMENT_MIN_ARMOR_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_armor *= log_multiplier;
+			  else
+				  e_armor = ProrataBetweenThreshold(value, sf::Vector2f(0, e_armor));
 
-			this->armor += e_armor;
-			this->armor = floor(this->armor);
-			break;
-		}
-		default:
-		{
-			printf("DEBUG: error: trying to add Armor property that does not exit.\n<!> Check that the chosen property for this Armor match with the existing properties in the AddArmorProperty function.\n");
-			break;
-		}
+			  this->armor += e_armor;
+			  this->armor = floor(this->armor);
+			  break;
+	}
+	default:
+	{
+			   printf("DEBUG: error: trying to add Armor property that does not exit.\n<!> Check that the chosen property for this Armor match with the existing properties in the AddArmorProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -270,43 +270,43 @@ void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f B
 {
 	switch (chosen_property) // 2 case
 	{
-		case 0:
-		{
-			//this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
-			float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X));
+	case 0:
+	{
+			  //this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
+			  float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X));
 
-			float e_shield = EQUIPMENT_MIN_SHIELD_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_shield *= log_multiplier;
-			else
-				e_shield = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield));
+			  float e_shield = EQUIPMENT_MIN_SHIELD_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_shield *= log_multiplier;
+			  else
+				  e_shield = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield));
 
-			this->shield += e_shield;
-			this->shield = floor(this->shield);
-			break;
-		}
+			  this->shield += e_shield;
+			  this->shield = floor(this->shield);
+			  break;
+	}
 
-		case 1:
-		{
-			//this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X));
+	case 1:
+	{
+			  //this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
+			  float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X));
 
-			float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_shield_regen *= log_multiplier;
-			else
-				e_shield_regen = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield_regen));
+			  float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE * RandomizeFloatBetweenValues(BeastScale);
+			  if (log_multiplier > 1)
+				  e_shield_regen *= log_multiplier;
+			  else
+				  e_shield_regen = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield_regen));
 
-			this->shield_regen += e_shield_regen;
-			this->shield_regen = floor(this->shield_regen);
-			break;
-		}
+			  this->shield_regen += e_shield_regen;
+			  this->shield_regen = floor(this->shield_regen);
+			  break;
+	}
 
-		default:
-		{
-			printf("DEBUG: error: trying to add Shield property that does not exit.\n<!> Check that the chosen property for this Shield match with the existing properties in the AddShieldProperty function.\n");
-			break;
-		}
+	default:
+	{
+			   printf("DEBUG: error: trying to add Shield property that does not exit.\n<!> Check that the chosen property for this Shield match with the existing properties in the AddShieldProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -314,35 +314,35 @@ void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f B
 {
 	switch (chosen_property)
 	{
-		case 0://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
-		case 1://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
-		case 2://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
-		case 3://adding bot
-		{
-			this->hasBot = true;
-			this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			break;
-		}
-		default:
-		{
-			printf("DEBUG: error: trying to add Module property that does not exit.\n<!> Check that the chosen property for this Module match with the existing properties in the AddModuleProperty function.\n");
-			break;
-		}
+	case 0://adding bot
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
+	case 1://adding bot
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
+	case 2://adding bot
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
+	case 3://adding bot
+	{
+			   this->hasBot = true;
+			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
+			   break;
+	}
+	default:
+	{
+			   printf("DEBUG: error: trying to add Module property that does not exit.\n<!> Check that the chosen property for this Module match with the existing properties in the AddModuleProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -621,7 +621,7 @@ bool ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats, bo
 		{
 			delete this->equipment[m_equipment->equipmentType];
 		}
-		this->equipment[m_equipment->equipmentType] = m_equipment;
+		this->equipment[m_equipment->equipmentType] = m_equipment->Clone();
 		if (recomputing_stats)
 		{
 			this->Init();
@@ -659,7 +659,7 @@ bool ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats, bool ov
 		{
 			delete this->weapon;
 		}
-		this->weapon = m_weapon;
+		this->weapon = m_weapon->Clone();
 		if (recomputing_stats)
 		{
 			this->Init();
@@ -703,7 +703,7 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 	{
 		if (this->equipment[i] != NULL)
 		{
-			if(this->equipment[i]->hasFake)
+			if (this->equipment[i]->hasFake)
 			{
 				FakeShip* fake_ship = new FakeShip(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
 				(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
@@ -772,7 +772,7 @@ void Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing)
 	{
 		this->ship_config.DestroyBots();
 	}
-	
+
 	this->ship_config.setEquipment(m_equipment, true, overwrite_existing);
 	this->Init();
 	if (m_equipment->hasBot)
@@ -787,7 +787,7 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 	{
 		this->ship_config.DestroyBots();
 	}
-	
+
 	this->ship_config.setShipModel(m_ship_model);
 	this->Init();
 
@@ -1009,7 +1009,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				this->isBraking = true;
 			}
 		}
-		
+
 		//HUD controls
 		else
 		{
@@ -1034,8 +1034,14 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							if (tmp_ptr->getEquipmentLoot() != NULL)
 							{
 								int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
-								
-								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, ship_index_, equip_index_))
+
+								//if there is no equipped item, we equip it
+								if (this->ship_config.equipment[ship_index_] == NULL)
+								{
+									(*CurrentGame).InsertObjectInShipGrid(*tmp_ptr, ship_index_);
+								}
+								//otherwise we try to swap it with the existing item
+								else if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
 								{
 									Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
 									this->setEquipment(new_equipment, true);
@@ -1046,7 +1052,13 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							{
 								int ship_index_ = NBVAL_Equipment;
 
-								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, ship_index_, equip_index_))
+								//if there is no equipped item, we equip it
+								if (this->ship_config.weapon == NULL)
+								{
+									(*CurrentGame).InsertObjectInShipGrid(*tmp_ptr, ship_index_);
+								}
+								//otherwise we try to swap it with the existing item
+								else if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
 								{
 									Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
 									this->setShipWeapon(new_weapon, true);
@@ -1057,7 +1069,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							{
 								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 							}
-							
+
 							tmp_ptr = NULL;
 						}
 					}
@@ -1230,8 +1242,8 @@ bool Ship::GetLoot(Independant& independant)
 			//...else we put it in the stash
 			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
-		independant.releaseEquipmentLoot();
-		independant.releaseWeaponLoot();
+		//independant.releaseEquipmentLoot();
+		//independant.releaseWeaponLoot();
 		return true;
 	}
 
@@ -1248,8 +1260,8 @@ bool Ship::GetLoot(Independant& independant)
 			//...else we put it in the stash
 			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
-		independant.releaseEquipmentLoot();
-		independant.releaseWeaponLoot();
+		//independant.releaseEquipmentLoot();
+		//independant.releaseWeaponLoot();
 		return true;
 	}
 
@@ -1278,33 +1290,33 @@ void Ship::GetGrazing()
 			graze_level++;
 			switch (graze_level)
 			{
-				case GrazeLevels::GRAZE_LEVEL_RED:
-				{
-					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
-					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED]->Clone();
-					(*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
-					break;
-				}
-				case GrazeLevels::GRAZE_LEVEL_BLUE:
-				{
-					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
-					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE]->Clone();
-					(*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
-					break;
-				}
-				case GrazeLevels::GRAZE_LEVEL_WHITE:
-				{
-					(*CurrentGame).garbageLayer(LayerType::AuraLayer);
-					Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE]->Clone();
-					(*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
-					break;
-				}
-				default:
-				{
-					graze_level = 0;
-					LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
-					break;
-				}
+			case GrazeLevels::GRAZE_LEVEL_RED:
+			{
+												 (*CurrentGame).garbageLayer(LayerType::AuraLayer);
+												 Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED]->Clone();
+												 (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
+												 break;
+			}
+			case GrazeLevels::GRAZE_LEVEL_BLUE:
+			{
+												  (*CurrentGame).garbageLayer(LayerType::AuraLayer);
+												  Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE]->Clone();
+												  (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
+												  break;
+			}
+			case GrazeLevels::GRAZE_LEVEL_WHITE:
+			{
+												   (*CurrentGame).garbageLayer(LayerType::AuraLayer);
+												   Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE]->Clone();
+												   (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
+												   break;
+			}
+			default:
+			{
+					   graze_level = 0;
+					   LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
+					   break;
+			}
 			}
 		}
 	}

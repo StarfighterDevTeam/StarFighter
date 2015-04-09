@@ -93,7 +93,7 @@ void Game::drawScene()
 {
 	this->mainScreen.clear();
 
-	for (int i = 0; i < NBVAL_Layer ; i++)
+	for (int i = 0; i < NBVAL_Layer; i++)
 	{
 		for (std::list<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
 		{
@@ -140,14 +140,14 @@ sf::Vector2i Game::getHudFocusedIndexWithinGrid(HudGridsIndex grid_)
 {
 	switch (grid_)
 	{
-		case HudGrid_ShipGrid:
-		{
-			return hud.fakeShipGrid.focus;
-		}
-		case HudGrid_EquipmentGrid:
-		{
-			return hud.fakeEquipmentGrid.focus;
-		}
+	case HudGrid_ShipGrid:
+	{
+							 return hud.fakeShipGrid.focus;
+	}
+	case HudGrid_EquipmentGrid:
+	{
+								  return hud.fakeEquipmentGrid.focus;
+	}
 	}
 
 	return sf::Vector2i(-1, -1);
@@ -280,7 +280,7 @@ void Game::colisionChecksV2()
 						//Loot
 						hazard += (*it1)->getMoney();
 						(*it1)->CreateRandomLoot(this->BeastScoreBonus);
- 						(*it1)->GenerateLoot();
+						(*it1)->GenerateLoot();
 						(*it1)->Death();
 					}
 				}
@@ -297,7 +297,7 @@ void Game::cleanGarbage()
 
 	for (std::list<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
 	{
-		Independant*	ptr	= *it;
+		Independant*	ptr = *it;
 		this->sceneIndependants.remove(ptr);
 		this->sceneIndependantsLayered[ptr->layer].remove(*it);
 		this->sceneIndependantsTyped[(int)(ptr->collider_type)].remove(*it);
@@ -330,7 +330,7 @@ void Game::collectGarbage()
 			{
 				(**it).isOnScene = true;
 			}
-			
+
 		}
 
 		//Out of scene content
@@ -360,7 +360,7 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 			{
 				(*it)->GarbageMe = true;
 				clear_count++;
-				
+
 			}
 		}
 		else
@@ -444,7 +444,7 @@ TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_
 		{
 			return TargetScan::TARGET_IN_RANGE;
 		}
-		
+
 	}
 	else
 	{
@@ -514,46 +514,29 @@ void Game::WakeUpEnemiesWithName(string m_display_name)
 
 bool Game::InsertObjectInShipGrid(Independant& object, int index)
 {
-	Independant* i = object.Clone();
-	bool result = hud.shipGrid.insertObject(*i, index);
-	delete i;
-	i = NULL;
+	bool result = hud.shipGrid.insertObject(object, index);
 
 	return result;
 }
 
 bool Game::InsertObjectInEquipmentGrid(Independant& object)
 {
-	Independant* i = object.Clone();
-	bool result = hud.equipmentGrid.insertObject(*i);
-	delete i;
-	i = NULL;
+	bool result = hud.equipmentGrid.insertObject(object);
 
 	return result;
 }
 
-bool Game::SwapEquipObjectInShipGrid(Independant& object, int index_ship, int index_equipment)
+bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
 {
-	Independant* tmp_object = object.Clone();
-	
-	bool result1 = hud.equipmentGrid.insertObject(*hud.shipGrid.getCellPointerFromIntIndex(index_ship), index_equipment, true);
-	bool result2 = hud.shipGrid.insertObject(*tmp_object, index_ship, true);
+	assert(hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL);
+	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
 
-	delete tmp_object;
-	tmp_object = NULL;
+	Independant* tmpShip = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
+	//Equipement > Ship
+	hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
+	//Ship > equipement
+	hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, tmpShip);
 
-	if (!result1)
-	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: while overwritting an item in shipGrid (Swap).\n");
-		return false;
-	}
-	else if (!result2)
-	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: while inserting previously equipped object in equipmentGrid (Swap).\n");
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	tmpShip = NULL;
+	return true;
 }

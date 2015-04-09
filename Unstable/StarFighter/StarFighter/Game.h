@@ -48,7 +48,7 @@ public:
 
 	bool InsertObjectInShipGrid(Independant& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(Independant& object);
-	bool SwapEquipObjectInShipGrid(Independant& object, int index_ship, int index_equipment);
+	bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment);
 	Independant* getHudFocusedItem();
 	sf::Vector2i getHudFocusedGridAndIndex();
 	sf::Vector2i getHudFocusedIndexWithinGrid(HudGridsIndex grid_);

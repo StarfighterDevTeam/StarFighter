@@ -40,6 +40,7 @@ public:
 	bool CleanFocus();
 	Independant* getCellPointerFromIntIndex(int index);
 	int getFocusIntIndex();
+	void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant);
 };
 
 #endif // HUDGRID_H_INCLUDED
