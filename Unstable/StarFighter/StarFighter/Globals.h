@@ -10,14 +10,14 @@
 
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 
-#define	REF_WINDOW_RESOLUTION_X					1920.0
-#define REF_WINDOW_RESOLUTION_Y					1080.0
+#define	REF_WINDOW_RESOLUTION_X					1920
+#define REF_WINDOW_RESOLUTION_Y					1080
 
-#define	WINDOW_RESOLUTION_X						1600.0
-#define WINDOW_RESOLUTION_Y						900.0
+#define	WINDOW_RESOLUTION_X						1600
+#define WINDOW_RESOLUTION_Y						900
 
-#define	SCENE_SIZE_X							1080.0
-#define SCENE_SIZE_Y							1080.0
+#define	SCENE_SIZE_X							1080
+#define SCENE_SIZE_Y							1080
 
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f

@@ -19,8 +19,8 @@ void Game::init(RenderWindow* window)
 	this->hubScreen.setSmooth(true);
 
 	this->sceneChronometer.restart();
-	scale_factor.x = float(WINDOW_RESOLUTION_X) / float(REF_WINDOW_RESOLUTION_X);
-	scale_factor.y = float(WINDOW_RESOLUTION_Y) / float(REF_WINDOW_RESOLUTION_Y);
+	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
+	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
 	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
 
 	this->resetHazard();;//initalisation of the scoring system
@@ -66,8 +66,8 @@ void Game::updateScene(Time deltaTime)
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
 
 	//TODO: Updating screen resolution
-	scale_factor.x = float(screen_size.x) / float(REF_WINDOW_RESOLUTION_X);
-	scale_factor.y = float(screen_size.y) / float(REF_WINDOW_RESOLUTION_Y);
+	scale_factor.x = 1.0f * screen_size.x / REF_WINDOW_RESOLUTION_X;
+	scale_factor.y = 1.0f * screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
 	//Collect & clean garbage
 	collectGarbage();
@@ -514,31 +514,33 @@ void Game::WakeUpEnemiesWithName(string m_display_name)
 
 bool Game::InsertObjectInShipGrid(Independant& object, int index)
 {
-	Independant *i = NULL;
-	i = object.Clone();
+	Independant* i = object.Clone();
 	bool result = hud.shipGrid.insertObject(*i, index);
-	object.releaseWeaponLoot();
+	delete i;
+	i = NULL;
 
 	return result;
 }
 
 bool Game::InsertObjectInEquipmentGrid(Independant& object)
 {
-	Independant *i = NULL;
-	i = object.Clone();
+	Independant* i = object.Clone();
 	bool result = hud.equipmentGrid.insertObject(*i);
-	object.releaseWeaponLoot();
+	delete i;
+	i = NULL;
 
 	return result;
 }
 
 bool Game::SwapEquipObjectInShipGrid(Independant& object, int index_ship, int index_equipment)
 {
-	Independant* new_object = object.Clone();
-	Independant* old_object = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
+	Independant* tmp_object = object.Clone();
+	
+	bool result1 = hud.equipmentGrid.insertObject(*hud.shipGrid.getCellPointerFromIntIndex(index_ship), index_equipment, true);
+	bool result2 = hud.shipGrid.insertObject(*tmp_object, index_ship, true);
 
-	bool result2 = hud.equipmentGrid.insertObject(*old_object, index_equipment, true);
-	bool result1 = hud.shipGrid.insertObject(*new_object, index_ship, true);
+	delete tmp_object;
+	tmp_object = NULL;
 
 	if (!result1)
 	{

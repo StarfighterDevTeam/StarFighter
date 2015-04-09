@@ -50,6 +50,8 @@ void InGameState::Initialize(Player player)
 		string textureName_ = this->playerShip->ship_config.weapon->textureName;
 		int frameNumber_ = this->playerShip->ship_config.weapon->frameNumber;
 		Independant* new_weapon = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName_, size_, sf::Vector2f(size_.x / 2, size_.y / 2), frameNumber_);
+		new_weapon->display_name = this->playerShip->ship_config.weapon->display_name;
+
 		new_weapon->setWeaponLoot(this->playerShip->ship_config.weapon);
 
 		if (!(*CurrentGame).InsertObjectInShipGrid(*new_weapon, NBVAL_Equipment))

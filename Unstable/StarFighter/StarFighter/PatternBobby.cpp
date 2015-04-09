@@ -328,7 +328,7 @@ void PatternBobby::ToCartesianCoords(sf::Vector2f* polarCoords)
 	polarCoords->y = r*sin(polarCoords->y);
 }
 
-void PatternBobby::CheckArgSize(int expected)
+void PatternBobby::CheckArgSize(size_t expected)
 {
 	if(this->patternParams->size() < expected)
 	{

@@ -27,6 +27,7 @@
 #include <SFGUI/SFGUI.hpp>
 #include "GameManager.h"
 #include "Player.h"
+#include "HudGrid.h"
 
 #define LOGGER_START(MIN_PRIORITY, FILE) Logger::Start(MIN_PRIORITY, FILE);
 #define LOGGER_STOP() Logger::Stop();

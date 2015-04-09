@@ -178,7 +178,7 @@ Equipment* FileLoader::LoadEquipment(string name)
 			else if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("module") == 0)
 				i->equipmentType = EquipmentType::Module;
 			else 
-				LOGGER_WRITE(Logger::Priority::DEBUG,"Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file",name);
+				LOGGER_WRITE(Logger::Priority::DEBUG,("Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file",name));
 
 			return i;
 		}

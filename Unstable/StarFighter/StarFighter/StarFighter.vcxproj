@@ -103,6 +103,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hud.cpp" />
+    <ClCompile Include="HudGrid.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Loot.cpp" />
@@ -137,6 +138,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hud.h" />
+    <ClInclude Include="HudGrid.h" />
     <ClInclude Include="Includes\PixelPerfectCollision.hpp" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="Independant.h" />

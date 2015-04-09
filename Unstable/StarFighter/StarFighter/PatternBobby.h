@@ -43,7 +43,7 @@ public:
 private:
 	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);
 	void ToCartesianCoords(sf::Vector2f* polarCoords);
-	void CheckArgSize(int expected);
+	void CheckArgSize(size_t expected);
 
 	sf::Vector2i _direction;
 	sf::Vector2f _curSandboxPosition_cartesian;

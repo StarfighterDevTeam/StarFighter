@@ -9,7 +9,7 @@
 
 class Independant;
 class Ammo;
-struct Weapon;
+class Weapon;
 
 class Bot : public Independant
 {

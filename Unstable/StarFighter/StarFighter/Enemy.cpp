@@ -940,7 +940,6 @@ int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_
 
 Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 {
-
 	vector<vector<string>> weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
 
 	for (std::vector<vector<string>>::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)

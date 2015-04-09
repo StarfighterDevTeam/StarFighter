@@ -1029,32 +1029,28 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
 						{
 							Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem()->Clone();
+							int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
+
 							if (tmp_ptr->getEquipmentLoot() != NULL)
 							{
-								int equip_type_ = tmp_ptr->getEquipmentLoot()->equipmentType;
-								Equipment* new_equipment = tmp_ptr->getEquipmentLoot()->Clone();
-
-								Equipment* tmp_equipment = tmp_ptr->getEquipmentLoot()->Clone();
-								tmp_ptr->setEquipmentLoot(new_equipment);
-
-								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
+								int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
+								
+								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, ship_index_, equip_index_))
 								{
+									Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
 									this->setEquipment(new_equipment, true);
-									delete tmp_equipment;
+									new_equipment = NULL;
 								}
 							}
 							else if (tmp_ptr->getWeaponLoot() != NULL)
 							{
-								int equip_type_ = NBVAL_Equipment;
-								Weapon* new_weapon = tmp_ptr->getWeaponLoot()->Clone();
+								int ship_index_ = NBVAL_Equipment;
 
-								Weapon* tmp_weapon = tmp_ptr->getWeaponLoot()->Clone();
-								tmp_ptr->setWeaponLoot(tmp_weapon);
-
-								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, equip_type_, (*CurrentGame).getHudFocusedGridAndIndex().y))
+								if ((*CurrentGame).SwapEquipObjectInShipGrid(*tmp_ptr, ship_index_, equip_index_))
 								{
+									Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
 									this->setShipWeapon(new_weapon, true);
-									delete tmp_weapon;
+									new_weapon = NULL;
 								}
 							}
 							else
@@ -1062,8 +1058,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 							}
 							
-							//destroying the now useless container
-							delete tmp_ptr;
 							tmp_ptr = NULL;
 						}
 					}
@@ -1223,56 +1217,44 @@ void Ship::Death()
 
 bool Ship::GetLoot(Independant& independant)
 {
-	//MONEY
-	bool hasMoney = this->get_money_from(independant);
-
 	//EQUIPMENT
-	bool canTakeEquipment = false;
 	if (independant.getEquipmentLoot() != NULL)
 	{
 		if (this->ship_config.setEquipment(independant.getEquipmentLoot(), true))
 		{
 			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
-			canTakeEquipment = (*CurrentGame).InsertObjectInShipGrid(independant, independant.getEquipmentLoot()->equipmentType);
+			(*CurrentGame).InsertObjectInShipGrid(independant, independant.getEquipmentLoot()->equipmentType);
 		}
 		else
 		{
 			//...else we put it in the stash
-			canTakeEquipment = (*CurrentGame).InsertObjectInEquipmentGrid(independant);
+			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
-	}
-	
-	if (canTakeEquipment)
-	{
-		//if we managed to transfer the item, it can be released from the provider
 		independant.releaseEquipmentLoot();
+		independant.releaseWeaponLoot();
+		return true;
 	}
 
-	bool canTakeWeapon = false;
 	//WEAPON
 	if (independant.getWeaponLoot() != NULL)
 	{
 		if (this->ship_config.setShipWeapon(independant.getWeaponLoot(), true))
 		{
 			//if the ship config does not have a weapon already, we equip it and update the HUD
-			canTakeWeapon = (*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_Equipment);
+			(*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_Equipment);
 		}
 		else
 		{
 			//...else we put it in the stash
-			canTakeWeapon = (*CurrentGame).InsertObjectInEquipmentGrid(independant);
+			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
 		}
-	}
-	if (canTakeWeapon)
-	{
-		//if we managed to transfer the item, it can be released from the provider
+		independant.releaseEquipmentLoot();
 		independant.releaseWeaponLoot();
+		return true;
 	}
 
-	if (hasMoney || canTakeEquipment || canTakeWeapon)
-		return true;
-	else
-		return false;
+	//MONEY
+	return this->get_money_from(independant);
 }
 
 void Ship::GetPortal(Independant* independant)
@@ -1282,7 +1264,7 @@ void Ship::GetPortal(Independant* independant)
 }
 
 static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 10, 40, 70 };
-static float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = { 0.0, 0.2, 0.4, 0.6 };
+static float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
 
 void Ship::GetGrazing()
 {

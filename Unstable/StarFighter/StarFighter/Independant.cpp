@@ -43,9 +43,9 @@ void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
 	//now let's load the new animation
 	Animation* anim = new Animation();
 	anim->setSpriteSheet(*this->defaultAnimation.getSpriteSheet());
-	for (int j = 0; j < this->defaultAnimation.getSize(); j++)
+	for (size_t j = 0; j < this->defaultAnimation.getSize(); j++)
 	{
-		int n = j / this->frameNumber;
+		size_t n = j / this->frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
 		if (n == m_animation)
 		{
@@ -249,7 +249,6 @@ sf::Vector2f Independant::getIndependantSpeed()
 Independant* Independant::Clone()
 {
 	Independant* clone = new Independant(this->getPosition(), this->speed, this->textureName, this->m_size);
-	clone->Init(clone->getPosition(), clone->speed, clone->textureName, clone->m_size);
 	clone->equipment_loot = this->equipment_loot;
 	clone->weapon_loot = this->weapon_loot;
 	clone->display_name = this->display_name;
@@ -621,7 +620,7 @@ FloatCompare Independant::compare_posY_withTarget_for_Direction(Directions direc
 		}
 	}
 
-	else if (direction == Directions::DIRECTION_LEFT)
+	else
 	{
 		if (this->getPosition().x > target_position.x)
 		{
@@ -689,7 +688,7 @@ FloatCompare Independant::compare_posX_withTarget_for_Direction(Directions direc
 			}
 		}
 
-		else if (direction == Directions::DIRECTION_LEFT)
+		else
 		{
 			if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
 			{
@@ -751,7 +750,7 @@ sf::Vector2f Independant::setPosition_Y_for_Direction(Directions direction, sf::
 		}
 	}
 
-	else if (direction == Directions::DIRECTION_LEFT)
+	else
 	{
 		if (!centered)
 		{
