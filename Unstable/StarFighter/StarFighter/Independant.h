@@ -61,6 +61,14 @@ enum TargetSeaking
 	SUPER_SEAKING,//bullet follows target
 };
 
+enum ShotMode
+{
+	NoShotMode,//0
+	AlternateShotMode,//1
+	AscendingShotMode,//2
+	DescendingShotMode,//3
+};
+
 enum AmmoData
 {
 	AMMO_NAME,//0

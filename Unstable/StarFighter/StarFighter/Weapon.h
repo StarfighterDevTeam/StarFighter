@@ -11,14 +11,6 @@
 #define LASERFAST_RATE_OF_FIRE			0.2f
 #define LASERFAST_DAMAGE				50
 
-enum ShotMode
-{
-	NoShotMode,//0
-	AlternateShotMode,//1
-	AscendingShotMode,//2
-	DescendingShotMode,//3
-};
-
 class Weapon : public sf::Sprite
 {
 

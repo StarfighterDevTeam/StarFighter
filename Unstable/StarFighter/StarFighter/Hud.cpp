@@ -4,6 +4,7 @@ PlayerHud::PlayerHud()
 {
 	this->max_hazard_level_reached = false;
 	this->focused_item = NULL;
+	this->has_focus = false;
 
 	this->fakeEquipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), true);
 	this->fakeShipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
@@ -64,8 +65,14 @@ void PlayerHud::Init(int m_armor, int m_shield)
 			// error
 			//TODO: font loader
 		}
-		//left part
+
 		sf::Color _white = sf::Color::Color(255, 255, 255, 200);//semi-transparent white
+
+		itemStatsText.setFont(*font2);
+		itemStatsText.setCharacterSize(18);
+		itemStatsText.setColor(_white);
+		itemStatsText.setPosition(HUD_LEFT_MARGIN + 5, (3 * ARMOR_BAR_SIZE_Y) + 40 + 5);
+		
 		Money.setFont(*font);
 		Money.setCharacterSize(20);
 		Money.setColor(_white);
@@ -85,16 +92,6 @@ void PlayerHud::Init(int m_armor, int m_shield)
 		framerate->setColor(sf::Color::Yellow);
 		framerate->setStyle(sf::Text::Bold);
 		framerate->setPosition(HUD_LEFT_MARGIN, REF_WINDOW_RESOLUTION_Y - 25);
-
-		//ShipGridTitle.setFont(*font);
-		//ShipGridTitle.setCharacterSize(14);
-		//ShipGridTitle.setColor(_white);
-		//ShipGridTitle.setPosition(HUD_LEFT_MARGIN, SHIP_GRID_OFFSET_POS_Y - 20);
-		//
-		//EquipmentGridTitle.setFont(*font);
-		//EquipmentGridTitle.setCharacterSize(14);
-		//EquipmentGridTitle.setColor(_white);
-		//EquipmentGridTitle.setPosition(HUD_LEFT_MARGIN, EQUIPMENT_GRID_OFFSET_POS_Y - 20);
 	}
 
 	catch( const std::exception & ex ) 
@@ -104,7 +101,9 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	}
 }
 
-void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub)
+void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
+	int focused_item_type, string f_name, float f_max_speed, float f_decceleration, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
+	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
 	//armor and shield
 	if (m_armor <=0)
@@ -181,6 +180,8 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	}
 	
 	//clean old focus
+	hud_cursor->visible = has_focus;
+
 	focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, -1);
 	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())
 	{
@@ -188,53 +189,119 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 		hud_cursor->setAnimationLine(Cursor_NormalState);
 	}
 
-	//HUD cursor collides with an item?
-	int hovered_index_ = fakeShipGrid.isCursorColling(*hud_cursor);
-	if (hovered_index_ < 0)
+	if (has_focus)
 	{
-		//we test the equipment grid
-		hovered_index_ = fakeEquipmentGrid.isCursorColling(*hud_cursor);
-		if (hovered_index_ > -1)
+		//HUD cursor collides with an item?
+		int hovered_index_ = fakeShipGrid.isCursorColling(*hud_cursor);
+		if (hovered_index_ < 0)
 		{
-			//we focus on the hovered grid cell in equipement grid
-			fakeEquipmentGrid.HighlightCell(hovered_index_);
-			if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
+			//we test the equipment grid
+			hovered_index_ = fakeEquipmentGrid.isCursorColling(*hud_cursor);
+			if (hovered_index_ > -1)
 			{
-				hud_cursor->setAnimationLine(Cursor_ActionState);
-				focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
+				//we focus on the hovered grid cell in equipement grid
+				fakeEquipmentGrid.HighlightCell(hovered_index_);
+				if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
+				{
+					hud_cursor->setAnimationLine(Cursor_ActionState);
+					focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
+				}
+				else
+				{
+					hud_cursor->setAnimationLine(Cursor_HighlightState);
+					focused_item = NULL;
+				}
+				focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
 			}
 			else
 			{
-				hud_cursor->setAnimationLine(Cursor_HighlightState);
-				focused_item = NULL;
+				//not hovering any of the grids
 			}
-			focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
 		}
 		else
 		{
-			//not hovering any of the grids
+			//we focus the hovered grid cell in ship grid
+			fakeShipGrid.HighlightCell(hovered_index_);
+			hud_cursor->setAnimationLine(Cursor_HighlightState);
+
+			if (shipGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
+			{
+				focused_item = shipGrid.getCellPointerFromIntIndex(hovered_index_);
+			}
+			else
+			{
+				focused_item = NULL;
+			}
+			focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, hovered_index_);
 		}
 	}
 	else
 	{
-		//we focus the hovered grid cell in ship grid
-		fakeShipGrid.HighlightCell(hovered_index_);
-		hud_cursor->setAnimationLine(Cursor_HighlightState);
-
-		if (shipGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
-		{
-			focused_item = shipGrid.getCellPointerFromIntIndex(hovered_index_);
-		}
-		else
-		{
-			focused_item = NULL;
-		}
-		focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, hovered_index_);
+		focused_item = NULL;
 	}
-		
-	//grid titles
-	//ShipGridTitle.setString("Ship equipment");
-	//EquipmentGridTitle.setString("Stash");
+	
+	//item stats
+	
+	ostringstream ss_stats;
+	if (this->focused_item != NULL)
+	{
+		switch (focused_item_type)
+		{
+			case Engine:
+			{
+				ss_stats << "THRUSTER: " << f_name << "\nSpeed: " << f_max_speed << "\nHyperspeed: " << f_hyperspeed << "\nContact damage: " << f_damage;
+				break;
+			}
+			case Armor:
+			{
+				ss_stats << "HULL: " << f_name << "\nHull pts: " << f_armor;
+				break;
+			}
+			case Shield:
+			{
+				ss_stats << "SHIELD: " << f_name << "\nMax shield pts: " << f_shield << "\nShield regen/sec: " << f_shield_regen;
+				break;
+			}
+			case Module:
+			{
+				ss_stats << "BOT MODULE: " << f_name;
+				if (f_bot)
+				{
+					ss_stats << " Yes";
+				}
+				else
+				{
+					ss_stats << " None";
+				}
+				break;
+			}
+			case NBVAL_Equipment:
+			{
+				ss_stats << "MAIN WEAPON: " << f_name;
+				ss_stats << "\nFire rate: " << (1 / f_rate_of_fire) << " shots/sec";
+				ss_stats << "\nMultishot: " << f_multishot;
+				if (f_multishot > 1)
+				{
+					ss_stats << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion;
+				}
+				if (f_rafale > 0)
+				{
+					ss_stats << "\nRafale: " << f_rafale << " (cooldown: " << f_rafale_cooldown << " sec";
+				}
+				if (f_shot_mode != NoShotMode)
+				{
+					ss_stats << "\nFiring style: " << "todo";
+				}
+				if (f_target_seaking != NO_SEAKING)
+				{
+					ss_stats << "\nTarget seaking: " << "todo";
+				}
+				break;
+			}
+		}
+	}
+
+	itemStatsText.setString(ss_stats.str());
 }
 
 void PlayerHud::Draw(sf::RenderTexture& offscreen)
@@ -250,18 +317,21 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 	offscreen.draw(Money);
 	offscreen.draw(GrazeScore);
 	offscreen.draw(SceneName);
-	offscreen.draw(itemStatsPanel);
+
+	if (this->focused_item != NULL && this->has_focus)
+	{
+		offscreen.draw(itemStatsPanel);
+		offscreen.draw(itemStatsText);
+	}
 	
 	offscreen.draw(*(framerate));
-	//offscreen.draw(ShipGridTitle);
-	//offscreen.draw(EquipmentGridTitle);
 
 	fakeEquipmentGrid.Draw(offscreen);
 	fakeShipGrid.Draw(offscreen);
 	equipmentGrid.Draw(offscreen);
 	shipGrid.Draw(offscreen);
 
-	if (hud_cursor->visible)
+	if (this->has_focus)
 	{
 		offscreen.draw(*hud_cursor);
 	}

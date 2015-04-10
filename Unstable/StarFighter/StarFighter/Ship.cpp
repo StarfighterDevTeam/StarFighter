@@ -854,7 +854,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				isFocusedOnHud = !isFocusedOnHud;
 				hud_key_repeat = true;
 
-				(*CurrentGame).hud.hud_cursor->visible = isFocusedOnHud;
+				(*CurrentGame).hud.has_focus = isFocusedOnHud;
 			}
 		}
 		else
@@ -1290,26 +1290,26 @@ void Ship::GetGrazing()
 			graze_level++;
 			switch (graze_level)
 			{
-			case GrazeLevels::GRAZE_LEVEL_RED:
+			case GRAZE_LEVEL_RED:
 			{
-												 (*CurrentGame).garbageLayer(LayerType::AuraLayer);
-												 Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED]->Clone();
-												 (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
-												 break;
+				(*CurrentGame).garbageLayer(AuraLayer);
+				Aura* m_combo_aura = this->combo_aura[GRAZE_LEVEL_RED]->Clone();
+				(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
+				break;
 			}
-			case GrazeLevels::GRAZE_LEVEL_BLUE:
+			case GRAZE_LEVEL_BLUE:
 			{
-												  (*CurrentGame).garbageLayer(LayerType::AuraLayer);
-												  Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE]->Clone();
-												  (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
-												  break;
+				(*CurrentGame).garbageLayer(AuraLayer);
+				Aura* m_combo_aura = this->combo_aura[GRAZE_LEVEL_BLUE]->Clone();
+				(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
+				break;
 			}
-			case GrazeLevels::GRAZE_LEVEL_WHITE:
+			case GRAZE_LEVEL_WHITE:
 			{
-												   (*CurrentGame).garbageLayer(LayerType::AuraLayer);
-												   Aura* m_combo_aura = this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE]->Clone();
-												   (*CurrentGame).addToScene(m_combo_aura, LayerType::AuraLayer, IndependantType::Neutral);
-												   break;
+				(*CurrentGame).garbageLayer(AuraLayer);
+				Aura* m_combo_aura = this->combo_aura[GRAZE_LEVEL_WHITE]->Clone();
+				(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
+				break;
 			}
 			default:
 			{
@@ -1330,7 +1330,7 @@ int Ship::getGrazeCount()
 float Ship::getShipBeastScore()
 {
 	float bonus = 0;
-	if (graze_level < GrazeLevels::NB_GRAZE_LEVELS && this->graze_level >= 0)
+	if (graze_level < NB_GRAZE_LEVELS && this->graze_level >= 0)
 	{
 		bonus = GrazeLevelsBeastBonus[graze_level];
 	}
@@ -1359,6 +1359,6 @@ void Ship::damage_from(Independant& independant)
 		}
 	}
 	graze_count = 0;
-	graze_level = GrazeLevels::GRAZE_LEVEL_NONE;
-	(*CurrentGame).garbageLayer(LayerType::AuraLayer);
+	graze_level = GRAZE_LEVEL_NONE;
+	(*CurrentGame).garbageLayer(AuraLayer);
 }
