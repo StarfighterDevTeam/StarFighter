@@ -6,9 +6,6 @@
 #include "Independant.h"
 #include "Includes/SimpleCollision.hpp"
 
-#define ARMOR_BAR_SIZE_X		20
-#define ARMOR_BAR_SIZE_Y		200
-
 #include "HudGrid.h"
 
 class PlayerHud
@@ -35,6 +32,9 @@ public:
 	sf::Font* font;
 	sf::Font* font2;
 	sf::Text* framerate;
+
+	//item stats
+	sf::RectangleShape itemStatsPanel;
 
 	Independant* hud_cursor;
 	Independant* focused_item;

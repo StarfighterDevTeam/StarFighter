@@ -21,21 +21,27 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	backgroundColor.setOrigin(0, 0);
 	backgroundColor.setPosition(0, 0);
 
-	armorBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_armor));
+	armorBar.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
 	armorBar.setFillColor(sf::Color(0, 250, 50, 128));//green
 	armorBar.setOutlineThickness(1);
 	armorBar.setOutlineColor(sf::Color(255, 255, 255));
 	armorBar.setOrigin(0, 0);
 	armorBar.setPosition(HUD_LEFT_MARGIN, 10);
 
+	shieldBar.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
+	shieldBar.setFillColor(sf::Color(0, 50, 250, 128));//blue
+	shieldBar.setOutlineThickness(1);
+	shieldBar.setOutlineColor(sf::Color(255, 255, 255));
+	shieldBar.setOrigin(0, 0);
+	shieldBar.setPosition(HUD_LEFT_MARGIN, 20 + ARMOR_BAR_SIZE_Y);
+
+	itemStatsPanel.setSize(sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y));
+	itemStatsPanel.setFillColor(sf::Color(70, 70, 70, 128));//like grey
+	itemStatsPanel.setOrigin(0, 0);
+	itemStatsPanel.setPosition(HUD_LEFT_MARGIN, (3 * ARMOR_BAR_SIZE_Y) + 40);
+
 	if (m_shield > 0)
 	{
-		shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1 + m_shield));
-		shieldBar.setFillColor(sf::Color(0, 50, 250, 128));//blue
-		shieldBar.setOutlineThickness(1);
-		shieldBar.setOutlineColor(sf::Color(255, 255, 255));
-		shieldBar.setOrigin(0, 0);
-		shieldBar.setPosition((HUD_LEFT_MARGIN + 20 + ARMOR_BAR_SIZE_X), 10);
 		this->has_shield = true;
 	}
 	else
@@ -103,20 +109,22 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	//armor and shield
 	if (m_armor <=0)
 	{
-		armorBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1));
+		armorBar.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 	}
 	else
 	{
-		armorBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_armor));
+		armorBar.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
 	}
 
 	if (m_shield <=0) 
 	{
-		shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1));	
+		shieldBar.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
+		this->has_shield = false;
 	}	
 	else
 	{
-		shieldBar.setSize(sf::Vector2f(ARMOR_BAR_SIZE_X, 1+m_shield));	
+		shieldBar.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
+		this->has_shield = true;
 	}
 
 	//money
@@ -242,6 +250,7 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 	offscreen.draw(Money);
 	offscreen.draw(GrazeScore);
 	offscreen.draw(SceneName);
+	offscreen.draw(itemStatsPanel);
 	
 	offscreen.draw(*(framerate));
 	//offscreen.draw(ShipGridTitle);
