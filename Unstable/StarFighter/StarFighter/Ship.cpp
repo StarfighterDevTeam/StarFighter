@@ -94,6 +94,11 @@ Equipment* Equipment::Clone()
 	Equipment* new_equipment = new Equipment();
 	new_equipment->Init(this->equipmentType, this->max_speed.x, this->acceleration.x, this->decceleration, this->hyperspeed, this->armor, this->shield, this->shield_regen, this->damage, this->textureName, this->size, this->frameNumber, this->display_name);
 	new_equipment->display_name = this->display_name;
+	new_equipment->hasBot = this->hasBot;
+	if (this->hasBot)
+	{
+		new_equipment->bot = this->bot->Clone();
+	}
 
 	return new_equipment;
 }
@@ -624,7 +629,7 @@ bool ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats, bo
 		this->equipment[m_equipment->equipmentType] = m_equipment->Clone();
 		if (recomputing_stats)
 		{
-			this->Init();
+	 		this->Init();
 		}
 		return true;
 	}

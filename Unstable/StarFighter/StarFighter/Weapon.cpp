@@ -362,8 +362,10 @@ Weapon* Weapon::Clone()
 #define WEAPON_MULTISHOT_MULTIPLIER					2
 #define WEAPON_CHANCE_OF_DISPERSION					0.50
 #define WEAPON_DISPERSION_MAX_ANGLE					170
-#define WEAPON_CHANCE_OF_ALTERNATE					0.25
-#define WEAPON_VSPEED_LN_MULTIPLIER					20
+#define WEAPON_CHANCE_OF_ALTERNATE					0.10
+#define WEAPON_CHANCE_OF_ASCENDING					0.10
+#define WEAPON_CHANCE_OF_DESCENDING					0.10
+#define WEAPON_VSPEED_LN_MULTIPLIER					50
 
 #define BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER	1
 #define BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER		0.5
@@ -382,9 +384,8 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 		case 1:
 		{
 			this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
-
-			if (this->multishot * this->xspread > 32)
-				this->xspread = (32 / this->multishot);
+			if (multishot > 1)
+				this->xspread = RandomizeIntBetweenFloats(sf::Vector2f(0, 32));
 
 			double dispersion_chance = (double)rand() / (RAND_MAX);
 			if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)
@@ -397,6 +398,14 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 			if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE)
 			{
 				this->shot_mode = ShotMode::AlternateShotMode;
+			}
+			else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING)
+			{
+				this->shot_mode = ShotMode::AscendingShotMode;
+			}
+			else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING + WEAPON_CHANCE_OF_DESCENDING)
+			{
+				this->shot_mode = ShotMode::DescendingShotMode;
 			}
 			break;
 		}

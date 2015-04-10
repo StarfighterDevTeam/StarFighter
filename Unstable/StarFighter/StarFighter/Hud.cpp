@@ -278,11 +278,11 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			case NBVAL_Equipment:
 			{
 				ss_stats << "MAIN WEAPON: " << f_name;
-				ss_stats << "\nFire rate: " << (1 / f_rate_of_fire) << " shots/sec";
+				ss_stats << "\nFire rate: " << (floor)(1/f_rate_of_fire * 100) / 100 << " shots/sec";
 				ss_stats << "\nMultishot: " << f_multishot;
 				if (f_multishot > 1)
 				{
-					ss_stats << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion;
+					ss_stats << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
 				}
 				if (f_rafale > 0)
 				{
@@ -292,10 +292,10 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				{
 					ss_stats << "\nFiring style: " << "todo";
 				}
-				if (f_target_seaking != NO_SEAKING)
-				{
-					ss_stats << "\nTarget seaking: " << "todo";
-				}
+				//if (f_target_seaking != NO_SEAKING)
+				//{
+				//	ss_stats << "\nTarget seaking: " << "todo";
+				//}
 				break;
 			}
 		}

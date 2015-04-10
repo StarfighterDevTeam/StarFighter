@@ -898,7 +898,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					weapon->textureName = LASER_BLUE_FILENAME;
 					weapon->size = sf::Vector2f(64,64);
 					weapon->frameNumber = 1;
-					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
+					weapon->rate_of_fire = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_RATE_OF_FIRE_VALUE, WEAPON_MIN_RATE_OF_FIRE_VALUE / 10));
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
