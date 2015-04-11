@@ -856,7 +856,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
-					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(4, 16), e_damage, fx);
+					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(6, 32), e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
 					weapon->display_name = "laser_blue";
 					weapon->fire_direction = Vector2i(0,-1);
@@ -891,7 +891,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					if (log_multiplier > 1)
 						e_damage *= log_multiplier;
 					e_damage = floor(e_damage);
-					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(4, 16), e_damage, fx);
+					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(6, 32), e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
 					
 					weapon->fire_direction = Vector2i(0,-1);

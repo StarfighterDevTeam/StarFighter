@@ -52,7 +52,7 @@
 #define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
 
 #define GRAZE_DISTANCE									30
-#define SHIP_BRAKING_MALUS_SPEED						0.50f
+#define SHIP_BRAKING_MALUS_SPEED						0.40f
 
 //HUD
 #define ARMOR_BAR_SIZE_Y		20
