@@ -127,6 +127,19 @@ void Game::drawHud()
 	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
 	temp.setPosition(sf::Vector2f(scale_factor.x * (black_stripe + SCENE_SIZE_X), 0));
 	this->window->draw(temp);
+
+	//adding black stripes on the left and right
+	sf::RectangleShape blackStripeLeft, blackStripeRight;
+	blackStripeLeft.setSize(sf::Vector2f(scale_factor.x * black_stripe, scale_factor.y * REF_WINDOW_RESOLUTION_Y));
+	blackStripeRight.setSize(sf::Vector2f(scale_factor.x * black_stripe, scale_factor.y * REF_WINDOW_RESOLUTION_Y));
+	blackStripeLeft.setFillColor(sf::Color(0, 0, 0, 255));
+	blackStripeRight.setFillColor(sf::Color(0, 0, 0, 255));
+	blackStripeLeft.setOrigin(0, 0);
+	blackStripeRight.setOrigin(0, 0);
+	blackStripeLeft.setPosition(0, 0);
+	blackStripeRight.setPosition(sf::Vector2f(scale_factor.x * (REF_WINDOW_RESOLUTION_X - black_stripe), 0));
+	this->window->draw(blackStripeLeft);
+	this->window->draw(blackStripeRight);
 }
 
 Independant* Game::getHudFocusedItem()
@@ -143,14 +156,14 @@ sf::Vector2i Game::getHudFocusedIndexWithinGrid(HudGridsIndex grid_)
 {
 	switch (grid_)
 	{
-	case HudGrid_ShipGrid:
-	{
-							 return hud.fakeShipGrid.focus;
-	}
-	case HudGrid_EquipmentGrid:
-	{
-								  return hud.fakeEquipmentGrid.focus;
-	}
+		case HudGrid_ShipGrid:
+		{
+			return hud.fakeShipGrid.focus;
+		}
+		case HudGrid_EquipmentGrid:
+		{
+			return hud.fakeEquipmentGrid.focus;
+		}
 	}
 
 	return sf::Vector2i(-1, -1);

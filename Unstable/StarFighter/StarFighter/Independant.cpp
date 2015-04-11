@@ -250,8 +250,6 @@ sf::Vector2f Independant::getIndependantSpeed()
 Independant* Independant::Clone()
 {
 	Independant* clone = new Independant(this->getPosition(), this->speed, this->textureName, this->m_size);
-	clone->equipment_loot = this->equipment_loot;
-	clone->weapon_loot = this->weapon_loot;
 	clone->display_name = this->display_name;
 	clone->collider_type = this->collider_type;
 	clone->layer = this->layer;
