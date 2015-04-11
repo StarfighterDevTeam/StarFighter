@@ -1,17 +1,17 @@
-#weapon_name,image,width,height,frames,sound_name,time_between_shots,rafale,rafale_cooldown,multishot,xspread,dispersion,alternate,angle_offset,target_seaking
-laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05,3,0.8f,3,15,0,0,0,semi_seaking
-laser_fast,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,7,0,120,alternate,0,seaking
-laser_360,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
-laser_player,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
-laser_bot,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,0,1.f,3,26,0,0,0,seaking
-laser_default,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2,0,2.f,3,10,0,alternate,0,0
-laser_arc,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,seaking
-fireball_sinus,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_seaking
-#,,,,,,,,,,,,,,
-V_Alpha1_laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.4285714286,0,0,1,,,0,0,seaking
-V_Alpha2_ball,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,1,2.5714285714,6,0,90,alternate,0,semi_seaking
-V_Alpha2_death,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,0,,12,0,360,0,0,0
-V_Beta1_missile,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,0,0,2,30,0,alternate,0,seaking
-V_Beta1_fireball,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2142857143,3,1.7142857143,1,0,0,alternate,0,semi_seaking
-V_Delta1_laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,0,0,2,40,0,0,0,seaking
-V_Delta1_ball,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2142857143,2,0.8571428571,8,0,120,0,0,semi_seaking
+#weapon_name,display_name,image,width,height,frames,sound_name,time_between_shots,rafale,rafale_cooldown,multishot,xspread,dispersion,alternate,angle_offset,target_seaking
+laser,Laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05,3,0.8f,3,15,0,0,0,semi_seaking
+laser_fast,Laser fast,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,7,0,120,alternate,0,seaking
+laser_360,Laser 360°,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
+laser_player,Laser player,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
+laser_bot,Default laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,0,1.f,3,26,0,0,0,seaking
+laser_default,Laser default,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2,0,2.f,3,10,0,alternate,0,0
+laser_arc,Laser arc,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,seaking
+fireball_sinus,Fireball sinus,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_seaking
+#,,,,,,,,,,,,,,,
+V_Alpha1_laser,Vanguard Alpha1 Laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.4285714286,0,0,1,,,0,0,seaking
+V_Alpha2_ball,Vanguard Alpha2 Ball,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,1,2.5714285714,6,0,90,alternate,0,semi_seaking
+V_Alpha2_death,Vanguard Alpha2 PostMortemShot,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,0,,12,0,360,0,0,0
+V_Beta1_missile,Vanguard Beta1 Missile,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,0,0,2,30,0,alternate,0,seaking
+V_Beta1_fireball,Vanguard Beta1 Fireball,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2142857143,3,1.7142857143,1,0,0,alternate,0,semi_seaking
+V_Delta1_laser,Vanguard Delta1 Laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8571428571,0,0,2,40,0,0,0,seaking
+V_Delta1_ball,Vanguard Delta1 Ball,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2142857143,2,0.8571428571,8,0,120,0,0,semi_seaking

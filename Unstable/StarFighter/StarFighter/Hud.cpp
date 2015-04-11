@@ -103,7 +103,7 @@ void PlayerHud::Init(int m_armor, int m_shield)
 
 void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
-	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
+	float f_ammo_speed, PatternType f_pattern, int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
 	//armor and shield
 	if (m_armor <=0)
@@ -240,8 +240,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 		focused_item = NULL;
 	}
 	
-	//item stats
-	
+	//ITEM STATS PANEL DISPLAY
 	ostringstream ss_stats;
 	if (this->focused_item != NULL)
 	{
@@ -267,7 +266,32 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				ss_stats << "MODULE: " << f_name;
 				if (f_bot)
 				{
-					ss_stats << " \nAdding 1 drone";
+					ss_stats << " \nAdding 1 drone. Drone stats:";
+
+					ss_stats << "\nDamage: " << f_damage;
+					ss_stats << "\nAmmo speed: " << f_ammo_speed;
+					ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec";
+
+					if (f_multishot > 1)
+					{
+						ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
+					}
+					else
+					{
+						ss_stats << "\nSingle shot";
+					}
+					if (f_rafale > 0)
+					{
+						ss_stats << "\nRafale: " << f_rafale << " (cooldown: " << f_rafale_cooldown << " sec";
+					}
+					if (f_shot_mode != NoShotMode)
+					{
+						ss_stats << "\nFiring style: " << "todo";
+					}
+					if (f_target_seaking != NO_SEAKING)
+					{
+						ss_stats << "\nTarget seaking: " << "todo";
+					}
 				}
 				else
 				{
@@ -278,6 +302,8 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			case NBVAL_Equipment:
 			{
 				ss_stats << "MAIN WEAPON: " << f_name;
+				ss_stats << "\nDamage: " << f_damage;
+				ss_stats << "\nAmmo speed: " << f_ammo_speed;
 				ss_stats << "\nFire rate: " << (floor)(1/f_rate_of_fire * 100) / 100 << " shots/sec";
 				
 				if (f_multishot > 1)

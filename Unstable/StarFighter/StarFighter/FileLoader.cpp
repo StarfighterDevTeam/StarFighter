@@ -180,6 +180,8 @@ Equipment* FileLoader::LoadEquipment(string name)
 			else 
 				LOGGER_WRITE(Logger::Priority::DEBUG,("Equipment config file error: cannot find a valid equipment type for: '%s'. Please check the config file",name));
 
+			i->display_name = (*it)[EquipmentData::EQUIPMENT_DISPLAY_NAME];
+
 			return i;
 		}
 	}

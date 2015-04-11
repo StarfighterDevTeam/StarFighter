@@ -893,13 +893,13 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					e_damage = floor(e_damage);
 					Ammo* ammo = new Ammo(this->getPosition(), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(4, 16), e_damage, fx);
 					Weapon* weapon = new Weapon(ammo);
-					weapon->display_name = "laser_blue";
+					
 					weapon->fire_direction = Vector2i(0,-1);
 					weapon->textureName = LASER_BLUE_FILENAME;
 					weapon->size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_RATE_OF_FIRE_VALUE, WEAPON_MIN_RATE_OF_FIRE_VALUE / 10));
-
+					weapon->display_name = "Laser standard";
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{
@@ -947,7 +947,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		if ((*it)[0].compare(name) == 0)
 		{
 			Weapon* weapon = new Weapon(ammo);
-			weapon->display_name = (*it)[WeaponData::WEAPON_NAME];
+			weapon->display_name = (*it)[WeaponData::WEAPON_DISPLAY_NAME];
 			weapon->fire_direction = Vector2i(0, fire_direction);
 			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
 			weapon->shot_mode = ShotMode::NoShotMode;

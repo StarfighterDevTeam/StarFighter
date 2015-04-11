@@ -367,7 +367,7 @@ Weapon* Weapon::Clone()
 #define WEAPON_CHANCE_OF_ALTERNATE					0.10
 #define WEAPON_CHANCE_OF_ASCENDING					0.10
 #define WEAPON_CHANCE_OF_DESCENDING					0.10
-#define WEAPON_VSPEED_LN_MULTIPLIER					50
+#define WEAPON_VSPEED_LN_MULTIPLIER					150
 
 #define BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER	1
 #define BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER		0.5
@@ -381,6 +381,7 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 		case 0:
 		{
 			this->rate_of_fire /= (RandomizeFloatBetweenValues(BeastScale) * WEAPON_RATE_OF_FIRE_MULTIPLIER);
+			this->display_name = "Rapide-fire laser";
 			break;
 		}
 		case 1:
@@ -393,6 +394,7 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 				{
 					this->xspread = this->size.x / multishot;
 				}
+				this->display_name = "Multi-shot laser";
 			}
 
 			double dispersion_chance = (double)rand() / (RAND_MAX);
@@ -400,6 +402,7 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 			{
 				int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_ANGLE + 1);
 				this->dispersion = dispersion_roll;
+				this->display_name = "Dispersion laser";
 			}
 
 			double alternate_chance = (double)rand() / (RAND_MAX);
@@ -420,6 +423,7 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 		case 2:
 		{
 			this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale)));
+			this->display_name = "Lightning-speed laser";
 			break;
 		}
 		case 3:
@@ -435,6 +439,8 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 
 			this->ammunition->damage += e_damage;
 			this->ammunition->damage = floor(this->ammunition->damage);
+
+			this->display_name = "Power laser";
 			break;
 		}
 		default:
