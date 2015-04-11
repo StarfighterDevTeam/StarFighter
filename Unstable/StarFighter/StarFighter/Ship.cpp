@@ -872,6 +872,15 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 				(*CurrentGame).hud.has_focus = isFocusedOnHud;
 				disable_fire = isFocusedOnHud;
+
+				if (isFocusedOnHud && !isSlowMotion)
+				{
+					(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
+				}
+				else if (!isFocusedOnHud && !isSlowMotion)
+				{
+					(*CurrentGame).hyperspeedMultiplier = 1.0f;
+				}
 			}
 		}
 		else
