@@ -766,7 +766,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					e_acceleration_x = floor(e_acceleration_x);
 					e_acceleration_y = floor(e_acceleration_y);
 
-					equipment->Init((int)EquipmentType::Engine, e_maxspeed, 0, e_acceleration_x, 1.f,0,0,0,0, THRUSTER_FILENAME,sf::Vector2f(64,64),1,"Engine");
+					equipment->Init((int)EquipmentType::Engine, e_maxspeed, 0, e_acceleration_x, 1.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -789,7 +789,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 						e_armor *= log_multiplier;
 
 					e_armor = floor(e_armor);
-					equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, e_armor,0,0,0, ARMOR_FILENAME,sf::Vector2f(64,64),1,"Armor");
+					equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, e_armor, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -818,7 +818,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 						e_shield_regen *= log_multiplier;
 					e_shield_regen = floor(e_shield_regen);
 
-					equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, e_shield, e_shield_regen,0, SHIELD_FILENAME,sf::Vector2f(64,64),1,"Shield");
+					equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, e_shield, e_shield_regen, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
@@ -835,9 +835,9 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 				{
 					//Initialisation
 					Equipment* equipment = new Equipment();
-					equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0,0,0,0, MODULE_FILENAME,sf::Vector2f(64,64),1,"Module");
+					equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
 
-					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), BOT_FILENAME, sf::Vector2f (32,32));
+					Bot* bot = new Bot(sf::Vector2f (0,0), sf::Vector2f (0,0), BOT_FILENAME, sf::Vector2f (BOT_SIZE, BOT_SIZE));
 					bot->display_name = "Bot gerard";
 					bot->radius = 500;
 					bot->vspeed = 300;
@@ -861,7 +861,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					weapon->display_name = "laser_blue";
 					weapon->fire_direction = Vector2i(0,-1);
 					weapon->textureName = LASER_BLUE_FILENAME;
-					weapon->size = sf::Vector2f(64,64);
+					weapon->size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = WEAPON_MIN_RATE_OF_FIRE_VALUE;
 
@@ -896,7 +896,7 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					weapon->display_name = "laser_blue";
 					weapon->fire_direction = Vector2i(0,-1);
 					weapon->textureName = LASER_BLUE_FILENAME;
-					weapon->size = sf::Vector2f(64,64);
+					weapon->size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_RATE_OF_FIRE_VALUE, WEAPON_MIN_RATE_OF_FIRE_VALUE / 10));
 

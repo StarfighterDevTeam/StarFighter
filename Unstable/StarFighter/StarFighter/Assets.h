@@ -24,16 +24,15 @@
 #define LASER_RED_FILENAME		"Assets/2D/Equipment/laser_red.png"
 #define LASER_BLUE_FILENAME		"Assets/2D/Equipment/laser_blue1.png"
 #define SHIELD_FILENAME			"Assets/2D/Equipment/Shield.png"
-#define STABS_FILENAME			"Assets/2D/Equipment/Stab.png"
 #define THRUSTER_FILENAME		"Assets/2D/Equipment/Thruster.png"
 #define MODULE_FILENAME			"Assets/2D/Equipment/Module.png"
 #define BOT_FILENAME			"Assets/2D/bot.png"
-//#define AIRBRAKE_Z_FILENAME		"Assets/2D/Equipment/AirBrakeZ.png"
 
+#define EQUIPMENT_SIZE					48
+#define BOT_SIZE						32
 #define EMPTYSLOT_FILENAME				"Assets/2D/HUD/EmptySlot.png"
 #define EMPTYSLOT_ANIMATION_NUMBER		2
-#define SLOT_WIDTH						64
-#define SLOT_HEIGHT						64
+#define GRID_SLOT_SIZE					64
 
 #define FX_EXPLOSION_FILENAME				"Assets/2D/FX_explosion.png"
 #define FX_EXPLOSION_WIDTH					320
@@ -50,9 +49,9 @@
 #define FX_EXPLOSION_BLUE_DURATION			0.4f
 
 #define LOOT_FILENAME				"Assets/2D/World/crystal.png"
-#define LOOT_WIDTH					64
-#define LOOT_HEIGHT					64
-#define LOOT_SPEED_Y				100.f
+#define LOOT_WIDTH					32
+#define LOOT_HEIGHT					32
+#define LOOT_SPEED_Y				50.f
 
 #define ENEMYX_FILENAME				"Assets/2D/enemyX.png"
 #define ENEMYX_WIDTH				32

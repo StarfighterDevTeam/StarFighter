@@ -80,8 +80,8 @@ Equipment::Equipment()
 	this->shield = 0;
 	this->shield_regen = 0;
 	this->damage = 0;
-	this->size.x = SLOT_WIDTH;
-	this->size.y = SLOT_HEIGHT;
+	this->size.x = EQUIPMENT_SIZE;
+	this->size.y = EQUIPMENT_SIZE;
 	this->textureName = EMPTYSLOT_FILENAME;
 	this->frameNumber = 0;
 	this->equipmentType = EquipmentType::Armor;
@@ -626,10 +626,31 @@ bool ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats, bo
 		{
 			delete this->equipment[m_equipment->equipmentType];
 		}
-		this->equipment[m_equipment->equipmentType] = m_equipment->Clone();
+		this->equipment[m_equipment->equipmentType] = m_equipment;
 		if (recomputing_stats)
 		{
 	 		this->Init();
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats, bool overwrite)
+{
+	if (this->weapon == NULL || overwrite)
+	{
+		if (overwrite)
+		{
+			delete this->weapon;
+		}
+		this->weapon = m_weapon;
+		if (recomputing_stats)
+		{
+			this->Init();
 		}
 		return true;
 	}
@@ -648,27 +669,6 @@ bool ShipConfig::setShipModel(ShipModel* m_ship_model)
 		this->ship_model = m_ship_model;
 
 		this->Init();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats, bool overwrite)
-{
-	if (this->weapon == NULL || overwrite)
-	{
-		if (overwrite)
-		{
-			delete this->weapon;
-		}
-		this->weapon = m_weapon->Clone();
-		if (recomputing_stats)
-		{
-			this->Init();
-		}
 		return true;
 	}
 	else
@@ -771,19 +771,31 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->Init();
 }
 
-void Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing)
+bool Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing)
 {
-	if (m_equipment->hasBot)
+	if (m_equipment->hasBot && (overwrite_existing || ship_config.equipment[m_equipment->equipmentType] == NULL))
 	{
 		this->ship_config.DestroyBots();
 	}
 
-	this->ship_config.setEquipment(m_equipment, true, overwrite_existing);
+	bool result = this->ship_config.setEquipment(m_equipment, true, overwrite_existing);
 	this->Init();
-	if (m_equipment->hasBot)
+	if (m_equipment->hasBot && result)
 	{
 		this->ship_config.GenerateBots(this);
 	}
+
+	return result;
+}
+
+bool Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing)
+{
+	//this->ship_config.DestroyBots();
+	bool result = this->ship_config.setShipWeapon(m_weapon, true, overwrite_existing);
+	this->Init();
+	//this->ship_config.GenerateBots(this);
+
+	return result;
 }
 
 void Ship::setShipModel(ShipModel* m_ship_model)
@@ -800,14 +812,6 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 	{
 		this->ship_config.GenerateBots(this);
 	}
-}
-
-void Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing)
-{
-	//this->ship_config.DestroyBots();
-	this->ship_config.setShipWeapon(m_weapon, true, overwrite_existing);
-	this->Init();
-	//this->ship_config.GenerateBots(this);
 }
 
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -860,6 +864,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				hud_key_repeat = true;
 
 				(*CurrentGame).hud.has_focus = isFocusedOnHud;
+				disable_fire = isFocusedOnHud;
 			}
 		}
 		else
@@ -1040,14 +1045,10 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							{
 								int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
 
-								//if there is no equipped item, we equip it
-								if (this->ship_config.equipment[ship_index_] == NULL)
+								//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+								if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.equipment[ship_index_] != NULL))
 								{
-									(*CurrentGame).InsertObjectInShipGrid(*tmp_ptr, ship_index_);
-								}
-								//otherwise we try to swap it with the existing item
-								else if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
-								{
+									//if this succeeds, we can actually equip the item
 									Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
 									this->setEquipment(new_equipment, true);
 									new_equipment = NULL;
@@ -1057,14 +1058,10 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							{
 								int ship_index_ = NBVAL_Equipment;
 
-								//if there is no equipped item, we equip it
-								if (this->ship_config.weapon == NULL)
+								//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+								if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.weapon != NULL))
 								{
-									(*CurrentGame).InsertObjectInShipGrid(*tmp_ptr, ship_index_);
-								}
-								//otherwise we try to swap it with the existing item
-								else if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
-								{
+									//if this succeeds, we can actually equip the item
 									Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
 									this->setShipWeapon(new_weapon, true);
 									new_weapon = NULL;
@@ -1232,20 +1229,40 @@ void Ship::Death()
 	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
 }
 
+Independant* Ship::CloneEquipmentIntoIndependant(Equipment* new_equipment)
+{
+	assert(new_equipment != NULL);
+	Independant* capsule = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), new_equipment->textureName, new_equipment->size, sf::Vector2f(new_equipment->size.x / 2, new_equipment->size.y / 2), new_equipment->frameNumber);
+	capsule->setEquipmentLoot(new_equipment->Clone());
+
+	return capsule;
+}
+
+Independant* Ship::CloneWeaponIntoIndependant(Weapon* new_weapon)
+{
+	assert(new_weapon != NULL);
+	Independant* capsule = new Independant(new_weapon->getPosition(), sf::Vector2f(0, 0), new_weapon->textureName, new_weapon->size, sf::Vector2f(new_weapon->size.x / 2, new_weapon->size.y / 2), new_weapon->frameNumber);
+	capsule->setWeaponLoot(new_weapon->Clone());
+
+	return capsule;
+}
+
 bool Ship::GetLoot(Independant& independant)
 {
 	//EQUIPMENT
 	if (independant.getEquipmentLoot() != NULL)
 	{
-		if (this->ship_config.setEquipment(independant.getEquipmentLoot(), true))
+		Independant* capsule = CloneEquipmentIntoIndependant(independant.getEquipmentLoot());
+		if (this->setEquipment(independant.getEquipmentLoot()))
 		{
 			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
-			(*CurrentGame).InsertObjectInShipGrid(independant, independant.getEquipmentLoot()->equipmentType);
+			
+			(*CurrentGame).InsertObjectInShipGrid(*capsule, independant.getEquipmentLoot()->equipmentType);
 		}
 		else
 		{
 			//...else we put it in the stash
-			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
+			(*CurrentGame).InsertObjectInEquipmentGrid(*capsule);
 		}
 		//independant.releaseEquipmentLoot();
 		//independant.releaseWeaponLoot();
@@ -1255,15 +1272,16 @@ bool Ship::GetLoot(Independant& independant)
 	//WEAPON
 	if (independant.getWeaponLoot() != NULL)
 	{
-		if (this->ship_config.setShipWeapon(independant.getWeaponLoot(), true))
+		Independant* capsule = CloneWeaponIntoIndependant(independant.getWeaponLoot());
+		if (this->setShipWeapon(independant.getWeaponLoot()))
 		{
 			//if the ship config does not have a weapon already, we equip it and update the HUD
-			(*CurrentGame).InsertObjectInShipGrid(independant, NBVAL_Equipment);
+			(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment);
 		}
 		else
 		{
 			//...else we put it in the stash
-			(*CurrentGame).InsertObjectInEquipmentGrid(independant);
+			(*CurrentGame).InsertObjectInEquipmentGrid(*capsule);
 		}
 		//independant.releaseEquipmentLoot();
 		//independant.releaseWeaponLoot();

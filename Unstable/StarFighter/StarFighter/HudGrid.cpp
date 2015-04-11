@@ -13,10 +13,10 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 		{
 			if (fill_with_fake)
 			{
-				Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE, EQUIPMENT_GRID_SLOT_SIZE),
-					sf::Vector2f(EQUIPMENT_GRID_SLOT_SIZE / 2, EQUIPMENT_GRID_SLOT_SIZE / 2), 1, EMPTYSLOT_ANIMATION_NUMBER);
+				Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE),
+					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, EMPTYSLOT_ANIMATION_NUMBER);
 
-				empty_slot->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + position.x + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + position.y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
+				empty_slot->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
 
 				grid[i][j] = empty_slot;
 			}
@@ -52,8 +52,8 @@ bool ObjectGrid::insertObject(Independant& object, int index, bool overwrite_exi
 					{
 						delete grid[i][j];
 					}
-					grid[i][j] = object.Clone();
-					grid[i][j]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (j * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (i * EQUIPMENT_GRID_SLOT_SIZE)));
+					grid[i][j] = &object;
+					grid[i][j]->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + this->position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + this->position.y + (i * GRID_SLOT_SIZE)));
 
 					return true;
 				}
@@ -81,8 +81,8 @@ bool ObjectGrid::insertObject(Independant& object, int index, bool overwrite_exi
 			{
 				delete grid[l][r];
 			}
-			grid[l][r] = object.Clone();
-			grid[l][r]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (r * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (l * EQUIPMENT_GRID_SLOT_SIZE)));
+			grid[l][r] = &object;
+			grid[l][r]->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + this->position.x + (r * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + this->position.y + (l * GRID_SLOT_SIZE)));
 
 			return true;
 		}
@@ -118,8 +118,8 @@ int ObjectGrid::isCursorColling(Independant& cursor)
 	{
 		//1st test
 
-		sf::FloatRect gridBounds(sf::Vector2f(grid[0][0]->getPosition().x - SHIP_GRID_SLOT_SIZE / 2, grid[0][0]->getPosition().y - SHIP_GRID_SLOT_SIZE / 2),
-			sf::Vector2f(SHIP_GRID_SLOT_SIZE * squares.y, SHIP_GRID_SLOT_SIZE * squares.x));
+		sf::FloatRect gridBounds(sf::Vector2f(grid[0][0]->getPosition().x - GRID_SLOT_SIZE / 2, grid[0][0]->getPosition().y - GRID_SLOT_SIZE / 2),
+			sf::Vector2f(GRID_SLOT_SIZE * squares.y, GRID_SLOT_SIZE * squares.x));
 
 		if (!gridBounds.contains(cursor.getPosition().x, cursor.getPosition().y))
 		{
@@ -218,6 +218,6 @@ void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant)
 	}
 
 	this->grid[l][r] = independant;
-	this->grid[l][r]->setPosition(sf::Vector2f((EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.x + (r * EQUIPMENT_GRID_SLOT_SIZE), (EQUIPMENT_GRID_SLOT_SIZE / 2) + this->position.y + (l * EQUIPMENT_GRID_SLOT_SIZE)));
+	this->grid[l][r]->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + this->position.x + (r * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + this->position.y + (l * GRID_SLOT_SIZE)));
 
 }

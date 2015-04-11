@@ -31,13 +31,8 @@ void InGameState::Initialize(Player player)
 	{
 		if (this->playerShip->ship_config.equipment[i] != NULL)
 		{
-			sf::Vector2f size_ = this->playerShip->ship_config.equipment[i]->size;
-			string textureName_ = this->playerShip->ship_config.equipment[i]->textureName;
-			int frameNumber_ = this->playerShip->ship_config.equipment[i]->frameNumber;
-			Independant* new_equipment = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName_, size_, sf::Vector2f(size_.x / 2, size_.y / 2), frameNumber_);
-			new_equipment->setEquipmentLoot(this->playerShip->ship_config.equipment[i]->Clone());
-
-			if (!(*CurrentGame).InsertObjectInShipGrid(*new_equipment, i))
+			Independant* capsule = Ship::CloneEquipmentIntoIndependant(this->playerShip->ship_config.equipment[i]);
+			if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, i))
 			{
 				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
 			}
@@ -46,15 +41,8 @@ void InGameState::Initialize(Player player)
 	
 	if (this->playerShip->ship_config.weapon != NULL)
 	{
-		sf::Vector2f size_ = this->playerShip->ship_config.weapon->size;
-		string textureName_ = this->playerShip->ship_config.weapon->textureName;
-		int frameNumber_ = this->playerShip->ship_config.weapon->frameNumber;
-		Independant* new_weapon = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName_, size_, sf::Vector2f(size_.x / 2, size_.y / 2), frameNumber_);
-		new_weapon->display_name = this->playerShip->ship_config.weapon->display_name;
-
-		new_weapon->setWeaponLoot(this->playerShip->ship_config.weapon->Clone());
-
-		if (!(*CurrentGame).InsertObjectInShipGrid(*new_weapon, NBVAL_Equipment))
+		Independant* capsule = Ship::CloneWeaponIntoIndependant(this->playerShip->ship_config.weapon);
+		if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment))
 		{
 			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize a weapon item from the ship config to the HUD Ship grid\n");
 		}
@@ -89,7 +77,6 @@ void InGameState::Update(Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//displaying stats of focused item in the HUD...
-	
 	if ((*CurrentGame).getHudFocusedItem() != NULL)
 	{
 		Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();

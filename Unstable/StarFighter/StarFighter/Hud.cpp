@@ -264,14 +264,14 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			}
 			case Module:
 			{
-				ss_stats << "BOT MODULE: " << f_name;
+				ss_stats << "MODULE: " << f_name;
 				if (f_bot)
 				{
-					ss_stats << " Yes";
+					ss_stats << " \nAdding 1 drone";
 				}
 				else
 				{
-					ss_stats << " None";
+					ss_stats << "\nNo effect";
 				}
 				break;
 			}

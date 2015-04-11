@@ -85,7 +85,6 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	
 	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
-
 	this->speed = speed;
 	this->setPosition(position.x, position.y);
 	this->visible = false;

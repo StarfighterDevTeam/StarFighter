@@ -529,17 +529,25 @@ bool Game::InsertObjectInEquipmentGrid(Independant& object)
 	return result;
 }
 
-bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
+bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment, bool needs_swapping)
 {
 	assert(hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL);
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
 
-	Independant* tmpShip = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
-	//Equipement > Ship
-	hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
-	//Ship > equipement
-	hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, tmpShip);
+	if (needs_swapping)
+	{
+		Independant* tmpShip = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
+		//Equipement > Ship
+		hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
+		//Ship > equipement
+		hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, tmpShip);
+		tmpShip = NULL;
+	}
+	else
+	{
+		//Equipement > Ship
+		hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
+	}
 
-	tmpShip = NULL;
 	return true;
 }

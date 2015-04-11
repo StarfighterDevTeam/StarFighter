@@ -83,7 +83,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (this->target != NULL)
 		{
-			if (!target->isUsingPortal)
+			if (!target->isUsingPortal && !target->disable_fire)
 			{
 				if (InputGuy::isFiring() || this->automatic_fire)
 				{

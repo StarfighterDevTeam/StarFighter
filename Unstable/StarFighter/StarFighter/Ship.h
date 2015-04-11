@@ -179,9 +179,11 @@ public :
 	PlayerHud ship_hud;
 
 	void Respawn() override;
-	void setEquipment(Equipment* m_equipment, bool overwrite = false);
+	bool setEquipment(Equipment* m_equipment, bool overwrite = false);
+	bool setShipWeapon(Weapon* m_weapon, bool overwrite = false);
 	void setShipModel(ShipModel* m_ship_model);
-	void setShipWeapon(Weapon* m_weapon, bool overwrite = false);
+	static Independant* CloneEquipmentIntoIndependant(Equipment* new_equipment);
+	static Independant* CloneWeaponIntoIndependant(Weapon* new_weapon);
 	
 	void Death() override;
 	bool GetLoot(Independant& independant) override;
