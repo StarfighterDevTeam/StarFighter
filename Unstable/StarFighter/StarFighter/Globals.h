@@ -38,7 +38,7 @@
 #define HUD_SCORES_SPACING						20
 #define HUD_LEFT_MARGIN							20
 
-#define HUD_CURSOR_SPEED						800
+#define HUD_CURSOR_SPEED						700
 
 #define SHIP_FILE "Assets/Scripts/Generated/Ship.csv"
 #define ENEMY_FILE	"Assets/Scripts/Generated/Enemies.csv"
@@ -52,7 +52,7 @@
 #define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
 
 #define GRAZE_DISTANCE									30
-#define SHIP_BRAKING_MALUS_SPEED						0.50f
+#define SHIP_BRAKING_MALUS_SPEED						0.60f
 
 //HUD
 #define ARMOR_BAR_SIZE_Y		20

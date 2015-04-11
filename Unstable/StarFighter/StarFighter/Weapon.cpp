@@ -378,13 +378,13 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 {
 	switch (chosen_property)
 	{
+		//case 0:
+		//{
+		//	this->rate_of_fire /= (RandomizeFloatBetweenValues(BeastScale) * WEAPON_RATE_OF_FIRE_MULTIPLIER);
+		//	this->display_name = "Rapide-fire laser";
+		//	break;
+		//}
 		case 0:
-		{
-			this->rate_of_fire /= (RandomizeFloatBetweenValues(BeastScale) * WEAPON_RATE_OF_FIRE_MULTIPLIER);
-			this->display_name = "Rapide-fire laser";
-			break;
-		}
-		case 1:
 		{
 			this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
 			if (multishot > 1)
@@ -420,29 +420,29 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 			}
 			break;
 		}
-		case 2:
+		case 1:
 		{
 			this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale)));
 			this->display_name = "Lightning-speed laser";
 			break;
 		}
-		case 3:
-		{
-			//this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
-			float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BONUS * (log(value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
-
-			float e_damage = WEAPON_MIN_DAMAGE_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			if (log_multiplier > 1)
-				e_damage *= log_multiplier;
-			else
-				e_damage = ProrataBetweenThreshold(value, sf::Vector2f(0, e_damage));
-
-			this->ammunition->damage += e_damage;
-			this->ammunition->damage = floor(this->ammunition->damage);
-
-			this->display_name = "Power laser";
-			break;
-		}
+		//case 3:
+		//{
+		//	//this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
+		//	float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BONUS * (log(value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
+		//
+		//	float e_damage = WEAPON_MIN_DAMAGE_VALUE * RandomizeFloatBetweenValues(BeastScale);
+		//	if (log_multiplier > 1)
+		//		e_damage *= log_multiplier;
+		//	else
+		//		e_damage = ProrataBetweenThreshold(value, sf::Vector2f(0, e_damage));
+		//
+		//	this->ammunition->damage += e_damage;
+		//	this->ammunition->damage = floor(this->ammunition->damage);
+		//
+		//	this->display_name = "Power laser";
+		//	break;
+		//}
 		default:
 		{
 			printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
