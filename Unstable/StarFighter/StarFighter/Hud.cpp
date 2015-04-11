@@ -102,7 +102,7 @@ void PlayerHud::Init(int m_armor, int m_shield)
 }
 
 void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
-	int focused_item_type, string f_name, float f_max_speed, float f_decceleration, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
+	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
 	//armor and shield
@@ -279,10 +279,14 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			{
 				ss_stats << "MAIN WEAPON: " << f_name;
 				ss_stats << "\nFire rate: " << (floor)(1/f_rate_of_fire * 100) / 100 << " shots/sec";
-				ss_stats << "\nMultishot: " << f_multishot;
+				
 				if (f_multishot > 1)
 				{
-					ss_stats << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
+					ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
+				}
+				else
+				{
+					ss_stats << "\nSingle shot";
 				}
 				if (f_rafale > 0)
 				{
@@ -292,10 +296,10 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				{
 					ss_stats << "\nFiring style: " << "todo";
 				}
-				//if (f_target_seaking != NO_SEAKING)
-				//{
-				//	ss_stats << "\nTarget seaking: " << "todo";
-				//}
+				if (f_target_seaking != NO_SEAKING)
+				{
+					ss_stats << "\nTarget seaking: " << "todo";
+				}
 				break;
 			}
 		}

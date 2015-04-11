@@ -387,7 +387,13 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 		{
 			this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
 			if (multishot > 1)
+			{
 				this->xspread = RandomizeIntBetweenFloats(sf::Vector2f(0, 32));
+				if (this->xspread * multishot > this->size.x)
+				{
+					this->xspread = this->size.x / multishot;
+				}
+			}
 
 			double dispersion_chance = (double)rand() / (RAND_MAX);
 			if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)

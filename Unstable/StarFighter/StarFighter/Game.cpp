@@ -85,10 +85,10 @@ void Game::updateScene(Time deltaTime)
 
 
 void Game::updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
-	int focused_item_type, string f_name, float f_max_speed, float f_decceleration, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
+	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
-	this->hud.Update(m_armor, m_shield, m_money, m_graze_count, m_hazard_level, scene_name, deltaTime, hub, focused_item_type, f_name, f_max_speed, f_decceleration, f_hyperspeed, 
+	this->hud.Update(m_armor, m_shield, m_money, m_graze_count, m_hazard_level, scene_name, deltaTime, hub, focused_item_type, f_name, f_max_speed, f_hyperspeed, 
 		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 

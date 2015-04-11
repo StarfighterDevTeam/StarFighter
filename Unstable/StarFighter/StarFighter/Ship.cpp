@@ -779,12 +779,16 @@ bool Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing)
 	}
 
 	bool result = this->ship_config.setEquipment(m_equipment, true, overwrite_existing);
-	this->Init();
-	if (m_equipment->hasBot && result)
+	
+	if (result)
 	{
-		this->ship_config.GenerateBots(this);
+		this->Init();
+		if (m_equipment->hasBot)
+		{
+			this->ship_config.GenerateBots(this);
+		}
 	}
-
+	
 	return result;
 }
 
@@ -792,7 +796,10 @@ bool Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing)
 {
 	//this->ship_config.DestroyBots();
 	bool result = this->ship_config.setShipWeapon(m_weapon, true, overwrite_existing);
-	this->Init();
+	if (result)
+	{
+		this->Init();
+	}
 	//this->ship_config.GenerateBots(this);
 
 	return result;
@@ -1038,7 +1045,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					{
 						if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
 						{
-							Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem()->Clone();
+							Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
 							int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
 
 							if (tmp_ptr->getEquipmentLoot() != NULL)
