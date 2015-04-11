@@ -52,7 +52,7 @@
 #define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
 
 #define GRAZE_DISTANCE									30
-#define SHIP_BRAKING_MALUS_SPEED						0.40f
+#define SHIP_BRAKING_MALUS_SPEED						0.50f
 
 //HUD
 #define ARMOR_BAR_SIZE_Y		20
@@ -60,7 +60,7 @@
 
 //ITEM STATS DISPLAY
 #define ITEM_STATS_PANEL_SIZE_X							320
-#define ITEM_STATS_PANEL_SIZE_Y							180
+#define ITEM_STATS_PANEL_SIZE_Y							230
 #define ITEM_STATS_PANEL_POSITION_X						20
 #define ITEM_STATS_PANEL_POSITION_Y						80
 
@@ -69,13 +69,13 @@
 #define SHIP_GRID_NB_ROWS								5
 #define SHIP_GRID_SLOT_SIZE								64
 #define SHIP_GRID_OFFSET_POS_X							20
-#define SHIP_GRID_OFFSET_POS_Y							294
+#define SHIP_GRID_OFFSET_POS_Y							344
 
 #define EQUIPMENT_GRID_NB_LINES							8
 #define EQUIPMENT_GRID_NB_ROWS							5
 #define EQUIPMENT_GRID_SLOT_SIZE						64
 #define EQUIPMENT_GRID_OFFSET_POS_X						20
-#define EQUIPMENT_GRID_OFFSET_POS_Y						410
+#define EQUIPMENT_GRID_OFFSET_POS_Y						450
 
 //ENEMY GENERATION
 #define SPAWN_NORMAL_MINIMUM_RESOURCE					-0.05f
