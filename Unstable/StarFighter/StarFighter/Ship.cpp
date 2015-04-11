@@ -89,6 +89,15 @@ Equipment::Equipment()
 	this->hasFake = false;
 }
 
+Equipment::~Equipment()
+{
+	if (this->hasBot)
+	{
+		this->bot->~Bot();
+		this->hasBot = false;
+	}
+}
+
 Equipment* Equipment::Clone()
 {
 	Equipment* new_equipment = new Equipment();
@@ -745,6 +754,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isCollindingWithPortal = false;
 	this->isUsingPortal = false;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
+	this->isBrakingButtonPressed = true;//will be updated to false in the update function if button released
 	this->targetPortal = NULL;
 	this->equipment_loot = NULL;
 	this->weapon_loot = NULL;
@@ -805,6 +815,41 @@ bool Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing)
 	return result;
 }
 
+void Ship::cleanEquipment(int equipment_type)
+{
+	if (this->ship_config.equipment[equipment_type] != NULL)
+	{
+		bool delete_bots = this->ship_config.equipment[equipment_type]->hasBot;
+		if (delete_bots)
+		{
+			this->ship_config.DestroyBots();
+		}
+		this->ship_config.equipment[equipment_type]->~Equipment();
+		delete this->ship_config.equipment[equipment_type];
+		this->ship_config.equipment[equipment_type] = NULL;
+
+		this->ship_config.Init();
+		this->Init();
+		if (delete_bots)
+		{
+			this->ship_config.GenerateBots(this);
+		}
+	}
+}
+
+void Ship::cleanWeapon()
+{
+	if (this->ship_config.weapon != NULL)
+	{
+		this->ship_config.weapon->~Weapon();
+		delete this->ship_config.weapon;
+		this->ship_config.weapon = NULL;
+
+		this->ship_config.Init();
+		this->Init();
+	}
+}
+
 void Ship::setShipModel(ShipModel* m_ship_model)
 {
 	if (m_ship_model->hasBot)
@@ -861,7 +906,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//switching controls to the HUD
 	//Ship controls
-	if (!disable_inputs)
+ 	if (!disable_inputs)
 	{
 		if (InputGuy::isOpeningHud())
 		{
@@ -1018,15 +1063,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 			isCollindingWithPortal = false;
 
-			if (InputGuy::isFiring())
-			{
-				isFiringButtonPressed = true;
-			}
-			else
-			{
-				isFiringButtonPressed = false;
-			}
-
 			//Braking function
 			if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding)
 			{
@@ -1045,62 +1081,117 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			cursor_->speed.y = directions.y * HUD_CURSOR_SPEED;
 
 			//focus
-			if (InputGuy::isFiring())
+			if (!isFiringButtonPressed)
 			{
-				if (!fire_key_repeat)
+				if (InputGuy::isFiring())
 				{
-					//interaction
+					if (!fire_key_repeat)
+					{
+						//interaction
+						if ((*CurrentGame).getHudFocusedItem() != NULL)
+						{
+							if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+							{
+								Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
+								int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
+
+								if (tmp_ptr->getEquipmentLoot() != NULL)
+								{
+									int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
+
+									//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.equipment[ship_index_] != NULL))
+									{
+										//if this succeeds, we can actually equip the item
+										Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
+										this->setEquipment(new_equipment, true);
+										new_equipment = NULL;
+									}
+								}
+								else if (tmp_ptr->getWeaponLoot() != NULL)
+								{
+									int ship_index_ = NBVAL_Equipment;
+
+									//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.weapon != NULL))
+									{
+										//if this succeeds, we can actually equip the item
+										Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
+										this->setShipWeapon(new_weapon, true);
+										new_weapon = NULL;
+									}
+								}
+								else
+								{
+									LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+								}
+
+								tmp_ptr = NULL;
+							}
+						}
+
+						fire_key_repeat = true;
+					}
+				}
+				else
+				{
+					fire_key_repeat = false;
+				}
+			}
+
+			if (!isBrakingButtonPressed)
+			{
+				if (InputGuy::isBraking())
+				{
 					if ((*CurrentGame).getHudFocusedItem() != NULL)
 					{
-						if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+						//if ((*CurrentGame).updateHudActionHoldingTime(deltaTime) > sf::seconds(HUD_TIME_BEFORE_ERASE))
+						int equip_type = NBVAL_Equipment;
+						if ((*CurrentGame).getHudFocusedItem()->getEquipmentLoot() != NULL)
 						{
-							Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
-							int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
-
-							if (tmp_ptr->getEquipmentLoot() != NULL)
+							equip_type = (*CurrentGame).getHudFocusedItem()->getEquipmentLoot()->equipmentType;
+						}
+						//garbage in hud
+						int grid_id_ = (*CurrentGame).getHudFocusedGridAndIndex().x;
+						int index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
+						(*CurrentGame).GarbageObjectInGrid(grid_id_, index_);
+						//garbage for real
+						if (grid_id_ == (int)HudGrid_ShipGrid)
+						{
+							//this->clearShipEquipmentOrWeapon(equip_type);
+							if (equip_type == NBVAL_Equipment)
 							{
-								int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
-
-								//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-								if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.equipment[ship_index_] != NULL))
-								{
-									//if this succeeds, we can actually equip the item
-									Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
-									this->setEquipment(new_equipment, true);
-									new_equipment = NULL;
-								}
-							}
-							else if (tmp_ptr->getWeaponLoot() != NULL)
-							{
-								int ship_index_ = NBVAL_Equipment;
-
-								//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-								if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.weapon != NULL))
-								{
-									//if this succeeds, we can actually equip the item
-									Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
-									this->setShipWeapon(new_weapon, true);
-									new_weapon = NULL;
-								}
+								this->cleanWeapon();
 							}
 							else
 							{
-								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+								this->cleanEquipment(equip_type);
 							}
-
-							tmp_ptr = NULL;
 						}
 					}
-
-					fire_key_repeat = true;
 				}
-			}
-			else
-			{
-				fire_key_repeat = false;
 			}
 
 			cursor_ = NULL;
+		}
+
+		//testing button release
+		if (InputGuy::isFiring())
+		{
+			isFiringButtonPressed = true;
+		}
+		else
+		{
+			isFiringButtonPressed = false;
+		}
+
+		if (InputGuy::isBraking() && (*CurrentGame).updateHudActionHoldingTime() > sf::seconds(0))//holding in progress
+		{
+			isBrakingButtonPressed = true;
+		}
+		else
+		{
+			isBrakingButtonPressed = false;
 		}
 
 		//idle decceleration

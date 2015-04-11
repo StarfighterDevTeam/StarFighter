@@ -544,11 +544,10 @@ bool Game::InsertObjectInEquipmentGrid(Independant& object)
 
 bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment, bool needs_swapping)
 {
-	assert(hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL);
-	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
-
+	
 	if (needs_swapping)
 	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
 		Independant* tmpShip = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
 		//Equipement > Ship
 		hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
@@ -558,9 +557,20 @@ bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment, bool n
 	}
 	else
 	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Equiping ship #'%d'", index_ship + 1));
 		//Equipement > Ship
 		hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
 	}
 
 	return true;
+}
+
+void Game::GarbageObjectInGrid(int grid_id, int index)
+{
+	hud.GarbageObjectInGrid(grid_id, index);
+}
+
+sf::Time Game::updateHudActionHoldingTime(sf::Time deltaTime)
+{
+	return hud.updateHudActionHoldingTime(deltaTime);
 }

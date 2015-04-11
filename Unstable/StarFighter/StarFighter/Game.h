@@ -50,10 +50,12 @@ public:
 
 	bool InsertObjectInShipGrid(Independant& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(Independant& object);
-	bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment, bool needs_swapping = true);
+	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment, bool needs_swapping = true);
+	void GarbageObjectInGrid(int grid_id, int index);
 	Independant* getHudFocusedItem();
 	sf::Vector2i getHudFocusedGridAndIndex();
 	sf::Vector2i getHudFocusedIndexWithinGrid(HudGridsIndex grid_);
+	sf::Time updateHudActionHoldingTime(sf::Time deltaTime = sf::seconds(0.f));
 
 	bool isLastEnemyDead();
 	int getHazard();

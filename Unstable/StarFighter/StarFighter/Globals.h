@@ -54,6 +54,8 @@
 #define GRAZE_DISTANCE									30
 #define SHIP_BRAKING_MALUS_SPEED						0.60f
 
+#define HUD_TIME_BEFORE_ERASE							1.0f
+
 //HUD
 #define ARMOR_BAR_SIZE_Y		20
 #define SHIELD_BAR_SIZE_Y		20

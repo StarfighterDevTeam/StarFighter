@@ -18,6 +18,8 @@ public:
 		int f_multishot = 1, int f_xspread = 0, float f_rate_of_fire = 1, ShotMode f_shot_mode = NoShotMode, float f_dispersion = 0, int f_rafale = 0, float f_rafale_cooldown = 0, TargetSeaking f_target_seaking = NO_SEAKING);
 	void Draw(sf::RenderTexture& offscreen);
 
+	void GarbageObjectInGrid(int grid_id, int index);
+
 	ObjectGrid fakeEquipmentGrid;
 	ObjectGrid equipmentGrid;
 	ObjectGrid fakeShipGrid;
@@ -42,6 +44,8 @@ public:
 	Independant* hud_cursor;
 	Independant* focused_item;
 	sf::Vector2i focused_grid_and_index;
+	sf::Time action_holding_time;
+	sf::Time updateHudActionHoldingTime(sf::Time deltaTime);
 
 	bool max_hazard_level_reached;
 	bool has_shield;

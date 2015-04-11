@@ -17,6 +17,14 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	key_repeat = false;
 }
 
+Bot::~Bot()
+{
+	if (this->weapon != NULL)
+	{
+		this->weapon->~Weapon();
+	}
+}
+
 void Bot::setTarget (Independant* m_target)
 {
 	this->target = m_target;

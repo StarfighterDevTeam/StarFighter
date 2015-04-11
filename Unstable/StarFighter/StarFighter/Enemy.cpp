@@ -899,7 +899,9 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					weapon->size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
 					weapon->frameNumber = 1;
 					weapon->rate_of_fire = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_RATE_OF_FIRE_VALUE, WEAPON_MIN_RATE_OF_FIRE_VALUE / 10));
+					weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, 1200));
 					weapon->display_name = "Laser standard";
+					weapon->target_seaking = SEAKING;
 					//Adding properties
 					for (int p=0; p<number_of_equipment_properties; p++)
 					{

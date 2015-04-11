@@ -26,6 +26,12 @@ Weapon::Weapon(Ammo* Ammunition)
 	this->ammunition = Ammunition;
 }
 
+Weapon::~Weapon()
+{
+	delete this->ammunition;
+	this->ammunition = NULL;
+}
+
 void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = this->ammunition->Clone();

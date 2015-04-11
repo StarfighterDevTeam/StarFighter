@@ -101,6 +101,33 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	}
 }
 
+void PlayerHud::GarbageObjectInGrid(int grid_id, int index)
+{
+	switch (grid_id)
+	{
+		case HudGrid_ShipGrid:
+		{
+			delete shipGrid.getCellPointerFromIntIndex(index);
+			shipGrid.setCellPointerForIntIndex(index, NULL);
+			break;
+		}
+		case HudGrid_EquipmentGrid:
+		{
+			delete equipmentGrid.getCellPointerFromIntIndex(index);
+			equipmentGrid.setCellPointerForIntIndex(index, NULL);
+			break;
+		}
+	}
+
+	this->focused_item = NULL;
+}
+
+sf::Time PlayerHud::updateHudActionHoldingTime(sf::Time deltaTime)
+{
+	this->action_holding_time += deltaTime;
+	return this->action_holding_time;
+}
+
 void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
 	float f_ammo_speed, PatternType f_pattern, int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
@@ -182,7 +209,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	//clean old focus
 	hud_cursor->visible = has_focus;
 
-	focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, -1);
+	focused_grid_and_index = sf::Vector2i((int)HudGrid_NoFocus, -1);
 	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())
 	{
 		//if the focus has been cleaned, that means we must also clean the cursor
@@ -204,18 +231,25 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
 				{
 					hud_cursor->setAnimationLine(Cursor_ActionState);
-					focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
+					if (focused_item != equipmentGrid.getCellPointerFromIntIndex(hovered_index_))
+					{
+						focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
+						action_holding_time = sf::seconds(-1);
+					}
 				}
 				else
 				{
 					hud_cursor->setAnimationLine(Cursor_HighlightState);
 					focused_item = NULL;
+					action_holding_time = sf::seconds(-1);
 				}
 				focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
 			}
 			else
 			{
-				//not hovering any of the grids
+				focused_grid_and_index = sf::Vector2i((int)HudGrid_NoFocus, hovered_index_);
+				focused_item = NULL;
+				action_holding_time = sf::seconds(-1);
 			}
 		}
 		else
@@ -226,11 +260,16 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 
 			if (shipGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
 			{
-				focused_item = shipGrid.getCellPointerFromIntIndex(hovered_index_);
+				if (focused_item != shipGrid.getCellPointerFromIntIndex(hovered_index_))
+				{
+					focused_item = shipGrid.getCellPointerFromIntIndex(hovered_index_);
+					action_holding_time = sf::seconds(-1);
+				}
 			}
 			else
 			{
 				focused_item = NULL;
+				action_holding_time = sf::seconds(-1);
 			}
 			focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, hovered_index_);
 		}

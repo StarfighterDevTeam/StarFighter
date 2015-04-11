@@ -88,6 +88,7 @@ class Equipment
 public:
 	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
+	~Equipment();
 	Equipment* Clone();
 	std::string textureName;
 	sf::Vector2f size;
@@ -182,6 +183,8 @@ public :
 	bool setEquipment(Equipment* m_equipment, bool overwrite = false);
 	bool setShipWeapon(Weapon* m_weapon, bool overwrite = false);
 	void setShipModel(ShipModel* m_ship_model);
+	void cleanEquipment(int equipment_type);
+	void cleanWeapon();
 	static Independant* CloneEquipmentIntoIndependant(Equipment* new_equipment);
 	static Independant* CloneWeaponIntoIndependant(Weapon* new_weapon);
 	
@@ -191,6 +194,7 @@ public :
 	Portal* targetPortal;
 	bool isCollindingWithPortal;
 	bool isFiringButtonPressed;
+	bool isBrakingButtonPressed;
 	void GetGrazing() override;
 	int getGrazeCount();
 	float getShipBeastScore();
