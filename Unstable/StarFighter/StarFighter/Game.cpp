@@ -570,8 +570,3 @@ void Game::GarbageObjectInGrid(int grid_id, int index)
 {
 	hud.GarbageObjectInGrid(grid_id, index);
 }
-
-sf::Time Game::updateHudActionHoldingTime(sf::Time deltaTime)
-{
-	return hud.updateHudActionHoldingTime(deltaTime);
-}

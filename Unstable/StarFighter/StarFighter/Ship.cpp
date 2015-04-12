@@ -754,11 +754,13 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isCollindingWithPortal = false;
 	this->isUsingPortal = false;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
-	this->isBrakingButtonPressed = true;//will be updated to false in the update function if button released
+	this->wasBrakingButtonPressed = true;
+	this->isBrakingButtonHeldPressed = false;
 	this->targetPortal = NULL;
 	this->equipment_loot = NULL;
 	this->weapon_loot = NULL;
 	this->isFocusedOnHud = false;
+	this->previously_focused_item = NULL;
 
 	this->Init();
 }
@@ -1081,6 +1083,16 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			cursor_->speed.y = directions.y * HUD_CURSOR_SPEED;
 
 			//focus
+			bool has_changed_focused_item_ = true;
+			if ((*CurrentGame).getHudFocusedItem() == this->previously_focused_item)
+			{
+				has_changed_focused_item_ = false;
+			}
+			else
+			{
+				this->previously_focused_item = (*CurrentGame).getHudFocusedItem();
+			}
+
 			if (!isFiringButtonPressed)
 			{
 				if (InputGuy::isFiring())
@@ -1139,41 +1151,71 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 			}
 
-			if (!isBrakingButtonPressed)
+			if (!wasBrakingButtonPressed || isBrakingButtonHeldPressed)
 			{
 				if (InputGuy::isBraking())
 				{
-					if ((*CurrentGame).getHudFocusedItem() != NULL)
+					if (!isBrakingButtonHeldPressed)
 					{
-						//if ((*CurrentGame).updateHudActionHoldingTime(deltaTime) > sf::seconds(HUD_TIME_BEFORE_ERASE))
-						int equip_type = NBVAL_Equipment;
-						if ((*CurrentGame).getHudFocusedItem()->getEquipmentLoot() != NULL)
+						brakingHoldingClock.restart();
+						isBrakingButtonHeldPressed = true;
+						(*CurrentGame).hud.removing_item = true;
+					}
+					else
+					{
+						if (has_changed_focused_item_)
 						{
-							equip_type = (*CurrentGame).getHudFocusedItem()->getEquipmentLoot()->equipmentType;
+							brakingHoldingClock.restart();
+							isBrakingButtonHeldPressed = false;
+							(*CurrentGame).hud.removing_item = false;
 						}
-						//garbage in hud
-						int grid_id_ = (*CurrentGame).getHudFocusedGridAndIndex().x;
-						int index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
-						(*CurrentGame).GarbageObjectInGrid(grid_id_, index_);
-						//garbage for real
-						if (grid_id_ == (int)HudGrid_ShipGrid)
+						else if (brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
 						{
-							//this->clearShipEquipmentOrWeapon(equip_type);
-							if (equip_type == NBVAL_Equipment)
+							if ((*CurrentGame).getHudFocusedItem() != NULL)
 							{
-								this->cleanWeapon();
+								(*CurrentGame).hud.removing_item = true;
+
+								int equip_type = NBVAL_Equipment;
+								if ((*CurrentGame).getHudFocusedItem()->getEquipmentLoot() != NULL)
+								{
+									equip_type = (*CurrentGame).getHudFocusedItem()->getEquipmentLoot()->equipmentType;
+								}
+								//garbage in hud
+								int grid_id_ = (*CurrentGame).getHudFocusedGridAndIndex().x;
+								int index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
+								(*CurrentGame).GarbageObjectInGrid(grid_id_, index_);
+								//garbage for real
+								if (grid_id_ == (int)HudGrid_ShipGrid)
+								{
+									//this->clearShipEquipmentOrWeapon(equip_type);
+									if (equip_type == NBVAL_Equipment)
+									{
+										this->cleanWeapon();
+									}
+									else
+									{
+										this->cleanEquipment(equip_type);
+									}
+								}
 							}
-							else
-							{
-								this->cleanEquipment(equip_type);
-							}
+
+							brakingHoldingClock.restart();
+							isBrakingButtonHeldPressed = false;
 						}
 					}
+					
+				}
+				else
+				{
+					isBrakingButtonHeldPressed = false;
+					brakingHoldingClock.restart();
 				}
 			}
-
+			
 			cursor_ = NULL;
 		}
+
+		printf("braking hold clock : %f\n", brakingHoldingClock.getElapsedTime().asSeconds());
 
 		//testing button release
 		if (InputGuy::isFiring())
@@ -1185,13 +1227,13 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			isFiringButtonPressed = false;
 		}
 
-		if (InputGuy::isBraking() && (*CurrentGame).updateHudActionHoldingTime() > sf::seconds(0))//holding in progress
+		if (InputGuy::isBraking())
 		{
-			isBrakingButtonPressed = true;
+			wasBrakingButtonPressed = true;
 		}
 		else
 		{
-			isBrakingButtonPressed = false;
+			wasBrakingButtonPressed = false;
 		}
 
 		//idle decceleration

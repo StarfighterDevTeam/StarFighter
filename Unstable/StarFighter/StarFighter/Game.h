@@ -55,7 +55,6 @@ public:
 	Independant* getHudFocusedItem();
 	sf::Vector2i getHudFocusedGridAndIndex();
 	sf::Vector2i getHudFocusedIndexWithinGrid(HudGridsIndex grid_);
-	sf::Time updateHudActionHoldingTime(sf::Time deltaTime = sf::seconds(0.f));
 
 	bool isLastEnemyDead();
 	int getHazard();

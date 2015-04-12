@@ -44,8 +44,7 @@ public:
 	Independant* hud_cursor;
 	Independant* focused_item;
 	sf::Vector2i focused_grid_and_index;
-	sf::Time action_holding_time;
-	sf::Time updateHudActionHoldingTime(sf::Time deltaTime);
+	bool removing_item;
 
 	bool max_hazard_level_reached;
 	bool has_shield;

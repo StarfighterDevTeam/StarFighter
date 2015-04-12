@@ -194,7 +194,11 @@ public :
 	Portal* targetPortal;
 	bool isCollindingWithPortal;
 	bool isFiringButtonPressed;
-	bool isBrakingButtonPressed;
+	bool wasBrakingButtonPressed;
+	bool isBrakingButtonHeldPressed;
+	sf::Clock brakingHoldingClock;
+	Independant* previously_focused_item;
+
 	void GetGrazing() override;
 	int getGrazeCount();
 	float getShipBeastScore();

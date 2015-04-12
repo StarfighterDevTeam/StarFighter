@@ -5,6 +5,7 @@ PlayerHud::PlayerHud()
 	this->max_hazard_level_reached = false;
 	this->focused_item = NULL;
 	this->has_focus = false;
+	this->removing_item = false;
 
 	this->fakeEquipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), true);
 	this->fakeShipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
@@ -122,12 +123,6 @@ void PlayerHud::GarbageObjectInGrid(int grid_id, int index)
 	this->focused_item = NULL;
 }
 
-sf::Time PlayerHud::updateHudActionHoldingTime(sf::Time deltaTime)
-{
-	this->action_holding_time += deltaTime;
-	return this->action_holding_time;
-}
-
 void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
 	float f_ammo_speed, PatternType f_pattern, int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
@@ -234,14 +229,12 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 					if (focused_item != equipmentGrid.getCellPointerFromIntIndex(hovered_index_))
 					{
 						focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
-						action_holding_time = sf::seconds(-1);
 					}
 				}
 				else
 				{
 					hud_cursor->setAnimationLine(Cursor_HighlightState);
 					focused_item = NULL;
-					action_holding_time = sf::seconds(-1);
 				}
 				focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
 			}
@@ -249,7 +242,6 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			{
 				focused_grid_and_index = sf::Vector2i((int)HudGrid_NoFocus, hovered_index_);
 				focused_item = NULL;
-				action_holding_time = sf::seconds(-1);
 			}
 		}
 		else
@@ -263,13 +255,11 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				if (focused_item != shipGrid.getCellPointerFromIntIndex(hovered_index_))
 				{
 					focused_item = shipGrid.getCellPointerFromIntIndex(hovered_index_);
-					action_holding_time = sf::seconds(-1);
 				}
 			}
 			else
 			{
 				focused_item = NULL;
-				action_holding_time = sf::seconds(-1);
 			}
 			focused_grid_and_index = sf::Vector2i((int)HudGrid_ShipGrid, hovered_index_);
 		}
