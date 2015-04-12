@@ -570,3 +570,8 @@ void Game::GarbageObjectInGrid(int grid_id, int index)
 {
 	hud.GarbageObjectInGrid(grid_id, index);
 }
+
+void Game::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
+{
+	this->hud.setRemovingCursorAnimation(animation_index);
+}

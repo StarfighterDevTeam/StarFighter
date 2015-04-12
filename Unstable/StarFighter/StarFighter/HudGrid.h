@@ -21,6 +21,14 @@ enum CursorFeedbackStates
 	Cursor_NormalState,
 	Cursor_HighlightState,
 	Cursor_ActionState,
+	Cursor_Focus1_8,
+	Cursor_Focus2_8,
+	Cursor_Focus3_8,
+	Cursor_Focus4_8,
+	Cursor_Focus5_8,
+	Cursor_Focus6_8,
+	Cursor_Focus7_8,
+	Cursor_Focus8_8,
 };
 
 class ObjectGrid

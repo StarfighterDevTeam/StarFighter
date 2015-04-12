@@ -5,7 +5,7 @@ PlayerHud::PlayerHud()
 	this->max_hazard_level_reached = false;
 	this->focused_item = NULL;
 	this->has_focus = false;
-	this->removing_item = false;
+	this->has_prioritary_cursor_feedback = false;
 
 	this->fakeEquipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), true);
 	this->fakeShipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
@@ -13,7 +13,7 @@ PlayerHud::PlayerHud()
 	this->shipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
 
 	this->hud_cursor = new Independant(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)), 
-		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, HUD_CURSOR_ANIMATION_NUMBER);
+		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8+1));
 }
 
 void PlayerHud::Init(int m_armor, int m_shield)
@@ -123,6 +123,11 @@ void PlayerHud::GarbageObjectInGrid(int grid_id, int index)
 	this->focused_item = NULL;
 }
 
+void PlayerHud::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
+{
+	this->hud_cursor->setAnimationLine(animation_index);
+}
+
 void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
 	float f_ammo_speed, PatternType f_pattern, int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
@@ -208,7 +213,11 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())
 	{
 		//if the focus has been cleaned, that means we must also clean the cursor
-		hud_cursor->setAnimationLine(Cursor_NormalState);
+		if (!has_prioritary_cursor_feedback)
+		{
+			hud_cursor->setAnimationLine(Cursor_NormalState);
+		}
+		
 	}
 
 	if (has_focus)
@@ -219,13 +228,15 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 		{
 			//we test the equipment grid
 			hovered_index_ = fakeEquipmentGrid.isCursorColling(*hud_cursor);
-			if (hovered_index_ > -1)
+			if (hovered_index_ > -1)//the equipment grid is focused
 			{
-				//we focus on the hovered grid cell in equipement grid
 				fakeEquipmentGrid.HighlightCell(hovered_index_);
 				if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
 				{
-					hud_cursor->setAnimationLine(Cursor_ActionState);
+					if (!has_prioritary_cursor_feedback)
+					{
+						hud_cursor->setAnimationLine(Cursor_ActionState);
+					}
 					if (focused_item != equipmentGrid.getCellPointerFromIntIndex(hovered_index_))
 					{
 						focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
@@ -233,22 +244,32 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				}
 				else
 				{
-					hud_cursor->setAnimationLine(Cursor_HighlightState);
+					if (!has_prioritary_cursor_feedback)
+					{
+						hud_cursor->setAnimationLine(Cursor_HighlightState);
+					}
 					focused_item = NULL;
 				}
 				focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
 			}
-			else
+			else//no focus at all: the cursor is on an empty space
 			{
 				focused_grid_and_index = sf::Vector2i((int)HudGrid_NoFocus, hovered_index_);
 				focused_item = NULL;
+				if (!has_prioritary_cursor_feedback)
+				{
+					hud_cursor->setAnimationLine(Cursor_NormalState);
+				}
 			}
 		}
-		else
+		else//the ship grid is focused
 		{
-			//we focus the hovered grid cell in ship grid
+			
 			fakeShipGrid.HighlightCell(hovered_index_);
-			hud_cursor->setAnimationLine(Cursor_HighlightState);
+			if (!has_prioritary_cursor_feedback)
+			{
+				hud_cursor->setAnimationLine(Cursor_HighlightState);
+			}
 
 			if (shipGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
 			{

@@ -44,7 +44,8 @@ public:
 	Independant* hud_cursor;
 	Independant* focused_item;
 	sf::Vector2i focused_grid_and_index;
-	bool removing_item;
+	void setRemovingCursorAnimation(CursorFeedbackStates animation_index);
+	bool has_prioritary_cursor_feedback;
 
 	bool max_hazard_level_reached;
 	bool has_shield;

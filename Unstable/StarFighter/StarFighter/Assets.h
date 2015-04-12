@@ -15,9 +15,9 @@
 #define PORTAL_ANIMATIONS		4
 
 #define HUD_CURSOR_TEXTURE_NAME			"Assets/2D/HUD/cursor.png"
-#define HUD_CURSOR_ANIMATION_NUMBER		3
-#define HUD_CURSOR_WIDTH				25
-#define HUD_CURSOR_HEIGHT				25
+#define HUD_CURSOR_WIDTH				33
+#define HUD_CURSOR_HEIGHT				32
+#define HUD_CURSOR_HOLDING_FRACTIONS	8
 
 //#define AIRBRAKE_FILENAME		"Assets/2D/Equipment/AirBrake.png"
 #define ARMOR_FILENAME			"Assets/2D/Equipment/Armor.png"

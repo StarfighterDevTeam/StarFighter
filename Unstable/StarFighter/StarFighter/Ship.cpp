@@ -1159,7 +1159,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					{
 						brakingHoldingClock.restart();
 						isBrakingButtonHeldPressed = true;
-						(*CurrentGame).hud.removing_item = true;
+						(*CurrentGame).hud.has_prioritary_cursor_feedback = true;
 					}
 					else
 					{
@@ -1167,13 +1167,15 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						{
 							brakingHoldingClock.restart();
 							isBrakingButtonHeldPressed = false;
-							(*CurrentGame).hud.removing_item = false;
+							(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
 						}
-						else if (brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
+						else if ((*CurrentGame).getHudFocusedItem() != NULL)
 						{
-							if ((*CurrentGame).getHudFocusedItem() != NULL)
+							if (brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
 							{
-								(*CurrentGame).hud.removing_item = true;
+								(*CurrentGame).hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
+								if (brakingHoldingClock.getElapsedTime().asSeconds() < HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8)
+									(*CurrentGame).hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
 
 								int equip_type = NBVAL_Equipment;
 								if ((*CurrentGame).getHudFocusedItem()->getEquipmentLoot() != NULL)
@@ -1197,25 +1199,38 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 										this->cleanEquipment(equip_type);
 									}
 								}
-							}
 
-							brakingHoldingClock.restart();
-							isBrakingButtonHeldPressed = false;
-						}
+								brakingHoldingClock.restart();
+								isBrakingButtonHeldPressed = false;
+								(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
+							}
+							else
+							{
+								for (int k = 0; k < HUD_CURSOR_HOLDING_FRACTIONS; k++)
+								{
+									if (brakingHoldingClock.getElapsedTime().asSeconds() < (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / HUD_CURSOR_HOLDING_FRACTIONS) * (k + 1))
+									{
+										(*CurrentGame).setRemovingCursorAnimation((CursorFeedbackStates)(Cursor_Focus1_8 + k));
+										(*CurrentGame).hud.has_prioritary_cursor_feedback = true;
+										break;
+									}
+								}
+							}
+						}	
 					}
-					
 				}
 				else
 				{
 					isBrakingButtonHeldPressed = false;
 					brakingHoldingClock.restart();
+					(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
 				}
 			}
 			
 			cursor_ = NULL;
 		}
 
-		printf("braking hold clock : %f\n", brakingHoldingClock.getElapsedTime().asSeconds());
+		printf("braking hold clock : %f | target 1: %f\n", brakingHoldingClock.getElapsedTime().asSeconds(), (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8));
 
 		//testing button release
 		if (InputGuy::isFiring())

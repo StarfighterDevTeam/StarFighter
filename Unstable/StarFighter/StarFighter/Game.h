@@ -55,6 +55,7 @@ public:
 	Independant* getHudFocusedItem();
 	sf::Vector2i getHudFocusedGridAndIndex();
 	sf::Vector2i getHudFocusedIndexWithinGrid(HudGridsIndex grid_);
+	void setRemovingCursorAnimation(CursorFeedbackStates animation_index);
 
 	bool isLastEnemyDead();
 	int getHazard();
