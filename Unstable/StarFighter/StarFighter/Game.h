@@ -50,7 +50,7 @@ public:
 
 	bool InsertObjectInShipGrid(Independant& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(Independant& object);
-	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment, bool needs_swapping = true);
+	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment);
 	void GarbageObjectInGrid(int grid_id, int index);
 	Independant* getHudFocusedItem();
 	sf::Vector2i getHudFocusedGridAndIndex();

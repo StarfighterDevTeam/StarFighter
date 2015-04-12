@@ -1100,7 +1100,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 									int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
 
 									//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.equipment[ship_index_] != NULL))
+									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
 									{
 										//if this succeeds, we can actually equip the item
 										Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
@@ -1113,7 +1113,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 									int ship_index_ = NBVAL_Equipment;
 
 									//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_, this->ship_config.weapon != NULL))
+									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
 									{
 										//if this succeeds, we can actually equip the item
 										Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();

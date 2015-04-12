@@ -129,7 +129,7 @@ Bot* Bot::Clone()
 	bot->vspeed = this->vspeed;
 	bot->Pattern = this->Pattern;
 	bot->spread = this->spread;
-		bot->weapon = this->weapon;
+	bot->weapon = this->weapon->Clone();
 	bot->damage = this->damage;
 	bot->armor = this->armor;
 	bot->armor_max = this->armor_max;
