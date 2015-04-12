@@ -317,7 +317,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				if (f_bot)
 				{
 					ss_stats << " \nAdding 1 drone. Drone stats:";
-
+					ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
 					ss_stats << "\nDamage: " << f_damage;
 					ss_stats << "\nAmmo speed: " << f_ammo_speed;
 					ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec";
@@ -352,6 +352,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 			case NBVAL_Equipment:
 			{
 				ss_stats << "MAIN WEAPON: " << f_name;
+				ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
 				ss_stats << "\nDamage: " << f_damage;
 				ss_stats << "\nAmmo speed: " << f_ammo_speed;
 				ss_stats << "\nFire rate: " << (floor)(1/f_rate_of_fire * 100) / 100 << " shots/sec";
