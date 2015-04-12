@@ -334,13 +334,46 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 					{
 						ss_stats << "\nRafale: " << f_rafale << " (cooldown: " << f_rafale_cooldown << " sec";
 					}
+					
 					if (f_shot_mode != NoShotMode)
 					{
-						ss_stats << "\nFiring style: " << "todo";
+						ss_stats << "\nFiring style: ";
+						switch (f_shot_mode)
+						{
+							case AlternateShotMode:
+							{
+								ss_stats << "Alternating shots";
+								break;
+							}
+							case AscendingShotMode:
+							{
+								ss_stats << "Ascending shots";
+								break;
+							}
+							case DescendingShotMode:
+							{
+								ss_stats << "Descending shots";
+								break;
+							}
+						}
 					}
+
 					if (f_target_seaking != NO_SEAKING)
 					{
-						ss_stats << "\nTarget seaking: " << "todo";
+						switch (f_target_seaking)
+						{
+							case SEAKING:
+							case SUPER_SEAKING:
+							{
+								ss_stats << "\nSeaking target";
+								break;
+							}
+							case SEMI_SEAKING:
+							{
+								ss_stats << "\nSeaking target once per rafale";
+								break;
+							}
+						}						
 					}
 				}
 				else
@@ -371,11 +404,43 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 				}
 				if (f_shot_mode != NoShotMode)
 				{
-					ss_stats << "\nFiring style: " << "todo";
+					ss_stats << "\nFiring style: ";
+					switch (f_shot_mode)
+					{
+						case AlternateShotMode:
+						{
+							ss_stats << "Alternating shots";
+							break;
+						}
+						case AscendingShotMode:
+						{
+							ss_stats << "Ascending shots";
+							break;
+						}
+						case DescendingShotMode:
+						{
+							ss_stats << "Descending shots";
+							break;
+						}
+					}
 				}
+
 				if (f_target_seaking != NO_SEAKING)
 				{
-					ss_stats << "\nTarget seaking: " << "todo";
+					switch (f_target_seaking)
+					{
+						case SEAKING:
+						case SUPER_SEAKING:
+						{
+							ss_stats << "\nSeaking target";
+							break;
+						}
+						case SEMI_SEAKING:
+						{
+							ss_stats << "\nSeaking target once per rafale";
+							break;
+						}
+					}
 				}
 				break;
 			}
