@@ -126,7 +126,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//automatic fire
-	if (this->isOnScene && !this->weapons_list.empty())
+	if (this->isOnScene && !this->weapons_list.empty() && !this->disable_fire)
 	{
 		for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 		{

@@ -58,10 +58,12 @@ void InGameState::Initialize(Player player)
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
 	{
 		(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+		(*CurrentGame).playerShip->disabledHyperspeed = false;
 	}
 	else
 	{
 		(*CurrentGame).playerShip->disable_fire = true;
+		(*CurrentGame).playerShip->disabledHyperspeed = true;
 	}
 	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
@@ -421,6 +423,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
 				{
 					this->IG_State = InGameStateMachine::HUB_ROAMING;
+					(*CurrentGame).playerShip->disabledHyperspeed = true;
 				}
 				else
 				{

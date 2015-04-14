@@ -79,6 +79,10 @@ void Game::updateScene(Time deltaTime)
 	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
 		(*it)->update(deltaTime, hyperspeedMultiplier);
+		
+		(*it)->setGhost(hyperspeedMultiplier > 1.0f);
+		(*it)->disable_fire = hyperspeedMultiplier > 1.0f;
+		
 	}
 	//isLastEnemyDead();
 }
