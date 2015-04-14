@@ -366,6 +366,7 @@ ShipConfig::ShipConfig()
 {
 	this->ship_model = new ShipModel(0, 0, 0.0f, 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
 	this->automatic_fire = false;
+	this->fake_ship = NULL;
 
 	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
@@ -406,6 +407,8 @@ void ShipConfig::Init()
 			}
 		}
 	}
+
+
 }
 
 int ShipConfig::getShipConfigArmor()
@@ -709,8 +712,9 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 	assert(this->ship_model != NULL);
 	if (this->ship_model->hasFake)
 	{
-		FakeShip* fake_ship = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-		(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
+		FakeShip* fake_ship_ = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
+		this->fake_ship = fake_ship_;
+		(*CurrentGame).addToScene(fake_ship_, LayerType::FakeShipLayer, IndependantType::Neutral);
 	}
 
 	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
@@ -775,6 +779,11 @@ void Ship::Init()
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
 	this->transparent = this->ship_config.ship_model->hasFake;
+
+	if (this->ship_config.ship_model->hasFake)
+	{
+		this->ship_config.GenerateFakeShip(this);
+	}
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -988,7 +997,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 
 			//auto fire option (F key)
-			if (InputGuy::setAutomaticFire())
+			if (InputGuy::setAutomaticFire() && !disable_fire)
 			{
 				if (!this->fire_key_repeat)
 				{
@@ -1189,7 +1198,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 								//garbage for real
 								if (grid_id_ == (int)HudGrid_ShipGrid)
 								{
-									//this->clearShipEquipmentOrWeapon(equip_type);
 									if (equip_type == NBVAL_Equipment)
 									{
 										this->cleanWeapon();
@@ -1230,8 +1238,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			cursor_ = NULL;
 		}
 
-		printf("braking hold clock : %f | target 1: %f\n", brakingHoldingClock.getElapsedTime().asSeconds(), (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8));
-
 		//testing button release
 		if (InputGuy::isFiring())
 		{
@@ -1271,6 +1277,11 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else
 	{
 		isFocusedOnHud = false;
+	}
+
+	if (this->ship_config.ship_model->hasFake)
+	{
+		this->ship_config.fake_ship->setGhost(hyperspeedMultiplier > 1.0f);
 	}
 
 	Independant::update(deltaTime, hyperspeedMultiplier);

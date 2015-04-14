@@ -136,7 +136,9 @@ void Independant::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newspeed.x = this->speed.x * hyperspeedMultiplier;
 		newspeed.y = this->speed.y * hyperspeedMultiplier;
 	}
-
+	
+	this->setGhost(hyperspeedMultiplier > 1.0f);
+	
 	//Basic movement (initial vector)
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
 	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
@@ -404,21 +406,6 @@ sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vsp
 	}
 
 	return speed;
-}
-
-sf::Vector2f Independant::getSpeedYMultiplier_for_Direction(Directions direction, float speed_multiplier)
-{
-	sf::Vector2f speed_ = this->speed;
-	if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
-	{
-		speed_.y *= speed_multiplier;
-	}
-	else if (direction == Directions::DIRECTION_UP || direction == Directions::DIRECTION_DOWN)
-	{
-		speed_.x *= speed_multiplier;
-	}
-
-	return speed_;
 }
 
 sf::Vector2f Independant::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position)

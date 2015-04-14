@@ -25,13 +25,16 @@ void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed = this->getSpeedYMultiplier_for_Direction((*CurrentGame).direction, hyperspeedMultiplier);
+		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
+		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 	}
 	else if (hyperspeedMultiplier < 1)
 	{
 		newspeed.x = this->speed.x * hyperspeedMultiplier;
 		newspeed.y = this->speed.y * hyperspeedMultiplier;
 	}
+
+	this->setGhost(hyperspeedMultiplier > 1.0f);
 
 	//Basic movement (initial vector)
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();

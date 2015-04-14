@@ -1,4 +1,6 @@
 Horizon_IV 0
+Vanguard_H1 0
+Vanguard_H2 0
 Vanguard_Hub0 0
 Vanguard_V1 0
 Vanguard_V2 0

@@ -51,7 +51,8 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	float new_ref_speed = ref_speed;
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed = this->getSpeedYMultiplier_for_Direction((*CurrentGame).direction, hyperspeedMultiplier);
+		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier -1) * (*CurrentGame).vspeed).x;
+		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 		new_ref_speed *= hyperspeedMultiplier;
 	}
 	else if (hyperspeedMultiplier < 1)
@@ -60,6 +61,8 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newspeed.y = this->speed.y * hyperspeedMultiplier;
 		new_ref_speed *= hyperspeedMultiplier;
 	}
+
+	this->setGhost(hyperspeedMultiplier > 1.0f);
 
 	//range before bullet extinction (optional. put "0" not to use)
 	if (this->range > 0)

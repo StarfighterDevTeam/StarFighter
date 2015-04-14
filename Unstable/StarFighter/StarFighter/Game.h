@@ -47,6 +47,7 @@ public:
 	PlayerHud hud;
 	sf::Vector2i screen_size;
 	float hyperspeedMultiplier;
+	float vspeed;
 
 	bool InsertObjectInShipGrid(Independant& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(Independant& object);
@@ -62,6 +63,7 @@ public:
 	void resetHazard(int hazard_overkill = 0);
 	sf::Vector2f scale_factor;
 	Directions direction;
+	
 
 	int hazard;
 	int hazardSpawned;

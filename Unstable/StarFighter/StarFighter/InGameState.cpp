@@ -65,7 +65,7 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).playerShip->disable_fire = true;
 		(*CurrentGame).playerShip->disabledHyperspeed = true;
 	}
-	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
+	//(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, IndependantType::PlayerShip);
@@ -268,6 +268,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					//Correct the position
 					this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2));
 					this->currentScene->bg->speed = sf::Vector2f(0, 0);
+					(*CurrentGame).vspeed = 0;
 
 					//Disable hyperspeed capacity
 					(*CurrentGame).playerShip->disabledHyperspeed = true;
@@ -392,6 +393,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).playerShip->getPosition());
 
 				this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
+				(*CurrentGame).vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
@@ -419,6 +421,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 				this->nextScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2)));
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling(this->nextScene->direction, this->nextScene->vspeed);
+				(*CurrentGame).vspeed = this->nextScene->vspeed;
 
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
 				{
