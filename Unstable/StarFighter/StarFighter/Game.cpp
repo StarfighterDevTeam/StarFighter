@@ -513,6 +513,21 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 			}
 		}
 	}
+	else
+	{
+		//return default: firing straight ahead
+		switch (type)
+		{
+			case PlayerShip:
+			{
+				return (fmod(180 + Independant::getRotation_for_Direction(this->direction), 360));
+			}
+			case EnemyObject:
+			{
+				return (fmod(Independant::getRotation_for_Direction(this->direction), 360));
+			}
+		}
+	}
 
 	return angle;
 }

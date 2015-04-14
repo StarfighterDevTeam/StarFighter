@@ -1279,6 +1279,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		isFocusedOnHud = false;
 	}
 
+	//Ghost while hyperspeeding
 	if (this->ship_config.ship_model->hasFake)
 	{
 		this->ship_config.fake_ship->setGhost(hyperspeedMultiplier > 1.0f);
