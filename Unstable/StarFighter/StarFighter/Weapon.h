@@ -24,10 +24,11 @@ public:
 	std::string display_name;
 	sf::Vector2f speed;
 	bool firing_ready;
-	void Fire(IndependantType m_collider_type);
+	void Fire(IndependantType m_collider_type, sf::Time deltaTime = sf::seconds(0), float hyperspeedMultiplier = 1.0f);
+	bool isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier);
 
 	void CreateBullet(IndependantType m_collider_type, float offsetX=0, float dispersion=0);
-	bool isFiringReady();
+	
 	void FireSingleShot(IndependantType m_collider_type);
 	void FireMultiShot(IndependantType m_collider_type);
 	void FireAlternateShot(IndependantType m_collider_type);
@@ -36,7 +37,7 @@ public:
 	sf::Vector2f AngleShot(float angle, float m_ref_speed);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
-	sf::Clock deltaClock;
+	sf::Time readyFireTimer;
 	Ammo* ammunition;
 
 	TargetSeaking target_seaking;

@@ -102,19 +102,9 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 					this->weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
 					this->weapon->shot_angle = theta;
-					this->weapon->Fire(IndependantType::FriendlyFire);
+					this->weapon->Fire(IndependantType::FriendlyFire, deltaTime);
 				}
 			}
-		}
-		else if (InputGuy::isFiring() || this->automatic_fire)
-		{
-			float theta = this->getRotation() / 180 * M_PI;
-			float x_weapon_offset = this->m_size.y / 2 * sin(theta);
-			float y_weapon_offset = -this->m_size.y / 2 * cos(theta);
-
-			this->weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
-			this->weapon->shot_angle = theta;
-			this->weapon->Fire(IndependantType::FriendlyFire);
 		}
 	}
 

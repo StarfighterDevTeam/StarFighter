@@ -99,9 +99,18 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 
 }
 
-bool Weapon::isFiringReady()
+bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	if (rafale > 0 && deltaClock.getElapsedTime() > sf::seconds(rafale_cooldown))//if you wait long enough, you can reset your rafale
+	if (hyperspeedMultiplier < 1.0f)
+	{
+		this->readyFireTimer += deltaTime * hyperspeedMultiplier;
+	}
+	else
+	{
+		this->readyFireTimer += deltaTime;
+	}
+
+	if (rafale > 0 && readyFireTimer > sf::seconds(rafale_cooldown))//if you wait long enough, you can reset your rafale
 	{
 		firing_ready = true;
 		rafale_index = 0;
@@ -110,7 +119,7 @@ bool Weapon::isFiringReady()
 
 	if (rafale > 0 && rafale_index > rafale - 1)
 	{
-		if (deltaClock.getElapsedTime() > sf::seconds(rafale_cooldown))
+		if (readyFireTimer > sf::seconds(rafale_cooldown))
 		{
 			firing_ready = true;
 			rafale_index = 0;
@@ -120,13 +129,13 @@ bool Weapon::isFiringReady()
 	{
 		if (this->shot_mode != ShotMode::NoShotMode && multishot > 1)
 		{
-			if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire / multishot))
+			if (readyFireTimer > sf::seconds(rate_of_fire / multishot))
 			{
 				firing_ready = true;
 			}
 		}
 
-		else if (deltaClock.getElapsedTime() > sf::seconds(rate_of_fire))
+		else if (readyFireTimer > sf::seconds(rate_of_fire))
 		{
 			firing_ready = true;
 		}
@@ -135,9 +144,9 @@ bool Weapon::isFiringReady()
 	return firing_ready;
 }
 
-void Weapon::Fire(IndependantType m_collider_type)
+void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	if (isFiringReady())
+	if (isFiringReady(deltaTime, hyperspeedMultiplier))
 	{
 		if (multishot > 1)
 		{
@@ -168,7 +177,7 @@ void Weapon::Fire(IndependantType m_collider_type)
 			FireSingleShot(m_collider_type);
 		}
 
-		deltaClock.restart();
+		readyFireTimer = sf::seconds(0);
 		firing_ready = false;
 
 		if (rafale > 0 && shot_index == 0)

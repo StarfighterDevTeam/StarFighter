@@ -150,7 +150,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				(*it)->shot_angle = theta;
 				(*it)->face_target = this->face_target;
 
-				(*it)->Fire(IndependantType::EnemyFire);
+				(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
 			}
 		}
 

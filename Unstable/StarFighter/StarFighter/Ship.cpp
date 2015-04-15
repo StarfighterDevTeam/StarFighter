@@ -1053,7 +1053,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 						ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
 						ship_config.weapon->shot_angle = theta;
-						ship_config.weapon->Fire(FriendlyFire);
+						ship_config.weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
 
 						//speed malus when shooting
 						if (!this->isBraking)
