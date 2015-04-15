@@ -28,6 +28,7 @@ public:
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	Aura* Clone();
 	Independant* target;
+	sf::Vector2f offset;
 
 private:
 	sf::Clock deltaClockExploding;

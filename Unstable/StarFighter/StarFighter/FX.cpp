@@ -58,6 +58,7 @@ Aura::Aura(Independant* m_target, std::string textureName, sf::Vector2f size, in
 	this->target = m_target;
 	visible = true;
 	isOnScene = true;
+	offset = sf::Vector2f(0, 0);
 }
 
 void Aura::Init(std::string m_textureName, sf::Vector2f size, int m_frameNumber)
@@ -69,12 +70,22 @@ void Aura::Init(std::string m_textureName, sf::Vector2f size, int m_frameNumber)
 
 void Aura::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition;
-	newposition.x = target->getPosition().x;
-	newposition.y = target->getPosition().y;
+	static sf::Vector2f newposition, newoffset;
+	newoffset = getSpeed_for_Direction((*CurrentGame).direction, this->offset);
+	newposition.x = target->getPosition().x + newoffset.x;
+	newposition.y = target->getPosition().y + newoffset.y;
 	this->setPosition(newposition.x,newposition.y);
 
-	AnimatedSprite::update(deltaTime);
+	if (visible)
+	{
+		AnimatedSprite::update(deltaTime);
+	}
+	else
+	{
+		//if the Aura is not visible, we don't display it and reset its animation to frame 0
+		this->m_currentFrame = 0;
+	}
+	
 }
 
 Aura* Aura::Clone()

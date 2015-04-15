@@ -206,6 +206,7 @@ public :
 
 	bool disable_inputs;
 	Aura* combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
+	Aura* trail;
 	bool fire_key_repeat;
 	bool slowmo_key_repeat;
 	bool hud_key_repeat;

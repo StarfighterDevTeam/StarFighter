@@ -738,7 +738,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->movingX = movingY = false;
 	this->visible = true;
 	this->damage = 0;
-	this->shield = 0;
+	this->shield = m_ship_config.getShipConfigShield();;
 	this->disable_inputs = false;
 	this->disable_fire = false;
 	this->isBraking = false;
@@ -750,6 +750,17 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
 	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
+	this->trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
+	this->trail->visible = false;
+	if (this->ship_config.ship_model->hasFake)
+	{
+		this->trail->offset = sf::Vector2f(0, (this->ship_config.ship_model->fake_size.y / 2) + (this->trail->m_size. y / 2));
+	}
+	else
+	{
+		this->trail->offset = sf::Vector2f(0, (this->ship_config.ship_model->size.y / 2 ) + (this->trail->m_size.y / 2));
+	}
+	(*CurrentGame).addToScene(this->trail, LayerType::FakeShipLayer, IndependantType::Neutral);
 	this->fire_key_repeat = false;
 	this->slowmo_key_repeat = false;
 	this->hud_key_repeat = false;
@@ -891,7 +902,15 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	static double shield_regen_buffer = 0;
 	if (shield < ship_config.getShipConfigShield())
 	{
-		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+		if (hyperspeedMultiplier < 1.0f)
+		{
+			shield_regen_buffer += shield_regen * deltaTime.asSeconds() * hyperspeedMultiplier;
+		}
+		else
+		{
+			shield_regen_buffer += shield_regen * deltaTime.asSeconds();
+		}
+		
 		if (shield_regen_buffer > 1)
 		{
 			double intpart;
@@ -957,7 +976,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 
 			//Slow_motion function
-			if (InputGuy::isSlowMotion())
+			if (InputGuy::isSlowMotion() && !disable_fire)
 			{
 				if (!this->slowmo_key_repeat)
 				{
@@ -1271,6 +1290,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		isFocusedOnHud = false;
 	}
+
+	this->trail->visible = (hyperspeedMultiplier > 1.0f);
 
 	Independant::update(deltaTime, hyperspeedMultiplier);
 
