@@ -403,8 +403,6 @@ bool Game::isLastEnemyDead()
 	n += sceneIndependantsTyped[IndependantType::EnemyFire].size();
 	n += sceneIndependantsTyped[IndependantType::EnemyObject].size();
 
-
-
 	if (n == 0)
 	{
 		return true;
@@ -513,6 +511,11 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 				angle = -angle;
 			}
 		}
+	}
+	//if no target found, the default value for enemies is 180 degrees (firing straight ahead)
+	else if (type == PlayerShip)
+	{
+		return 180;
 	}
 
 	return angle;
