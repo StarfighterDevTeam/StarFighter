@@ -80,7 +80,6 @@ void Game::updateScene(Time deltaTime)
 	{
 		(*it)->update(deltaTime, hyperspeedMultiplier);
 	}
-	//isLastEnemyDead();
 }
 
 
@@ -349,8 +348,8 @@ void Game::collectGarbage()
 
 		}
 
-		//Out of scene content
-		if (!(**it).DontGarbageMe)
+		//Content that went on scene and then exited have to be deleted
+		if (!(**it).DontGarbageMe && (**it).isOnScene)
 		{
 			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > SCENE_SIZE_X
 				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > SCENE_SIZE_Y)
@@ -403,6 +402,8 @@ bool Game::isLastEnemyDead()
 	n += sceneIndependantsTyped[IndependantType::LootObject].size();
 	n += sceneIndependantsTyped[IndependantType::EnemyFire].size();
 	n += sceneIndependantsTyped[IndependantType::EnemyObject].size();
+
+
 
 	if (n == 0)
 	{
@@ -510,21 +511,6 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 			if (diff_position.y < 0)
 			{
 				angle = -angle;
-			}
-		}
-	}
-	else
-	{
-		//return default: firing straight ahead
-		switch (type)
-		{
-			case PlayerShip:
-			{
-				return (fmod(180 + Independant::getRotation_for_Direction(this->direction), 360));
-			}
-			case EnemyObject:
-			{
-				return (fmod(Independant::getRotation_for_Direction(this->direction), 360));
 			}
 		}
 	}

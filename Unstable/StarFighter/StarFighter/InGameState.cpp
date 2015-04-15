@@ -65,7 +65,7 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).playerShip->disable_fire = true;
 		(*CurrentGame).playerShip->disabledHyperspeed = true;
 	}
-	//(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
+	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, IndependantType::PlayerShip);

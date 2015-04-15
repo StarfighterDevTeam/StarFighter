@@ -15,7 +15,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	this->generating_boss = false;
 	this->hazard_level = hazard_level;
 	this->m_hazardbreak_has_occurred = false;
-	this->sceneEnemyGenerators->clear();
 
 	int p = 0;
 	int enemy_count = 0;
@@ -161,7 +160,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 							EnemyGenerator* generator = new EnemyGenerator(stof((*it)[SceneDataEnemy::ENEMY_CLASS_SPAWNCOST]), e->enemyclass, 
 								stof((*it)[SceneDataEnemy::ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[SceneDataEnemy::ENEMY_CLASS_MISS_CHANCE]));
 							generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
-							this->sceneEnemyGenerators->push_back(generator);
+							this->sceneEnemyGenerators.push_back(generator);
 						}
 
 						//setting probabilities of spawn within enemy class
@@ -284,8 +283,8 @@ void Scene::DestroyScene()
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
 		enemies_ranked_by_class[i].clear();
-		sceneEnemyGenerators[i].clear();
 	}
+	sceneEnemyGenerators.clear();
 }
 
 void Scene::GenerateBoss()
@@ -300,7 +299,7 @@ void Scene::GenerateBoss()
 
 void Scene::GenerateEnemiesv2(Time deltaTime)
 {
-	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
+	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators.begin(); it != sceneEnemyGenerators.end(); ++it)
 	{
 		//SOURCES OF INCREMENTATION
 		//Time
@@ -350,7 +349,7 @@ void Scene::GenerateEnemiesv2(Time deltaTime)
 
 void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multiplier, int below_enemy_class)
 {
-	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators->begin(); it != sceneEnemyGenerators->end(); ++it)
+	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators.begin(); it != sceneEnemyGenerators.end(); ++it)
 	{
 		if ((*it)->enemyClass < below_enemy_class)
 		{
@@ -378,12 +377,11 @@ void Scene::SpawnEnemy(int enemy_class)
 		if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
 		{
 			enemy = (*it)->enemy->Clone();
-			enemy->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
-			
 			break;
 		}
 	}
 	assert(enemy != NULL);
+	enemy->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
 
 	//RANDOM POSITION
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).direction, enemy->m_size);

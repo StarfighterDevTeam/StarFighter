@@ -366,7 +366,6 @@ ShipConfig::ShipConfig()
 {
 	this->ship_model = new ShipModel(0, 0, 0.0f, 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
 	this->automatic_fire = false;
-	this->fake_ship = NULL;
 
 	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
@@ -713,7 +712,6 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 	if (this->ship_model->hasFake)
 	{
 		FakeShip* fake_ship_ = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-		this->fake_ship = fake_ship_;
 		(*CurrentGame).addToScene(fake_ship_, LayerType::FakeShipLayer, IndependantType::Neutral);
 	}
 
@@ -779,11 +777,6 @@ void Ship::Init()
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
 	this->transparent = this->ship_config.ship_model->hasFake;
-
-	if (this->ship_config.ship_model->hasFake)
-	{
-		this->ship_config.GenerateFakeShip(this);
-	}
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -1277,12 +1270,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else
 	{
 		isFocusedOnHud = false;
-	}
-
-	//Ghost while hyperspeeding
-	if (this->ship_config.ship_model->hasFake)
-	{
-		this->ship_config.fake_ship->setGhost(hyperspeedMultiplier > 1.0f);
 	}
 
 	Independant::update(deltaTime, hyperspeedMultiplier);

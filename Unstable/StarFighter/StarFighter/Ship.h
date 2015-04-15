@@ -150,7 +150,6 @@ public:
 	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true, bool overwrite = false);
 	Equipment* equipment[NBVAL_Equipment];
 	ShipModel* ship_model;
-	FakeShip* fake_ship;
 	Weapon* weapon;
 	vector<Bot*> bot_list;
 	FX* FX_death;

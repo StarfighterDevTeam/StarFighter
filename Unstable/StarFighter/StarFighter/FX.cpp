@@ -96,5 +96,8 @@ void FakeShip::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		this->setAnimationLine(this->target->currentAnimationIndex, true);
 	}
 
+	//Ghost while hyperspeeding
+	//this->setGhost(hyperspeedMultiplier > 1.0f);
+
 	Aura::update(deltaTime, hyperspeedMultiplier);
 }
