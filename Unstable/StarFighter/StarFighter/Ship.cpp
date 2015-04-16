@@ -696,6 +696,7 @@ void ShipConfig::GenerateBots(Independant* m_target)
 		m_bot->automatic_fire = this->automatic_fire;
 		m_bot->spread = Independant::getSize_for_Direction((*CurrentGame).direction, m_bot->spread);
 		m_bot->setTarget(m_target);
+		m_bot->rotate(Independant::getRotation_for_Direction((*CurrentGame).direction));
 		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, IndependantType::Neutral);
 	}
 }
