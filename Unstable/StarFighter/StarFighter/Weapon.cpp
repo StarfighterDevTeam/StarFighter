@@ -67,13 +67,6 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	//calculation of bullet offset respect to the weapon position
 	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
 	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
-	
-
-	//because we don't use fire direction on the X axis, it needs to be changed manually here
-	if (m_collider_type == IndependantType::FriendlyFire)
-	{
-		bullet_offset_x *= -1;
-	}
 
  	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 

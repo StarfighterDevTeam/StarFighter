@@ -96,7 +96,18 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				if (InputGuy::isFiring() || this->automatic_fire)
 				{
-					float theta = this->getRotation() / 180 * M_PI;
+					//calculating the angle we want to face, if any
+					float target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+
+					float current_angle = this->getRotation();
+					float delta = current_angle - target_angle;
+					if (delta > 180)
+						delta -= 360;
+					else if (delta < -180)
+						delta += 360;
+
+					float theta = (this->getRotation() - delta) / 180 * M_PI;
+
 					float x_weapon_offset = this->m_size.y / 2 * sin(theta);
 					float y_weapon_offset = -this->m_size.y / 2 * cos(theta);
 

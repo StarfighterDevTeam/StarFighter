@@ -140,7 +140,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 			else
 			{
-				float theta = this->getRotation() / 180 * M_PI;
+				//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
+				float theta = (this->getRotation() - delta) / 180 * M_PI;
 				float weapon_offset_x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
 				float weapon_offset_y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
@@ -149,7 +150,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				//transmitting the angle to the weapon, which will pass it to the bullets
 				(*it)->shot_angle = theta;
 				(*it)->face_target = this->face_target;
-
 				(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
 			}
 		}
