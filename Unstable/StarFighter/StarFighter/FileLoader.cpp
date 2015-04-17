@@ -90,29 +90,31 @@ EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_ene
 			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
 			((Independant*)base->enemy)->display_name = (*it)[EnemyData::ENEMY_NAME];
 
-			if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
-			{
-				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO])));
-			}
-			if ((*it)[EnemyData::ENEMY_WEAPON_2].compare("0") != 0)
-			{
-				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_2], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_2])));
-			}
-			if ((*it)[EnemyData::ENEMY_WEAPON_3].compare("0") != 0)
-			{
-				base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_3], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_3])));
-			}
-
-			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyData::ENEMY_PATTERN);
-			base->enemy->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
-
-			base->enemy->rotation_speed = stoi((*it)[EnemyData::ENEMY_ROTATION_SPEED]);
-
 			//Loading phases
 			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
 			{
 				base->enemy->hasPhases = true;
 				base->enemy->setPhase((*it)[EnemyData::ENEMY_PHASE]);
+			}
+			else
+			{
+				if ((*it)[EnemyData::ENEMY_WEAPON].compare("0") != 0)
+				{
+					base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO])));
+				}
+				if ((*it)[EnemyData::ENEMY_WEAPON_2].compare("0") != 0)
+				{
+					base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_2], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_2])));
+				}
+				if ((*it)[EnemyData::ENEMY_WEAPON_3].compare("0") != 0)
+				{
+					base->enemy->weapons_list.push_back(FileLoader::LoadWeapon((*it)[EnemyData::ENEMY_WEAPON_3], 1, FileLoader::LoadAmmo((*it)[EnemyData::ENEMY_AMMO_3])));
+				}
+
+				PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyData::ENEMY_PATTERN);
+				base->enemy->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
+
+				base->enemy->rotation_speed = stoi((*it)[EnemyData::ENEMY_ROTATION_SPEED]);
 			}
 
 			return base;
