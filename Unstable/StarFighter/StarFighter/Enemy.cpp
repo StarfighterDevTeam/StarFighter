@@ -130,39 +130,51 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//automatic fire
-	if (this->isOnScene && !this->weapons_list.empty() && !this->disable_fire)
+	if (!this->weapons_list.empty())
 	{
-		for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+		if (this->isOnScene)
 		{
-			if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
+			for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 			{
-				//do nothing
-			}
-			else
-			{
-				//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
-				float theta = (this->getRotation() - delta) / 180 * M_PI;
-				float weapon_offset_x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
-				float weapon_offset_y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+				if (!this->disable_fire)
+				{
+					if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
+					{
+						//even if we don't shoot, the weapon has to keep reloading
+						(*it)->isFiringReady(deltaTime, hyperspeedMultiplier);
+					}
+					else
+					{
+						//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
+						float theta = (this->getRotation() - delta) / 180 * M_PI;
+						float weapon_offset_x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
+						float weapon_offset_y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
-				(*it)->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
+						(*it)->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
 
-				//transmitting the angle to the weapon, which will pass it to the bullets
-				(*it)->shot_angle = theta;
-				(*it)->face_target = this->face_target;
-				(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
+						//transmitting the angle to the weapon, which will pass it to the bullets
+						(*it)->shot_angle = theta;
+						(*it)->face_target = this->face_target;
+						(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
+					}
+				}
+				else
+				{
+					//even if we don't shoot, the weapon has to keep reloading
+					(*it)->isFiringReady(deltaTime, hyperspeedMultiplier);
+				}
 			}
 		}
-
-		//sheld regen if not maximum
-		if (shield < getIndependantShield())
+	}
+	
+	//sheld regen if not maximum
+	if (shield < getIndependantShield())
+	{
+		shield += getIndependantShieldRegen();
+		//canceling over-regen
+		if (shield > getIndependantShield())
 		{
-			shield += getIndependantShieldRegen();
-			//canceling over-regen
-			if (shield > getIndependantShield())
-			{
-				shield = getIndependantShield();
-			}
+			shield = getIndependantShield();
 		}
 	}
 

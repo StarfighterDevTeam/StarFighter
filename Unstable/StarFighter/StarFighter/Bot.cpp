@@ -88,34 +88,41 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//automatic fire
-	if (this->weapon != NULL && !disable_fire)
+	if (this->weapon != NULL && this->target != NULL)
 	{
-		if (this->target != NULL)
+		if (!disable_fire && !target->isUsingPortal && !target->disable_fire)
 		{
-			if (!target->isUsingPortal && !target->disable_fire)
+			if (InputGuy::isFiring() || this->automatic_fire)
 			{
-				if (InputGuy::isFiring() || this->automatic_fire)
-				{
-					//calculating the angle we want to face, if any
-					float target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+				//calculating the angle we want to face, if any
+				float target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
 
-					float current_angle = this->getRotation();
-					float delta = current_angle - target_angle;
-					if (delta > 180)
-						delta -= 360;
-					else if (delta < -180)
-						delta += 360;
+				float current_angle = this->getRotation();
+				float delta = current_angle - target_angle;
+				if (delta > 180)
+					delta -= 360;
+				else if (delta < -180)
+					delta += 360;
 
-					float theta = (this->getRotation() - delta) / 180 * M_PI;
+				float theta = (this->getRotation() - delta) / 180 * M_PI;
 
-					float x_weapon_offset = this->m_size.y / 2 * sin(theta);
-					float y_weapon_offset = -this->m_size.y / 2 * cos(theta);
+				float x_weapon_offset = this->m_size.y / 2 * sin(theta);
+				float y_weapon_offset = -this->m_size.y / 2 * cos(theta);
 
-					this->weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
-					this->weapon->shot_angle = theta;
-					this->weapon->Fire(IndependantType::FriendlyFire, deltaTime);
-				}
+				this->weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
+				this->weapon->shot_angle = theta;
+				this->weapon->Fire(IndependantType::FriendlyFire, deltaTime);
 			}
+			else
+			{
+				//even if we don't shoot, the weapon has to keep reloading
+				this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
+			}
+		}
+		else
+		{
+			//even if we don't shoot, the weapon has to keep reloading
+			this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
 		}
 	}
 

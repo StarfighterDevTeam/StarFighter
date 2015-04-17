@@ -1051,11 +1051,11 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 			}
 			//Fire function
-			if (!disable_fire && !isUsingPortal && !isHyperspeeding)
+			if (this->ship_config.weapon != NULL)
 			{
-				if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
+				if (!disable_fire && !isUsingPortal && !isHyperspeeding)
 				{
-					if (this->ship_config.weapon != NULL)
+					if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 					{
 						//calculating the angle we want to face, if any
 						float target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
@@ -1093,13 +1093,19 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						}
 						this->isBraking = true;
 					}
+					else
+					{
+						//even if we don't shoot, the weapon has to keep reloading
+						ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
+					}
+				}
+				else
+				{
+					//even if we don't shoot, the weapon has to keep reloading
+					ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
 				}
 			}
-			else
-			{
-				//even if we don't shoot, the weapon has to keep reloading
-				ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
-			}
+			
 				
 			isCollindingWithPortal = false;
 
