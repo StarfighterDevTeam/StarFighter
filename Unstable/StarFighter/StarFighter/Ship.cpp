@@ -1095,6 +1095,12 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					}
 				}
 			}
+			else
+			{
+				//even if we don't shoot, the weapon has to keep reloading
+				ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
+			}
+				
 			isCollindingWithPortal = false;
 
 			//Braking function
