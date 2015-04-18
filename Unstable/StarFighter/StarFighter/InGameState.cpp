@@ -6,11 +6,24 @@ void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
-	LoadPlayerSave(player.m_save_file);//update knownScenes and hazard levels from save file
+	
+	//Load knownScenes, hazard levels and current scene from save file
+	if (!LoadPlayerSave(player.m_save_file).empty())
+	{
+		player.m_currentSceneFile = LoadPlayerSave(player.m_save_file);
+		this->currentSceneSave = player.m_currentSceneFile;
+	}
+	else
+	{
+		//New game save
+		player.m_currentSceneFile = "Vanguard_Hub0";
+		this->currentSceneSave = player.m_currentSceneFile;
+		AddToKnownScenes(player.m_currentSceneFile);
+		SavePlayer(PLAYER_SAVE_FILE);
+	}
 	
 	//Loading current scene
-	this->currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevel(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
-	AddToKnownScenes(this->currentScene->m_name);
+	this->currentScene = new Scene(this->currentSceneSave, GetSceneHazardLevel(this->currentSceneSave), player.reverse_scene, true);//first_scene = true
 
 	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -147,6 +160,7 @@ void InGameState::Release()
 
 bool InGameState::AddToKnownScenes(string scene_name)
 {
+	this->currentSceneSave = scene_name;
 	map<string, int>::iterator it = this->knownScenes.find(scene_name);
 
 	//if scene not already known
@@ -192,7 +206,12 @@ int InGameState::SavePlayer(string file)
 		// instructions
 		for (map<string, int>::iterator it = this->knownScenes.begin(); it != this->knownScenes.end(); it++)
 		{
-			data << it->first.c_str() << " " << it->second << endl;
+			data << it->first.c_str() << " " << it->second;
+			if (it->first.c_str() == this->currentSceneSave)
+			{
+				data << " " << "!";
+			}
+			data << endl;
 		}
 
 		data.close();  // on ferme le fichier
@@ -205,8 +224,10 @@ int InGameState::SavePlayer(string file)
 	return 0;
 }
 
-int InGameState::LoadPlayerSave(string file)
+string InGameState::LoadPlayerSave(string file)
 {
+	string return_current_scene;
+
 	std::ifstream  data(file, ios::in);
 
 	if (data) // si ouverture du fichier réussie
@@ -217,11 +238,18 @@ int InGameState::LoadPlayerSave(string file)
 			string scene;
 			int level;
 			std::istringstream(line) >> scene >> level;
+			string current_scene;
+				
+			std::istringstream(line) >> scene >> level >> current_scene;
 			if (level > NB_HAZARD_LEVELS - 1)
 			{
 				level = NB_HAZARD_LEVELS - 1;
 			}
 			this->knownScenes.insert(std::pair<string, int>(scene, level));
+			if (current_scene.compare("!") == 0)
+			{
+				return_current_scene = scene;
+			}
 		}
 
 		data.close();  // on ferme le fichier
@@ -231,7 +259,7 @@ int InGameState::LoadPlayerSave(string file)
 		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
 	}
 
-	return 0;
+	return return_current_scene;
 }
 
 void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
@@ -343,7 +371,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
 					this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
 					this->nextScene->bg->speed = sf::Vector2f(0, 0);
-					AddToKnownScenes(nextScene_filename);
 
 					//Putting the player on rails
 					(*CurrentGame).playerShip->disable_inputs = true;
@@ -452,9 +479,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				this->nextScene = NULL;
 				(*CurrentGame).direction = this->currentScene->direction;
 
-				//and save the map into the player save file
+				//Save scenes
 				AddToKnownScenes(this->currentScene->m_name);
-				this->SavePlayer(PLAYER_SAVE_FILE);
+				if (this->currentScene->direction == Directions::NO_DIRECTION)
+				{
+					this->SavePlayer(PLAYER_SAVE_FILE);
+				}
 
 				//Giving control back to the player
 				(*CurrentGame).playerShip->disable_inputs = false;
@@ -480,8 +510,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).direction = (*CurrentGame).playerShip->targetPortal->direction;
 				this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
 				this->nextScene->bg->speed = sf::Vector2f(0, 0);
-
-				AddToKnownScenes(nextScene_filename);
 
 				//Putting the player on rails
 				(*CurrentGame).playerShip->disable_inputs = true;
