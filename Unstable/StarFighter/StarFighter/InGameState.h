@@ -14,6 +14,7 @@ public:
 	Scene* currentScene;
 	Scene* nextScene;
 	map<string, int> knownScenes;
+	string currentSceneSave;
 
 	InGameStateMachine IG_State;
 
@@ -22,7 +23,7 @@ public:
 	void Draw();
 	void Release();
 	int SavePlayer(string file);
-	int LoadPlayerSave(string file);
+	string LoadPlayerSave(string file);
 	bool AddToKnownScenes(string scene_name);
 	void SetSceneHazardLevel(string scene_name, int hazard_level);
 	int GetSceneHazardLevel(string scene_name);

@@ -1,5 +1,5 @@
 #,filename,width,height,vspeed,Vertical/Horizontal,
-bg,Assets/2D/Backgrounds/BGHorizontal_2.png,5400,1080,15,H,
+bg,Assets/2D/Backgrounds/BGHorizontal_2.png,5400,1080,50,H,
 #,enemies_name,proba,enemy_class,spawnCost,repeatChance,missChance
 enemy,V_Alpha1,3,1,1.5f,0.10f,0.30f
 enemy,V_Alpha2,1,1,,,
