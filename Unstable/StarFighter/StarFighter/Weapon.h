@@ -56,6 +56,7 @@ public:
 	float angle_offset;
 	float target_seaking_angle;
 	sf::Vector2f weaponOffset;
+	sf::Vector2f weapon_current_offset;
 	float shot_angle;
 	bool face_target;
 	

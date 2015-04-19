@@ -150,16 +150,19 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 						if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
 						{
-							theta = this->getRotation() / 180 * M_PI;
+							//semi-seaking and rafale not ended = no update of target or weapon position
+						}
+						else
+						{
+							(*it)->weapon_current_offset.x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
+							(*it)->weapon_current_offset.y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+							(*it)->shot_angle = theta;
 						}
 
-						float weapon_offset_x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
-						float weapon_offset_y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
-
-						(*it)->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
+						(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
 
 						//transmitting the angle to the weapon, which will pass it to the bullets
-						(*it)->shot_angle = theta;
+						
 						(*it)->face_target = this->face_target;
 						(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
 					}
