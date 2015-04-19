@@ -5,7 +5,10 @@ EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass, float m_spaw
 	this->spawnCost = m_spawnCost;
 	this->enemyClass = m_enemyClass;
 
-	assert(m_spawnRepeatProbability + m_spawnMissProbability <= 1);
+	if (m_spawnRepeatProbability + m_spawnMissProbability > 1)
+	{
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error in scene config file: repeat probability + miss probability should always be <= 1");
+	}
 	this->spawnRepeatProbability = m_spawnRepeatProbability;
 	this->spawnMissProbability = m_spawnMissProbability;
 

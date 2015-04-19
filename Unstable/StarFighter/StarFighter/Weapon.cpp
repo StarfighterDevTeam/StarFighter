@@ -16,8 +16,8 @@ Weapon::Weapon(Ammo* Ammunition)
 	rafale_cooldown = 0.8f;
 	rafale = 0;
 	rafale_index = 0;
-	target_seaking = TargetSeaking::NO_SEAKING;
-	shot_mode = ShotMode::NoShotMode;
+	target_seaking = NO_SEAKING;
+	shot_mode = NoShotMode;
 	angle_offset = 0;
 	target_seaking_angle = 0;
 	weaponOffset = sf::Vector2f(0, 0);
@@ -37,21 +37,21 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	Ammo* bullet = this->ammunition->Clone();
 
 	//if target seaking (closest enemy)
-	if (target_seaking != TargetSeaking::NO_SEAKING)
+	if (target_seaking != NO_SEAKING)
 	{
-		if (rafale > 0 && rafale_index > 0 && target_seaking == TargetSeaking::SEMI_SEAKING)
+		if (rafale > 0 && rafale_index > 0 && target_seaking == SEMI_SEAKING)
 		{
 			//do nothing
 		}
 		else
 		{
-			if (m_collider_type == IndependantType::FriendlyFire)
+			if (m_collider_type == FriendlyFire)
 			{
-				target_seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition(), bullet->range);
+				target_seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(EnemyObject, this->getPosition(), bullet->range);
 			}
-			else if (m_collider_type == IndependantType::EnemyFire)
+			else if (m_collider_type == EnemyFire)
 			{
-				target_seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition(), bullet->range);
+				target_seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(PlayerShip, this->getPosition(), bullet->range);
 				target_seaking_angle += 180;
 			}
 		}
@@ -81,13 +81,13 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->visible = true;
 	bullet->collider_type = m_collider_type;
 	bullet->isOnScene = true;
-	if (m_collider_type == IndependantType::FriendlyFire)
+	if (m_collider_type == FriendlyFire)
 	{
-		(*CurrentGame).addToScene(bullet, LayerType::FriendlyFireLayer, m_collider_type);
+		(*CurrentGame).addToScene(bullet, FriendlyFireLayer, m_collider_type);
 	}
 	else
 	{
-		(*CurrentGame).addToScene(bullet, LayerType::EnemyFireLayer, m_collider_type);
+		(*CurrentGame).addToScene(bullet, EnemyFireLayer, m_collider_type);
 	}
 
 }
@@ -103,32 +103,25 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 		this->readyFireTimer += deltaTime;
 	}
 
-	if (rafale > 0 && readyFireTimer > sf::seconds(rafale_cooldown))//if you wait long enough, you can reset your rafale
+	bool rafale_ended = true;
+	if (rafale > 0)
 	{
-		firing_ready = true;
+		rafale_ended = false;
+	}
+	if (rafale > 0 && rafale_index > rafale - 1 && readyFireTimer > sf::seconds(rafale_cooldown))//if you wait long enough, you can reset your rafale
+	{
 		rafale_index = 0;
 		shot_index = 0;
+		rafale_ended = true;
 	}
 
-	if (rafale > 0 && rafale_index > rafale - 1)
+	if (readyFireTimer > sf::seconds(rate_of_fire) && rafale_ended)
 	{
-		if (readyFireTimer > sf::seconds(rafale_cooldown))
-		{
-			firing_ready = true;
-			rafale_index = 0;
-		}
+		firing_ready = true;
 	}
-	else
+	else if (rafale > 0)
 	{
-		if (this->shot_mode != ShotMode::NoShotMode && multishot > 1)
-		{
-			if (readyFireTimer > sf::seconds(rate_of_fire / multishot))
-			{
-				firing_ready = true;
-			}
-		}
-
-		else if (readyFireTimer > sf::seconds(rate_of_fire))
+		if (readyFireTimer > sf::seconds(rate_of_fire) && rafale_index <= rafale - 1)
 		{
 			firing_ready = true;
 		}

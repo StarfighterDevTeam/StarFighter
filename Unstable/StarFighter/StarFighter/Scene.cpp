@@ -146,7 +146,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					//Loading enemies
 					else if ((*it)[0].compare("enemy") == 0)
 					{
-						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY].c_str()), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
+						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
 						
 						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
 						if (!e->enemy->hasPhases)

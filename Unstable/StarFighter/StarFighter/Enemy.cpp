@@ -95,7 +95,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		//if one of the weapon is semi-seaking and the enemy has to face the target, then it cannot rotate until he's done firing
 		for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 		{
-			if ((*it)->target_seaking == TargetSeaking::SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+			if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
 			{
 				isDoneFiringOnLockedTarget = false;
 			}
@@ -147,6 +147,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					{
 						//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
 						float theta = (this->getRotation() - delta) / 180 * M_PI;
+
+						if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+						{
+							theta = this->getRotation() / 180 * M_PI;
+						}
+
 						float weapon_offset_x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
 						float weapon_offset_y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
