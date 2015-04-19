@@ -104,6 +104,7 @@ enum IndependantType {
 	PortalObject,
 	LootObject,
 	PlayerShip,
+	FakePlayerShip,
 	FriendlyFire,
 	Neutral,
 	EnemyFire,

@@ -713,7 +713,7 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 	if (this->ship_model->hasFake)
 	{
 		FakeShip* fake_ship_ = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-		(*CurrentGame).addToScene(fake_ship_, LayerType::FakeShipLayer, IndependantType::Neutral);
+		(*CurrentGame).addToScene(fake_ship_, LayerType::FakeShipLayer, IndependantType::FakePlayerShip);
 	}
 
 	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)

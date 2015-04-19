@@ -302,6 +302,25 @@ void Game::colisionChecksV2()
 			}
 		}
 	}
+
+	//First, Checks if the ship has been touched by an enemy/enemy bullet
+	for (std::list<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::FakePlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::FakePlayerShip].end(); it1++)
+	{
+		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
+		{
+			i++;
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something (like, take the loot)
+				if ((*it1)->GetLoot((*(*it2))))
+				{
+					(*it2)->visible = false;
+					(*it2)->isOnScene = false;
+					(*it2)->GarbageMe = true;
+				}
+			}
+		}
+	}
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
