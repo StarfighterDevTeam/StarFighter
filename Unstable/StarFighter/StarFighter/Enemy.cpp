@@ -21,7 +21,15 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	static double shield_regen_buffer = 0;
 	if (shield < shield_max)
 	{
-		shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+		if (hyperspeedMultiplier < 1.0f)
+		{
+			shield_regen_buffer += shield_regen*deltaTime.asSeconds() * hyperspeedMultiplier;
+		}
+		else
+		{
+			shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+		}
+		
 		if (shield_regen_buffer > 1)
 		{
 			double intpart;
@@ -58,8 +66,17 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 	//call bobbyPattern
-	offset = Pattern.GetOffset(deltaTime.asSeconds());
+	if (hyperspeedMultiplier < 1.0f)
+	{
+		offset = Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
+	}
+	else
+	{
+		offset = Pattern.GetOffset(deltaTime.asSeconds());
+	}
+	
 	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+
 	newposition.x += offset.x;
 	newposition.y += offset.y;
 
@@ -139,34 +156,46 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 			{
+
 				if (!this->disable_fire)
 				{
-					if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
+					if (this->phaseClock.getElapsedTime().asSeconds() < (*it)->delay)
 					{
-						//even if we don't shoot, the weapon has to keep reloading
-						(*it)->isFiringReady(deltaTime, hyperspeedMultiplier);
+						//do nothing: this weapon is settled to start firing later (delay)
 					}
 					else
 					{
-						//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
-						float theta = (this->getRotation() - delta) / 180 * M_PI;
-
-						if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+						if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 						{
-							//semi-seaking and rafale not ended = no update of target or weapon position
+							//even if we don't shoot, the weapon has to keep reloading
+							(*it)->isFiringReady(deltaTime, hyperspeedMultiplier);
 						}
 						else
 						{
-							(*it)->weapon_current_offset.x = (*it)->weaponOffset.x - this->m_size.x / 2 * sin(theta);
-							(*it)->weapon_current_offset.y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+							if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+							{
+								//semi-seaking and rafale not ended = no update of target or weapon position
+							}
+							else
+							{
+								//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
+								float theta = this->getRotation() / 180 * M_PI;
+								if ((*it)->target_seaking != NO_SEAKING)
+								{
+									theta -= delta / 180 * M_PI;
+								}
 
-							//transmitting the angle to the weapon, which will pass it to the bullets
-							(*it)->shot_angle = theta;
+								(*it)->weapon_current_offset.x = (*it)->weaponOffset.x - this->m_size.x / 2 * sin(theta);
+								(*it)->weapon_current_offset.y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+
+								//transmitting the angle to the weapon, which will pass it to the bullets
+								(*it)->shot_angle = theta;
+							}
+
+							(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
+							(*it)->face_target = this->face_target;
+							(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
 						}
-
-						(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
-						(*it)->face_target = this->face_target;
-						(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
 					}
 				}
 				else
@@ -527,21 +556,24 @@ Phase* Enemy::LoadPhase(string name)
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO]));
-				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET]);
+				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET].c_str());
+				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY].c_str());
 				phase->weapons_list.push_back(m_weapon);
 			}
 
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2]));
-				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_2]);
+				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_2].c_str());
+				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY_2].c_str());
 				phase->weapons_list.push_back(m_weapon);
 			}
 
 			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
 			{
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3]));
-				m_weapon->weaponOffset.x = stoi((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_3]);
+				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_3].c_str());
+				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY_3].c_str());
 				phase->weapons_list.push_back(m_weapon);
 			}
 
@@ -989,11 +1021,11 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
 				{
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
-						weapon->shot_mode = ShotMode::AlternateShotMode;
+						weapon->shot_mode = AlternateShotMode;
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending") == 0)
-						weapon->shot_mode = ShotMode::AscendingShotMode;
+						weapon->shot_mode = AscendingShotMode;
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
-						weapon->shot_mode = ShotMode::DescendingShotMode;
+						weapon->shot_mode = DescendingShotMode;
 				}
 			}
 
@@ -1012,11 +1044,11 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("0") != 0)
 			{
 				if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
-					weapon->target_seaking = TargetSeaking::SEMI_SEAKING;
+					weapon->target_seaking = SEMI_SEAKING;
 				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("seaking") == 0)
-					weapon->target_seaking = TargetSeaking::SEAKING;
+					weapon->target_seaking = SEAKING;
 				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("super_seaking") == 0)
-					weapon->target_seaking = TargetSeaking::SUPER_SEAKING;
+					weapon->target_seaking = SUPER_SEAKING;
 			}
 
 			return weapon;

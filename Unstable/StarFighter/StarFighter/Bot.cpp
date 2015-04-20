@@ -60,7 +60,15 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 	
 	//call bobbyPattern
-	offset = Pattern.GetOffset(deltaTime.asSeconds(), true);
+	if (hyperspeedMultiplier < 1.0f)
+	{
+		offset = Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier, true);
+	}
+	else
+	{
+		offset = Pattern.GetOffset(deltaTime.asSeconds(), true);
+	}
+	
 	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
 	newposition.x += offset.x;
 	newposition.y += offset.y;
@@ -120,7 +128,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 
 				this->weapon->setPosition(this->getPosition().x + this->weapon->weapon_current_offset.x, this->getPosition().y + this->weapon->weapon_current_offset.y);
-				this->weapon->Fire(IndependantType::FriendlyFire, deltaTime);
+				this->weapon->Fire(IndependantType::FriendlyFire, deltaTime, hyperspeedMultiplier);
 			}
 			else
 			{

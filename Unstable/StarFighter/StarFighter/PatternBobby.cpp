@@ -19,7 +19,7 @@ PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
 		if (line_data[index].compare("line") == 0)
 		{
 			pattern_type = PatternType::Line_;
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2])); // opposite speed (-1), random (0), normal (1)
+			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2])); // opposite sign of speed (-1), random sign (0), normal (1)
 		}
 		else if (line_data[index].compare("circle") == 0)
 		{

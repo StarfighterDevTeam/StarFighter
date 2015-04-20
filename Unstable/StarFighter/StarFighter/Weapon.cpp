@@ -19,6 +19,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	target_seaking = NO_SEAKING;
 	shot_mode = NoShotMode;
 	angle_offset = 0;
+	delay = 0.f;
 	target_seaking_angle = 0;
 	weaponOffset = sf::Vector2f(0, 0);
 	face_target = false;
@@ -357,6 +358,7 @@ Weapon* Weapon::Clone()
 	weapon->rafale_cooldown = this->rafale_cooldown;
 	weapon->target_seaking = this->target_seaking;
 	weapon->angle_offset = this->angle_offset;
+	weapon->delay = this->delay;
 	weapon->weaponOffset = this->weaponOffset;
 
 	weapon->frameNumber = this->frameNumber;
