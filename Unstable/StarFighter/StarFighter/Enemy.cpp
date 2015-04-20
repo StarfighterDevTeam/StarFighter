@@ -154,15 +154,14 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						}
 						else
 						{
-							(*it)->weapon_current_offset.x = (*it)->weaponOffset.x - this->m_size.y / 2 * sin(theta);
+							(*it)->weapon_current_offset.x = (*it)->weaponOffset.x - this->m_size.x / 2 * sin(theta);
 							(*it)->weapon_current_offset.y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+
+							//transmitting the angle to the weapon, which will pass it to the bullets
 							(*it)->shot_angle = theta;
 						}
 
 						(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
-
-						//transmitting the angle to the weapon, which will pass it to the bullets
-						
 						(*it)->face_target = this->face_target;
 						(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
 					}

@@ -3,7 +3,7 @@ laser,Laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.
 laser_fast,Laser fast,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,7,0,120,alternate,0,seaking
 laser_360,Laser 360°,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
 laser_player,Laser player,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
-laser_bot,Default laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,0,0,3,26,0,0,0,seaking
+laser_bot,Default laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,1,1.5f,5,0,60,ascending,0,semi_seaking
 laser_default,Laser default,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2,0,2.f,3,10,0,alternate,0,0
 laser_arc,Laser arc,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,seaking
 fireball_sinus,Fireball sinus,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_seaking

@@ -58,17 +58,17 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	}
 
 	//calculating the angle of the shot, which will determine how to offset the position of the bullet respect to the weapon position
-	bullet->shot_angle = this->shot_angle - (this->angle_offset / 180 * M_PI);
-	if (!this->face_target)
-	{
-		bullet->shot_angle = this->shot_angle - ((this->angle_offset + this->target_seaking_angle) / 180 * M_PI);
-	}
+	bullet->shot_angle = this->shot_angle - ((this->angle_offset + this->target_seaking_angle) / 180 * M_PI);
+
+	//printf("this angle: %f\n", this->shot_angle);
 
 	//calculation of bullet offset respect to the weapon position
 	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
 	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
 
- 	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
+	//because we don't use fire direction on the X axis, it needs to be changed manually here
+
+ 	bullet->setPosition(this->getPosition().x - bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
 	bullet->speed = this->AngleShot(this->angle + dispersion + angle_offset + target_seaking_angle, bullet->ref_speed);
 	bullet->speed.x = bullet->speed.x * - this->fire_direction.y;
@@ -81,6 +81,7 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->visible = true;
 	bullet->collider_type = m_collider_type;
 	bullet->isOnScene = true;
+	
 	if (m_collider_type == FriendlyFire)
 	{
 		(*CurrentGame).addToScene(bullet, FriendlyFireLayer, m_collider_type);
@@ -89,7 +90,6 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	{
 		(*CurrentGame).addToScene(bullet, EnemyFireLayer, m_collider_type);
 	}
-
 }
 
 bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)

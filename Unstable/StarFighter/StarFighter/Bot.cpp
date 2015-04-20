@@ -106,11 +106,20 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 				float theta = (this->getRotation() - delta) / 180 * M_PI;
 
-				float x_weapon_offset = this->m_size.y / 2 * sin(theta);
-				float y_weapon_offset = -this->m_size.y / 2 * cos(theta);
+				if (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index > 0 && this->weapon->rafale_index < this->weapon->rafale)
+				{
+					//semi-seaking and rafale not ended = no update of target or weapon position
+				}
+				else
+				{
+					this->weapon->weapon_current_offset.x = this->weapon->weaponOffset.x + this->m_size.x / 2 * sin(theta);
+					this->weapon->weapon_current_offset.y = this->weapon->weaponOffset.y - this->m_size.y / 2 * cos(theta);
 
-				this->weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
-				this->weapon->shot_angle = theta;
+					//transmitting the angle to the weapon, which will pass it to the bullets
+					this->weapon->shot_angle = theta;
+				}
+
+				this->weapon->setPosition(this->getPosition().x + this->weapon->weapon_current_offset.x, this->getPosition().y + this->weapon->weapon_current_offset.y);
 				this->weapon->Fire(IndependantType::FriendlyFire, deltaTime);
 			}
 			else

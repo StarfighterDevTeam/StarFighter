@@ -1069,20 +1069,34 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 						float theta = (this->getRotation() - delta) / 180 * M_PI;
 
+						float sizeX = this->m_size.x;
 						float sizeY = this->m_size.y;
 						if (this->ship_config.ship_model->hasFake)
 						{
+							if (this->ship_config.ship_model->fake_size.x > sizeX)
+							{
+								sizeX = this->ship_config.ship_model->fake_size.x;
+							}
 							if (this->ship_config.ship_model->fake_size.y > sizeY)
 							{
 								sizeY = this->ship_config.ship_model->fake_size.y;
 							}
 						}
 
-						float x_weapon_offset = sizeY / 2 * sin(theta);
-						float y_weapon_offset = -sizeY / 2 * cos(theta);
+						if (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index > 0 && ship_config.weapon->rafale_index < ship_config.weapon->rafale)
+						{
+							//semi-seaking and rafale not ended = no update of target or weapon position
+						}
+						else
+						{
+							ship_config.weapon->weapon_current_offset.x = ship_config.weapon->weaponOffset.x + sizeX / 2 * sin(theta);
+							ship_config.weapon->weapon_current_offset.y = ship_config.weapon->weaponOffset.y - sizeY / 2 * cos(theta);
 
-						ship_config.weapon->setPosition(this->getPosition().x + x_weapon_offset, this->getPosition().y + y_weapon_offset);
-						ship_config.weapon->shot_angle = theta;
+							//transmitting the angle to the weapon, which will pass it to the bullets
+							ship_config.weapon->shot_angle = theta;
+						}
+
+						ship_config.weapon->setPosition(this->getPosition().x + ship_config.weapon->weapon_current_offset.x, this->getPosition().y + ship_config.weapon->weapon_current_offset.y);
 						ship_config.weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
 
 						//speed malus when shooting
