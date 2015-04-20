@@ -275,15 +275,18 @@ void Weapon::FireAscendingShot(IndependantType m_collider_type)
 		//left and center bullets (from left to right)
 		if (shot_index < (multishot / 2))
 		{
-			CreateBullet(m_collider_type, (-((multishot / 2) + shot_index)*xspread) + (xspread / 2), -((multishot / 2) + shot_index + (xspread / 2))*(dispersion / (multishot - 1)));
+			CreateBullet(m_collider_type, (-((multishot / 2) + shot_index)*xspread) + (xspread / 2), -((multishot / 2) - shot_index + (xspread / 2))*(dispersion / (multishot - 1)));
+			printf("dispersion : %f\n", -((multishot / 2) + shot_index + (xspread / 2))*(dispersion / (multishot - 1)));
 		}
 		//right
 		else
 		{
 			CreateBullet(m_collider_type, (shot_index - (multishot / 2))*xspread + (xspread / 2), (shot_index - (multishot / 2) + (xspread / 2))*(dispersion / (multishot - 1)));
+			printf("dispersion : %f\n", (shot_index - (multishot / 2) + (xspread / 2))*(dispersion / (multishot - 1)));
 		}
 	}
 
+	
 	if (shot_index < multishot - 1)
 		shot_index++;
 	else
