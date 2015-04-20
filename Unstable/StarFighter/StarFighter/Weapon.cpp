@@ -60,8 +60,6 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	//calculating the angle of the shot, which will determine how to offset the position of the bullet respect to the weapon position
 	bullet->shot_angle = this->shot_angle - ((this->angle_offset + this->target_seaking_angle) / 180 * M_PI);
 
-	//printf("this angle: %f\n", this->shot_angle);
-
 	//calculation of bullet offset respect to the weapon position
 	float bullet_offset_x = offsetX * cos(this->shot_angle) + this->ammunition->m_size.y / 2 * sin(this->shot_angle);
 	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);

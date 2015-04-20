@@ -93,14 +93,17 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else
 	{
 		//if one of the weapon is semi-seaking and the enemy has to face the target, then it cannot rotate until he's done firing
-		for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+		if (this->face_target)
 		{
-			if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+			for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 			{
-				isDoneFiringOnLockedTarget = false;
+				if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+				{
+					isDoneFiringOnLockedTarget = false;
+				}
 			}
 		}
-
+		
 		if (isDoneFiringOnLockedTarget)
 		{
 			//now let's rotate toward the target (the player)
