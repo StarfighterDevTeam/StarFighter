@@ -50,8 +50,8 @@ public:
 	Phase* currentPhase;
 	bool hasPhases;
 	bool CheckCondition();
-	sf::Clock phaseClock;
-	sf::Clock enemyClock;
+	sf::Time phaseTimer;
+	sf::Time enemyTimer;
 	Phase* LoadPhase(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);

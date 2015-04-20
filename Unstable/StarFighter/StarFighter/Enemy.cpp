@@ -13,10 +13,22 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	rotation_speed = 0;
 	face_target = false;
 	reset_facing = false;
+	enemyTimer = sf::seconds(0);
 }
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	if (hyperspeedMultiplier < 1.0f)
+	{
+		phaseTimer += deltaTime * hyperspeedMultiplier;;
+		enemyTimer += deltaTime * hyperspeedMultiplier;;
+	}
+	else
+	{
+		phaseTimer += deltaTime;
+		enemyTimer += deltaTime;
+	}
+
 	//shield regen if not maximum
 	static double shield_regen_buffer = 0;
 	if (shield < shield_max)
@@ -159,7 +171,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 				if (!this->disable_fire)
 				{
-					if (this->phaseClock.getElapsedTime().asSeconds() < (*it)->delay)
+					if (this->phaseTimer.asSeconds() < (*it)->delay)
 					{
 						//do nothing: this weapon is settled to start firing later (delay)
 					}
@@ -302,12 +314,12 @@ bool Enemy::CheckCondition()
 		
 			case ConditionType::phaseClock:
 			{
-				if ((this->phaseClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+				if ((this->phaseTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 				{
 					this->setPhase((*it)->nextPhase_name);
 					return true;
 				}
-				else if ((this->phaseClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+				else if ((this->phaseTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
 				{
 					this->setPhase((*it)->nextPhase_name);
 					return true;
@@ -318,16 +330,16 @@ bool Enemy::CheckCondition()
 		
 			case ConditionType::enemyClock:
 			{
-				if ((this->enemyClock.getElapsedTime() > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+				if ((this->enemyTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 				{
 					this->setPhase((*it)->nextPhase_name);
-					this->enemyClock.restart();
+					this->enemyTimer = sf::seconds(0);
 					return true;
 				}
-				else if ((this->enemyClock.getElapsedTime() < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+				else if ((this->enemyTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
 				{
 					this->setPhase((*it)->nextPhase_name);
-					this->enemyClock.restart();
+					this->enemyTimer = sf::seconds(0);
 					return true;
 				}
 										   
@@ -441,7 +453,7 @@ bool Enemy::CheckCondition()
 void Enemy::setPhase(Phase* m_phase)
 {
 	this->currentPhase = m_phase;
-	this->phaseClock.restart();
+	this->phaseTimer = sf::seconds(0);
 
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, m_phase->vspeed);
 
