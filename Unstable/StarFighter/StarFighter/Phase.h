@@ -69,6 +69,7 @@ enum Modifier
 	Death,//suicide
 	FaceTarget,//rotate to always face player
 	ResetFacing,//rotate to always face player
+	Bouncing,//bounces on scene borders
 };
 
 //forward declaration

@@ -13,6 +13,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	rotation_speed = 0;
 	face_target = false;
 	reset_facing = false;
+	bouncing = false;
 	enemyTimer = sf::seconds(0);
 }
 
@@ -93,6 +94,32 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	newposition.y += offset.y;
 
 	this->setPosition(newposition.x, newposition.y);
+	
+	if (this->bouncing)
+	{
+		if (newposition.x < this->m_size.x / 2 || newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
+		{
+			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			{
+				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+			}
+			else
+			{
+				this->speed.x *= -1;
+			}
+		}
+		if (newposition.y < this->m_size.y / 2 || newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
+		{
+			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			{
+				this->speed.y *= -1;
+			}
+			else
+			{
+				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+			}
+		}
+	}
 
 	//rotation
 	//calculating the angle we want to face, if any
@@ -461,6 +488,7 @@ void Enemy::setPhase(Phase* m_phase)
 	this->immune = false;
 	this->setGhost(false);
 	this->face_target = false;
+	this->bouncing = false;
 
 	//load new stats
 	switch (m_phase->modifier)
@@ -493,6 +521,11 @@ void Enemy::setPhase(Phase* m_phase)
 		case Modifier::ResetFacing:
 		{
 			this->reset_facing = true;
+			break;
+		}
+		case Modifier::Bouncing:
+		{
+			this->bouncing = true;
 			break;
 		}
 	}
@@ -619,6 +652,10 @@ Phase* Enemy::LoadPhase(string name)
 				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("reset_facing") == 0)
 				{
 					phase->modifier = Modifier::ResetFacing;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("bouncing") == 0)
+				{
+					phase->modifier = Modifier::Bouncing;
 				}
 			}
 
