@@ -12,8 +12,6 @@
 #include <math.h>
 #include "Hud.h"
 
-#define LOOT_SPEED_Y		100.f
-
 class Ship;
 
 using namespace sf;

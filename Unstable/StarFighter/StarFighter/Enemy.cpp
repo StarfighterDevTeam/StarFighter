@@ -635,13 +635,7 @@ Phase* Enemy::LoadPhase(string name)
 				phase->wake_up_name = (*it)[EnemyPhaseData::PHASE_WAKEUP];
 				phase->hasWakeUp = true;
 			}
-			
-			//loading transitions to next phase
-			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
-			{
-				phase->hasTransition = true;
-				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
-			}
+
 			//loading transition to next phase
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
 			{
