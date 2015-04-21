@@ -72,7 +72,14 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newspeed.y = this->speed.y * hyperspeedMultiplier;
 	}
 
-	this->setGhost(hyperspeedMultiplier > 1.0f);
+	if (this->currentPhase->modifier == Ghost)
+	{
+		this->setGhost(true);
+	}
+	else
+	{
+		this->setGhost(hyperspeedMultiplier > 1.0f);
+	}
 	this->disable_fire = hyperspeedMultiplier > 1.0f;
 
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -92,12 +99,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	newposition.x += offset.x;
 	newposition.y += offset.y;
-
-	this->setPosition(newposition.x, newposition.y);
 	
+	this->setPosition(newposition.x, newposition.y);
+
 	if (this->bouncing)
 	{
-		if (newposition.x < this->m_size.x / 2 || newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
+		if (newposition.x < this->m_size.x / 2)// || newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
 		{
 			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
 			{
@@ -107,8 +114,23 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				this->speed.x *= -1;
 			}
+			this->setPosition(this->m_size.x / 2, newposition.y);
 		}
-		if (newposition.y < this->m_size.y / 2 || newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
+
+		else if (newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
+		{
+			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			{
+				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+			}
+			else
+			{
+				this->speed.x *= -1;
+			}
+			this->setPosition(SCENE_SIZE_X - this->m_size.x / 2, newposition.y);
+		}
+
+		else if (newposition.y < this->m_size.y / 2)
 		{
 			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
 			{
@@ -118,6 +140,20 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				this->currentPhase->Pattern->patternParams->at(0) *= -1;
 			}
+			this->setPosition(newposition.x, this->m_size.y / 2);
+		}
+
+		else if (newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
+		{
+			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			{
+				this->speed.y *= -1;
+			}
+			else
+			{
+				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+			}
+			this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 		}
 	}
 
