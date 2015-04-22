@@ -65,6 +65,9 @@ public:
 	void AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	void AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	Weapon* Clone();
+
+private:
+	bool fire_pattern_return;
 };
 
 #endif // WEAPON_H_INCLUDED

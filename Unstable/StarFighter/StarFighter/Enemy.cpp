@@ -1105,6 +1105,10 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 						weapon->shot_mode = AscendingShotMode;
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
 						weapon->shot_mode = DescendingShotMode;
+					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending2") == 0)
+						weapon->shot_mode = Ascending2ShotMode;
+					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending2") == 0)
+						weapon->shot_mode = Descending2ShotMode;
 				}
 			}
 

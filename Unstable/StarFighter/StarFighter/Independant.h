@@ -68,6 +68,8 @@ enum ShotMode
 	AlternateShotMode,//1
 	AscendingShotMode,//2
 	DescendingShotMode,//3
+	Ascending2ShotMode,//4 - back and forth
+	Descending2ShotMode,//5 - back and forth
 };
 
 enum AmmoData

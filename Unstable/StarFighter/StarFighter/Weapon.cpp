@@ -23,6 +23,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	target_seaking_angle = 0;
 	weaponOffset = sf::Vector2f(0, 0);
 	face_target = false;
+	fire_pattern_return = false;
 
 	this->ammunition = Ammunition;
 }
@@ -138,21 +139,53 @@ void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyp
 				dispersion *= (1 - (1 / multishot));//ex: 10 shots at 360°, we make it shots at 324° instead (360 - 360/10 to avoid the double bullet)
 			}
 
-			if (this->shot_mode == ShotMode::NoShotMode)
+			if (this->shot_mode == NoShotMode)
 			{
 				FireMultiShot(m_collider_type);
 			}
-			else if (this->shot_mode == ShotMode::AlternateShotMode)
+			else if (this->shot_mode == AlternateShotMode)
 			{
 				FireAlternateShot(m_collider_type);
 			}
-			else if (this->shot_mode == ShotMode::AscendingShotMode)
+			else if (this->shot_mode == AscendingShotMode)
 			{
 				FireAscendingShot(m_collider_type);
 			}
-			else if (this->shot_mode == ShotMode::DescendingShotMode)
+			else if (this->shot_mode == DescendingShotMode)
 			{
 				FireDescendingShot(m_collider_type);
+			}
+			else if (this->shot_mode == Ascending2ShotMode)
+			{
+				if (!fire_pattern_return)
+				{
+					FireAscendingShot(m_collider_type);
+				}
+				else
+				{
+					FireDescendingShot(m_collider_type);
+				}
+				
+				if (shot_index == 0)
+				{
+					fire_pattern_return = !fire_pattern_return;
+				}
+			}
+			else if (this->shot_mode == Descending2ShotMode)
+			{
+				if (!fire_pattern_return)
+				{
+					FireDescendingShot(m_collider_type);
+				}
+				else
+				{
+					FireAscendingShot(m_collider_type);
+				}
+
+				if (shot_index == 0)
+				{
+					fire_pattern_return = !fire_pattern_return;
+				}
 			}
 		}
 		else
@@ -239,9 +272,11 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 		}
 
 	}
-
+	
 	if (shot_index < multishot - 1)
+	{
 		shot_index++;
+	}	
 	else
 	{
 		shot_index = 0;
@@ -283,7 +318,9 @@ void Weapon::FireAscendingShot(IndependantType m_collider_type)
 
 	
 	if (shot_index < multishot - 1)
+	{
 		shot_index++;
+	}	
 	else
 	{
 		shot_index = 0;
@@ -322,7 +359,9 @@ void Weapon::FireDescendingShot(IndependantType m_collider_type)
 	}
 
 	if (shot_index < multishot - 1)
+	{
 		shot_index++;
+	}
 	else
 	{
 		shot_index = 0;
