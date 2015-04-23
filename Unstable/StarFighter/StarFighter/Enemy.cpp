@@ -71,10 +71,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (hyperspeedMultiplier < 1.0f)
 	{
 		l_hyperspeedMultiplier = hyperspeedMultiplier;
+		newspeed.x *= l_hyperspeedMultiplier;
+		newspeed.y *= l_hyperspeedMultiplier;
 	}
-
-	newspeed.x = this->speed.x * l_hyperspeedMultiplier;
-	newspeed.y = this->speed.y * l_hyperspeedMultiplier;
 
 	if (this->currentPhase->modifier == Ghost)
 	{
@@ -258,7 +257,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							else
 							{
 								//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
-								float theta = this->getRotation() / 180 * M_PI;
+								float theta = (this->getRotation() + (*it)->angle_offset) / 180 * M_PI;
 								if ((*it)->target_seaking != NO_SEAKING)
 								{
 									theta -= delta / 180 * M_PI;
@@ -659,6 +658,14 @@ Phase* Enemy::LoadPhase(string name)
 				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3]));
 				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_3].c_str());
 				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY_3].c_str());
+				phase->weapons_list.push_back(m_weapon);
+			}
+
+			if ((*it)[EnemyPhaseData::PHASE_WEAPON_4].compare("0") != 0)
+			{
+				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_4], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_4]));
+				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_4].c_str());
+				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY_4].c_str());
 				phase->weapons_list.push_back(m_weapon);
 			}
 

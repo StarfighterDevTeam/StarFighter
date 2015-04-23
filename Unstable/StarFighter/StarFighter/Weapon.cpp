@@ -19,7 +19,6 @@ Weapon::Weapon(Ammo* Ammunition)
 	shot_mode = NoShotMode;
 	angle_offset = 0;
 	delay = 0.f;
-	target_seaking_angle = 0;
 	weaponOffset = sf::Vector2f(0, 0);
 	face_target = false;
 	fire_pattern_return = false;
@@ -37,29 +36,8 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 {
 	Ammo* bullet = this->ammunition->Clone();
 
-	//if target seaking (closest enemy)
-	if (target_seaking != NO_SEAKING)
-	{
-		if (rafale > 0 && rafale_index > 0 && target_seaking == SEMI_SEAKING)
-		{
-			//do nothing
-		}
-		else
-		{
-			if (m_collider_type == FriendlyFire)
-			{
-				target_seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(EnemyObject, this->getPosition(), bullet->range);
-			}
-			else if (m_collider_type == EnemyFire)
-			{
-				target_seaking_angle = (*CurrentGame).GetAngleToNearestIndependant(PlayerShip, this->getPosition(), bullet->range);
-				target_seaking_angle += 180;
-			}
-		}
-	}
-
-	//calculating the angle of the shot, which will determine how to offset the position of the bullet respect to the weapon position
-	bullet->shot_angle = this->shot_angle - ((this->angle_offset + this->target_seaking_angle) / 180 * M_PI);
+	//transmitting the value to the bullet
+	bullet->shot_angle = this->shot_angle;
 	
 	//calculation of bullet offset respect to the weapon position
 	float bullet_offset_x = offsetX * cos(this->shot_angle) - this->ammunition->m_size.y / 2 * sin(this->shot_angle);
@@ -67,10 +45,10 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 
  	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
-	bullet->speed.x = bullet->ref_speed * sin(bullet->shot_angle + (dispersion *  M_PI / 180)) * (-this->fire_direction.y);
-	bullet->speed.y = bullet->ref_speed * cos(bullet->shot_angle + (dispersion *  M_PI / 180)) * (this->fire_direction.y);
+	bullet->speed.x = bullet->ref_speed * sin(this->shot_angle + (dispersion *  M_PI / 180)) * (-this->fire_direction.y);
+	bullet->speed.y = bullet->ref_speed * cos(this->shot_angle + (dispersion *  M_PI / 180)) * (this->fire_direction.y);
 
-	bullet->setRotation((bullet->shot_angle * 180.0f / M_PI) + dispersion);
+	bullet->setRotation((this->shot_angle * 180.0f / M_PI) + dispersion);
 
 	bullet->visible = true;
 	bullet->collider_type = m_collider_type;
@@ -193,7 +171,9 @@ void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyp
 		firing_ready = false;
 
 		if (rafale > 0 && shot_index == 0)
+		{
 			rafale_index++;
+		}	
 	}
 }
 

@@ -35,6 +35,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = this->speed;
+	float l_hyperspeedMultiplier = 1.0f;
 
 	if (this->target != NULL)
 	{
@@ -49,10 +50,11 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
 			newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 		}
-		else if (hyperspeedMultiplier < 1)
+		else if (hyperspeedMultiplier < 1.0f)
 		{
-			newspeed.x = this->speed.x * hyperspeedMultiplier;
-			newspeed.y = this->speed.y * hyperspeedMultiplier;
+			l_hyperspeedMultiplier = hyperspeedMultiplier;
+			newspeed.x *= l_hyperspeedMultiplier;
+			newspeed.y *= l_hyperspeedMultiplier;
 		}
 
 		newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -60,14 +62,8 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 	
 	//call bobbyPattern
-	if (hyperspeedMultiplier < 1.0f)
-	{
-		offset = Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier, true);
-	}
-	else
-	{
-		offset = Pattern.GetOffset(deltaTime.asSeconds(), true);
-	}
+	
+	offset = Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
 	
 	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
 	newposition.x += offset.x;
@@ -79,7 +75,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	this->setPosition(newposition.x,newposition.y);
 
 	//rotation
-	this->rotate(this->rotation_speed*deltaTime.asSeconds());
+	this->rotate(this->rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 
 	//auto fire option (F key)
 	if (InputGuy::setAutomaticFire())
@@ -112,7 +108,11 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				else if (delta < -180)
 					delta += 360;
 
-				float theta = (this->getRotation() - delta) / 180 * M_PI;
+				float theta = this->getRotation() / 180 * M_PI;
+				if (this->weapon->target_seaking != NO_SEAKING)
+				{
+					theta -= delta / 180 * M_PI;
+				}
 
 				if (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index > 0 && this->weapon->rafale_index < this->weapon->rafale)
 				{

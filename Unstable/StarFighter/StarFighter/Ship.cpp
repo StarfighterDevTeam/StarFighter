@@ -1067,7 +1067,12 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						else if (delta < -180)
 							delta += 360;
 
-						float theta = (this->getRotation() - delta) / 180 * M_PI;
+						//float theta = (this->getRotation() - delta) / 180 * M_PI;
+						float theta = this->getRotation() / 180 * M_PI;
+						if (ship_config.weapon->target_seaking != NO_SEAKING)
+						{
+							theta -= delta / 180 * M_PI;
+						}
 
 						float sizeX = this->m_size.x;
 						float sizeY = this->m_size.y;
