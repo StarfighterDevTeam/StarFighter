@@ -66,11 +66,15 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
 		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 	}
-	else if (hyperspeedMultiplier < 1)
+
+	float l_hyperspeedMultiplier = 1.0f;
+	if (hyperspeedMultiplier < 1.0f)
 	{
-		newspeed.x = this->speed.x * hyperspeedMultiplier;
-		newspeed.y = this->speed.y * hyperspeedMultiplier;
+		l_hyperspeedMultiplier = hyperspeedMultiplier;
 	}
+
+	newspeed.x = this->speed.x * l_hyperspeedMultiplier;
+	newspeed.y = this->speed.y * l_hyperspeedMultiplier;
 
 	if (this->currentPhase->modifier == Ghost)
 	{
@@ -159,7 +163,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//rotation
 	//calculating the angle we want to face, if any
-	float target_angle = 0;
+	float target_angle = this->getRotation();
 	if (this->reset_facing)
 	{
 		target_angle = Independant::getRotation_for_Direction((*CurrentGame).direction);	
@@ -180,7 +184,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (!this->face_target && !this->reset_facing)
 	{
-		this->rotate(this->rotation_speed*deltaTime.asSeconds());
+		this->rotate(this->rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 	}
 	else
 	{
@@ -201,9 +205,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//now let's rotate toward the target (the player)
 			if (delta >= 0)
 			{
-				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds())
+				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
 				{
-					this->rotate(-abs(this->rotation_speed)*deltaTime.asSeconds());
+					this->rotate(-abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 				}
 				else
 				{
@@ -212,9 +216,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 			else
 			{
-				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds())
+				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
 				{
-					this->rotate(abs(this->rotation_speed)*deltaTime.asSeconds());
+					this->rotate(abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 				}
 				else
 				{

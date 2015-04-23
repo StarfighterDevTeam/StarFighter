@@ -48,7 +48,6 @@ public:
 	int xspread;
 	ShotMode shot_mode;
 	int shot_index;
-	float angle;
 	float dispersion;
 	int rafale;
 	int rafale_index;
