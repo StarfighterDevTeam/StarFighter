@@ -112,3 +112,8 @@ void FakeShip::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	Aura::update(deltaTime, hyperspeedMultiplier);
 }
+
+bool FakeShip::GetLoot(Independant& independant)
+{
+	return this->target->GetLoot(independant);
+}

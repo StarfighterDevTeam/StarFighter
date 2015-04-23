@@ -40,6 +40,7 @@ class FakeShip : public Aura
 public:
 	FakeShip(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	bool GetLoot(Independant& independant) override;
 };
 
 #endif // FX_H_INCLUDED
