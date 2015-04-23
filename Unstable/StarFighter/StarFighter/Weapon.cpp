@@ -67,14 +67,10 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 
  	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
-	//bullet->speed = this->AngleShot(this->shot_angle + dispersion + angle_offset + target_seaking_angle, bullet->ref_speed);
 	bullet->speed.x = bullet->ref_speed * sin(bullet->shot_angle + (dispersion *  M_PI / 180)) * (-this->fire_direction.y);
 	bullet->speed.y = bullet->ref_speed * cos(bullet->shot_angle + (dispersion *  M_PI / 180)) * (this->fire_direction.y);
 
-	//bullet->speed = Independant::getSpeed_for_Direction((*CurrentGame).direction, bullet->speed);
-
 	bullet->setRotation((bullet->shot_angle * 180.0f / M_PI) + dispersion);
-	printf("rotation %f\n", bullet->getRotation());
 
 	bullet->visible = true;
 	bullet->collider_type = m_collider_type;
@@ -366,15 +362,6 @@ void Weapon::FireDescendingShot(IndependantType m_collider_type)
 	{
 		shot_index = 0;
 	}
-}
-
-sf::Vector2f Weapon::AngleShot(float angle, float m_ref_speed)
-{
-	sf::Vector2f new_speed;
-	angle = -angle * M_PI / 180;
-	new_speed.x = m_ref_speed * sin(angle);
-	new_speed.y = m_ref_speed * cos(angle);
-	return new_speed;
 }
 
 Weapon* Weapon::Clone()

@@ -34,7 +34,6 @@ public:
 	void FireAlternateShot(IndependantType m_collider_type);
 	void FireAscendingShot(IndependantType m_collider_type);
 	void FireDescendingShot(IndependantType m_collider_type);
-	sf::Vector2f AngleShot(float angle, float m_ref_speed);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
 	sf::Time readyFireTimer;
