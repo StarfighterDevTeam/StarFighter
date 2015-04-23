@@ -1058,7 +1058,11 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 					{
 						//calculating the angle we want to face, if any
-						float target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+						float target_angle = this->getRotation();
+						if (ship_config.weapon->target_seaking != NO_SEAKING)
+						{
+							target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+						}
 
 						float current_angle = this->getRotation();
 						float delta = current_angle - target_angle;
