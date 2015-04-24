@@ -87,7 +87,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
 	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
-
+	
 	//call bobbyPattern
 	if (hyperspeedMultiplier < 1.0f)
 	{
@@ -107,11 +107,11 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (this->bouncing)
 	{
-		if (newposition.x < this->m_size.x / 2)// || newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
+		if (newposition.x < this->m_size.x / 2)
 		{
 			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
 			{
-				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+				this->Pattern.patternSpeed *= -1;
 			}
 			else
 			{
@@ -124,7 +124,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
 			{
-				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+				this->Pattern.patternSpeed *= -1;
 			}
 			else
 			{
@@ -141,7 +141,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 			else
 			{
-				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+				this->currentPhase->Pattern->patternSpeed *= -1;
 			}
 			this->setPosition(newposition.x, this->m_size.y / 2);
 		}
@@ -154,7 +154,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 			else
 			{
-				this->currentPhase->Pattern->patternParams->at(0) *= -1;
+				this->currentPhase->Pattern->patternSpeed *= -1;
 			}
 			this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 		}
