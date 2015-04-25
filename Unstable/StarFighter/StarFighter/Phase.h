@@ -65,6 +65,14 @@ enum ConditionType
 	EnemyProximity,
 };
 
+enum BouncingType
+{
+	NoBouncing,
+	BouncingEverywhere,
+	BouncingHorizontal,
+	BouncingVertical,
+};
+
 enum Modifier
 {
 	NoModifier,
@@ -74,6 +82,8 @@ enum Modifier
 	FaceTarget,//rotate to always face player
 	ResetFacing,//rotate to always face player
 	Bouncing,//bounces on scene borders
+	BouncingH,//bounces on horizontal scene borders only
+	BouncingV,//bounces on horizontal scene borders only
 };
 
 //forward declaration

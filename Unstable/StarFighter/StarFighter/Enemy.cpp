@@ -13,7 +13,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	rotation_speed = 0;
 	face_target = false;
 	reset_facing = false;
-	bouncing = false;
+	bouncing = NoBouncing;
 	enemyTimer = sf::seconds(0);
 }
 
@@ -105,58 +105,64 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	
 	this->setPosition(newposition.x, newposition.y);
 
-	if (this->bouncing)
+	if (this->bouncing != NoBouncing)
 	{
-		if (newposition.x < this->m_size.x / 2)
+		if (this->bouncing != BouncingVertical)
 		{
-			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			if (newposition.x < this->m_size.x / 2)
 			{
-				this->Pattern.patternSpeed *= -1;
+				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				{
+					this->Pattern.patternSpeed *= -1;
+				}
+				else
+				{
+					this->speed.x *= -1;
+				}
+				this->setPosition(this->m_size.x / 2, newposition.y);
 			}
-			else
-			{
-				this->speed.x *= -1;
-			}
-			this->setPosition(this->m_size.x / 2, newposition.y);
-		}
 
-		else if (newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
-		{
-			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			else if (newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
 			{
-				this->Pattern.patternSpeed *= -1;
+				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				{
+					this->Pattern.patternSpeed *= -1;
+				}
+				else
+				{
+					this->speed.x *= -1;
+				}
+				this->setPosition(SCENE_SIZE_X - this->m_size.x / 2, newposition.y);
 			}
-			else
-			{
-				this->speed.x *= -1;
-			}
-			this->setPosition(SCENE_SIZE_X - this->m_size.x / 2, newposition.y);
 		}
-
-		else if (newposition.y < this->m_size.y / 2)
+		
+		if (this->bouncing != BouncingHorizontal)
 		{
-			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			if (newposition.y < this->m_size.y / 2)
 			{
-				this->speed.y *= -1;
+				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				{
+					this->speed.y *= -1;
+				}
+				else
+				{
+					this->currentPhase->Pattern->patternSpeed *= -1;
+				}
+				this->setPosition(newposition.x, this->m_size.y / 2);
 			}
-			else
-			{
-				this->currentPhase->Pattern->patternSpeed *= -1;
-			}
-			this->setPosition(newposition.x, this->m_size.y / 2);
-		}
 
-		else if (newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
-		{
-			if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+			else if (newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
 			{
-				this->speed.y *= -1;
+				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				{
+					this->speed.y *= -1;
+				}
+				else
+				{
+					this->currentPhase->Pattern->patternSpeed *= -1;
+				}
+				this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 			}
-			else
-			{
-				this->currentPhase->Pattern->patternSpeed *= -1;
-			}
-			this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 		}
 	}
 
@@ -538,7 +544,7 @@ void Enemy::setPhase(Phase* m_phase)
 	this->immune = false;
 	this->setGhost(false);
 	this->face_target = false;
-	this->bouncing = false;
+	this->bouncing = NoBouncing;
 
 	//load new stats
 	switch (m_phase->modifier)
@@ -575,7 +581,17 @@ void Enemy::setPhase(Phase* m_phase)
 		}
 		case Modifier::Bouncing:
 		{
-			this->bouncing = true;
+			this->bouncing = BouncingEverywhere;
+			break;
+		}
+		case Modifier::BouncingH:
+		{
+			this->bouncing = BouncingHorizontal;
+			break;
+		}
+		case Modifier::BouncingV:
+		{
+			this->bouncing = BouncingVertical;
 			break;
 		}
 	}
@@ -714,6 +730,14 @@ Phase* Enemy::LoadPhase(string name)
 				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("bouncing") == 0)
 				{
 					phase->modifier = Modifier::Bouncing;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("bouncingH") == 0)
+				{
+					phase->modifier = Modifier::BouncingH;
+				}
+				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("bouncingV") == 0)
+				{
+					phase->modifier = Modifier::BouncingV;
 				}
 			}
 
