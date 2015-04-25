@@ -222,3 +222,21 @@ void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant)
 		this->grid[l][r]->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + this->position.x + (r * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + this->position.y + (l * GRID_SLOT_SIZE)));
 	}
 }
+
+list<Independant*>* ObjectGrid::GetAllEquipments()
+{
+	list<Independant*>* allEqs = new list<Independant*>();
+
+	//Take all the equipment in the grid 
+	for (int i = 0; i < this->squares.x; i++)
+	{
+		for (int j = 0; j < this->squares.y; j++)
+		{
+			if (grid[i][j] != NULL)
+			{
+				allEqs->push_back(grid[i][j]);
+			}
+		}
+	}
+	return allEqs;
+}

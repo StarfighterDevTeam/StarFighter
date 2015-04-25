@@ -6,7 +6,7 @@ void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
-	
+
 	//Load knownScenes, hazard levels and current scene from save file
 	if (!LoadPlayerSave(player.m_save_file).empty())
 	{
@@ -21,7 +21,7 @@ void InGameState::Initialize(Player player)
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer(PLAYER_SAVE_FILE);
 	}
-	
+
 	//Loading current scene
 	this->currentScene = new Scene(this->currentSceneSave, GetSceneHazardLevel(this->currentSceneSave), player.reverse_scene, true);//first_scene = true
 
@@ -51,7 +51,7 @@ void InGameState::Initialize(Player player)
 			}
 		}
 	}
-	
+
 	if (this->playerShip->ship_config.weapon != NULL)
 	{
 		Independant* capsule = Ship::CloneWeaponIntoIndependant(this->playerShip->ship_config.weapon);
@@ -127,12 +127,12 @@ void InGameState::Update(Time deltaTime)
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
 					(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
-					equip_index_, tmp_equipment->display_name, tmp_equipment->bot->Pattern.patternSpeed, tmp_equipment->getEquipmentHyperspeed() , tmp_equipment->bot->armor_max,
+					equip_index_, tmp_equipment->display_name, tmp_equipment->bot->Pattern.patternSpeed, tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->bot->armor_max,
 					tmp_equipment->bot->shield_max, tmp_equipment->bot->shield_regen, tmp_equipment->bot->weapon->ammunition->damage, tmp_equipment->hasBot, tmp_equipment->bot->weapon->ammunition->speed.y,
 					tmp_equipment->bot->weapon->ammunition->Pattern.currentPattern, tmp_equipment->bot->weapon->multishot, tmp_equipment->bot->weapon->xspread, tmp_equipment->bot->weapon->rate_of_fire,
 					tmp_equipment->bot->weapon->shot_mode, tmp_equipment->bot->weapon->dispersion, tmp_equipment->bot->weapon->rafale, tmp_equipment->bot->weapon->rafale_cooldown, tmp_equipment->bot->weapon->target_seaking);
 			}
-			
+
 			tmp_equipment = NULL;
 		}
 
@@ -182,7 +182,7 @@ void InGameState::SetSceneHazardLevel(string scene_name, int hazard_level)
 		hazard_level = NB_HAZARD_LEVELS - 1;
 	}
 	this->knownScenes[scene_name] = hazard_level;
-	
+
 }
 
 int InGameState::GetSceneHazardLevel(string scene_name)
@@ -200,6 +200,7 @@ int InGameState::GetSceneHazardLevel(string scene_name)
 
 int InGameState::SavePlayer(string file)
 {
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving Player Known Scenes");
 	ofstream data(file.c_str(), ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
@@ -218,10 +219,79 @@ int InGameState::SavePlayer(string file)
 	}
 	else  // si l'ouverture a échoué
 	{
+		LOGGER_WRITE(Logger::Priority::LERROR, "Failed to open PLAYER SAVE FILE !");
 		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
 	}
 
 	return 0;
+}
+
+void InGameState::SaveShipEquipment(string file, list<Independant*>* equipped, list<Independant*>* stored)
+{
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving player equipment");
+	//tableau à écrire contenant l'équipement du ship
+	vector<vector<string>> shipEq = vector<vector<string>>(equipped->size() + stored->size());
+
+	int i = 0;
+	Equipment* actualEquipment;
+	Weapon* actualWepaon;
+	//Equipped stuff
+	for (list<Independant*>::iterator independant = equipped->begin(); independant != equipped->end(); independant++)
+	{
+		actualEquipment = (*independant)->getEquipmentLoot();
+		actualWepaon = (*independant)->getWeaponLoot();
+		assert(actualEquipment != NULL || actualWepaon != NULL);
+
+		if (actualEquipment == NULL)
+		{
+			//TODO: handle weapons
+			continue;
+		}
+
+		shipEq[i++] = vector<string>(EQUIPMENTSAVE_NBCOLS);
+		SetEquipementConfigLine(actualEquipment, true, &shipEq[i - 1]);
+	}
+
+	//Not Equipped stuff
+	for (list<Independant*>::iterator independant = equipped->begin(); independant != equipped->end(); independant++)
+	{
+		//TODO: refactor this with what's above
+		actualEquipment = (*independant)->getEquipmentLoot();
+		actualWepaon = (*independant)->getWeaponLoot();
+		assert(actualEquipment != NULL || actualWepaon != NULL);
+
+		if (actualEquipment == NULL)
+		{
+			//TODO: handle weapons
+			continue;
+
+		}
+		shipEq[i++] = vector<string>(EQUIPMENTSAVE_NBCOLS);
+		SetEquipementConfigLine(actualEquipment, false, &shipEq[i - 1]);
+	}
+
+	//Ecriture du tableau dans le fichier de save
+	FileLoaderUtils::FileWriter(file, &shipEq);
+
+	//Deleting lists
+	delete (equipped);
+	delete (stored);
+}
+
+void InGameState::SetEquipementConfigLine(Equipment* actualEquipment, bool equipped, vector<string>* configLine)
+{
+	assert(actualEquipment != NULL);
+	assert(configLine->size() == EQUIPMENTSAVE_NBCOLS);
+
+	(*configLine)[EQUIPMENTSAVE_EQUIPPED] = equipped ? "1" : "0";
+	(*configLine)[EQUIPMENTSAVE_TYPE] = std::to_string(actualEquipment->equipmentType);
+	(*configLine)[EQUIPMENTSAVE_NAME] = "TODO";
+	(*configLine)[EQUIPMENTSAVE_DISPLAY_NAME] = actualEquipment->display_name;
+	(*configLine)[EQUIPMENTSAVE_ARMOR] = std::to_string(actualEquipment->getEquipmentArmor());
+	(*configLine)[EQUIPMENTSAVE_SHIELD] = std::to_string(actualEquipment->getEquipmentShield());
+	(*configLine)[EQUIPMENTSAVE_SHIELD_REGEN] = std::to_string(actualEquipment->getEquipmentShieldRegen());
+	(*configLine)[EQUIPMENTSAVE_DAMAGE] = std::to_string(actualEquipment->getEquipmentDamage());
+	(*configLine)[EQUIPMENTSAVE_BOT] = "";//TODO actualEquipment->bot;
 }
 
 string InGameState::LoadPlayerSave(string file)
@@ -239,7 +309,7 @@ string InGameState::LoadPlayerSave(string file)
 			int level;
 			std::istringstream(line) >> scene >> level;
 			string current_scene;
-				
+
 			std::istringstream(line) >> scene >> level >> current_scene;
 			if (level > NB_HAZARD_LEVELS - 1)
 			{
@@ -276,250 +346,255 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 	switch (this->IG_State)
 	{
-		case InGameStateMachine::SCROLLING:
-		{
-			if (this->currentScene->generating_enemies)
-			{
-				this->currentScene->GenerateEnemiesv2(deltaTime);
-			}
-			//Scrolling until the background reaches its end
-			if ((*CurrentGame).direction == Directions::NO_DIRECTION)
-			{
-				this->IG_State = InGameStateMachine::LAST_SCREEN;
-			}
-			else
-			{
-				//when last screen is reached
-				if (this->currentScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::GREATHER_THAN
-					|| this->currentScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::EQUAL_TO)
-				{
-					//Correct the position
-					this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2));
-					this->currentScene->bg->speed = sf::Vector2f(0, 0);
-					(*CurrentGame).vspeed = 0;
+	case InGameStateMachine::SCROLLING:
+	{
+										  if (this->currentScene->generating_enemies)
+										  {
+											  this->currentScene->GenerateEnemiesv2(deltaTime);
+										  }
+										  //Scrolling until the background reaches its end
+										  if ((*CurrentGame).direction == Directions::NO_DIRECTION)
+										  {
+											  this->IG_State = InGameStateMachine::LAST_SCREEN;
+										  }
+										  else
+										  {
+											  //when last screen is reached
+											  if (this->currentScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::GREATHER_THAN
+												  || this->currentScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::EQUAL_TO)
+											  {
+												  //Correct the position
+												  this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w / 2, h / 2));
+												  this->currentScene->bg->speed = sf::Vector2f(0, 0);
+												  (*CurrentGame).vspeed = 0;
 
-					//Disable hyperspeed capacity
-					(*CurrentGame).playerShip->disabledHyperspeed = true;
+												  //Disable hyperspeed capacity
+												  (*CurrentGame).playerShip->disabledHyperspeed = true;
 
-					//Stop spawning enemies
-					this->currentScene->generating_enemies = false;
-					if (this->currentScene->generating_boss)
-					{
-						this->bossSpawnCountdown.restart();
-					}
-					
-					this->hasDisplayedDestructionRatio = false;
-					this->IG_State = InGameStateMachine::LAST_SCREEN;
-				}
-			}
+												  //Stop spawning enemies
+												  this->currentScene->generating_enemies = false;
+												  if (this->currentScene->generating_boss)
+												  {
+													  this->bossSpawnCountdown.restart();
+												  }
 
-			break;
-		}
+												  this->hasDisplayedDestructionRatio = false;
+												  this->IG_State = InGameStateMachine::LAST_SCREEN;
+											  }
+										  }
 
-		case InGameStateMachine::LAST_SCREEN:
-		{	
-			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
-			if ((*CurrentGame).isLastEnemyDead())
-			{
-				//trigger hazard break event (spawning boss) if destructions are 100.00% and we reached the last scene before a hub
-				if (!this->currentScene->m_hazardbreak_has_occurred && !this->hasDisplayedDestructionRatio && this->currentScene->generating_boss)
-				{
-					//displaying the xx.xx% of destruction
-					//int pourcentage = 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned;
-					printf("Destructions: %d / %d [%.2f%%]. ", (*CurrentGame).getHazard(), (*CurrentGame).hazardSpawned, roundf(100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned));
-					this->hasDisplayedDestructionRatio = true;
-					if ((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0)
-					{
-						this->currentScene->m_hazardbreak_has_occurred = true;
-						printf("SPAWNING BOSS...\n");
-					}
-					else
-					{
-						printf("No hazard break event\n");
-					}
+										  break;
+	}
 
-					(*CurrentGame).resetHazard();
-				}
-				else if (!this->hasDisplayedDestructionRatio)
-				{
-					printf("No boss to spawn.\n");
-					this->hasDisplayedDestructionRatio = true;
-				}
-				
-				this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
+	case InGameStateMachine::LAST_SCREEN:
+	{
+											//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
+											if ((*CurrentGame).isLastEnemyDead())
+											{
+												//trigger hazard break event (spawning boss) if destructions are 100.00% and we reached the last scene before a hub
+												if (!this->currentScene->m_hazardbreak_has_occurred && !this->hasDisplayedDestructionRatio && this->currentScene->generating_boss)
+												{
+													//displaying the xx.xx% of destruction
+													//int pourcentage = 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned;
+													printf("Destructions: %d / %d [%.2f%%]. ", (*CurrentGame).getHazard(), (*CurrentGame).hazardSpawned, roundf(100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned));
+													this->hasDisplayedDestructionRatio = true;
+													if ((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0)
+													{
+														this->currentScene->m_hazardbreak_has_occurred = true;
+														printf("SPAWNING BOSS...\n");
+													}
+													else
+													{
+														printf("No hazard break event\n");
+													}
 
-				if (this->currentScene->m_hazardbreak_has_occurred && this->currentScene->generating_boss)
-				{
-					if (bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
-					{
-						this->currentScene->GenerateBoss();
-						this->currentScene->bg->SetPortalsState(PortalState::PortalInvisible);
-						this->IG_State = InGameStateMachine::BOSS_FIGHT;
-					}
-				}
+													(*CurrentGame).resetHazard();
+												}
+												else if (!this->hasDisplayedDestructionRatio)
+												{
+													printf("No boss to spawn.\n");
+													this->hasDisplayedDestructionRatio = true;
+												}
 
-				//player takes exit?
-				if ((*CurrentGame).playerShip->isUsingPortal)
-				{
-					this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
-					bool reverse = false;
-					if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
-					{
-						reverse = true;
-					}
+												this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
 
-					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
-					this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
-					this->nextScene->bg->speed = sf::Vector2f(0, 0);
+												if (this->currentScene->m_hazardbreak_has_occurred && this->currentScene->generating_boss)
+												{
+													if (bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
+													{
+														this->currentScene->GenerateBoss();
+														this->currentScene->bg->SetPortalsState(PortalState::PortalInvisible);
+														this->IG_State = InGameStateMachine::BOSS_FIGHT;
+													}
+												}
 
-					//Putting the player on rails
-					(*CurrentGame).playerShip->disable_inputs = true;
-					(*CurrentGame).playerShip->disable_fire = true;
-					(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
+												//player takes exit?
+												if ((*CurrentGame).playerShip->isUsingPortal)
+												{
+													this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
+													bool reverse = false;
+													if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
+													{
+														reverse = true;
+													}
 
-					this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
-				}
-			}
-			//clearing enemies that have spawned out of the scene size
-			else
-			{
-				(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
-				if (this->currentScene->generating_boss)
-				{
-					this->bossSpawnCountdown.restart();
-				}
-				this->currentScene->bg->SetPortalsState(PortalState::PortalClose);
-			}
+													string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
+													this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+													this->nextScene->bg->speed = sf::Vector2f(0, 0);
 
-			break;
-		}
+													//Putting the player on rails
+													(*CurrentGame).playerShip->disable_inputs = true;
+													(*CurrentGame).playerShip->disable_fire = true;
+													(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
 
-		case InGameStateMachine::BOSS_FIGHT:
-		{
-			//is boss dead?
-			if ((*CurrentGame).isLastEnemyDead())
-			{
-				this->currentScene->generating_boss = false;
-				this->currentScene->HazardBreak();
-				this->IG_State = InGameStateMachine::LAST_SCREEN;
-			}
+													this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
+												}
+											}
+											//clearing enemies that have spawned out of the scene size
+											else
+											{
+												(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
+												if (this->currentScene->generating_boss)
+												{
+													this->bossSpawnCountdown.restart();
+												}
+												this->currentScene->bg->SetPortalsState(PortalState::PortalClose);
+											}
 
-			break;
-		}
+											break;
+	}
 
-		case InGameStateMachine::TRANSITION_PHASE1_2:
-		{
-			//When the playership reaches the scene border, we can start the swapping of scenes, while replacing him on the right starting position for the next scene
-			if ((*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w_ / 2, h_ / 2)) == FloatCompare::LESSER_THAN
-				|| (*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w_ / 2, h_ / 2)) == FloatCompare::EQUAL_TO)
-			{
-				//Correction of playership position
-				(*CurrentGame).playerShip->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w_ / 2, h_ / 2));
+	case InGameStateMachine::BOSS_FIGHT:
+	{
+										   //is boss dead?
+										   if ((*CurrentGame).isLastEnemyDead())
+										   {
+											   this->currentScene->generating_boss = false;
+											   this->currentScene->HazardBreak();
+											   this->IG_State = InGameStateMachine::LAST_SCREEN;
+										   }
 
-				(*CurrentGame).playerShip->speed = Independant::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).direction, this->nextScene->direction, ENDSCENE_TRANSITION_SPEED_DOWN,
-					(*CurrentGame).playerShip->getPosition());
+										   break;
+	}
 
-				this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
-				(*CurrentGame).vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
-				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
-				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
-				if (this->nextScene->direction == Directions::NO_DIRECTION)
-				{
-					(*CurrentGame).garbageLayer(LayerType::BotLayer);
-				}
+	case InGameStateMachine::TRANSITION_PHASE1_2:
+	{
+													//When the playership reaches the scene border, we can start the swapping of scenes, while replacing him on the right starting position for the next scene
+													if ((*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w_ / 2, h_ / 2)) == FloatCompare::LESSER_THAN
+														|| (*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(w_ / 2, h_ / 2)) == FloatCompare::EQUAL_TO)
+													{
+														//Correction of playership position
+														(*CurrentGame).playerShip->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w_ / 2, h_ / 2));
 
-				this->IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
-			}
+														(*CurrentGame).playerShip->speed = Independant::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).direction, this->nextScene->direction, ENDSCENE_TRANSITION_SPEED_DOWN,
+															(*CurrentGame).playerShip->getPosition());
 
-			break;
-		}
+														this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
+														(*CurrentGame).vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
+														this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
+														(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
+														if (this->nextScene->direction == Directions::NO_DIRECTION)
+														{
+															(*CurrentGame).garbageLayer(LayerType::BotLayer);
+														}
 
-		case InGameStateMachine::TRANSITION_PHASE2_2:
-		{
-			float wn = this->nextScene->bg->m_size.x;
-			float hn = this->nextScene->bg->m_size.y;
-			//When the new scene is completely swapped, we can wrap up the replacement and restart scrolling (or do what the Hubs do if the scene is a Hub)
-			if (this->nextScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::GREATHER_THAN
-				|| this->nextScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::EQUAL_TO)
-			{
+														this->IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
+													}
 
-				//Correction of the scenes position
-				this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f((w / 2), (h / 2)));
+													break;
+	}
 
-				this->nextScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2)));
-				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling(this->nextScene->direction, this->nextScene->vspeed);
-				(*CurrentGame).vspeed = this->nextScene->vspeed;
+	case InGameStateMachine::TRANSITION_PHASE2_2:
+	{
+													float wn = this->nextScene->bg->m_size.x;
+													float hn = this->nextScene->bg->m_size.y;
+													//When the new scene is completely swapped, we can wrap up the replacement and restart scrolling (or do what the Hubs do if the scene is a Hub)
+													if (this->nextScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::GREATHER_THAN
+														|| this->nextScene->bg->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::EQUAL_TO)
+													{
 
-				if (this->nextScene->direction == Directions::NO_DIRECTION)
-				{
-					this->IG_State = InGameStateMachine::HUB_ROAMING;
-					(*CurrentGame).playerShip->disabledHyperspeed = true;
-				}
-				else
-				{
-					this->IG_State = InGameStateMachine::SCROLLING;
-					(*CurrentGame).playerShip->disable_fire = false;
-					(*CurrentGame).playerShip->disabledHyperspeed = false;
-					if (this->currentScene->direction == Directions::NO_DIRECTION)
-					{
-						(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
-					}
-					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-				}
+														//Correction of the scenes position
+														this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f((w / 2), (h / 2)));
 
-				//Saving the hazard level
-				SetSceneHazardLevel(this->currentScene->m_name, this->currentScene->getSceneHazardLevelValue());
+														this->nextScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2)));
+														this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling(this->nextScene->direction, this->nextScene->vspeed);
+														(*CurrentGame).vspeed = this->nextScene->vspeed;
 
-				//Wiping the previous background and swapping with the new one
-				this->currentScene->DestroyScene();
-				delete this->currentScene;
-				this->currentScene = this->nextScene;
-				this->nextScene = NULL;
-				(*CurrentGame).direction = this->currentScene->direction;
+														if (this->nextScene->direction == Directions::NO_DIRECTION)
+														{
+															this->IG_State = InGameStateMachine::HUB_ROAMING;
+															(*CurrentGame).playerShip->disabledHyperspeed = true;
+														}
+														else
+														{
+															this->IG_State = InGameStateMachine::SCROLLING;
+															(*CurrentGame).playerShip->disable_fire = false;
+															(*CurrentGame).playerShip->disabledHyperspeed = false;
+															if (this->currentScene->direction == Directions::NO_DIRECTION)
+															{
+																(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+															}
+															(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
+															(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
+															(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
+														}
 
-				//Save scenes
-				AddToKnownScenes(this->currentScene->m_name);
-				if (this->currentScene->direction == Directions::NO_DIRECTION)
-				{
-					this->SavePlayer(PLAYER_SAVE_FILE);
-				}
+														//Saving the hazard level
+														SetSceneHazardLevel(this->currentScene->m_name, this->currentScene->getSceneHazardLevelValue());
 
-				//Giving control back to the player
-				(*CurrentGame).playerShip->disable_inputs = false;
-				(*CurrentGame).playerShip->speed = sf::Vector2f(0, 0);
-			}
+														//Wiping the previous background and swapping with the new one
+														this->currentScene->DestroyScene();
+														delete this->currentScene;
+														this->currentScene = this->nextScene;
+														this->nextScene = NULL;
+														(*CurrentGame).direction = this->currentScene->direction;
 
-			break;
-		}
+														//Save scenes
+														AddToKnownScenes(this->currentScene->m_name);
+														if (this->currentScene->direction == Directions::NO_DIRECTION)
+														{
+															this->SavePlayer(PLAYER_SAVE_FILE);
 
-		case InGameStateMachine::HUB_ROAMING:
-		{
-			this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
-			//player takes exit?
-			if ((*CurrentGame).playerShip->isUsingPortal)
-			{
-				this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
-				bool reverse = false;
-				if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
-				{
-					reverse = true;
-				}
-				string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
-				(*CurrentGame).direction = (*CurrentGame).playerShip->targetPortal->direction;
-				this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
-				this->nextScene->bg->speed = sf::Vector2f(0, 0);
+														}
 
-				//Putting the player on rails
-				(*CurrentGame).playerShip->disable_inputs = true;
-				(*CurrentGame).playerShip->disable_fire = true;
-				(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
+														list<Independant*>* shipEqs = (*CurrentGame).hud.shipGrid.GetAllEquipments();
+														list<Independant*>* StoredEqs = (*CurrentGame).hud.equipmentGrid.GetAllEquipments();
+														this->SaveShipEquipment(EQUIPMENT_SAVE_FILE, shipEqs, StoredEqs);
 
-				this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
-			}
+														//Giving control back to the player
+														(*CurrentGame).playerShip->disable_inputs = false;
+														(*CurrentGame).playerShip->speed = sf::Vector2f(0, 0);
+													}
 
-			break;
-		}
+													break;
+	}
+
+	case InGameStateMachine::HUB_ROAMING:
+	{
+											this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
+											//player takes exit?
+											if ((*CurrentGame).playerShip->isUsingPortal)
+											{
+												this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
+												bool reverse = false;
+												if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
+												{
+													reverse = true;
+												}
+												string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
+												(*CurrentGame).direction = (*CurrentGame).playerShip->targetPortal->direction;
+												this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+												this->nextScene->bg->speed = sf::Vector2f(0, 0);
+
+												//Putting the player on rails
+												(*CurrentGame).playerShip->disable_inputs = true;
+												(*CurrentGame).playerShip->disable_fire = true;
+												(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
+
+												this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
+											}
+
+											break;
+	}
 	}
 }

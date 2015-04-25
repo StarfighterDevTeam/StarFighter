@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <list>
 
 class InGameState : public GameState
 {
@@ -23,6 +24,8 @@ public:
 	void Draw();
 	void Release();
 	int SavePlayer(string file);
+	void InGameState::SaveShipEquipment(string file, list<Independant*>* equipped, list<Independant*>* stored);
+	void InGameState::SetEquipementConfigLine(Equipment* actualEquipment, bool equipped, vector<string>* configLine);
 	string LoadPlayerSave(string file);
 	bool AddToKnownScenes(string scene_name);
 	void SetSceneHazardLevel(string scene_name, int hazard_level);

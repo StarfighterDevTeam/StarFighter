@@ -2,6 +2,7 @@
 #define HUDGRID_H_INCLUDED
 
 #include "Independant.h"
+#include <list>
 
 enum HudGridsIndex
 {
@@ -49,6 +50,7 @@ public:
 	Independant* getCellPointerFromIntIndex(int index);
 	int getFocusIntIndex();
 	void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant);
+	list<Independant*>* ObjectGrid::GetAllEquipments();
 };
 
 #endif // HUDGRID_H_INCLUDED
