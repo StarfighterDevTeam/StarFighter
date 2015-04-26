@@ -71,13 +71,19 @@ void AnimatedSprite::setLooped(bool looped)
     m_isLooped = looped;
 }
 
-void AnimatedSprite::setColor(const sf::Color& color)
+void AnimatedSprite::setColor(const sf::Color& color, sf::Time color_timer)
 {
     // Update the vertices' color
     m_vertices[0].color = color;
     m_vertices[1].color = color;
     m_vertices[2].color = color;
     m_vertices[3].color = color;
+
+	if (color_timer > sf::seconds(0))
+	{
+		m_color = color;
+		m_color_timer = color_timer;
+	}
 }
 
 const Animation* AnimatedSprite::getAnimation() const

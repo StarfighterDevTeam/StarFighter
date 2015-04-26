@@ -181,6 +181,7 @@ void Independant::damage_from(Independant& independant)
 {
 	if (!immune)
 	{
+		setColor(Color(255,0,0,255), sf::seconds(DAMAGE_FEEDBACK_TIME));
 		if (independant.damage > shield)
 		{
 			armor -= (independant.damage - shield);

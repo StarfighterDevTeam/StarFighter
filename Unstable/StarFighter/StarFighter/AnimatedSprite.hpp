@@ -31,6 +31,7 @@
 #include <SFML/System/Vector2.hpp>
 
 #include "Animation.hpp"
+#include "Globals.h"
 
 #define TIME_BETWEEN_ANIMATION_FRAMES			0.2f
 
@@ -47,7 +48,7 @@ public:
     void pause();
     void stop();
     void setLooped(bool looped);
-    void setColor(const sf::Color& color);
+    void setColor(const sf::Color& color, sf::Time color_timer = sf::seconds(0));
     const Animation* getAnimation() const;
     sf::FloatRect getLocalBounds() const;
     sf::FloatRect getGlobalBounds() const;
@@ -56,6 +57,8 @@ public:
     sf::Time getFrameTime() const;
     void setFrame(std::size_t newFrame, bool resetTime = true);
 	std::size_t m_currentFrame;
+	sf::Color m_color;
+	sf::Time m_color_timer;
 
 private:
     const Animation* m_animation;

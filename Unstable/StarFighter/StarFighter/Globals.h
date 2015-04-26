@@ -33,6 +33,8 @@
 #define HUB_LINK_NAME_OFFSET_RATIO				0.3f
 
 #define	GHOST_ALPHA_VALUE						120
+#define DAMAGE_FEEDBACK_TIME					0.04f
+
 #define JOYSTICK_MIN_AXIS_VALUE					25
 
 #define HUD_SCORES_SPACING							20

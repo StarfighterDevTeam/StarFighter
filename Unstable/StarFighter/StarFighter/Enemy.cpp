@@ -75,14 +75,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newspeed.y *= l_hyperspeedMultiplier;
 	}
 
-	if (this->currentPhase->modifier == Ghost)
-	{
-		this->setGhost(true);
-	}
-	else
-	{
-		this->setGhost(hyperspeedMultiplier > 1.0f);
-	}
+	this->setGhost(this->currentPhase->modifier == Ghost || hyperspeedMultiplier > 1.0f);
 	this->disable_fire = hyperspeedMultiplier > 1.0f;
 
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -314,6 +307,16 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	AnimatedSprite::update(deltaTime);
+
+	if (m_color_timer > sf::seconds(0))
+	{
+		m_color_timer -= deltaTime;
+		setColor(m_color);
+		if (m_color_timer < sf::seconds(0))
+		{
+			setColor(Color(255, 255, 255, 255));
+		}
+	}
 
 	//phases
 	if (this->hasPhases)
