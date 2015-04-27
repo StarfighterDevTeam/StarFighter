@@ -156,6 +156,7 @@ public:
 	void GenerateBots(Independant* m_target);
 	void DestroyBots();
 	void GenerateFakeShip(Independant* m_target);
+	FakeShip* m_fake_ship;
 	bool automatic_fire;
 
 private:

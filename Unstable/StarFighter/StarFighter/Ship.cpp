@@ -712,20 +712,8 @@ void ShipConfig::GenerateFakeShip(Independant* m_target)
 	assert(this->ship_model != NULL);
 	if (this->ship_model->hasFake)
 	{
-		FakeShip* fake_ship_ = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-		(*CurrentGame).addToScene(fake_ship_, LayerType::FakeShipLayer, IndependantType::FakePlayerShip);
-	}
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			if (this->equipment[i]->hasFake)
-			{
-				FakeShip* fake_ship = new FakeShip(m_target, this->equipment[i]->fake_textureName, this->equipment[i]->fake_size, this->equipment[i]->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-				(*CurrentGame).addToScene(fake_ship, LayerType::FakeShipLayer, IndependantType::Neutral);
-			}
-		}
+		m_fake_ship = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
+		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, IndependantType::FakePlayerShip);
 	}
 }
 
@@ -1434,6 +1422,30 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			this->currentAnimationIndex = ShipAnimations::ShipIdle;
 		}
 	}
+
+	//damage feedback expires?
+	if (ship_config.ship_model->hasFake)
+	{
+		assert(ship_config.m_fake_ship != NULL);
+		if (ship_config.m_fake_ship->m_color_timer > sf::seconds(0))
+		{
+			ship_config.m_fake_ship->m_color_timer -= deltaTime;
+			ship_config.m_fake_ship->setColor(ship_config.m_fake_ship->m_color);
+			if (ship_config.m_fake_ship->m_color_timer < sf::seconds(0))
+			{
+				ship_config.m_fake_ship->setColor(Color(255, 255, 255, 255));
+			}
+		}
+	}
+	if (m_color_timer > sf::seconds(0))
+	{
+		m_color_timer -= deltaTime;
+		setColor(m_color);
+		if (m_color_timer < sf::seconds(0))
+		{
+			setColor(Color(255, 255, 255, 255));
+		}
+	}
 }
 
 void Ship::Respawn()
@@ -1601,6 +1613,13 @@ void Ship::damage_from(Independant& independant)
 {
 	if (!immune)
 	{
+		if (ship_config.ship_model->hasFake)
+		{
+			assert(ship_config.m_fake_ship != NULL);
+			ship_config.m_fake_ship->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+		}
+		this->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+
 		if (independant.damage > shield)
 		{
 			armor -= (independant.damage - shield);

@@ -52,6 +52,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	//health bars feedbacks
 	if (feedbackTimer > sf::seconds(0))
 	{
 		feedbackTimer -= deltaTime;
@@ -371,6 +372,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	AnimatedSprite::update(deltaTime);
 
+	//damage feedback expires?
 	if (m_color_timer > sf::seconds(0))
 	{
 		m_color_timer -= deltaTime;
