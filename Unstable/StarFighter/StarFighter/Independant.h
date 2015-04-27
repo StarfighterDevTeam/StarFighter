@@ -22,6 +22,7 @@ enum LayerType {
 	BackgroundLayer,
 	PortalLayer,
 	ExplosionLayer,
+	FeedbacksLayer,
 	EnemyObjectLayer,
 	AuraLayer,
 	BotLayer,

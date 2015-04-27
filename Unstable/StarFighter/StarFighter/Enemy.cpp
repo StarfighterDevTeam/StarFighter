@@ -17,51 +17,68 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	enemyTimer = sf::seconds(0);
 
 	//life bars
+	feedbackTimer = sf::seconds(0);
+
 	armorBar = new RectangleShape();
 	armorBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	armorBar->setFillColor(sf::Color(0, 250, 50, 128));//green
+	armorBar->setFillColor(sf::Color(148, 247, 79, 128));//green
 	armorBar->setOutlineThickness(0);
 	armorBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	armorBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
 
 	armorBarContainer = new RectangleShape();
 	armorBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	armorBarContainer->setFillColor(sf::Color(0, 0, 0, 0));
-	armorBarContainer->setOutlineThickness(2);
-	armorBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
+	armorBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
+	armorBarContainer->setOutlineThickness(0);
+	//armorBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	armorBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	armorBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
 
 	shieldBar = new RectangleShape();
 	shieldBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	shieldBar->setFillColor(sf::Color(0, 50, 250, 128));//blue
+	shieldBar->setFillColor(sf::Color(0, 79, 157, 128));//blue
 	shieldBar->setOutlineThickness(0);
 	shieldBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
 
 	shieldBarContainer = new RectangleShape();
 	shieldBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	shieldBarContainer->setFillColor(sf::Color(0, 0, 0, 0));
-	shieldBarContainer->setOutlineThickness(2);
-	shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
+	shieldBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
+	shieldBarContainer->setOutlineThickness(0);
+	//shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	shieldBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
 }
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	if (feedbackTimer > sf::seconds(0))
+	{
+		feedbackTimer -= deltaTime;
 
-	if (armorBar)
-	{
-		armorBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
-		armorBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
-		armorBar->setSize(sf::Vector2f(1.0f * armor / armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	}
-	if (shieldBar)
-	{
-		shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
-		shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
-		shieldBar->setSize(sf::Vector2f(1.0f * shield / shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+		if (armorBar)
+		{
+			armorBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
+			armorBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
+			armorBar->setSize(sf::Vector2f(1.0f * armor / armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+			if (feedbackTimer <= sf::seconds(0))
+			{
+				(*CurrentGame).removeFromFeedbacks(armorBar);
+				(*CurrentGame).removeFromFeedbacks(armorBarContainer);
+			}
+		}
+		if (shieldBar)
+		{
+			shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+			shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+			shieldBar->setSize(sf::Vector2f(1.0f * shield / shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+
+			if (feedbackTimer <= sf::seconds(0))
+			{
+				(*CurrentGame).removeFromFeedbacks(shieldBar);
+				(*CurrentGame).removeFromFeedbacks(shieldBarContainer);
+			}
+		}
 	}
 	
 	//slow motion
@@ -378,7 +395,20 @@ void Enemy::damage_from(Independant& independant)
 {
 	if (!immune)
 	{
+		if (feedbackTimer <= sf::seconds(0))
+		{
+			(*CurrentGame).addToFeedbacks(armorBarContainer);
+			(*CurrentGame).addToFeedbacks(armorBar);
+			if (shield_max > 0)
+			{
+				(*CurrentGame).addToFeedbacks(shieldBarContainer);
+				(*CurrentGame).addToFeedbacks(shieldBar);
+			}
+		}
+
+		feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
 		setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+
 		if (independant.damage > shield)
 		{
 			armor -= (independant.damage - shield);

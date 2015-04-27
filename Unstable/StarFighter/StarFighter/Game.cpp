@@ -106,21 +106,26 @@ void Game::drawScene()
 
 	for (int i = 0; i < NBVAL_Layer; i++)
 	{
-		for (std::list<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
+		if (i == FeedbacksLayer)
 		{
-			if ((*(*it)).visible)
+			for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
 			{
-				if (!(*(*it)).transparent)
+				mainScreen.draw(*(*it));
+			}
+		}
+		else
+		{
+			for (std::list<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
+			{
+				if ((*(*it)).visible)
 				{
-					this->mainScreen.draw((*(*it)));
+					if (!(*(*it)).transparent)
+					{
+						this->mainScreen.draw((*(*it)));
+					}
 				}
 			}
 		}
-	}
-
-	for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
-	{
-		mainScreen.draw(*(*it));
 	}
 
 	this->mainScreen.display();
