@@ -387,6 +387,13 @@ void Scene::SpawnEnemy(int enemy_class)
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).direction, enemy->m_size);
 	enemy->setPosition(pos);
 	(*CurrentGame).addToScene(enemy, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
+	(*CurrentGame).addToFeedbacks(enemy->armorBar);
+	(*CurrentGame).addToFeedbacks(enemy->armorBarContainer);
+	if (enemy->shield_max > 0)
+	{
+		(*CurrentGame).addToFeedbacks(enemy->shieldBar);
+		(*CurrentGame).addToFeedbacks(enemy->shieldBarContainer);
+	}
 
 	//counting spawned enemies
 	(*CurrentGame).hazardSpawned += enemy->getMoney();

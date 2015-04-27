@@ -1,11 +1,10 @@
-Horizon_IV 0
 Vanguard_H1 0
 Vanguard_H2 0
 Vanguard_H3 0
 Vanguard_H4 0
-Vanguard_Hub0 0
+Vanguard_Hub0 0 !
 Vanguard_Hub1 0
-Vanguard_Hub2 0 !
+Vanguard_Hub2 0
 Vanguard_Hub4 0
 Vanguard_Hub5 0
 Vanguard_Hub6 0
@@ -16,8 +15,3 @@ Vanguard_V12 0
 Vanguard_V2 0
 Vanguard_V8 0
 Vanguard_V9 0
-Vertigo_I 0
-scene1 2
-scene2 0
-scene3 1
-scene4 0

@@ -61,6 +61,16 @@ void Game::addToScene(Independant *object, LayerType m_layer, IndependantType ty
 	}
 }
 
+void Game::addToFeedbacks(RectangleShape* feedback)
+{
+	sceneFeedbackBars.push_back(feedback);
+}
+
+void Game::removeFromFeedbacks(RectangleShape* feedback)
+{
+	sceneFeedbackBars.remove(feedback);
+}
+
 void Game::updateScene(Time deltaTime)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
@@ -81,7 +91,6 @@ void Game::updateScene(Time deltaTime)
 		(*it)->update(deltaTime, hyperspeedMultiplier);
 	}
 }
-
 
 void Game::updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
@@ -107,6 +116,11 @@ void Game::drawScene()
 				}
 			}
 		}
+	}
+
+	for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
+	{
+		mainScreen.draw(*(*it));
 	}
 
 	this->mainScreen.display();
@@ -335,6 +349,7 @@ void Game::cleanGarbage()
 		this->sceneIndependants.remove(ptr);
 		this->sceneIndependantsLayered[ptr->layer].remove(*it);
 		this->sceneIndependantsTyped[(int)(ptr->collider_type)].remove(*it);
+		(*it)->Destroy();//destructor function
 		delete (*it);
 	}
 

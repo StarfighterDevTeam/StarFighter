@@ -187,6 +187,7 @@ public:
 	virtual void Respawn();
 	Independant* Clone();
 	virtual void Death();
+	virtual void Destroy();
 	virtual void GenerateLoot();
 
 	int getMoney();

@@ -280,6 +280,11 @@ void Independant::Death()
 
 }
 
+void Independant::Destroy()
+{
+
+}
+
 void Independant::GenerateLoot()
 {
 

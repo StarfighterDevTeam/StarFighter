@@ -38,10 +38,12 @@ public:
 	Enemy* Clone();
 	FX* FX_death;
 	void Death() override;
+	void Destroy() override;
 	float radius;
 	float angspeed;
 	void GenerateLoot() override;
 	void CreateRandomLoot(float BeastScaleBonus=0) override;
+	void damage_from(Independant& independant) override;
 	EnemyClass enemy_class;
 
 	//phases
@@ -60,8 +62,13 @@ public:
 	bool reset_facing;
 	BouncingType bouncing;
 
+	sf::RectangleShape* armorBar;
+	sf::RectangleShape* armorBarContainer;
+	sf::RectangleShape* shieldBar;
+	sf::RectangleShape* shieldBarContainer;
+
 private:
-	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);	
+	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);
 };
 
 struct EnemyBase

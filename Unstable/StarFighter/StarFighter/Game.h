@@ -29,6 +29,8 @@ public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
 	void addToScene(Independant *object, LayerType m_layer, IndependantType type);
+	void addToFeedbacks(RectangleShape* feedback);
+	void removeFromFeedbacks(RectangleShape* feedback);
 	void updateScene(Time deltaTime);
 	void updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 		int focused_item_type = -1, string f_name = "", float f_max_speed = 0, float f_hyperspeed = 1, int f_armor = 1, int f_shield = 0, int f_shield_regen = 0, int f_damage = 0, bool f_bot = false, float f_ammo_speed = 0, PatternType f_pattern = NoMovePattern,
@@ -62,7 +64,6 @@ public:
 	sf::Vector2f scale_factor;
 	Directions direction;
 	
-
 	int hazard;
 	int hazardSpawned;
 
@@ -79,6 +80,7 @@ private:
 	float movementClock;
 	float BeastScoreBonus;
 	RenderWindow *window;
+	std::list<RectangleShape*> sceneFeedbackBars;
 	std::list<Independant*> sceneIndependants;
 	std::list<Independant*> sceneIndependantsLayered[NBVAL_Layer];
 	std::list<Independant*> sceneIndependantsTyped[NBVAL_Independant];
