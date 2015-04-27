@@ -21,7 +21,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 
 	armorBar = new RectangleShape();
 	armorBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	armorBar->setFillColor(sf::Color(148, 247, 79, 128));//green
+	armorBar->setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
 	armorBar->setOutlineThickness(0);
 	armorBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	armorBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
@@ -36,7 +36,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 
 	shieldBar = new RectangleShape();
 	shieldBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	shieldBar->setFillColor(sf::Color(0, 79, 157, 128));//blue
+	shieldBar->setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
 	shieldBar->setOutlineThickness(0);
 	shieldBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);

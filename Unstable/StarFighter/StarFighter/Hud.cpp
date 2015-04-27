@@ -24,14 +24,14 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	backgroundColor.setPosition(0, 0);
 
 	armorBar.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
-	armorBar.setFillColor(sf::Color(0, 250, 50, 128));//green
+	armorBar.setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
 	armorBar.setOutlineThickness(1);
 	armorBar.setOutlineColor(sf::Color(255, 255, 255));
 	armorBar.setOrigin(0, 0);
 	armorBar.setPosition(HUD_LEFT_MARGIN, 10);
 
 	shieldBar.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
-	shieldBar.setFillColor(sf::Color(0, 50, 250, 128));//blue
+	shieldBar.setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
 	shieldBar.setOutlineThickness(1);
 	shieldBar.setOutlineColor(sf::Color(255, 255, 255));
 	shieldBar.setOrigin(0, 0);
