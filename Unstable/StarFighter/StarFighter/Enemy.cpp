@@ -96,7 +96,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//shield regen if not maximum
 	static double shield_regen_buffer = 0;
-	if (shield < shield_max)
+	if (shield < shield_max && shield > 0)
 	{
 		if (hyperspeedMultiplier < 1.0f)
 		{
@@ -139,7 +139,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newspeed.y *= l_hyperspeedMultiplier;
 	}
 
-	this->setGhost(this->currentPhase->modifier == Ghost || hyperspeedMultiplier > 1.0f);
+	bool l_ghost = false;
+	for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
+	{
+		l_ghost = l_ghost || (this->currentPhase->modifiers[i] == Ghost);
+	}
+	this->setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
 	this->disable_fire = hyperspeedMultiplier > 1.0f;
 
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -642,55 +647,59 @@ void Enemy::setPhase(Phase* m_phase)
 	this->immune = false;
 	this->setGhost(false);
 	this->face_target = false;
+	this->reset_facing = false;
 	this->bouncing = NoBouncing;
 
 	//load new stats
-	switch (m_phase->modifier)
+	for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
 	{
-		case Modifier::NoModifier:
+		switch (m_phase->modifiers[i])
 		{
-			//do nothing
-			break;
-		}
-		case Modifier::Immune:
-		{
-			this->immune = true;
-			break;
-		}
-		case Modifier::Ghost:
-		{
-			this->setGhost(true);
-			break;
-		}
-		case Modifier::Death:
-		{
-			this->Death();
-			break;
-		}
-		case Modifier::FaceTarget:
-		{
-			this->face_target = true;
-			break;
-		}
-		case Modifier::ResetFacing:
-		{
-			this->reset_facing = true;
-			break;
-		}
-		case Modifier::Bouncing:
-		{
-			this->bouncing = BouncingEverywhere;
-			break;
-		}
-		case Modifier::BouncingH:
-		{
-			this->bouncing = BouncingHorizontal;
-			break;
-		}
-		case Modifier::BouncingV:
-		{
-			this->bouncing = BouncingVertical;
-			break;
+			case Modifier::NoModifier:
+			{
+				//do nothing
+				break;
+			}
+			case Modifier::Immune:
+			{
+				this->immune = true;
+				break;
+			}
+			case Modifier::Ghost:
+			{
+				this->setGhost(true);
+				break;
+			}
+			case Modifier::Death:
+			{
+				this->Death();
+				break;
+			}
+			case Modifier::FaceTarget:
+			{
+				this->face_target = true;
+				break;
+			}
+			case Modifier::ResetFacing:
+			{
+				this->reset_facing = true;
+				break;
+			}
+			case Modifier::Bouncing:
+			{
+				this->bouncing = BouncingEverywhere;
+				break;
+			}
+			case Modifier::BouncingH:
+			{
+				this->bouncing = BouncingHorizontal;
+				break;
+			}
+			case Modifier::BouncingV:
+			{
+				this->bouncing = BouncingVertical;
+				break;
+			}
 		}
 	}
 
@@ -802,41 +811,47 @@ Phase* Enemy::LoadPhase(string name)
 			phase->rotation_speed = stoi((*it)[EnemyPhaseData::PHASE_ROTATION_SPEED]);
 
 			//loading modifier (immune to damage, etc.)
-			phase->modifier = Modifier::NoModifier;
-			if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("0") != 0)
+			
+			for (int i = 0; i < 2; i++)
 			{
-				if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("immune") == 0)
+				Modifier l_new_modifier = Modifier::NoModifier;
+				if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("0") != 0)
 				{
-					phase->modifier = Modifier::Immune;
+					if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("immune") == 0)
+					{
+						l_new_modifier = Modifier::Immune;
+					}
+					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("ghost") == 0)
+					{
+						l_new_modifier = Modifier::Ghost;
+					}
+					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("death") == 0)
+					{
+						l_new_modifier = Modifier::Death;
+					}
+					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("face_target") == 0)
+					{
+						l_new_modifier = Modifier::FaceTarget;
+					}
+					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("reset_facing") == 0)
+					{
+						l_new_modifier = Modifier::ResetFacing;
+					}
+					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("bouncing") == 0)
+					{
+						l_new_modifier = Modifier::Bouncing;
+					}
+					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("bouncingH") == 0)
+					{
+						l_new_modifier = Modifier::BouncingH;
+					}
+					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("bouncingV") == 0)
+					{
+						l_new_modifier = Modifier::BouncingV;
+					}
 				}
-				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("ghost") == 0)
-				{
-					phase->modifier = Modifier::Ghost;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("death") == 0)
-				{
-					phase->modifier = Modifier::Death;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("face_target") == 0)
-				{
-					phase->modifier = Modifier::FaceTarget;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("reset_facing") == 0)
-				{
-					phase->modifier = Modifier::ResetFacing;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("bouncing") == 0)
-				{
-					phase->modifier = Modifier::Bouncing;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("bouncingH") == 0)
-				{
-					phase->modifier = Modifier::BouncingH;
-				}
-				else if ((*it)[EnemyPhaseData::PHASE_MODIFIER].compare("bouncingV") == 0)
-				{
-					phase->modifier = Modifier::BouncingV;
-				}
+
+				phase->modifiers.push_back(l_new_modifier);
 			}
 
 			//loading welcome shot

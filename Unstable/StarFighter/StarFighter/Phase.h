@@ -39,6 +39,7 @@ enum EnemyPhaseData
 	PHASE_CLOCKWISE,
 	PHASE_ROTATION_SPEED,
 	PHASE_MODIFIER,
+	PHASE_MODIFIER_2,
 	PHASE_WAKEUP,
 	PHASE_WELCOME_WEAPON,
 	PHASE_WELCOME_AMMO,
@@ -96,7 +97,7 @@ public:
 	string display_name;
 	vector<Weapon*> weapons_list;
 	PatternBobby* Pattern;
-	Modifier modifier;
+	vector <Modifier> modifiers;
 	float angspeed;
 	float radius;
 	float vspeed;

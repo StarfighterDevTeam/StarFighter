@@ -11,7 +11,8 @@ V_Alpha3,200,0,0,10,V_Alpha3_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Alpha3.pn
 V_Sigma1,200,0,0,10,V_Sigma1_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Sigma1.png,63,84,3,110,death_explosion,10,0,,,,0,V_Sigma1_Entry
 V_Sigma2,200,0,0,10,V_Sigma1_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Sigma2.png,63,84,3,110,death_explosion,10,0,,,,0,V_Sigma2_Entry
 V_Sigma3,200,0,0,10,V_Sigma1_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Sigma3.png,63,84,3,110,death_explosion,10,0,,,,0,V_Sigma3_Entry
-V_Beta1,600,20,1,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta1.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta1_Entry
+V_Beta1,400,600,100,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta1.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta1_Entry
+V_Beta2,400,600,100,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta2.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta2_Entry
 V_Delta1,1500,100,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta1.png,288,390,1,50,death_explosion,50,0,,,,0,V_Delta1_Entry
 V_Gamma1,1000,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma1.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma1_Entry
 V_Gamma2,1000,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma2.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma2_Entry
