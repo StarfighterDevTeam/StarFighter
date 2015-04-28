@@ -2,9 +2,9 @@ Vanguard_H1 0
 Vanguard_H2 0
 Vanguard_H3 0
 Vanguard_H4 0
-Vanguard_Hub0 0 !
+Vanguard_Hub0 0
 Vanguard_Hub1 0
-Vanguard_Hub2 0
+Vanguard_Hub2 0 !
 Vanguard_Hub4 0
 Vanguard_Hub5 0
 Vanguard_Hub6 0

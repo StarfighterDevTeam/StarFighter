@@ -36,6 +36,12 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 {
 	Ammo* bullet = this->ammunition->Clone();
 
+	float l_dispersion = dispersion;
+	if (m_collider_type == EnemyFire)
+	{
+		l_dispersion = -l_dispersion;
+	}
+
 	//transmitting the value to the bullet
 	bullet->shot_angle = this->shot_angle;
 	
@@ -45,10 +51,10 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 
  	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
-	bullet->speed.x = bullet->ref_speed * sin(this->shot_angle + (dispersion *  M_PI / 180)) * (-this->fire_direction.y);
-	bullet->speed.y = bullet->ref_speed * cos(this->shot_angle + (dispersion *  M_PI / 180)) * (this->fire_direction.y);
+	bullet->speed.x = bullet->ref_speed * sin(this->shot_angle + (l_dispersion *  M_PI / 180)) * (-this->fire_direction.y);
+	bullet->speed.y = bullet->ref_speed * cos(this->shot_angle + (l_dispersion *  M_PI / 180)) * (this->fire_direction.y);
 
-	bullet->setRotation((this->shot_angle * 180.0f / M_PI) + dispersion);
+	bullet->setRotation((this->shot_angle * 180.0f / M_PI) + l_dispersion);
 
 	bullet->visible = true;
 	bullet->collider_type = m_collider_type;

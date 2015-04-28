@@ -12,7 +12,7 @@ V_laserL,50,300,0,Assets/2D/Vanguard/V_laserL.png,36,30,1,explosion_S,0,,,,0
 V_laserXL,50,400,0,Assets/2D/Vanguard/V_laserXL.png,36,126,1,explosion_S,0,,,,0
 V_ballS,50,560,0,Assets/2D/Vanguard/V_ballS.png,15,15,1,explosion_S,0,,,,0
 V_ballM,50,520,0,Assets/2D/Vanguard/V_ballM.png,33,33,1,explosion_S,0,,,,0
-V_fireball,50,400,0,Assets/2D/Vanguard/V_fireball.png,30,42,1,explosion_S,0,,,,0
+V_fireball,50,700,0,Assets/2D/Vanguard/V_fireball.png,30,42,1,explosion_S,0,,,,0
 V_missile,20,780,0,Assets/2D/Vanguard/V_missile.png,24,42,1,explosion_S,0,,,,0
 V_laserM_fast,50,700,0,Assets/2D/Vanguard/V_laserM.png,15,33,1,explosion_S,0,,,,0
 V_laserM_Vfast,50,800,0,Assets/2D/Vanguard/V_laserM.png,15,33,1,explosion_S,0,,,,0
