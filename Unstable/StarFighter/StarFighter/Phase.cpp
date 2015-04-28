@@ -52,6 +52,10 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 	{
 		cond = ConditionType::EnemyProximity;
 	}
+	else if (line_data[index].compare("shotsFired") == 0)
+	{
+		cond = ConditionType::ShotsFired;
+	}
 
 	//loading operator type
 	FloatCompare op = FloatCompare::ERROR_COMPARE;

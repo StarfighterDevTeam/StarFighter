@@ -108,7 +108,7 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 	return firing_ready;
 }
 
-void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
+bool Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (isFiringReady(deltaTime, hyperspeedMultiplier))
 	{
@@ -180,6 +180,12 @@ void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyp
 		{
 			rafale_index++;
 		}	
+
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

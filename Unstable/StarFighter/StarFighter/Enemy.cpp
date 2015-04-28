@@ -271,7 +271,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 			{
-				if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+				//semi-seaking and rafale not ended or alternated multishot not ended
+				if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale > 0 && (((*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale) || ((*it)->multishot > 1 && (*it)->shot_index > 0)))
 				{
 					isDoneFiringOnLockedTarget = false;
 				}
@@ -313,7 +314,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 			{
-
 				if (!this->disable_fire)
 				{
 					if (this->phaseTimer.asSeconds() < (*it)->delay)
@@ -329,9 +329,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						}
 						else
 						{
-							if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale)
+							if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale > 0 && (((*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale) || ((*it)->multishot > 1 && (*it)->shot_index > 0)))
 							{
-								//semi-seaking and rafale not ended = no update of target or weapon position
+								//semi-seaking and rafale not ended or alternated multishot not ended = no update of target or weapon position
 							}
 							else
 							{
@@ -351,7 +351,10 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 							(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
 							(*it)->face_target = this->face_target;
-							(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
+							if ((*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier))
+							{
+								shots_fired++;
+							}
 						}
 					}
 				}
@@ -630,6 +633,35 @@ bool Enemy::CheckCondition()
 				}							  
 				break;
 			}
+
+			case ConditionType::ShotsFired:
+			{
+				if ((*it)->op == FloatCompare::GREATHER_THAN)
+				{
+					if (this->shots_fired >= (*it)->value)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+				}
+				else if ((*it)->op == FloatCompare::EQUAL_TO)
+				{
+					if (this->shots_fired == (*it)->value)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+				}
+				else if ((*it)->op == FloatCompare::LESSER_THAN)
+				{
+					if (this->shots_fired < (*it)->value)
+					{
+						this->setPhase((*it)->nextPhase_name);
+						return true;
+					}
+				}
+				break;
+			}
 		}
 	}
 
@@ -640,6 +672,7 @@ void Enemy::setPhase(Phase* m_phase)
 {
 	this->currentPhase = m_phase;
 	this->phaseTimer = sf::seconds(0);
+	this->shots_fired = 0;
 
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, m_phase->vspeed);
 

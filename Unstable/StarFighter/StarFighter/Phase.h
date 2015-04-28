@@ -64,6 +64,7 @@ enum ConditionType
 	ShieldPourcentage,
 	wakeUp,
 	EnemyProximity,
+	ShotsFired,
 };
 
 enum BouncingType
