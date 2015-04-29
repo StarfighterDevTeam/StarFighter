@@ -322,6 +322,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					}
 					else
 					{
+						printf("wait %f\n", phaseTimer.asSeconds());
 						if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 						{
 							//even if we don't shoot, the weapon has to keep reloading
@@ -671,7 +672,6 @@ bool Enemy::CheckCondition()
 void Enemy::setPhase(Phase* m_phase)
 {
 	this->currentPhase = m_phase;
-	this->phaseTimer = sf::seconds(0);
 	this->shots_fired = 0;
 
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, m_phase->vspeed);
@@ -781,13 +781,14 @@ void Enemy::setPhase(Phase* m_phase)
 	{
 		(*CurrentGame).WakeUpEnemiesWithName(m_phase->wake_up_name);
 	}
+
+	this->phaseTimer = sf::seconds(0);
 }
 
 void Enemy::setPhase(string phase_name)
 {
 	Phase* phase = this->LoadPhase(phase_name);
 	this->setPhase(phase);
-	
 }
 
 Phase* Enemy::LoadPhase(string name)
