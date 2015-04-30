@@ -51,11 +51,6 @@ void Game::addToScene(Independant *object, LayerType m_layer, IndependantType ty
 
 	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_Independant))
 	{
-		if ((object)->collider_type > 100)
-		{
-			printf("m");
-		}
-
 		AddIndependantToVector(object, &this->sceneIndependantsTyped[(int)type]);
 		AddIndependantToVector(object, &this->sceneIndependantsLayered[(int)m_layer]);
 		AddIndependantToVector(object, &this->sceneIndependants);
@@ -203,7 +198,6 @@ void Game::colisionChecksV2()
 {
 	sf::Clock dt;
 	dt.restart();
-	int i = 0;
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
 	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::PlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::PlayerShip].end(); it1++)
@@ -217,7 +211,6 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			i++;
 			if (SimpleCollision::IsGrazing((*it1), (*it2)))
 			{
 				(*it1)->GetGrazing();
@@ -250,7 +243,6 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, kill ship)
@@ -291,7 +283,6 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, take the loot)
@@ -310,7 +301,6 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				(*it1)->GetPortal((*it2));
@@ -330,11 +320,6 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			i++;
-			if ((*it2)->collider_type > 100)
-			{
-				printf("m");
-			}
 			//Bullets are invisible after impact
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
@@ -367,7 +352,6 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, take the loot)
