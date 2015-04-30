@@ -49,11 +49,16 @@ void Game::addToScene(Independant *object, LayerType m_layer, IndependantType ty
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
-	if ((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer)
+	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_Independant))
 	{
-		sceneIndependantsTyped[(int)type].push_back(object);
-		sceneIndependantsLayered[(int)m_layer].push_back(object);
-		sceneIndependants.push_back(object);
+		if ((object)->collider_type > 100)
+		{
+			printf("m");
+		}
+
+		AddIndependantToVector(object, &this->sceneIndependantsTyped[(int)type]);
+		AddIndependantToVector(object, &this->sceneIndependantsLayered[(int)m_layer]);
+		AddIndependantToVector(object, &this->sceneIndependants);
 	}
 	else
 	{
@@ -79,24 +84,31 @@ void Game::updateScene(Time deltaTime)
 	scale_factor.x = 1.0f * screen_size.x / REF_WINDOW_RESOLUTION_X;
 	scale_factor.y = 1.0f * screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
-	//Collect & clean garbage
-	collectGarbage();
+	//Clean garbage
 	cleanGarbage();
 
 	//Checking colisions
 	colisionChecksV2();
 
-	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
+	size_t sceneIndependantsSize = this->sceneIndependants.size();
+
+	for (int i = 0; i < sceneIndependantsSize; i++)
 	{
-		(*it)->update(deltaTime, hyperspeedMultiplier);
+		if (this->sceneIndependants[i] == NULL)
+			continue;
+
+		this->sceneIndependants[i]->update(deltaTime, hyperspeedMultiplier);
 	}
+
+	//Collect the dust
+	collectGarbage();
 }
 
 void Game::updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
-	this->hud.Update(m_armor, m_shield, m_money, m_graze_count, m_hazard_level, scene_name, deltaTime, hub, focused_item_type, f_name, f_max_speed, f_hyperspeed, 
+	this->hud.Update(m_armor, m_shield, m_money, m_graze_count, m_hazard_level, scene_name, deltaTime, hub, focused_item_type, f_name, f_max_speed, f_hyperspeed,
 		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 
@@ -115,8 +127,11 @@ void Game::drawScene()
 		}
 		else
 		{
-			for (std::list<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
+			for (std::vector<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
 			{
+				if (*it == NULL)
+					continue;
+
 				if ((*(*it)).visible)
 				{
 					if (!(*(*it)).transparent)
@@ -174,14 +189,11 @@ sf::Vector2i Game::getHudFocusedIndexWithinGrid(HudGridsIndex grid_)
 {
 	switch (grid_)
 	{
-		case HudGrid_ShipGrid:
-		{
-			return hud.fakeShipGrid.focus;
-		}
-		case HudGrid_EquipmentGrid:
-		{
-			return hud.fakeEquipmentGrid.focus;
-		}
+	case HudGrid_ShipGrid:
+		return hud.fakeShipGrid.focus;
+
+	case HudGrid_EquipmentGrid:
+		return hud.fakeEquipmentGrid.focus;
 	}
 
 	return sf::Vector2i(-1, -1);
@@ -194,11 +206,17 @@ void Game::colisionChecksV2()
 	int i = 0;
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::list<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::PlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::PlayerShip].end(); it1++)
+	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::PlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::PlayerShip].end(); it1++)
 	{
+		if (*it1 == NULL)
+			continue;
+
 		//Enemy bullets hitting the player
-		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyFire].end(); it2++)
+		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyFire].end(); it2++)
 		{
+			if (*it2 == NULL)
+				continue;
+
 			i++;
 			if (SimpleCollision::IsGrazing((*it1), (*it2)))
 			{
@@ -227,8 +245,11 @@ void Game::colisionChecksV2()
 		}
 
 		//Enemy objects
-		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it2++)
+		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it2++)
 		{
+			if (*it2 == NULL)
+				continue;
+
 			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
@@ -265,8 +286,11 @@ void Game::colisionChecksV2()
 		}
 
 		//Loot
-		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
+		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
 		{
+			if (*it2 == NULL)
+				continue;
+
 			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
@@ -281,8 +305,11 @@ void Game::colisionChecksV2()
 		}
 
 		//Portal
-		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::PortalObject].begin(); it2 != sceneIndependantsTyped[IndependantType::PortalObject].end(); it2++)
+		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::PortalObject].begin(); it2 != sceneIndependantsTyped[IndependantType::PortalObject].end(); it2++)
 		{
+			if (*it2 == NULL)
+				continue;
+
 			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
@@ -292,41 +319,54 @@ void Game::colisionChecksV2()
 	}
 
 	//Then, check if any allied bullet collide with any enemy
-	for (std::list<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it1 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it1++)
+	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it1 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it1++)
 	{
+		if (*it1 == NULL)
+			continue;
+
 		//Player bullets on enemy
-		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::FriendlyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::FriendlyFire].end(); it2++)
+		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::FriendlyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::FriendlyFire].end(); it2++)
 		{
+			if (*it2 == NULL)
+				continue;
+
 			i++;
+			if ((*it2)->collider_type > 100)
+			{
+				printf("m");
+			}
 			//Bullets are invisible after impact
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				if ((*it2)->collider_type == FriendlyFire)
-				{
-					//Do something (like, kill the enemy ship ?)
-					(*it1)->damage_from(*(*it2));
-					//explosion
-					(*it2)->Death();
+				//Do something (like, kill the enemy ship ?)
+				(*it1)->damage_from(*(*it2));
+				//explosion
+				(*it2)->Death();
 
-					//death
-					if ((*it1)->getIndependantArmor() <= 0)
-					{
-						//Loot
-						hazard += (*it1)->getMoney();
-						(*it1)->CreateRandomLoot(this->BeastScoreBonus);
-						(*it1)->GenerateLoot();
-						(*it1)->Death();
-					}
+				//death
+				if ((*it1)->getIndependantArmor() <= 0)
+				{
+					//Loot
+					hazard += (*it1)->getMoney();
+					(*it1)->CreateRandomLoot(this->BeastScoreBonus);
+					(*it1)->GenerateLoot();
+					(*it1)->Death();
 				}
 			}
 		}
 	}
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::list<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::FakePlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::FakePlayerShip].end(); it1++)
+	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::FakePlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::FakePlayerShip].end(); it1++)
 	{
-		for (std::list<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
+		if (*it1 == NULL)
+			continue;
+
+		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
 		{
+			if (*it2 == NULL)
+				continue;
+
 			i++;
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
@@ -348,17 +388,82 @@ void Game::cleanGarbage()
 	sf::Clock dt;
 	dt.restart();
 
-	for (std::list<Independant*>::iterator it = (this->garbage).begin(); it != (this->garbage).end(); it++)
+	// On "cache" les size, pour éviter d'appeler des fonctions à chaque itération
+	const size_t garbageSize = this->garbage.size();
+	const size_t sceneIndependantsSize = this->sceneIndependants.size();
+	//Size layer
+	size_t sceneIndependantsLayeredSize[NBVAL_Layer];
+	for (int layer = 0; layer < NBVAL_Layer; layer++)
 	{
-		Independant*	ptr = *it;
-		this->sceneIndependants.remove(ptr);
-		this->sceneIndependantsLayered[ptr->layer].remove(*it);
-		this->sceneIndependantsTyped[(int)(ptr->collider_type)].remove(*it);
-		(*it)->Destroy();//destructor function
-		delete (*it);
+		sceneIndependantsLayeredSize[layer] = this->sceneIndependantsLayered[layer].size();
+	}
+	//Size ind type
+	size_t sceneIndependantsTypedSize[NBVAL_Independant];
+	for (int layer = 0; layer < NBVAL_Independant; layer++)
+	{
+		sceneIndependantsTypedSize[layer] = this->sceneIndependantsTyped[layer].size();
+	}
+
+	//Scene independants
+	for (size_t i = 0; i < garbageSize; i++)
+	{
+		Independant*    pCurIndependant = this->garbage[i];
+
+		// On remet à NULL lorsqu'on a trouvé un élément à dégager
+		for (size_t j = 0; j < sceneIndependantsSize; j++)
+		{
+			if (this->sceneIndependants[j] == pCurIndependant)
+			{
+				this->sceneIndependants[j] = NULL;
+				break;
+			}
+		}
+
+		// "layered"...
+		const int layer = pCurIndependant->layer;
+		for (size_t j = 0; j < sceneIndependantsLayeredSize[layer]; j++)
+		{
+			if (this->sceneIndependantsLayered[layer][j] == pCurIndependant)
+			{
+				this->sceneIndependantsLayered[layer][j] = NULL;
+				break;
+			}
+		}
+
+		// "typed"
+		const int type = pCurIndependant->collider_type;
+		for (size_t j = 0; j < sceneIndependantsTypedSize[type]; j++)
+		{
+			if (this->sceneIndependantsTyped[type][j] == pCurIndependant)
+			{
+				this->sceneIndependantsTyped[type][j] = NULL;
+				break;
+			}
+		}
+
+		pCurIndependant->Destroy();//destructor function
+
+		// A la fin, on delete l'élément
+		delete pCurIndependant;
 	}
 
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
+}
+
+void Game::AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector)
+{
+	const size_t vectorSize = vector->size();
+	for (size_t i = 0; i < vectorSize; i++)
+	{
+		if ((*vector)[i] == NULL)
+		{
+			(*vector)[i] = pIndependant;
+			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
+		}
+	}
+
+	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
+	vector->push_back(pIndependant);
 }
 
 void Game::collectGarbage()
@@ -368,8 +473,11 @@ void Game::collectGarbage()
 
 	this->garbage.clear();
 
-	for (std::list<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
+	for (std::vector<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
 	{
+		if (*it == NULL)
+			continue;
+
 		//Content flagged for deletion
 		if ((**it).GarbageMe)
 		{
@@ -384,7 +492,6 @@ void Game::collectGarbage()
 			{
 				(**it).isOnScene = true;
 			}
-
 		}
 
 		//Content that went on scene and then exited have to be deleted
@@ -406,15 +513,17 @@ void Game::collectGarbage()
 void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 {
 	int clear_count = 0;
-	for (std::list<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
+	for (std::vector<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
 	{
+		if (*it == NULL)
+			continue;
+
 		if (only_offscene)
 		{
 			if (!(*it)->isOnScene)
 			{
 				(*it)->GarbageMe = true;
 				clear_count++;
-
 			}
 		}
 		else
@@ -428,8 +537,11 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 
 void Game::SetLayerRotation(LayerType m_layer, float angle)
 {
-	for (std::list<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
+	for (std::vector<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
 	{
+		if (*it == NULL)
+			continue;
+
 		(*it)->setRotation(angle);
 	}
 }
@@ -472,8 +584,11 @@ TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_
 {
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::list<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
+	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
 	{
+		if (*it == NULL)
+			continue;
+
 		if ((*it)->isOnScene && !(*it)->ghost)
 		{
 			const float a = ref_position.x - (*it)->getPosition().x;
@@ -511,8 +626,11 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 	float angle = 0.f;
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::list<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
+	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
 	{
+		if (*it == NULL)
+			continue;
+
 		if ((*it)->isOnScene && !(*it)->ghost)
 		{
 			const float a = ref_position.x - (*it)->getPosition().x;
@@ -562,8 +680,11 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 
 void Game::WakeUpEnemiesWithName(string m_display_name)
 {
-	for (std::list<Independant*>::iterator it = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it++)
+	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it++)
 	{
+		if (*it == NULL)
+			continue;
+
 		if ((*it)->display_name == m_display_name)
 		{
 			(*it)->wake_up = true;

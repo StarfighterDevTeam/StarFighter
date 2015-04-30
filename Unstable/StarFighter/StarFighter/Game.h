@@ -23,7 +23,7 @@ enum TargetScan
 	TARGET_IN_RANGE,//2
 };
 
-struct Game 
+struct Game
 {
 public:
 	void init(RenderWindow* window);
@@ -40,7 +40,7 @@ public:
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
-	void garbageLayer (LayerType m_layer, bool only_offscene=false);
+	void garbageLayer(LayerType m_layer, bool only_offscene = false);
 	void SetLayerRotation(LayerType m_layer, float angle);
 	sf::RenderTexture mainScreen;
 	sf::RenderTexture hubScreen;
@@ -63,28 +63,29 @@ public:
 	void resetHazard(int hazard_overkill = 0);
 	sf::Vector2f scale_factor;
 	Directions direction;
-	
+
 	int hazard;
 	int hazardSpawned;
 
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
-	void GetBeastScoreBonus (float m_playerShipBeastScore, float m_sceneBeastScore);
+	void GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
 	TargetScan FoundNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range = 0);
-	float GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range=0);
+	float GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range = 0);
 	void WakeUpEnemiesWithName(string m_display_name);
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
+	void Game::AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector);
 	Clock sceneChronometer;
 	float movementClock;
 	float BeastScoreBonus;
 	RenderWindow *window;
 	std::list<RectangleShape*> sceneFeedbackBars;
-	std::list<Independant*> sceneIndependants;
-	std::list<Independant*> sceneIndependantsLayered[NBVAL_Layer];
-	std::list<Independant*> sceneIndependantsTyped[NBVAL_Independant];
-	std::list<Independant*> garbage;
+	std::vector<Independant*> sceneIndependants;
+	std::vector<Independant*> sceneIndependantsLayered[NBVAL_Layer];
+	std::vector<Independant*> sceneIndependantsTyped[NBVAL_Independant];
+	std::vector<Independant*> garbage;
 };
 
 #endif // GAME_H_INCLUDED
