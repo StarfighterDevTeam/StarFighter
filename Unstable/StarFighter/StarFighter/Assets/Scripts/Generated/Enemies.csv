@@ -18,3 +18,4 @@ V_Delta1,1500,100,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta1.pn
 V_Gamma1,1000,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma1.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma1_Entry
 V_Gamma2,1000,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma2.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma2_Entry
 V_Gamma3,1000,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma3.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma3_Entry
+V_Zeta,500,0,0,10,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,250,death_explosion,50,0,,,,10,0

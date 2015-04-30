@@ -140,9 +140,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	bool l_ghost = false;
-	for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
+	if (this->hasPhases)
 	{
-		l_ghost = l_ghost || (this->currentPhase->modifiers[i] == Ghost);
+		for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
+		{
+			l_ghost = l_ghost || (this->currentPhase->modifiers[i] == Ghost);
+		}
 	}
 	this->setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
 	this->disable_fire = hyperspeedMultiplier > 1.0f;
@@ -230,7 +233,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//rotation
 	//calculating the angle we want to face, if any
-	float target_angle = this->getRotation();
+ 	float target_angle = this->getRotation();
 
 	bool l_has_target_seaking = false;
 	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
