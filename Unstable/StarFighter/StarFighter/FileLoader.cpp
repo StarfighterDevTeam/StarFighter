@@ -112,8 +112,6 @@ EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_ene
 						vector<string>::iterator nextPhase = find(l_loadedPhases.begin(), l_loadedPhases.end(), (*it)->nextPhase_name);
 						if (nextPhase == l_loadedPhases.end())
 						{
-							//Phase* next_phase = Enemy::LoadPhase((*it)->nextPhase_name);
-							//base->enemy->phases.push_back(next_phase);
 							l_phasesToBeLoaded.push_back((*it)->nextPhase_name);
 						}
 					}

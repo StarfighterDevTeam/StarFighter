@@ -821,36 +821,15 @@ Phase* Enemy::LoadPhase(string name)
 			phase->vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
 
 			//loading weapons and ammos
-			if ((*it)[EnemyPhaseData::PHASE_WEAPON].compare("0") != 0)
+			for (int i = 0; i < 6; i++)
 			{
-				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO]));
-				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET].c_str());
-				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY].c_str());
-				phase->weapons_list.push_back(m_weapon);
-			}
-
-			if ((*it)[EnemyPhaseData::PHASE_WEAPON_2].compare("0") != 0)
-			{
-				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_2], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_2]));
-				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_2].c_str());
-				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY_2].c_str());
-				phase->weapons_list.push_back(m_weapon);
-			}
-
-			if ((*it)[EnemyPhaseData::PHASE_WEAPON_3].compare("0") != 0)
-			{
-				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_3], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_3]));
-				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_3].c_str());
-				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY_3].c_str());
-				phase->weapons_list.push_back(m_weapon);
-			}
-
-			if ((*it)[EnemyPhaseData::PHASE_WEAPON_4].compare("0") != 0)
-			{
-				Weapon* m_weapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WEAPON_4], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_AMMO_4]));
-				m_weapon->weaponOffset.x = atof((*it)[EnemyPhaseData::PHASE_WEAPON_OFFSET_4].c_str());
-				m_weapon->delay = atof((*it)[EnemyPhaseData::PHASE_WEAPON_DELAY_4].c_str());
-				phase->weapons_list.push_back(m_weapon);
+				if ((*it)[PHASE_WEAPON + (i * 4)].compare("0") != 0)
+				{
+					Weapon* m_weapon = Enemy::LoadWeapon((*it)[PHASE_WEAPON + (i * 4)], 1, Enemy::LoadAmmo((*it)[PHASE_AMMO + (i * 4)]));
+					m_weapon->weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 4)].c_str());
+					m_weapon->delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 4)].c_str());
+					phase->weapons_list.push_back(m_weapon);
+				}
 			}
 
 			//loading phases
