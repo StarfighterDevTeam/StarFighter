@@ -108,84 +108,75 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 	return firing_ready;
 }
 
-bool Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
+void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	if (isFiringReady(deltaTime, hyperspeedMultiplier))
+	if (multishot > 1)
 	{
-		if (multishot > 1)
+		if (dispersion == 360)//treating this particular case to avoid a double bullet on the 360th degree
 		{
-			if (dispersion == 360)//treating this particular case to avoid a double bullet on the 360th degree
-			{
-				dispersion *= (1 - (1 / multishot));//ex: 10 shots at 360°, we make it shots at 324° instead (360 - 360/10 to avoid the double bullet)
-			}
+			dispersion *= (1 - (1 / multishot));//ex: 10 shots at 360°, we make it shots at 324° instead (360 - 360/10 to avoid the double bullet)
+		}
 
-			if (this->shot_mode == NoShotMode)
-			{
-				FireMultiShot(m_collider_type);
-			}
-			else if (this->shot_mode == AlternateShotMode)
-			{
-				FireAlternateShot(m_collider_type);
-			}
-			else if (this->shot_mode == AscendingShotMode)
+		if (this->shot_mode == NoShotMode)
+		{
+			FireMultiShot(m_collider_type);
+		}
+		else if (this->shot_mode == AlternateShotMode)
+		{
+			FireAlternateShot(m_collider_type);
+		}
+		else if (this->shot_mode == AscendingShotMode)
+		{
+			FireAscendingShot(m_collider_type);
+		}
+		else if (this->shot_mode == DescendingShotMode)
+		{
+			FireDescendingShot(m_collider_type);
+		}
+		else if (this->shot_mode == Ascending2ShotMode)
+		{
+			if (!fire_pattern_return)
 			{
 				FireAscendingShot(m_collider_type);
 			}
-			else if (this->shot_mode == DescendingShotMode)
+			else
 			{
 				FireDescendingShot(m_collider_type);
 			}
-			else if (this->shot_mode == Ascending2ShotMode)
-			{
-				if (!fire_pattern_return)
-				{
-					FireAscendingShot(m_collider_type);
-				}
-				else
-				{
-					FireDescendingShot(m_collider_type);
-				}
 				
-				if (shot_index == 0)
-				{
-					fire_pattern_return = !fire_pattern_return;
-				}
-			}
-			else if (this->shot_mode == Descending2ShotMode)
+			if (shot_index == 0)
 			{
-				if (!fire_pattern_return)
-				{
-					FireDescendingShot(m_collider_type);
-				}
-				else
-				{
-					FireAscendingShot(m_collider_type);
-				}
-
-				if (shot_index == 0)
-				{
-					fire_pattern_return = !fire_pattern_return;
-				}
+				fire_pattern_return = !fire_pattern_return;
 			}
 		}
-		else
+		else if (this->shot_mode == Descending2ShotMode)
 		{
-			FireSingleShot(m_collider_type);
+			if (!fire_pattern_return)
+			{
+				FireDescendingShot(m_collider_type);
+			}
+			else
+			{
+				FireAscendingShot(m_collider_type);
+			}
+
+			if (shot_index == 0)
+			{
+				fire_pattern_return = !fire_pattern_return;
+			}
 		}
-
-		readyFireTimer = sf::seconds(0);
-		firing_ready = false;
-
-		if (rafale > 0 && shot_index == 0)
-		{
-			rafale_index++;
-		}	
-
-		return true;
 	}
 	else
 	{
-		return false;
+		FireSingleShot(m_collider_type);
+	}
+
+	readyFireTimer = sf::seconds(0);
+	firing_ready = false;
+
+	if (rafale > 0 && shot_index == 0)
+	{
+		rafale_index++;
 	}
 }
 

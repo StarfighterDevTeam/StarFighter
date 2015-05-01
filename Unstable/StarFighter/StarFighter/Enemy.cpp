@@ -231,29 +231,52 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 	}
 
-	//rotation
 	//calculating the angle we want to face, if any
  	float target_angle = this->getRotation();
 
-	bool l_has_target_seaking = false;
-	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
-	{
-		if ((*it)->target_seaking == SEMI_SEAKING || (*it)->target_seaking == SEAKING)
-		{
-			l_has_target_seaking = true;
-			break;
-		}
-	}
-
+	//calculating the angle we want to face, if any
+	bool isNearestTargetIsKnown = false;
 	if (this->reset_facing)
 	{
 		target_angle = Independant::getRotation_for_Direction((*CurrentGame).direction);	
 	}
-	else if (l_has_target_seaking || this->face_target)
+	else if (this->face_target)
 	{
 		target_angle = fmod(180 + Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+		isNearestTargetIsKnown = true;
 	}
 
+	//calculating the weapons cooldown and targets
+	bool isDoneFiringOnLockedTarget = true;
+	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+	{
+		if ((*it)->isFiringReady(deltaTime, hyperspeedMultiplier))//update all weapons cooldown
+		{
+			(*it)->m_isReadyToFire = true;
+			//now acquire target is the weapons needs to
+			if (!isNearestTargetIsKnown)//maybe we know it already?
+			{
+				if ((*it)->target_seaking == SEAKING || ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index == 0))
+				{
+					target_angle = fmod(180 + Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+				}
+			}
+		}
+		else
+		{
+			(*it)->m_isReadyToFire = false;
+		}
+
+		//semi-seaking and rafale not ended or alternated multishot not ended need to keep the enemy oriented to the same target if it's "semi_seaking"
+		if (this->face_target)
+		{
+			if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale > 0 && (((*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale) || ((*it)->multishot > 1 && (*it)->shot_index > 0)))
+			{
+				isDoneFiringOnLockedTarget = false;
+			}
+		}
+	}
+	
 	float current_angle = this->getRotation();
 	float delta = current_angle - target_angle;
 	if (delta > 180)
@@ -261,27 +284,12 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else if (delta < -180)
 		delta += 360;
 
-	bool isDoneFiringOnLockedTarget = true;
-
 	if (!this->face_target && !this->reset_facing)
 	{
 		this->rotate(this->rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 	}
 	else
 	{
-		//if one of the weapon is semi-seaking and the enemy has to face the target, then it cannot rotate until he's done firing
-		if (this->face_target)
-		{
-			for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
-			{
-				//semi-seaking and rafale not ended or alternated multishot not ended
-				if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale > 0 && (((*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale) || ((*it)->multishot > 1 && (*it)->shot_index > 0)))
-				{
-					isDoneFiringOnLockedTarget = false;
-				}
-			}
-		}
-		
 		if (isDoneFiringOnLockedTarget)
 		{
 			//now let's rotate toward the target (the player)
@@ -323,13 +331,11 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					{
 						//do nothing: this weapon is settled to start firing later (delay)
 					}
-					else
+					else if ((*it)->m_isReadyToFire)
 					{
-						printf("wait %f\n", phaseTimer.asSeconds());
 						if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 						{
-							//even if we don't shoot, the weapon has to keep reloading
-							(*it)->isFiringReady(deltaTime, hyperspeedMultiplier);
+							//do nothing
 						}
 						else
 						{
@@ -355,17 +361,13 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 							(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
 							(*it)->face_target = this->face_target;
-							if ((*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier))
+
+							(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
 							{
-								shots_fired++;
+								m_shots_fired++;
 							}
 						}
 					}
-				}
-				else
-				{
-					//even if we don't shoot, the weapon has to keep reloading
-					(*it)->isFiringReady(deltaTime, hyperspeedMultiplier);
 				}
 			}
 		}
@@ -642,7 +644,7 @@ bool Enemy::CheckCondition()
 			{
 				if ((*it)->op == FloatCompare::GREATHER_THAN)
 				{
-					if (this->shots_fired >= (*it)->value)
+					if (this->m_shots_fired >= (*it)->value)
 					{
 						this->setPhase((*it)->nextPhase_name);
 						return true;
@@ -650,7 +652,7 @@ bool Enemy::CheckCondition()
 				}
 				else if ((*it)->op == FloatCompare::EQUAL_TO)
 				{
-					if (this->shots_fired == (*it)->value)
+					if (this->m_shots_fired == (*it)->value)
 					{
 						this->setPhase((*it)->nextPhase_name);
 						return true;
@@ -658,7 +660,7 @@ bool Enemy::CheckCondition()
 				}
 				else if ((*it)->op == FloatCompare::LESSER_THAN)
 				{
-					if (this->shots_fired < (*it)->value)
+					if (this->m_shots_fired < (*it)->value)
 					{
 						this->setPhase((*it)->nextPhase_name);
 						return true;
@@ -675,7 +677,7 @@ bool Enemy::CheckCondition()
 void Enemy::setPhase(Phase* m_phase)
 {
 	this->currentPhase = m_phase;
-	this->shots_fired = 0;
+	this->m_shots_fired = 0;
 
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, m_phase->vspeed);
 

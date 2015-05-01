@@ -98,51 +98,44 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			if (InputGuy::isFiring() || this->automatic_fire)
 			{
-				//calculating the angle we want to face, if any
-				float target_angle = this->getRotation();
-				if (this->weapon->target_seaking != NO_SEAKING)
+				if (this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 				{
-					target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
-				}
-				float current_angle = this->getRotation();
-				float delta = current_angle - target_angle;
-				if (delta > 180)
-					delta -= 360;
-				else if (delta < -180)
-					delta += 360;
+					//calculating the angle we want to face, if any
+					float target_angle = this->getRotation();
+					if (this->weapon->target_seaking != NO_SEAKING || (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index == 0))
+					{
+						target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+					}
+					float current_angle = this->getRotation();
+					float delta = current_angle - target_angle;
+					if (delta > 180)
+						delta -= 360;
+					else if (delta < -180)
+						delta += 360;
 
-				float theta = this->getRotation() / 180 * M_PI;
-				if (this->weapon->target_seaking != NO_SEAKING)
-				{
-					theta -= delta / 180 * M_PI;
-				}
+					float theta = this->getRotation() / 180 * M_PI;
+					if (this->weapon->target_seaking != NO_SEAKING)
+					{
+						theta -= delta / 180 * M_PI;
+					}
 
-				if (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index > 0 && this->weapon->rafale_index < this->weapon->rafale)
-				{
-					//semi-seaking and rafale not ended = no update of target or weapon position
-				}
-				else
-				{
-					this->weapon->weapon_current_offset.x = this->weapon->weaponOffset.x + this->m_size.x / 2 * sin(theta);
-					this->weapon->weapon_current_offset.y = this->weapon->weaponOffset.y - this->m_size.y / 2 * cos(theta);
+					if (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index > 0 && this->weapon->rafale_index < this->weapon->rafale)
+					{
+						//semi-seaking and rafale not ended = no update of target or weapon position
+					}
+					else
+					{
+						this->weapon->weapon_current_offset.x = this->weapon->weaponOffset.x + this->m_size.x / 2 * sin(theta);
+						this->weapon->weapon_current_offset.y = this->weapon->weaponOffset.y - this->m_size.y / 2 * cos(theta);
 
-					//transmitting the angle to the weapon, which will pass it to the bullets
-					this->weapon->shot_angle = theta;
-				}
+						//transmitting the angle to the weapon, which will pass it to the bullets
+						this->weapon->shot_angle = theta;
+					}
 
-				this->weapon->setPosition(this->getPosition().x + this->weapon->weapon_current_offset.x, this->getPosition().y + this->weapon->weapon_current_offset.y);
-				this->weapon->Fire(IndependantType::FriendlyFire, deltaTime, hyperspeedMultiplier);
+					this->weapon->setPosition(this->getPosition().x + this->weapon->weapon_current_offset.x, this->getPosition().y + this->weapon->weapon_current_offset.y);
+					this->weapon->Fire(IndependantType::FriendlyFire, deltaTime, hyperspeedMultiplier);
+				}
 			}
-			else
-			{
-				//even if we don't shoot, the weapon has to keep reloading
-				this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
-			}
-		}
-		else
-		{
-			//even if we don't shoot, the weapon has to keep reloading
-			this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier);
 		}
 	}
 
