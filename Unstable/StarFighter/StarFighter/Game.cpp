@@ -530,22 +530,30 @@ void Game::SetLayerRotation(LayerType m_layer, float angle)
 	}
 }
 
+bool Game::isVectorEmpty(vector <Independant*>* vector)
+{
+	const size_t vectorSize = vector->size();
+	for (size_t i = 0; i < vectorSize; i++)
+	{
+		if ((*vector)[i] != NULL)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool Game::isLastEnemyDead()
 {
-	int n = 0;
-
-	n += sceneIndependantsTyped[IndependantType::LootObject].size();
-	n += sceneIndependantsTyped[IndependantType::EnemyFire].size();
-	n += sceneIndependantsTyped[IndependantType::EnemyObject].size();
-
-	if (n == 0)
-	{
-		return true;
-	}
-	else
-	{
+	if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyFire]))
 		return false;
-	}
+	else if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyObject]))
+		return false;
+	else if (!isVectorEmpty(&this->sceneIndependantsTyped[LootObject]))
+		return false;
+	
+	return true;
 }
 
 int Game::getHazard()

@@ -76,7 +76,8 @@ public:
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
-	void Game::AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector);
+	void AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector);
+	bool isVectorEmpty(vector <Independant*>* vector);
 	Clock sceneChronometer;
 	float movementClock;
 	float BeastScoreBonus;
