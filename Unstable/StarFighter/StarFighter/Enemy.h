@@ -47,14 +47,15 @@ public:
 	EnemyClass enemy_class;
 
 	//phases
-	void setPhase(string phase_name);
-	void setPhase(Phase* m_phase);
+	void setPhase(Phase* phase);
+	Phase* getPhase(string phaseName);
 	Phase* currentPhase;
+	vector <Phase*> phases;
 	bool hasPhases;
 	bool CheckCondition();
 	sf::Time phaseTimer;
 	sf::Time enemyTimer;
-	Phase* LoadPhase(string name);
+	static Phase* LoadPhase(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);

@@ -472,9 +472,26 @@ Enemy* Enemy::Clone()
 		enemy->hasPhases = this->hasPhases;
 		enemy->currentPhase = this->currentPhase;
 		enemy->setPhase(this->currentPhase);
+		for (std::vector<Phase*>::iterator it = (this->phases.begin()); it != (this->phases.end()); it++)
+		{
+			enemy->phases.push_back((*it));
+		}
 	}
 
 	return enemy;
+}
+
+Phase* Enemy::getPhase(string phaseName)
+{
+	for (vector<Phase*>::iterator it = this->phases.begin(); it != this->phases.end(); it++)
+	{
+		if ((*it)->m_name == phaseName)
+		{
+			return (*it);
+		}
+	}
+	
+	return NULL;
 }
 
 bool Enemy::CheckCondition()
@@ -488,7 +505,7 @@ bool Enemy::CheckCondition()
 				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->value));
 				if (result == (*it)->op)
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					return true;
 				}
 													  
@@ -500,7 +517,7 @@ bool Enemy::CheckCondition()
 				FloatCompare result = this->compare_posX_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value, (*it)->value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				if (result == (*it)->op)
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					return true;
 				}
 			
@@ -511,12 +528,12 @@ bool Enemy::CheckCondition()
 			{
 				if ((this->phaseTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					return true;
 				}
 				else if ((this->phaseTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					return true;
 				}
 
@@ -527,13 +544,13 @@ bool Enemy::CheckCondition()
 			{
 				if ((this->enemyTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					this->enemyTimer = sf::seconds(0);
 					return true;
 				}
 				else if ((this->enemyTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					this->enemyTimer = sf::seconds(0);
 					return true;
 				}
@@ -545,17 +562,15 @@ bool Enemy::CheckCondition()
 			{
 				if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 
 					return true;
 				}
 				else if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					return true;
 				}
-				//Debug:
-				//printf("vie: %d. vie max: %d. shield: %d\n", this->getIndependantArmor(), this->getIndependantArmorMax(), this->getIndependantShield());
 				break;
 			}
 		
@@ -570,7 +585,7 @@ bool Enemy::CheckCondition()
 					}
 					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 					break;
@@ -579,12 +594,12 @@ bool Enemy::CheckCondition()
 				{
 					if (this->getIndependantShieldMax() == 0)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 					break;
@@ -595,14 +610,14 @@ bool Enemy::CheckCondition()
 					{
 						if ((*it)->value == 0)
 						{
-							this->setPhase((*it)->nextPhase_name);
+							this->setPhase(this->getPhase((*it)->nextPhase_name));
 							return true;
 						}
 						break;
 					}
 					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() == (*it)->value)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 					break;
@@ -613,7 +628,7 @@ bool Enemy::CheckCondition()
 			{
 				if (this->wake_up)
 				{
-					this->setPhase((*it)->nextPhase_name);
+					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					return true;
 				}
 				break;
@@ -625,7 +640,7 @@ bool Enemy::CheckCondition()
 				{
 					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_OUT_OF_RANGE)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 				}
@@ -633,7 +648,7 @@ bool Enemy::CheckCondition()
 				{
 					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_IN_RANGE)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 				}							  
@@ -646,7 +661,7 @@ bool Enemy::CheckCondition()
 				{
 					if (this->m_shots_fired >= (*it)->value)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 				}
@@ -654,7 +669,7 @@ bool Enemy::CheckCondition()
 				{
 					if (this->m_shots_fired == (*it)->value)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 				}
@@ -662,7 +677,7 @@ bool Enemy::CheckCondition()
 				{
 					if (this->m_shots_fired < (*it)->value)
 					{
-						this->setPhase((*it)->nextPhase_name);
+						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
 				}
@@ -674,12 +689,13 @@ bool Enemy::CheckCondition()
 	return false;
 }
 
-void Enemy::setPhase(Phase* m_phase)
+void Enemy::setPhase(Phase* phase)
 {
-	this->currentPhase = m_phase;
+	assert(phase != NULL);
+	this->currentPhase = phase;
 	this->m_shots_fired = 0;
 
-	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, m_phase->vspeed);
+	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
 
 	//reset old stats
 	this->immune = false;
@@ -691,7 +707,7 @@ void Enemy::setPhase(Phase* m_phase)
 	//load new stats
 	for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
 	{
-		switch (m_phase->modifiers[i])
+		switch (phase->modifiers[i])
 		{
 			case Modifier::NoModifier:
 			{
@@ -743,31 +759,31 @@ void Enemy::setPhase(Phase* m_phase)
 
 	//clearing old weapons and setting new ones
 	this->weapons_list.clear();
-	for (std::vector<Weapon*>::iterator it = m_phase->weapons_list.begin(); it != m_phase->weapons_list.end(); it++)
+	for (std::vector<Weapon*>::iterator it = phase->weapons_list.begin(); it != phase->weapons_list.end(); it++)
 	{
 		this->weapons_list.push_back((*it)->Clone());
 	}
 
 	//movement
-	this->Pattern.SetPattern(m_phase->Pattern->currentPattern, m_phase->Pattern->patternSpeed, m_phase->Pattern->patternParams); //vitesse angulaire (degres/s)
-	this->rotation_speed = m_phase->rotation_speed;
+	this->Pattern.SetPattern(phase->Pattern->currentPattern, phase->Pattern->patternSpeed, phase->Pattern->patternParams); //vitesse angulaire (degres/s)
+	this->rotation_speed = phase->rotation_speed;
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
-	if (m_phase->hasWelcomeShot)
+	if (phase->hasWelcomeShot)
 	{
 		float theta = this->getRotation() / 180 * M_PI;
-		float weapon_offset_x = m_phase->welcomeWeapon->weaponOffset.x - this->m_size.y / 2 * sin(theta);
-		float weapon_offset_y = m_phase->welcomeWeapon->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+		float weapon_offset_x = phase->welcomeWeapon->weaponOffset.x - this->m_size.y / 2 * sin(theta);
+		float weapon_offset_y = phase->welcomeWeapon->weaponOffset.y + this->m_size.y / 2 * cos(theta);
 
-		m_phase->welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
-		m_phase->welcomeWeapon->shot_angle = theta;
+		phase->welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
+		phase->welcomeWeapon->shot_angle = theta;
 
-		m_phase->welcomeWeapon->Fire(IndependantType::EnemyFire);
+		phase->welcomeWeapon->Fire(IndependantType::EnemyFire);
 	}
 
 	//setting up wake_up condition
 	bool wake_up_condition_exists = false;
-	for (std::vector<ConditionTransition*>::iterator it = (m_phase->transitions_list.begin()); it != (m_phase->transitions_list.end()); it++)
+	for (std::vector<ConditionTransition*>::iterator it = (phase->transitions_list.begin()); it != (phase->transitions_list.end()); it++)
 	{
 		if ((*it)->condition == ConditionType::wakeUp)
 		{
@@ -782,18 +798,12 @@ void Enemy::setPhase(Phase* m_phase)
 	}
 
 	//waking up enemies
-	if (m_phase->hasWakeUp)
+	if (phase->hasWakeUp)
 	{
-		(*CurrentGame).WakeUpEnemiesWithName(m_phase->wake_up_name);
+		(*CurrentGame).WakeUpEnemiesWithName(phase->wake_up_name);
 	}
 
 	this->phaseTimer = sf::seconds(0);
-}
-
-void Enemy::setPhase(string phase_name)
-{
-	Phase* phase = this->LoadPhase(phase_name);
-	this->setPhase(phase);
 }
 
 Phase* Enemy::LoadPhase(string name)
@@ -806,6 +816,7 @@ Phase* Enemy::LoadPhase(string name)
 		{
 			Phase* phase = new Phase();
 
+			phase->m_name = name;
 			phase->display_name = (*it)[EnemyPhaseData::PHASE_NAME];
 			phase->vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
 

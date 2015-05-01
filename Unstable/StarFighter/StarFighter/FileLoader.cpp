@@ -93,8 +93,35 @@ EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_ene
 			//Loading phases
 			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
 			{
+				vector<string> l_loadedPhases;
+				vector<string> l_phasesToBeLoaded;
+
+				l_phasesToBeLoaded.push_back((*it)[EnemyData::ENEMY_PHASE]);
+
+				while (!l_phasesToBeLoaded.empty())
+				{
+					//loading phase
+					Phase* phase = Enemy::LoadPhase(l_phasesToBeLoaded.front());
+					base->enemy->phases.push_back(phase);
+					l_loadedPhases.push_back(phase->m_name);
+					l_phasesToBeLoaded.erase(l_phasesToBeLoaded.begin());
+
+					//Do we have other phases to load that we have not loaded already?
+					for (vector<ConditionTransition*>::iterator it = (phase->transitions_list).begin(); it != (phase->transitions_list).end(); it++)
+					{
+						vector<string>::iterator nextPhase = find(l_loadedPhases.begin(), l_loadedPhases.end(), (*it)->nextPhase_name);
+						if (nextPhase == l_loadedPhases.end())
+						{
+							//Phase* next_phase = Enemy::LoadPhase((*it)->nextPhase_name);
+							//base->enemy->phases.push_back(next_phase);
+							l_phasesToBeLoaded.push_back((*it)->nextPhase_name);
+						}
+					}
+				}
+
+				//setting the starting phase
+				base->enemy->setPhase(base->enemy->phases.front());
 				base->enemy->hasPhases = true;
-				base->enemy->setPhase((*it)[EnemyData::ENEMY_PHASE]);
 			}
 			else
 			{

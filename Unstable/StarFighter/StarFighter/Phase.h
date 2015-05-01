@@ -96,6 +96,7 @@ class Phase
 public:
 	Phase();
 	string display_name;
+	string m_name;
 	vector<Weapon*> weapons_list;
 	PatternBobby* Pattern;
 	vector <Modifier> modifiers;
