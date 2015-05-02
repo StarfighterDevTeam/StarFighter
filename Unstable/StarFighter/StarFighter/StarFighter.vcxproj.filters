@@ -111,9 +111,6 @@
     <ClCompile Include="HudGrid.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionUtils.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ammo.h">
@@ -218,8 +215,8 @@
     <ClInclude Include="HudGrid.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionUtils.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+    <ClInclude Include="Includes\PixelPerfectCollision.hpp">
+      <Filter>Fichiers d%27en-tête\Includes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

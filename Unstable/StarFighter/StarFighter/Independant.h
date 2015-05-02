@@ -28,9 +28,8 @@ enum LayerType {
 	BotLayer,
 	FriendlyFireLayer,
 	EnemyFireLayer,
-	PlayerShipLayer,
 	FakeShipLayer,
-
+	PlayerShipLayer,
 	HudObject,
 	HudCursor,
 	NBVAL_Layer

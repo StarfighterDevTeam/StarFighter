@@ -54,7 +54,6 @@
 #define SCENES_FILE "Assets/Scripts/Generated/Scenes.csv"
 #define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
 
-#define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 #define SHIP_BRAKING_MALUS_SPEED						0.60f
 
