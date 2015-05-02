@@ -2,13 +2,14 @@
 #define SIMPLECOLLISION_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include "../Independant.h"
+#include "../CollisionUtils.h"
 
+//TODO: move this out of /includes ?
 
-class SimpleCollision 
+class SimpleCollision
 {
 public:
-	static inline sf::IntRect FToIRect(const sf::FloatRect& f) 
+	static inline sf::IntRect FToIRect(const sf::FloatRect& f)
 	{
 		return sf::IntRect((int)f.left, (int)f.top, (int)f.width, (int)f.height);
 	}
@@ -30,20 +31,28 @@ public:
 		const float b = independantA->getPosition().y - independantB->getPosition().y;
 		const float c = independantA->diag + independantB->diag;
 
-		if (( (a * a) + (b * b)) > (c * c))
+		if (((a * a) + (b * b)) > (c * c))
 			return false;
 
-		// Second test : are the corners included in the other sprite, or vice versa ?
+
 		else
 		{
-			sf::IntRect boundsA(FToIRect(independantA->getGlobalBounds()));
-			sf::IntRect boundsB(FToIRect(independantB->getGlobalBounds()));
+			if (PIXEL_PERFECT_COLLISION)
+			{
+				return Collision::PixelPerfectTest(independantA, independantB, MinAlphaLimitForCollision);
+			}
+			else
+			{
+				// No pixel perfect : are the corners included in the other sprite, or vice versa ?
+				sf::IntRect boundsA(FToIRect(independantA->getGlobalBounds()));
+				sf::IntRect boundsB(FToIRect(independantB->getGlobalBounds()));
 				return boundsA.intersects(boundsB);
+			}
 		}
 		return false;
 	}
 
-	static bool IsGrazing(const Independant* independantA, const Independant* independantB) 
+	static bool IsGrazing(const Independant* independantA, const Independant* independantB)
 	{
 		const float a = independantA->getPosition().x - independantB->getPosition().x;
 		const float b = independantA->getPosition().y - independantB->getPosition().y;
@@ -51,9 +60,12 @@ public:
 
 		if (((a * a) + (b * b)) < (c * c))
 			return true;
-		else 
+		else
 			return false;
 	}
+
+private:
+	static const sf::Uint8 MinAlphaLimitForCollision = 127;
 };
 
 #endif // SIMPLECOLLISION_H_INCLUDED

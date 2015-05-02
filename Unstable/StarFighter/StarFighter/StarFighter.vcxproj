@@ -95,6 +95,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Bot.cpp" />
+    <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyGenerator.cpp" />
     <ClCompile Include="EnemyPool.cpp" />
@@ -128,6 +129,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="Bot.h" />
+    <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyGenerator.h" />
     <ClInclude Include="EnemyPool.h" />
@@ -140,7 +142,6 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hud.h" />
     <ClInclude Include="HudGrid.h" />
-    <ClInclude Include="Includes\PixelPerfectCollision.hpp" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="Independant.h" />
     <ClInclude Include="InputGuy.h" />
