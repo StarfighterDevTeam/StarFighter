@@ -6,7 +6,6 @@
 #include <list>
 #include <vector>
 #include "TextUtils.h"
-#include "Includes/PixelPerfectCollision.hpp"
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>

@@ -111,6 +111,9 @@
     <ClCompile Include="HudGrid.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionUtils.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ammo.h">
@@ -167,9 +170,6 @@
     <ClInclude Include="Logger.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Includes\PixelPerfectCollision.hpp">
-      <Filter>Fichiers d%27en-tête\Includes</Filter>
-    </ClInclude>
     <ClInclude Include="Includes\SimpleCollision.hpp">
       <Filter>Fichiers d%27en-tête\Includes</Filter>
     </ClInclude>
@@ -216,6 +216,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="HudGrid.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionUtils.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
