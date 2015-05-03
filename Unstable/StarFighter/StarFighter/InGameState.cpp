@@ -81,6 +81,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
+	(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, IndependantType::PlayerShip);
 }
 
@@ -467,6 +468,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
+					(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 				}
 
 				//Saving the hazard level
