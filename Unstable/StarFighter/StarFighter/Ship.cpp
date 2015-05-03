@@ -1379,37 +1379,19 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	const sf::Vector2f f = (sf::Vector2f)Independant::getDirectionMultiplier((*CurrentGame).direction);
 	const float x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(this->speed.x * f.x, this->speed.y * f.y)).x;
 
-	if (x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight && !this->disable_inputs)
+	if (this->ship_config.ship_model->hasFake)
 	{
-		if (!this->ship_config.ship_model->hasFake)
-		{
-			this->setAnimationLine(ShipAnimations::ShipTurningRight, true);
-		}
-		else
+		if (x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight && !this->disable_inputs)
 		{
 			this->currentAnimationIndex = ShipAnimations::ShipTurningRight;
 		}
-	}
 
-	else if (x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft && !this->disable_inputs)
-	{
-		if (!this->ship_config.ship_model->hasFake)
-		{
-			this->setAnimationLine(ShipAnimations::ShipTurningLeft, true);
-		}
-		else
+		else if (x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft && !this->disable_inputs)
 		{
 			this->currentAnimationIndex = ShipAnimations::ShipTurningLeft;
 		}
-	}
 
-	else if ((x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle) || this->disable_inputs)
-	{
-		if (!this->ship_config.ship_model->hasFake)
-		{
-			this->setAnimationLine(ShipAnimations::ShipIdle, true);
-		}
-		else
+		else if ((x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle) || this->disable_inputs)
 		{
 			this->currentAnimationIndex = ShipAnimations::ShipIdle;
 		}
