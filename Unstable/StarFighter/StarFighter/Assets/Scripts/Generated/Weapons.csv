@@ -3,7 +3,7 @@ laser,Laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.
 laser_fast,Laser fast,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,7,0,120,alternate,0,seaking
 laser_360,Laser 360°,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.5,3,3.f,10,0,360,0,0,0
 laser_player,Laser player,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.08,0,2.f,7,0,160,0,0,0
-laser_bot,Default laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,0,0,3,26,5,0,0,seaking
+laser_bot,Default laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,0,0,2,20,0,0,0,0
 laser_arc,Laser arc,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.8,0,0,7,0,150,0,0,seaking
 fireball_sinus,Fireball sinus,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05f,25,1.5f,1,0,0,0,0,semi_seaking
 #,,,,,,,,,,,,,,,
@@ -50,6 +50,13 @@ V_Delta2_ring1R,Vanguard Delta2 Ring1 Right,Assets/2D/Equipment/laser_red.png,48
 V_Delta2_ring2L,Vanguard Delta2 Ring2 Left,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,2,semi_seaking
 V_Delta2_ring2M,Vanguard Delta2 Ring2 Mid,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,0,semi_seaking
 V_Delta2_ring2R,Vanguard Delta2 Ring2 Right,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.6,2,2.6,8,8,106,0,358,semi_seaking
+V_Delta3_blast,Vanguard Delta3 Blast,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2,4,3.f,2,50,0,alternate,0,seaking
+V_Delta3_laser1,Vanguard Delta3 Laser1,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,4.4,0,2.f,15,4,160,0,7,semi_seaking
+V_Delta3_laser2L,Vanguard Delta3 Laser2 Left,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,1,semi_seaking
+V_Delta3_laser2R,Vanguard Delta3 Laser2 Right,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,359,semi_seaking
+V_Delta3_laser3L,Vanguard Delta3 Laser3 Left,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,1,semi_seaking
+V_Delta3_laser3R,Vanguard Delta3 Laser3 Right,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,4.4,0,2.f,14,4,149,0,359,semi_seaking
+V_Delta3_blast_exit,Vanguard Delta3 Blast Exit,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.6,3,10,1,0,0,alternate,0,seaking
 V_Gamma1_laser,Vanguard Gamma1 Laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.2,12,1.7142857143,3,20,0,0,0,seaking
 V_Gamma2_ball,Vanguard Gamma2 Ball,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,1.5,0,0,10,0,100,0,0,seaking
 V_Gamma2_missile,Vanguard Gamma2 Missile,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,1,2.f,2,40,0,alternate,0,seaking

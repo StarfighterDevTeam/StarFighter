@@ -736,9 +736,9 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->disabledHyperspeed = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
-	this->combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
+	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
+	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
+	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
 	this->trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	this->trail->visible = false;
 	if (this->ship_config.ship_model->hasFake)
@@ -872,110 +872,85 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	this->isBraking = false;
-	this->isHyperspeeding = false;
-
-	//immunity frames after death
-	if (immune)
+	//no update on invisible ship (=dead)
+	bool l_visible = false;
+	if (this->visible)
 	{
-		if (immunityTimer.getElapsedTime() > sf::seconds(2))
+		l_visible = true;
+	}
+	if (this->ship_config.m_fake_ship != NULL)
+	{
+		if (this->ship_config.m_fake_ship->visible)
 		{
-			immune = false;
+			l_visible = true;
 		}
 	}
 
-	//CHEAT
-	//this->immune = true;
-
-	//sheld regen if not maximum
-	static double shield_regen_buffer = 0;
-	if (shield < ship_config.getShipConfigShield())
+	if (l_visible)
 	{
-		if (hyperspeedMultiplier < 1.0f)
-		{
-			shield_regen_buffer += shield_regen * deltaTime.asSeconds() * hyperspeedMultiplier;
-		}
-		else
-		{
-			shield_regen_buffer += shield_regen * deltaTime.asSeconds();
-		}
-		
-		if (shield_regen_buffer > 1)
-		{
-			double intpart;
-			shield_regen_buffer = modf(shield_regen_buffer, &intpart);
-			shield += intpart;
-		}
+		this->isBraking = false;
+		this->isHyperspeeding = false;
 
-		//canceling over-regen
-		if (shield > ship_config.getShipConfigShield())
+		//immunity frames after death
+		if (immune)
 		{
-			shield = ship_config.getShipConfigShield();
-		}
-	}
-
-	sf::Vector2f directions = InputGuy::getDirections();
-
-	//switching controls to the HUD
-	//Ship controls
- 	if (!disable_inputs)
-	{
-		if (InputGuy::isOpeningHud())
-		{
-			if (!this->hud_key_repeat)
+			if (immunityTimer.getElapsedTime() > sf::seconds(2))
 			{
-				isFocusedOnHud = !isFocusedOnHud;
-				hud_key_repeat = true;
-
-				(*CurrentGame).hud.has_focus = isFocusedOnHud;
-				disable_fire = isFocusedOnHud;
-
-				if (isFocusedOnHud && !isSlowMotion)
-				{
-					(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
-				}
-				else if (!isFocusedOnHud && !isSlowMotion)
-				{
-					(*CurrentGame).hyperspeedMultiplier = 1.0f;
-				}
+				immune = false;
 			}
 		}
-		else
+
+		//CHEAT
+		//this->immune = true;
+
+		//sheld regen if not maximum
+		static double shield_regen_buffer = 0;
+		if (shield < ship_config.getShipConfigShield())
 		{
-			hud_key_repeat = false;
+			if (hyperspeedMultiplier < 1.0f)
+			{
+				shield_regen_buffer += shield_regen * deltaTime.asSeconds() * hyperspeedMultiplier;
+			}
+			else
+			{
+				shield_regen_buffer += shield_regen * deltaTime.asSeconds();
+			}
+
+			if (shield_regen_buffer > 1)
+			{
+				double intpart;
+				shield_regen_buffer = modf(shield_regen_buffer, &intpart);
+				shield += intpart;
+			}
+
+			//canceling over-regen
+			if (shield > ship_config.getShipConfigShield())
+			{
+				shield = ship_config.getShipConfigShield();
+			}
 		}
 
-		moving = directions.x != 0 || directions.y != 0;
-		movingX = directions.x != 0;
-		movingY = directions.y != 0;
+		sf::Vector2f directions = InputGuy::getDirections();
 
-		if (!isFocusedOnHud)
+		//switching controls to the HUD
+		//Ship controls
+		if (!disable_inputs)
 		{
-			speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
-			speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
-
-			//max speed constraints
-			if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
+			if (InputGuy::isOpeningHud())
 			{
-				speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
-			}
-			if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
-			{
-				speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
-			}
-
-			//Slow_motion function
-			if (InputGuy::isSlowMotion() && !disable_fire)
-			{
-				if (!this->slowmo_key_repeat)
+				if (!this->hud_key_repeat)
 				{
-					this->isSlowMotion = !this->isSlowMotion;
-					this->slowmo_key_repeat = true;
-					if (this->isSlowMotion)
+					isFocusedOnHud = !isFocusedOnHud;
+					hud_key_repeat = true;
+
+					(*CurrentGame).hud.has_focus = isFocusedOnHud;
+					disable_fire = isFocusedOnHud;
+
+					if (isFocusedOnHud && !isSlowMotion)
 					{
 						(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
 					}
-					else
+					else if (!isFocusedOnHud && !isSlowMotion)
 					{
 						(*CurrentGame).hyperspeedMultiplier = 1.0f;
 					}
@@ -983,441 +958,483 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 			else
 			{
-				this->slowmo_key_repeat = false;
+				hud_key_repeat = false;
 			}
 
-			//Hyperspeed function
-			if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion)
-			{
-				this->isHyperspeeding = true;
-				(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
-			}
-			else if (!this->isSlowMotion)
-			{
-				(*CurrentGame).hyperspeedMultiplier = 1.0f;
-			}
+			moving = directions.x != 0 || directions.y != 0;
+			movingX = directions.x != 0;
+			movingY = directions.y != 0;
 
-			//auto fire option (F key)
-			if (InputGuy::setAutomaticFire() && !disable_fire)
+			if (!isFocusedOnHud)
 			{
-				if (!this->fire_key_repeat)
+				speed.x += directions.x*ship_config.getShipConfigAcceleration().x;
+				speed.y += directions.y*ship_config.getShipConfigAcceleration().y;
+
+				//max speed constraints
+				if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
 				{
-					this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
-					this->fire_key_repeat = true;
+					speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
 				}
-			}
-			else
-			{
-				this->fire_key_repeat = false;
-			}
-
-			//portals: required to release fire and then press fire while colliding with a portal
-			isUsingPortal = false;
-			if (!isFiringButtonPressed)
-			{
-				if (isCollindingWithPortal)
+				if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
 				{
-					if (InputGuy::isFiring())
-					{
-						if (this->targetPortal != NULL)
-						{
-							if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
-							{
-								isUsingPortal = true;
+					speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
+				}
 
-								if (this->targetPortal->destination_name.compare("0") == 0)
-								{
-									LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
-								}
-							}
+				//Slow_motion function
+				if (InputGuy::isSlowMotion() && !disable_fire)
+				{
+					if (!this->slowmo_key_repeat)
+					{
+						this->isSlowMotion = !this->isSlowMotion;
+						this->slowmo_key_repeat = true;
+						if (this->isSlowMotion)
+						{
+							(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
 						}
 						else
 						{
-							LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, Ship::targetPortal still NULL when it should be initialized.\n");
+							(*CurrentGame).hyperspeedMultiplier = 1.0f;
 						}
-					}
-				}
-			}
-			//Fire function
-			if (this->ship_config.weapon != NULL)
-			{
-				if (!disable_fire && !isUsingPortal && !isHyperspeeding)
-				{
-					if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
-					{
-						if (ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
-						{
-							//calculating the angle we want to face, if any
-							float target_angle = this->getRotation();
-							if (ship_config.weapon->target_seaking != NO_SEAKING || (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index == 0))
-							{
-								target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
-							}
-
-							float current_angle = this->getRotation();
-							float delta = current_angle - target_angle;
-							if (delta > 180)
-								delta -= 360;
-							else if (delta < -180)
-								delta += 360;
-
-							//float theta = (this->getRotation() - delta) / 180 * M_PI;
-							float theta = this->getRotation() / 180 * M_PI;
-							if (ship_config.weapon->target_seaking != NO_SEAKING)
-							{
-								theta -= delta / 180 * M_PI;
-							}
-
-							float sizeX = this->m_size.x;
-							float sizeY = this->m_size.y;
-							if (this->ship_config.ship_model->hasFake)
-							{
-								if (this->ship_config.ship_model->fake_size.x > sizeX)
-								{
-									sizeX = this->ship_config.ship_model->fake_size.x;
-								}
-								if (this->ship_config.ship_model->fake_size.y > sizeY)
-								{
-									sizeY = this->ship_config.ship_model->fake_size.y;
-								}
-							}
-
-							if (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index > 0 && ship_config.weapon->rafale_index < ship_config.weapon->rafale)
-							{
-								//semi-seaking and rafale not ended = no update of target or weapon position
-							}
-							else
-							{
-								ship_config.weapon->weapon_current_offset.x = ship_config.weapon->weaponOffset.x + sizeX / 2 * sin(theta);
-								ship_config.weapon->weapon_current_offset.y = ship_config.weapon->weaponOffset.y - sizeY / 2 * cos(theta);
-
-								//transmitting the angle to the weapon, which will pass it to the bullets
-								ship_config.weapon->shot_angle = theta;
-							}
-
-							ship_config.weapon->setPosition(this->getPosition().x + ship_config.weapon->weapon_current_offset.x, this->getPosition().y + ship_config.weapon->weapon_current_offset.y);
-							ship_config.weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
-						}
-
-						//speed malus when shooting
-						if (!this->isBraking)
-						{
-							speed.x *= SHIP_BRAKING_MALUS_SPEED;
-							speed.y *= SHIP_BRAKING_MALUS_SPEED;
-						}
-						this->isBraking = true;
-					}
-				}
-			}
-			
-			isCollindingWithPortal = false;
-
-			//Braking function
-			if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding)
-			{
-				speed.x *= SHIP_BRAKING_MALUS_SPEED;
-				speed.y *= SHIP_BRAKING_MALUS_SPEED;
-				this->isBraking = true;
-			}
-		}
-
-		//HUD controls
-		else
-		{
-			//movement
-			Independant* cursor_ = (*CurrentGame).hud.hud_cursor;
-			cursor_->speed.x = directions.x * HUD_CURSOR_SPEED;
-			cursor_->speed.y = directions.y * HUD_CURSOR_SPEED;
-
-			//focus
-			bool has_changed_focused_item_ = true;
-			if ((*CurrentGame).getHudFocusedItem() == this->previously_focused_item)
-			{
-				has_changed_focused_item_ = false;
-			}
-			else
-			{
-				this->previously_focused_item = (*CurrentGame).getHudFocusedItem();
-			}
-
-			if (!isFiringButtonPressed)
-			{
-				if (InputGuy::isFiring())
-				{
-					if (!fire_key_repeat)
-					{
-						//interaction
-						if ((*CurrentGame).getHudFocusedItem() != NULL)
-						{
-							if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
-							{
-								Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
-								int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
-
-								if (tmp_ptr->getEquipmentLoot() != NULL)
-								{
-									int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
-
-									//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
-									{
-										//if this succeeds, we can actually equip the item
-										Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
-										this->setEquipment(new_equipment, true);
-										new_equipment = NULL;
-									}
-								}
-								else if (tmp_ptr->getWeaponLoot() != NULL)
-								{
-									int ship_index_ = NBVAL_Equipment;
-
-									//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-									if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
-									{
-										//if this succeeds, we can actually equip the item
-										Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
-										this->setShipWeapon(new_weapon, true);
-										new_weapon = NULL;
-									}
-								}
-								else
-								{
-									LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
-								}
-
-								tmp_ptr = NULL;
-							}
-						}
-
-						fire_key_repeat = true;
 					}
 				}
 				else
 				{
-					fire_key_repeat = false;
+					this->slowmo_key_repeat = false;
+				}
+
+				//Hyperspeed function
+				if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion)
+				{
+					this->isHyperspeeding = true;
+					(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
+				}
+				else if (!this->isSlowMotion)
+				{
+					(*CurrentGame).hyperspeedMultiplier = 1.0f;
+				}
+
+				//auto fire option (F key)
+				if (InputGuy::setAutomaticFire() && !disable_fire)
+				{
+					if (!this->fire_key_repeat)
+					{
+						this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
+						this->fire_key_repeat = true;
+					}
+				}
+				else
+				{
+					this->fire_key_repeat = false;
+				}
+
+				//portals: required to release fire and then press fire while colliding with a portal
+				isUsingPortal = false;
+				if (!isFiringButtonPressed)
+				{
+					if (isCollindingWithPortal)
+					{
+						if (InputGuy::isFiring())
+						{
+							if (this->targetPortal != NULL)
+							{
+								if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
+								{
+									isUsingPortal = true;
+
+									if (this->targetPortal->destination_name.compare("0") == 0)
+									{
+										LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
+									}
+								}
+							}
+							else
+							{
+								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, Ship::targetPortal still NULL when it should be initialized.\n");
+							}
+						}
+					}
+				}
+				//Fire function
+				if (this->ship_config.weapon != NULL)
+				{
+					if (!disable_fire && !isUsingPortal && !isHyperspeeding)
+					{
+						if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
+						{
+							if (ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
+							{
+								//calculating the angle we want to face, if any
+								float target_angle = this->getRotation();
+								if (ship_config.weapon->target_seaking != NO_SEAKING || (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index == 0))
+								{
+									target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+								}
+
+								float current_angle = this->getRotation();
+								float delta = current_angle - target_angle;
+								if (delta > 180)
+									delta -= 360;
+								else if (delta < -180)
+									delta += 360;
+
+								//float theta = (this->getRotation() - delta) / 180 * M_PI;
+								float theta = this->getRotation() / 180 * M_PI;
+								if (ship_config.weapon->target_seaking != NO_SEAKING)
+								{
+									theta -= delta / 180 * M_PI;
+								}
+
+								float sizeX = this->m_size.x;
+								float sizeY = this->m_size.y;
+								if (this->ship_config.ship_model->hasFake)
+								{
+									if (this->ship_config.ship_model->fake_size.x > sizeX)
+									{
+										sizeX = this->ship_config.ship_model->fake_size.x;
+									}
+									if (this->ship_config.ship_model->fake_size.y > sizeY)
+									{
+										sizeY = this->ship_config.ship_model->fake_size.y;
+									}
+								}
+
+								if (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index > 0 && ship_config.weapon->rafale_index < ship_config.weapon->rafale)
+								{
+									//semi-seaking and rafale not ended = no update of target or weapon position
+								}
+								else
+								{
+									ship_config.weapon->weapon_current_offset.x = ship_config.weapon->weaponOffset.x + sizeX / 2 * sin(theta);
+									ship_config.weapon->weapon_current_offset.y = ship_config.weapon->weaponOffset.y - sizeY / 2 * cos(theta);
+
+									//transmitting the angle to the weapon, which will pass it to the bullets
+									ship_config.weapon->shot_angle = theta;
+								}
+
+								ship_config.weapon->setPosition(this->getPosition().x + ship_config.weapon->weapon_current_offset.x, this->getPosition().y + ship_config.weapon->weapon_current_offset.y);
+								ship_config.weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
+							}
+
+							//speed malus when shooting
+							if (!this->isBraking)
+							{
+								speed.x *= SHIP_BRAKING_MALUS_SPEED;
+								speed.y *= SHIP_BRAKING_MALUS_SPEED;
+							}
+							this->isBraking = true;
+						}
+					}
+				}
+
+				isCollindingWithPortal = false;
+
+				//Braking function
+				if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding)
+				{
+					speed.x *= SHIP_BRAKING_MALUS_SPEED;
+					speed.y *= SHIP_BRAKING_MALUS_SPEED;
+					this->isBraking = true;
 				}
 			}
 
-			if (!wasBrakingButtonPressed || isBrakingButtonHeldPressed)
+			//HUD controls
+			else
 			{
-				if (InputGuy::isBraking())
-				{
-					if (!isBrakingButtonHeldPressed)
-					{
-						brakingHoldingClock.restart();
-						isBrakingButtonHeldPressed = true;
-						(*CurrentGame).hud.has_prioritary_cursor_feedback = true;
-					}
-					else
-					{
-						if (has_changed_focused_item_)
-						{
-							brakingHoldingClock.restart();
-							isBrakingButtonHeldPressed = false;
-							(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
-						}
-						else if ((*CurrentGame).getHudFocusedItem() != NULL)
-						{
-							if (brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
-							{
-								(*CurrentGame).hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
-								if (brakingHoldingClock.getElapsedTime().asSeconds() < HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8)
-									(*CurrentGame).hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
+				//movement
+				Independant* cursor_ = (*CurrentGame).hud.hud_cursor;
+				cursor_->speed.x = directions.x * HUD_CURSOR_SPEED;
+				cursor_->speed.y = directions.y * HUD_CURSOR_SPEED;
 
-								int equip_type = NBVAL_Equipment;
-								if ((*CurrentGame).getHudFocusedItem()->getEquipmentLoot() != NULL)
+				//focus
+				bool has_changed_focused_item_ = true;
+				if ((*CurrentGame).getHudFocusedItem() == this->previously_focused_item)
+				{
+					has_changed_focused_item_ = false;
+				}
+				else
+				{
+					this->previously_focused_item = (*CurrentGame).getHudFocusedItem();
+				}
+
+				if (!isFiringButtonPressed)
+				{
+					if (InputGuy::isFiring())
+					{
+						if (!fire_key_repeat)
+						{
+							//interaction
+							if ((*CurrentGame).getHudFocusedItem() != NULL)
+							{
+								if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
 								{
-									equip_type = (*CurrentGame).getHudFocusedItem()->getEquipmentLoot()->equipmentType;
-								}
-								//garbage in hud
-								int grid_id_ = (*CurrentGame).getHudFocusedGridAndIndex().x;
-								int index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
-								(*CurrentGame).GarbageObjectInGrid(grid_id_, index_);
-								//garbage for real
-								if (grid_id_ == (int)HudGrid_ShipGrid)
-								{
-									if (equip_type == NBVAL_Equipment)
+									Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
+									int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
+
+									if (tmp_ptr->getEquipmentLoot() != NULL)
 									{
-										this->cleanWeapon();
+										int ship_index_ = tmp_ptr->getEquipmentLoot()->equipmentType;
+
+										//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+										if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
+										{
+											//if this succeeds, we can actually equip the item
+											Equipment* new_equipment = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
+											this->setEquipment(new_equipment, true);
+											new_equipment = NULL;
+										}
+									}
+									else if (tmp_ptr->getWeaponLoot() != NULL)
+									{
+										int ship_index_ = NBVAL_Equipment;
+
+										//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+										if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
+										{
+											//if this succeeds, we can actually equip the item
+											Weapon* new_weapon = (*CurrentGame).hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
+											this->setShipWeapon(new_weapon, true);
+											new_weapon = NULL;
+										}
 									}
 									else
 									{
-										this->cleanEquipment(equip_type);
+										LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 									}
-								}
 
+									tmp_ptr = NULL;
+								}
+							}
+
+							fire_key_repeat = true;
+						}
+					}
+					else
+					{
+						fire_key_repeat = false;
+					}
+				}
+
+				if (!wasBrakingButtonPressed || isBrakingButtonHeldPressed)
+				{
+					if (InputGuy::isBraking())
+					{
+						if (!isBrakingButtonHeldPressed)
+						{
+							brakingHoldingClock.restart();
+							isBrakingButtonHeldPressed = true;
+							(*CurrentGame).hud.has_prioritary_cursor_feedback = true;
+						}
+						else
+						{
+							if (has_changed_focused_item_)
+							{
 								brakingHoldingClock.restart();
 								isBrakingButtonHeldPressed = false;
 								(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
 							}
-							else
+							else if ((*CurrentGame).getHudFocusedItem() != NULL)
 							{
-								for (int k = 0; k < HUD_CURSOR_HOLDING_FRACTIONS; k++)
+								if (brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
 								{
-									if (brakingHoldingClock.getElapsedTime().asSeconds() < (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / HUD_CURSOR_HOLDING_FRACTIONS) * (k + 1))
+									(*CurrentGame).hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
+									if (brakingHoldingClock.getElapsedTime().asSeconds() < HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8)
+										(*CurrentGame).hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
+
+									int equip_type = NBVAL_Equipment;
+									if ((*CurrentGame).getHudFocusedItem()->getEquipmentLoot() != NULL)
 									{
-										(*CurrentGame).setRemovingCursorAnimation((CursorFeedbackStates)(Cursor_Focus1_8 + k));
-										(*CurrentGame).hud.has_prioritary_cursor_feedback = true;
-										break;
+										equip_type = (*CurrentGame).getHudFocusedItem()->getEquipmentLoot()->equipmentType;
+									}
+									//garbage in hud
+									int grid_id_ = (*CurrentGame).getHudFocusedGridAndIndex().x;
+									int index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
+									(*CurrentGame).GarbageObjectInGrid(grid_id_, index_);
+									//garbage for real
+									if (grid_id_ == (int)HudGrid_ShipGrid)
+									{
+										if (equip_type == NBVAL_Equipment)
+										{
+											this->cleanWeapon();
+										}
+										else
+										{
+											this->cleanEquipment(equip_type);
+										}
+									}
+
+									brakingHoldingClock.restart();
+									isBrakingButtonHeldPressed = false;
+									(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
+								}
+								else
+								{
+									for (int k = 0; k < HUD_CURSOR_HOLDING_FRACTIONS; k++)
+									{
+										if (brakingHoldingClock.getElapsedTime().asSeconds() < (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / HUD_CURSOR_HOLDING_FRACTIONS) * (k + 1))
+										{
+											(*CurrentGame).setRemovingCursorAnimation((CursorFeedbackStates)(Cursor_Focus1_8 + k));
+											(*CurrentGame).hud.has_prioritary_cursor_feedback = true;
+											break;
+										}
 									}
 								}
 							}
-						}	
+						}
+					}
+					else
+					{
+						isBrakingButtonHeldPressed = false;
+						brakingHoldingClock.restart();
+						(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
 					}
 				}
-				else
+
+				cursor_ = NULL;
+			}
+
+			//testing button release
+			if (InputGuy::isFiring())
+			{
+				isFiringButtonPressed = true;
+			}
+			else
+			{
+				isFiringButtonPressed = false;
+			}
+
+			if (InputGuy::isBraking())
+			{
+				wasBrakingButtonPressed = true;
+			}
+			else
+			{
+				wasBrakingButtonPressed = false;
+			}
+
+			//idle decceleration
+			if (!movingX || isFocusedOnHud == true)
+			{
+				speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
+
+				if (abs(speed.x) < SHIP_MIN_SPEED_X)
+					speed.x = 0;
+			}
+
+			if (!movingY || isFocusedOnHud == true)
+			{
+				speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
+
+				if (abs(speed.y) < SHIP_MIN_SPEED_Y)
+					speed.y = 0;
+			}
+		}
+		else
+		{
+			isFocusedOnHud = false;
+		}
+
+		this->trail->visible = (hyperspeedMultiplier > 1.0f);
+
+		Independant::update(deltaTime, hyperspeedMultiplier);
+
+		//screen borders contraints	correction
+		if (this->ship_config.ship_model->hasFake)
+		{
+			if (this->getPosition().x < ship_config.ship_model->fake_size.x / 2)
+			{
+				this->setPosition(ship_config.ship_model->fake_size.x / 2, this->getPosition().y);
+				speed.x = 0;
+			}
+
+			if (this->getPosition().x > SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2))
+			{
+				this->setPosition(SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2), this->getPosition().y);
+				speed.x = 0;
+			}
+
+			if (this->getPosition().y < ship_config.ship_model->fake_size.y / 2)
+			{
+				this->setPosition(this->getPosition().x, ship_config.ship_model->fake_size.y / 2);
+				speed.y = 0;
+			}
+
+			if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2))
+			{
+				this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2));
+				speed.y = 0;
+			}
+		}
+		else
+		{
+			if (this->getPosition().x < ship_config.size.x / 2)
+			{
+				this->setPosition(ship_config.size.x / 2, this->getPosition().y);
+				speed.x = 0;
+			}
+
+			if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x / 2))
+			{
+				this->setPosition(SCENE_SIZE_X - (ship_config.size.x / 2), this->getPosition().y);
+				speed.x = 0;
+			}
+
+			if (this->getPosition().y < ship_config.size.y / 2)
+			{
+				this->setPosition(this->getPosition().x, ship_config.size.y / 2);
+				speed.y = 0;
+			}
+
+			if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.size.y / 2))
+			{
+				this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.size.y / 2));
+				speed.y = 0;
+			}
+		}
+
+		//setting animation
+		const sf::Vector2f f = (sf::Vector2f)Independant::getDirectionMultiplier((*CurrentGame).direction);
+		const float x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(this->speed.x * f.x, this->speed.y * f.y)).x;
+
+		if (this->ship_config.ship_model->hasFake)
+		{
+			if (x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight && !this->disable_inputs)
+			{
+				this->currentAnimationIndex = ShipAnimations::ShipTurningRight;
+			}
+
+			else if (x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft && !this->disable_inputs)
+			{
+				this->currentAnimationIndex = ShipAnimations::ShipTurningLeft;
+			}
+
+			else if ((x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle) || this->disable_inputs)
+			{
+				this->currentAnimationIndex = ShipAnimations::ShipIdle;
+			}
+		}
+
+		//damage feedback expires?
+		if (ship_config.ship_model->hasFake)
+		{
+			assert(ship_config.m_fake_ship != NULL);
+			if (ship_config.m_fake_ship->m_color_timer > sf::seconds(0))
+			{
+				ship_config.m_fake_ship->m_color_timer -= deltaTime;
+				ship_config.m_fake_ship->setColor(ship_config.m_fake_ship->m_color);
+				if (ship_config.m_fake_ship->m_color_timer < sf::seconds(0))
 				{
-					isBrakingButtonHeldPressed = false;
-					brakingHoldingClock.restart();
-					(*CurrentGame).hud.has_prioritary_cursor_feedback = false;
+					ship_config.m_fake_ship->setColor(Color(255, 255, 255, 255));
 				}
 			}
-			
-			cursor_ = NULL;
 		}
-
-		//testing button release
-		if (InputGuy::isFiring())
+		if (m_color_timer > sf::seconds(0))
 		{
-			isFiringButtonPressed = true;
-		}
-		else
-		{
-			isFiringButtonPressed = false;
-		}
-
-		if (InputGuy::isBraking())
-		{
-			wasBrakingButtonPressed = true;
-		}
-		else
-		{
-			wasBrakingButtonPressed = false;
-		}
-
-		//idle decceleration
-		if (!movingX || isFocusedOnHud == true)
-		{
-			speed.x -= (speed.x)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
-
-			if (abs(speed.x) < SHIP_MIN_SPEED_X)
-				speed.x = 0;
-		}
-
-		if (!movingY || isFocusedOnHud == true)
-		{
-			speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
-
-			if (abs(speed.y) < SHIP_MIN_SPEED_Y)
-				speed.y = 0;
-		}
-	}
-	else
-	{
-		isFocusedOnHud = false;
-	}
-
-	this->trail->visible = (hyperspeedMultiplier > 1.0f);
-
-	Independant::update(deltaTime, hyperspeedMultiplier);
-
-	//screen borders contraints	correction
-	if (this->ship_config.ship_model->hasFake)
-	{
-		if (this->getPosition().x < ship_config.ship_model->fake_size.x / 2)
-		{
-			this->setPosition(ship_config.ship_model->fake_size.x / 2, this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().x > SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2))
-		{
-			this->setPosition(SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2), this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().y < ship_config.ship_model->fake_size.y / 2)
-		{
-			this->setPosition(this->getPosition().x, ship_config.ship_model->fake_size.y / 2);
-			speed.y = 0;
-		}
-
-		if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2))
-		{
-			this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2));
-			speed.y = 0;
-		}
-	}
-	else
-	{
-		if (this->getPosition().x < ship_config.size.x / 2)
-		{
-			this->setPosition(ship_config.size.x / 2, this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x / 2))
-		{
-			this->setPosition(SCENE_SIZE_X - (ship_config.size.x / 2), this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().y < ship_config.size.y / 2)
-		{
-			this->setPosition(this->getPosition().x, ship_config.size.y / 2);
-			speed.y = 0;
-		}
-
-		if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.size.y / 2))
-		{
-			this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.size.y / 2));
-			speed.y = 0;
-		}
-	}
-
-	//setting animation
-	const sf::Vector2f f = (sf::Vector2f)Independant::getDirectionMultiplier((*CurrentGame).direction);
-	const float x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(this->speed.x * f.x, this->speed.y * f.y)).x;
-
-	if (this->ship_config.ship_model->hasFake)
-	{
-		if (x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight && !this->disable_inputs)
-		{
-			this->currentAnimationIndex = ShipAnimations::ShipTurningRight;
-		}
-
-		else if (x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft && !this->disable_inputs)
-		{
-			this->currentAnimationIndex = ShipAnimations::ShipTurningLeft;
-		}
-
-		else if ((x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle) || this->disable_inputs)
-		{
-			this->currentAnimationIndex = ShipAnimations::ShipIdle;
-		}
-	}
-
-	//damage feedback expires?
-	if (ship_config.ship_model->hasFake)
-	{
-		assert(ship_config.m_fake_ship != NULL);
-		if (ship_config.m_fake_ship->m_color_timer > sf::seconds(0))
-		{
-			ship_config.m_fake_ship->m_color_timer -= deltaTime;
-			ship_config.m_fake_ship->setColor(ship_config.m_fake_ship->m_color);
-			if (ship_config.m_fake_ship->m_color_timer < sf::seconds(0))
+			m_color_timer -= deltaTime;
+			setColor(m_color);
+			if (m_color_timer < sf::seconds(0))
 			{
-				ship_config.m_fake_ship->setColor(Color(255, 255, 255, 255));
+				setColor(Color(255, 255, 255, 255));
 			}
-		}
-	}
-	if (m_color_timer > sf::seconds(0))
-	{
-		m_color_timer -= deltaTime;
-		setColor(m_color);
-		if (m_color_timer < sf::seconds(0))
-		{
-			setColor(Color(255, 255, 255, 255));
 		}
 	}
 }
@@ -1429,6 +1446,10 @@ void Ship::Respawn()
 	speed.x = 0;
 	speed.y = 0;
 	this->visible = true;
+	if (this->ship_config.ship_model->hasFake)
+	{
+		this->ship_config.m_fake_ship->visible = true;
+	}
 	isOnScene = true;
 	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
 	pos = Independant::getPosition_for_Direction((*CurrentGame).direction, pos);
@@ -1443,6 +1464,13 @@ void Ship::Death()
 	FX* myFX = this->ship_config.FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
 	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
+
+	this->visible = false;
+	if (this->ship_config.m_fake_ship != NULL)
+	{
+		this->ship_config.m_fake_ship->visible = false;
+	}
+	(*CurrentGame).garbageLayer(AuraLayer);
 }
 
 Independant* Ship::CloneEquipmentIntoIndependant(Equipment* new_equipment)
@@ -1529,33 +1557,33 @@ void Ship::GetGrazing()
 			graze_level++;
 			switch (graze_level)
 			{
-			case GRAZE_LEVEL_RED:
-			{
-				(*CurrentGame).garbageLayer(AuraLayer);
-				Aura* m_combo_aura = this->combo_aura[GRAZE_LEVEL_RED]->Clone();
-				(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
-				break;
-			}
-			case GRAZE_LEVEL_BLUE:
-			{
-				(*CurrentGame).garbageLayer(AuraLayer);
-				Aura* m_combo_aura = this->combo_aura[GRAZE_LEVEL_BLUE]->Clone();
-				(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
-				break;
-			}
-			case GRAZE_LEVEL_WHITE:
-			{
-				(*CurrentGame).garbageLayer(AuraLayer);
-				Aura* m_combo_aura = this->combo_aura[GRAZE_LEVEL_WHITE]->Clone();
-				(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
-				break;
-			}
-			default:
-			{
-					   graze_level = 0;
-					   LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
-					   break;
-			}
+				case GRAZE_LEVEL_RED:
+				{
+					(*CurrentGame).garbageLayer(AuraLayer);
+					Aura* combo_aura = this->m_combo_aura[GRAZE_LEVEL_RED]->Clone();
+					(*CurrentGame).addToScene(combo_aura, AuraLayer, Neutral);
+					break;
+				}
+				case GRAZE_LEVEL_BLUE:
+				{
+					(*CurrentGame).garbageLayer(AuraLayer);
+					Aura* combo_aura = this->m_combo_aura[GRAZE_LEVEL_BLUE]->Clone();
+					(*CurrentGame).addToScene(combo_aura, AuraLayer, Neutral);
+					break;
+				}
+				case GRAZE_LEVEL_WHITE:
+				{
+					(*CurrentGame).garbageLayer(AuraLayer);
+					Aura* combo_aura = this->m_combo_aura[GRAZE_LEVEL_WHITE]->Clone();
+					(*CurrentGame).addToScene(combo_aura, AuraLayer, Neutral);
+					break;
+				}
+				default:
+				{
+					graze_level = 0;
+					LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
+					break;
+				}
 			}
 		}
 	}

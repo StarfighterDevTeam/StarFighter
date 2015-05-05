@@ -230,8 +230,7 @@ void Game::colisionChecksV2()
 						(*it1)->visible = false;
 						(*it1)->Death();
 						//we all deserve another chance...
-						(*it1)->Respawn();
-						//hazard = 0;
+						//(*it1)->Respawn();
 					}
 				}
 			}

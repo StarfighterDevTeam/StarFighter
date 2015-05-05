@@ -54,6 +54,17 @@ public:
 
 	static bool IsGrazing(const Independant* independantA, const Independant* independantB)
 	{
+		// If not visibe, let's not even bother with the collision
+		if (!independantA->visible || !(independantB->visible))
+			return false;
+
+		//ghost is a property that prevents an object from colliding, so by definition we exclude it
+		if (independantA->ghost || (independantB->ghost))
+			return false;
+
+		if (!independantA->isOnScene || !(independantB->isOnScene))
+			return false;
+
 		const float a = independantA->getPosition().x - independantB->getPosition().x;
 		const float b = independantA->getPosition().y - independantB->getPosition().y;
 		const float c = independantA->diag + independantB->diag + GRAZE_DISTANCE;

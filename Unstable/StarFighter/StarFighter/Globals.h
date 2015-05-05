@@ -56,7 +56,7 @@
 
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
-#define SHIP_BRAKING_MALUS_SPEED						0.60f
+#define SHIP_BRAKING_MALUS_SPEED						0.50f
 
 //HUD
 #define ARMOR_BAR_SIZE_Y								20

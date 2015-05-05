@@ -1,7 +1,7 @@
 #scene_name,filename,display_name,link_UP,link_DOWN,link_RIGHT,link_LEFT
 Vanguard_Hub0,Assets/Scripts/Scenes/Generated/Vanguard_Hub0.csv,Vanguard_Hub0,Vanguard_V1,0,0,0
 Vanguard_Hub1,Assets/Scripts/Scenes/Generated/Vanguard_Hub1.csv,Vanguard_Hub1,Vanguard_V3,Vanguard_V1,Vanguard_H1,0
-Vanguard_Hub2,Assets/Scripts/Scenes/Generated/Vanguard_Hub2.csv,Vanguard_Hub2,Vanguard_V5,Vanguard_V4,Vanguard_H3,0
+Vanguard_Hub2,Assets/Scripts/Scenes/Generated/Vanguard_Hub2.csv,Vanguard_Hub2,Vanguard_V5,Vanguard_V3,Vanguard_H3,0
 Vanguard_Hub3,Assets/Scripts/Scenes/Generated/Vanguard_Hub3.csv,Vanguard_Hub3,0,Vanguard_V7,Vanguard_H5,0
 Vanguard_Hub4,Assets/Scripts/Scenes/Generated/Vanguard_Hub4.csv,Vanguard_Hub4,Vanguard_V8,0,0,Vanguard_H2
 Vanguard_Hub5,Assets/Scripts/Scenes/Generated/Vanguard_Hub5.csv,Vanguard_Hub5,Vanguard_V10,Vanguard_V9,0,Vanguard_H4
