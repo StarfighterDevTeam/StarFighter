@@ -13,7 +13,7 @@
 #include "Bot.h"
 #include "PatternBobby.h"
 #include "Portal.h"
-//#include "Independant.h"
+#include "Shop.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -192,9 +192,11 @@ public :
 	void Death() override;
 	bool GetLoot(Independant& independant) override;
 	void GetPortal(Independant* independant) override;
+	void GetShop(Independant* independant) override;
 	Portal* targetPortal;
-	bool isCollindingWithPortal;
-	bool previouslyCollindingWithPortal;
+	Shop* targetShop;
+	InteractionType isCollindingWithInteractiveObject;
+	InteractionType previouslyCollindingWithInteractiveObject;
 	bool wasHyperspeedingButtonPressed;
 	bool isFiringButtonPressed;
 	bool wasBrakingButtonPressed;
@@ -217,6 +219,7 @@ public :
 	bool isHyperspeeding;
 	bool isSlowMotion;
 	bool disabledHyperspeed;
+	InteractionType m_interactionType;
 
 	bool isFocusedOnHud;
 

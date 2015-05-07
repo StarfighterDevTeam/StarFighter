@@ -126,7 +126,7 @@ void InGameState::Update(Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
-	(*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel());
+	(*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->previouslyCollindingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel());
 
 	//displaying stats of focused item in the HUD...
 	if ((*CurrentGame).getHudFocusedItem() != NULL)
@@ -186,7 +186,7 @@ void InGameState::Update(Time deltaTime)
 
 void InGameState::Draw()
 {
-	(*CurrentGame).drawScene(this->playerShip->previouslyCollindingWithPortal && (*CurrentGame).direction == NO_DIRECTION);
+	(*CurrentGame).drawScene();
 	(*CurrentGame).drawHud();
 }
 
@@ -395,7 +395,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//player takes exit?
-				if ((*CurrentGame).playerShip->isUsingPortal)
+				if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
 				{
 					this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
 					bool reverse = false;
@@ -537,7 +537,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 		{
 			this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
 			//player takes exit?
-			if ((*CurrentGame).playerShip->isUsingPortal)
+			if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
 			{
 				this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
 				bool reverse = false;

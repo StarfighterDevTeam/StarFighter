@@ -141,6 +141,16 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							this->bg->SetPortalsState(PortalState::PortalGhost);
 						}
+
+						//creating the shop
+						if (this->direction == NO_DIRECTION)
+						{
+							this->m_shop = new Independant(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), SHOP_ASSET_FILENAME, sf::Vector2f(SHOP_ASSET_WIDTH, SHOP_ASSET_HEIGHT), sf::Vector2f(SHOP_ASSET_WIDTH / 2, SHOP_ASSET_HEIGHT / 2));
+							this->m_shop->visible = true;
+							this->m_shop->display_name = this->bg->display_name + " Shop";
+							(*CurrentGame).addToScene(this->m_shop, PortalLayer, ShopObject);
+
+						}
 					}
 
 					//Loading enemies

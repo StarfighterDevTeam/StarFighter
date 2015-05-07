@@ -753,18 +753,20 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->fire_key_repeat = false;
 	this->slowmo_key_repeat = false;
 	this->hud_key_repeat = false;
-	this->isCollindingWithPortal = false;
-	this->isUsingPortal = false;
+	this->m_interactionType = No_Interaction;
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
 	this->wasBrakingButtonPressed = true;
 	this->isBrakingButtonHeldPressed = false;
 	this->wasHyperspeedingButtonPressed = true;
 	this->targetPortal = NULL;
+	this->targetShop = NULL;
 	this->equipment_loot = NULL;
 	this->weapon_loot = NULL;
 	this->isFocusedOnHud = false;
 	this->previously_focused_item = NULL;
-	this->previouslyCollindingWithPortal = false;
+
+	this->previouslyCollindingWithInteractiveObject = No_Interaction;
+	this->isCollindingWithInteractiveObject = No_Interaction;
 
 	this->Init();
 }
@@ -1028,11 +1030,11 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				{
 					this->fire_key_repeat = false;
 				}
-
-				//portals: required to release fire and then press fire while colliding with a portal
-				isUsingPortal = false;
 				
-				if (isCollindingWithPortal)
+				//using portals and shops
+				m_interactionType = No_Interaction;
+
+				if (this->isCollindingWithInteractiveObject != No_Interaction)
 				{
 					if (!isFiringButtonPressed)
 					{
@@ -1043,25 +1045,41 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							assert(this->targetPortal->destination_name.compare("0") != 0);
 							(*CurrentGame).SetSelectedDestination(this->targetPortal->display_name);
 							//default value = max
-							if (!previouslyCollindingWithPortal)
+							if (previouslyCollindingWithInteractiveObject != PortalInteraction)
 							{
 								(*CurrentGame).SetSelectedIndex(this->targetPortal->max_unlocked_hazard_level);
 							}
-							
+
 							//interaction: select
 							if (InputGuy::isFiring())
 							{
 								if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
 								{
-									
-									isUsingPortal = true;
+									this->m_interactionType = PortalInteraction;
 								}
+								isFiringButtonPressed = true;
+							}
+						}
+						else if (this->targetShop != NULL)
+						{
+							(*CurrentGame).SetSelectedDestination(this->targetShop->display_name);
+							//default value = first choice
+							if (previouslyCollindingWithInteractiveObject != ShopInteraction)
+							{
+								(*CurrentGame).SetSelectedIndex(0);
+							}
+
+							//interaction: select
+							if (InputGuy::isFiring())
+							{
+								this->m_interactionType = ShopInteraction;
+								isFiringButtonPressed = true;
 							}
 						}
 					}
 
 					//decreasing or increasing the selected hazard level
-					if (!isUsingPortal)
+					if (this->isCollindingWithInteractiveObject == PortalInteraction && this->m_interactionType != PortalInteraction)
 					{
 						//interaction: decreasing
 						if (InputGuy::isBraking() && !wasBrakingButtonPressed)
@@ -1079,13 +1097,32 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 								(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() + 1);
 							}
 						}
-
+					}
+					else if (this->isCollindingWithInteractiveObject == ShopInteraction  && this->m_interactionType != ShopInteraction)
+					{
+						//interaction: decreasing
+						if (InputGuy::isBraking() && !wasBrakingButtonPressed)
+						{
+							if ((*CurrentGame).GetSelectedIndex() > 0)
+							{
+								(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() - 1);
+							}
+						}
+						//interaction: increasing
+						else if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
+						{
+							if ((*CurrentGame).GetSelectedIndex() < NBVAL_ShopOptions - 1)
+							{
+								(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() + 1);
+							}
+						}
 					}
 				}
+
 				//Fire function
 				if (this->ship_config.weapon != NULL)
 				{
-					if (!disable_fire && !isUsingPortal && !isHyperspeeding)
+					if (!disable_fire && (m_interactionType == No_Interaction) && !isHyperspeeding)
 					{
 						if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 						{
@@ -1346,6 +1383,9 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				wasHyperspeedingButtonPressed = false;
 			}
 
+			//this->targetPortal = NULL;
+			//this->targetShop = NULL;
+
 			//idle decceleration
 			if (!movingX || isFocusedOnHud == true)
 			{
@@ -1368,8 +1408,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			isFocusedOnHud = false;
 		}
 
-		previouslyCollindingWithPortal = isCollindingWithPortal;
-		isCollindingWithPortal = false;
+		previouslyCollindingWithInteractiveObject = isCollindingWithInteractiveObject;
+		isCollindingWithInteractiveObject = No_Interaction;
 
 		this->trail->visible = (hyperspeedMultiplier > 1.0f);
 
@@ -1577,7 +1617,13 @@ bool Ship::GetLoot(Independant& independant)
 void Ship::GetPortal(Independant* independant)
 {
 	this->targetPortal = (Portal*)(independant);
-	this->isCollindingWithPortal = true;
+	this->isCollindingWithInteractiveObject = PortalInteraction;
+}
+
+void Ship::GetShop(Independant* independant)
+{
+	this->targetShop = (Shop*)(independant);
+	this->isCollindingWithInteractiveObject = ShopInteraction;
 }
 
 static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 10, 40, 70 };

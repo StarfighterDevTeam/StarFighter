@@ -84,5 +84,10 @@
 #define INTERACTION_PANEL_HEIGHT			250
 #define INTERACTION_INTERLINE				20
 
+//SHOP
+#define SHOP_ASSET_FILENAME					"Assets/2D/PNJ/station.png"
+#define SHOP_ASSET_WIDTH					319
+#define SHOP_ASSET_HEIGHT					158
+
 #endif // ASSETS_H_INCLUDED
 

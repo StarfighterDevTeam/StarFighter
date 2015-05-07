@@ -94,7 +94,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//automatic fire
 	if (this->weapon != NULL && this->target != NULL)
 	{
-		if (!disable_fire && !target->isUsingPortal && !target->disable_fire)
+		if (!disable_fire && (target->m_interactionType == No_Interaction) && !target->disable_fire)
 		{
 			if (InputGuy::isFiring() || this->automatic_fire)
 			{

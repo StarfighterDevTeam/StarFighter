@@ -108,12 +108,9 @@ void Game::updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, 
 		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 
-void Game::UpdateInteractionPanel(int max_unlocked_hazard_level)
+void Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_hazard_level)
 {
-	if (max_unlocked_hazard_level > -1 && max_unlocked_hazard_level < NB_HAZARD_LEVELS)
-	{
-		this->m_interactionPanel->Update(max_unlocked_hazard_level);
-	}
+	this->m_interactionPanel->Update(interaction, max_unlocked_hazard_level);
 }
 
 void Game::SetSelectedIndex(int index_)
@@ -136,7 +133,7 @@ int Game::GetSelectedIndex()
 	return this->m_interactionPanel->m_selected_index;
 }
 
-void Game::drawScene(bool draw_interaction_panel)
+void Game::drawScene()
 {
 	this->mainScreen.clear();
 
@@ -149,7 +146,7 @@ void Game::drawScene(bool draw_interaction_panel)
 				mainScreen.draw(*(*it));
 			}
 		}
-		else if (i == PanelLayer && draw_interaction_panel)
+		else if (i == PanelLayer)
 		{
 			this->m_interactionPanel->Draw(mainScreen);
 		}
@@ -336,6 +333,18 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				(*it1)->GetPortal((*it2));
+			}
+		}
+
+		//Shop
+		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::ShopObject].begin(); it2 != sceneIndependantsTyped[IndependantType::ShopObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				(*it1)->GetShop((*it2));
 			}
 		}
 	}

@@ -24,7 +24,7 @@ string Independant::getName()
 
 Independant::Independant()
 {
-	
+
 }
 
 void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
@@ -100,9 +100,9 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->rotation_speed = 0.f;
 	this->disable_fire = false;
 	this->wake_up = true;
-	this->isUsingPortal = false;
 	this->equipment_loot = NULL;
 	this->weapon_loot = NULL;
+	this->m_interactionType = No_Interaction;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
@@ -304,7 +304,10 @@ void Independant::GetPortal(Independant* independant)
 
 }
 
+void Independant::GetShop(Independant* independant)
+{
 
+}
 
 bool Independant::get_equipment_from(Independant& independant)
 {

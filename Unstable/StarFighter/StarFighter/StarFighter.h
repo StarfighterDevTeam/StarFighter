@@ -29,6 +29,7 @@
 #include "Player.h"
 #include "HudGrid.h"
 #include "InteractionPanel.h"
+#include "Shop.h"
 
 #define LOGGER_START(MIN_PRIORITY, FILE) Logger::Start(MIN_PRIORITY, FILE);
 #define LOGGER_STOP() Logger::Stop();

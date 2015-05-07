@@ -107,6 +107,7 @@ enum FXData
 enum IndependantType {
 	BackgroundObject,
 	PortalObject,
+	ShopObject,
 	LootObject,
 	PlayerShip,
 	FakePlayerShip,
@@ -115,6 +116,13 @@ enum IndependantType {
 	EnemyFire,
 	EnemyObject,
 	NBVAL_Independant
+};
+
+enum InteractionType
+{
+	No_Interaction,
+	PortalInteraction,
+	ShopInteraction,
 };
 
 enum Directions
@@ -200,6 +208,7 @@ public:
 	bool get_money_from(Independant& independant, int loot_value);
 	virtual bool GetLoot(Independant& independant);
 	virtual void GetPortal(Independant* independant);
+	virtual void GetShop(Independant* independant);
 	void setGhost(bool m_ghost);
 	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
 
@@ -234,7 +243,7 @@ public:
 	int animationNumber;
 	int frameNumber;
 	int currentAnimationIndex;
-	bool isUsingPortal;
+	InteractionType m_interactionType;
 
 	//TIPS:
 	// direction = the scene border you refer too

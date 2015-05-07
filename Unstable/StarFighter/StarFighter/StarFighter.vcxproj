@@ -119,6 +119,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Independant.cpp" />
+    <ClCompile Include="Shop.cpp" />
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="TextureLoader.h" />
     <ClCompile Include="Weapon.cpp" />
@@ -157,6 +158,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Ship.h" />
+    <ClInclude Include="Shop.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="TextUtils.h" />
     <ClInclude Include="Weapon.h" />
