@@ -2,6 +2,39 @@
 
 extern Game* CurrentGame;
 
+void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_)
+{
+	//getting the max hazard value for the upcoming scene
+	map<string, int>::iterator it = this->knownScenes.find(scene_->m_name);
+	if (it != this->knownScenes.end())
+	{
+		scene_->m_hazard_level_unlocked = this->knownScenes[scene_->m_name];
+	}
+	else
+	{
+		//destination is not know yet -> default max hazard value
+		scene_->m_hazard_level_unlocked = 0;
+	}
+
+	//loading the scene's portals with the info about their respective max hazard values
+	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	{
+		if (scene_->bg->portals[(Directions)i] != NULL)
+		{
+			map<string, int>::iterator it = this->knownScenes.find(scene_->bg->portals[(Directions)i]->destination_name);
+			if (it != this->knownScenes.end())
+			{
+				scene_->bg->portals[(Directions)i]->max_unlocked_hazard_level = this->knownScenes[scene_->bg->portals[(Directions)i]->destination_name];
+			}
+			else
+			{
+				//destination is not know yet -> default max hazard value
+				scene_->bg->portals[(Directions)i]->max_unlocked_hazard_level = 0;
+			}
+		}
+	}
+}
+
 void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
@@ -23,7 +56,8 @@ void InGameState::Initialize(Player player)
 	}
 	
 	//Loading current scene
-	this->currentScene = new Scene(this->currentSceneSave, GetSceneHazardLevel(this->currentSceneSave), player.reverse_scene, true);//first_scene = true
+	this->currentScene = new Scene(this->currentSceneSave, GetSceneHazardLevelUnlocked(this->currentSceneSave), player.reverse_scene, true);//first_scene = true
+	UpdatePortalsMaxUnlockedHazardLevel(this->currentScene);
 
 	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
@@ -92,6 +126,8 @@ void InGameState::Update(Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
+	(*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel());
+
 	//displaying stats of focused item in the HUD...
 	if ((*CurrentGame).getHudFocusedItem() != NULL)
 	{
@@ -107,7 +143,7 @@ void InGameState::Update(Time deltaTime)
 			Weapon* tmp_weapon = tmp_ptr->getWeaponLoot();
 
 			(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-				(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
+				(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
 				equip_index_, tmp_weapon->display_name, -1, -1, -1, -1, -1, tmp_weapon->ammunition->damage, false, tmp_weapon->ammunition->speed.y, tmp_weapon->ammunition->Pattern.currentPattern, tmp_weapon->multishot, tmp_weapon->xspread, tmp_weapon->rate_of_fire, tmp_weapon->shot_mode,
 				tmp_weapon->dispersion, tmp_weapon->rafale, tmp_weapon->rafale_cooldown, tmp_weapon->target_seaking);
 
@@ -120,14 +156,14 @@ void InGameState::Update(Time deltaTime)
 			if (!tmp_equipment->hasBot)
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-					(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
+					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
 					equip_index_, tmp_equipment->display_name, tmp_equipment->getEquipmentMaxSpeed().x, tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->getEquipmentArmor(),
 					tmp_equipment->getEquipmentShield(), tmp_equipment->getEquipmentShieldRegen(), tmp_equipment->getEquipmentDamage(), tmp_equipment->hasBot);
 			}
 			else
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-					(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
+					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
 					equip_index_, tmp_equipment->display_name, tmp_equipment->bot->Pattern.patternSpeed, tmp_equipment->getEquipmentHyperspeed() , tmp_equipment->bot->armor_max,
 					tmp_equipment->bot->shield_max, tmp_equipment->bot->shield_regen, tmp_equipment->bot->weapon->ammunition->damage, tmp_equipment->hasBot, tmp_equipment->bot->weapon->ammunition->speed.y,
 					tmp_equipment->bot->weapon->ammunition->Pattern.currentPattern, tmp_equipment->bot->weapon->multishot, tmp_equipment->bot->weapon->xspread, tmp_equipment->bot->weapon->rate_of_fire,
@@ -142,7 +178,7 @@ void InGameState::Update(Time deltaTime)
 	else //...else not bothering with it
 	{
 		(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-			(*CurrentGame).playerShip->graze_count, this->GetSceneHazardLevel(this->currentScene->m_name), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION);
+			(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION);
 	}
 
 	this->mainWindow->clear();
@@ -150,7 +186,7 @@ void InGameState::Update(Time deltaTime)
 
 void InGameState::Draw()
 {
-	(*CurrentGame).drawScene();
+	(*CurrentGame).drawScene(this->playerShip->previouslyCollindingWithPortal && (*CurrentGame).direction == NO_DIRECTION);
 	(*CurrentGame).drawHud();
 }
 
@@ -175,18 +211,20 @@ bool InGameState::AddToKnownScenes(string scene_name)
 	return false;
 }
 
-void InGameState::SetSceneHazardLevel(string scene_name, int hazard_level)
+void InGameState::SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level)
 {
 	map<string, int>::iterator it = this->knownScenes.find(scene_name);
 	if (hazard_level > NB_HAZARD_LEVELS - 1)
 	{
 		hazard_level = NB_HAZARD_LEVELS - 1;
 	}
-	this->knownScenes[scene_name] = hazard_level;
-	
+	if (it != this->knownScenes.end())
+	{
+		this->knownScenes[scene_name] = hazard_level;
+	}
 }
 
-int InGameState::GetSceneHazardLevel(string scene_name)
+int InGameState::GetSceneHazardLevelUnlocked(string scene_name)
 {
 	map<string, int>::iterator it = this->knownScenes.find(scene_name);
 
@@ -242,10 +280,7 @@ string InGameState::LoadPlayerSave(string file)
 			string current_scene;
 				
 			std::istringstream(line) >> scene >> level >> current_scene;
-			if (level > NB_HAZARD_LEVELS - 1)
-			{
-				level = NB_HAZARD_LEVELS - 1;
-			}
+
 			this->knownScenes.insert(std::pair<string, int>(scene, level));
 			if (current_scene.compare("!") == 0)
 			{
@@ -370,7 +405,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					}
 
 					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
-					this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+					this->nextScene = new Scene(nextScene_filename, (*CurrentGame).m_interactionPanel->m_selected_index, reverse, false);
+					UpdatePortalsMaxUnlockedHazardLevel(this->nextScene);
+
 					this->nextScene->bg->speed = sf::Vector2f(0, 0);
 
 					//Putting the player on rails
@@ -472,7 +509,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//Saving the hazard level
-				SetSceneHazardLevel(this->currentScene->m_name, this->currentScene->getSceneHazardLevelValue());
+				SaveSceneHazardLevelUnlocked(this->currentScene->m_name, this->currentScene->getSceneHazardLevelUnlockedValue());
 
 				//Wiping the previous background and swapping with the new one
 				this->currentScene->DestroyScene();
@@ -510,7 +547,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 				string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
 				(*CurrentGame).direction = (*CurrentGame).playerShip->targetPortal->direction;
-				this->nextScene = new Scene(nextScene_filename, GetSceneHazardLevel(nextScene_filename), reverse, false);
+				this->nextScene = new Scene(nextScene_filename, (*CurrentGame).m_interactionPanel->m_selected_index, reverse, false);
+				UpdatePortalsMaxUnlockedHazardLevel(this->nextScene);
 				this->nextScene->bg->speed = sf::Vector2f(0, 0);
 
 				//Putting the player on rails

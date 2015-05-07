@@ -107,6 +107,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClCompile Include="Hud.cpp" />
     <ClCompile Include="HudGrid.cpp" />
     <ClCompile Include="InputGuy.cpp" />
+    <ClCompile Include="InteractionPanel.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Loot.cpp" />
     <ClCompile Include="InGameState.cpp" />
@@ -145,6 +146,7 @@ COPY $(ProjectDir)..\..\..\Libraries\SFML-2.1-windows-vc11-32bits\SFML-2.1\bin\*
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="Independant.h" />
     <ClInclude Include="InputGuy.h" />
+    <ClInclude Include="InteractionPanel.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Loot.h" />
     <ClInclude Include="InGameState.h" />

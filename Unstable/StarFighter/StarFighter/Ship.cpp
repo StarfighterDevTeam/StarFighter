@@ -758,11 +758,13 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
 	this->wasBrakingButtonPressed = true;
 	this->isBrakingButtonHeldPressed = false;
+	this->wasHyperspeedingButtonPressed = true;
 	this->targetPortal = NULL;
 	this->equipment_loot = NULL;
 	this->weapon_loot = NULL;
 	this->isFocusedOnHud = false;
 	this->previously_focused_item = NULL;
+	this->previouslyCollindingWithPortal = false;
 
 	this->Init();
 }
@@ -1029,29 +1031,55 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 				//portals: required to release fire and then press fire while colliding with a portal
 				isUsingPortal = false;
-				if (!isFiringButtonPressed)
+				
+				if (isCollindingWithPortal)
 				{
-					if (isCollindingWithPortal)
+					if (!isFiringButtonPressed)
 					{
-						if (InputGuy::isFiring())
+						if (this->targetPortal != NULL)
 						{
-							if (this->targetPortal != NULL)
+							//Updating interaction panel informations
+							(*CurrentGame).SetSelectedDirection(this->targetPortal->direction);
+							assert(this->targetPortal->destination_name.compare("0") != 0);
+							(*CurrentGame).SetSelectedDestination(this->targetPortal->display_name);
+							//default value = max
+							if (!previouslyCollindingWithPortal)
+							{
+								(*CurrentGame).SetSelectedIndex(this->targetPortal->max_unlocked_hazard_level);
+							}
+							
+							//interaction: select
+							if (InputGuy::isFiring())
 							{
 								if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
 								{
+									
 									isUsingPortal = true;
-
-									if (this->targetPortal->destination_name.compare("0") == 0)
-									{
-										LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a portal that has an empty destination name\n");
-									}
 								}
 							}
-							else
+						}
+					}
+
+					//decreasing or increasing the selected hazard level
+					if (!isUsingPortal)
+					{
+						//interaction: decreasing
+						if (InputGuy::isBraking() && !wasBrakingButtonPressed)
+						{
+							if ((*CurrentGame).GetSelectedIndex() > 0)
 							{
-								LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, Ship::targetPortal still NULL when it should be initialized.\n");
+								(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() - 1);
 							}
 						}
+						//interaction: increasing
+						else if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
+						{
+							if ((*CurrentGame).GetSelectedIndex() < this->targetPortal->max_unlocked_hazard_level)
+							{
+								(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() + 1);
+							}
+						}
+
 					}
 				}
 				//Fire function
@@ -1125,8 +1153,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						}
 					}
 				}
-
-				isCollindingWithPortal = false;
 
 				//Braking function
 				if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding)
@@ -1311,6 +1337,15 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				wasBrakingButtonPressed = false;
 			}
 
+			if (InputGuy::isHyperspeeding())
+			{
+				wasHyperspeedingButtonPressed = true;
+			}
+			else
+			{
+				wasHyperspeedingButtonPressed = false;
+			}
+
 			//idle decceleration
 			if (!movingX || isFocusedOnHud == true)
 			{
@@ -1332,6 +1367,9 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			isFocusedOnHud = false;
 		}
+
+		previouslyCollindingWithPortal = isCollindingWithPortal;
+		isCollindingWithPortal = false;
 
 		this->trail->visible = (hyperspeedMultiplier > 1.0f);
 
@@ -1635,4 +1673,17 @@ void Ship::damage_from(Independant& independant)
 	graze_count = 0;
 	graze_level = GRAZE_LEVEL_NONE;
 	(*CurrentGame).garbageLayer(AuraLayer);
+}
+
+
+int Ship::GetFocusedPortalMaxUnlockedHazardLevel()
+{
+	if (this->targetPortal == NULL)
+	{
+		return -1;
+	}
+	else
+	{
+		return this->targetPortal->max_unlocked_hazard_level;
+	}
 }

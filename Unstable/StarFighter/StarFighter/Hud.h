@@ -6,6 +6,7 @@
 #include "Independant.h"
 #include "Includes/SimpleCollision.hpp"
 
+#include "InteractionPanel.h"
 #include "HudGrid.h"
 
 class PlayerHud

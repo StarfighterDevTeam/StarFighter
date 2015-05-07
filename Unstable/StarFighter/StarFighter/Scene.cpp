@@ -13,7 +13,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	}
 	this->generating_enemies = false;
 	this->generating_boss = false;
-	this->hazard_level = hazard_level;
+	this->m_hazard_level = hazard_level;
 	this->m_hazardbreak_has_occurred = false;
 
 	int p = 0;
@@ -463,31 +463,37 @@ float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 
 
 void Scene::HazardBreak()
 {
-	if (hazard_level < HazardLevels::NB_HAZARD_LEVELS - 1)
+	if (this->m_hazard_level_unlocked < HazardLevels::NB_HAZARD_LEVELS - 1)
 	{
-		hazard_level++;
+		this->m_hazard_level_unlocked++;
 	}
 	
-	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", this->hazard_level + 1));
+	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", this->m_hazard_level + 1));
 }
 
 float Scene::getSceneBeastScore()
 {
 	float bonus = 0;
-	if (this->hazard_level < HazardLevels::NB_HAZARD_LEVELS && this->hazard_level >= 0)
+	if (this->m_hazard_level < HazardLevels::NB_HAZARD_LEVELS && this->m_hazard_level >= 0)
 	{
-		bonus = HazardLevelsBeastBonus[this->hazard_level];
+		bonus = HazardLevelsBeastBonus[this->m_hazard_level];
 	}
 	else
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", this->hazard_level);
-		this->hazard_level = 0;
+		this->m_hazard_level = 0;
 	}
 
 	return bonus;
 }
 
+int Scene::getSceneHazardLevelUnlockedValue()
+{
+	return this->m_hazard_level_unlocked;
+}
+
 int Scene::getSceneHazardLevelValue()
 {
-	return this->hazard_level;
+	return this->m_hazard_level;
 }
+

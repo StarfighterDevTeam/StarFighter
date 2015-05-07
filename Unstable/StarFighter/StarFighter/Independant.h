@@ -31,6 +31,7 @@ enum LayerType {
 	PlayerShipLayer,
 	EnemyFireLayer,
 
+	PanelLayer,
 	HudObject,
 	HudCursor,
 	NBVAL_Layer

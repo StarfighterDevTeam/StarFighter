@@ -51,6 +51,7 @@ public:
 	bool generating_boss;
 	sf::Clock spawnClock;
 
+	int getSceneHazardLevelUnlockedValue();
 	int getSceneHazardLevelValue();
 	std::string links[Directions::NO_DIRECTION];
 
@@ -60,12 +61,14 @@ public:
 	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
 
 	void HazardBreak();
+	int m_hazard_level_unlocked;
 
 private:
 	vector<EnemyBase*> boss_list;
 	vector<EnemyBase*> enemies_ranked_by_class[NBVAL_EnemyClass];
 	int total_class_probability[NBVAL_EnemyClass];
-	int hazard_level;
+	int m_hazard_level;
+
 };
 
 #endif // STARFIGHTER_H_INCLUDED

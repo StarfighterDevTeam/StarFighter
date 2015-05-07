@@ -194,6 +194,8 @@ public :
 	void GetPortal(Independant* independant) override;
 	Portal* targetPortal;
 	bool isCollindingWithPortal;
+	bool previouslyCollindingWithPortal;
+	bool wasHyperspeedingButtonPressed;
 	bool isFiringButtonPressed;
 	bool wasBrakingButtonPressed;
 	bool isBrakingButtonHeldPressed;
@@ -220,6 +222,8 @@ public :
 
 	int graze_count;
 	int graze_level;
+
+	int GetFocusedPortalMaxUnlockedHazardLevel();
 	
 private:
 	bool moving;

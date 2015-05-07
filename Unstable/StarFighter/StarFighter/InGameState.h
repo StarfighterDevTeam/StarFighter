@@ -25,12 +25,13 @@ public:
 	int SavePlayer(string file);
 	string LoadPlayerSave(string file);
 	bool AddToKnownScenes(string scene_name);
-	void SetSceneHazardLevel(string scene_name, int hazard_level);
-	int GetSceneHazardLevel(string scene_name);
+	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level);
+	int GetSceneHazardLevelUnlocked(string scene_name);
 	void InGameStateMachineCheck(sf::Time deltaTime);
 	sf::Clock clockHubExit;
 	sf::Clock bossSpawnCountdown;
 	bool hasDisplayedDestructionRatio;
+	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_);
 
 private:
 	sf::RenderWindow* mainWindow;
