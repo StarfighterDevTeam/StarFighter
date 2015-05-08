@@ -176,6 +176,18 @@ public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
+	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
+	void ManageInteractions();
+	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
+	void ManageImmunity();
+	void ResplenishHealth();
+	void ManageHudControls(sf::Vector2f inputs_directions);
+	void TestingInputsRelease();
+	void ManageFeedbackExpiration(sf::Time deltaTime);
+	void IdleDecelleration(sf::Time deltaTime);
+	void ScreenBorderContraints();
+	void SettingTurnAnimations();
 	void setShipConfig(ShipConfig m_ship_config);
 	ShipConfig ship_config;
 	PlayerHud ship_hud;

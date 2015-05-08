@@ -4,3 +4,11 @@ Shop::Shop(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 {
 
 }
+
+void Shop::update(sf::Time deltaTime, float hyperspeedMultiplier)
+{
+	if (!this->GarbageMe)
+	{
+		AnimatedSprite::update(deltaTime);
+	}
+}
