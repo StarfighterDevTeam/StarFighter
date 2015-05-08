@@ -3,12 +3,20 @@
 
 #include <SFML/Graphics.hpp>
 #include "Independant.h"
+#include "HudGrid.h"
 
 enum ShopOptions
 {
 	ShopHeal,
 	ShopBuy,
 	NBVAL_ShopOptions,
+};
+
+enum ShopMenus
+{
+	ShopMainMenu,
+	ShopBuyMenu,
+	NBVAL_ShopMenus,
 };
 
 struct InteractionPanel
@@ -24,7 +32,8 @@ public:
 
 	sf::RectangleShape m_panel;
 	sf::Text m_text[NB_HAZARD_LEVELS];
-	sf::Text m_textHelp;
+	sf::Text m_textHelpNavigation;
+	sf::Text m_textHelpBuy;
 	sf::Text m_textDestination;
 	sf::Text m_textShopOptions[NBVAL_ShopOptions];
 	sf::Font* m_font;
@@ -32,6 +41,12 @@ public:
 	int m_selected_index;
 	Directions m_direction;
 	InteractionType m_currentInteractionType;
+	ShopMenus m_currentShopMenu;
+
+	ObjectGrid m_fakeShopGrid;
+	ObjectGrid m_shopGrid;
+	Independant* m_cursor;
+	Independant* m_focused_item;
 };
 
 #endif //INTERACTIONPANEL_H_INCLUDED

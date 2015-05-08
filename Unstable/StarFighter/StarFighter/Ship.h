@@ -176,7 +176,12 @@ public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	bool ManageVisibility();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
+	void ManageAcceleration(sf::Vector2f inputs_direction);
+	void ManageBraking();
+	void ManageSlowMotion();
+	void ManageHyperspeed();
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageInteractions();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);

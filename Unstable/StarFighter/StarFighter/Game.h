@@ -79,6 +79,8 @@ public:
 	void SetSelectedDirection(Directions direction_);
 	void SetSelectedDestination(string destination_);
 	int GetSelectedIndex();
+	void SetShopMenu(ShopMenus menu);
+	ShopMenus GetShopMenu();
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);

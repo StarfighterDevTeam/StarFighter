@@ -94,6 +94,22 @@ bool ObjectGrid::insertObject(Independant& object, int index, bool overwrite_exi
 	}
 }
 
+void ObjectGrid::SetGridPosition(sf::Vector2f position)
+{
+	for (int i = 0; i < squares.x; i++)
+	{
+		for (int j = 0; j < squares.y; j++)
+		{
+			if (grid[i][j] != NULL)
+			{
+				grid[i][j]->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
+			}
+		}
+	}
+
+	this->position = position;
+}
+
 void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 {
 	for (int i = 0; i < this->squares.x; i++)

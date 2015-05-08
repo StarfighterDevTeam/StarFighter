@@ -36,6 +36,7 @@ class ObjectGrid
 public:
 	ObjectGrid();
 	ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake = false);
+	void SetGridPosition(sf::Vector2f position);
 	bool insertObject(Independant& object, int index = -1, bool overwrite_existing = false);
 	Independant* grid[EQUIPMENT_GRID_NB_LINES][EQUIPMENT_GRID_NB_ROWS];
 	void Draw(sf::RenderTexture& offscreen);

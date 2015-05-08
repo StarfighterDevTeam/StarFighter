@@ -113,6 +113,16 @@ void Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_
 	this->m_interactionPanel->Update(interaction, max_unlocked_hazard_level);
 }
 
+void Game::SetShopMenu(ShopMenus menu)
+{
+	this->m_interactionPanel->m_currentShopMenu = menu;
+}
+
+ShopMenus Game::GetShopMenu()
+{
+	return this->m_interactionPanel->m_currentShopMenu;
+}
+
 void Game::SetSelectedIndex(int index_)
 {
 	this->m_interactionPanel->m_selected_index = index_;

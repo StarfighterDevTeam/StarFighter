@@ -4,6 +4,13 @@ InteractionPanel::InteractionPanel()
 {
 	m_selected_index = 0;
 	m_currentInteractionType = No_Interaction;
+	m_currentShopMenu = ShopMainMenu;
+
+	m_cursor = new Independant(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
+		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
+
+	m_fakeShopGrid = ObjectGrid(sf::Vector2f(SHOP_GRID_OFFSET_POS_X, SHOP_GRID_OFFSET_POS_Y), sf::Vector2i(SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS), true);
+	m_shopGrid = ObjectGrid(sf::Vector2f(SHOP_GRID_OFFSET_POS_X, SHOP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, SHOP_GRID_NB_ROWS), false);
 
 	m_arrow = new Independant(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
 		sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
@@ -58,13 +65,21 @@ InteractionPanel::InteractionPanel()
 		m_textShopOptions[ShopHeal].setString("\n\nHeal");
 		m_textShopOptions[ShopBuy].setString("\n\nBuy");
 
-		ostringstream ss_help;
-		ss_help << "\n\n\nFire: select\nBrake: up\nHyperspeed: down";
-		m_textHelp.setFont(*m_font);
-		m_textHelp.setCharacterSize(18);
-		m_textHelp.setColor(_yellow);
-		m_textHelp.setPosition(INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH, INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * NB_HAZARD_LEVELS));
-		m_textHelp.setString(ss_help.str());
+		ostringstream ss_helpNavigation;
+		ss_helpNavigation << "\n\n\nFire: select\nBrake: down\nHyperspeed: up";
+		m_textHelpNavigation.setFont(*m_font);
+		m_textHelpNavigation.setCharacterSize(18);
+		m_textHelpNavigation.setColor(_yellow);
+		m_textHelpNavigation.setPosition(INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH, INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * NB_HAZARD_LEVELS));
+		m_textHelpNavigation.setString(ss_helpNavigation.str());
+
+		ostringstream ss_helpBuy;
+		ss_helpBuy << "\n\n\nFire: buy\nSlowmotion: exit\n";
+		m_textHelpBuy.setFont(*m_font);
+		m_textHelpBuy.setCharacterSize(18);
+		m_textHelpBuy.setColor(_yellow);
+		m_textHelpBuy.setPosition(INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH, INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * NB_HAZARD_LEVELS));
+		m_textHelpBuy.setString(ss_helpBuy.str());
 	}
 
 	catch (const std::exception & ex)
@@ -76,29 +91,57 @@ InteractionPanel::InteractionPanel()
 
 void InteractionPanel::UpdateShopInteraction()
 {
-	sf::Vector2f l_size = sf::Vector2f(INTERACTION_PANEL_WIDTH, (2 * INTERACTION_PANEL_MARGIN_TOP) + (INTERACTION_INTERLINE * (NBVAL_ShopOptions + 3)) + m_textDestination.getCharacterSize() + (m_textHelp.getCharacterSize() * 3));
-	m_panel.setSize(l_size);
-	m_panel.setOrigin(l_size.x / 2, l_size.y / 2);
-
-	sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
-
-	m_panel.setPosition(position.x, position.y);
-
-	for (int i = 0; i < NBVAL_ShopOptions; i++)
+	switch (m_currentShopMenu)
 	{
-		m_textShopOptions[i].setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * i) - (l_size.y / 2));
+		case ShopMainMenu:
+		{
+			sf::Vector2f l_size = sf::Vector2f(INTERACTION_PANEL_WIDTH, (2 * INTERACTION_PANEL_MARGIN_TOP) + (INTERACTION_INTERLINE * (NBVAL_ShopOptions + 3)) + m_textDestination.getCharacterSize() + (m_textHelpNavigation.getCharacterSize() * 3));
+			m_panel.setSize(l_size);
+			m_panel.setOrigin(l_size.x / 2, l_size.y / 2);
+
+			sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
+
+			m_panel.setPosition(position.x, position.y);
+
+			for (int i = 0; i < NBVAL_ShopOptions; i++)
+			{
+				m_textShopOptions[i].setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * i) - (l_size.y / 2));
+			}
+
+			m_textDestination.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP - (l_size.y / 2));
+
+			m_textHelpNavigation.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * NBVAL_ShopOptions) - (l_size.y / 2));
+
+			m_arrow->setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * m_selected_index) + (m_textDestination.getCharacterSize() / 2) + (m_text[0].getCharacterSize() * (4 + 1) / 2) - (l_size.y / 2));
+
+			break;
+		}
+
+		case ShopBuyMenu:
+		{
+			sf::Vector2f l_size = sf::Vector2f((2 * INTERACTION_PANEL_MARGIN_SIDES) + (SHOP_GRID_NB_ROWS * SHOP_GRID_SLOT_SIZE), (2 * INTERACTION_PANEL_MARGIN_TOP) + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) + m_textDestination.getCharacterSize() + (m_textHelpNavigation.getCharacterSize() * 5));
+			m_panel.setSize(l_size);
+			m_panel.setOrigin(l_size.x / 2, l_size.y / 2);
+
+			sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
+
+			m_panel.setPosition(position);
+
+			m_fakeShopGrid.SetGridPosition(sf::Vector2f(position.x + INTERACTION_PANEL_MARGIN_SIDES - (l_size.x / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + m_textDestination.getCharacterSize() + INTERACTION_INTERLINE - (l_size.y / 2)));
+			m_shopGrid.SetGridPosition(sf::Vector2f(position.x + INTERACTION_PANEL_MARGIN_SIDES - (l_size.x / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + m_textDestination.getCharacterSize() + INTERACTION_INTERLINE - (l_size.y / 2)));
+
+			m_textDestination.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP - (l_size.y / 2));
+
+			m_textHelpBuy.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) - (l_size.y / 2));
+
+			break;
+		}
 	}
-
-	m_textDestination.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP - (l_size.y / 2));
-
-	m_textHelp.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * NBVAL_ShopOptions) - (l_size.y / 2));
-
-	m_arrow->setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * m_selected_index) + (m_textDestination.getCharacterSize() / 2) + (m_text[0].getCharacterSize() * (4 + 1) / 2) - (l_size.y / 2));
 }
 
 void InteractionPanel::UpdatePortalInteraction(int max_unlocked_hazard_level)
 {
-	sf::Vector2f l_size = sf::Vector2f(INTERACTION_PANEL_WIDTH, (2 * INTERACTION_PANEL_MARGIN_TOP) + (INTERACTION_INTERLINE * (NB_HAZARD_LEVELS + 3)) + m_textDestination.getCharacterSize() + (m_textHelp.getCharacterSize() * 3));
+	sf::Vector2f l_size = sf::Vector2f(INTERACTION_PANEL_WIDTH, (2 * INTERACTION_PANEL_MARGIN_TOP) + (INTERACTION_INTERLINE * (NB_HAZARD_LEVELS + 3)) + m_textDestination.getCharacterSize() + (m_textHelpNavigation.getCharacterSize() * 3));
 	m_panel.setSize(l_size);
 	m_panel.setOrigin(l_size.x / 2, l_size.y / 2);
 
@@ -118,7 +161,7 @@ void InteractionPanel::UpdatePortalInteraction(int max_unlocked_hazard_level)
 
 	m_textDestination.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP - (l_size.y / 2));
 	
-	m_textHelp.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * NB_HAZARD_LEVELS) - (l_size.y / 2));
+	m_textHelpNavigation.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * NB_HAZARD_LEVELS) - (l_size.y / 2));
 
 	m_arrow->setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * m_selected_index) + (m_textDestination.getCharacterSize() / 2) + (m_text[0].getCharacterSize() * (4 + 1) / 2) - (l_size.y / 2));
 
@@ -158,22 +201,34 @@ void InteractionPanel::Draw(sf::RenderTexture& screen)
 	if (m_currentInteractionType != No_Interaction)
 	{
 		screen.draw(m_panel);
-		screen.draw(*m_arrow);
-		screen.draw(m_textHelp);
 		screen.draw(m_textDestination);
+
+		if (m_currentShopMenu == ShopMainMenu)
+		{
+			screen.draw(*m_arrow);
+
+			if (m_currentInteractionType == ShopInteraction)
+			{
+				screen.draw(m_textHelpNavigation);
+				for (int i = 0; i < NBVAL_ShopOptions; i++)
+				{
+					screen.draw(m_textShopOptions[i]);
+				}
+			}
+		}
+		else if (m_currentShopMenu == ShopBuyMenu)
+		{
+			m_fakeShopGrid.Draw(screen);
+			m_shopGrid.Draw(screen);
+			screen.draw(m_textHelpBuy);
+		}
 
 		if (m_currentInteractionType == PortalInteraction)
 		{
 			for (int i = 0; i < NB_HAZARD_LEVELS; i++)
 			{
 				screen.draw(m_text[i]);
-			}
-		}
-		else if (m_currentInteractionType == ShopInteraction)
-		{
-			for (int i = 0; i < NBVAL_ShopOptions; i++)
-			{
-				screen.draw(m_textShopOptions[i]);
+				screen.draw(m_textHelpNavigation);
 			}
 		}
 	}

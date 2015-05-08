@@ -881,35 +881,18 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 	}
 }
 
+
+
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	//no update on invisible ship (=dead)
-	bool l_visible = false;
-	if (this->visible)
+	if (ManageVisibility())
 	{
-		l_visible = true;
-	}
-	if (this->ship_config.m_fake_ship != NULL)
-	{
-		if (this->ship_config.m_fake_ship->visible)
-		{
-			l_visible = true;
-		}
-	}
-
-	if (l_visible)
-	{
-		this->isBraking = false;
-		this->isHyperspeeding = false;
-
 		ManageImmunity();
 
 		ManageShieldRegen(deltaTime, hyperspeedMultiplier);
 
 		sf::Vector2f directions = InputGuy::getDirections();
 
-		//switching controls to the HUD
-		//Ship controls
 		ManageInputs(deltaTime, hyperspeedMultiplier, directions);
 		
 		previouslyCollindingWithInteractiveObject = isCollindingWithInteractiveObject;
@@ -925,6 +908,25 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 		ManageFeedbackExpiration(deltaTime);		
 	}
+}
+
+bool Ship::ManageVisibility()
+{
+	//no update on invisible ship (=dead)
+	bool l_visible = false;
+	if (this->visible)
+	{
+		l_visible = true;
+	}
+	if (this->ship_config.m_fake_ship != NULL)
+	{
+		if (this->ship_config.m_fake_ship->visible)
+		{
+			l_visible = true;
+		}
+	}
+
+	return l_visible;
 }
 
 void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -1081,62 +1083,23 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 		if (!isFocusedOnHud)
 		{
-			speed.x += inputs_direction.x*ship_config.getShipConfigAcceleration().x;
-			speed.y += inputs_direction.y*ship_config.getShipConfigAcceleration().y;
+			if ((*CurrentGame).GetShopMenu() == ShopMainMenu)
+			{
+				ManageAcceleration(inputs_direction);
 
-			//max speed constraints
-			if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
-			{
-				speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
-			}
-			if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
-			{
-				speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
-			}
+				ManageSlowMotion();
 
-			//Slow_motion function
-			if (InputGuy::isSlowMotion() && !disable_fire && (isCollindingWithInteractiveObject == No_Interaction))
-			{
-				if (!this->slowmo_key_repeat)
-				{
-					this->isSlowMotion = !this->isSlowMotion;
-					this->slowmo_key_repeat = true;
-					if (this->isSlowMotion)
-					{
-						(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
-					}
-					else
-					{
-						(*CurrentGame).hyperspeedMultiplier = 1.0f;
-					}
-				}
-			}
-			else
-			{
-				this->slowmo_key_repeat = false;
-			}
+				ManageHyperspeed();
 
-			//Hyperspeed function
-			if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion && (isCollindingWithInteractiveObject == No_Interaction))
-			{
-				this->isHyperspeeding = true;
-				(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
+				ManageInteractions();
+
+				ManageFiring(deltaTime, hyperspeedMultiplier);
+
+				ManageBraking();
 			}
-			else if (!this->isSlowMotion)
+			else if ((*CurrentGame).GetShopMenu() == ShopBuyMenu)
 			{
-				(*CurrentGame).hyperspeedMultiplier = 1.0f;
-			}
-
-			ManageInteractions();
-
-			ManageFiring(deltaTime, hyperspeedMultiplier);
-
-			//Braking function
-			if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding && (isCollindingWithInteractiveObject == No_Interaction))
-			{
-				speed.x *= SHIP_BRAKING_MALUS_SPEED;
-				speed.y *= SHIP_BRAKING_MALUS_SPEED;
-				this->isBraking = true;
+				ManageInteractions();
 			}
 		}
 
@@ -1153,6 +1116,73 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 	else
 	{
 		isFocusedOnHud = false;
+	}
+}
+
+void Ship::ManageSlowMotion()
+{
+	//Slow_motion function
+	if (InputGuy::isSlowMotion() && !disable_fire && (isCollindingWithInteractiveObject == No_Interaction))
+	{
+		if (!this->slowmo_key_repeat)
+		{
+			this->isSlowMotion = !this->isSlowMotion;
+			this->slowmo_key_repeat = true;
+			if (this->isSlowMotion)
+			{
+				(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
+			}
+			else
+			{
+				(*CurrentGame).hyperspeedMultiplier = 1.0f;
+			}
+		}
+	}
+	else
+	{
+		this->slowmo_key_repeat = false;
+	}
+}
+
+void Ship::ManageHyperspeed()
+{
+	this->isHyperspeeding = false;
+	if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion && (isCollindingWithInteractiveObject == No_Interaction))
+	{
+		this->isHyperspeeding = true;
+		(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
+	}
+	else if (!this->isSlowMotion)
+	{
+		(*CurrentGame).hyperspeedMultiplier = 1.0f;
+	}
+}
+
+void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
+{
+	speed.x += inputs_direction.x*ship_config.getShipConfigAcceleration().x;
+	speed.y += inputs_direction.y*ship_config.getShipConfigAcceleration().y;
+
+	//max speed constraints
+	if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
+	{
+		speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
+	}
+	if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
+	{
+		speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
+	}
+}
+
+void Ship::ManageBraking()
+{
+	//Braking function
+	this->isBraking = false;
+	if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding && (isCollindingWithInteractiveObject == No_Interaction))
+	{
+		speed.x *= SHIP_BRAKING_MALUS_SPEED;
+		speed.y *= SHIP_BRAKING_MALUS_SPEED;
+		this->isBraking = true;
 	}
 }
 
@@ -1226,6 +1256,15 @@ void Ship::TestingInputsRelease()
 	else
 	{
 		wasHyperspeedingButtonPressed = false;
+	}
+
+	if (InputGuy::isSlowMotion())
+	{
+		slowmo_key_repeat = true;
+	}
+	else
+	{
+		slowmo_key_repeat = false;
 	}
 }
 
@@ -1492,61 +1531,74 @@ void Ship::ManageInteractions()
 
 	if (this->isCollindingWithInteractiveObject != No_Interaction)
 	{
-		//testing interaction
-		if (!isFiringButtonPressed)
+		if (this->isCollindingWithInteractiveObject == PortalInteraction)
 		{
-			if (this->isCollindingWithInteractiveObject == PortalInteraction)
+			assert(this->targetPortal != NULL);
+			if (this->targetPortal->state == PortalOpen)
 			{
-				assert(this->targetPortal != NULL);
-				if (this->targetPortal->state == PortalOpen)
+				//Updating interaction panel informations
+				(*CurrentGame).SetSelectedDirection(this->targetPortal->direction);
+				assert(this->targetPortal->destination_name.compare("0") != 0);
+				(*CurrentGame).SetSelectedDestination(this->targetPortal->display_name);
+				//default value = max
+				if (previouslyCollindingWithInteractiveObject != PortalInteraction)
 				{
-					//Updating interaction panel informations
-					(*CurrentGame).SetSelectedDirection(this->targetPortal->direction);
-					assert(this->targetPortal->destination_name.compare("0") != 0);
-					(*CurrentGame).SetSelectedDestination(this->targetPortal->display_name);
-					//default value = max
-					if (previouslyCollindingWithInteractiveObject != PortalInteraction)
-					{
-						(*CurrentGame).SetSelectedIndex(this->targetPortal->max_unlocked_hazard_level);
-					}
-
-					//interaction: select
-					if (InputGuy::isFiring())
-					{
-						if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
-						{
-							this->m_interactionType = PortalInteraction;
-						}
-						isFiringButtonPressed = true;
-					}
-				}
-				else
-				{
-					this->isCollindingWithInteractiveObject = No_Interaction;
-				}
-			}
-			else if (this->isCollindingWithInteractiveObject == ShopInteraction)
-			{
-				assert(this->targetShop != NULL);
-				(*CurrentGame).SetSelectedDestination(this->targetShop->display_name);
-				//default value = first choice
-				if (previouslyCollindingWithInteractiveObject != ShopInteraction)
-				{
-					(*CurrentGame).SetSelectedIndex(0);
+					(*CurrentGame).SetSelectedIndex(this->targetPortal->max_unlocked_hazard_level);
 				}
 
 				//interaction: select
-				if (InputGuy::isFiring())
+				if (InputGuy::isFiring() && !isFiringButtonPressed)
 				{
-					this->m_interactionType = ShopInteraction;
-					isFiringButtonPressed = true;
-					switch ((*CurrentGame).m_interactionPanel->m_selected_index)
+					if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
 					{
-					case ShopHeal:
-						ResplenishHealth();
-						break;
-
+						this->m_interactionType = PortalInteraction;
 					}
+					isFiringButtonPressed = true;
+				}
+			}
+			else
+			{
+				this->isCollindingWithInteractiveObject = No_Interaction;
+			}
+		}
+		else if (this->isCollindingWithInteractiveObject == ShopInteraction)
+		{
+			assert(this->targetShop != NULL);
+
+			(*CurrentGame).SetSelectedDestination(this->targetShop->display_name);
+			//default value = first choice
+			if (previouslyCollindingWithInteractiveObject != ShopInteraction)
+			{
+				(*CurrentGame).SetSelectedIndex(0);
+			}
+
+			switch ((*CurrentGame).GetShopMenu())
+			{
+				case ShopMainMenu:
+				{
+					//interaction: select
+					if (InputGuy::isFiring() && !isFiringButtonPressed)
+					{
+						this->m_interactionType = ShopInteraction;
+						isFiringButtonPressed = true;
+						switch ((*CurrentGame).m_interactionPanel->m_selected_index)
+						{
+						case ShopHeal:
+							ResplenishHealth();
+							break;
+						case ShopBuy:
+							(*CurrentGame).SetShopMenu(ShopBuyMenu);
+						}
+					}
+					break;
+				}
+				case ShopBuyMenu:
+				{
+					if (InputGuy::isSlowMotion() && !slowmo_key_repeat)
+					{
+						(*CurrentGame).SetShopMenu(ShopMainMenu);
+					}
+					break;
 				}
 			}
 		}
@@ -1555,7 +1607,7 @@ void Ship::ManageInteractions()
 		if (this->isCollindingWithInteractiveObject == PortalInteraction && this->m_interactionType != PortalInteraction)
 		{
 			//interaction: decreasing
-			if (InputGuy::isBraking() && !wasBrakingButtonPressed)
+			if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
 			{
 				if ((*CurrentGame).GetSelectedIndex() > 0)
 				{
@@ -1563,7 +1615,7 @@ void Ship::ManageInteractions()
 				}
 			}
 			//interaction: increasing
-			else if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
+			else if (InputGuy::isBraking() && !wasBrakingButtonPressed)
 			{
 				if ((*CurrentGame).GetSelectedIndex() < this->targetPortal->max_unlocked_hazard_level)
 				{
@@ -1574,7 +1626,7 @@ void Ship::ManageInteractions()
 		else if (this->isCollindingWithInteractiveObject == ShopInteraction  && this->m_interactionType != ShopInteraction)
 		{
 			//interaction: decreasing
-			if (InputGuy::isBraking() && !wasBrakingButtonPressed)
+			if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
 			{
 				if ((*CurrentGame).GetSelectedIndex() > 0)
 				{
@@ -1582,7 +1634,7 @@ void Ship::ManageInteractions()
 				}
 			}
 			//interaction: increasing
-			else if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
+			else if (InputGuy::isBraking() && !wasBrakingButtonPressed)
 			{
 				if ((*CurrentGame).GetSelectedIndex() < NBVAL_ShopOptions - 1)
 				{
