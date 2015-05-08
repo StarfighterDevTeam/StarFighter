@@ -69,8 +69,10 @@ void InGameState::Initialize(Player player)
 	{
 		this->IG_State = InGameStateMachine::HUB_ROAMING;
 	}
-
+	
+	//creating new ship
 	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
+	this->playerShip->ResplenishHealth();
 
 	//initalizing equipment in HUD
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");

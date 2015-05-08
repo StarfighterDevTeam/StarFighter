@@ -773,9 +773,16 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 
 void Ship::Init()
 {
-	this->armor = this->ship_config.getShipConfigArmor();
 	this->armor_max = this->ship_config.getShipConfigArmor();
+	if (this->armor > this->armor_max)
+	{
+		this->armor = this->armor_max;
+	}
 	this->shield_max = this->ship_config.getShipConfigShield();
+	if (this->shield > this->shield_max)
+	{
+		this->shield = this->shield_max;
+	}
 	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
 	this->damage = this->ship_config.getShipConfigDamage();
 	this->m_size = this->ship_config.ship_model->size;
