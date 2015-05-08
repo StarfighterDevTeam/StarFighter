@@ -85,7 +85,6 @@ void Aura::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		//if the Aura is not visible, we don't display it and reset its animation to frame 0
 		this->m_currentFrame = 0;
 	}
-	
 }
 
 Aura* Aura::Clone()

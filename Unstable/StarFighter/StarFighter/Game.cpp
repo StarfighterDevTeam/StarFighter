@@ -146,7 +146,7 @@ void Game::drawScene()
 				mainScreen.draw(*(*it));
 			}
 		}
-		else if (i == PanelLayer)
+		else if (i == PanelLayer && this->direction == NO_DIRECTION)
 		{
 			this->m_interactionPanel->Draw(mainScreen);
 		}
@@ -590,8 +590,6 @@ bool Game::isLastEnemyDead()
 	if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyFire]))
 		return false;
 	else if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyObject]))
-		return false;
-	else if (!isVectorEmpty(&this->sceneIndependantsTyped[LootObject]))
 		return false;
 	
 	return true;

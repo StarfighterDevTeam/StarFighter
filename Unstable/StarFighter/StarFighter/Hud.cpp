@@ -164,14 +164,16 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	GrazeScore.setString("Graze: "+ss_g.str());
 
 	//scene name
-	ostringstream ss_bg;
-	ss_bg << scene_name;
 	if (!hub)
 	{
+		ostringstream ss_bg;
 		ss_bg  << " (" << m_hazard_level+1 << ")";
+		SceneName.setString(scene_name + ss_bg.str());
 	} 
-
-	SceneName.setString(ss_bg.str());
+	else
+	{
+		SceneName.setString(scene_name);
+	}
 
 	//framerate
 	framerate->setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));

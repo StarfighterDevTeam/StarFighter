@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
 {
-	
+	m_shop = NULL;
 	visible = true;
 	
 	sf::Vector2f size_ = Independant::getSize_for_Direction(direction, size);
@@ -46,6 +46,11 @@ void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			this->portals[(Directions)i]->setPosition(newposition.x + this->portals[(Directions)i]->offset.x, newposition.y + this->portals[(Directions)i]->offset.y);
 		}
+	}
+
+	if (this->m_shop != NULL)
+	{
+		this->m_shop->setPosition(newposition);
 	}
 
 	AnimatedSprite::update(deltaTime);

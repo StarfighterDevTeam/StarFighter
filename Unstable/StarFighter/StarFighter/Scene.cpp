@@ -145,11 +145,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						//creating the shop
 						if (this->direction == NO_DIRECTION)
 						{
-							this->m_shop = new Independant(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), SHOP_ASSET_FILENAME, sf::Vector2f(SHOP_ASSET_WIDTH, SHOP_ASSET_HEIGHT), sf::Vector2f(SHOP_ASSET_WIDTH / 2, SHOP_ASSET_HEIGHT / 2));
-							this->m_shop->visible = true;
-							this->m_shop->display_name = this->bg->display_name + " Shop";
-							(*CurrentGame).addToScene(this->m_shop, PortalLayer, ShopObject);
-
+							this->bg->m_shop = new Shop(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), SHOP_ASSET_FILENAME, sf::Vector2f(SHOP_ASSET_WIDTH, SHOP_ASSET_HEIGHT), sf::Vector2f(SHOP_ASSET_WIDTH / 2, SHOP_ASSET_HEIGHT / 2));
+							this->bg->m_shop->visible = true;
+							this->bg->m_shop->display_name = this->bg->display_name + " Shop";
+							(*CurrentGame).addToScene(this->bg->m_shop, PortalLayer, ShopObject);
 						}
 					}
 
@@ -284,6 +283,11 @@ void Scene::DestroyScene()
 		{
 			this->bg->portals[(Directions)i]->GarbageMe = true;
 		}
+	}
+
+	if (this->bg->m_shop != NULL)
+	{
+		this->bg->m_shop->GarbageMe = true;
 	}
 
 	this->bg->GarbageMe = true;

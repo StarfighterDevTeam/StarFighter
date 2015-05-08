@@ -3,7 +3,6 @@
 
 #include "FileLoader.h"
 #include "EnemyGenerator.h"
-#include "Shop.h"
 
 using namespace std;
 
@@ -63,7 +62,6 @@ public:
 
 	void HazardBreak();
 	int m_hazard_level_unlocked;
-	Independant* m_shop;
 
 private:
 	vector<EnemyBase*> boss_list;

@@ -1491,24 +1491,31 @@ void Ship::ManageInteractions()
 			if (this->isCollindingWithInteractiveObject == PortalInteraction)
 			{
 				assert(this->targetPortal != NULL);
-				//Updating interaction panel informations
-				(*CurrentGame).SetSelectedDirection(this->targetPortal->direction);
-				assert(this->targetPortal->destination_name.compare("0") != 0);
-				(*CurrentGame).SetSelectedDestination(this->targetPortal->display_name);
-				//default value = max
-				if (previouslyCollindingWithInteractiveObject != PortalInteraction)
+				if (this->targetPortal->state == PortalOpen)
 				{
-					(*CurrentGame).SetSelectedIndex(this->targetPortal->max_unlocked_hazard_level);
-				}
-
-				//interaction: select
-				if (InputGuy::isFiring())
-				{
-					if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
+					//Updating interaction panel informations
+					(*CurrentGame).SetSelectedDirection(this->targetPortal->direction);
+					assert(this->targetPortal->destination_name.compare("0") != 0);
+					(*CurrentGame).SetSelectedDestination(this->targetPortal->display_name);
+					//default value = max
+					if (previouslyCollindingWithInteractiveObject != PortalInteraction)
 					{
-						this->m_interactionType = PortalInteraction;
+						(*CurrentGame).SetSelectedIndex(this->targetPortal->max_unlocked_hazard_level);
 					}
-					isFiringButtonPressed = true;
+
+					//interaction: select
+					if (InputGuy::isFiring())
+					{
+						if (this->targetPortal->currentAnimationIndex == (int)(PortalAnimation::PortalOpenIdle))
+						{
+							this->m_interactionType = PortalInteraction;
+						}
+						isFiringButtonPressed = true;
+					}
+				}
+				else
+				{
+					this->isCollindingWithInteractiveObject = No_Interaction;
 				}
 			}
 			else if (this->isCollindingWithInteractiveObject == ShopInteraction)
