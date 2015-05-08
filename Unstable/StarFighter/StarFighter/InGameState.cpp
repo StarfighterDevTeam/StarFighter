@@ -2,39 +2,6 @@
 
 extern Game* CurrentGame;
 
-void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_)
-{
-	//getting the max hazard value for the upcoming scene
-	map<string, int>::iterator it = this->knownScenes.find(scene_->m_name);
-	if (it != this->knownScenes.end())
-	{
-		scene_->m_hazard_level_unlocked = this->knownScenes[scene_->m_name];
-	}
-	else
-	{
-		//destination is not know yet -> default max hazard value
-		scene_->m_hazard_level_unlocked = 0;
-	}
-
-	//loading the scene's portals with the info about their respective max hazard values
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
-	{
-		if (scene_->bg->portals[(Directions)i] != NULL)
-		{
-			map<string, int>::iterator it = this->knownScenes.find(scene_->bg->portals[(Directions)i]->destination_name);
-			if (it != this->knownScenes.end())
-			{
-				scene_->bg->portals[(Directions)i]->max_unlocked_hazard_level = this->knownScenes[scene_->bg->portals[(Directions)i]->destination_name];
-			}
-			else
-			{
-				//destination is not know yet -> default max hazard value
-				scene_->bg->portals[(Directions)i]->max_unlocked_hazard_level = 0;
-			}
-		}
-	}
-}
-
 void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
@@ -562,6 +529,41 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			}
 
 			break;
+		}
+	}
+}
+
+
+
+void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_)
+{
+	//getting the max hazard value for the upcoming scene
+	map<string, int>::iterator it = this->knownScenes.find(scene_->m_name);
+	if (it != this->knownScenes.end())
+	{
+		scene_->m_hazard_level_unlocked = this->knownScenes[scene_->m_name];
+	}
+	else
+	{
+		//destination is not know yet -> default max hazard value
+		scene_->m_hazard_level_unlocked = 0;
+	}
+
+	//loading the scene's portals with the info about their respective max hazard values
+	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	{
+		if (scene_->bg->portals[(Directions)i] != NULL)
+		{
+			map<string, int>::iterator it = this->knownScenes.find(scene_->bg->portals[(Directions)i]->destination_name);
+			if (it != this->knownScenes.end())
+			{
+				scene_->bg->portals[(Directions)i]->max_unlocked_hazard_level = this->knownScenes[scene_->bg->portals[(Directions)i]->destination_name];
+			}
+			else
+			{
+				//destination is not know yet -> default max hazard value
+				scene_->bg->portals[(Directions)i]->max_unlocked_hazard_level = 0;
+			}
 		}
 	}
 }

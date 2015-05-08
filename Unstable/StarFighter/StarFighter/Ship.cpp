@@ -1593,10 +1593,20 @@ void Ship::ManageInteractions()
 	}
 }
 
-void Ship::ResplenishHealth()
+bool Ship::ResplenishHealth()
 {
-	this->armor = this->armor_max;
-	this->shield = this->shield_max;
+	bool hasHealthToResplenish = false;
+	if (this->armor < this->armor_max)
+	{
+		this->armor = this->armor_max;
+		hasHealthToResplenish = true;
+	}
+	if (this->shield < this->shield_max)
+	{
+		this->shield = this->shield_max;
+		hasHealthToResplenish = true;
+	}
+	return hasHealthToResplenish;
 }
 
 void Ship::Respawn()

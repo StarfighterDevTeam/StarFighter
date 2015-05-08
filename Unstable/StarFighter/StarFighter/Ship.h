@@ -181,7 +181,7 @@ public :
 	void ManageInteractions();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
 	void ManageImmunity();
-	void ResplenishHealth();
+	bool ResplenishHealth();
 	void ManageHudControls(sf::Vector2f inputs_directions);
 	void TestingInputsRelease();
 	void ManageFeedbackExpiration(sf::Time deltaTime);

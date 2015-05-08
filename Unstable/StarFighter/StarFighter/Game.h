@@ -74,7 +74,7 @@ public:
 	void WakeUpEnemiesWithName(string m_display_name);
 
 	InteractionPanel* m_interactionPanel;
-	void UpdateInteractionPanel (InteractionType interaction, int max_unlocked_hazard_level = 0);
+	void UpdateInteractionPanel (InteractionType interaction, int max_unlocked_hazard_level);
 	void SetSelectedIndex(int index_);
 	void SetSelectedDirection(Directions direction_);
 	void SetSelectedDestination(string destination_);
