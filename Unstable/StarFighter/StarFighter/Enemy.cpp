@@ -956,21 +956,21 @@ void Enemy::GenerateLoot()
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getWeaponLoot()->textureName, sf::Vector2f(this->getWeaponLoot()->size.x, this->getWeaponLoot()->size.y), this->getWeaponLoot()->display_name);
 		new_loot->get_weapon_from(*this);
-		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::LootLayer, IndependantType::LootObject);
 	}
 
 	else if (this->equipment_loot != NULL)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getEquipmentLoot()->textureName, sf::Vector2f(this->getEquipmentLoot()->size.x, this->getEquipmentLoot()->size.y), this->getEquipmentLoot()->display_name);
 		new_loot->get_equipment_from(*this);
-		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::LootLayer, IndependantType::LootObject);
 	}
 
 	else if (this->money > 0)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Money");
 		new_loot->get_money_from(*this);
-		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::PlayerShipLayer, IndependantType::LootObject);
+		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::LootLayer, IndependantType::LootObject);
 	}
 	else
 	{

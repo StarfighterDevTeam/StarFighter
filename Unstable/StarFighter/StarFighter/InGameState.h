@@ -32,6 +32,7 @@ public:
 	sf::Clock bossSpawnCountdown;
 	bool hasDisplayedDestructionRatio;
 	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_);
+	void RespawnInLastHub();
 
 private:
 	sf::RenderWindow* mainWindow;

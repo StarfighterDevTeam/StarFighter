@@ -241,6 +241,8 @@ public :
 
 	bool isFocusedOnHud;
 
+	string respawnSceneName;
+
 	int graze_count;
 	int graze_level;
 

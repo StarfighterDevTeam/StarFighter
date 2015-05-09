@@ -40,6 +40,7 @@ void InGameState::Initialize(Player player)
 	//creating new ship
 	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
 	this->playerShip->ResplenishHealth();
+	this->playerShip->respawnSceneName = this->currentScene->m_name;
 
 	//initalizing equipment in HUD
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");
@@ -90,6 +91,12 @@ void InGameState::Initialize(Player player)
 
 void InGameState::Update(Time deltaTime)
 {
+	//automatic respawn if dead
+	if (!(*CurrentGame).playerShip->visible)
+	{
+		RespawnInLastHub();
+	}
+
 	InGameStateMachineCheck(deltaTime);
 	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), this->currentScene->getSceneBeastScore());
 
@@ -517,6 +524,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if (this->currentScene->direction == Directions::NO_DIRECTION)
 				{
 					this->SavePlayer(PLAYER_SAVE_FILE);
+					this->playerShip->respawnSceneName = this->currentScene->m_name;
 				}
 
 				//Giving control back to the player
@@ -591,4 +599,36 @@ void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_)
 			}
 		}
 	}
+}
+
+void InGameState::RespawnInLastHub()
+{
+	//cleaning layers
+	(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
+	(*CurrentGame).garbageLayer(LayerType::EnemyFireLayer);
+	(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer);
+	(*CurrentGame).garbageLayer(LayerType::ExplosionLayer);
+	(*CurrentGame).garbageLayer(LayerType::BotLayer);
+	(*CurrentGame).garbageLayer(LayerType::LootLayer);
+
+	//loading last visited hub
+	string nextScene_filename = (*CurrentGame).playerShip->respawnSceneName;
+	this->nextScene = new Scene(nextScene_filename, 0, false, true);
+	UpdatePortalsMaxUnlockedHazardLevel(this->nextScene);
+
+	//Wiping the previous background and swapping with the new one
+	this->currentScene->DestroyScene();
+	delete this->currentScene;
+	this->currentScene = this->nextScene;
+	this->nextScene = NULL;
+	(*CurrentGame).direction = this->currentScene->direction;
+
+	//Applying hub modifiers to gameplay
+	(*CurrentGame).playerShip->disabledHyperspeed = true;
+	(*CurrentGame).playerShip->disable_fire = true;
+	this->IG_State = HUB_ROAMING;
+
+	//resetting ship
+	(*CurrentGame).playerShip->Respawn();
+	(*CurrentGame).playerShip->setPosition(sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO));
 }
