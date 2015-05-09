@@ -27,6 +27,7 @@ public:
 	Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	std::string destination_name;
+	Directions target_direction;
 	int max_unlocked_hazard_level;
 	sf::Vector2f offset;//respect to the background
 	PortalState state;

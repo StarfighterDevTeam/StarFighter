@@ -881,12 +881,20 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 	}
 }
 
-
+void Ship::ManageDebugCommand()
+{
+	if (InputGuy::isUsingDebugCommand())
+	{
+		(*CurrentGame).killIndependantLayer(EnemyObject);
+	}
+}
 
 void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (ManageVisibility())
 	{
+		ManageDebugCommand();
+
 		ManageImmunity();
 
 		ManageShieldRegen(deltaTime, hyperspeedMultiplier);
@@ -907,6 +915,34 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		SettingTurnAnimations();
 
 		ManageFeedbackExpiration(deltaTime);		
+	}
+}
+
+void Ship::ManageOpeningHud()
+{
+	if (InputGuy::isOpeningHud())
+	{
+		if (!this->hud_key_repeat)
+		{
+			isFocusedOnHud = !isFocusedOnHud;
+			hud_key_repeat = true;
+
+			(*CurrentGame).hud.has_focus = isFocusedOnHud;
+			disable_fire = isFocusedOnHud;
+
+			if (isFocusedOnHud && !isSlowMotion)
+			{
+				(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
+			}
+			else if (!isFocusedOnHud && !isSlowMotion)
+			{
+				(*CurrentGame).hyperspeedMultiplier = 1.0f;
+			}
+		}
+	}
+	else
+	{
+		hud_key_repeat = false;
 	}
 }
 
@@ -1052,31 +1088,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 {
 	if (!disable_inputs)
 	{
-		if (InputGuy::isOpeningHud())
-		{
-			if (!this->hud_key_repeat)
-			{
-				isFocusedOnHud = !isFocusedOnHud;
-				hud_key_repeat = true;
-
-				(*CurrentGame).hud.has_focus = isFocusedOnHud;
-				disable_fire = isFocusedOnHud;
-
-				if (isFocusedOnHud && !isSlowMotion)
-				{
-					(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
-				}
-				else if (!isFocusedOnHud && !isSlowMotion)
-				{
-					(*CurrentGame).hyperspeedMultiplier = 1.0f;
-				}
-			}
-		}
-		else
-		{
-			hud_key_repeat = false;
-		}
-
 		moving = inputs_direction.x != 0 || inputs_direction.y != 0;
 		movingX = inputs_direction.x != 0;
 		movingY = inputs_direction.y != 0;
@@ -1085,13 +1096,15 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		{
 			if ((*CurrentGame).GetShopMenu() == ShopMainMenu)
 			{
+				ManageOpeningHud();
+
 				ManageAcceleration(inputs_direction);
 
 				ManageSlowMotion();
 
 				ManageHyperspeed();
 
-				ManageInteractions();
+				ManageInteractions(inputs_direction);
 
 				ManageFiring(deltaTime, hyperspeedMultiplier);
 
@@ -1099,13 +1112,14 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			}
 			else if ((*CurrentGame).GetShopMenu() == ShopBuyMenu)
 			{
-				ManageInteractions();
+				ManageInteractions(inputs_direction);
 			}
 		}
-
 		//HUD controls
 		else
 		{
+			ManageOpeningHud();
+
 			ManageHudControls(inputs_direction);
 		}
 
@@ -1271,9 +1285,9 @@ void Ship::TestingInputsRelease()
 void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 {
 	//movement
-	Independant* cursor_ = (*CurrentGame).hud.hud_cursor;
-	cursor_->speed.x = inputs_directions.x * HUD_CURSOR_SPEED;
-	cursor_->speed.y = inputs_directions.y * HUD_CURSOR_SPEED;
+	Independant* l_cursor = (*CurrentGame).hud.hud_cursor;
+	l_cursor->speed.x = inputs_directions.x * HUD_CURSOR_SPEED;
+	l_cursor->speed.y = inputs_directions.y * HUD_CURSOR_SPEED;
 
 	//focus
 	bool has_changed_focused_item_ = true;
@@ -1419,7 +1433,7 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 		}
 	}
 
-	cursor_ = NULL;
+	l_cursor = NULL;
 }
 
 void Ship::SettingTurnAnimations()
@@ -1524,7 +1538,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	}
 }
 
-void Ship::ManageInteractions()
+void Ship::ManageInteractions(sf::Vector2f input_directions)
 {
 	//using portals and shops
 	m_interactionType = No_Interaction;
@@ -1588,12 +1602,21 @@ void Ship::ManageInteractions()
 							break;
 						case ShopBuy:
 							(*CurrentGame).SetShopMenu(ShopBuyMenu);
+							(*CurrentGame).m_interactionPanel->InitCursorOnGrid();
+							break;
 						}
 					}
 					break;
 				}
 				case ShopBuyMenu:
 				{
+					//cursor control
+					//movement
+					Independant* l_cursor = (*CurrentGame).m_interactionPanel->m_cursor;
+					l_cursor->speed.x = input_directions.x * HUD_CURSOR_SPEED;
+					l_cursor->speed.y = input_directions.y * HUD_CURSOR_SPEED;
+
+					//exit
 					if (InputGuy::isSlowMotion() && !slowmo_key_repeat)
 					{
 						(*CurrentGame).SetShopMenu(ShopMainMenu);

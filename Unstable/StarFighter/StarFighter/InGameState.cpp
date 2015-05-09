@@ -95,7 +95,7 @@ void InGameState::Update(Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
-	(*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->previouslyCollindingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel());
+	(*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->previouslyCollindingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
 
 	//displaying stats of focused item in the HUD...
 	if ((*CurrentGame).getHudFocusedItem() != NULL)
@@ -326,13 +326,48 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
 			if ((*CurrentGame).isLastEnemyDead())
 			{
+				//scene generates boss? (or boss is dead, eitherway)
+				if (this->currentScene->generating_boss)
+				{
+					this->currentScene->bg->SetPortalsState(PortalState::PortalInvisible);
+					if (bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
+					{
+						this->currentScene->GenerateBoss();
+						this->IG_State = InGameStateMachine::BOSS_FIGHT;
+					}
+				}
+				else
+				{
+					if (!this->hasDisplayedDestructionRatio)
+					{
+						//is the scene capable of hazard break? (= last scene before hub)
+						if (this->currentScene->canHazardBreak)
+						{
+							//what is our destruction ratio? (displaying score). 100% = Hazard break
+							if ((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0)
+							{
+								this->currentScene->HazardBreak();
+								this->currentScene->DisplayDestructions(true);
+							}
+							else
+							{
+								this->currentScene->DisplayDestructions();
+							}
+						}
+
+						this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
+
+						hasDisplayedDestructionRatio = true;
+					}
+				}
+
 				//trigger hazard break event (spawning boss) if destructions are 100.00% and we reached the last scene before a hub
-				if (!this->currentScene->m_hazardbreak_has_occurred && !this->hasDisplayedDestructionRatio && this->currentScene->generating_boss)
+				/*if (!this->currentScene->m_hazardbreak_has_occurred && !this->hasDisplayedDestructionRatio && this->currentScene->canHazardBreak)
 				{
 					//displaying the xx.xx% of destruction
 					//int pourcentage = 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned;
 					printf("Destructions: %d / %d [%.2f%%]. ", (*CurrentGame).getHazard(), (*CurrentGame).hazardSpawned, roundf(100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned));
-					this->hasDisplayedDestructionRatio = true;
+
 					if ((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0)
 					{
 						this->currentScene->m_hazardbreak_has_occurred = true;
@@ -345,9 +380,11 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 					(*CurrentGame).resetHazard();
 				}
-				else if (!this->hasDisplayedDestructionRatio)
+				else if (!this->hasDisplayedDestructionRatio && this->currentScene->canHazardBreak)
 				{
 					printf("No boss to spawn.\n");
+
+					this->currentScene->DisplayDestructions((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0);
 					this->hasDisplayedDestructionRatio = true;
 				}
 				
@@ -362,11 +399,15 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 						this->IG_State = InGameStateMachine::BOSS_FIGHT;
 					}
 				}
+				*/
 
 				//player takes exit?
 				if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
 				{
 					this->currentScene->bg->SetPortalsState(PortalState::PortalGhost);
+
+					(*CurrentGame).removeFromFeedbacks(&(this->currentScene->m_textHazardBreak));
+
 					bool reverse = false;
 					if ((*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->targetPortal->direction == Directions::DIRECTION_LEFT)
 					{
@@ -407,7 +448,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			if ((*CurrentGame).isLastEnemyDead())
 			{
 				this->currentScene->generating_boss = false;
-				this->currentScene->HazardBreak();
 				this->IG_State = InGameStateMachine::LAST_SCREEN;
 			}
 

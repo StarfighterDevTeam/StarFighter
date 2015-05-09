@@ -922,6 +922,13 @@ void Enemy::Death()
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
 	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
 
+	//Score
+	(*CurrentGame).hazard += this->money;
+
+	//Loot
+	CreateRandomLoot((*CurrentGame).BeastScoreBonus);
+	GenerateLoot();
+
 	this->visible = false;
 	this->isOnScene = false;
 	this->GarbageMe = true;

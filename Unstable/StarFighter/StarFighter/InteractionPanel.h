@@ -24,10 +24,12 @@ struct InteractionPanel
 public:
 	InteractionPanel();
 	void SetPanelPosition(sf::Vector2f position);
+	sf::Vector2f GetShopBuyPanelSize();
 
 	void UpdatePortalInteraction(int max_unlocked_hazard_level);
-	void UpdateShopInteraction();
-	void Update(InteractionType interaction, int max_unlocked_hazard_level);
+	void UpdateShopInteraction(sf::Time deltaTime);
+	void Update(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime);
+	void InitCursorOnGrid();
 	void Draw(sf::RenderTexture& screen);
 
 	sf::RectangleShape m_panel;
@@ -47,6 +49,7 @@ public:
 	ObjectGrid m_shopGrid;
 	Independant* m_cursor;
 	Independant* m_focused_item;
+	sf::Vector2i m_focused_index;
 };
 
 #endif //INTERACTIONPANEL_H_INCLUDED

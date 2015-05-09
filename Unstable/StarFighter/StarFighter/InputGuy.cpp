@@ -89,6 +89,22 @@ bool InputGuy::setAutomaticFire()
 	return false;
 }
 
+bool InputGuy::isUsingDebugCommand()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
+	{
+		return true;
+	}
+
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 4)) //Left upper trigger
+			return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isChangingResolution()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F3))

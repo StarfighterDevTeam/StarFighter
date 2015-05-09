@@ -67,9 +67,19 @@ void Game::addToFeedbacks(RectangleShape* feedback)
 	sceneFeedbackBars.push_back(feedback);
 }
 
+void Game::addToFeedbacks(Text* text)
+{
+	sceneFeedbackTexts.push_back(text);
+}
+
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
 	sceneFeedbackBars.remove(feedback);
+}
+
+void Game::removeFromFeedbacks(Text* text)
+{
+	sceneFeedbackTexts.remove(text);
 }
 
 void Game::updateScene(Time deltaTime)
@@ -108,9 +118,9 @@ void Game::updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, 
 		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 
-void Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_hazard_level)
+void Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)
 {
-	this->m_interactionPanel->Update(interaction, max_unlocked_hazard_level);
+	this->m_interactionPanel->Update(interaction, max_unlocked_hazard_level, deltaTime);
 }
 
 void Game::SetShopMenu(ShopMenus menu)
@@ -143,6 +153,17 @@ int Game::GetSelectedIndex()
 	return this->m_interactionPanel->m_selected_index;
 }
 
+void Game::killIndependantLayer(IndependantType m_layer)
+{
+	for (std::vector<Independant*>::iterator it = this->sceneIndependantsTyped[m_layer].begin(); it != this->sceneIndependantsTyped[m_layer].end(); it++)
+	{
+		if ((*it) != NULL)
+		{
+			(*it)->Death();
+		}
+	}
+}
+
 void Game::drawScene()
 {
 	this->mainScreen.clear();
@@ -152,6 +173,10 @@ void Game::drawScene()
 		if (i == FeedbacksLayer)
 		{
 			for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
+			{
+				mainScreen.draw(*(*it));
+			}
+			for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
 			{
 				mainScreen.draw(*(*it));
 			}
@@ -308,10 +333,7 @@ void Game::colisionChecksV2()
 				if ((*it2)->getIndependantArmor() <= 0)
 				{
 					(*it2)->Death();
-					//Loot
-					hazard += (*it2)->getMoney();
-					(*it2)->CreateRandomLoot(this->BeastScoreBonus);
-					(*it2)->GenerateLoot();
+					
 				}
 			}
 		}
@@ -382,10 +404,6 @@ void Game::colisionChecksV2()
 				//death
 				if ((*it1)->getIndependantArmor() <= 0)
 				{
-					//Loot
-					hazard += (*it1)->getMoney();
-					(*it1)->CreateRandomLoot(this->BeastScoreBonus);
-					(*it1)->GenerateLoot();
 					(*it1)->Death();
 				}
 			}

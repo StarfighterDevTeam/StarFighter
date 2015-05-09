@@ -89,7 +89,7 @@ InteractionPanel::InteractionPanel()
 	}
 }
 
-void InteractionPanel::UpdateShopInteraction()
+void InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 {
 	switch (m_currentShopMenu)
 	{
@@ -119,7 +119,7 @@ void InteractionPanel::UpdateShopInteraction()
 
 		case ShopBuyMenu:
 		{
-			sf::Vector2f l_size = sf::Vector2f((2 * INTERACTION_PANEL_MARGIN_SIDES) + (SHOP_GRID_NB_ROWS * SHOP_GRID_SLOT_SIZE), (2 * INTERACTION_PANEL_MARGIN_TOP) + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) + m_textDestination.getCharacterSize() + (m_textHelpNavigation.getCharacterSize() * 5));
+			sf::Vector2f l_size = GetShopBuyPanelSize();
 			m_panel.setSize(l_size);
 			m_panel.setOrigin(l_size.x / 2, l_size.y / 2);
 
@@ -134,9 +134,25 @@ void InteractionPanel::UpdateShopInteraction()
 
 			m_textHelpBuy.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) - (l_size.y / 2));
 
+			m_cursor->update(deltaTime);
+			//panel constraints
+			if (m_cursor->getPosition().x < m_panel.getPosition().x - (GetShopBuyPanelSize().x / 2))
+				m_cursor->setPosition(m_panel.getPosition().x - (GetShopBuyPanelSize().x / 2), m_cursor->getPosition().y);
+			if (m_cursor->getPosition().x > m_panel.getPosition().x + (GetShopBuyPanelSize().x / 2))
+				m_cursor->setPosition(m_panel.getPosition().x + (GetShopBuyPanelSize().x / 2), m_cursor->getPosition().y);
+			if (m_cursor->getPosition().y < m_panel.getPosition().y - (GetShopBuyPanelSize().y / 2))
+				m_cursor->setPosition(m_cursor->getPosition().x, m_panel.getPosition().y - (GetShopBuyPanelSize().y / 2));
+			if (m_cursor->getPosition().y > m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2))
+				m_cursor->setPosition(m_cursor->getPosition().x, m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2));
+
 			break;
 		}
 	}
+}
+
+sf::Vector2f InteractionPanel::GetShopBuyPanelSize()
+{
+	return sf::Vector2f((2 * INTERACTION_PANEL_MARGIN_SIDES) + (SHOP_GRID_NB_ROWS * SHOP_GRID_SLOT_SIZE), (2 * INTERACTION_PANEL_MARGIN_TOP) + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) + m_textDestination.getCharacterSize() + (m_textHelpNavigation.getCharacterSize() * 5));
 }
 
 void InteractionPanel::UpdatePortalInteraction(int max_unlocked_hazard_level)
@@ -178,7 +194,7 @@ void InteractionPanel::UpdatePortalInteraction(int max_unlocked_hazard_level)
 	}
 }
 
-void InteractionPanel::Update(InteractionType interaction, int max_unlocked_hazard_level)
+void InteractionPanel::Update(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)
 {
 	m_currentInteractionType = interaction;
 
@@ -191,9 +207,15 @@ void InteractionPanel::Update(InteractionType interaction, int max_unlocked_haza
 		}
 		break;
 	case ShopInteraction:
-		UpdateShopInteraction();
+		UpdateShopInteraction(deltaTime);
 		break;
 	}
+}
+
+void InteractionPanel::InitCursorOnGrid()
+{
+	m_cursor->setPosition(sf::Vector2f(m_panel.getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (GetShopBuyPanelSize().x / 2) + (SHOP_GRID_SLOT_SIZE / 2), m_panel.getPosition().y + INTERACTION_PANEL_MARGIN_TOP + m_textDestination.getCharacterSize() + INTERACTION_INTERLINE - (GetShopBuyPanelSize().y / 2) + (SHOP_GRID_SLOT_SIZE / 2)));
+	//m_cursor->setPosition(sf::Vector2f(m_panel.getPosition().x - (GetShopBuyPanelSize().x / 2) + m_fakeShopGrid.grid[0][0]->getPosition().x, m_panel.getPosition().y - (GetShopBuyPanelSize().y / 2) + m_fakeShopGrid.grid[0][0]->getPosition().y + INTERACTION_PANEL_MARGIN_TOP));
 }
 
 void InteractionPanel::Draw(sf::RenderTexture& screen)
@@ -221,6 +243,7 @@ void InteractionPanel::Draw(sf::RenderTexture& screen)
 			m_fakeShopGrid.Draw(screen);
 			m_shopGrid.Draw(screen);
 			screen.draw(m_textHelpBuy);
+			screen.draw(*m_cursor);
 		}
 
 		if (m_currentInteractionType == PortalInteraction)

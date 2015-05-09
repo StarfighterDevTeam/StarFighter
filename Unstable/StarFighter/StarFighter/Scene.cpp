@@ -15,9 +15,14 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	this->generating_boss = false;
 	this->m_hazard_level = hazard_level;
 	this->m_hazardbreak_has_occurred = false;
+	this->canHazardBreak = false;
 
 	int p = 0;
 	int enemy_count = 0;
+
+	m_textHazardBreak.setFont(*(*CurrentGame).hud.font2);
+	m_textHazardBreak.setCharacterSize(30);
+	m_textHazardBreak.setColor(sf::Color(255, 255, 255, 255));
 
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
@@ -32,6 +37,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				this->links[Directions::DIRECTION_DOWN] = (*it)[ScenesData::SCENE_LINK_DOWN];
 				this->links[Directions::DIRECTION_RIGHT] = (*it)[ScenesData::SCENE_LINK_RIGHT];
 				this->links[Directions::DIRECTION_LEFT] = (*it)[ScenesData::SCENE_LINK_LEFT];
+
+				this->canHazardBreak = ((*it)[ScenesData::SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
+
 				std::string scene_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
@@ -273,6 +281,33 @@ Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene
 	this->LoadSceneFromFile(name, hazard_level, reverse_scene, first_scene);
 
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
+}
+
+void Scene::DisplayDestructions(bool hazard_break)
+{
+	ostringstream ss;
+	stringstream ratio;
+	ratio.precision(4);
+	ratio << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned;
+
+	ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).hazardSpawned << " [" << ratio.str() << "%]";
+	if (hazard_break)
+	{
+		ss << "\n\n          HAZARD BREAK!!!";
+	}
+	this->m_textHazardBreak.setString(ss.str());
+
+	if (this->direction != DIRECTION_DOWN)
+	{
+		
+		m_textHazardBreak.setPosition(sf::Vector2f((SCENE_SIZE_X / 2) - (m_textHazardBreak.getLocalBounds().width / 2), ENDSCENE_SCORE_DISPLAY_POSITION_Y));
+	}
+	else
+	{
+		m_textHazardBreak.setPosition(sf::Vector2f((SCENE_SIZE_X / 2) - (m_textHazardBreak.getLocalBounds().width / 2), SCENE_SIZE_Y - ENDSCENE_SCORE_DISPLAY_POSITION_Y));
+	}
+
+	(*CurrentGame).addToFeedbacks(&this->m_textHazardBreak);
 }
 
 void Scene::DestroyScene()

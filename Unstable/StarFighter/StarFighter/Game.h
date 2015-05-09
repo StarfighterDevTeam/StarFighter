@@ -29,7 +29,10 @@ public:
 	RenderWindow* getMainWindow();
 	void addToScene(Independant *object, LayerType m_layer, IndependantType type);
 	void addToFeedbacks(RectangleShape* feedback);
+	void addToFeedbacks(Text* text);
 	void removeFromFeedbacks(RectangleShape* feedback);
+	void removeFromFeedbacks(Text* text);
+
 	void updateScene(Time deltaTime);
 	void updateHud(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
 		int focused_item_type = -1, string f_name = "", float f_max_speed = 0, float f_hyperspeed = 1, int f_armor = 1, int f_shield = 0, int f_shield_regen = 0, int f_damage = 0, bool f_bot = false, float f_ammo_speed = 0, PatternType f_pattern = NoMovePattern,
@@ -40,6 +43,7 @@ public:
 	void cleanGarbage();
 	void collectGarbage();
 	void garbageLayer(LayerType m_layer, bool only_offscene = false);
+	void killIndependantLayer(IndependantType m_layer);
 	void SetLayerRotation(LayerType m_layer, float angle);
 	sf::RenderTexture mainScreen;
 	sf::RenderTexture hubScreen;
@@ -66,15 +70,18 @@ public:
 	int hazard;
 	int hazardSpawned;
 
+
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
 	void GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
+
+	float BeastScoreBonus;
 	TargetScan FoundNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range = 0);
 	float GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range = 0);
 	void WakeUpEnemiesWithName(string m_display_name);
 
 	InteractionPanel* m_interactionPanel;
-	void UpdateInteractionPanel (InteractionType interaction, int max_unlocked_hazard_level);
+	void UpdateInteractionPanel (InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime);
 	void SetSelectedIndex(int index_);
 	void SetSelectedDirection(Directions direction_);
 	void SetSelectedDestination(string destination_);
@@ -88,9 +95,9 @@ private:
 	bool isVectorEmpty(vector <Independant*>* vector);
 	Clock sceneChronometer;
 	float movementClock;
-	float BeastScoreBonus;
 	RenderWindow *window;
 	std::list<RectangleShape*> sceneFeedbackBars;
+	std::list<Text*> sceneFeedbackTexts;
 	std::vector<Independant*> sceneIndependants;
 	std::vector<Independant*> sceneIndependantsLayered[NBVAL_Layer];
 	std::vector<Independant*> sceneIndependantsTyped[NBVAL_Independant];

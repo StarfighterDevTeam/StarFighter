@@ -26,6 +26,7 @@ enum ScenesData
 	SCENE_LINK_DOWN,
 	SCENE_LINK_RIGHT,
 	SCENE_LINK_LEFT,
+	SCENE_HAZARD_BREAK,
 };
 
 class Scene
@@ -63,6 +64,12 @@ public:
 
 	void HazardBreak();
 	int m_hazard_level_unlocked;
+	bool canHazardBreak;
+
+	sf::Text m_textHazardBreak;
+	sf::Font* m_fontHazardBreak;
+	void DisplayDestructions(bool hazard_break = false);
+	bool IsLastSceneBeforeHub();
 
 private:
 	vector<EnemyBase*> boss_list;
