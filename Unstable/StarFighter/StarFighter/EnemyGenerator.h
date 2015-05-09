@@ -5,7 +5,11 @@
 #include <assert.h>
 #include "Globals.h"
 
-const float spawnCostCollateralMultiplierTable[NB_HAZARD_LEVELS] = { 0.35, 0.30, 0.25, 0.20, 0.15 };
+const float spawnCostCollateralMultiplierTable[NB_HAZARD_LEVELS] = { 0.30, 0.30, 0.30, 0.30, 0.30 };
+const float spawnCostMultiplierTable[NB_HAZARD_LEVELS] = { 1.0, 1.5, 2.0, 3.0, 4.0 };
+
+const float enemySpeedModifierTable[NB_HAZARD_LEVELS] = { 1.0, 1.2, 1.5, 1.7, 2.0 };
+const float ammoSpeedModifierTable[NB_HAZARD_LEVELS] = { 1.0, 1.1, 1.2, 1.3, 1.5 };
 
 class EnemyGenerator
 {

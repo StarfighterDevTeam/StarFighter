@@ -14,5 +14,4 @@ EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass, float m_spaw
 
 	this->currentClock.restart();
 	this->spawnResource = 0;
-	this->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[0];
 }

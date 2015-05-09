@@ -166,8 +166,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						//setting enemy generators: we need to create on generator per class
 						if (this->total_class_probability[e->enemyclass] == 0)
 						{
-							EnemyGenerator* generator = new EnemyGenerator(stof((*it)[SceneDataEnemy::ENEMY_CLASS_SPAWNCOST]), e->enemyclass, 
-								stof((*it)[SceneDataEnemy::ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[SceneDataEnemy::ENEMY_CLASS_MISS_CHANCE]));
+							float l_spawnCost = stof((*it)[SceneDataEnemy::ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[this->getSceneHazardLevelValue()];
+							EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->enemyclass, stof((*it)[SceneDataEnemy::ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[SceneDataEnemy::ENEMY_CLASS_MISS_CHANCE]));
 							generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
 							this->sceneEnemyGenerators.push_back(generator);
 						}
@@ -391,6 +391,7 @@ void Scene::SpawnEnemy(int enemy_class)
 		if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
 		{
 			enemy = (*it)->enemy->Clone();
+			ApplyHazardLevelModifiers(getSceneHazardLevelValue(), *enemy);
 			break;
 		}
 	}
@@ -404,6 +405,16 @@ void Scene::SpawnEnemy(int enemy_class)
 
 	//counting spawned enemies
 	(*CurrentGame).hazardSpawned += enemy->getMoney();
+}
+
+void Scene::ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy_)
+{
+	enemy_.speed.x *= enemySpeedModifierTable[hazard_level];
+	enemy_.speed.y *= enemySpeedModifierTable[hazard_level];
+	for (std::vector<Weapon*>::iterator it = enemy_.weapons_list.begin(); it != enemy_.weapons_list.end(); it++)
+	{
+		(*it)->ammunition->speed.y *= ammoSpeedModifierTable[hazard_level];
+	}
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
