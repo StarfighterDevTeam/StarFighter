@@ -159,9 +159,14 @@ void Game::killIndependantLayer(IndependantType m_layer)
 	{
 		if ((*it) != NULL)
 		{
-			(*it)->Death();
+			if ((*it)->isOnScene)
+			{
+				(*it)->Death();
+			}
 		}
 	}
+
+	printf("spawned: %d / killed: %d \n", this->hazardSpawned, this->hazard);
 }
 
 void Game::drawScene()
@@ -584,6 +589,12 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 			(*it)->visible = false;
 			(*it)->isOnScene = false;
 			(*it)->GarbageMe = true;
+		}
+
+		//don't count them as "spawned" enemies if we cut them off this way
+		if (m_layer == EnemyObjectLayer)
+		{
+			this->hazardSpawned -= (*it)->getMoney();
 		}
 	}
 }

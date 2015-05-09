@@ -5,22 +5,22 @@ Vanguard_Hub2,Assets/Scripts/Scenes/Generated/Vanguard_Hub2.csv,Vanguard Hub 2,V
 Vanguard_Hub3,Assets/Scripts/Scenes/Generated/Vanguard_Hub3.csv,Vanguard Hub 3,0,Vanguard_V7,Vanguard_H5,0,0
 Vanguard_Hub4,Assets/Scripts/Scenes/Generated/Vanguard_Hub4.csv,Vanguard Hub 4,Vanguard_V8,0,0,Vanguard_H2,0
 Vanguard_Hub5,Assets/Scripts/Scenes/Generated/Vanguard_Hub5.csv,Vanguard Hub 5,Vanguard_V10,Vanguard_V9,0,Vanguard_H4,0
-Vanguard_Hub6,Assets/Scripts/Scenes/Generated/Vanguard_Hub6.csv,Vanguard Hub 6,0,Vanguard_V12,0,Vanguard_H6,0
+Vanguard_Hub6,Assets/Scripts/Scenes/Generated/Vanguard_Hub6.csv,Vanguard Hub 6,0,Vanguard_V10,0,Vanguard_H6,0
 Vanguard_V1,Assets/Scripts/Scenes/Generated/Vanguard_V1.csv,Vanguard V1,Vanguard_V2,Vanguard_V2,0,0,0
 Vanguard_V2,Assets/Scripts/Scenes/Generated/Vanguard_V2.csv,Vanguard V2,Vanguard_Hub1,Vanguard_Hub0,0,0,1
 Vanguard_V3,Assets/Scripts/Scenes/Generated/Vanguard_V3.csv,Vanguard V3,Vanguard_V4,Vanguard_V4,0,0,0
 Vanguard_V4,Assets/Scripts/Scenes/Generated/Vanguard_V4.csv,Vanguard V4,Vanguard_Hub2,Vanguard_Hub1,0,0,1
 Vanguard_V5,Assets/Scripts/Scenes/Generated/Vanguard_V5.csv,Vanguard V5,Vanguard_V6,Vanguard_V6,0,0,0
 Vanguard_V6,Assets/Scripts/Scenes/Generated/Vanguard_V6.csv,Vanguard V6,Vanguard_V7,Vanguard_V7,0,0,0
-Vanguard_V7,Assets/Scripts/Scenes/Generated/Vanguard_V7.csv,Vanguard V7,Vanguard_Hub3,Vanguard_Hub2,0,0,0
+Vanguard_V7,Assets/Scripts/Scenes/Generated/Vanguard_V7.csv,Vanguard V7,Vanguard_Hub3,Vanguard_Hub2,0,0,1
 Vanguard_V8,Assets/Scripts/Scenes/Generated/Vanguard_V8.csv,Vanguard V8,Vanguard_V9,Vanguard_V9,0,0,0
-Vanguard_V9,Assets/Scripts/Scenes/Generated/Vanguard_V9.csv,Vanguard V9,Vanguard_Hub5,Vanguard_Hub4,0,0,0
+Vanguard_V9,Assets/Scripts/Scenes/Generated/Vanguard_V9.csv,Vanguard V9,Vanguard_Hub5,Vanguard_Hub4,0,0,1
 Vanguard_V10,Assets/Scripts/Scenes/Generated/Vanguard_V10.csv,Vanguard V10,Vanguard_V11,Vanguard_V11,0,0,0
 Vanguard_V11,Assets/Scripts/Scenes/Generated/Vanguard_V11.csv,Vanguard V11,Vanguard_V12,Vanguard_V12,0,0,0
-Vanguard_V12,Assets/Scripts/Scenes/Generated/Vanguard_V12.csv,Vanguard V12,Vanguard_Hub6,Vanguard_Hub5,0,0,0
+Vanguard_V12,Assets/Scripts/Scenes/Generated/Vanguard_V12.csv,Vanguard V12,Vanguard_Hub6,Vanguard_Hub5,0,0,1
 Vanguard_H1,Assets/Scripts/Scenes/Generated/Vanguard_H1.csv,Vanguard H1,0,0,Vanguard_H2,Vanguard_H2,0
-Vanguard_H2,Assets/Scripts/Scenes/Generated/Vanguard_H2.csv,Vanguard H2,0,0,Vanguard_Hub4,Vanguard_Hub1,0
+Vanguard_H2,Assets/Scripts/Scenes/Generated/Vanguard_H2.csv,Vanguard H2,0,0,Vanguard_Hub4,Vanguard_Hub1,1
 Vanguard_H3,Assets/Scripts/Scenes/Generated/Vanguard_H3.csv,Vanguard H3,0,0,Vanguard_H4,Vanguard_H4,0
-Vanguard_H4,Assets/Scripts/Scenes/Generated/Vanguard_H4.csv,Vanguard H4,0,0,Vanguard_Hub5,Vanguard_Hub2,0
+Vanguard_H4,Assets/Scripts/Scenes/Generated/Vanguard_H4.csv,Vanguard H4,0,0,Vanguard_Hub5,Vanguard_Hub2,1
 Vanguard_H5,Assets/Scripts/Scenes/Generated/Vanguard_H5.csv,Vanguard H5,0,0,Vanguard_H6,Vanguard_H6,0
-Vanguard_H6,Assets/Scripts/Scenes/Generated/Vanguard_H6.csv,Vanguard H6,0,0,Vanguard_Hub6,Vanguard_Hub3,0
+Vanguard_H6,Assets/Scripts/Scenes/Generated/Vanguard_H6.csv,Vanguard H6,0,0,Vanguard_Hub6,Vanguard_Hub3,1

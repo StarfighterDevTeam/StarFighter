@@ -343,6 +343,9 @@ void Scene::GenerateBoss()
 		Enemy* m_boss = (*it)->enemy->Clone();
 		m_boss->enemy_class = (EnemyClass)((*it)->enemyclass);
 		(*CurrentGame).addToScene(m_boss, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
+
+		//counting spawned enemies
+		(*CurrentGame).hazardSpawned += m_boss->getMoney();
 	}
 }
 

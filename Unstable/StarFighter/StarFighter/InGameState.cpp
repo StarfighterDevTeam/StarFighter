@@ -348,6 +348,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 							{
 								this->currentScene->HazardBreak();
 								this->currentScene->DisplayDestructions(true);
+								(*CurrentGame).resetHazard();
 							}
 							else
 							{
@@ -360,46 +361,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 						hasDisplayedDestructionRatio = true;
 					}
 				}
-
-				//trigger hazard break event (spawning boss) if destructions are 100.00% and we reached the last scene before a hub
-				/*if (!this->currentScene->m_hazardbreak_has_occurred && !this->hasDisplayedDestructionRatio && this->currentScene->canHazardBreak)
-				{
-					//displaying the xx.xx% of destruction
-					//int pourcentage = 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned;
-					printf("Destructions: %d / %d [%.2f%%]. ", (*CurrentGame).getHazard(), (*CurrentGame).hazardSpawned, roundf(100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned));
-
-					if ((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0)
-					{
-						this->currentScene->m_hazardbreak_has_occurred = true;
-						printf("SPAWNING BOSS...\n");
-					}
-					else
-					{
-						printf("No hazard break event\n");
-					}
-
-					(*CurrentGame).resetHazard();
-				}
-				else if (!this->hasDisplayedDestructionRatio && this->currentScene->canHazardBreak)
-				{
-					printf("No boss to spawn.\n");
-
-					this->currentScene->DisplayDestructions((*CurrentGame).getHazard() - (*CurrentGame).hazardSpawned == 0);
-					this->hasDisplayedDestructionRatio = true;
-				}
-				
-				this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);
-
-				if (this->currentScene->m_hazardbreak_has_occurred && this->currentScene->generating_boss)
-				{
-					if (bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
-					{
-						this->currentScene->GenerateBoss();
-						this->currentScene->bg->SetPortalsState(PortalState::PortalInvisible);
-						this->IG_State = InGameStateMachine::BOSS_FIGHT;
-					}
-				}
-				*/
 
 				//player takes exit?
 				if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
@@ -416,6 +377,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 					string nextScene_filename = (*CurrentGame).playerShip->targetPortal->destination_name;
 					this->nextScene = new Scene(nextScene_filename, (*CurrentGame).m_interactionPanel->m_selected_index, reverse, false);
+					//remembering linked scenes to hazard break later
+					if (!this->currentScene->canHazardBreak)
+					{
+						this->nextScene->scenesLinkedToUpdate.push_back(this->currentScene->m_name);
+					}
+
 					UpdatePortalsMaxUnlockedHazardLevel(this->nextScene);
 
 					this->nextScene->bg->speed = sf::Vector2f(0, 0);
@@ -517,8 +484,26 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
 				}
 
-				//Saving the hazard level
-				SaveSceneHazardLevelUnlocked(this->currentScene->m_name, this->currentScene->getSceneHazardLevelUnlockedValue());
+				//Saving the hazard level change
+				if (this->currentScene->canHazardBreak)
+				{
+					SaveSceneHazardLevelUnlocked(this->currentScene->m_name, this->currentScene->getSceneHazardLevelUnlockedValue());
+					for (vector <string>::iterator it = this->currentScene->scenesLinkedToUpdate.begin(); it != this->currentScene->scenesLinkedToUpdate.end(); it++)
+					{
+						SaveSceneHazardLevelUnlocked((*it), this->currentScene->getSceneHazardLevelUnlockedValue());
+					}
+					this->currentScene->scenesLinkedToUpdate.clear();
+					//transmitting the info to the next scene so it can update her portals
+					UpdatePortalsMaxUnlockedHazardLevel(this->nextScene);
+				}
+				else
+				{
+					//if the next scene is not a hub, then we want to remember the past scenes so we can update them later in case of hazard break
+					for (vector <string>::iterator it = this->currentScene->scenesLinkedToUpdate.begin(); it != this->currentScene->scenesLinkedToUpdate.end(); it++)
+					{
+						this->nextScene->scenesLinkedToUpdate.push_back((*it));
+					}
+				}
 
 				//Wiping the previous background and swapping with the new one
 				this->currentScene->DestroyScene();

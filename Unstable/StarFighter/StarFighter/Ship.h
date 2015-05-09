@@ -214,7 +214,6 @@ public :
 	void GetShop(Independant* independant) override;
 	Portal* targetPortal;
 	Shop* targetShop;
-	InteractionType isCollindingWithInteractiveObject;
 	InteractionType previouslyCollindingWithInteractiveObject;
 	bool wasHyperspeedingButtonPressed;
 	bool isFiringButtonPressed;

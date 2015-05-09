@@ -223,6 +223,9 @@ public:
 	Weapon* getWeaponLoot();
 	virtual void CreateRandomLoot(float BeastScaleBonus = 0);
 
+	InteractionType isCollindingWithInteractiveObject;
+	InteractionType previouslyCollindingWithInteractiveObject;
+
 	virtual void GetGrazing();
 	void GetPolarMovement(sf::Vector2f* np);
 	int damage;
@@ -243,7 +246,6 @@ public:
 	int animationNumber;
 	int frameNumber;
 	int currentAnimationIndex;
-	InteractionType m_interactionType;
 
 	//TIPS:
 	// direction = the scene border you refer too

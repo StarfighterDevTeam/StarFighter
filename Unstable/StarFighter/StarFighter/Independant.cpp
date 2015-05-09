@@ -102,7 +102,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->wake_up = true;
 	this->equipment_loot = NULL;
 	this->weapon_loot = NULL;
-	this->m_interactionType = No_Interaction;
+	this->isCollindingWithInteractiveObject = No_Interaction;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)

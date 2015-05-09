@@ -65,6 +65,7 @@ public:
 	void HazardBreak();
 	int m_hazard_level_unlocked;
 	bool canHazardBreak;
+	vector <string> scenesLinkedToUpdate;
 
 	sf::Text m_textHazardBreak;
 	sf::Font* m_fontHazardBreak;

@@ -70,7 +70,6 @@ public:
 	int hazard;
 	int hazardSpawned;
 
-
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
 	void GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
