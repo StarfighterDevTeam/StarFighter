@@ -932,6 +932,8 @@ void Enemy::Death()
 	this->visible = false;
 	this->isOnScene = false;
 	this->GarbageMe = true;
+
+	printf("Spawned: %d / killed: %d \n", (*CurrentGame).hazardSpawned, (*CurrentGame).hazard);
 }
 
 void Enemy::Destroy()

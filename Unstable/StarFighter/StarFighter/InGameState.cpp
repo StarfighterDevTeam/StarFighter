@@ -355,12 +355,14 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 							{
 								this->currentScene->HazardBreak();
 								this->currentScene->DisplayDestructions(true);
-								(*CurrentGame).resetHazard();
 							}
 							else
 							{
 								this->currentScene->DisplayDestructions();
 							}
+
+							//eitherway, reset the score
+							(*CurrentGame).resetHazard();
 						}
 
 						this->currentScene->bg->SetPortalsState(PortalState::PortalOpen);

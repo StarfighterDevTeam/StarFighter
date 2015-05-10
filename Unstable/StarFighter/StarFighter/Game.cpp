@@ -582,6 +582,11 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 			{
 				(*it)->GarbageMe = true;
 				clear_count++;
+				//don't count them as "spawned" enemies if we cut them off this way
+				if (m_layer == EnemyObjectLayer)
+				{
+					this->hazardSpawned -= (*it)->getMoney();
+				}
 			}
 		}
 		else
@@ -589,12 +594,11 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 			(*it)->visible = false;
 			(*it)->isOnScene = false;
 			(*it)->GarbageMe = true;
-		}
-
-		//don't count them as "spawned" enemies if we cut them off this way
-		if (m_layer == EnemyObjectLayer)
-		{
-			this->hazardSpawned -= (*it)->getMoney();
+			//don't count them as "spawned" enemies if we cut them off this way
+			if (m_layer == EnemyObjectLayer)
+			{
+				this->hazardSpawned -= (*it)->getMoney();
+			}
 		}
 	}
 }
