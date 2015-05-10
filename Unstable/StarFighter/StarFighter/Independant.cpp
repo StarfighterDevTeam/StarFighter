@@ -791,3 +791,35 @@ sf::Vector2f Independant::getRandomXSpawnPosition(Directions direction, sf::Vect
 
 	return sf::Vector2f(pos_x, pos_y);
 }
+
+sf::Vector2f Independant::ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size)
+{
+	sf::Vector2f new_position = position;
+	sf::Vector2f l_size = Independant::getSize_for_Direction(direction, sf::Vector2f(size.x, size.y));
+
+	float l_overlap_left = position.x - (l_size.x / 2);
+	if (l_overlap_left < 0)
+	{
+		new_position = sf::Vector2f((l_size.x / 2), position.y);
+	}
+
+	float l_overlap_right = position.x + (l_size.x / 2);
+	if (l_overlap_right > SCENE_SIZE_X)
+	{
+		new_position = sf::Vector2f(SCENE_SIZE_X - (l_size.x / 2), position.y);
+	}
+
+	float l_overlap_up = position.y - (l_size.y / 2);
+	if (l_overlap_up < 0)
+	{
+		new_position = sf::Vector2f(position.x, (l_size.y / 2));
+	}
+
+	float l_overlap_down = position.y + (l_size.y / 2);
+	if (l_overlap_down > SCENE_SIZE_Y)
+	{
+		new_position = sf::Vector2f(position.x, SCENE_SIZE_Y - (l_size.x / 2));
+	}
+
+	return new_position;
+}

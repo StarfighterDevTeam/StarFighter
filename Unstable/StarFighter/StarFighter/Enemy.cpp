@@ -19,12 +19,15 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	//life bars
 	feedbackTimer = sf::seconds(0);
 
+	armorBar_offsetY = - (m_size.y / 2) - (ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2) - ENEMY_HP_BAR_OFFSET_Y;
+	shieldBar_offsetY = - (m_size.y / 2) - (1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y) - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y;
+	//offsetBetweenHealthBars = armorBar_offsetY - shieldBar_offsetY;
+
 	armorBar = new RectangleShape();
 	armorBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 	armorBar->setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
 	armorBar->setOutlineThickness(0);
 	armorBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-	armorBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
 
 	armorBarContainer = new RectangleShape();
 	armorBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
@@ -32,7 +35,6 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	armorBarContainer->setOutlineThickness(0);
 	//armorBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	armorBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-	armorBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
 
 	shieldBar = new RectangleShape();
 	shieldBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
@@ -50,17 +52,24 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
 }
 
-void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
+void Enemy::UpdateHealthBars(sf::Time deltaTime)
 {
 	//health bars feedbacks
 	if (feedbackTimer > sf::seconds(0))
 	{
 		feedbackTimer -= deltaTime;
 
+		float angle_rad = Independant::getRotation_for_Direction((*CurrentGame).direction) / 180 * M_PI;
 		if (armorBar)
 		{
-			armorBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
-			armorBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2 - ENEMY_HP_BAR_OFFSET_Y);
+			armorBar->setPosition(this->getPosition().x - (this->armorBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->armorBar_offsetY * cos(angle_rad)));
+			armorBarContainer->setPosition(this->getPosition().x - (this->armorBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->armorBar_offsetY * cos(angle_rad)));
+
+			//TODO: screen borders constraints
+			//armorBar->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), armorBar->getSize()));
+			//armorBarContainer->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
+
+			//update size (damage)
 			armorBar->setSize(sf::Vector2f(1.0f * armor / armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 			if (feedbackTimer <= sf::seconds(0))
 			{
@@ -70,8 +79,16 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 		if (shieldBar)
 		{
-			shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
-			shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+			shieldBar->setPosition(this->getPosition().x - (this->shieldBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->shieldBar_offsetY * cos(angle_rad)));
+			shieldBarContainer->setPosition(this->getPosition().x - (this->shieldBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->shieldBar_offsetY * cos(angle_rad)));
+
+			//TODO: screen borders constraints
+			//shieldBar->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBar->getPosition(), shieldBar->getSize()));
+			//shieldBarContainer->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
+			//if shield bar touches screen, we need to move both bars
+			//armorBar->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+			//armorBarContainer->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+
 			shieldBar->setSize(sf::Vector2f(1.0f * shield / shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 
 			if (feedbackTimer <= sf::seconds(0))
@@ -81,6 +98,11 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 	}
+}
+
+void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
+{
+	UpdateHealthBars(deltaTime);
 	
 	//slow motion
 	if (hyperspeedMultiplier < 1.0f)
@@ -405,6 +427,14 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			this->CheckCondition();
 		}
 	}
+}
+
+void Enemy::RotateFeedbacks(float angle)
+{
+	armorBar->setRotation(angle);
+	armorBarContainer->setRotation(angle);
+	shieldBar->setRotation(angle);
+	shieldBarContainer->setRotation(angle);
 }
 
 void Enemy::damage_from(Independant& independant)
@@ -932,8 +962,6 @@ void Enemy::Death()
 	this->visible = false;
 	this->isOnScene = false;
 	this->GarbageMe = true;
-
-	printf("Spawned: %d / killed: %d \n", (*CurrentGame).hazardSpawned, (*CurrentGame).hazard);
 }
 
 void Enemy::Destroy()

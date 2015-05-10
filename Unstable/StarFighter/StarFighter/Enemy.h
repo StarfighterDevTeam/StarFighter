@@ -34,6 +34,7 @@ class Enemy : public Independant
 public:
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber = 1, int m_animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	void UpdateHealthBars(sf::Time deltaTime);
 	vector<Weapon*> weapons_list;
 	Enemy* Clone();
 	FX* FX_death;
@@ -68,6 +69,10 @@ public:
 	sf::RectangleShape* armorBarContainer;
 	sf::RectangleShape* shieldBar;
 	sf::RectangleShape* shieldBarContainer;
+	float armorBar_offsetY;
+	float shieldBar_offsetY;
+	//float offsetBetweenHealthBars;
+	void RotateFeedbacks(float angle);
 	sf::Time feedbackTimer;
 
 private:

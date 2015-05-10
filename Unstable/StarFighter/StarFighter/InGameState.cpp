@@ -446,6 +446,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
 				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
+				(*CurrentGame).garbageLayer(LayerType::LootLayer);
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
 				{
 					(*CurrentGame).garbageLayer(LayerType::BotLayer);

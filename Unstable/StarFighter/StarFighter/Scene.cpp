@@ -336,19 +336,6 @@ void Scene::DestroyScene()
 	sceneEnemyGenerators.clear();
 }
 
-void Scene::GenerateBoss()
-{
-	for (std::vector<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)
-	{
-		Enemy* m_boss = (*it)->enemy->Clone();
-		m_boss->enemy_class = (EnemyClass)((*it)->enemyclass);
-		(*CurrentGame).addToScene(m_boss, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
-
-		//counting spawned enemies
-		(*CurrentGame).hazardSpawned += m_boss->getMoney();
-	}
-}
-
 void Scene::GenerateEnemiesv2(Time deltaTime)
 {
 	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators.begin(); it != sceneEnemyGenerators.end(); ++it)
@@ -435,14 +422,31 @@ void Scene::SpawnEnemy(int enemy_class)
 	}
 	assert(enemy != NULL);
 	enemy->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
+	enemy->RotateFeedbacks(Independant::getRotation_for_Direction((*CurrentGame).direction));
 
 	//RANDOM POSITION
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).direction, enemy->m_size);
 	enemy->setPosition(pos);
-	(*CurrentGame).addToScene(enemy, LayerType::EnemyObjectLayer, IndependantType::EnemyObject);
+	(*CurrentGame).addToScene(enemy, EnemyObjectLayer, EnemyObject);
 
 	//counting spawned enemies
 	(*CurrentGame).hazardSpawned += enemy->getMoney();
+}
+
+void Scene::GenerateBoss()
+{
+	for (std::vector<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)
+	{
+		Enemy* m_boss = (*it)->enemy->Clone();
+		m_boss->enemy_class = (EnemyClass)((*it)->enemyclass);
+		(*CurrentGame).addToScene(m_boss, EnemyObjectLayer, EnemyObject);
+
+		m_boss->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
+		m_boss->RotateFeedbacks(Independant::getRotation_for_Direction((*CurrentGame).direction));
+
+		//counting spawned enemies
+		(*CurrentGame).hazardSpawned += m_boss->getMoney();
+	}
 }
 
 void Scene::ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy_)

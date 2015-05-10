@@ -1014,11 +1014,11 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	//Fire function
 	if (this->ship_config.weapon != NULL)
 	{
-		if (!disable_fire && (isCollindingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
+		if (ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
+			if (!disable_fire && (isCollindingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
 			{
-				if (ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
+				if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 				{
 					//calculating the angle we want to face, if any
 					float target_angle = this->getRotation();

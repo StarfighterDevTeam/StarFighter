@@ -94,11 +94,11 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//automatic fire
 	if (this->weapon != NULL && this->target != NULL)
 	{
-		if (!disable_fire && (target->isCollindingWithInteractiveObject == No_Interaction) && !target->disable_fire)
+		if (this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (InputGuy::isFiring() || this->automatic_fire)
+			if (!disable_fire && (target->isCollindingWithInteractiveObject == No_Interaction) && !target->disable_fire)
 			{
-				if (this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
+				if (InputGuy::isFiring() || this->automatic_fire)
 				{
 					//calculating the angle we want to face, if any
 					float target_angle = this->getRotation();
