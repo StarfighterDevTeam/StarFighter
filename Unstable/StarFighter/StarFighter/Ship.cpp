@@ -1070,16 +1070,20 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 
 					ship_config.weapon->setPosition(this->getPosition().x + ship_config.weapon->weapon_current_offset.x, this->getPosition().y + ship_config.weapon->weapon_current_offset.y);
 					ship_config.weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
-				}
 
-				//speed malus when shooting
-				if (!this->isBraking)
-				{
-					speed.x *= SHIP_BRAKING_MALUS_SPEED;
-					speed.y *= SHIP_BRAKING_MALUS_SPEED;
+					
 				}
-				this->isBraking = true;
 			}
+		}
+		//speed malus when shooting
+		if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
+		{
+			if (!this->isBraking)
+			{
+				speed.x *= SHIP_BRAKING_MALUS_SPEED;
+				speed.y *= SHIP_BRAKING_MALUS_SPEED;
+			}
+			this->isBraking = true;
 		}
 	}
 }
