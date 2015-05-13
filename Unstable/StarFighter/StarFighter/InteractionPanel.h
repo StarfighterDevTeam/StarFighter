@@ -9,6 +9,7 @@ enum ShopOptions
 {
 	ShopHeal,
 	ShopBuy,
+	StellarMap,
 	NBVAL_ShopOptions,
 };
 

@@ -63,8 +63,4 @@ V_Gamma2_missile,Vanguard Gamma2 Missile,Assets/2D/Equipment/laser_red.png,48,48
 V_Gamma3_laserL,Vanguard Gamma3 Laser Left,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,0,0,20,0,120,ascending2,-15,seaking
 V_Gamma3_laserR,Vanguard Gamma3 Laser Right,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.1,0,0,20,0,120,descending2,15,seaking
 #,,,,,,,,,,,,,,,
-V_AlphaGold_laser50,Vanguard AlphaGold Laser 50,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05,20,1.5f,3,0,50,0,0,0
-V_AlphaGold_laser30,Vanguard AlphaGold Laser 30,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05,20,1.5f,3,0,30,0,0,0
-V_AlphaGold_laser0,Vanguard AlphaGold Laser 0,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05,20,1.5f,3,40,0,0,0,0
-V_AlphaGold_laser180,Vanguard AlphaGold Laser 180,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,2.f,0,2.f,15,0,180,0,0,semi_seaking
-V_AlphaGold_sniper,Vanguard AlphaGold Sniper,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,2.f,0,1.5f,1,40,0,0,0,seaking
+V_AlphaGold_laser,Vanguard AlphaGold Laser,Assets/2D/Equipment/laser_red.png,48,48,1,Assets/Sounds/laser.ogg,0.05,15,1.5f,3,0,60,0,0,0

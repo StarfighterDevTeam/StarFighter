@@ -165,8 +165,6 @@ void Game::killIndependantLayer(IndependantType m_layer)
 			}
 		}
 	}
-
-	printf("spawned: %d / killed: %d \n", this->hazardSpawned, this->hazard);
 }
 
 void Game::drawScene()

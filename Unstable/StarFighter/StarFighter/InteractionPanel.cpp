@@ -64,6 +64,7 @@ InteractionPanel::InteractionPanel()
 		}
 		m_textShopOptions[ShopHeal].setString("\n\nHeal");
 		m_textShopOptions[ShopBuy].setString("\n\nBuy");
+		m_textShopOptions[StellarMap].setString("\n\nStellar map");
 
 		ostringstream ss_helpNavigation;
 		ss_helpNavigation << "\n\n\nFire: select\nBrake: down\nHyperspeed: up";
@@ -118,6 +119,37 @@ void InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 		}
 
 		case ShopBuyMenu:
+		{
+			sf::Vector2f l_size = GetShopBuyPanelSize();
+			m_panel.setSize(l_size);
+			m_panel.setOrigin(l_size.x / 2, l_size.y / 2);
+
+			sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
+
+			m_panel.setPosition(position);
+
+			m_fakeShopGrid.SetGridPosition(sf::Vector2f(position.x + INTERACTION_PANEL_MARGIN_SIDES - (l_size.x / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + m_textDestination.getCharacterSize() + INTERACTION_INTERLINE - (l_size.y / 2)));
+			m_shopGrid.SetGridPosition(sf::Vector2f(position.x + INTERACTION_PANEL_MARGIN_SIDES - (l_size.x / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + m_textDestination.getCharacterSize() + INTERACTION_INTERLINE - (l_size.y / 2)));
+
+			m_textDestination.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP - (l_size.y / 2));
+
+			m_textHelpBuy.setPosition(position.x + INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH - (INTERACTION_PANEL_WIDTH / 2), position.y + INTERACTION_PANEL_MARGIN_TOP + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) - (l_size.y / 2));
+
+			m_cursor->update(deltaTime);
+			//panel constraints
+			if (m_cursor->getPosition().x < m_panel.getPosition().x - (GetShopBuyPanelSize().x / 2))
+				m_cursor->setPosition(m_panel.getPosition().x - (GetShopBuyPanelSize().x / 2), m_cursor->getPosition().y);
+			if (m_cursor->getPosition().x > m_panel.getPosition().x + (GetShopBuyPanelSize().x / 2))
+				m_cursor->setPosition(m_panel.getPosition().x + (GetShopBuyPanelSize().x / 2), m_cursor->getPosition().y);
+			if (m_cursor->getPosition().y < m_panel.getPosition().y - (GetShopBuyPanelSize().y / 2))
+				m_cursor->setPosition(m_cursor->getPosition().x, m_panel.getPosition().y - (GetShopBuyPanelSize().y / 2));
+			if (m_cursor->getPosition().y > m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2))
+				m_cursor->setPosition(m_cursor->getPosition().x, m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2));
+
+			break;
+		}
+
+		case StellarMap:
 		{
 			sf::Vector2f l_size = GetShopBuyPanelSize();
 			m_panel.setSize(l_size);

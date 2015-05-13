@@ -197,7 +197,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							boss->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, boss->enemy->speed.y);
 						}
-						sf::Vector2f boss_pos = sf::Vector2f(atof((*it)[SceneDataBoss::BOSS_SPAWN_X].c_str()), atof((*it)[SceneDataBoss::BOSS_SPAWN_Y].c_str()));
+						sf::Vector2f boss_pos = sf::Vector2f(atof((*it)[SceneDataBoss::BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*it)[SceneDataBoss::BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
 						boss_pos = Independant::getPosition_for_Direction(this->direction, boss_pos);
 						boss->enemy->setPosition(boss_pos);
 
