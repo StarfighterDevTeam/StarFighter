@@ -24,7 +24,6 @@
 #include "Bot.h"
 #include "InGameState.h"
 #include "FileLoader.h"
-#include <SFGUI/SFGUI.hpp>
 #include "GameManager.h"
 #include "Player.h"
 #include "HudGrid.h"

@@ -18,18 +18,6 @@ int main()
 	//renderWindow.setVerticalSyncEnabled(true);
 	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
 
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing GUI");
-	//Init SFGUI Window
-	sfg::SFGUI sfgui;
-	auto mainWindow = sfg::Window::Create();
-	mainWindow->SetTitle("Starfighter");
-
-	//Test
-	auto box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.f);
-	auto m_button = sfg::Button::Create("Chips au jambon");
-	box->Pack(m_button);
-	mainWindow->Add(box);
-
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
 	sf::Music SpaceCowboys;
@@ -83,7 +71,6 @@ int main()
 			{
 				renderWindow.close();
 			}
-			mainWindow->HandleEvent(event);
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -131,7 +118,6 @@ int main()
 		dt = deltaClock.restart();
 
 		//Update
-		mainWindow->Update(dt.asSeconds());
 		gameManager.GetCurrentState()->Update(dt);
 
 		//Draw
