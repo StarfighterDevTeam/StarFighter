@@ -152,12 +152,19 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Portal.h" />
     <ClInclude Include="PrefsManager.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Shop.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="TextUtils.h" />
     <ClInclude Include="Weapon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="StarFighter.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Icons\ShipModel_icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
