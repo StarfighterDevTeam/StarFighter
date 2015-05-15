@@ -31,5 +31,8 @@ echo Copying bins
 xcopy /S %releasefolder% %packagename% /EXCLUDE:excludedextensions.txt
 echo bins copied
 echo:
+echo Copying VC Redist
+echo VC Redist copied
+echo:
 echo:
 set /p input=All done [Press enter to exit]
