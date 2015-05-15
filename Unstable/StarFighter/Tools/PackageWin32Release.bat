@@ -12,6 +12,7 @@ echo:
 set packagename=StarFighter
 set projectsrc=.\..\StarFighter
 set releasefolder=.\..\Release
+set vcredistfolder=.\..\..\..\Libraries\VCRedist\x86
 
 echo Creating folder %packagename%
 rd /S /Q %packagename%
@@ -32,6 +33,7 @@ xcopy /S %releasefolder% %packagename% /EXCLUDE:excludedextensions.txt
 echo bins copied
 echo:
 echo Copying VC Redist
+xcopy /S %vcredistfolder% %packagename%
 echo VC Redist copied
 echo:
 echo:
