@@ -1,4 +1,5 @@
 #include "StarFighter.h"
+#include "resource.h"
 
 Game* CurrentGame;
 
@@ -14,9 +15,18 @@ int main()
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing SFML Window");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
+
 	//Refresh rate
-	//renderWindow.setVerticalSyncEnabled(true);
 	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+
+	//Icon
+	sf::Image icon = sf::Image();
+	icon.loadFromFile(ICON_SHIP_PNG);
+	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+	//Title
+	renderWindow.setTitle("StarFighter Beta");
+
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");

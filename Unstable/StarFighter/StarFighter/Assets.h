@@ -92,5 +92,8 @@
 #define SHOP_ASSET_WIDTH					319
 #define SHOP_ASSET_HEIGHT					158
 
+//ICONS
+#define ICON_SHIP_PNG						"Assets/Icons/ShipModel_icon.png"
+
 #endif // ASSETS_H_INCLUDED
 
