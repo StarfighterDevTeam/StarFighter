@@ -929,6 +929,10 @@ void Ship::ManageOpeningHud()
 
 			(*CurrentGame).hud.has_focus = isFocusedOnHud;
 			disable_fire = isFocusedOnHud;
+			if ((*CurrentGame).direction == NO_DIRECTION)
+			{
+				disable_fire = true;
+			}
 
 			if (isFocusedOnHud && !isSlowMotion)
 			{
@@ -1078,12 +1082,15 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		//speed malus when shooting
 		if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 		{
-			if (!this->isBraking)
+			if (!disable_fire && (isCollindingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
 			{
-				speed.x *= SHIP_BRAKING_MALUS_SPEED;
-				speed.y *= SHIP_BRAKING_MALUS_SPEED;
+				if (!this->isBraking)
+				{
+					speed.x *= SHIP_BRAKING_MALUS_SPEED;
+					speed.y *= SHIP_BRAKING_MALUS_SPEED;
+				}
+				this->isBraking = true;
 			}
-			this->isBraking = true;
 		}
 	}
 }
