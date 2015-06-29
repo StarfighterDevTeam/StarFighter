@@ -16,7 +16,7 @@ PlayerHud::PlayerHud()
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8+1));
 }
 
-void PlayerHud::Init(int m_armor, int m_shield)
+void PlayerHud::Init(int m_armor, int m_shield, int xp, int xp_max)
 {
 	backgroundColor.setSize(sf::Vector2f(SCENE_SIZE_X * 1.0f / 3, SCENE_SIZE_Y));
 	backgroundColor.setFillColor(sf::Color(10, 10, 10, 128));//dark grey
@@ -36,6 +36,11 @@ void PlayerHud::Init(int m_armor, int m_shield)
 	shieldBar.setOutlineColor(sf::Color(255, 255, 255));
 	shieldBar.setOrigin(0, 0);
 	shieldBar.setPosition(HUD_LEFT_MARGIN, 20 + ARMOR_BAR_SIZE_Y);
+
+	xpBar.setSize(sf::Vector2f((1.0f * xp / xp_max) * XP_BAR_SIZE_X, XP_BAR_SIZE_Y));
+	xpBar.setFillColor(sf::Color(COLOR_LIGHT_BLUE_R_VALUE, COLOR_LIGHT_BLUE_G_VALUE, COLOR_LIGHT_BLUE_B_VALUE, COLOR_LIGHT_BLUE_A_VALUE));//light blue
+	xpBar.setOrigin(0, 0);
+	xpBar.setPosition(HUD_LEFT_MARGIN, 20 + (2 * ARMOR_BAR_SIZE_Y) + 20);
 
 	itemStatsPanel.setSize(sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y));
 	itemStatsPanel.setFillColor(sf::Color(70, 70, 70, 128));//like grey
@@ -84,6 +89,11 @@ void PlayerHud::Init(int m_armor, int m_shield)
 		GrazeScore.setColor(_white);
 		GrazeScore.setPosition(HUD_LEFT_MARGIN, REF_WINDOW_RESOLUTION_Y - 50 - HUD_SCORES_SPACING);
 
+		Level.setFont(*font);
+		Level.setCharacterSize(14);
+		Level.setColor(_white);
+		Level.setPosition(HUD_LEFT_MARGIN, 20 + (2 * ARMOR_BAR_SIZE_Y) + 20);
+
 		SceneName.setFont(*font);
 		SceneName.setCharacterSize(14);
 		SceneName.setColor(_white);
@@ -128,7 +138,7 @@ void PlayerHud::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
 	this->hud_cursor->setAnimationLine(animation_index);
 }
 
-void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, sf::Time deltaTime, bool hub,
+void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
 	float f_ammo_speed, PatternType f_pattern, int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
@@ -161,7 +171,14 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	//graze
 	ostringstream ss_g;
 	ss_g << m_graze_count;
-	GrazeScore.setString("Graze: "+ss_g.str());
+	GrazeScore.setString("Graze: "+ ss_g.str());
+
+	//level
+	ostringstream ss_slash;
+	ss_slash << "Level " << level << " / " << level_max << " (XP: " << xp << " / " << xp_max << ")";
+	Level.setString(ss_slash.str());
+
+	xpBar.setSize(sf::Vector2f((1.0f * xp / xp_max) * XP_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
 
 	//scene name
 	if (!hub)
@@ -479,6 +496,8 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 	}
 	offscreen.draw(Money);
 	offscreen.draw(GrazeScore);
+	offscreen.draw(xpBar);
+	offscreen.draw(Level);
 	offscreen.draw(SceneName);
 
 	if (this->focused_item != NULL && this->has_focus)

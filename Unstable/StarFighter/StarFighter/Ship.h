@@ -247,6 +247,13 @@ public :
 	int graze_level;
 
 	int GetFocusedPortalMaxUnlockedHazardLevel();
+
+	int level;
+	int level_max;
+	int xp;
+	int xp_max;
+	void gain_xp (int xp_earned_);
+	void LevelUp();
 	
 private:
 	bool moving;

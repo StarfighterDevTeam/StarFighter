@@ -38,6 +38,8 @@
 
 #define JOYSTICK_MIN_AXIS_VALUE					25
 
+
+
 #define HUD_SCORES_SPACING							20
 #define HUD_LEFT_MARGIN								20
 #define HUD_CURSOR_SPEED							700
@@ -61,6 +63,9 @@
 //HUD
 #define ARMOR_BAR_SIZE_Y								20
 #define SHIELD_BAR_SIZE_Y								20
+
+#define XP_BAR_SIZE_X									320
+#define XP_BAR_SIZE_Y									16
 
 //ENEMY LIFE BARS
 #define ENEMY_HP_BAR_CONTAINER_SIZE_X					90
@@ -136,6 +141,12 @@
 
 #define NUMBER_OF_BEASTSCALE_THRESHOLD					5
 #define NB_MAX_PROPERTIES_FOR_NON_EPIC_EQUIPMENT		3
+
+//LEVELING
+#define FIRST_LEVEL_MAX									2
+#define XP_MAX_FIRST_LEVEL								100
+#define XP_MAX_INCREASE_PER_LEVEL						0.50
+#define XP_DEATH_MALUS_PERCENTAGE						0.05
 
 enum HazardLevels
 {

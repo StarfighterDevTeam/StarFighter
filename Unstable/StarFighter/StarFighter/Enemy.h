@@ -29,6 +29,8 @@ const sf::Vector2f LootTable_BeastScale_Base[EnemyClass::NBVAL_EnemyClass] = { s
 const float LootTable_BeastScaleThreshold[NUMBER_OF_BEASTSCALE_THRESHOLD] =  {0.0, 1.5, 3.0, 4.5, 6.0};
 const int LootTable_MaxPropertiesPerEquipmentType[EquipmentType::NBVAL_Equipment+1] =  {2, 1, 2, 2, 2};
 
+const int XPTable_PerEnemyClass[EnemyClass::NBVAL_EnemyClass] = { 0, 10, 10, 30, 30, 100, 100, 500, 0 };
+
 class Enemy : public Independant
 {
 public:

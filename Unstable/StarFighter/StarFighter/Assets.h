@@ -31,6 +31,11 @@
 #define	COLOR_BLUE_A_VALUE				128
 //COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE
 
+#define	COLOR_LIGHT_BLUE_R_VALUE		0
+#define	COLOR_LIGHT_BLUE_G_VALUE		100
+#define	COLOR_LIGHT_BLUE_B_VALUE		200
+#define	COLOR_LIGHT_BLUE_A_VALUE		179
+
 //#define AIRBRAKE_FILENAME		"Assets/2D/Equipment/AirBrake.png"
 #define ARMOR_FILENAME			"Assets/2D/Equipment/Armor.png"
 #define LASER_RED_FILENAME		"Assets/2D/Equipment/laser_red.png"

@@ -955,6 +955,9 @@ void Enemy::Death()
 	//Score
 	(*CurrentGame).hazard += this->money;
 
+	//Player XP
+	(*CurrentGame).playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
+
 	//Loot
 	CreateRandomLoot((*CurrentGame).BeastScoreBonus);
 	GenerateLoot();

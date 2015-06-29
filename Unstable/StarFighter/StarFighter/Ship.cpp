@@ -736,6 +736,12 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->disabledHyperspeed = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
+
+	this->level = 1;
+	this->level_max = FIRST_LEVEL_MAX;
+	this->xp = 0;
+	this->xp_max = XP_MAX_FIRST_LEVEL;
+
 	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
 	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
 	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
@@ -1727,6 +1733,17 @@ void Ship::Death()
 		this->ship_config.m_fake_ship->visible = false;
 	}
 	(*CurrentGame).garbageLayer(AuraLayer);
+
+	//losing xp
+	int death_xp_penalty_ = floor(this->xp_max * XP_DEATH_MALUS_PERCENTAGE);
+	if (this->xp < death_xp_penalty_)
+	{
+		this->xp = 0;
+	}
+	else
+	{
+		this->xp -= death_xp_penalty_;
+	}
 }
 
 Independant* Ship::CloneEquipmentIntoIndependant(Equipment* new_equipment)
@@ -1910,4 +1927,36 @@ int Ship::GetFocusedPortalMaxUnlockedHazardLevel()
 	{
 		return this->targetPortal->max_unlocked_hazard_level;
 	}
+}
+
+void Ship::gain_xp(int xp_earned_)
+{
+	this->xp += xp_earned_;
+
+	//no level down
+	if (this->xp < 0)
+	{
+		this->xp = 0;
+	}
+
+	while (this->xp >= this->xp_max && this->level < this->level_max)
+	{
+		this->LevelUp();
+	}
+
+	//max level reached?
+	if (this->xp > this->xp_max && this->level >= this->level_max)
+	{
+		this->xp = this->xp_max;
+	}
+}
+
+void Ship::LevelUp()
+{
+	this->level++;
+	this->xp -= this->xp_max;
+	this->xp_max = floor(this->xp_max * (1 + XP_MAX_INCREASE_PER_LEVEL));
+
+	//increasing enemies level
+	(*CurrentGame).level++;
 }

@@ -21,7 +21,7 @@ void InGameState::Initialize(Player player)
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer(PLAYER_SAVE_FILE);
 	}
-	
+
 	//Loading current scene
 	this->currentScene = new Scene(this->currentSceneSave, GetSceneHazardLevelUnlocked(this->currentSceneSave), player.reverse_scene, true);//first_scene = true
 	UpdatePortalsMaxUnlockedHazardLevel(this->currentScene);
@@ -41,6 +41,9 @@ void InGameState::Initialize(Player player)
 	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
 	this->playerShip->ResplenishHealth();
 	this->playerShip->respawnSceneName = this->currentScene->m_name;
+
+	//transmitting player level to the game
+	(*CurrentGame).level = this->playerShip->level;
 
 	//initalizing equipment in HUD
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");
@@ -118,8 +121,8 @@ void InGameState::Update(Time deltaTime)
 		{
 			Weapon* tmp_weapon = tmp_ptr->getWeaponLoot();
 
-			(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-				(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
+			(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(), (*CurrentGame).playerShip->graze_count, 
+				this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
 				equip_index_, tmp_weapon->display_name, -1, -1, -1, -1, -1, tmp_weapon->ammunition->damage, false, tmp_weapon->ammunition->speed.y, tmp_weapon->ammunition->Pattern.currentPattern, tmp_weapon->multishot, tmp_weapon->xspread, tmp_weapon->rate_of_fire, tmp_weapon->shot_mode,
 				tmp_weapon->dispersion, tmp_weapon->rafale, tmp_weapon->rafale_cooldown, tmp_weapon->target_seaking);
 
@@ -132,14 +135,14 @@ void InGameState::Update(Time deltaTime)
 			if (!tmp_equipment->hasBot)
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
+					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
 					equip_index_, tmp_equipment->display_name, tmp_equipment->getEquipmentMaxSpeed().x, tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->getEquipmentArmor(),
 					tmp_equipment->getEquipmentShield(), tmp_equipment->getEquipmentShieldRegen(), tmp_equipment->getEquipmentDamage(), tmp_equipment->hasBot);
 			}
 			else
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION,
+					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
 					equip_index_, tmp_equipment->display_name, tmp_equipment->bot->Pattern.patternSpeed, tmp_equipment->getEquipmentHyperspeed() , tmp_equipment->bot->armor_max,
 					tmp_equipment->bot->shield_max, tmp_equipment->bot->shield_regen, tmp_equipment->bot->weapon->ammunition->damage, tmp_equipment->hasBot, tmp_equipment->bot->weapon->ammunition->speed.y,
 					tmp_equipment->bot->weapon->ammunition->Pattern.currentPattern, tmp_equipment->bot->weapon->multishot, tmp_equipment->bot->weapon->xspread, tmp_equipment->bot->weapon->rate_of_fire,
@@ -154,7 +157,7 @@ void InGameState::Update(Time deltaTime)
 	else //...else not bothering with it
 	{
 		(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->getMoney(),
-			(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, deltaTime, this->currentScene->direction == NO_DIRECTION);
+			(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION);
 	}
 
 	this->mainWindow->clear();
