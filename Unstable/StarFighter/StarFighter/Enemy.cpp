@@ -959,7 +959,8 @@ void Enemy::Death()
 	(*CurrentGame).playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
 
 	//Loot
-	CreateRandomLoot((*CurrentGame).BeastScoreBonus);
+	//CreateRandomLoot((*CurrentGame).BeastScoreBonus);
+	CreateRandomLootv2(this->enemy_class, (*CurrentGame).BeastScoreBonus);
 	GenerateLoot();
 
 	this->visible = false;
