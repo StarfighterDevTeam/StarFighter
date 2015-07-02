@@ -46,6 +46,7 @@ public:
 	float angspeed;
 	void GenerateLoot() override;
 	void CreateRandomLoot(float BeastScaleBonus=0) override;
+	void CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus = 0, bool force_BeastScale = false, float BeastScale_min = 0.0f, float BeastScale_max = 6.0f);
 	void damage_from(Independant& independant) override;
 	EnemyClass enemy_class;
 
@@ -76,6 +77,8 @@ public:
 	//float offsetBetweenHealthBars;
 	void RotateFeedbacks(float angle);
 	sf::Time feedbackTimer;
+
+	void ApplyLevelModifiers() override;
 
 private:
 	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);

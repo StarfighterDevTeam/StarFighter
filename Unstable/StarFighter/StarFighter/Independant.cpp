@@ -190,7 +190,7 @@ void Independant::damage_from(Independant& independant)
 		else
 		{
 			shield -= independant.damage;
-		}
+		}		
 	}
 }
 
@@ -381,6 +381,11 @@ Weapon* Independant::getWeaponLoot()
 void Independant::releaseWeaponLoot()
 {
 	this->weapon_loot = NULL;
+}
+
+void Independant::ApplyLevelModifiers()
+{
+	//-> Enemy::ApplyLevelModifiers override
 }
 
 void Independant::CreateRandomLoot(float BeastScaleBonus)

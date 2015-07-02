@@ -1309,6 +1309,87 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 	}
 }
 
+void Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, bool force_BeastScale, float BeastScale_min, float BeastScale_max)
+{
+	double random_number = (double)rand() / (RAND_MAX);
+
+	if (random_number > LootTable_DroppingSomething[loot_class])
+	{
+		//EMPTY DROP
+	}
+	else
+	{
+		//setting min and max beast score values
+		sf::Vector2f LootTable_BeastScale[EnemyClass::NBVAL_EnemyClass];
+		for (int b = 0; b < EnemyClass::NBVAL_EnemyClass; b++)
+		{
+			if (b != EnemyClass::ENEMYPOOL_VOID && b != EnemyClass::ENEMYPOOL_ZETA)
+			{
+				LootTable_BeastScale[b].x = LootTable_BeastScale_Base[b].x + BeastScaleBonus;
+				LootTable_BeastScale[b].y = LootTable_BeastScale_Base[b].y + BeastScaleBonus;
+			}
+			else
+			{
+				LootTable_BeastScale[b].x = 0;
+				LootTable_BeastScale[b].y = 0;
+			}
+		}
+
+		//ITEM DROP
+		if (random_number < LootTable_DropIsEquipment[loot_class] * LootTable_DroppingSomething[loot_class])
+		{
+			//Beast Scale Score randomized here within the min and max
+			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[loot_class]);
+
+			//Calculation of the bonus "credits" for the loot
+			int loot_credits_ = BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).loot_on_par_stat_multiplier;
+
+			//Equipment type
+			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
+
+			//-----CHOSING RANDOM PROPERTIES-----
+			int properties_to_choose_from = LootTable_MaxPropertiesPerEquipmentType[equipment_type_roll];
+
+			//"Spending credits" on item stats
+			switch (equipment_type_roll)
+			{
+				case (int)EquipmentType::Armor:
+				{
+					this->setEquipmentLoot(Equipment::CreateRandomArmor(loot_credits_));
+					break;
+				}
+				
+				case (int)EquipmentType::Shield:
+				{
+					this->setEquipmentLoot(Equipment::CreateRandomShield(loot_credits_));
+					break;
+				}
+
+				case (int)EquipmentType::Module:
+				{				   
+					this->setEquipmentLoot(Equipment::CreateRandomModule(loot_credits_));
+					break;
+				}
+
+				case (int)EquipmentType::NBVAL_Equipment://WEAPON DROP
+				{
+					this->setWeaponLoot(Weapon::CreateRandomWeapon(loot_credits_));
+					break;
+				}
+			}
+		}
+
+		else
+		{
+			//MONEY DROP
+			int money = RandomizeIntBetweenRatios(1.0f * XPTable_PerEnemyClass[loot_class] * (*CurrentGame).enemy_base_stat_multiplier / 100, LootTable_BeastScale[loot_class]);
+			this->addMoney(money);//looting money
+		}
+	}
+
+	return;
+}
+
 int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p)
 {
 	int index = rand() % (properties_to_choose_from - p);
@@ -1430,4 +1511,18 @@ FX* Enemy::LoadFX(string name)
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file", name));
 
+}
+
+void Enemy::ApplyLevelModifiers()
+{
+	float multiplier_ = 1.0f * (*CurrentGame).enemy_base_stat_multiplier / 100;
+
+	this->armor_max = ceil(this->armor_max * multiplier_);
+	this->shield_max = ceil(this->shield_max * multiplier_);
+	this->shield_regen = ceil(this->shield_regen * multiplier_);
+	this->damage = ceil(this->damage * multiplier_);
+	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+	{
+		(*it)->ammunition->damage = ceil((*it)->ammunition->damage * multiplier_);
+	}
 }

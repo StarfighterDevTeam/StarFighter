@@ -417,6 +417,7 @@ void Scene::SpawnEnemy(int enemy_class)
 		{
 			enemy = (*it)->enemy->Clone();
 			ApplyHazardLevelModifiers(getSceneHazardLevelValue(), *enemy);
+			enemy->ApplyLevelModifiers();
 			break;
 		}
 	}
@@ -449,13 +450,13 @@ void Scene::GenerateBoss()
 	}
 }
 
-void Scene::ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy_)
+void Scene::ApplyHazardLevelModifiers(int hazard_level_, Enemy& enemy_)
 {
-	enemy_.speed.x *= enemySpeedModifierTable[hazard_level];
-	enemy_.speed.y *= enemySpeedModifierTable[hazard_level];
+	enemy_.speed.x *= enemySpeedModifierTable[hazard_level_];
+	enemy_.speed.y *= enemySpeedModifierTable[hazard_level_];
 	for (std::vector<Weapon*>::iterator it = enemy_.weapons_list.begin(); it != enemy_.weapons_list.end(); it++)
 	{
-		(*it)->ammunition->speed.y *= ammoSpeedModifierTable[hazard_level];
+		(*it)->ammunition->speed.y *= ammoSpeedModifierTable[hazard_level_];
 	}
 }
 

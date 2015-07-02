@@ -40,6 +40,11 @@ public:
 	Ammo* ammunition;
 	bool m_isReadyToFire;
 
+	int loot_credits;
+	float bonus_damage;
+	float bonus_rate_of_fire;
+	float bonus_multishot;
+
 	TargetSeaking target_seaking;
 	void SeakTarget(IndependantType m_collider_type);
 
@@ -63,6 +68,8 @@ public:
 	void AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	void AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	Weapon* Clone();
+
+	static Weapon* CreateRandomWeapon(int credits_);
 
 private:
 	bool fire_pattern_return;

@@ -11,25 +11,25 @@ V_Alpha3,150,0,0,1,V_Alpha3_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Alpha3.png
 V_Sigma1,75,0,0,1,V_Sigma1_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Sigma1.png,63,84,3,110,death_explosion,10,0,,,,0,V_Sigma1_Entry
 V_Sigma2,100,0,0,1,V_Sigma1_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Sigma2.png,63,84,3,110,death_explosion,10,0,,,,0,V_Sigma2_Entry
 V_Sigma3,125,0,0,1,V_Sigma1_laser,V_laserM,0,,0,,Assets/2D/Vanguard/V_Sigma3.png,63,84,3,110,death_explosion,10,0,,,,0,V_Sigma3_Entry
-V_Beta1,100,100,30,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta1.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta1_Entry
-V_Beta2,400,200,50,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta2.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta2_Entry
-V_Beta3,500,400,150,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta3.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta3_Entry
-V_Delta1,3200,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta1.png,288,390,1,50,death_explosion,50,0,,,,0,V_Delta1_Entry
-V_Delta2,3000,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta2.png,288,390,1,50,death_explosion,50,0,,,,0,V_Delta2_Entry
-V_Delta3,3400,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta3.png,288,390,1,50,death_explosion,50,0,,,,0,V_Delta3_Entry
-V_Gamma1,300,0,5,10,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma1.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma1_Entry
-V_Gamma2,400,0,5,10,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma2.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma2_Entry
-V_Gamma3,500,0,5,10,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma3.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma3_Entry
-V_Zeta_01,200,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,250,death_explosion,50,0,,,,30,0
-V_Zeta_02,200,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,400,death_explosion,50,0,,,,50,0
-V_Zeta_03,200,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,250,death_explosion,50,0,,,,-30,0
-V_Zeta_04,200,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,400,death_explosion,50,0,,,,-50,0
-V_Zeta_05,200,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,150,death_explosion,50,0,,,,10,0
-V_Zeta_06,200,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,150,death_explosion,50,0,,,,-10,0
+V_Beta1,200,200,25,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta1.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta1_Entry
+V_Beta2,300,100,10,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta2.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta2_Entry
+V_Beta3,300,200,50,20,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Beta3.png,135,156,1,70,death_explosion,20,0,,,,0,V_Beta3_Entry
+V_Delta1,1000,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta1.png,288,390,1,50,death_explosion,50,0,,,,0,V_Delta1_Entry
+V_Delta2,1100,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta2.png,288,390,1,50,death_explosion,50,0,,,,0,V_Delta2_Entry
+V_Delta3,1200,0,5,50,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Delta3.png,288,390,1,50,death_explosion,50,0,,,,0,V_Delta3_Entry
+V_Gamma1,250,0,5,10,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma1.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma1_Entry
+V_Gamma2,300,0,5,10,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma2.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma2_Entry
+V_Gamma3,350,0,5,10,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Gamma3.png,75,126,1,50,death_explosion,50,0,,,,0,V_Gamma3_Entry
+V_Zeta_01,50,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,250,death_explosion,50,0,,,,30,0
+V_Zeta_02,50,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,400,death_explosion,50,0,,,,50,0
+V_Zeta_03,50,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,250,death_explosion,50,0,,,,-30,0
+V_Zeta_04,50,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,400,death_explosion,50,0,,,,-50,0
+V_Zeta_05,50,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,150,death_explosion,50,0,,,,10,0
+V_Zeta_06,50,0,0,1,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_Zeta.png,66,66,1,150,death_explosion,50,0,,,,-10,0
 V_BetaGold,3000,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_BetaGold.png,288,390,1,50,death_explosion,50,0,,,,0,V_BetaGold_Entry
-V_AlphaGold,400,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry
-V_AlphaGold1,400,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry1
-V_AlphaGold2,400,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry2
-V_AlphaGold3,400,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry3
-V_AlphaGold4,400,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry4
-V_AlphaGold5,400,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry5
+V_AlphaGold,500,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry
+V_AlphaGold1,500,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry1
+V_AlphaGold2,500,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry2
+V_AlphaGold3,500,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry3
+V_AlphaGold4,500,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry4
+V_AlphaGold5,500,0,0,100,0,cf. phase,0,cf. phase,0,,Assets/2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry5

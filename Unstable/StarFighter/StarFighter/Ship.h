@@ -72,15 +72,17 @@ public:
 	sf::Vector2f fake_size;
 	int fake_frameNumber;
 
+	int armor;
+	int shield;
+	int shield_regen;
+	int damage;
+
 private:
 	float decceleration;
 	sf::Vector2f acceleration;
 	sf::Vector2f max_speed;
 	float hyperspeed;
-	int armor;
-	int shield;
-	int shield_regen;
-	int damage;
+	
 };
 
 class Equipment
@@ -117,6 +119,16 @@ public:
 	void AddShieldProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 	void AddModuleProperty(int chosen_property, int value, sf::Vector2f BeastScale);
 
+	int bonus_armor;
+	int bonus_shield;
+	int bonus_shield_regen;
+	int bonus_damage;
+	int loot_credits;
+
+	static Equipment* CreateRandomArmor(int credits_);
+	static Equipment* CreateRandomShield(int credits_);
+	static Equipment* CreateRandomModule(int credits_);
+
 private:
 	sf::Vector2f max_speed;
 	sf::Vector2f acceleration;
@@ -145,6 +157,10 @@ public:
 	int getShipConfigShield();
 	int getShipConfigShieldRegen();
 	int getShipConfigDamage();
+	int getShipConfigArmorBonus();
+	int getShipConfigShieldBonus();
+	int getShipConfigShieldRegenBonus();
+	int getShipConfigDamageBonus();
 	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true, bool overwrite = false);
 	bool setShipModel(ShipModel* m_ship_model);
 	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true, bool overwrite = false);
@@ -254,6 +270,7 @@ public :
 	int xp_max;
 	void gain_xp (int xp_earned_);
 	void LevelUp();
+	int ship_base_stat_multiplier;
 	
 private:
 	bool moving;

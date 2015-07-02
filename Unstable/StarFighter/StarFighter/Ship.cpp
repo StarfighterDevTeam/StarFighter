@@ -87,6 +87,11 @@ Equipment::Equipment()
 	this->equipmentType = EquipmentType::Armor;
 	this->hasBot = false;
 	this->hasFake = false;
+
+	this->bonus_armor = 0;
+	this->bonus_shield = 0;
+	this->bonus_shield_regen = 0;
+	this->bonus_damage = 0;
 }
 
 Equipment::~Equipment()
@@ -108,6 +113,12 @@ Equipment* Equipment::Clone()
 	{
 		new_equipment->bot = this->bot->Clone();
 	}
+
+	new_equipment->loot_credits = this->loot_credits;
+	new_equipment->bonus_armor = this->bonus_armor;
+	new_equipment->bonus_shield = this->bonus_shield;
+	new_equipment->bonus_shield_regen = this->bonus_shield_regen;
+	new_equipment->bonus_damage = this->bonus_damage;
 
 	return new_equipment;
 }
@@ -170,6 +181,120 @@ int Equipment::getEquipmentShieldRegen()
 int Equipment::getEquipmentDamage()
 {
 	return this->damage;
+}
+
+Equipment* Equipment::CreateRandomArmor(int credits_)
+{
+	//Spending credits on the possible bonuses
+	int bonus_armor_ = 0;
+	int bonus_damage_ = 0;
+
+	int loot_credits_remaining_ = credits_;
+	while (loot_credits_remaining_ > 0)
+	{
+		int random_type_of_bonus_ = RandomizeIntBetweenValues(0, 5);
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus_)
+		{
+			case 0://damage
+			{
+				loot_credits_remaining_ --;
+				bonus_damage_++;
+				break;
+			}
+
+			default://armor
+			{
+				loot_credits_remaining_--;
+				bonus_armor_++;
+				break;
+			}
+		}
+	}
+
+	//Creating the item
+	Equipment* equipment = new Equipment();
+	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
+
+	//allocating bonuses to the weapon
+	equipment->loot_credits = credits_;
+	equipment->bonus_damage = bonus_damage_;
+	equipment->bonus_armor = bonus_armor_;
+
+	return equipment;
+}
+
+Equipment* Equipment::CreateRandomShield(int credits_)
+{
+	//Spending credits on the possible bonuses
+	int bonus_shield_ = 0;
+	int bonus_shield_regen_ = 0;
+
+	int loot_credits_remaining_ = credits_;
+	while (loot_credits_remaining_ > 0)
+	{
+		int random_type_of_bonus_ = RandomizeIntBetweenValues(0, 3);
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus_)
+		{
+			case 0://shield regen
+			{
+				loot_credits_remaining_--;
+				bonus_shield_regen_++;
+				break;
+			}
+
+			default://shield
+			{
+				loot_credits_remaining_--;
+				bonus_shield_++;
+				break;
+			}
+		}
+	}
+
+	//Creating the item
+	Equipment* equipment = new Equipment();
+	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
+
+	//allocating bonuses to the weapon
+	equipment->loot_credits = credits_;
+	equipment->bonus_shield = bonus_shield_;
+	equipment->bonus_shield_regen = bonus_shield_regen_;
+
+	return equipment;
+}
+
+Equipment* Equipment::CreateRandomModule(int credits_)
+{
+	//Spending credits on the possible bonuses
+	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER));
+
+	//Initialisation
+	Equipment* equipment = new Equipment();
+	equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
+
+	Bot* bot = new Bot(sf::Vector2f(0, 0), sf::Vector2f(0, 0), BOT_FILENAME, sf::Vector2f(BOT_SIZE, BOT_SIZE));
+	bot->display_name = "Bot gerard";
+	bot->radius = 500;
+	bot->vspeed = 300;
+	bot->spread = sf::Vector2f(-50, 0);
+
+	vector<float>* v = new vector<float>;
+	//v->push_back(bot->radius); // rayon 500px
+	//v->push_back(1);  // clockwise (>)
+	PatternType pattern_type = PatternType::NoMovePattern;
+	bot->Pattern.SetPattern(pattern_type, bot->vspeed, v); //vitesse angulaire (degres/s)
+
+	bot->weapon = weapon;
+	equipment->bot = bot;
+
+	//allocating bonuses to the weapon
+	equipment->loot_credits = credits_;
+
+	return equipment;
 }
 
 #define EQUIPMENT_DECCELERATION_MULTIPLIER		10
@@ -406,8 +531,6 @@ void ShipConfig::Init()
 			}
 		}
 	}
-
-
 }
 
 int ShipConfig::getShipConfigArmor()
@@ -513,6 +636,82 @@ int ShipConfig::getShipConfigDamage()
 		new_damage = ship_model->getShipModelDamage();
 
 	return new_damage;
+}
+
+int ShipConfig::getShipConfigArmorBonus()
+{
+	int new_bonus_armor = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (this->equipment[i] != NULL)
+		{
+			new_bonus_armor += equipment[i]->bonus_armor;
+		}
+		else
+		{
+			new_bonus_armor += 0;
+		}
+	}
+
+	return new_bonus_armor;
+}
+
+int ShipConfig::getShipConfigShieldBonus()
+{
+	int new_bonus_shield = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (this->equipment[i] != NULL)
+		{
+			new_bonus_shield += equipment[i]->bonus_shield;
+		}
+		else
+		{
+			new_bonus_shield += 0;
+		}
+	}
+
+	return new_bonus_shield;
+}
+
+int ShipConfig::getShipConfigShieldRegenBonus()
+{
+	int new_bonus_shield_regen = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (this->equipment[i] != NULL)
+		{
+			new_bonus_shield_regen += equipment[i]->bonus_shield_regen;
+		}
+		else
+		{
+			new_bonus_shield_regen += 0;
+		}
+	}
+
+	return new_bonus_shield_regen;
+}
+
+int ShipConfig::getShipConfigDamageBonus()
+{
+	int new_bonus_damage = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (this->equipment[i] != NULL)
+		{
+			new_bonus_damage += equipment[i]->bonus_damage;
+		}
+		else
+		{
+			new_bonus_damage += 0;
+		}
+	}
+
+	return new_bonus_damage;
 }
 
 sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
@@ -774,23 +973,49 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->previouslyCollindingWithInteractiveObject = No_Interaction;
 	this->isCollindingWithInteractiveObject = No_Interaction;
 
+	this->ship_base_stat_multiplier = (*CurrentGame).GetPlayerStatsMultiplierForLevel(this->level);
+
 	this->Init();
 }
 
 void Ship::Init()
 {
-	this->armor_max = this->ship_config.getShipConfigArmor();
+	float multiplier_ = 1.0f * this->ship_base_stat_multiplier / 100;
+
+	this->armor_max = ceil(multiplier_ * this->ship_config.getShipConfigArmor() * (1 + (1.0f * this->ship_config.getShipConfigArmorBonus() / 100)));
 	if (this->armor > this->armor_max)
 	{
 		this->armor = this->armor_max;
 	}
-	this->shield_max = this->ship_config.getShipConfigShield();
+	this->shield_max = ceil(multiplier_ * this->ship_config.getShipConfigShield() * (1 + (1.0f * this->ship_config.getShipConfigShieldBonus() / 100)));
 	if (this->shield > this->shield_max)
 	{
 		this->shield = this->shield_max;
 	}
-	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
-	this->damage = this->ship_config.getShipConfigDamage();
+	this->shield_regen = ceil(multiplier_ * this->ship_config.getShipConfigShieldRegen() * (1 + (1.0f * this->ship_config.getShipConfigShieldRegenBonus() / 100)));
+	this->damage = ceil(multiplier_ * this->ship_config.getShipConfigDamage() * (1 + (1.0f * this->ship_config.getShipConfigDamageBonus() / 100)));
+
+	this->ship_config.weapon->ammunition->damage = ceil(multiplier_ * this->ship_config.weapon->ammunition->damage * (1 + (1.0f * this->ship_config.weapon->bonus_damage / 100))
+		* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (this->ship_config.weapon->multishot - MIN_VALUE_OF_MULTISHOT) / 100)));
+	this->ship_config.weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * ship_config.weapon->bonus_rate_of_fire / 100));
+	this->ship_config.weapon->multishot = MIN_VALUE_OF_MULTISHOT + this->ship_config.weapon->bonus_multishot;
+
+	for (std::vector<Bot*>::iterator it = (this->ship_config.bot_list.begin()); it != (this->ship_config.bot_list.end()); it++)
+	{
+		(*it)->weapon->ammunition->damage = ceil(multiplier_ * FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * (*it)->weapon->bonus_damage / 100))
+			* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * ((*it)->weapon->multishot - MIN_VALUE_OF_MULTISHOT) / 100)));
+		this->ship_config.weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * (*it)->weapon->bonus_rate_of_fire / 100));
+		this->ship_config.weapon->multishot = ceil(MIN_VALUE_OF_MULTISHOT * BOT_STATS_MULTIPLIER) + this->ship_config.weapon->bonus_multishot;
+	}
+	
+	
+
+	printf("\nLEVEL %d. Stats:\n", level);
+	printf("armor: %d\n", armor_max);
+	printf("shield: %d\n", shield_max);
+	printf("shield_regen: %d\n", shield_regen);
+	printf("ammo damage: %d\n", ship_config.weapon->ammunition->damage);
+
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
 	this->transparent = this->ship_config.ship_model->hasFake;
@@ -1957,6 +2182,17 @@ void Ship::LevelUp()
 	this->xp -= this->xp_max;
 	this->xp_max = floor(this->xp_max * (1 + XP_MAX_INCREASE_PER_LEVEL));
 
+	//updating ship stats
+	this->ship_base_stat_multiplier = (*CurrentGame).GetPlayerStatsMultiplierForLevel(this->level);
+
 	//increasing enemies level
-	(*CurrentGame).level++;
+	(*CurrentGame).level = this->level;
+	(*CurrentGame).enemy_base_stat_multiplier = (*CurrentGame).GetEnemiesStatsMultiplierForLevel((*CurrentGame).level);
+
+	//increasing loot level
+	(*CurrentGame).loot_on_par_stat_multiplier = (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel((*CurrentGame).level);
+	
+	//applying level modifiers
+	this->Init();
+	(*CurrentGame).ApplyLevelModifiers();
 }

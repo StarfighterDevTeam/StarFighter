@@ -60,7 +60,7 @@ public:
 	void GenerateEnemiesv2(Time deltaTime);
 	void SpawnEnemy(int enemy_class);
 	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
-	void ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy_);
+	void ApplyHazardLevelModifiers(int hazard_level_, Enemy& enemy_);
 
 	void HazardBreak();
 	int m_hazard_level_unlocked;

@@ -23,6 +23,11 @@ Weapon::Weapon(Ammo* Ammunition)
 	face_target = false;
 	fire_pattern_return = false;
 
+	loot_credits = 0;
+	bonus_damage = 0;
+	bonus_rate_of_fire = 0;
+	bonus_multishot = 0;
+
 	this->ammunition = Ammunition;
 }
 
@@ -364,6 +369,11 @@ Weapon* Weapon::Clone()
 	weapon->textureName = this->textureName;
 	weapon->size = this->size;
 
+	loot_credits = this->loot_credits;
+	bonus_damage = this->bonus_damage;
+	bonus_rate_of_fire = this->bonus_rate_of_fire;
+	bonus_multishot = this->bonus_multishot;
+
 	return weapon;
 }
 
@@ -510,4 +520,84 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 	}
 
 	return fire_direction_;
+}
+
+Weapon* Weapon::CreateRandomWeapon(int credits_)
+{
+	//Spending credits on the possible bonuses
+	int bonus_multishot_ = 0;
+	int bonus_damage_ = 0;
+	int bonus_rate_of_fire_ = 0;
+
+	int loot_credits_remaining_ = credits_;
+	while (loot_credits_remaining_ > 0)
+	{
+		int random_type_of_bonus_ = -1;
+
+		//limitations per bonus
+		if (credits_ > CREDITS_COST_PER_ONE_MULTISHOT && bonus_rate_of_fire_ < MAX_RATE_OF_FIRE_BONUS)
+		{
+			random_type_of_bonus_ = RandomizeIntBetweenValues(0, 2);
+		}
+		//insufficient credit for multishot
+		else if (bonus_rate_of_fire_ < MAX_RATE_OF_FIRE_BONUS)
+		{
+			random_type_of_bonus_ = RandomizeIntBetweenValues(1, 2);
+		}
+		//max rate of fire bonus reached
+		else if (credits_ > CREDITS_COST_PER_ONE_MULTISHOT)
+		{
+			random_type_of_bonus_ = RandomizeIntBetweenValues(0, 1);
+		}
+		//insufficient credit for multishot + max rate of fire bonus reached
+		else
+		{
+			random_type_of_bonus_ = 1;
+		}
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus_)
+		{
+		case 0://multishot
+		{
+				   loot_credits_remaining_ -= CREDITS_COST_PER_ONE_MULTISHOT;
+				   bonus_multishot_++;
+				   break;
+		}
+		case 1://flat bonus damage
+		{
+				   loot_credits_remaining_--;
+				   bonus_damage_++;
+				   break;
+		}
+		case 2://rate of fire
+		{
+				   loot_credits_remaining_--;
+				   bonus_rate_of_fire_++;
+				   break;
+		}
+		default:
+			break;
+		}
+	}
+
+	//Creating the item
+	FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f(320, 236), 2, sf::seconds(0.4f));
+	Ammo* ammo = new Ammo(sf::Vector2f(0, 0), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(6, 32), -1, fx);
+	Weapon* weapon = new Weapon(ammo);
+	weapon->fire_direction = Vector2i(0, -1);
+	weapon->textureName = LASER_BLUE_FILENAME;
+	weapon->size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
+	weapon->frameNumber = 1;
+	weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
+	weapon->display_name = "Laser standard";
+	weapon->target_seaking = SEAKING;
+
+	//allocating bonuses to the weapon
+	weapon->loot_credits = credits_;
+	weapon->bonus_damage = bonus_damage_;
+	weapon->multishot = bonus_multishot_;
+	weapon->bonus_rate_of_fire = bonus_damage_;
+
+	return weapon;
 }

@@ -138,7 +138,7 @@ void PlayerHud::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
 	this->hud_cursor->setAnimationLine(animation_index);
 }
 
-void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
+void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_max, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
 	float f_ammo_speed, PatternType f_pattern, int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
@@ -149,7 +149,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	}
 	else
 	{
-		armorBar.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
+		armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X), ARMOR_BAR_SIZE_Y));
 	}
 
 	if (m_shield <=0) 
@@ -159,7 +159,7 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 	}	
 	else
 	{
-		shieldBar.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
+		shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X), SHIELD_BAR_SIZE_Y));
 		this->has_shield = true;
 	}
 
@@ -175,7 +175,13 @@ void PlayerHud::Update(int m_armor, int m_shield, int m_money, int m_graze_count
 
 	//level
 	ostringstream ss_slash;
-	ss_slash << "Level " << level << " / " << level_max << " (XP: " << xp << " / " << xp_max << ")";
+	ss_slash << "Level " << level;
+	if (level_max > -1)
+	{
+		ss_slash  << " / " << level_max;
+	}
+	ss_slash << " (XP: " << xp << " / " << xp_max << ")";
+
 	Level.setString(ss_slash.str());
 
 	xpBar.setSize(sf::Vector2f((1.0f * xp / xp_max) * XP_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
