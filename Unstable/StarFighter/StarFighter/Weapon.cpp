@@ -369,10 +369,10 @@ Weapon* Weapon::Clone()
 	weapon->textureName = this->textureName;
 	weapon->size = this->size;
 
-	loot_credits = this->loot_credits;
-	bonus_damage = this->bonus_damage;
-	bonus_rate_of_fire = this->bonus_rate_of_fire;
-	bonus_multishot = this->bonus_multishot;
+	weapon->loot_credits = this->loot_credits;
+	weapon->bonus_damage = this->bonus_damage;
+	weapon->bonus_rate_of_fire = this->bonus_rate_of_fire;
+	weapon->bonus_multishot = this->bonus_multishot;
 
 	return weapon;
 }
@@ -589,14 +589,19 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 	weapon->textureName = LASER_BLUE_FILENAME;
 	weapon->size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
 	weapon->frameNumber = 1;
-	weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
+
+	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
+	
 	weapon->display_name = "Laser standard";
 	weapon->target_seaking = SEAKING;
+
+	weapon->ammunition->speed.y = DEFAULT_AMMO_SPEED;
+	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot_;
 
 	//allocating bonuses to the weapon
 	weapon->loot_credits = credits_;
 	weapon->bonus_damage = bonus_damage_;
-	weapon->multishot = bonus_multishot_;
+	weapon->bonus_multishot = bonus_multishot_;
 	weapon->bonus_rate_of_fire = bonus_damage_;
 
 	return weapon;

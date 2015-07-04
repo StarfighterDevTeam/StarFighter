@@ -129,15 +129,16 @@ public:
 	static Equipment* CreateRandomShield(int credits_);
 	static Equipment* CreateRandomModule(int credits_);
 
+	int armor;
+	int shield;
+	int shield_regen;
+	int damage;
+
 private:
 	sf::Vector2f max_speed;
 	sf::Vector2f acceleration;
 	float decceleration;
 	float hyperspeed;
-	int armor;
-	int shield;
-	int shield_regen;
-	int damage;
 };
 
 class ShipConfig

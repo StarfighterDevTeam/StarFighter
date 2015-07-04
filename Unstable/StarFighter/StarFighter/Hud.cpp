@@ -138,9 +138,10 @@ void PlayerHud::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
 	this->hud_cursor->setAnimationLine(animation_index);
 }
 
-void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_max, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
-	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot,
-	float f_ammo_speed, PatternType f_pattern, int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
+void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_max, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, int ship_stats_multiplier, sf::Time deltaTime, bool hub,
+	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_armor_bonus, int f_shield, int f_shield_bonus, int f_shield_regen, int f_shield_regen_bonus,
+	int f_damage, int f_damage_bonus, bool f_bot, float f_ammo_speed, PatternType f_pattern,
+	int f_multishot, int f_multishot_bonus, int f_xspread, float f_rate_of_fire, int f_rate_of_fire_bonus, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
 	//armor and shield
 	if (m_armor <=0)
@@ -328,12 +329,13 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 			}
 			case Armor:
 			{
-				ss_stats << "HULL: " << f_name << "\nHull pts: " << f_armor;
+				//ss_stats << "HULL: " << f_name << "\nHull pts: " << f_armor;
+						  ss_stats << "HULL: " << f_name << "\nHull pts: " << floor(ship_stats_multiplier * (1 + (1.0f * f_armor_bonus / 100))) << " (+" << f_armor_bonus << "%)" << "\nDamage pts: " << floor(ship_stats_multiplier * (1 + (1.0f * f_damage_bonus / 100))) << " (+" << f_damage_bonus << "%)";
 				break;
 			}
 			case Shield:
 			{
-				ss_stats << "SHIELD: " << f_name << "\nMax shield pts: " << f_shield << "\nShield regen/sec: " << f_shield_regen;
+						   ss_stats << "SHIELD: " << f_name << "\nMax shield pts: " << floor(ship_stats_multiplier * (1 + (1.0f * f_shield_bonus / 100))) << " (+" << f_shield_bonus << "%)" << "\nShield regen/sec: " << floor(ship_stats_multiplier * (1 + (1.0f * f_shield_regen_bonus / 100))) << " (+" << f_shield_regen_bonus << "%)";
 				break;
 			}
 			case Module:
@@ -344,20 +346,20 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 					ss_stats << " \nAdding 1 drone. Drone stats:";
 					if (f_shot_mode != NoShotMode)
 					{
-						ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_damage;
+						ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100))) / 100;
 					}
 					else
 					{
-						ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
+						ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100) * f_multishot)) / 100;
 					}
 					
-					ss_stats << "\nDamage: " << f_damage;
+					ss_stats << "\nDamage: " << ship_stats_multiplier * (1 + (1.0f * f_damage_bonus / 100)) << " (+" << f_damage_bonus << "%)";
 					ss_stats << "\nAmmo speed: " << f_ammo_speed;
-					ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec";
+					ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec" << " (+" << f_rate_of_fire_bonus << "%)";
 
 					if (f_multishot > 1)
 					{
-						ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
+						ss_stats << "\nMultishot: " << f_multishot << " (+" << f_multishot_bonus << ")" << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
 					}
 					else
 					{
@@ -420,19 +422,20 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 				ss_stats << "MAIN WEAPON: " << f_name;
 				if (f_shot_mode != NoShotMode)
 				{
-					ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_damage;
+					ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100))) / 100;
 				}
 				else
 				{
-					ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
+					ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100) * f_multishot)) / 100;
 				}
-				ss_stats << "\nDamage: " << f_damage;
+
+				ss_stats << "\nDamage: " << ship_stats_multiplier * (1 + (1.0f * f_damage_bonus / 100)) << " (+" << f_damage_bonus << "%)";
 				ss_stats << "\nAmmo speed: " << f_ammo_speed;
-				ss_stats << "\nFire rate: " << (floor)(1/f_rate_of_fire * 100) / 100 << " shots/sec";
-				
+				ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec" << " (+" << f_rate_of_fire_bonus << "%)";
+
 				if (f_multishot > 1)
 				{
-					ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
+					ss_stats << "\nMultishot: " << f_multishot << " (+" << f_multishot_bonus << ")" << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
 				}
 				else
 				{

@@ -111,11 +111,13 @@ void Game::updateScene(Time deltaTime)
 }
 
 void Game::updateHud(int m_armor, int m_armor_max, int m_shield, int m_shield_max, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
-	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen, int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
-	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
+	int focused_item_type, string f_name, float f_max_speed, float f_hyperspeed, int f_armor, int f_armor_bonus, int f_shield, int f_shield_bonus, int f_shield_regen, int f_shield_regen_bonus, 
+	int f_damage, int f_damage_bonus, bool f_bot, float f_ammo_speed, PatternType f_pattern,
+	int f_multishot, int f_multishot_bonus, int f_xspread, float f_rate_of_fire, int f_rate_of_fire_bonus, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
-	this->hud.Update(m_armor, m_armor_max, m_shield, m_shield_max, m_money, m_graze_count, m_hazard_level, scene_name, level, level_max, xp, xp_max, deltaTime, hub, focused_item_type, f_name, f_max_speed, f_hyperspeed,
-		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
+	this->hud.Update(m_armor, m_armor_max, m_shield, m_shield_max, m_money, m_graze_count, m_hazard_level, scene_name, level, level_max, xp, xp_max, this->GetPlayerStatsMultiplierForLevel(level), deltaTime, hub, focused_item_type, f_name, f_max_speed, f_hyperspeed,
+		f_armor, f_armor_bonus, f_shield, f_shield_bonus, f_shield_regen, f_shield_regen_bonus, f_damage, f_damage_bonus, 
+		f_bot, f_ammo_speed, f_pattern, f_multishot, f_multishot_bonus, f_xspread, f_rate_of_fire, f_rate_of_fire_bonus, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 
 void Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)

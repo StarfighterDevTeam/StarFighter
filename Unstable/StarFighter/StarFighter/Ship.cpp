@@ -185,6 +185,8 @@ int Equipment::getEquipmentDamage()
 
 Equipment* Equipment::CreateRandomArmor(int credits_)
 {
+	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+
 	//Spending credits on the possible bonuses
 	int bonus_armor_ = 0;
 	int bonus_damage_ = 0;
@@ -227,6 +229,8 @@ Equipment* Equipment::CreateRandomArmor(int credits_)
 
 Equipment* Equipment::CreateRandomShield(int credits_)
 {
+	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+
 	//Spending credits on the possible bonuses
 	int bonus_shield_ = 0;
 	int bonus_shield_regen_ = 0;
@@ -269,6 +273,8 @@ Equipment* Equipment::CreateRandomShield(int credits_)
 
 Equipment* Equipment::CreateRandomModule(int credits_)
 {
+	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+
 	//Spending credits on the possible bonuses
 	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER));
 
@@ -1008,8 +1014,6 @@ void Ship::Init()
 		this->ship_config.weapon->multishot = ceil(MIN_VALUE_OF_MULTISHOT * BOT_STATS_MULTIPLIER) + this->ship_config.weapon->bonus_multishot;
 	}
 	
-	
-
 	printf("\nLEVEL %d. Stats:\n", level);
 	printf("armor: %d\n", armor_max);
 	printf("shield: %d\n", shield_max);
