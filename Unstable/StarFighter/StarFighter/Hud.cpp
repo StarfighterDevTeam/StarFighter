@@ -346,11 +346,11 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 					ss_stats << " \nAdding 1 drone. Drone stats:";
 					if (f_shot_mode != NoShotMode)
 					{
-						ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100))) / 100;
+						ss_stats << "\nDPS: " << floor(100.0f * (1.0f * ship_stats_multiplier / 100) / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (f_multishot - MIN_VALUE_OF_MULTISHOT) / 100))) / 100;
 					}
 					else
 					{
-						ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100) * f_multishot)) / 100;
+						ss_stats << "\nDPS: " << floor(100.0f * (1.0f * ship_stats_multiplier / 100) / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (f_multishot - MIN_VALUE_OF_MULTISHOT) / 100) / f_multishot)) / 100;
 					}
 					
 					ss_stats << "\nDamage: " << ship_stats_multiplier * (1 + (1.0f * f_damage_bonus / 100)) << " (+" << f_damage_bonus << "%)";
@@ -422,11 +422,11 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 				ss_stats << "MAIN WEAPON: " << f_name;
 				if (f_shot_mode != NoShotMode)
 				{
-					ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100))) / 100;
+					ss_stats << "\nDPS: " << floor(100.0f * (1.0f * ship_stats_multiplier / 100) / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (f_multishot - MIN_VALUE_OF_MULTISHOT) / 100))) / 100;
 				}
 				else
 				{
-					ss_stats << "\nDPS: " << floor(100.0f * ship_stats_multiplier / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot / 100) * f_multishot)) / 100;
+					ss_stats << "\nDPS: " << floor(100.0f * (1.0f * ship_stats_multiplier / 100) / f_rate_of_fire  * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (f_multishot - MIN_VALUE_OF_MULTISHOT) / 100) / f_multishot)) / 100;
 				}
 
 				ss_stats << "\nDamage: " << ship_stats_multiplier * (1 + (1.0f * f_damage_bonus / 100)) << " (+" << f_damage_bonus << "%)";

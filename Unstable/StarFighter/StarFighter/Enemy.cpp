@@ -960,8 +960,10 @@ void Enemy::Death()
 
 	//Loot
 	//CreateRandomLoot((*CurrentGame).BeastScoreBonus);
-	CreateRandomLootv2(this->enemy_class, (*CurrentGame).BeastScoreBonus);
-	GenerateLoot();
+	if (CreateRandomLootv2(this->enemy_class, (*CurrentGame).BeastScoreBonus))
+	{
+		GenerateLoot();
+	}
 
 	this->visible = false;
 	this->isOnScene = false;
@@ -1310,13 +1312,14 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 	}
 }
 
-void Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, bool force_BeastScale, float BeastScale_min, float BeastScale_max)
+bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, bool force_BeastScale, float BeastScale_min, float BeastScale_max)
 {
 	double random_number = (double)rand() / (RAND_MAX);
 
 	if (random_number > LootTable_DroppingSomething[loot_class])
 	{
 		//EMPTY DROP
+		return false;
 	}
 	else
 	{
@@ -1388,7 +1391,7 @@ void Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 		}
 	}
 
-	return;
+	return true;
 }
 
 int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p)

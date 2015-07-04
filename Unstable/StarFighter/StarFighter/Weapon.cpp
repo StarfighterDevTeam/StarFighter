@@ -524,6 +524,8 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 
 Weapon* Weapon::CreateRandomWeapon(int credits_)
 {
+	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+
 	//Spending credits on the possible bonuses
 	int bonus_multishot_ = 0;
 	int bonus_damage_ = 0;
