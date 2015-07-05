@@ -123,10 +123,12 @@ public:
 	int bonus_shield;
 	int bonus_shield_regen;
 	int bonus_damage;
+	int bonus_hyperspeed;
 	int loot_credits;
 
 	static Equipment* CreateRandomArmor(int credits_);
 	static Equipment* CreateRandomShield(int credits_);
+	static Equipment* CreateRandomEngine(int credits_);
 	static Equipment* CreateRandomModule(int credits_);
 
 	int armor;
@@ -162,6 +164,7 @@ public:
 	int getShipConfigShieldBonus();
 	int getShipConfigShieldRegenBonus();
 	int getShipConfigDamageBonus();
+	int getShipConfigHyperspeedBonus();
 	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true, bool overwrite = false);
 	bool setShipModel(ShipModel* m_ship_model);
 	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true, bool overwrite = false);
@@ -272,6 +275,8 @@ public :
 	void gain_xp (int xp_earned_);
 	void LevelUp();
 	int ship_base_stat_multiplier;
+
+	float hyperspeed;
 	
 private:
 	bool moving;

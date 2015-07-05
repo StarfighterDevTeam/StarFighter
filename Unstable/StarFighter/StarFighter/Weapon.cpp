@@ -49,12 +49,12 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 
 	//transmitting the value to the bullet
 	bullet->shot_angle = this->shot_angle;
-	
+
 	//calculation of bullet offset respect to the weapon position
 	float bullet_offset_x = offsetX * cos(this->shot_angle) - this->ammunition->m_size.y / 2 * sin(this->shot_angle);
 	float bullet_offset_y = offsetX * sin(this->shot_angle) + this->ammunition->m_size.y / 2 * cos(this->shot_angle);
 
- 	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
+	bullet->setPosition(this->getPosition().x + bullet_offset_x, this->getPosition().y + bullet_offset_y);
 
 	bullet->speed.x = bullet->ref_speed * sin(this->shot_angle + (l_dispersion *  M_PI / 180)) * (-this->fire_direction.y);
 	bullet->speed.y = bullet->ref_speed * cos(this->shot_angle + (l_dispersion *  M_PI / 180)) * (this->fire_direction.y);
@@ -64,7 +64,7 @@ void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float 
 	bullet->visible = true;
 	bullet->collider_type = m_collider_type;
 	bullet->isOnScene = true;
-	
+
 	if (m_collider_type == FriendlyFire)
 	{
 		(*CurrentGame).addToScene(bullet, FriendlyFireLayer, m_collider_type);
@@ -148,7 +148,7 @@ void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyp
 			{
 				FireDescendingShot(m_collider_type);
 			}
-				
+
 			if (shot_index == 0)
 			{
 				fire_pattern_return = !fire_pattern_return;
@@ -255,11 +255,11 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 			CreateBullet(m_collider_type, (((shot_index / 2) + 1)*xspread) - (xspread / 2), ((shot_index / 2) + 1)*dispersion / (multishot - 1) - (dispersion / (multishot - 1) / 2));
 		}
 	}
-	
+
 	if (shot_index < multishot - 1)
 	{
 		shot_index++;
-	}	
+	}
 	else
 	{
 		shot_index = 0;
@@ -274,13 +274,13 @@ void Weapon::FireAscendingShot(IndependantType m_collider_type)
 		//left and center bullets (from left to right)
 		if (shot_index < (((multishot - 1) / 2) + 1))
 		{
-			CreateBullet(m_collider_type, (-((multishot - 1) / 2) + shot_index)*xspread, (-((multishot-1)/2) + shot_index)*(dispersion/(multishot-1)));
+			CreateBullet(m_collider_type, (-((multishot - 1) / 2) + shot_index)*xspread, (-((multishot - 1) / 2) + shot_index)*(dispersion / (multishot - 1)));
 		}
 		//right
 		else
 		{
 			CreateBullet(m_collider_type, (shot_index - ((multishot - 1) / 2))*xspread, (shot_index - ((multishot - 1) / 2))*(dispersion / (multishot - 1)));
-		}	
+		}
 	}
 
 	if (multishot % 2 == 0) //case of an odd number of bullets
@@ -300,7 +300,7 @@ void Weapon::FireAscendingShot(IndependantType m_collider_type)
 	if (shot_index < multishot - 1)
 	{
 		shot_index++;
-	}	
+	}
 	else
 	{
 		shot_index = 0;
@@ -401,48 +401,48 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 		//	this->display_name = "Rapide-fire laser";
 		//	break;
 		//}
-		case 0:
-		{
-			this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
-			if (multishot > 1)
-			{
-				this->xspread = RandomizeIntBetweenFloats(sf::Vector2f(0, 32));
-				if (this->xspread * multishot > this->size.x)
-				{
-					this->xspread = this->size.x / multishot;
-				}
-				this->display_name = "Multi-shot laser";
-			}
+	case 0:
+	{
+			  this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
+			  if (multishot > 1)
+			  {
+				  this->xspread = RandomizeIntBetweenFloats(sf::Vector2f(0, 32));
+				  if (this->xspread * multishot > this->size.x)
+				  {
+					  this->xspread = this->size.x / multishot;
+				  }
+				  this->display_name = "Multi-shot laser";
+			  }
 
-			double dispersion_chance = (double)rand() / (RAND_MAX);
-			if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)
-			{
-				int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_ANGLE + 1);
-				this->dispersion = dispersion_roll;
-				this->display_name = "Dispersion laser";
-			}
+			  double dispersion_chance = (double)rand() / (RAND_MAX);
+			  if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)
+			  {
+				  int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_ANGLE + 1);
+				  this->dispersion = dispersion_roll;
+				  this->display_name = "Dispersion laser";
+			  }
 
-			double alternate_chance = (double)rand() / (RAND_MAX);
-			if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE)
-			{
-				this->shot_mode = ShotMode::AlternateShotMode;
-			}
-			else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING)
-			{
-				this->shot_mode = ShotMode::AscendingShotMode;
-			}
-			else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING + WEAPON_CHANCE_OF_DESCENDING)
-			{
-				this->shot_mode = ShotMode::DescendingShotMode;
-			}
-			break;
-		}
-		case 1:
-		{
-			this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale)));
-			this->display_name = "Lightning-speed laser";
-			break;
-		}
+			  double alternate_chance = (double)rand() / (RAND_MAX);
+			  if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE)
+			  {
+				  this->shot_mode = ShotMode::AlternateShotMode;
+			  }
+			  else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING)
+			  {
+				  this->shot_mode = ShotMode::AscendingShotMode;
+			  }
+			  else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING + WEAPON_CHANCE_OF_DESCENDING)
+			  {
+				  this->shot_mode = ShotMode::DescendingShotMode;
+			  }
+			  break;
+	}
+	case 1:
+	{
+			  this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale)));
+			  this->display_name = "Lightning-speed laser";
+			  break;
+	}
 		//case 3:
 		//{
 		//	//this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
@@ -460,11 +460,11 @@ void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f Beas
 		//	this->display_name = "Power laser";
 		//	break;
 		//}
-		default:
-		{
-			printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
-			break;
-		}
+	default:
+	{
+			   printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -472,31 +472,31 @@ void Weapon::AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f B
 {
 	switch (chosen_property)
 	{
-		case 0:
-		{
-			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER));
-			break;
-		}
-		case 1:
-		{
-			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER));
-			break;
-		}
-		case 2:
-		{
-			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER));
-			break;
-		}
-		case 3:
-		{
-			AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER));
-			break;
-		}
-		default:
-		{
-			printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
-			break;
-		}
+	case 0:
+	{
+			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER));
+			  break;
+	}
+	case 1:
+	{
+			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER));
+			  break;
+	}
+	case 2:
+	{
+			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER));
+			  break;
+	}
+	case 3:
+	{
+			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER));
+			  break;
+	}
+	default:
+	{
+			   printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
+			   break;
+	}
 	}
 }
 
@@ -562,21 +562,21 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 		{
 		case 0://multishot
 		{
-				   loot_credits_remaining_ -= CREDITS_COST_PER_ONE_MULTISHOT;
-				   bonus_multishot_++;
-				   break;
+			loot_credits_remaining_ -= CREDITS_COST_PER_ONE_MULTISHOT;
+			bonus_multishot_++;
+			break;
 		}
 		case 1://flat bonus damage
 		{
-				   loot_credits_remaining_--;
-				   bonus_damage_++;
-				   break;
+			loot_credits_remaining_--;
+			bonus_damage_++;
+			break;
 		}
 		case 2://rate of fire
 		{
-				   loot_credits_remaining_--;
-				   bonus_rate_of_fire_++;
-				   break;
+			loot_credits_remaining_--;
+			bonus_rate_of_fire_++;
+			break;
 		}
 		default:
 			break;
@@ -593,7 +593,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 	weapon->frameNumber = 1;
 
 	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
-	
+
 	weapon->display_name = "Laser standard";
 	weapon->target_seaking = SEAKING;
 

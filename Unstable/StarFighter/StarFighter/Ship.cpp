@@ -80,6 +80,7 @@ Equipment::Equipment()
 	this->shield = 0;
 	this->shield_regen = 0;
 	this->damage = 0;
+	this->hyperspeed = 0;
 	this->size.x = EQUIPMENT_SIZE;
 	this->size.y = EQUIPMENT_SIZE;
 	this->textureName = EMPTYSLOT_FILENAME;
@@ -92,6 +93,7 @@ Equipment::Equipment()
 	this->bonus_shield = 0;
 	this->bonus_shield_regen = 0;
 	this->bonus_damage = 0;
+	this->bonus_hyperspeed = 0;
 }
 
 Equipment::~Equipment()
@@ -119,6 +121,7 @@ Equipment* Equipment::Clone()
 	new_equipment->bonus_shield = this->bonus_shield;
 	new_equipment->bonus_shield_regen = this->bonus_shield_regen;
 	new_equipment->bonus_damage = this->bonus_damage;
+	new_equipment->bonus_hyperspeed = this->bonus_hyperspeed;
 
 	return new_equipment;
 }
@@ -271,6 +274,24 @@ Equipment* Equipment::CreateRandomShield(int credits_)
 	return equipment;
 }
 
+Equipment* Equipment::CreateRandomEngine(int credits_)
+{
+	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+
+	//Spending credits on the possible bonuses
+	int bonus_hyperspeed_ = credits_;
+
+	//Creating the item
+	Equipment* equipment = new Equipment();
+	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
+
+	//allocating bonuses to the weapon
+	equipment->loot_credits = credits_;
+	equipment->bonus_hyperspeed = bonus_hyperspeed_;
+
+	return equipment;
+}
+
 Equipment* Equipment::CreateRandomModule(int credits_)
 {
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
@@ -296,6 +317,7 @@ Equipment* Equipment::CreateRandomModule(int credits_)
 
 	bot->weapon = weapon;
 	equipment->bot = bot;
+	equipment->hasBot = true;
 
 	//allocating bonuses to the weapon
 	equipment->loot_credits = credits_;
@@ -720,6 +742,25 @@ int ShipConfig::getShipConfigDamageBonus()
 	return new_bonus_damage;
 }
 
+int ShipConfig::getShipConfigHyperspeedBonus()
+{
+	int new_bonus_hyperspeed = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (this->equipment[i] != NULL)
+		{
+			new_bonus_hyperspeed += equipment[i]->bonus_hyperspeed;
+		}
+		else
+		{
+			new_bonus_hyperspeed += 0;
+		}
+	}
+
+	return new_bonus_hyperspeed;
+}
+
 sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
 {
 	sf::Vector2f new_max_speed = sf::Vector2f(0, 0);
@@ -932,6 +973,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->movingX = movingY = false;
 	this->visible = true;
 	this->damage = 0;
+	this->hyperspeed = 1.0f;
 	this->shield = m_ship_config.getShipConfigShield();;
 	this->disable_inputs = false;
 	this->disable_fire = false;
@@ -1000,6 +1042,7 @@ void Ship::Init()
 	}
 	this->shield_regen = ceil(multiplier_ * this->ship_config.getShipConfigShieldRegen() * (1 + (1.0f * this->ship_config.getShipConfigShieldRegenBonus() / 100)));
 	this->damage = ceil(multiplier_ * this->ship_config.getShipConfigDamage() * (1 + (1.0f * this->ship_config.getShipConfigDamageBonus() / 100)));
+	this->hyperspeed = ceil(multiplier_ * this->ship_config.getShipConfigHyperspeed() * (1 + (1.0f * this->ship_config.getShipConfigHyperspeedBonus() / 100)));
 
 	this->ship_config.weapon->ammunition->damage = ceil(multiplier_ * this->ship_config.weapon->ammunition->damage * (1 + (1.0f * this->ship_config.weapon->bonus_damage / 100))
 		* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (this->ship_config.weapon->multishot - MIN_VALUE_OF_MULTISHOT) / 100)));
@@ -1171,7 +1214,8 @@ void Ship::ManageOpeningHud()
 
 			if (isFocusedOnHud && !isSlowMotion)
 			{
-				(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
+				(*CurrentGame).hyperspeedMultiplier = 1.0f / this->hyperspeed;
+				printf("");
 			}
 			else if (!isFocusedOnHud && !isSlowMotion)
 			{
@@ -1390,7 +1434,7 @@ void Ship::ManageSlowMotion()
 			this->slowmo_key_repeat = true;
 			if (this->isSlowMotion)
 			{
-				(*CurrentGame).hyperspeedMultiplier = 1.0f / this->ship_config.getShipConfigHyperspeed();
+				(*CurrentGame).hyperspeedMultiplier = 1.0f / this->hyperspeed;
 			}
 			else
 			{
@@ -1410,7 +1454,7 @@ void Ship::ManageHyperspeed()
 	if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion && (isCollindingWithInteractiveObject == No_Interaction))
 	{
 		this->isHyperspeeding = true;
-		(*CurrentGame).hyperspeedMultiplier = this->ship_config.getShipConfigHyperspeed();
+		(*CurrentGame).hyperspeedMultiplier = this->hyperspeed;
 	}
 	else if (!this->isSlowMotion)
 	{

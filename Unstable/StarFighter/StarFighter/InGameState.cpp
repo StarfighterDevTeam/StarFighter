@@ -138,8 +138,8 @@ void InGameState::Update(Time deltaTime)
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->armor_max, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->shield_max, (*CurrentGame).playerShip->getMoney(),
 					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
-					equip_index_, tmp_equipment->display_name, tmp_equipment->getEquipmentMaxSpeed().x, tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->getEquipmentArmor(), tmp_equipment->bonus_armor,
-					tmp_equipment->getEquipmentShield(), tmp_equipment->bonus_shield, tmp_equipment->getEquipmentShieldRegen(), tmp_equipment->bonus_shield_regen, tmp_equipment->getEquipmentDamage(), tmp_equipment->bonus_damage, tmp_equipment->hasBot);
+					equip_index_, tmp_equipment->display_name, tmp_equipment->getEquipmentMaxSpeed().x, (*CurrentGame).playerShip->ship_config.getShipConfigHyperspeed(), (*CurrentGame).playerShip->ship_config.getShipConfigArmor(), tmp_equipment->bonus_armor,
+					(*CurrentGame).playerShip->ship_config.getShipConfigShield(), tmp_equipment->bonus_shield, (*CurrentGame).playerShip->ship_config.getShipConfigShieldRegen(), tmp_equipment->bonus_shield_regen, (*CurrentGame).playerShip->ship_config.getShipConfigDamage(), tmp_equipment->bonus_damage, tmp_equipment->hasBot);
 			}
 			else
 			{
