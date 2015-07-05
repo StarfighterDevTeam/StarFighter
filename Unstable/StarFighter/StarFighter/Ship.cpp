@@ -1056,12 +1056,6 @@ void Ship::Init()
 		this->ship_config.weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * (*it)->weapon->bonus_rate_of_fire / 100));
 		this->ship_config.weapon->multishot = ceil(MIN_VALUE_OF_MULTISHOT * BOT_STATS_MULTIPLIER) + this->ship_config.weapon->bonus_multishot;
 	}
-	
-	printf("\nLEVEL %d. Stats:\n", level);
-	printf("armor: %d\n", armor_max);
-	printf("shield: %d\n", shield_max);
-	printf("shield_regen: %d\n", shield_regen);
-	printf("ammo damage: %d\n", ship_config.weapon->ammunition->damage);
 
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;

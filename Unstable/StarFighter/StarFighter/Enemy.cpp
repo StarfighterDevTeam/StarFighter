@@ -1355,7 +1355,6 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			int properties_to_choose_from = LootTable_MaxPropertiesPerEquipmentType[equipment_type_roll];
 
 			//"Spending credits" on item stats
-			equipment_type_roll = 2;
 			switch (equipment_type_roll)
 			{
 				case (int)EquipmentType::Engine:
