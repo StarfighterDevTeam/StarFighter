@@ -526,6 +526,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 {
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
+	int cost_per_multishot_ = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), (*CurrentGame).level - 1));
 	//Spending credits on the possible bonuses
 	int bonus_multishot_ = 0;
 	int bonus_damage_ = 0;
@@ -537,7 +538,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 		int random_type_of_bonus_ = -1;
 
 		//limitations per bonus
-		if (credits_ > CREDITS_COST_PER_ONE_MULTISHOT && bonus_rate_of_fire_ < MAX_RATE_OF_FIRE_BONUS)
+		if (credits_ > cost_per_multishot_ && bonus_rate_of_fire_ < MAX_RATE_OF_FIRE_BONUS)
 		{
 			random_type_of_bonus_ = RandomizeIntBetweenValues(0, 2);
 		}
@@ -547,7 +548,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 			random_type_of_bonus_ = RandomizeIntBetweenValues(1, 2);
 		}
 		//max rate of fire bonus reached
-		else if (credits_ > CREDITS_COST_PER_ONE_MULTISHOT)
+		else if (credits_ > cost_per_multishot_)
 		{
 			random_type_of_bonus_ = RandomizeIntBetweenValues(0, 1);
 		}
@@ -562,7 +563,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 		{
 		case 0://multishot
 		{
-			loot_credits_remaining_ -= CREDITS_COST_PER_ONE_MULTISHOT;
+			loot_credits_remaining_ -= cost_per_multishot_;
 			bonus_multishot_++;
 			break;
 		}

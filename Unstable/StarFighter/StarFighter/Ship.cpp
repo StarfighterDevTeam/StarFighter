@@ -283,7 +283,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
+	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//allocating bonuses to the weapon
 	equipment->loot_credits = credits_;
@@ -1045,16 +1045,16 @@ void Ship::Init()
 	this->hyperspeed = ceil(multiplier_ * this->ship_config.getShipConfigHyperspeed() * (1 + (1.0f * this->ship_config.getShipConfigHyperspeedBonus() / 100)));
 
 	this->ship_config.weapon->ammunition->damage = ceil(multiplier_ * this->ship_config.weapon->ammunition->damage * (1 + (1.0f * this->ship_config.weapon->bonus_damage / 100))
-		* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (this->ship_config.weapon->multishot - MIN_VALUE_OF_MULTISHOT) / 100)));
+		* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (this->ship_config.weapon->bonus_multishot) / 100)));
 	this->ship_config.weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * ship_config.weapon->bonus_rate_of_fire / 100));
 	this->ship_config.weapon->multishot = MIN_VALUE_OF_MULTISHOT + this->ship_config.weapon->bonus_multishot;
 
 	for (std::vector<Bot*>::iterator it = (this->ship_config.bot_list.begin()); it != (this->ship_config.bot_list.end()); it++)
 	{
 		(*it)->weapon->ammunition->damage = ceil(multiplier_ * FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * (*it)->weapon->bonus_damage / 100))
-			* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * ((*it)->weapon->multishot - MIN_VALUE_OF_MULTISHOT) / 100)));
-		this->ship_config.weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * (*it)->weapon->bonus_rate_of_fire / 100));
-		this->ship_config.weapon->multishot = ceil(MIN_VALUE_OF_MULTISHOT * BOT_STATS_MULTIPLIER) + this->ship_config.weapon->bonus_multishot;
+			* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * ((*it)->weapon->bonus_multishot) / 100)));
+		(*it)->weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * (*it)->weapon->bonus_rate_of_fire / 100));
+		(*it)->weapon->multishot = ceil(MIN_VALUE_OF_MULTISHOT * BOT_STATS_MULTIPLIER) + (*it)->weapon->bonus_multishot;
 	}
 
 	this->m_size = this->ship_config.ship_model->size;
@@ -1246,7 +1246,7 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//sheld regen if not maximum
 	static double shield_regen_buffer = 0;
-	if (shield < ship_config.getShipConfigShield())
+	if (shield < shield_max)
 	{
 		if (hyperspeedMultiplier < 1.0f)
 		{
@@ -1265,9 +1265,9 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 
 		//canceling over-regen
-		if (shield > ship_config.getShipConfigShield())
+		if (shield > shield_max)
 		{
-			shield = ship_config.getShipConfigShield();
+			shield = shield_max;
 		}
 	}
 }
