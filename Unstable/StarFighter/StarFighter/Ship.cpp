@@ -1044,7 +1044,7 @@ void Ship::Init()
 	this->damage = ceil(multiplier_ * this->ship_config.getShipConfigDamage() * (1 + (1.0f * this->ship_config.getShipConfigDamageBonus() / 100)));
 	this->hyperspeed = ceil(multiplier_ * this->ship_config.getShipConfigHyperspeed() * (1 + (1.0f * this->ship_config.getShipConfigHyperspeedBonus() / 100)));
 
-	this->ship_config.weapon->ammunition->damage = ceil(multiplier_ * this->ship_config.weapon->ammunition->damage * (1 + (1.0f * this->ship_config.weapon->bonus_damage / 100))
+	this->ship_config.weapon->ammunition->damage = ceil(multiplier_ * FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * this->ship_config.weapon->bonus_damage / 100))
 		* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (this->ship_config.weapon->bonus_multishot) / 100)));
 	this->ship_config.weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * ship_config.weapon->bonus_rate_of_fire / 100));
 	this->ship_config.weapon->multishot = MIN_VALUE_OF_MULTISHOT + this->ship_config.weapon->bonus_multishot;
@@ -1060,6 +1060,8 @@ void Ship::Init()
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
 	this->transparent = this->ship_config.ship_model->hasFake;
+
+	printf("damage: %d\n", this->ship_config.weapon->ammunition->damage);
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
