@@ -355,7 +355,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 
 					ss_stats << "\nDamage: " << ceil((1.0f * ship_stats_multiplier / 100) * FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot_bonus))) << " (+" << f_damage_bonus + (CREDITS_COST_PER_ONE_MULTISHOT * f_multishot_bonus) << "%)";
 					ss_stats << "\nAmmo speed: " << f_ammo_speed;
-					ss_stats << "\nFire rate: " << (ceil)(1.0f / FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * f_rate_of_fire_bonus / 100)) * 100) / 100 << " shots/sec" << " (+" << f_rate_of_fire_bonus << "%)";
+					ss_stats << "\nFire rate: " << (ceil)(1.0f / FIRST_LEVEL_RATE_OF_FIRE * (1 + (1.0f * f_rate_of_fire_bonus / 100)) * 100) / 100 << " shots/sec" << " (+" << f_rate_of_fire_bonus << "%)";
 
 					if (f_multishot > 1)
 					{
@@ -432,7 +432,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 
 				ss_stats << "\nDamage: " << ceil((1.0f * ship_stats_multiplier / 100) * FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * f_damage_bonus / 100)) * (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * f_multishot_bonus))) << " (+" << f_damage_bonus + (CREDITS_COST_PER_ONE_MULTISHOT * f_multishot_bonus) << "%)";
 				ss_stats << "\nAmmo speed: " << f_ammo_speed;
-				ss_stats << "\nFire rate: " << (ceil)(1.0f / FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * f_rate_of_fire_bonus / 100)) * 100) / 100 << " shots/sec" << " (+" << f_rate_of_fire_bonus << "%)";
+				ss_stats << "\nFire rate: " << (ceil)(1.0f / FIRST_LEVEL_RATE_OF_FIRE * (1 + (1.0f * f_rate_of_fire_bonus / 100)) * 100) / 100 << " shots/sec" << " (+" << f_rate_of_fire_bonus << "%)";
 
 				if (f_multishot > 1)
 				{

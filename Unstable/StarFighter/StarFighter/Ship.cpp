@@ -1060,8 +1060,6 @@ void Ship::Init()
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
 	this->transparent = this->ship_config.ship_model->hasFake;
-
-	printf("damage: %d\n", this->ship_config.weapon->ammunition->damage);
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
