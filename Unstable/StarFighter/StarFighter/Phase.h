@@ -103,6 +103,9 @@ class Phase
 {
 public:
 	Phase();
+	virtual ~Phase();
+	Phase* Clone();
+
 	string display_name;
 	string m_name;
 	vector<Weapon*> weapons_list;
@@ -128,7 +131,6 @@ public:
 	ConditionType condition;
 	FloatCompare op;
 	float value;
-	Phase* nextPhase;
 	std::string nextPhase_name;
 };
 

@@ -28,8 +28,8 @@ Weapon::Weapon(Ammo* Ammunition)
 
 Weapon::~Weapon()
 {
+	//TODO: destructor ammo ?
 	delete this->ammunition;
-	this->ammunition = NULL;
 }
 
 void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)

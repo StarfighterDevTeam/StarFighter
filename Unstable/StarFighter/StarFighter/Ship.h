@@ -88,7 +88,7 @@ class Equipment
 public:
 	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
-	~Equipment();
+	virtual ~Equipment();
 	Equipment* Clone();
 	std::string textureName;
 	sf::Vector2f size;
@@ -133,6 +133,7 @@ class ShipConfig
 public:
 	void Init();
 	ShipConfig();
+	virtual ~ShipConfig();
 	std::string textureName;
 	sf::Vector2f size;
 
@@ -174,6 +175,7 @@ class Ship : public Independant
 {
 public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
+	virtual ~Ship();
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void ManageDebugCommand();

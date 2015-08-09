@@ -50,6 +50,24 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	//shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	shieldBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+
+	currentPhaseIndex = -1;
+}
+
+Enemy::~Enemy()
+{
+	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+	{
+		delete (*it);
+	}
+	//delete FX_death;	// TODO: to be cloned
+	// TODO
+//	for (std::vector<Phase*>::iterator it = this->phases.begin(); it != this->phases.end(); it++)
+//		delete (*it);
+	delete armorBar;
+	delete armorBarContainer;
+	delete shieldBar;
+	delete shieldBarContainer;
 }
 
 void Enemy::UpdateHealthBars(sf::Time deltaTime)
@@ -164,9 +182,10 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	bool l_ghost = false;
 	if (this->hasPhases)
 	{
-		for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
+		const Phase*	currentPhase	= phases[currentPhaseIndex];
+		for (int i = 0; i < currentPhase->modifiers.size(); i++)
 		{
-			l_ghost = l_ghost || (this->currentPhase->modifiers[i] == Ghost);
+			l_ghost = l_ghost || (currentPhase->modifiers[i] == Ghost);
 		}
 	}
 	this->setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
@@ -233,7 +252,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
-					this->currentPhase->Pattern->patternSpeed *= -1;
+					const Phase*	currentPhase = phases[currentPhaseIndex];
+					currentPhase->Pattern->patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, this->m_size.y / 2);
 			}
@@ -246,7 +266,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
-					this->currentPhase->Pattern->patternSpeed *= -1;
+					const Phase*	currentPhase = phases[currentPhaseIndex];
+					currentPhase->Pattern->patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 			}
@@ -422,7 +443,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//phases
 	if (this->hasPhases)
 	{
-		if (this->currentPhase->hasTransition)
+		const Phase*	currentPhase = phases[currentPhaseIndex];
+		if (currentPhase->hasTransition)
 		{
 			this->CheckCondition();
 		}
@@ -471,7 +493,8 @@ Enemy* Enemy::Clone()
 {
 	sf::Vector2f s = this->speed;
 
-	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death, this->frameNumber, this->animationNumber);
+	// TODO: clone FX death + add to destructor...
+	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death->Clone(), this->frameNumber, this->animationNumber);
 
 	((Independant*)enemy)->armor = this->getIndependantArmor();
 	((Independant*)enemy)->armor_max = this->getIndependantArmorMax();
@@ -500,12 +523,13 @@ Enemy* Enemy::Clone()
 	if (this->hasPhases)
 	{
 		enemy->hasPhases = this->hasPhases;
-		enemy->currentPhase = this->currentPhase;
-		enemy->setPhase(this->currentPhase);
+		enemy->currentPhaseIndex = this->currentPhaseIndex;
 		for (std::vector<Phase*>::iterator it = (this->phases.begin()); it != (this->phases.end()); it++)
 		{
-			enemy->phases.push_back((*it));
+			enemy->phases.push_back((*it)->Clone());
 		}
+
+		enemy->setPhaseByName(enemy->phases[enemy->currentPhaseIndex]->m_name);
 	}
 
 	return enemy;
@@ -526,7 +550,8 @@ Phase* Enemy::getPhase(string phaseName)
 
 bool Enemy::CheckCondition()
 {
-	for (std::vector<ConditionTransition*>::iterator it = (this->currentPhase->transitions_list.begin()); it != (this->currentPhase->transitions_list.end()); it++)
+	Phase*	currentPhase = phases[currentPhaseIndex];
+	for (std::vector<ConditionTransition*>::iterator it = (currentPhase->transitions_list.begin()); it != (currentPhase->transitions_list.end()); it++)
 	{
 		switch ((*it)->condition)
 		{
@@ -535,7 +560,7 @@ bool Enemy::CheckCondition()
 				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->value));
 				if (result == (*it)->op)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					return true;
 				}
 													  
@@ -547,7 +572,7 @@ bool Enemy::CheckCondition()
 				FloatCompare result = this->compare_posX_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value, (*it)->value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				if (result == (*it)->op)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					return true;
 				}
 			
@@ -558,12 +583,12 @@ bool Enemy::CheckCondition()
 			{
 				if ((this->phaseTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					return true;
 				}
 				else if ((this->phaseTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					return true;
 				}
 
@@ -574,13 +599,13 @@ bool Enemy::CheckCondition()
 			{
 				if ((this->enemyTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					this->enemyTimer = sf::seconds(0);
 					return true;
 				}
 				else if ((this->enemyTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					this->enemyTimer = sf::seconds(0);
 					return true;
 				}
@@ -592,13 +617,13 @@ bool Enemy::CheckCondition()
 			{
 				if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 
 					return true;
 				}
 				else if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					return true;
 				}
 				break;
@@ -615,7 +640,7 @@ bool Enemy::CheckCondition()
 					}
 					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 					break;
@@ -624,12 +649,12 @@ bool Enemy::CheckCondition()
 				{
 					if (this->getIndependantShieldMax() == 0)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 					break;
@@ -640,14 +665,14 @@ bool Enemy::CheckCondition()
 					{
 						if ((*it)->value == 0)
 						{
-							this->setPhase(this->getPhase((*it)->nextPhase_name));
+							this->setPhaseByName((*it)->nextPhase_name);
 							return true;
 						}
 						break;
 					}
 					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() == (*it)->value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 					break;
@@ -658,7 +683,7 @@ bool Enemy::CheckCondition()
 			{
 				if (this->wake_up)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhaseByName((*it)->nextPhase_name);
 					return true;
 				}
 				break;
@@ -670,7 +695,7 @@ bool Enemy::CheckCondition()
 				{
 					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_OUT_OF_RANGE)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 				}
@@ -678,7 +703,7 @@ bool Enemy::CheckCondition()
 				{
 					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_IN_RANGE)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 				}							  
@@ -691,7 +716,7 @@ bool Enemy::CheckCondition()
 				{
 					if (this->m_shots_fired >= (*it)->value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 				}
@@ -699,7 +724,7 @@ bool Enemy::CheckCondition()
 				{
 					if (this->m_shots_fired == (*it)->value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 				}
@@ -707,7 +732,7 @@ bool Enemy::CheckCondition()
 				{
 					if (this->m_shots_fired < (*it)->value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhaseByName((*it)->nextPhase_name);
 						return true;
 					}
 				}
@@ -719,10 +744,20 @@ bool Enemy::CheckCondition()
 	return false;
 }
 
-void Enemy::setPhase(Phase* phase)
+void Enemy::setPhaseByName(const std::string& phaseName)
 {
+	Phase*	phase = NULL;
+	for (size_t i = 0; i < this->phases.size(); i++)
+	{
+		if (phases[i]->m_name == phaseName)
+		{
+			phase = phases[i];
+			currentPhaseIndex = i;
+			break;
+		}
+	}
+
 	assert(phase != NULL);
-	this->currentPhase = phase;
 	this->m_shots_fired = 0;
 
 	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
@@ -735,7 +770,7 @@ void Enemy::setPhase(Phase* phase)
 	this->bouncing = NoBouncing;
 
 	//load new stats
-	for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
+	for (int i = 0; i < phase->modifiers.size(); i++)
 	{
 		switch (phase->modifiers[i])
 		{
@@ -834,6 +869,12 @@ void Enemy::setPhase(Phase* phase)
 	}
 
 	this->phaseTimer = sf::seconds(0);
+}
+
+void Enemy::setFirstPhase()
+{
+	assert(hasPhases == true);
+	setPhaseByName(phases[0]->m_name);
 }
 
 Phase* Enemy::LoadPhase(string name)
@@ -1220,9 +1261,9 @@ void Enemy::CreateRandomLoot(float BeastScaleBonus)
 					bot->vspeed = 300;
 					bot->spread = sf::Vector2f(-50,0);
 
-					vector<float>* v = new vector<float>;
-					//v->push_back(bot->radius); // rayon 500px
-					//v->push_back(1);  // clockwise (>)
+					vector<float> v;
+					//v.push_back(bot->radius); // rayon 500px
+					//v.push_back(1);  // clockwise (>)
 					PatternType pattern_type = PatternType::NoMovePattern;
 					bot->Pattern.SetPattern(pattern_type,bot->vspeed,v); //vitesse angulaire (degres/s)
 

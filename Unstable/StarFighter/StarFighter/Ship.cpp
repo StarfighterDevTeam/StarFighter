@@ -93,7 +93,7 @@ Equipment::~Equipment()
 {
 	if (this->hasBot)
 	{
-		this->bot->~Bot();
+		delete bot;
 		this->hasBot = false;
 	}
 }
@@ -373,6 +373,27 @@ ShipConfig::ShipConfig()
 	}
 
 	this->weapon = NULL;
+	this->FX_death = NULL;
+	this->m_fake_ship = NULL;
+}
+
+ShipConfig::~ShipConfig()
+{
+	// TODO
+//	delete weapon;
+//
+//	for (int i = 0; i < _countof(equipment); i++)
+//		delete equipment[i];
+//
+//	delete FX_death;
+//	delete m_fake_ship;
+//
+//	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
+//	{
+//		delete (*it);
+//	}
+//
+//	delete ship_model;
 }
 
 void ShipConfig::Init()
@@ -736,9 +757,9 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->disabledHyperspeed = false;
 	this->graze_count = 0;
 	this->graze_level = 0;
-	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
-	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
-	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
+	this->m_combo_aura[GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
+	this->m_combo_aura[GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
+	this->m_combo_aura[GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
 	this->trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	this->trail->visible = false;
 	if (this->ship_config.ship_model->hasFake)
@@ -769,6 +790,13 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isCollindingWithInteractiveObject = No_Interaction;
 
 	this->Init();
+}
+
+Ship::~Ship()
+{
+	for (int i = 0; i < _countof(this->m_combo_aura); i++)
+		delete this->m_combo_aura[i];
+	delete this->trail;
 }
 
 void Ship::Init()

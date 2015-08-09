@@ -33,6 +33,7 @@ class Enemy : public Independant
 {
 public:
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber = 1, int m_animationNumber = 1);
+	virtual ~Enemy();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void UpdateHealthBars(sf::Time deltaTime);
 	vector<Weapon*> weapons_list;
@@ -48,9 +49,10 @@ public:
 	EnemyClass enemy_class;
 
 	//phases
-	void setPhase(Phase* phase);
+	void setPhaseByName(const std::string& phaseName);
+	void setFirstPhase();
 	Phase* getPhase(string phaseName);
-	Phase* currentPhase;
+	int currentPhaseIndex;
 	vector <Phase*> phases;
 	bool hasPhases;
 	bool CheckCondition();

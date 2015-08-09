@@ -16,7 +16,7 @@ class Weapon : public sf::Sprite
 
 public:
 	Weapon(Ammo* Ammunition);
-	~Weapon();
+	virtual ~Weapon();
 
 	std::string textureName;
 	sf::Vector2f size;

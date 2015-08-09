@@ -33,11 +33,11 @@ class PatternBobby : virtual public IPatternHandler
 
 public:
 	PatternBobby();
-	void SetPattern(PatternType pt, float patternSpeed, vector<float>*  args);
+	void SetPattern(PatternType pt, float patternSpeed, const vector<float>&  args);
 	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
 	static PatternBobby* PatternLoader(vector<string> line_data, int index);
 	PatternType currentPattern;
-	vector<float>* patternParams;
+	vector<float> patternParams;
 	float patternSpeed;
 
 private:
