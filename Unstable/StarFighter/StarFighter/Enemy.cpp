@@ -879,7 +879,8 @@ void Enemy::setFirstPhase()
 
 Phase* Enemy::LoadPhase(string name)
 {
-	vector<vector<string>> phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
+	vector<vector<string>> phaseConfig;
+	FileLoaderUtils::FileLoader(PHASES_FILE, &phaseConfig);
 
 	for (std::vector<vector<string>>::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
 	{
@@ -1360,7 +1361,8 @@ int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_
 
 Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 {
-	vector<vector<string>> weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
+	vector<vector<string>> weaponConfig;
+	FileLoaderUtils::FileLoader(WEAPON_FILE, &weaponConfig);
 
 	for (std::vector<vector<string>>::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
 	{
@@ -1424,7 +1426,8 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 
 Ammo* Enemy::LoadAmmo(string name)
 {
-	vector<vector<string>> ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
+	vector<vector<string>> ammoConfig;
+	FileLoaderUtils::FileLoader(AMMO_FILE, &ammoConfig);
 
 	for (std::vector<vector<string>>::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
 	{
@@ -1449,7 +1452,8 @@ Ammo* Enemy::LoadAmmo(string name)
 
 FX* Enemy::LoadFX(string name)
 {
-	vector<vector<string>>FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
+	vector<vector<string>>FXConfig;
+	FileLoaderUtils::FileLoader(FX_FILE, &FXConfig);
 
 	for (std::vector<vector<string>>::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
 	{
