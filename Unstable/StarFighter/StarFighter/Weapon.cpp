@@ -28,7 +28,6 @@ Weapon::Weapon(Ammo* Ammunition)
 
 Weapon::~Weapon()
 {
-	//TODO: destructor ammo ?
 	delete this->ammunition;
 }
 
