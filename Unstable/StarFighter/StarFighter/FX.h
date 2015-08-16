@@ -9,6 +9,7 @@ class FX : public Independant
 {
 public:
 	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration, int m_animationNumber = 1);
+
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 
 	FX* Clone();

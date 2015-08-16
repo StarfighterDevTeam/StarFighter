@@ -8,9 +8,7 @@ using namespace std;
 class FileLoaderUtils
 {
 public:
-	static vector<vector<string>>* FileLoader(string name){
-		vector<vector<string>>* fileConfig = new vector<vector<string>>;
-
+	static void FileLoader(string name, vector<vector<string>>* fileConfig){
 		std::ifstream  data(name);
 
 		std::string line;
@@ -34,8 +32,6 @@ public:
 	loop_end:;
 		}
 		data.close();
-
-		return fileConfig;
 	}
 };
 

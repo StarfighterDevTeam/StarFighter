@@ -29,7 +29,6 @@ Weapon::Weapon(Ammo* Ammunition)
 Weapon::~Weapon()
 {
 	delete this->ammunition;
-	this->ammunition = NULL;
 }
 
 void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)

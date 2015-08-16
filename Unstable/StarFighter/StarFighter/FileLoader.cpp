@@ -5,7 +5,8 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
 	try
 	{
-		vector<vector<string>> shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
+		vector<vector<string>> shipConfig;
+		FileLoaderUtils::FileLoader(SHIP_FILE, &shipConfig);
 
 		for (std::vector<vector<string>>::iterator it = (shipConfig).begin(); it != (shipConfig).end(); it++)
 		{
@@ -54,7 +55,8 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 EnemyPool* FileLoader::LoadEnemyPool(string name)
 {
 	
-	vector<vector<string>> enemypoolConfig = *(FileLoaderUtils::FileLoader(ENEMYPOOL_FILE));
+	vector<vector<string>> enemypoolConfig;
+	FileLoaderUtils::FileLoader(ENEMYPOOL_FILE, &enemypoolConfig);
 
 	for (std::vector<vector<string>>::iterator it = (enemypoolConfig).begin(); it != (enemypoolConfig).end(); it++)
 	{
@@ -69,7 +71,8 @@ EnemyPool* FileLoader::LoadEnemyPool(string name)
 
 EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_enemyClass)
 {
-	vector<vector<string>> enemyConfig = *(FileLoaderUtils::FileLoader(ENEMY_FILE));
+	vector<vector<string>> enemyConfig;
+	FileLoaderUtils::FileLoader(ENEMY_FILE, &enemyConfig);
 
 	for (std::vector<vector<string>>::iterator it = (enemyConfig).begin(); it != (enemyConfig).end(); it++)
 	{
@@ -118,8 +121,8 @@ EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_ene
 				}
 
 				//setting the starting phase
-				base->enemy->setPhase(base->enemy->phases.front());
 				base->enemy->hasPhases = true;
+				base->enemy->setFirstPhase();
 			}
 			else
 			{
@@ -166,7 +169,8 @@ FX* FileLoader::LoadFX(string name)
 
 Equipment* FileLoader::LoadEquipment(string name)
 {
-	vector<vector<string>>equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
+	vector<vector<string>>equipmentConfig;
+	FileLoaderUtils::FileLoader(EQUIPMENT_FILE, &equipmentConfig);
 
 	for (std::vector<vector<string>>::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
 	{
@@ -218,7 +222,8 @@ Equipment* FileLoader::LoadEquipment(string name)
 
 ShipModel* FileLoader::LoadShipModel(string name)
 {
-	vector<vector<string>> equipmentConfig = *(FileLoaderUtils::FileLoader(EQUIPMENT_FILE));
+	vector<vector<string>> equipmentConfig;
+	FileLoaderUtils::FileLoader(EQUIPMENT_FILE, &equipmentConfig);
 
 	for (std::vector<vector<string>>::iterator it = (equipmentConfig).begin(); it != (equipmentConfig).end(); it++)
 	{
@@ -256,7 +261,8 @@ ShipModel* FileLoader::LoadShipModel(string name)
 
 Bot* FileLoader::LoadBot(string name)
 {
-	vector<vector<string>>botConfig = *(FileLoaderUtils::FileLoader(BOT_FILE));
+	vector<vector<string>>botConfig;
+	FileLoaderUtils::FileLoader(BOT_FILE, &botConfig);
 
 	for (std::vector<vector<string>>::iterator it = (botConfig).begin(); it != (botConfig).end(); it++)
 	{

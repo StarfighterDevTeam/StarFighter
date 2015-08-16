@@ -2,10 +2,45 @@
 
 Phase::Phase()
 {
+	this->Pattern = new PatternBobby();
+	this->angspeed = 0.0f;
+	this->radius = 0.0f;
+	this->vspeed = 0.0f;
+	this->rotation_speed = 0.0f;
 	this->hasTransition = false;
 	this->hasWakeUp = false;
 	this->hasWelcomeShot = false;
-	this->Pattern = new PatternBobby();
+	this->welcomeWeapon = NULL;
+}
+
+Phase::~Phase()
+{
+	
+}
+
+Phase* Phase::Clone()
+{
+	Phase* new_phase = new Phase();
+
+	*new_phase = *this;
+
+	for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+	{
+		new_phase->weapons_list.push_back((*it)->Clone());
+	}
+
+	new_phase->Pattern = new PatternBobby();
+	*(new_phase->Pattern) = *(this->Pattern);
+	vector<ConditionTransition*> transitions_list;
+	for (std::vector<ConditionTransition*>::iterator it = (this->transitions_list.begin()); it != (this->transitions_list.end()); it++)
+	{
+		new_phase->transitions_list.push_back(new ConditionTransition((*it)->condition, (*it)->op, (*it)->value, (*it)->nextPhase_name));
+	}
+	
+	if(this->welcomeWeapon != NULL)
+		new_phase->welcomeWeapon = this->welcomeWeapon->Clone();
+
+	return new_phase;
 }
 
 ConditionTransition::ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, std::string m_nextPhase_name)
