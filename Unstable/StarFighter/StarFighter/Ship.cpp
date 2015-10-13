@@ -8,16 +8,25 @@ using namespace sf;
 
 Ship::Ship()
 {
-
+	
 }
 
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Independant(position, speed, textureName, size, origin, frameNumber, animationNumber)
+void Ship::Init()
 {
 	this->collider_type = IndependantType::PlayerShip;
 	this->moving = false;
 	this->movingX = movingY = false;
-	this->visible = true;
 	this->disable_inputs = false;
+}
+
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Independant(position, speed, textureName, size, origin, frameNumber, animationNumber)
+{
+	this->Init();
+}
+
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : Independant(position, speed, textureName, size)
+{
+	this->Init();
 }
 
 Ship::~Ship()

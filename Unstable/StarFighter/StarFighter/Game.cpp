@@ -134,8 +134,7 @@ void Game::drawScene()
 	this->mainScreen.display();
 	sf::Sprite temp(this->mainScreen.getTexture());
 	temp.scale(scale_factor.x, scale_factor.y);
-	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
-	temp.setPosition(sf::Vector2f(scale_factor.x * black_stripe, 0));
+	temp.setPosition(sf::Vector2f(0, 0));
 	this->window->draw(temp);
 }
 

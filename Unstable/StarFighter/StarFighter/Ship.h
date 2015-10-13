@@ -6,11 +6,11 @@
 #include "InputGuy.h"
 #include "Game.h"
 
-#define SHIP_START_X                0
-#define SHIP_START_Y                0
-#define SHIP_ACCELERATION	        20.0f
-#define SHIP_DECCELERATION_COEF		1000.0f
-#define SHIP_MAX_SPEED				500.0f
+#define SHIP_START_X                990
+#define SHIP_START_Y                540
+#define SHIP_ACCELERATION	        2000.0f
+#define SHIP_DECCELERATION_COEF		5000.0f
+#define SHIP_MAX_SPEED				400.0f
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
@@ -19,6 +19,8 @@ class Ship : public Independant
 public :
 	Ship();
 	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
+	void Init();
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
 	

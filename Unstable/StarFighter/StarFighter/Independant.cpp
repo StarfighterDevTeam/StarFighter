@@ -87,7 +87,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	
 	this->speed = speed;
 	this->setPosition(position.x, position.y);
-	this->visible = false;
+	this->visible = true;
 	this->isOnScene = false;
 	this->GarbageMe = false;
 	this->DontGarbageMe = false;
