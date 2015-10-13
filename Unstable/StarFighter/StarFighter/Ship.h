@@ -2,7 +2,6 @@
 #define SHIP_H_INCLUDED
 
 #include "Globals.h"
-#include "Independant.h"
 #include "InputGuy.h"
 #include "Game.h"
 
@@ -14,7 +13,7 @@
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
-class Ship : public Independant
+class Ship : public GameObject
 {
 public :
 	Ship();
@@ -24,7 +23,6 @@ public :
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
 	
-	void ManageHudControls(sf::Vector2f inputs_directions);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();

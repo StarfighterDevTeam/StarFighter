@@ -7,13 +7,14 @@
 #include <sstream>
 #include "Game.h"
 #include "Ship.h"
+#include "Discoball.h"
 
-class Independant;
+class GameObject;
 
 class InGameState : public GameState
 {
 public:
-	Independant* playerShip;
+	GameObject* playerShip;
 
 	void Initialize(Player player);
 	void Update(sf::Time deltaTime);
