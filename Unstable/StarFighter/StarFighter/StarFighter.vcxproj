@@ -86,79 +86,40 @@
     <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Ammo.cpp" />
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="Background.cpp" />
-    <ClCompile Include="Bot.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyGenerator.cpp" />
-    <ClCompile Include="EnemyPool.cpp" />
-    <ClCompile Include="FileLoader.cpp" />
-    <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="Hud.cpp" />
-    <ClCompile Include="HudGrid.cpp" />
-    <ClCompile Include="InputGuy.cpp" />
-    <ClCompile Include="InteractionPanel.cpp" />
-    <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="Loot.cpp" />
-    <ClCompile Include="InGameState.cpp" />
-    <ClCompile Include="PatternBobby.cpp" />
-    <ClCompile Include="Phase.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Portal.cpp" />
-    <ClCompile Include="PrefsManager.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Independant.cpp" />
-    <ClCompile Include="Shop.cpp" />
+    <ClCompile Include="InputGuy.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="InGameState.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="TextureLoader.h" />
-    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Ammo.h" />
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Assets.h" />
-    <ClInclude Include="Background.h" />
-    <ClInclude Include="Bot.h" />
     <ClInclude Include="CollisionUtils.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyGenerator.h" />
-    <ClInclude Include="EnemyPool.h" />
-    <ClInclude Include="FileLoader.h" />
-    <ClInclude Include="FileLoadUtils.h" />
-    <ClInclude Include="FX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="Hud.h" />
-    <ClInclude Include="HudGrid.h" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="Independant.h" />
     <ClInclude Include="InputGuy.h" />
-    <ClInclude Include="InteractionPanel.h" />
     <ClInclude Include="Logger.h" />
-    <ClInclude Include="Loot.h" />
     <ClInclude Include="InGameState.h" />
-    <ClInclude Include="PatternBobby.h" />
-    <ClInclude Include="Phase.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Portal.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="Ship.h" />
-    <ClInclude Include="Shop.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="TextUtils.h" />
-    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />

@@ -2,7 +2,7 @@
 #define SIMPLECOLLISION_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include "../CollisionUtils.h"
+#include "CollisionUtils.h"
 
 //TODO: move this out of /includes ?
 

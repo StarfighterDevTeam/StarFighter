@@ -164,21 +164,21 @@ Vector2f InputGuy::getDirections()
 	static float x;
 	static float y;
 
-	x = dirX > 0 ? 1 : (dirX < 0 ? -1 : 0);
-	y = dirY > 0 ? 1 : (dirY < 0 ? -1 : 0);
+	x = dirX > 0 ? 1 : (dirX < 0 ? -1.f : 0.f);
+	y = dirY > 0 ? 1 : (dirY < 0 ? -1.f : 0.f);
 
 	//Joystick inputs (if connected)
 	if (sf::Joystick::isConnected(0))
 	{
 		if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)) > JOYSTICK_MIN_AXIS_VALUE)
-			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X) / 100.0;
+			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X) / 100.0f;
 		else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX)) > JOYSTICK_MIN_AXIS_VALUE)
-			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.0;
+			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.0f;
 		
 		if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)) > JOYSTICK_MIN_AXIS_VALUE)
-			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) / 100.0;
+			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) / 100.0f;
 		else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY)) > JOYSTICK_MIN_AXIS_VALUE)
-			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0;
+			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0f;
 	}
 
 	//diagonal movement?
