@@ -28,8 +28,6 @@ public :
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
-	void ManageDiscoball(sf::Time deltaTime);
-	void ManageFire();
 
 	bool disable_inputs;
 
@@ -37,8 +35,12 @@ public :
 	Discoball* m_discoball;
 	float discoball_curAngle;
 	float discoball_curAngularSpeed;
+	float discoball_clockwise;
 	void GetDiscoball(GameObject* discoball, float angle_collision) override;
+	void ManageDiscoball(sf::Time deltaTime);
 	void ReleaseDiscoball();
+	void ManageFire();
+	void DiscoballSpeedConstraints();
 	sf::Clock carrier_clock;
 
 private:

@@ -5,11 +5,13 @@
 #include "Game.h"
 #include "GameObject.h"
 
-#define	DISCOBALL_GRAVITATION_DISTANCE					50.f
+#define	DISCOBALL_GRAVITATION_DISTANCE					70.f
 #define	DISCOBALL_BASE_ANGULAR_SPEED					M_PI
 #define	CARRY_TIME_FOR_ACCELERATION						1
-#define	CARRY_MAX_TIME_FOR_ACCELERATION					3
+#define	CARRY_MAX_TIME_FOR_ACCELERATION					5
 #define	CARRY_ANGULAR_ACCELERATION						1.f
+#define	CARRY_THROW_ACCELERATION_BONUS					2.f
+#define	CARRY_CATCH_ACCELERATION_MALUS					4.f
 
 
 class Discoball : public GameObject
@@ -21,6 +23,9 @@ public :
 	void Init();
 	virtual ~Discoball();
 	void update(sf::Time deltaTime) override;
+
+	float cartesian_speed;
+	float polar_angle;
 
 	float carrier_curAngle;
 	sf::Vector2f carrier_curPosition;

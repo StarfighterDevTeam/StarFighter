@@ -67,6 +67,17 @@ void Discoball::update(sf::Time deltaTime)
 			this->speed.y *= -1;
 			this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 		}
+
+		//calculations
+		const float a = speed.x;
+		const float b = speed.y;
+		float s = (a * a) + (b * b);
+		s = sqrt(s);
+		cartesian_speed = s;
+
+		polar_angle = acos(a / b);
+
+		//printf("cartesian speed: %f, polar angle: %f\n", cartesian_speed, polar_angle);
 	}
 
 	else // get carrier position
@@ -80,6 +91,7 @@ void Discoball::update(sf::Time deltaTime)
 		new_position.y = carrier_curPosition.y + new_offset.y;
 
 		setPosition(new_position);
+
 	}
 
 	AnimatedSprite::update(deltaTime);
