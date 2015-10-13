@@ -105,69 +105,34 @@ public:
 
 	~Independant();
 
-	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier = 1);
+	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
+	void setAnimationLine(int m_animation, bool keep_frame_index = false);
 	bool visible;
 	bool isOnScene;
 	bool GarbageMe;
 	bool DontGarbageMe;
 	IndependantType collider_type;
 	LayerType layer;
-	virtual void damage_from(Independant& independant);
 	sf::Vector2f m_size;
 	sf::Vector2f getIndependantSpeed();
-	int getIndependantDamage();
-	int getIndependantArmor();
-	int getIndependantArmorMax();
-	int getIndependantShield();
-	int getIndependantShieldMax();
-	int getIndependantShieldRegen();
 	string getName();
 	virtual void Respawn();
 	Independant* Clone();
-	virtual void Death();
-	virtual void Destroy();
 
-	int getMoney();
-	void addMoney(int loot_value);
-	void setMoney(int loot_value);
-	bool get_money_from(Independant& independant);
-	bool get_money_from(Independant& independant, int loot_value);
 	
-	void setGhost(bool m_ghost);
-	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
-
-	bool get_equipment_from(Independant& independant);
-	bool setEquipmentLoot(Equipment* equipment);
-	void releaseEquipmentLoot();
-	Equipment* getEquipmentLoot();
-
-	bool get_weapon_from(Independant& independant);
-	bool setWeaponLoot(Weapon* weapon);
-	void releaseWeaponLoot();
-	Weapon* getWeaponLoot();
-
-	int damage;
-	int armor;
-	int armor_max;
-	int shield;
-	int shield_max;
-	int shield_regen;
-	sf::Vector2f speed;
 	float diag;
 	bool ghost;
+	void setGhost(bool m_ghost);
 	float rotation_speed;
 	int animationNumber;
 	int frameNumber;
 	int currentAnimationIndex;
 
-	int money;
-	Equipment* equipment_loot;
-	Weapon* weapon_loot;
 	std::string textureName;
 protected:
 	sf::Vector2f initial_position;
-	
+	sf::Vector2f speed;
 	Animation defaultAnimation;
 	Animation* currentAnimation;
 

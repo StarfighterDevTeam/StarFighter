@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include "Game.h"
+#include "Ship.h"
 
 class Independant;
 

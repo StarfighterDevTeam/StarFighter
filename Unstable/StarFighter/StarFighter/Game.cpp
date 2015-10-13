@@ -92,7 +92,7 @@ void Game::updateScene(Time deltaTime)
 		if (this->sceneIndependants[i] == NULL)
 			continue;
 
-		this->sceneIndependants[i]->update(deltaTime, hyperspeedMultiplier);
+		this->sceneIndependants[i]->update(deltaTime);
 	}
 
 	//Collect the dust
@@ -224,7 +224,7 @@ void Game::cleanGarbage()
 			}
 		}
 
-		pCurIndependant->Destroy();//destructor function
+		//destructor function ??
 
 		// A la fin, on delete l'élément
 		delete pCurIndependant;

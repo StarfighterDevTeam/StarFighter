@@ -91,12 +91,9 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->isOnScene = false;
 	this->GarbageMe = false;
 	this->DontGarbageMe = false;
-	this->money = 0;
 	this->diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	this->ghost = false;
 	this->rotation_speed = 0.f;
-	this->equipment_loot = NULL;
-	this->weapon_loot = NULL;
 }
 
 void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
@@ -120,18 +117,10 @@ Independant::~Independant()
 	//delete this->weapon_loot;
 }
 
-void Independant::update(sf::Time deltaTime, float hyperspeedMultiplier)
+void Independant::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = this->speed;
-
-	if (hyperspeedMultiplier < 1)
-	{
-		newspeed.x = this->speed.x * hyperspeedMultiplier;
-		newspeed.y = this->speed.y * hyperspeedMultiplier;
-	}
-	
-	this->setGhost(hyperspeedMultiplier > 1.0f);
 	
 	//Basic movement (initial vector)
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -164,81 +153,11 @@ void Independant::setGhost(bool m_ghost)
 		this->ghost = false;
 		this->setColor(Color(255, 255, 255, 255));
 	}
-	
-}
-//void Independant::Follow(Independant* target)
-//{
-//	this->setPosition(target->getPosition().x, target->getPosition().x);
-//}
-
-void Independant::damage_from(Independant& independant)
-{
-	setColor(Color(255,0,0,255), sf::seconds(DAMAGE_FEEDBACK_TIME));
-	if (independant.damage > shield)
-	{
-		armor -= (independant.damage - shield);
-		shield = 0;
-	}
-	else
-	{
-		shield -= independant.damage;
-	}
-}
-
-bool Independant::get_money_from(Independant& independant)
-{
-	int loot_value = independant.getMoney();//give all the money
-	money += loot_value;
-	independant.addMoney(-loot_value);
-	if (loot_value > 0)
-		return true;
-	else
-		return false;
-}
-
-bool Independant::get_money_from(Independant& independant, int loot_value)
-{
-	money += loot_value;
-	independant.addMoney(-loot_value);
-	if (loot_value > 0)
-		return true;
-	else
-		return false;
-}
-
-int Independant::getIndependantDamage()
-{
-	return damage;
-}
-
-int Independant::getIndependantShield()
-{
-	return shield;
-}
-
-int Independant::getIndependantShieldMax()
-{
-	return shield_max;
-}
-
-int Independant::getIndependantShieldRegen()
-{
-	return shield_regen;
-}
-
-int Independant::getIndependantArmor()
-{
-	return armor;
-}
-
-int Independant::getIndependantArmorMax()
-{
-	return armor_max;
 }
 
 sf::Vector2f Independant::getIndependantSpeed()
 {
-	return sf::Vector2f(speed.x, speed.y);
+	return speed;
 }
 
 Independant* Independant::Clone()
@@ -248,103 +167,4 @@ Independant* Independant::Clone()
 	clone->layer = this->layer;
 
 	return clone;
-}
-
-int Independant::getMoney()
-{
-	return money;
-}
-
-void Independant::addMoney(int loot_value)
-{
-	money += loot_value;
-}
-
-void Independant::setMoney(int loot_value)
-{
-	money = loot_value;
-}
-
-void Independant::Death()
-{
-
-}
-
-void Independant::Destroy()
-{
-
-}
-
-bool Independant::get_equipment_from(Independant& independant)
-{
-	if (independant.equipment_loot != NULL && this->equipment_loot == NULL)
-	{
-		this->equipment_loot = independant.getEquipmentLoot();
-		independant.equipment_loot = NULL;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Independant::setEquipmentLoot(Equipment* equipment)
-{
-	if (this->equipment_loot == NULL)
-	{
-		this->equipment_loot = equipment;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-Equipment* Independant::getEquipmentLoot()
-{
-	return this->equipment_loot;
-}
-
-void Independant::releaseEquipmentLoot()
-{
-	this->equipment_loot = NULL;
-}
-
-bool Independant::get_weapon_from(Independant& independant)
-{
-	if (independant.weapon_loot != NULL && this->weapon_loot == NULL)
-	{
-		this->weapon_loot = independant.getWeaponLoot();
-		independant.weapon_loot = NULL;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Independant::setWeaponLoot(Weapon* weapon)
-{
-	if (this->weapon_loot == NULL)
-	{
-		this->weapon_loot = weapon;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-Weapon* Independant::getWeaponLoot()
-{
-	return this->weapon_loot;
-}
-
-void Independant::releaseWeaponLoot()
-{
-	this->weapon_loot = NULL;
 }
