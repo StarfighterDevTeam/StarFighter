@@ -14,22 +14,22 @@ public:
 		return sf::IntRect((int)f.left, (int)f.top, (int)f.width, (int)f.height);
 	}
 
-	static bool AreColliding(const Independant* independantA, const Independant* independantB) {
+	static bool AreColliding(const GameObject* GameObjectA, const GameObject* GameObjectB) {
 		// If not visibe, let's not even bother with the collision
-		if (!independantA->visible || !(independantB->visible))
+		if (!GameObjectA->visible || !(GameObjectB->visible))
 			return false;
 
 		//ghost is a property that prevents an object from colliding, so by definition we exclude it
-		if (independantA->ghost || (independantB->ghost))
+		if (GameObjectA->ghost || (GameObjectB->ghost))
 			return false;
 
-		if (!independantA->isOnScene || !(independantB->isOnScene))
+		if (!GameObjectA->isOnScene || !(GameObjectB->isOnScene))
 			return false;
 
 		//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
-		const float a = independantA->getPosition().x - independantB->getPosition().x;
-		const float b = independantA->getPosition().y - independantB->getPosition().y;
-		const float c = independantA->diag + independantB->diag;
+		const float a = GameObjectA->getPosition().x - GameObjectB->getPosition().x;
+		const float b = GameObjectA->getPosition().y - GameObjectB->getPosition().y;
+		const float c = GameObjectA->diag + GameObjectB->diag;
 
 		if (((a * a) + (b * b)) > (c * c))
 			return false;
@@ -39,40 +39,17 @@ public:
 		{
 			if (PIXEL_PERFECT_COLLISION)
 			{
-				return Collision::PixelPerfectTest(independantA, independantB, MinAlphaLimitForCollision);
+				return Collision::PixelPerfectTest(GameObjectA, GameObjectB, MinAlphaLimitForCollision);
 			}
 			else
 			{
 				// No pixel perfect : are the corners included in the other sprite, or vice versa ?
-				sf::IntRect boundsA(FToIRect(independantA->getGlobalBounds()));
-				sf::IntRect boundsB(FToIRect(independantB->getGlobalBounds()));
+				sf::IntRect boundsA(FToIRect(GameObjectA->getGlobalBounds()));
+				sf::IntRect boundsB(FToIRect(GameObjectB->getGlobalBounds()));
 				return boundsA.intersects(boundsB);
 			}
 		}
 		return false;
-	}
-
-	static bool IsGrazing(const Independant* independantA, const Independant* independantB)
-	{
-		// If not visibe, let's not even bother with the collision
-		if (!independantA->visible || !(independantB->visible))
-			return false;
-
-		//ghost is a property that prevents an object from colliding, so by definition we exclude it
-		if (independantA->ghost || (independantB->ghost))
-			return false;
-
-		if (!independantA->isOnScene || !(independantB->isOnScene))
-			return false;
-
-		const float a = independantA->getPosition().x - independantB->getPosition().x;
-		const float b = independantA->getPosition().y - independantB->getPosition().y;
-		const float c = independantA->diag + independantB->diag + GRAZE_DISTANCE;
-
-		if (((a * a) + (b * b)) < (c * c))
-			return true;
-		else
-			return false;
 	}
 
 private:

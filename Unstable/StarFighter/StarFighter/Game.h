@@ -39,6 +39,9 @@ public:
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
 
+	//TRON SPECIFIC
+	float GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj);
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);

@@ -1,8 +1,16 @@
 #ifndef DISCOBALL_H_INCLUDED
-#define DISCOBALL_INCLUDED
+#define DISCOBALL_H_INCLUDED
 
 #include "Globals.h"
 #include "Game.h"
+#include "GameObject.h"
+
+#define	DISCOBALL_GRAVITATION_DISTANCE					50.f
+#define	DISCOBALL_BASE_ANGULAR_SPEED					M_PI
+#define	CARRY_TIME_FOR_ACCELERATION						1
+#define	CARRY_MAX_TIME_FOR_ACCELERATION					3
+#define	CARRY_ANGULAR_ACCELERATION						1.f
+
 
 class Discoball : public GameObject
 {
@@ -13,6 +21,11 @@ public :
 	void Init();
 	virtual ~Discoball();
 	void update(sf::Time deltaTime) override;
+
+	float carrier_curAngle;
+	sf::Vector2f carrier_curPosition;
+
+	bool carried;
 };
 
 #endif // DISCOBALL_H_INCLUDED

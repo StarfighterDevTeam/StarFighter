@@ -1,33 +1,33 @@
-#include "Independant.h"
+#include "GameObject.h"
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
 	this->setOrigin(origin.x, origin.y);
 }
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size);
 }
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture) : AnimatedSprite()
 {
 	Init(position, speed, texture, 1);
 }
 
-string Independant::getName()
+string GameObject::getName()
 {
 	vector<string> s1 = TextUtils::split(this->textureName, '/');
 	return *(s1.end() - 1);
 }
 
-Independant::Independant()
+GameObject::GameObject()
 {
 
 }
 
-void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
+void GameObject::setAnimationLine(int m_animation, bool keep_frame_index)
 {
 	//bulletproof verifications
 	if (m_animation >= this->animationNumber)
@@ -63,7 +63,7 @@ void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
 	this->currentAnimationIndex = m_animation;
 }
 
-void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber)
 {
 	this->animationNumber = m_animationNumber;
 	this->frameNumber = m_frameNumber;
@@ -71,7 +71,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->m_size.x = ((*texture).getSize().x / m_frameNumber);
 	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
 
-	this->collider_type = IndependantType::BackgroundObject;
+	this->collider_type = GameObjectType::BackgroundObject;
 	this->defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < m_animationNumber; j++)
 	{
@@ -96,7 +96,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	this->rotation_speed = 0.f;
 }
 
-void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
@@ -109,7 +109,7 @@ void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string te
 
 }
 
-Independant::~Independant()
+GameObject::~GameObject()
 {
 	//TODO
 
@@ -117,31 +117,30 @@ Independant::~Independant()
 	//delete this->weapon_loot;
 }
 
-void Independant::update(sf::Time deltaTime)
+void GameObject::update(sf::Time deltaTime)
 {
-	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->speed;
+	static sf::Vector2f newposition;
 	
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = this->getPosition().x + speed.x*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + speed.y*deltaTime.asSeconds();
 
 	this->setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
 }
 
-void Independant::updateAnimation(sf::Time deltaTime)
+void GameObject::updateAnimation(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
 }
 
-void Independant::Respawn()
+void GameObject::Respawn()
 {
 
 }
 
-void Independant::setGhost(bool m_ghost)
+void GameObject::setGhost(bool m_ghost)
 {
 	if (m_ghost == true)
 	{
@@ -155,16 +154,22 @@ void Independant::setGhost(bool m_ghost)
 	}
 }
 
-sf::Vector2f Independant::getIndependantSpeed()
+sf::Vector2f GameObject::getGameObjectSpeed()
 {
 	return speed;
 }
 
-Independant* Independant::Clone()
+GameObject* GameObject::Clone()
 {
-	Independant* clone = new Independant(this->getPosition(), this->speed, this->textureName, this->m_size);
+	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->textureName, this->m_size);
 	clone->collider_type = this->collider_type;
 	clone->layer = this->layer;
 
 	return clone;
+}
+
+//TRON SPECIFIC
+void GameObject::GetDiscoball(GameObject* discoball, float angle_collision)
+{
+	//see override function
 }

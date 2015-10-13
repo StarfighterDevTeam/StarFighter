@@ -158,7 +158,10 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				LOGGER_WRITE(Logger::Priority::DEBUG, "Discoball collision.\n");
+				
+				//TRON SPECIFIC
+				float angle = GetAngleOfCollision(*it1, *it2);
+				(*it1)->GetDiscoball(*it2, angle);
 			}
 		}
 	}
@@ -289,4 +292,19 @@ void Game::collectGarbage()
 	}
 
 	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
+}
+
+float Game::GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj)
+{
+	sf::Vector2f diff_position;
+	
+	const float a = ref_obj->getPosition().x - aimed_obj->getPosition().x;
+	const float b = ref_obj->getPosition().y - aimed_obj->getPosition().y;
+
+	float distance_to_obj = (a * a) + (b * b);
+	distance_to_obj = sqrt(distance_to_obj);
+
+	float angle = acos(a / distance_to_obj);
+	angle = fmod(angle + M_PI_2, 2 * M_PI);
+	return angle;
 }

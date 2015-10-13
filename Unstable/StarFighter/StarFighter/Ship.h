@@ -4,6 +4,8 @@
 #include "Globals.h"
 #include "InputGuy.h"
 #include "Game.h"
+#include "GameObject.h"
+#include "Discoball.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -26,9 +28,19 @@ public :
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
+	void ManageDiscoball(sf::Time deltaTime);
+	void ManageFire();
 
 	bool disable_inputs;
-	
+
+	//TRON SPECIFIC
+	Discoball* m_discoball;
+	float discoball_curAngle;
+	float discoball_curAngularSpeed;
+	void GetDiscoball(GameObject* discoball, float angle_collision) override;
+	void ReleaseDiscoball();
+	sf::Clock carrier_clock;
+
 private:
 	bool moving;
 	bool movingX;
