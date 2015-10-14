@@ -25,7 +25,7 @@ bool InputGuy::isFiring()
 	return false;
 }
 
-bool InputGuy::isHyperspeeding()
+bool InputGuy::isSwitchingRotation()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 	{

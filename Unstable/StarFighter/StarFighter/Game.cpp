@@ -304,7 +304,16 @@ float Game::GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aim
 	float distance_to_obj = (a * a) + (b * b);
 	distance_to_obj = sqrt(distance_to_obj);
 
-	float angle = acos(a / distance_to_obj);
-	angle = fmod(angle + M_PI_2, 2 * M_PI);
+	// TO DO
+	float angle;
+	angle = acos(a / distance_to_obj);
+
+	if (b < 0)
+	{
+		angle = -angle;
+	}
+
+	angle += M_PI_2;
+
 	return angle;
 }

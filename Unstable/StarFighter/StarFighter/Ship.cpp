@@ -23,6 +23,9 @@ void Ship::Init()
 	discoball_curAngle = -1.f;
 	discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
 	discoball_clockwise = true;
+
+	isFiringButtonReleased = false;
+	isSwitchingButtonReleased = false;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -60,7 +63,10 @@ void Ship::update(sf::Time deltaTime)
 	ScreenBorderContraints();
 
 	ManageFire();
+	ManageSwitchRotation();
 	ManageDiscoball(deltaTime);
+
+	ManageKeyReleases();
 }
 
 void Ship::ScreenBorderContraints()
@@ -142,9 +148,27 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 		//2/ or translate cartesian speed into polar speed?
 		discoball_curAngularSpeed = m_discoball->cartesian_speed / DISCOBALL_GRAVITATION_DISTANCE;
 		discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
-		printf("Discoball catched. (speed: %f", discoball_curAngularSpeed);
+		printf("Discoball catched (speed: %f", angle_collision, discoball_curAngularSpeed);
 		DiscoballSpeedConstraints();
 		printf(" | correction: %f)\n", discoball_curAngularSpeed);
+
+		//setting the sense of rotation (clockwise or counter-clockwise)
+		if (abs(angle_collision) < M_PI_4)
+		{
+			m_discoball->speed.x < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+		}
+		else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
+		{
+			m_discoball->speed.y < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+		}
+		else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
+		{
+			m_discoball->speed.x > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+		}
+		else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
+		{
+			m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+		}
 	}
 }
 
@@ -152,13 +176,13 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 {
 	if (m_discoball != NULL)
 	{
-		int cc = discoball_clockwise ? cc = 1 : cc = -1;
+		int cc = discoball_clockwise ? cc = -1 : cc = 1;
 		discoball_curAngle = fmod(discoball_curAngle - (discoball_curAngularSpeed * cc * deltaTime.asSeconds()), 2 * M_PI);
 		m_discoball->carrier_curAngle = discoball_curAngle;
 		m_discoball->carrier_curPosition = getPosition();
 
 		//angular speed acceleration
-		if (carrier_clock.getElapsedTime().asSeconds() > 1 && carrier_clock.getElapsedTime().asSeconds() < DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_TIME_FOR_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
+		if (carrier_clock.getElapsedTime().asSeconds() > 1 && discoball_curAngularSpeed < DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_TIME_FOR_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
 		{
 			discoball_curAngularSpeed += CARRY_ANGULAR_ACCELERATION;
 			printf("Discoball accelerated. (speed: %f", discoball_curAngularSpeed);
@@ -205,5 +229,33 @@ void Ship::DiscoballSpeedConstraints()
 	else if (discoball_curAngularSpeed > DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_TIME_FOR_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
 	{
 		discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_TIME_FOR_ACCELERATION * CARRY_ANGULAR_ACCELERATION);
+	}
+}
+
+void Ship::ManageSwitchRotation()
+{
+	if (m_discoball != NULL)
+	{
+		if (isSwitchingButtonReleased)
+		{
+			if (InputGuy::isSwitchingRotation())
+			{
+				discoball_clockwise = !discoball_clockwise;
+				carrier_clock.restart();
+				isSwitchingButtonReleased = false;
+			}
+		}
+	}
+}
+
+void Ship::ManageKeyReleases()
+{
+	if (!InputGuy::isFiring())
+	{
+		isFiringButtonReleased = true;
+	}
+	if (!InputGuy::isSwitchingRotation())
+	{
+		isSwitchingButtonReleased = true;
 	}
 }

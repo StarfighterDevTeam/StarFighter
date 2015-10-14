@@ -15,7 +15,7 @@ public:
 	static Vector2f getDirections();
 	static bool isFiring();
 	static bool isBraking();
-	static bool isHyperspeeding();
+	static bool isSwitchingRotation();
 	static bool isSlowMotion();
 	static bool setAutomaticFire();
 	static bool isChangingResolution();

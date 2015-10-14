@@ -40,6 +40,10 @@ public :
 	void ManageDiscoball(sf::Time deltaTime);
 	void ReleaseDiscoball();
 	void ManageFire();
+	void ManageSwitchRotation();
+	void ManageKeyReleases();
+	bool isFiringButtonReleased;
+	bool isSwitchingButtonReleased;
 	void DiscoballSpeedConstraints();
 	sf::Clock carrier_clock;
 
