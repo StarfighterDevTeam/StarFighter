@@ -26,6 +26,7 @@ void Ship::Init()
 
 	isFiringButtonReleased = false;
 	isSwitchingButtonReleased = false;
+	carry_again_clock.restart();
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -137,37 +138,50 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 {
 	if (m_discoball == NULL)
 	{
-		m_discoball = (Discoball*)discoball;
-		m_discoball->carried = true;
-		discoball_curAngle = angle_collision;
-		carrier_clock.restart();
+		if (carry_again_clock.getElapsedTime().asSeconds() > CARRY_AGAIN_COOLDOWN)
+		{
+			m_discoball = (Discoball*)discoball;
 
-		//1/ reset speed on catch?
-		//discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
+			//deleting old carrier's discoball ownership
+			if (m_discoball->carried)
+			{
+				m_discoball->carrier->carry_again_clock.restart();
+				m_discoball->carrier->m_discoball = NULL;
+			}
 
-		//2/ or translate cartesian speed into polar speed?
-		discoball_curAngularSpeed = m_discoball->cartesian_speed / DISCOBALL_GRAVITATION_DISTANCE;
-		discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
-		printf("Discoball catched (speed: %f", angle_collision, discoball_curAngularSpeed);
-		DiscoballSpeedConstraints();
-		printf(" | correction: %f)\n", discoball_curAngularSpeed);
+			//acquisition of the discoball
+			m_discoball->carried = true;
+			m_discoball->carrier = this;
+			discoball_curAngle = angle_collision;
+			carrier_clock.restart();
 
-		//setting the sense of rotation (clockwise or counter-clockwise)
-		if (abs(angle_collision) < M_PI_4)
-		{
-			m_discoball->speed.x < 0 ? discoball_clockwise = true : discoball_clockwise = false;
-		}
-		else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
-		{
-			m_discoball->speed.y < 0 ? discoball_clockwise = true : discoball_clockwise = false;
-		}
-		else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
-		{
-			m_discoball->speed.x > 0 ? discoball_clockwise = true : discoball_clockwise = false;
-		}
-		else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
-		{
-			m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+			//1/ reset speed on catch?
+			//discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
+
+			//2/ or translate cartesian speed into polar speed?
+			discoball_curAngularSpeed = m_discoball->cartesian_speed / DISCOBALL_GRAVITATION_DISTANCE;
+			discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
+			printf("Discoball catched (speed: %f", angle_collision, discoball_curAngularSpeed);
+			DiscoballSpeedConstraints();
+			printf(" | correction: %f)\n", discoball_curAngularSpeed);
+
+			//setting the sense of rotation (clockwise or counter-clockwise)
+			if (abs(angle_collision) < M_PI_4)
+			{
+				m_discoball->speed.x < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+			}
+			else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
+			{
+				m_discoball->speed.y < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+			}
+			else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
+			{
+				m_discoball->speed.x > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+			}
+			else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
+			{
+				m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+			}
 		}
 	}
 }
@@ -215,7 +229,10 @@ void Ship::ReleaseDiscoball()
 		m_discoball->speed.y = discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
 		m_discoball->carried = false;
 		printf("Discoball released. (speed: %f)\n", discoball_curAngularSpeed);
+		carry_again_clock.restart();
+		m_discoball->carrier = NULL;
 		m_discoball = NULL;
+
 	}
 }
 

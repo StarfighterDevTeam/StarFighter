@@ -11,8 +11,9 @@
 #define	CARRY_MAX_TIME_FOR_ACCELERATION					5
 #define	CARRY_ANGULAR_ACCELERATION						1.f
 #define	CARRY_THROW_ACCELERATION_BONUS					6.f
-#define	CARRY_CATCH_ACCELERATION_MALUS					8.f
+#define	CARRY_CATCH_ACCELERATION_MALUS					4.f
 
+class Ship;
 
 class Discoball : public GameObject
 {
@@ -27,9 +28,9 @@ public :
 	float cartesian_speed;
 	float polar_angle;
 
+	Ship* carrier;
 	float carrier_curAngle;
 	sf::Vector2f carrier_curPosition;
-
 	bool carried;
 };
 
