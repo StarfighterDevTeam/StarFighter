@@ -7,27 +7,6 @@
 #include "GameObject.h"
 #include "Discoball.h"
 
-#define SHIP_START_X								990
-#define SHIP_START_Y								540
-
-#define SHIP_ACCELERATION							100.f
-#define SHIP_DECELERATION_COEF						5000.f
-#define SHIP_MAX_SPEED								400.f
-#define SHIP_MIN_SPEED								50.f
-
-#define SHIP_MIN_SPEED_FOR_TACKLE					200.f
-#define SHIP_TACKLE_ACCELERATION_RATIO				0.2f
-#define SHIP_MAX_TACKLE_SPEED_BONUS_RATIO			2.5f
-#define SHIP_SPEED_PERCENTAGE_ON_HOLDING_TACKLE		0.7f
-#define SHIP_TACKLE_MIN_LASTING_TIME				0.f
-#define SHIP_TACKLE_MAX_HOLD_TIME					0.2f
-#define SHIP_TACKLE_HOLDDECELERATION_COFF			0.1f
-#define SHIP_TACKLE_DECELERATION_COFF				0.5f
-#define SHIP_MIN_SPEED_AFTER_TACKLE					100.f
-
-#define CARRY_AGAIN_COOLDOWN						0.5f
-#define TACKLE_AGAIN_COOLDOWN						0.5f
-
 enum TacklingStatus
 {
 	NOT_TACKLING,
@@ -35,6 +14,12 @@ enum TacklingStatus
 	MAX_SPEED_TACKLE,
 	HOLDING_TACKLE,
 	ENDING_TACKLE,
+};
+
+enum ThrowingStatus
+{
+	NOT_THROWING,
+	AFTER_THROW,
 };
 
 class Ship : public GameObject
@@ -47,7 +32,8 @@ public :
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
 	
-	void ManageAcceleration(sf::Vector2f inputs_direction);
+	void GetDirectionInputs(sf::Vector2f inputs_direction);
+	void MaxSpeedConstraints();
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
 
@@ -60,11 +46,12 @@ public :
 	float discoball_clockwise;
 	void GetDiscoball(GameObject* discoball, float angle_collision) override;
 	void ManageDiscoball(sf::Time deltaTime);
-	void ReleaseDiscoball();
+	void ThrowDiscoball();
 	void ManageFire();
 	void ManageTackle();
 	void ManageSwitchRotation();
 	void ManageKeyReleases();
+	void ManageFeedbacks();
 	bool isFiringButtonReleased;
 	bool wasFiringButtonReleased;
 	bool isSwitchingButtonReleased;
@@ -72,8 +59,10 @@ public :
 	sf::Clock carrier_clock;
 	sf::Clock carry_again_clock;
 	sf::Clock tackle_again_clock;
+	sf::Clock throw_bonus_speed_clock;
 
 	TacklingStatus isTackling;
+	ThrowingStatus isThrowing;
 	sf::Clock tackle_max_hold_clock;
 	sf::Clock tackle_min_clock;
 	sf::Vector2f speed_on_tackling;

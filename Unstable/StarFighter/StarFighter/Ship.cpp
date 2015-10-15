@@ -27,9 +27,9 @@ void Ship::Init()
 	isFiringButtonReleased = false;
 	wasFiringButtonReleased = false;
 	isSwitchingButtonReleased = false;
-	carry_again_clock.restart();
 
 	isTackling = NOT_TACKLING;
+	isThrowing = NOT_THROWING;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -60,7 +60,8 @@ void Ship::update(sf::Time deltaTime)
 
 	if (isTackling == NOT_TACKLING)
 	{
-		ManageAcceleration(inputs_direction);
+		GetDirectionInputs(inputs_direction);
+		MaxSpeedConstraints();
 		IdleDecelleration(deltaTime);
 	}
 	
@@ -83,6 +84,7 @@ void Ship::update(sf::Time deltaTime)
 	ManageDiscoball(deltaTime);
 
 	ManageKeyReleases();
+	ManageFeedbacks();
 }
 
 bool Ship::ScreenBorderContraints()
@@ -140,28 +142,51 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	}
 }
 
-void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
+void Ship::GetDirectionInputs(sf::Vector2f inputs_direction)
 {
 	speed.x += inputs_direction.x * SHIP_ACCELERATION;
 	speed.y += inputs_direction.y * SHIP_ACCELERATION;
+}
+
+void Ship::MaxSpeedConstraints()
+{
+	float ship_max_speed = SHIP_MAX_SPEED;
+
+	//bonus given after throwing the discoball
+	if (throw_bonus_speed_clock.getElapsedTime().asSeconds() < THROW_BONUS_SPEED_TIMER)
+	{
+		if (isThrowing == AFTER_THROW)
+		{
+			if (isTackling == NOT_TACKLING && m_discoball == NULL) //for safety
+			{
+				ship_max_speed = SHIP_MAX_SPEED + (discoball_curAngularSpeed * SHIP_MAX_SPEED_MULTIPLIER_AFTER_THROW);
+			}
+		}
+	}
+	else
+	{
+		isThrowing = NOT_THROWING;
+	}
 
 	//max speed constraints
-	if (abs(speed.x) > SHIP_MAX_SPEED)
+	if (abs(speed.x) > ship_max_speed)
 	{
-		speed.x = speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+		speed.x = speed.x > 0 ? ship_max_speed : -ship_max_speed;
 	}
-	if (abs(speed.y) > SHIP_MAX_SPEED)
+	if (abs(speed.y) > ship_max_speed)
 	{
-		speed.y = speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+		speed.y = speed.y > 0 ? ship_max_speed : -ship_max_speed;
 	}
 
 	//diagonal movement?
-	if (abs(speed.x) + abs(speed.y) > SHIP_MAX_SPEED)
+	if (abs(speed.x) + abs(speed.y) > ship_max_speed)
 	{
-		float p = (SHIP_MAX_SPEED / sqrt((speed.x*speed.x) + (speed.y*speed.y)));
+		float p = (ship_max_speed / sqrt((speed.x*speed.x) + (speed.y*speed.y)));
 		speed.x *= p;
 		speed.y *= p;
 	}
+
+	printf("speed : %f, %f \n", speed.x, speed.y);
 }
 
 //TRON SPECIFIC
@@ -214,6 +239,9 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
 			}
 		}
+
+		//canceling speed bonus on receiving the ball
+		isThrowing = NOT_THROWING;
 	}
 }
 
@@ -227,7 +255,7 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 		m_discoball->carrier_curPosition = getPosition();
 
 		//angular speed acceleration
-		if (carrier_clock.getElapsedTime().asSeconds() > 1 && discoball_curAngularSpeed < DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_TIME_FOR_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
+		if (carrier_clock.getElapsedTime().asSeconds() > 1 && discoball_curAngularSpeed < DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
 		{
 			discoball_curAngularSpeed += CARRY_ANGULAR_ACCELERATION;
 			printf("Discoball accelerated. (speed: %f", discoball_curAngularSpeed);
@@ -246,7 +274,7 @@ void Ship::ManageFire()
 	{
 		if (InputGuy::isFiring() && wasFiringButtonReleased)
 		{
-			ReleaseDiscoball();
+			ThrowDiscoball();
 
 			isFiringButtonReleased = false;
 			wasFiringButtonReleased = false;
@@ -254,18 +282,22 @@ void Ship::ManageFire()
 	}
 }
 
-void Ship::ReleaseDiscoball()
+void Ship::ThrowDiscoball()
 {
 	if (m_discoball != NULL)
 	{
 		discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
-		m_discoball->speed.x = 400;
-		m_discoball->speed.y = 0;
+		m_discoball->speed.x = - discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);;
+		m_discoball->speed.y = discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
 		m_discoball->carried = false;
 		printf("Discoball released. (speed: %f)\n", discoball_curAngularSpeed);
 		carry_again_clock.restart();
 		m_discoball->carrier = NULL;
 		m_discoball = NULL;
+
+		isThrowing = AFTER_THROW;
+		throw_bonus_speed_clock.restart();
+		carry_again_clock.restart();
 	}
 }
 
@@ -276,9 +308,9 @@ void Ship::DiscoballSpeedConstraints()
 	{
 		discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
 	}
-	else if (discoball_curAngularSpeed > DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_TIME_FOR_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
+	else if (discoball_curAngularSpeed > DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
 	{
-		discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_TIME_FOR_ACCELERATION * CARRY_ANGULAR_ACCELERATION);
+		discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION);
 	}
 }
 
@@ -331,6 +363,7 @@ void Ship::ManageTackle()
 						isFiringButtonReleased = false;
 						wasFiringButtonReleased = false;
 
+						MaxSpeedConstraints();//avoids to cumulate multiple bonuses
 						speed_on_tackling.x = speed.x;
 						speed_on_tackling.y = speed.y;
 					}
@@ -419,5 +452,25 @@ void Ship::ManageTackle()
 			tackle_again_clock.restart();
 			printf("speed normal : %f, %f \n", speed.x, speed.y);
 		}
+	}
+}
+
+void Ship::ManageFeedbacks()
+{
+	if (isTackling != NOT_TACKLING)
+	{
+		setColor(Color(255, 0, 0, 255));
+	}
+	else if (isThrowing != NOT_THROWING)
+	{
+		setColor(Color(0, 255, 0, 255));
+	}
+	else if (m_discoball != NULL)
+	{
+		setColor(Color(255, 255, 255, 200));
+	}
+	else
+	{
+		setColor(Color(255, 255, 255, 255));
 	}
 }

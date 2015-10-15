@@ -5,14 +5,6 @@
 #include "Game.h"
 #include "GameObject.h"
 
-#define	DISCOBALL_GRAVITATION_DISTANCE					70.f
-#define	DISCOBALL_BASE_ANGULAR_SPEED					M_PI
-#define	CARRY_TIME_FOR_ACCELERATION						1
-#define	CARRY_MAX_TIME_FOR_ACCELERATION					5
-#define	CARRY_ANGULAR_ACCELERATION						1.f
-#define	CARRY_THROW_ACCELERATION_BONUS					6.f
-#define	CARRY_CATCH_ACCELERATION_MALUS					8.f
-
 class Ship;
 
 class Discoball : public GameObject

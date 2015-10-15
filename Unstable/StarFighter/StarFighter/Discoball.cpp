@@ -80,6 +80,8 @@ void Discoball::update(sf::Time deltaTime)
 		polar_angle = atan(a / b);
 
 		//printf("cartesian speed: %f, polar angle: %f\n", cartesian_speed, polar_angle);
+
+		setColor(sf::Color(0, 0, 0, 255));
 	}
 
 	else // get carrier position
@@ -93,8 +95,9 @@ void Discoball::update(sf::Time deltaTime)
 		new_position.y = carrier_curPosition.y + new_offset.y;
 
 		setPosition(new_position);
-
 	}
 
 	AnimatedSprite::update(deltaTime);
+
+	
 }
