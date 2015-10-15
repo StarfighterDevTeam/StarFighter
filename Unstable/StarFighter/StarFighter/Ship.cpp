@@ -154,6 +154,14 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 	{
 		speed.y = speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
 	}
+
+	//diagonal movement?
+	if (abs(speed.x) + abs(speed.y) > SHIP_MAX_SPEED)
+	{
+		float p = (SHIP_MAX_SPEED / sqrt((speed.x*speed.x) + (speed.y*speed.y)));
+		speed.x *= p;
+		speed.y *= p;
+	}
 }
 
 //TRON SPECIFIC
@@ -251,8 +259,8 @@ void Ship::ReleaseDiscoball()
 	if (m_discoball != NULL)
 	{
 		discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
-		m_discoball->speed.x = - discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
-		m_discoball->speed.y = discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
+		m_discoball->speed.x = 400;
+		m_discoball->speed.y = 0;
 		m_discoball->carried = false;
 		printf("Discoball released. (speed: %f)\n", discoball_curAngularSpeed);
 		carry_again_clock.restart();
