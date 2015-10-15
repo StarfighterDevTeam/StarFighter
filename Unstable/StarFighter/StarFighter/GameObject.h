@@ -17,6 +17,7 @@ class Discoball;
 
 enum LayerType {
 	BackgroundLayer,
+	GoalLayer,
 	ExplosionLayer,
 	EnemyObjectLayer,
 	AuraLayer,
@@ -29,6 +30,8 @@ enum LayerType {
 enum GameObjectType {
 	BackgroundObject,
 	DiscoballObject,
+	GoalBlueObject,
+	GoalRedObject,
 	PlayerShip,
 	EnemyObject,
 	NBVAL_GameObject
@@ -79,6 +82,8 @@ public:
 
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
+	void PlayHitFeedback();
+	sf::Clock feedback_reset_clock;
 
 	sf::Vector2f speed;
 

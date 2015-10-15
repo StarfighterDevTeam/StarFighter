@@ -22,7 +22,6 @@
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
-
 #define SHIP_START_X								990
 #define SHIP_START_Y								540
 
@@ -58,7 +57,9 @@
 #define THROW_BONUS_SPEED_TIMER						0.3f
 #define SHIP_MAX_SPEED_MULTIPLIER_AFTER_THROW		20.f
 
+//FEEDBACKS
 #define	GHOST_ALPHA_VALUE							120
+#define RESET_FEEDBACK_COOLDOWN						0.5f
 
 #define JOYSTICK_MIN_AXIS_VALUE						25
 

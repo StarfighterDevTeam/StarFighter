@@ -127,6 +127,11 @@ void GameObject::update(sf::Time deltaTime)
 
 	this->setPosition(newposition.x, newposition.y);
 
+	if (feedback_reset_clock.getElapsedTime().asSeconds() > RESET_FEEDBACK_COOLDOWN)
+	{
+		setColor(Color(255, 255, 255, 255));
+	}
+
 	AnimatedSprite::update(deltaTime);
 }
 
@@ -172,4 +177,10 @@ GameObject* GameObject::Clone()
 void GameObject::GetDiscoball(GameObject* discoball, float angle_collision)
 {
 	//see override function
+}
+
+void GameObject::PlayHitFeedback()
+{
+	setColor(Color(0, 255, 0, 255));
+	feedback_reset_clock.restart();
 }

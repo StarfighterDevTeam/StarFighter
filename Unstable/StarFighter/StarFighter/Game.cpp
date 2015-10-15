@@ -165,6 +165,42 @@ void Game::colisionChecksV2()
 			}
 		}
 	}
+
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[GameObjectType::DiscoballObject].begin(); it1 != sceneGameObjectsTyped[GameObjectType::DiscoballObject].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		//Discoball hits goal
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::GoalBlueObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::GoalBlueObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+
+				//TRON SPECIFIC
+				(*it2)->PlayHitFeedback();
+			}
+		}
+
+		//Discoball hits goal
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::GoalRedObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::GoalRedObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+
+				//TRON SPECIFIC
+				(*it2)->PlayHitFeedback();
+			}
+		}
+	}
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
