@@ -34,9 +34,9 @@ int main()
 		//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
 		//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
 		//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
-	if (!SpaceCowboys.openFromFile("Assets/Music/OrientalCrystal.ogg"))
+	if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
 		return -1; // erreur
-	//SpaceCowboys.play();
+	SpaceCowboys.play();
 	SpaceCowboys.setLoop(true);
 
 	CurrentGame = new Game();

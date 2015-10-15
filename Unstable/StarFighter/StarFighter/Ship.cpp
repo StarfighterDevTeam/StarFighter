@@ -25,8 +25,11 @@ void Ship::Init()
 	discoball_clockwise = true;
 
 	isFiringButtonReleased = false;
+	wasFiringButtonReleased = false;
 	isSwitchingButtonReleased = false;
 	carry_again_clock.restart();
+
+	isTackling = NOT_TACKLING;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -55,13 +58,25 @@ void Ship::update(sf::Time deltaTime)
 		movingY = inputs_direction.y != 0;
 	}
 
-
-	ManageAcceleration(inputs_direction);
-	IdleDecelleration(deltaTime);
+	if (isTackling == NOT_TACKLING)
+	{
+		ManageAcceleration(inputs_direction);
+		IdleDecelleration(deltaTime);
+	}
+	
+	ManageTackle();
+	
+	//printf("speed : %f, %f \n", speed.x, speed.y);
 
 	GameObject::update(deltaTime);
 
-	ScreenBorderContraints();
+	if (ScreenBorderContraints())
+	{
+		if (isTackling != NOT_TACKLING)
+		{
+			isTackling = NOT_TACKLING;
+		}
+	}
 
 	ManageFire();
 	ManageSwitchRotation();
@@ -70,31 +85,39 @@ void Ship::update(sf::Time deltaTime)
 	ManageKeyReleases();
 }
 
-void Ship::ScreenBorderContraints()
+bool Ship::ScreenBorderContraints()
 {
+	bool correction_made = false;
+
 	if (this->getPosition().x < this->m_size.x / 2)
 	{
 		this->setPosition(m_size.x / 2, this->getPosition().y);
 		speed.x = 0;
+		correction_made = true;
 	}
 
 	if (this->getPosition().x > SCENE_SIZE_X - (m_size.x / 2))
 	{
 		this->setPosition(SCENE_SIZE_X - (m_size.x / 2), this->getPosition().y);
 		speed.x = 0;
+		correction_made = true;
 	}
 
 	if (this->getPosition().y < m_size.y / 2)
 	{
 		this->setPosition(this->getPosition().x, m_size.y / 2);
 		speed.y = 0;
+		correction_made = true;
 	}
 
 	if (this->getPosition().y > SCENE_SIZE_Y - (m_size.y / 2))
 	{
 		this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (m_size.y / 2));
 		speed.y = 0;
+		correction_made = true;
 	}
+
+	return correction_made;
 }
 
 void Ship::IdleDecelleration(sf::Time deltaTime)
@@ -102,7 +125,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	//idle decceleration
 	if (!movingX)
 	{
-		speed.x -= (speed.x) * deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
+		speed.x -= (speed.x) * deltaTime.asSeconds()* SHIP_DECELERATION_COEF / 100.f;
 
 		if (abs(speed.x) < SHIP_MIN_SPEED)
 			speed.x = 0;
@@ -110,7 +133,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 	if (!movingY)
 	{
-		speed.y -= (speed.y)*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
+		speed.y -= (speed.y)*deltaTime.asSeconds()*SHIP_DECELERATION_COEF / 100.f;
 
 		if (abs(speed.y) < SHIP_MIN_SPEED)
 			speed.y = 0;
@@ -119,8 +142,8 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	speed.y += inputs_direction.y*SHIP_ACCELERATION;
+	speed.x += inputs_direction.x * SHIP_ACCELERATION;
+	speed.y += inputs_direction.y * SHIP_ACCELERATION;
 
 	//max speed constraints
 	if (abs(speed.x) > SHIP_MAX_SPEED)
@@ -213,9 +236,12 @@ void Ship::ManageFire()
 {
 	if (m_discoball != NULL)
 	{
-		if (InputGuy::isFiring())
+		if (InputGuy::isFiring() && wasFiringButtonReleased)
 		{
 			ReleaseDiscoball();
+
+			isFiringButtonReleased = false;
+			wasFiringButtonReleased = false;
 		}
 	}
 }
@@ -232,7 +258,6 @@ void Ship::ReleaseDiscoball()
 		carry_again_clock.restart();
 		m_discoball->carrier = NULL;
 		m_discoball = NULL;
-
 	}
 }
 
@@ -270,9 +295,121 @@ void Ship::ManageKeyReleases()
 	if (!InputGuy::isFiring())
 	{
 		isFiringButtonReleased = true;
+		wasFiringButtonReleased = true;
 	}
 	if (!InputGuy::isSwitchingRotation())
 	{
 		isSwitchingButtonReleased = true;
+	}
+}
+
+void Ship::ManageTackle()
+{
+	//State 0
+	if (isTackling == NOT_TACKLING)
+	{
+		tackle_curSpeedBonus = 0;
+
+		if (m_discoball == NULL)
+		{
+			if (tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
+			{
+				if ((speed.x * speed.x) + (speed.y * speed.y) > SHIP_MIN_SPEED_FOR_TACKLE * SHIP_MIN_SPEED_FOR_TACKLE)
+				{
+					if (InputGuy::isFiring() && wasFiringButtonReleased)
+					{
+						isTackling = INITIATE_TACLKE;
+
+						isFiringButtonReleased = false;
+						wasFiringButtonReleased = false;
+
+						speed_on_tackling.x = speed.x;
+						speed_on_tackling.y = speed.y;
+					}
+				}
+			}
+		}
+	}
+
+	//State 1
+	if (isTackling == INITIATE_TACLKE)
+	{
+		//max value not reach = linear increase of speed
+		if (tackle_curSpeedBonus + SHIP_TACKLE_ACCELERATION_RATIO < SHIP_MAX_TACKLE_SPEED_BONUS_RATIO)
+		{
+			speed.x += (speed_on_tackling.x * SHIP_TACKLE_ACCELERATION_RATIO);
+			speed.y += (speed_on_tackling.y * SHIP_TACKLE_ACCELERATION_RATIO);
+
+			//keeping memory of increases
+			tackle_curSpeedBonus += SHIP_TACKLE_ACCELERATION_RATIO;
+		}
+		//max value reached = changing state
+		else
+		{
+			//capping value
+			tackle_curSpeedBonus = SHIP_MAX_TACKLE_SPEED_BONUS_RATIO - tackle_curSpeedBonus;
+
+			speed.x += (speed_on_tackling.x * tackle_curSpeedBonus);
+			speed.y += (speed_on_tackling.y * tackle_curSpeedBonus);
+
+			isTackling = MAX_SPEED_TACKLE;
+			tackle_min_clock.restart();
+
+			printf("speed max : %f, %f \n", speed.x, speed.y);
+		}
+	}
+
+	//State 2
+	if (isTackling == MAX_SPEED_TACKLE)
+	{
+		if (tackle_min_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MIN_LASTING_TIME)
+		{
+			if (!wasFiringButtonReleased)
+			{
+				isTackling = HOLDING_TACKLE;
+				tackle_max_hold_clock.restart();
+				printf("speed holding");
+			}
+			else
+			{
+				isTackling = ENDING_TACKLE;
+
+				printf("speed end of tackle");
+			}
+			speed.x *= SHIP_SPEED_PERCENTAGE_ON_HOLDING_TACKLE;
+			speed.y *= SHIP_SPEED_PERCENTAGE_ON_HOLDING_TACKLE;
+
+			printf(" : %f, %f \n", speed.x, speed.y);
+		}
+	}
+		
+	//State 3
+	if (isTackling == HOLDING_TACKLE)
+	{
+		if (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasFiringButtonReleased)
+		{
+			isTackling = ENDING_TACKLE;
+			printf("speed end of tackle : %f, %f \n", speed.x, speed.y);
+		}
+		else
+		{
+			speed.x *= (1 - SHIP_TACKLE_HOLDDECELERATION_COFF);
+			speed.y *= (1 - SHIP_TACKLE_HOLDDECELERATION_COFF);
+		}
+	}
+
+	//State 4
+	if (isTackling == ENDING_TACKLE)
+	{
+		speed.x *= (1 - SHIP_TACKLE_DECELERATION_COFF);
+		speed.y *= (1 - SHIP_TACKLE_DECELERATION_COFF);
+
+		//reached targeted speed for ending the tackle?
+		if ((abs(speed.x) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.x) > 0) || (abs(speed.y) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.y) > 0))
+		{
+			isTackling = NOT_TACKLING;
+			tackle_again_clock.restart();
+			printf("speed normal : %f, %f \n", speed.x, speed.y);
+		}
 	}
 }
