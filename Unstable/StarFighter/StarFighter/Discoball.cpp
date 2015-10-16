@@ -95,13 +95,15 @@ void Discoball::update(sf::Time deltaTime)
 		setColor(sf::Color(0, 0, 0, 255));
 	}
 
-	else // get carrier position
+	else //get carrier position
 	{
 		static sf::Vector2f new_position, new_offset;
 		static sf::Vector2f previous_position = getPosition();
 
 		new_offset.x = -DISCOBALL_GRAVITATION_DISTANCE * sin(carrier_curAngle);
 		new_offset.y = DISCOBALL_GRAVITATION_DISTANCE * cos(carrier_curAngle);
+		//new_offset.x = 0;
+		//new_offset.y = 0;
 
 		new_position.x = carrier_curPosition.x + new_offset.x;
 		new_position.y = carrier_curPosition.y + new_offset.y;

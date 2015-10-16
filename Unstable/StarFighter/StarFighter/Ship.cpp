@@ -152,6 +152,48 @@ void Ship::GetDirectionInputs(sf::Vector2f inputs_direction)
 {
 	speed.x += inputs_direction.x * SHIP_ACCELERATION;
 	speed.y += inputs_direction.y * SHIP_ACCELERATION;
+
+	//turning toward targeted position
+	if (speed.x == 0 && speed.y == 0)
+	{
+		//do nothing
+	}
+	else if (speed.x == 0 && speed.y > 0)
+	{
+		setRotation(180);
+	}
+	else if (speed.x == 0 && speed.y < 0)
+	{
+		setRotation(0);
+	}
+	else if (speed.y == 0 && speed.x > 0)
+	{
+		setRotation(90);
+	}
+	else if (speed.y == 0 && speed.x < 0)
+	{
+		setRotation(270);
+	}
+	else
+	{
+		const float a = speed.x;
+		const float b = speed.y;
+
+		float distance_to_obj = (a * a) + (b * b);
+		distance_to_obj = sqrt(distance_to_obj);
+
+		// TO DO
+		float angle;
+		angle = acos(a / distance_to_obj);
+
+		if (b < 0)
+		{
+			angle = -angle;
+		}
+
+		angle += M_PI_2;
+		setRotation(angle * 180 / M_PI);
+	}
 }
 
 void Ship::MaxSpeedConstraints()
@@ -221,7 +263,15 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 			//discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
 
 			//2/ or translate cartesian speed into polar speed?
-			discoball_curAngularSpeed = m_discoball->cartesian_speed / DISCOBALL_GRAVITATION_DISTANCE;
+			if (DISCOBALL_GRAVITATION_DISTANCE == 0)
+			{
+				LOGGER_WRITE(Logger::Priority::DEBUG, "division by zero in Ship::GetDiscoball, cause DISCOBALL_GRATIVATION_DISTANCE = 0");
+			}
+			else
+			{
+				discoball_curAngularSpeed = m_discoball->cartesian_speed / DISCOBALL_GRAVITATION_DISTANCE;
+			}
+			
 			discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
 			printf("Discoball catched (speed: %f", angle_collision, discoball_curAngularSpeed);
 			DiscoballSpeedConstraints();
@@ -244,12 +294,12 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 			{
 				m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
 			}
+
+			//canceling speed bonus on receiving the ball
+			isThrowing = NOT_THROWING;
+
+			(*CurrentGame).PlaySFX(SFX_Catch);
 		}
-
-		//canceling speed bonus on receiving the ball
-		isThrowing = NOT_THROWING;
-
-		(*CurrentGame).PlaySFX(SFX_Catch);
 	}
 }
 
@@ -294,8 +344,11 @@ void Ship::ThrowDiscoball()
 {
 	if (m_discoball != NULL)
 	{
+		//throw in rotation direction #optional line
+		//discoball_curAngle = (getRotation() + 180.f) * M_PI / 180.f;
+
 		discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
-		m_discoball->speed.x = - discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);;
+		m_discoball->speed.x = -discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
 		m_discoball->speed.y = discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
 		m_discoball->carried = false;
 		printf("Discoball released. (speed: %f)\n", discoball_curAngularSpeed);
