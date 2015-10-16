@@ -248,6 +248,8 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 
 		//canceling speed bonus on receiving the ball
 		isThrowing = NOT_THROWING;
+
+		(*CurrentGame).PlaySFX(SFX_Catch);
 	}
 }
 
@@ -304,6 +306,8 @@ void Ship::ThrowDiscoball()
 		isThrowing = AFTER_THROW;
 		throw_bonus_speed_clock.restart();
 		carry_again_clock.restart();
+
+		(*CurrentGame).PlaySFX(SFX_Throw);
 	}
 }
 
@@ -331,6 +335,8 @@ void Ship::ManageSwitchRotation()
 				discoball_clockwise = !discoball_clockwise;
 				carrier_clock.restart();
 				isSwitchingButtonReleased = false;
+
+				(*CurrentGame).PlaySFX(SFX_Switch);
 			}
 		}
 	}
@@ -372,6 +378,8 @@ void Ship::ManageTackle()
 						MaxSpeedConstraints();//avoids to cumulate multiple bonuses
 						speed_on_tackling.x = speed.x;
 						speed_on_tackling.y = speed.y;
+
+						(*CurrentGame).PlaySFX(SFX_Tackle);
 					}
 				}
 			}

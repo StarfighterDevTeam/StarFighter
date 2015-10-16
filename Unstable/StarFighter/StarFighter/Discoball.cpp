@@ -49,25 +49,36 @@ void Discoball::update(sf::Time deltaTime)
 		this->setPosition(newposition.x, newposition.y);
 
 		//Bouncing against screen borders
+		bool isBouncing_ = false;
 		if (newposition.x < this->m_size.x / 2)
 		{
 			this->speed.x *= -1;
 			this->setPosition(this->m_size.x / 2, newposition.y);
+			isBouncing_ = true;
+			
 		}
 		else if (newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
 		{
 			this->speed.x *= -1;
 			this->setPosition(SCENE_SIZE_X - this->m_size.x / 2, newposition.y);
+			isBouncing_ = true;
 		}
 		else if (newposition.y < this->m_size.y / 2)
 		{
 			this->speed.y *= -1;
 			this->setPosition(newposition.x, this->m_size.y / 2);
+			isBouncing_ = true;
 		}
 		else if (newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
 		{
 			this->speed.y *= -1;
 			this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
+			isBouncing_ = true;
+		}
+		//SFX feedback
+		if (isBouncing_)
+		{
+			(*CurrentGame).PlaySFX(SFX_Bounce);
 		}
 
 		//calculations
@@ -103,6 +114,4 @@ void Discoball::update(sf::Time deltaTime)
 	}
 
 	AnimatedSprite::update(deltaTime);
-
-	
 }

@@ -10,6 +10,70 @@ const char* GameObjectTypeValues[] =
 	stringify(EnemyObject)
 };
 
+int Game::LoadSFX()
+{
+	if (!soundBuffers[0].loadFromFile("Assets/Sounds/Bounce1.ogg"))
+		return -1;
+	if (!soundBuffers[1].loadFromFile("Assets/Sounds/Bounce2.ogg"))
+		return -1;
+	if (!soundBuffers[2].loadFromFile("Assets/Sounds/Bounce3.ogg"))
+		return -1;
+	if (!soundBuffers[3].loadFromFile("Assets/Sounds/Bounce4.ogg"))
+		return -1;
+	if (!soundBuffers[4].loadFromFile("Assets/Sounds/Bounce5.ogg"))
+		return -1;
+	if (!soundBuffers[5].loadFromFile("Assets/Sounds/Goal.ogg"))
+		return -1;
+	if (!soundBuffers[6].loadFromFile("Assets/Sounds/Tackle.ogg"))
+		return -1;
+	if (!soundBuffers[7].loadFromFile("Assets/Sounds/Throw.ogg"))
+		return -1;
+	if (!soundBuffers[8].loadFromFile("Assets/Sounds/Catch.ogg"))
+		return -1;
+	//if (!soundBuffers[9].loadFromFile("Assets/Sounds/Switch.ogg"))
+		//return -1;
+
+	soundsBounce[0].setBuffer(soundBuffers[0]);
+	soundsBounce[1].setBuffer(soundBuffers[1]);
+	soundsBounce[2].setBuffer(soundBuffers[2]);
+	soundsBounce[3].setBuffer(soundBuffers[3]);
+	soundsBounce[4].setBuffer(soundBuffers[4]);
+	soundsGoal.setBuffer(soundBuffers[5]);
+	soundsTackle.setBuffer(soundBuffers[6]);
+	soundsThrow.setBuffer(soundBuffers[7]);
+	soundsCatch.setBuffer(soundBuffers[8]);
+	//soundsSwitch.setBuffer(soundBuffers[9]);
+}
+
+void Game::PlaySFX(SFX_Bank sfx_name)
+{
+	if (sfx_name == SFX_Bounce)
+	{
+		int i = RandomizeIntBetweenValues(0, 4);
+		soundsBounce[i].play();
+	}
+	if (sfx_name == SFX_Goal)
+	{
+		soundsGoal.play();
+	}
+	if (sfx_name == SFX_Tackle)
+	{
+		soundsTackle.play();
+	}
+	if (sfx_name == SFX_Throw)
+	{
+		soundsThrow.play();
+	}
+	if (sfx_name == SFX_Catch)
+	{
+		soundsCatch.play();
+	}
+	if (sfx_name == SFX_Switch)
+	{
+		//soundsSwitch.play();
+	}
+}
+
 void Game::init(RenderWindow* window)
 {
 	this->window = window;
@@ -19,6 +83,8 @@ void Game::init(RenderWindow* window)
 	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
 	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
 	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+
+	LoadSFX();
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -178,6 +244,7 @@ void Game::colisionChecksV2()
 
 				//TRON SPECIFIC
 				(*it2)->PlayHitFeedback();
+				PlaySFX(SFX_Goal);
 			}
 		}
 
@@ -193,6 +260,7 @@ void Game::colisionChecksV2()
 
 				//TRON SPECIFIC
 				(*it2)->PlayHitFeedback();
+				PlaySFX(SFX_Goal);
 			}
 		}
 	}

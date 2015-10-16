@@ -9,8 +9,19 @@
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <SFML/Audio.hpp>
 
 class Ship;
+
+enum SFX_Bank
+{
+	SFX_Bounce,
+	SFX_Goal,
+	SFX_Tackle,
+	SFX_Throw,
+	SFX_Catch,
+	SFX_Switch,
+};
 
 using namespace sf;
 
@@ -36,7 +47,16 @@ public:
 	float vspeed;
 	sf::Vector2f scale_factor;
 
-	Ship* playerShip;
+	//SFX
+	int LoadSFX();
+	void PlaySFX(SFX_Bank sfx_name);
+	sf::SoundBuffer soundBuffers[9];
+	sf::Sound soundsBounce[5];
+	sf::Sound soundsTackle;
+	sf::Sound soundsGoal;
+	sf::Sound soundsThrow;
+	sf::Sound soundsCatch;
+	sf::Sound soundsSwitch;
 
 	//TRON SPECIFIC
 	float GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj);
