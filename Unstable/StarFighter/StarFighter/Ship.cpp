@@ -17,6 +17,7 @@ void Ship::Init()
 	moving = false;
 	movingX = movingY = false;
 	disable_inputs = false;
+	m_controllerType = AllControlDevices;
 
 	//TRON SPECIFIC
 	m_discoball = NULL;
@@ -47,9 +48,14 @@ Ship::~Ship()
 	
 }
 
+void Ship::SetControllerType(ControlerType contoller)
+{
+	m_controllerType = contoller;
+}
+
 void Ship::update(sf::Time deltaTime)
 {
-	sf::Vector2f inputs_direction = InputGuy::getDirections();
+	sf::Vector2f inputs_direction = InputGuy::getDirections(m_controllerType);
 
 	if (!disable_inputs)
 	{
@@ -272,7 +278,7 @@ void Ship::ManageFire()
 {
 	if (m_discoball != NULL)
 	{
-		if (InputGuy::isFiring() && wasFiringButtonReleased)
+		if (InputGuy::isFiring(m_controllerType) && wasFiringButtonReleased)
 		{
 			ThrowDiscoball();
 
@@ -320,7 +326,7 @@ void Ship::ManageSwitchRotation()
 	{
 		if (isSwitchingButtonReleased)
 		{
-			if (InputGuy::isSwitchingRotation())
+			if (InputGuy::isSwitchingRotation(m_controllerType))
 			{
 				discoball_clockwise = !discoball_clockwise;
 				carrier_clock.restart();
@@ -332,12 +338,12 @@ void Ship::ManageSwitchRotation()
 
 void Ship::ManageKeyReleases()
 {
-	if (!InputGuy::isFiring())
+	if (!InputGuy::isFiring(m_controllerType))
 	{
 		isFiringButtonReleased = true;
 		wasFiringButtonReleased = true;
 	}
-	if (!InputGuy::isSwitchingRotation())
+	if (!InputGuy::isSwitchingRotation(m_controllerType))
 	{
 		isSwitchingButtonReleased = true;
 	}
@@ -356,7 +362,7 @@ void Ship::ManageTackle()
 			{
 				if ((speed.x * speed.x) + (speed.y * speed.y) > SHIP_MIN_SPEED_FOR_TACKLE * SHIP_MIN_SPEED_FOR_TACKLE)
 				{
-					if (InputGuy::isFiring() && wasFiringButtonReleased)
+					if (InputGuy::isFiring(m_controllerType) && wasFiringButtonReleased)
 					{
 						isTackling = INITIATE_TACLKE;
 

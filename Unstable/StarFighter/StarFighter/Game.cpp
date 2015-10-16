@@ -26,11 +26,6 @@ sf::RenderWindow* Game::getMainWindow()
 	return this->window;
 }
 
-void Game::SetPlayerShip(Ship* m_playerShip)
-{
-	this->playerShip = m_playerShip;
-}
-
 void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
 {
 	object->layer = m_layer;

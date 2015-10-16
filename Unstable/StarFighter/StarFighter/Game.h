@@ -37,7 +37,6 @@ public:
 	sf::Vector2f scale_factor;
 
 	Ship* playerShip;
-	void SetPlayerShip(Ship* m_playerShip);
 
 	//TRON SPECIFIC
 	float GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj);

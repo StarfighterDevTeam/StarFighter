@@ -87,6 +87,7 @@ void Discoball::update(sf::Time deltaTime)
 	else // get carrier position
 	{
 		static sf::Vector2f new_position, new_offset;
+		static sf::Vector2f previous_position = getPosition();
 
 		new_offset.x = -DISCOBALL_GRAVITATION_DISTANCE * sin(carrier_curAngle);
 		new_offset.y = DISCOBALL_GRAVITATION_DISTANCE * cos(carrier_curAngle);
@@ -95,6 +96,10 @@ void Discoball::update(sf::Time deltaTime)
 		new_position.y = carrier_curPosition.y + new_offset.y;
 
 		setPosition(new_position);
+
+		//useful info to record
+		speed.x = new_position.x - previous_position.x;
+		speed.y = new_position.y - previous_position.y;
 	}
 
 	AnimatedSprite::update(deltaTime);

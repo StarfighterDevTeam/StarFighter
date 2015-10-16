@@ -1,43 +1,56 @@
 
 #include "InputGuy.h"
 
-bool InputGuy::isFiring()
+bool InputGuy::isFiring(ControlerType device)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		return true;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			return true;
+		}
 	}
 
-	if (sf::Joystick::isConnected(0))
+	if (device == AllControlDevices || device == JoystickControl)
 	{
-		if (sf::Joystick::hasAxis(0, sf::Joystick::Axis::Z))
+		if (sf::Joystick::isConnected(0))
 		{
-			if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE)
+			if (sf::Joystick::hasAxis(0, sf::Joystick::Axis::Z))
+			{
+				if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE)
+				{
+					return true;
+				}
+			}
+			if (sf::Joystick::isButtonPressed(0, 0)) // A button
 			{
 				return true;
 			}
 		}
-		if (sf::Joystick::isButtonPressed(0, 0)) // A button
+	}
+	
+	return false;
+}
+
+bool InputGuy::isSwitchingRotation(ControlerType device)
+{
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 		{
 			return true;
 		}
 	}
-	return false;
-}
 
-bool InputGuy::isSwitchingRotation()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+	if (device == AllControlDevices || device == JoystickControl)
 	{
-		return true;
+		if (sf::Joystick::isConnected(0))
+		{
+			if (sf::Joystick::isButtonPressed(0, 3))// Y button
+				return true;
+		}
 	}
-
-	if (sf::Joystick::isConnected(0))
-	{
-		if (sf::Joystick::isButtonPressed(0, 3))// Y button
-			return true;
-	}
-
+	
 	return false;
 }
 
@@ -137,27 +150,30 @@ bool InputGuy::isOpeningHud()
 	return false;
 }
 
-Vector2f InputGuy::getDirections()
+Vector2f InputGuy::getDirections(ControlerType device)
 {
 	short dirX = 0;
 	short dirY = 0;
 
 	//Keyboard inputs
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		dirX++;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-	{
-		dirY--;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-	{
-		dirX--;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-	{
-		dirY++;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			dirX++;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			dirY--;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			dirX--;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			dirY++;
+		}
 	}
 
 	//Conputing directions
@@ -168,18 +184,22 @@ Vector2f InputGuy::getDirections()
 	y = dirY > 0 ? 1 : (dirY < 0 ? -1.f : 0.f);
 
 	//Joystick inputs (if connected)
-	if (sf::Joystick::isConnected(0))
+	if (device == AllControlDevices || device == JoystickControl)
 	{
-		if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)) > JOYSTICK_MIN_AXIS_VALUE)
-			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X) / 100.0f;
-		else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX)) > JOYSTICK_MIN_AXIS_VALUE)
-			x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.0f;
-		
-		if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)) > JOYSTICK_MIN_AXIS_VALUE)
-			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) / 100.0f;
-		else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY)) > JOYSTICK_MIN_AXIS_VALUE)
-			y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0f;
+		if (sf::Joystick::isConnected(0))
+		{
+			if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)) > JOYSTICK_MIN_AXIS_VALUE)
+				x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X) / 100.0f;
+			else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX)) > JOYSTICK_MIN_AXIS_VALUE)
+				x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.0f;
+
+			if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)) > JOYSTICK_MIN_AXIS_VALUE)
+				y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) / 100.0f;
+			else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY)) > JOYSTICK_MIN_AXIS_VALUE)
+				y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0f;
+		}
 	}
+	
 
 	//diagonal movement?
 	if (abs(x) + abs(y) > 1)

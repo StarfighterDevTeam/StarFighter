@@ -8,9 +8,13 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).init(this->mainWindow);
 	
 	//intégration placeholder
-	Ship* playerShip = new Ship(sf::Vector2f(100, 540), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
-	(*CurrentGame).SetPlayerShip(playerShip);
-	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
+	Ship* playerShip1 = new Ship(sf::Vector2f(100, 540), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+	playerShip1->SetControllerType(KeyboardControl);
+	(*CurrentGame).addToScene(playerShip1, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
+
+	Ship* playerShip2 = new Ship(sf::Vector2f(1820, 540), sf::Vector2f(0, 0), "Assets/2D/quorra.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+	playerShip2->SetControllerType(JoystickControl);
+	(*CurrentGame).addToScene(playerShip2, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 
 	GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
 	(*CurrentGame).addToScene(background, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);

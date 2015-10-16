@@ -9,13 +9,20 @@
 
 using namespace sf;
 
+enum ControlerType
+{
+	AllControlDevices,
+	KeyboardControl,
+	JoystickControl,
+};
+
 class InputGuy
 {
 public:
-	static Vector2f getDirections();
-	static bool isFiring();
+	static Vector2f getDirections(ControlerType device = AllControlDevices);
+	static bool isFiring(ControlerType device = AllControlDevices);
 	static bool isBraking();
-	static bool isSwitchingRotation();
+	static bool isSwitchingRotation(ControlerType device = AllControlDevices);
 	static bool isSlowMotion();
 	static bool setAutomaticFire();
 	static bool isChangingResolution();

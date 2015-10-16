@@ -39,6 +39,9 @@ public :
 
 	bool disable_inputs;
 
+	ControlerType m_controllerType;
+	void SetControllerType(ControlerType contoller);
+
 	//TRON SPECIFIC
 	Discoball* m_discoball;
 	float discoball_curAngle;
