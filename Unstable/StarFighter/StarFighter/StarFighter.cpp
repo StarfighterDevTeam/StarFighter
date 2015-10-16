@@ -34,8 +34,10 @@ int main()
 		//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
 		//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
 		//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
-	if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
+		//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
+	if (!SpaceCowboys.openFromFile("Assets/Music/Tron_End_Titles.ogg"))
 		return -1; // erreur
+	SpaceCowboys.setVolume(50);
 	SpaceCowboys.play();
 	SpaceCowboys.setLoop(true);
 
