@@ -65,7 +65,8 @@ public:
 	GameObjectType collider_type;
 	LayerType layer;
 	sf::Vector2f m_size;
-	sf::Vector2f getGameObjectSpeed();
+	float GetAbsoluteSpeed();
+
 	string getName();
 	virtual void Respawn();
 	GameObject* Clone();

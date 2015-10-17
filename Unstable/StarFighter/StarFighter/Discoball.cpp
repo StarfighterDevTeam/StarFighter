@@ -29,6 +29,7 @@ void Discoball::Init()
 	carrier_curAngle = -1.f;
 	carrier_curPosition = sf::Vector2f(-1.f, -1.f);
 	DontGarbageMe = true;
+	discoball_curAngularSpeed = 0.f;
 }
 
 Discoball::~Discoball()
@@ -82,13 +83,7 @@ void Discoball::update(sf::Time deltaTime)
 		}
 
 		//calculations
-		const float a = speed.x;
-		const float b = speed.y;
-		float s = (a * a) + (b * b);
-		s = sqrt(s);
-		cartesian_speed = s;
-
-		polar_angle = atan(a / b);
+		polar_angle = atan(speed.x / speed.y);
 
 		//printf("cartesian speed: %f, polar angle: %f\n", cartesian_speed, polar_angle);
 

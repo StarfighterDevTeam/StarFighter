@@ -159,9 +159,14 @@ void GameObject::setGhost(bool m_ghost)
 	}
 }
 
-sf::Vector2f GameObject::getGameObjectSpeed()
+float GameObject::GetAbsoluteSpeed()
 {
-	return speed;
+	const float a = speed.x;
+	const float b = speed.y;
+	float s = (a * a) + (b * b);
+	s = sqrt(s);
+
+	return s;
 }
 
 GameObject* GameObject::Clone()

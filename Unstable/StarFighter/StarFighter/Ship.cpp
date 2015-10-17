@@ -22,7 +22,6 @@ void Ship::Init()
 	//TRON SPECIFIC
 	m_discoball = NULL;
 	discoball_curAngle = -1.f;
-	discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
 	discoball_clockwise = true;
 
 	isFiringButtonReleased = false;
@@ -31,6 +30,8 @@ void Ship::Init()
 
 	isTackling = NOT_TACKLING;
 	isThrowing = NOT_THROWING;
+
+	throw_curSpeedBonus = 0.f;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -91,6 +92,8 @@ void Ship::update(sf::Time deltaTime)
 
 	ManageKeyReleases();
 	ManageFeedbacks();
+
+	(*CurrentGame).view.move(sf::Vector2f(speed.x, speed.y));
 }
 
 bool Ship::ScreenBorderContraints()
@@ -207,13 +210,14 @@ void Ship::MaxSpeedConstraints()
 		{
 			if (isTackling == NOT_TACKLING && m_discoball == NULL) //for safety
 			{
-				ship_max_speed = SHIP_MAX_SPEED + (discoball_curAngularSpeed * SHIP_MAX_SPEED_MULTIPLIER_AFTER_THROW);
+				ship_max_speed = SHIP_MAX_SPEED + throw_curSpeedBonus;
 			}
 		}
 	}
 	else
 	{
 		isThrowing = NOT_THROWING;
+		throw_curSpeedBonus = 0;
 	}
 
 	//max speed constraints
@@ -233,8 +237,6 @@ void Ship::MaxSpeedConstraints()
 		speed.x *= p;
 		speed.y *= p;
 	}
-
-	printf("speed : %f, %f \n", speed.x, speed.y);
 }
 
 //TRON SPECIFIC
@@ -253,29 +255,23 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				m_discoball->carrier->m_discoball = NULL;
 			}
 
+			//setting discoball speed after catch
+			//1/ reset speed on catch?
+			//m_discoball->discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
+			
+			//2/ apply a malus?
+			m_discoball->discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
+
 			//acquisition of the discoball
 			m_discoball->carried = true;
 			m_discoball->carrier = this;
 			discoball_curAngle = angle_collision;
 			carrier_clock.restart();
 
-			//1/ reset speed on catch?
-			//discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
-
-			//2/ or translate cartesian speed into polar speed?
-			if (DISCOBALL_GRAVITATION_DISTANCE == 0)
-			{
-				LOGGER_WRITE(Logger::Priority::DEBUG, "division by zero in Ship::GetDiscoball, cause DISCOBALL_GRATIVATION_DISTANCE = 0");
-			}
-			else
-			{
-				discoball_curAngularSpeed = m_discoball->cartesian_speed / DISCOBALL_GRAVITATION_DISTANCE;
-			}
-			
-			discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
-			printf("Discoball catched (speed: %f", angle_collision, discoball_curAngularSpeed);
+			//checking min and max cap values
+			printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);
 			DiscoballSpeedConstraints();
-			printf(" | correction: %f)\n", discoball_curAngularSpeed);
+			printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
 
 			//setting the sense of rotation (clockwise or counter-clockwise)
 			if (abs(angle_collision) < M_PI_4)
@@ -308,17 +304,17 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 	if (m_discoball != NULL)
 	{
 		int cc = discoball_clockwise ? cc = -1 : cc = 1;
-		discoball_curAngle = fmod(discoball_curAngle - (discoball_curAngularSpeed * cc * deltaTime.asSeconds()), 2 * M_PI);
+		discoball_curAngle = fmod(discoball_curAngle - (m_discoball->discoball_curAngularSpeed * cc * deltaTime.asSeconds()), 2 * M_PI);
 		m_discoball->carrier_curAngle = discoball_curAngle;
 		m_discoball->carrier_curPosition = getPosition();
 
 		//angular speed acceleration
-		if (carrier_clock.getElapsedTime().asSeconds() > 1 && discoball_curAngularSpeed < DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
+		if (carrier_clock.getElapsedTime().asSeconds() > 1 && m_discoball->discoball_curAngularSpeed < DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
 		{
-			discoball_curAngularSpeed += CARRY_ANGULAR_ACCELERATION;
-			printf("Discoball accelerated. (speed: %f", discoball_curAngularSpeed);
+			m_discoball->discoball_curAngularSpeed += CARRY_ANGULAR_ACCELERATION;
+			printf("Discoball accelerated. (speed: %f", m_discoball->discoball_curAngularSpeed);
 			DiscoballSpeedConstraints();
-			printf(" | correction: %f)\n", discoball_curAngularSpeed);
+			printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
 			carrier_clock.restart();
 		}
 
@@ -347,18 +343,24 @@ void Ship::ThrowDiscoball()
 		//throw in rotation direction #optional line
 		//discoball_curAngle = (getRotation() + 180.f) * M_PI / 180.f;
 
-		discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
-		m_discoball->speed.x = -discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
-		m_discoball->speed.y = discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
-		m_discoball->carried = false;
-		printf("Discoball released. (speed: %f)\n", discoball_curAngularSpeed);
-		carry_again_clock.restart();
-		m_discoball->carrier = NULL;
-		m_discoball = NULL;
-
 		isThrowing = AFTER_THROW;
 		throw_bonus_speed_clock.restart();
 		carry_again_clock.restart();
+		throw_curSpeedBonus = m_discoball->discoball_curAngularSpeed * SHIP_MAX_SPEED_MULTIPLIER_AFTER_THROW;
+
+		m_discoball->discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
+		m_discoball->speed.x = - m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
+		m_discoball->speed.y = m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
+		m_discoball->carried = false;
+		printf("Discoball released. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
+		carry_again_clock.restart();
+
+		m_discoball->carrier = NULL;
+		m_discoball = NULL;
+
+		
+
+		
 
 		(*CurrentGame).PlaySFX(SFX_Throw);
 	}
@@ -367,13 +369,13 @@ void Ship::ThrowDiscoball()
 void Ship::DiscoballSpeedConstraints()
 {
 	//apply min and max speed caps
-	if (discoball_curAngularSpeed < DISCOBALL_BASE_ANGULAR_SPEED)
+	if (m_discoball->discoball_curAngularSpeed < DISCOBALL_BASE_ANGULAR_SPEED)
 	{
-		discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
+		m_discoball->discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
 	}
-	else if (discoball_curAngularSpeed > DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
+	else if (m_discoball->discoball_curAngularSpeed > DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION))
 	{
-		discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION);
+		m_discoball->discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED + (CARRY_MAX_STOCKS_OF_ACCELERATION * CARRY_ANGULAR_ACCELERATION);
 	}
 }
 

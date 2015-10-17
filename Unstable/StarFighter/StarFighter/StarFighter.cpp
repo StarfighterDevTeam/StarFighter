@@ -100,28 +100,28 @@ int main()
 				{
 					fullscreen = false;
 					renderWindow.create(VideoMode(1600, 900), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).screen_size = sf::Vector2i(1600, 900);
+					(*CurrentGame).screen_size = sf::Vector2f(1600, 900);
 					break;
 				}
 				case RESOLUTION_1920x1080_FullScreen:
 				{
 					fullscreen = true;
 					renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).screen_size = sf::Vector2i(1920, 1080);
+					(*CurrentGame).screen_size = sf::Vector2f(1920, 1080);
 					break;
 				}
 				case RESOLUTION_1280x720:
 				{
 					fullscreen = false;
 					renderWindow.create(VideoMode(1280, 720), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).screen_size = sf::Vector2i(1280, 720);
+					(*CurrentGame).screen_size = sf::Vector2f(1280, 720);
 					break;
 				}
 				case RESOLUTION_1920x1080:
 				{
 					fullscreen = false;
 					renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).screen_size = sf::Vector2i(1920, 1080);
+					(*CurrentGame).screen_size = sf::Vector2f(1920, 1080);
 					break;
 				}
 			}

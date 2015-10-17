@@ -43,6 +43,7 @@ int Game::LoadSFX()
 	soundsThrow.setBuffer(soundBuffers[7]);
 	soundsCatch.setBuffer(soundBuffers[8]);
 	//soundsSwitch.setBuffer(soundBuffers[9]);
+
 }
 
 void Game::PlaySFX(SFX_Bank sfx_name)
@@ -82,9 +83,12 @@ void Game::init(RenderWindow* window)
 
 	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
 	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
-	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+	screen_size = sf::Vector2f(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
 
 	LoadSFX();
+
+	view = this->window->getView();
+	this->window->setView(view);
 }
 
 sf::RenderWindow* Game::getMainWindow()

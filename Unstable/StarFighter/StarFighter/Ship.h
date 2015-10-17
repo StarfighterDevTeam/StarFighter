@@ -45,8 +45,7 @@ public :
 	//TRON SPECIFIC
 	Discoball* m_discoball;
 	float discoball_curAngle;
-	float discoball_curAngularSpeed;
-	float discoball_clockwise;
+	bool discoball_clockwise;
 	void GetDiscoball(GameObject* discoball, float angle_collision) override;
 	void ManageDiscoball(sf::Time deltaTime);
 	void ThrowDiscoball();
@@ -70,6 +69,7 @@ public :
 	sf::Clock tackle_min_clock;
 	sf::Vector2f speed_on_tackling;
 	float tackle_curSpeedBonus;
+	float throw_curSpeedBonus;
 
 private:
 	bool moving;

@@ -17,7 +17,7 @@ public :
 	virtual ~Discoball();
 	void update(sf::Time deltaTime) override;
 
-	float cartesian_speed;
+	float discoball_curAngularSpeed;
 	float polar_angle;
 
 	Ship* carrier;

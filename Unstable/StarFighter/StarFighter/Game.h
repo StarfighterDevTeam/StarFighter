@@ -42,10 +42,12 @@ public:
 	void cleanGarbage();
 	void collectGarbage();
 	sf::RenderTexture mainScreen;
-	sf::Vector2i screen_size;
+	sf::Vector2f screen_size;
 	float hyperspeedMultiplier;
 	float vspeed;
 	sf::Vector2f scale_factor;
+
+	sf::View view;
 
 	//SFX
 	int LoadSFX();
