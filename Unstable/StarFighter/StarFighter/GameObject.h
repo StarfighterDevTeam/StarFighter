@@ -29,6 +29,7 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
+	BumperObject,
 	DiscoballObject,
 	GoalBlueObject,
 	GoalRedObject,

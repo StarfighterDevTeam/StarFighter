@@ -341,6 +341,9 @@ void Ship::ThrowDiscoball()
 
 		m_discoball->discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
 
+		//orthogonal launch
+		discoball_curAngle += discoball_clockwise ? M_PI_2 : - M_PI_2;
+
 		m_discoball->SetSpeedVectorFromAbsoluteSpeed(m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE, discoball_curAngle);
 
 		m_discoball->carried = false;
@@ -524,7 +527,7 @@ void Ship::ManageTackle()
 		speed.y *= (1 - SHIP_TACKLE_DECELERATION_COFF);
 
 		//reached targeted speed for ending the tackle?
-		if ((abs(speed.x) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.x) > 0) || (abs(speed.y) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.y) > 0))
+		if ((abs(speed.x) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.x) > 0) || (abs(speed.y) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.y) > 0) || (speed.x == 0 && speed.y == 0))
 		{
 			isTackling = NOT_TACKLING;
 			tackle_again_clock.restart();
@@ -582,21 +585,33 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 
 	if (isTackling != NOT_TACKLING || isBrawling != NOT_BRAWLING)
 	{
-		if (player2->m_discoball != NULL)
+		if (player2->isRecovering == NOT_HIT)
 		{
-			player2->ReleaseDiscoball();
+			if (player2->m_discoball != NULL)
+			{
+				player2->ReleaseDiscoball();
+			}
+
 			player2->isRecovering = isTackling != NOT_TACKLING ? RECOVERING_FROM_TACKLE : RECOVERING_FROM_BRAWL;
 			player2->hit_recovery_clock.restart();
+			player2->speed.x = 0;
+			player2->speed.y = 0;
 		}
 	}
 
 	else if (player2->isTackling != NOT_TACKLING || player2->isBrawling != NOT_BRAWLING)
 	{
-		if (m_discoball != NULL)
+		if (isRecovering == NOT_HIT)
 		{
-			ReleaseDiscoball();
+			if (m_discoball != NULL)
+			{
+				ReleaseDiscoball();
+			}
+
 			isRecovering = player2->isTackling != NOT_TACKLING ? RECOVERING_FROM_TACKLE : RECOVERING_FROM_BRAWL;
 			hit_recovery_clock.restart();
+			speed.x = 0;
+			speed.y = 0;
 		}
 	}
 }
