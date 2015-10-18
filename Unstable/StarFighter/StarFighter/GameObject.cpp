@@ -177,7 +177,6 @@ float GameObject::SpeedToPolarAngle(sf::Vector2f curSpeed)
 	float distance_to_obj = (a * a) + (b * b);
 	distance_to_obj = sqrt(distance_to_obj);
 
-	// TO DO
 	float angle;
 	angle = acos(a / distance_to_obj);
 

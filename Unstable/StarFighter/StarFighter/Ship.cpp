@@ -31,6 +31,7 @@ void Ship::Init()
 	isTackling = NOT_TACKLING;
 	isThrowing = NOT_THROWING;
 	isBrawling = NOT_BRAWLING;
+	isRecovering = NOT_HIT;
 
 	throw_curSpeedBonus = 0.f;
 }
@@ -57,6 +58,8 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	ManageHitRecovery();
+
 	sf::Vector2f inputs_direction = InputGuy::getDirections(m_controllerType);
 
 	if (!disable_inputs)
@@ -66,7 +69,7 @@ void Ship::update(sf::Time deltaTime)
 		movingY = inputs_direction.y != 0;
 	}
 
-	if (isTackling == NOT_TACKLING && isBrawling == NOT_BRAWLING)
+	if (isTackling == NOT_TACKLING && isBrawling == NOT_BRAWLING && isRecovering == NOT_HIT)
 	{
 		GetDirectionInputs(inputs_direction);
 		MaxSpeedConstraints();
@@ -527,11 +530,23 @@ void Ship::ManageTackle()
 	}
 }
 
+void Ship::ManageHitRecovery()
+{
+	if (hit_recovery_clock.getElapsedTime().asSeconds() > HIT_RECOVERY_COOLDOWN)
+	{
+		isRecovering = NOT_HIT;
+	}
+}
+
 void Ship::ManageFeedbacks()
 {
 	if (isTackling != NOT_TACKLING || isBrawling != NOT_BRAWLING)
 	{
 		setColor(Color(255, 0, 0, 255));
+	}
+	else if (isRecovering == RECOVERING_HIT)
+	{
+		setColor(Color(0, 0, 255, 255));
 	}
 	else if (isThrowing != NOT_THROWING)
 	{
@@ -556,6 +571,8 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 		if (player2->m_discoball != NULL)
 		{
 			player2->ReleaseDiscoball();
+			player2->isRecovering = RECOVERING_HIT;
+			player2->hit_recovery_clock.restart();
 		}
 	}
 
@@ -564,6 +581,8 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 		if (m_discoball != NULL)
 		{
 			ReleaseDiscoball();
+			isRecovering = RECOVERING_HIT;
+			hit_recovery_clock.restart();
 		}
 	}
 }

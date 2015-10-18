@@ -29,6 +29,12 @@ enum BrawlingStatus
 	ENDING_BRAWL,
 };
 
+enum HitRecoveryStatus
+{
+	NOT_HIT,
+	RECOVERING_HIT,
+};
+
 class Ship : public GameObject
 {
 public :
@@ -64,6 +70,7 @@ public :
 	void ManageSwitchRotation();
 	void ManageKeyReleases();
 	void ManageFeedbacks();
+	void ManageHitRecovery();
 	bool isFiringButtonReleased;
 	bool wasFiringButtonReleased;
 	bool isSwitchingButtonReleased;
@@ -74,10 +81,12 @@ public :
 	sf::Clock brawl_duration_clock;
 	sf::Clock brawl_again_clock;
 	sf::Clock throw_bonus_speed_clock;
+	sf::Clock hit_recovery_clock;
 
 	TacklingStatus isTackling;
 	ThrowingStatus isThrowing;
 	BrawlingStatus isBrawling;
+	HitRecoveryStatus isRecovering;
 	sf::Clock tackle_max_hold_clock;
 	sf::Clock tackle_min_clock;
 	sf::Vector2f speed_on_tackling;
