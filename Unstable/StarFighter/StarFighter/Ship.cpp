@@ -233,57 +233,60 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 {
 	if (m_discoball == NULL)
 	{
-		if (carry_again_clock.getElapsedTime().asSeconds() > CARRY_AGAIN_COOLDOWN)
+		if (isRecovering == NOT_HIT)
 		{
-			m_discoball = (Discoball*)discoball;
-
-			//deleting old carrier's discoball ownership
-			if (m_discoball->carried)
+			if (carry_again_clock.getElapsedTime().asSeconds() > CARRY_AGAIN_COOLDOWN)
 			{
-				m_discoball->carrier->carry_again_clock.restart();
-				m_discoball->carrier->m_discoball = NULL;
+				m_discoball = (Discoball*)discoball;
+
+				//deleting old carrier's discoball ownership
+				if (m_discoball->carried)
+				{
+					m_discoball->carrier->carry_again_clock.restart();
+					m_discoball->carrier->m_discoball = NULL;
+				}
+
+				//setting discoball speed after catch
+				//1/ reset speed on catch?
+				//m_discoball->discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
+
+				//2/ apply a malus?
+				m_discoball->discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
+
+				//acquisition of the discoball
+				m_discoball->carried = true;
+				m_discoball->carrier = this;
+				discoball_curAngle = angle_collision;
+				carrier_clock.restart();
+
+				//checking min and max cap values
+				printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);
+				DiscoballSpeedConstraints();
+				printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
+
+				//setting the sense of rotation (clockwise or counter-clockwise)
+				if (abs(angle_collision) < M_PI_4)
+				{
+					m_discoball->speed.x < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+				}
+				else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
+				{
+					m_discoball->speed.y < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+				}
+				else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
+				{
+					m_discoball->speed.x > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+				}
+				else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
+				{
+					m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+				}
+
+				//canceling speed bonus on receiving the ball
+				isThrowing = NOT_THROWING;
+
+				(*CurrentGame).PlaySFX(SFX_Catch);
 			}
-
-			//setting discoball speed after catch
-			//1/ reset speed on catch?
-			//m_discoball->discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
-			
-			//2/ apply a malus?
-			m_discoball->discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
-
-			//acquisition of the discoball
-			m_discoball->carried = true;
-			m_discoball->carrier = this;
-			discoball_curAngle = angle_collision;
-			carrier_clock.restart();
-
-			//checking min and max cap values
-			printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);
-			DiscoballSpeedConstraints();
-			printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
-
-			//setting the sense of rotation (clockwise or counter-clockwise)
-			if (abs(angle_collision) < M_PI_4)
-			{
-				m_discoball->speed.x < 0 ? discoball_clockwise = true : discoball_clockwise = false;
-			}
-			else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
-			{
-				m_discoball->speed.y < 0 ? discoball_clockwise = true : discoball_clockwise = false;
-			}
-			else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
-			{
-				m_discoball->speed.x > 0 ? discoball_clockwise = true : discoball_clockwise = false;
-			}
-			else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
-			{
-				m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
-			}
-
-			//canceling speed bonus on receiving the ball
-			isThrowing = NOT_THROWING;
-
-			(*CurrentGame).PlaySFX(SFX_Catch);
 		}
 	}
 }
@@ -532,9 +535,20 @@ void Ship::ManageTackle()
 
 void Ship::ManageHitRecovery()
 {
-	if (hit_recovery_clock.getElapsedTime().asSeconds() > HIT_RECOVERY_COOLDOWN)
+	if (isRecovering == RECOVERING_FROM_BRAWL)
 	{
-		isRecovering = NOT_HIT;
+		if (hit_recovery_clock.getElapsedTime().asSeconds() > RECOVERING_FROM_BRAWL_COOLDOWN)
+		{
+			isRecovering = NOT_HIT;
+		}
+	}
+
+	if (isRecovering == RECOVERING_FROM_TACKLE)
+	{
+		if (hit_recovery_clock.getElapsedTime().asSeconds() > RECOVERING_FROM_TACKLE_COOLDOWN)
+		{
+			isRecovering = NOT_HIT;
+		}
 	}
 }
 
@@ -544,7 +558,7 @@ void Ship::ManageFeedbacks()
 	{
 		setColor(Color(255, 0, 0, 255));
 	}
-	else if (isRecovering == RECOVERING_HIT)
+	else if (isRecovering != NOT_HIT)
 	{
 		setColor(Color(0, 0, 255, 255));
 	}
@@ -571,7 +585,7 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 		if (player2->m_discoball != NULL)
 		{
 			player2->ReleaseDiscoball();
-			player2->isRecovering = RECOVERING_HIT;
+			player2->isRecovering = isTackling != NOT_TACKLING ? RECOVERING_FROM_TACKLE : RECOVERING_FROM_BRAWL;
 			player2->hit_recovery_clock.restart();
 		}
 	}
@@ -581,7 +595,7 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 		if (m_discoball != NULL)
 		{
 			ReleaseDiscoball();
-			isRecovering = RECOVERING_HIT;
+			isRecovering = player2->isTackling != NOT_TACKLING ? RECOVERING_FROM_TACKLE : RECOVERING_FROM_BRAWL;
 			hit_recovery_clock.restart();
 		}
 	}

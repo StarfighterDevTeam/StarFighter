@@ -32,7 +32,8 @@ enum BrawlingStatus
 enum HitRecoveryStatus
 {
 	NOT_HIT,
-	RECOVERING_HIT,
+	RECOVERING_FROM_BRAWL,
+	RECOVERING_FROM_TACKLE,
 };
 
 class Ship : public GameObject
