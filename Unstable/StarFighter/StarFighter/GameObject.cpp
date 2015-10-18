@@ -169,6 +169,34 @@ float GameObject::GetAbsoluteSpeed()
 	return s;
 }
 
+float GameObject::SpeedToPolarAngle(sf::Vector2f curSpeed)
+{
+	const float a = curSpeed.x;
+	const float b = curSpeed.y;
+
+	float distance_to_obj = (a * a) + (b * b);
+	distance_to_obj = sqrt(distance_to_obj);
+
+	// TO DO
+	float angle;
+	angle = acos(a / distance_to_obj);
+
+	if (b < 0)
+	{
+		angle = -angle;
+	}
+
+	angle += M_PI_2;
+	
+	return angle;
+}
+
+void GameObject::SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle)
+{
+	speed.x = - absolute_speed * sin(curAngle);
+	speed.y = absolute_speed * cos(curAngle);
+}
+
 GameObject* GameObject::Clone()
 {
 	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->textureName, this->m_size);
@@ -180,6 +208,11 @@ GameObject* GameObject::Clone()
 
 //TRON SPECIFIC
 void GameObject::GetDiscoball(GameObject* discoball, float angle_collision)
+{
+	//see override function
+}
+
+void GameObject::PlayerContact(GameObject* player, float angle_collision)
 {
 	//see override function
 }

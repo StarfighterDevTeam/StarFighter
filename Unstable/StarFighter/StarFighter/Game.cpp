@@ -214,7 +214,7 @@ void Game::colisionChecksV2()
 		if (*it1 == NULL)
 			continue;
 
-		//Enemy bullets hitting the player
+		//Player gets discoball
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::DiscoballObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::DiscoballObject].end(); it2++)
 		{
 			if (*it2 == NULL)
@@ -227,6 +227,24 @@ void Game::colisionChecksV2()
 				//TRON SPECIFIC
 				float angle = GetAngleOfCollision(*it1, *it2);
 				(*it1)->GetDiscoball(*it2, angle);
+			}
+		}
+
+		//Players in contact
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it2 != sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+			if (*it1 == *it2)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+
+				//TRON SPECIFIC
+				float angle = GetAngleOfCollision(*it1, *it2);
+				(*it1)->PlayerContact(*it2, angle);
 			}
 		}
 	}

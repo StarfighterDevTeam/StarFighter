@@ -22,6 +22,13 @@ enum ThrowingStatus
 	AFTER_THROW,
 };
 
+enum BrawlingStatus
+{
+	NOT_BRAWLING,
+	INITIATE_BRAWL,
+	ENDING_BRAWL,
+};
+
 class Ship : public GameObject
 {
 public :
@@ -47,10 +54,13 @@ public :
 	float discoball_curAngle;
 	bool discoball_clockwise;
 	void GetDiscoball(GameObject* discoball, float angle_collision) override;
+	void PlayerContact(GameObject* player, float angle_collision) override;
 	void ManageDiscoball(sf::Time deltaTime);
 	void ThrowDiscoball();
+	void ReleaseDiscoball(float angularSpeedBonus = 0.f);
 	void ManageFire();
 	void ManageTackle();
+	void ManageBrawl();
 	void ManageSwitchRotation();
 	void ManageKeyReleases();
 	void ManageFeedbacks();
@@ -61,10 +71,13 @@ public :
 	sf::Clock carrier_clock;
 	sf::Clock carry_again_clock;
 	sf::Clock tackle_again_clock;
+	sf::Clock brawl_duration_clock;
+	sf::Clock brawl_again_clock;
 	sf::Clock throw_bonus_speed_clock;
 
 	TacklingStatus isTackling;
 	ThrowingStatus isThrowing;
+	BrawlingStatus isBrawling;
 	sf::Clock tackle_max_hold_clock;
 	sf::Clock tackle_min_clock;
 	sf::Vector2f speed_on_tackling;

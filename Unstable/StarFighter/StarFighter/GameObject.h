@@ -65,7 +65,6 @@ public:
 	GameObjectType collider_type;
 	LayerType layer;
 	sf::Vector2f m_size;
-	float GetAbsoluteSpeed();
 
 	string getName();
 	virtual void Respawn();
@@ -81,8 +80,13 @@ public:
 
 	std::string textureName;
 
+	float GetAbsoluteSpeed();
+	void SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle);
+	float SpeedToPolarAngle(sf::Vector2f curSpeed);
+
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
+	virtual void PlayerContact(GameObject* player, float angle_collision = -1.f);
 	void PlayHitFeedback();
 	sf::Clock feedback_reset_clock;
 
