@@ -90,7 +90,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	this->visible = true;
 	this->isOnScene = false;
 	this->GarbageMe = false;
-	this->DontGarbageMe = false;
+	this->DontGarbageMe = true;
 	this->diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	this->ghost = false;
 	this->rotation_speed = 0.f;
