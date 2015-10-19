@@ -97,8 +97,6 @@ void Ship::update(sf::Time deltaTime)
 
 	ManageKeyReleases();
 	ManageFeedbacks();
-
-	(*CurrentGame).view.move(sf::Vector2f(speed.x, speed.y));
 }
 
 bool Ship::ScreenBorderContraints()
@@ -112,9 +110,9 @@ bool Ship::ScreenBorderContraints()
 		correction_made = true;
 	}
 
-	if (this->getPosition().x > SCENE_SIZE_X - (m_size.x / 2))
+	if (this->getPosition().x > (*CurrentGame).map_size.x - (m_size.x / 2))
 	{
-		this->setPosition(SCENE_SIZE_X - (m_size.x / 2), this->getPosition().y);
+		this->setPosition((*CurrentGame).map_size.x - (m_size.x / 2), this->getPosition().y);
 		speed.x = 0;
 		correction_made = true;
 	}
@@ -126,9 +124,9 @@ bool Ship::ScreenBorderContraints()
 		correction_made = true;
 	}
 
-	if (this->getPosition().y > SCENE_SIZE_Y - (m_size.y / 2))
+	if (this->getPosition().y >(*CurrentGame).map_size.y - (m_size.y / 2))
 	{
-		this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (m_size.y / 2));
+		this->setPosition(this->getPosition().x, (*CurrentGame).map_size.y - (m_size.y / 2));
 		speed.y = 0;
 		correction_made = true;
 	}
@@ -141,7 +139,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	//idle decceleration
 	if (!movingX)
 	{
-		speed.x -= (speed.x) * deltaTime.asSeconds()* SHIP_DECELERATION_COEF / 100.f;
+		speed.x -= (speed.x) * deltaTime.asSeconds() * SHIP_DECELERATION_COEF / 100.f;
 
 		if (abs(speed.x) < SHIP_MIN_SPEED)
 			speed.x = 0;
@@ -149,7 +147,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 	if (!movingY)
 	{
-		speed.y -= (speed.y)*deltaTime.asSeconds()*SHIP_DECELERATION_COEF / 100.f;
+		speed.y -= (speed.y) * deltaTime.asSeconds() * SHIP_DECELERATION_COEF / 100.f;
 
 		if (abs(speed.y) < SHIP_MIN_SPEED)
 			speed.y = 0;

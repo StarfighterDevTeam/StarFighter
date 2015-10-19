@@ -10,6 +10,31 @@ const char* GameObjectTypeValues[] =
 	stringify(EnemyObject)
 };
 
+void Game::init(RenderWindow* window)
+{
+	this->window = window;
+	this->mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	this->mainScreen.setSmooth(true);
+
+	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
+	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
+	screen_size = sf::Vector2f(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+
+	LoadSFX();
+
+	view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+
+	//default value
+	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+}
+
+sf::RenderWindow* Game::getMainWindow()
+{
+	return this->window;
+}
+
+
 int Game::LoadSFX()
 {
 	if (!soundBuffers[0].loadFromFile("Assets/Sounds/Bounce1.ogg"))
@@ -31,7 +56,7 @@ int Game::LoadSFX()
 	if (!soundBuffers[8].loadFromFile("Assets/Sounds/Catch.ogg"))
 		return -1;
 	//if (!soundBuffers[9].loadFromFile("Assets/Sounds/Switch.ogg"))
-		//return -1;
+	//return -1;
 
 	soundsBounce[0].setBuffer(soundBuffers[0]);
 	soundsBounce[1].setBuffer(soundBuffers[1]);
@@ -73,27 +98,6 @@ void Game::PlaySFX(SFX_Bank sfx_name)
 	{
 		//soundsSwitch.play();
 	}
-}
-
-void Game::init(RenderWindow* window)
-{
-	this->window = window;
-	this->mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
-	this->mainScreen.setSmooth(true);
-
-	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
-	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
-	screen_size = sf::Vector2f(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
-
-	LoadSFX();
-
-	view = this->window->getView();
-	this->window->setView(view);
-}
-
-sf::RenderWindow* Game::getMainWindow()
-{
-	return this->window;
 }
 
 void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
@@ -162,6 +166,12 @@ void Game::updateScene(Time deltaTime)
 
 	//Collect the dust
 	collectGarbage();
+
+	//Update view
+	//view.setCenter(scale_factor.x*view.getCenter().x, scale_factor.y*view.getCenter().y);
+	//window->setView(view);
+	
+	mainScreen.setView(view);
 }
 
 void Game::drawScene()
@@ -190,6 +200,7 @@ void Game::drawScene()
 
 				if ((*(*it)).visible)
 				{
+
 					this->mainScreen.draw((*(*it)));
 				}
 			}
@@ -219,11 +230,11 @@ void Game::colisionChecksV2()
 		{
 			if (*it2 == NULL)
 				continue;
-			
+
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				
+
 				//TRON SPECIFIC
 				float angle = GetAngleOfCollision(*it1, *it2);
 				(*it1)->GetDiscoball(*it2, angle);
@@ -394,7 +405,7 @@ void Game::collectGarbage()
 		if (!(**it).isOnScene)
 		{
 			//objects that are spawning out of screen are not deleted
-			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= SCENE_SIZE_Y))
+			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= map_size.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= map_size.y))
 			{
 				(**it).isOnScene = true;
 			}
@@ -403,8 +414,8 @@ void Game::collectGarbage()
 		//Content that went on scene and then exited have to be deleted
 		if (!(**it).DontGarbageMe && (**it).isOnScene)
 		{
-			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > SCENE_SIZE_X
-				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > SCENE_SIZE_Y)
+			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > map_size.x
+				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > map_size.y)
 			{
 				this->garbage.push_back(*it);
 				continue;
@@ -418,7 +429,7 @@ void Game::collectGarbage()
 float Game::GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj)
 {
 	sf::Vector2f diff_position;
-	
+
 	const float a = ref_obj->getPosition().x - aimed_obj->getPosition().x;
 	const float b = ref_obj->getPosition().y - aimed_obj->getPosition().y;
 

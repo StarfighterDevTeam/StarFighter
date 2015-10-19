@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Ship.h"
 #include "Discoball.h"
+#include "Bumper.h"
 
 class GameObject;
 
@@ -20,6 +21,7 @@ public:
 	void Update(sf::Time deltaTime);
 	void Draw();
 	void Release();
+	void UpdateCamera(sf::Time deltaTime);
 
 private:
 	sf::RenderWindow* mainWindow;

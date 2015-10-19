@@ -58,10 +58,10 @@ void Discoball::update(sf::Time deltaTime)
 			isBouncing_ = true;
 			
 		}
-		else if (newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
+		else if (newposition.x > (*CurrentGame).map_size.x - this->m_size.x / 2)
 		{
 			this->speed.x *= -1;
-			this->setPosition(SCENE_SIZE_X - this->m_size.x / 2, newposition.y);
+			this->setPosition((*CurrentGame).map_size.x - this->m_size.x / 2, newposition.y);
 			isBouncing_ = true;
 		}
 		else if (newposition.y < this->m_size.y / 2)
@@ -70,10 +70,10 @@ void Discoball::update(sf::Time deltaTime)
 			this->setPosition(newposition.x, this->m_size.y / 2);
 			isBouncing_ = true;
 		}
-		else if (newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
+		else if (newposition.y > (*CurrentGame).map_size.y - this->m_size.y / 2)
 		{
 			this->speed.y *= -1;
-			this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
+			this->setPosition(newposition.x, (*CurrentGame).map_size.y - this->m_size.y / 2);
 			isBouncing_ = true;
 		}
 		//SFX feedback

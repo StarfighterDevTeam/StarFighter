@@ -43,11 +43,14 @@ public:
 	void collectGarbage();
 	sf::RenderTexture mainScreen;
 	sf::Vector2f screen_size;
+	sf::Vector2f map_size;
 	float hyperspeedMultiplier;
 	float vspeed;
 	sf::Vector2f scale_factor;
 
 	sf::View view;
+
+	Ship* playerShip;
 
 	//SFX
 	int LoadSFX();
