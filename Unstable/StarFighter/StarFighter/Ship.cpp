@@ -293,30 +293,40 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 {
 	if (m_discoball != NULL)
 	{
-		int cc = discoball_clockwise ? cc = -1 : cc = 1;
-		discoball_curAngle = fmod(discoball_curAngle - (m_discoball->discoball_curAngularSpeed * cc * deltaTime.asSeconds()), 2 * M_PI);
-		m_discoball->carrier_curAngle = discoball_curAngle;
-		m_discoball->carrier_curPosition = getPosition();
-
-		//angular speed deceleration
-		if (carrier_clock.getElapsedTime().asSeconds() > CARRY_TIME_FOR_DECELERATION && m_discoball->discoball_curAngularSpeed > CARRY_BASE_ANGULAR_SPEED)
+		//touching map border results in dropping discoball
+		if (m_discoball->getPosition().y > (*CurrentGame).map_size.y - (m_discoball->m_size.y / 2) || m_discoball->getPosition().y < m_discoball->m_size.y / 2
+			|| m_discoball->getPosition().x > (*CurrentGame).map_size.x - (m_discoball->m_size.x / 2) || m_discoball->getPosition().x < m_discoball->m_size.x / 2)
 		{
-			if (m_discoball->discoball_curAngularSpeed > CARRY_BASE_ANGULAR_SPEED + CARRY_ANGULAR_DECELERATION)
-			{
-				m_discoball->discoball_curAngularSpeed -= CARRY_ANGULAR_DECELERATION;
-			}
-			else
-			{
-				m_discoball->discoball_curAngularSpeed = CARRY_BASE_ANGULAR_SPEED;
-			}
-			
-			printf("Discoball decelerated. (speed: %f", m_discoball->discoball_curAngularSpeed);
-			DiscoballSpeedConstraints();
-			printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
-			carrier_clock.restart();
+			ReleaseDiscoball();
 		}
+		else
+		{
+			int cc = discoball_clockwise ? cc = -1 : cc = 1;
+			discoball_curAngle = discoball_curAngle - (m_discoball->discoball_curAngularSpeed * cc * deltaTime.asSeconds());
 
-		//printf("angle: %f\n", discoball_curAngle * 180.f / M_PI);
+			//angular speed deceleration
+			if (carrier_clock.getElapsedTime().asSeconds() > CARRY_TIME_FOR_DECELERATION && m_discoball->discoball_curAngularSpeed > CARRY_BASE_ANGULAR_SPEED)
+			{
+				if (m_discoball->discoball_curAngularSpeed > CARRY_BASE_ANGULAR_SPEED + CARRY_ANGULAR_DECELERATION)
+				{
+					m_discoball->discoball_curAngularSpeed -= CARRY_ANGULAR_DECELERATION;
+				}
+				else
+				{
+					m_discoball->discoball_curAngularSpeed = CARRY_BASE_ANGULAR_SPEED;
+				}
+
+				printf("Discoball decelerated. (speed: %f", m_discoball->discoball_curAngularSpeed);
+				DiscoballSpeedConstraints();
+				printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
+				carrier_clock.restart();
+			}
+
+			//transmitting values to the discoball
+			discoball_curAngle = fmod(discoball_curAngle, 2 * M_PI);
+			m_discoball->carrier_curAngle = discoball_curAngle;
+			m_discoball->carrier_curPosition = getPosition();
+		}
 	}
 }
 
