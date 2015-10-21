@@ -27,7 +27,7 @@ void Ship::Init()
 	isFiringButtonReleased = false;
 	wasFiringButtonReleased = false;
 	isSwitchingButtonReleased = false;
-	isBrakingButtonReleased = false;
+	isDodgingButtonReleased = false;
 
 	isTackling = NOT_TACKLING;
 	isThrowing = NOT_THROWING;
@@ -80,7 +80,10 @@ void Ship::update(sf::Time deltaTime)
 
 	ManageDodge();
 	
-	UpdateRotation();
+	if (!InputGuy::isStraffing(m_controllerType))
+	{
+		UpdateRotation();
+	}
 	
 	ManageTackle();
 	ManageBrawl();
@@ -173,6 +176,12 @@ void Ship::GetDirectionInputs(sf::Vector2f inputs_direction)
 {
 	speed.x += inputs_direction.x * SHIP_ACCELERATION;
 	speed.y += inputs_direction.y * SHIP_ACCELERATION;
+
+	if (InputGuy::isStraffing(m_controllerType))
+	{
+		speed.x *= SHIP_STRAFFING_SPEED_MALUS;
+		speed.y *= SHIP_STRAFFING_SPEED_MALUS;
+	}
 }
 
 void Ship::UpdateRotation()
@@ -458,9 +467,9 @@ void Ship::ManageKeyReleases()
 	{
 		isSwitchingButtonReleased = true;
 	}
-	if (!InputGuy::isBraking(m_controllerType))
+	if (!InputGuy::isDodging(m_controllerType))
 	{
-		isBrakingButtonReleased = true;
+		isDodgingButtonReleased = true;
 	}
 }
 
@@ -724,18 +733,18 @@ void Ship::ManageDodge()
 		{
 			if (dodge_again_clock.getElapsedTime().asSeconds() > DODGE_AGAIN_COOLDOWN)
 			{
-				if (isBrakingButtonReleased)
+				if (isDodgingButtonReleased)
 				{
 					if ((speed.x * speed.x) + (speed.y * speed.y) > SHIP_MIN_SPEED_FOR_DODGE * SHIP_MIN_SPEED_FOR_DODGE)
 					{
-						if (InputGuy::isBraking(m_controllerType))
+						if (InputGuy::isDodging(m_controllerType))
 						{
 							isDodging = INITIATE_DODGING;
 							dodge_duration_clock.restart();
-							isBrakingButtonReleased = false;
+							isDodgingButtonReleased = false;
 
 							float angle = SpeedToPolarAngle(speed);
-							SetSpeedVectorFromAbsoluteSpeed(-SHIP_SPEED_ON_DODGING, angle);
+							SetSpeedVectorFromAbsoluteSpeed(-SHIP_SPEED_BONUS_ON_DODGING * SHIP_MAX_SPEED, angle);
 
 							ghost = true;
 
@@ -756,25 +765,14 @@ void Ship::ManageDodge()
 	{
 		if (dodge_duration_clock.getElapsedTime().asSeconds() > SHIP_DODGE_DURATION)
 		{
-			isDodging = ENDING_DODGE;
+			isDodging = NOT_DODGING;
 			dodge_again_clock.restart();
 			ghost = false;
-
-			speed.x = 0;
-			speed.y = 0;
 
 			if (m_discoball != NULL)
 			{
 				m_discoball->ghost = false;
 			}
-		}
-	}
-
-	if (isDodging == ENDING_DODGE)
-	{
-		if (dodge_again_clock.getElapsedTime().asSeconds() > DODGE_AGAIN_COOLDOWN)
-		{
-			isDodging = NOT_DODGING;
 		}
 	}
 }

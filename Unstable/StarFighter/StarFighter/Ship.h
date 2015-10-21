@@ -85,8 +85,8 @@ public :
 	bool isFiringButtonReleased;
 	bool wasFiringButtonReleased;
 	bool isSwitchingButtonReleased;
-	bool isBrakingButtonReleased;
-	bool wasBrakingButtonReleased;
+	bool isDodgingButtonReleased;
+	bool wasDodgingButtonReleased;
 	void DiscoballSpeedConstraints();
 	sf::Clock carrier_clock;
 	sf::Clock carry_again_clock;

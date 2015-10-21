@@ -16,7 +16,7 @@ bool InputGuy::isFiring(ControlerType device)
 		{
 			if (sf::Joystick::hasAxis(0, sf::Joystick::Axis::Z))
 			{
-				if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE)
+				if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE) // right trigger
 				{
 					return true;
 				}
@@ -53,27 +53,11 @@ bool InputGuy::isSwitchingRotation(ControlerType device)
 	return false;
 }
 
-bool InputGuy::isSlowMotion()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-	{
-		return true;
-	}
-
-	if (sf::Joystick::isConnected(0))
-	{
-		if (sf::Joystick::isButtonPressed(0, 1))// B button
-			return true;
-	}
-
-	return false;
-}
-
-bool InputGuy::isBraking(ControlerType device)
+bool InputGuy::isDodging(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 		{
 			return true;
 		}
@@ -91,17 +75,26 @@ bool InputGuy::isBraking(ControlerType device)
 	return false;
 }
 
-bool InputGuy::setAutomaticFire()
+bool InputGuy::isStraffing(ControlerType device)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		return true;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+		{
+			return true;
+		}
 	}
 
-	if (sf::Joystick::isConnected(0))
+	if (device == AllControlDevices || device == JoystickControl)
 	{
-		if (sf::Joystick::isButtonPressed(0, 5))
-			return true;
+		if (sf::Joystick::isConnected(0))
+		{
+			if (sf::Joystick::isButtonPressed(0, 4)) // left upper trigger
+			{
+				return true;
+			}
+			
+		}
 	}
 
 	return false;
