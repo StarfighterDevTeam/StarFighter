@@ -10,6 +10,7 @@
 
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 
+//DISPLAY
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080
 
@@ -21,6 +22,9 @@
 
 #define SHIP_START_X								990
 #define SHIP_START_Y								540
+
+//GAME RULES
+#define GOAL_RESPAWN_COOLDOWN						2.f
 
 //SHIP MANEUVERABILITY
 #define SHIP_ACCELERATION							100.f
@@ -43,6 +47,11 @@
 #define SHIP_BRAWL_DURATION							0.07f
 #define SHIP_SPEED_ON_BRAWLING						1500.f
 
+//DODGE
+#define SHIP_MIN_SPEED_FOR_DODGE					1.f
+#define SHIP_DODGE_DURATION							0.05f
+#define SHIP_SPEED_ON_DODGING						1500.f
+
 //RELEASE
 #define DISCOBALL_RELEASE_SPEED_RATIO				0.3f
 
@@ -50,6 +59,7 @@
 #define CARRY_AGAIN_COOLDOWN						0.5f
 #define TACKLE_AGAIN_COOLDOWN						0.5f
 #define BRAWL_AGAIN_COOLDOWN						0.3f
+#define DODGE_AGAIN_COOLDOWN						0.5f
 
 //RECOVERY
 #define RECOVERING_FROM_BRAWL_COOLDOWN				0.2f
@@ -70,8 +80,10 @@
 #define	GHOST_ALPHA_VALUE							120
 #define RESET_FEEDBACK_COOLDOWN						0.5f
 
+//CONTROLS
 #define JOYSTICK_MIN_AXIS_VALUE						25
 
+//COLLISION
 #define PIXEL_PERFECT_COLLISION						true
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);

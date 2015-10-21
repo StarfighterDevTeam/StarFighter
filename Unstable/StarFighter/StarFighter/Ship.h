@@ -29,6 +29,13 @@ enum BrawlingStatus
 	ENDING_BRAWL,
 };
 
+enum DodingStatus
+{
+	NOT_DODGING,
+	INITIATE_DODGING,
+	ENDING_DODGE,
+};
+
 enum HitRecoveryStatus
 {
 	NOT_HIT,
@@ -65,16 +72,21 @@ public :
 	void ManageDiscoball(sf::Time deltaTime);
 	void ThrowDiscoball();
 	void ReleaseDiscoball(float angularSpeedBonus = 0.f);
+	void UpdateRotation();
 	void ManageFire();
 	void ManageTackle();
 	void ManageBrawl();
+	void ManageDodge();
 	void ManageSwitchRotation();
 	void ManageKeyReleases();
 	void ManageFeedbacks();
 	void ManageHitRecovery();
+	void ResetStatus();
 	bool isFiringButtonReleased;
 	bool wasFiringButtonReleased;
 	bool isSwitchingButtonReleased;
+	bool isBrakingButtonReleased;
+	bool wasBrakingButtonReleased;
 	void DiscoballSpeedConstraints();
 	sf::Clock carrier_clock;
 	sf::Clock carry_again_clock;
@@ -83,11 +95,14 @@ public :
 	sf::Clock brawl_again_clock;
 	sf::Clock throw_bonus_speed_clock;
 	sf::Clock hit_recovery_clock;
+	sf::Clock dodge_duration_clock;
+	sf::Clock dodge_again_clock;
 
 	TacklingStatus isTackling;
 	ThrowingStatus isThrowing;
 	BrawlingStatus isBrawling;
 	HitRecoveryStatus isRecovering;
+	DodingStatus isDodging;
 	sf::Clock tackle_max_hold_clock;
 	sf::Clock tackle_min_clock;
 	sf::Vector2f speed_on_tackling;

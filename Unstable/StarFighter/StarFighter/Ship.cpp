@@ -27,10 +27,12 @@ void Ship::Init()
 	isFiringButtonReleased = false;
 	wasFiringButtonReleased = false;
 	isSwitchingButtonReleased = false;
+	isBrakingButtonReleased = false;
 
 	isTackling = NOT_TACKLING;
 	isThrowing = NOT_THROWING;
 	isBrawling = NOT_BRAWLING;
+	isDodging = NOT_DODGING;
 	isRecovering = NOT_HIT;
 
 	throw_curSpeedBonus = 0.f;
@@ -69,12 +71,16 @@ void Ship::update(sf::Time deltaTime)
 		movingY = inputs_direction.y != 0;
 	}
 
-	if (isTackling == NOT_TACKLING && isBrawling == NOT_BRAWLING && isRecovering == NOT_HIT)
+	if (isTackling == NOT_TACKLING && isBrawling == NOT_BRAWLING && isRecovering == NOT_HIT && isDodging != INITIATE_DODGING)
 	{
 		GetDirectionInputs(inputs_direction);
 		MaxSpeedConstraints();
 		IdleDecelleration(deltaTime);
 	}
+
+	ManageDodge();
+	
+	UpdateRotation();
 	
 	ManageTackle();
 	ManageBrawl();
@@ -85,18 +91,27 @@ void Ship::update(sf::Time deltaTime)
 
 	if (ScreenBorderContraints())
 	{
-		if (isTackling != NOT_TACKLING)
-		{
-			isTackling = NOT_TACKLING;
-		}
+		ResetStatus();
 	}
 
-	ManageFire();
-	ManageSwitchRotation();
-	ManageDiscoball(deltaTime);
+	if (isDodging == NOT_DODGING)
+	{
+		ManageFire();
+	}
 
+	ManageSwitchRotation();
+	
+	ManageDiscoball(deltaTime);
 	ManageKeyReleases();
 	ManageFeedbacks();
+}
+
+void Ship::ResetStatus()
+{
+	isTackling = NOT_TACKLING;
+	isBrawling = NOT_BRAWLING;
+	isDodging = NOT_DODGING;
+	ghost = false;
 }
 
 bool Ship::ScreenBorderContraints()
@@ -158,7 +173,10 @@ void Ship::GetDirectionInputs(sf::Vector2f inputs_direction)
 {
 	speed.x += inputs_direction.x * SHIP_ACCELERATION;
 	speed.y += inputs_direction.y * SHIP_ACCELERATION;
+}
 
+void Ship::UpdateRotation()
+{
 	//turning toward targeted position
 	if (speed.x == 0 && speed.y == 0)
 	{
@@ -380,6 +398,9 @@ void Ship::ReleaseDiscoball(float angularSpeedBonus)
 	{
 		carry_again_clock.restart();
 
+		//cancel possible ghost status
+		m_discoball->ghost = false;
+
 		//m_discoball->discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
 		m_discoball->discoball_curAngularSpeed *= DISCOBALL_RELEASE_SPEED_RATIO;
 		m_discoball->discoball_curAngularSpeed += angularSpeedBonus;
@@ -391,6 +412,7 @@ void Ship::ReleaseDiscoball(float angularSpeedBonus)
 
 		m_discoball->carrier = NULL;
 		m_discoball = NULL;
+
 	}
 }
 
@@ -435,6 +457,10 @@ void Ship::ManageKeyReleases()
 	if (!InputGuy::isSwitchingRotation(m_controllerType))
 	{
 		isSwitchingButtonReleased = true;
+	}
+	if (!InputGuy::isBraking(m_controllerType))
+	{
+		isBrakingButtonReleased = true;
 	}
 }
 
@@ -585,9 +611,18 @@ void Ship::ManageFeedbacks()
 	{
 		setColor(Color(0, 255, 0, 255));
 	}
+	else if (isDodging != NOT_DODGING)
+	{
+		setColor(Color(255, 0, 0, 129));
+		if (m_discoball != NULL)
+		{
+			m_discoball->setColor(Color(255, 0, 0, 129));
+		}
+	}
 	else if (m_discoball != NULL)
 	{
 		setColor(Color(255, 255, 255, 200));
+		m_discoball->setColor(Color(255, 255, 255, 255));
 	}
 	else
 	{
@@ -676,6 +711,70 @@ void Ship::ManageBrawl()
 		if (brawl_again_clock.getElapsedTime().asSeconds() > BRAWL_AGAIN_COOLDOWN)
 		{
 			isBrawling = NOT_BRAWLING;
+		}
+	}
+}
+
+void Ship::ManageDodge()
+{
+	//State 0
+	if (isDodging == NOT_DODGING)
+	{
+		if (m_discoball != NULL)
+		{
+			if (dodge_again_clock.getElapsedTime().asSeconds() > DODGE_AGAIN_COOLDOWN)
+			{
+				if (isBrakingButtonReleased)
+				{
+					if ((speed.x * speed.x) + (speed.y * speed.y) > SHIP_MIN_SPEED_FOR_DODGE * SHIP_MIN_SPEED_FOR_DODGE)
+					{
+						if (InputGuy::isBraking(m_controllerType))
+						{
+							isDodging = INITIATE_DODGING;
+							dodge_duration_clock.restart();
+							isBrakingButtonReleased = false;
+
+							float angle = SpeedToPolarAngle(speed);
+							SetSpeedVectorFromAbsoluteSpeed(-SHIP_SPEED_ON_DODGING, angle);
+
+							ghost = true;
+
+							if (m_discoball != NULL)
+							{
+								m_discoball->ghost = true;
+							}
+
+							(*CurrentGame).PlaySFX(SFX_Tackle);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (isDodging == INITIATE_DODGING)
+	{
+		if (dodge_duration_clock.getElapsedTime().asSeconds() > SHIP_DODGE_DURATION)
+		{
+			isDodging = ENDING_DODGE;
+			dodge_again_clock.restart();
+			ghost = false;
+
+			speed.x = 0;
+			speed.y = 0;
+
+			if (m_discoball != NULL)
+			{
+				m_discoball->ghost = false;
+			}
+		}
+	}
+
+	if (isDodging == ENDING_DODGE)
+	{
+		if (dodge_again_clock.getElapsedTime().asSeconds() > DODGE_AGAIN_COOLDOWN)
+		{
+			isDodging = NOT_DODGING;
 		}
 	}
 }

@@ -21,7 +21,7 @@ class InputGuy
 public:
 	static Vector2f getDirections(ControlerType device = AllControlDevices);
 	static bool isFiring(ControlerType device = AllControlDevices);
-	static bool isBraking();
+	static bool isBraking(ControlerType device = AllControlDevices);
 	static bool isSwitchingRotation(ControlerType device = AllControlDevices);
 	static bool isSlowMotion();
 	static bool setAutomaticFire();

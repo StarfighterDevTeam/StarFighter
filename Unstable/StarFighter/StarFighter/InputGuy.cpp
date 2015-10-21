@@ -1,4 +1,3 @@
-
 #include "InputGuy.h"
 
 bool InputGuy::isFiring(ControlerType device)
@@ -70,17 +69,23 @@ bool InputGuy::isSlowMotion()
 	return false;
 }
 
-bool InputGuy::isBraking()
+bool InputGuy::isBraking(ControlerType device)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		return true;
-	}
-
-	if (sf::Joystick::isConnected(0))
-	{
-		if (sf::Joystick::isButtonPressed(0, 2)) // X button
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+		{
 			return true;
+		}
+	}
+	
+	if (device == AllControlDevices || device == JoystickControl)
+	{
+		if (sf::Joystick::isConnected(0))
+		{
+			if (sf::Joystick::isButtonPressed(0, 2)) // X button
+				return true;
+		}
 	}
 
 	return false;
