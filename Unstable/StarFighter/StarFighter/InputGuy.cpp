@@ -57,7 +57,7 @@ bool InputGuy::isDodging(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 		{
 			return true;
 		}
