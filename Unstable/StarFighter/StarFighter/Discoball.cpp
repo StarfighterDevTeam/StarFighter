@@ -29,7 +29,8 @@ void Discoball::Init()
 	carrier_curAngle = -1.f;
 	carrier_curPosition = sf::Vector2f(-1.f, -1.f);
 	DontGarbageMe = true;
-	discoball_curAngularSpeed = 0.f;
+	discoball_curAngularSpeed = 0;
+	coeff_friction = 0;
 }
 
 Discoball::~Discoball()
@@ -85,6 +86,16 @@ void Discoball::update(sf::Time deltaTime)
 		//calculations
 		polar_angle = atan(speed.x / speed.y);
 
+		//friction
+		coeff_friction += COEFF_FRICTION_INCREASE_RATIO * COEFF_FRICTION_INCREASE_RATIO;
+		speed.x *= (1 - COEFF_FRICTION_INCREASE_RATIO);
+		speed.y *= (1 - COEFF_FRICTION_INCREASE_RATIO);
+		if (GetAbsoluteSpeed() < DISCOBALL_MIN_SPEED)
+		{
+			speed.x = 0;
+			speed.y = 0;
+		}
+
 		//printf("cartesian speed: %f, polar angle: %f\n", cartesian_speed, polar_angle);
 
 		setColor(sf::Color(0, 0, 0, 255));
@@ -108,6 +119,8 @@ void Discoball::update(sf::Time deltaTime)
 		//useful info to record
 		speed.x = new_position.x - previous_position.x;
 		speed.y = new_position.y - previous_position.y;
+
+		coeff_friction = 0;
 	}
 
 	AnimatedSprite::update(deltaTime);

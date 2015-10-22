@@ -19,6 +19,7 @@ public :
 
 	float discoball_curAngularSpeed;
 	float polar_angle;
+	float coeff_friction;
 
 	Ship* carrier;
 	float carrier_curAngle;
