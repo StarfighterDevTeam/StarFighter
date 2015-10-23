@@ -87,13 +87,16 @@ void Discoball::update(sf::Time deltaTime)
 		polar_angle = atan(speed.x / speed.y);
 
 		//friction
-		coeff_friction += COEFF_FRICTION_INCREASE_RATIO * COEFF_FRICTION_INCREASE_RATIO;
-		speed.x *= (1 - COEFF_FRICTION_INCREASE_RATIO);
-		speed.y *= (1 - COEFF_FRICTION_INCREASE_RATIO);
-		if (GetAbsoluteSpeed() < DISCOBALL_MIN_SPEED)
+		if (USE_FRICTION_ON_DISCOBALL)
 		{
-			speed.x = 0;
-			speed.y = 0;
+			coeff_friction += COEFF_FRICTION_INCREASE_RATIO * COEFF_FRICTION_INCREASE_RATIO;
+			speed.x *= (1 - COEFF_FRICTION_INCREASE_RATIO);
+			speed.y *= (1 - COEFF_FRICTION_INCREASE_RATIO);
+			if (GetAbsoluteSpeed() < DISCOBALL_MIN_SPEED)
+			{
+				speed.x = 0;
+				speed.y = 0;
+			}
 		}
 
 		//printf("cartesian speed: %f, polar angle: %f\n", cartesian_speed, polar_angle);

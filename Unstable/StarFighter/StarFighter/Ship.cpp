@@ -209,7 +209,7 @@ void Ship::UpdateRotation()
 	}
 	else
 	{
-		setRotation(SpeedToPolarAngle(speed) * 180 / M_PI);
+		setRotation(SpeedToPolarAngle(speed) * 180 / (float)M_PI);
 	}
 }
 

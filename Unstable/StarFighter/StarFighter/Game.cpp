@@ -69,6 +69,8 @@ int Game::LoadSFX()
 	soundsCatch.setBuffer(soundBuffers[8]);
 	//soundsSwitch.setBuffer(soundBuffers[9]);
 
+	return 0;
+
 }
 
 void Game::PlaySFX(SFX_Bank sfx_name)
@@ -94,10 +96,12 @@ void Game::PlaySFX(SFX_Bank sfx_name)
 	{
 		soundsCatch.play();
 	}
+	
 	if (sfx_name == SFX_Switch)
 	{
 		//soundsSwitch.play();
 	}
+	
 }
 
 void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
