@@ -7,11 +7,11 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 	
-	//StartMainMenu();
-	//m_status = MainMenu;
+	StartMainMenu();
+	m_status = MainMenu;
 
-	StartMultiGame();
-	m_status = OfflineMulti;
+	//StartMultiGame();
+	//m_status = OfflineMulti;
 }
 
 void InGameState::StartMainMenu()

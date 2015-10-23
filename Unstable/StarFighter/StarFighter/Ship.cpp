@@ -62,14 +62,13 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	ApplyGameRules();
-
 	ManageHitRecovery();
 
-	sf::Vector2f inputs_direction = InputGuy::getDirections(m_controllerType);
+	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 
 	if (!disable_inputs)
 	{
+		inputs_direction = InputGuy::getDirections(m_controllerType);
 		moving = inputs_direction.x != 0 || inputs_direction.y != 0;
 		movingX = inputs_direction.x != 0;
 		movingY = inputs_direction.y != 0;
@@ -272,6 +271,17 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				if (m_discoball->carried)
 				{
 					m_discoball->carrier->carry_again_clock.restart();
+
+					//game mode specific
+					if ((*CurrentGame).cur_GameRules == CarryToAbleInputs)
+					{
+						m_discoball->carrier->disable_inputs = true;
+						m_discoball->carrier->speed.x = 0;
+						m_discoball->carrier->speed.y = 0;
+						disable_inputs = false;
+						printf("switch\n");
+					}
+
 					m_discoball->carrier->m_discoball = NULL;
 				}
 
@@ -789,22 +799,5 @@ void Ship::ManageDodge()
 				m_discoball->ghost = false;
 			}
 		}
-	}
-}
-
-void Ship::ApplyGameRules()
-{
-	if ((*CurrentGame).cur_GameRules == CarryToAbleInputs)
-	{
-		disable_inputs = m_discoball == NULL;
-		if (disable_inputs)
-		{
-			speed.x = 0;
-			speed.y = 0;
-		}
-	}
-	else
-	{
-		disable_inputs = false;
 	}
 }
