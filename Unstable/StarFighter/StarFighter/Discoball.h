@@ -5,6 +5,14 @@
 #include "Game.h"
 #include "GameObject.h"
 
+enum DiscoballStatus
+{
+	DiscoballCarriedTeamBlue,
+	DiscoballCarriedTeamRed,
+	DiscoballLost,
+	DiscoballFree,
+};
+
 class Ship;
 
 class Discoball : public GameObject
@@ -25,6 +33,8 @@ public :
 	float carrier_curAngle;
 	sf::Vector2f carrier_curPosition;
 	bool carried;
+	DiscoballStatus m_status;
+	void SetDiscoballStatus(DiscoballStatus status);
 };
 
 #endif // DISCOBALL_H_INCLUDED

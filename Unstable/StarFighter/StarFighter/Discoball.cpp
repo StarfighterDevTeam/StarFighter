@@ -31,6 +31,8 @@ void Discoball::Init()
 	DontGarbageMe = true;
 	discoball_curAngularSpeed = 0;
 	coeff_friction = 0;
+	m_status = DiscoballFree;
+	setAnimationLine(DiscoballFree);
 }
 
 Discoball::~Discoball()
@@ -101,7 +103,7 @@ void Discoball::update(sf::Time deltaTime)
 
 		//printf("cartesian speed: %f, polar angle: %f\n", cartesian_speed, polar_angle);
 
-		setColor(sf::Color(0, 0, 0, 255));
+		setColor(sf::Color(255, 255, 255, 255));
 	}
 
 	else //get carrier position
@@ -128,3 +130,10 @@ void Discoball::update(sf::Time deltaTime)
 
 	AnimatedSprite::update(deltaTime);
 }
+
+void Discoball::SetDiscoballStatus(DiscoballStatus status)
+{
+	m_status = status;
+	setAnimationLine(m_status, true);
+}
+

@@ -46,6 +46,13 @@ enum FloatCompare
 	ERROR_COMPARE,
 };
 
+enum Teams
+{
+	TeamBlue,
+	TeamRed,
+	TeamNeutral,
+};
+
 class GameObject : public AnimatedSprite
 {
 public:

@@ -36,6 +36,8 @@ void Ship::Init()
 	isRecovering = NOT_HIT;
 
 	throw_curSpeedBonus = 0.f;
+
+	team = TeamBlue;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -60,6 +62,8 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	ApplyGameRules();
+
 	ManageHitRecovery();
 
 	sf::Vector2f inputs_direction = InputGuy::getDirections(m_controllerType);
@@ -311,6 +315,14 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				isThrowing = NOT_THROWING;
 
 				(*CurrentGame).PlaySFX(SFX_Catch);
+				if (team == TeamBlue)
+				{
+					m_discoball->SetDiscoballStatus(DiscoballCarriedTeamBlue);
+				}
+				if (team == TeamRed)
+				{
+					m_discoball->SetDiscoballStatus(DiscoballCarriedTeamRed);
+				}
 			}
 		}
 	}
@@ -393,6 +405,8 @@ void Ship::ThrowDiscoball()
 		printf("Discoball thrown. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 		carry_again_clock.restart();
 
+		m_discoball->SetDiscoballStatus(DiscoballFree);
+
 		m_discoball->carrier = NULL;
 		m_discoball = NULL;
 
@@ -419,9 +433,10 @@ void Ship::ReleaseDiscoball(float angularSpeedBonus)
 		printf("Discoball released. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 		carry_again_clock.restart();
 
+		m_discoball->SetDiscoballStatus(DiscoballLost);
+
 		m_discoball->carrier = NULL;
 		m_discoball = NULL;
-
 	}
 }
 
@@ -774,5 +789,22 @@ void Ship::ManageDodge()
 				m_discoball->ghost = false;
 			}
 		}
+	}
+}
+
+void Ship::ApplyGameRules()
+{
+	if ((*CurrentGame).cur_GameRules == CarryToAbleInputs)
+	{
+		disable_inputs = m_discoball == NULL;
+		if (disable_inputs)
+		{
+			speed.x = 0;
+			speed.y = 0;
+		}
+	}
+	else
+	{
+		disable_inputs = false;
 	}
 }

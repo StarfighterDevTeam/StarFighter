@@ -27,6 +27,8 @@ void Game::init(RenderWindow* window)
 
 	//default value
 	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+
+	cur_GameRules = NormalGameRules;
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -438,9 +440,13 @@ float Game::GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aim
 	const float b = ref_obj->getPosition().y - aimed_obj->getPosition().y;
 
 	float distance_to_obj = (a * a) + (b * b);
+	if (distance_to_obj == 0)
+	{
+		return 0;
+	}
+
 	distance_to_obj = sqrt(distance_to_obj);
 
-	// TO DO
 	float angle;
 	angle = acos(a / distance_to_obj);
 

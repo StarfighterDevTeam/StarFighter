@@ -23,6 +23,12 @@ enum SFX_Bank
 	SFX_Switch,
 };
 
+enum ScriptedGameRules
+{
+	NormalGameRules,
+	CarryToAbleInputs,
+};
+
 using namespace sf;
 
 struct Game
@@ -51,6 +57,7 @@ public:
 	sf::View view;
 
 	Ship* playerShip;
+	ScriptedGameRules cur_GameRules;
 
 	//SFX
 	int LoadSFX();

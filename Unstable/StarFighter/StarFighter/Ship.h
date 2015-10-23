@@ -88,6 +88,7 @@ public :
 	bool isDodgingButtonReleased;
 	bool wasDodgingButtonReleased;
 	void DiscoballSpeedConstraints();
+	void ApplyGameRules();
 	sf::Clock carrier_clock;
 	sf::Clock carry_again_clock;
 	sf::Clock tackle_again_clock;
@@ -108,6 +109,8 @@ public :
 	sf::Vector2f speed_on_tackling;
 	float tackle_curSpeedBonus;
 	float throw_curSpeedBonus;
+
+	Teams team;
 
 private:
 	bool moving;

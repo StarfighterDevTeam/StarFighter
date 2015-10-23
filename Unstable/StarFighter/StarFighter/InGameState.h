@@ -10,6 +10,12 @@
 #include "Discoball.h"
 #include "Bumper.h"
 
+enum IngameStatus
+{
+	MainMenu,
+	OfflineMulti,
+};
+
 class GameObject;
 
 class InGameState : public GameState
@@ -22,6 +28,11 @@ public:
 	void Draw();
 	void Release();
 	void UpdateCamera(sf::Time deltaTime);
+
+	void StartMainMenu();
+	void StartMultiGame();
+
+	IngameStatus m_status;
 
 private:
 	sf::RenderWindow* mainWindow;
