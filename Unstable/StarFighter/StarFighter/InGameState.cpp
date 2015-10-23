@@ -7,11 +7,11 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 	
-	StartMainMenu();
-	m_status = MainMenu;
+	//StartMainMenu();
+	//m_status = MainMenu;
 
-	//StartMultiGame();
-	//m_status = OfflineMulti;
+	StartMultiGame();
+	m_status = OfflineMulti;
 }
 
 void InGameState::StartMainMenu()
@@ -34,13 +34,12 @@ void InGameState::StartMainMenu()
 	(*CurrentGame).addToScene(playerShip2, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 
 	GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/main_menu_background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
-	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, 540), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, 540));
 	(*CurrentGame).addToScene(background, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
 
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	Discoball* discoball = new Discoball(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/discoball.png", sf::Vector2f(50, 50), sf::Vector2f(25, 25), 4, 4);
+	Discoball* discoball = new Discoball(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/discoball.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 4, 4);
 	(*CurrentGame).addToScene(discoball, LayerType::DiscoballLayer, GameObjectType::DiscoballObject);
 }
 
@@ -62,14 +61,14 @@ void InGameState::StartMultiGame()
 	playerShip2->team = TeamRed;
 	(*CurrentGame).addToScene(playerShip2, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 
-	//GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
-	GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, 540), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, 540));
+	GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
+	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, 540), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, 540));
 	(*CurrentGame).addToScene(background, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
 
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	Discoball* discoball = new Discoball(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/discoball.png", sf::Vector2f(50, 50), sf::Vector2f(25, 25), 4, 4);
+	Discoball* discoball = new Discoball(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/discoball.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 4, 4);
 	(*CurrentGame).addToScene(discoball, LayerType::DiscoballLayer, GameObjectType::DiscoballObject);
 
 	GameObject* goal_blue = new GameObject(sf::Vector2f(8, 540), sf::Vector2f(0, 0), "Assets/2D/goal_blue.png", sf::Vector2f(16, 200), sf::Vector2f(8, 100));
