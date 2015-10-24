@@ -216,8 +216,14 @@ void GameObject::PlayerContact(GameObject* player, float angle_collision)
 	//see override function
 }
 
+void GameObject::GetPortal(GameObject* portal)
+{
+	//see override function
+}
+
 void GameObject::PlayHitFeedback()
 {
 	setColor(Color(0, 255, 0, 255));
 	feedback_reset_clock.restart();
 }
+

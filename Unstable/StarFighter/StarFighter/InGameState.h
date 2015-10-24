@@ -9,12 +9,7 @@
 #include "Ship.h"
 #include "Discoball.h"
 #include "Bumper.h"
-
-enum IngameStatus
-{
-	MainMenu,
-	OfflineMulti,
-};
+#include "LevelPortal.h"
 
 class GameObject;
 
@@ -32,7 +27,13 @@ public:
 	void StartMainMenu();
 	void StartMultiGame();
 
-	IngameStatus m_status;
+	void SetIngameScript(IngameScript script);
+
+	IngameScript m_script;
+
+	Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = TeamBlue);
+	Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	PlayableCharacters chosen_character;
 
 private:
 	sf::RenderWindow* mainWindow;

@@ -13,7 +13,7 @@ Ship::Ship()
 
 void Ship::Init()
 {
-	collider_type = GameObjectType::PlayerShip;
+	collider_type = PlayerShip;
 	moving = false;
 	movingX = movingY = false;
 	disable_inputs = false;
@@ -37,7 +37,9 @@ void Ship::Init()
 
 	throw_curSpeedBonus = 0.f;
 
-	team = TeamBlue;
+	m_team = TeamBlue;
+	isUsingPortal = false;
+	m_character = Natalia;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -279,7 +281,7 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 						m_discoball->carrier->speed.x = 0;
 						m_discoball->carrier->speed.y = 0;
 						disable_inputs = false;
-						printf("switch\n");
+						(*CurrentGame).playerShip = this;
 					}
 
 					m_discoball->carrier->m_discoball = NULL;
@@ -325,11 +327,11 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				isThrowing = NOT_THROWING;
 
 				(*CurrentGame).PlaySFX(SFX_Catch);
-				if (team == TeamBlue)
+				if (m_team == TeamBlue)
 				{
 					m_discoball->SetDiscoballStatus(DiscoballCarriedTeamBlue);
 				}
-				if (team == TeamRed)
+				if (m_team == TeamRed)
 				{
 					m_discoball->SetDiscoballStatus(DiscoballCarriedTeamRed);
 				}
@@ -800,4 +802,11 @@ void Ship::ManageDodge()
 			}
 		}
 	}
+}
+
+void Ship::GetPortal(GameObject* portal)
+{
+	LevelPortal* getportal = (LevelPortal*)portal;
+	m_script = getportal->m_script;
+	isUsingPortal = true;
 }

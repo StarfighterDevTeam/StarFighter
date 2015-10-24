@@ -220,6 +220,17 @@ void Game::drawScene()
 	this->window->draw(temp);
 }
 
+void Game::CleanAllGameObjects()
+{
+	for (std::vector<GameObject*>::iterator it = sceneGameObjects.begin(); it != sceneGameObjects.end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		(*(*it)).GarbageMe = true;
+	}
+}
+
 void Game::colisionChecksV2()
 {
 	sf::Clock dt;
@@ -262,6 +273,21 @@ void Game::colisionChecksV2()
 				//TRON SPECIFIC
 				float angle = GetAngleOfCollision(*it1, *it2);
 				(*it1)->PlayerContact(*it2, angle);
+			}
+		}
+
+		//Players enters level portal
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::LevelPortalObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::LevelPortalObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+
+				//TRON SPECIFIC
+				(*it1)->GetPortal(*it2);
 			}
 		}
 	}

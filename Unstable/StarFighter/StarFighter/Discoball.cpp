@@ -23,7 +23,7 @@ Discoball::Discoball(sf::Vector2f position, sf::Vector2f speed, std::string text
 
 void Discoball::Init()
 {
-	collider_type = GameObjectType::DiscoballObject;
+	collider_type = DiscoballObject;
 	carrier = NULL;
 	carried = false;
 	carrier_curAngle = -1.f;

@@ -6,6 +6,7 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "Discoball.h"
+#include "LevelPortal.h"
 
 enum TacklingStatus
 {
@@ -41,6 +42,13 @@ enum HitRecoveryStatus
 	NOT_HIT,
 	RECOVERING_FROM_BRAWL,
 	RECOVERING_FROM_TACKLE,
+};
+
+enum PlayableCharacters
+{
+	Natalia,
+	Quorra,
+	NB_PLAYABLE_CHARACTERS,
 };
 
 class Ship : public GameObject
@@ -109,7 +117,11 @@ public :
 	float tackle_curSpeedBonus;
 	float throw_curSpeedBonus;
 
-	Teams team;
+	Teams m_team;
+	IngameScript m_script;
+	void GetPortal(GameObject* portal) override;
+	bool isUsingPortal;
+	PlayableCharacters m_character;
 
 private:
 	bool moving;

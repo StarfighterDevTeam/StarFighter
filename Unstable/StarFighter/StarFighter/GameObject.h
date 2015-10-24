@@ -35,6 +35,7 @@ enum GameObjectType {
 	GoalRedObject,
 	PlayerShip,
 	EnemyObject,
+	LevelPortalObject,
 	NBVAL_GameObject
 };
 
@@ -94,6 +95,7 @@ public:
 
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
+	virtual void GetPortal(GameObject* portal);
 	virtual void PlayerContact(GameObject* player, float angle_collision = -1.f);
 	void PlayHitFeedback();
 	sf::Clock feedback_reset_clock;

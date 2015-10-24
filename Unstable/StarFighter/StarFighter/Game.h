@@ -23,6 +23,12 @@ enum SFX_Bank
 	SFX_Switch,
 };
 
+enum IngameScript
+{
+	MainMenuScript,
+	OfflineMulti,
+};
+
 enum ScriptedGameRules
 {
 	NormalGameRules,
@@ -41,6 +47,7 @@ public:
 	void addToFeedbacks(Text* text);
 	void removeFromFeedbacks(RectangleShape* feedback);
 	void removeFromFeedbacks(Text* text);
+	void CleanAllGameObjects();
 
 	void updateScene(Time deltaTime);
 	void drawScene();
