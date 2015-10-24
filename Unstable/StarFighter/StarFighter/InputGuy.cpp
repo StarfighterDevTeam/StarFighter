@@ -109,7 +109,7 @@ bool InputGuy::isUsingDebugCommand()
 
 	if (sf::Joystick::isConnected(0))
 	{
-		if (sf::Joystick::isButtonPressed(0, 4)) //Left upper trigger
+		if (sf::Joystick::isButtonPressed(0, 6)) //Select button
 			return true;
 	}
 

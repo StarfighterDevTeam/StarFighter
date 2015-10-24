@@ -511,7 +511,7 @@ void Ship::ManageTackle()
 		{
 			if (tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
 			{
-				if ((speed.x * speed.x) + (speed.y * speed.y) > SHIP_MIN_SPEED_FOR_TACKLE * SHIP_MIN_SPEED_FOR_TACKLE)
+				if ((speed.x * speed.x) + (speed.y * speed.y) > (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS) * (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS))
 				{
 					if (InputGuy::isFiring(m_controllerType) && wasFiringButtonReleased)
 					{
