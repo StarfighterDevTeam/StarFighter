@@ -7,11 +7,8 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 	
-	StartMainMenu();
-	m_script = MainMenuScript;
-
-	//StartMultiGame();
-	//m_status = OfflineMulti;
+	SetIngameScript(MainMenuScript);
+	SetIngameScript(OfflineMulti);
 }
 
 void InGameState::SetIngameScript(IngameScript script)
@@ -123,7 +120,7 @@ void InGameState::StartMultiGame()
 	(*CurrentGame).cur_GameRules = NormalGameRules;
 
 	//intégration placeholder
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, 540), chosen_character, TeamBlue);
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, 540), Natalia, TeamBlue);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK

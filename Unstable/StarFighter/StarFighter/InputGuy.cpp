@@ -13,6 +13,9 @@ bool InputGuy::isFiring(ControlerType device)
 	if (device == AllControlDevices || device >= JoystickControl1)
 	{
 		int joystick = device - JoystickControl1;
+		if (device == AllControlDevices)
+			joystick = 0;// = joystick 1
+
 		if (sf::Joystick::isConnected(joystick))
 		{
 			if (sf::Joystick::hasAxis(joystick, sf::Joystick::Axis::Z))
@@ -45,6 +48,8 @@ bool InputGuy::isSwitchingRotation(ControlerType device)
 	if (device == AllControlDevices || device >= JoystickControl1)
 	{
 		int joystick = device - JoystickControl1;
+		if (device == AllControlDevices)
+			joystick = 0;// = joystick 1
 		if (sf::Joystick::isConnected(joystick))
 		{
 			if (sf::Joystick::isButtonPressed(joystick, 3))// Y button
@@ -68,6 +73,8 @@ bool InputGuy::isDodging(ControlerType device)
 	if (device == AllControlDevices || device >= JoystickControl1)
 	{
 		int joystick = device - JoystickControl1;
+		if (device == AllControlDevices)
+			joystick = 0;// = joystick 1
 		if (sf::Joystick::isConnected(joystick))
 		{
 			if (sf::Joystick::isButtonPressed(joystick, 2)) // X button
@@ -91,6 +98,8 @@ bool InputGuy::isStraffing(ControlerType device)
 	if (device == AllControlDevices || device >= JoystickControl1)
 	{
 		int joystick = device - JoystickControl1;
+		if (device == AllControlDevices)
+			joystick = 0;// = joystick 1
 		if (sf::Joystick::isConnected(joystick))
 		{
 			if (sf::Joystick::isButtonPressed(joystick, 4)) // left upper trigger
