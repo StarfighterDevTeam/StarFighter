@@ -48,6 +48,8 @@ enum PlayableCharacters
 {
 	Natalia,
 	Quorra,
+	Katyusha,
+	Savannah,
 	NB_PLAYABLE_CHARACTERS,
 };
 

@@ -50,6 +50,22 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 		(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
 		return newship;
 	}
+	if (character == Katyusha)
+	{
+		Ship* newship = new Ship(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/katyusha.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+		newship->m_team = team;
+		newship->m_character = character;
+		(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+		return newship;
+	}
+	if (character == Savannah)
+	{
+		Ship* newship = new Ship(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/savannah.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+		newship->m_team = team;
+		newship->m_character = character;
+		(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+		return newship;
+	}
 	
 	return NULL;	
 }
@@ -108,14 +124,14 @@ void InGameState::StartMultiGame()
 
 	//intégration placeholder
 	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, 540), chosen_character, TeamBlue);
-	playerShip1->SetControllerType(KeyboardControl);
+	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
 	Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, 540), Quorra, TeamRed);
-	playerShip2->SetControllerType(JoystickControl);
+	playerShip2->SetControllerType(JoystickControl2);
 
 	GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
 	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, 540), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, 540));
@@ -131,6 +147,9 @@ void InGameState::StartMultiGame()
 
 	GameObject* goal_red = new GameObject(sf::Vector2f((*CurrentGame).map_size.x - 8, 540), sf::Vector2f(0, 0), "Assets/2D/goal_red.png", sf::Vector2f(16, 200), sf::Vector2f(8, 100));
 	(*CurrentGame).addToScene(goal_red, GoalLayer, GoalRedObject);
+
+	//GameObject* bumper = new GameObject(sf::Vector2f(1200, 540), sf::Vector2f(0, 0), "Assets/2D/bumper.png", sf::Vector2f(16, 200), sf::Vector2f(8, 100));
+	//(*CurrentGame).addToScene(bumper, GoalLayer, BumperObject);
 }
 
 void InGameState::Update(sf::Time deltaTime)

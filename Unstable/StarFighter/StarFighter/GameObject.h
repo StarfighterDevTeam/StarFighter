@@ -96,6 +96,7 @@ public:
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
 	virtual void GetPortal(GameObject* portal);
+	void Bounce(GameObject* bumper, float angle_collision);
 	virtual void PlayerContact(GameObject* player, float angle_collision = -1.f);
 	void PlayHitFeedback();
 	sf::Clock feedback_reset_clock;

@@ -13,7 +13,10 @@ enum ControlerType
 {
 	AllControlDevices,
 	KeyboardControl,
-	JoystickControl,
+	JoystickControl1,
+	JoystickControl2,
+	JoystickControl3,
+	JoystickControl4,
 };
 
 class InputGuy

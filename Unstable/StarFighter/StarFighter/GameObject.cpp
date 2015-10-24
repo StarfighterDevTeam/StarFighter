@@ -227,3 +227,27 @@ void GameObject::PlayHitFeedback()
 	feedback_reset_clock.restart();
 }
 
+void GameObject::Bounce(GameObject* bumper, float angle_collision)
+{
+	if (abs(angle_collision) < M_PI_4)
+	{
+		setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2)));
+		speed.y *= -1;
+	}
+	else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
+	{
+		setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2), getPosition().y));
+		speed.x *= -1;
+	}
+	else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
+	{
+		setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2)));
+		speed.y *= -1;
+	}
+	else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
+	{
+		setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2), getPosition().y));
+		speed.x *= -1;
+	}
+}
+

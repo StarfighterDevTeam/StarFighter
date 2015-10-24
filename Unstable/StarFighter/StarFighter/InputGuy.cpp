@@ -10,18 +10,19 @@ bool InputGuy::isFiring(ControlerType device)
 		}
 	}
 
-	if (device == AllControlDevices || device == JoystickControl)
+	if (device == AllControlDevices || device >= JoystickControl1)
 	{
-		if (sf::Joystick::isConnected(0))
+		int joystick = device - JoystickControl1;
+		if (sf::Joystick::isConnected(joystick))
 		{
-			if (sf::Joystick::hasAxis(0, sf::Joystick::Axis::Z))
+			if (sf::Joystick::hasAxis(joystick, sf::Joystick::Axis::Z))
 			{
-				if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE) // right trigger
+				if (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z) < -JOYSTICK_MIN_AXIS_VALUE) // right trigger
 				{
 					return true;
 				}
 			}
-			if (sf::Joystick::isButtonPressed(0, 0)) // A button
+			if (sf::Joystick::isButtonPressed(joystick, 0)) // A button
 			{
 				return true;
 			}
@@ -41,11 +42,12 @@ bool InputGuy::isSwitchingRotation(ControlerType device)
 		}
 	}
 
-	if (device == AllControlDevices || device == JoystickControl)
+	if (device == AllControlDevices || device >= JoystickControl1)
 	{
-		if (sf::Joystick::isConnected(0))
+		int joystick = device - JoystickControl1;
+		if (sf::Joystick::isConnected(joystick))
 		{
-			if (sf::Joystick::isButtonPressed(0, 3))// Y button
+			if (sf::Joystick::isButtonPressed(joystick, 3))// Y button
 				return true;
 		}
 	}
@@ -63,11 +65,12 @@ bool InputGuy::isDodging(ControlerType device)
 		}
 	}
 	
-	if (device == AllControlDevices || device == JoystickControl)
+	if (device == AllControlDevices || device >= JoystickControl1)
 	{
-		if (sf::Joystick::isConnected(0))
+		int joystick = device - JoystickControl1;
+		if (sf::Joystick::isConnected(joystick))
 		{
-			if (sf::Joystick::isButtonPressed(0, 2)) // X button
+			if (sf::Joystick::isButtonPressed(joystick, 2)) // X button
 				return true;
 		}
 	}
@@ -85,11 +88,12 @@ bool InputGuy::isStraffing(ControlerType device)
 		}
 	}
 
-	if (device == AllControlDevices || device == JoystickControl)
+	if (device == AllControlDevices || device >= JoystickControl1)
 	{
-		if (sf::Joystick::isConnected(0))
+		int joystick = device - JoystickControl1;
+		if (sf::Joystick::isConnected(joystick))
 		{
-			if (sf::Joystick::isButtonPressed(0, 4)) // left upper trigger
+			if (sf::Joystick::isButtonPressed(joystick, 4)) // left upper trigger
 			{
 				return true;
 			}
@@ -182,22 +186,25 @@ Vector2f InputGuy::getDirections(ControlerType device)
 	y = dirY > 0 ? 1 : (dirY < 0 ? -1.f : 0.f);
 
 	//Joystick inputs (if connected)
-	if (device == AllControlDevices || device == JoystickControl)
+	if (device == AllControlDevices || device >= JoystickControl1)
 	{
-		if (sf::Joystick::isConnected(0))
-		{
-			if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)) > JOYSTICK_MIN_AXIS_VALUE)
-				x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X) / 100.0f;
-			else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX)) > JOYSTICK_MIN_AXIS_VALUE)
-				x = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX) / 100.0f;
+		int joystick = device - JoystickControl1;
+		if (device == AllControlDevices)
+			joystick = 0;// = joystick 1
 
-			if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)) > JOYSTICK_MIN_AXIS_VALUE)
-				y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y) / 100.0f;
-			else if (abs(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY)) > JOYSTICK_MIN_AXIS_VALUE)
-				y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY) / 100.0f;
+		if (sf::Joystick::isConnected(joystick))
+		{
+			if (abs(sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::X)) > JOYSTICK_MIN_AXIS_VALUE)
+				x = sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::X) / 100.0f;
+			else if (abs(sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::PovX)) > JOYSTICK_MIN_AXIS_VALUE)
+				x = sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::PovX) / 100.0f;
+
+			if (abs(sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y)) > JOYSTICK_MIN_AXIS_VALUE)
+				y = sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y) / 100.0f;
+			else if (abs(sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::PovY)) > JOYSTICK_MIN_AXIS_VALUE)
+				y = sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::PovY) / 100.0f;
 		}
 	}
-	
 
 	//diagonal movement?
 	if (abs(x) + abs(y) > 1)
