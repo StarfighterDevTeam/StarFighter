@@ -65,6 +65,7 @@ public :
 	
 	void GetDirectionInputs(sf::Vector2f inputs_direction);
 	void MaxSpeedConstraints();
+	float GetMaxSpeed();
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
 
@@ -72,6 +73,9 @@ public :
 
 	ControlerType m_controllerType;
 	void SetControllerType(ControlerType contoller);
+
+	//IA
+	sf::Vector2f MoveToPosition(sf::Vector2i position, sf::Time deltaTime);
 
 	//TRON SPECIFIC
 	Discoball* m_discoball;

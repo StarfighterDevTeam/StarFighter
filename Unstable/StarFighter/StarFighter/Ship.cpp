@@ -64,6 +64,15 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	//TEST
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_controllerType == AllControlDevices)
+	{
+		printf("Current position: %f, %f | ", getPosition().x, getPosition().y);
+		sf::Vector2i click_position = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+		MoveToPosition(click_position, deltaTime);
+	}
+
+
 	ManageHitRecovery();
 
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
@@ -216,6 +225,25 @@ void Ship::UpdateRotation()
 	{
 		setRotation(SpeedToPolarAngle(speed) * 180 / (float)M_PI);
 	}
+}
+
+float Ship::GetMaxSpeed()
+{
+	float ship_max_speed = SHIP_MAX_SPEED;
+
+	//bonus given after throwing the discoball
+	if (throw_bonus_speed_clock.getElapsedTime().asSeconds() < THROW_BONUS_SPEED_TIMER)
+	{
+		if (isThrowing == AFTER_THROW)
+		{
+			if (isTackling == NOT_TACKLING && m_discoball == NULL) //for safety
+			{
+				ship_max_speed = SHIP_MAX_SPEED + throw_curSpeedBonus;
+			}
+		}
+	}
+
+	return ship_max_speed;
 }
 
 void Ship::MaxSpeedConstraints()
@@ -809,4 +837,64 @@ void Ship::GetPortal(GameObject* portal)
 	LevelPortal* getportal = (LevelPortal*)portal;
 	m_script = getportal->m_script;
 	isUsingPortal = true;
+}
+
+//IA
+sf::Vector2f Ship::MoveToPosition(sf::Vector2i position, sf::Time deltaTime)
+{
+	sf::Vector2f input_direction = sf::Vector2f(0, 0);
+	//acknowledge position
+	sf::Vector2f target_position = (*CurrentGame).mainScreen.mapPixelToCoords(position);
+	printf("click pos: (%f, %f)\n", target_position.x, target_position.y);
+	
+	//compute max speed available
+	float cur_MaxSpeed = GetAbsoluteSpeed() + SHIP_ACCELERATION;
+	const float cur_MaxSpeed_limit = GetMaxSpeed();
+	if (cur_MaxSpeed > cur_MaxSpeed_limit)
+	{
+		cur_MaxSpeed = cur_MaxSpeed_limit;
+	}
+
+	//compute distance
+	const float diff_x = target_position.x - getPosition().x;
+	const float diff_y = target_position.y - getPosition().y;
+	float distance = sqrt(diff_x * diff_x + diff_y * diff_y);
+
+	if (distance == 0)//arrived at destination
+	{
+		printf("input calculated: (%f, %f) #ARRIVED#\n\n", input_direction.x, input_direction.y);
+		return sf::Vector2f(0, 0);
+	}
+	else if (distance < cur_MaxSpeed)//last frame before arrival at destination
+	{
+		input_direction.x = (diff_x - speed.x) / SHIP_ACCELERATION;//*deltaTime.asSeconds();
+		input_direction.y = (diff_y - speed.y) / SHIP_ACCELERATION;//*deltaTime.asSeconds();
+
+		//normalize
+		if (abs(input_direction.x) + abs(input_direction.y) > 1)
+		{
+			float p = (1 / sqrt((input_direction.x*input_direction.x) + (input_direction.y*input_direction.y)));
+			input_direction.x = input_direction.x*p;
+			input_direction.y = input_direction.y*p;
+		}
+
+		printf("input calculated: (%f, %f) #LAST MOVE#\n\n", input_direction.x, input_direction.y);
+		return input_direction;
+	}
+	else//not arrived yet (need to travel at max speed)
+	{
+		input_direction.x = diff_x * cur_MaxSpeed / distance;
+		input_direction.y = diff_y * cur_MaxSpeed / distance;
+
+		//normalize
+		if (abs(input_direction.x) + abs(input_direction.y) > 1)
+		{
+			float p = (1 / sqrt((input_direction.x*input_direction.x) + (input_direction.y*input_direction.y)));
+			input_direction.x = input_direction.x*p;
+			input_direction.y = input_direction.y*p;
+		}
+
+		printf("input calculated: (%f, %f) #MAX SPEED#\n\n", input_direction.x, input_direction.y);
+		return input_direction;
+	}
 }

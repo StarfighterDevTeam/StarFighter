@@ -26,7 +26,6 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	float discoball_curAngularSpeed;
-	float polar_angle;
 	float coeff_friction;
 
 	Ship* carrier;

@@ -85,9 +85,6 @@ void Discoball::update(sf::Time deltaTime)
 			(*CurrentGame).PlaySFX(SFX_Bounce);
 		}
 
-		//calculations
-		polar_angle = atan(speed.x / speed.y);
-
 		//friction
 		if (USE_FRICTION_ON_DISCOBALL)
 		{
@@ -100,8 +97,6 @@ void Discoball::update(sf::Time deltaTime)
 				speed.y = 0;
 			}
 		}
-
-		//printf("cartesian speed: %f, polar angle: %f\n", cartesian_speed, polar_angle);
 
 		setColor(sf::Color(255, 255, 255, 255));
 	}

@@ -250,4 +250,3 @@ void GameObject::Bounce(GameObject* bumper, float angle_collision)
 		speed.x *= -1;
 	}
 }
-
