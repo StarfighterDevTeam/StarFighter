@@ -35,7 +35,7 @@ public :
 	DiscoballStatus m_status;
 	void SetDiscoballStatus(DiscoballStatus status);
 
-	void BouncedBy(GameObject* bumper) override;
+	void DiscoballBumper(GameObject* bumper) override;
 	bool is_touching_bumper;
 
 };

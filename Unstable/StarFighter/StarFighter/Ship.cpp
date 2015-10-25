@@ -913,25 +913,28 @@ void Ship::BumpedBy(GameObject* bumper)
 
 		bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
 
+		const float correction_x = (bumper->m_size.x / 2) + (m_size.x / 2);
+		const float correction_y = (bumper->m_size.y / 2) + (m_size.y / 2);
+
 		if (is_vertical_bumper)
 		{
 			if (speed.x > 0)
 			{
-				setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2) - (m_size.x / 2), getPosition().y));
+				setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
 			}
 			else if (speed.x < 0)
 			{
-				setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2) + (m_size.x / 2), getPosition().y));
+				setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
 			}
 			else
 			{
 				if (getPosition().x < bumper->getPosition().x)
 				{
-					setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2) - (m_size.x / 2), getPosition().y));
+					setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
 				}
 				else
 				{
-					setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2) + (m_size.x / 2), getPosition().y));
+					setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
 				}
 			}
 
@@ -941,21 +944,21 @@ void Ship::BumpedBy(GameObject* bumper)
 		{
 			if (speed.y > 0)
 			{
-				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2) - (m_size.y / 2)));
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
 			}
 			else if (speed.y < 0)
 			{
-				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2) + (m_size.y / 2)));
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
 			}
 			else
 			{
 				if (getPosition().y < bumper->getPosition().y)
 				{
-					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2) - (m_size.y / 2)));
+					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
 				}
 				else
 				{
-					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2) + (m_size.y / 2)));
+					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
 				}
 			}
 

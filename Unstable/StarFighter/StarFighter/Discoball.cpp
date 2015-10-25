@@ -136,7 +136,7 @@ void Discoball::SetDiscoballStatus(DiscoballStatus status)
 }
 
 
-void Discoball::BouncedBy(GameObject* bumper)
+void Discoball::DiscoballBumper(GameObject* bumper)
 {
 	is_touching_bumper = true;
 

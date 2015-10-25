@@ -300,7 +300,7 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				(*it1)->BumpedBy(*it2);
+				(*it1)->PlayerBumper(*it2);
 			}
 		}
 
@@ -311,7 +311,7 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				(*it1)->BumpedBy(*it2);
+				(*it1)->PlayerBumper(*it2);
 			}
 		}
 	}
@@ -362,7 +362,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//float angle = GetAngleOfCollision(*it2, *it1);
-				(*it1)->BouncedBy(*it2);
+				(*it1)->DiscoballBumper(*it2);
 				PlaySFX(SFX_Bounce);
 			}
 		}

@@ -67,7 +67,7 @@ public :
 	void GetDirectionInputs(sf::Vector2f inputs_direction);
 	void MaxSpeedConstraints();
 	float GetMaxSpeed();
-	void BumpedBy(GameObject* bumper) override;
+	void PlayerBumper(GameObject* bumper) override;
 	
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();

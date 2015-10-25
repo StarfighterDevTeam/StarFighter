@@ -227,12 +227,12 @@ void GameObject::PlayHitFeedback()
 	feedback_reset_clock.restart();
 }
 
-void GameObject::BouncedBy(GameObject* bumper)
+void GameObject::DiscoballBumper(GameObject* bumper)
 {
 	// see override function in class Ship
 }
 
-void GameObject::BumpedBy(GameObject* bumper)
+void GameObject::PlayerBumper(GameObject* bumper)
 {
 	// see override function in class Ship
 }
