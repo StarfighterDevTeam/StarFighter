@@ -903,7 +903,7 @@ sf::Vector2f Ship::MoveToPosition(sf::Vector2i position, sf::Time deltaTime)
 	}
 }
 
-void Ship::BumpedBy(GameObject* bumper)
+void Ship::PlayerBumper(GameObject* bumper)
 {
 	Bumper* bumper_ = (Bumper*)bumper;
 
