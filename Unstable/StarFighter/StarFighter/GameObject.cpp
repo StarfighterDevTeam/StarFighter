@@ -106,6 +106,18 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 	this->setOrigin(size.x / 2, size.y / 2);
 
 	Init(position, speed, texture, m_frameNumber, m_animationNumber);
+}
+
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber, sf::Uint8* pixels)
+{
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture(textureName, size.x*m_frameNumber, size.y*m_animationNumber, pixels);
+	this->textureName = textureName;
+
+	this->setOrigin(size.x / 2, size.y / 2);
+
+	Init(position, speed, texture, m_frameNumber, m_animationNumber);
 
 }
 

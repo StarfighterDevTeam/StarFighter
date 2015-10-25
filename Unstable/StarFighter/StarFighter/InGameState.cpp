@@ -157,8 +157,11 @@ void InGameState::StartMultiGame()
 	Bumper* red_bumper = new Bumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, 540), "Assets/2D/bumper_red.png", sf::Vector2f(4, 1080), sf::Vector2f(2, 540));
 	(*CurrentGame).addToScene(red_bumper, BumperLayer, BumperRedObject);
 
-	Bumper* green_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), "Assets/2D/bumper_green200.png", sf::Vector2f(4, 200), sf::Vector2f(2, 100));
-	(*CurrentGame).addToScene(green_bumper, BumperLayer, BumperGreenObject);
+	//Bumper* green_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), "Assets/2D/bumper_green200.png", sf::Vector2f(4, 200), sf::Vector2f(2, 100));
+	//(*CurrentGame).addToScene(green_bumper, BumperLayer, BumperGreenObject);
+
+	Bumper* test_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), sf::Vector2f(2, 200));
+	(*CurrentGame).addToScene(test_bumper, BumperLayer, BumperGreenObject);
 }
 
 void InGameState::Update(sf::Time deltaTime)

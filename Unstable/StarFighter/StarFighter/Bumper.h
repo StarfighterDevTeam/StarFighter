@@ -18,7 +18,7 @@ public :
 	Bumper();
 	Bumper(BumperType type, sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	Bumper(BumperType type, sf::Vector2f position, std::string textureName, sf::Vector2f size);
-	void Init();
+	Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size);
 	virtual ~Bumper();
 	void update(sf::Time deltaTime) override;
 
