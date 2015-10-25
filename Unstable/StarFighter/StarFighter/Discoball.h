@@ -7,8 +7,8 @@
 
 enum DiscoballStatus
 {
-	DiscoballCarriedTeamBlue,
-	DiscoballCarriedTeamRed,
+	DiscoballCarriedBlueTeam,
+	DiscoballCarriedRedTeam,
 	DiscoballLost,
 	DiscoballFree,
 };

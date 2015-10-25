@@ -71,7 +71,6 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	this->m_size.x = ((*texture).getSize().x / m_frameNumber);
 	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
 
-	this->collider_type = GameObjectType::BackgroundObject;
 	this->defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < m_animationNumber; j++)
 	{

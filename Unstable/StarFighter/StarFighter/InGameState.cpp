@@ -75,19 +75,28 @@ Discoball* InGameState::CreateDiscoball(sf::Vector2f position)
 	return discoball;
 }
 
+Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size)
+{
+	sf::Vector2f size_ = vertical ? sf::Vector2f(BUMPER_WIDTH, size) : sf::Vector2f(size, BUMPER_WIDTH);
+	Bumper* bumper = new Bumper(type, position, size_);
+	(*CurrentGame).addToScene(bumper, BumperLayer, bumper->collider_type);
+
+	return bumper;
+}
+
 void InGameState::StartMainMenu()
 {
 	(*CurrentGame).cur_GameRules = CarryToAbleInputs;
 
 	//intégration placeholder
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(960, 540), Natalia, TeamBlue);
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(960, 540), Natalia, BlueTeam);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateCharacter(sf::Vector2f(960, 340), Quorra, TeamRed);
+	Ship* playerShip2 = CreateCharacter(sf::Vector2f(960, 340), Quorra, RedTeam);
 	playerShip2->SetControllerType(AllControlDevices);
 	playerShip2->disable_inputs = true;
 
@@ -114,11 +123,9 @@ void InGameState::StartMainMenu()
 	LevelPortal* multi_online = new LevelPortal(MainMenuScript, sf::Vector2f(1560, 540), sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
 	(*CurrentGame).addToScene(multi_online, GoalLayer, LevelPortalObject);
 
-	Bumper* green_bumper_left = new Bumper(OnlyPlayersThrough, sf::Vector2f(494, 540), "Assets/2D/bumper_green.png", sf::Vector2f(4, 1080), sf::Vector2f(2, 540));
-	(*CurrentGame).addToScene(green_bumper_left, BumperLayer, BumperGreenObject);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(494, 540), true, (*CurrentGame).map_size.y);
 
-	Bumper* green_bumper_right = new Bumper(OnlyPlayersThrough, sf::Vector2f(1409, 540), "Assets/2D/bumper_green.png", sf::Vector2f(4, 1080), sf::Vector2f(2, 540));
-	(*CurrentGame).addToScene(green_bumper_right, BumperLayer, BumperGreenObject);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, 540), true, (*CurrentGame).map_size.y);
 }
 
 void InGameState::StartMultiGame()
@@ -126,14 +133,14 @@ void InGameState::StartMultiGame()
 	(*CurrentGame).cur_GameRules = NormalGameRules;
 
 	//intégration placeholder
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, 540), Natalia, TeamBlue);
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, 540), Natalia, BlueTeam);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, 540), Quorra, TeamRed);
+	Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, 540), Quorra, RedTeam);
 	playerShip2->SetControllerType(JoystickControl2);
 
 	GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
@@ -151,17 +158,14 @@ void InGameState::StartMultiGame()
 	GameObject* goal_red = new GameObject(sf::Vector2f((*CurrentGame).map_size.x - 8, 540), sf::Vector2f(0, 0), "Assets/2D/goal_red.png", sf::Vector2f(16, 200), sf::Vector2f(8, 100));
 	(*CurrentGame).addToScene(goal_red, GoalLayer, GoalRedObject);
 
-	Bumper* blue_bumper = new Bumper(OnlyBlueTeamThrough, sf::Vector2f(SAFE_ZONE_X, 540), "Assets/2D/bumper_blue.png", sf::Vector2f(4, 1080), sf::Vector2f(2, 540));
-	(*CurrentGame).addToScene(blue_bumper, BumperLayer, BumperBlueObject);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(SAFE_ZONE_X, 540), true, (*CurrentGame).map_size.y);
 
-	Bumper* red_bumper = new Bumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, 540), "Assets/2D/bumper_red.png", sf::Vector2f(4, 1080), sf::Vector2f(2, 540));
-	(*CurrentGame).addToScene(red_bumper, BumperLayer, BumperRedObject);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, 540), true, (*CurrentGame).map_size.y);
 
 	//Bumper* green_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), "Assets/2D/bumper_green200.png", sf::Vector2f(4, 200), sf::Vector2f(2, 100));
 	//(*CurrentGame).addToScene(green_bumper, BumperLayer, BumperGreenObject);
 
-	Bumper* test_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), sf::Vector2f(2, 200));
-	(*CurrentGame).addToScene(test_bumper, BumperLayer, BumperGreenObject);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), true, 200);
 }
 
 void InGameState::Update(sf::Time deltaTime)

@@ -51,8 +51,8 @@ enum FloatCompare
 
 enum Teams
 {
-	TeamBlue,
-	TeamRed,
+	BlueTeam,
+	RedTeam,
 	TeamNeutral,
 };
 

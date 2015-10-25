@@ -25,30 +25,66 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 {
 	m_type = type;
 
+	//pixel array creation
 	const unsigned int W = size.x;
 	const unsigned int H = size.y;
 
-	//sf::Texture texture;
-	//texture.create(W, H);
+	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
 
-	sf::Uint8* pixels = new sf::Uint8[W*H * 4];
-
-	for (int i = 0; i < W*H * 4; i += 4) 
+	ostringstream ss;
+	if (type == OnlyBlueTeamThrough)
 	{
-		pixels[i] = 0;			// R
-		pixels[i + 1] = 255;	// G
-		pixels[i + 2] = 0;		// B
-		pixels[i + 3] = 100;	// A
+		ss << "blue";
+		collider_type = BumperBlueObject;
+		for (int i = 0; i < W*H * 4; i += 4)
+		{
+			pixels[i] = 0;			// R
+			pixels[i + 1] = 0;		// G
+			pixels[i + 2] = 255;	// B
+			pixels[i + 3] = 255;	// A
+		}
+	}
+	else if (type == OnlyRedTeamThrough)
+	{
+		ss << "red";
+		collider_type = BumperRedObject;
+		for (int i = 0; i < W*H * 4; i += 4)
+		{
+			pixels[i] = 255;		// R
+			pixels[i + 1] = 0;		// G
+			pixels[i + 2] = 0;		// B
+			pixels[i + 3] = 255;	// A
+		}
+	}
+	else
+	{
+		ss << "green";
+		collider_type = BumperGreenObject;
+		for (int i = 0; i < W*H * 4; i += 4)
+		{
+			pixels[i] = 0;			// R
+			pixels[i + 1] = 255;	// G
+			pixels[i + 2] = 0;		// B
+			pixels[i + 3] = 255;	// A
+		}
 	}
 
-	//texture.update(pixels);
+	if (size.x > size.y)
+	{
+		ss << "H" << size.x;
+	}
+	else if (size.x < size.y)
+	{
+		ss << "V" << size.y;
+	}
+	else
+	{
+		ss << "D"; // not supported
+	}
+	
+	std::string s = ss.str();
 
-	//Init(position, sf::Vector2f(0, 0), &texture);
-	Init(position, sf::Vector2f(0, 0), "test", sf::Vector2f(W, H), 1, 1, pixels);
-
-	// ...
-
-	collider_type = BumperRedObject;
+	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 1, pixels);
 }
 /*
 void Bumper::Init()

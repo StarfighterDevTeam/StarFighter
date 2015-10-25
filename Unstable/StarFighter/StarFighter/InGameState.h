@@ -31,8 +31,9 @@ public:
 
 	IngameScript m_script;
 
-	Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = TeamBlue);
+	Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam);
 	Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	Bumper* CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size);
 	PlayableCharacters chosen_character;
 
 private:

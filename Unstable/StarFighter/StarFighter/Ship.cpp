@@ -37,7 +37,7 @@ void Ship::Init()
 
 	throw_curSpeedBonus = 0.f;
 
-	m_team = TeamBlue;
+	m_team = BlueTeam;
 	isUsingPortal = false;
 	m_character = Natalia;
 }
@@ -355,13 +355,13 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				isThrowing = NOT_THROWING;
 
 				(*CurrentGame).PlaySFX(SFX_Catch);
-				if (m_team == TeamBlue)
+				if (m_team == BlueTeam)
 				{
-					m_discoball->SetDiscoballStatus(DiscoballCarriedTeamBlue);
+					m_discoball->SetDiscoballStatus(DiscoballCarriedBlueTeam);
 				}
-				if (m_team == TeamRed)
+				if (m_team == RedTeam)
 				{
-					m_discoball->SetDiscoballStatus(DiscoballCarriedTeamRed);
+					m_discoball->SetDiscoballStatus(DiscoballCarriedRedTeam);
 				}
 			}
 		}
@@ -907,7 +907,7 @@ void Ship::PlayerBumper(GameObject* bumper)
 {
 	Bumper* bumper_ = (Bumper*)bumper;
 
-	if ((bumper_->m_type == OnlyBlueTeamThrough && m_team == TeamRed) || (bumper_->m_type == OnlyRedTeamThrough && m_team == TeamBlue))
+	if ((bumper_->m_type == OnlyBlueTeamThrough && m_team == RedTeam) || (bumper_->m_type == OnlyRedTeamThrough && m_team == BlueTeam))
 	{
 		ResetStatus();
 
