@@ -142,53 +142,65 @@ void Discoball::BouncedBy(GameObject* bumper)
 
 	bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
 
-	if (is_vertical_bumper)
-	{
-		if (speed.x >= 0)
-		{
-			setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2) - (m_size.x / 2), getPosition().y));
-		}
-		else
-		{
-			setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2) + (m_size.x / 2), getPosition().y));
-		}
+	const float correction_x = (bumper->m_size.x / 2) + (m_size.x / 2);
+	const float correction_y = (bumper->m_size.y / 2) + (m_size.y / 2);
 
-		speed.x *= -1;
-	}
-	else //horizontal bumper
+	if (!carried)
 	{
-		if (speed.y >= 0)
+		if (is_vertical_bumper)
 		{
-			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2) - (m_size.y / 2)));
+			if (speed.x >= 0)
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
+			}
+			else
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
+			}
+
+			speed.x *= -1;
 		}
-		else
+		else //horizontal bumper
 		{
-			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2) + (m_size.y / 2)));
+			if (speed.y >= 0)
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
+			}
+			else
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
+			}
+
+			speed.y *= -1;
 		}
+	}
+	else
+	{
+		if (is_vertical_bumper)
+		{
+			if (speed.x >= 0)
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
+			}
+			else
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
+			}
 
-		speed.y *= -1;
-	}
+			speed.x *= -1;
+		}
+		else //horizontal bumper
+		{
+			if (speed.y >= 0)
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
+			}
+			else
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
+			}
 
-	/*
-	if (abs(angle_collision) < M_PI_4)
-	{
-	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2)));
-	speed.y *= -1;
+			speed.y *= -1;
+		}
 	}
-	else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
-	{
-	setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2), getPosition().y));
-	speed.x *= -1;
-	}
-	else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
-	{
-	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2)));
-	speed.y *= -1;
-	}
-	else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
-	{
-	setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2), getPosition().y));
-	speed.x *= -1;
-	}
-	*/
 }

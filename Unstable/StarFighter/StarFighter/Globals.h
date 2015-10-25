@@ -28,7 +28,7 @@
 #define USE_FRICTION_ON_DISCOBALL					false
 #define COEFF_FRICTION_INCREASE_RATIO				0.005f
 #define DISCOBALL_MIN_SPEED							20.f
-#define SAFE_ZONE_X									300.f
+#define SAFE_ZONE_X									200.f
 
 //SHIP MANEUVERABILITY
 #define SHIP_ACCELERATION							100.f
