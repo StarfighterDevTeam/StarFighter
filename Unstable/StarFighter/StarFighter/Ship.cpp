@@ -915,26 +915,48 @@ void Ship::BumpedBy(GameObject* bumper)
 
 		if (is_vertical_bumper)
 		{
-			if (speed.x >= 0)
+			if (speed.x > 0)
 			{
 				setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2) - (m_size.x / 2), getPosition().y));
 			}
-			else
+			else if (speed.x < 0)
 			{
 				setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2) + (m_size.x / 2), getPosition().y));
+			}
+			else
+			{
+				if (getPosition().x < bumper->getPosition().x)
+				{
+					setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2) - (m_size.x / 2), getPosition().y));
+				}
+				else
+				{
+					setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2) + (m_size.x / 2), getPosition().y));
+				}
 			}
 
 			speed.x = 0;
 		}
 		else //horizontal bumper
 		{
-			if (speed.y >= 0)
+			if (speed.y > 0)
 			{
 				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2) - (m_size.y / 2)));
 			}
-			else
+			else if (speed.y < 0)
 			{
 				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2) + (m_size.y / 2)));
+			}
+			else
+			{
+				if (getPosition().y < bumper->getPosition().y)
+				{
+					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2) - (m_size.y / 2)));
+				}
+				else
+				{
+					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2) + (m_size.y / 2)));
+				}
 			}
 
 			speed.y = 0;
