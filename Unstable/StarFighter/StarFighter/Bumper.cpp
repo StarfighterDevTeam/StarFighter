@@ -6,26 +6,37 @@ using namespace sf;
 
 // ----------------SHIP ---------------
 
-Bumper::Bumper(float angle)
+Bumper::Bumper()
 {
-	m_reflection_angle = angle;
+
 }
 
-Bumper::Bumper(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, float angle, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
+Bumper::Bumper(BumperType type, sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
 {
-	m_reflection_angle = angle;
+	m_type = type;
 	this->Init();
 }
 
-Bumper::Bumper(sf::Vector2f position, std::string textureName, sf::Vector2f size, float angle) : GameObject(position, sf::Vector2f(0, 0), textureName, size)
+Bumper::Bumper(BumperType type, sf::Vector2f position, std::string textureName, sf::Vector2f size) : GameObject(position, sf::Vector2f(0, 0), textureName, size)
 {
-	m_reflection_angle = angle;
+	m_type = type;
 	this->Init();
 }
 
 void Bumper::Init()
 {
-	collider_type = GameObjectType::BumperObject;
+	if (m_type == OnlyBlueTeamThrough)
+	{
+		collider_type = BumperBlueObject;
+	}
+	else if (m_type == OnlyRedTeamThrough)
+	{
+		collider_type = BumperRedObject;
+	}
+	else//if (m_type == OnlyPlayersThrough)
+	{
+		collider_type = BumperGreenObject;
+	}
 }
 
 Bumper::~Bumper()

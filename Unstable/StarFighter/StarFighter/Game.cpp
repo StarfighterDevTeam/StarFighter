@@ -157,9 +157,7 @@ void Game::updateScene(Time deltaTime)
 	//Clean garbage
 	cleanGarbage();
 
-	//Checking colisions
-	colisionChecksV2();
-
+	//Move objects
 	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
 
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
@@ -169,6 +167,9 @@ void Game::updateScene(Time deltaTime)
 
 		this->sceneGameObjects[i]->update(deltaTime);
 	}
+
+	//Checking colisions
+	colisionChecksV2();
 
 	//Collect the dust
 	collectGarbage();
@@ -290,6 +291,29 @@ void Game::colisionChecksV2()
 				(*it1)->GetPortal(*it2);
 			}
 		}
+
+		//Gets blocked by bumper
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperBlueObject].begin(); it2 != sceneGameObjectsTyped[BumperBlueObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				(*it1)->BumpedBy(*it2);
+			}
+		}
+
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperRedObject].begin(); it2 != sceneGameObjectsTyped[BumperRedObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				(*it1)->BumpedBy(*it2);
+			}
+		}
 	}
 
 	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[DiscoballObject].begin(); it1 != sceneGameObjectsTyped[DiscoballObject].end(); it1++)
@@ -330,18 +354,15 @@ void Game::colisionChecksV2()
 		}
 
 		//Discoball hits bumper
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperObject].begin(); it2 != sceneGameObjectsTyped[BumperObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperGreenObject].begin(); it2 != sceneGameObjectsTyped[BumperGreenObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				//Do something 
-
-				//TRON SPECIFIC
-				float angle = GetAngleOfCollision(*it2, *it1);
-				(*it1)->Bounce(*it2, angle);
+				//float angle = GetAngleOfCollision(*it2, *it1);
+				(*it1)->BouncedBy(*it2);
 				PlaySFX(SFX_Bounce);
 			}
 		}

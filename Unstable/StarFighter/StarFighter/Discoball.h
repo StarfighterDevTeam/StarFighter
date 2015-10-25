@@ -34,6 +34,10 @@ public :
 	bool carried;
 	DiscoballStatus m_status;
 	void SetDiscoballStatus(DiscoballStatus status);
+
+	void BouncedBy(GameObject* bumper) override;
+	bool is_touching_bumper;
+
 };
 
 #endif // DISCOBALL_H_INCLUDED

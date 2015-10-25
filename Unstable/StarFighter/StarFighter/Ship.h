@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "Discoball.h"
 #include "LevelPortal.h"
+#include "Bumper.h"
 
 enum TacklingStatus
 {
@@ -66,6 +67,8 @@ public :
 	void GetDirectionInputs(sf::Vector2f inputs_direction);
 	void MaxSpeedConstraints();
 	float GetMaxSpeed();
+	void BumpedBy(GameObject* bumper) override;
+	
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
 

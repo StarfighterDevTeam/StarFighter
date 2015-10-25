@@ -33,6 +33,7 @@ void Discoball::Init()
 	coeff_friction = 0;
 	m_status = DiscoballFree;
 	setAnimationLine(DiscoballFree);
+	is_touching_bumper = false;
 }
 
 Discoball::~Discoball()
@@ -42,6 +43,8 @@ Discoball::~Discoball()
 
 void Discoball::update(sf::Time deltaTime)
 {
+	is_touching_bumper = false;
+
 	if (!carried)
 	{
 		static sf::Vector2f newposition;
@@ -132,3 +135,60 @@ void Discoball::SetDiscoballStatus(DiscoballStatus status)
 	setAnimationLine(m_status, true);
 }
 
+
+void Discoball::BouncedBy(GameObject* bumper)
+{
+	is_touching_bumper = true;
+
+	bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
+
+	if (is_vertical_bumper)
+	{
+		if (speed.x >= 0)
+		{
+			setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2) - (m_size.x / 2), getPosition().y));
+		}
+		else
+		{
+			setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2) + (m_size.x / 2), getPosition().y));
+		}
+
+		speed.x *= -1;
+	}
+	else //horizontal bumper
+	{
+		if (speed.y >= 0)
+		{
+			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2) - (m_size.y / 2)));
+		}
+		else
+		{
+			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2) + (m_size.y / 2)));
+		}
+
+		speed.y *= -1;
+	}
+
+	/*
+	if (abs(angle_collision) < M_PI_4)
+	{
+	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2)));
+	speed.y *= -1;
+	}
+	else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
+	{
+	setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2), getPosition().y));
+	speed.x *= -1;
+	}
+	else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
+	{
+	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2)));
+	speed.y *= -1;
+	}
+	else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
+	{
+	setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2), getPosition().y));
+	speed.x *= -1;
+	}
+	*/
+}

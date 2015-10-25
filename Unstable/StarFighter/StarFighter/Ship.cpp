@@ -378,6 +378,10 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 		{
 			ReleaseDiscoball();
 		}
+		else if (m_discoball->is_touching_bumper)
+		{
+			ReleaseDiscoball();
+		}
 		else
 		{
 			int cc = discoball_clockwise ? cc = -1 : cc = 1;
@@ -896,5 +900,44 @@ sf::Vector2f Ship::MoveToPosition(sf::Vector2i position, sf::Time deltaTime)
 
 		printf("input calculated: (%f, %f) #MAX SPEED#\n\n", input_direction.x, input_direction.y);
 		return input_direction;
+	}
+}
+
+void Ship::BumpedBy(GameObject* bumper)
+{
+	Bumper* bumper_ = (Bumper*)bumper;
+
+	if ((bumper_->m_type == OnlyBlueTeamThrough && m_team == TeamRed) || (bumper_->m_type == OnlyRedTeamThrough && m_team == TeamBlue))
+	{
+		ResetStatus();
+
+		bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
+
+		if (is_vertical_bumper)
+		{
+			if (speed.x >= 0)
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - (bumper->m_size.x / 2) - (m_size.x / 2), getPosition().y));
+			}
+			else
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + (bumper->m_size.x / 2) + (m_size.x / 2), getPosition().y));
+			}
+
+			speed.x = 0;
+		}
+		else //horizontal bumper
+		{
+			if (speed.y >= 0)
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - (bumper->m_size.y / 2) - (m_size.y / 2)));
+			}
+			else
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + (bumper->m_size.y / 2) + (m_size.y / 2)));
+			}
+
+			speed.y = 0;
+		}
 	}
 }
