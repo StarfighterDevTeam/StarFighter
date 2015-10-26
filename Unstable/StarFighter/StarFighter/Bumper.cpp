@@ -41,7 +41,14 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i] = 0;			// R
 			pixels[i + 1] = 0;		// G
 			pixels[i + 2] = 255;	// B
-			pixels[i + 3] = 255;	// A
+			if ((i / 4) % W == 0 || (i / 4) % W == (W - 1)) // A
+			{
+				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+			}
+			else
+			{
+				pixels[i + 3] = 255;
+			}
 		}
 	}
 	else if (type == OnlyRedTeamThrough)
@@ -53,19 +60,33 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i] = 255;		// R
 			pixels[i + 1] = 0;		// G
 			pixels[i + 2] = 0;		// B
-			pixels[i + 3] = 255;	// A
+			if ((i / 4) % W == 0 || (i / 4) % W == (W - 1)) // A
+			{
+				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+			}
+			else
+			{
+				pixels[i + 3] = 255;
+			}
 		}
 	}
 	else
 	{
 		ss << "green";
 		collider_type = BumperGreenObject;
-		for (int i = 0; i < W*H * 4; i += 4)
+		for (int i = 0; i < W * H * 4; i += 4)
 		{
 			pixels[i] = 0;			// R
 			pixels[i + 1] = 255;	// G
 			pixels[i + 2] = 0;		// B
-			pixels[i + 3] = 255;	// A
+			if ((i / 4) % W == 0 || (i / 4) % W == (W-1)) // A
+			{
+				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+			}
+			else
+			{
+				pixels[i + 3] = 255;
+			}
 		}
 	}
 
