@@ -6,8 +6,29 @@ void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
+
+	//score display
+	score_blue_text.setFont(*(*CurrentGame).font);
+	score_blue_text.setCharacterSize(30);
+	score_blue_text.setColor(sf::Color::Blue);
+	score_blue_text.setPosition((*CurrentGame).map_size.x / 2 + 50, 10);
+
+	score_red_text.setFont(*(*CurrentGame).font);
+	score_red_text.setCharacterSize(30);
+	score_red_text.setColor(sf::Color::Red);
+	score_red_text.setPosition((*CurrentGame).map_size.x / 2 - 50, 10);
+
+	ostringstream ss_score_blue, ss_score_red;
+	ss_score_blue << (*CurrentGame).score_blue_team;
+	ss_score_red << (*CurrentGame).score_red_team;
+	score_blue_text.setString(ss_score_blue.str());
+	score_red_text.setString(ss_score_red.str());
+
+	(*CurrentGame).addToFeedbacks(&score_blue_text);
+	(*CurrentGame).addToFeedbacks(&score_red_text);
 	
-	SetIngameScript(MainMenuScript);
+	//launch script
+	//SetIngameScript(MainMenuScript);
 	SetIngameScript(OfflineMulti);
 }
 
@@ -25,6 +46,9 @@ void InGameState::SetIngameScript(IngameScript script)
 		break;
 	case OfflineMulti:
 		StartMultiGame();
+		break;
+	case OfflineMultiContinue:
+		StartMultiGame(false);
 		break;
 	}
 }
@@ -128,11 +152,10 @@ void InGameState::StartMainMenu()
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, 540), true, (*CurrentGame).map_size.y);
 }
 
-void InGameState::StartMultiGame()
+void InGameState::StartMultiGame(bool reset_scores)
 {
-	(*CurrentGame).cur_GameRules = NormalGameRules;
+	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
 
-	//intégration placeholder
 	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, 540), Natalia, BlueTeam);
 	playerShip1->SetControllerType(AllControlDevices);
 
@@ -166,18 +189,30 @@ void InGameState::StartMultiGame()
 	//(*CurrentGame).addToScene(green_bumper, BumperLayer, BumperGreenObject);
 
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), true, 200);
+
+	if (reset_scores)
+	{
+		(*CurrentGame).score_blue_team = 0;
+		(*CurrentGame).score_red_team = 0;
+	}
 }
 
 void InGameState::Update(sf::Time deltaTime)
 {
 	chosen_character = (*CurrentGame).playerShip->m_character;
 
+	ostringstream ss_score_blue, ss_score_red;
+	ss_score_blue << (*CurrentGame).score_blue_team;
+	ss_score_red << (*CurrentGame).score_red_team;
+	score_blue_text.setString(ss_score_blue.str());
+	score_red_text.setString(ss_score_red.str());
+
 	if (InputGuy::isUsingDebugCommand())
 	{
 		SetIngameScript(MainMenuScript);
 	}
 
-	if ((*CurrentGame).playerShip->isUsingPortal)
+	if ((*CurrentGame).playerShip->isLaunchingScript)
 	{
 		SetIngameScript((*CurrentGame).playerShip->m_script);
 	}

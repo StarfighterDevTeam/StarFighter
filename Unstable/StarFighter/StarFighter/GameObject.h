@@ -21,7 +21,7 @@ enum LayerType {
 	BumperLayer,
 	EnemyObjectLayer,
 	AuraLayer,
-	FeedbacksLayer,
+	ScoresLayer,
 	PlayerShipLayer,
 	DiscoballLayer,
 	NBVAL_Layer
@@ -54,6 +54,13 @@ enum Teams
 	BlueTeam,
 	RedTeam,
 	TeamNeutral,
+};
+
+enum IngameScript
+{
+	MainMenuScript,
+	OfflineMulti,
+	OfflineMultiContinue,
 };
 
 class GameObject : public AnimatedSprite
@@ -102,10 +109,10 @@ public:
 	virtual void PlayerBumper(GameObject* bumper);
 	virtual void PlayerContact(GameObject* player, float angle_collision = -1.f);
 	void PlayHitFeedback();
+	virtual void LoadPlayerShipWithScript(IngameScript script);
 	sf::Clock feedback_reset_clock;
 
 	sf::Vector2f speed;
-
 
 protected:
 	sf::Vector2f initial_position;

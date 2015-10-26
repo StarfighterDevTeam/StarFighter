@@ -23,15 +23,9 @@ enum SFX_Bank
 	SFX_Switch,
 };
 
-enum IngameScript
-{
-	MainMenuScript,
-	OfflineMulti,
-};
-
 enum ScriptedGameRules
 {
-	NormalGameRules,
+	ClassicMatchGamesRules,
 	CarryToAbleInputs,
 };
 
@@ -64,7 +58,9 @@ public:
 	sf::View view;
 
 	Ship* playerShip;
+	GameObject* scriptLauncher;
 	ScriptedGameRules cur_GameRules;
+	void Goal(Teams team);
 
 	//SFX
 	int LoadSFX();
@@ -79,6 +75,11 @@ public:
 
 	//TRON SPECIFIC
 	float GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj);
+	unsigned int score_blue_team;
+	unsigned int score_red_team;
+	sf::Font* font;
+	sf::Font* font2;
+	sf::Clock score_again_clock;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

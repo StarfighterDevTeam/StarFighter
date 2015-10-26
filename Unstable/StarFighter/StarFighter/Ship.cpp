@@ -38,7 +38,7 @@ void Ship::Init()
 	throw_curSpeedBonus = 0.f;
 
 	m_team = BlueTeam;
-	isUsingPortal = false;
+	isLaunchingScript = false;
 	m_character = Natalia;
 }
 
@@ -840,7 +840,7 @@ void Ship::GetPortal(GameObject* portal)
 {
 	LevelPortal* getportal = (LevelPortal*)portal;
 	m_script = getportal->m_script;
-	isUsingPortal = true;
+	isLaunchingScript = true;
 }
 
 //IA
@@ -979,5 +979,14 @@ void Ship::PlayerBumper(GameObject* bumper)
 
 			speed.y = 0;
 		}
+	}
+}
+
+void Ship::LoadPlayerShipWithScript(IngameScript script)
+{
+	if (this == (*CurrentGame).playerShip)
+	{
+		m_script = script;
+		isLaunchingScript = true;
 	}
 }

@@ -127,10 +127,11 @@ public :
 	float throw_curSpeedBonus;
 
 	Teams m_team;
-	IngameScript m_script;
 	void GetPortal(GameObject* portal) override;
-	bool isUsingPortal;
 	PlayableCharacters m_character;
+	IngameScript m_script;
+	bool isLaunchingScript;
+	void LoadPlayerShipWithScript(IngameScript script) override;
 
 private:
 	bool moving;

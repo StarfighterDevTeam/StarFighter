@@ -247,3 +247,8 @@ void GameObject::PlayerBumper(GameObject* bumper)
 {
 	// see override function in class Ship
 }
+
+void GameObject::LoadPlayerShipWithScript(IngameScript script)
+{
+	// see override function in class Ship
+}

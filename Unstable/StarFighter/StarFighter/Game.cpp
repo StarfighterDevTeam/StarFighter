@@ -28,7 +28,22 @@ void Game::init(RenderWindow* window)
 	//default value
 	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
-	cur_GameRules = NormalGameRules;
+	cur_GameRules = ClassicMatchGamesRules;
+	scriptLauncher = NULL;
+
+	font = new sf::Font();
+	if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+	{
+		// error
+		//TODO: font loader
+	}
+
+	font2 = new sf::Font();
+	if (!font2->loadFromFile("Assets/Fonts/arial.ttf"))
+	{
+		// error
+		//TODO: font loader
+	}
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -187,15 +202,18 @@ void Game::drawScene()
 
 	for (int i = 0; i < NBVAL_Layer; i++)
 	{
-		if (i == FeedbacksLayer)
+		if (i == ScoresLayer)
 		{
 			for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
 			{
 				mainScreen.draw(*(*it));
 			}
-			for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
+			if (cur_GameRules == ClassicMatchGamesRules)
 			{
-				mainScreen.draw(*(*it));
+				for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
+				{
+					mainScreen.draw(*(*it));
+				}
 			}
 		}
 		else
@@ -332,8 +350,11 @@ void Game::colisionChecksV2()
 				//Do something 
 
 				//TRON SPECIFIC
-				(*it2)->PlayHitFeedback();
-				PlaySFX(SFX_Goal);
+				if (score_again_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
+				{
+					(*it2)->PlayHitFeedback();
+					Goal(RedTeam);
+				}
 			}
 		}
 
@@ -348,8 +369,11 @@ void Game::colisionChecksV2()
 				//Do something 
 
 				//TRON SPECIFIC
-				(*it2)->PlayHitFeedback();
-				PlaySFX(SFX_Goal);
+				if (score_again_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
+				{
+					(*it2)->PlayHitFeedback();
+					Goal(BlueTeam);
+				}
 			}
 		}
 
@@ -522,4 +546,26 @@ float Game::GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aim
 	angle += M_PI_2;
 
 	return angle;
+}
+
+void Game::Goal(Teams team)
+{
+	if (team == BlueTeam)
+		score_blue_team++;
+	else
+		score_red_team++;
+
+	PlaySFX(SFX_Goal);
+	score_again_clock.restart();
+
+
+	/*
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[PlayerShip].begin(); it != sceneGameObjectsTyped[PlayerShip].end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		(*it)->LoadPlayerShipWithScript(OfflineMultiContinue);
+	}
+	*/
 }

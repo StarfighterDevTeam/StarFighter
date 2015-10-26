@@ -25,7 +25,7 @@ public:
 	void UpdateCamera(sf::Time deltaTime);
 
 	void StartMainMenu();
-	void StartMultiGame();
+	void StartMultiGame(bool reset_scores = true);
 
 	void SetIngameScript(IngameScript script);
 
@@ -35,6 +35,10 @@ public:
 	Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	Bumper* CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size);
 	PlayableCharacters chosen_character;
+
+	//HUD
+	sf::Text score_blue_text;
+	sf::Text score_red_text;
 
 private:
 	sf::RenderWindow* mainWindow;
