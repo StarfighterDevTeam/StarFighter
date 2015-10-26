@@ -92,15 +92,15 @@ void Ship::update(sf::Time deltaTime)
 		IdleDecelleration(deltaTime);
 	}
 
-	ManageDodge();
+	//ManageDodge();
 	
-	if (!InputGuy::isStraffing(m_controllerType))
-	{
-		UpdateRotation();
-	}
+	//if (!InputGuy::isStraffing(m_controllerType))
+	//{
+	UpdateRotation();
+	//}
 	
 	ManageTackle();
-	ManageBrawl();
+	//ManageBrawl();
 	
 	//printf("speed : %f, %f \n", speed.x, speed.y);
 
@@ -191,11 +191,11 @@ void Ship::GetDirectionInputs(sf::Vector2f inputs_direction)
 	speed.x += inputs_direction.x * SHIP_ACCELERATION;
 	speed.y += inputs_direction.y * SHIP_ACCELERATION;
 
-	if (InputGuy::isStraffing(m_controllerType))
-	{
-		speed.x *= SHIP_STRAFFING_SPEED_MALUS;
-		speed.y *= SHIP_STRAFFING_SPEED_MALUS;
-	}
+	//if (InputGuy::isStraffing(m_controllerType))
+	//{
+	//	speed.x *= SHIP_STRAFFING_SPEED_MALUS;
+	//	speed.y *= SHIP_STRAFFING_SPEED_MALUS;
+	//}
 }
 
 void Ship::UpdateRotation()
@@ -539,13 +539,13 @@ void Ship::ManageTackle()
 	{
 		tackle_curSpeedBonus = 0;
 
-		if (m_discoball == NULL)
+		if (m_discoball == NULL || m_discoball != NULL)
 		{
 			if (tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
 			{
 				if ((speed.x * speed.x) + (speed.y * speed.y) > (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS) * (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS))
 				{
-					if (InputGuy::isFiring(m_controllerType) && wasFiringButtonReleased)
+					if (InputGuy::isDodging(m_controllerType) && wasFiringButtonReleased)
 					{
 						isTackling = INITIATE_TACLKE;
 
