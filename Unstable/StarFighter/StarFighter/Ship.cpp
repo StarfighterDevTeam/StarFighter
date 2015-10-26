@@ -918,49 +918,64 @@ void Ship::PlayerBumper(GameObject* bumper)
 
 		if (is_vertical_bumper)
 		{
-			if (speed.x > 0)
-			{
-				setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
-			}
-			else if (speed.x < 0)
-			{
-				setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
-			}
-			else
-			{
+			//if (speed.x > 0)
+			//{
+			//	setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
+			//}
+			//else if (speed.x < 0)
+			//{
+			//
+			//	setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
+			//}
+			//else
+			//{
+
+				//this detection system is not perfect. It's good enough.
 				if (getPosition().x < bumper->getPosition().x)
 				{
-					setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
+					if (speed.x > - m_size.x)
+						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
+					else // in this situation, the player most likely passed through the detection because of a very high speed... but we busted him :) look at him, he looks like a suspect.
+						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
 				}
 				else
 				{
-					setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
+					if (speed.x < m_size.x)
+  						setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
+					else
+						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
 				}
-			}
+			//}
 
 			speed.x = 0;
 		}
 		else //horizontal bumper
 		{
-			if (speed.y > 0)
-			{
-				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
-			}
-			else if (speed.y < 0)
-			{
-				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
-			}
-			else
-			{
+			//if (speed.y > 0)
+			//{
+			//	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
+			//}
+			//else if (speed.y < 0)
+			//{
+			//	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
+			//}
+			//else
+			//{
 				if (getPosition().y < bumper->getPosition().y)
 				{
-					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
+					if (speed.y < m_size.y)
+						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
+					else
+						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
 				}
 				else
 				{
-					setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
+					if (speed.y > - m_size.y)
+						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
+					else
+						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
 				}
-			}
+			//}
 
 			speed.y = 0;
 		}

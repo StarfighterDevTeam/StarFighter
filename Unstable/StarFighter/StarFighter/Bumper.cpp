@@ -92,15 +92,15 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 
 	if (size.x > size.y)
 	{
-		ss << "H" << size.x;
+		ss << "_H_" << size.x;
 	}
 	else if (size.x < size.y)
 	{
-		ss << "V" << size.y;
+		ss << "_V_" << size.y;
 	}
 	else
 	{
-		ss << "D"; // not supported
+		ss << "_D"; // not supported
 	}
 	
 	std::string s = ss.str();
