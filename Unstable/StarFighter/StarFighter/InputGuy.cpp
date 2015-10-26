@@ -216,11 +216,11 @@ Vector2f InputGuy::getDirections(ControlerType device)
 	}
 
 	//diagonal movement?
-	if (abs(x) + abs(y) > 1)
+	if (x*x + y*y > 1)
 	{
 		float p = (1 / sqrt((x*x) + (y*y)));
-		x = x*p;
-		y = y*p;
+		x *= p;
+		y *= p;
 	}
 
 	return Vector2f(x, y);

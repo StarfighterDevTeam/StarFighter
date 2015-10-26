@@ -849,6 +849,8 @@ sf::Vector2f Ship::MoveToPosition(sf::Vector2i position, sf::Time deltaTime)
 	sf::Vector2f input_direction = sf::Vector2f(0, 0);
 	//acknowledge position
 	sf::Vector2f target_position = (*CurrentGame).mainScreen.mapPixelToCoords(position);
+	target_position.x /= (*CurrentGame).scale_factor.x;
+	target_position.y /= (*CurrentGame).scale_factor.y;
 	printf("click pos: (%f, %f)\n", target_position.x, target_position.y);
 	
 	//compute max speed available
@@ -875,11 +877,11 @@ sf::Vector2f Ship::MoveToPosition(sf::Vector2i position, sf::Time deltaTime)
 		input_direction.y = (diff_y - speed.y) / SHIP_ACCELERATION;//*deltaTime.asSeconds();
 
 		//normalize
-		if (abs(input_direction.x) + abs(input_direction.y) > 1)
+		if (input_direction.x * input_direction.x * + input_direction.y * input_direction.y > 1)
 		{
 			float p = (1 / sqrt((input_direction.x*input_direction.x) + (input_direction.y*input_direction.y)));
-			input_direction.x = input_direction.x*p;
-			input_direction.y = input_direction.y*p;
+			input_direction.x *= p;
+			input_direction.y *= p;
 		}
 
 		printf("input calculated: (%f, %f) #LAST MOVE#\n\n", input_direction.x, input_direction.y);
