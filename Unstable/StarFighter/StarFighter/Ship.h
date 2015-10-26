@@ -78,7 +78,9 @@ public :
 	void SetControllerType(ControlerType contoller);
 
 	//IA
-	sf::Vector2f MoveToPosition(sf::Vector2i position, sf::Time deltaTime);
+	sf::Vector2f GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaTime);
+	bool arrived_at_destination;
+	sf::Vector2f m_destination;
 
 	//TRON SPECIFIC
 	Discoball* m_discoball;
