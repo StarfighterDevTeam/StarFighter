@@ -947,7 +947,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 	}
 }
 
-void Ship::PlayerBumper(GameObject* bumper)
+void Ship::PlayerBumper(GameObject* bumper, Time deltaTime)
 {
 	Bumper* bumper_ = (Bumper*)bumper;
 
@@ -959,6 +959,9 @@ void Ship::PlayerBumper(GameObject* bumper)
 
 		const float correction_x = (bumper->m_size.x / 2) + (m_size.x / 2);
 		const float correction_y = (bumper->m_size.y / 2) + (m_size.y / 2);
+
+		const float speed_x = speed.x * deltaTime.asSeconds();
+		const float speed_y = speed.y * deltaTime.asSeconds();
 
 		if (is_vertical_bumper)
 		{
@@ -977,14 +980,14 @@ void Ship::PlayerBumper(GameObject* bumper)
 				//this detection system is not perfect. It's good enough.
 				if (getPosition().x < bumper->getPosition().x)
 				{
-					if (speed.x > - m_size.x)
+					if (speed_x > -m_size.x)
 						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
 					else // in this situation, the player most likely passed through the detection because of a very high speed... but we busted him :) look at him, he looks like a suspect.
-						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
+						setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
 				}
 				else
 				{
-					if (speed.x < m_size.x)
+					if (speed_x < m_size.x)
   						setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
 					else
 						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
@@ -1007,14 +1010,14 @@ void Ship::PlayerBumper(GameObject* bumper)
 			//{
 				if (getPosition().y < bumper->getPosition().y)
 				{
-					if (speed.y < m_size.y)
-						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
+					if (speed_y > -m_size.y)
+ 						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
 					else
 						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
 				}
 				else
 				{
-					if (speed.y > - m_size.y)
+					if (speed_y < m_size.y)
 						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
 					else
 						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));

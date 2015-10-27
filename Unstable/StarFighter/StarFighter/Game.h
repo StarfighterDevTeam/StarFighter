@@ -46,7 +46,7 @@ public:
 
 	void updateScene(Time deltaTime);
 	void drawScene();
-	void colisionChecksV2();
+	void colisionChecksV2(Time deltaTime);
 	void cleanGarbage();
 	void collectGarbage();
 	sf::RenderTexture mainScreen;

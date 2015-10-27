@@ -184,7 +184,7 @@ void Game::updateScene(Time deltaTime)
 	}
 
 	//Checking colisions
-	colisionChecksV2();
+	colisionChecksV2(deltaTime);
 
 	//Collect the dust
 	collectGarbage();
@@ -250,7 +250,7 @@ void Game::CleanAllGameObjects()
 	}
 }
 
-void Game::colisionChecksV2()
+void Game::colisionChecksV2(Time deltaTime)
 {
 	sf::Clock dt;
 	dt.restart();
@@ -318,7 +318,7 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				(*it1)->PlayerBumper(*it2);
+				(*it1)->PlayerBumper(*it2, deltaTime);
 			}
 		}
 
@@ -329,7 +329,7 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				(*it1)->PlayerBumper(*it2);
+				(*it1)->PlayerBumper(*it2, deltaTime);
 			}
 		}
 	}

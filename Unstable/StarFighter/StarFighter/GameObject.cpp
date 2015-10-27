@@ -244,7 +244,7 @@ void GameObject::DiscoballBumper(GameObject* bumper)
 	// see override function in class Ship
 }
 
-void GameObject::PlayerBumper(GameObject* bumper)
+void GameObject::PlayerBumper(GameObject* bumper, Time deltaTime)
 {
 	// see override function in class Ship
 }

@@ -108,7 +108,7 @@ public:
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
 	virtual void GetPortal(GameObject* portal);
 	virtual void DiscoballBumper(GameObject* bumper);
-	virtual void PlayerBumper(GameObject* bumper);
+	virtual void PlayerBumper(GameObject* bumper, Time deltaTime);
 	virtual void PlayerContact(GameObject* player, float angle_collision = -1.f);
 	void PlayHitFeedback();
 	virtual void LoadPlayerShipWithScript(IngameScript script);

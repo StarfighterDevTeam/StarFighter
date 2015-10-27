@@ -230,8 +230,8 @@ void InGameState::StartShooting01()
 
 	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200 - 102, REF_WINDOW_RESOLUTION_Y / 2), true, 200);
 	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200 + 102, REF_WINDOW_RESOLUTION_Y / 2), true, 200);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 - 102), false, 200);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 + 102), false, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 - 100), false, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 + 100), false, 200);
 
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), true, 200);
 }
