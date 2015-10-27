@@ -23,6 +23,7 @@ enum LayerType {
 	EnemyObjectLayer,
 	AuraLayer,
 	ScoresLayer,
+	PlayerStroboscopicLayer,
 	PlayerShipLayer,
 	DiscoballLayer,
 	NBVAL_Layer

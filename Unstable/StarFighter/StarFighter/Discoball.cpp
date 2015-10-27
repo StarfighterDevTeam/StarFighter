@@ -101,6 +101,10 @@ void Discoball::update(sf::Time deltaTime)
 			}
 		}
 
+		//stroboscopic effect
+		if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION)
+			PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION * discoball_curAngularSpeed / ANGULARSPEED_FOR_FULL_STROBO), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
+
 		setColor(sf::Color(255, 255, 255, 255));
 	}
 
@@ -202,5 +206,16 @@ void Discoball::DiscoballBumper(GameObject* bumper)
 
 			speed.y *= -1;
 		}
+	}
+}
+
+void Discoball::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
+{
+	if (stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
+	{
+		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
+		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+
+		stroboscopic_effect_clock.restart();
 	}
 }

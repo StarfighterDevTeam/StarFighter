@@ -4,8 +4,6 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-// ----------------SHIP ---------------
-
 Bumper::Bumper()
 {
 

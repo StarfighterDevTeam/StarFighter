@@ -135,6 +135,9 @@ public :
 	bool isLaunchingScript;
 	void LoadPlayerShipWithScript(IngameScript script) override;
 
+	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
+	sf::Clock stroboscopic_effect_clock;
+
 private:
 	bool moving;
 	bool movingX;

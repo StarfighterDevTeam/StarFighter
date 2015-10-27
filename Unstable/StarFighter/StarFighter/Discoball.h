@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "Game.h"
 #include "GameObject.h"
+#include "Stroboscopic.h"
 
 enum DiscoballStatus
 {
@@ -38,6 +39,8 @@ public :
 	void DiscoballBumper(GameObject* bumper) override;
 	bool is_touching_bumper;
 
+	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
+	sf::Clock stroboscopic_effect_clock;
 };
 
 #endif // DISCOBALL_H_INCLUDED

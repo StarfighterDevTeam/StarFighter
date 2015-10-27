@@ -583,6 +583,8 @@ void Ship::ManageTackle()
 	//State 1
 	if (isTackling == INITIATE_TACLKE)
 	{
+		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
+
 		//max value not reach = linear increase of speed
 		if (tackle_curSpeedBonus + SHIP_TACKLE_ACCELERATION_RATIO < SHIP_MAX_TACKLE_SPEED_BONUS_RATIO)
 		{
@@ -611,6 +613,8 @@ void Ship::ManageTackle()
 	//State 2
 	if (isTackling == MAX_SPEED_TACKLE)
 	{
+		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
+
 		if (tackle_min_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MIN_LASTING_TIME)
 		{
 			if (!wasDodgingButtonReleased)
@@ -1035,5 +1039,16 @@ void Ship::LoadPlayerShipWithScript(IngameScript script)
 	{
 		m_script = script;
 		isLaunchingScript = true;
+	}
+}
+
+void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
+{
+	if (stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
+	{
+		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
+		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+
+		stroboscopic_effect_clock.restart();
 	}
 }

@@ -103,6 +103,7 @@
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StarFighter.cpp" />
+    <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +128,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
+    <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
   </ItemGroup>
   <ItemGroup>
