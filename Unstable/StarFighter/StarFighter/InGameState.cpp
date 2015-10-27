@@ -50,6 +50,9 @@ void InGameState::SetIngameScript(IngameScript script)
 	case OfflineMultiContinue:
 		StartMultiGame(false);
 		break;
+	case Shooting01:
+		StartShooting01();
+		break;
 	}
 }
 
@@ -108,12 +111,32 @@ Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, bool v
 	return bumper;
 }
 
+GameObject* InGameState::CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size)
+{
+	std::string str;
+	str.assign(team == BlueTeam ? "Assets/2D/goal_blue.png" : "Assets/2D/goal_red.png");
+	GameObject* goal = new GameObject(position, sf::Vector2f(0, 0), str, size);
+	GameObjectType collider_type = team == BlueTeam ? GoalBlueObject : GoalRedObject;
+
+	(*CurrentGame).addToScene(goal, GoalLayer, collider_type);
+
+	return goal;
+}
+
+LevelPortal* InGameState::CreateLevelPortal(IngameScript script, sf::Vector2f position)
+{
+	LevelPortal* portal = new LevelPortal(script, position, sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
+	(*CurrentGame).addToScene(portal, PortalLayer, LevelPortalObject);
+
+	return portal;
+}
+
 void InGameState::StartMainMenu()
 {
 	(*CurrentGame).cur_GameRules = CarryToAbleInputs;
 
 	//intégration placeholder
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(960, 540), Natalia, BlueTeam);
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
@@ -124,7 +147,7 @@ void InGameState::StartMainMenu()
 	playerShip2->SetControllerType(AllControlDevices);
 	playerShip2->disable_inputs = true;
 
-	GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/main_menu_background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/main_menu_background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	// ##### HACK
@@ -132,42 +155,33 @@ void InGameState::StartMainMenu()
 
 	CreateDiscoball();
 
-	LevelPortal* training_shoot = new LevelPortal(MainMenuScript, sf::Vector2f(360, 380), sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
-	(*CurrentGame).addToScene(training_shoot, GoalLayer, LevelPortalObject);
+	CreateLevelPortal(Shooting01, sf::Vector2f(360, 380));
+	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, REF_WINDOW_RESOLUTION_Y / 2));
+	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, 700));
+	CreateLevelPortal(OfflineMulti, sf::Vector2f(1560, 380));
+	CreateLevelPortal(MainMenuScript, sf::Vector2f(1560, REF_WINDOW_RESOLUTION_Y / 2));
 
-	LevelPortal* training_pass = new LevelPortal(MainMenuScript, sf::Vector2f(360, 540), sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
-	(*CurrentGame).addToScene(training_pass, GoalLayer, LevelPortalObject);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(494, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
 
-	LevelPortal* training_dribble = new LevelPortal(MainMenuScript, sf::Vector2f(360, 700), sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
-	(*CurrentGame).addToScene(training_dribble, GoalLayer, LevelPortalObject);
-
-	LevelPortal* multi_offline = new LevelPortal(OfflineMulti, sf::Vector2f(1560, 380), sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
-	(*CurrentGame).addToScene(multi_offline, GoalLayer, LevelPortalObject);
-
-	LevelPortal* multi_online = new LevelPortal(MainMenuScript, sf::Vector2f(1560, 540), sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
-	(*CurrentGame).addToScene(multi_online, GoalLayer, LevelPortalObject);
-
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(494, 540), true, (*CurrentGame).map_size.y);
-
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, 540), true, (*CurrentGame).map_size.y);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
 }
 
 void InGameState::StartMultiGame(bool reset_scores)
 {
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
 
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, 540), Natalia, BlueTeam);
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, 540), Quorra, RedTeam);
+	Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, REF_WINDOW_RESOLUTION_Y/2), Quorra, RedTeam);
 	playerShip2->SetControllerType(JoystickControl2);
 
-	GameObject* background = new GameObject(sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, 540));
-	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, 540), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, 540));
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
+	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	// ##### HACK
@@ -175,26 +189,54 @@ void InGameState::StartMultiGame(bool reset_scores)
 
 	CreateDiscoball(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, (REF_WINDOW_RESOLUTION_Y / 2) - 200));
 
-	GameObject* goal_blue = new GameObject(sf::Vector2f(8, 540), sf::Vector2f(0, 0), "Assets/2D/goal_blue.png", sf::Vector2f(16, 200), sf::Vector2f(8, 100));
-	(*CurrentGame).addToScene(goal_blue, GoalLayer, GoalBlueObject);
+	CreateGoal(BlueTeam, sf::Vector2f(8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
 
-	GameObject* goal_red = new GameObject(sf::Vector2f((*CurrentGame).map_size.x - 8, 540), sf::Vector2f(0, 0), "Assets/2D/goal_red.png", sf::Vector2f(16, 200), sf::Vector2f(8, 100));
-	(*CurrentGame).addToScene(goal_red, GoalLayer, GoalRedObject);
+	CreateGoal(RedTeam, sf::Vector2f((*CurrentGame).map_size.x - 8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
 
-	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(SAFE_ZONE_X, 540), true, (*CurrentGame).map_size.y);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
 
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, 540), true, (*CurrentGame).map_size.y);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
 
-	//Bumper* green_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), "Assets/2D/bumper_green200.png", sf::Vector2f(4, 200), sf::Vector2f(2, 100));
+	//Bumper* green_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), "Assets/2D/bumper_green200.png", sf::Vector2f(4, 200), sf::Vector2f(2, 100));
 	//(*CurrentGame).addToScene(green_bumper, BumperLayer, BumperGreenObject);
 
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, 540), true, 200);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), true, 200);
 
 	if (reset_scores)
 	{
 		(*CurrentGame).score_blue_team = 0;
 		(*CurrentGame).score_red_team = 0;
 	}
+}
+
+void InGameState::StartShooting01()
+{
+	(*CurrentGame).cur_GameRules = SoloTraining;
+
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
+	playerShip1->SetControllerType(AllControlDevices);
+
+	// #### HACK
+	(*CurrentGame).playerShip = playerShip1;
+	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
+	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+
+	// ##### HACK
+	(*CurrentGame).map_size = background->m_size;
+
+	CreateDiscoball(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y/2));
+
+	CreateGoal(RedTeam, sf::Vector2f((*CurrentGame).map_size.x - 8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
+
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200 - 102, REF_WINDOW_RESOLUTION_Y / 2), true, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200 + 102, REF_WINDOW_RESOLUTION_Y / 2), true, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 - 102), false, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 + 102), false, 200);
+
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), true, 200);
 }
 
 void InGameState::Update(sf::Time deltaTime)

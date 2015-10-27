@@ -26,6 +26,7 @@ enum SFX_Bank
 enum ScriptedGameRules
 {
 	ClassicMatchGamesRules,
+	SoloTraining,
 	CarryToAbleInputs,
 };
 

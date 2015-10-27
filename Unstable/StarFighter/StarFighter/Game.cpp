@@ -28,7 +28,7 @@ void Game::init(RenderWindow* window)
 	//default value
 	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
-	cur_GameRules = ClassicMatchGamesRules;
+	cur_GameRules = SoloTraining;
 	scriptLauncher = NULL;
 
 	font = new sf::Font();

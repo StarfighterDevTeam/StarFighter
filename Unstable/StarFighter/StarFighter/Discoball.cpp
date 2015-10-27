@@ -178,7 +178,7 @@ void Discoball::DiscoballBumper(GameObject* bumper)
 	{
 		if (is_vertical_bumper)
 		{
-			if (speed.x >= 0)
+			if (getPosition().x > bumper->getPosition().x)
 			{
 				setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
 			}
@@ -191,7 +191,7 @@ void Discoball::DiscoballBumper(GameObject* bumper)
 		}
 		else //horizontal bumper
 		{
-			if (speed.y >= 0)
+			if (getPosition().y > bumper->getPosition().y)
 			{
 				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
 			}

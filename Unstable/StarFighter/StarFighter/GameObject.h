@@ -17,6 +17,7 @@ class Discoball;
 
 enum LayerType {
 	BackgroundLayer,
+	PortalLayer,
 	GoalLayer,
 	BumperLayer,
 	EnemyObjectLayer,
@@ -61,6 +62,7 @@ enum IngameScript
 	MainMenuScript,
 	OfflineMulti,
 	OfflineMultiContinue,
+	Shooting01,
 };
 
 class GameObject : public AnimatedSprite

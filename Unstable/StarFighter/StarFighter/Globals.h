@@ -21,7 +21,7 @@
 #define STARTSCENE_Y_RATIO						0.85f
 
 #define SHIP_START_X								990
-#define SHIP_START_Y								540
+#define SHIP_START_Y								REF_WINDOW_RESOLUTION_Y/2
 
 //GAME RULES
 #define GOAL_RESPAWN_COOLDOWN						2.f
