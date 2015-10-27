@@ -187,7 +187,7 @@ void InGameState::StartMultiGame(bool reset_scores)
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	CreateDiscoball(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, (REF_WINDOW_RESOLUTION_Y / 2) - 200));
+	CreateDiscoball(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 
 	CreateGoal(BlueTeam, sf::Vector2f(8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
 
@@ -197,10 +197,7 @@ void InGameState::StartMultiGame(bool reset_scores)
 
 	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
 
-	//Bumper* green_bumper = new Bumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), "Assets/2D/bumper_green200.png", sf::Vector2f(4, 200), sf::Vector2f(2, 100));
-	//(*CurrentGame).addToScene(green_bumper, BumperLayer, BumperGreenObject);
-
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), true, 200);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), true, 200);
 
 	if (reset_scores)
 	{

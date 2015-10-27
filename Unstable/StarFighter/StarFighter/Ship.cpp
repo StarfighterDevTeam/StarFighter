@@ -542,6 +542,7 @@ void Ship::ManageKeyReleases()
 	if (!InputGuy::isDodging(m_controllerType))
 	{
 		isDodgingButtonReleased = true;
+		wasDodgingButtonReleased = true;
 	}
 }
 
@@ -558,12 +559,15 @@ void Ship::ManageTackle()
 			{
 				if ((speed.x * speed.x) + (speed.y * speed.y) > (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS) * (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS))
 				{
-					if (InputGuy::isDodging(m_controllerType) && wasFiringButtonReleased)
+					if (InputGuy::isDodging(m_controllerType) && wasDodgingButtonReleased)
 					{
 						isTackling = INITIATE_TACLKE;
+						printf("pouet\n");
 
-						isFiringButtonReleased = false;
-						wasFiringButtonReleased = false;
+						//isFiringButtonReleased = false;
+						//wasFiringButtonReleased = false;
+						isDodgingButtonReleased = false;
+						wasDodgingButtonReleased = false;
 
 						MaxSpeedConstraints();//avoids to cumulate multiple bonuses
 						speed_on_tackling.x = speed.x;
@@ -609,7 +613,7 @@ void Ship::ManageTackle()
 	{
 		if (tackle_min_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MIN_LASTING_TIME)
 		{
-			if (!wasFiringButtonReleased)
+			if (!wasDodgingButtonReleased)
 			{
 				isTackling = HOLDING_TACKLE;
 				tackle_max_hold_clock.restart();
