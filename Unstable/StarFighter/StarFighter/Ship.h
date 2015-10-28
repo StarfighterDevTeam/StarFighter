@@ -13,7 +13,6 @@ enum TacklingStatus
 {
 	NOT_TACKLING,
 	INITIATE_TACLKE,
-	MAX_SPEED_TACKLE,
 	HOLDING_TACKLE,
 	ENDING_TACKLE,
 };
@@ -123,9 +122,6 @@ public :
 	HitRecoveryStatus isRecovering;
 	DodingStatus isDodging;
 	sf::Clock tackle_max_hold_clock;
-	sf::Clock tackle_min_clock;
-	sf::Vector2f speed_on_tackling;
-	float tackle_curSpeedBonus;
 	float throw_curSpeedBonus;
 
 	Teams m_team;

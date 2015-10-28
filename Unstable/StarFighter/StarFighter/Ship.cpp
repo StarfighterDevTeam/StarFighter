@@ -134,6 +134,10 @@ void Ship::update(sf::Time deltaTime)
 	ManageDiscoball(deltaTime);
 	ManageKeyReleases();
 	ManageFeedbacks();
+
+	//stroboscopic effect
+	if (GetAbsoluteSpeed() > SHIP_MAX_SPEED)
+		PlayStroboscopicEffect(seconds(TACKLE_STROBO_EFFECT_DURATION * GetAbsoluteSpeed() / SHIP_TACKLE_MAX_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
 }
 
 void Ship::ResetStatus()
@@ -236,7 +240,7 @@ void Ship::UpdateRotation()
 	}
 	else
 	{
-		setRotation(SpeedToPolarAngle(speed) * 180 / (float)M_PI);
+		setRotation((SpeedToPolarAngle(speed) * 180 / (float)M_PI));
 	}
 }
 
@@ -551,18 +555,15 @@ void Ship::ManageTackle()
 	//State 0
 	if (isTackling == NOT_TACKLING)
 	{
-		tackle_curSpeedBonus = 0;
-
 		if (m_discoball == NULL || m_discoball != NULL)
 		{
 			if (tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
 			{
-				if ((speed.x * speed.x) + (speed.y * speed.y) > (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS) * (SHIP_MAX_SPEED * SHIP_STRAFFING_SPEED_MALUS))
+				if (moving)
 				{
 					if (InputGuy::isDodging(m_controllerType) && wasDodgingButtonReleased)
 					{
 						isTackling = INITIATE_TACLKE;
-						printf("pouet\n");
 
 						//isFiringButtonReleased = false;
 						//wasFiringButtonReleased = false;
@@ -570,8 +571,6 @@ void Ship::ManageTackle()
 						wasDodgingButtonReleased = false;
 
 						MaxSpeedConstraints();//avoids to cumulate multiple bonuses
-						speed_on_tackling.x = speed.x;
-						speed_on_tackling.y = speed.y;
 
 						(*CurrentGame).PlaySFX(SFX_Tackle);
 					}
@@ -583,82 +582,54 @@ void Ship::ManageTackle()
 	//State 1
 	if (isTackling == INITIATE_TACLKE)
 	{
-		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
-
 		//max value not reach = linear increase of speed
-		if (tackle_curSpeedBonus + SHIP_TACKLE_ACCELERATION_RATIO < SHIP_MAX_TACKLE_SPEED_BONUS_RATIO)
+		float new_absolute_speed = GetAbsoluteSpeed();
+		if (new_absolute_speed + SHIP_TACKLE_ACCELERATION < SHIP_TACKLE_MAX_SPEED)
 		{
-			speed.x += (speed_on_tackling.x * SHIP_TACKLE_ACCELERATION_RATIO);
-			speed.y += (speed_on_tackling.y * SHIP_TACKLE_ACCELERATION_RATIO);
-
-			//keeping memory of increases
-			tackle_curSpeedBonus += SHIP_TACKLE_ACCELERATION_RATIO;
+			new_absolute_speed += SHIP_TACKLE_ACCELERATION;
 		}
-		//max value reached = changing state
 		else
 		{
-			//capping value
-			tackle_curSpeedBonus = SHIP_MAX_TACKLE_SPEED_BONUS_RATIO - tackle_curSpeedBonus;
-
-			speed.x += (speed_on_tackling.x * tackle_curSpeedBonus);
-			speed.y += (speed_on_tackling.y * tackle_curSpeedBonus);
-
-			isTackling = MAX_SPEED_TACKLE;
-			tackle_min_clock.restart();
-
-			//printf("speed max : %f, %f \n", speed.x, speed.y);
+			new_absolute_speed = SHIP_TACKLE_MAX_SPEED;
+			isTackling = HOLDING_TACKLE;
+			tackle_max_hold_clock.restart();
 		}
-	}
 
-	//State 2
-	if (isTackling == MAX_SPEED_TACKLE)
-	{
-		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
-
-		if (tackle_min_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MIN_LASTING_TIME)
-		{
-			if (!wasDodgingButtonReleased)
-			{
-				isTackling = HOLDING_TACKLE;
-				tackle_max_hold_clock.restart();
-				//printf("speed holding");
-			}
-			else
-			{
-				isTackling = ENDING_TACKLE;
-
-				//printf("speed end of tackle");
-			}
-			speed.x *= SHIP_SPEED_PERCENTAGE_ON_HOLDING_TACKLE;
-			speed.y *= SHIP_SPEED_PERCENTAGE_ON_HOLDING_TACKLE;
-
-			//printf(" : %f, %f \n", speed.x, speed.y);
-		}
-	}
+		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, SpeedToPolarAngle(speed) + M_PI);
 		
+		printf("speed : %f, %f \n", speed.x, speed.y);
+	}
+
 	//State 3
 	if (isTackling == HOLDING_TACKLE)
 	{
-		if (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasFiringButtonReleased)
+		if (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasDodgingButtonReleased)
 		{
 			isTackling = ENDING_TACKLE;
 			//printf("speed end of tackle : %f, %f \n", speed.x, speed.y);
 		}
 		else
 		{
-			speed.x *= (1 - SHIP_TACKLE_HOLDDECELERATION_COFF);
-			speed.y *= (1 - SHIP_TACKLE_HOLDDECELERATION_COFF);
+			SetSpeedVectorFromAbsoluteSpeed(GetAbsoluteSpeed() - SHIP_TACKLE_DECELERATION_WHILE_HOLDING, SpeedToPolarAngle(speed) + M_PI);
 		}
 	}
 
 	//State 4
 	if (isTackling == ENDING_TACKLE)
 	{
-		speed.x *= (1 - SHIP_TACKLE_DECELERATION_COFF);
-		speed.y *= (1 - SHIP_TACKLE_DECELERATION_COFF);
+		float new_absolute_speed = GetAbsoluteSpeed();
+		if (new_absolute_speed - SHIP_TACKLE_DECELERATION > 0)
+		{
+			new_absolute_speed -= SHIP_TACKLE_DECELERATION;
+		}
+		else
+		{
+			new_absolute_speed = 0;
+		}
 
-		//reached targeted speed for ending the tackle?
-		if ((abs(speed.x) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.x) > 0) || (abs(speed.y) < SHIP_MIN_SPEED_AFTER_TACKLE && abs(speed.y) > 0) || (speed.x == 0 && speed.y == 0))
+		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, SpeedToPolarAngle(speed) + M_PI);
+
+		if (new_absolute_speed < SHIP_MIN_SPEED_AFTER_TACKLE)
 		{
 			isTackling = NOT_TACKLING;
 			tackle_again_clock.restart();
@@ -688,35 +659,36 @@ void Ship::ManageHitRecovery()
 
 void Ship::ManageFeedbacks()
 {
-	if (isTackling != NOT_TACKLING || isBrawling != NOT_BRAWLING)
-	{
-		setColor(Color(255, 0, 0, 255));
-	}
-	else if (isRecovering != NOT_HIT)
+	//if (isTackling != NOT_TACKLING || isBrawling != NOT_BRAWLING)
+	//{
+	//	setColor(Color(255, 0, 0, 255));
+	//}
+	//else if (isRecovering != NOT_HIT)
+	if (isRecovering != NOT_HIT)
 	{
 		setColor(Color(0, 0, 255, 255));
 	}
-	else if (isThrowing != NOT_THROWING)
-	{
-		setColor(Color(0, 255, 0, 255));
-	}
-	else if (isDodging != NOT_DODGING)
-	{
-		setColor(Color(255, 0, 0, 129));
-		if (m_discoball != NULL)
-		{
-			m_discoball->setColor(Color(255, 0, 0, 129));
-		}
-	}
-	else if (m_discoball != NULL)
-	{
-		setColor(Color(255, 255, 255, 200));
-		m_discoball->setColor(Color(255, 255, 255, 255));
-	}
-	else
-	{
-		setColor(Color(255, 255, 255, 255));
-	}
+	//else if (isThrowing != NOT_THROWING)
+	//{
+	//	setColor(Color(0, 255, 0, 255));
+	//}
+	//else if (isDodging != NOT_DODGING)
+	//{
+	//	setColor(Color(255, 0, 0, 129));
+	//	if (m_discoball != NULL)
+	//	{
+	//		m_discoball->setColor(Color(255, 0, 0, 129));
+	//	}
+	//}
+	//else if (m_discoball != NULL)
+	//{
+	//	setColor(Color(255, 255, 255, 200));
+	//	m_discoball->setColor(Color(255, 255, 255, 255));
+	//}
+	//else
+	//{
+	//	setColor(Color(255, 255, 255, 255));
+	//}
 }
 
 void Ship::PlayerContact(GameObject* player, float angle_collision)

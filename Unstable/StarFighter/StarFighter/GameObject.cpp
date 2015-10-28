@@ -197,7 +197,7 @@ float GameObject::SpeedToPolarAngle(sf::Vector2f curSpeed)
 	}
 
 	angle += M_PI_2;
-	angle = (fmod(angle, 2 * M_PI));
+	//angle = (fmod(angle, 2 * M_PI));
 	
 	return angle;
 }

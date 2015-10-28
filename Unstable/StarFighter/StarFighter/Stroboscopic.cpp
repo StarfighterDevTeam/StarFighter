@@ -32,7 +32,6 @@ void Stroboscopic::update(sf::Time deltaTime)
     if (m_alpha - decade_ > 0)
 	{
 		m_alpha -= decade_;
-		printf("m_alpha: %d\n", m_alpha);
 	}
 	else
 	{
