@@ -45,6 +45,10 @@ void Discoball::update(sf::Time deltaTime)
 {
 	is_touching_bumper = false;
 
+	//stroboscopic effect
+	if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION)
+		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION * discoball_curAngularSpeed / CARRY_MAX_ANGULAR_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
+
 	if (!carried)
 	{
 		static sf::Vector2f newposition;
@@ -100,10 +104,6 @@ void Discoball::update(sf::Time deltaTime)
 				speed.y = 0;
 			}
 		}
-
-		//stroboscopic effect
-		if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION)
-			PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION * discoball_curAngularSpeed / ANGULARSPEED_FOR_FULL_STROBO), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
 
 		setColor(sf::Color(255, 255, 255, 255));
 	}
