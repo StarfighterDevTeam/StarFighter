@@ -34,18 +34,38 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	{
 		ss << "blue";
 		collider_type = BumperBlueObject;
-		for (int i = 0; i < W*H * 4; i += 4)
+		if (size.x > size.y)//horizontal bumper
 		{
-			pixels[i] = 0;			// R
-			pixels[i + 1] = 0;		// G
-			pixels[i + 2] = 255;	// B
-			if ((i / 4) % W == 0 || (i / 4) % W == (W - 1)) // A
+			for (int i = 0; i < W*H * 4; i += 4)
 			{
-				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+				pixels[i] = 0;			// R
+				pixels[i + 1] = 0;		// G
+				pixels[i + 2] = 255;	// B
+				if ((i / 4) <= W || (i / 4) > (H-1)*W) // A
+				{
+					pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+				}
+				else
+				{
+					pixels[i + 3] = 255;
+				}
 			}
-			else
+		}
+		else//vertical bumper
+		{
+			for (int i = 0; i < W*H * 4; i += 4)
 			{
-				pixels[i + 3] = 255;
+				pixels[i] = 0;			// R
+				pixels[i + 1] = 0;		// G
+				pixels[i + 2] = 255;	// B
+				if ((i / 4) % W == 0 || (i / 4) % W == (W - 1)) // A
+				{
+					pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+				}
+				else
+				{
+					pixels[i + 3] = 255;
+				}
 			}
 		}
 	}
@@ -53,39 +73,81 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	{
 		ss << "red";
 		collider_type = BumperRedObject;
-		for (int i = 0; i < W*H * 4; i += 4)
+		if (size.x > size.y)//horizontal bumper
 		{
-			pixels[i] = 255;		// R
-			pixels[i + 1] = 0;		// G
-			pixels[i + 2] = 0;		// B
-			if ((i / 4) % W == 0 || (i / 4) % W == (W - 1)) // A
+			for (int i = 0; i < W*H * 4; i += 4)
 			{
-				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
-			}
-			else
-			{
-				pixels[i + 3] = 255;
+				pixels[i] = 255;		// R
+				pixels[i + 1] = 0;		// G
+				pixels[i + 2] = 0;		// B
+				if ((i / 4) <= W || (i / 4) >(H - 1)*W) // A
+				{
+					pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+				}
+				else
+				{
+					pixels[i + 3] = 255;
+				}
 			}
 		}
+		else
+		{
+			for (int i = 0; i < W*H * 4; i += 4)
+			{
+				pixels[i] = 255;		// R
+				pixels[i + 1] = 0;		// G
+				pixels[i + 2] = 0;		// B
+				if ((i / 4) % W == 0 || (i / 4) % W == (W - 1)) // A
+				{
+					pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+				}
+				else
+				{
+					pixels[i + 3] = 255;
+				}
+			}
+		}
+		
 	}
 	else
 	{
 		ss << "green";
 		collider_type = BumperGreenObject;
-		for (int i = 0; i < W * H * 4; i += 4)
+		if (size.x > size.y)//horizontal bumper
 		{
-			pixels[i] = 0;			// R
-			pixels[i + 1] = 255;	// G
-			pixels[i + 2] = 0;		// B
-			if ((i / 4) % W == 0 || (i / 4) % W == (W-1)) // A
+			for (int i = 0; i < W * H * 4; i += 4)
 			{
-				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
-			}
-			else
-			{
-				pixels[i + 3] = 255;
+				pixels[i] = 0;			// R
+				pixels[i + 1] = 255;	// G
+				pixels[i + 2] = 0;		// B
+				if ((i / 4) <= W || (i / 4) >(H - 1)*W) // A
+				{
+					pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+				}
+				else
+				{
+					pixels[i + 3] = 255;
+				}
 			}
 		}
+		else
+		{
+			for (int i = 0; i < W * H * 4; i += 4)
+			{
+				pixels[i] = 0;			// R
+				pixels[i + 1] = 255;	// G
+				pixels[i + 2] = 0;		// B
+				if ((i / 4) % W == 0 || (i / 4) % W == (W - 1)) // A
+				{
+					pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+				}
+				else
+				{
+					pixels[i + 3] = 255;
+				}
+			}
+		}
+		
 	}
 
 	if (size.x > size.y)
