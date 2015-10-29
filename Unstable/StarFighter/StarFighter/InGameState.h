@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Ship.h"
 #include "Discoball.h"
+#include "Goal.h"
 #include "Bumper.h"
 #include "LevelPortal.h"
 

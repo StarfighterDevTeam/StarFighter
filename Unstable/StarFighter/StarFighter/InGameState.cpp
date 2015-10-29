@@ -113,12 +113,9 @@ Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, bool v
 
 GameObject* InGameState::CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size)
 {
-	std::string str;
-	str.assign(team == BlueTeam ? "Assets/2D/goal_blue.png" : "Assets/2D/goal_red.png");
-	GameObject* goal = new GameObject(position, sf::Vector2f(0, 0), str, size);
-	GameObjectType collider_type = team == BlueTeam ? GoalBlueObject : GoalRedObject;
+	Goal* goal = new Goal(team, position, size);
 
-	(*CurrentGame).addToScene(goal, GoalLayer, collider_type);
+	(*CurrentGame).addToScene(goal, GoalLayer, goal->collider_type);
 
 	return goal;
 }
