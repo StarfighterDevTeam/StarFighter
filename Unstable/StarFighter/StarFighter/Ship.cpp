@@ -66,7 +66,7 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	ManageHitRecovery();
+	//ManageHitRecovery();
 
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 
@@ -553,7 +553,7 @@ void Ship::ManageKeyReleases()
 void Ship::ManageTackle()
 {
 	//State 0
-	if (isTackling == NOT_TACKLING)
+	if (isTackling == NOT_TACKLING && isRecovering == NOT_HIT)
 	{
 		if (m_discoball == NULL || m_discoball != NULL)
 		{
@@ -704,26 +704,28 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 				player2->ReleaseDiscoball();
 			}
 
-			player2->isRecovering = isTackling != NOT_TACKLING ? RECOVERING_FROM_TACKLE : RECOVERING_FROM_BRAWL;
+			if (player2->isTackling != NOT_TACKLING || player2->isBrawling != NOT_BRAWLING)
+			{
+				if (isRecovering == NOT_HIT)
+				{
+					if (m_discoball != NULL)
+					{
+						ReleaseDiscoball();
+					}
+
+					isTackling = NOT_TACKLING;
+					//isRecovering = RECOVERING_FROM_TACKLE;
+					hit_recovery_clock.restart();
+					speed.x = 0;
+					speed.y = 0;
+				}
+			}
+
+			player2->isTackling = NOT_TACKLING;
+			//player2->isRecovering = RECOVERING_FROM_TACKLE;
 			player2->hit_recovery_clock.restart();
 			player2->speed.x = 0;
 			player2->speed.y = 0;
-		}
-	}
-
-	else if (player2->isTackling != NOT_TACKLING || player2->isBrawling != NOT_BRAWLING)
-	{
-		if (isRecovering == NOT_HIT)
-		{
-			if (m_discoball != NULL)
-			{
-				ReleaseDiscoball();
-			}
-
-			isRecovering = player2->isTackling != NOT_TACKLING ? RECOVERING_FROM_TACKLE : RECOVERING_FROM_BRAWL;
-			hit_recovery_clock.restart();
-			speed.x = 0;
-			speed.y = 0;
 		}
 	}
 }
