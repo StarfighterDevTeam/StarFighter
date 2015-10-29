@@ -79,7 +79,7 @@ void Ship::update(sf::Time deltaTime)
 			target_position.x /= (*CurrentGame).scale_factor.x;
 			target_position.y /= (*CurrentGame).scale_factor.y;
 			m_destination = target_position;
-			//inputs_direction = GetInputsToGetPosition(m_destination, deltaTime);
+			inputs_direction = GetInputsToGetPosition(m_destination, deltaTime);
 		}
 		else
 		{
@@ -137,7 +137,10 @@ void Ship::update(sf::Time deltaTime)
 
 	//stroboscopic effect
 	if (GetAbsoluteSpeed() > SHIP_MAX_SPEED)
+	{
 		PlayStroboscopicEffect(seconds(TACKLE_STROBO_EFFECT_DURATION * GetAbsoluteSpeed() / SHIP_TACKLE_MAX_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
+	}
+		
 }
 
 void Ship::ResetStatus()
@@ -207,12 +210,6 @@ void Ship::GetDirectionInputs(sf::Vector2f inputs_direction)
 {
 	speed.x += inputs_direction.x * SHIP_ACCELERATION;
 	speed.y += inputs_direction.y * SHIP_ACCELERATION;
-
-	//if (InputGuy::isStraffing(m_controllerType))
-	//{
-	//	speed.x *= SHIP_STRAFFING_SPEED_MALUS;
-	//	speed.y *= SHIP_STRAFFING_SPEED_MALUS;
-	//}
 }
 
 void Ship::UpdateRotation()
@@ -285,22 +282,7 @@ void Ship::MaxSpeedConstraints()
 	}
 
 	//max speed constraints
-	if (abs(speed.x) > ship_max_speed)
-	{
-		speed.x = speed.x > 0 ? ship_max_speed : -ship_max_speed;
-	}
-	if (abs(speed.y) > ship_max_speed)
-	{
-		speed.y = speed.y > 0 ? ship_max_speed : -ship_max_speed;
-	}
-
-	//diagonal movement?
-	if (abs(speed.x) + abs(speed.y) > ship_max_speed)
-	{
-		float p = (ship_max_speed / sqrt((speed.x*speed.x) + (speed.y*speed.y)));
-		speed.x *= p;
-		speed.y *= p;
-	}
+	NormalizeSpeed(&speed, ship_max_speed);
 }
 
 //TRON SPECIFIC
@@ -892,16 +874,8 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 		input_direction.x = diff_x / cur_MaxSpeed;//*deltaTime.asSeconds();
 		input_direction.y = diff_y / cur_MaxSpeed;//*deltaTime.asSeconds();
 
-		// normalize
-		if (input_direction.x*input_direction.x + input_direction.y*input_direction.y > 1)
-		{
-			float p = (1 / sqrt((input_direction.x*input_direction.x) + (input_direction.y*input_direction.y)));
-			input_direction.x *= p;
-			input_direction.y *= p;
-			printf("NORMALIZED ");
-		}
-
 		printf("input calculated: (%f, %f) #LAST MOVE#\n\n", input_direction.x, input_direction.y);
+
 		arrived_at_destination = false;
 		return input_direction;
 	}
@@ -910,16 +884,8 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 		input_direction.x = diff_x / distance;
 		input_direction.y = diff_y / distance;
 
-		// normalize
-		if (input_direction.x*input_direction.x + input_direction.y*input_direction.y > 1)
-		{
-			float p = (1 / sqrt((input_direction.x*input_direction.x) + (input_direction.y*input_direction.y)));
-			input_direction.x *= p;
-			input_direction.y *= p;
-			printf("NORMALIZED ");
-		}
-
 		printf("input calculated: (%f, %f) #MAX SPEED#\n\n", input_direction.x, input_direction.y);
+
 		arrived_at_destination = false;
 		return input_direction;
 	}

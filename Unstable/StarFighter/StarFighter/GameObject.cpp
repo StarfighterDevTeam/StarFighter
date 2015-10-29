@@ -176,7 +176,7 @@ float GameObject::GetAbsoluteSpeed()
 	const float b = speed.y;
 	float s = (a * a) + (b * b);
 	s = sqrt(s);
-
+	s = floor(s);
 	return s;
 }
 
@@ -206,6 +206,20 @@ void GameObject::SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float cur
 {
 	speed.x = - absolute_speed * sin(curAngle);
 	speed.y = absolute_speed * cos(curAngle);
+}
+
+bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
+{
+	if (vector->x * vector->x + vector->y * vector->y > max_value * max_value)
+	{
+		float p = max_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+		vector->x *= p;
+		vector->y *= p;
+		
+		return true;
+	}
+
+	return false;
 }
 
 GameObject* GameObject::Clone()

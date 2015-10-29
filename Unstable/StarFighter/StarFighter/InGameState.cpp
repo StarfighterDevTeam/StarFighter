@@ -228,12 +228,14 @@ void InGameState::StartShooting01()
 
 	CreateGoal(RedTeam, sf::Vector2f((*CurrentGame).map_size.x - 8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
 
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200 - 102, REF_WINDOW_RESOLUTION_Y / 2), true, 200);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200 + 102, REF_WINDOW_RESOLUTION_Y / 2), true, 200);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 - 100), false, 200);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2 + 100), false, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(REF_WINDOW_RESOLUTION_X - 200, 100), true, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100, 200), false, 200);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(REF_WINDOW_RESOLUTION_X - 196, 96), true, 200);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(REF_WINDOW_RESOLUTION_X - 96, 196), false, 200);
 
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), true, 200);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), true, REF_WINDOW_RESOLUTION_Y);
+
+	CreateLevelPortal(MainMenuScript, sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100, 100));
 }
 
 void InGameState::Update(sf::Time deltaTime)
