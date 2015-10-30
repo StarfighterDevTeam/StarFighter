@@ -63,7 +63,9 @@ void ShipIA::update(sf::Time deltaTime)
 			//2. Try to defend it
 			if (m_target_discoball != NULL)
 			{
-				if (GetAngleVariationToObject(m_target_discoball) > IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE || m_target_discoball->carried)
+				if ((GetAngleVariationToObject(m_target_discoball) > IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE
+						&& (GetDistanceToObject(m_target_discoball) > IA_DISTANCE_FOR_DISCOBALL_GUARD_STANCE))
+					|| m_target_discoball->carried)
 				{
 					//Passive defense: move around own goal
 					float distance_guard = GetDistanceToObject(m_target_goal);

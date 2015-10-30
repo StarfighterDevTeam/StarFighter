@@ -74,7 +74,7 @@
 #define DISCOBALL_RELEASE_SPEED_RATIO				0.3f
 
 //COOLDOWNS
-#define CARRY_AGAIN_COOLDOWN						0.5f
+#define CARRY_AGAIN_COOLDOWN						0.3f
 #define TACKLE_AGAIN_COOLDOWN						0.5f
 #define BRAWL_AGAIN_COOLDOWN						0.3f
 #define DODGE_AGAIN_COOLDOWN						0.5f
@@ -110,10 +110,10 @@
 #define IA_REACTION_TIME_HARD								0.f
 #define IA_PRECISION_EASY									10
 #define IA_PRECISION_MEDIUM									5
-#define IA_PRECISION_HARD									3
+#define IA_PRECISION_HARD									10
 #define IA_DISTANCE_FOR_UNMARKED							500
-#define IA_DISTANCE_FOR_DISCOBALL_GUARD_STANCE				500
-#define IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE	0.02f
+#define IA_DISTANCE_FOR_DISCOBALL_GUARD_STANCE				250
+#define IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE	0.01f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

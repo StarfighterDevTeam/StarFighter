@@ -272,19 +272,19 @@ void InGameState::StartMultiGame(bool reset_scores)
 {
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
 
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
-	playerShip1->SetControllerType(AllControlDevices);
+	//Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
+	//playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
-	(*CurrentGame).playerShip = playerShip1;
+	//(*CurrentGame).playerShip = playerShip1;
+	//(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+
+	(*CurrentGame).playerShip = CreateIACharacter(sf::Vector2f(100 / 2, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam, IAHard, true);
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
 	//Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, REF_WINDOW_RESOLUTION_Y/2), Quorra, RedTeam, true);
 	//playerShip2->SetControllerType(JoystickControl2);
 	CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100 / 2, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAHard, true);
-
-	//TEST
-	CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, false);
 
 	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
 	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2));
