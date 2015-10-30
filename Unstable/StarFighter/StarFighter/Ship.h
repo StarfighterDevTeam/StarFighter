@@ -141,7 +141,6 @@ public :
 	Ship* m_target_opponent;
 	Ship* m_target_team_mate;
 	bool SetTargetOpponent();
-	bool SetTargetTeamMate(bool only_unmarked = true);
 	GameObject* FindClosestGameObjectTyped(GameObjectType type, bool needs_to_be_unmarked = false);
 
 protected:

@@ -105,13 +105,15 @@
 #define PIXEL_PERFECT_COLLISION						true
 
 //IA
-#define IA_REACTION_TIME_EASY							0.5f
-#define IA_REACTION_TIME_MEDIUM							0.2f
-#define IA_REACTION_TIME_HARD							0.f
-#define IA_PRECISION_EASY								10
-#define IA_PRECISION_MEDIUM								5
-#define IA_PRECISION_HARD								3
-#define IA_DISTANCE_FOR_UNMARKED						500
+#define IA_REACTION_TIME_EASY								0.5f
+#define IA_REACTION_TIME_MEDIUM								0.2f
+#define IA_REACTION_TIME_HARD								0.f
+#define IA_PRECISION_EASY									10
+#define IA_PRECISION_MEDIUM									5
+#define IA_PRECISION_HARD									3
+#define IA_DISTANCE_FOR_UNMARKED							500
+#define IA_DISTANCE_FOR_DISCOBALL_GUARD_STANCE				500
+#define IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE	0.02f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

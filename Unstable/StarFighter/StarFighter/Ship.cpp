@@ -72,7 +72,6 @@ void Ship::update(sf::Time deltaTime)
 {
 	//IA SPECIFIC
 	SetTargetOpponent();
-	SetTargetTeamMate();
 	m_isUnmarked = IsUnmarked();
 
 	//ManageHitRecovery();
@@ -1030,22 +1029,10 @@ bool Ship::SetTargetOpponent()
 {
 	GameObjectType type = m_team == BlueTeam ? PlayerRedShip : PlayerBlueShip;
 
-	//m_target_opponent = (Ship*)(*CurrentGame).GetClosestObject(this, type);
-
 	//find closest opponent
 	m_target_opponent = (Ship*)FindClosestGameObjectTyped(type, false);
 
 	return m_target_opponent;
-}
-
-bool Ship::SetTargetTeamMate(bool only_unmarked)
-{
-	GameObjectType type = m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
-
-	//find closest unmarked team mate
-	m_target_team_mate = (Ship*)FindClosestGameObjectTyped(type, only_unmarked);
-
-	return m_target_team_mate;
 }
 
 GameObject* Ship::FindClosestGameObjectTyped(GameObjectType type, bool needs_to_be_unmarked)

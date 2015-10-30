@@ -24,22 +24,27 @@ public :
 	void update(sf::Time deltaTime) override;
 	void IA_MoveToPosition(sf::Vector2f position, sf::Time deltaTime);
 	void IA_ShootToPosition(sf::Vector2f position);
+	void IA_GuardPosition(sf::Vector2f position, float distance, sf::Time deltaTime);
 
 	//# utilitary
 	Discoball* m_target_discoball;
 	Goal* m_target_goal;
 	bool SetTargetDiscoball();
 	bool SetTargetGoal(bool own_goal);
-	void(*foo)(int);
+	bool SetTargetTeamMate(bool only_unmarked = true);
 	void SetIADifficultyLevel(IADifficultyLevel IA_level);
 	sf::Time GetReactionTime(IADifficultyLevel IA_level);
 	float GetThrowPrecision(IADifficultyLevel IA_level);
 	void ActivateIA(bool activate);
+	sf::Vector2f GetDefensivePosition(sf::Vector2f position, float distance, GameObject* object_to_intercept);
+	float GetAngleVariationToObject(GameObject* object_to_intercept);
+	float GetDistanceToObject(GameObject* object_to_intercept);
 
 private:
 	bool m_IA_activated;
 	IADifficultyLevel m_IA_level;
 	sf::Clock reaction_clock;
+	sf::Vector2f m_target_previous_position;
 };
 
 #endif // SHIPIA_H_INCLUDED
