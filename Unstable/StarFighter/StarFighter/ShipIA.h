@@ -2,6 +2,7 @@
 #define SHIPIA_H_INCLUDED
 
 #include "Ship.h"
+#include "Goal.h"
 
 enum IADifficultyLevel
 {
@@ -26,7 +27,9 @@ public :
 
 	//# utilitary
 	Discoball* m_target_discoball;
+	Goal* m_target_goal;
 	bool SetTargetDiscoball();
+	bool SetTargetGoal(bool own_goal);
 	void SetIADifficultyLevel(IADifficultyLevel IA_level);
 	sf::Time GetReactionTime(IADifficultyLevel IA_level);
 	float GetThrowPrecision(IADifficultyLevel IA_level);

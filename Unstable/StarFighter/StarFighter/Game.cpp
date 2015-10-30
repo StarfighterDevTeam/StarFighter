@@ -367,6 +367,18 @@ void Game::colisionChecksV2(Time deltaTime)
 			}
 		}
 
+		//Discoball hits goal
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GoalGreenObject].begin(); it2 != sceneGameObjectsTyped[GoalGreenObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//TO DO
+			}
+		}
+
 		//Discoball hits bumper
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperGreenObject].begin(); it2 != sceneGameObjectsTyped[BumperGreenObject].end(); it2++)
 		{

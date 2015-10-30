@@ -7,11 +7,12 @@
 #include <sstream>
 #include "Game.h"
 #include "Ship.h"
+#include "ShipIA.h"
 #include "Discoball.h"
 #include "Goal.h"
 #include "Bumper.h"
 #include "LevelPortal.h"
-#include "ShipIA.h"
+
 
 class GameObject;
 

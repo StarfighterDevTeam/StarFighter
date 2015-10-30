@@ -37,6 +37,7 @@ enum GameObjectType {
 	DiscoballObject,
 	GoalBlueObject,
 	GoalRedObject,
+	GoalGreenObject,
 	PlayerShip,
 	EnemyObject,
 	LevelPortalObject,

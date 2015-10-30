@@ -7,6 +7,7 @@ using namespace sf;
 ShipIA::ShipIA()
 {
 	m_target_discoball = NULL;
+	m_target_goal = NULL;
 	m_IA_activated = true;
 	m_IA_level = IAMedium;
 }
@@ -14,6 +15,7 @@ ShipIA::ShipIA()
 ShipIA::ShipIA(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Ship(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_target_discoball = NULL;
+	m_target_goal = NULL;
 	m_IA_activated = true;
 	m_IA_level = IAMedium;
 }
@@ -21,6 +23,7 @@ ShipIA::ShipIA(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 ShipIA::ShipIA(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : Ship(position, speed, textureName, size)
 {
 	m_target_discoball = NULL;
+	m_target_goal = NULL;
 	m_IA_activated = true;
 	m_IA_level = IAMedium;
 }
@@ -39,22 +42,46 @@ void ShipIA::update(sf::Time deltaTime)
 		//DEFENSE
 		if (m_discoball == NULL)
 		{
-			if (m_target_discoball != NULL)
+			//1. Define where is own goal
+			if (m_target_goal == NULL)
 			{
-				IA_MoveToPosition(m_target_discoball->getPosition(), deltaTime);
+				SetTargetGoal(true);
+			}
+			else if (m_target_goal->m_team != m_team)
+			{
+				SetTargetGoal(true);
 			}
 			else
 			{
-				SetTargetDiscoball();
+				//2. Try to defend it
+				if (m_target_discoball != NULL)
+				{
+					IA_MoveToPosition(m_target_discoball->getPosition(), deltaTime);
+				}
+				else
+				{
+					SetTargetDiscoball();
+				}
 			}
 		}
-
 		//ATTAQUE
 		else
 		{
-			IA_ShootToPosition(sf::Vector2f(0, 540));
+			//1. Define where is opponent's goal
+			if (m_target_goal == NULL)
+			{
+				SetTargetGoal(false);
+			}
+			else if (m_target_goal->m_team == m_team)
+			{
+				SetTargetGoal(false);
+			}
+			else
+			{
+				//2. Shoot at it
+				IA_ShootToPosition(m_target_goal->getPosition());
+			}
 		}
-
 
 		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
 		movingX = m_input_direction.x != 0;
@@ -115,6 +142,21 @@ bool ShipIA::SetTargetDiscoball()
 	m_target_discoball = (Discoball*)(*CurrentGame).GetClosestObject(this, DiscoballObject);
 
 	return m_target_discoball;	
+}
+
+bool ShipIA::SetTargetGoal(bool own_goal)
+{
+	GameObjectType type;
+	if (m_team == BlueTeam)
+		type = own_goal ? GoalBlueObject : GoalRedObject;
+	else if (m_team == RedTeam)
+		type = own_goal ? GoalRedObject : GoalBlueObject;
+	else
+		type = GoalGreenObject;
+
+	m_target_goal = (Goal*)(*CurrentGame).GetClosestObject(this, type);
+
+	return m_target_goal;
 }
 
 void ShipIA::SetIADifficultyLevel(IADifficultyLevel IA_level)
