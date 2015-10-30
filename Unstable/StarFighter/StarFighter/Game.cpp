@@ -1,14 +1,4 @@
 #include "Game.h"
-#define stringify(x)  #x
-
-const char* GameObjectTypeValues[] =
-{
-	stringify(BackgroundObject),
-	stringify(PlayerShip),
-	stringify(FriendlyFire),
-	stringify(EnemyFire),
-	stringify(EnemyObject)
-};
 
 void Game::init(RenderWindow* window)
 {

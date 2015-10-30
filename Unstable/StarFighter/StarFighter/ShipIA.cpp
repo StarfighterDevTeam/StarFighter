@@ -27,7 +27,7 @@ ShipIA::ShipIA(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 ShipIA::~ShipIA()
 {
-	delete m_target_discoball;
+	
 }
 
 void ShipIA::update(sf::Time deltaTime)
