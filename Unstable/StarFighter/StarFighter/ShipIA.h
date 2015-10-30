@@ -30,9 +30,11 @@ public :
 	Goal* m_target_goal;
 	bool SetTargetDiscoball();
 	bool SetTargetGoal(bool own_goal);
+	void(*foo)(int);
 	void SetIADifficultyLevel(IADifficultyLevel IA_level);
 	sf::Time GetReactionTime(IADifficultyLevel IA_level);
 	float GetThrowPrecision(IADifficultyLevel IA_level);
+	void ActivateIA(bool activate);
 
 private:
 	bool m_IA_activated;

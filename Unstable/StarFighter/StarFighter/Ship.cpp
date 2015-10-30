@@ -13,7 +13,6 @@ Ship::Ship()
 
 void Ship::Init()
 {
-	collider_type = PlayerShip;
 	moving = false;
 	movingX = movingY = false;
 	disable_inputs = false;
@@ -42,6 +41,11 @@ void Ship::Init()
 	m_character = Natalia;
 
 	arrived_at_destination = true;
+
+	//IA SPECIFIC
+	m_target_opponent = NULL;
+	m_target_team_mate = NULL;
+	m_isUnmarked = true;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -66,6 +70,11 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	//IA SPECIFIC
+	SetTargetOpponent();
+	SetTargetTeamMate();
+	m_isUnmarked = IsUnmarked();
+
 	//ManageHitRecovery();
 
 	m_input_direction = sf::Vector2f(0, 0);
@@ -327,9 +336,9 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				carrier_clock.restart();
 
 				//checking min and max cap values
-				printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);
+				//printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);
 				DiscoballSpeedConstraints();
-				printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
+				//printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
 
 				//setting the sense of rotation (clockwise or counter-clockwise)
 				if (abs(angle_collision) < M_PI_4)
@@ -397,9 +406,9 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 					m_discoball->discoball_curAngularSpeed = CARRY_BASE_ANGULAR_SPEED;
 				}
 
-				printf("Discoball decelerated. (speed: %f", m_discoball->discoball_curAngularSpeed);
+				//printf("Discoball decelerated. (speed: %f", m_discoball->discoball_curAngularSpeed);
 				DiscoballSpeedConstraints();
-				printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
+				//printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
 				carrier_clock.restart();
 			}
 
@@ -444,7 +453,7 @@ void Ship::ThrowDiscoball()
 		m_discoball->SetSpeedVectorFromAbsoluteSpeed(m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE, discoball_curAngle);
 
 		m_discoball->carried = false;
-		printf("Discoball thrown. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
+		//printf("Discoball thrown. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 		carry_again_clock.restart();
 
 		m_discoball->SetDiscoballStatus(DiscoballFree);
@@ -472,7 +481,7 @@ void Ship::ReleaseDiscoball(float angularSpeedBonus)
 		m_discoball->speed.x = -m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
 		m_discoball->speed.y = m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
 		m_discoball->carried = false;
-		printf("Discoball released. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
+		//printf("Discoball released. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 		carry_again_clock.restart();
 
 		m_discoball->SetDiscoballStatus(DiscoballLost);
@@ -995,4 +1004,87 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 		stroboscopic_effect_clock.restart();
 	}
+}
+
+bool Ship::IsUnmarked()
+{
+	if (m_target_opponent)
+	{
+		sf::Vector2f diff_position = sf::Vector2f(getPosition().x - m_target_opponent->getPosition().x, getPosition().y - m_target_opponent->getPosition().y);
+		if (diff_position.x * diff_position.x + diff_position.y * diff_position.y > IA_DISTANCE_FOR_UNMARKED * IA_DISTANCE_FOR_UNMARKED)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool Ship::SetTargetOpponent()
+{
+	GameObjectType type = m_team == BlueTeam ? PlayerRedShip : PlayerBlueShip;
+
+	//m_target_opponent = (Ship*)(*CurrentGame).GetClosestObject(this, type);
+
+	//find closest opponent
+	m_target_opponent = (Ship*)FindClosestGameObjectTyped(type, false);
+
+	return m_target_opponent;
+}
+
+bool Ship::SetTargetTeamMate(bool only_unmarked)
+{
+	GameObjectType type = m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
+
+	//find closest unmarked team mate
+	m_target_team_mate = (Ship*)FindClosestGameObjectTyped(type, only_unmarked);
+
+	return m_target_team_mate;
+}
+
+GameObject* Ship::FindClosestGameObjectTyped(GameObjectType type, bool needs_to_be_unmarked)
+{
+	std::vector<GameObject*> sceneGameObjectsTyped = (*CurrentGame).GetSceneGameObjectsTyped(type);
+	size_t sceneGameObjectsTypedSize = sceneGameObjectsTyped.size();
+
+	sf::Vector2f pos;
+	float shortest_distance = -1;
+	GameObject* returned_obj = NULL;
+	for (size_t j = 0; j < sceneGameObjectsTypedSize; j++)
+	{
+		if (sceneGameObjectsTyped[j] == NULL)
+			continue;
+
+		if (sceneGameObjectsTyped[j]->isOnScene && !sceneGameObjectsTyped[j]->ghost)
+		{
+			//specific for unmarked players
+			if (needs_to_be_unmarked && (type == PlayerBlueShip || type == PlayerRedShip))
+			{
+				Ship* ship = (Ship*)(sceneGameObjectsTyped[j]);
+				if (!ship->m_isUnmarked || ship == this)
+				{
+					continue;
+				}
+			}
+
+			const float a = getPosition().x - sceneGameObjectsTyped[j]->getPosition().x;
+			const float b = getPosition().y - sceneGameObjectsTyped[j]->getPosition().y;
+
+			float distance_to_ref = (a * a) + (b * b);
+			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
+			if (distance_to_ref < shortest_distance || shortest_distance < 0)
+			{
+				shortest_distance = distance_to_ref;
+				returned_obj = sceneGameObjectsTyped[j];
+			}
+		}
+	}
+
+	return returned_obj;
 }

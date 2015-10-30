@@ -58,6 +58,12 @@ void InGameState::SetIngameScript(IngameScript script)
 
 Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters character, Teams team, bool IA)
 {
+	GameObjectType type;
+	if (team == BlueTeam)
+		type = PlayerBlueShip;
+	else
+		type = PlayerRedShip;
+
 	if (character == Quorra)
 	{
 		if (!IA)
@@ -65,7 +71,7 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			Ship* newship = new Ship(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/quorra.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 		else
@@ -73,7 +79,7 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/quorra.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 	}
@@ -84,7 +90,7 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			Ship* newship = new Ship(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 		else
@@ -92,7 +98,7 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 		
@@ -104,7 +110,7 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			Ship* newship = new Ship(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/katyusha.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 		else
@@ -112,7 +118,7 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/katyusha.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 		
@@ -124,7 +130,7 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			Ship* newship = new Ship(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/savannah.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 		else
@@ -132,12 +138,65 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/savannah.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 			newship->m_team = team;
 			newship->m_character = character;
-			(*CurrentGame).addToScene(newship, PlayerShipLayer, PlayerShip);
+			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
 	}
 	
 	return NULL;	
+}
+
+ShipIA* InGameState::CreateIACharacter(sf::Vector2f position, PlayableCharacters character, Teams team, IADifficultyLevel IA_level, bool activated)
+{
+	GameObjectType type;
+	if (team == BlueTeam)
+		type = PlayerBlueShip;
+	else
+		type = PlayerRedShip;
+
+	if (character == Quorra)
+	{
+		ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/quorra.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+		newship->m_team = team;
+		newship->m_character = character;
+		newship->SetIADifficultyLevel(IA_level);
+		newship->ActivateIA(activated);
+		(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
+		return newship;
+		
+	}
+	if (character == Natalia)
+	{
+		ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+		newship->m_team = team;
+		newship->m_character = character;
+		newship->SetIADifficultyLevel(IA_level);
+		newship->ActivateIA(activated);
+		(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
+		return newship;
+	}
+	if (character == Katyusha)
+	{
+		ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/katyusha.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+		newship->m_team = team;
+		newship->m_character = character;
+		newship->SetIADifficultyLevel(IA_level);
+		newship->ActivateIA(activated);
+		(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
+		return newship;
+	}
+	if (character == Savannah)
+	{
+		ShipIA* newship = new ShipIA(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/savannah.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+		newship->m_team = team;
+		newship->m_character = character;
+		newship->SetIADifficultyLevel(IA_level);
+		newship->ActivateIA(activated);
+		(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
+		return newship;
+	}
+
+	return NULL;
 }
 
 Discoball* InGameState::CreateDiscoball(sf::Vector2f position)
@@ -220,8 +279,12 @@ void InGameState::StartMultiGame(bool reset_scores)
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, REF_WINDOW_RESOLUTION_Y/2), Quorra, RedTeam, true);
-	playerShip2->SetControllerType(JoystickControl2);
+	//Ship* playerShip2 = CreateCharacter(sf::Vector2f(1820, REF_WINDOW_RESOLUTION_Y/2), Quorra, RedTeam, true);
+	//playerShip2->SetControllerType(JoystickControl2);
+	CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100 / 2, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAHard, true);
+
+	//TEST
+	CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, false);
 
 	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
 	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2));

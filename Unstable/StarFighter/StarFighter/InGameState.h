@@ -37,6 +37,8 @@ public:
 	IngameScript m_script;
 
 	Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, bool IA = false);
+	ShipIA* CreateIACharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, IADifficultyLevel IA_level = IAEasy, bool activated = true);
+
 	Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	Bumper* CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size);
 	LevelPortal* CreateLevelPortal(IngameScript script, sf::Vector2f position);

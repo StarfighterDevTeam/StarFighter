@@ -246,7 +246,7 @@ void Game::colisionChecksV2(Time deltaTime)
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerShip].begin(); it1 != sceneGameObjectsTyped[PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerBlueShip].begin(); it1 != sceneGameObjectsTyped[PlayerBlueShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
@@ -268,11 +268,9 @@ void Game::colisionChecksV2(Time deltaTime)
 		}
 
 		//Players in contact
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[PlayerShip].begin(); it2 != sceneGameObjectsTyped[PlayerShip].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[PlayerRedShip].begin(); it2 != sceneGameObjectsTyped[PlayerRedShip].end(); it2++)
 		{
 			if (*it2 == NULL)
-				continue;
-			if (*it1 == *it2)
 				continue;
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
@@ -301,7 +299,7 @@ void Game::colisionChecksV2(Time deltaTime)
 		}
 
 		//Gets blocked by bumper
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperBlueObject].begin(); it2 != sceneGameObjectsTyped[BumperBlueObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperRedObject].begin(); it2 != sceneGameObjectsTyped[BumperRedObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -311,8 +309,47 @@ void Game::colisionChecksV2(Time deltaTime)
 				(*it1)->PlayerBumper(*it2, deltaTime);
 			}
 		}
+	}
 
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperRedObject].begin(); it2 != sceneGameObjectsTyped[BumperRedObject].end(); it2++)
+	//Now red team players
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerRedShip].begin(); it1 != sceneGameObjectsTyped[PlayerRedShip].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		//Player gets discoball
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[DiscoballObject].begin(); it2 != sceneGameObjectsTyped[DiscoballObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+
+				//TRON SPECIFIC
+				float angle = GetAngleOfCollision(*it1, *it2);
+				(*it1)->GetDiscoball(*it2, angle);
+			}
+		}
+
+		//Players enters level portal
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[LevelPortalObject].begin(); it2 != sceneGameObjectsTyped[LevelPortalObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+
+				//TRON SPECIFIC
+				(*it1)->GetPortal(*it2);
+			}
+		}
+
+		//Gets blocked by bumper
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperBlueObject].begin(); it2 != sceneGameObjectsTyped[BumperBlueObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -599,4 +636,9 @@ GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType typ
 	}
 
 	return returned_obj;
+}
+
+std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
+{
+	return sceneGameObjectsTyped[type];
 }

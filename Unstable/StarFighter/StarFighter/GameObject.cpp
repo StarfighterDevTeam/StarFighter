@@ -179,6 +179,15 @@ float GameObject::GetAbsoluteSpeed()
 	s = floor(s);
 	return s;
 }
+float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
+{
+	const float a = speed_.x;
+	const float b = speed_.y;
+	float s = (a * a) + (b * b);
+	s = sqrt(s);
+	s = floor(s);
+	return s;
+}
 
 float GameObject::SpeedToPolarAngle(sf::Vector2f curSpeed)
 {

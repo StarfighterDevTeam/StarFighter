@@ -111,6 +111,7 @@
 #define IA_PRECISION_EASY								10
 #define IA_PRECISION_MEDIUM								5
 #define IA_PRECISION_HARD								3
+#define IA_DISTANCE_FOR_UNMARKED						500
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

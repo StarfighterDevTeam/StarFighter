@@ -38,7 +38,8 @@ enum GameObjectType {
 	GoalBlueObject,
 	GoalRedObject,
 	GoalGreenObject,
-	PlayerShip,
+	PlayerBlueShip,
+	PlayerRedShip,
 	EnemyObject,
 	LevelPortalObject,
 	NBVAL_GameObject
@@ -104,6 +105,7 @@ public:
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();
+	float GetAbsoluteSpeed(sf::Vector2f speed_);
 	void SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle);
 	float SpeedToPolarAngle(sf::Vector2f curSpeed);
 	bool NormalizeSpeed(sf::Vector2f* vector, float max_value);

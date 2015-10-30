@@ -10,6 +10,7 @@ ShipIA::ShipIA()
 	m_target_goal = NULL;
 	m_IA_activated = true;
 	m_IA_level = IAMedium;
+
 }
 
 ShipIA::ShipIA(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Ship(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -36,6 +37,11 @@ ShipIA::~ShipIA()
 void ShipIA::update(sf::Time deltaTime)
 {
 	m_input_direction = sf::Vector2f(0, 0);
+
+	//0. Acknowledge players' positions relative to me. Am I unmarked? Where is the closest threat? Where is my closest support?
+	SetTargetOpponent();
+	SetTargetTeamMate();
+	m_isUnmarked = IsUnmarked();//note: even a non playing IA needs to update its  situation in order for team mates to know if it's unmarked or not
 
 	if (!disable_inputs && m_IA_activated)
 	{
@@ -139,7 +145,10 @@ void ShipIA::IA_MoveToPosition(sf::Vector2f position, sf::Time deltaTime)
 
 bool ShipIA::SetTargetDiscoball()
 {
-	m_target_discoball = (Discoball*)(*CurrentGame).GetClosestObject(this, DiscoballObject);
+	//m_target_discoball = (Discoball*)(*CurrentGame).GetClosestObject(this, DiscoballObject);
+
+	//find closest discoball
+	m_target_discoball = (Discoball*)FindClosestGameObjectTyped(DiscoballObject);
 
 	return m_target_discoball;	
 }
@@ -154,7 +163,10 @@ bool ShipIA::SetTargetGoal(bool own_goal)
 	else
 		type = GoalGreenObject;
 
-	m_target_goal = (Goal*)(*CurrentGame).GetClosestObject(this, type);
+	//m_target_goal = (Goal*)(*CurrentGame).GetClosestObject(this, type);
+
+	//find closest goal
+	m_target_goal = (Goal*)FindClosestGameObjectTyped(type);
 
 	return m_target_goal;
 }
@@ -230,4 +242,9 @@ void ShipIA::IA_ShootToPosition(sf::Vector2f position)
 			}
 		}
 	}
+}
+
+void ShipIA::ActivateIA(bool activate)
+{
+	m_IA_activated = activate;
 }

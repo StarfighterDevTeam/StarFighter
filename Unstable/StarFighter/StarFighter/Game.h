@@ -43,6 +43,7 @@ public:
 	void removeFromFeedbacks(RectangleShape* feedback);
 	void removeFromFeedbacks(Text* text);
 	void CleanAllGameObjects();
+	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
 
 	void updateScene(Time deltaTime);
 	void drawScene();

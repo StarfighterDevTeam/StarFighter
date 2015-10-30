@@ -135,6 +135,15 @@ public :
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;
 
+	//IA SPECIFIC
+	bool m_isUnmarked;
+	bool IsUnmarked();
+	Ship* m_target_opponent;
+	Ship* m_target_team_mate;
+	bool SetTargetOpponent();
+	bool SetTargetTeamMate(bool only_unmarked = true);
+	GameObject* FindClosestGameObjectTyped(GameObjectType type, bool needs_to_be_unmarked = false);
+
 protected:
 	bool moving;
 	bool movingX;
