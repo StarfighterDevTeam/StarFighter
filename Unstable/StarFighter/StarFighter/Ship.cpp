@@ -503,14 +503,19 @@ void Ship::ManageSwitchRotation()
 		{
 			if (InputGuy::isSwitchingRotation(m_controllerType))
 			{
-				discoball_clockwise = !discoball_clockwise;
-				carrier_clock.restart();
-				isSwitchingButtonReleased = false;
-
-				(*CurrentGame).PlaySFX(SFX_Switch);
+				SwitchRotation();
 			}
 		}
 	}
+}
+
+void Ship::SwitchRotation()
+{
+	discoball_clockwise = !discoball_clockwise;
+	carrier_clock.restart();
+	isSwitchingButtonReleased = false;
+
+	(*CurrentGame).PlaySFX(SFX_Switch);
 }
 
 void Ship::ManageKeyReleases()

@@ -89,6 +89,7 @@ public :
 	void PlayerContact(GameObject* player, float angle_collision) override;
 	void ManageDiscoball(sf::Time deltaTime);
 	void ThrowDiscoball();
+	void SwitchRotation();
 	void ReleaseDiscoball(float angularSpeedBonus = 0.f);
 	void UpdateRotation();
 	void ManageFire();

@@ -176,5 +176,16 @@ void ShipIA::IA_ShootToPosition(sf::Vector2f position)
 		{
 			ThrowDiscoball();
 		}
+		else
+		{
+			if (diff_angle > 0 && diff_angle < M_PI_2 && !discoball_clockwise)
+			{
+				SwitchRotation();
+			}
+			else if (diff_angle < 0 && diff_angle > -M_PI_2 && discoball_clockwise)
+			{
+				SwitchRotation();
+			}
+		}
 	}
 }
