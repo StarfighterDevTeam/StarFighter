@@ -102,7 +102,18 @@ void ShipIA::update(sf::Time deltaTime)
 			}
 			
 			//2. Shoot at it
-			IA_ShootToPosition(m_target_goal->getPosition());
+			IA_MoveToPosition(m_target_goal->getPosition(), deltaTime);
+			//if (m_isUnmarked)
+				IA_ShootToPosition(m_target_goal->getPosition());
+			//else
+			//{
+			//	if (m_target_team_mate && m_target_team_mate->m_isUnmarked)
+			//	{
+			//		IA_ShootToPosition(m_target_team_mate->getPosition());
+			//	}
+			//		
+			//}
+
 		}
 
 		moving = m_input_direction.x != 0 || m_input_direction.y != 0;

@@ -320,13 +320,10 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 
 					m_discoball->carrier->m_discoball = NULL;
 				}
-
-				//setting discoball speed after catch
-				//1/ reset speed on catch?
-				//m_discoball->discoball_curAngularSpeed = DISCOBALL_BASE_ANGULAR_SPEED;
-
-				//2/ apply a malus?
-				m_discoball->discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
+				else
+				{
+					m_discoball->discoball_curAngularSpeed -= CARRY_CATCH_ACCELERATION_MALUS;
+				}
 
 				//acquisition of the discoball
 				m_discoball->carried = true;
