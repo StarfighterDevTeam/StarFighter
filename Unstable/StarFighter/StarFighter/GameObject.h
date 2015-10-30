@@ -109,6 +109,7 @@ public:
 	void SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle);
 	float SpeedToPolarAngle(sf::Vector2f curSpeed);
 	bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
+	float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);

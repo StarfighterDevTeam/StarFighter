@@ -1048,6 +1048,9 @@ GameObject* Ship::FindClosestGameObjectTyped(GameObjectType type, bool needs_to_
 		if (sceneGameObjectsTyped[j] == NULL)
 			continue;
 
+		if (sceneGameObjectsTyped[j]->GarbageMe)
+			continue;
+
 		if (sceneGameObjectsTyped[j]->isOnScene && !sceneGameObjectsTyped[j]->ghost)
 		{
 			//specific for unmarked players

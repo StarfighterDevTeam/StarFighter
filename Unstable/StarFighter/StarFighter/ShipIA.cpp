@@ -290,10 +290,12 @@ void ShipIA::IA_GuardPosition(sf::Vector2f position, float distance, sf::Time de
 		sf::Vector2f target_pos;
 		if (m_target_discoball->carrier)
 		{
+			assert(m_target_discoball->carrier != NULL);
 			target_pos = GetDefensivePosition(position, distance, m_target_discoball->carrier);
 		}
 		else
 		{
+			assert(m_target_discoball != NULL);
 			target_pos = GetDefensivePosition(position, distance, m_target_discoball);
 		}
 			

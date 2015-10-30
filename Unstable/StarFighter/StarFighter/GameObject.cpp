@@ -217,6 +217,13 @@ void GameObject::SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float cur
 	speed.y = absolute_speed * cos(curAngle);
 }
 
+float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)
+{
+	Vector2f current_diff = sf::Vector2f(object1->getPosition().x - object2->getPosition().x, object1->getPosition().y - object2->getPosition().y);
+	return GetAbsoluteSpeed(current_diff);
+}
+
+
 bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 {
 	if (vector->x * vector->x + vector->y * vector->y > max_value * max_value)
