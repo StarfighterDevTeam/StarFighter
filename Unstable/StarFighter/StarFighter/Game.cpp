@@ -569,3 +569,32 @@ void Game::Goal(Teams team)
 	}
 	*/
 }
+
+GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object)
+{
+	sf::Vector2f pos;
+	const sf::Vector2f ref_position = ref_obj->getPosition();
+	float shortest_distance = -1;
+	GameObject* returned_obj = NULL;
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[type_of_closest_object].begin(); it != sceneGameObjectsTyped[type_of_closest_object].end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		if ((*it)->isOnScene && !(*it)->ghost)
+		{
+			const float a = ref_position.x - (*it)->getPosition().x;
+			const float b = ref_position.y - (*it)->getPosition().y;
+
+			float distance_to_ref = (a * a) + (b * b);
+			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
+			if (distance_to_ref < shortest_distance || shortest_distance < 0)
+			{
+				shortest_distance = distance_to_ref;
+				returned_obj = (*it);
+			}
+		}
+	}
+
+	return returned_obj;
+}

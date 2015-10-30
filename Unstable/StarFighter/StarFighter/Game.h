@@ -76,6 +76,7 @@ public:
 
 	//TRON SPECIFIC
 	float GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj);
+	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
 	unsigned int score_blue_team;
 	unsigned int score_red_team;
 	sf::Font* font;

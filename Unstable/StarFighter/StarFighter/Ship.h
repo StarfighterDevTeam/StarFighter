@@ -134,10 +134,11 @@ public :
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;
 
-private:
+protected:
 	bool moving;
 	bool movingX;
 	bool movingY;
+	sf::Vector2f m_input_direction;
 };
 
 #endif // SHIP_H_INCLUDED

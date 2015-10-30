@@ -21,6 +21,7 @@ Goal::Goal(Teams team, sf::Vector2f position, std::string textureName, sf::Vecto
 
 Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 {
+
 	m_team = team;
 
 	//pixel array creation

@@ -68,7 +68,7 @@ void Ship::update(sf::Time deltaTime)
 {
 	//ManageHitRecovery();
 
-	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
+	m_input_direction = sf::Vector2f(0, 0);
 
 	if (!disable_inputs)
 	{
@@ -79,28 +79,28 @@ void Ship::update(sf::Time deltaTime)
 			target_position.x /= (*CurrentGame).scale_factor.x;
 			target_position.y /= (*CurrentGame).scale_factor.y;
 			m_destination = target_position;
-			inputs_direction = GetInputsToGetPosition(m_destination, deltaTime);
+			//m_input_direction = GetInputsToGetPosition(m_destination, deltaTime);
 		}
 		else
 		{
 			if (!arrived_at_destination)
 			{
-				inputs_direction = GetInputsToGetPosition(m_destination, deltaTime);
+				m_input_direction = GetInputsToGetPosition(m_destination, deltaTime);
 			}
 			else
 			{
-				inputs_direction = InputGuy::getDirections(m_controllerType);
+				m_input_direction = InputGuy::getDirections(m_controllerType);
 			}
 		}
 
-		moving = inputs_direction.x != 0 || inputs_direction.y != 0;
-		movingX = inputs_direction.x != 0;
-		movingY = inputs_direction.y != 0;
+		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
+		movingX = m_input_direction.x != 0;
+		movingY = m_input_direction.y != 0;
 	}
 
 	if (isTackling == NOT_TACKLING && isBrawling == NOT_BRAWLING && isRecovering == NOT_HIT && isDodging != INITIATE_DODGING)
 	{
-		GetDirectionInputs(inputs_direction);
+		GetDirectionInputs(m_input_direction);
 		MaxSpeedConstraints();
 		IdleDecelleration(deltaTime);
 	}
@@ -139,8 +139,7 @@ void Ship::update(sf::Time deltaTime)
 	if (GetAbsoluteSpeed() > SHIP_MAX_SPEED)
 	{
 		PlayStroboscopicEffect(seconds(TACKLE_STROBO_EFFECT_DURATION * GetAbsoluteSpeed() / SHIP_TACKLE_MAX_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
-	}
-		
+	}	
 }
 
 void Ship::ResetStatus()
@@ -579,7 +578,7 @@ void Ship::ManageTackle()
 
 		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, SpeedToPolarAngle(speed) + M_PI);
 		
-		printf("speed : %f, %f \n", speed.x, speed.y);
+		//printf("speed : %f, %f \n", speed.x, speed.y);
 	}
 
 	//State 3
@@ -865,7 +864,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 
 	if (distance < SHIP_CLICK_INPUT_PRECISION)//arrived at destination
 	{
-		printf("input calculated: (%f, %f) #ARRIVED#\n\n", input_direction.x, input_direction.y);
+		//printf("input calculated: (%f, %f) #ARRIVED#\n\n", input_direction.x, input_direction.y);
 		arrived_at_destination = true;
 		return sf::Vector2f(0, 0);
 	}
@@ -874,7 +873,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 		input_direction.x = diff_x / cur_MaxSpeed;//*deltaTime.asSeconds();
 		input_direction.y = diff_y / cur_MaxSpeed;//*deltaTime.asSeconds();
 
-		printf("input calculated: (%f, %f) #LAST MOVE#\n\n", input_direction.x, input_direction.y);
+		//printf("input calculated: (%f, %f) #LAST MOVE#\n\n", input_direction.x, input_direction.y);
 
 		arrived_at_destination = false;
 		return input_direction;
@@ -884,7 +883,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 		input_direction.x = diff_x / distance;
 		input_direction.y = diff_y / distance;
 
-		printf("input calculated: (%f, %f) #MAX SPEED#\n\n", input_direction.x, input_direction.y);
+		//printf("input calculated: (%f, %f) #MAX SPEED#\n\n", input_direction.x, input_direction.y);
 
 		arrived_at_destination = false;
 		return input_direction;
