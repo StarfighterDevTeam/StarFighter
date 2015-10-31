@@ -26,7 +26,7 @@ void InGameState::Initialize(Player player)
 
 	(*CurrentGame).addToFeedbacks(&score_blue_text);
 	(*CurrentGame).addToFeedbacks(&score_red_text);
-	
+
 	//launch script
 	//SetIngameScript(MainMenuScript);
 	SetIngameScript(OfflineMulti);
@@ -140,8 +140,8 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			return newship;
 		}
 	}
-	
-	return NULL;	
+
+	return NULL;
 }
 
 ShipIA* InGameState::CreateIACharacter(sf::Vector2f position, PlayableCharacters character, Teams team, IADifficultyLevel IA_level, bool activated)
@@ -161,7 +161,7 @@ ShipIA* InGameState::CreateIACharacter(sf::Vector2f position, PlayableCharacters
 		newship->ActivateIA(activated);
 		(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 		return newship;
-		
+
 	}
 	if (character == Natalia)
 	{
@@ -236,7 +236,7 @@ void InGameState::StartMainMenu()
 	(*CurrentGame).cur_GameRules = CarryToAbleInputs;
 
 	//intégration placeholder
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
@@ -247,7 +247,7 @@ void InGameState::StartMainMenu()
 	playerShip2->SetControllerType(AllControlDevices);
 	playerShip2->m_disable_inputs = true;
 
-	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/main_menu_background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/main_menu_background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	// ##### HACK
@@ -261,45 +261,84 @@ void InGameState::StartMainMenu()
 	CreateLevelPortal(OfflineMulti, sf::Vector2f(1560, 380));
 	CreateLevelPortal(MainMenuScript, sf::Vector2f(1560, REF_WINDOW_RESOLUTION_Y / 2));
 
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(494, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(494, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
 
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
 }
 
 void InGameState::StartMultiGame(bool reset_scores)
 {
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
 
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
-	playerShip1->SetControllerType(AllControlDevices);
-
-	// #### HACK
-	(*CurrentGame).playerShip = playerShip1;
-	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
-
-	//Ship* playerShip2 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y/2), Savannah, BlueTeam);
-	//playerShip2->SetControllerType(JoystickControl2);
-
-	CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100 / 2, REF_WINDOW_RESOLUTION_Y / 3), Quorra, RedTeam, IAHard, true);
-
-	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
+	GameObject* background = new GameObject(sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(2880, 1080), sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2));
 	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	CreateDiscoball(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
+	playerShip1->SetControllerType(AllControlDevices);
 
-	CreateGoal(BlueTeam, sf::Vector2f(8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
+	// #### HACK
+	(*CurrentGame).playerShip = playerShip1;
+	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	CreateGoal(RedTeam, sf::Vector2f((*CurrentGame).map_size.x - 8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
+	Ship* playerShip2 = CreateCharacter(sf::Vector2f((*CurrentGame).map_size.x - 100, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam);
+	playerShip2->SetControllerType(JoystickControl2);
 
-	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
+	//CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100 / 2, REF_WINDOW_RESOLUTION_Y / 3), Quorra, RedTeam, IAEasy, true);
+	//CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100 / 2, REF_WINDOW_RESOLUTION_Y / 3), Quorra, RedTeam, IAEasy, true);
 
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y/2), true, (*CurrentGame).map_size.y);
+	CreateDiscoball(sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y / 2));
 
-	//CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y/2), true, 200);
+	CreateGoal(BlueTeam, sf::Vector2f(8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, GOAL_SIZE));
+
+	CreateGoal(RedTeam, sf::Vector2f((*CurrentGame).map_size.x - 8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, GOAL_SIZE));
+
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
+
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
+
+	//A
+	auto va1 = sf::Vector2f(600, 250);
+	float sa = 150;
+	CreateBumper(OnlyBlueTeamThrough, va1, true, sa);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
+
+	//B
+	auto vb1 = sf::Vector2f(1000, 400);
+	float sb = 150;
+	CreateBumper(OnlyPlayersThrough, vb1, true, sb);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
+
+	//C
+	auto vc1 = sf::Vector2f((*CurrentGame).map_size.x / 2, 250);
+	float sc = 150;
+	CreateBumper(OnlyPlayersThrough, vc1, true, sc);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(vc1.x, (*CurrentGame).map_size.y - vc1.y), true, sc);
+
+	//B
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, vb1.y), true, sb);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
+
+	//A
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, va1.y), true, sa);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
+
+	//SafeSpace
+	float goal_size_y = GOAL_SIZE;
+	float safe_space_x = 100;
+	float ss = ((*CurrentGame).map_size.y - goal_size_y) / 2;
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x, ss/2), true, ss);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x, (*CurrentGame).map_size.y - ss / 2), true, ss);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x/2, ss), false, safe_space_x);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x/2, (*CurrentGame).map_size.y - ss), false, safe_space_x);
+
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x, ss / 2), true, ss);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x, (*CurrentGame).map_size.y - ss / 2), true, ss);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x / 2, ss), false, safe_space_x);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x / 2, (*CurrentGame).map_size.y - ss), false, safe_space_x);
 
 	if (reset_scores)
 	{
@@ -312,21 +351,21 @@ void InGameState::StartShooting01()
 {
 	(*CurrentGame).cur_GameRules = SoloTraining;
 
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y/2), Natalia, BlueTeam);
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
 	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	CreateDiscoball(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y/2));
+	CreateDiscoball(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2));
 
 	CreateGoal(RedTeam, sf::Vector2f((*CurrentGame).map_size.x - 8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, 200));
 
@@ -349,6 +388,13 @@ void InGameState::Update(sf::Time deltaTime)
 	ss_score_red << (*CurrentGame).score_red_team;
 	score_blue_text.setString(ss_score_blue.str());
 	score_red_text.setString(ss_score_red.str());
+
+	if ((*CurrentGame).m_goal_happened)
+	{
+		(*CurrentGame).m_goal_happened = false;
+		(*CurrentGame).CleanAllGameObjects();
+		StartMultiGame(false);
+	}
 
 	if (InputGuy::isUsingDebugCommand())
 	{
@@ -385,7 +431,7 @@ void InGameState::UpdateCamera(sf::Time deltaTime)
 		(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, y);
 	if (b > (*CurrentGame).map_size.y - y)
 		(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, (*CurrentGame).map_size.y - y);
-	
+
 }
 
 void InGameState::Draw()

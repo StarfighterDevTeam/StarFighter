@@ -34,6 +34,8 @@ void Game::init(RenderWindow* window)
 		// error
 		//TODO: font loader
 	}
+
+	m_goal_happened = false;
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -604,7 +606,7 @@ void Game::Goal(Teams team)
 
 	PlaySFX(SFX_Goal);
 
-
+	m_goal_happened = true;
 	/*
 	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[PlayerShip].begin(); it != sceneGameObjectsTyped[PlayerShip].end(); it++)
 	{

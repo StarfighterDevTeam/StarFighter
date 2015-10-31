@@ -26,9 +26,7 @@ public:
 	static bool isFiring(ControlerType device = AllControlDevices);
 	static bool isTackling(ControlerType device = AllControlDevices);
 	static bool isSwitchingRotation(ControlerType device = AllControlDevices);
-	static bool isStraffing(ControlerType device = AllControlDevices);
 	static bool isChangingResolution();
-	static bool isOpeningHud();
 	static bool isUsingDebugCommand();
 };
 

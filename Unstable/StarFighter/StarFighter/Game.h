@@ -84,6 +84,7 @@ public:
 	sf::Font* font2;
 	sf::Clock score_again_blue_clock;
 	sf::Clock score_again_red_clock;
+	bool m_goal_happened;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

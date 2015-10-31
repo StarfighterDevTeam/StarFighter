@@ -85,34 +85,6 @@ bool InputGuy::isTackling(ControlerType device)
 	return false;
 }
 
-bool InputGuy::isStraffing(ControlerType device)
-{
-	if (device == AllControlDevices || device == KeyboardControl)
-	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-		{
-			return true;
-		}
-	}
-
-	if (device == AllControlDevices || device >= JoystickControl1)
-	{
-		int joystick = device - JoystickControl1;
-		if (device == AllControlDevices)
-			joystick = 0;// = joystick 1
-		if (sf::Joystick::isConnected(joystick))
-		{
-			if (sf::Joystick::isButtonPressed(joystick, 4)) // left upper trigger
-			{
-				return true;
-			}
-			
-		}
-	}
-
-	return false;
-}
-
 bool InputGuy::isUsingDebugCommand()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
@@ -139,22 +111,6 @@ bool InputGuy::isChangingResolution()
 	if (sf::Joystick::isConnected(0))
 	{
 		if (sf::Joystick::isButtonPressed(0, 7)) //Start button
-			return true;
-	}
-
-	return false;
-}
-
-bool InputGuy::isOpeningHud()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-	{
-		return true;
-	}
-
-	if (sf::Joystick::isConnected(0))
-	{
-		if (sf::Joystick::isButtonPressed(0, 6)) //Select button
 			return true;
 	}
 
