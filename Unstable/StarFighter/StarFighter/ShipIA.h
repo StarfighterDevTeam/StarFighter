@@ -45,7 +45,6 @@ private:
 	bool m_IA_activated;
 	IADifficultyLevel m_IA_level;
 	sf::Clock reaction_clock;
-	sf::Vector2f m_target_previous_position;
 };
 
 #endif // SHIPIA_H_INCLUDED

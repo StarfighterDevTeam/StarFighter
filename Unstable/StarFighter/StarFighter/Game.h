@@ -82,7 +82,8 @@ public:
 	unsigned int score_red_team;
 	sf::Font* font;
 	sf::Font* font2;
-	sf::Clock score_again_clock;
+	sf::Clock score_again_blue_clock;
+	sf::Clock score_again_red_clock;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

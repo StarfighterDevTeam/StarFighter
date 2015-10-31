@@ -25,7 +25,7 @@ void ShipIA::Init()
 	m_target_goal = NULL;
 	m_IA_activated = true;
 	m_IA_level = IAMedium;
-	m_target_previous_position = sf::Vector2f(0, 0);
+	m_disable_inputs = true;
 }
 
 ShipIA::~ShipIA()
@@ -42,7 +42,7 @@ void ShipIA::update(sf::Time deltaTime)
 	SetTargetTeamMate();
 	m_isUnmarked = IsUnmarked();//note: even a non playing IA needs to update its  situation in order for team mates to know if it's unmarked or not
 
-	if (!disable_inputs && m_IA_activated)
+	if (m_IA_activated)
 	{
 		//DEFENSE
 		if (m_discoball == NULL)
@@ -60,24 +60,30 @@ void ShipIA::update(sf::Time deltaTime)
 			//2. Try to defend it
 			if (m_target_discoball != NULL)
 			{
-				if ((GetAngleVariationToObject(m_target_discoball) > IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE
-					&& (GetDistanceBetweenObjects(this, m_target_discoball) > IA_DISTANCE_FOR_DISCOBALL_GUARD_STANCE))
-					|| m_target_discoball->carried)
+				printf("angle variation: %f | distance to ball: %f\n", GetAngleVariationToObject(m_target_discoball), (GetDistanceBetweenObjects(this, m_target_discoball)));
+				if (GetAngleVariationToObject(m_target_discoball) < IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE || m_target_discoball->m_carrier)
 				{
-					//Passive defense: move around own goal
-					float distance_guard = GetDistanceBetweenObjects(this, m_target_goal);
-					float distance_discoball_to_goal = GetDistanceBetweenObjects(m_target_discoball, m_target_goal);
-					//are we "behind" the ball?
-					if (distance_discoball_to_goal < distance_guard)
-					{
-						distance_guard = distance_discoball_to_goal;
-					}
-					IA_GuardPosition(m_target_goal->getPosition(), distance_guard, deltaTime);
+					//Aggresive defense: move to the ball
+					if (m_target_discoball->m_carrier != NULL)
+						IA_MoveToObject(m_target_discoball->m_carrier, deltaTime, false);
+					else
+						IA_MoveToObject(m_target_discoball, deltaTime, true);
 				}
 				else
 				{
-					//Aggresive defense: move to the ball
-					IA_MoveToObject(m_target_discoball, deltaTime, true);
+					float distance_guard = GetDistanceBetweenObjects(this, m_target_goal);
+					float distance_discoball_to_goal = GetDistanceBetweenObjects(m_target_discoball, m_target_goal);
+
+					//are we "behind" the ball?
+					if (distance_discoball_to_goal < distance_guard)
+						IA_MoveToObject(m_target_discoball, deltaTime, true);
+					else if (GetDistanceBetweenObjects(this, m_target_discoball) > IA_DISTANCE_MIN_TO_DISCOBALL_FOR_MOVE_STANCE || m_target_discoball->m_status == DiscoballLost)
+						IA_MoveToObject(m_target_discoball, deltaTime, true);
+					else
+					{
+						//Passive defense: move around own goal
+						IA_GuardPosition(m_target_goal->getPosition(), distance_guard, deltaTime);
+					}
 				}
 			}
 			else
@@ -100,17 +106,7 @@ void ShipIA::update(sf::Time deltaTime)
 			
 			//2. Shoot at it
 			IA_MoveToPosition(m_target_goal->getPosition(), deltaTime);
-			//if (m_isUnmarked)
-				IA_ShootToPosition(m_target_goal->getPosition());
-			//else
-			//{
-			//	if (m_target_team_mate && m_target_team_mate->m_isUnmarked)
-			//	{
-			//		IA_ShootToPosition(m_target_team_mate->getPosition());
-			//	}
-			//		
-			//}
-
+			IA_ShootToPosition(m_target_goal->getPosition());
 		}
 
 		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
@@ -156,7 +152,7 @@ void ShipIA::IA_MoveToObject(GameObject* object, sf::Time deltaTime, bool antici
 {
 	if (object)
 	{
-		m_input_direction = GetInputsToGetPosition(sf::Vector2f(object->getPosition().x + anticipation * object->speed.x, object->getPosition().y + anticipation * object->speed.y), deltaTime);
+		m_input_direction = GetInputsToGetPosition(sf::Vector2f(object->getPosition().x + anticipation * object->speed.x * deltaTime.asSeconds(), object->getPosition().y + anticipation * object->speed.y * deltaTime.asSeconds()), deltaTime);
 	}
 }
 
@@ -241,7 +237,7 @@ void ShipIA::IA_ShootToPosition(sf::Vector2f position)
 	if (m_discoball != NULL)
 	{
 		const sf::Vector2f diff = sf::Vector2f(position.x - getPosition().x, position.y - getPosition().y);
-		float target_angle = SpeedToPolarAngle(diff) + M_PI;
+		float target_angle = GetSpeedToAngleRad(diff) + M_PI;
 		target_angle -= discoball_clockwise ? M_PI_2 : -M_PI_2;
 
 		float diff_angle = target_angle - discoball_curAngle;
@@ -279,7 +275,7 @@ sf::Vector2f ShipIA::GetDefensivePosition(sf::Vector2f position, float distance,
 
 	const sf::Vector2f diff = sf::Vector2f(position.x - (object_to_intercept->getPosition().x + anticipation * object_to_intercept->speed.x), 
 		position.y - (object_to_intercept->getPosition().y + anticipation * object_to_intercept->speed.y));
-	float target_angle = SpeedToPolarAngle(diff);
+	float target_angle = GetSpeedToAngleRad(diff);
 
 	sf::Vector2f target_position;
 	target_position.x = position.x - distance * sin(target_angle);
@@ -293,10 +289,10 @@ void ShipIA::IA_GuardPosition(sf::Vector2f position, float distance, sf::Time de
 	if (m_target_discoball)
 	{
 		sf::Vector2f target_pos;
-		//align with discoball's carrier
-		if (m_target_discoball->carrier)
+		//align with discoball's m_carrier
+		if (m_target_discoball->m_carrier)
 		{
-			target_pos = GetDefensivePosition(position, distance, m_target_discoball->carrier, false);
+			target_pos = GetDefensivePosition(position, distance, m_target_discoball->m_carrier, false);
 		}
 		else//align with discoball and anticipate on its movement
 		{
@@ -305,6 +301,8 @@ void ShipIA::IA_GuardPosition(sf::Vector2f position, float distance, sf::Time de
 			
 		IA_MoveToPosition(target_pos, deltaTime);
 	}
+
+	printf("Guard\n");
 }
 
 float ShipIA::GetAngleVariationToObject(GameObject* object_to_intercept)
@@ -312,23 +310,12 @@ float ShipIA::GetAngleVariationToObject(GameObject* object_to_intercept)
 	assert(object_to_intercept != NULL);
 
 	const sf::Vector2f current_diff = sf::Vector2f(getPosition().x - object_to_intercept->getPosition().x, getPosition().y - object_to_intercept->getPosition().y);
-	const float current_angle = SpeedToPolarAngle(current_diff);
+	const float current_angle = GetSpeedToAngleRad(current_diff);
 
-	
-	//printf("cur angle: %f | ", current_angle);
-
-	//const sf::Vector2f previous_object_pos = sf::Vector2f(object_to_intercept->getPosition().x - object_to_intercept->speed.x, object_to_intercept->getPosition().y - object_to_intercept->speed.y);
-	//const sf::Vector2f previous_diff = sf::Vector2f(getPosition().x - previous_object_pos.x, getPosition().y - previous_object_pos.y);
-	const sf::Vector2f previous_diff = sf::Vector2f(getPosition().x - m_target_previous_position.x, getPosition().y - m_target_previous_position.y);
-	const float previous_angle = SpeedToPolarAngle(previous_diff);
-
-	m_target_previous_position = object_to_intercept->getPosition();
-
-	//printf("prev angle: %f | ", previous_angle);
+	const sf::Vector2f future_diff = sf::Vector2f(getPosition().x - (object_to_intercept->getPosition().x + object_to_intercept->speed.x), getPosition().y - (object_to_intercept->getPosition().y + object_to_intercept->speed.y));
+	const float previous_angle = GetSpeedToAngleRad(future_diff);
 
 	float angle_variation = abs(current_angle - previous_angle);
-
-	printf("var: %f\n ", angle_variation);
 	
 	return angle_variation;
 }

@@ -24,10 +24,10 @@ Discoball::Discoball(sf::Vector2f position, sf::Vector2f speed, std::string text
 void Discoball::Init()
 {
 	collider_type = DiscoballObject;
-	carrier = NULL;
-	carried = false;
-	carrier_curAngle = -1.f;
-	carrier_curPosition = sf::Vector2f(-1.f, -1.f);
+	m_carrier = NULL;
+	m_carried = false;
+	m_carrier_curAngle = -1.f;
+	m_carrier_curPosition = sf::Vector2f(-1.f, -1.f);
 	DontGarbageMe = true;
 	discoball_curAngularSpeed = 0;
 	coeff_friction = 0;
@@ -49,7 +49,7 @@ void Discoball::update(sf::Time deltaTime)
 	if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION)
 		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION * discoball_curAngularSpeed / CARRY_MAX_ANGULAR_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
 
-	if (!carried)
+	if (!m_carried)
 	{
 		static sf::Vector2f newposition;
 
@@ -108,18 +108,18 @@ void Discoball::update(sf::Time deltaTime)
 		setColor(sf::Color(255, 255, 255, 255));
 	}
 
-	else //get carrier position
+	else //get m_carrier position
 	{
 		static sf::Vector2f new_position, new_offset;
 		static sf::Vector2f previous_position = getPosition();
 
-		new_offset.x = -DISCOBALL_GRAVITATION_DISTANCE * sin(carrier_curAngle);
-		new_offset.y = DISCOBALL_GRAVITATION_DISTANCE * cos(carrier_curAngle);
+		new_offset.x = -DISCOBALL_GRAVITATION_DISTANCE * sin(m_carrier_curAngle);
+		new_offset.y = DISCOBALL_GRAVITATION_DISTANCE * cos(m_carrier_curAngle);
 		//new_offset.x = 0;
 		//new_offset.y = 0;
 
-		new_position.x = carrier_curPosition.x + new_offset.x;
-		new_position.y = carrier_curPosition.y + new_offset.y;
+		new_position.x = m_carrier_curPosition.x + new_offset.x;
+		new_position.y = m_carrier_curPosition.y + new_offset.y;
 
 		setPosition(new_position);
 
@@ -149,7 +149,7 @@ void Discoball::DiscoballBumper(GameObject* bumper)
 	const float correction_x = (bumper->m_size.x / 2) + (m_size.x / 2);
 	const float correction_y = (bumper->m_size.y / 2) + (m_size.y / 2);
 
-	if (!carried)
+	if (!m_carried)
 	{
 		if (is_vertical_bumper)
 		{

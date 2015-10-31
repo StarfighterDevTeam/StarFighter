@@ -245,7 +245,7 @@ void InGameState::StartMainMenu()
 
 	Ship* playerShip2 = CreateCharacter(sf::Vector2f(960, 340), Quorra, RedTeam);
 	playerShip2->SetControllerType(AllControlDevices);
-	playerShip2->disable_inputs = true;
+	playerShip2->m_disable_inputs = true;
 
 	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/main_menu_background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);

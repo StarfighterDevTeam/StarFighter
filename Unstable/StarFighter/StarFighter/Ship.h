@@ -57,7 +57,7 @@ public :
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
 
-	bool disable_inputs;
+	bool m_disable_inputs;
 
 	ControlerType m_controllerType;
 	void SetControllerType(ControlerType contoller);
@@ -91,7 +91,7 @@ public :
 	bool isTacklingButtonReleased;
 	bool wasTacklingButtonReleased;
 	void DiscoballSpeedConstraints();
-	sf::Clock carrier_clock;
+	sf::Clock m_carrier_clock;
 	sf::Clock carry_again_clock;
 	sf::Clock tackle_again_clock;
 	sf::Clock brawl_duration_clock;

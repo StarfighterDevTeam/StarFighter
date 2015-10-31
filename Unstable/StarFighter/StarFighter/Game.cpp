@@ -377,7 +377,7 @@ void Game::colisionChecksV2(Time deltaTime)
 				//Do something 
 
 				//TRON SPECIFIC
-				if (score_again_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
+				if (score_again_blue_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
 				{
 					(*it2)->PlayHitFeedback();
 					Goal(RedTeam);
@@ -396,7 +396,7 @@ void Game::colisionChecksV2(Time deltaTime)
 				//Do something 
 
 				//TRON SPECIFIC
-				if (score_again_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
+				if (score_again_red_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
 				{
 					(*it2)->PlayHitFeedback();
 					Goal(BlueTeam);
@@ -590,12 +590,19 @@ float Game::GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aim
 void Game::Goal(Teams team)
 {
 	if (team == BlueTeam)
+	{
 		score_blue_team++;
+		score_again_red_clock.restart();
+	}
+		
 	else
+	{
 		score_red_team++;
+		score_again_blue_clock.restart();
+	}
+		
 
 	PlaySFX(SFX_Goal);
-	score_again_clock.restart();
 
 
 	/*

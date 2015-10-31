@@ -15,7 +15,7 @@ void Ship::Init()
 {
 	moving = false;
 	movingX = movingY = false;
-	disable_inputs = false;
+	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
 
 	//TRON SPECIFIC
@@ -76,7 +76,7 @@ void Ship::update(sf::Time deltaTime)
 
 	m_input_direction = sf::Vector2f(0, 0);
 
-	if (!disable_inputs)
+	if (!m_disable_inputs)
 	{
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_controllerType == AllControlDevices)
 		{
@@ -229,7 +229,7 @@ void Ship::UpdateRotation()
 	}
 	else
 	{
-		setRotation((SpeedToPolarAngle(speed) * 180 / (float)M_PI));
+		setRotation((GetSpeedToAngleRad(speed) * 180 / (float)M_PI));
 	}
 }
 
@@ -288,22 +288,22 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 			{
 				m_discoball = (Discoball*)discoball;
 
-				//deleting old carrier's discoball ownership
-				if (m_discoball->carried)
+				//deleting old m_carrier's discoball ownership
+				if (m_discoball->m_carried)
 				{
-					m_discoball->carrier->carry_again_clock.restart();
+					m_discoball->m_carrier->carry_again_clock.restart();
 
 					//game mode specific
 					if ((*CurrentGame).cur_GameRules == CarryToAbleInputs)
 					{
-						m_discoball->carrier->disable_inputs = true;
-						m_discoball->carrier->speed.x = 0;
-						m_discoball->carrier->speed.y = 0;
-						disable_inputs = false;
+						m_discoball->m_carrier->m_disable_inputs = true;
+						m_discoball->m_carrier->speed.x = 0;
+						m_discoball->m_carrier->speed.y = 0;
+						m_disable_inputs = false;
 						(*CurrentGame).playerShip = this;
 					}
 
-					m_discoball->carrier->m_discoball = NULL;
+					m_discoball->m_carrier->m_discoball = NULL;
 				}
 				else
 				{
@@ -311,10 +311,10 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				}
 
 				//acquisition of the discoball
-				m_discoball->carried = true;
-				m_discoball->carrier = this;
+				m_discoball->m_carried = true;
+				m_discoball->m_carrier = this;
 				discoball_curAngle = angle_collision;
-				carrier_clock.restart();
+				m_carrier_clock.restart();
 
 				//checking min and max cap values
 				//printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);
@@ -345,11 +345,11 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				(*CurrentGame).PlaySFX(SFX_Catch);
 				if (m_team == BlueTeam)
 				{
-					m_discoball->SetDiscoballStatus(DiscoballCarriedBlueTeam);
+					m_discoball->SetDiscoballStatus(Discoballm_carriedBlueTeam);
 				}
 				if (m_team == RedTeam)
 				{
-					m_discoball->SetDiscoballStatus(DiscoballCarriedRedTeam);
+					m_discoball->SetDiscoballStatus(Discoballm_carriedRedTeam);
 				}
 			}
 		}
@@ -376,7 +376,7 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 			discoball_curAngle = discoball_curAngle - (m_discoball->discoball_curAngularSpeed * cc * deltaTime.asSeconds());
 
 			//angular speed deceleration
-			if (carrier_clock.getElapsedTime().asSeconds() > CARRY_TIME_FOR_DECELERATION && m_discoball->discoball_curAngularSpeed > CARRY_BASE_ANGULAR_SPEED)
+			if (m_carrier_clock.getElapsedTime().asSeconds() > CARRY_TIME_FOR_DECELERATION && m_discoball->discoball_curAngularSpeed > CARRY_BASE_ANGULAR_SPEED)
 			{
 				if (m_discoball->discoball_curAngularSpeed > CARRY_BASE_ANGULAR_SPEED + CARRY_ANGULAR_DECELERATION)
 				{
@@ -390,13 +390,13 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 				//printf("Discoball decelerated. (speed: %f", m_discoball->discoball_curAngularSpeed);
 				DiscoballSpeedConstraints();
 				//printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
-				carrier_clock.restart();
+				m_carrier_clock.restart();
 			}
 
 			//transmitting values to the discoball
 			discoball_curAngle = fmod(discoball_curAngle, 2 * M_PI);
-			m_discoball->carrier_curAngle = discoball_curAngle;
-			m_discoball->carrier_curPosition = getPosition();
+			m_discoball->m_carrier_curAngle = discoball_curAngle;
+			m_discoball->m_carrier_curPosition = getPosition();
 		}
 	}
 }
@@ -433,13 +433,13 @@ void Ship::ThrowDiscoball()
 
 		m_discoball->SetSpeedVectorFromAbsoluteSpeed(m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE, discoball_curAngle);
 
-		m_discoball->carried = false;
+		m_discoball->m_carried = false;
 		//printf("Discoball thrown. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 		carry_again_clock.restart();
 
 		m_discoball->SetDiscoballStatus(DiscoballFree);
 
-		m_discoball->carrier = NULL;
+		m_discoball->m_carrier = NULL;
 		m_discoball = NULL;
 
 		(*CurrentGame).PlaySFX(SFX_Throw);
@@ -461,13 +461,13 @@ void Ship::ReleaseDiscoball(float angularSpeedBonus)
 		m_discoball->discoball_curAngularSpeed += angularSpeedBonus;
 		m_discoball->speed.x = -m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
 		m_discoball->speed.y = m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
-		m_discoball->carried = false;
+		m_discoball->m_carried = false;
 		//printf("Discoball released. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 		carry_again_clock.restart();
 
 		m_discoball->SetDiscoballStatus(DiscoballLost);
 
-		m_discoball->carrier = NULL;
+		m_discoball->m_carrier = NULL;
 		m_discoball = NULL;
 	}
 }
@@ -502,7 +502,7 @@ void Ship::ManageSwitchRotation()
 void Ship::SwitchRotation()
 {
 	discoball_clockwise = !discoball_clockwise;
-	carrier_clock.restart();
+	m_carrier_clock.restart();
 	isSwitchingButtonReleased = false;
 
 	(*CurrentGame).PlaySFX(SFX_Switch);
@@ -528,6 +528,9 @@ void Ship::ManageKeyReleases()
 
 void Ship::ManageTackle(bool force_input)
 {
+	if (m_disable_inputs)
+		return;
+
 	//State 0
 	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
 	{
@@ -570,7 +573,7 @@ void Ship::ManageTackle(bool force_input)
 			tackle_max_hold_clock.restart();
 		}
 
-		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, SpeedToPolarAngle(speed) + M_PI);
+		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetSpeedToAngleRad(speed) + M_PI);
 	}
 
 	//State 3
@@ -582,7 +585,7 @@ void Ship::ManageTackle(bool force_input)
 		}
 		else
 		{
-			SetSpeedVectorFromAbsoluteSpeed(GetAbsoluteSpeed() - SHIP_TACKLE_DECELERATION_WHILE_HOLDING, SpeedToPolarAngle(speed) + M_PI);
+			SetSpeedVectorFromAbsoluteSpeed(GetAbsoluteSpeed() - SHIP_TACKLE_DECELERATION_WHILE_HOLDING, GetSpeedToAngleRad(speed) + M_PI);
 		}
 	}
 
@@ -599,7 +602,7 @@ void Ship::ManageTackle(bool force_input)
 			new_absolute_speed = 0;
 		}
 
-		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, SpeedToPolarAngle(speed) + M_PI);
+		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetSpeedToAngleRad(speed) + M_PI);
 
 		if (new_absolute_speed < SHIP_MIN_SPEED_AFTER_TACKLE)
 		{
@@ -612,14 +615,6 @@ void Ship::ManageTackle(bool force_input)
 
 void Ship::ManageHitRecovery()
 {
-	if (m_isRecovering == RECOVERING_FROM_BRAWL)
-	{
-		if (hit_recovery_clock.getElapsedTime().asSeconds() > RECOVERING_FROM_BRAWL_COOLDOWN)
-		{
-			m_isRecovering = NOT_HIT;
-		}
-	}
-
 	if (m_isRecovering == RECOVERING_FROM_TACKLE)
 	{
 		if (hit_recovery_clock.getElapsedTime().asSeconds() > RECOVERING_FROM_TACKLE_COOLDOWN)
@@ -729,7 +724,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 
 	//U-turn?
 	/*
-	float angle = SpeedToPolarAngle(sf::Vector2f(diff_x, diff_y)) * 180 / M_PI;
+	float angle = GetSpeedToAngleRad(sf::Vector2f(diff_x, diff_y)) * 180 / M_PI;
 	if (abs(getRotation() - angle) > SHIP_CLICK_ANGLE_FOR_UTURN)
 	{
 		printf("\ngetrot : %f, angle: %f\n", getRotation(), angle);

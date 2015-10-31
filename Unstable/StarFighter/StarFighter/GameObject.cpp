@@ -189,7 +189,7 @@ float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 	return s;
 }
 
-float GameObject::SpeedToPolarAngle(sf::Vector2f curSpeed)
+float GameObject::GetSpeedToAngleRad(sf::Vector2f curSpeed)
 {
 	const float a = curSpeed.x;
 	const float b = curSpeed.y;
