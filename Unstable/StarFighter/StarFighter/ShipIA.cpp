@@ -57,6 +57,8 @@ void ShipIA::update(sf::Time deltaTime)
 				SetTargetGoal(true);
 			}
 			
+			bool isGoalGuarded = m_target_goal ? isTargetGoalGuarded() : false;
+
 			//2. Try to defend it
 			if (m_target_discoball != NULL)
 			{
@@ -76,9 +78,14 @@ void ShipIA::update(sf::Time deltaTime)
 
 					//are we "behind" the ball?
 					if (distance_discoball_to_goal < distance_guard)
+					{
+						//run back to the ball
 						IA_MoveToObject(m_target_discoball, deltaTime, true);
+					}
 					else if (GetDistanceBetweenObjects(this, m_target_discoball) > IA_DISTANCE_MIN_TO_DISCOBALL_FOR_MOVE_STANCE || m_target_discoball->m_status == DiscoballLost)
+					{
 						IA_MoveToObject(m_target_discoball, deltaTime, true);
+					}
 					else
 					{
 						//Passive defense: move around own goal
@@ -104,6 +111,8 @@ void ShipIA::update(sf::Time deltaTime)
 				SetTargetGoal(false);
 			}
 			
+			bool isGoalGuarded = m_target_goal ? isTargetGoalGuarded() : false;
+
 			//2. Shoot at it
 			IA_MoveToPosition(m_target_goal->getPosition(), deltaTime);
 			IA_ShootToPosition(m_target_goal->getPosition());
@@ -160,7 +169,7 @@ void ShipIA::IA_MoveToObject(GameObject* object, sf::Time deltaTime, bool antici
 bool ShipIA::SetTargetDiscoball()
 {
 	//find closest discoball
-	m_target_discoball = (Discoball*)FindClosestGameObjectTyped(DiscoballObject);
+	m_target_discoball = (Discoball*)FindClosestGameObjectTyped(this, DiscoballObject);
 
 	return m_target_discoball;	
 }
@@ -176,7 +185,7 @@ bool ShipIA::SetTargetGoal(bool own_goal)
 		type = GoalGreenObject;
 
 	//find closest goal
-	m_target_goal = (Goal*)FindClosestGameObjectTyped(type);
+	m_target_goal = (Goal*)FindClosestGameObjectTyped(this, type);
 
 	return m_target_goal;
 }
@@ -186,7 +195,7 @@ bool ShipIA::SetTargetTeamMate(bool only_unmarked)
 	GameObjectType type = m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
 
 	//find closest unmarked team mate
-	m_target_team_mate = (Ship*)FindClosestGameObjectTyped(type, only_unmarked);
+	m_target_team_mate = (Ship*)FindClosestGameObjectTyped(this, type, only_unmarked);
 
 	return m_target_team_mate;
 }
@@ -318,4 +327,36 @@ float ShipIA::GetAngleVariationToObject(GameObject* object_to_intercept)
 	float angle_variation = abs(current_angle - previous_angle);
 	
 	return angle_variation;
+}
+
+bool ShipIA::isTargetGoalGuarded()
+{
+	if (m_target_goal)
+	{
+		GameObjectType type = m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
+
+		GameObject* closest_defender = Ship::FindClosestGameObjectTyped(m_target_goal, type);
+
+		if (closest_defender)
+		{
+			sf::Vector2f diff_position = sf::Vector2f(m_target_goal->getPosition().x - closest_defender->getPosition().x, m_target_goal->getPosition().y - closest_defender->getPosition().y);
+
+			//can we find a defender nearby the goal?
+			if (diff_position.x * diff_position.x + diff_position.y * diff_position.y < IA_DISTANCE_FOR_UNGUARDED * IA_DISTANCE_FOR_UNGUARDED)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	LOGGER_WRITE(Logger::Priority::DEBUG, "IsTargetGoalGuarded() calls a NULL target goal.\n");
+	return false;
 }

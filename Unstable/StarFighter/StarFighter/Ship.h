@@ -123,7 +123,7 @@ public :
 	Ship* m_target_opponent;
 	Ship* m_target_team_mate;
 	bool SetTargetOpponent();
-	GameObject* FindClosestGameObjectTyped(GameObjectType type, bool needs_to_be_unmarked = false);
+	static GameObject* FindClosestGameObjectTyped(GameObject* this_object, GameObjectType type, bool needs_to_be_unmarked = false);
 
 protected:
 	bool moving;

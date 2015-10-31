@@ -40,6 +40,7 @@ public :
 	void ActivateIA(bool activate);
 	sf::Vector2f GetDefensivePosition(sf::Vector2f position, float distance, GameObject* object_to_intercept, bool anticipation = false);
 	float GetAngleVariationToObject(GameObject* object_to_intercept);
+	bool isTargetGoalGuarded();
 
 private:
 	bool m_IA_activated;

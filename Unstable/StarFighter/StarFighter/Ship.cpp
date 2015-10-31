@@ -902,12 +902,12 @@ bool Ship::SetTargetOpponent()
 	GameObjectType type = m_team == BlueTeam ? PlayerRedShip : PlayerBlueShip;
 
 	//find closest opponent
-	m_target_opponent = (Ship*)FindClosestGameObjectTyped(type, false);
+	m_target_opponent = (Ship*)FindClosestGameObjectTyped(this, type, false);
 
 	return m_target_opponent;
 }
 
-GameObject* Ship::FindClosestGameObjectTyped(GameObjectType type, bool needs_to_be_unmarked)
+GameObject* Ship::FindClosestGameObjectTyped(GameObject* this_object, GameObjectType type, bool needs_to_be_unmarked)
 {
 	std::vector<GameObject*> sceneGameObjectsTyped = (*CurrentGame).GetSceneGameObjectsTyped(type);
 	size_t sceneGameObjectsTypedSize = sceneGameObjectsTyped.size();
@@ -929,14 +929,14 @@ GameObject* Ship::FindClosestGameObjectTyped(GameObjectType type, bool needs_to_
 			if (needs_to_be_unmarked && (type == PlayerBlueShip || type == PlayerRedShip))
 			{
 				Ship* ship = (Ship*)(sceneGameObjectsTyped[j]);
-				if (!ship->m_isUnmarked || ship == this)
+				if (!ship->m_isUnmarked || ship == this_object)
 				{
 					continue;
 				}
 			}
 
-			const float a = getPosition().x - sceneGameObjectsTyped[j]->getPosition().x;
-			const float b = getPosition().y - sceneGameObjectsTyped[j]->getPosition().y;
+			const float a = this_object->getPosition().x - sceneGameObjectsTyped[j]->getPosition().x;
+			const float b = this_object->getPosition().y - sceneGameObjectsTyped[j]->getPosition().y;
 
 			float distance_to_ref = (a * a) + (b * b);
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
