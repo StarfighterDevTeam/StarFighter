@@ -101,7 +101,6 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
-		
 	}
 	if (character == Katyusha)
 	{
@@ -121,7 +120,6 @@ Ship* InGameState::CreateCharacter(sf::Vector2f position, PlayableCharacters cha
 			(*CurrentGame).addToScene(newship, PlayerShipLayer, type);
 			return newship;
 		}
-		
 	}
 	if (character == Savannah)
 	{
@@ -279,11 +277,10 @@ void InGameState::StartMultiGame(bool reset_scores)
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y/2), Savannah, BlueTeam);
-	playerShip2->SetControllerType(JoystickControl2);
+	//Ship* playerShip2 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y/2), Savannah, BlueTeam);
+	//playerShip2->SetControllerType(JoystickControl2);
 
 	CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100 / 2, REF_WINDOW_RESOLUTION_Y / 3), Quorra, RedTeam, IAHard, true);
-	CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 100 / 2, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAHard, true);
 
 	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
 	//GameObject* background = new GameObject(sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920 * 1.5f, 1080), sf::Vector2f(960 * 1.5f, REF_WINDOW_RESOLUTION_Y/2));

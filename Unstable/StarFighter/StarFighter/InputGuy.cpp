@@ -60,7 +60,7 @@ bool InputGuy::isSwitchingRotation(ControlerType device)
 	return false;
 }
 
-bool InputGuy::isDodging(ControlerType device)
+bool InputGuy::isTackling(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{

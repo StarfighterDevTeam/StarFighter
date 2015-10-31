@@ -26,15 +26,13 @@ void Ship::Init()
 	isFiringButtonReleased = false;
 	wasFiringButtonReleased = false;
 	isSwitchingButtonReleased = false;
-	isDodgingButtonReleased = false;
+	isTacklingButtonReleased = false;
 
-	isTackling = NOT_TACKLING;
-	isThrowing = NOT_THROWING;
-	isBrawling = NOT_BRAWLING;
-	isDodging = NOT_DODGING;
-	isRecovering = NOT_HIT;
+	m_isTackling = NOT_TACKLING;
+	m_isThrowing = NOT_THROWING;
+	m_isRecovering = NOT_HIT;
 
-	throw_curSpeedBonus = 0.f;
+	m_throw_curSpeedBonus = 0.f;
 
 	m_team = BlueTeam;
 	isLaunchingScript = false;
@@ -106,24 +104,16 @@ void Ship::update(sf::Time deltaTime)
 		movingY = m_input_direction.y != 0;
 	}
 
-	if (isTackling == NOT_TACKLING && isBrawling == NOT_BRAWLING && isRecovering == NOT_HIT && isDodging != INITIATE_DODGING)
+	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
 	{
 		GetDirectionInputs(m_input_direction);
 		MaxSpeedConstraints();
 		IdleDecelleration(deltaTime);
 	}
-
-	//ManageDodge();
 	
-	//if (!InputGuy::isStraffing(m_controllerType))
-	//{
 	UpdateRotation();
-	//}
 	
 	ManageTackle();
-	//ManageBrawl();
-	
-	//printf("speed : %f, %f \n", speed.x, speed.y);
 
 	GameObject::update(deltaTime);
 
@@ -132,11 +122,8 @@ void Ship::update(sf::Time deltaTime)
 		ResetStatus();
 	}
 
-	if (isDodging == NOT_DODGING)
-	{
-		ManageFire();
-	}
-
+	ManageFire();
+	
 	ManageSwitchRotation();
 	
 	ManageDiscoball(deltaTime);
@@ -152,9 +139,7 @@ void Ship::update(sf::Time deltaTime)
 
 void Ship::ResetStatus()
 {
-	isTackling = NOT_TACKLING;
-	isBrawling = NOT_BRAWLING;
-	isDodging = NOT_DODGING;
+	m_isTackling = NOT_TACKLING;
 	ghost = false;
 }
 
@@ -255,11 +240,11 @@ float Ship::GetMaxSpeed()
 	//bonus given after throwing the discoball
 	if (throw_bonus_speed_clock.getElapsedTime().asSeconds() < THROW_BONUS_SPEED_TIMER)
 	{
-		if (isThrowing == AFTER_THROW)
+		if (m_isThrowing == AFTER_THROW)
 		{
-			if (isTackling == NOT_TACKLING && m_discoball == NULL) //for safety
+			if (m_isTackling == NOT_TACKLING && m_discoball == NULL) //for safety
 			{
-				ship_max_speed = SHIP_MAX_SPEED + throw_curSpeedBonus;
+				ship_max_speed = SHIP_MAX_SPEED + m_throw_curSpeedBonus;
 			}
 		}
 	}
@@ -274,18 +259,18 @@ void Ship::MaxSpeedConstraints()
 	//bonus given after throwing the discoball
 	if (throw_bonus_speed_clock.getElapsedTime().asSeconds() < THROW_BONUS_SPEED_TIMER)
 	{
-		if (isThrowing == AFTER_THROW)
+		if (m_isThrowing == AFTER_THROW)
 		{
-			if (isTackling == NOT_TACKLING && m_discoball == NULL) //for safety
+			if (m_isTackling == NOT_TACKLING && m_discoball == NULL) //for safety
 			{
-				ship_max_speed = SHIP_MAX_SPEED + throw_curSpeedBonus;
+				ship_max_speed = SHIP_MAX_SPEED + m_throw_curSpeedBonus;
 			}
 		}
 	}
 	else
 	{
-		isThrowing = NOT_THROWING;
-		throw_curSpeedBonus = 0;
+		m_isThrowing = NOT_THROWING;
+		m_throw_curSpeedBonus = 0;
 	}
 
 	//max speed constraints
@@ -297,7 +282,7 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 {
 	if (m_discoball == NULL)
 	{
-		if (isRecovering == NOT_HIT)
+		if (m_isRecovering == NOT_HIT)
 		{
 			if (carry_again_clock.getElapsedTime().asSeconds() > CARRY_AGAIN_COOLDOWN)
 			{
@@ -355,7 +340,7 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				}
 
 				//canceling speed bonus on receiving the ball
-				isThrowing = NOT_THROWING;
+				m_isThrowing = NOT_THROWING;
 
 				(*CurrentGame).PlaySFX(SFX_Catch);
 				if (m_team == BlueTeam)
@@ -437,9 +422,9 @@ void Ship::ThrowDiscoball()
 		//throw in rotation direction #optional line
 		//discoball_curAngle = (getRotation() + 180.f) * M_PI / 180.f;
 
-		isThrowing = AFTER_THROW;
+		m_isThrowing = AFTER_THROW;
 		throw_bonus_speed_clock.restart();
-		throw_curSpeedBonus = m_discoball->discoball_curAngularSpeed * SHIP_MAX_SPEED_MULTIPLIER_AFTER_THROW;
+		m_throw_curSpeedBonus = m_discoball->discoball_curAngularSpeed * SHIP_MAX_SPEED_MULTIPLIER_AFTER_THROW;
 
 		m_discoball->discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
 
@@ -534,17 +519,17 @@ void Ship::ManageKeyReleases()
 	{
 		isSwitchingButtonReleased = true;
 	}
-	if (!InputGuy::isDodging(m_controllerType))
+	if (!InputGuy::isTackling(m_controllerType))
 	{
-		isDodgingButtonReleased = true;
-		wasDodgingButtonReleased = true;
+		isTacklingButtonReleased = true;
+		wasTacklingButtonReleased = true;
 	}
 }
 
-void Ship::ManageTackle()
+void Ship::ManageTackle(bool force_input)
 {
 	//State 0
-	if (isTackling == NOT_TACKLING && isRecovering == NOT_HIT)
+	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
 	{
 		if (m_discoball == NULL || m_discoball != NULL)
 		{
@@ -552,14 +537,13 @@ void Ship::ManageTackle()
 			{
 				if (moving)
 				{
-					if (InputGuy::isDodging(m_controllerType) && wasDodgingButtonReleased)
+					if ((InputGuy::isTackling(m_controllerType) || force_input)
+						&& wasTacklingButtonReleased)
 					{
-						isTackling = INITIATE_TACLKE;
+						m_isTackling = INITIATE_TACLKE;
 
-						//isFiringButtonReleased = false;
-						//wasFiringButtonReleased = false;
-						isDodgingButtonReleased = false;
-						wasDodgingButtonReleased = false;
+						isTacklingButtonReleased = false;
+						wasTacklingButtonReleased = false;
 
 						MaxSpeedConstraints();//avoids to cumulate multiple bonuses
 
@@ -571,7 +555,7 @@ void Ship::ManageTackle()
 	}
 
 	//State 1
-	if (isTackling == INITIATE_TACLKE)
+	if (m_isTackling == INITIATE_TACLKE)
 	{
 		//max value not reach = linear increase of speed
 		float new_absolute_speed = GetAbsoluteSpeed();
@@ -582,22 +566,19 @@ void Ship::ManageTackle()
 		else
 		{
 			new_absolute_speed = SHIP_TACKLE_MAX_SPEED;
-			isTackling = HOLDING_TACKLE;
+			m_isTackling = HOLDING_TACKLE;
 			tackle_max_hold_clock.restart();
 		}
 
 		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, SpeedToPolarAngle(speed) + M_PI);
-		
-		//printf("speed : %f, %f \n", speed.x, speed.y);
 	}
 
 	//State 3
-	if (isTackling == HOLDING_TACKLE)
+	if (m_isTackling == HOLDING_TACKLE)
 	{
-		if (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasDodgingButtonReleased)
+		if (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased)
 		{
-			isTackling = ENDING_TACKLE;
-			//printf("speed end of tackle : %f, %f \n", speed.x, speed.y);
+			m_isTackling = ENDING_TACKLE;
 		}
 		else
 		{
@@ -606,7 +587,7 @@ void Ship::ManageTackle()
 	}
 
 	//State 4
-	if (isTackling == ENDING_TACKLE)
+	if (m_isTackling == ENDING_TACKLE)
 	{
 		float new_absolute_speed = GetAbsoluteSpeed();
 		if (new_absolute_speed - SHIP_TACKLE_DECELERATION > 0)
@@ -622,7 +603,7 @@ void Ship::ManageTackle()
 
 		if (new_absolute_speed < SHIP_MIN_SPEED_AFTER_TACKLE)
 		{
-			isTackling = NOT_TACKLING;
+			m_isTackling = NOT_TACKLING;
 			tackle_again_clock.restart();
 			//printf("speed normal : %f, %f \n", speed.x, speed.y);
 		}
@@ -631,39 +612,39 @@ void Ship::ManageTackle()
 
 void Ship::ManageHitRecovery()
 {
-	if (isRecovering == RECOVERING_FROM_BRAWL)
+	if (m_isRecovering == RECOVERING_FROM_BRAWL)
 	{
 		if (hit_recovery_clock.getElapsedTime().asSeconds() > RECOVERING_FROM_BRAWL_COOLDOWN)
 		{
-			isRecovering = NOT_HIT;
+			m_isRecovering = NOT_HIT;
 		}
 	}
 
-	if (isRecovering == RECOVERING_FROM_TACKLE)
+	if (m_isRecovering == RECOVERING_FROM_TACKLE)
 	{
 		if (hit_recovery_clock.getElapsedTime().asSeconds() > RECOVERING_FROM_TACKLE_COOLDOWN)
 		{
-			isRecovering = NOT_HIT;
+			m_isRecovering = NOT_HIT;
 		}
 	}
 }
 
 void Ship::ManageFeedbacks()
 {
-	//if (isTackling != NOT_TACKLING || isBrawling != NOT_BRAWLING)
+	//if (m_isTackling != NOT_TACKLING || isBrawling != NOT_BRAWLING)
 	//{
 	//	setColor(Color(255, 0, 0, 255));
 	//}
-	//else if (isRecovering != NOT_HIT)
-	if (isRecovering != NOT_HIT)
+	//else if (m_isRecovering != NOT_HIT)
+	if (m_isRecovering != NOT_HIT)
 	{
 		setColor(Color(0, 0, 255, 255));
 	}
-	//else if (isThrowing != NOT_THROWING)
+	//else if (m_isThrowing != NOT_THROWING)
 	//{
 	//	setColor(Color(0, 255, 0, 255));
 	//}
-	//else if (isDodging != NOT_DODGING)
+	//else if (isTackling != NOT_DODGING)
 	//{
 	//	setColor(Color(255, 0, 0, 129));
 	//	if (m_discoball != NULL)
@@ -686,138 +667,37 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 {
 	Ship* player2 = (Ship*)player;
 
-	if (isTackling != NOT_TACKLING || isBrawling != NOT_BRAWLING)
+	if (m_isTackling != NOT_TACKLING)
 	{
-		if (player2->isRecovering == NOT_HIT)
+		if (player2->m_isRecovering == NOT_HIT)
 		{
 			if (player2->m_discoball != NULL)
 			{
 				player2->ReleaseDiscoball();
 			}
 
-			if (player2->isTackling != NOT_TACKLING || player2->isBrawling != NOT_BRAWLING)
+			if (player2->m_isTackling != NOT_TACKLING)
 			{
-				if (isRecovering == NOT_HIT)
+				if (m_isRecovering == NOT_HIT)
 				{
 					if (m_discoball != NULL)
 					{
 						ReleaseDiscoball();
 					}
 
-					isTackling = NOT_TACKLING;
-					//isRecovering = RECOVERING_FROM_TACKLE;
+					m_isTackling = NOT_TACKLING;
+					//m_isRecovering = RECOVERING_FROM_TACKLE;
 					hit_recovery_clock.restart();
 					speed.x = 0;
 					speed.y = 0;
 				}
 			}
 
-			player2->isTackling = NOT_TACKLING;
-			//player2->isRecovering = RECOVERING_FROM_TACKLE;
+			player2->m_isTackling = NOT_TACKLING;
+			//player2->m_isRecovering = RECOVERING_FROM_TACKLE;
 			player2->hit_recovery_clock.restart();
 			player2->speed.x = 0;
 			player2->speed.y = 0;
-		}
-	}
-}
-
-void Ship::ManageBrawl()
-{
-	//State 0
-	if (isBrawling == NOT_BRAWLING)
-	{
-		if (m_discoball == NULL)
-		{
-			if (brawl_again_clock.getElapsedTime().asSeconds() > BRAWL_AGAIN_COOLDOWN)
-			{
-				if (isSwitchingButtonReleased)
-				{
-					if (InputGuy::isSwitchingRotation(m_controllerType))
-					{
-						isBrawling = INITIATE_BRAWL;
-						brawl_duration_clock.restart();
-						isSwitchingButtonReleased = false;
-
-						float angle = getRotation() / 180.f * M_PI;
-						SetSpeedVectorFromAbsoluteSpeed(- SHIP_SPEED_ON_BRAWLING, angle);
-
-						(*CurrentGame).PlaySFX(SFX_Switch);
-					}
-				}
-			}
-		}
-	}
-
-	if (isBrawling == INITIATE_BRAWL)
-	{
-		if (brawl_duration_clock.getElapsedTime().asSeconds() > SHIP_BRAWL_DURATION)
-		{
-			speed.x = 0;
-			speed.y = 0;
-
-			isBrawling = ENDING_BRAWL;
-			brawl_again_clock.restart();
-		}
-	}
-
-	if (isBrawling == ENDING_BRAWL)
-	{
-		if (brawl_again_clock.getElapsedTime().asSeconds() > BRAWL_AGAIN_COOLDOWN)
-		{
-			isBrawling = NOT_BRAWLING;
-		}
-	}
-}
-
-void Ship::ManageDodge()
-{
-	//State 0
-	if (isDodging == NOT_DODGING)
-	{
-		if (m_discoball != NULL)
-		{
-			if (dodge_again_clock.getElapsedTime().asSeconds() > DODGE_AGAIN_COOLDOWN)
-			{
-				if (isDodgingButtonReleased)
-				{
-					if ((speed.x * speed.x) + (speed.y * speed.y) > SHIP_MIN_SPEED_FOR_DODGE * SHIP_MIN_SPEED_FOR_DODGE)
-					{
-						if (InputGuy::isDodging(m_controllerType))
-						{
-							isDodging = INITIATE_DODGING;
-							dodge_duration_clock.restart();
-							isDodgingButtonReleased = false;
-
-							float angle = SpeedToPolarAngle(speed);
-							SetSpeedVectorFromAbsoluteSpeed(-SHIP_SPEED_BONUS_ON_DODGING * SHIP_MAX_SPEED, angle);
-
-							ghost = true;
-
-							if (m_discoball != NULL)
-							{
-								m_discoball->ghost = true;
-							}
-
-							(*CurrentGame).PlaySFX(SFX_Tackle);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if (isDodging == INITIATE_DODGING)
-	{
-		if (dodge_duration_clock.getElapsedTime().asSeconds() > SHIP_DODGE_DURATION)
-		{
-			isDodging = NOT_DODGING;
-			dodge_again_clock.restart();
-			ghost = false;
-
-			if (m_discoball != NULL)
-			{
-				m_discoball->ghost = false;
-			}
 		}
 	}
 }

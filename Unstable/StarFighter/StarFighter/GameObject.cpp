@@ -219,6 +219,9 @@ void GameObject::SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float cur
 
 float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)
 {
+	assert(object1 != NULL);
+	assert(object2 != NULL);
+
 	Vector2f current_diff = sf::Vector2f(object1->getPosition().x - object2->getPosition().x, object1->getPosition().y - object2->getPosition().y);
 	return GetAbsoluteSpeed(current_diff);
 }

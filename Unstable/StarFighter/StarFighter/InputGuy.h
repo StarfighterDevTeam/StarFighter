@@ -24,7 +24,7 @@ class InputGuy
 public:
 	static Vector2f getDirections(ControlerType device = AllControlDevices);
 	static bool isFiring(ControlerType device = AllControlDevices);
-	static bool isDodging(ControlerType device = AllControlDevices);
+	static bool isTackling(ControlerType device = AllControlDevices);
 	static bool isSwitchingRotation(ControlerType device = AllControlDevices);
 	static bool isStraffing(ControlerType device = AllControlDevices);
 	static bool isChangingResolution();

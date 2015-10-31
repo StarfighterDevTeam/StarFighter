@@ -23,20 +23,6 @@ enum ThrowingStatus
 	AFTER_THROW,
 };
 
-enum BrawlingStatus
-{
-	NOT_BRAWLING,
-	INITIATE_BRAWL,
-	ENDING_BRAWL,
-};
-
-enum DodingStatus
-{
-	NOT_DODGING,
-	INITIATE_DODGING,
-	ENDING_DODGE,
-};
-
 enum HitRecoveryStatus
 {
 	NOT_HIT,
@@ -93,9 +79,7 @@ public :
 	void ReleaseDiscoball(float angularSpeedBonus = 0.f);
 	void UpdateRotation();
 	void ManageFire();
-	void ManageTackle();
-	void ManageBrawl();
-	void ManageDodge();
+	void ManageTackle(bool force_input = false);
 	void ManageSwitchRotation();
 	void ManageKeyReleases();
 	void ManageFeedbacks();
@@ -104,8 +88,8 @@ public :
 	bool isFiringButtonReleased;
 	bool wasFiringButtonReleased;
 	bool isSwitchingButtonReleased;
-	bool isDodgingButtonReleased;
-	bool wasDodgingButtonReleased;
+	bool isTacklingButtonReleased;
+	bool wasTacklingButtonReleased;
 	void DiscoballSpeedConstraints();
 	sf::Clock carrier_clock;
 	sf::Clock carry_again_clock;
@@ -117,13 +101,11 @@ public :
 	sf::Clock dodge_duration_clock;
 	sf::Clock dodge_again_clock;
 
-	TacklingStatus isTackling;
-	ThrowingStatus isThrowing;
-	BrawlingStatus isBrawling;
-	HitRecoveryStatus isRecovering;
-	DodingStatus isDodging;
+	TacklingStatus m_isTackling;
+	ThrowingStatus m_isThrowing;
+	HitRecoveryStatus m_isRecovering;
 	sf::Clock tackle_max_hold_clock;
-	float throw_curSpeedBonus;
+	float m_throw_curSpeedBonus;
 
 	Teams m_team;
 	void GetPortal(GameObject* portal) override;
