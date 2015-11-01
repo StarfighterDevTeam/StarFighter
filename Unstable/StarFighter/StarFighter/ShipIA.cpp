@@ -69,24 +69,37 @@ void ShipIA::update(sf::Time deltaTime)
 				//Are we "behind" the ball?
 				if (isOffside())
 				{
-					//Run back to the ball
-					IA_MoveToObject(m_target_discoball, deltaTime, true);
-
-					//Seems safe to use tackle
-					if (GetAngleVariationToObject(m_target_discoball) * deltaTime.asSeconds() < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL || m_target_discoball->m_carrier)
+					//Run back to the discoball carrier if any
+					if (m_target_discoball->m_carrier)
 					{
-						printf("angle variation: %f -> TACKLE !!", GetAngleVariationToObject(m_target_discoball) * deltaTime.asSeconds());
-						Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+						IA_MoveToObject(m_target_discoball->m_carrier, deltaTime, true);
+						//Seems safe to use tackle
+						if (GetAngleVariationToObject(m_target_discoball->m_carrier) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
+						{
+							Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+						}
+						
 					}
+					//otherwise, run back to the discoball itself
 					else
 					{
-						printf("angle variation: %f | distance to ball: %f\n", GetAngleVariationToObject(m_target_discoball) * deltaTime.asSeconds(), (GetDistanceBetweenObjects(this, m_target_discoball)));
+						IA_MoveToObject(m_target_discoball, deltaTime, true);
+						//Seems safe to use tackle
+						if (GetAngleVariationToObject(m_target_discoball) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
+						{
+							Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+						}
 					}
 				}
 				//Ball is uncontested? let's go get it.
 				else if (!isTargetBallContested())
 				{
 					IA_MoveToObject(m_target_discoball, deltaTime, true);
+					//Seems safe to use tackle
+					if (GetAngleVariationToObject(m_target_discoball) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
+					{
+						Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+					}
 				}
 				//Ok, we are not offside, ball is contested, let's think: should we go contest it or just wait in defense?
 				else
@@ -439,7 +452,7 @@ bool ShipIA::isTargetBallContested()
 		GameObject* opponent = FindClosestGameObjectTyped(m_target_discoball, GetOpponentGameObjectType(this));
 		const float distance_discoball_to_opponent = GetDistanceBetweenObjects(opponent, m_target_discoball);
 
-		if (distance_discoball_to_opponent > IA_DISTANCE_FOR_UNCONTESTED || (distance_to_target < distance_discoball_to_opponent))
+		if (distance_discoball_to_opponent > IA_DISTANCE_FOR_UNCONTESTED || (distance_to_target <= distance_discoball_to_opponent))
 			return false;
 		else
 			return true;

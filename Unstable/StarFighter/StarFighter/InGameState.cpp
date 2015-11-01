@@ -276,7 +276,7 @@ void InGameState::StartMultiGame(bool reset_scores)
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
+	Ship* playerShip1 = CreateIACharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam, IAHard);
 	playerShip1->SetControllerType(AllControlDevices);
 
 	// #### HACK

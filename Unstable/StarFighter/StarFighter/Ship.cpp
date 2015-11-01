@@ -17,6 +17,7 @@ void Ship::Init()
 	movingX = movingY = false;
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
+	m_tackle_cooldown_init = true;
 
 	//TRON SPECIFIC
 	m_discoball = NULL;
@@ -533,7 +534,7 @@ void Ship::ManageTackle(bool force_input)
 	{
 		if (m_discoball == NULL || m_discoball != NULL)
 		{
-			if (tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
+			if (m_tackle_cooldown_init || tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
 			{
 				if (moving)
 				{
@@ -541,6 +542,7 @@ void Ship::ManageTackle(bool force_input)
 						&& wasTacklingButtonReleased)
 					{
 						m_isTackling = INITIATE_TACLKE;
+						m_tackle_cooldown_init = false;
 
 						isTacklingButtonReleased = false;
 						wasTacklingButtonReleased = false;
