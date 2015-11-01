@@ -250,8 +250,7 @@ void ShipIA::IA_ShootToPosition(sf::Vector2f position)
 {
 	if (m_discoball != NULL)
 	{
-		const sf::Vector2f diff = sf::Vector2f(position.x - getPosition().x, position.y - getPosition().y);
-		float target_angle = GetSpeedToAngleRad(diff) + M_PI;
+		float target_angle = GetAngleRadBetweenPositions(getPosition(), position);
 		target_angle -= discoball_clockwise ? M_PI_2 : -M_PI_2;
 
 		float diff_angle = target_angle - discoball_curAngle;
@@ -287,9 +286,9 @@ sf::Vector2f ShipIA::GetDefensivePosition(sf::Vector2f position, float distance,
 {
 	assert(object_to_intercept != NULL);
 
-	const sf::Vector2f diff = sf::Vector2f(position.x - (object_to_intercept->getPosition().x + anticipation * object_to_intercept->speed.x), 
-		position.y - (object_to_intercept->getPosition().y + anticipation * object_to_intercept->speed.y));
-	float target_angle = GetSpeedToAngleRad(diff);
+	const sf::Vector2f position_to_intercept = sf::Vector2f(object_to_intercept->getPosition().x + anticipation * object_to_intercept->speed.x,
+		object_to_intercept->getPosition().y + anticipation * object_to_intercept->speed.y);
+	float target_angle = GetAngleRadBetweenPositions(position, position_to_intercept);
 
 	sf::Vector2f target_position;
 	target_position.x = position.x - distance * sin(target_angle);
@@ -323,11 +322,13 @@ float ShipIA::GetAngleVariationToObject(GameObject* object_to_intercept)
 {
 	assert(object_to_intercept != NULL);
 
-	const sf::Vector2f current_diff = sf::Vector2f(getPosition().x - object_to_intercept->getPosition().x, getPosition().y - object_to_intercept->getPosition().y);
-	const float current_angle = GetSpeedToAngleRad(current_diff);
+	const float current_angle = GetAngleRadBetweenObjects(this, object_to_intercept);
 
-	const sf::Vector2f future_diff = sf::Vector2f(getPosition().x - (object_to_intercept->getPosition().x + object_to_intercept->speed.x), getPosition().y - (object_to_intercept->getPosition().y + object_to_intercept->speed.y));
-	const float previous_angle = GetSpeedToAngleRad(future_diff);
+	const sf::Vector2f future_position = sf::Vector2f(getPosition().x + speed.x,
+		getPosition().y + speed.y); 
+	const sf::Vector2f future_position_to_intercept = sf::Vector2f(object_to_intercept->getPosition().x + object_to_intercept->speed.x,
+		object_to_intercept->getPosition().y + object_to_intercept->speed.y);
+	const float previous_angle = GetAngleRadBetweenPositions(future_position, future_position_to_intercept);
 
 	float angle_variation = abs(current_angle - previous_angle);
 	
@@ -338,23 +339,13 @@ bool ShipIA::isTargetGoalGuarded()
 {
 	if (m_target_goal)
 	{
-		GameObjectType type = m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
+		GameObjectType type = m_target_goal->m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
 
 		GameObject* closest_defender = Ship::FindClosestGameObjectTyped(m_target_goal, type);
 
 		if (closest_defender)
 		{
-			sf::Vector2f diff_position = sf::Vector2f(m_target_goal->getPosition().x - closest_defender->getPosition().x, m_target_goal->getPosition().y - closest_defender->getPosition().y);
-
-			//can we find a defender nearby the goal?
-			if (diff_position.x * diff_position.x + diff_position.y * diff_position.y < IA_DISTANCE_FOR_UNGUARDED * IA_DISTANCE_FOR_UNGUARDED)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return GetDistanceBetweenObjects(closest_defender, m_target_goal) < IA_DISTANCE_FOR_UNGUARDED;
 		}
 		else
 		{

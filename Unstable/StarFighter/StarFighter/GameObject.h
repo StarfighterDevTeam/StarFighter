@@ -105,11 +105,14 @@ public:
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();
-	float GetAbsoluteSpeed(sf::Vector2f speed_);
 	void SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle);
-	float GetSpeedToAngleRad(sf::Vector2f curSpeed);
-	bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
-	float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
+
+	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
+	static float GetAbsoluteSpeed(sf::Vector2f speed_);
+	static float GetAngleRadForSpeed(sf::Vector2f curSpeed);
+	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
+	static float GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2);
+	static float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
 
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);

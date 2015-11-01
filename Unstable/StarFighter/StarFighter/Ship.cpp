@@ -229,7 +229,7 @@ void Ship::UpdateRotation()
 	}
 	else
 	{
-		setRotation((GetSpeedToAngleRad(speed) * 180 / (float)M_PI));
+		setRotation((GetAngleRadForSpeed(speed) * 180 / (float)M_PI));
 	}
 }
 
@@ -573,7 +573,7 @@ void Ship::ManageTackle(bool force_input, float force_hold_duration)
 			tackle_max_hold_clock.restart();
 		}
 
-		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetSpeedToAngleRad(speed) + M_PI);
+		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetAngleRadForSpeed(speed) + M_PI);
 	}
 
 	//State 3
@@ -586,7 +586,7 @@ void Ship::ManageTackle(bool force_input, float force_hold_duration)
 		}
 		else
 		{
-			SetSpeedVectorFromAbsoluteSpeed(GetAbsoluteSpeed() - SHIP_TACKLE_DECELERATION_WHILE_HOLDING, GetSpeedToAngleRad(speed) + M_PI);
+			SetSpeedVectorFromAbsoluteSpeed(GetAbsoluteSpeed() - SHIP_TACKLE_DECELERATION_WHILE_HOLDING, GetAngleRadForSpeed(speed) + M_PI);
 		}
 	}
 
@@ -603,7 +603,7 @@ void Ship::ManageTackle(bool force_input, float force_hold_duration)
 			new_absolute_speed = 0;
 		}
 
-		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetSpeedToAngleRad(speed) + M_PI);
+		SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetAngleRadForSpeed(speed) + M_PI);
 
 		if (new_absolute_speed < SHIP_MIN_SPEED_AFTER_TACKLE)
 		{
@@ -725,7 +725,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 
 	//U-turn?
 	/*
-	float angle = GetSpeedToAngleRad(sf::Vector2f(diff_x, diff_y)) * 180 / M_PI;
+	float angle = GetAngleRadForSpeed(sf::Vector2f(diff_x, diff_y)) * 180 / M_PI;
 	if (abs(getRotation() - angle) > SHIP_CLICK_ANGLE_FOR_UTURN)
 	{
 		printf("\ngetrot : %f, angle: %f\n", getRotation(), angle);

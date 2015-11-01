@@ -189,7 +189,7 @@ float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 	return s;
 }
 
-float GameObject::GetSpeedToAngleRad(sf::Vector2f curSpeed)
+float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 {
 	const float a = curSpeed.x;
 	const float b = curSpeed.y;
@@ -211,6 +211,39 @@ float GameObject::GetSpeedToAngleRad(sf::Vector2f curSpeed)
 	return angle;
 }
 
+float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2)
+{
+	assert(ref_object != NULL);
+	assert(object2 != NULL);
+
+	return GetAngleRadBetweenPositions(ref_object->getPosition(), object2->getPosition());
+}
+
+float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2)
+{
+	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, ref_position.y - position2.y);
+	float target_angle = GetAngleRadForSpeed(diff);
+
+	const float a = diff.x;
+	const float b = diff.y;
+
+	float distance_to_obj = (a * a) + (b * b);
+	distance_to_obj = sqrt(distance_to_obj);
+
+	float angle;
+	angle = acos(a / distance_to_obj);
+
+	if (b < 0)
+	{
+		angle = -angle;
+	}
+
+	angle += M_PI_2;
+	//angle = (fmod(angle, 2 * M_PI));
+
+	return angle;
+}
+
 void GameObject::SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle)
 {
 	speed.x = - absolute_speed * sin(curAngle);
@@ -225,7 +258,6 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 	Vector2f current_diff = sf::Vector2f(object1->getPosition().x - object2->getPosition().x, object1->getPosition().y - object2->getPosition().y);
 	return GetAbsoluteSpeed(current_diff);
 }
-
 
 bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 {
