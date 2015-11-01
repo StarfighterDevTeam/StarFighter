@@ -13,7 +13,7 @@ int main()
 
 	//Init SFML Window
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing SFML Window");
-	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
+	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "DashJammers");
 	renderWindow.setKeyRepeatEnabled(false);
 
 	//Refresh rate
@@ -25,7 +25,7 @@ int main()
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	//Title
-	renderWindow.setTitle("StarFighter Beta");
+	renderWindow.setTitle("DashJammers Alpha");
 
 
 	//Music
