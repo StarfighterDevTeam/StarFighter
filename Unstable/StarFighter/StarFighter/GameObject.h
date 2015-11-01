@@ -64,7 +64,7 @@ enum IngameScript
 {
 	MainMenuScript,
 	OfflineMulti,
-	OfflineMultiContinue,
+	OfflineMultiBig,
 	Shooting01,
 };
 

@@ -36,6 +36,9 @@ void Game::init(RenderWindow* window)
 	}
 
 	m_goal_happened = false;
+	score_blue_team = 0;
+	score_red_team = 0;
+
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -607,15 +610,6 @@ void Game::Goal(Teams team)
 	PlaySFX(SFX_Goal);
 
 	m_goal_happened = true;
-	/*
-	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[PlayerShip].begin(); it != sceneGameObjectsTyped[PlayerShip].end(); it++)
-	{
-		if (*it == NULL)
-			continue;
-
-		(*it)->LoadPlayerShipWithScript(OfflineMultiContinue);
-	}
-	*/
 }
 
 GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object)

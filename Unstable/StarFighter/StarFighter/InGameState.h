@@ -29,10 +29,13 @@ public:
 
 	void StartMainMenu();
 	void StartMultiGame(bool reset_scores = true);
+	void StartMultiGameBig(bool reset_scores = true);
+
+	void InitializeMapDesign();
 
 	void StartShooting01();
 
-	void SetIngameScript(IngameScript script);
+	void SetIngameScript(IngameScript script, bool reset_scores = true);
 
 	IngameScript m_script;
 
