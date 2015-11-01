@@ -258,22 +258,22 @@ void ShipIA::SetIADifficultyLevel(IADifficultyLevel IA_level)
 	m_IA_level = IA_level;
 }
 
-sf::Time ShipIA::GetReactionTime(IADifficultyLevel IA_level)
+float ShipIA::GetReactionTime(IADifficultyLevel IA_level)
 {
 	if (IA_level == IAEasy)
 	{
-		return sf::seconds(IA_REACTION_TIME_EASY);
+		return IA_REACTION_TIME_EASY;
 	}
 	else if (IA_level == IAMedium)
 	{
-		return sf::seconds(IA_REACTION_TIME_MEDIUM);
+		return IA_REACTION_TIME_MEDIUM;
 	}
 	else if (IA_level == IAHard)
 	{
-		return sf::seconds(IA_REACTION_TIME_HARD);
+		return IA_REACTION_TIME_HARD;
 	}
 
-	return sf::seconds(0.f);
+	return 0.f;
 }
 
 float ShipIA::GetThrowPrecision(IADifficultyLevel IA_level)

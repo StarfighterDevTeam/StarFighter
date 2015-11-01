@@ -38,7 +38,7 @@ void Ship::Init()
 	isLaunchingScript = false;
 	m_character = Natalia;
 
-	arrived_at_destination = true;
+	m_arrived_at_destination = true;
 
 	//IA SPECIFIC
 	m_target_opponent = NULL;
@@ -89,7 +89,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 		else
 		{
-			if (!arrived_at_destination)
+			if (!m_arrived_at_destination)
 			{
 				m_input_direction = GetInputsToGetPosition(m_destination, deltaTime);
 			}
@@ -719,35 +719,12 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 	const float diff_y = position.y - getPosition().y;
 	float distance = sqrt(diff_x * diff_x + diff_y * diff_y);
 
-	//U-turn?
-	/*
-	float angle = GetAngleRadForSpeed(sf::Vector2f(diff_x, diff_y)) * 180 / M_PI;
-	if (abs(getRotation() - angle) > SHIP_CLICK_ANGLE_FOR_UTURN)
-	{
-		printf("\ngetrot : %f, angle: %f\n", getRotation(), angle);
-		input_direction.x = diff_x / distance;
-		input_direction.y = diff_y / distance;
-
-		// normalize
-		if (input_direction.x*input_direction.x + input_direction.y*input_direction.y > SHIP_CLICK_UTURN_INPUT_VALUE)
-		{
-			float p = (1.f / SHIP_CLICK_UTURN_INPUT_VALUE / sqrt((input_direction.x*input_direction.x) + (input_direction.y*input_direction.y)));
-			input_direction.x *= p;
-			input_direction.y *= p;
-		}
-
-		printf("U-TURN\n ");
-
-		return input_direction;
-	}
-	*/
-
 	cur_MaxSpeed *= deltaTime.asSeconds();
 
 	if (distance < SHIP_CLICK_INPUT_PRECISION)//arrived at destination
 	{
 		//printf("input calculated: (%f, %f) #ARRIVED#\n\n", input_direction.x, input_direction.y);
-		arrived_at_destination = true;
+		m_arrived_at_destination = true;
 		return sf::Vector2f(0, 0);
 	}
 	else if (distance < cur_MaxSpeed)//last frame before arrival at destination
@@ -757,7 +734,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 
 		//printf("input calculated: (%f, %f) #LAST MOVE#\n\n", input_direction.x, input_direction.y);
 
-		arrived_at_destination = false;
+		m_arrived_at_destination = false;
 		return input_direction;
 	}
 	else//not arrived yet (need to travel at max speed)
@@ -767,7 +744,7 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 
 		//printf("input calculated: (%f, %f) #MAX SPEED#\n\n", input_direction.x, input_direction.y);
 
-		arrived_at_destination = false;
+		m_arrived_at_destination = false;
 		return input_direction;
 	}
 }

@@ -64,7 +64,7 @@ public :
 
 	//IA
 	sf::Vector2f GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaTime);
-	bool arrived_at_destination;
+	bool m_arrived_at_destination;
 	sf::Vector2f m_destination;
 
 	//TRON SPECIFIC

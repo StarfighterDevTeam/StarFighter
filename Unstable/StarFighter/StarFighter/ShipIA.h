@@ -37,7 +37,7 @@ public :
 	bool SetTargetGoal(bool own_goal);
 	bool SetTargetTeamMate(bool only_unmarked = true);
 	void SetIADifficultyLevel(IADifficultyLevel IA_level);
-	sf::Time GetReactionTime(IADifficultyLevel IA_level);
+	float GetReactionTime(IADifficultyLevel IA_level);
 	float GetThrowPrecision(IADifficultyLevel IA_level);
 	void ActivateIA(bool activate);
 	sf::Vector2f GetDefensivePosition(sf::Vector2f position, float distance, GameObject* object_to_intercept, bool anticipation = false);
