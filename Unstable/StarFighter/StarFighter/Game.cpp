@@ -243,6 +243,8 @@ void Game::CleanAllGameObjects()
 
 		(*(*it)).GarbageMe = true;
 	}
+
+	collectGarbage();
 }
 
 void Game::colisionChecksV2(Time deltaTime)

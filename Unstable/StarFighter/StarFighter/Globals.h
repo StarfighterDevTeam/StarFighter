@@ -104,7 +104,7 @@
 #define IA_PRECISION_HARD									3
 #define IA_DISTANCE_FOR_UNMARKED							500
 #define IA_DISTANCE_FOR_UNGUARDED							500
-#define IA_DISTANCE_MIN_TO_DISCOBALL_FOR_MOVE_STANCE		750
+#define IA_DISTANCE_FOR_UNCONTESTED							750
 #define IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE	0.01f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);

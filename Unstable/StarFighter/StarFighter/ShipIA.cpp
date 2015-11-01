@@ -62,7 +62,9 @@ void ShipIA::update(sf::Time deltaTime)
 			//2. Try to defend it
 			if (m_target_discoball != NULL)
 			{
-				printf("angle variation: %f | distance to ball: %f\n", GetAngleVariationToObject(m_target_discoball), (GetDistanceBetweenObjects(this, m_target_discoball)));
+				//printf("angle variation: %f | distance to ball: %f\n", GetAngleVariationToObject(m_target_discoball), (GetDistanceBetweenObjects(this, m_target_discoball)));
+				
+				//ball is on our trajectory, or is carried by the player? Easy, just go get 'em.
 				if (GetAngleVariationToObject(m_target_discoball) < IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE || m_target_discoball->m_carrier)
 				{
 					//Aggresive defense: move to the ball
@@ -73,22 +75,25 @@ void ShipIA::update(sf::Time deltaTime)
 				}
 				else
 				{
-					float distance_guard = GetDistanceBetweenObjects(this, m_target_goal);
-					float distance_discoball_to_goal = GetDistanceBetweenObjects(m_target_discoball, m_target_goal);
+					
+					//float distance_discoball_to_goal = GetDistanceBetweenObjects(m_target_discoball, m_target_goal);
 
 					//are we "behind" the ball?
-					if (distance_discoball_to_goal < distance_guard)
+					if (isOffside())
 					{
 						//run back to the ball
 						IA_MoveToObject(m_target_discoball, deltaTime, true);
+						ManageTackle(true, SHIP_TACKLE_MAX_HOLD_TIME);
 					}
-					else if (GetDistanceBetweenObjects(this, m_target_discoball) > IA_DISTANCE_MIN_TO_DISCOBALL_FOR_MOVE_STANCE || m_target_discoball->m_status == DiscoballLost)
+					//ball is uncontested? go get it.
+					else if (!isTargetBallContested())
 					{
 						IA_MoveToObject(m_target_discoball, deltaTime, true);
 					}
 					else
 					{
-						//Passive defense: move around own goal
+						//Passive defense: move around own goal at current distance
+						float distance_guard = GetDistanceBetweenObjects(this, m_target_goal);
 						IA_GuardPosition(m_target_goal->getPosition(), distance_guard, deltaTime);
 					}
 				}
@@ -359,4 +364,49 @@ bool ShipIA::isTargetGoalGuarded()
 
 	LOGGER_WRITE(Logger::Priority::DEBUG, "IsTargetGoalGuarded() calls a NULL target goal.\n");
 	return false;
+}
+
+bool ShipIA::isOffside()
+{
+	if (m_discoball == NULL)
+	{
+		const float distance_to_own_goal = GetDistanceBetweenObjects(this, m_target_goal);
+		const float distance_discoball_to_goal = GetDistanceBetweenObjects(m_target_discoball, m_target_goal);
+		
+		return distance_to_own_goal > distance_discoball_to_goal;
+	}
+	else
+		return false;
+}
+
+bool ShipIA::isTargetBallContested()
+{
+	//if we are closer to the ball than the opponent, or if the ball is really far from anyone anyway, then it's "uncontested" (... and we should probably go get it)
+	if (m_target_discoball)
+	{
+		const float distance_to_target = GetDistanceBetweenObjects(this, m_target_discoball);
+		GameObject* opponent = FindClosestGameObjectTyped(m_target_discoball, GetOpponentGameObjectType(this));
+		const float distance_discoball_to_opponent = GetDistanceBetweenObjects(opponent, m_target_discoball);
+
+		if (distance_discoball_to_opponent > IA_DISTANCE_FOR_UNCONTESTED || (distance_to_target < distance_discoball_to_opponent))
+			return false;
+		else
+			return true;
+	}
+	else
+		return false;
+}
+
+GameObjectType ShipIA::GetOpponentGameObjectType(Ship* player)
+{
+	assert(player != NULL);
+	GameObjectType type = player->m_team == BlueTeam ? PlayerRedShip : PlayerBlueShip;
+	return type;
+}
+
+GameObjectType ShipIA::GetOwnGameObjectType(Ship* player)
+{
+	assert(player != NULL);
+	GameObjectType type = player->m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
+	return type;
 }

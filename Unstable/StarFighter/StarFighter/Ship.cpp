@@ -526,7 +526,7 @@ void Ship::ManageKeyReleases()
 	}
 }
 
-void Ship::ManageTackle(bool force_input)
+void Ship::ManageTackle(bool force_input, float force_hold_duration)
 {
 	if (m_disable_inputs)
 		return;
@@ -579,7 +579,8 @@ void Ship::ManageTackle(bool force_input)
 	//State 3
 	if (m_isTackling == HOLDING_TACKLE)
 	{
-		if (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased)
+		if ((!force_input && (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased))
+			|| force_input && (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased || tackle_max_hold_clock.getElapsedTime().asSeconds() > force_hold_duration))
 		{
 			m_isTackling = ENDING_TACKLE;
 		}

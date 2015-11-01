@@ -41,6 +41,10 @@ public :
 	sf::Vector2f GetDefensivePosition(sf::Vector2f position, float distance, GameObject* object_to_intercept, bool anticipation = false);
 	float GetAngleVariationToObject(GameObject* object_to_intercept);
 	bool isTargetGoalGuarded();
+	bool isTargetBallContested();
+	bool isOffside();
+	static GameObjectType GetOpponentGameObjectType(Ship* player);
+	static GameObjectType GetOwnGameObjectType(Ship* player);
 
 private:
 	bool m_IA_activated;

@@ -28,7 +28,6 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToFeedbacks(&score_red_text);
 
 	//launch script
-	//SetIngameScript(MainMenuScript);
 	SetIngameScript(OfflineMulti);
 }
 
@@ -284,8 +283,8 @@ void InGameState::StartMultiGame(bool reset_scores)
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateCharacter(sf::Vector2f((*CurrentGame).map_size.x - 100, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAHard);
-	playerShip2->SetControllerType(JoystickControl2);
+	Ship* playerShip2 = CreateIACharacter(sf::Vector2f((*CurrentGame).map_size.x - 100, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAHard);
+	//playerShip2->SetControllerType(JoystickControl2);
 
 	InitializeMapDesign();
 
@@ -395,10 +394,10 @@ void InGameState::Update(sf::Time deltaTime)
 	score_blue_text.setPosition((*CurrentGame).view.getCenter().x - SCORE_DISPLAY_OFFSET, 14);
 	score_red_text.setPosition((*CurrentGame).view.getCenter().x + SCORE_DISPLAY_OFFSET, 14);
 
+	//Reset script after a goal
 	if ((*CurrentGame).m_goal_happened)
 	{
 		(*CurrentGame).m_goal_happened = false;
-		(*CurrentGame).CleanAllGameObjects();
 		SetIngameScript(m_script, false);
 	}
 
