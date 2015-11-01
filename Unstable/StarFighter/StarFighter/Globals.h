@@ -69,7 +69,7 @@
 
 //COOLDOWNS
 #define CARRY_AGAIN_COOLDOWN						0.5f
-#define TACKLE_AGAIN_COOLDOWN						2.f
+#define TACKLE_AGAIN_COOLDOWN						1.f
 
 //RECOVERY
 #define RECOVERING_FROM_TACKLE_COOLDOWN				0.8f
@@ -105,7 +105,8 @@
 #define IA_DISTANCE_FOR_UNMARKED							500
 #define IA_DISTANCE_FOR_UNGUARDED							500
 #define IA_DISTANCE_FOR_UNCONTESTED							750
-#define IA_ANGLERAD_VARIATION_FOR_DISCOBALL_GUARD_STANCE	0.01f
+#define IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL			0.01f
+#define IA_DISTANCE_FOR_SAFE_TACKLE							450
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

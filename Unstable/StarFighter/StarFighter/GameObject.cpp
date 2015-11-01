@@ -177,6 +177,7 @@ float GameObject::GetAbsoluteSpeed()
 	float s = (a * a) + (b * b);
 	s = sqrt(s);
 	s = floor(s);
+
 	return s;
 }
 float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
@@ -239,7 +240,6 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 	}
 
 	angle += M_PI_2;
-	//angle = (fmod(angle, 2 * M_PI));
 
 	return angle;
 }
@@ -261,12 +261,15 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 
 bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 {
+	if (vector->x == 0 && vector->y == 0)
+		return true;
+
 	if (vector->x * vector->x + vector->y * vector->y > max_value * max_value)
 	{
 		float p = max_value / sqrt(vector->x * vector->x + vector->y * vector->y);
 		vector->x *= p;
 		vector->y *= p;
-		
+
 		return true;
 	}
 

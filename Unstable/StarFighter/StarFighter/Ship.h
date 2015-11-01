@@ -79,7 +79,7 @@ public :
 	void ReleaseDiscoball(float angularSpeedBonus = 0.f);
 	void UpdateRotation();
 	void ManageFire();
-	void ManageTackle(bool force_input = false, float force_hold_duration = 0.f);
+	virtual void ManageTackle(bool force_input = false);
 	void ManageSwitchRotation();
 	void ManageKeyReleases();
 	void ManageFeedbacks();

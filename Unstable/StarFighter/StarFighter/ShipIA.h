@@ -27,6 +27,8 @@ public :
 	void IA_MoveToObject(GameObject* object, sf::Time deltaTime, bool anticipation = false);
 	void IA_ShootToPosition(sf::Vector2f position);
 	void IA_GuardPosition(sf::Vector2f position, float distance, sf::Time deltaTime);
+	void ManageTackle(bool force_input = false) override;
+	void Tackle(float hold_tackle_duration);
 
 	//# utilitary
 	Discoball* m_target_discoball;
@@ -49,7 +51,9 @@ public :
 private:
 	bool m_IA_activated;
 	IADifficultyLevel m_IA_level;
-	sf::Clock reaction_clock;
+	sf::Clock m_reaction_clock;
+	float m_hold_tackle_duration;
+	float m_tackle_activated;
 };
 
 #endif // SHIPIA_H_INCLUDED

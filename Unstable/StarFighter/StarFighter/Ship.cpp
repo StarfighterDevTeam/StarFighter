@@ -119,7 +119,7 @@ void Ship::update(sf::Time deltaTime)
 
 	if (ScreenBorderContraints())
 	{
-		ResetStatus();
+		//ResetStatus();
 	}
 
 	ManageFire();
@@ -526,11 +526,8 @@ void Ship::ManageKeyReleases()
 	}
 }
 
-void Ship::ManageTackle(bool force_input, float force_hold_duration)
+void Ship::ManageTackle(bool force_input)
 {
-	if (m_disable_inputs)
-		return;
-
 	//State 0
 	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
 	{
@@ -540,7 +537,7 @@ void Ship::ManageTackle(bool force_input, float force_hold_duration)
 			{
 				if (moving)
 				{
-					if ((InputGuy::isTackling(m_controllerType) || force_input)
+					if (((InputGuy::isTackling(m_controllerType) && !m_disable_inputs) || force_input)
 						&& wasTacklingButtonReleased)
 					{
 						m_isTackling = INITIATE_TACLKE;
@@ -579,8 +576,7 @@ void Ship::ManageTackle(bool force_input, float force_hold_duration)
 	//State 3
 	if (m_isTackling == HOLDING_TACKLE)
 	{
-		if ((!force_input && (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased))
-			|| force_input && (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased || tackle_max_hold_clock.getElapsedTime().asSeconds() > force_hold_duration))
+		if ((force_input || (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased)))
 		{
 			m_isTackling = ENDING_TACKLE;
 		}
@@ -782,7 +778,7 @@ void Ship::PlayerBumper(GameObject* bumper, Time deltaTime)
 
 	if ((bumper_->m_type == OnlyBlueTeamThrough && m_team == RedTeam) || (bumper_->m_type == OnlyRedTeamThrough && m_team == BlueTeam))
 	{
-		ResetStatus();
+		//ResetStatus();
 
 		bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
 
