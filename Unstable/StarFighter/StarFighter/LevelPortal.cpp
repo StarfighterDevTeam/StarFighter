@@ -27,6 +27,7 @@ void LevelPortal::Init()
 {
 	collider_type = LevelPortalObject;
 	DontGarbageMe = true;
+	m_destination = NULL;
 }
 
 LevelPortal::~LevelPortal()

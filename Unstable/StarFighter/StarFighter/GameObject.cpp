@@ -317,7 +317,7 @@ void GameObject::PlayerBumper(GameObject* bumper, Time deltaTime)
 	// see override function in class Ship
 }
 
-void GameObject::LoadPlayerShipWithScript(IngameScript script)
+void GameObject::UsingPortal(bool is_using)
 {
-	// see override function in class Ship
+	// see override function in class Ship and Discoball
 }

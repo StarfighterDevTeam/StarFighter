@@ -85,6 +85,22 @@ bool InputGuy::isTackling(ControlerType device)
 	return false;
 }
 
+bool InputGuy::isRestartingScript()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))
+	{
+		return true;
+	}
+
+	if (sf::Joystick::isConnected(0))
+	{
+		if (sf::Joystick::isButtonPressed(0, 4)) //Upper left trigger
+			return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isUsingDebugCommand()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))

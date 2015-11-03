@@ -13,7 +13,6 @@
 #include "Bumper.h"
 #include "LevelPortal.h"
 
-
 class GameObject;
 
 class InGameState : public GameState
@@ -31,8 +30,10 @@ public:
 	void StartMultiGame(bool reset_scores = true);
 	void StartMultiGameBig(bool reset_scores = true);
 
+	void InitializeSoloCharacter();
 	void InitializeMapDesign();
 
+	void StartTuto01();
 	void StartShooting01();
 
 	void SetIngameScript(IngameScript script, bool reset_scores = true);

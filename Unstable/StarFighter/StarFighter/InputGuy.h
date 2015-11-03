@@ -28,6 +28,7 @@ public:
 	static bool isSwitchingRotation(ControlerType device = AllControlDevices);
 	static bool isChangingResolution();
 	static bool isUsingDebugCommand();
+	static bool isRestartingScript();
 };
 
 

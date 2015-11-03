@@ -14,6 +14,7 @@ public :
 	void Init();
 	virtual ~LevelPortal();
 	IngameScript m_script;
+	LevelPortal* m_destination;
 };
 
 #endif // LEVELPORTAL_H_INCLUDED

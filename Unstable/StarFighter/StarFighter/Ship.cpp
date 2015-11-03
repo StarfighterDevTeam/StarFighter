@@ -36,7 +36,9 @@ void Ship::Init()
 	m_throw_curSpeedBonus = 0.f;
 
 	m_team = BlueTeam;
-	isLaunchingScript = false;
+	m_isLaunchingScript = false;
+	m_isUsingPortal = false;
+
 	m_character = Natalia;
 
 	m_arrived_at_destination = true;
@@ -367,7 +369,7 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 		{
 			ReleaseDiscoball();
 		}
-		else if (m_discoball->is_touching_bumper)
+		else if (m_discoball->m_isTouchingBumper)
 		{
 			ReleaseDiscoball();
 		}
@@ -688,7 +690,6 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 			}
 
 			player2->m_isTackling = NOT_TACKLING;
-			//player2->m_isRecovering = RECOVERING_FROM_TACKLE;
 			player2->hit_recovery_clock.restart();
 			player2->speed.x = 0;
 			player2->speed.y = 0;
@@ -698,9 +699,25 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 
 void Ship::GetPortal(GameObject* portal)
 {
-	LevelPortal* getportal = (LevelPortal*)portal;
-	m_script = getportal->m_script;
-	isLaunchingScript = true;
+	if (!m_isUsingPortal)
+	{
+		LevelPortal* getportal = (LevelPortal*)portal;
+		if (getportal->m_destination)
+		{
+			setPosition(getportal->m_destination->getPosition());
+			//m_isUsingPortal = true; -> set in Game::CollisionCheckV2 method
+		}
+		else
+		{
+			m_script = getportal->m_script;
+			m_isLaunchingScript = true;
+		}
+	}
+}
+
+void Ship::UsingPortal(bool is_using)
+{
+	m_isUsingPortal = is_using;
 }
 
 //IA
@@ -830,15 +847,6 @@ void Ship::PlayerBumper(GameObject* bumper, Time deltaTime)
 
 			speed.y = 0;
 		}
-	}
-}
-
-void Ship::LoadPlayerShipWithScript(IngameScript script)
-{
-	if (this == (*CurrentGame).playerShip)
-	{
-		m_script = script;
-		isLaunchingScript = true;
 	}
 }
 

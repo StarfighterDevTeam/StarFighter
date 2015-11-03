@@ -28,7 +28,8 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToFeedbacks(&score_red_text);
 
 	//launch script
-	SetIngameScript(OfflineMulti);
+	//SetIngameScript(OfflineMulti);
+	SetIngameScript(Tuto01);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
@@ -38,20 +39,43 @@ void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 	//clean previous scene
 	(*CurrentGame).CleanAllGameObjects();
 
-	switch (script)
+	switch (m_script)
 	{
-	case MainMenuScript:
-		StartMainMenu();
-		break;
-	case OfflineMulti:
-		StartMultiGame(reset_scores);
-		break;
-	case OfflineMultiBig:
-		StartMultiGameBig(reset_scores);
-		break;
-	case Shooting01:
-		StartShooting01();
-		break;
+		case MainMenuScript:
+		{
+							   StartMainMenu();
+							   break;
+		}
+
+		case OfflineMulti:
+		{
+							 StartMultiGame(reset_scores);
+							 break;
+		}
+
+		case OfflineMultiBig:
+		{
+								StartMultiGameBig(reset_scores);
+								break;
+		}
+
+		case Tuto01:
+		{
+					   StartTuto01();
+					   break;
+		}
+
+		case Shooting01:
+		{
+						   StartShooting01();
+						   break;
+		}
+
+		default:
+		{
+				   StartMainMenu();
+				   break;
+		}
 	}
 }
 
@@ -254,7 +278,7 @@ void InGameState::StartMainMenu()
 
 	CreateDiscoball();
 
-	CreateLevelPortal(Shooting01, sf::Vector2f(360, 380));
+	CreateLevelPortal(Tuto01, sf::Vector2f(360, 380));
 	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, REF_WINDOW_RESOLUTION_Y / 2));
 	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, 700));
 	CreateLevelPortal(OfflineMulti, sf::Vector2f(1560, 380));
@@ -350,6 +374,52 @@ void InGameState::StartMultiGameBig(bool reset_scores)
 	}
 }
 
+void InGameState::InitializeSoloCharacter()
+{
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
+	playerShip1->SetControllerType(AllControlDevices);
+
+	// #### HACK
+	(*CurrentGame).playerShip = playerShip1;
+	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+}
+
+void InGameState::StartTuto01()
+{
+	(*CurrentGame).cur_GameRules = SoloTraining;
+
+
+	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_tuto01.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+	(*CurrentGame).map_size = background->m_size;
+
+	InitializeSoloCharacter();
+
+	const float xo = 400;
+	const float xa = 750;
+	const float xb = 1000;
+	const float ya = 200;
+	const float xc_ = (*CurrentGame).map_size.x - ((*CurrentGame).map_size.x - xb) / 2;
+	const float goal_size = 200;
+	const float xd_ = (*CurrentGame).map_size.x - xc_ - goal_size / 2;
+
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xo, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
+	LevelPortal* portal_left = CreateLevelPortal(MainMenuScript, sf::Vector2f(xa, ya));
+	CreateDiscoball(sf::Vector2f(xa, REF_WINDOW_RESOLUTION_Y / 2));
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xb, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
+
+	LevelPortal* portal_right = CreateLevelPortal(MainMenuScript, sf::Vector2f(xc_, ya));
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xc_, REF_WINDOW_RESOLUTION_Y / 2), false, (*CurrentGame).map_size.x - xb);
+	CreateGoal(RedTeam, sf::Vector2f(xc_, REF_WINDOW_RESOLUTION_Y - 8), sf::Vector2f(goal_size, 16));
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xc_ + goal_size / 2, REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X / 2), true, GOAL_SAFE_ZONE_X);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xc_ - goal_size / 2, REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X / 2), true, GOAL_SAFE_ZONE_X);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xc_ - goal_size /2 - xd_ / 2, REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X), false, (*CurrentGame).map_size.x - (xc_ + goal_size / 2));
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xc_ + goal_size / 2 + xd_ / 2, REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X), false, (*CurrentGame).map_size.x - (xc_ + goal_size / 2));
+
+	portal_left->m_destination = portal_right;
+	portal_right->m_destination = portal_left;
+}
+
 void InGameState::StartShooting01()
 {
 	(*CurrentGame).cur_GameRules = SoloTraining;
@@ -406,9 +476,14 @@ void InGameState::Update(sf::Time deltaTime)
 		SetIngameScript(MainMenuScript);
 	}
 
-	if ((*CurrentGame).playerShip->isLaunchingScript)
+	if ((*CurrentGame).playerShip->m_isLaunchingScript)
 	{
 		SetIngameScript((*CurrentGame).playerShip->m_script);
+	}
+
+	if (InputGuy::isRestartingScript())
+	{
+		SetIngameScript(m_script, true);
 	}
 
 	(*CurrentGame).updateScene(deltaTime);

@@ -252,7 +252,7 @@ void Game::colisionChecksV2(Time deltaTime)
 	sf::Clock dt;
 	dt.restart();
 
-	//First, Checks if the ship has been touched by an enemy/enemy bullet
+	//Check collisions with blue players
 	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerBlueShip].begin(); it1 != sceneGameObjectsTyped[PlayerBlueShip].end(); it1++)
 	{
 		if (*it1 == NULL)
@@ -291,6 +291,7 @@ void Game::colisionChecksV2(Time deltaTime)
 		}
 
 		//Players enters level portal
+		bool contact_with_portal = false;
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[LevelPortalObject].begin(); it2 != sceneGameObjectsTyped[LevelPortalObject].end(); it2++)
 		{
 			if (*it2 == NULL)
@@ -302,8 +303,11 @@ void Game::colisionChecksV2(Time deltaTime)
 
 				//TRON SPECIFIC
 				(*it1)->GetPortal(*it2);
+				contact_with_portal = true;
+				(*it1)->UsingPortal(contact_with_portal);
 			}
 		}
+		(*it1)->UsingPortal(contact_with_portal);
 
 		//Gets blocked by bumper
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperRedObject].begin(); it2 != sceneGameObjectsTyped[BumperRedObject].end(); it2++)
@@ -341,6 +345,7 @@ void Game::colisionChecksV2(Time deltaTime)
 		}
 
 		//Players enters level portal
+		bool contact_with_portal = false;
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[LevelPortalObject].begin(); it2 != sceneGameObjectsTyped[LevelPortalObject].end(); it2++)
 		{
 			if (*it2 == NULL)
@@ -352,8 +357,11 @@ void Game::colisionChecksV2(Time deltaTime)
 
 				//TRON SPECIFIC
 				(*it1)->GetPortal(*it2);
+				contact_with_portal = true;
+				(*it1)->UsingPortal(contact_with_portal);
 			}
 		}
+		(*it1)->UsingPortal(contact_with_portal);
 
 		//Gets blocked by bumper
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[BumperBlueObject].begin(); it2 != sceneGameObjectsTyped[BumperBlueObject].end(); it2++)
@@ -436,6 +444,25 @@ void Game::colisionChecksV2(Time deltaTime)
 				PlaySFX(SFX_Bounce);
 			}
 		}
+
+		//Discoball hits level portal
+		bool contact_with_portal = false;
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[LevelPortalObject].begin(); it2 != sceneGameObjectsTyped[LevelPortalObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+
+				//TRON SPECIFIC
+				(*it1)->GetPortal(*it2);
+				contact_with_portal = true;
+				(*it1)->UsingPortal(contact_with_portal);
+			}
+		}
+		(*it1)->UsingPortal(contact_with_portal);
 	}
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }

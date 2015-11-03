@@ -69,7 +69,7 @@ void ShipIA::update(sf::Time deltaTime)
 				//Are we "behind" the ball?
 				if (isOffside())
 				{
-					//Run back to the discoball carrier if any
+					//Run back to the discoball carrier if any...
 					if (m_target_discoball->m_carrier)
 					{
 						IA_MoveToObject(m_target_discoball->m_carrier, deltaTime, true);
@@ -80,7 +80,7 @@ void ShipIA::update(sf::Time deltaTime)
 						}
 						
 					}
-					//otherwise, run back to the discoball itself
+					//...otherwise, run back to the discoball itself
 					else
 					{
 						IA_MoveToObject(m_target_discoball, deltaTime, true);
@@ -146,8 +146,13 @@ void ShipIA::update(sf::Time deltaTime)
 			
 			bool isGoalGuarded = m_target_goal ? isTargetGoalGuarded() : false;
 
-			//2. Shoot at it
+			//2. Attack it
+			//Move toward target
 			IA_MoveToPosition(m_target_goal->getPosition(), deltaTime);
+			if (!isGoalGuarded)
+				Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+
+			//Shoot
 			IA_ShootToPosition(m_target_goal->getPosition());
 		}
 

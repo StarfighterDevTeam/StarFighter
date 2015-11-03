@@ -6,7 +6,6 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "Discoball.h"
-#include "LevelPortal.h"
 #include "Bumper.h"
 
 enum TacklingStatus
@@ -112,8 +111,9 @@ public :
 	void GetPortal(GameObject* portal) override;
 	PlayableCharacters m_character;
 	IngameScript m_script;
-	bool isLaunchingScript;
-	void LoadPlayerShipWithScript(IngameScript script) override;
+	bool m_isLaunchingScript;
+	bool m_isUsingPortal;
+	void UsingPortal(bool is_using) override;
 
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;

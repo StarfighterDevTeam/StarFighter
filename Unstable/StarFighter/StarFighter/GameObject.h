@@ -65,6 +65,7 @@ enum IngameScript
 	MainMenuScript,
 	OfflineMulti,
 	OfflineMultiBig,
+	Tuto01,
 	Shooting01,
 };
 
@@ -120,8 +121,8 @@ public:
 	virtual void DiscoballBumper(GameObject* bumper);
 	virtual void PlayerBumper(GameObject* bumper, Time deltaTime);
 	virtual void PlayerContact(GameObject* player, float angle_collision = -1.f);
+	virtual void UsingPortal(bool is_using);
 	void PlayHitFeedback();
-	virtual void LoadPlayerShipWithScript(IngameScript script);
 	sf::Clock feedback_reset_clock;
 
 	sf::Vector2f speed;

@@ -33,7 +33,8 @@ void Discoball::Init()
 	coeff_friction = 0;
 	m_status = DiscoballFree;
 	setAnimationLine(DiscoballFree);
-	is_touching_bumper = false;
+	m_isTouchingBumper = false;
+	m_isUsingPortal = false;
 }
 
 Discoball::~Discoball()
@@ -43,7 +44,7 @@ Discoball::~Discoball()
 
 void Discoball::update(sf::Time deltaTime)
 {
-	is_touching_bumper = false;
+	m_isTouchingBumper = false;
 
 	//stroboscopic effect
 	if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION)
@@ -142,7 +143,7 @@ void Discoball::SetDiscoballStatus(DiscoballStatus status)
 
 void Discoball::DiscoballBumper(GameObject* bumper)
 {
-	is_touching_bumper = true;
+	m_isTouchingBumper = true;
 
 	bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
 
@@ -217,5 +218,26 @@ void Discoball::PlayStroboscopicEffect(Time effect_duration, Time time_between_p
 		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
 
 		stroboscopic_effect_clock.restart();
+	}
+}
+
+void Discoball::UsingPortal(bool is_using)
+{
+	m_isUsingPortal = is_using;
+}
+
+void Discoball::GetPortal(GameObject* portal)
+{
+	if (!m_carried)
+	{
+		if (!m_isUsingPortal)
+		{
+			LevelPortal* getportal = (LevelPortal*)portal;
+			if (getportal->m_destination)
+			{
+				setPosition(getportal->m_destination->getPosition());
+				//isUsingPortal = true; -> set in Game::CollisionCheckV2 method
+			}
+		}
 	}
 }
