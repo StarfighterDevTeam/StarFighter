@@ -66,6 +66,7 @@ enum IngameScript
 	OfflineMulti,
 	OfflineMultiBig,
 	Tuto01,
+	Tuto02,
 	Shooting01,
 };
 

@@ -80,11 +80,13 @@ public:
 	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
 	unsigned int score_blue_team;
 	unsigned int score_red_team;
+	unsigned int score_to_win;
 	sf::Font* font;
 	sf::Font* font2;
 	sf::Clock score_again_blue_clock;
 	sf::Clock score_again_red_clock;
 	bool m_goal_happened;
+	sf::Clock m_after_goal_clock;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

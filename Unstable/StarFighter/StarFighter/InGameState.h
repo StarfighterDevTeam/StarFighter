@@ -34,11 +34,13 @@ public:
 	void InitializeMapDesign();
 
 	void StartTuto01();
+	void StartTuto02();
 	void StartShooting01();
 
 	void SetIngameScript(IngameScript script, bool reset_scores = true);
 
 	IngameScript m_script;
+	IngameScript m_next_script;
 
 	Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, bool IA = false);
 	ShipIA* CreateIACharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, IADifficultyLevel IA_level = IAEasy, bool activated = true);

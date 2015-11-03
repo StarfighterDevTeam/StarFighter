@@ -38,6 +38,7 @@ void Game::init(RenderWindow* window)
 	m_goal_happened = false;
 	score_blue_team = 0;
 	score_red_team = 0;
+	score_to_win = 1;
 
 }
 
@@ -396,6 +397,8 @@ void Game::colisionChecksV2(Time deltaTime)
 				{
 					(*it2)->PlayHitFeedback();
 					Goal(RedTeam);
+					(*it1)->visible = false;
+					(*it1)->GarbageMe = true;
 				}
 			}
 		}
@@ -415,6 +418,8 @@ void Game::colisionChecksV2(Time deltaTime)
 				{
 					(*it2)->PlayHitFeedback();
 					Goal(BlueTeam);
+					(*it1)->visible = false;
+					(*it1)->GarbageMe = true;
 				}
 			}
 		}
@@ -639,6 +644,7 @@ void Game::Goal(Teams team)
 	PlaySFX(SFX_Goal);
 
 	m_goal_happened = true;
+	m_after_goal_clock.restart();
 }
 
 GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object)

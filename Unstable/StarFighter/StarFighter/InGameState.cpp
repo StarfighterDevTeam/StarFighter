@@ -43,38 +43,44 @@ void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 	{
 		case MainMenuScript:
 		{
-							   StartMainMenu();
-							   break;
+			StartMainMenu();
+			break;
 		}
 
 		case OfflineMulti:
 		{
-							 StartMultiGame(reset_scores);
-							 break;
+			StartMultiGame(reset_scores);
+			break;
 		}
 
 		case OfflineMultiBig:
 		{
-								StartMultiGameBig(reset_scores);
-								break;
+			StartMultiGameBig(reset_scores);
+			break;
 		}
 
 		case Tuto01:
 		{
-					   StartTuto01();
-					   break;
+			StartTuto01();
+			break;
+		}
+
+		case Tuto02:
+		{
+			StartTuto02();
+			break;
 		}
 
 		case Shooting01:
 		{
-						   StartShooting01();
-						   break;
+			StartShooting01();
+			break;
 		}
 
 		default:
 		{
-				   StartMainMenu();
-				   break;
+			StartMainMenu();
+			break;
 		}
 	}
 }
@@ -293,6 +299,7 @@ void InGameState::StartMainMenu()
 void InGameState::StartMultiGame(bool reset_scores)
 {
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
+	(*CurrentGame).score_to_win = 10;
 
 	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y/2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
@@ -322,6 +329,7 @@ void InGameState::StartMultiGame(bool reset_scores)
 void InGameState::StartMultiGameBig(bool reset_scores)
 {
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
+	(*CurrentGame).score_to_win = 10;
 
 	GameObject* background = new GameObject(sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(2880, 1080), sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
@@ -387,7 +395,8 @@ void InGameState::InitializeSoloCharacter()
 void InGameState::StartTuto01()
 {
 	(*CurrentGame).cur_GameRules = SoloTraining;
-
+	(*CurrentGame).score_to_win = 1;
+	m_next_script = Tuto02;
 
 	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_tuto01.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
@@ -418,6 +427,18 @@ void InGameState::StartTuto01()
 
 	portal_left->m_destination = portal_right;
 	portal_right->m_destination = portal_left;
+}
+
+void InGameState::StartTuto02()
+{
+	(*CurrentGame).cur_GameRules = SoloTraining;
+	(*CurrentGame).score_to_win = 1;
+
+	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+	(*CurrentGame).map_size = background->m_size;
+
+	InitializeSoloCharacter();
 }
 
 void InGameState::StartShooting01()
@@ -465,10 +486,38 @@ void InGameState::Update(sf::Time deltaTime)
 	score_red_text.setPosition((*CurrentGame).view.getCenter().x + SCORE_DISPLAY_OFFSET, 14);
 
 	//Reset script after a goal
-	if ((*CurrentGame).m_goal_happened)
+	if ((*CurrentGame).m_goal_happened && (*CurrentGame).m_after_goal_clock.getElapsedTime().asSeconds() > DELAY_AFTER_GOAL)
 	{
+		//resetting flag
 		(*CurrentGame).m_goal_happened = false;
-		SetIngameScript(m_script, false);
+
+		//end game? (blue wins)
+		if ((*CurrentGame).score_blue_team >= (*CurrentGame).score_to_win)
+		{
+			//Solo = load next script
+			if ((*CurrentGame).cur_GameRules == SoloTraining)
+			{
+				SetIngameScript(m_next_script, true);
+			}
+			//Multi = go back to main menu
+			else
+			{
+				SetIngameScript(MainMenuScript, true);
+			}
+		}
+		//end game? (red wins)
+		else if ((*CurrentGame).score_red_team >= (*CurrentGame).score_to_win)
+		{
+			SetIngameScript(MainMenuScript, true);
+		}
+		//continue
+		else
+		{
+			if ((*CurrentGame).cur_GameRules != SoloTraining)
+			{
+				SetIngameScript(m_script, false);
+			}
+		}
 	}
 
 	if (InputGuy::isUsingDebugCommand())
