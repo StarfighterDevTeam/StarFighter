@@ -470,18 +470,30 @@ void InGameState::StartTuto03()
 {
 	(*CurrentGame).cur_GameRules = SoloTraining;
 	(*CurrentGame).score_to_win = 1;
-	m_next_script = Tuto02;
+	m_next_script = MainMenuScript;
 
 	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 	(*CurrentGame).map_size = background->m_size;
 
-	InitializeSoloCharacter();
+	const float xo = 200;
+	const float yo = 3 * REF_WINDOW_RESOLUTION_Y / 4;
+	const float xa = 1400;
+	const float ya = 100;
+	const float yb = 400;
+	const float goal_size = 300;
 
-	const float xa = 1000;
-	const float ya = 200;
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(xo, yo), Natalia, BlueTeam);
+	playerShip1->SetControllerType(AllControlDevices);
+
+	// #### HACK
+	(*CurrentGame).playerShip = playerShip1;
+	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+
 	CreateIACharacter(sf::Vector2f(xa, ya), Quorra, RedTeam, IAHard, true);
-	//CreateDiscoball(sf::Vector2f(xa, ya));
+	CreateDiscoball(sf::Vector2f(xa, yb));
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), false, REF_WINDOW_RESOLUTION_X);
+	CreateGoal(BlueTeam, sf::Vector2f(xa, REF_WINDOW_RESOLUTION_Y - 8), sf::Vector2f(goal_size, 16));
 }
 
 void InGameState::ShootingTrainingTuto01()
@@ -577,7 +589,16 @@ void InGameState::Update(sf::Time deltaTime)
 		//end game? (red wins)
 		else if ((*CurrentGame).score_red_team >= (*CurrentGame).score_to_win)
 		{
-			SetIngameScript(MainMenuScript, true);
+			//Solo = load next script
+			if ((*CurrentGame).cur_GameRules == SoloTraining)
+			{
+				SetIngameScript(m_script, true);
+			}
+			//Multi = go back to main menu
+			else
+			{
+				SetIngameScript(MainMenuScript, true);
+			}
 		}
 		//continue
 		else

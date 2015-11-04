@@ -129,6 +129,22 @@ void ShipIA::update(sf::Time deltaTime)
 					}
 				}
 			}
+			//We haven't found any goal to defend, but perhaps there is a ball to play nevertheless?
+			else
+			{
+				if (SetTargetDiscoball())
+				{
+					if (!isTargetBallContested())
+					{
+						IA_MoveToObject(m_target_discoball, deltaTime, true);
+						//Seems safe to use tackle
+						//if (GetAngleVariationToObject(m_target_discoball) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
+						//{
+						//	Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+						//}
+					}
+				}
+			}
 		}
 		//ATTAQUE
 		else
