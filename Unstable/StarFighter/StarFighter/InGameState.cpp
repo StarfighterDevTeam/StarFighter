@@ -29,7 +29,7 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	SetIngameScript(Tuto02);
+	SetIngameScript(Tuto03);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
@@ -68,6 +68,12 @@ void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 		case Tuto02:
 		{
 			StartTuto02();
+			break;
+		}
+
+		case Tuto03:
+		{
+			StartTuto03();
 			break;
 		}
 
@@ -458,6 +464,24 @@ void InGameState::StartTuto02()
 
 	//CreateIACharacter(sf::Vector2f(xa, ya / 2), Savannah, BlueTeam, IAHard, true);
 	//CreateIACharacter(sf::Vector2f(xc, (REF_WINDOW_RESOLUTION_Y + yb) / 2), Quorra, RedTeam, IAHard, true);
+}
+
+void InGameState::StartTuto03()
+{
+	(*CurrentGame).cur_GameRules = SoloTraining;
+	(*CurrentGame).score_to_win = 1;
+	m_next_script = Tuto02;
+
+	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+	(*CurrentGame).map_size = background->m_size;
+
+	InitializeSoloCharacter();
+
+	const float xa = 1000;
+	const float ya = 200;
+	CreateIACharacter(sf::Vector2f(xa, ya), Quorra, RedTeam, IAHard, true);
+	//CreateDiscoball(sf::Vector2f(xa, ya));
 }
 
 void InGameState::ShootingTrainingTuto01()

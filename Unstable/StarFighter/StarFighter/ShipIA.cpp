@@ -62,26 +62,39 @@ void ShipIA::update(sf::Time deltaTime)
 			bool isGoalGuarded = m_target_goal ? isTargetGoalGuarded() : false;
 
 			//2. Define discoball to play
-			if (m_target_discoball != NULL)
+			if (m_target_goal)
 			{
-				//printf("angle variation: %f | distance to ball: %f\n", GetAngleVariationToObject(m_target_discoball), (GetDistanceBetweenObjects(this, m_target_discoball)));
-				
-				//Are we "behind" the ball?
-				if (isOffside())
+				if (SetTargetDiscoball())
 				{
-					//Run back to the discoball carrier if any...
-					if (m_target_discoball->m_carrier)
+					//printf("angle variation: %f | distance to ball: %f\n", GetAngleVariationToObject(m_target_discoball), (GetDistanceBetweenObjects(this, m_target_discoball)));
+
+					//Are we "behind" the ball?
+					if (isOffside())
 					{
-						IA_MoveToObject(m_target_discoball->m_carrier, deltaTime, true);
-						//Seems safe to use tackle
-						if (GetAngleVariationToObject(m_target_discoball->m_carrier) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
+						//Run back to the discoball carrier if any...
+						if (m_target_discoball->m_carrier)
 						{
-							Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+							IA_MoveToObject(m_target_discoball->m_carrier, deltaTime, true);
+							//Seems safe to use tackle
+							if (GetAngleVariationToObject(m_target_discoball->m_carrier) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
+							{
+								Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+							}
+
 						}
-						
+						//...otherwise, run back to the discoball itself
+						else
+						{
+							IA_MoveToObject(m_target_discoball, deltaTime, true);
+							//Seems safe to use tackle
+							if (GetAngleVariationToObject(m_target_discoball) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
+							{
+								Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+							}
+						}
 					}
-					//...otherwise, run back to the discoball itself
-					else
+					//Ball is uncontested? let's go get it.
+					else if (!isTargetBallContested())
 					{
 						IA_MoveToObject(m_target_discoball, deltaTime, true);
 						//Seems safe to use tackle
@@ -90,45 +103,31 @@ void ShipIA::update(sf::Time deltaTime)
 							Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
 						}
 					}
-				}
-				//Ball is uncontested? let's go get it.
-				else if (!isTargetBallContested())
-				{
-					IA_MoveToObject(m_target_discoball, deltaTime, true);
-					//Seems safe to use tackle
-					if (GetAngleVariationToObject(m_target_discoball) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL)
-					{
-						Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
-					}
-				}
-				//Ok, we are not offside, ball is contested, let's think: should we go contest it or just wait in defense?
-				else
-				{
-					//ball is on our trajectory, or is carried by the player? Let's go, but carefully.
-					if (GetAngleVariationToObject(m_target_discoball) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL || m_target_discoball->m_carrier)
-					{
-						//Aggresive defense: move to the ball
-						if (m_target_discoball->m_carrier != NULL)
-						{
-							IA_MoveToObject(m_target_discoball->m_carrier, deltaTime, false);
-						}
-						else
-						{
-							IA_MoveToObject(m_target_discoball, deltaTime, true);
-						}
-					}
-					//Ball is changing trajectory too much, let's just wait here, adjusting position to intercept.
+					//Ok, we are not offside, ball is contested, let's think: should we go contest it or just wait in defense?
 					else
 					{
-						//Passive defense: move around own goal at current distance
-						float distance_guard = GetDistanceBetweenObjects(this, m_target_goal);
-						IA_GuardPosition(m_target_goal->getPosition(), distance_guard, deltaTime);
+						//ball is on our trajectory, or is carried by the player? Let's go, but carefully.
+						if (GetAngleVariationToObject(m_target_discoball) < IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL || m_target_discoball->m_carrier)
+						{
+							//Aggresive defense: move to the ball
+							if (m_target_discoball->m_carrier != NULL)
+							{
+								IA_MoveToObject(m_target_discoball->m_carrier, deltaTime, false);
+							}
+							else
+							{
+								IA_MoveToObject(m_target_discoball, deltaTime, true);
+							}
+						}
+						//Ball is changing trajectory too much, let's just wait here, adjusting position to intercept.
+						else
+						{
+							//Passive defense: move around own goal at current distance
+							float distance_guard = GetDistanceBetweenObjects(this, m_target_goal);
+							IA_GuardPosition(m_target_goal->getPosition(), distance_guard, deltaTime);
+						}
 					}
 				}
-			}
-			else
-			{
-				SetTargetDiscoball();
 			}
 		}
 		//ATTAQUE
@@ -146,14 +145,17 @@ void ShipIA::update(sf::Time deltaTime)
 			
 			bool isGoalGuarded = m_target_goal ? isTargetGoalGuarded() : false;
 
-			//2. Attack it
-			//Move toward target
-			IA_MoveToPosition(m_target_goal->getPosition(), deltaTime);
-			if (!isGoalGuarded)
-				Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
+			if (m_target_goal)
+			{
+				//2. Attack it
+				//Move toward target
+				IA_MoveToPosition(m_target_goal->getPosition(), deltaTime);
+				if (!isGoalGuarded)
+					Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
 
-			//Shoot
-			IA_ShootToPosition(m_target_goal->getPosition());
+				//Shoot
+				IA_ShootToPosition(m_target_goal->getPosition());
+			}
 		}
 
 		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
