@@ -432,7 +432,8 @@ void Ship::ThrowDiscoball()
 		m_discoball->discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
 
 		//orthogonal launch
-		discoball_curAngle += discoball_clockwise ? M_PI_2 : - M_PI_2;
+		if (USE_ORTHOGONAL_THROW)
+			discoball_curAngle += discoball_clockwise ? M_PI_2 : - M_PI_2;
 
 		m_discoball->SetSpeedVectorFromAbsoluteSpeed(m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE, discoball_curAngle);
 

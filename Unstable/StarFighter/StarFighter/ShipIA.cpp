@@ -317,7 +317,9 @@ void ShipIA::IA_ShootToPosition(sf::Vector2f position)
 	if (m_discoball != NULL)
 	{
 		float target_angle = GetAngleRadBetweenPositions(getPosition(), position);
-		target_angle -= discoball_clockwise ? M_PI_2 : -M_PI_2;
+		
+		if (USE_ORTHOGONAL_THROW)
+			target_angle -= discoball_clockwise ? M_PI_2 : -M_PI_2;
 
 		float diff_angle = target_angle - discoball_curAngle;
 		while (diff_angle < -M_PI)

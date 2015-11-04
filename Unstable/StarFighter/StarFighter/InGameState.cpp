@@ -429,11 +429,35 @@ void InGameState::StartTuto02()
 	(*CurrentGame).score_to_win = 1;
 	m_next_script = Tuto02;
 
-	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_tuto01.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 	(*CurrentGame).map_size = background->m_size;
 
 	InitializeSoloCharacter();
+
+	const float xo = 400;
+	const float xa = 600;
+	const float xb = 1200;
+	const float xc = 1500;
+	const float ya = 400;
+	const float yb = REF_WINDOW_RESOLUTION_Y - ya;
+	CreateDiscoball(sf::Vector2f(xo, REF_WINDOW_RESOLUTION_Y / 2 + 200));
+
+	// A
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa / 2, ya), false, xa);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa + (xb - xa) / 2, ya), false, xb - xa);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa, ((REF_WINDOW_RESOLUTION_Y - ya) / 2) + ya + 1), true, REF_WINDOW_RESOLUTION_Y - ya - 1);
+
+	//B
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xb, ya / 2), true, ya);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa + (xb - xa) / 2, ya + 2), false, xb - xa);
+
+	//C
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xc + (REF_WINDOW_RESOLUTION_X - xc) / 2, ya), false, REF_WINDOW_RESOLUTION_X - xc);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xb + (xc - xb) /2, ya), false, xc - xb);
+
+	//CreateIACharacter(sf::Vector2f(xa, ya / 2), Savannah, BlueTeam, IAHard, true);
+	//CreateIACharacter(sf::Vector2f(xc, (REF_WINDOW_RESOLUTION_Y + yb) / 2), Quorra, RedTeam, IAHard, true);
 }
 
 void InGameState::ShootingTrainingTuto01()
@@ -493,6 +517,11 @@ void InGameState::Update(sf::Time deltaTime)
 {
 	chosen_character = (*CurrentGame).playerShip->m_character;
 
+	(*CurrentGame).updateScene(deltaTime);
+
+	//move camera
+	UpdateCamera(deltaTime);
+
 	ostringstream ss_score_blue, ss_score_red;
 	ss_score_blue << (*CurrentGame).score_blue_team;
 	ss_score_red << (*CurrentGame).score_red_team;
@@ -550,11 +579,6 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		SetIngameScript(m_script, true);
 	}
-
-	(*CurrentGame).updateScene(deltaTime);
-
-	//move camera
-	UpdateCamera(deltaTime);
 
 	this->mainWindow->clear();
 }
