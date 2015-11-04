@@ -67,7 +67,6 @@ enum IngameScript
 	OfflineMultiBig,
 	Tuto01,
 	Tuto02,
-	Shooting01,
 };
 
 class GameObject : public AnimatedSprite

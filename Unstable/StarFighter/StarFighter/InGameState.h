@@ -35,7 +35,7 @@ public:
 
 	void StartTuto01();
 	void StartTuto02();
-	void StartShooting01();
+	void ShootingTrainingTuto01();
 
 	void SetIngameScript(IngameScript script, bool reset_scores = true);
 
