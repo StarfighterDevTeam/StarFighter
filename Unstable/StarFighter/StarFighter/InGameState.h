@@ -15,6 +15,14 @@
 
 class GameObject;
 
+enum ScreenBorder
+{
+	BorderUp,
+	BorderDown,
+	BorderRight,
+	BorderLeft,
+};
+
 class InGameState : public GameState
 {
 public:
@@ -36,6 +44,7 @@ public:
 	void StartTuto01();
 	void StartTuto02();
 	void StartTuto03();
+	void StartTuto04();
 	void ShootingTrainingTuto01();
 
 	void SetIngameScript(IngameScript script, bool reset_scores = true);
@@ -43,13 +52,15 @@ public:
 	IngameScript m_script;
 	IngameScript m_next_script;
 
-	Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, bool IA = false);
-	ShipIA* CreateIACharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, IADifficultyLevel IA_level = IAEasy, bool activated = true);
+	static Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, bool IA = false);
+	static ShipIA* CreateIACharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, IADifficultyLevel IA_level = IAEasy, bool activated = true);
 
-	Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
-	Bumper* CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size);
-	LevelPortal* CreateLevelPortal(IngameScript script, sf::Vector2f position);
-	GameObject* CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size);
+	static Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	static Bumper* CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size);
+	static LevelPortal* CreateLevelPortal(IngameScript script, sf::Vector2f position);
+	static GameObject* CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size);
+
+	static void AutoFillGoalBumpers(ScreenBorder border, float goal_size, float goal_pos);
 
 	PlayableCharacters chosen_character;
 
