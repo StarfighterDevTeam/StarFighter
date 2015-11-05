@@ -29,7 +29,7 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	SetIngameScript(Tuto03);
+	SetIngameScript(Tuto01);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
@@ -406,6 +406,38 @@ void InGameState::StartTuto01()
 
 	const float xo = 400;
 	const float xa = 750;
+	const float xb = 1500;
+	const float ya = 200;
+	const float goal_size = 250;
+	const float ss = ((*CurrentGame).map_size.y - goal_size) / 2;
+
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xo, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
+	CreateDiscoball(sf::Vector2f(xa, REF_WINDOW_RESOLUTION_Y / 2));
+
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(REF_WINDOW_RESOLUTION_X - xo, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
+
+	CreateGoal(RedTeam, sf::Vector2f((*CurrentGame).map_size.x - 8, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(16, GOAL_SIZE));
+
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - GOAL_SAFE_ZONE_X, ss / 2), true, ss);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - GOAL_SAFE_ZONE_X, (*CurrentGame).map_size.y - ss / 2), true, ss);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - GOAL_SAFE_ZONE_X / 2, ss), false, GOAL_SAFE_ZONE_X);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - GOAL_SAFE_ZONE_X / 2, (*CurrentGame).map_size.y - ss), false, GOAL_SAFE_ZONE_X);
+}
+
+void InGameState::StartTuto02()
+{
+	(*CurrentGame).cur_GameRules = SoloTraining;
+	(*CurrentGame).score_to_win = 1;
+	m_next_script = Tuto03;
+
+	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_tuto02.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+	(*CurrentGame).map_size = background->m_size;
+
+	InitializeSoloCharacter();
+
+	const float xo = 400;
+	const float xa = 750;
 	const float xb = 1000;
 	const float ya = 200;
 	const float xc_ = (*CurrentGame).map_size.x - ((*CurrentGame).map_size.x - xb) / 2;
@@ -429,42 +461,42 @@ void InGameState::StartTuto01()
 	portal_right->m_destination = portal_left;
 }
 
-void InGameState::StartTuto02()
-{
-	(*CurrentGame).cur_GameRules = SoloTraining;
-	(*CurrentGame).score_to_win = 1;
-	m_next_script = Tuto02;
-
-	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
-	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
-	(*CurrentGame).map_size = background->m_size;
-
-	InitializeSoloCharacter();
-
-	const float xo = 400;
-	const float xa = 600;
-	const float xb = 1200;
-	const float xc = 1500;
-	const float ya = 400;
-	const float yb = REF_WINDOW_RESOLUTION_Y - ya;
-	CreateDiscoball(sf::Vector2f(xo, REF_WINDOW_RESOLUTION_Y / 2 + 200));
-
-	// A
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa / 2, ya), false, xa);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa + (xb - xa) / 2, ya), false, xb - xa);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa, ((REF_WINDOW_RESOLUTION_Y - ya) / 2) + ya + 1), true, REF_WINDOW_RESOLUTION_Y - ya - 1);
-
-	//B
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xb, ya / 2), true, ya);
-	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa + (xb - xa) / 2, ya + 2), false, xb - xa);
-
-	//C
-	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xc + (REF_WINDOW_RESOLUTION_X - xc) / 2, ya), false, REF_WINDOW_RESOLUTION_X - xc);
-	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xb + (xc - xb) /2, ya), false, xc - xb);
-
-	//CreateIACharacter(sf::Vector2f(xa, ya / 2), Savannah, BlueTeam, IAHard, true);
-	//CreateIACharacter(sf::Vector2f(xc, (REF_WINDOW_RESOLUTION_Y + yb) / 2), Quorra, RedTeam, IAHard, true);
-}
+//void InGameState::StartTuto02()
+//{
+//	(*CurrentGame).cur_GameRules = SoloTraining;
+//	(*CurrentGame).score_to_win = 1;
+//	m_next_script = Tuto02;
+//
+//	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+//	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+//	(*CurrentGame).map_size = background->m_size;
+//
+//	InitializeSoloCharacter();
+//
+//	const float xo = 400;
+//	const float xa = 600;
+//	const float xb = 1200;
+//	const float xc = 1500;
+//	const float ya = 400;
+//	const float yb = REF_WINDOW_RESOLUTION_Y - ya;
+//	CreateDiscoball(sf::Vector2f(xo, REF_WINDOW_RESOLUTION_Y / 2 + 200));
+//
+//	// A
+//	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa / 2, ya), false, xa);
+//	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa + (xb - xa) / 2, ya), false, xb - xa);
+//	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa, ((REF_WINDOW_RESOLUTION_Y - ya) / 2) + ya + 1), true, REF_WINDOW_RESOLUTION_Y - ya - 1);
+//
+//	//B
+//	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xb, ya / 2), true, ya);
+//	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa + (xb - xa) / 2, ya + 2), false, xb - xa);
+//
+//	//C
+//	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xc + (REF_WINDOW_RESOLUTION_X - xc) / 2, ya), false, REF_WINDOW_RESOLUTION_X - xc);
+//	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xb + (xc - xb) /2, ya), false, xc - xb);
+//
+//	//CreateIACharacter(sf::Vector2f(xa, ya / 2), Savannah, BlueTeam, IAHard, true);
+//	//CreateIACharacter(sf::Vector2f(xc, (REF_WINDOW_RESOLUTION_Y + yb) / 2), Quorra, RedTeam, IAHard, true);
+//}
 
 void InGameState::StartTuto03()
 {
@@ -472,7 +504,7 @@ void InGameState::StartTuto03()
 	(*CurrentGame).score_to_win = 1;
 	m_next_script = MainMenuScript;
 
-	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_tuto02.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	GameObject* background = new GameObject(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_tuto03.png", sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y), sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 	(*CurrentGame).map_size = background->m_size;
 
@@ -682,9 +714,9 @@ void InGameState::InitializeMapDesign()
 	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - DEFENDER_SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
 
 	//SafeSpace
-	float goal_size_y = GOAL_SIZE;
-	float safe_space_x = GOAL_SAFE_ZONE_X;
-	float ss = ((*CurrentGame).map_size.y - goal_size_y) / 2;
+	const float goal_size_y = GOAL_SIZE;
+	const float safe_space_x = GOAL_SAFE_ZONE_X;
+	const float ss = ((*CurrentGame).map_size.y - goal_size_y) / 2;
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x, ss / 2), true, ss);
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x, (*CurrentGame).map_size.y - ss / 2), true, ss);
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x / 2, ss), false, safe_space_x);
