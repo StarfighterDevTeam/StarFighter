@@ -29,7 +29,7 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	SetIngameScript(Tuto04);
+	SetIngameScript(MainMenuScript);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
@@ -80,6 +80,12 @@ void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 		case Tuto04:
 		{
 			StartTuto04();
+			break;
+		}
+
+		case Tuto05:
+		{
+			StartTuto05();
 			break;
 		}
 
@@ -555,7 +561,7 @@ void InGameState::StartTuto04()
 {
 	(*CurrentGame).cur_GameRules = SoloTraining;
 	(*CurrentGame).score_to_win = 1;
-	m_next_script = MainMenuScript;
+	m_next_script = Tuto05;
 	(*CurrentGame).score_blue_team = 0;
 	(*CurrentGame).score_red_team = 0;
 
@@ -642,6 +648,27 @@ void InGameState::StartTuto04()
 	ShipIA* bot2 = CreateIACharacter(sf::Vector2f(x_goal_, yo), Quorra, RedTeam, IAHard, true);
 	bot2->ForceDiscoballUncontested();
 	bot2->ForceTackleDisabled();
+}
+
+void InGameState::StartTuto05()
+{
+	(*CurrentGame).cur_GameRules = SoloTraining;
+	(*CurrentGame).score_to_win = 1;
+	m_next_script = MainMenuScript;
+	(*CurrentGame).score_blue_team = 0;
+	(*CurrentGame).score_red_team = 0;
+
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_tuto05.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+
+	// ##### HACK
+	(*CurrentGame).map_size = background->m_size;
+
+	InitializeSoloCharacter();
+
+	Ship* playerShip2 = CreateIACharacter(sf::Vector2f((*CurrentGame).map_size.x - 100, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAEasy);
+
+	InitializeMapDesign();
 }
 
 void InGameState::AutoFillGoalBumpers(ScreenBorder border, float goal_size, float goal_pos)

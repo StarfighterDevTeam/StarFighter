@@ -69,6 +69,7 @@ enum IngameScript
 	Tuto02,
 	Tuto03,
 	Tuto04,
+	Tuto05,
 };
 
 class GameObject : public AnimatedSprite
