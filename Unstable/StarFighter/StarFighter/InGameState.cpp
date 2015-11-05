@@ -529,7 +529,7 @@ void InGameState::StartTuto03()
 	const float xo = 100;
 	const float yo = 3 * REF_WINDOW_RESOLUTION_Y / 4;
 
-	const float x1 = 650;
+	const float x1 = 800;
 	const float xa = 1400;
 	const float ya = 100;
 	const float yb = 400;
