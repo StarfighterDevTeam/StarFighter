@@ -479,7 +479,7 @@ void InGameState::StartTuto03()
 	const float xo = 100;
 	const float yo = 3 * REF_WINDOW_RESOLUTION_Y / 4;
 
-	const float x1 = 500;
+	const float x1 = 650;
 	const float xa = 1400;
 	const float ya = 100;
 	const float yb = 400;
@@ -502,7 +502,7 @@ void InGameState::StartTuto03()
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa - goal_size / 2, REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X/2), true, GOAL_SAFE_ZONE_X);
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(xa + goal_size / 2, REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X/2), true, GOAL_SAFE_ZONE_X);
 
-	CreateGoal(RedTeam, sf::Vector2f(REF_WINDOW_RESOLUTION_X, ((REF_WINDOW_RESOLUTION_Y / 2) + (REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X)) / 2), sf::Vector2f(16, REF_WINDOW_RESOLUTION_Y / 2 - GOAL_SAFE_ZONE_X));
+	CreateGoal(RedTeam, sf::Vector2f(REF_WINDOW_RESOLUTION_X - 8, ((REF_WINDOW_RESOLUTION_Y / 2) + (REF_WINDOW_RESOLUTION_Y - GOAL_SAFE_ZONE_X)) / 2), sf::Vector2f(16, REF_WINDOW_RESOLUTION_Y / 2 - GOAL_SAFE_ZONE_X));
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - GOAL_SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y / 2 / 2), true, REF_WINDOW_RESOLUTION_Y / 2);
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - GOAL_SAFE_ZONE_X / 2, REF_WINDOW_RESOLUTION_Y / 2), false, GOAL_SAFE_ZONE_X);
 }

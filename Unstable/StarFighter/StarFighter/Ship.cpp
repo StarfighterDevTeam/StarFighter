@@ -361,15 +361,15 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 
 void Ship::ManageDiscoball(sf::Time deltaTime)
 {
-	if (m_discoball != NULL)
+	if (m_discoball)
 	{
 		//touching map border results in dropping discoball
-		if (m_discoball->getPosition().y > (*CurrentGame).map_size.y - (m_discoball->m_size.y / 2) || m_discoball->getPosition().y < m_discoball->m_size.y / 2
-			|| m_discoball->getPosition().x > (*CurrentGame).map_size.x - (m_discoball->m_size.x / 2) || m_discoball->getPosition().x < m_discoball->m_size.x / 2)
+		if (m_discoball->visible && (m_discoball->getPosition().y > (*CurrentGame).map_size.y - (m_discoball->m_size.y / 2) || m_discoball->getPosition().y < m_discoball->m_size.y / 2
+			|| m_discoball->getPosition().x > (*CurrentGame).map_size.x - (m_discoball->m_size.x / 2) || m_discoball->getPosition().x < m_discoball->m_size.x / 2))
 		{
 			ReleaseDiscoball();
 		}
-		else if (m_discoball->m_isTouchingBumper)
+		else if (m_discoball->visible && m_discoball->m_isTouchingBumper)
 		{
 			ReleaseDiscoball();
 		}
