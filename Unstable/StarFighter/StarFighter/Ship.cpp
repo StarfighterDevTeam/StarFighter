@@ -134,7 +134,7 @@ void Ship::update(sf::Time deltaTime)
 	ManageFeedbacks();
 
 	//stroboscopic effect
-	if (GetAbsoluteSpeed() > SHIP_MAX_SPEED)
+	if (GetAbsoluteSpeed() > SHIP_MAX_SPEED && visible)
 	{
 		PlayStroboscopicEffect(seconds(TACKLE_STROBO_EFFECT_DURATION * GetAbsoluteSpeed() / SHIP_TACKLE_MAX_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
 	}	
@@ -318,6 +318,9 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				m_discoball->m_carrier = this;
 				discoball_curAngle = angle_collision;
 				m_carrier_clock.restart();
+				//transmitting values to the discoball
+				m_discoball->m_carrier_curAngle = discoball_curAngle;
+				m_discoball->m_carrier_curPosition = getPosition();
 
 				//checking min and max cap values
 				//printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);

@@ -221,7 +221,6 @@ void Game::drawScene()
 
 				if ((*(*it)).visible)
 				{
-
 					this->mainScreen.draw((*(*it)));
 				}
 			}

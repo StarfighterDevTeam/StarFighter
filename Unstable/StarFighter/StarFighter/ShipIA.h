@@ -48,12 +48,17 @@ public :
 	static GameObjectType GetOpponentGameObjectType(Ship* player);
 	static GameObjectType GetOwnGameObjectType(Ship* player);
 
+	void ForceDiscoballUncontested(bool forced_value = true);
+	void ForceTackleDisabled(bool forced_value = true);
+
 private:
 	bool m_IA_activated;
 	IADifficultyLevel m_IA_level;
 	sf::Clock m_reaction_clock;
 	float m_hold_tackle_duration;
 	float m_tackle_activated;
+	bool m_force_discoball_uncontested;
+	bool m_force_tackle_disabled;
 };
 
 #endif // SHIPIA_H_INCLUDED

@@ -28,6 +28,10 @@ void ShipIA::Init()
 	m_disable_inputs = true;
 	m_hold_tackle_duration = 0;
 	m_tackle_activated = false;
+
+	//IA scripted
+	m_force_discoball_uncontested = false;
+	m_force_tackle_disabled = false;
 }
 
 ShipIA::~ShipIA()
@@ -226,7 +230,7 @@ void ShipIA::IA_MoveToObject(GameObject* object, sf::Time deltaTime, bool antici
 
 void ShipIA::Tackle(float hold_tackle_duration)
 {
-	if (m_isTackling == NOT_TACKLING)
+	if (m_isTackling == NOT_TACKLING && !m_force_tackle_disabled)
 	{
 		m_hold_tackle_duration = hold_tackle_duration;
 		m_tackle_activated = true;
@@ -477,7 +481,7 @@ bool ShipIA::isTargetBallContested()
 		GameObject* opponent = FindClosestGameObjectTyped(m_target_discoball, GetOpponentGameObjectType(this));
 		const float distance_discoball_to_opponent = GetDistanceBetweenObjects(opponent, m_target_discoball);
 
-		if (distance_discoball_to_opponent > IA_DISTANCE_FOR_UNCONTESTED || (distance_to_target <= distance_discoball_to_opponent))
+		if (distance_discoball_to_opponent > IA_DISTANCE_FOR_UNCONTESTED || (distance_to_target <= distance_discoball_to_opponent) || m_force_discoball_uncontested)
 			return false;
 		else
 			return true;
@@ -498,4 +502,14 @@ GameObjectType ShipIA::GetOwnGameObjectType(Ship* player)
 	assert(player != NULL);
 	GameObjectType type = player->m_team == BlueTeam ? PlayerBlueShip : PlayerRedShip;
 	return type;
+}
+
+void ShipIA::ForceDiscoballUncontested(bool forced_value)
+{
+	m_force_discoball_uncontested = forced_value;
+}
+
+void ShipIA::ForceTackleDisabled(bool forced_value)
+{
+	m_force_tackle_disabled = forced_value;
 }

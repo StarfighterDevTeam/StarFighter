@@ -563,17 +563,18 @@ void InGameState::StartTuto04()
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 	(*CurrentGame).map_size = background->m_size;
 
-	const float xo = 200;
+	const float xo = GOAL_SAFE_ZONE_X + 150;
 	const float yo = 200;
-	const float y_disc = 700;
+	const float y_disc = 600;
 
-	const float xa = 250;
+	const float xa = GOAL_SAFE_ZONE_X + 300;
+	const float xb = GOAL_SAFE_ZONE_X + 400;
 	const float ya = 800;
+	const float goal_size = 300;
 
-	const float goal_size = 200;
-
-
-	//CreateIACharacter(sf::Vector2f(x1, ya), Quorra, RedTeam, IAHard, true);
+	const float xc = GOAL_SAFE_ZONE_X + 800;
+	const float xd = GOAL_SAFE_ZONE_X + 900;
+	const float yb = 600;
 
 	//Start
 	Ship* playerShip1 = CreateCharacter(sf::Vector2f(xo, yo), Natalia, BlueTeam);
@@ -586,8 +587,19 @@ void InGameState::StartTuto04()
 
 	//Switch1
 	CreateGoal(BlueTeam, sf::Vector2f(8, ya), sf::Vector2f(16, goal_size));
-
 	AutoFillGoalBumpers(BorderLeft, goal_size, ya);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa, ya /2), true, ya);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xb, (*CurrentGame).map_size.y - ya / 2), true, ya);
+
+	//Switch2
+	AutoFillGoalBumpers(BorderLeft, goal_size, ya);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa, ya / 2), true, ya);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xc, (*CurrentGame).map_size.y - ya / 2), true, ya);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f((xc + xb) /2, (*CurrentGame).map_size.y - ya), false, xc - xb);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xd, ya / 2), true, ya);
+	ShipIA* bot1 = CreateIACharacter(sf::Vector2f((xc + xb) / 2, yb), Quorra, RedTeam, IAHard, true);
+	bot1->ForceDiscoballUncontested();
+	bot1->ForceTackleDisabled();
 }
 
 void InGameState::AutoFillGoalBumpers(ScreenBorder border, float goal_size, float goal_pos)

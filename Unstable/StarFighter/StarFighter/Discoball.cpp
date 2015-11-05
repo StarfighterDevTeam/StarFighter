@@ -46,10 +46,6 @@ void Discoball::update(sf::Time deltaTime)
 {
 	m_isTouchingBumper = false;
 
-	//stroboscopic effect
-	if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION)
-		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION * discoball_curAngularSpeed / CARRY_MAX_ANGULAR_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
-
 	if (!m_carried)
 	{
 		static sf::Vector2f newposition;
@@ -130,6 +126,10 @@ void Discoball::update(sf::Time deltaTime)
 
 		coeff_friction = 0;
 	}
+
+	//stroboscopic effect
+	if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION && visible)
+		PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION * discoball_curAngularSpeed / CARRY_MAX_ANGULAR_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
 
 	AnimatedSprite::update(deltaTime);
 }
