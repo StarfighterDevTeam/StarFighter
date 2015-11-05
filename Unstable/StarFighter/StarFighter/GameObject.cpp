@@ -27,16 +27,16 @@ GameObject::GameObject()
 
 }
 
-void GameObject::setAnimationLine(int m_animation, bool keep_frame_index)
+void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
 	//bulletproof verifications
-	if (m_animation >= this->animationNumber)
+	if (animation >= m_animationNumber)
 	{
-		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", m_animation, this->animationNumber);
-		m_animation = this->animationNumber - 1;
-		if (m_animation < 0)
+		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, m_animationNumber);
+		animation = m_animationNumber - 1;
+		if (animation < 0)
 		{
-			m_animation = 0;
+			animation = 0;
 		}
 	}
 
@@ -45,9 +45,9 @@ void GameObject::setAnimationLine(int m_animation, bool keep_frame_index)
 	anim->setSpriteSheet(*this->defaultAnimation.getSpriteSheet());
 	for (size_t j = 0; j < this->defaultAnimation.getSize(); j++)
 	{
-		size_t n = j / this->frameNumber;
+		size_t n = j / m_frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
-		if (n == m_animation)
+		if (n == animation)
 		{
 			anim->addFrame(this->defaultAnimation.getFrame(j));
 		}
@@ -60,24 +60,24 @@ void GameObject::setAnimationLine(int m_animation, bool keep_frame_index)
 
 	this->currentAnimation = anim;
 	this->play(*currentAnimation);
-	this->currentAnimationIndex = m_animation;
+	this->currentAnimationIndex = animation;
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
 {
-	this->animationNumber = m_animationNumber;
-	this->frameNumber = m_frameNumber;
+	this->m_animationNumber = animationNumber;
+	this->m_frameNumber = frameNumber;
 	this->initial_position = sf::Vector2f(position.x, position.y);
-	this->m_size.x = ((*texture).getSize().x / m_frameNumber);
-	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
+	this->m_size.x = ((*texture).getSize().x / frameNumber);
+	this->m_size.y = ((*texture).getSize().y / animationNumber);
 
 	this->defaultAnimation.setSpriteSheet(*texture);
-	for (int j = 0; j < m_animationNumber; j++)
+	for (int j = 0; j < animationNumber; j++)
 	{
-		for (int i = 0; i < m_frameNumber; i++)
+		for (int i = 0; i < frameNumber; i++)
 		{
-			int x = ((*texture).getSize().x / m_frameNumber)*(i);
-			int y = ((*texture).getSize().y / m_animationNumber)*(j);
+			int x = ((*texture).getSize().x / frameNumber)*(i);
+			int y = ((*texture).getSize().y / animationNumber)*(j);
 			this->defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
 		}
 	}

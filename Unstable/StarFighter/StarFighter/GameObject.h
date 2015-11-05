@@ -73,7 +73,7 @@ enum IngameScript
 class GameObject : public AnimatedSprite
 {
 public:
-	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber = 1, int m_animationNumber = 1);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	GameObject();
@@ -82,7 +82,7 @@ public:
 
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
-	void setAnimationLine(int m_animation, bool keep_frame_index = false);
+	void setAnimationLine(int animation, bool keep_frame_index = false);
 	bool visible;
 	bool isOnScene;
 	bool GarbageMe;
@@ -99,8 +99,8 @@ public:
 	bool ghost;
 	void setGhost(bool m_ghost);
 	float rotation_speed;
-	int animationNumber;
-	int frameNumber;
+	int m_animationNumber;
+	int m_frameNumber;
 	int currentAnimationIndex;
 
 	std::string textureName;
