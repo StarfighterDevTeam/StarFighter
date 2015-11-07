@@ -610,7 +610,7 @@ void InGameState::StartTuto04()
 	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(xa, ya / 2), true, ya);
 	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xc, (*CurrentGame).map_size.y - ya / 2), true, ya);
 
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((xb + xc) / 2, (*CurrentGame).map_size.y - ya / 2), true, ya);
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f((xb + xc) / 2, (*CurrentGame).map_size.y - ya / 2), true, ya);
 	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f((xc + xb) /2, (*CurrentGame).map_size.y - ya), false, xc - xb);
 	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(xd, yc/2), true, yc);
 	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f((xe + xd) / 2, yc), false, xe - xd);

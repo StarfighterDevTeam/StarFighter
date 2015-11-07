@@ -466,7 +466,7 @@ void Ship::ReleaseDiscoball(float angularSpeedBonus)
 		//m_discoball->discoball_curAngularSpeed += CARRY_THROW_ACCELERATION_BONUS;
 		m_discoball->discoball_curAngularSpeed *= DISCOBALL_RELEASE_SPEED_RATIO;
 		m_discoball->discoball_curAngularSpeed += angularSpeedBonus;
-		m_discoball->speed.x = -m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
+		m_discoball->speed.x = - m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * sin(discoball_curAngle);
 		m_discoball->speed.y = m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE * cos(discoball_curAngle);
 		m_discoball->m_carried = false;
 		//printf("Discoball released. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
