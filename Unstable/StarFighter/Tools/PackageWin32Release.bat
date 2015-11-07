@@ -1,6 +1,6 @@
 @echo off 
 echo:
-echo Packager for StarFighter Win32
+echo Packager for DashJammers Win32
 echo:
 echo First of all, make sure the project is built with params [Release ^| Win32]
 echo:
@@ -9,8 +9,8 @@ set /p input=Then press [enter]
 echo:
 echo:
 
-set packagename=StarFighter
-set projectsrc=.\..\StarFighter
+set packagename=DashJammers
+set projectsrc=.\..\DashJammers
 set releasefolder=.\..\Release
 set vcredistfolder=.\..\..\..\Libraries\VCRedist\x86
 
