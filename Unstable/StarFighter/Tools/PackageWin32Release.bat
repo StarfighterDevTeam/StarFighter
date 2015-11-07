@@ -9,8 +9,8 @@ set /p input=Then press [enter]
 echo:
 echo:
 
-set packagename=DashJammers
-set projectsrc=.\..\DashJammers
+set packagename=StarFighter
+set projectsrc=.\..\StarFighter
 set releasefolder=.\..\Release
 set vcredistfolder=.\..\..\..\Libraries\VCRedist\x86
 
