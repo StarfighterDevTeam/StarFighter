@@ -89,6 +89,12 @@ void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 			break;
 		}
 
+		case ScriptTest:
+		{
+			StartTest();
+			break;
+		}
+
 		default:
 		{
 			StartMainMenu();
@@ -298,7 +304,7 @@ void InGameState::StartMainMenu()
 
 	CreateLevelPortal(Tuto01, sf::Vector2f(360, 380));
 	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, REF_WINDOW_RESOLUTION_Y / 2));
-	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, 700));
+	CreateLevelPortal(ScriptTest, sf::Vector2f(360, 700));
 	CreateLevelPortal(OfflineMulti, sf::Vector2f(1560, 380));
 	CreateLevelPortal(OfflineMultiBig, sf::Vector2f(1560, REF_WINDOW_RESOLUTION_Y / 2));
 	CreateLevelPortal(MainMenuScript, sf::Vector2f(1560, 700));
@@ -336,6 +342,30 @@ void InGameState::StartMultiGame(bool reset_scores)
 		(*CurrentGame).score_blue_team = 0;
 		(*CurrentGame).score_red_team = 0;
 	}
+}
+
+void InGameState::StartTest()
+{
+	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
+	(*CurrentGame).score_to_win = 10;
+
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+
+	// ##### HACK
+	(*CurrentGame).map_size = background->m_size;
+
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
+	playerShip1->SetControllerType(AllControlDevices);
+
+	// #### HACK
+	(*CurrentGame).playerShip = playerShip1;
+	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+
+	Ship* playerShip2 = CreateCharacter(sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam);
+	playerShip2->SetControllerType(JoystickControl2);
+
+	InitializeMapDesign();
 }
 
 void InGameState::StartMultiGameBig(bool reset_scores)

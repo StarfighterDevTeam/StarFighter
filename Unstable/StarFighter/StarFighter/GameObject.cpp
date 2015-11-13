@@ -321,3 +321,77 @@ void GameObject::UsingPortal(bool is_using)
 {
 	// see override function in class Ship and Discoball
 }
+
+bool GameObject::IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float *i_x, float *i_y)
+{
+	float s1_x, s1_y, s2_x, s2_y;
+	s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+	s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+	float s, t;
+	s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+	t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+	if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+	{
+		// Collision detected
+		if (i_x != NULL)
+			*i_x = p0_x + (t * s1_x);
+		if (i_y != NULL)
+			*i_y = p0_y + (t * s1_y);
+		return 1;
+	}
+
+	return 0; // No collision
+}
+
+bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, float *i_x, float *i_y, sf::Time deltaTime)
+{
+	if (!object || !bumper)
+		return false;
+
+	const float p_0x = object->getPosition().x;
+	const float p_0y = object->getPosition().y;
+	const float p_1x = object->getPosition().x - object->speed.x * deltaTime.asSeconds();
+	const float p_1y = object->getPosition().y - object->speed.y * deltaTime.asSeconds();
+
+	const float theta = GetAngleRadForSpeed(object->speed);
+	const float angle_top = M_PI - theta;
+	const float angle_bottom = - theta;
+	const float offset_top_x = -object->m_size.x / 2 * sin(angle_top);
+	const float offset_top_y = object->m_size.x / 2 * cos(angle_top);
+	const float offset_bottom_x = -object->m_size.x / 2 * sin(angle_bottom);
+	const float offset_bottom_y = object->m_size.x / 2 * cos(angle_bottom);
+
+	bool is_bumper_vertical = bumper->m_size.x > bumper->m_size.y ? false : true;
+	const float p_2x = is_bumper_vertical ? bumper->getPosition().x : bumper->getPosition().x - bumper->m_size.x / 2;
+	const float p_2y = is_bumper_vertical ? bumper->getPosition().y - bumper->m_size.y / 2 : bumper->getPosition().y;
+	const float p_3x = is_bumper_vertical ? bumper->getPosition().x : bumper->getPosition().x + bumper->m_size.x / 2;
+	const float p_3y = is_bumper_vertical ? bumper->getPosition().y + bumper->m_size.y / 2 : bumper->getPosition().y;
+	
+	if (IntersectSegments(p_0x + offset_top_x, p_0y + offset_top_y, p_1x + offset_top_x, p_1y + offset_bottom_y, p_2x, p_2y, p_3x, p_3y, i_x, i_y)
+		|| IntersectSegments(p_0x + offset_bottom_x, p_0y + offset_bottom_y, p_1x + offset_bottom_x, p_1y + offset_bottom_y, p_2x, p_2y, p_3x, p_3y, i_x, i_y))
+	{
+		printf("Collision on capsule movement \n");
+		return true;//capsule collision
+	}
+	else
+	{
+		//collision at arrival
+		//if (abs((p_3y - p_2y) * p_1x - (p_3x - p_2x) * p_1y + p_3x*p_2y - p_3y*p_2x) / sqrt((p_3y - p_2y) * (p_3y - p_2y) + (p_3x - p_2x) * (p_3x - p_2x)) < object->m_size.x / 2)
+		//		return true;
+
+		
+		const float a = p_3y - p_2y;
+		const float b = p_3x - p_2x;
+		const float c = p_2x * p_3y - p_3x * p_2y;
+		if (abs(a * p_1x + b * p_1y + c) / sqrt(a * a + b * b) < object->m_size.x / 2)
+		{
+			printf("Collision at arrival position \n");
+			return true;
+		}
+			
+
+		return false;
+	}
+}

@@ -14,7 +14,7 @@ void Game::init(RenderWindow* window)
 
 	view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
-	view.zoom(0.8f);
+	//view.zoom(0.8f);
 
 	//default value
 	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
@@ -446,6 +446,12 @@ void Game::colisionChecksV2(Time deltaTime)
 				(*it1)->DiscoballBumper(*it2);
 				PlaySFX(SFX_Bounce);
 			}
+			//else 	
+			//if (GameObject::isCapsuleColliding((*it1), (*it2), NULL, NULL, deltaTime))
+			//{
+			//	//(*it1)->DiscoballBumper(*it2);
+			//	PlaySFX(SFX_Bounce);
+			//}
 		}
 
 		//Discoball hits level portal

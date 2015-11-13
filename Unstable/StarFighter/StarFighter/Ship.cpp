@@ -75,6 +75,8 @@ void Ship::update(sf::Time deltaTime)
 	SetTargetOpponent();
 	m_isUnmarked = IsUnmarked();
 
+	//printf("speed y :%f\n", speed.y);
+
 	//ManageHitRecovery();
 
 	m_input_direction = sf::Vector2f(0, 0);
