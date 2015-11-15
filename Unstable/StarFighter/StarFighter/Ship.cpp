@@ -325,7 +325,7 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				m_discoball->m_carrier_curPosition = getPosition();
 
 				//checking min and max cap values
-				//printf("Discoball catched (speed: %f", m_discoball->discoball_curAngularSpeed);
+				printf("Discoball catched (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 				DiscoballSpeedConstraints();
 				//printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
 
@@ -395,7 +395,7 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 					m_discoball->discoball_curAngularSpeed = CARRY_BASE_ANGULAR_SPEED;
 				}
 
-				//printf("Discoball decelerated. (speed: %f", m_discoball->discoball_curAngularSpeed);
+				printf("Discoball decelerated. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 				DiscoballSpeedConstraints();
 				//printf(" | correction: %f)\n", m_discoball->discoball_curAngularSpeed);
 				m_carrier_clock.restart();
@@ -443,7 +443,7 @@ void Ship::ThrowDiscoball()
 		m_discoball->SetSpeedVectorFromAbsoluteSpeed(m_discoball->discoball_curAngularSpeed * DISCOBALL_GRAVITATION_DISTANCE, discoball_curAngle);
 
 		m_discoball->m_carried = false;
-		//printf("Discoball thrown. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
+		printf("Discoball thrown. (speed: %f)\n", m_discoball->discoball_curAngularSpeed);
 		carry_again_clock.restart();
 
 		m_discoball->SetDiscoballStatus(DiscoballFree);

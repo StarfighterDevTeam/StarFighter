@@ -95,11 +95,15 @@ void Discoball::update(sf::Time deltaTime)
 			coeff_friction += COEFF_FRICTION_INCREASE_RATIO * COEFF_FRICTION_INCREASE_RATIO;
 			speed.x *= (1 - COEFF_FRICTION_INCREASE_RATIO);
 			speed.y *= (1 - COEFF_FRICTION_INCREASE_RATIO);
-			if (GetAbsoluteSpeed() < DISCOBALL_MIN_SPEED)
+			const float abs_speed = GetAbsoluteSpeed();
+			if (abs_speed < DISCOBALL_MIN_SPEED)
 			{
 				speed.x = 0;
 				speed.y = 0;
 			}
+
+			discoball_curAngularSpeed = abs_speed / DISCOBALL_GRAVITATION_DISTANCE;
+			//printf("speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
 		}
 
 		setColor(sf::Color(255, 255, 255, 255));

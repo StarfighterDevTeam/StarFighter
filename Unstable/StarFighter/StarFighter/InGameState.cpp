@@ -29,7 +29,7 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	SetIngameScript(Tuto04);
+	SetIngameScript(ScriptTest);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
@@ -349,14 +349,17 @@ void InGameState::StartTest()
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
 	(*CurrentGame).score_to_win = 10;
 
-	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	Ship* playerShip1 = CreateCharacter(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
+	Ship* playerShip1 = new Ship(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/natalia_test.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+	playerShip1->m_team = BlueTeam;
+	playerShip1->m_character = Natalia;
 	playerShip1->SetControllerType(AllControlDevices);
+	(*CurrentGame).addToScene(playerShip1, PlayerShipLayer, PlayerBlueShip);
 
 	// #### HACK
 	(*CurrentGame).playerShip = playerShip1;
@@ -365,7 +368,8 @@ void InGameState::StartTest()
 	Ship* playerShip2 = CreateCharacter(sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam);
 	playerShip2->SetControllerType(JoystickControl2);
 
-	InitializeMapDesign();
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), true, REF_WINDOW_RESOLUTION_Y);
+	CreateDiscoball();
 }
 
 void InGameState::StartMultiGameBig(bool reset_scores)
@@ -373,7 +377,7 @@ void InGameState::StartMultiGameBig(bool reset_scores)
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
 	(*CurrentGame).score_to_win = 10;
 
-	GameObject* background = new GameObject(sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(2880, 1080), sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2));
+	GameObject* background = new GameObject(sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_big.png", sf::Vector2f(2880, 1080), sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	// ##### HACK
