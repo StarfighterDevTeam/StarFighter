@@ -372,12 +372,12 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	//collision at arrival? Calculation of distance of point p0 to segment [p_2, p_3]
 	const float px = p_3x - p_2x;
 	const float py = p_3y - p_2y;
-	float u = ((p_1x - p_2x)*px + (p_1y - p_2y)*py) / (px*px + py*py);
+	float u = ((p_0x - p_2x)*px + (p_0y - p_2y)*py) / (px*px + py*py);
 	u = (u > 1) ? 1 : (u < 0) ? 0 : u;
 	const float x = p_2x + u*px;
 	const float y = p_2y + u*py;
-	const float dx = x - p_1x;
-	const float dy = y - p_1y;
+	const float dx = x - p_0x;
+	const float dy = y - p_0y;
 	const float dist = sqrt(dx*dx + dy*dy);
 
 	//const float dist = sqrt(((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y))*((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y)) / ((p_3x - p_2x)*(p_3x - p_2x) + (p_3y - p_2y)*(p_3y - p_2y)));

@@ -779,82 +779,22 @@ void Ship::PlayerBumper(GameObject* bumper, Time deltaTime)
 {
 	Bumper* bumper_ = (Bumper*)bumper;
 
-	if ((bumper_->m_type == OnlyBlueTeamThrough && m_team == RedTeam) || (bumper_->m_type == OnlyRedTeamThrough && m_team == BlueTeam))
+	bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
+	if (is_vertical_bumper)
 	{
-		//ResetStatus();
-
-		bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
-
-		const float correction_x = (bumper->m_size.x / 2) + (m_size.x / 2);
-		const float correction_y = (bumper->m_size.y / 2) + (m_size.y / 2);
-
-		const float speed_x = speed.x * deltaTime.asSeconds();
-		const float speed_y = speed.y * deltaTime.asSeconds();
-
-		if (is_vertical_bumper)
-		{
-			//if (speed.x > 0)
-			//{
-			//	setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
-			//}
-			//else if (speed.x < 0)
-			//{
-			//
-			//	setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
-			//}
-			//else
-			//{
-
-				//this detection system is not perfect. It's good enough.
-				if (getPosition().x < bumper->getPosition().x)
-				{
-					if (speed_x > -m_size.x)
-						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
-					else // in this situation, the player most likely passed through the detection because of a very high speed... but we busted him :) look at him, he looks like a suspect.
-						setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
-				}
-				else
-				{
-					if (speed_x < m_size.x)
-  						setPosition(sf::Vector2f(bumper->getPosition().x + correction_x, getPosition().y));
-					else
-						setPosition(sf::Vector2f(bumper->getPosition().x - correction_x, getPosition().y));
-				}
-			//}
-
-			speed.x = 0;
-		}
-		else //horizontal bumper
-		{
-			//if (speed.y > 0)
-			//{
-			//	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
-			//}
-			//else if (speed.y < 0)
-			//{
-			//	setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
-			//}
-			//else
-			//{
-				if (getPosition().y < bumper->getPosition().y)
-				{
-					if (speed_y > -m_size.y)
- 						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
-					else
-						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
-				}
-				else
-				{
-					if (speed_y < m_size.y)
-						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + correction_y));
-					else
-						setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - correction_y));
-				}
-			//}
-
-			speed.y = 0;
-		}
+		int speed_bool = speed.x > 0 ? -1 : 1;
+		setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
+		speed.x = 0.f;
 	}
+	else
+	{
+		int speed_bool = speed.y > 0 ? -1 : 1;
+		setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + speed_bool * m_size.y / 2));
+		speed.y = 0.f;
+	}
+	
+	if (m_isTackling == INITIATE_TACLKE)
+		m_isTackling = HOLDING_TACKLE;
 }
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)

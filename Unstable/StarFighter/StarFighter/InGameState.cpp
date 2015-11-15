@@ -368,7 +368,7 @@ void InGameState::StartTest()
 	Ship* playerShip2 = CreateCharacter(sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam);
 	playerShip2->SetControllerType(JoystickControl2);
 
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), true, REF_WINDOW_RESOLUTION_Y);
+	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(300, 540), false, 200);
 	CreateDiscoball();
 }
 
