@@ -418,6 +418,7 @@ void Game::colisionChecksV2(Time deltaTime)
 					(*it2)->PlayHitFeedback();
 					Goal(BlueTeam);
 					(*it1)->visible = false;
+					(*it1)->GarbageMe = true;
 				}
 			}
 		}

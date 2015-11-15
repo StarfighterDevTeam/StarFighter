@@ -354,6 +354,16 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	if (!object || !bumper)
 		return false;
 
+	if (!object->visible || !(bumper->visible))
+		return false;
+
+	//ghost is a property that prevents an object from colliding, so by definition we exclude it
+	if (object->ghost || (bumper->ghost))
+		return false;
+
+	if (!object->isOnScene || !(bumper->isOnScene))
+		return false;
+
 	//p_0 : current position of discoball
 	//p_1 : previous position of discoball
 	//p_2 : bumper segment point 1
