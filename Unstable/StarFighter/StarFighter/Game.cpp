@@ -440,18 +440,18 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			//if (SimpleCollision::AreColliding((*it1), (*it2)))
+			//{
+			//	//float angle = GetAngleOfCollision(*it2, *it1);
+			//	(*it1)->DiscoballBumper(*it2);
+			//	PlaySFX(SFX_Bounce);
+			//}
+			//else
+			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
-				//float angle = GetAngleOfCollision(*it2, *it1);
 				(*it1)->DiscoballBumper(*it2);
 				PlaySFX(SFX_Bounce);
 			}
-			//else 	
-			//if (GameObject::isCapsuleColliding((*it1), (*it2), NULL, NULL, deltaTime))
-			//{
-			//	//(*it1)->DiscoballBumper(*it2);
-			//	PlaySFX(SFX_Bounce);
-			//}
 		}
 
 		//Discoball hits level portal

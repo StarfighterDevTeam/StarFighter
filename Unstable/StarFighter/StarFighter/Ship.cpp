@@ -75,6 +75,12 @@ void Ship::update(sf::Time deltaTime)
 	SetTargetOpponent();
 	m_isUnmarked = IsUnmarked();
 
+	//stroboscopic effect
+	if (GetAbsoluteSpeed() > SHIP_MAX_SPEED && visible)
+	{
+		PlayStroboscopicEffect(seconds(TACKLE_STROBO_EFFECT_DURATION * GetAbsoluteSpeed() / SHIP_TACKLE_MAX_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
+	}
+
 	//printf("speed y :%f\n", speed.y);
 
 	//ManageHitRecovery();
@@ -134,12 +140,6 @@ void Ship::update(sf::Time deltaTime)
 	ManageDiscoball(deltaTime);
 	ManageKeyReleases();
 	ManageFeedbacks();
-
-	//stroboscopic effect
-	if (GetAbsoluteSpeed() > SHIP_MAX_SPEED && visible)
-	{
-		PlayStroboscopicEffect(seconds(TACKLE_STROBO_EFFECT_DURATION * GetAbsoluteSpeed() / SHIP_TACKLE_MAX_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
-	}	
 }
 
 void Ship::ResetStatus()
