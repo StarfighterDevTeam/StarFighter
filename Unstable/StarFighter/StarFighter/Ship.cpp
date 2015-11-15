@@ -81,8 +81,6 @@ void Ship::update(sf::Time deltaTime)
 		PlayStroboscopicEffect(seconds(TACKLE_STROBO_EFFECT_DURATION * GetAbsoluteSpeed() / SHIP_TACKLE_MAX_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
 	}
 
-	//printf("speed y :%f\n", speed.y);
-
 	//ManageHitRecovery();
 
 	m_input_direction = sf::Vector2f(0, 0);
@@ -130,8 +128,11 @@ void Ship::update(sf::Time deltaTime)
 
 	if (ScreenBorderContraints())
 	{
-		//ResetStatus();
+		if (m_isTackling == INITIATE_TACLKE)
+			m_isTackling = HOLDING_TACKLE;
 	}
+
+	//printf("speed y :%f", speed.y);
 
 	ManageFire();
 	
@@ -155,28 +156,28 @@ bool Ship::ScreenBorderContraints()
 	if (this->getPosition().x < this->m_size.x / 2)
 	{
 		this->setPosition(m_size.x / 2, this->getPosition().y);
-		speed.x = 0;
+		speed.x = 0.f;
 		correction_made = true;
 	}
 
 	if (this->getPosition().x > (*CurrentGame).map_size.x - (m_size.x / 2))
 	{
 		this->setPosition((*CurrentGame).map_size.x - (m_size.x / 2), this->getPosition().y);
-		speed.x = 0;
+		speed.x = 0.f;
 		correction_made = true;
 	}
 
 	if (this->getPosition().y < m_size.y / 2)
 	{
 		this->setPosition(this->getPosition().x, m_size.y / 2);
-		speed.y = 0;
+		speed.y = 0.f;
 		correction_made = true;
 	}
 
 	if (this->getPosition().y >(*CurrentGame).map_size.y - (m_size.y / 2))
 	{
 		this->setPosition(this->getPosition().x, (*CurrentGame).map_size.y - (m_size.y / 2));
-		speed.y = 0;
+		speed.y = 0.f;
 		correction_made = true;
 	}
 
@@ -586,7 +587,7 @@ void Ship::ManageTackle(bool force_input)
 	//State 3
 	if (m_isTackling == HOLDING_TACKLE)
 	{
-		if ((force_input || (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased)))
+		if ((force_input || (tackle_max_hold_clock.getElapsedTime().asSeconds() > SHIP_TACKLE_MAX_HOLD_TIME || wasTacklingButtonReleased || GetAbsoluteSpeed() < SHIP_MIN_SPEED_AFTER_TACKLE)))
 		{
 			m_isTackling = ENDING_TACKLE;
 		}

@@ -381,7 +381,7 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	const float dist = sqrt(dx*dx + dy*dy);
 
 	//const float dist = sqrt(((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y))*((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y)) / ((p_3x - p_2x)*(p_3x - p_2x) + (p_3y - p_2y)*(p_3y - p_2y)));
-	printf("dist: %f\n", dist);
+	//printf("dist: %f\n", dist);
 
 	if (dist - object->m_size.x / 2 < 0)
 	{
