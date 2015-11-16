@@ -279,6 +279,16 @@ bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 	return false;
 }
 
+void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
+{
+	if (vector->x == 0 && vector->y == 0)
+		return;
+
+	float p = target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+	vector->x *= p;
+	vector->y *= p;
+}
+
 GameObject* GameObject::Clone()
 {
 	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->textureName, this->m_size);

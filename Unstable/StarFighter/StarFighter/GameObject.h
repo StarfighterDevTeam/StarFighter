@@ -113,6 +113,7 @@ public:
 	void SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle);
 
 	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
+	static void ScaleSpeed(sf::Vector2f* vector, float target_value);
 	static float GetAbsoluteSpeed(sf::Vector2f speed_);
 	static float GetAngleRadForSpeed(sf::Vector2f curSpeed);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
