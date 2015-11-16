@@ -309,6 +309,7 @@ void Game::colisionChecksV2(Time deltaTime)
 				(*it1)->GetPortal(*it2);
 				contact_with_portal = true;
 				(*it1)->UsingPortal(contact_with_portal);
+				break;
 			}
 		}
 		(*it1)->UsingPortal(contact_with_portal);
@@ -319,9 +320,11 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			//if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				(*it1)->PlayerBumper(*it2, deltaTime);
+				break;
 			}
 		}
 	}
@@ -363,6 +366,7 @@ void Game::colisionChecksV2(Time deltaTime)
 				(*it1)->GetPortal(*it2);
 				contact_with_portal = true;
 				(*it1)->UsingPortal(contact_with_portal);
+				break;
 			}
 		}
 		(*it1)->UsingPortal(contact_with_portal);
@@ -374,8 +378,10 @@ void Game::colisionChecksV2(Time deltaTime)
 				continue;
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			//if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				(*it1)->PlayerBumper(*it2, deltaTime);
+				break;
 			}
 		}
 	}
@@ -391,7 +397,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
 
@@ -401,6 +407,7 @@ void Game::colisionChecksV2(Time deltaTime)
 					(*it2)->PlayHitFeedback();
 					Goal(RedTeam);
 					(*it1)->visible = false;
+					break;
 				}
 			}
 		}
@@ -422,6 +429,7 @@ void Game::colisionChecksV2(Time deltaTime)
 					Goal(BlueTeam);
 					(*it1)->visible = false;
 					(*it1)->GarbageMe = true;
+					break;
 				}
 			}
 		}
@@ -435,6 +443,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//TO DO
+				break;
 			}
 		}
 
@@ -445,10 +454,12 @@ void Game::colisionChecksV2(Time deltaTime)
 				continue;
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			//if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//float angle = GetAngleOfCollision(*it2, *it1);
 				(*it1)->DiscoballBumper(*it2, deltaTime);
 				PlaySFX(SFX_Bounce);
+				break;
 			}
 		}
 
@@ -467,6 +478,7 @@ void Game::colisionChecksV2(Time deltaTime)
 				(*it1)->GetPortal(*it2);
 				contact_with_portal = true;
 				(*it1)->UsingPortal(contact_with_portal);
+				break;
 			}
 		}
 		(*it1)->UsingPortal(contact_with_portal);

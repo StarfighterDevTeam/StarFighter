@@ -18,6 +18,7 @@ void Ship::Init()
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
 	m_tackle_cooldown_init = true;
+	m_carry_cooldown_init = true;
 
 	//TRON SPECIFIC
 	m_discoball = NULL;
@@ -290,9 +291,10 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 	{
 		if (m_isRecovering == NOT_HIT)
 		{
-			if (carry_again_clock.getElapsedTime().asSeconds() > CARRY_AGAIN_COOLDOWN)
+			if (m_carry_cooldown_init || carry_again_clock.getElapsedTime().asSeconds() > CARRY_AGAIN_COOLDOWN)
 			{
 				m_discoball = (Discoball*)discoball;
+				m_carry_cooldown_init = false;
 
 				//deleting old m_carrier's discoball ownership
 				if (m_discoball->m_carrier)
@@ -372,11 +374,6 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 		if (m_discoball->visible && (m_discoball->getPosition().y > (*CurrentGame).map_size.y - (m_discoball->m_size.y / 2) || m_discoball->getPosition().y < m_discoball->m_size.y / 2
 			|| m_discoball->getPosition().x > (*CurrentGame).map_size.x - (m_discoball->m_size.x / 2) || m_discoball->getPosition().x < m_discoball->m_size.x / 2))
 		{
-			ReleaseDiscoball();
-		}
-		else if (m_discoball->visible && m_discoball->m_isTouchingBumper)
-		{
-			m_discoball->m_isTouchingBumper = false;
 			ReleaseDiscoball();
 		}
 		else
@@ -703,9 +700,9 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 
 void Ship::CheckIfPlayerDiscoballBumped(Time deltaTime)
 {
-	if (m_discoball && m_discoball->m_isTouchingBumper)
+	if (m_discoball && m_discoball->m_touchedBumper)
 	{
-		m_discoball->m_isTouchingBumper = false;
+		m_discoball->m_touchedBumper = NULL;
 		printf("released\n");
 		ReleaseDiscoball();
 	}
@@ -785,13 +782,13 @@ sf::Vector2f Ship::GetInputsToGetPosition(sf::Vector2f position, sf::Time deltaT
 void Ship::PlayerBumper(GameObject* bumper, Time deltaTime)
 {
 	Bumper* bumper_ = (Bumper*)bumper;
-
 	bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
 	if (is_vertical_bumper)
 	{
 		int speed_bool = speed.x > 0 ? -1 : 1;
 		setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
 		speed.x = 0.f;
+		
 	}
 	else
 	{

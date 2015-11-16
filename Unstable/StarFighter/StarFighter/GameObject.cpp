@@ -395,12 +395,11 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	//const float dy = y - p_0y;
 	//const float dist = sqrt(dx*dx + dy*dy);
 	//
-	////const float dist = sqrt(((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y))*((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y)) / ((p_3x - p_2x)*(p_3x - p_2x) + (p_3y - p_2y)*(p_3y - p_2y)));
 	////printf("dist: %f\n", dist);
 	//
 	//if (dist - object->m_size.x / 2 < 0)
 	//{
-	//	printf("Collision at arrival position (dist: %f)\n", dist);
+	//	//printf("Collision at arrival position (dist: %f)\n", dist);
 	//	return true;
 	//}
 	//else
@@ -426,7 +425,7 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 		if (IntersectSegments(p_0Topx, p_0Topy, p_1Topx, p_1Topy, p_2x, p_2y, p_3x, p_3y)
 			|| IntersectSegments(p_0Botx, p_0Boty, p_1Botx, p_1Boty, p_2x, p_2y, p_3x, p_3y))
 		{
-			printf("Collision on capsule movement\n");
+			//printf("Collision on capsule movement\n");
 			return true;
 		}
 		else

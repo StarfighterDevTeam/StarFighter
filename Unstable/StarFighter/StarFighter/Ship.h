@@ -100,6 +100,7 @@ public :
 	sf::Clock dodge_duration_clock;
 	sf::Clock dodge_again_clock;
 	bool m_tackle_cooldown_init;
+	bool m_carry_cooldown_init;
 
 	TacklingStatus m_isTackling;
 	ThrowingStatus m_isThrowing;

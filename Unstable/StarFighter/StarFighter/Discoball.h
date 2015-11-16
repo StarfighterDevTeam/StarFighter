@@ -6,6 +6,7 @@
 #include "GameObject.h"
 #include "Stroboscopic.h"
 #include "LevelPortal.h"
+#include "Bumper.h"
 
 enum DiscoballStatus
 {
@@ -39,7 +40,7 @@ public :
 	void DiscoballBumper(GameObject* bumper, sf::Time deltaTime) override;
 	void UsingPortal(bool is_using) override;
 	void GetPortal(GameObject* portal) override;
-	bool m_isTouchingBumper;
+	Bumper* m_touchedBumper;
 	bool m_isUsingPortal;
 
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
