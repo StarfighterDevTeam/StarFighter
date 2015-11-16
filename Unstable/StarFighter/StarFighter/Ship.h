@@ -114,6 +114,7 @@ public :
 	bool m_isLaunchingScript;
 	bool m_isUsingPortal;
 	void UsingPortal(bool is_using) override;
+	void CheckIfPlayerDiscoballBumped(Time deltaTime) override;
 
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;

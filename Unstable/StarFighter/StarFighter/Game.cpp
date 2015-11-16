@@ -183,6 +183,9 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2(deltaTime);
 
+	//Apply consequences of certain collisions
+	updateSceneAfterCollisions(deltaTime);
+
 	//Collect the dust
 	collectGarbage();
 
@@ -370,7 +373,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				(*it1)->PlayerBumper(*it2, deltaTime);
 			}
@@ -388,7 +391,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//Do something 
 
@@ -441,16 +444,10 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			//if (SimpleCollision::AreColliding((*it1), (*it2)))
-			//{
-			//	//float angle = GetAngleOfCollision(*it2, *it1);
-			//	(*it1)->DiscoballBumper(*it2);
-			//	PlaySFX(SFX_Bounce);
-			//}
-			//else
-			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
-				(*it1)->DiscoballBumper(*it2);
+				//float angle = GetAngleOfCollision(*it2, *it1);
+				(*it1)->DiscoballBumper(*it2, deltaTime);
 				PlaySFX(SFX_Bounce);
 			}
 		}
@@ -475,6 +472,24 @@ void Game::colisionChecksV2(Time deltaTime)
 		(*it1)->UsingPortal(contact_with_portal);
 	}
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
+}
+
+void Game::updateSceneAfterCollisions(Time deltaTime)
+{
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerBlueShip].begin(); it1 != sceneGameObjectsTyped[PlayerBlueShip].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		(*it1)->CheckIfPlayerDiscoballBumped(deltaTime);
+	}
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerRedShip].begin(); it1 != sceneGameObjectsTyped[PlayerRedShip].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		(*it1)->CheckIfPlayerDiscoballBumped(deltaTime);
+	}
 }
 
 void Game::cleanGarbage()

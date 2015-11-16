@@ -33,11 +33,10 @@ public :
 	Ship* m_carrier;
 	float m_carrier_curAngle;
 	sf::Vector2f m_carrier_curPosition;
-	bool m_carried;
 	DiscoballStatus m_status;
 	void SetDiscoballStatus(DiscoballStatus status);
 
-	void DiscoballBumper(GameObject* bumper) override;
+	void DiscoballBumper(GameObject* bumper, sf::Time deltaTime) override;
 	void UsingPortal(bool is_using) override;
 	void GetPortal(GameObject* portal) override;
 	bool m_isTouchingBumper;

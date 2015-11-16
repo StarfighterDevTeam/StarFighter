@@ -46,6 +46,7 @@ public:
 	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
 
 	void updateScene(Time deltaTime);
+	void updateSceneAfterCollisions(Time deltaTime);
 	void drawScene();
 	void colisionChecksV2(Time deltaTime);
 	void cleanGarbage();

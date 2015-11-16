@@ -25,7 +25,6 @@ void Discoball::Init()
 {
 	collider_type = DiscoballObject;
 	m_carrier = NULL;
-	m_carried = false;
 	m_carrier_curAngle = -1.f;
 	m_carrier_curPosition = sf::Vector2f(-1.f, -1.f);
 	DontGarbageMe = true;
@@ -44,15 +43,13 @@ Discoball::~Discoball()
 
 void Discoball::update(sf::Time deltaTime)
 {
-	m_isTouchingBumper = false;
-
 	if (visible)
 	{
 		//stroboscopic effect
 		if (discoball_curAngularSpeed > ANGULARSPEED_FOR_STROBO_ACTIVATION && visible)
 			PlayStroboscopicEffect(seconds(STROBO_EFFECT_DURATION * discoball_curAngularSpeed / CARRY_MAX_ANGULAR_SPEED), seconds(STROBO_EFFECT_TIME_BETWEEN_POSES));
 
-		if (!m_carried)
+		if (m_carrier == NULL)
 		{
 			static sf::Vector2f newposition;
 
@@ -109,7 +106,6 @@ void Discoball::update(sf::Time deltaTime)
 				}
 
 				discoball_curAngularSpeed = abs_speed / DISCOBALL_GRAVITATION_DISTANCE;
-				//printf("speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
 			}
 
 			setColor(sf::Color(255, 255, 255, 255));
@@ -130,14 +126,12 @@ void Discoball::update(sf::Time deltaTime)
 
 			setPosition(new_position);
 
-			//useful info to record
-			speed.x = new_position.x - previous_position.x;
-			speed.y = new_position.y - previous_position.y;
-
 			coeff_friction = 0;
 		}
 
 		AnimatedSprite::update(deltaTime);
+
+		printf("speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
 	}
 }
 
@@ -148,22 +142,31 @@ void Discoball::SetDiscoballStatus(DiscoballStatus status)
 }
 
 
-void Discoball::DiscoballBumper(GameObject* bumper)
+void Discoball::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
 {
-	m_isTouchingBumper = true;
+	printf("(collision) speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
 
-	bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
-	if (is_vertical_bumper)
+	if (bumper)
 	{
-		speed.x *= -1;
-		int speed_bool = speed.x > 0 ? 1 : -1;
-		setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
-	}
-	else
-	{
-		speed.y *= -1;
-		int speed_bool = speed.y > 0 ? 1 : -1;
-		setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + speed_bool * m_size.y / 2));
+		bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
+		if (is_vertical_bumper)
+		{
+			speed.x *= -1;
+			int speed_bool = speed.x > 0 ? 1 : -1;
+			setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
+		}
+		else
+		{
+			speed.y *= -1;
+			int speed_bool = speed.y > 0 ? 1 : -1;
+			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + speed_bool * m_size.y / 2));
+		}
+
+		if (m_carrier)
+		{
+			m_isTouchingBumper = true;
+			printf("carried hit\n");
+		}
 	}
 }
 
@@ -185,7 +188,7 @@ void Discoball::UsingPortal(bool is_using)
 
 void Discoball::GetPortal(GameObject* portal)
 {
-	if (!m_carried)
+	if (m_carrier == NULL)
 	{
 		if (!m_isUsingPortal)
 		{

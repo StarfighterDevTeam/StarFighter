@@ -310,7 +310,7 @@ void GameObject::PlayHitFeedback()
 	feedback_reset_clock.restart();
 }
 
-void GameObject::DiscoballBumper(GameObject* bumper)
+void GameObject::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
 {
 	// see override function in class Ship
 }
@@ -323,6 +323,11 @@ void GameObject::PlayerBumper(GameObject* bumper, Time deltaTime)
 void GameObject::UsingPortal(bool is_using)
 {
 	// see override function in class Ship and Discoball
+}
+
+void GameObject::CheckIfPlayerDiscoballBumped(Time deltaTime)
+{
+	// see override function in class Ship
 }
 
 bool GameObject::IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y)//, float *i_x, float *i_y)
@@ -380,26 +385,26 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	const float p_3y = is_bumper_vertical ? bumper->getPosition().y + bumper->m_size.y / 2 : bumper->getPosition().y;
 
 	//collision at arrival? Calculation of distance of point p0 to segment [p_2, p_3]
-	const float px = p_3x - p_2x;
-	const float py = p_3y - p_2y;
-	float u = ((p_0x - p_2x)*px + (p_0y - p_2y)*py) / (px*px + py*py);
-	u = (u > 1) ? 1 : (u < 0) ? 0 : u;
-	const float x = p_2x + u*px;
-	const float y = p_2y + u*py;
-	const float dx = x - p_0x;
-	const float dy = y - p_0y;
-	const float dist = sqrt(dx*dx + dy*dy);
-
-	//const float dist = sqrt(((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y))*((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y)) / ((p_3x - p_2x)*(p_3x - p_2x) + (p_3y - p_2y)*(p_3y - p_2y)));
-	//printf("dist: %f\n", dist);
-
-	if (dist - object->m_size.x / 2 < 0)
-	{
-		//printf("Collision at arrival position \n");
-		return true;
-	}
-	else
-	{
+	//const float px = p_3x - p_2x;
+	//const float py = p_3y - p_2y;
+	//float u = ((p_0x - p_2x)*px + (p_0y - p_2y)*py) / (px*px + py*py);
+	//u = (u > 1) ? 1 : (u < 0) ? 0 : u;
+	//const float x = p_2x + u*px;
+	//const float y = p_2y + u*py;
+	//const float dx = x - p_0x;
+	//const float dy = y - p_0y;
+	//const float dist = sqrt(dx*dx + dy*dy);
+	//
+	////const float dist = sqrt(((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y))*((p_3y - p_2y)*(p_0x - p_2x) + (p_3x - p_2x)*(p_0y - p_2y)) / ((p_3x - p_2x)*(p_3x - p_2x) + (p_3y - p_2y)*(p_3y - p_2y)));
+	////printf("dist: %f\n", dist);
+	//
+	//if (dist - object->m_size.x / 2 < 0)
+	//{
+	//	printf("Collision at arrival position (dist: %f)\n", dist);
+	//	return true;
+	//}
+	//else
+	//{
 		//capsule collision
 		const float theta = GetAngleRadForSpeed(object->speed);
 		const float angle_top = M_PI - theta;
@@ -421,10 +426,10 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 		if (IntersectSegments(p_0Topx, p_0Topy, p_1Topx, p_1Topy, p_2x, p_2y, p_3x, p_3y)
 			|| IntersectSegments(p_0Botx, p_0Boty, p_1Botx, p_1Boty, p_2x, p_2y, p_3x, p_3y))
 		{
-			//printf("Collision on capsule movement\n");
+			printf("Collision on capsule movement\n");
 			return true;
 		}
 		else
 			return false;
-	}	
+	//}	
 }
