@@ -146,7 +146,7 @@ void Discoball::SetDiscoballStatus(DiscoballStatus status)
 
 void Discoball::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
 {
-	printf("(collision) speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
+	//printf("(collision) speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
 
 	if (bumper)
 	{

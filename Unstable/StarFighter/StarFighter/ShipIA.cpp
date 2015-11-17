@@ -404,7 +404,7 @@ void ShipIA::IA_GuardPosition(sf::Vector2f position, float distance, sf::Time de
 		IA_MoveToPosition(target_pos, deltaTime);
 	}
 
-	printf("Guard\n");
+	//printf("Guard\n");
 }
 
 float ShipIA::GetAngleVariationToObject(GameObject* object_to_intercept)

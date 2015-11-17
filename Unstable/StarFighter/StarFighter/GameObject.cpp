@@ -423,7 +423,7 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	{
 		//capsule collision
 		const float theta = GetAngleRadForSpeed(object->speed);
-		const float angle_top = M_PI - theta + M_PI_2;
+		const float angle_top = M_PI - theta + M_PI_2 - (!is_bumper_vertical * M_PI);
 		const float angle_bottom = angle_top - M_PI;
 		const float offset_top_x = object->m_size.x / 2 * sin(angle_top);
 		const float offset_top_y = -object->m_size.x / 2 * cos(angle_top);

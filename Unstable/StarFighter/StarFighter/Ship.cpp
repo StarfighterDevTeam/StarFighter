@@ -703,7 +703,6 @@ void Ship::CheckIfPlayerDiscoballBumped(Time deltaTime)
 	if (m_discoball && m_discoball->m_touchedBumper)
 	{
 		m_discoball->m_touchedBumper = NULL;
-		printf("released\n");
 		ReleaseDiscoball();
 	}
 }
