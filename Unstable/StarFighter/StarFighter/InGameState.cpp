@@ -366,11 +366,12 @@ void InGameState::StartTest()
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateCharacter(sf::Vector2f((*CurrentGame).map_size.x / 2, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam);
+	Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, true);
 	playerShip2->SetControllerType(JoystickControl2);
 
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f(100, 540), true, 800);
+	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
 	CreateDiscoball();
+	CreateGoal(BlueTeam, sf::Vector2f(8, 540), sf::Vector2f(16, 200));
 }
 
 void InGameState::StartMultiGameBig(bool reset_scores)

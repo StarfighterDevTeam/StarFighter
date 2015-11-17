@@ -532,8 +532,6 @@ void Ship::ManageKeyReleases()
 
 void Ship::ManageTackle(bool force_input)
 {
-	if (m_isTackling != NOT_TACKLING)
-		printf("speed: %f, %f\n", speed.x, speed.y);
 	//State 0
 	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
 	{
@@ -577,7 +575,6 @@ void Ship::ManageTackle(bool force_input)
 			tackle_max_hold_clock.restart();
 		}
 
-		//SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetAngleRadForSpeed(speed) + M_PI);
 		ScaleSpeed(&speed, new_absolute_speed);
 	}
 
@@ -590,7 +587,6 @@ void Ship::ManageTackle(bool force_input)
 		}
 		else
 		{
-			//SetSpeedVectorFromAbsoluteSpeed(GetAbsoluteSpeed() - SHIP_TACKLE_DECELERATION_WHILE_HOLDING, GetAngleRadForSpeed(speed) + M_PI);
 			ScaleSpeed(&speed, GetAbsoluteSpeed() - SHIP_TACKLE_DECELERATION_WHILE_HOLDING);
 		}
 	}
@@ -608,7 +604,6 @@ void Ship::ManageTackle(bool force_input)
 			new_absolute_speed = 0;
 		}
 
-		//SetSpeedVectorFromAbsoluteSpeed(new_absolute_speed, GetAngleRadForSpeed(speed) + M_PI);
 		ScaleSpeed(&speed, new_absolute_speed);
 
 		if (new_absolute_speed < SHIP_MIN_SPEED_AFTER_TACKLE)

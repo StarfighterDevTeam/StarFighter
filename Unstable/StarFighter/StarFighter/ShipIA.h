@@ -56,7 +56,7 @@ private:
 	IADifficultyLevel m_IA_level;
 	sf::Clock m_reaction_clock;
 	float m_hold_tackle_duration;
-	float m_tackle_activated;
+	bool m_tackle_activated;
 	bool m_force_discoball_uncontested;
 	bool m_force_tackle_disabled;
 };
