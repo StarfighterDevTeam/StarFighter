@@ -157,8 +157,6 @@ void Discoball::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
 			speed.x *= -1;
 			int speed_bool = speed.x > 0 ? 1 : -1;
 			setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
-			if (speed_bool < 0)
-				printf(".");
 		}
 		else
 		{
@@ -170,8 +168,6 @@ void Discoball::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
 		if (m_carrier)
 		{
 			m_touchedBumper = (Bumper*)bumper;
-			//correction to be handled in post-check collision, because we can't access ship from here
-			printf("carried hit\n");
 		}
 	}
 }

@@ -320,8 +320,8 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
-			//if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			//if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				(*it1)->PlayerBumper(*it2, deltaTime);
 				break;
@@ -377,11 +377,10 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
-			//if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			//if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				(*it1)->PlayerBumper(*it2, deltaTime);
-				break;
 			}
 		}
 	}
@@ -429,7 +428,6 @@ void Game::colisionChecksV2(Time deltaTime)
 					Goal(BlueTeam);
 					(*it1)->visible = false;
 					(*it1)->GarbageMe = true;
-					break;
 				}
 			}
 		}
@@ -453,8 +451,8 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
-			//if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			//if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
+			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//float angle = GetAngleOfCollision(*it2, *it1);
 				(*it1)->DiscoballBumper(*it2, deltaTime);

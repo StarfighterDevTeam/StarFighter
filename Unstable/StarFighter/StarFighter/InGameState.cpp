@@ -29,8 +29,8 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	//SetIngameScript(Tuto04);
-	SetIngameScript(ScriptTest);
+	SetIngameScript(Tuto04);
+	//SetIngameScript(ScriptTest);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)

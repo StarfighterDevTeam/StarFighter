@@ -364,6 +364,21 @@ bool GameObject::IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_
 	return false; // No collision
 }
 
+float GameObject::DistancePointToSement(float p_0x, float p_0y, float p_1x, float p_1y, float p_2x, float p_2y)
+{
+	const float px = p_2x - p_1x;
+	const float py = p_2y - p_1y;
+	float u = ((p_0x - p_1x)*px + (p_0y - p_1y)*py) / (px*px + py*py);
+	u = (u > 1) ? 1 : (u < 0) ? 0 : u;
+	const float x = p_1x + u*px;
+	const float y = p_1y + u*py;
+	const float dx = x - p_0x;
+	const float dy = y - p_0y;
+	const float dist = sqrt(dx*dx + dy*dy);
+
+	return dist;
+}
+
 bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::Time deltaTime)
 {
 	if (!object || !bumper)
@@ -395,33 +410,25 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	const float p_3y = is_bumper_vertical ? bumper->getPosition().y + bumper->m_size.y / 2 : bumper->getPosition().y;
 
 	//collision at arrival? Calculation of distance of point p0 to segment [p_2, p_3]
-	//const float px = p_3x - p_2x;
-	//const float py = p_3y - p_2y;
-	//float u = ((p_0x - p_2x)*px + (p_0y - p_2y)*py) / (px*px + py*py);
-	//u = (u > 1) ? 1 : (u < 0) ? 0 : u;
-	//const float x = p_2x + u*px;
-	//const float y = p_2y + u*py;
-	//const float dx = x - p_0x;
-	//const float dy = y - p_0y;
-	//const float dist = sqrt(dx*dx + dy*dy);
-	//
-	////printf("dist: %f\n", dist);
-	//
-	//if (dist - object->m_size.x / 2 < 0)
-	//{
-	//	//printf("Collision at arrival position (dist: %f)\n", dist);
-	//	return true;
-	//}
-	//else
-	//{
+	const float dist = DistancePointToSement(p_0x, p_0y, p_2x, p_2y, p_3x, p_3y);
+	
+	//printf("dist: %f\n", dist);
+	
+	if (dist - object->m_size.x / 2 < 0)
+	{
+		//printf("Collision at arrival position (dist: %f)\n", dist);
+		return true;
+	}
+	else
+	{
 		//capsule collision
 		const float theta = GetAngleRadForSpeed(object->speed);
-		const float angle_top = M_PI - theta;
-		const float angle_bottom = -theta;
-		const float offset_top_x = object->m_size.x / 2 * cos(angle_top);
-		const float offset_top_y = -object->m_size.x / 2 * sin(angle_top);
-		const float offset_bottom_x = object->m_size.x / 2 * cos(angle_bottom);
-		const float offset_bottom_y = -object->m_size.x / 2 * sin(angle_bottom);
+		const float angle_top = M_PI - theta + M_PI_2;
+		const float angle_bottom = angle_top - M_PI;
+		const float offset_top_x = object->m_size.x / 2 * sin(angle_top);
+		const float offset_top_y = -object->m_size.x / 2 * cos(angle_top);
+		const float offset_bottom_x = object->m_size.x / 2 * sin(angle_bottom);
+		const float offset_bottom_y = -object->m_size.x / 2 * cos(angle_bottom);
 
 		const float p_0Topx = p_0x + offset_top_x;
 		const float p_0Topy = p_0y + offset_top_y;
@@ -435,10 +442,14 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 		if (IntersectSegments(p_0Topx, p_0Topy, p_1Topx, p_1Topy, p_2x, p_2y, p_3x, p_3y)
 			|| IntersectSegments(p_0Botx, p_0Boty, p_1Botx, p_1Boty, p_2x, p_2y, p_3x, p_3y))
 		{
-			//printf("Collision on capsule movement\n");
-			return true;
+			//avoids to count a collision when leaving a position that was pixel-perfectly-not in collision
+			if (DistancePointToSement(p_1Topx, p_1Topy, p_2x, p_2y, p_3x, p_3y) > 0 && DistancePointToSement(p_1Botx, p_1Boty, p_2x, p_2y, p_3x, p_3y) > 0)
+			{
+				//printf("Collision on capsule movement\n");
+				return true;
+			}
 		}
-		else
-			return false;
-	//}	
+		
+		return false;
+	}	
 }

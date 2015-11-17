@@ -788,7 +788,6 @@ void Ship::PlayerBumper(GameObject* bumper, Time deltaTime)
 		int speed_bool = speed.x > 0 ? -1 : 1;
 		setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
 		speed.x = 0.f;
-		
 	}
 	else
 	{

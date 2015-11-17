@@ -121,6 +121,7 @@ public:
 	static float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
 	static bool isCapsuleColliding(GameObject* object, GameObject* bumper, sf::Time deltaTime);
 	static bool IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y);
+	static float DistancePointToSement(float p_0x, float p_0y, float p_1x, float p_1y, float p_2x, float p_2y);
 
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
