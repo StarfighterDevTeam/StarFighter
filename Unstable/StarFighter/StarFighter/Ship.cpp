@@ -868,8 +868,8 @@ GameObject* Ship::FindClosestGameObjectTyped(GameObject* this_object, GameObject
 				}
 			}
 
-			const float a = this_object->getPosition().x - sceneGameObjectsTyped[j]->getPosition().x;
-			const float b = this_object->getPosition().y - sceneGameObjectsTyped[j]->getPosition().y;
+			float a = this_object->getPosition().x - sceneGameObjectsTyped[j]->getPosition().x;
+			float b = this_object->getPosition().y - sceneGameObjectsTyped[j]->getPosition().y;
 
 			float distance_to_ref = (a * a) + (b * b);
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration

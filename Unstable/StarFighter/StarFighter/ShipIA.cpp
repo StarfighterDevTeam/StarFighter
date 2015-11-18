@@ -170,8 +170,13 @@ void ShipIA::update(sf::Time deltaTime)
 				if (!isGoalGuarded)
 					Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
 
-				//Shoot
-				IA_ShootToPosition(m_target_goal->getPosition());
+				//Shoot (or pass)
+				if (EvaluateFireTrajectory(m_target_goal))
+					IA_ShootToPosition(m_target_goal->getPosition());
+				else if (EvaluateFireTrajectory(m_target_team_mate))
+					IA_ShootToPosition(m_target_goal->getPosition());
+				else
+					IA_ShootToPosition(m_target_goal->getPosition());
 			}
 		}
 
@@ -511,4 +516,47 @@ void ShipIA::ForceDiscoballUncontested(bool forced_value)
 void ShipIA::ForceTackleDisabled(bool forced_value)
 {
 	m_force_tackle_disabled = forced_value;
+}
+
+bool ShipIA::EvaluateFireTrajectory(sf::Vector2f target_position)
+{
+	if (m_discoball == NULL)
+		return false;
+
+	GameObjectType type = m_team == BlueTeam ? PlayerRedShip : PlayerBlueShip;
+	std::vector<GameObject*> sceneGameObjectsTyped = (*CurrentGame).GetSceneGameObjectsTyped(type);
+	size_t sceneGameObjectsTypedSize = sceneGameObjectsTyped.size();
+
+	float shortest_distance = IA_DISTANCE_FOR_CLEAR_LINE_OF_FIRE;
+	GameObject* returned_obj = NULL;
+	for (size_t j = 0; j < sceneGameObjectsTypedSize; j++)
+	{
+		if (sceneGameObjectsTyped[j] == NULL)
+			continue;
+
+		if (sceneGameObjectsTyped[j]->GarbageMe)
+			continue;
+
+		if (sceneGameObjectsTyped[j]->isOnScene && !sceneGameObjectsTyped[j]->ghost)
+		{
+			sf::Vector2f p_0 = sceneGameObjectsTyped[j]->getPosition();
+			sf::Vector2f p_1 = m_discoball->getPosition();
+			sf::Vector2f p_2 = target_position;
+			float distance_to_ref = GameObject::DistancePointToSement(p_0.x, p_0.y, p_1.x, p_1.y, p_2.x, p_2.y);
+			if (distance_to_ref < shortest_distance || shortest_distance < 0)
+			{
+				shortest_distance = distance_to_ref;
+			}
+		}
+	}
+
+	return shortest_distance > IA_DISTANCE_FOR_CLEAR_LINE_OF_FIRE;
+}
+
+bool ShipIA::EvaluateFireTrajectory(GameObject* target_object)
+{
+	if (target_object == NULL)
+		return false;
+	else
+		return EvaluateFireTrajectory(target_object->getPosition());
 }

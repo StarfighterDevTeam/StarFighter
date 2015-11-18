@@ -366,6 +366,7 @@ bool GameObject::IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_
 
 float GameObject::DistancePointToSement(float p_0x, float p_0y, float p_1x, float p_1y, float p_2x, float p_2y)
 {
+	//distance of point p_0 to segment [p_1, p_2]
 	const float px = p_2x - p_1x;
 	const float py = p_2y - p_1y;
 	float u = ((p_0x - p_1x)*px + (p_0y - p_1y)*py) / (px*px + py*py);

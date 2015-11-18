@@ -47,6 +47,8 @@ public :
 	bool isOffside();
 	static GameObjectType GetOpponentGameObjectType(Ship* player);
 	static GameObjectType GetOwnGameObjectType(Ship* player);
+	bool EvaluateFireTrajectory(sf::Vector2f target_position);
+	bool EvaluateFireTrajectory(GameObject* target_object);
 
 	void ForceDiscoballUncontested(bool forced_value = true);
 	void ForceTackleDisabled(bool forced_value = true);

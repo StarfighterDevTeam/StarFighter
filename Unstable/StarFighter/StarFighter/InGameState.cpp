@@ -334,6 +334,8 @@ void InGameState::StartMultiGame(bool reset_scores)
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
 	Ship* playerShip2 = CreateIACharacter(sf::Vector2f((*CurrentGame).map_size.x - 100, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAHard);
+	Ship* playerShip3 = CreateIACharacter(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, BlueTeam, IAHard);
+	Ship* playerShip4 = CreateIACharacter(sf::Vector2f((*CurrentGame).map_size.x - 200, REF_WINDOW_RESOLUTION_Y / 2), Katyusha, RedTeam, IAHard);
 	//playerShip2->SetControllerType(JoystickControl2);
 
 	InitializeMapDesign();

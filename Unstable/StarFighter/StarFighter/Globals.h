@@ -109,6 +109,7 @@
 #define IA_DISTANCE_FOR_UNCONTESTED							750
 #define IA_DISCOBALL_ANGLERAD_VARIATION_IS_SMALL			0.6f
 #define IA_DISTANCE_FOR_SAFE_TACKLE							450
+#define IA_DISTANCE_FOR_CLEAR_LINE_OF_FIRE					200
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
