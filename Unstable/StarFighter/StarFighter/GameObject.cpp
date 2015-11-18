@@ -394,8 +394,8 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	if (!object->isOnScene || !(bumper->isOnScene))
 		return false;
 
-	//p_0 : current position of discoball
-	//p_1 : previous position of discoball
+	//p_0 : current position of moving object
+	//p_1 : previous position of moving object
 	//p_2 : bumper segment point 1
 	//p_3 : bumper segment point 2
 	const float p_0x = object->getPosition().x;

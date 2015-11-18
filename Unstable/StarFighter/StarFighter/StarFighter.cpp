@@ -14,19 +14,17 @@ int main()
 	//Init SFML Window
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing SFML Window");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "DashJammers");
-	renderWindow.setKeyRepeatEnabled(false);
 
+	//Setting window parameters
+	renderWindow.setKeyRepeatEnabled(false);
 	//Refresh rate
 	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
-
 	//Icon
 	sf::Image icon = sf::Image();
 	icon.loadFromFile(ICON_SHIP_PNG);
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-
 	//Title
 	renderWindow.setTitle("DashJammers Alpha");
-
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
@@ -100,6 +98,7 @@ int main()
 				{
 					fullscreen = false;
 					renderWindow.create(VideoMode(1600, 900), "DashJammers", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+
 					(*CurrentGame).screen_size = sf::Vector2f(1600, 900);
 					break;
 				}
@@ -125,8 +124,17 @@ int main()
 					break;
 				}
 			}
+
+			//setting parameters again, because they are lost on calling renderWindow.create
+			renderWindow.setKeyRepeatEnabled(false);
+			renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+			sf::Image icon = sf::Image();
+			icon.loadFromFile(ICON_SHIP_PNG);
+			renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+			renderWindow.setTitle("DashJammers Alpha");
 		}
 
+		printf("dt: %f\n", dt.asSeconds());
 		dt = deltaClock.restart();
 
 		//Update
