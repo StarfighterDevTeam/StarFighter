@@ -155,13 +155,13 @@ void Discoball::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
 		if (is_vertical_bumper)
 		{
 			speed.x *= -1;
-			int speed_bool = speed.x > 0 ? 1 : -1;
+			int speed_bool = getPosition().x - speed.x*deltaTime.asSeconds() < bumper->getPosition().x ? -1 : 1;
 			setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
 		}
 		else
 		{
 			speed.y *= -1;
-			int speed_bool = speed.y > 0 ? 1 : -1;
+			int speed_bool = getPosition().x - speed.x*deltaTime.asSeconds() < bumper->getPosition().x ? -1 : 1;
 			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + speed_bool * m_size.y / 2));
 		}
 		

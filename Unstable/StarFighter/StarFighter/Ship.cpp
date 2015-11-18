@@ -784,13 +784,13 @@ void Ship::PlayerBumper(GameObject* bumper, Time deltaTime)
 	bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
 	if (is_vertical_bumper)
 	{
-		int speed_bool = speed.x > 0 ? -1 : 1;
+		int speed_bool = getPosition().x - speed.x*deltaTime.asSeconds() < bumper->getPosition().x ? -1 : 1;
 		setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
 		speed.x = 0.f;
 	}
 	else
 	{
-		int speed_bool = speed.y > 0 ? -1 : 1;
+		int speed_bool = getPosition().y - speed.y*deltaTime.asSeconds() < bumper->getPosition().y ? -1 : 1;
 		setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + speed_bool * m_size.y / 2));
 		speed.y = 0.f;
 	}
