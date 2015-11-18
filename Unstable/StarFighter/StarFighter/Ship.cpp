@@ -334,19 +334,19 @@ void Ship::GetDiscoball(GameObject* discoball, float angle_collision)
 				//setting the sense of rotation (clockwise or counter-clockwise)
 				if (abs(angle_collision) < M_PI_4)
 				{
-					m_discoball->speed.x < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+					m_discoball->speed.x == 0 ? discoball_clockwise = speed.y < 0 : m_discoball->speed.x < 0 ? discoball_clockwise = true : discoball_clockwise = false;
 				}
 				else if (angle_collision >= M_PI_4 && angle_collision < 3.f * M_PI_4)
 				{
-					m_discoball->speed.y < 0 ? discoball_clockwise = true : discoball_clockwise = false;
+					m_discoball->speed.y == 0 ? discoball_clockwise = speed.x < 0 : m_discoball->speed.y < 0 ? discoball_clockwise = true : discoball_clockwise = false;
 				}
 				else if (angle_collision >= 3.f * M_PI_4 && angle_collision < 5.f * M_PI_4)
 				{
-					m_discoball->speed.x > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+					m_discoball->speed.x == 0 ? discoball_clockwise = speed.y > 0 : m_discoball->speed.x > 0 ? discoball_clockwise = true : discoball_clockwise = false;
 				}
 				else //if (angle_collision >= 5.f * M_PI_4 && angle_collision < 7.f * M_PI_4)
 				{
-					m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
+					m_discoball->speed.y == 0 ? discoball_clockwise = speed.x > 0 : m_discoball->speed.y > 0 ? discoball_clockwise = true : discoball_clockwise = false;
 				}
 
 				//canceling speed bonus on receiving the ball

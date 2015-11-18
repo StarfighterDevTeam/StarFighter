@@ -652,6 +652,9 @@ float Game::GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aim
 	}
 
 	angle += M_PI_2;
+	angle = fmod(angle, 2 * M_PI);
+	while (angle < 0)
+		angle += 2 * M_PI;
 
 	return angle;
 }

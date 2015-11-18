@@ -366,8 +366,8 @@ void InGameState::StartTest()
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, true);
-	playerShip2->SetControllerType(JoystickControl2);
+	//Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, true);
+	//playerShip2->SetControllerType(JoystickControl2);
 
 	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
 	CreateDiscoball();
