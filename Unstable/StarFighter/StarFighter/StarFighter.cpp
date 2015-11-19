@@ -134,7 +134,6 @@ int main()
 			renderWindow.setTitle("DashJammers Alpha");
 		}
 
-		printf("dt: %f\n", dt.asSeconds());
 		dt = deltaClock.restart();
 
 		//Update

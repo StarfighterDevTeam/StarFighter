@@ -542,7 +542,7 @@ bool ShipIA::EvaluateFireTrajectory(sf::Vector2f target_position)
 			sf::Vector2f p_0 = sceneGameObjectsTyped[j]->getPosition();
 			sf::Vector2f p_1 = m_discoball->getPosition();
 			sf::Vector2f p_2 = target_position;
-			float distance_to_ref = GameObject::DistancePointToSement(p_0.x, p_0.y, p_1.x, p_1.y, p_2.x, p_2.y);
+			float distance_to_ref = GameObject::DistancePointToSement(p_0.x, p_0.y, p_1.x, p_1.y, p_2.x, p_2.y) - sceneGameObjectsTyped[j]->diag;
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
 				shortest_distance = distance_to_ref;
