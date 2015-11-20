@@ -173,8 +173,9 @@ void ShipIA::update(sf::Time deltaTime)
 				//Shoot (or pass)
 				if (EvaluateFireTrajectory(m_target_goal))
 					IA_ShootToPosition(m_target_goal->getPosition());
+					//IA_ShootToPosition(GetBouncingShotCoordinate(m_target_goal->getPosition(), false, false));
 				else if (EvaluateFireTrajectory(m_target_team_mate))
-					IA_ShootToPosition(m_target_goal->getPosition());
+					IA_ShootToPosition(m_target_team_mate->getPosition());
 				else
 					IA_ShootToPosition(m_target_goal->getPosition());
 			}
@@ -183,6 +184,14 @@ void ShipIA::update(sf::Time deltaTime)
 		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
 		movingX = m_input_direction.x != 0;
 		movingY = m_input_direction.y != 0;
+	}
+	else
+	{
+		m_input_direction = InputGuy::getDirections(m_controllerType);
+		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
+		movingX = m_input_direction.x != 0;
+		movingY = m_input_direction.y != 0;
+
 	}
 
 	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
@@ -559,4 +568,46 @@ bool ShipIA::EvaluateFireTrajectory(GameObject* target_object)
 		return false;
 	else
 		return EvaluateFireTrajectory(target_object->getPosition());
+}
+
+sf::Vector2f ShipIA::GetBouncingShotCoordinate(sf::Vector2f target_position, bool vertical_bounce, bool solution_top_or_left)
+{
+	//no bounce needed
+	if ((target_position.x == 0 && target_position.x == 0) || (target_position.x == 0 && target_position.y == (*CurrentGame).map_size.y)
+		|| (target_position.x == (*CurrentGame).map_size.x && target_position.y == 0) || (target_position.x == (*CurrentGame).map_size.x && target_position.y == (*CurrentGame).map_size.y))
+		return target_position;
+
+	sf::Vector2f bounce_position;
+	float dx = getPosition().x - target_position.x;
+	float dy = getPosition().y - target_position.y;
+
+	if (vertical_bounce)
+	{
+		if (solution_top_or_left)
+		{
+			bounce_position.x = target_position.y * dx / (getPosition().y + target_position.y);
+			bounce_position.y = 0;
+		}
+		else
+		{
+			bounce_position.x = ((*CurrentGame).map_size.y - target_position.y) * dx / ((*CurrentGame).map_size.y - getPosition().y + (*CurrentGame).map_size.y - target_position.y);
+			bounce_position.y = (*CurrentGame).map_size.y;
+		}
+	}
+	else
+	{
+		if (solution_top_or_left)
+		{
+			bounce_position.x = 0;
+			bounce_position.y = target_position.x * dy / (getPosition().x + target_position.x);
+		}
+		else
+		{
+			bounce_position.x = (*CurrentGame).map_size.x;
+			bounce_position.y = ((*CurrentGame).map_size.x - target_position.x) * dy / ((*CurrentGame).map_size.x - getPosition().x + (*CurrentGame).map_size.x - target_position.x);
+		}
+	}
+	
+
+	return bounce_position;
 }

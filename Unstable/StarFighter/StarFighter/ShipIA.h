@@ -49,9 +49,9 @@ public :
 	static GameObjectType GetOwnGameObjectType(Ship* player);
 	bool EvaluateFireTrajectory(sf::Vector2f target_position);
 	bool EvaluateFireTrajectory(GameObject* target_object);
-
 	void ForceDiscoballUncontested(bool forced_value = true);
 	void ForceTackleDisabled(bool forced_value = true);
+	sf::Vector2f GetBouncingShotCoordinate(sf::Vector2f target_position, bool vertical_bounce, bool solution_top_or_left);
 
 private:
 	bool m_IA_activated;

@@ -29,7 +29,7 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	SetIngameScript(Tuto04);
+	SetIngameScript(MainMenuScript);
 	//SetIngameScript(ScriptTest);
 }
 
@@ -334,9 +334,7 @@ void InGameState::StartMultiGame(bool reset_scores)
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
 	Ship* playerShip2 = CreateIACharacter(sf::Vector2f((*CurrentGame).map_size.x - 100, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAHard);
-	Ship* playerShip3 = CreateIACharacter(sf::Vector2f(200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, BlueTeam, IAHard);
-	Ship* playerShip4 = CreateIACharacter(sf::Vector2f((*CurrentGame).map_size.x - 200, REF_WINDOW_RESOLUTION_Y / 2), Katyusha, RedTeam, IAHard);
-	//playerShip2->SetControllerType(JoystickControl2);
+	playerShip2->SetControllerType(JoystickControl2);
 
 	InitializeMapDesign();
 
@@ -368,8 +366,8 @@ void InGameState::StartTest()
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	//Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, true);
-	//playerShip2->SetControllerType(JoystickControl2);
+	Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, false);
+	playerShip2->SetControllerType(AllControlDevices);
 
 	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
 	CreateDiscoball();
