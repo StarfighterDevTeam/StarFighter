@@ -88,6 +88,7 @@ public:
 	sf::Clock score_again_red_clock;
 	bool m_goal_happened;
 	sf::Clock m_after_goal_clock;
+	sf::Clock m_map_clock;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

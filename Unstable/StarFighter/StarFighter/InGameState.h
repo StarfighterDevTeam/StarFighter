@@ -69,6 +69,7 @@ public:
 	//HUD
 	sf::Text score_blue_text;
 	sf::Text score_red_text;
+	sf::Text map_timer_text;
 
 private:
 	sf::RenderWindow* mainWindow;

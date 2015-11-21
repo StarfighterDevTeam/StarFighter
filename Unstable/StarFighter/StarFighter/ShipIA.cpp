@@ -147,7 +147,7 @@ void ShipIA::update(sf::Time deltaTime)
 				}
 			}
 		}
-		//ATTAQUE
+		//ATTACK
 		else
 		{
 			//1. Define where is opponent's goal
@@ -171,13 +171,33 @@ void ShipIA::update(sf::Time deltaTime)
 					Tackle(SHIP_TACKLE_MAX_HOLD_TIME);
 
 				//Shoot (or pass)
+				sf::Vector2f target_position;
 				if (EvaluateFireTrajectory(m_target_goal))
+				{
 					IA_ShootToPosition(m_target_goal->getPosition());
 					//IA_ShootToPosition(GetBouncingShotCoordinate(m_target_goal->getPosition(), false, false));
-				else if (EvaluateFireTrajectory(m_target_team_mate))
+					printf("direct shoot\n");
+				}
+				else if (m_target_team_mate && EvaluateFireTrajectory(m_target_team_mate))
+				{
 					IA_ShootToPosition(m_target_team_mate->getPosition());
+					printf("direct pass\n");
+				}
+				else if (EvaluateBouncingFireTrajectory(m_target_goal, &target_position))
+				{
+					printf("bounce shot\n");
+					IA_ShootToPosition(target_position);
+				}
+				else if (m_target_team_mate && EvaluateBouncingFireTrajectory(m_target_team_mate, &target_position))
+				{
+					printf("bounce pass\n");
+					IA_ShootToPosition(target_position);
+				}
 				else
+				{
+					printf("direct shoot\n");
 					IA_ShootToPosition(m_target_goal->getPosition());
+				}
 			}
 		}
 
@@ -527,16 +547,15 @@ void ShipIA::ForceTackleDisabled(bool forced_value)
 	m_force_tackle_disabled = forced_value;
 }
 
-bool ShipIA::EvaluateFireTrajectory(sf::Vector2f target_position)
+bool ShipIA::EvaluateFireTrajectory(sf::Vector2f firing_position, sf::Vector2f target_position)
 {
-	if (m_discoball == NULL)
-		return false;
-
+	//looking for closest enemy able to intercept the ball: distance to segment of trajectory
 	GameObjectType type = m_team == BlueTeam ? PlayerRedShip : PlayerBlueShip;
 	std::vector<GameObject*> sceneGameObjectsTyped = (*CurrentGame).GetSceneGameObjectsTyped(type);
 	size_t sceneGameObjectsTypedSize = sceneGameObjectsTyped.size();
-
-	float shortest_distance = IA_DISTANCE_FOR_CLEAR_LINE_OF_FIRE;
+	
+	float shortest_distance = -1;
+	sf::Vector2f threat_position;
 	GameObject* returned_obj = NULL;
 	for (size_t j = 0; j < sceneGameObjectsTypedSize; j++)
 	{
@@ -549,17 +568,35 @@ bool ShipIA::EvaluateFireTrajectory(sf::Vector2f target_position)
 		if (sceneGameObjectsTyped[j]->isOnScene && !sceneGameObjectsTyped[j]->ghost)
 		{
 			sf::Vector2f p_0 = sceneGameObjectsTyped[j]->getPosition();
-			sf::Vector2f p_1 = m_discoball->getPosition();
+			sf::Vector2f p_1 = firing_position;
 			sf::Vector2f p_2 = target_position;
 			float distance_to_ref = GameObject::DistancePointToSement(p_0.x, p_0.y, p_1.x, p_1.y, p_2.x, p_2.y) - sceneGameObjectsTyped[j]->diag;
+			if (distance_to_ref < 0)
+				distance_to_ref = 0;
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
 				shortest_distance = distance_to_ref;
+				threat_position = p_0;
 			}
 		}
 	}
 
-	return shortest_distance > IA_DISTANCE_FOR_CLEAR_LINE_OF_FIRE;
+	//distance of threat is sufficient -> trajectory is clear
+	bool threat_is_far_enough = shortest_distance > IA_DISTANCE_FOR_CLEAR_LINE_OF_FIRE || shortest_distance < 0;
+	if (threat_is_far_enough)
+		return true;
+
+	//opponent could be close but "behind" the shooter, hence not a threat to the trajectory
+	bool threat_is_behind = abs(GetAngleRadBetweenPositions(firing_position, target_position) - GetAngleRadBetweenPositions(firing_position, threat_position)) > M_PI_2;
+	return threat_is_behind;
+}
+
+bool ShipIA::EvaluateFireTrajectory(sf::Vector2f target_position)
+{
+	if (m_discoball)
+		return EvaluateFireTrajectory(m_discoball->getPosition(), target_position);
+	else
+		return EvaluateFireTrajectory(getPosition(), target_position);
 }
 
 bool ShipIA::EvaluateFireTrajectory(GameObject* target_object)
@@ -581,7 +618,7 @@ sf::Vector2f ShipIA::GetBouncingShotCoordinate(sf::Vector2f target_position, boo
 	float dx = getPosition().x - target_position.x;
 	float dy = getPosition().y - target_position.y;
 
-	if (vertical_bounce)
+	if (vertical_bounce)//discoball hits the top or bottom border
 	{
 		if (solution_top_or_left)
 		{
@@ -594,7 +631,7 @@ sf::Vector2f ShipIA::GetBouncingShotCoordinate(sf::Vector2f target_position, boo
 			bounce_position.y = (*CurrentGame).map_size.y;
 		}
 	}
-	else
+	else//discoball hits the left or right border
 	{
 		if (solution_top_or_left)
 		{
@@ -608,6 +645,120 @@ sf::Vector2f ShipIA::GetBouncingShotCoordinate(sf::Vector2f target_position, boo
 		}
 	}
 	
-
 	return bounce_position;
+}
+
+bool ShipIA::EvaluateBouncingFireTrajectory(GameObject* target_object, sf::Vector2f* target_position)
+{
+	if (target_object == NULL)
+		return false;
+
+	//acquisition of bouncing shot solutions
+	sf::Vector2f solution[4];
+	bool valid_solution[4] = { true, true, true, true };
+
+	if (target_object->collider_type == GoalBlueObject || target_object->collider_type == GoalRedObject)
+	{
+		if (target_object->m_size.x < target_object->m_size.y)
+		{
+			solution[0] = GetBouncingShotCoordinate(target_object->getPosition(), true, true);
+			solution[1] = GetBouncingShotCoordinate(target_object->getPosition(), true, false);
+			valid_solution[2] = false;
+			valid_solution[3] = false;
+		}
+		else
+		{
+			solution[2] = GetBouncingShotCoordinate(target_object->getPosition(), false, true);
+			solution[3] = GetBouncingShotCoordinate(target_object->getPosition(), false, false);
+			valid_solution[0] = false;
+			valid_solution[1] = false;
+		}
+	}
+	else
+	{
+		solution[0] = GetBouncingShotCoordinate(target_object->getPosition(), true, true);
+		solution[1] = GetBouncingShotCoordinate(target_object->getPosition(), true, false);
+		solution[2] = GetBouncingShotCoordinate(target_object->getPosition(), false, true);
+		solution[3] = GetBouncingShotCoordinate(target_object->getPosition(), false, false);
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (!valid_solution[i])
+			continue;
+
+		//checking if both trajectories are safe: fire to screen border and bounce toward final target
+		valid_solution[i] = EvaluateFireTrajectory(solution[i]) && EvaluateFireTrajectory(solution[i], target_object->getPosition());
+	}
+
+	//any solution still valid at this stage?
+	if (!valid_solution[0] && !valid_solution[1] && !valid_solution[2] && !valid_solution[3])
+		return false;
+	//any unique solution at this stage?
+	else if (valid_solution[0] + valid_solution[1] + valid_solution[2] + valid_solution[3] == 1)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (valid_solution[i])
+			{
+				*target_position = solution[i];
+				return true;
+			}
+		}
+	}
+
+	//choosing the best option among the remaining: shortest distance to travel for the discoball
+	float shortest_distance = -1;
+	for (int i = 0; i < 4; i++)
+	{
+		if (!valid_solution[i])
+			continue;
+
+		float dx, dy;
+		switch (i)
+		{
+			case 0: {//top
+						dx = getPosition().x - target_object->getPosition().x;
+						dy = getPosition().y + target_object->getPosition().y;
+						break;
+			}
+			case 1: {//bottom
+						dx = getPosition().x - target_object->getPosition().x;
+						dy = (*CurrentGame).map_size.y - getPosition().y + target_object->getPosition().y;
+						break;
+			}
+			case 2: {//left
+						dx = getPosition().x + target_object->getPosition().x;
+						dy = getPosition().y;
+						break;
+			}
+			case 3: {//right
+						dx = (*CurrentGame).map_size.x - getPosition().x + (*CurrentGame).map_size.x - target_object->getPosition().x;
+						dy = getPosition().y;
+						break;
+			}
+		}
+
+		float distance = sqrt(dx*dx + dy*dy);
+		if (distance < shortest_distance || shortest_distance < 0)
+		{
+			shortest_distance = distance;
+			for (int j = 0; j < i; j++)
+				valid_solution[j] = false;//elimination of previously checked solutions, for they are longer
+		}
+		else
+			valid_solution[i] = false;
+	}
+
+	//return the best valid solution remaining
+	for (int i = 0; i < 4; i++)
+	{
+		if (valid_solution[i])
+		{
+			*target_position = solution[i];
+			return true;
+		}
+	}
+
+	return false;
 }

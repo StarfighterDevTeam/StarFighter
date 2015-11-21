@@ -27,6 +27,17 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToFeedbacks(&score_blue_text);
 	(*CurrentGame).addToFeedbacks(&score_red_text);
 
+	//timer display
+	map_timer_text.setFont(*(*CurrentGame).font);
+	map_timer_text.setCharacterSize(30);
+	map_timer_text.setColor(sf::Color::White);
+	map_timer_text.setPosition((*CurrentGame).map_size.x / 2, 14);
+	ostringstream ss_time_display;
+	ss_time_display << (*CurrentGame).m_map_clock.getElapsedTime().asMilliseconds() / 1000;
+	map_timer_text.setString(ss_time_display.str());
+
+	//(*CurrentGame).addToFeedbacks(&map_timer_text);
+
 	//launch script
 	//SetIngameScript(OfflineMulti);
 	SetIngameScript(MainMenuScript);
@@ -36,6 +47,7 @@ void InGameState::Initialize(Player player)
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 {
 	m_script = script;
+	(*CurrentGame).m_map_clock.restart();
 
 	//clean previous scene
 	(*CurrentGame).CleanAllGameObjects();
@@ -348,7 +360,7 @@ void InGameState::StartMultiGame(bool reset_scores)
 void InGameState::StartTest()
 {
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
-	(*CurrentGame).score_to_win = 10;
+	(*CurrentGame).score_to_win = 0;
 
 	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_test.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
@@ -366,10 +378,11 @@ void InGameState::StartTest()
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, false);
-	playerShip2->SetControllerType(AllControlDevices);
+	//Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, false);
+	Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1800, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAHard, true);
+	playerShip2->SetControllerType(JoystickControl2);
 
-	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
+	//CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
 	CreateDiscoball();
 	CreateGoal(BlueTeam, sf::Vector2f(8, 540), sf::Vector2f(16, 200));
 }
@@ -377,7 +390,7 @@ void InGameState::StartTest()
 void InGameState::StartMultiGameBig(bool reset_scores)
 {
 	(*CurrentGame).cur_GameRules = ClassicMatchGamesRules;
-	(*CurrentGame).score_to_win = 10;
+	(*CurrentGame).score_to_win = -1;
 
 	GameObject* background = new GameObject(sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/background_big.png", sf::Vector2f(2880, 1080), sf::Vector2f(1440, REF_WINDOW_RESOLUTION_Y / 2));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
@@ -801,6 +814,7 @@ void InGameState::Update(sf::Time deltaTime)
 	//move camera
 	UpdateCamera(deltaTime);
 
+	//score display
 	ostringstream ss_score_blue, ss_score_red;
 	ss_score_blue << (*CurrentGame).score_blue_team;
 	ss_score_red << (*CurrentGame).score_red_team;
@@ -809,6 +823,10 @@ void InGameState::Update(sf::Time deltaTime)
 	score_blue_text.setPosition((*CurrentGame).view.getCenter().x - SCORE_DISPLAY_OFFSET, 14);
 	score_red_text.setPosition((*CurrentGame).view.getCenter().x + SCORE_DISPLAY_OFFSET, 14);
 
+	ostringstream ss_time_display;
+	ss_time_display << (*CurrentGame).m_map_clock.getElapsedTime().asMilliseconds() / 1000;
+	map_timer_text.setString(ss_time_display.str());
+
 	//Reset script after a goal
 	if ((*CurrentGame).m_goal_happened && (*CurrentGame).m_after_goal_clock.getElapsedTime().asSeconds() > DELAY_AFTER_GOAL)
 	{
@@ -816,7 +834,7 @@ void InGameState::Update(sf::Time deltaTime)
 		(*CurrentGame).m_goal_happened = false;
 
 		//end game? (blue wins)
-		if ((*CurrentGame).score_blue_team >= (*CurrentGame).score_to_win)
+		if ((*CurrentGame).score_to_win != 0 && (*CurrentGame).score_blue_team >= (*CurrentGame).score_to_win)
 		{
 			//Solo = load next script
 			if ((*CurrentGame).cur_GameRules == SoloTraining)
@@ -830,7 +848,7 @@ void InGameState::Update(sf::Time deltaTime)
 			}
 		}
 		//end game? (red wins)
-		else if ((*CurrentGame).score_red_team >= (*CurrentGame).score_to_win)
+		else if ((*CurrentGame).score_to_win != 0 && (*CurrentGame).score_red_team >= (*CurrentGame).score_to_win)
 		{
 			//Solo = load next script
 			if ((*CurrentGame).cur_GameRules == SoloTraining)
