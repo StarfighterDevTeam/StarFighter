@@ -65,6 +65,7 @@ enum IngameScript
 	MainMenuScript,
 	OfflineMulti,
 	OfflineMultiBig,
+	OfflineMulti2vs2,
 	Tuto01,
 	Tuto02,
 	Tuto03,

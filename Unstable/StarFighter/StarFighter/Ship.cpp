@@ -41,6 +41,7 @@ void Ship::Init()
 	m_isUsingPortal = false;
 
 	m_character = Natalia;
+	m_team_aura = NULL;
 
 	m_arrived_at_destination = true;
 

@@ -91,6 +91,7 @@
     <ClCompile Include="Bumper.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="Discoball.cpp" />
+    <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="Bumper.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Discoball.h" />
+    <ClInclude Include="FX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />

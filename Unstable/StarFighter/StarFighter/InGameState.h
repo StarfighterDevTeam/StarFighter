@@ -37,6 +37,7 @@ public:
 	void StartMainMenu();
 	void StartMultiGame(bool reset_scores = true);
 	void StartMultiGameBig(bool reset_scores = true);
+	void StartMultiGame2vs2(bool reset_scores = true);
 
 	void InitializeSoloCharacter();
 	void InitializeMapDesign();
@@ -54,7 +55,7 @@ public:
 	IngameScript m_script;
 	IngameScript m_next_script;
 
-	static Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, bool IA = false);
+	static Ship* CreateCharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam);
 	static ShipIA* CreateIACharacter(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2), PlayableCharacters character = Natalia, Teams team = BlueTeam, IADifficultyLevel IA_level = IAEasy, bool activated = true);
 
 	static Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));

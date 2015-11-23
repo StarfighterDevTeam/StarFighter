@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "Discoball.h"
 #include "Bumper.h"
+#include "FX.h"
 
 enum TacklingStatus
 {
@@ -119,6 +120,7 @@ public :
 
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;
+	Aura* m_team_aura;
 
 	//IA SPECIFIC
 	bool m_isUnmarked;
