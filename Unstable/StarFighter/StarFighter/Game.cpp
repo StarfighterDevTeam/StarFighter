@@ -324,7 +324,6 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//(*it1)->PlayerBumper(*it2, deltaTime);
-				break;
 			}
 		}
 	}
@@ -381,7 +380,6 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//(*it1)->PlayerBumper(*it2, deltaTime);
-				break;
 			}
 		}
 	}
@@ -457,7 +455,6 @@ void Game::colisionChecksV2(Time deltaTime)
 			{
 				//float angle = GetAngleOfCollision(*it2, *it1);
 				PlaySFX(SFX_Bounce);
-				break;
 			}
 		}
 

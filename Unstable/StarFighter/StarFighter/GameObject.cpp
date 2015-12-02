@@ -180,6 +180,7 @@ float GameObject::GetAbsoluteSpeed()
 
 	return s;
 }
+
 float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 {
 	const float a = speed_.x;
@@ -187,6 +188,24 @@ float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 	float s = (a * a) + (b * b);
 	s = sqrt(s);
 	s = floor(s);
+	return s;
+}
+
+float GameObject::GetAbsoluteSpeedSquared()
+{
+	const float a = speed.x;
+	const float b = speed.y;
+	float s = (a * a) + (b * b);
+
+	return s;
+}
+
+float GameObject::GetAbsoluteSpeedSquared(sf::Vector2f speed_)
+{
+	const float a = speed_.x;
+	const float b = speed_.y;
+	float s = (a * a) + (b * b);
+
 	return s;
 }
 

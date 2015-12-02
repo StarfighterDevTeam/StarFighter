@@ -539,7 +539,7 @@ void Ship::ManageTackle(bool force_input)
 		{
 			if (m_tackle_cooldown_init || tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
 			{
-				if (moving && GetAbsoluteSpeed() > 0)
+				if (moving && GetAbsoluteSpeedSquared() > 0)
 				{
 					if (((InputGuy::isTackling(m_controllerType) && !m_disable_inputs) || force_input)
 						&& wasTacklingButtonReleased)
@@ -562,20 +562,28 @@ void Ship::ManageTackle(bool force_input)
 	//State 1
 	if (m_isTackling == INITIATE_TACLKE)
 	{
-		//max value not reach = linear increase of speed
-		float new_absolute_speed = GetAbsoluteSpeed();
-		if (new_absolute_speed + SHIP_TACKLE_ACCELERATION < SHIP_TACKLE_MAX_SPEED)
+		//case blocked by a a wall or bumper: proceed to next step
+		if (GetAbsoluteSpeedSquared() == 0)
 		{
-			new_absolute_speed += SHIP_TACKLE_ACCELERATION;
+			m_isTackling = HOLDING_TACKLE;
 		}
 		else
 		{
-			new_absolute_speed = SHIP_TACKLE_MAX_SPEED;
-			m_isTackling = HOLDING_TACKLE;
-			tackle_max_hold_clock.restart();
-		}
+			//max value not reach = linear increase of speed
+			float new_absolute_speed = GetAbsoluteSpeed();
+			if (new_absolute_speed + SHIP_TACKLE_ACCELERATION < SHIP_TACKLE_MAX_SPEED)
+			{
+				new_absolute_speed += SHIP_TACKLE_ACCELERATION;
+			}
+			else
+			{
+				new_absolute_speed = SHIP_TACKLE_MAX_SPEED;
+				m_isTackling = HOLDING_TACKLE;
+				tackle_max_hold_clock.restart();
+			}
 
-		ScaleSpeed(&speed, new_absolute_speed);
+			ScaleSpeed(&speed, new_absolute_speed);
+		}
 	}
 
 	//State 3
