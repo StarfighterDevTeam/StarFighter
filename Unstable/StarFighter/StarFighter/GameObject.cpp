@@ -289,6 +289,17 @@ void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
 	vector->y *= p;
 }
 
+void GameObject::AddSpeed(sf::Vector2f* vector, float added_value)
+{
+	if (vector->x == 0 && vector->y == 0)
+		return;
+
+	float target_value = GetAbsoluteSpeed(*vector) + added_value;
+	float p = target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+	vector->x *= p;
+	vector->y *= p;
+}
+
 GameObject* GameObject::Clone()
 {
 	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->textureName, this->m_size);
@@ -320,10 +331,10 @@ void GameObject::PlayHitFeedback()
 	feedback_reset_clock.restart();
 }
 
-void GameObject::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
-{
-	// see override function in class Ship
-}
+//void GameObject::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
+//{
+//	// see override function in class Ship
+//}
 
 void GameObject::PlayerBumper(GameObject* bumper, Time deltaTime)
 {
@@ -340,7 +351,7 @@ void GameObject::CheckIfPlayerDiscoballBumped(Time deltaTime)
 	// see override function in class Ship
 }
 
-bool GameObject::IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y)//, float *i_x, float *i_y)
+bool GameObject::IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float *i_x, float *i_y)
 {
 	//segment 1: [p0, p1], segment 2: [p2, p3]
 	float s1_x, s1_y, s2_x, s2_y;
@@ -353,29 +364,35 @@ bool GameObject::IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_
 
 	if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
 	{
-		//// Collision detected
-		//if (i_x != NULL)
-		//	*i_x = p0_x + (t * s1_x);
-		//if (i_y != NULL)
-		//	*i_y = p0_y + (t * s1_y);
+		// Collision detected
+		if (i_x != NULL)
+			*i_x = p0_x + (t * s1_x);
+		if (i_y != NULL)
+			*i_y = p0_y + (t * s1_y);
 		return true;
 	}
 
 	return false; // No collision
 }
 
-float GameObject::DistancePointToSement(float p_0x, float p_0y, float p_1x, float p_1y, float p_2x, float p_2y)
+float GameObject::DistancePointToSement(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float *i_x, float *i_y)
 {
-	//distance of point p_0 to segment [p_1, p_2]
-	const float px = p_2x - p_1x;
-	const float py = p_2y - p_1y;
-	float u = ((p_0x - p_1x)*px + (p_0y - p_1y)*py) / (px*px + py*py);
+	//distance of point p0_ to segment [p1_, p2_]
+	const float px = p2_x - p1_x;
+	const float py = p2_y - p1_y;
+	float u = ((p0_x - p1_x)*px + (p0_y - p1_y)*py) / (px*px + py*py);
 	u = (u > 1) ? 1 : (u < 0) ? 0 : u;
-	const float x = p_1x + u*px;
-	const float y = p_1y + u*py;
-	const float dx = x - p_0x;
-	const float dy = y - p_0y;
+	const float x = p1_x + u*px;
+	const float y = p1_y + u*py;
+	const float dx = x - p0_x;
+	const float dy = y - p0_y;
 	const float dist = sqrt(dx*dx + dy*dy);
+
+	// Orthogonal projected point
+	if (i_x != NULL)
+		*i_x = x;
+	if (i_y != NULL)
+		*i_y = y;
 
 	return dist;
 }
@@ -395,62 +412,231 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 	if (!object->isOnScene || !(bumper->isOnScene))
 		return false;
 
-	//p_0 : current position of moving object
-	//p_1 : previous position of moving object
-	//p_2 : bumper segment point 1
-	//p_3 : bumper segment point 2
-	const float p_0x = object->getPosition().x;
-	const float p_0y = object->getPosition().y;
-	const float p_1x = object->getPosition().x - object->speed.x * deltaTime.asSeconds();
-	const float p_1y = object->getPosition().y - object->speed.y * deltaTime.asSeconds();
+	//p0_ : current position of moving object
+	//P0_radius : current position with added radius of the circle
+	//p1_ : previous position of moving object
+	//p2_, p3_, p4_, p5_ : bumper corner points
+	const float p0_x = object->getPosition().x;
+	const float p0_y = object->getPosition().y;
+	const float p1_x = object->getPosition().x - object->speed.x * deltaTime.asSeconds();
+	const float p1_y = object->getPosition().y - object->speed.y * deltaTime.asSeconds();
+	const float dx = p0_x - p1_x;
+	const float dy = p0_y - p1_y;
 
-	bool is_bumper_vertical = bumper->m_size.x > bumper->m_size.y ? false : true;
-	const float p_2x = is_bumper_vertical ? bumper->getPosition().x : bumper->getPosition().x - bumper->m_size.x / 2;
-	const float p_2y = is_bumper_vertical ? bumper->getPosition().y - bumper->m_size.y / 2 : bumper->getPosition().y;
-	const float p_3x = is_bumper_vertical ? bumper->getPosition().x : bumper->getPosition().x + bumper->m_size.x / 2;
-	const float p_3y = is_bumper_vertical ? bumper->getPosition().y + bumper->m_size.y / 2 : bumper->getPosition().y;
+	const float p2_x = bumper->getPosition().x - bumper->m_size.x / 2;
+	const float p2_y = bumper->getPosition().y - bumper->m_size.y / 2;
+	const float p3_x = bumper->getPosition().x + bumper->m_size.x / 2;
+	const float p3_y = bumper->getPosition().y - bumper->m_size.y / 2;
+	const float p4_x = bumper->getPosition().x + bumper->m_size.x / 2;
+	const float p4_y = bumper->getPosition().y + bumper->m_size.y / 2;
+	const float p5_x = bumper->getPosition().x - bumper->m_size.x / 2;
+	const float p5_y = bumper->getPosition().y + bumper->m_size.y / 2;
 
-	//collision at arrival? Calculation of distance of point p0 to segment [p_2, p_3]
-	const float dist = DistancePointToSement(p_0x, p_0y, p_2x, p_2y, p_3x, p_3y);
-	
-	//printf("dist: %f\n", dist);
-	
-	if (dist - object->m_size.x / 2 < 0)
+	const float segment[4][4] = { p2_x, p2_y, p3_x, p3_y, p3_x, p3_y, p4_x, p4_y, p4_x, p4_y, p5_x, p5_y, p5_x, p5_y, p2_x, p2_y };
+
+	//1. collision with borders during movement (projection of the center of the object, interesecting segments)?
+	bool segment_is_colliding[4] = { false, false, false, false };
+	sf::Vector2f segment_collision_coordinate[4];
+
+	for (int i = 0; i < 4; i++)
 	{
-		//printf("Collision at arrival position (dist: %f)\n", dist);
-		return true;
+		segment_is_colliding[i] = IntersectSegments(p0_x, p0_y, p1_x, p1_y, segment[i][0], segment[i][1], segment[i][2], segment[i][3], &segment_collision_coordinate[i].x, &segment_collision_coordinate[i].y);
 	}
+
+	//2. collision with borders on arrival?
+	bool segment_is_colliding_on_arrival[4] = { false, false, false, false };
+	float segment_collision_at_arrival_distance[4];
+
+	if (segment_is_colliding[0] + segment_is_colliding[1] + segment_is_colliding[2] + segment_is_colliding[3] == 0)
+	{
+		float dist;
+		for (int i = 0; i < 4; i++)
+		{
+			//collision at arrival? Calculation of distance of point p0 to segment
+			dist = DistancePointToSement(p0_x, p0_y, segment[i][0], segment[i][1], segment[i][2], segment[i][3]);
+			segment_is_colliding_on_arrival[i] = (dist - object->m_size.x / 2 < 0);
+			segment_collision_at_arrival_distance[i] = dist;
+		}
+	}
+
+	//3. collision with corners?
+	bool corner_is_colliding[4] = { false, false, false, false };
+
+	for (int i = 0; i < 4; i++)
+	{
+		corner_is_colliding[i] = DistancePointToSement(segment[i][0], segment[i][1], p0_x, p0_y, p1_x, p1_y) < object->m_size.x / 2;//object is a circle
+	}
+	
+	if (segment_is_colliding[0] + segment_is_colliding[1] + segment_is_colliding[2] + segment_is_colliding[3] 
+		+ segment_is_colliding_on_arrival[0] + segment_is_colliding_on_arrival[1] + segment_is_colliding_on_arrival[2] + segment_is_colliding_on_arrival[3]
+		+ corner_is_colliding[0] + corner_is_colliding[1] + corner_is_colliding[2] + corner_is_colliding[3] == 0)
+		return false;//no collision
 	else
 	{
-		//capsule collision
-		const float theta = GetAngleRadForSpeed(object->speed);
-		const float angle_top = M_PI - theta + M_PI_2 - (!is_bumper_vertical * M_PI);
-		const float angle_bottom = angle_top - M_PI;
-		const float offset_top_x = object->m_size.x / 2 * sin(angle_top);
-		const float offset_top_y = -object->m_size.x / 2 * cos(angle_top);
-		const float offset_bottom_x = object->m_size.x / 2 * sin(angle_bottom);
-		const float offset_bottom_y = -object->m_size.x / 2 * cos(angle_bottom);
+		//choose the closest collision
+		float shortest_distance = -1;
+		int solution = -1;
 
-		const float p_0Topx = p_0x + offset_top_x;
-		const float p_0Topy = p_0y + offset_top_y;
-		const float p_1Topx = p_1x + offset_top_x;
-		const float p_1Topy = p_1y + offset_top_y;
-		const float p_0Botx = p_0x + offset_bottom_x;
-		const float p_0Boty = p_0y + offset_bottom_y;
-		const float p_1Botx = p_1x + offset_bottom_x;
-		const float p_1Boty = p_1y + offset_bottom_y;
-
-		if (IntersectSegments(p_0Topx, p_0Topy, p_1Topx, p_1Topy, p_2x, p_2y, p_3x, p_3y)
-			|| IntersectSegments(p_0Botx, p_0Boty, p_1Botx, p_1Boty, p_2x, p_2y, p_3x, p_3y))
+		//solutions from 1. (borders on movement)
+		for (int i = 0; i < 4; i++)
 		{
-			//avoids to count a collision when leaving a position that was pixel-perfectly-not in collision
-			if (DistancePointToSement(p_1Topx, p_1Topy, p_2x, p_2y, p_3x, p_3y) > 0 && DistancePointToSement(p_1Botx, p_1Boty, p_2x, p_2y, p_3x, p_3y) > 0)
+			if (segment_is_colliding[i])
 			{
-				//printf("Collision on capsule movement\n");
-				return true;
+				float dx = p0_x - segment_collision_coordinate[i].x;
+				float dy = p0_y - segment_collision_coordinate[i].y;
+				float squared_distance = dx*dx + dy*dy;
+				if (shortest_distance < 0 || squared_distance < shortest_distance)
+				{
+					shortest_distance = squared_distance;
+					solution = i;
+				}
 			}
 		}
-		
-		return false;
-	}	
+
+		//solutions from 2. (borders on arrival)
+		for (int i = 0; i < 4; i++)
+		{
+			if (segment_is_colliding_on_arrival[i])
+			{
+				float squared_distance = segment_collision_at_arrival_distance[i] * segment_collision_at_arrival_distance[i];
+				if (shortest_distance < 0 || squared_distance < shortest_distance)
+				{
+					shortest_distance = squared_distance;
+					solution = i;
+				}
+			}
+		}
+
+		//solutions from 3. (corners)
+		for (int i = 0; i < 4; i++)
+		{
+			if (corner_is_colliding[i])
+			{
+				float dx = p0_x - segment[i][0];
+				float dy = p0_y - segment[i][1];
+				float squared_distance = dx*dx + dy*dy;
+				if (shortest_distance < 0 || squared_distance < shortest_distance)
+				{
+					shortest_distance = squared_distance;
+					solution = i + 4;
+				}
+			}
+		}
+
+		printf("Collision segment: %d\n", solution);
+
+		object->CollisionResponse(bumper, (CollisionSide)solution);
+		//0 : top
+		//1 : right
+		//2 : bottom
+		//3 : left
+		//4 : upper left corner
+		//5 : upper right corner
+		//6 : bottom right corner
+		//7 : bottom left corner
+
+		return true;
+	}
+}
+
+void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision)
+{
+	//see override in class Ship and Discoball
+}
+
+void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing)
+{
+	if (bumper)
+	{
+		switch (collision)
+		{
+			case NoCollision:
+				break;
+			case Collision_Top:
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - bumper->m_size.y / 2 - m_size.y / 2));
+				speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_Bottom:
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + bumper->m_size.y / 2 + m_size.y / 2));
+				speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_Right:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + bumper->m_size.x / 2 + m_size.x / 2, getPosition().y));
+				speed.x *= -1 * bouncing;
+				break;
+			}
+			case Collision_Left:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - bumper->m_size.x / 2 - m_size.x / 2, getPosition().y));
+				speed.x *= -1 * bouncing;
+				break;
+			}
+			case Collision_TopLeft:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - bumper->m_size.x / 2 - m_size.x / 2, bumper->getPosition().y - bumper->m_size.y / 2 - m_size.y / 2));
+				speed.x *= -1 * bouncing;
+				speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_TopRight:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + bumper->m_size.x / 2 + m_size.x / 2, bumper->getPosition().y - bumper->m_size.y / 2 - m_size.y / 2));
+				speed.x *= -1 * bouncing;
+				speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_BottomRight:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + bumper->m_size.x / 2 + m_size.x / 2, bumper->getPosition().y + bumper->m_size.y / 2 + m_size.y / 2));
+				speed.x *= -1 * bouncing;
+				speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_BottomLeft:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - bumper->m_size.x / 2 - m_size.x / 2, bumper->getPosition().y + bumper->m_size.y / 2 + m_size.y / 2));
+				speed.x *= -1 * bouncing;
+				speed.y *= -1 * bouncing;
+				break;
+			}
+		}
+	}
+}
+
+bool GameObject::isCapsuleCollidingDuringMovement(GameObject* object, float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y)
+{
+	const float theta = GetAngleRadForSpeed(object->speed);
+	const float angle_top = M_PI - theta + M_PI_2 - (p1_x == p2_x) * M_PI; // p1_x == p2_x if horizontal, else is vertical (diagonal not supported)
+	const float angle_bottom = angle_top - M_PI;
+	const float offset_top_x = object->m_size.x / 2 * sin(angle_top);
+	const float offset_top_y = -object->m_size.x / 2 * cos(angle_top);
+	const float offset_bottom_x = object->m_size.x / 2 * sin(angle_bottom);
+	const float offset_bottom_y = -object->m_size.x / 2 * cos(angle_bottom);
+
+	const float p0_Topx = p0_x + offset_top_x;
+	const float p0_Topy = p0_y + offset_top_y;
+	const float p1_Topx = p1_x + offset_top_x;
+	const float p1_Topy = p1_y + offset_top_y;
+	const float p0_Botx = p0_x + offset_bottom_x;
+	const float p0_Boty = p0_y + offset_bottom_y;
+	const float p1_Botx = p1_x + offset_bottom_x;
+	const float p1_Boty = p1_y + offset_bottom_y;
+
+	if (IntersectSegments(p0_Topx, p0_Topy, p1_Topx, p1_Topy, p2_x, p2_y, p3_x, p3_y)
+		|| IntersectSegments(p0_Botx, p0_Boty, p1_Botx, p1_Boty, p2_x, p2_y, p3_x, p3_y))
+	{
+		//avoids to count a collision when leaving a position that was pixel-perfectly-not in collision
+		if (DistancePointToSement(p1_Topx, p1_Topy, p2_x, p2_y, p3_x, p3_y) > 0 && DistancePointToSement(p1_Botx, p1_Boty, p2_x, p2_y, p3_x, p3_y) > 0)
+		{
+			//printf("Collision on capsule movement\n");
+			return true;
+		}
+	}
+
+	return false;
 }

@@ -144,31 +144,43 @@ void Discoball::SetDiscoballStatus(DiscoballStatus status)
 }
 
 
-void Discoball::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
-{
-	//printf("(collision) speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
+//void Discoball::DiscoballBumper(GameObject* bumper, sf::Time deltaTime)
+//{
+//	//printf("(collision) speed: %f, %f | ang speed:%f\n", speed.x, speed.y, discoball_curAngularSpeed);
+//
+//	if (bumper)
+//	{
+//		bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
+//		
+//		if (is_vertical_bumper)
+//		{
+//			speed.x *= -1;
+//			int speed_bool = getPosition().x - speed.x*deltaTime.asSeconds() < bumper->getPosition().x ? -1 : 1;
+//			setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
+//		}
+//		else
+//		{
+//			speed.y *= -1;
+//			int speed_bool = getPosition().x - speed.x*deltaTime.asSeconds() < bumper->getPosition().x ? -1 : 1;
+//			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + speed_bool * m_size.y / 2));
+//		}
+//		
+//		if (m_carrier)
+//		{
+//			m_touchedBumper = (Bumper*)bumper;
+//		}
+//	}
+//}
 
-	if (bumper)
+void Discoball::CollisionResponse(GameObject* bumper, CollisionSide collision)
+{
+	if (m_carrier)
 	{
-		bool is_vertical_bumper = bumper->m_size.x < bumper->m_size.y;
-		
-		if (is_vertical_bumper)
-		{
-			speed.x *= -1;
-			int speed_bool = getPosition().x - speed.x*deltaTime.asSeconds() < bumper->getPosition().x ? -1 : 1;
-			setPosition(sf::Vector2f(bumper->getPosition().x + speed_bool * m_size.x / 2, getPosition().y));
-		}
-		else
-		{
-			speed.y *= -1;
-			int speed_bool = getPosition().x - speed.x*deltaTime.asSeconds() < bumper->getPosition().x ? -1 : 1;
-			setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + speed_bool * m_size.y / 2));
-		}
-		
-		if (m_carrier)
-		{
-			m_touchedBumper = (Bumper*)bumper;
-		}
+		m_touchedBumper = (Bumper*)bumper;
+	}
+	else
+	{
+		GameObject::CollisionResponse(bumper, collision, true);
 	}
 }
 

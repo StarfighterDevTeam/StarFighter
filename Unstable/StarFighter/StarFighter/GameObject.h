@@ -74,6 +74,20 @@ enum IngameScript
 	ScriptTest,
 };
 
+enum CollisionSide
+{
+	Collision_Top,
+	Collision_Right,
+	Collision_Bottom,
+	Collision_Left,
+	Collision_TopLeft,
+	Collision_TopRight,
+	Collision_BottomRight,
+	Collision_BottomLeft,
+	NoCollision,
+};
+
+
 class GameObject : public AnimatedSprite
 {
 public:
@@ -115,19 +129,23 @@ public:
 
 	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
 	static void ScaleSpeed(sf::Vector2f* vector, float target_value);
+	static void AddSpeed(sf::Vector2f* vector, float added_value);
 	static float GetAbsoluteSpeed(sf::Vector2f speed_);
 	static float GetAngleRadForSpeed(sf::Vector2f curSpeed);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2);
 	static float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
 	static bool isCapsuleColliding(GameObject* object, GameObject* bumper, sf::Time deltaTime);
-	static bool IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y);
-	static float DistancePointToSement(float p_0x, float p_0y, float p_1x, float p_1y, float p_2x, float p_2y);
+	static bool isCapsuleCollidingDuringMovement(GameObject* object, float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y);
+	static bool IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float *i_x = NULL, float *i_y = NULL);
+	static float DistancePointToSement(float p0_x, float p0_y, float p_1x, float p_1y, float p_2x, float p_2y, float *i_x = NULL, float *i_y = NULL);
 
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
 	virtual void GetPortal(GameObject* portal);
-	virtual void DiscoballBumper(GameObject* bumper, sf::Time deltaTime);
+	//virtual void DiscoballBumper(GameObject* bumper, sf::Time deltaTime);
+	virtual void CollisionResponse(GameObject* bumper, CollisionSide collision);
+	virtual void CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing);
 	virtual void PlayerBumper(GameObject* bumper, Time deltaTime);
 	virtual void PlayerContact(GameObject* player, float angle_collision = -1.f);
 	virtual void CheckIfPlayerDiscoballBumped(Time deltaTime);

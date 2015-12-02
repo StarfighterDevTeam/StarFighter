@@ -323,7 +323,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			//if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
-				(*it1)->PlayerBumper(*it2, deltaTime);
+				//(*it1)->PlayerBumper(*it2, deltaTime);
 				break;
 			}
 		}
@@ -380,7 +380,8 @@ void Game::colisionChecksV2(Time deltaTime)
 			//if (SimpleCollision::AreColliding((*it1), (*it2)) || GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
-				(*it1)->PlayerBumper(*it2, deltaTime);
+				//(*it1)->PlayerBumper(*it2, deltaTime);
+				break;
 			}
 		}
 	}
@@ -455,7 +456,6 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//float angle = GetAngleOfCollision(*it2, *it1);
-				(*it1)->DiscoballBumper(*it2, deltaTime);
 				PlaySFX(SFX_Bounce);
 				break;
 			}

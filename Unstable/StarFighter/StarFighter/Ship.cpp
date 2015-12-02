@@ -115,16 +115,15 @@ void Ship::update(sf::Time deltaTime)
 		movingY = m_input_direction.y != 0;
 	}
 
+	ManageTackle();
+
 	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
 	{
 		GetDirectionInputs(m_input_direction);
 		MaxSpeedConstraints();
 		IdleDecelleration(deltaTime);
+		UpdateRotation();
 	}
-	
-	UpdateRotation();
-	
-	ManageTackle();
 
 	GameObject::update(deltaTime);
 
@@ -540,7 +539,7 @@ void Ship::ManageTackle(bool force_input)
 		{
 			if (m_tackle_cooldown_init || tackle_again_clock.getElapsedTime().asSeconds() > TACKLE_AGAIN_COOLDOWN)
 			{
-				if (moving)
+				if (moving && GetAbsoluteSpeed() > 0)
 				{
 					if (((InputGuy::isTackling(m_controllerType) && !m_disable_inputs) || force_input)
 						&& wasTacklingButtonReleased)
@@ -697,6 +696,15 @@ void Ship::PlayerContact(GameObject* player, float angle_collision)
 			player2->speed.y = 0;
 		}
 	}
+}
+
+void Ship::CollisionResponse(GameObject* bumper, CollisionSide collision)
+{
+	GameObject::CollisionResponse(bumper, collision, false);
+
+	//synchronizing aura with the corrected position
+	if (m_team_aura)
+		m_team_aura->setPosition(getPosition());
 }
 
 void Ship::CheckIfPlayerDiscoballBumped(Time deltaTime)

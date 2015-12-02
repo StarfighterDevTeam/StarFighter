@@ -147,7 +147,6 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 				}
 			}
 		}
-		
 	}
 
 	if (size.x > size.y)

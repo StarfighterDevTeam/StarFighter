@@ -37,7 +37,8 @@ public :
 	DiscoballStatus m_status;
 	void SetDiscoballStatus(DiscoballStatus status);
 
-	void DiscoballBumper(GameObject* bumper, sf::Time deltaTime) override;
+	//void DiscoballBumper(GameObject* bumper, sf::Time deltaTime) override;
+	void CollisionResponse(GameObject* bumper, CollisionSide collision) override;
 	void UsingPortal(bool is_using) override;
 	void GetPortal(GameObject* portal) override;
 	Bumper* m_touchedBumper;
