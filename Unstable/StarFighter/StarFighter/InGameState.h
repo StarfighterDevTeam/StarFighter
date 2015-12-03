@@ -60,6 +60,7 @@ public:
 
 	static Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	static Bumper* CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size);
+	static Bumper* CreateBumper(BumperType type, sf::Vector2f position, sf::Vector2f size);
 	static LevelPortal* CreateLevelPortal(IngameScript script, sf::Vector2f position);
 	static GameObject* CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size);
 

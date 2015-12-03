@@ -215,6 +215,14 @@ Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, bool v
 	return bumper;
 }
 
+Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
+{
+	Bumper* bumper = new Bumper(type, position, size);
+	(*CurrentGame).addToScene(bumper, BumperLayer, bumper->collider_type);
+
+	return bumper;
+}
+
 GameObject* InGameState::CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size)
 {
 	Goal* goal = new Goal(team, position, size);
@@ -309,7 +317,7 @@ void InGameState::StartTest()
 	// ##### HACK
 	(*CurrentGame).map_size = background->m_size;
 
-	Ship* playerShip1 = new Ship(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/natalia_test.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
+	Ship* playerShip1 = new Ship(sf::Vector2f(100, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32));
 	playerShip1->m_team = BlueTeam;
 	playerShip1->m_character = Natalia;
 	playerShip1->SetControllerType(AllControlDevices);
@@ -320,12 +328,14 @@ void InGameState::StartTest()
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
 	//Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, false);
-	Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1800, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAHard, true);
-	playerShip2->SetControllerType(JoystickControl2);
+	//Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1800, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAHard, true);
+	//playerShip2->SetControllerType(JoystickControl2);
 
 	//CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
 	CreateDiscoball();
 	CreateGoal(BlueTeam, sf::Vector2f(8, 540), sf::Vector2f(16, 200));
+
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(500, 500), sf::Vector2f(100, 100));
 }
 
 void InGameState::StartMultiGameBig(bool reset_scores)
