@@ -352,30 +352,30 @@ void InGameState::StartMultiGameBig(bool reset_scores)
 	InitializeMapDesign();
 
 	//A
-	auto va1 = sf::Vector2f(600, 250);
-	float sa = 150;
-	CreateBumper(OnlyBlueTeamThrough, va1, true, sa);
-	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
-
-	//B
-	auto vb1 = sf::Vector2f(1000, 400);
-	float sb = 150;
-	CreateBumper(OnlyPlayersThrough, vb1, true, sb);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
-
-	//C
-	auto vc1 = sf::Vector2f((*CurrentGame).map_size.x / 2, 250);
-	float sc = 150;
-	CreateBumper(OnlyPlayersThrough, vc1, true, sc);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(vc1.x, (*CurrentGame).map_size.y - vc1.y), true, sc);
-
-	//B
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, vb1.y), true, sb);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
-
-	//A
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, va1.y), true, sa);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
+	//auto va1 = sf::Vector2f(600, 250);
+	//float sa = 150;
+	//CreateBumper(OnlyBlueTeamThrough, va1, true, sa);
+	//CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
+	//
+	////B
+	//auto vb1 = sf::Vector2f(1000, 400);
+	//float sb = 150;
+	//CreateBumper(OnlyPlayersThrough, vb1, true, sb);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
+	//
+	////C
+	//auto vc1 = sf::Vector2f((*CurrentGame).map_size.x / 2, 250);
+	//float sc = 150;
+	//CreateBumper(OnlyPlayersThrough, vc1, true, sc);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(vc1.x, (*CurrentGame).map_size.y - vc1.y), true, sc);
+	//
+	////B
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, vb1.y), true, sb);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
+	//
+	////A
+	//CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, va1.y), true, sa);
+	//CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
 
 	if (reset_scores)
 	{
@@ -414,30 +414,30 @@ void InGameState::StartMultiGame2vs2(bool reset_scores)
 	InitializeMapDesign();
 
 	//A
-	auto va1 = sf::Vector2f(600, 250);
-	float sa = 150;
-	CreateBumper(OnlyBlueTeamThrough, va1, true, sa);
-	CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
-
-	//B
-	auto vb1 = sf::Vector2f(1000, 400);
-	float sb = 150;
-	CreateBumper(OnlyPlayersThrough, vb1, true, sb);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
-
-	//C
-	auto vc1 = sf::Vector2f((*CurrentGame).map_size.x / 2, 250);
-	float sc = 150;
-	CreateBumper(OnlyPlayersThrough, vc1, true, sc);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(vc1.x, (*CurrentGame).map_size.y - vc1.y), true, sc);
-
-	//B
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, vb1.y), true, sb);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
-
-	//A
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, va1.y), true, sa);
-	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
+	//auto va1 = sf::Vector2f(600, 250);
+	//float sa = 150;
+	//CreateBumper(OnlyBlueTeamThrough, va1, true, sa);
+	//CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
+	//
+	////B
+	//auto vb1 = sf::Vector2f(1000, 400);
+	//float sb = 150;
+	//CreateBumper(OnlyPlayersThrough, vb1, true, sb);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
+	//
+	////C
+	//auto vc1 = sf::Vector2f((*CurrentGame).map_size.x / 2, 250);
+	//float sc = 150;
+	//CreateBumper(OnlyPlayersThrough, vc1, true, sc);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(vc1.x, (*CurrentGame).map_size.y - vc1.y), true, sc);
+	//
+	////B
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, vb1.y), true, sb);
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - vb1.x, (*CurrentGame).map_size.y - vb1.y), true, sb);
+	//
+	////A
+	//CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, va1.y), true, sa);
+	//CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - va1.x, (*CurrentGame).map_size.y - va1.y), true, sa);
 
 	if (reset_scores)
 	{
@@ -934,17 +934,6 @@ void InGameState::InitializeMapDesign()
 
 	CreateBumper(OnlyRedTeamThrough, sf::Vector2f((*CurrentGame).map_size.x - DEFENDER_SAFE_ZONE_X, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
 
-	//SafeSpace
-	const float goal_size_y = GOAL_SIZE;
-	const float safe_space_x = GOAL_SAFE_ZONE_X;
-	const float ss = ((*CurrentGame).map_size.y - goal_size_y) / 2;
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x, ss / 2), true, ss);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x, (*CurrentGame).map_size.y - ss / 2), true, ss);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x / 2, ss), false, safe_space_x);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(safe_space_x / 2, (*CurrentGame).map_size.y - ss), false, safe_space_x);
-
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x, ss / 2), true, ss);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x, (*CurrentGame).map_size.y - ss / 2), true, ss);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x / 2, ss), false, safe_space_x);
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f((*CurrentGame).map_size.x - safe_space_x / 2, (*CurrentGame).map_size.y - ss), false, safe_space_x);
+	AutoFillGoalBumpers(BorderLeft, GOAL_SIZE, (*CurrentGame).map_size.y / 2);
+	AutoFillGoalBumpers(BorderRight, GOAL_SIZE, (*CurrentGame).map_size.y / 2);
 }
