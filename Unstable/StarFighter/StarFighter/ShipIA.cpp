@@ -175,7 +175,6 @@ void ShipIA::update(sf::Time deltaTime)
 				if (EvaluateFireTrajectory(m_target_goal))
 				{
 					IA_ShootToPosition(m_target_goal->getPosition());
-					//IA_ShootToPosition(GetBouncingShotCoordinate(m_target_goal->getPosition(), false, false));
 					printf("direct shoot\n");
 				}
 				else if (m_target_team_mate && EvaluateFireTrajectory(m_target_team_mate))

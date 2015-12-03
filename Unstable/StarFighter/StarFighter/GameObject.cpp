@@ -542,7 +542,14 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 			}
 		}
 
-		printf("Collision segment: %d\n", solution);
+		//reducing speed based on how much the object already penetrated the bumper
+		if (solution < 4 && segment_collision_coordinate[solution].x > 0)
+		{
+			object->speed.x = p0_x - segment_collision_coordinate[solution].x;
+			object->speed.y = p0_x - segment_collision_coordinate[solution].y;
+		}
+
+		//printf("Collision segment: %d\n", solution);
 
 		object->CollisionResponse(bumper, (CollisionSide)solution);
 		//0 : top
@@ -560,7 +567,7 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 
 void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision)
 {
-	//see override in class Ship and Discoball
+	//see override function in class Ship and Discoball
 }
 
 void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing)
