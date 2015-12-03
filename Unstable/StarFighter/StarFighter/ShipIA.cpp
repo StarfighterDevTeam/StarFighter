@@ -195,24 +195,20 @@ void ShipIA::update(sf::Time deltaTime)
 				}
 				else
 				{
-					printf("direct shoot\n");
+					printf("direct shoot (last resort)\n");
 					IA_ShootToPosition(m_target_goal->getPosition());
 				}
 			}
 		}
-
-		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
-		movingX = m_input_direction.x != 0;
-		movingY = m_input_direction.y != 0;
 	}
 	else
 	{
 		m_input_direction = InputGuy::getDirections(m_controllerType);
-		moving = m_input_direction.x != 0 || m_input_direction.y != 0;
-		movingX = m_input_direction.x != 0;
-		movingY = m_input_direction.y != 0;
-
 	}
+
+	moving = m_input_direction.x != 0 || m_input_direction.y != 0;
+	movingX = m_input_direction.x != 0;
+	movingY = m_input_direction.y != 0;
 
 	if (m_isTackling == NOT_TACKLING && m_isRecovering == NOT_HIT)
 	{
@@ -617,6 +613,10 @@ sf::Vector2f ShipIA::GetBouncingShotCoordinate(sf::Vector2f target_position, boo
 	sf::Vector2f bounce_position;
 	float dx = getPosition().x - target_position.x;
 	float dy = getPosition().y - target_position.y;
+	if (dx < 0)
+		dx = (*CurrentGame).map_size.x - dx;
+	if (dy < 0)
+		dy = (*CurrentGame).map_size.y - dy;
 
 	if (vertical_bounce)//discoball hits the top or bottom border
 	{

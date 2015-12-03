@@ -163,9 +163,9 @@ protected:
 	Animation defaultAnimation;
 	Animation* currentAnimation;
 
-	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber = 1, int m_animationNumber = 1);
-	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber = 1, int m_animationNumber = 1);
-	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber, sf::Uint8* pixels);
+	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber = 1, int animationNumber = 1);
+	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1, int animationNumber = 1);
+	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels);
 };
 
 #endif // GAMEOBJECT_H_INCLUDED

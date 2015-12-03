@@ -370,9 +370,14 @@ void Ship::ManageDiscoball(sf::Time deltaTime)
 {
 	if (m_discoball)
 	{
+		if (!m_discoball->visible || m_discoball->GarbageMe)
+		{
+			m_discoball = NULL;
+			return;
+		}
 		//touching map border results in dropping discoball
-		if (m_discoball->visible && (m_discoball->getPosition().y > (*CurrentGame).map_size.y - (m_discoball->m_size.y / 2) || m_discoball->getPosition().y < m_discoball->m_size.y / 2
-			|| m_discoball->getPosition().x > (*CurrentGame).map_size.x - (m_discoball->m_size.x / 2) || m_discoball->getPosition().x < m_discoball->m_size.x / 2))
+		else if (m_discoball->getPosition().y > (*CurrentGame).map_size.y - (m_discoball->m_size.y / 2) || m_discoball->getPosition().y < m_discoball->m_size.y / 2
+			|| m_discoball->getPosition().x > (*CurrentGame).map_size.x - (m_discoball->m_size.x / 2) || m_discoball->getPosition().x < m_discoball->m_size.x / 2)
 		{
 			ReleaseDiscoball();
 		}

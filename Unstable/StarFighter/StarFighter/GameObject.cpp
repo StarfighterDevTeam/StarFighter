@@ -1,8 +1,8 @@
 #include "GameObject.h"
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
-	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
+	Init(position, speed, textureName, size, frameNumber, animationNumber);
 	this->setOrigin(origin.x, origin.y);
 }
 
@@ -95,28 +95,28 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	this->rotation_speed = 0.f;
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*m_frameNumber, size.y*m_animationNumber);
+	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
 	this->textureName = textureName;
 
 	this->setOrigin(size.x / 2, size.y / 2);
 
-	Init(position, speed, texture, m_frameNumber, m_animationNumber);
+	Init(position, speed, texture, frameNumber, animationNumber);
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber, sf::Uint8* pixels)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*m_frameNumber, size.y*m_animationNumber, pixels);
+	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber, pixels);
 	this->textureName = textureName;
 
 	this->setOrigin(size.x / 2, size.y / 2);
 
-	Init(position, speed, texture, m_frameNumber, m_animationNumber);
+	Init(position, speed, texture, frameNumber, animationNumber);
 
 }
 
