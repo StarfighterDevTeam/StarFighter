@@ -40,8 +40,8 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	SetIngameScript(MainMenuScript);
-	//SetIngameScript(ScriptTest);
+	//SetIngameScript(MainMenuScript);
+	SetIngameScript(ScriptTest);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
@@ -219,6 +219,8 @@ Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, sf::Ve
 {
 	Bumper* bumper = new Bumper(type, position, size);
 	(*CurrentGame).addToScene(bumper, BumperLayer, bumper->collider_type);
+	if (bumper->m_glow_effect)
+		(*CurrentGame).addToScene(bumper->m_glow_effect, BumperLayer, bumper->m_glow_effect->collider_type);
 
 	return bumper;
 }
@@ -335,7 +337,10 @@ void InGameState::StartTest()
 	CreateDiscoball();
 	CreateGoal(BlueTeam, sf::Vector2f(8, 540), sf::Vector2f(16, 200));
 
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(500, 500), sf::Vector2f(100, 100));
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(150, 250), sf::Vector2f(200, 400));
+
+	int a = GameObject::GetPixelDistanceFromEdge(11, 3, 4);
+	int b = 0;
 }
 
 void InGameState::StartMultiGameBig(bool reset_scores)

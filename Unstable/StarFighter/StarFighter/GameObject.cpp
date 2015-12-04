@@ -666,3 +666,46 @@ bool GameObject::isCapsuleCollidingDuringMovement(GameObject* object, float p0_x
 
 	return false;
 }
+
+int GameObject::GetPixelDistanceFromEdge(int pixel_index, int width, int height)
+{
+	int line = (pixel_index / 4 / width);
+	int row = (pixel_index / 4) % width;
+
+	int x_ = row;
+	if (width - row - 1 < x_)
+		x_ = width - row;
+
+	int y_ = line;
+	if (height - line - 1 < y_)
+		y_ = height - line;
+
+	int distance = x_;
+	if (y_ < distance)
+		distance = y_;
+
+	distance++;//min value to return is 1
+	return distance;
+}
+
+void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height)
+{
+	if (blur_radius > 0)
+	{
+		for (int i = 0; i < width * height * 4; i += 4)
+		{
+			if ((i / 4) <= width * blur_radius || (i / 4) >(height - 1 * blur_radius)*width || (i / 4) % width <= 0 + (blur_radius - 1) || (i / 4) % width >= (width - 1 * blur_radius))
+			{
+				//pixels[i + 3] = (GetPixelDistanceFromEdge(i, width, height) + 1) * 255 / (blur_radius + 1);   // A
+				int nominator = GaussianBlurDistribution(GetPixelDistanceFromEdge(i, width, height));
+				int denominator = GaussianBlurDistribution(blur_radius + 1);
+				pixels[i + 3] = (Uint8)(ceil(1.f * nominator / denominator * 255)); // Alpha
+			}
+		}
+	}
+}
+
+int GameObject::GaussianBlurDistribution(int x)
+{
+	return x*x;
+}

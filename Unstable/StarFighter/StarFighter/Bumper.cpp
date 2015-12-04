@@ -24,12 +24,13 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	m_type = type;
 
 	//pixel array creation
-	const unsigned int W = size.x;
-	const unsigned int H = size.y;
+	const int W = size.x;
+	const int H = size.y;
 
 	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
 
 	ostringstream ss;
+	
 	if (type == OnlyBlueTeamThrough)
 	{
 		ss << "blue";
@@ -40,7 +41,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i + 1] = 0;		// G
 			pixels[i + 2] = 255;	// B
 
-			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * BUMPER_STROKE_SIZE || (i / 4) >(H - 1 * BUMPER_STROKE_SIZE)*W || (i / 4) % W <= 0 + (BUMPER_STROKE_SIZE  - 1) || (i / 4) % W >= (W - 1 * BUMPER_STROKE_SIZE)) // A
+			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * (BUMPER_STROKE_SIZE) || (i / 4) >(H - 1 * (BUMPER_STROKE_SIZE))*W || (i / 4) % W <= 0 + ((BUMPER_STROKE_SIZE) - 1) || (i / 4) % W >= (W - 1 * (BUMPER_STROKE_SIZE))) // A
 			{
 				pixels[i + 3] = 255;
 			}
@@ -60,7 +61,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i + 1] = 0;		// G
 			pixels[i + 2] = 0;		// B
 
-			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * BUMPER_STROKE_SIZE || (i / 4) >(H - 1 * BUMPER_STROKE_SIZE)*W || (i / 4) % W <= 0 + (BUMPER_STROKE_SIZE - 1) || (i / 4) % W >= (W - 1 * BUMPER_STROKE_SIZE)) // A
+			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * (BUMPER_STROKE_SIZE) || (i / 4) >(H - 1 * (BUMPER_STROKE_SIZE))*W || (i / 4) % W <= 0 + ((BUMPER_STROKE_SIZE) - 1) || (i / 4) % W >= (W - 1 * (BUMPER_STROKE_SIZE))) // A
 			{
 				pixels[i + 3] = 255;
 			}
@@ -80,7 +81,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i + 1] = 255;	// G
 			pixels[i + 2] = 0;		// B
 		
-			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * BUMPER_STROKE_SIZE || (i / 4) >(H - 1 * BUMPER_STROKE_SIZE)*W || (i / 4) % W <= 0 + (BUMPER_STROKE_SIZE - 1) || (i / 4) % W >= (W - 1 * BUMPER_STROKE_SIZE)) // A
+			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * (BUMPER_STROKE_SIZE) || (i / 4) >(H - 1 * (BUMPER_STROKE_SIZE))*W || (i / 4) % W <= 0 + ((BUMPER_STROKE_SIZE) - 1) || (i / 4) % W >= (W - 1 * (BUMPER_STROKE_SIZE))) // A
 			{
 				pixels[i + 3] = 255;
 			}
@@ -107,6 +108,18 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	std::string s = ss.str();
 
 	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 1, pixels);
+
+	//Add outter glow effect
+	if (BUMPER_OUTTER_GLOW_RADIUS > 0)
+	{
+		//BlurEffect(BUMPER_OUTTER_GLOW_RADIUS, pixels, W, H);
+		m_glow_effect = new Glow(this, sf::Color(pixels[0], pixels[1], pixels[2], pixels[3]), BUMPER_OUTTER_GLOW_RADIUS);
+	}
+	else
+	{
+		m_glow_effect = NULL;
+	}
+	//visible = false;
 }
 /*
 void Bumper::Init()
@@ -134,4 +147,7 @@ Bumper::~Bumper()
 void Bumper::update(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
+
+	if (m_glow_effect)
+		m_glow_effect->setPosition(getPosition());
 }

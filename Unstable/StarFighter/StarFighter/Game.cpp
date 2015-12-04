@@ -14,7 +14,7 @@ void Game::init(RenderWindow* window)
 
 	view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
-	//view.zoom(0.8f);
+	//view.zoom(0.3f);
 
 	//default value
 	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));

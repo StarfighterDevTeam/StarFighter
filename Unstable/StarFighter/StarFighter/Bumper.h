@@ -23,6 +23,7 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	BumperType m_type;
+	Glow* m_glow_effect;
 };
 
 #endif // BUMPER_H_INCLUDED

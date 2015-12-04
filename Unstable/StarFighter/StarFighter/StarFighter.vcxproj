@@ -96,6 +96,7 @@
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Glow.cpp" />
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="LevelPortal.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Glow.h" />
     <ClInclude Include="Goal.h" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />

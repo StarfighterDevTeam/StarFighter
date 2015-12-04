@@ -10,6 +10,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <SFML/Audio.hpp>
+#include "Glow.h"
+#include "Stroboscopic.h"
 
 class Ship;
 

@@ -156,6 +156,10 @@ public:
 	void PlayHitFeedback();
 	sf::Clock feedback_reset_clock;
 
+	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
+	void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height);
+	static int GaussianBlurDistribution(int x);
+
 	sf::Vector2f speed;
 
 protected:

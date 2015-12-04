@@ -4,7 +4,6 @@
 #include "Globals.h"
 #include "Game.h"
 #include "GameObject.h"
-#include "Stroboscopic.h"
 #include "LevelPortal.h"
 #include "Bumper.h"
 
