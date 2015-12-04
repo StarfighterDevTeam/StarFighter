@@ -656,7 +656,7 @@ bool ShipIA::EvaluateBouncingFireTrajectory(GameObject* target_object, sf::Vecto
 	sf::Vector2f solution[4];
 	bool valid_solution[4] = { true, true, true, true };
 
-	if (target_object->collider_type == GoalBlueObject || target_object->collider_type == GoalRedObject)
+	if (target_object->m_collider_type == GoalBlueObject || target_object->m_collider_type == GoalRedObject)
 	{
 		if (target_object->m_size.x < target_object->m_size.y)
 		{

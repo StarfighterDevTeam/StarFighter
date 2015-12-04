@@ -215,9 +215,9 @@ Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, bool v
 Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 {
 	Bumper* bumper = new Bumper(type, position, size);
-	(*CurrentGame).addToScene(bumper, BumperLayer, bumper->collider_type);
+	(*CurrentGame).addToScene(bumper, BumperLayer, bumper->m_collider_type);
 	if (bumper->m_glow_effect)
-		(*CurrentGame).addToScene(bumper->m_glow_effect, BumperLayer, bumper->m_glow_effect->collider_type);
+		(*CurrentGame).addToScene(bumper->m_glow_effect, BumperLayer, bumper->m_glow_effect->m_collider_type);
 
 	return bumper;
 }
@@ -226,7 +226,7 @@ GameObject* InGameState::CreateGoal(Teams team, sf::Vector2f position, sf::Vecto
 {
 	Goal* goal = new Goal(team, position, size);
 
-	(*CurrentGame).addToScene(goal, GoalLayer, goal->collider_type);
+	(*CurrentGame).addToScene(goal, GoalLayer, goal->m_collider_type);
 
 	return goal;
 }

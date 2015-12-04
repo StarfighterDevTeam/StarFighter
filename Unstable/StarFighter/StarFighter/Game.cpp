@@ -121,10 +121,7 @@ void Game::PlaySFX(SFX_Bank sfx_name)
 void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
 {
 	object->layer = m_layer;
-	object->collider_type = type;
-
-	//Window resolution adjustements
-	//object->setScale(scale_factor.x, scale_factor.y);
+	object->m_collider_type = type;
 
 	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
@@ -547,7 +544,7 @@ void Game::cleanGarbage()
 		}
 
 		// "typed"
-		const int type = pCurGameObject->collider_type;
+		const int type = pCurGameObject->m_collider_type;
 		for (size_t j = 0; j < sceneGameObjectsTypedSize[type]; j++)
 		{
 			if (this->sceneGameObjectsTyped[type][j] == pCurGameObject)

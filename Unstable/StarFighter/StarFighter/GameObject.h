@@ -105,7 +105,7 @@ public:
 	bool isOnScene;
 	bool GarbageMe;
 	bool DontGarbageMe;
-	GameObjectType collider_type;
+	GameObjectType m_collider_type;
 	LayerType layer;
 	sf::Vector2f m_size;
 
@@ -121,7 +121,7 @@ public:
 	int m_frameNumber;
 	int currentAnimationIndex;
 
-	std::string textureName;
+	std::string m_textureName;
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();

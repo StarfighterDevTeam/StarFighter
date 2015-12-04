@@ -38,7 +38,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	if (type == OnlyBlueTeamThrough)
 	{
 		ss << "blue";
-		collider_type = BumperBlueObject;
+		m_collider_type = BumperBlueObject;
 		for (int i = 0; i < W * H * 4; i += 4)
 		{
 			pixels[i] = 0;			// R
@@ -50,7 +50,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	else if (type == OnlyRedTeamThrough)
 	{
 		ss << "red";
-		collider_type = BumperRedObject;
+		m_collider_type = BumperRedObject;
 		for (int i = 0; i < W * H * 4; i += 4)
 		{
 			pixels[i] = 255;		// R
@@ -62,7 +62,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	else
 	{
 		ss << "green";
-		collider_type = BumperGreenObject;
+		m_collider_type = BumperGreenObject;
 		for (int i = 0; i < W * H * 4; i += 4)
 		{
 			pixels[i] = 0;			// R
@@ -110,25 +110,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	{
 		m_glow_effect = NULL;
 	}
-	//visible = false;
 }
-/*
-void Bumper::Init()
-{
-	if (m_type == OnlyBlueTeamThrough)
-	{
-		collider_type = BumperBlueObject;
-	}
-	else if (m_type == OnlyRedTeamThrough)
-	{
-		collider_type = BumperRedObject;
-	}
-	else//if (m_type == OnlyPlayersThrough)
-	{
-		collider_type = BumperGreenObject;
-	}
-}
-*/
 
 Bumper::~Bumper()
 {

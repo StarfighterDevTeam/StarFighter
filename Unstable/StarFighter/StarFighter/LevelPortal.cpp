@@ -25,7 +25,7 @@ LevelPortal::LevelPortal(IngameScript script, sf::Vector2f position, sf::Vector2
 
 void LevelPortal::Init()
 {
-	collider_type = LevelPortalObject;
+	m_collider_type = LevelPortalObject;
 	DontGarbageMe = true;
 	m_destination = NULL;
 }

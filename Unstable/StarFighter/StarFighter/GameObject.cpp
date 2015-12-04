@@ -18,7 +18,7 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 
 string GameObject::getName()
 {
-	vector<string> s1 = TextUtils::split(this->textureName, '/');
+	vector<string> s1 = TextUtils::split(m_textureName, '/');
 	return *(s1.end() - 1);
 }
 
@@ -100,9 +100,9 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
-	this->textureName = textureName;
+	m_textureName = textureName;
 
-	this->setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x / 2, size.y / 2);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
@@ -112,9 +112,9 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber, pixels);
-	this->textureName = textureName;
+	m_textureName = textureName;
 
-	this->setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x / 2, size.y / 2);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
 
@@ -321,8 +321,8 @@ void GameObject::AddSpeed(sf::Vector2f* vector, float added_value)
 
 GameObject* GameObject::Clone()
 {
-	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->textureName, this->m_size);
-	clone->collider_type = this->collider_type;
+	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->m_textureName, this->m_size);
+	clone->m_collider_type = this->m_collider_type;
 	clone->layer = this->layer;
 
 	return clone;

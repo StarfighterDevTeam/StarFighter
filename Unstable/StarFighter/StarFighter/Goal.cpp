@@ -33,7 +33,7 @@ Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 	if (m_team == BlueTeam)
 	{
 		ss << "blue_goal";
-		collider_type = GoalBlueObject;
+		m_collider_type = GoalBlueObject;
 		
 		for (int i = 0; i < W*H * 4; i += 4)
 		{
@@ -47,7 +47,7 @@ Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 	else if (m_team == RedTeam)
 	{
 		ss << "red_goal";
-		collider_type = GoalRedObject;
+		m_collider_type = GoalRedObject;
 		
 		for (int i = 0; i < W*H * 4; i += 4)
 		{
@@ -61,7 +61,7 @@ Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 	else
 	{
 		ss << "green_goal";
-		collider_type = BumperGreenObject;
+		m_collider_type = BumperGreenObject;
 
 		for (int i = 0; i < W*H * 4; i += 4)
 		{

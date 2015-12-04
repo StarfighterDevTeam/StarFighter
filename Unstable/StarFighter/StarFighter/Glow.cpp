@@ -8,10 +8,10 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 {
 	assert(parent != NULL);
 
-	collider_type = BackgroundObject;
+	m_collider_type = BackgroundObject;
 	m_color = color;
 	m_glow_radius = glow_thickness;
-	textureName = parent->textureName + "_glow";
+	m_textureName = parent->m_textureName + "_glow";
 
 	const int W = parent->m_size.x + glow_thickness*2;
 	const int H = parent->m_size.y + glow_thickness*2;
@@ -39,7 +39,7 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 	//Add outter glow effect
 	GlowEffect(glow_thickness, pixels, W, H, stroke_size);
 
-	Init(parent->getPosition(), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1, pixels);
+	Init(parent->getPosition(), sf::Vector2f(0, 0), m_textureName, sf::Vector2f(W, H), 1, 1, pixels);
 }
 
 Glow::~Glow()
