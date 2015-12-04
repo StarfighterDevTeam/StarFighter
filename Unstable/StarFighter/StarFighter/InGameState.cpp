@@ -209,10 +209,7 @@ Discoball* InGameState::CreateDiscoball(sf::Vector2f position)
 Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size)
 {
 	sf::Vector2f size_ = vertical ? sf::Vector2f(BUMPER_WIDTH, size) : sf::Vector2f(size, BUMPER_WIDTH);
-	Bumper* bumper = new Bumper(type, position, size_);
-	(*CurrentGame).addToScene(bumper, BumperLayer, bumper->collider_type);
-
-	return bumper;
+	return CreateBumper(type, position, size_);
 }
 
 Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, sf::Vector2f size)

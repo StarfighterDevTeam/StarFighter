@@ -8,7 +8,7 @@
 class Glow : public GameObject
 {
 public :
-	Glow(GameObject* parent, sf::Color color, int glow_thickness);
+	Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size = 0);
 	virtual ~Glow();
 	void update(sf::Time deltaTime) override;
 

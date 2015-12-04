@@ -24,6 +24,7 @@ public :
 
 	BumperType m_type;
 	Glow* m_glow_effect;
+	int m_stroke_size;
 };
 
 #endif // BUMPER_H_INCLUDED

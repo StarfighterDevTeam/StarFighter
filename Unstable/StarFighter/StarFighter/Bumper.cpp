@@ -27,10 +27,14 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	const int W = size.x;
 	const int H = size.y;
 
+	m_stroke_size = BUMPER_STROKE_SIZE;
+
 	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
 
 	ostringstream ss;
 	
+	sf::Color color;
+
 	if (type == OnlyBlueTeamThrough)
 	{
 		ss << "blue";
@@ -40,15 +44,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i] = 0;			// R
 			pixels[i + 1] = 0;		// G
 			pixels[i + 2] = 255;	// B
-
-			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * (BUMPER_STROKE_SIZE) || (i / 4) >(H - 1 * (BUMPER_STROKE_SIZE))*W || (i / 4) % W <= 0 + ((BUMPER_STROKE_SIZE) - 1) || (i / 4) % W >= (W - 1 * (BUMPER_STROKE_SIZE))) // A
-			{
-				pixels[i + 3] = 255;
-			}
-			else
-			{
-				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
-			}
+			color = { pixels[i], pixels[i + 1], pixels[i + 2], 255 };
 		}
 	}
 	else if (type == OnlyRedTeamThrough)
@@ -60,15 +56,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i] = 255;		// R
 			pixels[i + 1] = 0;		// G
 			pixels[i + 2] = 0;		// B
-
-			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * (BUMPER_STROKE_SIZE) || (i / 4) >(H - 1 * (BUMPER_STROKE_SIZE))*W || (i / 4) % W <= 0 + ((BUMPER_STROKE_SIZE) - 1) || (i / 4) % W >= (W - 1 * (BUMPER_STROKE_SIZE))) // A
-			{
-				pixels[i + 3] = 255;
-			}
-			else
-			{
-				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
-			}
+			color = { pixels[i], pixels[i + 1], pixels[i + 2], 255 };
 		}
 	}
 	else
@@ -80,15 +68,18 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 			pixels[i] = 0;			// R
 			pixels[i + 1] = 255;	// G
 			pixels[i + 2] = 0;		// B
-		
-			if (BUMPER_STROKE_SIZE < 1 || (i / 4) <= W * (BUMPER_STROKE_SIZE) || (i / 4) >(H - 1 * (BUMPER_STROKE_SIZE))*W || (i / 4) % W <= 0 + ((BUMPER_STROKE_SIZE) - 1) || (i / 4) % W >= (W - 1 * (BUMPER_STROKE_SIZE))) // A
-			{
-				pixels[i + 3] = 255;
-			}
-			else
-			{
-				pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
-			}
+			color = { pixels[i], pixels[i + 1], pixels[i + 2], 255 };
+		}
+	}
+	for (int i = 0; i < W * H * 4; i += 4)
+	{
+		if (m_stroke_size < 1 || (i / 4) <= W * (m_stroke_size) || (i / 4) >(H - 1 * (m_stroke_size))*W || (i / 4) % W <= 0 + ((m_stroke_size)-1) || (i / 4) % W >= (W - 1 * (m_stroke_size))) // A
+		{
+			pixels[i + 3] = 255;
+		}
+		else
+		{
+			pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
 		}
 	}
 
@@ -113,7 +104,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	if (BUMPER_OUTTER_GLOW_RADIUS > 0)
 	{
 		//BlurEffect(BUMPER_OUTTER_GLOW_RADIUS, pixels, W, H);
-		m_glow_effect = new Glow(this, sf::Color(pixels[0], pixels[1], pixels[2], pixels[3]), BUMPER_OUTTER_GLOW_RADIUS);
+		m_glow_effect = new Glow(this, color, BUMPER_OUTTER_GLOW_RADIUS, m_stroke_size);
 	}
 	else
 	{

@@ -47,6 +47,21 @@ public:
 		return texture;
 	}
 
+	sf::Texture* getTexture(std::string filename)
+	{
+		//Do we already have this loaded ?
+		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
+
+		if (it != this->_loadedTextures.end())
+		{
+			//element found;
+			return it->second;	//Return the texture*
+		}
+
+		//Not found, load the texture
+		return NULL;
+	}
+
 	sf::Texture* loadTexture(std::string filename, int sizeX, int sizeY, sf::Uint8* pixels)
 	{
 		//Do we already have this loaded ?
