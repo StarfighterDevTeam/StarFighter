@@ -21,6 +21,7 @@ public :
 	Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size);
 	virtual ~Bumper();
 	void update(sf::Time deltaTime) override;
+	void CollisionResponse(Time deltaTime) override;
 
 	BumperType m_type;
 	Glow* m_glow_effect;

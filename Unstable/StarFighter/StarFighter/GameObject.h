@@ -87,6 +87,11 @@ enum CollisionSide
 	NoCollision,
 };
 
+enum GlowAnimations
+{
+	GlowDefaultAnimation,
+	GlowHitAnimation
+};
 
 class GameObject : public AnimatedSprite
 {
@@ -146,7 +151,7 @@ public:
 	//TRON SPECIFIC
 	virtual void GetDiscoball(GameObject* discoball, float angle_collision = -1.f);
 	virtual void GetPortal(GameObject* portal);
-	//virtual void DiscoballBumper(GameObject* bumper, sf::Time deltaTime);
+	virtual void CollisionResponse(Time deltaTime);
 	virtual void CollisionResponse(GameObject* bumper, CollisionSide collision);
 	virtual void CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing);
 	virtual void PlayerBumper(GameObject* bumper, Time deltaTime);

@@ -52,6 +52,8 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 	m_collider_type = BackgroundObject;
 	m_color = color;
 	m_glow_radius = glow_thickness;
+	m_glow_animation_duration = glow_animation_duration;
+	m_glow_status = GlowDefaultAnimation;
 
 	//calculating the number of frames required to create an animation with the desired duration
 	int unique_frames_number = (int)(ceil(glow_animation_duration / TIME_BETWEEN_ANIMATION_FRAMES));
@@ -116,16 +118,19 @@ Glow::~Glow()
 
 void Glow::update(sf::Time deltaTime)
 {
-	//const int W = m_size.x;
-	//const int H = m_size.y;
-	//
-	//sf::Uint8* pixels = new sf::Uint8[W * H * 4];
-	//
-	//TextureLoader *loader;
-	//loader = TextureLoader::getInstance();
-	//
-	//sf::Texture* texture = loader->getTexture(this->textureName);
-	
-
 	AnimatedSprite::update(deltaTime);
+	if (m_glow_status == GlowDefaultAnimation)
+	{
+		//restart animation every frame (=fixed image)
+		m_currentFrame = 0;
+	}
+	else
+	{
+		//end of animation
+		if (m_currentFrame == m_frameNumber - 1)
+		{
+			m_glow_status = GlowDefaultAnimation;
+			m_currentFrame = 0;
+		}
+	}
 }

@@ -33,7 +33,7 @@
 #include "Animation.hpp"
 #include "Globals.h"
 
-#define TIME_BETWEEN_ANIMATION_FRAMES			0.2f
+#define TIME_BETWEEN_ANIMATION_FRAMES			0.06f
 
 class AnimatedSprite : public sf::Drawable, public sf::Transformable
 {

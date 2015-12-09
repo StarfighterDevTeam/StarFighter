@@ -92,8 +92,6 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	//Add outter glow effect
 	if (BUMPER_GLOW_RADIUS > 0)
 	{
-		//BlurEffect(BUMPER_OUTTER_GLOW_RADIUS, pixels, W, H);
-		//m_glow_effect = new Glow(this, color, BUMPER_GLOW_RADIUS, m_stroke_size);
 		m_glow_effect = new Glow(this, color, BUMPER_GLOW_RADIUS, m_stroke_size, BUMPER_GLOW_ANIMATION_DURATION, BUMPER_GLOW_MIN_RADIUS);
 	}
 	else
@@ -113,4 +111,17 @@ void Bumper::update(sf::Time deltaTime)
 
 	if (m_glow_effect)
 		m_glow_effect->setPosition(getPosition());
+}
+
+void Bumper::CollisionResponse(Time deltaTime)
+{
+	//start a new animation
+	if (m_glow_effect->m_glow_status != GlowHitAnimation)
+	{
+		m_glow_effect->m_glow_status = GlowHitAnimation;
+		if (m_glow_effect->m_frameNumber > 1)
+			m_glow_effect->m_currentFrame = 1;
+	}
+
+	AnimatedSprite::update(deltaTime);
 }

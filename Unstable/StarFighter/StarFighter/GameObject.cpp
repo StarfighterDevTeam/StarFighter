@@ -552,6 +552,7 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 		//printf("Collision segment: %d\n", solution);
 
 		object->CollisionResponse(bumper, (CollisionSide)solution);
+		bumper->CollisionResponse(deltaTime);//bumper visual feedback
 		//0 : top
 		//1 : right
 		//2 : bottom
@@ -568,6 +569,11 @@ bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::
 void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision)
 {
 	//see override function in class Ship and Discoball
+}
+
+void GameObject::CollisionResponse(Time deltaTime)
+{
+	//see override function in class Bumper
 }
 
 void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing)
