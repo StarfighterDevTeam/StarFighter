@@ -79,32 +79,22 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 		}
 		else
 		{
-			pixels[i + 3] = BUMPER_OUTSIDE_GLOW_ALPHA;
+			pixels[i + 3] = BUMPER_INSIDE_ALPHA;
 		}
 	}
 
-	if (size.x > size.y)
-	{
-		ss << "_H_" << size.x;
-	}
-	else if (size.x < size.y)
-	{
-		ss << "_V_" << size.y;
-	}
-	else
-	{
-		ss << "_S";
-	}
-	
+	//automatic naming of the texture for a unique identification
+	ss << size.x << "x" << size.y;
 	std::string s = ss.str();
 
 	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 1, pixels);
 
 	//Add outter glow effect
-	if (BUMPER_OUTTER_GLOW_RADIUS > 0)
+	if (BUMPER_GLOW_RADIUS > 0)
 	{
 		//BlurEffect(BUMPER_OUTTER_GLOW_RADIUS, pixels, W, H);
-		m_glow_effect = new Glow(this, color, BUMPER_OUTTER_GLOW_RADIUS, m_stroke_size);
+		//m_glow_effect = new Glow(this, color, BUMPER_GLOW_RADIUS, m_stroke_size);
+		m_glow_effect = new Glow(this, color, BUMPER_GLOW_RADIUS, m_stroke_size, BUMPER_GLOW_ANIMATION_DURATION, BUMPER_GLOW_MIN_RADIUS);
 	}
 	else
 	{
