@@ -14,7 +14,11 @@ public :
 	Goal(Teams team, sf::Vector2f position, sf::Vector2f size);
 	virtual ~Goal();
 
+	void CollisionResponse(Time deltaTime) override;
+
 	Teams m_team;
+	int m_stroke_size;
+	Glow* m_glow_effect;
 };
 
 #endif // GOAL_H_INCLUDED

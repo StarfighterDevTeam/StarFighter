@@ -573,7 +573,7 @@ void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision)
 
 void GameObject::CollisionResponse(Time deltaTime)
 {
-	//see override function in class Bumper
+	//see override function in class Bumper and Goal
 }
 
 void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing)
@@ -723,4 +723,35 @@ void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int h
 int GameObject::GaussianBlurDistribution(int x)
 {
 	return x*x;
+}
+
+sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size)
+{
+	//pixel array creation
+	const int W = size.x;
+	const int H = size.y;
+
+	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
+
+	for (int i = 0; i < W * H * 4; i += 4)
+	{
+		pixels[i] = color.r;			// R
+		pixels[i + 1] = color.g;		// G
+		pixels[i + 2] = color.b;	// B
+		pixels[i + 3] = 255;
+	}
+	//inside stroke
+	for (int i = 0; i < W * H * 4; i += 4)
+	{
+		if (stroke_size < 1 || (i / 4) <= W * (stroke_size) || (i / 4) >(H - 1 * (stroke_size))*W || (i / 4) % W <= 0 + ((stroke_size)-1) || (i / 4) % W >= (W - 1 * (stroke_size))) // A
+		{
+			pixels[i + 3] = 255;
+		}
+		else
+		{
+			pixels[i + 3] = BUMPER_INSIDE_ALPHA;
+		}
+	}
+
+	return pixels;
 }

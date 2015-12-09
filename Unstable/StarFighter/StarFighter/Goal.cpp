@@ -24,74 +24,62 @@ Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 	m_team = team;
 
 	//pixel array creation
-	const unsigned int W = size.x;
-	const unsigned int H = size.y;
+	const int W = size.x;
+	const int H = size.y;
 
-	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
+	m_stroke_size = GOAL_STROKE_SIZE;
 
 	ostringstream ss;
+	ss << "bumper";
+
+	sf::Color color;
+
 	if (m_team == BlueTeam)
 	{
-		ss << "blue_goal";
+		ss << "_blue";
 		m_collider_type = GoalBlueObject;
-		
-		for (int i = 0; i < W*H * 4; i += 4)
-		{
-			pixels[i] = 0;			// R
-			pixels[i + 1] = 162;	// G
-			pixels[i + 2] = 232;	// B
-			pixels[i + 3] = 255;	//A
-			
-		}
+		color = { 0, 0, 255, 255 };
 	}
-	else if (m_team == RedTeam)
+	else//if (m_team == RedTeam)
 	{
-		ss << "red_goal";
+		ss << "_red";
 		m_collider_type = GoalRedObject;
-		
-		for (int i = 0; i < W*H * 4; i += 4)
-		{
-			pixels[i] = 237;		// R
-			pixels[i + 1] = 25;		// G
-			pixels[i + 2] = 36;		// B
-			pixels[i + 3] = 255;	// A
-			
-		}
-	}
-	else
-	{
-		ss << "green_goal";
-		m_collider_type = BumperGreenObject;
-
-		for (int i = 0; i < W*H * 4; i += 4)
-		{
-			pixels[i] = 0;			// R
-			pixels[i + 1] = 255;	// G
-			pixels[i + 2] = 0;		// B
-			pixels[i + 3] = 255;	// A
-			
-		}
+		color = { 255, 0, 0, 255 };
 	}
 
-	if (size.x > size.y)
-	{
-		ss << "_H_" << size.x;
-	}
-	else if (size.x < size.y)
-	{
-		ss << "_V_" << size.y;
-	}
-	else
-	{
-		ss << "_D"; // not supported
-	}
-	
+	sf::Uint8* pixels = CreateRectangleWithStroke(size, color, m_stroke_size);
+
+	//automatic naming of the texture for a unique identification
+	ss << size.x << "x" << size.y;
 	std::string s = ss.str();
 
 	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 1, pixels);
+
+	//Add outter glow effect
+	if (GOAL_GLOW_RADIUS > 0)
+	{
+		m_glow_effect = new Glow(this, color, GOAL_GLOW_RADIUS, m_stroke_size, GOAL_GLOW_ANIMATION_DURATION, GOAL_GLOW_MIN_RADIUS);
+	}
+	else
+	{
+		m_glow_effect = NULL;
+	}
 }
 
 Goal::~Goal()
 {
 	
+}
+
+void Goal::CollisionResponse(Time deltaTime)
+{
+	//start a new animation
+	if (m_glow_effect->m_glow_status != GlowHitAnimation)
+	{
+		m_glow_effect->m_glow_status = GlowHitAnimation;
+		if (m_glow_effect->m_frameNumber > 1)
+			m_glow_effect->m_currentFrame = 1;
+	}
+
+	AnimatedSprite::update(deltaTime);
 }

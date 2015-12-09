@@ -399,7 +399,8 @@ void Game::colisionChecksV2(Time deltaTime)
 				//TRON SPECIFIC
 				if (score_again_blue_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
 				{
-					(*it2)->PlayHitFeedback();
+					//(*it2)->PlayHitFeedback();
+					(*it2)->CollisionResponse(deltaTime);
 					Goal(RedTeam);
 					(*it1)->visible = false;
 					break;
@@ -420,7 +421,8 @@ void Game::colisionChecksV2(Time deltaTime)
 				//TRON SPECIFIC
 				if (score_again_red_clock.getElapsedTime().asSeconds() > SCORE_AGAIN_COOLDOWN)
 				{
-					(*it2)->PlayHitFeedback();
+					//(*it2)->PlayHitFeedback();
+					(*it2)->CollisionResponse(deltaTime);
 					Goal(BlueTeam);
 					(*it1)->visible = false;
 					(*it1)->GarbageMe = true;

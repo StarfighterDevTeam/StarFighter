@@ -225,8 +225,9 @@ Bumper* InGameState::CreateBumper(BumperType type, sf::Vector2f position, sf::Ve
 GameObject* InGameState::CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size)
 {
 	Goal* goal = new Goal(team, position, size);
-
 	(*CurrentGame).addToScene(goal, GoalLayer, goal->m_collider_type);
+	if (goal->m_glow_effect)
+		(*CurrentGame).addToScene(goal->m_glow_effect, GoalLayer, goal->m_glow_effect->m_collider_type);
 
 	return goal;
 }

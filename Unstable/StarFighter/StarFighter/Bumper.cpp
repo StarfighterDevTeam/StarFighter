@@ -29,59 +29,30 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 
 	m_stroke_size = BUMPER_STROKE_SIZE;
 
-	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
-
 	ostringstream ss;
-	
+	ss << "bumper";
 	sf::Color color;
 
 	if (type == OnlyBlueTeamThrough)
 	{
-		ss << "blue";
+		ss << "_blue";
 		m_collider_type = BumperBlueObject;
-		for (int i = 0; i < W * H * 4; i += 4)
-		{
-			pixels[i] = 0;			// R
-			pixels[i + 1] = 0;		// G
-			pixels[i + 2] = 255;	// B
-			color = { pixels[i], pixels[i + 1], pixels[i + 2], 255 };
-		}
+		color = { 0, 0, 255, 255 };
 	}
 	else if (type == OnlyRedTeamThrough)
 	{
-		ss << "red";
+		ss << "_red";
 		m_collider_type = BumperRedObject;
-		for (int i = 0; i < W * H * 4; i += 4)
-		{
-			pixels[i] = 255;		// R
-			pixels[i + 1] = 0;		// G
-			pixels[i + 2] = 0;		// B
-			color = { pixels[i], pixels[i + 1], pixels[i + 2], 255 };
-		}
+		color = { 255, 0, 0, 255 };
 	}
 	else
 	{
-		ss << "green";
+		ss << "_green";
 		m_collider_type = BumperGreenObject;
-		for (int i = 0; i < W * H * 4; i += 4)
-		{
-			pixels[i] = 0;			// R
-			pixels[i + 1] = 255;	// G
-			pixels[i + 2] = 0;		// B
-			color = { pixels[i], pixels[i + 1], pixels[i + 2], 255 };
-		}
+		color = { 0, 255, 0, 255 };
 	}
-	for (int i = 0; i < W * H * 4; i += 4)
-	{
-		if (m_stroke_size < 1 || (i / 4) <= W * (m_stroke_size) || (i / 4) >(H - 1 * (m_stroke_size))*W || (i / 4) % W <= 0 + ((m_stroke_size)-1) || (i / 4) % W >= (W - 1 * (m_stroke_size))) // A
-		{
-			pixels[i + 3] = 255;
-		}
-		else
-		{
-			pixels[i + 3] = BUMPER_INSIDE_ALPHA;
-		}
-	}
+
+	sf::Uint8* pixels = CreateRectangleWithStroke(size, color, m_stroke_size);
 
 	//automatic naming of the texture for a unique identification
 	ss << size.x << "x" << size.y;
