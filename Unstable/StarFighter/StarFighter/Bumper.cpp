@@ -86,13 +86,16 @@ void Bumper::update(sf::Time deltaTime)
 
 void Bumper::CollisionResponse(Time deltaTime)
 {
-	//start a new animation
-	if (m_glow_effect->m_glow_status != GlowHitAnimation)
+	if (m_glow_effect)
 	{
-		m_glow_effect->m_glow_status = GlowHitAnimation;
-		if (m_glow_effect->m_frameNumber > 1)
-			m_glow_effect->m_currentFrame = 1;
+		//start a new animation
+		if (m_glow_effect->m_glow_status != GlowHitAnimation)
+		{
+			m_glow_effect->m_glow_status = GlowHitAnimation;
+			if (m_glow_effect->m_frameNumber > 1)
+				m_glow_effect->m_currentFrame = 1;
+		}
 	}
-
+	
 	AnimatedSprite::update(deltaTime);
 }
