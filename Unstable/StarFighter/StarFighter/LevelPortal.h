@@ -5,6 +5,12 @@
 #include "Game.h"
 #include "GameObject.h"
 
+enum PortalAnimations
+{
+	PortalActivated,
+	PortalDeactivated,
+};
+
 class LevelPortal : public GameObject
 {
 public :

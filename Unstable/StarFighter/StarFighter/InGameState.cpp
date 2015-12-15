@@ -200,7 +200,7 @@ ShipIA* InGameState::CreateIACharacter(sf::Vector2f position, PlayableCharacters
 
 Discoball* InGameState::CreateDiscoball(sf::Vector2f position)
 {
-	Discoball* discoball = new Discoball(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/discoball.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 4, 4);
+	Discoball* discoball = new Discoball(sf::Vector2f(position.x, position.y), sf::Vector2f(0, 0), "Assets/2D/discoball.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 12, 4);
 	(*CurrentGame).addToScene(discoball, DiscoballLayer, DiscoballObject);
 
 	return discoball;
@@ -234,7 +234,7 @@ GameObject* InGameState::CreateGoal(Teams team, sf::Vector2f position, sf::Vecto
 
 LevelPortal* InGameState::CreateLevelPortal(IngameScript script, sf::Vector2f position)
 {
-	LevelPortal* portal = new LevelPortal(script, position, sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 4, 1);
+	LevelPortal* portal = new LevelPortal(script, position, sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 6, 2);
 	(*CurrentGame).addToScene(portal, PortalLayer, LevelPortalObject);
 
 	return portal;

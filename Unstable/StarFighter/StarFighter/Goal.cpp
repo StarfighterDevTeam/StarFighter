@@ -30,7 +30,7 @@ Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 	m_stroke_size = GOAL_STROKE_SIZE;
 
 	ostringstream ss;
-	ss << "bumper";
+	ss << "goal";
 
 	sf::Color color;
 
@@ -49,11 +49,13 @@ Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 
 	sf::Uint8* pixels = CreateRectangleWithStroke(size, color, m_stroke_size);
 
+	sf::Uint8* pixels_highlight = CreateRectangleWithStroke(size, color, m_stroke_size);
+
 	//automatic naming of the texture for a unique identification
 	ss << size.x << "x" << size.y;
 	std::string s = ss.str();
 
-	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 1, pixels);
+	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 2, pixels);
 
 	//Add outter glow effect
 	if (GOAL_GLOW_RADIUS > 0)
