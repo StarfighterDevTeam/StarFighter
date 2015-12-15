@@ -29,9 +29,9 @@
 #define USE_ORTHOGONAL_THROW						false
 #define COEFF_FRICTION_INCREASE_RATIO				0.005f
 #define DISCOBALL_MIN_SPEED							20.f
-#define DEFENDER_SAFE_ZONE_X						300.f
-#define GOAL_SIZE									250.f
-#define GOAL_SAFE_ZONE_X							100.f
+#define DEFENDER_SAFE_ZONE_X						300
+#define GOAL_SIZE									250
+#define GOAL_SAFE_ZONE_X							100
 #define SCORE_AGAIN_COOLDOWN						2.f
 #define SCORE_DISPLAY_OFFSET						50
 #define DELAY_AFTER_GOAL							2.f

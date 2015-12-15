@@ -47,15 +47,45 @@ Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 		color = { 255, 0, 0, 255 };
 	}
 
-	sf::Uint8* pixels = CreateRectangleWithStroke(size, color, m_stroke_size);
+	sf::Uint8* pixels_normal = CreateRectangleWithStroke(size, color, m_stroke_size);
 
-	sf::Uint8* pixels_highlight = CreateRectangleWithStroke(size, color, m_stroke_size);
+	//creation of a highlighted version for hit feedback
+	sf::Color color_highlight = { 0, 255, 0, 255 };
+	sf::Uint8* pixels_highlight = CreateRectangleWithStroke(size, color_highlight, m_stroke_size);
 
 	//automatic naming of the texture for a unique identification
 	ss << size.x << "x" << size.y;
 	std::string s = ss.str();
+	this->m_textureName = s;
 
-	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 2, pixels);
+	//checking if texture laready exists. if not, create a fake one, to be filled few lines of code below
+	//we want to create two animations: normal, and highlighted
+	sf::Uint8* pixels_animation = new sf::Uint8[W * H * 4 * 2];
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	bool existing_texture = loader->getTexture(s);
+	sf::Texture* texture = loader->loadTexture(s, W, H*2, pixels_animation);
+
+	//updating the newly created texture, if it wasn't existing before
+	if (!existing_texture)
+	{
+		//creating a transparent default background
+		for (int p = 0; p < W * H * 4 * 2; p++)
+		{
+			pixels_animation[p] = 0;
+			pixels_animation[p + 1] = 0;
+			pixels_animation[p + 2] = 0;
+			pixels_animation[p + 3] = 0;
+		}
+		texture->update(pixels_animation, W, H*2, 0, 0);
+
+		//create one frame for each of the 2 animations
+		texture->update(pixels_normal, W, H, 0, 0);
+		texture->update(pixels_highlight, W, H, 0, H);
+	}
+
+	setOrigin(W / 2, H / 2);
+	Init(position, sf::Vector2f(0, 0), texture, 1, 2);
 
 	//Add outter glow effect
 	if (GOAL_GLOW_RADIUS > 0)
@@ -75,7 +105,7 @@ Goal::~Goal()
 
 void Goal::CollisionResponse(Time deltaTime)
 {
-	//start a new animation
+	//start a new glow animation
 	if (m_glow_effect)
 	{
 		if (m_glow_effect->m_glow_status != GlowHitAnimation)
@@ -85,6 +115,9 @@ void Goal::CollisionResponse(Time deltaTime)
 				m_glow_effect->m_currentFrame = 1;
 		}
 	}
+
+	//changing goal color
+	setAnimationLine(GoalHighlighted, true);
 
 	AnimatedSprite::update(deltaTime);
 }

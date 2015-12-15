@@ -57,6 +57,7 @@ Bumper::Bumper(BumperType type, sf::Vector2f position, sf::Vector2f size)
 	//automatic naming of the texture for a unique identification
 	ss << size.x << "x" << size.y;
 	std::string s = ss.str();
+	this->m_textureName = s;
 
 	Init(position, sf::Vector2f(0, 0), s, sf::Vector2f(W, H), 1, 1, pixels);
 

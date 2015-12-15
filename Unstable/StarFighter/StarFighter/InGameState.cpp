@@ -333,7 +333,7 @@ void InGameState::StartTest()
 
 	//CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
 	CreateDiscoball();
-	CreateGoal(BlueTeam, sf::Vector2f(8, 540), sf::Vector2f(16, 200));
+	CreateGoal(BlueTeam, sf::Vector2f(80, 540), sf::Vector2f(16, 250));
 
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(150, 250), sf::Vector2f(200, 400));
 

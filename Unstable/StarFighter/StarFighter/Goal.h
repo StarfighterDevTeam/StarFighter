@@ -5,6 +5,12 @@
 #include "Game.h"
 #include "GameObject.h"
 
+enum GoalAnimations
+{
+	GoalNormal,
+	GoalHighlighted,
+};
+
 class Goal : public GameObject
 {
 public :
