@@ -72,6 +72,9 @@ enum IngameScript
 	Tuto04,
 	Tuto05,
 	ScriptTest,
+	OptionsMenu,
+	SFXOnOff,
+	MusicOnOff,
 };
 
 enum CollisionSide

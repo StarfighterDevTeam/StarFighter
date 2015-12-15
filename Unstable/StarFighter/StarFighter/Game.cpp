@@ -10,8 +10,6 @@ void Game::init(RenderWindow* window)
 	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
 	screen_size = sf::Vector2f(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
 
-	LoadSFX();
-
 	view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 	//view.zoom(0.3f);
@@ -41,6 +39,44 @@ void Game::init(RenderWindow* window)
 	score_red_team = 0;
 	score_to_win = 1;
 
+	//TODO: save in local preferences
+	m_Music_Activated = false;
+	m_SFX_Activated = false;
+
+	//Sounds
+	LoadSFX();
+
+	//Music
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
+	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
+	if (m_curMusic.openFromFile("Assets/Music/Tron_End_Titles.ogg"))
+	{
+		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated);
+		m_curMusic.play();
+		m_curMusic.setLoop(true);
+	}
+}
+
+void Game::SetSFXVolume(bool activate_sfx)
+{
+	soundsBounce[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsBounce[1].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsBounce[2].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsBounce[3].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsBounce[4].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsGoal.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsTackle.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsThrow.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsCatch.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+}
+
+void Game::SetMusicVolume(bool activate_music)
+{
+	m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * activate_music);
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -82,6 +118,17 @@ int Game::LoadSFX()
 	soundsThrow.setBuffer(soundBuffers[7]);
 	soundsCatch.setBuffer(soundBuffers[8]);
 	//soundsSwitch.setBuffer(soundBuffers[9]);
+
+	soundsBounce[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsBounce[1].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsBounce[2].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsBounce[3].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsBounce[4].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsGoal.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsTackle.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsThrow.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsCatch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
 	return 0;
 

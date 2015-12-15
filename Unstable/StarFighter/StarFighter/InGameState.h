@@ -38,6 +38,7 @@ public:
 	void StartMultiGame(bool reset_scores = true);
 	void StartMultiGameBig(bool reset_scores = true);
 	void StartMultiGame2vs2(bool reset_scores = true);
+	void StartOptionsMenu();
 
 	void InitializeSoloCharacter();
 	void InitializeMapDesign();
@@ -61,7 +62,7 @@ public:
 	static Discoball* CreateDiscoball(sf::Vector2f position = sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
 	static Bumper* CreateBumper(BumperType type, sf::Vector2f position, bool vertical, float size);
 	static Bumper* CreateBumper(BumperType type, sf::Vector2f position, sf::Vector2f size);
-	static LevelPortal* CreateLevelPortal(IngameScript script, sf::Vector2f position);
+	static LevelPortal* CreateLevelPortal(IngameScript script, sf::Vector2f position, bool togglable = false, bool toggled = false);
 	static GameObject* CreateGoal(Teams team, sf::Vector2f position, sf::Vector2f size);
 
 	static void AutoFillGoalBumpers(ScreenBorder border, float goal_size, float goal_pos);

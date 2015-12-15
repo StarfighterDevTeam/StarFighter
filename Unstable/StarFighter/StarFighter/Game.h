@@ -77,6 +77,13 @@ public:
 	sf::Sound soundsThrow;
 	sf::Sound soundsCatch;
 	sf::Sound soundsSwitch;
+	bool m_SFX_Activated;
+	void SetSFXVolume(bool activate_sfx);
+
+	//Music
+	sf::Music m_curMusic;
+	bool m_Music_Activated;
+	void SetMusicVolume(bool activate_music);
 
 	//TRON SPECIFIC
 	float GetAngleOfCollision(const GameObject* ref_obj, const GameObject* aimed_obj);

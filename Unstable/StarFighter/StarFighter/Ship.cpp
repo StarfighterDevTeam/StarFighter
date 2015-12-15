@@ -737,12 +737,20 @@ void Ship::GetPortal(GameObject* portal)
 		if (getportal->m_destination)
 		{
 			setPosition(getportal->m_destination->getPosition());
-			//m_isUsingPortal = true; -> set in Game::CollisionCheckV2 method
 		}
 		else
 		{
 			m_script = getportal->m_script;
 			m_isLaunchingScript = true;
+		}
+
+		if (getportal->m_togglable)
+		{
+			getportal->m_toggled = !getportal->m_toggled;
+			if (getportal->m_toggled)
+				getportal->setAnimationLine(PortalOn);
+			else
+				getportal->setAnimationLine(PortalOff);
 		}
 	}
 }

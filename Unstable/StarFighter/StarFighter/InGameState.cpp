@@ -40,13 +40,31 @@ void InGameState::Initialize(Player player)
 
 	//launch script
 	//SetIngameScript(OfflineMulti);
-	//SetIngameScript(MainMenuScript);
-	SetIngameScript(ScriptTest);
+	SetIngameScript(MainMenuScript);
+	//SetIngameScript(ScriptTest);
 }
 
 void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 {
 	m_script = script;
+
+	switch (m_script)
+	{
+		case MusicOnOff:
+		{
+			(*CurrentGame).m_Music_Activated = !(*CurrentGame).m_Music_Activated;
+			(*CurrentGame).SetMusicVolume((*CurrentGame).m_Music_Activated);
+			return;
+		}
+
+		case SFXOnOff:
+		{
+			(*CurrentGame).m_SFX_Activated = !(*CurrentGame).m_SFX_Activated;
+			(*CurrentGame).SetSFXVolume((*CurrentGame).m_SFX_Activated);
+			return;
+		}
+	}
+
 	(*CurrentGame).m_map_clock.restart();
 
 	//clean previous scene
@@ -107,11 +125,19 @@ void InGameState::SetIngameScript(IngameScript script, bool reset_scores)
 			StartTest();
 			break;
 		}
+
 		case OfflineMulti2vs2:
 		{
 			StartMultiGame2vs2();
 			break;
 		}
+
+		case OptionsMenu:
+		{
+			StartOptionsMenu();
+			break;
+		}
+
 		default:
 		{
 			StartMainMenu();
@@ -232,9 +258,9 @@ GameObject* InGameState::CreateGoal(Teams team, sf::Vector2f position, sf::Vecto
 	return goal;
 }
 
-LevelPortal* InGameState::CreateLevelPortal(IngameScript script, sf::Vector2f position)
+LevelPortal* InGameState::CreateLevelPortal(IngameScript script, sf::Vector2f position, bool togglable, bool toggled)
 {
-	LevelPortal* portal = new LevelPortal(script, position, sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 6, 2);
+	LevelPortal* portal = new LevelPortal(script, position, sf::Vector2f(0, 0), "Assets/2D/portal.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48), 6, 2, togglable, toggled);
 	(*CurrentGame).addToScene(portal, PortalLayer, LevelPortalObject);
 
 	return portal;
@@ -265,7 +291,7 @@ void InGameState::StartMainMenu()
 	CreateDiscoball();
 
 	CreateLevelPortal(Tuto01, sf::Vector2f(360, 380));
-	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, REF_WINDOW_RESOLUTION_Y / 2));
+	CreateLevelPortal(OptionsMenu, sf::Vector2f(360, REF_WINDOW_RESOLUTION_Y / 2));
 	CreateLevelPortal(ScriptTest, sf::Vector2f(360, 700));
 	CreateLevelPortal(OfflineMulti, sf::Vector2f(1560, 380));
 	CreateLevelPortal(OfflineMultiBig, sf::Vector2f(1560, REF_WINDOW_RESOLUTION_Y / 2));
@@ -273,6 +299,34 @@ void InGameState::StartMainMenu()
 
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(494, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
 
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
+}
+
+void InGameState::StartOptionsMenu()
+{
+	//intégration placeholder
+	Ship* playerShip1 = CreateCharacter(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), Natalia, BlueTeam);
+	playerShip1->SetControllerType(AllControlDevices);
+
+	// #### HACK
+	(*CurrentGame).playerShip = playerShip1;
+	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+
+	GameObject* background = new GameObject(sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2), sf::Vector2f(0, 0), "Assets/2D/options_menu_background.png", sf::Vector2f(1920, 1080), sf::Vector2f(960, REF_WINDOW_RESOLUTION_Y / 2));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+
+	// ##### HACK
+	(*CurrentGame).map_size = background->m_size;
+
+	CreateLevelPortal(MainMenuScript, sf::Vector2f(360, 380));
+	CreateLevelPortal(MusicOnOff, sf::Vector2f(360, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).m_Music_Activated);
+	CreateLevelPortal(SFXOnOff, sf::Vector2f(360, 700), true, (*CurrentGame).m_SFX_Activated);
+	//CreateLevelPortal(MainMenuScript, sf::Vector2f(1560, 380));
+	//CreateLevelPortal(MainMenuScript, sf::Vector2f(1560, REF_WINDOW_RESOLUTION_Y / 2));
+	//CreateLevelPortal(MainMenuScript, sf::Vector2f(1560, 700));
+
+	CreateDiscoball();
+	CreateBumper(OnlyPlayersThrough, sf::Vector2f(494, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
 	CreateBumper(OnlyPlayersThrough, sf::Vector2f(1409, REF_WINDOW_RESOLUTION_Y / 2), true, (*CurrentGame).map_size.y);
 }
 
@@ -327,15 +381,15 @@ void InGameState::StartTest()
 	(*CurrentGame).playerShip = playerShip1;
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	//Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1200, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAEasy, false);
-	//Ship* playerShip2 = CreateIACharacter(sf::Vector2f(1800, REF_WINDOW_RESOLUTION_Y / 2), Savannah, RedTeam, IAHard, true);
-	//playerShip2->SetControllerType(JoystickControl2);
+	Ship* playerShip2 = CreateIACharacter(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 500, REF_WINDOW_RESOLUTION_Y / 2), Quorra, RedTeam, IAEasy, false);
+	playerShip2->SetControllerType(JoystickControl2);
 
 	//CreateBumper(OnlyBlueTeamThrough, sf::Vector2f(1000, 540), true, 500);
-	CreateDiscoball();
-	CreateGoal(BlueTeam, sf::Vector2f(80, 540), sf::Vector2f(16, 250));
+	//CreateDiscoball();
+	//CreateGoal(BlueTeam, sf::Vector2f(80, 540), sf::Vector2f(16, 250));
+	//CreateBumper(OnlyPlayersThrough, sf::Vector2f(350, 250), sf::Vector2f(200, 400));
 
-	CreateBumper(OnlyPlayersThrough, sf::Vector2f(150, 250), sf::Vector2f(200, 400));
+	InitializeMapDesign();
 
 	int a = GameObject::GetPixelDistanceFromEdge(11, 3, 4);
 	int b = 0;
@@ -895,6 +949,9 @@ void InGameState::Update(sf::Time deltaTime)
 	if ((*CurrentGame).playerShip->m_isLaunchingScript)
 	{
 		SetIngameScript((*CurrentGame).playerShip->m_script);
+		//reset script container
+		if ((*CurrentGame).playerShip)
+			(*CurrentGame).playerShip->m_isLaunchingScript = NULL;
 	}
 
 	if (InputGuy::isRestartingScript())
