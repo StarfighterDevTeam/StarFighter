@@ -439,7 +439,8 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			//if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//Do something 
 
@@ -461,7 +462,8 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			//if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
 				//Do something 
 

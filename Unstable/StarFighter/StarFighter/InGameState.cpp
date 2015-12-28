@@ -641,7 +641,7 @@ void InGameState::StartTuto03()
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 	(*CurrentGame).map_size = background->m_size;
 
-	const float xo = 100;
+	const float xo = 200;
 	const float yo = 3 * REF_WINDOW_RESOLUTION_Y / 4;
 
 	const float x1 = 800;
