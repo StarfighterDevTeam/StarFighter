@@ -65,6 +65,24 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 	const int W = parent->m_size.x + glow_thickness * 2;
 	const int H = parent->m_size.y + glow_thickness * 2;
 
+	//hardware limitation
+	if (W*frames_number > TEXTURE_SIZE_LIMITATION)
+	{
+		frames_number = (int)(ceil(TEXTURE_SIZE_LIMITATION / W));
+		if (frames_number % 2 != 0)
+			frames_number--;
+		unique_frames_number = frames_number / 2 + 1;
+		printf("<!>Trying to create a texture that exceeds 8187x8187. Frame number reduced to %d.\n",frames_number);
+	}
+	if (H > TEXTURE_SIZE_LIMITATION)
+	{
+		frames_number = (int)(ceil(TEXTURE_SIZE_LIMITATION / H));
+		if (frames_number % 2 != 0)
+			frames_number--;
+		unique_frames_number = frames_number / 2 + 1;
+		printf("<!>Trying to create a texture that exceeds 8187x8187. Frame number reduced to %d.\n", frames_number);
+	}
+
 	//checking if texture laready exists. if not, create a fake one, to be filled few lines of code below
 	sf::Uint8* pixels_animation = new sf::Uint8[W * H * 4 * frames_number];
 	TextureLoader *loader;
@@ -118,19 +136,11 @@ Glow::~Glow()
 
 void Glow::update(sf::Time deltaTime)
 {
-	AnimatedSprite::update(deltaTime);
-	if (m_glow_status == GlowDefaultAnimation)
+	if (m_glow_status == GlowHitAnimation)
 	{
-		//restart animation every frame (=fixed image)
-		m_currentFrame = 0;
-	}
-	else
-	{
-		//end of animation
-		if (m_currentFrame == m_frameNumber - 1)
-		{
+		AnimatedSprite::update(deltaTime);
+
+		if (m_currentFrame == 0)
 			m_glow_status = GlowDefaultAnimation;
-			m_currentFrame = 0;
-		}
 	}
 }
