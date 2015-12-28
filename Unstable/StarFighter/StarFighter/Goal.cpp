@@ -6,22 +6,25 @@ using namespace sf;
 
 Goal::Goal()
 {
-
+	m_hit = false;
 }
 
 Goal::Goal(Teams team, sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
 {
 	m_team = team;
+	m_hit = false;
 }
 
 Goal::Goal(Teams team, sf::Vector2f position, std::string textureName, sf::Vector2f size) : GameObject(position, sf::Vector2f(0, 0), textureName, size)
 {
 	m_team = team;
+	m_hit = false;
 }
 
 Goal::Goal(Teams team, sf::Vector2f position, sf::Vector2f size)
 {
 	m_team = team;
+	m_hit = false;
 
 	//pixel array creation
 	const int W = size.x;
@@ -119,5 +122,20 @@ void Goal::CollisionResponse(Time deltaTime)
 	//changing goal color
 	setAnimationLine(GoalHighlighted, true);
 
+	//flag
+	m_hit = true;
+	m_hit_clock.restart();
+
+	AnimatedSprite::update(deltaTime);
+}
+
+void Goal::update(Time deltaTime)
+{
+	if (m_hit && m_hit_clock.getElapsedTime().asSeconds() > DELAY_FOR_GOAL_FADE_OUT)
+	{
+		GarbageMe = true;
+		if (m_glow_effect)
+			m_glow_effect->GarbageMe = true;
+	}
 	AnimatedSprite::update(deltaTime);
 }

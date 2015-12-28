@@ -12,7 +12,7 @@ Stroboscopic::Stroboscopic(sf::Time decade_time, GameObject* parent) : GameObjec
 	//getting a one-framed animation (the current frame and animation)
 	Animation* anim = new Animation();
 	anim->setSpriteSheet(*this->defaultAnimation.getSpriteSheet());
-	setAnimationLine(parent->currentAnimationIndex);
+	setAnimationLine(parent->m_currentAnimationIndex);
 	anim->addFrame(currentAnimation->getFrame(parent->m_currentFrame));
 
 	this->currentAnimation = anim;

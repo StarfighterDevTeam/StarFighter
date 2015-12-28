@@ -60,7 +60,7 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 
 	this->currentAnimation = anim;
 	this->play(*currentAnimation);
-	this->currentAnimationIndex = animation;
+	this->m_currentAnimationIndex = animation;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)

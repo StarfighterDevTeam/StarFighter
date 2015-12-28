@@ -21,10 +21,13 @@ public :
 	virtual ~Goal();
 
 	void CollisionResponse(Time deltaTime) override;
+	void update(Time deltaTime) override;
 
 	Teams m_team;
 	int m_stroke_size;
 	Glow* m_glow_effect;
+	bool m_hit;
+	sf::Clock m_hit_clock;
 };
 
 #endif // GOAL_H_INCLUDED

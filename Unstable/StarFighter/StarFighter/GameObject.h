@@ -127,7 +127,7 @@ public:
 	float rotation_speed;
 	int m_animationNumber;
 	int m_frameNumber;
-	int currentAnimationIndex;
+	int m_currentAnimationIndex;
 
 	std::string m_textureName;
 
