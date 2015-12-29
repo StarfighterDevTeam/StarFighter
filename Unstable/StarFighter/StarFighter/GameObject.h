@@ -19,6 +19,7 @@ class Loot;
 
 enum LayerType {
 	BackgroundLayer,
+	FakeGridLayer,
 	PortalLayer,
 	PlayerStroboscopicLayer,
 	ExplosionLayer,

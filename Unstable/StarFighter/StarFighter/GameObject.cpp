@@ -174,7 +174,7 @@ sf::Vector2f GameObject::getGameObjectSpeed()
 
 GameObject* GameObject::Clone()
 {
-	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->m_textureName, this->m_size);
+	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x/2, this->m_size.y/2), this->m_frameNumber, this->m_animationNumber);
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
 
