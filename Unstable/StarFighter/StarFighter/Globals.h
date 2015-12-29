@@ -34,6 +34,7 @@
 //FLUX SPECIFIC
 #define TILE_SIZE									128
 
+//FLUXOR
 #define FLUXOR_WIDTH								64
 #define FLUXOR_HEIGHT								48
 #define FLUXOR_SPEED_MIN							100
@@ -41,7 +42,11 @@
 #define FLUXOR_TURN_MIN_DELAY						0.5f
 #define FLUXOR_TURN_MAX_DELAY						3.f
 #define FLUXOR_FLUX_VALUE							10
+#define FLUXOR_MAX_POPULATION						50
+#define FLUXOR_RESPAWN_MIN_TIME						5.f
+#define FLUXOR_RESPAWN_MAX_TIME						60.f
 
+//PLAYER
 #define SHIP_MAX_FLUX								100
 #define SHIP_FLUX_DISPLAY_OFFSET_Y					4
 

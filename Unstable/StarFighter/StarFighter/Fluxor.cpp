@@ -20,6 +20,7 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	std::string textureName;
 	if (FluxorType == FluxorType_Blue)
 		textureName = "Assets/2D/fluxor_blue.png";
+
 	const unsigned int W = FLUXOR_WIDTH;
 	const unsigned int H = FLUXOR_HEIGHT;
 
@@ -54,20 +55,31 @@ Fluxor::~Fluxor()
 
 void Fluxor::update(sf::Time deltaTime)
 {
-	//chaos turns
-	if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
+	if (visible)
 	{
-		ChaosTurns();
-	}
+		//chaos turns
+		if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
+		{
+			ChaosTurns();
+		}
 
-	if (ScreenBorderContraints())
+		if (ScreenBorderContraints())
+		{
+			m_turn_clock.restart();
+		}
+
+		UpdateRotation();
+
+		GameObject::update(deltaTime);
+	}
+	else//if dead
 	{
-		m_turn_clock.restart();
+		if (m_respawn_clock.getElapsedTime().asSeconds() > m_respawn_time)
+		{
+			Respawn();
+		}
 	}
-
-	UpdateRotation();
-		
-	GameObject::update(deltaTime);
+	
 }
 
 float Fluxor::RandomizeTurnDelay()
@@ -144,4 +156,24 @@ void Fluxor::UpdateRotation()
 	{
 		setRotation((GetAngleRadForSpeed(speed) * 180 / (float)M_PI) - 90);
 	}
+}
+
+void Fluxor::Death()
+{
+	visible = false;
+	m_respawn_time = RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_RESPAWN_MIN_TIME, FLUXOR_RESPAWN_MAX_TIME));
+	m_respawn_clock.restart();
+}
+
+void Fluxor::Respawn()
+{
+	const unsigned int W = FLUXOR_WIDTH;
+	const unsigned int H = FLUXOR_HEIGHT;
+
+	//position
+	float position_x = RandomizeFloatBetweenValues(sf::Vector2f(W / 2, (*CurrentGame).map_size.x - W / 2));
+	float position_y = RandomizeFloatBetweenValues(sf::Vector2f(H / 2, (*CurrentGame).map_size.y - H / 2));
+
+	visible = true;
+	m_turn_clock.restart();
 }

@@ -21,6 +21,7 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	ModuleType m_moduleType;
+	unsigned int m_flux;
 };
 
 #endif // MODULE_H_INCLUDED

@@ -43,7 +43,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(module, ModuleLayer, ModuleObject);
 
 	//Fluxors
-	for (int i = 0; i < 30; i++)
+	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
 		Fluxor::CreateFluxor(FluxorType_Blue);
 
 	//Flux display
@@ -66,7 +66,6 @@ void InGameState::Update(sf::Time deltaTime)
 	ss << (*CurrentGame).playerShip->m_flux << "/" << (*CurrentGame).playerShip->m_flux_max;
 	m_player_flux.setString(ss.str());
 	m_player_flux.setPosition(sf::Vector2f((*CurrentGame).playerShip->getPosition().x - m_player_flux.getGlobalBounds().width/2, (*CurrentGame).playerShip->getPosition().y + (*CurrentGame).playerShip->m_size.y / 2 + SHIP_FLUX_DISPLAY_OFFSET_Y));
-	
 
 	this->mainWindow->clear();
 }

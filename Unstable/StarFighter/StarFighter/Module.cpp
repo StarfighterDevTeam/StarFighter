@@ -6,12 +6,12 @@ using namespace sf;
 
 Module::Module()
 {
-	
+	m_flux = 0;
 }
 
 Module::Module(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0,0), textureName, size, origin, frameNumber, animationNumber)
 {
-
+	m_flux = 0;
 }
 
 Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)

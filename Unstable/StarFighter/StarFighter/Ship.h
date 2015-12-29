@@ -40,8 +40,8 @@ public :
 	sf::Clock stroboscopic_effect_clock;
 
 	//FLUX SPECIFIC
-	int m_flux;
-	int m_flux_max;
+	unsigned int m_flux;
+	unsigned int m_flux_max;
 	void GetFluxor(GameObject* object) override;
 
 private:

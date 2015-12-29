@@ -29,7 +29,13 @@ public :
 	float m_turn_delay;
 	sf::Clock m_turn_clock;
 	float m_absolute_speed;
-	int m_flux;
+	unsigned int m_flux;
+
+	void Respawn();
+	void Death();
+	sf::Clock m_respawn_clock;
+	float m_respawn_time;
+
 };
 
 #endif // FLUXOR_H_INCLUDED
