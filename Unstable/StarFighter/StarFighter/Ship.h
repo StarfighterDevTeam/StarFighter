@@ -6,6 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "Fluxor.h"
+#include "Module.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -43,6 +44,8 @@ public :
 	unsigned int m_flux;
 	unsigned int m_flux_max;
 	void GetFluxor(GameObject* object) override;
+	void GetModule(GameObject* object) override;
+	sf::Vector2u m_curGridIndex;
 
 	//HUD
 	sf::Text m_flux_text;

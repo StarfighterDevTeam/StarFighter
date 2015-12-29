@@ -24,6 +24,7 @@ public :
 	ModuleType m_moduleType;
 	unsigned int m_flux;
 	unsigned int m_flux_max;
+	sf::Vector2u m_curGridIndex;
 
 	//HUD
 	sf::Text m_flux_text;

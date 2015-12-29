@@ -213,13 +213,13 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerShip].begin(); it1 != sceneGameObjectsTyped[PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Player eating Fluxor
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::FluxorObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::FluxorObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[FluxorObject].begin(); it2 != sceneGameObjectsTyped[FluxorObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -228,6 +228,19 @@ void Game::colisionChecksV2()
 			{
 				//Do something 
 				(*it1)->GetFluxor(*it2);
+			}
+		}
+
+		//Player interacting with Module
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[ModuleObject].begin(); it2 != sceneGameObjectsTyped[ModuleObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it1)->GetModule(*it2);
 			}
 		}
 	}

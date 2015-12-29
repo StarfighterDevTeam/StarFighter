@@ -15,6 +15,9 @@ void Module::Init()
 	m_flux_text.setColor(sf::Color::White);
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUX_DISPLAY_OFFSET_Y));
 	(*CurrentGame).addToFeedbacks(&m_flux_text);
+
+	//update grid index
+	m_curGridIndex = GetGridIndex();
 }
 
 Module::Module()
