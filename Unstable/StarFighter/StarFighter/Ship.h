@@ -44,6 +44,9 @@ public :
 	unsigned int m_flux_max;
 	void GetFluxor(GameObject* object) override;
 
+	//HUD
+	sf::Text m_flux_text;
+
 private:
 	bool moving;
 	bool movingX;

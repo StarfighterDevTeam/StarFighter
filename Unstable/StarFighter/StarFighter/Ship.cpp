@@ -20,6 +20,15 @@ void Ship::Init()
 	m_controllerType = AllControlDevices;
 	m_flux = 0;
 	m_flux_max = SHIP_MAX_FLUX;
+
+	//Flux display
+	m_flux_text.setFont(*(*CurrentGame).font2);
+	m_flux_text.setCharacterSize(20);
+	m_flux_text.setColor(sf::Color::White);
+	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUX_DISPLAY_OFFSET_Y));
+	(*CurrentGame).addToFeedbacks(&m_flux_text);
+
+	
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -61,6 +70,12 @@ void Ship::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 
 	ScreenBorderContraints();	
+
+	//hud
+	ostringstream ss;
+	ss << m_flux << "/" << m_flux_max;
+	m_flux_text.setString(ss.str());
+	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUX_DISPLAY_OFFSET_Y));
 }
 
 void Ship::ScreenBorderContraints()

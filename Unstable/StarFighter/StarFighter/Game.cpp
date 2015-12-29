@@ -218,7 +218,7 @@ void Game::colisionChecksV2()
 		if (*it1 == NULL)
 			continue;
 
-		//Enemy bullets hitting the player
+		//Player eating Fluxor
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::FluxorObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::FluxorObject].end(); it2++)
 		{
 			if (*it2 == NULL)
