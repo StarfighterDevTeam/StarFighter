@@ -42,8 +42,16 @@ void InGameState::Initialize(Player player)
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_A);
 	(*CurrentGame).addToScene(module, ModuleLayer, ModuleObject);
 
+	//Fluxors
 	for (int i = 0; i < 30; i++)
 		Fluxor::CreateFluxor(FluxorType_Blue);
+
+	//Flux display
+	m_player_flux.setFont(*(*CurrentGame).font2);
+	m_player_flux.setCharacterSize(20);
+	m_player_flux.setColor(sf::Color::White);
+	m_player_flux.setPosition(sf::Vector2f((*CurrentGame).playerShip->getPosition().x, (*CurrentGame).playerShip->getPosition().y + (*CurrentGame).playerShip->m_size.y / 2 + SHIP_FLUX_DISPLAY_OFFSET_Y));
+	(*CurrentGame).addToFeedbacks(&m_player_flux);
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -52,6 +60,13 @@ void InGameState::Update(sf::Time deltaTime)
 
 	//move camera
 	UpdateCamera(deltaTime);
+
+	//hud
+	ostringstream ss;
+	ss << (*CurrentGame).playerShip->m_flux << "/" << (*CurrentGame).playerShip->m_flux_max;
+	m_player_flux.setString(ss.str());
+	m_player_flux.setPosition(sf::Vector2f((*CurrentGame).playerShip->getPosition().x - m_player_flux.getGlobalBounds().width/2, (*CurrentGame).playerShip->getPosition().y + (*CurrentGame).playerShip->m_size.y / 2 + SHIP_FLUX_DISPLAY_OFFSET_Y));
+	
 
 	this->mainWindow->clear();
 }

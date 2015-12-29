@@ -227,7 +227,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				
+				(*it1)->GetFluxor(*it2);
 			}
 		}
 	}

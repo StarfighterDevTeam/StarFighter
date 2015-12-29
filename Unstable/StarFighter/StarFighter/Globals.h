@@ -42,6 +42,9 @@
 #define FLUXOR_TURN_MAX_DELAY						3.f
 #define FLUXOR_FLUX_VALUE							10
 
+#define SHIP_MAX_FLUX								100
+#define SHIP_FLUX_DISPLAY_OFFSET_Y					4
+
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);

@@ -29,7 +29,7 @@ public :
 	float m_turn_delay;
 	sf::Clock m_turn_clock;
 	float m_absolute_speed;
-	float m_flux;
+	int m_flux;
 };
 
 #endif // FLUXOR_H_INCLUDED

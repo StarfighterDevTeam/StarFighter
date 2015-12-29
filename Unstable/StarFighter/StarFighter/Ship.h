@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "InputGuy.h"
 #include "Game.h"
+#include "Fluxor.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -37,6 +38,11 @@ public :
 
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;
+
+	//FLUX SPECIFIC
+	int m_flux;
+	int m_flux_max;
+	void GetFluxor(GameObject* object) override;
 
 private:
 	bool moving;

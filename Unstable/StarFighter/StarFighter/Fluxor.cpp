@@ -78,8 +78,9 @@ float Fluxor::RandomizeTurnDelay()
 void Fluxor::ChaosTurns()
 {
 	m_turn_delay = RandomizeTurnDelay();
+	m_turn_clock.restart();
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	sf::Vector2f speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_absolute_speed, angle);
+	speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_absolute_speed, angle);
 }
 
 bool Fluxor::ScreenBorderContraints()

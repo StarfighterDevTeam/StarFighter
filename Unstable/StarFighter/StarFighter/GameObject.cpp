@@ -437,3 +437,9 @@ int GameObject::GaussianBlurDistribution(int x)
 {
 	return x*x;
 }
+
+//FLUX SPECIFIC
+void GameObject::GetFluxor(GameObject* object)
+{
+	//see override function in class Ship
+}

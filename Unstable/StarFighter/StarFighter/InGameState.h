@@ -23,6 +23,9 @@ public:
 	void Release();
 	void UpdateCamera(sf::Time deltaTime);
 
+	//FLUX SPECIFIC
+	sf::Text m_player_flux;
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

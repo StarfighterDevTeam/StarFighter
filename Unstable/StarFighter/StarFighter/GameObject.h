@@ -119,6 +119,9 @@ public:
 	static void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);
 	static int GaussianBlurDistribution(int x);
 
+	//FLUX SPECIFIC
+	virtual void GetFluxor(GameObject* object);
+
 protected:
 	sf::Vector2f initial_position;
 	Animation defaultAnimation;

@@ -18,6 +18,8 @@ void Ship::Init()
 	movingX = movingY = false;
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
+	m_flux = 0;
+	m_flux_max = SHIP_MAX_FLUX;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -169,5 +171,25 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
 
 		stroboscopic_effect_clock.restart();
+	}
+}
+
+//FLUX SPECIFIC
+void Ship::GetFluxor(GameObject* object)
+{
+	if (object)
+	{
+		if (m_flux < m_flux_max)
+		{
+			Fluxor* fluxor = (Fluxor*)object;
+
+			m_flux += fluxor->m_flux;
+			if (m_flux > m_flux_max)
+			{
+				m_flux = m_flux_max;
+			}
+
+			fluxor->GarbageMe = true;
+		}
 	}
 }
