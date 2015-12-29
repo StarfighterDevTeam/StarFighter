@@ -25,7 +25,7 @@ int main()
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	//Title
-	renderWindow.setTitle("StarFighter Beta");
+	renderWindow.setTitle("StarFighter Engine");
 
 
 	//Music
@@ -123,6 +123,14 @@ int main()
 					break;
 				}
 			}
+
+			//setting parameters again, because they are lost on calling renderWindow.create
+			renderWindow.setKeyRepeatEnabled(false);
+			renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+			sf::Image icon = sf::Image();
+			icon.loadFromFile(ICON_SHIP_PNG);
+			renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+			renderWindow.setTitle("StarFighter Engine");
 		}
 
 		dt = deltaClock.restart();

@@ -2,7 +2,7 @@
 #define GAME_H_INCLUDED
 
 #include "Globals.h"
-#include "Independant.h"
+#include "GameObject.h"
 #include <list>
 #include <vector>
 #include "TextUtils.h"
@@ -11,6 +11,9 @@
 #include <math.h>
 
 #include "InputGuy.h"
+
+#include "Glow.h"
+#include "Stroboscopic.h"
 
 class Ship;
 
@@ -21,7 +24,7 @@ struct Game
 public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	void addToScene(Independant *object, LayerType m_layer, IndependantType type);
+	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(Text* text);
 	void removeFromFeedbacks(RectangleShape* feedback);
@@ -42,15 +45,15 @@ public:
 	void SetPlayerShip(Ship* m_playerShip);
 
 private:
-	void AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector);
-	bool isVectorEmpty(vector <Independant*>* vector);
+	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
+	bool isVectorEmpty(vector <GameObject*>* vector);
 	RenderWindow *window;
 	std::list<RectangleShape*> sceneFeedbackBars;
 	std::list<Text*> sceneFeedbackTexts;
-	std::vector<Independant*> sceneIndependants;
-	std::vector<Independant*> sceneIndependantsLayered[NBVAL_Layer];
-	std::vector<Independant*> sceneIndependantsTyped[NBVAL_Independant];
-	std::vector<Independant*> garbage;
+	std::vector<GameObject*> sceneGameObjects;
+	std::vector<GameObject*> sceneGameObjectsLayered[NBVAL_Layer];
+	std::vector<GameObject*> sceneGameObjectsTyped[NBVAL_GameObject];
+	std::vector<GameObject*> garbage;
 };
 
 #endif // GAME_H_INCLUDED

@@ -8,12 +8,12 @@
 #include "Game.h"
 #include "Ship.h"
 
-class Independant;
+class GameObject;
 
 class InGameState : public GameState
 {
 public:
-	Independant* playerShip;
+	GameObject* playerShip;
 
 	void Initialize(Player player);
 	void Update(sf::Time deltaTime);

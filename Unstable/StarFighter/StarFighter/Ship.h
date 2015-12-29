@@ -2,7 +2,7 @@
 #define SHIP_H_INCLUDED
 
 #include "Globals.h"
-#include "Independant.h"
+#include "GameObject.h"
 #include "InputGuy.h"
 #include "Game.h"
 
@@ -14,7 +14,7 @@
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
-class Ship : public Independant
+class Ship : public GameObject
 {
 public :
 	Ship();
@@ -28,9 +28,16 @@ public :
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
+	void MaxSpeedConstraints();
+	void UpdateRotation();
 
-	bool disable_inputs;
-	
+	bool m_disable_inputs;
+	ControlerType m_controllerType;
+	void SetControllerType(ControlerType contoller);
+
+	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
+	sf::Clock stroboscopic_effect_clock;
+
 private:
 	bool moving;
 	bool movingX;

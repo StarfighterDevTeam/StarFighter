@@ -9,7 +9,7 @@
 #include "PrefsManager.h"
 #include "TextureLoader.h"
 #include "Assets.h"
-#include "Independant.h"
+#include "GameObject.h"
 #include "Game.h"
 #include "Logger.h"
 #include "InGameState.h"
