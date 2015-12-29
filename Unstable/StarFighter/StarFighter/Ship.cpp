@@ -61,31 +61,39 @@ void Ship::update(sf::Time deltaTime)
 	ScreenBorderContraints();	
 }
 
-void Ship::ScreenBorderContraints()
+bool Ship::ScreenBorderContraints()
 {
+	bool touched_screen_border = false;
+
 	if (this->getPosition().x < this->m_size.x / 2)
 	{
 		this->setPosition(m_size.x / 2, this->getPosition().y);
 		speed.x = 0;
+		touched_screen_border = true;
 	}
 
-	if (this->getPosition().x > SCENE_SIZE_X - (m_size.x / 2))
+	if (this->getPosition().x > (*CurrentGame).map_size.x - (m_size.x / 2))
 	{
-		this->setPosition(SCENE_SIZE_X - (m_size.x / 2), this->getPosition().y);
+		this->setPosition((*CurrentGame).map_size.x - (m_size.x / 2), this->getPosition().y);
 		speed.x = 0;
+		touched_screen_border = true;
 	}
 
 	if (this->getPosition().y < m_size.y / 2)
 	{
 		this->setPosition(this->getPosition().x, m_size.y / 2);
 		speed.y = 0;
+		touched_screen_border = true;
 	}
 
-	if (this->getPosition().y > SCENE_SIZE_Y - (m_size.y / 2))
+	if (this->getPosition().y > (*CurrentGame).map_size.y - (m_size.y / 2))
 	{
-		this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (m_size.y / 2));
+		this->setPosition(this->getPosition().x, (*CurrentGame).map_size.y - (m_size.y / 2));
 		speed.y = 0;
+		touched_screen_border = true;
 	}
+
+	return touched_screen_border;
 }
 
 void Ship::IdleDecelleration(sf::Time deltaTime)
