@@ -76,7 +76,6 @@ int Game::LoadSFX()
 	soundsLaser[0].setBuffer(soundBuffers[0]);
 
 	soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
-	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
 	return 0;
 }

@@ -27,7 +27,6 @@ int main()
 	//Title
 	renderWindow.setTitle("StarFighter Engine");
 
-
 	//Game initialization
 	CurrentGame = new Game();
 

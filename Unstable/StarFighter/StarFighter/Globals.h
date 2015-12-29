@@ -34,6 +34,9 @@
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
 
+//FLUX SPECIFIC
+#define TILE_SIZE									64
+
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);

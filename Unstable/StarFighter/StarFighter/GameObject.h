@@ -20,6 +20,7 @@ class Loot;
 enum LayerType {
 	BackgroundLayer,
 	FakeGridLayer,
+	ModuleLayer,
 	PortalLayer,
 	PlayerStroboscopicLayer,
 	ExplosionLayer,
@@ -45,7 +46,7 @@ enum GlowAnimations
 enum GameObjectType {
 	BackgroundObject,
 	PortalObject,
-	ShopObject,
+	ModuleObject,
 	LootObject,
 	PlayerShip,
 	FakePlayerShip,

@@ -97,6 +97,7 @@
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="InGameState.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="InGameState.h" />
+    <ClInclude Include="Module.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />

@@ -7,6 +7,7 @@
 #include <sstream>
 #include "Game.h"
 #include "Ship.h"
+#include "Module.h"
 
 class GameObject;
 
