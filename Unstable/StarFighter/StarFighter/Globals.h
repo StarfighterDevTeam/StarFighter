@@ -31,6 +31,9 @@
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
+#define DEFAULT_MUSIC_VOLUME						50
+#define DEFAULT_SFX_VOLUME							100
+
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);

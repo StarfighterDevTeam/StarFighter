@@ -6,6 +6,7 @@
 #include <list>
 #include <vector>
 #include "TextUtils.h"
+#include <SFML/Audio.hpp>
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -16,6 +17,11 @@
 #include "Stroboscopic.h"
 
 class Ship;
+
+enum SFX_Bank
+{
+	SFX_Laser,
+};
 
 using namespace sf;
 
@@ -43,6 +49,26 @@ public:
 
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
+
+	sf::View view;
+	sf::Vector2f map_size;
+
+	//Fonts
+	sf::Font* font;
+	sf::Font* font2;
+
+	//SFX
+	int LoadSFX();
+	void PlaySFX(SFX_Bank sfx_name);
+	sf::SoundBuffer soundBuffers[1];
+	sf::Sound soundsLaser[1];
+	bool m_SFX_Activated;
+	void SetSFXVolume(bool activate_sfx);
+
+	//Music
+	sf::Music m_curMusic;
+	bool m_Music_Activated;
+	void SetMusicVolume(bool activate_music);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

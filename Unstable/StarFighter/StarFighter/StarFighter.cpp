@@ -28,18 +28,10 @@ int main()
 	renderWindow.setTitle("StarFighter Engine");
 
 
-	//Music
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	sf::Music SpaceCowboys;
-	if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
-		//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
-		//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
-		//if (!SpaceCowboys.openFromFile("Assets/Music/OrientalCrystal.ogg"))
-		return -1; // erreur
-	SpaceCowboys.play();
-	SpaceCowboys.setLoop(true);
-
+	//Game initialization
 	CurrentGame = new Game();
+
+	//Random seed
 	srand(time(NULL));
 
 	//update
@@ -50,7 +42,6 @@ int main()
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing player");
 	Player player;
 	player.Init(&renderWindow);
-	player.m_currentSceneFile = "Vanguard_Hub0";
 
 	//Loading InGame state
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Starting game");
@@ -97,28 +88,28 @@ int main()
 				case RESOLUTION_1600x900:
 				{
 					fullscreen = false;
-					renderWindow.create(VideoMode(1600, 900), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+					renderWindow.create(VideoMode(1600, 900), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
 					(*CurrentGame).screen_size = sf::Vector2i(1600, 900);
 					break;
 				}
 				case RESOLUTION_1920x1080_FullScreen:
 				{
 					fullscreen = true;
-					renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+					renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
 					(*CurrentGame).screen_size = sf::Vector2i(1920, 1080);
 					break;
 				}
 				case RESOLUTION_1280x720:
 				{
 					fullscreen = false;
-					renderWindow.create(VideoMode(1280, 720), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+					renderWindow.create(VideoMode(1280, 720), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
 					(*CurrentGame).screen_size = sf::Vector2i(1280, 720);
 					break;
 				}
 				case RESOLUTION_1920x1080:
 				{
 					fullscreen = false;
-					renderWindow.create(VideoMode(1920, 1080), "Starfighter", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
+					renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
 					(*CurrentGame).screen_size = sf::Vector2i(1920, 1080);
 					break;
 				}

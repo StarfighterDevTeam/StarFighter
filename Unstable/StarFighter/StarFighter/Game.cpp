@@ -19,6 +19,74 @@ void Game::init(RenderWindow* window)
 	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
 	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
 	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+
+	view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	//view.zoom(0.3f);
+
+	//default value
+	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+
+	//fonts
+	font = new sf::Font();
+	if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+	{
+		// error
+		//TODO: font loader
+	}
+
+	font2 = new sf::Font();
+	if (!font2->loadFromFile("Assets/Fonts/arial.ttf"))
+	{
+		// error
+		//TODO: font loader
+	}
+
+	//TODO: save in local preferences
+	m_Music_Activated = false;
+	m_SFX_Activated = false;
+
+	//Sounds
+	LoadSFX();
+
+	//Music
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
+	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
+	if (m_curMusic.openFromFile("Assets/Music/Tron_End_Titles.ogg"))
+	{
+		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated);
+		m_curMusic.play();
+		m_curMusic.setLoop(true);
+	}
+}
+
+void Game::SetSFXVolume(bool activate_sfx)
+{
+	soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+}
+
+int Game::LoadSFX()
+{
+	if (!soundBuffers[0].loadFromFile("Assets/Sounds/laser.ogg"))
+		return -1;
+
+	soundsLaser[0].setBuffer(soundBuffers[0]);
+
+	soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	return 0;
+}
+
+void Game::PlaySFX(SFX_Bank sfx_name)
+{
+	if (sfx_name == SFX_Laser)
+	{
+		soundsLaser[0].play();
+	}
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -97,6 +165,8 @@ void Game::updateScene(Time deltaTime)
 
 	//Collect the dust
 	collectGarbage();
+
+	mainScreen.setView(view);
 }
 
 void Game::drawScene()

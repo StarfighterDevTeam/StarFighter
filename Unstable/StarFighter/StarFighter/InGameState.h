@@ -19,6 +19,7 @@ public:
 	void Update(sf::Time deltaTime);
 	void Draw();
 	void Release();
+	void UpdateCamera(sf::Time deltaTime);
 
 private:
 	sf::RenderWindow* mainWindow;
