@@ -8,7 +8,6 @@
 #include "GameState.h"
 #include "Player.h"
 
-
 class GameManager
 {
 public:

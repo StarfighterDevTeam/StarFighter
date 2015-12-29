@@ -30,6 +30,7 @@ public :
 	sf::Vector2u m_curGridIndex;
 	bool m_activated;
 	Glow* m_glow;
+	Module* m_parent;
 
 	//HUD
 	sf::Text m_flux_text;

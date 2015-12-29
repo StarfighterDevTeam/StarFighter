@@ -8,6 +8,7 @@ using namespace sf;
 void Module::Init()
 {
 	m_flux = 0;
+	m_parent = NULL;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -94,7 +95,14 @@ void Module::update(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
 
-	m_activated = m_flux == m_flux_max;
+	if (m_parent)
+	{
+		m_activated = m_flux == m_flux_max && m_parent->m_activated;
+	}
+	else
+	{
+		m_activated = m_flux == m_flux_max;
+	}
 	m_glow->visible = m_activated;
 	
 	//hud
