@@ -76,6 +76,11 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 		new_module->m_flux_max = MODULE_C_FLUX_MAX;
 	}
 
+	new_module->m_glow = new Glow(new_module, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
+
+	(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
+	(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
+
 	return new_module;
 }
 
@@ -90,6 +95,7 @@ void Module::update(sf::Time deltaTime)
 	AnimatedSprite::update(deltaTime);
 
 	m_activated = m_flux == m_flux_max;
+	m_glow->visible = m_activated;
 	
 	//hud
 	ostringstream ss;

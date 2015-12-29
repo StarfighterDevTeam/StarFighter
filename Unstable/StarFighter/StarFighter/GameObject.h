@@ -20,6 +20,7 @@ class Loot;
 enum LayerType {
 	BackgroundLayer,
 	FakeGridLayer,
+	GlowLayer,
 	ModuleLayer,
 	FluxorLayer,
 	PortalLayer,
@@ -36,12 +37,6 @@ enum LayerType {
 	HudObject,
 	HudCursor,
 	NBVAL_Layer
-};
-
-enum GlowAnimations
-{
-	GlowDefaultAnimation,
-	GlowHitAnimation
 };
 
 enum GameObjectType {

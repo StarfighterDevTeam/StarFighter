@@ -29,6 +29,7 @@ public :
 	unsigned int m_flux_max;
 	sf::Vector2u m_curGridIndex;
 	bool m_activated;
+	Glow* m_glow;
 
 	//HUD
 	sf::Text m_flux_text;

@@ -20,7 +20,6 @@ public :
 	Uint8 m_glow_radius;
 	sf::Clock m_glow_variation_clock;
 	float m_glow_animation_duration;
-	GlowAnimations m_glow_status;
 };
 
 #endif // GLOW_H_INCLUDED
