@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Ship.h"
 #include "Module.h"
+#include "Fluxor.h"
 
 class GameObject;
 

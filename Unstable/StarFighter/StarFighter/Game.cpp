@@ -219,7 +219,7 @@ void Game::colisionChecksV2()
 			continue;
 
 		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::FluxorObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::FluxorObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -339,7 +339,7 @@ void Game::collectGarbage()
 		if (!(**it).isOnScene)
 		{
 			//objects that are spawning out of screen are not deleted
-			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= SCENE_SIZE_Y))
+			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= map_size.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= map_size.y))
 			{
 				(**it).isOnScene = true;
 			}
@@ -348,8 +348,8 @@ void Game::collectGarbage()
 		//Content that went on scene and then exited have to be deleted
 		if (!(**it).DontGarbageMe && (**it).isOnScene)
 		{
-			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > SCENE_SIZE_X
-				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > SCENE_SIZE_Y)
+			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > map_size.x
+				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > map_size.y)
 			{
 				this->garbage.push_back(*it);
 				continue;

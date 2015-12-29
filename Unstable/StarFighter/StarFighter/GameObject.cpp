@@ -277,10 +277,19 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 	return angle;
 }
 
-void GameObject::SetSpeedVectorFromAbsoluteSpeed(float absolute_speed, float curAngle)
+void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
 	speed.x = -absolute_speed * sin(curAngle);
 	speed.y = absolute_speed * cos(curAngle);
+}
+
+sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
+{
+	sf::Vector2f speed;
+	speed.x = -absolute_speed * sin(curAngle);
+	speed.y = absolute_speed * cos(curAngle);
+
+	return speed;
 }
 
 float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)

@@ -16,9 +16,6 @@
 #define	WINDOW_RESOLUTION_X						1600
 #define WINDOW_RESOLUTION_Y						900
 
-#define	SCENE_SIZE_X							1920
-#define SCENE_SIZE_Y							1080
-
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
@@ -35,7 +32,15 @@
 #define DEFAULT_SFX_VOLUME							100
 
 //FLUX SPECIFIC
-#define TILE_SIZE									64
+#define TILE_SIZE									128
+
+#define FLUXOR_WIDTH								64
+#define FLUXOR_HEIGHT								48
+#define FLUXOR_SPEED_MIN							100
+#define FLUXOR_SPEED_MAX							500
+#define FLUXOR_TURN_MIN_DELAY						0.5f
+#define FLUXOR_TURN_MAX_DELAY						3.f
+#define FLUXOR_FLUX_VALUE							10
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

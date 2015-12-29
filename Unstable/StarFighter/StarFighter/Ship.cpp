@@ -69,9 +69,9 @@ void Ship::ScreenBorderContraints()
 		speed.x = 0;
 	}
 
-	if (this->getPosition().x > SCENE_SIZE_X - (m_size.x / 2))
+	if (this->getPosition().x > (*CurrentGame).map_size.x - (m_size.x / 2))
 	{
-		this->setPosition(SCENE_SIZE_X - (m_size.x / 2), this->getPosition().y);
+		this->setPosition((*CurrentGame).map_size.x - (m_size.x / 2), this->getPosition().y);
 		speed.x = 0;
 	}
 
@@ -81,9 +81,9 @@ void Ship::ScreenBorderContraints()
 		speed.y = 0;
 	}
 
-	if (this->getPosition().y > SCENE_SIZE_Y - (m_size.y / 2))
+	if (this->getPosition().y > (*CurrentGame).map_size.y - (m_size.y / 2))
 	{
-		this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (m_size.y / 2));
+		this->setPosition(this->getPosition().x, (*CurrentGame).map_size.y - (m_size.y / 2));
 		speed.y = 0;
 	}
 }

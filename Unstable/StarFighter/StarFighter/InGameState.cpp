@@ -41,6 +41,9 @@ void InGameState::Initialize(Player player)
 	//Module* module_grid[grid_width][grid_height];
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_A);
 	(*CurrentGame).addToScene(module, ModuleLayer, ModuleObject);
+
+	for (int i = 0; i < 30; i++)
+		Fluxor::CreateFluxor(FluxorType_Blue);
 }
 
 void InGameState::Update(sf::Time deltaTime)
