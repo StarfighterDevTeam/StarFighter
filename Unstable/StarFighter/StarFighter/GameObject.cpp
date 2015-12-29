@@ -448,11 +448,3 @@ void GameObject::GetModule(GameObject* object)
 {
 	//see override function in class Ship
 }
-
-sf::Vector2u GameObject::GetGridIndex()
-{
-	unsigned int grid_line = (unsigned int)(ceil(1.f * getPosition().x / TILE_SIZE));
-	unsigned int grid_row = (unsigned int)(ceil(1.f * getPosition().y / TILE_SIZE));
-
-	return sf::Vector2u(grid_line, grid_row);
-}

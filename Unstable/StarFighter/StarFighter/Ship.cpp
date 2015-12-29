@@ -76,7 +76,7 @@ void Ship::update(sf::Time deltaTime)
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUX_DISPLAY_OFFSET_Y));
 
 	//update grid index
-	m_curGridIndex = GetGridIndex();
+	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 }
 
 void Ship::ScreenBorderContraints()

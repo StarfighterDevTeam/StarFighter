@@ -122,7 +122,6 @@ public:
 	//FLUX SPECIFIC
 	virtual void GetFluxor(GameObject* object);
 	virtual void GetModule(GameObject* object);
-	sf::Vector2u GetGridIndex();
 
 protected:
 	sf::Vector2f initial_position;

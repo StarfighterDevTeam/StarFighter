@@ -70,6 +70,10 @@ public:
 	bool m_Music_Activated;
 	void SetMusicVolume(bool activate_music);
 
+	//FLUX SPECIFIC
+	bool isCellFree(sf::Vector2f position);
+	static sf::Vector2u GetGridIndex(sf::Vector2f position);
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);

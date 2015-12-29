@@ -372,3 +372,49 @@ void Game::collectGarbage()
 
 	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
 }
+
+bool Game::isCellFree(sf::Vector2f position)
+{
+	sf::Vector2u grid_index = GetGridIndex(position);
+
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[FluxorObject].begin(); it != sceneGameObjectsTyped[FluxorObject].end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		if ((*it)->visible)
+		{
+			sf::Vector2u fluxor_grid_index = GetGridIndex((*it)->getPosition());
+			if (fluxor_grid_index == grid_index)
+			{
+				return false;
+			}
+		}
+	}
+
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[ModuleObject].begin(); it != sceneGameObjectsTyped[ModuleObject].end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		if ((*it)->visible)
+		{
+			sf::Vector2u module_grid_index = GetGridIndex((*it)->getPosition());
+			if (module_grid_index == grid_index)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+sf::Vector2u Game::GetGridIndex(sf::Vector2f position)
+{
+	unsigned int grid_line = (unsigned int)(ceil(1.f * position.x / TILE_SIZE));
+	unsigned int grid_row = (unsigned int)(ceil(1.f * position.y / TILE_SIZE));
+
+	return sf::Vector2u(grid_line, grid_row);
+}

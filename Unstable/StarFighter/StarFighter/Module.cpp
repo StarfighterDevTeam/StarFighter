@@ -17,7 +17,7 @@ void Module::Init()
 	(*CurrentGame).addToFeedbacks(&m_flux_text);
 
 	//update grid index
-	m_curGridIndex = GetGridIndex();
+	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 }
 
 Module::Module()
