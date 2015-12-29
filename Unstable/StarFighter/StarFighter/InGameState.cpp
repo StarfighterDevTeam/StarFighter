@@ -42,6 +42,15 @@ void InGameState::Initialize(Player player)
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_A);
 	(*CurrentGame).addToScene(module, ModuleLayer, ModuleObject);
 
+	Module* module2 = Module::CreateModule(sf::Vector2u(6, 5), ModuleType_B);
+	(*CurrentGame).addToScene(module2, ModuleLayer, ModuleObject);
+
+	Module* module3 = Module::CreateModule(sf::Vector2u(7, 5), ModuleType_C);
+	(*CurrentGame).addToScene(module3, ModuleLayer, ModuleObject);
+
+	Module* module4 = Module::CreateModule(sf::Vector2u(7, 6), ModuleType_O);
+	(*CurrentGame).addToScene(module4, ModuleLayer, ModuleObject);
+
 	//Fluxors
 	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
 		Fluxor::CreateFluxor(FluxorType_Blue);

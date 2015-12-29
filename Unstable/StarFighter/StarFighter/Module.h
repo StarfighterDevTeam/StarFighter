@@ -7,7 +7,10 @@
 
 enum ModuleType
 {
+	ModuleType_O,
 	ModuleType_A,
+	ModuleType_B,
+	ModuleType_C,
 };
 
 class Module : public GameObject
@@ -25,6 +28,7 @@ public :
 	unsigned int m_flux;
 	unsigned int m_flux_max;
 	sf::Vector2u m_curGridIndex;
+	bool m_activated;
 
 	//HUD
 	sf::Text m_flux_text;

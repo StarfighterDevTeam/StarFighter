@@ -33,25 +33,31 @@
 
 //FLUX SPECIFIC
 #define TILE_SIZE									128
+#define FLUX_TRANSFER_LIMITER_TIME					0.1f
 
 //PLAYER
 #define SHIP_MAX_FLUX								100
-#define FLUX_DISPLAY_OFFSET_Y						4
+#define PLAYER_FLUX_DISPLAY_OFFSET_Y				4
 
 //FLUXOR
+#define FLUXOR_FLUX_VALUE							20
+
 #define FLUXOR_WIDTH								64
 #define FLUXOR_HEIGHT								48
 #define FLUXOR_SPEED_MIN							100
 #define FLUXOR_SPEED_MAX							500
 #define FLUXOR_TURN_MIN_DELAY						0.5f
 #define FLUXOR_TURN_MAX_DELAY						3.f
-#define FLUXOR_FLUX_VALUE							10
 #define FLUXOR_MAX_POPULATION						50
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
 #define FLUXOR_RESPAWN_MAX_TIME						60.f
 
 //MODULE
-#define MODULE_A_FLUX_MAX							500
+#define MODULE_FLUX_DISPLAY_OFFSET_Y				- 24
+#define MODULE_A_FLUX_MAX							200
+#define MODULE_B_FLUX_MAX							50
+#define MODULE_C_FLUX_MAX							100
+#define MODULE_O_FLUX_MAX							10
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

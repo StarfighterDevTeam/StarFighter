@@ -25,7 +25,7 @@ void Ship::Init()
 	m_flux_text.setFont(*(*CurrentGame).font2);
 	m_flux_text.setCharacterSize(20);
 	m_flux_text.setColor(sf::Color::White);
-	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUX_DISPLAY_OFFSET_Y));
+	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	(*CurrentGame).addToFeedbacks(&m_flux_text);
 }
 
@@ -73,7 +73,7 @@ void Ship::update(sf::Time deltaTime)
 	ostringstream ss;
 	ss << m_flux << "/" << m_flux_max;
 	m_flux_text.setString(ss.str());
-	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUX_DISPLAY_OFFSET_Y));
+	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
@@ -220,10 +220,11 @@ void Ship::GetModule(GameObject* object)
 		{
 			if (InputGuy::isFiring())
 			{
-				if (module->m_flux < module->m_flux_max && m_flux > 0)
+				if (module->m_flux < module->m_flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
 				{
 					m_flux--;
 					module->m_flux++;
+					m_flux_transfer_limiter_clock.restart();
 				}
 			}
 		}

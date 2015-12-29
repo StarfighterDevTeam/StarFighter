@@ -43,7 +43,7 @@ void Game::init(RenderWindow* window)
 	}
 
 	//TODO: save in local preferences
-	m_Music_Activated = false;
+	m_Music_Activated = true;
 	m_SFX_Activated = false;
 
 	//Sounds
@@ -55,7 +55,8 @@ void Game::init(RenderWindow* window)
 	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
-	if (m_curMusic.openFromFile("Assets/Music/Tron_End_Titles.ogg"))
+	//if (m_curMusic.openFromFile("Assets/Music/Tron_End_Titles.ogg"))
+	if (m_curMusic.openFromFile("Assets/Music/Tyrian_Remix/technoguyx_Sarah's_Song_(remix).ogg"))
 	{
 		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated);
 		m_curMusic.play();

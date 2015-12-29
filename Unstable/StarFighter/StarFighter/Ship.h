@@ -46,6 +46,7 @@ public :
 	void GetFluxor(GameObject* object) override;
 	void GetModule(GameObject* object) override;
 	sf::Vector2u m_curGridIndex;
+	sf::Clock m_flux_transfer_limiter_clock;
 
 	//HUD
 	sf::Text m_flux_text;
