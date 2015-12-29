@@ -32,12 +32,8 @@ void InGameState::Initialize(Player player)
 		}
 	}
 
-	//Creating a background
-	GameObject* background = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(W, H), sf::Vector2f(W/2, H/2));
-	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
-
 	//HACK
-	(*CurrentGame).map_size = background->m_size;
+	(*CurrentGame).map_size = sf::Vector2f(W, H);
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 	(*CurrentGame).playerShip->SetControllerType(AllControlDevices);
 }
