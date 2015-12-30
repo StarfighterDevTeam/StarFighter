@@ -17,6 +17,23 @@
 #include "Stroboscopic.h"
 
 class Ship;
+class Fluxor;
+class Module;
+
+enum FluxorType
+{
+	FluxorType_Blue,
+	NBVAL_FluxorType,
+};
+
+enum ModuleType
+{
+	ModuleType_O,
+	ModuleType_A,
+	ModuleType_B,
+	ModuleType_C,
+	NBVAL_ModuleType,
+};
 
 enum SFX_Bank
 {
@@ -81,6 +98,9 @@ public:
 	bool isCellFree(sf::Vector2u grid_index);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
 	void ResolveConstructionBufferList();
+
+	vector<Fluxor*> m_fluxor_list;
+	vector<Module*> m_module_list;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

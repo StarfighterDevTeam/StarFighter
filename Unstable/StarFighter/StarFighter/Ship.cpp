@@ -84,25 +84,25 @@ void Ship::ScreenBorderContraints()
 	if (this->getPosition().x < this->m_size.x / 2)
 	{
 		this->setPosition(m_size.x / 2, this->getPosition().y);
-		speed.x = 0;
+		m_speed.x = 0;
 	}
 
 	if (this->getPosition().x > (*CurrentGame).map_size.x - (m_size.x / 2))
 	{
 		this->setPosition((*CurrentGame).map_size.x - (m_size.x / 2), this->getPosition().y);
-		speed.x = 0;
+		m_speed.x = 0;
 	}
 
 	if (this->getPosition().y < m_size.y / 2)
 	{
 		this->setPosition(this->getPosition().x, m_size.y / 2);
-		speed.y = 0;
+		m_speed.y = 0;
 	}
 
 	if (this->getPosition().y > (*CurrentGame).map_size.y - (m_size.y / 2))
 	{
 		this->setPosition(this->getPosition().x, (*CurrentGame).map_size.y - (m_size.y / 2));
-		speed.y = 0;
+		m_speed.y = 0;
 	}
 }
 
@@ -111,34 +111,34 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	//idle decceleration
 	if (!movingX)
 	{
-		speed.x -= (speed.x) * deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
+		m_speed.x -= (m_speed.x) * deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
 
-		if (abs(speed.x) < SHIP_MIN_SPEED)
-			speed.x = 0;
+		if (abs(m_speed.x) < SHIP_MIN_SPEED)
+			m_speed.x = 0;
 	}
 
 	if (!movingY)
 	{
-		speed.y -= (speed.y)*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
+		m_speed.y -= (m_speed.y)*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
 
-		if (abs(speed.y) < SHIP_MIN_SPEED)
-			speed.y = 0;
+		if (abs(m_speed.y) < SHIP_MIN_SPEED)
+			m_speed.y = 0;
 	}
 }
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	speed.y += inputs_direction.y*SHIP_ACCELERATION;
+	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
+	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
 
 	//max speed constraints
-	if (abs(speed.x) > SHIP_MAX_SPEED)
+	if (abs(m_speed.x) > SHIP_MAX_SPEED)
 	{
-		speed.x = speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
 	}
-	if (abs(speed.y) > SHIP_MAX_SPEED)
+	if (abs(m_speed.y) > SHIP_MAX_SPEED)
 	{
-		speed.y = speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
 	}
 }
 
@@ -147,35 +147,35 @@ void Ship::MaxSpeedConstraints()
 	float ship_max_speed = SHIP_MAX_SPEED;
 
 	//max speed constraints
-	NormalizeSpeed(&speed, ship_max_speed);
+	NormalizeSpeed(&m_speed, ship_max_speed);
 }
 
 void Ship::UpdateRotation()
 {
 	//turning toward targeted position
-	if (speed.x == 0 && speed.y == 0)
+	if (m_speed.x == 0 && m_speed.y == 0)
 	{
 		//do nothing
 	}
-	else if (speed.x == 0 && speed.y > 0)
+	else if (m_speed.x == 0 && m_speed.y > 0)
 	{
 		setRotation(180);
 	}
-	else if (speed.x == 0 && speed.y < 0)
+	else if (m_speed.x == 0 && m_speed.y < 0)
 	{
 		setRotation(0);
 	}
-	else if (speed.y == 0 && speed.x > 0)
+	else if (m_speed.y == 0 && m_speed.x > 0)
 	{
 		setRotation(90);
 	}
-	else if (speed.y == 0 && speed.x < 0)
+	else if (m_speed.y == 0 && m_speed.x < 0)
 	{
 		setRotation(270);
 	}
 	else
 	{
-		setRotation((GetAngleRadForSpeed(speed) * 180 / (float)M_PI));
+		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI));
 	}
 }
 
@@ -239,17 +239,17 @@ void Ship::GetModule(GameObject* object)
 
 						if (module->m_moduleType == ModuleType_A)
 						{
-							new_module->m_curGridIndex = sf::Vector2u(6, 5);
+							new_module->m_curGridIndex = sf::Vector2u(7, 5);
 							new_module->m_moduleType = ModuleType_B;
 						}
 						else if (module->m_moduleType == ModuleType_B)
 						{
-							new_module->m_curGridIndex = sf::Vector2u(7, 5);
+							new_module->m_curGridIndex = sf::Vector2u(9, 5);
 							new_module->m_moduleType = ModuleType_O;
 						}
 						else if (module->m_moduleType == ModuleType_O)
 						{
-							new_module->m_curGridIndex = sf::Vector2u(7, 5);
+							new_module->m_curGridIndex = sf::Vector2u(9, 5);
 							new_module->m_moduleType = ModuleType_C;
 						}
 
@@ -290,7 +290,7 @@ void Ship::ResolveConstructionBufferList()
 				//hack: skipping the "dead" module
 				new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front()->m_parents.front());
 				m_construction_buffer[i]->m_parents.front()->m_parents.front()->m_children.push_back(new_module);
-				m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
+				//m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
 			}
 		}
 	}

@@ -9,6 +9,21 @@ Fluxor::Fluxor()
 	
 }
 
+Fluxor::Fluxor(FluxorType FluxorType)
+{
+	//texture
+	std::string textureName;
+	if (FluxorType == FluxorType_Blue)
+		textureName = "Assets/2D/fluxor_blue.png";
+
+	const unsigned int W = FLUXOR_WIDTH;
+	const unsigned int H = FLUXOR_HEIGHT;
+
+	m_FluxorType = FluxorType;
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
+	setOrigin(sf::Vector2f(W / 2, H / 2));
+}
+
 Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 
@@ -32,13 +47,14 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	//position
 	sf::Vector2f position = RandomizePosition();
 
-	Fluxor* new_Fluxor = new Fluxor(position, speed, textureName, sf::Vector2f(W, H), sf::Vector2f(W / 2, H / 2), 1, 1);
+	Fluxor* new_Fluxor = (*CurrentGame).m_fluxor_list[FluxorType_Blue]->Clone();
+	new_Fluxor->setPosition(position);
+	new_Fluxor->m_speed = speed;
 
 	//turn delay
 	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
 	new_Fluxor->m_absolute_speed = absolute_speed;
 
-	new_Fluxor->m_FluxorType = FluxorType;
 	new_Fluxor->m_flux = FLUXOR_FLUX_VALUE;
 
 	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);
@@ -46,10 +62,19 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	return new_Fluxor;
 }
 
-
 Fluxor::~Fluxor()
 {
 	
+}
+
+Fluxor* Fluxor::Clone()
+{
+	Fluxor* clone = new Fluxor(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x / 2, this->m_size.y / 2), this->m_frameNumber, this->m_animationNumber);
+	clone->m_collider_type = this->m_collider_type;
+	clone->m_layer = this->m_layer;
+	clone->m_FluxorType = this->m_FluxorType;
+
+	return clone;
 }
 
 void Fluxor::update(sf::Time deltaTime)
@@ -127,7 +152,7 @@ void Fluxor::ChaosTurns()
 	m_turn_delay = RandomizeTurnDelay();
 	m_turn_clock.restart();
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_absolute_speed, angle);
+	m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_absolute_speed, angle);
 }
 
 bool Fluxor::ScreenBorderContraints()
@@ -136,28 +161,28 @@ bool Fluxor::ScreenBorderContraints()
 	if (this->getPosition().x < this->m_size.x / 2)
 	{
 		this->setPosition(m_size.x / 2, this->getPosition().y);
-		speed.x *= -1;
+		m_speed.x *= -1;
 		touching_screen_border = true;
 	}
 
 	if (this->getPosition().x >(*CurrentGame).map_size.x - (m_size.x / 2))
 	{
 		this->setPosition((*CurrentGame).map_size.x - (m_size.x / 2), this->getPosition().y);
-		speed.x *= -1;
+		m_speed.x *= -1;
 		touching_screen_border = true;
 	}
 
 	if (this->getPosition().y < m_size.y / 2)
 	{
 		this->setPosition(this->getPosition().x, m_size.y / 2);
-		speed.y *= -1;
+		m_speed.y *= -1;
 		touching_screen_border = true;
 	}
 
 	if (this->getPosition().y >(*CurrentGame).map_size.y - (m_size.y / 2))
 	{
 		this->setPosition(this->getPosition().x, (*CurrentGame).map_size.y - (m_size.y / 2));
-		speed.y *= -1;
+		m_speed.y *= -1;
 		touching_screen_border = true;
 	}
 
@@ -167,29 +192,29 @@ bool Fluxor::ScreenBorderContraints()
 void Fluxor::UpdateRotation()
 {
 	//turning toward targeted position
-	if (speed.x == 0 && speed.y == 0)
+	if (m_speed.x == 0 && m_speed.y == 0)
 	{
 		//do nothing
 	}
-	else if (speed.x == 0 && speed.y > 0)
+	else if (m_speed.x == 0 && m_speed.y > 0)
 	{
 		setRotation(180);
 	}
-	else if (speed.x == 0 && speed.y < 0)
+	else if (m_speed.x == 0 && m_speed.y < 0)
 	{
 		setRotation(0);
 	}
-	else if (speed.y == 0 && speed.x > 0)
+	else if (m_speed.y == 0 && m_speed.x > 0)
 	{
 		setRotation(90);
 	}
-	else if (speed.y == 0 && speed.x < 0)
+	else if (m_speed.y == 0 && m_speed.x < 0)
 	{
 		setRotation(270);
 	}
 	else
 	{
-		setRotation((GetAngleRadForSpeed(speed) * 180 / (float)M_PI) - 90);
+		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI) - 90);
 	}
 }
 

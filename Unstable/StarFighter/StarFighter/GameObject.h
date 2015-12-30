@@ -87,7 +87,7 @@ public:
 	int m_frameNumber;
 	int m_currentAnimationIndex;
 	std::string m_textureName;
-	sf::Vector2f speed;
+	sf::Vector2f m_speed;
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();

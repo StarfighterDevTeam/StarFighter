@@ -5,16 +5,13 @@
 #include "GameObject.h"
 #include "Game.h"
 
-enum FluxorType
-{
-	FluxorType_Blue,
-};
-
 class Fluxor : public GameObject
 {
 public :
 	Fluxor();
+	Fluxor(FluxorType FluxorType);
 	Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Fluxor* Clone();
 	static Fluxor* CreateFluxor(FluxorType FluxorType);
 
 	virtual ~Fluxor();

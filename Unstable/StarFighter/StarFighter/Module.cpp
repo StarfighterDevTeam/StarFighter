@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 
-void Module::Init()
+void Module::Initialize()
 {
 	m_flux = 0;
 
@@ -24,19 +24,18 @@ void Module::Init()
 
 Module::Module()
 {
-	Init();
+	Initialize();
 }
 
 Module::Module(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0,0), textureName, size, origin, frameNumber, animationNumber)
 {
-	Init();
+	Initialize();
 }
 
-Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
+Module::Module(ModuleType moduleType)
 {
-	grid_index.x--;
-	grid_index.y--;
 	std::string textureName;
+	m_moduleType = moduleType;
 
 	if (moduleType == ModuleType_O)
 	{
@@ -54,10 +53,32 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	{
 		textureName = "Assets/2D/moduleC.png";
 	}
-		
-	Module* new_module = new Module(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2), textureName, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Vector2f(TILE_SIZE / 2, TILE_SIZE / 2), 1, 2);
+	
+	const unsigned int W = TILE_SIZE;
+	const unsigned int H = TILE_SIZE;
 
-	new_module->m_moduleType = moduleType;
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
+	setOrigin(sf::Vector2f(W / 2, H / 2));
+}
+
+Module* Module::Clone()
+{
+	Module* clone = new Module(this->getPosition(), this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x / 2, this->m_size.y / 2), this->m_frameNumber, this->m_animationNumber);
+	clone->m_speed = this->m_speed;
+	clone->m_collider_type = this->m_collider_type;
+	clone->m_layer = this->m_layer;
+	clone->m_moduleType = this->m_moduleType;
+
+	return clone;
+}
+
+Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
+{
+	Module* new_module = (*CurrentGame).m_module_list[moduleType]->Clone();
+
+	grid_index.x--;
+	grid_index.y--;
+	new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
 
 	if (moduleType == ModuleType_O)
 	{
@@ -97,6 +118,10 @@ void Module::update(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
 
+	//update grid index
+	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
+
+	//update activation
 	if (!m_parents.empty())
 	{
 		bool parent_activated = false;

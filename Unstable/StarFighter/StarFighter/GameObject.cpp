@@ -3,7 +3,7 @@
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
-	this->setOrigin(origin.x, origin.y);
+	setOrigin(origin.x, origin.y);
 }
 
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
@@ -85,7 +85,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	
 	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
-	this->speed = speed;
+	this->m_speed = speed;
 	this->setPosition(position.x, position.y);
 	this->visible = true;
 	this->isOnScene = false;
@@ -132,7 +132,7 @@ GameObject::~GameObject()
 void GameObject::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->speed;
+	newspeed = this->m_speed;
 	
 	//Basic movement (initial vector)
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
@@ -169,12 +169,12 @@ void GameObject::setGhost(bool m_ghost)
 
 sf::Vector2f GameObject::getGameObjectSpeed()
 {
-	return speed;
+	return m_speed;
 }
 
 GameObject* GameObject::Clone()
 {
-	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x/2, this->m_size.y/2), this->m_frameNumber, this->m_animationNumber);
+	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x / 2, this->m_size.y / 2), this->m_frameNumber, this->m_animationNumber);
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
 
@@ -183,8 +183,8 @@ GameObject* GameObject::Clone()
 
 float GameObject::GetAbsoluteSpeed()
 {
-	const float a = speed.x;
-	const float b = speed.y;
+	const float a = m_speed.x;
+	const float b = m_speed.y;
 	float s = (a * a) + (b * b);
 	s = sqrt(s);
 	s = floor(s);
@@ -204,8 +204,8 @@ float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 
 float GameObject::GetAbsoluteSpeedSquared()
 {
-	const float a = speed.x;
-	const float b = speed.y;
+	const float a = m_speed.x;
+	const float b = m_speed.y;
 	float s = (a * a) + (b * b);
 
 	return s;
@@ -279,8 +279,8 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 
 void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
-	speed.x = -absolute_speed * sin(curAngle);
-	speed.y = absolute_speed * cos(curAngle);
+	m_speed.x = -absolute_speed * sin(curAngle);
+	m_speed.y = absolute_speed * cos(curAngle);
 }
 
 sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)

@@ -37,14 +37,24 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).map_size = sf::Vector2f(W, H);
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
-	//Module grid construction
-	//Module* module_grid[grid_width][grid_height];
+	//Loading data
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Modules");
+	for (int i = 0; i < NBVAL_ModuleType; i++)
+	{
+		ModuleType type = (ModuleType)i;
+		(*CurrentGame).m_module_list.push_back(new Module(type));
+	}
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Fluxors");
+	for (int i = 0; i < NBVAL_FluxorType; i++)
+	{
+		FluxorType type = (FluxorType)i;
+		(*CurrentGame).m_fluxor_list.push_back(new Fluxor(type));
+	}
 	
-
 	//HACK PROTO
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_A);
 
-	//Fluxors
+	//Spawning Fluxors
 	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
 		Fluxor::CreateFluxor(FluxorType_Blue);
 }
@@ -55,8 +65,6 @@ void InGameState::Update(sf::Time deltaTime)
 
 	//move camera
 	UpdateCamera(deltaTime);
-
-	
 
 	this->mainWindow->clear();
 }
@@ -73,7 +81,7 @@ void InGameState::Release()
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
 {
-	(*CurrentGame).view.move(sf::Vector2f((*CurrentGame).playerShip->speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShip->speed.y * deltaTime.asSeconds()));
+	(*CurrentGame).view.move(sf::Vector2f((*CurrentGame).playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShip->m_speed.y * deltaTime.asSeconds()));
 
 	//Map border constraints
 	const float x = (*CurrentGame).view.getSize().x / 2;
