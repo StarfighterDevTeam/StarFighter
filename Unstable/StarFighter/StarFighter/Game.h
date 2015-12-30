@@ -53,6 +53,12 @@ public:
 	sf::View view;
 	sf::Vector2f map_size;
 
+
+	//utilitary methods
+	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
+	GameObject* GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object);
+	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
+
 	//Fonts
 	sf::Font* font;
 	sf::Font* font2;

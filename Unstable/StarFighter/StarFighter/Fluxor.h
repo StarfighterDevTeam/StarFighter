@@ -23,6 +23,7 @@ public :
 	void UpdateRotation();
 
 	static float RandomizeTurnDelay();
+	static sf::Vector2f RandomizePosition();
 	void ChaosTurns();
 	
 	FluxorType m_FluxorType;

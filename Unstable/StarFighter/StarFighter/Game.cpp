@@ -436,3 +436,42 @@ sf::Vector2u Game::GetGridIndex(sf::Vector2f position)
 
 	return sf::Vector2u(grid_line, grid_row);
 }
+
+GameObject* Game::GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object)
+{
+	float shortest_distance = -1;
+	GameObject* returned_obj = NULL;
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[type_of_closest_object].begin(); it != sceneGameObjectsTyped[type_of_closest_object].end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		if ((*it)->isOnScene && !(*it)->ghost && (*it)->visible)
+		{
+			const float a = position.x - (*it)->getPosition().x;
+			const float b = position.y - (*it)->getPosition().y;
+
+			float distance_to_ref = (a * a) + (b * b);
+			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
+			if (distance_to_ref < shortest_distance || shortest_distance < 0)
+			{
+				shortest_distance = distance_to_ref;
+				returned_obj = (*it);
+			}
+		}
+	}
+
+	return returned_obj;
+}
+
+GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object)
+{
+	const sf::Vector2f ref_position = ref_obj->getPosition();
+	
+	return GetClosestObject(ref_position, type_of_closest_object);
+}
+
+std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
+{
+	return sceneGameObjectsTyped[type];
+}

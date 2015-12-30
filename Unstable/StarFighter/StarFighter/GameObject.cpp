@@ -301,6 +301,12 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 	return GetAbsoluteSpeed(current_diff);
 }
 
+float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
+{
+	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
+	return GetAbsoluteSpeed(current_diff);
+}
+
 bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 {
 	if (vector->x == 0 && vector->y == 0)

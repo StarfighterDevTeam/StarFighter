@@ -285,10 +285,11 @@ void Ship::ResolveConstructionBufferList()
 			if (m_construction_buffer[i]->m_parents.front()->m_moduleType == ModuleType_O)
 			{
 				m_construction_buffer[i]->m_parents.front()->GarbageMe = true;
-				Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
-				new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front());
-				m_construction_buffer[i]->m_parents.front()->m_children.push_back(new_module);
 
+				Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
+				//hack: skipping the "dead" module
+				new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front()->m_parents.front());
+				m_construction_buffer[i]->m_parents.front()->m_parents.front()->m_children.push_back(new_module);
 				m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
 			}
 		}

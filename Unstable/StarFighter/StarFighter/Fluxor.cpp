@@ -30,10 +30,9 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	sf::Vector2f speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(absolute_speed, angle);
 
 	//position
-	float position_x = RandomizeFloatBetweenValues(sf::Vector2f(W / 2, (*CurrentGame).map_size.x - W / 2));
-	float position_y = RandomizeFloatBetweenValues(sf::Vector2f(H / 2, (*CurrentGame).map_size.y - H / 2));
+	sf::Vector2f position = RandomizePosition();
 
-	Fluxor* new_Fluxor = new Fluxor(sf::Vector2f(position_x, position_y), speed, textureName, sf::Vector2f(W, H), sf::Vector2f(W / 2, H / 2), 1, 1);
+	Fluxor* new_Fluxor = new Fluxor(position, speed, textureName, sf::Vector2f(W, H), sf::Vector2f(W / 2, H / 2), 1, 1);
 
 	//turn delay
 	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
@@ -85,6 +84,42 @@ void Fluxor::update(sf::Time deltaTime)
 float Fluxor::RandomizeTurnDelay()
 {
 	return RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_TURN_MIN_DELAY, FLUXOR_TURN_MAX_DELAY));
+}
+
+sf::Vector2f Fluxor::RandomizePosition()
+{
+	const unsigned int W = FLUXOR_WIDTH;
+	const unsigned int H = FLUXOR_HEIGHT;
+
+	sf::Vector2f position;
+	bool position_is_valid = false;
+
+	while (!position_is_valid)
+	{
+		position_is_valid = true;
+
+		float position_x = RandomizeFloatBetweenValues(sf::Vector2f(W / 2, (*CurrentGame).map_size.x - W / 2));
+		float position_y = RandomizeFloatBetweenValues(sf::Vector2f(H / 2, (*CurrentGame).map_size.y - H / 2));
+
+		position = sf::Vector2f(position_x, position_y);
+
+		//checking if position is valid
+		if ((*CurrentGame).GetClosestObject(position, PlayerShip))
+		{
+			float distance_to_player = GameObject::GetDistanceBetweenPositions(position, (*CurrentGame).GetClosestObject(position, PlayerShip)->getPosition());
+			if (distance_to_player < TILE_SIZE)
+			{
+				position_is_valid = false;
+			}
+		}
+
+		if (!(*CurrentGame).isCellFree(position))
+		{
+			position_is_valid = false;
+		}
+	}
+
+	return position;
 }
 
 void Fluxor::ChaosTurns()
@@ -171,8 +206,7 @@ void Fluxor::Respawn()
 	const unsigned int H = FLUXOR_HEIGHT;
 
 	//position
-	float position_x = RandomizeFloatBetweenValues(sf::Vector2f(W / 2, (*CurrentGame).map_size.x - W / 2));
-	float position_y = RandomizeFloatBetweenValues(sf::Vector2f(H / 2, (*CurrentGame).map_size.y - H / 2));
+	setPosition(RandomizePosition());
 
 	visible = true;
 	m_turn_clock.restart();
