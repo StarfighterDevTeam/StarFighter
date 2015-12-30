@@ -28,7 +28,11 @@ public :
 	vector<Module*> m_parents;
 	vector<Module*> m_children;
 
-	Fluxor m_fluxor_generated;
+	//Fluxor generation
+	Fluxor* m_fluxor_generated;
+	bool GenerateFluxor();
+	float m_fluxor_spawn_time;
+	sf::Clock m_fluxor_spawn_clock;
 
 	//HUD
 	sf::Text m_flux_text;

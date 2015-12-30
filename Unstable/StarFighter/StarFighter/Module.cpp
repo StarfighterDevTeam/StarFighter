@@ -8,6 +8,7 @@ using namespace sf;
 void Module::Initialize()
 {
 	m_flux = 0;
+	m_fluxor_generated = NULL;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -90,6 +91,9 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 
 		//HACK PROTO
 		new_module->m_flux = 200;
+		new_module->m_fluxor_generated = (*CurrentGame).m_fluxor_list[FluxorType_Green];
+		new_module->m_fluxor_spawn_time = 1.f;
+		new_module->m_fluxor_spawn_clock.restart();
 	}
 	else if (moduleType == ModuleType_B)
 	{
@@ -141,10 +145,36 @@ void Module::update(sf::Time deltaTime)
 		m_activated = m_flux == m_flux_max;
 	}
 	m_glow->visible = m_activated;
+
+	//fluxor generation
+	GenerateFluxor();
 	
 	//hud
 	ostringstream ss;
 	ss << m_flux << "/" << m_flux_max;
 	m_flux_text.setString(ss.str());
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
+}
+
+bool Module::GenerateFluxor()
+{
+	if (m_fluxor_generated && m_activated)
+	{
+		if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_spawn_time)
+		{
+			Fluxor* fluxor = m_fluxor_generated->Clone();
+			fluxor->m_speed = sf::Vector2f(100, 0);
+			fluxor->m_absolute_speed = 100;
+			fluxor->setPosition(getPosition());
+			fluxor->m_guided = true;
+
+			(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
+
+			m_fluxor_spawn_clock.restart();
+
+			return true;
+		}
+	}
+
+	return false;
 }

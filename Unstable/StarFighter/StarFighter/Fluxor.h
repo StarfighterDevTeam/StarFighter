@@ -21,6 +21,7 @@ public :
 
 	static float RandomizeTurnDelay();
 	static sf::Vector2f RandomizePosition();
+	static sf::Vector2f RandomizeSpeed();
 	void ChaosTurns();
 	
 	FluxorType m_FluxorType;
@@ -33,6 +34,8 @@ public :
 	void Death();
 	sf::Clock m_respawn_clock;
 	float m_respawn_time;
+
+	bool m_guided;
 
 };
 

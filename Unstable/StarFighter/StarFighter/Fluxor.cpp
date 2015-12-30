@@ -15,11 +15,18 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	std::string textureName;
 	if (FluxorType == FluxorType_Blue)
 		textureName = "Assets/2D/fluxor_blue.png";
+	if (FluxorType == FluxorType_Green)
+		textureName = "Assets/2D/fluxor_green.png";
+	if (FluxorType == FluxorType_Red)
+		textureName = "Assets/2D/fluxor_red.png";
 
 	const unsigned int W = FLUXOR_WIDTH;
 	const unsigned int H = FLUXOR_HEIGHT;
 
 	m_FluxorType = FluxorType;
+	m_flux = FLUXOR_FLUX_VALUE;
+	m_guided = false;
+
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
 	setOrigin(sf::Vector2f(W / 2, H / 2));
 }
@@ -32,12 +39,16 @@ Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 {
 	//texture
-	std::string textureName;
-	if (FluxorType == FluxorType_Blue)
-		textureName = "Assets/2D/fluxor_blue.png";
-
-	const unsigned int W = FLUXOR_WIDTH;
-	const unsigned int H = FLUXOR_HEIGHT;
+	//std::string textureName;
+	//if (FluxorType == FluxorType_Blue)
+	//	textureName = "Assets/2D/fluxor_blue.png";
+	//if (FluxorType == FluxorType_Green)
+	//	textureName = "Assets/2D/fluxor_green.png";
+	//if (FluxorType == FluxorType_Red)
+	//	textureName = "Assets/2D/fluxor_red.png";
+	//
+	//const unsigned int W = FLUXOR_WIDTH;
+	//const unsigned int H = FLUXOR_HEIGHT;
 
 	//speed and direction
 	float absolute_speed = RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_SPEED_MIN, FLUXOR_SPEED_MAX));
@@ -82,9 +93,12 @@ void Fluxor::update(sf::Time deltaTime)
 	if (visible)
 	{
 		//chaos turns
-		if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
+		if (!m_guided)
 		{
-			ChaosTurns();
+			if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
+			{
+				ChaosTurns();
+			}
 		}
 
 		if (ScreenBorderContraints())
@@ -147,6 +161,15 @@ sf::Vector2f Fluxor::RandomizePosition()
 	return position;
 }
 
+sf::Vector2f Fluxor::RandomizeSpeed()
+{
+	float absolute_speed = RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_SPEED_MIN, FLUXOR_SPEED_MAX));
+	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
+	sf::Vector2f speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(absolute_speed, angle);
+
+	return speed;
+}
+
 void Fluxor::ChaosTurns()
 {
 	m_turn_delay = RandomizeTurnDelay();
@@ -202,11 +225,11 @@ void Fluxor::UpdateRotation()
 	}
 	else if (m_speed.x == 0 && m_speed.y < 0)
 	{
-		setRotation(0);
+		setRotation(90);
 	}
 	else if (m_speed.y == 0 && m_speed.x > 0)
 	{
-		setRotation(90);
+		setRotation(0);
 	}
 	else if (m_speed.y == 0 && m_speed.x < 0)
 	{

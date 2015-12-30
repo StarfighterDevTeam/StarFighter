@@ -23,6 +23,8 @@ class Module;
 enum FluxorType
 {
 	FluxorType_Blue,
+	FluxorType_Green,
+	FluxorType_Red,
 	NBVAL_FluxorType,
 };
 

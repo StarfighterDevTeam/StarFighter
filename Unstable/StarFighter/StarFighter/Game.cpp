@@ -396,20 +396,20 @@ bool Game::isCellFree(sf::Vector2f position)
 
 bool Game::isCellFree(sf::Vector2u grid_index)
 {
-	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[FluxorObject].begin(); it != sceneGameObjectsTyped[FluxorObject].end(); it++)
-	{
-		if (*it == NULL)
-			continue;
-
-		if ((*it)->visible)
-		{
-			sf::Vector2u fluxor_grid_index = GetGridIndex((*it)->getPosition());
-			if (fluxor_grid_index == grid_index)
-			{
-				return false;
-			}
-		}
-	}
+	//for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[FluxorObject].begin(); it != sceneGameObjectsTyped[FluxorObject].end(); it++)
+	//{
+	//	if (*it == NULL)
+	//		continue;
+	//
+	//	if ((*it)->visible)
+	//	{
+	//		sf::Vector2u fluxor_grid_index = GetGridIndex((*it)->getPosition());
+	//		if (fluxor_grid_index == grid_index)
+	//		{
+	//			return false;
+	//		}
+	//	}
+	//}
 
 	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[ModuleObject].begin(); it != sceneGameObjectsTyped[ModuleObject].end(); it++)
 	{
