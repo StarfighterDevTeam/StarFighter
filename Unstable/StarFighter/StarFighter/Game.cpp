@@ -361,10 +361,8 @@ void Game::collectGarbage()
 	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
-GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object)
+GameObject* Game::GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object)
 {
-	sf::Vector2f pos;
-	const sf::Vector2f ref_position = ref_obj->getPosition();
 	float shortest_distance = -1;
 	GameObject* returned_obj = NULL;
 	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[type_of_closest_object].begin(); it != sceneGameObjectsTyped[type_of_closest_object].end(); it++)
@@ -374,8 +372,8 @@ GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType typ
 
 		if ((*it)->isOnScene && !(*it)->ghost && (*it)->visible)
 		{
-			const float a = ref_position.x - (*it)->getPosition().x;
-			const float b = ref_position.y - (*it)->getPosition().y;
+			const float a = position.x - (*it)->getPosition().x;
+			const float b = position.y - (*it)->getPosition().y;
 
 			float distance_to_ref = (a * a) + (b * b);
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
@@ -388,6 +386,13 @@ GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType typ
 	}
 
 	return returned_obj;
+}
+
+GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object)
+{
+	const sf::Vector2f ref_position = ref_obj->getPosition();
+
+	return GetClosestObject(ref_position, type_of_closest_object);
 }
 
 std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
