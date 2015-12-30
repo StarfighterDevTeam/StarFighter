@@ -8,7 +8,6 @@ using namespace sf;
 void Module::Init()
 {
 	m_flux = 0;
-	m_parent = NULL;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -51,7 +50,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	{
 		textureName = "Assets/2D/moduleB.png";
 	}
-	else if (moduleType == ModuleType_C)
+	else
 	{
 		textureName = "Assets/2D/moduleC.png";
 	}
@@ -67,12 +66,15 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	else if (moduleType == ModuleType_A)
 	{
 		new_module->m_flux_max = MODULE_A_FLUX_MAX;
+
+		//HACK PROTO
+		new_module->m_flux = 200;
 	}
 	else if (moduleType == ModuleType_B)
 	{
 		new_module->m_flux_max = MODULE_B_FLUX_MAX;
 	}
-	else if (moduleType == ModuleType_C)
+	else
 	{
 		new_module->m_flux_max = MODULE_C_FLUX_MAX;
 	}
@@ -95,9 +97,19 @@ void Module::update(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
 
-	if (m_parent)
+	if (!m_parents.empty())
 	{
-		m_activated = m_flux == m_flux_max && m_parent->m_activated;
+		bool parent_activated = false;
+		size_t parentsVectorSize = m_parents.size();
+		for (size_t i = 0; i < parentsVectorSize; i++)
+		{
+			if (m_parents[i]->m_activated)
+			{
+				parent_activated = true;
+				break;
+			}
+		}
+		m_activated = m_flux == m_flux_max && parent_activated;
 	}
 	else
 	{

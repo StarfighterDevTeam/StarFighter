@@ -72,7 +72,9 @@ public:
 
 	//FLUX SPECIFIC
 	bool isCellFree(sf::Vector2f position);
+	bool isCellFree(sf::Vector2u grid_index);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
+	void ResolveConstructionBufferList();
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

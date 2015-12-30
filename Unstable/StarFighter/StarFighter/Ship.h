@@ -51,6 +51,11 @@ public :
 	//HUD
 	sf::Text m_flux_text;
 
+	//construction
+	//vector<pair<Vector2u, ModuleType>> m_construction_buffer_list;
+	void ResolveConstructionBufferList() override;
+	vector<Module*> m_construction_buffer;
+
 private:
 	bool moving;
 	bool movingX;

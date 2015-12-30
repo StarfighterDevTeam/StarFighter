@@ -25,7 +25,7 @@ public:
 	static Vector2f getDirections(ControlerType device = AllControlDevices);
 	static bool isFiring(ControlerType device = AllControlDevices);
 	static bool isTackling(ControlerType device = AllControlDevices);
-	static bool isSwitchingRotation(ControlerType device = AllControlDevices);
+	static bool isUsing(ControlerType device = AllControlDevices);
 	static bool isChangingResolution();
 	static bool isUsingDebugCommand();
 	static bool isRestartingScript();

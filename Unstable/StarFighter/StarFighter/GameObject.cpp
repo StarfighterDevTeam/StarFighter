@@ -448,3 +448,8 @@ void GameObject::GetModule(GameObject* object)
 {
 	//see override function in class Ship
 }
+
+void GameObject::ResolveConstructionBufferList()
+{
+	//see override function in class Ship
+}

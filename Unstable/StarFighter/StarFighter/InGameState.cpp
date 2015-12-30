@@ -39,13 +39,10 @@ void InGameState::Initialize(Player player)
 
 	//Module grid construction
 	//Module* module_grid[grid_width][grid_height];
+	
+
+	//HACK PROTO
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_A);
-
-	Module* module2 = Module::CreateModule(sf::Vector2u(6, 5), ModuleType_B);
-
-	Module* module3 = Module::CreateModule(sf::Vector2u(7, 5), ModuleType_C);
-
-	Module* module4 = Module::CreateModule(sf::Vector2u(7, 6), ModuleType_O);
 
 	//Fluxors
 	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
@@ -58,6 +55,8 @@ void InGameState::Update(sf::Time deltaTime)
 
 	//move camera
 	UpdateCamera(deltaTime);
+
+	
 
 	this->mainWindow->clear();
 }

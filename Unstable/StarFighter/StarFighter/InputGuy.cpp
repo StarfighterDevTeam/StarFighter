@@ -35,7 +35,7 @@ bool InputGuy::isFiring(ControlerType device)
 	return false;
 }
 
-bool InputGuy::isSwitchingRotation(ControlerType device)
+bool InputGuy::isUsing(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{

@@ -152,6 +152,7 @@ void Game::updateScene(Time deltaTime)
 
 	//Checking colisions
 	colisionChecksV2();
+	ResolveConstructionBufferList();//must be done after collision checks
 
 	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
 
@@ -167,6 +168,18 @@ void Game::updateScene(Time deltaTime)
 	collectGarbage();
 
 	mainScreen.setView(view);
+}
+
+void Game::ResolveConstructionBufferList()
+{
+	size_t scenePlayerShipsVectorSize = this->sceneGameObjectsTyped[PlayerShip].size();
+	for (size_t i = 0; i < scenePlayerShipsVectorSize; i++)
+	{
+		if (this->sceneGameObjectsTyped[PlayerShip][i] == NULL)
+			continue;
+		
+		this->sceneGameObjectsTyped[PlayerShip][i]->ResolveConstructionBufferList();
+	}
 }
 
 void Game::drawScene()
@@ -378,6 +391,11 @@ bool Game::isCellFree(sf::Vector2f position)
 {
 	sf::Vector2u grid_index = GetGridIndex(position);
 
+	return isCellFree(grid_index);
+}
+
+bool Game::isCellFree(sf::Vector2u grid_index)
+{
 	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[FluxorObject].begin(); it != sceneGameObjectsTyped[FluxorObject].end(); it++)
 	{
 		if (*it == NULL)
@@ -410,7 +428,6 @@ bool Game::isCellFree(sf::Vector2f position)
 
 	return true;
 }
-
 
 sf::Vector2u Game::GetGridIndex(sf::Vector2f position)
 {
