@@ -90,7 +90,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 
 Module::~Module()
 {
-	
+	(*CurrentGame).removeFromFeedbacks(&m_flux_text);
 }
 
 void Module::update(sf::Time deltaTime)

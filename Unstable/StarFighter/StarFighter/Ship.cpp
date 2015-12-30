@@ -41,7 +41,7 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	
+	(*CurrentGame).removeFromFeedbacks(&m_flux_text);
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -233,33 +233,29 @@ void Ship::GetModule(GameObject* object)
 				if (InputGuy::isUsing())
 				{
 					////HACK PROTO
-					Module* new_module = new Module();
-
-					if (module->m_moduleType == ModuleType_A)
+					if (module->m_moduleType != ModuleType_C)
 					{
-						//m_construction_buffer_list.push_back(pair<Vector2u, ModuleType>(sf::Vector2u(6, 5), ModuleType_B));
-						
-						new_module->m_curGridIndex = sf::Vector2u(6, 5);
-						new_module->m_moduleType = ModuleType_B;
-						
-					}
-					else if (module->m_moduleType == ModuleType_B)
-					{
-						//m_construction_buffer_list.push_back(pair<Vector2u, ModuleType>(sf::Vector2u(7, 5), ModuleType_O));
+						Module* new_module = new Module();
 
-						new_module->m_curGridIndex = sf::Vector2u(7, 5);
-						new_module->m_moduleType = ModuleType_O;
-					}
-					else if (module->m_moduleType == ModuleType_O)
-					{
-						//m_construction_buffer_list.push_back(pair<Vector2u, ModuleType>(sf::Vector2u(7, 5), ModuleType_C));
+						if (module->m_moduleType == ModuleType_A)
+						{
+							new_module->m_curGridIndex = sf::Vector2u(6, 5);
+							new_module->m_moduleType = ModuleType_B;
+						}
+						else if (module->m_moduleType == ModuleType_B)
+						{
+							new_module->m_curGridIndex = sf::Vector2u(7, 5);
+							new_module->m_moduleType = ModuleType_O;
+						}
+						else if (module->m_moduleType == ModuleType_O)
+						{
+							new_module->m_curGridIndex = sf::Vector2u(7, 5);
+							new_module->m_moduleType = ModuleType_C;
+						}
 
-						new_module->m_curGridIndex = sf::Vector2u(7, 5);
-						new_module->m_moduleType = ModuleType_C;
+						new_module->m_parents.push_back(module);
+						m_construction_buffer.push_back(new_module);
 					}
-
-					new_module->m_parents.push_back(module);
-					m_construction_buffer.push_back(new_module);
 				}
 			}
 		}
@@ -268,11 +264,9 @@ void Ship::GetModule(GameObject* object)
 
 void Ship::ResolveConstructionBufferList()
 {
-	//size_t constructionBufferSize = m_construction_buffer_list.size();
 	size_t constructionBufferSize = m_construction_buffer.size();
 	for (size_t i = 0; i < constructionBufferSize; i++)
 	{
-		//if ((*CurrentGame).isCellFree(m_construction_buffer_list[i].first))
 		if ((*CurrentGame).isCellFree(m_construction_buffer[i]->m_curGridIndex))
 		{
 			//Module* new_module = Module::CreateModule(m_construction_buffer_list[i].first, m_construction_buffer_list[i].second);
@@ -283,9 +277,22 @@ void Ship::ResolveConstructionBufferList()
 
 			//HACK PROTO
 			m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
+			
+		}
+		else
+		{
+			//HACK PROTO
+			if (m_construction_buffer[i]->m_parents.front()->m_moduleType == ModuleType_O)
+			{
+				m_construction_buffer[i]->m_parents.front()->GarbageMe = true;
+				Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
+				new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front());
+				m_construction_buffer[i]->m_parents.front()->m_children.push_back(new_module);
+
+				m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
+			}
 		}
 	}
 
-	//m_construction_buffer_list.clear();
 	m_construction_buffer.clear();
 }
