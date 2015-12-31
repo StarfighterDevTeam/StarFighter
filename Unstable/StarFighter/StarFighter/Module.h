@@ -29,17 +29,23 @@ public :
 	vector<Module*> m_parents;
 	vector<Module*> m_children;
 
-	//Fluxor generation
-	Fluxor* m_fluxor_generated;
-	bool GenerateFluxor();
-	float m_fluxor_spawn_time;
-	sf::Clock m_fluxor_spawn_clock;
-
 	//Activation
 	void UpdateActivation();
 
 	//Module properties
 	void ApplyModuleEffect(Fluxor* fluxor);
+	bool m_isConsummingFlux;
+	bool m_isRefillingFlux;
+
+	//Fluxor generation
+	bool m_isGeneratingFluxor;
+	FluxorType m_fluxor_generated_type;
+	bool GenerateFluxor();
+	float m_fluxor_generation_time;
+	sf::Clock m_fluxor_spawn_clock;
+
+	//Flux transfer from and to Fluxors
+	//sf::Clock m_flux_transfer_limiter_clock;
 
 	//Spawn
 	void ResolveProductionBufferList() override;

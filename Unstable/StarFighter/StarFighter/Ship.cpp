@@ -51,6 +51,11 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	if (m_flux > m_flux_max  && m_flux_max > 0)
+	{
+		m_flux = m_flux_max;
+	}
+
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
 
 	if (!m_disable_inputs)
@@ -77,7 +82,6 @@ void Ship::update(sf::Time deltaTime)
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
-
 
 	//DEBUG
 	if (InputGuy::isSpawningModule1())
@@ -118,7 +122,7 @@ void Ship::update(sf::Time deltaTime)
 	}
 	if (InputGuy::isSpawningModule0())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 0 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1));
 	}
 }
 
@@ -278,29 +282,7 @@ void Ship::GetModule(GameObject* object)
 				if (InputGuy::isUsing())
 				{
 					////HACK PROTO
-					if (module->m_moduleType != ModuleType_C)
-					{
-						Module* new_module = new Module();
-
-						if (module->m_moduleType == ModuleType_A)
-						{
-							new_module->m_curGridIndex = sf::Vector2u(7, 5);
-							new_module->m_moduleType = ModuleType_B;
-						}
-						else if (module->m_moduleType == ModuleType_B)
-						{
-							new_module->m_curGridIndex = sf::Vector2u(9, 5);
-							new_module->m_moduleType = ModuleType_O;
-						}
-						else if (module->m_moduleType == ModuleType_O)
-						{
-							new_module->m_curGridIndex = sf::Vector2u(9, 5);
-							new_module->m_moduleType = ModuleType_C;
-						}
-
-						new_module->m_parents.push_back(module);
-						m_construction_buffer.push_back(new_module);
-					}
+					
 				}
 			}
 		}
@@ -314,29 +296,12 @@ void Ship::ResolveProductionBufferList()
 	{
 		if ((*CurrentGame).isCellFree(m_construction_buffer[i]->m_curGridIndex))
 		{
-			//Module* new_module = Module::CreateModule(m_construction_buffer_list[i].first, m_construction_buffer_list[i].second);
-
 			Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
 			new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front());
 			m_construction_buffer[i]->m_parents.front()->m_children.push_back(new_module);
 
 			//HACK PROTO
 			m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
-			
-		}
-		else
-		{
-			//HACK PROTO
-			if (m_construction_buffer[i]->m_parents.front()->m_moduleType == ModuleType_O)
-			{
-				m_construction_buffer[i]->m_parents.front()->GarbageMe = true;
-
-				Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
-				//hack: skipping the "dead" module
-				new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front()->m_parents.front());
-				m_construction_buffer[i]->m_parents.front()->m_parents.front()->m_children.push_back(new_module);
-				//m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
-			}
 		}
 	}
 

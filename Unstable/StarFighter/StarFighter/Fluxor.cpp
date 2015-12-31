@@ -8,11 +8,10 @@ void Fluxor::Initialize()
 {
 	m_guided = false;
 	m_docked = false;
+	m_isWasting = false;
 	m_flux = 0;
 	m_flux_max = 0;
 	m_isDisplayingFlux = false;
-
-	m_isWasting = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -45,18 +44,24 @@ Fluxor::Fluxor(FluxorType FluxorType)
 
 	Initialize();
 
-	//flux display
+	m_FluxorType = FluxorType;
+
+	//Type specific parameters
 	if (FluxorType == FluxorType_Green)
 	{
 		m_isDisplayingFlux = true;
-
 		m_isWasting = true;
 		m_flux_waste = FLUXOR_WASTE_VALUE;
 		m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+		m_flux = 10;
+		m_flux_max = 10;
 	}
-
-	m_FluxorType = FluxorType;
-	m_flux = FLUXOR_FLUX_VALUE;
+	else
+	{
+		m_isDisplayingFlux = false;
+		m_isWasting = false;
+		m_flux = FLUXOR_FLUX_VALUE;
+	}
 }
 
 Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -66,14 +71,13 @@ Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 {
-	Fluxor* new_Fluxor = (*CurrentGame).m_fluxor_list[FluxorType_Blue]->Clone();
+	Fluxor* new_Fluxor = new Fluxor(FluxorType);
 	
 	new_Fluxor->setPosition(RandomizePosition());
 	new_Fluxor->m_speed = RandomizeSpeed();
 	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
 
 	new_Fluxor->m_absolute_speed = GetAbsoluteSpeed(new_Fluxor->m_speed);
-	new_Fluxor->m_flux = FLUXOR_FLUX_VALUE;
 
 	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);
 	if (new_Fluxor->m_isDisplayingFlux)
@@ -108,6 +112,11 @@ Fluxor* Fluxor::Clone()
 
 void Fluxor::update(sf::Time deltaTime)
 {
+	if (m_flux > m_flux_max && m_flux_max > 0)
+	{
+		m_flux = m_flux_max;
+	}
+
 	if (visible)
 	{
 		if (!m_docked)

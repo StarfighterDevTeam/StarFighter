@@ -30,20 +30,16 @@ enum FluxorType
 
 enum ModuleType
 {
-	ModuleType_O,
-	ModuleType_A,
-	ModuleType_B,
-	ModuleType_C,
 	ModuleType_Generator,
-	ModuleType_Armory,
-	ModuleType_Battery,
+	ModuleType_Accelerator,
 	ModuleType_Relay,
+	ModuleType_Battery,
+	ModuleType_Amplifier,
 	ModuleType_Factory,
 	ModuleType_Shield,
 	ModuleType_Turret,
 	ModuleType_Switch,
-	ModuleType_Amplifier,
-	ModuleType_Accelerator,
+	ModuleType_Armory,
 	NBVAL_ModuleType,
 };
 
@@ -110,9 +106,6 @@ public:
 	bool isCellFree(sf::Vector2u grid_index);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
 	void ResolveProductionBufferList();
-
-	vector<Fluxor*> m_fluxor_list;
-	vector<Module*> m_module_list;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

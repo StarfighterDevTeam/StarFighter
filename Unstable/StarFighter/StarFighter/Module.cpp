@@ -8,10 +8,14 @@ using namespace sf;
 void Module::Initialize()
 {
 	m_flux = 0;
-	m_fluxor_generated = NULL;
+	m_flux_max = 1;
 	m_activated = false;
 	m_glow = new Glow(this, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->visible = false;
+
+	m_isGeneratingFluxor = false;
+	m_isConsummingFlux = false;
+	m_isRefillingFlux = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -38,23 +42,6 @@ Module::Module(ModuleType moduleType)
 {
 	std::string textureName;
 	m_moduleType = moduleType;
-
-	if (moduleType == ModuleType_O)
-	{
-		textureName = "Assets/2D/moduleO.png";
-	}
-	else if (moduleType == ModuleType_A)
-	{
-		textureName = "Assets/2D/moduleA.png";
-	}
-	else if (moduleType == ModuleType_B)
-	{
-		textureName = "Assets/2D/moduleB.png";
-	}
-	else
-	{
-		textureName = "Assets/2D/moduleC.png";
-	}
 
 	switch (moduleType)
 	{
@@ -117,6 +104,66 @@ Module::Module(ModuleType moduleType)
 	setOrigin(sf::Vector2f(W / 2, H / 2));
 
 	Initialize();
+
+	//type specific parameters
+	switch (moduleType)
+	{
+		case ModuleType_Generator:
+		{
+			m_flux_max = 100;
+			m_isGeneratingFluxor = true;
+			m_fluxor_generated_type = FluxorType_Green;
+			m_fluxor_generation_time = 3.f;
+			break;
+		}
+		case ModuleType_Armory:
+		{
+			m_flux_max = 100;
+			break;
+		}
+		case ModuleType_Battery:
+		{
+			m_flux_max = 1500;
+			m_isConsummingFlux = true;
+			break;
+		}
+		case ModuleType_Relay:
+		{
+			m_flux_max = 5;
+			m_isRefillingFlux = true;
+			break;
+		}
+		case ModuleType_Factory:
+		{
+			m_flux_max = 50;
+			break;
+		}
+		case ModuleType_Shield:
+		{
+			m_flux_max = 100;
+			break;
+		}
+		case ModuleType_Turret:
+		{
+			m_flux_max = 200;
+			break;
+		}
+		case ModuleType_Switch:
+		{
+			m_flux_max = 1;
+			break;
+		}
+		case ModuleType_Amplifier:
+		{
+			m_flux_max = 1;
+			break;
+		}
+		case ModuleType_Accelerator:
+		{
+			 m_flux_max = 1;
+			break;
+		}
+	}
 }
 
 Module* Module::Clone()
@@ -134,7 +181,7 @@ Module* Module::Clone()
 
 Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 {
-	Module* new_module = (*CurrentGame).m_module_list[moduleType]->Clone();
+	Module* new_module = new Module(moduleType);
 
 	grid_index.x--;
 	grid_index.y--;
@@ -143,32 +190,6 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	{
 		new_module->m_glow->setPosition(new_module->getPosition());
 	}
-
-	if (moduleType == ModuleType_O)
-	{
-		new_module->m_flux_max = MODULE_O_FLUX_MAX;
-	}
-	else if (moduleType == ModuleType_A)
-	{
-		new_module->m_flux_max = MODULE_A_FLUX_MAX;
-
-		//HACK PROTO
-		new_module->m_flux = 200;
-		new_module->m_fluxor_generated = (*CurrentGame).m_fluxor_list[FluxorType_Green];
-		new_module->m_fluxor_generated->m_flux = 10;
-		new_module->m_fluxor_spawn_time = 3.f;
-		new_module->m_fluxor_spawn_clock.restart();
-	}
-	else if (moduleType == ModuleType_B)
-	{
-		new_module->m_flux_max = MODULE_B_FLUX_MAX;
-	}
-	else
-	{
-		new_module->m_flux_max = MODULE_C_FLUX_MAX;
-	}
-
-	//new_module->m_glow = new Glow(new_module, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 
 	(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
 	(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
@@ -197,6 +218,11 @@ Module::~Module()
 
 void Module::update(sf::Time deltaTime)
 {
+	if (m_flux > m_flux_max && m_flux_max > 0)
+	{
+		m_flux = m_flux_max;
+	}
+
 	GameObject::update(deltaTime);
 
 	//update grid index
@@ -249,11 +275,13 @@ void Module::UpdateActivation()
 
 bool Module::GenerateFluxor()
 {
-	if (m_fluxor_generated && m_activated)
+	if (m_isGeneratingFluxor && m_activated)
 	{
-		if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_spawn_time)
+		if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 		{
-			Fluxor* fluxor = m_fluxor_generated->Clone();
+			Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+
+			//HACK
 			fluxor->m_speed = sf::Vector2f(100, 0);
 			fluxor->m_absolute_speed = 100;
 			fluxor->setPosition(getPosition());
@@ -284,22 +312,45 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			if (m_moduleType == ModuleType_Relay)
 			{
 				//example
-				if (m_flux < m_flux_max)
+		
+			}
+
+			//module "consumption"
+			if (m_isConsummingFlux)
+			{
+				if (m_flux < m_flux_max && fluxor->m_flux > 0)
 				{
 					m_flux++;
-					fluxor->m_flux++;
+					fluxor->m_flux--;
 					fluxor->m_docked = true;
-					if (m_fluxor_generated)
-					{
-						Fluxor* new_fluxor1 = (*CurrentGame).m_fluxor_list[FluxorType_Red]->Clone();
-						new_fluxor1->m_speed = (sf::Vector2f(0, 100));
-						m_fluxor_generation_buffer.push_back(new_fluxor1);
-					}
 				}
 				else
 				{
 					fluxor->m_docked = false;
 				}
+			}
+
+			//module "refill fluxor"
+			if (m_isRefillingFlux)
+			{
+				if (fluxor->m_flux < fluxor->m_flux_max  && m_flux > 0)
+				{
+					fluxor->m_flux++;
+					//m_flux--;
+					fluxor->m_docked = true;
+				}
+				else
+				{
+					fluxor->m_docked = false;
+				}
+			}
+
+			//module "factory"
+			if (m_isGeneratingFluxor)
+			{
+				Fluxor* new_fluxor = new Fluxor(m_fluxor_generated_type);
+				new_fluxor->m_speed = (sf::Vector2f(0, 100));
+				m_fluxor_generation_buffer.push_back(new_fluxor);
 			}
 		}
 	}

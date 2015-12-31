@@ -36,23 +36,10 @@ void InGameState::Initialize(Player player)
 	//Background
 	(*CurrentGame).map_size = sf::Vector2f(W, H);
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
-
-	//Loading data
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Modules");
-	for (int i = 0; i < NBVAL_ModuleType; i++)
-	{
-		ModuleType type = (ModuleType)i;
-		(*CurrentGame).m_module_list.push_back(new Module(type));
-	}
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Fluxors");
-	for (int i = 0; i < NBVAL_FluxorType; i++)
-	{
-		FluxorType type = (FluxorType)i;
-		(*CurrentGame).m_fluxor_list.push_back(new Fluxor(type));
-	}
 	
 	//HACK PROTO
-	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_A);
+	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator);
+	module->m_flux = 100;
 
 	//Spawning Fluxors
 	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
