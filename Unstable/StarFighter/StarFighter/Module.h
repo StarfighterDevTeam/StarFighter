@@ -44,11 +44,8 @@ public :
 	float m_fluxor_generation_time;
 	sf::Clock m_fluxor_spawn_clock;
 
-	//Flux transfer from and to Fluxors
+	//Flux transfer to Fluxors
 	float m_flux_transfer_delay;
-	sf::Clock m_flux_transfer_limiter_clock;
-	map<Fluxor*, unsigned int> m_module_to_fluxor_transfer_buffer;
-	void ManageTransfer(Fluxor* fluxor, unsigned int flux_to_transfer);
 
 	//Spawn
 	void ResolveProductionBufferList() override;

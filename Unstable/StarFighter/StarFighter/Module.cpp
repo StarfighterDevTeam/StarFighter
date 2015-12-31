@@ -334,7 +334,34 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			//module "refill fluxor"
 			if (m_isRefillingFlux)
 			{
-				ManageTransfer(fluxor, m_flux);
+				if (fluxor->m_flux < fluxor->m_flux_max && m_flux > 0)
+				{
+					if (fluxor->m_transfer_buffer == 0)
+					{
+						fluxor->m_transfer_buffer = m_flux;
+						fluxor->m_docked = true;
+						fluxor->m_flux_transfer_clock.restart();
+					}
+
+					if (fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
+					{
+
+						fluxor->m_flux++;
+						fluxor->m_transfer_buffer--;
+						fluxor->m_flux_transfer_clock.restart();
+						fluxor->m_flux_waste_clock.restart();
+					}
+
+					if (fluxor->m_transfer_buffer == 0)
+					{
+						fluxor->m_docked = false;
+					}
+				}
+				else
+				{
+					fluxor->m_docked = false;
+					fluxor->m_transfer_buffer = 0;
+				}
 			}
 
 			//module "factory"
@@ -344,77 +371,6 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				new_fluxor->m_speed = (sf::Vector2f(0, 100));
 				m_fluxor_generation_buffer.push_back(new_fluxor);
 			}
-		}
-	}
-}
-
-void Module::ManageTransfer(Fluxor* fluxor, unsigned int flux_to_transfer)
-{
-	//Fluxor already exists in known transfers?
-	map<Fluxor*, unsigned int>::iterator it = m_module_to_fluxor_transfer_buffer.find(fluxor);
-	if (it != this->m_module_to_fluxor_transfer_buffer.end())
-	{
-		//Conditions for transfer are valid?
-		if (fluxor->m_flux < fluxor->m_flux_max && m_flux > 0)
-		{
-			//manage transfer
-			if (m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
-			{
-				map<Fluxor*, unsigned int>::iterator it(m_module_to_fluxor_transfer_buffer.begin());
-				it->first->m_flux++;//transfer flux to Fluxor
-				it->second--;//substract from amount remaining to transfer
-				m_flux_transfer_limiter_clock.restart();
-				it->first->m_flux_waste_clock.restart();
-
-				//transfer finished?
-				if (it->second == 0)
-				{
-					//thanks bye
-					m_module_to_fluxor_transfer_buffer.erase(fluxor);
-					fluxor->m_docked = false;
-				}
-			}
-		}
-		//Conditions for transfer are invalid
-		else
-		{
-			//thanks bye
-			m_module_to_fluxor_transfer_buffer.erase(fluxor);
-			fluxor->m_docked = false;
-		}
-	}
-	//New Fluxor transfer
-	else
-	{
-		//Conditions for transfer are valid?
-		if (fluxor->m_flux < fluxor->m_flux_max && m_flux > 0)
-		{
-			//welcome
-			m_module_to_fluxor_transfer_buffer[fluxor] = flux_to_transfer;
-			fluxor->m_docked = true;
-			map<Fluxor*, unsigned int>::iterator it = m_module_to_fluxor_transfer_buffer.find(fluxor);
-
-			//manage transfer
-			if (m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
-			{
-				it->first->m_flux++;//transfer flux to Fluxor
-				it->second--;//substract from amount remaining to transfer
-				m_flux_transfer_limiter_clock.restart();
-				it->first->m_flux_waste_clock.restart();
-
-				//transfer finished?
-				if (it->second == 0)
-				{
-					//thanks bye
-					m_module_to_fluxor_transfer_buffer.erase(fluxor);
-					fluxor->m_docked = false;
-				}
-			}
-		}
-		else
-		{
-			//thanks bye, no need to subscribe
-			fluxor->m_docked = false;
 		}
 	}
 }

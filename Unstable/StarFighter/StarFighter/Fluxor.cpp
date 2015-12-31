@@ -12,6 +12,7 @@ void Fluxor::Initialize()
 	m_flux = 0;
 	m_flux_max = 0;
 	m_isDisplayingFlux = false;
+	m_transfer_buffer = 0;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);

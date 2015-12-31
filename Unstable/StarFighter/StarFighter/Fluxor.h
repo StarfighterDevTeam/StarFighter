@@ -47,6 +47,9 @@ public :
 	sf::Clock m_flux_waste_clock;
 	void WastingFlux();
 
+	unsigned int m_transfer_buffer;
+	sf::Clock m_flux_transfer_clock;
+
 	//HUD
 	sf::Text m_flux_text;
 };
