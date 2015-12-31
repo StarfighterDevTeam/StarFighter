@@ -16,6 +16,7 @@ void Module::Initialize()
 	m_isGeneratingFluxor = false;
 	m_isConsummingFlux = false;
 	m_isRefillingFlux = false;
+	m_flux_transfer_delay = 0.1f;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -113,7 +114,7 @@ Module::Module(ModuleType moduleType)
 			m_flux_max = 100;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Green;
-			m_fluxor_generation_time = 3.f;
+			m_fluxor_generation_time = 6.f;
 			break;
 		}
 		case ModuleType_Armory:
@@ -333,15 +334,76 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			//module "refill fluxor"
 			if (m_isRefillingFlux)
 			{
-				if (fluxor->m_flux < fluxor->m_flux_max  && m_flux > 0)
+				//Fluxor already exists in known transfers?
+				map<Fluxor*, unsigned int>::iterator it = m_module_to_fluxor_transfer_buffer.find(fluxor);
+				if (it != this->m_module_to_fluxor_transfer_buffer.end())
 				{
-					fluxor->m_flux++;
-					//m_flux--;
-					fluxor->m_docked = true;
+					//Conditions for transfer are valid?
+					if (fluxor->m_flux < fluxor->m_flux_max && m_flux > 0)
+					{
+						//manage transfer
+						if (m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
+						{
+							map<Fluxor*, unsigned int>::iterator it(m_module_to_fluxor_transfer_buffer.begin());
+							printf("flux avant:%d", it->first->m_flux);
+							it->first->m_flux++;//transfer flux to Fluxor
+							printf(" | flux apres:%d", it->first->m_flux);
+							it->second--;//substract from amount remaining to transfer
+							printf(" | remaining:%d\n", it->second);
+							m_flux_transfer_limiter_clock.restart();
+							it->first->m_flux_waste_clock.restart();
+
+							//transfer finished?
+							if (it->second == 0)
+							{
+								//thanks bye
+								m_module_to_fluxor_transfer_buffer.erase(fluxor);
+								fluxor->m_docked = false;
+							}
+						}
+					}
+					//Conditions for transfer are invalid
+					else
+					{
+						//thanks bye
+						m_module_to_fluxor_transfer_buffer.erase(fluxor);
+						fluxor->m_docked = false;
+					}
 				}
+				//New Fluxor transfer
 				else
 				{
-					fluxor->m_docked = false;
+					//Conditions for transfer are valid?
+					if (fluxor->m_flux < fluxor->m_flux_max && m_flux > 0)
+					{
+						//welcome
+						m_module_to_fluxor_transfer_buffer[fluxor] = m_flux;
+						fluxor->m_docked = true;
+						map<Fluxor*, unsigned int>::iterator it = m_module_to_fluxor_transfer_buffer.find(fluxor);
+
+						//manage transfer
+						if (m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
+						{
+							it->first->m_flux++;//transfer flux to Fluxor
+							printf("remaining:%d\n", it->second);
+							it->second--;//substract from amount remaining to transfer
+							m_flux_transfer_limiter_clock.restart();
+							it->first->m_flux_waste_clock.restart();
+
+							//transfer finished?
+							if (it->second == 0)
+							{
+								//thanks bye
+								m_module_to_fluxor_transfer_buffer.erase(fluxor);
+								fluxor->m_docked = false;
+							}
+						}
+					}
+					else
+					{
+						//thanks bye, no need to subscribe
+						fluxor->m_docked = false;
+					}
 				}
 			}
 

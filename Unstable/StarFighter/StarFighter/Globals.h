@@ -62,10 +62,6 @@
 #define MODULE_GLOW_MIN_RADIUS						10
 #define MODULE_GLOW_RADIUS							30
 #define MODULE_GLOW_ANIMATION_DURATION				0.5f
-#define MODULE_A_FLUX_MAX							200
-#define MODULE_B_FLUX_MAX							50
-#define MODULE_C_FLUX_MAX							100
-#define MODULE_O_FLUX_MAX							10
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

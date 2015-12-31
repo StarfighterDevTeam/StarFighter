@@ -326,6 +326,7 @@ void Fluxor::WastingFlux()
 			}
 
 			m_flux_waste_clock.restart();
+			printf("waste\n");
 		}
 	}
 }
