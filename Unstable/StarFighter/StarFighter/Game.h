@@ -109,7 +109,7 @@ public:
 	bool isCellFree(sf::Vector2f position);
 	bool isCellFree(sf::Vector2u grid_index);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
-	void ResolveConstructionBufferList();
+	void ResolveProductionBufferList();
 
 	vector<Fluxor*> m_fluxor_list;
 	vector<Module*> m_module_list;

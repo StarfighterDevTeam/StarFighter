@@ -67,7 +67,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 {
 	this->m_animationNumber = animationNumber;
 	this->m_frameNumber = frameNumber;
-	this->initial_position = sf::Vector2f(position.x, position.y);
+	this->m_initial_position = sf::Vector2f(position.x, position.y);
 	this->m_size.x = ((*texture).getSize().x / frameNumber);
 	this->m_size.y = ((*texture).getSize().y / animationNumber);
 
@@ -131,6 +131,7 @@ GameObject::~GameObject()
 
 void GameObject::update(sf::Time deltaTime)
 {
+	m_initial_position = getPosition();
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = this->m_speed;
 	
@@ -447,7 +448,7 @@ int GameObject::GaussianBlurDistribution(int x)
 //FLUX SPECIFIC
 void GameObject::GetFluxor(GameObject* object)
 {
-	//see override function in class Ship
+	//see override function in class Ship and class Module
 }
 
 void GameObject::GetModule(GameObject* object)
@@ -455,7 +456,7 @@ void GameObject::GetModule(GameObject* object)
 	//see override function in class Ship
 }
 
-void GameObject::ResolveConstructionBufferList()
+void GameObject::ResolveProductionBufferList()
 {
 	//see override function in class Ship
 }

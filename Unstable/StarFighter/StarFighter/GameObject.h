@@ -88,6 +88,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+	sf::Vector2f m_initial_position;
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();
@@ -118,10 +119,9 @@ public:
 	//FLUX SPECIFIC
 	virtual void GetFluxor(GameObject* object);
 	virtual void GetModule(GameObject* object);
-	virtual void ResolveConstructionBufferList();
+	virtual void ResolveProductionBufferList();
 
 protected:
-	sf::Vector2f initial_position;
 	Animation defaultAnimation;
 	Animation* currentAnimation;
 

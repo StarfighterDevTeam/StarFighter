@@ -17,6 +17,7 @@ public :
 	Module* Clone();
 	virtual ~Module();
 	void update(sf::Time deltaTime) override;
+	void GetFluxor(GameObject* object) override;
 
 	ModuleType m_moduleType;
 	unsigned int m_flux;
@@ -36,6 +37,13 @@ public :
 
 	//Activation
 	void UpdateActivation();
+
+	//Module properties
+	void ApplyModuleEffect(Fluxor* fluxor);
+
+	//Spawn
+	void ResolveProductionBufferList() override;
+	vector<Fluxor*> m_fluxor_generation_buffer;
 
 	//HUD
 	sf::Text m_flux_text;

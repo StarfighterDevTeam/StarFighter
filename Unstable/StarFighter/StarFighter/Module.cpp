@@ -192,7 +192,7 @@ Module::~Module()
 
 void Module::update(sf::Time deltaTime)
 {
-	AnimatedSprite::update(deltaTime);
+	GameObject::update(deltaTime);
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
@@ -208,6 +208,18 @@ void Module::update(sf::Time deltaTime)
 	ss << m_flux << "/" << m_flux_max;
 	m_flux_text.setString(ss.str());
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
+}
+
+void Module::GetFluxor(GameObject* object)
+{
+	if (object)
+	{
+		if (m_flux < m_flux_max)
+		{
+			Fluxor* fluxor = (Fluxor*)object;
+			ApplyModuleEffect(fluxor);
+		}
+	}
 }
 
 void Module::UpdateActivation()
@@ -254,4 +266,48 @@ bool Module::GenerateFluxor()
 	}
 
 	return false;
+}
+
+void Module::ApplyModuleEffect(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (fluxor->m_FluxorType == FluxorType_Green)
+		{
+			if (m_moduleType == ModuleType_Relay)
+			{
+				//example
+				if (m_flux < m_flux_max)
+				{
+					m_flux++;
+					fluxor->m_flux++;
+					fluxor->m_docked = true;
+					if (m_fluxor_generated)
+					{
+						Fluxor* new_fluxor1 = (*CurrentGame).m_fluxor_list[FluxorType_Red]->Clone();
+						new_fluxor1->m_speed = (sf::Vector2f(0, 100));
+						m_fluxor_generation_buffer.push_back(new_fluxor1);
+					}
+				}
+				else
+				{
+					fluxor->m_docked = false;
+				}
+			}
+		}
+	}
+}
+
+void Module::ResolveProductionBufferList()
+{
+	size_t fluxorGenerationBufferSize = m_fluxor_generation_buffer.size();
+	if (fluxorGenerationBufferSize > 0)
+	{
+		for (size_t i = 0; i < fluxorGenerationBufferSize; i++)
+		{
+			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, FluxorObject);
+		}
+
+		m_fluxor_generation_buffer.clear();
+	}
 }

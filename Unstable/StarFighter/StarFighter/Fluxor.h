@@ -37,6 +37,7 @@ public :
 	float m_respawn_time;
 
 	bool m_guided;
+	bool m_docked;
 
 };
 

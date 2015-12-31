@@ -7,6 +7,7 @@ using namespace sf;
 void Fluxor::Initialize()
 {
 	m_guided = false;
+	m_docked = false;
 }
 
 Fluxor::Fluxor()
@@ -77,23 +78,30 @@ void Fluxor::update(sf::Time deltaTime)
 {
 	if (visible)
 	{
-		//chaos turns
-		if (!m_guided)
+		if (!m_docked)
 		{
-			if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
+			//chaos turns
+			if (!m_guided)
 			{
-				ChaosTurns();
+				if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
+				{
+					ChaosTurns();
+				}
 			}
-		}
 
-		if (ScreenBorderContraints())
+			if (ScreenBorderContraints())
+			{
+				m_turn_clock.restart();
+			}
+
+			UpdateRotation();
+
+			GameObject::update(deltaTime);
+		}
+		else
 		{
-			m_turn_clock.restart();
+			AnimatedSprite::update(deltaTime);
 		}
-
-		UpdateRotation();
-
-		GameObject::update(deltaTime);
 	}
 	else//if dead
 	{
@@ -102,7 +110,6 @@ void Fluxor::update(sf::Time deltaTime)
 			Respawn();
 		}
 	}
-	
 }
 
 float Fluxor::RandomizeTurnDelay()

@@ -161,7 +161,7 @@ void Game::updateScene(Time deltaTime)
 
 	//Checking colisions
 	colisionChecksV2();
-	ResolveConstructionBufferList();//must be done after collision checks
+	ResolveProductionBufferList();//must be done after collision checks
 
 	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
 
@@ -179,7 +179,7 @@ void Game::updateScene(Time deltaTime)
 	mainScreen.setView(view);
 }
 
-void Game::ResolveConstructionBufferList()
+void Game::ResolveProductionBufferList()
 {
 	size_t scenePlayerShipsVectorSize = this->sceneGameObjectsTyped[PlayerShip].size();
 	for (size_t i = 0; i < scenePlayerShipsVectorSize; i++)
@@ -187,7 +187,16 @@ void Game::ResolveConstructionBufferList()
 		if (this->sceneGameObjectsTyped[PlayerShip][i] == NULL)
 			continue;
 		
-		this->sceneGameObjectsTyped[PlayerShip][i]->ResolveConstructionBufferList();
+		this->sceneGameObjectsTyped[PlayerShip][i]->ResolveProductionBufferList();
+	}
+
+	size_t sceneModulesVectorSize = this->sceneGameObjectsTyped[ModuleObject].size();
+	for (size_t i = 0; i < sceneModulesVectorSize; i++)
+	{
+		if (this->sceneGameObjectsTyped[ModuleObject][i] == NULL)
+			continue;
+
+		this->sceneGameObjectsTyped[ModuleObject][i]->ResolveProductionBufferList();
 	}
 }
 
@@ -235,7 +244,7 @@ void Game::colisionChecksV2()
 	sf::Clock dt;
 	dt.restart();
 
-	//First, Checks if the ship has been touched by an enemy/enemy bullet
+	//Player interactions with modules and fluxors
 	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[PlayerShip].begin(); it1 != sceneGameObjectsTyped[PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
@@ -264,6 +273,26 @@ void Game::colisionChecksV2()
 			{
 				//Do something 
 				(*it1)->GetModule(*it2);
+			}
+		}
+	}
+
+	//Fluxors interactions with Modules
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[FluxorObject].begin(); it1 != sceneGameObjectsTyped[FluxorObject].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		//Player eating Fluxor
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[ModuleObject].begin(); it2 != sceneGameObjectsTyped[ModuleObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (GameObject::DistancePointToSement((*it2)->getPosition().x, (*it2)->getPosition().y, (*it1)->m_initial_position.x, (*it1)->m_initial_position.y, (*it1)->getPosition().x, (*it1)->getPosition().y) == 0)
+			{
+				//Do something 
+				(*it2)->GetFluxor(*it1);
 			}
 		}
 	}

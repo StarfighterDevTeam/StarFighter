@@ -50,7 +50,7 @@
 #define FLUXOR_SPEED_MAX							500
 #define FLUXOR_TURN_MIN_DELAY						0.5f
 #define FLUXOR_TURN_MAX_DELAY						3.f
-#define FLUXOR_MAX_POPULATION						50
+#define FLUXOR_MAX_POPULATION						100
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
 #define FLUXOR_RESPAWN_MAX_TIME						60.f
 

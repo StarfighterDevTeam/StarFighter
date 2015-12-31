@@ -307,7 +307,7 @@ void Ship::GetModule(GameObject* object)
 	}
 }
 
-void Ship::ResolveConstructionBufferList()
+void Ship::ResolveProductionBufferList()
 {
 	size_t constructionBufferSize = m_construction_buffer.size();
 	for (size_t i = 0; i < constructionBufferSize; i++)
