@@ -8,8 +8,11 @@ void Fluxor::Initialize()
 {
 	m_guided = false;
 	m_docked = false;
+	m_flux = 0;
 	m_flux_max = 0;
 	m_isDisplayingFlux = false;
+
+	m_isWasting = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -46,6 +49,10 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	if (FluxorType == FluxorType_Green)
 	{
 		m_isDisplayingFlux = true;
+
+		m_isWasting = true;
+		m_flux_waste = FLUXOR_WASTE_VALUE;
+		m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 	}
 
 	m_FluxorType = FluxorType;
@@ -92,6 +99,9 @@ Fluxor* Fluxor::Clone()
 	clone->m_isDisplayingFlux = this->m_isDisplayingFlux;
 	clone->m_flux = this->m_flux;
 	clone->m_flux_max = this->m_flux_max;
+	clone->m_isWasting = this->m_isWasting;
+	clone->m_flux_waste = this->m_flux_waste;
+	clone->m_flux_waste_delay = this->m_flux_waste_delay;
 
 	return clone;
 }
@@ -102,6 +112,9 @@ void Fluxor::update(sf::Time deltaTime)
 	{
 		if (!m_docked)
 		{
+			//flux waste
+			WastingFlux();
+
 			//chaos turns
 			if (!m_guided)
 			{
@@ -123,6 +136,12 @@ void Fluxor::update(sf::Time deltaTime)
 		else
 		{
 			AnimatedSprite::update(deltaTime);
+		}
+
+		//death by flux consumption
+		if (m_flux <= 0)
+		{
+			GarbageMe = true;
 		}
 
 		//hud
@@ -285,12 +304,19 @@ void Fluxor::Respawn()
 	m_turn_clock.restart();
 }
 
-void Fluxor::SetFluxTextVisibility(bool visible)
+void Fluxor::WastingFlux()
 {
-	if (visible)
-		(*CurrentGame).addToFeedbacks(&m_flux_text);
-	else
-		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+	if (m_isWasting)
+	{
+		if (m_flux_waste_clock.getElapsedTime().asSeconds() > m_flux_waste_delay)
+		{
+			m_flux -= m_flux_waste;
+			if (m_flux < 0)
+			{
+				m_flux = 0;
+			}
 
-	m_isDisplayingFlux = visible;
+			m_flux_waste_clock.restart();
+		}
+	}
 }

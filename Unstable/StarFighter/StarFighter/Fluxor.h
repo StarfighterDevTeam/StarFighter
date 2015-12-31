@@ -40,11 +40,15 @@ public :
 	bool m_guided;
 	bool m_docked;
 	bool m_isDisplayingFlux;
-	void SetFluxTextVisibility(bool visible);
+
+	bool m_isWasting;
+	int m_flux_waste;
+	float m_flux_waste_delay;
+	sf::Clock m_flux_waste_clock;
+	void WastingFlux();
 
 	//HUD
 	sf::Text m_flux_text;
-
 };
 
 #endif // FLUXOR_H_INCLUDED

@@ -115,6 +115,8 @@ Module::Module(ModuleType moduleType)
 
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
 	setOrigin(sf::Vector2f(W / 2, H / 2));
+
+	Initialize();
 }
 
 Module* Module::Clone()
@@ -154,7 +156,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 		new_module->m_flux = 200;
 		new_module->m_fluxor_generated = (*CurrentGame).m_fluxor_list[FluxorType_Green];
 		new_module->m_fluxor_generated->m_flux = 10;
-		new_module->m_fluxor_spawn_time = 1.f;
+		new_module->m_fluxor_spawn_time = 3.f;
 		new_module->m_fluxor_spawn_clock.restart();
 	}
 	else if (moduleType == ModuleType_B)
@@ -217,11 +219,8 @@ void Module::GetFluxor(GameObject* object)
 {
 	if (object)
 	{
-		if (m_flux < m_flux_max)
-		{
-			Fluxor* fluxor = (Fluxor*)object;
-			ApplyModuleEffect(fluxor);
-		}
+		Fluxor* fluxor = (Fluxor*)object;
+		ApplyModuleEffect(fluxor);	
 	}
 }
 

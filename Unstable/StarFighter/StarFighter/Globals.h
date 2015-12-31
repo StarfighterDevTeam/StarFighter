@@ -54,6 +54,8 @@
 #define FLUXOR_MAX_POPULATION						100
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
 #define FLUXOR_RESPAWN_MAX_TIME						60.f
+#define FLUXOR_WASTE_DELAY							0.5f
+#define FLUXOR_WASTE_VALUE							1
 
 //MODULE
 #define MODULE_FLUX_DISPLAY_OFFSET_Y				- 24
