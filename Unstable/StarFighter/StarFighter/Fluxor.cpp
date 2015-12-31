@@ -4,9 +4,14 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
+void Fluxor::Initialize()
+{
+	m_guided = false;
+}
+
 Fluxor::Fluxor()
 {
-	
+	Initialize();
 }
 
 Fluxor::Fluxor(FluxorType FluxorType)
@@ -25,47 +30,27 @@ Fluxor::Fluxor(FluxorType FluxorType)
 
 	m_FluxorType = FluxorType;
 	m_flux = FLUXOR_FLUX_VALUE;
-	m_guided = false;
-
+	
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
 	setOrigin(sf::Vector2f(W / 2, H / 2));
+
+	Initialize();
 }
 
 Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-
+	Initialize();
 }
 
 Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 {
-	//texture
-	//std::string textureName;
-	//if (FluxorType == FluxorType_Blue)
-	//	textureName = "Assets/2D/fluxor_blue.png";
-	//if (FluxorType == FluxorType_Green)
-	//	textureName = "Assets/2D/fluxor_green.png";
-	//if (FluxorType == FluxorType_Red)
-	//	textureName = "Assets/2D/fluxor_red.png";
-	//
-	//const unsigned int W = FLUXOR_WIDTH;
-	//const unsigned int H = FLUXOR_HEIGHT;
-
-	//speed and direction
-	float absolute_speed = RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_SPEED_MIN, FLUXOR_SPEED_MAX));
-	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	sf::Vector2f speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(absolute_speed, angle);
-
-	//position
-	sf::Vector2f position = RandomizePosition();
-
 	Fluxor* new_Fluxor = (*CurrentGame).m_fluxor_list[FluxorType_Blue]->Clone();
-	new_Fluxor->setPosition(position);
-	new_Fluxor->m_speed = speed;
-
-	//turn delay
+	
+	new_Fluxor->setPosition(RandomizePosition());
+	new_Fluxor->m_speed = RandomizeSpeed();
 	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
-	new_Fluxor->m_absolute_speed = absolute_speed;
 
+	new_Fluxor->m_absolute_speed = GetAbsoluteSpeed(new_Fluxor->m_speed);
 	new_Fluxor->m_flux = FLUXOR_FLUX_VALUE;
 
 	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);

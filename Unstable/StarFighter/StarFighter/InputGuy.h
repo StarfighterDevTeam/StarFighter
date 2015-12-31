@@ -29,6 +29,17 @@ public:
 	static bool isChangingResolution();
 	static bool isUsingDebugCommand();
 	static bool isRestartingScript();
+
+	static bool isSpawningModule1();
+	static bool isSpawningModule2();
+	static bool isSpawningModule3();
+	static bool isSpawningModule4();
+	static bool isSpawningModule5();
+	static bool isSpawningModule6();
+	static bool isSpawningModule7();
+	static bool isSpawningModule8();
+	static bool isSpawningModule9();
+	static bool isSpawningModule0();
 };
 
 

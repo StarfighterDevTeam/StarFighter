@@ -77,6 +77,49 @@ void Ship::update(sf::Time deltaTime)
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
+
+
+	//DEBUG
+	if (InputGuy::isSpawningModule1())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 1 - 1));
+	}
+	if (InputGuy::isSpawningModule2())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 2 - 1));
+	}
+	if (InputGuy::isSpawningModule3())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 3 - 1));
+	}
+	if (InputGuy::isSpawningModule4())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 4 - 1));
+	}
+	if (InputGuy::isSpawningModule5())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 5 - 1));
+	}
+	if (InputGuy::isSpawningModule6())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 6 - 1));
+	}
+	if (InputGuy::isSpawningModule7())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 7 - 1));
+	}
+	if (InputGuy::isSpawningModule8())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 8 - 1));
+	}
+	if (InputGuy::isSpawningModule9())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 9 - 1));
+	}
+	if (InputGuy::isSpawningModule0())
+	{
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 0 - 1));
+	}
 }
 
 void Ship::ScreenBorderContraints()

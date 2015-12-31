@@ -197,3 +197,45 @@ Vector2f InputGuy::getDirections(ControlerType device)
 
 	return Vector2f(x, y);
 }
+
+//DEBUG - FLUX SPECIFIC
+bool InputGuy::isSpawningModule1()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num1);
+}
+bool InputGuy::isSpawningModule2()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num2);
+}
+bool InputGuy::isSpawningModule3()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num3);
+}
+bool InputGuy::isSpawningModule4()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num4);
+}
+bool InputGuy::isSpawningModule5()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num5);
+}
+bool InputGuy::isSpawningModule6()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num6);
+}
+bool InputGuy::isSpawningModule7()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num7);
+}
+bool InputGuy::isSpawningModule8()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num8);
+}
+bool InputGuy::isSpawningModule9()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num9);
+}
+bool InputGuy::isSpawningModule0()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num0);
+}

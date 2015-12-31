@@ -62,6 +62,15 @@ void Game::init(RenderWindow* window)
 		m_curMusic.play();
 		m_curMusic.setLoop(true);
 	}
+
+	//FLUX SPECIFIC
+	for (int i = 0; i < GRID_WIDTH; i++)
+	{
+		for (int j = 0; j < GRID_HEIGHT; j++)
+		{
+			m_module_grid[i][j] = NULL;
+		}
+	}
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -411,22 +420,24 @@ bool Game::isCellFree(sf::Vector2u grid_index)
 	//	}
 	//}
 
-	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[ModuleObject].begin(); it != sceneGameObjectsTyped[ModuleObject].end(); it++)
-	{
-		if (*it == NULL)
-			continue;
+	return !m_module_grid[grid_index.x][grid_index.y];
 
-		if ((*it)->visible)
-		{
-			sf::Vector2u module_grid_index = GetGridIndex((*it)->getPosition());
-			if (module_grid_index == grid_index)
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
+	//for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[ModuleObject].begin(); it != sceneGameObjectsTyped[ModuleObject].end(); it++)
+	//{
+	//	if (*it == NULL)
+	//		continue;
+	//
+	//	if ((*it)->visible)
+	//	{
+	//		sf::Vector2u module_grid_index = GetGridIndex((*it)->getPosition());
+	//		if (module_grid_index == grid_index)
+	//		{
+	//			return false;
+	//		}
+	//	}
+	//}
+	//
+	//return true;
 }
 
 sf::Vector2u Game::GetGridIndex(sf::Vector2f position)

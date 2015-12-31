@@ -32,6 +32,8 @@
 #define DEFAULT_SFX_VOLUME							100
 
 //FLUX SPECIFIC
+#define GRID_WIDTH									50
+#define GRID_HEIGHT									50
 #define TILE_SIZE									128
 #define FLUX_TRANSFER_LIMITER_TIME					0.1f
 

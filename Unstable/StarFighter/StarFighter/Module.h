@@ -34,6 +34,9 @@ public :
 	float m_fluxor_spawn_time;
 	sf::Clock m_fluxor_spawn_clock;
 
+	//Activation
+	void UpdateActivation();
+
 	//HUD
 	sf::Text m_flux_text;
 };

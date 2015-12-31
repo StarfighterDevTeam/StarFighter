@@ -34,6 +34,16 @@ enum ModuleType
 	ModuleType_A,
 	ModuleType_B,
 	ModuleType_C,
+	ModuleType_Generator,
+	ModuleType_Armory,
+	ModuleType_Battery,
+	ModuleType_Relay,
+	ModuleType_Factory,
+	ModuleType_Shield,
+	ModuleType_Turret,
+	ModuleType_Switch,
+	ModuleType_Amplifier,
+	ModuleType_Accelerator,
 	NBVAL_ModuleType,
 };
 
@@ -72,7 +82,6 @@ public:
 	sf::View view;
 	sf::Vector2f map_size;
 
-
 	//utilitary methods
 	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
 	GameObject* GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object);
@@ -96,6 +105,7 @@ public:
 	void SetMusicVolume(bool activate_music);
 
 	//FLUX SPECIFIC
+	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
 	bool isCellFree(sf::Vector2f position);
 	bool isCellFree(sf::Vector2u grid_index);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);

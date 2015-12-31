@@ -14,8 +14,8 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene((*CurrentGame).playerShip, PlayerShipLayer, PlayerShip);
 
 	//Fake grid construction
-	const unsigned int grid_width = 30;
-	const unsigned int grid_height = 40;
+	const unsigned int grid_width = GRID_WIDTH;
+	const unsigned int grid_height = GRID_HEIGHT;
 	const unsigned int tile_width = TILE_SIZE;
 	const unsigned int tile_height = TILE_SIZE;
 	const unsigned int W = grid_width * tile_width;

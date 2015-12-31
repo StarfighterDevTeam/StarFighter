@@ -9,6 +9,9 @@ void Module::Initialize()
 {
 	m_flux = 0;
 	m_fluxor_generated = NULL;
+	m_activated = false;
+	m_glow = new Glow(this, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
+	m_glow->visible = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -19,8 +22,6 @@ void Module::Initialize()
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
-
-	m_activated = false;
 }
 
 Module::Module()
@@ -54,6 +55,60 @@ Module::Module(ModuleType moduleType)
 	{
 		textureName = "Assets/2D/moduleC.png";
 	}
+
+	switch (moduleType)
+	{
+		case ModuleType_Generator:
+		{
+			textureName = "Assets/2D/module_generator.png";
+			break;
+		}
+		case ModuleType_Armory:
+		{
+			textureName = "Assets/2D/module_armory.png";
+			break;
+		}
+		case ModuleType_Battery:
+		{
+			textureName = "Assets/2D/module_battery.png";
+			break;
+		}
+		case ModuleType_Relay:
+		{
+			textureName = "Assets/2D/module_relay.png";
+			break;
+		}
+		case ModuleType_Factory:
+		{
+			textureName = "Assets/2D/module_factory.png";
+			break;
+		}
+		case ModuleType_Shield:
+		{
+			textureName = "Assets/2D/module_shield.png";
+			break;
+		}
+		case ModuleType_Turret:
+		{
+			textureName = "Assets/2D/module_turret.png";
+			break;
+		}
+		case ModuleType_Switch:
+		{
+			textureName = "Assets/2D/module_switch.png";
+			break;
+		}
+		case ModuleType_Amplifier:
+		{
+			textureName = "Assets/2D/module_amplifier.png";
+			break;
+		}
+		case ModuleType_Accelerator:
+		{
+			textureName = "Assets/2D/module_accelerator.png";
+			break;
+		}
+	}
 	
 	const unsigned int W = TILE_SIZE;
 	const unsigned int H = TILE_SIZE;
@@ -80,6 +135,10 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	grid_index.x--;
 	grid_index.y--;
 	new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
+	if (new_module->m_glow)
+	{
+		new_module->m_glow->setPosition(new_module->getPosition());
+	}
 
 	if (moduleType == ModuleType_O)
 	{
@@ -104,10 +163,18 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 		new_module->m_flux_max = MODULE_C_FLUX_MAX;
 	}
 
-	new_module->m_glow = new Glow(new_module, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
+	//new_module->m_glow = new Glow(new_module, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 
 	(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
 	(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
+
+	//update game grid knownledge
+	if (!(*CurrentGame).isCellFree(grid_index))
+	{
+		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
+	}
+	(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = (GameObject*)new_module;
+
 
 	return new_module;
 }
@@ -116,6 +183,11 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 Module::~Module()
 {
 	(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+	if (m_glow)
+	{
+		m_glow->visible = false;
+		m_glow->GarbageMe = true;
+	}
 }
 
 void Module::update(sf::Time deltaTime)
@@ -126,6 +198,20 @@ void Module::update(sf::Time deltaTime)
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
 	//update activation
+	UpdateActivation();
+
+	//fluxor generation
+	GenerateFluxor();
+	
+	//hud
+	ostringstream ss;
+	ss << m_flux << "/" << m_flux_max;
+	m_flux_text.setString(ss.str());
+	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
+}
+
+void Module::UpdateActivation()
+{
 	if (!m_parents.empty())
 	{
 		bool parent_activated = false;
@@ -145,15 +231,6 @@ void Module::update(sf::Time deltaTime)
 		m_activated = m_flux == m_flux_max;
 	}
 	m_glow->visible = m_activated;
-
-	//fluxor generation
-	GenerateFluxor();
-	
-	//hud
-	ostringstream ss;
-	ss << m_flux << "/" << m_flux_max;
-	m_flux_text.setString(ss.str());
-	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
 }
 
 bool Module::GenerateFluxor()
