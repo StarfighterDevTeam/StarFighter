@@ -8,6 +8,14 @@ void Fluxor::Initialize()
 {
 	m_guided = false;
 	m_docked = false;
+	m_flux_max = 0;
+	m_isDisplayingFlux = false;
+
+	//Flux display
+	m_flux_text.setFont(*(*CurrentGame).font2);
+	m_flux_text.setCharacterSize(20);
+	m_flux_text.setColor(sf::Color::White);
+	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
 }
 
 Fluxor::Fluxor()
@@ -28,14 +36,20 @@ Fluxor::Fluxor(FluxorType FluxorType)
 
 	const unsigned int W = FLUXOR_WIDTH;
 	const unsigned int H = FLUXOR_HEIGHT;
-
-	m_FluxorType = FluxorType;
-	m_flux = FLUXOR_FLUX_VALUE;
-	
+		
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
 	setOrigin(sf::Vector2f(W / 2, H / 2));
 
 	Initialize();
+
+	//flux display
+	if (FluxorType == FluxorType_Green)
+	{
+		m_isDisplayingFlux = true;
+	}
+
+	m_FluxorType = FluxorType;
+	m_flux = FLUXOR_FLUX_VALUE;
 }
 
 Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -55,13 +69,18 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	new_Fluxor->m_flux = FLUXOR_FLUX_VALUE;
 
 	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);
+	if (new_Fluxor->m_isDisplayingFlux)
+	{
+		(*CurrentGame).addToFeedbacks(&new_Fluxor->m_flux_text);
+	}
 
 	return new_Fluxor;
 }
 
 Fluxor::~Fluxor()
 {
-	
+	if (m_isDisplayingFlux)
+		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
 }
 
 Fluxor* Fluxor::Clone()
@@ -70,6 +89,9 @@ Fluxor* Fluxor::Clone()
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
 	clone->m_FluxorType = this->m_FluxorType;
+	clone->m_isDisplayingFlux = this->m_isDisplayingFlux;
+	clone->m_flux = this->m_flux;
+	clone->m_flux_max = this->m_flux_max;
 
 	return clone;
 }
@@ -101,6 +123,17 @@ void Fluxor::update(sf::Time deltaTime)
 		else
 		{
 			AnimatedSprite::update(deltaTime);
+		}
+
+		//hud
+		if (m_isDisplayingFlux)
+		{
+			ostringstream ss;
+			ss << m_flux;
+			if (m_flux_max > 0)
+				ss << "/" << m_flux_max;
+			m_flux_text.setString(ss.str());
+			m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
 		}
 	}
 	else//if dead
@@ -250,4 +283,14 @@ void Fluxor::Respawn()
 
 	visible = true;
 	m_turn_clock.restart();
+}
+
+void Fluxor::SetFluxTextVisibility(bool visible)
+{
+	if (visible)
+		(*CurrentGame).addToFeedbacks(&m_flux_text);
+	else
+		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+
+	m_isDisplayingFlux = visible;
 }

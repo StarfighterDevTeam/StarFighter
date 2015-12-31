@@ -30,6 +30,7 @@ public :
 	sf::Clock m_turn_clock;
 	float m_absolute_speed;
 	unsigned int m_flux;
+	unsigned int m_flux_max;
 
 	void Respawn();
 	void Death();
@@ -38,6 +39,11 @@ public :
 
 	bool m_guided;
 	bool m_docked;
+	bool m_isDisplayingFlux;
+	void SetFluxTextVisibility(bool visible);
+
+	//HUD
+	sf::Text m_flux_text;
 
 };
 

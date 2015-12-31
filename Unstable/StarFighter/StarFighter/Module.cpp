@@ -124,6 +124,8 @@ Module* Module::Clone()
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
 	clone->m_moduleType = this->m_moduleType;
+	clone->m_flux = this->m_flux;
+	clone->m_flux_max = this->m_flux_max;
 
 	return clone;
 }
@@ -151,6 +153,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 		//HACK PROTO
 		new_module->m_flux = 200;
 		new_module->m_fluxor_generated = (*CurrentGame).m_fluxor_list[FluxorType_Green];
+		new_module->m_fluxor_generated->m_flux = 10;
 		new_module->m_fluxor_spawn_time = 1.f;
 		new_module->m_fluxor_spawn_clock.restart();
 	}
@@ -258,6 +261,11 @@ bool Module::GenerateFluxor()
 			fluxor->m_guided = true;
 
 			(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
+			//flux display
+			if (fluxor->m_isDisplayingFlux)
+			{
+				(*CurrentGame).addToFeedbacks(&fluxor->m_flux_text);
+			}
 
 			m_fluxor_spawn_clock.restart();
 
