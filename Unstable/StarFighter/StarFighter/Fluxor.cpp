@@ -88,9 +88,8 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	
 	new_Fluxor->setPosition(RandomizePosition());
 	new_Fluxor->m_speed = RandomizeSpeed();
-	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
-
 	new_Fluxor->m_absolute_speed = GetAbsoluteSpeed(new_Fluxor->m_speed);
+	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
 
 	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);
 	if (new_Fluxor->m_isDisplayingFlux)
@@ -153,6 +152,9 @@ void Fluxor::update(sf::Time deltaTime)
 					m_turn_clock.restart();
 				}
 			}
+
+			if (m_guided)
+				printf("pos: %f, %f\n", getPosition().x, getPosition().y);
 
 			UpdateRotation();
 

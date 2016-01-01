@@ -129,7 +129,7 @@ Module::Module(ModuleType moduleType)
 			m_flux_max = 100;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
-			m_fluxor_generation_time = 3.f;
+			m_fluxor_generation_time = 5.f;
 			//m_fluxor_generation_cost = m_flux_max;
 			break;
 		}
@@ -259,8 +259,6 @@ void Module::update(sf::Time deltaTime)
 		m_flux = m_flux_max;
 	}
 
-	
-
 	GameObject::update(deltaTime);
 
 	//update grid index
@@ -284,7 +282,10 @@ void Module::GetFluxor(GameObject* object)
 	if (object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
-		ApplyModuleEffect(fluxor);	
+		if (fluxor->m_life_clock.getElapsedTime().asSeconds() > 0.5f)//avoid being consummed by the very module that created it
+		{
+			ApplyModuleEffect(fluxor);
+		}
 	}
 }
 
@@ -320,14 +321,12 @@ bool Module::GenerateFluxor()
 			Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
 			m_flux -= m_fluxor_generation_cost;
 
-			//HACK
-			int main_link = GetMainLink();
-			if (main_link >= 0)
-			{
-				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(FLUXOR_GUIDED_BASE_SPEED, main_link * M_PI_2 - M_PI_2);
-			}
-			fluxor->setPosition(getPosition());
+
 			fluxor->m_guided = true;
+			fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
+			UpdateFluxorDirection(fluxor);
+
+			fluxor->setPosition(getPosition());
 
 			(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
 			//flux display
@@ -349,13 +348,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		//fluxor accelerator
-		if (!fluxor->m_docked)
-		{
-			fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
-		}
-
-		if (fluxor->m_FluxorType == FluxorType_Blue && fluxor->m_life_clock.getElapsedTime().asSeconds() > 0.5f)//avoid being consummed by the very module that created it
+		if (fluxor->m_FluxorType == FluxorType_Blue)
 		{
 			//consumption (automatic)
 			if (fluxor->m_flux > 0)
@@ -433,36 +426,52 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				}
 			}
 
-			//module "factory"
-			if (m_isGeneratingFluxor)
-			{
-				Fluxor* new_fluxor = new Fluxor(m_fluxor_generated_type);
-				new_fluxor->m_speed = (sf::Vector2f(0, 100));
-				m_fluxor_generation_buffer.push_back(new_fluxor);
-			}
+			////module "factory"
+			//if (m_isGeneratingFluxor)
+			//{
+			//	Fluxor* new_fluxor = new Fluxor(m_fluxor_generated_type);
+			//	new_fluxor->m_speed = (sf::Vector2f(0, 100));
+			//	m_fluxor_generation_buffer.push_back(new_fluxor);
+			//}
 		}
-	}
-}
 
-void Module::ResolveProductionBufferList()
-{
-	size_t fluxorGenerationBufferSize = m_fluxor_generation_buffer.size();
-	if (fluxorGenerationBufferSize > 0)
-	{
-		for (size_t i = 0; i < fluxorGenerationBufferSize; i++)
+		if (!fluxor->m_docked)
 		{
-			int main_link = GetMainLink();
-			if (main_link >= 0)
-			{
-				m_fluxor_generation_buffer[i]->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_fluxor_generation_buffer[i]->m_absolute_speed, main_link * M_PI_2);
-			}
-			
-			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, FluxorObject);
-		}
+			UpdateFluxorDirection(fluxor);
 
-		m_fluxor_generation_buffer.clear();
+			//accelerator
+			if (m_add_speed != 0)
+			{
+				fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
+				fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
+			}
+		}
+		else
+		{
+			fluxor->setPosition(getPosition());
+		}
 	}
 }
+
+//void Module::ResolveProductionBufferList()
+//{
+//	size_t fluxorGenerationBufferSize = m_fluxor_generation_buffer.size();
+//	if (fluxorGenerationBufferSize > 0)
+//	{
+//		for (size_t i = 0; i < fluxorGenerationBufferSize; i++)
+//		{
+//			int main_link = GetMainLink();
+//			if (main_link >= 0)
+//			{
+//				m_fluxor_generation_buffer[i]->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_fluxor_generation_buffer[i]->m_absolute_speed, main_link * M_PI_2);
+//			}
+//			
+//			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, FluxorObject);
+//		}
+//
+//		m_fluxor_generation_buffer.clear();
+//	}
+//}
 
 void Module::SwitchLinkDirection()
 {
@@ -491,4 +500,38 @@ int Module::GetMainLink()
 	}
 
 	return -1;
+}
+
+bool Module::UpdateFluxorDirection(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (fluxor->m_guided)
+		{
+			int main_link = GetMainLink();
+			if (main_link >= 0)
+			{
+				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, main_link * M_PI_2 - M_PI_2);
+				if (main_link % 2 == 0)
+					fluxor->setPosition(sf::Vector2f(fluxor->getPosition().x, getPosition().y));
+				else
+					fluxor->setPosition(sf::Vector2f(getPosition().x, fluxor->getPosition().y));
+
+				return true;
+			}
+			else
+			{
+				printf("<!> Trying to generate fluxors with a module that doesn't have link, in Module::UpdateFluxorDirection(Fluxor* fluxor)\n.");
+				return false;
+			}
+		}
+		else
+		{
+			printf("<!> Trying to use Module::UpdateFluxorDirection(Fluxor* fluxor) on a fluxor that is not guided.\n.");
+			return false;
+		}
+	}
+
+	printf("<!> Trying to update a NULL pointer with Module::UpdateFluxorDirection(Fluxor* fluxor)\n.");
+	return false;
 }

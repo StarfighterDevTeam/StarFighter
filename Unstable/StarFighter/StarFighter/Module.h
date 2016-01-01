@@ -57,8 +57,8 @@ public :
 	float m_flux_transfer_delay;
 
 	//Spawn
-	void ResolveProductionBufferList() override;
-	vector<Fluxor*> m_fluxor_generation_buffer;
+	//void ResolveProductionBufferList() override;
+	//vector<Fluxor*> m_fluxor_generation_buffer;
 
 	//Links
 	GameObject* m_arrow[4];
@@ -66,6 +66,7 @@ public :
 	int GetMainLink();
 	void SwitchLinkDirection();
 	void UpdateLinks();
+	bool UpdateFluxorDirection(Fluxor* fluxor);
 
 	//HUD
 	sf::Text m_flux_text;

@@ -289,12 +289,9 @@ void Ship::GetModule(GameObject* object)
 				}
 			}
 
-			if (module->m_activated)
+			if (InputGuy::isUsing() && m_CtrlKey_released)
 			{
-				if (InputGuy::isUsing() && m_CtrlKey_released)
-				{
-					module->SwitchLinkDirection();
-				}
+				module->SwitchLinkDirection();
 			}
 		}
 	}
