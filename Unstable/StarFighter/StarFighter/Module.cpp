@@ -487,6 +487,62 @@ void Module::UpdateLinks()
 	for (int i = 0; i < 4; i++)
 	{
 		m_arrow[i]->visible = m_link[i].m_exists;
+
+		if (m_flux == 0)
+		{
+			m_link[i].m_activated = false;
+		}
+		else
+		{
+			sf::Vector2u global_grid_index = sf::Vector2u(m_curGridIndex.x - 1, m_curGridIndex.y - 1);
+			if (i == 0)
+			{
+				if (global_grid_index.x == GRID_WIDTH - 1)
+				{
+					m_link[i].m_activated = false;
+				}
+				else
+				{
+
+					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x + 1][global_grid_index.y];
+				}
+			}
+			else if (i == 1)
+			{
+				if (global_grid_index.y == GRID_HEIGHT - 1)
+				{
+					m_link[i].m_activated = false;
+				}
+				else
+				{
+					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + 1];
+				}
+			}
+			else if (i == 2)
+			{
+				if (global_grid_index.x == 0)
+				{
+					m_link[i].m_activated = false;
+				}
+				else
+				{
+					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x - 1][global_grid_index.y];
+				}
+			}
+			else// if (i == 3)
+			{
+				if (global_grid_index.y == 0)
+				{
+					m_link[i].m_activated = false;
+				}
+				else
+				{
+					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - 1];
+				}
+			}
+		}
+		
+		//update arrow visual
 		m_arrow[i]->setAnimationLine(m_link[i].m_activated);
 	}
 }

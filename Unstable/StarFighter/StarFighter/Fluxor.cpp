@@ -153,9 +153,6 @@ void Fluxor::update(sf::Time deltaTime)
 				}
 			}
 
-			if (m_guided)
-				printf("pos: %f, %f\n", getPosition().x, getPosition().y);
-
 			UpdateRotation();
 
 			GameObject::update(deltaTime);
@@ -353,7 +350,6 @@ void Fluxor::WastingFlux()
 			}
 
 			m_flux_waste_clock.restart();
-			printf("waste\n");
 		}
 	}
 }
