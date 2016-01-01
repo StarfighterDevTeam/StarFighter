@@ -129,6 +129,10 @@ void Ship::update(sf::Time deltaTime)
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1));
 	}
+	if (InputGuy::isErasingModule())
+	{
+		Module::EraseModule(m_curGridIndex);
+	}
 }
 
 void Ship::ScreenBorderContraints()
@@ -250,7 +254,7 @@ void Ship::GetFluxor(GameObject* object)
 		if (m_flux < m_flux_max)
 		{
 			Fluxor* fluxor = (Fluxor*)object;
-			if (fluxor->m_FluxorType == FluxorType_Blue)
+			if (fluxor->m_FluxorType == FluxorType_Green)
 			{
 				m_flux += fluxor->m_flux;
 				if (m_flux > m_flux_max)
@@ -281,7 +285,8 @@ void Ship::GetModule(GameObject* object)
 		{
 			if (InputGuy::isFiring())
 			{
-				if (module->m_flux < module->m_flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
+				unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
+				if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
 				{
 					m_flux--;
 					module->m_flux++;

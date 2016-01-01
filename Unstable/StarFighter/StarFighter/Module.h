@@ -20,6 +20,7 @@ public :
 	Module(ModuleType moduleType);
 	Module(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	static Module* CreateModule(sf::Vector2u grid_index, ModuleType moduleType);
+	static void EraseModule(sf::Vector2u grid_index);
 	void Initialize();
 	Module* Clone();
 	virtual ~Module();
@@ -29,9 +30,14 @@ public :
 	ModuleType m_moduleType;
 	unsigned int m_flux;
 	unsigned int m_flux_max;
+	unsigned int m_flux_max_after_construction;
+	unsigned int m_flux_max_under_construction;
+	void FinishConstruction();
 	sf::Vector2u m_curGridIndex;
 	//bool m_activated;
 	Glow* m_glow;
+	bool m_under_construction;
+	void SetConstructionStatus(bool under_construction);
 
 	vector<Module*> m_parents;
 	vector<Module*> m_children;

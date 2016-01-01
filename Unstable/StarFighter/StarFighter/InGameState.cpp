@@ -43,7 +43,7 @@ void InGameState::Initialize(Player player)
 
 	//Spawning Fluxors
 	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
-		Fluxor::CreateFluxor(FluxorType_Blue);
+		Fluxor::CreateFluxor(FluxorType_Green);
 }
 
 void InGameState::Update(sf::Time deltaTime)

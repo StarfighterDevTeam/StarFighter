@@ -80,8 +80,8 @@ public:
 	GameObject* Clone();
 	
 	float diag;
-	bool ghost;
-	void setGhost(bool m_ghost);
+	bool m_ghost;
+	void setGhost(bool ghost);
 	float rotation_speed;
 	int m_animationNumber;
 	int m_frameNumber;

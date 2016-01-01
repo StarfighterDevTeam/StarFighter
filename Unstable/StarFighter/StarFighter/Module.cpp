@@ -9,9 +9,12 @@ void Module::Initialize()
 {
 	m_flux = 0;
 	m_flux_max = 1;
+	m_flux_max_under_construction = 1;
+	m_flux_max_after_construction = 1;
 	//m_activated = false;
 	m_glow = new Glow(this, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->visible = false;
+	SetConstructionStatus(true);
 
 	m_isGeneratingFluxor = false;
 	m_isConsummingFlux = false;
@@ -117,7 +120,7 @@ Module::Module(ModuleType moduleType)
 	const unsigned int W = TILE_SIZE;
 	const unsigned int H = TILE_SIZE;
 
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 2);
 	setOrigin(sf::Vector2f(W / 2, H / 2));
 
 	Initialize();
@@ -127,7 +130,8 @@ Module::Module(ModuleType moduleType)
 	{
 		case ModuleType_Generator:
 		{	 
-			m_flux_max = 10;
+			m_flux_max_after_construction = 10;
+			m_flux_max_under_construction = 20;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 1.f;
 
@@ -139,24 +143,28 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Armory:
 		{
-			m_flux_max = 100;
+			m_flux_max_after_construction = 100;
+			m_flux_max_under_construction = 20;
 			break;
 		}
 		case ModuleType_Battery:
 		{
-			m_flux_max = 1500;
+			m_flux_max_after_construction = 1500;
+			m_flux_max_under_construction = 20;
 			m_isConsummingFlux = true;
 			break;
 		}
 		case ModuleType_Relay:
 		{
-			m_flux_max = 1;
+			m_flux_max_after_construction = 1;
+			m_flux_max_under_construction = 20;
 			m_isRefillingFlux = true;
 			break;
 		}
 		case ModuleType_Factory:
 		{
-			m_flux_max = 10;
+			m_flux_max_after_construction = 10;
+			m_flux_max_under_construction = 20;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Red;
 			m_fluxor_generation_time = 3.f;
@@ -165,17 +173,20 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Shield:
 		{
-			m_flux_max = 100;
+			m_flux_max_after_construction = 100;
+			m_flux_max_under_construction = 20;
 			break;
 		}
 		case ModuleType_Turret:
 		{
-			m_flux_max = 200;
+			m_flux_max_after_construction = 200;
+			m_flux_max_under_construction = 20;
 			break;
 		}
 		case ModuleType_Switch:
 		{
-			m_flux_max = 1;
+			m_flux_max_after_construction = 1;
+			m_flux_max_under_construction = 20;
 			for (int i = 0; i < 4; i++)
 			{
 				m_link[i].m_exists = true;
@@ -183,12 +194,14 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Amplifier:
 		{
-			m_flux_max = 1;
+			m_flux_max_after_construction = 1;
+			m_flux_max_under_construction = 20;
 			break;
 		}
 		case ModuleType_Accelerator:
 		{
-			m_flux_max = 30;
+			m_flux_max_after_construction = 30;
+			m_flux_max_under_construction = 20;
 			m_add_speed = 100;
 			break;
 		}
@@ -206,6 +219,20 @@ Module* Module::Clone()
 	clone->m_flux_max = this->m_flux_max;
 
 	return clone;
+}
+
+void Module::SetConstructionStatus(bool under_construction)
+{
+	m_under_construction = under_construction;
+	if (under_construction)
+	{
+		setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
+	}
+	else
+	{
+		setColor(Color(255, 255, 255, 255));
+	}
+		
 }
 
 Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
@@ -238,10 +265,21 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	}
 	(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = (GameObject*)new_module;
 
-
 	return new_module;
 }
 
+void Module::EraseModule(sf::Vector2u grid_index)
+{
+	grid_index.x--;
+	grid_index.y--;
+
+	//update game grid knownledge
+	if (!(*CurrentGame).isCellFree(grid_index))
+	{
+		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
+		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = NULL;
+	}
+}
 
 Module::~Module()
 {
@@ -259,16 +297,31 @@ Module::~Module()
 	}
 }
 
+void Module::FinishConstruction()
+{
+	m_under_construction = false;
+	setColor(sf::Color(255, 255, 255, 255));
+	m_flux = 0;
+	m_flux_autogeneration_clock.restart();
+	m_fluxor_spawn_clock.restart();
+}
+
 void Module::update(sf::Time deltaTime)
 {
+	//construction finished?
+	if (m_under_construction && m_flux == m_flux_max_under_construction)
+	{
+		FinishConstruction();
+	}
+	m_flux_max = m_under_construction ? m_flux_max_under_construction : m_flux_max_after_construction;
+
 	if (m_flux > m_flux_max && m_flux_max > 0)
 	{
 		m_flux = m_flux_max;
 	}
-
 	if (m_glow)
 	{
-		m_glow->visible = m_flux == m_flux_max;
+		m_glow->visible = m_flux == m_flux_max && !m_under_construction;
 	}
 
 	GameObject::update(deltaTime);
@@ -276,18 +329,29 @@ void Module::update(sf::Time deltaTime)
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
-	//UpdateActivation();
+	if (!m_under_construction)
+	{
+		//UpdateActivation();
 
-	UpdateLinks();
+		UpdateLinks();
 
-	AutogenerateFlux();
+		AutogenerateFlux();
 
-	GenerateFluxor();
+		GenerateFluxor();
+	}
+
+	setAnimationLine(m_under_construction);
 	
 	//hud
 	ostringstream ss;
-	ss << m_flux << "/" << m_flux_max;
+	ss << m_flux;
+	if (m_flux_max > 0)
+	{
+		ss << "/" << m_flux_max;
+	}
 	m_flux_text.setString(ss.str());
+
+	ss << m_flux << "/" << m_flux_max;
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
 }
 
@@ -578,8 +642,8 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-
-					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x + 1][global_grid_index.y];
+					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + 1][global_grid_index.y];
+					m_link[i].m_activated = module && !module->m_under_construction;
 				}
 			}
 			else if (i == 1)
@@ -590,7 +654,8 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + 1];
+					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + 1];
+					m_link[i].m_activated = module && !module->m_under_construction;
 				}
 			}
 			else if (i == 2)
@@ -601,7 +666,8 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x - 1][global_grid_index.y];
+					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - 1][global_grid_index.y];
+					m_link[i].m_activated = module && !module->m_under_construction;
 				}
 			}
 			else// if (i == 3)
@@ -612,7 +678,8 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					m_link[i].m_activated = (*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - 1];
+					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - 1];
+					m_link[i].m_activated = module && !module->m_under_construction;
 				}
 			}
 		}

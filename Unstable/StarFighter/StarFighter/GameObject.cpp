@@ -92,7 +92,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	this->GarbageMe = false;
 	this->DontGarbageMe = false;
 	this->diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
-	this->ghost = false;
+	this->m_ghost = false;
 	this->rotation_speed = 0.f;
 }
 
@@ -154,17 +154,16 @@ void GameObject::Respawn()
 
 }
 
-void GameObject::setGhost(bool m_ghost)
+void GameObject::setGhost(bool ghost)
 {
-	if (m_ghost == true)
+	m_ghost = ghost;
+	if (ghost)
 	{
-		this->ghost = true;
-		this->setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
+		setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
 	}
 	else
 	{
-		this->ghost = false;
-		this->setColor(Color(255, 255, 255, 255));
+		setColor(Color(255, 255, 255, 255));
 	}
 }
 

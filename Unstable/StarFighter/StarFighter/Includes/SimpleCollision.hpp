@@ -20,7 +20,7 @@ public:
 			return false;
 
 		//ghost is a property that prevents an object from colliding, so by definition we exclude it
-		if (GameObjectA->ghost || (GameObjectB->ghost))
+		if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
 			return false;
 
 		if (!GameObjectA->isOnScene || !(GameObjectB->isOnScene))
@@ -59,7 +59,7 @@ public:
 			return false;
 
 		//ghost is a property that prevents an object from colliding, so by definition we exclude it
-		if (GameObjectA->ghost || (GameObjectB->ghost))
+		if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
 			return false;
 
 		if (!GameObjectA->isOnScene || !(GameObjectB->isOnScene))

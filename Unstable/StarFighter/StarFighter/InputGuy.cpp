@@ -239,3 +239,8 @@ bool InputGuy::isSpawningModule0()
 {
 	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num0);
 }
+
+bool InputGuy::isErasingModule()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace);
+}

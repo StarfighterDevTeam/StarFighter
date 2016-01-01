@@ -40,6 +40,7 @@ public:
 	static bool isSpawningModule8();
 	static bool isSpawningModule9();
 	static bool isSpawningModule0();
+	static bool isErasingModule();
 };
 
 

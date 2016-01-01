@@ -486,7 +486,7 @@ GameObject* Game::GetClosestObject(const sf::Vector2f position, GameObjectType t
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->isOnScene && !(*it)->ghost && (*it)->visible)
+		if ((*it)->isOnScene && !(*it)->m_ghost && (*it)->visible)
 		{
 			const float a = position.x - (*it)->getPosition().x;
 			const float b = position.y - (*it)->getPosition().y;
