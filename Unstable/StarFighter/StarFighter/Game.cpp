@@ -43,7 +43,7 @@ void Game::init(RenderWindow* window)
 	}
 
 	//TODO: save in local preferences
-	m_Music_Activated = false;
+	m_Music_Activated = true;
 	m_SFX_Activated = false;
 
 	//Sounds

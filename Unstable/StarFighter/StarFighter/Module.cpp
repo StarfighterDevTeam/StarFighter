@@ -374,7 +374,13 @@ void Module::GetFluxor(GameObject* object)
 	if (object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
-		if (fluxor->m_life_clock.getElapsedTime().asSeconds() > 0.5f)//avoid being consummed by the very module that created it
+
+		//make sure a fluxor leaving the module is not colliding again
+		if (fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
+		{
+			//do nothing
+		}
+		else
 		{
 			ApplyModuleEffect(fluxor);
 		}
@@ -487,7 +493,7 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 		{
 			if (fluxor->m_transfer_buffer == 0)
 			{
-				fluxor->m_transfer_buffer = m_isRefillingFlux ? m_flux : m_add_flux;
+				fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
 				fluxor->m_docked = true;
 				fluxor->m_flux_transfer_clock.restart();
 			}
@@ -568,6 +574,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			UndockFluxor(fluxor);
 			UpdateFluxorDirection(fluxor);
 
+			printf("blip\n");
 			//accelerator
 			if (m_add_speed != 0 && m_flux == m_flux_max)
 			{
@@ -590,7 +597,6 @@ bool Module::UndockFluxor(Fluxor* fluxor)
 		if (fluxor->m_FluxorType != FluxorType_Blue || IsMainLinkActivated())
 		{
 			fluxor->m_docked = false;
-			fluxor->m_life_clock.restart();
 			return true;
 		}
 		else
