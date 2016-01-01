@@ -45,6 +45,12 @@ public :
 	bool m_isRefillingFlux;
 	int m_add_speed;
 
+	//Flux auto-generation
+	bool m_isAutogeneratingFlux;
+	float m_flux_autogeneration_time;
+	sf::Clock m_flux_autogeneration_clock;
+	void AutogenerateFlux();
+
 	//Fluxor generation
 	bool m_isGeneratingFluxor;
 	FluxorType m_fluxor_generated_type;

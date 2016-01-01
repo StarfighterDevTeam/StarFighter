@@ -39,7 +39,7 @@ void InGameState::Initialize(Player player)
 	
 	//HACK PROTO
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator);
-	module->m_flux = 100;
+	//module->m_flux = 100;
 
 	//Spawning Fluxors
 	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)

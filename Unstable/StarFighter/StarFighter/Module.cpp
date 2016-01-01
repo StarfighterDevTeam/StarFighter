@@ -19,6 +19,7 @@ void Module::Initialize()
 	m_flux_transfer_delay = 0.1f;
 	m_fluxor_generation_cost = 0;
 	m_add_speed = 0;
+	m_isAutogeneratingFlux = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -125,12 +126,15 @@ Module::Module(ModuleType moduleType)
 	switch (moduleType)
 	{
 		case ModuleType_Generator:
-		{
-			m_flux_max = 100;
+		{	 
+			m_flux_max = 10;
+			m_isAutogeneratingFlux = true;
+			m_flux_autogeneration_time = 1.f;
+
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
-			m_fluxor_generation_time = 5.f;
-			//m_fluxor_generation_cost = m_flux_max;
+			m_fluxor_generation_time = 1.f;
+			m_fluxor_generation_cost = m_flux_max;
 			break;
 		}
 		case ModuleType_Armory:
@@ -172,7 +176,10 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Switch:
 		{
 			m_flux_max = 1;
-			break;
+			for (int i = 0; i < 4; i++)
+			{
+				m_link[i].m_exists = true;
+			}
 		}
 		case ModuleType_Amplifier:
 		{
@@ -268,6 +275,8 @@ void Module::update(sf::Time deltaTime)
 
 	UpdateLinks();
 
+	AutogenerateFlux();
+
 	GenerateFluxor();
 	
 	//hud
@@ -314,35 +323,60 @@ void Module::UpdateActivation()
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_flux == m_flux_max && IsMainLinkActivated())//m_flux >= m_fluxor_generation_cost)
+	if (m_isGeneratingFluxor && m_flux == m_flux_max)// && IsMainLinkActivated())//m_flux >= m_fluxor_generation_cost)
 	{
-		if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
+		if (m_fluxor_generated_type != FluxorType_Blue || IsMainLinkActivated())//only Blue Fluxors need to be connected in order to be generated
 		{
-			Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
-			m_flux -= m_fluxor_generation_cost;
-
-
-			fluxor->m_guided = true;
-			fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
-			UpdateFluxorDirection(fluxor);
-
-			fluxor->setPosition(getPosition());
-
-			(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
-			//flux display
-			if (fluxor->m_isDisplayingFlux)
+			if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 			{
-				(*CurrentGame).addToFeedbacks(&fluxor->m_flux_text);
+				Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+				m_flux -= m_fluxor_generation_cost;
+
+				fluxor->m_guided = true;
+				fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
+				UpdateFluxorDirection(fluxor);
+
+				fluxor->setPosition(getPosition());
+
+				(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
+				//flux display
+				if (fluxor->m_isDisplayingFlux)
+				{
+					(*CurrentGame).addToFeedbacks(&fluxor->m_flux_text);
+				}
+
+				m_fluxor_spawn_clock.restart();
+
+				return true;
 			}
-
-			m_fluxor_spawn_clock.restart();
-
-			return true;
 		}
 	}
-
-	return false;
+	else
+	{
+		m_fluxor_spawn_clock.restart();
+		return false;
+	}
 }
+
+void Module::AutogenerateFlux()
+{
+	if (m_isAutogeneratingFlux)
+	{
+		if (m_flux < m_flux_max)
+		{
+			if (m_flux_autogeneration_clock.getElapsedTime().asSeconds() > m_flux_autogeneration_time)
+			{
+				m_flux++;
+				m_flux_autogeneration_clock.restart();
+			}
+		}
+		else
+		{
+			m_flux_autogeneration_clock.restart();
+		}	
+	}
+}
+
 
 void Module::ApplyModuleEffect(Fluxor* fluxor)
 {
@@ -358,6 +392,10 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 					m_flux++;
 					fluxor->m_flux--;
 					fluxor->m_docked = true;
+					if (fluxor->m_flux == 0 || m_flux == m_flux_max)
+					{
+						UndockFluxor(fluxor);
+					}
 				}
 				else
 				{
@@ -370,7 +408,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			}
 		}
 
-		if (fluxor->m_FluxorType == FluxorType_Green)
+		if (fluxor->m_FluxorType == FluxorType_Green || fluxor->m_FluxorType == FluxorType_Red)
 		{
 			if (m_moduleType == ModuleType_Relay)
 			{
@@ -389,7 +427,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				}
 				else
 				{
-					fluxor->m_docked = false;
+					UndockFluxor(fluxor);
 				}
 			}
 
@@ -415,12 +453,14 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 					if (fluxor->m_transfer_buffer == 0)
 					{
-						fluxor->m_docked = false;
+						//fluxor->m_docked = false;
+						UndockFluxor(fluxor);
 					}
 				}
 				else
 				{
-					fluxor->m_docked = false;
+					//fluxor->m_docked = false;
+					UndockFluxor(fluxor);
 					fluxor->m_transfer_buffer = 0;
 				}
 			}
@@ -457,9 +497,10 @@ bool Module::UndockFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (IsMainLinkActivated())
+		if (fluxor->m_FluxorType != FluxorType_Blue || IsMainLinkActivated())
 		{
 			fluxor->m_docked = false;
+			fluxor->m_life_clock.restart();
 			return true;
 		}
 		else

@@ -70,8 +70,11 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		case FluxorType_Red:
 		{
 			m_isDisplayingFlux = true;
-			m_isWasting = false;
+			m_isWasting = true;
+			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 			m_flux = 10;
+			m_flux_max = 10;
 			break;
 		}
 	}
