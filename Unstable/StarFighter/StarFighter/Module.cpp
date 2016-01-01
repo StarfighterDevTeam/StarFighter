@@ -22,6 +22,7 @@ void Module::Initialize()
 	m_flux_transfer_delay = 0.1f;
 	m_fluxor_generation_cost = 0;
 	m_add_speed = 0;
+	m_add_flux = 0;
 	m_isAutogeneratingFlux = false;
 
 	//Flux display
@@ -131,7 +132,7 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Generator:
 		{	 
 			m_flux_max_after_construction = 10;
-			m_flux_max_under_construction = 20;
+			m_flux_max_under_construction = 100;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 1.f;
 
@@ -157,7 +158,7 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Relay:
 		{
 			m_flux_max_after_construction = 1;
-			m_flux_max_under_construction = 20;
+			m_flux_max_under_construction = 1;
 			m_isRefillingFlux = true;
 			break;
 		}
@@ -194,8 +195,9 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Amplifier:
 		{
-			m_flux_max_after_construction = 1;
+			m_flux_max_after_construction = 30;
 			m_flux_max_under_construction = 20;
+			m_add_flux = 30;
 			break;
 		}
 		case ModuleType_Accelerator:
@@ -462,26 +464,53 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (fluxor->m_flux > 0)
+		if (m_flux < m_flux_max && fluxor->m_flux > 0)
 		{
-			if (m_flux < m_flux_max)
+			m_flux++;
+			fluxor->m_flux--;
+			fluxor->m_docked = true;
+			//consumption finished?
+			if (m_flux == m_flux_max || fluxor->m_flux == 0)
 			{
-				m_flux++;
-				fluxor->m_flux--;
-				fluxor->m_docked = true;
-				if (fluxor->m_flux == 0 || m_flux == m_flux_max)
-				{
-					UndockFluxor(fluxor);
-				}
+				UpdateLinks();
+				UndockFluxor(fluxor);
 			}
-			else
+		}
+	}
+}
+
+void Module::AmplifyFluxor(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (fluxor->m_flux < fluxor->m_flux_max || fluxor->m_flux_max == 0)
+		{
+			if (fluxor->m_transfer_buffer == 0)
 			{
+				fluxor->m_transfer_buffer = m_isRefillingFlux ? m_flux : m_add_flux;
+				fluxor->m_docked = true;
+				fluxor->m_flux_transfer_clock.restart();
+			}
+
+			if (fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
+			{
+				fluxor->m_flux++;
+				fluxor->m_transfer_buffer--;
+				fluxor->m_flux_transfer_clock.restart();
+				fluxor->m_flux_waste_clock.restart();
+			}
+
+			if (fluxor->m_transfer_buffer == 0)
+			{
+				//fluxor->m_docked = false;
 				UndockFluxor(fluxor);
 			}
 		}
 		else
 		{
+			//fluxor->m_docked = false;
 			UndockFluxor(fluxor);
+			fluxor->m_transfer_buffer = 0;
 		}
 	}
 }
@@ -492,65 +521,37 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 	{
 		if (fluxor->m_FluxorType == FluxorType_Blue && !m_under_construction)
 		{
-			//consumption (automatic)
+			//module "refill/amplify fluxor"
+			if (m_add_flux > 0 && m_flux == m_flux_max)
+			{
+				AmplifyFluxor(fluxor);
+			}
+
+			//consumption (automatic) - must be done last
 			ConsummeFluxor(fluxor);
 		}
 
 		else if (fluxor->m_FluxorType == FluxorType_Green && m_under_construction)
 		{
-			//consumption (automatic)
+			//consumption (automatic) - must be done last
 			ConsummeFluxor(fluxor);
 		}
 
 		else if (fluxor->m_FluxorType == FluxorType_Red)
 		{
-			//module "consumption"
-			if (m_isConsummingFlux)
+			//module "refill/amplify fluxor"
+			if (m_flux == m_flux_max)
 			{
-				if (m_flux < m_flux_max && fluxor->m_flux > 0)
+				if (m_isRefillingFlux)
 				{
-					m_flux++;
-					fluxor->m_flux--;
-					fluxor->m_docked = true;
-				}
-				else
-				{
-					UndockFluxor(fluxor);
+					AmplifyFluxor(fluxor);
 				}
 			}
 
-			//module "refill fluxor"
-			if (m_isRefillingFlux)
+			//module "consumption" - must be done last
+			if (m_isConsummingFlux)
 			{
-				if (fluxor->m_flux < fluxor->m_flux_max && m_flux > 0)
-				{
-					if (fluxor->m_transfer_buffer == 0)
-					{
-						fluxor->m_transfer_buffer = m_flux;
-						fluxor->m_docked = true;
-						fluxor->m_flux_transfer_clock.restart();
-					}
-
-					if (fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
-					{
-						fluxor->m_flux++;
-						fluxor->m_transfer_buffer--;
-						fluxor->m_flux_transfer_clock.restart();
-						fluxor->m_flux_waste_clock.restart();
-					}
-
-					if (fluxor->m_transfer_buffer == 0)
-					{
-						//fluxor->m_docked = false;
-						UndockFluxor(fluxor);
-					}
-				}
-				else
-				{
-					//fluxor->m_docked = false;
-					UndockFluxor(fluxor);
-					fluxor->m_transfer_buffer = 0;
-				}
+				ConsummeFluxor(fluxor);
 			}
 
 			////module "factory"
@@ -564,11 +565,11 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 		if (!fluxor->m_docked)
 		{
+			UndockFluxor(fluxor);
 			UpdateFluxorDirection(fluxor);
-			printf("pos y : %f\n", fluxor->getPosition().y);
 
 			//accelerator
-			if (m_add_speed != 0)
+			if (m_add_speed != 0 && m_flux == m_flux_max)
 			{
 				fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
 				fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);

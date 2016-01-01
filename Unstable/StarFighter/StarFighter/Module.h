@@ -51,6 +51,7 @@ public :
 	bool m_isConsummingFlux;
 	bool m_isRefillingFlux;
 	int m_add_speed;
+	int m_add_flux;
 
 	//Flux auto-generation
 	bool m_isAutogeneratingFlux;
@@ -68,6 +69,7 @@ public :
 
 	//Flux transfer to Fluxors
 	void ConsummeFluxor(Fluxor* fluxor);
+	void AmplifyFluxor(Fluxor* fluxor);
 	float m_flux_transfer_delay;
 
 	//Spawn
