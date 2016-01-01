@@ -375,14 +375,27 @@ void Module::GetFluxor(GameObject* object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
 
-		//make sure a fluxor leaving the module is not colliding again
-		if (fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
+		if (!fluxor->m_guided)
 		{
-			//do nothing
+			float angle = GetAngleRadBetweenPositions(fluxor->getPosition(), fluxor->m_initial_position);
+			fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, angle);
+			fluxor->m_turn_clock.restart();
 		}
 		else
 		{
-			ApplyModuleEffect(fluxor);
+			//check if the guided Fluxor passes right through the middle of the Module
+			if (GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
+			{
+				//make sure a fluxor leaving the module is not colliding again
+				if (fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
+				{
+					//do nothing
+				}
+				else
+				{
+					ApplyModuleEffect(fluxor);
+				}
+			}
 		}
 	}
 }

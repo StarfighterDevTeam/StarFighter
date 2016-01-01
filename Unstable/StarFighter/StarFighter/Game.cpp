@@ -43,7 +43,7 @@ void Game::init(RenderWindow* window)
 	}
 
 	//TODO: save in local preferences
-	m_Music_Activated = true;
+	m_Music_Activated = false;
 	m_SFX_Activated = false;
 
 	//Sounds
@@ -289,7 +289,8 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			if (GameObject::DistancePointToSement((*it2)->getPosition().x, (*it2)->getPosition().y, (*it1)->m_initial_position.x, (*it1)->m_initial_position.y, (*it1)->getPosition().x, (*it1)->getPosition().y) == 0)
+			//if (GameObject::DistancePointToSement((*it2)->getPosition().x, (*it2)->getPosition().y, (*it1)->m_initial_position.x, (*it1)->m_initial_position.y, (*it1)->getPosition().x, (*it1)->getPosition().y) == 0)
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
 				(*it2)->GetFluxor(*it1);
