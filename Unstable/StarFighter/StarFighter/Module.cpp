@@ -17,6 +17,8 @@ void Module::Initialize()
 	m_isConsummingFlux = false;
 	m_isRefillingFlux = false;
 	m_flux_transfer_delay = 0.1f;
+	m_fluxor_generation_cost = 0;
+	m_add_speed = 0;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -113,8 +115,9 @@ Module::Module(ModuleType moduleType)
 		{
 			m_flux_max = 100;
 			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Green;
+			m_fluxor_generated_type = FluxorType_Blue;
 			m_fluxor_generation_time = 3.f;
+			//m_fluxor_generation_cost = m_flux_max;
 			break;
 		}
 		case ModuleType_Armory:
@@ -136,7 +139,11 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Factory:
 		{
-			m_flux_max = 50;
+			m_flux_max = 10;
+			m_isGeneratingFluxor = true;
+			m_fluxor_generated_type = FluxorType_Green;
+			m_fluxor_generation_time = 3.f;
+			m_fluxor_generation_cost = m_flux_max;
 			break;
 		}
 		case ModuleType_Shield:
@@ -161,7 +168,8 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Accelerator:
 		{
-			 m_flux_max = 1;
+			m_flux_max = 30;
+			m_add_speed = 100;
 			break;
 		}
 	}
@@ -276,11 +284,12 @@ void Module::UpdateActivation()
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_activated)
+	if (m_isGeneratingFluxor && m_flux == m_flux_max)//m_flux >= m_fluxor_generation_cost)
 	{
 		if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 		{
 			Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+			m_flux -= m_fluxor_generation_cost;
 
 			//HACK
 			fluxor->m_speed = sf::Vector2f(100, 0);
@@ -308,6 +317,35 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
+		//fluxor accelerator
+		if (!fluxor->m_docked)
+		{
+			fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
+		}
+
+		if (fluxor->m_FluxorType == FluxorType_Blue && fluxor->m_life_clock.getElapsedTime().asSeconds() > 0.5f)//avoid being consummed by the very module that created it
+		{
+			//consumption (automatic)
+			if (fluxor->m_flux > 0)
+			{
+				if (m_flux < m_flux_max)
+				{
+					m_flux++;
+					fluxor->m_flux--;
+					fluxor->m_docked = true;
+				}
+				else
+				{
+					fluxor->m_docked = false;
+					//fluxor->GarbageMe = true;
+				}
+			}
+			else
+			{
+				fluxor->GarbageMe = true;
+			}
+		}
+
 		if (fluxor->m_FluxorType == FluxorType_Green)
 		{
 			if (m_moduleType == ModuleType_Relay)
@@ -345,7 +383,6 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 					if (fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
 					{
-
 						fluxor->m_flux++;
 						fluxor->m_transfer_buffer--;
 						fluxor->m_flux_transfer_clock.restart();

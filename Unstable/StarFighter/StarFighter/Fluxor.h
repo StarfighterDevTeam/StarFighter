@@ -46,6 +46,7 @@ public :
 	float m_flux_waste_delay;
 	sf::Clock m_flux_waste_clock;
 	void WastingFlux();
+	sf::Clock m_life_clock;
 
 	unsigned int m_transfer_buffer;
 	sf::Clock m_flux_transfer_clock;

@@ -36,6 +36,7 @@ public :
 	void ApplyModuleEffect(Fluxor* fluxor);
 	bool m_isConsummingFlux;
 	bool m_isRefillingFlux;
+	int m_add_speed;
 
 	//Fluxor generation
 	bool m_isGeneratingFluxor;
@@ -43,6 +44,7 @@ public :
 	bool GenerateFluxor();
 	float m_fluxor_generation_time;
 	sf::Clock m_fluxor_spawn_clock;
+	unsigned int m_fluxor_generation_cost;
 
 	//Flux transfer to Fluxors
 	float m_flux_transfer_delay;

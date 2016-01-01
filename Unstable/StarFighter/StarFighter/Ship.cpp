@@ -253,7 +253,14 @@ void Ship::GetFluxor(GameObject* object)
 					m_flux = m_flux_max;
 				}
 
-				fluxor->Death();
+				if (fluxor->m_guided)
+				{
+					fluxor->GarbageMe = true;
+				}
+				else
+				{
+					fluxor->Death();
+				}
 			}
 		}
 	}

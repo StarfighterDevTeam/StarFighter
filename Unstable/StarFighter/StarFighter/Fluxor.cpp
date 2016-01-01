@@ -59,7 +59,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	}
 	else
 	{
-		m_isDisplayingFlux = false;
+		m_isDisplayingFlux = true;
 		m_isWasting = false;
 		m_flux = FLUXOR_FLUX_VALUE;
 	}
@@ -134,9 +134,12 @@ void Fluxor::update(sf::Time deltaTime)
 				}
 			}
 
-			if (ScreenBorderContraints())
+			if (!m_guided)
 			{
-				m_turn_clock.restart();
+				if (ScreenBorderContraints())
+				{
+					m_turn_clock.restart();
+				}
 			}
 
 			UpdateRotation();
@@ -298,6 +301,10 @@ void Fluxor::UpdateRotation()
 void Fluxor::Death()
 {
 	visible = false;
+	if (m_isDisplayingFlux)
+	{
+		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+	}
 	m_respawn_time = RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_RESPAWN_MIN_TIME, FLUXOR_RESPAWN_MAX_TIME));
 	m_respawn_clock.restart();
 }
@@ -312,6 +319,11 @@ void Fluxor::Respawn()
 
 	visible = true;
 	m_turn_clock.restart();
+
+	if (m_isDisplayingFlux)
+	{
+		(*CurrentGame).addToFeedbacks(&m_flux_text);
+	}
 }
 
 void Fluxor::WastingFlux()
