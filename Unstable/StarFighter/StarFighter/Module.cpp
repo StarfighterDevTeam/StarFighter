@@ -314,7 +314,7 @@ void Module::UpdateActivation()
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_flux == m_flux_max)//m_flux >= m_fluxor_generation_cost)
+	if (m_isGeneratingFluxor && m_flux == m_flux_max && IsMainLinkActivated())//m_flux >= m_fluxor_generation_cost)
 	{
 		if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 		{
@@ -361,13 +361,12 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				}
 				else
 				{
-					fluxor->m_docked = false;
-					//fluxor->GarbageMe = true;
+					UndockFluxor(fluxor);
 				}
 			}
 			else
 			{
-				fluxor->GarbageMe = true;
+				UndockFluxor(fluxor);
 			}
 		}
 
@@ -443,6 +442,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			if (m_add_speed != 0)
 			{
 				fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
+				fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
 				fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
 			}
 		}
@@ -451,6 +451,35 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			fluxor->setPosition(getPosition());
 		}
 	}
+}
+
+bool Module::UndockFluxor(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (IsMainLinkActivated())
+		{
+			fluxor->m_docked = false;
+			return true;
+		}
+		else
+		{
+			fluxor->GarbageMe = true;
+			return false;
+		}
+	}
+	else
+	{
+		printf("<!> Trying to Module::UndockFluxor(Fluxor* fluxor) a NULL pointer.\n");
+		return false;
+	}
+}
+
+bool Module::IsMainLinkActivated()
+{
+	int main_link = GetMainLinkIndex();
+
+	return main_link >= 0 && m_link[main_link].m_activated;
 }
 
 //void Module::ResolveProductionBufferList()
@@ -547,7 +576,7 @@ void Module::UpdateLinks()
 	}
 }
 
-int Module::GetMainLink()
+int Module::GetMainLinkIndex()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -564,7 +593,7 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 	{
 		if (fluxor->m_guided)
 		{
-			int main_link = GetMainLink();
+			int main_link = GetMainLinkIndex();
 			if (main_link >= 0)
 			{
 				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, main_link * M_PI_2 - M_PI_2);

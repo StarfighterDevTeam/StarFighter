@@ -63,10 +63,12 @@ public :
 	//Links
 	GameObject* m_arrow[4];
 	Link m_link[4];
-	int GetMainLink();
+	int GetMainLinkIndex();
 	void SwitchLinkDirection();
+	bool UndockFluxor(Fluxor* fluxor);
 	void UpdateLinks();
 	bool UpdateFluxorDirection(Fluxor* fluxor);
+	bool IsMainLinkActivated();
 
 	//HUD
 	sf::Text m_flux_text;
