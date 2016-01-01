@@ -133,6 +133,10 @@ void Ship::update(sf::Time deltaTime)
 	{
 		Module::EraseModule(m_curGridIndex);
 	}
+	if (InputGuy::isFinishModuleConstruction())
+	{
+		Module::DebugFinishModule(m_curGridIndex);
+	}
 }
 
 void Ship::ScreenBorderContraints()
@@ -281,23 +285,26 @@ void Ship::GetModule(GameObject* object)
 	{
 		Module* module = (Module*)object;
 
-		if (m_curGridIndex.x == module->m_curGridIndex.x && m_curGridIndex.y == module->m_curGridIndex.y)
+		if (module->m_under_construction)
 		{
-			if (InputGuy::isFiring())
+			if (m_curGridIndex.x == module->m_curGridIndex.x && m_curGridIndex.y == module->m_curGridIndex.y)
 			{
-				unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
-				if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
+				if (InputGuy::isFiring())
 				{
-					m_flux--;
-					module->m_flux++;
-					m_flux_transfer_limiter_clock.restart();
+					unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
+					if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
+					{
+						m_flux--;
+						module->m_flux++;
+						m_flux_transfer_limiter_clock.restart();
+					}
 				}
 			}
+		}
 
-			if (InputGuy::isUsing() && m_CtrlKey_released)
-			{
-				module->SwitchLinkDirection();
-			}
+		if (InputGuy::isUsing() && m_CtrlKey_released)
+		{
+			module->SwitchLinkDirection();
 		}
 	}
 }

@@ -21,6 +21,7 @@ public :
 	Module(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	static Module* CreateModule(sf::Vector2u grid_index, ModuleType moduleType);
 	static void EraseModule(sf::Vector2u grid_index);
+	static void DebugFinishModule(sf::Vector2u grid_index);
 	void Initialize();
 	Module* Clone();
 	virtual ~Module();
@@ -66,6 +67,7 @@ public :
 	unsigned int m_fluxor_generation_cost;
 
 	//Flux transfer to Fluxors
+	void ConsummeFluxor(Fluxor* fluxor);
 	float m_flux_transfer_delay;
 
 	//Spawn

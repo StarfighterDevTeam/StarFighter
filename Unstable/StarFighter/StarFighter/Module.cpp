@@ -138,7 +138,7 @@ Module::Module(ModuleType moduleType)
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
 			m_fluxor_generation_time = 1.f;
-			m_fluxor_generation_cost = m_flux_max;
+			m_fluxor_generation_cost = m_flux_max_after_construction;
 			break;
 		}
 		case ModuleType_Armory:
@@ -168,7 +168,7 @@ Module::Module(ModuleType moduleType)
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Red;
 			m_fluxor_generation_time = 3.f;
-			m_fluxor_generation_cost = m_flux_max;
+			m_fluxor_generation_cost = m_flux_max_after_construction;
 			break;
 		}
 		case ModuleType_Shield:
@@ -281,6 +281,18 @@ void Module::EraseModule(sf::Vector2u grid_index)
 	}
 }
 
+void Module::DebugFinishModule(sf::Vector2u grid_index)
+{
+	grid_index.x--;
+	grid_index.y--;
+
+	if (!(*CurrentGame).isCellFree(grid_index))
+	{
+		Module* module = (Module*)(*CurrentGame).m_module_grid[grid_index.x][grid_index.y];
+		module->FinishConstruction();
+	}
+}
+
 Module::~Module()
 {
 	(*CurrentGame).removeFromFeedbacks(&m_flux_text);
@@ -329,11 +341,11 @@ void Module::update(sf::Time deltaTime)
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
+	UpdateLinks();
+
 	if (!m_under_construction)
 	{
 		//UpdateActivation();
-
-		UpdateLinks();
 
 		AutogenerateFlux();
 
@@ -446,27 +458,18 @@ void Module::AutogenerateFlux()
 	}
 }
 
-
-void Module::ApplyModuleEffect(Fluxor* fluxor)
+void Module::ConsummeFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (fluxor->m_FluxorType == FluxorType_Blue)
+		if (fluxor->m_flux > 0)
 		{
-			//consumption (automatic)
-			if (fluxor->m_flux > 0)
+			if (m_flux < m_flux_max)
 			{
-				if (m_flux < m_flux_max)
-				{
-					m_flux++;
-					fluxor->m_flux--;
-					fluxor->m_docked = true;
-					if (fluxor->m_flux == 0 || m_flux == m_flux_max)
-					{
-						UndockFluxor(fluxor);
-					}
-				}
-				else
+				m_flux++;
+				fluxor->m_flux--;
+				fluxor->m_docked = true;
+				if (fluxor->m_flux == 0 || m_flux == m_flux_max)
 				{
 					UndockFluxor(fluxor);
 				}
@@ -476,15 +479,31 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				UndockFluxor(fluxor);
 			}
 		}
-
-		if (fluxor->m_FluxorType == FluxorType_Green || fluxor->m_FluxorType == FluxorType_Red)
+		else
 		{
-			if (m_moduleType == ModuleType_Relay)
-			{
-				//example
-		
-			}
+			UndockFluxor(fluxor);
+		}
+	}
+}
 
+void Module::ApplyModuleEffect(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (fluxor->m_FluxorType == FluxorType_Blue && !m_under_construction)
+		{
+			//consumption (automatic)
+			ConsummeFluxor(fluxor);
+		}
+
+		else if (fluxor->m_FluxorType == FluxorType_Green && m_under_construction)
+		{
+			//consumption (automatic)
+			ConsummeFluxor(fluxor);
+		}
+
+		else if (fluxor->m_FluxorType == FluxorType_Red)
+		{
 			//module "consumption"
 			if (m_isConsummingFlux)
 			{
@@ -546,6 +565,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 		if (!fluxor->m_docked)
 		{
 			UpdateFluxorDirection(fluxor);
+			printf("pos y : %f\n", fluxor->getPosition().y);
 
 			//accelerator
 			if (m_add_speed != 0)
@@ -627,7 +647,7 @@ void Module::UpdateLinks()
 	{
 		m_arrow[i]->visible = m_link[i].m_exists;
 
-		if (m_flux == 0)
+		if (m_flux == 0 || m_under_construction)
 		{
 			m_link[i].m_activated = false;
 		}

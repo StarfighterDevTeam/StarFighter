@@ -41,6 +41,7 @@ public:
 	static bool isSpawningModule9();
 	static bool isSpawningModule0();
 	static bool isErasingModule();
+	static bool isFinishModuleConstruction();
 };
 
 
