@@ -261,7 +261,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	}
 
 	//update game grid knownledge
-	if (!(*CurrentGame).isCellFree(grid_index))
+	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
 		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
 	}
@@ -276,7 +276,7 @@ void Module::EraseModule(sf::Vector2u grid_index)
 	grid_index.y--;
 
 	//update game grid knownledge
-	if (!(*CurrentGame).isCellFree(grid_index))
+	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
 		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
 		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = NULL;
@@ -288,7 +288,7 @@ void Module::DebugFinishModule(sf::Vector2u grid_index)
 	grid_index.x--;
 	grid_index.y--;
 
-	if (!(*CurrentGame).isCellFree(grid_index))
+	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
 		Module* module = (Module*)(*CurrentGame).m_module_grid[grid_index.x][grid_index.y];
 		module->FinishConstruction();

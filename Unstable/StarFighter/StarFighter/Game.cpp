@@ -43,7 +43,7 @@ void Game::init(RenderWindow* window)
 	}
 
 	//TODO: save in local preferences
-	m_Music_Activated = false;
+	m_Music_Activated = true;
 	m_SFX_Activated = false;
 
 	//Sounds
@@ -430,44 +430,7 @@ bool Game::isCellFree(sf::Vector2f position)
 {
 	sf::Vector2u grid_index = GetGridIndex(position);
 
-	return isCellFree(grid_index);
-}
-
-bool Game::isCellFree(sf::Vector2u grid_index)
-{
-	//for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[FluxorObject].begin(); it != sceneGameObjectsTyped[FluxorObject].end(); it++)
-	//{
-	//	if (*it == NULL)
-	//		continue;
-	//
-	//	if ((*it)->visible)
-	//	{
-	//		sf::Vector2u fluxor_grid_index = GetGridIndex((*it)->getPosition());
-	//		if (fluxor_grid_index == grid_index)
-	//		{
-	//			return false;
-	//		}
-	//	}
-	//}
-
 	return !m_module_grid[grid_index.x][grid_index.y];
-
-	//for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[ModuleObject].begin(); it != sceneGameObjectsTyped[ModuleObject].end(); it++)
-	//{
-	//	if (*it == NULL)
-	//		continue;
-	//
-	//	if ((*it)->visible)
-	//	{
-	//		sf::Vector2u module_grid_index = GetGridIndex((*it)->getPosition());
-	//		if (module_grid_index == grid_index)
-	//		{
-	//			return false;
-	//		}
-	//	}
-	//}
-	//
-	//return true;
 }
 
 sf::Vector2u Game::GetGridIndex(sf::Vector2f position)

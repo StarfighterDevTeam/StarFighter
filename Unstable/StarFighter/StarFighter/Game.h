@@ -103,7 +103,6 @@ public:
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
 	bool isCellFree(sf::Vector2f position);
-	bool isCellFree(sf::Vector2u grid_index);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
 	void ResolveProductionBufferList();
 
