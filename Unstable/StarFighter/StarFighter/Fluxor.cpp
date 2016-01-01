@@ -48,20 +48,32 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	m_FluxorType = FluxorType;
 
 	//Type specific parameters
-	if (FluxorType == FluxorType_Green)
+	switch (FluxorType)
 	{
-		m_isDisplayingFlux = true;
-		m_isWasting = true;
-		m_flux_waste = FLUXOR_WASTE_VALUE;
-		m_flux_waste_delay = FLUXOR_WASTE_DELAY;
-		m_flux = 10;
-		m_flux_max = 10;
-	}
-	else
-	{
-		m_isDisplayingFlux = true;
-		m_isWasting = false;
-		m_flux = FLUXOR_FLUX_VALUE;
+		case FluxorType_Green:
+		{
+			m_isDisplayingFlux = true;
+			m_isWasting = true;
+			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+			m_flux = 10;
+			m_flux_max = 10;
+			break;
+		}
+		case FluxorType_Blue:
+		{
+			m_isDisplayingFlux = true;
+			m_isWasting = false;
+			m_flux = FLUXOR_FLUX_VALUE;
+			break;
+		}
+		case FluxorType_Red:
+		{
+			m_isDisplayingFlux = true;
+			m_isWasting = false;
+			m_flux = 10;
+			break;
+		}
 	}
 }
 
@@ -278,7 +290,7 @@ void Fluxor::UpdateRotation()
 	}
 	else if (m_speed.x == 0 && m_speed.y > 0)
 	{
-		setRotation(180);
+		setRotation(90);
 	}
 	else if (m_speed.x == 0 && m_speed.y < 0)
 	{

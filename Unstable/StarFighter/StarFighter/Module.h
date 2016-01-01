@@ -6,6 +6,13 @@
 #include "Game.h"
 #include "Fluxor.h"
 
+struct Link
+{
+	Link(){};
+	bool m_exists;
+	bool m_activated;
+};
+
 class Module : public GameObject
 {
 public :
@@ -52,6 +59,13 @@ public :
 	//Spawn
 	void ResolveProductionBufferList() override;
 	vector<Fluxor*> m_fluxor_generation_buffer;
+
+	//Links
+	GameObject* m_arrow[4];
+	Link m_link[4];
+	int GetMainLink();
+	void SwitchLinkDirection();
+	void UpdateLinks();
 
 	//HUD
 	sf::Text m_flux_text;

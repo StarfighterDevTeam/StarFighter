@@ -36,7 +36,7 @@ public :
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
 	void SetControllerType(ControlerType contoller);
-
+	bool m_CtrlKey_released;
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;
 

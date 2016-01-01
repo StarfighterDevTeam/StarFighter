@@ -27,6 +27,9 @@ void Ship::Init()
 	m_flux_text.setColor(sf::Color::White);
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	(*CurrentGame).addToFeedbacks(&m_flux_text);
+
+	//inputs
+	m_CtrlKey_released = false;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -51,6 +54,8 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	m_CtrlKey_released = !InputGuy::isUsing();
+
 	if (m_flux > m_flux_max  && m_flux_max > 0)
 	{
 		m_flux = m_flux_max;
@@ -82,7 +87,7 @@ void Ship::update(sf::Time deltaTime)
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
-
+	
 	//DEBUG
 	if (InputGuy::isSpawningModule1())
 	{
@@ -286,10 +291,9 @@ void Ship::GetModule(GameObject* object)
 
 			if (module->m_activated)
 			{
-				if (InputGuy::isUsing())
+				if (InputGuy::isUsing() && m_CtrlKey_released)
 				{
-					////HACK PROTO
-					
+					module->SwitchLinkDirection();
 				}
 			}
 		}

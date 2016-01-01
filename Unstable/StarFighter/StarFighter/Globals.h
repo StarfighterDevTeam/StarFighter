@@ -49,6 +49,7 @@
 #define FLUXOR_HEIGHT								48
 #define FLUXOR_SPEED_MIN							100
 #define FLUXOR_SPEED_MAX							500
+#define FLUXOR_GUIDED_BASE_SPEED					100
 #define FLUXOR_TURN_MIN_DELAY						0.5f
 #define FLUXOR_TURN_MAX_DELAY						3.f
 #define FLUXOR_MAX_POPULATION						100
@@ -59,8 +60,8 @@
 
 //MODULE
 #define MODULE_FLUX_DISPLAY_OFFSET_Y				- 24
-#define MODULE_GLOW_MIN_RADIUS						10
-#define MODULE_GLOW_RADIUS							30
+#define MODULE_GLOW_MIN_RADIUS						1
+#define MODULE_GLOW_RADIUS							12
 #define MODULE_GLOW_ANIMATION_DURATION				0.5f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);

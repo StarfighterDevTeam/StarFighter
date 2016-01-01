@@ -29,6 +29,19 @@ void Module::Initialize()
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
+
+	//links
+	GameObject arrow = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 2);
+	for (int i = 0; i < 4; i++)
+	{
+		m_link[i].m_exists = i == 0;
+		m_link[i].m_activated = false;
+
+		m_arrow[i] = arrow.Clone();
+		m_arrow[i]->visible = m_link[i].m_exists;
+		float angle = i * 90;
+		m_arrow[i]->rotate(i * 90);
+	}
 }
 
 Module::Module()
@@ -141,7 +154,7 @@ Module::Module(ModuleType moduleType)
 		{
 			m_flux_max = 10;
 			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Green;
+			m_fluxor_generated_type = FluxorType_Red;
 			m_fluxor_generation_time = 3.f;
 			m_fluxor_generation_cost = m_flux_max;
 			break;
@@ -199,9 +212,17 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
 	{
 		new_module->m_glow->setPosition(new_module->getPosition());
 	}
+	for (int i = 0; i < 4; i++)
+	{
+		new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2));
+	}
 
 	(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
 	(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
+	for (int i = 0; i < 4; i++)
+	{
+		(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
+	}
 
 	//update game grid knownledge
 	if (!(*CurrentGame).isCellFree(grid_index))
@@ -223,6 +244,12 @@ Module::~Module()
 		m_glow->visible = false;
 		m_glow->GarbageMe = true;
 	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_arrow[i]->visible = false;
+		m_arrow[i]->GarbageMe = true;
+	}
 }
 
 void Module::update(sf::Time deltaTime)
@@ -232,15 +259,17 @@ void Module::update(sf::Time deltaTime)
 		m_flux = m_flux_max;
 	}
 
+	
+
 	GameObject::update(deltaTime);
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
-	//update activation
 	UpdateActivation();
 
-	//fluxor generation
+	UpdateLinks();
+
 	GenerateFluxor();
 	
 	//hud
@@ -292,8 +321,11 @@ bool Module::GenerateFluxor()
 			m_flux -= m_fluxor_generation_cost;
 
 			//HACK
-			fluxor->m_speed = sf::Vector2f(100, 0);
-			fluxor->m_absolute_speed = 100;
+			int main_link = GetMainLink();
+			if (main_link >= 0)
+			{
+				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(FLUXOR_GUIDED_BASE_SPEED, main_link * M_PI_2 - M_PI_2);
+			}
 			fluxor->setPosition(getPosition());
 			fluxor->m_guided = true;
 
@@ -419,9 +451,44 @@ void Module::ResolveProductionBufferList()
 	{
 		for (size_t i = 0; i < fluxorGenerationBufferSize; i++)
 		{
+			int main_link = GetMainLink();
+			if (main_link >= 0)
+			{
+				m_fluxor_generation_buffer[i]->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_fluxor_generation_buffer[i]->m_absolute_speed, main_link * M_PI_2);
+			}
+			
 			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, FluxorObject);
 		}
 
 		m_fluxor_generation_buffer.clear();
 	}
+}
+
+void Module::SwitchLinkDirection()
+{
+	bool bool_array[4] = { m_link[3].m_exists, m_link[0].m_exists, m_link[1].m_exists, m_link[2].m_exists };
+	for (int i = 0; i < 4; i++)
+	{
+		m_link[i].m_exists = bool_array[i];
+	}
+}
+
+void Module::UpdateLinks()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		m_arrow[i]->visible = m_link[i].m_exists;
+		m_arrow[i]->setAnimationLine(m_link[i].m_activated);
+	}
+}
+
+int Module::GetMainLink()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_link[i].m_exists)
+			return i;
+	}
+
+	return -1;
 }
