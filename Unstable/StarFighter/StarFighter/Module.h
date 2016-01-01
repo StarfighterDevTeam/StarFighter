@@ -30,14 +30,14 @@ public :
 	unsigned int m_flux;
 	unsigned int m_flux_max;
 	sf::Vector2u m_curGridIndex;
-	bool m_activated;
+	//bool m_activated;
 	Glow* m_glow;
 
 	vector<Module*> m_parents;
 	vector<Module*> m_children;
 
 	//Activation
-	void UpdateActivation();
+	//void UpdateActivation();
 
 	//Module properties
 	void ApplyModuleEffect(Fluxor* fluxor);

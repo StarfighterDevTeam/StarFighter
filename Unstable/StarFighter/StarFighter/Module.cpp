@@ -9,7 +9,7 @@ void Module::Initialize()
 {
 	m_flux = 0;
 	m_flux_max = 1;
-	m_activated = false;
+	//m_activated = false;
 	m_glow = new Glow(this, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->visible = false;
 
@@ -150,7 +150,7 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Relay:
 		{
-			m_flux_max = 5;
+			m_flux_max = 1;
 			m_isRefillingFlux = true;
 			break;
 		}
@@ -266,12 +266,17 @@ void Module::update(sf::Time deltaTime)
 		m_flux = m_flux_max;
 	}
 
+	if (m_glow)
+	{
+		m_glow->visible = m_flux == m_flux_max;
+	}
+
 	GameObject::update(deltaTime);
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
-	UpdateActivation();
+	//UpdateActivation();
 
 	UpdateLinks();
 
@@ -298,28 +303,28 @@ void Module::GetFluxor(GameObject* object)
 	}
 }
 
-void Module::UpdateActivation()
-{
-	if (!m_parents.empty())
-	{
-		bool parent_activated = false;
-		size_t parentsVectorSize = m_parents.size();
-		for (size_t i = 0; i < parentsVectorSize; i++)
-		{
-			if (m_parents[i]->m_activated)
-			{
-				parent_activated = true;
-				break;
-			}
-		}
-		m_activated = m_flux == m_flux_max && parent_activated;
-	}
-	else
-	{
-		m_activated = m_flux == m_flux_max;
-	}
-	m_glow->visible = m_activated;
-}
+//void Module::UpdateActivation()
+//{
+//	if (!m_parents.empty())
+//	{
+//		bool parent_activated = false;
+//		size_t parentsVectorSize = m_parents.size();
+//		for (size_t i = 0; i < parentsVectorSize; i++)
+//		{
+//			if (m_parents[i]->m_activated)
+//			{
+//				parent_activated = true;
+//				break;
+//			}
+//		}
+//		m_activated = m_flux == m_flux_max && parent_activated;
+//	}
+//	else
+//	{
+//		m_activated = m_flux == m_flux_max;
+//	}
+//	m_glow->visible = m_activated;
+//}
 
 bool Module::GenerateFluxor()
 {

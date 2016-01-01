@@ -42,7 +42,7 @@
 #define PLAYER_FLUX_DISPLAY_OFFSET_Y				4
 
 //FLUXOR
-#define FLUXOR_FLUX_VALUE							20
+#define FLUXOR_FLUX_VALUE							10
 #define FLUXOR_FLUX_DISPLAY_OFFSET_Y				2
 
 #define FLUXOR_WIDTH								64
