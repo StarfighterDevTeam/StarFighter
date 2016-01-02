@@ -17,7 +17,7 @@ void Module::Initialize()
 
 	m_isGeneratingFluxor = false;
 	m_isRefillingFlux = false;
-	m_flux_transfer_delay = 0.1f;
+	m_flux_transfer_delay = MODULE_TRANSFER_DELAY;
 	m_fluxor_generation_cost = 0;
 	m_add_speed = 0;
 	m_add_flux = 0;
@@ -154,7 +154,7 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Relay:
 		{
-			m_flux_max_after_construction = 1;
+			m_flux_max_after_construction = 5;
 			m_flux_max_under_construction = 1;
 			m_isRefillingFlux = true;
 			break;
@@ -164,7 +164,7 @@ Module::Module(ModuleType moduleType)
 			m_flux_max_after_construction = 10;
 			m_flux_max_under_construction = 20;
 			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Red;
+			m_fluxor_generated_type = FluxorType_Purple;
 			m_fluxor_generation_time = 3.f;
 			m_fluxor_generation_cost = m_flux_max_after_construction;
 			break;
@@ -338,8 +338,10 @@ void Module::FinishConstruction()
 
 	m_under_construction = false;
 	m_flux = 0;
+	m_flux_max = m_flux_max_after_construction;
 	m_flux_autogeneration_clock.restart();
 	m_fluxor_spawn_clock.restart();
+	m_flux_consumption_clock.restart();
 
 	//wipe out unguided Fluxors that are found on the cell being built on
 	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorObject).size();
@@ -469,7 +471,7 @@ bool Module::GenerateFluxor()
 
 				(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
 				//flux display
-				if (fluxor->m_isDisplayingFlux)
+				if (fluxor->m_displaying_flux)
 				{
 					(*CurrentGame).addToFeedbacks(&fluxor->m_flux_text);
 				}
@@ -512,14 +514,19 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 	{
 		if (m_flux < m_flux_max && fluxor->m_flux > 0)
 		{
+			if (m_flux_consumption_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
 			m_flux++;
 			fluxor->m_flux--;
-			fluxor->m_docked = true;
+
 			//consumption finished?
 			if (m_flux == m_flux_max || fluxor->m_flux == 0)
 			{
 				UpdateLinks();
 				UndockFluxor(fluxor);
+			}
+			else
+			{
+				fluxor->m_docked = true;
 			}
 		}
 	}
@@ -562,6 +569,35 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 	}
 }
 
+void Module::AttackModule(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (m_flux > 0 && fluxor->m_flux > 0)
+		{
+			if (fluxor->m_flux_attack_clock.getElapsedTime().asSeconds() > fluxor->m_flux_attack_delay)
+			{
+				m_flux--;
+				fluxor->m_flux--;
+				if (fluxor->m_flux_stealer)
+				{
+					fluxor->m_flux_stolen++;
+				}
+			}
+			
+			//consumption finished?
+			if (m_flux == 0 || fluxor->m_flux == 0)
+			{
+				fluxor->m_docked = false;
+			}
+			else
+			{
+				fluxor->m_docked = true;
+			}
+		}
+	}
+}
+
 void Module::ApplyModuleEffect(Fluxor* fluxor)
 {
 	if (fluxor)
@@ -576,7 +612,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			if (!m_under_construction)
 			{
 				//module "refill/amplify fluxor"
-				if ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0 && m_flux == m_flux_max))
+				if (m_flux == m_flux_max && ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0)))
 				{
 					AmplifyFluxor(fluxor);
 				}
@@ -596,7 +632,6 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			//	m_fluxor_generation_buffer.push_back(new_fluxor);
 			//}
 
-
 			if (!fluxor->m_docked)
 			{
 				UndockFluxor(fluxor);
@@ -613,6 +648,46 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			else
 			{
 				fluxor->setPosition(getPosition());
+			}
+		}
+		//interaction with enemy modules
+		else
+		{
+			if (m_flux > 0)
+			{
+				fluxor->m_docked = false;
+
+				if (fluxor->m_flux_attacker)
+				{
+					AttackModule(fluxor);
+				}
+
+				if (!fluxor->m_docked)
+				{
+					fluxor->setPosition(this->getPosition());
+					if (!fluxor->m_flux_attack_piercing)
+					{
+						if (fluxor->m_flux_stealer)
+						{
+							fluxor->m_speed = (sf::Vector2f(fluxor->m_speed.x *= -1, fluxor->m_speed.y *= -1));
+							fluxor->m_flux = fluxor->m_flux_stolen;
+							fluxor->m_flux_stolen = 0;
+							fluxor->m_flux_max = 0;
+							fluxor->m_flux_attacker = false;
+							fluxor->m_wasting_flux = false;
+							fluxor->m_displaying_flux = false;
+							fluxor->m_consummable_by_modules = true;
+						}
+						else
+						{
+							fluxor->GarbageMe = true;
+						}
+					}
+				}
+				else
+				{
+					fluxor->setPosition(this->getPosition());
+				}
 			}
 		}
 	}
@@ -647,25 +722,29 @@ bool Module::IsMainLinkActivated()
 	return main_link >= 0 && m_link[main_link].m_activated == Link_Activated;
 }
 
-//void Module::ResolveProductionBufferList()
-//{
-//	size_t fluxorGenerationBufferSize = m_fluxor_generation_buffer.size();
-//	if (fluxorGenerationBufferSize > 0)
-//	{
-//		for (size_t i = 0; i < fluxorGenerationBufferSize; i++)
-//		{
-//			int main_link = GetMainLink();
-//			if (main_link >= 0)
-//			{
-//				m_fluxor_generation_buffer[i]->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_fluxor_generation_buffer[i]->m_absolute_speed, main_link * M_PI_2);
-//			}
-//			
-//			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, FluxorObject);
-//		}
-//
-//		m_fluxor_generation_buffer.clear();
-//	}
-//}
+void Module::ResolveProductionBufferList()
+{
+	size_t fluxorGenerationBufferSize = m_fluxor_generation_buffer.size();
+	if (fluxorGenerationBufferSize > 0)
+	{
+		for (size_t i = 0; i < fluxorGenerationBufferSize; i++)
+		{
+			//int main_link = GetMainLinkIndex();
+			//if (main_link >= 0)
+			//{
+			//	m_fluxor_generation_buffer[i]->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_fluxor_generation_buffer[i]->m_absolute_speed, main_link * M_PI_2);
+			//}
+			
+			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, FluxorObject);
+			if (m_fluxor_generation_buffer[i]->m_displaying_flux)
+			{
+				(*CurrentGame).addToFeedbacks(&m_fluxor_generation_buffer[i]->m_flux_text);
+			}
+		}
+
+		m_fluxor_generation_buffer.clear();
+	}
+}
 
 void Module::SwitchLinkDirection()
 {
@@ -704,8 +783,6 @@ void Module::UpdateLinks()
 					{
 						m_link[i].m_activated = Link_Activated;
 					}
-
-					
 				}
 			}
 			else if (i == 1)

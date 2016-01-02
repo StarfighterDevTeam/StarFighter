@@ -128,7 +128,7 @@ public:
 	//FLUX SPECIFIC
 	virtual void GetFluxor(GameObject* object);
 	virtual void GetModule(GameObject* object);
-	//virtual void ResolveProductionBufferList();
+	virtual void ResolveProductionBufferList();
 
 protected:
 	Animation defaultAnimation;

@@ -57,6 +57,7 @@
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
 #define FLUXOR_RESPAWN_MAX_TIME						60.f
 #define FLUXOR_WASTE_DELAY							0.5f
+#define FLUXOR_ATTACK_DELAY							0.5f
 #define FLUXOR_WASTE_VALUE							1
 
 //MODULE
@@ -64,6 +65,7 @@
 #define MODULE_GLOW_MIN_RADIUS						1
 #define MODULE_GLOW_RADIUS							12
 #define MODULE_GLOW_ANIMATION_DURATION				0.5f
+#define MODULE_TRANSFER_DELAY						0.1f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

@@ -8,17 +8,19 @@ void Fluxor::Initialize()
 {
 	m_guided = false;
 	m_docked = false;
-	m_isWasting = false;
+	m_wasting_flux = false;
 	m_flux = 0;
 	m_flux_max = 0;
-	m_isDisplayingFlux = false;
+	m_displaying_flux = false;
 	m_transfer_buffer = 0;
 	m_team = PlayerNeutral;
 
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;
 	m_flux_attacker = false;
+	m_flux_attack_piercing = false;
 	m_flux_stealer = false;
+	m_flux_stolen = 0;
 	m_needs_link_to_circulate = false;
 
 	//Flux display
@@ -61,8 +63,8 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	{
 		case FluxorType_Green:
 		{
-			m_isDisplayingFlux = true;
-			m_isWasting = false;
+			m_displaying_flux = true;
+			m_wasting_flux = false;
 			m_flux = FLUXOR_FLUX_VALUE;
 			m_consummable_by_players = true;
 			m_consummable_by_modules = true;
@@ -70,8 +72,8 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		}
 		case FluxorType_Blue:
 		{
-			m_isDisplayingFlux = true;
-			m_isWasting = false;
+			m_displaying_flux = true;
+			m_wasting_flux = false;
 			m_flux = FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
 			m_needs_link_to_circulate = true;
@@ -79,21 +81,24 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		}
 		case FluxorType_Red:
 		{
-			m_isDisplayingFlux = true;
-			m_isWasting = true;
+			m_displaying_flux = true;
+			m_wasting_flux = true;
 			m_flux_waste = FLUXOR_WASTE_VALUE;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			m_flux = 10;
 			m_flux_max = 10;
 			m_flux_attacker = true;
+			m_flux_attack_piercing = true;
 			break;
 		}
 		case FluxorType_Purple:
 		{
-			m_isDisplayingFlux = true;
-			m_isWasting = true;
+			m_displaying_flux = true;
+			m_wasting_flux = true;
 			m_flux_waste = FLUXOR_WASTE_VALUE;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			m_flux = 20;
 			m_flux_max = 20;
 			m_flux_attacker = true;
@@ -119,7 +124,7 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
 
 	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);
-	if (new_Fluxor->m_isDisplayingFlux)
+	if (new_Fluxor->m_displaying_flux)
 	{
 		(*CurrentGame).addToFeedbacks(&new_Fluxor->m_flux_text);
 	}
@@ -129,7 +134,7 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 
 Fluxor::~Fluxor()
 {
-	if (m_isDisplayingFlux)
+	if (m_displaying_flux)
 		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
 }
 
@@ -139,10 +144,10 @@ Fluxor* Fluxor::Clone()
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
 	clone->m_FluxorType = this->m_FluxorType;
-	clone->m_isDisplayingFlux = this->m_isDisplayingFlux;
+	clone->m_displaying_flux = this->m_displaying_flux;
 	clone->m_flux = this->m_flux;
 	clone->m_flux_max = this->m_flux_max;
-	clone->m_isWasting = this->m_isWasting;
+	clone->m_wasting_flux = this->m_wasting_flux;
 	clone->m_flux_waste = this->m_flux_waste;
 	clone->m_flux_waste_delay = this->m_flux_waste_delay;
 
@@ -197,7 +202,7 @@ void Fluxor::update(sf::Time deltaTime)
 		}
 
 		//hud
-		if (m_isDisplayingFlux)
+		if (m_displaying_flux)
 		{
 			ostringstream ss;
 			ss << m_flux;
@@ -340,7 +345,7 @@ void Fluxor::UpdateRotation()
 void Fluxor::Death()
 {
 	visible = false;
-	if (m_isDisplayingFlux)
+	if (m_displaying_flux)
 	{
 		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
 	}
@@ -360,7 +365,7 @@ void Fluxor::Respawn()
 	m_turn_delay = RandomizeTurnDelay();
 	m_turn_clock.restart();
 
-	if (m_isDisplayingFlux)
+	if (m_displaying_flux)
 	{
 		(*CurrentGame).addToFeedbacks(&m_flux_text);
 	}
@@ -368,7 +373,7 @@ void Fluxor::Respawn()
 
 void Fluxor::WastingFlux()
 {
-	if (m_isWasting)
+	if (m_wasting_flux)
 	{
 		if (m_flux_waste_clock.getElapsedTime().asSeconds() > m_flux_waste_delay)
 		{

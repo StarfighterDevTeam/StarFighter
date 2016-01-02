@@ -73,10 +73,14 @@ public :
 	void ConsummeFluxor(Fluxor* fluxor);
 	void AmplifyFluxor(Fluxor* fluxor);
 	float m_flux_transfer_delay;
+	sf::Clock m_flux_consumption_clock;
+
+	//Module attacked by Fluxors
+	void AttackModule(Fluxor* fluxor);
 
 	//Spawn
-	//void ResolveProductionBufferList() override;
-	//vector<Fluxor*> m_fluxor_generation_buffer;
+	void ResolveProductionBufferList() override;
+	vector<Fluxor*> m_fluxor_generation_buffer;
 
 	//Links
 	GameObject* m_arrow[4];

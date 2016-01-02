@@ -287,9 +287,9 @@ void Ship::GetModule(GameObject* object)
 		{
 			Module* module = (Module*)object;
 
-			if (module->m_under_construction)
+			if (m_curGridIndex.x == module->m_curGridIndex.x && m_curGridIndex.y == module->m_curGridIndex.y)
 			{
-				if (m_curGridIndex.x == module->m_curGridIndex.x && m_curGridIndex.y == module->m_curGridIndex.y)
+				if (module->m_under_construction)
 				{
 					if (InputGuy::isFiring())
 					{
@@ -302,11 +302,11 @@ void Ship::GetModule(GameObject* object)
 						}
 					}
 				}
-			}
 
-			if (InputGuy::isUsing() && m_CtrlKey_released)
-			{
-				module->SwitchLinkDirection();
+				if (InputGuy::isUsing() && m_CtrlKey_released)
+				{
+					module->SwitchLinkDirection();
+				}
 			}
 		}
 	}

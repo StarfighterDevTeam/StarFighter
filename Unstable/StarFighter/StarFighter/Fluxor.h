@@ -41,13 +41,17 @@ public :
 	bool m_docked;
 	
 	//Fluxor properties
-	bool m_isDisplayingFlux;
+	bool m_displaying_flux;
 	bool m_consummable_by_players;
 	bool m_consummable_by_modules;
 	bool m_needs_link_to_circulate;
 	bool m_flux_attacker;
 	bool m_flux_stealer;
-	bool m_isWasting;
+	unsigned int m_flux_stolen;
+	bool m_flux_attack_piercing;
+	float m_flux_attack_delay;
+	sf::Clock m_flux_attack_clock;
+	bool m_wasting_flux;
 	int m_flux_waste;
 	float m_flux_waste_delay;
 	sf::Clock m_flux_waste_clock;
