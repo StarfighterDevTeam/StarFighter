@@ -87,6 +87,7 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 	Fluxor* new_Fluxor = new Fluxor(FluxorType);
 	
 	new_Fluxor->setPosition(RandomizePosition());
+	new_Fluxor->m_initial_position = new_Fluxor->getPosition();
 	new_Fluxor->m_speed = RandomizeSpeed();
 	new_Fluxor->m_absolute_speed = GetAbsoluteSpeed(new_Fluxor->m_speed);
 	new_Fluxor->m_turn_delay = RandomizeTurnDelay();

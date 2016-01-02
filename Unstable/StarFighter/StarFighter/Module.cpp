@@ -461,6 +461,7 @@ bool Module::GenerateFluxor()
 				UpdateFluxorDirection(fluxor);
 
 				fluxor->setPosition(getPosition());
+				fluxor->m_initial_position = getPosition();
 
 				(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
 				//flux display
@@ -529,7 +530,6 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 			if (fluxor->m_transfer_buffer == 0)
 			{
 				fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
-				fluxor->m_docked = true;
 				fluxor->m_flux_transfer_clock.restart();
 			}
 
@@ -543,13 +543,15 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 
 			if (fluxor->m_transfer_buffer == 0)
 			{
-				//fluxor->m_docked = false;
 				UndockFluxor(fluxor);
+			}
+			else
+			{
+				fluxor->m_docked = true;
 			}
 		}
 		else
 		{
-			//fluxor->m_docked = false;
 			UndockFluxor(fluxor);
 			fluxor->m_transfer_buffer = 0;
 		}
@@ -560,6 +562,10 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
+		//by default, we assume at each frame that the Fluxor will be released unless told otherwise.
+		//therefore each method must explicitly lock it again if needed, every frame with "fluxor->m_docked = true"
+		fluxor->m_docked = false;
+
 		if (fluxor->m_FluxorType == FluxorType_Blue && !m_under_construction)
 		{
 			//module "refill/amplify fluxor"
@@ -609,7 +615,6 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			UndockFluxor(fluxor);
 			UpdateFluxorDirection(fluxor);
 
-			printf("blip\n");
 			//accelerator
 			if (m_add_speed != 0 && m_flux == m_flux_max)
 			{
