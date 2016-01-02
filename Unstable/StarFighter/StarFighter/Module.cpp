@@ -16,7 +16,6 @@ void Module::Initialize()
 	SetConstructionStatus(true);
 
 	m_isGeneratingFluxor = false;
-	m_isConsummingFlux = false;
 	m_isRefillingFlux = false;
 	m_flux_transfer_delay = 0.1f;
 	m_fluxor_generation_cost = 0;
@@ -151,7 +150,6 @@ Module::Module(ModuleType moduleType)
 		{
 			m_flux_max_after_construction = 1500;
 			m_flux_max_under_construction = 20;
-			m_isConsummingFlux = true;
 			break;
 		}
 		case ModuleType_Relay:
@@ -426,13 +424,14 @@ void Module::GetFluxor(GameObject* object)
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_flux == m_flux_max)// && IsMainLinkActivated())//m_flux >= m_fluxor_generation_cost)
+	if (m_isGeneratingFluxor && m_flux == m_flux_max)
 	{
-		if (m_fluxor_generated_type != FluxorType_Blue || IsMainLinkActivated())//only Blue Fluxors need to be connected in order to be generated
+		Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+		if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//only Blue Fluxors need to be connected in order to be generated
 		{
 			if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 			{
-				Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+				
 				m_flux -= m_fluxor_generation_cost;
 
 				fluxor->m_guided = true;
@@ -545,49 +544,29 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 		//therefore each method must explicitly lock it again if needed, every frame with "fluxor->m_docked = true"
 		fluxor->m_docked = false;
 
-		if (fluxor->m_FluxorType == FluxorType_Blue && !m_under_construction)
+		if (!m_under_construction)
 		{
 			//module "refill/amplify fluxor"
-			if (m_add_flux > 0 && m_flux == m_flux_max)
+			if ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0 && m_flux == m_flux_max))
 			{
 				AmplifyFluxor(fluxor);
 			}
 
 			//consumption (automatic) - must be done last
-			ConsummeFluxor(fluxor);
-		}
-
-		else if (fluxor->m_FluxorType == FluxorType_Green && m_under_construction)
-		{
-			//consumption (automatic) - must be done last
-			ConsummeFluxor(fluxor);
-		}
-
-		else if (fluxor->m_FluxorType == FluxorType_Red)
-		{
-			//module "refill/amplify fluxor"
-			if (m_flux == m_flux_max)
-			{
-				if (m_isRefillingFlux)
-				{
-					AmplifyFluxor(fluxor);
-				}
-			}
-
-			//module "consumption" - must be done last
-			if (m_isConsummingFlux)
+			if (fluxor->m_consummable_by_modules)
 			{
 				ConsummeFluxor(fluxor);
 			}
-
-			////module "factory"
-			//if (m_isGeneratingFluxor)
-			//{
-			//	Fluxor* new_fluxor = new Fluxor(m_fluxor_generated_type);
-			//	new_fluxor->m_speed = (sf::Vector2f(0, 100));
-			//	m_fluxor_generation_buffer.push_back(new_fluxor);
-			//}
 		}
+
+		////module "factory"
+		//if (m_isGeneratingFluxor)
+		//{
+		//	Fluxor* new_fluxor = new Fluxor(m_fluxor_generated_type);
+		//	new_fluxor->m_speed = (sf::Vector2f(0, 100));
+		//	m_fluxor_generation_buffer.push_back(new_fluxor);
+		//}
+		
 
 		if (!fluxor->m_docked)
 		{
@@ -613,7 +592,7 @@ bool Module::UndockFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (fluxor->m_FluxorType != FluxorType_Blue || IsMainLinkActivated())
+		if (!fluxor->m_consummable_by_modules || IsMainLinkActivated())
 		{
 			fluxor->m_docked = false;
 			return true;

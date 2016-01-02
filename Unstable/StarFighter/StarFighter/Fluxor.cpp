@@ -14,6 +14,12 @@ void Fluxor::Initialize()
 	m_isDisplayingFlux = false;
 	m_transfer_buffer = 0;
 
+	m_consummable_by_players = false;
+	m_consummable_by_modules = false;
+	m_flux_attacker = false;
+	m_flux_stealer = false;
+	m_needs_link_to_circulate = false;
+
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
 	m_flux_text.setCharacterSize(20);
@@ -36,7 +42,9 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		textureName = "Assets/2D/fluxor_green.png";
 	if (FluxorType == FluxorType_Red)
 		textureName = "Assets/2D/fluxor_red.png";
-
+	if (FluxorType == FluxorType_Purple)
+		textureName = "Assets/2D/fluxor_purple.png";
+		
 	const unsigned int W = FLUXOR_WIDTH;
 	const unsigned int H = FLUXOR_HEIGHT;
 		
@@ -55,6 +63,8 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_isDisplayingFlux = true;
 			m_isWasting = false;
 			m_flux = FLUXOR_FLUX_VALUE;
+			m_consummable_by_players = true;
+			m_consummable_by_modules = true;
 			break;
 		}
 		case FluxorType_Blue:
@@ -62,6 +72,8 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_isDisplayingFlux = true;
 			m_isWasting = false;
 			m_flux = FLUXOR_FLUX_VALUE;
+			m_consummable_by_modules = true;
+			m_needs_link_to_circulate = true;
 			break;
 		}
 		case FluxorType_Red:
@@ -72,6 +84,19 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 			m_flux = 10;
 			m_flux_max = 10;
+			m_flux_attacker = true;
+			break;
+		}
+		case FluxorType_Purple:
+		{
+			m_isDisplayingFlux = true;
+			m_isWasting = true;
+			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+			m_flux = 20;
+			m_flux_max = 20;
+			m_flux_attacker = true;
+			m_flux_stealer = true;
 			break;
 		}
 	}

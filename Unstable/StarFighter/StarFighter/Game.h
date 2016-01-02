@@ -25,6 +25,7 @@ enum FluxorType
 	FluxorType_Blue,
 	FluxorType_Green,
 	FluxorType_Red,
+	FluxorType_Purple,
 	NBVAL_FluxorType,
 };
 

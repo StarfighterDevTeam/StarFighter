@@ -39,8 +39,14 @@ public :
 
 	bool m_guided;
 	bool m_docked;
+	
+	//Fluxor properties
 	bool m_isDisplayingFlux;
-
+	bool m_consummable_by_players;
+	bool m_consummable_by_modules;
+	bool m_needs_link_to_circulate;
+	bool m_flux_attacker;
+	bool m_flux_stealer;
 	bool m_isWasting;
 	int m_flux_waste;
 	float m_flux_waste_delay;

@@ -258,7 +258,7 @@ void Ship::GetFluxor(GameObject* object)
 		if (m_flux < m_flux_max)
 		{
 			Fluxor* fluxor = (Fluxor*)object;
-			if (fluxor->m_FluxorType == FluxorType_Green)
+			if (fluxor->m_consummable_by_players)
 			{
 				m_flux += fluxor->m_flux;
 				if (m_flux > m_flux_max)

@@ -51,7 +51,6 @@ public :
 
 	//Module properties
 	void ApplyModuleEffect(Fluxor* fluxor);
-	bool m_isConsummingFlux;
 	bool m_isRefillingFlux;
 	int m_add_speed;
 	int m_add_flux;

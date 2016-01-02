@@ -41,11 +41,11 @@ void InGameState::Initialize(Player player)
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator);
 	//module->m_flux_autogeneration_time = 0.01f;
 
-	Module::CreateModule(sf::Vector2u(7, 5), ModuleType_Factory);
-	Module::CreateModule(sf::Vector2u(8, 5), ModuleType_Accelerator);
-	Module::CreateModule(sf::Vector2u(6, 5), ModuleType_Amplifier);
-	Module::CreateModule(sf::Vector2u(5, 6), ModuleType_Relay);
-	Module::CreateModule(sf::Vector2u(6, 6), ModuleType_Amplifier);
+	//Module::CreateModule(sf::Vector2u(7, 5), ModuleType_Factory);
+	//Module::CreateModule(sf::Vector2u(8, 5), ModuleType_Accelerator);
+	//Module::CreateModule(sf::Vector2u(6, 5), ModuleType_Amplifier);
+	//Module::CreateModule(sf::Vector2u(5, 6), ModuleType_Relay);
+	//Module::CreateModule(sf::Vector2u(6, 6), ModuleType_Amplifier);
 
 	//Spawning Fluxors
 	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
