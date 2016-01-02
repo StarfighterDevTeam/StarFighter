@@ -40,6 +40,8 @@ public :
 	bool m_guided;
 	bool m_docked;
 	
+	vector<Module*> m_modules_visited;
+
 	//Fluxor properties
 	bool m_displaying_flux;
 	bool m_consummable_by_players;

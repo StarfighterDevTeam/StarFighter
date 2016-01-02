@@ -44,6 +44,8 @@ void Module::Initialize()
 		m_arrow[i]->visible = m_link[i].m_exists;
 		float angle = i * 90;
 		m_arrow[i]->rotate(i * 90);
+
+		m_linked_modules[i] = NULL;
 	}
 }
 
@@ -478,6 +480,8 @@ bool Module::GenerateFluxor()
 
 				m_fluxor_spawn_clock.restart();
 
+				fluxor->m_modules_visited.push_back(this);//must come after UpdateFluxorDirection(fluxor)
+
 				return true;
 			}
 		}
@@ -612,9 +616,10 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
+		fluxor->m_modules_visited.push_back(this);
+
 		//by default, we assume at each frame that the Fluxor will be released unless told otherwise.
 		//therefore each method must explicitly lock it again if needed, every frame with "fluxor->m_docked = true"
-		
 		if (fluxor->m_team == this->m_team)
 		{
 			fluxor->m_docked = false;
@@ -768,6 +773,7 @@ void Module::UpdateLinks()
 	{
 		m_arrow[i]->visible = m_link[i].m_exists;
 
+		Module* module = NULL;
 		if (m_under_construction)
 		{
 			m_link[i].m_activated = Link_Deactivated;
@@ -775,8 +781,6 @@ void Module::UpdateLinks()
 		else
 		{
 			sf::Vector2u global_grid_index = sf::Vector2u(m_curGridIndex.x - 1, m_curGridIndex.y - 1);
-			Module* module = NULL;
-			bool link_found = false;
 
 			if (i == 0)
 			{
@@ -899,6 +903,9 @@ void Module::UpdateLinks()
 				}
 			}
 		}
+
+		//update knownledge of linked modules
+		m_linked_modules[i] = module;
 		
 		//update arrow visual
 		m_arrow[i]->setAnimationLine(m_link[i].m_activated);
@@ -925,13 +932,37 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 			int main_link = GetMainLinkIndex();
 			if (main_link >= 0)
 			{
-				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, main_link * M_PI_2 - M_PI_2);
-				if (main_link % 2 == 0)
-					fluxor->setPosition(sf::Vector2f(fluxor->getPosition().x, getPosition().y));
-				else
-					fluxor->setPosition(sf::Vector2f(getPosition().x, fluxor->getPosition().y));
+				if (m_linked_modules[main_link])//just a double check
+				{
+					size_t ModulesVisitedVectorSize = fluxor->m_modules_visited.size();
+					for (size_t i = 0; i < ModulesVisitedVectorSize; i++)
+					{
+						if (fluxor->m_modules_visited[i])
+						{
+							//element found?
+							if (m_linked_modules[main_link] == fluxor->m_modules_visited[i] && m_linked_modules[main_link]->m_team == fluxor->m_team)
+							{
+								//Fluxor is visiting the same Module twice. This is forbidden for allied modules.
+								fluxor->GarbageMe = true;
+								return false;
+							}
+						}
+					}
 
-				return true;
+					//linked module is legit, we shall proceed to direction change
+					fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, main_link * M_PI_2 - M_PI_2);
+					if (main_link % 2 == 0)
+						fluxor->setPosition(sf::Vector2f(fluxor->getPosition().x, getPosition().y));
+					else
+						fluxor->setPosition(sf::Vector2f(getPosition().x, fluxor->getPosition().y));
+
+					return true;
+				}
+				else
+				{
+					printf("<!> Error in Module::UpdateFluxorDirection(Fluxor* fluxor), trying to call a m_linked_modules[main_link] that is NULL. m_linked_modules is probably not synced properly with GetMainLinkIndex()\n.");
+					return false;
+				}
 			}
 			else
 			{

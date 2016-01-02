@@ -85,6 +85,7 @@ public :
 	//Links
 	GameObject* m_arrow[4];
 	Link m_link[4];
+	Module* m_linked_modules[4];
 	int GetMainLinkIndex();
 	void SwitchLinkDirection();
 	bool UndockFluxor(Fluxor* fluxor);
