@@ -22,6 +22,7 @@ void Module::Initialize()
 	m_add_speed = 0;
 	m_add_flux = 0;
 	m_isAutogeneratingFlux = false;
+	m_turret_range = 0;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -101,9 +102,9 @@ Module::Module(ModuleType moduleType)
 			textureName = "Assets/2D/module_turret.png";
 			break;
 		}
-		case ModuleType_Switch:
+		case ModuleType_Barrier:
 		{
-			textureName = "Assets/2D/module_switch.png";
+			textureName = "Assets/2D/module_barrier.png";
 			break;
 		}
 		case ModuleType_Amplifier:
@@ -179,23 +180,25 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Turret:
 		{
-			m_flux_max_after_construction = 200;
-			m_flux_max_under_construction = 20;
+			m_flux_max_after_construction = 50;
+			m_flux_max_under_construction = 30;
+			m_turret_range = 4;
+			m_isGeneratingFluxor = true;
+			m_fluxor_generated_type = FluxorType_Black;
+			m_fluxor_generation_time = 3.f;
 			break;
 		}
-		case ModuleType_Switch:
+		case ModuleType_Barrier:
 		{
-			m_flux_max_after_construction = 1;
+			m_flux_max_after_construction = 200;
 			m_flux_max_under_construction = 20;
-			for (int i = 0; i < 4; i++)
-			{
-				m_link[i].m_exists = true;
-			}
+			m_isAutogeneratingFlux = true;
+			m_flux_autogeneration_time = 1.f;
 		}
 		case ModuleType_Amplifier:
 		{
 			m_flux_max_after_construction = 30;
-			m_flux_max_under_construction = 20;
+			m_flux_max_under_construction = 30;
 			m_add_flux = 30;
 			break;
 		}
@@ -307,7 +310,25 @@ void Module::DebugFinishModule(sf::Vector2u grid_index)
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
 		Module* module = (Module*)(*CurrentGame).m_module_grid[grid_index.x][grid_index.y];
-		module->FinishConstruction();
+		if (module->m_under_construction)
+		{
+			module->FinishConstruction();
+		}
+	}
+}
+
+void Module::DebugRefillingModuleFlux(sf::Vector2u grid_index)
+{
+	grid_index.x--;
+	grid_index.y--;
+
+	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
+	{
+		Module* module = (Module*)(*CurrentGame).m_module_grid[grid_index.x][grid_index.y];
+		if (!module->m_under_construction)
+		{
+			module->m_flux = module->m_flux_max;
+		}
 	}
 }
 
@@ -349,18 +370,18 @@ void Module::FinishConstruction()
 	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorObject).size();
 	for (int i = 0; i < FluxorVectorSize; i++)
 	{
-		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i])
+		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i] == NULL)
+			continue;
+
+		Fluxor* fluxor = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i];
+		if (fluxor->visible && !fluxor->m_guided)
 		{
-			Fluxor* fluxor = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i];
-			if (fluxor->visible && !fluxor->m_guided)
+			//quick collision test
+			sf::IntRect boundsA(SimpleCollision::FToIRect(fluxor->getGlobalBounds()));
+			sf::IntRect boundsB(SimpleCollision::FToIRect(this->getGlobalBounds()));
+			if (boundsA.intersects(boundsB))
 			{
-				//quick collision test
-				sf::IntRect boundsA(SimpleCollision::FToIRect(fluxor->getGlobalBounds()));
-				sf::IntRect boundsB(SimpleCollision::FToIRect(this->getGlobalBounds()));
-				if (boundsA.intersects(boundsB))
-				{
-					fluxor->Death();
-				}
+				fluxor->Death();
 			}
 		}
 	}
@@ -458,31 +479,42 @@ bool Module::GenerateFluxor()
 		Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
 		fluxor->m_team = this->m_team;
 
-		if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//only Blue Fluxors need to be connected in order to be generated
+		//turret?
+		if (m_turret_range > 0)
 		{
-			if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
+			fluxor->m_target = SearchNearbyAttackers(m_team, m_turret_range * TILE_SIZE);
+			if (fluxor->m_target)
+				printf("hurra");
+		}
+
+		if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//if it needs a link to circulate, we check that an activated link exists
+		{
+			if (m_turret_range == 0 || fluxor->m_target)//turrets only fire when a target is in sight within range
 			{
-				m_flux -= m_fluxor_generation_cost;
-
-				fluxor->m_guided = true;
-				fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
-				UpdateFluxorDirection(fluxor);
-
-				fluxor->setPosition(getPosition());
-				fluxor->m_initial_position = getPosition();
-
-				(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
-				//flux display
-				if (fluxor->m_displaying_flux)
+				if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 				{
-					(*CurrentGame).addToFeedbacks(&fluxor->m_flux_text);
+					m_flux -= m_fluxor_generation_cost;
+
+					fluxor->m_guided = true;
+					fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
+					UpdateFluxorDirection(fluxor);
+
+					fluxor->setPosition(getPosition());
+					fluxor->m_initial_position = getPosition();
+
+					(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
+					//flux display
+					if (fluxor->m_displaying_flux)
+					{
+						(*CurrentGame).addToFeedbacks(&fluxor->m_flux_text);
+					}
+
+					m_fluxor_spawn_clock.restart();
+
+					fluxor->m_modules_visited.push_back(this);//must come after UpdateFluxorDirection(fluxor)
+
+					return true;
 				}
-
-				m_fluxor_spawn_clock.restart();
-
-				fluxor->m_modules_visited.push_back(this);//must come after UpdateFluxorDirection(fluxor)
-
-				return true;
 			}
 		}
 	}
@@ -627,9 +659,12 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			if (!m_under_construction)
 			{
 				//module "refill/amplify fluxor"
-				if (m_flux == m_flux_max && ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0)))
+				if (fluxor->m_can_be_refilled_by_modules)
 				{
-					AmplifyFluxor(fluxor);
+					if (m_flux == m_flux_max && ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0)))
+					{
+						AmplifyFluxor(fluxor);
+					}
 				}
 
 				//consumption (automatic) - must be done last
@@ -929,45 +964,60 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 	{
 		if (fluxor->m_guided)
 		{
-			int main_link = GetMainLinkIndex();
-			if (main_link >= 0)
+			if (fluxor->m_target)
 			{
-				if (m_linked_modules[main_link])//just a double check
+				//go to target
+				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, GetAngleRadBetweenPositions(this->getPosition(), fluxor->m_target->getPosition()));
+				fluxor->setPosition(sf::Vector2f(getPosition().x, getPosition().y));
+				return true;
+			}
+			else
+			{
+				int main_link = GetMainLinkIndex();
+				if (main_link >= 0)
 				{
-					size_t ModulesVisitedVectorSize = fluxor->m_modules_visited.size();
-					for (size_t i = 0; i < ModulesVisitedVectorSize; i++)
+					//linked module is not a loop circuit?
+					if (m_linked_modules[main_link])
 					{
-						if (fluxor->m_modules_visited[i])
+						size_t ModulesVisitedVectorSize = fluxor->m_modules_visited.size();
+						for (size_t i = 0; i < ModulesVisitedVectorSize; i++)
 						{
-							//element found?
-							if (m_linked_modules[main_link] == fluxor->m_modules_visited[i] && m_linked_modules[main_link]->m_team == fluxor->m_team)
+							if (fluxor->m_modules_visited[i])
 							{
-								//Fluxor is visiting the same Module twice. This is forbidden for allied modules.
-								fluxor->GarbageMe = true;
-								return false;
+								//element found?
+								if (m_linked_modules[main_link] == fluxor->m_modules_visited[i] && m_linked_modules[main_link]->m_team == fluxor->m_team)
+								{
+									//This is a looping circuit (allied module visited twice). This is forbidden, and the Fluxor shall therefore die now.
+									fluxor->GarbageMe = true;
+									return false;
+								}
 							}
 						}
 					}
 
 					//linked module is legit, we shall proceed to direction change
-					fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, main_link * M_PI_2 - M_PI_2);
-					if (main_link % 2 == 0)
-						fluxor->setPosition(sf::Vector2f(fluxor->getPosition().x, getPosition().y));
+					if (fluxor->m_target)
+					{
+						//go to target
+						fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, GetAngleRadBetweenPositions(this->getPosition(), fluxor->m_target->getPosition()));
+						fluxor->setPosition(sf::Vector2f(getPosition().x, getPosition().y));
+					}
 					else
-						fluxor->setPosition(sf::Vector2f(getPosition().x, fluxor->getPosition().y));
+					{
+						fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, main_link * M_PI_2 - M_PI_2);
+						if (main_link % 2 == 0)
+							fluxor->setPosition(sf::Vector2f(fluxor->getPosition().x, getPosition().y));
+						else
+							fluxor->setPosition(sf::Vector2f(getPosition().x, fluxor->getPosition().y));
+					}
 
 					return true;
 				}
 				else
 				{
-					printf("<!> Error in Module::UpdateFluxorDirection(Fluxor* fluxor), trying to call a m_linked_modules[main_link] that is NULL. m_linked_modules is probably not synced properly with GetMainLinkIndex()\n.");
+					printf("<!> Trying to generate fluxors with a module that doesn't have link, in Module::UpdateFluxorDirection(Fluxor* fluxor)\n.");
 					return false;
 				}
-			}
-			else
-			{
-				printf("<!> Trying to generate fluxors with a module that doesn't have link, in Module::UpdateFluxorDirection(Fluxor* fluxor)\n.");
-				return false;
 			}
 		}
 		else
@@ -979,4 +1029,41 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 
 	printf("<!> Trying to update a NULL pointer with Module::UpdateFluxorDirection(Fluxor* fluxor)\n.");
 	return false;
+}
+
+Fluxor* Module::SearchNearbyAttackers(PlayerTeams team_not_to_target, float range)
+{
+	Fluxor* fluxor = NULL;
+	float shortest_distance = -1;
+
+	size_t FluxorsVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorObject).size();
+	for (size_t i = 0; i < FluxorsVectorSize; i++)
+	{
+		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i] == NULL)
+			continue;
+
+		Fluxor* pCandidate = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i];
+
+		if (pCandidate->m_team != team_not_to_target && pCandidate->m_flux_attacker)
+		{
+			if (pCandidate->isOnScene && !pCandidate->m_ghost && pCandidate->visible)
+			{
+				const float a = this->getPosition().x - pCandidate->getPosition().x;
+				const float b = this->getPosition().y - pCandidate->getPosition().y;
+
+				float distance_to_ref = (a * a) + (b * b);
+				//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
+				if (distance_to_ref < shortest_distance || shortest_distance < 0)
+				{
+					if (distance_to_ref < range * range)
+					{
+						shortest_distance = distance_to_ref;
+						fluxor = pCandidate;
+					}
+				}
+			}
+		}
+	}
+
+	return fluxor;
 }

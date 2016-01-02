@@ -42,6 +42,7 @@ public:
 	static bool isSpawningModule0();
 	static bool isErasingModule();
 	static bool isFinishModuleConstruction();
+	static bool isRefillingFlux();
 };
 
 

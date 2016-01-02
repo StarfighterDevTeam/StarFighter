@@ -29,6 +29,7 @@ public :
 	static Module* CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team);
 	static void EraseModule(sf::Vector2u grid_index);
 	static void DebugFinishModule(sf::Vector2u grid_index);
+	static void DebugRefillingModuleFlux(sf::Vector2u grid_index);
 	void Initialize();
 	Module* Clone();
 	virtual ~Module();
@@ -54,6 +55,8 @@ public :
 	bool m_isRefillingFlux;
 	int m_add_speed;
 	int m_add_flux;
+	unsigned int m_turret_range;
+	Fluxor* SearchNearbyAttackers(PlayerTeams team_not_to_target, float range);
 
 	//Flux auto-generation
 	bool m_isAutogeneratingFlux;

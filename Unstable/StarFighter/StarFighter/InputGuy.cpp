@@ -249,3 +249,8 @@ bool InputGuy::isFinishModuleConstruction()
 {
 	return sf::Keyboard::isKeyPressed(sf::Keyboard::Add);
 }
+
+bool InputGuy::isRefillingFlux()
+{
+	return sf::Keyboard::isKeyPressed(sf::Keyboard::Multiply);
+}

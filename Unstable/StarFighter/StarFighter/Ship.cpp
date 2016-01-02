@@ -137,6 +137,11 @@ void Ship::update(sf::Time deltaTime)
 	{
 		Module::DebugFinishModule(m_curGridIndex);
 	}
+	if (InputGuy::isRefillingFlux())
+	{
+		Module::DebugRefillingModuleFlux(m_curGridIndex);
+	}
+	
 }
 
 void Ship::ScreenBorderContraints()

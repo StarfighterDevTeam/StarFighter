@@ -41,13 +41,16 @@ public :
 	bool m_docked;
 	
 	vector<Module*> m_modules_visited;
+	GameObject* m_target;
 
 	//Fluxor properties
 	bool m_displaying_flux;
 	bool m_consummable_by_players;
 	bool m_consummable_by_modules;
+	bool m_can_be_refilled_by_modules;
 	bool m_needs_link_to_circulate;
 	bool m_flux_attacker;
+	bool m_fluxovore;
 	bool m_flux_stealer;
 	unsigned int m_flux_stolen;
 	bool m_flux_attack_piercing;

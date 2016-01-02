@@ -26,6 +26,7 @@ enum FluxorType
 	FluxorType_Green,
 	FluxorType_Red,
 	FluxorType_Purple,
+	FluxorType_Black,
 	NBVAL_FluxorType,
 };
 
@@ -39,7 +40,7 @@ enum ModuleType
 	ModuleType_Factory,
 	ModuleType_Shield,
 	ModuleType_Turret,
-	ModuleType_Switch,
+	ModuleType_Barrier,
 	ModuleType_Armory,
 	NBVAL_ModuleType,
 };

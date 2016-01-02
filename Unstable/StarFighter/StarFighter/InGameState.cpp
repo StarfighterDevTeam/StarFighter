@@ -45,7 +45,7 @@ void InGameState::Initialize(Player player)
 	Module* module2 = Module::CreateModule(sf::Vector2u(10, 5), ModuleType_Battery, PlayerRed);
 	module2->FinishConstruction();
 	module2->m_flux = 15;
-	Module* module3 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed);
+	Module* module3 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Turret, PlayerRed);
 	module3->FinishConstruction();
 	module3->m_flux = 1000;
 

@@ -14,6 +14,7 @@ void Fluxor::Initialize()
 	m_displaying_flux = false;
 	m_transfer_buffer = 0;
 	m_team = PlayerNeutral;
+	m_target = NULL;
 
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;
@@ -22,6 +23,8 @@ void Fluxor::Initialize()
 	m_flux_stealer = false;
 	m_flux_stolen = 0;
 	m_needs_link_to_circulate = false;
+	m_fluxovore = false;
+	m_can_be_refilled_by_modules = true;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -39,14 +42,39 @@ Fluxor::Fluxor(FluxorType FluxorType)
 {
 	//texture
 	std::string textureName;
-	if (FluxorType == FluxorType_Blue)
-		textureName = "Assets/2D/fluxor_blue.png";
-	if (FluxorType == FluxorType_Green)
-		textureName = "Assets/2D/fluxor_green.png";
-	if (FluxorType == FluxorType_Red)
-		textureName = "Assets/2D/fluxor_red.png";
-	if (FluxorType == FluxorType_Purple)
-		textureName = "Assets/2D/fluxor_purple.png";
+	switch (FluxorType)
+	{
+		case FluxorType_Blue:
+		{
+			textureName = "Assets/2D/fluxor_blue.png";
+			break;
+		}
+		case FluxorType_Green:
+		{
+			textureName = "Assets/2D/fluxor_green.png";
+			break;
+		}
+		case FluxorType_Red:
+		{
+			textureName = "Assets/2D/fluxor_red.png";
+			break;
+		}
+		case FluxorType_Purple:
+		{
+			textureName = "Assets/2D/fluxor_purple.png";
+			break;
+		}
+		case FluxorType_Black:
+		{
+			textureName = "Assets/2D/fluxor_black.png";
+			break;
+		}
+		default:
+		{
+			textureName = "Assets/2D/fluxor_blue.png";
+			break;
+		}
+	}
 		
 	const unsigned int W = FLUXOR_WIDTH;
 	const unsigned int H = FLUXOR_HEIGHT;
@@ -103,6 +131,16 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux_max = 20;
 			m_flux_attacker = true;
 			m_flux_stealer = true;
+			break;
+		}
+		case FluxorType_Black:
+		{
+			m_displaying_flux = true;
+			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
+			m_flux = 20;
+			m_flux_max = 0;
+			m_fluxovore = true;
+			m_can_be_refilled_by_modules = false;
 			break;
 		}
 	}
