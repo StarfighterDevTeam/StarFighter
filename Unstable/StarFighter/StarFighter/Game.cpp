@@ -210,10 +210,16 @@ void Game::drawScene()
 		{
 			for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
 			{
+				if (*it == NULL)
+					continue;
+
 				mainScreen.draw(*(*it));
 			}
 			for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
 			{
+				if (*it == NULL)
+					continue;
+
 				mainScreen.draw(*(*it));
 			}
 		}

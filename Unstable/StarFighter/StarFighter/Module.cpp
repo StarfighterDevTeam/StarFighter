@@ -164,7 +164,7 @@ Module::Module(ModuleType moduleType)
 			m_flux_max_after_construction = 10;
 			m_flux_max_under_construction = 20;
 			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Purple;
+			m_fluxor_generated_type = FluxorType_Red;
 			m_fluxor_generation_time = 3.f;
 			m_fluxor_generation_cost = m_flux_max_after_construction;
 			break;
@@ -573,20 +573,30 @@ void Module::AttackModule(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (m_flux > 0 && fluxor->m_flux > 0)
+		if (m_flux >= 0 && fluxor->m_flux > 0)
 		{
 			if (fluxor->m_flux_attack_clock.getElapsedTime().asSeconds() > fluxor->m_flux_attack_delay)
 			{
-				m_flux--;
-				fluxor->m_flux--;
-				if (fluxor->m_flux_stealer)
+				//kill?
+				if (m_flux == 0)
 				{
-					fluxor->m_flux_stolen++;
+					this->GarbageMe = true;
 				}
+				else
+				{
+					m_flux--;
+					fluxor->m_flux--;
+					if (fluxor->m_flux_stealer)
+					{
+						fluxor->m_flux_stolen++;
+					}
+				}
+
+				fluxor->m_flux_attack_clock.restart();
 			}
 			
 			//consumption finished?
-			if (m_flux == 0 || fluxor->m_flux == 0)
+			if (this->GarbageMe || fluxor->m_flux == 0)
 			{
 				fluxor->m_docked = false;
 			}
@@ -653,41 +663,38 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 		//interaction with enemy modules
 		else
 		{
-			if (m_flux > 0)
+			fluxor->m_docked = false;
+
+			if (fluxor->m_flux_attacker)
 			{
-				fluxor->m_docked = false;
+				AttackModule(fluxor);
+			}
 
-				if (fluxor->m_flux_attacker)
+			if (!fluxor->m_docked)
+			{
+				fluxor->setPosition(this->getPosition());
+				if (!fluxor->m_flux_attack_piercing)
 				{
-					AttackModule(fluxor);
-				}
-
-				if (!fluxor->m_docked)
-				{
-					fluxor->setPosition(this->getPosition());
-					if (!fluxor->m_flux_attack_piercing)
+					if (fluxor->m_flux_stealer)
 					{
-						if (fluxor->m_flux_stealer)
-						{
-							fluxor->m_speed = (sf::Vector2f(fluxor->m_speed.x *= -1, fluxor->m_speed.y *= -1));
-							fluxor->m_flux = fluxor->m_flux_stolen;
-							fluxor->m_flux_stolen = 0;
-							fluxor->m_flux_max = 0;
-							fluxor->m_flux_attacker = false;
-							fluxor->m_wasting_flux = false;
-							fluxor->m_displaying_flux = false;
-							fluxor->m_consummable_by_modules = true;
-						}
-						else
-						{
-							fluxor->GarbageMe = true;
-						}
+						fluxor->m_speed = (sf::Vector2f(fluxor->m_speed.x *= -1, fluxor->m_speed.y *= -1));
+						fluxor->m_flux = fluxor->m_flux_stolen;
+						fluxor->m_flux_stolen = 0;
+						fluxor->m_flux_max = 0;
+						fluxor->m_flux_attacker = false;
+						fluxor->m_wasting_flux = false;
+						fluxor->m_displaying_flux = true;
+						fluxor->m_consummable_by_modules = true;
+					}
+					else
+					{
+						fluxor->GarbageMe = true;
 					}
 				}
-				else
-				{
-					fluxor->setPosition(this->getPosition());
-				}
+			}
+			else
+			{
+				fluxor->setPosition(this->getPosition());
 			}
 		}
 	}
@@ -761,7 +768,7 @@ void Module::UpdateLinks()
 	{
 		m_arrow[i]->visible = m_link[i].m_exists;
 
-		if (m_flux == 0 || m_under_construction)
+		if (m_under_construction)
 		{
 			m_link[i].m_activated = Link_Deactivated;
 		}

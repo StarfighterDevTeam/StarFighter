@@ -175,10 +175,7 @@ void Fluxor::update(sf::Time deltaTime)
 				{
 					ChaosTurns();
 				}
-			}
 
-			if (!m_guided)
-			{
 				if (ScreenBorderContraints())
 				{
 					m_turn_delay = RandomizeTurnDelay();
@@ -192,11 +189,13 @@ void Fluxor::update(sf::Time deltaTime)
 		}
 		else
 		{
+			m_flux_waste_clock.restart();
+
 			AnimatedSprite::update(deltaTime);
 		}
 
 		//death by flux consumption
-		if (m_flux <= 0)
+		if (m_flux == 0)
 		{
 			GarbageMe = true;
 		}
@@ -373,12 +372,15 @@ void Fluxor::Respawn()
 
 void Fluxor::WastingFlux()
 {
-	if (m_wasting_flux)
+	if (m_wasting_flux && m_flux > 0)
 	{
 		if (m_flux_waste_clock.getElapsedTime().asSeconds() > m_flux_waste_delay)
 		{
-			m_flux -= m_flux_waste;
-			if (m_flux < 0)
+			if (m_flux_waste <= m_flux)
+			{
+				m_flux -= m_flux_waste;
+			}
+			else
 			{
 				m_flux = 0;
 			}
