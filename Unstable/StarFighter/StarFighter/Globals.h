@@ -25,8 +25,8 @@
 
 #define TEXTURE_SIZE_LIMITATION						8187
 
-#define PIXEL_PERFECT_COLLISION							true
-#define GRAZE_DISTANCE									30
+#define PIXEL_PERFECT_COLLISION						false
+#define GRAZE_DISTANCE								30
 
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
@@ -51,7 +51,7 @@
 #define FLUXOR_SPEED_MAX							500
 #define FLUXOR_GUIDED_BASE_SPEED					100
 #define FLUXOR_GUIDED_MAX_SPEED						1000
-#define FLUXOR_TURN_MIN_DELAY						0.5f
+#define FLUXOR_TURN_MIN_DELAY						0.05f
 #define FLUXOR_TURN_MAX_DELAY						3.f
 #define FLUXOR_MAX_POPULATION						100
 #define FLUXOR_RESPAWN_MIN_TIME						5.f

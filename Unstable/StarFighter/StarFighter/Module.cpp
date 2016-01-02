@@ -318,6 +318,26 @@ void Module::FinishConstruction()
 	m_flux = 0;
 	m_flux_autogeneration_clock.restart();
 	m_fluxor_spawn_clock.restart();
+
+	//wipe out unguided Fluxors that are found on the cell being built on
+	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorObject).size();
+	for (int i = 0; i < FluxorVectorSize; i++)
+	{
+		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i])
+		{
+			Fluxor* fluxor = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i];
+			if (fluxor->visible && !fluxor->m_guided)
+			{
+				//quick collision test
+				sf::IntRect boundsA(SimpleCollision::FToIRect(fluxor->getGlobalBounds()));
+				sf::IntRect boundsB(SimpleCollision::FToIRect(this->getGlobalBounds()));
+				if (boundsA.intersects(boundsB))
+				{
+					fluxor->Death();
+				}
+			}
+		}
+	}
 }
 
 void Module::update(sf::Time deltaTime)
@@ -375,10 +395,12 @@ void Module::GetFluxor(GameObject* object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
 
-		if (!fluxor->m_guided)
+		if (!fluxor->m_guided && !m_under_construction)
 		{
 			float angle = GetAngleRadBetweenPositions(fluxor->getPosition(), fluxor->m_initial_position);
 			fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, angle);
+			fluxor->setPosition(fluxor->m_initial_position);
+			fluxor->m_turn_delay = Fluxor::RandomizeTurnDelay();
 			fluxor->m_turn_clock.restart();
 		}
 		else

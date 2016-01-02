@@ -149,6 +149,7 @@ void Fluxor::update(sf::Time deltaTime)
 			{
 				if (ScreenBorderContraints())
 				{
+					m_turn_delay = RandomizeTurnDelay();
 					m_turn_clock.restart();
 				}
 			}
@@ -329,6 +330,7 @@ void Fluxor::Respawn()
 	setPosition(RandomizePosition());
 
 	visible = true;
+	m_turn_delay = RandomizeTurnDelay();
 	m_turn_clock.restart();
 
 	if (m_isDisplayingFlux)
