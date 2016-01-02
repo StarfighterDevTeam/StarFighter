@@ -13,6 +13,7 @@ void Fluxor::Initialize()
 	m_flux_max = 0;
 	m_isDisplayingFlux = false;
 	m_transfer_buffer = 0;
+	m_team = PlayerNeutral;
 
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;

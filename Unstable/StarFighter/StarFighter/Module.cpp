@@ -234,35 +234,52 @@ void Module::SetConstructionStatus(bool under_construction)
 		
 }
 
-Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType)
+Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team)
 {
 	Module* new_module = new Module(moduleType);
 
+	new_module->m_team = team;
+
 	grid_index.x--;
 	grid_index.y--;
-	new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
-	if (new_module->m_glow)
-	{
-		new_module->m_glow->setPosition(new_module->getPosition());
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2));
-	}
-
-	(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
-	(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
-	for (int i = 0; i < 4; i++)
-	{
-		(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
-	}
 
 	//update game grid knownledge
+	bool construction_allowed = true;
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
-		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
+		construction_allowed = (*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_team == team;
+		if (construction_allowed)
+		{
+			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
+		}
 	}
-	(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = (GameObject*)new_module;
+
+	if (construction_allowed)
+	{
+		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = (GameObject*)new_module;
+
+		//complete module data
+		new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
+		if (new_module->m_glow)
+		{
+			new_module->m_glow->setPosition(new_module->getPosition());
+		}
+		for (int i = 0; i < 4; i++)
+		{
+			new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2));
+		}
+
+		(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
+		(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
+		for (int i = 0; i < 4; i++)
+		{
+			(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
+		}
+	}
+	else
+	{
+		new_module = NULL;
+	}
 
 	return new_module;
 }
@@ -310,8 +327,16 @@ Module::~Module()
 
 void Module::FinishConstruction()
 {
+	if (m_team == PlayerRed)
+	{
+		setColor(sf::Color::Red);
+	}
+	else
+	{
+		setColor(sf::Color(255, 255, 255, 255));
+	}
+
 	m_under_construction = false;
-	setColor(sf::Color(255, 255, 255, 255));
 	m_flux = 0;
 	m_flux_autogeneration_clock.restart();
 	m_fluxor_spawn_clock.restart();
@@ -427,11 +452,12 @@ bool Module::GenerateFluxor()
 	if (m_isGeneratingFluxor && m_flux == m_flux_max)
 	{
 		Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+		fluxor->m_team = this->m_team;
+
 		if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//only Blue Fluxors need to be connected in order to be generated
 		{
 			if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 			{
-				
 				m_flux -= m_fluxor_generation_cost;
 
 				fluxor->m_guided = true;
@@ -542,48 +568,52 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 	{
 		//by default, we assume at each frame that the Fluxor will be released unless told otherwise.
 		//therefore each method must explicitly lock it again if needed, every frame with "fluxor->m_docked = true"
-		fluxor->m_docked = false;
-
-		if (!m_under_construction)
-		{
-			//module "refill/amplify fluxor"
-			if ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0 && m_flux == m_flux_max))
-			{
-				AmplifyFluxor(fluxor);
-			}
-
-			//consumption (automatic) - must be done last
-			if (fluxor->m_consummable_by_modules)
-			{
-				ConsummeFluxor(fluxor);
-			}
-		}
-
-		////module "factory"
-		//if (m_isGeneratingFluxor)
-		//{
-		//	Fluxor* new_fluxor = new Fluxor(m_fluxor_generated_type);
-		//	new_fluxor->m_speed = (sf::Vector2f(0, 100));
-		//	m_fluxor_generation_buffer.push_back(new_fluxor);
-		//}
 		
-
-		if (!fluxor->m_docked)
+		if (fluxor->m_team == this->m_team)
 		{
-			UndockFluxor(fluxor);
-			UpdateFluxorDirection(fluxor);
+			fluxor->m_docked = false;
 
-			//accelerator
-			if (m_add_speed != 0 && m_flux == m_flux_max)
+			if (!m_under_construction)
 			{
-				fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
-				fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
-				fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
+				//module "refill/amplify fluxor"
+				if ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0 && m_flux == m_flux_max))
+				{
+					AmplifyFluxor(fluxor);
+				}
+
+				//consumption (automatic) - must be done last
+				if (fluxor->m_consummable_by_modules)
+				{
+					ConsummeFluxor(fluxor);
+				}
 			}
-		}
-		else
-		{
-			fluxor->setPosition(getPosition());
+
+			////module "factory"
+			//if (m_isGeneratingFluxor)
+			//{
+			//	Fluxor* new_fluxor = new Fluxor(m_fluxor_generated_type);
+			//	new_fluxor->m_speed = (sf::Vector2f(0, 100));
+			//	m_fluxor_generation_buffer.push_back(new_fluxor);
+			//}
+
+
+			if (!fluxor->m_docked)
+			{
+				UndockFluxor(fluxor);
+				UpdateFluxorDirection(fluxor);
+
+				//accelerator
+				if (m_add_speed != 0 && m_flux == m_flux_max)
+				{
+					fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
+					fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
+					fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
+				}
+			}
+			else
+			{
+				fluxor->setPosition(getPosition());
+			}
 		}
 	}
 }
@@ -670,7 +700,7 @@ void Module::UpdateLinks()
 				else
 				{
 					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + 1][global_grid_index.y];
-					if (module && !module->m_under_construction)
+					if (module && !module->m_under_construction && module->m_team == this->m_team)
 					{
 						m_link[i].m_activated = Link_Activated;
 					}
@@ -687,7 +717,7 @@ void Module::UpdateLinks()
 				else
 				{
 					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + 1];
-					if (module && !module->m_under_construction)
+					if (module && !module->m_under_construction && module->m_team == this->m_team)
 					{
 						m_link[i].m_activated = Link_Activated;
 					}
@@ -702,7 +732,7 @@ void Module::UpdateLinks()
 				else
 				{
 					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - 1][global_grid_index.y];
-					if (module && !module->m_under_construction)
+					if (module && !module->m_under_construction && module->m_team == this->m_team)
 					{
 						m_link[i].m_activated = Link_Activated;
 					}
@@ -717,7 +747,7 @@ void Module::UpdateLinks()
 				else
 				{
 					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - 1];
-					if (module && !module->m_under_construction)
+					if (module && !module->m_under_construction && module->m_team == this->m_team)
 					{
 						m_link[i].m_activated = Link_Activated;
 					}
@@ -727,7 +757,7 @@ void Module::UpdateLinks()
 			//case of "short circuit" (links pointer each other)
 			if (module)
 			{
-				if (module->m_link[(i + 2) % 4].m_exists && module->m_link[(i + 2) % 4].m_activated == Link_Activated)
+				if (module->m_link[(i + 2) % 4].m_exists && module->m_link[(i + 2) % 4].m_activated == Link_Activated && module->m_team == this->m_team)
 				{
 					m_link[i].m_activated = Link_Invalid;
 				}

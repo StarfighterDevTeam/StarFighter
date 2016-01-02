@@ -61,7 +61,7 @@ void Ship::update(sf::Time deltaTime)
 		m_flux = m_flux_max;
 	}
 
-	sf::Vector2f inputs_direction = InputGuy::getDirections();
+	sf::Vector2f inputs_direction = InputGuy::getDirections(m_controllerType);
 
 	if (!m_disable_inputs)
 	{
@@ -91,43 +91,43 @@ void Ship::update(sf::Time deltaTime)
 	//DEBUG
 	if (InputGuy::isSpawningModule1())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 1 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 1 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule2())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 2 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 2 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule3())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 3 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 3 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule4())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 4 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 4 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule5())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 5 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 5 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule6())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 6 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 6 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule7())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 7 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 7 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule8())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 8 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 8 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule9())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 9 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 9 - 1), m_team);
 	}
 	if (InputGuy::isSpawningModule0())
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1));
+		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1), m_team);
 	}
 	if (InputGuy::isErasingModule())
 	{
@@ -283,28 +283,31 @@ void Ship::GetModule(GameObject* object)
 {
 	if (object)
 	{
-		Module* module = (Module*)object;
-
-		if (module->m_under_construction)
+		if (object->m_team == this->m_team)
 		{
-			if (m_curGridIndex.x == module->m_curGridIndex.x && m_curGridIndex.y == module->m_curGridIndex.y)
+			Module* module = (Module*)object;
+
+			if (module->m_under_construction)
 			{
-				if (InputGuy::isFiring())
+				if (m_curGridIndex.x == module->m_curGridIndex.x && m_curGridIndex.y == module->m_curGridIndex.y)
 				{
-					unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
-					if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
+					if (InputGuy::isFiring())
 					{
-						m_flux--;
-						module->m_flux++;
-						m_flux_transfer_limiter_clock.restart();
+						unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
+						if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
+						{
+							m_flux--;
+							module->m_flux++;
+							m_flux_transfer_limiter_clock.restart();
+						}
 					}
 				}
 			}
-		}
 
-		if (InputGuy::isUsing() && m_CtrlKey_released)
-		{
-			module->SwitchLinkDirection();
+			if (InputGuy::isUsing() && m_CtrlKey_released)
+			{
+				module->SwitchLinkDirection();
+			}
 		}
 	}
 }

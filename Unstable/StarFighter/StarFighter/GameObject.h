@@ -17,6 +17,13 @@ class Equipment;
 class Weapon;
 class Loot;
 
+enum PlayerTeams
+{
+	PlayerBlue,
+	PlayerRed,
+	PlayerNeutral,
+};
+
 enum LayerType {
 	BackgroundLayer,
 	FakeGridLayer,
@@ -89,6 +96,8 @@ public:
 	std::string m_textureName;
 	sf::Vector2f m_speed;
 	sf::Vector2f m_initial_position;
+
+	PlayerTeams m_team;
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();

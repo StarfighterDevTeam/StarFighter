@@ -10,8 +10,9 @@ void InGameState::Initialize(Player player)
 	//intégration placeholder
 	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
 	(*CurrentGame).SetPlayerShip(playerShip);
-	(*CurrentGame).playerShip->SetControllerType(AllControlDevices);
-	(*CurrentGame).addToScene((*CurrentGame).playerShip, PlayerShipLayer, PlayerShip);
+	playerShip->SetControllerType(AllControlDevices);
+	playerShip->m_team = PlayerBlue;
+	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
 
 	//Fake grid construction
 	const unsigned int grid_width = GRID_WIDTH;
@@ -38,8 +39,10 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 	
 	//HACK PROTO
-	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator);
+	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, (*CurrentGame).playerShip->m_team);
 	//module->m_flux_autogeneration_time = 0.01f;
+
+	Module* module2 = Module::CreateModule(sf::Vector2u(10, 5), ModuleType_Generator, PlayerRed);
 
 	//Module::CreateModule(sf::Vector2u(7, 5), ModuleType_Factory);
 	//Module::CreateModule(sf::Vector2u(8, 5), ModuleType_Accelerator);
