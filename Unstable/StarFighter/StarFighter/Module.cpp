@@ -395,27 +395,30 @@ void Module::GetFluxor(GameObject* object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
 
-		if (!fluxor->m_guided && !m_under_construction)
+		if (!m_under_construction)
 		{
-			float angle = GetAngleRadBetweenPositions(fluxor->getPosition(), fluxor->m_initial_position);
-			fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, angle);
-			fluxor->setPosition(fluxor->m_initial_position);
-			fluxor->m_turn_delay = Fluxor::RandomizeTurnDelay();
-			fluxor->m_turn_clock.restart();
-		}
-		else
-		{
-			//check if the guided Fluxor passes right through the middle of the Module
-			if (GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
+			if (!fluxor->m_guided)
 			{
-				//make sure a fluxor leaving the module is not colliding again
-				if (fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
+				float angle = GetAngleRadBetweenPositions(fluxor->getPosition(), fluxor->m_initial_position);
+				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, angle);
+				fluxor->setPosition(fluxor->m_initial_position);
+				fluxor->m_turn_delay = Fluxor::RandomizeTurnDelay();
+				fluxor->m_turn_clock.restart();
+			}
+			else
+			{
+				//check if the guided Fluxor passes right through the middle of the Module
+				if (GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
 				{
-					//do nothing
-				}
-				else
-				{
-					ApplyModuleEffect(fluxor);
+					//make sure a fluxor leaving the module is not colliding again
+					if (fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
+					{
+						//do nothing
+					}
+					else
+					{
+						ApplyModuleEffect(fluxor);
+					}
 				}
 			}
 		}
