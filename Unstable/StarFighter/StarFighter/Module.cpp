@@ -769,6 +769,7 @@ void Module::UpdateLinks()
 		{
 			sf::Vector2u global_grid_index = sf::Vector2u(m_curGridIndex.x - 1, m_curGridIndex.y - 1);
 			Module* module = NULL;
+			bool link_found = false;
 
 			if (i == 0)
 			{
@@ -778,10 +779,23 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + 1][global_grid_index.y];
-					if (module && !module->m_under_construction && module->m_team == this->m_team)
+					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						m_link[i].m_activated = Link_Activated;
+						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + j][global_grid_index.y];
+						if (module && !module->m_under_construction)
+						{
+							if (module->m_team == this->m_team)
+							{
+								m_link[i].m_activated = Link_Activated;
+								break;
+							}
+							else
+							{
+								m_link[i].m_activated = Link_Deactivated;
+								break;
+
+							}
+						}
 					}
 				}
 			}
@@ -793,10 +807,23 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + 1];
-					if (module && !module->m_under_construction && module->m_team == this->m_team)
+					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						m_link[i].m_activated = Link_Activated;
+						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + j];
+						if (module && !module->m_under_construction)
+						{
+							if (module->m_team == this->m_team)
+							{
+								m_link[i].m_activated = Link_Activated;
+								break;
+							}
+							else
+							{
+								m_link[i].m_activated = Link_Deactivated;
+								break;
+
+							}
+						}
 					}
 				}
 			}
@@ -808,10 +835,23 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - 1][global_grid_index.y];
-					if (module && !module->m_under_construction && module->m_team == this->m_team)
+					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						m_link[i].m_activated = Link_Activated;
+						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - j][global_grid_index.y];
+						if (module && !module->m_under_construction)
+						{
+							if (module->m_team == this->m_team)
+							{
+								m_link[i].m_activated = Link_Activated;
+								break;
+							}
+							else
+							{
+								m_link[i].m_activated = Link_Deactivated;
+								break;
+
+							}
+						}
 					}
 				}
 			}
@@ -823,10 +863,22 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - 1];
-					if (module && !module->m_under_construction && module->m_team == this->m_team)
+					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						m_link[i].m_activated = Link_Activated;
+						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - j];
+						if (module && !module->m_under_construction)
+						{
+							if (module->m_team == this->m_team)
+							{
+								m_link[i].m_activated = Link_Activated;
+								break;
+							}
+							else
+							{
+								m_link[i].m_activated = Link_Deactivated;
+								break;
+							}
+						}
 					}
 				}
 			}

@@ -36,6 +36,7 @@
 #define GRID_HEIGHT									50
 #define TILE_SIZE									128
 #define FLUX_TRANSFER_LIMITER_TIME					0.1f
+#define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		2
 
 //PLAYER
 #define SHIP_MAX_FLUX								100
