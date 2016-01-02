@@ -309,21 +309,21 @@ void Ship::GetModule(GameObject* object)
 	}
 }
 
-void Ship::ResolveProductionBufferList()
-{
-	size_t constructionBufferSize = m_construction_buffer.size();
-	for (size_t i = 0; i < constructionBufferSize; i++)
-	{
-		if ((*CurrentGame).m_module_grid[m_construction_buffer[i]->m_curGridIndex.x][m_construction_buffer[i]->m_curGridIndex.y])
-		{
-			Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
-			new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front());
-			m_construction_buffer[i]->m_parents.front()->m_children.push_back(new_module);
-
-			//HACK PROTO
-			m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
-		}
-	}
-
-	m_construction_buffer.clear();
-}
+//void Ship::ResolveProductionBufferList()
+//{
+//	size_t constructionBufferSize = m_construction_buffer.size();
+//	for (size_t i = 0; i < constructionBufferSize; i++)
+//	{
+//		if ((*CurrentGame).m_module_grid[m_construction_buffer[i]->m_curGridIndex.x][m_construction_buffer[i]->m_curGridIndex.y])
+//		{
+//			Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
+//			new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front());
+//			m_construction_buffer[i]->m_parents.front()->m_children.push_back(new_module);
+//
+//			//HACK PROTO
+//			m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
+//		}
+//	}
+//
+//	m_construction_buffer.clear();
+//}

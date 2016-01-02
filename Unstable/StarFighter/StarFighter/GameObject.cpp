@@ -455,7 +455,7 @@ void GameObject::GetModule(GameObject* object)
 	//see override function in class Ship
 }
 
-void GameObject::ResolveProductionBufferList()
-{
-	//see override function in class Ship
-}
+//void GameObject::ResolveProductionBufferList()
+//{
+//	//see override function in class Ship
+//}

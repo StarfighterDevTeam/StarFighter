@@ -6,11 +6,18 @@
 #include "Game.h"
 #include "Fluxor.h"
 
+enum LinkStatus
+{
+	Link_Deactivated,
+	Link_Activated,
+	Link_Invalid,
+};
+
 struct Link
 {
 	Link(){};
 	bool m_exists;
-	bool m_activated;
+	LinkStatus m_activated;
 };
 
 class Module : public GameObject
@@ -35,16 +42,12 @@ public :
 	unsigned int m_flux_max_under_construction;
 	void FinishConstruction();
 	sf::Vector2u m_curGridIndex;
-	//bool m_activated;
 	Glow* m_glow;
 	bool m_under_construction;
 	void SetConstructionStatus(bool under_construction);
 
-	vector<Module*> m_parents;
-	vector<Module*> m_children;
-
-	//Activation
-	//void UpdateActivation();
+	//vector<Module*> m_parents;
+	//vector<Module*> m_children;
 
 	//Module properties
 	void ApplyModuleEffect(Fluxor* fluxor);

@@ -52,7 +52,7 @@ public :
 	sf::Text m_flux_text;
 
 	//construction
-	void ResolveProductionBufferList() override;
+	//void ResolveProductionBufferList() override;
 	vector<Module*> m_construction_buffer;
 
 private:

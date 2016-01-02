@@ -11,7 +11,6 @@ void Module::Initialize()
 	m_flux_max = 1;
 	m_flux_max_under_construction = 1;
 	m_flux_max_after_construction = 1;
-	//m_activated = false;
 	m_glow = new Glow(this, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->visible = false;
 	SetConstructionStatus(true);
@@ -36,11 +35,11 @@ void Module::Initialize()
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
 	//links
-	GameObject arrow = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 2);
+	GameObject arrow = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 3);
 	for (int i = 0; i < 4; i++)
 	{
 		m_link[i].m_exists = i == 0;
-		m_link[i].m_activated = false;
+		m_link[i].m_activated = Link_Deactivated;
 
 		m_arrow[i] = arrow.Clone();
 		m_arrow[i]->visible = m_link[i].m_exists;
@@ -425,29 +424,6 @@ void Module::GetFluxor(GameObject* object)
 	}
 }
 
-//void Module::UpdateActivation()
-//{
-//	if (!m_parents.empty())
-//	{
-//		bool parent_activated = false;
-//		size_t parentsVectorSize = m_parents.size();
-//		for (size_t i = 0; i < parentsVectorSize; i++)
-//		{
-//			if (m_parents[i]->m_activated)
-//			{
-//				parent_activated = true;
-//				break;
-//			}
-//		}
-//		m_activated = m_flux == m_flux_max && parent_activated;
-//	}
-//	else
-//	{
-//		m_activated = m_flux == m_flux_max;
-//	}
-//	m_glow->visible = m_activated;
-//}
-
 bool Module::GenerateFluxor()
 {
 	if (m_isGeneratingFluxor && m_flux == m_flux_max)// && IsMainLinkActivated())//m_flux >= m_fluxor_generation_cost)
@@ -659,7 +635,7 @@ bool Module::IsMainLinkActivated()
 {
 	int main_link = GetMainLinkIndex();
 
-	return main_link >= 0 && m_link[main_link].m_activated;
+	return main_link >= 0 && m_link[main_link].m_activated == Link_Activated;
 }
 
 //void Module::ResolveProductionBufferList()
@@ -699,57 +675,82 @@ void Module::UpdateLinks()
 
 		if (m_flux == 0 || m_under_construction)
 		{
-			m_link[i].m_activated = false;
+			m_link[i].m_activated = Link_Deactivated;
 		}
 		else
 		{
 			sf::Vector2u global_grid_index = sf::Vector2u(m_curGridIndex.x - 1, m_curGridIndex.y - 1);
+			Module* module = NULL;
+
 			if (i == 0)
 			{
 				if (global_grid_index.x == GRID_WIDTH - 1)
 				{
-					m_link[i].m_activated = false;
+					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + 1][global_grid_index.y];
-					m_link[i].m_activated = module && !module->m_under_construction;
+					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + 1][global_grid_index.y];
+					if (module && !module->m_under_construction)
+					{
+						m_link[i].m_activated = Link_Activated;
+					}
+
+					
 				}
 			}
 			else if (i == 1)
 			{
 				if (global_grid_index.y == GRID_HEIGHT - 1)
 				{
-					m_link[i].m_activated = false;
+					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + 1];
-					m_link[i].m_activated = module && !module->m_under_construction;
+					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + 1];
+					if (module && !module->m_under_construction)
+					{
+						m_link[i].m_activated = Link_Activated;
+					}
 				}
 			}
 			else if (i == 2)
 			{
 				if (global_grid_index.x == 0)
 				{
-					m_link[i].m_activated = false;
+					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - 1][global_grid_index.y];
-					m_link[i].m_activated = module && !module->m_under_construction;
+					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - 1][global_grid_index.y];
+					if (module && !module->m_under_construction)
+					{
+						m_link[i].m_activated = Link_Activated;
+					}
 				}
 			}
 			else// if (i == 3)
 			{
 				if (global_grid_index.y == 0)
 				{
-					m_link[i].m_activated = false;
+					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					Module* module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - 1];
-					m_link[i].m_activated = module && !module->m_under_construction;
+					module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - 1];
+					if (module && !module->m_under_construction)
+					{
+						m_link[i].m_activated = Link_Activated;
+					}
+				}
+			}
+
+			//case of "short circuit" (links pointer each other)
+			if (module)
+			{
+				if (module->m_link[(i + 2) % 4].m_exists && module->m_link[(i + 2) % 4].m_activated == Link_Activated)
+				{
+					m_link[i].m_activated = Link_Invalid;
 				}
 			}
 		}
