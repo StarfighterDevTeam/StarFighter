@@ -43,7 +43,7 @@ public :
 	
 	vector<Module*> m_modules_visited;
 	GameObject* m_target;
-	GameObject* m_target_memory;
+	bool m_target_memory;
 
 	//Fluxor properties
 	bool m_displaying_flux;

@@ -182,10 +182,11 @@ Module::Module(ModuleType moduleType)
 		{
 			m_flux_max_after_construction = 50;
 			m_flux_max_under_construction = 30;
-			m_turret_range = 4;
+			m_turret_range = 2;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Black;
 			m_fluxor_generation_time = 2.f;
+			//m_fluxor_generation_cost = 5;
 			break;
 		}
 		case ModuleType_Barrier:
@@ -482,11 +483,7 @@ bool Module::GenerateFluxor()
 		//turret?
 		if (m_turret_range > 0)
 		{
-			fluxor->m_target = SearchNearbyAttackers(m_team, m_turret_range * TILE_SIZE);
-			if (fluxor->m_target)
-			{
-				fluxor->m_target_memory = fluxor->m_target->Clone();
-			}
+			fluxor->m_target = SearchNearbyAttackers(m_team, (m_turret_range + 1) * TILE_SIZE);//+1 because this is what we actually mean by "range N": it avoids an enemy to reach a module located N tiles away
 		}
 
 		if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//if it needs a link to circulate, we check that an activated link exists
@@ -498,7 +495,16 @@ bool Module::GenerateFluxor()
 					m_flux -= m_fluxor_generation_cost;
 
 					fluxor->m_guided = true;
-					fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
+					//turret?
+					if (m_turret_range == 0)
+					{
+						fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
+					}
+					else
+					{
+						fluxor->m_absolute_speed = FLUXOR_BULLET_SPEED;
+					}
+					
 					UpdateFluxorDirection(fluxor);
 
 					fluxor->setPosition(getPosition());
@@ -578,6 +584,12 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 		{
 			if (fluxor->m_transfer_buffer == 0)
 			{
+				//increasing potential
+				if (m_add_flux > 0 && fluxor->m_flux_max > 0)
+				{
+					fluxor->m_flux_max += m_add_flux;
+				}
+				//refilling or increasing?
 				fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
 				fluxor->m_flux_transfer_clock.restart();
 			}
@@ -663,9 +675,13 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				//module "refill/amplify fluxor"
 				if (fluxor->m_can_be_refilled_by_modules)
 				{
-					if (m_flux == m_flux_max && ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0)))
+					//if (m_flux == m_flux_max && ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0)))
+					if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
 					{
-						AmplifyFluxor(fluxor);
+						if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//if it needs a link to circulate and no activated link exists, amplyfing is pointless
+						{
+							AmplifyFluxor(fluxor);
+						}
 					}
 				}
 
@@ -961,15 +977,17 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 	{
 		if (fluxor->m_guided)
 		{
-			if (fluxor->m_target)
+			//fluxor has a new target?
+			if (fluxor->m_target && !fluxor->m_target_memory)
 			{
 				//go to target
 				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, GetAngleRadBetweenPositions(this->getPosition(), fluxor->m_target->getPosition()));
 				fluxor->setPosition(sf::Vector2f(getPosition().x, getPosition().y));
+				fluxor->m_target_memory = true;
 
 				return true;
 			}
-			else
+			else if (!fluxor->m_target)
 			{
 				int main_link = GetMainLinkIndex();
 				if (main_link >= 0)
@@ -1016,6 +1034,11 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 					printf("<!> Trying to generate fluxors with a module that doesn't have link, in Module::UpdateFluxorDirection(Fluxor* fluxor)\n.");
 					return false;
 				}
+			}
+			else
+			{
+				//it already has a target and is going for it, nothing to do
+				return true;
 			}
 		}
 		else

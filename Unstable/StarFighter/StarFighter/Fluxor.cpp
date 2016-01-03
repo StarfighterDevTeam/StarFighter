@@ -15,7 +15,7 @@ void Fluxor::Initialize()
 	m_transfer_buffer = 0;
 	m_team = PlayerNeutral;
 	m_target = NULL;
-	m_target_memory = NULL;
+	m_target_memory = false;
 
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;
@@ -106,6 +106,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux = FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
 			m_needs_link_to_circulate = true;
+			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 			break;
 		}
 		case FluxorType_Red:
@@ -177,11 +178,6 @@ Fluxor::~Fluxor()
 {
 	if (m_displaying_flux)
 		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
-
-	if (m_target_memory)
-	{
-		m_target_memory->GarbageMe = true;
-	}
 }
 
 Fluxor* Fluxor::Clone()
@@ -238,21 +234,15 @@ void Fluxor::update(sf::Time deltaTime)
 			m_flux_waste_clock.restart();
 
 			AnimatedSprite::update(deltaTime);
+
+			//reset docked every frame. The collision will be in charge of re-docking the fluxor every frame if necessary.
+			m_docked = false;
 		}
 
 		//death by flux consumption
 		if (m_flux == 0)
 		{
 			GarbageMe = true;
-		}
-
-		//death because no means in life (target died)
-		if (m_target_memory)
-		{
-			if (!m_target)
-			{
-				GarbageMe = true;
-			}
 		}
 
 		//hud
@@ -451,8 +441,6 @@ void Fluxor::GetFluxor(GameObject* object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
 
-		m_docked = false;
-
 		if (fluxor->m_guided && this->m_guided)
 		{
 			if (fluxor->m_team != this->m_team)
@@ -460,10 +448,6 @@ void Fluxor::GetFluxor(GameObject* object)
 				if (m_fluxovore && fluxor->m_flux_attacker)
 				{
 					AttackFluxor(fluxor);
-				}
-				else
-				{
-					m_docked = true;
 				}
 			}
 		}
@@ -474,36 +458,28 @@ void Fluxor::AttackFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (m_flux > 0)
+		//steal flux?
+		if (m_flux_stealer)
 		{
-			if (m_flux_attack_clock.getElapsedTime().asSeconds() > m_flux_attack_delay)
-			{
-				m_flux--;
-				fluxor->m_flux--;
-				if (m_flux_stealer)
-				{
-					m_flux_stolen++;
-				}
+			m_flux_stolen = fluxor->m_flux;
+		}
+		//deal damage
+		if (m_flux < fluxor->m_flux)
+		{
+			fluxor->m_flux -= m_flux;
+		}
+		else
+		{
+			fluxor->m_flux = 0;
+		}
 
-				m_flux_attack_clock.restart();
-			}
-
-			//attack finished?
-			if (fluxor->m_flux == 0)
-			{
-				if (m_flux_stealer)
-				{
-					BringStealerBack();
-				}
-				else
-				{
-					GarbageMe = true;
-				}
-			}
-			else
-			{
-				m_docked = true;
-			}
+		if (m_flux_stealer)
+		{
+			BringStealerBack();
+		}
+		else
+		{
+			GarbageMe = true;
 		}
 	}
 }
