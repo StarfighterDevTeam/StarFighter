@@ -15,6 +15,7 @@ void Fluxor::Initialize()
 	m_transfer_buffer = 0;
 	m_team = PlayerNeutral;
 	m_target = NULL;
+	m_target_memory = NULL;
 
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;
@@ -153,27 +154,34 @@ Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 {
-	Fluxor* new_Fluxor = new Fluxor(FluxorType);
+	Fluxor* new_fluxor = new Fluxor(FluxorType);
 	
-	new_Fluxor->setPosition(RandomizePosition());
-	new_Fluxor->m_initial_position = new_Fluxor->getPosition();
-	new_Fluxor->m_speed = RandomizeSpeed();
-	new_Fluxor->m_absolute_speed = GetAbsoluteSpeed(new_Fluxor->m_speed);
-	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
+	new_fluxor->setPosition(RandomizePosition());
+	new_fluxor->m_initial_position = new_fluxor->getPosition();
+	new_fluxor->m_speed = RandomizeSpeed();
+	new_fluxor->m_absolute_speed = GetAbsoluteSpeed(new_fluxor->m_speed);
+	new_fluxor->m_turn_delay = RandomizeTurnDelay();
 
-	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);
-	if (new_Fluxor->m_displaying_flux)
+	GameObjectType type = new_fluxor->m_guided ? FluxorGuidedObject : FluxorUnguidedObject;
+
+	(*CurrentGame).addToScene(new_fluxor, FluxorLayer, type);
+	if (new_fluxor->m_displaying_flux)
 	{
-		(*CurrentGame).addToFeedbacks(&new_Fluxor->m_flux_text);
+		(*CurrentGame).addToFeedbacks(&new_fluxor->m_flux_text);
 	}
 
-	return new_Fluxor;
+	return new_fluxor;
 }
 
 Fluxor::~Fluxor()
 {
 	if (m_displaying_flux)
 		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+
+	if (m_target_memory)
+	{
+		m_target_memory->GarbageMe = true;
+	}
 }
 
 Fluxor* Fluxor::Clone()
@@ -236,6 +244,15 @@ void Fluxor::update(sf::Time deltaTime)
 		if (m_flux == 0)
 		{
 			GarbageMe = true;
+		}
+
+		//death because no means in life (target died)
+		if (m_target_memory)
+		{
+			if (!m_target)
+			{
+				GarbageMe = true;
+			}
 		}
 
 		//hud
@@ -426,4 +443,79 @@ void Fluxor::WastingFlux()
 			m_flux_waste_clock.restart();
 		}
 	}
+}
+
+void Fluxor::GetFluxor(GameObject* object)
+{
+	if (object)
+	{
+		Fluxor* fluxor = (Fluxor*)object;
+
+		m_docked = false;
+
+		if (fluxor->m_guided && this->m_guided)
+		{
+			if (fluxor->m_team != this->m_team)
+			{
+				if (m_fluxovore && fluxor->m_flux_attacker)
+				{
+					AttackFluxor(fluxor);
+				}
+				else
+				{
+					m_docked = true;
+				}
+			}
+		}
+	}
+}
+
+void Fluxor::AttackFluxor(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (m_flux > 0)
+		{
+			if (m_flux_attack_clock.getElapsedTime().asSeconds() > m_flux_attack_delay)
+			{
+				m_flux--;
+				fluxor->m_flux--;
+				if (m_flux_stealer)
+				{
+					m_flux_stolen++;
+				}
+
+				m_flux_attack_clock.restart();
+			}
+
+			//attack finished?
+			if (fluxor->m_flux == 0)
+			{
+				if (m_flux_stealer)
+				{
+					BringStealerBack();
+				}
+				else
+				{
+					GarbageMe = true;
+				}
+			}
+			else
+			{
+				m_docked = true;
+			}
+		}
+	}
+}
+
+void Fluxor::BringStealerBack()
+{
+	m_speed = (sf::Vector2f(m_speed.x *= -1, m_speed.y *= -1));
+	m_flux = m_flux_stolen;
+	m_flux_stolen = 0;
+	m_flux_max = 0;
+	m_flux_attacker = false;
+	m_wasting_flux = false;
+	m_displaying_flux = true;
+	m_consummable_by_modules = true;
 }

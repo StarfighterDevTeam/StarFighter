@@ -19,6 +19,7 @@ public :
 	void update(sf::Time deltaTime) override;
 	bool ScreenBorderContraints();
 	void UpdateRotation();
+	void GetFluxor(GameObject* object) override;
 
 	static float RandomizeTurnDelay();
 	static sf::Vector2f RandomizePosition();
@@ -42,6 +43,7 @@ public :
 	
 	vector<Module*> m_modules_visited;
 	GameObject* m_target;
+	GameObject* m_target_memory;
 
 	//Fluxor properties
 	bool m_displaying_flux;
@@ -61,6 +63,8 @@ public :
 	float m_flux_waste_delay;
 	sf::Clock m_flux_waste_clock;
 	void WastingFlux();
+	void AttackFluxor(Fluxor* fluxor);
+	void BringStealerBack();
 
 	unsigned int m_transfer_buffer;
 	sf::Clock m_flux_transfer_clock;

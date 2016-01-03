@@ -185,7 +185,7 @@ Module::Module(ModuleType moduleType)
 			m_turret_range = 4;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Black;
-			m_fluxor_generation_time = 3.f;
+			m_fluxor_generation_time = 2.f;
 			break;
 		}
 		case ModuleType_Barrier:
@@ -367,13 +367,13 @@ void Module::FinishConstruction()
 	m_flux_consumption_clock.restart();
 
 	//wipe out unguided Fluxors that are found on the cell being built on
-	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorObject).size();
+	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size();
 	for (int i = 0; i < FluxorVectorSize; i++)
 	{
-		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i] == NULL)
+		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject)[i] == NULL)
 			continue;
 
-		Fluxor* fluxor = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i];
+		Fluxor* fluxor = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject)[i];
 		if (fluxor->visible && !fluxor->m_guided)
 		{
 			//quick collision test
@@ -484,7 +484,9 @@ bool Module::GenerateFluxor()
 		{
 			fluxor->m_target = SearchNearbyAttackers(m_team, m_turret_range * TILE_SIZE);
 			if (fluxor->m_target)
-				printf("hurra");
+			{
+				fluxor->m_target_memory = fluxor->m_target->Clone();
+			}
 		}
 
 		if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//if it needs a link to circulate, we check that an activated link exists
@@ -502,7 +504,7 @@ bool Module::GenerateFluxor()
 					fluxor->setPosition(getPosition());
 					fluxor->m_initial_position = getPosition();
 
-					(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorObject);
+					(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorGuidedObject);
 					//flux display
 					if (fluxor->m_displaying_flux)
 					{
@@ -717,14 +719,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				{
 					if (fluxor->m_flux_stealer)
 					{
-						fluxor->m_speed = (sf::Vector2f(fluxor->m_speed.x *= -1, fluxor->m_speed.y *= -1));
-						fluxor->m_flux = fluxor->m_flux_stolen;
-						fluxor->m_flux_stolen = 0;
-						fluxor->m_flux_max = 0;
-						fluxor->m_flux_attacker = false;
-						fluxor->m_wasting_flux = false;
-						fluxor->m_displaying_flux = true;
-						fluxor->m_consummable_by_modules = true;
+						fluxor->BringStealerBack();
 					}
 					else
 					{
@@ -782,7 +777,9 @@ void Module::ResolveProductionBufferList()
 			//	m_fluxor_generation_buffer[i]->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_fluxor_generation_buffer[i]->m_absolute_speed, main_link * M_PI_2);
 			//}
 			
-			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, FluxorObject);
+			GameObjectType type = m_fluxor_generation_buffer[i]->m_guided ? FluxorGuidedObject : FluxorUnguidedObject;
+
+			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, type);
 			if (m_fluxor_generation_buffer[i]->m_displaying_flux)
 			{
 				(*CurrentGame).addToFeedbacks(&m_fluxor_generation_buffer[i]->m_flux_text);
@@ -969,6 +966,7 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 				//go to target
 				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, GetAngleRadBetweenPositions(this->getPosition(), fluxor->m_target->getPosition()));
 				fluxor->setPosition(sf::Vector2f(getPosition().x, getPosition().y));
+
 				return true;
 			}
 			else
@@ -1036,13 +1034,13 @@ Fluxor* Module::SearchNearbyAttackers(PlayerTeams team_not_to_target, float rang
 	Fluxor* fluxor = NULL;
 	float shortest_distance = -1;
 
-	size_t FluxorsVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorObject).size();
+	size_t FluxorsVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorGuidedObject).size();
 	for (size_t i = 0; i < FluxorsVectorSize; i++)
 	{
-		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i] == NULL)
+		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorGuidedObject)[i] == NULL)
 			continue;
 
-		Fluxor* pCandidate = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorObject)[i];
+		Fluxor* pCandidate = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorGuidedObject)[i];
 
 		if (pCandidate->m_team != team_not_to_target && pCandidate->m_flux_attacker)
 		{

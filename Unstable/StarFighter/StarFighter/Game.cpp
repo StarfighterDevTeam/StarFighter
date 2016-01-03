@@ -223,6 +223,22 @@ void Game::drawScene()
 				mainScreen.draw(*(*it));
 			}
 		}
+		else if (i == FakeGridLayer)
+		{
+			std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin();
+
+			if (*it)
+			{
+				for (size_t j = 0; j < GRID_WIDTH; j++)
+				{
+					for (size_t k = 0; k < GRID_HEIGHT; k++)
+					{
+						(*it)->setPosition(sf::Vector2f(j*TILE_SIZE + TILE_SIZE / 2, k*TILE_SIZE + TILE_SIZE / 2));
+						this->mainScreen.draw((*(*it)));
+					}
+				}
+			}
+		}
 		else
 		{
 			for (std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin(); it != this->sceneGameObjectsLayered[i].end(); it++)
@@ -256,8 +272,8 @@ void Game::colisionChecksV2()
 		if (*it1 == NULL)
 			continue;
 
-		//Player eating Fluxor
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[FluxorObject].begin(); it2 != sceneGameObjectsTyped[FluxorObject].end(); it2++)
+		//Player eating Fluxors (unguided)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[FluxorUnguidedObject].begin(); it2 != sceneGameObjectsTyped[FluxorUnguidedObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -283,13 +299,50 @@ void Game::colisionChecksV2()
 		}
 	}
 
-	//Fluxors interactions with Modules
-	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[FluxorObject].begin(); it1 != sceneGameObjectsTyped[FluxorObject].end(); it1++)
+	//Fluxors interactions (guided)
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[FluxorGuidedObject].begin(); it1 != sceneGameObjectsTyped[FluxorGuidedObject].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
-		//Player eating Fluxor
+		//Fluxors interactions with Modules
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[ModuleObject].begin(); it2 != sceneGameObjectsTyped[ModuleObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			//if (GameObject::DistancePointToSement((*it2)->getPosition().x, (*it2)->getPosition().y, (*it1)->m_initial_position.x, (*it1)->m_initial_position.y, (*it1)->getPosition().x, (*it1)->getPosition().y) == 0)
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it2)->GetFluxor(*it1);
+			}
+		}
+
+		//Fluxors eating each others
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[FluxorGuidedObject].begin(); it2 != sceneGameObjectsTyped[FluxorGuidedObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (*it1 == *it2)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it2)->GetFluxor(*it1);
+			}
+		}
+	}
+
+	//Fluxors interactions (unguided)
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[FluxorUnguidedObject].begin(); it1 != sceneGameObjectsTyped[FluxorUnguidedObject].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		//Fluxors interactions with Modules
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[ModuleObject].begin(); it2 != sceneGameObjectsTyped[ModuleObject].end(); it2++)
 		{
 			if (*it2 == NULL)
