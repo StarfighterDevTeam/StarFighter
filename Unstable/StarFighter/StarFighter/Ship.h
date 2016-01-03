@@ -8,14 +8,6 @@
 #include "Fluxor.h"
 #include "Module.h"
 
-#define SHIP_START_X                990
-#define SHIP_START_Y                540
-#define SHIP_ACCELERATION	        2000.0f
-#define SHIP_DECCELERATION_COEF		5000.0f
-#define SHIP_MAX_SPEED				400.0f
-#define SHIP_MIN_SPEED				50.0f
-#define SHIP_SPRITE_RATE_SEC        0.2f
-
 class Ship : public GameObject
 {
 public :
@@ -47,6 +39,9 @@ public :
 	void GetModule(GameObject* object) override;
 	sf::Vector2u m_curGridIndex;
 	sf::Clock m_flux_transfer_limiter_clock;
+	unsigned int m_upgrade_level;
+	float m_speed_max;
+	void UpdatePlayerStats();
 
 	//HUD
 	sf::Text m_flux_text;

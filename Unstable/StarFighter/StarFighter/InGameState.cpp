@@ -41,7 +41,7 @@ void InGameState::Initialize(Player player)
 	
 	//HACK PROTO
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, (*CurrentGame).playerShip->m_team);
-	//module->m_flux_autogeneration_time = 0.01f;
+	module->FinishConstruction();
 
 	Module* module2 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed);
 	module2->FinishConstruction();

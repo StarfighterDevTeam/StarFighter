@@ -32,8 +32,8 @@
 #define DEFAULT_SFX_VOLUME							100
 
 //FLUX SPECIFIC
-#define GRID_WIDTH									50
-#define GRID_HEIGHT									50
+#define GRID_WIDTH									20
+#define GRID_HEIGHT									20
 #define TILE_SIZE									128
 #define FLUX_TRANSFER_LIMITER_TIME					0.1f
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		2
@@ -41,6 +41,17 @@
 //PLAYER
 #define SHIP_MAX_FLUX								100
 #define PLAYER_FLUX_DISPLAY_OFFSET_Y				4
+#define SHIP_MAX_FLUX_BONUS_PER_LEVEL				100
+#define SHIP_MAX_SPEED_BONUS_PER_LEVEL				100
+#define SHIP_MAX_UPGRADE_LEVEL						9
+
+#define SHIP_START_X                990
+#define SHIP_START_Y                540
+#define SHIP_ACCELERATION	        2000.0f
+#define SHIP_DECCELERATION_COEF		5000.0f
+#define SHIP_MAX_SPEED				400.0f
+#define SHIP_MIN_SPEED				50.0f
+#define SHIP_SPRITE_RATE_SEC        0.2f
 
 //FLUXOR
 #define FLUXOR_FLUX_VALUE							10
@@ -55,7 +66,7 @@
 #define FLUXOR_BULLET_SPEED							500
 #define FLUXOR_TURN_MIN_DELAY						0.05f
 #define FLUXOR_TURN_MAX_DELAY						3.f
-#define FLUXOR_MAX_POPULATION						100
+#define FLUXOR_MAX_POPULATION						20
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
 #define FLUXOR_RESPAWN_MAX_TIME						60.f
 #define FLUXOR_WASTE_DELAY							0.5f

@@ -57,6 +57,7 @@ public :
 	int m_add_flux;
 	unsigned int m_turret_range;
 	Fluxor* SearchNearbyAttackers(PlayerTeams team_not_to_target, float range);
+	bool m_upgrade_player_stats;
 
 	//Flux auto-generation
 	bool m_isAutogeneratingFlux;

@@ -20,6 +20,8 @@ void Ship::Init()
 	m_controllerType = AllControlDevices;
 	m_flux = 0;
 	m_flux_max = SHIP_MAX_FLUX;
+	m_speed_max = SHIP_MAX_SPEED;
+	m_upgrade_level = 0;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -52,10 +54,50 @@ void Ship::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
+void Ship::UpdatePlayerStats()
+{
+	m_upgrade_level = 0;
+	for (size_t i = 0; i < GRID_WIDTH; i++)
+	{
+		for (size_t j = 0; j < GRID_HEIGHT; j++)
+		{
+			if ((*CurrentGame).m_module_grid[i][j])
+			{
+				Module* module = (Module*)(*CurrentGame).m_module_grid[i][j];
+				if (module->m_team == this->m_team && !module->m_under_construction && module->m_flux == module->m_flux_max && module->m_upgrade_player_stats)
+				{
+					m_upgrade_level++;
+					if (m_upgrade_level == SHIP_MAX_UPGRADE_LEVEL)
+					{
+						goto exit_loop;
+					}
+				}
+			}
+		}
+		if (m_upgrade_level == SHIP_MAX_UPGRADE_LEVEL)
+		{
+			break;
+		}
+	}
+
+	exit_loop:
+
+	//anti-cheat
+	if (m_upgrade_level > SHIP_MAX_UPGRADE_LEVEL)
+	{
+		m_upgrade_level == SHIP_MAX_UPGRADE_LEVEL;
+	}
+
+	m_flux_max = SHIP_MAX_FLUX + (SHIP_MAX_FLUX_BONUS_PER_LEVEL * m_upgrade_level);
+	m_speed_max = SHIP_MAX_SPEED + (SHIP_MAX_SPEED_BONUS_PER_LEVEL * m_upgrade_level);
+}
+
 void Ship::update(sf::Time deltaTime)
 {
 	m_CtrlKey_released = !InputGuy::isUsing();
 
+	UpdatePlayerStats();
+	
 	if (m_flux > m_flux_max  && m_flux_max > 0)
 	{
 		m_flux = m_flux_max;
@@ -195,24 +237,12 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
 	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
 	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
-
-	//max speed constraints
-	if (abs(m_speed.x) > SHIP_MAX_SPEED)
-	{
-		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
-	if (abs(m_speed.y) > SHIP_MAX_SPEED)
-	{
-		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
 }
 
 void Ship::MaxSpeedConstraints()
 {
-	float ship_max_speed = SHIP_MAX_SPEED;
-
 	//max speed constraints
-	NormalizeSpeed(&m_speed, ship_max_speed);
+	NormalizeSpeed(&m_speed, m_speed_max);
 }
 
 void Ship::UpdateRotation()

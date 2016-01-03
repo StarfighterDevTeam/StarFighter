@@ -24,6 +24,7 @@ void Module::Initialize()
 	m_add_flux = 0;
 	m_isAutogeneratingFlux = false;
 	m_turret_range = 0;
+	m_upgrade_player_stats = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -145,8 +146,9 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Armory:
 		{
-			m_flux_max_after_construction = 100;
-			m_flux_max_under_construction = 20;
+			m_flux_max_after_construction = 20;
+			m_flux_max_under_construction = 50;
+			m_upgrade_player_stats = true;
 			break;
 		}
 		case ModuleType_Battery:
@@ -191,8 +193,8 @@ Module::Module(ModuleType moduleType)
 		}
 		case ModuleType_Barrier:
 		{
-			m_flux_max_after_construction = 200;
-			m_flux_max_under_construction = 20;
+			m_flux_max_after_construction = 50;
+			m_flux_max_under_construction = 10;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 1.f;
 		}
@@ -856,19 +858,22 @@ void Module::UpdateLinks()
 				{
 					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + j][global_grid_index.y];
-						if (module && !module->m_under_construction)
+						if (global_grid_index.x + j < GRID_WIDTH)
 						{
-							if (module->m_team == this->m_team)
+							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + j][global_grid_index.y];
+							if (module && !module->m_under_construction)
 							{
-								m_link[i].m_activated = Link_Activated;
-								break;
-							}
-							else
-							{
-								m_link[i].m_activated = Link_Deactivated;
-								break;
+								if (module->m_team == this->m_team)
+								{
+									m_link[i].m_activated = Link_Activated;
+									break;
+								}
+								else
+								{
+									m_link[i].m_activated = Link_Deactivated;
+									break;
 
+								}
 							}
 						}
 					}
@@ -884,19 +889,22 @@ void Module::UpdateLinks()
 				{
 					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + j];
-						if (module && !module->m_under_construction)
+						if (global_grid_index.y + j < GRID_HEIGHT)
 						{
-							if (module->m_team == this->m_team)
+							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + j];
+							if (module && !module->m_under_construction)
 							{
-								m_link[i].m_activated = Link_Activated;
-								break;
-							}
-							else
-							{
-								m_link[i].m_activated = Link_Deactivated;
-								break;
+								if (module->m_team == this->m_team)
+								{
+									m_link[i].m_activated = Link_Activated;
+									break;
+								}
+								else
+								{
+									m_link[i].m_activated = Link_Deactivated;
+									break;
 
+								}
 							}
 						}
 					}
@@ -912,19 +920,22 @@ void Module::UpdateLinks()
 				{
 					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - j][global_grid_index.y];
-						if (module && !module->m_under_construction)
+						if (global_grid_index.x - j >= 0)
 						{
-							if (module->m_team == this->m_team)
+							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - j][global_grid_index.y];
+							if (module && !module->m_under_construction)
 							{
-								m_link[i].m_activated = Link_Activated;
-								break;
-							}
-							else
-							{
-								m_link[i].m_activated = Link_Deactivated;
-								break;
+								if (module->m_team == this->m_team)
+								{
+									m_link[i].m_activated = Link_Activated;
+									break;
+								}
+								else
+								{
+									m_link[i].m_activated = Link_Deactivated;
+									break;
 
+								}
 							}
 						}
 					}
@@ -940,18 +951,21 @@ void Module::UpdateLinks()
 				{
 					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
 					{
-						module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - j];
-						if (module && !module->m_under_construction)
+						if (global_grid_index.y - j >= 0)
 						{
-							if (module->m_team == this->m_team)
+							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - j];
+							if (module && !module->m_under_construction)
 							{
-								m_link[i].m_activated = Link_Activated;
-								break;
-							}
-							else
-							{
-								m_link[i].m_activated = Link_Deactivated;
-								break;
+								if (module->m_team == this->m_team)
+								{
+									m_link[i].m_activated = Link_Activated;
+									break;
+								}
+								else
+								{
+									m_link[i].m_activated = Link_Deactivated;
+									break;
+								}
 							}
 						}
 					}
