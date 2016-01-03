@@ -22,17 +22,18 @@ void InGameState::Initialize(Player player)
 	const unsigned int W = grid_width * tile_width;
 	const unsigned int H = grid_height * tile_height;
 
-	GameObject tile = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/tile.png", sf::Vector2f(tile_width, tile_height), sf::Vector2f(tile_width/2, tile_height/2), 1, 2);
-	GameObject* fake_grid[grid_width][grid_height];
-	for (int i = 0; i < grid_width; i++)
-	{
-		for (int j = 0; j < grid_height; j++)
-		{
-			fake_grid[i][j] = tile.Clone();
-			fake_grid[i][j]->setPosition(sf::Vector2f(i*tile_width + tile_width / 2, j*tile_height + tile_height / 2));
-			(*CurrentGame).addToScene(fake_grid[i][j], FakeGridLayer, BackgroundObject);
-		}
-	}
+	GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/tile.png", sf::Vector2f(tile_width, tile_height), sf::Vector2f(tile_width/2, tile_height/2), 1, 2);
+	(*CurrentGame).addToScene(tile, FakeGridLayer, BackgroundObject);
+	//GameObject* fake_grid[grid_width][grid_height];
+	//for (int i = 0; i < grid_width; i++)
+	//{
+	//	for (int j = 0; j < grid_height; j++)
+	//	{
+	//		fake_grid[i][j] = tile.Clone();
+	//		fake_grid[i][j]->setPosition(sf::Vector2f(i*tile_width + tile_width / 2, j*tile_height + tile_height / 2));
+	//		(*CurrentGame).addToScene(fake_grid[i][j], FakeGridLayer, BackgroundObject);
+	//	}
+	//}
 
 	//Background
 	(*CurrentGame).map_size = sf::Vector2f(W, H);

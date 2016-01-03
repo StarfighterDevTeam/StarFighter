@@ -15,6 +15,7 @@ void Fluxor::Initialize()
 	m_transfer_buffer = 0;
 	m_team = PlayerNeutral;
 	m_target = NULL;
+	m_target_memory = false;
 
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;
@@ -105,6 +106,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux = FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
 			m_needs_link_to_circulate = true;
+			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 			break;
 		}
 		case FluxorType_Red:
@@ -153,21 +155,23 @@ Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
 {
-	Fluxor* new_Fluxor = new Fluxor(FluxorType);
+	Fluxor* new_fluxor = new Fluxor(FluxorType);
 	
-	new_Fluxor->setPosition(RandomizePosition());
-	new_Fluxor->m_initial_position = new_Fluxor->getPosition();
-	new_Fluxor->m_speed = RandomizeSpeed();
-	new_Fluxor->m_absolute_speed = GetAbsoluteSpeed(new_Fluxor->m_speed);
-	new_Fluxor->m_turn_delay = RandomizeTurnDelay();
+	new_fluxor->setPosition(RandomizePosition());
+	new_fluxor->m_initial_position = new_fluxor->getPosition();
+	new_fluxor->m_speed = RandomizeSpeed();
+	new_fluxor->m_absolute_speed = GetAbsoluteSpeed(new_fluxor->m_speed);
+	new_fluxor->m_turn_delay = RandomizeTurnDelay();
 
-	(*CurrentGame).addToScene(new_Fluxor, FluxorLayer, FluxorObject);
-	if (new_Fluxor->m_displaying_flux)
+	GameObjectType type = new_fluxor->m_guided ? FluxorGuidedObject : FluxorUnguidedObject;
+
+	(*CurrentGame).addToScene(new_fluxor, FluxorLayer, type);
+	if (new_fluxor->m_displaying_flux)
 	{
-		(*CurrentGame).addToFeedbacks(&new_Fluxor->m_flux_text);
+		(*CurrentGame).addToFeedbacks(&new_fluxor->m_flux_text);
 	}
 
-	return new_Fluxor;
+	return new_fluxor;
 }
 
 Fluxor::~Fluxor()
@@ -230,6 +234,9 @@ void Fluxor::update(sf::Time deltaTime)
 			m_flux_waste_clock.restart();
 
 			AnimatedSprite::update(deltaTime);
+
+			//reset docked every frame. The collision will be in charge of re-docking the fluxor every frame if necessary.
+			m_docked = false;
 		}
 
 		//death by flux consumption
@@ -426,4 +433,65 @@ void Fluxor::WastingFlux()
 			m_flux_waste_clock.restart();
 		}
 	}
+}
+
+void Fluxor::GetFluxor(GameObject* object)
+{
+	if (object)
+	{
+		Fluxor* fluxor = (Fluxor*)object;
+
+		if (fluxor->m_guided && this->m_guided)
+		{
+			if (fluxor->m_team != this->m_team)
+			{
+				if (m_fluxovore && fluxor->m_flux_attacker)
+				{
+					AttackFluxor(fluxor);
+				}
+			}
+		}
+	}
+}
+
+void Fluxor::AttackFluxor(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		//steal flux?
+		if (m_flux_stealer)
+		{
+			m_flux_stolen = fluxor->m_flux;
+		}
+		//deal damage
+		if (m_flux < fluxor->m_flux)
+		{
+			fluxor->m_flux -= m_flux;
+		}
+		else
+		{
+			fluxor->m_flux = 0;
+		}
+
+		if (m_flux_stealer)
+		{
+			BringStealerBack();
+		}
+		else
+		{
+			GarbageMe = true;
+		}
+	}
+}
+
+void Fluxor::BringStealerBack()
+{
+	m_speed = (sf::Vector2f(m_speed.x *= -1, m_speed.y *= -1));
+	m_flux = m_flux_stolen;
+	m_flux_stolen = 0;
+	m_flux_max = 0;
+	m_flux_attacker = false;
+	m_wasting_flux = false;
+	m_displaying_flux = true;
+	m_consummable_by_modules = true;
 }
