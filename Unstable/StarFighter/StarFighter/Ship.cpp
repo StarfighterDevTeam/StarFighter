@@ -98,6 +98,7 @@ void Ship::update(sf::Time deltaTime)
 
 	UpdatePlayerStats();
 	
+	m_flux++;
 	if (m_flux > m_flux_max  && m_flux_max > 0)
 	{
 		m_flux = m_flux_max;

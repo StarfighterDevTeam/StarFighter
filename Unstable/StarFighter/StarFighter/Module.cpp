@@ -496,24 +496,32 @@ bool Module::GenerateFluxor()
 {
 	if (m_isGeneratingFluxor && m_flux == m_flux_max)
 	{
-		Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
-		fluxor->m_team = this->m_team;
+		Fluxor* pFluxor = (*CurrentGame).m_fluxors[m_fluxor_generated_type];
 
-		//turret?
-		if (m_turret_range > 0)
+		if (!pFluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
 		{
-			fluxor->m_target = SearchNearbyAttackers(m_team, (m_turret_range + 1) * TILE_SIZE);//+1 because this is what we actually mean by "range N": it avoids an enemy to reach a module located N tiles away
-		}
+			//turret?
+			Fluxor* pTarget = NULL;
+			if (m_turret_range > 0)
+			{
+				pTarget = SearchNearbyAttackers(m_team, (m_turret_range + 1) * TILE_SIZE);//+1 because this is what we actually mean by "range N": it avoids an enemy to reach a module located N tiles away
+			}
 
-		if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
-		{
-			if (m_turret_range == 0 || fluxor->m_target)//turrets only fire when a target is in sight within range
+			if (m_turret_range == 0 || pTarget)//turrets only fire when a target is in sight within range
 			{
 				if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 				{
+					Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+
+					fluxor->m_team = m_team;
+					fluxor->m_guided = true;
+					if (pTarget)
+					{
+						fluxor->m_target = pTarget;
+					}
+
 					m_flux -= m_fluxor_generation_cost;
 
-					fluxor->m_guided = true;
 					//turret?
 					if (m_turret_range == 0)
 					{
@@ -544,6 +552,8 @@ bool Module::GenerateFluxor()
 				}
 			}
 		}
+
+		return false;
 	}
 	else
 	{

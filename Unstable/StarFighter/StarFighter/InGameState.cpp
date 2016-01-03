@@ -38,6 +38,12 @@ void InGameState::Initialize(Player player)
 	//Background
 	(*CurrentGame).map_size = sf::Vector2f(W, H);
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+
+	//Fluxors data
+	for (int i = 0; i < NBVAL_FluxorType; i++)
+	{
+		(*CurrentGame).m_fluxors[i] = new Fluxor((FluxorType)i);
+	}
 	
 	//HACK PROTO
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, (*CurrentGame).playerShip->m_team);
