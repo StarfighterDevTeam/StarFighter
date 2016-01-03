@@ -21,6 +21,9 @@ void Ship::Init()
 	m_flux = 0;
 	m_flux_max = SHIP_MAX_FLUX;
 	m_speed_max = SHIP_MAX_SPEED;
+	m_flux_transfer_time = 0.1f;
+	m_flux_autogeneration_time = 1.f;
+	m_flux_autogeneration = 0;
 	m_upgrade_level = 0;
 
 	//Flux display
@@ -29,9 +32,10 @@ void Ship::Init()
 	m_flux_text.setColor(sf::Color::Green);
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	(*CurrentGame).addToFeedbacks(&m_flux_text);
+	m_flux_text_status = Player_NotOverConstruction;
 
 	//inputs
-	m_CtrlKey_released = false;
+	m_SwitchKey_released = false;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -92,14 +96,26 @@ void Ship::UpdatePlayerStats()
 	m_speed_max = SHIP_MAX_SPEED + (SHIP_MAX_SPEED_BONUS_PER_LEVEL * m_upgrade_level);
 }
 
+void Ship::FluxAutogeneration()
+{
+	if (m_flux_autogeneration > 0)
+	{
+		if (m_flux_autogeneration_clock.getElapsedTime().asSeconds() > m_flux_autogeneration_time)
+		{
+			m_flux += m_flux_autogeneration;
+			m_flux_autogeneration_clock.restart();
+		}
+	}
+}
+
 void Ship::update(sf::Time deltaTime)
 {
-	m_CtrlKey_released = !InputGuy::isUsing();
+	m_SwitchKey_released = !InputGuy::isUsing();
 
 	UpdatePlayerStats();
-	
-	m_flux++;
-	if (m_flux > m_flux_max  && m_flux_max > 0)
+
+	FluxAutogeneration();
+	if (m_flux > m_flux_max && m_flux_max > 0)
 	{
 		m_flux = m_flux_max;
 	}
@@ -123,10 +139,29 @@ void Ship::update(sf::Time deltaTime)
 	ScreenBorderContraints();	
 
 	//hud
-	ostringstream ss;
-	ss << m_flux << "/" << m_flux_max;
-	m_flux_text.setString(ss.str());
+	//ostringstream ss;
+	//ss << m_flux << "/" << m_flux_max;
+	//m_flux_text.setString(ss.str());
+	
+	if (m_flux_text_status == Player_OverConstruction)
+	{
+		m_flux_text.setString("Hold 'Build'");
+	}
+	else if (m_flux_text_status == Player_ConstructionInProgress)
+	{
+		m_flux_text.setString("Building...");
+	}
+	
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
+	if (m_flux_text_status != Player_NotOverConstruction)
+	{
+		m_flux_text.setColor(sf::Color::Green);
+	}
+	else
+	{
+		m_flux_text.setColor(sf::Color::Transparent);
+	}
+	m_flux_text_status = Player_NotOverConstruction;
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
@@ -329,17 +364,25 @@ void Ship::GetModule(GameObject* object)
 				{
 					if (InputGuy::isFiring())
 					{
+						m_flux_text_status = Player_ConstructionInProgress;
+
 						unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
-						if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > FLUX_TRANSFER_LIMITER_TIME)
+						//if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_time)
+						if (module->m_flux < flux_max && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_time)
 						{
-							m_flux--;
+							//m_flux--;
 							module->m_flux++;
 							m_flux_transfer_limiter_clock.restart();
 						}
 					}
+					else
+					{
+						m_flux_text_status = Player_OverConstruction;
+						m_flux_transfer_limiter_clock.restart();
+					}
 				}
 
-				if (InputGuy::isUsing() && m_CtrlKey_released)
+				if (InputGuy::isUsing() && m_SwitchKey_released)
 				{
 					module->SwitchLinkDirection();
 				}

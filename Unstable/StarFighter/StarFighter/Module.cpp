@@ -140,7 +140,7 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Generator:
 		{	 
 			m_flux_max_after_construction = 10;
-			m_flux_max_under_construction = 100;
+			m_flux_max_under_construction = 500;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
@@ -152,27 +152,27 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Armory:
 		{
 			m_flux_max_after_construction = 20;
-			m_flux_max_under_construction = 50;
+			m_flux_max_under_construction = 200;
 			m_upgrade_player_stats = true;
 			break;
 		}
 		case ModuleType_Battery:
 		{
 			m_flux_max_after_construction = 1500;
-			m_flux_max_under_construction = 20;
+			m_flux_max_under_construction = 200;
 			break;
 		}
 		case ModuleType_Relay:
 		{
-			m_flux_max_after_construction = 5;
-			m_flux_max_under_construction = 1;
+			m_flux_max_after_construction = 10;
+			m_flux_max_under_construction = 30;
 			m_isRefillingFlux = true;
 			break;
 		}
 		case ModuleType_Factory:
 		{
 			m_flux_max_after_construction = 10;
-			m_flux_max_under_construction = 30;
+			m_flux_max_under_construction = 150;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Red;
 			m_fluxor_generation_time = 3.f;
@@ -182,7 +182,7 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Factory_Up:
 		{
 			m_flux_max_after_construction = 10;
-			m_flux_max_under_construction = 50;
+			m_flux_max_under_construction = 300;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Purple;
 			m_fluxor_generation_time = 3.f;
@@ -192,13 +192,13 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Shield:
 		{
 			m_flux_max_after_construction = 100;
-			m_flux_max_under_construction = 20;
+			m_flux_max_under_construction = 200;
 			break;
 		}
 		case ModuleType_Turret:
 		{
 			m_flux_max_after_construction = 50;
-			m_flux_max_under_construction = 30;
+			m_flux_max_under_construction = 300;
 			m_turret_range = 2;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Black;
@@ -209,21 +209,21 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Barrier:
 		{
 			m_flux_max_after_construction = 50;
-			m_flux_max_under_construction = 10;
+			m_flux_max_under_construction = 100;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 1.f;
 		}
 		case ModuleType_Amplifier:
 		{
 			m_flux_max_after_construction = 30;
-			m_flux_max_under_construction = 30;
+			m_flux_max_under_construction = 250;
 			m_add_flux = 30;
 			break;
 		}
 		case ModuleType_Accelerator:
 		{
 			m_flux_max_after_construction = 30;
-			m_flux_max_under_construction = 20;
+			m_flux_max_under_construction = 150;
 			m_add_speed = 100;
 			break;
 		}
@@ -257,7 +257,7 @@ void Module::SetConstructionStatus(bool under_construction)
 		
 }
 
-Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team)
+Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished, int link_activation, unsigned int flux)
 {
 	Module* new_module = new Module(moduleType);
 
@@ -297,6 +297,21 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 		for (int i = 0; i < 4; i++)
 		{
 			(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
+		}
+
+		//overload parameters
+		if (construction_finished)
+		{
+			new_module->FinishConstruction();
+		}
+		for (int i = 0; i < link_activation; i++)
+		{
+			new_module->SwitchLinkDirection();
+		}
+		new_module->m_flux = flux;
+		if (flux > new_module->m_flux_max)
+		{
+			new_module->m_flux = new_module->m_flux_max;
 		}
 	}
 	else
@@ -371,6 +386,10 @@ void Module::FinishConstruction()
 	if (m_team == PlayerRed)
 	{
 		setColor(sf::Color::Red);
+	}
+	else if (m_team == PlayerNeutral)
+	{
+		setColor(sf::Color::Yellow);
 	}
 	else
 	{

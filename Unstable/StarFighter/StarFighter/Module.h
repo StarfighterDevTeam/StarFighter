@@ -20,13 +20,21 @@ struct Link
 	LinkStatus m_activated;
 };
 
+enum LinkDirection
+{
+	LinkRight,
+	LinkDown,
+	LinkLeft,
+	LinkUp,
+};
+
 class Module : public GameObject
 {
 public :
 	Module();
 	Module(ModuleType moduleType);
 	Module(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
-	static Module* CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team);
+	static Module* CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished = false, int link_activation = 0, unsigned flux = 0);
 	static void EraseModule(sf::Vector2u grid_index);
 	static void DebugFinishModule(sf::Vector2u grid_index);
 	static void DebugRefillingModuleFlux(sf::Vector2u grid_index);

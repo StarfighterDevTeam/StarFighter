@@ -35,7 +35,6 @@
 #define GRID_WIDTH									20
 #define GRID_HEIGHT									20
 #define TILE_SIZE									128
-#define FLUX_TRANSFER_LIMITER_TIME					0.1f
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		1
 
 //PLAYER

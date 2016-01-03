@@ -36,30 +36,17 @@ void InGameState::Initialize(Player player)
 	}
 	
 	//HACK PROTO
-	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, (*CurrentGame).playerShip->m_team);
-	module->FinishConstruction();
+	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, (*CurrentGame).playerShip->m_team, true);
 
-	Module* module2 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed);
-	module2->FinishConstruction();
-	module2->m_flux = 15;
-	Module* module3 = Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed);
-	module3->FinishConstruction();
-	module3->SwitchLinkDirection();
-	module3->m_flux = module3->m_flux_max;
-	Module* module4 = Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Generator, PlayerRed);
-	module4->FinishConstruction();
-	module4->SwitchLinkDirection();
-	module4->SwitchLinkDirection();
+	Module* module2 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed, true, LinkRight, 15);
+	Module* module3 = Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed, true, LinkDown, 1000);
+	Module* module4 = Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Generator, PlayerRed, true, LinkLeft);
 
-	Module::CreateModule(sf::Vector2u(7, 5), ModuleType_Factory, PlayerBlue);
-	Module::CreateModule(sf::Vector2u(8, 5), ModuleType_Accelerator, PlayerBlue);
-	Module::CreateModule(sf::Vector2u(6, 5), ModuleType_Amplifier, PlayerBlue);
-	Module::CreateModule(sf::Vector2u(5, 6), ModuleType_Relay, PlayerBlue);
-	Module::CreateModule(sf::Vector2u(6, 6), ModuleType_Amplifier, PlayerBlue);
+	Module::CreateModule(sf::Vector2u(15, 5), ModuleType_Barrier, PlayerNeutral, true);
 
 	//Spawning Fluxors
-	for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
-		Fluxor::CreateFluxor(FluxorType_Green);
+	//for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
+	//	Fluxor::CreateFluxor(FluxorType_Green);
 }
 
 void InGameState::Update(sf::Time deltaTime)

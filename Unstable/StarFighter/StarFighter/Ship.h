@@ -8,6 +8,13 @@
 #include "Fluxor.h"
 #include "Module.h"
 
+enum PlayerConstructionFeedbacks
+{
+	Player_NotOverConstruction,
+	Player_OverConstruction,
+	Player_ConstructionInProgress,
+};
+
 class Ship : public GameObject
 {
 public :
@@ -28,23 +35,29 @@ public :
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
 	void SetControllerType(ControlerType contoller);
-	bool m_CtrlKey_released;
+	bool m_SwitchKey_released;
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;
 
 	//FLUX SPECIFIC
 	unsigned int m_flux;
 	unsigned int m_flux_max;
+	unsigned int m_flux_autogeneration;
 	void GetFluxor(GameObject* object) override;
 	void GetModule(GameObject* object) override;
 	sf::Vector2u m_curGridIndex;
+	float m_flux_transfer_time;
 	sf::Clock m_flux_transfer_limiter_clock;
+	void FluxAutogeneration();
+	float m_flux_autogeneration_time;
+	sf::Clock m_flux_autogeneration_clock;
 	unsigned int m_upgrade_level;
 	float m_speed_max;
 	void UpdatePlayerStats();
 
 	//HUD
 	sf::Text m_flux_text;
+	PlayerConstructionFeedbacks m_flux_text_status;
 
 	//construction
 	//void ResolveProductionBufferList() override;
