@@ -24,7 +24,7 @@ void Ship::Init()
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
 	m_flux_text.setCharacterSize(20);
-	m_flux_text.setColor(sf::Color::White);
+	m_flux_text.setColor(sf::Color::Green);
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	(*CurrentGame).addToFeedbacks(&m_flux_text);
 

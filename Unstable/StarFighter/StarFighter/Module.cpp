@@ -27,7 +27,7 @@ void Module::Initialize()
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
 	m_flux_text.setCharacterSize(20);
-	m_flux_text.setColor(sf::Color::White);
+	m_flux_text.setColor(sf::Color::Green);
 	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
 	(*CurrentGame).addToFeedbacks(&m_flux_text);
 
@@ -359,6 +359,8 @@ void Module::FinishConstruction()
 	{
 		setColor(sf::Color(255, 255, 255, 255));
 	}
+
+	m_flux_text.setColor(sf::Color::Cyan);
 
 	m_under_construction = false;
 	m_flux = 0;

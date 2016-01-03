@@ -19,7 +19,7 @@
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
-#define	GHOST_ALPHA_VALUE						120
+#define	GHOST_ALPHA_VALUE						150
 
 #define JOYSTICK_MIN_AXIS_VALUE					25
 

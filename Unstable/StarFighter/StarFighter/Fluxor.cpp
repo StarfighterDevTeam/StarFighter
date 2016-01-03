@@ -146,6 +146,24 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			break;
 		}
 	}
+
+	//Generic parameters
+	if (m_consummable_by_players)
+	{
+		m_flux_text.setColor(sf::Color::Green);
+	}
+	else if (m_consummable_by_modules)
+	{
+		m_flux_text.setColor(sf::Color::Cyan);
+	}
+	else if (m_flux_attacker)
+	{
+		m_flux_text.setColor(sf::Color::Red);
+	}
+	else if (m_fluxovore)
+	{
+		m_flux_text.setColor(sf::Color::Black);
+	}
 }
 
 Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
