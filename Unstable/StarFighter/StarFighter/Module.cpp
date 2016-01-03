@@ -1015,13 +1015,21 @@ void Module::UpdateLinks()
 	}
 
 	//update circuit knowledge
-	
 	m_has_child_to_refill = false;
 	Module* module_parent = this;
+	vector<Module*> checked_modules;
 
 	while (module_parent->GetMainLinkedModule())//check if it has an active link with another module
 	{
-		Module* module_child = module_parent->GetMainLinkedModule();
+		int main_link = module_parent->GetMainLinkIndex();
+		Module* module_child = module_parent->m_linked_modules[main_link];
+
+		//module already checked? (= infinite loop)
+		if (find(checked_modules.begin(), checked_modules.end(), module_child) != checked_modules.end())
+		{
+			break;
+		}
+		
 		if (module_child->m_flux < module_child->m_flux_max)
 		{
 			m_has_child_to_refill = true;
@@ -1030,6 +1038,7 @@ void Module::UpdateLinks()
 		else
 		{
 			//child has full stocks, we shall continue the loop until we find a child thas need to be refilled
+			checked_modules.push_back(module_parent);
 			module_parent = module_child;
 		}
 	}
@@ -1070,19 +1079,14 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 					//linked module is not a loop circuit?
 					if (m_linked_modules[main_link])
 					{
-						size_t ModulesVisitedVectorSize = fluxor->m_modules_visited.size();
-						for (size_t i = 0; i < ModulesVisitedVectorSize; i++)
+						vector<Module*>::iterator it = find(fluxor->m_modules_visited.begin(), fluxor->m_modules_visited.end(), m_linked_modules[main_link]);
+
+						//element found?
+						if (it != fluxor->m_modules_visited.end() && (*it)->m_team == fluxor->m_team)
 						{
-							if (fluxor->m_modules_visited[i])
-							{
-								//element found?
-								if (m_linked_modules[main_link] == fluxor->m_modules_visited[i] && m_linked_modules[main_link]->m_team == fluxor->m_team)
-								{
-									//This is a looping circuit (allied module visited twice). This is forbidden, and the Fluxor shall therefore die now.
-									fluxor->GarbageMe = true;
-									return false;
-								}
-							}
+							//This is a looping circuit (allied module visited twice). This is forbidden, and the Fluxor shall therefore die now.
+							fluxor->GarbageMe = true;
+							return false;
 						}
 					}
 
