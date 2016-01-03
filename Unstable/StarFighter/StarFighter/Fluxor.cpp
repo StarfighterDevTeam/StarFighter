@@ -25,7 +25,7 @@ void Fluxor::Initialize()
 	m_flux_stolen = 0;
 	m_needs_link_to_circulate = false;
 	m_fluxovore = false;
-	m_can_be_refilled_by_modules = true;
+	m_can_be_refilled_by_modules = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -105,6 +105,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_wasting_flux = false;
 			m_flux = FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
+			m_can_be_refilled_by_modules = true;
 			m_needs_link_to_circulate = true;
 			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 			break;
@@ -118,6 +119,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			m_flux = 10;
 			m_flux_max = 10;
+			m_can_be_refilled_by_modules = true;
 			m_flux_attacker = true;
 			m_flux_attack_piercing = true;
 			break;
@@ -131,6 +133,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			m_flux = 20;
 			m_flux_max = 20;
+			m_can_be_refilled_by_modules = true;
 			m_flux_attacker = true;
 			m_flux_stealer = true;
 			break;
@@ -142,7 +145,6 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux = 20;
 			m_flux_max = 0;
 			m_fluxovore = true;
-			m_can_be_refilled_by_modules = false;
 			break;
 		}
 	}
@@ -519,4 +521,5 @@ void Fluxor::BringStealerBack()
 	m_wasting_flux = false;
 	m_displaying_flux = true;
 	m_consummable_by_modules = true;
+	m_can_be_refilled_by_modules = false;
 }
