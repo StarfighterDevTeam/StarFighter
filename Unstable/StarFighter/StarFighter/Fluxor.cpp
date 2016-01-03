@@ -271,7 +271,14 @@ void Fluxor::update(sf::Time deltaTime)
 			if (m_flux_max > 0)
 				ss << "/" << m_flux_max;
 			m_flux_text.setString(ss.str());
-			m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+			if (m_flux_attacker || m_fluxovore)
+			{
+				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text.getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+			}
+			else
+			{
+				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+			}
 		}
 	}
 	else//if dead

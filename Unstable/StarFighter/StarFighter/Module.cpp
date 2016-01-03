@@ -94,6 +94,11 @@ Module::Module(ModuleType moduleType)
 			textureName = "Assets/2D/module_factory.png";
 			break;
 		}
+		case ModuleType_Factory_Up:
+		{
+			textureName = "Assets/2D/module_factory_up.png";
+			break;
+		}
 		case ModuleType_Shield:
 		{
 			textureName = "Assets/2D/module_shield.png";
@@ -137,11 +142,11 @@ Module::Module(ModuleType moduleType)
 			m_flux_max_after_construction = 10;
 			m_flux_max_under_construction = 100;
 			m_isAutogeneratingFlux = true;
-			m_flux_autogeneration_time = 1.f;
+			m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
-			m_fluxor_generation_time = 5.f;
-			//m_fluxor_generation_cost = m_flux_max_after_construction;
+			m_fluxor_generation_time = 0.f;
+			m_fluxor_generation_cost = FLUXOR_FLUX_VALUE;
 			break;
 		}
 		case ModuleType_Armory:
@@ -167,9 +172,19 @@ Module::Module(ModuleType moduleType)
 		case ModuleType_Factory:
 		{
 			m_flux_max_after_construction = 10;
-			m_flux_max_under_construction = 20;
+			m_flux_max_under_construction = 30;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Red;
+			m_fluxor_generation_time = 3.f;
+			m_fluxor_generation_cost = m_flux_max_after_construction;
+			break;
+		}
+		case ModuleType_Factory_Up:
+		{
+			m_flux_max_after_construction = 10;
+			m_flux_max_under_construction = 50;
+			m_isGeneratingFluxor = true;
+			m_fluxor_generated_type = FluxorType_Purple;
 			m_fluxor_generation_time = 3.f;
 			m_fluxor_generation_cost = m_flux_max_after_construction;
 			break;
@@ -584,7 +599,7 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (fluxor->m_flux < fluxor->m_flux_max || fluxor->m_flux_max == 0)
+		if (fluxor->m_flux < fluxor->m_flux_max || (fluxor->m_flux_max == 0 && m_add_flux > 0))
 		{
 			if (fluxor->m_transfer_buffer == 0)
 			{

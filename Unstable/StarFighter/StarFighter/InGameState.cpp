@@ -46,11 +46,14 @@ void InGameState::Initialize(Player player)
 	Module* module2 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed);
 	module2->FinishConstruction();
 	module2->m_flux = 15;
-	Module* module3 = Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Turret, PlayerRed);
+	Module* module3 = Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed);
 	module3->FinishConstruction();
+	module3->SwitchLinkDirection();
 	module3->m_flux = module3->m_flux_max;
-	Module* module4 = Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Generator, PlayerRed);
+	Module* module4 = Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Generator, PlayerRed);
 	module4->FinishConstruction();
+	module4->SwitchLinkDirection();
+	module4->SwitchLinkDirection();
 
 	Module::CreateModule(sf::Vector2u(7, 5), ModuleType_Factory, PlayerBlue);
 	Module::CreateModule(sf::Vector2u(8, 5), ModuleType_Accelerator, PlayerBlue);
