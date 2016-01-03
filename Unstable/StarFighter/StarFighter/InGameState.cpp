@@ -43,12 +43,14 @@ void InGameState::Initialize(Player player)
 	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, (*CurrentGame).playerShip->m_team);
 	//module->m_flux_autogeneration_time = 0.01f;
 
-	Module* module2 = Module::CreateModule(sf::Vector2u(10, 5), ModuleType_Battery, PlayerRed);
+	Module* module2 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed);
 	module2->FinishConstruction();
 	module2->m_flux = 15;
-	Module* module3 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Turret, PlayerRed);
+	Module* module3 = Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Turret, PlayerRed);
 	module3->FinishConstruction();
-	module3->m_flux = 1000;
+	module3->m_flux = module3->m_flux_max;
+	Module* module4 = Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Generator, PlayerRed);
+	module4->FinishConstruction();
 
 	Module::CreateModule(sf::Vector2u(7, 5), ModuleType_Factory, PlayerBlue);
 	Module::CreateModule(sf::Vector2u(8, 5), ModuleType_Accelerator, PlayerBlue);

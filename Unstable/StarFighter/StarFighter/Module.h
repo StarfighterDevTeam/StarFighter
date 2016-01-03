@@ -90,6 +90,8 @@ public :
 	Link m_link[4];
 	Module* m_linked_modules[4];
 	int GetMainLinkIndex();
+	Module* GetMainLinkedModule();
+	bool m_has_child_to_refill;
 	void SwitchLinkDirection();
 	bool UndockFluxor(Fluxor* fluxor);
 	void UpdateLinks();

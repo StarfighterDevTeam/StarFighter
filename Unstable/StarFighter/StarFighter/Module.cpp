@@ -16,6 +16,7 @@ void Module::Initialize()
 	SetConstructionStatus(true);
 
 	m_isGeneratingFluxor = false;
+	m_has_child_to_refill = false;
 	m_isRefillingFlux = false;
 	m_flux_transfer_delay = MODULE_TRANSFER_DELAY;
 	m_fluxor_generation_cost = 0;
@@ -136,11 +137,10 @@ Module::Module(ModuleType moduleType)
 			m_flux_max_under_construction = 100;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 1.f;
-
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
-			m_fluxor_generation_time = 1.f;
-			m_fluxor_generation_cost = m_flux_max_after_construction;
+			m_fluxor_generation_time = 5.f;
+			//m_fluxor_generation_cost = m_flux_max_after_construction;
 			break;
 		}
 		case ModuleType_Armory:
@@ -186,7 +186,7 @@ Module::Module(ModuleType moduleType)
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Black;
 			m_fluxor_generation_time = 2.f;
-			//m_fluxor_generation_cost = 5;
+			m_fluxor_generation_cost = 5;
 			break;
 		}
 		case ModuleType_Barrier:
@@ -488,7 +488,7 @@ bool Module::GenerateFluxor()
 			fluxor->m_target = SearchNearbyAttackers(m_team, (m_turret_range + 1) * TILE_SIZE);//+1 because this is what we actually mean by "range N": it avoids an enemy to reach a module located N tiles away
 		}
 
-		if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//if it needs a link to circulate, we check that an activated link exists
+		if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
 		{
 			if (m_turret_range == 0 || fluxor->m_target)//turrets only fire when a target is in sight within range
 			{
@@ -680,7 +680,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 					//if (m_flux == m_flux_max && ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0)))
 					if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
 					{
-						if (!fluxor->m_needs_link_to_circulate || IsMainLinkActivated())//if it needs a link to circulate and no activated link exists, amplyfing is pointless
+						if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
 						{
 							AmplifyFluxor(fluxor);
 						}
@@ -780,6 +780,20 @@ bool Module::IsMainLinkActivated()
 	int main_link = GetMainLinkIndex();
 
 	return main_link >= 0 && m_link[main_link].m_activated == Link_Activated;
+}
+
+Module* Module::GetMainLinkedModule()
+{
+	int main_link = GetMainLinkIndex();
+
+	if (main_link >= 0 && m_link[main_link].m_activated == Link_Activated)
+	{
+		return m_linked_modules[main_link];
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 void Module::ResolveProductionBufferList()
@@ -960,6 +974,26 @@ void Module::UpdateLinks()
 		//update arrow visual
 		m_arrow[i]->setAnimationLine(m_link[i].m_activated);
 	}
+
+	//update circuit knowledge
+	
+	m_has_child_to_refill = false;
+	Module* module_parent = this;
+
+	while (module_parent->GetMainLinkedModule())//check if it has an active link with another module
+	{
+		Module* module_child = module_parent->GetMainLinkedModule();
+		if (module_child->m_flux < module_child->m_flux_max)
+		{
+			m_has_child_to_refill = true;
+			break;
+		}
+		else
+		{
+			//child has full stocks, we shall continue the loop until we find a child thas need to be refilled
+			module_parent = module_child;
+		}
+	}
 }
 
 int Module::GetMainLinkIndex()
@@ -1011,6 +1045,13 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 								}
 							}
 						}
+					}
+
+					if (fluxor->m_FluxorType == FluxorType_Blue && !m_has_child_to_refill)
+					{
+						//no child module to refill, going on is pointless
+						fluxor->GarbageMe = true;
+						return false;
 					}
 
 					//linked module is legit, we shall proceed to direction change
