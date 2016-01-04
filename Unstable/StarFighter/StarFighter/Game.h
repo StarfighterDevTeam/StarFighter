@@ -111,6 +111,8 @@ public:
 	bool isCellFree(sf::Vector2f position);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
 	void ResolveProductionBufferList();
+	vector<vector<int>> m_teams_vs_alliance_map;
+	int GetTeamAlliance(PlayerTeams team);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

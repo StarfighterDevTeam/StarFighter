@@ -67,6 +67,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 	std::string textureName;
 	m_moduleType = moduleType;
 	m_team = team;
+	m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(team);
 
 	switch (moduleType)
 	{
@@ -146,7 +147,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
-			m_fluxor_generation_time = 0.f;
+			m_fluxor_generation_time = 0.5f;
 			m_fluxor_generation_cost = FLUXOR_FLUX_VALUE;
 			break;
 		}
@@ -532,6 +533,7 @@ bool Module::GenerateFluxor()
 					Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
 
 					fluxor->m_team = m_team;
+					fluxor->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 					fluxor->m_guided = true;
 					if (pTarget)
 					{
@@ -713,7 +715,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 		//by default, we assume at each frame that the Fluxor will be released unless told otherwise.
 		//therefore each method must explicitly lock it again if needed, every frame with "fluxor->m_docked = true"
-		if (fluxor->m_team == this->m_team)
+		if (fluxor->m_team == this->m_team || fluxor->m_alliance == this->m_alliance)
 		{
 			fluxor->m_docked = false;
 
@@ -906,7 +908,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + j][global_grid_index.y];
 							if (module && !module->m_under_construction)
 							{
-								if (module->m_team == this->m_team)
+								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 								{
 									m_link[i].m_activated = Link_Activated;
 									break;
@@ -937,7 +939,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + j];
 							if (module && !module->m_under_construction)
 							{
-								if (module->m_team == this->m_team)
+								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 								{
 									m_link[i].m_activated = Link_Activated;
 									break;
@@ -968,7 +970,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - j][global_grid_index.y];
 							if (module && !module->m_under_construction)
 							{
-								if (module->m_team == this->m_team)
+								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 								{
 									m_link[i].m_activated = Link_Activated;
 									break;
@@ -999,7 +1001,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - j];
 							if (module && !module->m_under_construction)
 							{
-								if (module->m_team == this->m_team)
+								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 								{
 									m_link[i].m_activated = Link_Activated;
 									break;
@@ -1018,7 +1020,7 @@ void Module::UpdateLinks()
 			//case of "short circuit" (links pointer each other)
 			if (module)
 			{
-				if (module->m_link[(i + 2) % 4].m_exists && module->m_link[(i + 2) % 4].m_activated == Link_Activated && module->m_team == this->m_team)
+				if (module->m_link[(i + 2) % 4].m_exists && module->m_link[(i + 2) % 4].m_activated == Link_Activated && (module->m_team == this->m_team || module->m_alliance == this->m_alliance))
 				{
 					m_link[i].m_activated = Link_Invalid;
 				}
@@ -1100,7 +1102,7 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 						vector<Module*>::iterator it = find(fluxor->m_modules_visited.begin(), fluxor->m_modules_visited.end(), m_linked_modules[main_link]);
 
 						//element found?
-						if (it != fluxor->m_modules_visited.end() && (*it)->m_team == fluxor->m_team)
+						if (it != fluxor->m_modules_visited.end() && ((*it)->m_team == fluxor->m_team || (*it)->m_alliance == fluxor->m_alliance))
 						{
 							//This is a looping circuit (allied module visited twice). This is forbidden, and the Fluxor shall therefore die now.
 							fluxor->GarbageMe = true;
@@ -1169,7 +1171,7 @@ Fluxor* Module::SearchNearbyAttackers(PlayerTeams team_not_to_target, float rang
 
 		Fluxor* pCandidate = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorGuidedObject)[i];
 
-		if (pCandidate->m_team != team_not_to_target && pCandidate->m_flux_attacker)
+		if ((pCandidate->m_flux_attacker && pCandidate->m_team != team_not_to_target && pCandidate->m_alliance != (*CurrentGame).GetTeamAlliance(team_not_to_target)))
 		{
 			if (pCandidate->isOnScene && !pCandidate->m_ghost && pCandidate->visible)
 			{

@@ -6,13 +6,6 @@ void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
-	
-	//intégration placeholder
-	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
-	(*CurrentGame).SetPlayerShip(playerShip);
-	playerShip->SetControllerType(AllControlDevices);
-	playerShip->m_team = PlayerBlue;
-	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
 
 	//Fake grid construction
 	const unsigned int grid_width = GRID_WIDTH;
@@ -22,26 +15,47 @@ void InGameState::Initialize(Player player)
 	const unsigned int W = grid_width * tile_width;
 	const unsigned int H = grid_height * tile_height;
 
-	GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/tile.png", sf::Vector2f(tile_width, tile_height), sf::Vector2f(tile_width/2, tile_height/2), 1, 2);
+	GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/tile.png", sf::Vector2f(tile_width, tile_height), sf::Vector2f(tile_width / 2, tile_height / 2), 1, 2);
 	(*CurrentGame).addToScene(tile, FakeGridLayer, BackgroundObject);
 
-	//Background
-	(*CurrentGame).map_size = sf::Vector2f(W, H);
-	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+	//team alliance 1
+	vector<int> v;
+	v.push_back(PlayerBlue);
+	v.push_back(PlayerBlue2);
+	(*CurrentGame).m_teams_vs_alliance_map.push_back(v);
+	//team alliance 2
+	v.clear();
+	v.push_back(PlayerRed);
+	v.push_back(PlayerRed2);
+	(*CurrentGame).m_teams_vs_alliance_map.push_back(v);
+	//team neutral
+	v.clear();
+	v.push_back(PlayerNeutral);
+	(*CurrentGame).m_teams_vs_alliance_map.push_back(v);
 
 	//Colors data
-	for (int i = 0; i < NBVAL_PlayerTeams; i++)
+	for (size_t i = 0; i < NBVAL_PlayerTeams; i++)
 	{
 		switch (i)
-			{
+		{
 			case PlayerBlue:
 			{
 				(*CurrentGame).m_team_colors[i] = sf::Color::Blue;
 				break;
 			}
+			case PlayerBlue2:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::White;
+				break;
+			}
 			case PlayerRed:
 			{
 				(*CurrentGame).m_team_colors[i] = sf::Color::Red;
+				break;
+			}
+			case PlayerRed2:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::Black;
 				break;
 			}
 			case PlayerNeutral:
@@ -63,12 +77,21 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).m_fluxors[i] = new Fluxor((FluxorType)i);
 	}
 
-	//HACK PROTO
-	Module* module = Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, (*CurrentGame).playerShip->m_team, true);
+	//intégration placeholder
+	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue, 3);
+	(*CurrentGame).SetPlayerShip(playerShip);
+	playerShip->SetControllerType(AllControlDevices);
+	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
 
-	Module* module2 = Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed, true, LinkRight, 15);
-	Module* module3 = Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed, true, LinkDown, 1000);
-	Module* module4 = Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Generator, PlayerRed, true, LinkLeft);
+	(*CurrentGame).map_size = sf::Vector2f(W, H);
+	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
+
+	//HACK PROTO
+	Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, PlayerBlue, true);
+
+	Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed, true, LinkRight, 15);
+	Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed, true, LinkDown, 1000);
+	Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Generator, PlayerRed, true, LinkLeft);
 
 	Module::CreateModule(sf::Vector2u(15, 5), ModuleType_Barrier, PlayerNeutral, true);
 

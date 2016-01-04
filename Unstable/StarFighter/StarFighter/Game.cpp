@@ -538,3 +538,22 @@ std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
 {
 	return sceneGameObjectsTyped[type];
 }
+
+//ol Game::isAlly(PlayerTeams ref_team, PlayerTeams other_team)
+//
+//eturn ref_team != other_team && find(m_player_alliances[ref_team].begin(), m_player_alliances[ref_team].end(), other_team) != m_player_alliances[ref_team].end();
+//
+
+int Game::GetTeamAlliance(PlayerTeams team)
+{
+	for (size_t i = 0; i < NBVAL_TeamAlliances; i++)
+	{
+		if (find(m_teams_vs_alliance_map[i].begin(), m_teams_vs_alliance_map[i].end(), team) != m_teams_vs_alliance_map[i].end())
+		{
+			return i;
+		}
+	}
+
+	printf("<!> Game::GetTeamAlliance(PlayerTeams team) is looking for a team assigned to no alliance in vector<vector<int>> Game::m_player_alliances.\n");
+	return 0;
+}

@@ -470,7 +470,7 @@ void Fluxor::GetFluxor(GameObject* object)
 
 		if (fluxor->m_guided && this->m_guided)
 		{
-			if (fluxor->m_team != this->m_team)
+			if (fluxor->m_team != this->m_team && fluxor->m_alliance != this->m_alliance)
 			{
 				if (m_fluxovore && fluxor->m_flux_attacker)
 				{
@@ -522,4 +522,5 @@ void Fluxor::BringStealerBack()
 	m_displaying_flux = true;
 	m_consummable_by_modules = true;
 	m_can_be_refilled_by_modules = false;
+	m_flux_text.setColor(sf::Color::Cyan);
 }

@@ -86,8 +86,10 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 	sf::Uint8* pixels_animation = new sf::Uint8[W * H * 4 * frames_number];
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	bool existing_texture = loader->getTexture(parent->m_textureName + "_glow_anim");
-	sf::Texture* texture = loader->loadTexture(parent->m_textureName + "_glow_anim", W*frames_number, H, pixels_animation);
+	ostringstream ss;
+	ss << parent->m_textureName << "_glow_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
+	bool existing_texture = loader->getTexture(ss.str());
+	sf::Texture* texture = loader->loadTexture(ss.str(), W*frames_number, H, pixels_animation);
 	
 	//updating the newly created texture, if it wasn't existing before
 	if (!existing_texture)

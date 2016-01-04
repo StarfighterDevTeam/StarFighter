@@ -21,8 +21,18 @@ enum PlayerTeams
 {
 	PlayerBlue,
 	PlayerRed,
+	PlayerBlue2,
+	PlayerRed2,
 	PlayerNeutral,
 	NBVAL_PlayerTeams,
+};
+
+enum TeamAlliances
+{
+	AllianceNeutral,
+	Alliance1,
+	Alliance2,
+	NBVAL_TeamAlliances,
 };
 
 enum LayerType {
@@ -100,6 +110,7 @@ public:
 	sf::Vector2f m_initial_position;
 
 	PlayerTeams m_team;
+	TeamAlliances m_alliance;
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();
