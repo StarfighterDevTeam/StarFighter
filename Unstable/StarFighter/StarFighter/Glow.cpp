@@ -128,6 +128,11 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 	Init(parent->getPosition(), sf::Vector2f(0, 0), texture, frames_number, 1);
 }
 
+Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness)
+{
+	Glow(parent, (*CurrentGame).m_team_colors[team], glow_thickness, stroke_size, glow_animation_duration, glow_min_thickness);
+}
+
 Glow::~Glow()
 {
 	

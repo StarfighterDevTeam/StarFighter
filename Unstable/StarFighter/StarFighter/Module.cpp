@@ -11,7 +11,7 @@ void Module::Initialize()
 	m_flux_max = 1;
 	m_flux_max_under_construction = 1;
 	m_flux_max_after_construction = 1;
-	m_glow = new Glow(this, sf::Color::Blue, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
+	m_glow = new Glow(this, (*CurrentGame).m_team_colors[m_team], MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->visible = false;
 	SetConstructionStatus(true);
 
@@ -62,10 +62,11 @@ Module::Module(sf::Vector2f position, std::string textureName, sf::Vector2f size
 	Initialize();
 }
 
-Module::Module(ModuleType moduleType)
+Module::Module(ModuleType moduleType, PlayerTeams team)
 {
 	std::string textureName;
 	m_moduleType = moduleType;
+	m_team = team;
 
 	switch (moduleType)
 	{
@@ -259,9 +260,7 @@ void Module::SetConstructionStatus(bool under_construction)
 
 Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished, int link_activation, unsigned int flux)
 {
-	Module* new_module = new Module(moduleType);
-
-	new_module->m_team = team;
+	Module* new_module = new Module(moduleType, team);
 
 	grid_index.x--;
 	grid_index.y--;
@@ -407,7 +406,7 @@ void Module::FinishConstruction()
 
 	//wipe out unguided Fluxors that are found on the cell being built on
 	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size();
-	for (int i = 0; i < FluxorVectorSize; i++)
+	for (size_t i = 0; i < FluxorVectorSize; i++)
 	{
 		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject)[i] == NULL)
 			continue;

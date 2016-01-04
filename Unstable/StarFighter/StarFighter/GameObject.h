@@ -22,6 +22,7 @@ enum PlayerTeams
 	PlayerBlue,
 	PlayerRed,
 	PlayerNeutral,
+	NBVAL_PlayerTeams,
 };
 
 enum LayerType {

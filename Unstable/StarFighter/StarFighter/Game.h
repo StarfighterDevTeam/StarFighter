@@ -19,6 +19,7 @@
 class Ship;
 class Fluxor;
 class Module;
+class Glow;
 
 enum FluxorType
 {
@@ -106,6 +107,7 @@ public:
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
 	Fluxor* m_fluxors[NBVAL_FluxorType];
+	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	bool isCellFree(sf::Vector2f position);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
 	void ResolveProductionBufferList();
