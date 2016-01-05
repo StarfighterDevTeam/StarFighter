@@ -230,6 +230,11 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			break;
 		}
 	}
+
+	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
+	{
+		m_flux_max_under_construction *= USE_UNGUIDED_FLUXORS_COST_MULTIPLIER;
+	}
 }
 
 Module* Module::Clone()

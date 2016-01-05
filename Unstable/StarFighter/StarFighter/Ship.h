@@ -56,7 +56,8 @@ public :
 
 	//HUD
 	sf::Text m_flux_text;
-	PlayerConstructionFeedbacks m_flux_text_status;
+	sf::Text m_build_text;
+	PlayerConstructionFeedbacks m_build_text_status;
 
 	//construction
 	//void ResolveProductionBufferList() override;

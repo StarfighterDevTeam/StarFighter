@@ -96,8 +96,11 @@ void InGameState::Initialize(Player player)
 	Module::CreateModule(sf::Vector2u(15, 5), ModuleType_Barrier, PlayerNeutral, true);
 
 	//Spawning Fluxors
-	//for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
-	//	Fluxor::CreateFluxor(FluxorType_Green);
+	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
+	{
+		for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
+			Fluxor::CreateFluxor(FluxorType_Green);
+	}
 }
 
 void InGameState::Update(sf::Time deltaTime)
