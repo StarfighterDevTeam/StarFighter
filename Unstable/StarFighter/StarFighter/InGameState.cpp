@@ -113,14 +113,24 @@ void InGameState::Initialize(Player player)
 	//Spawning Fluxors
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		FluxorSpawnZone(sf::FloatRect(0, 0, W, H), FLUXOR_MAX_POPULATION);
+		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W, H), FLUXOR_MAX_POPULATION));
 	}
 }
 
 void InGameState::Update(sf::Time deltaTime)
 {
+	//update Fluxors spawn zones
+	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
+	{
+		size_t FluxorSpawnZonesVectorSize = m_fluxor_spawn_zones.size();
+		for (size_t i = 0; i < FluxorSpawnZonesVectorSize; i++)
+		{
+			m_fluxor_spawn_zones[i].update(deltaTime);
+		}
+	}
+
 	(*CurrentGame).updateScene(deltaTime);
-	
+
 	//move camera
 	UpdateCamera(deltaTime);
 
