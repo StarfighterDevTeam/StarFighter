@@ -183,58 +183,58 @@ void Ship::update(sf::Time deltaTime)
 	m_build_text_status = Player_NotOverConstruction;
 
 	//update grid index
-	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
+	m_curGridIndex = (*CurrentGame).GetGridIndex((*CurrentGame).playerShip->getPosition());
 	
 	//DEBUG
-	if (InputGuy::isSpawningModule1((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule1(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 1 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule2((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule2(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 2 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule3((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule3(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 3 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule4((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule4(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 4 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule5((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule5(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 5 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule6((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule6(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 6 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule7((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule7(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 7 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule8((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule8(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 8 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule9((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule9(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 9 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule0((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isSpawningModule0(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1), m_team);
 	}
-	if (InputGuy::isErasingModule((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isErasingModule(m_controllerType))
 	{
 		Module::EraseModule(m_curGridIndex);
 	}
-	if (InputGuy::isFinishModuleConstruction((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isFinishModuleConstruction(m_controllerType))
 	{
 		Module::DebugFinishModule(m_curGridIndex);
 	}
-	if (InputGuy::isRefillingFlux((*CurrentGame).playerShip->m_controllerType))
+	if (InputGuy::isRefillingFlux(m_controllerType))
 	{
 		Module::DebugRefillingModuleFlux(m_curGridIndex);
 	}

@@ -205,6 +205,7 @@ bool InputGuy::isSpawningModule1(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num1);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule2(ControlerType device)
 {
@@ -212,6 +213,7 @@ bool InputGuy::isSpawningModule2(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num2);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule3(ControlerType device)
 {
@@ -219,6 +221,7 @@ bool InputGuy::isSpawningModule3(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num3);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule4(ControlerType device)
 {
@@ -226,6 +229,7 @@ bool InputGuy::isSpawningModule4(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num4);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule5(ControlerType device)
 {
@@ -233,6 +237,7 @@ bool InputGuy::isSpawningModule5(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num5);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule6(ControlerType device)
 {
@@ -240,6 +245,7 @@ bool InputGuy::isSpawningModule6(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num6);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule7(ControlerType device)
 {
@@ -247,6 +253,7 @@ bool InputGuy::isSpawningModule7(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num7);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule8(ControlerType device)
 {
@@ -254,6 +261,7 @@ bool InputGuy::isSpawningModule8(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num8);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule9(ControlerType device)
 {
@@ -261,6 +269,7 @@ bool InputGuy::isSpawningModule9(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num9);
 	}
+	return false;
 }
 bool InputGuy::isSpawningModule0(ControlerType device)
 {
@@ -268,6 +277,7 @@ bool InputGuy::isSpawningModule0(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num0);
 	}
+	return false;
 }
 
 bool InputGuy::isErasingModule(ControlerType device)
@@ -276,6 +286,7 @@ bool InputGuy::isErasingModule(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract);
 	}
+	return false;
 }
 
 bool InputGuy::isFinishModuleConstruction(ControlerType device)
@@ -284,6 +295,7 @@ bool InputGuy::isFinishModuleConstruction(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Add);
 	}
+	return false;
 }
 
 bool InputGuy::isRefillingFlux(ControlerType device)
@@ -292,4 +304,5 @@ bool InputGuy::isRefillingFlux(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Multiply);
 	}
+	return false;
 }
