@@ -26,7 +26,7 @@ void FluxorSpawnZone::update(sf::Time deltaTime)
 {
 	//respawn clock loop
 	float curTime = m_respawn_clock.getElapsedTime().asSeconds();
-	if (curTime  > FLUXOR_RESPAWN_MAX_TIME + FLUXOR_RESPAWN_MIN_TIME)
+	if (curTime  > FLUXOR_RESPAWN_MAX_TIME)
 	{
 		m_respawn_clock.restart();
 	}
@@ -34,7 +34,8 @@ void FluxorSpawnZone::update(sf::Time deltaTime)
 	//marking Fluxors to respawn
 	for (size_t i = 0; i < m_population; i++)
 	{
-		if (m_fluxors[i] == NULL)
+		//if (m_fluxors[i] == NULL)
+		if (m_fluxors[i]->m_FluxorType > NBVAL_FluxorType) // = Fluxor data corrupted which means it has been destroyed. Hack.
 		{
 			//timer not yet randomized?
 			if (m_respawn_timers[i] < 0)
@@ -45,14 +46,13 @@ void FluxorSpawnZone::update(sf::Time deltaTime)
 
 				//insert new timer
 				m_respawn_timers[i] = randomTime;
-				printf("timer added %f (id %d)\n", randomTime, i);
+				printf("timer added %f / cur chrono %f (id %d)\n", randomTime, curTime, i);
 			}
-			else
+			else if (abs(curTime - m_respawn_timers[i]) < 1)//not perfect but will do
 			{
-				if (curTime > m_respawn_timers[i])
-				{
-					m_fluxors[i] = Fluxor::CreateFluxor(FluxorType_Green, true, m_spawn_bounds);
-				}
+				m_fluxors[i] = Fluxor::CreateFluxor(FluxorType_Green, true, m_spawn_bounds);
+				m_respawn_timers[i] = -1;
+				
 				printf("fluxor respawned %f (id %d)\n", curTime, i);
 			}
 		}

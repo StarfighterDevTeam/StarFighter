@@ -83,17 +83,17 @@ void InGameState::Initialize(Player player)
 	playerShip->SetControllerType(AllControlDevices);
 	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
 
-	Ship* playerShip2 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed, 3);
-	(*CurrentGame).addToScene(playerShip2, PlayerShipLayer, PlayerShip);
-	playerShip2->SetControllerType(JoystickControl2);
-	
-	Ship* playerShip3 = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue2, 3);
-	(*CurrentGame).addToScene(playerShip3, PlayerShipLayer, PlayerShip);
-	playerShip3->SetControllerType(JoystickControl3);
-	
-	Ship* playerShip4 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed2, 3);
-	(*CurrentGame).addToScene(playerShip4, PlayerShipLayer, PlayerShip);
-	playerShip4->SetControllerType(JoystickControl4);
+	//Ship* playerShip2 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed, 3);
+	//(*CurrentGame).addToScene(playerShip2, PlayerShipLayer, PlayerShip);
+	//playerShip2->SetControllerType(JoystickControl2);
+	//
+	//Ship* playerShip3 = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue2, 3);
+	//(*CurrentGame).addToScene(playerShip3, PlayerShipLayer, PlayerShip);
+	//playerShip3->SetControllerType(JoystickControl3);
+	//
+	//Ship* playerShip4 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed2, 3);
+	//(*CurrentGame).addToScene(playerShip4, PlayerShipLayer, PlayerShip);
+	//playerShip4->SetControllerType(JoystickControl4);
 
 	(*CurrentGame).map_size = sf::Vector2f(W, H);
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
@@ -113,7 +113,12 @@ void InGameState::Initialize(Player player)
 	//Spawning Fluxors
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W, H), FLUXOR_MAX_POPULATION));
+		//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W, H), FLUXOR_MAX_POPULATION));
+
+		for (size_t i = 0; i < FLUXOR_MAX_POPULATION; i++)
+		{
+			Fluxor::CreateFluxor(FluxorType_Green);
+		}
 	}
 }
 

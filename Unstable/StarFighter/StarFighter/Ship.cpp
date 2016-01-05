@@ -233,6 +233,11 @@ void Ship::update(sf::Time deltaTime)
 	if (InputGuy::isFinishModuleConstruction(m_controllerType))
 	{
 		Module::DebugFinishModule(m_curGridIndex);
+
+		if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
+		{
+			m_flux = 0;
+		}
 	}
 	if (InputGuy::isRefillingFlux(m_controllerType))
 	{
