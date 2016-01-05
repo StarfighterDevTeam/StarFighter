@@ -33,11 +33,6 @@ public :
 	unsigned int m_flux;
 	unsigned int m_flux_max;
 
-	void Respawn();
-	void Death();
-	sf::Clock m_respawn_clock;
-	float m_respawn_time;
-
 	bool m_guided;
 	bool m_docked;
 

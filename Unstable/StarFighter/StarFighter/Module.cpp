@@ -425,7 +425,7 @@ void Module::FinishConstruction()
 			sf::IntRect boundsB(SimpleCollision::FToIRect(this->getGlobalBounds()));
 			if (boundsA.intersects(boundsB))
 			{
-				fluxor->Death();
+				fluxor->GarbageMe = true;
 			}
 		}
 	}

@@ -18,7 +18,7 @@ FluxorSpawnZone::FluxorSpawnZone(sf::FloatRect spawn_bounds, unsigned int popula
 	{
 		Fluxor* fluxor = Fluxor::CreateFluxor(FluxorType_Green, true, spawn_bounds);
 		m_fluxors.push_back(fluxor);
-		m_respawn_timers.insert(std::pair<size_t, float> (i, -1));
+		m_respawn_timers.insert(std::pair<size_t, float> (i, -1));//negative value = not to be respawned
 	}
 }
 
@@ -31,7 +31,30 @@ void FluxorSpawnZone::update(sf::Time deltaTime)
 		m_respawn_clock.restart();
 	}
 
-	//marking Fluxors to respawn
+	//looking for dead Fluxors
+	size_t FluxorsVectorSize = m_fluxors.size();
+	for (size_t i = 0; i < FluxorsVectorSize; i++)
+	{
+		if (m_fluxors[i])
+		{
+			size_t FluxorsGameVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size();
+			bool element_found = false;
+			for (size_t j = 0; j < FluxorsGameVectorSize; j++)
+			{
+				if (m_fluxors[i] == (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject)[j])
+				{
+					element_found = true;
+					break;
+				}
+			}
+			if (!element_found)
+			{
+				m_fluxors[i] = NULL;
+			}
+		}
+	}
+
+	//respawn dead Fluxors
 	for (size_t i = 0; i < m_population; i++)
 	{
 		if (m_fluxors[i] == NULL)
@@ -45,14 +68,11 @@ void FluxorSpawnZone::update(sf::Time deltaTime)
 
 				//insert new timer
 				m_respawn_timers[i] = randomTime;
-				printf("timer added %f / cur chrono %f (id %d)\n", randomTime, curTime, i);
 			}
-			else if (abs(curTime - m_respawn_timers[i]) < 1)//not perfect but will do
+			else if (abs(curTime - m_respawn_timers[i]) < 1)//not perfect but will do with a 1-sec accuracy
 			{
 				m_fluxors[i] = Fluxor::CreateFluxor(FluxorType_Green, true, m_spawn_bounds);
 				m_respawn_timers[i] = -1;
-				
-				printf("fluxor respawned %f (id %d)\n", curTime, i);
 			}
 		}
 	}

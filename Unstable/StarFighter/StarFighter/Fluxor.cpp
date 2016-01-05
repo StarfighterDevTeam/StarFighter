@@ -231,71 +231,61 @@ void Fluxor::update(sf::Time deltaTime)
 		m_flux = m_flux_max;
 	}
 
-	if (visible)
+	if (!m_docked)
 	{
-		if (!m_docked)
+		//flux waste
+		WastingFlux();
+
+		//chaos turns
+		if (!m_guided)
 		{
-			//flux waste
-			WastingFlux();
-
-			//chaos turns
-			if (!m_guided)
+			if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
 			{
-				if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
-				{
-					ChaosTurns();
-				}
-
-				if (ScreenBorderContraints())
-				{
-					m_turn_delay = RandomizeTurnDelay();
-					m_turn_clock.restart();
-				}
+				ChaosTurns();
 			}
 
-			UpdateRotation();
+			if (ScreenBorderContraints())
+			{
+				m_turn_delay = RandomizeTurnDelay();
+				m_turn_clock.restart();
+			}
+		}
 
-			GameObject::update(deltaTime);
+		UpdateRotation();
+
+		GameObject::update(deltaTime);
+	}
+	else
+	{
+		m_flux_waste_clock.restart();
+
+		AnimatedSprite::update(deltaTime);
+
+		//reset docked every frame. The collision will be in charge of re-docking the fluxor every frame if necessary.
+		m_docked = false;
+	}
+
+	//death by flux consumption
+	if (m_flux == 0)
+	{
+		GarbageMe = true;
+	}
+
+	//hud
+	if (m_displaying_flux)
+	{
+		ostringstream ss;
+		ss << m_flux;
+		if (m_flux_max > 0)
+			ss << "/" << m_flux_max;
+		m_flux_text.setString(ss.str());
+		if (m_flux_attacker || m_fluxovore)
+		{
+			m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text.getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
 		}
 		else
 		{
-			m_flux_waste_clock.restart();
-
-			AnimatedSprite::update(deltaTime);
-
-			//reset docked every frame. The collision will be in charge of re-docking the fluxor every frame if necessary.
-			m_docked = false;
-		}
-
-		//death by flux consumption
-		if (m_flux == 0)
-		{
-			GarbageMe = true;
-		}
-
-		//hud
-		if (m_displaying_flux)
-		{
-			ostringstream ss;
-			ss << m_flux;
-			if (m_flux_max > 0)
-				ss << "/" << m_flux_max;
-			m_flux_text.setString(ss.str());
-			if (m_flux_attacker || m_fluxovore)
-			{
-				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text.getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
-			}
-			else
-			{
-				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
-			}
-		}
-	}
-	else//if dead
-	{
-		if (m_respawn_clock.getElapsedTime().asSeconds() > m_respawn_time)
-		{
-			Respawn();
+			m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
 		}
 	}
 }
@@ -427,35 +417,6 @@ void Fluxor::UpdateRotation()
 	else
 	{
 		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI) - 90);
-	}
-}
-
-void Fluxor::Death()
-{
-	visible = false;
-	if (m_displaying_flux)
-	{
-		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
-	}
-	m_respawn_time = RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_RESPAWN_MIN_TIME, FLUXOR_RESPAWN_MAX_TIME));
-	m_respawn_clock.restart();
-}
-
-void Fluxor::Respawn()
-{
-	const unsigned int W = FLUXOR_WIDTH;
-	const unsigned int H = FLUXOR_HEIGHT;
-
-	//position
-	setPosition(RandomizePosition(m_has_spawn_bounds, m_spawn_bounds));
-
-	visible = true;
-	m_turn_delay = RandomizeTurnDelay();
-	m_turn_clock.restart();
-
-	if (m_displaying_flux)
-	{
-		(*CurrentGame).addToFeedbacks(&m_flux_text);
 	}
 }
 
