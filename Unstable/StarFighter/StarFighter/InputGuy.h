@@ -30,19 +30,19 @@ public:
 	static bool isUsingDebugCommand();
 	static bool isRestartingScript();
 
-	static bool isSpawningModule1();
-	static bool isSpawningModule2();
-	static bool isSpawningModule3();
-	static bool isSpawningModule4();
-	static bool isSpawningModule5();
-	static bool isSpawningModule6();
-	static bool isSpawningModule7();
-	static bool isSpawningModule8();
-	static bool isSpawningModule9();
-	static bool isSpawningModule0();
-	static bool isErasingModule();
-	static bool isFinishModuleConstruction();
-	static bool isRefillingFlux();
+	static bool isSpawningModule1(ControlerType device = AllControlDevices);
+	static bool isSpawningModule2(ControlerType device = AllControlDevices);
+	static bool isSpawningModule3(ControlerType device = AllControlDevices);
+	static bool isSpawningModule4(ControlerType device = AllControlDevices);
+	static bool isSpawningModule5(ControlerType device = AllControlDevices);
+	static bool isSpawningModule6(ControlerType device = AllControlDevices);
+	static bool isSpawningModule7(ControlerType device = AllControlDevices);
+	static bool isSpawningModule8(ControlerType device = AllControlDevices);
+	static bool isSpawningModule9(ControlerType device = AllControlDevices);
+	static bool isSpawningModule0(ControlerType device = AllControlDevices);
+	static bool isErasingModule(ControlerType device = AllControlDevices);
+	static bool isFinishModuleConstruction(ControlerType device = AllControlDevices);
+	static bool isRefillingFlux(ControlerType device = AllControlDevices);
 };
 
 

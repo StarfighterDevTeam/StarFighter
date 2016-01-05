@@ -199,58 +199,97 @@ Vector2f InputGuy::getDirections(ControlerType device)
 }
 
 //DEBUG - FLUX SPECIFIC
-bool InputGuy::isSpawningModule1()
+bool InputGuy::isSpawningModule1(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num1);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num1);
+	}
 }
-bool InputGuy::isSpawningModule2()
+bool InputGuy::isSpawningModule2(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num2);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num2);
+	}
 }
-bool InputGuy::isSpawningModule3()
+bool InputGuy::isSpawningModule3(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num3);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num3);
+	}
 }
-bool InputGuy::isSpawningModule4()
+bool InputGuy::isSpawningModule4(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num4);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num4);
+	}
 }
-bool InputGuy::isSpawningModule5()
+bool InputGuy::isSpawningModule5(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num5);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num5);
+	}
 }
-bool InputGuy::isSpawningModule6()
+bool InputGuy::isSpawningModule6(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num6);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num6);
+	}
 }
-bool InputGuy::isSpawningModule7()
+bool InputGuy::isSpawningModule7(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num7);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num7);
+	}
 }
-bool InputGuy::isSpawningModule8()
+bool InputGuy::isSpawningModule8(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num8);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num8);
+	}
 }
-bool InputGuy::isSpawningModule9()
+bool InputGuy::isSpawningModule9(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num9);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num9);
+	}
 }
-bool InputGuy::isSpawningModule0()
+bool InputGuy::isSpawningModule0(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Num0);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num0);
+	}
 }
 
-bool InputGuy::isErasingModule()
+bool InputGuy::isErasingModule(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract);
+	}
 }
 
-bool InputGuy::isFinishModuleConstruction()
+bool InputGuy::isFinishModuleConstruction(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Add);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Add);
+	}
 }
 
-bool InputGuy::isRefillingFlux()
+bool InputGuy::isRefillingFlux(ControlerType device)
 {
-	return sf::Keyboard::isKeyPressed(sf::Keyboard::Multiply);
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Multiply);
+	}
 }

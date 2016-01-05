@@ -13,6 +13,7 @@ enum PlayerConstructionFeedbacks
 	Player_NotOverConstruction,
 	Player_OverConstruction,
 	Player_ConstructionInProgress,
+	Player_NoRessourcesToBuild,
 };
 
 class Ship : public GameObject

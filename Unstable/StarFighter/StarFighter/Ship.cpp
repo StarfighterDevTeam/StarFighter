@@ -121,7 +121,7 @@ void Ship::FluxAutogeneration()
 
 void Ship::update(sf::Time deltaTime)
 {
-	m_SwitchKey_released = !InputGuy::isUsing();
+	m_SwitchKey_released = !InputGuy::isUsing(m_controllerType);
 
 	UpdatePlayerStats();
 
@@ -167,6 +167,10 @@ void Ship::update(sf::Time deltaTime)
 	{
 		m_build_text.setString("Building...");
 	}
+	else if (m_build_text_status == Player_NoRessourcesToBuild)
+	{
+		m_build_text.setString("No ressources");
+	}
 	
 	if (m_build_text_status != Player_NotOverConstruction)
 	{
@@ -182,55 +186,55 @@ void Ship::update(sf::Time deltaTime)
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 	
 	//DEBUG
-	if (InputGuy::isSpawningModule1())
+	if (InputGuy::isSpawningModule1((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 1 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule2())
+	if (InputGuy::isSpawningModule2((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 2 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule3())
+	if (InputGuy::isSpawningModule3((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 3 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule4())
+	if (InputGuy::isSpawningModule4((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 4 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule5())
+	if (InputGuy::isSpawningModule5((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 5 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule6())
+	if (InputGuy::isSpawningModule6((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 6 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule7())
+	if (InputGuy::isSpawningModule7((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 7 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule8())
+	if (InputGuy::isSpawningModule8((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 8 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule9())
+	if (InputGuy::isSpawningModule9((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 9 - 1), m_team);
 	}
-	if (InputGuy::isSpawningModule0())
+	if (InputGuy::isSpawningModule0((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1), m_team);
 	}
-	if (InputGuy::isErasingModule())
+	if (InputGuy::isErasingModule((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::EraseModule(m_curGridIndex);
 	}
-	if (InputGuy::isFinishModuleConstruction())
+	if (InputGuy::isFinishModuleConstruction((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::DebugFinishModule(m_curGridIndex);
 	}
-	if (InputGuy::isRefillingFlux())
+	if (InputGuy::isRefillingFlux((*CurrentGame).playerShip->m_controllerType))
 	{
 		Module::DebugRefillingModuleFlux(m_curGridIndex);
 	}
@@ -352,14 +356,7 @@ void Ship::GetFluxor(GameObject* object)
 					m_flux = m_flux_max;
 				}
 
-				if (fluxor->m_guided)
-				{
-					fluxor->GarbageMe = true;
-				}
-				else
-				{
-					fluxor->Death();
-				}
+				fluxor->GarbageMe = true;
 			}
 		}
 	}
@@ -377,15 +374,17 @@ void Ship::GetModule(GameObject* object)
 			{
 				if (module->m_under_construction)
 				{
-					if (InputGuy::isFiring())
+					if (InputGuy::isFiring(m_controllerType))
 					{
-						m_build_text_status = Player_ConstructionInProgress;
+						m_build_text_status = (USE_UNGUIDED_FLUXORS_TO_BUILD == true && m_flux == 0) ? Player_NoRessourcesToBuild : Player_ConstructionInProgress;
 
 						unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
-						//if (module->m_flux < flux_max && m_flux > 0 && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_time)
-						if (module->m_flux < flux_max && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_time)
+						if (module->m_flux < flux_max && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_time && (USE_UNGUIDED_FLUXORS_TO_BUILD == false || m_flux > 0))
 						{
-							//m_flux--;
+							if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
+							{
+								m_flux--;
+							}
 							module->m_flux++;
 							m_flux_transfer_limiter_clock.restart();
 						}
@@ -397,7 +396,7 @@ void Ship::GetModule(GameObject* object)
 					}
 				}
 
-				if (InputGuy::isUsing() && m_SwitchKey_released)
+				if (InputGuy::isUsing(m_controllerType) && m_SwitchKey_released)
 				{
 					module->SwitchLinkDirection();
 				}
