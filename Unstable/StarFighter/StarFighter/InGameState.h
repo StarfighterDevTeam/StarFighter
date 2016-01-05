@@ -9,6 +9,7 @@
 #include "Ship.h"
 #include "Module.h"
 #include "Fluxor.h"
+#include "FluxorSpawnZone.h"
 
 class GameObject;
 
@@ -22,6 +23,7 @@ public:
 	void Draw();
 	void Release();
 	void UpdateCamera(sf::Time deltaTime);
+	vector<FluxorSpawnZone> m_fluxor_spawn_zones;
 
 private:
 	sf::RenderWindow* mainWindow;

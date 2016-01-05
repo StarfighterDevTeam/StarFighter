@@ -27,6 +27,8 @@ void Fluxor::Initialize()
 	m_fluxovore = false;
 	m_can_be_refilled_by_modules = false;
 
+	m_has_spawn_bounds = false;
+
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
 	m_flux_text.setCharacterSize(20);
@@ -173,11 +175,17 @@ Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 	Initialize();
 }
 
-Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType)
+Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType, bool within_bounds, sf::FloatRect bounds)
 {
 	Fluxor* new_fluxor = new Fluxor(FluxorType);
 	
-	new_fluxor->setPosition(RandomizePosition());
+	new_fluxor->m_has_spawn_bounds = within_bounds;
+	if (within_bounds)
+	{
+		new_fluxor->m_spawn_bounds = bounds;
+	}
+	new_fluxor->setPosition(RandomizePosition(within_bounds, bounds));
+	
 	new_fluxor->m_initial_position = new_fluxor->getPosition();
 	new_fluxor->m_speed = RandomizeSpeed();
 	new_fluxor->m_absolute_speed = GetAbsoluteSpeed(new_fluxor->m_speed);
@@ -297,7 +305,7 @@ float Fluxor::RandomizeTurnDelay()
 	return RandomizeFloatBetweenValues(sf::Vector2f(FLUXOR_TURN_MIN_DELAY, FLUXOR_TURN_MAX_DELAY));
 }
 
-sf::Vector2f Fluxor::RandomizePosition()
+sf::Vector2f Fluxor::RandomizePosition(bool within_bounds, sf::FloatRect bounds)
 {
 	const unsigned int W = FLUXOR_WIDTH;
 	const unsigned int H = FLUXOR_HEIGHT;
@@ -309,10 +317,17 @@ sf::Vector2f Fluxor::RandomizePosition()
 	{
 		position_is_valid = true;
 
-		float position_x = RandomizeFloatBetweenValues(sf::Vector2f(W / 2, (*CurrentGame).map_size.x - W / 2));
-		float position_y = RandomizeFloatBetweenValues(sf::Vector2f(H / 2, (*CurrentGame).map_size.y - H / 2));
-
-		position = sf::Vector2f(position_x, position_y);
+		
+		if (within_bounds)
+		{
+			position.x = RandomizeFloatBetweenValues(sf::Vector2f(bounds.left + W / 2, bounds.left + bounds.width - W / 2));
+			position.y = RandomizeFloatBetweenValues(sf::Vector2f(bounds.top + H / 2, bounds.top + bounds.height - H / 2));
+		}
+		else
+		{
+			position.x = RandomizeFloatBetweenValues(sf::Vector2f(W / 2, (*CurrentGame).map_size.x - W / 2));
+			position.y = RandomizeFloatBetweenValues(sf::Vector2f(H / 2, (*CurrentGame).map_size.y - H / 2));
+		}
 
 		//checking if position is valid
 		if ((*CurrentGame).GetClosestObject(position, PlayerShip))
@@ -321,12 +336,14 @@ sf::Vector2f Fluxor::RandomizePosition()
 			if (distance_to_player < TILE_SIZE)
 			{
 				position_is_valid = false;
+				continue;
 			}
 		}
 
 		if (!(*CurrentGame).isCellFree(position))
 		{
 			position_is_valid = false;
+			continue;
 		}
 	}
 
@@ -430,7 +447,7 @@ void Fluxor::Respawn()
 	const unsigned int H = FLUXOR_HEIGHT;
 
 	//position
-	setPosition(RandomizePosition());
+	setPosition(RandomizePosition(m_has_spawn_bounds, m_spawn_bounds));
 
 	visible = true;
 	m_turn_delay = RandomizeTurnDelay();

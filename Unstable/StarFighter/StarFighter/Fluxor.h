@@ -13,7 +13,7 @@ public :
 	Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	Fluxor* Clone();
 	void Initialize();
-	static Fluxor* CreateFluxor(FluxorType FluxorType);
+	static Fluxor* CreateFluxor(FluxorType FluxorType, bool within_bounds = false, sf::FloatRect bounds = { 0, 0, 0, 0 });
 
 	virtual ~Fluxor();
 	void update(sf::Time deltaTime) override;
@@ -22,7 +22,7 @@ public :
 	void GetFluxor(GameObject* object) override;
 
 	static float RandomizeTurnDelay();
-	static sf::Vector2f RandomizePosition();
+	static sf::Vector2f RandomizePosition(bool within_bounds = false, sf::FloatRect bounds = { 0, 0, 0, 0 });
 	static sf::Vector2f RandomizeSpeed();
 	void ChaosTurns();
 	
@@ -40,6 +40,9 @@ public :
 
 	bool m_guided;
 	bool m_docked;
+
+	bool m_has_spawn_bounds;
+	sf::FloatRect m_spawn_bounds;
 	
 	vector<Module*> m_modules_visited;
 	GameObject* m_target;

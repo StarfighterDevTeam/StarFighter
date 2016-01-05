@@ -110,6 +110,7 @@ public:
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	bool isCellFree(sf::Vector2f position);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
+	static sf::Vector2f GridToPosition(sf::Vector2u grid_index);
 	void ResolveProductionBufferList();
 	vector<vector<int>> m_teams_vs_alliance_map;
 	int GetTeamAlliance(PlayerTeams team);

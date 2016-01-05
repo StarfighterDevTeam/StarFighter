@@ -500,6 +500,13 @@ sf::Vector2u Game::GetGridIndex(sf::Vector2f position)
 	return sf::Vector2u(grid_line, grid_row);
 }
 
+sf::Vector2f Game::GridToPosition(sf::Vector2u grid_index)
+{
+	grid_index.x--;
+	grid_index.y--;
+	return sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2);
+}
+
 GameObject* Game::GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object)
 {
 	float shortest_distance = -1;

@@ -78,16 +78,31 @@ void InGameState::Initialize(Player player)
 	}
 
 	//intégration placeholder
-	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue, 3);
+	Ship* playerShip = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue, 3);
 	(*CurrentGame).SetPlayerShip(playerShip);
 	playerShip->SetControllerType(AllControlDevices);
 	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
+
+	Ship* playerShip2 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed, 3);
+	(*CurrentGame).addToScene(playerShip2, PlayerShipLayer, PlayerShip);
+	playerShip2->SetControllerType(JoystickControl2);
+	
+	Ship* playerShip3 = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue2, 3);
+	(*CurrentGame).addToScene(playerShip3, PlayerShipLayer, PlayerShip);
+	playerShip3->SetControllerType(JoystickControl3);
+	
+	Ship* playerShip4 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed2, 3);
+	(*CurrentGame).addToScene(playerShip4, PlayerShipLayer, PlayerShip);
+	playerShip4->SetControllerType(JoystickControl4);
 
 	(*CurrentGame).map_size = sf::Vector2f(W, H);
 	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
 	//HACK PROTO
-	Module::CreateModule(sf::Vector2u(5, 5), ModuleType_Generator, PlayerBlue, true);
+	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true);
+	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true);
+	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue2, true);
+	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed2, true);
 
 	Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed, true, LinkRight, 15);
 	Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed, true, LinkDown, 1000);
@@ -98,15 +113,14 @@ void InGameState::Initialize(Player player)
 	//Spawning Fluxors
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		for (int i = 1; i < FLUXOR_MAX_POPULATION; i++)
-			Fluxor::CreateFluxor(FluxorType_Green);
+		FluxorSpawnZone(sf::FloatRect(0, 0, W, H), FLUXOR_MAX_POPULATION);
 	}
 }
 
 void InGameState::Update(sf::Time deltaTime)
 {
 	(*CurrentGame).updateScene(deltaTime);
-
+	
 	//move camera
 	UpdateCamera(deltaTime);
 
