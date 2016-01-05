@@ -47,10 +47,10 @@ sf::Uint8* Glow::CreateGlowFrame(GameObject* parent, sf::Color color, int glow_t
 	return pixels;
 }
 
-Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness)
+Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness)
 {
 	m_collider_type = BackgroundObject;
-	m_color = color;
+	m_color = (*CurrentGame).m_team_colors[team];
 	m_glow_radius = glow_thickness;
 	m_glow_animation_duration = glow_animation_duration;
 
@@ -64,7 +64,7 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 	const int W = parent->m_size.x + glow_thickness * 2;
 	const int H = parent->m_size.y + glow_thickness * 2;
 
-	//hardware limitation
+	//hardware limitation: TEXTURE_SIZE_LIMITATION x TEXTURE_SIZE_LIMITATION
 	if (W*frames_number > TEXTURE_SIZE_LIMITATION)
 	{
 		frames_number = (int)(ceil(TEXTURE_SIZE_LIMITATION / W));
@@ -83,19 +83,21 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 	}
 
 	//checking if texture laready exists. if not, create a fake one, to be filled few lines of code below
-	sf::Uint8* pixels_animation = new sf::Uint8[W * H * 4 * frames_number];
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	ostringstream ss;
-	ss << parent->m_textureName << "_glow_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
-	bool existing_texture = loader->getTexture(ss.str());
-	sf::Texture* texture = loader->loadTexture(ss.str(), W*frames_number, H, pixels_animation);
-	
-	//updating the newly created texture, if it wasn't existing before
-	if (!existing_texture)
+	ss << W << "x" << H << "_glow_" << "team" << (int)team;
+	sf::Texture* texture = loader->getTexture(ss.str());
+
+	//updating the newly created texture, if it does not exist yet
+	if (!texture)
 	{
+		//creating and loading the texture
+		sf::Uint8* pixels_animation = new sf::Uint8[W * H * frames_number * 4];
+		texture = loader->loadTexture(ss.str(), W*frames_number, H, pixels_animation);
+
 		//creating a transparent default background
-		for (int p = 0; p < W * H * 4 * frames_number; p++)
+		for (int p = 0; p < ((W * H * frames_number - 1) * 4) + 1; p++)// <!> very touchy because there can be heap corruption if we write outside the size of [W*H*frames_number*4] when i = p+3
 		{
 			pixels_animation[p] = 0;
 			pixels_animation[p + 1] = 0;
@@ -103,13 +105,14 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 			pixels_animation[p + 3] = 0;
 		}
 		texture->update(pixels_animation, W*frames_number, H, 0, 0);
+		delete[] pixels_animation;
 			
 		//create and add as many frames as necessary for the complete glow animation
 		for (int i = 1; i < unique_frames_number + 1; i++)
 		{
 			//"growing" part of the animation
 			int thickness = (int)(floor(1.f * (glow_thickness - glow_min_thickness) * i / unique_frames_number));
-			sf::Uint8* pixels_frame = CreateGlowFrame(parent, color, glow_min_thickness + thickness, stroke_size);
+			sf::Uint8* pixels_frame = CreateGlowFrame(parent, m_color, glow_min_thickness + thickness, stroke_size);
 			int size_x = parent->m_size.x + (glow_min_thickness + thickness) * 2;
 			int size_y = parent->m_size.y + (glow_min_thickness + thickness) * 2;
 			int x_offset = glow_thickness - glow_min_thickness - thickness;
@@ -123,16 +126,13 @@ Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_s
 				x = (frames_number - i + 1)*W + x_offset;
 				texture->update(pixels_frame, size_x, size_y, x, y);
 			}
+			
+			delete[] pixels_frame;
 		}
 	}
 
 	setOrigin(parent->getOrigin().x + glow_thickness, parent->getOrigin().y + glow_thickness);
 	Init(parent->getPosition(), sf::Vector2f(0, 0), texture, frames_number, 1);
-}
-
-Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness)
-{
-	Glow(parent, (*CurrentGame).m_team_colors[team], glow_thickness, stroke_size, glow_animation_duration, glow_min_thickness);
 }
 
 Glow::~Glow()

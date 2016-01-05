@@ -10,7 +10,6 @@ class Glow : public GameObject
 public :
 	Glow(GameObject* parent, sf::Color color);
 	Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size = 0);
-	Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness);
 	Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness);
 	static sf::Uint8* CreateGlowFrame(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size = 0);
 	virtual ~Glow();

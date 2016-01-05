@@ -11,7 +11,7 @@ void Module::Initialize()
 	m_flux_max = 1;
 	m_flux_max_under_construction = 1;
 	m_flux_max_after_construction = 1;
-	m_glow = new Glow(this, (*CurrentGame).m_team_colors[m_team], MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
+	m_glow = new Glow(this, m_team, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->visible = false;
 	SetConstructionStatus(true);
 

@@ -81,6 +81,7 @@ public:
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
 		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
+
 		return texture;
 	}
 
