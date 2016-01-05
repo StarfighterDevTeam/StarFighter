@@ -113,7 +113,12 @@ void InGameState::Initialize(Player player)
 	//Spawning Fluxors
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W, H), FLUXOR_MAX_POPULATION));
+		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		//main central zone
+		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
 	}
 }
 

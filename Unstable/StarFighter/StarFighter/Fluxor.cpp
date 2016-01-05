@@ -96,7 +96,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		{
 			m_displaying_flux = true;
 			m_wasting_flux = false;
-			m_flux = FLUXOR_FLUX_VALUE;
+			m_flux = GREEN_FLUXOR_VALUE;
 			m_consummable_by_players = true;
 			m_consummable_by_modules = true;
 			break;

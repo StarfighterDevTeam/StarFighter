@@ -32,11 +32,12 @@
 #define DEFAULT_SFX_VOLUME							100
 
 //FLUX SPECIFIC
-#define GRID_WIDTH									20
-#define GRID_HEIGHT									20
+#define GRID_WIDTH									15
+#define GRID_HEIGHT									15
 #define TILE_SIZE									128
 #define DEFAULT_TILE_START							5
 #define DEFAULT_TILE_GENERATOR						4
+#define CENTRAL_FLUXOR_ZONE_TILE_OFFSET				5
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		1
 #define USE_UNGUIDED_FLUXORS_TO_BUILD				true
 #define USE_UNGUIDED_FLUXORS_COST_MULTIPLIER		0.1f
@@ -58,6 +59,7 @@
 
 //FLUXOR
 #define FLUXOR_FLUX_VALUE							10
+#define	GREEN_FLUXOR_VALUE							5
 #define FLUXOR_FLUX_DISPLAY_OFFSET_Y				2
 
 #define FLUXOR_WIDTH								64
