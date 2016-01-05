@@ -13,6 +13,7 @@ enum ControlerType
 {
 	AllControlDevices,
 	KeyboardControl,
+	KeyboardControl2,
 	JoystickControl1,
 	JoystickControl2,
 	JoystickControl3,

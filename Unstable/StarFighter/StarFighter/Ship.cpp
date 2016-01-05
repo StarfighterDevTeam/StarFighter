@@ -183,9 +183,8 @@ void Ship::update(sf::Time deltaTime)
 	m_build_text_status = Player_NotOverConstruction;
 
 	//update grid index
-	m_curGridIndex = (*CurrentGame).GetGridIndex((*CurrentGame).playerShip->getPosition());
+	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 	
-	//DEBUG
 	if (InputGuy::isSpawningModule1(m_controllerType))
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 1 - 1), m_team);
@@ -226,6 +225,8 @@ void Ship::update(sf::Time deltaTime)
 	{
 		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1), m_team);
 	}
+
+	//DEBUG
 	if (InputGuy::isErasingModule(m_controllerType))
 	{
 		Module::EraseModule(m_curGridIndex);
@@ -361,7 +362,14 @@ void Ship::GetFluxor(GameObject* object)
 					m_flux = m_flux_max;
 				}
 
-				fluxor->GarbageMe = true;
+				if (fluxor->m_guided)
+				{
+					fluxor->GarbageMe = true;
+				}
+				else
+				{
+					fluxor->Death();
+				}
 			}
 		}
 	}

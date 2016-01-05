@@ -34,8 +34,7 @@ void FluxorSpawnZone::update(sf::Time deltaTime)
 	//marking Fluxors to respawn
 	for (size_t i = 0; i < m_population; i++)
 	{
-		//if (m_fluxors[i] == NULL)
-		if (m_fluxors[i]->m_FluxorType > NBVAL_FluxorType) // = Fluxor data corrupted which means it has been destroyed. Hack.
+		if (m_fluxors[i] == NULL)
 		{
 			//timer not yet randomized?
 			if (m_respawn_timers[i] < 0)

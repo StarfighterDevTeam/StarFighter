@@ -10,6 +10,11 @@ bool InputGuy::isFiring(ControlerType device)
 		}
 	}
 
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Return);
+	}
+
 	if (device == AllControlDevices || device >= JoystickControl1)
 	{
 		int joystick = device - JoystickControl1;
@@ -43,6 +48,11 @@ bool InputGuy::isUsing(ControlerType device)
 		{
 			return true;
 		}
+	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
 	}
 
 	if (device == AllControlDevices || device >= JoystickControl1)
@@ -141,19 +151,39 @@ Vector2f InputGuy::getDirections(ControlerType device)
 	//Keyboard inputs
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		{
 			dirX++;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 		{
 			dirY--;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 		{
 			dirX--;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			dirY++;
+		}
+	}
+
+	else if (device == KeyboardControl2)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			dirX++;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			dirY--;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			dirX--;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
 			dirY++;
 		}
@@ -205,6 +235,12 @@ bool InputGuy::isSpawningModule1(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num1);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule2(ControlerType device)
@@ -213,6 +249,12 @@ bool InputGuy::isSpawningModule2(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num2);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule3(ControlerType device)
@@ -221,6 +263,12 @@ bool InputGuy::isSpawningModule3(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num3);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad3);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule4(ControlerType device)
@@ -229,6 +277,12 @@ bool InputGuy::isSpawningModule4(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num4);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule5(ControlerType device)
@@ -237,6 +291,12 @@ bool InputGuy::isSpawningModule5(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num5);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad5);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule6(ControlerType device)
@@ -245,6 +305,12 @@ bool InputGuy::isSpawningModule6(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num6);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad6);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule7(ControlerType device)
@@ -253,6 +319,12 @@ bool InputGuy::isSpawningModule7(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num7);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad7);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule8(ControlerType device)
@@ -261,6 +333,12 @@ bool InputGuy::isSpawningModule8(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num8);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad8);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule9(ControlerType device)
@@ -269,6 +347,12 @@ bool InputGuy::isSpawningModule9(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num9);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad9);
+	}
+
 	return false;
 }
 bool InputGuy::isSpawningModule0(ControlerType device)
@@ -277,6 +361,12 @@ bool InputGuy::isSpawningModule0(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Num0);
 	}
+
+	else if (device == KeyboardControl2)
+	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad0);
+	}
+
 	return false;
 }
 
