@@ -121,7 +121,12 @@ void InGameState::Initialize(Player player)
 	//Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed, true, LinkDown, 1000);
 	//Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Generator, PlayerRed, true, LinkLeft);
 	//
-	//Module::CreateModule(sf::Vector2u(15, 5), ModuleType_Barrier, PlayerNeutral, true);
+	for (size_t i = 1; i < GRID_HEIGHT + 1; i++)
+	{
+		if (i != GRID_HEIGHT / 2 + 1 && i != GRID_HEIGHT / 2 + 1 - 1 && i != GRID_HEIGHT / 2 + 1 +1)
+		Module::CreateModule(sf::Vector2u(GRID_WIDTH / 2 + 1, i), ModuleType_Barrier, PlayerNeutral, true);
+	}
+		
 
 	//Spawning Fluxors
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)

@@ -303,10 +303,16 @@ sf::Vector2f Fluxor::RandomizePosition(bool within_bounds, sf::FloatRect bounds)
 	sf::Vector2f position;
 	bool position_is_valid = false;
 
-	while (!position_is_valid)
+	unsigned int number_of_tries = 0;
+	while (!position_is_valid && number_of_tries < 100)
 	{
-		position_is_valid = true;
+		number_of_tries++;
+		if (number_of_tries == 100)
+		{
+			printf("<!> Can't find a valid position in Fluxor::RandomizePosition(bool within_bounds, sf::FloatRect bounds) after %d tries. Spawning Fluxor in a bad spot.\n", number_of_tries);
+		}
 
+		position_is_valid = true;
 		
 		if (within_bounds)
 		{
