@@ -35,12 +35,6 @@ enum LayerType {
 	NBVAL_Layer
 };
 
-enum GlowAnimations
-{
-	GlowDefaultAnimation,
-	GlowHitAnimation
-};
-
 enum GameObjectType {
 	BackgroundObject,
 	PortalObject,
