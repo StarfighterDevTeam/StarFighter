@@ -29,9 +29,9 @@ enum PlayerTeams
 
 enum TeamAlliances
 {
-	AllianceNeutral,
 	Alliance1,
 	Alliance2,
+	AllianceNeutral,
 	NBVAL_TeamAlliances,
 };
 
@@ -100,6 +100,7 @@ public:
 	
 	float diag;
 	bool m_ghost;
+	bool m_under_construction;
 	void setGhost(bool ghost);
 	float rotation_speed;
 	int m_animationNumber;

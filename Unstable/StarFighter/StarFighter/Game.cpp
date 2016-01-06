@@ -276,6 +276,18 @@ void Game::drawScene()
 					if (*it == NULL)
 						continue;
 
+					if ((*(*it)).m_under_construction && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == false)
+						continue;
+
+					if ((*(*it)).m_under_construction && USE_SPLIT_SCREEN == true)
+					{
+						if (v == 0 && (*(*it)).m_alliance != Alliance1)
+							continue;
+
+						if (v == 1 && (*(*it)).m_alliance != Alliance2)
+							continue;
+					}
+					
 					if ((*(*it)).visible)
 					{
 						this->mainScreen.draw((*(*it)));
@@ -322,6 +334,12 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
+			if ((*(*it2)).m_under_construction && (*(*it1)).m_team != (*(*it2)).m_team)
+				continue;
+
+			if ((*(*it1)).m_alliance!= (*(*it2)).m_alliance)
+				continue;
+
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
@@ -342,7 +360,6 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			//if (GameObject::DistancePointToSement((*it2)->getPosition().x, (*it2)->getPosition().y, (*it1)->m_initial_position.x, (*it1)->m_initial_position.y, (*it1)->getPosition().x, (*it1)->getPosition().y) == 0)
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 

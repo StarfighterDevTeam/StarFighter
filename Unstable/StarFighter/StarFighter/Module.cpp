@@ -286,6 +286,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 
 		//complete module data
 		new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
+		new_module->m_curGridIndex = grid_index;
 		if (new_module->m_glow)
 		{
 			new_module->m_glow->setPosition(new_module->getPosition());

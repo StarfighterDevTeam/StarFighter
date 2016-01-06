@@ -52,7 +52,6 @@ public :
 	void FinishConstruction();
 	sf::Vector2u m_curGridIndex;
 	Glow* m_glow;
-	bool m_under_construction;
 	void SetConstructionStatus(bool under_construction);
 
 	//vector<Module*> m_parents;
