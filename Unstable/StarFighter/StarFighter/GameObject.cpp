@@ -87,10 +87,10 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	
 	this->m_speed = speed;
 	this->setPosition(position.x, position.y);
-	this->visible = true;
+	this->m_visible = true;
 	this->isOnScene = false;
-	this->GarbageMe = false;
-	this->DontGarbageMe = false;
+	this->m_GarbageMe = false;
+	this->Dontm_GarbageMe = false;
 	this->diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	this->m_ghost = false;
 	this->m_under_construction = false;

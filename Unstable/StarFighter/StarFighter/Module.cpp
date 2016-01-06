@@ -12,7 +12,7 @@ void Module::Initialize()
 	m_flux_max_under_construction = 1;
 	m_flux_max_after_construction = 1;
 	m_glow = new Glow(this, m_team, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
-	m_glow->visible = false;
+	m_glow->m_visible = false;
 	SetConstructionStatus(true);
 
 	m_isGeneratingFluxor = false;
@@ -44,7 +44,7 @@ void Module::Initialize()
 		m_link[i].m_activated = Link_Deactivated;
 
 		m_arrow[i] = arrow.Clone();
-		m_arrow[i]->visible = m_link[i].m_exists;
+		m_arrow[i]->m_visible = m_link[i].m_exists;
 		float angle = i * 90;
 		m_arrow[i]->rotate(i * 90);
 
@@ -275,7 +275,8 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 		construction_allowed = (*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_team == team;
 		if (construction_allowed)
 		{
-			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
+			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_visible = false;
+			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_GarbageMe = true;
 		}
 	}
 
@@ -333,7 +334,7 @@ void Module::EraseModule(sf::Vector2u grid_index)
 	//update game grid knownledge
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
-		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->GarbageMe = true;
+		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_GarbageMe = true;
 		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = NULL;
 	}
 }
@@ -367,14 +368,14 @@ Module::~Module()
 	(*CurrentGame).removeFromFeedbacks(&m_flux_text);
 	if (m_glow)
 	{
-		m_glow->visible = false;
-		m_glow->GarbageMe = true;
+		m_glow->m_visible = false;
+		m_glow->m_GarbageMe = true;
 	}
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_arrow[i]->visible = false;
-		m_arrow[i]->GarbageMe = true;
+		m_arrow[i]->m_visible = false;
+		m_arrow[i]->m_GarbageMe = true;
 	}
 
 	//updating grid knowledge
@@ -419,14 +420,14 @@ void Module::FinishConstruction()
 			continue;
 
 		Fluxor* fluxor = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject)[i];
-		if (fluxor->visible && !fluxor->m_guided)
+		if (fluxor->m_visible && !fluxor->m_guided)
 		{
 			//quick collision test
 			sf::IntRect boundsA(SimpleCollision::FToIRect(fluxor->getGlobalBounds()));
 			sf::IntRect boundsB(SimpleCollision::FToIRect(this->getGlobalBounds()));
 			if (boundsA.intersects(boundsB))
 			{
-				fluxor->GarbageMe = true;
+				fluxor->m_GarbageMe = true;
 			}
 		}
 	}
@@ -447,7 +448,7 @@ void Module::update(sf::Time deltaTime)
 	}
 	if (m_glow)
 	{
-		m_glow->visible = m_flux == m_flux_max && !m_under_construction;
+		m_glow->m_visible = m_flux == m_flux_max && !m_under_construction;
 	}
 
 	GameObject::update(deltaTime);
@@ -685,7 +686,7 @@ void Module::AttackModule(Fluxor* fluxor)
 				//kill?
 				if (m_flux == 0)
 				{
-					this->GarbageMe = true;
+					this->m_GarbageMe = true;
 				}
 				else
 				{
@@ -701,7 +702,7 @@ void Module::AttackModule(Fluxor* fluxor)
 			}
 			
 			//consumption finished?
-			if (this->GarbageMe || fluxor->m_flux == 0)
+			if (this->m_GarbageMe || fluxor->m_flux == 0)
 			{
 				fluxor->m_docked = false;
 			}
@@ -794,7 +795,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 					}
 					else
 					{
-						fluxor->GarbageMe = true;
+						fluxor->m_GarbageMe = true;
 					}
 				}
 			}
@@ -817,7 +818,7 @@ bool Module::UndockFluxor(Fluxor* fluxor)
 		}
 		else
 		{
-			fluxor->GarbageMe = true;
+			fluxor->m_GarbageMe = true;
 			return false;
 		}
 	}
@@ -888,7 +889,7 @@ void Module::UpdateLinks()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_arrow[i]->visible = m_link[i].m_exists;
+		m_arrow[i]->m_visible = m_link[i].m_exists;
 
 		Module* module = NULL;
 		if (m_under_construction)
@@ -1111,7 +1112,7 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 						if (it != fluxor->m_modules_visited.end() && ((*it)->m_team == fluxor->m_team || (*it)->m_alliance == fluxor->m_alliance))
 						{
 							//This is a looping circuit (allied module visited twice). This is forbidden, and the Fluxor shall therefore die now.
-							fluxor->GarbageMe = true;
+							fluxor->m_GarbageMe = true;
 							return false;
 						}
 					}
@@ -1119,7 +1120,7 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 					if (fluxor->m_FluxorType == FluxorType_Blue && !m_has_child_to_refill)
 					{
 						//no child module to refill, going on is pointless
-						fluxor->GarbageMe = true;
+						fluxor->m_GarbageMe = true;
 						return false;
 					}
 
@@ -1179,7 +1180,7 @@ Fluxor* Module::SearchNearbyAttackers(PlayerTeams team_not_to_target, float rang
 
 		if ((pCandidate->m_flux_attacker && pCandidate->m_team != team_not_to_target && pCandidate->m_alliance != (*CurrentGame).GetTeamAlliance(team_not_to_target)))
 		{
-			if (pCandidate->isOnScene && !pCandidate->m_ghost && pCandidate->visible)
+			if (pCandidate->isOnScene && !pCandidate->m_ghost && pCandidate->m_visible)
 			{
 				const float a = this->getPosition().x - pCandidate->getPosition().x;
 				const float b = this->getPosition().y - pCandidate->getPosition().y;

@@ -268,7 +268,7 @@ void Fluxor::update(sf::Time deltaTime)
 	//death by flux consumption
 	if (m_flux == 0)
 	{
-		GarbageMe = true;
+		m_GarbageMe = true;
 	}
 
 	//hud
@@ -490,7 +490,7 @@ void Fluxor::AttackFluxor(Fluxor* fluxor)
 		}
 		else
 		{
-			GarbageMe = true;
+			m_GarbageMe = true;
 		}
 	}
 }

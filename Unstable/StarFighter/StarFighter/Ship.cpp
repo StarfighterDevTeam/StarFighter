@@ -362,7 +362,7 @@ void Ship::GetFluxor(GameObject* object)
 					m_flux = m_flux_max;
 				}
 
-				fluxor->GarbageMe = true;
+				fluxor->m_GarbageMe = true;
 			}
 		}
 	}

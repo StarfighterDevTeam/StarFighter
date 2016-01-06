@@ -86,10 +86,10 @@ public:
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
-	bool visible;
+	bool m_visible;
 	bool isOnScene;
-	bool GarbageMe;
-	bool DontGarbageMe;
+	bool m_GarbageMe;
+	bool Dontm_GarbageMe;
 	GameObjectType m_collider_type;
 	LayerType m_layer;
 	sf::Vector2f m_size;

@@ -16,7 +16,7 @@ public:
 
 	static bool AreColliding(const GameObject* GameObjectA, const GameObject* GameObjectB) {
 		// If not visibe, let's not even bother with the collision
-		if (!GameObjectA->visible || !(GameObjectB->visible))
+		if (!GameObjectA->m_visible || !(GameObjectB->m_visible))
 			return false;
 
 		//ghost is a property that prevents an object from colliding, so by definition we exclude it
@@ -55,7 +55,7 @@ public:
 	static bool IsGrazing(const GameObject* GameObjectA, const GameObject* GameObjectB)
 	{
 		// If not visibe, let's not even bother with the collision
-		if (!GameObjectA->visible || !(GameObjectB->visible))
+		if (!GameObjectA->m_visible || !(GameObjectB->m_visible))
 			return false;
 
 		//ghost is a property that prevents an object from colliding, so by definition we exclude it
