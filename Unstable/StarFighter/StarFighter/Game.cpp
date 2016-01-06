@@ -20,9 +20,23 @@ void Game::init(RenderWindow* window)
 	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
 	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
 
-	view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
-	view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
-	//view.zoom(0.3f);
+	//split screens
+	if (USE_SPLIT_SCREEN == true)
+	{
+		viewP1.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 4, REF_WINDOW_RESOLUTION_Y / 2));
+		viewP1.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y));
+		viewP1.setViewport(sf::FloatRect(0, 0, 0.5f, 1));
+
+		viewP2.setCenter(sf::Vector2f(3 * REF_WINDOW_RESOLUTION_X / 4, REF_WINDOW_RESOLUTION_Y / 2));
+		viewP2.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y));
+		viewP2.setViewport(sf::FloatRect(0.5f, 0, 0.5f, 1));
+	}
+	else//standard view
+	{
+		view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+		view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+		//view.zoom(0.3f);
+	}
 
 	//default value
 	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
@@ -103,18 +117,10 @@ sf::RenderWindow* Game::getMainWindow()
 	return this->window;
 }
 
-void Game::SetPlayerShip(Ship* m_playerShip)
-{
-	this->playerShip = m_playerShip;
-}
-
 void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 {
 	object->m_layer = layer;
 	object->m_collider_type = type;
-
-	//Window resolution adjustements
-	//object->setScale(scale_factor.x, scale_factor.y);
 
 	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
@@ -175,8 +181,6 @@ void Game::updateScene(Time deltaTime)
 
 	//Collect the dust
 	collectGarbage();
-
-	mainScreen.setView(view);
 }
 
 void Game::ResolveProductionBufferList()
@@ -204,51 +208,78 @@ void Game::drawScene()
 {
 	this->mainScreen.clear();
 
-	for (int i = 0; i < NBVAL_Layer; i++)
+	for (int v = 0; v < 2; v++)//Split screen
 	{
-		if (i == FeedbacksLayer)
+		if (v == 0)
 		{
-			for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
+			if (USE_SPLIT_SCREEN == true)
 			{
-				if (*it == NULL)
-					continue;
-
-				mainScreen.draw(*(*it));
+				mainScreen.setView(viewP1);
 			}
-			for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
+			else
 			{
-				if (*it == NULL)
-					continue;
-
-				mainScreen.draw(*(*it));
+				//standard view
+				mainScreen.setView(view);
 			}
 		}
-		else if (i == FakeGridLayer)
+		if (v > 0)
 		{
-			std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin();
-
-			if (*it)
+			if (USE_SPLIT_SCREEN == true)
 			{
-				for (size_t j = 0; j < GRID_WIDTH; j++)
+				mainScreen.setView(viewP2);
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		for (int i = 0; i < NBVAL_Layer; i++)
+		{
+			if (i == FeedbacksLayer)
+			{
+				for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
 				{
-					for (size_t k = 0; k < GRID_HEIGHT; k++)
+					if (*it == NULL)
+						continue;
+
+					mainScreen.draw(*(*it));
+				}
+				for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
+				{
+					if (*it == NULL)
+						continue;
+
+					mainScreen.draw(*(*it));
+				}
+			}
+			else if (i == FakeGridLayer)
+			{
+				std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin();
+
+				if (*it)
+				{
+					for (size_t j = 0; j < GRID_WIDTH; j++)
 					{
-						(*it)->setPosition(sf::Vector2f(j*TILE_SIZE + TILE_SIZE / 2, k*TILE_SIZE + TILE_SIZE / 2));
-						this->mainScreen.draw((*(*it)));
+						for (size_t k = 0; k < GRID_HEIGHT; k++)
+						{
+							(*it)->setPosition(sf::Vector2f(j*TILE_SIZE + TILE_SIZE / 2, k*TILE_SIZE + TILE_SIZE / 2));
+							this->mainScreen.draw((*(*it)));
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			for (std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin(); it != this->sceneGameObjectsLayered[i].end(); it++)
+			else
 			{
-				if (*it == NULL)
-					continue;
-
-				if ((*(*it)).visible)
+				for (std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin(); it != this->sceneGameObjectsLayered[i].end(); it++)
 				{
-					this->mainScreen.draw((*(*it)));
+					if (*it == NULL)
+						continue;
+
+					if ((*(*it)).visible)
+					{
+						this->mainScreen.draw((*(*it)));
+					}
 				}
 			}
 		}

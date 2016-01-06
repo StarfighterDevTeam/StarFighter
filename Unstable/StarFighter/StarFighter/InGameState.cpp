@@ -79,25 +79,38 @@ void InGameState::Initialize(Player player)
 
 	//intégration placeholder
 	Ship* playerShip = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue, 3);
-	(*CurrentGame).SetPlayerShip(playerShip);
+	(*CurrentGame).playerShips[playerShip->m_team] = playerShip;
 	playerShip->SetControllerType(AllControlDevices);
 	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
 
 	Ship* playerShip2 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed, 3);
 	(*CurrentGame).addToScene(playerShip2, PlayerShipLayer, PlayerShip);
 	playerShip2->SetControllerType(KeyboardControl2);
-	//
+	playerShip2->setColor(sf::Color::Red);
+	(*CurrentGame).playerShips[playerShip2->m_team] = playerShip2;
+
 	//Ship* playerShip3 = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue2, 3);
 	//(*CurrentGame).addToScene(playerShip3, PlayerShipLayer, PlayerShip);
 	//playerShip3->SetControllerType(JoystickControl3);
+	//(*CurrentGame).playerShips[playerShip3->m_team] = playerShip3;
 	//
 	//Ship* playerShip4 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed2, 3);
 	//(*CurrentGame).addToScene(playerShip4, PlayerShipLayer, PlayerShip);
 	//playerShip4->SetControllerType(JoystickControl4);
+	//(*CurrentGame).playerShips[playerShip4->m_team] = playerShip4;
 
 	(*CurrentGame).map_size = sf::Vector2f(W, H);
-	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
 
+	if (USE_SPLIT_SCREEN == true)
+	{
+		(*CurrentGame).viewP1.setCenter((*CurrentGame).playerShips[0]->getPosition());
+		(*CurrentGame).viewP2.setCenter((*CurrentGame).playerShips[1]->getPosition());
+	}
+	else
+	{
+		(*CurrentGame).view.setCenter((*CurrentGame).playerShips[0]->getPosition());
+	}
+	
 	//HACK PROTO
 	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true);
 	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true);
@@ -154,19 +167,53 @@ void InGameState::Release()
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
 {
-	(*CurrentGame).view.move(sf::Vector2f((*CurrentGame).playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShip->m_speed.y * deltaTime.asSeconds()));
+	if (USE_SPLIT_SCREEN == true)
+	{
+		(*CurrentGame).viewP1.move(sf::Vector2f((*CurrentGame).playerShips[0]->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShips[0]->m_speed.y * deltaTime.asSeconds()));
+		(*CurrentGame).viewP2.move(sf::Vector2f((*CurrentGame).playerShips[1]->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShips[1]->m_speed.y * deltaTime.asSeconds()));
 
-	//Map border constraints
-	const float x = (*CurrentGame).view.getSize().x / 2;
-	const float y = (*CurrentGame).view.getSize().y / 2;
-	const float a = (*CurrentGame).playerShip->getPosition().x;
-	const float b = (*CurrentGame).playerShip->getPosition().y;
-	if (a < x)
-		(*CurrentGame).view.setCenter(x, (*CurrentGame).view.getCenter().y);
-	if (a >(*CurrentGame).map_size.x - x)
-		(*CurrentGame).view.setCenter((*CurrentGame).map_size.x - x, (*CurrentGame).view.getCenter().y);
-	if (b < y)
-		(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, y);
-	if (b >(*CurrentGame).map_size.y - y)
-		(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, (*CurrentGame).map_size.y - y);
+		//Map border constraints
+		const float a1 = (*CurrentGame).playerShips[0]->getPosition().x;
+		const float b1 = (*CurrentGame).playerShips[0]->getPosition().y;
+		const float x1 = (*CurrentGame).viewP1.getSize().x / 2;
+		const float y1 = (*CurrentGame).viewP1.getSize().y / 2;
+
+		if (a1 < x1)
+			(*CurrentGame).viewP1.setCenter(x1, (*CurrentGame).viewP1.getCenter().y);
+		if (a1 >(*CurrentGame).map_size.x - x1)
+			(*CurrentGame).viewP1.setCenter((*CurrentGame).map_size.x - x1, (*CurrentGame).viewP1.getCenter().y);
+		if (b1 < y1)
+			(*CurrentGame).viewP1.setCenter((*CurrentGame).viewP1.getCenter().x, y1);
+		if (b1 >(*CurrentGame).map_size.y - y1)
+			(*CurrentGame).viewP1.setCenter((*CurrentGame).viewP1.getCenter().x, (*CurrentGame).map_size.y - y1);
+
+		const float a2 = (*CurrentGame).playerShips[1]->getPosition().x;
+		const float b2 = (*CurrentGame).playerShips[1]->getPosition().y;
+		if (a2 < x1)
+			(*CurrentGame).viewP2.setCenter(x1, (*CurrentGame).viewP2.getCenter().y);
+		if (a2 >(*CurrentGame).map_size.x - x1)
+			(*CurrentGame).viewP2.setCenter((*CurrentGame).map_size.x - x1, (*CurrentGame).viewP2.getCenter().y);
+		if (b2 < y1)
+			(*CurrentGame).viewP2.setCenter((*CurrentGame).viewP2.getCenter().x, y1);
+		if (b2 >(*CurrentGame).map_size.y - y1)
+			(*CurrentGame).viewP2.setCenter((*CurrentGame).viewP2.getCenter().x, (*CurrentGame).map_size.y - y1);
+	}
+	else
+	{
+		(*CurrentGame).view.move(sf::Vector2f((*CurrentGame).playerShips[0]->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShips[0]->m_speed.y * deltaTime.asSeconds()));
+
+		//Map border constraints
+		const float x = (*CurrentGame).view.getSize().x / 2;
+		const float y = (*CurrentGame).view.getSize().y / 2;
+		const float a = (*CurrentGame).playerShips[0]->getPosition().x;
+		const float b = (*CurrentGame).playerShips[0]->getPosition().y;
+		if (a < x)
+			(*CurrentGame).view.setCenter(x, (*CurrentGame).view.getCenter().y);
+		if (a >(*CurrentGame).map_size.x - x)
+			(*CurrentGame).view.setCenter((*CurrentGame).map_size.x - x, (*CurrentGame).view.getCenter().y);
+		if (b < y)
+			(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, y);
+		if (b >(*CurrentGame).map_size.y - y)
+			(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, (*CurrentGame).map_size.y - y);
+	}
 }
