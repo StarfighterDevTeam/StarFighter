@@ -268,10 +268,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 {
 	Module* new_module = new Module(moduleType, team);
 
-	grid_index.x--;
-	grid_index.y--;
-
-	//update game grid knownledge
+	//construction over own existing module?
 	bool construction_allowed = true;
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
@@ -282,6 +279,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 		}
 	}
 
+	//construction
 	if (construction_allowed)
 	{
 		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = (GameObject*)new_module;
@@ -319,9 +317,11 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 			new_module->m_flux = new_module->m_flux_max;
 		}
 	}
+	//no construction
 	else
 	{
-		new_module = NULL;
+		delete new_module;
+		return NULL;
 	}
 
 	return new_module;
@@ -329,9 +329,6 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 
 void Module::EraseModule(sf::Vector2u grid_index)
 {
-	grid_index.x--;
-	grid_index.y--;
-
 	//update game grid knownledge
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
@@ -342,9 +339,6 @@ void Module::EraseModule(sf::Vector2u grid_index)
 
 void Module::DebugFinishModule(sf::Vector2u grid_index)
 {
-	grid_index.x--;
-	grid_index.y--;
-
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
 		Module* module = (Module*)(*CurrentGame).m_module_grid[grid_index.x][grid_index.y];
@@ -357,9 +351,6 @@ void Module::DebugFinishModule(sf::Vector2u grid_index)
 
 void Module::DebugRefillingModuleFlux(sf::Vector2u grid_index)
 {
-	grid_index.x--;
-	grid_index.y--;
-
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
 		Module* module = (Module*)(*CurrentGame).m_module_grid[grid_index.x][grid_index.y];
@@ -383,6 +374,15 @@ Module::~Module()
 	{
 		m_arrow[i]->visible = false;
 		m_arrow[i]->GarbageMe = true;
+	}
+
+	//updating grid knowledge
+	if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y])
+	{
+		if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] == (GameObject*)this)
+		{
+			(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] = NULL;
+		}
 	}
 }
 

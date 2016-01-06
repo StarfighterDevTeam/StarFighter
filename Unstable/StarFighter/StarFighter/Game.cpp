@@ -525,16 +525,14 @@ bool Game::isCellFree(sf::Vector2f position)
 
 sf::Vector2u Game::GetGridIndex(sf::Vector2f position)
 {
-	unsigned int grid_line = (unsigned int)(ceil(1.f * position.x / TILE_SIZE));
-	unsigned int grid_row = (unsigned int)(ceil(1.f * position.y / TILE_SIZE));
+	unsigned int grid_line = (unsigned int)(ceil(1.f * position.x / TILE_SIZE)) - 1;
+	unsigned int grid_row = (unsigned int)(ceil(1.f * position.y / TILE_SIZE)) - 1;
 
 	return sf::Vector2u(grid_line, grid_row);
 }
 
 sf::Vector2f Game::GridToPosition(sf::Vector2u grid_index)
 {
-	grid_index.x--;
-	grid_index.y--;
 	return sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2);
 }
 

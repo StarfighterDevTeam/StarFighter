@@ -35,8 +35,8 @@
 #define GRID_WIDTH									15
 #define GRID_HEIGHT									15
 #define TILE_SIZE									128
-#define DEFAULT_TILE_START							5
-#define DEFAULT_TILE_GENERATOR						4
+#define DEFAULT_TILE_START							5-1
+#define DEFAULT_TILE_GENERATOR						4-1
 #define CENTRAL_FLUXOR_ZONE_TILE_OFFSET				5
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		1
 #define USE_UNGUIDED_FLUXORS_TO_BUILD				true

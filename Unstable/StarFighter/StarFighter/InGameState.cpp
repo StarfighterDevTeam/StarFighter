@@ -121,9 +121,11 @@ void InGameState::Initialize(Player player)
 	//Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed, true, LinkDown, 1000);
 	//Module::CreateModule(sf::Vector2u(12, 4), ModuleType_Generator, PlayerRed, true, LinkLeft);
 	//
-	for (size_t i = 1; i < GRID_HEIGHT + 1; i++)
+
+	//Neutral blocks
+	for (size_t i = 0; i < GRID_HEIGHT; i++)
 	{
-		if (i != GRID_HEIGHT / 2 + 1 && i != GRID_HEIGHT / 2 + 1 - 1 && i != GRID_HEIGHT / 2 + 1 +1)
+		if (i != GRID_HEIGHT / 2 && i != GRID_HEIGHT / 2 - 1 && i != GRID_HEIGHT / 2 +1)
 		Module::CreateModule(sf::Vector2u(GRID_WIDTH / 2 + 1, i), ModuleType_Barrier, PlayerNeutral, true);
 	}
 		
