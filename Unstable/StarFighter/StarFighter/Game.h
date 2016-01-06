@@ -76,10 +76,11 @@ public:
 	float vspeed;
 	sf::Vector2f scale_factor;
 
-	Ship* playerShip;
-	void SetPlayerShip(Ship* m_playerShip);
+	Ship* playerShips[NBVAL_PlayerTeams];
 
 	sf::View view;
+	sf::View viewP1;
+	sf::View viewP2;
 	sf::Vector2f map_size;
 
 	//utilitary methods
