@@ -87,9 +87,9 @@ public:
 	virtual void updateAnimation(sf::Time deltaTime);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
 	bool m_visible;
-	bool isOnScene;
+	bool m_isOnScene;
 	bool m_GarbageMe;
-	bool Dontm_GarbageMe;
+	bool m_DontGarbageMe;
 	GameObjectType m_collider_type;
 	LayerType m_layer;
 	sf::Vector2f m_size;
@@ -98,11 +98,11 @@ public:
 	virtual void Respawn();
 	GameObject* Clone();
 	
-	float diag;
+	float m_diag;
 	bool m_ghost;
 	bool m_under_construction;
 	void setGhost(bool ghost);
-	float rotation_speed;
+	float m_rotation_speed;
 	int m_animationNumber;
 	int m_frameNumber;
 	int m_currentAnimationIndex;

@@ -49,6 +49,7 @@ public :
 	bool m_consummable_by_modules;
 	bool m_can_be_refilled_by_modules;
 	bool m_needs_link_to_circulate;
+	bool m_condensed_to_circulate;
 	bool m_flux_attacker;
 	bool m_fluxovore;
 	bool m_flux_stealer;

@@ -42,6 +42,7 @@ enum ModuleType
 	ModuleType_Factory_Up,
 	ModuleType_Turret,
 	ModuleType_Barrier,
+	ModuleType_Condensator,
 	ModuleType_Armory,
 	ModuleType_Shield,
 	NBVAL_ModuleType,

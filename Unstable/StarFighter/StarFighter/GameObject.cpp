@@ -88,13 +88,13 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	this->m_speed = speed;
 	this->setPosition(position.x, position.y);
 	this->m_visible = true;
-	this->isOnScene = false;
+	this->m_isOnScene = false;
 	this->m_GarbageMe = false;
-	this->Dontm_GarbageMe = false;
-	this->diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	this->m_DontGarbageMe = false;
+	this->m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	this->m_ghost = false;
 	this->m_under_construction = false;
-	this->rotation_speed = 0.f;
+	this->m_rotation_speed = 0.f;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)

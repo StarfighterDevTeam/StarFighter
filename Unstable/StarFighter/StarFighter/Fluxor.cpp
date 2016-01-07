@@ -26,6 +26,7 @@ void Fluxor::Initialize()
 	m_needs_link_to_circulate = false;
 	m_fluxovore = false;
 	m_can_be_refilled_by_modules = false;
+	m_condensed_to_circulate = false;
 
 	m_has_spawn_bounds = false;
 

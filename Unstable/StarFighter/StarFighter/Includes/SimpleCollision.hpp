@@ -23,13 +23,13 @@ public:
 		if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
 			return false;
 
-		if (!GameObjectA->isOnScene || !(GameObjectB->isOnScene))
+		if (!GameObjectA->m_isOnScene || !(GameObjectB->m_isOnScene))
 			return false;
 
 		//discus check: on regarde si la distance entre les centres des 2 sprites est plus grande que leurs rayons additionnés
 		const float a = GameObjectA->getPosition().x - GameObjectB->getPosition().x;
 		const float b = GameObjectA->getPosition().y - GameObjectB->getPosition().y;
-		const float c = GameObjectA->diag + GameObjectB->diag;
+		const float c = GameObjectA->m_diag + GameObjectB->m_diag;
 
 		if (((a * a) + (b * b)) > (c * c))
 			return false;
@@ -62,12 +62,12 @@ public:
 		if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
 			return false;
 
-		if (!GameObjectA->isOnScene || !(GameObjectB->isOnScene))
+		if (!GameObjectA->m_isOnScene || !(GameObjectB->m_isOnScene))
 			return false;
 
 		const float a = GameObjectA->getPosition().x - GameObjectB->getPosition().x;
 		const float b = GameObjectA->getPosition().y - GameObjectB->getPosition().y;
-		const float c = GameObjectA->diag + GameObjectB->diag + GRAZE_DISTANCE;
+		const float c = GameObjectA->m_diag + GameObjectB->m_diag + GRAZE_DISTANCE;
 
 		if (((a * a) + (b * b)) < (c * c))
 			return true;

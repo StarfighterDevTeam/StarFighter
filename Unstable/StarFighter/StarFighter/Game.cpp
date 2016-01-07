@@ -509,17 +509,17 @@ void Game::collectGarbage()
 			continue;
 		}
 
-		if (!(**it).isOnScene)
+		if (!(**it).m_isOnScene)
 		{
 			//objects that are spawning out of screen are not deleted
 			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= map_size.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= map_size.y))
 			{
-				(**it).isOnScene = true;
+				(**it).m_isOnScene = true;
 			}
 		}
 
 		//Content that went on scene and then exited have to be deleted
-		if (!(**it).Dontm_GarbageMe && (**it).isOnScene)
+		if (!(**it).m_DontGarbageMe && (**it).m_isOnScene)
 		{
 			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > map_size.x
 				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > map_size.y)
@@ -562,7 +562,7 @@ GameObject* Game::GetClosestObject(const sf::Vector2f position, GameObjectType t
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->isOnScene && !(*it)->m_ghost && (*it)->m_visible)
+		if ((*it)->m_isOnScene && !(*it)->m_ghost && (*it)->m_visible)
 		{
 			const float a = position.x - (*it)->getPosition().x;
 			const float b = position.y - (*it)->getPosition().y;

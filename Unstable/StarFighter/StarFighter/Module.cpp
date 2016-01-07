@@ -25,6 +25,7 @@ void Module::Initialize()
 	m_isAutogeneratingFlux = false;
 	m_turret_range = 0;
 	m_upgrade_player_stats = false;
+	m_isCondensatingFluxor = false;
 
 	//Flux display
 	m_flux_text.setFont(*(*CurrentGame).font2);
@@ -124,6 +125,17 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Accelerator:
 		{
 			textureName = "Assets/2D/module_accelerator.png";
+			break;
+		}
+		case ModuleType_Condensator:
+		{
+			textureName = "Assets/2D/module_condensator.png";
+			break;
+		}
+			
+		default:
+		{
+			textureName = "Assets/2D/module_generator.png";
 			break;
 		}
 	}
@@ -227,6 +239,13 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_flux_max_after_construction = 30;
 			m_flux_max_under_construction = 150;
 			m_add_speed = 100;
+			break;
+		}
+		case ModuleType_Condensator:
+		{
+			m_flux_max_after_construction = 50;
+			m_flux_max_under_construction = 300;
+			m_isCondensatingFluxor = true;
 			break;
 		}
 	}
@@ -632,6 +651,30 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 	}
 }
 
+void Module::CondensateFluxor(Fluxor* fluxor)
+{
+	if (fluxor)
+	{
+		if (m_flux == m_flux_max)
+		{
+			if (fluxor->m_condensed_to_circulate)
+			{
+				//end of condensed effect
+				fluxor->m_condensed_to_circulate = false;
+				fluxor->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+			}
+			else
+			{
+				if (m_isCondensatingFluxor && fluxor->m_needs_link_to_circulate)
+				{
+					fluxor->m_condensed_to_circulate = true;
+					fluxor->setColor(sf::Color(255, 255, 255, 255));
+				}
+			}
+		}
+	}
+}
+
 void Module::AmplifyFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
@@ -728,6 +771,9 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 			if (!m_under_construction)
 			{
+				//module "condensation"
+				CondensateFluxor(fluxor);
+
 				//module "refill/amplify fluxor"
 				if (fluxor->m_can_be_refilled_by_modules)
 				{
@@ -811,7 +857,7 @@ bool Module::UndockFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (!fluxor->m_consummable_by_modules || IsMainLinkActivated())
+		if (!fluxor->m_consummable_by_modules || fluxor->m_condensed_to_circulate || IsMainLinkActivated())//the Fluxor may go on if it is not consummed by modules, unless condensated, OR has an active link to continue its journey
 		{
 			fluxor->m_docked = false;
 			return true;
@@ -887,6 +933,10 @@ void Module::SwitchLinkDirection()
 
 void Module::UpdateLinks()
 {
+	//condensation?
+	int hyperlink = m_isCondensatingFluxor;
+	hyperlink *= GRID_WIDTH > GRID_HEIGHT ? GRID_WIDTH : GRID_HEIGHT;
+
 	for (int i = 0; i < 4; i++)
 	{
 		m_arrow[i]->m_visible = m_link[i].m_exists;
@@ -898,33 +948,40 @@ void Module::UpdateLinks()
 		}
 		else
 		{
-			sf::Vector2u global_grid_index = sf::Vector2u(m_curGridIndex.x - 1, m_curGridIndex.y - 1);
-
 			if (i == 0)
 			{
-				if (global_grid_index.x == GRID_WIDTH - 1)
+				if (m_curGridIndex.x == GRID_WIDTH - 1)
 				{
 					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
+					int max = max_temp > GRID_WIDTH - m_curGridIndex.x - 1 ? GRID_WIDTH - m_curGridIndex.x - 1 : max_temp;
+					for (int j = 1; j < max; j++)
 					{
-						if (global_grid_index.x + j < GRID_WIDTH)
+						if (m_curGridIndex.x + j < GRID_WIDTH)
 						{
-							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x + j][global_grid_index.y];
-							if (module && !module->m_under_construction)
+							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + j][m_curGridIndex.y];
+							if (module)
 							{
-								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+								if (module->m_under_construction)
 								{
-									m_link[i].m_activated = Link_Activated;
-									break;
+									module = NULL;
+									continue;
 								}
 								else
 								{
-									m_link[i].m_activated = Link_Deactivated;
-									break;
-
+									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+									{
+										m_link[i].m_activated = Link_Activated;
+										break;
+									}
+									else
+									{
+										m_link[i].m_activated = Link_Deactivated;
+										break;
+									}
 								}
 							}
 						}
@@ -933,29 +990,38 @@ void Module::UpdateLinks()
 			}
 			else if (i == 1)
 			{
-				if (global_grid_index.y == GRID_HEIGHT - 1)
+				if (m_curGridIndex.y == GRID_HEIGHT - 1)
 				{
 					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
+					int max = max_temp > GRID_HEIGHT - m_curGridIndex.y - 1 ? GRID_HEIGHT - m_curGridIndex.y - 1 : max_temp;
+					for (int j = 1; j < max; j++)
 					{
-						if (global_grid_index.y + j < GRID_HEIGHT)
+						if (m_curGridIndex.y + j < GRID_HEIGHT)
 						{
-							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y + j];
-							if (module && !module->m_under_construction)
+							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y + j];
+							if (module)
 							{
-								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+								if (module->m_under_construction)
 								{
-									m_link[i].m_activated = Link_Activated;
-									break;
+									module = NULL;
+									continue;
 								}
 								else
 								{
-									m_link[i].m_activated = Link_Deactivated;
-									break;
-
+									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+									{
+										m_link[i].m_activated = Link_Activated;
+										break;
+									}
+									else
+									{
+										m_link[i].m_activated = Link_Deactivated;
+										break;
+									}
 								}
 							}
 						}
@@ -964,29 +1030,38 @@ void Module::UpdateLinks()
 			}
 			else if (i == 2)
 			{
-				if (global_grid_index.x == 0)
+				if (m_curGridIndex.x == 0)
 				{
 					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
+					int max = max_temp > m_curGridIndex.x ? m_curGridIndex.x : max_temp;
+					for (int j = 1; j < max; j++)
 					{
-						if (global_grid_index.x - j >= 0)
+						if (m_curGridIndex.x - j >= 0)
 						{
-							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x - j][global_grid_index.y];
-							if (module && !module->m_under_construction)
+							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x - j][m_curGridIndex.y];
+							if (module)
 							{
-								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+								if (module->m_under_construction)
 								{
-									m_link[i].m_activated = Link_Activated;
-									break;
+									module = NULL;
+									continue;
 								}
 								else
 								{
-									m_link[i].m_activated = Link_Deactivated;
-									break;
-
+									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+									{
+										m_link[i].m_activated = Link_Activated;
+										break;
+									}
+									else
+									{
+										m_link[i].m_activated = Link_Deactivated;
+										break;
+									}
 								}
 							}
 						}
@@ -995,28 +1070,38 @@ void Module::UpdateLinks()
 			}
 			else// if (i == 3)
 			{
-				if (global_grid_index.y == 0)
+				if (m_curGridIndex.y == 0)
 				{
 					m_link[i].m_activated = Link_Deactivated;
 				}
 				else
 				{
-					for (int j = 1; j < GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1; j++)
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
+					int max = max_temp > m_curGridIndex.y ? m_curGridIndex.y : max_temp;
+					for (int j = 1; j < max; j++)
 					{
-						if (global_grid_index.y - j >= 0)
+						if (m_curGridIndex.y - j >= 0)
 						{
-							module = (Module*)(*CurrentGame).m_module_grid[global_grid_index.x][global_grid_index.y - j];
-							if (module && !module->m_under_construction)
+							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y - j];
+							if (module)
 							{
-								if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+								if (module->m_under_construction)
 								{
-									m_link[i].m_activated = Link_Activated;
-									break;
+									module = NULL;
+									continue;
 								}
 								else
 								{
-									m_link[i].m_activated = Link_Deactivated;
-									break;
+									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+									{
+										m_link[i].m_activated = Link_Activated;
+										break;
+									}
+									else
+									{
+										m_link[i].m_activated = Link_Deactivated;
+										break;
+									}
 								}
 							}
 						}
@@ -1180,7 +1265,7 @@ Fluxor* Module::SearchNearbyAttackers(PlayerTeams team_not_to_target, float rang
 
 		if ((pCandidate->m_flux_attacker && pCandidate->m_team != team_not_to_target && pCandidate->m_alliance != (*CurrentGame).GetTeamAlliance(team_not_to_target)))
 		{
-			if (pCandidate->isOnScene && !pCandidate->m_ghost && pCandidate->m_visible)
+			if (pCandidate->m_isOnScene && !pCandidate->m_ghost && pCandidate->m_visible)
 			{
 				const float a = this->getPosition().x - pCandidate->getPosition().x;
 				const float b = this->getPosition().y - pCandidate->getPosition().y;
