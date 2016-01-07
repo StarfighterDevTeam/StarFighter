@@ -179,7 +179,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Relay:
 		{
 			m_flux_max_after_construction = 10;
-			m_flux_max_under_construction = 30;
+			m_flux_max_under_construction = 50;
 			m_isRefillingFlux = true;
 			break;
 		}
@@ -229,9 +229,9 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		}
 		case ModuleType_Amplifier:
 		{
-			m_flux_max_after_construction = 30;
+			m_flux_max_after_construction = 20;
 			m_flux_max_under_construction = 250;
-			m_add_flux = 30;
+			m_add_flux = 10;
 			break;
 		}
 		case ModuleType_Accelerator:
