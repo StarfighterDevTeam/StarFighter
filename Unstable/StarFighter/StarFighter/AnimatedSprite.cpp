@@ -29,12 +29,15 @@ m_animation(NULL), m_frameTime(frameTime), m_currentFrame(0), m_isPaused(paused)
 
 }
 
-void AnimatedSprite::setAnimation(const Animation& animation)
+void AnimatedSprite::setAnimation(const Animation& animation, bool keep_frame_index)
 {
 	m_animation = &animation;
 	m_texture = m_animation->getSpriteSheet();
-	m_currentFrame = 0;
-	setFrame(m_currentFrame);
+	if (!keep_frame_index)
+	{
+		m_currentFrame = 0;
+		setFrame(m_currentFrame);
+	}
 }
 
 void AnimatedSprite::setFrameTime(sf::Time time)
@@ -47,10 +50,10 @@ void AnimatedSprite::play()
 	m_isPaused = false;
 }
 
-void AnimatedSprite::play(const Animation& animation)
+void AnimatedSprite::play(const Animation& animation, bool keep_frame_index)
 {
 	if (getAnimation() != &animation)
-		setAnimation(animation);
+		setAnimation(animation, keep_frame_index);
 	play();
 }
 
