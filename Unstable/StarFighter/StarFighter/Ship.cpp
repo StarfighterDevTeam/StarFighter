@@ -170,14 +170,8 @@ void Ship::update(sf::Time deltaTime)
 		m_build_text.setString("No ressources");
 	}
 	
-	if (m_build_text_status != Player_NotOverConstruction)
-	{
-		m_build_text.setColor(sf::Color::Green);
-	}
-	else
-	{
-		m_build_text.setColor(sf::Color::Transparent);
-	}
+	m_build_text.m_visible = m_build_text_status != Player_NotOverConstruction;
+
 	m_build_text_status = Player_NotOverConstruction;
 
 	//update grid index
