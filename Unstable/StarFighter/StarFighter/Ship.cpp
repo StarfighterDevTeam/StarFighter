@@ -53,12 +53,14 @@ void Ship::Init()
 
 	//inputs
 	m_SwitchKey_released = false;
+
+	//team and alliance
+	SetTeam(m_team, (*CurrentGame).GetTeamAlliance(m_team));
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, PlayerTeams team, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_team = team;
-	m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(team);
 	this->Init();
 }
 
@@ -446,3 +448,26 @@ void Ship::GetModule(GameObject* object)
 //
 //	m_construction_buffer.clear();
 //}
+
+void Ship::SetTeam(PlayerTeams team, TeamAlliances alliance)
+{
+	m_team = team;
+	m_alliance = alliance;
+	if (m_flux_text)
+	{
+		m_flux_text->m_team = team;
+		m_flux_text->m_alliance = alliance;
+	}
+	if (m_build_text)
+	{
+		m_build_text->m_team = team;
+		m_build_text->m_alliance = alliance;
+	}
+	//if (m_flux_gauge)
+	//{
+	//	m_flux_gauge->m_SFText.m_team = team;
+	//	m_flux_gauge->m_SFText.m_alliance = alliance;
+	//	m_flux_gauge->m_SFRectangle.m_team = team;
+	//	m_flux_gauge->m_SFRectangle.m_alliance = alliance;
+	//}
+}

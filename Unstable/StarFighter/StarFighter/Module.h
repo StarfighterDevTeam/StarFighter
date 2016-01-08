@@ -112,6 +112,7 @@ public :
 
 	//HUD
 	SFText* m_flux_text;
+	void SetTeam(PlayerTeams team, TeamAlliances alliance);
 };
 
 #endif // MODULE_H_INCLUDED

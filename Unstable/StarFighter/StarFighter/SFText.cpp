@@ -9,7 +9,7 @@ SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f 
 
 	m_visible = true;
 	m_team = team;
-	m_alliance = (TeamAlliances)0;
+	m_alliance = AllianceNeutral;
 
 	m_GarbageMe = false;
 }

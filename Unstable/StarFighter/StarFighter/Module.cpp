@@ -65,7 +65,6 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 	std::string textureName;
 	m_moduleType = moduleType;
 	m_team = team;
-	m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(team);
 
 	switch (moduleType)
 	{
@@ -144,6 +143,8 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 	setOrigin(sf::Vector2f(W / 2, H / 2));
 
 	Initialize();
+
+	SetTeam(team, (*CurrentGame).GetTeamAlliance(team));
 
 	//type specific parameters
 	switch (moduleType)
@@ -426,8 +427,12 @@ void Module::FinishConstruction()
 	}
 
 	if (m_flux_text)
+	{
 		m_flux_text->setColor(sf::Color::Cyan);
-
+		m_flux_text->m_team = PlayerNeutral;
+		m_flux_text->m_alliance = AllianceNeutral;
+	}
+		
 	m_under_construction = false;
 	m_flux = 0;
 	m_flux_max = m_flux_max_after_construction;
@@ -566,7 +571,7 @@ bool Module::GenerateFluxor()
 					Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
 
 					fluxor->m_team = m_team;
-					fluxor->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+					fluxor->m_alliance = m_alliance;
 					fluxor->m_guided = true;
 					if (pTarget)
 					{
@@ -1292,4 +1297,15 @@ Fluxor* Module::SearchNearbyAttackers(PlayerTeams team_not_to_target, float rang
 	}
 
 	return fluxor;
+}
+
+void Module::SetTeam(PlayerTeams team, TeamAlliances alliance)
+{
+	m_team = team;
+	m_alliance = alliance;
+	if (m_flux_text)
+	{
+		m_flux_text->m_team = team;
+		m_flux_text->m_alliance = alliance;
+	}
 }

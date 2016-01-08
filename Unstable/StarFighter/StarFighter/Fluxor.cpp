@@ -14,8 +14,10 @@ void Fluxor::Initialize()
 	m_displaying_flux = false;
 	m_transfer_buffer = 0;
 	m_team = PlayerNeutral;
+	m_alliance = AllianceNeutral;
 	m_target = NULL;
 	m_target_memory = false;
+	m_displaying_flux = true;
 
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;
@@ -32,7 +34,7 @@ void Fluxor::Initialize()
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::White, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y), m_team);
-	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	m_flux_text->m_alliance = m_alliance;
 }
 
 Fluxor::Fluxor()
@@ -93,7 +95,6 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	{
 		case FluxorType_Green:
 		{
-			m_displaying_flux = true;
 			m_wasting_flux = false;
 			m_flux = GREEN_FLUXOR_VALUE;
 			m_consummable_by_players = true;
@@ -102,9 +103,9 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		}
 		case FluxorType_Blue:
 		{
-			m_displaying_flux = true;
 			m_wasting_flux = false;
 			m_flux = FLUXOR_FLUX_VALUE;
+			m_flux_max = FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
 			m_can_be_refilled_by_modules = true;
 			m_needs_link_to_circulate = true;
@@ -113,7 +114,6 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		}
 		case FluxorType_Red:
 		{
-			m_displaying_flux = true;
 			m_wasting_flux = true;
 			m_flux_waste = FLUXOR_WASTE_VALUE;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
@@ -127,7 +127,6 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		}
 		case FluxorType_Purple:
 		{
-			m_displaying_flux = true;
 			m_wasting_flux = true;
 			m_flux_waste = FLUXOR_WASTE_VALUE;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
@@ -257,8 +256,6 @@ void Fluxor::update(sf::Time deltaTime)
 			}
 		}
 
-		UpdateRotation();
-
 		GameObject::update(deltaTime);
 	}
 	else
@@ -271,6 +268,8 @@ void Fluxor::update(sf::Time deltaTime)
 		m_docked = false;
 	}
 
+	UpdateRotation();
+
 	//death by flux consumption
 	if (m_flux == 0)
 	{
@@ -278,6 +277,10 @@ void Fluxor::update(sf::Time deltaTime)
 	}
 
 	//hud
+	if (m_FluxorType == FluxorType_Blue && m_alliance == AllianceNeutral)
+	{
+		printf("kk");
+	}
 	if (m_displaying_flux)
 	{
 		if (m_flux_text && m_flux_text->m_visible)
@@ -419,7 +422,7 @@ void Fluxor::UpdateRotation()
 	}
 	else if (m_speed.x == 0 && m_speed.y < 0)
 	{
-		setRotation(90);
+		setRotation(270);
 	}
 	else if (m_speed.y == 0 && m_speed.x > 0)
 	{
@@ -507,9 +510,9 @@ void Fluxor::AttackFluxor(Fluxor* fluxor)
 void Fluxor::BringStealerBack()
 {
 	m_speed = (sf::Vector2f(m_speed.x *= -1, m_speed.y *= -1));
+	UpdateRotation();
 	m_flux = m_flux_stolen;
 	m_flux_stolen = 0;
-	m_flux_max = 0;
 	m_flux_attacker = false;
 	m_wasting_flux = false;
 	m_displaying_flux = true;

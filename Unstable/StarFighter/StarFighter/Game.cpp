@@ -243,10 +243,10 @@ void Game::drawScene()
 
 					if ((*(*it)).m_visible)
 					{
-						if ((v == 0 && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == true))
+						if ((v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
 							continue;
 
-						if ((v == 1 && (*(*it)).m_alliance != Alliance2 && USE_SPLIT_SCREEN == true))
+						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
 							continue;
 
 						mainScreen.draw(*(*it));
@@ -259,10 +259,10 @@ void Game::drawScene()
 
 					if ((*(*it)).m_visible)
 					{
-						if ((v == 0 && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == true))
+						if ((v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
 							continue;
 
-						if ((v == 1 && (*(*it)).m_alliance != Alliance2 && USE_SPLIT_SCREEN == true))
+						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
 							continue;
 
 						mainScreen.draw(*(*it));
@@ -297,10 +297,10 @@ void Game::drawScene()
 
 					if ((*(*it)).m_under_construction && USE_SPLIT_SCREEN == true)
 					{
-						if (v == 0 && (*(*it)).m_alliance != Alliance1)
+						if (v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral))
 							continue;
 
-						if (v == 1 && (*(*it)).m_alliance != Alliance2)
+						if (v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral))
 							continue;
 					}
 					
@@ -756,16 +756,16 @@ std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
 //eturn ref_team != other_team && find(m_player_alliances[ref_team].begin(), m_player_alliances[ref_team].end(), other_team) != m_player_alliances[ref_team].end();
 //
 
-int Game::GetTeamAlliance(PlayerTeams team)
+TeamAlliances Game::GetTeamAlliance(PlayerTeams team)
 {
 	for (size_t i = 0; i < NBVAL_TeamAlliances; i++)
 	{
 		if (find(m_teams_vs_alliance_map[i].begin(), m_teams_vs_alliance_map[i].end(), team) != m_teams_vs_alliance_map[i].end())
 		{
-			return i;
+			return (TeamAlliances)i;
 		}
 	}
 
 	printf("<!> Game::GetTeamAlliance(PlayerTeams team) is looking for a team assigned to no alliance in vector<vector<int>> Game::m_player_alliances.\n");
-	return 0;
+	return (TeamAlliances)0;
 }

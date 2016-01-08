@@ -60,6 +60,7 @@ public :
 	SFText* m_build_text;
 	PlayerConstructionFeedbacks m_build_text_status;
 	SFGauge* m_flux_gauge;
+	void SetTeam(PlayerTeams team, TeamAlliances alliance);
 
 	//construction
 	//void ResolveProductionBufferList() override;

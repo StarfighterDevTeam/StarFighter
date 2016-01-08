@@ -114,7 +114,7 @@ public:
 	static sf::Vector2f GridToPosition(sf::Vector2u grid_index);
 	void ResolveProductionBufferList();
 	vector<vector<int>> m_teams_vs_alliance_map;
-	int GetTeamAlliance(PlayerTeams team);
+	TeamAlliances GetTeamAlliance(PlayerTeams team);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
