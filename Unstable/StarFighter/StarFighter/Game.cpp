@@ -139,6 +139,11 @@ void Game::addToFeedbacks(RectangleShape* feedback)
 	sceneFeedbackBars.push_back(feedback);
 }
 
+void Game::addToFeedbacks(SFText* text)
+{
+	sceneFeedbackSFTexts.push_back(text);
+}
+
 void Game::addToFeedbacks(Text* text)
 {
 	sceneFeedbackTexts.push_back(text);
@@ -152,6 +157,11 @@ void Game::removeFromFeedbacks(RectangleShape* feedback)
 void Game::removeFromFeedbacks(Text* text)
 {
 	sceneFeedbackTexts.remove(text);
+}
+
+void Game::removeFromFeedbacks(SFText* text)
+{
+	sceneFeedbackSFTexts.remove(text);
 }
 
 void Game::updateScene(Time deltaTime)
@@ -251,6 +261,22 @@ void Game::drawScene()
 						continue;
 
 					mainScreen.draw(*(*it));
+				}
+				for (std::list<SFText*>::iterator it = this->sceneFeedbackSFTexts.begin(); it != this->sceneFeedbackSFTexts.end(); it++)
+				{
+					if (*it == NULL)
+						continue;
+
+					if ((*(*it)).m_visible)
+					{
+						if ((v == 0 && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == true))
+							continue;
+
+						if ((v == 1 && (*(*it)).m_alliance != Alliance2 && USE_SPLIT_SCREEN == true))
+							continue;
+
+						mainScreen.draw(*(*it));
+					}
 				}
 			}
 			else if (i == FakeGridLayer)

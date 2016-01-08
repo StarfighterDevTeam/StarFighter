@@ -28,11 +28,8 @@ void Module::Initialize()
 	m_isCondensatingFluxor = false;
 
 	//Flux display
-	m_flux_text.setFont(*(*CurrentGame).font2);
-	m_flux_text.setCharacterSize(20);
-	m_flux_text.setColor(sf::Color::Green);
-	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
-	(*CurrentGame).addToFeedbacks(&m_flux_text);
+	m_flux_text = SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
@@ -291,7 +288,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 	bool construction_allowed = true;
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
-		construction_allowed = (*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_team == team;
+		construction_allowed = (*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_team == team || (*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_under_construction;
 		if (construction_allowed)
 		{
 			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_visible = false;
@@ -314,6 +311,9 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 		for (int i = 0; i < 4; i++)
 		{
 			new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2));
+			new_module->m_arrow[i]->m_team = new_module->m_team;
+			new_module->m_arrow[i]->m_alliance = new_module->m_alliance;
+			new_module->m_arrow[i]->m_under_construction = new_module->m_under_construction;
 		}
 
 		(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
@@ -322,6 +322,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 		{
 			(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
 		}
+		(*CurrentGame).addToFeedbacks(&new_module->m_flux_text);
 
 		//overload parameters
 		if (construction_finished)
@@ -489,16 +490,19 @@ void Module::update(sf::Time deltaTime)
 	setAnimationLine(m_under_construction);
 	
 	//hud
-	ostringstream ss;
-	ss << m_flux;
-	if (m_flux_max > 0)
+	if (m_flux_text.m_visible)
 	{
-		ss << "/" << m_flux_max;
-	}
-	m_flux_text.setString(ss.str());
+		ostringstream ss;
+		ss << m_flux;
+		if (m_flux_max > 0)
+		{
+			ss << "/" << m_flux_max;
+		}
+		m_flux_text.setString(ss.str());
 
-	ss << m_flux << "/" << m_flux_max;
-	m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
+		ss << m_flux << "/" << m_flux_max;
+		m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
+	}
 }
 
 void Module::GetFluxor(GameObject* object)

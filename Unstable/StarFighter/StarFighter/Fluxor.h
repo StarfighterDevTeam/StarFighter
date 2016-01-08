@@ -69,7 +69,7 @@ public :
 	sf::Clock m_flux_transfer_clock;
 
 	//HUD
-	sf::Text m_flux_text;
+	SFText m_flux_text;
 };
 
 #endif // FLUXOR_H_INCLUDED

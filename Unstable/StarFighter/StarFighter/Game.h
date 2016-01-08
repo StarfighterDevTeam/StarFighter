@@ -36,14 +36,14 @@ enum ModuleType
 	ModuleType_Generator,
 	ModuleType_Accelerator,
 	ModuleType_Relay,
-	ModuleType_Battery,
+	ModuleType_Condensator,
 	ModuleType_Amplifier,
 	ModuleType_Factory,
 	ModuleType_Factory_Up,
 	ModuleType_Turret,
 	ModuleType_Barrier,
-	ModuleType_Condensator,
 	ModuleType_Armory,
+	ModuleType_Battery,
 	ModuleType_Shield,
 	NBVAL_ModuleType,
 };
@@ -63,8 +63,10 @@ public:
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(Text* text);
+	void addToFeedbacks(SFText* text);
 	void removeFromFeedbacks(RectangleShape* feedback);
 	void removeFromFeedbacks(Text* text);
+	void removeFromFeedbacks(SFText* text);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -123,6 +125,7 @@ private:
 	RenderWindow *window;
 	std::list<RectangleShape*> sceneFeedbackBars;
 	std::list<Text*> sceneFeedbackTexts;
+	std::list<SFText*> sceneFeedbackSFTexts;
 	std::vector<GameObject*> sceneGameObjects;
 	std::vector<GameObject*> sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> sceneGameObjectsTyped[NBVAL_GameObject];

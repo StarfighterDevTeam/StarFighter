@@ -31,10 +31,8 @@ void Fluxor::Initialize()
 	m_has_spawn_bounds = false;
 
 	//Flux display
-	m_flux_text.setFont(*(*CurrentGame).font2);
-	m_flux_text.setCharacterSize(20);
-	m_flux_text.setColor(sf::Color::White);
-	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+	m_flux_text = SFText(((*CurrentGame).font2), 20, sf::Color::White, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 }
 
 Fluxor::Fluxor()
@@ -275,18 +273,21 @@ void Fluxor::update(sf::Time deltaTime)
 	//hud
 	if (m_displaying_flux)
 	{
-		ostringstream ss;
-		ss << m_flux;
-		if (m_flux_max > 0)
-			ss << "/" << m_flux_max;
-		m_flux_text.setString(ss.str());
-		if (m_flux_attacker || m_fluxovore)
+		if (m_flux_text.m_visible)
 		{
-			m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text.getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
-		}
-		else
-		{
-			m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+			ostringstream ss;
+			ss << m_flux;
+			if (m_flux_max > 0)
+				ss << "/" << m_flux_max;
+			m_flux_text.setString(ss.str());
+			if (m_flux_attacker || m_fluxovore)
+			{
+				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text.getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+			}
+			else
+			{
+				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+			}
 		}
 	}
 }

@@ -73,6 +73,18 @@ enum GameObjectType {
 	NBVAL_GameObject
 };
 
+class SFText : public Text
+{
+public:
+	SFText() {};
+	SFText(sf::Font* font, int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
+	~SFText() {};
+	bool m_visible;
+	PlayerTeams m_team;
+	TeamAlliances m_alliance;
+};
+
+
 class GameObject : public AnimatedSprite
 {
 public:

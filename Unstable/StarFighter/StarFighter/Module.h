@@ -111,7 +111,7 @@ public :
 	bool IsMainLinkActivated();
 
 	//HUD
-	sf::Text m_flux_text;
+	SFText m_flux_text;
 };
 
 #endif // MODULE_H_INCLUDED
