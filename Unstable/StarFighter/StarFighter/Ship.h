@@ -59,6 +59,7 @@ public :
 	SFText* m_flux_text;
 	SFText* m_build_text;
 	PlayerConstructionFeedbacks m_build_text_status;
+	SFGauge* m_flux_gauge;
 
 	//construction
 	//void ResolveProductionBufferList() override;

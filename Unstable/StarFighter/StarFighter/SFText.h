@@ -29,8 +29,8 @@ class SFText : public Text
 {
 public:
 	SFText() {};
-	SFText(sf::Font* font, int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
-	~SFText() { printf("merdum"); };
+	SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
+	~SFText() {};
 	bool m_visible;
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
@@ -41,7 +41,7 @@ class SFRectangle : public sf::RectangleShape
 {
 public:
 	SFRectangle() {};
-	SFRectangle(sf::RectangleShape rectangle, PlayerTeams team);
+	SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team);
 	~SFRectangle() {};
 	bool m_visible;
 	PlayerTeams m_team;
@@ -49,17 +49,22 @@ public:
 	bool m_GarbageMe;
 };
 
-class SFGauge : public Text
+class SFGauge : public sf::RectangleShape
 {
 public:
 	SFGauge() {};
 	SFGauge(SFText text, SFRectangle rectangle);
 	~SFGauge() {};
+	bool m_visible;
+	void setVisible(bool visible);
+	void setVisible(bool text_visible, bool rectangle);
+
+	void setString(string& str);
+	void setPosition(sf::Vector2f position, sf::Vector2f offset);
+	bool m_GarbageMe;
+
 	SFText m_SFText;
 	SFRectangle m_SFRectangle;
-	bool m_visible;
-	void SetVisible(bool visible);
-	bool m_GarbageMe;
 };
 
 #endif // SFTEXT_H_INCLUDED

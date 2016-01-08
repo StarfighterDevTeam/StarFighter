@@ -63,6 +63,7 @@ public:
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(SFRectangle* feedback);
 	void addToFeedbacks(SFText* text);
+	void addToFeedbacks(SFGauge* gauge);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -119,16 +120,19 @@ private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddGameObjectToVector(SFRectangle* pRectangleShape, vector<SFRectangle*>* vector);
 	void AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector);
+	void AddGameObjectToVector(SFGauge* pSFGauge, vector<SFGauge*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 	RenderWindow *window;
 	std::vector<SFRectangle*> sceneFeedbackBars;
 	std::vector<SFText*> sceneFeedbackSFTexts;
+	std::vector<SFGauge*> sceneFeedbackSFGauge;
 	std::vector<GameObject*> sceneGameObjects;
 	std::vector<GameObject*> sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> sceneGameObjectsTyped[NBVAL_GameObject];
 	std::vector<GameObject*> garbage;
 	std::vector<SFText*> garbageTexts;
 	std::vector<SFRectangle*> garbageRectangleShapes;
+	std::vector<SFGauge*> garbageGauges;
 };
 
 #endif // GAME_H_INCLUDED

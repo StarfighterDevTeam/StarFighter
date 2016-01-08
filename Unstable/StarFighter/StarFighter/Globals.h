@@ -43,6 +43,26 @@
 #define USE_UNGUIDED_FLUXORS_COST_MULTIPLIER		0.1f
 #define USE_SPLIT_SCREEN							true
 
+//HUD
+#define FLUX_GAUGE_HEIGHT							10
+#define FLUX_GAUGE_WIDTH							150
+
+#define FLUX_GAUGE_COLOR_R							150
+#define FLUX_GAUGE_COLOR_G							150
+#define FLUX_GAUGE_COLOR_B							255
+#define FLUX_GAUGE_COLOR_A							150
+#define FLUX_GAUGE_THICNKESS						2
+#define FLUX_GAUGE_OUTLINE_COLOR_A					255
+
+#define BUILD_GAUGE_HEIGHT							10
+#define BUILD_GAUGE_WIDTH							150
+#define BUILD_GAUGE_COLOR_R							150
+#define BUILD_GAUGE_COLOR_G							255
+#define BUILD_GAUGE_COLOR_B							150
+#define BUILD_GAUGE_COLOR_A							150
+#define FLUX_GAUGE_THICNKESS						2
+#define BUILD_GAUGE_OUTLINE_COLOR_A					255
+
 //PLAYER
 #define SHIP_MAX_FLUX								100
 #define PLAYER_FLUX_DISPLAY_OFFSET_Y				4

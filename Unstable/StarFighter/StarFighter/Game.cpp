@@ -146,6 +146,12 @@ void Game::addToFeedbacks(SFText* text)
 		AddGameObjectToVector(text, &this->sceneFeedbackSFTexts);
 }
 
+void Game::addToFeedbacks(SFGauge* gauge)
+{
+	if (gauge)
+		AddGameObjectToVector(gauge, &this->sceneFeedbackSFGauge);
+}
+
 void Game::updateScene(Time deltaTime)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
@@ -518,6 +524,24 @@ void Game::cleanGarbage()
 		delete pRectangle;
 	}
 
+	const size_t garbagegaugeSize = this->garbageGauges.size();
+	for (size_t i = 0; i < garbagegaugeSize; i++)
+	{
+		SFGauge*    pGauge = this->garbageGauges[i];
+
+		const size_t VectorGaugeSize = this->sceneFeedbackSFGauge.size();
+		for (size_t j = 0; j < VectorGaugeSize; j++)
+		{
+			if (this->sceneFeedbackSFGauge[j] == pGauge)
+			{
+				this->sceneFeedbackSFGauge[j] = NULL;
+				break;
+			}
+		}
+
+		delete pGauge;
+	}
+
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -567,6 +591,22 @@ void Game::AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector)
 
 	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
 	vector->push_back(pSFText);
+}
+
+void Game::AddGameObjectToVector(SFGauge* pSFGauge, vector<SFGauge*>* vector)
+{
+	const size_t vectorSize = vector->size();
+	for (size_t i = 0; i < vectorSize; i++)
+	{
+		if ((*vector)[i] == NULL)
+		{
+			(*vector)[i] = pSFGauge;
+			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
+		}
+	}
+
+	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
+	vector->push_back(pSFGauge);
 }
 
 void Game::collectGarbage()
@@ -633,6 +673,18 @@ void Game::collectGarbage()
 		if ((**it).m_GarbageMe)
 		{
 			this->garbageRectangleShapes.push_back(*it);
+			continue;
+		}
+	}
+	for (std::vector<SFGauge*>::iterator it = (this->sceneFeedbackSFGauge).begin(); it != (this->sceneFeedbackSFGauge).end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		//Content flagged for deletion
+		if ((**it).m_GarbageMe)
+		{
+			this->garbageGauges.push_back(*it);
 			continue;
 		}
 	}
