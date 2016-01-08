@@ -1,21 +1,5 @@
 #include "GameObject.h"
 
-
-
-
-SFText::SFText(sf::Font* font, int size, sf::Color color, sf::Vector2f position, PlayerTeams team)
-{
-	setFont(*font);
-	setCharacterSize(size);
-	setColor(color);
-	setPosition(position);
-
-	m_visible = true;
-	m_team = team;
-
-	m_alliance = AllianceNeutral;
-}
-
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
