@@ -61,12 +61,8 @@ public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
-	void addToFeedbacks(RectangleShape* feedback);
-	void addToFeedbacks(Text* text);
+	void addToFeedbacks(SFRectangle* feedback);
 	void addToFeedbacks(SFText* text);
-	void removeFromFeedbacks(RectangleShape* feedback);
-	void removeFromFeedbacks(Text* text);
-	void removeFromFeedbacks(SFText* text);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -121,15 +117,18 @@ public:
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
+	void AddGameObjectToVector(SFRectangle* pRectangleShape, vector<SFRectangle*>* vector);
+	void AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 	RenderWindow *window;
-	std::list<RectangleShape*> sceneFeedbackBars;
-	std::list<Text*> sceneFeedbackTexts;
-	std::list<SFText*> sceneFeedbackSFTexts;
+	std::vector<SFRectangle*> sceneFeedbackBars;
+	std::vector<SFText*> sceneFeedbackSFTexts;
 	std::vector<GameObject*> sceneGameObjects;
 	std::vector<GameObject*> sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> sceneGameObjectsTyped[NBVAL_GameObject];
 	std::vector<GameObject*> garbage;
+	std::vector<SFText*> garbageTexts;
+	std::vector<SFRectangle*> garbageRectangleShapes;
 };
 
 #endif // GAME_H_INCLUDED

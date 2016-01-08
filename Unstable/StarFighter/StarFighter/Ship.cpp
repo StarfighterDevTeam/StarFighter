@@ -27,18 +27,18 @@ void Ship::Init()
 	m_upgrade_level = 0;
 
 	//Flux display
-	m_flux_text = SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
-	m_flux_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	m_flux_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		(*CurrentGame).addToFeedbacks(&m_flux_text);
+		(*CurrentGame).addToFeedbacks(m_flux_text);
 	}
 
 	//Build feedback
-	m_build_text = SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
-	m_build_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
-	(*CurrentGame).addToFeedbacks(&m_build_text);
+	m_build_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
+	m_build_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	(*CurrentGame).addToFeedbacks(m_build_text);
 
 	m_build_text_status = Player_NotOverConstruction;
 
@@ -57,9 +57,11 @@ Ship::~Ship()
 {
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+		if (m_flux_text)
+			m_flux_text->m_GarbageMe = true;
 	}
-	(*CurrentGame).removeFromFeedbacks(&m_build_text);
+	if (m_build_text)
+		m_build_text->m_GarbageMe = true;
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -150,29 +152,35 @@ void Ship::update(sf::Time deltaTime)
 	//hud
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		ostringstream ss;
-		ss << m_flux << "/" << m_flux_max;
-		m_flux_text.setString(ss.str());
-		m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
+		if (m_flux_text)
+		{
+			ostringstream ss;
+			ss << m_flux << "/" << m_flux_max;
+			m_flux_text->setString(ss.str());
+			m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
+		}
 	}
 	
-	m_build_text.setPosition(sf::Vector2f(getPosition().x - m_build_text.getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_build_text.getGlobalBounds().height*1.5));
-	if (m_build_text_status == Player_OverConstruction)
+	if (m_build_text)
 	{
-		m_build_text.setString("Hold 'Build'");
-	}
-	else if (m_build_text_status == Player_ConstructionInProgress)
-	{
-		m_build_text.setString("Building...");
-	}
-	else if (m_build_text_status == Player_NoRessourcesToBuild)
-	{
-		m_build_text.setString("No ressources");
-	}
-	
-	m_build_text.m_visible = m_build_text_status != Player_NotOverConstruction;
+		m_build_text->setPosition(sf::Vector2f(getPosition().x - m_build_text->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_build_text->getGlobalBounds().height*1.5));
+		if (m_build_text_status == Player_OverConstruction)
+		{
+			m_build_text->setString("Hold 'Build'");
+		}
+		else if (m_build_text_status == Player_ConstructionInProgress)
+		{
+			m_build_text->setString("Building...");
+		}
+		else if (m_build_text_status == Player_NoRessourcesToBuild)
+		{
+			m_build_text->setString("No ressources");
+		}
 
-	m_build_text_status = Player_NotOverConstruction;
+		m_build_text->m_visible = m_build_text_status != Player_NotOverConstruction;
+
+		m_build_text_status = Player_NotOverConstruction;
+	}
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());

@@ -134,34 +134,16 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 	}
 }
 
-void Game::addToFeedbacks(RectangleShape* feedback)
+void Game::addToFeedbacks(SFRectangle* feedback)
 {
-	sceneFeedbackBars.push_back(feedback);
+	if (feedback)
+		AddGameObjectToVector(feedback, &this->sceneFeedbackBars);
 }
 
 void Game::addToFeedbacks(SFText* text)
 {
-	sceneFeedbackSFTexts.push_back(text);
-}
-
-void Game::addToFeedbacks(Text* text)
-{
-	sceneFeedbackTexts.push_back(text);
-}
-
-void Game::removeFromFeedbacks(RectangleShape* feedback)
-{
-	sceneFeedbackBars.remove(feedback);
-}
-
-void Game::removeFromFeedbacks(Text* text)
-{
-	sceneFeedbackTexts.remove(text);
-}
-
-void Game::removeFromFeedbacks(SFText* text)
-{
-	sceneFeedbackSFTexts.remove(text);
+	if (text)
+		AddGameObjectToVector(text, &this->sceneFeedbackSFTexts);
 }
 
 void Game::updateScene(Time deltaTime)
@@ -248,21 +230,23 @@ void Game::drawScene()
 		{
 			if (i == FeedbacksLayer)
 			{
-				for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
+				for (std::vector<SFRectangle*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
 				{
 					if (*it == NULL)
 						continue;
 
-					mainScreen.draw(*(*it));
-				}
-				for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
-				{
-					if (*it == NULL)
-						continue;
+					if ((*(*it)).m_visible)
+					{
+						if ((v == 0 && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == true))
+							continue;
 
-					mainScreen.draw(*(*it));
+						if ((v == 1 && (*(*it)).m_alliance != Alliance2 && USE_SPLIT_SCREEN == true))
+							continue;
+
+						mainScreen.draw(*(*it));
+					}
 				}
-				for (std::list<SFText*>::iterator it = this->sceneFeedbackSFTexts.begin(); it != this->sceneFeedbackSFTexts.end(); it++)
+				for (std::vector<SFText*>::iterator it = this->sceneFeedbackSFTexts.begin(); it != this->sceneFeedbackSFTexts.end(); it++)
 				{
 					if (*it == NULL)
 						continue;
@@ -497,6 +481,43 @@ void Game::cleanGarbage()
 		delete pCurGameObject;
 	}
 
+	//Now deleting texts and feedbacks
+	const size_t garbageTextsSize = this->garbageTexts.size();
+	for (size_t i = 0; i < garbageTextsSize; i++)
+	{
+		SFText*    pSFText = this->garbageTexts[i];
+
+		const size_t VectorTextsSize = this->sceneFeedbackSFTexts.size();
+		for (size_t j = 0; j < VectorTextsSize; j++)
+		{
+			if (this->sceneFeedbackSFTexts[j] == pSFText)
+			{
+				this->sceneFeedbackSFTexts[j] = NULL;
+				break;
+			}
+		}
+
+		delete pSFText;
+	}
+
+	const size_t garbageRectangleSize = this->garbageRectangleShapes.size();
+	for (size_t i = 0; i < garbageRectangleSize; i++)
+	{
+		RectangleShape*    pRectangle = this->garbageRectangleShapes[i];
+
+		const size_t VectorRectanglesSize = this->sceneFeedbackBars.size();
+		for (size_t j = 0; j < VectorRectanglesSize; j++)
+		{
+			if (this->sceneFeedbackBars[j] == pRectangle)
+			{
+				this->sceneFeedbackBars[j] = NULL;
+				break;
+			}
+		}
+
+		delete pRectangle;
+	}
+
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -516,12 +537,46 @@ void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* v
 	vector->push_back(pGameObject);
 }
 
+void Game::AddGameObjectToVector(SFRectangle* pRectangleShape, vector<SFRectangle*>* vector)
+{
+	const size_t vectorSize = vector->size();
+	for (size_t i = 0; i < vectorSize; i++)
+	{
+		if ((*vector)[i] == NULL)
+		{
+			(*vector)[i] = pRectangleShape;
+			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
+		}
+	}
+
+	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
+	vector->push_back(pRectangleShape);
+}
+
+void Game::AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector)
+{
+	const size_t vectorSize = vector->size();
+	for (size_t i = 0; i < vectorSize; i++)
+	{
+		if ((*vector)[i] == NULL)
+		{
+			(*vector)[i] = pSFText;
+			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
+		}
+	}
+
+	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
+	vector->push_back(pSFText);
+}
+
 void Game::collectGarbage()
 {
 	sf::Clock dt;
 	dt.restart();
 
 	this->garbage.clear();
+	this->garbageTexts.clear();
+	this->garbageRectangleShapes.clear();
 
 	for (std::vector<GameObject*>::iterator it = (this->sceneGameObjects).begin(); it != (this->sceneGameObjects).end(); it++)
 	{
@@ -553,6 +608,32 @@ void Game::collectGarbage()
 				this->garbage.push_back(*it);
 				continue;
 			}
+		}
+	}
+
+	//Texts and feedbacks
+	for (std::vector<SFText*>::iterator it = (this->sceneFeedbackSFTexts).begin(); it != (this->sceneFeedbackSFTexts).end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		//Content flagged for deletion
+		if ((**it).m_GarbageMe)
+		{
+			this->garbageTexts.push_back(*it);
+			continue;
+		}
+	}
+	for (std::vector<SFRectangle*>::iterator it = (this->sceneFeedbackBars).begin(); it != (this->sceneFeedbackBars).end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		//Content flagged for deletion
+		if ((**it).m_GarbageMe)
+		{
+			this->garbageRectangleShapes.push_back(*it);
+			continue;
 		}
 	}
 

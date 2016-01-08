@@ -28,8 +28,8 @@ void Module::Initialize()
 	m_isCondensatingFluxor = false;
 
 	//Flux display
-	m_flux_text = SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
-	m_flux_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
@@ -322,7 +322,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 		{
 			(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
 		}
-		(*CurrentGame).addToFeedbacks(&new_module->m_flux_text);
+		(*CurrentGame).addToFeedbacks(new_module->m_flux_text);
 
 		//overload parameters
 		if (construction_finished)
@@ -385,7 +385,9 @@ void Module::DebugRefillingModuleFlux(sf::Vector2u grid_index)
 
 Module::~Module()
 {
-	(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+	if (m_flux_text)
+		m_flux_text->m_GarbageMe = true;
+
 	if (m_glow)
 	{
 		m_glow->m_visible = false;
@@ -423,7 +425,8 @@ void Module::FinishConstruction()
 		setColor(sf::Color(255, 255, 255, 255));
 	}
 
-	m_flux_text.setColor(sf::Color::Cyan);
+	if (m_flux_text)
+		m_flux_text->setColor(sf::Color::Cyan);
 
 	m_under_construction = false;
 	m_flux = 0;
@@ -490,7 +493,7 @@ void Module::update(sf::Time deltaTime)
 	setAnimationLine(m_under_construction);
 	
 	//hud
-	if (m_flux_text.m_visible)
+	if (m_flux_text && m_flux_text->m_visible)
 	{
 		ostringstream ss;
 		ss << m_flux;
@@ -498,10 +501,10 @@ void Module::update(sf::Time deltaTime)
 		{
 			ss << "/" << m_flux_max;
 		}
-		m_flux_text.setString(ss.str());
+		m_flux_text->setString(ss.str());
 
 		ss << m_flux << "/" << m_flux_max;
-		m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
+		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
 	}
 }
 
@@ -591,7 +594,7 @@ bool Module::GenerateFluxor()
 					//flux display
 					if (fluxor->m_displaying_flux)
 					{
-						(*CurrentGame).addToFeedbacks(&fluxor->m_flux_text);
+						(*CurrentGame).addToFeedbacks(fluxor->m_flux_text);
 					}
 
 					m_fluxor_spawn_clock.restart();
@@ -918,7 +921,7 @@ void Module::ResolveProductionBufferList()
 			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, type);
 			if (m_fluxor_generation_buffer[i]->m_displaying_flux)
 			{
-				(*CurrentGame).addToFeedbacks(&m_fluxor_generation_buffer[i]->m_flux_text);
+				(*CurrentGame).addToFeedbacks(m_fluxor_generation_buffer[i]->m_flux_text);
 			}
 		}
 

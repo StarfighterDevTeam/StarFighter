@@ -31,8 +31,8 @@ void Fluxor::Initialize()
 	m_has_spawn_bounds = false;
 
 	//Flux display
-	m_flux_text = SFText(((*CurrentGame).font2), 20, sf::Color::White, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y), m_team);
-	m_flux_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::White, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 }
 
 Fluxor::Fluxor()
@@ -151,21 +151,24 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	}
 
 	//Generic parameters
-	if (m_consummable_by_players)
+	if (m_flux_text)
 	{
-		m_flux_text.setColor(sf::Color::Green);
-	}
-	else if (m_consummable_by_modules)
-	{
-		m_flux_text.setColor(sf::Color::Cyan);
-	}
-	else if (m_flux_attacker)
-	{
-		m_flux_text.setColor(sf::Color::Red);
-	}
-	else if (m_fluxovore)
-	{
-		m_flux_text.setColor(sf::Color::Black);
+		if (m_consummable_by_players)
+		{
+			m_flux_text->setColor(sf::Color::Green);
+		}
+		else if (m_consummable_by_modules)
+		{
+			m_flux_text->setColor(sf::Color::Cyan);
+		}
+		else if (m_flux_attacker)
+		{
+			m_flux_text->setColor(sf::Color::Red);
+		}
+		else if (m_fluxovore)
+		{
+			m_flux_text->setColor(sf::Color::Black);
+		}
 	}
 }
 
@@ -195,7 +198,7 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType, bool within_bounds, sf::Floa
 	(*CurrentGame).addToScene(new_fluxor, FluxorLayer, type);
 	if (new_fluxor->m_displaying_flux)
 	{
-		(*CurrentGame).addToFeedbacks(&new_fluxor->m_flux_text);
+		(*CurrentGame).addToFeedbacks(new_fluxor->m_flux_text);
 	}
 
 	return new_fluxor;
@@ -204,7 +207,11 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType, bool within_bounds, sf::Floa
 Fluxor::~Fluxor()
 {
 	if (m_displaying_flux)
-		(*CurrentGame).removeFromFeedbacks(&m_flux_text);
+	{
+		if (m_flux_text)
+			m_flux_text->m_GarbageMe = true;
+	}
+		
 }
 
 Fluxor* Fluxor::Clone()
@@ -273,20 +280,20 @@ void Fluxor::update(sf::Time deltaTime)
 	//hud
 	if (m_displaying_flux)
 	{
-		if (m_flux_text.m_visible)
+		if (m_flux_text && m_flux_text->m_visible)
 		{
 			ostringstream ss;
 			ss << m_flux;
 			if (m_flux_max > 0)
 				ss << "/" << m_flux_max;
-			m_flux_text.setString(ss.str());
+			m_flux_text->setString(ss.str());
 			if (m_flux_attacker || m_fluxovore)
 			{
-				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text.getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+				m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text->getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
 			}
 			else
 			{
-				m_flux_text.setPosition(sf::Vector2f(getPosition().x - m_flux_text.getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+				m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
 			}
 		}
 	}
@@ -508,5 +515,6 @@ void Fluxor::BringStealerBack()
 	m_displaying_flux = true;
 	m_consummable_by_modules = true;
 	m_can_be_refilled_by_modules = false;
-	m_flux_text.setColor(sf::Color::Cyan);
+	if (m_flux_text)
+		m_flux_text->setColor(sf::Color::Cyan);
 }

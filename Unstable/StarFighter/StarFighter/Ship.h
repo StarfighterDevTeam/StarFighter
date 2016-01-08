@@ -56,8 +56,8 @@ public :
 	void UpdatePlayerStats();
 
 	//HUD
-	SFText m_flux_text;
-	SFText m_build_text;
+	SFText* m_flux_text;
+	SFText* m_build_text;
 	PlayerConstructionFeedbacks m_build_text_status;
 
 	//construction
