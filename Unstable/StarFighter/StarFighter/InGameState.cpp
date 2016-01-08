@@ -113,7 +113,7 @@ void InGameState::Initialize(Player player)
 	
 	//HACK PROTO
 	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true);
-	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true);
+	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true);
 	//Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue2, true);
 	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed2, true);
 	//
@@ -133,12 +133,12 @@ void InGameState::Initialize(Player player)
 	//Spawning Fluxors
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		//main central zone
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
+		//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+		////main central zone
+		//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
 	}
 }
 

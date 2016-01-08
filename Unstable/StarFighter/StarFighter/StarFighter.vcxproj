@@ -102,6 +102,7 @@
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
+    <ClCompile Include="SFText.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SFText.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="Stroboscopic.h" />

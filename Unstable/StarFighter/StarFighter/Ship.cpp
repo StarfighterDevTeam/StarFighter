@@ -27,21 +27,19 @@ void Ship::Init()
 	m_upgrade_level = 0;
 
 	//Flux display
-	m_flux_text.setFont(*(*CurrentGame).font2);
-	m_flux_text.setCharacterSize(20);
-	m_flux_text.setColor(sf::Color::Green);
-	m_flux_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
+	m_flux_text = SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{
 		(*CurrentGame).addToFeedbacks(&m_flux_text);
 	}
 
 	//Build feedback
-	m_build_text.setFont(*(*CurrentGame).font2);
-	m_build_text.setCharacterSize(20);
-	m_build_text.setColor(sf::Color::Green);
-	m_build_text.setPosition(sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2));
+	m_build_text = SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
+	m_build_text.m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 	(*CurrentGame).addToFeedbacks(&m_build_text);
+
 	m_build_text_status = Player_NotOverConstruction;
 
 	//inputs

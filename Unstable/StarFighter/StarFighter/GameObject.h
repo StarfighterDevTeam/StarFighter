@@ -9,6 +9,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Globals.h"
+#include "SFText.h"
 
 using namespace std;
 using namespace sf;
@@ -16,24 +17,6 @@ using namespace sf;
 class Equipment;
 class Weapon;
 class Loot;
-
-enum PlayerTeams
-{
-	PlayerBlue,
-	PlayerRed,
-	PlayerBlue2,
-	PlayerRed2,
-	PlayerNeutral,
-	NBVAL_PlayerTeams,
-};
-
-enum TeamAlliances
-{
-	Alliance1,
-	Alliance2,
-	AllianceNeutral,
-	NBVAL_TeamAlliances,
-};
 
 enum LayerType {
 	BackgroundLayer,
