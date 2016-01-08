@@ -53,13 +53,8 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 		}
 	}
 
-	if (!keep_frame_index)
-	{
-		this->m_currentFrame = 0;
-	}
-
 	this->currentAnimation = anim;
-	this->play(*currentAnimation);
+	this->play(*currentAnimation, keep_frame_index);
 	this->m_currentAnimationIndex = animation;
 }
 

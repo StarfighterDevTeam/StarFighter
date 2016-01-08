@@ -41,10 +41,10 @@ public:
 	explicit AnimatedSprite(sf::Time frameTime = sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES), bool paused = false, bool looped = true);
 
 	void update(sf::Time deltaTime);
-	void setAnimation(const Animation& animation);
+	void setAnimation(const Animation& animation, bool keep_frame_index = false);
 	void setFrameTime(sf::Time time);
 	void play();
-	void play(const Animation& animation);
+	void play(const Animation& animation, bool keep_frame_index = false);
 	void pause();
 	void stop();
 	void setLooped(bool looped);
