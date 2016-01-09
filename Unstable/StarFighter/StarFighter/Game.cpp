@@ -20,6 +20,12 @@ void Game::init(RenderWindow* window)
 	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
 	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
 
+	//HUD
+	m_module_HUD = new GameObject(sf::Vector2f(screen_size.x + 128 / 2, screen_size.y / 2), sf::Vector2f(0, 0), "Assets/2D/Modules_HUD.png", sf::Vector2f(128, 1280));
+	m_module_HUD->setColor(sf::Color(255, 255, 255, 200));
+	this->hudScreen.create(m_module_HUD->m_size.x, REF_WINDOW_RESOLUTION_Y, false);
+	this->hudScreen.setSmooth(true);
+
 	//split screens
 	if (USE_SPLIT_SCREEN == true)
 	{
@@ -157,7 +163,8 @@ void Game::updateScene(Time deltaTime)
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
 
 	//TODO: Updating screen resolution
-	scale_factor.x = 1.0f * screen_size.x / REF_WINDOW_RESOLUTION_X;
+	float HUD_size = m_module_HUD->m_size.x * screen_size.x / REF_WINDOW_RESOLUTION_X;
+	scale_factor.x = 1.0f * (screen_size.x - HUD_size) / REF_WINDOW_RESOLUTION_X;
 	scale_factor.y = 1.0f * screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
 	//Clean garbage
@@ -199,6 +206,28 @@ void Game::ResolveProductionBufferList()
 			continue;
 
 		this->sceneGameObjectsTyped[ModuleObject][i]->ResolveProductionBufferList();
+	}
+}
+
+void Game::drawHud()
+{
+	//this->hudScreen.clear();
+
+	if (m_module_HUD)
+	{
+		//adjusting size and position of the HUD according to screen resolution
+		float resize = 1.f * screen_size.y / m_module_HUD->m_size.y / scale_factor.y;
+		m_module_HUD->setScale(resize, resize);
+		m_module_HUD->setPosition(sf::Vector2f(m_module_HUD->m_size.x / 2 * scale_factor.x, screen_size.y / scale_factor.y / 2));
+		view.setSize(sf::Vector2f(m_module_HUD->m_size));
+		
+		hudScreen.draw(*m_module_HUD);
+
+		hudScreen.display();
+		sf::Sprite temp(hudScreen.getTexture());
+		temp.scale(scale_factor.x, scale_factor.y);
+		temp.setPosition(0, 0);
+		this->window->draw(temp);
 	}
 }
 
@@ -291,18 +320,6 @@ void Game::drawScene()
 				{
 					if (*it == NULL)
 						continue;
-
-					//if ((*(*it)).m_under_construction && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == false)
-					//	continue;
-					//
-					//if ((*(*it)).m_under_construction && USE_SPLIT_SCREEN == true)
-					//{
-					//	if (v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral))
-					//		continue;
-					//
-					//	if (v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral))
-					//		continue;
-					//}
 					
 					if ((*(*it)).m_visible)
 					{
@@ -318,6 +335,15 @@ void Game::drawScene()
 	temp.scale(scale_factor.x, scale_factor.y);
 	temp.setPosition(sf::Vector2f(0, 0));
 	this->window->draw(temp);
+
+	//HUD display
+	this->hudScreen.clear();
+	this->hudScreen.draw((*m_module_HUD));
+	this->hudScreen.display();
+	sf::Sprite tempHUD(this->hudScreen.getTexture());
+	tempHUD.scale(scale_factor.x, scale_factor.y);
+	tempHUD.setPosition(sf::Vector2f(screen_size.x, 0));
+	this->window->draw(tempHUD);
 }
 
 void Game::colisionChecksV2()
