@@ -43,6 +43,11 @@
 #define USE_SPLIT_SCREEN							true
 
 //HUD
+#define TEXT_POP_DISTANCE_NOT_FADED					10
+#define TEXT_POP_DISTANCE_FADE_OUT					60
+#define TEXT_POP_TOTAL_TIME							1.0f
+#define TEXT_POP_OFFSET_Y							8
+
 #define FLUX_GAUGE_HEIGHT							10
 #define FLUX_GAUGE_WIDTH							150
 

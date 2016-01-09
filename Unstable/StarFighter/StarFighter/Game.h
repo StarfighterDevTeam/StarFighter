@@ -67,10 +67,13 @@ public:
 
 	void updateScene(Time deltaTime);
 	void drawScene();
+	void drawHud();
+	void Draw(sf::RenderTexture& offscreen);
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
 	sf::RenderTexture mainScreen;
+	sf::RenderTexture hudScreen;
 	sf::Vector2i screen_size;
 	float hyperspeedMultiplier;
 	float vspeed;
@@ -112,6 +115,7 @@ public:
 	Module* m_modules[NBVAL_ModuleType];
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	GameObject* m_team_markers[NBVAL_PlayerTeams];
+	GameObject* m_module_HUD;
 
 	bool isCellFree(sf::Vector2f position);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);

@@ -30,10 +30,8 @@ enum LayerType {
 	ExplosionLayer,
 	EnemyObjectLayer,
 	AuraLayer,
-	FeedbacksLayer,
-	FriendlyFireLayer,
 	PlayerShipLayer,
-	EnemyFireLayer,
+	FeedbacksLayer,
 
 	PanelLayer,
 	HudObject,
@@ -137,6 +135,22 @@ protected:
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1, int animationNumber = 1);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels);
 	
+};
+
+class SFTextPop : public SFText
+{
+public:
+	SFTextPop() {};
+	SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target);
+	~SFTextPop() {};
+	void update(Time deltaTime) override;
+
+	float m_distance_not_faded;
+	float m_distance_faded;
+	float m_total_pop_time;
+	sf::Clock m_timer_clock;
+	Uint8 m_alpha;
+	GameObject* m_target;
 };
 
 #endif // GameObject_H_INCLUDED

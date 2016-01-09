@@ -13,7 +13,7 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	Uint8 m_alpha;
-	sf::Time m_decade_time;
+	sf::Time m_decay_time;
 };
 
 #endif // STROBOSCOPIC_H_INCLUDED
