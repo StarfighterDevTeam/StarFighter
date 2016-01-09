@@ -29,11 +29,9 @@ void Ship::Init()
 	//Flux display
 	m_flux_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
-	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
-	{
-		(*CurrentGame).addToFeedbacks(m_flux_text);
-	}
-
+	
+	(*CurrentGame).addToFeedbacks(m_flux_text);
+	
 	// Build gauge
 	//sf::Color fill_color = sf::Color(BUILD_GAUGE_COLOR_R, BUILD_GAUGE_COLOR_G, BUILD_GAUGE_COLOR_B, BUILD_GAUGE_COLOR_A);
 	//sf::Color outline_color = sf::Color(BUILD_GAUGE_COLOR_R, BUILD_GAUGE_COLOR_G, BUILD_GAUGE_COLOR_B, BUILD_GAUGE_OUTLINE_COLOR_A);
@@ -41,8 +39,6 @@ void Ship::Init()
 	//SFText text = SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
 	//m_flux_gauge = new SFGauge(text, rect);
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
-
-	
 
 	//Build feedback
 	m_build_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
@@ -67,11 +63,9 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
-	{
-		if (m_flux_text)
-			m_flux_text->m_GarbageMe = true;
-	}
+	if (m_flux_text)
+		m_flux_text->m_GarbageMe = true;
+	
 	if (m_build_text)
 		m_build_text->m_GarbageMe = true;
 }
@@ -160,24 +154,21 @@ void Ship::update(sf::Time deltaTime)
 	ScreenBorderContraints();	
 
 	//hud
-	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
+	if (m_flux_text)
 	{
-		if (m_flux_text)
-		{
-			ostringstream ss;
-			ss << m_flux << "/" << m_flux_max;
-			m_flux_text->setString(ss.str());
-			m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
-		}
+		ostringstream ss;
+		ss << m_flux << "/" << m_flux_max;
+		m_flux_text->setString(ss.str());
+		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
+	}
 
-		//if (m_flux_gauge)
-		//{
-		//	ostringstream ss;
-		//	ss << m_flux << "/" << m_flux_max;
-		//	m_flux_gauge->setString(ss.str());
-		//	m_flux_gauge->setPosition(getPosition(), sf::Vector2f(-m_flux_gauge->getGlobalBounds().width / 2, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
-		//}
-	}		
+	//if (m_flux_gauge)
+	//{
+	//	ostringstream ss;
+	//	ss << m_flux << "/" << m_flux_max;
+	//	m_flux_gauge->setString(ss.str());
+	//	m_flux_gauge->setPosition(getPosition(), sf::Vector2f(-m_flux_gauge->getGlobalBounds().width / 2, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
+	//}
 	
 	if (m_build_text)
 	{
@@ -252,15 +243,12 @@ void Ship::update(sf::Time deltaTime)
 	if (InputGuy::isFinishModuleConstruction(m_controllerType))
 	{
 		Module::DebugFinishModule(m_curGridIndex);
-
-		if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
-		{
-			m_flux = 0;
-		}
+		m_flux = 0;
 	}
 	if (InputGuy::isRefillingFlux(m_controllerType))
 	{
-		Module::DebugRefillingModuleFlux(m_curGridIndex);
+		m_flux = m_flux_max;
+		//Module::DebugRefillingModuleFlux(m_curGridIndex);
 	}
 	
 	//Inputs release

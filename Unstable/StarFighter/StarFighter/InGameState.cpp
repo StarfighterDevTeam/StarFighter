@@ -144,35 +144,27 @@ void InGameState::Initialize(Player player)
 	}
 		
 	//Spawning Fluxors
-	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
-	{
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-		//main central zone
-		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
-	}
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+	//main central zone
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
 }
 
 void InGameState::Update(sf::Time deltaTime)
 {
 	//update Fluxors spawn zones
-	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
+	size_t FluxorSpawnZonesVectorSize = m_fluxor_spawn_zones.size();
+	for (size_t i = 0; i < FluxorSpawnZonesVectorSize; i++)
 	{
-		size_t FluxorSpawnZonesVectorSize = m_fluxor_spawn_zones.size();
-		for (size_t i = 0; i < FluxorSpawnZonesVectorSize; i++)
-		{
-			m_fluxor_spawn_zones[i].update(deltaTime);
-		}
+		m_fluxor_spawn_zones[i].update(deltaTime);
 	}
-
+	
 	(*CurrentGame).updateScene(deltaTime);
 
 	//move camera
 	UpdateCamera(deltaTime);
-
-	printf("size %d\n", (*CurrentGame).GetSceneGameObjectsTyped(ModuleObject).size());
 
 	this->mainWindow->clear();
 }
@@ -180,6 +172,7 @@ void InGameState::Update(sf::Time deltaTime)
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
+	//(*CurrentGame).drawHud();
 }
 
 void InGameState::Release()
