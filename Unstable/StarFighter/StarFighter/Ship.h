@@ -36,6 +36,7 @@ public :
 	ControlerType m_controllerType;
 	void SetControllerType(ControlerType contoller);
 	bool m_SwitchKey_released;
+	bool m_BuildKey_released;
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 	sf::Clock stroboscopic_effect_clock;
 
@@ -45,6 +46,7 @@ public :
 	unsigned int m_flux_autogeneration;
 	void GetFluxor(GameObject* object) override;
 	void GetModule(GameObject* object) override;
+	void TryBuildModule(int module_key);
 	sf::Vector2u m_curGridIndex;
 	float m_flux_transfer_time;
 	sf::Clock m_flux_transfer_limiter_clock;

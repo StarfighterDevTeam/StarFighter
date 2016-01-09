@@ -77,6 +77,12 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).m_fluxors[i] = new Fluxor((FluxorType)i);
 	}
 
+	//Modules data
+	for (int i = 0; i < NBVAL_ModuleType; i++)
+	{
+		(*CurrentGame).m_modules[i] = new Module((ModuleType)i);
+	}
+
 	//intégration placeholder
 	Ship* playerShip = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue, 3);
 	(*CurrentGame).playerShips[playerShip->m_team] = playerShip;

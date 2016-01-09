@@ -53,6 +53,7 @@ void Ship::Init()
 
 	//inputs
 	m_SwitchKey_released = false;
+	m_BuildKey_released = false;
 
 	//team and alliance
 	SetTeam(m_team, (*CurrentGame).GetTeamAlliance(m_team));
@@ -132,8 +133,6 @@ void Ship::FluxAutogeneration()
 
 void Ship::update(sf::Time deltaTime)
 {
-	m_SwitchKey_released = !InputGuy::isUsing(m_controllerType);
-
 	UpdatePlayerStats();
 
 	FluxAutogeneration();
@@ -204,45 +203,55 @@ void Ship::update(sf::Time deltaTime)
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 	
-	if (InputGuy::isSpawningModule1(m_controllerType))
+	if (InputGuy::isSpawningModule1(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 1 - 1), m_team);
+		TryBuildModule(1);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule2(m_controllerType))
+	if (InputGuy::isSpawningModule2(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 2 - 1), m_team);
+		TryBuildModule(2);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule3(m_controllerType))
+	if (InputGuy::isSpawningModule3(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 3 - 1), m_team);
+		TryBuildModule(3);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule4(m_controllerType))
+	if (InputGuy::isSpawningModule4(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 4 - 1), m_team);
+		TryBuildModule(3);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule5(m_controllerType))
+	if (InputGuy::isSpawningModule5(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 5 - 1), m_team);
+		TryBuildModule(4);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule6(m_controllerType))
+	if (InputGuy::isSpawningModule6(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 6 - 1), m_team);
+		TryBuildModule(5);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule7(m_controllerType))
+	if (InputGuy::isSpawningModule7(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 7 - 1), m_team);
+		TryBuildModule(6);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule8(m_controllerType))
+	if (InputGuy::isSpawningModule8(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 8 - 1), m_team);
+		TryBuildModule(7);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule9(m_controllerType))
+	if (InputGuy::isSpawningModule9(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 9 - 1), m_team);
+		TryBuildModule(8);
+		m_BuildKey_released = false;
 	}
-	if (InputGuy::isSpawningModule0(m_controllerType))
+	if (InputGuy::isSpawningModule0(m_controllerType) && m_BuildKey_released)
 	{
-		Module::CreateModule(m_curGridIndex, (ModuleType)(ModuleType_Generator + 10 - 1), m_team);
+		TryBuildModule(9);
+		m_BuildKey_released = false;
 	}
 
 	//DEBUG
@@ -264,6 +273,18 @@ void Ship::update(sf::Time deltaTime)
 		Module::DebugRefillingModuleFlux(m_curGridIndex);
 	}
 	
+	//Inputs release
+	m_SwitchKey_released = !InputGuy::isUsing(m_controllerType);
+	m_BuildKey_released = (!InputGuy::isSpawningModule1(m_controllerType)
+		&& !InputGuy::isSpawningModule2(m_controllerType)
+		&& !InputGuy::isSpawningModule3(m_controllerType)
+		&& !InputGuy::isSpawningModule4(m_controllerType)
+		&& !InputGuy::isSpawningModule5(m_controllerType)
+		&& !InputGuy::isSpawningModule6(m_controllerType)
+		&& !InputGuy::isSpawningModule7(m_controllerType)
+		&& !InputGuy::isSpawningModule8(m_controllerType)
+		&& !InputGuy::isSpawningModule9(m_controllerType)
+		&& !InputGuy::isSpawningModule0(m_controllerType));
 }
 
 void Ship::ScreenBorderContraints()
@@ -401,23 +422,11 @@ void Ship::GetModule(GameObject* object)
 				{
 					if (InputGuy::isFiring(m_controllerType))
 					{
-						m_build_text_status = (USE_UNGUIDED_FLUXORS_TO_BUILD == true && m_flux == 0) ? Player_NoRessourcesToBuild : Player_ConstructionInProgress;
-
-						unsigned int flux_max = module->m_under_construction ? module->m_flux_max_under_construction : module->m_flux_max;
-						if (module->m_flux < flux_max && m_flux_transfer_limiter_clock.getElapsedTime().asSeconds() > m_flux_transfer_time && (USE_UNGUIDED_FLUXORS_TO_BUILD == false || m_flux > 0))
-						{
-							if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
-							{
-								m_flux--;
-							}
-							module->m_flux++;
-							m_flux_transfer_limiter_clock.restart();
-						}
+						
 					}
 					else
 					{
-						m_build_text_status = Player_OverConstruction;
-						m_flux_transfer_limiter_clock.restart();
+						
 					}
 				}
 
@@ -470,4 +479,13 @@ void Ship::SetTeam(PlayerTeams team, TeamAlliances alliance)
 	//	m_flux_gauge->m_SFRectangle.m_team = team;
 	//	m_flux_gauge->m_SFRectangle.m_alliance = alliance;
 	//}
+}
+
+void Ship::TryBuildModule(int module_key)
+{
+	if (m_flux >= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction)
+	{
+		m_flux -= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction;
+		Module::CreateModule(m_curGridIndex, (ModuleType)(module_key - 1), m_team);
+	}
 }

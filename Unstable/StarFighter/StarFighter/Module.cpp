@@ -60,6 +60,11 @@ Module::Module(sf::Vector2f position, std::string textureName, sf::Vector2f size
 	Initialize();
 }
 
+Module::Module(ModuleType moduleType) : Module(moduleType, PlayerNeutral)
+{
+
+}
+
 Module::Module(ModuleType moduleType, PlayerTeams team)
 {
 	std::string textureName;
@@ -464,9 +469,17 @@ void Module::FinishConstruction()
 void Module::update(sf::Time deltaTime)
 {
 	//construction finished?
-	if (m_under_construction && m_flux == m_flux_max_under_construction)
+	if (m_under_construction)
 	{
-		FinishConstruction();
+		if (m_flux == m_flux_max_under_construction)
+		{
+			FinishConstruction();
+		}
+		else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / MODULE_FLUX_CONSTRUCTION_PER_SECOND))
+		{
+			m_flux++;
+			m_construction_clock.restart();
+		}
 	}
 	m_flux_max = m_under_construction ? m_flux_max_under_construction : m_flux_max_after_construction;
 

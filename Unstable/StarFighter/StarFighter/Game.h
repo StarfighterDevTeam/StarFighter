@@ -108,6 +108,7 @@ public:
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
 	Fluxor* m_fluxors[NBVAL_FluxorType];
+	Module* m_modules[NBVAL_ModuleType];
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	bool isCellFree(sf::Vector2f position);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
