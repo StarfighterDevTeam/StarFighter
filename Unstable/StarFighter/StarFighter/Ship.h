@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "Fluxor.h"
 #include "Module.h"
+#include "SFTextPop.h"
 
 enum PlayerConstructionFeedbacks
 {

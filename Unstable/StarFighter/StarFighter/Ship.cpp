@@ -383,7 +383,7 @@ void Ship::GetFluxor(GameObject* object)
 				fluxor->m_GarbageMe = true;
 
 				//fedback
-				SFText* text_feedback = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y/2 - TEXT_POP_OFFSET_Y), m_team);
+				SFText* text_feedback = new SFText((*CurrentGame).font2, 24, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y/2 - TEXT_POP_OFFSET_Y), m_team);
 				text_feedback->m_alliance = m_alliance;
 				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this);
 				ostringstream ss;
