@@ -297,16 +297,13 @@ void Module::SetConstructionStatus(bool under_construction)
 
 Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished, int link_activation, unsigned int flux)
 {
-	Module* new_module = new Module(moduleType, team);
-
 	//construction over own existing module?
-	bool construction_allowed = true;
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
 		if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_team != team)
 		{
 			//can't build on other player's modules
-			construction_allowed = false;
+			return NULL;
 		}
 		else
 		{
@@ -315,73 +312,50 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_GarbageMe = true;
 		}
 	}
-	else if ((*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y])
+
+	//updating game grid knowledge
+	Module* new_module = new Module(moduleType, team);
+	(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = (GameObject*)new_module;
+
+	//complete module data
+	new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
+	new_module->m_curGridIndex = grid_index;
+
+	//add to scene
+	(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
+	if (new_module->m_glow)
 	{
-		if ((*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y]->m_team != team)
-		{
-			//can't build on other player's modules
-			construction_allowed = false;
-		}
-		else
-		{
-			//overwrite own module
-			(*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y]->m_visible = false;
-			(*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y]->m_GarbageMe = true;
-		}
+		new_module->m_glow->setPosition(new_module->getPosition());
+		(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
 	}
-
-	//construction
-	if (construction_allowed)
+	for (int i = 0; i < 4; i++)
 	{
-		//module under construction goes to a temporary grid only shared with allied players, until the module is built
-		(*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y] = (GameObject*)new_module;
-
-		//complete module data
-		new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
-		new_module->m_curGridIndex = grid_index;
-
-		//add to scene
-		(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
-		if (new_module->m_glow)
-		{
-			new_module->m_glow->setPosition(new_module->getPosition());
-			(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
-		}
-		for (int i = 0; i < 4; i++)
-		{
-			new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2));
-			new_module->m_arrow[i]->m_team = new_module->m_team;
-			new_module->m_arrow[i]->m_alliance = new_module->m_alliance;
-			new_module->m_arrow[i]->m_under_construction = new_module->m_under_construction;
-			(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
-		}
-		if (new_module->m_team_marker)
-		{
-			new_module->m_team_marker->setPosition(new_module->getPosition());
-			(*CurrentGame).addToScene(new_module->m_team_marker, TeamMarkerLayer, BackgroundObject);
-		}
-		(*CurrentGame).addToFeedbacks(new_module->m_flux_text);
-
-		//overload parameters
-		if (construction_finished)
-		{
-			new_module->FinishConstruction();
-		}
-		for (int i = 0; i < link_activation; i++)
-		{
-			new_module->SwitchLinkDirection();
-		}
-		new_module->m_flux = flux;
-		if (flux > new_module->m_flux_max)
-		{
-			new_module->m_flux = new_module->m_flux_max;
-		}
+		new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2));
+		new_module->m_arrow[i]->m_team = new_module->m_team;
+		new_module->m_arrow[i]->m_alliance = new_module->m_alliance;
+		new_module->m_arrow[i]->m_under_construction = new_module->m_under_construction;
+		(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
 	}
-	//no construction
-	else
+	if (new_module->m_team_marker)
 	{
-		delete new_module;
-		return NULL;
+		new_module->m_team_marker->setPosition(new_module->getPosition());
+		(*CurrentGame).addToScene(new_module->m_team_marker, TeamMarkerLayer, BackgroundObject);
+	}
+	(*CurrentGame).addToFeedbacks(new_module->m_flux_text);
+
+	//overload parameters
+	if (construction_finished)
+	{
+		new_module->FinishConstruction();
+	}
+	for (int i = 0; i < link_activation; i++)
+	{
+		new_module->SwitchLinkDirection();
+	}
+	new_module->m_flux = flux;
+	if (flux > new_module->m_flux_max)
+	{
+		new_module->m_flux = new_module->m_flux_max;
 	}
 
 	return new_module;
@@ -451,10 +425,6 @@ Module::~Module()
 		{
 			(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] = NULL;
 		}
-		if ((*CurrentGame).m_alliance_module_grid[m_alliance][m_curGridIndex.x][m_curGridIndex.y] == (GameObject*)this)
-		{
-			(*CurrentGame).m_alliance_module_grid[m_alliance][m_curGridIndex.x][m_curGridIndex.y] = NULL;
-		}
 	}
 }
 
@@ -464,7 +434,7 @@ void Module::FinishConstruction()
 	SetConstructionStatus(false);
 
 	//updating game grid knowledge
-	(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] = (GameObject*)this;
+	//(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] = (GameObject*)this;
 
 	if (m_flux_text)
 	{
@@ -480,7 +450,6 @@ void Module::FinishConstruction()
 	m_fluxor_spawn_clock.restart();
 	m_flux_consumption_clock.restart();
 
-	printf("size %f\n", (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size());
 	//wipe out unguided Fluxors that are found on the cell being built on
 	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size();
 	for (size_t i = 0; i < FluxorVectorSize; i++)
@@ -508,13 +477,13 @@ void Module::update(sf::Time deltaTime)
 	if (m_under_construction)
 	{
 		//too late, a module has been built on this cell already
-		if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] && (*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_visible && !(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_GarbageMe)
-		{
-			m_visible = false;
-			m_GarbageMe = true;
-		}
-		else
-		{
+		//if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] && (*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_visible && !(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_GarbageMe)
+		//{
+		//	m_visible = false;
+		//	m_GarbageMe = true;
+		//}
+		//else
+		//{
 			//construction finished
 			if (m_flux == m_flux_max_under_construction)
 			{
@@ -526,7 +495,7 @@ void Module::update(sf::Time deltaTime)
 				m_flux++;
 				m_construction_clock.restart();
 			}
-		}
+		//}
 	}
 	m_flux_max = m_under_construction ? m_flux_max_under_construction : m_flux_max_after_construction;
 

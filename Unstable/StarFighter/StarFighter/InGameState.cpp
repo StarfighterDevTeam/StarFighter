@@ -124,7 +124,7 @@ void InGameState::Initialize(Player player)
 	}
 	
 	//HACK PROTO
-	//Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true);
+	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true);
 	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true);
 	//Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue2, true);
 	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed2, true);
@@ -137,10 +137,10 @@ void InGameState::Initialize(Player player)
 	//Neutral blocks
 	for (size_t i = 0; i < GRID_HEIGHT; i++)
 	{
-		if (i != GRID_HEIGHT / 2 && i != GRID_HEIGHT / 2 - 1 && i != GRID_HEIGHT / 2 + 1)
-		{
-			Module::CreateModule(sf::Vector2u(GRID_WIDTH / 2 + 1, i), ModuleType_Barrier, PlayerNeutral, true);
-		}
+		//if (i != GRID_HEIGHT / 2 && i != GRID_HEIGHT / 2 - 1 && i != GRID_HEIGHT / 2 + 1)
+		//{
+		//	Module::CreateModule(sf::Vector2u(GRID_WIDTH / 2 + 1, i), ModuleType_Barrier, PlayerNeutral, true);
+		//}
 	}
 		
 	//Spawning Fluxors
@@ -171,6 +171,8 @@ void InGameState::Update(sf::Time deltaTime)
 
 	//move camera
 	UpdateCamera(deltaTime);
+
+	printf("size %d\n", (*CurrentGame).GetSceneGameObjectsTyped(ModuleObject).size());
 
 	this->mainWindow->clear();
 }

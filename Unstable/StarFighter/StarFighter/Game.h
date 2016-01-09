@@ -107,7 +107,6 @@ public:
 
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
-	GameObject* m_alliance_module_grid[NBVAL_TeamAlliances][GRID_WIDTH][GRID_HEIGHT];
 	//Prototypes
 	Fluxor* m_fluxors[NBVAL_FluxorType];
 	Module* m_modules[NBVAL_ModuleType];

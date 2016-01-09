@@ -83,8 +83,6 @@ void Game::init(RenderWindow* window)
 		for (int j = 0; j < GRID_HEIGHT; j++)
 		{
 			m_module_grid[i][j] = NULL;
-			for (int k = 0; k < NBVAL_TeamAlliances; k++)
-				m_alliance_module_grid[k][i][j] = NULL;
 		}
 	}
 }
@@ -294,17 +292,17 @@ void Game::drawScene()
 					if (*it == NULL)
 						continue;
 
-					if ((*(*it)).m_under_construction && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == false)
-						continue;
-
-					if ((*(*it)).m_under_construction && USE_SPLIT_SCREEN == true)
-					{
-						if (v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral))
-							continue;
-
-						if (v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral))
-							continue;
-					}
+					//if ((*(*it)).m_under_construction && (*(*it)).m_alliance != Alliance1 && USE_SPLIT_SCREEN == false)
+					//	continue;
+					//
+					//if ((*(*it)).m_under_construction && USE_SPLIT_SCREEN == true)
+					//{
+					//	if (v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral))
+					//		continue;
+					//
+					//	if (v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral))
+					//		continue;
+					//}
 					
 					if ((*(*it)).m_visible)
 					{
