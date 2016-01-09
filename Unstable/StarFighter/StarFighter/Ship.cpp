@@ -205,53 +205,43 @@ void Ship::update(sf::Time deltaTime)
 	
 	if (InputGuy::isSpawningModule1(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(1);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(1);
 	}
 	if (InputGuy::isSpawningModule2(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(2);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(2);
 	}
 	if (InputGuy::isSpawningModule3(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(3);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(3);
 	}
 	if (InputGuy::isSpawningModule4(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(3);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(4);
 	}
 	if (InputGuy::isSpawningModule5(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(4);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(5);
 	}
 	if (InputGuy::isSpawningModule6(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(5);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(6);
 	}
 	if (InputGuy::isSpawningModule7(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(6);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(7);
 	}
 	if (InputGuy::isSpawningModule8(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(7);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(8);
 	}
 	if (InputGuy::isSpawningModule9(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(8);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(9);
 	}
 	if (InputGuy::isSpawningModule0(m_controllerType) && m_BuildKey_released)
 	{
-		TryBuildModule(9);
-		m_BuildKey_released = false;
+		m_BuildKey_released = !TryBuildModule(0);
 	}
 
 	//DEBUG
@@ -481,11 +471,19 @@ void Ship::SetTeam(PlayerTeams team, TeamAlliances alliance)
 	//}
 }
 
-void Ship::TryBuildModule(int module_key)
+bool Ship::TryBuildModule(int module_key)
 {
 	if (m_flux >= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction)
 	{
-		m_flux -= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction;
-		Module::CreateModule(m_curGridIndex, (ModuleType)(module_key - 1), m_team);
+		
+		Module* module = Module::CreateModule(m_curGridIndex, (ModuleType)(module_key - 1), m_team);
+		if (module)
+		{
+			m_flux -= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction;
+		}
+
+		return module;
 	}
+
+	return false;
 }

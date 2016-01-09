@@ -46,7 +46,7 @@ public :
 	unsigned int m_flux_autogeneration;
 	void GetFluxor(GameObject* object) override;
 	void GetModule(GameObject* object) override;
-	void TryBuildModule(int module_key);
+	bool TryBuildModule(int module_key);
 	sf::Vector2u m_curGridIndex;
 	float m_flux_transfer_time;
 	sf::Clock m_flux_transfer_limiter_clock;

@@ -149,6 +149,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 
 	Initialize();
 
+	//need to have created flux text before using this -> Initialize()
 	SetTeam(team, (*CurrentGame).GetTeamAlliance(team));
 
 	//type specific parameters
@@ -283,7 +284,8 @@ void Module::SetConstructionStatus(bool under_construction)
 	{
 		setColor(Color(255, 255, 255, 255));
 	}
-		
+
+	setAnimationLine(under_construction);
 }
 
 Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished, int link_activation, unsigned int flux)
@@ -294,18 +296,38 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 	bool construction_allowed = true;
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
-		construction_allowed = (*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_team == team || (*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_under_construction;
-		if (construction_allowed)
+		if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_team != team)
 		{
+			//can't build on other player's modules
+			construction_allowed = false;
+		}
+		else
+		{
+			//overwrite own module
 			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_visible = false;
 			(*CurrentGame).m_module_grid[grid_index.x][grid_index.y]->m_GarbageMe = true;
+		}
+	}
+	else if ((*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y])
+	{
+		if ((*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y]->m_team != team)
+		{
+			//can't build on other player's modules
+			construction_allowed = false;
+		}
+		else
+		{
+			//overwrite own module
+			(*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y]->m_visible = false;
+			(*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y]->m_GarbageMe = true;
 		}
 	}
 
 	//construction
 	if (construction_allowed)
 	{
-		(*CurrentGame).m_module_grid[grid_index.x][grid_index.y] = (GameObject*)new_module;
+		//module under construction goes to a temporary grid only shared with allied players, until the module is built
+		(*CurrentGame).m_alliance_module_grid[new_module->m_alliance][grid_index.x][grid_index.y] = (GameObject*)new_module;
 
 		//complete module data
 		new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
@@ -413,23 +435,20 @@ Module::~Module()
 		{
 			(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] = NULL;
 		}
+		if ((*CurrentGame).m_alliance_module_grid[m_alliance][m_curGridIndex.x][m_curGridIndex.y] == (GameObject*)this)
+		{
+			(*CurrentGame).m_alliance_module_grid[m_alliance][m_curGridIndex.x][m_curGridIndex.y] = NULL;
+		}
 	}
 }
 
 void Module::FinishConstruction()
 {
-	if (m_team == PlayerRed)
-	{
-		setColor(sf::Color::Red);
-	}
-	else if (m_team == PlayerNeutral)
-	{
-		setColor(sf::Color::Yellow);
-	}
-	else
-	{
-		setColor(sf::Color(255, 255, 255, 255));
-	}
+	//end of alpha
+	SetConstructionStatus(false);
+
+	//updating game grid knowledge
+	(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] = (GameObject*)this;
 
 	if (m_flux_text)
 	{
@@ -468,17 +487,28 @@ void Module::FinishConstruction()
 
 void Module::update(sf::Time deltaTime)
 {
-	//construction finished?
+	//construction under progress
 	if (m_under_construction)
 	{
-		if (m_flux == m_flux_max_under_construction)
+		//too late, a module has been built on this cell already
+		if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] && (*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_visible && !(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_GarbageMe)
 		{
-			FinishConstruction();
+			m_visible = false;
+			m_GarbageMe = true;
 		}
-		else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / MODULE_FLUX_CONSTRUCTION_PER_SECOND))
+		else
 		{
-			m_flux++;
-			m_construction_clock.restart();
+			//construction finished
+			if (m_flux == m_flux_max_under_construction)
+			{
+				FinishConstruction();
+			}
+			//still under construction
+			else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / MODULE_FLUX_CONSTRUCTION_PER_SECOND))
+			{
+				m_flux++;
+				m_construction_clock.restart();
+			}
 		}
 	}
 	m_flux_max = m_under_construction ? m_flux_max_under_construction : m_flux_max_after_construction;
@@ -501,14 +531,10 @@ void Module::update(sf::Time deltaTime)
 
 	if (!m_under_construction)
 	{
-		//UpdateActivation();
-
 		AutogenerateFlux();
 
 		GenerateFluxor();
 	}
-
-	setAnimationLine(m_under_construction);
 	
 	//hud
 	if (m_flux_text && m_flux_text->m_visible)
