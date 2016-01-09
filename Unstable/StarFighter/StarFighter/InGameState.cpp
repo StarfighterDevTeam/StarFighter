@@ -71,6 +71,12 @@ void InGameState::Initialize(Player player)
 		}
 	}
 
+	//Team markers
+	for (size_t i = 0; i < NBVAL_PlayerTeams; i++)
+	{
+		(*CurrentGame).m_team_markers[i] = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/team_markers.png", sf::Vector2f(128, 128), sf::Vector2f(64, 64), 1, NBVAL_PlayerTeams);
+	}
+
 	//Fluxors data
 	for (int i = 0; i < NBVAL_FluxorType; i++)
 	{
@@ -129,13 +135,14 @@ void InGameState::Initialize(Player player)
 	//
 
 	//Neutral blocks
-	//for (size_t i = 0; i < GRID_HEIGHT; i++)
-	//{
-	//	if (i != GRID_HEIGHT / 2 && i != GRID_HEIGHT / 2 - 1 && i != GRID_HEIGHT / 2 +1)
-	//	Module::CreateModule(sf::Vector2u(GRID_WIDTH / 2 + 1, i), ModuleType_Barrier, PlayerNeutral, true);
-	//}
+	for (size_t i = 0; i < GRID_HEIGHT; i++)
+	{
+		if (i != GRID_HEIGHT / 2 && i != GRID_HEIGHT / 2 - 1 && i != GRID_HEIGHT / 2 + 1)
+		{
+			Module::CreateModule(sf::Vector2u(GRID_WIDTH / 2 + 1, i), ModuleType_Barrier, PlayerNeutral, true);
+		}
+	}
 		
-
 	//Spawning Fluxors
 	if (USE_UNGUIDED_FLUXORS_TO_BUILD == true)
 	{

@@ -72,6 +72,7 @@ void FluxorSpawnZone::update(sf::Time deltaTime)
 			else if (abs(curTime - m_respawn_timers[i]) < 1)//not perfect but will do with a 1-sec accuracy
 			{
 				m_fluxors[i] = Fluxor::CreateFluxor(FluxorType_Green, true, m_spawn_bounds);
+				printf("spawn\n");
 				m_respawn_timers[i] = -1;
 			}
 		}

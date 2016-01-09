@@ -107,10 +107,13 @@ public:
 
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
-	GameObject* m_alliance_module_grid[NBVAL_TeamAlliances - 1][GRID_WIDTH][GRID_HEIGHT];
+	GameObject* m_alliance_module_grid[NBVAL_TeamAlliances][GRID_WIDTH][GRID_HEIGHT];
+	//Prototypes
 	Fluxor* m_fluxors[NBVAL_FluxorType];
 	Module* m_modules[NBVAL_ModuleType];
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
+	GameObject* m_team_markers[NBVAL_PlayerTeams];
+
 	bool isCellFree(sf::Vector2f position);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
 	static sf::Vector2f GridToPosition(sf::Vector2u grid_index);

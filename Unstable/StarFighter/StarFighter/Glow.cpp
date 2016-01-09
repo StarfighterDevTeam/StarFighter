@@ -47,10 +47,10 @@ sf::Uint8* Glow::CreateGlowFrame(GameObject* parent, sf::Color color, int glow_t
 	return pixels;
 }
 
-Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness)
+Glow::Glow(GameObject* parent, sf::Color color, int glow_thickness, int stroke_size, float glow_animation_duration, int glow_min_thickness)
 {
 	m_collider_type = BackgroundObject;
-	m_color = (*CurrentGame).m_team_colors[team];
+	m_color = color;
 	m_glow_radius = glow_thickness;
 	m_glow_animation_duration = glow_animation_duration;
 
@@ -71,7 +71,7 @@ Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_
 		if (frames_number % 2 != 0)
 			frames_number--;
 		unique_frames_number = frames_number / 2 + 1;
-		printf("<!>Trying to create a texture that exceeds 8187x8187. Frame number reduced to %d.\n",frames_number);
+		printf("<!>Trying to create a texture that exceeds 8187x8187. Frame number reduced to %d.\n", frames_number);
 	}
 	if (H > TEXTURE_SIZE_LIMITATION)
 	{
@@ -86,7 +86,7 @@ Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	ostringstream ss;
-	ss << W << "x" << H << "_glow_" << "team" << (int)team;
+	ss << W << "x" << H << "_glow_" << "team" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
 	sf::Texture* texture = loader->getTexture(ss.str());
 
 	//updating the newly created texture, if it does not exist yet
@@ -106,7 +106,7 @@ Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_
 		}
 		texture->update(pixels_animation, W*frames_number, H, 0, 0);
 		delete[] pixels_animation;
-			
+
 		//create and add as many frames as necessary for the complete glow animation
 		for (int i = 1; i < unique_frames_number + 1; i++)
 		{
@@ -119,14 +119,14 @@ Glow::Glow(GameObject* parent, PlayerTeams team, int glow_thickness, int stroke_
 			int x = (i - 1)*W + x_offset;
 			int y = glow_thickness - glow_min_thickness - thickness;
 			texture->update(pixels_frame, size_x, size_y, x, y);
-		
+
 			//"diminishing" part of the animation
 			if (i > 1 && i < unique_frames_number)//first and last frame must not be repeated
 			{
 				x = (frames_number - i + 1)*W + x_offset;
 				texture->update(pixels_frame, size_x, size_y, x, y);
 			}
-			
+
 			delete[] pixels_frame;
 		}
 	}

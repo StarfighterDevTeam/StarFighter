@@ -22,6 +22,7 @@ enum LayerType {
 	BackgroundLayer,
 	FakeGridLayer,
 	ModuleLayer,
+	TeamMarkerLayer,
 	GlowLayer,
 	FluxorLayer,
 	PortalLayer,

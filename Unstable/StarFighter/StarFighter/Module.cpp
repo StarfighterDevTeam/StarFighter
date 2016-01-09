@@ -11,8 +11,11 @@ void Module::Initialize()
 	m_flux_max = 1;
 	m_flux_max_under_construction = 1;
 	m_flux_max_after_construction = 1;
-	m_glow = new Glow(this, m_team, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
+	//m_glow = new Glow(this, m_team, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
+	m_glow = new Glow(this, sf::Color::Cyan, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->m_visible = false;
+	m_team_marker = (*CurrentGame).m_team_markers[m_team]->Clone();
+	m_team_marker->setAnimationLine(m_team);
 	SetConstructionStatus(true);
 
 	m_isGeneratingFluxor = false;
@@ -284,6 +287,10 @@ void Module::SetConstructionStatus(bool under_construction)
 	{
 		setColor(Color(255, 255, 255, 255));
 	}
+	if (m_team_marker)
+	{
+		m_team_marker->m_under_construction = under_construction;
+	}
 
 	setAnimationLine(under_construction);
 }
@@ -332,9 +339,13 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 		//complete module data
 		new_module->setPosition(sf::Vector2f(grid_index.x*TILE_SIZE + TILE_SIZE / 2, grid_index.y*TILE_SIZE + TILE_SIZE / 2));
 		new_module->m_curGridIndex = grid_index;
+
+		//add to scene
+		(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
 		if (new_module->m_glow)
 		{
 			new_module->m_glow->setPosition(new_module->getPosition());
+			(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
 		}
 		for (int i = 0; i < 4; i++)
 		{
@@ -342,13 +353,12 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 			new_module->m_arrow[i]->m_team = new_module->m_team;
 			new_module->m_arrow[i]->m_alliance = new_module->m_alliance;
 			new_module->m_arrow[i]->m_under_construction = new_module->m_under_construction;
-		}
-
-		(*CurrentGame).addToScene(new_module, ModuleLayer, ModuleObject);
-		(*CurrentGame).addToScene(new_module->m_glow, GlowLayer, BackgroundObject);
-		for (int i = 0; i < 4; i++)
-		{
 			(*CurrentGame).addToScene(new_module->m_arrow[i], GlowLayer, BackgroundObject);
+		}
+		if (new_module->m_team_marker)
+		{
+			new_module->m_team_marker->setPosition(new_module->getPosition());
+			(*CurrentGame).addToScene(new_module->m_team_marker, TeamMarkerLayer, BackgroundObject);
 		}
 		(*CurrentGame).addToFeedbacks(new_module->m_flux_text);
 
@@ -428,6 +438,12 @@ Module::~Module()
 		m_arrow[i]->m_GarbageMe = true;
 	}
 
+	if (m_team_marker)
+	{
+		m_team_marker->m_visible = false;
+		m_team_marker->m_GarbageMe = true;
+	}
+
 	//updating grid knowledge
 	if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y])
 	{
@@ -464,6 +480,7 @@ void Module::FinishConstruction()
 	m_fluxor_spawn_clock.restart();
 	m_flux_consumption_clock.restart();
 
+	printf("size %f\n", (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size());
 	//wipe out unguided Fluxors that are found on the cell being built on
 	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size();
 	for (size_t i = 0; i < FluxorVectorSize; i++)
@@ -1346,5 +1363,15 @@ void Module::SetTeam(PlayerTeams team, TeamAlliances alliance)
 	{
 		m_flux_text->m_team = team;
 		m_flux_text->m_alliance = alliance;
+	}
+	if (m_team_marker)
+	{
+		m_team_marker->m_team = team;
+		m_team_marker->m_alliance = alliance;
+	}
+	if (m_glow)
+	{
+		m_glow->m_team = team;
+		m_glow->m_alliance = alliance;
 	}
 }

@@ -55,6 +55,7 @@ public :
 	Glow* m_glow;
 	void SetConstructionStatus(bool under_construction);
 	sf::Clock m_construction_clock;
+	GameObject* m_team_marker;
 
 	//vector<Module*> m_parents;
 	//vector<Module*> m_children;

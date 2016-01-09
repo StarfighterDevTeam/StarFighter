@@ -83,7 +83,7 @@ void Game::init(RenderWindow* window)
 		for (int j = 0; j < GRID_HEIGHT; j++)
 		{
 			m_module_grid[i][j] = NULL;
-			for (int k = 0; k < NBVAL_TeamAlliances - 1; k++)
+			for (int k = 0; k < NBVAL_TeamAlliances; k++)
 				m_alliance_module_grid[k][i][j] = NULL;
 		}
 	}
