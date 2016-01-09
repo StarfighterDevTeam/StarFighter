@@ -175,13 +175,21 @@ void Game::updateScene(Time deltaTime)
 	//ResolveProductionBufferList();//must be done after collision checks
 
 	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
-
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
 		if (this->sceneGameObjects[i] == NULL)
 			continue;
 
 		this->sceneGameObjects[i]->update(deltaTime);
+	}
+
+	size_t sceneTextPopFeedbacksSize = this->sceneFeedbackSFTexts.size();
+	for (size_t i = 0; i < sceneTextPopFeedbacksSize; i++)
+	{
+		if (this->sceneFeedbackSFTexts[i] == NULL)
+			continue;
+
+		this->sceneFeedbackSFTexts[i]->update(deltaTime);
 	}
 
 	//Collect the dust

@@ -14,6 +14,11 @@ SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f 
 	m_GarbageMe = false;
 }
 
+void SFText::update(Time deltaTime)
+{
+	//see override function in class SFTextPop
+}
+
 SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team)
 {
 	setSize(size);
