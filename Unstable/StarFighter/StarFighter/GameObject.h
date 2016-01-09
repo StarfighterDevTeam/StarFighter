@@ -9,6 +9,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Globals.h"
+#include "SFText.h"
 
 using namespace std;
 using namespace sf;

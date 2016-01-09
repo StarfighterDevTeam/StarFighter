@@ -31,6 +31,8 @@
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
 
+#define TEXT_POP_OFFSET_Y							10
+
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);

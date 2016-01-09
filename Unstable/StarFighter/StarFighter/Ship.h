@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "InputGuy.h"
 #include "Game.h"
+#include "SFTextPop.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540

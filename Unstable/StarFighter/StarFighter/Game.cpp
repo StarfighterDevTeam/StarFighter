@@ -154,7 +154,6 @@ void Game::updateScene(Time deltaTime)
 	colisionChecksV2();
 
 	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
-
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
 		if (this->sceneGameObjects[i] == NULL)
