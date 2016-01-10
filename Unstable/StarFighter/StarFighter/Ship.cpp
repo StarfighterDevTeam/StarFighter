@@ -27,18 +27,14 @@ void Ship::Init()
 	m_upgrade_level = 0;
 
 	//Flux display
-	m_flux_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text = new SFText((*CurrentGame).m_fonts[Font_Arial], 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 	
 	(*CurrentGame).addToFeedbacks(m_flux_text);
 	
-	// Build gauge
-	//sf::Color fill_color = sf::Color(BUILD_GAUGE_COLOR_R, BUILD_GAUGE_COLOR_G, BUILD_GAUGE_COLOR_B, BUILD_GAUGE_COLOR_A);
-	//sf::Color outline_color = sf::Color(BUILD_GAUGE_COLOR_R, BUILD_GAUGE_COLOR_G, BUILD_GAUGE_COLOR_B, BUILD_GAUGE_OUTLINE_COLOR_A);
-	//SFRectangle rect = SFRectangle(sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), sf::Vector2f(FLUX_GAUGE_WIDTH, FLUX_GAUGE_HEIGHT), fill_color, FLUX_GAUGE_THICNKESS, outline_color, m_team);
-	//SFText text = SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
-	//m_flux_gauge = new SFGauge(text, rect);
+	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
+	m_flux_gauge = NULL;
 
 	//Build feedback
 	m_build_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
@@ -58,6 +54,7 @@ void Ship::Init()
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, PlayerTeams team, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_team = team;
+	m_alliance = (*CurrentGame).GetTeamAlliance(team);
 	this->Init();
 }
 
@@ -68,6 +65,9 @@ Ship::~Ship()
 	
 	if (m_build_text)
 		m_build_text->m_GarbageMe = true;
+
+	if (m_flux_gauge)
+		m_flux_gauge->m_GarbageMe = true;
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -159,16 +159,17 @@ void Ship::update(sf::Time deltaTime)
 		ostringstream ss;
 		ss << m_flux << "/" << m_flux_max;
 		m_flux_text->setString(ss.str());
-		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
+		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_TEXT_OFFSET_Y));
 	}
 
-	//if (m_flux_gauge)
-	//{
-	//	ostringstream ss;
-	//	ss << m_flux << "/" << m_flux_max;
-	//	m_flux_gauge->setString(ss.str());
-	//	m_flux_gauge->setPosition(getPosition(), sf::Vector2f(-m_flux_gauge->getGlobalBounds().width / 2, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
-	//}
+	if (m_flux_gauge)
+	{
+		m_flux_gauge->update(m_flux, m_flux_max);
+		ostringstream ss;
+		ss << m_flux << "/" << m_flux_max;
+		m_flux_gauge->setString(ss.str());
+		m_flux_gauge->setPosition(getPosition());
+	}
 	
 	if (m_build_text)
 	{
@@ -484,4 +485,11 @@ bool Ship::TryBuildModule(int module_key)
 	}
 
 	return false;
+}
+
+
+void Ship::AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset)
+{
+	m_flux_gauge = (*CurrentGame).m_flux_gauges[gauge]->Clone();
+	m_flux_gauge->m_offset = offset;
 }

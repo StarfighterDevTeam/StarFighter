@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "GameObject.h"
 #include "Game.h"
+#include "SFText.h"
 
 class Fluxor : public GameObject
 {

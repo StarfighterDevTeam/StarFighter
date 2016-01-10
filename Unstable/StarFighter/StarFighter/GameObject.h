@@ -9,14 +9,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Globals.h"
-#include "SFText.h"
 
 using namespace std;
 using namespace sf;
-
-class Equipment;
-class Weapon;
-class Loot;
 
 enum LayerType {
 	BackgroundLayer,
@@ -53,6 +48,14 @@ enum GameObjectType {
 	EnemyFire,
 	EnemyObject,
 	NBVAL_GameObject
+};
+
+enum GaugeStyles
+{
+	GaugeStyle_Green,
+	GaugeStyle_Blue,
+	GaugeStyle_Red,
+	NBVAL_GaugeStyles,
 };
 
 class GameObject : public AnimatedSprite

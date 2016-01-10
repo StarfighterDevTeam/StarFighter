@@ -15,6 +15,7 @@
 
 #include "Glow.h"
 #include "Stroboscopic.h"
+#include "SFText.h"
 
 class Ship;
 class Fluxor;
@@ -94,6 +95,7 @@ public:
 	//Fonts
 	sf::Font* font;
 	sf::Font* font2;
+	sf::Font* m_fonts[NBVAL_FontReferences];
 
 	//SFX
 	int LoadSFX();
@@ -110,11 +112,13 @@ public:
 
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
+
 	//Prototypes
 	Fluxor* m_fluxors[NBVAL_FluxorType];
 	Module* m_modules[NBVAL_ModuleType];
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	GameObject* m_team_markers[NBVAL_PlayerTeams];
+	SFGauge* m_flux_gauges[NBVAL_GaugeStyles];
 	GameObject* m_module_HUD;
 
 	bool isCellFree(sf::Vector2f position);

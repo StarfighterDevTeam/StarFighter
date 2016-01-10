@@ -77,6 +77,9 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).m_team_markers[i] = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/team_markers.png", sf::Vector2f(128, 128), sf::Vector2f(64, 64), 1, NBVAL_PlayerTeams);
 	}
 
+	//Gauges data
+	CreateFluxGauges();
+
 	//Fluxors data
 	for (int i = 0; i < NBVAL_FluxorType; i++)
 	{
@@ -230,5 +233,34 @@ void InGameState::UpdateCamera(sf::Time deltaTime)
 			(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, y);
 		if (b >(*CurrentGame).map_size.y - y)
 			(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, (*CurrentGame).map_size.y - y);
+	}
+}
+
+void InGameState::CreateFluxGauges()
+{
+	for (int i = 0; i < NBVAL_GaugeStyles; i++)
+	{
+		//i == 0: creating green "flux build" gauge
+		//i == 1: creating blue "flux" gauge
+		//i == 2: creating red "attack flux" gauge
+		if (i == 0)
+		{
+			sf::Color fill_color = sf::Color(255, 255, 255, 120);
+			sf::Color outline_color = sf::Color(255 * (i == GaugeStyle_Red), 255 * (i == GaugeStyle_Green), 255 * (i == GaugeStyle_Blue), 0);
+			SFRectangle* rect_container = new SFRectangle(sf::Vector2f(0, 0), sf::Vector2f(FLUX_GAUGE_WIDTH, FLUX_GAUGE_HEIGHT), fill_color, FLUX_GAUGE_THICNKESS, outline_color, PlayerNeutral);
+
+			sf::Color fill_color2 = sf::Color(255 * (i == GaugeStyle_Red), 255 * (i == GaugeStyle_Green), 255 * (i == GaugeStyle_Blue), 70);
+			sf::Color outline_color2 = sf::Color(0, 0, 0, 0);
+			SFRectangle* rect_gauge = new SFRectangle(sf::Vector2f(0, 0), sf::Vector2f(FLUX_GAUGE_WIDTH, FLUX_GAUGE_HEIGHT), fill_color2, FLUX_GAUGE_THICNKESS, outline_color2, PlayerNeutral);
+
+			SFText* text = new SFText((*CurrentGame).m_fonts[Font_Arial], 20, sf::Color::Green, sf::Vector2f(0, 0), PlayerNeutral);
+
+			SFGauge* flux_gauge = new SFGauge(text->Clone(), rect_gauge->Clone(), rect_container->Clone());
+			delete rect_container;
+			delete rect_gauge;
+			delete text;
+
+			(*CurrentGame).m_flux_gauges[i] = flux_gauge;
+		}
 	}
 }

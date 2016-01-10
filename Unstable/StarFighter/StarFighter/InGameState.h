@@ -24,6 +24,7 @@ public:
 	void Release();
 	void UpdateCamera(sf::Time deltaTime);
 	vector<FluxorSpawnZone> m_fluxor_spawn_zones;
+	void CreateFluxGauges();
 
 private:
 	sf::RenderWindow* mainWindow;

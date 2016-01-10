@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "Game.h"
 #include "Fluxor.h"
+#include "SFText.h"
 
 enum LinkStatus
 {
@@ -55,7 +56,6 @@ public :
 	Glow* m_glow;
 	void SetConstructionStatus(bool under_construction);
 	sf::Clock m_construction_clock;
-	GameObject* m_team_marker;
 
 	//vector<Module*> m_parents;
 	//vector<Module*> m_children;
@@ -116,6 +116,9 @@ public :
 	//HUD
 	SFText* m_flux_text;
 	void SetTeam(PlayerTeams team, TeamAlliances alliance);
+	GameObject* m_team_marker;
+	SFGauge* m_flux_gauge;
+	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
 };
 
 #endif // MODULE_H_INCLUDED

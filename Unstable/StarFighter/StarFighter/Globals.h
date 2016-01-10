@@ -8,6 +8,24 @@
 #include "Logger.h"
 #include <assert.h>
 
+enum PlayerTeams
+{
+	PlayerBlue,
+	PlayerRed,
+	PlayerBlue2,
+	PlayerRed2,
+	PlayerNeutral,
+	NBVAL_PlayerTeams,
+};
+
+enum TeamAlliances
+{
+	Alliance1,
+	Alliance2,
+	AllianceNeutral,
+	NBVAL_TeamAlliances,
+};
+
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 
 #define	REF_WINDOW_RESOLUTION_X					1920
@@ -48,9 +66,6 @@
 #define TEXT_POP_TOTAL_TIME							1.0f
 #define TEXT_POP_OFFSET_Y							8
 
-#define FLUX_GAUGE_HEIGHT							10
-#define FLUX_GAUGE_WIDTH							150
-
 #define FLUX_GAUGE_COLOR_R							150
 #define FLUX_GAUGE_COLOR_G							150
 #define FLUX_GAUGE_COLOR_B							255
@@ -69,7 +84,6 @@
 
 //PLAYER
 #define SHIP_MAX_FLUX								100
-#define PLAYER_FLUX_DISPLAY_OFFSET_Y				4
 #define SHIP_MAX_FLUX_BONUS_PER_LEVEL				100
 #define SHIP_MAX_SPEED_BONUS_PER_LEVEL				100
 #define SHIP_MAX_UPGRADE_LEVEL						9
@@ -81,6 +95,12 @@
 #define SHIP_MAX_SPEED				400.0f
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
+
+#define PLAYER_FLUX_DISPLAY_OFFSET_Y				20
+#define PLAYER_FLUX_TEXT_OFFSET_Y					4
+#define FLUX_GAUGE_HEIGHT							16
+#define FLUX_GAUGE_WIDTH							100
+#define GAUGE_TEXT_OFFSET_Y							4
 
 //FLUXOR
 #define FLUXOR_FLUX_VALUE							10

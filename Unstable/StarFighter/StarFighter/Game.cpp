@@ -49,10 +49,15 @@ void Game::init(RenderWindow* window)
 
 	//fonts
 	font = new sf::Font();
+
 	if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
 	{
 		// error
 		//TODO: font loader
+	}
+	else
+	{
+		m_fonts[Font_Terminator] = font;
 	}
 
 	font2 = new sf::Font();
@@ -60,6 +65,10 @@ void Game::init(RenderWindow* window)
 	{
 		// error
 		//TODO: font loader
+	}
+	else
+	{
+		m_fonts[Font_Arial] = font2;
 	}
 
 	//TODO: save in local preferences
@@ -303,6 +312,22 @@ void Game::drawScene()
 							continue;
 
 						mainScreen.draw(*(*it));
+					}
+				}
+				for (std::vector<SFGauge*>::iterator it = this->sceneFeedbackSFGauge.begin(); it != this->sceneFeedbackSFGauge.end(); it++)
+				{
+					if (*it == NULL)
+						continue;
+
+					if ((*(*it)).m_visible)
+					{
+						if ((v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
+							continue;
+
+						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
+							continue;
+
+						(*(*it)).draw(mainScreen);
 					}
 				}
 			}

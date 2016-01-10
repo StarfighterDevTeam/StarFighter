@@ -34,6 +34,9 @@ void Module::Initialize()
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 
+	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2));
+	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
+
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
@@ -281,6 +284,10 @@ void Module::SetConstructionStatus(bool under_construction)
 	else
 	{
 		setColor(Color(255, 255, 255, 255));
+		//if (m_flux_gauge)
+		//{
+		//	m_flux_gauge = (*CurrentGame).m_flux_gauges[GaugeStyle_Blue]->Clone();
+		//}
 	}
 	if (m_team_marker)
 	{
@@ -412,6 +419,11 @@ Module::~Module()
 		m_team_marker->m_visible = false;
 		m_team_marker->m_GarbageMe = true;
 	}
+	if (m_flux_gauge)
+	{
+		m_flux_gauge->m_visible = false;
+		m_flux_gauge->m_GarbageMe = true;
+	}
 
 	//updating grid knowledge
 	if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y])
@@ -531,6 +543,15 @@ void Module::update(sf::Time deltaTime)
 		ss << m_flux << "/" << m_flux_max;
 		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
 	}
+
+	//if (m_flux_gauge)
+	//{
+	//	m_flux_gauge->update(m_flux, m_flux_max);
+	//	ostringstream ss;
+	//	ss << m_flux << "/" << m_flux_max;
+	//	m_flux_gauge->setString(ss.str());
+	//	m_flux_gauge->setPosition(getPosition());
+	//}
 }
 
 void Module::GetFluxor(GameObject* object)
@@ -1338,4 +1359,15 @@ void Module::SetTeam(PlayerTeams team, TeamAlliances alliance)
 		m_glow->m_team = team;
 		m_glow->m_alliance = alliance;
 	}
+	//if (m_flux_gauge)
+	//{
+	//	m_flux_gauge->m_team = team;
+	//	m_flux_gauge->m_alliance = alliance;
+	//}
+}
+
+void Module::AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset)
+{
+	m_flux_gauge = (*CurrentGame).m_flux_gauges[0]->Clone();
+	m_flux_gauge->m_offset = offset;
 }

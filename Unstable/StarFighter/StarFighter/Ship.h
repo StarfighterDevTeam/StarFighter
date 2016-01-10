@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "Fluxor.h"
 #include "Module.h"
+#include "SFText.h"
 #include "SFTextPop.h"
 
 enum PlayerConstructionFeedbacks
@@ -64,6 +65,7 @@ public :
 	PlayerConstructionFeedbacks m_build_text_status;
 	SFGauge* m_flux_gauge;
 	void SetTeam(PlayerTeams team, TeamAlliances alliance);
+	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
 
 	//construction
 	//void ResolveProductionBufferList() override;
