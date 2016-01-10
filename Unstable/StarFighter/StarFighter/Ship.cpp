@@ -233,7 +233,7 @@ void Ship::update(sf::Time deltaTime)
 	}
 	if (InputGuy::isSpawningModule0(m_controllerType) && m_BuildKey_released)
 	{
-		m_BuildKey_released = !TryBuildModule(0);
+		m_BuildKey_released = !TryBuildModule(10);
 	}
 
 	//DEBUG

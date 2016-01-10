@@ -34,6 +34,7 @@ void Module::Initialize()
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
 
+	m_flux_gauge = NULL;
 	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2));
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
 
@@ -737,41 +738,33 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (fluxor->m_flux < fluxor->m_flux_max || (fluxor->m_flux_max == 0 && m_add_flux > 0))
+		if (fluxor->m_transfer_buffer == 0)
 		{
-			if (fluxor->m_transfer_buffer == 0)
+			//increasing potential
+			if (fluxor->m_flux_max > 0)
 			{
-				//increasing potential
-				if (m_add_flux > 0 && fluxor->m_flux_max > 0)
-				{
-					fluxor->m_flux_max += m_add_flux;
-				}
-				//refilling or increasing?
-				fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
-				fluxor->m_flux_transfer_clock.restart();
+				fluxor->m_flux_max += m_add_flux;
 			}
+			//refilling or increasing?
+			fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
+			fluxor->m_flux_transfer_clock.restart();
+		}
 
-			if (fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
-			{
-				fluxor->m_flux++;
-				fluxor->m_transfer_buffer--;
-				fluxor->m_flux_transfer_clock.restart();
-				fluxor->m_flux_waste_clock.restart();
-			}
+		if (fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
+		{
+			fluxor->m_flux++;
+			fluxor->m_transfer_buffer--;
+			fluxor->m_flux_transfer_clock.restart();
+			fluxor->m_flux_waste_clock.restart();
+		}
 
-			if (fluxor->m_transfer_buffer == 0)
-			{
-				UndockFluxor(fluxor);
-			}
-			else
-			{
-				fluxor->m_docked = true;
-			}
+		if (fluxor->m_transfer_buffer == 0)
+		{
+			UndockFluxor(fluxor);
 		}
 		else
 		{
-			UndockFluxor(fluxor);
-			fluxor->m_transfer_buffer = 0;
+			fluxor->m_docked = true;
 		}
 	}
 }
@@ -835,7 +828,6 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				//module "refill/amplify fluxor"
 				if (fluxor->m_can_be_refilled_by_modules)
 				{
-					//if (m_flux == m_flux_max && ((m_isRefillingFlux && !fluxor->m_consummable_by_modules) || (fluxor->m_consummable_by_modules && m_add_flux > 0)))
 					if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
 					{
 						if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
