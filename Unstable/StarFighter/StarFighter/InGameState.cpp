@@ -74,7 +74,7 @@ void InGameState::Initialize(Player player)
 	//Team markers
 	for (size_t i = 0; i < NBVAL_PlayerTeams; i++)
 	{
-		(*CurrentGame).m_team_markers[i] = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/team_markers.png", sf::Vector2f(128, 128), sf::Vector2f(64, 64), 1, NBVAL_PlayerTeams);
+		(*CurrentGame).m_team_markers[i] = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/team_markers.png", sf::Vector2f(128, 128), sf::Vector2f(64, 64), 2, NBVAL_PlayerTeams);
 	}
 
 	//Gauges data
@@ -128,9 +128,9 @@ void InGameState::Initialize(Player player)
 	
 	//HACK PROTO
 	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true);
-	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true);
-	//Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue2, true);
-	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed2, true);
+	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true);
+	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue2, true);
+	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed2, true);
 	//
 	//Module::CreateModule(sf::Vector2u(11, 5), ModuleType_Battery, PlayerRed, true, LinkRight, 15);
 	//Module::CreateModule(sf::Vector2u(11, 4), ModuleType_Turret, PlayerRed, true, LinkDown, 1000);

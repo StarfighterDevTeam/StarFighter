@@ -515,6 +515,11 @@ void Module::update(sf::Time deltaTime)
 		m_glow->m_visible = m_flux == m_flux_max && !m_under_construction;
 	}
 
+	if (m_team_marker)
+	{
+		m_team_marker->setFrame(m_under_construction, true);
+	}
+
 	GameObject::update(deltaTime);
 
 	//update grid index
