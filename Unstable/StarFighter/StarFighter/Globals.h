@@ -49,6 +49,8 @@ enum TeamAlliances
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
 
+#define USE_SPLIT_SCREEN							false
+
 //FLUX SPECIFIC
 #define GRID_WIDTH									15
 #define GRID_HEIGHT									15
@@ -57,8 +59,6 @@ enum TeamAlliances
 #define DEFAULT_TILE_GENERATOR						4-1
 #define CENTRAL_FLUXOR_ZONE_TILE_OFFSET				5
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		1
-#define USE_UNGUIDED_FLUXORS_COST_MULTIPLIER		0.1f
-#define USE_SPLIT_SCREEN							true
 
 //HUD
 #define TEXT_POP_DISTANCE_NOT_FADED					10

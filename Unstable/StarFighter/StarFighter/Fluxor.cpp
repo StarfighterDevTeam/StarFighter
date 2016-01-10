@@ -33,7 +33,7 @@ void Fluxor::Initialize()
 	m_has_spawn_bounds = false;
 
 	//Flux display
-	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::White, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text = new SFText(((*CurrentGame).m_fonts[Font_Arial]), 20, sf::Color::White, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = m_alliance;
 }
 

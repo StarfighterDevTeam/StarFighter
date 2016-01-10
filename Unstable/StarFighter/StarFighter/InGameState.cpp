@@ -175,7 +175,7 @@ void InGameState::Update(sf::Time deltaTime)
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
-	//(*CurrentGame).drawHud();
+	(*CurrentGame).drawHud();
 }
 
 void InGameState::Release()
