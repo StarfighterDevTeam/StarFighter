@@ -25,6 +25,11 @@ void Game::init(RenderWindow* window)
 	m_module_HUD->setColor(sf::Color(255, 255, 255, 200));
 	this->hudScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
 	this->hudScreen.setSmooth(true);
+	//if (USE_SPLIT_SCREEN == true)
+	//{
+	//	this->hudScreen_SplitScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	//	this->hudScreen_SplitScreen.setSmooth(true);
+	//}
 
 	//split screens
 	if (USE_SPLIT_SCREEN == true)

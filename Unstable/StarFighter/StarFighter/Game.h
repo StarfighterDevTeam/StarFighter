@@ -75,6 +75,7 @@ public:
 	void collectGarbage();
 	sf::RenderTexture mainScreen;
 	sf::RenderTexture hudScreen;
+	sf::RenderTexture hudScreen_SplitScreen;
 	sf::Vector2i screen_size;
 	float hyperspeedMultiplier;
 	float vspeed;

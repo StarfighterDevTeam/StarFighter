@@ -1,11 +1,12 @@
 #include "SFTextPop.h"
 
-SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target)
+SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target, sf::Vector2f offset)
 {
 	setFont(*text->getFont());
 	setCharacterSize(text->getCharacterSize());
 	setColor(text->getColor());
 	setPosition(text->getPosition());
+	setString(text->getString());
 
 	m_visible = text->m_visible;
 	m_team = text->m_team;
@@ -19,6 +20,7 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 	m_total_pop_time = total_pop_time;
 
 	m_alpha = 255;
+	m_offset = offset;
 
 	if (target)
 	{
@@ -29,6 +31,10 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 		m_target = NULL;
 	}
 }
+SFTextPop::~SFTextPop()
+{
+	m_target = NULL;
+}
 
 void SFTextPop::update(Time deltaTime)
 {
@@ -38,11 +44,11 @@ void SFTextPop::update(Time deltaTime)
 
 	if (m_target)
 	{
-		setPosition(sf::Vector2f(m_target->getPosition().x, m_target->getPosition().y - m_target->m_size.y / 2 - TEXT_POP_OFFSET_Y - (total_pop_distance / m_total_pop_time * m_timer_clock.getElapsedTime().asSeconds())));
+		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width / 2 + m_offset.x, m_target->getPosition().y - m_target->m_size.y / 2 + m_offset.y - (total_pop_distance / m_total_pop_time * m_timer_clock.getElapsedTime().asSeconds())));
 	}
 	else
 	{
-		setPosition(sf::Vector2f(getPosition().x, getPosition().y - (total_pop_distance / m_total_pop_time * deltaTime.asSeconds())));
+		setPosition(sf::Vector2f(getPosition().x - getGlobalBounds().width / 2 + m_offset.x, getPosition().y + m_offset.y - (total_pop_distance / m_total_pop_time * deltaTime.asSeconds())));
 	}
 
 	if (m_timer_clock.getElapsedTime().asSeconds() > pop_time_not_faded)

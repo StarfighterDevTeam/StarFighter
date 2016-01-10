@@ -6,6 +6,7 @@
 #include "Game.h"
 #include "Fluxor.h"
 #include "SFText.h"
+#include "SFTextPop.h"
 
 enum LinkStatus
 {

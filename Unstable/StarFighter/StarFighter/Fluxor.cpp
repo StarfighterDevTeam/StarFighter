@@ -13,6 +13,7 @@ void Fluxor::Initialize()
 	m_flux_max = 0;
 	m_displaying_flux = false;
 	m_transfer_buffer = 0;
+	m_transfert_buffer_memory = 0;
 	m_team = PlayerNeutral;
 	m_alliance = AllianceNeutral;
 	m_target = NULL;
@@ -99,6 +100,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux = GREEN_FLUXOR_VALUE;
 			m_consummable_by_players = true;
 			m_consummable_by_modules = true;
+			m_color = Color::Green;
 			break;
 		}
 		case FluxorType_Blue:
@@ -110,6 +112,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_can_be_refilled_by_modules = true;
 			m_needs_link_to_circulate = true;
 			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+			m_color = Color::Cyan;
 			break;
 		}
 		case FluxorType_Red:
@@ -123,6 +126,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_can_be_refilled_by_modules = true;
 			m_flux_attacker = true;
 			m_flux_attack_piercing = true;
+			m_color = Color::Red;
 			break;
 		}
 		case FluxorType_Purple:
@@ -136,6 +140,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_can_be_refilled_by_modules = true;
 			m_flux_attacker = true;
 			m_flux_stealer = true;
+			m_color = Color::Magenta;
 			break;
 		}
 		case FluxorType_Black:
@@ -145,6 +150,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_flux = 20;
 			m_flux_max = 0;
 			m_fluxovore = true;
+			m_color = Color::Black;
 			break;
 		}
 	}
@@ -454,6 +460,16 @@ void Fluxor::WastingFlux()
 			}
 
 			m_flux_waste_clock.restart();
+
+			//fedback
+			SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, m_color, sf::Vector2f(getPosition().x, getPosition().y - m_size.y - TEXT_POP_FLUXOR_OFFSET_Y), m_team);
+			text_feedback->m_alliance = m_alliance;
+			SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_FLUXOR_DISTANCE_NOT_FADED, TEXT_POP_FLUXOR_DISTANCE_FADE_OUT, TEXT_POP_FLUXOR_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_FLUXOR_OFFSET_Y));
+			ostringstream ss;
+			ss << "-" << m_flux_waste;
+			pop_feedback->setString(ss.str());
+			delete text_feedback;
+			(*CurrentGame).addToFeedbacks(pop_feedback);
 		}
 	}
 }
@@ -518,6 +534,7 @@ void Fluxor::BringStealerBack()
 	m_displaying_flux = true;
 	m_consummable_by_modules = true;
 	m_can_be_refilled_by_modules = false;
+	m_color = Color::Cyan;
 	if (m_flux_text)
 		m_flux_text->setColor(sf::Color::Cyan);
 }

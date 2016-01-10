@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "Game.h"
 #include "SFText.h"
+#include "SFTextPop.h"
 
 class Fluxor : public GameObject
 {
@@ -67,6 +68,7 @@ public :
 	void BringStealerBack();
 
 	unsigned int m_transfer_buffer;
+	unsigned int m_transfert_buffer_memory;
 	sf::Clock m_flux_transfer_clock;
 
 	//HUD
