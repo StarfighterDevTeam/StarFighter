@@ -71,6 +71,7 @@ enum TeamAlliances
 #define USE_FEEDBACK_ATTACK							true
 #define USE_FEEDBACK_CONSTRUCTION					true
 #define USE_FEEDBACK_GREEN_FLUXOR					true
+#define USE_FEEDBACK_DESTRUCTION					true
 
 #define TEXT_POP_DISTANCE_NOT_FADED					30
 #define TEXT_POP_DISTANCE_FADE_OUT					30

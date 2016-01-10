@@ -242,67 +242,70 @@ void Fluxor::update(sf::Time deltaTime)
 		m_flux = m_flux_max;
 	}
 
-	if (!m_docked)
-	{
-		//flux waste
-		WastingFlux();
-
-		//chaos turns
-		if (!m_guided)
-		{
-			if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
-			{
-				ChaosTurns();
-			}
-
-			if (ScreenBorderContraints())
-			{
-				m_turn_delay = RandomizeTurnDelay();
-				m_turn_clock.restart();
-			}
-		}
-
-		GameObject::update(deltaTime);
-	}
-	else
-	{
-		m_flux_waste_clock.restart();
-
-		AnimatedSprite::update(deltaTime);
-
-		//reset docked every frame. The collision will be in charge of re-docking the fluxor every frame if necessary.
-		m_docked = false;
-	}
-
-	UpdateRotation();
-
-	//death by flux consumption
+	//death?
 	if (m_flux == 0)
 	{
 		m_GarbageMe = true;
+		m_visible = false;
 	}
-
-	//hud
-	if (m_FluxorType == FluxorType_Blue && m_alliance == AllianceNeutral)
+	else
 	{
-		printf("kk");
-	}
-	if (m_displaying_flux)
-	{
-		if (m_flux_text && m_flux_text->m_visible)
+		if (!m_docked)
 		{
-			ostringstream ss;
-			ss << m_flux;
-			if (m_flux_max > 0)
-				ss << "/" << m_flux_max;
-			m_flux_text->setString(ss.str());
-			if (m_flux_attacker || m_fluxovore)
+			//flux waste
+			WastingFlux();
+
+			//chaos turns
+			if (!m_guided)
 			{
-				m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text->getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+				if (m_turn_clock.getElapsedTime().asSeconds() > m_turn_delay)
+				{
+					ChaosTurns();
+				}
+
+				if (ScreenBorderContraints())
+				{
+					m_turn_delay = RandomizeTurnDelay();
+					m_turn_clock.restart();
+				}
 			}
-			else
+
+			GameObject::update(deltaTime);
+		}
+		else
+		{
+			m_flux_waste_clock.restart();
+
+			AnimatedSprite::update(deltaTime);
+
+			//reset docked every frame. The collision will be in charge of re-docking the fluxor every frame if necessary.
+			m_docked = false;
+		}
+
+		UpdateRotation();
+
+		//hud
+		if (m_FluxorType == FluxorType_Blue && m_alliance == AllianceNeutral)
+		{
+			printf("kk");
+		}
+		if (m_displaying_flux)
+		{
+			if (m_flux_text && m_flux_text->m_visible)
 			{
-				m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+				ostringstream ss;
+				ss << m_flux;
+				if (m_flux_max > 0)
+					ss << "/" << m_flux_max;
+				m_flux_text->setString(ss.str());
+				if (m_flux_attacker || m_fluxovore)
+				{
+					m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_flux_text->getGlobalBounds().height - FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+				}
+				else
+				{
+					m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y));
+				}
 			}
 		}
 	}

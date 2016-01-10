@@ -5,8 +5,8 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 	setFont(*text->getFont());
 	setCharacterSize(text->getCharacterSize());
 	setColor(text->getColor());
-	setPosition(text->getPosition());
 	setString(text->getString());
+	setPosition(sf::Vector2f(text->getPosition().x + offset.x, text->getPosition().y + offset.y));
 
 	m_visible = text->m_visible;
 	m_team = text->m_team;
@@ -48,7 +48,7 @@ void SFTextPop::update(Time deltaTime)
 	}
 	else
 	{
-		setPosition(sf::Vector2f(getPosition().x - getGlobalBounds().width / 2 + m_offset.x, getPosition().y + m_offset.y - (total_pop_distance / m_total_pop_time * deltaTime.asSeconds())));
+		setPosition(sf::Vector2f(getPosition().x, getPosition().y - (total_pop_distance / m_total_pop_time * deltaTime.asSeconds())));
 	}
 
 	if (m_timer_clock.getElapsedTime().asSeconds() > pop_time_not_faded)
