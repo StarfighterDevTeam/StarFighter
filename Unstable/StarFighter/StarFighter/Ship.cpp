@@ -397,15 +397,18 @@ void Ship::GetFluxor(GameObject* object)
 
 				fluxor->m_GarbageMe = true;
 
-				//fedback
-				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y/2), m_team);
-				text_feedback->m_alliance = m_alliance;
-				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
-				ostringstream ss;
-				ss << "+" << fluxor->m_flux;
-				pop_feedback->setString(ss.str());
-				delete text_feedback;
-				(*CurrentGame).addToFeedbacks(pop_feedback);
+				//feedback
+				if (USE_FEEDBACK_GREEN_FLUXOR)
+				{
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
+					text_feedback->m_alliance = m_alliance;
+					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+					ostringstream ss;
+					ss << "+" << fluxor->m_flux;
+					pop_feedback->setString(ss.str());
+					delete text_feedback;
+					(*CurrentGame).addToFeedbacks(pop_feedback);
+				}
 			}
 		}
 	}
@@ -495,14 +498,17 @@ bool Ship::TryBuildModule(int module_key)
 			m_flux -= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction;
 
 			//feedback
-			SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Green, getPosition(), m_team);
-			text_feedback->m_alliance = m_alliance;
-			ostringstream ss;
-			ss << "-" << (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction;
-			text_feedback->setString(ss.str());
-			SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
-			delete text_feedback;
-			(*CurrentGame).addToFeedbacks(pop_feedback);
+			if (USE_FEEDBACK_CONSTRUCTION)
+			{
+				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Green, getPosition(), m_team);
+				text_feedback->m_alliance = m_alliance;
+				ostringstream ss;
+				ss << "-" << (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction;
+				text_feedback->setString(ss.str());
+				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+				delete text_feedback;
+				(*CurrentGame).addToFeedbacks(pop_feedback);
+			}
 		}
 
 		return module;

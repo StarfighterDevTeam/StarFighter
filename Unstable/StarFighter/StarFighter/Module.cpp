@@ -628,14 +628,17 @@ bool Module::GenerateFluxor()
 					m_flux -= m_fluxor_generation_cost;
 
 					//feedback
-					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
-					text_feedback->m_alliance = m_alliance;
-					ostringstream ss;
-					ss << "-" << m_fluxor_generation_cost;
-					text_feedback->setString(ss.str());
-					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, 0));
-					delete text_feedback;
-					(*CurrentGame).addToFeedbacks(pop_feedback);
+					if (USE_FEEDBACK_GENERATE_FLUXOR)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						ostringstream ss;
+						ss << "-" << m_fluxor_generation_cost;
+						text_feedback->setString(ss.str());
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, 0));
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
 
 					//turret?
 					if (m_turret_range == 0)
@@ -689,12 +692,28 @@ void Module::AutogenerateFlux()
 				m_flux_autogeneration_clock.restart();
 
 				//feedback
-				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
-				text_feedback->m_alliance = m_alliance;
-				text_feedback->setString("+1");
-				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, 0));
-				delete text_feedback;
-				(*CurrentGame).addToFeedbacks(pop_feedback);
+				if (USE_FEEDBACK_AUTOGENERATION)
+				{
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+					text_feedback->m_alliance = m_alliance;
+					text_feedback->setString("+1");
+					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, 0));
+					delete text_feedback;
+					(*CurrentGame).addToFeedbacks(pop_feedback);
+				}
+
+				if (USE_FEEDBACK_ACTIVATION)
+				{
+					if (m_flux == m_flux_max)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						text_feedback->setString("Activated");
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
+				}
 			}
 		}
 		else
@@ -708,8 +727,6 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		
-
 		if (m_flux < m_flux_max && fluxor->m_flux > 0)
 		{
 			if (fluxor->m_transfert_buffer_memory == 0)
@@ -721,6 +738,20 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 			{
 				m_flux++;
 				fluxor->m_flux--;
+
+				//feedback
+				if (USE_FEEDBACK_ACTIVATION)
+				{
+					if (m_flux == m_flux_max)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						text_feedback->setString("Activated");
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
+				}
 			}
 			
 			//consumption finished?
@@ -730,14 +761,17 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 				UndockFluxor(fluxor);
 				
 				//feedback
-				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, sf::Color::Cyan, getPosition(), m_team);
-				text_feedback->m_alliance = m_alliance;
-				ostringstream ss;
-				ss << "-" << fluxor->m_transfert_buffer_memory;
-				text_feedback->setString(ss.str());
-				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_FLUXOR_DISTANCE_NOT_FADED, TEXT_POP_FLUXOR_DISTANCE_FADE_OUT, TEXT_POP_FLUXOR_TOTAL_TIME, this, sf::Vector2f(0, m_size.y / 2 - TEXT_POP_FLUXOR_OFFSET_Y));
-				delete text_feedback;
-				(*CurrentGame).addToFeedbacks(pop_feedback);
+				if (USE_FEEDBACK_CONSUMPTION)
+				{
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, sf::Color::Cyan, getPosition(), m_team);
+					text_feedback->m_alliance = m_alliance;
+					ostringstream ss;
+					ss << "-" << fluxor->m_transfert_buffer_memory;
+					text_feedback->setString(ss.str());
+					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_FLUXOR_DISTANCE_NOT_FADED, TEXT_POP_FLUXOR_DISTANCE_FADE_OUT, TEXT_POP_FLUXOR_TOTAL_TIME, this, sf::Vector2f(0, m_size.y / 2 - TEXT_POP_FLUXOR_OFFSET_Y));
+					delete text_feedback;
+					(*CurrentGame).addToFeedbacks(pop_feedback);
+				}
 
 				fluxor->m_transfert_buffer_memory = 0;
 			}
@@ -798,6 +832,7 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 			fluxor->m_flux_waste_clock.restart();
 
 			//fedback once finished
+			if ((m_isRefillingFlux && USE_FEEDBACK_REFILL) || (m_add_flux > 0 && USE_FEEDBACK_AMPLIFICATION))
 			if (fluxor->m_transfer_buffer == 0)
 			{
 				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
@@ -854,12 +889,16 @@ void Module::AttackModule(Fluxor* fluxor)
 					}
 
 					//fedback module
-					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
-					text_feedback->m_alliance = AllianceNeutral;
-					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, 0));
-					pop_feedback->setString("-1");
-					delete text_feedback;
-					(*CurrentGame).addToFeedbacks(pop_feedback);
+					if (USE_FEEDBACK_ATTACK)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
+						text_feedback->m_alliance = AllianceNeutral;
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, 0));
+						pop_feedback->setString("-1");
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
+					
 					//feedback fluxor
 					//SFText* text_feedback2 = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, fluxor->m_color, getPosition(), m_team);
 					//text_feedback2->m_alliance = fluxor->m_alliance;

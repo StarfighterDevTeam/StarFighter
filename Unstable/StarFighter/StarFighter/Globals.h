@@ -61,6 +61,17 @@ enum TeamAlliances
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		1
 
 //HUD
+#define USE_FEEDBACK_ACTIVATION						true
+#define USE_FEEDBACK_AUTOGENERATION					false
+#define USE_FEEDBACK_GENERATE_FLUXOR				true
+#define USE_FEEDBACK_WASTING						false
+#define USE_FEEDBACK_CONSUMPTION					false
+#define USE_FEEDBACK_AMPLIFICATION					true
+#define USE_FEEDBACK_REFILL							true
+#define USE_FEEDBACK_ATTACK							true
+#define USE_FEEDBACK_CONSTRUCTION					true
+#define USE_FEEDBACK_GREEN_FLUXOR					true
+
 #define TEXT_POP_DISTANCE_NOT_FADED					30
 #define TEXT_POP_DISTANCE_FADE_OUT					30
 #define TEXT_POP_TOTAL_TIME							1.0f

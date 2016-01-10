@@ -140,7 +140,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_can_be_refilled_by_modules = true;
 			m_flux_attacker = true;
 			m_flux_stealer = true;
-			m_color = Color::Magenta;
+			m_color = Color::Red;
 			break;
 		}
 		case FluxorType_Black:
@@ -462,14 +462,17 @@ void Fluxor::WastingFlux()
 			m_flux_waste_clock.restart();
 
 			//fedback
-			SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, m_color, sf::Vector2f(getPosition().x, getPosition().y - m_size.y - TEXT_POP_FLUXOR_OFFSET_Y), m_team);
-			text_feedback->m_alliance = m_alliance;
-			SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_FLUXOR_DISTANCE_NOT_FADED, TEXT_POP_FLUXOR_DISTANCE_FADE_OUT, TEXT_POP_FLUXOR_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_FLUXOR_OFFSET_Y));
-			ostringstream ss;
-			ss << "-" << m_flux_waste;
-			pop_feedback->setString(ss.str());
-			delete text_feedback;
-			(*CurrentGame).addToFeedbacks(pop_feedback);
+			if (USE_FEEDBACK_WASTING)
+			{
+				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, m_color, sf::Vector2f(getPosition().x, getPosition().y - m_size.y - TEXT_POP_FLUXOR_OFFSET_Y), m_team);
+				text_feedback->m_alliance = m_alliance;
+				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_FLUXOR_DISTANCE_NOT_FADED, TEXT_POP_FLUXOR_DISTANCE_FADE_OUT, TEXT_POP_FLUXOR_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_FLUXOR_OFFSET_Y));
+				ostringstream ss;
+				ss << "-" << m_flux_waste;
+				pop_feedback->setString(ss.str());
+				delete text_feedback;
+				(*CurrentGame).addToFeedbacks(pop_feedback);
+			}
 		}
 	}
 }
