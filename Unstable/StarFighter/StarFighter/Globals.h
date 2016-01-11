@@ -65,7 +65,7 @@ enum TeamAlliances
 #define USE_FEEDBACK_AUTOGENERATION					false
 #define USE_FEEDBACK_GENERATE_FLUXOR				true
 #define USE_FEEDBACK_WASTING						false
-#define USE_FEEDBACK_CONSUMPTION					false
+#define USE_FEEDBACK_CONSUMPTION					true
 #define USE_FEEDBACK_AMPLIFICATION					true
 #define USE_FEEDBACK_REFILL							true
 #define USE_FEEDBACK_ATTACK							true
@@ -122,7 +122,7 @@ enum TeamAlliances
 //FLUXOR
 #define FLUXOR_FLUX_VALUE							10
 #define	GREEN_FLUXOR_VALUE							5
-#define FLUXOR_FLUX_DISPLAY_OFFSET_Y				2
+#define FLUXOR_FLUX_DISPLAY_OFFSET_Y				8
 
 #define FLUXOR_WIDTH								67
 #define FLUXOR_HEIGHT								50
@@ -141,7 +141,7 @@ enum TeamAlliances
 #define FLUXOR_WASTE_VALUE							1
 
 //MODULE
-#define MODULE_FLUX_DISPLAY_OFFSET_Y				- 24
+#define MODULE_FLUX_DISPLAY_OFFSET_Y				- 40
 #define MODULE_GLOW_MIN_RADIUS						1
 #define MODULE_GLOW_RADIUS							12
 #define MODULE_GLOW_ANIMATION_DURATION				0.5f

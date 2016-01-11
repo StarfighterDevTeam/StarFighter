@@ -284,11 +284,6 @@ void Fluxor::update(sf::Time deltaTime)
 
 		UpdateRotation();
 
-		//hud
-		if (m_FluxorType == FluxorType_Blue && m_alliance == AllianceNeutral)
-		{
-			printf("kk");
-		}
 		if (m_displaying_flux)
 		{
 			if (m_flux_text && m_flux_text->m_visible)

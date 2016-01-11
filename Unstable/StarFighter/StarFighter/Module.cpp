@@ -32,7 +32,7 @@ void Module::Initialize()
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
-	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	m_flux_text->m_alliance = AllianceNeutral;
 
 	m_flux_gauge = NULL;
 	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2));
@@ -595,11 +595,12 @@ void Module::GetFluxor(GameObject* object)
 			}
 			else
 			{
-				//check if the guided Fluxor passes right through the middle of the Module
-				if (GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
+				//Allied guided Fluxor passes right through the middle of the Module. Enemy Fluxors collide on the Module edge
+				if (fluxor->m_alliance != m_alliance || GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
+				//if (GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
 				{
 					//make sure a fluxor leaving the module is not colliding again
-					if (fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
+					if (fluxor->m_alliance == m_alliance && fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
 					{
 						//do nothing
 					}
@@ -1029,7 +1030,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 			if (!fluxor->m_docked)
 			{
-				fluxor->setPosition(this->getPosition());
+				//fluxor->setPosition(this->getPosition());
 				if (!fluxor->m_flux_attack_piercing)
 				{
 					if (fluxor->m_flux_stealer)
@@ -1044,7 +1045,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			}
 			else
 			{
-				fluxor->setPosition(this->getPosition());
+				//fluxor->setPosition(this->getPosition());
 			}
 		}
 	}
@@ -1545,11 +1546,6 @@ void Module::SetTeam(PlayerTeams team, TeamAlliances alliance)
 {
 	m_team = team;
 	m_alliance = alliance;
-	if (m_flux_text)
-	{
-		m_flux_text->m_team = team;
-		m_flux_text->m_alliance = alliance;
-	}
 	if (m_team_marker)
 	{
 		m_team_marker->m_team = team;
