@@ -298,7 +298,7 @@ void Module::SetConstructionStatus(bool under_construction)
 	setAnimationLine(under_construction);
 }
 
-Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished, int link_activation, unsigned int flux)
+Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished, bool force_direction, int forced_link_direction, unsigned flux)
 {
 	//construction over own existing module?
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
@@ -351,10 +351,19 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 	{
 		new_module->FinishConstruction();
 	}
-	for (int i = 0; i < link_activation; i++)
+	if (force_direction)
 	{
-		new_module->SwitchLinkDirection();
+		for (int i = 0; i < forced_link_direction; i++)
+		{
+			new_module->SwitchLinkDirection();
+		}
 	}
+	//auto direction
+	else
+	{
+		new_module->SetDirectionAutomatically();
+	}
+	
 	new_module->m_flux = flux;
 	if (flux > new_module->m_flux_max)
 	{
@@ -1497,4 +1506,70 @@ void Module::AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset)
 {
 	m_flux_gauge = (*CurrentGame).m_flux_gauges[0]->Clone();
 	m_flux_gauge->m_offset = offset;
+}
+
+void Module::SetDirectionAutomatically()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		//cases where module is on a border of the map
+		if (i == 0 && m_curGridIndex.x == GRID_WIDTH - 1)
+		{
+			return;
+		}
+		else if (i == 1 && m_curGridIndex.y == GRID_HEIGHT - 1)
+		{
+			SwitchLinkDirection();
+			return;
+		}
+		else if (i == 2 && m_curGridIndex.x == 0)
+		{
+			SwitchLinkDirection();
+			SwitchLinkDirection();
+			return;
+		}
+		else if (i == 3 && m_curGridIndex.y == 0)
+		{
+			SwitchLinkDirection();
+			SwitchLinkDirection();
+			SwitchLinkDirection();
+			return;
+		}
+	}
+
+	//other cases
+	bool link_found = false;
+	int link_index = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		int next_x = (i == 0) - (i == 2);
+		int next_y = (i == 1) - (i == 3);
+
+		if ((*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y])
+		{
+			Module* pModule = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y];
+			if (pModule->m_team == this->m_team)
+			{
+				if (pModule->GetMainLinkIndex() == (i + 2) % 4)
+				{
+					link_index = pModule->GetMainLinkIndex();
+					link_found = true;
+					break;
+				}
+			}
+
+		}
+	}
+
+	//by default, we turn it left or right depending on alliance index
+	if (!link_found)
+	{
+		link_index = (m_alliance * 2 % 4);
+	}
+
+	//apply computed index (number of switches necessary to face the desidred direction)
+	for (int j = 0; j < link_index; j++)
+	{
+		SwitchLinkDirection();
+	}
 }

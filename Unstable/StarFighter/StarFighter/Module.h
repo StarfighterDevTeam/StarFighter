@@ -37,7 +37,7 @@ public :
 	Module(ModuleType moduleType);
 	Module(ModuleType moduleType, PlayerTeams team);
 	Module(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
-	static Module* CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished = false, int link_activation = 0, unsigned flux = 0);
+	static Module* CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished = false, bool force_direction = false, int forced_link_direction = 0, unsigned flux = 0);
 	static void EraseModule(sf::Vector2u grid_index);
 	static void DebugFinishModule(sf::Vector2u grid_index);
 	static void DebugRefillingModuleFlux(sf::Vector2u grid_index);
@@ -46,6 +46,7 @@ public :
 	virtual ~Module();
 	void update(sf::Time deltaTime) override;
 	void GetFluxor(GameObject* object) override;
+	void SetDirectionAutomatically();
 
 	ModuleType m_moduleType;
 	unsigned int m_flux;
