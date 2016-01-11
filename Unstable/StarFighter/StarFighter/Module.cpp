@@ -41,6 +41,9 @@ void Module::Initialize()
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
+	m_tile_child_feedback = NULL;
+	m_is_a_child_module = false;
+
 	//links
 	GameObject arrow = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 3);
 	for (int i = 0; i < 4; i++)
@@ -433,6 +436,11 @@ Module::~Module()
 	{
 		m_flux_gauge->m_visible = false;
 		m_flux_gauge->m_GarbageMe = true;
+	}
+	if (m_tile_child_feedback)
+	{
+		m_tile_child_feedback->m_visible = false;
+		m_tile_child_feedback->m_GarbageMe = true;
 	}
 
 	//updating grid knowledge
@@ -1319,11 +1327,16 @@ void Module::UpdateLinks()
 	m_has_child_to_refill = false;
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
+	if (!m_under_construction && m_fluxor_generated_type == FluxorType_Blue)
+	{
+		m_is_a_child_module = true;
+	}
 
 	while (module_parent->GetMainLinkedModule())//check if it has an active link with another module
 	{
 		int main_link = module_parent->GetMainLinkIndex();
 		Module* module_child = module_parent->m_linked_modules[main_link];
+		module_child->m_is_a_child_module = true;
 
 		//module already checked? (= infinite loop)
 		if (find(checked_modules.begin(), checked_modules.end(), module_child) != checked_modules.end())
@@ -1341,6 +1354,58 @@ void Module::UpdateLinks()
 			//child has full stocks, we shall continue the loop until we find a child thas need to be refilled
 			checked_modules.push_back(module_parent);
 			module_parent = module_child;
+		}
+	}
+
+	//CHILD CELL FEEDBACK
+	if (m_is_a_child_module)//is a generator of blue fluxors, or is eventually linked to one
+	{
+		//look for a connected free cell
+		int link_index = GetLinkIndexToFreeConnectedCell();
+		if (link_index >= 0)
+		{
+			int next_x = (link_index == 0) - (link_index == 2);
+			int next_y = (link_index == 1) - (link_index == 3);
+
+			sf::Vector2f position = Game::GridToPosition(sf::Vector2u(m_curGridIndex.x + next_x, m_curGridIndex.y + next_y));
+			//create new feedback
+			if (!m_tile_child_feedback)
+			{
+				m_tile_child_feedback = new SFRectangle(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+				m_tile_child_feedback->m_alliance = m_alliance;
+				(*CurrentGame).addToFeedbacks(m_tile_child_feedback, GridFeedbackLayer);
+			}
+			//update existing feedback
+			else
+			{
+				m_tile_child_feedback->setPosition(position);
+			}
+
+			//check for doublons and clean them
+			std::vector<SFRectangle*> existing_tile_feedbacks = (*CurrentGame).GetSceneSFRectanglesLayered(GridFeedbackLayer);
+			size_t FakeGridFeedbacksVectorSize = existing_tile_feedbacks.size();
+			for (size_t i = 0; i < FakeGridFeedbacksVectorSize; i++)
+			{
+				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i] != m_tile_child_feedback && existing_tile_feedbacks[i]->getPosition() == m_tile_child_feedback->getPosition())
+				{
+					//delete doublon feedback
+					m_tile_child_feedback->m_GarbageMe = true;
+					m_tile_child_feedback->m_visible = false;
+					m_tile_child_feedback = NULL;
+					break;
+
+				}
+			}
+		}
+		else
+		{
+			//delete obsolete feedback if existing
+			if (m_tile_child_feedback)
+			{
+				m_tile_child_feedback->m_GarbageMe = true;
+				m_tile_child_feedback->m_visible = false;
+				m_tile_child_feedback = NULL;
+			}
 		}
 	}
 }
@@ -1510,38 +1575,29 @@ void Module::AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset)
 
 void Module::SetDirectionAutomatically()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		//cases where module is on a border of the map
-		if (i == 0 && m_curGridIndex.x == GRID_WIDTH - 1)
-		{
-			return;
-		}
-		else if (i == 1 && m_curGridIndex.y == GRID_HEIGHT - 1)
-		{
-			SwitchLinkDirection();
-			return;
-		}
-		else if (i == 2 && m_curGridIndex.x == 0)
-		{
-			SwitchLinkDirection();
-			SwitchLinkDirection();
-			return;
-		}
-		else if (i == 3 && m_curGridIndex.y == 0)
-		{
-			SwitchLinkDirection();
-			SwitchLinkDirection();
-			SwitchLinkDirection();
-			return;
-		}
-	}
-
 	//other cases
 	bool link_found = false;
 	int link_index = 0;
 	for (int i = 0; i < 4; i++)
 	{
+		//cases where module is on a border of the map
+		if (i == 0 && m_curGridIndex.x == GRID_WIDTH - 1)
+		{
+			continue;
+		}
+		else if (i == 1 && m_curGridIndex.y == GRID_HEIGHT - 1)
+		{
+			continue;
+		}
+		else if (i == 2 && m_curGridIndex.x == 0)
+		{
+			continue;
+		}
+		else if (i == 3 && m_curGridIndex.y == 0)
+		{
+			continue;
+		}
+
 		int next_x = (i == 0) - (i == 2);
 		int next_y = (i == 1) - (i == 3);
 
@@ -1571,5 +1627,43 @@ void Module::SetDirectionAutomatically()
 	for (int j = 0; j < link_index; j++)
 	{
 		SwitchLinkDirection();
+	}
+}
+
+int Module::GetLinkIndexToFreeConnectedCell()
+{
+	//other cases
+	int link = GetMainLinkIndex();
+
+	//cases where module is on a border of the map
+	if (link == 0 && m_curGridIndex.x == GRID_WIDTH - 1)
+	{
+		return -1;
+	}
+	else if (link == 1 && m_curGridIndex.y == GRID_HEIGHT - 1)
+	{
+		return -1;
+	}
+	else if (link == 2 && m_curGridIndex.x == 0)
+	{
+		return -1;
+	}
+	else if (link == 3 && m_curGridIndex.y == 0)
+	{
+		return -1;
+	}
+
+	int next_x = (link == 0) - (link == 2);
+	int next_y = (link == 1) - (link == 3);
+
+	//cell is free?
+	if (!(*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y])
+	{
+		//return link index to free cell
+		return link;
+	}
+	else
+	{
+		return -1;
 	}
 }

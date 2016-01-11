@@ -16,6 +16,7 @@ using namespace sf;
 enum LayerType {
 	BackgroundLayer,
 	FakeGridLayer,
+	GridFeedbackLayer,
 	ModuleLayer,
 	TeamMarkerLayer,
 	GlowLayer,

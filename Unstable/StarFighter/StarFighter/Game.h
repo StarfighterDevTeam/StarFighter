@@ -62,7 +62,7 @@ public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
-	void addToFeedbacks(SFRectangle* feedback);
+	void addToFeedbacks(SFRectangle* feedback, LayerType layer);
 	void addToFeedbacks(SFText* text);
 	void addToFeedbacks(SFGauge* gauge);
 
@@ -92,6 +92,8 @@ public:
 	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
 	GameObject* GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object);
 	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
+	std::vector<GameObject*> GetSceneGameObjectsLayered(LayerType layer);
+	std::vector<SFRectangle*> GetSceneSFRectanglesLayered(LayerType layer);
 
 	//Fonts
 	sf::Font* font;
@@ -136,7 +138,7 @@ private:
 	void AddGameObjectToVector(SFGauge* pSFGauge, vector<SFGauge*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 	RenderWindow *window;
-	std::vector<SFRectangle*> sceneFeedbackBars;
+	std::vector<SFRectangle*> sceneFeedbackBars[NBVAL_Layer];
 	std::vector<SFText*> sceneFeedbackSFTexts;
 	std::vector<SFGauge*> sceneFeedbackSFGauge;
 	std::vector<GameObject*> sceneGameObjects;

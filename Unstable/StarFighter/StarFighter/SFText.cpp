@@ -50,6 +50,7 @@ SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color col
 SFRectangle* SFRectangle::Clone()
 {
 	SFRectangle* clone = new SFRectangle(getPosition(), getSize(), m_color, getOutlineThickness(), getOutlineColor(), m_team);
+	clone->m_layer = m_layer;
 
 	return clone;
 }

@@ -154,10 +154,14 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 	}
 }
 
-void Game::addToFeedbacks(SFRectangle* feedback)
+void Game::addToFeedbacks(SFRectangle* feedback, LayerType layer)
 {
 	if (feedback)
-		AddGameObjectToVector(feedback, &this->sceneFeedbackBars);
+	{
+		AddGameObjectToVector(feedback, &this->sceneFeedbackBars[layer]);
+		feedback->m_layer = layer;
+	}
+		
 }
 
 void Game::addToFeedbacks(SFText* text)
@@ -289,22 +293,6 @@ void Game::drawScene()
 		{
 			if (i == FeedbacksLayer)
 			{
-				for (std::vector<SFRectangle*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
-				{
-					if (*it == NULL)
-						continue;
-
-					if ((*(*it)).m_visible)
-					{
-						if ((v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
-							continue;
-
-						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
-							continue;
-
-						mainScreen.draw(*(*it));
-					}
-				}
 				for (std::vector<SFText*>::iterator it = this->sceneFeedbackSFTexts.begin(); it != this->sceneFeedbackSFTexts.end(); it++)
 				{
 					if (*it == NULL)
@@ -354,8 +342,28 @@ void Game::drawScene()
 					}
 				}
 			}
+
 			else
 			{
+				//feedbacks
+				for (std::vector<SFRectangle*>::iterator it = this->sceneFeedbackBars[i].begin(); it != this->sceneFeedbackBars[i].end(); it++)
+				{
+					if (*it == NULL)
+						continue;
+
+					if ((*(*it)).m_visible)
+					{
+						if ((v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
+							continue;
+
+						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
+							continue;
+
+						mainScreen.draw(*(*it));
+					}
+				}
+
+				//game objects
 				for (std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin(); it != this->sceneGameObjectsLayered[i].end(); it++)
 				{
 					if (*it == NULL)
@@ -563,17 +571,19 @@ void Game::cleanGarbage()
 		delete pSFText;
 	}
 
+	
 	const size_t garbageRectangleSize = this->garbageRectangleShapes.size();
 	for (size_t i = 0; i < garbageRectangleSize; i++)
 	{
-		RectangleShape*    pRectangle = this->garbageRectangleShapes[i];
+		SFRectangle*    pRectangle = this->garbageRectangleShapes[i];
+		const int layer = pRectangle->m_layer;
 
-		const size_t VectorRectanglesSize = this->sceneFeedbackBars.size();
+		const size_t VectorRectanglesSize = this->sceneFeedbackBars[layer].size();
 		for (size_t j = 0; j < VectorRectanglesSize; j++)
 		{
-			if (this->sceneFeedbackBars[j] == pRectangle)
+			if (this->sceneFeedbackBars[layer][j] == pRectangle)
 			{
-				this->sceneFeedbackBars[j] = NULL;
+				this->sceneFeedbackBars[layer][j] = NULL;
 				break;
 			}
 		}
@@ -721,16 +731,19 @@ void Game::collectGarbage()
 			continue;
 		}
 	}
-	for (std::vector<SFRectangle*>::iterator it = (this->sceneFeedbackBars).begin(); it != (this->sceneFeedbackBars).end(); it++)
+	for (size_t layer = 0; layer < NBVAL_Layer; layer++)
 	{
-		if (*it == NULL)
-			continue;
-
-		//Content flagged for deletion
-		if ((**it).m_GarbageMe)
+		for (std::vector<SFRectangle*>::iterator it = (this->sceneFeedbackBars[layer]).begin(); it != (this->sceneFeedbackBars[layer]).end(); it++)
 		{
-			this->garbageRectangleShapes.push_back(*it);
-			continue;
+			if (*it == NULL)
+				continue;
+
+			//Content flagged for deletion
+			if ((**it).m_GarbageMe)
+			{
+				this->garbageRectangleShapes.push_back(*it);
+				continue;
+			}
 		}
 	}
 	for (std::vector<SFGauge*>::iterator it = (this->sceneFeedbackSFGauge).begin(); it != (this->sceneFeedbackSFGauge).end(); it++)
@@ -806,6 +819,16 @@ GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType typ
 std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
 {
 	return sceneGameObjectsTyped[type];
+}
+
+std::vector<GameObject*> Game::GetSceneGameObjectsLayered(LayerType layer)
+{
+	return sceneGameObjectsLayered[layer];
+}
+
+std::vector<SFRectangle*> Game::GetSceneSFRectanglesLayered(LayerType layer)
+{
+	return sceneFeedbackBars[layer];
 }
 
 //ol Game::isAlly(PlayerTeams ref_team, PlayerTeams other_team)

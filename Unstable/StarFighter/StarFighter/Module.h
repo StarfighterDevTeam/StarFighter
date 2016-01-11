@@ -121,6 +121,9 @@ public :
 	GameObject* m_team_marker;
 	SFGauge* m_flux_gauge;
 	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
+	SFRectangle* m_tile_child_feedback;
+	int GetLinkIndexToFreeConnectedCell();
+	bool m_is_a_child_module;
 };
 
 #endif // MODULE_H_INCLUDED

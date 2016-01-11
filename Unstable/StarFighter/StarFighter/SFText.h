@@ -40,6 +40,7 @@ public:
 	TeamAlliances m_alliance;
 	bool m_GarbageMe;
 	sf::Color m_color;
+	int m_layer;
 };
 
 class SFGauge : public SFText
