@@ -124,8 +124,8 @@ enum TeamAlliances
 #define	GREEN_FLUXOR_VALUE							5
 #define FLUXOR_FLUX_DISPLAY_OFFSET_Y				2
 
-#define FLUXOR_WIDTH								64
-#define FLUXOR_HEIGHT								48
+#define FLUXOR_WIDTH								67
+#define FLUXOR_HEIGHT								50
 #define FLUXOR_SPEED_MIN							100
 #define FLUXOR_SPEED_MAX							500
 #define FLUXOR_GUIDED_BASE_SPEED					100

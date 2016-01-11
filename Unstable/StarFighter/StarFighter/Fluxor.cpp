@@ -84,7 +84,7 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	const unsigned int W = FLUXOR_WIDTH;
 	const unsigned int H = FLUXOR_HEIGHT;
 		
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 1, 1);
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(W, H), 2, 1);
 	setOrigin(sf::Vector2f(W / 2, H / 2));
 
 	Initialize();
