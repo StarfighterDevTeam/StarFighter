@@ -1603,14 +1603,15 @@ void Module::SetDirectionAutomatically()
 			Module* pModule = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y];
 			if (pModule->m_team == this->m_team)
 			{
-				//1) is there a parent module linking to this one? (if yes, continue direction)
-				if (pModule->GetMainLinkIndex() == (i + 2) % 4)
+				//1) is there a parent module linking to this one? (and choose the best one if several)
+				if (pModule->GetMainLinkIndex() == (i + 2) % 4 && (link_parent_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1)))
 				{
 					link_parent_index = pModule->GetMainLinkIndex();
-					break;
+					continue;
 				}
-				//2) if we are building a Generator and there is Module nearby, it should be a good a idea to make it our child module and direct the Generator toward it.
-				else if (m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue && (link_child_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1)))
+
+				//2) is there a child module we should link to? (and choose the best one if several)
+				if (link_child_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1))
 				{
 					link_child_index = i;
 				}
@@ -1619,30 +1620,34 @@ void Module::SetDirectionAutomatically()
 		}
 	}
 
-	
-	//apply computed index
-	if (link_parent_index >= 0)
+	//Decision-making:
+	int number_of_turns = 0;
+
+	// 1) Has parent, but no child -> turn in the continuity of the parent's direction
+	if (link_parent_index >= 0 && link_child_index < 0)
 	{
-		for (int j = 0; j < link_parent_index; j++)
-		{
-			SwitchLinkDirection();
-		}
+		number_of_turns = link_parent_index;
 	}
-	else if (link_child_index >= 0)
+	// 2) Has parent and child -> turn to child
+	else if (link_parent_index >= 0 && link_child_index >= 0)
 	{
-		for (int j = 0; j < link_child_index; j++)
-		{
-			SwitchLinkDirection();
-		}
+		number_of_turns = link_child_index;
 	}
-	//by default, we turn it left or right depending on alliance index, which is a pretty arrousing method
+	// 3) has child, but no parent -> turn to child if generating Blue Fluxors
+	else if (link_parent_index < 0 && link_child_index >= 0 && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
+	{
+		number_of_turns = link_child_index;
+	}
+	// 4) by default, we turn it left or right depending on alliance index, which is a pretty arrousing method
 	else
 	{
-		int default_link = ((m_alliance * 2) % 4);
-		for (int j = 0; j < default_link; j++)
-		{
-			SwitchLinkDirection();
-		}
+		number_of_turns = ((m_alliance * 2) % 4);
+	}
+
+	//Apply decision
+	for (int j = 0; j < number_of_turns; j++)
+	{
+		SwitchLinkDirection();
 	}
 }
 
