@@ -1572,8 +1572,8 @@ void Module::AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset)
 void Module::SetDirectionAutomatically()
 {
 	//other cases
-	bool link_found = false;
-	int link_index = 0;
+	int link_parent_index = -1;
+	int link_child_index = -1;
 	for (int i = 0; i < 4; i++)
 	{
 		//cases where module is on a border of the map
@@ -1594,6 +1594,7 @@ void Module::SetDirectionAutomatically()
 			continue;
 		}
 
+		//other cases
 		int next_x = (i == 0) - (i == 2);
 		int next_y = (i == 1) - (i == 3);
 
@@ -1602,27 +1603,46 @@ void Module::SetDirectionAutomatically()
 			Module* pModule = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y];
 			if (pModule->m_team == this->m_team)
 			{
+				//1) is there a parent module linking to this one? (if yes, continue direction)
 				if (pModule->GetMainLinkIndex() == (i + 2) % 4)
 				{
-					link_index = pModule->GetMainLinkIndex();
-					link_found = true;
+					link_parent_index = pModule->GetMainLinkIndex();
 					break;
+				}
+				//2) if we are building a Generator and there is Module nearby, it should be a good a idea to make it our child module and direct the Generator toward it.
+				else if (m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue && (link_child_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1)))
+				{
+					link_child_index = i;
 				}
 			}
 
 		}
 	}
 
-	//by default, we turn it left or right depending on alliance index
-	if (!link_found)
+	
+	//apply computed index
+	if (link_parent_index >= 0)
 	{
-		link_index = (m_alliance * 2 % 4);
+		for (int j = 0; j < link_parent_index; j++)
+		{
+			SwitchLinkDirection();
+		}
 	}
-
-	//apply computed index (number of switches necessary to face the desidred direction)
-	for (int j = 0; j < link_index; j++)
+	else if (link_child_index >= 0)
 	{
-		SwitchLinkDirection();
+		for (int j = 0; j < link_child_index; j++)
+		{
+			SwitchLinkDirection();
+		}
+	}
+	//by default, we turn it left or right depending on alliance index, which is a pretty arrousing method
+	else
+	{
+		int default_link = ((m_alliance * 2) % 4);
+		for (int j = 0; j < default_link; j++)
+		{
+			SwitchLinkDirection();
+		}
 	}
 }
 
