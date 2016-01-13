@@ -1140,10 +1140,7 @@ void Module::UpdateLinks()
 		m_arrow[i]->m_visible = m_link[i].m_exists;
 
 		//reset of arrow status to default value
-		if (m_link[i].m_exists)
-		{
-			m_link[i].m_activated = Link_Deactivated;
-		}
+		m_link[i].m_activated = Link_Deactivated;
 
 		Module* module = NULL;
 		if (m_under_construction)
@@ -1178,7 +1175,10 @@ void Module::UpdateLinks()
 								{
 									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 									{
-										m_link[i].m_activated = Link_Activated;
+										if (m_link[i].m_exists)
+										{
+											m_link[i].m_activated = Link_Activated;
+										}
 										break;
 									}
 									else
@@ -1218,7 +1218,10 @@ void Module::UpdateLinks()
 								{
 									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 									{
-										m_link[i].m_activated = Link_Activated;
+										if (m_link[i].m_exists)
+										{
+											m_link[i].m_activated = Link_Activated;
+										}
 										break;
 									}
 									else
@@ -1258,7 +1261,10 @@ void Module::UpdateLinks()
 								{
 									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 									{
-										m_link[i].m_activated = Link_Activated;
+										if (m_link[i].m_exists)
+										{
+											m_link[i].m_activated = Link_Activated;
+										}
 										break;
 									}
 									else
@@ -1298,7 +1304,10 @@ void Module::UpdateLinks()
 								{
 									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
 									{
-										m_link[i].m_activated = Link_Activated;
+										if (m_link[i].m_exists)
+										{
+											m_link[i].m_activated = Link_Activated;
+										}
 										break;
 									}
 									else
@@ -1636,8 +1645,8 @@ void Module::SetDirectionAutomatically()
 				Module* pModule = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y];
 				if (pModule->m_team == this->m_team)
 				{
-					//1) is there a parent module linking to this one?
-					if (pModule->GetMainLinkIndex() == (i + 2) % 4)
+					//1) is there a parent module linking to this one? (we can go on and find a better one if we already have found a parent and a child)
+					if (pModule->GetMainLinkIndex() == (i + 2) % 4 && (link_parent_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1)))
 					{
 						link_parent_index = pModule->GetMainLinkIndex();
 
