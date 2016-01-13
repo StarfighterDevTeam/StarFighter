@@ -166,7 +166,7 @@ void InGameState::Update(sf::Time deltaTime)
 		if ((*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i])
 		{
 			Module* module = (Module*)(*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i];
-			module->m_is_a_child_module = false;
+			module->m_is_connected_to_a_circuit = false;
 		}
 	}
 
