@@ -729,7 +729,7 @@ void Module::AutogenerateFlux()
 						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
 						text_feedback->m_alliance = m_alliance;
 						
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
 						text_feedback->setString("Activated");
 						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - TEXT_POP_OFFSET_Y));
 						
@@ -770,7 +770,7 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
 						text_feedback->m_alliance = m_alliance;
 						text_feedback->setString("Activated");
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
 						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - TEXT_POP_OFFSET_Y));
 						delete text_feedback;
 						(*CurrentGame).addToFeedbacks(pop_feedback);
@@ -911,7 +911,7 @@ void Module::AttackModule(Fluxor* fluxor)
 					{
 						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Red, getPosition(), m_team);
 						text_feedback->m_alliance = AllianceNeutral;
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
 						pop_feedback->setString("Destroyed");
 						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - TEXT_POP_OFFSET_Y));
 						delete text_feedback;
@@ -1154,9 +1154,9 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
-					int max = max_temp > GRID_WIDTH - m_curGridIndex.x - 1 ? GRID_WIDTH - m_curGridIndex.x - 1 : max_temp;
-					for (int j = 1; j < max; j++)
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + hyperlink;
+					int max = max_temp > GRID_WIDTH - m_curGridIndex.x ? GRID_WIDTH - m_curGridIndex.x : max_temp;
+					for (int j = 1; j <= max; j++)
 					{
 						if (m_curGridIndex.x + j < GRID_WIDTH)
 						{
@@ -1194,9 +1194,9 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
-					int max = max_temp > GRID_HEIGHT - m_curGridIndex.y - 1 ? GRID_HEIGHT - m_curGridIndex.y - 1 : max_temp;
-					for (int j = 1; j < max; j++)
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + hyperlink;
+					int max = max_temp > GRID_HEIGHT - m_curGridIndex.y ? GRID_HEIGHT - m_curGridIndex.y : max_temp;
+					for (int j = 1; j <= max; j++)
 					{
 						if (m_curGridIndex.y + j < GRID_HEIGHT)
 						{
@@ -1234,9 +1234,9 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
-					int max = max_temp > m_curGridIndex.x ? m_curGridIndex.x : max_temp;
-					for (int j = 1; j < max; j++)
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + hyperlink;
+					int max = max_temp > m_curGridIndex.x ? m_curGridIndex.x: max_temp;
+					for (int j = 1; j <= max; j++)
 					{
 						if (m_curGridIndex.x - j >= 0)
 						{
@@ -1274,9 +1274,9 @@ void Module::UpdateLinks()
 				}
 				else
 				{
-					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + 1 + hyperlink;
+					int max_temp = GRID_CELLS_FOR_MODULE_LINK_ACTIVATION + hyperlink;
 					int max = max_temp > m_curGridIndex.y ? m_curGridIndex.y : max_temp;
-					for (int j = 1; j < max; j++)
+					for (int j = 1; j <= max; j++)
 					{
 						if (m_curGridIndex.y - j >= 0)
 						{
@@ -1310,7 +1310,7 @@ void Module::UpdateLinks()
 			//case of "short circuit" (links pointer each other)
 			if (module)
 			{
-				if (module->m_link[(i + 2) % 4].m_exists && module->m_link[(i + 2) % 4].m_activated == Link_Activated && (module->m_team == this->m_team || module->m_alliance == this->m_alliance))
+				if (module->GetMainLinkIndex() == (GetMainLinkIndex() + 2) % 4 && (module->m_team == this->m_team || module->m_alliance == this->m_alliance))
 				{
 					m_link[i].m_activated = Link_Invalid;
 				}
@@ -1328,16 +1328,21 @@ void Module::UpdateLinks()
 	m_has_child_to_refill = false;
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
-	if (!m_under_construction && m_fluxor_generated_type == FluxorType_Blue)
+
+	//module child of themselves: generators
+	if (!m_under_construction && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
 	{
 		m_is_a_child_module = true;
 	}
-
 	while (module_parent->GetMainLinkedModule())//check if it has an active link with another module
 	{
 		int main_link = module_parent->GetMainLinkIndex();
 		Module* module_child = module_parent->m_linked_modules[main_link];
-		module_child->m_is_a_child_module = true;
+		module_child->m_is_a_child_module = module_parent->m_is_a_child_module;
+		if (!module_child->m_is_a_child_module)
+		{
+			printf("ping, %d, %d\n", this->m_curGridIndex.x, this->m_curGridIndex.y);
+		}
 
 		//module already checked? (= infinite loop)
 		if (find(checked_modules.begin(), checked_modules.end(), module_child) != checked_modules.end())
@@ -1372,14 +1377,26 @@ void Module::UpdateLinks()
 			//create new feedback
 			if (!m_tile_child_feedback)
 			{
-				m_tile_child_feedback = new SFRectangle(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+				m_tile_child_feedback = new SFRectangle(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(255, 180, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 				m_tile_child_feedback->m_alliance = m_alliance;
 				(*CurrentGame).addToFeedbacks(m_tile_child_feedback, GridFeedbackLayer);
 			}
-			//update existing feedback
+			//update position of existing feedback
 			else
 			{
 				m_tile_child_feedback->setPosition(position);
+			}
+
+			//update color in any case
+			if (m_flux == m_flux_max)
+			{
+				m_tile_child_feedback->setFillColor(sf::Color(0, 255, 0, 70));
+				m_tile_child_feedback->m_prioritary = true;
+			}
+			else
+			{
+				m_tile_child_feedback->setFillColor(sf::Color(255, 180, 0, 70));
+				m_tile_child_feedback->m_prioritary = false;
 			}
 
 			//check for doublons and clean them
@@ -1387,11 +1404,11 @@ void Module::UpdateLinks()
 			size_t FakeGridFeedbacksVectorSize = existing_tile_feedbacks.size();
 			for (size_t i = 0; i < FakeGridFeedbacksVectorSize; i++)
 			{
-				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i] != m_tile_child_feedback && existing_tile_feedbacks[i]->getPosition() == m_tile_child_feedback->getPosition())
+				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i]->m_visible && existing_tile_feedbacks[i] != m_tile_child_feedback && existing_tile_feedbacks[i]->getPosition() == m_tile_child_feedback->getPosition())
 				{
 					//delete doublon feedback
-					m_tile_child_feedback->m_GarbageMe = true;
 					m_tile_child_feedback->m_visible = false;
+					m_tile_child_feedback->m_GarbageMe = true;
 					m_tile_child_feedback = NULL;
 					break;
 
@@ -1403,10 +1420,20 @@ void Module::UpdateLinks()
 			//delete obsolete feedback if existing
 			if (m_tile_child_feedback)
 			{
-				m_tile_child_feedback->m_GarbageMe = true;
 				m_tile_child_feedback->m_visible = false;
+				m_tile_child_feedback->m_GarbageMe = true;
 				m_tile_child_feedback = NULL;
 			}
+		}
+	}
+	else
+	{
+		//delete obsolete feedback if existing
+		if (m_tile_child_feedback)
+		{
+			m_tile_child_feedback->m_visible = false;
+			m_tile_child_feedback->m_GarbageMe = true;
+			m_tile_child_feedback = NULL;
 		}
 	}
 }

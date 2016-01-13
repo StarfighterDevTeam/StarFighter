@@ -30,7 +30,7 @@ SFText* SFText::Clone()
 }
 
 // RECTANGLES
-SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team)
+SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team, bool prioritary)
 {
 	setPosition(position);
 	setSize(size);
@@ -43,14 +43,21 @@ SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color col
 	m_visible = true;
 	m_team = team;
 	m_alliance = (TeamAlliances)0;
+	m_prioritary = prioritary;
 
 	m_GarbageMe = false;
+}
+
+SFRectangle::~SFRectangle()
+{
+	
 }
 
 SFRectangle* SFRectangle::Clone()
 {
 	SFRectangle* clone = new SFRectangle(getPosition(), getSize(), m_color, getOutlineThickness(), getOutlineColor(), m_team);
 	clone->m_layer = m_layer;
+	clone->m_prioritary = m_prioritary;
 
 	return clone;
 }

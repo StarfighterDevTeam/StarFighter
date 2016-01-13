@@ -32,8 +32,8 @@ class SFRectangle : public sf::RectangleShape
 {
 public:
 	SFRectangle() {};
-	SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team);
-	~SFRectangle() {};
+	SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team, bool prioritary = false);
+	~SFRectangle();
 	SFRectangle* Clone();
 	bool m_visible;
 	PlayerTeams m_team;
@@ -41,6 +41,7 @@ public:
 	bool m_GarbageMe;
 	sf::Color m_color;
 	int m_layer;
+	bool m_prioritary;
 };
 
 class SFGauge : public SFText
