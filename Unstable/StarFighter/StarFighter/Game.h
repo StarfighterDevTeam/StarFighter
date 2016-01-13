@@ -41,11 +41,11 @@ enum ModuleType
 	ModuleType_Amplifier,
 	ModuleType_Factory,
 	ModuleType_Factory_Up,
-	ModuleType_Turret,
+	ModuleType_Shield,
 	ModuleType_Barrier,
 	ModuleType_Armory,
 	ModuleType_Battery,
-	ModuleType_Shield,
+	ModuleType_Turret,
 	NBVAL_ModuleType,
 };
 

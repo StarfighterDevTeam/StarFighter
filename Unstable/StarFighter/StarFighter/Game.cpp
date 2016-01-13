@@ -435,6 +435,19 @@ void Game::colisionChecksV2()
 		if (*it1 == NULL)
 			continue;
 
+		//Fluxors interactions with Shields (before interacting with Modules).
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[ShieldObject].begin(); it2 != sceneGameObjectsTyped[ShieldObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it2)->GetFluxor(*it1);
+			}
+		}
+
 		//Fluxors interactions with Modules
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[ModuleObject].begin(); it2 != sceneGameObjectsTyped[ModuleObject].end(); it2++)
 		{

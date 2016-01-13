@@ -18,10 +18,10 @@ enum LayerType {
 	FakeGridLayer,
 	GridFeedbackLayer,
 	ModuleLayer,
+	ShieldLayer,
 	TeamMarkerLayer,
 	GlowLayer,
 	FluxorLayer,
-	PortalLayer,
 	PlayerStroboscopicLayer,
 	ExplosionLayer,
 	EnemyObjectLayer,
@@ -37,7 +37,7 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
-	PortalObject,
+	ShieldObject,
 	ModuleObject,
 	FluxorUnguidedObject,
 	FluxorGuidedObject,
@@ -129,6 +129,7 @@ public:
 	virtual void GetFluxor(GameObject* object);
 	virtual void GetModule(GameObject* object);
 	virtual void ResolveProductionBufferList();
+	GameObject* m_target;
 
 protected:
 	Animation defaultAnimation;

@@ -27,8 +27,10 @@ void Module::Initialize()
 	m_add_flux = 0;
 	m_isAutogeneratingFlux = false;
 	m_turret_range = 0;
+	m_shield_range = 0;
 	m_upgrade_player_stats = false;
 	m_isCondensatingFluxor = false;
+	m_shield = NULL;
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
@@ -221,6 +223,9 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		{
 			m_flux_max_under_construction = 20;
 			m_flux_max_after_construction = 100;
+			m_shield_range = 1;
+			m_isAutogeneratingFlux = true;
+			m_flux_autogeneration_time = 1.f;
 			break;
 		}
 		case ModuleType_Turret:
@@ -442,6 +447,11 @@ Module::~Module()
 		m_tile_child_feedback->m_visible = false;
 		m_tile_child_feedback->m_GarbageMe = true;
 	}
+	if (m_shield)
+	{
+		m_shield->m_visible = false;
+		m_shield->m_GarbageMe = true;
+	}
 
 	//updating grid knowledge
 	if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y])
@@ -536,6 +546,16 @@ void Module::update(sf::Time deltaTime)
 	if (m_team_marker)
 	{
 		m_team_marker->setFrame(m_under_construction, true);
+	}
+
+	//shield?
+	if (m_shield_range > 0 && m_flux > 0 && !m_under_construction && !m_shield)
+	{
+		m_shield = new GameObject(getPosition(), sf::Vector2f(0, 0), "Assets/2D/shield.png", sf::Vector2f(384, 384));
+		sf::Color color = (*CurrentGame).m_team_colors[m_team];
+		m_shield->setColor(Color(color.r, color.g, color.b, 70));
+		m_shield->m_target = this;
+		(*CurrentGame).addToScene(m_shield, ShieldLayer, ShieldObject);
 	}
 
 	GameObject::update(deltaTime);
