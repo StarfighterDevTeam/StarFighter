@@ -43,8 +43,8 @@ void Module::Initialize()
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
-	m_tile_child_feedback = NULL;
-	m_is_a_child_module = false;
+	m_free_tile_feedback = NULL;
+	m_is_connected_to_a_circuit = false;
 
 	//links
 	GameObject arrow = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 3);
@@ -440,10 +440,10 @@ Module::~Module()
 		m_flux_gauge->m_visible = false;
 		m_flux_gauge->m_GarbageMe = true;
 	}
-	if (m_tile_child_feedback)
+	if (m_free_tile_feedback)
 	{
-		m_tile_child_feedback->m_visible = false;
-		m_tile_child_feedback->m_GarbageMe = true;
+		m_free_tile_feedback->m_visible = false;
+		m_free_tile_feedback->m_GarbageMe = true;
 	}
 	if (m_shield)
 	{
@@ -509,26 +509,17 @@ void Module::update(sf::Time deltaTime)
 	//construction under progress
 	if (m_under_construction)
 	{
-		//too late, a module has been built on this cell already
-		//if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] && (*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_visible && !(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_GarbageMe)
-		//{
-		//	m_visible = false;
-		//	m_GarbageMe = true;
-		//}
-		//else
-		//{
-			//construction finished
-			if (m_flux == m_flux_max_under_construction)
-			{
-				FinishConstruction();
-			}
-			//still under construction
-			else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / MODULE_FLUX_CONSTRUCTION_PER_SECOND))
-			{
-				m_flux++;
-				m_construction_clock.restart();
-			}
-		//}
+		//construction finished
+		if (m_flux == m_flux_max_under_construction)
+		{
+			FinishConstruction();
+		}
+		//still under construction
+		else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / MODULE_FLUX_CONSTRUCTION_PER_SECOND))
+		{
+			m_flux++;
+			m_construction_clock.restart();
+		}
 	}
 	m_flux_max = m_under_construction ? m_flux_max_under_construction : m_flux_max_after_construction;
 
@@ -561,12 +552,15 @@ void Module::update(sf::Time deltaTime)
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 
+	//update links, circuit knowledge and feedbacks
 	UpdateLinks();
-
+	CheckCircuit();
+	UpdateFreeTileFeedbacks();
+	
+	//module properties
 	if (!m_under_construction)
 	{
 		AutogenerateFlux();
-
 		GenerateFluxor();
 	}
 	
@@ -1356,23 +1350,25 @@ void Module::UpdateLinks()
 		//update arrow visual
 		m_arrow[i]->setAnimationLine(m_link[i].m_activated);
 	}
+}
 
-	//update circuit knowledge
+void Module::CheckCircuit()
+{
 	m_has_child_to_refill = false;
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
 
 	if (!m_under_construction && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
 	{
-		m_is_a_child_module = true;
+		m_is_connected_to_a_circuit = true;
 	}
 	while (module_parent->GetMainLinkedModule())//check if it has an active link with another module
 	{
 		int main_link = module_parent->GetMainLinkIndex();
 		Module* module_child = module_parent->m_linked_modules[main_link];
-		if (module_parent->m_is_a_child_module)
+		if (module_parent->m_is_connected_to_a_circuit)
 		{
-			module_child->m_is_a_child_module = true;
+			module_child->m_is_connected_to_a_circuit = true;
 		}
 
 		//module already checked? (= infinite loop)
@@ -1380,7 +1376,7 @@ void Module::UpdateLinks()
 		{
 			break;
 		}
-		
+
 		if (module_child->m_flux < module_child->m_flux_max)
 		{
 			m_has_child_to_refill = true;
@@ -1388,14 +1384,16 @@ void Module::UpdateLinks()
 		}
 		//else
 		//{
-			//child has full stocks, we shall continue the loop until we find a child thas need to be refilled
-			checked_modules.push_back(module_parent);
-			module_parent = module_child;
+		//child has full stocks, we shall continue the loop until we find a child thas need to be refilled
+		checked_modules.push_back(module_parent);
+		module_parent = module_child;
 		//}
 	}
+}
 
-	//CHILD CELL FEEDBACK
-	if (m_is_a_child_module)//is a generator of blue fluxors, or is eventually linked to one
+void Module::UpdateFreeTileFeedbacks()
+{
+	if (m_is_connected_to_a_circuit)//is a generator of blue fluxors, or is eventually linked to one
 	{
 		//look for a connected free cell
 		int link_index = GetLinkIndexToFreeConnectedCell();
@@ -1406,28 +1404,28 @@ void Module::UpdateLinks()
 
 			sf::Vector2f position = Game::GridToPosition(sf::Vector2u(m_curGridIndex.x + next_x, m_curGridIndex.y + next_y));
 			//create new feedback
-			if (!m_tile_child_feedback)
+			if (!m_free_tile_feedback)
 			{
-				m_tile_child_feedback = new SFRectangle(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(255, 180, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
-				m_tile_child_feedback->m_alliance = m_alliance;
-				(*CurrentGame).addToFeedbacks(m_tile_child_feedback, GridFeedbackLayer);
+				m_free_tile_feedback = new SFRectangle(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(255, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+				m_free_tile_feedback->m_alliance = m_alliance;
+				(*CurrentGame).addToFeedbacks(m_free_tile_feedback, GridFeedbackLayer);
 			}
 			//update position of existing feedback
 			else
 			{
-				m_tile_child_feedback->setPosition(position);
+				m_free_tile_feedback->setPosition(position);
 			}
 
 			//update color in any case
 			if (m_flux == m_flux_max)
 			{
-				m_tile_child_feedback->setFillColor(sf::Color(0, 255, 0, 70));
-				m_tile_child_feedback->m_prioritary = true;
+				m_free_tile_feedback->setFillColor(sf::Color(0, 255, 0, 70));
+				m_free_tile_feedback->m_prioritary = true;
 			}
 			else
 			{
-				m_tile_child_feedback->setFillColor(sf::Color(255, 180, 0, 70));
-				m_tile_child_feedback->m_prioritary = false;
+				m_free_tile_feedback->setFillColor(sf::Color(255, 255, 0, 70));
+				m_free_tile_feedback->m_prioritary = false;
 			}
 
 			//check for doublons and clean them
@@ -1435,12 +1433,12 @@ void Module::UpdateLinks()
 			size_t FakeGridFeedbacksVectorSize = existing_tile_feedbacks.size();
 			for (size_t i = 0; i < FakeGridFeedbacksVectorSize; i++)
 			{
-				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i]->m_visible && existing_tile_feedbacks[i] != m_tile_child_feedback && existing_tile_feedbacks[i]->getPosition() == m_tile_child_feedback->getPosition())
+				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i]->m_visible && existing_tile_feedbacks[i] != m_free_tile_feedback && existing_tile_feedbacks[i]->getPosition() == m_free_tile_feedback->getPosition())
 				{
 					//delete doublon feedback
-					m_tile_child_feedback->m_visible = false;
-					m_tile_child_feedback->m_GarbageMe = true;
-					m_tile_child_feedback = NULL;
+					m_free_tile_feedback->m_visible = false;
+					m_free_tile_feedback->m_GarbageMe = true;
+					m_free_tile_feedback = NULL;
 					break;
 
 				}
@@ -1449,22 +1447,22 @@ void Module::UpdateLinks()
 		else
 		{
 			//delete obsolete feedback if existing
-			if (m_tile_child_feedback)
+			if (m_free_tile_feedback)
 			{
-				m_tile_child_feedback->m_visible = false;
-				m_tile_child_feedback->m_GarbageMe = true;
-				m_tile_child_feedback = NULL;
+				m_free_tile_feedback->m_visible = false;
+				m_free_tile_feedback->m_GarbageMe = true;
+				m_free_tile_feedback = NULL;
 			}
 		}
 	}
 	else
 	{
 		//delete obsolete feedback if existing
-		if (m_tile_child_feedback)
+		if (m_free_tile_feedback)
 		{
-			m_tile_child_feedback->m_visible = false;
-			m_tile_child_feedback->m_GarbageMe = true;
-			m_tile_child_feedback = NULL;
+			m_free_tile_feedback->m_visible = false;
+			m_free_tile_feedback->m_GarbageMe = true;
+			m_free_tile_feedback = NULL;
 		}
 	}
 }

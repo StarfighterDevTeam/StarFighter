@@ -60,9 +60,6 @@ public :
 	sf::Clock m_construction_clock;
 	GameObject* m_shield;
 
-	//vector<Module*> m_parents;
-	//vector<Module*> m_children;
-
 	//Module properties
 	void ApplyModuleEffect(Fluxor* fluxor);
 	bool m_isRefillingFlux;
@@ -104,7 +101,7 @@ public :
 	void ResolveProductionBufferList() override;
 	vector<Fluxor*> m_fluxor_generation_buffer;
 
-	//Links
+	//Links and circuit
 	GameObject* m_arrow[4];
 	Link m_link[4];
 	Module* m_linked_modules[4];
@@ -114,8 +111,14 @@ public :
 	void SwitchLinkDirection();
 	bool UndockFluxor(Fluxor* fluxor);
 	void UpdateLinks();
+	void CheckCircuit();
+	void UpdateFreeTileFeedbacks();
 	bool UpdateFluxorDirection(Fluxor* fluxor);
 	bool IsMainLinkActivated();
+
+	SFRectangle* m_free_tile_feedback;
+	int GetLinkIndexToFreeConnectedCell();
+	bool m_is_connected_to_a_circuit;
 
 	//HUD
 	SFText* m_flux_text;
@@ -123,9 +126,6 @@ public :
 	GameObject* m_team_marker;
 	SFGauge* m_flux_gauge;
 	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
-	SFRectangle* m_tile_child_feedback;
-	int GetLinkIndexToFreeConnectedCell();
-	bool m_is_a_child_module;
 };
 
 #endif // MODULE_H_INCLUDED
