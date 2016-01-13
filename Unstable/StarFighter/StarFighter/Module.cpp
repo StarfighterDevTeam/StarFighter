@@ -1139,6 +1139,12 @@ void Module::UpdateLinks()
 	{
 		m_arrow[i]->m_visible = m_link[i].m_exists;
 
+		//reset of arrow status to default value
+		if (m_link[i].m_exists)
+		{
+			m_link[i].m_activated = Link_Deactivated;
+		}
+
 		Module* module = NULL;
 		if (m_under_construction)
 		{
@@ -1329,7 +1335,6 @@ void Module::UpdateLinks()
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
 
-	//module child of themselves: generators
 	if (!m_under_construction && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
 	{
 		m_is_a_child_module = true;
@@ -1338,10 +1343,9 @@ void Module::UpdateLinks()
 	{
 		int main_link = module_parent->GetMainLinkIndex();
 		Module* module_child = module_parent->m_linked_modules[main_link];
-		module_child->m_is_a_child_module = module_parent->m_is_a_child_module;
-		if (!module_child->m_is_a_child_module)
+		if (module_parent->m_is_a_child_module)
 		{
-			printf("ping, %d, %d\n", this->m_curGridIndex.x, this->m_curGridIndex.y);
+			module_child->m_is_a_child_module = true;
 		}
 
 		//module already checked? (= infinite loop)
@@ -1353,14 +1357,14 @@ void Module::UpdateLinks()
 		if (module_child->m_flux < module_child->m_flux_max)
 		{
 			m_has_child_to_refill = true;
-			break;
+			//break;
 		}
-		else
-		{
+		//else
+		//{
 			//child has full stocks, we shall continue the loop until we find a child thas need to be refilled
 			checked_modules.push_back(module_parent);
 			module_parent = module_child;
-		}
+		//}
 	}
 
 	//CHILD CELL FEEDBACK
@@ -1601,49 +1605,66 @@ void Module::SetDirectionAutomatically()
 	//other cases
 	int link_parent_index = -1;
 	int link_child_index = -1;
-	for (int i = 0; i < 4; i++)
+	if (USE_SMART_ARROWS == true)
 	{
-		//cases where module is on a border of the map
-		if (i == 0 && m_curGridIndex.x == GRID_WIDTH - 1)
+		for (int i = 0; i < 4; i++)
 		{
-			continue;
-		}
-		else if (i == 1 && m_curGridIndex.y == GRID_HEIGHT - 1)
-		{
-			continue;
-		}
-		else if (i == 2 && m_curGridIndex.x == 0)
-		{
-			continue;
-		}
-		else if (i == 3 && m_curGridIndex.y == 0)
-		{
-			continue;
-		}
-
-		//other cases
-		int next_x = (i == 0) - (i == 2);
-		int next_y = (i == 1) - (i == 3);
-
-		if ((*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y])
-		{
-			Module* pModule = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y];
-			if (pModule->m_team == this->m_team)
+			//cases where module is on a border of the map
+			if (i == 0 && m_curGridIndex.x == GRID_WIDTH - 1)
 			{
-				//1) is there a parent module linking to this one? (and choose the best one if several)
-				if (pModule->GetMainLinkIndex() == (i + 2) % 4 && (link_parent_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1)))
-				{
-					link_parent_index = pModule->GetMainLinkIndex();
-					continue;
-				}
-
-				//2) is there a child module we should link to? (and choose the best one if several)
-				if (link_child_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1))
-				{
-					link_child_index = i;
-				}
+				continue;
+			}
+			else if (i == 1 && m_curGridIndex.y == GRID_HEIGHT - 1)
+			{
+				continue;
+			}
+			else if (i == 2 && m_curGridIndex.x == 0)
+			{
+				continue;
+			}
+			else if (i == 3 && m_curGridIndex.y == 0)
+			{
+				continue;
 			}
 
+			//other cases
+			int next_x = (i == 0) - (i == 2);
+			int next_y = (i == 1) - (i == 3);
+
+			if ((*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y])
+			{
+				Module* pModule = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + next_x][m_curGridIndex.y + next_y];
+				if (pModule->m_team == this->m_team)
+				{
+					//1) is there a parent module linking to this one?
+					if (pModule->GetMainLinkIndex() == (i + 2) % 4)
+					{
+						link_parent_index = pModule->GetMainLinkIndex();
+
+						//refuse solutions that create an obvious short circuit (in this case, we take the default direction)
+						if (link_child_index == (link_parent_index + 2) % 4)
+						{
+							link_child_index = -1;
+							link_parent_index = -1;
+						}
+
+						continue;
+					}
+
+					//2) is there a child module we should link to? (and choose the best one if several)
+					if (link_child_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1))
+					{
+						link_child_index = i;
+						
+						//refuse solutions that create an obvious short circuit (in this case, we take the default direction)
+						if (link_parent_index == (link_child_index + 2) % 4)
+						{
+							link_child_index = -1;
+							link_parent_index = -1;
+						}
+					}
+				}
+			}
 		}
 	}
 

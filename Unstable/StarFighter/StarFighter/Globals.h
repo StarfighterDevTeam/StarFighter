@@ -59,6 +59,7 @@ enum TeamAlliances
 #define DEFAULT_TILE_GENERATOR						4-1
 #define CENTRAL_FLUXOR_ZONE_TILE_OFFSET				5
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		1
+#define USE_SMART_ARROWS							true
 
 //HUD
 #define USE_FEEDBACK_ACTIVATION						true

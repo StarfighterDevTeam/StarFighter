@@ -158,7 +158,7 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		m_fluxor_spawn_zones[i].update(deltaTime);
 	}
-	
+
 	//reset modules childhood status
 	size_t ModulesVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(ModuleObject).size();
 	for (size_t i = 0; i < ModulesVectorSize; i++)
@@ -167,9 +167,6 @@ void InGameState::Update(sf::Time deltaTime)
 		{
 			Module* module = (Module*)(*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i];
 			module->m_is_a_child_module = false;
-			
-			if (module->m_isGeneratingFluxor && module->m_fluxor_generated_type == FluxorType_Blue)
-				continue;
 		}
 	}
 
