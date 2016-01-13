@@ -1406,7 +1406,7 @@ void Module::UpdateFreeTileFeedbacks()
 			//create new feedback
 			if (!m_free_tile_feedback)
 			{
-				m_free_tile_feedback = new SFRectangle(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(255, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+				m_free_tile_feedback = new SFRectangle(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(255, 255, 255, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 				m_free_tile_feedback->m_alliance = m_alliance;
 				(*CurrentGame).addToFeedbacks(m_free_tile_feedback, GridFeedbackLayer);
 			}
@@ -1424,7 +1424,7 @@ void Module::UpdateFreeTileFeedbacks()
 			}
 			else
 			{
-				m_free_tile_feedback->setFillColor(sf::Color(255, 255, 0, 70));
+				m_free_tile_feedback->setFillColor(sf::Color(255, 255, 255, 70));
 				m_free_tile_feedback->m_prioritary = false;
 			}
 
@@ -1440,7 +1440,6 @@ void Module::UpdateFreeTileFeedbacks()
 					m_free_tile_feedback->m_GarbageMe = true;
 					m_free_tile_feedback = NULL;
 					break;
-
 				}
 			}
 		}
