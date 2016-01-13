@@ -221,8 +221,8 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		}
 		case ModuleType_Shield:
 		{
-			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 100;
+			m_flux_max_under_construction = 60;
+			m_flux_max_after_construction = 30;
 			m_shield_range = 1;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 1.f;
