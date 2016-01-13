@@ -1646,15 +1646,19 @@ void Module::SetDirectionAutomatically()
 				if (pModule->m_team == this->m_team)
 				{
 					//1) is there a parent module linking to this one? (we can go on and find a better one if we already have found a parent and a child)
-					if (pModule->GetMainLinkIndex() == (i + 2) % 4 && (link_parent_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1)))
+					if (pModule->GetMainLinkIndex() == (i + 2) % 4)
 					{
-						link_parent_index = pModule->GetMainLinkIndex();
-
-						//refuse solutions that create an obvious short circuit (in this case, we take the default direction)
-						if (link_child_index == (link_parent_index + 2) % 4)
+						//risk of invalid link? abort smart arrow
+						if (pModule->GetMainLinkIndex() == (link_parent_index + 2) % 4)
 						{
-							link_child_index = -1;
 							link_parent_index = -1;
+							continue;
+						}
+
+						// if we alreay know a parent, can it be a better one?
+						if (link_parent_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1))
+						{
+							link_parent_index = pModule->GetMainLinkIndex();
 						}
 
 						continue;
@@ -1664,13 +1668,6 @@ void Module::SetDirectionAutomatically()
 					if (link_child_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1))
 					{
 						link_child_index = i;
-						
-						//refuse solutions that create an obvious short circuit (in this case, we take the default direction)
-						if (link_parent_index == (link_child_index + 2) % 4)
-						{
-							link_child_index = -1;
-							link_parent_index = -1;
-						}
 					}
 				}
 			}
