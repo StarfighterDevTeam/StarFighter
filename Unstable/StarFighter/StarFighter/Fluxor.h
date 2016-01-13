@@ -16,6 +16,7 @@ public :
 	Fluxor* Clone();
 	void Initialize();
 	static Fluxor* CreateFluxor(FluxorType FluxorType, bool within_bounds = false, sf::FloatRect bounds = { 0, 0, 0, 0 });
+	void CheckCondensation() override;
 
 	virtual ~Fluxor();
 	void update(sf::Time deltaTime) override;

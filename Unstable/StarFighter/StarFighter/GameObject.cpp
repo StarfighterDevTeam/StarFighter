@@ -462,3 +462,8 @@ void GameObject::ResolveProductionBufferList()
 {
 	//see override function in class Module //and class Ship
 }
+
+void GameObject::CheckCondensation()
+{
+	//see override function in class Fluxor
+}

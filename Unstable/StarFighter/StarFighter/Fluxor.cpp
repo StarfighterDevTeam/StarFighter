@@ -539,3 +539,13 @@ void Fluxor::BringStealerBack()
 	if (m_flux_text)
 		m_flux_text->setColor(sf::Color::Cyan);
 }
+
+void Fluxor::CheckCondensation()
+{
+	//check if circuit did not get destroyed or removed while fluxor is circulating and not condensed
+	if (m_needs_link_to_circulate && !m_condensed_to_circulate)
+	{
+		m_visible = false;
+		m_GarbageMe = true;
+	}
+}

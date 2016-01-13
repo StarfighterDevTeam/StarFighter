@@ -435,6 +435,7 @@ void Game::colisionChecksV2()
 		if (*it1 == NULL)
 			continue;
 
+		bool has_collided = false;
 		//Fluxors interactions with Shields (before interacting with Modules).
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[ShieldObject].begin(); it2 != sceneGameObjectsTyped[ShieldObject].end(); it2++)
 		{
@@ -443,8 +444,9 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				//Do something 
+				//Attack them maybe? (before attacking Modules inside it)
 				(*it2)->GetFluxor(*it1);
+				has_collided = true;
 			}
 		}
 
@@ -456,9 +458,16 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				//Do something 
+				//Attack them maybe?
 				(*it2)->GetFluxor(*it1);
+				has_collided = true;
 			}
+		}
+
+		//Check if we are allowed to continue
+		if (!has_collided)
+		{
+			(*it1)->CheckCondensation();
 		}
 
 		//Fluxors eating each others
