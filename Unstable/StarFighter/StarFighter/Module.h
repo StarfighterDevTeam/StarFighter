@@ -117,6 +117,7 @@ public :
 	bool IsMainLinkActivated();
 
 	SFRectangle* m_free_tile_feedback;
+	vector <SFRectangle*> m_free_tile_condensator_feedbacks;
 	int GetLinkIndexToFreeConnectedCell();
 	bool m_is_connected_to_a_circuit;
 

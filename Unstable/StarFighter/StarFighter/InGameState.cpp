@@ -128,7 +128,7 @@ void InGameState::Initialize(Player player)
 	
 	//HACK PROTO
 	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true, true, LinkRight);
-	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true, true, LinkLeft);
+	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true, true, LinkLeft);
 	//Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue2, true, true, LinkRight);
 	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed2, true, true, LinkLeft);
 
@@ -172,6 +172,17 @@ void InGameState::Update(sf::Time deltaTime)
 
 	//update all scene objects
 	(*CurrentGame).updateScene(deltaTime);
+
+	//update feedbacks
+	size_t ModulesVectorSizeNow = (*CurrentGame).GetSceneGameObjectsTyped(ModuleObject).size();
+	for (size_t i = 0; i < ModulesVectorSizeNow; i++)
+	{
+		if ((*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i])
+		{
+			Module* module = (Module*)(*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i];
+			module->UpdateFreeTileFeedbacks();
+		}
+	}
 
 	//move camera
 	UpdateCamera(deltaTime);
