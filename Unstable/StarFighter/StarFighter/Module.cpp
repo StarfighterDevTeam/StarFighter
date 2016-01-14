@@ -559,6 +559,10 @@ void Module::update(sf::Time deltaTime)
 		m_shield->m_target = this;
 		(*CurrentGame).addToScene(m_shield, ShieldLayer, ShieldObject);
 	}
+	else if (m_shield)
+	{
+		m_shield->m_visible = m_flux > 0;
+	}
 
 	GameObject::update(deltaTime);
 
@@ -568,7 +572,6 @@ void Module::update(sf::Time deltaTime)
 	//update links, circuit knowledge and feedbacks
 	UpdateLinks();
 	CheckCircuit();
-	UpdateFreeTileFeedbacks();
 	
 	//module properties
 	if (!m_under_construction)
@@ -1237,7 +1240,6 @@ void Module::UpdateLinks()
 								{
 									SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x + j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 									m_free_tile_condensator_feedbacks.push_back(rect);
-									printf("pos: %d, %d, je check la case: %d, %d. Result: %d\n", m_curGridIndex.x, m_curGridIndex.y, m_curGridIndex.x + j, m_curGridIndex.y, m_free_tile_condensator_feedbacks.size());
 									rect = NULL;
 								}
 							}
@@ -1420,11 +1422,6 @@ void Module::CheckCircuit()
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
 
-	if (m_moduleType == ModuleType_Condensator && !m_under_construction)
-	{
-		printf("check connected to circuit...");
-	}
-
 	if (!m_under_construction && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
 	{
 		m_is_connected_to_a_circuit = true;
@@ -1456,17 +1453,12 @@ void Module::CheckCircuit()
 		module_parent = module_child;
 		//}
 	}
-
-	if (m_moduleType == ModuleType_Condensator && !m_under_construction && m_is_connected_to_a_circuit)
-	{
-		printf(" ok\n");
-	}
 }
 
 void Module::UpdateFreeTileFeedbacks()
 {
 	Color free_cell_max_flux_feedback = Color(0, 255, 0, 70);
-	Color free_cell_not_max_flux_feedback = Color(255, 255, 255, 70);
+	Color free_cell_not_max_flux_feedback = Color(255, 120, 0, 70);
 
 	if (m_is_connected_to_a_circuit && !m_isCondensatingFluxor)//is a generator of blue fluxors, or is eventually linked to one. Condensators are handled separately (below).
 	{
@@ -1605,7 +1597,6 @@ void Module::UpdateFreeTileFeedbacks()
 	//not connected to ciruit -> destroy feedbacks
 	else if (!m_free_tile_condensator_feedbacks.empty())
 	{
-		printf("not connected\n");
 		size_t SizeFreeTileCondensatorFeedbacksVector = m_free_tile_condensator_feedbacks.size();
 		for (size_t i = 0; i < SizeFreeTileCondensatorFeedbacksVector; i++)
 		{
