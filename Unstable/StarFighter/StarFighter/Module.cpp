@@ -440,15 +440,28 @@ Module::~Module()
 		m_flux_gauge->m_visible = false;
 		m_flux_gauge->m_GarbageMe = true;
 	}
+	
+	if (m_shield)
+	{
+		m_shield->m_visible = false;
+		m_shield->m_GarbageMe = true;
+	}
+
 	if (m_free_tile_feedback)
 	{
 		m_free_tile_feedback->m_visible = false;
 		m_free_tile_feedback->m_GarbageMe = true;
 	}
-	if (m_shield)
+
+	size_t SizeFreeTileCondensatorFeedbacksVector = m_free_tile_condensator_feedbacks.size();
+	for (size_t i = 0; i < SizeFreeTileCondensatorFeedbacksVector; i++)
 	{
-		m_shield->m_visible = false;
-		m_shield->m_GarbageMe = true;
+		if (m_free_tile_condensator_feedbacks[i])
+		{
+			m_free_tile_condensator_feedbacks[i]->m_visible = false;
+			m_free_tile_condensator_feedbacks[i]->m_GarbageMe = true;
+			m_free_tile_condensator_feedbacks[i] = NULL;
+		}
 	}
 
 	//updating grid knowledge
@@ -1144,9 +1157,26 @@ void Module::SwitchLinkDirection()
 void Module::UpdateLinks()
 {
 	//condensation?
-	int hyperlink = m_isCondensatingFluxor;
+	int hyperlink = m_isCondensatingFluxor && !m_under_construction;
 	hyperlink *= GRID_WIDTH > GRID_HEIGHT ? GRID_WIDTH : GRID_HEIGHT;
 
+	//clear all condensator's free tile feedbacks, because we are going to create new ones every frame, so they can always be up to date (to hard to update)
+	if (m_isCondensatingFluxor && !m_under_construction)
+	{
+		size_t SizeFreeTileCondensatorFeedbacksVector = m_free_tile_condensator_feedbacks.size();
+		for (size_t i = 0; i < SizeFreeTileCondensatorFeedbacksVector; i++)
+		{
+			if (m_free_tile_condensator_feedbacks[i])
+			{
+				m_free_tile_condensator_feedbacks[i]->m_visible = false;
+				m_free_tile_condensator_feedbacks[i]->m_GarbageMe = true;
+				m_free_tile_condensator_feedbacks[i] = NULL;
+			}
+		}
+		m_free_tile_condensator_feedbacks.clear();
+	}
+
+	//begin scanning cells around
 	for (int i = 0; i < 4; i++)
 	{
 		m_arrow[i]->m_visible = m_link[i].m_exists;
@@ -1191,13 +1221,24 @@ void Module::UpdateLinks()
 										{
 											m_link[i].m_activated = Link_Activated;
 										}
-										break;
 									}
 									else
 									{
 										m_link[i].m_activated = Link_Deactivated;
-										break;
 									}
+
+									break;
+								}
+							}
+							else
+							{
+								//feedback for Module "Condensator"
+								if (m_isCondensatingFluxor)
+								{
+									SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x + j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+									m_free_tile_condensator_feedbacks.push_back(rect);
+									printf("pos: %d, %d, je check la case: %d, %d. Result: %d\n", m_curGridIndex.x, m_curGridIndex.y, m_curGridIndex.x + j, m_curGridIndex.y, m_free_tile_condensator_feedbacks.size());
+									rect = NULL;
 								}
 							}
 						}
@@ -1234,14 +1275,21 @@ void Module::UpdateLinks()
 										{
 											m_link[i].m_activated = Link_Activated;
 										}
-										break;
 									}
 									else
 									{
 										m_link[i].m_activated = Link_Deactivated;
-										break;
 									}
+
+									break;
 								}
+							}
+							//feedback for Module "Condensator"
+							if (m_isCondensatingFluxor)
+							{
+								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y + j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+								m_free_tile_condensator_feedbacks.push_back(rect);
+								rect = NULL;
 							}
 						}
 					}
@@ -1277,14 +1325,21 @@ void Module::UpdateLinks()
 										{
 											m_link[i].m_activated = Link_Activated;
 										}
-										break;
 									}
 									else
 									{
 										m_link[i].m_activated = Link_Deactivated;
-										break;
 									}
+
+									break;
 								}
+							}
+							//feedback for Module "Condensator"
+							if (m_isCondensatingFluxor)
+							{
+								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x - j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+								m_free_tile_condensator_feedbacks.push_back(rect);
+								rect = NULL;
 							}
 						}
 					}
@@ -1320,14 +1375,21 @@ void Module::UpdateLinks()
 										{
 											m_link[i].m_activated = Link_Activated;
 										}
-										break;
 									}
 									else
 									{
 										m_link[i].m_activated = Link_Deactivated;
-										break;
 									}
+
+									break;
 								}
+							}
+							//feedback for Module "Condensator"
+							if (m_isCondensatingFluxor)
+							{
+								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y - j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+								m_free_tile_condensator_feedbacks.push_back(rect);
+								rect = NULL;
 							}
 						}
 					}
@@ -1357,6 +1419,11 @@ void Module::CheckCircuit()
 	m_has_child_to_refill = false;
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
+
+	if (m_moduleType == ModuleType_Condensator && !m_under_construction)
+	{
+		printf("check connected to circuit...");
+	}
 
 	if (!m_under_construction && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
 	{
@@ -1389,11 +1456,19 @@ void Module::CheckCircuit()
 		module_parent = module_child;
 		//}
 	}
+
+	if (m_moduleType == ModuleType_Condensator && !m_under_construction && m_is_connected_to_a_circuit)
+	{
+		printf(" ok\n");
+	}
 }
 
 void Module::UpdateFreeTileFeedbacks()
 {
-	if (m_is_connected_to_a_circuit)//is a generator of blue fluxors, or is eventually linked to one
+	Color free_cell_max_flux_feedback = Color(0, 255, 0, 70);
+	Color free_cell_not_max_flux_feedback = Color(255, 255, 255, 70);
+
+	if (m_is_connected_to_a_circuit && !m_isCondensatingFluxor)//is a generator of blue fluxors, or is eventually linked to one. Condensators are handled separately (below).
 	{
 		//look for a connected free cell
 		int link_index = GetLinkIndexToFreeConnectedCell();
@@ -1419,12 +1494,12 @@ void Module::UpdateFreeTileFeedbacks()
 			//update color in any case
 			if (m_flux == m_flux_max)
 			{
-				m_free_tile_feedback->setFillColor(sf::Color(0, 255, 0, 70));
+				m_free_tile_feedback->setFillColor(free_cell_max_flux_feedback);
 				m_free_tile_feedback->m_prioritary = true;
 			}
 			else
 			{
-				m_free_tile_feedback->setFillColor(sf::Color(255, 255, 255, 70));
+				m_free_tile_feedback->setFillColor(free_cell_not_max_flux_feedback);
 				m_free_tile_feedback->m_prioritary = false;
 			}
 
@@ -1433,12 +1508,22 @@ void Module::UpdateFreeTileFeedbacks()
 			size_t FakeGridFeedbacksVectorSize = existing_tile_feedbacks.size();
 			for (size_t i = 0; i < FakeGridFeedbacksVectorSize; i++)
 			{
-				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i]->m_visible && existing_tile_feedbacks[i] != m_free_tile_feedback && existing_tile_feedbacks[i]->getPosition() == m_free_tile_feedback->getPosition())
+				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i] != m_free_tile_feedback && existing_tile_feedbacks[i]->m_visible && existing_tile_feedbacks[i]->m_alliance == m_alliance && existing_tile_feedbacks[i] != m_free_tile_feedback && existing_tile_feedbacks[i]->getPosition() == m_free_tile_feedback->getPosition())
 				{
-					//delete doublon feedback
-					m_free_tile_feedback->m_visible = false;
-					m_free_tile_feedback->m_GarbageMe = true;
-					m_free_tile_feedback = NULL;
+					//delete doublon feedback, based on priority
+					if (!existing_tile_feedbacks[i]->m_prioritary && m_free_tile_feedback->m_prioritary)
+					{
+						existing_tile_feedbacks[i]->m_visible = false;
+						existing_tile_feedbacks[i]->m_GarbageMe = true;
+						existing_tile_feedbacks[i] = NULL;
+					}
+					else
+					{
+						m_free_tile_feedback->m_visible = false;
+						m_free_tile_feedback->m_GarbageMe = true;
+						m_free_tile_feedback = NULL;
+					}
+					
 					break;
 				}
 			}
@@ -1463,6 +1548,75 @@ void Module::UpdateFreeTileFeedbacks()
 			m_free_tile_feedback->m_GarbageMe = true;
 			m_free_tile_feedback = NULL;
 		}
+	}
+
+	// CONDENSATOR: same story but with vectors of feedbacks now...
+
+	//finish the job of condensator feedbacks
+	if (!m_free_tile_condensator_feedbacks.empty() && m_is_connected_to_a_circuit)
+	{
+		size_t SizeFreeTileCondensatorFeedbacksVector = m_free_tile_condensator_feedbacks.size();
+		for (size_t i = 0; i < SizeFreeTileCondensatorFeedbacksVector; i++)
+		{
+			assert(m_free_tile_condensator_feedbacks[i] != NULL);
+
+			//complete data
+			m_free_tile_condensator_feedbacks[i]->m_alliance = m_alliance;
+			(*CurrentGame).addToFeedbacks(m_free_tile_condensator_feedbacks[i], GridFeedbackLayer);
+
+			//update color in any case
+			if (m_flux == m_flux_max)
+			{
+				m_free_tile_condensator_feedbacks[i]->setFillColor(free_cell_max_flux_feedback);
+				m_free_tile_condensator_feedbacks[i]->m_prioritary = true;
+			}
+			else
+			{
+				m_free_tile_condensator_feedbacks[i]->setFillColor(free_cell_not_max_flux_feedback);
+				m_free_tile_condensator_feedbacks[i]->m_prioritary = false;
+			}
+
+			//check for doublons and clean them
+			std::vector<SFRectangle*> existing_tile_feedbacks = (*CurrentGame).GetSceneSFRectanglesLayered(GridFeedbackLayer);
+			size_t FakeGridFeedbacksVectorSize = existing_tile_feedbacks.size();
+			for (size_t j = 0; j < FakeGridFeedbacksVectorSize; j++)
+			{
+				if (existing_tile_feedbacks[j] && existing_tile_feedbacks[j] != m_free_tile_condensator_feedbacks[i] && existing_tile_feedbacks[j]->m_visible && existing_tile_feedbacks[j]->m_alliance == m_alliance && existing_tile_feedbacks[j]->getPosition() == m_free_tile_condensator_feedbacks[i]->getPosition())
+				{
+					//delete doublon feedback, based on priority
+					if (!existing_tile_feedbacks[j]->m_prioritary && m_free_tile_condensator_feedbacks[i]->m_prioritary)
+					{
+						existing_tile_feedbacks[j]->m_visible = false;
+						existing_tile_feedbacks[j]->m_GarbageMe = true;
+						existing_tile_feedbacks[j] = NULL;
+					}
+					else
+					{
+						m_free_tile_condensator_feedbacks[i]->m_visible = false;
+						m_free_tile_condensator_feedbacks[i]->m_GarbageMe = true;
+						m_free_tile_condensator_feedbacks[i] = NULL;
+					}
+					
+					break;
+				}
+			}
+		}
+	}
+	//not connected to ciruit -> destroy feedbacks
+	else if (!m_free_tile_condensator_feedbacks.empty())
+	{
+		printf("not connected\n");
+		size_t SizeFreeTileCondensatorFeedbacksVector = m_free_tile_condensator_feedbacks.size();
+		for (size_t i = 0; i < SizeFreeTileCondensatorFeedbacksVector; i++)
+		{
+			if (m_free_tile_condensator_feedbacks[i])
+			{
+				m_free_tile_condensator_feedbacks[i]->m_visible = false;
+				m_free_tile_condensator_feedbacks[i]->m_GarbageMe = true;
+				m_free_tile_condensator_feedbacks[i] = NULL;
+			}
+		}
+		m_free_tile_condensator_feedbacks.clear();
 	}
 }
 
