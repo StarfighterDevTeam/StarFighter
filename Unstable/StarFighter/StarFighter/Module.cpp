@@ -1161,7 +1161,7 @@ void Module::UpdateLinks()
 	hyperlink *= GRID_WIDTH > GRID_HEIGHT ? GRID_WIDTH : GRID_HEIGHT;
 
 	//clear all condensator's free tile feedbacks, because we are going to create new ones every frame, so they can always be up to date (to hard to update)
-	if (m_isCondensatingFluxor && !m_under_construction)
+	if (!m_free_tile_condensator_feedbacks.empty())
 	{
 		size_t SizeFreeTileCondensatorFeedbacksVector = m_free_tile_condensator_feedbacks.size();
 		for (size_t i = 0; i < SizeFreeTileCondensatorFeedbacksVector; i++)
@@ -1233,7 +1233,7 @@ void Module::UpdateLinks()
 							else
 							{
 								//feedback for Module "Condensator"
-								if (m_isCondensatingFluxor)
+								if (m_isCondensatingFluxor && m_link[i].m_exists)
 								{
 									SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x + j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 									m_free_tile_condensator_feedbacks.push_back(rect);
@@ -1285,7 +1285,7 @@ void Module::UpdateLinks()
 								}
 							}
 							//feedback for Module "Condensator"
-							if (m_isCondensatingFluxor)
+							if (m_isCondensatingFluxor && m_link[i].m_exists)
 							{
 								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y + j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 								m_free_tile_condensator_feedbacks.push_back(rect);
@@ -1335,7 +1335,7 @@ void Module::UpdateLinks()
 								}
 							}
 							//feedback for Module "Condensator"
-							if (m_isCondensatingFluxor)
+							if (m_isCondensatingFluxor && m_link[i].m_exists)
 							{
 								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x - j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 								m_free_tile_condensator_feedbacks.push_back(rect);
@@ -1385,7 +1385,7 @@ void Module::UpdateLinks()
 								}
 							}
 							//feedback for Module "Condensator"
-							if (m_isCondensatingFluxor)
+							if (m_isCondensatingFluxor && m_link[i].m_exists)
 							{
 								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y - j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 								m_free_tile_condensator_feedbacks.push_back(rect);
