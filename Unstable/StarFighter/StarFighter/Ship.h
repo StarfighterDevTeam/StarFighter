@@ -66,7 +66,6 @@ public :
 	SFGauge* m_flux_gauge;
 	void SetTeam(PlayerTeams team, TeamAlliances alliance);
 	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
-	void UpdateProductionMasks();
 
 	//construction
 	//void ResolveProductionBufferList() override;

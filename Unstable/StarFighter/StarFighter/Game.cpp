@@ -32,6 +32,9 @@ void Game::init(RenderWindow* window)
 	//split screens
 	if (USE_SPLIT_SCREEN == true)
 	{
+		this->hudScreen_SplitScreen.create(HUD_PANEL_SIZE_X, REF_WINDOW_RESOLUTION_Y, false);
+		this->hudScreen_SplitScreen.setSmooth(true);
+
 		viewP1.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 4, REF_WINDOW_RESOLUTION_Y / 2));
 		viewP1.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y));
 		viewP1.setViewport(sf::FloatRect(0, 0, 0.5f, 1));
@@ -367,6 +370,11 @@ void Game::drawHud()
 		//draw background hud image
 		hudScreen.draw(*m_module_HUD);
 
+		if (USE_SPLIT_SCREEN == true)
+		{
+			hudScreen_SplitScreen.draw(*m_module_HUD);
+		}
+
 		//draw production feedbacks
 		for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
 		{
@@ -377,12 +385,14 @@ void Game::drawHud()
 		
 				if ((*(*it)).m_visible)
 				{
-					this->hudScreen.draw((*(*it)));
+					if (v == 0)
+						this->hudScreen.draw((*(*it)));
+					else
+						this->hudScreen_SplitScreen.draw((*(*it)));
 				}
 			}
 		}
 		
-
 		hudScreen.display();
 		sf::Sprite temp(hudScreen.getTexture());
 		temp.scale(scale_factor.x, scale_factor.y);
@@ -391,8 +401,11 @@ void Game::drawHud()
 
 		if (USE_SPLIT_SCREEN == true)
 		{
-			temp.setPosition(screen_size.x - (HUD_PANEL_SIZE_X * scale_factor.x), 0);
-			this->window->draw(temp);
+			hudScreen_SplitScreen.display();
+			sf::Sprite tempSplit(hudScreen_SplitScreen.getTexture());
+			tempSplit.scale(scale_factor.x, scale_factor.y);
+			tempSplit.setPosition(screen_size.x - (HUD_PANEL_SIZE_X * scale_factor.x), 0);
+			this->window->draw(tempSplit);
 		}
 	}
 }
