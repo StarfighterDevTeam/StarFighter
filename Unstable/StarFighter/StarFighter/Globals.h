@@ -62,6 +62,9 @@ enum TeamAlliances
 #define USE_SMART_ARROWS							true
 
 //HUD
+#define HUD_PANEL_SIZE_X							108
+#define HUD_PANEL_SIZE_Y							1080
+
 #define USE_FEEDBACK_ACTIVATION						true
 #define USE_FEEDBACK_AUTOGENERATION					false
 #define USE_FEEDBACK_GENERATE_FLUXOR				true
