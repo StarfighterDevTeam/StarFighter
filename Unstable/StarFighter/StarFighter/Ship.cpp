@@ -192,6 +192,9 @@ void Ship::update(sf::Time deltaTime)
 		m_build_text_status = Player_NotOverConstruction;
 	}
 
+	//update HUD production masks
+	UpdateProductionMasks();
+
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
 	
@@ -522,4 +525,17 @@ void Ship::AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset)
 {
 	m_flux_gauge = (*CurrentGame).m_flux_gauges[gauge]->Clone();
 	m_flux_gauge->m_offset = offset;
+}
+
+void Ship::UpdateProductionMasks()
+{
+	//local player only
+	size_t HUDProductionMasksVectorSize = (*CurrentGame).m_HUD_productions_mask[m_team].size();
+	for (size_t i = 0; i < HUDProductionMasksVectorSize; i++)
+	{
+		assert((*CurrentGame).m_HUD_productions_mask[m_team][i] != NULL);
+
+		//hide if player's flux is sufficient for building
+		(*CurrentGame).m_HUD_productions_mask[m_team][i]->m_visible = !(m_flux >= (*CurrentGame).m_modules[i]->m_flux_max_under_construction);
+	}
 }

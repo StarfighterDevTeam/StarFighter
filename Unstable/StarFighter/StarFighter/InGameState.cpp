@@ -92,6 +92,22 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).m_modules[i] = new Module((ModuleType)i);
 	}
 
+	//HUD production mask (for local player only)
+	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			SFRectangle* rect = new SFRectangle(sf::Vector2f(0, 1.0f * i * HUD_PANEL_SIZE_Y / 10), sf::Vector2f(1.0f * HUD_PANEL_SIZE_X, 1.0f * HUD_PANEL_SIZE_Y / 10), sf::Color(0, 0, 0, 150), 0.f, Color::Transparent, PlayerNeutral);
+			rect->setOrigin(0, 0);
+			if (v == 1)
+			{
+				rect->setPosition(sf::Vector2f((*CurrentGame).screen_size.x - (HUD_PANEL_SIZE_X * (*CurrentGame).scale_factor.x), rect->getPosition().y));
+			}
+			printf("position y : %f, size %f, %f \n", rect->getPosition().y, rect->getGlobalBounds().width, rect->getGlobalBounds().height);
+			(*CurrentGame).m_HUD_productions_mask[v].push_back(rect);
+		}
+	}
+	
 	//intégration placeholder
 	Ship* playerShip = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue, 3);
 	(*CurrentGame).playerShips[playerShip->m_team] = playerShip;
@@ -99,7 +115,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
 
 	Ship* playerShip2 = new Ship(Game::GridToPosition(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_START, GRID_WIDTH + 1 - DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerRed, 3);
-	(*CurrentGame).addToScene(playerShip2, PlayerShipLayer, PlayerShip);
+	//(*CurrentGame).addToScene(playerShip2, PlayerShipLayer, PlayerShip);
 	playerShip2->SetControllerType(KeyboardControl2);
 	playerShip2->setColor(sf::Color::Red);
 	(*CurrentGame).playerShips[playerShip2->m_team] = playerShip2;
@@ -183,6 +199,20 @@ void InGameState::Update(sf::Time deltaTime)
 			module->UpdateFreeTileFeedbacks();
 		}
 	}
+
+	//update HUD production mask (for local player only)
+	//for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
+	//{
+	//	//player 2 exists in split screen?
+	//	assert((*CurrentGame).playerShips[v] != NULL);
+	//	
+	//	size_t HUDProductionMasksVectorSize = (*CurrentGame).m_HUD_productions_mask[v].size();
+	//	for (size_t i = 0; i < HUDProductionMasksVectorSize; i++)
+	//	{
+	//		//hide if player's flux is sufficient for building
+	//		(*CurrentGame).m_HUD_productions_mask[v][i]->m_visible = !((*CurrentGame).playerShips[v]->m_flux >= (*CurrentGame).m_modules[i]->m_flux_max_under_construction);
+	//	}
+	//}
 
 	//move camera
 	UpdateCamera(deltaTime);

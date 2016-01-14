@@ -364,7 +364,24 @@ void Game::drawHud()
 
 	if (m_module_HUD)
 	{
+		//draw background hud image
 		hudScreen.draw(*m_module_HUD);
+
+		//draw production feedbacks
+		for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
+		{
+			for (std::vector<SFRectangle*>::iterator it = this->m_HUD_productions_mask[v].begin(); it != this->m_HUD_productions_mask[v].end(); it++)
+			{
+				if (*it == NULL)
+					continue;
+		
+				if ((*(*it)).m_visible)
+				{
+					this->hudScreen.draw((*(*it)));
+				}
+			}
+		}
+		
 
 		hudScreen.display();
 		sf::Sprite temp(hudScreen.getTexture());

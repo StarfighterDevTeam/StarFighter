@@ -123,6 +123,7 @@ public:
 	GameObject* m_team_markers[NBVAL_PlayerTeams];
 	SFGauge* m_flux_gauges[NBVAL_GaugeStyles];
 	GameObject* m_module_HUD;
+	vector<SFRectangle*> m_HUD_productions_mask[1 + USE_SPLIT_SCREEN];
 
 	bool isCellFree(sf::Vector2f position);
 	static sf::Vector2u GetGridIndex(sf::Vector2f position);
@@ -130,7 +131,7 @@ public:
 	void ResolveProductionBufferList();
 	vector<vector<int>> m_teams_vs_alliance_map;
 	TeamAlliances GetTeamAlliance(PlayerTeams team);
-
+	
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddGameObjectToVector(SFRectangle* pRectangleShape, vector<SFRectangle*>* vector);
