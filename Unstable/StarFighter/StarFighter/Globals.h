@@ -49,7 +49,7 @@ enum TeamAlliances
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
 
-#define USE_SPLIT_SCREEN							true
+#define USE_SPLIT_SCREEN							false
 
 //FLUX SPECIFIC
 #define GRID_WIDTH									15

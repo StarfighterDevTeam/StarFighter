@@ -239,7 +239,7 @@ void Game::drawScene()
 {
 	this->mainScreen.clear();
 
-	for (int v = 0; v < 2; v++)//Split screen
+	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)//Split screen
 	{
 		if (v == 0)
 		{
@@ -333,6 +333,9 @@ void Game::drawScene()
 							continue;
 
 						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
+							continue;
+
+						if ((((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == false))
 							continue;
 
 						mainScreen.draw(*(*it));
