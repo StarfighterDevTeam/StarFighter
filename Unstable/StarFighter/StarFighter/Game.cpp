@@ -43,11 +43,18 @@ void Game::init(RenderWindow* window)
 		{
 			view[v].setViewport(sf::FloatRect(v * 0.5f, 0, 0.5f, 1));
 		}
+		view[v].zoom(1.777777);
 	}
 
 	//default value
 	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
+	//initialization of players
+	for (int i = 0; i < NBVAL_PlayerTeams; i++)
+	{
+		playerShips[i] = NULL;
+	}
+	
 	//fonts
 	font = new sf::Font();
 

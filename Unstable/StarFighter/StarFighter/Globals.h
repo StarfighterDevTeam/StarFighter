@@ -49,7 +49,7 @@ enum TeamAlliances
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
 
-#define USE_SPLIT_SCREEN							true
+#define USE_SPLIT_SCREEN							false
 
 //FLUX SPECIFIC
 #define GRID_WIDTH									15
@@ -139,7 +139,7 @@ enum TeamAlliances
 #define FLUXOR_BULLET_SPEED							500
 #define FLUXOR_TURN_MIN_DELAY						0.05f
 #define FLUXOR_TURN_MAX_DELAY						3.f
-#define FLUXOR_MAX_POPULATION						20
+#define FLUXOR_MAX_POPULATION						15
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
 #define FLUXOR_RESPAWN_MAX_TIME						60.f
 #define FLUXOR_WASTE_DELAY							0.5f
