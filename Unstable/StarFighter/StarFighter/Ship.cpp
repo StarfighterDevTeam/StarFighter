@@ -160,6 +160,8 @@ void Ship::update(sf::Time deltaTime)
 		ss << m_flux << "/" << m_flux_max;
 		m_flux_text->setString(ss.str());
 		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_TEXT_OFFSET_Y));
+
+		m_flux_text->setColor(m_flux == m_flux_max ? Color::Red : Color::Green);
 	}
 
 	if (m_flux_gauge)
