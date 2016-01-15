@@ -38,36 +38,36 @@ void InGameState::Initialize(Player player)
 	{
 		switch (i)
 		{
-			case PlayerBlue:
-			{
-				(*CurrentGame).m_team_colors[i] = sf::Color::Blue;
-				break;
-			}
-			case PlayerBlue2:
-			{
-				(*CurrentGame).m_team_colors[i] = sf::Color::White;
-				break;
-			}
-			case PlayerRed:
-			{
-				(*CurrentGame).m_team_colors[i] = sf::Color::Red;
-				break;
-			}
-			case PlayerRed2:
-			{
-				(*CurrentGame).m_team_colors[i] = sf::Color::Black;
-				break;
-			}
-			case PlayerNeutral:
-			{
-				(*CurrentGame).m_team_colors[i] = sf::Color::Yellow;
-				break;
-			}
-			default:
-			{
-				(*CurrentGame).m_team_colors[i] = sf::Color::White;
-				break;
-			}
+		case PlayerBlue:
+		{
+						   (*CurrentGame).m_team_colors[i] = sf::Color::Blue;
+						   break;
+		}
+		case PlayerBlue2:
+		{
+							(*CurrentGame).m_team_colors[i] = sf::Color::White;
+							break;
+		}
+		case PlayerRed:
+		{
+						  (*CurrentGame).m_team_colors[i] = sf::Color::Red;
+						  break;
+		}
+		case PlayerRed2:
+		{
+						   (*CurrentGame).m_team_colors[i] = sf::Color::Black;
+						   break;
+		}
+		case PlayerNeutral:
+		{
+							  (*CurrentGame).m_team_colors[i] = sf::Color::Yellow;
+							  break;
+		}
+		default:
+		{
+				   (*CurrentGame).m_team_colors[i] = sf::Color::White;
+				   break;
+		}
 		}
 	}
 
@@ -102,7 +102,7 @@ void InGameState::Initialize(Player player)
 			(*CurrentGame).m_HUD_productions_mask[v].push_back(rect);
 		}
 	}
-	
+
 	//intégration placeholder
 	Ship* playerShip = new Ship(Game::GridToPosition(sf::Vector2u(DEFAULT_TILE_START, DEFAULT_TILE_START)), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), PlayerBlue, 3);
 	(*CurrentGame).playerShips[playerShip->m_team] = playerShip;
@@ -133,7 +133,7 @@ void InGameState::Initialize(Player player)
 
 		(*CurrentGame).view[v].setCenter((*CurrentGame).playerShips[v]->getPosition());
 	}
-	
+
 	//HACK PROTO
 	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true, true, LinkRight);
 	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true, true, LinkLeft);
@@ -148,14 +148,21 @@ void InGameState::Initialize(Player player)
 		//	Module::CreateModule(sf::Vector2u(GRID_WIDTH / 2 + 1, i), ModuleType_Barrier, PlayerNeutral, true);
 		//}
 	}
-		
+
 	//Spawning Fluxors
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, 0, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W/2, H/2, W/2, H/2), FLUXOR_MAX_POPULATION / 6));
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H / 2, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
+	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2, H / 2, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
 	//main central zone
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
+	for (int i = 0; i < NBVAL_PlayerTeams; i++)
+	{
+		//spawning a new lot of Fluxors based on the number of players
+		if ((*CurrentGame).playerShips[i] && i != PlayerNeutral)
+		{
+			m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
+		}
+	}
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -254,7 +261,7 @@ void InGameState::UpdateCamera(sf::Time deltaTime)
 		else
 		{
 			//camera cannot move because map is too small -> center view
-			(*CurrentGame).view[v].setCenter(1.0f * (*CurrentGame).screen_size.x / 2, (*CurrentGame).view[v].getCenter().y);
+			(*CurrentGame).view[v].setCenter(1.0f * ((*CurrentGame).screen_size.x + HUD_PANEL_SIZE_X * HUD_VERTICAL) / 2 + HUD_PANEL_SIZE_X * HUD_VERTICAL, (*CurrentGame).view[v].getCenter().y);
 		}
 
 		if (y_axis_scroll)
@@ -268,7 +275,7 @@ void InGameState::UpdateCamera(sf::Time deltaTime)
 		else
 		{
 			//camera cannot move because map is too small -> center view
-			(*CurrentGame).view[v].setCenter((*CurrentGame).view[v].getCenter().x, 1.0f * (*CurrentGame).screen_size.y / 2);
+			(*CurrentGame).view[v].setCenter((*CurrentGame).view[v].getCenter().x, 1.0f * ((*CurrentGame).screen_size.y + HUD_PANEL_SIZE_Y * !HUD_VERTICAL) / 2 + HUD_PANEL_SIZE_Y * !HUD_VERTICAL);
 		}
 	}
 }
