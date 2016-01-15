@@ -29,25 +29,20 @@ void Game::init(RenderWindow* window)
 	this->hudScreen.create(HUD_PANEL_SIZE_X, REF_WINDOW_RESOLUTION_Y, false);
 	this->hudScreen.setSmooth(true);
 
-	//split screens
 	if (USE_SPLIT_SCREEN == true)
 	{
 		this->hudScreen_SplitScreen.create(HUD_PANEL_SIZE_X, REF_WINDOW_RESOLUTION_Y, false);
 		this->hudScreen_SplitScreen.setSmooth(true);
-
-		viewP1.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 4, REF_WINDOW_RESOLUTION_Y / 2));
-		viewP1.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y));
-		viewP1.setViewport(sf::FloatRect(0, 0, 0.5f, 1));
-
-		viewP2.setCenter(sf::Vector2f(3 * REF_WINDOW_RESOLUTION_X / 4, REF_WINDOW_RESOLUTION_Y / 2));
-		viewP2.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y));
-		viewP2.setViewport(sf::FloatRect(0.5f, 0, 0.5f, 1));
 	}
-	else//standard view
+
+	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
 	{
-		view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
-		view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
-		//view.zoom(0.3f);
+		view[v].setCenter(sf::Vector2f((1 + 2 * USE_SPLIT_SCREEN) * REF_WINDOW_RESOLUTION_X / 2 / (1 + USE_SPLIT_SCREEN), REF_WINDOW_RESOLUTION_Y / 2));
+		view[v].setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X / (1 + USE_SPLIT_SCREEN), REF_WINDOW_RESOLUTION_Y));
+		if (USE_SPLIT_SCREEN == true)
+		{
+			view[v].setViewport(sf::FloatRect(v * 0.5f, 0, 0.5f, 1));
+		}
 	}
 
 	//default value
@@ -241,29 +236,7 @@ void Game::drawScene()
 
 	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)//Split screen
 	{
-		if (v == 0)
-		{
-			if (USE_SPLIT_SCREEN == true)
-			{
-				mainScreen.setView(viewP1);
-			}
-			else
-			{
-				//standard view
-				mainScreen.setView(view);
-			}
-		}
-		if (v > 0)
-		{
-			if (USE_SPLIT_SCREEN == true)
-			{
-				mainScreen.setView(viewP2);
-			}
-			else
-			{
-				break;
-			}
-		}
+		mainScreen.setView(view[v]);
 
 		for (int i = 0; i < NBVAL_Layer; i++)
 		{

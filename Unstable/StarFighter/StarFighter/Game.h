@@ -83,9 +83,7 @@ public:
 
 	Ship* playerShips[NBVAL_PlayerTeams];
 
-	sf::View view;
-	sf::View viewP1;
-	sf::View viewP2;
+	sf::View view[1+USE_SPLIT_SCREEN];
 	sf::Vector2f map_size;
 
 	//utilitary methods

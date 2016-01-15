@@ -49,7 +49,7 @@ enum TeamAlliances
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
 
-#define USE_SPLIT_SCREEN							false
+#define USE_SPLIT_SCREEN							true
 
 //FLUX SPECIFIC
 #define GRID_WIDTH									15
@@ -64,6 +64,7 @@ enum TeamAlliances
 //HUD
 #define HUD_PANEL_SIZE_X							108
 #define HUD_PANEL_SIZE_Y							1080
+#define HUD_VERTICAL								true
 
 #define USE_FEEDBACK_ACTIVATION						true
 #define USE_FEEDBACK_AUTOGENERATION					false

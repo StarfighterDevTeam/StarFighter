@@ -127,14 +127,11 @@ void InGameState::Initialize(Player player)
 
 	(*CurrentGame).map_size = sf::Vector2f(W, H);
 
-	if (USE_SPLIT_SCREEN == true)
+	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
 	{
-		(*CurrentGame).viewP1.setCenter((*CurrentGame).playerShips[0]->getPosition());
-		(*CurrentGame).viewP2.setCenter((*CurrentGame).playerShips[1]->getPosition());
-	}
-	else
-	{
-		(*CurrentGame).view.setCenter((*CurrentGame).playerShips[0]->getPosition());
+		assert((*CurrentGame).playerShips[v] != NULL);
+
+		(*CurrentGame).view[v].setCenter((*CurrentGame).playerShips[v]->getPosition());
 	}
 	
 	//HACK PROTO
@@ -228,54 +225,51 @@ void InGameState::Release()
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
 {
-	if (USE_SPLIT_SCREEN == true)
+	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
 	{
-		(*CurrentGame).viewP1.move(sf::Vector2f((*CurrentGame).playerShips[0]->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShips[0]->m_speed.y * deltaTime.asSeconds()));
-		(*CurrentGame).viewP2.move(sf::Vector2f((*CurrentGame).playerShips[1]->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShips[1]->m_speed.y * deltaTime.asSeconds()));
+		//if the map is smaller than the view, then we don't need to scroll
+		bool x_axis_scroll = (*CurrentGame).map_size.x >(*CurrentGame).view[v].getSize().x - (HUD_PANEL_SIZE_X * HUD_VERTICAL);
+		bool y_axis_scroll = (*CurrentGame).map_size.y > (*CurrentGame).view[v].getSize().y - (HUD_PANEL_SIZE_Y * !HUD_VERTICAL);
+
+		//camera follows player's movement
+		if (x_axis_scroll)
+			(*CurrentGame).view[v].move(sf::Vector2f((*CurrentGame).playerShips[v]->m_speed.x * deltaTime.asSeconds(), 0));
+		if (y_axis_scroll)
+			(*CurrentGame).view[v].move(sf::Vector2f(0, (*CurrentGame).playerShips[v]->m_speed.y * deltaTime.asSeconds()));
 
 		//Map border constraints
-		const float a1 = (*CurrentGame).playerShips[0]->getPosition().x;
-		const float b1 = (*CurrentGame).playerShips[0]->getPosition().y;
-		const float x1 = (*CurrentGame).viewP1.getSize().x / 2;
-		const float y1 = (*CurrentGame).viewP1.getSize().y / 2;
+		const float x = (*CurrentGame).view[v].getSize().x / 2;
+		const float y = (*CurrentGame).view[v].getSize().y / 2;
+		const float a = (*CurrentGame).playerShips[v]->getPosition().x;
+		const float b = (*CurrentGame).playerShips[v]->getPosition().y;
 
-		if (a1 < x1)
-			(*CurrentGame).viewP1.setCenter(x1, (*CurrentGame).viewP1.getCenter().y);
-		if (a1 >(*CurrentGame).map_size.x - x1)
-			(*CurrentGame).viewP1.setCenter((*CurrentGame).map_size.x - x1, (*CurrentGame).viewP1.getCenter().y);
-		if (b1 < y1)
-			(*CurrentGame).viewP1.setCenter((*CurrentGame).viewP1.getCenter().x, y1);
-		if (b1 >(*CurrentGame).map_size.y - y1)
-			(*CurrentGame).viewP1.setCenter((*CurrentGame).viewP1.getCenter().x, (*CurrentGame).map_size.y - y1);
+		if (x_axis_scroll)
+		{
+			//camera reach border of screen, stop scrolling and re-center camera at the limit
+			if (a < x)
+				(*CurrentGame).view[v].setCenter(x, (*CurrentGame).view[v].getCenter().y);
+			if (a >(*CurrentGame).map_size.x - x)
+				(*CurrentGame).view[v].setCenter((*CurrentGame).map_size.x - x, (*CurrentGame).view[v].getCenter().y);
+		}
+		else
+		{
+			//camera cannot move because map is too small -> center view
+			(*CurrentGame).view[v].setCenter(1.0f * (*CurrentGame).screen_size.x / 2, (*CurrentGame).view[v].getCenter().y);
+		}
 
-		const float a2 = (*CurrentGame).playerShips[1]->getPosition().x;
-		const float b2 = (*CurrentGame).playerShips[1]->getPosition().y;
-		if (a2 < x1)
-			(*CurrentGame).viewP2.setCenter(x1, (*CurrentGame).viewP2.getCenter().y);
-		if (a2 >(*CurrentGame).map_size.x - x1)
-			(*CurrentGame).viewP2.setCenter((*CurrentGame).map_size.x - x1, (*CurrentGame).viewP2.getCenter().y);
-		if (b2 < y1)
-			(*CurrentGame).viewP2.setCenter((*CurrentGame).viewP2.getCenter().x, y1);
-		if (b2 >(*CurrentGame).map_size.y - y1)
-			(*CurrentGame).viewP2.setCenter((*CurrentGame).viewP2.getCenter().x, (*CurrentGame).map_size.y - y1);
-	}
-	else
-	{
-		(*CurrentGame).view.move(sf::Vector2f((*CurrentGame).playerShips[0]->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShips[0]->m_speed.y * deltaTime.asSeconds()));
-
-		//Map border constraints
-		const float x = (*CurrentGame).view.getSize().x / 2;
-		const float y = (*CurrentGame).view.getSize().y / 2;
-		const float a = (*CurrentGame).playerShips[0]->getPosition().x;
-		const float b = (*CurrentGame).playerShips[0]->getPosition().y;
-		if (a < x)
-			(*CurrentGame).view.setCenter(x, (*CurrentGame).view.getCenter().y);
-		if (a >(*CurrentGame).map_size.x - x)
-			(*CurrentGame).view.setCenter((*CurrentGame).map_size.x - x, (*CurrentGame).view.getCenter().y);
-		if (b < y)
-			(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, y);
-		if (b >(*CurrentGame).map_size.y - y)
-			(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, (*CurrentGame).map_size.y - y);
+		if (y_axis_scroll)
+		{
+			//camera reach border of screen, stop scrolling and re-center camera at the limit
+			if (b < y)
+				(*CurrentGame).view[v].setCenter((*CurrentGame).view[v].getCenter().x, y);
+			if (b >(*CurrentGame).map_size.y - y)
+				(*CurrentGame).view[v].setCenter((*CurrentGame).view[v].getCenter().x, (*CurrentGame).map_size.y - y);
+		}
+		else
+		{
+			//camera cannot move because map is too small -> center view
+			(*CurrentGame).view[v].setCenter((*CurrentGame).view[v].getCenter().x, 1.0f * (*CurrentGame).screen_size.y / 2);
+		}
 	}
 }
 
