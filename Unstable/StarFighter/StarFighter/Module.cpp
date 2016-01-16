@@ -925,11 +925,24 @@ void Module::AttackModule(Fluxor* fluxor)
 		{
 			if (fluxor->m_flux_attack_clock.getElapsedTime().asSeconds() > fluxor->m_flux_attack_delay)
 			{
+				//instant damage or damage over time?
+				int damage = 1;
+				if (fluxor->m_flux_attack_delay == 0)
+				{
+					damage = fluxor->m_flux;
+				}
+
 				//kill?
-				if (m_flux == 0)
+				if ((int)m_flux - damage < 0 )
 				{
 					this->m_GarbageMe = true;
 					this->m_visible = false;
+
+					fluxor->m_flux -= m_flux;
+					if (fluxor->m_flux_stealer)
+					{
+						fluxor->m_flux_stolen += m_flux;
+					}
 
 					//feedback
 					if (USE_FEEDBACK_DESTRUCTION)
@@ -945,23 +958,11 @@ void Module::AttackModule(Fluxor* fluxor)
 				}
 				else
 				{
-					m_flux--;
-					fluxor->m_flux--;
+					m_flux -= damage;
+					fluxor->m_flux -= damage;
 					if (fluxor->m_flux_stealer)
 					{
-						fluxor->m_flux_stolen++;
-					}
-
-					//feedback module
-					if (USE_FEEDBACK_ATTACK)
-					{
-						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
-						text_feedback->m_alliance = AllianceNeutral;
-						text_feedback->setString("-1");
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
-						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
-						delete text_feedback;
-						(*CurrentGame).addToFeedbacks(pop_feedback);
+						fluxor->m_flux_stolen += damage;
 					}
 					
 					//feedback fluxor
@@ -971,6 +972,20 @@ void Module::AttackModule(Fluxor* fluxor)
 					//pop_feedback2->setString("-1");
 					//delete text_feedback2;
 					//(*CurrentGame).addToFeedbacks(pop_feedback2);
+				}
+
+				//feedback module
+				if (USE_FEEDBACK_ATTACK)
+				{
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
+					text_feedback->m_alliance = AllianceNeutral;
+					ostringstream ss;
+					ss << "-" << damage;
+					text_feedback->setString(ss.str());
+					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+					pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+					delete text_feedback;
+					(*CurrentGame).addToFeedbacks(pop_feedback);
 				}
 
 				fluxor->m_flux_attack_clock.restart();
@@ -1641,11 +1656,12 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 					return false;
 				}
 				//if we need a link to circulate and we are not condensed, then the next module should be nearby (right next to the module). Otherwise it means it's a Condensator that just consummed the Fluxor and his "active link" is not legit.
-				else if (fluxor->m_needs_link_to_circulate && !fluxor->m_condensed_to_circulate && (abs(float(GetMainLinkedModule()->m_curGridIndex.x - m_curGridIndex.x)) > 1 || abs(float(GetMainLinkedModule()->m_curGridIndex.y - m_curGridIndex.y)) > 1))
+				else if (fluxor->m_needs_link_to_circulate && !fluxor->m_condensed_to_circulate
+					&& ((GetMainLinkedModule()->m_curGridIndex.x > m_curGridIndex.x ? GetMainLinkedModule()->m_curGridIndex.x - m_curGridIndex.x : m_curGridIndex.x - GetMainLinkedModule()->m_curGridIndex.x) > 1 
+					|| (GetMainLinkedModule()->m_curGridIndex.y > m_curGridIndex.y ? GetMainLinkedModule()->m_curGridIndex.y - m_curGridIndex.y : m_curGridIndex.y - GetMainLinkedModule()->m_curGridIndex.y) > 1))
 				{
 					fluxor->m_visible = false;
 					fluxor->m_GarbageMe = true;
-					float f = abs(float(GetMainLinkedModule()->m_curGridIndex.x - m_curGridIndex.x));
 					return false;
 				}
 				else
