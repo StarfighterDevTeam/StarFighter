@@ -19,19 +19,19 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(tile, FakeGridLayer, BackgroundObject);
 
 	//team alliance 1
-	vector<int> v;
-	v.push_back(PlayerBlue);
-	v.push_back(PlayerBlue2);
-	(*CurrentGame).m_teams_vs_alliance_map.push_back(v);
+	vector<int> vect;
+	vect.push_back(PlayerBlue);
+	vect.push_back(PlayerBlue2);
+	(*CurrentGame).m_teams_vs_alliance_map.push_back(vect);
 	//team alliance 2
-	v.clear();
-	v.push_back(PlayerRed);
-	v.push_back(PlayerRed2);
-	(*CurrentGame).m_teams_vs_alliance_map.push_back(v);
+	vect.clear();
+	vect.push_back(PlayerRed);
+	vect.push_back(PlayerRed2);
+	(*CurrentGame).m_teams_vs_alliance_map.push_back(vect);
 	//team neutral
-	v.clear();
-	v.push_back(PlayerNeutral);
-	(*CurrentGame).m_teams_vs_alliance_map.push_back(v);
+	vect.clear();
+	vect.push_back(PlayerNeutral);
+	(*CurrentGame).m_teams_vs_alliance_map.push_back(vect);
 
 	//Colors data
 	for (size_t i = 0; i < NBVAL_PlayerTeams; i++)
@@ -93,7 +93,7 @@ void InGameState::Initialize(Player player)
 	}
 
 	//HUD production mask (for local player only)
-	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
+	for (int v = 0; v < 1 + (USE_SPLIT_SCREEN || SHARED_VIEW); v++)
 	{
 		for (int i = 0; i < 10; i++)
 		{
@@ -200,7 +200,7 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//update HUD production masks
-	for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
+	for (int v = 0; v < 1 + (USE_SPLIT_SCREEN || SHARED_VIEW); v++)
 	{
 		size_t HUDProductionMasksVectorSize = (*CurrentGame).m_HUD_productions_mask[v].size();
 		for (size_t i = 0; i < HUDProductionMasksVectorSize; i++)

@@ -29,7 +29,7 @@ void Game::init(RenderWindow* window)
 	this->hudScreen.create(HUD_PANEL_SIZE_X, REF_WINDOW_RESOLUTION_Y, false);
 	this->hudScreen.setSmooth(true);
 
-	if (USE_SPLIT_SCREEN == true)
+	if (USE_SPLIT_SCREEN == true || SHARED_VIEW == true)
 	{
 		this->hudScreen_SplitScreen.create(HUD_PANEL_SIZE_X, REF_WINDOW_RESOLUTION_Y, false);
 		this->hudScreen_SplitScreen.setSmooth(true);
@@ -309,13 +309,13 @@ void Game::drawScene()
 
 					if ((*(*it)).m_visible)
 					{
-						if ((v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
+						if ((v == 0 && ((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true) && SHARED_VIEW == false)
 							continue;
 
-						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true))
+						if ((v == 1 && ((*(*it)).m_alliance != Alliance2 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == true) && SHARED_VIEW == false)
 							continue;
 
-						if ((((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == false))
+						if ((((*(*it)).m_alliance != Alliance1 && (*(*it)).m_alliance != AllianceNeutral) && USE_SPLIT_SCREEN == false) && SHARED_VIEW == false)
 							continue;
 
 						mainScreen.draw(*(*it));
@@ -353,13 +353,13 @@ void Game::drawHud()
 		//draw background hud image
 		hudScreen.draw(*m_module_HUD);
 
-		if (USE_SPLIT_SCREEN == true)
+		if (USE_SPLIT_SCREEN == true || SHARED_VIEW == true)
 		{
 			hudScreen_SplitScreen.draw(*m_module_HUD);
 		}
 
 		//draw production feedbacks
-		for (int v = 0; v < 1 + USE_SPLIT_SCREEN; v++)
+		for (int v = 0; v < 1 + (USE_SPLIT_SCREEN || SHARED_VIEW); v++)
 		{
 			for (std::vector<SFRectangle*>::iterator it = this->m_HUD_productions_mask[v].begin(); it != this->m_HUD_productions_mask[v].end(); it++)
 			{
@@ -382,7 +382,7 @@ void Game::drawHud()
 		temp.setPosition(0, 0);
 		this->window->draw(temp);
 
-		if (USE_SPLIT_SCREEN == true)
+		if (USE_SPLIT_SCREEN == true || SHARED_VIEW == true)
 		{
 			hudScreen_SplitScreen.display();
 			sf::Sprite tempSplit(hudScreen_SplitScreen.getTexture());
