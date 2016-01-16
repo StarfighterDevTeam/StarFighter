@@ -1211,7 +1211,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + j][m_curGridIndex.y];
 							if (module)
 							{
-								if (module->m_under_construction)
+								if (module->m_under_construction || !module->m_visible)
 								{
 									module = NULL;
 									continue;
@@ -1264,7 +1264,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y + j];
 							if (module)
 							{
-								if (module->m_under_construction)
+								if (module->m_under_construction || !module->m_visible)
 								{
 									module = NULL;
 									continue;
@@ -1314,7 +1314,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x - j][m_curGridIndex.y];
 							if (module)
 							{
-								if (module->m_under_construction)
+								if (module->m_under_construction || !module->m_visible)
 								{
 									module = NULL;
 									continue;
@@ -1364,7 +1364,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y - j];
 							if (module)
 							{
-								if (module->m_under_construction)
+								if (module->m_under_construction || !module->m_visible)
 								{
 									module = NULL;
 									continue;
@@ -1422,7 +1422,7 @@ void Module::CheckCircuit()
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
 
-	if (!m_under_construction && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
+	if (!m_under_construction && m_isGeneratingFluxor && (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_needs_link_to_circulate)
 	{
 		m_is_connected_to_a_circuit = true;
 	}
