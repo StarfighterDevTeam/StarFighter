@@ -96,7 +96,6 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	{
 		case FluxorType_Green:
 		{
-			m_wasting_flux = false;
 			m_flux = GREEN_FLUXOR_VALUE;
 			m_consummable_by_players = true;
 			m_consummable_by_modules = true;
@@ -105,7 +104,6 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		}
 		case FluxorType_Blue:
 		{
-			m_wasting_flux = false;
 			m_flux = FLUXOR_FLUX_VALUE;
 			m_flux_max = FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
@@ -113,6 +111,14 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_needs_link_to_circulate = true;
 			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 			m_color = Color::Cyan;
+
+			//m_needs_link_to_circulate = false;
+			//m_wasting_flux = true;
+			//m_flux_waste = FLUXOR_WASTE_VALUE;
+			//m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+			//m_flux_attacker = true;
+			//m_flux_attack_piercing = true;
+			//m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			break;
 		}
 		case FluxorType_Red:

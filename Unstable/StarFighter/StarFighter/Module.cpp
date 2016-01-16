@@ -169,14 +169,14 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 	{
 		case ModuleType_Generator:
 		{	 
-			m_flux_max_under_construction = 50;
+			m_flux_max_under_construction = 100;
 			m_flux_max_after_construction = 10;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
-			m_fluxor_generation_time = 0.5f;
-			m_fluxor_generation_cost = FLUXOR_FLUX_VALUE;
+			m_fluxor_generation_time = 5.f;// 0.5f;
+			m_fluxor_generation_cost = 0;// FLUXOR_FLUX_VALUE;
 			break;
 		}
 		case ModuleType_Armory:
@@ -717,7 +717,7 @@ bool Module::GenerateFluxor()
 				}
 			}
 		}
-
+		
 		return false;
 	}
 	else
@@ -809,9 +809,6 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 			//consumption finished?
 			if (m_flux == m_flux_max || fluxor->m_flux == 0)
 			{
-				UpdateLinks();
-				UndockFluxor(fluxor);
-				
 				//feedback
 				if (USE_FEEDBACK_CONSUMPTION)
 				{
@@ -1030,15 +1027,17 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 			if (!fluxor->m_docked)
 			{
-				UndockFluxor(fluxor);
-				UpdateFluxorDirection(fluxor);
-
-				//accelerator
-				if (m_add_speed != 0 && m_flux == m_flux_max)
+				if (fluxor->m_flux > 0)//otherwise there is no point, he's a dead fluxor anyway
 				{
-					fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
-					fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
-					fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
+					UpdateFluxorDirection(fluxor);
+
+					//accelerator
+					if (m_add_speed != 0 && m_flux == m_flux_max)
+					{
+						fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
+						fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
+						fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
+					}
 				}
 			}
 			else
@@ -1067,6 +1066,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 					}
 					else
 					{
+						fluxor->m_visible = false;
 						fluxor->m_GarbageMe = true;
 					}
 				}
@@ -1083,13 +1083,15 @@ bool Module::UndockFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (!fluxor->m_consummable_by_modules || fluxor->m_condensed_to_circulate || IsMainLinkActivated())//the Fluxor may go on if it is not consummed by modules, unless condensated, OR has an active link to continue its journey
+		//the Fluxor may go on if it is doesn't need link to circulate, unless condensated. Otherwise he needs an active link to continue his journey.
+		if (!fluxor->m_needs_link_to_circulate || fluxor->m_condensed_to_circulate || IsMainLinkActivated())
 		{
 			fluxor->m_docked = false;
 			return true;
 		}
 		else
 		{
+			fluxor->m_visible = false;
 			fluxor->m_GarbageMe = true;
 			return false;
 		}
@@ -1422,7 +1424,7 @@ void Module::CheckCircuit()
 	Module* module_parent = this;
 	vector<Module*> checked_modules;
 
-	if (!m_under_construction && m_isGeneratingFluxor && (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_needs_link_to_circulate)
+	if (!m_under_construction && m_isGeneratingFluxor && (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_consummable_by_modules)
 	{
 		m_is_connected_to_a_circuit = true;
 	}
@@ -1628,6 +1630,36 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 	{
 		if (fluxor->m_guided)
 		{
+			//Fluxor allowed to continue his journey?
+			if (!fluxor->m_needs_link_to_circulate || fluxor->m_condensed_to_circulate || IsMainLinkActivated())
+			{
+				//no child module to refill, going on is pointless. Unless it's an attacker that could go on an aggress the enemy
+				if (fluxor->m_consummable_by_modules && !m_has_child_to_refill && !fluxor->m_flux_attacker)
+				{
+					fluxor->m_visible = false;
+					fluxor->m_GarbageMe = true;
+					return false;
+				}
+				//if we need a link to circulate and we are not condensed, then the next module should be nearby (right next to the module). Otherwise it means it's a Condensator that just consummed the Fluxor and his "active link" is not legit.
+				else if (fluxor->m_needs_link_to_circulate && !fluxor->m_condensed_to_circulate && (abs(float(GetMainLinkedModule()->m_curGridIndex.x - m_curGridIndex.x)) > 1 || abs(float(GetMainLinkedModule()->m_curGridIndex.y - m_curGridIndex.y)) > 1))
+				{
+					fluxor->m_visible = false;
+					fluxor->m_GarbageMe = true;
+					float f = abs(float(GetMainLinkedModule()->m_curGridIndex.x - m_curGridIndex.x));
+					return false;
+				}
+				else
+				{
+					fluxor->m_docked = false;
+				}
+			}
+			else
+			{
+				fluxor->m_visible = false;
+				fluxor->m_GarbageMe = true;
+				return false;
+			}
+
 			//fluxor has a new target?
 			if (fluxor->m_target && !fluxor->m_target_memory)
 			{
@@ -1652,16 +1684,10 @@ bool Module::UpdateFluxorDirection(Fluxor* fluxor)
 						if (it != fluxor->m_modules_visited.end() && ((*it)->m_team == fluxor->m_team || (*it)->m_alliance == fluxor->m_alliance))
 						{
 							//This is a looping circuit (allied module visited twice). This is forbidden, and the Fluxor shall therefore die now.
+							fluxor->m_visible = false;
 							fluxor->m_GarbageMe = true;
 							return false;
 						}
-					}
-
-					if (fluxor->m_FluxorType == FluxorType_Blue && !m_has_child_to_refill)
-					{
-						//no child module to refill, going on is pointless
-						fluxor->m_GarbageMe = true;
-						return false;
 					}
 
 					//linked module is legit, we shall proceed to direction change
@@ -1848,7 +1874,7 @@ void Module::SetDirectionAutomatically()
 		number_of_turns = link_child_index;
 	}
 	// 3) has child, but no parent -> turn to child if generating Blue Fluxors
-	else if (link_parent_index < 0 && link_child_index >= 0 && m_isGeneratingFluxor && m_fluxor_generated_type == FluxorType_Blue)
+	else if (link_parent_index < 0 && link_child_index >= 0 && m_isGeneratingFluxor && (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_consummable_by_modules)
 	{
 		number_of_turns = link_child_index;
 	}
