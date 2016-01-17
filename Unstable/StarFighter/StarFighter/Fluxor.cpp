@@ -371,6 +371,16 @@ sf::Vector2f Fluxor::RandomizePosition(bool within_bounds, sf::FloatRect bounds)
 			}
 		}
 
+		if ((*CurrentGame).GetClosestObject(position, ModuleObject))
+		{
+			float distance_to_module = GameObject::GetDistanceBetweenPositions(position, (*CurrentGame).GetClosestObject(position, PlayerShip)->getPosition());
+			if (distance_to_module < TILE_SIZE)
+			{
+				position_is_valid = false;
+				continue;
+			}
+		}
+
 		if (!(*CurrentGame).isCellFree(position))
 		{
 			position_is_valid = false;
