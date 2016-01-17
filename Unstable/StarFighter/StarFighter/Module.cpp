@@ -790,11 +790,11 @@ void Module::AutogenerateFlux()
 	}
 }
 
-void Module::ConsummeFluxor(Fluxor* fluxor)
+bool Module::ConsummeFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (m_flux < m_flux_max && fluxor->m_flux > 0)
+		if (m_flux < m_flux_max && fluxor->m_flux > 0 && fluxor->m_consummable_by_modules)
 		{
 			if (fluxor->m_transfert_buffer_memory == 0)
 			{
@@ -845,8 +845,12 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 			{
 				fluxor->m_docked = true;
 			}
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 bool Module::CondensateFluxor(Fluxor* fluxor)
@@ -883,6 +887,17 @@ bool Module::CondensateFluxor(Fluxor* fluxor)
 						(*CurrentGame).addToFeedbacks(pop_feedback);
 					}
 
+					if (USE_FEEDBACK_CONDENSATION)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						text_feedback->setString("Condensed for attack");
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
+
 					return true;
 				}
 			//}
@@ -892,64 +907,73 @@ bool Module::CondensateFluxor(Fluxor* fluxor)
 	return false;
 }
 
-void Module::AmplifyFluxor(Fluxor* fluxor)
+bool Module::AmplifyFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (fluxor->m_transfer_buffer == 0)
+		if (m_flux == m_flux_max && fluxor->m_can_be_refilled_by_modules && (m_isRefillingFlux || m_add_flux > 0) && fluxor->m_can_be_refilled_by_modules)
 		{
-			//increasing potential
-			if (fluxor->m_flux_max > 0 && m_add_flux > 0)
-			{
-				fluxor->m_flux_max += m_add_flux;
-			}
-			//refilling or increasing?
-			fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
-			fluxor->m_transfert_buffer_memory = fluxor->m_transfer_buffer;
-			fluxor->m_flux_transfer_clock.restart();
-		}
+			//if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill || fluxor->m_condensed_to_circulate)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
 
-		if (fluxor->m_transfer_buffer > 0 && fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
-		{
-			fluxor->m_flux++;
-			fluxor->m_transfer_buffer--;
-			fluxor->m_flux_transfer_clock.restart();
-			fluxor->m_flux_waste_clock.restart();
-
-			//fedback once finished
-			if ((m_isRefillingFlux && USE_FEEDBACK_REFILL) || (m_add_flux > 0 && USE_FEEDBACK_AMPLIFICATION))
 			if (fluxor->m_transfer_buffer == 0)
 			{
-				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Cyan, getPosition(), m_team);
-				text_feedback->m_alliance = m_alliance;
-				ostringstream ss;
-				if (m_isRefillingFlux)
+				//increasing potential
+				if (fluxor->m_flux_max > 0 && m_add_flux > 0)
 				{
-					ss << "+" << fluxor->m_transfert_buffer_memory;
-					text_feedback->setCharacterSize(16);
+					fluxor->m_flux_max += m_add_flux;
 				}
-				else
-				{
-					ss << "+" << m_add_flux;
-				}
-				text_feedback->setString(ss.str());
-				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, m_size.y/2 - TEXT_POP_FLUXOR_OFFSET_Y));
-				pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - TEXT_POP_FLUXOR_OFFSET_Y));
-				delete text_feedback;
-				(*CurrentGame).addToFeedbacks(pop_feedback);
+				//refilling or increasing?
+				fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
+				fluxor->m_transfert_buffer_memory = fluxor->m_transfer_buffer;
+				fluxor->m_flux_transfer_clock.restart();
 			}
-		}
 
-		if (fluxor->m_transfer_buffer == 0)
-		{
-			UndockFluxor(fluxor);
-			fluxor->m_transfert_buffer_memory = 0;
-		}
-		else
-		{
-			fluxor->m_docked = true;
+			if (fluxor->m_transfer_buffer > 0 && fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
+			{
+				fluxor->m_flux++;
+				fluxor->m_transfer_buffer--;
+				fluxor->m_flux_transfer_clock.restart();
+				fluxor->m_flux_waste_clock.restart();
+
+				//fedback once finished
+				if ((m_isRefillingFlux && USE_FEEDBACK_REFILL) || (m_add_flux > 0 && USE_FEEDBACK_AMPLIFICATION))
+				if (fluxor->m_transfer_buffer == 0)
+				{
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Cyan, getPosition(), m_team);
+					text_feedback->m_alliance = m_alliance;
+					ostringstream ss;
+					if (m_isRefillingFlux)
+					{
+						ss << "+" << fluxor->m_transfert_buffer_memory;
+						text_feedback->setCharacterSize(16);
+					}
+					else
+					{
+						ss << "+" << m_add_flux;
+					}
+					text_feedback->setString(ss.str());
+					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, m_size.y / 2 - TEXT_POP_FLUXOR_OFFSET_Y));
+					pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - TEXT_POP_FLUXOR_OFFSET_Y));
+					delete text_feedback;
+					(*CurrentGame).addToFeedbacks(pop_feedback);
+				}
+			}
+
+			if (fluxor->m_transfer_buffer == 0)
+			{
+				UndockFluxor(fluxor);
+				fluxor->m_transfert_buffer_memory = 0;
+			}
+			else
+			{
+				fluxor->m_docked = true;
+			}
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void Module::AttackModule(Fluxor* fluxor)
@@ -1053,26 +1077,11 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 			if (!m_under_construction)
 			{
-				//module "condensation"
-				if (!CondensateFluxor(fluxor))
+				if (!ConsummeFluxor(fluxor))
 				{
-					//module "refill/amplify fluxor"
-					if (fluxor->m_can_be_refilled_by_modules)
-					{
-						if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && fluxor->m_can_be_refilled_by_modules)
-						{
-							if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill || fluxor->m_condensed_to_circulate)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
-							{
-								AmplifyFluxor(fluxor);
-							}
-						}
-					}
+					CondensateFluxor(fluxor);
 
-					//consumption (automatic) - must be done last
-					if (fluxor->m_consummable_by_modules)
-					{
-						ConsummeFluxor(fluxor);
-					}
+					AmplifyFluxor(fluxor);
 				}
 			}
 
