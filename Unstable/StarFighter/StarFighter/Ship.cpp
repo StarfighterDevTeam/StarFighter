@@ -231,11 +231,11 @@ void Ship::update(sf::Time deltaTime)
 	}
 	if (InputGuy::isSpawningModule9(m_controllerType) && m_BuildKey_released)
 	{
-		m_BuildKey_released = !TryBuildModule(9);
+		//m_BuildKey_released = !TryBuildModule(9);
 	}
 	if (InputGuy::isSpawningModule0(m_controllerType) && m_BuildKey_released)
 	{
-		m_BuildKey_released = !TryBuildModule(10);
+		//m_BuildKey_released = !TryBuildModule(10);
 	}
 
 	//DEBUG
@@ -493,7 +493,6 @@ bool Ship::TryBuildModule(int module_key)
 {
 	if (m_flux >= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction)
 	{
-		
 		Module* module = Module::CreateModule(m_curGridIndex, (ModuleType)(module_key - 1), m_team);
 		if (module)
 		{

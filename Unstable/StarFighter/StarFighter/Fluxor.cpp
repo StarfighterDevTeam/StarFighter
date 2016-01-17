@@ -43,15 +43,24 @@ Fluxor::Fluxor()
 	Initialize();
 }
 
-Fluxor::Fluxor(FluxorType FluxorType)
+Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team)
 {
 	//texture
-	std::string textureName;
+	std::string textureName = "Assets/2D/fluxor_white.png";//default value
+	m_team = team;
 	switch (FluxorType)
 	{
 		case FluxorType_Blue:
 		{
-			textureName = "Assets/2D/fluxor_blue.png";
+			if (team == PlayerBlue)
+			{
+				textureName = "Assets/2D/fluxor_blue.png";
+			}
+			else if (team == PlayerRed)
+			{
+				textureName = "Assets/2D/fluxor_red.png";
+			}
+
 			break;
 		}
 		case FluxorType_Green:
@@ -104,21 +113,18 @@ Fluxor::Fluxor(FluxorType FluxorType)
 		}
 		case FluxorType_Blue:
 		{
+			m_wasting_flux = true;
+			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 			m_flux = FLUXOR_FLUX_VALUE;
 			m_flux_max = FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
 			m_can_be_refilled_by_modules = true;
 			m_needs_link_to_circulate = true;
-			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
-			m_color = Color::Cyan;
 
-			//m_needs_link_to_circulate = false;
-			//m_wasting_flux = true;
-			//m_flux_waste = FLUXOR_WASTE_VALUE;
-			//m_flux_waste_delay = FLUXOR_WASTE_DELAY;
-			//m_flux_attacker = true;
-			//m_flux_attack_piercing = true;
-			//m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
+			m_flux_attacker = true;
+			m_flux_attack_piercing = true;
+			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			break;
 		}
 		case FluxorType_Red:
@@ -126,13 +132,15 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			m_wasting_flux = true;
 			m_flux_waste = FLUXOR_WASTE_VALUE;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
-			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
-			m_flux = 10;
-			m_flux_max = 10;
+			m_flux = FLUXOR_FLUX_VALUE;
+			m_flux_max = FLUXOR_FLUX_VALUE;
+			m_consummable_by_modules = true;
 			m_can_be_refilled_by_modules = true;
+			m_needs_link_to_circulate = true;
+
 			m_flux_attacker = true;
 			m_flux_attack_piercing = true;
-			m_color = Color::Red;
+			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			break;
 		}
 		case FluxorType_Purple:
@@ -190,7 +198,7 @@ Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType, bool within_bounds, sf::FloatRect bounds)
 {
-	Fluxor* new_fluxor = new Fluxor(FluxorType);
+	Fluxor* new_fluxor = new Fluxor(FluxorType, PlayerNeutral);
 	
 	new_fluxor->m_has_spawn_bounds = within_bounds;
 	if (within_bounds)
@@ -455,7 +463,8 @@ void Fluxor::UpdateRotation()
 
 void Fluxor::WastingFlux()
 {
-	if (m_wasting_flux && m_flux > 0)
+	//wasting flux only happens when Condensed
+	if (m_wasting_flux && m_flux > 0 && m_condensed_to_circulate)
 	{
 		if (m_flux_waste_clock.getElapsedTime().asSeconds() > m_flux_waste_delay)
 		{

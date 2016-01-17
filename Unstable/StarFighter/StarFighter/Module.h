@@ -83,10 +83,11 @@ public :
 	float m_fluxor_generation_time;
 	sf::Clock m_fluxor_spawn_clock;
 	unsigned int m_fluxor_generation_cost;
+	unsigned int m_fluxor_condensation_cost;
 
 	//Fluxor condensation
 	bool m_isCondensatingFluxor;
-	void CondensateFluxor(Fluxor* fluxor);
+	bool CondensateFluxor(Fluxor* fluxor);
 
 	//Flux transfer to Fluxors
 	void ConsummeFluxor(Fluxor* fluxor);

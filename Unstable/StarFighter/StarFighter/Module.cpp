@@ -23,6 +23,7 @@ void Module::Initialize()
 	m_isRefillingFlux = false;
 	m_flux_transfer_delay = MODULE_TRANSFER_DELAY;
 	m_fluxor_generation_cost = 0;
+	m_fluxor_condensation_cost = 0;
 	m_add_speed = 0;
 	m_add_flux = 0;
 	m_isAutogeneratingFlux = false;
@@ -79,7 +80,7 @@ Module::Module(ModuleType moduleType) : Module(moduleType, PlayerNeutral)
 
 Module::Module(ModuleType moduleType, PlayerTeams team)
 {
-	std::string textureName;
+	std::string textureName = "Assets/2D/module.png";//default value
 	m_moduleType = moduleType;
 	m_team = team;
 
@@ -87,7 +88,15 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 	{
 		case ModuleType_Generator:
 		{
-			textureName = "Assets/2D/module_generator.png";
+			if (team == PlayerBlue)
+			{
+				textureName = "Assets/2D/module_generator_blue.png";
+			}
+			else if (team == PlayerRed)
+			{
+				textureName = "Assets/2D/module_generator_red.png";
+			}
+			
 			break;
 		}
 		case ModuleType_Armory:
@@ -105,16 +114,16 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			textureName = "Assets/2D/module_relay.png";
 			break;
 		}
-		case ModuleType_Factory:
-		{
-			textureName = "Assets/2D/module_factory.png";
-			break;
-		}
-		case ModuleType_Factory_Up:
-		{
-			textureName = "Assets/2D/module_factory_up.png";
-			break;
-		}
+		//case ModuleType_Factory:
+		//{
+		//	textureName = "Assets/2D/module_factory.png";
+		//	break;
+		//}
+		//case ModuleType_Factory_Up:
+		//{
+		//	textureName = "Assets/2D/module_factory_up.png";
+		//	break;
+		//}
 		case ModuleType_Shield:
 		{
 			textureName = "Assets/2D/module_shield.png";
@@ -199,26 +208,26 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_isRefillingFlux = true;
 			break;
 		}
-		case ModuleType_Factory:
-		{
-			m_flux_max_under_construction = 15;
-			m_flux_max_after_construction = 10;
-			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Red;
-			m_fluxor_generation_time = 3.f;
-			m_fluxor_generation_cost = m_flux_max_after_construction;
-			break;
-		}
-		case ModuleType_Factory_Up:
-		{
-			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 20;
-			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Purple;
-			m_fluxor_generation_time = 3.f;
-			m_fluxor_generation_cost = m_flux_max_after_construction;
-			break;
-		}
+		//case ModuleType_Factory:
+		//{
+		//	m_flux_max_under_construction = 15;
+		//	m_flux_max_after_construction = 10;
+		//	m_isGeneratingFluxor = true;
+		//	m_fluxor_generated_type = FluxorType_Red;
+		//	m_fluxor_generation_time = 3.f;
+		//	m_fluxor_generation_cost = m_flux_max_after_construction;
+		//	break;
+		//}
+		//case ModuleType_Factory_Up:
+		//{
+		//	m_flux_max_under_construction = 30;
+		//	m_flux_max_after_construction = 20;
+		//	m_isGeneratingFluxor = true;
+		//	m_fluxor_generated_type = FluxorType_Purple;
+		//	m_fluxor_generation_time = 3.f;
+		//	m_fluxor_generation_cost = m_flux_max_after_construction;
+		//	break;
+		//}
 		case ModuleType_Shield:
 		{
 			m_flux_max_under_construction = 60;
@@ -260,8 +269,9 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		}
 		case ModuleType_Condensator:
 		{
-			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 50;
+			m_flux_max_under_construction = 50;
+			m_flux_max_after_construction = 10;
+			m_fluxor_condensation_cost = m_flux_max_after_construction;
 			m_isCondensatingFluxor = true;
 			break;
 		}
@@ -644,80 +654,86 @@ void Module::GetFluxor(GameObject* object)
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_flux == m_flux_max)
+	//do we have a connected cell to supply?
+	if (m_isGeneratingFluxor && m_flux == m_flux_max && GetMainLinkedModule())
 	{
-		Fluxor* pFluxor = (*CurrentGame).m_fluxors[m_fluxor_generated_type];
-
-		if (!pFluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
+		
+		//turret?
+		Fluxor* pTarget = NULL;
+		if (m_turret_range > 0)
 		{
-			//turret?
-			Fluxor* pTarget = NULL;
-			if (m_turret_range > 0)
-			{
-				pTarget = SearchNearbyAttackers(m_team, (m_turret_range + 1) * TILE_SIZE);//+1 because this is what we actually mean by "range N": it avoids an enemy to reach a module located N tiles away
-			}
+			pTarget = SearchNearbyAttackers(m_team, (m_turret_range + 1) * TILE_SIZE);//+1 because this is what we actually mean by "range N": it avoids an enemy to reach a module located N tiles away
+		}
 
-			if (m_turret_range == 0 || pTarget)//turrets only fire when a target is in sight within range
+		if (m_turret_range == 0 || pTarget)//turrets only fire when a target is in sight within range
+		{
+			if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 			{
-				if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
+				Fluxor* fluxor = new Fluxor(m_fluxor_generated_type, m_team);
+
+				fluxor->m_team = m_team;
+				fluxor->m_alliance = m_alliance;
+				fluxor->m_guided = true;
+				//color
+				//fluxor->m_color = (*CurrentGame).m_team_colors[m_team];
+				fluxor->setColor(Color(255, 255, 255, fluxor->m_needs_link_to_circulate ? GHOST_ALPHA_VALUE : 255));
+				//if (fluxor->m_flux_text)
+				//{
+				//	fluxor->m_flux_text->setColor((*CurrentGame).m_team_colors[m_team]);
+				//}
+
+
+				if (pTarget)
 				{
-					Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
-
-					fluxor->m_team = m_team;
-					fluxor->m_alliance = m_alliance;
-					fluxor->m_guided = true;
-					if (pTarget)
-					{
-						fluxor->m_target = pTarget;
-					}
-
-					m_flux -= m_fluxor_generation_cost;
-
-					//feedback
-					if (USE_FEEDBACK_GENERATE_FLUXOR)
-					{
-						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
-						text_feedback->m_alliance = m_alliance;
-						ostringstream ss;
-						ss << "-" << m_fluxor_generation_cost;
-						text_feedback->setString(ss.str());
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
-						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
-						delete text_feedback;
-						(*CurrentGame).addToFeedbacks(pop_feedback);
-					}
-
-					//turret?
-					if (m_turret_range == 0)
-					{
-						fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
-					}
-					else
-					{
-						fluxor->m_absolute_speed = FLUXOR_BULLET_SPEED;
-					}
-					
-					UpdateFluxorDirection(fluxor);
-
-					fluxor->setPosition(getPosition());
-					fluxor->m_initial_position = getPosition();
-
-					(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorGuidedObject);
-					//flux display
-					if (fluxor->m_displaying_flux)
-					{
-						(*CurrentGame).addToFeedbacks(fluxor->m_flux_text);
-					}
-
-					m_fluxor_spawn_clock.restart();
-
-					fluxor->m_modules_visited.push_back(this);//must come after UpdateFluxorDirection(fluxor)
-
-					return true;
+					fluxor->m_target = pTarget;
 				}
+
+				m_flux -= m_fluxor_generation_cost;
+
+				//feedback
+				if (USE_FEEDBACK_GENERATE_FLUXOR)
+				{
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+					text_feedback->m_alliance = m_alliance;
+					ostringstream ss;
+					ss << "-" << m_fluxor_generation_cost;
+					text_feedback->setString(ss.str());
+					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+					pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+					delete text_feedback;
+					(*CurrentGame).addToFeedbacks(pop_feedback);
+				}
+
+				//turret?
+				if (m_turret_range == 0)
+				{
+					fluxor->m_absolute_speed = FLUXOR_GUIDED_BASE_SPEED;
+				}
+				else
+				{
+					fluxor->m_absolute_speed = FLUXOR_BULLET_SPEED;
+				}
+					
+				UpdateFluxorDirection(fluxor);
+
+				fluxor->setPosition(getPosition());
+				fluxor->m_initial_position = getPosition();
+
+				(*CurrentGame).addToScene(fluxor, FluxorLayer, FluxorGuidedObject);
+				//flux display
+				if (fluxor->m_displaying_flux)
+				{
+					(*CurrentGame).addToFeedbacks(fluxor->m_flux_text);
+				}
+
+				m_fluxor_spawn_clock.restart();
+
+				fluxor->m_modules_visited.push_back(this);//must come after UpdateFluxorDirection(fluxor)
+
+				return true;
 			}
 		}
-		
+
 		return false;
 	}
 	else
@@ -833,28 +849,47 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 	}
 }
 
-void Module::CondensateFluxor(Fluxor* fluxor)
+bool Module::CondensateFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
 		if (m_flux == m_flux_max)
 		{
-			if (fluxor->m_condensed_to_circulate)
-			{
-				//end of condensed effect
-				fluxor->m_condensed_to_circulate = false;
-				fluxor->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
-			}
-			else
-			{
+			//if (fluxor->m_condensed_to_circulate)
+			//{
+			//	//end of condensed effect
+			//	fluxor->m_condensed_to_circulate = false;
+			//	fluxor->setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
+			//}
+			//else
+			//{
 				if (m_isCondensatingFluxor && fluxor->m_needs_link_to_circulate)
 				{
+					m_flux -= m_fluxor_condensation_cost;
 					fluxor->m_condensed_to_circulate = true;
-					fluxor->setColor(sf::Color(255, 255, 255, 255));
+					fluxor->setColor(Color(255, 255, 255, 255));
+
+					//feedback
+					if (USE_FEEDBACK_CONSUMPTION)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						ostringstream ss;
+						ss << "-" << m_fluxor_condensation_cost;
+						text_feedback->setString(ss.str());
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
+
+					return true;
 				}
-			}
+			//}
 		}
 	}
+
+	return false;
 }
 
 void Module::AmplifyFluxor(Fluxor* fluxor)
@@ -885,7 +920,7 @@ void Module::AmplifyFluxor(Fluxor* fluxor)
 			if ((m_isRefillingFlux && USE_FEEDBACK_REFILL) || (m_add_flux > 0 && USE_FEEDBACK_AMPLIFICATION))
 			if (fluxor->m_transfer_buffer == 0)
 			{
-				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
+				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Cyan, getPosition(), m_team);
 				text_feedback->m_alliance = m_alliance;
 				ostringstream ss;
 				if (m_isRefillingFlux)
@@ -1019,24 +1054,25 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			if (!m_under_construction)
 			{
 				//module "condensation"
-				CondensateFluxor(fluxor);
-
-				//module "refill/amplify fluxor"
-				if (fluxor->m_can_be_refilled_by_modules)
+				if (!CondensateFluxor(fluxor))
 				{
-					if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
+					//module "refill/amplify fluxor"
+					if (fluxor->m_can_be_refilled_by_modules)
 					{
-						if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
+						if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && fluxor->m_can_be_refilled_by_modules)
 						{
-							AmplifyFluxor(fluxor);
+							if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill || fluxor->m_condensed_to_circulate)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
+							{
+								AmplifyFluxor(fluxor);
+							}
 						}
 					}
-				}
 
-				//consumption (automatic) - must be done last
-				if (fluxor->m_consummable_by_modules)
-				{
-					ConsummeFluxor(fluxor);
+					//consumption (automatic) - must be done last
+					if (fluxor->m_consummable_by_modules)
+					{
+						ConsummeFluxor(fluxor);
+					}
 				}
 			}
 

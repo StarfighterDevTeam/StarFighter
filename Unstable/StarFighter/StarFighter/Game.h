@@ -39,8 +39,6 @@ enum ModuleType
 	ModuleType_Relay,
 	ModuleType_Condensator,
 	ModuleType_Amplifier,
-	ModuleType_Factory,
-	ModuleType_Factory_Up,
 	ModuleType_Shield,
 	ModuleType_Barrier,
 	ModuleType_Armory,

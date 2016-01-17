@@ -83,7 +83,7 @@ void InGameState::Initialize(Player player)
 	//Fluxors data
 	for (int i = 0; i < NBVAL_FluxorType; i++)
 	{
-		(*CurrentGame).m_fluxors[i] = new Fluxor((FluxorType)i);
+		(*CurrentGame).m_fluxors[i] = new Fluxor((FluxorType)i, PlayerNeutral);
 	}
 
 	//Modules data

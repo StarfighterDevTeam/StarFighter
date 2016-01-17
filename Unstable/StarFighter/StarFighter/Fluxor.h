@@ -11,7 +11,7 @@ class Fluxor : public GameObject
 {
 public :
 	Fluxor();
-	Fluxor(FluxorType FluxorType);
+	Fluxor(FluxorType FluxorType, PlayerTeams team);
 	Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	Fluxor* Clone();
 	void Initialize();
