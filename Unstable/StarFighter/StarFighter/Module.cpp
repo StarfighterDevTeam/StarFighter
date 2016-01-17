@@ -794,7 +794,7 @@ bool Module::ConsummeFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (m_flux < m_flux_max && fluxor->m_flux > 0 && fluxor->m_consummable_by_modules)
+		if (m_flux < m_flux_max && fluxor->m_flux > 0 && fluxor->m_consummable_by_modules && !fluxor->m_condensed_to_circulate)
 		{
 			if (fluxor->m_transfert_buffer_memory == 0)
 			{
@@ -872,6 +872,10 @@ bool Module::CondensateFluxor(Fluxor* fluxor)
 					m_flux -= m_fluxor_condensation_cost;
 					fluxor->m_condensed_to_circulate = true;
 					fluxor->setColor(Color(255, 255, 255, 255));
+					if (fluxor->m_flux_text)
+					{
+						fluxor->m_flux_text->setColor(Color::Red);
+					}
 
 					//feedback
 					if (USE_FEEDBACK_CONSUMPTION)
@@ -1036,7 +1040,7 @@ void Module::AttackModule(Fluxor* fluxor)
 				//feedback module
 				if (USE_FEEDBACK_ATTACK)
 				{
-					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Red, getPosition(), m_team);
 					text_feedback->m_alliance = AllianceNeutral;
 					ostringstream ss;
 					ss << "-" << damage;
