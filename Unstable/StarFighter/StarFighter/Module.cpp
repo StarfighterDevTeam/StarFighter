@@ -646,9 +646,9 @@ void Module::GetFluxor(GameObject* object)
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_flux == m_flux_max && IsMainLinkActivated())
+	if (m_isGeneratingFluxor && m_flux == m_flux_max)
 	{
-		if (!(*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_needs_link_to_circulate || m_has_child_to_refill || (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_flux_attacker)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
+		if (IsMainLinkActivated() && (!(*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_needs_link_to_circulate || m_has_child_to_refill || (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_flux_attacker))//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
 		{
 			//turret?
 			Fluxor* pTarget = NULL;
