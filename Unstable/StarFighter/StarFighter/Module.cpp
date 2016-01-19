@@ -982,7 +982,7 @@ void Module::AttackModule(Fluxor* fluxor)
 				int damage = 1;
 				if (fluxor->m_flux_attack_delay == 0)
 				{
-					damage = fluxor->m_flux;
+					damage = fluxor->m_flux > m_flux ? m_flux + 1 : fluxor->m_flux;
 				}
 
 				//modules under construction behave like modules with 0 hp (instantly killed)

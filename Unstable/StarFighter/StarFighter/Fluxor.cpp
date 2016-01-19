@@ -121,7 +121,7 @@ Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team)
 			m_flux_waste = 1;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 			m_flux_attacker = true;
-			m_flux_attack_piercing = true;
+			m_flux_attack_piercing = false;
 			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			break;
 		}
