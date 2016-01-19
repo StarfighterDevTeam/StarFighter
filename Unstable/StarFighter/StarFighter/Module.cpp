@@ -31,6 +31,9 @@ void Module::Initialize()
 	m_upgrade_player_stats = false;
 	m_isCondensatingFluxor = false;
 	m_shield = NULL;
+	m_wasting_flux = false;
+	m_flux_waste = 0;;
+	m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
@@ -70,6 +73,7 @@ Module::Module()
 Module::Module(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0,0), textureName, size, origin, frameNumber, animationNumber)
 {
 	Initialize();
+	m_curGridIndex = (*CurrentGame).GetGridIndex(position);
 }
 
 Module::Module(ModuleType moduleType) : Module(moduleType, PlayerNeutral)
@@ -193,7 +197,10 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Accumulator:
 		{
 			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 0;
+			m_flux_max_after_construction = 1000;
+			m_wasting_flux = true;
+			m_flux_waste = 1;
+			m_flux_waste_delay = MODULE_WASTE_DELAY;
 			//m_isAutogeneratingFlux = true;
 			//m_flux_autogeneration_time = 1.f;
 			break;
@@ -549,24 +556,20 @@ void Module::update(sf::Time deltaTime)
 		m_team_marker->setFrame(m_under_construction, true);
 	}
 
-	//shield?
-	UpdateShield();
-
-	GameObject::update(deltaTime);
-
-	//update grid index
-	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
-
-	//update links, circuit knowledge and feedbacks
-	UpdateLinks();
-	CheckCircuit();
-	
 	//module properties
 	if (!m_under_construction)
 	{
 		AutogenerateFlux();
+		WastingFlux();
 		GenerateFluxor();
+		UpdateShield();
 	}
+	
+	GameObject::update(deltaTime);
+
+	//update links, circuit knowledge and feedbacks
+	UpdateLinks();
+	CheckCircuit();
 	
 	//hud
 	if (m_flux_text && m_flux_text->m_visible)
@@ -792,6 +795,7 @@ bool Module::ConsummeFluxor(Fluxor* fluxor)
 			{
 				m_flux++;
 				fluxor->m_flux--;
+				m_flux_waste_clock.restart();
 
 				//feedback
 				if (USE_FEEDBACK_ACTIVATION)
@@ -1009,6 +1013,7 @@ void Module::AttackModule(Fluxor* fluxor)
 						(*CurrentGame).addToFeedbacks(pop_feedback);
 					}
 				}
+				//not killed
 				else
 				{
 					//case of shield not getting one-shotted
@@ -1043,7 +1048,7 @@ void Module::AttackModule(Fluxor* fluxor)
 					text_feedback->setString(ss.str());
 					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
 					pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
-					if (m_shield_range > 0 && !m_GarbageMe)
+					if (!m_GarbageMe)
 					{
 						pop_feedback->setPosition(sf::Vector2f(fluxor->getPosition().x - pop_feedback->getGlobalBounds().width / 2, fluxor->getPosition().y));
 					}
@@ -2005,5 +2010,37 @@ int Module::GetLinkIndexToFreeConnectedCell()
 	else
 	{
 		return -1;
+	}
+}
+
+void Module::WastingFlux()
+{
+	if (m_wasting_flux && m_flux > 0)
+	{
+		if (m_flux_waste_clock.getElapsedTime().asSeconds() > m_flux_waste_delay)
+		{
+			if (m_flux_waste <= m_flux)
+			{
+				m_flux -= m_flux_waste;
+			}
+			else
+			{
+				m_flux = 0;
+			}
+
+			m_flux_waste_clock.restart();
+
+			//feedback
+			if (USE_FEEDBACK_WASTING)
+			{
+				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, sf::Color::Cyan, getPosition(), m_team);
+				text_feedback->m_alliance = m_alliance;
+				text_feedback->setString("-1");
+				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+				pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+				delete text_feedback;
+				(*CurrentGame).addToFeedbacks(pop_feedback);
+			}
+		}
 	}
 }

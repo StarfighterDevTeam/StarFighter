@@ -118,7 +118,7 @@ Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team)
 			m_color = Color::Cyan;
 
 			//m_wasting_flux = true;
-			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste = 1;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 			m_flux_attacker = true;
 			m_flux_attack_piercing = true;
@@ -128,7 +128,7 @@ Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team)
 		case FluxorType_Red:
 		{
 			m_wasting_flux = true;
-			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste = 1;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			m_flux = 10;
@@ -142,7 +142,7 @@ Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team)
 		case FluxorType_Purple:
 		{
 			m_wasting_flux = true;
-			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste = 1;
 			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
 			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			m_flux = 20;

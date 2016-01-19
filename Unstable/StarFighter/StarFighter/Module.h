@@ -98,6 +98,13 @@ public :
 	float m_flux_transfer_delay;
 	sf::Clock m_flux_consumption_clock;
 
+	//Flux waste
+	bool m_wasting_flux;
+	int m_flux_waste;
+	float m_flux_waste_delay;
+	sf::Clock m_flux_waste_clock;
+	void WastingFlux();
+
 	//Module attacked by Fluxors
 	void AttackModule(Fluxor* fluxor);
 
