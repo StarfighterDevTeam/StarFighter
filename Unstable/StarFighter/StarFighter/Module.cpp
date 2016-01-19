@@ -1901,18 +1901,29 @@ void Module::SetDirectionAutomatically()
 					if (pModule->GetMainLinkIndex() == (i + 2) % 4)
 					{
 						//risk of invalid link? abort smart arrow
-						if (pModule->GetMainLinkIndex() == (link_parent_index + 2) % 4)
+						Module* pPotentialShortCircuit = NULL;
+						if (m_curGridIndex.x - next_x > 0 && m_curGridIndex.x - next_x < GRID_WIDTH && m_curGridIndex.y - next_y > 0 && m_curGridIndex.y - next_y < GRID_WIDTH)//making sure we're not checking outside of the grid
+						{
+							pPotentialShortCircuit = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x - next_x][m_curGridIndex.y - next_y];
+						}
+						if (pPotentialShortCircuit && (pModule->GetMainLinkIndex() + 2) % 4 == pPotentialShortCircuit->GetMainLinkIndex())
 						{
 							link_parent_index = -1;
+							//thx bye
+							pPotentialShortCircuit = NULL;
+							pModule = NULL;
 							continue;
 						}
+						//thx bye
+						pPotentialShortCircuit = NULL;
 
 						// if we alreay know a parent, can it be a better one?
 						if (link_parent_index < 0 || (i == 0 && m_alliance % 2 == 0) || (i == 2 && m_alliance % 2 == 1))
 						{
 							link_parent_index = pModule->GetMainLinkIndex();
 						}
-
+						//thx bye
+						pModule = NULL;
 						continue;
 					}
 
@@ -1922,6 +1933,8 @@ void Module::SetDirectionAutomatically()
 						link_child_index = i;
 					}
 				}
+				//thx bye
+				pModule = NULL;
 			}
 		}
 	}
