@@ -83,7 +83,7 @@ void InGameState::Initialize(Player player)
 	//Fluxors data
 	for (int i = 0; i < NBVAL_FluxorType; i++)
 	{
-		(*CurrentGame).m_fluxors[i] = new Fluxor((FluxorType)i);
+		(*CurrentGame).m_fluxors[i] = new Fluxor((FluxorType)i, PlayerNeutral);
 	}
 
 	//Modules data
@@ -209,7 +209,14 @@ void InGameState::Update(sf::Time deltaTime)
 			assert((*CurrentGame).playerShips[v] != NULL);
 
 			//hide if player's flux is sufficient for building
-			(*CurrentGame).m_HUD_productions_mask[v][i]->m_visible = !((*CurrentGame).playerShips[v]->m_flux >= (*CurrentGame).m_modules[i]->m_flux_max_under_construction);
+			if (i >= NBVAL_ModuleType)
+			{
+				(*CurrentGame).m_HUD_productions_mask[v][i]->m_visible = true;
+			}
+			else
+			{
+				(*CurrentGame).m_HUD_productions_mask[v][i]->m_visible = !((*CurrentGame).playerShips[v]->m_flux >= (*CurrentGame).m_modules[i]->m_flux_max_under_construction);
+			}
 		}
 	}
 	

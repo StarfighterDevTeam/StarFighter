@@ -89,8 +89,8 @@ public :
 	void CondensateFluxor(Fluxor* fluxor);
 
 	//Flux transfer to Fluxors
-	void ConsummeFluxor(Fluxor* fluxor);
-	void AmplifyFluxor(Fluxor* fluxor);
+	bool ConsummeFluxor(Fluxor* fluxor);
+	bool AmplifyFluxor(Fluxor* fluxor);
 	float m_flux_transfer_delay;
 	sf::Clock m_flux_consumption_clock;
 

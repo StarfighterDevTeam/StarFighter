@@ -71,8 +71,9 @@ enum TeamAlliances
 #define USE_FEEDBACK_ACTIVATION						true
 #define USE_FEEDBACK_AUTOGENERATION					true
 #define USE_FEEDBACK_GENERATE_FLUXOR				true
-#define USE_FEEDBACK_WASTING						false
+#define USE_FEEDBACK_WASTING						true
 #define USE_FEEDBACK_CONSUMPTION					true
+#define USE_FEEDBACK_CONDENSATION					true
 #define USE_FEEDBACK_AMPLIFICATION					true
 #define USE_FEEDBACK_REFILL							true
 #define USE_FEEDBACK_ATTACK							true

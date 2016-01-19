@@ -87,7 +87,12 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 	{
 		case ModuleType_Generator:
 		{
-			textureName = "Assets/2D/module_generator.png";
+			if (team == PlayerBlue)
+				textureName = "Assets/2D/module_generator_P1.png";
+			else if (team == PlayerRed)
+				textureName = "Assets/2D/module_generator_P2.png";
+			else
+				textureName = "Assets/2D/module_generator_P1.png";
 			break;
 		}
 		case ModuleType_Armory:
@@ -105,31 +110,31 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			textureName = "Assets/2D/module_relay.png";
 			break;
 		}
-		case ModuleType_Factory:
-		{
-			textureName = "Assets/2D/module_factory.png";
-			break;
-		}
-		case ModuleType_Factory_Up:
-		{
-			textureName = "Assets/2D/module_factory_up.png";
-			break;
-		}
+		//case ModuleType_Factory:
+		//{
+		//	textureName = "Assets/2D/module_factory.png";
+		//	break;
+		//}
+		//case ModuleType_Factory_Up:
+		//{
+		//	textureName = "Assets/2D/module_factory_up.png";
+		//	break;
+		//}
 		case ModuleType_Shield:
 		{
 			textureName = "Assets/2D/module_shield.png";
 			break;
 		}
-		case ModuleType_Turret:
-		{
-			textureName = "Assets/2D/module_turret.png";
-			break;
-		}
-		case ModuleType_Barrier:
-		{
-			textureName = "Assets/2D/module_barrier.png";
-			break;
-		}
+		//case ModuleType_Turret:
+		//{
+		//	textureName = "Assets/2D/module_turret.png";
+		//	break;
+		//}
+		//case ModuleType_Barrier:
+		//{
+		//	textureName = "Assets/2D/module_barrier.png";
+		//	break;
+		//}
 		case ModuleType_Amplifier:
 		{
 			textureName = "Assets/2D/module_amplifier.png";
@@ -145,10 +150,9 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			textureName = "Assets/2D/module_condensator.png";
 			break;
 		}
-			
 		default:
 		{
-			textureName = "Assets/2D/module_generator.png";
+			textureName = "Assets/2D/module.png";
 			break;
 		}
 	}
@@ -188,8 +192,10 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		}
 		case ModuleType_Battery:
 		{
-			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 1500;
+			m_flux_max_under_construction = 30;
+			m_flux_max_after_construction = 300;
+			m_isAutogeneratingFlux = true;
+			m_flux_autogeneration_time = 1.f;
 			break;
 		}
 		case ModuleType_Relay:
@@ -199,26 +205,26 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_isRefillingFlux = true;
 			break;
 		}
-		case ModuleType_Factory:
-		{
-			m_flux_max_under_construction = 15;
-			m_flux_max_after_construction = 10;
-			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Red;
-			m_fluxor_generation_time = 3.f;
-			m_fluxor_generation_cost = m_flux_max_after_construction;
-			break;
-		}
-		case ModuleType_Factory_Up:
-		{
-			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 20;
-			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Purple;
-			m_fluxor_generation_time = 3.f;
-			m_fluxor_generation_cost = m_flux_max_after_construction;
-			break;
-		}
+		//case ModuleType_Factory:
+		//{
+		//	m_flux_max_under_construction = 15;
+		//	m_flux_max_after_construction = 10;
+		//	m_isGeneratingFluxor = true;
+		//	m_fluxor_generated_type = FluxorType_Red;
+		//	m_fluxor_generation_time = 3.f;
+		//	m_fluxor_generation_cost = m_flux_max_after_construction;
+		//	break;
+		//}
+		//case ModuleType_Factory_Up:
+		//{
+		//	m_flux_max_under_construction = 30;
+		//	m_flux_max_after_construction = 20;
+		//	m_isGeneratingFluxor = true;
+		//	m_fluxor_generated_type = FluxorType_Purple;
+		//	m_fluxor_generation_time = 3.f;
+		//	m_fluxor_generation_cost = m_flux_max_after_construction;
+		//	break;
+		//}
 		case ModuleType_Shield:
 		{
 			m_flux_max_under_construction = 60;
@@ -226,24 +232,17 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_shield_range = 1;
 			break;
 		}
-		case ModuleType_Turret:
-		{
-			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 50;
-			m_turret_range = 2;
-			m_isGeneratingFluxor = true;
-			m_fluxor_generated_type = FluxorType_Black;
-			m_fluxor_generation_time = 2.f;
-			m_fluxor_generation_cost = 5;
-			break;
-		}
-		case ModuleType_Barrier:
-		{
-			m_flux_max_under_construction = 10;
-			m_flux_max_after_construction = 25;
-			m_isAutogeneratingFlux = true;
-			m_flux_autogeneration_time = 1.f;
-		}
+		//case ModuleType_Turret:
+		//{
+		//	m_flux_max_under_construction = 30;
+		//	m_flux_max_after_construction = 50;
+		//	m_turret_range = 2;
+		//	m_isGeneratingFluxor = true;
+		//	m_fluxor_generated_type = FluxorType_Black;
+		//	m_fluxor_generation_time = 2.f;
+		//	m_fluxor_generation_cost = 5;
+		//	break;
+		//}
 		case ModuleType_Amplifier:
 		{
 			m_flux_max_under_construction = 25;
@@ -646,9 +645,7 @@ bool Module::GenerateFluxor()
 {
 	if (m_isGeneratingFluxor && m_flux == m_flux_max)
 	{
-		Fluxor* pFluxor = (*CurrentGame).m_fluxors[m_fluxor_generated_type];
-
-		if (!pFluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
+		if (!(*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_needs_link_to_circulate || m_has_child_to_refill || (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_flux_attacker)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
 		{
 			//turret?
 			Fluxor* pTarget = NULL;
@@ -661,7 +658,7 @@ bool Module::GenerateFluxor()
 			{
 				if (m_fluxor_spawn_clock.getElapsedTime().asSeconds() > m_fluxor_generation_time)
 				{
-					Fluxor* fluxor = new Fluxor(m_fluxor_generated_type);
+					Fluxor* fluxor = new Fluxor(m_fluxor_generated_type, m_team);
 
 					fluxor->m_team = m_team;
 					fluxor->m_alliance = m_alliance;
@@ -731,7 +728,7 @@ void Module::AutogenerateFlux()
 {
 	if (m_isAutogeneratingFlux)
 	{
-		if (m_flux < m_flux_max)
+		if (m_flux < m_flux_max || m_flux_max == 0)
 		{
 			if (m_flux_autogeneration_clock.getElapsedTime().asSeconds() > m_flux_autogeneration_time)
 			{
@@ -774,11 +771,11 @@ void Module::AutogenerateFlux()
 	}
 }
 
-void Module::ConsummeFluxor(Fluxor* fluxor)
+bool Module::ConsummeFluxor(Fluxor* fluxor)
 {
-	if (fluxor)
+	if (fluxor && fluxor->m_consummable_by_modules)
 	{
-		if (m_flux < m_flux_max && fluxor->m_flux > 0)
+		if ((m_flux < m_flux_max || m_flux_max == 0) && fluxor->m_flux > 0)
 		{
 			if (fluxor->m_transfert_buffer_memory == 0)
 			{
@@ -829,8 +826,12 @@ void Module::ConsummeFluxor(Fluxor* fluxor)
 			{
 				fluxor->m_docked = true;
 			}
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void Module::CondensateFluxor(Fluxor* fluxor)
@@ -839,82 +840,100 @@ void Module::CondensateFluxor(Fluxor* fluxor)
 	{
 		if (m_flux == m_flux_max)
 		{
-			if (fluxor->m_condensed_to_circulate)
-			{
-				//end of condensed effect
-				fluxor->m_condensed_to_circulate = false;
-				fluxor->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
-			}
-			else
+			if (!fluxor->m_condensed_to_circulate)
 			{
 				if (m_isCondensatingFluxor && fluxor->m_needs_link_to_circulate)
 				{
 					fluxor->m_condensed_to_circulate = true;
 					fluxor->setColor(sf::Color(255, 255, 255, 255));
+
+					fluxor->m_wasting_flux = true;
+
+					//feedback
+					if (USE_FEEDBACK_CONDENSATION)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						text_feedback->setString("Condensation");
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - TEXT_POP_OFFSET_Y)); 
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
 				}
 			}
 		}
 	}
 }
 
-void Module::AmplifyFluxor(Fluxor* fluxor)
+bool Module::AmplifyFluxor(Fluxor* fluxor)
 {
-	if (fluxor)
+	if (fluxor && fluxor->m_can_be_refilled_by_modules)
 	{
-		if (fluxor->m_transfer_buffer == 0)
+		if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
 		{
-			//increasing potential
-			if (fluxor->m_flux_max > 0 && m_add_flux > 0)
+			if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
 			{
-				fluxor->m_flux_max += m_add_flux;
-			}
-			//refilling or increasing?
-			fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
-			fluxor->m_transfert_buffer_memory = fluxor->m_transfer_buffer;
-			fluxor->m_flux_transfer_clock.restart();
-		}
-
-		if (fluxor->m_transfer_buffer > 0 && fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
-		{
-			fluxor->m_flux++;
-			fluxor->m_transfer_buffer--;
-			fluxor->m_flux_transfer_clock.restart();
-			fluxor->m_flux_waste_clock.restart();
-
-			//fedback once finished
-			if ((m_isRefillingFlux && USE_FEEDBACK_REFILL) || (m_add_flux > 0 && USE_FEEDBACK_AMPLIFICATION))
-			if (fluxor->m_transfer_buffer == 0)
-			{
-				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
-				text_feedback->m_alliance = m_alliance;
-				ostringstream ss;
-				if (m_isRefillingFlux)
+				if (fluxor->m_transfer_buffer == 0)
 				{
-					ss << "+" << fluxor->m_transfert_buffer_memory;
-					text_feedback->setCharacterSize(16);
+					//increasing potential
+					if (fluxor->m_flux_max > 0 && m_add_flux > 0)
+					{
+						fluxor->m_flux_max += m_add_flux;
+					}
+					//refilling or increasing?
+					fluxor->m_transfer_buffer = m_isRefillingFlux ? fluxor->m_flux_max - fluxor->m_flux : m_add_flux;
+					fluxor->m_transfert_buffer_memory = fluxor->m_transfer_buffer;
+					fluxor->m_flux_transfer_clock.restart();
+				}
+
+				if (fluxor->m_transfer_buffer > 0 && fluxor->m_flux_transfer_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
+				{
+					fluxor->m_flux++;
+					fluxor->m_transfer_buffer--;
+					fluxor->m_flux_transfer_clock.restart();
+					fluxor->m_flux_waste_clock.restart();
+
+					//fedback once finished
+					if ((m_isRefillingFlux && USE_FEEDBACK_REFILL) || (m_add_flux > 0 && USE_FEEDBACK_AMPLIFICATION))
+					if (fluxor->m_transfer_buffer == 0)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, fluxor->m_color, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						ostringstream ss;
+						if (m_isRefillingFlux)
+						{
+							ss << "+" << fluxor->m_transfert_buffer_memory;
+							text_feedback->setCharacterSize(16);
+						}
+						else
+						{
+							ss << "+" << m_add_flux;
+						}
+						text_feedback->setString(ss.str());
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, m_size.y / 2 - TEXT_POP_FLUXOR_OFFSET_Y));
+						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - TEXT_POP_FLUXOR_OFFSET_Y));
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
+				}
+
+				if (fluxor->m_transfer_buffer == 0)
+				{
+					UndockFluxor(fluxor);
+					fluxor->m_transfert_buffer_memory = 0;
 				}
 				else
 				{
-					ss << "+" << m_add_flux;
+					fluxor->m_docked = true;
 				}
-				text_feedback->setString(ss.str());
-				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, m_size.y/2 - TEXT_POP_FLUXOR_OFFSET_Y));
-				pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - TEXT_POP_FLUXOR_OFFSET_Y));
-				delete text_feedback;
-				(*CurrentGame).addToFeedbacks(pop_feedback);
+
+				return true;
 			}
 		}
-
-		if (fluxor->m_transfer_buffer == 0)
-		{
-			UndockFluxor(fluxor);
-			fluxor->m_transfert_buffer_memory = 0;
-		}
-		else
-		{
-			fluxor->m_docked = true;
-		}
 	}
+
+	return false;
 }
 
 void Module::AttackModule(Fluxor* fluxor)
@@ -1018,25 +1037,19 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 			if (!m_under_construction)
 			{
-				//module "condensation"
-				CondensateFluxor(fluxor);
-
-				//module "refill/amplify fluxor"
-				if (fluxor->m_can_be_refilled_by_modules)
+				//end of condensed effect
+				if (fluxor->m_condensed_to_circulate)
 				{
-					if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
-					{
-						if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
-						{
-							AmplifyFluxor(fluxor);
-						}
-					}
+					fluxor->m_condensed_to_circulate = false;
+					fluxor->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+
+					fluxor->m_wasting_flux = false;
 				}
 
-				//consumption (automatic) - must be done last
-				if (fluxor->m_consummable_by_modules)
+				if (!ConsummeFluxor(fluxor))
 				{
-					ConsummeFluxor(fluxor);
+					CondensateFluxor(fluxor);
+					AmplifyFluxor(fluxor);
 				}
 			}
 

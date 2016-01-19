@@ -43,7 +43,7 @@ Fluxor::Fluxor()
 	Initialize();
 }
 
-Fluxor::Fluxor(FluxorType FluxorType)
+Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team)
 {
 	//texture
 	std::string textureName;
@@ -51,7 +51,12 @@ Fluxor::Fluxor(FluxorType FluxorType)
 	{
 		case FluxorType_Blue:
 		{
-			textureName = "Assets/2D/fluxor_blue.png";
+			if (team == PlayerBlue)
+				textureName = "Assets/2D/fluxor_blue.png";
+			else if (team == PlayerRed)
+				textureName = "Assets/2D/fluxor_red.png";
+			else
+				textureName = "Assets/2D/fluxor_blue.png";
 			break;
 		}
 		case FluxorType_Green:
@@ -112,13 +117,12 @@ Fluxor::Fluxor(FluxorType FluxorType)
 			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 			m_color = Color::Cyan;
 
-			//m_needs_link_to_circulate = false;
 			//m_wasting_flux = true;
-			//m_flux_waste = FLUXOR_WASTE_VALUE;
-			//m_flux_waste_delay = FLUXOR_WASTE_DELAY;
-			//m_flux_attacker = true;
-			//m_flux_attack_piercing = true;
-			//m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
+			m_flux_waste = FLUXOR_WASTE_VALUE;
+			m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+			m_flux_attacker = true;
+			m_flux_attack_piercing = true;
+			m_flux_attack_delay = FLUXOR_ATTACK_DELAY;
 			break;
 		}
 		case FluxorType_Red:
@@ -190,7 +194,7 @@ Fluxor::Fluxor(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType, bool within_bounds, sf::FloatRect bounds)
 {
-	Fluxor* new_fluxor = new Fluxor(FluxorType);
+	Fluxor* new_fluxor = new Fluxor(FluxorType, PlayerNeutral);
 	
 	new_fluxor->m_has_spawn_bounds = within_bounds;
 	if (within_bounds)
