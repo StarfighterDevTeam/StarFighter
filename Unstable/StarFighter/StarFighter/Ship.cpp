@@ -264,6 +264,8 @@ void Ship::update(sf::Time deltaTime)
 		}
 		
 		m_flux = m_flux_max;
+		if ((*CurrentGame).playerShips[1])
+			(*CurrentGame).playerShips[1]->m_flux = (*CurrentGame).playerShips[1]->m_flux_max;
 
 		//Module::DebugRefillingModuleFlux(m_curGridIndex);
 	}

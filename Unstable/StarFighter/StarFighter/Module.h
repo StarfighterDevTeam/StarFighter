@@ -58,7 +58,11 @@ public :
 	Glow* m_glow;
 	void SetConstructionStatus(bool under_construction);
 	sf::Clock m_construction_clock;
+
+	//Shield module
 	GameObject* m_shield;
+	unsigned int m_shield_range;
+	void UpdateShield();
 
 	//Module properties
 	void ApplyModuleEffect(Fluxor* fluxor);
@@ -66,7 +70,6 @@ public :
 	int m_add_speed;
 	int m_add_flux;
 	unsigned int m_turret_range;
-	unsigned int m_shield_range;
 	Fluxor* SearchNearbyAttackers(PlayerTeams team_not_to_target, float range);
 	bool m_upgrade_player_stats;
 

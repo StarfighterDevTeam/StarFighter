@@ -450,6 +450,7 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
+			//once a Fluxor has gone past the shield (while it was deactivated), it's not colliding with it anymore. He's through.
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Attack them maybe? (before attacking Modules inside it)

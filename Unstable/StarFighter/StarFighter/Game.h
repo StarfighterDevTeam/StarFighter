@@ -42,7 +42,7 @@ enum ModuleType
 	//ModuleType_Factory,
 	//ModuleType_Factory_Up,
 	ModuleType_Shield,
-	ModuleType_Battery,
+	ModuleType_Accumulator,
 	//ModuleType_Barrier,
 	ModuleType_Armory,
 	

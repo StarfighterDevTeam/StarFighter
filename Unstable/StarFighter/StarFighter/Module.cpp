@@ -100,9 +100,9 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			textureName = "Assets/2D/module_armory.png";
 			break;
 		}
-		case ModuleType_Battery:
+		case ModuleType_Accumulator:
 		{
-			textureName = "Assets/2D/module_battery.png";
+			textureName = "Assets/2D/module_accumulator.png";
 			break;
 		}
 		case ModuleType_Relay:
@@ -190,12 +190,12 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_upgrade_player_stats = true;
 			break;
 		}
-		case ModuleType_Battery:
+		case ModuleType_Accumulator:
 		{
 			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 300;
-			m_isAutogeneratingFlux = true;
-			m_flux_autogeneration_time = 1.f;
+			m_flux_max_after_construction = 0;
+			//m_isAutogeneratingFlux = true;
+			//m_flux_autogeneration_time = 1.f;
 			break;
 		}
 		case ModuleType_Relay:
@@ -550,18 +550,7 @@ void Module::update(sf::Time deltaTime)
 	}
 
 	//shield?
-	if (m_shield_range > 0 && m_flux > 0 && !m_under_construction && !m_shield)
-	{
-		m_shield = new GameObject(getPosition(), sf::Vector2f(0, 0), "Assets/2D/shield.png", sf::Vector2f(384, 384));
-		sf::Color color = (*CurrentGame).m_team_colors[m_team];
-		m_shield->setColor(Color(color.r, color.g, color.b, 70));
-		m_shield->m_target = this;
-		(*CurrentGame).addToScene(m_shield, ShieldLayer, ShieldObject);
-	}
-	else if (m_shield)
-	{
-		m_shield->m_visible = m_flux > 0;
-	}
+	UpdateShield();
 
 	GameObject::update(deltaTime);
 
@@ -603,6 +592,23 @@ void Module::update(sf::Time deltaTime)
 	//	m_flux_gauge->setPosition(getPosition());
 	//}
 }
+
+void Module::UpdateShield()
+{
+	if (m_shield_range > 0 && m_flux == m_flux_max && !m_under_construction && !m_shield)
+	{
+		m_shield = new GameObject(getPosition(), sf::Vector2f(0, 0), "Assets/2D/shield.png", sf::Vector2f(384, 384));
+		sf::Color color = (*CurrentGame).m_team_colors[m_team];
+		m_shield->setColor(Color(color.r, color.g, color.b, 70));
+		m_shield->m_target = this;
+		(*CurrentGame).addToScene(m_shield, ShieldLayer, ShieldObject);
+	}
+	else if (m_shield)
+	{
+		m_shield->m_visible = m_flux == m_flux_max;
+	}
+}
+
 
 void Module::GetFluxor(GameObject* object)
 {
@@ -898,7 +904,8 @@ bool Module::AmplifyFluxor(Fluxor* fluxor)
 	{
 		if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
 		{
-			if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled.
+			//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled. Unless it can attack something.
+			if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill || fluxor->m_flux_attacker)
 			{
 				if (fluxor->m_transfer_buffer == 0)
 				{
@@ -977,8 +984,8 @@ void Module::AttackModule(Fluxor* fluxor)
 					damage = fluxor->m_flux;
 				}
 
-				//kill?
-				if ((int)m_flux - damage < 0 )
+				//kill? (shields cannot get one-shotted)
+				if ((m_shield_range == 0 && damage > m_flux) || (m_shield_range > 0 && m_flux < m_flux_max))
 				{
 					this->m_GarbageMe = true;
 					this->m_visible = false;
@@ -1003,6 +1010,12 @@ void Module::AttackModule(Fluxor* fluxor)
 				}
 				else
 				{
+					//case of shield not getting one-shotted
+					if (damage > m_flux)
+					{
+						damage = m_flux;
+					}
+
 					m_flux -= damage;
 					fluxor->m_flux -= damage;
 					if (fluxor->m_flux_stealer)
@@ -1029,6 +1042,10 @@ void Module::AttackModule(Fluxor* fluxor)
 					text_feedback->setString(ss.str());
 					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
 					pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+					if (m_shield_range > 0 && !m_GarbageMe)
+					{
+						pop_feedback->setPosition(sf::Vector2f(fluxor->getPosition().x - pop_feedback->getGlobalBounds().width / 2, fluxor->getPosition().y));
+					}
 					delete text_feedback;
 					(*CurrentGame).addToFeedbacks(pop_feedback);
 				}
@@ -1036,8 +1053,8 @@ void Module::AttackModule(Fluxor* fluxor)
 				fluxor->m_flux_attack_clock.restart();
 			}
 			
-			//consumption finished?
-			if (this->m_GarbageMe || fluxor->m_flux == 0)
+			//attack finished?
+			if (m_GarbageMe || (m_shield_range > 0 && m_flux < m_flux_max) || fluxor->m_flux == 0)
 			{
 				fluxor->m_docked = false;
 			}
@@ -1268,12 +1285,9 @@ void Module::UpdateLinks()
 								}
 								else
 								{
-									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
+									if (m_link[i].m_exists)
 									{
-										if (m_link[i].m_exists)
-										{
-											m_link[i].m_activated = Link_Activated;
-										}
+										m_link[i].m_activated = Link_Activated;
 									}
 									else
 									{
@@ -1321,13 +1335,12 @@ void Module::UpdateLinks()
 								}
 								else
 								{
-									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
-									{
+									
 										if (m_link[i].m_exists)
 										{
 											m_link[i].m_activated = Link_Activated;
 										}
-									}
+									
 									else
 									{
 										m_link[i].m_activated = Link_Deactivated;
@@ -1371,13 +1384,12 @@ void Module::UpdateLinks()
 								}
 								else
 								{
-									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
-									{
+									
 										if (m_link[i].m_exists)
 										{
 											m_link[i].m_activated = Link_Activated;
 										}
-									}
+									
 									else
 									{
 										m_link[i].m_activated = Link_Deactivated;
@@ -1421,13 +1433,12 @@ void Module::UpdateLinks()
 								}
 								else
 								{
-									if (module->m_team == this->m_team || module->m_alliance == this->m_alliance)
-									{
+									
 										if (m_link[i].m_exists)
 										{
 											m_link[i].m_activated = Link_Activated;
 										}
-									}
+									
 									else
 									{
 										m_link[i].m_activated = Link_Deactivated;
@@ -1494,6 +1505,11 @@ void Module::CheckCircuit()
 		if (module_child->m_flux < module_child->m_flux_max)
 		{
 			m_has_child_to_refill = true;
+
+			if (module_child->m_alliance != m_alliance)
+			{
+				break;//we are now boarding an enemy module, it's time to stop scanning further.
+			}
 			//break;
 		}
 		//else
