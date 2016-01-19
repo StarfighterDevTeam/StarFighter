@@ -455,10 +455,7 @@ void Game::colisionChecksV2()
 			{
 				//Attack them maybe? (before attacking Modules inside it)
 				(*it2)->GetFluxor(*it1);
-				if (!(*it2)->m_under_construction)
-				{
-					has_collided = true;
-				}
+				has_collided = true;
 			}
 		}
 
@@ -472,10 +469,7 @@ void Game::colisionChecksV2()
 			{
 				//Attack them maybe?
 				(*it2)->GetFluxor(*it1);
-				if (!(*it2)->m_under_construction)
-				{
-					has_collided = true;
-				}
+				has_collided = true;
 			}
 		}
 

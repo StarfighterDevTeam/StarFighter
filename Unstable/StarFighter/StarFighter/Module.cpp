@@ -616,31 +616,28 @@ void Module::GetFluxor(GameObject* object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
 
-		if (!m_under_construction)
+		if (!fluxor->m_guided && !m_under_construction)
 		{
-			if (!fluxor->m_guided)
+			float angle = GetAngleRadBetweenPositions(fluxor->getPosition(), fluxor->m_initial_position);
+			fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, angle);
+			fluxor->setPosition(fluxor->m_initial_position);
+			fluxor->m_turn_delay = Fluxor::RandomizeTurnDelay();
+			fluxor->m_turn_clock.restart();
+		}
+		else if (fluxor->m_guided)
+		{
+			//Allied guided Fluxor passes right through the middle of the Module. Enemy Fluxors collide on the Module edge
+			if (fluxor->m_alliance != m_alliance || GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
+			//if (GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
 			{
-				float angle = GetAngleRadBetweenPositions(fluxor->getPosition(), fluxor->m_initial_position);
-				fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, angle);
-				fluxor->setPosition(fluxor->m_initial_position);
-				fluxor->m_turn_delay = Fluxor::RandomizeTurnDelay();
-				fluxor->m_turn_clock.restart();
-			}
-			else
-			{
-				//Allied guided Fluxor passes right through the middle of the Module. Enemy Fluxors collide on the Module edge
-				if (fluxor->m_alliance != m_alliance || GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
-				//if (GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)
+				//make sure a fluxor leaving the module is not colliding again
+				if (fluxor->m_alliance == m_alliance && fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
 				{
-					//make sure a fluxor leaving the module is not colliding again
-					if (fluxor->m_alliance == m_alliance && fluxor->m_initial_position == getPosition() && !fluxor->m_docked)
-					{
-						//do nothing
-					}
-					else
-					{
-						ApplyModuleEffect(fluxor);
-					}
+					//do nothing
+				}
+				else
+				{
+					ApplyModuleEffect(fluxor);
 				}
 			}
 		}
@@ -649,7 +646,7 @@ void Module::GetFluxor(GameObject* object)
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_flux == m_flux_max)
+	if (m_isGeneratingFluxor && m_flux == m_flux_max && IsMainLinkActivated())
 	{
 		if (!(*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_needs_link_to_circulate || m_has_child_to_refill || (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_flux_attacker)//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
 		{
@@ -973,7 +970,7 @@ void Module::AttackModule(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (m_flux >= 0 && fluxor->m_flux > 0)
+		if (fluxor->m_flux > 0)
 		{
 			if (fluxor->m_flux_attack_clock.getElapsedTime().asSeconds() > fluxor->m_flux_attack_delay)
 			{
@@ -984,16 +981,20 @@ void Module::AttackModule(Fluxor* fluxor)
 					damage = fluxor->m_flux;
 				}
 
+				//modules under construction behave like modules with 0 hp (instantly killed)
+				m_flux = m_under_construction ? 0 : m_flux;
+				damage = m_under_construction ? 1 : damage;
+
 				//kill? (shields cannot get one-shotted)
 				if ((m_shield_range == 0 && damage > m_flux) || (m_shield_range > 0 && m_flux < m_flux_max))
 				{
 					this->m_GarbageMe = true;
 					this->m_visible = false;
 
-					fluxor->m_flux -= m_flux;
+					fluxor->m_flux -= damage;
 					if (fluxor->m_flux_stealer)
 					{
-						fluxor->m_flux_stolen += m_flux;
+						fluxor->m_flux_stolen += damage;
 					}
 
 					//feedback
@@ -1122,10 +1123,10 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 			if (!fluxor->m_docked)
 			{
-				//fluxor->setPosition(this->getPosition());
-				if (!fluxor->m_flux_attack_piercing)
+				//only piercing attacks can continue trajectory after a module destruction. Attacks against modules under construction are ALWAYS considered piercing.
+				if (!fluxor->m_flux_attack_piercing && !m_under_construction)
 				{
-					if (fluxor->m_flux_stealer)
+					if (fluxor->m_flux_stealer && !m_under_construction)
 					{
 						fluxor->BringStealerBack();
 					}
@@ -1278,7 +1279,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + j][m_curGridIndex.y];
 							if (module)
 							{
-								if (module->m_under_construction || !module->m_visible)
+								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
 								{
 									module = NULL;
 									continue;
@@ -1328,7 +1329,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y + j];
 							if (module)
 							{
-								if (module->m_under_construction || !module->m_visible)
+								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
 								{
 									module = NULL;
 									continue;
@@ -1377,7 +1378,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x - j][m_curGridIndex.y];
 							if (module)
 							{
-								if (module->m_under_construction || !module->m_visible)
+								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
 								{
 									module = NULL;
 									continue;
@@ -1426,7 +1427,7 @@ void Module::UpdateLinks()
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y - j];
 							if (module)
 							{
-								if (module->m_under_construction || !module->m_visible)
+								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
 								{
 									module = NULL;
 									continue;
