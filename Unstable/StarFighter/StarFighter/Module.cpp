@@ -671,17 +671,20 @@ bool Module::GenerateFluxor()
 					m_flux -= m_fluxor_generation_cost;
 
 					//feedback
-					if (USE_FEEDBACK_GENERATE_FLUXOR)
+					if (m_fluxor_generation_cost > 0)
 					{
-						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
-						text_feedback->m_alliance = m_alliance;
-						ostringstream ss;
-						ss << "-" << m_fluxor_generation_cost;
-						text_feedback->setString(ss.str());
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
-						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
-						delete text_feedback;
-						(*CurrentGame).addToFeedbacks(pop_feedback);
+						if (USE_FEEDBACK_GENERATE_FLUXOR)
+						{
+							SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+							text_feedback->m_alliance = m_alliance;
+							ostringstream ss;
+							ss << "-" << m_fluxor_generation_cost;
+							text_feedback->setString(ss.str());
+							SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+							pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+							delete text_feedback;
+							(*CurrentGame).addToFeedbacks(pop_feedback);
+						}
 					}
 
 					//turret?
@@ -852,16 +855,39 @@ void Module::CondensateFluxor(Fluxor* fluxor)
 					//feedback
 					if (USE_FEEDBACK_CONDENSATION)
 					{
-						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 20, sf::Color::Cyan, getPosition(), m_team);
 						text_feedback->m_alliance = m_alliance;
 						text_feedback->setString("Condensation");
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
-						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - TEXT_POP_OFFSET_Y)); 
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
 						delete text_feedback;
 						(*CurrentGame).addToFeedbacks(pop_feedback);
 					}
 				}
 			}
+		}
+	}
+}
+
+void Module::DecondensateFluxor(Fluxor* fluxor)
+{
+	if (fluxor && fluxor->m_condensed_to_circulate)
+	{
+		fluxor->m_condensed_to_circulate = false;
+		fluxor->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+
+		fluxor->m_wasting_flux = false;
+
+		//feedback
+		if (USE_FEEDBACK_DECONDENSATION)
+		{
+			SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 20, sf::Color::Red, getPosition(), m_team);
+			text_feedback->m_alliance = m_alliance;
+			text_feedback->setString("- Condensation");
+			SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+			pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - TEXT_POP_OFFSET_Y));
+			delete text_feedback;
+			(*CurrentGame).addToFeedbacks(pop_feedback);
 		}
 	}
 }
@@ -1037,14 +1063,8 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 
 			if (!m_under_construction)
 			{
-				//end of condensed effect
-				if (fluxor->m_condensed_to_circulate)
-				{
-					fluxor->m_condensed_to_circulate = false;
-					fluxor->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
-
-					fluxor->m_wasting_flux = false;
-				}
+				//end of condensed effect?
+				DecondensateFluxor(fluxor);
 
 				if (!ConsummeFluxor(fluxor))
 				{

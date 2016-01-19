@@ -87,6 +87,7 @@ public :
 	//Fluxor condensation
 	bool m_isCondensatingFluxor;
 	void CondensateFluxor(Fluxor* fluxor);
+	void DecondensateFluxor(Fluxor* fluxor);
 
 	//Flux transfer to Fluxors
 	bool ConsummeFluxor(Fluxor* fluxor);
