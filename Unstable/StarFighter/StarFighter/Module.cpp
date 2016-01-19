@@ -7,8 +7,6 @@ using namespace sf;
 
 void Module::Initialize()
 {
-	m_flux = 0;
-	m_flux_max = 1;
 	m_flux_max_under_construction = 1;
 	m_flux_max_after_construction = 1;
 	//m_glow = new Glow(this, m_team, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
@@ -18,6 +16,8 @@ void Module::Initialize()
 	m_team_marker->setAnimationLine(m_team);
 	SetConstructionStatus(true);
 
+	m_flux = 0;
+	m_flux_max = 1;
 	m_isGeneratingFluxor = false;
 	m_has_child_to_refill = false;
 	m_isRefillingFlux = false;
@@ -31,15 +31,11 @@ void Module::Initialize()
 	m_upgrade_player_stats = false;
 	m_isCondensatingFluxor = false;
 	m_shield = NULL;
-	m_wasting_flux = false;
-	m_flux_waste = 0;;
-	m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+	m_flux_waste_delay = MODULE_WASTE_DELAY;
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = AllianceNeutral;
-
-	m_flux_gauge = NULL;
 	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2));
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
 
@@ -421,9 +417,6 @@ void Module::DebugRefillingModuleFlux(sf::Vector2u grid_index)
 
 Module::~Module()
 {
-	if (m_flux_text)
-		m_flux_text->m_GarbageMe = true;
-
 	if (m_glow)
 	{
 		m_glow->m_visible = false;
@@ -440,11 +433,6 @@ Module::~Module()
 	{
 		m_team_marker->m_visible = false;
 		m_team_marker->m_GarbageMe = true;
-	}
-	if (m_flux_gauge)
-	{
-		m_flux_gauge->m_visible = false;
-		m_flux_gauge->m_GarbageMe = true;
 	}
 	
 	if (m_shield)

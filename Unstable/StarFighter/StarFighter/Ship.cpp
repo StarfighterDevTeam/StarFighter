@@ -33,7 +33,6 @@ void Ship::Init()
 	
 	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
-	m_flux_gauge = NULL;
 
 	//Build feedback
 	m_build_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
@@ -59,14 +58,8 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	if (m_flux_text)
-		m_flux_text->m_GarbageMe = true;
-	
 	if (m_build_text)
 		m_build_text->m_GarbageMe = true;
-
-	if (m_flux_gauge)
-		m_flux_gauge->m_GarbageMe = true;
 }
 
 void Ship::SetControllerType(ControlerType contoller)

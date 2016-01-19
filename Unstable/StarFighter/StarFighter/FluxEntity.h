@@ -10,6 +10,7 @@ public:
 	FluxEntity();
 	FluxEntity(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber);
 	~FluxEntity();
+	void FluxInitialization();
 
 	unsigned int m_flux;
 	unsigned int m_flux_max;

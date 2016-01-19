@@ -8,18 +8,13 @@ void Fluxor::Initialize()
 {
 	m_guided = false;
 	m_docked = false;
-	m_wasting_flux = false;
-	m_flux = 0;
-	m_flux_max = 0;
-	m_displaying_flux = false;
-	m_transfer_buffer = 0;
-	m_transfert_buffer_memory = 0;
 	m_team = PlayerNeutral;
 	m_alliance = AllianceNeutral;
 	m_target = NULL;
 	m_target_memory = false;
-	m_displaying_flux = true;
 
+	m_flux = GREEN_FLUXOR_VALUE;
+	m_flux_max = 0;
 	m_consummable_by_players = false;
 	m_consummable_by_modules = false;
 	m_flux_attacker = false;
@@ -43,7 +38,7 @@ Fluxor::Fluxor()
 	Initialize();
 }
 
-Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team)
+Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team) : FluxEntity()
 {
 	//texture
 	std::string textureName;
@@ -221,11 +216,6 @@ Fluxor* Fluxor::CreateFluxor(FluxorType FluxorType, bool within_bounds, sf::Floa
 
 Fluxor::~Fluxor()
 {
-	if (m_displaying_flux)
-	{
-		if (m_flux_text)
-			m_flux_text->m_GarbageMe = true;
-	}
 		
 }
 

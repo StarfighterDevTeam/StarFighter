@@ -4,21 +4,25 @@ extern Game* CurrentGame;
 
 FluxEntity::FluxEntity()
 {
-	m_flux_text = NULL;
-	m_flux_gauge = NULL;
+	FluxInitialization();
 }
 
 FluxEntity::FluxEntity(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
 {
-	m_flux = 0;
-	m_flux_max = 1;
+	FluxInitialization();
+}
+
+void FluxEntity::FluxInitialization()
+{
 	m_isAutogeneratingFlux = false;
 	m_wasting_flux = false;
-	m_flux_waste = 0;;
+	m_flux_waste = 0;
 	m_flux_waste_delay = FLUXOR_WASTE_DELAY;
+	m_transfer_buffer = 0;
+	m_transfert_buffer_memory = 0;
 
-	m_displaying_flux = false;
-
+	//hud
+	m_displaying_flux = true;
 	m_flux_text = NULL;
 	m_flux_gauge = NULL;
 
