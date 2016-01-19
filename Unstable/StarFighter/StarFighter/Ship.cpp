@@ -23,7 +23,6 @@ void Ship::Init()
 	m_speed_max = SHIP_MAX_SPEED;
 	m_flux_transfer_time = 0.1f;
 	m_flux_autogeneration_time = 1.f;
-	m_flux_autogeneration = 0;
 	m_upgrade_level = 0;
 
 	//Flux display
@@ -51,7 +50,7 @@ void Ship::Init()
 	SetTeam(m_team, (*CurrentGame).GetTeamAlliance(m_team));
 }
 
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, PlayerTeams team, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, PlayerTeams team, int frameNumber, int animationNumber) : FluxEntity(position, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_team = team;
 	m_alliance = (*CurrentGame).GetTeamAlliance(team);
@@ -113,23 +112,11 @@ void Ship::UpdatePlayerStats()
 	m_speed_max = SHIP_MAX_SPEED + (SHIP_MAX_SPEED_BONUS_PER_LEVEL * m_upgrade_level);
 }
 
-void Ship::FluxAutogeneration()
-{
-	if (m_flux_autogeneration > 0)
-	{
-		if (m_flux_autogeneration_clock.getElapsedTime().asSeconds() > m_flux_autogeneration_time)
-		{
-			m_flux += m_flux_autogeneration;
-			m_flux_autogeneration_clock.restart();
-		}
-	}
-}
-
 void Ship::update(sf::Time deltaTime)
 {
 	UpdatePlayerStats();
+	AutogenerateFlux();
 
-	FluxAutogeneration();
 	if (m_flux > m_flux_max && m_flux_max > 0)
 	{
 		m_flux = m_flux_max;
@@ -470,13 +457,8 @@ void Ship::GetModule(GameObject* object)
 
 void Ship::SetTeam(PlayerTeams team, TeamAlliances alliance)
 {
-	m_team = team;
-	m_alliance = alliance;
-	if (m_flux_text)
-	{
-		m_flux_text->m_team = team;
-		m_flux_text->m_alliance = alliance;
-	}
+	FluxEntity::SetTeam(team, alliance);
+
 	if (m_build_text)
 	{
 		m_build_text->m_team = team;
@@ -522,11 +504,4 @@ bool Ship::TryBuildModule(int module_key)
 	}
 
 	return false;
-}
-
-
-void Ship::AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset)
-{
-	m_flux_gauge = (*CurrentGame).m_flux_gauges[gauge]->Clone();
-	m_flux_gauge->m_offset = offset;
 }

@@ -6,8 +6,9 @@
 #include "Game.h"
 #include "SFText.h"
 #include "SFTextPop.h"
+#include "FluxEntity.h"
 
-class Fluxor : public GameObject
+class Fluxor : public FluxEntity
 {
 public :
 	Fluxor();
@@ -33,8 +34,6 @@ public :
 	float m_turn_delay;
 	sf::Clock m_turn_clock;
 	float m_absolute_speed;
-	unsigned int m_flux;
-	unsigned int m_flux_max;
 
 	bool m_guided;
 	bool m_docked;
@@ -47,7 +46,6 @@ public :
 	bool m_target_memory;
 
 	//Fluxor properties
-	bool m_displaying_flux;
 	bool m_consummable_by_players;
 	bool m_consummable_by_modules;
 	bool m_can_be_refilled_by_modules;
@@ -60,20 +58,9 @@ public :
 	bool m_flux_attack_piercing;
 	float m_flux_attack_delay;
 	sf::Clock m_flux_attack_clock;
-	bool m_wasting_flux;
-	int m_flux_waste;
-	float m_flux_waste_delay;
-	sf::Clock m_flux_waste_clock;
 	void WastingFlux();
 	void AttackFluxor(Fluxor* fluxor);
 	void BringStealerBack();
-
-	unsigned int m_transfer_buffer;
-	unsigned int m_transfert_buffer_memory;
-	sf::Clock m_flux_transfer_clock;
-
-	//HUD
-	SFText* m_flux_text;
 };
 
 #endif // FLUXOR_H_INCLUDED

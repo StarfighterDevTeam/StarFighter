@@ -7,6 +7,7 @@
 #include "Fluxor.h"
 #include "SFText.h"
 #include "SFTextPop.h"
+#include "FluxEntity.h"
 
 enum LinkStatus
 {
@@ -30,7 +31,7 @@ enum LinkDirection
 	LinkUp,
 };
 
-class Module : public GameObject
+class Module : public FluxEntity
 {
 public :
 	Module();
@@ -47,14 +48,12 @@ public :
 	void update(sf::Time deltaTime) override;
 	void GetFluxor(GameObject* object) override;
 	void SetDirectionAutomatically();
+	bool AutogenerateFlux() override;
 
 	ModuleType m_moduleType;
-	unsigned int m_flux;
-	unsigned int m_flux_max;
 	unsigned int m_flux_max_after_construction;
 	unsigned int m_flux_max_under_construction;
 	void FinishConstruction();
-	sf::Vector2u m_curGridIndex;
 	Glow* m_glow;
 	void SetConstructionStatus(bool under_construction);
 	sf::Clock m_construction_clock;
@@ -72,12 +71,6 @@ public :
 	unsigned int m_turret_range;
 	Fluxor* SearchNearbyAttackers(PlayerTeams team_not_to_target, float range);
 	bool m_upgrade_player_stats;
-
-	//Flux auto-generation
-	bool m_isAutogeneratingFlux;
-	float m_flux_autogeneration_time;
-	sf::Clock m_flux_autogeneration_clock;
-	void AutogenerateFlux();
 
 	//Fluxor generation
 	bool m_isGeneratingFluxor;
@@ -97,13 +90,6 @@ public :
 	bool AmplifyFluxor(Fluxor* fluxor);
 	float m_flux_transfer_delay;
 	sf::Clock m_flux_consumption_clock;
-
-	//Flux waste
-	bool m_wasting_flux;
-	int m_flux_waste;
-	float m_flux_waste_delay;
-	sf::Clock m_flux_waste_clock;
-	void WastingFlux();
 
 	//Module attacked by Fluxors
 	void AttackModule(Fluxor* fluxor);
@@ -133,11 +119,8 @@ public :
 	bool m_is_connected_to_a_circuit;
 
 	//HUD
-	SFText* m_flux_text;
 	void SetTeam(PlayerTeams team, TeamAlliances alliance);
 	GameObject* m_team_marker;
-	SFGauge* m_flux_gauge;
-	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
 };
 
 #endif // MODULE_H_INCLUDED

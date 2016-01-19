@@ -89,6 +89,7 @@
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
+    <ClCompile Include="FluxEntity.cpp" />
     <ClCompile Include="Fluxor.cpp" />
     <ClCompile Include="FluxorSpawnZone.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Assets.h" />
     <ClInclude Include="CollisionUtils.h" />
+    <ClInclude Include="FluxEntity.h" />
     <ClInclude Include="Fluxor.h" />
     <ClInclude Include="FluxorSpawnZone.h" />
     <ClInclude Include="Game.h" />

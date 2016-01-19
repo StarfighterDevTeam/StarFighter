@@ -7,8 +7,7 @@
 #include "Game.h"
 #include "Fluxor.h"
 #include "Module.h"
-#include "SFText.h"
-#include "SFTextPop.h"
+#include "FluxEntity.h"
 
 enum PlayerConstructionFeedbacks
 {
@@ -18,7 +17,7 @@ enum PlayerConstructionFeedbacks
 	Player_NoRessourcesToBuild,
 };
 
-class Ship : public GameObject
+class Ship : public FluxEntity
 {
 public :
 	Ship();
@@ -43,29 +42,19 @@ public :
 	sf::Clock stroboscopic_effect_clock;
 
 	//FLUX SPECIFIC
-	unsigned int m_flux;
-	unsigned int m_flux_max;
-	unsigned int m_flux_autogeneration;
 	void GetFluxor(GameObject* object) override;
 	void GetModule(GameObject* object) override;
 	bool TryBuildModule(int module_key);
-	sf::Vector2u m_curGridIndex;
 	float m_flux_transfer_time;
 	sf::Clock m_flux_transfer_limiter_clock;
-	void FluxAutogeneration();
-	float m_flux_autogeneration_time;
-	sf::Clock m_flux_autogeneration_clock;
 	unsigned int m_upgrade_level;
 	float m_speed_max;
 	void UpdatePlayerStats();
 
 	//HUD
-	SFText* m_flux_text;
 	SFText* m_build_text;
 	PlayerConstructionFeedbacks m_build_text_status;
-	SFGauge* m_flux_gauge;
-	void SetTeam(PlayerTeams team, TeamAlliances alliance);
-	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
+	void SetTeam(PlayerTeams team, TeamAlliances alliance) override;
 
 	//construction
 	//void ResolveProductionBufferList() override;
