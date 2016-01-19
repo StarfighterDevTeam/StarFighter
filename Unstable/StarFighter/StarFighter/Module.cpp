@@ -198,7 +198,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		{
 			m_flux_max_under_construction = 30;
 			m_flux_max_after_construction = 1000;
-			m_wasting_flux = true;
+			m_wasting_flux = false;
 			m_flux_waste = 1;
 			m_flux_waste_delay = MODULE_WASTE_DELAY;
 			//m_isAutogeneratingFlux = true;
