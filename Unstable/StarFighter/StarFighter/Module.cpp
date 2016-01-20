@@ -942,7 +942,7 @@ void Module::AttackModule(Fluxor* fluxor)
 				damage = m_under_construction ? 1 : damage;
 
 				//kill? (shields cannot get one-shotted)
-				if ((m_shield_range == 0 && damage > m_flux) || (m_shield_range > 0 && m_flux < m_flux_max))
+				if ((m_shield_range == 0 && damage > m_flux) || (m_shield_range > 0 && m_flux < m_flux_max && damage > m_flux))
 				{
 					this->m_GarbageMe = true;
 					this->m_visible = false;
