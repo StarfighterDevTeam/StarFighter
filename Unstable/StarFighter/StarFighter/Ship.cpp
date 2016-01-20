@@ -223,9 +223,9 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	//DEBUG
-	if (InputGuy::isErasingModule(m_controllerType))
+	if (InputGuy::isSellingModule(m_controllerType))
 	{
-		Module::EraseModule(m_curGridIndex);
+		TrySellModule();
 	}
 	if (InputGuy::isFinishModuleConstruction(m_controllerType))
 	{
@@ -445,7 +445,6 @@ bool Ship::TryBuildModule(int module_key)
 	{
 		if (m_flux >= (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction)
 		{
-
 			Module* module = Module::CreateModule(m_curGridIndex, (ModuleType)(module_key - 1), m_team);
 			if (module)
 			{
@@ -454,10 +453,10 @@ bool Ship::TryBuildModule(int module_key)
 				//feedback
 				if (USE_FEEDBACK_CONSTRUCTION)
 				{
-					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Green, getPosition(), m_team);
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Red, getPosition(), m_team);
 					text_feedback->m_alliance = m_alliance;
 					ostringstream ss;
-					ss << "-" << (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction;
+					ss << "-" << (*CurrentGame).m_modules[(ModuleType)(module_key - 1)]->m_flux_max_under_construction << " (building)";
 					text_feedback->setString(ss.str());
 					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
 					delete text_feedback;
@@ -466,6 +465,57 @@ bool Ship::TryBuildModule(int module_key)
 			}
 
 			return module;
+		}
+	}
+
+	return false;
+}
+
+bool Ship::TrySellModule()
+{
+	if ((*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y] && (*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y]->m_team == m_team)
+	{
+		Module* module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y];
+		if (module)
+		{
+			if (module->m_is_sold)
+			{
+				module = NULL;
+				return false;
+			}
+			else
+			{
+				module->m_is_sold = true;
+				if (!module->m_under_construction)
+				{
+					module->m_flux = module->m_flux_max_under_construction;
+				}
+				module->SetConstructionStatus(true);
+
+				unsigned int flux_recovered = SELLING_RATIO_OF_FLUX_RECOVERY * module->m_flux_max_under_construction;
+
+				m_flux += flux_recovered;
+				if (m_flux > m_flux_max)
+				{
+					m_flux = m_flux_max;
+				}
+
+				//feedback
+				if (USE_FEEDBACK_CONSTRUCTION)
+				{
+					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, Color::Green, getPosition(), m_team);
+					text_feedback->m_alliance = m_alliance;
+					ostringstream ss;
+					ss << "+" << flux_recovered << " (selling -" << (int)(SELLING_RATIO_OF_FLUX_RECOVERY * 100) << "%)";
+					text_feedback->setString(ss.str());
+					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+					delete text_feedback;
+					(*CurrentGame).addToFeedbacks(pop_feedback);
+				}
+
+				module = NULL;
+				return true;
+			}
 		}
 	}
 

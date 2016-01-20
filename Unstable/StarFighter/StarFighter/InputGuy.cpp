@@ -370,12 +370,18 @@ bool InputGuy::isSpawningModule0(ControlerType device)
 	return false;
 }
 
-bool InputGuy::isErasingModule(ControlerType device)
+bool InputGuy::isSellingModule(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
+		return sf::Keyboard::isKeyPressed(sf::Keyboard::X);
+	}
+
+	else if (device == KeyboardControl2)
+	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract);
 	}
+
 	return false;
 }
 
@@ -385,6 +391,7 @@ bool InputGuy::isFinishModuleConstruction(ControlerType device)
 	{
 		return sf::Keyboard::isKeyPressed(sf::Keyboard::Add);
 	}
+
 	return false;
 }
 

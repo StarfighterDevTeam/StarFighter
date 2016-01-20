@@ -41,7 +41,7 @@ public:
 	static bool isSpawningModule8(ControlerType device = AllControlDevices);
 	static bool isSpawningModule9(ControlerType device = AllControlDevices);
 	static bool isSpawningModule0(ControlerType device = AllControlDevices);
-	static bool isErasingModule(ControlerType device = AllControlDevices);
+	static bool isSellingModule(ControlerType device = AllControlDevices);
 	static bool isFinishModuleConstruction(ControlerType device = AllControlDevices);
 	static bool isRefillingFlux(ControlerType device = AllControlDevices);
 };

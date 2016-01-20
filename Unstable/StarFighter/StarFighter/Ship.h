@@ -37,6 +37,7 @@ public :
 	void GetFluxor(GameObject* object) override;
 	void GetModule(GameObject* object) override;
 	bool TryBuildModule(int module_key);
+	bool TrySellModule();
 	float m_flux_transfer_time;
 	sf::Clock m_flux_transfer_limiter_clock;
 	unsigned int m_upgrade_level;

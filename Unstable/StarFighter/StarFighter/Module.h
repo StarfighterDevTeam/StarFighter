@@ -58,6 +58,7 @@ public :
 	void SetConstructionStatus(bool under_construction);
 	float m_construction_flux_per_second;
 	sf::Clock m_construction_clock;
+	bool m_is_sold;
 
 	//Shield module
 	GameObject* m_shield;

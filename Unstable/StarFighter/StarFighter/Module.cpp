@@ -33,6 +33,7 @@ void Module::Initialize()
 	m_isCondensatingFluxor = false;
 	m_shield = NULL;
 	m_flux_waste_delay = MODULE_WASTE_DELAY;
+	m_is_sold = false;
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
@@ -502,19 +503,44 @@ void Module::FinishConstruction()
 
 void Module::update(sf::Time deltaTime)
 {
+	//sold?
+	if (m_is_sold)
+	{
+		m_under_construction = true;
+	}
+
 	//construction under progress
 	if (m_under_construction)
 	{
-		//construction finished
-		if (m_flux == m_flux_max_under_construction)
+		//building up a module
+		if (!m_is_sold)
 		{
-			FinishConstruction();
+			//construction finished
+			if (m_flux == m_flux_max_under_construction)
+			{
+				FinishConstruction();
+			}
+			//still under construction
+			else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / m_construction_flux_per_second))
+			{
+				m_flux++;
+				m_construction_clock.restart();
+			}
 		}
-		//still under construction
-		else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / m_construction_flux_per_second))
+		//solding out a module
+		else
 		{
-			m_flux++;
-			m_construction_clock.restart();
+			if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / m_construction_flux_per_second))
+			{
+				m_flux--;
+				m_construction_clock.restart();
+			}
+
+			if (m_flux == 0)
+			{
+				m_visible = false;
+				m_GarbageMe = true;
+			}
 		}
 	}
 	m_flux_max = m_under_construction ? m_flux_max_under_construction : m_flux_max_after_construction;
