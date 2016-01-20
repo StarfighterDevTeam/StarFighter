@@ -175,13 +175,14 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//reset modules childhood status
-	size_t ModulesVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(ModuleObject).size();
+	size_t ModulesVectorSize = (*CurrentGame).sceneModuleObjects.size();
 	for (size_t i = 0; i < ModulesVectorSize; i++)
 	{
-		if ((*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i])
+		if ((*CurrentGame).sceneModuleObjects[i])
 		{
-			Module* module = (Module*)(*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i];
+			Module* module = (Module*)(*CurrentGame).sceneModuleObjects[i];
 			module->m_is_connected_to_a_circuit = false;
+			module = NULL;
 		}
 	}
 
@@ -189,13 +190,14 @@ void InGameState::Update(sf::Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//update feedbacks
-	size_t ModulesVectorSizeNow = (*CurrentGame).GetSceneGameObjectsTyped(ModuleObject).size();
+	size_t ModulesVectorSizeNow = (*CurrentGame).sceneModuleObjects.size();
 	for (size_t i = 0; i < ModulesVectorSizeNow; i++)
 	{
-		if ((*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i])
+		if ((*CurrentGame).sceneModuleObjects[i])
 		{
-			Module* module = (Module*)(*CurrentGame).GetSceneGameObjectsTyped(ModuleObject)[i];
+			Module* module = (Module*)(*CurrentGame).sceneModuleObjects[i];
 			module->UpdateFreeTileFeedbacks();
+			module = NULL;
 		}
 	}
 

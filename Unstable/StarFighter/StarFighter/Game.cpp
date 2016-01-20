@@ -153,6 +153,10 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 		AddGameObjectToVector(object, &this->sceneGameObjectsTyped[(int)type]);
 		AddGameObjectToVector(object, &this->sceneGameObjectsLayered[(int)layer]);
 		AddGameObjectToVector(object, &this->sceneGameObjects);
+
+		//module-specific
+		if (type == ModuleObject)
+			AddGameObjectToVector(object, &this->sceneModuleObjects);
 	}
 	else
 	{
@@ -167,6 +171,7 @@ void Game::addToFeedbacks(SFRectangle* feedback, LayerType layer)
 		AddGameObjectToVector(feedback, &this->sceneFeedbackBars[layer]);
 		feedback->m_layer = layer;
 
+		//tile feedback-specific
 		if (layer == GridFeedbackLayer)
 		{
 			AddGameObjectToVector(feedback, &this->sceneFreeTilesFeedbacks);
@@ -585,7 +590,16 @@ void Game::cleanGarbage()
 			}
 		}
 
-		//destructor function ??
+		// module-specific
+		const size_t sceneModuleObjectsSize = this->sceneModuleObjects.size();
+		for (size_t j = 0; j < sceneModuleObjectsSize; j++)
+		{
+			if (this->sceneModuleObjects[j] == pCurGameObject)
+			{
+				this->sceneModuleObjects[j] = NULL;
+				break;
+			}
+		}
 
 		// A la fin, on delete l'élément
 		delete pCurGameObject;

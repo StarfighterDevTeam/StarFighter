@@ -115,6 +115,7 @@ public:
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
 	vector<SFRectangle*> sceneFreeTilesFeedbacks;
+	vector<GameObject*> sceneModuleObjects;
 	void WipeAllObjectsWithGridIndex(GameObjectType type, sf::Vector2u grid_index);
 
 	//Prototypes
