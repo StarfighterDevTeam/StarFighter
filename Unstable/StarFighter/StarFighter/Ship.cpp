@@ -47,13 +47,6 @@ void Ship::Init()
 	m_warning->m_alliance = m_alliance;
 	(*CurrentGame).addToScene(m_warning, PanelLayer, BackgroundObject);
 
-	//Build feedback
-	m_build_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
-	m_build_text->m_alliance = m_alliance;
-	(*CurrentGame).addToFeedbacks(m_build_text);
-
-	m_build_text_status = Player_NotOverConstruction;
-
 	//inputs
 	m_SwitchKey_released = false;
 	m_BuildKey_released = false;
@@ -71,12 +64,6 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	if (m_build_text)
-	{
-		m_build_text->m_visible = false;
-		m_build_text->m_GarbageMe = true;
-	}
-
 	if (m_warning)
 	{
 		m_warning->m_visible = false;
@@ -189,27 +176,6 @@ void Ship::update(sf::Time deltaTime)
 		{
 			m_warning->m_visible = false;
 		}
-	}
-
-	if (m_build_text)
-	{
-		m_build_text->setPosition(sf::Vector2f(getPosition().x - m_build_text->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_build_text->getGlobalBounds().height*1.5));
-		if (m_build_text_status == Player_OverConstruction)
-		{
-			m_build_text->setString("Hold 'Build'");
-		}
-		else if (m_build_text_status == Player_ConstructionInProgress)
-		{
-			m_build_text->setString("Building...");
-		}
-		else if (m_build_text_status == Player_NoRessourcesToBuild)
-		{
-			m_build_text->setString("No ressources");
-		}
-
-		m_build_text->m_visible = m_build_text_status != Player_NotOverConstruction;
-
-		m_build_text_status = Player_NotOverConstruction;
 	}
 
 	//update grid index
@@ -468,41 +434,9 @@ void Ship::GetModule(GameObject* object)
 	}
 }
 
-//void Ship::ResolveProductionBufferList()
-//{
-//	size_t constructionBufferSize = m_construction_buffer.size();
-//	for (size_t i = 0; i < constructionBufferSize; i++)
-//	{
-//		if ((*CurrentGame).m_module_grid[m_construction_buffer[i]->m_curGridIndex.x][m_construction_buffer[i]->m_curGridIndex.y])
-//		{
-//			Module* new_module = Module::CreateModule(m_construction_buffer[i]->m_curGridIndex, m_construction_buffer[i]->m_moduleType);
-//			new_module->m_parents.push_back(m_construction_buffer[i]->m_parents.front());
-//			m_construction_buffer[i]->m_parents.front()->m_children.push_back(new_module);
-//
-//			//HACK PROTO
-//			m_construction_buffer[i]->m_parents.front()->m_flux -= new_module->m_flux_max;
-//		}
-//	}
-//
-//	m_construction_buffer.clear();
-//}
-
 void Ship::SetTeam(PlayerTeams team, TeamAlliances alliance)
 {
 	FluxEntity::SetTeam(team, alliance);
-
-	if (m_build_text)
-	{
-		m_build_text->m_team = team;
-		m_build_text->m_alliance = alliance;
-	}
-	//if (m_flux_gauge)
-	//{
-	//	m_flux_gauge->m_SFText.m_team = team;
-	//	m_flux_gauge->m_SFText.m_alliance = alliance;
-	//	m_flux_gauge->m_SFRectangle.m_team = team;
-	//	m_flux_gauge->m_SFRectangle.m_alliance = alliance;
-	//}
 }
 
 bool Ship::TryBuildModule(int module_key)

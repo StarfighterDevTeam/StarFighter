@@ -9,14 +9,6 @@
 #include "Module.h"
 #include "FluxEntity.h"
 
-enum PlayerConstructionFeedbacks
-{
-	Player_NotOverConstruction,
-	Player_OverConstruction,
-	Player_ConstructionInProgress,
-	Player_NoRessourcesToBuild,
-};
-
 class Ship : public FluxEntity
 {
 public :
@@ -52,15 +44,12 @@ public :
 	void UpdatePlayerStats();
 
 	//HUD
-	SFText* m_build_text;
 	GameObject* m_warning;
 	sf::Clock m_warning_clock;
 	void ActivateWarningFeedback();
-	PlayerConstructionFeedbacks m_build_text_status;
 	void SetTeam(PlayerTeams team, TeamAlliances alliance) override;
 
 	//construction
-	//void ResolveProductionBufferList() override;
 	vector<Module*> m_construction_buffer;
 
 private:

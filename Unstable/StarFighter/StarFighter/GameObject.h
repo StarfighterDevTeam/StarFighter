@@ -128,7 +128,6 @@ public:
 	//FLUX SPECIFIC
 	virtual void GetFluxor(GameObject* object);
 	virtual void GetModule(GameObject* object);
-	virtual void ResolveProductionBufferList();
 	virtual void CheckCondensation();
 	GameObject* m_target;
 

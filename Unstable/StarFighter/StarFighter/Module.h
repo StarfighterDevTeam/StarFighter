@@ -95,10 +95,6 @@ public :
 	//Module attacked by Fluxors
 	void AttackModule(Fluxor* fluxor);
 
-	//Spawn
-	void ResolveProductionBufferList() override;
-	vector<Fluxor*> m_fluxor_generation_buffer;
-
 	//Links and circuit
 	GameObject* m_arrow[4];
 	Link m_link[4];

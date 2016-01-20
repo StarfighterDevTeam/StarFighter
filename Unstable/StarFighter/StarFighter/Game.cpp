@@ -230,27 +230,6 @@ void Game::updateScene(Time deltaTime)
 	collectGarbage();
 }
 
-void Game::ResolveProductionBufferList()
-{
-	size_t scenePlayerShipsVectorSize = this->sceneGameObjectsTyped[PlayerShip].size();
-	for (size_t i = 0; i < scenePlayerShipsVectorSize; i++)
-	{
-		if (this->sceneGameObjectsTyped[PlayerShip][i] == NULL)
-			continue;
-		
-		this->sceneGameObjectsTyped[PlayerShip][i]->ResolveProductionBufferList();
-	}
-
-	size_t sceneModulesVectorSize = this->sceneGameObjectsTyped[ModuleObject].size();
-	for (size_t i = 0; i < sceneModulesVectorSize; i++)
-	{
-		if (this->sceneGameObjectsTyped[ModuleObject][i] == NULL)
-			continue;
-
-		this->sceneGameObjectsTyped[ModuleObject][i]->ResolveProductionBufferList();
-	}
-}
-
 void Game::drawScene()
 {
 	this->mainScreen.clear();

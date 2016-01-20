@@ -1154,32 +1154,6 @@ Module* Module::GetMainLinkedModule()
 	}
 }
 
-void Module::ResolveProductionBufferList()
-{
-	size_t fluxorGenerationBufferSize = m_fluxor_generation_buffer.size();
-	if (fluxorGenerationBufferSize > 0)
-	{
-		for (size_t i = 0; i < fluxorGenerationBufferSize; i++)
-		{
-			//int main_link = GetMainLinkIndex();
-			//if (main_link >= 0)
-			//{
-			//	m_fluxor_generation_buffer[i]->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_fluxor_generation_buffer[i]->m_absolute_speed, main_link * M_PI_2);
-			//}
-			
-			GameObjectType type = m_fluxor_generation_buffer[i]->m_guided ? FluxorGuidedObject : FluxorUnguidedObject;
-
-			(*CurrentGame).addToScene(m_fluxor_generation_buffer[i], FluxorLayer, type);
-			if (m_fluxor_generation_buffer[i]->m_displaying_flux)
-			{
-				(*CurrentGame).addToFeedbacks(m_fluxor_generation_buffer[i]->m_flux_text);
-			}
-		}
-
-		m_fluxor_generation_buffer.clear();
-	}
-}
-
 void Module::SwitchLinkDirection()
 {
 	bool bool_array[4] = { m_link[3].m_exists, m_link[0].m_exists, m_link[1].m_exists, m_link[2].m_exists };
