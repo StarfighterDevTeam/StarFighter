@@ -114,10 +114,13 @@ public:
 
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
+	vector<SFRectangle*> sceneFreeTilesFeedbacks;
+	void WipeAllObjectsWithGridIndex(GameObjectType type, sf::Vector2u grid_index);
 
 	//Prototypes
 	Fluxor* m_fluxors[NBVAL_FluxorType];
 	Module* m_modules[NBVAL_ModuleType];
+	GameObject* m_module_arrows;
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	GameObject* m_team_markers[NBVAL_PlayerTeams];
 	SFGauge* m_flux_gauges[NBVAL_GaugeStyles];

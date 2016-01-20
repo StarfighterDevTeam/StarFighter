@@ -46,13 +46,17 @@ void Module::Initialize()
 	m_is_connected_to_a_circuit = false;
 
 	//links
-	GameObject arrow = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 3);
+	if (!(*CurrentGame).m_module_arrows)
+	{
+		(*CurrentGame).m_module_arrows = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 3);
+	}
+
 	for (int i = 0; i < 4; i++)
 	{
 		m_link[i].m_exists = i == 0;
 		m_link[i].m_activated = Link_Deactivated;
 
-		m_arrow[i] = arrow.Clone();
+		m_arrow[i] = (*CurrentGame).m_module_arrows->Clone();
 		m_arrow[i]->m_visible = m_link[i].m_exists;
 		float angle = i * 90;
 		m_arrow[i]->rotate(i * 90);
@@ -491,24 +495,7 @@ void Module::FinishConstruction()
 	m_flux_consumption_clock.restart();
 
 	//wipe out unguided Fluxors that are found on the cell being built on
-	size_t FluxorVectorSize = (*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject).size();
-	for (size_t i = 0; i < FluxorVectorSize; i++)
-	{
-		if ((*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject)[i] == NULL)
-			continue;
-
-		Fluxor* fluxor = (Fluxor*)(*CurrentGame).GetSceneGameObjectsTyped(FluxorUnguidedObject)[i];
-		if (fluxor->m_visible && !fluxor->m_guided)
-		{
-			//quick collision test
-			sf::IntRect boundsA(SimpleCollision::FToIRect(fluxor->getGlobalBounds()));
-			sf::IntRect boundsB(SimpleCollision::FToIRect(this->getGlobalBounds()));
-			if (boundsA.intersects(boundsB))
-			{
-				fluxor->m_GarbageMe = true;
-			}
-		}
-	}
+	(*CurrentGame).WipeAllObjectsWithGridIndex(FluxorUnguidedObject, m_curGridIndex);
 }
 
 void Module::update(sf::Time deltaTime)
@@ -849,7 +836,6 @@ bool Module::AutogenerateFlux()
 			//feedback
 			if (USE_FEEDBACK_ACTIVATION)
 			{
-
 				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
 				text_feedback->m_alliance = m_alliance;
 				text_feedback->setString("Activated");
@@ -857,7 +843,6 @@ bool Module::AutogenerateFlux()
 				pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - TEXT_POP_OFFSET_Y));
 				delete text_feedback;
 				(*CurrentGame).addToFeedbacks(pop_feedback);
-
 			}
 		}
 		return true;
@@ -1444,6 +1429,7 @@ void Module::UpdateLinks()
 
 		//update knownledge of linked modules
 		m_linked_modules[i] = module;
+		module = NULL;
 		
 		//update arrow visual
 		m_arrow[i]->setAnimationLine(m_link[i].m_activated);
@@ -1472,6 +1458,7 @@ void Module::CheckCircuit()
 		//module already checked? (= infinite loop)
 		if (find(checked_modules.begin(), checked_modules.end(), module_child) != checked_modules.end())
 		{
+			module_child = NULL;
 			break;
 		}
 
@@ -1481,6 +1468,7 @@ void Module::CheckCircuit()
 
 			if (module_child->m_alliance != m_alliance)
 			{
+				module_child = NULL;
 				break;//we are now boarding an enemy module, it's time to stop scanning further.
 			}
 			//break;
@@ -1490,8 +1478,13 @@ void Module::CheckCircuit()
 		//child has full stocks, we shall continue the loop until we find a child thas need to be refilled
 		checked_modules.push_back(module_parent);
 		module_parent = module_child;
+		module_child = NULL;
 		//}
 	}
+
+	//clear pointers
+	module_parent = NULL;
+	checked_modules.clear();
 }
 
 void Module::UpdateFreeTileFeedbacks()
@@ -1535,18 +1528,19 @@ void Module::UpdateFreeTileFeedbacks()
 			}
 
 			//check for doublons and clean them
-			std::vector<SFRectangle*> existing_tile_feedbacks = (*CurrentGame).GetSceneSFRectanglesLayered(GridFeedbackLayer);
-			size_t FakeGridFeedbacksVectorSize = existing_tile_feedbacks.size();
+			size_t FakeGridFeedbacksVectorSize = (*CurrentGame).sceneFreeTilesFeedbacks.size();
 			for (size_t i = 0; i < FakeGridFeedbacksVectorSize; i++)
 			{
-				if (existing_tile_feedbacks[i] && existing_tile_feedbacks[i] != m_free_tile_feedback && existing_tile_feedbacks[i]->m_visible && existing_tile_feedbacks[i]->m_alliance == m_alliance && existing_tile_feedbacks[i] != m_free_tile_feedback && existing_tile_feedbacks[i]->getPosition() == m_free_tile_feedback->getPosition())
+				if ((*CurrentGame).sceneFreeTilesFeedbacks[i] && (*CurrentGame).sceneFreeTilesFeedbacks[i] != m_free_tile_feedback && (*CurrentGame).sceneFreeTilesFeedbacks[i]->m_visible 
+					&& (*CurrentGame).sceneFreeTilesFeedbacks[i]->m_alliance == m_alliance && (*CurrentGame).sceneFreeTilesFeedbacks[i] != m_free_tile_feedback 
+					&& (*CurrentGame).sceneFreeTilesFeedbacks[i]->getPosition() == m_free_tile_feedback->getPosition())
 				{
 					//delete doublon feedback, based on priority
-					if (!existing_tile_feedbacks[i]->m_prioritary && m_free_tile_feedback->m_prioritary)
+					if (!(*CurrentGame).sceneFreeTilesFeedbacks[i]->m_prioritary && m_free_tile_feedback->m_prioritary)
 					{
-						existing_tile_feedbacks[i]->m_visible = false;
-						existing_tile_feedbacks[i]->m_GarbageMe = true;
-						existing_tile_feedbacks[i] = NULL;
+						(*CurrentGame).sceneFreeTilesFeedbacks[i]->m_visible = false;
+						(*CurrentGame).sceneFreeTilesFeedbacks[i]->m_GarbageMe = true;
+						(*CurrentGame).sceneFreeTilesFeedbacks[i] = NULL;
 					}
 					else
 					{
@@ -1608,18 +1602,18 @@ void Module::UpdateFreeTileFeedbacks()
 			}
 
 			//check for doublons and clean them
-			std::vector<SFRectangle*> existing_tile_feedbacks = (*CurrentGame).GetSceneSFRectanglesLayered(GridFeedbackLayer);
-			size_t FakeGridFeedbacksVectorSize = existing_tile_feedbacks.size();
+			size_t FakeGridFeedbacksVectorSize = (*CurrentGame).sceneFreeTilesFeedbacks.size();
 			for (size_t j = 0; j < FakeGridFeedbacksVectorSize; j++)
 			{
-				if (existing_tile_feedbacks[j] && existing_tile_feedbacks[j] != m_free_tile_condensator_feedbacks[i] && existing_tile_feedbacks[j]->m_visible && existing_tile_feedbacks[j]->m_alliance == m_alliance && existing_tile_feedbacks[j]->getPosition() == m_free_tile_condensator_feedbacks[i]->getPosition())
+				if ((*CurrentGame).sceneFreeTilesFeedbacks[j] && (*CurrentGame).sceneFreeTilesFeedbacks[j] != m_free_tile_condensator_feedbacks[i] && (*CurrentGame).sceneFreeTilesFeedbacks[j]->m_visible 
+					&& (*CurrentGame).sceneFreeTilesFeedbacks[j]->m_alliance == m_alliance && (*CurrentGame).sceneFreeTilesFeedbacks[j]->getPosition() == m_free_tile_condensator_feedbacks[i]->getPosition())
 				{
 					//delete doublon feedback, based on priority
-					if (!existing_tile_feedbacks[j]->m_prioritary && m_free_tile_condensator_feedbacks[i]->m_prioritary)
+					if (!(*CurrentGame).sceneFreeTilesFeedbacks[j]->m_prioritary && m_free_tile_condensator_feedbacks[i]->m_prioritary)
 					{
-						existing_tile_feedbacks[j]->m_visible = false;
-						existing_tile_feedbacks[j]->m_GarbageMe = true;
-						existing_tile_feedbacks[j] = NULL;
+						(*CurrentGame).sceneFreeTilesFeedbacks[j]->m_visible = false;
+						(*CurrentGame).sceneFreeTilesFeedbacks[j]->m_GarbageMe = true;
+						(*CurrentGame).sceneFreeTilesFeedbacks[j] = NULL;
 					}
 					else
 					{

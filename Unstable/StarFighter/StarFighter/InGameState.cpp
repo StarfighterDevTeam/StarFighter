@@ -38,36 +38,36 @@ void InGameState::Initialize(Player player)
 	{
 		switch (i)
 		{
-		case PlayerBlue:
-		{
-						   (*CurrentGame).m_team_colors[i] = sf::Color::Blue;
-						   break;
-		}
-		case PlayerBlue2:
-		{
-							(*CurrentGame).m_team_colors[i] = sf::Color::White;
-							break;
-		}
-		case PlayerRed:
-		{
-						  (*CurrentGame).m_team_colors[i] = sf::Color::Red;
-						  break;
-		}
-		case PlayerRed2:
-		{
-						   (*CurrentGame).m_team_colors[i] = sf::Color::Black;
-						   break;
-		}
-		case PlayerNeutral:
-		{
-							  (*CurrentGame).m_team_colors[i] = sf::Color::Yellow;
-							  break;
-		}
-		default:
-		{
-				   (*CurrentGame).m_team_colors[i] = sf::Color::White;
-				   break;
-		}
+			case PlayerBlue:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::Blue;
+				break;
+			}
+			case PlayerBlue2:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::White;
+				break;
+			}
+			case PlayerRed:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::Red;
+				break;
+			}
+			case PlayerRed2:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::Black;
+				break;
+			}
+			case PlayerNeutral:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::Yellow;
+				break;
+			}
+			default:
+			{
+				(*CurrentGame).m_team_colors[i] = sf::Color::White;
+				break;
+			}
 		}
 	}
 

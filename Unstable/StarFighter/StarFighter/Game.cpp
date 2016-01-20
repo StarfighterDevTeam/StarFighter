@@ -55,6 +55,9 @@ void Game::init(RenderWindow* window)
 		playerShips[i] = NULL;
 	}
 	
+	//assets for modules
+	m_module_arrows = NULL;
+
 	//fonts
 	font = new sf::Font();
 
@@ -163,6 +166,11 @@ void Game::addToFeedbacks(SFRectangle* feedback, LayerType layer)
 	{
 		AddGameObjectToVector(feedback, &this->sceneFeedbackBars[layer]);
 		feedback->m_layer = layer;
+
+		if (layer == GridFeedbackLayer)
+		{
+			AddGameObjectToVector(feedback, &this->sceneFreeTilesFeedbacks);
+		}
 	}
 		
 }
@@ -619,6 +627,16 @@ void Game::cleanGarbage()
 			}
 		}
 
+		const size_t VectorTileFeedbacksSize = this->sceneFreeTilesFeedbacks.size();
+		for (size_t j = 0; j < VectorTileFeedbacksSize; j++)
+		{
+			if (sceneFreeTilesFeedbacks[j] == pRectangle)
+			{
+				sceneFreeTilesFeedbacks[j] = NULL;
+				break;
+			}
+		}
+
 		delete pRectangle;
 	}
 
@@ -879,4 +897,20 @@ TeamAlliances Game::GetTeamAlliance(PlayerTeams team)
 
 	printf("<!> Game::GetTeamAlliance(PlayerTeams team) is looking for a team assigned to no alliance in vector<vector<int>> Game::m_player_alliances.\n");
 	return (TeamAlliances)0;
+}
+
+void Game::WipeAllObjectsWithGridIndex(GameObjectType type, sf::Vector2u grid_index)
+{
+	size_t FluxorVectorSize = sceneGameObjectsTyped[type].size();
+	for (size_t i = 0; i < FluxorVectorSize; i++)
+	{
+		if (sceneGameObjectsTyped[type][i] == NULL)
+			continue;
+
+		if (Game::GetGridIndex(sceneGameObjectsTyped[type][i]->getPosition()) == grid_index)
+		{
+			sceneGameObjectsTyped[type][i]->m_visible = false;
+			sceneGameObjectsTyped[type][i]->m_GarbageMe = true;
+		}
+	}
 }
