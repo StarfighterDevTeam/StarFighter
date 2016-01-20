@@ -128,6 +128,8 @@ enum TeamAlliances
 #define FLUX_GAUGE_HEIGHT							16
 #define FLUX_GAUGE_WIDTH							100
 #define GAUGE_TEXT_OFFSET_Y							4
+#define WARNING_FEEDBACK_DURATION					2.f
+#define WARNING_OFFSET_Y							16
 
 //FLUXOR
 #define FLUXOR_FLUX_VALUE							10
@@ -143,9 +145,9 @@ enum TeamAlliances
 #define FLUXOR_BULLET_SPEED							500
 #define FLUXOR_TURN_MIN_DELAY						0.05f
 #define FLUXOR_TURN_MAX_DELAY						3.f
-#define FLUXOR_MAX_POPULATION						15
+#define FLUXOR_MAX_POPULATION						10
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
-#define FLUXOR_RESPAWN_MAX_TIME						40.f
+#define FLUXOR_RESPAWN_MAX_TIME						30.f
 #define FLUXOR_WASTE_DELAY							0.5f
 #define FLUXOR_ATTACK_DELAY							0.f
 
@@ -155,7 +157,7 @@ enum TeamAlliances
 #define MODULE_GLOW_RADIUS							12
 #define MODULE_GLOW_ANIMATION_DURATION				0.5f
 #define MODULE_TRANSFER_DELAY						0.1f
-#define MODULE_FLUX_CONSTRUCTION_PER_SECOND			4
+#define MODULE_FLUX_CONSTRUCTION_PER_SECOND			3
 #define MODULE_WASTE_DELAY							2.f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);

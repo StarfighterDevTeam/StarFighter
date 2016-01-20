@@ -184,7 +184,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
-			m_fluxor_generation_time = 5.f;// 0.5f;
+			m_fluxor_generation_time = 3.f;// 0.5f;
 			m_fluxor_generation_cost = 0;// FLUXOR_FLUX_VALUE;
 			break;
 		}
@@ -932,6 +932,8 @@ void Module::AttackModule(Fluxor* fluxor)
 		{
 			if (fluxor->m_flux_attack_clock.getElapsedTime().asSeconds() > fluxor->m_flux_attack_delay)
 			{
+				bool shield_up = m_shield_range > 0 && m_flux == m_flux_max;
+
 				//instant damage or damage over time?
 				int damage = 1;
 				if (fluxor->m_flux_attack_delay == 0)
@@ -944,7 +946,7 @@ void Module::AttackModule(Fluxor* fluxor)
 				damage = m_under_construction ? 1 : damage;
 
 				//kill? (shields cannot get one-shotted)
-				if ((m_shield_range == 0 && damage > m_flux) || (m_shield_range > 0 && m_flux < m_flux_max && damage > m_flux))
+				if (!shield_up && damage > m_flux)
 				{
 					this->m_GarbageMe = true;
 					this->m_visible = false;
@@ -971,10 +973,10 @@ void Module::AttackModule(Fluxor* fluxor)
 				else
 				{
 					//case of shield not getting one-shotted
-					if (damage > m_flux)
-					{
-						damage = m_flux;
-					}
+					//if (shield_up && damage > m_flux)
+					//{
+					//	damage = m_flux;
+					//}
 
 					m_flux -= damage;
 					fluxor->m_flux -= damage;
@@ -1009,6 +1011,9 @@ void Module::AttackModule(Fluxor* fluxor)
 					delete text_feedback;
 					(*CurrentGame).addToFeedbacks(pop_feedback);
 				}
+
+				//feedback to player
+				(*CurrentGame).ActivateWarningFeedback(m_team);
 
 				fluxor->m_flux_attack_clock.restart();
 			}

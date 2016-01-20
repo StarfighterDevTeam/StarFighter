@@ -27,16 +27,29 @@ void Ship::Init()
 
 	//Flux display
 	m_flux_text = new SFText((*CurrentGame).m_fonts[Font_Arial], 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
-	m_flux_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	m_flux_text->m_alliance = m_alliance;
 	
 	(*CurrentGame).addToFeedbacks(m_flux_text);
+	
 	
 	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
 
+	//warning feedback
+	if (!(*CurrentGame).m_player_warnings)
+	{
+		(*CurrentGame).m_player_warnings = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/warning.png", sf::Vector2f(42, 38), sf::Vector2f(21, 19), 4, 1);
+	}
+	m_warning = (*CurrentGame).m_player_warnings->Clone();
+	m_warning->setPosition(getPosition());
+	m_warning->m_visible = false;
+	m_warning->m_team = m_team;
+	m_warning->m_alliance = m_alliance;
+	(*CurrentGame).addToScene(m_warning, PanelLayer, BackgroundObject);
+
 	//Build feedback
 	m_build_text = new SFText((*CurrentGame).font2, 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
-	m_build_text->m_alliance = (TeamAlliances)(*CurrentGame).GetTeamAlliance(m_team);
+	m_build_text->m_alliance = m_alliance;
 	(*CurrentGame).addToFeedbacks(m_build_text);
 
 	m_build_text_status = Player_NotOverConstruction;
@@ -59,7 +72,16 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 Ship::~Ship()
 {
 	if (m_build_text)
+	{
+		m_build_text->m_visible = false;
 		m_build_text->m_GarbageMe = true;
+	}
+
+	if (m_warning)
+	{
+		m_warning->m_visible = false;
+		m_warning->m_GarbageMe = true;
+	}
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -153,6 +175,22 @@ void Ship::update(sf::Time deltaTime)
 		m_flux_gauge->setPosition(getPosition());
 	}
 	
+	//warning feedback (in case of attack)
+	if (m_warning && m_warning_feedback_activated)
+	{
+		m_warning->m_visible = true;
+		m_warning_feedback_activated = false;
+		m_warning_clock.restart();
+	}
+	if (m_warning && m_warning->m_visible)
+	{
+		m_warning->setPosition(sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2 - WARNING_OFFSET_Y));
+		if (m_warning_clock.getElapsedTime().asSeconds() > WARNING_FEEDBACK_DURATION)
+		{
+			m_warning->m_visible = false;
+		}
+	}
+
 	if (m_build_text)
 	{
 		m_build_text->setPosition(sf::Vector2f(getPosition().x - m_build_text->getGlobalBounds().width / 2, getPosition().y - m_size.y / 2 - m_build_text->getGlobalBounds().height*1.5));
@@ -498,4 +536,13 @@ bool Ship::TryBuildModule(int module_key)
 	}
 
 	return false;
+}
+
+void Ship::ActivateWarningFeedback()
+{
+	if (m_warning)
+	{
+		m_warning->m_visible = true;
+		m_warning->setFrame(0, true);
+	}
 }

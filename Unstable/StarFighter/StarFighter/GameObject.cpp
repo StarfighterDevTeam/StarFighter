@@ -91,6 +91,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_under_construction = false;
 	m_rotation_speed = 0.f;
 	m_target = NULL;
+	m_warning_feedback_activated = false;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)

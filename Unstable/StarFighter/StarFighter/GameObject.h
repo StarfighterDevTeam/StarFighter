@@ -28,7 +28,6 @@ enum LayerType {
 	AuraLayer,
 	PlayerShipLayer,
 	FeedbacksLayer,
-
 	PanelLayer,
 	HudObject,
 	HudCursor,
@@ -98,6 +97,7 @@ public:
 
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
+	bool m_warning_feedback_activated;
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();

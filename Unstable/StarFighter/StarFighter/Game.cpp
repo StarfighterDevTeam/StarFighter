@@ -55,8 +55,9 @@ void Game::init(RenderWindow* window)
 		playerShips[i] = NULL;
 	}
 	
-	//assets for modules
+	//assets prototype initialization
 	m_module_arrows = NULL;
+	m_player_warnings = NULL;
 
 	//fonts
 	font = new sf::Font();
@@ -927,4 +928,11 @@ void Game::WipeAllObjectsWithGridIndex(GameObjectType type, sf::Vector2u grid_in
 			sceneGameObjectsTyped[type][i]->m_GarbageMe = true;
 		}
 	}
+}
+
+void Game::ActivateWarningFeedback(PlayerTeams team)
+{
+	GameObject* object = (GameObject*)playerShips[team];
+	object->m_warning_feedback_activated = true;
+	object = NULL;
 }

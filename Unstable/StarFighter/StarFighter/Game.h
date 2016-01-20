@@ -83,6 +83,7 @@ public:
 	sf::Vector2f scale_factor;
 
 	Ship* playerShips[NBVAL_PlayerTeams];
+	void ActivateWarningFeedback(PlayerTeams team);
 
 	sf::View view[1+USE_SPLIT_SCREEN];
 	sf::Vector2f map_size;
@@ -122,6 +123,7 @@ public:
 	Fluxor* m_fluxors[NBVAL_FluxorType];
 	Module* m_modules[NBVAL_ModuleType];
 	GameObject* m_module_arrows;
+	GameObject* m_player_warnings;
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	GameObject* m_team_markers[NBVAL_PlayerTeams];
 	SFGauge* m_flux_gauges[NBVAL_GaugeStyles];

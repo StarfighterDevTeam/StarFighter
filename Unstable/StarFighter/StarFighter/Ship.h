@@ -53,6 +53,9 @@ public :
 
 	//HUD
 	SFText* m_build_text;
+	GameObject* m_warning;
+	sf::Clock m_warning_clock;
+	void ActivateWarningFeedback();
 	PlayerConstructionFeedbacks m_build_text_status;
 	void SetTeam(PlayerTeams team, TeamAlliances alliance) override;
 
