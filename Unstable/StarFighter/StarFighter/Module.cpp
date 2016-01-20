@@ -542,7 +542,7 @@ void Module::update(sf::Time deltaTime)
 		UpdateShield();
 	}
 	
-	GameObject::update(deltaTime);
+	AnimatedSprite::update(deltaTime);
 
 	//update links, circuit knowledge and feedbacks
 	UpdateLinks();
