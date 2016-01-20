@@ -205,7 +205,7 @@ void Game::updateScene(Time deltaTime)
 	cleanGarbage();
 
 	//Checking colisions
-	colisionChecksV2();
+	colisionChecksV2(deltaTime);
 	//ResolveProductionBufferList();//must be done after collision checks
 
 	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
@@ -386,7 +386,7 @@ void Game::drawHud()
 	}
 }
 
-void Game::colisionChecksV2()
+void Game::colisionChecksV2(Time deltaTime)
 {
 	sf::Clock dt;
 	dt.restart();
@@ -424,7 +424,6 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				//Do something 
 				(*it1)->GetModule(*it2);
 			}
 		}
@@ -501,11 +500,9 @@ void Game::colisionChecksV2()
 			if (*it2 == NULL)
 				continue;
 
-			//if (GameObject::DistancePointToSement((*it2)->getPosition().x, (*it2)->getPosition().y, (*it1)->m_initial_position.x, (*it1)->m_initial_position.y, (*it1)->getPosition().x, (*it1)->getPosition().y) == 0)
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (GameObject::isCapsuleColliding((*it1), (*it2), deltaTime))
 			{
-				//Do something 
-				(*it2)->GetFluxor(*it1);
+				//Bounce on Modules
 			}
 		}
 	}

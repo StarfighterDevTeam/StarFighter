@@ -13,6 +13,19 @@
 using namespace std;
 using namespace sf;
 
+enum CollisionSide
+{
+	Collision_Top,
+	Collision_Right,
+	Collision_Bottom,
+	Collision_Left,
+	Collision_TopLeft,
+	Collision_TopRight,
+	Collision_BottomRight,
+	Collision_BottomLeft,
+	NoCollision,
+};
+
 enum LayerType {
 	BackgroundLayer,
 	FakeGridLayer,
@@ -98,6 +111,10 @@ public:
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
 	bool m_warning_feedback_activated;
+
+	//Collision tests
+	static bool isCapsuleColliding(GameObject* object, GameObject* bumper, sf::Time deltaTime);
+	virtual void CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing);
 
 	//Utilitary methodes
 	float GetAbsoluteSpeed();

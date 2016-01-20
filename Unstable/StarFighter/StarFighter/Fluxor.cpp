@@ -554,3 +554,9 @@ void Fluxor::CheckCondensation()
 		m_GarbageMe = true;
 	}
 }
+
+void Fluxor::CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing)
+{
+	GameObject::CollisionResponse(bumper, collision, bouncing);
+	m_turn_clock.restart();
+}

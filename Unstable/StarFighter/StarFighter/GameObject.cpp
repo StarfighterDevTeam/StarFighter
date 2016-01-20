@@ -442,6 +442,222 @@ int GameObject::GaussianBlurDistribution(int x)
 	return x*x;
 }
 
+//COLLISION TESTS
+bool GameObject::isCapsuleColliding(GameObject* object, GameObject* bumper, sf::Time deltaTime)
+{
+	if (!object || !bumper)
+		return false;
+
+	if (!object->m_visible || !(bumper->m_visible))
+		return false;
+
+	//ghost is a property that prevents an object from colliding, so by definition we exclude it
+	if (object->m_ghost || (bumper->m_ghost))
+		return false;
+
+	if (!object->m_isOnScene || !(bumper->m_isOnScene))
+		return false;
+
+	//p0_ : current position of moving object
+	//P0_radius : current position with added radius of the circle
+	//p1_ : previous position of moving object
+	//p2_, p3_, p4_, p5_ : bumper corner points
+	const float p0_x = object->getPosition().x;
+	const float p0_y = object->getPosition().y;
+	const float p1_x = object->getPosition().x - object->m_speed.x * deltaTime.asSeconds();
+	const float p1_y = object->getPosition().y - object->m_speed.y * deltaTime.asSeconds();
+	const float dx = p0_x - p1_x;
+	const float dy = p0_y - p1_y;
+
+	const float p2_x = bumper->getPosition().x - bumper->m_size.x / 2;
+	const float p2_y = bumper->getPosition().y - bumper->m_size.y / 2;
+	const float p3_x = bumper->getPosition().x + bumper->m_size.x / 2;
+	const float p3_y = bumper->getPosition().y - bumper->m_size.y / 2;
+	const float p4_x = bumper->getPosition().x + bumper->m_size.x / 2;
+	const float p4_y = bumper->getPosition().y + bumper->m_size.y / 2;
+	const float p5_x = bumper->getPosition().x - bumper->m_size.x / 2;
+	const float p5_y = bumper->getPosition().y + bumper->m_size.y / 2;
+
+	const float segment[4][4] = { p2_x, p2_y, p3_x, p3_y, p3_x, p3_y, p4_x, p4_y, p4_x, p4_y, p5_x, p5_y, p5_x, p5_y, p2_x, p2_y };
+
+	//1. collision with borders during movement (projection of the center of the object, interesecting segments)?
+	bool segment_is_colliding[4] = { false, false, false, false };
+	sf::Vector2f segment_collision_coordinate[4];
+
+	for (int i = 0; i < 4; i++)
+	{
+		segment_is_colliding[i] = IntersectSegments(p0_x, p0_y, p1_x, p1_y, segment[i][0], segment[i][1], segment[i][2], segment[i][3], &segment_collision_coordinate[i].x, &segment_collision_coordinate[i].y);
+	}
+
+	//2. collision with borders on arrival?
+	bool segment_is_colliding_on_arrival[4] = { false, false, false, false };
+	float segment_collision_at_arrival_distance[4];
+
+	if (segment_is_colliding[0] + segment_is_colliding[1] + segment_is_colliding[2] + segment_is_colliding[3] == 0)
+	{
+		float dist;
+		for (int i = 0; i < 4; i++)
+		{
+			//collision at arrival? Calculation of distance of point p0 to segment
+			dist = DistancePointToSement(p0_x, p0_y, segment[i][0], segment[i][1], segment[i][2], segment[i][3], NULL, NULL);
+			segment_is_colliding_on_arrival[i] = (dist - object->m_size.x / 2 < 0);
+			segment_collision_at_arrival_distance[i] = dist;
+		}
+	}
+
+	//3. collision with corners?
+	bool corner_is_colliding[4] = { false, false, false, false };
+
+	for (int i = 0; i < 4; i++)
+	{
+		corner_is_colliding[i] = DistancePointToSement(segment[i][0], segment[i][1], p0_x, p0_y, p1_x, p1_y, NULL, NULL) < object->m_size.x / 2;//object is a circle
+	}
+
+	if (segment_is_colliding[0] + segment_is_colliding[1] + segment_is_colliding[2] + segment_is_colliding[3]
+		+ segment_is_colliding_on_arrival[0] + segment_is_colliding_on_arrival[1] + segment_is_colliding_on_arrival[2] + segment_is_colliding_on_arrival[3]
+		+ corner_is_colliding[0] + corner_is_colliding[1] + corner_is_colliding[2] + corner_is_colliding[3] == 0)
+		return false;//no collision
+	else
+	{
+		//choose the closest collision
+		float shortest_distance = -1;
+		int solution = -1;
+
+		//solutions from 1. (borders on movement)
+		for (int i = 0; i < 4; i++)
+		{
+			if (segment_is_colliding[i])
+			{
+				float dx = p0_x - segment_collision_coordinate[i].x;
+				float dy = p0_y - segment_collision_coordinate[i].y;
+				float squared_distance = dx*dx + dy*dy;
+				if (shortest_distance < 0 || squared_distance < shortest_distance)
+				{
+					shortest_distance = squared_distance;
+					solution = i;
+				}
+			}
+		}
+
+		//solutions from 2. (borders on arrival)
+		for (int i = 0; i < 4; i++)
+		{
+			if (segment_is_colliding_on_arrival[i])
+			{
+				float squared_distance = segment_collision_at_arrival_distance[i] * segment_collision_at_arrival_distance[i];
+				if (shortest_distance < 0 || squared_distance < shortest_distance)
+				{
+					shortest_distance = squared_distance;
+					solution = i;
+				}
+			}
+		}
+
+		//solutions from 3. (corners)
+		for (int i = 0; i < 4; i++)
+		{
+			if (corner_is_colliding[i])
+			{
+				float dx = p0_x - segment[i][0];
+				float dy = p0_y - segment[i][1];
+				float squared_distance = dx*dx + dy*dy;
+				if (shortest_distance < 0 || squared_distance < shortest_distance)
+				{
+					shortest_distance = squared_distance;
+					solution = i + 4;
+				}
+			}
+		}
+
+		//reducing speed based on how much the object already penetrated the bumper
+		if (solution < 4 && segment_collision_coordinate[solution].x > 0)
+		{
+			object->m_speed.x = p0_x - segment_collision_coordinate[solution].x;
+			object->m_speed.y = p0_x - segment_collision_coordinate[solution].y;
+		}
+
+		//printf("Collision segment: %d\n", solution);
+
+		//bounce
+		object->CollisionResponse(bumper, (CollisionSide)solution, true);
+		//0 : top
+		//1 : right
+		//2 : bottom
+		//3 : left
+		//4 : upper left corner
+		//5 : upper right corner
+		//6 : bottom right corner
+		//7 : bottom left corner
+
+		return true;
+	}
+}
+
+void GameObject::CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing)
+{
+	if (bumper)
+	{
+		float size = m_size.x > m_size.y ? m_size.x : m_size.y;
+		switch (collision)
+		{
+			case NoCollision:
+				break;
+			case Collision_Top:
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y - bumper->m_size.y / 2 - size / 2));
+				m_speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_Bottom:
+			{
+				setPosition(sf::Vector2f(getPosition().x, bumper->getPosition().y + bumper->m_size.y / 2 + size / 2));
+				m_speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_Right:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + bumper->m_size.x / 2 + m_size.x / 2, getPosition().y));
+				m_speed.x *= -1 * bouncing;
+				break;
+			}
+			case Collision_Left:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - bumper->m_size.x / 2 - size / 2, getPosition().y));
+				m_speed.x *= -1 * bouncing;
+				break;
+			}
+			case Collision_TopLeft:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - bumper->m_size.x / 2 - size / 2, bumper->getPosition().y - bumper->m_size.y / 2 - size / 2));
+				m_speed.x *= -1 * bouncing;
+				m_speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_TopRight:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + bumper->m_size.x / 2 + size / 2, bumper->getPosition().y - bumper->m_size.y / 2 - size / 2));
+				m_speed.x *= -1 * bouncing;
+				m_speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_BottomRight:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x + bumper->m_size.x / 2 + size / 2, bumper->getPosition().y + bumper->m_size.y / 2 + size / 2));
+				m_speed.x *= -1 * bouncing;
+				m_speed.y *= -1 * bouncing;
+				break;
+			}
+			case Collision_BottomLeft:
+			{
+				setPosition(sf::Vector2f(bumper->getPosition().x - bumper->m_size.x / 2 - size / 2, bumper->getPosition().y + bumper->m_size.y / 2 + size / 2));
+				m_speed.x *= -1 * bouncing;
+				m_speed.y *= -1 * bouncing;
+				break;
+			}
+		}
+	}
+}
+
 //FLUX SPECIFIC
 void GameObject::GetFluxor(GameObject* object)
 {

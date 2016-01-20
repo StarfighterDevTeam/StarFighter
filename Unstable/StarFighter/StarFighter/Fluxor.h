@@ -29,6 +29,7 @@ public :
 	static sf::Vector2f RandomizePosition(bool within_bounds = false, sf::FloatRect bounds = { 0, 0, 0, 0 });
 	static sf::Vector2f RandomizeSpeed();
 	void ChaosTurns();
+	void CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing) override;
 	
 	FluxorType m_FluxorType;
 	float m_turn_delay;

@@ -622,15 +622,7 @@ void Module::GetFluxor(GameObject* object)
 	{
 		Fluxor* fluxor = (Fluxor*)object;
 
-		if (!fluxor->m_guided && !m_under_construction)
-		{
-			float angle = GetAngleRadBetweenPositions(fluxor->getPosition(), fluxor->m_initial_position);
-			fluxor->SetSpeedVectorFromAbsoluteSpeedAndAngle(fluxor->m_absolute_speed, angle);
-			fluxor->setPosition(fluxor->m_initial_position);
-			fluxor->m_turn_delay = Fluxor::RandomizeTurnDelay();
-			fluxor->m_turn_clock.restart();
-		}
-		else if (fluxor->m_guided)
+		if (fluxor->m_guided)
 		{
 			//Allied guided Fluxor passes right through the middle of the Module. Enemy Fluxors collide on the Module edge
 			if (fluxor->m_alliance != m_alliance || GameObject::DistancePointToSement(getPosition().x, getPosition().y, fluxor->m_initial_position.x, fluxor->m_initial_position.y, fluxor->getPosition().x, fluxor->getPosition().y) == 0)

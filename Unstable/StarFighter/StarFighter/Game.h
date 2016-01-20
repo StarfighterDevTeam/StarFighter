@@ -71,7 +71,7 @@ public:
 	void drawScene();
 	void drawHud();
 	void Draw(sf::RenderTexture& offscreen);
-	void colisionChecksV2();
+	void colisionChecksV2(Time deltaTime);
 	void cleanGarbage();
 	void collectGarbage();
 	sf::RenderTexture mainScreen;
