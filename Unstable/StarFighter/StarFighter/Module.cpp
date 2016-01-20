@@ -18,6 +18,7 @@ void Module::Initialize()
 
 	m_flux = 0;
 	m_flux_max = 1;
+	m_construction_flux_per_second = MODULE_FLUX_CONSTRUCTION_PER_SECOND;
 	m_isGeneratingFluxor = false;
 	m_has_child_to_refill = false;
 	m_isRefillingFlux = false;
@@ -196,7 +197,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		}
 		case ModuleType_Accumulator:
 		{
-			m_flux_max_under_construction = 30;
+			m_flux_max_under_construction = 40;
 			m_flux_max_after_construction = 1000;
 			m_wasting_flux = false;
 			m_flux_waste = 1;
@@ -208,8 +209,9 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Relay:
 		{
 			m_flux_max_under_construction = 5;
-			m_flux_max_after_construction = 10;
+			m_flux_max_after_construction = 5;
 			m_isRefillingFlux = true;
+			m_construction_flux_per_second = 1.0f * MODULE_FLUX_CONSTRUCTION_PER_SECOND / 2;
 			break;
 		}
 		//case ModuleType_Factory:
@@ -234,7 +236,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		//}
 		case ModuleType_Shield:
 		{
-			m_flux_max_under_construction = 60;
+			m_flux_max_under_construction = 30;
 			m_flux_max_after_construction = 30;
 			m_shield_range = 1;
 			break;
@@ -252,21 +254,21 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		//}
 		case ModuleType_Amplifier:
 		{
-			m_flux_max_under_construction = 25;
-			m_flux_max_after_construction = 20;
+			m_flux_max_under_construction = 30;
+			m_flux_max_after_construction = 30;
 			m_add_flux = 10;
 			break;
 		}
 		case ModuleType_Accelerator:
 		{
 			m_flux_max_under_construction = 15;
-			m_flux_max_after_construction = 30;
+			m_flux_max_after_construction = 15;
 			m_add_speed = 100;
 			break;
 		}
 		case ModuleType_Condensator:
 		{
-			m_flux_max_under_construction = 30;
+			m_flux_max_under_construction = 50;
 			m_flux_max_after_construction = 50;
 			m_isCondensatingFluxor = true;
 			break;
@@ -509,7 +511,7 @@ void Module::update(sf::Time deltaTime)
 			FinishConstruction();
 		}
 		//still under construction
-		else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / MODULE_FLUX_CONSTRUCTION_PER_SECOND))
+		else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / m_construction_flux_per_second))
 		{
 			m_flux++;
 			m_construction_clock.restart();

@@ -145,7 +145,7 @@ enum TeamAlliances
 #define FLUXOR_TURN_MAX_DELAY						3.f
 #define FLUXOR_MAX_POPULATION						15
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
-#define FLUXOR_RESPAWN_MAX_TIME						60.f
+#define FLUXOR_RESPAWN_MAX_TIME						40.f
 #define FLUXOR_WASTE_DELAY							0.5f
 #define FLUXOR_ATTACK_DELAY							0.f
 
@@ -155,7 +155,7 @@ enum TeamAlliances
 #define MODULE_GLOW_RADIUS							12
 #define MODULE_GLOW_ANIMATION_DURATION				0.5f
 #define MODULE_TRANSFER_DELAY						0.1f
-#define MODULE_FLUX_CONSTRUCTION_PER_SECOND			5
+#define MODULE_FLUX_CONSTRUCTION_PER_SECOND			4
 #define MODULE_WASTE_DELAY							2.f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);

@@ -56,6 +56,7 @@ public :
 	void FinishConstruction();
 	Glow* m_glow;
 	void SetConstructionStatus(bool under_construction);
+	float m_construction_flux_per_second;
 	sf::Clock m_construction_clock;
 
 	//Shield module
