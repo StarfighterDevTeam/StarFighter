@@ -159,7 +159,7 @@ enum TeamAlliances
 #define MODULE_GLOW_RADIUS							12
 #define MODULE_GLOW_ANIMATION_DURATION				0.5f
 #define MODULE_TRANSFER_DELAY						0.1f
-#define MODULE_FLUX_CONSTRUCTION_PER_SECOND			2
+#define MODULE_FLUX_CONSTRUCTION_PER_SECOND			4
 #define MODULE_WASTE_DELAY							2.f
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
