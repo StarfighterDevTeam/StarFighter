@@ -32,7 +32,7 @@ void FluxEntity::FluxInitialization()
 	//warning feedback
 	if (!(*CurrentGame).m_player_warnings)
 	{
-		(*CurrentGame).m_player_warnings = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/warning.png", sf::Vector2f(42, 38), sf::Vector2f(21, 19), 4, 1);
+		(*CurrentGame).m_player_warnings = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/warning.png", sf::Vector2f(42, 38), sf::Vector2f(21, 19), 4, 2);
 	}
 	m_warning = (*CurrentGame).m_player_warnings->Clone();
 	m_warning->setPosition(getPosition());
@@ -150,6 +150,12 @@ bool FluxEntity::AutogenerateFlux()
 
 void FluxEntity::UpdateWarningFeedback()
 {
+	//setting the correct animation line if not already set
+	if (m_warning && m_currentAnimationIndex != m_team)
+	{
+		m_warning->setAnimationLine(m_team);
+	}
+
 	//warning feedback (in case of attack)
 	if (m_warning && m_warning_feedback_activated)
 	{
@@ -165,4 +171,17 @@ void FluxEntity::UpdateWarningFeedback()
 			m_warning->m_visible = false;
 		}
 	}
+}
+
+void FluxEntity::CreateWarningFeedback(sf::Vector2f position)
+{
+	GameObject* warning = (*CurrentGame).m_player_warnings->Clone();
+	warning->setPosition(position);
+	warning->m_team = m_team;
+	warning->m_alliance = m_alliance;
+	warning->setAnimationLine(m_team);
+	warning->m_life_time = WARNING_FEEDBACK_DURATION;
+	(*CurrentGame).addToScene(warning, WarningLayer, BackgroundObject);
+
+	warning = NULL;
 }

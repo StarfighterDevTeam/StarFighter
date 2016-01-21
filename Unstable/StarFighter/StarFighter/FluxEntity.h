@@ -44,6 +44,7 @@ public:
 	GameObject* m_warning;
 	sf::Clock m_warning_clock;
 	void UpdateWarningFeedback();
+	void CreateWarningFeedback(sf::Vector2f position);
 };
 
 #endif // FLUXENTITY_H_INCLUDED

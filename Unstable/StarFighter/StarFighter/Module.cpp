@@ -588,9 +588,6 @@ void Module::update(sf::Time deltaTime)
 		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
 	}
 
-	//warning feedback
-	UpdateWarningFeedback();
-
 	//if (m_flux_gauge)
 	//{
 	//	m_flux_gauge->update(m_flux, m_flux_max);
@@ -1034,7 +1031,7 @@ void Module::AttackModule(Fluxor* fluxor)
 
 				//warning feedback to player
 				(*CurrentGame).ActivateWarningFeedback(m_team);
-				m_warning_feedback_activated = true;
+				CreateWarningFeedback(fluxor->getPosition());
 
 				fluxor->m_flux_attack_clock.restart();
 			}
@@ -1241,7 +1238,7 @@ void Module::UpdateLinks()
 								m_link[i].m_activated = Link_Activated;
 								break;
 							}
-							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
+							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
 								module = NULL;
 								break;
@@ -1282,7 +1279,7 @@ void Module::UpdateLinks()
 								m_link[i].m_activated = Link_Activated;
 								break;
 							}
-							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
+							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
 								module = NULL;
 								break;
@@ -1323,7 +1320,7 @@ void Module::UpdateLinks()
 								m_link[i].m_activated = Link_Activated;
 								break;
 							}
-							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
+							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
 								module = NULL;
 								break;
@@ -1364,7 +1361,7 @@ void Module::UpdateLinks()
 								m_link[i].m_activated = Link_Activated;
 								break;
 							}
-							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
+							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
 								module = NULL;
 								break;

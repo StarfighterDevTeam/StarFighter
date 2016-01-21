@@ -92,6 +92,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_rotation_speed = 0.f;
 	m_target = NULL;
 	m_warning_feedback_activated = false;
+	m_life_time = -1;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -140,6 +141,13 @@ void GameObject::update(sf::Time deltaTime)
 	this->setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
+
+	//temporary object?
+	if (m_life_time > 0 && m_life_clock.getElapsedTime().asSeconds() > m_life_time)
+	{
+		m_visible = false;
+		m_GarbageMe = true;
+	}
 }
 
 void GameObject::updateAnimation(sf::Time deltaTime)

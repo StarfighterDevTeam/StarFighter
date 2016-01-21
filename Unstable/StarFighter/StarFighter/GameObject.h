@@ -145,6 +145,8 @@ public:
 	virtual void GetModule(GameObject* object);
 	virtual void CheckCondensation();
 	GameObject* m_target;
+	float m_life_time;
+	sf::Clock m_life_clock;
 
 protected:
 	Animation defaultAnimation;
