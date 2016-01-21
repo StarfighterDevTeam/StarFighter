@@ -49,7 +49,7 @@ void Module::Initialize()
 	//links
 	if (!(*CurrentGame).m_module_arrows)
 	{
-		(*CurrentGame).m_module_arrows = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(12, 18), sf::Vector2f(6, 9), 1, 3);
+		(*CurrentGame).m_module_arrows = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/arrow.png", sf::Vector2f(20, 28), sf::Vector2f(10, 14), 1, 3);
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -347,7 +347,7 @@ Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, Pla
 	}
 	for (int i = 0; i < 4; i++)
 	{
-		new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2 - new_module->m_arrow[i]->m_size.x / 2));
+		new_module->m_arrow[i]->setPosition(new_module->getPosition().x + cos(i * M_PI_2)*(new_module->m_size.x / 2), new_module->getPosition().y + sin(i * M_PI_2)*(new_module->m_size.x / 2));
 		new_module->m_arrow[i]->m_team = new_module->m_team;
 		new_module->m_arrow[i]->m_alliance = new_module->m_alliance;
 		new_module->m_arrow[i]->m_under_construction = new_module->m_under_construction;
