@@ -9,7 +9,6 @@ void Module::Initialize()
 {
 	m_flux_max_under_construction = 1;
 	m_flux_max_after_construction = 1;
-	//m_glow = new Glow(this, m_team, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow = new Glow(this, sf::Color::Cyan, MODULE_GLOW_RADIUS, 1, MODULE_GLOW_ANIMATION_DURATION, MODULE_GLOW_MIN_RADIUS);
 	m_glow->m_visible = false;
 	m_team_marker = (*CurrentGame).m_team_markers[m_team]->Clone();
@@ -441,7 +440,7 @@ Module::~Module()
 		m_team_marker->m_visible = false;
 		m_team_marker->m_GarbageMe = true;
 	}
-	
+
 	if (m_shield)
 	{
 		m_shield->m_visible = false;
@@ -588,6 +587,9 @@ void Module::update(sf::Time deltaTime)
 		ss << m_flux << "/" << m_flux_max;
 		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y));
 	}
+
+	//warning feedback
+	UpdateWarningFeedback();
 
 	//if (m_flux_gauge)
 	//{
@@ -1030,8 +1032,9 @@ void Module::AttackModule(Fluxor* fluxor)
 					(*CurrentGame).addToFeedbacks(pop_feedback);
 				}
 
-				//feedback to player
+				//warning feedback to player
 				(*CurrentGame).ActivateWarningFeedback(m_team);
+				m_warning_feedback_activated = true;
 
 				fluxor->m_flux_attack_clock.restart();
 			}
@@ -1071,26 +1074,26 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 					CondensateFluxor(fluxor);
 					AmplifyFluxor(fluxor);
 				}
-			}
 
-			if (!fluxor->m_docked)
-			{
-				if (fluxor->m_flux > 0)//otherwise there is no point, he's a dead fluxor anyway
+				if (!fluxor->m_docked)
 				{
-					UpdateFluxorDirection(fluxor);
-
-					//accelerator
-					if (m_add_speed != 0 && m_flux == m_flux_max)
+					if (fluxor->m_flux > 0)//otherwise there is no point, he's a dead fluxor anyway
 					{
-						fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
-						fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
-						fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
+						UpdateFluxorDirection(fluxor);
+
+						//accelerator
+						if (m_add_speed != 0 && m_flux == m_flux_max)
+						{
+							fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
+							fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
+							fluxor->m_absolute_speed = GetAbsoluteSpeed(fluxor->m_speed);
+						}
 					}
 				}
-			}
-			else
-			{
-				fluxor->setPosition(getPosition());
+				else
+				{
+					fluxor->setPosition(getPosition());
+				}
 			}
 		}
 		//interaction with enemy modules
@@ -1212,7 +1215,7 @@ void Module::UpdateLinks()
 		m_link[i].m_activated = Link_Deactivated;
 
 		Module* module = NULL;
-		if (m_under_construction)
+		if (m_under_construction || !m_link[i].m_exists)
 		{
 			m_link[i].m_activated = Link_Deactivated;
 		}
@@ -1233,36 +1236,27 @@ void Module::UpdateLinks()
 						if (m_curGridIndex.x + j < GRID_WIDTH)
 						{
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x + j][m_curGridIndex.y];
-							if (module)
+							if (module && !module->m_under_construction && module->m_alliance == m_alliance && module->m_visible)
 							{
-								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
-								{
-									module = NULL;
-									continue;
-								}
-								else
-								{
-									if (m_link[i].m_exists)
-									{
-										m_link[i].m_activated = Link_Activated;
-									}
-									else
-									{
-										m_link[i].m_activated = Link_Deactivated;
-									}
-
-									break;
-								}
+								m_link[i].m_activated = Link_Activated;
+								break;
 							}
-							else
+							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
+							{
+								module = NULL;
+								break;
+							}
+							else if (!module || (module && (m_under_construction || !m_visible)))
 							{
 								//feedback for Module "Condensator"
-								if (m_isCondensatingFluxor && m_link[i].m_exists)
+								if (m_isCondensatingFluxor)
 								{
 									SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x + j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
 									m_free_tile_condensator_feedbacks.push_back(rect);
 									rect = NULL;
 								}
+
+								module = NULL;
 							}
 						}
 					}
@@ -1283,35 +1277,27 @@ void Module::UpdateLinks()
 						if (m_curGridIndex.y + j < GRID_HEIGHT)
 						{
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y + j];
-							if (module)
+							if (module && !module->m_under_construction && module->m_alliance == m_alliance && module->m_visible)
 							{
-								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
-								{
-									module = NULL;
-									continue;
-								}
-								else
-								{
-									
-										if (m_link[i].m_exists)
-										{
-											m_link[i].m_activated = Link_Activated;
-										}
-									
-									else
-									{
-										m_link[i].m_activated = Link_Deactivated;
-									}
-
-									break;
-								}
+								m_link[i].m_activated = Link_Activated;
+								break;
 							}
-							//feedback for Module "Condensator"
-							if (m_isCondensatingFluxor && m_link[i].m_exists)
+							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
 							{
-								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y + j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
-								m_free_tile_condensator_feedbacks.push_back(rect);
-								rect = NULL;
+								module = NULL;
+								break;
+							}
+							else if (!module || (module && (m_under_construction || !m_visible)))
+							{
+								//feedback for Module "Condensator"
+								if (m_isCondensatingFluxor)
+								{
+									SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y + j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+									m_free_tile_condensator_feedbacks.push_back(rect);
+									rect = NULL;
+								}
+
+								module = NULL;
 							}
 						}
 					}
@@ -1332,35 +1318,27 @@ void Module::UpdateLinks()
 						if (m_curGridIndex.x - j >= 0)
 						{
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x - j][m_curGridIndex.y];
-							if (module)
+							if (module && !module->m_under_construction && module->m_alliance == m_alliance && module->m_visible)
 							{
-								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
-								{
-									module = NULL;
-									continue;
-								}
-								else
-								{
-									
-										if (m_link[i].m_exists)
-										{
-											m_link[i].m_activated = Link_Activated;
-										}
-									
-									else
-									{
-										m_link[i].m_activated = Link_Deactivated;
-									}
-
-									break;
-								}
+								m_link[i].m_activated = Link_Activated;
+								break;
 							}
-							//feedback for Module "Condensator"
-							if (m_isCondensatingFluxor && m_link[i].m_exists)
+							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
 							{
-								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x - j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
-								m_free_tile_condensator_feedbacks.push_back(rect);
-								rect = NULL;
+								module = NULL;
+								break;
+							}
+							else if (!module || (module && (m_under_construction || !m_visible)))
+							{
+								//feedback for Module "Condensator"
+								if (m_isCondensatingFluxor)
+								{
+									SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x - j, m_curGridIndex.y)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+									m_free_tile_condensator_feedbacks.push_back(rect);
+									rect = NULL;
+								}
+
+								module = NULL;
 							}
 						}
 					}
@@ -1381,35 +1359,27 @@ void Module::UpdateLinks()
 						if (m_curGridIndex.y - j >= 0)
 						{
 							module = (Module*)(*CurrentGame).m_module_grid[m_curGridIndex.x][m_curGridIndex.y - j];
-							if (module)
+							if (module && !module->m_under_construction && module->m_alliance == m_alliance && module->m_visible)
 							{
-								if ((module->m_under_construction && module->m_alliance == m_alliance) || !module->m_visible)
-								{
-									module = NULL;
-									continue;
-								}
-								else
-								{
-									
-										if (m_link[i].m_exists)
-										{
-											m_link[i].m_activated = Link_Activated;
-										}
-									
-									else
-									{
-										m_link[i].m_activated = Link_Deactivated;
-									}
-
-									break;
-								}
+								m_link[i].m_activated = Link_Activated;
+								break;
 							}
-							//feedback for Module "Condensator"
-							if (m_isCondensatingFluxor && m_link[i].m_exists)
+							else if (module && !module->m_under_construction && module->m_alliance != m_alliance && module->m_visible)
 							{
-								SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y - j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
-								m_free_tile_condensator_feedbacks.push_back(rect);
-								rect = NULL;
+								module = NULL;
+								break;
+							}
+							else if (!module || (module && (m_under_construction || !m_visible)))
+							{
+								//feedback for Module "Condensator"
+								if (m_isCondensatingFluxor)
+								{
+									SFRectangle* rect = new SFRectangle(Game::GridToPosition(sf::Vector2u(m_curGridIndex.x, m_curGridIndex.y - j)), sf::Vector2f(TILE_SIZE, TILE_SIZE), sf::Color(0, 255, 0, 70), 0, sf::Color(0, 255, 0, 255), m_team);
+									m_free_tile_condensator_feedbacks.push_back(rect);
+									rect = NULL;
+								}
+
+								module = NULL;
 							}
 						}
 					}

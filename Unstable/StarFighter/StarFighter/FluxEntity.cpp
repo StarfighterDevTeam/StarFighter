@@ -28,6 +28,18 @@ void FluxEntity::FluxInitialization()
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
+
+	//warning feedback
+	if (!(*CurrentGame).m_player_warnings)
+	{
+		(*CurrentGame).m_player_warnings = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/warning.png", sf::Vector2f(42, 38), sf::Vector2f(21, 19), 4, 1);
+	}
+	m_warning = (*CurrentGame).m_player_warnings->Clone();
+	m_warning->setPosition(getPosition());
+	m_warning->m_visible = false;
+	m_warning->m_team = m_team;
+	m_warning->m_alliance = m_alliance;
+	(*CurrentGame).addToScene(m_warning, WarningLayer, BackgroundObject);
 }
 
 FluxEntity::~FluxEntity()
@@ -41,6 +53,12 @@ FluxEntity::~FluxEntity()
 	{
 		m_flux_gauge->m_visible = false;
 		m_flux_gauge->m_GarbageMe = true;
+	}
+
+	if (m_warning)
+	{
+		m_warning->m_visible = false;
+		m_warning->m_GarbageMe = true;
 	}
 }
 
@@ -128,4 +146,23 @@ bool FluxEntity::AutogenerateFlux()
 	}
 
 	return false;
+}
+
+void FluxEntity::UpdateWarningFeedback()
+{
+	//warning feedback (in case of attack)
+	if (m_warning && m_warning_feedback_activated)
+	{
+		m_warning->m_visible = true;
+		m_warning_feedback_activated = false;
+		m_warning_clock.restart();
+	}
+	if (m_warning && m_warning->m_visible)
+	{
+		m_warning->setPosition(sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2 - WARNING_OFFSET_Y));
+		if (m_warning_clock.getElapsedTime().asSeconds() > WARNING_FEEDBACK_DURATION)
+		{
+			m_warning->m_visible = false;
+		}
+	}
 }

@@ -41,6 +41,9 @@ public:
 	SFText* m_flux_text;
 	SFGauge* m_flux_gauge;
 	void AddFluxGauge(GaugeStyles gauge, sf::Vector2f offset);
+	GameObject* m_warning;
+	sf::Clock m_warning_clock;
+	void UpdateWarningFeedback();
 };
 
 #endif // FLUXENTITY_H_INCLUDED

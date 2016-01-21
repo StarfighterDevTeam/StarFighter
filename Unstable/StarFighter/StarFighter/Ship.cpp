@@ -35,18 +35,6 @@ void Ship::Init()
 	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
 
-	//warning feedback
-	if (!(*CurrentGame).m_player_warnings)
-	{
-		(*CurrentGame).m_player_warnings = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/warning.png", sf::Vector2f(42, 38), sf::Vector2f(21, 19), 4, 1);
-	}
-	m_warning = (*CurrentGame).m_player_warnings->Clone();
-	m_warning->setPosition(getPosition());
-	m_warning->m_visible = false;
-	m_warning->m_team = m_team;
-	m_warning->m_alliance = m_alliance;
-	(*CurrentGame).addToScene(m_warning, PanelLayer, BackgroundObject);
-
 	//inputs
 	m_SwitchKey_released = false;
 	m_BuildKey_released = false;
@@ -162,21 +150,8 @@ void Ship::update(sf::Time deltaTime)
 		m_flux_gauge->setPosition(getPosition());
 	}
 	
-	//warning feedback (in case of attack)
-	if (m_warning && m_warning_feedback_activated)
-	{
-		m_warning->m_visible = true;
-		m_warning_feedback_activated = false;
-		m_warning_clock.restart();
-	}
-	if (m_warning && m_warning->m_visible)
-	{
-		m_warning->setPosition(sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2 - WARNING_OFFSET_Y));
-		if (m_warning_clock.getElapsedTime().asSeconds() > WARNING_FEEDBACK_DURATION)
-		{
-			m_warning->m_visible = false;
-		}
-	}
+	//warning feedback
+	UpdateWarningFeedback();
 
 	//update grid index
 	m_curGridIndex = (*CurrentGame).GetGridIndex(getPosition());
@@ -520,13 +495,4 @@ bool Ship::TrySellModule()
 	}
 
 	return false;
-}
-
-void Ship::ActivateWarningFeedback()
-{
-	if (m_warning)
-	{
-		m_warning->m_visible = true;
-		m_warning->setFrame(0, true);
-	}
 }

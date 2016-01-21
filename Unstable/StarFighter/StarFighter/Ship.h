@@ -45,9 +45,6 @@ public :
 	void UpdatePlayerStats();
 
 	//HUD
-	GameObject* m_warning;
-	sf::Clock m_warning_clock;
-	void ActivateWarningFeedback();
 	void SetTeam(PlayerTeams team, TeamAlliances alliance) override;
 
 	//construction

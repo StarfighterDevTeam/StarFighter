@@ -41,9 +41,7 @@ enum LayerType {
 	AuraLayer,
 	PlayerShipLayer,
 	FeedbacksLayer,
-	PanelLayer,
-	HudObject,
-	HudCursor,
+	WarningLayer,
 	NBVAL_Layer
 };
 
