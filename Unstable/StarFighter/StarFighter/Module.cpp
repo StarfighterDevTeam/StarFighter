@@ -949,13 +949,13 @@ void Module::AttackModule(Fluxor* fluxor)
 		{
 			if (fluxor->m_flux_attack_clock.getElapsedTime().asSeconds() > fluxor->m_flux_attack_delay)
 			{
-				bool shield_up = m_shield_range > 0 && m_flux == m_flux_max;
+				bool shield_up = m_shield && m_shield->m_visible;
 
 				//instant damage or damage over time?
 				int damage = 1;
 				if (fluxor->m_flux_attack_delay == 0)
 				{
-					damage = fluxor->m_flux > m_flux ? m_flux + 1 : fluxor->m_flux;
+					damage = fluxor->m_flux > m_flux ? m_flux + 1 - shield_up : fluxor->m_flux;
 				}
 
 				//modules under construction behave like modules with 0 hp (instantly killed)
