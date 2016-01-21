@@ -460,7 +460,7 @@ void Module::FinishConstruction()
 	}
 		
 	m_under_construction = false;
-	m_flux = m_flux_max_under_construction;
+	m_flux = 0;// m_flux_max_under_construction;
 	m_flux_max = m_flux_max_after_construction;
 	m_flux_autogeneration_clock.restart();
 	m_fluxor_spawn_clock.restart();
@@ -520,7 +520,8 @@ void Module::update(sf::Time deltaTime)
 	}
 	if (m_glow)
 	{
-		m_glow->m_visible = m_flux == m_flux_max && !m_under_construction;
+		//m_glow->m_visible = m_flux == m_flux_max && !m_under_construction;
+		m_glow->m_visible = m_shield && m_shield->m_visible;
 	}
 
 	if (m_team_marker)
@@ -570,7 +571,7 @@ void Module::update(sf::Time deltaTime)
 
 void Module::UpdateShield()
 {
-	if (m_shield_range > 0 && (m_flux == m_flux_max || m_flux_max == 0) && !m_under_construction && !m_shield)
+	if (m_shield_range > 0 && !m_under_construction && !m_shield)
 	{
 		m_shield = new GameObject(getPosition(), sf::Vector2f(0, 0), "Assets/2D/shield.png", sf::Vector2f(384, 384));
 		sf::Color color = (*CurrentGame).m_team_colors[m_team];
@@ -578,9 +579,10 @@ void Module::UpdateShield()
 		m_shield->m_target = this;
 		(*CurrentGame).addToScene(m_shield, ShieldLayer, ShieldObject);
 	}
-	else if (m_shield)
+
+	if (m_shield)
 	{
-		m_shield->m_visible = (m_flux == m_flux_max || (m_flux_max == 0 && m_flux > 0));
+		m_shield->m_visible = (m_flux_max > 0 && m_flux == m_flux_max || (m_flux_max == 0 && m_flux > 0));
 	}
 }
 
@@ -938,6 +940,10 @@ void Module::AttackModule(Fluxor* fluxor)
 				{
 					damage = fluxor->m_flux > m_flux ? m_flux + 1 - shield_up : fluxor->m_flux;
 				}
+
+				//modules under construction behave like modules with 0 hp (instantly killed)		
+				m_flux = m_under_construction ? 0 : m_flux;
+				damage = m_under_construction ? 1 : damage;
 
 				//kill? (shields cannot get one-shotted)
 				if (!shield_up && damage > m_flux)
