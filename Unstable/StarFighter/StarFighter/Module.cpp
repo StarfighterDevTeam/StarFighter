@@ -1241,7 +1241,7 @@ void Module::UpdateLinks()
 							}
 							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
-								module = NULL;
+								m_link[i].m_activated = Link_Activated;
 								break;
 							}
 							else if (!module || (module && (m_under_construction || !m_visible)))
@@ -1282,7 +1282,7 @@ void Module::UpdateLinks()
 							}
 							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
-								module = NULL;
+								m_link[i].m_activated = Link_Activated;
 								break;
 							}
 							else if (!module || (module && (m_under_construction || !m_visible)))
@@ -1323,7 +1323,7 @@ void Module::UpdateLinks()
 							}
 							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
-								module = NULL;
+								m_link[i].m_activated = Link_Activated;
 								break;
 							}
 							else if (!module || (module && (m_under_construction || !m_visible)))
@@ -1364,7 +1364,7 @@ void Module::UpdateLinks()
 							}
 							else if (module && module->m_alliance != m_alliance && module->m_visible)
 							{
-								module = NULL;
+								m_link[i].m_activated = Link_Activated;
 								break;
 							}
 							else if (!module || (module && (m_under_construction || !m_visible)))
