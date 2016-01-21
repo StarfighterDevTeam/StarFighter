@@ -32,7 +32,7 @@ void FluxEntity::FluxInitialization()
 	//warning feedback
 	if (!(*CurrentGame).m_player_warnings)
 	{
-		(*CurrentGame).m_player_warnings = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/warning.png", sf::Vector2f(42, 38), sf::Vector2f(21, 19), 4, 2);
+		(*CurrentGame).m_player_warnings = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/warning.png", sf::Vector2f(42, 38), sf::Vector2f(21, 19), 4, 3);
 	}
 	m_warning = (*CurrentGame).m_player_warnings->Clone();
 	m_warning->setPosition(getPosition());
@@ -173,7 +173,7 @@ void FluxEntity::UpdateWarningFeedback()
 	}
 }
 
-void FluxEntity::CreateWarningFeedback(sf::Vector2f position)
+GameObject* FluxEntity::CreateWarningFeedback(sf::Vector2f position)
 {
 	GameObject* warning = (*CurrentGame).m_player_warnings->Clone();
 	warning->setPosition(position);
@@ -183,5 +183,5 @@ void FluxEntity::CreateWarningFeedback(sf::Vector2f position)
 	warning->m_life_time = WARNING_FEEDBACK_DURATION;
 	(*CurrentGame).addToScene(warning, WarningLayer, BackgroundObject);
 
-	warning = NULL;
+	return warning;
 }

@@ -1204,6 +1204,7 @@ void Module::UpdateLinks()
 	}
 
 	//begin scanning cells around
+	bool warning_feedback_created = false;
 	for (int i = 0; i < 4; i++)
 	{
 		m_arrow[i]->m_visible = m_link[i].m_exists;
@@ -1389,6 +1390,12 @@ void Module::UpdateLinks()
 				if (module->GetMainLinkIndex() == (GetMainLinkIndex() + 2) % 4 && (module->m_team == this->m_team || module->m_alliance == this->m_alliance))
 				{
 					m_link[i].m_activated = Link_Invalid;
+
+					//warning feedback to player
+					GameObject* warning = CreateWarningFeedback(module->getPosition());
+					warning->m_life_time = WARNING_SHORT_FEEDBACK_DURATION;
+					warning->setAnimationLine(2);
+					warning = NULL;
 				}
 			}
 		}

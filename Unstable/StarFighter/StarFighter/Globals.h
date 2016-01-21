@@ -129,6 +129,7 @@ enum TeamAlliances
 #define FLUX_GAUGE_WIDTH							100
 #define GAUGE_TEXT_OFFSET_Y							4
 #define WARNING_FEEDBACK_DURATION					2.f
+#define WARNING_SHORT_FEEDBACK_DURATION				0.3f
 #define WARNING_OFFSET_Y							16
 #define SELLING_RATIO_OF_FLUX_RECOVERY				0.5f
 

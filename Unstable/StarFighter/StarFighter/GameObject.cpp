@@ -143,7 +143,7 @@ void GameObject::update(sf::Time deltaTime)
 	AnimatedSprite::update(deltaTime);
 
 	//temporary object?
-	if (m_life_time > 0 && m_life_clock.getElapsedTime().asSeconds() > m_life_time)
+	if (m_life_time >= 0 && m_life_clock.getElapsedTime().asSeconds() > m_life_time)
 	{
 		m_visible = false;
 		m_GarbageMe = true;
