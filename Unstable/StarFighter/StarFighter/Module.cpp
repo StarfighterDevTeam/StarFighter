@@ -17,6 +17,7 @@ void Module::Initialize()
 
 	m_flux = 0;
 	m_flux_max = 1;
+	m_flux_max_after_construction = 0;
 	m_construction_flux_per_second = MODULE_FLUX_CONSTRUCTION_PER_SECOND;
 	m_isGeneratingFluxor = false;
 	m_has_child_to_refill = false;
@@ -179,9 +180,9 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Generator:
 		{	 
 			m_flux_max_under_construction = 100;
-			m_flux_max_after_construction = 10;
+			//m_flux_max_after_construction = 10;
 			m_isAutogeneratingFlux = true;
-			m_flux_autogeneration_time = 0.5f;
+			m_flux_autogeneration_time = 1.0f;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
 			m_fluxor_generation_time = 3.f;// 0.5f;
@@ -191,14 +192,14 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Armory:
 		{
 			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 20;
+			//m_flux_max_after_construction = 20;
 			m_upgrade_player_stats = true;
 			break;
 		}
 		case ModuleType_Accumulator:
 		{
 			m_flux_max_under_construction = 40;
-			m_flux_max_after_construction = 1000;
+			//m_flux_max_after_construction = 1000;
 			m_wasting_flux = false;
 			m_flux_waste = 1;
 			m_flux_waste_delay = MODULE_WASTE_DELAY;
@@ -209,67 +210,36 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Relay:
 		{
 			m_flux_max_under_construction = 5;
-			m_flux_max_after_construction = 5;
+			//m_flux_max_after_construction = 5;
 			m_isRefillingFlux = true;
 			m_construction_flux_per_second = 1.0f * MODULE_FLUX_CONSTRUCTION_PER_SECOND / 2;
 			break;
 		}
-		//case ModuleType_Factory:
-		//{
-		//	m_flux_max_under_construction = 15;
-		//	m_flux_max_after_construction = 10;
-		//	m_isGeneratingFluxor = true;
-		//	m_fluxor_generated_type = FluxorType_Red;
-		//	m_fluxor_generation_time = 3.f;
-		//	m_fluxor_generation_cost = m_flux_max_after_construction;
-		//	break;
-		//}
-		//case ModuleType_Factory_Up:
-		//{
-		//	m_flux_max_under_construction = 30;
-		//	m_flux_max_after_construction = 20;
-		//	m_isGeneratingFluxor = true;
-		//	m_fluxor_generated_type = FluxorType_Purple;
-		//	m_fluxor_generation_time = 3.f;
-		//	m_fluxor_generation_cost = m_flux_max_after_construction;
-		//	break;
-		//}
 		case ModuleType_Shield:
 		{
 			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 30;
+			//m_flux_max_after_construction = 30;
 			m_shield_range = 1;
 			break;
 		}
-		//case ModuleType_Turret:
-		//{
-		//	m_flux_max_under_construction = 30;
-		//	m_flux_max_after_construction = 50;
-		//	m_turret_range = 2;
-		//	m_isGeneratingFluxor = true;
-		//	m_fluxor_generated_type = FluxorType_Black;
-		//	m_fluxor_generation_time = 2.f;
-		//	m_fluxor_generation_cost = 5;
-		//	break;
-		//}
 		case ModuleType_Amplifier:
 		{
 			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 30;
+			//m_flux_max_after_construction = 30;
 			m_add_flux = 10;
 			break;
 		}
 		case ModuleType_Accelerator:
 		{
 			m_flux_max_under_construction = 15;
-			m_flux_max_after_construction = 15;
+			//m_flux_max_after_construction = 15;
 			m_add_speed = 100;
 			break;
 		}
 		case ModuleType_Condensator:
 		{
 			m_flux_max_under_construction = 50;
-			m_flux_max_after_construction = 50;
+			//m_flux_max_after_construction = 50;
 			m_isCondensatingFluxor = true;
 			break;
 		}
@@ -490,7 +460,7 @@ void Module::FinishConstruction()
 	}
 		
 	m_under_construction = false;
-	m_flux = 0;
+	m_flux = m_flux_max_under_construction;
 	m_flux_max = m_flux_max_after_construction;
 	m_flux_autogeneration_clock.restart();
 	m_fluxor_spawn_clock.restart();
@@ -600,7 +570,7 @@ void Module::update(sf::Time deltaTime)
 
 void Module::UpdateShield()
 {
-	if (m_shield_range > 0 && m_flux == m_flux_max && !m_under_construction && !m_shield)
+	if (m_shield_range > 0 && (m_flux == m_flux_max || m_flux_max == 0) && !m_under_construction && !m_shield)
 	{
 		m_shield = new GameObject(getPosition(), sf::Vector2f(0, 0), "Assets/2D/shield.png", sf::Vector2f(384, 384));
 		sf::Color color = (*CurrentGame).m_team_colors[m_team];
@@ -610,7 +580,7 @@ void Module::UpdateShield()
 	}
 	else if (m_shield)
 	{
-		m_shield->m_visible = m_flux == m_flux_max;
+		m_shield->m_visible = (m_flux == m_flux_max || (m_flux_max == 0 && m_flux > 0));
 	}
 }
 
@@ -643,7 +613,7 @@ void Module::GetFluxor(GameObject* object)
 
 bool Module::GenerateFluxor()
 {
-	if (m_isGeneratingFluxor && m_flux == m_flux_max)
+	if (m_isGeneratingFluxor && (m_flux == m_flux_max || m_flux_max == 0) && m_flux >= m_fluxor_generation_cost)
 	{
 		if (IsMainLinkActivated() && (!(*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_needs_link_to_circulate || m_has_child_to_refill || (*CurrentGame).m_fluxors[m_fluxor_generated_type]->m_flux_attacker))//if it needs a link to circulate, we check that an activated link exists and that a linked module that need this ressource
 		{
@@ -733,15 +703,21 @@ bool Module::ConsummeFluxor(Fluxor* fluxor)
 	{
 		if ((m_flux < m_flux_max || m_flux_max == 0) && fluxor->m_flux > 0)
 		{
-			if (fluxor->m_transfert_buffer_memory == 0)
+			if (fluxor->m_transfer_buffer == 0)
 			{
-				fluxor->m_transfert_buffer_memory = m_flux_max - m_flux > fluxor->m_flux ? fluxor->m_flux : m_flux_max - m_flux;
+				fluxor->m_transfer_buffer = m_flux_max > 0 ? (m_flux_max - m_flux > fluxor->m_flux ? fluxor->m_flux : m_flux_max - m_flux) : fluxor->m_flux;
+				fluxor->m_transfert_buffer_memory = fluxor->m_transfer_buffer;
+				fluxor->m_module_interaction = Fluxor_Consumption;
 			}
+
+			//instant consumption or consumption over time?
+			int consumption = m_flux_transfer_delay == 0 ? fluxor->m_flux : 1;
 
 			if (m_flux_consumption_clock.getElapsedTime().asSeconds() > m_flux_transfer_delay)
 			{
-				m_flux++;
-				fluxor->m_flux--;
+				m_flux += consumption;
+				//fluxor->m_flux--;
+				fluxor->m_transfer_buffer -= consumption;
 				m_flux_waste_clock.restart();
 
 				//feedback
@@ -761,15 +737,17 @@ bool Module::ConsummeFluxor(Fluxor* fluxor)
 			}
 			
 			//consumption finished?
-			if (m_flux == m_flux_max || fluxor->m_flux == 0)
+			if (m_flux == m_flux_max || fluxor->m_transfer_buffer == 0)
 			{
+				fluxor->m_module_interaction = Fluxor_OtherInteractions;
+
 				//feedback
 				if (USE_FEEDBACK_CONSUMPTION)
 				{
 					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 16, sf::Color::Cyan, getPosition(), m_team);
 					text_feedback->m_alliance = m_alliance;
 					ostringstream ss;
-					ss << "-" << fluxor->m_transfert_buffer_memory;
+					ss << "+" << fluxor->m_transfert_buffer_memory;
 					text_feedback->setString(ss.str());
 					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_FLUXOR_DISTANCE_NOT_FADED, TEXT_POP_FLUXOR_DISTANCE_FADE_OUT, TEXT_POP_FLUXOR_TOTAL_TIME, NULL, sf::Vector2f(0, m_size.y / 2 - TEXT_POP_FLUXOR_OFFSET_Y));
 					pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - TEXT_POP_FLUXOR_OFFSET_Y));
@@ -777,7 +755,10 @@ bool Module::ConsummeFluxor(Fluxor* fluxor)
 					(*CurrentGame).addToFeedbacks(pop_feedback);
 				}
 
+				fluxor->m_transfer_buffer = 0;
 				fluxor->m_transfert_buffer_memory = 0;
+
+				return false;
 			}
 			else
 			{
@@ -795,7 +776,7 @@ void Module::CondensateFluxor(Fluxor* fluxor)
 {
 	if (fluxor)
 	{
-		if (m_flux == m_flux_max)
+		if (m_flux == m_flux_max || m_flux_max == 0)
 		{
 			if (!fluxor->m_condensed_to_circulate)
 			{
@@ -874,10 +855,10 @@ bool Module::AmplifyFluxor(Fluxor* fluxor)
 {
 	if (fluxor && fluxor->m_can_be_refilled_by_modules)
 	{
-		if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
+		if ((m_flux == m_flux_max || m_flux_max == 0) && ((m_isRefillingFlux && fluxor->m_flux_max > 0) || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
 		{
 			//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled. Unless it can attack something.
-			if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill || fluxor->m_flux_attacker)
+			if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill)
 			{
 				if (fluxor->m_transfer_buffer == 0)
 				{
@@ -916,8 +897,8 @@ bool Module::AmplifyFluxor(Fluxor* fluxor)
 							ss << "+" << m_add_flux;
 						}
 						text_feedback->setString(ss.str());
-						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, m_size.y / 2 - TEXT_POP_FLUXOR_OFFSET_Y));
-						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - TEXT_POP_FLUXOR_OFFSET_Y));
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_LONG_TOTAL_TIME, NULL, sf::Vector2f(0, m_size.y / 2 - TEXT_POP_OFFSET_Y));
+						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y - TEXT_POP_OFFSET_Y));
 						delete text_feedback;
 						(*CurrentGame).addToFeedbacks(pop_feedback);
 					}
@@ -957,10 +938,6 @@ void Module::AttackModule(Fluxor* fluxor)
 				{
 					damage = fluxor->m_flux > m_flux ? m_flux + 1 - shield_up : fluxor->m_flux;
 				}
-
-				//modules under construction behave like modules with 0 hp (instantly killed)
-				m_flux = m_under_construction ? 0 : m_flux;
-				damage = m_under_construction ? 1 : damage;
 
 				//kill? (shields cannot get one-shotted)
 				if (!shield_up && damage > m_flux)
@@ -1066,7 +1043,10 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				//end of condensed effect?
 				DecondensateFluxor(fluxor);
 
-				if (!ConsummeFluxor(fluxor))
+				if (fluxor->m_module_interaction != Fluxor_OtherInteractions)
+					ConsummeFluxor(fluxor);
+
+				if (fluxor->m_module_interaction != Fluxor_Consumption)
 				{
 					CondensateFluxor(fluxor);
 					AmplifyFluxor(fluxor);
@@ -1076,10 +1056,12 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 				{
 					if (fluxor->m_flux > 0)//otherwise there is no point, he's a dead fluxor anyway
 					{
+						fluxor->m_module_interaction = Fluxor_NewInteraction;
+
 						UpdateFluxorDirection(fluxor);
 
 						//accelerator
-						if (m_add_speed != 0 && m_flux == m_flux_max)
+						if (m_add_speed != 0 && (m_flux == m_flux_max || m_flux_max == 0))
 						{
 							fluxor->AddSpeed(&fluxor->m_speed, (float)m_add_speed);
 							fluxor->NormalizeSpeed(&fluxor->m_speed, FLUXOR_GUIDED_MAX_SPEED);
@@ -1435,7 +1417,7 @@ void Module::CheckCircuit()
 			break;
 		}
 
-		if (module_child->m_flux < module_child->m_flux_max)
+		if (module_child->m_flux < module_child->m_flux_max || module_child->m_flux_max == 0)
 		{
 			m_has_child_to_refill = true;
 

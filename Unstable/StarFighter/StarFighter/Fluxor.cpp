@@ -28,6 +28,8 @@ void Fluxor::Initialize()
 
 	m_has_spawn_bounds = false;
 
+	m_module_interaction = Fluxor_NewInteraction;
+
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).m_fonts[Font_Arial]), 20, sf::Color::White, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + FLUXOR_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = m_alliance;
@@ -105,7 +107,7 @@ Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team) : FluxEntity()
 		case FluxorType_Blue:
 		{
 			m_flux = FLUXOR_FLUX_VALUE;
-			m_flux_max = FLUXOR_FLUX_VALUE;
+			m_flux_max = 0;// FLUXOR_FLUX_VALUE;
 			m_consummable_by_modules = true;
 			m_can_be_refilled_by_modules = true;
 			m_needs_link_to_circulate = true;

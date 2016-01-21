@@ -8,6 +8,13 @@
 #include "SFTextPop.h"
 #include "FluxEntity.h"
 
+enum FluxorInteractionWithModule
+{
+	Fluxor_NewInteraction,
+	Fluxor_Consumption,
+	Fluxor_OtherInteractions,
+};
+
 class Fluxor : public FluxEntity
 {
 public :
@@ -62,6 +69,9 @@ public :
 	void WastingFlux();
 	void AttackFluxor(Fluxor* fluxor);
 	void BringStealerBack();
+
+	//flags
+	FluxorInteractionWithModule m_module_interaction;
 };
 
 #endif // FLUXOR_H_INCLUDED
