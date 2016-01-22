@@ -74,7 +74,7 @@ void Ship::UpdatePlayerStats()
 			if ((*CurrentGame).m_module_grid[i][j])
 			{
 				Module* module = (Module*)(*CurrentGame).m_module_grid[i][j];
-				if (module->m_team == this->m_team && !module->m_under_construction && module->m_flux == module->m_flux_max && module->m_upgrade_player_stats)
+				if (module->m_team == this->m_team && !module->m_under_construction && ((module->m_flux_max > 0 && module->m_flux == module->m_flux_max) || (module->m_flux_max == 0 && module->m_flux > 0)) && module->m_upgrade_player_stats)
 				{
 					m_upgrade_level++;
 					if (m_upgrade_level == SHIP_MAX_UPGRADE_LEVEL)

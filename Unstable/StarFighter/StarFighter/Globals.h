@@ -111,7 +111,7 @@ enum TeamAlliances
 
 //PLAYER
 #define SHIP_MAX_FLUX								100
-#define SHIP_MAX_FLUX_BONUS_PER_LEVEL				100
+#define SHIP_MAX_FLUX_BONUS_PER_LEVEL				50
 #define SHIP_MAX_SPEED_BONUS_PER_LEVEL				100
 #define SHIP_MAX_UPGRADE_LEVEL						9
 

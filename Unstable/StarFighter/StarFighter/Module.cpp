@@ -521,7 +521,7 @@ void Module::update(sf::Time deltaTime)
 	if (m_glow)
 	{
 		//m_glow->m_visible = m_flux == m_flux_max && !m_under_construction;
-		m_glow->m_visible = m_shield && m_shield->m_visible;
+		m_glow->m_visible = m_flux > 0 && !m_under_construction;
 	}
 
 	if (m_team_marker)
