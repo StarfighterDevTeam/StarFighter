@@ -134,6 +134,7 @@ enum TeamAlliances
 #define SELLING_RATIO_OF_FLUX_RECOVERY				0.5f
 
 //FLUXOR
+#define FLUXOR_FLUX_VALUE							10
 #define	GREEN_FLUXOR_VALUE							5
 #define FLUXOR_FLUX_DISPLAY_OFFSET_Y				8
 
@@ -149,7 +150,7 @@ enum TeamAlliances
 #define FLUXOR_MAX_POPULATION						10
 #define FLUXOR_RESPAWN_MIN_TIME						5.f
 #define FLUXOR_RESPAWN_MAX_TIME						30.f
-#define FLUXOR_WASTE_DELAY							1.0f
+#define FLUXOR_WASTE_DELAY							0.5f
 #define FLUXOR_ATTACK_DELAY							0.f
 
 //MODULE

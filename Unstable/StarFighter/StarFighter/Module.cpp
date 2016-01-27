@@ -256,7 +256,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		{
 			m_flux_max_under_construction = 30;
 			m_flux_max_after_construction = 30;
-			m_add_flux = 1;
+			m_add_flux = 10;
 			break;
 		}
 		case ModuleType_Accelerator:
@@ -274,9 +274,6 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			break;
 		}
 	}
-
-	//v6 new paradigm
-	m_flux_max = m_flux_max_after_construction;
 }
 
 Module* Module::Clone()
@@ -493,12 +490,11 @@ void Module::FinishConstruction()
 	}
 		
 	m_under_construction = false;
-	//m_flux = m_flux_max_after_construction;
+	m_flux = 0;
 	m_flux_max = m_flux_max_after_construction;
 	m_flux_autogeneration_clock.restart();
 	m_fluxor_spawn_clock.restart();
 	m_flux_consumption_clock.restart();
-	m_transfer_buffer = 0;
 
 	//wipe out unguided Fluxors that are found on the cell being built on
 	(*CurrentGame).WipeAllObjectsWithGridIndex(FluxorUnguidedObject, m_curGridIndex);
@@ -519,7 +515,7 @@ void Module::update(sf::Time deltaTime)
 		if (!m_is_sold)
 		{
 			//construction finished
-			if (m_transfer_buffer == m_flux_max)
+			if (m_flux == m_flux_max_under_construction)
 			{
 				FinishConstruction();
 			}
@@ -527,7 +523,6 @@ void Module::update(sf::Time deltaTime)
 			else if (m_construction_clock.getElapsedTime().asSeconds() > (1.f / m_construction_flux_per_second))
 			{
 				m_flux++;
-				m_transfer_buffer++;
 				m_construction_clock.restart();
 			}
 		}
@@ -547,6 +542,7 @@ void Module::update(sf::Time deltaTime)
 			}
 		}
 	}
+	m_flux_max = m_under_construction ? m_flux_max_under_construction : m_flux_max_after_construction;
 
 	if (m_flux > m_flux_max && m_flux_max > 0)
 	{
@@ -604,7 +600,7 @@ void Module::update(sf::Time deltaTime)
 
 void Module::UpdateShield()
 {
-	if (m_shield_range > 0 && !m_under_construction && !m_shield)
+	if (m_shield_range > 0 && m_flux == m_flux_max && !m_under_construction && !m_shield)
 	{
 		m_shield = new GameObject(getPosition(), sf::Vector2f(0, 0), "Assets/2D/shield.png", sf::Vector2f(384, 384));
 		sf::Color color = (*CurrentGame).m_team_colors[m_team];
@@ -614,7 +610,7 @@ void Module::UpdateShield()
 	}
 	else if (m_shield)
 	{
-		m_shield->m_visible = m_flux > 0;
+		m_shield->m_visible = m_flux == m_flux_max;
 	}
 }
 
@@ -878,7 +874,7 @@ bool Module::AmplifyFluxor(Fluxor* fluxor)
 {
 	if (fluxor && fluxor->m_can_be_refilled_by_modules)
 	{
-		if (m_flux == m_flux_max && ((m_isRefillingFlux && fluxor->m_flux_max > 0) || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
+		if (m_flux == m_flux_max && (m_isRefillingFlux || m_add_flux > 0) && (fluxor->m_can_be_refilled_by_modules || !fluxor->m_consummable_by_modules))
 		{
 			//if it needs a link to circulate and no activated link exists, amplyfing is pointless. Also if no child needs to be refilled. Unless it can attack something.
 			if (!fluxor->m_needs_link_to_circulate || m_has_child_to_refill || fluxor->m_flux_attacker)
@@ -963,11 +959,11 @@ void Module::AttackModule(Fluxor* fluxor)
 				}
 
 				//modules under construction behave like modules with 0 hp (instantly killed)
-				//m_flux = m_under_construction ? 1 : m_flux;
-				//damage = m_under_construction ? 1 : damage;
+				m_flux = m_under_construction ? 0 : m_flux;
+				damage = m_under_construction ? 1 : damage;
 
 				//kill? (shields cannot get one-shotted)
-				if (!shield_up && damage >= m_flux)
+				if (!shield_up && damage > m_flux)
 				{
 					this->m_GarbageMe = true;
 					this->m_visible = false;
