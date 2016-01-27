@@ -104,8 +104,8 @@ Fluxor::Fluxor(FluxorType FluxorType, PlayerTeams team) : FluxEntity()
 		}
 		case FluxorType_Blue:
 		{
-			m_flux = FLUXOR_FLUX_VALUE;
-			m_flux_max = FLUXOR_FLUX_VALUE;
+			m_flux = 1;
+			m_flux_max = 0;
 			m_consummable_by_modules = true;
 			m_can_be_refilled_by_modules = true;
 			m_needs_link_to_circulate = true;
