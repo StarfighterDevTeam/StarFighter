@@ -470,6 +470,10 @@ void Game::colisionChecksV2(Time deltaTime)
 		{
 			(*it1)->CheckCondensation();
 		}
+		else
+		{
+			(*it1)->RestartWasteClock();
+		}
 
 		//Fluxors eating each others
 		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[FluxorGuidedObject].begin(); it2 != sceneGameObjectsTyped[FluxorGuidedObject].end(); it2++)

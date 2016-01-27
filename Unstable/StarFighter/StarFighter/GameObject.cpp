@@ -687,3 +687,8 @@ void GameObject::CheckCondensation()
 {
 	//see override function in class Fluxor
 }
+
+void GameObject::RestartWasteClock()
+{
+	//see override function in class Fluxor
+}

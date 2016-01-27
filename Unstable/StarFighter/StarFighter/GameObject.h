@@ -144,6 +144,7 @@ public:
 	virtual void GetFluxor(GameObject* object);
 	virtual void GetModule(GameObject* object);
 	virtual void CheckCondensation();
+	virtual void RestartWasteClock();
 	GameObject* m_target;
 	float m_life_time;
 	sf::Clock m_life_clock;
