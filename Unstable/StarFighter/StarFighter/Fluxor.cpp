@@ -555,11 +555,6 @@ void Fluxor::CheckCondensation()
 	}
 }
 
-void Fluxor::RestartWasteClock()
-{
-	m_flux_waste_clock.restart();
-}
-
 void Fluxor::CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing)
 {
 	GameObject::CollisionResponse(bumper, collision, bouncing);

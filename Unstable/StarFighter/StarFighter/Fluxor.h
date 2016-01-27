@@ -30,7 +30,6 @@ public :
 	static sf::Vector2f RandomizeSpeed();
 	void ChaosTurns();
 	void CollisionResponse(GameObject* bumper, CollisionSide collision, bool bouncing) override;
-	void RestartWasteClock() override;
 	
 	FluxorType m_FluxorType;
 	float m_turn_delay;

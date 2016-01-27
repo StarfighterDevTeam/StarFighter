@@ -105,11 +105,11 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			textureName = "Assets/2D/module_armory.png";
 			break;
 		}
-		//case ModuleType_Accumulator:
-		//{
-		//	textureName = "Assets/2D/module_accumulator.png";
-		//	break;
-		//}
+		case ModuleType_Accumulator:
+		{
+			textureName = "Assets/2D/module_accumulator.png";
+			break;
+		}
 		case ModuleType_Relay:
 		{
 			textureName = "Assets/2D/module_relay.png";
@@ -179,7 +179,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Generator:
 		{	 
 			m_flux_max_under_construction = 100;
-			m_flux_max_after_construction = 20;
+			m_flux_max_after_construction = 10;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
@@ -191,25 +191,25 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Armory:
 		{
 			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 10;
+			m_flux_max_after_construction = 20;
 			m_upgrade_player_stats = true;
 			break;
 		}
-		//case ModuleType_Accumulator:
-		//{
-		//	m_flux_max_under_construction = 40;
-		//	m_flux_max_after_construction = 1000;
-		//	m_wasting_flux = false;
-		//	m_flux_waste = 1;
-		//	m_flux_waste_delay = MODULE_WASTE_DELAY;
-		//	//m_isAutogeneratingFlux = true;
-		//	//m_flux_autogeneration_time = 1.f;
-		//	break;
-		//}
+		case ModuleType_Accumulator:
+		{
+			m_flux_max_under_construction = 40;
+			m_flux_max_after_construction = 1000;
+			m_wasting_flux = false;
+			m_flux_waste = 1;
+			m_flux_waste_delay = MODULE_WASTE_DELAY;
+			//m_isAutogeneratingFlux = true;
+			//m_flux_autogeneration_time = 1.f;
+			break;
+		}
 		case ModuleType_Relay:
 		{
 			m_flux_max_under_construction = 5;
-			m_flux_max_after_construction = 20;
+			m_flux_max_after_construction = 5;
 			m_isRefillingFlux = true;
 			m_construction_flux_per_second = 1.0f * MODULE_FLUX_CONSTRUCTION_PER_SECOND / 2;
 			break;
@@ -255,21 +255,21 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Amplifier:
 		{
 			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 10;
+			m_flux_max_after_construction = 30;
 			m_add_flux = 1;
 			break;
 		}
 		case ModuleType_Accelerator:
 		{
-			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 20;
+			m_flux_max_under_construction = 15;
+			m_flux_max_after_construction = 15;
 			m_add_speed = 100;
 			break;
 		}
 		case ModuleType_Condensator:
 		{
 			m_flux_max_under_construction = 50;
-			m_flux_max_after_construction = 30;
+			m_flux_max_after_construction = 50;
 			m_isCondensatingFluxor = true;
 			break;
 		}
@@ -809,7 +809,6 @@ void Module::CondensateFluxor(Fluxor* fluxor)
 					fluxor->setColor(sf::Color(255, 255, 255, 255));
 
 					fluxor->m_wasting_flux = true;
-					fluxor->m_flux_waste_clock.restart();
 
 					//feedback
 					if (USE_FEEDBACK_CONDENSATION)
