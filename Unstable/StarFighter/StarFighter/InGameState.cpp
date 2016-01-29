@@ -150,19 +150,19 @@ void InGameState::Initialize(Player player)
 	}
 
 	//Spawning Fluxors
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H / 2, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
-	m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2, H / 2, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
-	//main central zone
-	for (int i = 0; i < NBVAL_PlayerTeams; i++)
-	{
-		//spawning a new lot of Fluxors based on the number of players
-		if ((*CurrentGame).playerShips[i] && i != PlayerNeutral)
-		{
-			m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
-		}
-	}
+	//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
+	//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H / 2, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
+	//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
+	//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2, H / 2, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
+	////main central zone
+	//for (int i = 0; i < NBVAL_PlayerTeams; i++)
+	//{
+	//	//spawning a new lot of Fluxors based on the number of players
+	//	if ((*CurrentGame).playerShips[i] && i != PlayerNeutral)
+	//	{
+	//		m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(W / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, H / 2 - CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET, 2 * CENTRAL_FLUXOR_ZONE_TILE_OFFSET), FLUXOR_MAX_POPULATION / 3));
+	//	}
+	//}
 }
 
 void InGameState::Update(sf::Time deltaTime)

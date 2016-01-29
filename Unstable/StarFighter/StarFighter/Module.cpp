@@ -179,7 +179,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Generator:
 		{	 
 			m_flux_max_under_construction = 100;
-			m_flux_max_after_construction = 20;
+			m_flux_max_after_construction = 10;
 			m_isAutogeneratingFlux = true;
 			m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
@@ -191,7 +191,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Armory:
 		{
 			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 10;
+			m_flux_max_after_construction = 5;
 			m_upgrade_player_stats = true;
 			break;
 		}
@@ -209,7 +209,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Relay:
 		{
 			m_flux_max_under_construction = 5;
-			m_flux_max_after_construction = 5;
+			m_flux_max_after_construction = 10;
 			m_isRefillingFlux = true;
 			m_construction_flux_per_second = 1.0f * MODULE_FLUX_CONSTRUCTION_PER_SECOND / 2;
 			break;
@@ -237,7 +237,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Shield:
 		{
 			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 30;
+			m_flux_max_after_construction = 50;
 			m_shield_range = 1;
 			break;
 		}
@@ -255,7 +255,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Amplifier:
 		{
 			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 10;
+			m_flux_max_after_construction = 5;
 			m_add_flux = 1;
 			break;
 		}

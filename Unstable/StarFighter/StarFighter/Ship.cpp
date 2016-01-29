@@ -24,13 +24,14 @@ void Ship::Init()
 	m_flux_transfer_time = 0.1f;
 	m_flux_autogeneration_time = 1.f;
 	m_upgrade_level = 0;
+	m_isAutogeneratingFlux = true;
+	m_flux_autogeneration_time = 0.1f;
 
 	//Flux display
-	m_flux_text = new SFText((*CurrentGame).m_fonts[Font_Arial], 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
+	m_flux_text = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y), m_team);
 	m_flux_text->m_alliance = m_alliance;
 	
 	(*CurrentGame).addToFeedbacks(m_flux_text);
-	
 	
 	//AddFluxGauge(GaugeStyle_Green, sf::Vector2f(0, m_size.y / 2 + PLAYER_FLUX_DISPLAY_OFFSET_Y));
 	//(*CurrentGame).addToFeedbacks(m_flux_gauge);
@@ -134,7 +135,9 @@ void Ship::update(sf::Time deltaTime)
 	if (m_flux_text)
 	{
 		ostringstream ss;
-		ss << m_flux << "/" << m_flux_max;
+		ss << m_flux;
+		if (m_flux_max > 0)
+			ss << "/" << m_flux_max;
 		m_flux_text->setString(ss.str());
 		m_flux_text->setPosition(sf::Vector2f(getPosition().x - m_flux_text->getGlobalBounds().width / 2, getPosition().y + m_size.y / 2 + PLAYER_FLUX_TEXT_OFFSET_Y));
 

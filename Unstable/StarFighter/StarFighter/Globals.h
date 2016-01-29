@@ -110,9 +110,9 @@ enum TeamAlliances
 #define BUILD_GAUGE_OUTLINE_COLOR_A					255
 
 //PLAYER
-#define SHIP_MAX_FLUX								100
-#define SHIP_MAX_FLUX_BONUS_PER_LEVEL				100
-#define SHIP_MAX_SPEED_BONUS_PER_LEVEL				100
+#define SHIP_MAX_FLUX								0
+#define SHIP_MAX_FLUX_BONUS_PER_LEVEL				0
+#define SHIP_MAX_SPEED_BONUS_PER_LEVEL				50
 #define SHIP_MAX_UPGRADE_LEVEL						9
 
 #define SHIP_START_X                990

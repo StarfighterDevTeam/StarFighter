@@ -122,16 +122,19 @@ bool FluxEntity::AutogenerateFlux()
 				m_flux++;
 				m_flux_autogeneration_clock.restart();
 
-				//feedback
-				if (USE_FEEDBACK_AUTOGENERATION)
+				if (m_flux_max > 0)
 				{
-					SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
-					text_feedback->m_alliance = m_alliance;
-					text_feedback->setString("+1");
-					SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
-					pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
-					delete text_feedback;
-					(*CurrentGame).addToFeedbacks(pop_feedback);
+					//feedback
+					if (USE_FEEDBACK_AUTOGENERATION)
+					{
+						SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Cyan, getPosition(), m_team);
+						text_feedback->m_alliance = m_alliance;
+						text_feedback->setString("+1");
+						SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+						pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+						delete text_feedback;
+						(*CurrentGame).addToFeedbacks(pop_feedback);
+					}
 				}
 
 				return true;
