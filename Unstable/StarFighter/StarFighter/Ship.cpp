@@ -275,25 +275,27 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	//idle decceleration
 	if (!movingX)
 	{
-		m_speed.x -= (m_speed.x) * deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
+		//m_speed.x -= (m_speed.x) * deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
 
-		if (abs(m_speed.x) < SHIP_MIN_SPEED)
+		//if (abs(m_speed.x) < SHIP_MIN_SPEED)
 			m_speed.x = 0;
 	}
 
 	if (!movingY)
 	{
-		m_speed.y -= (m_speed.y)*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
+		//m_speed.y -= (m_speed.y)*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
 
-		if (abs(m_speed.y) < SHIP_MIN_SPEED)
+		//if (abs(m_speed.y) < SHIP_MIN_SPEED)
 			m_speed.y = 0;
 	}
 }
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
+	//m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
+	//m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
+	m_speed.x = inputs_direction.x * m_speed_max;
+	m_speed.y = inputs_direction.y * m_speed_max;
 }
 
 void Ship::MaxSpeedConstraints()
