@@ -100,46 +100,16 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 				textureName = "Assets/2D/module_generator_P1.png";
 			break;
 		}
-		case ModuleType_Armory:
-		{
-			textureName = "Assets/2D/module_armory.png";
-			break;
-		}
-		//case ModuleType_Accumulator:
-		//{
-		//	textureName = "Assets/2D/module_accumulator.png";
-		//	break;
-		//}
 		case ModuleType_Relay:
 		{
 			textureName = "Assets/2D/module_relay.png";
 			break;
 		}
-		//case ModuleType_Factory:
-		//{
-		//	textureName = "Assets/2D/module_factory.png";
-		//	break;
-		//}
-		//case ModuleType_Factory_Up:
-		//{
-		//	textureName = "Assets/2D/module_factory_up.png";
-		//	break;
-		//}
 		case ModuleType_Shield:
 		{
 			textureName = "Assets/2D/module_shield.png";
 			break;
 		}
-		//case ModuleType_Turret:
-		//{
-		//	textureName = "Assets/2D/module_turret.png";
-		//	break;
-		//}
-		//case ModuleType_Barrier:
-		//{
-		//	textureName = "Assets/2D/module_barrier.png";
-		//	break;
-		//}
 		case ModuleType_Amplifier:
 		{
 			textureName = "Assets/2D/module_amplifier.png";
@@ -179,33 +149,15 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Generator:
 		{	 
 			m_flux_max_under_construction = 100;
-			m_flux_max_after_construction = 10;
-			m_isAutogeneratingFlux = true;
-			m_flux_autogeneration_time = 0.5f;
+			m_flux_max_after_construction = 30;
+			//m_isAutogeneratingFlux = true;
+			//m_flux_autogeneration_time = 0.5f;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
 			m_fluxor_generation_time = 3.f;// 0.5f;
 			m_fluxor_generation_cost = 0;// FLUXOR_FLUX_VALUE;
 			break;
 		}
-		case ModuleType_Armory:
-		{
-			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 5;
-			m_upgrade_player_stats = true;
-			break;
-		}
-		//case ModuleType_Accumulator:
-		//{
-		//	m_flux_max_under_construction = 40;
-		//	m_flux_max_after_construction = 1000;
-		//	m_wasting_flux = false;
-		//	m_flux_waste = 1;
-		//	m_flux_waste_delay = MODULE_WASTE_DELAY;
-		//	//m_isAutogeneratingFlux = true;
-		//	//m_flux_autogeneration_time = 1.f;
-		//	break;
-		//}
 		case ModuleType_Relay:
 		{
 			m_flux_max_under_construction = 5;
@@ -214,26 +166,6 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_construction_flux_per_second = 1.0f * MODULE_FLUX_CONSTRUCTION_PER_SECOND / 2;
 			break;
 		}
-		//case ModuleType_Factory:
-		//{
-		//	m_flux_max_under_construction = 15;
-		//	m_flux_max_after_construction = 10;
-		//	m_isGeneratingFluxor = true;
-		//	m_fluxor_generated_type = FluxorType_Red;
-		//	m_fluxor_generation_time = 3.f;
-		//	m_fluxor_generation_cost = m_flux_max_after_construction;
-		//	break;
-		//}
-		//case ModuleType_Factory_Up:
-		//{
-		//	m_flux_max_under_construction = 30;
-		//	m_flux_max_after_construction = 20;
-		//	m_isGeneratingFluxor = true;
-		//	m_fluxor_generated_type = FluxorType_Purple;
-		//	m_fluxor_generation_time = 3.f;
-		//	m_fluxor_generation_cost = m_flux_max_after_construction;
-		//	break;
-		//}
 		case ModuleType_Shield:
 		{
 			m_flux_max_under_construction = 30;
@@ -241,17 +173,6 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_shield_range = 1;
 			break;
 		}
-		//case ModuleType_Turret:
-		//{
-		//	m_flux_max_under_construction = 30;
-		//	m_flux_max_after_construction = 50;
-		//	m_turret_range = 2;
-		//	m_isGeneratingFluxor = true;
-		//	m_fluxor_generated_type = FluxorType_Black;
-		//	m_fluxor_generation_time = 2.f;
-		//	m_fluxor_generation_cost = 5;
-		//	break;
-		//}
 		case ModuleType_Amplifier:
 		{
 			m_flux_max_under_construction = 30;

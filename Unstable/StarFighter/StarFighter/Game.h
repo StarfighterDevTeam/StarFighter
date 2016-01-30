@@ -34,19 +34,12 @@ enum FluxorType
 
 enum ModuleType
 {
-	ModuleType_Generator,
-	ModuleType_Accelerator,
 	ModuleType_Relay,
-	ModuleType_Condensator,
+	ModuleType_Accelerator,
 	ModuleType_Amplifier,
-	//ModuleType_Factory,
-	//ModuleType_Factory_Up,
 	ModuleType_Shield,
-	//ModuleType_Accumulator,
-	//ModuleType_Barrier,
-	ModuleType_Armory,
-	
-	//ModuleType_Turret,
+	ModuleType_Condensator,
+	ModuleType_Generator,
 	NBVAL_ModuleType,
 };
 
