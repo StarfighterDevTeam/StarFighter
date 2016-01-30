@@ -56,6 +56,7 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 	if (currentAnimation)
 		delete currentAnimation;
 	this->currentAnimation = anim;
+	anim = NULL;
 	this->play(*currentAnimation, keep_frame_index);
 	this->m_currentAnimationIndex = animation;
 }
