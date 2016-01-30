@@ -212,24 +212,25 @@ void Ship::update(sf::Time deltaTime)
 	}
 	if (InputGuy::isRefillingFlux(m_controllerType))
 	{
-		//fedback
-		if (m_flux != m_flux_max)
+		if (m_flux_max > 0)
 		{
-			SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
-			text_feedback->m_alliance = m_alliance;
-			SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
-			ostringstream ss;
-			ss << "+" << m_flux_max - m_flux << " (Debug)";
-			pop_feedback->setString(ss.str());
-			delete text_feedback;
-			(*CurrentGame).addToFeedbacks(pop_feedback);
-		}
-		
-		m_flux = m_flux_max;
-		if ((*CurrentGame).playerShips[1])
-			(*CurrentGame).playerShips[1]->m_flux = (*CurrentGame).playerShips[1]->m_flux_max;
+			//fedback
+			if (m_flux != m_flux_max)
+			{
+				SFText* text_feedback = new SFText((*CurrentGame).m_fonts[Font_Arial], 24, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y - m_size.y / 2), m_team);
+				text_feedback->m_alliance = m_alliance;
+				SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, this, sf::Vector2f(0, -TEXT_POP_OFFSET_Y));
+				ostringstream ss;
+				ss << "+" << m_flux_max - m_flux << " (Debug)";
+				pop_feedback->setString(ss.str());
+				delete text_feedback;
+				(*CurrentGame).addToFeedbacks(pop_feedback);
+			}
 
-		//Module::DebugRefillingModuleFlux(m_curGridIndex);
+			m_flux = m_flux_max;
+			if ((*CurrentGame).playerShips[1])
+				(*CurrentGame).playerShips[1]->m_flux = (*CurrentGame).playerShips[1]->m_flux_max;
+		}
 	}
 	
 	//Inputs release
