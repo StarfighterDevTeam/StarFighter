@@ -53,6 +53,8 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 		}
 	}
 
+	if (currentAnimation)
+		delete currentAnimation;
 	this->currentAnimation = anim;
 	this->play(*currentAnimation, keep_frame_index);
 	this->m_currentAnimationIndex = animation;
@@ -78,6 +80,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 		}
 	}
 	
+	currentAnimation = NULL;
 	setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
 	m_speed = speed;
