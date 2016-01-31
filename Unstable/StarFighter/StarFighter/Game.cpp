@@ -110,8 +110,11 @@ void Game::init(RenderWindow* window)
 		for (int j = 0; j < GRID_HEIGHT; j++)
 		{
 			m_module_grid[i][j] = NULL;
+			m_flux_source_grid[i][j] = NULL;
 		}
 	}
+
+	m_flux_source = NULL;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -835,7 +838,7 @@ GameObject* Game::GetClosestObject(const sf::Vector2f position, GameObjectType t
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->m_isOnScene && !(*it)->m_ghost && (*it)->m_visible)
+		if (!(*it)->m_ghost && (*it)->m_visible)
 		{
 			const float a = position.x - (*it)->getPosition().x;
 			const float b = position.y - (*it)->getPosition().y;

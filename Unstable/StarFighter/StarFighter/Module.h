@@ -49,6 +49,7 @@ public :
 	void GetFluxor(GameObject* object) override;
 	void SetDirectionAutomatically();
 	bool AutogenerateFlux() override;
+	bool m_needs_flux_source;
 
 	ModuleType m_moduleType;
 	unsigned int m_flux_max_after_construction;

@@ -57,10 +57,12 @@ enum TeamAlliances
 #define GRID_WIDTH									15
 #define GRID_HEIGHT									15
 #define TILE_SIZE									128
-#define DEFAULT_TILE_START							5-1
-#define DEFAULT_TILE_GENERATOR						4-1
+#define DEFAULT_TILE_START							4
+#define DEFAULT_TILE_GENERATOR						3
 #define CENTRAL_FLUXOR_ZONE_TILE_OFFSET				5
 #define GRID_CELLS_FOR_MODULE_LINK_ACTIVATION		1
+#define MINIMUM_TILES_FROM_FLUX_SOURCE				3
+#define FLUX_SOURCES_NUMBER							2
 #define USE_SMART_ARROWS							true
 
 //HUD

@@ -29,6 +29,7 @@ enum CollisionSide
 enum LayerType {
 	BackgroundLayer,
 	FakeGridLayer,
+	FluxSourceLayer,
 	GridFeedbackLayer,
 	ModuleLayer,
 	ShieldLayer,
@@ -47,6 +48,7 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
+	FluxSourceObject,
 	ShieldObject,
 	ModuleObject,
 	FluxorUnguidedObject,

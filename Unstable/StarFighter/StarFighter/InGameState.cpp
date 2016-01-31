@@ -18,6 +18,9 @@ void InGameState::Initialize(Player player)
 	GameObject* tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/tile.png", sf::Vector2f(tile_width, tile_height), sf::Vector2f(tile_width / 2, tile_height / 2), 1, 2);
 	(*CurrentGame).addToScene(tile, FakeGridLayer, BackgroundObject);
 
+	//flux source data
+	(*CurrentGame).m_flux_source = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/tile_flux.png", sf::Vector2f(tile_width, tile_height), sf::Vector2f(tile_width / 2, tile_height / 2), 1, 2);
+
 	//team alliance 1
 	vector<int> vect;
 	vect.push_back(PlayerBlue);
@@ -134,9 +137,45 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).view[v].setCenter((*CurrentGame).playerShips[v]->getPosition());
 	}
 
-	//HACK PROTO
-	Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true, true, LinkRight);
-	Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true, true, LinkLeft);
+	//Starting Positions
+	for (size_t p = 0; p < NBVAL_PlayerTeams; p++)
+	{
+		switch (p)
+		{
+			case PlayerBlue:
+			{
+				(*CurrentGame).m_startingGeneratorGridIndex[p] = sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR);
+				Module::CreateModule((*CurrentGame).m_startingGeneratorGridIndex[p], ModuleType_Generator, PlayerBlue, true, true, LinkRight, (*CurrentGame).m_modules[ModuleType_Generator]->m_flux_max_after_construction);
+				break;
+			}
+			case PlayerRed: 
+			{
+				(*CurrentGame).m_startingGeneratorGridIndex[p] = sf::Vector2u(GRID_WIDTH - 1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT - 1 - DEFAULT_TILE_GENERATOR);
+				Module::CreateModule((*CurrentGame).m_startingGeneratorGridIndex[p], ModuleType_Generator, PlayerRed, true, true, LinkLeft, (*CurrentGame).m_modules[ModuleType_Generator]->m_flux_max_after_construction);
+				break;
+			}
+			case PlayerBlue2: 
+			{
+				(*CurrentGame).m_startingGeneratorGridIndex[p] = sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT - 1 - DEFAULT_TILE_GENERATOR);
+				//Module::CreateModule((*CurrentGame).m_startingGeneratorGridIndex[p], ModuleType_Generator, PlayerBlue2, true, true, LinkRight, (*CurrentGame).m_modules[ModuleType_Generator]->m_flux_max_after_construction);
+				break;
+			}
+			case PlayerRed2:
+			{
+				(*CurrentGame).m_startingGeneratorGridIndex[p] = sf::Vector2u(GRID_WIDTH - 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR);
+				//Module::CreateModule((*CurrentGame).m_startingGeneratorGridIndex[p], ModuleType_Generator, PlayerRed2, true, true, LinkLeft, (*CurrentGame).m_modules[ModuleType_Generator]->m_flux_max_after_construction);
+				break;
+			}
+			case PlayerNeutral:
+			{
+				(*CurrentGame).m_startingGeneratorGridIndex[p] = sf::Vector2u((GRID_WIDTH - 1) / 2, (GRID_HEIGHT - 1) / 2);
+				break;
+			}
+		}
+	}
+	
+	//Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue, true, true, LinkRight);
+	//Module::CreateModule(sf::Vector2u(GRID_WIDTH -1 - DEFAULT_TILE_GENERATOR, GRID_HEIGHT -1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed, true, true, LinkLeft);
 	//Module::CreateModule(sf::Vector2u(DEFAULT_TILE_GENERATOR, GRID_HEIGHT + 1 - DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerBlue2, true, true, LinkRight);
 	//Module::CreateModule(sf::Vector2u(GRID_WIDTH + 1 - DEFAULT_TILE_GENERATOR, DEFAULT_TILE_GENERATOR), ModuleType_Generator, PlayerRed2, true, true, LinkLeft);
 
@@ -149,6 +188,23 @@ void InGameState::Initialize(Player player)
 		//}
 	}
 
+	//Flux sources
+	for (size_t p = 0; p < NBVAL_PlayerTeams; p++)
+	{
+		//default source
+		CreateFluxSource((*CurrentGame).m_startingGeneratorGridIndex[p], 0);
+		
+		//additional random sources
+		//if ((*CurrentGame).playerShips[p])
+		if (p != PlayerNeutral)
+		{
+			for (size_t i = 0; i < FLUX_SOURCES_NUMBER; i++)
+			{
+				CreateFluxSource((*CurrentGame).m_startingGeneratorGridIndex[p], MINIMUM_TILES_FROM_FLUX_SOURCE);
+			}
+		}
+	}
+	
 	//Spawning Fluxors
 	//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
 	//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, H / 2, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
@@ -316,4 +372,75 @@ void InGameState::CreateFluxGauges()
 			(*CurrentGame).m_flux_gauges[i] = flux_gauge;
 		}
 	}
+}
+
+bool InGameState::CreateFluxSource(sf::Vector2u origin, int dispersion)
+{
+	if ((*CurrentGame).m_flux_source)
+	{
+		sf::Vector2f position;
+		sf::Vector2i index;
+		bool position_is_valid = false;
+
+		unsigned int number_of_tries = 0;
+		while (!position_is_valid && number_of_tries < 100)
+		{
+			number_of_tries++;
+			if (number_of_tries == 50)
+			{
+				printf("<!> Can't find a valid position in InGameState::CreateFluxSource().\n", number_of_tries);
+				return false;
+			}
+			
+			position_is_valid = true;
+
+			index.x = origin.x + RandomizeIntBetweenValues(-dispersion, dispersion);
+			index.y = origin.y + RandomizeIntBetweenValues(-dispersion, dispersion);
+			//correction if out of map
+			if (index.x > GRID_WIDTH - 1)
+				index.x = GRID_WIDTH - 1;
+			if (index.x < 0)
+				index.x = 0;
+			if (index.y > GRID_HEIGHT - 1)
+				index.y = GRID_HEIGHT - 1;
+			if (index.y < 0)
+				index.y = 0;
+
+			position.x = index.x * TILE_SIZE + TILE_SIZE/2;
+			position.y = index.y * TILE_SIZE + TILE_SIZE/2;
+			
+			if (index.x > GRID_WIDTH - 1)
+				index.x = GRID_WIDTH - 1;
+			//checking if position is valid
+			if ((*CurrentGame).GetClosestObject(position, ModuleObject))
+			{
+				float distance_to_modules = GameObject::GetDistanceBetweenPositions(position, (*CurrentGame).GetClosestObject(position, ModuleObject)->getPosition());
+				if (distance_to_modules < TILE_SIZE * dispersion)
+				{
+					position_is_valid = false;
+					continue;
+				}
+			}
+
+			if ((*CurrentGame).GetClosestObject(position, FluxSourceObject))
+			{
+				float distance_to_other_sources = GameObject::GetDistanceBetweenPositions(position, (*CurrentGame).GetClosestObject(position, FluxSourceObject)->getPosition());
+				if (distance_to_other_sources < TILE_SIZE * MINIMUM_TILES_FROM_FLUX_SOURCE)
+				{
+					position_is_valid = false;
+					continue;
+				}
+			}
+		}
+
+		GameObject* source = (*CurrentGame).m_flux_source->Clone();
+		source->setPosition(position);
+		(*CurrentGame).addToScene(source, FluxSourceLayer, FluxSourceObject);
+		sf::Vector2u index_unsigned = (sf::Vector2u(index));
+		(*CurrentGame).m_flux_source_grid[index_unsigned.x][index_unsigned.y] = source;
+
+		return true;
+	}
+
+	return false;
 }

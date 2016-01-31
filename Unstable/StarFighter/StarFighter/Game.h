@@ -76,6 +76,8 @@ public:
 	sf::Vector2f scale_factor;
 
 	Ship* playerShips[NBVAL_PlayerTeams];
+
+	sf::Vector2u m_startingGeneratorGridIndex[NBVAL_PlayerTeams];
 	void ActivateWarningFeedback(PlayerTeams team);
 
 	sf::View view[1+USE_SPLIT_SCREEN];
@@ -108,6 +110,7 @@ public:
 
 	//FLUX SPECIFIC
 	GameObject* m_module_grid[GRID_WIDTH][GRID_HEIGHT];
+	GameObject* m_flux_source_grid[GRID_WIDTH][GRID_HEIGHT];
 	vector<SFRectangle*> sceneFreeTilesFeedbacks;
 	vector<GameObject*> sceneModuleObjects;
 	void WipeAllObjectsWithGridIndex(GameObjectType type, sf::Vector2u grid_index);
@@ -116,6 +119,7 @@ public:
 	Fluxor* m_fluxors[NBVAL_FluxorType];
 	Module* m_modules[NBVAL_ModuleType];
 	GameObject* m_module_arrows;
+	GameObject* m_flux_source;
 	GameObject* m_player_warnings;
 	sf::Color m_team_colors[NBVAL_PlayerTeams];
 	GameObject* m_team_markers[NBVAL_PlayerTeams];

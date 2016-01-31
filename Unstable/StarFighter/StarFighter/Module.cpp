@@ -33,6 +33,7 @@ void Module::Initialize()
 	m_shield = NULL;
 	m_flux_waste_delay = MODULE_WASTE_DELAY;
 	m_is_sold = false;
+	m_needs_flux_source = false;
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
@@ -152,6 +153,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_flux_max_after_construction = 30;
 			//m_isAutogeneratingFlux = true;
 			//m_flux_autogeneration_time = 0.5f;
+			m_needs_flux_source = true;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
 			m_fluxor_generation_time = 3.f;// 0.5f;
@@ -238,6 +240,12 @@ void Module::SetConstructionStatus(bool under_construction)
 
 Module* Module::CreateModule(sf::Vector2u grid_index, ModuleType moduleType, PlayerTeams team, bool construction_finished, bool force_direction, int forced_link_direction, unsigned flux)
 {
+	//construction of generator allowed here?
+	if ((*CurrentGame).m_modules[moduleType]->m_needs_flux_source && !(*CurrentGame).m_flux_source_grid[grid_index.x][grid_index.y])
+	{
+		return NULL;
+	}
+
 	//construction over own existing module?
 	if ((*CurrentGame).m_module_grid[grid_index.x][grid_index.y])
 	{
