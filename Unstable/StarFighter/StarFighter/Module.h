@@ -88,6 +88,11 @@ public :
 	void CondensateFluxor(Fluxor* fluxor);
 	void DecondensateFluxor(Fluxor* fluxor);
 
+	//Flux accumulation
+	bool m_isAccumulatingFluxor;
+	Fluxor* m_fluxor_accumulated;
+	bool AccumulateFluxor(Fluxor* fluxor);
+
 	//Flux transfer to Fluxors
 	bool ConsummeFluxor(Fluxor* fluxor);
 	bool AmplifyFluxor(Fluxor* fluxor);

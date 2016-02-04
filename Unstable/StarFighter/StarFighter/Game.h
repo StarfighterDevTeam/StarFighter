@@ -39,6 +39,7 @@ enum ModuleType
 	ModuleType_Amplifier,
 	ModuleType_Shield,
 	ModuleType_Condensator,
+	ModuleType_Accumulator,
 	ModuleType_Generator,
 	NBVAL_ModuleType,
 };

@@ -34,6 +34,8 @@ void Module::Initialize()
 	m_flux_waste_delay = MODULE_WASTE_DELAY;
 	m_is_sold = false;
 	m_needs_flux_source = false;
+	m_isAccumulatingFluxor = false;
+	m_fluxor_accumulated = NULL;
 
 	//Flux display
 	m_flux_text = new SFText(((*CurrentGame).font2), 20, sf::Color::Green, sf::Vector2f(getPosition().x, getPosition().y + m_size.y / 2 + MODULE_FLUX_DISPLAY_OFFSET_Y), m_team);
@@ -126,6 +128,11 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			textureName = "Assets/2D/module_condensator.png";
 			break;
 		}
+		case ModuleType_Accumulator:
+		{
+			textureName = "Assets/2D/module_accumulator.png";
+			break;
+		}
 		default:
 		{
 			textureName = "Assets/2D/module.png";
@@ -163,7 +170,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Relay:
 		{
 			m_flux_max_under_construction = 10;
-			m_flux_max_after_construction = 20;
+			m_flux_max_after_construction = 10;
 			m_isRefillingFlux = true;
 			m_construction_flux_per_second = 1.0f * MODULE_FLUX_CONSTRUCTION_PER_SECOND / 2;
 			break;
@@ -171,7 +178,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Shield:
 		{
 			m_flux_max_under_construction = 40;
-			m_flux_max_after_construction = 30;
+			m_flux_max_after_construction = 50;
 			m_shield_range = 1;
 			break;
 		}
@@ -194,6 +201,13 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_flux_max_under_construction = 50;
 			m_flux_max_after_construction = 10;
 			m_isCondensatingFluxor = true;
+			break;
+		}
+		case ModuleType_Accumulator:
+		{
+			m_flux_max_under_construction = 60;
+			m_flux_max_after_construction = 20;
+			m_isAccumulatingFluxor = true;
 			break;
 		}
 	}
@@ -780,6 +794,39 @@ void Module::DecondensateFluxor(Fluxor* fluxor)
 	}
 }
 
+bool Module::AccumulateFluxor(Fluxor* fluxor)
+{
+	if (fluxor && m_isAccumulatingFluxor)
+	{
+		if (!m_fluxor_accumulated)
+		{
+			//dock new fluxor
+			fluxor->m_docked = true;
+			m_fluxor_accumulated = fluxor;
+			return true;
+		}
+		else if (fluxor == m_fluxor_accumulated)
+		{
+			//keep docked
+			fluxor->m_docked = true;
+			return true;
+		}
+		else
+		{
+			//merging 2 fluxors into one
+			fluxor->m_flux += m_fluxor_accumulated->m_flux;
+
+			m_fluxor_accumulated->m_GarbageMe = true;
+			m_fluxor_accumulated->m_visible = false;
+			m_fluxor_accumulated = NULL;
+
+			return false;
+		}
+	}
+
+	return false;
+}
+
 bool Module::AutogenerateFlux()
 {
 	if (FluxEntity::AutogenerateFlux())
@@ -998,6 +1045,7 @@ void Module::ApplyModuleEffect(Fluxor* fluxor)
 			if (!m_under_construction)
 			{
 				//end of condensed effect?
+				AccumulateFluxor(fluxor);
 				DecondensateFluxor(fluxor);
 
 				if (!ConsummeFluxor(fluxor))
