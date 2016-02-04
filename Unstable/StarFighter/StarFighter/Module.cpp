@@ -162,16 +162,16 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		}
 		case ModuleType_Relay:
 		{
-			m_flux_max_under_construction = 5;
-			m_flux_max_after_construction = 10;
+			m_flux_max_under_construction = 10;
+			m_flux_max_after_construction = 20;
 			m_isRefillingFlux = true;
 			m_construction_flux_per_second = 1.0f * MODULE_FLUX_CONSTRUCTION_PER_SECOND / 2;
 			break;
 		}
 		case ModuleType_Shield:
 		{
-			m_flux_max_under_construction = 30;
-			m_flux_max_after_construction = 50;
+			m_flux_max_under_construction = 40;
+			m_flux_max_after_construction = 30;
 			m_shield_range = 1;
 			break;
 		}
@@ -185,14 +185,14 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 		case ModuleType_Accelerator:
 		{
 			m_flux_max_under_construction = 20;
-			m_flux_max_after_construction = 20;
+			m_flux_max_after_construction = 5;
 			m_add_speed = 100;
 			break;
 		}
 		case ModuleType_Condensator:
 		{
 			m_flux_max_under_construction = 50;
-			m_flux_max_after_construction = 30;
+			m_flux_max_after_construction = 10;
 			m_isCondensatingFluxor = true;
 			break;
 		}
