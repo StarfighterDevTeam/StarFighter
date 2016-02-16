@@ -23,6 +23,8 @@ Weapon::Weapon(Ammo* Ammunition)
 	face_target = false;
 	fire_pattern_return = false;
 	display_name = "Laser";
+	level = 1;
+	credits = 0;
 
 	this->ammunition = Ammunition;
 }
@@ -365,6 +367,9 @@ Weapon* Weapon::Clone()
 	weapon->textureName = this->textureName;
 	weapon->size = this->size;
 
+	weapon->level = this->level;
+	weapon->credits = this->credits;
+
 	return weapon;
 }
 
@@ -405,22 +410,23 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 	{
 		int random_type_of_bonus = -1;
 
-		//limitations per bonus
-		if (credits_ > cost_per_multishot && bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS)
+		//checking bonus limitations
+		bool can_buy_multishot = credits_ > cost_per_multishot;
+		bool can_buy_rate_of_fire = bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS && floor(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * credits_ / 100))) != FIRST_LEVEL_AMMO_DAMAGE;
+
+		//and chosing among the authorized ones
+		if (can_buy_multishot && can_buy_rate_of_fire)
 		{
 			random_type_of_bonus = RandomizeIntBetweenValues(0, 2);
 		}
-		//insufficient credit for multishot
-		else if (bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS)
+		else if (!can_buy_multishot && can_buy_rate_of_fire)
 		{
 			random_type_of_bonus = RandomizeIntBetweenValues(1, 2);
 		}
-		//max rate of fire bonus reached
-		else if (credits_ > cost_per_multishot)
+		else if (can_buy_multishot && !can_buy_rate_of_fire)
 		{
 			random_type_of_bonus = RandomizeIntBetweenValues(0, 1);
 		}
-		//insufficient credit for multishot + max rate of fire bonus reached
 		else
 		{
 			random_type_of_bonus = 1;
@@ -464,14 +470,16 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
 
 	weapon->target_seaking = SEAKING;
-
 	weapon->ammunition->speed.y = DEFAULT_AMMO_SPEED;
-	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot;
 
 	//allocating bonuses to the weapon
-	weapon->ammunition->damage = 100 + bonus_damage + (CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot);
-	weapon->multishot = 1 + bonus_multishot;
-	weapon->rate_of_fire = bonus_rate_of_fire;
+	weapon->ammunition->damage = ceil(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * (bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) / 100)));
+	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot;
+	weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * bonus_rate_of_fire / 100));
+
+	//saving level and credits used
+	weapon->level = level;
+	weapon->credits = credits_;
 
 	return weapon;
 }

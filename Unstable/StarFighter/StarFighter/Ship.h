@@ -113,15 +113,17 @@ public:
 	sf::Vector2f fake_size;
 	int fake_frameNumber;
 
-	static Equipment* CreateRandomArmor(int credits_);
-	static Equipment* CreateRandomShield(int credits_);
-	static Equipment* CreateRandomEngine(int credits_);
+	static Equipment* CreateRandomArmor(int credits_, int level);
+	static Equipment* CreateRandomShield(int credits_, int level);
+	static Equipment* CreateRandomEngine(int credits_, int level);
 	static Equipment* CreateRandomModule(int credits_, int level);
 
 	int armor;
 	int shield;
 	int shield_regen;
 	int damage;
+	int level;
+	int credits;
 
 private:
 	sf::Vector2f max_speed;

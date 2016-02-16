@@ -1042,13 +1042,14 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 		}
 
 		//ITEM DROP
-		if (random_number < LootTable_DropIsEquipment[loot_class] * LootTable_DroppingSomething[loot_class])
+		//if (random_number < LootTable_DropIsEquipment[loot_class] * LootTable_DroppingSomething[loot_class])
+		if (random_number < 1)
 		{
 			//Beast Scale Score randomized here within the min and max
 			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[loot_class]);
 
 			//Calculation of the bonus "credits" for the loot
-			int loot_credits_ = BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(this->level);
+			int loot_credits_ = ceil(BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(this->level));
 
 			//Equipment type
 			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
@@ -1061,19 +1062,19 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			{
 				case (int)EquipmentType::Engine:
 				{
-					this->setEquipmentLoot(Equipment::CreateRandomEngine(loot_credits_));
+					this->setEquipmentLoot(Equipment::CreateRandomEngine(loot_credits_, this->level));
 					break;
 				}
 
 				case (int)EquipmentType::Armor:
 				{
-					this->setEquipmentLoot(Equipment::CreateRandomArmor(loot_credits_));
+					this->setEquipmentLoot(Equipment::CreateRandomArmor(loot_credits_, this->level));
 					break;
 				}
 				
 				case (int)EquipmentType::Shield:
 				{
-					this->setEquipmentLoot(Equipment::CreateRandomShield(loot_credits_));
+					this->setEquipmentLoot(Equipment::CreateRandomShield(loot_credits_, this->level));
 					break;
 				}
 
@@ -1146,7 +1147,6 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 						weapon->shot_mode = Descending2ShotMode;
 				}
 			}
-
 			
 			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
 			if (weapon->rafale != 0)

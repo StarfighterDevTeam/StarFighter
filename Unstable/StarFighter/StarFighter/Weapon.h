@@ -58,6 +58,9 @@ public:
 	sf::Vector2f weapon_current_offset;
 	float shot_angle;
 	bool face_target;
+
+	int level;
+	int credits;
 	
 	sf::Vector2i getFireDirection_for_Direction (Directions direction);
 	Weapon* Clone();

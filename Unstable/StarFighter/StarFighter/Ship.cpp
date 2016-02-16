@@ -97,6 +97,9 @@ Equipment::~Equipment()
 		this->bot->~Bot();
 		this->hasBot = false;
 	}
+
+	level = 1;
+	credits = 0;
 }
 
 Equipment* Equipment::Clone()
@@ -109,6 +112,8 @@ Equipment* Equipment::Clone()
 	{
 		new_equipment->bot = this->bot->Clone();
 	}
+	new_equipment->level = this->level;
+	new_equipment->credits = this->credits;
 
 	return new_equipment;
 }
@@ -173,7 +178,7 @@ int Equipment::getEquipmentDamage()
 	return this->damage;
 }
 
-Equipment* Equipment::CreateRandomArmor(int credits_)
+Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 {
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
@@ -210,13 +215,17 @@ Equipment* Equipment::CreateRandomArmor(int credits_)
 	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
 	//allocating bonuses to the weapon
-	equipment->damage = 100 + bonus_damage;
-	equipment->armor = 100 + bonus_armor;
+	equipment->armor = floor(FIRST_LEVEL_ARMOR * (1 + (1.0f * bonus_armor / 100)));
+	equipment->damage = floor(FIRST_LEVEL_COLLISION_DAMAGE * (1 + (1.0f * bonus_damage / 100)));
+
+	//saving level and credits used
+	equipment->level = level;
+	equipment->credits = credits_;
 
 	return equipment;
 }
 
-Equipment* Equipment::CreateRandomShield(int credits_)
+Equipment* Equipment::CreateRandomShield(int credits_, int level)
 {
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
@@ -253,13 +262,17 @@ Equipment* Equipment::CreateRandomShield(int credits_)
 	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
 	//allocating bonuses to the weapon
-	equipment->shield = 100 + bonus_shield;
-	equipment->shield_regen = 100 + bonus_shield_regen;
+	equipment->shield = floor(FIRST_LEVEL_SHIELD * (1 + (1.0f * bonus_shield / 100)));
+	equipment->shield_regen = floor(FIRST_LEVEL_SHIELD_REGEN * (1 + (1.0f * bonus_shield_regen / 100)));
+
+	//saving level and credits used
+	equipment->level = level;
+	equipment->credits = credits_;
 
 	return equipment;
 }
 
-Equipment* Equipment::CreateRandomEngine(int credits_)
+Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 {
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
@@ -271,7 +284,11 @@ Equipment* Equipment::CreateRandomEngine(int credits_)
 	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//allocating bonuses to the weapon
-	equipment->hyperspeed = 1 + bonus_hyperspeed;
+	equipment->hyperspeed = FIRST_LEVEL_HYPERSPEED * (1 + (1.0f * bonus_hyperspeed / 100));
+
+	//saving level and credits used
+	equipment->level = level;
+	equipment->credits = credits_;
 
 	return equipment;
 }
@@ -301,6 +318,10 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 	bot->weapon = weapon;
 	equipment->bot = bot;
 	equipment->hasBot = true;
+
+	//saving level and credits used
+	equipment->level = level;
+	equipment->credits = credits_;
 
 	return equipment;
 }
