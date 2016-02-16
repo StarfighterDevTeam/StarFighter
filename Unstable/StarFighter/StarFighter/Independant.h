@@ -222,9 +222,6 @@ public:
 	bool setWeaponLoot(Weapon* weapon);
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
-	virtual void CreateRandomLoot(float BeastScaleBonus = 0);
-
-	virtual void ApplyLevelModifiers();
 
 	InteractionType isCollindingWithInteractiveObject;
 	InteractionType previouslyCollindingWithInteractiveObject;

@@ -18,6 +18,7 @@ Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	range = 0;
 	current_range = 0;
 	shot_angle = 0;
+	display_name = "Ammo";
 }
 
 Ammo* Ammo::Clone()

@@ -417,7 +417,8 @@ void Scene::SpawnEnemy(int enemy_class)
 		{
 			enemy = (*it)->enemy->Clone();
 			ApplyHazardLevelModifiers(getSceneHazardLevelValue(), *enemy);
-			enemy->ApplyLevelModifiers();
+			//TODO: set enemy levels in scene config file
+			enemy->ApplyLevelModifiers(1);
 			break;
 		}
 	}

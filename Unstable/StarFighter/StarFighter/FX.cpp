@@ -10,6 +10,7 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	isOnScene = true;
 	collider_type = IndependantType::Neutral;
 	frameNumber = m_frameNumber;
+	display_name = "explosion_S_blue";
 }
 
 void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)

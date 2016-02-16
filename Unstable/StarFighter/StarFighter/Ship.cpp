@@ -88,12 +88,6 @@ Equipment::Equipment()
 	this->equipmentType = EquipmentType::Armor;
 	this->hasBot = false;
 	this->hasFake = false;
-
-	this->bonus_armor = 0;
-	this->bonus_shield = 0;
-	this->bonus_shield_regen = 0;
-	this->bonus_damage = 0;
-	this->bonus_hyperspeed = 0;
 }
 
 Equipment::~Equipment()
@@ -115,13 +109,6 @@ Equipment* Equipment::Clone()
 	{
 		new_equipment->bot = this->bot->Clone();
 	}
-
-	new_equipment->loot_credits = this->loot_credits;
-	new_equipment->bonus_armor = this->bonus_armor;
-	new_equipment->bonus_shield = this->bonus_shield;
-	new_equipment->bonus_shield_regen = this->bonus_shield_regen;
-	new_equipment->bonus_damage = this->bonus_damage;
-	new_equipment->bonus_hyperspeed = this->bonus_hyperspeed;
 
 	return new_equipment;
 }
@@ -191,28 +178,28 @@ Equipment* Equipment::CreateRandomArmor(int credits_)
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
 	//Spending credits on the possible bonuses
-	int bonus_armor_ = 0;
-	int bonus_damage_ = 0;
+	int bonus_armor = 0;
+	int bonus_damage = 0;
 
-	int loot_credits_remaining_ = credits_;
-	while (loot_credits_remaining_ > 0)
+	int loot_credits_remaining = credits_;
+	while (loot_credits_remaining > 0)
 	{
-		int random_type_of_bonus_ = RandomizeIntBetweenValues(0, 5);
+		int random_type_of_bonus = RandomizeIntBetweenValues(0, 5);
 
 		//spending the credits in the chosen bonus
-		switch (random_type_of_bonus_)
+		switch (random_type_of_bonus)
 		{
 			case 0://damage
 			{
-				loot_credits_remaining_ --;
-				bonus_damage_++;
+				loot_credits_remaining--;
+				bonus_damage++;
 				break;
 			}
 
 			default://armor
 			{
-				loot_credits_remaining_--;
-				bonus_armor_++;
+				loot_credits_remaining--;
+				bonus_armor++;
 				break;
 			}
 		}
@@ -223,9 +210,8 @@ Equipment* Equipment::CreateRandomArmor(int credits_)
 	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
 	//allocating bonuses to the weapon
-	equipment->loot_credits = credits_;
-	equipment->bonus_damage = bonus_damage_;
-	equipment->bonus_armor = bonus_armor_;
+	equipment->damage = 100 + bonus_damage;
+	equipment->armor = 100 + bonus_armor;
 
 	return equipment;
 }
@@ -235,28 +221,28 @@ Equipment* Equipment::CreateRandomShield(int credits_)
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
 	//Spending credits on the possible bonuses
-	int bonus_shield_ = 0;
-	int bonus_shield_regen_ = 0;
+	int bonus_shield = 0;
+	int bonus_shield_regen = 0;
 
-	int loot_credits_remaining_ = credits_;
-	while (loot_credits_remaining_ > 0)
+	int loot_credits_remaining = credits_;
+	while (loot_credits_remaining > 0)
 	{
-		int random_type_of_bonus_ = RandomizeIntBetweenValues(0, 3);
+		int random_type_of_bonus = RandomizeIntBetweenValues(0, 3);
 
 		//spending the credits in the chosen bonus
-		switch (random_type_of_bonus_)
+		switch (random_type_of_bonus)
 		{
 			case 0://shield regen
 			{
-				loot_credits_remaining_--;
-				bonus_shield_regen_++;
+				loot_credits_remaining--;
+				bonus_shield_regen++;
 				break;
 			}
 
 			default://shield
 			{
-				loot_credits_remaining_--;
-				bonus_shield_++;
+				loot_credits_remaining--;
+				bonus_shield++;
 				break;
 			}
 		}
@@ -267,9 +253,8 @@ Equipment* Equipment::CreateRandomShield(int credits_)
 	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
 	//allocating bonuses to the weapon
-	equipment->loot_credits = credits_;
-	equipment->bonus_shield = bonus_shield_;
-	equipment->bonus_shield_regen = bonus_shield_regen_;
+	equipment->shield = 100 + bonus_shield;
+	equipment->shield_regen = 100 + bonus_shield_regen;
 
 	return equipment;
 }
@@ -279,32 +264,30 @@ Equipment* Equipment::CreateRandomEngine(int credits_)
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
 	//Spending credits on the possible bonuses
-	int bonus_hyperspeed_ = credits_;
+	int bonus_hyperspeed = credits_;
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
 	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//allocating bonuses to the weapon
-	equipment->loot_credits = credits_;
-	equipment->bonus_hyperspeed = bonus_hyperspeed_;
+	equipment->hyperspeed = 1 + bonus_hyperspeed;
 
 	return equipment;
 }
 
-Equipment* Equipment::CreateRandomModule(int credits_)
+Equipment* Equipment::CreateRandomModule(int credits_, int level)
 {
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
 	//Spending credits on the possible bonuses
-	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER));
+	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER), level);
 
 	//Initialisation
 	Equipment* equipment = new Equipment();
 	equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
 
 	Bot* bot = new Bot(sf::Vector2f(0, 0), sf::Vector2f(0, 0), BOT_FILENAME, sf::Vector2f(BOT_SIZE, BOT_SIZE));
-	bot->display_name = "Bot gerard";
 	bot->radius = 500;
 	bot->vspeed = 300;
 	bot->spread = sf::Vector2f(-50, 0);
@@ -319,9 +302,6 @@ Equipment* Equipment::CreateRandomModule(int credits_)
 	equipment->bot = bot;
 	equipment->hasBot = true;
 
-	//allocating bonuses to the weapon
-	equipment->loot_credits = credits_;
-
 	return equipment;
 }
 
@@ -332,186 +312,6 @@ Equipment* Equipment::CreateRandomModule(int credits_)
 #define EQUIPMENT_SHIELD_MULTIPLIER				10
 #define EQUIPMENT_SHIELD_REGEN_MULTIPLIER		10
 #define EQUIPMENT_DAMAGE_MULTIPLIER				10
-
-void Equipment::AddAirbrakeProperty(int chosen_property, int value, sf::Vector2f BeastScale)
-{
-	switch (chosen_property) // 1 case
-	{
-	case 0:
-	{
-			  float log_multiplier = EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_DECCELLERATION_LN_MULTIPLIER_X));
-
-			  float e_decceleration = EQUIPMENT_MIN_DECCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			  if (log_multiplier > 1)
-				  e_decceleration *= log_multiplier;
-			  else
-				  e_decceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_decceleration));
-
-			  this->decceleration += e_decceleration;
-			  this->decceleration = floor(this->decceleration);
-			  break;
-	}
-
-	default:
-	{
-			   printf("DEBUG: error: trying to add Airbrake property that does not exit.\n<!> Check that the chosen property for this Airbrake match with the existing properties in the AddAibrakeProperty function.\n");
-			   break;
-	}
-	}
-}
-
-void Equipment::AddEngineProperty(int chosen_property, int value, sf::Vector2f BeastScale)
-{
-	switch (chosen_property) // 2 case
-	{
-	case 0:
-	{
-			  float log_multiplier = EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ACCELLERATION_LN_MULTIPLIER_X));
-
-			  float e_acceleration = EQUIPMENT_MIN_ACCELLERATION_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			  if (log_multiplier > 1)
-				  e_acceleration *= log_multiplier;
-			  else
-				  e_acceleration = ProrataBetweenThreshold(value, sf::Vector2f(0, e_acceleration));
-
-			  this->acceleration.x += e_acceleration;
-			  this->acceleration.y += e_acceleration;
-			  this->acceleration.x = floor(this->acceleration.x);
-			  this->acceleration.y = floor(this->acceleration.y);
-			  break;
-	}
-	case 1:
-	{
-			  //this->max_speed.x += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			  //this->max_speed.y += value * EQUIPMENT_MAXSPEED_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			  float log_multiplier = EQUIPMENT_MAXSPEED_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_MAXSPEED_LN_MULTIPLIER_X));
-
-			  float e_maxspeed = EQUIPMENT_MIN_MAXSPEED_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			  if (log_multiplier > 1)
-				  e_maxspeed *= log_multiplier;
-			  else
-				  e_maxspeed = ProrataBetweenThreshold(value, sf::Vector2f(0, e_maxspeed));
-
-			  this->max_speed.x += e_maxspeed;
-			  this->max_speed.y += e_maxspeed;
-			  this->max_speed.x = floor(this->max_speed.x);
-			  this->max_speed.y = floor(this->max_speed.y);
-			  break;
-	}
-	default:
-	{
-			   printf("DEBUG: error: trying to add Engine property that does not exit.\n<!> Check that the chosen property for this Engine match with the existing properties in the AddEngineProperty function.\n");
-			   break;
-	}
-	}
-}
-
-void Equipment::AddArmorProperty(int chosen_property, int value, sf::Vector2f BeastScale)
-{
-	switch (chosen_property) // 1 case
-	{
-	case 0:
-	{
-			  //this->armor += value * EQUIPMENT_ARMOR_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			  float log_multiplier = EQUIPMENT_ARMOR_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_ARMOR_LN_MULTIPLIER_X));
-
-			  float e_armor = EQUIPMENT_MIN_ARMOR_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			  if (log_multiplier > 1)
-				  e_armor *= log_multiplier;
-			  else
-				  e_armor = ProrataBetweenThreshold(value, sf::Vector2f(0, e_armor));
-
-			  this->armor += e_armor;
-			  this->armor = floor(this->armor);
-			  break;
-	}
-	default:
-	{
-			   printf("DEBUG: error: trying to add Armor property that does not exit.\n<!> Check that the chosen property for this Armor match with the existing properties in the AddArmorProperty function.\n");
-			   break;
-	}
-	}
-}
-
-void Equipment::AddShieldProperty(int chosen_property, int value, sf::Vector2f BeastScale)
-{
-	switch (chosen_property) // 2 case
-	{
-	case 0:
-	{
-			  //this->shield += value * EQUIPMENT_SHIELD_MULTIPLIER;
-			  float log_multiplier = EQUIPMENT_SHIELD_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_LN_MULTIPLIER_X));
-
-			  float e_shield = EQUIPMENT_MIN_SHIELD_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			  if (log_multiplier > 1)
-				  e_shield *= log_multiplier;
-			  else
-				  e_shield = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield));
-
-			  this->shield += e_shield;
-			  this->shield = floor(this->shield);
-			  break;
-	}
-
-	case 1:
-	{
-			  //this->shield_regen += value * EQUIPMENT_SHIELD_REGEN_MULTIPLIER * RandomizeFloatBetweenValues(BeastScale);
-			  float log_multiplier = EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_BONUS * (log(value * EQUIPMENT_SHIELD_REGEN_LN_MULTIPLIER_X));
-
-			  float e_shield_regen = EQUIPMENT_MIN_SHIELD_REGEN_VALUE * RandomizeFloatBetweenValues(BeastScale);
-			  if (log_multiplier > 1)
-				  e_shield_regen *= log_multiplier;
-			  else
-				  e_shield_regen = ProrataBetweenThreshold(value, sf::Vector2f(0, e_shield_regen));
-
-			  this->shield_regen += e_shield_regen;
-			  this->shield_regen = floor(this->shield_regen);
-			  break;
-	}
-
-	default:
-	{
-			   printf("DEBUG: error: trying to add Shield property that does not exit.\n<!> Check that the chosen property for this Shield match with the existing properties in the AddShieldProperty function.\n");
-			   break;
-	}
-	}
-}
-
-void Equipment::AddModuleProperty(int chosen_property, int value, sf::Vector2f BeastScale)
-{
-	switch (chosen_property)
-	{
-	case 0://adding bot
-	{
-			   this->hasBot = true;
-			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			   break;
-	}
-	case 1://adding bot
-	{
-			   this->hasBot = true;
-			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			   break;
-	}
-	case 2://adding bot
-	{
-			   this->hasBot = true;
-			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			   break;
-	}
-	case 3://adding bot
-	{
-			   this->hasBot = true;
-			   this->bot->weapon->AddBotWeaponProperty(chosen_property, value, BeastScale);
-			   break;
-	}
-	default:
-	{
-			   printf("DEBUG: error: trying to add Module property that does not exit.\n<!> Check that the chosen property for this Module match with the existing properties in the AddModuleProperty function.\n");
-			   break;
-	}
-	}
-}
 
 // ----------------SHIP CONFIG ---------------
 
@@ -664,101 +464,6 @@ int ShipConfig::getShipConfigDamage()
 		new_damage = ship_model->getShipModelDamage();
 
 	return new_damage;
-}
-
-int ShipConfig::getShipConfigArmorBonus()
-{
-	int new_bonus_armor = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			new_bonus_armor += equipment[i]->bonus_armor;
-		}
-		else
-		{
-			new_bonus_armor += 0;
-		}
-	}
-
-	return new_bonus_armor;
-}
-
-int ShipConfig::getShipConfigShieldBonus()
-{
-	int new_bonus_shield = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			new_bonus_shield += equipment[i]->bonus_shield;
-		}
-		else
-		{
-			new_bonus_shield += 0;
-		}
-	}
-
-	return new_bonus_shield;
-}
-
-int ShipConfig::getShipConfigShieldRegenBonus()
-{
-	int new_bonus_shield_regen = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			new_bonus_shield_regen += equipment[i]->bonus_shield_regen;
-		}
-		else
-		{
-			new_bonus_shield_regen += 0;
-		}
-	}
-
-	return new_bonus_shield_regen;
-}
-
-int ShipConfig::getShipConfigDamageBonus()
-{
-	int new_bonus_damage = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			new_bonus_damage += equipment[i]->bonus_damage;
-		}
-		else
-		{
-			new_bonus_damage += 0;
-		}
-	}
-
-	return new_bonus_damage;
-}
-
-int ShipConfig::getShipConfigHyperspeedBonus()
-{
-	int new_bonus_hyperspeed = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			new_bonus_hyperspeed += equipment[i]->bonus_hyperspeed;
-		}
-		else
-		{
-			new_bonus_hyperspeed += 0;
-		}
-	}
-
-	return new_bonus_hyperspeed;
 }
 
 sf::Vector2f ShipConfig::getShipConfigMaxSpeed()
@@ -1021,41 +726,24 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->previouslyCollindingWithInteractiveObject = No_Interaction;
 	this->isCollindingWithInteractiveObject = No_Interaction;
 
-	this->ship_base_stat_multiplier = (*CurrentGame).GetPlayerStatsMultiplierForLevel(this->level);
-
 	this->Init();
 }
 
 void Ship::Init()
 {
-	float multiplier_ = 1.0f * this->ship_base_stat_multiplier / 100;
-
-	this->armor_max = ceil(multiplier_ * this->ship_config.getShipConfigArmor() * (1 + (1.0f * this->ship_config.getShipConfigArmorBonus() / 100)));
+	this->armor_max = this->ship_config.getShipConfigArmor();
 	if (this->armor > this->armor_max)
 	{
 		this->armor = this->armor_max;
 	}
-	this->shield_max = ceil(multiplier_ * this->ship_config.getShipConfigShield() * (1 + (1.0f * this->ship_config.getShipConfigShieldBonus() / 100)));
+	this->shield_max = this->ship_config.getShipConfigShield();
 	if (this->shield > this->shield_max)
 	{
 		this->shield = this->shield_max;
 	}
-	this->shield_regen = ceil(multiplier_ * this->ship_config.getShipConfigShieldRegen() * (1 + (1.0f * this->ship_config.getShipConfigShieldRegenBonus() / 100)));
-	this->damage = ceil(multiplier_ * this->ship_config.getShipConfigDamage() * (1 + (1.0f * this->ship_config.getShipConfigDamageBonus() / 100)));
-	this->hyperspeed = ceil(multiplier_ * this->ship_config.getShipConfigHyperspeed() * (1 + (1.0f * this->ship_config.getShipConfigHyperspeedBonus() / 100)));
-
-	this->ship_config.weapon->ammunition->damage = ceil(multiplier_ * FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * this->ship_config.weapon->bonus_damage / 100))
-		* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * (this->ship_config.weapon->bonus_multishot) / 100)));
-	this->ship_config.weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * ship_config.weapon->bonus_rate_of_fire / 100));
-	this->ship_config.weapon->multishot = MIN_VALUE_OF_MULTISHOT + this->ship_config.weapon->bonus_multishot;
-
-	for (std::vector<Bot*>::iterator it = (this->ship_config.bot_list.begin()); it != (this->ship_config.bot_list.end()); it++)
-	{
-		(*it)->weapon->ammunition->damage = ceil(multiplier_ * FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * (*it)->weapon->bonus_damage / 100))
-			* (1 + (1.0f * CREDITS_COST_PER_ONE_MULTISHOT * ((*it)->weapon->bonus_multishot) / 100)));
-		(*it)->weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * (*it)->weapon->bonus_rate_of_fire / 100));
-		(*it)->weapon->multishot = ceil(MIN_VALUE_OF_MULTISHOT * BOT_STATS_MULTIPLIER) + (*it)->weapon->bonus_multishot;
-	}
+	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
+	this->damage = this->ship_config.getShipConfigDamage();
+	this->hyperspeed = this->ship_config.getShipConfigHyperspeed();
 
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
@@ -2223,18 +1911,4 @@ void Ship::LevelUp()
 	this->level++;
 	this->xp -= this->xp_max;
 	this->xp_max = floor(this->xp_max * (1 + XP_MAX_INCREASE_PER_LEVEL));
-
-	//updating ship stats
-	this->ship_base_stat_multiplier = (*CurrentGame).GetPlayerStatsMultiplierForLevel(this->level);
-
-	//increasing enemies level
-	(*CurrentGame).level = this->level;
-	(*CurrentGame).enemy_base_stat_multiplier = (*CurrentGame).GetEnemiesStatsMultiplierForLevel((*CurrentGame).level);
-
-	//increasing loot level
-	(*CurrentGame).loot_on_par_stat_multiplier = (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel((*CurrentGame).level);
-	
-	//applying level modifiers
-	this->Init();
-	(*CurrentGame).ApplyLevelModifiers();
 }

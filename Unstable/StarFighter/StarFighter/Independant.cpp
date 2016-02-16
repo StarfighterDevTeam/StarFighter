@@ -385,16 +385,6 @@ void Independant::releaseWeaponLoot()
 	this->weapon_loot = NULL;
 }
 
-void Independant::ApplyLevelModifiers()
-{
-	//-> Enemy::ApplyLevelModifiers override
-}
-
-void Independant::CreateRandomLoot(float BeastScaleBonus)
-{
-	//-> Enemy::CreateRandomLoot override
-}
-
 void Independant::GetGrazing()
 {
 	//see overide function in class Ship

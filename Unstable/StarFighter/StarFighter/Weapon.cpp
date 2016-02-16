@@ -22,11 +22,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	weaponOffset = sf::Vector2f(0, 0);
 	face_target = false;
 	fire_pattern_return = false;
-
-	loot_credits = 0;
-	bonus_damage = 0;
-	bonus_rate_of_fire = 0;
-	bonus_multishot = 0;
+	display_name = "Laser";
 
 	this->ammunition = Ammunition;
 }
@@ -369,135 +365,7 @@ Weapon* Weapon::Clone()
 	weapon->textureName = this->textureName;
 	weapon->size = this->size;
 
-	weapon->loot_credits = this->loot_credits;
-	weapon->bonus_damage = this->bonus_damage;
-	weapon->bonus_rate_of_fire = this->bonus_rate_of_fire;
-	weapon->bonus_multishot = this->bonus_multishot;
-
 	return weapon;
-}
-
-#define WEAPON_RATE_OF_FIRE_MULTIPLIER				5
-#define WEAPON_MULTISHOT_MULTIPLIER					2
-#define WEAPON_CHANCE_OF_DISPERSION					0.50
-#define WEAPON_DISPERSION_MAX_ANGLE					170
-#define WEAPON_CHANCE_OF_ALTERNATE					0.10
-#define WEAPON_CHANCE_OF_ASCENDING					0.10
-#define WEAPON_CHANCE_OF_DESCENDING					0.10
-#define WEAPON_VSPEED_LN_MULTIPLIER					150
-
-#define BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER	1
-#define BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER		0.5
-#define BOT_WEAPON_VSPEED_MALUS_MULTIPLIER			1
-#define BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER			1
-
-void Weapon::AddWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale)
-{
-	switch (chosen_property)
-	{
-		//case 0:
-		//{
-		//	this->rate_of_fire /= (RandomizeFloatBetweenValues(BeastScale) * WEAPON_RATE_OF_FIRE_MULTIPLIER);
-		//	this->display_name = "Rapide-fire laser";
-		//	break;
-		//}
-	case 0:
-	{
-			  this->multishot = RandomizeIntBetweenFloats(sf::Vector2f(BeastScale.x*WEAPON_MULTISHOT_MULTIPLIER, BeastScale.y*WEAPON_MULTISHOT_MULTIPLIER));
-			  if (multishot > 1)
-			  {
-				  this->xspread = RandomizeIntBetweenFloats(sf::Vector2f(0, 32));
-				  if (this->xspread * multishot > this->size.x)
-				  {
-					  this->xspread = this->size.x / multishot;
-				  }
-				  this->display_name = "Multi-shot laser";
-			  }
-
-			  double dispersion_chance = (double)rand() / (RAND_MAX);
-			  if (dispersion_chance < WEAPON_CHANCE_OF_DISPERSION)
-			  {
-				  int dispersion_roll = rand() % (WEAPON_DISPERSION_MAX_ANGLE + 1);
-				  this->dispersion = dispersion_roll;
-				  this->display_name = "Dispersion laser";
-			  }
-
-			  double alternate_chance = (double)rand() / (RAND_MAX);
-			  if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE)
-			  {
-				  this->shot_mode = ShotMode::AlternateShotMode;
-			  }
-			  else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING)
-			  {
-				  this->shot_mode = ShotMode::AscendingShotMode;
-			  }
-			  else if (alternate_chance < WEAPON_CHANCE_OF_ALTERNATE + WEAPON_CHANCE_OF_ASCENDING + WEAPON_CHANCE_OF_DESCENDING)
-			  {
-				  this->shot_mode = ShotMode::DescendingShotMode;
-			  }
-			  break;
-	}
-	case 1:
-	{
-			  this->ammunition->speed.y += (log(WEAPON_VSPEED_LN_MULTIPLIER*RandomizeFloatBetweenValues(BeastScale)));
-			  this->display_name = "Lightning-speed laser";
-			  break;
-	}
-		//case 3:
-		//{
-		//	//this->ammunition->damage += RandomizeFloatBetweenRatios(value, BeastScale);
-		//	float log_multiplier = WEAPON_DAMAGE_LN_MULTIPLIER_BONUS * (log(value * WEAPON_DAMAGE_LN_MULTIPLIER_X));
-		//
-		//	float e_damage = WEAPON_MIN_DAMAGE_VALUE * RandomizeFloatBetweenValues(BeastScale);
-		//	if (log_multiplier > 1)
-		//		e_damage *= log_multiplier;
-		//	else
-		//		e_damage = ProrataBetweenThreshold(value, sf::Vector2f(0, e_damage));
-		//
-		//	this->ammunition->damage += e_damage;
-		//	this->ammunition->damage = floor(this->ammunition->damage);
-		//
-		//	this->display_name = "Power laser";
-		//	break;
-		//}
-	default:
-	{
-			   printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
-			   break;
-	}
-	}
-}
-
-void Weapon::AddBotWeaponProperty(int chosen_property, int value, sf::Vector2f BeastScale)
-{
-	switch (chosen_property)
-	{
-	case 0:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_RATE_OF_FIRE_MALUS_MULTIPLIER));
-			  break;
-	}
-	case 1:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_MULTISHOT_MALUS_MULTIPLIER));
-			  break;
-	}
-	case 2:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_VSPEED_MALUS_MULTIPLIER));
-			  break;
-	}
-	case 3:
-	{
-			  AddWeaponProperty(chosen_property, value, sf::Vector2f(BeastScale.x*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER, BeastScale.y*BOT_WEAPON_DAMAGE_MALUS_MULTIPLIER));
-			  break;
-	}
-	default:
-	{
-			   printf("DEBUG: error: trying to add Weapon property that does not exit.\n<!> Check that the chosen property for this Weapon match with the existing properties in the AddWeaponProperty function.\n");
-			   break;
-	}
-	}
 }
 
 sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
@@ -522,61 +390,61 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 	return fire_direction_;
 }
 
-Weapon* Weapon::CreateRandomWeapon(int credits_)
+Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 {
 	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
 
-	int cost_per_multishot_ = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), (*CurrentGame).level - 1));
+	int cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), level - 1));
 	//Spending credits on the possible bonuses
-	int bonus_multishot_ = 0;
-	int bonus_damage_ = 0;
-	int bonus_rate_of_fire_ = 0;
+	int bonus_multishot = 0;
+	int bonus_damage = 0;
+	int bonus_rate_of_fire = 0;
 
-	int loot_credits_remaining_ = credits_;
-	while (loot_credits_remaining_ > 0)
+	int loot_credits_remaining = credits_;
+	while (loot_credits_remaining > 0)
 	{
-		int random_type_of_bonus_ = -1;
+		int random_type_of_bonus = -1;
 
 		//limitations per bonus
-		if (credits_ > cost_per_multishot_ && bonus_rate_of_fire_ < MAX_RATE_OF_FIRE_BONUS)
+		if (credits_ > cost_per_multishot && bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS)
 		{
-			random_type_of_bonus_ = RandomizeIntBetweenValues(0, 2);
+			random_type_of_bonus = RandomizeIntBetweenValues(0, 2);
 		}
 		//insufficient credit for multishot
-		else if (bonus_rate_of_fire_ < MAX_RATE_OF_FIRE_BONUS)
+		else if (bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS)
 		{
-			random_type_of_bonus_ = RandomizeIntBetweenValues(1, 2);
+			random_type_of_bonus = RandomizeIntBetweenValues(1, 2);
 		}
 		//max rate of fire bonus reached
-		else if (credits_ > cost_per_multishot_)
+		else if (credits_ > cost_per_multishot)
 		{
-			random_type_of_bonus_ = RandomizeIntBetweenValues(0, 1);
+			random_type_of_bonus = RandomizeIntBetweenValues(0, 1);
 		}
 		//insufficient credit for multishot + max rate of fire bonus reached
 		else
 		{
-			random_type_of_bonus_ = 1;
+			random_type_of_bonus = 1;
 		}
 
 		//spending the credits in the chosen bonus
-		switch (random_type_of_bonus_)
+		switch (random_type_of_bonus)
 		{
 		case 0://multishot
 		{
-			loot_credits_remaining_ -= cost_per_multishot_;
-			bonus_multishot_++;
+			loot_credits_remaining -= cost_per_multishot;
+			bonus_multishot++;
 			break;
 		}
 		case 1://flat bonus damage
 		{
-			loot_credits_remaining_--;
-			bonus_damage_++;
+			loot_credits_remaining--;
+			bonus_damage++;
 			break;
 		}
 		case 2://rate of fire
 		{
-			loot_credits_remaining_--;
-			bonus_rate_of_fire_++;
+			loot_credits_remaining--;
+			bonus_rate_of_fire++;
 			break;
 		}
 		default:
@@ -595,17 +463,15 @@ Weapon* Weapon::CreateRandomWeapon(int credits_)
 
 	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
 
-	weapon->display_name = "Laser standard";
 	weapon->target_seaking = SEAKING;
 
 	weapon->ammunition->speed.y = DEFAULT_AMMO_SPEED;
-	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot_;
+	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot;
 
 	//allocating bonuses to the weapon
-	weapon->loot_credits = credits_;
-	weapon->bonus_damage = bonus_damage_;
-	weapon->bonus_multishot = bonus_multishot_;
-	weapon->bonus_rate_of_fire = bonus_damage_;
+	weapon->ammunition->damage = 100 + bonus_damage + (CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot);
+	weapon->multishot = 1 + bonus_multishot;
+	weapon->rate_of_fire = bonus_rate_of_fire;
 
 	return weapon;
 }

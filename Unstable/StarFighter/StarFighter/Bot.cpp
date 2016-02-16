@@ -15,6 +15,7 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	spread = sf::Vector2f(0,0);
 	damage = 0;
 	key_repeat = false;
+	display_name = "Bot";
 }
 
 Bot::~Bot()
