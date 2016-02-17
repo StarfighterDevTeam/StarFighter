@@ -1971,8 +1971,6 @@ int Ship::UpdateShipLevel()
 	this->xp = credits_;
 	this->xp_max = ((*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) - (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_)) * (NBVAL_Equipment + 1);
 
-	Equipment::CreateRandomArmor(11, 3);
-
 	return level_;
 }
 

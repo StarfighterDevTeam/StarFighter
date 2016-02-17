@@ -815,13 +815,13 @@ void Game::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
 
 int Game::GetPlayerStatsMultiplierForLevel(int level_)
 {
-	int result_ = floor(100 * (pow((1 + PLAYER_LEVELING_STATS_MULTIPLIER), (level_ - 1))));
+	int result_ = round(100 * (pow((1 + PLAYER_LEVELING_STATS_MULTIPLIER), (level_ - 1))));
 	return result_;
 }
 
 int Game::GetEnemiesStatsMultiplierForLevel(int level_)
 {
-	int result_ = floor(100 * (pow((1 + ENEMIES_LEVELING_STATS_MULTIPLIER), (level_ - 1))));
+	int result_ = round(100 * (pow((1 + ENEMIES_LEVELING_STATS_MULTIPLIER), (level_ - 1))));
 	return result_;
 }
 
