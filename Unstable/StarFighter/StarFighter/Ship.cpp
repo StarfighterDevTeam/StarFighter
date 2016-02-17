@@ -215,8 +215,8 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
 	//allocating bonuses to the weapon
-	equipment->armor = floor(FIRST_LEVEL_ARMOR * (1 + (1.0f * bonus_armor / 100)));
-	equipment->damage = floor(FIRST_LEVEL_COLLISION_DAMAGE * (1 + (1.0f * bonus_damage / 100)));
+	equipment->armor = FIRST_LEVEL_ARMOR + (bonus_armor * FIRST_LEVEL_ARMOR * 0.01);
+	equipment->damage = FIRST_LEVEL_COLLISION_DAMAGE + (bonus_damage * FIRST_LEVEL_COLLISION_DAMAGE * 0.01);
 
 	//saving level and credits used
 	equipment->level = level;
@@ -262,8 +262,8 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
 	//allocating bonuses to the weapon
-	equipment->shield = floor(FIRST_LEVEL_SHIELD * (1 + (1.0f * bonus_shield / 100)));
-	equipment->shield_regen = floor(FIRST_LEVEL_SHIELD_REGEN * (1 + (1.0f * bonus_shield_regen / 100)));
+	equipment->shield = FIRST_LEVEL_SHIELD + (bonus_shield * FIRST_LEVEL_SHIELD * 0.01);
+	equipment->shield_regen = FIRST_LEVEL_SHIELD_REGEN + (bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
 
 	//saving level and credits used
 	equipment->level = level;
@@ -284,7 +284,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//allocating bonuses to the weapon
-	equipment->hyperspeed = FIRST_LEVEL_HYPERSPEED * (1 + (1.0f * bonus_hyperspeed / 100));
+	equipment->hyperspeed = FIRST_LEVEL_HYPERSPEED + (bonus_hyperspeed * FIRST_LEVEL_HYPERSPEED / 0.01);
 
 	//saving level and credits used
 	equipment->level = level;

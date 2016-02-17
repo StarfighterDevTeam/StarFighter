@@ -150,7 +150,7 @@
 #define MAX_RATE_OF_FIRE_BONUS							90
 
 //LEVELING
-#define FIRST_LEVEL_MAX									5
+#define FIRST_LEVEL_MAX									20
 #define XP_MAX_FIRST_LEVEL								100
 #define XP_MAX_INCREASE_PER_LEVEL						0.50
 #define XP_DEATH_MALUS_PERCENTAGE						0.05

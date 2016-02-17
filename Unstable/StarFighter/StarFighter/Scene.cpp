@@ -30,20 +30,20 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 		for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 		{
-			if ((*it)[ScenesData::SCENE_NAME].compare(name) == 0)
+			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
 				//Loading the linked scene names
-				this->links[Directions::DIRECTION_UP] = (*it)[ScenesData::SCENE_LINK_UP];
-				this->links[Directions::DIRECTION_DOWN] = (*it)[ScenesData::SCENE_LINK_DOWN];
-				this->links[Directions::DIRECTION_RIGHT] = (*it)[ScenesData::SCENE_LINK_RIGHT];
-				this->links[Directions::DIRECTION_LEFT] = (*it)[ScenesData::SCENE_LINK_LEFT];
+				this->links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
+				this->links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
+				this->links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
+				this->links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
 
-				this->canHazardBreak = ((*it)[ScenesData::SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
+				this->canHazardBreak = ((*it)[SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
 
-				std::string scene_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
+				std::string scene_name = (*it)[SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
-				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
+				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[SCENE_FILENAME]));
 				for (std::vector<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
 				{
 					if ((*it)[0].compare("bg") == 0)
@@ -51,12 +51,12 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						this->direction = Directions::NO_DIRECTION;
 						bool hub = false;
 
-						this->vspeed = stoi((*it)[SceneDataBackground::BACKGROUND_VSPEED]);
-						float w = stoi((*it)[SceneDataBackground::BACGKROUND_WIDTH]);
-						float h = stoi((*it)[SceneDataBackground::BACKGROUND_HEIGHT]);
+						this->vspeed = stoi((*it)[BACKGROUND_VSPEED]);
+						float w = stoi((*it)[BACGKROUND_WIDTH]);
+						float h = stoi((*it)[BACKGROUND_HEIGHT]);
 
 						//Assigning the right direction for the scene
-						if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("V") == 0)
+						if ((*it)[BACKGROUND_VERTICAL].compare("V") == 0)
 						{
 							if (!reverse_scene)
 							{
@@ -67,7 +67,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								this->direction = Directions::DIRECTION_DOWN;
 							}
 						}
-						else if ((*it)[SceneDataBackground::BACKGROUND_VERTICAL].compare("H") == 0)
+						else if ((*it)[BACKGROUND_VERTICAL].compare("H") == 0)
 						{
 							if (!reverse_scene)
 							{
@@ -102,7 +102,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 							this->direction = Directions::NO_DIRECTION;
 						}
 						
-						this->bg = new Background(sf::Vector2f(0, 0), speed, (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).direction, first_screen_offset);
+						this->bg = new Background(sf::Vector2f(0, 0), speed, (*it)[BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).direction, first_screen_offset);
 						this->bg->display_name = scene_name;
 						(*CurrentGame).addToScene(this->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
 
@@ -130,9 +130,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								//Getting the string of the "display name" for a each linked scene
 								for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 								{
-									if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
+									if ((*it)[SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 									{
-										this->bg->portals[(Directions)i]->display_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
+										this->bg->portals[(Directions)i]->display_name = (*it)[SCENE_DISPLAYNAME];
 									}
 								}
 
@@ -163,19 +163,21 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					//Loading enemies
 					else if ((*it)[0].compare("enemy") == 0)
 					{
-						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[SceneDataEnemy::ENEMY], stoi((*it)[SceneDataEnemy::ENEMY_PROBABILITY]), stoi((*it)[SceneDataEnemy::ENEMY_CLASS]));
-						
+						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[ENEMY], stoi((*it)[ENEMY_PROBABILITY]), stoi((*it)[ENEMY_CLASS]));
+						e->enemy->level = stoi((*it)[ENEMY_CLASS_LEVEL]);
+						e->enemy->ApplyLevelModifiers();
+
 						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
 						if (!e->enemy->hasPhases)
 						{
 							e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
 						}
 						
-						//setting enemy generators: we need to create on generator per class
+						//setting enemy generators: we need to create one generator per class
 						if (this->total_class_probability[e->enemyclass] == 0)
 						{
-							float l_spawnCost = stof((*it)[SceneDataEnemy::ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[this->getSceneHazardLevelValue()];
-							EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->enemyclass, stof((*it)[SceneDataEnemy::ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[SceneDataEnemy::ENEMY_CLASS_MISS_CHANCE]));
+							float l_spawnCost = stof((*it)[ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[this->getSceneHazardLevelValue()];
+							EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->enemyclass, stof((*it)[ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[ENEMY_CLASS_MISS_CHANCE]));
 							generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
 							this->sceneEnemyGenerators.push_back(generator);
 						}
@@ -192,12 +194,14 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					//loading boss
 					else if ((*it)[0].compare("boss") == 0)
 					{
-						EnemyBase* boss = FileLoader::LoadEnemyBase((*it)[SceneDataBoss::BOSS], 1, stoi((*it)[SceneDataBoss::BOSS_CLASS]));
+						EnemyBase* boss = FileLoader::LoadEnemyBase((*it)[BOSS], 1, stoi((*it)[BOSS_CLASS]));
+						boss->enemy->level = stoi((*it)[BOSS_LEVEL]);
+
 						if (!boss->enemy->hasPhases)
 						{
 							boss->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, boss->enemy->speed.y);
 						}
-						sf::Vector2f boss_pos = sf::Vector2f(atof((*it)[SceneDataBoss::BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*it)[SceneDataBoss::BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
+						sf::Vector2f boss_pos = sf::Vector2f(atof((*it)[BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*it)[BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
 						boss_pos = Independant::getPosition_for_Direction(this->direction, boss_pos);
 						boss->enemy->setPosition(boss_pos);
 
@@ -230,22 +234,22 @@ Scene::Scene(string name)
 
 		for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 		{
-			if ((*it)[ScenesData::SCENE_NAME].compare(name) == 0)
+			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
 				//Loading the linked scene names
-				this->links[Directions::DIRECTION_UP] = (*it)[ScenesData::SCENE_LINK_UP];
-				this->links[Directions::DIRECTION_DOWN] = (*it)[ScenesData::SCENE_LINK_DOWN];
-				this->links[Directions::DIRECTION_RIGHT] = (*it)[ScenesData::SCENE_LINK_RIGHT];
-				this->links[Directions::DIRECTION_LEFT] = (*it)[ScenesData::SCENE_LINK_LEFT];
-				std::string scene_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
+				this->links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
+				this->links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
+				this->links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
+				this->links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
+				std::string scene_name = (*it)[SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
-				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[ScenesData::SCENE_FILENAME]));
+				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[SCENE_FILENAME]));
 				for (std::vector<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
-						this->bg = new Background(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*it)[SceneDataBackground::BACKGROUND_NAME], sf::Vector2f(0, 0), this->direction);
+						this->bg = new Background(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*it)[BACKGROUND_NAME], sf::Vector2f(0, 0), this->direction);
 						this->bg->display_name = scene_name;
 					}
 				}
@@ -259,10 +263,10 @@ Scene::Scene(string name)
 					//Getting the string of the "display name" for a each linked scene
 					for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 					{
-						if ((*it)[ScenesData::SCENE_NAME].compare(this->links[(Directions)i]) == 0)
+						if ((*it)[SCENE_NAME].compare(this->links[(Directions)i]) == 0)
 						{
 							//Getting the name
-							this->bg->portals[(Directions)i]->display_name = (*it)[ScenesData::SCENE_DISPLAYNAME];
+							this->bg->portals[(Directions)i]->display_name = (*it)[SCENE_DISPLAYNAME];
 						}
 					}
 				}
@@ -417,8 +421,6 @@ void Scene::SpawnEnemy(int enemy_class)
 		{
 			enemy = (*it)->enemy->Clone();
 			ApplyHazardLevelModifiers(getSceneHazardLevelValue(), *enemy);
-			//TODO: set enemy levels in scene config file
-			enemy->ApplyLevelModifiers(1);
 			break;
 		}
 	}

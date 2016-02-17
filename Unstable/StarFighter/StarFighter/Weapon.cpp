@@ -473,9 +473,9 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 	weapon->ammunition->speed.y = DEFAULT_AMMO_SPEED;
 
 	//allocating bonuses to the weapon
-	weapon->ammunition->damage = ceil(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * (bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) / 100)));
+	weapon->ammunition->damage = ceil(FIRST_LEVEL_AMMO_DAMAGE + ((bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE * 0.01));
 	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot;
-	weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE * (1 - (1.0f * bonus_rate_of_fire / 100));
+	weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE - (bonus_rate_of_fire * FIRST_LEVEL_RATE_OF_FIRE * 0.01);
 
 	//saving level and credits used
 	weapon->level = level;

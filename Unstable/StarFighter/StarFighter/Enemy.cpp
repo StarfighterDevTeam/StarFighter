@@ -509,6 +509,8 @@ Enemy* Enemy::Clone()
 		}
 	}
 
+	enemy->level = this->level;
+
 	return enemy;
 }
 
@@ -860,6 +862,7 @@ Phase* Enemy::LoadPhase(string name)
 					m_weapon->weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 4)].c_str());
 					m_weapon->delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 4)].c_str());
 					phase->weapons_list.push_back(m_weapon);
+					
 				}
 			}
 
@@ -1042,8 +1045,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 		}
 
 		//ITEM DROP
-		//if (random_number < LootTable_DropIsEquipment[loot_class] * LootTable_DroppingSomething[loot_class])
-		if (random_number < 1)
+		if (random_number < LootTable_DropIsEquipment[loot_class] * LootTable_DroppingSomething[loot_class])
 		{
 			//Beast Scale Score randomized here within the min and max
 			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[loot_class]);
@@ -1174,7 +1176,6 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 	}
 
 	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file", name));
-
 }
 
 Ammo* Enemy::LoadAmmo(string name)
@@ -1194,7 +1195,6 @@ Ammo* Enemy::LoadAmmo(string name)
 			new_ammo->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
 
 			new_ammo->rotation_speed = stoi((*it)[AmmoData::AMMO_ROTATION_SPEED]);
-
 			return new_ammo;
 		}
 	}
@@ -1225,14 +1225,14 @@ FX* Enemy::LoadFX(string name)
 
 }
 
-void Enemy::ApplyLevelModifiers(int level)
+void Enemy::ApplyLevelModifiers()
 {
-	float multiplier_ = 1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level) / 100;
+	float multiplier_ = ceil(1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(this->level) / 100);
 
-	this->armor_max = ceil(this->armor_max * multiplier_);
-	this->shield_max = ceil(this->shield_max * multiplier_);
-	this->shield_regen = ceil(this->shield_regen * multiplier_);
-	this->damage = ceil(this->damage * multiplier_);
+	this->armor_max = floor(this->armor_max * multiplier_);
+	this->shield_max = floor(this->shield_max * multiplier_);
+	this->shield_regen = floor(this->shield_regen * multiplier_);
+	this->damage = floor(this->damage * multiplier_);
 	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
 	{
 		(*it)->ammunition->damage = ceil((*it)->ammunition->damage * multiplier_);

@@ -78,7 +78,7 @@ public:
 	sf::Time feedbackTimer;
 
 	int level;
-	void ApplyLevelModifiers(int level);
+	void ApplyLevelModifiers();
 
 private:
 	int GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p);

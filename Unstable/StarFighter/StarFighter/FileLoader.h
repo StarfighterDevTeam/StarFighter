@@ -44,6 +44,7 @@ enum SceneDataEnemy
 	ENEMY_CLASS_SPAWNCOST,//4
 	ENEMY_CLASS_REPEAT_CHANCE,//5
 	ENEMY_CLASS_MISS_CHANCE,//6
+	ENEMY_CLASS_LEVEL,//7
 };
 
 enum SceneDataBoss
@@ -53,6 +54,7 @@ enum SceneDataBoss
 	BOSS_CLASS,//2
 	BOSS_SPAWN_X,//3
 	BOSS_SPAWN_Y,//4
+	BOSS_LEVEL,//5
 };
 
 enum SceneDataBackground
