@@ -174,7 +174,7 @@ int Equipment::getEquipmentDamage()
 
 Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 {
-	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
 	int bonus_armor = 0;
@@ -208,9 +208,14 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 	Equipment* equipment = new Equipment();
 	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
+	//Base item stats
+	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
+	equipment->armor = FIRST_LEVEL_ARMOR * multiplier_;
+	equipment->damage = FIRST_LEVEL_COLLISION_DAMAGE * multiplier_;
+
 	//allocating bonuses to the weapon
-	equipment->armor = FIRST_LEVEL_ARMOR + (bonus_armor * FIRST_LEVEL_ARMOR * 0.01);
-	equipment->damage = FIRST_LEVEL_COLLISION_DAMAGE + (bonus_damage * FIRST_LEVEL_COLLISION_DAMAGE * 0.01);
+	equipment->armor += bonus_armor * FIRST_LEVEL_ARMOR * 0.01;
+	equipment->damage += bonus_damage * FIRST_LEVEL_COLLISION_DAMAGE * 0.01;
 
 	//saving level and credits used
 	equipment->level = level;
@@ -221,7 +226,7 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 
 Equipment* Equipment::CreateRandomShield(int credits_, int level)
 {
-	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
 	int bonus_shield = 0;
@@ -256,9 +261,14 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 	Equipment* equipment = new Equipment();
 	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
+	//Base item stats
+	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
+	equipment->shield = FIRST_LEVEL_SHIELD * multiplier_;
+	equipment->shield_regen = FIRST_LEVEL_SHIELD_REGEN * multiplier_;
+
 	//allocating bonuses to the weapon
-	equipment->shield = FIRST_LEVEL_SHIELD + (bonus_shield * FIRST_LEVEL_SHIELD * 0.01);
-	equipment->shield_regen = ceil(FIRST_LEVEL_SHIELD_REGEN + (bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01));
+	equipment->shield += bonus_shield * FIRST_LEVEL_SHIELD * 0.01;
+	equipment->shield_regen += ceil(bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
 
 	//saving level and credits used
 	equipment->level = level;
@@ -269,7 +279,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 
 Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 {
-	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
 	int bonus_hyperspeed = credits_;
@@ -278,8 +288,12 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 	Equipment* equipment = new Equipment();
 	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
+	//Base item stats
+	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
+	equipment->hyperspeed = FIRST_LEVEL_HYPERSPEED * multiplier_;
+
 	//allocating bonuses to the weapon
-	equipment->hyperspeed = FIRST_LEVEL_HYPERSPEED + (bonus_hyperspeed * FIRST_LEVEL_HYPERSPEED * 0.01);
+	equipment->hyperspeed += bonus_hyperspeed * FIRST_LEVEL_HYPERSPEED * 0.01;
 
 	//saving level and credits used
 	equipment->level = level;
@@ -290,7 +304,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 
 Equipment* Equipment::CreateRandomModule(int credits_, int level)
 {
-	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
 	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER), level);
@@ -1386,13 +1400,15 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 						{
 							if (equip_type == NBVAL_Equipment)
 							{
-								this->cleanWeapon();
+								this->cleanWeapon(true);
 							}
 							else
 							{
-								this->cleanEquipment(equip_type);
+								this->cleanEquipment(equip_type, true);
 							}
 						}
+						//Save items
+						SaveItems(ITEMS_SAVE_FILE);
 
 						brakingHoldingClock.restart();
 						isBrakingButtonHeldPressed = false;
@@ -1945,15 +1961,17 @@ int Ship::UpdateShipLevel()
 		credits_ += ship_config.weapon->credits;
 	}
 
-	while (credits_ > (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) * (NBVAL_Equipment + 1))
+	while (credits_ >= ((*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) - (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_)) * (NBVAL_Equipment + 1))
 	{
-		credits_ -= (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1);
+		credits_ -= ((*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) - (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_)) * (NBVAL_Equipment + 1);
 		level_++;
 	}
 
 	this->level = level_;
 	this->xp = credits_;
-	this->xp_max = (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) * (NBVAL_Equipment + 1);
+	this->xp_max = ((*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) - (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_)) * (NBVAL_Equipment + 1);
+
+	Equipment::CreateRandomArmor(11, 3);
 
 	return level_;
 }

@@ -397,7 +397,7 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 
 Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 {
-	credits_ += LOOT_CREDITS_DEFAULT_BONUS;
+	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	int cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), level - 1));
 	//Spending credits on the possible bonuses
@@ -472,10 +472,16 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 	weapon->target_seaking = NO_SEAKING;
 	weapon->ammunition->speed.y = DEFAULT_AMMO_SPEED;
 
+	//Base item stats
+	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
+	weapon->ammunition->damage = FIRST_LEVEL_AMMO_DAMAGE * multiplier_;
+	weapon->multishot = MIN_VALUE_OF_MULTISHOT;
+	weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE;
+
 	//allocating bonuses to the weapon
-	weapon->ammunition->damage = ceil(FIRST_LEVEL_AMMO_DAMAGE + ((bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE * 0.01));
-	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot;
-	weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE - (bonus_rate_of_fire * FIRST_LEVEL_RATE_OF_FIRE * 0.01);
+	weapon->ammunition->damage += (bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE * 0.01;
+	weapon->multishot += bonus_multishot;
+	weapon->rate_of_fire -= bonus_rate_of_fire * FIRST_LEVEL_RATE_OF_FIRE * 0.01;
 
 	//spread of multishot weapons
 	if (weapon->multishot > 1)
