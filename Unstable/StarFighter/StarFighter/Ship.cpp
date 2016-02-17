@@ -219,7 +219,7 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 
 	//saving level and credits used
 	equipment->level = level;
-	equipment->credits = credits_;
+	equipment->credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 
 	return equipment;
 }
@@ -272,7 +272,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 
 	//saving level and credits used
 	equipment->level = level;
-	equipment->credits = credits_;
+	equipment->credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 
 	return equipment;
 }
@@ -297,7 +297,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 
 	//saving level and credits used
 	equipment->level = level;
-	equipment->credits = credits_;
+	equipment->credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 
 	return equipment;
 }
@@ -330,7 +330,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 
 	//saving level and credits used
 	equipment->level = level;
-	equipment->credits = credits_;
+	equipment->credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 
 	return equipment;
 }
@@ -1961,15 +1961,15 @@ int Ship::UpdateShipLevel()
 		credits_ += ship_config.weapon->credits;
 	}
 
-	while (credits_ >= ((*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) - (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_)) * (NBVAL_Equipment + 1))
+	while (credits_ >= ((*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_ + 1) - (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_)) * (NBVAL_Equipment + 1))
 	{
-		credits_ -= ((*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) - (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_)) * (NBVAL_Equipment + 1);
+		credits_ -= ((*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_ + 1) - (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_)) * (NBVAL_Equipment + 1);
 		level_++;
 	}
 
 	this->level = level_;
 	this->xp = credits_;
-	this->xp_max = ((*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) - (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_)) * (NBVAL_Equipment + 1);
+	this->xp_max = ((*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_ + 1) - (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_)) * (NBVAL_Equipment + 1);
 
 	return level_;
 }

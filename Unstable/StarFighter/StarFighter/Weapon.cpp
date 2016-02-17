@@ -491,7 +491,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 
 	//saving level and credits used
 	weapon->level = level;
-	weapon->credits = credits_;
+	weapon->credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 
 	return weapon;
 }
