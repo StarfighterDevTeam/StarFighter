@@ -138,8 +138,8 @@ void PlayerHud::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
 	this->hud_cursor->setAnimationLine(animation_index);
 }
 
-void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_max, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, int ship_stats_multiplier, sf::Time deltaTime, bool hub,
-	int focused_item_type, string f_name, int f_level, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen,
+void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_max, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
+	int focused_item_type, string f_name, int f_level, int f_xp, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen,
 	int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
@@ -487,7 +487,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 				break;
 			}
 		}
-		ss_stats << "\nLevel: " << f_level;
+		ss_stats << "\nLevel: " << f_level << " (+" << f_xp << " XP)";
 	}
 
 	itemStatsText.setString(ss_stats.str());

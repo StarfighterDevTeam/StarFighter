@@ -256,8 +256,9 @@ public :
 	int level_max;
 	int xp;
 	int xp_max;
-	void gain_xp (int xp_earned_);
-	void LevelUp();
+	//void gain_xp (int xp_earned_);
+	//void LevelUp();
+	int UpdateShipLevel();
 
 	float hyperspeed;
 	

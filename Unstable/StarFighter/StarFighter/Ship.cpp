@@ -228,6 +228,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 	int bonus_shield_regen = 0;
 
 	int loot_credits_remaining = credits_;
+
 	while (loot_credits_remaining > 0)
 	{
 		int random_type_of_bonus = RandomizeIntBetweenValues(0, 3);
@@ -257,7 +258,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 
 	//allocating bonuses to the weapon
 	equipment->shield = FIRST_LEVEL_SHIELD + (bonus_shield * FIRST_LEVEL_SHIELD * 0.01);
-	equipment->shield_regen = FIRST_LEVEL_SHIELD_REGEN + (bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
+	equipment->shield_regen = ceil(FIRST_LEVEL_SHIELD_REGEN + (bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01));
 
 	//saving level and credits used
 	equipment->level = level;
@@ -278,7 +279,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//allocating bonuses to the weapon
-	equipment->hyperspeed = FIRST_LEVEL_HYPERSPEED + (bonus_hyperspeed * FIRST_LEVEL_HYPERSPEED / 0.01);
+	equipment->hyperspeed = FIRST_LEVEL_HYPERSPEED + (bonus_hyperspeed * FIRST_LEVEL_HYPERSPEED * 0.01);
 
 	//saving level and credits used
 	equipment->level = level;
@@ -753,6 +754,8 @@ void Ship::Init()
 	this->m_size = this->ship_config.ship_model->size;
 	this->textureName = this->ship_config.ship_model->textureName;
 	this->transparent = this->ship_config.ship_model->hasFake;
+
+	UpdateShipLevel();
 }
 
 void Ship::setShipConfig(ShipConfig m_ship_config)
@@ -1688,15 +1691,15 @@ void Ship::Death()
 	(*CurrentGame).garbageLayer(AuraLayer);
 
 	//losing xp
-	int death_xp_penalty_ = floor(this->xp_max * XP_DEATH_MALUS_PERCENTAGE);
-	if (this->xp < death_xp_penalty_)
-	{
-		this->xp = 0;
-	}
-	else
-	{
-		this->xp -= death_xp_penalty_;
-	}
+	//int death_xp_penalty_ = floor(this->xp_max * XP_DEATH_MALUS_PERCENTAGE);
+	//if (this->xp < death_xp_penalty_)
+	//{
+	//	this->xp = 0;
+	//}
+	//else
+	//{
+	//	this->xp -= death_xp_penalty_;
+	//}
 }
 
 Independant* Ship::CloneEquipmentIntoIndependant(Equipment* new_equipment)
@@ -1882,31 +1885,61 @@ int Ship::GetFocusedPortalMaxUnlockedHazardLevel()
 	}
 }
 
-void Ship::gain_xp(int xp_earned_)
+//void Ship::gain_xp(int xp_earned_)
+//{
+//	this->xp += xp_earned_;
+//
+//	//no level down
+//	if (this->xp < 0)
+//	{
+//		this->xp = 0;
+//	}
+//
+//	while (this->xp >= this->xp_max && this->level < this->level_max)
+//	{
+//		this->LevelUp();
+//	}
+//
+//	//max level reached?
+//	if (this->xp > this->xp_max && this->level >= this->level_max)
+//	{
+//		this->xp = this->xp_max;
+//	}
+//}
+
+//void Ship::LevelUp()
+//{
+//	this->level++;
+//	this->xp -= this->xp_max;
+//	this->xp_max = floor(this->xp_max * (1 + XP_MAX_INCREASE_PER_LEVEL));
+//}
+
+int Ship::UpdateShipLevel()
 {
-	this->xp += xp_earned_;
+	int level_ = 1;
+	int credits_ = 0;
 
-	//no level down
-	if (this->xp < 0)
+	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
-		this->xp = 0;
+		if (ship_config.equipment[i])
+		{
+			credits_ += ship_config.equipment[i]->credits;
+		}
+	}
+	if (ship_config.weapon)
+	{
+		credits_ += ship_config.weapon->credits;
 	}
 
-	while (this->xp >= this->xp_max && this->level < this->level_max)
+	while (credits_ > (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) * (NBVAL_Equipment + 1))
 	{
-		this->LevelUp();
+		credits_ -= (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1);
+		level_++;
 	}
 
-	//max level reached?
-	if (this->xp > this->xp_max && this->level >= this->level_max)
-	{
-		this->xp = this->xp_max;
-	}
-}
+	this->level = level_;
+	this->xp = credits_;
+	this->xp_max = (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) * (NBVAL_Equipment + 1);
 
-void Ship::LevelUp()
-{
-	this->level++;
-	this->xp -= this->xp_max;
-	this->xp_max = floor(this->xp_max * (1 + XP_MAX_INCREASE_PER_LEVEL));
+	return level_;
 }

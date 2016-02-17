@@ -120,7 +120,7 @@ void InGameState::Update(Time deltaTime)
 
 			(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->armor_max, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->shield_max, (*CurrentGame).playerShip->getMoney(), (*CurrentGame).playerShip->graze_count,
 				this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
-				equip_index_, tmp_weapon->display_name, tmp_weapon->level, -1, -1, -1, -1, -1, tmp_weapon->ammunition->damage, false, tmp_weapon->ammunition->speed.y, tmp_weapon->ammunition->Pattern.currentPattern, tmp_weapon->multishot, 
+				equip_index_, tmp_weapon->display_name, tmp_weapon->level, tmp_weapon->credits, -1, -1, -1, -1, -1, tmp_weapon->ammunition->damage, false, tmp_weapon->ammunition->speed.y, tmp_weapon->ammunition->Pattern.currentPattern, tmp_weapon->multishot, 
 				tmp_weapon->xspread, tmp_weapon->rate_of_fire, tmp_weapon->shot_mode, tmp_weapon->dispersion, tmp_weapon->rafale, tmp_weapon->rafale_cooldown, tmp_weapon->target_seaking);
 
 			tmp_weapon = NULL;
@@ -133,7 +133,7 @@ void InGameState::Update(Time deltaTime)
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->armor_max, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->shield_max, (*CurrentGame).playerShip->getMoney(),
 					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
-					equip_index_, tmp_equipment->display_name, tmp_equipment->level, tmp_equipment->getEquipmentMaxSpeed(), tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->getEquipmentArmor(),
+					equip_index_, tmp_equipment->display_name, tmp_equipment->level, tmp_equipment->credits, tmp_equipment->getEquipmentMaxSpeed(), tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->getEquipmentArmor(),
 					tmp_equipment->getEquipmentShield(), tmp_equipment->getEquipmentShieldRegen(), tmp_equipment->getEquipmentDamage(), tmp_equipment->hasBot);
 			}
 			else
@@ -141,7 +141,7 @@ void InGameState::Update(Time deltaTime)
 				//todo : clean getEquipmentHyperspeed() etc...
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->armor_max, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->shield_max, (*CurrentGame).playerShip->getMoney(),
 					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
-					equip_index_, tmp_equipment->display_name, tmp_equipment->level, tmp_equipment->bot->Pattern.patternSpeed, tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->bot->armor_max,
+					equip_index_, tmp_equipment->display_name, tmp_equipment->level, tmp_equipment->credits, tmp_equipment->bot->Pattern.patternSpeed, tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->bot->armor_max,
 					tmp_equipment->bot->shield_max, tmp_equipment->bot->shield_regen, tmp_equipment->bot->weapon->ammunition->damage, tmp_equipment->hasBot, tmp_equipment->bot->weapon->ammunition->speed.y,
 					tmp_equipment->bot->weapon->ammunition->Pattern.currentPattern, tmp_equipment->bot->weapon->multishot, tmp_equipment->bot->weapon->xspread, tmp_equipment->bot->weapon->rate_of_fire,
 					tmp_equipment->bot->weapon->shot_mode, tmp_equipment->bot->weapon->dispersion, tmp_equipment->bot->weapon->rafale, tmp_equipment->bot->weapon->rafale_cooldown, tmp_equipment->bot->weapon->target_seaking);
