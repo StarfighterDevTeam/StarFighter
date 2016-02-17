@@ -52,8 +52,8 @@ class ShipModel
 {
 public:
 	ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
-	sf::Vector2f getShipModelMaxSpeed();
-	sf::Vector2f getShipModelAcceleration();
+	float getShipModelMaxSpeed();
+	float getShipModelAcceleration();
 	float getShipModelDecceleration();
 	float getShipModelHyperspeed();
 	int getShipModelArmor();
@@ -79,8 +79,8 @@ public:
 
 private:
 	float decceleration;
-	sf::Vector2f acceleration;
-	sf::Vector2f max_speed;
+	float acceleration;
+	float max_speed;
 	float hyperspeed;
 	
 };
@@ -97,8 +97,8 @@ public:
 	int frameNumber;
 	std::string display_name;
 	int equipmentType;
-	sf::Vector2f getEquipmentMaxSpeed();
-	sf::Vector2f getEquipmentAcceleration();
+	float getEquipmentMaxSpeed();
+	float getEquipmentAcceleration();
 	float getEquipmentDecceleration();
 	float getEquipmentHyperspeed();
 	int getEquipmentArmor();
@@ -126,8 +126,8 @@ public:
 	int credits;
 
 private:
-	sf::Vector2f max_speed;
-	sf::Vector2f acceleration;
+	float max_speed;
+	float acceleration;
 	float decceleration;
 	float hyperspeed;
 };
@@ -141,8 +141,8 @@ public:
 	sf::Vector2f size;
 
 	int frameNumber;
-	sf::Vector2f getShipConfigMaxSpeed();
-	sf::Vector2f getShipConfigAcceleration();
+	float getShipConfigMaxSpeed();
+	float getShipConfigAcceleration();
 	float getShipConfigDecceleration();
 	float getShipConfigHyperspeed();
 	int getShipConfigArmor();
@@ -164,8 +164,8 @@ public:
 	bool automatic_fire;
 
 private:
-	sf::Vector2f max_speed;
-	sf::Vector2f acceleration;
+	float max_speed;
+	float acceleration;
 	float decceleration;
 	float hyperspeed;
 	int armor;

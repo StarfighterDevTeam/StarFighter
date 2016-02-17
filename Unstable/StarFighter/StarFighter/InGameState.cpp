@@ -133,7 +133,7 @@ void InGameState::Update(Time deltaTime)
 			{
 				(*CurrentGame).updateHud((*CurrentGame).playerShip->armor, (*CurrentGame).playerShip->armor_max, (*CurrentGame).playerShip->shield, (*CurrentGame).playerShip->shield_max, (*CurrentGame).playerShip->getMoney(),
 					(*CurrentGame).playerShip->graze_count, this->currentScene->getSceneHazardLevelValue(), this->currentScene->bg->display_name, (*CurrentGame).playerShip->level, (*CurrentGame).playerShip->level_max, (*CurrentGame).playerShip->xp, (*CurrentGame).playerShip->xp_max, deltaTime, this->currentScene->direction == NO_DIRECTION,
-					equip_index_, tmp_equipment->display_name, tmp_equipment->level, tmp_equipment->getEquipmentMaxSpeed().x, tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->getEquipmentArmor(),
+					equip_index_, tmp_equipment->display_name, tmp_equipment->level, tmp_equipment->getEquipmentMaxSpeed(), tmp_equipment->getEquipmentHyperspeed(), tmp_equipment->getEquipmentArmor(),
 					tmp_equipment->getEquipmentShield(), tmp_equipment->getEquipmentShieldRegen(), tmp_equipment->getEquipmentDamage(), tmp_equipment->hasBot);
 			}
 			else
