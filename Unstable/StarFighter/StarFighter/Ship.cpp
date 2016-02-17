@@ -1171,14 +1171,7 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 	speed.y += inputs_direction.y*ship_config.getShipConfigAcceleration().y;
 
 	//max speed constraints
-	if (abs(speed.x) > this->ship_config.getShipConfigMaxSpeed().x)
-	{
-		speed.x = speed.x > 0 ? this->ship_config.getShipConfigMaxSpeed().x : -this->ship_config.getShipConfigMaxSpeed().x;
-	}
-	if (abs(speed.y) > this->ship_config.getShipConfigMaxSpeed().y)
-	{
-		speed.y = speed.y > 0 ? this->ship_config.getShipConfigMaxSpeed().y : -this->ship_config.getShipConfigMaxSpeed().y;
-	}
+	Independant::NormalizeSpeed(&this->speed, this->ship_config.getShipConfigMaxSpeed().x);
 }
 
 void Ship::ManageBraking()

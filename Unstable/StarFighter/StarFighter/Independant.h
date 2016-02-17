@@ -271,6 +271,9 @@ public:
 
 	static sf::Vector2f ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size);
 
+	//utilitary methods
+	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
+
 	int money;
 	Equipment* equipment_loot;
 	Weapon* weapon_loot;

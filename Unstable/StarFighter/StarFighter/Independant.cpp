@@ -155,6 +155,23 @@ void Independant::updateAnimation(sf::Time deltaTime)
 	AnimatedSprite::update(deltaTime);
 }
 
+bool Independant::NormalizeSpeed(sf::Vector2f* vector, float max_value)
+{
+	if (vector->x == 0 && vector->y == 0)
+		return true;
+
+	if (vector->x * vector->x + vector->y * vector->y > max_value * max_value)
+	{
+		float p = max_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+		vector->x *= p;
+		vector->y *= p;
+
+		return true;
+	}
+
+	return false;
+}
+
 void Independant::Respawn()
 {
 
