@@ -9,6 +9,7 @@
 #include <assert.h>
 
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
+#define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
 
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080
@@ -168,6 +169,7 @@
 #define FIRST_LEVEL_RATE_OF_FIRE						0.1f
 #define FIRST_LEVEL_HYPERSPEED							1.0f
 #define DEFAULT_AMMO_SPEED								2200
+#define ASSUMED_SHIP_SIZE								70
 
 enum HazardLevels
 {

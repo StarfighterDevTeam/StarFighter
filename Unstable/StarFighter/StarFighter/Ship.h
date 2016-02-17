@@ -14,6 +14,7 @@
 #include "PatternBobby.h"
 #include "Portal.h"
 #include "Shop.h"
+#include "Enemy.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0
@@ -204,11 +205,11 @@ public :
 	PlayerHud ship_hud;
 
 	void Respawn() override;
-	bool setEquipment(Equipment* m_equipment, bool overwrite = false);
-	bool setShipWeapon(Weapon* m_weapon, bool overwrite = false);
-	void setShipModel(ShipModel* m_ship_model);
-	void cleanEquipment(int equipment_type);
-	void cleanWeapon();
+	bool setEquipment(Equipment* m_equipment, bool overwrite = false, bool no_save = false);
+	bool setShipWeapon(Weapon* m_weapon, bool overwrite = false, bool no_save = false);
+	void setShipModel(ShipModel* m_ship_model, bool no_save = false);
+	void cleanEquipment(int equipment_type, bool no_save = false);
+	void cleanWeapon(bool no_save = false);
 	static Independant* CloneEquipmentIntoIndependant(Equipment* new_equipment);
 	static Independant* CloneWeaponIntoIndependant(Weapon* new_weapon);
 	
@@ -259,6 +260,13 @@ public :
 	//void gain_xp (int xp_earned_);
 	//void LevelUp();
 	int UpdateShipLevel();
+
+	static int SaveItems(string file);
+	static bool LoadPlayerItems(string file);
+	static Equipment* LoadEquipmentFromLine(string line);
+	static Weapon* LoadWeaponFromLine(string line);
+	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);
+	static void SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level = false);
 
 	float hyperspeed;
 	

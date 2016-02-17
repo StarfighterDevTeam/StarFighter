@@ -39,8 +39,18 @@ void InGameState::Initialize(Player player)
 	
 	//creating new ship
 	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
-	this->playerShip->ResplenishHealth();
+	(*CurrentGame).SetPlayerShip(this->playerShip);
 	this->playerShip->respawnSceneName = this->currentScene->m_name;
+
+	//Load saved items
+	if (!Ship::LoadPlayerItems(ITEMS_SAVE_FILE))
+	{
+		//or create a new save file
+		Ship::SaveItems(ITEMS_SAVE_FILE);
+	}
+	this->playerShip->Init();
+	this->playerShip->ResplenishHealth();
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
 
 	//initalizing equipment in HUD
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");
@@ -65,11 +75,6 @@ void InGameState::Initialize(Player player)
 		}
 	}
 	LOGGER_WRITE(Logger::Priority::DEBUG, "HUD initialization completed\n");
-
-	//transmitting a global reference to the ship
-	(*CurrentGame).SetPlayerShip(this->playerShip);
-
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
 
 	//ship
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)

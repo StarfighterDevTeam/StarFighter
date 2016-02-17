@@ -764,7 +764,7 @@ void Ship::setShipConfig(ShipConfig m_ship_config)
 	this->Init();
 }
 
-bool Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing)
+bool Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing, bool no_save)
 {
 	if (m_equipment->hasBot && (overwrite_existing || ship_config.equipment[m_equipment->equipmentType] == NULL))
 	{
@@ -782,10 +782,13 @@ bool Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing)
 		}
 	}
 	
+	if (!no_save)
+		Ship::SaveItems(ITEMS_SAVE_FILE);
+
 	return result;
 }
 
-bool Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing)
+bool Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing, bool no_save)
 {
 	//this->ship_config.DestroyBots();
 	bool result = this->ship_config.setShipWeapon(m_weapon, true, overwrite_existing);
@@ -795,10 +798,13 @@ bool Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing)
 	}
 	//this->ship_config.GenerateBots(this);
 
+	if (!no_save)
+		Ship::SaveItems(ITEMS_SAVE_FILE);
+	
 	return result;
 }
 
-void Ship::cleanEquipment(int equipment_type)
+void Ship::cleanEquipment(int equipment_type, bool no_save)
 {
 	if (this->ship_config.equipment[equipment_type] != NULL)
 	{
@@ -818,9 +824,12 @@ void Ship::cleanEquipment(int equipment_type)
 			this->ship_config.GenerateBots(this);
 		}
 	}
+
+	if (!no_save)
+		Ship::SaveItems(ITEMS_SAVE_FILE);
 }
 
-void Ship::cleanWeapon()
+void Ship::cleanWeapon(bool no_save)
 {
 	if (this->ship_config.weapon != NULL)
 	{
@@ -831,9 +840,12 @@ void Ship::cleanWeapon()
 		this->ship_config.Init();
 		this->Init();
 	}
+
+	if (!no_save)
+		Ship::SaveItems(ITEMS_SAVE_FILE);
 }
 
-void Ship::setShipModel(ShipModel* m_ship_model)
+void Ship::setShipModel(ShipModel* m_ship_model, bool no_save)
 {
 	if (m_ship_model->hasBot)
 	{
@@ -847,6 +859,9 @@ void Ship::setShipModel(ShipModel* m_ship_model)
 	{
 		this->ship_config.GenerateBots(this);
 	}
+
+	if (!no_save)
+		Ship::SaveItems(ITEMS_SAVE_FILE);
 }
 
 void Ship::ManageDebugCommand()
@@ -1729,7 +1744,6 @@ bool Ship::GetLoot(Independant& independant)
 		if (this->setEquipment(independant.getEquipmentLoot()))
 		{
 			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
-			
 			(*CurrentGame).InsertObjectInShipGrid(*capsule, independant.getEquipmentLoot()->equipmentType);
 		}
 		else
@@ -1942,4 +1956,649 @@ int Ship::UpdateShipLevel()
 	this->xp_max = (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level_ + 1) * (NBVAL_Equipment + 1);
 
 	return level_;
+}
+
+//SAVING AND LOADING ITEMS
+void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type)
+{
+	if (equipment)
+	{
+		if (!skip_type)
+		{
+			switch (equipment->equipmentType)
+			{
+			case Engine:
+			{
+						   data << "Engine ";
+						   break;
+			}
+			case Armor:
+			{
+						  data << "Armor ";
+						  break;
+			}
+			case Shield:
+			{
+						   data << "Shield ";
+						   break;
+			}
+			case Module:
+			{
+						   data << "Module ";
+						   break;
+			}
+			default:
+			{
+					   data << "Unknown ";
+					   break;
+			}
+			}
+		}
+
+		data << equipment->display_name << " ";
+		data << equipment->level << " ";
+		data << equipment->credits << " ";
+		data << equipment->textureName << " ";
+		data << equipment->size.x << " ";
+		data << equipment->size.y << " ";
+		data << equipment->frameNumber << " ";
+		data << equipment->getEquipmentMaxSpeed() << " ";
+		data << equipment->getEquipmentDecceleration() << " ";
+		data << equipment->getEquipmentAcceleration() << " ";
+		data.precision(3);
+		data << equipment->getEquipmentHyperspeed() << " ";
+		data.precision(0);
+		data << equipment->getEquipmentArmor() << " ";
+		data << equipment->getEquipmentShield() << " ";
+		data << equipment->getEquipmentShieldRegen() << " ";
+		data << equipment->getEquipmentDamage() << " ";
+
+		if (equipment->hasBot)
+		{
+			data << equipment->bot->display_name << " ";
+			data << equipment->bot->textureName << " ";
+			data << equipment->bot->m_size.x << " ";
+			data << equipment->bot->m_size.y << " ";
+			data << equipment->bot->frameNumber << " ";
+			data << equipment->bot->spread.x << " ";
+			data << equipment->bot->spread.y << " ";
+			data << equipment->bot->rotation_speed << " ";
+			data << equipment->bot->Pattern.currentPattern << " ";
+			switch (equipment->bot->Pattern.currentPattern)
+			{
+			case NoMovePattern:
+			{
+								  break;
+			}
+			case Line_:
+			{
+						  data << equipment->bot->Pattern.patternSpeed << " ";
+						  data << &equipment->bot->Pattern.patternParams[1] << " ";
+						  break;
+			}
+			default:
+			{
+					   data << equipment->bot->Pattern.patternSpeed << " ";
+					   data << &equipment->bot->Pattern.patternParams[0] << " ";
+					   data << &equipment->bot->Pattern.patternParams[1] << " ";
+					   break;
+			}
+			}
+
+			if (equipment->bot->weapon)
+			{
+				Ship::SaveWeaponData(data, equipment->bot->weapon, true, true);
+				return;
+			}
+			else
+			{
+				data << "0";
+			}
+		}
+		else
+		{
+			data << "0";
+		}
+	}
+	else
+	{
+		data << "0";
+	}
+
+	data << endl;
+}
+
+void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level)
+{
+	if (!skip_type)
+	{
+		data << "Weapon ";
+	}
+
+	if (weapon)
+	{
+		data << weapon->display_name << " ";
+		if (!skip_level)
+		{
+			data << weapon->level << " ";
+			data << weapon->credits << " ";
+		}
+		data << weapon->textureName << " ";
+		data << weapon->size.x << " ";
+		data << weapon->size.y << " ";
+		data << weapon->frameNumber << " ";
+		data.precision(3);
+		data << weapon->rate_of_fire << " ";
+		data.precision(0);
+		data << weapon->rafale << " ";
+		data.precision(3);
+		data << weapon->rafale_cooldown << " ";
+		data.precision(0);
+
+		data << weapon->multishot << " ";
+		data << weapon->xspread << " ";
+		data << weapon->dispersion << " ";
+		data << (int)weapon->shot_mode << " ";
+		data << (int)weapon->target_seaking << " ";
+
+		data << weapon->ammunition->display_name << " ";
+		data << weapon->ammunition->damage << " ";
+		data << weapon->ammunition->speed.y << " ";
+		data << weapon->ammunition->range << " ";
+		data << weapon->ammunition->textureName << " ";
+		data << weapon->ammunition->m_size.x << " ";
+		data << weapon->ammunition->m_size.y << " ";
+		data << weapon->ammunition->frameNumber << " ";
+		data << weapon->ammunition->explosion->display_name << " ";
+		data << (int)weapon->ammunition->Pattern.currentPattern;
+		if (weapon->ammunition->Pattern.currentPattern == Line_)
+		{
+			data << " " << weapon->ammunition->Pattern.patternSpeed << " ";
+			data << &weapon->ammunition->Pattern.patternParams[1];
+		}
+		else if (weapon->ammunition->Pattern.currentPattern > NoMovePattern)
+		{
+			data << " " << weapon->ammunition->Pattern.patternSpeed << " ";
+			data << &weapon->ammunition->Pattern.patternParams[0] << " ";
+			data << &weapon->ammunition->Pattern.patternParams[1];
+		}
+	}
+	else
+	{
+		data << "0";
+	}
+
+	data << endl;
+}
+
+int Ship::SaveItems(string file)
+{
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving items in profile.\n");
+
+	ofstream data(file.c_str(), ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		// instructions
+		for (int i = 0; i < NBVAL_Equipment; i++)
+		{
+			switch (i)
+			{
+				case Engine:
+				{
+					data << "Engine ";
+					break;
+				}
+				case Armor:
+				{
+					data << "Armor ";
+					break;
+				}
+				case Shield:
+				{
+					data << "Shield ";
+					break;
+				}
+				case Module:
+				{
+					data << "Module ";
+					break;
+				}
+				default:
+				{
+					data << "Unknown ";
+					break;
+				}
+			}
+
+			Ship::SaveEquipmentData(data, (*CurrentGame).playerShip->ship_config.equipment[i], true);
+		}
+
+		data << "Weapon ";
+		Ship::SaveWeaponData(data, (*CurrentGame).playerShip->ship_config.weapon, true);
+
+		for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+		{
+			for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+			{
+				if ((*CurrentGame).hud.equipmentGrid.grid[i][j])
+				{
+					if ((*CurrentGame).hud.equipmentGrid.grid[i][j]->equipment_loot)
+					{
+						Ship::SaveEquipmentData(data, (*CurrentGame).hud.equipmentGrid.grid[i][j]->equipment_loot, false);
+					}
+					else if ((*CurrentGame).hud.equipmentGrid.grid[i][j]->weapon_loot)
+					{
+						Ship::SaveWeaponData(data, (*CurrentGame).hud.equipmentGrid.grid[i][j]->weapon_loot, false);
+					}
+					else
+					{
+						data << "0";
+						data << endl;
+					}
+				}
+				else
+				{
+					data << "0";
+					data << endl;
+				}
+			}
+		}
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
+	}
+
+	return 0;
+}
+
+Equipment* Ship::LoadEquipmentFromLine(string line)
+{
+	string equipment_type;
+	string display_name;
+
+	std::istringstream ss(line);
+	ss >> equipment_type >> display_name;
+	//ss.str(line.substr(ss.tellg()));
+
+	Equipment* equipment = new Equipment();
+
+	string texture_name;
+	int level;
+	int credits;
+	int width;
+	int height;
+	int frames;
+	float max_speed;
+	float deceleration;
+	float acceleration;
+	float hyperspeed;
+	int armor;
+	int shield;
+	int shield_regen;
+	int damage;
+
+	string bot_name;
+	string bot_texture_name;
+	int bot_width;
+	int bot_height;
+	int bot_frames;
+	float bot_spread_x;
+	float bot_spread_y;
+	float bot_rotation_speed;
+	float bot_pattern_speed;
+	int bot_pattern_type;
+	float bot_pattern_arg1;
+	float bot_pattern_arg2;
+
+	string bot_weapon_name;
+	string bot_weapon_texture_name;
+	int bot_weapon_width;
+	int bot_weapon_height;
+	int bot_weapon_frames;
+	float bot_weapon_rate_of_fire;
+	int bot_weapon_rafale;
+	float bot_rafale_cooldown;
+	int bot_weapon_multishot;
+	float bot_weapon_xspread;
+	float bot_weapon_dispersion;
+	int bot_weapon_shot_mode;
+	int bot_weapon_target_seaking;
+
+	string bot_ammo_name;
+	int bot_ammo_damage;
+	float bot_ammo_speed;
+	float bot_ammo_range;
+	string bot_ammo_texture_name;
+	int bot_ammo_width;
+	int bot_ammo_height;
+	int bot_ammo_frames;
+	int bot_ammo_pattern_type;
+	float bot_ammo_pattern_speed;
+	float bot_ammo_pattern_arg1;
+	float bot_ammo_pattern_arg2;
+	string bot_ammo_explosion_name;
+
+	if (display_name.compare("0") == 0)
+	{
+		//do nothing
+	}
+	else
+	{
+		ss >> level >> credits >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> armor >> shield >> shield_regen >> damage >> bot_name;
+
+		if (bot_name.compare("0") == 0)
+		{
+			//do nothing
+		}
+		else
+		{
+			ss >> bot_texture_name >> bot_width >> bot_height >> bot_frames >> bot_spread_x >> bot_spread_y >> bot_rotation_speed >> bot_pattern_type;
+			if (bot_pattern_type == Line_)
+			{
+				ss >> bot_pattern_speed >> bot_pattern_arg2;
+			}
+			else if (bot_pattern_type > NoMovePattern)
+			{
+				ss >> bot_pattern_speed >> bot_pattern_arg1 >> bot_pattern_arg2;
+			}
+
+			ss >> bot_weapon_name;
+			if (bot_weapon_name.compare("0") == 0)
+			{
+				//do nothing
+			}
+			else
+			{
+				ss >> bot_weapon_texture_name >> bot_weapon_width >> bot_weapon_height >> bot_weapon_frames >> bot_weapon_rate_of_fire >>
+					bot_weapon_rafale >> bot_rafale_cooldown >> bot_weapon_multishot >> bot_weapon_xspread >> bot_weapon_dispersion >> bot_weapon_shot_mode
+					>> bot_weapon_target_seaking;
+
+				ss >> bot_ammo_name >> bot_ammo_damage >> bot_ammo_speed >> bot_ammo_range >> bot_ammo_texture_name >> bot_ammo_width >> bot_ammo_height >>
+					bot_ammo_frames >> bot_ammo_explosion_name >> bot_ammo_pattern_type;
+
+				if (bot_ammo_pattern_type == Line_)
+				{
+					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_arg2;
+				}
+				else if (bot_ammo_pattern_type >> NoMovePattern)
+				{
+					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_arg1 >> bot_ammo_pattern_arg2;
+				}
+			}
+		}
+	}
+
+	EquipmentType type = NBVAL_Equipment;
+	if (equipment_type.compare("Shield") == 0)
+	{
+		type = Shield;
+	}
+	else if (equipment_type.compare("Armor") == 0)
+	{
+		type = Armor;
+	}
+	else if (equipment_type.compare("Engine") == 0)
+	{
+		type = Engine;
+	}
+	else if (equipment_type.compare("Module") == 0)
+	{
+		type = Module;
+	}
+
+	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, armor, shield, shield_regen, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
+	equipment->level = level;
+	equipment->credits = credits;
+	if (bot_name.compare("0") == 0)
+	{
+		equipment->hasBot = false;
+	}
+	else
+	{
+		equipment->hasBot = true;
+		Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), bot_texture_name, sf::Vector2f(bot_width, bot_height));
+
+		bot->display_name = bot_name;
+		bot->spread = sf::Vector2f(bot_spread_x, bot_spread_y);
+		bot->rotation_speed = bot_rotation_speed;
+		bot->Pattern.currentPattern = (PatternType)bot_pattern_type;
+		if (bot->Pattern.currentPattern == Line_)
+		{
+			bot->Pattern.patternSpeed = bot_pattern_speed;
+			bot->Pattern.patternParams->push_back(bot_pattern_arg2);
+		}
+		else if (bot->Pattern.currentPattern > NoMovePattern)
+		{
+			bot->Pattern.patternSpeed = bot_pattern_speed;
+			bot->Pattern.patternParams->push_back(bot_pattern_arg1);
+			bot->Pattern.patternParams->push_back(bot_pattern_arg2);
+		}
+
+		if (bot_weapon_name.compare("0") == 0)
+		{
+			//do nothing
+		}
+		else
+		{
+			Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, bot_ammo_speed), bot_ammo_texture_name, sf::Vector2f(bot_ammo_width, bot_ammo_height), bot_ammo_damage, Enemy::LoadFX(bot_ammo_explosion_name));
+			ammo->display_name = bot_ammo_name;
+			ammo->range = bot_ammo_range;
+			ammo->Pattern.currentPattern = (PatternType)bot_ammo_pattern_type;
+			if (ammo->Pattern.currentPattern == Line_)
+			{
+				ammo->Pattern.patternSpeed = bot_ammo_pattern_speed;
+				ammo->Pattern.patternParams->push_back(bot_ammo_pattern_arg2);
+			}
+			else if (ammo->Pattern.currentPattern > NoMovePattern)
+			{
+				ammo->Pattern.patternSpeed = bot_ammo_pattern_speed;
+				ammo->Pattern.patternParams->push_back(bot_ammo_pattern_arg1);
+				ammo->Pattern.patternParams->push_back(bot_ammo_pattern_arg2);
+			}
+
+			Weapon* weapon = new Weapon(ammo);
+			weapon->display_name = bot_weapon_name;
+			weapon->fire_direction = Vector2i(0, -1);
+			weapon->rate_of_fire = bot_weapon_rate_of_fire;
+			weapon->shot_mode = (ShotMode)bot_weapon_shot_mode;
+
+			weapon->multishot = bot_weapon_multishot;
+			weapon->xspread = bot_weapon_xspread;
+			weapon->dispersion = bot_weapon_dispersion;
+			weapon->rafale = bot_weapon_rafale;
+			weapon->rafale_cooldown = bot_rafale_cooldown;
+
+			weapon->textureName = bot_weapon_texture_name;
+			weapon->size = sf::Vector2f(bot_weapon_width, bot_weapon_height);
+			weapon->frameNumber = bot_weapon_frames;
+			weapon->target_seaking = (TargetSeaking)bot_weapon_target_seaking;
+
+			bot->weapon = weapon;
+		}
+
+		equipment->bot = bot;
+	}
+
+	return equipment;
+}
+
+Weapon* Ship::LoadWeaponFromLine(string line)
+{
+	string equipment_type;
+	string display_name;
+
+	//std::istringstream(line) >> equipment_type >> display_name;
+
+	std::istringstream ss(line);
+	ss >> equipment_type >> display_name;
+
+	Equipment* equipment = new Equipment();
+
+	string weapon_texture_name;
+	int weapon_level;
+	int weapon_credits;
+	int weapon_width;
+	int weapon_height;
+	int weapon_frames;
+	float weapon_rate_of_fire;
+	int weapon_rafale;
+	float rafale_cooldown;
+	int weapon_multishot;
+	float weapon_xspread;
+	float weapon_dispersion;
+	int weapon_shot_mode;
+	int weapon_target_seaking;
+
+	string ammo_name;
+	int ammo_damage;
+	float ammo_speed;
+	float ammo_range;
+	string ammo_texture_name;
+	int ammo_width;
+	int ammo_height;
+	int ammo_frames;
+	int ammo_pattern_type;
+	float ammo_pattern_speed;
+	float ammo_pattern_arg1;
+	float ammo_pattern_arg2;
+	string ammo_explosion_name;
+
+	ss >> weapon_level >> weapon_credits >> weapon_texture_name >> weapon_width >> weapon_height >> weapon_frames >> weapon_rate_of_fire >>
+		weapon_rafale >> rafale_cooldown >> weapon_multishot >> weapon_xspread >> weapon_dispersion >> weapon_shot_mode
+		>> weapon_target_seaking >> ammo_name >> ammo_damage >> ammo_speed >> ammo_range >> ammo_texture_name >> ammo_width >> ammo_height >>
+		ammo_frames >> ammo_explosion_name >> ammo_pattern_type;
+	if (ammo_pattern_type == Line_)
+	{
+		ss >> ammo_pattern_speed >> ammo_pattern_arg2;
+	}
+	else if (ammo_pattern_type > NoMovePattern)
+	{
+		ss >> ammo_pattern_speed >> ammo_pattern_arg1 >> ammo_pattern_arg2;
+	}
+
+	EquipmentType type = NBVAL_Equipment;
+
+	Ammo* ammo = new Ammo(Vector2f(0, 0), sf::Vector2f(0, ammo_speed), ammo_texture_name, sf::Vector2f(ammo_width, ammo_height), ammo_damage, Enemy::LoadFX(ammo_explosion_name));
+	ammo->display_name = ammo_name;
+	ammo->range = ammo_range;
+	ammo->Pattern.currentPattern = (PatternType)ammo_pattern_type;
+	if (ammo->Pattern.currentPattern == Line_)
+	{
+		ammo->Pattern.patternSpeed = ammo_pattern_speed;
+		ammo->Pattern.patternParams->push_back(ammo_pattern_arg2);
+	}
+	else if (ammo->Pattern.currentPattern > NoMovePattern)
+	{
+		ammo->Pattern.patternSpeed = ammo_pattern_speed;
+		ammo->Pattern.patternParams->push_back(ammo_pattern_arg1);
+		ammo->Pattern.patternParams->push_back(ammo_pattern_arg2);
+	}
+
+	Weapon* weapon = new Weapon(ammo);
+	weapon->display_name = display_name;
+	weapon->level = weapon_level;
+	weapon->credits = weapon_credits;
+	weapon->fire_direction = Vector2i(0, -1);
+	weapon->rate_of_fire = weapon_rate_of_fire;
+	weapon->shot_mode = (ShotMode)weapon_shot_mode;
+
+	weapon->multishot = weapon_multishot;
+	weapon->xspread = weapon_xspread;
+	weapon->dispersion = weapon_dispersion;
+	weapon->rafale = weapon_rafale;
+	weapon->rafale_cooldown = rafale_cooldown;
+
+	weapon->textureName = weapon_texture_name;
+	weapon->size = sf::Vector2f(weapon_width, weapon_height);
+	weapon->frameNumber = weapon_frames;
+	weapon->target_seaking = (TargetSeaking)weapon_target_seaking;
+
+	return weapon;
+}
+
+bool Ship::LoadPlayerItems(string file)
+{
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading items from profile.\n");
+
+	std::ifstream  data(file, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+		int i = 0;
+		while (std::getline(data, line))
+		{
+			string equipment_type;
+			string display_name;
+
+			//Loading equipment
+			if (i < NBVAL_Equipment)
+			{
+				std::istringstream(line) >> equipment_type >> display_name;
+				if (display_name.compare("0") != 0)
+				{
+					(*CurrentGame).playerShip->setEquipment(Ship::LoadEquipmentFromLine(line), true, true);
+				}
+			}
+			//Loading weapon
+			else if (i == NBVAL_Equipment)
+			{
+				std::istringstream(line) >> equipment_type >> display_name;
+				if (display_name.compare("0") != 0)
+				{
+					(*CurrentGame).playerShip->setShipWeapon(Ship::LoadWeaponFromLine(line), true, true);
+				}
+			}
+			//Loading stash
+			else //if (i > NBVAL_Equipment)
+			{
+				std::istringstream(line) >> equipment_type;
+
+				int index = i - NBVAL_Equipment - 1;
+				int r = index % (*CurrentGame).hud.equipmentGrid.squares.y;
+				int l = index / (*CurrentGame).hud.equipmentGrid.squares.y;
+
+				if ((*CurrentGame).hud.equipmentGrid.grid[l][r])
+				{
+					(*CurrentGame).GarbageObjectInGrid(HudGrid_ShipGrid, index);
+				}
+
+				if (equipment_type.compare("0") != 0)
+				{
+					if ((*CurrentGame).hud.equipmentGrid.grid[l][r])
+					{
+						delete (*CurrentGame).hud.equipmentGrid.grid[l][r];
+					}
+					if (equipment_type.compare("Weapon") == 0)
+					{
+						Weapon* weapon = Ship::LoadWeaponFromLine(line);
+						Independant* capsule = (*CurrentGame).playerShip->CloneWeaponIntoIndependant(weapon);
+						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
+						delete weapon;
+					}
+					else
+					{
+						Equipment* equipment = Ship::LoadEquipmentFromLine(line);
+						Independant* capsule = (*CurrentGame).playerShip->CloneEquipmentIntoIndependant(equipment);
+						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
+						delete equipment;
+					}
+				}
+			}
+
+			i++;
+		}
+
+		data.close();  // on ferme le fichier
+
+		return i == NBVAL_Equipment + 1 + EQUIPMENT_GRID_NB_LINES*EQUIPMENT_GRID_NB_ROWS;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "Failed to open ITEMS SAVE FILE !" << endl;
+		return false;
+	}
 }

@@ -469,13 +469,19 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 
 	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
 
-	weapon->target_seaking = SEAKING;
+	weapon->target_seaking = NO_SEAKING;
 	weapon->ammunition->speed.y = DEFAULT_AMMO_SPEED;
 
 	//allocating bonuses to the weapon
 	weapon->ammunition->damage = ceil(FIRST_LEVEL_AMMO_DAMAGE + ((bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE * 0.01));
 	weapon->multishot = MIN_VALUE_OF_MULTISHOT + bonus_multishot;
 	weapon->rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE - (bonus_rate_of_fire * FIRST_LEVEL_RATE_OF_FIRE * 0.01);
+
+	//spread of multishot weapons
+	if (weapon->multishot > 1)
+	{
+		weapon->xspread = RandomizeIntBetweenValues(0, ASSUMED_SHIP_SIZE * 2 / weapon->multishot);
+	}
 
 	//saving level and credits used
 	weapon->level = level;

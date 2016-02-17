@@ -54,7 +54,7 @@ public:
 	float vspeed;
 
 	bool InsertObjectInShipGrid(Independant& object, int index = 0);
-	bool InsertObjectInEquipmentGrid(Independant& object);
+	bool InsertObjectInEquipmentGrid(Independant& object, int index=-1);
 	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment);
 	void GarbageObjectInGrid(int grid_id, int index);
 	Independant* getHudFocusedItem();

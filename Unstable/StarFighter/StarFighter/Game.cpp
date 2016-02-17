@@ -772,9 +772,9 @@ bool Game::InsertObjectInShipGrid(Independant& object, int index)
 	return result;
 }
 
-bool Game::InsertObjectInEquipmentGrid(Independant& object)
+bool Game::InsertObjectInEquipmentGrid(Independant& object, int index)
 {
-	bool result = hud.equipmentGrid.insertObject(object);
+	bool result = hud.equipmentGrid.insertObject(object, index);
 
 	return result;
 }
