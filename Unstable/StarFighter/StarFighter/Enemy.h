@@ -71,6 +71,8 @@ public:
 	sf::RectangleShape* armorBarContainer;
 	sf::RectangleShape* shieldBar;
 	sf::RectangleShape* shieldBarContainer;
+	sf::Text enemyLevel;
+	sf::Font* font;
 	float armorBar_offsetY;
 	float shieldBar_offsetY;
 	//float offsetBetweenHealthBars;

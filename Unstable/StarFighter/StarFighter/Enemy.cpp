@@ -51,6 +51,26 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	//shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	shieldBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+
+	try
+	{
+		font = new sf::Font();
+		if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		{
+			// error
+			//TODO: font loader
+		}
+		enemyLevel.setFont(*font);
+		enemyLevel.setCharacterSize(12);
+		enemyLevel.setColor(sf::Color::White);
+		enemyLevel.setPosition(getPosition().x, getPosition().y);
+	}
+
+	catch (const std::exception & ex)
+	{
+		//An error occured
+		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+	}
 }
 
 void Enemy::UpdateHealthBars(sf::Time deltaTime)
@@ -97,6 +117,13 @@ void Enemy::UpdateHealthBars(sf::Time deltaTime)
 				(*CurrentGame).removeFromFeedbacks(shieldBar);
 				(*CurrentGame).removeFromFeedbacks(shieldBarContainer);
 			}
+		}
+
+		//update enemy level display
+		enemyLevel.setPosition(sf::Vector2f(armorBarContainer->getPosition().x - armorBarContainer->getGlobalBounds().width / 2 - enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, armorBarContainer->getPosition().y - enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
+		if (feedbackTimer <= sf::seconds(0))
+		{
+			(*CurrentGame).removeFromFeedbacks(&enemyLevel);
 		}
 	}
 }
@@ -451,6 +478,7 @@ void Enemy::damage_from(Independant& independant)
 				(*CurrentGame).addToFeedbacks(shieldBarContainer);
 				(*CurrentGame).addToFeedbacks(shieldBar);
 			}
+			(*CurrentGame).addToFeedbacks(&enemyLevel);
 		}
 
 		feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
@@ -510,6 +538,7 @@ Enemy* Enemy::Clone()
 	}
 
 	enemy->level = this->level;
+	enemy->enemyLevel.setString(to_string(this->level));
 
 	return enemy;
 }
@@ -985,6 +1014,7 @@ void Enemy::Destroy()
 		(*CurrentGame).removeFromFeedbacks(shieldBar);
 		(*CurrentGame).removeFromFeedbacks(shieldBarContainer);
 	}
+	(*CurrentGame).removeFromFeedbacks(&enemyLevel);
 }
 
 void Enemy::GenerateLoot()
@@ -1237,4 +1267,6 @@ void Enemy::ApplyLevelModifiers()
 	{
 		(*it)->ammunition->damage = ceil((*it)->ammunition->damage * multiplier_);
 	}
+
+	enemyLevel.setString(to_string(this->level));
 }
