@@ -32,6 +32,9 @@ public:
 	sf::RectangleShape shieldBar;
 	sf::RectangleShape armorBarContainer;
 	sf::RectangleShape shieldBarContainer;
+	sf::Text LifeText;
+	sf::Text ShieldText;
+
 	sf::RectangleShape xpBar;
 	//sf::Text ShipGridTitle;
 	//sf::Text EquipmentGridTitle;

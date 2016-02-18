@@ -93,6 +93,16 @@ void PlayerHud::Init(int m_armor, int m_shield, int xp, int xp_max)
 		itemStatsText.setColor(_white);
 		itemStatsText.setPosition(HUD_LEFT_MARGIN + 5, (3 * ARMOR_BAR_SIZE_Y) + 40 + 5);
 		
+		LifeText.setFont(*font);
+		LifeText.setCharacterSize(10);
+		LifeText.setColor(_white);
+		LifeText.setPosition(HUD_LEFT_MARGIN + ARMOR_BAR_SIZE_X / 2, 10);
+
+		ShieldText.setFont(*font);
+		ShieldText.setCharacterSize(10);
+		ShieldText.setColor(_white);
+		ShieldText.setPosition(HUD_LEFT_MARGIN + ARMOR_BAR_SIZE_X / 2, 20 + ARMOR_BAR_SIZE_Y);
+
 		Money.setFont(*font);
 		Money.setCharacterSize(20);
 		Money.setColor(_white);
@@ -198,6 +208,16 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		}
 		this->has_shield = true;
 	}
+
+	ostringstream ss_life;
+	ss_life << m_armor;// << " / " << m_armor_max;
+	LifeText.setString(ss_life.str());
+	LifeText.setPosition(HUD_LEFT_MARGIN + armorBar.getGlobalBounds().width / 2 - LifeText.getGlobalBounds().width / 2, 10 + LifeText.getGlobalBounds().height / 2);
+
+	ostringstream ss_shield;
+	ss_shield << m_shield;// << " / " << m_shield_max;
+	ShieldText.setString(ss_shield.str());
+	ShieldText.setPosition(HUD_LEFT_MARGIN + shieldBar.getGlobalBounds().width / 2 - ShieldText.getGlobalBounds().width / 2, 20 + ARMOR_BAR_SIZE_Y + ShieldText.getGlobalBounds().height / 2);
 
 	//money
 	ostringstream ss_m;
@@ -535,10 +555,12 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 
 	offscreen.draw(armorBar);
 	offscreen.draw(armorBarContainer);
+	offscreen.draw(LifeText);
 	if (this->has_shield)
 	{
 		offscreen.draw(shieldBar);
 		offscreen.draw(shieldBarContainer);
+		offscreen.draw(ShieldText);
 	}
 	offscreen.draw(Money);
 	offscreen.draw(GrazeScore);
