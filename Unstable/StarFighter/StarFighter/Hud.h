@@ -30,6 +30,8 @@ public:
 	sf::RectangleShape backgroundColor;
 	sf::RectangleShape armorBar;
 	sf::RectangleShape shieldBar;
+	sf::RectangleShape armorBarContainer;
+	sf::RectangleShape shieldBarContainer;
 	sf::RectangleShape xpBar;
 	//sf::Text ShipGridTitle;
 	//sf::Text EquipmentGridTitle;

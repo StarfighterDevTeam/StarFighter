@@ -25,17 +25,31 @@ void PlayerHud::Init(int m_armor, int m_shield, int xp, int xp_max)
 
 	armorBar.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
 	armorBar.setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
-	armorBar.setOutlineThickness(1);
-	armorBar.setOutlineColor(sf::Color(255, 255, 255));
+	//armorBar.setOutlineThickness(1);
+	//armorBar.setOutlineColor(sf::Color(255, 255, 255));
 	armorBar.setOrigin(0, 0);
 	armorBar.setPosition(HUD_LEFT_MARGIN, 10);
 
 	shieldBar.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
 	shieldBar.setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
-	shieldBar.setOutlineThickness(1);
-	shieldBar.setOutlineColor(sf::Color(255, 255, 255));
+	//shieldBar.setOutlineThickness(1);
+	//shieldBar.setOutlineColor(sf::Color(255, 255, 255));
 	shieldBar.setOrigin(0, 0);
 	shieldBar.setPosition(HUD_LEFT_MARGIN, 20 + ARMOR_BAR_SIZE_Y);
+
+	armorBarContainer.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
+	armorBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
+	armorBarContainer.setOutlineThickness(1);
+	armorBarContainer.setOutlineColor(sf::Color(255, 255, 255));
+	armorBarContainer.setOrigin(0, 0);
+	armorBarContainer.setPosition(HUD_LEFT_MARGIN, 10);
+
+	shieldBarContainer.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
+	shieldBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
+	shieldBarContainer.setOutlineThickness(1);
+	shieldBarContainer.setOutlineColor(sf::Color(255, 255, 255));
+	shieldBarContainer.setOrigin(0, 0);
+	shieldBarContainer.setPosition(HUD_LEFT_MARGIN, 20 + ARMOR_BAR_SIZE_Y);
 
 	xpBar.setSize(sf::Vector2f((1.0f * xp / xp_max) * XP_BAR_SIZE_X, XP_BAR_SIZE_Y));
 	xpBar.setFillColor(sf::Color(COLOR_LIGHT_BLUE_R_VALUE, COLOR_LIGHT_BLUE_G_VALUE, COLOR_LIGHT_BLUE_B_VALUE, COLOR_LIGHT_BLUE_A_VALUE));//light blue
@@ -148,20 +162,40 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 	if (m_armor <=0)
 	{
 		armorBar.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
+		armorBarContainer.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 	}
 	else
 	{
-		armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X), ARMOR_BAR_SIZE_Y));
+		if (m_armor < m_shield)
+		{
+			armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max), ARMOR_BAR_SIZE_Y));
+			armorBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max, ARMOR_BAR_SIZE_Y));
+		}
+		else
+		{
+			armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X), ARMOR_BAR_SIZE_Y));
+			armorBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, ARMOR_BAR_SIZE_Y));
+		}
 	}
 
 	if (m_shield <=0) 
 	{
 		shieldBar.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
+		shieldBarContainer.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
 		this->has_shield = false;
 	}	
 	else
 	{
-		shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X), SHIELD_BAR_SIZE_Y));
+		if (m_shield < m_armor)
+		{
+			shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max), SHIELD_BAR_SIZE_Y));
+			shieldBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max, SHIELD_BAR_SIZE_Y));
+		}
+		else
+		{
+			shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X), SHIELD_BAR_SIZE_Y));
+			shieldBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
+		}
 		this->has_shield = true;
 	}
 
@@ -500,9 +534,11 @@ void PlayerHud::Draw(sf::RenderTexture& offscreen)
 	offscreen.draw(backgroundColor);
 
 	offscreen.draw(armorBar);
+	offscreen.draw(armorBarContainer);
 	if (this->has_shield)
 	{
 		offscreen.draw(shieldBar);
+		offscreen.draw(shieldBarContainer);
 	}
 	offscreen.draw(Money);
 	offscreen.draw(GrazeScore);
