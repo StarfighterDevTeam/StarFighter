@@ -221,6 +221,8 @@ int InGameState::GetSceneHazardLevelUnlocked(string scene_name)
 
 int InGameState::SavePlayer(string file)
 {
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving known scenes and current scene in profile.\n");
+
 	ofstream data(file.c_str(), ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{

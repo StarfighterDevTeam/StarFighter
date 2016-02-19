@@ -1038,7 +1038,7 @@ void Enemy::GenerateLoot()
 	else if (this->money > 0)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Money");
-		new_loot->get_money_from(*this);
+		new_loot->setMoney(this->getMoney());
 		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::LootLayer, IndependantType::LootObject);
 	}
 	else
@@ -1049,6 +1049,7 @@ void Enemy::GenerateLoot()
 
 bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, bool force_BeastScale, float BeastScale_min, float BeastScale_max)
 {
+	setMoney(0);
 	double random_number = (double)rand() / (RAND_MAX);
 
 	if (random_number > LootTable_DroppingSomething[loot_class])
@@ -1128,7 +1129,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 		{
 			//MONEY DROP
 			int money = RandomizeIntBetweenRatios(1.0f * XPTable_PerEnemyClass[loot_class] * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level) / 100, LootTable_BeastScale[loot_class]);
-			this->addMoney(money);//looting money
+			this->setMoney(money);//looting money
 		}
 	}
 
@@ -1267,6 +1268,7 @@ void Enemy::ApplyLevelModifiers()
 	{
 		(*it)->ammunition->damage = ceil((*it)->ammunition->damage * multiplier_);
 	}
+	this->setMoney(money *= 1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(this->level) / 100);
 
 	enemyLevel.setString(to_string(this->level));
 }
