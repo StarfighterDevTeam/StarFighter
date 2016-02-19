@@ -2,7 +2,7 @@
 #define GAME_H_INCLUDED
 
 #include "Globals.h"
-#include "Independant.h"
+#include "GameObject.h"
 #include <list>
 #include <vector>
 #include "TextUtils.h"
@@ -27,7 +27,7 @@ struct Game
 public:
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
-	void addToScene(Independant *object, LayerType m_layer, IndependantType type);
+	void addToScene(GameObject *object, LayerType m_layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(Text* text);
 	void removeFromFeedbacks(RectangleShape* feedback);
@@ -44,7 +44,7 @@ public:
 	void cleanGarbage();
 	void collectGarbage();
 	void garbageLayer(LayerType m_layer, bool only_offscene = false);
-	void killIndependantLayer(IndependantType m_layer);
+	void killGameObjectLayer(GameObjectType m_layer);
 	void SetLayerRotation(LayerType m_layer, float angle);
 	sf::RenderTexture mainScreen;
 	sf::RenderTexture hubScreen;
@@ -53,11 +53,11 @@ public:
 	float hyperspeedMultiplier;
 	float vspeed;
 
-	bool InsertObjectInShipGrid(Independant& object, int index = 0);
-	bool InsertObjectInEquipmentGrid(Independant& object, int index=-1);
+	bool InsertObjectInShipGrid(GameObject& object, int index = 0);
+	bool InsertObjectInEquipmentGrid(GameObject& object, int index=-1);
 	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment);
 	void GarbageObjectInGrid(int grid_id, int index);
-	Independant* getHudFocusedItem();
+	GameObject* getHudFocusedItem();
 	sf::Vector2i getHudFocusedGridAndIndex();
 	sf::Vector2i getHudFocusedIndexWithinGrid(HudGridsIndex grid_);
 	void setRemovingCursorAnimation(CursorFeedbackStates animation_index);
@@ -76,8 +76,8 @@ public:
 	void GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
 
 	float BeastScoreBonus;
-	TargetScan FoundNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range = 0);
-	float GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range = 0);
+	TargetScan FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
+	float GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	void WakeUpEnemiesWithName(string m_display_name);
 
 	InteractionPanel* m_interactionPanel;
@@ -95,17 +95,17 @@ public:
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
-	void AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector);
-	bool isVectorEmpty(vector <Independant*>* vector);
+	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
+	bool isVectorEmpty(vector <GameObject*>* vector);
 	Clock sceneChronometer;
 	float movementClock;
 	RenderWindow *window;
 	std::list<RectangleShape*> sceneFeedbackBars;
 	std::list<Text*> sceneFeedbackTexts;
-	std::vector<Independant*> sceneIndependants;
-	std::vector<Independant*> sceneIndependantsLayered[NBVAL_Layer];
-	std::vector<Independant*> sceneIndependantsTyped[NBVAL_Independant];
-	std::vector<Independant*> garbage;
+	std::vector<GameObject*> sceneGameObjects;
+	std::vector<GameObject*> sceneGameObjectsLayered[NBVAL_Layer];
+	std::vector<GameObject*> sceneGameObjectsTyped[NBVAL_GameObject];
+	std::vector<GameObject*> garbage;
 };
 
 #endif // GAME_H_INCLUDED

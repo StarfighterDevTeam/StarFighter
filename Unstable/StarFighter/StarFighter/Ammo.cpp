@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, FX* m_explosion) : Independant(position, speed,  textureName, size)
+Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, FX* m_explosion) : GameObject(position, speed,  textureName, size)
 {
 	damage = m_damage;
 	armor = 1;
@@ -39,7 +39,7 @@ void Ammo::Death()
 {
 	FX* myFX = this->explosion->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-    (*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
+    (*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
 
 	this->visible = false;
 	this->isOnScene = false;
@@ -52,8 +52,8 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	float new_ref_speed = ref_speed;
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier -1) * (*CurrentGame).vspeed).x;
-		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier -1) * (*CurrentGame).vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 		new_ref_speed *= hyperspeedMultiplier;
 	}
 	else if (hyperspeedMultiplier < 1)
@@ -88,7 +88,7 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		pattern_offset = Pattern.GetOffset(deltaTime.asSeconds());
 		offset.x = pattern_offset.x * cos(this->shot_angle) + pattern_offset.y * sin(this->shot_angle);
 		offset.y = pattern_offset.x * sin(this->shot_angle) + pattern_offset.y * cos(this->shot_angle);
-		//offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+		//offset = GameObject::getSpeed_for_Direction((*CurrentGame).direction, offset);
 		newposition.x += offset.x;
 		newposition.y += offset.y;
 

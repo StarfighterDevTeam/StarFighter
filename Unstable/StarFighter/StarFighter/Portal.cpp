@@ -1,6 +1,6 @@
 #include "Portal.h"
 
-Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Independant(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	DontGarbageMe = true;
 	state = PortalState::PortalOpen;

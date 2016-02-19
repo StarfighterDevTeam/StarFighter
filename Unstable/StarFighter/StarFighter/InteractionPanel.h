@@ -2,7 +2,7 @@
 #define INTERACTIONPANEL_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include "Independant.h"
+#include "GameObject.h"
 #include "HudGrid.h"
 
 enum ShopOptions
@@ -40,7 +40,7 @@ public:
 	sf::Text m_textDestination;
 	sf::Text m_textShopOptions[NBVAL_ShopOptions];
 	sf::Font* m_font;
-	Independant* m_arrow;
+	GameObject* m_arrow;
 	int m_selected_index;
 	Directions m_direction;
 	InteractionType m_currentInteractionType;
@@ -48,8 +48,8 @@ public:
 
 	ObjectGrid m_fakeShopGrid;
 	ObjectGrid m_shopGrid;
-	Independant* m_cursor;
-	Independant* m_focused_item;
+	GameObject* m_cursor;
+	GameObject* m_focused_item;
 	sf::Vector2i m_focused_index;
 };
 

@@ -1,17 +1,17 @@
 #ifndef BOT_H_INCLUDED
 #define BOT_H_INCLUDED
 
-#include "Independant.h"
+#include "GameObject.h"
 #include "Weapon.h"
 #include "InputGuy.h"
 
 //forward declaration
 
-class Independant;
+class GameObject;
 class Ammo;
 class Weapon;
 
-class Bot : public Independant
+class Bot : public GameObject
 {
 public:
 	Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
@@ -19,12 +19,12 @@ public:
 
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	Weapon* weapon;
-	Independant* target;
+	GameObject* target;
 	Bot* Clone();
 	float radius;
 	float angspeed;
 	float vspeed;
-	void setTarget (Independant* m_target);
+	void setTarget (GameObject* m_target);
 	void setRadius (float m_radius, float clockwise);
 	sf::Vector2f spread;
 	bool automatic_fire;

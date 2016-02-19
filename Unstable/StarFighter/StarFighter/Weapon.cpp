@@ -35,7 +35,7 @@ Weapon::~Weapon()
 	this->ammunition = NULL;
 }
 
-void Weapon::CreateBullet(IndependantType m_collider_type, float offsetX, float dispersion)
+void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)
 {
 	Ammo* bullet = this->ammunition->Clone();
 
@@ -111,7 +111,7 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 	return firing_ready;
 }
 
-void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
+void Weapon::Fire(GameObjectType m_collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (multishot > 1)
 	{
@@ -183,12 +183,12 @@ void Weapon::Fire(IndependantType m_collider_type, sf::Time deltaTime, float hyp
 	}
 }
 
-void Weapon::FireSingleShot(IndependantType m_collider_type)
+void Weapon::FireSingleShot(GameObjectType m_collider_type)
 {
 	CreateBullet(m_collider_type);
 }
 
-void Weapon::FireMultiShot(IndependantType m_collider_type)
+void Weapon::FireMultiShot(GameObjectType m_collider_type)
 {
 	if (multishot % 2 != 0) //case of an odd number of bullets
 	{
@@ -224,7 +224,7 @@ void Weapon::FireMultiShot(IndependantType m_collider_type)
 	}
 }
 
-void Weapon::FireAlternateShot(IndependantType m_collider_type)
+void Weapon::FireAlternateShot(GameObjectType m_collider_type)
 {
 	if (multishot % 2 != 0) //case of an odd number of bullets
 	{
@@ -265,7 +265,7 @@ void Weapon::FireAlternateShot(IndependantType m_collider_type)
 }
 
 //left to right order
-void Weapon::FireAscendingShot(IndependantType m_collider_type)
+void Weapon::FireAscendingShot(GameObjectType m_collider_type)
 {
 	if (multishot % 2 != 0) //case of an even number of bullets
 	{
@@ -306,7 +306,7 @@ void Weapon::FireAscendingShot(IndependantType m_collider_type)
 }
 
 //right to left order
-void Weapon::FireDescendingShot(IndependantType m_collider_type)
+void Weapon::FireDescendingShot(GameObjectType m_collider_type)
 {
 	if (multishot % 2 != 0) //case of an even number of bullets
 	{

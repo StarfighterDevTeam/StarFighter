@@ -2,9 +2,9 @@
 
 extern Game* CurrentGame;
 
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber, int m_animationNumber) : Independant(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), m_frameNumber, m_animationNumber)
+Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber, int m_animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), m_frameNumber, m_animationNumber)
 {
-	collider_type = IndependantType::EnemyObject;
+	collider_type = GameObjectType::EnemyObject;
 	visible = true;
 	angspeed = 0;
 	radius = 0;
@@ -80,15 +80,15 @@ void Enemy::UpdateHealthBars(sf::Time deltaTime)
 	{
 		feedbackTimer -= deltaTime;
 
-		float angle_rad = Independant::getRotation_for_Direction((*CurrentGame).direction) / 180 * M_PI;
+		float angle_rad = GameObject::getRotation_for_Direction((*CurrentGame).direction) / 180 * M_PI;
 		if (armorBar)
 		{
 			armorBar->setPosition(this->getPosition().x - (this->armorBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->armorBar_offsetY * cos(angle_rad)));
 			armorBarContainer->setPosition(this->getPosition().x - (this->armorBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->armorBar_offsetY * cos(angle_rad)));
 
 			//TODO: screen borders constraints
-			//armorBar->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), armorBar->getSize()));
-			//armorBarContainer->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
+			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), armorBar->getSize()));
+			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
 
 			//update size (damage)
 			armorBar->setSize(sf::Vector2f(1.0f * armor / armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
@@ -104,11 +104,11 @@ void Enemy::UpdateHealthBars(sf::Time deltaTime)
 			shieldBarContainer->setPosition(this->getPosition().x - (this->shieldBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->shieldBar_offsetY * cos(angle_rad)));
 
 			//TODO: screen borders constraints
-			//shieldBar->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBar->getPosition(), shieldBar->getSize()));
-			//shieldBarContainer->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
+			//shieldBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBar->getPosition(), shieldBar->getSize()));
+			//shieldBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
 			//if shield bar touches screen, we need to move both bars
-			//armorBar->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
-			//armorBarContainer->setPosition(Independant::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
 
 			shieldBar->setSize(sf::Vector2f(1.0f * shield / shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 
@@ -177,8 +177,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 	}
 
 	float l_hyperspeedMultiplier = 1.0f;
@@ -213,7 +213,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		offset = Pattern.GetOffset(deltaTime.asSeconds());
 	}
 	
-	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+	offset = GameObject::getSpeed_for_Direction((*CurrentGame).direction, offset);
 
 	newposition.x += offset.x;
 	newposition.y += offset.y;
@@ -288,11 +288,11 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	bool isNearestTargetIsKnown = false;
 	if (this->reset_facing)
 	{
-		target_angle = Independant::getRotation_for_Direction((*CurrentGame).direction);	
+		target_angle = GameObject::getRotation_for_Direction((*CurrentGame).direction);	
 	}
 	else if (this->face_target)
 	{
-		target_angle = fmod(180 + Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+		target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
 		isNearestTargetIsKnown = true;
 	}
 
@@ -308,7 +308,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				if ((*it)->target_seaking == SEAKING || ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index == 0))
 				{
-					target_angle = fmod(180 + Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::PlayerShip, this->getPosition()), 360);
+					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
 				}
 			}
 		}
@@ -412,7 +412,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
 							(*it)->face_target = this->face_target;
 
-							(*it)->Fire(IndependantType::EnemyFire, deltaTime, hyperspeedMultiplier);
+							(*it)->Fire(GameObjectType::EnemyFire, deltaTime, hyperspeedMultiplier);
 							{
 								m_shots_fired++;
 							}
@@ -424,13 +424,13 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 	
 	//sheld regen if not maximum
-	if (shield < getIndependantShield())
+	if (shield < getGameObjectShield())
 	{
-		shield += getIndependantShieldRegen();
+		shield += getGameObjectShieldRegen();
 		//canceling over-regen
-		if (shield > getIndependantShield())
+		if (shield > getGameObjectShield())
 		{
-			shield = getIndependantShield();
+			shield = getGameObjectShield();
 		}
 	}
 
@@ -465,7 +465,7 @@ void Enemy::RotateFeedbacks(float angle)
 	shieldBarContainer->setRotation(angle);
 }
 
-void Enemy::damage_from(Independant& independant)
+void Enemy::damage_from(GameObject& object)
 {
 	if (!immune)
 	{
@@ -484,14 +484,14 @@ void Enemy::damage_from(Independant& independant)
 		feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
 		setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
 
-		if (independant.damage > shield)
+		if (object.damage > shield)
 		{
-			armor -= (independant.damage - shield);
+			armor -= (object.damage - shield);
 			shield = 0;
 		}
 		else
 		{
-			shield -= independant.damage;
+			shield -= object.damage;
 		}
 	}
 }
@@ -502,19 +502,19 @@ Enemy* Enemy::Clone()
 
 	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death, this->frameNumber, this->animationNumber);
 
-	((Independant*)enemy)->armor = this->getIndependantArmor();
-	((Independant*)enemy)->armor_max = this->getIndependantArmorMax();
-	((Independant*)enemy)->shield = this->getIndependantShield();
-	((Independant*)enemy)->shield_max = this->getIndependantShieldMax();
-	((Independant*)enemy)->shield_regen = this->getIndependantShieldRegen();
-	((Independant*)enemy)->damage = this->getIndependantDamage();
+	((GameObject*)enemy)->armor = this->getGameObjectArmor();
+	((GameObject*)enemy)->armor_max = this->getGameObjectArmorMax();
+	((GameObject*)enemy)->shield = this->getGameObjectShield();
+	((GameObject*)enemy)->shield_max = this->getGameObjectShieldMax();
+	((GameObject*)enemy)->shield_regen = this->getGameObjectShieldRegen();
+	((GameObject*)enemy)->damage = this->getGameObjectDamage();
 
 	for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
 	{
 		enemy->weapons_list.push_back((*it)->Clone());
 	}	
 	
-	((Independant*)enemy)->addMoney(this->getMoney());
+	((GameObject*)enemy)->addMoney(this->getMoney());
 	enemy->equipment_loot = this->getEquipmentLoot();
 	enemy->weapon_loot = this->getWeaponLoot();
 	enemy->display_name = this->display_name;
@@ -622,13 +622,13 @@ bool Enemy::CheckCondition()
 		
 			case ConditionType::LifePourcentage:
 			{
-				if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+				if ((100.0f * this->getGameObjectArmor() / this->getGameObjectArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
 				{
 					this->setPhase(this->getPhase((*it)->nextPhase_name));
 
 					return true;
 				}
-				else if ((100.0f * this->getIndependantArmor() / this->getIndependantArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+				else if ((100.0f * this->getGameObjectArmor() / this->getGameObjectArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
 				{
 					this->setPhase(this->getPhase((*it)->nextPhase_name));
 					return true;
@@ -641,11 +641,11 @@ bool Enemy::CheckCondition()
 				//Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
 				if ((*it)->op == FloatCompare::GREATHER_THAN)
 				{
-					if (this->getIndependantShieldMax() == 0)
+					if (this->getGameObjectShieldMax() == 0)
 					{
 						break;
 					}
-					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() >= (*it)->value)
+					else if (100.0f * this->getGameObjectShield() / this->getGameObjectShieldMax() >= (*it)->value)
 					{
 						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
@@ -654,12 +654,12 @@ bool Enemy::CheckCondition()
 				}
 				else if ((*it)->op == FloatCompare::LESSER_THAN)
 				{
-					if (this->getIndependantShieldMax() == 0)
+					if (this->getGameObjectShieldMax() == 0)
 					{
 						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
 					}
-					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() <= (*it)->value)
+					else if (100.0f * this->getGameObjectShield() / this->getGameObjectShieldMax() <= (*it)->value)
 					{
 						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
@@ -668,7 +668,7 @@ bool Enemy::CheckCondition()
 				}
 				else if ((*it)->op == FloatCompare::EQUAL_TO)
 				{
-					if (this->getIndependantShieldMax() == 0)
+					if (this->getGameObjectShieldMax() == 0)
 					{
 						if ((*it)->value == 0)
 						{
@@ -677,7 +677,7 @@ bool Enemy::CheckCondition()
 						}
 						break;
 					}
-					else if (100.0f * this->getIndependantShield() / this->getIndependantShieldMax() == (*it)->value)
+					else if (100.0f * this->getGameObjectShield() / this->getGameObjectShieldMax() == (*it)->value)
 					{
 						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
@@ -700,7 +700,7 @@ bool Enemy::CheckCondition()
 			{
 				if ((*it)->op == FloatCompare::GREATHER_THAN)
 				{
-					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_OUT_OF_RANGE)
+					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_OUT_OF_RANGE)
 					{
 						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
@@ -708,7 +708,7 @@ bool Enemy::CheckCondition()
 				}
 				else if ((*it)->op == FloatCompare::LESSER_THAN || (*it)->op == FloatCompare::EQUAL_TO)
 				{
-					if ((*CurrentGame).FoundNearestIndependant(IndependantType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_IN_RANGE)
+					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_IN_RANGE)
 					{
 						this->setPhase(this->getPhase((*it)->nextPhase_name));
 						return true;
@@ -757,7 +757,7 @@ void Enemy::setPhase(Phase* phase)
 	this->currentPhase = phase;
 	this->m_shots_fired = 0;
 
-	this->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
+	this->speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
 
 	//reset old stats
 	this->immune = false;
@@ -840,7 +840,7 @@ void Enemy::setPhase(Phase* phase)
 		phase->welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
 		phase->welcomeWeapon->shot_angle = theta;
 
-		phase->welcomeWeapon->Fire(IndependantType::EnemyFire);
+		phase->welcomeWeapon->Fire(GameObjectType::EnemyFire);
 	}
 
 	//setting up wake_up condition
@@ -983,7 +983,7 @@ void Enemy::Death()
 {
 	FX* myFX = this->FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, IndependantType::Neutral);
+	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, GameObjectType::Neutral);
 
 	//Score
 	(*CurrentGame).hazard += this->money;
@@ -1019,27 +1019,27 @@ void Enemy::Destroy()
 
 void Enemy::GenerateLoot()
 {
-	sf::Vector2f speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, LOOT_SPEED_Y);
+	sf::Vector2f speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, LOOT_SPEED_Y);
 
 	if (this->weapon_loot != NULL)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getWeaponLoot()->textureName, sf::Vector2f(this->getWeaponLoot()->size.x, this->getWeaponLoot()->size.y), this->getWeaponLoot()->display_name);
 		new_loot->get_weapon_from(*this);
-		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::LootLayer, IndependantType::LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
 	}
 
 	else if (this->equipment_loot != NULL)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, this->getEquipmentLoot()->textureName, sf::Vector2f(this->getEquipmentLoot()->size.x, this->getEquipmentLoot()->size.y), this->getEquipmentLoot()->display_name);
 		new_loot->get_equipment_from(*this);
-		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::LootLayer, IndependantType::LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
 	}
 
 	else if (this->money > 0)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Money");
 		new_loot->setMoney(this->getMoney());
-		(*CurrentGame).addToScene((Independant*)new_loot, LayerType::LootLayer, IndependantType::LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
 	}
 	else
 	{

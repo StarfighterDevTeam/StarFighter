@@ -105,7 +105,7 @@ enum FXData
 	FX_DURATION,//6
 };
 
-enum IndependantType {
+enum GameObjectType {
 	BackgroundObject,
 	PortalObject,
 	ShopObject,
@@ -116,7 +116,7 @@ enum IndependantType {
 	Neutral,
 	EnemyFire,
 	EnemyObject,
-	NBVAL_Independant
+	NBVAL_GameObject
 };
 
 enum InteractionType
@@ -168,15 +168,15 @@ enum EquipmentType {
 
 
 
-class Independant : public AnimatedSprite
+class GameObject : public AnimatedSprite
 {
 public:
-	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber = 1, int m_animationNumber = 1);
-	Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
-	Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
-	Independant();
+	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber = 1, int m_animationNumber = 1);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
+	GameObject();
 
-	~Independant();
+	~GameObject();
 
 	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier = 1);
 	virtual void updateAnimation(sf::Time deltaTime);
@@ -185,20 +185,20 @@ public:
 	bool isOnScene;
 	bool GarbageMe;
 	bool DontGarbageMe;
-	IndependantType collider_type;
+	GameObjectType collider_type;
 	LayerType layer;
-	virtual void damage_from(Independant& independant);
+	virtual void damage_from(GameObject& object);
 	sf::Vector2f m_size;
-	sf::Vector2f getIndependantSpeed();
-	int getIndependantDamage();
-	int getIndependantArmor();
-	int getIndependantArmorMax();
-	int getIndependantShield();
-	int getIndependantShieldMax();
-	int getIndependantShieldRegen();
+	sf::Vector2f getGameObjectSpeed();
+	int getGameObjectDamage();
+	int getGameObjectArmor();
+	int getGameObjectArmorMax();
+	int getGameObjectShield();
+	int getGameObjectShieldMax();
+	int getGameObjectShieldRegen();
 	string getName();
 	virtual void Respawn();
-	Independant* Clone();
+	GameObject* Clone();
 	virtual void Death();
 	virtual void Destroy();
 	virtual void GenerateLoot();
@@ -206,20 +206,20 @@ public:
 	int getMoney();
 	void addMoney(int loot_value);
 	void setMoney(int loot_value);
-	bool get_money_from(Independant& independant);
-	bool get_money_from(Independant& independant, int loot_value);
-	virtual bool GetLoot(Independant& independant);
-	virtual void GetPortal(Independant* independant);
-	virtual void GetShop(Independant* independant);
+	bool get_money_from(GameObject& object);
+	bool get_money_from(GameObject& object, int loot_value);
+	virtual bool GetLoot(GameObject& object);
+	virtual void GetPortal(GameObject* object);
+	virtual void GetShop(GameObject* object);
 	void setGhost(bool m_ghost);
 	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
 
-	bool get_equipment_from(Independant& independant);
+	bool get_equipment_from(GameObject& object);
 	bool setEquipmentLoot(Equipment* equipment);
 	void releaseEquipmentLoot();
 	Equipment* getEquipmentLoot();
 
-	bool get_weapon_from(Independant& independant);
+	bool get_weapon_from(GameObject& object);
 	bool setWeaponLoot(Weapon* weapon);
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();

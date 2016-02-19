@@ -81,14 +81,14 @@ EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_ene
 			base->enemyclass = m_enemyClass;
 			base->enemy->enemy_class = (EnemyClass)m_enemyClass;
 
-			((Independant*)base->enemy)->armor = stoi((*it)[EnemyData::ENEMY_ARMOR]);
-			((Independant*)base->enemy)->armor_max = stoi((*it)[EnemyData::ENEMY_ARMOR]);
-			((Independant*)base->enemy)->shield = stoi((*it)[EnemyData::ENEMY_SHIELD]);
-			((Independant*)base->enemy)->shield_max = stoi((*it)[EnemyData::ENEMY_SHIELD]);
-			((Independant*)base->enemy)->shield_regen = stoi((*it)[EnemyData::ENEMY_SHIELD_REGEN]);
-			((Independant*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
-			((Independant*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
-			((Independant*)base->enemy)->display_name = (*it)[EnemyData::ENEMY_NAME];
+			((GameObject*)base->enemy)->armor = stoi((*it)[EnemyData::ENEMY_ARMOR]);
+			((GameObject*)base->enemy)->armor_max = stoi((*it)[EnemyData::ENEMY_ARMOR]);
+			((GameObject*)base->enemy)->shield = stoi((*it)[EnemyData::ENEMY_SHIELD]);
+			((GameObject*)base->enemy)->shield_max = stoi((*it)[EnemyData::ENEMY_SHIELD]);
+			((GameObject*)base->enemy)->shield_regen = stoi((*it)[EnemyData::ENEMY_SHIELD_REGEN]);
+			((GameObject*)base->enemy)->damage = stoi((*it)[EnemyData::ENEMY_DAMAGE]);
+			((GameObject*)base->enemy)->setMoney(stoi((*it)[EnemyData::ENEMY_VALUE]));
+			((GameObject*)base->enemy)->display_name = (*it)[EnemyData::ENEMY_NAME];
 
 			//Loading phases
 			if ((*it)[EnemyData::ENEMY_PHASE].compare("0") != 0)
@@ -264,13 +264,13 @@ Bot* FileLoader::LoadBot(string name)
 		{
 			Bot* bot = new Bot(Vector2f(0,0), Vector2f(0,0),(*it)[BotData::BOT_IMAGE_NAME],sf::Vector2f(stoi((*it)[BotData::BOT_WIDTH]),stoi((*it)[BotData::BOT_HEIGHT])));
 
-			((Independant*)bot)->display_name = (*it)[BotData::BOT_NAME];
-			((Independant*)bot)->armor = stoi((*it)[BotData::BOT_ARMOR]);
-			((Independant*)bot)->armor_max = stoi((*it)[BotData::BOT_ARMOR]);
-			((Independant*)bot)->shield = stoi((*it)[BotData::BOT_SHIELD]);
-			((Independant*)bot)->shield_max = stoi((*it)[BotData::BOT_SHIELD]);
-			((Independant*)bot)->shield_regen = stoi((*it)[BotData::BOT_SHIELD_REGEN]);
-			((Independant*)bot)->damage = stoi((*it)[BotData::BOT_DAMAGE]);
+			((GameObject*)bot)->display_name = (*it)[BotData::BOT_NAME];
+			((GameObject*)bot)->armor = stoi((*it)[BotData::BOT_ARMOR]);
+			((GameObject*)bot)->armor_max = stoi((*it)[BotData::BOT_ARMOR]);
+			((GameObject*)bot)->shield = stoi((*it)[BotData::BOT_SHIELD]);
+			((GameObject*)bot)->shield_max = stoi((*it)[BotData::BOT_SHIELD]);
+			((GameObject*)bot)->shield_regen = stoi((*it)[BotData::BOT_SHIELD_REGEN]);
+			((GameObject*)bot)->damage = stoi((*it)[BotData::BOT_DAMAGE]);
 			bot->spread = Vector2f(stoi((*it)[BotData::BOT_XSPREAD]), stoi((*it)[BotData::BOT_YSPREAD]));
 
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), BotData::BOT_PATTERN);

@@ -9,11 +9,11 @@ extern Game* CurrentGame;
 #define WEAPON_LOOT_PROBABILITY		30
 #define MODULE_LOOT_PROBABILITY		1
 
-Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name) : Independant(position, speed, textureName, size)
+Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name) : GameObject(position, speed, textureName, size)
 {
 	 this->visible = true;
 	 this->isOnScene = true;
-	 this->collider_type = IndependantType::LootObject;
+	 this->collider_type = GameObjectType::LootObject;
 	 this->money = 0;
 	 this->display_name = m_display_name;
 }
@@ -25,8 +25,8 @@ void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 	}
 	else if (hyperspeedMultiplier < 1)
 	{

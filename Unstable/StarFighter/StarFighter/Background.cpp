@@ -2,12 +2,12 @@
 
 extern Game* CurrentGame;
 
-Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
+Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, Directions direction, float first_screen_offset) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2))
 {
 	m_shop = NULL;
 	visible = true;
 	
-	sf::Vector2f size_ = Independant::getSize_for_Direction(direction, size);
+	sf::Vector2f size_ = GameObject::getSize_for_Direction(direction, size);
 	this->setPosition_Y_for_Direction(direction, sf::Vector2f(size_.x / 2, (-size_.y / 2) + first_screen_offset), true);
 
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
@@ -23,8 +23,8 @@ void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 	}
 	else if (hyperspeedMultiplier < 1)
 	{

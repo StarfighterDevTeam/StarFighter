@@ -2,10 +2,10 @@
 #define FX_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include "Independant.h"
+#include "GameObject.h"
 #include "Game.h"
 
-class FX : public Independant
+class FX : public GameObject
 {
 public:
 	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration, int m_animationNumber = 1);
@@ -23,11 +23,11 @@ private:
 class Aura : public FX
 {
 public:
-	Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
+	Aura(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
 	void Init(std::string m_textureName, sf::Vector2f dsize, int m_frameNumber);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	Aura* Clone();
-	Independant* target;
+	GameObject* target;
 	sf::Vector2f offset;
 
 private:
@@ -38,9 +38,9 @@ private:
 class FakeShip : public Aura
 {
 public:
-	FakeShip(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
+	FakeShip(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
-	bool GetLoot(Independant& independant) override;
+	bool GetLoot(GameObject& GameObject) override;
 };
 
 #endif // FX_H_INCLUDED

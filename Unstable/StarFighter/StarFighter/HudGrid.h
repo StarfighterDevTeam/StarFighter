@@ -1,7 +1,7 @@
 #ifndef HUDGRID_H_INCLUDED
 #define HUDGRID_H_INCLUDED
 
-#include "Independant.h"
+#include "GameObject.h"
 
 enum HudGridsIndex
 {
@@ -37,19 +37,19 @@ public:
 	ObjectGrid();
 	ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake = false);
 	void SetGridPosition(sf::Vector2f position);
-	bool insertObject(Independant& object, int index = -1, bool overwrite_existing = false);
-	Independant* grid[EQUIPMENT_GRID_NB_LINES][EQUIPMENT_GRID_NB_ROWS];
+	bool insertObject(GameObject& object, int index = -1, bool overwrite_existing = false);
+	GameObject* grid[EQUIPMENT_GRID_NB_LINES][EQUIPMENT_GRID_NB_ROWS];
 	void Draw(sf::RenderTexture& offscreen);
 	sf::Vector2f position;
 	sf::Vector2i squares;
 	sf::Vector2i focus;
-	int isCursorColling(Independant& cursor);
+	int isCursorColling(GameObject& cursor);
 	bool HighlightCell(int index);
 	bool GarbageCell(int index);
 	bool CleanFocus();
-	Independant* getCellPointerFromIntIndex(int index);
+	GameObject* getCellPointerFromIntIndex(int index);
 	int getFocusIntIndex();
-	void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant);
+	void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject);
 };
 
 #endif // HUDGRID_H_INCLUDED

@@ -24,16 +24,16 @@ public:
 	std::string display_name;
 	sf::Vector2f speed;
 	bool firing_ready;
-	void Fire(IndependantType m_collider_type, sf::Time deltaTime = sf::seconds(0), float hyperspeedMultiplier = 1.0f);
+	void Fire(GameObjectType m_collider_type, sf::Time deltaTime = sf::seconds(0), float hyperspeedMultiplier = 1.0f);
 	bool isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier);
 
-	void CreateBullet(IndependantType m_collider_type, float offsetX=0, float dispersion=0);
+	void CreateBullet(GameObjectType m_collider_type, float offsetX=0, float dispersion=0);
 	
-	void FireSingleShot(IndependantType m_collider_type);
-	void FireMultiShot(IndependantType m_collider_type);
-	void FireAlternateShot(IndependantType m_collider_type);
-	void FireAscendingShot(IndependantType m_collider_type);
-	void FireDescendingShot(IndependantType m_collider_type);
+	void FireSingleShot(GameObjectType m_collider_type);
+	void FireMultiShot(GameObjectType m_collider_type);
+	void FireAlternateShot(GameObjectType m_collider_type);
+	void FireAscendingShot(GameObjectType m_collider_type);
+	void FireDescendingShot(GameObjectType m_collider_type);
 	sf::Vector2i fire_direction;
 	float rate_of_fire;
 	sf::Time readyFireTimer;
@@ -41,7 +41,7 @@ public:
 	bool m_isReadyToFire;
 
 	TargetSeaking target_seaking;
-	void SeakTarget(IndependantType m_collider_type);
+	void SeakTarget(GameObjectType m_collider_type);
 
 	//special weapon abilities
 	int multishot;

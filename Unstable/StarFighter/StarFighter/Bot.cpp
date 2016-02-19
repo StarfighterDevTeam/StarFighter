@@ -2,9 +2,9 @@
 
 extern Game* CurrentGame;
 
-Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : Independant(position, speed,  textureName, size)
+Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : GameObject(position, speed,  textureName, size)
 {
-	collider_type = IndependantType::FriendlyFire;
+	collider_type = GameObjectType::FriendlyFire;
 	visible = true;
 	visible = true;
 	isOnScene = true;
@@ -26,7 +26,7 @@ Bot::~Bot()
 	}
 }
 
-void Bot::setTarget (Independant* m_target)
+void Bot::setTarget (GameObject* m_target)
 {
 	this->target = m_target;
 	this->setPosition(m_target->getPosition());
@@ -48,8 +48,8 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (hyperspeedMultiplier > 1)
 		{
-			newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-			newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+			newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
+			newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 		}
 		else if (hyperspeedMultiplier < 1.0f)
 		{
@@ -66,7 +66,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	
 	offset = Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
 	
-	offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+	offset = GameObject::getSpeed_for_Direction((*CurrentGame).direction, offset);
 	newposition.x += offset.x;
 	newposition.y += offset.y;
 	//bot spread value
@@ -105,7 +105,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					float target_angle = this->getRotation();
 					if (this->weapon->target_seaking != NO_SEAKING || (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index == 0))
 					{
-						target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, this->getPosition()), 360);
 					}
 					float current_angle = this->getRotation();
 					float delta = current_angle - target_angle;
@@ -134,7 +134,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 					}
 
 					this->weapon->setPosition(this->getPosition().x + this->weapon->weapon_current_offset.x, this->getPosition().y + this->weapon->weapon_current_offset.y);
-					this->weapon->Fire(IndependantType::FriendlyFire, deltaTime, hyperspeedMultiplier);
+					this->weapon->Fire(GameObjectType::FriendlyFire, deltaTime, hyperspeedMultiplier);
 				}
 			}
 		}

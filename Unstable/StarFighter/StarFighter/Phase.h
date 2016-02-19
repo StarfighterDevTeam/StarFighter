@@ -1,7 +1,7 @@
 #ifndef PHASE_H_INCLUDED
 #define PHASE_H_INCLUDED
 
-#include "Independant.h"
+#include "GameObject.h"
 #include "Weapon.h"
 #include "TextUtils.h"
 

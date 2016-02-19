@@ -158,9 +158,9 @@ public:
 	Weapon* weapon;
 	vector<Bot*> bot_list;
 	FX* FX_death;
-	void GenerateBots(Independant* m_target);
+	void GenerateBots(GameObject* m_target);
 	void DestroyBots();
-	void GenerateFakeShip(Independant* m_target);
+	void GenerateFakeShip(GameObject* m_target);
 	FakeShip* m_fake_ship;
 	bool automatic_fire;
 
@@ -175,7 +175,7 @@ private:
 	int damage;
 };
 
-class Ship : public Independant
+class Ship : public GameObject
 {
 public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
@@ -211,13 +211,13 @@ public :
 	void setShipModel(ShipModel* m_ship_model, bool no_save = false);
 	void cleanEquipment(int equipment_type, bool no_save = false);
 	void cleanWeapon(bool no_save = false);
-	static Independant* CloneEquipmentIntoIndependant(Equipment* new_equipment);
-	static Independant* CloneWeaponIntoIndependant(Weapon* new_weapon);
+	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
+	static GameObject* CloneWeaponIntoGameObject(Weapon* new_weapon);
 	
 	void Death() override;
-	bool GetLoot(Independant& independant) override;
-	void GetPortal(Independant* independant) override;
-	void GetShop(Independant* independant) override;
+	bool GetLoot(GameObject& object) override;
+	void GetPortal(GameObject* object) override;
+	void GetShop(GameObject* object) override;
 	Portal* targetPortal;
 	Shop* targetShop;
 	InteractionType previouslyCollidingWithInteractiveObject;
@@ -226,12 +226,12 @@ public :
 	bool wasBrakingButtonPressed;
 	bool isBrakingButtonHeldPressed;
 	sf::Clock brakingHoldingClock;
-	Independant* previously_focused_item;
+	GameObject* previously_focused_item;
 
 	void GetGrazing() override;
 	int getGrazeCount();
 	float getShipBeastScore();
-	void damage_from (Independant& independant) override;
+	void damage_from (GameObject& object) override;
 
 	bool disable_inputs;
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];

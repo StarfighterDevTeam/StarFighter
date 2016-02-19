@@ -659,16 +659,16 @@ bool ShipConfig::setShipModel(ShipModel* m_ship_model)
 	}
 }
 
-void ShipConfig::GenerateBots(Independant* m_target)
+void ShipConfig::GenerateBots(GameObject* m_target)
 {
 	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
 	{
 		Bot* m_bot = (*it)->Clone();
 		m_bot->automatic_fire = this->automatic_fire;
-		m_bot->spread = Independant::getSize_for_Direction((*CurrentGame).direction, m_bot->spread);
+		m_bot->spread = GameObject::getSize_for_Direction((*CurrentGame).direction, m_bot->spread);
 		m_bot->setTarget(m_target);
-		m_bot->rotate(Independant::getRotation_for_Direction((*CurrentGame).direction));
-		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, IndependantType::Neutral);
+		m_bot->rotate(GameObject::getRotation_for_Direction((*CurrentGame).direction));
+		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, GameObjectType::Neutral);
 	}
 }
 
@@ -678,21 +678,21 @@ void ShipConfig::DestroyBots()
 	(*CurrentGame).garbageLayer(LayerType::BotLayer);
 }
 
-void ShipConfig::GenerateFakeShip(Independant* m_target)
+void ShipConfig::GenerateFakeShip(GameObject* m_target)
 {
 	assert(this->ship_model != NULL);
 	if (this->ship_model->hasFake)
 	{
 		m_fake_ship = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, IndependantType::FakePlayerShip);
+		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, GameObjectType::FakePlayerShip);
 	}
 }
 
 // ----------------SHIP ---------------
 
-Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, Vector2f(0, 0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x / 2), (m_ship_config.size.y / 2)), m_ship_config.frameNumber)
+Ship::Ship(Vector2f position, ShipConfig m_ship_config) : GameObject(position, Vector2f(0, 0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x / 2), (m_ship_config.size.y / 2)), m_ship_config.frameNumber)
 {
-	this->collider_type = IndependantType::PlayerShip;
+	this->collider_type = GameObjectType::PlayerShip;
 	this->ship_config = m_ship_config;
 	this->moving = false;
 	this->movingX = movingY = false;
@@ -727,7 +727,7 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	{
 		this->trail->offset = sf::Vector2f(0, (this->ship_config.ship_model->size.y / 2 ) + (this->trail->m_size.y / 2));
 	}
-	(*CurrentGame).addToScene(this->trail, LayerType::FakeShipLayer, IndependantType::Neutral);
+	(*CurrentGame).addToScene(this->trail, LayerType::FakeShipLayer, GameObjectType::Neutral);
 	this->fire_key_repeat = false;
 	this->slowmo_key_repeat = false;
 	this->hud_key_repeat = false;
@@ -882,7 +882,7 @@ void Ship::ManageDebugCommand()
 {
 	if (InputGuy::isUsingDebugCommand())
 	{
-		(*CurrentGame).killIndependantLayer(EnemyObject);
+		(*CurrentGame).killGameObjectLayer(EnemyObject);
 	}
 }
 
@@ -902,7 +902,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 		this->trail->visible = (hyperspeedMultiplier > 1.0f);
 
-		Independant::update(deltaTime, hyperspeedMultiplier);
+		GameObject::update(deltaTime, hyperspeedMultiplier);
 
 		ScreenBorderContraints();
 
@@ -1023,7 +1023,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 					float target_angle = this->getRotation();
 					if (ship_config.weapon->target_seaking != NO_SEAKING || (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index == 0))
 					{
-						target_angle = fmod(Independant::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestIndependant(IndependantType::EnemyObject, this->getPosition()), 360);
+						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, this->getPosition()), 360);
 					}
 
 					float current_angle = this->getRotation();
@@ -1184,7 +1184,7 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 	speed.y += inputs_direction.y*ship_config.getShipConfigAcceleration();
 
 	//max speed constraints
-	Independant::NormalizeSpeed(&this->speed, this->ship_config.getShipConfigMaxSpeed());
+	GameObject::NormalizeSpeed(&this->speed, this->ship_config.getShipConfigMaxSpeed());
 }
 
 void Ship::ManageBraking()
@@ -1284,7 +1284,7 @@ void Ship::TestingInputsRelease()
 void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 {
 	//movement
-	Independant* l_cursor = (*CurrentGame).hud.hud_cursor;
+	GameObject* l_cursor = (*CurrentGame).hud.hud_cursor;
 	l_cursor->speed.x = inputs_directions.x * HUD_CURSOR_SPEED;
 	l_cursor->speed.y = inputs_directions.y * HUD_CURSOR_SPEED;
 
@@ -1310,7 +1310,7 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 				{
 					if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
 					{
-						Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
+						GameObject* tmp_ptr = (*CurrentGame).getHudFocusedItem();
 						int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
 
 						if (tmp_ptr->getEquipmentLoot() != NULL)
@@ -1440,8 +1440,8 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 void Ship::SettingTurnAnimations()
 {
 	//setting animation
-	const sf::Vector2f f = (sf::Vector2f)Independant::getDirectionMultiplier((*CurrentGame).direction);
-	const float x = Independant::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(this->speed.x * f.x, this->speed.y * f.y)).x;
+	const sf::Vector2f f = (sf::Vector2f)GameObject::getDirectionMultiplier((*CurrentGame).direction);
+	const float x = GameObject::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(this->speed.x * f.x, this->speed.y * f.y)).x;
 
 	if (this->ship_config.ship_model->hasFake)
 	{
@@ -1613,7 +1613,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 				{
 					//cursor control
 					//movement
-					Independant* l_cursor = (*CurrentGame).m_interactionPanel->m_cursor;
+					GameObject* l_cursor = (*CurrentGame).m_interactionPanel->m_cursor;
 					l_cursor->speed.x = input_directions.x * HUD_CURSOR_SPEED;
 					l_cursor->speed.y = input_directions.y * HUD_CURSOR_SPEED;
 
@@ -1698,7 +1698,7 @@ void Ship::Respawn()
 	}
 	isOnScene = true;
 	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
-	pos = Independant::getPosition_for_Direction((*CurrentGame).direction, pos);
+	pos = GameObject::getPosition_for_Direction((*CurrentGame).direction, pos);
 	this->setPosition(pos);
 
 	immune = true;
@@ -1709,7 +1709,7 @@ void Ship::Death()
 {
 	FX* myFX = this->ship_config.FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
+	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
 
 	this->visible = false;
 	if (this->ship_config.m_fake_ship != NULL)
@@ -1730,50 +1730,50 @@ void Ship::Death()
 	//}
 }
 
-Independant* Ship::CloneEquipmentIntoIndependant(Equipment* new_equipment)
+GameObject* Ship::CloneEquipmentIntoGameObject(Equipment* new_equipment)
 {
 	assert(new_equipment != NULL);
-	Independant* capsule = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), new_equipment->textureName, new_equipment->size, sf::Vector2f(new_equipment->size.x / 2, new_equipment->size.y / 2), new_equipment->frameNumber);
+	GameObject* capsule = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), new_equipment->textureName, new_equipment->size, sf::Vector2f(new_equipment->size.x / 2, new_equipment->size.y / 2), new_equipment->frameNumber);
 	capsule->setEquipmentLoot(new_equipment->Clone());
 
 	return capsule;
 }
 
-Independant* Ship::CloneWeaponIntoIndependant(Weapon* new_weapon)
+GameObject* Ship::CloneWeaponIntoGameObject(Weapon* new_weapon)
 {
 	assert(new_weapon != NULL);
-	Independant* capsule = new Independant(new_weapon->getPosition(), sf::Vector2f(0, 0), new_weapon->textureName, new_weapon->size, sf::Vector2f(new_weapon->size.x / 2, new_weapon->size.y / 2), new_weapon->frameNumber);
+	GameObject* capsule = new GameObject(new_weapon->getPosition(), sf::Vector2f(0, 0), new_weapon->textureName, new_weapon->size, sf::Vector2f(new_weapon->size.x / 2, new_weapon->size.y / 2), new_weapon->frameNumber);
 	capsule->setWeaponLoot(new_weapon->Clone());
 
 	return capsule;
 }
 
-bool Ship::GetLoot(Independant& independant)
+bool Ship::GetLoot(GameObject& object)
 {
 	//EQUIPMENT
-	if (independant.getEquipmentLoot() != NULL)
+	if (object.getEquipmentLoot() != NULL)
 	{
-		Independant* capsule = CloneEquipmentIntoIndependant(independant.getEquipmentLoot());
-		if (this->setEquipment(independant.getEquipmentLoot()))
+		GameObject* capsule = CloneEquipmentIntoGameObject(object.getEquipmentLoot());
+		if (this->setEquipment(object.getEquipmentLoot()))
 		{
 			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
-			(*CurrentGame).InsertObjectInShipGrid(*capsule, independant.getEquipmentLoot()->equipmentType);
+			(*CurrentGame).InsertObjectInShipGrid(*capsule, object.getEquipmentLoot()->equipmentType);
 		}
 		else
 		{
 			//...else we put it in the stash
 			(*CurrentGame).InsertObjectInEquipmentGrid(*capsule);
 		}
-		//independant.releaseEquipmentLoot();
-		//independant.releaseWeaponLoot();
+		//object.releaseEquipmentLoot();
+		//object.releaseWeaponLoot();
 		return true;
 	}
 
 	//WEAPON
-	if (independant.getWeaponLoot() != NULL)
+	if (object.getWeaponLoot() != NULL)
 	{
-		Independant* capsule = CloneWeaponIntoIndependant(independant.getWeaponLoot());
-		if (this->setShipWeapon(independant.getWeaponLoot()))
+		GameObject* capsule = CloneWeaponIntoGameObject(object.getWeaponLoot());
+		if (this->setShipWeapon(object.getWeaponLoot()))
 		{
 			//if the ship config does not have a weapon already, we equip it and update the HUD
 			(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment);
@@ -1783,24 +1783,24 @@ bool Ship::GetLoot(Independant& independant)
 			//...else we put it in the stash
 			(*CurrentGame).InsertObjectInEquipmentGrid(*capsule);
 		}
-		//independant.releaseEquipmentLoot();
-		//independant.releaseWeaponLoot();
+		//object.releaseEquipmentLoot();
+		//object.releaseWeaponLoot();
 		return true;
 	}
 
 	//MONEY
-	return this->get_money_from(independant);
+	return this->get_money_from(object);
 }
 
-void Ship::GetPortal(Independant* independant)
+void Ship::GetPortal(GameObject* object)
 {
-	this->targetPortal = (Portal*)(independant);
+	this->targetPortal = (Portal*)(object);
 	this->isCollidingWithInteractiveObject = PortalInteraction;
 }
 
-void Ship::GetShop(Independant* independant)
+void Ship::GetShop(GameObject* object)
 {
-	this->targetShop = (Shop*)(independant);
+	this->targetShop = (Shop*)(object);
 	this->isCollidingWithInteractiveObject = ShopInteraction;
 }
 
@@ -1873,7 +1873,7 @@ float Ship::getShipBeastScore()
 	return bonus;
 }
 
-void Ship::damage_from(Independant& independant)
+void Ship::damage_from(GameObject& object)
 {
 	if (!immune)
 	{
@@ -1884,14 +1884,14 @@ void Ship::damage_from(Independant& independant)
 		}
 		this->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
 
-		if (independant.damage > shield)
+		if (object.damage > shield)
 		{
-			armor -= (independant.damage - shield);
+			armor -= (object.damage - shield);
 			shield = 0;
 		}
 		else
 		{
-			shield -= independant.damage;
+			shield -= object.damage;
 		}
 	}
 	graze_count = 0;
@@ -2588,14 +2588,14 @@ bool Ship::LoadPlayerItems(string file)
 					if (equipment_type.compare("Weapon") == 0)
 					{
 						Weapon* weapon = Ship::LoadWeaponFromLine(line);
-						Independant* capsule = (*CurrentGame).playerShip->CloneWeaponIntoIndependant(weapon);
+						GameObject* capsule = (*CurrentGame).playerShip->CloneWeaponIntoGameObject(weapon);
 						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
 						delete weapon;
 					}
 					else
 					{
 						Equipment* equipment = Ship::LoadEquipmentFromLine(line);
-						Independant* capsule = (*CurrentGame).playerShip->CloneEquipmentIntoIndependant(equipment);
+						GameObject* capsule = (*CurrentGame).playerShip->CloneEquipmentIntoGameObject(equipment);
 						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
 						delete equipment;
 					}

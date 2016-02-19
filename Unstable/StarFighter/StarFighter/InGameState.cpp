@@ -30,7 +30,7 @@ void InGameState::Initialize(Player player)
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
 	{
 		this->IG_State = InGameStateMachine::SCROLLING;
-		ship_pos = Independant::getPosition_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
+		ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
 	}
 	else
 	{
@@ -58,7 +58,7 @@ void InGameState::Initialize(Player player)
 	{
 		if (this->playerShip->ship_config.equipment[i] != NULL)
 		{
-			Independant* capsule = Ship::CloneEquipmentIntoIndependant(this->playerShip->ship_config.equipment[i]);
+			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(this->playerShip->ship_config.equipment[i]);
 			if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, i))
 			{
 				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
@@ -68,7 +68,7 @@ void InGameState::Initialize(Player player)
 	
 	if (this->playerShip->ship_config.weapon != NULL)
 	{
-		Independant* capsule = Ship::CloneWeaponIntoIndependant(this->playerShip->ship_config.weapon);
+		GameObject* capsule = Ship::CloneWeaponIntoGameObject(this->playerShip->ship_config.weapon);
 		if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment))
 		{
 			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize a weapon item from the ship config to the HUD Ship grid\n");
@@ -88,10 +88,10 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).playerShip->disabledHyperspeed = true;
 	}
 	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
-	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-	(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, IndependantType::PlayerShip);
+	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
+	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
+	(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
+	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 }
 
 void InGameState::Update(Time deltaTime)
@@ -112,7 +112,7 @@ void InGameState::Update(Time deltaTime)
 	//displaying stats of focused item in the HUD...
 	if ((*CurrentGame).getHudFocusedItem() != NULL)
 	{
-		Independant* tmp_ptr = (*CurrentGame).getHudFocusedItem();
+		GameObject* tmp_ptr = (*CurrentGame).getHudFocusedItem();
 		int equip_index_ = NBVAL_Equipment;
 		if (tmp_ptr->getEquipmentLoot() != NULL)
 		{
@@ -407,7 +407,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					//Putting the player on rails
 					(*CurrentGame).playerShip->disable_inputs = true;
 					(*CurrentGame).playerShip->disable_fire = true;
-					(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
+					(*CurrentGame).playerShip->speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
 
 					this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
 				}
@@ -447,12 +447,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				//Correction of playership position
 				(*CurrentGame).playerShip->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(w_ / 2, h_ / 2));
 
-				(*CurrentGame).playerShip->speed = Independant::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).direction, this->nextScene->direction, ENDSCENE_TRANSITION_SPEED_DOWN,
+				(*CurrentGame).playerShip->speed = GameObject::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).direction, this->nextScene->direction, ENDSCENE_TRANSITION_SPEED_DOWN,
 					(*CurrentGame).playerShip->getPosition());
 
-				this->currentScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
+				this->currentScene->bg->speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
-				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
+				this->nextScene->bg->speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LayerType::LootLayer);
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
@@ -479,7 +479,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				this->currentScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f((w / 2), (h / 2)));
 
 				this->nextScene->bg->setPosition_Y_for_Direction((*CurrentGame).direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2)));
-				this->nextScene->bg->speed = Independant::getSpeed_for_Scrolling(this->nextScene->direction, this->nextScene->vspeed);
+				this->nextScene->bg->speed = GameObject::getSpeed_for_Scrolling(this->nextScene->direction, this->nextScene->vspeed);
 				(*CurrentGame).vspeed = this->nextScene->vspeed;
 
 				if (this->nextScene->direction == Directions::NO_DIRECTION)
@@ -496,10 +496,10 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					{
 						(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
 					}
-					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
-					(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, Independant::getRotation_for_Direction((*CurrentGame).direction));
+					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
+					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
+					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
+					(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
 				}
 
 				//Saving the hazard level change
@@ -567,7 +567,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				//Putting the player on rails
 				(*CurrentGame).playerShip->disable_inputs = true;
 				(*CurrentGame).playerShip->disable_fire = true;
-				(*CurrentGame).playerShip->speed = -Independant::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
+				(*CurrentGame).playerShip->speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, ENDSCENE_TRANSITION_SPEED_UP);
 
 				this->IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
 			}

@@ -92,10 +92,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						if (first_scene)
 						{
 							(*CurrentGame).direction = this->direction;
-							first_screen_offset = Independant::getSize_for_Direction(this->direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
+							first_screen_offset = GameObject::getSize_for_Direction(this->direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
 						}
 
-						sf::Vector2f speed = Independant::getSpeed_for_Scrolling(this->direction, this->vspeed);
+						sf::Vector2f speed = GameObject::getSpeed_for_Scrolling(this->direction, this->vspeed);
 
 						if (hub)
 						{
@@ -104,7 +104,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						
 						this->bg = new Background(sf::Vector2f(0, 0), speed, (*it)[BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).direction, first_screen_offset);
 						this->bg->display_name = scene_name;
-						(*CurrentGame).addToScene(this->bg, LayerType::BackgroundLayer, IndependantType::BackgroundObject);
+						(*CurrentGame).addToScene(this->bg, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
 
 						//Getting the display name of the scene and loading it into the scene portals
 						for (int i = 0; i < Directions::NO_DIRECTION; i++)
@@ -113,13 +113,13 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 							{
 								//CREATING THE PORTAL
 								this->bg->portals[(Directions)i] = new Portal(sf::Vector2f(0, 0), speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
-								sf::Vector2f bg_size = Independant::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
+								sf::Vector2f bg_size = GameObject::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
 								//applying offset respect to the center of the background, depending on the direction
-								this->bg->portals[(Directions)i]->offset = Independant::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
+								this->bg->portals[(Directions)i]->offset = GameObject::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
 								this->bg->portals[(Directions)i]->setPosition(this->bg->getPosition().x + this->bg->portals[(Directions)i]->offset.x, this->bg->getPosition().y + this->bg->portals[(Directions)i]->offset.y);
 
 								//rotation
-								this->bg->portals[(Directions)i]->setRotation(Independant::getRotation_for_Direction((Directions)i));
+								this->bg->portals[(Directions)i]->setRotation(GameObject::getRotation_for_Direction((Directions)i));
 
 								//direction
 								this->bg->portals[(Directions)i]->direction = (Directions)i;
@@ -137,7 +137,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								}
 
 								//Displaying the portals
-								(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::PortalLayer, IndependantType::PortalObject);
+								(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::PortalLayer, GameObjectType::PortalObject);
 							}
 						}
 
@@ -170,7 +170,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
 						if (!e->enemy->hasPhases)
 						{
-							e->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
+							e->enemy->speed = GameObject::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
 						}
 						
 						//setting enemy generators: we need to create one generator per class
@@ -199,10 +199,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 						if (!boss->enemy->hasPhases)
 						{
-							boss->enemy->speed = Independant::getSpeed_for_Scrolling(this->direction, boss->enemy->speed.y);
+							boss->enemy->speed = GameObject::getSpeed_for_Scrolling(this->direction, boss->enemy->speed.y);
 						}
 						sf::Vector2f boss_pos = sf::Vector2f(atof((*it)[BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*it)[BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
-						boss_pos = Independant::getPosition_for_Direction(this->direction, boss_pos);
+						boss_pos = GameObject::getPosition_for_Direction(this->direction, boss_pos);
 						boss->enemy->setPosition(boss_pos);
 
 						this->boss_list.push_back(boss);
@@ -425,8 +425,8 @@ void Scene::SpawnEnemy(int enemy_class)
 		}
 	}
 	assert(enemy != NULL);
-	enemy->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
-	enemy->RotateFeedbacks(Independant::getRotation_for_Direction((*CurrentGame).direction));
+	enemy->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).direction));
+	enemy->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).direction));
 
 	//RANDOM POSITION
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).direction, enemy->m_size);
@@ -445,8 +445,8 @@ void Scene::GenerateBoss()
 		m_boss->enemy_class = (EnemyClass)((*it)->enemyclass);
 		(*CurrentGame).addToScene(m_boss, EnemyObjectLayer, EnemyObject);
 
-		m_boss->setRotation(Independant::getRotation_for_Direction((*CurrentGame).direction));
-		m_boss->RotateFeedbacks(Independant::getRotation_for_Direction((*CurrentGame).direction));
+		m_boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).direction));
+		m_boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).direction));
 
 		//counting spawned enemies
 		(*CurrentGame).hazardSpawned += m_boss->getMoney();

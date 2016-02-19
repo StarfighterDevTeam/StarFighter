@@ -2,13 +2,13 @@
 
 extern Game* CurrentGame;
 
-FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration, int m_animationNumber) : Independant(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2), m_frameNumber, m_animationNumber)
+FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration, int m_animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2), m_frameNumber, m_animationNumber)
 {
 	//deltaClockExploding.restart();
 	duration = m_duration;
 	visible = true;
 	isOnScene = true;
-	collider_type = IndependantType::Neutral;
+	collider_type = GameObjectType::Neutral;
 	frameNumber = m_frameNumber;
 	display_name = "explosion_S_blue";
 }
@@ -20,8 +20,8 @@ void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
 	}
 	else if (hyperspeedMultiplier < 1)
 	{
@@ -54,7 +54,7 @@ FX* FX::Clone()
 	return new_FX;
 }
 
-Aura::Aura(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : FX(m_target->getPosition(), sf::Vector2f(0, 0), textureName, size, m_frameNumber, sf::seconds(0), m_animationNumber)
+Aura::Aura(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : FX(m_target->getPosition(), sf::Vector2f(0, 0), textureName, size, m_frameNumber, sf::seconds(0), m_animationNumber)
 {
 	this->target = m_target;
 	visible = true;
@@ -95,7 +95,7 @@ Aura* Aura::Clone()
 	return new_aura;
 }
 
-FakeShip::FakeShip(Independant* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : Aura(m_target, textureName, size, m_frameNumber, m_animationNumber)
+FakeShip::FakeShip(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : Aura(m_target, textureName, size, m_frameNumber, m_animationNumber)
 {
 
 }
@@ -113,7 +113,7 @@ void FakeShip::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	Aura::update(deltaTime, hyperspeedMultiplier);
 }
 
-bool FakeShip::GetLoot(Independant& independant)
+bool FakeShip::GetLoot(GameObject& GameObject)
 {
-	return this->target->GetLoot(independant);
+	return this->target->GetLoot(GameObject);
 }

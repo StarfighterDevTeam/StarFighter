@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "TextureLoader.h"
-#include "Independant.h"
+#include "GameObject.h"
 #include "Weapon.h"
 #include "Loot.h"
 #include "Ship.h"
@@ -31,7 +31,7 @@ const int LootTable_MaxPropertiesPerEquipmentType[EquipmentType::NBVAL_Equipment
 
 const int XPTable_PerEnemyClass[EnemyClass::NBVAL_EnemyClass] = { 0, 10, 10, 30, 30, 100, 100, 500, 0 };
 
-class Enemy : public Independant
+class Enemy : public GameObject
 {
 public:
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber = 1, int m_animationNumber = 1);
@@ -46,7 +46,7 @@ public:
 	float angspeed;
 	void GenerateLoot() override;
 	bool CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus = 0, bool force_BeastScale = false, float BeastScale_min = 0.0f, float BeastScale_max = 6.0f);
-	void damage_from(Independant& independant) override;
+	void damage_from(GameObject& object) override;
 	EnemyClass enemy_class;
 
 	//phases

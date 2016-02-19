@@ -1,7 +1,7 @@
 #include "Game.h"
 #define stringify(x)  #x
 
-const char* IndependantTypeValues[] =
+const char* GameObjectTypeValues[] =
 {
 	stringify(BackgroundObject),
 	stringify(PlayerShip),
@@ -42,7 +42,7 @@ void Game::SetPlayerShip(Ship* m_playerShip)
 	this->playerShip = m_playerShip;
 }
 
-void Game::addToScene(Independant *object, LayerType m_layer, IndependantType type)
+void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
 {
 	object->layer = m_layer;
 	object->collider_type = type;
@@ -50,15 +50,15 @@ void Game::addToScene(Independant *object, LayerType m_layer, IndependantType ty
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
-	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_Independant))
+	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
-		AddIndependantToVector(object, &this->sceneIndependantsTyped[(int)type]);
-		AddIndependantToVector(object, &this->sceneIndependantsLayered[(int)m_layer]);
-		AddIndependantToVector(object, &this->sceneIndependants);
+		AddGameObjectToVector(object, &this->sceneGameObjectsTyped[(int)type]);
+		AddGameObjectToVector(object, &this->sceneGameObjectsLayered[(int)m_layer]);
+		AddGameObjectToVector(object, &this->sceneGameObjects);
 	}
 	else
 	{
-		throw invalid_argument(TextUtils::format("Game eror: Unable to add Independant '%s' to layer '%d'", object->getName().c_str(), (int)m_layer));
+		throw invalid_argument(TextUtils::format("Game eror: Unable to add GameObject '%s' to layer '%d'", object->getName().c_str(), (int)m_layer));
 	}
 }
 
@@ -84,7 +84,7 @@ void Game::removeFromFeedbacks(Text* text)
 
 void Game::updateScene(Time deltaTime)
 {
-	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
+	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
 
 	//TODO: Updating screen resolution
 	scale_factor.x = 1.0f * screen_size.x / REF_WINDOW_RESOLUTION_X;
@@ -96,22 +96,22 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
-	size_t sceneIndependantsSize = this->sceneIndependants.size();
+	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
 
-	for (int i = 0; i < sceneIndependantsSize; i++)
+	for (int i = 0; i < sceneGameObjectsSize; i++)
 	{
-		if (this->sceneIndependants[i] == NULL)
+		if (this->sceneGameObjects[i] == NULL)
 			continue;
 
-		this->sceneIndependants[i]->update(deltaTime, hyperspeedMultiplier);
+		this->sceneGameObjects[i]->update(deltaTime, hyperspeedMultiplier);
 	}
 
-	for (int i = 0; i < sceneIndependantsSize; i++)
+	for (int i = 0; i < sceneGameObjectsSize; i++)
 	{
-		if (this->sceneIndependants[i] == NULL)
+		if (this->sceneGameObjects[i] == NULL)
 			continue;
 
-		this->sceneIndependants[i]->updatePostCollision();
+		this->sceneGameObjects[i]->updatePostCollision();
 	}
 
 	//Collect the dust
@@ -162,9 +162,9 @@ int Game::GetSelectedIndex()
 	return this->m_interactionPanel->m_selected_index;
 }
 
-void Game::killIndependantLayer(IndependantType m_layer)
+void Game::killGameObjectLayer(GameObjectType m_layer)
 {
-	for (std::vector<Independant*>::iterator it = this->sceneIndependantsTyped[m_layer].begin(); it != this->sceneIndependantsTyped[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = this->sceneGameObjectsTyped[m_layer].begin(); it != this->sceneGameObjectsTyped[m_layer].end(); it++)
 	{
 		if ((*it) != NULL)
 		{
@@ -199,7 +199,7 @@ void Game::drawScene()
 		}
 		else
 		{
-			for (std::vector<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
+			for (std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin(); it != this->sceneGameObjectsLayered[i].end(); it++)
 			{
 				if (*it == NULL)
 					continue;
@@ -247,7 +247,7 @@ void Game::drawHud()
 	this->window->draw(blackStripeRight);
 }
 
-Independant* Game::getHudFocusedItem()
+GameObject* Game::getHudFocusedItem()
 {
 	return hud.focused_item;
 }
@@ -277,13 +277,13 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::PlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Enemy bullets hitting the player
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -300,9 +300,9 @@ void Game::colisionChecksV2()
 					(*it2)->Death();
 
 					//FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
-					//this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
+					//this->addToScene(explosion, LayerType::ExplosionLayer, GameObjectType::Neutral);
 					//hide destroyed item
-					if ((*it1)->getIndependantArmor() <= 0)
+					if ((*it1)->getGameObjectArmor() <= 0)
 					{
 						(*it1)->visible = false;
 						(*it1)->Death();
@@ -314,7 +314,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Enemy objects
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -327,7 +327,7 @@ void Game::colisionChecksV2()
 				//TO DO : explosion impact enemy vs ship
 
 				//death of player?
-				if ((*it1)->getIndependantArmor() <= 0)
+				if ((*it1)->getGameObjectArmor() <= 0)
 				{
 					(*it1)->visible = false;
 					(*it1)->Death();
@@ -342,7 +342,7 @@ void Game::colisionChecksV2()
 				//TODO: display contact feedback (small explosion?)
 
 				//death of enemy ship?
-				if ((*it2)->getIndependantArmor() <= 0)
+				if ((*it2)->getGameObjectArmor() <= 0)
 				{
 					(*it2)->Death();
 					
@@ -351,7 +351,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Loot
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::LootObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::LootObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -369,7 +369,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Portal
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::PortalObject].begin(); it2 != sceneIndependantsTyped[IndependantType::PortalObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::PortalObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::PortalObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -381,7 +381,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Shop
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::ShopObject].begin(); it2 != sceneIndependantsTyped[IndependantType::ShopObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::ShopObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::ShopObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -394,13 +394,13 @@ void Game::colisionChecksV2()
 	}
 
 	//Then, check if any allied bullet collide with any enemy
-	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it1 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it1 != sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Player bullets on enemy
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::FriendlyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::FriendlyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::FriendlyFire].begin(); it2 != sceneGameObjectsTyped[GameObjectType::FriendlyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -414,7 +414,7 @@ void Game::colisionChecksV2()
 				(*it2)->Death();
 
 				//death
-				if ((*it1)->getIndependantArmor() <= 0)
+				if ((*it1)->getGameObjectArmor() <= 0)
 				{
 					(*it1)->Death();
 				}
@@ -423,12 +423,12 @@ void Game::colisionChecksV2()
 	}
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::FakePlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::FakePlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[GameObjectType::FakePlayerShip].begin(); it1 != sceneGameObjectsTyped[GameObjectType::FakePlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::LootObject].begin(); it2 != sceneGameObjectsTyped[GameObjectType::LootObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -455,80 +455,80 @@ void Game::cleanGarbage()
 
 	// On "cache" les size, pour éviter d'appeler des fonctions à chaque itération
 	const size_t garbageSize = this->garbage.size();
-	const size_t sceneIndependantsSize = this->sceneIndependants.size();
+	const size_t sceneGameObjectsSize = this->sceneGameObjects.size();
 	//Size layer
-	size_t sceneIndependantsLayeredSize[NBVAL_Layer];
+	size_t sceneGameObjectsLayeredSize[NBVAL_Layer];
 	for (int layer = 0; layer < NBVAL_Layer; layer++)
 	{
-		sceneIndependantsLayeredSize[layer] = this->sceneIndependantsLayered[layer].size();
+		sceneGameObjectsLayeredSize[layer] = this->sceneGameObjectsLayered[layer].size();
 	}
 	//Size ind type
-	size_t sceneIndependantsTypedSize[NBVAL_Independant];
-	for (int layer = 0; layer < NBVAL_Independant; layer++)
+	size_t sceneGameObjectsTypedSize[NBVAL_GameObject];
+	for (int layer = 0; layer < NBVAL_GameObject; layer++)
 	{
-		sceneIndependantsTypedSize[layer] = this->sceneIndependantsTyped[layer].size();
+		sceneGameObjectsTypedSize[layer] = this->sceneGameObjectsTyped[layer].size();
 	}
 
-	//Scene independants
+	//Scene objects
 	for (size_t i = 0; i < garbageSize; i++)
 	{
-		Independant*    pCurIndependant = this->garbage[i];
+		GameObject*    pCurGameObject = this->garbage[i];
 
 		// On remet à NULL lorsqu'on a trouvé un élément à dégager
-		for (size_t j = 0; j < sceneIndependantsSize; j++)
+		for (size_t j = 0; j < sceneGameObjectsSize; j++)
 		{
-			if (this->sceneIndependants[j] == pCurIndependant)
+			if (this->sceneGameObjects[j] == pCurGameObject)
 			{
-				this->sceneIndependants[j] = NULL;
+				this->sceneGameObjects[j] = NULL;
 				break;
 			}
 		}
 
 		// "layered"...
-		const int layer = pCurIndependant->layer;
-		for (size_t j = 0; j < sceneIndependantsLayeredSize[layer]; j++)
+		const int layer = pCurGameObject->layer;
+		for (size_t j = 0; j < sceneGameObjectsLayeredSize[layer]; j++)
 		{
-			if (this->sceneIndependantsLayered[layer][j] == pCurIndependant)
+			if (this->sceneGameObjectsLayered[layer][j] == pCurGameObject)
 			{
-				this->sceneIndependantsLayered[layer][j] = NULL;
+				this->sceneGameObjectsLayered[layer][j] = NULL;
 				break;
 			}
 		}
 
 		// "typed"
-		const int type = pCurIndependant->collider_type;
-		for (size_t j = 0; j < sceneIndependantsTypedSize[type]; j++)
+		const int type = pCurGameObject->collider_type;
+		for (size_t j = 0; j < sceneGameObjectsTypedSize[type]; j++)
 		{
-			if (this->sceneIndependantsTyped[type][j] == pCurIndependant)
+			if (this->sceneGameObjectsTyped[type][j] == pCurGameObject)
 			{
-				this->sceneIndependantsTyped[type][j] = NULL;
+				this->sceneGameObjectsTyped[type][j] = NULL;
 				break;
 			}
 		}
 
-		pCurIndependant->Destroy();//destructor function
+		pCurGameObject->Destroy();//destructor function
 
 		// A la fin, on delete l'élément
-		delete pCurIndependant;
+		delete pCurGameObject;
 	}
 
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
-void Game::AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector)
+void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector)
 {
 	const size_t vectorSize = vector->size();
 	for (size_t i = 0; i < vectorSize; i++)
 	{
 		if ((*vector)[i] == NULL)
 		{
-			(*vector)[i] = pIndependant;
+			(*vector)[i] = pGameObject;
 			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
 		}
 	}
 
 	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
-	vector->push_back(pIndependant);
+	vector->push_back(pGameObject);
 }
 
 void Game::collectGarbage()
@@ -538,7 +538,7 @@ void Game::collectGarbage()
 
 	this->garbage.clear();
 
-	for (std::vector<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
+	for (std::vector<GameObject*>::iterator it = (this->sceneGameObjects).begin(); it != (this->sceneGameObjects).end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -578,7 +578,7 @@ void Game::collectGarbage()
 void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 {
 	int clear_count = 0;
-	for (std::vector<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsLayered[m_layer].begin(); it != sceneGameObjectsLayered[m_layer].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -612,7 +612,7 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 
 void Game::SetLayerRotation(LayerType m_layer, float angle)
 {
-	for (std::vector<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsLayered[m_layer].begin(); it != sceneGameObjectsLayered[m_layer].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -621,7 +621,7 @@ void Game::SetLayerRotation(LayerType m_layer, float angle)
 	}
 }
 
-bool Game::isVectorEmpty(vector <Independant*>* vector)
+bool Game::isVectorEmpty(vector <GameObject*>* vector)
 {
 	const size_t vectorSize = vector->size();
 	for (size_t i = 0; i < vectorSize; i++)
@@ -637,9 +637,9 @@ bool Game::isVectorEmpty(vector <Independant*>* vector)
 
 bool Game::isLastEnemyDead()
 {
-	if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyFire]))
+	if (!isVectorEmpty(&this->sceneGameObjectsTyped[EnemyFire]))
 		return false;
-	else if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyObject]))
+	else if (!isVectorEmpty(&this->sceneGameObjectsTyped[EnemyObject]))
 		return false;
 	
 	return true;
@@ -661,11 +661,11 @@ void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastSc
 	this->BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
 }
 
-TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range)
+TargetScan Game::FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)
 {
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[type].begin(); it != sceneGameObjectsTyped[type].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -702,12 +702,12 @@ TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_
 	}
 }
 
-float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range)
+float Game::GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)
 {
 	float angle = 0.f;
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[type].begin(); it != sceneGameObjectsTyped[type].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -736,12 +736,12 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 		{
 			shortest_distance = sqrtf(shortest_distance);
 			//angle = acos((ref_position.y - pos.y) / shortest_distance);
-			sf::Vector2f diff_position = Independant::getSize_for_Direction(this->direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
-			diff_position.x *= Independant::getDirectionMultiplier(this->direction).x;
+			sf::Vector2f diff_position = GameObject::getSize_for_Direction(this->direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
+			diff_position.x *= GameObject::getDirectionMultiplier(this->direction).x;
 			angle = acos(diff_position.x / shortest_distance);
 			angle = angle * 180 / M_PI;
 
-			diff_position.y *= Independant::getDirectionMultiplier(this->direction).y;
+			diff_position.y *= GameObject::getDirectionMultiplier(this->direction).y;
 
 			//if (ref_position.x < pos.x)
 			if (diff_position.y < 0)
@@ -761,7 +761,7 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 
 void Game::WakeUpEnemiesWithName(string m_display_name)
 {
-	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it++)
+	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it != sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -773,14 +773,14 @@ void Game::WakeUpEnemiesWithName(string m_display_name)
 	}
 }
 
-bool Game::InsertObjectInShipGrid(Independant& object, int index)
+bool Game::InsertObjectInShipGrid(GameObject& object, int index)
 {
 	bool result = hud.shipGrid.insertObject(object, index);
 
 	return result;
 }
 
-bool Game::InsertObjectInEquipmentGrid(Independant& object, int index)
+bool Game::InsertObjectInEquipmentGrid(GameObject& object, int index)
 {
 	bool result = hud.equipmentGrid.insertObject(object, index);
 
@@ -792,7 +792,7 @@ bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
 	if (hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL)
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
-		Independant* tmpShip = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
+		GameObject* tmpShip = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
 		//Equipement > Ship
 		hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
 		//Ship > equipement

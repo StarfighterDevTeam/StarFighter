@@ -2,7 +2,7 @@
 #define PORTAL_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include "Independant.h"
+#include "GameObject.h"
 #include "Game.h"
 
 enum PortalState
@@ -21,7 +21,7 @@ enum PortalAnimation
 	PortalCloseIdle,//3
 };
 
-class Portal : public Independant
+class Portal : public GameObject
 {
 public:
 	Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber);
