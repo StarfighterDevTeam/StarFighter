@@ -59,7 +59,6 @@ public:
 	std::string display_name;
 	Bot* bot;
 	
-	bool hasFake;
 	std::string fake_textureName;
 	sf::Vector2f fake_size;
 	int fake_frameNumber;
@@ -89,7 +88,6 @@ public:
 	int equipmentType;
 	Bot* bot;
 
-	bool hasFake;
 	std::string fake_textureName;
 	sf::Vector2f fake_size;
 	int fake_frameNumber;

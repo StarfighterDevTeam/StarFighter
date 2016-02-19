@@ -190,7 +190,6 @@ Equipment* FileLoader::LoadEquipment(string name)
 				i->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
 				i->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
 				i->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
-				i->hasFake = true;
 			}
 
 			//if((*it)[EquipmentData::EQUIPMENT_COMPARE].compare("airbrake") == 0)
@@ -241,7 +240,6 @@ ShipModel* FileLoader::LoadShipModel(string name)
 					s->fake_textureName = (*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE];
 					s->fake_size = sf::Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_FAKE_HEIGHT]));
 					s->fake_frameNumber = stoi((*it)[EquipmentData::EQUIPMENT_FAKE_FRAMES]);
-					s->hasFake = true;
 				}
 
 				return s;

@@ -20,7 +20,6 @@ ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decelerati
 	frameNumber = m_frameNumber;
 	display_name = m_display_name;
 	bot = NULL;
-	hasFake = false;
 	hyperspeed = m_hyperspeed;
 }
 
@@ -42,7 +41,6 @@ Equipment::Equipment()
 	frameNumber = 0;
 	equipmentType = EquipmentType::Armor;
 	bot = NULL;
-	hasFake = false;
 }
 
 Equipment::~Equipment()
@@ -451,8 +449,8 @@ void Ship::DestroyBots()
 
 void Ship::GenerateFakeShip(GameObject* m_target)
 {
-	assert(this->ship_model != NULL);
-	if (this->ship_model->hasFake)
+	assert(ship_model != NULL);
+	if (!ship_model->fake_textureName.empty())
 	{
 		m_fake_ship = new FakeShip(m_target, this->ship_model->fake_textureName, this->ship_model->fake_size, this->ship_model->fake_frameNumber, ShipAnimations::NB_ShipAnimations);
 		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, GameObjectType::FakePlayerShip);
@@ -501,14 +499,8 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
 	trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	trail->visible = false;
-	if (ship_model->hasFake)
-	{
-		trail->offset = sf::Vector2f(0, (ship_model->fake_size.y / 2) + (this->trail->m_size.y / 2));
-	}
-	else
-	{
-		trail->offset = sf::Vector2f(0, (ship_model->size.y / 2) + (this->trail->m_size.y / 2));
-	}
+	trail->offset = sf::Vector2f(0, (m_ship_size.y / 2) + (this->trail->m_size.y / 2));
+
 	(*CurrentGame).addToScene(this->trail, LayerType::FakeShipLayer, GameObjectType::Neutral);
 	fire_key_repeat = false;
 	slowmo_key_repeat = false;
@@ -556,8 +548,8 @@ void Ship::Init()
 	frameNumber = ship_model->frameNumber;
 
 	//fake texture
-	transparent = ship_model->hasFake;
-	m_ship_size = ship_model->hasFake ? ship_model->fake_size : m_size;
+	transparent = !ship_model->fake_textureName.empty();
+	m_ship_size = !ship_model->fake_textureName.empty() ? ship_model->fake_size : ship_model->size;
 
 	//Loading bots
 	bot_list.clear();
@@ -1010,7 +1002,7 @@ void Ship::ManageImmunity()
 void Ship::ManageFeedbackExpiration(sf::Time deltaTime)
 {
 	//damage feedback expires?
-	if (ship_model->hasFake)
+	if (!ship_model->fake_textureName.empty())
 	{
 		assert(m_fake_ship != NULL);
 
@@ -1237,7 +1229,7 @@ void Ship::SettingTurnAnimations()
 	const sf::Vector2f f = (sf::Vector2f)GameObject::getDirectionMultiplier((*CurrentGame).direction);
 	const float x = GameObject::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(speed.x * f.x, speed.y * f.y)).x;
 
-	if (ship_model->hasFake)
+	if (!ship_model->fake_textureName.empty())
 	{
 		if (x > 0 && currentAnimationIndex != ShipAnimations::ShipTurningRight && !disable_inputs)
 		{
@@ -1458,7 +1450,7 @@ void Ship::Respawn()
 	speed.x = 0;
 	speed.y = 0;
 	this->visible = true;
-	if (ship_model->hasFake)
+	if (!ship_model->fake_textureName.empty())
 	{
 		m_fake_ship->visible = true;
 	}
@@ -1643,7 +1635,7 @@ void Ship::damage_from(GameObject& object)
 {
 	if (!immune)
 	{
-		if (ship_model->hasFake)
+		if (!ship_model->fake_textureName.empty())
 		{
 			assert(m_fake_ship != NULL);
 			m_fake_ship->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
