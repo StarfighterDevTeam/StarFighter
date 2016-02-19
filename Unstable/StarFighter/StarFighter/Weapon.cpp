@@ -395,7 +395,7 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 	return fire_direction_;
 }
 
-Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
+Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot)
 {
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
@@ -486,7 +486,8 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level)
 	//spread of multishot weapons
 	if (weapon->multishot > 1)
 	{
-		weapon->xspread = RandomizeIntBetweenValues(0, ASSUMED_SHIP_SIZE * 2 / weapon->multishot);
+		int sprite_size = is_bot ? ASSUMED_BOT_SIZE : ASSUMED_SHIP_SIZE;
+		weapon->xspread = RandomizeIntBetweenValues(0, sprite_size * 2 / weapon->multishot);
 	}
 
 	//saving level and credits used

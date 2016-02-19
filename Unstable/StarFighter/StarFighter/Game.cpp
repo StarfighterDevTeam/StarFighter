@@ -106,6 +106,14 @@ void Game::updateScene(Time deltaTime)
 		this->sceneIndependants[i]->update(deltaTime, hyperspeedMultiplier);
 	}
 
+	for (int i = 0; i < sceneIndependantsSize; i++)
+	{
+		if (this->sceneIndependants[i] == NULL)
+			continue;
+
+		this->sceneIndependants[i]->updatePostCollision();
+	}
+
 	//Collect the dust
 	collectGarbage();
 }

@@ -107,7 +107,7 @@ void InGameState::Update(Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
-	(*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->previouslyCollindingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
+	(*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->previouslyCollidingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
 
 	//displaying stats of focused item in the HUD...
 	if ((*CurrentGame).getHudFocusedItem() != NULL)

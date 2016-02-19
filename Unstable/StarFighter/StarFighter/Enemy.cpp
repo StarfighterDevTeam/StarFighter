@@ -1118,7 +1118,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 
 				case (int)EquipmentType::NBVAL_Equipment://WEAPON DROP
 				{
-					this->setWeaponLoot(Weapon::CreateRandomWeapon(loot_credits_, this->level));
+					this->setWeaponLoot(Weapon::CreateRandomWeapon(loot_credits_, this->level, false));
 					break;
 				}
 			}

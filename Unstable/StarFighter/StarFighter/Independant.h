@@ -180,6 +180,7 @@ public:
 
 	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier = 1);
 	virtual void updateAnimation(sf::Time deltaTime);
+	virtual void updatePostCollision();
 	bool visible;
 	bool isOnScene;
 	bool GarbageMe;
@@ -223,8 +224,8 @@ public:
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
 
-	InteractionType isCollindingWithInteractiveObject;
-	InteractionType previouslyCollindingWithInteractiveObject;
+	InteractionType isCollidingWithInteractiveObject;
+	InteractionType previouslyCollidingWithInteractiveObject;
 
 	virtual void GetGrazing();
 	void GetPolarMovement(sf::Vector2f* np);

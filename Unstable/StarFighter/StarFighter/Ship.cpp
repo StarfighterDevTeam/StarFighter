@@ -307,7 +307,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
-	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER), level);
+	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER), level, true);
 
 	//Initialisation
 	Equipment* equipment = new Equipment();
@@ -743,8 +743,8 @@ Ship::Ship(Vector2f position, ShipConfig m_ship_config) : Independant(position, 
 	this->isFocusedOnHud = false;
 	this->previously_focused_item = NULL;
 
-	this->previouslyCollindingWithInteractiveObject = No_Interaction;
-	this->isCollindingWithInteractiveObject = No_Interaction;
+	this->previouslyCollidingWithInteractiveObject = No_Interaction;
+	this->isCollidingWithInteractiveObject = No_Interaction;
 
 	this->Init();
 }
@@ -899,9 +899,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		sf::Vector2f directions = InputGuy::getDirections();
 
 		ManageInputs(deltaTime, hyperspeedMultiplier, directions);
-		
-		previouslyCollindingWithInteractiveObject = isCollindingWithInteractiveObject;
-		isCollindingWithInteractiveObject = No_Interaction;
 
 		this->trail->visible = (hyperspeedMultiplier > 1.0f);
 
@@ -1018,7 +1015,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!disable_fire && (isCollindingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
+			if (!disable_fire && (isCollidingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
 			{
 				if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 				{
@@ -1080,7 +1077,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 		//speed malus when shooting
 		if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
 		{
-			if (!disable_fire && (isCollindingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
+			if (!disable_fire && (isCollidingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
 			{
 				if (!this->isBraking)
 				{
@@ -1145,7 +1142,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 void Ship::ManageSlowMotion()
 {
 	//Slow_motion function
-	if (InputGuy::isSlowMotion() && !disable_fire && (isCollindingWithInteractiveObject == No_Interaction))
+	if (InputGuy::isSlowMotion() && !disable_fire && (isCollidingWithInteractiveObject == No_Interaction))
 	{
 		if (!this->slowmo_key_repeat)
 		{
@@ -1170,7 +1167,7 @@ void Ship::ManageSlowMotion()
 void Ship::ManageHyperspeed()
 {
 	this->isHyperspeeding = false;
-	if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion && (isCollindingWithInteractiveObject == No_Interaction))
+	if (InputGuy::isHyperspeeding() && !this->disabledHyperspeed && !this->isHyperspeeding && !this->isBraking &&!this->isSlowMotion && (isCollidingWithInteractiveObject == No_Interaction))
 	{
 		this->isHyperspeeding = true;
 		(*CurrentGame).hyperspeedMultiplier = this->hyperspeed;
@@ -1194,7 +1191,7 @@ void Ship::ManageBraking()
 {
 	//Braking function
 	this->isBraking = false;
-	if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding && (isCollindingWithInteractiveObject == No_Interaction))
+	if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding && (isCollidingWithInteractiveObject == No_Interaction))
 	{
 		speed.x *= SHIP_BRAKING_MALUS_SPEED;
 		speed.y *= SHIP_BRAKING_MALUS_SPEED;
@@ -1547,9 +1544,9 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 	//using portals and shops
 	m_interactionType = No_Interaction;
 
-	if (this->isCollindingWithInteractiveObject != No_Interaction)
+	if (this->isCollidingWithInteractiveObject != No_Interaction)
 	{
-		if (this->isCollindingWithInteractiveObject == PortalInteraction)
+		if (this->isCollidingWithInteractiveObject == PortalInteraction)
 		{
 			assert(this->targetPortal != NULL);
 			if (this->targetPortal->state == PortalOpen)
@@ -1559,7 +1556,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 				assert(this->targetPortal->destination_name.compare("0") != 0);
 				(*CurrentGame).SetSelectedDestination(this->targetPortal->display_name);
 				//default value = max
-				if (previouslyCollindingWithInteractiveObject != PortalInteraction)
+				if (previouslyCollidingWithInteractiveObject != PortalInteraction)
 				{
 					(*CurrentGame).SetSelectedIndex(this->targetPortal->max_unlocked_hazard_level);
 				}
@@ -1576,16 +1573,16 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 			}
 			else
 			{
-				this->isCollindingWithInteractiveObject = No_Interaction;
+				this->isCollidingWithInteractiveObject = No_Interaction;
 			}
 		}
-		else if (this->isCollindingWithInteractiveObject == ShopInteraction)
+		else if (this->isCollidingWithInteractiveObject == ShopInteraction)
 		{
 			assert(this->targetShop != NULL);
 
 			(*CurrentGame).SetSelectedDestination(this->targetShop->display_name);
 			//default value = first choice
-			if (previouslyCollindingWithInteractiveObject != ShopInteraction)
+			if (previouslyCollidingWithInteractiveObject != ShopInteraction)
 			{
 				(*CurrentGame).SetSelectedIndex(0);
 			}
@@ -1631,7 +1628,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 		}
 
 		//controls up and down selected object
-		if (this->isCollindingWithInteractiveObject == PortalInteraction && this->m_interactionType != PortalInteraction)
+		if (this->isCollidingWithInteractiveObject == PortalInteraction && this->m_interactionType != PortalInteraction)
 		{
 			//interaction: decreasing
 			if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
@@ -1650,7 +1647,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 				}
 			}
 		}
-		else if (this->isCollindingWithInteractiveObject == ShopInteraction  && this->m_interactionType != ShopInteraction)
+		else if (this->isCollidingWithInteractiveObject == ShopInteraction  && this->m_interactionType != ShopInteraction)
 		{
 			//interaction: decreasing
 			if (InputGuy::isHyperspeeding() && !wasHyperspeedingButtonPressed)
@@ -1798,13 +1795,13 @@ bool Ship::GetLoot(Independant& independant)
 void Ship::GetPortal(Independant* independant)
 {
 	this->targetPortal = (Portal*)(independant);
-	this->isCollindingWithInteractiveObject = PortalInteraction;
+	this->isCollidingWithInteractiveObject = PortalInteraction;
 }
 
 void Ship::GetShop(Independant* independant)
 {
 	this->targetShop = (Shop*)(independant);
-	this->isCollindingWithInteractiveObject = ShopInteraction;
+	this->isCollidingWithInteractiveObject = ShopInteraction;
 }
 
 static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 10, 40, 70 };
@@ -2617,4 +2614,10 @@ bool Ship::LoadPlayerItems(string file)
 		cerr << "Failed to open ITEMS SAVE FILE !" << endl;
 		return false;
 	}
+}
+
+void Ship::updatePostCollision()
+{
+	previouslyCollidingWithInteractiveObject = isCollidingWithInteractiveObject;
+	isCollidingWithInteractiveObject = No_Interaction;
 }

@@ -97,7 +97,7 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!disable_fire && (target->isCollindingWithInteractiveObject == No_Interaction) && !target->disable_fire)
+			if (!disable_fire && (target->isCollidingWithInteractiveObject == No_Interaction) && !target->disable_fire)
 			{
 				if (InputGuy::isFiring() || this->automatic_fire)
 				{

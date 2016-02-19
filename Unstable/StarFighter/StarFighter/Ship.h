@@ -181,6 +181,7 @@ public :
 	Ship(Vector2f position, ShipConfig m_ship_config);
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	void updatePostCollision() override;
 	void ManageDebugCommand();
 	bool ManageVisibility();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
@@ -219,7 +220,7 @@ public :
 	void GetShop(Independant* independant) override;
 	Portal* targetPortal;
 	Shop* targetShop;
-	InteractionType previouslyCollindingWithInteractiveObject;
+	InteractionType previouslyCollidingWithInteractiveObject;
 	bool wasHyperspeedingButtonPressed;
 	bool isFiringButtonPressed;
 	bool wasBrakingButtonPressed;

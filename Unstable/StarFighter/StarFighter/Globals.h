@@ -172,6 +172,7 @@
 #define FIRST_LEVEL_HYPERSPEED							1.0f
 #define DEFAULT_AMMO_SPEED								2200
 #define ASSUMED_SHIP_SIZE								70
+#define ASSUMED_BOT_SIZE								32
 
 enum HazardLevels
 {
