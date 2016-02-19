@@ -1261,7 +1261,9 @@ void Enemy::ApplyLevelModifiers()
 	float multiplier_ = ceil(1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(this->level) / 100);
 
 	this->armor_max = floor(this->armor_max * multiplier_);
+	this->armor = this->armor_max;
 	this->shield_max = floor(this->shield_max * multiplier_);
+	this->shield = this->shield_max;
 	this->shield_regen = floor(this->shield_regen * multiplier_);
 	this->damage = floor(this->damage * multiplier_);
 	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
