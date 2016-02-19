@@ -8,82 +8,41 @@ using namespace sf;
 // ----------------SHIP MODEL ---------------
 ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
-	this->max_speed = m_max_speed;
-	this->deceleration = m_deceleration;
-	this->acceleration = m_acceleration;
-	this->armor = m_armor;
-	this->shield = m_shield;
-	this->shield_regen = m_shield_regen;
-	this->damage = m_damage;
-	this->textureName = m_textureName;
-	this->size = m_size;
-	this->frameNumber = m_frameNumber;
-	this->display_name = m_display_name;
-	this->hasBot = false;
-	this->hasFake = false;
-	this->hyperspeed = m_hyperspeed;
-}
-
-//various "get" functions to enter private members of ShipModel, Equipment, and ShipConfig
-float ShipModel::getShipModelMaxSpeed()
-{
-	return this->max_speed;
-}
-
-float ShipModel::getShipModelAcceleration()
-{
-	return this->acceleration;
-}
-
-float ShipModel::getShipModelDeceleration()
-{
-	return this->deceleration;
-}
-
-float ShipModel::getShipModelHyperspeed()
-{
-	return this->hyperspeed;
-}
-
-int ShipModel::getShipModelArmor()
-{
-	return this->armor;
-}
-
-int ShipModel::getShipModelShield()
-{
-	return this->shield;
-}
-
-int ShipModel::getShipModelShieldRegen()
-{
-	return this->shield_regen;
-}
-
-int ShipModel::getShipModelDamage()
-{
-	return this->damage;
+	max_speed = m_max_speed;
+	deceleration = m_deceleration;
+	acceleration = m_acceleration;
+	armor = m_armor;
+	shield = m_shield;
+	shield_regen = m_shield_regen;
+	damage = m_damage;
+	textureName = m_textureName;
+	size = m_size;
+	frameNumber = m_frameNumber;
+	display_name = m_display_name;
+	hasBot = false;
+	hasFake = false;
+	hyperspeed = m_hyperspeed;
 }
 
 // ----------------EQUIPMENT ---------------
 
 Equipment::Equipment()
 {
-	this->max_speed = 0.0f;
-	this->deceleration = 0.0f;
-	this->acceleration = 0.0f;
-	this->armor = 0;
-	this->shield = 0;
-	this->shield_regen = 0;
-	this->damage = 0;
-	this->hyperspeed = 0;
-	this->size.x = EQUIPMENT_SIZE;
-	this->size.y = EQUIPMENT_SIZE;
-	this->textureName = EMPTYSLOT_FILENAME;
-	this->frameNumber = 0;
-	this->equipmentType = EquipmentType::Armor;
-	this->hasBot = false;
-	this->hasFake = false;
+	max_speed = 0.0f;
+	deceleration = 0.0f;
+	acceleration = 0.0f;
+	armor = 0;
+	shield = 0;
+	shield_regen = 0;
+	damage = 0;
+	hyperspeed = 0;
+	size.x = EQUIPMENT_SIZE;
+	size.y = EQUIPMENT_SIZE;
+	textureName = EMPTYSLOT_FILENAME;
+	frameNumber = 0;
+	equipmentType = EquipmentType::Armor;
+	hasBot = false;
+	hasFake = false;
 }
 
 Equipment::~Equipment()
@@ -116,60 +75,20 @@ Equipment* Equipment::Clone()
 
 void Equipment::Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
-	this->max_speed = m_max_speed;
-	this->deceleration = m_deceleration;
-	this->acceleration = m_acceleration;
-	this->hyperspeed = m_hyperspeed;
-	this->armor = m_armor;
-	this->shield = m_shield;
-	this->shield_regen = m_shield_regen;
-	this->damage = damage;
-	this->size.x = m_size.x;
-	this->size.y = m_size.y;
-	this->textureName = m_textureName;
-	this->frameNumber = m_frameNumber;
-	this->display_name = m_display_name;
-	this->equipmentType = m_equipmentType;
-}
-
-float Equipment::getEquipmentMaxSpeed()
-{
-	return this->max_speed;
-}
-
-float Equipment::getEquipmentDeceleration()
-{
-	return this->deceleration;
-}
-
-float Equipment::getEquipmentAcceleration()
-{
-	return this->acceleration;
-}
-
-float Equipment::getEquipmentHyperspeed()
-{
-	return this->hyperspeed;
-}
-
-int Equipment::getEquipmentArmor()
-{
-	return this->armor;
-}
-
-int Equipment::getEquipmentShield()
-{
-	return this->shield;
-}
-
-int Equipment::getEquipmentShieldRegen()
-{
-	return this->shield_regen;
-}
-
-int Equipment::getEquipmentDamage()
-{
-	return this->damage;
+	max_speed = m_max_speed;
+	deceleration = m_deceleration;
+	acceleration = m_acceleration;
+	hyperspeed = m_hyperspeed;
+	armor = m_armor;
+	shield = m_shield;
+	shield_regen = m_shield_regen;
+	damage = damage;
+	size.x = m_size.x;
+	size.y = m_size.y;
+	textureName = m_textureName;
+	frameNumber = m_frameNumber;
+	display_name = m_display_name;
+	equipmentType = m_equipmentType;
 }
 
 Equipment* Equipment::CreateRandomArmor(int credits_, int level)
@@ -343,220 +262,175 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 #define EQUIPMENT_SHIELD_REGEN_MULTIPLIER		10
 #define EQUIPMENT_DAMAGE_MULTIPLIER				10
 
-// ----------------SHIP CONFIG ---------------
-
-int Ship::getShipArmor()
+float Ship::getFighterFloatStatValue(FighterStats stat)
 {
-	int new_armor = 0;
-	int equipment_armor = 0;
+	float new_stat_value = 0;
+	float equipment_value = 0;
 
 	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
-		if (this->equipment[i] != NULL)
+		if (equipment[i])
 		{
-			equipment_armor += equipment[i]->getEquipmentArmor();
+			switch (stat)
+			{
+				case Fighter_Hyperspeed:
+				{
+					equipment_value += equipment[i]->hyperspeed;
+					break;
+				}
+				case Fighter_MaxSpeed:
+				{
+					equipment_value += equipment[i]->max_speed;
+					break;
+				}
+				case Fighter_Acceleration:
+				{
+					equipment_value += equipment[i]->acceleration;
+					break;
+				}
+				case Fighter_Deceleration:
+				{
+					equipment_value += equipment[i]->deceleration;
+					break;
+				}
+				default:
+				{
+					equipment_value += 0;
+				}
+			}
 		}
 		else
 		{
-			equipment_armor += 0;
+			equipment_value += 0;
 		}
 	}
 
-	new_armor = ship_model->getShipModelArmor() + equipment_armor;
+	//adding ship model stats
+	switch (stat)
+	{
+		case Fighter_Hyperspeed:
+		{
+			new_stat_value = ship_model->hyperspeed + equipment_value;
+			break;
+		}
+		case Fighter_MaxSpeed:
+		{
+			new_stat_value = ship_model->max_speed + equipment_value;
+			break;
+		}
+		case Fighter_Acceleration:
+		{
+			new_stat_value = ship_model->acceleration + equipment_value;
+			break;
+		}
+		case Fighter_Deceleration:
+		{
+			new_stat_value = ship_model->deceleration + equipment_value;
+			break;
+		}
+		default:
+		{
+			new_stat_value = equipment_value;
+		}
+	}
 
-	//cancelling negative equipment values
-	if (new_armor < ship_model->getShipModelArmor())
-		new_armor = ship_model->getShipModelArmor();
-
-	return new_armor;
+	return new_stat_value;
 }
 
-int Ship::getShipShield()
+int Ship::getFighterIntStatValue(FighterStats stat)
 {
-	int new_shield = 0;
-	int equipment_shield = 0;
+	int new_stat_value = 0;
+	int equipment_value = 0;
 
 	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
-		if (this->equipment[i] != NULL)
+		if (equipment[i])
 		{
-			equipment_shield += equipment[i]->getEquipmentShield();
+			switch (stat)
+			{
+				case Fighter_ArmorMax:
+				{
+					equipment_value += equipment[i]->armor;
+					break;
+				}
+				case Fighter_ShieldMax:
+				{
+					equipment_value += equipment[i]->shield;
+					break;
+				}
+				case Fighter_ShieldRegen:
+				{
+					equipment_value += equipment[i]->shield_regen;
+					break;
+				}
+				case Fighter_ContactDamage:
+				{
+					equipment_value += equipment[i]->damage;
+					break;
+				}
+				case Fighter_Credits:
+				{
+					equipment_value += equipment[i]->credits;
+					break;
+				}
+				case Fighter_Level:
+				{
+					equipment_value += equipment[i]->level;
+					break;
+				}
+				default:
+				{
+					equipment_value += 0;
+				}
+			}
 		}
 		else
 		{
-			equipment_shield += 0;
+			equipment_value += 0;
 		}
 	}
 
-	new_shield = ship_model->getShipModelShield() + equipment_shield;
-
-	//cancelling negative equipment values
-	if (new_shield < ship_model->getShipModelShield())
-		new_shield = ship_model->getShipModelShield();
-
-	return new_shield;
-}
-
-int Ship::getShipShieldRegen()
-{
-	int new_shield_regen = 0;
-	int equipment_shield_regen = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	//adding ship model stats
+	switch (stat)
 	{
-		if (this->equipment[i] != NULL)
+		case Fighter_ArmorMax:
 		{
-			equipment_shield_regen += equipment[i]->getEquipmentShieldRegen();
-
+			new_stat_value = ship_model->armor + equipment_value;
+			break;
 		}
-		else
+		case Fighter_ShieldMax:
 		{
-			equipment_shield_regen += 0;
+			new_stat_value = ship_model->shield + equipment_value;
+			break;
 		}
-	}
-
-	new_shield_regen = ship_model->getShipModelShieldRegen() + equipment_shield_regen;
-
-	//cancelling negative equipment values
-	if (new_shield_regen < ship_model->getShipModelShieldRegen())
-		new_shield_regen = ship_model->getShipModelShieldRegen();
-
-	return new_shield_regen;
-}
-
-int Ship::getShipDamage()
-{
-	int new_damage = 0;
-	int equipment_damage = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
+		case Fighter_ShieldRegen:
 		{
-			equipment_damage += equipment[i]->getEquipmentDamage();
+			new_stat_value = ship_model->shield_regen + equipment_value;
+			break;
 		}
-		else
+		case Fighter_ContactDamage:
 		{
-			equipment_damage += 0;
+			new_stat_value = ship_model->damage + equipment_value;
+			break;
 		}
-	}
-
-	new_damage = ship_model->getShipModelDamage() + equipment_damage;
-
-	//cancelling negative equipment values
-	if (new_damage < ship_model->getShipModelDamage())
-		new_damage = ship_model->getShipModelDamage();
-
-	return new_damage;
-}
-
-float Ship::getShipMaxSpeed()
-{
-	float new_max_speed = 0;
-	float equipment_max_speed = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
+		case Fighter_Credits:
 		{
-			equipment_max_speed += equipment[i]->getEquipmentMaxSpeed();
+			new_stat_value = equipment_value;
+			break;
 		}
-		else
+		case Fighter_Level:
 		{
-			equipment_max_speed += 0;
+			new_stat_value = equipment_value;
+			break;
+		}
+		default:
+		{
+			new_stat_value = equipment_value;
 		}
 	}
 
-	new_max_speed = ship_model->getShipModelMaxSpeed() + equipment_max_speed;
-
-	//cancelling negative equipment values
-	if (new_max_speed < ship_model->getShipModelMaxSpeed())
-		new_max_speed = ship_model->getShipModelMaxSpeed();
-
-	return new_max_speed;
+	return new_stat_value;
 }
-
-float Ship::getShipDeceleration()
-{
-	float new_deceleration = 0.0f;
-	float equipment_deceleration = 0.0f;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			equipment_deceleration += equipment[i]->getEquipmentDeceleration();
-		}
-		else
-		{
-			equipment_deceleration += 0;
-		}
-	}
-
-	new_deceleration = ship_model->getShipModelDeceleration() + equipment_deceleration;
-
-	//cancelling negative equipment values
-	if (new_deceleration < ship_model->getShipModelDeceleration())
-		new_deceleration = ship_model->getShipModelDeceleration();
-
-	return new_deceleration;
-}
-
-float Ship::getShipAcceleration()
-{
-	float new_acceleration = 0;
-	float equipment_acceleration = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			equipment_acceleration += equipment[i]->getEquipmentAcceleration();
-		}
-		else
-		{
-			equipment_acceleration += 0;
-		}
-	}
-
-	new_acceleration = ship_model->getShipModelAcceleration() + equipment_acceleration;
-
-	//cancelling negative equipment values
-	if (new_acceleration < ship_model->getShipModelAcceleration())
-		new_acceleration = ship_model->getShipModelAcceleration();
-
-	return new_acceleration;
-}
-
-float Ship::getShipHyperspeed()
-{
-	float new_hyperspeed = 0.0f;
-	float equipment_hyperspeed = 0.0f;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			equipment_hyperspeed += equipment[i]->getEquipmentHyperspeed();
-		}
-		else
-		{
-			equipment_hyperspeed += 0;
-		}
-	}
-
-	new_hyperspeed = ship_model->getShipModelHyperspeed() + equipment_hyperspeed;
-
-	//cancelling negative equipment values
-	if (new_hyperspeed < ship_model->getShipModelHyperspeed())
-		new_hyperspeed = ship_model->getShipModelHyperspeed();
-
-	return new_hyperspeed;
-}
-
-
-
-
 
 void Ship::GenerateBots(GameObject* m_target)
 {
@@ -663,22 +537,22 @@ void Ship::Init()
 {
 	UpdateShipLevel();
 
-	max_speed = getShipMaxSpeed();
-	deceleration = getShipDeceleration();
-	acceleration = getShipAcceleration();
-	hyperspeed = getShipHyperspeed();
-	armor_max = getShipArmor();
+	max_speed = getFighterFloatStatValue(Fighter_MaxSpeed);
+	deceleration = getFighterFloatStatValue(Fighter_Deceleration);
+	acceleration = getFighterFloatStatValue(Fighter_Acceleration);
+	hyperspeed = getFighterFloatStatValue(Fighter_Hyperspeed);
+	armor_max = getFighterIntStatValue(Fighter_ArmorMax);
 	if (armor > armor_max)
 	{
 		armor = armor_max;
 	}
-	shield_max = getShipShield();
+	shield_max = getFighterIntStatValue(Fighter_ShieldMax);
 	if (shield > shield_max)
 	{
 		shield = shield_max;
 	}
-	shield_regen = getShipShieldRegen();
-	damage = getShipDamage();
+	shield_regen = getFighterIntStatValue(Fighter_ShieldRegen);
+	damage = getFighterIntStatValue(Fighter_ContactDamage);
 	m_size = ship_model->size;
 	textureName = ship_model->textureName;
 	frameNumber = ship_model->frameNumber;
@@ -1105,11 +979,11 @@ void Ship::ManageHyperspeed()
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	speed.x += inputs_direction.x*getShipAcceleration();
-	speed.y += inputs_direction.y*getShipAcceleration();
+	speed.x += inputs_direction.x*getFighterFloatStatValue(Fighter_Acceleration);
+	speed.y += inputs_direction.y*getFighterFloatStatValue(Fighter_Acceleration);
 
 	//max speed constraints
-	GameObject::NormalizeSpeed(&speed, getShipMaxSpeed());
+	GameObject::NormalizeSpeed(&speed, getFighterFloatStatValue(Fighter_MaxSpeed));
 }
 
 void Ship::ManageBraking()
@@ -1422,7 +1296,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	//idle deceleration
 	if (!movingX || isFocusedOnHud == true)
 	{
-		speed.x -= (speed.x) * deltaTime.asSeconds()*(getShipDeceleration() / 100);
+		speed.x -= (speed.x) * deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 
 		if (abs(speed.x) < SHIP_MIN_SPEED_X)
 			speed.x = 0;
@@ -1430,7 +1304,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 	if (!movingY || isFocusedOnHud == true)
 	{
-		speed.y -= (speed.y)*deltaTime.asSeconds()*(getShipDeceleration() / 100);
+		speed.y -= (speed.y)*deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 
 		if (abs(speed.y) < SHIP_MIN_SPEED_Y)
 			speed.y = 0;
@@ -1585,8 +1459,8 @@ bool Ship::ResplenishHealth()
 
 void Ship::Respawn()
 {
-	armor = getShipArmor();
-	shield = getShipShield();
+	armor = getFighterIntStatValue(Fighter_ArmorMax);
+	shield = getFighterIntStatValue(Fighter_ShieldMax);
 	speed.x = 0;
 	speed.y = 0;
 	this->visible = true;
@@ -1878,31 +1752,31 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		{
 			switch (equipment->equipmentType)
 			{
-			case Engine:
-			{
-						   data << "Engine ";
-						   break;
-			}
-			case Armor:
-			{
-						  data << "Armor ";
-						  break;
-			}
-			case Shield:
-			{
-						   data << "Shield ";
-						   break;
-			}
-			case Module:
-			{
-						   data << "Module ";
-						   break;
-			}
-			default:
-			{
-					   data << "Unknown ";
-					   break;
-			}
+				case Engine:
+				{
+					data << "Engine ";
+					break;
+				}
+				case Armor:
+				{
+					data << "Armor ";
+					break;
+				}
+				case Shield:
+				{
+					data << "Shield ";
+					break;
+				}
+				case Module:
+				{
+					data << "Module ";
+					break;
+				}
+				default:
+				{
+					data << "Unknown ";
+					break;
+				}
 			}
 		}
 
@@ -1913,16 +1787,16 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data << equipment->size.x << " ";
 		data << equipment->size.y << " ";
 		data << equipment->frameNumber << " ";
-		data << equipment->getEquipmentMaxSpeed() << " ";
-		data << equipment->getEquipmentDeceleration() << " ";
-		data << equipment->getEquipmentAcceleration() << " ";
+		data << equipment->max_speed << " ";
+		data << equipment->deceleration << " ";
+		data << equipment->acceleration << " ";
 		data.precision(3);
-		data << equipment->getEquipmentHyperspeed() << " ";
+		data << equipment->hyperspeed << " ";
 		data.precision(0);
-		data << equipment->getEquipmentArmor() << " ";
-		data << equipment->getEquipmentShield() << " ";
-		data << equipment->getEquipmentShieldRegen() << " ";
-		data << equipment->getEquipmentDamage() << " ";
+		data << equipment->armor << " ";
+		data << equipment->shield << " ";
+		data << equipment->shield_regen << " ";
+		data << equipment->damage << " ";
 
 		if (equipment->hasBot)
 		{

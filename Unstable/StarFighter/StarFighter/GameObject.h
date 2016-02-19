@@ -18,7 +18,23 @@ class Equipment;
 class Weapon;
 class Loot;
 
-enum LayerType {
+enum FighterStats
+{
+	Fighter_ArmorMax,
+	Fighter_ShieldMax,
+	Fighter_ShieldRegen,
+	Fighter_ContactDamage,
+	Fighter_MaxSpeed,
+	Fighter_Acceleration,
+	Fighter_Deceleration,
+	Fighter_Hyperspeed,
+	Fighter_Credits,
+	Fighter_Level,
+	NBVAL_FighterStats,
+};
+
+enum LayerType 
+{
 	BackgroundLayer,
 	PortalLayer,
 	ExplosionLayer,
