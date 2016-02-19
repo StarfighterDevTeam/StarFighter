@@ -6,10 +6,10 @@ using namespace sf;
 
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
+ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed = m_max_speed;
-	this->decceleration = m_decceleration;
+	this->deceleration = m_deceleration;
 	this->acceleration = m_acceleration;
 	this->armor = m_armor;
 	this->shield = m_shield;
@@ -35,9 +35,9 @@ float ShipModel::getShipModelAcceleration()
 	return this->acceleration;
 }
 
-float ShipModel::getShipModelDecceleration()
+float ShipModel::getShipModelDeceleration()
 {
-	return this->decceleration;
+	return this->deceleration;
 }
 
 float ShipModel::getShipModelHyperspeed()
@@ -70,7 +70,7 @@ int ShipModel::getShipModelDamage()
 Equipment::Equipment()
 {
 	this->max_speed = 0.0f;
-	this->decceleration = 0.0f;
+	this->deceleration = 0.0f;
 	this->acceleration = 0.0f;
 	this->armor = 0;
 	this->shield = 0;
@@ -101,7 +101,7 @@ Equipment::~Equipment()
 Equipment* Equipment::Clone()
 {
 	Equipment* new_equipment = new Equipment();
-	new_equipment->Init(this->equipmentType, this->max_speed, this->acceleration, this->decceleration, this->hyperspeed, this->armor, this->shield, this->shield_regen, this->damage, this->textureName, this->size, this->frameNumber, this->display_name);
+	new_equipment->Init(this->equipmentType, this->max_speed, this->acceleration, this->deceleration, this->hyperspeed, this->armor, this->shield, this->shield_regen, this->damage, this->textureName, this->size, this->frameNumber, this->display_name);
 	new_equipment->display_name = this->display_name;
 	new_equipment->hasBot = this->hasBot;
 	if (this->hasBot)
@@ -114,10 +114,10 @@ Equipment* Equipment::Clone()
 	return new_equipment;
 }
 
-void Equipment::Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
+void Equipment::Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name)
 {
 	this->max_speed = m_max_speed;
-	this->decceleration = m_decceleration;
+	this->deceleration = m_deceleration;
 	this->acceleration = m_acceleration;
 	this->hyperspeed = m_hyperspeed;
 	this->armor = m_armor;
@@ -137,9 +137,9 @@ float Equipment::getEquipmentMaxSpeed()
 	return this->max_speed;
 }
 
-float Equipment::getEquipmentDecceleration()
+float Equipment::getEquipmentDeceleration()
 {
-	return this->decceleration;
+	return this->deceleration;
 }
 
 float Equipment::getEquipmentAcceleration()
@@ -345,53 +345,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 
 // ----------------SHIP CONFIG ---------------
 
-ShipConfig::ShipConfig()
-{
-	this->ship_model = new ShipModel(0, 0, 0.0f, 0.0f, 0, 0, 0, 0, EMPTYSLOT_FILENAME, sf::Vector2f(64, 64), 1, "default");
-	this->automatic_fire = false;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		this->equipment[i] = NULL;
-	}
-
-	this->weapon = NULL;
-}
-
-void ShipConfig::Init()
-{
-	this->max_speed = getShipConfigMaxSpeed();
-	this->decceleration = getShipConfigDecceleration();
-	this->acceleration = getShipConfigAcceleration();
-	this->hyperspeed = getShipConfigHyperspeed();
-	this->armor = getShipConfigArmor();
-	this->shield = getShipConfigShield();
-	this->shield_regen = getShipConfigShieldRegen();
-	this->damage = getShipConfigDamage();
-	this->size.x = ship_model->size.x;
-	this->size.y = ship_model->size.y;
-	this->textureName = ship_model->textureName;
-	this->frameNumber = ship_model->frameNumber;
-
-	//Loading bots
-	this->bot_list.clear();
-	if (this->ship_model->hasBot)
-	{
-		this->bot_list.push_back(this->ship_model->bot);
-	}
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (this->equipment[i] != NULL)
-		{
-			if (this->equipment[i]->hasBot)
-			{
-				this->bot_list.push_back(this->equipment[i]->bot);
-			}
-		}
-	}
-}
-
-int ShipConfig::getShipConfigArmor()
+int Ship::getShipArmor()
 {
 	int new_armor = 0;
 	int equipment_armor = 0;
@@ -417,7 +371,7 @@ int ShipConfig::getShipConfigArmor()
 	return new_armor;
 }
 
-int ShipConfig::getShipConfigShield()
+int Ship::getShipShield()
 {
 	int new_shield = 0;
 	int equipment_shield = 0;
@@ -443,7 +397,7 @@ int ShipConfig::getShipConfigShield()
 	return new_shield;
 }
 
-int ShipConfig::getShipConfigShieldRegen()
+int Ship::getShipShieldRegen()
 {
 	int new_shield_regen = 0;
 	int equipment_shield_regen = 0;
@@ -470,7 +424,7 @@ int ShipConfig::getShipConfigShieldRegen()
 	return new_shield_regen;
 }
 
-int ShipConfig::getShipConfigDamage()
+int Ship::getShipDamage()
 {
 	int new_damage = 0;
 	int equipment_damage = 0;
@@ -496,7 +450,7 @@ int ShipConfig::getShipConfigDamage()
 	return new_damage;
 }
 
-float ShipConfig::getShipConfigMaxSpeed()
+float Ship::getShipMaxSpeed()
 {
 	float new_max_speed = 0;
 	float equipment_max_speed = 0;
@@ -522,33 +476,33 @@ float ShipConfig::getShipConfigMaxSpeed()
 	return new_max_speed;
 }
 
-float ShipConfig::getShipConfigDecceleration()
+float Ship::getShipDeceleration()
 {
-	float new_decceleration = 0.0f;
-	float equipment_decceleration = 0.0f;
+	float new_deceleration = 0.0f;
+	float equipment_deceleration = 0.0f;
 
 	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
 		if (this->equipment[i] != NULL)
 		{
-			equipment_decceleration += equipment[i]->getEquipmentDecceleration();
+			equipment_deceleration += equipment[i]->getEquipmentDeceleration();
 		}
 		else
 		{
-			equipment_decceleration += 0;
+			equipment_deceleration += 0;
 		}
 	}
 
-	new_decceleration = ship_model->getShipModelDecceleration() + equipment_decceleration;
+	new_deceleration = ship_model->getShipModelDeceleration() + equipment_deceleration;
 
 	//cancelling negative equipment values
-	if (new_decceleration < ship_model->getShipModelDecceleration())
-		new_decceleration = ship_model->getShipModelDecceleration();
+	if (new_deceleration < ship_model->getShipModelDeceleration())
+		new_deceleration = ship_model->getShipModelDeceleration();
 
-	return new_decceleration;
+	return new_deceleration;
 }
 
-float ShipConfig::getShipConfigAcceleration()
+float Ship::getShipAcceleration()
 {
 	float new_acceleration = 0;
 	float equipment_acceleration = 0;
@@ -574,7 +528,7 @@ float ShipConfig::getShipConfigAcceleration()
 	return new_acceleration;
 }
 
-float ShipConfig::getShipConfigHyperspeed()
+float Ship::getShipHyperspeed()
 {
 	float new_hyperspeed = 0.0f;
 	float equipment_hyperspeed = 0.0f;
@@ -600,66 +554,11 @@ float ShipConfig::getShipConfigHyperspeed()
 	return new_hyperspeed;
 }
 
-bool ShipConfig::setEquipment(Equipment* m_equipment, bool recomputing_stats, bool overwrite)
-{
-	if (this->equipment[m_equipment->equipmentType] == NULL || overwrite)
-	{
-		if (overwrite)
-		{
-			delete this->equipment[m_equipment->equipmentType];
-		}
-		this->equipment[m_equipment->equipmentType] = m_equipment;
-		if (recomputing_stats)
-		{
-	 		this->Init();
-		}
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
-bool ShipConfig::setShipWeapon(Weapon* m_weapon, bool recomputing_stats, bool overwrite)
-{
-	if (this->weapon == NULL || overwrite)
-	{
-		if (overwrite)
-		{
-			delete this->weapon;
-		}
-		this->weapon = m_weapon;
-		if (recomputing_stats)
-		{
-			this->Init();
-		}
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
-bool ShipConfig::setShipModel(ShipModel* m_ship_model)
-{
-	assert(m_ship_model != NULL);
 
-	if (m_ship_model != NULL)
-	{
-		this->ship_model = m_ship_model;
 
-		this->Init();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-void ShipConfig::GenerateBots(GameObject* m_target)
+void Ship::GenerateBots(GameObject* m_target)
 {
 	for (std::vector<Bot*>::iterator it = (this->bot_list.begin()); it != (this->bot_list.end()); it++)
 	{
@@ -672,13 +571,13 @@ void ShipConfig::GenerateBots(GameObject* m_target)
 	}
 }
 
-void ShipConfig::DestroyBots()
+void Ship::DestroyBots()
 {
 	this->bot_list.clear();
 	(*CurrentGame).garbageLayer(LayerType::BotLayer);
 }
 
-void ShipConfig::GenerateFakeShip(GameObject* m_target)
+void Ship::GenerateFakeShip(GameObject* m_target)
 {
 	assert(this->ship_model != NULL);
 	if (this->ship_model->hasFake)
@@ -690,152 +589,192 @@ void ShipConfig::GenerateFakeShip(GameObject* m_target)
 
 // ----------------SHIP ---------------
 
-Ship::Ship(Vector2f position, ShipConfig m_ship_config) : GameObject(position, Vector2f(0, 0), m_ship_config.textureName, Vector2f(m_ship_config.size.x, m_ship_config.size.y), Vector2f((m_ship_config.size.x / 2), (m_ship_config.size.y / 2)), m_ship_config.frameNumber)
+Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), ship_model->textureName, ship_model->size, Vector2f((ship_model->size.x / 2), (ship_model->size.y / 2)), ship_model->frameNumber)
 {
-	this->collider_type = GameObjectType::PlayerShip;
-	this->ship_config = m_ship_config;
-	this->moving = false;
-	this->movingX = movingY = false;
-	this->visible = true;
-	this->damage = 0;
-	this->hyperspeed = 1.0f;
-	this->shield = m_ship_config.getShipConfigShield();;
-	this->disable_inputs = false;
-	this->disable_fire = false;
-	this->isBraking = false;
-	this->isHyperspeeding = false;
-	this->isSlowMotion = false;
-	this->disabledHyperspeed = false;
-	this->graze_count = 0;
-	this->graze_level = 0;
+	this->ship_model = ship_model;
 
-	this->level = 1;
-	this->level_max = FIRST_LEVEL_MAX;
-	this->xp = 0;
-	this->xp_max = XP_MAX_FIRST_LEVEL;
+	automatic_fire = false;
 
-	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
-	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
-	this->m_combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
-	this->trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
-	this->trail->visible = false;
-	if (this->ship_config.ship_model->hasFake)
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
 	{
-		this->trail->offset = sf::Vector2f(0, (this->ship_config.ship_model->fake_size.y / 2) + (this->trail->m_size. y / 2));
+		equipment[i] = NULL;
+	}
+	weapon = NULL;
+
+	collider_type = GameObjectType::PlayerShip;
+	moving = false;
+	movingX = movingY = false;
+	visible = true;
+	damage = 0;
+	hyperspeed = 1.0f;
+	armor = 1;
+	shield = 0;
+	shield_regen = 0;
+	disable_inputs = false;
+	disable_fire = false;
+	isBraking = false;
+	isHyperspeeding = false;
+	isSlowMotion = false;
+	disabledHyperspeed = false;
+	graze_count = 0;
+	graze_level = 0;
+
+	level = 1;
+	level_max = FIRST_LEVEL_MAX;
+	xp = 0;
+	xp_max = XP_MAX_FIRST_LEVEL;
+
+	m_combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
+	m_combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
+	m_combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
+	trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
+	trail->visible = false;
+	if (ship_model->hasFake)
+	{
+		trail->offset = sf::Vector2f(0, (ship_model->fake_size.y / 2) + (this->trail->m_size.y / 2));
 	}
 	else
 	{
-		this->trail->offset = sf::Vector2f(0, (this->ship_config.ship_model->size.y / 2 ) + (this->trail->m_size.y / 2));
+		trail->offset = sf::Vector2f(0, (ship_model->size.y / 2) + (this->trail->m_size.y / 2));
 	}
 	(*CurrentGame).addToScene(this->trail, LayerType::FakeShipLayer, GameObjectType::Neutral);
-	this->fire_key_repeat = false;
-	this->slowmo_key_repeat = false;
-	this->hud_key_repeat = false;
-	this->m_interactionType = No_Interaction;
-	this->isFiringButtonPressed = true;//will be updated to false in the update function if button released
-	this->wasBrakingButtonPressed = true;
-	this->isBrakingButtonHeldPressed = false;
-	this->wasHyperspeedingButtonPressed = true;
-	this->targetPortal = NULL;
-	this->targetShop = NULL;
-	this->equipment_loot = NULL;
-	this->weapon_loot = NULL;
-	this->isFocusedOnHud = false;
-	this->previously_focused_item = NULL;
+	fire_key_repeat = false;
+	slowmo_key_repeat = false;
+	hud_key_repeat = false;
+	m_interactionType = No_Interaction;
+	isFiringButtonPressed = true;//will be updated to false in the update function if button released
+	wasBrakingButtonPressed = true;
+	isBrakingButtonHeldPressed = false;
+	wasHyperspeedingButtonPressed = true;
+	targetPortal = NULL;
+	targetShop = NULL;
+	equipment_loot = NULL;
+	weapon_loot = NULL;
+	isFocusedOnHud = false;
+	previously_focused_item = NULL;
 
-	this->previouslyCollidingWithInteractiveObject = No_Interaction;
-	this->isCollidingWithInteractiveObject = No_Interaction;
+	previouslyCollidingWithInteractiveObject = No_Interaction;
+	isCollidingWithInteractiveObject = No_Interaction;
 
-	this->Init();
+	Init();
 }
 
 void Ship::Init()
 {
-	this->armor_max = this->ship_config.getShipConfigArmor();
-	if (this->armor > this->armor_max)
-	{
-		this->armor = this->armor_max;
-	}
-	this->shield_max = this->ship_config.getShipConfigShield();
-	if (this->shield > this->shield_max)
-	{
-		this->shield = this->shield_max;
-	}
-	this->shield_regen = this->ship_config.getShipConfigShieldRegen();
-	this->damage = this->ship_config.getShipConfigDamage();
-	this->hyperspeed = this->ship_config.getShipConfigHyperspeed();
-
-	this->m_size = this->ship_config.ship_model->size;
-	this->textureName = this->ship_config.ship_model->textureName;
-	this->transparent = this->ship_config.ship_model->hasFake;
-
 	UpdateShipLevel();
-}
 
-void Ship::setShipConfig(ShipConfig m_ship_config)
-{
-	this->ship_config = m_ship_config;
-	this->Init();
-}
-
-bool Ship::setEquipment(Equipment* m_equipment, bool overwrite_existing, bool no_save)
-{
-	if (m_equipment->hasBot && (overwrite_existing || ship_config.equipment[m_equipment->equipmentType] == NULL))
+	max_speed = getShipMaxSpeed();
+	deceleration = getShipDeceleration();
+	acceleration = getShipAcceleration();
+	hyperspeed = getShipHyperspeed();
+	armor_max = getShipArmor();
+	if (armor > armor_max)
 	{
-		this->ship_config.DestroyBots();
+		armor = armor_max;
 	}
-
-	bool result = this->ship_config.setEquipment(m_equipment, true, overwrite_existing);
-	
-	if (result)
+	shield_max = getShipShield();
+	if (shield > shield_max)
 	{
-		this->Init();
-		if (m_equipment->hasBot)
+		shield = shield_max;
+	}
+	shield_regen = getShipShieldRegen();
+	damage = getShipDamage();
+	m_size = ship_model->size;
+	textureName = ship_model->textureName;
+	frameNumber = ship_model->frameNumber;
+
+	//fake texture
+	transparent = ship_model->hasFake;
+	m_ship_size = ship_model->hasFake ? ship_model->fake_size : m_size;
+
+	//Loading bots
+	bot_list.clear();
+	if (ship_model->hasBot)
+	{
+		bot_list.push_back(ship_model->bot);
+	}
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (equipment[i] != NULL)
 		{
-			this->ship_config.GenerateBots(this);
+			if (equipment[i]->hasBot)
+			{
+				bot_list.push_back(equipment[i]->bot);
+			}
 		}
 	}
-	
-	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE);
-
-	return result;
 }
 
-bool Ship::setShipWeapon(Weapon* m_weapon, bool overwrite_existing, bool no_save)
+bool Ship::setEquipment(Equipment* equipment, bool overwrite_existing, bool no_save)
 {
-	//this->ship_config.DestroyBots();
-	bool result = this->ship_config.setShipWeapon(m_weapon, true, overwrite_existing);
-	if (result)
+	assert(equipment != NULL);
+
+	if (!overwrite_existing && this->equipment[equipment->equipmentType])
 	{
-		this->Init();
+		return false;
 	}
-	//this->ship_config.GenerateBots(this);
+
+	if (overwrite_existing && this->equipment[equipment->equipmentType] && this->equipment[equipment->equipmentType]->hasBot)
+	{
+		DestroyBots();
+	}
+
+	if (overwrite_existing && this->equipment[equipment->equipmentType])
+	{
+		delete this->equipment[equipment->equipmentType];
+	}
+
+	this->equipment[equipment->equipmentType] = equipment;
+	
+	Init();
+
+	GenerateBots(this);
+	
+	if (!no_save)
+		Ship::SaveItems(ITEMS_SAVE_FILE);
+
+	return true;
+}
+
+bool Ship::setShipWeapon(Weapon* weapon, bool overwrite_existing, bool no_save)
+{
+	assert(weapon != NULL);
+
+	if (!overwrite_existing && weapon)
+	{
+		return false;
+	}
+
+	if (overwrite_existing && weapon)
+	{
+		delete this->weapon;
+	}
+		
+	this->weapon = weapon;
+		
+	this->Init();
 
 	if (!no_save)
 		Ship::SaveItems(ITEMS_SAVE_FILE);
 	
-	return result;
+	return true;
 }
 
 void Ship::cleanEquipment(int equipment_type, bool no_save)
 {
-	if (this->ship_config.equipment[equipment_type] != NULL)
+	if (equipment[equipment_type])
 	{
-		bool delete_bots = this->ship_config.equipment[equipment_type]->hasBot;
-		if (delete_bots)
+		if (equipment[equipment_type]->hasBot)
 		{
-			this->ship_config.DestroyBots();
+			DestroyBots();
 		}
-		this->ship_config.equipment[equipment_type]->~Equipment();
-		delete this->ship_config.equipment[equipment_type];
-		this->ship_config.equipment[equipment_type] = NULL;
+		delete equipment[equipment_type];
+		equipment[equipment_type] = NULL;
 
-		this->ship_config.Init();
 		this->Init();
-		if (delete_bots)
+		if (equipment[equipment_type]->hasBot)
 		{
-			this->ship_config.GenerateBots(this);
+			GenerateBots(this);
 		}
 	}
 
@@ -845,33 +784,33 @@ void Ship::cleanEquipment(int equipment_type, bool no_save)
 
 void Ship::cleanWeapon(bool no_save)
 {
-	if (this->ship_config.weapon != NULL)
+	if (weapon != NULL)
 	{
-		this->ship_config.weapon->~Weapon();
-		delete this->ship_config.weapon;
-		this->ship_config.weapon = NULL;
+		delete weapon;
+		weapon = NULL;
 
-		this->ship_config.Init();
-		this->Init();
+		Init();
 	}
 
 	if (!no_save)
 		Ship::SaveItems(ITEMS_SAVE_FILE);
 }
 
-void Ship::setShipModel(ShipModel* m_ship_model, bool no_save)
+void Ship::setShipModel(ShipModel* ship_model, bool no_save)
 {
-	if (m_ship_model->hasBot)
+	assert(ship_model != NULL);
+
+	if (ship_model->hasBot)
 	{
-		this->ship_config.DestroyBots();
+		DestroyBots();
 	}
 
-	this->ship_config.setShipModel(m_ship_model);
+	this->ship_model = ship_model;
 	this->Init();
 
-	if (m_ship_model->hasBot)
+	if (ship_model->hasBot)
 	{
-		this->ship_config.GenerateBots(this);
+		GenerateBots(this);
 	}
 
 	if (!no_save)
@@ -953,9 +892,9 @@ bool Ship::ManageVisibility()
 	{
 		l_visible = true;
 	}
-	if (this->ship_config.m_fake_ship != NULL)
+	if (m_fake_ship)
 	{
-		if (this->ship_config.m_fake_ship->visible)
+		if (m_fake_ship->visible)
 		{
 			l_visible = true;
 		}
@@ -1001,8 +940,8 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (!this->fire_key_repeat)
 		{
-			this->ship_config.automatic_fire = !this->ship_config.automatic_fire;
-			this->fire_key_repeat = true;
+			automatic_fire = !automatic_fire;
+			fire_key_repeat = true;
 		}
 	}
 	else
@@ -1011,22 +950,22 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//Fire function
-	if (this->ship_config.weapon != NULL)
+	if (weapon)
 	{
-		if (ship_config.weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
+		if (weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
 			if (!disable_fire && (isCollidingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
 			{
-				if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
+				if ((InputGuy::isFiring() || automatic_fire))
 				{
 					//calculating the angle we want to face, if any
-					float target_angle = this->getRotation();
-					if (ship_config.weapon->target_seaking != NO_SEAKING || (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index == 0))
+					float target_angle = getRotation();
+					if (weapon->target_seaking != NO_SEAKING || (weapon->target_seaking == SEMI_SEAKING && weapon->rafale_index == 0))
 					{
-						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, this->getPosition()), 360);
+						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, getPosition()), 360);
 					}
 
-					float current_angle = this->getRotation();
+					float current_angle = getRotation();
 					float delta = current_angle - target_angle;
 					if (delta > 180)
 						delta -= 360;
@@ -1034,57 +973,43 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 						delta += 360;
 
 					//float theta = (this->getRotation() - delta) / 180 * M_PI;
-					float theta = this->getRotation() / 180 * M_PI;
-					if (ship_config.weapon->target_seaking != NO_SEAKING)
+					float theta = getRotation() / 180 * M_PI;
+					if (weapon->target_seaking != NO_SEAKING)
 					{
 						theta -= delta / 180 * M_PI;
 					}
 
-					float sizeX = this->m_size.x;
-					float sizeY = this->m_size.y;
-					if (this->ship_config.ship_model->hasFake)
-					{
-						if (this->ship_config.ship_model->fake_size.x > sizeX)
-						{
-							sizeX = this->ship_config.ship_model->fake_size.x;
-						}
-						if (this->ship_config.ship_model->fake_size.y > sizeY)
-						{
-							sizeY = this->ship_config.ship_model->fake_size.y;
-						}
-					}
-
-					if (ship_config.weapon->target_seaking == SEMI_SEAKING && ship_config.weapon->rafale_index > 0 && ship_config.weapon->rafale_index < ship_config.weapon->rafale)
+					if (weapon->target_seaking == SEMI_SEAKING && weapon->rafale_index > 0 && weapon->rafale_index < weapon->rafale)
 					{
 						//semi-seaking and rafale not ended = no update of target or weapon position
 					}
 					else
 					{
-						ship_config.weapon->weapon_current_offset.x = ship_config.weapon->weaponOffset.x + sizeX / 2 * sin(theta);
-						ship_config.weapon->weapon_current_offset.y = ship_config.weapon->weaponOffset.y - sizeY / 2 * cos(theta);
+						weapon->weapon_current_offset.x = weapon->weaponOffset.x + m_ship_size.x / 2 * sin(theta);
+						weapon->weapon_current_offset.y = weapon->weaponOffset.y - m_ship_size.y / 2 * cos(theta);
 
 						//transmitting the angle to the weapon, which will pass it to the bullets
-						ship_config.weapon->shot_angle = theta;
+						weapon->shot_angle = theta;
 					}
 
-					ship_config.weapon->setPosition(this->getPosition().x + ship_config.weapon->weapon_current_offset.x, this->getPosition().y + ship_config.weapon->weapon_current_offset.y);
-					ship_config.weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
+					weapon->setPosition(getPosition().x + weapon->weapon_current_offset.x, getPosition().y + weapon->weapon_current_offset.y);
+					weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
 
 					
 				}
 			}
 		}
 		//speed malus when shooting
-		if ((InputGuy::isFiring() || this->ship_config.automatic_fire))
+		if ((InputGuy::isFiring() || automatic_fire))
 		{
 			if (!disable_fire && (isCollidingWithInteractiveObject == No_Interaction) && !isHyperspeeding)
 			{
-				if (!this->isBraking)
+				if (!isBraking)
 				{
 					speed.x *= SHIP_BRAKING_MALUS_SPEED;
 					speed.y *= SHIP_BRAKING_MALUS_SPEED;
 				}
-				this->isBraking = true;
+				isBraking = true;
 			}
 		}
 	}
@@ -1180,22 +1105,22 @@ void Ship::ManageHyperspeed()
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	speed.x += inputs_direction.x*ship_config.getShipConfigAcceleration();
-	speed.y += inputs_direction.y*ship_config.getShipConfigAcceleration();
+	speed.x += inputs_direction.x*getShipAcceleration();
+	speed.y += inputs_direction.y*getShipAcceleration();
 
 	//max speed constraints
-	GameObject::NormalizeSpeed(&this->speed, this->ship_config.getShipConfigMaxSpeed());
+	GameObject::NormalizeSpeed(&speed, getShipMaxSpeed());
 }
 
 void Ship::ManageBraking()
 {
 	//Braking function
-	this->isBraking = false;
-	if (InputGuy::isBraking() && !this->isBraking && !this->isHyperspeeding && (isCollidingWithInteractiveObject == No_Interaction))
+	isBraking = false;
+	if (InputGuy::isBraking() && !isBraking && !isHyperspeeding && (isCollidingWithInteractiveObject == No_Interaction))
 	{
 		speed.x *= SHIP_BRAKING_MALUS_SPEED;
 		speed.y *= SHIP_BRAKING_MALUS_SPEED;
-		this->isBraking = true;
+		isBraking = true;
 	}
 }
 
@@ -1217,16 +1142,17 @@ void Ship::ManageImmunity()
 void Ship::ManageFeedbackExpiration(sf::Time deltaTime)
 {
 	//damage feedback expires?
-	if (ship_config.ship_model->hasFake)
+	if (ship_model->hasFake)
 	{
-		assert(ship_config.m_fake_ship != NULL);
-		if (ship_config.m_fake_ship->m_color_timer > sf::seconds(0))
+		assert(m_fake_ship != NULL);
+
+		if (m_fake_ship->m_color_timer > sf::seconds(0))
 		{
-			ship_config.m_fake_ship->m_color_timer -= deltaTime;
-			ship_config.m_fake_ship->setColor(ship_config.m_fake_ship->m_color);
-			if (ship_config.m_fake_ship->m_color_timer < sf::seconds(0))
+			m_fake_ship->m_color_timer -= deltaTime;
+			m_fake_ship->setColor(m_fake_ship->m_color);
+			if (m_fake_ship->m_color_timer < sf::seconds(0))
 			{
-				ship_config.m_fake_ship->setColor(Color(255, 255, 255, 255));
+				m_fake_ship->setColor(Color(255, 255, 255, 255));
 			}
 		}
 	}
@@ -1441,23 +1367,23 @@ void Ship::SettingTurnAnimations()
 {
 	//setting animation
 	const sf::Vector2f f = (sf::Vector2f)GameObject::getDirectionMultiplier((*CurrentGame).direction);
-	const float x = GameObject::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(this->speed.x * f.x, this->speed.y * f.y)).x;
+	const float x = GameObject::getSize_for_Direction((*CurrentGame).direction, sf::Vector2f(speed.x * f.x, speed.y * f.y)).x;
 
-	if (this->ship_config.ship_model->hasFake)
+	if (ship_model->hasFake)
 	{
-		if (x > 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningRight && !this->disable_inputs)
+		if (x > 0 && currentAnimationIndex != ShipAnimations::ShipTurningRight && !disable_inputs)
 		{
-			this->currentAnimationIndex = ShipAnimations::ShipTurningRight;
+			currentAnimationIndex = ShipAnimations::ShipTurningRight;
 		}
 
-		else if (x < 0 && this->currentAnimationIndex != ShipAnimations::ShipTurningLeft && !this->disable_inputs)
+		else if (x < 0 && currentAnimationIndex != ShipAnimations::ShipTurningLeft && !disable_inputs)
 		{
-			this->currentAnimationIndex = ShipAnimations::ShipTurningLeft;
+			currentAnimationIndex = ShipAnimations::ShipTurningLeft;
 		}
 
-		else if ((x == 0 && this->currentAnimationIndex != ShipAnimations::ShipIdle) || this->disable_inputs)
+		else if ((x == 0 && currentAnimationIndex != ShipAnimations::ShipIdle) || disable_inputs)
 		{
-			this->currentAnimationIndex = ShipAnimations::ShipIdle;
+			currentAnimationIndex = ShipAnimations::ShipIdle;
 		}
 	}
 }
@@ -1465,66 +1391,38 @@ void Ship::SettingTurnAnimations()
 void Ship::ScreenBorderContraints()
 {
 	//screen borders contraints	correction
-	if (this->ship_config.ship_model->hasFake)
+	if (this->getPosition().x < m_ship_size.x / 2)
 	{
-		if (this->getPosition().x < ship_config.ship_model->fake_size.x / 2)
-		{
-			this->setPosition(ship_config.ship_model->fake_size.x / 2, this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().x > SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2))
-		{
-			this->setPosition(SCENE_SIZE_X - (ship_config.ship_model->fake_size.x / 2), this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().y < ship_config.ship_model->fake_size.y / 2)
-		{
-			this->setPosition(this->getPosition().x, ship_config.ship_model->fake_size.y / 2);
-			speed.y = 0;
-		}
-
-		if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2))
-		{
-			this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.ship_model->fake_size.y / 2));
-			speed.y = 0;
-		}
+		this->setPosition(m_ship_size.x / 2, this->getPosition().y);
+		speed.x = 0;
 	}
-	else
+
+	if (this->getPosition().x > SCENE_SIZE_X - (m_ship_size.x / 2))
 	{
-		if (this->getPosition().x < ship_config.size.x / 2)
-		{
-			this->setPosition(ship_config.size.x / 2, this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().x > SCENE_SIZE_X - (ship_config.size.x / 2))
-		{
-			this->setPosition(SCENE_SIZE_X - (ship_config.size.x / 2), this->getPosition().y);
-			speed.x = 0;
-		}
-
-		if (this->getPosition().y < ship_config.size.y / 2)
-		{
-			this->setPosition(this->getPosition().x, ship_config.size.y / 2);
-			speed.y = 0;
-		}
-
-		if (this->getPosition().y > SCENE_SIZE_Y - (ship_config.size.y / 2))
-		{
-			this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (ship_config.size.y / 2));
-			speed.y = 0;
-		}
+		this->setPosition(SCENE_SIZE_X - (m_ship_size.x / 2), this->getPosition().y);
+		speed.x = 0;
 	}
+
+	if (this->getPosition().y < m_ship_size.y / 2)
+	{
+		this->setPosition(this->getPosition().x, m_ship_size.y / 2);
+		speed.y = 0;
+	}
+
+	if (this->getPosition().y > SCENE_SIZE_Y - (m_ship_size.y / 2))
+	{
+		this->setPosition(this->getPosition().x, SCENE_SIZE_Y - (m_ship_size.y / 2));
+		speed.y = 0;
+	}
+	
 }
 
 void Ship::IdleDecelleration(sf::Time deltaTime)
 {
-	//idle decceleration
+	//idle deceleration
 	if (!movingX || isFocusedOnHud == true)
 	{
-		speed.x -= (speed.x) * deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
+		speed.x -= (speed.x) * deltaTime.asSeconds()*(getShipDeceleration() / 100);
 
 		if (abs(speed.x) < SHIP_MIN_SPEED_X)
 			speed.x = 0;
@@ -1532,7 +1430,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 	if (!movingY || isFocusedOnHud == true)
 	{
-		speed.y -= (speed.y)*deltaTime.asSeconds()*(ship_config.getShipConfigDecceleration() / 100);
+		speed.y -= (speed.y)*deltaTime.asSeconds()*(getShipDeceleration() / 100);
 
 		if (abs(speed.y) < SHIP_MIN_SPEED_Y)
 			speed.y = 0;
@@ -1687,14 +1585,14 @@ bool Ship::ResplenishHealth()
 
 void Ship::Respawn()
 {
-	armor = ship_config.getShipConfigArmor();
-	shield = ship_config.getShipConfigShield();
+	armor = getShipArmor();
+	shield = getShipShield();
 	speed.x = 0;
 	speed.y = 0;
 	this->visible = true;
-	if (this->ship_config.ship_model->hasFake)
+	if (ship_model->hasFake)
 	{
-		this->ship_config.m_fake_ship->visible = true;
+		m_fake_ship->visible = true;
 	}
 	isOnScene = true;
 	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
@@ -1707,14 +1605,14 @@ void Ship::Respawn()
 
 void Ship::Death()
 {
-	FX* myFX = this->ship_config.FX_death->Clone();
+	FX* myFX = FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
 	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
 
 	this->visible = false;
-	if (this->ship_config.m_fake_ship != NULL)
+	if (m_fake_ship != NULL)
 	{
-		this->ship_config.m_fake_ship->visible = false;
+		m_fake_ship->visible = false;
 	}
 	(*CurrentGame).garbageLayer(AuraLayer);
 
@@ -1877,10 +1775,10 @@ void Ship::damage_from(GameObject& object)
 {
 	if (!immune)
 	{
-		if (ship_config.ship_model->hasFake)
+		if (ship_model->hasFake)
 		{
-			assert(ship_config.m_fake_ship != NULL);
-			ship_config.m_fake_ship->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+			assert(m_fake_ship != NULL);
+			m_fake_ship->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
 		}
 		this->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
 
@@ -1948,14 +1846,14 @@ int Ship::UpdateShipLevel()
 
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
-		if (ship_config.equipment[i])
+		if (equipment[i])
 		{
-			credits_ += ship_config.equipment[i]->credits;
+			credits_ += equipment[i]->credits;
 		}
 	}
-	if (ship_config.weapon)
+	if (weapon)
 	{
-		credits_ += ship_config.weapon->credits;
+		credits_ += weapon->credits;
 	}
 
 	while (credits_ >= ((*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_ + 1) - (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level_)) * (NBVAL_Equipment + 1))
@@ -2016,7 +1914,7 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data << equipment->size.y << " ";
 		data << equipment->frameNumber << " ";
 		data << equipment->getEquipmentMaxSpeed() << " ";
-		data << equipment->getEquipmentDecceleration() << " ";
+		data << equipment->getEquipmentDeceleration() << " ";
 		data << equipment->getEquipmentAcceleration() << " ";
 		data.precision(3);
 		data << equipment->getEquipmentHyperspeed() << " ";
@@ -2183,11 +2081,11 @@ int Ship::SaveItems(string file)
 				}
 			}
 
-			Ship::SaveEquipmentData(data, (*CurrentGame).playerShip->ship_config.equipment[i], true);
+			Ship::SaveEquipmentData(data, (*CurrentGame).playerShip->equipment[i], true);
 		}
 
 		data << "Weapon ";
-		Ship::SaveWeaponData(data, (*CurrentGame).playerShip->ship_config.weapon, true);
+		Ship::SaveWeaponData(data, (*CurrentGame).playerShip->weapon, true);
 
 		for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
 		{

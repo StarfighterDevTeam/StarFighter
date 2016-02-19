@@ -38,7 +38,8 @@ void InGameState::Initialize(Player player)
 	}
 	
 	//creating new ship
-	this->playerShip = new Ship(ship_pos, *FileLoader::LoadShipConfig("default"));
+	this->playerShip = FileLoader::LoadShipConfig("default");
+	this->playerShip->setPosition(ship_pos);
 	(*CurrentGame).SetPlayerShip(this->playerShip);
 	this->playerShip->respawnSceneName = this->currentScene->m_name;
 
@@ -56,9 +57,9 @@ void InGameState::Initialize(Player player)
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
-		if (this->playerShip->ship_config.equipment[i] != NULL)
+		if (this->playerShip->equipment[i] != NULL)
 		{
-			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(this->playerShip->ship_config.equipment[i]);
+			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(this->playerShip->equipment[i]);
 			if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, i))
 			{
 				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
@@ -66,9 +67,9 @@ void InGameState::Initialize(Player player)
 		}
 	}
 	
-	if (this->playerShip->ship_config.weapon != NULL)
+	if (this->playerShip->weapon != NULL)
 	{
-		GameObject* capsule = Ship::CloneWeaponIntoGameObject(this->playerShip->ship_config.weapon);
+		GameObject* capsule = Ship::CloneWeaponIntoGameObject(this->playerShip->weapon);
 		if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment))
 		{
 			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize a weapon item from the ship config to the HUD Ship grid\n");
@@ -79,7 +80,7 @@ void InGameState::Initialize(Player player)
 	//ship
 	if ((*CurrentGame).direction != Directions::NO_DIRECTION)
 	{
-		(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+		(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
 		(*CurrentGame).playerShip->disabledHyperspeed = false;
 	}
 	else
@@ -87,7 +88,7 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).playerShip->disable_fire = true;
 		(*CurrentGame).playerShip->disabledHyperspeed = true;
 	}
-	(*CurrentGame).playerShip->ship_config.GenerateFakeShip((*CurrentGame).playerShip);
+	(*CurrentGame).playerShip->GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
 	(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
@@ -286,13 +287,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 {
 	float w = this->currentScene->bg->m_size.x;
 	float h = this->currentScene->bg->m_size.y;
-	float w_ = (*CurrentGame).playerShip->m_size.x;
-	float h_ = (*CurrentGame).playerShip->m_size.y;
-	if ((*CurrentGame).playerShip->ship_config.ship_model->hasFake)
-	{
-		w_ = (*CurrentGame).playerShip->ship_config.ship_model->fake_size.x;
-		h_ = (*CurrentGame).playerShip->ship_config.ship_model->fake_size.y;
-	}
+	float w_ = (*CurrentGame).playerShip->m_ship_size.x;
+	float h_ = (*CurrentGame).playerShip->m_ship_size.y;
 
 	switch (this->IG_State)
 	{
@@ -494,7 +490,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).playerShip->disabledHyperspeed = false;
 					if (this->currentScene->direction == Directions::NO_DIRECTION)
 					{
-						(*CurrentGame).playerShip->ship_config.GenerateBots((*CurrentGame).playerShip);
+						(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
 					}
 					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));
 					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).direction));

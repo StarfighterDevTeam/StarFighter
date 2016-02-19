@@ -52,10 +52,10 @@ enum GrazeLevels
 class ShipModel
 {
 public:
-	ShipModel(float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
+	ShipModel(float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	float getShipModelMaxSpeed();
 	float getShipModelAcceleration();
-	float getShipModelDecceleration();
+	float getShipModelDeceleration();
 	float getShipModelHyperspeed();
 	int getShipModelArmor();
 	int getShipModelShield();
@@ -79,7 +79,7 @@ public:
 	int damage;
 
 private:
-	float decceleration;
+	float deceleration;
 	float acceleration;
 	float max_speed;
 	float hyperspeed;
@@ -89,7 +89,7 @@ private:
 class Equipment
 {
 public:
-	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_decceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
+	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
 	Equipment();
 	~Equipment();
 	Equipment* Clone();
@@ -100,7 +100,7 @@ public:
 	int equipmentType;
 	float getEquipmentMaxSpeed();
 	float getEquipmentAcceleration();
-	float getEquipmentDecceleration();
+	float getEquipmentDeceleration();
 	float getEquipmentHyperspeed();
 	int getEquipmentArmor();
 	int getEquipmentShield();
@@ -129,56 +129,56 @@ public:
 private:
 	float max_speed;
 	float acceleration;
-	float decceleration;
+	float deceleration;
 	float hyperspeed;
 };
 
-class ShipConfig
-{
-public:
-	void Init();
-	ShipConfig();
-	std::string textureName;
-	sf::Vector2f size;
-
-	int frameNumber;
-	float getShipConfigMaxSpeed();
-	float getShipConfigAcceleration();
-	float getShipConfigDecceleration();
-	float getShipConfigHyperspeed();
-	int getShipConfigArmor();
-	int getShipConfigShield();
-	int getShipConfigShieldRegen();
-	int getShipConfigDamage();
-	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true, bool overwrite = false);
-	bool setShipModel(ShipModel* m_ship_model);
-	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true, bool overwrite = false);
-	Equipment* equipment[NBVAL_Equipment];
-	ShipModel* ship_model;
-	Weapon* weapon;
-	vector<Bot*> bot_list;
-	FX* FX_death;
-	void GenerateBots(GameObject* m_target);
-	void DestroyBots();
-	void GenerateFakeShip(GameObject* m_target);
-	FakeShip* m_fake_ship;
-	bool automatic_fire;
-
-private:
-	float max_speed;
-	float acceleration;
-	float decceleration;
-	float hyperspeed;
-	int armor;
-	int shield;
-	int shield_regen;
-	int damage;
-};
+//class ShipConfig
+//{
+//public:
+//	void Init();
+//	ShipConfig();
+//	std::string textureName;
+//	sf::Vector2f size;
+//
+//	int frameNumber;
+//	float getShipConfigMaxSpeed();
+//	float getShipConfigAcceleration();
+//	float getShipConfigDeceleration();
+//	float getShipConfigHyperspeed();
+//	int getShipConfigArmor();
+//	int getShipConfigShield();
+//	int getShipConfigShieldRegen();
+//	int getShipConfigDamage();
+//	bool setEquipment(Equipment* m_equipment, bool recomputing_stats = true, bool overwrite = false);
+//	bool setShipModel(ShipModel* m_ship_model);
+//	bool setShipWeapon(Weapon* m_weapon, bool recomputing_stats = true, bool overwrite = false);
+//	Equipment* equipment[NBVAL_Equipment];
+//	ShipModel* ship_model;
+//	Weapon* weapon;
+//	vector<Bot*> bot_list;
+//	FX* FX_death;
+//	void GenerateBots(GameObject* m_target);
+//	void DestroyBots();
+//	void GenerateFakeShip(GameObject* m_target);
+//	FakeShip* m_fake_ship;
+//	bool automatic_fire;
+//
+//private:
+//	float max_speed;
+//	float acceleration;
+//	float deceleration;
+//	float hyperspeed;
+//	int armor;
+//	int shield;
+//	int shield_regen;
+//	int damage;
+//};
 
 class Ship : public GameObject
 {
 public :
-	Ship(Vector2f position, ShipConfig m_ship_config);
+	Ship(ShipModel* ship_model);
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void updatePostCollision() override;
@@ -201,14 +201,12 @@ public :
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
 	void SettingTurnAnimations();
-	void setShipConfig(ShipConfig m_ship_config);
-	ShipConfig ship_config;
 	PlayerHud ship_hud;
 
 	void Respawn() override;
-	bool setEquipment(Equipment* m_equipment, bool overwrite = false, bool no_save = false);
-	bool setShipWeapon(Weapon* m_weapon, bool overwrite = false, bool no_save = false);
-	void setShipModel(ShipModel* m_ship_model, bool no_save = false);
+	bool setEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
+	bool setShipWeapon(Weapon* weapon, bool overwrite = false, bool no_save = false);
+	void setShipModel(ShipModel* ship_model, bool no_save = false);
 	void cleanEquipment(int equipment_type, bool no_save = false);
 	void cleanWeapon(bool no_save = false);
 	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
@@ -233,6 +231,17 @@ public :
 	float getShipBeastScore();
 	void damage_from (GameObject& object) override;
 
+	Equipment* equipment[NBVAL_Equipment];
+	ShipModel* ship_model;
+	Weapon* weapon;
+	vector<Bot*> bot_list;
+	FX* FX_death;
+	void GenerateBots(GameObject* m_target);
+	void DestroyBots();
+	void GenerateFakeShip(GameObject* m_target);
+	FakeShip* m_fake_ship;
+	bool automatic_fire;
+
 	bool disable_inputs;
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	Aura* trail;
@@ -245,12 +254,22 @@ public :
 	bool disabledHyperspeed;
 	InteractionType m_interactionType;
 
+	float getShipMaxSpeed();
+	float getShipAcceleration();
+	float getShipDeceleration();
+	float getShipHyperspeed();
+	int getShipArmor();
+	int getShipShield();
+	int getShipShieldRegen();
+	int getShipDamage();
+
 	bool isFocusedOnHud;
 
 	string respawnSceneName;
 
 	int graze_count;
 	int graze_level;
+	sf::Vector2f m_ship_size;
 
 	int GetFocusedPortalMaxUnlockedHazardLevel();
 
@@ -275,6 +294,10 @@ private:
 	bool moving;
 	bool movingX;
 	bool movingY;
+	float max_speed;
+	float acceleration;
+	float deceleration;
+
 };
 
 #endif // SHIP_H_INCLUDED

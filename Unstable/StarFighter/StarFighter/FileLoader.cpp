@@ -1,6 +1,6 @@
 #include "FileLoader.h"
 
-ShipConfig* FileLoader::LoadShipConfig(string name)
+Ship* FileLoader::LoadShipConfig(string name)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship config file");
 	try
@@ -11,11 +11,11 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 		{
 			if((*it)[ShipConfigData::SHIPCONFIG_NAME].compare(name) == 0)
 			{
-				ShipConfig* shipC = new ShipConfig();
-
 				//Loading Ship Model
 				LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship model\n");
-				shipC->setShipModel(FileLoader::LoadShipModel((*it)[ShipConfigData::SHIPCONFIG_SHIPMODEL]));
+				ShipModel* ship_model = FileLoader::LoadShipModel((*it)[ShipConfigData::SHIPCONFIG_SHIPMODEL]);
+
+				Ship* ship = new Ship(ship_model);
 
 				//Loading equipment
 				LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship equipment\n");
@@ -26,19 +26,19 @@ ShipConfig* FileLoader::LoadShipConfig(string name)
 				//shipC->setEquipment(FileLoader::LoadEquipment((*it)[ShipConfigData::SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
 
 				//Loading FX
-				shipC->FX_death = FileLoader::LoadFX((*it)[ShipConfigData::SHIPCONFIG_DEATH_FX]);
+				ship->FX_death = FileLoader::LoadFX((*it)[ShipConfigData::SHIPCONFIG_DEATH_FX]);
 
 				//Loading weapon
 				if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
 				{
 					LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship weapon\n");
-					shipC->setShipWeapon(FileLoader::LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
+					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
 				}
 
 				//Computing the ship config
-				shipC->Init();
+				ship->Init();
 
-				return shipC;
+				return ship;
 			}
 		}
 	}
