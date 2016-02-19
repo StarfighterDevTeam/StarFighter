@@ -14,7 +14,7 @@ Weapon Laser 4 53 Assets/2D/Equipment/laser_blue1.png 48 48 1 0.089 0 0.8 2 36 0
 Engine Engine 4 56 Assets/2D/Equipment/Thruster.png 48 48 1 0 0 0 1.56 0 0 0 0 0
 Shield Shield 4 55 Assets/2D/Equipment/Shield.png 48 48 1 0 0 0 0 0 150 14 0 0
 Shield Shield 4 55 Assets/2D/Equipment/Shield.png 48 48 1 0 0 0 0 0 150 14 0 0
-0
+Armor Armor 2 15 Assets/2D/Equipment/Armor.png 48 48 1 0 0 0 0 113 0 0 0 0
 0
 0
 0

@@ -182,7 +182,6 @@ Equipment* FileLoader::LoadEquipment(string name)
 			if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
 			{
 				i->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
-				i->hasBot = true;
 			}
 
 			if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0
@@ -234,7 +233,6 @@ ShipModel* FileLoader::LoadShipModel(string name)
 				if ((*it)[EquipmentData::EQUIPMENT_BOT].compare("0") != 0)
 				{
 					s->bot = LoadBot((*it)[EquipmentData::EQUIPMENT_BOT]);
-					s->hasBot = true;
 				}
 
 				if(!(*it)[EquipmentData::EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EquipmentData::EQUIPMENT_FAKE_WIDTH].compare("0") == 0

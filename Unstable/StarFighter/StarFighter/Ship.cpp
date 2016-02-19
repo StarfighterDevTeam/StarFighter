@@ -19,7 +19,7 @@ ShipModel::ShipModel(float m_max_speed, float m_acceleration, float m_decelerati
 	size = m_size;
 	frameNumber = m_frameNumber;
 	display_name = m_display_name;
-	hasBot = false;
+	bot = NULL;
 	hasFake = false;
 	hyperspeed = m_hyperspeed;
 }
@@ -41,16 +41,16 @@ Equipment::Equipment()
 	textureName = EMPTYSLOT_FILENAME;
 	frameNumber = 0;
 	equipmentType = EquipmentType::Armor;
-	hasBot = false;
+	bot = NULL;
 	hasFake = false;
 }
 
 Equipment::~Equipment()
 {
-	if (this->hasBot)
+	if (bot)
 	{
-		this->bot->~Bot();
-		this->hasBot = false;
+		delete bot;
+		bot = NULL;
 	}
 
 	level = 1;
@@ -62,8 +62,7 @@ Equipment* Equipment::Clone()
 	Equipment* new_equipment = new Equipment();
 	new_equipment->Init(this->equipmentType, this->max_speed, this->acceleration, this->deceleration, this->hyperspeed, this->armor, this->shield, this->shield_regen, this->damage, this->textureName, this->size, this->frameNumber, this->display_name);
 	new_equipment->display_name = this->display_name;
-	new_equipment->hasBot = this->hasBot;
-	if (this->hasBot)
+	if (this->bot)
 	{
 		new_equipment->bot = this->bot->Clone();
 	}
@@ -245,7 +244,6 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 
 	bot->weapon = weapon;
 	equipment->bot = bot;
-	equipment->hasBot = true;
 
 	//saving level and credits used
 	equipment->level = level;
@@ -563,7 +561,7 @@ void Ship::Init()
 
 	//Loading bots
 	bot_list.clear();
-	if (ship_model->hasBot)
+	if (ship_model->bot)
 	{
 		bot_list.push_back(ship_model->bot);
 	}
@@ -571,7 +569,7 @@ void Ship::Init()
 	{
 		if (equipment[i] != NULL)
 		{
-			if (equipment[i]->hasBot)
+			if (equipment[i]->bot)
 			{
 				bot_list.push_back(equipment[i]->bot);
 			}
@@ -588,7 +586,7 @@ bool Ship::setEquipment(Equipment* equipment, bool overwrite_existing, bool no_s
 		return false;
 	}
 
-	if (overwrite_existing && this->equipment[equipment->equipmentType] && this->equipment[equipment->equipmentType]->hasBot)
+	if (overwrite_existing && this->equipment[equipment->equipmentType] && this->equipment[equipment->equipmentType]->bot)
 	{
 		DestroyBots();
 	}
@@ -638,7 +636,7 @@ void Ship::cleanEquipment(int equipment_type, bool no_save)
 {
 	if (equipment[equipment_type])
 	{
-		if (equipment[equipment_type]->hasBot)
+		if (equipment[equipment_type]->bot)
 		{
 			DestroyBots();
 		}
@@ -646,10 +644,6 @@ void Ship::cleanEquipment(int equipment_type, bool no_save)
 		equipment[equipment_type] = NULL;
 
 		this->Init();
-		if (equipment[equipment_type]->hasBot)
-		{
-			GenerateBots(this);
-		}
 	}
 
 	if (!no_save)
@@ -674,7 +668,7 @@ void Ship::setShipModel(ShipModel* ship_model, bool no_save)
 {
 	assert(ship_model != NULL);
 
-	if (ship_model->hasBot)
+	if (ship_model->bot)
 	{
 		DestroyBots();
 	}
@@ -682,7 +676,7 @@ void Ship::setShipModel(ShipModel* ship_model, bool no_save)
 	this->ship_model = ship_model;
 	this->Init();
 
-	if (ship_model->hasBot)
+	if (ship_model->bot)
 	{
 		GenerateBots(this);
 	}
@@ -1798,7 +1792,7 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data << equipment->shield_regen << " ";
 		data << equipment->damage << " ";
 
-		if (equipment->hasBot)
+		if (equipment->bot)
 		{
 			data << equipment->bot->display_name << " ";
 			data << equipment->bot->textureName << " ";
@@ -2137,15 +2131,9 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, armor, shield, shield_regen, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
 	equipment->level = level;
 	equipment->credits = credits;
-	if (bot_name.compare("0") == 0)
+	if (bot_name.compare("0") != 0)
 	{
-		equipment->hasBot = false;
-	}
-	else
-	{
-		equipment->hasBot = true;
 		Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), bot_texture_name, sf::Vector2f(bot_width, bot_height));
-
 		bot->display_name = bot_name;
 		bot->spread = sf::Vector2f(bot_spread_x, bot_spread_y);
 		bot->rotation_speed = bot_rotation_speed;

@@ -58,7 +58,6 @@ public:
 	int frameNumber;
 	std::string display_name;
 	Bot* bot;
-	bool hasBot;
 	
 	bool hasFake;
 	std::string fake_textureName;
@@ -89,7 +88,6 @@ public:
 	std::string display_name;
 	int equipmentType;
 	Bot* bot;
-	bool hasBot;
 
 	bool hasFake;
 	std::string fake_textureName;
