@@ -197,6 +197,7 @@ public :
 	bool m_isFocusedOnHud;
 
 	string m_respawnSceneName;
+	int m_last_hazard_level_played;
 
 	int m_graze_count;
 	int m_graze_level;

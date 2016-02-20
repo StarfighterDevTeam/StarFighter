@@ -289,6 +289,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_disabledHyperspeed = false;
 	m_graze_count = 0;
 	m_graze_level = 0;
+	m_last_hazard_level_played = 0;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -1118,7 +1119,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 				//default value = max
 				if (m_previouslyCollidingWithInteractiveObject != PortalInteraction)
 				{
-					(*CurrentGame).SetSelectedIndex(m_targetPortal->m_max_unlocked_hazard_level);
+					(*CurrentGame).SetSelectedIndex(m_last_hazard_level_played <= m_targetPortal->m_max_unlocked_hazard_level ? m_last_hazard_level_played : m_targetPortal->m_max_unlocked_hazard_level);
 				}
 
 				//interaction: select

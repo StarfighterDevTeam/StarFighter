@@ -145,7 +145,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//shield regen if not maximum
 	static double shield_regen_buffer = 0;
-	if (m_shield < m_shield_max && m_shield > 0)
+	if (m_shield < m_shield_max && m_shield_max > 0)
 	{
 		if (hyperspeedMultiplier < 1.0f)
 		{

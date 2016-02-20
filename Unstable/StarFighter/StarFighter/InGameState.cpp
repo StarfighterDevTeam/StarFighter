@@ -394,7 +394,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					{
 						m_nextScene->m_scenesLinkedToUpdate.push_back(m_currentScene->m_name);
 					}
-
 					UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
 
 					m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
@@ -506,7 +505,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 						SaveSceneHazardLevelUnlocked((*it), m_currentScene->getSceneHazardLevelUnlockedValue());
 					}
 					m_currentScene->m_scenesLinkedToUpdate.clear();
-					//transmitting the info to the next scene so it can update her portals
+					//transmitting the info to the next scene so it can update its portals
 					UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
 				}
 				else
@@ -556,6 +555,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
 				(*CurrentGame).m_direction = (*CurrentGame).playerShip->m_targetPortal->m_direction;
 				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).m_interactionPanel->m_selected_index, reverse, false);
+				(*CurrentGame).playerShip->m_last_hazard_level_played = (*CurrentGame).m_interactionPanel->m_selected_index;
 				UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
 				m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
 
