@@ -23,33 +23,29 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_shieldBar_offsetY = - (m_size.y / 2) - (1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y) - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y;
 	//m_offsetBetweenHealthBars = armorBar_offsetY - shieldBar_offsetY;
 
-	m_armorBar = new RectangleShape();
-	m_armorBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	m_armorBar->setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
-	m_armorBar->setOutlineThickness(0);
-	m_armorBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_armorBar.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_armorBar.setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
+	m_armorBar.setOutlineThickness(0);
+	m_armorBar.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 
-	m_armorBarContainer = new RectangleShape();
-	m_armorBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	m_armorBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
-	m_armorBarContainer->setOutlineThickness(0);
+	m_armorBarContainer.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_armorBarContainer.setFillColor(sf::Color(0, 0, 0, 128));
+	m_armorBarContainer.setOutlineThickness(0);
 	//m_armorBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
-	m_armorBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_armorBarContainer.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 
-	m_shieldBar = new RectangleShape();
-	m_shieldBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	m_shieldBar->setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
-	m_shieldBar->setOutlineThickness(0);
-	m_shieldBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-	m_shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+	m_shieldBar.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_shieldBar.setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
+	m_shieldBar.setOutlineThickness(0);
+	m_shieldBar.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_shieldBar.setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
 
-	m_shieldBarContainer = new RectangleShape();
-	m_shieldBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	m_shieldBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
-	m_shieldBarContainer->setOutlineThickness(0);
+	m_shieldBarContainer.setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_shieldBarContainer.setFillColor(sf::Color(0, 0, 0, 128));
+	m_shieldBarContainer.setOutlineThickness(0);
 	//m_shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
-	m_shieldBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-	m_shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+	m_shieldBarContainer.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_shieldBarContainer.setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
 
 	try
 	{
@@ -62,7 +58,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 		m_enemyLevel.setFont(*m_font);
 		m_enemyLevel.setCharacterSize(12);
 		m_enemyLevel.setColor(sf::Color::White);
-		m_enemyLevel.setPosition(getPosition().x, getPosition().y);
+		m_enemyLevel.setPosition(getPosition());
 	}
 
 	catch (const std::exception & ex)
@@ -80,46 +76,46 @@ void Enemy::UpdateHealthBars(sf::Time deltaTime)
 		m_feedbackTimer -= deltaTime;
 
 		float angle_rad = GameObject::getRotation_for_Direction((*CurrentGame).m_direction) / 180 * M_PI;
-		if (m_armorBar)
+		
+		m_armorBar.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
+		m_armorBarContainer.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
+
+		//TODO: screen borders constraints
+		//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), armorBar->getSize()));
+		//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
+
+		//update size (damage)
+		m_armorBar.setSize(sf::Vector2f(1.0f * m_armor / m_armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+		if (m_feedbackTimer <= sf::seconds(0))
 		{
-			m_armorBar->setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
-			m_armorBarContainer->setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
-
-			//TODO: screen borders constraints
-			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), armorBar->getSize()));
-			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
-
-			//update size (damage)
-			m_armorBar->setSize(sf::Vector2f(1.0f * m_armor / m_armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-			if (m_feedbackTimer <= sf::seconds(0))
-			{
-				(*CurrentGame).removeFromFeedbacks(m_armorBar);
-				(*CurrentGame).removeFromFeedbacks(m_armorBarContainer);
-			}
+			(*CurrentGame).removeFromFeedbacks(&m_armorBar);
+			(*CurrentGame).removeFromFeedbacks(&m_armorBarContainer);
 		}
-		if (m_shieldBar)
+		
+		m_shieldBar.setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
+		m_shieldBarContainer.setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
+
+		//TODO: screen borders constraints
+		//shieldBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBar->getPosition(), shieldBar->getSize()));
+		//shieldBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
+		//if shield bar touches screen, we need to move both bars
+		//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+		//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+
+		m_shieldBar.setSize(sf::Vector2f(1.0f * m_shield / m_shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+
+		if (m_feedbackTimer <= sf::seconds(0))
 		{
-			m_shieldBar->setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
-			m_shieldBarContainer->setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
-
-			//TODO: screen borders constraints
-			//shieldBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBar->getPosition(), shieldBar->getSize()));
-			//shieldBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
-			//if shield bar touches screen, we need to move both bars
-			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
-			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
-
-			m_shieldBar->setSize(sf::Vector2f(1.0f * m_shield / m_shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-
-			if (m_feedbackTimer <= sf::seconds(0))
-			{
-				(*CurrentGame).removeFromFeedbacks(m_shieldBar);
-				(*CurrentGame).removeFromFeedbacks(m_shieldBarContainer);
-			}
+			(*CurrentGame).removeFromFeedbacks(&m_shieldBar);
+			(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
 		}
 
 		//update enemy level display
-		m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer->getPosition().x - m_armorBarContainer->getGlobalBounds().width / 2 - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, m_armorBarContainer->getPosition().y - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
+		if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
+			m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_armorBarContainer.getGlobalBounds().width / 2 - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, m_armorBarContainer.getPosition().y - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
+		else if ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)
+			m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y, m_armorBarContainer.getPosition().y - m_armorBarContainer.getGlobalBounds().height / 2 - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X));
+
 		if (m_feedbackTimer <= sf::seconds(0))
 		{
 			(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
@@ -447,10 +443,10 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 void Enemy::RotateFeedbacks(float angle)
 {
-	m_armorBar->setRotation(angle);
-	m_armorBarContainer->setRotation(angle);
-	m_shieldBar->setRotation(angle);
-	m_shieldBarContainer->setRotation(angle);
+	m_armorBar.setRotation(angle);
+	m_armorBarContainer.setRotation(angle);
+	m_shieldBar.setRotation(angle);
+	m_shieldBarContainer.setRotation(angle);
 }
 
 void Enemy::damage_from(GameObject& object)
@@ -459,12 +455,12 @@ void Enemy::damage_from(GameObject& object)
 	{
 		if (m_feedbackTimer <= sf::seconds(0))
 		{
-			(*CurrentGame).addToFeedbacks(m_armorBarContainer);
-			(*CurrentGame).addToFeedbacks(m_armorBar);
+			(*CurrentGame).addToFeedbacks(&m_armorBarContainer);
+			(*CurrentGame).addToFeedbacks(&m_armorBar);
 			if (m_shield_max > 0)
 			{
-				(*CurrentGame).addToFeedbacks(m_shieldBarContainer);
-				(*CurrentGame).addToFeedbacks(m_shieldBar);
+				(*CurrentGame).addToFeedbacks(&m_shieldBarContainer);
+				(*CurrentGame).addToFeedbacks(&m_shieldBar);
 			}
 			(*CurrentGame).addToFeedbacks(&m_enemyLevel);
 		}
@@ -988,16 +984,12 @@ void Enemy::Death()
 
 void Enemy::Destroy()
 {
-	if (m_armorBar)
-	{
-		(*CurrentGame).removeFromFeedbacks(m_armorBar);
-		(*CurrentGame).removeFromFeedbacks(m_armorBarContainer);
-	}
-	if (m_shieldBar)
-	{
-		(*CurrentGame).removeFromFeedbacks(m_shieldBar);
-		(*CurrentGame).removeFromFeedbacks(m_shieldBarContainer);
-	}
+	(*CurrentGame).removeFromFeedbacks(&m_armorBar);
+	(*CurrentGame).removeFromFeedbacks(&m_armorBarContainer);
+	
+	(*CurrentGame).removeFromFeedbacks(&m_shieldBar);
+	(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
+	
 	(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
 }
 

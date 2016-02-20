@@ -65,15 +65,15 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 	
 	//call bobbyPattern
-	
 	offset = m_Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
-	
 	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 	newposition.x += offset.x;
 	newposition.y += offset.y;
+
 	//bot spread value
-	newposition.x += m_spread.x;
-	newposition.y += m_spread.y;
+	sf::Vector2f spread = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, m_spread);
+	newposition.x += spread.x;
+	newposition.y += spread.y;
 
 	this->setPosition(newposition.x,newposition.y);
 

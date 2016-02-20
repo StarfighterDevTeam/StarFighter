@@ -75,10 +75,10 @@ public:
 	BouncingType m_bouncing;
 	int m_shots_fired;
 
-	sf::RectangleShape* m_armorBar;
-	sf::RectangleShape* m_armorBarContainer;
-	sf::RectangleShape* m_shieldBar;
-	sf::RectangleShape* m_shieldBarContainer;
+	sf::RectangleShape m_armorBar;
+	sf::RectangleShape m_armorBarContainer;
+	sf::RectangleShape m_shieldBar;
+	sf::RectangleShape m_shieldBarContainer;
 	sf::Text m_enemyLevel;
 	sf::Font* m_font;
 	float m_armorBar_offsetY;

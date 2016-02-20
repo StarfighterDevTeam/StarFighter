@@ -1264,6 +1264,8 @@ void Ship::Respawn()
 
 	m_immune = true;
 	m_immunityTimer.restart();
+
+	GenerateBots(this);
 }
 
 void Ship::Death()
