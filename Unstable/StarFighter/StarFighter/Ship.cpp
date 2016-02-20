@@ -1772,7 +1772,6 @@ int Ship::SaveItems(string file, Ship* ship)
 	ofstream data(file.c_str(), ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
-		data << "Money " << ship->m_money << endl;
 		// instructions
 		for (int i = 0; i < NBVAL_Equipment; i++)
 		{
@@ -2158,23 +2157,14 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 	if (data) // si ouverture du fichier réussie
 	{
 		std::string line;
-		int i = -1;
+		int i = 0;
 		while (std::getline(data, line))
 		{
 			string equipment_type;
 			string display_name;
 
-			//Loading money
-			if (i == -1)
-			{
-				int money;
-				std::istringstream(line) >> equipment_type >> money;
-				ship->m_money = money;
-				continue;
-			}
-
 			//Loading equipment
-			else if (i < NBVAL_Equipment)
+			if (i < NBVAL_Equipment)
 			{
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)

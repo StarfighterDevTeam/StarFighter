@@ -32,7 +32,7 @@ Ship* FileLoader::LoadShipConfig(string name)
 				if ((*it)[ShipConfigData::SHIPCONFIG_WEAPON].compare("0") != 0)
 				{
 					LOGGER_WRITE(Logger::Priority::DEBUG, "Loading ship weapon\n");
-					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO])), false);//false because of shipC->Init() below that will recompute the ship config stats
+					ship->m_weapon = FileLoader::LoadWeapon((*it)[ShipConfigData::SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[ShipConfigData::SHIPCONFIG_AMMO]));//false because of shipC->Init() below that will recompute the ship config stats
 				}
 
 				//Computing the ship config
