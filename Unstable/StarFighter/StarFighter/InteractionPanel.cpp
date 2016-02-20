@@ -6,13 +6,13 @@ InteractionPanel::InteractionPanel()
 	m_currentInteractionType = No_Interaction;
 	m_currentShopMenu = ShopMainMenu;
 
-	m_cursor = new Independant(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
+	m_cursor = new GameObject(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
 
 	m_fakeShopGrid = ObjectGrid(sf::Vector2f(SHOP_GRID_OFFSET_POS_X, SHOP_GRID_OFFSET_POS_Y), sf::Vector2i(SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS), true);
 	m_shopGrid = ObjectGrid(sf::Vector2f(SHOP_GRID_OFFSET_POS_X, SHOP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, SHOP_GRID_NB_ROWS), false);
 
-	m_arrow = new Independant(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
+	m_arrow = new GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
 		sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
 
 	sf::Color _darkblue = sf::Color::Color(6, 87, 94, 255);//dark blue-green
@@ -196,8 +196,8 @@ void InteractionPanel::UpdatePortalInteraction(int max_unlocked_hazard_level)
 	sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
 	if (m_direction != NO_DIRECTION)
 	{
-		sf::Vector2f l_sizeNormalized = Independant::getSize_for_Direction(m_direction, l_size);
-		position = Independant::getPosition_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y + INTERACTION_PANEL_OFFSET_Y));
+		sf::Vector2f l_sizeNormalized = GameObject::getSize_for_Direction(m_direction, l_size);
+		position = GameObject::getPosition_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y + INTERACTION_PANEL_OFFSET_Y));
 	}
 
 	m_panel.setPosition(position.x, position.y);

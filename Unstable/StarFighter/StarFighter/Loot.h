@@ -3,10 +3,10 @@
 
 #include <SFML/Graphics.hpp>
 #include "TextureLoader.h"
-#include "Independant.h"
+#include "GameObject.h"
 #include "Ship.h"
 
-class Loot : public Independant
+class Loot : public GameObject
 {
 public:
 	Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name);

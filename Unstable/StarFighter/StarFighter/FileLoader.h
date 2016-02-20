@@ -174,7 +174,7 @@ enum BotData
 class FileLoader
 {
 public:
-	static ShipConfig* LoadShipConfig(string name);
+	static Ship* LoadShipConfig(string name);
 	static ShipModel* LoadShipModel(string name);
 	static EnemyBase*  LoadEnemyBase(string m_name, int m_probability, int m_enemyClass);
 	static EnemyPool*  LoadEnemyPool(string name);

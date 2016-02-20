@@ -1,126 +1,126 @@
-#include "Independant.h"
+#include "GameObject.h"
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
-	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
+	Init(position, speed, textureName, size, frameNumber, animationNumber);
 	this->setOrigin(origin.x, origin.y);
 }
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size);
 }
 
-Independant::Independant(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture) : AnimatedSprite()
 {
 	Init(position, speed, texture, 1);
 }
 
-string Independant::getName()
+string GameObject::getName()
 {
-	vector<string> s1 = TextUtils::split(this->textureName, '/');
+	vector<string> s1 = TextUtils::split(m_textureName, '/');
 	return *(s1.end() - 1);
 }
 
-Independant::Independant()
+GameObject::GameObject()
 {
 
 }
 
-void Independant::setAnimationLine(int m_animation, bool keep_frame_index)
+void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
 	//bulletproof verifications
-	if (m_animation >= this->animationNumber)
+	if (animation >= m_animationNumber)
 	{
-		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", m_animation, this->animationNumber);
-		m_animation = this->animationNumber - 1;
-		if (m_animation < 0)
+		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, m_animationNumber);
+		animation = m_animationNumber - 1;
+		if (animation < 0)
 		{
-			m_animation = 0;
+			animation = 0;
 		}
 	}
 
 	//now let's load the new animation
 	Animation* anim = new Animation();
-	anim->setSpriteSheet(*this->defaultAnimation.getSpriteSheet());
-	for (size_t j = 0; j < this->defaultAnimation.getSize(); j++)
+	anim->setSpriteSheet(*m_defaultAnimation.getSpriteSheet());
+	for (size_t j = 0; j < m_defaultAnimation.getSize(); j++)
 	{
-		size_t n = j / this->frameNumber;
+		size_t n = j / m_frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
-		if (n == m_animation)
+		if (n == animation)
 		{
-			anim->addFrame(this->defaultAnimation.getFrame(j));
+			anim->addFrame(m_defaultAnimation.getFrame(j));
 		}
 	}
 
 	if (!keep_frame_index)
 	{
-		this->m_currentFrame = 0;
+		m_currentFrame = 0;
 	}
 
-	if (currentAnimation)
-		delete currentAnimation;
-	this->currentAnimation = anim;
-	this->play(*currentAnimation);
-	this->currentAnimationIndex = m_animation;
+	if (m_currentAnimation)
+		delete m_currentAnimation;
+	m_currentAnimation = anim;
+	play(*m_currentAnimation);
+	m_currentAnimationIndex = animation;
 }
 
-void Independant::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
 {
-	this->animationNumber = m_animationNumber;
-	this->frameNumber = m_frameNumber;
-	this->initial_position = sf::Vector2f(position.x, position.y);
-	this->m_size.x = ((*texture).getSize().x / m_frameNumber);
-	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
+	m_animationNumber = animationNumber;
+	m_frameNumber = frameNumber;
+	m_initial_position = sf::Vector2f(position.x, position.y);
+	m_size.x = ((*texture).getSize().x / frameNumber);
+	m_size.y = ((*texture).getSize().y / animationNumber);
 
-	this->collider_type = IndependantType::BackgroundObject;
-	this->defaultAnimation.setSpriteSheet(*texture);
+	m_collider_type = GameObjectType::BackgroundObject;
+	m_defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < m_animationNumber; j++)
 	{
 		for (int i = 0; i < m_frameNumber; i++)
 		{
-			int x = ((*texture).getSize().x / m_frameNumber)*(i);
-			int y = ((*texture).getSize().y / m_animationNumber)*(j);
-			this->defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
+			int x = ((*texture).getSize().x / frameNumber)*(i);
+			int y = ((*texture).getSize().y / animationNumber)*(j);
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
 		}
 	}
 	
-	this->currentAnimation = NULL;
-	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
+	m_currentAnimation = NULL;
+	setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
-	this->speed = speed;
-	this->setPosition(position.x, position.y);
-	this->visible = false;
-	this->isOnScene = false;
-	this->immune = false;
-	this->startPattern = false;
-	this->GarbageMe = false;
-	this->DontGarbageMe = false;
-	this->money = 0;
-	this->diag = sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
-	this->transparent = false;
-	this->ghost = false;
-	this->rotation_speed = 0.f;
-	this->disable_fire = false;
-	this->wake_up = true;
-	this->equipment_loot = NULL;
-	this->weapon_loot = NULL;
-	this->isCollidingWithInteractiveObject = No_Interaction;
+	m_speed = speed;
+	setPosition(position.x, position.y);
+	m_visible = false;
+	m_isOnScene = false;
+	m_immune = false;
+	m_startPattern = false;
+	m_GarbageMe = false;
+	m_DontGarbageMe = false;
+	m_money = 0;
+	m_diag = sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	m_transparent = false;
+	m_ghost = false;
+	m_rotation_speed = 0.f;
+	m_disable_fire = false;
+	m_wake_up = true;
+	m_equipment_loot = NULL;
+	m_weapon_loot = NULL;
+	m_isCollidingWithInteractiveObject = No_Interaction;
 }
 
-void Independant::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*m_frameNumber, size.y*m_animationNumber);
-	this->textureName = textureName;
+	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
+	m_textureName = textureName;
 
-	this->setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x / 2, size.y / 2);
 
-	Init(position, speed, texture, m_frameNumber, m_animationNumber);
+	Init(position, speed, texture, frameNumber, animationNumber);
 }
 
-Independant::~Independant()
+GameObject::~GameObject()
 {
 	//TODO
 
@@ -128,34 +128,34 @@ Independant::~Independant()
 	//delete this->weapon_loot;
 }
 
-void Independant::update(sf::Time deltaTime, float hyperspeedMultiplier)
+void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->speed;
+	newspeed = m_speed;
 
 	if (hyperspeedMultiplier < 1)
 	{
-		newspeed.x = this->speed.x * hyperspeedMultiplier;
-		newspeed.y = this->speed.y * hyperspeedMultiplier;
+		newspeed.x = m_speed.x * hyperspeedMultiplier;
+		newspeed.y = m_speed.y * hyperspeedMultiplier;
 	}
 	
-	this->setGhost(hyperspeedMultiplier > 1.0f);
+	setGhost(hyperspeedMultiplier > 1.0f);
 	
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
-	this->setPosition(newposition.x, newposition.y);
+	setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
 }
 
-void Independant::updateAnimation(sf::Time deltaTime)
+void GameObject::updateAnimation(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
 }
 
-bool Independant::NormalizeSpeed(sf::Vector2f* vector, float max_value)
+bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return true;
@@ -172,168 +172,128 @@ bool Independant::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 	return false;
 }
 
-void Independant::Respawn()
+void GameObject::Respawn()
 {
 
 }
 
-void Independant::setGhost(bool m_ghost)
+void GameObject::setGhost(bool m_ghost)
 {
 	if (m_ghost == true)
 	{
-		this->ghost = true;
-		this->setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
+		m_ghost = true;
+		setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
 	}
 	else
 	{
-		this->ghost = false;
-		this->setColor(Color(255, 255, 255, 255));
+		m_ghost = false;
+		setColor(Color(255, 255, 255, 255));
 	}
 	
 }
-//void Independant::Follow(Independant* target)
+//void GameObject::Follow(GameObject* target)
 //{
 //	this->setPosition(target->getPosition().x, target->getPosition().x);
 //}
 
-void Independant::damage_from(Independant& independant)
+void GameObject::damage_from(GameObject& object)
 {
-	if (!immune)
+	if (!m_immune)
 	{
 		setColor(Color(255,0,0,255), sf::seconds(DAMAGE_FEEDBACK_TIME));
-		if (independant.damage > shield)
+		if (object.m_damage > m_shield)
 		{
-			armor -= (independant.damage - shield);
-			shield = 0;
+			m_armor -= (object.m_damage - m_shield);
+			m_shield = 0;
 		}
 		else
 		{
-			shield -= independant.damage;
+			m_shield -= object.m_damage;
 		}		
 	}
 }
 
-bool Independant::get_money_from(Independant& independant)
+bool GameObject::get_money_from(GameObject& object)
 {
-	int loot_value = independant.getMoney();//give all the money
-	money += loot_value;
-	independant.addMoney(-loot_value);
+	int loot_value = object.m_money;//give all the money
+	m_money += loot_value;
+	object.addMoney(-loot_value);
 	if (loot_value > 0)
 		return true;
 	else
 		return false;
 }
 
-bool Independant::get_money_from(Independant& independant, int loot_value)
+bool GameObject::get_money_from(GameObject& object, int loot_value)
 {
-	money += loot_value;
-	independant.addMoney(-loot_value);
+	m_money += loot_value;
+	object.addMoney(-loot_value);
 	if (loot_value > 0)
 		return true;
 	else
 		return false;
 }
 
-int Independant::getIndependantDamage()
+GameObject* GameObject::Clone()
 {
-	return damage;
-}
-
-int Independant::getIndependantShield()
-{
-	return shield;
-}
-
-int Independant::getIndependantShieldMax()
-{
-	return shield_max;
-}
-
-int Independant::getIndependantShieldRegen()
-{
-	return shield_regen;
-}
-
-int Independant::getIndependantArmor()
-{
-	return armor;
-}
-
-int Independant::getIndependantArmorMax()
-{
-	return armor_max;
-}
-
-sf::Vector2f Independant::getIndependantSpeed()
-{
-	return sf::Vector2f(speed.x, speed.y);
-}
-
-Independant* Independant::Clone()
-{
-	Independant* clone = new Independant(this->getPosition(), this->speed, this->textureName, this->m_size);
-	clone->display_name = this->display_name;
-	clone->collider_type = this->collider_type;
-	clone->layer = this->layer;
+	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size);
+	clone->m_display_name = this->m_display_name;
+	clone->m_collider_type = this->m_collider_type;
+	clone->m_layer = this->m_layer;
 
 	return clone;
 }
 
-int Independant::getMoney()
+void GameObject::addMoney(int loot_value)
 {
-	return money;
+	m_money += loot_value;
 }
 
-void Independant::addMoney(int loot_value)
+void GameObject::setMoney(int loot_value)
 {
-	money += loot_value;
+	m_money = loot_value;
 }
 
-void Independant::setMoney(int loot_value)
-{
-	money = loot_value;
-}
-
-void Independant::Death()
+void GameObject::Death()
 {
 
 }
 
-void Independant::Destroy()
+void GameObject::Destroy()
 {
 
 }
 
-void Independant::GenerateLoot()
+void GameObject::GenerateLoot()
 {
 
 }
 
-bool Independant::GetLoot(Independant& independant)
+bool GameObject::GetLoot(GameObject& object)
 {
-	if (this->get_money_from(independant) || this->get_equipment_from(independant) || this->get_weapon_from(independant))
+	if (this->get_money_from(object) || this->get_equipment_from(object) || this->get_weapon_from(object))
 		return true;
 	else
 		return false;
 	
 }
 
-void Independant::GetPortal(Independant* independant)
+void GameObject::GetPortal(GameObject* object)
 {
 
 }
 
-void Independant::GetShop(Independant* independant)
+void GameObject::GetShop(GameObject* object)
 {
 
 }
 
-bool Independant::get_equipment_from(Independant& independant)
+bool GameObject::get_equipment_from(GameObject& object)
 {
-	if (independant.equipment_loot != NULL && this->equipment_loot == NULL)
+	if (object.m_equipment_loot != NULL && m_equipment_loot == NULL)
 	{
-		this->equipment_loot = independant.getEquipmentLoot();
-		independant.equipment_loot = NULL;
+		m_equipment_loot = object.getEquipmentLoot();
+		object.m_equipment_loot = NULL;
 		return true;
 	}
 	else
@@ -342,11 +302,11 @@ bool Independant::get_equipment_from(Independant& independant)
 	}
 }
 
-bool Independant::setEquipmentLoot(Equipment* equipment)
+bool GameObject::setEquipmentLoot(Equipment* equipment)
 {
-	if (this->equipment_loot == NULL)
+	if (m_equipment_loot == NULL)
 	{
-		this->equipment_loot = equipment;
+		m_equipment_loot = equipment;
 		return true;
 	}
 	else
@@ -355,22 +315,22 @@ bool Independant::setEquipmentLoot(Equipment* equipment)
 	}
 }
 
-Equipment* Independant::getEquipmentLoot()
+Equipment* GameObject::getEquipmentLoot()
 {
-	return this->equipment_loot;
+	return m_equipment_loot;
 }
 
-void Independant::releaseEquipmentLoot()
+void GameObject::releaseEquipmentLoot()
 {
-	this->equipment_loot = NULL;
+	m_equipment_loot = NULL;
 }
 
-bool Independant::get_weapon_from(Independant& independant)
+bool GameObject::get_weapon_from(GameObject& object)
 {
-	if (independant.weapon_loot != NULL && this->weapon_loot == NULL)
+	if (object.m_weapon_loot != NULL && m_weapon_loot == NULL)
 	{
-		this->weapon_loot = independant.getWeaponLoot();
-		independant.weapon_loot = NULL;
+		m_weapon_loot = object.getWeaponLoot();
+		object.m_weapon_loot = NULL;
 		return true;
 	}
 	else
@@ -379,11 +339,11 @@ bool Independant::get_weapon_from(Independant& independant)
 	}
 }
 
-bool Independant::setWeaponLoot(Weapon* weapon)
+bool GameObject::setWeaponLoot(Weapon* weapon)
 {
-	if (this->weapon_loot == NULL)
+	if (m_weapon_loot == NULL)
 	{
-		this->weapon_loot = weapon;
+		m_weapon_loot = weapon;
 		return true;
 	}
 	else
@@ -392,22 +352,22 @@ bool Independant::setWeaponLoot(Weapon* weapon)
 	}
 }
 
-Weapon* Independant::getWeaponLoot()
+Weapon* GameObject::getWeaponLoot()
 {
-	return this->weapon_loot;
+	return m_weapon_loot;
 }
 
-void Independant::releaseWeaponLoot()
+void GameObject::releaseWeaponLoot()
 {
-	this->weapon_loot = NULL;
+	m_weapon_loot = NULL;
 }
 
-void Independant::GetGrazing()
+void GameObject::GetGrazing()
 {
 	//see overide function in class Ship
 }
 
-sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vspeed)
+sf::Vector2f GameObject::getSpeed_for_Scrolling(Directions direction, float vspeed)
 {
 	sf::Vector2f speed = sf::Vector2f(0, 0);
 
@@ -431,14 +391,14 @@ sf::Vector2f Independant::getSpeed_for_Scrolling(Directions direction, float vsp
 	return speed;
 }
 
-sf::Vector2f Independant::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position)
+sf::Vector2f GameObject::getSpeed_to_LocationWhileSceneSwap(Directions current_direction, Directions future_direction, float vspeed, sf::Vector2f sprite_position)
 {
 	sf::Vector2f speed = sf::Vector2f(0, 0);
 
-	sf::Vector2f future_pos = Independant::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_Y_RATIO)));
+	sf::Vector2f future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_Y_RATIO)));
 	if (future_direction == Directions::NO_DIRECTION)
 	{
-		future_pos = Independant::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_X_RATIO)));
+		future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_X_RATIO)));
 	}
 
 	if (current_direction == Directions::DIRECTION_UP || current_direction == Directions::DIRECTION_DOWN
@@ -458,7 +418,7 @@ sf::Vector2f Independant::getSpeed_to_LocationWhileSceneSwap(Directions current_
 	return speed;
 }
 
-sf::Vector2i Independant::getDirectionMultiplier(Directions direction)
+sf::Vector2i GameObject::getDirectionMultiplier(Directions direction)
 {
 	int x = 1;
 	int y = 1;
@@ -474,7 +434,7 @@ sf::Vector2i Independant::getDirectionMultiplier(Directions direction)
 	return sf::Vector2i(x, y);
 }
 
-sf::Vector2f Independant::getSize_for_Direction(Directions direction, sf::Vector2f size)
+sf::Vector2f GameObject::getSize_for_Direction(Directions direction, sf::Vector2f size)
 {
 	if (direction == Directions::DIRECTION_LEFT || direction == Directions::DIRECTION_RIGHT)
 	{
@@ -486,7 +446,7 @@ sf::Vector2f Independant::getSize_for_Direction(Directions direction, sf::Vector
 	}
 }
 
-sf::Vector2i Independant::getSize_for_Direction(Directions direction, sf::Vector2i size)
+sf::Vector2i GameObject::getSize_for_Direction(Directions direction, sf::Vector2i size)
 {
 	if (direction == Directions::DIRECTION_LEFT || direction == Directions::DIRECTION_RIGHT)
 	{
@@ -498,9 +458,9 @@ sf::Vector2i Independant::getSize_for_Direction(Directions direction, sf::Vector
 	}
 }
 
-sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vector2f speed)
+sf::Vector2f GameObject::getSpeed_for_Direction(Directions direction, sf::Vector2f speed)
 {
-	speed = Independant::getSize_for_Direction(direction, sf::Vector2f(speed.x, speed.y));
+	speed = GameObject::getSize_for_Direction(direction, sf::Vector2f(speed.x, speed.y));
 
 	if (direction == DIRECTION_DOWN)
 	{
@@ -523,7 +483,7 @@ sf::Vector2f Independant::getSpeed_for_Direction(Directions direction, sf::Vecto
 	return sf::Vector2f(speed.x, speed.y);
 }
 
-float Independant::getRotation_for_Direction(Directions direction)
+float GameObject::getRotation_for_Direction(Directions direction)
 {
 	if (direction == Directions::DIRECTION_DOWN)
 	{
@@ -543,7 +503,7 @@ float Independant::getRotation_for_Direction(Directions direction)
 	}
 }
 
-sf::Vector2f Independant::getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale)
+sf::Vector2f GameObject::getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale)
 {
 	float x = position.x;
 	float y = position.y;
@@ -579,7 +539,7 @@ sf::Vector2f Independant::getPosition_for_Direction(Directions direction, sf::Ve
 	return sf::Vector2f(x, y);
 }
 
-FloatCompare Independant::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
+FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	if (direction == Directions::DIRECTION_UP)
 	{
@@ -646,7 +606,7 @@ FloatCompare Independant::compare_posY_withTarget_for_Direction(Directions direc
 	}
 }
 
-FloatCompare Independant::compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
+FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	{
 		if (direction == Directions::DIRECTION_UP)
@@ -715,7 +675,7 @@ FloatCompare Independant::compare_posX_withTarget_for_Direction(Directions direc
 	}
 }
 
-sf::Vector2f Independant::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
+sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
 {
 	if (direction == Directions::DIRECTION_UP || direction == Directions::NO_DIRECTION)
 	{
@@ -774,7 +734,7 @@ sf::Vector2f Independant::setPosition_Y_for_Direction(Directions direction, sf::
 	}
 }
 
-sf::Vector2f Independant::getRandomXSpawnPosition(Directions direction, sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
+sf::Vector2f GameObject::getRandomXSpawnPosition(Directions direction, sf::Vector2f max_enemy_size, sf::Vector2f cluster_size)
 {
 	//default argument for cluster dize
 	if (cluster_size == sf::Vector2f(0, 0))
@@ -784,14 +744,14 @@ sf::Vector2f Independant::getRandomXSpawnPosition(Directions direction, sf::Vect
 
 	//now calculating the starting coordinate (left)
 	sf::Vector2f rand_coordinates_min = sf::Vector2f(max_enemy_size.x / 2, -cluster_size.y / 2);
-	rand_coordinates_min = Independant::getPosition_for_Direction(direction, rand_coordinates_min, false);
+	rand_coordinates_min = GameObject::getPosition_for_Direction(direction, rand_coordinates_min, false);
 
 	//length of the allowed spread
-	int i_ = Independant::getDirectionMultiplier(direction).y;
-	float allowed_spread = Independant::getSize_for_Direction(direction, sf::Vector2f(i_*(SCENE_SIZE_X - cluster_size.x), i_*(SCENE_SIZE_Y - cluster_size.x))).x;
+	int i_ = GameObject::getDirectionMultiplier(direction).y;
+	float allowed_spread = GameObject::getSize_for_Direction(direction, sf::Vector2f(i_*(SCENE_SIZE_X - cluster_size.x), i_*(SCENE_SIZE_Y - cluster_size.x))).x;
 
 	//cutting clusters bigger than the scene (+ debug message)
-	if ((allowed_spread*Independant::getDirectionMultiplier(direction).y) < 0)
+	if ((allowed_spread*GameObject::getDirectionMultiplier(direction).y) < 0)
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
 	}
@@ -800,16 +760,16 @@ sf::Vector2f Independant::getRandomXSpawnPosition(Directions direction, sf::Vect
 	float random_posX = RandomizeFloatBetweenValues(sf::Vector2f(0, allowed_spread));
 
 	//getting position coordinates (min + random value)
-	float pos_x = Independant::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;
-	float pos_y = Independant::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.y, rand_coordinates_min.y + random_posX)).x;
+	float pos_x = GameObject::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.x + random_posX, rand_coordinates_min.x)).x;
+	float pos_y = GameObject::getSize_for_Direction(direction, sf::Vector2f(rand_coordinates_min.y, rand_coordinates_min.y + random_posX)).x;
 
 	return sf::Vector2f(pos_x, pos_y);
 }
 
-sf::Vector2f Independant::ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size)
+sf::Vector2f GameObject::ApplyScreenBordersConstraints(Directions direction, sf::Vector2f position, sf::Vector2f size)
 {
 	sf::Vector2f new_position = position;
-	sf::Vector2f l_size = Independant::getSize_for_Direction(direction, sf::Vector2f(size.x, size.y));
+	sf::Vector2f l_size = GameObject::getSize_for_Direction(direction, sf::Vector2f(size.x, size.y));
 
 	float l_overlap_left = position.x - (l_size.x / 2);
 	if (l_overlap_left < 0)
@@ -838,7 +798,48 @@ sf::Vector2f Independant::ApplyScreenBordersConstraints(Directions direction, sf
 	return new_position;
 }
 
-void Independant::updatePostCollision()
+void GameObject::updatePostCollision()
 {
 	//see override in class Ship
+}
+
+float GameObject::getFighterFloatStatValue(FighterStats stat)
+{
+	//see override in class Ship
+	return -1;
+}
+
+int GameObject::getFighterIntStatValue(FighterStats stat)
+{
+	switch (stat)
+	{
+		case Fighter_Armor:
+		{
+			return m_armor;
+		}
+		case Fighter_ArmorMax:
+		{
+			return m_armor_max;
+		}
+		case Fighter_Shield:
+		{
+			return m_shield;
+		}
+		case Fighter_ShieldMax:
+		{
+			return m_shield_max;
+		}
+		case Fighter_ShieldRegen:
+		{
+			return m_shield_regen;
+		}
+		case Fighter_ContactDamage:
+		{
+			return m_damage;
+		}
+		default:
+		{
+			return -1;
+		}
+	}
 }

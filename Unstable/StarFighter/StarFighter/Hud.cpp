@@ -12,7 +12,7 @@ PlayerHud::PlayerHud()
 	this->equipmentGrid = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false);
 	this->shipGrid = ObjectGrid(sf::Vector2f(SHIP_GRID_OFFSET_POS_X, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
 
-	this->hud_cursor = new Independant(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)), 
+	this->hud_cursor = new GameObject(sf::Vector2f(HUD_LEFT_MARGIN + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)), 
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8+1));
 }
 
@@ -167,7 +167,6 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 	int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
-
 	//armor and shield
 	if (m_armor <=0)
 	{
@@ -179,7 +178,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		if (m_armor < m_shield)
 		{
 			armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max), ARMOR_BAR_SIZE_Y));
-			armorBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max, ARMOR_BAR_SIZE_Y));
+			armorBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max, ARMOR_BAR_SIZE_Y));
 		}
 		else
 		{
@@ -199,7 +198,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		if (m_shield < m_armor)
 		{
 			shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max), SHIELD_BAR_SIZE_Y));
-			shieldBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max, SHIELD_BAR_SIZE_Y));
+			shieldBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max, SHIELD_BAR_SIZE_Y));
 		}
 		else
 		{
@@ -265,30 +264,30 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		if (hud_cursor->getPosition().x < hud_cursor->m_size.x / 2)
 		{
 			hud_cursor->setPosition(hud_cursor->m_size.x / 2, hud_cursor->getPosition().y);
-			hud_cursor->speed.x = 0;
+			hud_cursor->m_speed.x = 0;
 		}
 
 		if (hud_cursor->getPosition().x >(SCENE_SIZE_X / 3) - (hud_cursor->m_size.x / 2))
 		{
 			hud_cursor->setPosition((SCENE_SIZE_X / 3) - (hud_cursor->m_size.x / 2), hud_cursor->getPosition().y);
-			hud_cursor->speed.x = 0;
+			hud_cursor->m_speed.x = 0;
 		}
 
 		if (hud_cursor->getPosition().y < hud_cursor->m_size.y / 2)
 		{
 			hud_cursor->setPosition(hud_cursor->getPosition().x, hud_cursor->m_size.y / 2);
-			hud_cursor->speed.y = 0;
+			hud_cursor->m_speed.y = 0;
 		}
 
 		if (hud_cursor->getPosition().y > SCENE_SIZE_Y - (hud_cursor->m_size.y / 2))
 		{
 			hud_cursor->setPosition(hud_cursor->getPosition().x, SCENE_SIZE_Y - (hud_cursor->m_size.y / 2));
-			hud_cursor->speed.y = 0;
+			hud_cursor->m_speed.y = 0;
 		}
 	}
 	
 	//clean old focus
-	hud_cursor->visible = has_focus;
+	hud_cursor->m_visible = has_focus;
 
 	focused_grid_and_index = sf::Vector2i((int)HudGrid_NoFocus, -1);
 	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())

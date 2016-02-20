@@ -1,7 +1,7 @@
 #ifndef PHASE_H_INCLUDED
 #define PHASE_H_INCLUDED
 
-#include "Independant.h"
+#include "GameObject.h"
 #include "Weapon.h"
 #include "TextUtils.h"
 
@@ -103,33 +103,34 @@ class Phase
 {
 public:
 	Phase();
-	string display_name;
+	string m_display_name;
 	string m_name;
-	vector<Weapon*> weapons_list;
-	PatternBobby* Pattern;
-	vector <Modifier> modifiers;
-	float angspeed;
-	float radius;
-	float vspeed;
-	float rotation_speed;
-	bool hasTransition;
-	bool hasWakeUp;
-	bool hasWelcomeShot;
-	vector<ConditionTransition*> transitions_list;
-	string wake_up_name;
+	vector<Weapon*> m_weapons_list;
+	PatternBobby* m_Pattern;
+	vector <Modifier> m_modifiers;
+	float m_angspeed;
+	float m_radius;
+	float m_vspeed;
+	float m_rotation_speed;
+	bool m_hasWakeUp;
+	bool m_hasWelcomeShot;
+	vector<ConditionTransition*> m_transitions_list;
+	string m_wake_up_name;
+	Weapon* m_welcomeWeapon;
+
 	static ConditionTransition* ConditionLoader(vector<string> line_data, int index);
-	Weapon* welcomeWeapon;
 };
 
 class ConditionTransition
 {
 public:
-	ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, string m_nextPhase_name);
-	ConditionType condition;
-	FloatCompare op;
-	float value;
-	Phase* nextPhase;
-	std::string nextPhase_name;
+	ConditionTransition(ConditionType condition, FloatCompare op, float value, string nextPhase_name);
+
+	ConditionType m_condition;
+	FloatCompare m_op;
+	float m_value;
+	Phase* m_nextPhase;
+	std::string m_nextPhase_name;
 };
 
 #endif// PHASE_H_INCLUDED

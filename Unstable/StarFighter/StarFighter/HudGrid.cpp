@@ -13,7 +13,7 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 		{
 			if (fill_with_fake)
 			{
-				Independant* empty_slot = new Independant(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE),
+				GameObject* empty_slot = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE),
 					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, EMPTYSLOT_ANIMATION_NUMBER);
 
 				empty_slot->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
@@ -37,7 +37,7 @@ int ObjectGrid::getFocusIntIndex()
 	return (focus.y + (focus.x * this->squares.y));
 }
 
-bool ObjectGrid::insertObject(Independant& object, int index, bool overwrite_existing)
+bool ObjectGrid::insertObject(GameObject& object, int index, bool overwrite_existing)
 {
 	//if no specific index is provided, we look for the first empty slot...
 	if (index < 0)
@@ -124,9 +124,9 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 	}
 }
 
-int ObjectGrid::isCursorColling(Independant& cursor)
+int ObjectGrid::isCursorColling(GameObject& cursor)
 {
-	if (!cursor.visible)
+	if (!cursor.m_visible)
 	{
 		return -1;
 	}
@@ -186,7 +186,7 @@ bool ObjectGrid::HighlightCell(int index)
 
 bool ObjectGrid::GarbageCell(int index)
 {
-	Independant* tmp_ptr = getCellPointerFromIntIndex(index);
+	GameObject* tmp_ptr = getCellPointerFromIntIndex(index);
 	if (tmp_ptr != NULL)
 	{
 		delete tmp_ptr;
@@ -209,7 +209,7 @@ bool ObjectGrid::CleanFocus()
 	return false;
 }
 
-Independant* ObjectGrid::getCellPointerFromIntIndex(int index)
+GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
 {
 	int r = index % squares.y;
 	int l = index / squares.y;
@@ -223,7 +223,7 @@ Independant* ObjectGrid::getCellPointerFromIntIndex(int index)
 
 }
 
-void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant)
+void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject)
 {
 	int r = index % squares.y;
 	int l = index / squares.y;
@@ -232,8 +232,8 @@ void ObjectGrid::setCellPointerForIntIndex(int index, Independant* independant)
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
 	}
-	this->grid[l][r] = independant;
-	if (independant != NULL)
+	this->grid[l][r] = GameObject;
+	if (GameObject != NULL)
 	{
 		this->grid[l][r]->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + this->position.x + (r * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + this->position.y + (l * GRID_SLOT_SIZE)));
 	}

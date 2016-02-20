@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Globals.h"
-#include "Independant.h"
+#include "GameObject.h"
 #include "Includes/SimpleCollision.hpp"
 
 #include "InteractionPanel.h"
@@ -51,8 +51,8 @@ public:
 	sf::RectangleShape itemStatsPanel;
 	sf::Text itemStatsText;
 
-	Independant* hud_cursor;
-	Independant* focused_item;
+	GameObject* hud_cursor;
+	GameObject* focused_item;
 	sf::Vector2i focused_grid_and_index;
 	void setRemovingCursorAnimation(CursorFeedbackStates animation_index);
 	bool has_prioritary_cursor_feedback;

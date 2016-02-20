@@ -2,82 +2,81 @@
 
 extern Game* CurrentGame;
 
-Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_damage, FX* m_explosion) : Independant(position, speed,  textureName, size)
+Ammo::Ammo(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int damage, FX* explosion) : GameObject(position, speed,  textureName, size)
 {
-	damage = m_damage;
-	armor = 1;
-	armor_max = 1;
-	shield = 0;
-	shield_max = 0;
-	shield_regen = 0;
-	startPattern = false;
-	ref_speed = sqrt((speed.x*speed.x) + (speed.y*speed.y));
-	explosion = m_explosion;
-	radius = 0;
-	angspeed = 0;
-	range = 0;
-	current_range = 0;
-	shot_angle = 0;
-	display_name = "Ammo";
+	m_damage = damage;
+	m_armor = 1;
+	m_armor_max = 1;
+	m_shield = 0;
+	m_shield_max = 0;
+	m_shield_regen = 0;
+	m_startPattern = false;
+	m_ref_speed = sqrt((speed.x*speed.x) + (speed.y*speed.y));
+	m_explosion = explosion;
+	m_radius = 0;
+	m_angspeed = 0;
+	m_range = 0;
+	m_current_range = 0;
+	m_shot_angle = 0;
+	m_display_name = "Ammo";
 }
 
 Ammo* Ammo::Clone()
 {
-	Ammo* m_ammo = new Ammo(this->getPosition(),this->speed,this->textureName,this->m_size,this->damage, this->explosion);
-	m_ammo->display_name = this->display_name;
+	Ammo* ammo = new Ammo(this->getPosition(),this->m_speed,this->m_textureName,this->m_size,this->m_damage, this->m_explosion);
+	ammo->m_display_name = this->m_display_name;
 
-	m_ammo->Pattern = this->Pattern;
-	m_ammo->radius = this->radius;
-	m_ammo->angspeed = this->angspeed;
-	m_ammo->range = this->range;
-	m_ammo->rotation_speed = this->rotation_speed;
+	ammo->m_Pattern = this->m_Pattern;
+	ammo->m_radius = this->m_radius;
+	ammo->m_angspeed = this->m_angspeed;
+	ammo->m_range = this->m_range;
+	ammo->m_rotation_speed = this->m_rotation_speed;
 
-	return m_ammo;
+	return ammo;
 }
 
 void Ammo::Death()
 {
-	FX* myFX = this->explosion->Clone();
+	FX* myFX = m_explosion->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-    (*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, IndependantType::Neutral);
+    (*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
 
-	this->visible = false;
-	this->isOnScene = false;
-	this->GarbageMe = true;
+	m_visible = false;
+	m_GarbageMe = true;
 }
 
 void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	sf::Vector2f newspeed = this->speed;
-	float new_ref_speed = ref_speed;
+	sf::Vector2f newspeed = m_speed;
+	float new_ref_speed = m_ref_speed;
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier -1) * (*CurrentGame).vspeed).x;
-		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier -1) * (*CurrentGame).m_vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
 		new_ref_speed *= hyperspeedMultiplier;
 	}
 	else if (hyperspeedMultiplier < 1)
 	{
-		newspeed.x = this->speed.x * hyperspeedMultiplier;
-		newspeed.y = this->speed.y * hyperspeedMultiplier;
+		newspeed.x = m_speed.x * hyperspeedMultiplier;
+		newspeed.y = m_speed.y * hyperspeedMultiplier;
 		new_ref_speed *= hyperspeedMultiplier;
 	}
 
 	this->setGhost(hyperspeedMultiplier > 1.0f);
 
 	//range before bullet extinction (optional. put "0" not to use)
-	if (this->range > 0)
+	if (m_range > 0)
 	{
-		this->current_range += (new_ref_speed*deltaTime.asSeconds());
-		if (this->current_range > this->range)
+		m_current_range += (new_ref_speed*deltaTime.asSeconds());
+		if (m_current_range > m_range)
 		{
-			this->visible = false;
-			this->GarbageMe = true;
+			m_visible = false;
+			m_GarbageMe = true;
 		}
 	}
 
 	//if not disappeared, move it
-	if (!this->GarbageMe)
+	if (!m_GarbageMe)
 	{
 		static sf::Vector2f newposition, offset, pattern_offset;
 		
@@ -85,17 +84,17 @@ void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
 		//call bobbyPattern
-		pattern_offset = Pattern.GetOffset(deltaTime.asSeconds());
-		offset.x = pattern_offset.x * cos(this->shot_angle) + pattern_offset.y * sin(this->shot_angle);
-		offset.y = pattern_offset.x * sin(this->shot_angle) + pattern_offset.y * cos(this->shot_angle);
-		//offset = Independant::getSpeed_for_Direction((*CurrentGame).direction, offset);
+		pattern_offset = m_Pattern.GetOffset(deltaTime.asSeconds());
+		offset.x = pattern_offset.x * cos(m_shot_angle) + pattern_offset.y * sin(m_shot_angle);
+		offset.y = pattern_offset.x * sin(m_shot_angle) + pattern_offset.y * cos(m_shot_angle);
+		//offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 		newposition.x += offset.x;
 		newposition.y += offset.y;
 
-		this->setPosition(newposition.x, newposition.y);
+		setPosition(newposition.x, newposition.y);
 
 		//rotation
-		this->rotate(this->rotation_speed*deltaTime.asSeconds());
+		rotate(m_rotation_speed*deltaTime.asSeconds());
 
 		AnimatedSprite::update(deltaTime);
 	}

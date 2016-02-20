@@ -9,38 +9,38 @@ extern Game* CurrentGame;
 #define WEAPON_LOOT_PROBABILITY		30
 #define MODULE_LOOT_PROBABILITY		1
 
-Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name) : Independant(position, speed, textureName, size)
+Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, std::string m_display_name) : GameObject(position, speed, textureName, size)
 {
-	 this->visible = true;
-	 this->isOnScene = true;
-	 this->collider_type = IndependantType::LootObject;
-	 this->money = 0;
-	 this->display_name = m_display_name;
+	 m_visible = true;
+	 m_isOnScene = true;
+	 m_collider_type = GameObjectType::LootObject;
+	 m_money = 0;
+	 m_display_name = m_display_name;
 }
 
 void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->speed;
+	newspeed = m_speed;
 
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-		newspeed.y += Independant::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
 	}
 	else if (hyperspeedMultiplier < 1)
 	{
-		newspeed.x = this->speed.x * hyperspeedMultiplier;
-		newspeed.y = this->speed.y * hyperspeedMultiplier;
+		newspeed.x = m_speed.x * hyperspeedMultiplier;
+		newspeed.y = m_speed.y * hyperspeedMultiplier;
 	}
 
-	this->setGhost(hyperspeedMultiplier > 1.0f);
+	setGhost(hyperspeedMultiplier > 1.0f);
 
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
-	this->setPosition(newposition.x, newposition.y);
+	setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
 }
@@ -48,9 +48,9 @@ void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 Loot* Loot::Clone()
 {
-	Loot* new_loot = new Loot(this->getPosition(), this->speed, this->textureName, this->m_size, this->display_name);
-	new_loot->money = this->getMoney();
-	new_loot->equipment_loot = this->equipment_loot;
+	Loot* new_loot = new Loot(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_display_name);
+	new_loot->m_money = this->m_money;
+	new_loot->m_equipment_loot = this->m_equipment_loot;
 
 	return new_loot;
 }

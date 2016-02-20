@@ -1,7 +1,7 @@
 #include "Game.h"
 #define stringify(x)  #x
 
-const char* IndependantTypeValues[] =
+const char* GameObjectTypeValues[] =
 {
 	stringify(BackgroundObject),
 	stringify(PlayerShip),
@@ -12,29 +12,29 @@ const char* IndependantTypeValues[] =
 
 void Game::init(RenderWindow* window)
 {
-	this->window = window;
-	this->mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
-	this->mainScreen.setSmooth(true);
-	this->hubScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
-	this->hubScreen.setSmooth(true);
+	m_window = window;
+	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	m_mainScreen.setSmooth(true);
+	m_hubScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	m_hubScreen.setSmooth(true);
 
-	this->sceneChronometer.restart();
-	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
-	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
-	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+	m_sceneChronometer.restart();
+	m_scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
+	m_scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
+	m_screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
 
-	this->resetHazard();;//initalisation of the scoring system
-	this->BeastScoreBonus = 0;
-	this->direction = Directions::NO_DIRECTION;
-	this->hyperspeedMultiplier = 1.0f;
+	resetHazard();;//initalisation of the scoring system
+	m_BeastScoreBonus = 0;
+	m_direction = Directions::NO_DIRECTION;
+	m_hyperspeedMultiplier = 1.0f;
 
-	this->hud.Init(0, 0, 0, 1);
-	this->m_interactionPanel = new InteractionPanel();
+	m_hud.Init(0, 0, 0, 1);
+	m_interactionPanel = new InteractionPanel();
 }
 
 sf::RenderWindow* Game::getMainWindow()
 {
-	return this->window;
+	return m_window;
 }
 
 void Game::SetPlayerShip(Ship* m_playerShip)
@@ -42,53 +42,53 @@ void Game::SetPlayerShip(Ship* m_playerShip)
 	this->playerShip = m_playerShip;
 }
 
-void Game::addToScene(Independant *object, LayerType m_layer, IndependantType type)
+void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
 {
-	object->layer = m_layer;
-	object->collider_type = type;
+	object->m_layer = m_layer;
+	object->m_collider_type = type;
 
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);
 
-	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_Independant))
+	if (((int)m_layer >= 0 && (int)m_layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
-		AddIndependantToVector(object, &this->sceneIndependantsTyped[(int)type]);
-		AddIndependantToVector(object, &this->sceneIndependantsLayered[(int)m_layer]);
-		AddIndependantToVector(object, &this->sceneIndependants);
+		AddGameObjectToVector(object, &m_sceneGameObjectsTyped[(int)type]);
+		AddGameObjectToVector(object, &m_sceneGameObjectsLayered[(int)m_layer]);
+		AddGameObjectToVector(object, &m_sceneGameObjects);
 	}
 	else
 	{
-		throw invalid_argument(TextUtils::format("Game eror: Unable to add Independant '%s' to layer '%d'", object->getName().c_str(), (int)m_layer));
+		throw invalid_argument(TextUtils::format("Game eror: Unable to add GameObject '%s' to layer '%d'", object->getName().c_str(), (int)m_layer));
 	}
 }
 
 void Game::addToFeedbacks(RectangleShape* feedback)
 {
-	sceneFeedbackBars.push_back(feedback);
+	m_sceneFeedbackBars.push_back(feedback);
 }
 
 void Game::addToFeedbacks(Text* text)
 {
-	sceneFeedbackTexts.push_back(text);
+	m_sceneFeedbackTexts.push_back(text);
 }
 
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
-	sceneFeedbackBars.remove(feedback);
+	m_sceneFeedbackBars.remove(feedback);
 }
 
 void Game::removeFromFeedbacks(Text* text)
 {
-	sceneFeedbackTexts.remove(text);
+	m_sceneFeedbackTexts.remove(text);
 }
 
 void Game::updateScene(Time deltaTime)
 {
-	//printf("OnScene: %d / Collected: %d\n", this->sceneIndependants.size(), this->garbage.size());
+	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
 
 	//TODO: Updating screen resolution
-	scale_factor.x = 1.0f * screen_size.x / REF_WINDOW_RESOLUTION_X;
-	scale_factor.y = 1.0f * screen_size.y / REF_WINDOW_RESOLUTION_Y;
+	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
+	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
 	//Clean garbage
 	cleanGarbage();
@@ -96,22 +96,22 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
-	size_t sceneIndependantsSize = this->sceneIndependants.size();
+	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 
-	for (int i = 0; i < sceneIndependantsSize; i++)
+	for (int i = 0; i < sceneGameObjectsSize; i++)
 	{
-		if (this->sceneIndependants[i] == NULL)
+		if (m_sceneGameObjects[i] == NULL)
 			continue;
 
-		this->sceneIndependants[i]->update(deltaTime, hyperspeedMultiplier);
+		m_sceneGameObjects[i]->update(deltaTime, m_hyperspeedMultiplier);
 	}
 
-	for (int i = 0; i < sceneIndependantsSize; i++)
+	for (int i = 0; i < sceneGameObjectsSize; i++)
 	{
-		if (this->sceneIndependants[i] == NULL)
+		if (m_sceneGameObjects[i] == NULL)
 			continue;
 
-		this->sceneIndependants[i]->updatePostCollision();
+		m_sceneGameObjects[i]->updatePostCollision();
 	}
 
 	//Collect the dust
@@ -123,7 +123,7 @@ void Game::updateHud(int m_armor, int m_armor_max, int m_shield, int m_shield_ma
 	int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
-	this->hud.Update(m_armor, m_armor_max, m_shield, m_shield_max, m_money, m_graze_count, m_hazard_level, scene_name, level, level_max, xp, xp_max, deltaTime, hub, focused_item_type, f_name, f_level, f_xp, f_max_speed, f_hyperspeed,
+	m_hud.Update(m_armor, m_armor_max, m_shield, m_shield_max, m_money, m_graze_count, m_hazard_level, scene_name, level, level_max, xp, xp_max, deltaTime, hub, focused_item_type, f_name, f_level, f_xp, f_max_speed, f_hyperspeed,
 		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 
@@ -162,13 +162,13 @@ int Game::GetSelectedIndex()
 	return this->m_interactionPanel->m_selected_index;
 }
 
-void Game::killIndependantLayer(IndependantType m_layer)
+void Game::killGameObjectLayer(GameObjectType m_layer)
 {
-	for (std::vector<Independant*>::iterator it = this->sceneIndependantsTyped[m_layer].begin(); it != this->sceneIndependantsTyped[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[m_layer].begin(); it != m_sceneGameObjectsTyped[m_layer].end(); it++)
 	{
 		if ((*it) != NULL)
 		{
-			if ((*it)->isOnScene)
+			if ((*it)->m_isOnScene)
 			{
 				(*it)->Death();
 			}
@@ -178,83 +178,83 @@ void Game::killIndependantLayer(IndependantType m_layer)
 
 void Game::drawScene()
 {
-	this->mainScreen.clear();
+	m_mainScreen.clear();
 
 	for (int i = 0; i < NBVAL_Layer; i++)
 	{
 		if (i == FeedbacksLayer)
 		{
-			for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
+			for (std::list<RectangleShape*>::iterator it = m_sceneFeedbackBars.begin(); it != m_sceneFeedbackBars.end(); it++)
 			{
-				mainScreen.draw(*(*it));
+				m_mainScreen.draw(*(*it));
 			}
-			for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
+			for (std::list<Text*>::iterator it = m_sceneFeedbackTexts.begin(); it != m_sceneFeedbackTexts.end(); it++)
 			{
-				mainScreen.draw(*(*it));
+				m_mainScreen.draw(*(*it));
 			}
 		}
-		else if (i == PanelLayer && this->direction == NO_DIRECTION)
+		else if (i == PanelLayer && m_direction == NO_DIRECTION)
 		{
-			this->m_interactionPanel->Draw(mainScreen);
+			this->m_interactionPanel->Draw(m_mainScreen);
 		}
 		else
 		{
-			for (std::vector<Independant*>::iterator it = this->sceneIndependantsLayered[i].begin(); it != this->sceneIndependantsLayered[i].end(); it++)
+			for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[i].begin(); it != m_sceneGameObjectsLayered[i].end(); it++)
 			{
 				if (*it == NULL)
 					continue;
 
-				if ((*(*it)).visible)
+				if ((*(*it)).m_visible)
 				{
-					if (!(*(*it)).transparent)
+					if (!(*(*it)).m_transparent)
 					{
-						this->mainScreen.draw((*(*it)));
+						m_mainScreen.draw((*(*it)));
 					}
 				}
 			}
 		}
 	}
 
-	this->mainScreen.display();
-	sf::Sprite temp(this->mainScreen.getTexture());
-	temp.scale(scale_factor.x, scale_factor.y);
+	m_mainScreen.display();
+	sf::Sprite temp(m_mainScreen.getTexture());
+	temp.scale(m_scale_factor.x, m_scale_factor.y);
 	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
-	temp.setPosition(sf::Vector2f(scale_factor.x * black_stripe, 0));
-	this->window->draw(temp);
+	temp.setPosition(sf::Vector2f(m_scale_factor.x * black_stripe, 0));
+	m_window->draw(temp);
 }
 
 void Game::drawHud()
 {
-	hud.Draw(hubScreen);
-	hubScreen.display();
-	sf::Sprite temp(hubScreen.getTexture());
-	temp.scale(scale_factor.x, scale_factor.y);
+	m_hud.Draw(m_hubScreen);
+	m_hubScreen.display();
+	sf::Sprite temp(m_hubScreen.getTexture());
+	temp.scale(m_scale_factor.x, m_scale_factor.y);
 	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
-	temp.setPosition(sf::Vector2f(scale_factor.x * (black_stripe + SCENE_SIZE_X), 0));
-	this->window->draw(temp);
+	temp.setPosition(sf::Vector2f(m_scale_factor.x * (black_stripe + SCENE_SIZE_X), 0));
+	m_window->draw(temp);
 
 	//adding black stripes on the left and right
 	sf::RectangleShape blackStripeLeft, blackStripeRight;
-	blackStripeLeft.setSize(sf::Vector2f(scale_factor.x * black_stripe, scale_factor.y * REF_WINDOW_RESOLUTION_Y));
-	blackStripeRight.setSize(sf::Vector2f(scale_factor.x * black_stripe, scale_factor.y * REF_WINDOW_RESOLUTION_Y));
+	blackStripeLeft.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
+	blackStripeRight.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
 	blackStripeLeft.setFillColor(sf::Color(0, 0, 0, 255));
 	blackStripeRight.setFillColor(sf::Color(0, 0, 0, 255));
 	blackStripeLeft.setOrigin(0, 0);
 	blackStripeRight.setOrigin(0, 0);
 	blackStripeLeft.setPosition(0, 0);
-	blackStripeRight.setPosition(sf::Vector2f(scale_factor.x * (REF_WINDOW_RESOLUTION_X - black_stripe), 0));
-	this->window->draw(blackStripeLeft);
-	this->window->draw(blackStripeRight);
+	blackStripeRight.setPosition(sf::Vector2f(m_scale_factor.x * (REF_WINDOW_RESOLUTION_X - black_stripe), 0));
+	m_window->draw(blackStripeLeft);
+	m_window->draw(blackStripeRight);
 }
 
-Independant* Game::getHudFocusedItem()
+GameObject* Game::getHudFocusedItem()
 {
-	return hud.focused_item;
+	return m_hud.focused_item;
 }
 
 sf::Vector2i Game::getHudFocusedGridAndIndex()
 {
-	return hud.focused_grid_and_index;
+	return m_hud.focused_grid_and_index;
 }
 
 sf::Vector2i Game::getHudFocusedIndexWithinGrid(HudGridsIndex grid_)
@@ -262,10 +262,10 @@ sf::Vector2i Game::getHudFocusedIndexWithinGrid(HudGridsIndex grid_)
 	switch (grid_)
 	{
 	case HudGrid_ShipGrid:
-		return hud.fakeShipGrid.focus;
+		return m_hud.fakeShipGrid.focus;
 
 	case HudGrid_EquipmentGrid:
-		return hud.fakeEquipmentGrid.focus;
+		return m_hud.fakeEquipmentGrid.focus;
 	}
 
 	return sf::Vector2i(-1, -1);
@@ -277,13 +277,13 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::PlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Enemy bullets hitting the player
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -300,11 +300,10 @@ void Game::colisionChecksV2()
 					(*it2)->Death();
 
 					//FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
-					//this->addToScene(explosion, LayerType::ExplosionLayer, IndependantType::Neutral);
+					//this->addToScene(explosion, LayerType::ExplosionLayer, GameObjectType::Neutral);
 					//hide destroyed item
-					if ((*it1)->getIndependantArmor() <= 0)
+					if ((*it1)->m_armor <= 0)
 					{
-						(*it1)->visible = false;
 						(*it1)->Death();
 						//we all deserve another chance...
 						//(*it1)->Respawn();
@@ -314,7 +313,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Enemy objects
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it2 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -327,13 +326,11 @@ void Game::colisionChecksV2()
 				//TO DO : explosion impact enemy vs ship
 
 				//death of player?
-				if ((*it1)->getIndependantArmor() <= 0)
+				if ((*it1)->m_armor <= 0)
 				{
-					(*it1)->visible = false;
 					(*it1)->Death();
 					//we all deserve another chance...
-					(*it1)->Respawn();
-					hazard = 0;
+					//(*it1)->Respawn();
 				}
 
 				//player may also deal contact damage to enemy ships
@@ -342,7 +339,7 @@ void Game::colisionChecksV2()
 				//TODO: display contact feedback (small explosion?)
 
 				//death of enemy ship?
-				if ((*it2)->getIndependantArmor() <= 0)
+				if ((*it2)->m_armor <= 0)
 				{
 					(*it2)->Death();
 					
@@ -351,7 +348,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Loot
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::LootObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::LootObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -361,15 +358,14 @@ void Game::colisionChecksV2()
 				//Do something (like, take the loot)
 				if ((*it1)->GetLoot((*(*it2))))
 				{
-					(*it2)->visible = false;
-					(*it2)->isOnScene = false;
-					(*it2)->GarbageMe = true;
+					(*it2)->m_visible = false;
+					(*it2)->m_GarbageMe = true;
 				}
 			}
 		}
 
 		//Portal
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::PortalObject].begin(); it2 != sceneIndependantsTyped[IndependantType::PortalObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::PortalObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::PortalObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -381,7 +377,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Shop
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::ShopObject].begin(); it2 != sceneIndependantsTyped[IndependantType::ShopObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::ShopObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::ShopObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -394,13 +390,13 @@ void Game::colisionChecksV2()
 	}
 
 	//Then, check if any allied bullet collide with any enemy
-	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it1 != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Player bullets on enemy
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::FriendlyFire].begin(); it2 != sceneIndependantsTyped[IndependantType::FriendlyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -414,7 +410,7 @@ void Game::colisionChecksV2()
 				(*it2)->Death();
 
 				//death
-				if ((*it1)->getIndependantArmor() <= 0)
+				if ((*it1)->m_armor <= 0)
 				{
 					(*it1)->Death();
 				}
@@ -423,12 +419,12 @@ void Game::colisionChecksV2()
 	}
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<Independant*>::iterator it1 = sceneIndependantsTyped[IndependantType::FakePlayerShip].begin(); it1 != sceneIndependantsTyped[IndependantType::FakePlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::FakePlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::FakePlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
-		for (std::vector<Independant*>::iterator it2 = sceneIndependantsTyped[IndependantType::LootObject].begin(); it2 != sceneIndependantsTyped[IndependantType::LootObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::LootObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::LootObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -438,9 +434,9 @@ void Game::colisionChecksV2()
 				//Do something (like, take the loot)
 				if ((*it1)->GetLoot((*(*it2))))
 				{
-					(*it2)->visible = false;
-					(*it2)->isOnScene = false;
-					(*it2)->GarbageMe = true;
+					(*it2)->m_visible = false;
+					(*it2)->m_isOnScene = false;
+					(*it2)->m_GarbageMe = true;
 				}
 			}
 		}
@@ -454,81 +450,81 @@ void Game::cleanGarbage()
 	dt.restart();
 
 	// On "cache" les size, pour éviter d'appeler des fonctions à chaque itération
-	const size_t garbageSize = this->garbage.size();
-	const size_t sceneIndependantsSize = this->sceneIndependants.size();
+	const size_t garbageSize = m_garbage.size();
+	const size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	//Size layer
-	size_t sceneIndependantsLayeredSize[NBVAL_Layer];
+	size_t sceneGameObjectsLayeredSize[NBVAL_Layer];
 	for (int layer = 0; layer < NBVAL_Layer; layer++)
 	{
-		sceneIndependantsLayeredSize[layer] = this->sceneIndependantsLayered[layer].size();
+		sceneGameObjectsLayeredSize[layer] = m_sceneGameObjectsLayered[layer].size();
 	}
 	//Size ind type
-	size_t sceneIndependantsTypedSize[NBVAL_Independant];
-	for (int layer = 0; layer < NBVAL_Independant; layer++)
+	size_t m_sceneGameObjectsTypedSize[NBVAL_GameObject];
+	for (int layer = 0; layer < NBVAL_GameObject; layer++)
 	{
-		sceneIndependantsTypedSize[layer] = this->sceneIndependantsTyped[layer].size();
+		m_sceneGameObjectsTypedSize[layer] = m_sceneGameObjectsTyped[layer].size();
 	}
 
-	//Scene independants
+	//Scene objects
 	for (size_t i = 0; i < garbageSize; i++)
 	{
-		Independant*    pCurIndependant = this->garbage[i];
+		GameObject*    pCurGameObject = m_garbage[i];
 
 		// On remet à NULL lorsqu'on a trouvé un élément à dégager
-		for (size_t j = 0; j < sceneIndependantsSize; j++)
+		for (size_t j = 0; j < sceneGameObjectsSize; j++)
 		{
-			if (this->sceneIndependants[j] == pCurIndependant)
+			if (m_sceneGameObjects[j] == pCurGameObject)
 			{
-				this->sceneIndependants[j] = NULL;
+				m_sceneGameObjects[j] = NULL;
 				break;
 			}
 		}
 
 		// "layered"...
-		const int layer = pCurIndependant->layer;
-		for (size_t j = 0; j < sceneIndependantsLayeredSize[layer]; j++)
+		const int layer = pCurGameObject->m_layer;
+		for (size_t j = 0; j < sceneGameObjectsLayeredSize[layer]; j++)
 		{
-			if (this->sceneIndependantsLayered[layer][j] == pCurIndependant)
+			if (m_sceneGameObjectsLayered[layer][j] == pCurGameObject)
 			{
-				this->sceneIndependantsLayered[layer][j] = NULL;
+				m_sceneGameObjectsLayered[layer][j] = NULL;
 				break;
 			}
 		}
 
 		// "typed"
-		const int type = pCurIndependant->collider_type;
-		for (size_t j = 0; j < sceneIndependantsTypedSize[type]; j++)
+		const int type = pCurGameObject->m_collider_type;
+		for (size_t j = 0; j < m_sceneGameObjectsTypedSize[type]; j++)
 		{
-			if (this->sceneIndependantsTyped[type][j] == pCurIndependant)
+			if (m_sceneGameObjectsTyped[type][j] == pCurGameObject)
 			{
-				this->sceneIndependantsTyped[type][j] = NULL;
+				m_sceneGameObjectsTyped[type][j] = NULL;
 				break;
 			}
 		}
 
-		pCurIndependant->Destroy();//destructor function
+		pCurGameObject->Destroy();//destructor function
 
 		// A la fin, on delete l'élément
-		delete pCurIndependant;
+		delete pCurGameObject;
 	}
 
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
-void Game::AddIndependantToVector(Independant* pIndependant, vector<Independant*>* vector)
+void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector)
 {
 	const size_t vectorSize = vector->size();
 	for (size_t i = 0; i < vectorSize; i++)
 	{
 		if ((*vector)[i] == NULL)
 		{
-			(*vector)[i] = pIndependant;
+			(*vector)[i] = pGameObject;
 			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
 		}
 	}
 
 	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
-	vector->push_back(pIndependant);
+	vector->push_back(pGameObject);
 }
 
 void Game::collectGarbage()
@@ -536,36 +532,36 @@ void Game::collectGarbage()
 	sf::Clock dt;
 	dt.restart();
 
-	this->garbage.clear();
+	m_garbage.clear();
 
-	for (std::vector<Independant*>::iterator it = (this->sceneIndependants).begin(); it != (this->sceneIndependants).end(); it++)
+	for (std::vector<GameObject*>::iterator it = (m_sceneGameObjects).begin(); it != (m_sceneGameObjects).end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
 		//Content flagged for deletion
-		if ((**it).GarbageMe)
+		if ((**it).m_GarbageMe)
 		{
-			this->garbage.push_back(*it);
+			m_garbage.push_back(*it);
 			continue;
 		}
 
-		if (!(**it).isOnScene)
+		if (!(**it).m_isOnScene)
 		{
 			//objects that are spawning out of screen are not deleted
 			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= SCENE_SIZE_X) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= SCENE_SIZE_Y))
 			{
-				(**it).isOnScene = true;
+				(**it).m_isOnScene = true;
 			}
 		}
 
 		//Content that went on scene and then exited have to be deleted
-		if (!(**it).DontGarbageMe && (**it).isOnScene)
+		if (!(**it).m_DontGarbageMe && (**it).m_isOnScene)
 		{
 			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > SCENE_SIZE_X
 				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > SCENE_SIZE_Y)
 			{
-				this->garbage.push_back(*it);
+				m_garbage.push_back(*it);
 				continue;
 			}
 		}
@@ -578,33 +574,33 @@ void Game::collectGarbage()
 void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 {
 	int clear_count = 0;
-	for (std::vector<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[m_layer].begin(); it != m_sceneGameObjectsLayered[m_layer].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
 		if (only_offscene)
 		{
-			if (!(*it)->isOnScene)
+			if (!(*it)->m_isOnScene)
 			{
-				(*it)->GarbageMe = true;
+				(*it)->m_GarbageMe = true;
 				clear_count++;
 				//don't count them as "spawned" enemies if we cut them off this way
 				if (m_layer == EnemyObjectLayer)
 				{
-					this->hazardSpawned -= (*it)->getMoney();
+					m_hazardSpawned -= (*it)->m_money;
 				}
 			}
 		}
 		else
 		{
-			(*it)->visible = false;
-			(*it)->isOnScene = false;
-			(*it)->GarbageMe = true;
+			(*it)->m_visible = false;
+			(*it)->m_isOnScene = false;
+			(*it)->m_GarbageMe = true;
 			//don't count them as "spawned" enemies if we cut them off this way
 			if (m_layer == EnemyObjectLayer)
 			{
-				this->hazardSpawned -= (*it)->getMoney();
+				m_hazardSpawned -= (*it)->m_money;
 			}
 		}
 	}
@@ -612,7 +608,7 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 
 void Game::SetLayerRotation(LayerType m_layer, float angle)
 {
-	for (std::vector<Independant*>::iterator it = sceneIndependantsLayered[m_layer].begin(); it != sceneIndependantsLayered[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[m_layer].begin(); it != m_sceneGameObjectsLayered[m_layer].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -621,7 +617,7 @@ void Game::SetLayerRotation(LayerType m_layer, float angle)
 	}
 }
 
-bool Game::isVectorEmpty(vector <Independant*>* vector)
+bool Game::isVectorEmpty(vector <GameObject*>* vector)
 {
 	const size_t vectorSize = vector->size();
 	for (size_t i = 0; i < vectorSize; i++)
@@ -637,9 +633,9 @@ bool Game::isVectorEmpty(vector <Independant*>* vector)
 
 bool Game::isLastEnemyDead()
 {
-	if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyFire]))
+	if (!isVectorEmpty(&m_sceneGameObjectsTyped[EnemyFire]))
 		return false;
-	else if (!isVectorEmpty(&this->sceneIndependantsTyped[EnemyObject]))
+	else if (!isVectorEmpty(&m_sceneGameObjectsTyped[EnemyObject]))
 		return false;
 	
 	return true;
@@ -647,30 +643,30 @@ bool Game::isLastEnemyDead()
 
 int Game::getHazard()
 {
-	return hazard;
+	return m_hazard;
 }
 
 void Game::resetHazard(int hazard_overkill)
 {
-	hazard = hazard_overkill;
-	hazardSpawned = 0;
+	m_hazard = hazard_overkill;
+	m_hazardSpawned = 0;
 }
 
 void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore)
 {
-	this->BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
+	m_BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
 }
 
-TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range)
+TargetScan Game::FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)
 {
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type].begin(); it != m_sceneGameObjectsTyped[type].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->isOnScene && !(*it)->ghost)
+		if ((*it)->m_isOnScene && !(*it)->m_ghost)
 		{
 			const float a = ref_position.x - (*it)->getPosition().x;
 			const float b = ref_position.y - (*it)->getPosition().y;
@@ -702,17 +698,17 @@ TargetScan Game::FoundNearestIndependant(IndependantType type, sf::Vector2f ref_
 	}
 }
 
-float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_position, float range)
+float Game::GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)
 {
 	float angle = 0.f;
 	sf::Vector2f pos;
 	float shortest_distance = -1;
-	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[type].begin(); it != sceneIndependantsTyped[type].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type].begin(); it != m_sceneGameObjectsTyped[type].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->isOnScene && !(*it)->ghost)
+		if ((*it)->m_isOnScene && !(*it)->m_ghost)
 		{
 			const float a = ref_position.x - (*it)->getPosition().x;
 			const float b = ref_position.y - (*it)->getPosition().y;
@@ -736,12 +732,12 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 		{
 			shortest_distance = sqrtf(shortest_distance);
 			//angle = acos((ref_position.y - pos.y) / shortest_distance);
-			sf::Vector2f diff_position = Independant::getSize_for_Direction(this->direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
-			diff_position.x *= Independant::getDirectionMultiplier(this->direction).x;
+			sf::Vector2f diff_position = GameObject::getSize_for_Direction(m_direction, (sf::Vector2f((ref_position.y - pos.y), (ref_position.x - pos.x))));
+			diff_position.x *= GameObject::getDirectionMultiplier(m_direction).x;
 			angle = acos(diff_position.x / shortest_distance);
 			angle = angle * 180 / M_PI;
 
-			diff_position.y *= Independant::getDirectionMultiplier(this->direction).y;
+			diff_position.y *= GameObject::getDirectionMultiplier(m_direction).y;
 
 			//if (ref_position.x < pos.x)
 			if (diff_position.y < 0)
@@ -761,51 +757,51 @@ float Game::GetAngleToNearestIndependant(IndependantType type, sf::Vector2f ref_
 
 void Game::WakeUpEnemiesWithName(string m_display_name)
 {
-	for (std::vector<Independant*>::iterator it = sceneIndependantsTyped[IndependantType::EnemyObject].begin(); it != sceneIndependantsTyped[IndependantType::EnemyObject].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->display_name == m_display_name)
+		if ((*it)->m_display_name == m_display_name)
 		{
-			(*it)->wake_up = true;
+			(*it)->m_wake_up = true;
 		}
 	}
 }
 
-bool Game::InsertObjectInShipGrid(Independant& object, int index)
+bool Game::InsertObjectInShipGrid(GameObject& object, int index)
 {
-	bool result = hud.shipGrid.insertObject(object, index);
+	bool result = m_hud.shipGrid.insertObject(object, index);
 
 	return result;
 }
 
-bool Game::InsertObjectInEquipmentGrid(Independant& object, int index)
+bool Game::InsertObjectInEquipmentGrid(GameObject& object, int index)
 {
-	bool result = hud.equipmentGrid.insertObject(object, index);
+	bool result = m_hud.equipmentGrid.insertObject(object, index);
 
 	return result;
 }
 
 bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
 {
-	if (hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL)
+	if (m_hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL)
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
-		Independant* tmpShip = hud.shipGrid.getCellPointerFromIntIndex(index_ship);
+		GameObject* tmpShip = m_hud.shipGrid.getCellPointerFromIntIndex(index_ship);
 		//Equipement > Ship
-		hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
+		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
 		//Ship > equipement
-		hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, tmpShip);
+		m_hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, tmpShip);
 		tmpShip = NULL;
 	}
 	else
 	{
 		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Equiping ship #'%d'", index_ship + 1));
 		//Equipement > Ship
-		hud.shipGrid.setCellPointerForIntIndex(index_ship, hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
+		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
 		//Equipment = NULL
-		hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, NULL);
+		m_hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, NULL);
 	}
 
 	return true;
@@ -813,12 +809,12 @@ bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
 
 void Game::GarbageObjectInGrid(int grid_id, int index)
 {
-	hud.GarbageObjectInGrid(grid_id, index);
+	m_hud.GarbageObjectInGrid(grid_id, index);
 }
 
 void Game::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
 {
-	this->hud.setRemovingCursorAnimation(animation_index);
+	m_hud.setRemovingCursorAnimation(animation_index);
 }
 
 int Game::GetPlayerStatsMultiplierForLevel(int level_)

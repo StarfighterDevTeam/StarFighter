@@ -114,7 +114,7 @@
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Ship.cpp" />
-    <ClCompile Include="Independant.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Shop.cpp" />
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="TextureLoader.h" />
@@ -141,7 +141,7 @@
     <ClInclude Include="Hud.h" />
     <ClInclude Include="HudGrid.h" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
-    <ClInclude Include="Independant.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="InteractionPanel.h" />
     <ClInclude Include="Logger.h" />

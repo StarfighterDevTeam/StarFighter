@@ -14,15 +14,15 @@ const float ammoSpeedModifierTable[NB_HAZARD_LEVELS] = { 1.0, 1.1, 1.2, 1.3, 1.5
 class EnemyGenerator
 {
 public:
-	EnemyGenerator::EnemyGenerator(float m_spawnCost, int m_enemyClass, float m_spawnRepeatProbability = 0, float m_spawnMissProbability = 0);
-	sf::Clock currentClock;
-	float spawnResource;
-	float spawnCost;
-	int enemyClass;
-	float spawnRepeatProbability;
-	float spawnMissProbability;
-	float spawnCostCollateralMultiplier;
+	EnemyGenerator::EnemyGenerator(float spawnCost, int enemyClass, float spawnRepeatProbability = 0, float spawnMissProbability = 0);
 
+	sf::Clock m_currentClock;
+	float m_spawnResource;
+	float m_spawnCost;
+	int m_enemyClass;
+	float m_spawnRepeatProbability;
+	float m_spawnMissProbability;
+	float m_spawnCostCollateralMultiplier;
 };
 
 
