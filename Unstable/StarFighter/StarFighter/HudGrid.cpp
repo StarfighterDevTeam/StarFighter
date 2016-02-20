@@ -126,7 +126,7 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 
 int ObjectGrid::isCursorColling(GameObject& cursor)
 {
-	if (!cursor.visible)
+	if (!cursor.m_visible)
 	{
 		return -1;
 	}

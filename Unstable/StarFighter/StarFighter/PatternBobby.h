@@ -36,6 +36,7 @@ public:
 	void SetPattern(PatternType pt, float patternSpeed, vector<float>*  args);
 	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
 	static PatternBobby* PatternLoader(vector<string> line_data, int index);
+
 	PatternType currentPattern;
 	vector<float>* patternParams;
 	float patternSpeed;

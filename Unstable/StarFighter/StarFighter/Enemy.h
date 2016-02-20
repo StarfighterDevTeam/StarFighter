@@ -34,52 +34,64 @@ const int XPTable_PerEnemyClass[EnemyClass::NBVAL_EnemyClass] = { 0, 10, 10, 30,
 class Enemy : public GameObject
 {
 public:
-	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber = 1, int m_animationNumber = 1);
+	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber = 1, int animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void UpdateHealthBars(sf::Time deltaTime);
-	vector<Weapon*> weapons_list;
-	Enemy* Clone();
-	FX* FX_death;
-	void Death() override;
+
+	vector<Weapon*> m_weapons_list;
+	FX* m_FX_death;
+
+	Enemy* Clone();void Death() override;
 	void Destroy() override;
-	float radius;
-	float angspeed;
+
+	float m_radius;
+	float m_angspeed;
+
 	void GenerateLoot() override;
 	bool CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus = 0, bool force_BeastScale = false, float BeastScale_min = 0.0f, float BeastScale_max = 6.0f);
 	void damage_from(GameObject& object) override;
-	EnemyClass enemy_class;
+
+	EnemyClass m_enemy_class;
 
 	//phases
 	void setPhase(Phase* phase);
 	Phase* getPhase(string phaseName);
-	Phase* currentPhase;
-	vector <Phase*> phases;
-	bool hasPhases;
+	Phase* m_currentPhase;
+
+	vector <Phase*> m_phases;
+	bool m_hasPhases;
+
 	bool CheckCondition();
-	sf::Time phaseTimer;
-	sf::Time enemyTimer;
+
+	sf::Time m_phaseTimer;
+	sf::Time m_enemyTimer;
+
 	static Phase* LoadPhase(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);
-	bool face_target;
-	bool reset_facing;
-	BouncingType bouncing;
+
+	bool m_face_target;
+	bool m_reset_facing;
+	BouncingType m_bouncing;
 	int m_shots_fired;
 
-	sf::RectangleShape* armorBar;
-	sf::RectangleShape* armorBarContainer;
-	sf::RectangleShape* shieldBar;
-	sf::RectangleShape* shieldBarContainer;
-	sf::Text enemyLevel;
-	sf::Font* font;
-	float armorBar_offsetY;
-	float shieldBar_offsetY;
+	sf::RectangleShape* m_armorBar;
+	sf::RectangleShape* m_armorBarContainer;
+	sf::RectangleShape* m_shieldBar;
+	sf::RectangleShape* m_shieldBarContainer;
+	sf::Text m_enemyLevel;
+	sf::Font* m_font;
+	float m_armorBar_offsetY;
+	float m_shieldBar_offsetY;
+
 	//float offsetBetweenHealthBars;
 	void RotateFeedbacks(float angle);
-	sf::Time feedbackTimer;
 
-	int level;
+	sf::Time m_feedbackTimer;
+
+	int m_level;
+
 	void ApplyLevelModifiers();
 
 private:
@@ -89,14 +101,14 @@ private:
 struct EnemyBase
 {
 public:
-	Enemy* enemy;
-	int probability;
-	int enemyclass;
-	float spawnCost;
-	float repeatChance;
-	float missChance;
-	int proba_min;//interval of dice roll values for a hit
-	int proba_max;
+	Enemy* m_enemy;
+	int m_probability;
+	int m_enemyclass;
+	float m_spawnCost;
+	float m_repeatChance;
+	float m_missChance;
+	int m_proba_min;//interval of dice roll values for a hit
+	int m_proba_max;
 };
 
 #endif // INDEPENDANT_H_INCLUDED

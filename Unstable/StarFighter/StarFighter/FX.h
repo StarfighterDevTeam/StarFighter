@@ -8,37 +8,39 @@
 class FX : public GameObject
 {
 public:
-	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, sf::Time m_duration, int m_animationNumber = 1);
+	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, sf::Time duration, int animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 
 	FX* Clone();
-	int frameNumber;
+
+	int m_frameNumber;
 
 private:
-	sf::Clock deltaClockExploding;
-	bool exploding;
-	sf::Time duration;
+	sf::Clock m_deltaClockExploding;
+	bool m_exploding;
+	sf::Time m_duration;
 };
 
 class Aura : public FX
 {
 public:
-	Aura(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
-	void Init(std::string m_textureName, sf::Vector2f dsize, int m_frameNumber);
+	Aura(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber = 1);
+	void Init(std::string textureName, sf::Vector2f dsize, int frameNumber);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	Aura* Clone();
-	GameObject* target;
-	sf::Vector2f offset;
+
+	GameObject* m_target;
+	sf::Vector2f m_offset;
 
 private:
-	sf::Clock deltaClockExploding;
-	sf::Time duration;
+	sf::Clock m_deltaClockExploding;
+	sf::Time m_duration;
 };
 
 class FakeShip : public Aura
 {
 public:
-	FakeShip(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber = 1);
+	FakeShip(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	bool GetLoot(GameObject& GameObject) override;
 };

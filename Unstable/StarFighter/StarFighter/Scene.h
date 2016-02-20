@@ -38,44 +38,47 @@ public:
 	void GenerateEnemies(Time deltaTime);
 	void GenerateBoss();
 	void LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
+
 	string m_name;
-	float vspeed;
+	float m_vspeed;
 	bool m_hazardbreak_has_occurred;
 
 	float getSceneBeastScore();
-	
 	void DestroyScene();
 
-	Background* bg;
-	Directions direction;
-	bool generating_enemies;
-	bool generating_boss;
-	sf::Clock spawnClock;
+	Background* m_bg;
+	Directions m_direction;
+	bool m_generating_enemies;
+	bool m_generating_boss;
+	sf::Clock m_spawnClock;
 
 	int getSceneHazardLevelUnlockedValue();
 	int getSceneHazardLevelValue();
-	std::string links[Directions::NO_DIRECTION];
 
-	vector<EnemyGenerator*> sceneEnemyGenerators;
+	std::string m_links[Directions::NO_DIRECTION];
+
+	vector<EnemyGenerator*> m_sceneEnemyGenerators;
+
 	void GenerateEnemiesv2(Time deltaTime);
 	void SpawnEnemy(int enemy_class);
 	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
-	void ApplyHazardLevelModifiers(int hazard_level_, Enemy& enemy_);
+	void ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy);
 
 	void HazardBreak();
-	int m_hazard_level_unlocked;
-	bool canHazardBreak;
-	vector <string> scenesLinkedToUpdate;
 
+	int m_hazard_level_unlocked;
+	bool m_canHazardBreak;
+	vector <string> m_scenesLinkedToUpdate;
 	sf::Text m_textHazardBreak;
 	sf::Font* m_fontHazardBreak;
+
 	void DisplayDestructions(bool hazard_break = false);
 	bool IsLastSceneBeforeHub();
 
 private:
-	vector<EnemyBase*> boss_list;
-	vector<EnemyBase*> enemies_ranked_by_class[NBVAL_EnemyClass];
-	int total_class_probability[NBVAL_EnemyClass];
+	vector<EnemyBase*> m_boss_list;
+	vector<EnemyBase*> m_enemies_ranked_by_class[NBVAL_EnemyClass];
+	int m_total_class_probability[NBVAL_EnemyClass];
 	int m_hazard_level;
 
 };

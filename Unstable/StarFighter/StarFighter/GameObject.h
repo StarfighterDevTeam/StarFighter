@@ -20,7 +20,9 @@ class Loot;
 
 enum FighterStats
 {
+	Fighter_Armor,
 	Fighter_ArmorMax,
+	Fighter_Shield,
 	Fighter_ShieldMax,
 	Fighter_ShieldRegen,
 	Fighter_ContactDamage,
@@ -187,7 +189,7 @@ enum EquipmentType {
 class GameObject : public AnimatedSprite
 {
 public:
-	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber = 1, int m_animationNumber = 1);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	GameObject();
@@ -197,21 +199,16 @@ public:
 	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier = 1);
 	virtual void updateAnimation(sf::Time deltaTime);
 	virtual void updatePostCollision();
-	bool visible;
-	bool isOnScene;
-	bool GarbageMe;
-	bool DontGarbageMe;
-	GameObjectType collider_type;
-	LayerType layer;
-	virtual void damage_from(GameObject& object);
+
+	bool m_visible;
+	bool m_isOnScene;
+	bool m_GarbageMe;
+	bool m_DontGarbageMe;
+	GameObjectType m_collider_type;
+	LayerType m_layer;
 	sf::Vector2f m_size;
-	sf::Vector2f getGameObjectSpeed();
-	int getGameObjectDamage();
-	int getGameObjectArmor();
-	int getGameObjectArmorMax();
-	int getGameObjectShield();
-	int getGameObjectShieldMax();
-	int getGameObjectShieldRegen();
+
+	virtual void damage_from(GameObject& object);
 	string getName();
 	virtual void Respawn();
 	GameObject* Clone();
@@ -219,7 +216,6 @@ public:
 	virtual void Destroy();
 	virtual void GenerateLoot();
 
-	int getMoney();
 	void addMoney(int loot_value);
 	void setMoney(int loot_value);
 	bool get_money_from(GameObject& object);
@@ -228,7 +224,7 @@ public:
 	virtual void GetPortal(GameObject* object);
 	virtual void GetShop(GameObject* object);
 	void setGhost(bool m_ghost);
-	void setAnimationLine(int m_animation_line, bool keep_frame_index = false);
+	void setAnimationLine(int animation_line, bool keep_frame_index = false);
 
 	bool get_equipment_from(GameObject& object);
 	bool setEquipmentLoot(Equipment* equipment);
@@ -240,29 +236,30 @@ public:
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
 
-	InteractionType isCollidingWithInteractiveObject;
-	InteractionType previouslyCollidingWithInteractiveObject;
+	InteractionType m_isCollidingWithInteractiveObject;
+	InteractionType m_previouslyCollidingWithInteractiveObject;
 
 	virtual void GetGrazing();
 	void GetPolarMovement(sf::Vector2f* np);
-	int damage;
-	int armor;
-	int armor_max;
-	int shield;
-	int shield_max;
-	int shield_regen;
-	sf::Vector2f speed;
-	PatternBobby Pattern;
-	float diag;
-	std::string display_name;
-	bool transparent;
-	bool ghost;
-	bool disable_fire;
-	bool wake_up;
-	float rotation_speed;
-	int animationNumber;
-	int frameNumber;
-	int currentAnimationIndex;
+
+	int m_damage;
+	int m_armor;
+	int m_armor_max;
+	int m_shield;
+	int m_shield_max;
+	int m_shield_regen;
+	sf::Vector2f m_speed;
+	PatternBobby m_Pattern;
+	float m_diag;
+	std::string m_display_name;
+	bool m_transparent;
+	bool m_ghost;
+	bool m_disable_fire;
+	bool m_wake_up;
+	float m_rotation_speed;
+	int m_animationNumber;
+	int m_frameNumber;
+	int m_currentAnimationIndex;
 
 	//TIPS:
 	// direction = the scene border you refer too
@@ -291,24 +288,26 @@ public:
 	//utilitary methods
 	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
 
-	int money;
-	Equipment* equipment_loot;
-	Weapon* weapon_loot;
-	std::string textureName;
-	bool immune;
+	int m_money;
+	Equipment* m_equipment_loot;
+	Weapon* m_weapon_loot;
+	std::string m_textureName;
+	bool m_immune;
+
+	virtual float getFighterFloatStatValue(FighterStats stat);
+	virtual int getFighterIntStatValue(FighterStats stat);
+
 protected:
-	sf::Vector2f initial_position;
-	bool startPattern;
+	sf::Vector2f m_initial_position;
+	bool m_startPattern;
+	sf::Clock m_immunityTimer;
 	
-	Animation defaultAnimation;
-	Animation* currentAnimation;
+	Animation m_defaultAnimation;
+	Animation* m_currentAnimation;
 
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber = 1);
 	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber = 1, int m_animationNumber = 1);
-	
-	sf::Clock immunityTimer;
-	
 };
 
 #endif // INDEPENDANT_H_INCLUDED

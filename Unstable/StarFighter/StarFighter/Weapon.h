@@ -18,49 +18,50 @@ public:
 	Weapon(Ammo* Ammunition);
 	~Weapon();
 
-	std::string textureName;
-	sf::Vector2f size;
-	int frameNumber;
-	std::string display_name;
-	sf::Vector2f speed;
-	bool firing_ready;
+	std::string m_textureName;
+	sf::Vector2f m_size;
+	int m_frameNumber;
+	std::string m_display_name;
+	sf::Vector2f m_speed;
+	bool m_firing_ready;
+
 	void Fire(GameObjectType m_collider_type, sf::Time deltaTime = sf::seconds(0), float hyperspeedMultiplier = 1.0f);
 	bool isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier);
+	void CreateBullet(GameObjectType collider_type, float offsetX=0, float dispersion=0);
 
-	void CreateBullet(GameObjectType m_collider_type, float offsetX=0, float dispersion=0);
-	
-	void FireSingleShot(GameObjectType m_collider_type);
-	void FireMultiShot(GameObjectType m_collider_type);
-	void FireAlternateShot(GameObjectType m_collider_type);
-	void FireAscendingShot(GameObjectType m_collider_type);
-	void FireDescendingShot(GameObjectType m_collider_type);
-	sf::Vector2i fire_direction;
-	float rate_of_fire;
-	sf::Time readyFireTimer;
-	Ammo* ammunition;
+	void FireSingleShot(GameObjectType collider_type);
+	void FireMultiShot(GameObjectType collider_type);
+	void FireAlternateShot(GameObjectType collider_type);
+	void FireAscendingShot(GameObjectType collider_type);
+	void FireDescendingShot(GameObjectType collider_type);
+
+	sf::Vector2i m_fire_direction;
+	float m_rate_of_fire;
+	sf::Time m_readyFireTimer;
+	Ammo* m_ammunition;
 	bool m_isReadyToFire;
+	TargetSeaking m_target_seaking;
 
-	TargetSeaking target_seaking;
-	void SeakTarget(GameObjectType m_collider_type);
+	void SeakTarget(GameObjectType collider_type);
 
 	//special weapon abilities
-	int multishot;
-	int xspread;
-	ShotMode shot_mode;
-	int shot_index;
-	float dispersion;
-	int rafale;
-	int rafale_index;
-	float rafale_cooldown;
-	float angle_offset;
-	float delay;
-	sf::Vector2f weaponOffset;
-	sf::Vector2f weapon_current_offset;
-	float shot_angle;
-	bool face_target;
+	int m_multishot;
+	int m_xspread;
+	ShotMode m_shot_mode;
+	int m_shot_index;
+	float m_dispersion;
+	int m_rafale;
+	int m_rafale_index;
+	float m_rafale_cooldown;
+	float m_angle_offset;
+	float m_delay;
+	sf::Vector2f m_weaponOffset;
+	sf::Vector2f m_weapon_current_offset;
+	float m_shot_angle;
+	bool m_face_target;
 
-	int level;
-	int credits;
+	int m_level;
+	int m_credits;
 	
 	sf::Vector2i getFireDirection_for_Direction (Directions direction);
 	Weapon* Clone();
@@ -68,7 +69,7 @@ public:
 	static Weapon* CreateRandomWeapon(int credits_, int level, bool is_bot);
 
 private:
-	bool fire_pattern_return;
+	bool m_fire_pattern_return;
 };
 
 #endif // WEAPON_H_INCLUDED

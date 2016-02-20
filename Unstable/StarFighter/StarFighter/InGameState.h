@@ -10,13 +10,12 @@
 class InGameState : public GameState
 {
 public:
-	Ship* playerShip;
-	Scene* currentScene;
-	Scene* nextScene;
-	map<string, int> knownScenes;
-	string currentSceneSave;
-
-	InGameStateMachine IG_State;
+	Ship* m_playerShip;
+	Scene* m_currentScene;
+	Scene* m_nextScene;
+	map<string, int> m_knownScenes;
+	string m_currentSceneSave;
+	InGameStateMachine m_IG_State;
 
 	void Initialize(Player player);
 	void Update(Time deltaTime);
@@ -28,9 +27,11 @@ public:
 	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level);
 	int GetSceneHazardLevelUnlocked(string scene_name);
 	void InGameStateMachineCheck(sf::Time deltaTime);
-	sf::Clock clockHubExit;
-	sf::Clock bossSpawnCountdown;
-	bool hasDisplayedDestructionRatio;
+
+	sf::Clock m_clockHubExit;
+	sf::Clock m_bossSpawnCountdown;
+	bool m_hasDisplayedDestructionRatio;
+
 	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_);
 	void RespawnInLastHub();
 

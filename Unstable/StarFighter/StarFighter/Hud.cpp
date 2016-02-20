@@ -265,30 +265,30 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		if (hud_cursor->getPosition().x < hud_cursor->m_size.x / 2)
 		{
 			hud_cursor->setPosition(hud_cursor->m_size.x / 2, hud_cursor->getPosition().y);
-			hud_cursor->speed.x = 0;
+			hud_cursor->m_speed.x = 0;
 		}
 
 		if (hud_cursor->getPosition().x >(SCENE_SIZE_X / 3) - (hud_cursor->m_size.x / 2))
 		{
 			hud_cursor->setPosition((SCENE_SIZE_X / 3) - (hud_cursor->m_size.x / 2), hud_cursor->getPosition().y);
-			hud_cursor->speed.x = 0;
+			hud_cursor->m_speed.x = 0;
 		}
 
 		if (hud_cursor->getPosition().y < hud_cursor->m_size.y / 2)
 		{
 			hud_cursor->setPosition(hud_cursor->getPosition().x, hud_cursor->m_size.y / 2);
-			hud_cursor->speed.y = 0;
+			hud_cursor->m_speed.y = 0;
 		}
 
 		if (hud_cursor->getPosition().y > SCENE_SIZE_Y - (hud_cursor->m_size.y / 2))
 		{
 			hud_cursor->setPosition(hud_cursor->getPosition().x, SCENE_SIZE_Y - (hud_cursor->m_size.y / 2));
-			hud_cursor->speed.y = 0;
+			hud_cursor->m_speed.y = 0;
 		}
 	}
 	
 	//clean old focus
-	hud_cursor->visible = has_focus;
+	hud_cursor->m_visible = has_focus;
 
 	focused_grid_and_index = sf::Vector2i((int)HudGrid_NoFocus, -1);
 	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())

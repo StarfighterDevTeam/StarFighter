@@ -2,68 +2,68 @@
 
 extern Game* CurrentGame;
 
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* m_FX_death, int m_frameNumber, int m_animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), m_frameNumber, m_animationNumber)
+Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), frameNumber, animationNumber)
 {
-	collider_type = GameObjectType::EnemyObject;
-	visible = true;
-	angspeed = 0;
-	radius = 0;
-	FX_death = m_FX_death;
-	hasPhases = false;
-	rotation_speed = 0;
-	face_target = false;
-	reset_facing = false;
-	bouncing = NoBouncing;
-	enemyTimer = sf::seconds(0);
-	level = 1;
+	m_collider_type = GameObjectType::EnemyObject;
+	m_visible = true;
+	m_angspeed = 0;
+	m_radius = 0;
+	m_FX_death = FX_death;
+	m_hasPhases = false;
+	m_rotation_speed = 0;
+	m_face_target = false;
+	m_reset_facing = false;
+	m_bouncing = NoBouncing;
+	m_enemyTimer = sf::seconds(0);
+	m_level = 1;
 
 	//life bars
-	feedbackTimer = sf::seconds(0);
+	m_feedbackTimer = sf::seconds(0);
 
-	armorBar_offsetY = - (m_size.y / 2) - (ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2) - ENEMY_HP_BAR_OFFSET_Y;
-	shieldBar_offsetY = - (m_size.y / 2) - (1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y) - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y;
-	//offsetBetweenHealthBars = armorBar_offsetY - shieldBar_offsetY;
+	m_armorBar_offsetY = - (m_size.y / 2) - (ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2) - ENEMY_HP_BAR_OFFSET_Y;
+	m_shieldBar_offsetY = - (m_size.y / 2) - (1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y) - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y;
+	//m_offsetBetweenHealthBars = armorBar_offsetY - shieldBar_offsetY;
 
-	armorBar = new RectangleShape();
-	armorBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	armorBar->setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
-	armorBar->setOutlineThickness(0);
-	armorBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_armorBar = new RectangleShape();
+	m_armorBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_armorBar->setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
+	m_armorBar->setOutlineThickness(0);
+	m_armorBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 
-	armorBarContainer = new RectangleShape();
-	armorBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	armorBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
-	armorBarContainer->setOutlineThickness(0);
-	//armorBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
-	armorBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_armorBarContainer = new RectangleShape();
+	m_armorBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_armorBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
+	m_armorBarContainer->setOutlineThickness(0);
+	//m_armorBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
+	m_armorBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 
-	shieldBar = new RectangleShape();
-	shieldBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	shieldBar->setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
-	shieldBar->setOutlineThickness(0);
-	shieldBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-	shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+	m_shieldBar = new RectangleShape();
+	m_shieldBar->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_shieldBar->setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
+	m_shieldBar->setOutlineThickness(0);
+	m_shieldBar->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_shieldBar->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
 
-	shieldBarContainer = new RectangleShape();
-	shieldBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-	shieldBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
-	shieldBarContainer->setOutlineThickness(0);
-	//shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
-	shieldBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
-	shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+	m_shieldBarContainer = new RectangleShape();
+	m_shieldBarContainer->setSize(sf::Vector2f(ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	m_shieldBarContainer->setFillColor(sf::Color(0, 0, 0, 128));
+	m_shieldBarContainer->setOutlineThickness(0);
+	//m_shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
+	m_shieldBarContainer->setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
+	m_shieldBarContainer->setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
 
 	try
 	{
-		font = new sf::Font();
-		if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		m_font = new sf::Font();
+		if (!m_font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
 		{
 			// error
 			//TODO: font loader
 		}
-		enemyLevel.setFont(*font);
-		enemyLevel.setCharacterSize(12);
-		enemyLevel.setColor(sf::Color::White);
-		enemyLevel.setPosition(getPosition().x, getPosition().y);
+		m_enemyLevel.setFont(*m_font);
+		m_enemyLevel.setCharacterSize(12);
+		m_enemyLevel.setColor(sf::Color::White);
+		m_enemyLevel.setPosition(getPosition().x, getPosition().y);
 	}
 
 	catch (const std::exception & ex)
@@ -76,54 +76,54 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 void Enemy::UpdateHealthBars(sf::Time deltaTime)
 {
 	//health bars feedbacks
-	if (feedbackTimer > sf::seconds(0))
+	if (m_feedbackTimer > sf::seconds(0))
 	{
-		feedbackTimer -= deltaTime;
+		m_feedbackTimer -= deltaTime;
 
-		float angle_rad = GameObject::getRotation_for_Direction((*CurrentGame).direction) / 180 * M_PI;
-		if (armorBar)
+		float angle_rad = GameObject::getRotation_for_Direction((*CurrentGame).m_direction) / 180 * M_PI;
+		if (m_armorBar)
 		{
-			armorBar->setPosition(this->getPosition().x - (this->armorBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->armorBar_offsetY * cos(angle_rad)));
-			armorBarContainer->setPosition(this->getPosition().x - (this->armorBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->armorBar_offsetY * cos(angle_rad)));
+			m_armorBar->setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
+			m_armorBarContainer->setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
 
 			//TODO: screen borders constraints
-			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), armorBar->getSize()));
-			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
+			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), armorBar->getSize()));
+			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
 
 			//update size (damage)
-			armorBar->setSize(sf::Vector2f(1.0f * armor / armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-			if (feedbackTimer <= sf::seconds(0))
+			m_armorBar->setSize(sf::Vector2f(1.0f * m_armor / m_armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+			if (m_feedbackTimer <= sf::seconds(0))
 			{
-				(*CurrentGame).removeFromFeedbacks(armorBar);
-				(*CurrentGame).removeFromFeedbacks(armorBarContainer);
+				(*CurrentGame).removeFromFeedbacks(m_armorBar);
+				(*CurrentGame).removeFromFeedbacks(m_armorBarContainer);
 			}
 		}
-		if (shieldBar)
+		if (m_shieldBar)
 		{
-			shieldBar->setPosition(this->getPosition().x - (this->shieldBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->shieldBar_offsetY * cos(angle_rad)));
-			shieldBarContainer->setPosition(this->getPosition().x - (this->shieldBar_offsetY * sin(angle_rad)), this->getPosition().y + (this->shieldBar_offsetY * cos(angle_rad)));
+			m_shieldBar->setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
+			m_shieldBarContainer->setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
 
 			//TODO: screen borders constraints
-			//shieldBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBar->getPosition(), shieldBar->getSize()));
-			//shieldBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
+			//shieldBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBar->getPosition(), shieldBar->getSize()));
+			//shieldBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
 			//if shield bar touches screen, we need to move both bars
-			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
-			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+			//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+			//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
 
-			shieldBar->setSize(sf::Vector2f(1.0f * shield / shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+			m_shieldBar->setSize(sf::Vector2f(1.0f * m_shield / m_shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 
-			if (feedbackTimer <= sf::seconds(0))
+			if (m_feedbackTimer <= sf::seconds(0))
 			{
-				(*CurrentGame).removeFromFeedbacks(shieldBar);
-				(*CurrentGame).removeFromFeedbacks(shieldBarContainer);
+				(*CurrentGame).removeFromFeedbacks(m_shieldBar);
+				(*CurrentGame).removeFromFeedbacks(m_shieldBarContainer);
 			}
 		}
 
 		//update enemy level display
-		enemyLevel.setPosition(sf::Vector2f(armorBarContainer->getPosition().x - armorBarContainer->getGlobalBounds().width / 2 - enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, armorBarContainer->getPosition().y - enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
-		if (feedbackTimer <= sf::seconds(0))
+		m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer->getPosition().x - m_armorBarContainer->getGlobalBounds().width / 2 - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, m_armorBarContainer->getPosition().y - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
+		if (m_feedbackTimer <= sf::seconds(0))
 		{
-			(*CurrentGame).removeFromFeedbacks(&enemyLevel);
+			(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
 		}
 	}
 }
@@ -135,50 +135,50 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//slow motion
 	if (hyperspeedMultiplier < 1.0f)
 	{
-		phaseTimer += deltaTime * hyperspeedMultiplier;;
-		enemyTimer += deltaTime * hyperspeedMultiplier;;
+		m_phaseTimer += deltaTime * hyperspeedMultiplier;;
+		m_enemyTimer += deltaTime * hyperspeedMultiplier;;
 	}
 	else
 	{
-		phaseTimer += deltaTime;
-		enemyTimer += deltaTime;
+		m_phaseTimer += deltaTime;
+		m_enemyTimer += deltaTime;
 	}
 
 	//shield regen if not maximum
 	static double shield_regen_buffer = 0;
-	if (shield < shield_max && shield > 0)
+	if (m_shield < m_shield_max && m_shield > 0)
 	{
 		if (hyperspeedMultiplier < 1.0f)
 		{
-			shield_regen_buffer += shield_regen*deltaTime.asSeconds() * hyperspeedMultiplier;
+			shield_regen_buffer += m_shield_regen*deltaTime.asSeconds() * hyperspeedMultiplier;
 		}
 		else
 		{
-			shield_regen_buffer += shield_regen*deltaTime.asSeconds();
+			shield_regen_buffer += m_shield_regen*deltaTime.asSeconds();
 		}
 		
 		if (shield_regen_buffer > 1)
 		{
 			double intpart;
 			shield_regen_buffer = modf(shield_regen_buffer, &intpart);
-			shield += intpart;
+			m_shield += intpart;
 		}
 
 		//canceling over-regen
-		if (shield > shield_max)
+		if (m_shield > m_shield_max)
 		{
-			shield = shield_max;
+			m_shield = m_shield_max;
 		}
 	}
 
 	//movement
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->speed;
+	newspeed = m_speed;
 
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+		newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
+		newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
 	}
 
 	float l_hyperspeedMultiplier = 1.0f;
@@ -190,15 +190,15 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	bool l_ghost = false;
-	if (this->hasPhases)
+	if (m_hasPhases)
 	{
-		for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
+		for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
 		{
-			l_ghost = l_ghost || (this->currentPhase->modifiers[i] == Ghost);
+			l_ghost = l_ghost || (m_currentPhase->m_modifiers[i] == Ghost);
 		}
 	}
-	this->setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
-	this->disable_fire = hyperspeedMultiplier > 1.0f;
+	setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
+	m_disable_fire = hyperspeedMultiplier > 1.0f;
 
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
 	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
@@ -206,75 +206,75 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//call bobbyPattern
 	if (hyperspeedMultiplier < 1.0f)
 	{
-		offset = Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
+		offset = m_Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier);
 	}
 	else
 	{
-		offset = Pattern.GetOffset(deltaTime.asSeconds());
+		offset = m_Pattern.GetOffset(deltaTime.asSeconds());
 	}
 	
-	offset = GameObject::getSpeed_for_Direction((*CurrentGame).direction, offset);
+	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 
 	newposition.x += offset.x;
 	newposition.y += offset.y;
 	
-	this->setPosition(newposition.x, newposition.y);
+	setPosition(newposition.x, newposition.y);
 
-	if (this->bouncing != NoBouncing)
+	if (m_bouncing != NoBouncing)
 	{
-		if (this->bouncing != BouncingVertical)
+		if (m_bouncing != BouncingVertical)
 		{
 			if (newposition.x < this->m_size.x / 2)
 			{
-				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 				{
-					this->Pattern.patternSpeed *= -1;
+					m_Pattern.patternSpeed *= -1;
 				}
 				else
 				{
-					this->speed.x *= -1;
+					m_speed.x *= -1;
 				}
 				this->setPosition(this->m_size.x / 2, newposition.y);
 			}
 
 			else if (newposition.x > SCENE_SIZE_X - this->m_size.x / 2)
 			{
-				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 				{
-					this->Pattern.patternSpeed *= -1;
+					m_Pattern.patternSpeed *= -1;
 				}
 				else
 				{
-					this->speed.x *= -1;
+					m_speed.x *= -1;
 				}
-				this->setPosition(SCENE_SIZE_X - this->m_size.x / 2, newposition.y);
+				setPosition(SCENE_SIZE_X - this->m_size.x / 2, newposition.y);
 			}
 		}
 		
-		if (this->bouncing != BouncingHorizontal && hyperspeedMultiplier <= 1)
+		if (m_bouncing != BouncingHorizontal && hyperspeedMultiplier <= 1)
 		{
-			if (newposition.y < this->m_size.y / 2)
+			if (newposition.y < m_size.y / 2)
 			{
-				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 				{
-					this->speed.y *= -1;
+					m_speed.y *= -1;
 				}
 				else
 				{
-					this->currentPhase->Pattern->patternSpeed *= -1;
+					m_currentPhase->m_Pattern->patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, this->m_size.y / 2);
 			}
 
 			else if (newposition.y > SCENE_SIZE_Y - this->m_size.y / 2)
 			{
-				if ((*CurrentGame).direction == DIRECTION_UP || (*CurrentGame).direction == DIRECTION_DOWN)
+				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 				{
-					this->speed.y *= -1;
+					m_speed.y *= -1;
 				}
 				else
 				{
-					this->currentPhase->Pattern->patternSpeed *= -1;
+					m_currentPhase->m_Pattern->patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 			}
@@ -286,19 +286,19 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//calculating the angle we want to face, if any
 	bool isNearestTargetIsKnown = false;
-	if (this->reset_facing)
+	if (m_reset_facing)
 	{
-		target_angle = GameObject::getRotation_for_Direction((*CurrentGame).direction);	
+		target_angle = GameObject::getRotation_for_Direction((*CurrentGame).m_direction);	
 	}
-	else if (this->face_target)
+	else if (m_face_target)
 	{
-		target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
+		target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
 		isNearestTargetIsKnown = true;
 	}
 
 	//calculating the weapons cooldown and targets
 	bool isDoneFiringOnLockedTarget = true;
-	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
 	{
 		if ((*it)->isFiringReady(deltaTime, hyperspeedMultiplier))//update all weapons cooldown
 		{
@@ -306,9 +306,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//now acquire target is the weapons needs to
 			if (!isNearestTargetIsKnown)//maybe we know it already?
 			{
-				if ((*it)->target_seaking == SEAKING || ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale_index == 0))
+				if ((*it)->m_target_seaking == SEAKING || ((*it)->m_target_seaking == SEMI_SEAKING && (*it)->m_rafale_index == 0))
 				{
-					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
+					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
 				}
 			}
 		}
@@ -318,9 +318,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 
 		//semi-seaking and rafale not ended or alternated multishot not ended need to keep the enemy oriented to the same target if it's "semi_seaking"
-		if (this->face_target)
+		if (m_face_target)
 		{
-			if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale > 0 && (((*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale) || ((*it)->multishot > 1 && (*it)->shot_index > 0)))
+			if ((*it)->m_target_seaking == SEMI_SEAKING && (*it)->m_rafale > 0 && (((*it)->m_rafale_index > 0 && (*it)->m_rafale_index < (*it)->m_rafale) || ((*it)->m_multishot > 1 && (*it)->m_shot_index > 0)))
 			{
 				isDoneFiringOnLockedTarget = false;
 			}
@@ -334,9 +334,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	else if (delta < -180)
 		delta += 360;
 
-	if (!this->face_target && !this->reset_facing)
+	if (!m_face_target && !m_reset_facing)
 	{
-		this->rotate(this->rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+		rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 	}
 	else
 	{
@@ -345,72 +345,72 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//now let's rotate toward the target (the player)
 			if (delta >= 0)
 			{
-				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
+				if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
 				{
-					this->rotate(-abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+					rotate(-abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 				}
 				else
 				{
-					this->setRotation(target_angle);
+					setRotation(target_angle);
 				}
 			}
 			else
 			{
-				if (abs(delta) > abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
+				if (abs(delta) > abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier)
 				{
-					this->rotate(abs(this->rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+					rotate(abs(m_rotation_speed)*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 				}
 				else
 				{
-					this->setRotation(target_angle);
+					setRotation(target_angle);
 				}
 			}
 		}
 	}
 
 	//automatic fire
-	if (!this->weapons_list.empty())
+	if (!m_weapons_list.empty())
 	{
-		if (this->isOnScene)
+		if (m_isOnScene)
 		{
-			for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+			for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
 			{
-				if (!this->disable_fire)
+				if (!m_disable_fire)
 				{
-					if (this->phaseTimer.asSeconds() < (*it)->delay)
+					if (m_phaseTimer.asSeconds() < (*it)->m_delay)
 					{
 						//do nothing: this weapon is settled to start firing later (delay)
 					}
 					else if ((*it)->m_isReadyToFire)
 					{
-						if (this->face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
+						if (m_face_target && abs(delta) > 1.0f && isDoneFiringOnLockedTarget)//let's take delta>1 as an epsilon
 						{
 							//do nothing
 						}
 						else
 						{
-							if ((*it)->target_seaking == SEMI_SEAKING && (*it)->rafale > 0 && (((*it)->rafale_index > 0 && (*it)->rafale_index < (*it)->rafale) || ((*it)->multishot > 1 && (*it)->shot_index > 0)))
+							if ((*it)->m_target_seaking == SEMI_SEAKING && (*it)->m_rafale > 0 && (((*it)->m_rafale_index > 0 && (*it)->m_rafale_index < (*it)->m_rafale) || ((*it)->m_multishot > 1 && (*it)->m_shot_index > 0)))
 							{
 								//semi-seaking and rafale not ended or alternated multishot not ended = no update of target or weapon position
 							}
 							else
 							{
 								//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
-								float theta = (this->getRotation() + (*it)->angle_offset) / 180 * M_PI;
-								if ((*it)->target_seaking != NO_SEAKING)
+								float theta = (getRotation() + (*it)->m_angle_offset) / 180 * M_PI;
+								if ((*it)->m_target_seaking != NO_SEAKING)
 								{
 									theta -= delta / 180 * M_PI;
 								}
 
-								(*it)->weapon_current_offset.x = (*it)->weaponOffset.x - this->m_size.x / 2 * sin(theta);
-								(*it)->weapon_current_offset.y = (*it)->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+								(*it)->m_weapon_current_offset.x = (*it)->m_weaponOffset.x - m_size.x / 2 * sin(theta);
+								(*it)->m_weapon_current_offset.y = (*it)->m_weaponOffset.y + m_size.y / 2 * cos(theta);
 
 								//transmitting the angle to the weapon, which will pass it to the bullets
-								(*it)->shot_angle = theta;
+								(*it)->m_shot_angle = theta;
 							}
 
-							(*it)->setPosition(this->getPosition().x + (*it)->weapon_current_offset.x, this->getPosition().y + (*it)->weapon_current_offset.y);
-							(*it)->face_target = this->face_target;
+							(*it)->setPosition(getPosition().x + (*it)->m_weapon_current_offset.x, getPosition().y + (*it)->m_weapon_current_offset.y);
+							(*it)->m_face_target = m_face_target;
 
 							(*it)->Fire(GameObjectType::EnemyFire, deltaTime, hyperspeedMultiplier);
 							{
@@ -424,13 +424,13 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 	
 	//sheld regen if not maximum
-	if (shield < getGameObjectShield())
+	if (m_shield < m_shield_max)
 	{
-		shield += getGameObjectShieldRegen();
+		m_shield += m_shield_regen;
 		//canceling over-regen
-		if (shield > getGameObjectShield())
+		if (m_shield > m_shield_max)
 		{
-			shield = getGameObjectShield();
+			m_shield = m_shield_max;
 		}
 	}
 
@@ -448,9 +448,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//phases
-	if (this->hasPhases)
+	if (m_hasPhases)
 	{
-		if (this->currentPhase->hasTransition)
+		if (m_currentPhase->m_hasTransition)
 		{
 			this->CheckCondition();
 		}
@@ -459,93 +459,91 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 void Enemy::RotateFeedbacks(float angle)
 {
-	armorBar->setRotation(angle);
-	armorBarContainer->setRotation(angle);
-	shieldBar->setRotation(angle);
-	shieldBarContainer->setRotation(angle);
+	m_armorBar->setRotation(angle);
+	m_armorBarContainer->setRotation(angle);
+	m_shieldBar->setRotation(angle);
+	m_shieldBarContainer->setRotation(angle);
 }
 
 void Enemy::damage_from(GameObject& object)
 {
-	if (!immune)
+	if (!m_immune)
 	{
-		if (feedbackTimer <= sf::seconds(0))
+		if (m_feedbackTimer <= sf::seconds(0))
 		{
-			(*CurrentGame).addToFeedbacks(armorBarContainer);
-			(*CurrentGame).addToFeedbacks(armorBar);
-			if (shield_max > 0)
+			(*CurrentGame).addToFeedbacks(m_armorBarContainer);
+			(*CurrentGame).addToFeedbacks(m_armorBar);
+			if (m_shield_max > 0)
 			{
-				(*CurrentGame).addToFeedbacks(shieldBarContainer);
-				(*CurrentGame).addToFeedbacks(shieldBar);
+				(*CurrentGame).addToFeedbacks(m_shieldBarContainer);
+				(*CurrentGame).addToFeedbacks(m_shieldBar);
 			}
-			(*CurrentGame).addToFeedbacks(&enemyLevel);
+			(*CurrentGame).addToFeedbacks(&m_enemyLevel);
 		}
 
-		feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
+		m_feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
 		setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
 
-		if (object.damage > shield)
+		if (object.m_damage > m_shield)
 		{
-			armor -= (object.damage - shield);
-			shield = 0;
+			m_armor -= (object.m_damage - m_shield);
+			m_shield = 0;
 		}
 		else
 		{
-			shield -= object.damage;
+			m_shield -= object.m_damage;
 		}
 	}
 }
 
 Enemy* Enemy::Clone()
 {
-	sf::Vector2f s = this->speed;
+	Enemy* enemy = new Enemy(getPosition(), m_speed, m_textureName, m_size, m_FX_death, m_frameNumber, m_animationNumber);
 
-	Enemy* enemy = new Enemy(this->getPosition(), this->speed, this->textureName, this->m_size, this->FX_death, this->frameNumber, this->animationNumber);
+	((GameObject*)enemy)->m_armor = this->m_armor;
+	((GameObject*)enemy)->m_armor_max = this->m_armor_max;
+	((GameObject*)enemy)->m_shield = this->m_shield;
+	((GameObject*)enemy)->m_shield_max = this->m_shield_max;
+	((GameObject*)enemy)->m_shield_regen = this->m_shield_regen;
+	((GameObject*)enemy)->m_damage = this->m_damage;
 
-	((GameObject*)enemy)->armor = this->getGameObjectArmor();
-	((GameObject*)enemy)->armor_max = this->getGameObjectArmorMax();
-	((GameObject*)enemy)->shield = this->getGameObjectShield();
-	((GameObject*)enemy)->shield_max = this->getGameObjectShieldMax();
-	((GameObject*)enemy)->shield_regen = this->getGameObjectShieldRegen();
-	((GameObject*)enemy)->damage = this->getGameObjectDamage();
-
-	for (std::vector<Weapon*>::iterator it = (this->weapons_list.begin()); it != (this->weapons_list.end()); it++)
+	for (std::vector<Weapon*>::iterator it = (m_weapons_list.begin()); it != (m_weapons_list.end()); it++)
 	{
-		enemy->weapons_list.push_back((*it)->Clone());
+		enemy->m_weapons_list.push_back((*it)->Clone());
 	}	
 	
-	((GameObject*)enemy)->addMoney(this->getMoney());
-	enemy->equipment_loot = this->getEquipmentLoot();
-	enemy->weapon_loot = this->getWeaponLoot();
-	enemy->display_name = this->display_name;
-	enemy->enemy_class = this->enemy_class;
+	((GameObject*)enemy)->addMoney(this->m_money);
+	enemy->m_equipment_loot = this->getEquipmentLoot();
+	enemy->m_weapon_loot = this->getWeaponLoot();
+	enemy->m_display_name = this->m_display_name;
+	enemy->m_enemy_class = this->m_enemy_class;
 
-	enemy->Pattern = this->Pattern;
-	enemy->angspeed = this->angspeed;
-	enemy->radius = this->radius;
+	enemy->m_Pattern = this->m_Pattern;
+	enemy->m_angspeed = this->m_angspeed;
+	enemy->m_radius = this->m_radius;
 
-	enemy->rotation_speed = this->rotation_speed;
+	enemy->m_rotation_speed = this->m_rotation_speed;
 
-	if (this->hasPhases)
+	if (this->m_hasPhases)
 	{
-		enemy->hasPhases = this->hasPhases;
-		enemy->currentPhase = this->currentPhase;
-		enemy->setPhase(this->currentPhase);
-		for (std::vector<Phase*>::iterator it = (this->phases.begin()); it != (this->phases.end()); it++)
+		enemy->m_hasPhases = this->m_hasPhases;
+		enemy->m_currentPhase = this->m_currentPhase;
+		enemy->setPhase(this->m_currentPhase);
+		for (std::vector<Phase*>::iterator it = (this->m_phases.begin()); it != (this->m_phases.end()); it++)
 		{
-			enemy->phases.push_back((*it));
+			enemy->m_phases.push_back((*it));
 		}
 	}
 
-	enemy->level = this->level;
-	enemy->enemyLevel.setString(to_string(this->level));
+	enemy->m_level = this->m_level;
+	enemy->m_enemyLevel.setString(to_string(this->m_level));
 
 	return enemy;
 }
 
 Phase* Enemy::getPhase(string phaseName)
 {
-	for (vector<Phase*>::iterator it = this->phases.begin(); it != this->phases.end(); it++)
+	for (vector<Phase*>::iterator it = this->m_phases.begin(); it != this->m_phases.end(); it++)
 	{
 		if ((*it)->m_name == phaseName)
 		{
@@ -558,16 +556,16 @@ Phase* Enemy::getPhase(string phaseName)
 
 bool Enemy::CheckCondition()
 {
-	for (std::vector<ConditionTransition*>::iterator it = (this->currentPhase->transitions_list.begin()); it != (this->currentPhase->transitions_list.end()); it++)
+	for (std::vector<ConditionTransition*>::iterator it = (this->m_currentPhase->m_transitions_list.begin()); it != (this->m_currentPhase->m_transitions_list.end()); it++)
 	{
-		switch ((*it)->condition)
+		switch ((*it)->m_condition)
 		{
 			case ConditionType::VerticalPosition:
 			{
-				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->value));
-				if (result == (*it)->op)
+				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
+				if (result == (*it)->m_op)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
 				}
 													  
@@ -576,10 +574,10 @@ bool Enemy::CheckCondition()
 
 			case ConditionType::HorizontalPosition:
 			{
-				FloatCompare result = this->compare_posX_withTarget_for_Direction((*CurrentGame).direction, sf::Vector2f((*it)->value, (*it)->value / SCENE_SIZE_X * SCENE_SIZE_Y));
-				if (result == (*it)->op)
+				FloatCompare result = this->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
+				if (result == (*it)->m_op)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
 				}
 			
@@ -588,14 +586,14 @@ bool Enemy::CheckCondition()
 		
 			case ConditionType::phaseClock:
 			{
-				if ((this->phaseTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+				if ((this->m_phaseTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::GREATHER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
 				}
-				else if ((this->phaseTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+				else if ((this->m_phaseTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::LESSER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
 				}
 
@@ -604,16 +602,16 @@ bool Enemy::CheckCondition()
 		
 			case ConditionType::enemyClock:
 			{
-				if ((this->enemyTimer > sf::seconds((*it)->value)) && (*it)->op == FloatCompare::GREATHER_THAN)
+				if ((this->m_enemyTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::GREATHER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
-					this->enemyTimer = sf::seconds(0);
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+					this->m_enemyTimer = sf::seconds(0);
 					return true;
 				}
-				else if ((this->enemyTimer < sf::seconds((*it)->value)) && (*it)->op == FloatCompare::LESSER_THAN)
+				else if ((this->m_enemyTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::LESSER_THAN)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
-					this->enemyTimer = sf::seconds(0);
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+					this->m_enemyTimer = sf::seconds(0);
 					return true;
 				}
 										   
@@ -622,15 +620,15 @@ bool Enemy::CheckCondition()
 		
 			case ConditionType::LifePourcentage:
 			{
-				if ((100.0f * this->getGameObjectArmor() / this->getGameObjectArmorMax() >= (*it)->value) && (((*it)->op == FloatCompare::GREATHER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+				if ((100.0f * m_armor / m_armor_max >= (*it)->m_value) && (((*it)->m_op == FloatCompare::GREATHER_THAN) || ((*it)->m_op == FloatCompare::EQUAL_TO)))
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 
 					return true;
 				}
-				else if ((100.0f * this->getGameObjectArmor() / this->getGameObjectArmorMax() <= (*it)->value) && (((*it)->op == FloatCompare::LESSER_THAN) || ((*it)->op == FloatCompare::EQUAL_TO)))
+				else if ((100.0f * m_armor / m_armor_max <= (*it)->m_value) && (((*it)->m_op == FloatCompare::LESSER_THAN) || ((*it)->m_op == FloatCompare::EQUAL_TO)))
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
 				}
 				break;
@@ -639,47 +637,47 @@ bool Enemy::CheckCondition()
 			case ConditionType::ShieldPourcentage:
 			{
 				//Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
-				if ((*it)->op == FloatCompare::GREATHER_THAN)
+				if ((*it)->m_op == FloatCompare::GREATHER_THAN)
 				{
-					if (this->getGameObjectShieldMax() == 0)
+					if (m_shield_max == 0)
 					{
 						break;
 					}
-					else if (100.0f * this->getGameObjectShield() / this->getGameObjectShieldMax() >= (*it)->value)
+					else if (100.0f * m_shield / m_shield_max >= (*it)->m_value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 					break;
 				}
-				else if ((*it)->op == FloatCompare::LESSER_THAN)
+				else if ((*it)->m_op == FloatCompare::LESSER_THAN)
 				{
-					if (this->getGameObjectShieldMax() == 0)
+					if (this->m_shield_max == 0)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
-					else if (100.0f * this->getGameObjectShield() / this->getGameObjectShieldMax() <= (*it)->value)
+					else if (100.0f * m_shield / m_shield_max <= (*it)->m_value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 					break;
 				}
-				else if ((*it)->op == FloatCompare::EQUAL_TO)
+				else if ((*it)->m_op == FloatCompare::EQUAL_TO)
 				{
-					if (this->getGameObjectShieldMax() == 0)
+					if (m_shield_max == 0)
 					{
-						if ((*it)->value == 0)
+						if ((*it)->m_value == 0)
 						{
-							this->setPhase(this->getPhase((*it)->nextPhase_name));
+							this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 							return true;
 						}
 						break;
 					}
-					else if (100.0f * this->getGameObjectShield() / this->getGameObjectShieldMax() == (*it)->value)
+					else if (100.0f * m_shield / m_shield_max == (*it)->m_value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 					break;
@@ -688,9 +686,9 @@ bool Enemy::CheckCondition()
 
 			case ConditionType::wakeUp:
 			{
-				if (this->wake_up)
+				if (this->m_wake_up)
 				{
-					this->setPhase(this->getPhase((*it)->nextPhase_name));
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
 				}
 				break;
@@ -698,19 +696,19 @@ bool Enemy::CheckCondition()
 
 			case ConditionType::EnemyProximity:
 			{
-				if ((*it)->op == FloatCompare::GREATHER_THAN)
+				if ((*it)->m_op == FloatCompare::GREATHER_THAN)
 				{
-					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_OUT_OF_RANGE)
+					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_OUT_OF_RANGE)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 				}
-				else if ((*it)->op == FloatCompare::LESSER_THAN || (*it)->op == FloatCompare::EQUAL_TO)
+				else if ((*it)->m_op == FloatCompare::LESSER_THAN || (*it)->m_op == FloatCompare::EQUAL_TO)
 				{
-					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->value) == TargetScan::TARGET_IN_RANGE)
+					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_IN_RANGE)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 				}							  
@@ -719,27 +717,27 @@ bool Enemy::CheckCondition()
 
 			case ConditionType::ShotsFired:
 			{
-				if ((*it)->op == FloatCompare::GREATHER_THAN)
+				if ((*it)->m_op == FloatCompare::GREATHER_THAN)
 				{
-					if (this->m_shots_fired >= (*it)->value)
+					if (this->m_shots_fired >= (*it)->m_value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 				}
-				else if ((*it)->op == FloatCompare::EQUAL_TO)
+				else if ((*it)->m_op == FloatCompare::EQUAL_TO)
 				{
-					if (this->m_shots_fired == (*it)->value)
+					if (this->m_shots_fired == (*it)->m_value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 				}
-				else if ((*it)->op == FloatCompare::LESSER_THAN)
+				else if ((*it)->m_op == FloatCompare::LESSER_THAN)
 				{
-					if (this->m_shots_fired < (*it)->value)
+					if (this->m_shots_fired < (*it)->m_value)
 					{
-						this->setPhase(this->getPhase((*it)->nextPhase_name));
+						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 				}
@@ -754,22 +752,23 @@ bool Enemy::CheckCondition()
 void Enemy::setPhase(Phase* phase)
 {
 	assert(phase != NULL);
-	this->currentPhase = phase;
-	this->m_shots_fired = 0;
+	m_currentPhase = phase;
+	m_shots_fired = 0;
 
-	this->speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, phase->vspeed);
+	m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, phase->m_vspeed);
 
 	//reset old stats
-	this->immune = false;
-	this->setGhost(false);
-	this->face_target = false;
-	this->reset_facing = false;
-	this->bouncing = NoBouncing;
+	m_immune = false;
+	m_face_target = false;
+	m_reset_facing = false;
+	m_bouncing = NoBouncing;
+
+	setGhost(false);
 
 	//load new stats
-	for (int i = 0; i < this->currentPhase->modifiers.size(); i++)
+	for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
 	{
-		switch (phase->modifiers[i])
+		switch (phase->m_modifiers[i])
 		{
 			case Modifier::NoModifier:
 			{
@@ -778,94 +777,94 @@ void Enemy::setPhase(Phase* phase)
 			}
 			case Modifier::Immune:
 			{
-				this->immune = true;
+				m_immune = true;
 				break;
 			}
 			case Modifier::Ghost:
 			{
-				this->setGhost(true);
+				setGhost(true);
 				break;
 			}
 			case Modifier::Death:
 			{
-				this->Death();
+				Death();
 				break;
 			}
 			case Modifier::FaceTarget:
 			{
-				this->face_target = true;
+				m_face_target = true;
 				break;
 			}
 			case Modifier::ResetFacing:
 			{
-				this->reset_facing = true;
+				m_reset_facing = true;
 				break;
 			}
 			case Modifier::Bouncing:
 			{
-				this->bouncing = BouncingEverywhere;
+				m_bouncing = BouncingEverywhere;
 				break;
 			}
 			case Modifier::BouncingH:
 			{
-				this->bouncing = BouncingHorizontal;
+				m_bouncing = BouncingHorizontal;
 				break;
 			}
 			case Modifier::BouncingV:
 			{
-				this->bouncing = BouncingVertical;
+				m_bouncing = BouncingVertical;
 				break;
 			}
 		}
 	}
 
 	//clearing old weapons and setting new ones
-	this->weapons_list.clear();
-	for (std::vector<Weapon*>::iterator it = phase->weapons_list.begin(); it != phase->weapons_list.end(); it++)
+	m_weapons_list.clear();
+	for (std::vector<Weapon*>::iterator it = phase->m_weapons_list.begin(); it != phase->m_weapons_list.end(); it++)
 	{
-		this->weapons_list.push_back((*it)->Clone());
+		m_weapons_list.push_back((*it)->Clone());
 	}
 
 	//movement
-	this->Pattern.SetPattern(phase->Pattern->currentPattern, phase->Pattern->patternSpeed, phase->Pattern->patternParams); //vitesse angulaire (degres/s)
-	this->rotation_speed = phase->rotation_speed;
+	m_Pattern.SetPattern(phase->m_Pattern->currentPattern, phase->m_Pattern->patternSpeed, phase->m_Pattern->patternParams); //vitesse angulaire (degres/s)
+	m_rotation_speed = phase->m_rotation_speed;
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
-	if (phase->hasWelcomeShot)
+	if (phase->m_hasWelcomeShot)
 	{
 		float theta = this->getRotation() / 180 * M_PI;
-		float weapon_offset_x = phase->welcomeWeapon->weaponOffset.x - this->m_size.y / 2 * sin(theta);
-		float weapon_offset_y = phase->welcomeWeapon->weaponOffset.y + this->m_size.y / 2 * cos(theta);
+		float weapon_offset_x = phase->m_welcomeWeapon->m_weaponOffset.x - m_size.y / 2 * sin(theta);
+		float weapon_offset_y = phase->m_welcomeWeapon->m_weaponOffset.y + m_size.y / 2 * cos(theta);
 
-		phase->welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
-		phase->welcomeWeapon->shot_angle = theta;
+		phase->m_welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
+		phase->m_welcomeWeapon->m_shot_angle = theta;
 
-		phase->welcomeWeapon->Fire(GameObjectType::EnemyFire);
+		phase->m_welcomeWeapon->Fire(GameObjectType::EnemyFire);
 	}
 
 	//setting up wake_up condition
 	bool wake_up_condition_exists = false;
-	for (std::vector<ConditionTransition*>::iterator it = (phase->transitions_list.begin()); it != (phase->transitions_list.end()); it++)
+	for (std::vector<ConditionTransition*>::iterator it = (phase->m_transitions_list.begin()); it != (phase->m_transitions_list.end()); it++)
 	{
-		if ((*it)->condition == ConditionType::wakeUp)
+		if ((*it)->m_condition == ConditionType::wakeUp)
 		{
-			this->wake_up = false;
+			m_wake_up = false;
 			wake_up_condition_exists = true;
 		}
 	}
 	//reset the flag "wake_up" if this phase doesn't use the condition (it means the awakening has been skipped by another phase transition
 	if (!wake_up_condition_exists)
 	{
-		this->wake_up = true;
+		m_wake_up = true;
 	}
 
 	//waking up enemies
-	if (phase->hasWakeUp)
+	if (phase->m_hasWakeUp)
 	{
-		(*CurrentGame).WakeUpEnemiesWithName(phase->wake_up_name);
+		(*CurrentGame).WakeUpEnemiesWithName(phase->m_wake_up_name);
 	}
 
-	this->phaseTimer = sf::seconds(0);
+	m_phaseTimer = sf::seconds(0);
 }
 
 Phase* Enemy::LoadPhase(string name)
@@ -879,8 +878,8 @@ Phase* Enemy::LoadPhase(string name)
 			Phase* phase = new Phase();
 
 			phase->m_name = name;
-			phase->display_name = (*it)[EnemyPhaseData::PHASE_NAME];
-			phase->vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
+			phase->m_display_name = (*it)[EnemyPhaseData::PHASE_NAME];
+			phase->m_vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
 
 			//loading weapons and ammos
 			for (int i = 0; i < 6; i++)
@@ -888,19 +887,19 @@ Phase* Enemy::LoadPhase(string name)
 				if ((*it)[PHASE_WEAPON + (i * 4)].compare("0") != 0)
 				{
 					Weapon* m_weapon = Enemy::LoadWeapon((*it)[PHASE_WEAPON + (i * 4)], 1, Enemy::LoadAmmo((*it)[PHASE_AMMO + (i * 4)]));
-					m_weapon->weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 4)].c_str());
-					m_weapon->delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 4)].c_str());
-					phase->weapons_list.push_back(m_weapon);
+					m_weapon->m_weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 4)].c_str());
+					m_weapon->m_delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 4)].c_str());
+					phase->m_weapons_list.push_back(m_weapon);
 					
 				}
 			}
 
 			//loading phases
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyPhaseData::PHASE_PATTERN);
-			phase->Pattern = m_bobby;
+			phase->m_Pattern = m_bobby;
 
 			//loading rotation speed
-			phase->rotation_speed = stoi((*it)[EnemyPhaseData::PHASE_ROTATION_SPEED]);
+			phase->m_rotation_speed = stoi((*it)[EnemyPhaseData::PHASE_ROTATION_SPEED]);
 
 			//loading modifier (immune to damage, etc.)
 			
@@ -943,33 +942,33 @@ Phase* Enemy::LoadPhase(string name)
 					}
 				}
 
-				phase->modifiers.push_back(l_new_modifier);
+				phase->m_modifiers.push_back(l_new_modifier);
 			}
 
 			//loading welcome shot
 			if ((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON].compare("0") != 0)
 			{
-				phase->welcomeWeapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_WELCOME_AMMO]));
-				phase->hasWelcomeShot = true;
+				phase->m_welcomeWeapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_WELCOME_AMMO]));
+				phase->m_hasWelcomeShot = true;
 			}
 			
 			//load enemies (by name) to wake up
 			if ((*it)[EnemyPhaseData::PHASE_WAKEUP].compare("0") != 0)
 			{
-				phase->wake_up_name = (*it)[EnemyPhaseData::PHASE_WAKEUP];
-				phase->hasWakeUp = true;
+				phase->m_wake_up_name = (*it)[EnemyPhaseData::PHASE_WAKEUP];
+				phase->m_hasWakeUp = true;
 			}
 
 			//loading transition to next phase
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
 			{
-				phase->hasTransition = true;
-				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
+				phase->m_hasTransition = true;
+				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
 			}
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("0") != 0)
 			{
-				phase->hasTransition = true;
-				phase->transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION_2));
+				phase->m_hasTransition = true;
+				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION_2));
 			}
 
 			return phase;
@@ -981,64 +980,64 @@ Phase* Enemy::LoadPhase(string name)
 
 void Enemy::Death()
 {
-	FX* myFX = this->FX_death->Clone();
-	myFX->setPosition(this->getPosition().x, this->getPosition().y);
+	FX* myFX = m_FX_death->Clone();
+	myFX->setPosition(getPosition().x, getPosition().y);
 	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, GameObjectType::Neutral);
 
 	//Score
-	(*CurrentGame).hazard += this->money;
+	(*CurrentGame).m_hazard += m_money;
 
 	//Player XP
 	//(*CurrentGame).playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
 
 	//Loot
-	if (CreateRandomLootv2(this->enemy_class, (*CurrentGame).BeastScoreBonus))
+	if (CreateRandomLootv2(m_enemy_class, (*CurrentGame).m_BeastScoreBonus))
 	{
 		GenerateLoot();
 	}
 
-	this->visible = false;
-	this->isOnScene = false;
-	this->GarbageMe = true;
+	m_visible = false;
+	m_isOnScene = false;
+	m_GarbageMe = true;
 }
 
 void Enemy::Destroy()
 {
-	if (armorBar)
+	if (m_armorBar)
 	{
-		(*CurrentGame).removeFromFeedbacks(armorBar);
-		(*CurrentGame).removeFromFeedbacks(armorBarContainer);
+		(*CurrentGame).removeFromFeedbacks(m_armorBar);
+		(*CurrentGame).removeFromFeedbacks(m_armorBarContainer);
 	}
-	if (shieldBar)
+	if (m_shieldBar)
 	{
-		(*CurrentGame).removeFromFeedbacks(shieldBar);
-		(*CurrentGame).removeFromFeedbacks(shieldBarContainer);
+		(*CurrentGame).removeFromFeedbacks(m_shieldBar);
+		(*CurrentGame).removeFromFeedbacks(m_shieldBarContainer);
 	}
-	(*CurrentGame).removeFromFeedbacks(&enemyLevel);
+	(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
 }
 
 void Enemy::GenerateLoot()
 {
-	sf::Vector2f speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, LOOT_SPEED_Y);
+	sf::Vector2f speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, LOOT_SPEED_Y);
 
-	if (this->weapon_loot != NULL)
+	if (m_weapon_loot != NULL)
 	{
-		Loot* new_loot = new Loot(this->getPosition(), speed, this->getWeaponLoot()->textureName, sf::Vector2f(this->getWeaponLoot()->size.x, this->getWeaponLoot()->size.y), this->getWeaponLoot()->display_name);
+		Loot* new_loot = new Loot(getPosition(), speed, m_weapon_loot->m_textureName, m_weapon_loot->m_size, m_weapon_loot->m_display_name);
 		new_loot->get_weapon_from(*this);
 		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
 	}
 
-	else if (this->equipment_loot != NULL)
+	else if (m_equipment_loot != NULL)
 	{
-		Loot* new_loot = new Loot(this->getPosition(), speed, this->getEquipmentLoot()->textureName, sf::Vector2f(this->getEquipmentLoot()->size.x, this->getEquipmentLoot()->size.y), this->getEquipmentLoot()->display_name);
+		Loot* new_loot = new Loot(this->getPosition(), speed, m_equipment_loot->m_textureName, m_equipment_loot->m_size, m_equipment_loot->m_display_name);
 		new_loot->get_equipment_from(*this);
 		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
 	}
 
-	else if (this->money > 0)
+	else if (m_money > 0)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Money");
-		new_loot->setMoney(this->getMoney());
+		new_loot->setMoney(m_money);
 		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
 	}
 	else
@@ -1082,7 +1081,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[loot_class]);
 
 			//Calculation of the bonus "credits" for the loot
-			int loot_credits_ = ceil(BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(this->level));
+			int loot_credits_ = ceil(BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(m_level));
 
 			//Equipment type
 			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
@@ -1095,31 +1094,31 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			{
 				case (int)EquipmentType::Engine:
 				{
-					this->setEquipmentLoot(Equipment::CreateRandomEngine(loot_credits_, this->level));
+					this->setEquipmentLoot(Equipment::CreateRandomEngine(loot_credits_, m_level));
 					break;
 				}
 
 				case (int)EquipmentType::Armor:
 				{
-					this->setEquipmentLoot(Equipment::CreateRandomArmor(loot_credits_, this->level));
+					this->setEquipmentLoot(Equipment::CreateRandomArmor(loot_credits_, m_level));
 					break;
 				}
 				
 				case (int)EquipmentType::Shield:
 				{
-					this->setEquipmentLoot(Equipment::CreateRandomShield(loot_credits_, this->level));
+					this->setEquipmentLoot(Equipment::CreateRandomShield(loot_credits_, m_level));
 					break;
 				}
 
 				case (int)EquipmentType::Module:
 				{				   
-					this->setEquipmentLoot(Equipment::CreateRandomModule(loot_credits_, this->level));
+					this->setEquipmentLoot(Equipment::CreateRandomModule(loot_credits_, m_level));
 					break;
 				}
 
 				case (int)EquipmentType::NBVAL_Equipment://WEAPON DROP
 				{
-					this->setWeaponLoot(Weapon::CreateRandomWeapon(loot_credits_, this->level, false));
+					this->setWeaponLoot(Weapon::CreateRandomWeapon(loot_credits_, m_level, false));
 					break;
 				}
 			}
@@ -1128,7 +1127,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 		else
 		{
 			//MONEY DROP
-			int money = RandomizeIntBetweenRatios(1.0f * XPTable_PerEnemyClass[loot_class] * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(level) / 100, LootTable_BeastScale[loot_class]);
+			int money = RandomizeIntBetweenRatios(1.0f * XPTable_PerEnemyClass[loot_class] * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100, LootTable_BeastScale[loot_class]);
 			this->setMoney(money);//looting money
 		}
 	}
@@ -1156,50 +1155,50 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		if ((*it)[0].compare(name) == 0)
 		{
 			Weapon* weapon = new Weapon(ammo);
-			weapon->display_name = (*it)[WeaponData::WEAPON_DISPLAY_NAME];
-			weapon->fire_direction = Vector2i(0, fire_direction);
-			weapon->rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
-			weapon->shot_mode = ShotMode::NoShotMode;
+			weapon->m_display_name = (*it)[WeaponData::WEAPON_DISPLAY_NAME];
+			weapon->m_fire_direction = Vector2i(0, fire_direction);
+			weapon->m_rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
+			weapon->m_shot_mode = ShotMode::NoShotMode;
 
-			weapon->multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
-			if (weapon->multishot > 1)
+			weapon->m_multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
+			if (weapon->m_multishot > 1)
 			{
-				weapon->xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
-				weapon->dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
+				weapon->m_xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
+				weapon->m_dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
 				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
 				{
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
-						weapon->shot_mode = AlternateShotMode;
+						weapon->m_shot_mode = AlternateShotMode;
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending") == 0)
-						weapon->shot_mode = AscendingShotMode;
+						weapon->m_shot_mode = AscendingShotMode;
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
-						weapon->shot_mode = DescendingShotMode;
+						weapon->m_shot_mode = DescendingShotMode;
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending2") == 0)
-						weapon->shot_mode = Ascending2ShotMode;
+						weapon->m_shot_mode = Ascending2ShotMode;
 					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending2") == 0)
-						weapon->shot_mode = Descending2ShotMode;
+						weapon->m_shot_mode = Descending2ShotMode;
 				}
 			}
 			
-			weapon->rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
-			if (weapon->rafale != 0)
+			weapon->m_rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
+			if (weapon->m_rafale != 0)
 			{
-				weapon->rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
+				weapon->m_rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
 			}
 				
-			weapon->textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
-			weapon->size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
-			weapon->frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
-			weapon->angle_offset = stoi((*it)[WeaponData::WEAPON_ANGLE_OFFSET]);
+			weapon->m_textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
+			weapon->m_size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
+			weapon->m_frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
+			weapon->m_angle_offset = stoi((*it)[WeaponData::WEAPON_ANGLE_OFFSET]);
 
 			if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("0") != 0)
 			{
 				if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
-					weapon->target_seaking = SEMI_SEAKING;
+					weapon->m_target_seaking = SEMI_SEAKING;
 				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("seaking") == 0)
-					weapon->target_seaking = SEAKING;
+					weapon->m_target_seaking = SEAKING;
 				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("super_seaking") == 0)
-					weapon->target_seaking = SUPER_SEAKING;
+					weapon->m_target_seaking = SUPER_SEAKING;
 			}
 
 			return weapon;
@@ -1219,13 +1218,13 @@ Ammo* Enemy::LoadAmmo(string name)
 		{
 			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME],
 				Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]), stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
-			new_ammo->display_name = (*it)[AmmoData::AMMO_NAME];
-			new_ammo->range = stoi((*it)[AmmoData::AMMO_RANGE]);
+			new_ammo->m_display_name = (*it)[AmmoData::AMMO_NAME];
+			new_ammo->m_range = stoi((*it)[AmmoData::AMMO_RANGE]);
 			
-			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), AmmoData::AMMO_PATTERN);
-			new_ammo->Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
+			PatternBobby* bobby = PatternBobby::PatternLoader((*it), AmmoData::AMMO_PATTERN);
+			new_ammo->m_Pattern.SetPattern(bobby->currentPattern, bobby->patternSpeed, bobby->patternParams);
 
-			new_ammo->rotation_speed = stoi((*it)[AmmoData::AMMO_ROTATION_SPEED]);
+			new_ammo->m_rotation_speed = stoi((*it)[AmmoData::AMMO_ROTATION_SPEED]);
 			return new_ammo;
 		}
 	}
@@ -1245,7 +1244,7 @@ FX* Enemy::LoadFX(string name)
 			{
 				float duration = atof(((*it)[FXData::FX_DURATION]).c_str());
 				FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]), stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(duration));
-				myFX->display_name = (*it)[FXData::FX_NAME];
+				myFX->m_display_name = (*it)[FXData::FX_NAME];
 
 				return myFX;
 			}
@@ -1258,19 +1257,19 @@ FX* Enemy::LoadFX(string name)
 
 void Enemy::ApplyLevelModifiers()
 {
-	float multiplier_ = ceil(1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(this->level) / 100);
+	float multiplier_ = ceil(1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100);
 
-	this->armor_max = floor(this->armor_max * multiplier_);
-	this->armor = this->armor_max;
-	this->shield_max = floor(this->shield_max * multiplier_);
-	this->shield = this->shield_max;
-	this->shield_regen = floor(this->shield_regen * multiplier_);
-	this->damage = floor(this->damage * multiplier_);
-	for (std::vector<Weapon*>::iterator it = this->weapons_list.begin(); it != this->weapons_list.end(); it++)
+	m_armor_max = floor(m_armor_max * multiplier_);
+	m_armor = m_armor_max;
+	m_shield_max = floor(m_shield_max * multiplier_);
+	m_shield = m_shield_max;
+	m_shield_regen = floor(m_shield_regen * multiplier_);
+	m_damage = floor(m_damage * multiplier_);
+	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
 	{
-		(*it)->ammunition->damage = ceil((*it)->ammunition->damage * multiplier_);
+		(*it)->m_ammunition->m_damage = ceil((*it)->m_ammunition->m_damage * multiplier_);
 	}
-	this->setMoney(money *= 1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(this->level) / 100);
+	this->setMoney(m_money *= 1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100);
 
-	enemyLevel.setString(to_string(this->level));
+	m_enemyLevel.setString(to_string(m_level));
 }

@@ -46,12 +46,13 @@ public:
 	void garbageLayer(LayerType m_layer, bool only_offscene = false);
 	void killGameObjectLayer(GameObjectType m_layer);
 	void SetLayerRotation(LayerType m_layer, float angle);
-	sf::RenderTexture mainScreen;
-	sf::RenderTexture hubScreen;
-	PlayerHud hud;
-	sf::Vector2i screen_size;
-	float hyperspeedMultiplier;
-	float vspeed;
+
+	sf::RenderTexture m_mainScreen;
+	sf::RenderTexture m_hubScreen;
+	PlayerHud m_hud;
+	sf::Vector2i m_screen_size;
+	float m_hyperspeedMultiplier;
+	float m_vspeed;
 
 	bool InsertObjectInShipGrid(GameObject& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(GameObject& object, int index=-1);
@@ -65,17 +66,18 @@ public:
 	bool isLastEnemyDead();
 	int getHazard();
 	void resetHazard(int hazard_overkill = 0);
-	sf::Vector2f scale_factor;
-	Directions direction;
 
-	int hazard;
-	int hazardSpawned;
+	sf::Vector2f m_scale_factor;
+	Directions m_direction;
+
+	int m_hazard;
+	int m_hazardSpawned;
+	float m_BeastScoreBonus;
 
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
 	void GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
 
-	float BeastScoreBonus;
 	TargetScan FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	float GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	void WakeUpEnemiesWithName(string m_display_name);
@@ -97,15 +99,17 @@ private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
-	Clock sceneChronometer;
-	float movementClock;
-	RenderWindow *window;
-	std::list<RectangleShape*> sceneFeedbackBars;
-	std::list<Text*> sceneFeedbackTexts;
-	std::vector<GameObject*> sceneGameObjects;
-	std::vector<GameObject*> sceneGameObjectsLayered[NBVAL_Layer];
-	std::vector<GameObject*> sceneGameObjectsTyped[NBVAL_GameObject];
-	std::vector<GameObject*> garbage;
+	Clock m_sceneChronometer;
+
+	float m_movementClock;
+	RenderWindow *m_window;
+
+	std::list<RectangleShape*> m_sceneFeedbackBars;
+	std::list<Text*> m_sceneFeedbackTexts;
+	std::vector<GameObject*> m_sceneGameObjects;
+	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
+	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
+	std::vector<GameObject*> m_garbage;
 };
 
 #endif // GAME_H_INCLUDED

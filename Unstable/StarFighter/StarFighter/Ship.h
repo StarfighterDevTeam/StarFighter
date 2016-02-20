@@ -52,62 +52,62 @@ enum GrazeLevels
 class ShipModel
 {
 public:
-	ShipModel(float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
-	std::string textureName;
-	sf::Vector2f size;
-	int frameNumber;
-	std::string display_name;
-	Bot* bot;
+	ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
+	std::string m_textureName;
+	sf::Vector2f m_size;
+	int m_frameNumber;
+	std::string m_display_name;
+	Bot* m_bot;
 	
-	std::string fake_textureName;
-	sf::Vector2f fake_size;
-	int fake_frameNumber;
+	std::string m_fake_textureName;
+	sf::Vector2f m_fake_size;
+	int m_fake_frameNumber;
 
-	int armor;
-	int shield;
-	int shield_regen;
-	int damage;
+	int m_armor;
+	int m_shield;
+	int m_shield_regen;
+	int m_damage;
 
-	float deceleration;
-	float acceleration;
-	float max_speed;
-	float hyperspeed;
+	float m_deceleration;
+	float m_acceleration;
+	float m_max_speed;
+	float m_hyperspeed;
 };
 
 class Equipment
 {
 public:
-	void Init(int m_equipmentType, float m_max_speed, float m_acceleration, float m_deceleration, float m_hyperspeed, int m_armor, int m_shield, int m_shield_regen, int m_damage, std::string m_textureName, sf::Vector2f m_size, int m_frameNumber, std::string m_display_name);
+	void Init(int equipmentType, float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
 	Equipment();
 	~Equipment();
 	Equipment* Clone();
-	std::string textureName;
-	sf::Vector2f size;
-	int frameNumber;
-	std::string display_name;
-	int equipmentType;
-	Bot* bot;
+	std::string m_textureName;
+	sf::Vector2f m_size;
+	int m_frameNumber;
+	std::string m_display_name;
+	int m_equipmentType;
+	Bot* m_bot;
 
-	std::string fake_textureName;
-	sf::Vector2f fake_size;
-	int fake_frameNumber;
+	std::string m_fake_textureName;
+	sf::Vector2f m_fake_size;
+	int m_fake_frameNumber;
 
 	static Equipment* CreateRandomArmor(int credits_, int level);
 	static Equipment* CreateRandomShield(int credits_, int level);
 	static Equipment* CreateRandomEngine(int credits_, int level);
 	static Equipment* CreateRandomModule(int credits_, int level);
 
-	int armor;
-	int shield;
-	int shield_regen;
-	int damage;
-	int level;
-	int credits;
+	int m_armor;
+	int m_shield;
+	int m_shield_regen;
+	int m_damage;
+	int m_level;
+	int m_credits;
 
-	float hyperspeed;
-	float max_speed;
-	float acceleration;
-	float deceleration;
+	float m_hyperspeed;
+	float m_max_speed;
+	float m_acceleration;
+	float m_deceleration;
 };
 
 class Ship : public GameObject
@@ -151,62 +151,62 @@ public :
 	bool GetLoot(GameObject& object) override;
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
-	Portal* targetPortal;
-	Shop* targetShop;
-	InteractionType previouslyCollidingWithInteractiveObject;
-	bool wasHyperspeedingButtonPressed;
-	bool isFiringButtonPressed;
-	bool wasBrakingButtonPressed;
-	bool isBrakingButtonHeldPressed;
-	sf::Clock brakingHoldingClock;
-	GameObject* previously_focused_item;
+
+	Portal* m_targetPortal;
+	Shop* m_targetShop;
+	InteractionType m_previouslyCollidingWithInteractiveObject;
+
+	bool m_wasHyperspeedingButtonPressed;
+	bool m_isFiringButtonPressed;
+	bool m_wasBrakingButtonPressed;
+	bool m_isBrakingButtonHeldPressed;
+	sf::Clock m_brakingHoldingClock;
+	GameObject* m_previously_focused_item;
 
 	void GetGrazing() override;
 	int getGrazeCount();
 	float getShipBeastScore();
 	void damage_from (GameObject& object) override;
 
-	Equipment* equipment[NBVAL_Equipment];
-	ShipModel* ship_model;
-	Weapon* weapon;
-	vector<Bot*> bot_list;
-	FX* FX_death;
-	void GenerateBots(GameObject* m_target);
+	Equipment* m_equipment[NBVAL_Equipment];
+	ShipModel* m_ship_model;
+	Weapon* m_weapon;
+	vector<Bot*> m_bot_list;
+	FX* m_FX_death;
+	void GenerateBots(GameObject* target);
 	void DestroyBots();
-	void GenerateFakeShip(GameObject* m_target);
+	void GenerateFakeShip(GameObject* target);
 	FakeShip* m_fake_ship;
-	bool automatic_fire;
+	bool m_automatic_fire;
 
-	bool disable_inputs;
+	bool m_disable_inputs;
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
-	Aura* trail;
-	bool fire_key_repeat;
-	bool slowmo_key_repeat;
-	bool hud_key_repeat;
-	bool isBraking;
-	bool isHyperspeeding;
-	bool isSlowMotion;
-	bool disabledHyperspeed;
+	Aura* m_trail;
+	bool m_fire_key_repeat;
+	bool m_slowmo_key_repeat;
+	bool m_hud_key_repeat;
+	bool m_isBraking;
+	bool m_isHyperspeeding;
+	bool m_isSlowMotion;
+	bool m_disabledHyperspeed;
 	InteractionType m_interactionType;
 
-	int getFighterIntStatValue(FighterStats stat);
-	float getFighterFloatStatValue(FighterStats stat);
-	
+	int getFighterIntStatValue(FighterStats stat) override;
+	float getFighterFloatStatValue(FighterStats stat) override;
 
-	bool isFocusedOnHud;
+	bool m_isFocusedOnHud;
 
-	string respawnSceneName;
+	string m_respawnSceneName;
 
-	int graze_count;
-	int graze_level;
-	sf::Vector2f m_ship_size;
+	int m_graze_count;
+	int m_graze_level;
 
 	int GetFocusedPortalMaxUnlockedHazardLevel();
 
-	int level;
-	int level_max;
-	int xp;
-	int xp_max;
+	int m_level;
+	int m_level_max;
+	int m_xp;
+	int m_xp_max;
 	//void gain_xp (int xp_earned_);
 	//void LevelUp();
 	int UpdateShipLevel();
@@ -218,15 +218,15 @@ public :
 	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);
 	static void SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level = false);
 
-	float hyperspeed;
+	float m_hyperspeed;
+	float m_max_speed;
+	float m_acceleration;
+	float m_deceleration;
 	
 private:
-	bool moving;
-	bool movingX;
-	bool movingY;
-	float max_speed;
-	float acceleration;
-	float deceleration;
+	bool m_moving;
+	bool m_movingX;
+	bool m_movingY;
 
 };
 

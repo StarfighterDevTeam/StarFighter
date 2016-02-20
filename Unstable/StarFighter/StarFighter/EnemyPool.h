@@ -10,33 +10,31 @@
 
 struct EnemyPoolElement
 {
-	EnemyPoolElement(Enemy* m_enemy, EnemyClass m_enemy_class, PatternType m_movepatternType);
-	Enemy* enemy;
-	EnemyClass enemy_class;
-	PatternType movepatternType;
+	EnemyPoolElement(Enemy* enemy, EnemyClass enemy_class, PatternType movepatternType);
+	Enemy* m_enemy;
+	EnemyClass m_enemy_class;
+	PatternType m_movepatternType;
 };
 
 struct EnemyPool
 {
 public:
-	EnemyPool(sf::Vector2f m_position, int m_nb_lines, int m_nb_rows, float m_xspread, float m_yspread, std::vector<EnemyPoolElement*>* m_enemyCluster);
+	EnemyPool(sf::Vector2f position, int nb_lines, int nb_rows, float xspread, float yspread, std::vector<EnemyPoolElement*>* enemyCluster);
 
-	int nb_lines;
-	int nb_rows;
-	float xspread;
-	float yspread;
+	int m_nb_lines;
+	int m_nb_rows;
+	float m_xspread;
+	float m_yspread;
 	
 
 	void CreateCluster();
 	sf::Vector2f getClusterSize();
 	sf::Vector2f getClusterPosition();
 private:
-	sf::Vector2f size;
-	sf::Vector2f position;
-	sf::Vector2f speed;
-	std::vector<EnemyPoolElement*>* enemyCluster;
-
-	
+	sf::Vector2f m_size;
+	sf::Vector2f m_position;
+	sf::Vector2f m_speed;
+	std::vector<EnemyPoolElement*>* m_enemyCluster;
 };
 
 

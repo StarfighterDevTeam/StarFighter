@@ -4,52 +4,54 @@ extern Game* CurrentGame;
 
 Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : GameObject(position, speed,  textureName, size)
 {
-	collider_type = GameObjectType::FriendlyFire;
-	visible = true;
-	visible = true;
-	isOnScene = true;
-	DontGarbageMe = true;
-	radius = 0;
-	angspeed = 0;
-	vspeed = 0;
-	spread = sf::Vector2f(0,0);
-	damage = 0;
-	key_repeat = false;
-	display_name = "Bot";
+	m_collider_type = GameObjectType::FriendlyFire;
+	m_visible = true;
+	m_visible = true;
+	m_isOnScene = true;
+	m_DontGarbageMe = true;
+	m_radius = 0;
+	m_angspeed = 0;
+	m_vspeed = 0;
+	m_spread = sf::Vector2f(0,0);
+	m_damage = 0;
+	m_key_repeat = false;
+	m_display_name = "Bot";
 }
 
 Bot::~Bot()
 {
-	if (this->weapon != NULL)
+	if (m_weapon != NULL)
 	{
-		this->weapon->~Weapon();
+		m_weapon->~Weapon();
 	}
 }
 
-void Bot::setTarget (GameObject* m_target)
+void Bot::setTarget (GameObject* target)
 {
-	this->target = m_target;
-	this->setPosition(m_target->getPosition());
+	m_target = target;
+
+	if (target)
+		setPosition(target->getPosition());
 }
 
 void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->speed;
+	newspeed = m_speed;
 	float l_hyperspeedMultiplier = 1.0f;
 
-	if (this->target != NULL)
+	if (m_target != NULL)
 	{
-		newposition.x = target->getPosition().x;
-		newposition.y = target->getPosition().y;
-		disable_fire = target->disable_fire;
+		newposition.x = m_target->getPosition().x;
+		newposition.y = m_target->getPosition().y;
+		m_disable_fire = m_target->m_disable_fire;
 	}
 	else
 	{
 		if (hyperspeedMultiplier > 1)
 		{
-			newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).x;
-			newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).direction, (hyperspeedMultiplier - 1) * (*CurrentGame).vspeed).y;
+			newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
+			newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
 		}
 		else if (hyperspeedMultiplier < 1.0f)
 		{
@@ -64,77 +66,77 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	
 	//call bobbyPattern
 	
-	offset = Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
+	offset = m_Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
 	
-	offset = GameObject::getSpeed_for_Direction((*CurrentGame).direction, offset);
+	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 	newposition.x += offset.x;
 	newposition.y += offset.y;
 	//bot spread value
-	newposition.x += spread.x;
-	newposition.y += spread.y;
+	newposition.x += m_spread.x;
+	newposition.y += m_spread.y;
 
 	this->setPosition(newposition.x,newposition.y);
 
 	//rotation
-	this->rotate(this->rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+	this->rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
 
 	//auto fire option (F key)
 	if (InputGuy::setAutomaticFire())
 	{
-		if (!this->key_repeat)
+		if (!m_key_repeat)
 		{
-			this->automatic_fire = !this->automatic_fire;
-			this->key_repeat = true;
+			m_automatic_fire = !m_automatic_fire;
+			m_key_repeat = true;
 		}
 	}
 	else
 	{
-		this->key_repeat = false;
+		m_key_repeat = false;
 	}
 
 	//automatic fire
-	if (this->weapon != NULL && this->target != NULL)
+	if (m_weapon != NULL && m_target != NULL)
 	{
-		if (this->weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
+		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!disable_fire && (target->isCollidingWithInteractiveObject == No_Interaction) && !target->disable_fire)
+			if (!m_disable_fire && (m_target->m_isCollidingWithInteractiveObject == No_Interaction) && !m_target->m_disable_fire)
 			{
-				if (InputGuy::isFiring() || this->automatic_fire)
+				if (InputGuy::isFiring() || m_automatic_fire)
 				{
 					//calculating the angle we want to face, if any
-					float target_angle = this->getRotation();
-					if (this->weapon->target_seaking != NO_SEAKING || (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index == 0))
+					float target_angle = getRotation();
+					if (m_weapon->m_target_seaking != NO_SEAKING || (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index == 0))
 					{
-						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, this->getPosition()), 360);
+						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, getPosition()), 360);
 					}
-					float current_angle = this->getRotation();
+					float current_angle = getRotation();
 					float delta = current_angle - target_angle;
 					if (delta > 180)
 						delta -= 360;
 					else if (delta < -180)
 						delta += 360;
 
-					float theta = this->getRotation() / 180 * M_PI;
-					if (this->weapon->target_seaking != NO_SEAKING)
+					float theta = getRotation() / 180 * M_PI;
+					if (m_weapon->m_target_seaking != NO_SEAKING)
 					{
 						theta -= delta / 180 * M_PI;
 					}
 
-					if (this->weapon->target_seaking == SEMI_SEAKING && this->weapon->rafale_index > 0 && this->weapon->rafale_index < this->weapon->rafale)
+					if (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
 					{
 						//semi-seaking and rafale not ended = no update of target or weapon position
 					}
 					else
 					{
-						this->weapon->weapon_current_offset.x = this->weapon->weaponOffset.x + this->m_size.x / 2 * sin(theta);
-						this->weapon->weapon_current_offset.y = this->weapon->weaponOffset.y - this->m_size.y / 2 * cos(theta);
+						m_weapon->m_weapon_current_offset.x = m_weapon->m_weaponOffset.x + m_size.x / 2 * sin(theta);
+						m_weapon->m_weapon_current_offset.y = m_weapon->m_weaponOffset.y - m_size.y / 2 * cos(theta);
 
 						//transmitting the angle to the weapon, which will pass it to the bullets
-						this->weapon->shot_angle = theta;
+						m_weapon->m_shot_angle = theta;
 					}
 
-					this->weapon->setPosition(this->getPosition().x + this->weapon->weapon_current_offset.x, this->getPosition().y + this->weapon->weapon_current_offset.y);
-					this->weapon->Fire(GameObjectType::FriendlyFire, deltaTime, hyperspeedMultiplier);
+					m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
+					m_weapon->Fire(GameObjectType::FriendlyFire, deltaTime, hyperspeedMultiplier);
 				}
 			}
 		}
@@ -145,21 +147,21 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 Bot* Bot::Clone()
 {
-	Bot* bot = new Bot(this->getPosition(), this->speed, this->textureName, this->m_size);
-	bot->display_name = this->display_name;
-	bot->radius = this->radius;
-	bot->angspeed = this->angspeed;
-	bot->vspeed = this->vspeed;
-	bot->Pattern = this->Pattern;
-	bot->spread = this->spread;
-	bot->weapon = this->weapon->Clone();
-	bot->damage = this->damage;
-	bot->armor = this->armor;
-	bot->armor_max = this->armor_max;
-	bot->shield= this->shield;
-	bot->shield_max = this->shield_max;
-	bot->shield_regen = this->shield_regen;
-	bot->rotation_speed = this->rotation_speed;
+	Bot* bot = new Bot(this->getPosition(), this->m_speed, this->m_textureName, this->m_size);
+	bot->m_display_name = this->m_display_name;
+	bot->m_radius = this->m_radius;
+	bot->m_angspeed = this->m_angspeed;
+	bot->m_vspeed = this->m_vspeed;
+	bot->m_Pattern = this->m_Pattern;
+	bot->m_spread = this->m_spread;
+	bot->m_weapon = this->m_weapon->Clone();
+	bot->m_damage = this->m_damage;
+	bot->m_armor = this->m_armor;
+	bot->m_armor_max = this->m_armor_max;
+	bot->m_shield= this->m_shield;
+	bot->m_shield_max = this->m_shield_max;
+	bot->m_shield_regen = this->m_shield_regen;
+	bot->m_rotation_speed = this->m_rotation_speed;
 
 	return bot;
 }
@@ -169,5 +171,5 @@ void Bot::setRadius(float m_radius, float clockwise)
 	vector<float>* v = new vector<float>;
 	v->push_back(m_radius);
 	v->push_back(clockwise);  // clockwise (>)
-	this->Pattern.SetPattern(this->Pattern.currentPattern,this->vspeed,v); //vitesse angulaire (degres/s)in
+	this->m_Pattern.SetPattern(this->m_Pattern.currentPattern,this->m_vspeed,v); //vitesse angulaire (degres/s)in
 }

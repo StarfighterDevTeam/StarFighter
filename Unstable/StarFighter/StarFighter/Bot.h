@@ -18,20 +18,17 @@ public:
 	~Bot();
 
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
-	Weapon* weapon;
-	GameObject* target;
+	Weapon* m_weapon;
+	GameObject* m_target;
 	Bot* Clone();
-	float radius;
-	float angspeed;
-	float vspeed;
-	void setTarget (GameObject* m_target);
-	void setRadius (float m_radius, float clockwise);
-	sf::Vector2f spread;
-	bool automatic_fire;
-	bool key_repeat;
-
-private:
-		
+	float m_radius;
+	float m_angspeed;
+	float m_vspeed;
+	void setTarget (GameObject* target);
+	void setRadius (float radius, float clockwise);
+	sf::Vector2f m_spread;
+	bool m_automatic_fire;
+	bool m_key_repeat;
 };
 
 

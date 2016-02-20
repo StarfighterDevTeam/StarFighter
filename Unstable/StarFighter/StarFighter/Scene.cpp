@@ -6,21 +6,21 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading scene '%s'", (char*)name.c_str()));
 	srand(time(NULL));
-	this->m_name = name;
+	m_name = name;
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
-		this->total_class_probability[i] = 0;
+		m_total_class_probability[i] = 0;
 	}
-	this->generating_enemies = false;
-	this->generating_boss = false;
-	this->m_hazard_level = hazard_level;
-	this->m_hazardbreak_has_occurred = false;
-	this->canHazardBreak = false;
+	m_generating_enemies = false;
+	m_generating_boss = false;
+	m_hazard_level = hazard_level;
+	m_hazardbreak_has_occurred = false;
+	m_canHazardBreak = false;
 
 	int p = 0;
 	int enemy_count = 0;
 
-	m_textHazardBreak.setFont(*(*CurrentGame).hud.font2);
+	m_textHazardBreak.setFont(*(*CurrentGame).m_hud.font2);
 	m_textHazardBreak.setCharacterSize(30);
 	m_textHazardBreak.setColor(sf::Color(255, 255, 255, 255));
 
@@ -33,12 +33,12 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
 				//Loading the linked scene names
-				this->links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
-				this->links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
-				this->links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
-				this->links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
+				m_links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
+				m_links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
+				m_links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
+				m_links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
 
-				this->canHazardBreak = ((*it)[SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
+				m_canHazardBreak = ((*it)[SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
 
 				std::string scene_name = (*it)[SCENE_DISPLAYNAME];
 
@@ -48,10 +48,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
-						this->direction = Directions::NO_DIRECTION;
+						m_direction = Directions::NO_DIRECTION;
 						bool hub = false;
 
-						this->vspeed = stoi((*it)[BACKGROUND_VSPEED]);
+						m_vspeed = stoi((*it)[BACKGROUND_VSPEED]);
 						float w = stoi((*it)[BACGKROUND_WIDTH]);
 						float h = stoi((*it)[BACKGROUND_HEIGHT]);
 
@@ -60,22 +60,22 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							if (!reverse_scene)
 							{
-								this->direction = Directions::DIRECTION_UP;
+								m_direction = Directions::DIRECTION_UP;
 							}
 							else
 							{
-								this->direction = Directions::DIRECTION_DOWN;
+								m_direction = Directions::DIRECTION_DOWN;
 							}
 						}
 						else if ((*it)[BACKGROUND_VERTICAL].compare("H") == 0)
 						{
 							if (!reverse_scene)
 							{
-								this->direction = Directions::DIRECTION_RIGHT;
+								m_direction = Directions::DIRECTION_RIGHT;
 							}
 							else
 							{
-								this->direction = Directions::DIRECTION_LEFT;
+								m_direction = Directions::DIRECTION_LEFT;
 							}
 						}
 						else
@@ -83,7 +83,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 							if (!first_scene)
 							{
 								hub = true;
-								this->direction = (*CurrentGame).direction;
+								m_direction = (*CurrentGame).m_direction;
 							}
 						}
 
@@ -91,72 +91,72 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						float first_screen_offset = 0;
 						if (first_scene)
 						{
-							(*CurrentGame).direction = this->direction;
-							first_screen_offset = GameObject::getSize_for_Direction(this->direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
+							(*CurrentGame).m_direction = m_direction;
+							first_screen_offset = GameObject::getSize_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X, SCENE_SIZE_Y)).y;
 						}
 
-						sf::Vector2f speed = GameObject::getSpeed_for_Scrolling(this->direction, this->vspeed);
+						sf::Vector2f speed = GameObject::getSpeed_for_Scrolling(m_direction, m_vspeed);
 
 						if (hub)
 						{
-							this->direction = Directions::NO_DIRECTION;
+							m_direction = Directions::NO_DIRECTION;
 						}
 						
-						this->bg = new Background(sf::Vector2f(0, 0), speed, (*it)[BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).direction, first_screen_offset);
-						this->bg->display_name = scene_name;
-						(*CurrentGame).addToScene(this->bg, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
+						m_bg = new Background(sf::Vector2f(0, 0), speed, (*it)[BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).m_direction, first_screen_offset);
+						m_bg->m_display_name = scene_name;
+						(*CurrentGame).addToScene(m_bg, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
 
 						//Getting the display name of the scene and loading it into the scene portals
 						for (int i = 0; i < Directions::NO_DIRECTION; i++)
 						{
-							if (this->links[(Directions)i].compare("0") != 0)
+							if (m_links[(Directions)i].compare("0") != 0)
 							{
 								//CREATING THE PORTAL
-								this->bg->portals[(Directions)i] = new Portal(sf::Vector2f(0, 0), speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
+								m_bg->m_portals[(Directions)i] = new Portal(sf::Vector2f(0, 0), speed, PORTAL_TEXTURE_NAME, sf::Vector2f(PORTAL_WIDTH, PORTAL_HEIGHT), sf::Vector2f(PORTAL_WIDTH / 2, PORTAL_HEIGHT / 2), PORTAL_FRAMES, PORTAL_ANIMATIONS);
 								sf::Vector2f bg_size = GameObject::getSize_for_Direction((Directions)i, sf::Vector2f(w, h));
 								//applying offset respect to the center of the background, depending on the direction
-								this->bg->portals[(Directions)i]->offset = GameObject::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
-								this->bg->portals[(Directions)i]->setPosition(this->bg->getPosition().x + this->bg->portals[(Directions)i]->offset.x, this->bg->getPosition().y + this->bg->portals[(Directions)i]->offset.y);
+								m_bg->m_portals[(Directions)i]->m_offset = GameObject::getSpeed_for_Scrolling((Directions)i, (-bg_size.y / 2) + (PORTAL_HEIGHT / 2));
+								m_bg->m_portals[(Directions)i]->setPosition(m_bg->getPosition().x + m_bg->m_portals[(Directions)i]->m_offset.x, m_bg->getPosition().y + m_bg->m_portals[(Directions)i]->m_offset.y);
 
 								//rotation
-								this->bg->portals[(Directions)i]->setRotation(GameObject::getRotation_for_Direction((Directions)i));
+								m_bg->m_portals[(Directions)i]->setRotation(GameObject::getRotation_for_Direction((Directions)i));
 
 								//direction
-								this->bg->portals[(Directions)i]->direction = (Directions)i;
+								m_bg->m_portals[(Directions)i]->m_direction = (Directions)i;
 
 								//copying the scene name into the portal, that will be responsible for the loading of the linked scenes
-								this->bg->portals[(Directions)i]->destination_name = this->links[(Directions)i];
+								m_bg->m_portals[(Directions)i]->m_destination_name = m_links[(Directions)i];
 
 								//Getting the string of the "display name" for a each linked scene
 								for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 								{
-									if ((*it)[SCENE_NAME].compare(this->links[(Directions)i]) == 0)
+									if ((*it)[SCENE_NAME].compare(m_links[(Directions)i]) == 0)
 									{
-										this->bg->portals[(Directions)i]->display_name = (*it)[SCENE_DISPLAYNAME];
+										m_bg->m_portals[(Directions)i]->m_display_name = (*it)[SCENE_DISPLAYNAME];
 									}
 								}
 
 								//Displaying the portals
-								(*CurrentGame).addToScene(this->bg->portals[(Directions)i], LayerType::PortalLayer, GameObjectType::PortalObject);
+								(*CurrentGame).addToScene(m_bg->m_portals[(Directions)i], LayerType::PortalLayer, GameObjectType::PortalObject);
 							}
 						}
 
 						if (first_scene)
 						{
-							this->bg->SetPortalsState(PortalState::PortalOpen);
+							m_bg->SetPortalsState(PortalState::PortalOpen);
 						}
 						else
 						{
-							this->bg->SetPortalsState(PortalState::PortalGhost);
+							m_bg->SetPortalsState(PortalState::PortalGhost);
 						}
 
 						//creating the shop
-						if (this->direction == NO_DIRECTION)
+						if (m_direction == NO_DIRECTION)
 						{
-							this->bg->m_shop = new Shop(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), SHOP_ASSET_FILENAME, sf::Vector2f(SHOP_ASSET_WIDTH, SHOP_ASSET_HEIGHT), sf::Vector2f(SHOP_ASSET_WIDTH / 2, SHOP_ASSET_HEIGHT / 2));
-							this->bg->m_shop->visible = true;
-							this->bg->m_shop->display_name = this->bg->display_name + " Shop";
-							(*CurrentGame).addToScene(this->bg->m_shop, PortalLayer, ShopObject);
+							m_bg->m_shop = new Shop(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), SHOP_ASSET_FILENAME, sf::Vector2f(SHOP_ASSET_WIDTH, SHOP_ASSET_HEIGHT), sf::Vector2f(SHOP_ASSET_WIDTH / 2, SHOP_ASSET_HEIGHT / 2));
+							m_bg->m_shop->m_visible = true;
+							m_bg->m_shop->m_display_name = m_bg->m_display_name + " Shop";
+							(*CurrentGame).addToScene(m_bg->m_shop, PortalLayer, ShopObject);
 						}
 					}
 
@@ -164,55 +164,55 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					else if ((*it)[0].compare("enemy") == 0)
 					{
 						EnemyBase* e = FileLoader::LoadEnemyBase((*it)[ENEMY], stoi((*it)[ENEMY_PROBABILITY]), stoi((*it)[ENEMY_CLASS]));
-						e->enemy->level = stoi((*it)[ENEMY_CLASS_LEVEL]);
-						e->enemy->ApplyLevelModifiers();
+						e->m_enemy->m_level = stoi((*it)[ENEMY_CLASS_LEVEL]);
+						e->m_enemy->ApplyLevelModifiers();
 
 						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
-						if (!e->enemy->hasPhases)
+						if (!e->m_enemy->m_hasPhases)
 						{
-							e->enemy->speed = GameObject::getSpeed_for_Scrolling(this->direction, e->enemy->speed.y);
+							e->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, e->m_enemy->m_speed.y);
 						}
 						
 						//setting enemy generators: we need to create one generator per class
-						if (this->total_class_probability[e->enemyclass] == 0)
+						if (m_total_class_probability[e->m_enemyclass] == 0)
 						{
 							float l_spawnCost = stof((*it)[ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[this->getSceneHazardLevelValue()];
-							EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->enemyclass, stof((*it)[ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[ENEMY_CLASS_MISS_CHANCE]));
-							generator->spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
-							this->sceneEnemyGenerators.push_back(generator);
+							EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->m_enemyclass, stof((*it)[ENEMY_CLASS_REPEAT_CHANCE]), stof((*it)[ENEMY_CLASS_MISS_CHANCE]));
+							generator->m_spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
+							m_sceneEnemyGenerators.push_back(generator);
 						}
 
 						//setting probabilities of spawn within enemy class
-						e->proba_min = this->total_class_probability[e->enemyclass];
-						e->proba_max = e->proba_min + e->probability;
-						this->total_class_probability[e->enemyclass] = e->proba_max;
-						enemy_count += e->proba_max;
+						e->m_proba_min = m_total_class_probability[e->m_enemyclass];
+						e->m_proba_max = e->m_proba_min + e->m_probability;
+						m_total_class_probability[e->m_enemyclass] = e->m_proba_max;
+						enemy_count += e->m_proba_max;
 
-						this->enemies_ranked_by_class[e->enemyclass].push_back(e);
+						m_enemies_ranked_by_class[e->m_enemyclass].push_back(e);
 					}
 
 					//loading boss
 					else if ((*it)[0].compare("boss") == 0)
 					{
 						EnemyBase* boss = FileLoader::LoadEnemyBase((*it)[BOSS], 1, stoi((*it)[BOSS_CLASS]));
-						boss->enemy->level = stoi((*it)[BOSS_LEVEL]);
+						boss->m_enemy->m_level = stoi((*it)[BOSS_LEVEL]);
 
-						if (!boss->enemy->hasPhases)
+						if (!boss->m_enemy->m_hasPhases)
 						{
-							boss->enemy->speed = GameObject::getSpeed_for_Scrolling(this->direction, boss->enemy->speed.y);
+							boss->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, boss->m_enemy->m_speed.y);
 						}
 						sf::Vector2f boss_pos = sf::Vector2f(atof((*it)[BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*it)[BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
-						boss_pos = GameObject::getPosition_for_Direction(this->direction, boss_pos);
-						boss->enemy->setPosition(boss_pos);
+						boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
+						boss->m_enemy->setPosition(boss_pos);
 
-						this->boss_list.push_back(boss);
-						this->generating_boss = true;
+						m_boss_list.push_back(boss);
+						m_generating_boss = true;
 					}
 
-					if (enemy_count != 0 && this->direction != Directions::NO_DIRECTION)
+					if (enemy_count != 0 && m_direction != Directions::NO_DIRECTION)
 					{
-						generating_enemies = true;
-						this->spawnClock.restart();
+						m_generating_enemies = true;
+						m_spawnClock.restart();
 					}
 				}
 			}
@@ -227,7 +227,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 Scene::Scene(string name)
 {
-	this->m_name = name;
+	m_name = name;
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
 		vector<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
@@ -237,10 +237,10 @@ Scene::Scene(string name)
 			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
 				//Loading the linked scene names
-				this->links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
-				this->links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
-				this->links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
-				this->links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
+				m_links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
+				m_links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
+				m_links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
+				m_links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
 				std::string scene_name = (*it)[SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
@@ -249,8 +249,8 @@ Scene::Scene(string name)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
-						this->bg = new Background(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*it)[BACKGROUND_NAME], sf::Vector2f(0, 0), this->direction);
-						this->bg->display_name = scene_name;
+						m_bg = new Background(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*it)[BACKGROUND_NAME], sf::Vector2f(0, 0), m_direction);
+						m_bg->m_display_name = scene_name;
 					}
 				}
 			}
@@ -258,15 +258,15 @@ Scene::Scene(string name)
 			//Drawing link zones and texts
 			for (int i = 0; i < Directions::NO_DIRECTION; i++)
 			{
-				if (this->links[(Directions)i].compare("0") != 0)
+				if (m_links[(Directions)i].compare("0") != 0)
 				{
 					//Getting the string of the "display name" for a each linked scene
 					for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 					{
-						if ((*it)[SCENE_NAME].compare(this->links[(Directions)i]) == 0)
+						if ((*it)[SCENE_NAME].compare(m_links[(Directions)i]) == 0)
 						{
 							//Getting the name
-							this->bg->portals[(Directions)i]->display_name = (*it)[SCENE_DISPLAYNAME];
+							m_bg->m_portals[(Directions)i]->m_display_name = (*it)[SCENE_DISPLAYNAME];
 						}
 					}
 				}
@@ -282,7 +282,7 @@ Scene::Scene(string name)
 
 Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene)
 {
-	this->LoadSceneFromFile(name, hazard_level, reverse_scene, first_scene);
+	LoadSceneFromFile(name, hazard_level, reverse_scene, first_scene);
 
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
 }
@@ -292,16 +292,16 @@ void Scene::DisplayDestructions(bool hazard_break)
 	ostringstream ss;
 	stringstream ratio;
 	ratio.precision(4);
-	ratio << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).hazardSpawned;
+	ratio << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned;
 
-	ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).hazardSpawned << " [" << ratio.str() << "%]";
+	ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).m_hazardSpawned << " [" << ratio.str() << "%]";
 	if (hazard_break)
 	{
 		ss << "\n\n          HAZARD BREAK!!!";
 	}
-	this->m_textHazardBreak.setString(ss.str());
+	m_textHazardBreak.setString(ss.str());
 
-	if (this->direction != DIRECTION_DOWN)
+	if (m_direction != DIRECTION_DOWN)
 	{
 		
 		m_textHazardBreak.setPosition(sf::Vector2f((SCENE_SIZE_X / 2) - (m_textHazardBreak.getLocalBounds().width / 2), ENDSCENE_SCORE_DISPLAY_POSITION_Y));
@@ -318,91 +318,91 @@ void Scene::DestroyScene()
 {
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
-		if (this->bg->portals[(Directions)i] != NULL)
+		if (m_bg->m_portals[(Directions)i] != NULL)
 		{
-			this->bg->portals[(Directions)i]->GarbageMe = true;
+			m_bg->m_portals[(Directions)i]->m_GarbageMe = true;
 		}
 	}
 
-	if (this->bg->m_shop != NULL)
+	if (m_bg->m_shop != NULL)
 	{
-		this->bg->m_shop->GarbageMe = true;
+		m_bg->m_shop->m_GarbageMe = true;
 	}
 
-	this->bg->GarbageMe = true;
+	m_bg->m_GarbageMe = true;
 
-	boss_list.clear();
+	m_boss_list.clear();
 
 	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 	{
-		enemies_ranked_by_class[i].clear();
+		m_enemies_ranked_by_class[i].clear();
 	}
-	sceneEnemyGenerators.clear();
+	m_sceneEnemyGenerators.clear();
 }
 
 void Scene::GenerateEnemiesv2(Time deltaTime)
 {
-	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators.begin(); it != sceneEnemyGenerators.end(); ++it)
+	for (std::vector<EnemyGenerator*>::iterator it = m_sceneEnemyGenerators.begin(); it != m_sceneEnemyGenerators.end(); ++it)
 	{
 		//SOURCES OF INCREMENTATION
 		//Time
-		sf::Time adjusted_time = deltaTime * (*CurrentGame).hyperspeedMultiplier;
-		(*it)->spawnResource += adjusted_time.asSeconds();
+		sf::Time adjusted_time = deltaTime * (*CurrentGame).m_hyperspeedMultiplier;
+		(*it)->m_spawnResource += adjusted_time.asSeconds();
 
 		//SPAWN
-		if ((*it)->spawnResource > (*it)->spawnCost)
+		if ((*it)->m_spawnResource > (*it)->m_spawnCost)
 		{
 			//Randomization of the event
 			float p = RandomizeFloatBetweenValues(sf::Vector2f(0, 1));
-			if (p < (*it)->spawnRepeatProbability)
+			if (p < (*it)->m_spawnRepeatProbability)
 			{
 				//Critical event: spawn enemy, pay discount cost
 				float r = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_REPEAT_MINIMUM_RESOURCE, SPAWN_REPEAT_MAXIMUM_RESOURCE));
-				(*it)->spawnResource *= r;
-				this->SpawnEnemy((*it)->enemyClass);
-				this->CollateralSpawnCost((*it)->spawnCost, (*it)->spawnCostCollateralMultiplier, (*it)->enemyClass);
+				(*it)->m_spawnResource *= r;
+				SpawnEnemy((*it)->m_enemyClass);
+				CollateralSpawnCost((*it)->m_spawnCost, (*it)->m_spawnCostCollateralMultiplier, (*it)->m_enemyClass);
 				//printf("CRITICAL REPEAT class %d\n", (*it)->enemyClass);
 			}
-			else if (p > 1 - (*it)->spawnMissProbability)
+			else if (p > 1 - (*it)->m_spawnMissProbability)
 			{
 				//Critical event: don't spawn enemy, but still pay a (discount) cost
 				float m = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_MISS_MINIMUM_RESOURCE, SPAWN_MISS_MAXIMUM_RESOURCE));
-				(*it)->spawnResource *= m;
+				(*it)->m_spawnResource *= m;
 				//printf("CRITICAL MISS class %d\n", (*it)->enemyClass);
 			}
 			else
 			{
 				//Normal event: spawn enemy, pay total cost
-				this->SpawnEnemy((*it)->enemyClass);
+				SpawnEnemy((*it)->m_enemyClass);
 				float n = RandomizeFloatBetweenValues(sf::Vector2f(SPAWN_NORMAL_MINIMUM_RESOURCE, SPAWN_NORMAL_MAXIMUM_RESOURCE));
-				(*it)->spawnResource = 0 + (n*(*it)->spawnCost);
-				this->CollateralSpawnCost((*it)->spawnCost, (*it)->spawnCostCollateralMultiplier, (*it)->enemyClass);
+				(*it)->m_spawnResource = 0 + (n*(*it)->m_spawnCost);
+				CollateralSpawnCost((*it)->m_spawnCost, (*it)->m_spawnCostCollateralMultiplier, (*it)->m_enemyClass);
 			}
 		}
 
 		//DEBUG
-		if ((*it)->enemyClass == 1)
+		if ((*it)->m_enemyClass == 1)
 		{
 			//printf("RESSOURCES: %f / %f\n", (*it)->spawnResource, (*it)->spawnCost);
 		}
 	}
 	
-	this->spawnClock.restart();
+	m_spawnClock.restart();
 }
 
 void Scene::CollateralSpawnCost(float collatefal_cost, float collateral_multiplier, int below_enemy_class)
 {
-	for (std::vector<EnemyGenerator*>::iterator it = sceneEnemyGenerators.begin(); it != sceneEnemyGenerators.end(); ++it)
+	for (std::vector<EnemyGenerator*>::iterator it = m_sceneEnemyGenerators.begin(); it != m_sceneEnemyGenerators.end(); ++it)
 	{
-		if ((*it)->enemyClass < below_enemy_class)
+		if ((*it)->m_enemyClass < below_enemy_class)
 		{
 			if (collateral_multiplier > 0)
 			{
-				(*it)->spawnResource -= (collatefal_cost * collateral_multiplier);
+				(*it)->m_spawnResource -= (collatefal_cost * collateral_multiplier);
 			}
 			else
 			{
-				(*it)->spawnResource = 0;
+				(*it)->m_spawnResource = 0;
 			}
 		}
 	}
@@ -413,61 +413,61 @@ void Scene::SpawnEnemy(int enemy_class)
 	Enemy* enemy = NULL;
 	//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
 	//int dice_roll = (rand() % (this->total_class_probability[enemy_class])) + 1;
-	int dice_roll = RandomizeIntBetweenValues(0, this->total_class_probability[enemy_class]);
+	int dice_roll = RandomizeIntBetweenValues(0, m_total_class_probability[enemy_class]);
 	
-	for (std::vector<EnemyBase*>::iterator it = enemies_ranked_by_class[enemy_class].begin(); it != enemies_ranked_by_class[enemy_class].end(); ++it)
+	for (std::vector<EnemyBase*>::iterator it = m_enemies_ranked_by_class[enemy_class].begin(); it != m_enemies_ranked_by_class[enemy_class].end(); ++it)
 	{
-		if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
+		if (dice_roll >= (*it)->m_proba_min && dice_roll <= (*it)->m_proba_max)
 		{
-			enemy = (*it)->enemy->Clone();
+			enemy = (*it)->m_enemy->Clone();
 			ApplyHazardLevelModifiers(getSceneHazardLevelValue(), *enemy);
 			break;
 		}
 	}
 	assert(enemy != NULL);
-	enemy->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).direction));
-	enemy->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).direction));
+	enemy->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+	enemy->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
 	//RANDOM POSITION
-	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).direction, enemy->m_size);
+	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).m_direction, enemy->m_size);
 	enemy->setPosition(pos);
 	(*CurrentGame).addToScene(enemy, EnemyObjectLayer, EnemyObject);
 
 	//counting spawned enemies
-	(*CurrentGame).hazardSpawned += enemy->getMoney();
+	(*CurrentGame).m_hazardSpawned += enemy->m_money;
 }
 
 void Scene::GenerateBoss()
 {
-	for (std::vector<EnemyBase*>::iterator it = boss_list.begin(); it != boss_list.end(); ++it)
+	for (std::vector<EnemyBase*>::iterator it = m_boss_list.begin(); it != m_boss_list.end(); ++it)
 	{
-		Enemy* m_boss = (*it)->enemy->Clone();
-		m_boss->enemy_class = (EnemyClass)((*it)->enemyclass);
+		Enemy* m_boss = (*it)->m_enemy->Clone();
+		m_boss->m_enemy_class = (EnemyClass)((*it)->m_enemyclass);
 		(*CurrentGame).addToScene(m_boss, EnemyObjectLayer, EnemyObject);
 
-		m_boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).direction));
-		m_boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).direction));
+		m_boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+		m_boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
 		//counting spawned enemies
-		(*CurrentGame).hazardSpawned += m_boss->getMoney();
+		(*CurrentGame).m_hazardSpawned += m_boss->m_money;
 	}
 }
 
-void Scene::ApplyHazardLevelModifiers(int hazard_level_, Enemy& enemy_)
+void Scene::ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy)
 {
-	enemy_.speed.x *= enemySpeedModifierTable[hazard_level_];
-	enemy_.speed.y *= enemySpeedModifierTable[hazard_level_];
-	for (std::vector<Weapon*>::iterator it = enemy_.weapons_list.begin(); it != enemy_.weapons_list.end(); it++)
+	enemy.m_speed.x *= enemySpeedModifierTable[hazard_level];
+	enemy.m_speed.y *= enemySpeedModifierTable[hazard_level];
+	for (std::vector<Weapon*>::iterator it = enemy.m_weapons_list.begin(); it != enemy.m_weapons_list.end(); it++)
 	{
-		(*it)->ammunition->speed.y *= ammoSpeedModifierTable[hazard_level_];
+		(*it)->m_ammunition->m_speed.y *= ammoSpeedModifierTable[hazard_level];
 	}
 }
 
 void Scene::GenerateEnemies(Time deltaTime)
 {
-	if (spawnClock.getElapsedTime() > sf::seconds(4))
+	if (m_spawnClock.getElapsedTime() > sf::seconds(4))
 	{
-		spawnClock.restart();
+		m_spawnClock.restart();
 		double random_number = ((double)rand() / (RAND_MAX));
 
 		// A PASSER EN .CSV :
@@ -484,15 +484,15 @@ void Scene::GenerateEnemies(Time deltaTime)
 		Enemy* random_enemy_within_class[EnemyClass::NBVAL_EnemyClass];
 
 		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
-		int dice_roll = (rand() % (total_class_probability[EnemyClass::ENEMYPOOL_ALPHA])) + 1;
+		int dice_roll = (rand() % (m_total_class_probability[EnemyClass::ENEMYPOOL_ALPHA])) + 1;
 
 		for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
 		{
-			for (std::vector<EnemyBase*>::iterator it = enemies_ranked_by_class[i].begin(); it != enemies_ranked_by_class[i].end(); ++it)
+			for (std::vector<EnemyBase*>::iterator it = m_enemies_ranked_by_class[i].begin(); it != m_enemies_ranked_by_class[i].end(); ++it)
 			{
-				if (dice_roll >= (*it)->proba_min && dice_roll <= (*it)->proba_max)
+				if (dice_roll >= (*it)->m_proba_min && dice_roll <= (*it)->m_proba_max)
 				{
-					random_enemy_within_class[i] = (*it)->enemy;
+					random_enemy_within_class[i] = (*it)->m_enemy;
 				}
 			}
 		}
@@ -508,13 +508,13 @@ void Scene::GenerateEnemies(Time deltaTime)
 			// arg1 = move pattern
 			//if arg0 != VOID
 			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[EnemyClass::ENEMYPOOL_ALPHA], EnemyClass::ENEMYPOOL_ALPHA, PatternType::NoMovePattern);
-			if (e->enemy->m_size.x > max_enemy_size.x)
+			if (e->m_enemy->m_size.x > max_enemy_size.x)
 			{
-				max_enemy_size.x = e->enemy->m_size.x;
+				max_enemy_size.x = e->m_enemy->m_size.x;
 			}
-			if (e->enemy->m_size.y > max_enemy_size.y)
+			if (e->m_enemy->m_size.y > max_enemy_size.y)
 			{
-				max_enemy_size.y = e->enemy->m_size.y;
+				max_enemy_size.y = e->m_enemy->m_size.y;
 
 				cluster->push_back(e);
 			}
@@ -522,7 +522,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 			sf::Vector2f size = sf::Vector2f(((nb_rows - 1) * xspread) + max_enemy_size.x, ((nb_lines - 1) * yspread) + max_enemy_size.y);
 
 			//RANDOM POSITION TO SPAWN THE CLUSTER
-			sf::Vector2f pos = cluster->front()->enemy->getRandomXSpawnPosition((*CurrentGame).direction, max_enemy_size, size);
+			sf::Vector2f pos = cluster->front()->m_enemy->getRandomXSpawnPosition((*CurrentGame).m_direction, max_enemy_size, size);
 
 			//generating the cluster at the given coordinates
 			EnemyPool* generated_cluster = new EnemyPool(pos, nb_lines, nb_rows, xspread, yspread, cluster);
@@ -534,25 +534,25 @@ float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 
 
 void Scene::HazardBreak()
 {
-	if (this->m_hazard_level_unlocked < HazardLevels::NB_HAZARD_LEVELS - 1)
+	if (m_hazard_level_unlocked < HazardLevels::NB_HAZARD_LEVELS - 1)
 	{
-		this->m_hazard_level_unlocked++;
+		m_hazard_level_unlocked++;
 	}
 	
-	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", this->m_hazard_level + 1));
+	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", m_hazard_level + 1));
 }
 
 float Scene::getSceneBeastScore()
 {
 	float bonus = 0;
-	if (this->m_hazard_level < HazardLevels::NB_HAZARD_LEVELS && this->m_hazard_level >= 0)
+	if (m_hazard_level < HazardLevels::NB_HAZARD_LEVELS && m_hazard_level >= 0)
 	{
-		bonus = HazardLevelsBeastBonus[this->m_hazard_level];
+		bonus = HazardLevelsBeastBonus[m_hazard_level];
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", this->hazard_level);
-		this->m_hazard_level = 0;
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", m_hazard_level);
+		m_hazard_level = 0;
 	}
 
 	return bonus;
@@ -560,11 +560,11 @@ float Scene::getSceneBeastScore()
 
 int Scene::getSceneHazardLevelUnlockedValue()
 {
-	return this->m_hazard_level_unlocked;
+	return m_hazard_level_unlocked;
 }
 
 int Scene::getSceneHazardLevelValue()
 {
-	return this->m_hazard_level;
+	return m_hazard_level;
 }
 

@@ -1,8 +1,8 @@
 #include "GameObject.h"
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
-	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
+	Init(position, speed, textureName, size, frameNumber, animationNumber);
 	this->setOrigin(origin.x, origin.y);
 }
 
@@ -18,7 +18,7 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 
 string GameObject::getName()
 {
-	vector<string> s1 = TextUtils::split(this->textureName, '/');
+	vector<string> s1 = TextUtils::split(m_textureName, '/');
 	return *(s1.end() - 1);
 }
 
@@ -27,97 +27,97 @@ GameObject::GameObject()
 
 }
 
-void GameObject::setAnimationLine(int m_animation, bool keep_frame_index)
+void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
 	//bulletproof verifications
-	if (m_animation >= this->animationNumber)
+	if (animation >= m_animationNumber)
 	{
-		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", m_animation, this->animationNumber);
-		m_animation = this->animationNumber - 1;
-		if (m_animation < 0)
+		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, m_animationNumber);
+		animation = m_animationNumber - 1;
+		if (animation < 0)
 		{
-			m_animation = 0;
+			animation = 0;
 		}
 	}
 
 	//now let's load the new animation
 	Animation* anim = new Animation();
-	anim->setSpriteSheet(*this->defaultAnimation.getSpriteSheet());
-	for (size_t j = 0; j < this->defaultAnimation.getSize(); j++)
+	anim->setSpriteSheet(*m_defaultAnimation.getSpriteSheet());
+	for (size_t j = 0; j < m_defaultAnimation.getSize(); j++)
 	{
-		size_t n = j / this->frameNumber;
+		size_t n = j / m_frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
-		if (n == m_animation)
+		if (n == animation)
 		{
-			anim->addFrame(this->defaultAnimation.getFrame(j));
+			anim->addFrame(m_defaultAnimation.getFrame(j));
 		}
 	}
 
 	if (!keep_frame_index)
 	{
-		this->m_currentFrame = 0;
+		m_currentFrame = 0;
 	}
 
-	if (currentAnimation)
-		delete currentAnimation;
-	this->currentAnimation = anim;
-	this->play(*currentAnimation);
-	this->currentAnimationIndex = m_animation;
+	if (m_currentAnimation)
+		delete m_currentAnimation;
+	m_currentAnimation = anim;
+	play(*m_currentAnimation);
+	m_currentAnimationIndex = animation;
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
 {
-	this->animationNumber = m_animationNumber;
-	this->frameNumber = m_frameNumber;
-	this->initial_position = sf::Vector2f(position.x, position.y);
-	this->m_size.x = ((*texture).getSize().x / m_frameNumber);
-	this->m_size.y = ((*texture).getSize().y / m_animationNumber);
+	m_animationNumber = animationNumber;
+	m_frameNumber = frameNumber;
+	m_initial_position = sf::Vector2f(position.x, position.y);
+	m_size.x = ((*texture).getSize().x / frameNumber);
+	m_size.y = ((*texture).getSize().y / animationNumber);
 
-	this->collider_type = GameObjectType::BackgroundObject;
-	this->defaultAnimation.setSpriteSheet(*texture);
+	m_collider_type = GameObjectType::BackgroundObject;
+	m_defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < m_animationNumber; j++)
 	{
 		for (int i = 0; i < m_frameNumber; i++)
 		{
-			int x = ((*texture).getSize().x / m_frameNumber)*(i);
-			int y = ((*texture).getSize().y / m_animationNumber)*(j);
-			this->defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
+			int x = ((*texture).getSize().x / frameNumber)*(i);
+			int y = ((*texture).getSize().y / animationNumber)*(j);
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
 		}
 	}
 	
-	this->currentAnimation = NULL;
-	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
+	m_currentAnimation = NULL;
+	setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
-	this->speed = speed;
-	this->setPosition(position.x, position.y);
-	this->visible = false;
-	this->isOnScene = false;
-	this->immune = false;
-	this->startPattern = false;
-	this->GarbageMe = false;
-	this->DontGarbageMe = false;
-	this->money = 0;
-	this->diag = sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
-	this->transparent = false;
-	this->ghost = false;
-	this->rotation_speed = 0.f;
-	this->disable_fire = false;
-	this->wake_up = true;
-	this->equipment_loot = NULL;
-	this->weapon_loot = NULL;
-	this->isCollidingWithInteractiveObject = No_Interaction;
+	m_speed = speed;
+	setPosition(position.x, position.y);
+	m_visible = false;
+	m_isOnScene = false;
+	m_immune = false;
+	m_startPattern = false;
+	m_GarbageMe = false;
+	m_DontGarbageMe = false;
+	m_money = 0;
+	m_diag = sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	m_transparent = false;
+	m_ghost = false;
+	m_rotation_speed = 0.f;
+	m_disable_fire = false;
+	m_wake_up = true;
+	m_equipment_loot = NULL;
+	m_weapon_loot = NULL;
+	m_isCollidingWithInteractiveObject = No_Interaction;
 }
 
-void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber)
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x*m_frameNumber, size.y*m_animationNumber);
-	this->textureName = textureName;
+	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
+	m_textureName = textureName;
 
-	this->setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x / 2, size.y / 2);
 
-	Init(position, speed, texture, m_frameNumber, m_animationNumber);
+	Init(position, speed, texture, frameNumber, animationNumber);
 }
 
 GameObject::~GameObject()
@@ -131,21 +131,21 @@ GameObject::~GameObject()
 void GameObject::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->speed;
+	newspeed = m_speed;
 
 	if (hyperspeedMultiplier < 1)
 	{
-		newspeed.x = this->speed.x * hyperspeedMultiplier;
-		newspeed.y = this->speed.y * hyperspeedMultiplier;
+		newspeed.x = m_speed.x * hyperspeedMultiplier;
+		newspeed.y = m_speed.y * hyperspeedMultiplier;
 	}
 	
-	this->setGhost(hyperspeedMultiplier > 1.0f);
+	setGhost(hyperspeedMultiplier > 1.0f);
 	
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
-	this->setPosition(newposition.x, newposition.y);
+	setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
 }
@@ -181,13 +181,13 @@ void GameObject::setGhost(bool m_ghost)
 {
 	if (m_ghost == true)
 	{
-		this->ghost = true;
-		this->setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
+		m_ghost = true;
+		setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
 	}
 	else
 	{
-		this->ghost = false;
-		this->setColor(Color(255, 255, 255, 255));
+		m_ghost = false;
+		setColor(Color(255, 255, 255, 255));
 	}
 	
 }
@@ -198,25 +198,25 @@ void GameObject::setGhost(bool m_ghost)
 
 void GameObject::damage_from(GameObject& object)
 {
-	if (!immune)
+	if (!m_immune)
 	{
 		setColor(Color(255,0,0,255), sf::seconds(DAMAGE_FEEDBACK_TIME));
-		if (object.damage > shield)
+		if (object.m_damage > m_shield)
 		{
-			armor -= (object.damage - shield);
-			shield = 0;
+			m_armor -= (object.m_damage - m_shield);
+			m_shield = 0;
 		}
 		else
 		{
-			shield -= object.damage;
+			m_shield -= object.m_damage;
 		}		
 	}
 }
 
 bool GameObject::get_money_from(GameObject& object)
 {
-	int loot_value = object.getMoney();//give all the money
-	money += loot_value;
+	int loot_value = object.m_money;//give all the money
+	m_money += loot_value;
 	object.addMoney(-loot_value);
 	if (loot_value > 0)
 		return true;
@@ -226,7 +226,7 @@ bool GameObject::get_money_from(GameObject& object)
 
 bool GameObject::get_money_from(GameObject& object, int loot_value)
 {
-	money += loot_value;
+	m_money += loot_value;
 	object.addMoney(-loot_value);
 	if (loot_value > 0)
 		return true;
@@ -234,64 +234,24 @@ bool GameObject::get_money_from(GameObject& object, int loot_value)
 		return false;
 }
 
-int GameObject::getGameObjectDamage()
-{
-	return damage;
-}
-
-int GameObject::getGameObjectShield()
-{
-	return shield;
-}
-
-int GameObject::getGameObjectShieldMax()
-{
-	return shield_max;
-}
-
-int GameObject::getGameObjectShieldRegen()
-{
-	return shield_regen;
-}
-
-int GameObject::getGameObjectArmor()
-{
-	return armor;
-}
-
-int GameObject::getGameObjectArmorMax()
-{
-	return armor_max;
-}
-
-sf::Vector2f GameObject::getGameObjectSpeed()
-{
-	return sf::Vector2f(speed.x, speed.y);
-}
-
 GameObject* GameObject::Clone()
 {
-	GameObject* clone = new GameObject(this->getPosition(), this->speed, this->textureName, this->m_size);
-	clone->display_name = this->display_name;
-	clone->collider_type = this->collider_type;
-	clone->layer = this->layer;
+	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size);
+	clone->m_display_name = this->m_display_name;
+	clone->m_collider_type = this->m_collider_type;
+	clone->m_layer = this->m_layer;
 
 	return clone;
 }
 
-int GameObject::getMoney()
-{
-	return money;
-}
-
 void GameObject::addMoney(int loot_value)
 {
-	money += loot_value;
+	m_money += loot_value;
 }
 
 void GameObject::setMoney(int loot_value)
 {
-	money = loot_value;
+	m_money = loot_value;
 }
 
 void GameObject::Death()
@@ -330,10 +290,10 @@ void GameObject::GetShop(GameObject* object)
 
 bool GameObject::get_equipment_from(GameObject& object)
 {
-	if (object.equipment_loot != NULL && this->equipment_loot == NULL)
+	if (object.m_equipment_loot != NULL && m_equipment_loot == NULL)
 	{
-		this->equipment_loot = object.getEquipmentLoot();
-		object.equipment_loot = NULL;
+		m_equipment_loot = object.getEquipmentLoot();
+		object.m_equipment_loot = NULL;
 		return true;
 	}
 	else
@@ -344,9 +304,9 @@ bool GameObject::get_equipment_from(GameObject& object)
 
 bool GameObject::setEquipmentLoot(Equipment* equipment)
 {
-	if (this->equipment_loot == NULL)
+	if (m_equipment_loot == NULL)
 	{
-		this->equipment_loot = equipment;
+		m_equipment_loot = equipment;
 		return true;
 	}
 	else
@@ -357,20 +317,20 @@ bool GameObject::setEquipmentLoot(Equipment* equipment)
 
 Equipment* GameObject::getEquipmentLoot()
 {
-	return this->equipment_loot;
+	return m_equipment_loot;
 }
 
 void GameObject::releaseEquipmentLoot()
 {
-	this->equipment_loot = NULL;
+	m_equipment_loot = NULL;
 }
 
 bool GameObject::get_weapon_from(GameObject& object)
 {
-	if (object.weapon_loot != NULL && this->weapon_loot == NULL)
+	if (object.m_weapon_loot != NULL && m_weapon_loot == NULL)
 	{
-		this->weapon_loot = object.getWeaponLoot();
-		object.weapon_loot = NULL;
+		m_weapon_loot = object.getWeaponLoot();
+		object.m_weapon_loot = NULL;
 		return true;
 	}
 	else
@@ -381,9 +341,9 @@ bool GameObject::get_weapon_from(GameObject& object)
 
 bool GameObject::setWeaponLoot(Weapon* weapon)
 {
-	if (this->weapon_loot == NULL)
+	if (m_weapon_loot == NULL)
 	{
-		this->weapon_loot = weapon;
+		m_weapon_loot = weapon;
 		return true;
 	}
 	else
@@ -394,12 +354,12 @@ bool GameObject::setWeaponLoot(Weapon* weapon)
 
 Weapon* GameObject::getWeaponLoot()
 {
-	return this->weapon_loot;
+	return m_weapon_loot;
 }
 
 void GameObject::releaseWeaponLoot()
 {
-	this->weapon_loot = NULL;
+	m_weapon_loot = NULL;
 }
 
 void GameObject::GetGrazing()
@@ -841,4 +801,45 @@ sf::Vector2f GameObject::ApplyScreenBordersConstraints(Directions direction, sf:
 void GameObject::updatePostCollision()
 {
 	//see override in class Ship
+}
+
+float GameObject::getFighterFloatStatValue(FighterStats stat)
+{
+	//see override in class Ship
+	return -1;
+}
+
+int GameObject::getFighterIntStatValue(FighterStats stat)
+{
+	switch (stat)
+	{
+		case Fighter_Armor:
+		{
+			return m_armor;
+		}
+		case Fighter_ArmorMax:
+		{
+			return m_armor_max;
+		}
+		case Fighter_Shield:
+		{
+			return m_shield;
+		}
+		case Fighter_ShieldMax:
+		{
+			return m_shield_max;
+		}
+		case Fighter_ShieldRegen:
+		{
+			return m_shield_regen;
+		}
+		case Fighter_ContactDamage:
+		{
+			return m_damage;
+		}
+		default:
+		{
+			return -1;
+		}
+	}
 }

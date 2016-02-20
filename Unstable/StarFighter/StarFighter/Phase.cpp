@@ -2,18 +2,18 @@
 
 Phase::Phase()
 {
-	this->hasTransition = false;
-	this->hasWakeUp = false;
-	this->hasWelcomeShot = false;
-	this->Pattern = new PatternBobby();
+	m_hasTransition = false;
+	m_hasWakeUp = false;
+	m_hasWelcomeShot = false;
+	m_Pattern = new PatternBobby();
 }
 
-ConditionTransition::ConditionTransition(ConditionType m_condition, FloatCompare m_op, float m_value, std::string m_nextPhase_name)
+ConditionTransition::ConditionTransition(ConditionType condition, FloatCompare op, float value, std::string nextPhase_name)
 {
-	this->condition = m_condition;
-	this->op = m_op;
-	this->value = m_value;
-	this->nextPhase_name = m_nextPhase_name;
+	m_condition = condition;
+	m_op = op;
+	m_value = value;
+	m_nextPhase_name = nextPhase_name;
 }
 
 ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
