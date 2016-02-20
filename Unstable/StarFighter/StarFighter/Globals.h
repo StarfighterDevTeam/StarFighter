@@ -10,6 +10,7 @@
 
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 #define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
+#define MONEY_SAVE_FILE							"Saves/Money.txt"
 
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080

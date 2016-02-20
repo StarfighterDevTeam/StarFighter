@@ -1354,7 +1354,14 @@ bool Ship::GetLoot(GameObject& object)
 	}
 
 	//MONEY
-	return this->get_money_from(object);
+	if (object.m_money > 0)
+	{
+		get_money_from(object);
+		Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+		return true;
+	}
+
+	return false;
 }
 
 void Ship::GetPortal(GameObject* object)
@@ -1536,7 +1543,55 @@ int Ship::UpdateShipLevel()
 	return level_;
 }
 
-//SAVING AND LOADING ITEMS
+//SAVING AND LOADING ITEMS AND MONEY
+int Ship::SavePlayerMoney(string file, Ship* ship)
+{
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving money in profile.\n");
+	assert(ship != NULL);
+
+	ofstream data(file.c_str(), ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		data << "Money " << ship->m_money << endl;
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No save file found for known scenes. A new file is going to be created.\n" << endl;
+	}
+
+	return 0;
+}
+
+bool Ship::LoadPlayerMoney(string file, Ship* ship)
+{
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading items from profile.\n");
+	assert(ship != NULL);
+
+	std::ifstream  data(file, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+		while (std::getline(data, line))
+		{
+			string equipment_type;
+
+			//Loading money
+
+			std::istringstream(line) >> equipment_type >> ship->m_money;
+		}
+		
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No MONEY SAVE FILE found. A new file is going to be created.\n" << endl;
+		return false;
+	}
+}
+
 void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type)
 {
 	if (equipment)
@@ -1604,23 +1659,23 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 			data << equipment->m_bot->m_Pattern.currentPattern << " ";
 			switch (equipment->m_bot->m_Pattern.currentPattern)
 			{
-			case NoMovePattern:
-			{
-								  break;
-			}
-			case Line_:
-			{
-						  data << equipment->m_bot->m_Pattern.patternSpeed << " ";
-						  data << &equipment->m_bot->m_Pattern.patternParams[1] << " ";
-						  break;
-			}
-			default:
-			{
-					   data << equipment->m_bot->m_Pattern.patternSpeed << " ";
-					   data << &equipment->m_bot->m_Pattern.patternParams[0] << " ";
-					   data << &equipment->m_bot->m_Pattern.patternParams[1] << " ";
-					   break;
-			}
+				case NoMovePattern:
+				{
+					break;
+				}
+				case Line_:
+				{
+					data << equipment->m_bot->m_Pattern.patternSpeed << " ";
+					data << &equipment->m_bot->m_Pattern.patternParams[1] << " ";
+					break;
+				}
+				default:
+				{
+					data << equipment->m_bot->m_Pattern.patternSpeed << " ";
+					data << &equipment->m_bot->m_Pattern.patternParams[0] << " ";
+					data << &equipment->m_bot->m_Pattern.patternParams[1] << " ";
+					break;
+				}
 			}
 
 			if (equipment->m_bot->m_weapon)
@@ -1717,6 +1772,7 @@ int Ship::SaveItems(string file, Ship* ship)
 	ofstream data(file.c_str(), ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
+		data << "Money " << ship->m_money << endl;
 		// instructions
 		for (int i = 0; i < NBVAL_Equipment; i++)
 		{
@@ -2102,14 +2158,23 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 	if (data) // si ouverture du fichier réussie
 	{
 		std::string line;
-		int i = 0;
+		int i = -1;
 		while (std::getline(data, line))
 		{
 			string equipment_type;
 			string display_name;
 
+			//Loading money
+			if (i == -1)
+			{
+				int money;
+				std::istringstream(line) >> equipment_type >> money;
+				ship->m_money = money;
+				continue;
+			}
+
 			//Loading equipment
-			if (i < NBVAL_Equipment)
+			else if (i < NBVAL_Equipment)
 			{
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
@@ -2172,7 +2237,7 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 	}
 	else  // si l'ouverture a échoué
 	{
-		cerr << "Failed to open ITEMS SAVE FILE !" << endl;
+		cerr << "DEBUG: No ITEMS SAVE FILE found. A new file is going to be created.\n" << endl;
 		return false;
 	}
 }

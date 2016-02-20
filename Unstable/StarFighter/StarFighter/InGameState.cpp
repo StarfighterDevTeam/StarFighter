@@ -48,6 +48,12 @@ void InGameState::Initialize(Player player)
 		//or create a new save file
 		Ship::SaveItems(ITEMS_SAVE_FILE, m_playerShip);
 	}
+	//load money
+	if (!Ship::LoadPlayerMoney(MONEY_SAVE_FILE, m_playerShip))
+	{
+		//or create a new save file
+		Ship::SavePlayerMoney(MONEY_SAVE_FILE, m_playerShip);
+	}
 	m_playerShip->Init();
 	m_playerShip->ResplenishHealth();
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
