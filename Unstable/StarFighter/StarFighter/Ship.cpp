@@ -1376,7 +1376,7 @@ void Ship::GetShop(GameObject* object)
 	m_isCollidingWithInteractiveObject = ShopInteraction;
 }
 
-static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 10, 40, 70 };
+static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 100, 500, 1500 };
 static float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
 
 void Ship::GetGrazing()
