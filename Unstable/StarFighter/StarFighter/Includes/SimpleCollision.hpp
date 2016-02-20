@@ -34,7 +34,6 @@ public:
 		if (((a * a) + (b * b)) > (c * c))
 			return false;
 
-
 		else
 		{
 			if (PIXEL_PERFECT_COLLISION)

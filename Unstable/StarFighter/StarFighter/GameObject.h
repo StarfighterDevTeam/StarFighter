@@ -223,7 +223,7 @@ public:
 	virtual bool GetLoot(GameObject& object);
 	virtual void GetPortal(GameObject* object);
 	virtual void GetShop(GameObject* object);
-	void setGhost(bool m_ghost);
+	void setGhost(bool ghost);
 	void setAnimationLine(int animation_line, bool keep_frame_index = false);
 
 	bool get_equipment_from(GameObject& object);

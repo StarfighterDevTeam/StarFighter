@@ -177,9 +177,9 @@ void GameObject::Respawn()
 
 }
 
-void GameObject::setGhost(bool m_ghost)
+void GameObject::setGhost(bool ghost)
 {
-	if (m_ghost == true)
+	if (ghost == true)
 	{
 		m_ghost = true;
 		setColor(Color(255, 255, 255, GHOST_ALPHA_VALUE));
