@@ -325,6 +325,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					
 					m_hasDisplayedDestructionRatio = false;
 					m_IG_State = InGameStateMachine::LAST_SCREEN;
+
+					//Wipe out enemies that were spawned offscren
+					(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
 				}
 			}
 
@@ -409,7 +412,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			//clearing enemies that have spawned out of the scene size
 			else
 			{
-				(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
 				if (m_currentScene->m_generating_boss)
 				{
 					m_bossSpawnCountdown.restart();
