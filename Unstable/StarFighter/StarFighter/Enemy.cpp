@@ -421,17 +421,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 	}
-	
-	//sheld regen if not maximum
-	if (m_shield < m_shield_max)
-	{
-		m_shield += m_shield_regen;
-		//canceling over-regen
-		if (m_shield > m_shield_max)
-		{
-			m_shield = m_shield_max;
-		}
-	}
 
 	AnimatedSprite::update(deltaTime);
 
