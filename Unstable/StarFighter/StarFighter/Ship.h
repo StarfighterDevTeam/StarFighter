@@ -212,8 +212,8 @@ public :
 	//void LevelUp();
 	int UpdateShipLevel();
 
-	static int SaveItems(string file);
-	static bool LoadPlayerItems(string file);
+	static int SaveItems(string file, Ship* ship);
+	static bool LoadPlayerItems(string file, Ship* ship);
 	static Equipment* LoadEquipmentFromLine(string line);
 	static Weapon* LoadWeaponFromLine(string line);
 	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);

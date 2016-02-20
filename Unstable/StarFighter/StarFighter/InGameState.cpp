@@ -43,10 +43,10 @@ void InGameState::Initialize(Player player)
 	m_playerShip->m_respawnSceneName = m_currentScene->m_name;
 
 	//Load saved items
-	if (!Ship::LoadPlayerItems(ITEMS_SAVE_FILE))
+	if (!Ship::LoadPlayerItems(ITEMS_SAVE_FILE, m_playerShip))
 	{
 		//or create a new save file
-		Ship::SaveItems(ITEMS_SAVE_FILE);
+		Ship::SaveItems(ITEMS_SAVE_FILE, m_playerShip);
 	}
 	m_playerShip->Init();
 	m_playerShip->ResplenishHealth();

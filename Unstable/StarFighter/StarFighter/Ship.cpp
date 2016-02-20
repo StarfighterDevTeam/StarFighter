@@ -396,7 +396,7 @@ bool Ship::setEquipment(Equipment* equipment, bool overwrite_existing, bool no_s
 	GenerateBots(this);
 	
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE);
+		Ship::SaveItems(ITEMS_SAVE_FILE, this);
 
 	return true;
 }
@@ -405,12 +405,12 @@ bool Ship::setShipWeapon(Weapon* weapon, bool overwrite_existing, bool no_save)
 {
 	assert(weapon != NULL);
 
-	if (!overwrite_existing && weapon)
+	if (!overwrite_existing && m_weapon)
 	{
 		return false;
 	}
 
-	if (overwrite_existing && weapon)
+	if (overwrite_existing && m_weapon)
 	{
 		delete m_weapon;
 	}
@@ -420,7 +420,7 @@ bool Ship::setShipWeapon(Weapon* weapon, bool overwrite_existing, bool no_save)
 	this->Init();
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE);
+		Ship::SaveItems(ITEMS_SAVE_FILE, this);
 	
 	return true;
 }
@@ -440,7 +440,7 @@ void Ship::cleanEquipment(int equipment_type, bool no_save)
 	}
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE);
+		Ship::SaveItems(ITEMS_SAVE_FILE, this);
 }
 
 void Ship::cleanWeapon(bool no_save)
@@ -454,7 +454,7 @@ void Ship::cleanWeapon(bool no_save)
 	}
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE);
+		Ship::SaveItems(ITEMS_SAVE_FILE, this);
 }
 
 void Ship::setShipModel(ShipModel* ship_model, bool no_save)
@@ -475,7 +475,7 @@ void Ship::setShipModel(ShipModel* ship_model, bool no_save)
 	}
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE);
+		Ship::SaveItems(ITEMS_SAVE_FILE, this);
 }
 
 void Ship::ManageDebugCommand()
@@ -992,7 +992,7 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 							}
 						}
 						//Save items
-						SaveItems(ITEMS_SAVE_FILE);
+						SaveItems(ITEMS_SAVE_FILE, this);
 
 						m_brakingHoldingClock.restart();
 						m_isBrakingButtonHeldPressed = false;
@@ -1709,9 +1709,10 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 	data << endl;
 }
 
-int Ship::SaveItems(string file)
+int Ship::SaveItems(string file, Ship* ship)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving items in profile.\n");
+	assert(ship != NULL);
 
 	ofstream data(file.c_str(), ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
@@ -1748,11 +1749,11 @@ int Ship::SaveItems(string file)
 				}
 			}
 
-			Ship::SaveEquipmentData(data, (*CurrentGame).playerShip->m_equipment[i], true);
+			Ship::SaveEquipmentData(data, ship->m_equipment[i], true);
 		}
 
 		data << "Weapon ";
-		Ship::SaveWeaponData(data, (*CurrentGame).playerShip->m_weapon, true);
+		Ship::SaveWeaponData(data, ship->m_weapon, true);
 
 		for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
 		{
@@ -1786,7 +1787,7 @@ int Ship::SaveItems(string file)
 	}
 	else  // si l'ouverture a échoué
 	{
-		cerr << "Failed to open PLAYER SAVE FILE !" << endl;
+		cerr << "DEBUG: No save file found for known scenes. A new file is going to be created.\n" << endl;
 	}
 
 	return 0;
@@ -2091,9 +2092,10 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	return weapon;
 }
 
-bool Ship::LoadPlayerItems(string file)
+bool Ship::LoadPlayerItems(string file, Ship* ship)
 {
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading items from profile.\n");
+	assert(ship != NULL);
 
 	std::ifstream  data(file, ios::in);
 
@@ -2112,7 +2114,7 @@ bool Ship::LoadPlayerItems(string file)
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
 				{
-					(*CurrentGame).playerShip->setEquipment(Ship::LoadEquipmentFromLine(line), true, true);
+					ship->setEquipment(Ship::LoadEquipmentFromLine(line), true, true);
 				}
 			}
 			//Loading weapon
@@ -2121,7 +2123,7 @@ bool Ship::LoadPlayerItems(string file)
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
 				{
-					(*CurrentGame).playerShip->setShipWeapon(Ship::LoadWeaponFromLine(line), true, true);
+					ship->setShipWeapon(Ship::LoadWeaponFromLine(line), true, true);
 				}
 			}
 			//Loading stash
@@ -2147,14 +2149,14 @@ bool Ship::LoadPlayerItems(string file)
 					if (equipment_type.compare("Weapon") == 0)
 					{
 						Weapon* weapon = Ship::LoadWeaponFromLine(line);
-						GameObject* capsule = (*CurrentGame).playerShip->CloneWeaponIntoGameObject(weapon);
+						GameObject* capsule = ship->CloneWeaponIntoGameObject(weapon);
 						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
 						delete weapon;
 					}
 					else
 					{
 						Equipment* equipment = Ship::LoadEquipmentFromLine(line);
-						GameObject* capsule = (*CurrentGame).playerShip->CloneEquipmentIntoGameObject(equipment);
+						GameObject* capsule = ship->CloneEquipmentIntoGameObject(equipment);
 						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
 						delete equipment;
 					}
