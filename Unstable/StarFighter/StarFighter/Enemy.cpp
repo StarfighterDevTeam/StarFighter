@@ -9,7 +9,6 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_angspeed = 0;
 	m_radius = 0;
 	m_FX_death = FX_death;
-	m_hasPhases = false;
 	m_rotation_speed = 0;
 	m_face_target = false;
 	m_reset_facing = false;
@@ -190,7 +189,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	bool l_ghost = false;
-	if (m_hasPhases)
+	if (!m_phases.empty())
 	{
 		for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
 		{
@@ -448,9 +447,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//phases
-	if (m_hasPhases)
+	if (!m_phases.empty())
 	{
-		if (m_currentPhase->m_hasTransition)
+		if (!m_currentPhase->m_transitions_list.empty())
 		{
 			this->CheckCondition();
 		}
@@ -524,9 +523,8 @@ Enemy* Enemy::Clone()
 
 	enemy->m_rotation_speed = this->m_rotation_speed;
 
-	if (this->m_hasPhases)
+	if (!m_phases.empty())
 	{
-		enemy->m_hasPhases = this->m_hasPhases;
 		enemy->m_currentPhase = this->m_currentPhase;
 		enemy->setPhase(this->m_currentPhase);
 		for (std::vector<Phase*>::iterator it = (this->m_phases.begin()); it != (this->m_phases.end()); it++)
@@ -962,12 +960,10 @@ Phase* Enemy::LoadPhase(string name)
 			//loading transition to next phase
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
 			{
-				phase->m_hasTransition = true;
 				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
 			}
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("0") != 0)
 			{
-				phase->m_hasTransition = true;
 				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION_2));
 			}
 

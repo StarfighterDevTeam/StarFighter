@@ -330,8 +330,7 @@ void Game::colisionChecksV2()
 				{
 					(*it1)->Death();
 					//we all deserve another chance...
-					(*it1)->Respawn();
-					m_hazard = 0;
+					//(*it1)->Respawn();
 				}
 
 				//player may also deal contact damage to enemy ships

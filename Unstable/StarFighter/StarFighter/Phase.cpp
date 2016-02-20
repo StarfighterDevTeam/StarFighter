@@ -2,7 +2,6 @@
 
 Phase::Phase()
 {
-	m_hasTransition = false;
 	m_hasWakeUp = false;
 	m_hasWelcomeShot = false;
 	m_Pattern = new PatternBobby();

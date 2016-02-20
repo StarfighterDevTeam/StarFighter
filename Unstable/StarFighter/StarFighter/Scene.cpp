@@ -168,7 +168,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						e->m_enemy->ApplyLevelModifiers();
 
 						//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
-						if (!e->m_enemy->m_hasPhases)
+						if (e->m_enemy->m_phases.empty())
 						{
 							e->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, e->m_enemy->m_speed.y);
 						}
@@ -197,7 +197,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						EnemyBase* boss = FileLoader::LoadEnemyBase((*it)[BOSS], 1, stoi((*it)[BOSS_CLASS]));
 						boss->m_enemy->m_level = stoi((*it)[BOSS_LEVEL]);
 
-						if (!boss->m_enemy->m_hasPhases)
+						if (boss->m_enemy->m_phases.empty())
 						{
 							boss->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, boss->m_enemy->m_speed.y);
 						}

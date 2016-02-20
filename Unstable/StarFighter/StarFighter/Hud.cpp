@@ -167,7 +167,6 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 	int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
-
 	//armor and shield
 	if (m_armor <=0)
 	{
@@ -179,7 +178,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		if (m_armor < m_shield)
 		{
 			armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max), ARMOR_BAR_SIZE_Y));
-			armorBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max, ARMOR_BAR_SIZE_Y));
+			armorBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max, ARMOR_BAR_SIZE_Y));
 		}
 		else
 		{
@@ -199,7 +198,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		if (m_shield < m_armor)
 		{
 			shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max), SHIELD_BAR_SIZE_Y));
-			shieldBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max, SHIELD_BAR_SIZE_Y));
+			shieldBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max, SHIELD_BAR_SIZE_Y));
 		}
 		else
 		{

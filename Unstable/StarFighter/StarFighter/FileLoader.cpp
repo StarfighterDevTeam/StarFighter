@@ -119,7 +119,6 @@ EnemyBase* FileLoader::LoadEnemyBase(string m_name, int m_probability, int m_ene
 
 				//setting the starting phase
 				base->m_enemy->setPhase(base->m_enemy->m_phases.front());
-				base->m_enemy->m_hasPhases = true;
 			}
 			else
 			{

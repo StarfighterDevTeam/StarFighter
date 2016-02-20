@@ -59,7 +59,6 @@ public:
 	Phase* m_currentPhase;
 
 	vector <Phase*> m_phases;
-	bool m_hasPhases;
 
 	bool CheckCondition();
 

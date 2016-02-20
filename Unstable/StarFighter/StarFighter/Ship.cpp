@@ -258,213 +258,6 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 #define EQUIPMENT_SHIELD_REGEN_MULTIPLIER		10
 #define EQUIPMENT_DAMAGE_MULTIPLIER				10
 
-float Ship::getFighterFloatStatValue(FighterStats stat)
-{
-	float new_stat_value = 0;
-	float equipment_value = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i])
-		{
-			switch (stat)
-			{
-				case Fighter_Hyperspeed:
-				{
-					equipment_value += m_equipment[i]->m_hyperspeed;
-					break;
-				}
-				case Fighter_MaxSpeed:
-				{
-					equipment_value += m_equipment[i]->m_max_speed;
-					break;
-				}
-				case Fighter_Acceleration:
-				{
-					equipment_value += m_equipment[i]->m_acceleration;
-					break;
-				}
-				case Fighter_Deceleration:
-				{
-					equipment_value += m_equipment[i]->m_deceleration;
-					break;
-				}
-				default:
-				{
-					equipment_value += 0;
-				}
-			}
-		}
-		else
-		{
-			equipment_value += 0;
-		}
-	}
-
-	//adding ship model stats
-	switch (stat)
-	{
-		case Fighter_Hyperspeed:
-		{
-			new_stat_value = m_ship_model->m_hyperspeed + equipment_value;
-			break;
-		}
-		case Fighter_MaxSpeed:
-		{
-			new_stat_value = m_ship_model->m_max_speed + equipment_value;
-			break;
-		}
-		case Fighter_Acceleration:
-		{
-			new_stat_value = m_ship_model->m_acceleration + equipment_value;
-			break;
-		}
-		case Fighter_Deceleration:
-		{
-			new_stat_value = m_ship_model->m_deceleration + equipment_value;
-			break;
-		}
-		default:
-		{
-			new_stat_value = equipment_value;
-		}
-	}
-
-	return new_stat_value;
-}
-
-int Ship::getFighterIntStatValue(FighterStats stat)
-{
-	int new_stat_value = 0;
-	int equipment_value = 0;
-
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
-	{
-		if (m_equipment[i])
-		{
-			switch (stat)
-			{
-				case Fighter_Armor:
-				{
-					return m_armor;
-				}
-				case Fighter_ArmorMax:
-				{
-					equipment_value += m_equipment[i]->m_armor;
-					break;
-				}
-				case Fighter_Shield:
-				{
-					return m_shield;
-				}
-				case Fighter_ShieldMax:
-				{
-					equipment_value += m_equipment[i]->m_shield;
-					break;
-				}
-				case Fighter_ShieldRegen:
-				{
-					equipment_value += m_equipment[i]->m_shield_regen;
-					break;
-				}
-				case Fighter_ContactDamage:
-				{
-					equipment_value += m_equipment[i]->m_damage;
-					break;
-				}
-				case Fighter_Credits:
-				{
-					equipment_value += m_equipment[i]->m_credits;
-					break;
-				}
-				case Fighter_Level:
-				{
-					equipment_value += m_equipment[i]->m_level;
-					break;
-				}
-				default:
-				{
-					equipment_value += 0;
-				}
-			}
-		}
-		else
-		{
-			equipment_value += 0;
-		}
-	}
-
-	//adding ship model stats
-	switch (stat)
-	{
-		case Fighter_ArmorMax:
-		{
-			new_stat_value = m_ship_model->m_armor + equipment_value;
-			break;
-		}
-		case Fighter_ShieldMax:
-		{
-			new_stat_value = m_ship_model->m_shield + equipment_value;
-			break;
-		}
-		case Fighter_ShieldRegen:
-		{
-			new_stat_value = m_ship_model->m_shield_regen + equipment_value;
-			break;
-		}
-		case Fighter_ContactDamage:
-		{
-			new_stat_value = m_ship_model->m_damage + equipment_value;
-			break;
-		}
-		case Fighter_Credits:
-		{
-			new_stat_value = equipment_value;
-			break;
-		}
-		case Fighter_Level:
-		{
-			new_stat_value = equipment_value;
-			break;
-		}
-		default:
-		{
-			new_stat_value = equipment_value;
-		}
-	}
-
-	return new_stat_value;
-}
-
-void Ship::GenerateBots(GameObject* m_target)
-{
-	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
-	{
-		Bot* m_bot = (*it)->Clone();
-		m_bot->m_automatic_fire = m_automatic_fire;
-		m_bot->m_spread = GameObject::getSize_for_Direction((*CurrentGame).m_direction, m_bot->m_spread);
-		m_bot->setTarget(m_target);
-		m_bot->rotate(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, GameObjectType::Neutral);
-	}
-}
-
-void Ship::DestroyBots()
-{
-	m_bot_list.clear();
-	(*CurrentGame).garbageLayer(LayerType::BotLayer);
-}
-
-void Ship::GenerateFakeShip(GameObject* m_target)
-{
-	assert(m_ship_model != NULL);
-	if (!m_ship_model->m_fake_textureName.empty())
-	{
-		m_fake_ship = new FakeShip(m_target, m_ship_model->m_fake_textureName, m_ship_model->m_fake_size, m_ship_model->m_fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, GameObjectType::FakePlayerShip);
-	}
-}
-
 // ----------------SHIP ---------------
 
 Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), ship_model->m_textureName, ship_model->m_size, Vector2f((ship_model->m_size.x / 2), (ship_model->m_size.y / 2)), ship_model->m_frameNumber)
@@ -478,7 +271,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 		m_equipment[i] = NULL;
 	}
 	m_weapon = NULL;
-
+	m_fake_ship = NULL;
 	m_collider_type = GameObjectType::PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
@@ -2383,4 +2176,212 @@ void Ship::updatePostCollision()
 {
 	m_previouslyCollidingWithInteractiveObject = m_isCollidingWithInteractiveObject;
 	m_isCollidingWithInteractiveObject = No_Interaction;
+}
+
+
+float Ship::getFighterFloatStatValue(FighterStats stat)
+{
+	float new_stat_value = 0;
+	float equipment_value = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (m_equipment[i])
+		{
+			switch (stat)
+			{
+			case Fighter_Hyperspeed:
+			{
+									   equipment_value += m_equipment[i]->m_hyperspeed;
+									   break;
+			}
+			case Fighter_MaxSpeed:
+			{
+									 equipment_value += m_equipment[i]->m_max_speed;
+									 break;
+			}
+			case Fighter_Acceleration:
+			{
+										 equipment_value += m_equipment[i]->m_acceleration;
+										 break;
+			}
+			case Fighter_Deceleration:
+			{
+										 equipment_value += m_equipment[i]->m_deceleration;
+										 break;
+			}
+			default:
+			{
+					   equipment_value += 0;
+			}
+			}
+		}
+		else
+		{
+			equipment_value += 0;
+		}
+	}
+
+	//adding ship model stats
+	switch (stat)
+	{
+		case Fighter_Hyperspeed:
+		{
+			new_stat_value = m_ship_model->m_hyperspeed + equipment_value;
+			break;
+		}
+		case Fighter_MaxSpeed:
+		{
+			new_stat_value = m_ship_model->m_max_speed + equipment_value;
+			break;
+		}
+		case Fighter_Acceleration:
+		{
+			new_stat_value = m_ship_model->m_acceleration + equipment_value;
+			break;
+		}
+		case Fighter_Deceleration:
+		{
+			new_stat_value = m_ship_model->m_deceleration + equipment_value;
+			break;				 
+		}
+		default:
+		{
+			new_stat_value = equipment_value;
+		}
+	}
+
+	return new_stat_value;
+}
+
+int Ship::getFighterIntStatValue(FighterStats stat)
+{
+	int new_stat_value = 0;
+	int equipment_value = 0;
+
+	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	{
+		if (m_equipment[i])
+		{
+			switch (stat)
+			{
+				case Fighter_Armor:
+				{
+					return m_armor;
+				}
+				case Fighter_ArmorMax:
+				{
+					equipment_value += m_equipment[i]->m_armor;
+					break;
+				}
+				case Fighter_Shield:
+				{
+					return m_shield;
+				}
+				case Fighter_ShieldMax:
+				{
+					equipment_value += m_equipment[i]->m_shield;
+					break;
+				}
+				case Fighter_ShieldRegen:
+				{
+					equipment_value += m_equipment[i]->m_shield_regen;
+					break;
+				}
+				case Fighter_ContactDamage:
+				{
+					equipment_value += m_equipment[i]->m_damage;
+					break;
+				}
+				case Fighter_Credits:
+				{
+					equipment_value += m_equipment[i]->m_credits;
+					break;
+				}
+				case Fighter_Level:
+				{
+					equipment_value += m_equipment[i]->m_level;
+					break;
+				}
+				default:
+				{
+					equipment_value += 0;
+				}
+			}
+		}
+		else
+		{
+			equipment_value += 0;
+		}
+	}
+
+	//adding ship model stats
+	switch (stat)
+	{
+		case Fighter_ArmorMax:
+		{
+			new_stat_value = m_ship_model->m_armor + equipment_value;
+			break;
+		}
+		case Fighter_ShieldMax:
+		{
+			new_stat_value = m_ship_model->m_shield + equipment_value;
+			break;
+		}
+		case Fighter_ShieldRegen:
+		{
+			new_stat_value = m_ship_model->m_shield_regen + equipment_value;
+			break;
+		}
+		case Fighter_ContactDamage:
+		{
+			new_stat_value = m_ship_model->m_damage + equipment_value;
+			break;
+		}
+		case Fighter_Credits:
+		{
+			new_stat_value = equipment_value;
+			break;
+		}
+		case Fighter_Level:
+		{
+			new_stat_value = equipment_value;
+			break;
+		}
+		default:
+		{
+			new_stat_value = equipment_value;
+		}
+	}
+
+	return new_stat_value;
+}
+
+void Ship::GenerateBots(GameObject* m_target)
+{
+	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+	{
+		Bot* m_bot = (*it)->Clone();
+		m_bot->m_automatic_fire = m_automatic_fire;
+		m_bot->m_spread = GameObject::getSize_for_Direction((*CurrentGame).m_direction, m_bot->m_spread);
+		m_bot->setTarget(m_target);
+		m_bot->rotate(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+		(*CurrentGame).addToScene(m_bot, LayerType::BotLayer, GameObjectType::Neutral);
+	}
+}
+
+void Ship::DestroyBots()
+{
+	m_bot_list.clear();
+	(*CurrentGame).garbageLayer(LayerType::BotLayer);
+}
+
+void Ship::GenerateFakeShip(GameObject* target)
+{
+	assert(m_ship_model != NULL);
+	if (!m_ship_model->m_fake_textureName.empty())
+	{
+		m_fake_ship = new FakeShip(target, m_ship_model->m_fake_textureName, m_ship_model->m_fake_size, m_ship_model->m_fake_frameNumber, ShipAnimations::NB_ShipAnimations);
+		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, GameObjectType::FakePlayerShip);
+	}
 }
