@@ -54,6 +54,7 @@ public:
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
 
+	bool InsertObjectInGrid(ObjectGrid& grid, GameObject& object, int index = 0);
 	bool InsertObjectInShipGrid(GameObject& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(GameObject& object, int index=-1);
 	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment);

@@ -27,7 +27,6 @@ const float LootTable_DroppingSomething[EnemyClass::NBVAL_EnemyClass] = { 0.0, 0
 const float LootTable_DropIsEquipment[EnemyClass::NBVAL_EnemyClass] = {0.0, 0.1, 0.1, 0.3, 0.3, 0.6, 0.6, 1.0, 0.0};
 const sf::Vector2f LootTable_BeastScale_Base[EnemyClass::NBVAL_EnemyClass] = { sf::Vector2f(0.0, 0.0), sf::Vector2f(0.7, 1.3), sf::Vector2f(0.7, 1.3), sf::Vector2f(0.9, 1.5), sf::Vector2f(0.9, 1.5), sf::Vector2f(1.1, 1.7), sf::Vector2f(1.1, 1.7), sf::Vector2f(1.5, 2.2), sf::Vector2f(0.0, 0.0) };
 const float LootTable_BeastScaleThreshold[NUMBER_OF_BEASTSCALE_THRESHOLD] =  {0.0, 1.5, 3.0, 4.5, 6.0};
-const int LootTable_MaxPropertiesPerEquipmentType[EquipmentType::NBVAL_Equipment+1] =  {2, 1, 2, 2, 2};
 
 const int XPTable_PerEnemyClass[EnemyClass::NBVAL_EnemyClass] = { 0, 10, 10, 30, 30, 100, 100, 500, 0 };
 
@@ -49,6 +48,7 @@ public:
 
 	void GenerateLoot() override;
 	bool CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus = 0, bool force_BeastScale = false, float BeastScale_min = 0.0f, float BeastScale_max = 6.0f);
+	static bool AssignRandomEquipment(EquipmentType equipment_type, int credits, int level, GameObject* object);
 	void damage_from(GameObject& object) override;
 
 	EnemyClass m_enemy_class;

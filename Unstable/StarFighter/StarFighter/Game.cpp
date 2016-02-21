@@ -769,6 +769,13 @@ void Game::WakeUpEnemiesWithName(string m_display_name)
 	}
 }
 
+bool Game::InsertObjectInGrid(ObjectGrid& grid, GameObject& object, int index)
+{
+	bool result = grid.insertObject(object, index);
+
+	return result;
+}
+
 bool Game::InsertObjectInShipGrid(GameObject& object, int index)
 {
 	bool result = m_hud.shipGrid.insertObject(object, index);

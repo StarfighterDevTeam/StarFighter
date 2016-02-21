@@ -47,6 +47,15 @@ enum SceneDataEnemy
 	ENEMY_CLASS_MISS_CHANCE,//7
 };
 
+enum SceneDataShop
+{
+	SCENE_COMPARE_SHOP,//0
+	SHOP_TEXTURE_NAME,//1
+	SHOP_WIDTH,//2
+	SHOP_HEIGHT,//3
+	SHOP_LEVEL,//4
+};
+
 enum SceneDataBoss
 {
 	SCENE_COMPARE_BOSS,//0
