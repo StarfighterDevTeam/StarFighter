@@ -133,7 +133,6 @@ int ObjectGrid::isCursorColliding(GameObject& cursor)
 	else
 	{
 		//1st test
-
 		sf::FloatRect gridBounds(sf::Vector2f(grid[0][0]->getPosition().x - GRID_SLOT_SIZE / 2, grid[0][0]->getPosition().y - GRID_SLOT_SIZE / 2),
 			sf::Vector2f(GRID_SLOT_SIZE * squares.y, GRID_SLOT_SIZE * squares.x));
 
@@ -161,7 +160,6 @@ int ObjectGrid::isCursorColliding(GameObject& cursor)
 		}
 		return -1;
 	}
-
 }
 
 bool ObjectGrid::HighlightCell(int index)

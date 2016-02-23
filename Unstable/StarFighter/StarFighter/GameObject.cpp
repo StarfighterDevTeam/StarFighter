@@ -90,7 +90,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	
 	m_speed = speed;
 	setPosition(position.x, position.y);
-	m_visible = false;
+	m_visible = true;
 	m_isOnScene = false;
 	m_immune = false;
 	m_startPattern = false;

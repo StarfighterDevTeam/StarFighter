@@ -146,6 +146,28 @@ void InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 			if (m_cursor->getPosition().y > m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2))
 				m_cursor->setPosition(m_cursor->getPosition().x, m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2));
 
+			//cursor hovering grid
+			m_fakeShopGrid.CleanFocus();//reset previous highlight
+			int hovered_index_ = m_fakeShopGrid.isCursorColliding(*m_cursor);
+			if (hovered_index_ > -1)//the grid is hovered
+			{
+				m_fakeShopGrid.HighlightCell(hovered_index_);
+				m_focused_item = m_shopGrid.getCellPointerFromIntIndex(hovered_index_);
+				if (m_focused_item != NULL)
+				{
+					m_cursor->setAnimationLine(Cursor_ActionState);
+				}
+				else
+				{
+					m_cursor->setAnimationLine(Cursor_HighlightState);
+				}
+			}
+			else//no focus at all: the cursor is on an empty space
+			{
+				m_focused_item = NULL;
+				m_cursor->setAnimationLine(Cursor_NormalState);
+			}
+
 			break;
 		}
 

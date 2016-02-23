@@ -297,7 +297,6 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		{
 			hud_cursor->setAnimationLine(Cursor_NormalState);
 		}
-		
 	}
 
 	if (has_focus)
@@ -311,15 +310,12 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 			if (hovered_index_ > -1)//the equipment grid is focused
 			{
 				fakeEquipmentGrid.HighlightCell(hovered_index_);
+				focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
 				if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
 				{
 					if (!has_prioritary_cursor_feedback)
 					{
 						hud_cursor->setAnimationLine(Cursor_ActionState);
-					}
-					if (focused_item != equipmentGrid.getCellPointerFromIntIndex(hovered_index_))
-					{
-						focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
 					}
 				}
 				else
@@ -328,7 +324,6 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 					{
 						hud_cursor->setAnimationLine(Cursor_HighlightState);
 					}
-					focused_item = NULL;
 				}
 				focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
 			}
