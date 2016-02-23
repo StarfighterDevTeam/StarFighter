@@ -1105,6 +1105,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 
 	if (m_isCollidingWithInteractiveObject != No_Interaction)
 	{
+		//INTERACTIONS WITH PORTAL
 		if (m_isCollidingWithInteractiveObject == PortalInteraction)
 		{
 			assert(m_targetPortal != NULL);
@@ -1122,6 +1123,13 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 					(*CurrentGame).SetSelectedIndex(m_last_hazard_level_played <= m_targetPortal->m_max_unlocked_hazard_level ? m_last_hazard_level_played : m_targetPortal->m_max_unlocked_hazard_level);
 				}
 
+				//controls up and down selected object
+				if (this->m_interactionType != PortalInteraction)
+				{
+					//interaction: decreasing
+					ManageInteractionPanelIndex(m_targetPortal->m_max_unlocked_hazard_level);
+				}
+
 				//interaction: select
 				if (InputGuy::isFiring() && !m_isFiringButtonPressed)
 				{
@@ -1137,11 +1145,13 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 				m_isCollidingWithInteractiveObject = No_Interaction;
 			}
 		}
+		//INTERACTIONS WITH SHOP
 		else if (m_isCollidingWithInteractiveObject == ShopInteraction)
 		{
 			assert(m_targetShop != NULL);
 
 			(*CurrentGame).SetSelectedDestination(m_targetShop->m_display_name);
+
 			//default value = first choice
 			if (m_previouslyCollidingWithInteractiveObject != ShopInteraction)
 			{
@@ -1150,8 +1160,15 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 
 			switch ((*CurrentGame).GetShopMenu())
 			{
+				//MAIN SHOP MENU
 				case ShopMainMenu:
 				{
+					//controls up and down selected object
+					if (this->m_interactionType != ShopInteraction)
+					{
+						ManageInteractionPanelIndex(NBVAL_ShopOptions - 1);
+					}
+
 					//interaction: select
 					if (InputGuy::isFiring() && !m_isFiringButtonPressed)
 					{
@@ -1207,6 +1224,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 					}
 					break;
 				}
+				//BUY SHOP MENU
 				case ShopBuyMenu:
 				{
 					//cursor control
@@ -1224,45 +1242,25 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 				}
 			}
 		}
+	}
+}
 
-		//controls up and down selected object
-		if (m_isCollidingWithInteractiveObject == PortalInteraction && this->m_interactionType != PortalInteraction)
+void Ship::ManageInteractionPanelIndex(size_t number_of_options)
+{
+	//interaction: decreasing
+	if (InputGuy::isHyperspeeding() && !m_wasHyperspeedingButtonPressed)
+	{
+		if ((*CurrentGame).GetSelectedIndex() > 0)
 		{
-			//interaction: decreasing
-			if (InputGuy::isHyperspeeding() && !m_wasHyperspeedingButtonPressed)
-			{
-				if ((*CurrentGame).GetSelectedIndex() > 0)
-				{
-					(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() - 1);
-				}
-			}
-			//interaction: increasing
-			else if (InputGuy::isBraking() && !m_wasBrakingButtonPressed)
-			{
-				if ((*CurrentGame).GetSelectedIndex() < m_targetPortal->m_max_unlocked_hazard_level)
-				{
-					(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() + 1);
-				}
-			}
+			(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() - 1);
 		}
-		else if (m_isCollidingWithInteractiveObject == ShopInteraction  && this->m_interactionType != ShopInteraction)
+	}
+	//interaction: increasing
+	else if (InputGuy::isBraking() && !m_wasBrakingButtonPressed)
+	{
+		if ((*CurrentGame).GetSelectedIndex() < number_of_options)
 		{
-			//interaction: decreasing
-			if (InputGuy::isHyperspeeding() && !m_wasHyperspeedingButtonPressed)
-			{
-				if ((*CurrentGame).GetSelectedIndex() > 0)
-				{
-					(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() - 1);
-				}
-			}
-			//interaction: increasing
-			else if (InputGuy::isBraking() && !m_wasBrakingButtonPressed)
-			{
-				if ((*CurrentGame).GetSelectedIndex() < NBVAL_ShopOptions - 1)
-				{
-					(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() + 1);
-				}
-			}
+			(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() + 1);
 		}
 	}
 }

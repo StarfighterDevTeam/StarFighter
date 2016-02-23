@@ -152,6 +152,8 @@ public :
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
 
+	void ManageInteractionPanelIndex(size_t number_of_options);
+
 	Portal* m_targetPortal;
 	Shop* m_targetShop;
 	InteractionType m_previouslyCollidingWithInteractiveObject;

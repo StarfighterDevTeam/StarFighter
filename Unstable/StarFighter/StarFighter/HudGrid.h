@@ -43,7 +43,7 @@ public:
 	sf::Vector2f position;
 	sf::Vector2i squares;
 	sf::Vector2i focus;
-	int isCursorColling(GameObject& cursor);
+	int isCursorColliding(GameObject& cursor);
 	bool HighlightCell(int index);
 	bool GarbageCell(int index);
 	bool CleanFocus();

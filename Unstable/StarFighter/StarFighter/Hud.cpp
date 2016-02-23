@@ -303,11 +303,11 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 	if (has_focus)
 	{
 		//HUD cursor collides with an item?
-		int hovered_index_ = fakeShipGrid.isCursorColling(*hud_cursor);
+		int hovered_index_ = fakeShipGrid.isCursorColliding(*hud_cursor);
 		if (hovered_index_ < 0)
 		{
 			//we test the equipment grid
-			hovered_index_ = fakeEquipmentGrid.isCursorColling(*hud_cursor);
+			hovered_index_ = fakeEquipmentGrid.isCursorColliding(*hud_cursor);
 			if (hovered_index_ > -1)//the equipment grid is focused
 			{
 				fakeEquipmentGrid.HighlightCell(hovered_index_);
@@ -344,7 +344,6 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		}
 		else//the ship grid is focused
 		{
-			
 			fakeShipGrid.HighlightCell(hovered_index_);
 			if (!has_prioritary_cursor_feedback)
 			{

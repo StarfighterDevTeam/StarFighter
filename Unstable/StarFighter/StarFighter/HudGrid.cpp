@@ -124,7 +124,7 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 	}
 }
 
-int ObjectGrid::isCursorColling(GameObject& cursor)
+int ObjectGrid::isCursorColliding(GameObject& cursor)
 {
 	if (!cursor.m_visible)
 	{
