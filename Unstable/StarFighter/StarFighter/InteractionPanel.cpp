@@ -90,7 +90,7 @@ InteractionPanel::InteractionPanel()
 	}
 }
 
-void InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
+GameObject* InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 {
 	switch (m_currentShopMenu)
 	{
@@ -156,6 +156,9 @@ void InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 				if (m_focused_item != NULL)
 				{
 					m_cursor->setAnimationLine(Cursor_ActionState);
+
+					//we want to highlight the equivalent item in HUD (item currently possessed by the player)
+					return m_focused_item;
 				}
 				else
 				{
@@ -202,6 +205,8 @@ void InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 			break;
 		}
 	}
+
+	return NULL;
 }
 
 sf::Vector2f InteractionPanel::GetShopBuyPanelSize()
@@ -248,7 +253,7 @@ void InteractionPanel::UpdatePortalInteraction(int max_unlocked_hazard_level)
 	}
 }
 
-void InteractionPanel::Update(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)
+GameObject* InteractionPanel::Update(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)
 {
 	m_currentInteractionType = interaction;
 
@@ -261,9 +266,10 @@ void InteractionPanel::Update(InteractionType interaction, int max_unlocked_haza
 		}
 		break;
 	case ShopInteraction:
-		UpdateShopInteraction(deltaTime);
-		break;
+		return UpdateShopInteraction(deltaTime);
 	}
+
+	return NULL;
 }
 
 void InteractionPanel::InitCursorOnGrid()

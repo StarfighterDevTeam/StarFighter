@@ -28,8 +28,8 @@ public:
 	sf::Vector2f GetShopBuyPanelSize();
 
 	void UpdatePortalInteraction(int max_unlocked_hazard_level);
-	void UpdateShopInteraction(sf::Time deltaTime);
-	void Update(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime);
+	GameObject* UpdateShopInteraction(sf::Time deltaTime);
+	GameObject* Update(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime);
 	void InitCursorOnGrid();
 	void Draw(sf::RenderTexture& screen);
 

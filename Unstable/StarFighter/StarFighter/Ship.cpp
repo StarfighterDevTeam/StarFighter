@@ -1186,6 +1186,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 							{
 								(*CurrentGame).SetShopMenu(ShopBuyMenu);
 								(*CurrentGame).m_interactionPanel->InitCursorOnGrid();
+								(*CurrentGame).m_hud.has_focus = true;
 
 								//Generate random loots in shop
 								size_t num_spawned_objects = 10;
@@ -1237,6 +1238,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 					if (InputGuy::isSlowMotion() && !m_slowmo_key_repeat)
 					{
 						(*CurrentGame).SetShopMenu(ShopMainMenu);
+						(*CurrentGame).m_hud.has_focus = false;
 					}
 					break;
 				}

@@ -127,9 +127,10 @@ void Game::updateHud(int m_armor, int m_armor_max, int m_shield, int m_shield_ma
 		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 
-void Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)
+GameObject* Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)
 {
-	this->m_interactionPanel->Update(interaction, max_unlocked_hazard_level, deltaTime);
+	return this->m_interactionPanel->Update(interaction, max_unlocked_hazard_level, deltaTime);
+	
 }
 
 void Game::SetShopMenu(ShopMenus menu)
