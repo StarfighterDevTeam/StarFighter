@@ -33,6 +33,10 @@ public:
 	void InitCursorOnGrid();
 	void Draw(sf::RenderTexture& screen);
 
+	static void UpdateItemStatsText(sf::Text* text, int focused_item_type = -1, string f_name = "", int f_level = 1, int f_xp = 0, float f_max_speed = 0, float f_hyperspeed = 1, int f_armor = 1, int f_shield = 0, int f_shield_regen = 0,
+		int f_damage = 0, bool f_bot = false, float f_ammo_speed = 0, PatternType f_pattern = NoMovePattern,
+		int f_multishot = 1, int f_xspread = 0, float f_rate_of_fire = 1, ShotMode f_shot_mode = NoShotMode, float f_dispersion = 0, int f_rafale = 0, float f_rafale_cooldown = 0, TargetSeaking f_target_seaking = NO_SEAKING);
+
 	sf::RectangleShape m_panel;
 	sf::Text m_text[NB_HAZARD_LEVELS];
 	sf::Text m_textHelpNavigation;
@@ -45,6 +49,9 @@ public:
 	Directions m_direction;
 	InteractionType m_currentInteractionType;
 	ShopMenus m_currentShopMenu;
+
+	sf::RectangleShape m_itemStatsPanel;
+	sf::Text m_itemStatsText;
 
 	ObjectGrid m_fakeShopGrid;
 	ObjectGrid m_shopGrid;

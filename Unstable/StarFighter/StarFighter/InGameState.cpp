@@ -121,7 +121,6 @@ void InGameState::Update(Time deltaTime)
 	{
 		if (obj->m_weapon_loot)// && (*CurrentGame).playerShip->m_weapon)
 		{
-			
 			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(NBVAL_Equipment);
 			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(NBVAL_Equipment)->getPosition());
 		}
@@ -130,55 +129,15 @@ void InGameState::Update(Time deltaTime)
 			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType);
 			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType)->getPosition());
 		}
+
+		//displaying stats of focused item in shop
+		SendFocusedItemDataToHintPanel(obj, deltaTime);
 	}
 
 	//displaying stats of focused item in the HUD...
-	if ((*CurrentGame).getHudFocusedItem() != NULL)
+	if ((*CurrentGame).getHudFocusedItem())
 	{
-		GameObject* tmp_ptr = (*CurrentGame).getHudFocusedItem();
-		int equip_index_ = NBVAL_Equipment;
-		if (tmp_ptr->getEquipmentLoot() != NULL)
-		{
-			equip_index_ = tmp_ptr->getEquipmentLoot()->m_equipmentType;
-		}
-
-		if (equip_index_ == NBVAL_Equipment)
-		{
-			Weapon* tmp_weapon = tmp_ptr->getWeaponLoot();
-
-			(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money, (*CurrentGame).playerShip->m_graze_count,
-				m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
-				equip_index_, tmp_weapon->m_display_name, tmp_weapon->m_level, tmp_weapon->m_credits, -1, -1, -1, -1, -1, tmp_weapon->m_ammunition->m_damage, false, tmp_weapon->m_ammunition->m_speed.y, tmp_weapon->m_ammunition->m_Pattern.currentPattern, tmp_weapon->m_multishot, 
-				tmp_weapon->m_xspread, tmp_weapon->m_rate_of_fire, tmp_weapon->m_shot_mode, tmp_weapon->m_dispersion, tmp_weapon->m_rafale, tmp_weapon->m_rafale_cooldown, tmp_weapon->m_target_seaking);
-
-			tmp_weapon = NULL;
-		}
-		else
-		{
-			Equipment* tmp_equipment = tmp_ptr->getEquipmentLoot();
-
-			if (!tmp_equipment->m_bot)
-			{
-				(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
-					(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
-					equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_max_speed, tmp_equipment->m_hyperspeed, tmp_equipment->m_armor,
-					tmp_equipment->m_shield, tmp_equipment->m_shield_regen, tmp_equipment->m_damage, tmp_equipment->m_bot);
-			}
-			else
-			{
-				//todo : clean getEquipmentHyperspeed() etc...
-				(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
-					(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
-					equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_bot->m_Pattern.patternSpeed, tmp_equipment->m_hyperspeed, tmp_equipment->m_bot->m_armor_max,
-					tmp_equipment->m_bot->m_shield_max, tmp_equipment->m_bot->m_shield_regen, tmp_equipment->m_bot->m_weapon->m_ammunition->m_damage, tmp_equipment->m_bot, tmp_equipment->m_bot->m_weapon->m_ammunition->m_speed.y,
-					tmp_equipment->m_bot->m_weapon->m_ammunition->m_Pattern.currentPattern, tmp_equipment->m_bot->m_weapon->m_multishot, tmp_equipment->m_bot->m_weapon->m_xspread, tmp_equipment->m_bot->m_weapon->m_rate_of_fire,
-					tmp_equipment->m_bot->m_weapon->m_shot_mode, tmp_equipment->m_bot->m_weapon->m_dispersion, tmp_equipment->m_bot->m_weapon->m_rafale, tmp_equipment->m_bot->m_weapon->m_rafale_cooldown, tmp_equipment->m_bot->m_weapon->m_target_seaking);
-			}
-			
-			tmp_equipment = NULL;
-		}
-
-		tmp_ptr = NULL;
+		SendFocusedItemDataToHUD((*CurrentGame).getHudFocusedItem(), deltaTime);
 	}
 	else //...else not bothering with it
 	{
@@ -187,6 +146,98 @@ void InGameState::Update(Time deltaTime)
 	}
 
 	this->mainWindow->clear();
+}
+
+void InGameState::SendFocusedItemDataToHintPanel(GameObject* focused_item, Time deltaTime)
+{
+	//displaying stats of focused item in the HUD...
+	GameObject* tmp_ptr = focused_item;
+	int equip_index_ = NBVAL_Equipment;
+	if (tmp_ptr->getEquipmentLoot() != NULL)
+	{
+		equip_index_ = tmp_ptr->getEquipmentLoot()->m_equipmentType;
+	}
+
+	if (equip_index_ == NBVAL_Equipment)
+	{
+		Weapon* tmp_weapon = tmp_ptr->getWeaponLoot();
+
+		InteractionPanel::UpdateItemStatsText(&(*CurrentGame).m_interactionPanel->m_itemStatsText, equip_index_, tmp_weapon->m_display_name, tmp_weapon->m_level, tmp_weapon->m_credits, -1, -1, -1, -1, -1, tmp_weapon->m_ammunition->m_damage, false, tmp_weapon->m_ammunition->m_speed.y, tmp_weapon->m_ammunition->m_Pattern.currentPattern, tmp_weapon->m_multishot,
+			tmp_weapon->m_xspread, tmp_weapon->m_rate_of_fire, tmp_weapon->m_shot_mode, tmp_weapon->m_dispersion, tmp_weapon->m_rafale, tmp_weapon->m_rafale_cooldown, tmp_weapon->m_target_seaking);
+
+		tmp_weapon = NULL;
+	}
+	else
+	{
+		Equipment* tmp_equipment = tmp_ptr->getEquipmentLoot();
+
+		if (!tmp_equipment->m_bot)
+		{
+			InteractionPanel::UpdateItemStatsText(&(*CurrentGame).m_interactionPanel->m_itemStatsText, equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_max_speed, tmp_equipment->m_hyperspeed, tmp_equipment->m_armor,
+				tmp_equipment->m_shield, tmp_equipment->m_shield_regen, tmp_equipment->m_damage, tmp_equipment->m_bot);
+		}
+		else
+		{
+			//todo : clean getEquipmentHyperspeed() etc...
+			InteractionPanel::UpdateItemStatsText(&(*CurrentGame).m_interactionPanel->m_itemStatsText, equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_bot->m_Pattern.patternSpeed, tmp_equipment->m_hyperspeed, tmp_equipment->m_bot->m_armor_max,
+				tmp_equipment->m_bot->m_shield_max, tmp_equipment->m_bot->m_shield_regen, tmp_equipment->m_bot->m_weapon->m_ammunition->m_damage, tmp_equipment->m_bot, tmp_equipment->m_bot->m_weapon->m_ammunition->m_speed.y,
+				tmp_equipment->m_bot->m_weapon->m_ammunition->m_Pattern.currentPattern, tmp_equipment->m_bot->m_weapon->m_multishot, tmp_equipment->m_bot->m_weapon->m_xspread, tmp_equipment->m_bot->m_weapon->m_rate_of_fire,
+				tmp_equipment->m_bot->m_weapon->m_shot_mode, tmp_equipment->m_bot->m_weapon->m_dispersion, tmp_equipment->m_bot->m_weapon->m_rafale, tmp_equipment->m_bot->m_weapon->m_rafale_cooldown, tmp_equipment->m_bot->m_weapon->m_target_seaking);
+		}
+
+		tmp_equipment = NULL;
+	}
+
+	tmp_ptr = NULL;
+}
+
+void InGameState::SendFocusedItemDataToHUD(GameObject* focused_item, Time deltaTime)
+{
+	//displaying stats of focused item in the HUD...
+	GameObject* tmp_ptr = focused_item;
+	int equip_index_ = NBVAL_Equipment;
+	if (tmp_ptr->getEquipmentLoot() != NULL)
+	{
+		equip_index_ = tmp_ptr->getEquipmentLoot()->m_equipmentType;
+	}
+
+	if (equip_index_ == NBVAL_Equipment)
+	{
+		Weapon* tmp_weapon = tmp_ptr->getWeaponLoot();
+
+		(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money, (*CurrentGame).playerShip->m_graze_count,
+			m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
+			equip_index_, tmp_weapon->m_display_name, tmp_weapon->m_level, tmp_weapon->m_credits, -1, -1, -1, -1, -1, tmp_weapon->m_ammunition->m_damage, false, tmp_weapon->m_ammunition->m_speed.y, tmp_weapon->m_ammunition->m_Pattern.currentPattern, tmp_weapon->m_multishot,
+			tmp_weapon->m_xspread, tmp_weapon->m_rate_of_fire, tmp_weapon->m_shot_mode, tmp_weapon->m_dispersion, tmp_weapon->m_rafale, tmp_weapon->m_rafale_cooldown, tmp_weapon->m_target_seaking);
+
+		tmp_weapon = NULL;
+	}
+	else
+	{
+		Equipment* tmp_equipment = tmp_ptr->getEquipmentLoot();
+
+		if (!tmp_equipment->m_bot)
+		{
+			(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
+				(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
+				equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_max_speed, tmp_equipment->m_hyperspeed, tmp_equipment->m_armor,
+				tmp_equipment->m_shield, tmp_equipment->m_shield_regen, tmp_equipment->m_damage, tmp_equipment->m_bot);
+		}
+		else
+		{
+			//todo : clean getEquipmentHyperspeed() etc...
+			(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
+				(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
+				equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_bot->m_Pattern.patternSpeed, tmp_equipment->m_hyperspeed, tmp_equipment->m_bot->m_armor_max,
+				tmp_equipment->m_bot->m_shield_max, tmp_equipment->m_bot->m_shield_regen, tmp_equipment->m_bot->m_weapon->m_ammunition->m_damage, tmp_equipment->m_bot, tmp_equipment->m_bot->m_weapon->m_ammunition->m_speed.y,
+				tmp_equipment->m_bot->m_weapon->m_ammunition->m_Pattern.currentPattern, tmp_equipment->m_bot->m_weapon->m_multishot, tmp_equipment->m_bot->m_weapon->m_xspread, tmp_equipment->m_bot->m_weapon->m_rate_of_fire,
+				tmp_equipment->m_bot->m_weapon->m_shot_mode, tmp_equipment->m_bot->m_weapon->m_dispersion, tmp_equipment->m_bot->m_weapon->m_rafale, tmp_equipment->m_bot->m_weapon->m_rafale_cooldown, tmp_equipment->m_bot->m_weapon->m_target_seaking);
+		}
+
+		tmp_equipment = NULL;
+	}
+
+	tmp_ptr = NULL;
 }
 
 void InGameState::Draw()

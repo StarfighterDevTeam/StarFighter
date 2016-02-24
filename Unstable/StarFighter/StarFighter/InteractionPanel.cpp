@@ -26,6 +26,11 @@ InteractionPanel::InteractionPanel()
 	m_panel.setOutlineThickness(2);
 	m_panel.setOutlineColor(_darkblue);//dark blue-green
 
+	m_itemStatsPanel.setSize(sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y));
+	m_itemStatsPanel.setFillColor(sf::Color(20, 20, 20, 200));//dark grey
+	m_itemStatsPanel.setOrigin(0, 0);
+	m_itemStatsPanel.setPosition(HUD_LEFT_MARGIN, (3 * ARMOR_BAR_SIZE_Y) + 40);
+
 	try
 	{
 		m_font = new sf::Font();
@@ -33,8 +38,14 @@ InteractionPanel::InteractionPanel()
 		{
 			// error
 			//TODO: font loader
-		}
-
+		}//TODO: font loader
+		
+		m_itemStatsText.setFont(*m_font);
+		m_itemStatsText.setCharacterSize(18);
+		sf::Color _white = sf::Color::Color(255, 255, 255, 200);//semi-transparent white
+		m_itemStatsText.setColor(_white);
+		m_itemStatsText.setPosition(HUD_LEFT_MARGIN + 5, (3 * ARMOR_BAR_SIZE_Y) + 40 + 5);
+		
 		ostringstream ss_destination;
 		ss_destination << "???Unknown???";
 		m_textDestination.setFont(*m_font);
@@ -146,6 +157,10 @@ GameObject* InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 			if (m_cursor->getPosition().y > m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2))
 				m_cursor->setPosition(m_cursor->getPosition().x, m_panel.getPosition().y + (GetShopBuyPanelSize().y / 2));
 
+			//stats panel follow cursor
+			m_itemStatsPanel.setPosition(sf::Vector2f(m_cursor->getPosition().x - m_itemStatsPanel.getGlobalBounds().width / 2, m_cursor->getPosition().y + ITEM_STATS_SHOP_OFFSET_Y));
+			m_itemStatsText.setPosition(sf::Vector2f(5 + m_cursor->getPosition().x - m_itemStatsPanel.getGlobalBounds().width / 2, 5 + m_cursor->getPosition().y + ITEM_STATS_SHOP_OFFSET_Y));
+
 			//cursor hovering grid
 			m_fakeShopGrid.CleanFocus();//reset previous highlight
 			int hovered_index_ = m_fakeShopGrid.isCursorColliding(*m_cursor);
@@ -170,7 +185,6 @@ GameObject* InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 				m_focused_item = NULL;
 				m_cursor->setAnimationLine(Cursor_NormalState);
 			}
-
 			break;
 		}
 
@@ -272,6 +286,185 @@ GameObject* InteractionPanel::Update(InteractionType interaction, int max_unlock
 	return NULL;
 }
 
+void InteractionPanel::UpdateItemStatsText(sf::Text* text, int focused_item_type, string f_name, int f_level, int f_xp, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen,
+	int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
+	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
+{
+	//ITEM STATS PANEL DISPLAY
+	ostringstream ss_stats;
+	//if focused item != NULL
+	switch (focused_item_type)
+	{
+		case Engine:
+		{
+						ss_stats << "THRUSTER: " << f_name << "\nSpeed: " << f_max_speed << "\nHyperspeed: " << f_hyperspeed << "\nContact damage: " << f_damage;
+						break;
+		}
+		case Armor:
+		{
+						ss_stats << "HULL: " << f_name << "\nHull pts: " << f_armor;
+						break;
+		}
+		case Shield:
+		{
+						ss_stats << "SHIELD: " << f_name << "\nMax shield pts: " << f_shield << "\nShield regen/sec: " << f_shield_regen;
+						break;
+		}
+		case Module:
+		{
+						ss_stats << "MODULE: " << f_name;
+						if (f_bot)
+						{
+							ss_stats << " \nAdding 1 drone. Drone stats:";
+							if (f_shot_mode != NoShotMode)
+							{
+								ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_damage;
+							}
+							else
+							{
+								ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
+							}
+
+							ss_stats << "\nDamage: " << f_damage;
+							ss_stats << "\nAmmo speed: " << f_ammo_speed;
+							ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec";
+
+							if (f_multishot > 1)
+							{
+								ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
+							}
+							else
+							{
+								ss_stats << "\nSingle shot";
+							}
+							if (f_rafale > 0)
+							{
+								ss_stats << "\nRafale: " << f_rafale << " (cooldown: " << f_rafale_cooldown << " sec";
+							}
+
+							if (f_shot_mode != NoShotMode)
+							{
+								ss_stats << "\nFiring style: ";
+								switch (f_shot_mode)
+								{
+									case AlternateShotMode:
+									{
+																ss_stats << "Alternating shots";
+																break;
+									}
+									case AscendingShotMode:
+									{
+																ss_stats << "Ascending shots";
+																break;
+									}
+									case DescendingShotMode:
+									{
+																ss_stats << "Descending shots";
+																break;
+									}
+								}
+							}
+
+							if (f_target_seaking != NO_SEAKING)
+							{
+								switch (f_target_seaking)
+								{
+									case SEAKING:
+									case SUPER_SEAKING:
+									{
+															ss_stats << "\nSeaking target";
+															break;
+									}
+									case SEMI_SEAKING:
+									{
+														ss_stats << "\nSeaking target once per rafale";
+														break;
+									}
+								}
+							}
+						}
+						else
+						{
+							ss_stats << "\nNo effect";
+						}
+						break;
+		}
+		case NBVAL_Equipment:
+		{
+								ss_stats << "MAIN WEAPON: " << f_name;
+								if (f_shot_mode != NoShotMode)
+								{
+									ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_damage;
+								}
+								else
+								{
+									ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
+								}
+								ss_stats << "\nDamage: " << f_damage;
+								ss_stats << "\nAmmo speed: " << f_ammo_speed;
+								ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec";
+
+								if (f_multishot > 1)
+								{
+									ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
+								}
+								else
+								{
+									ss_stats << "\nSingle shot";
+								}
+								if (f_rafale > 0)
+								{
+									ss_stats << "\nRafale: " << f_rafale << " (cooldown: " << f_rafale_cooldown << " sec";
+								}
+								if (f_shot_mode != NoShotMode)
+								{
+									ss_stats << "\nFiring style: ";
+									switch (f_shot_mode)
+									{
+										case AlternateShotMode:
+										{
+																	ss_stats << "Alternating shots";
+																	break;
+										}
+										case AscendingShotMode:
+										{
+																	ss_stats << "Ascending shots";
+																	break;
+										}
+										case DescendingShotMode:
+										{
+																	ss_stats << "Descending shots";
+																	break;
+										}
+									}
+								}
+
+								if (f_target_seaking != NO_SEAKING)
+								{
+									switch (f_target_seaking)
+									{
+										case SEAKING:
+										case SUPER_SEAKING:
+										{
+																ss_stats << "\nSeaking target";
+																break;
+										}
+										case SEMI_SEAKING:
+										{
+																ss_stats << "\nSeaking target once per rafale";
+																break;
+										}
+									}
+								}
+								break;
+		}
+	}
+	ss_stats << "\nLevel: " << f_level << " (+" << f_xp << " XP)";
+	
+
+	text->setString(ss_stats.str());
+}
+
 void InteractionPanel::InitCursorOnGrid()
 {
 	m_cursor->setPosition(sf::Vector2f(m_panel.getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (GetShopBuyPanelSize().x / 2) + (SHOP_GRID_SLOT_SIZE / 2), m_panel.getPosition().y + INTERACTION_PANEL_MARGIN_TOP + m_textDestination.getCharacterSize() + INTERACTION_INTERLINE - (GetShopBuyPanelSize().y / 2) + (SHOP_GRID_SLOT_SIZE / 2)));
@@ -304,6 +497,11 @@ void InteractionPanel::Draw(sf::RenderTexture& screen)
 			m_shopGrid.Draw(screen);
 			screen.draw(m_textHelpBuy);
 			screen.draw(*m_cursor);
+			if (m_focused_item)
+			{
+				screen.draw(m_itemStatsPanel);
+				screen.draw(m_itemStatsText);
+			}
 		}
 
 		if (m_currentInteractionType == PortalInteraction)

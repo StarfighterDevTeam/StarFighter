@@ -68,6 +68,8 @@
 #define XP_BAR_SIZE_X									320
 #define XP_BAR_SIZE_Y									16
 
+#define ITEM_STATS_SHOP_OFFSET_Y						16
+
 //ENEMY LIFE BARS
 #define ENEMY_HP_BAR_CONTAINER_SIZE_X					90
 #define ENEMY_HP_BAR_CONTAINER_SIZE_Y					8
