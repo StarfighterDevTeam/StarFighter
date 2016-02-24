@@ -370,7 +370,7 @@ void Ship::Init()
 	}
 }
 
-bool Ship::setEquipment(Equipment* equipment, bool overwrite_existing, bool no_save)
+bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool no_save)
 {
 	assert(equipment != NULL);
 
@@ -909,7 +909,7 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 							{
 								//if this succeeds, we can actually equip the item
 								Equipment* new_equipment = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
-								this->setEquipment(new_equipment, true);
+								this->setShipEquipment(new_equipment, true);
 								new_equipment = NULL;
 							}
 						}
@@ -1238,32 +1238,54 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 					{
 						m_isFiringButtonPressed = true;
 
+						//case of weapon hovered
 						if ((*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot)
 						{
-							if (m_money >= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits)
+							if (m_money >= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
 							{
 								//if weapon already possed, we try to pu item in stash
 								if (m_weapon)
 								{
 									if ((*CurrentGame).InsertObjectInGrid((*CurrentGame).m_hud.equipmentGrid, *(*CurrentGame).m_interactionPanel->m_focused_item, -1))
 									{
-										m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits;
-										//(*CurrentGame).m_interactionPanel->m_shopGrid.GarbageCell((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor));
-										//(*CurrentGame).m_hud.focused_item = NULL;
-										
+										m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+										(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
 									}
 								}
 								//else we equip if directly
 								else
 								{
 									setShipWeapon((*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot);
-									m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits;
-									//(*CurrentGame).m_interactionPanel->m_shopGrid.GarbageCell((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor));
-									
+									m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+									(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(NBVAL_Equipment, (*CurrentGame).m_interactionPanel->m_focused_item);
+									(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
 								}
 							}
 						}
-
+						//case of equipment hovered
+						else if ((*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot)
+						{
+							if (m_money >= (*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
+							{
+								//if equipment already possed, we try to pu item in stash
+								if (m_equipment[(*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_equipmentType])
+								{
+									if ((*CurrentGame).InsertObjectInGrid((*CurrentGame).m_hud.equipmentGrid, *(*CurrentGame).m_interactionPanel->m_focused_item, -1))
+									{
+										m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+										(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
+									}
+								}
+								//else we equip if directly
+								else
+								{
+									setShipEquipment((*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot);
+									m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+									(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_equipmentType, (*CurrentGame).m_interactionPanel->m_focused_item);
+									(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
+								}
+							}
+						}
 					}
 
 					//exit
@@ -1388,7 +1410,7 @@ bool Ship::GetLoot(GameObject& object)
 	if (object.getEquipmentLoot() != NULL)
 	{
 		GameObject* capsule = CloneEquipmentIntoGameObject(object.getEquipmentLoot());
-		if (this->setEquipment(object.getEquipmentLoot()))
+		if (this->setShipEquipment(object.getEquipmentLoot()))
 		{
 			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
 			(*CurrentGame).InsertObjectInShipGrid(*capsule, object.getEquipmentLoot()->m_equipmentType);
@@ -2238,7 +2260,7 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 				std::istringstream(line) >> equipment_type >> display_name;
 				if (display_name.compare("0") != 0)
 				{
-					ship->setEquipment(Ship::LoadEquipmentFromLine(line), true, true);
+					ship->setShipEquipment(Ship::LoadEquipmentFromLine(line), true, true);
 				}
 			}
 			//Loading weapon

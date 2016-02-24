@@ -139,7 +139,7 @@ public :
 	PlayerHud ship_hud;
 
 	void Respawn() override;
-	bool setEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
+	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
 	bool setShipWeapon(Weapon* weapon, bool overwrite = false, bool no_save = false);
 	void setShipModel(ShipModel* ship_model, bool no_save = false);
 	void cleanEquipment(int equipment_type, bool no_save = false);
