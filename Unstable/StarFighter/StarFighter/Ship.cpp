@@ -1250,6 +1250,8 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 									{
 										m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 										(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
+										Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+										Ship::SaveItems(ITEMS_SAVE_FILE, this);
 									}
 								}
 								//else we equip if directly
@@ -1259,6 +1261,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 									m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 									(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(NBVAL_Equipment, (*CurrentGame).m_interactionPanel->m_focused_item);
 									(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
+									Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 								}
 							}
 						}
@@ -1274,6 +1277,8 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 									{
 										m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 										(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
+										Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+										Ship::SaveItems(ITEMS_SAVE_FILE, this);
 									}
 								}
 								//else we equip if directly
@@ -1283,6 +1288,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 									m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 									(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_focused_item->m_equipment_loot->m_equipmentType, (*CurrentGame).m_interactionPanel->m_focused_item);
 									(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor), NULL);
+									Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 								}
 							}
 						}

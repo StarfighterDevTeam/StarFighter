@@ -462,8 +462,8 @@ void InteractionPanel::UpdateItemStatsText(sf::Text* text, int focused_item_type
 		}
 	}
 	ss_stats << "\nLevel: " << f_level << " (+" << f_xp << " XP)";
+	ss_stats << "\nMoney value: " << f_xp * MONEY_COST_OF_LOOT_CREDITS;
 	
-
 	text->setString(ss_stats.str());
 }
 
