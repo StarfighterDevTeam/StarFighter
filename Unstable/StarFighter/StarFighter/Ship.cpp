@@ -1186,7 +1186,6 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 							{
 								(*CurrentGame).SetShopMenu(ShopBuyMenu);
 								(*CurrentGame).m_interactionPanel->InitCursorOnGrid();
-								(*CurrentGame).m_hud.has_focus = true;
 
 								//Generate random loots in shop
 								size_t num_spawned_objects = 10;
@@ -1233,6 +1232,39 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 					GameObject* l_cursor = (*CurrentGame).m_interactionPanel->m_cursor;
 					l_cursor->m_speed.x = input_directions.x * HUD_CURSOR_SPEED;
 					l_cursor->m_speed.y = input_directions.y * HUD_CURSOR_SPEED;
+
+					//interaction: buy item
+					if (InputGuy::isFiring() && !m_isFiringButtonPressed && (*CurrentGame).m_interactionPanel->m_focused_item)
+					{
+						m_isFiringButtonPressed = true;
+
+						if ((*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot)
+						{
+							if (m_money >= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits)
+							{
+								//if weapon already possed, we try to pu item in stash
+								if (m_weapon)
+								{
+									if ((*CurrentGame).InsertObjectInGrid((*CurrentGame).m_hud.equipmentGrid, *(*CurrentGame).m_interactionPanel->m_focused_item, -1))
+									{
+										m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits;
+										//(*CurrentGame).m_interactionPanel->m_shopGrid.GarbageCell((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor));
+										//(*CurrentGame).m_hud.focused_item = NULL;
+										
+									}
+								}
+								//else we equip if directly
+								else
+								{
+									setShipWeapon((*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot);
+									m_money -= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits;
+									//(*CurrentGame).m_interactionPanel->m_shopGrid.GarbageCell((*CurrentGame).m_interactionPanel->m_fakeShopGrid.isCursorColliding(*(*CurrentGame).m_interactionPanel->m_cursor));
+									
+								}
+							}
+						}
+
+					}
 
 					//exit
 					if (InputGuy::isSlowMotion() && !m_slowmo_key_repeat)

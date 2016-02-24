@@ -54,10 +54,15 @@ public:
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
 
+	//methods v2
 	bool InsertObjectInGrid(ObjectGrid& grid, GameObject& object, int index = 0);
+	bool SwapObjectBetweenGrids(ObjectGrid& grid, ObjectGrid& grid2, int index1, int index2);
+
+	//methods v1
 	bool InsertObjectInShipGrid(GameObject& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(GameObject& object, int index=-1);
 	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment);
+
 	void GarbageObjectInGrid(int grid_id, int index);
 	GameObject* getHudFocusedItem();
 	sf::Vector2i getHudFocusedGridAndIndex();

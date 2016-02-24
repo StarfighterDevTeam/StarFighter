@@ -114,24 +114,30 @@ void InGameState::Update(Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//synchronizing shop interface with HUD interface
-	
-	//(*CurrentGame).m_hud.hud_cursor->m_visible = (*CurrentGame).m_hud.has_focus;
 	GameObject* obj = (*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->m_previouslyCollidingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
 	if (obj)
 	{
-		if (obj->m_weapon_loot)// && (*CurrentGame).playerShip->m_weapon)
+		if (obj->m_weapon_loot)
 		{
 			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(NBVAL_Equipment);
 			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(NBVAL_Equipment)->getPosition());
+			//displaying stats of focused item in shop
+			SendFocusedItemDataToHintPanel(obj, deltaTime);
+			(*CurrentGame).m_hud.has_focus = true;
 		}
-		else if (obj->m_equipment_loot)// && (*CurrentGame).playerShip->m_equipment[obj->m_equipment_loot->m_equipmentType])
+		else if (obj->m_equipment_loot)
 		{
 			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType);
 			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType)->getPosition());
+			//displaying stats of focused item in shop
+			SendFocusedItemDataToHintPanel(obj, deltaTime);
+			(*CurrentGame).m_hud.has_focus = true;
 		}
-
-		//displaying stats of focused item in shop
-		SendFocusedItemDataToHintPanel(obj, deltaTime);
+		else
+		{
+			(*CurrentGame).m_hud.focused_item = NULL;
+			(*CurrentGame).m_hud.has_focus = false;
+		}
 	}
 
 	//displaying stats of focused item in the HUD...

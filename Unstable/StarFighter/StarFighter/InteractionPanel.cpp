@@ -178,12 +178,14 @@ GameObject* InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 				else
 				{
 					m_cursor->setAnimationLine(Cursor_HighlightState);
+					return m_fakeShopGrid.getCellPointerFromIntIndex(hovered_index_);
 				}
 			}
 			else//no focus at all: the cursor is on an empty space
 			{
 				m_focused_item = NULL;
 				m_cursor->setAnimationLine(Cursor_NormalState);
+				return m_fakeShopGrid.getCellPointerFromIntIndex(0);
 			}
 			break;
 		}

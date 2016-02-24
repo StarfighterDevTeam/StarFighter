@@ -184,15 +184,21 @@ bool ObjectGrid::HighlightCell(int index)
 
 bool ObjectGrid::GarbageCell(int index)
 {
-	GameObject* tmp_ptr = getCellPointerFromIntIndex(index);
-	if (tmp_ptr != NULL)
+	int r = index % squares.y;
+	int l = index / squares.y;
+
+	if (l > squares.x)
 	{
-		delete tmp_ptr;
-		tmp_ptr = NULL;
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to garbage a pointer from a grid cell index that doesn't exist.\n");
+	}
+
+	if (grid[l][r])
+	{
+		delete grid[l][r];
+		grid[l][r] = NULL;
 		return true;
 	}
-	tmp_ptr = NULL;
-	LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to garbage an empty grid cell.\n");
+
 	return false;
 }
 
