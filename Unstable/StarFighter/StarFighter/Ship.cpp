@@ -519,7 +519,7 @@ void Ship::ManageOpeningHud(bool is_sell_available)
 	{
 		if (!m_hud_key_repeat)
 		{
-			//specific to shop "selle" menu
+			//specific to shop "sell" menu
 			if (is_sell_available)
 			{
 				m_is_sell_available = false;
@@ -535,6 +535,7 @@ void Ship::ManageOpeningHud(bool is_sell_available)
 			m_hud_key_repeat = true;
 
 			(*CurrentGame).m_hud.has_focus = m_isFocusedOnHud;
+
 			m_disable_fire = m_isFocusedOnHud;
 			if ((*CurrentGame).m_direction == NO_DIRECTION)
 			{
@@ -544,7 +545,6 @@ void Ship::ManageOpeningHud(bool is_sell_available)
 			if (m_isFocusedOnHud && !m_isSlowMotion)
 			{
 				(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
-				printf("");
 			}
 			else if (!m_isFocusedOnHud && !m_isSlowMotion)
 			{
@@ -700,8 +700,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		if (!m_isFocusedOnHud)
 		{
 			if ((*CurrentGame).GetShopMenu() == ShopMainMenu)
-			{
-				//ManageOpeningHud();
+			{	
+				ManageOpeningHud();
 
 				ManageAcceleration(inputs_direction);
 
@@ -909,6 +909,17 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 		m_previously_focused_item = (*CurrentGame).getHudFocusedItem();
 	}
 
+
+	//exit - specific to "sell" shop menu
+	if (m_is_sell_available)
+	{
+		if (InputGuy::isSlowMotion() && !m_slowmo_key_repeat)
+		{
+			(*CurrentGame).SetShopMenu(ShopMainMenu);
+			(*CurrentGame).m_hud.has_focus = false;
+		}
+	}
+
 	if (!m_isFiringButtonPressed)
 	{
 		if (InputGuy::isFiring())
@@ -933,13 +944,13 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 								if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
 								{
 									m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-									cleanWeapon();
+									m_weapon = NULL;
 									(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
 								}
 								else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
 								{
 									m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-									cleanEquipment(equip_type);
+									m_equipment[equip_type] = NULL;
 									(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
 								}
 							}
@@ -949,17 +960,17 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 								if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
 								{
 									m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex(equip_type, NULL);
-									Ship::SaveItems(ITEMS_SAVE_FILE, this);
+									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.equipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
+									
 								}
 								else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
 								{
 									m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex(equip_type, NULL);
-									Ship::SaveItems(ITEMS_SAVE_FILE, this);
+									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.equipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
 								}
 							}
 
+							Ship::SaveItems(ITEMS_SAVE_FILE, this);
 							(*CurrentGame).m_hud.focused_item = NULL;
 						}
 						
@@ -1334,7 +1345,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 						{
 							if (m_money >= (*CurrentGame).m_interactionPanel->m_focused_item->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
 							{
-								//if weapon already possed, we try to pu item in stash
+								//if weapon already possessed, we try to put item in stash
 								if (m_weapon)
 								{
 									if ((*CurrentGame).InsertObjectInGrid((*CurrentGame).m_hud.equipmentGrid, *(*CurrentGame).m_interactionPanel->m_focused_item, -1))

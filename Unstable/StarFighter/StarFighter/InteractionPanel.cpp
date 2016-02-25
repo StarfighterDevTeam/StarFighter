@@ -74,7 +74,7 @@ InteractionPanel::InteractionPanel()
 			m_textShopOptions[i].setPosition(INTERACTION_PANEL_MARGIN_SIDES + INTERACTION_ARROW_WIDTH, INTERACTION_PANEL_MARGIN_TOP + (INTERACTION_INTERLINE * i));
 		}
 		m_textShopOptions[ShopHeal].setString("\n\nHeal");
-		m_textShopOptions[ShopBuy].setString("\n\nBuy");
+		m_textShopOptions[ShopBuy].setString("\n\nBuy/Sell");
 		m_textShopOptions[StellarMap].setString("\n\nStellar map");
 
 		ostringstream ss_helpNavigation;
