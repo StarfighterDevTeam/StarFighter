@@ -229,6 +229,22 @@ GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
 
 void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject)
 {
+	if (index < 0)
+	{
+		for (int i = 0; i < this->squares.x; i++)
+		{
+			for (int j = 0; j < this->squares.y; j++)
+			{
+				if (grid[i][j] == NULL)
+				{
+					grid[i][j] = GameObject;
+					return;
+				}
+			}
+		}
+		return;
+	}
+
 	int r = index % squares.y;
 	int l = index / squares.y;
 

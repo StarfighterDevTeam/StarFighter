@@ -133,11 +133,12 @@ void InGameState::Update(Time deltaTime)
 			SendFocusedItemDataToHintPanel(obj, deltaTime);
 			(*CurrentGame).m_hud.has_focus = true;
 		}
-		else
-		{
-			(*CurrentGame).m_hud.focused_item = NULL;
-			(*CurrentGame).m_hud.has_focus = false;
-		}
+	}
+	//if we are not in the "sell" menu then we might be in the "buy" menu where those values should be reset
+	else if (!(*CurrentGame).playerShip->m_is_sell_available)
+	{
+		(*CurrentGame).m_hud.focused_item = NULL;
+		(*CurrentGame).m_hud.has_focus = false;
 	}
 
 	//displaying stats of focused item in the HUD...

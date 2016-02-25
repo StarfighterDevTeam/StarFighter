@@ -127,7 +127,7 @@ public :
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageInteractions(sf::Vector2f input_directions);
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
-	void ManageOpeningHud();
+	void ManageOpeningHud(bool is_sell_available = false);
 	void ManageImmunity();
 	bool ResplenishHealth();
 	void ManageHudControls(sf::Vector2f inputs_directions);
@@ -155,6 +155,7 @@ public :
 	void ManageInteractionPanelIndex(size_t number_of_options);
 
 	Portal* m_targetPortal;
+	bool m_is_sell_available;
 	Shop* m_targetShop;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 

@@ -86,7 +86,7 @@ InteractionPanel::InteractionPanel()
 		m_textHelpNavigation.setString(ss_helpNavigation.str());
 
 		ostringstream ss_helpBuy;
-		ss_helpBuy << "\n\n\nFire: buy\nSlowmotion: exit\n";
+		ss_helpBuy << "\n\nStart: Switch buy/sell.\nFire: buy/sell.\nSlowmotion: exit\n";
 		m_textHelpBuy.setFont(*m_font);
 		m_textHelpBuy.setCharacterSize(18);
 		m_textHelpBuy.setColor(_yellow);
@@ -177,15 +177,16 @@ GameObject* InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 				}
 				else
 				{
+					//empty cell
 					m_cursor->setAnimationLine(Cursor_HighlightState);
-					return m_fakeShopGrid.getCellPointerFromIntIndex(hovered_index_);
+					return NULL; // m_fakeShopGrid.getCellPointerFromIntIndex(hovered_index_);
 				}
 			}
 			else//no focus at all: the cursor is on an empty space
 			{
 				m_focused_item = NULL;
 				m_cursor->setAnimationLine(Cursor_NormalState);
-				return m_fakeShopGrid.getCellPointerFromIntIndex(0);
+				return NULL;// m_fakeShopGrid.getCellPointerFromIntIndex(0);
 			}
 			break;
 		}
@@ -498,7 +499,11 @@ void InteractionPanel::Draw(sf::RenderTexture& screen)
 			m_fakeShopGrid.Draw(screen);
 			m_shopGrid.Draw(screen);
 			screen.draw(m_textHelpBuy);
-			screen.draw(*m_cursor);
+			if (m_cursor && m_cursor->m_visible)
+			{
+				screen.draw(*m_cursor);
+			}
+		
 			if (m_focused_item)
 			{
 				screen.draw(m_itemStatsPanel);
