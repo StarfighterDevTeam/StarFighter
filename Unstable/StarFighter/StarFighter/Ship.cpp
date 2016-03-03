@@ -291,6 +291,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_graze_level = 0;
 	m_last_hazard_level_played = 0;
 	m_is_sell_available = false;
+	m_disable_bots = true;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -394,7 +395,10 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 	
 	Init();
 
-	GenerateBots(this);
+	if (equipment->m_bot && !m_disable_bots)
+	{
+		GenerateBots(this);
+	}
 	
 	if (!no_save)
 		Ship::SaveItems(ITEMS_SAVE_FILE, this);
@@ -418,7 +422,7 @@ bool Ship::setShipWeapon(Weapon* weapon, bool overwrite_existing, bool no_save)
 		
 	m_weapon = weapon;
 		
-	this->Init();
+	Init();
 
 	if (!no_save)
 		Ship::SaveItems(ITEMS_SAVE_FILE, this);
@@ -470,7 +474,7 @@ void Ship::setShipModel(ShipModel* ship_model, bool no_save)
 	m_ship_model = ship_model;
 	Init();
 
-	if (ship_model->m_bot)
+	if (ship_model->m_bot && !m_disable_bots)
 	{
 		GenerateBots(this);
 	}
@@ -764,7 +768,6 @@ void Ship::ManageSlowMotion()
 			else
 			{
 				(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
-				printf("normal\n");
 			}
 		}
 	}
@@ -785,7 +788,6 @@ void Ship::ManageHyperspeed()
 	else if (!m_isSlowMotion && !m_isFocusedOnHud)
 	{
 		(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
-		printf("normal h\n");
 	}
 }
 

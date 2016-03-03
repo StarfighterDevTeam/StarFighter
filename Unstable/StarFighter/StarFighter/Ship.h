@@ -183,6 +183,7 @@ public :
 	FakeShip* m_fake_ship;
 	bool m_automatic_fire;
 
+	bool m_disable_bots;
 	bool m_disable_inputs;
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	Aura* m_trail;

@@ -83,15 +83,16 @@ void InGameState::Initialize(Player player)
 	LOGGER_WRITE(Logger::Priority::DEBUG, "HUD initialization completed\n");
 
 	//ship
-	(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
 	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
 	{
 		(*CurrentGame).playerShip->m_disabledHyperspeed = false;
+		(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
 	}
 	else
 	{
 		(*CurrentGame).playerShip->m_disable_fire = true;
 		(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+		(*CurrentGame).playerShip->m_disable_bots = true;
 	}
 	(*CurrentGame).playerShip->GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -563,16 +564,17 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					m_IG_State = InGameStateMachine::HUB_ROAMING;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+					(*CurrentGame).playerShip->m_disable_bots = true;
+					(*CurrentGame).playerShip->DestroyBots();
 				}
 				else
 				{
 					m_IG_State = InGameStateMachine::SCROLLING;
 					(*CurrentGame).playerShip->m_disable_fire = false;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = false;
-					//if (m_currentScene->m_direction == Directions::NO_DIRECTION)
-					//{
-					//	(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
-					//}
+					(*CurrentGame).playerShip->m_disable_bots = false;
+					(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
+					
 					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
