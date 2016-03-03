@@ -1372,6 +1372,7 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 					{
 						(*CurrentGame).SetShopMenu(ShopMainMenu);
 						(*CurrentGame).m_hud.has_focus = false;
+						m_is_sell_available = false;
 					}
 					break;
 				}
