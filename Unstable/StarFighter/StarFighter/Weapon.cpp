@@ -487,7 +487,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot)
 	if (weapon->m_multishot > 1)
 	{
 		int sprite_size = is_bot ? ASSUMED_BOT_SIZE : ASSUMED_SHIP_SIZE;
-		weapon->m_xspread = RandomizeIntBetweenValues(0, sprite_size * 2 / weapon->m_multishot);
+		weapon->m_xspread = RandomizeIntBetweenValues(MIN_WEAPON_XSPREAD, sprite_size * 2 / weapon->m_multishot);
 	}
 
 	//saving level and credits used
