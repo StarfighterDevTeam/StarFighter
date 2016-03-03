@@ -50,6 +50,7 @@ public:
 	GameObject* getCellPointerFromIntIndex(int index);
 	int getFocusIntIndex();
 	void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject);
+	void ClearGrid();
 };
 
 #endif // HUDGRID_H_INCLUDED

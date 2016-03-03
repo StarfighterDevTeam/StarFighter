@@ -646,7 +646,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).playerShip->m_disable_inputs = true;
 				(*CurrentGame).playerShip->m_disable_fire = true;
 				(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
-
+				
 				m_IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
 			}
 

@@ -151,6 +151,7 @@ public :
 	bool GetLoot(GameObject& object) override;
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
+	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop);
 
 	void ManageInteractionPanelIndex(size_t number_of_options);
 

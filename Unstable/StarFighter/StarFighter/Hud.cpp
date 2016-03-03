@@ -288,10 +288,6 @@ void PlayerHud::Update(int armor, int armor_max, int shield, int shield_max, int
 	
 	//clean old focus
 	hud_cursor->m_visible = has_focus;
-	if (has_focus)
-		printf("focus\n");
-	else
-		printf("NOT focus\n");
 
 	focused_grid_and_index = sf::Vector2i((int)HudGrid_NoFocus, -1);
 	if (fakeShipGrid.CleanFocus() || fakeEquipmentGrid.CleanFocus())

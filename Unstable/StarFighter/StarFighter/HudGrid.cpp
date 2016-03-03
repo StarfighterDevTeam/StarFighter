@@ -213,6 +213,21 @@ bool ObjectGrid::CleanFocus()
 	return false;
 }
 
+void ObjectGrid::ClearGrid()
+{
+	for (int i = 0; i < this->squares.x; i++)
+	{
+		for (int j = 0; j < this->squares.y; j++)
+		{
+			if (grid[i][j] != NULL)
+			{
+				delete grid[i][j];
+				grid[i][j] = NULL;
+			}
+		}
+	}
+}
+
 GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
 {
 	int r = index % squares.y;

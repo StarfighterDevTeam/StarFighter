@@ -1271,39 +1271,6 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 							{
 								(*CurrentGame).SetShopMenu(ShopBuyMenu);
 								(*CurrentGame).m_interactionPanel->InitCursorOnGrid();
-
-								//Generate random loots in shop
-								size_t num_spawned_objects = 10;
-								for (size_t i = 0; i < num_spawned_objects; i++)
-								{
-									double random_number = (double)rand() / (RAND_MAX);
-									int loot_credits_ = ceil(1.0f / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(m_level + 1));
-									int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
-									
-									if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, m_targetShop->m_level, m_targetShop))
-									{
-										GameObject* capsule = NULL;
-										if (equipment_type_roll < NBVAL_Equipment)
-										{
-											capsule = Ship::CloneEquipmentIntoGameObject(m_targetShop->m_equipment_loot);
-											m_targetShop->m_equipment_loot = NULL;
-										}
-										else
-										{
-											capsule = Ship::CloneWeaponIntoGameObject(m_targetShop->m_weapon_loot);
-											m_targetShop->m_weapon_loot = NULL;
-										}
-
-										if (!(*CurrentGame).InsertObjectInGrid((*CurrentGame).m_interactionPanel->m_shopGrid, *capsule, i))
-										{
-											LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
-										}
-									}
-									else
-									{
-										printf("<!> Error: could not generate equipment in Shop, with Enemy::AssignRandomEquipment(), on i=%d\n", i);
-									}
-								}
 							}
 						}
 					}
@@ -1405,6 +1372,42 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 					break;
 				}
 			}
+		}
+	}
+}
+
+void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop)
+{
+	assert(shop != NULL);
+	//Generate random loots in shop
+	for (size_t i = 0; i < num_spawned_objects; i++)
+	{
+		double random_number = (double)rand() / (RAND_MAX);
+		int loot_credits_ = ceil(1.0f / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(shop->m_level + 1));
+		int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
+
+		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, shop->m_level, shop))
+		{
+			GameObject* capsule = NULL;
+			if (equipment_type_roll < NBVAL_Equipment)
+			{
+				capsule = Ship::CloneEquipmentIntoGameObject(shop->m_equipment_loot);
+				shop->m_equipment_loot = NULL;
+			}
+			else
+			{
+				capsule = Ship::CloneWeaponIntoGameObject(shop->m_weapon_loot);
+				shop->m_weapon_loot = NULL;
+			}
+
+			if (!(*CurrentGame).InsertObjectInGrid((*CurrentGame).m_interactionPanel->m_shopGrid, *capsule, i))
+			{
+				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
+			}
+		}
+		else
+		{
+			printf("<!> Error: could not generate equipment in Shop, with Enemy::AssignRandomEquipment(), on i=%d\n", i);
 		}
 	}
 }

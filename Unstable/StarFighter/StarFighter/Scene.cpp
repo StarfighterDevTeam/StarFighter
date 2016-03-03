@@ -160,7 +160,13 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						m_bg->m_shop->m_visible = true;
 						m_bg->m_shop->m_display_name = m_bg->m_display_name + " Shop";
 						(*CurrentGame).addToScene(m_bg->m_shop, PortalLayer, ShopObject);
-						
+
+						//clear old shop
+						(*CurrentGame).m_interactionPanel->m_shopGrid.ClearGrid();
+						//creating new one
+						Ship::FillShopWithRandomObjets(NUMBER_OF_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop);
+						LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Filling scene '%s' shop with new items.\n", (char*)name.c_str()));
+
 					}
 					//Loading enemies
 					else if ((*it)[0].compare("enemy") == 0)
