@@ -1376,14 +1376,15 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 	}
 }
 
-void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop)
+void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class)
 {
 	assert(shop != NULL);
 	//Generate random loots in shop
 	for (size_t i = 0; i < num_spawned_objects; i++)
 	{
-		double random_number = (double)rand() / (RAND_MAX);
-		int loot_credits_ = ceil(1.0f / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(shop->m_level + 1));
+		//double random_number = (double)rand() / (RAND_MAX);
+		float random_beast_scale = RandomizeFloatBetweenValues(LootTable_BeastScale_Base[loot_class]);
+		int loot_credits_ = ceil(random_beast_scale / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(shop->m_level + 1));
 		int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
 
 		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, shop->m_level, shop))
@@ -1400,7 +1401,7 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop)
 				shop->m_weapon_loot = NULL;
 			}
 
-			if (!(*CurrentGame).InsertObjectInGrid((*CurrentGame).m_interactionPanel->m_shopGrid, *capsule, i))
+			if (!(*CurrentGame).InsertObjectInGrid((*CurrentGame).m_interactionPanel->m_shopGrid, *capsule, -1))
 			{
 				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
 			}
