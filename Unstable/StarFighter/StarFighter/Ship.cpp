@@ -964,13 +964,13 @@ void Ship::ManageHudControls(sf::Vector2f inputs_directions)
 								if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
 								{
 									m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.equipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
+									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
 									
 								}
 								else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
 								{
 									m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.equipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
+									(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
 								}
 							}
 
