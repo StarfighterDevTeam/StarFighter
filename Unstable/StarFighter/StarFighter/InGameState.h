@@ -28,6 +28,9 @@ public:
 	int GetSceneHazardLevelUnlocked(string scene_name);
 	void InGameStateMachineCheck(sf::Time deltaTime);
 
+	void SendFocusedItemDataToHUD(GameObject* focused_item, Time deltaTime);
+	void SendFocusedItemDataToHintPanel(GameObject* focused_item, Time deltaTime);
+
 	sf::Clock m_clockHubExit;
 	sf::Clock m_bossSpawnCountdown;
 	bool m_hasDisplayedDestructionRatio;

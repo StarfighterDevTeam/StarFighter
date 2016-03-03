@@ -127,7 +127,7 @@ public :
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageInteractions(sf::Vector2f input_directions);
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
-	void ManageOpeningHud();
+	void ManageOpeningHud(bool is_sell_available = false);
 	void ManageImmunity();
 	bool ResplenishHealth();
 	void ManageHudControls(sf::Vector2f inputs_directions);
@@ -139,7 +139,7 @@ public :
 	PlayerHud ship_hud;
 
 	void Respawn() override;
-	bool setEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
+	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
 	bool setShipWeapon(Weapon* weapon, bool overwrite = false, bool no_save = false);
 	void setShipModel(ShipModel* ship_model, bool no_save = false);
 	void cleanEquipment(int equipment_type, bool no_save = false);
@@ -151,8 +151,12 @@ public :
 	bool GetLoot(GameObject& object) override;
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
+	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class);
+
+	void ManageInteractionPanelIndex(size_t number_of_options);
 
 	Portal* m_targetPortal;
+	bool m_is_sell_available;
 	Shop* m_targetShop;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
@@ -179,6 +183,7 @@ public :
 	FakeShip* m_fake_ship;
 	bool m_automatic_fire;
 
+	bool m_disable_bots;
 	bool m_disable_inputs;
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	Aura* m_trail;

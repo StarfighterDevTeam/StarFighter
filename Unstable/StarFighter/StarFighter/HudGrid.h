@@ -43,13 +43,14 @@ public:
 	sf::Vector2f position;
 	sf::Vector2i squares;
 	sf::Vector2i focus;
-	int isCursorColling(GameObject& cursor);
+	int isCursorColliding(GameObject& cursor);
 	bool HighlightCell(int index);
 	bool GarbageCell(int index);
 	bool CleanFocus();
 	GameObject* getCellPointerFromIntIndex(int index);
 	int getFocusIntIndex();
 	void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject);
+	void ClearGrid();
 };
 
 #endif // HUDGRID_H_INCLUDED

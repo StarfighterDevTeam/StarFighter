@@ -149,17 +149,26 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							m_bg->SetPortalsState(PortalState::PortalGhost);
 						}
-
-						//creating the shop
-						if (m_direction == NO_DIRECTION)
-						{
-							m_bg->m_shop = new Shop(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), SHOP_ASSET_FILENAME, sf::Vector2f(SHOP_ASSET_WIDTH, SHOP_ASSET_HEIGHT), sf::Vector2f(SHOP_ASSET_WIDTH / 2, SHOP_ASSET_HEIGHT / 2));
-							m_bg->m_shop->m_visible = true;
-							m_bg->m_shop->m_display_name = m_bg->m_display_name + " Shop";
-							(*CurrentGame).addToScene(m_bg->m_shop, PortalLayer, ShopObject);
-						}
 					}
+					else if ((*it)[0].compare("shop") == 0)
+					{
+						//creating the shop
+						float w_ = stoi((*it)[SHOP_WIDTH]);
+						float h_ = stoi((*it)[SHOP_HEIGHT]);
+						m_bg->m_shop = new Shop(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), (*it)[SHOP_TEXTURE_NAME], sf::Vector2f(w_, h_), sf::Vector2f(w_ / 2, h_ / 2));
+						m_bg->m_shop->m_level = stoi((*it)[SHOP_LEVEL]);
+						m_bg->m_shop->m_visible = true;
+						m_bg->m_shop->m_display_name = m_bg->m_display_name + " Shop";
+						(*CurrentGame).addToScene(m_bg->m_shop, PortalLayer, ShopObject);
 
+						//clear old shop
+						(*CurrentGame).m_interactionPanel->m_shopGrid.ClearGrid();
+						//creating new one
+						Ship::FillShopWithRandomObjets(NUMBER_OF_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_ALPHA);
+						Ship::FillShopWithRandomObjets(NUMBER_OF_RARE_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_DELTA);
+						LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Filling scene '%s' shop with new items.\n", (char*)name.c_str()));
+
+					}
 					//Loading enemies
 					else if ((*it)[0].compare("enemy") == 0)
 					{

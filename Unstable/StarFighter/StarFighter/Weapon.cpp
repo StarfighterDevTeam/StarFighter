@@ -479,7 +479,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot)
 	weapon->m_rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE;
 
 	//allocating bonuses to the weapon
-	weapon->m_ammunition->m_damage += (bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE * 0.01;
+	weapon->m_ammunition->m_damage += ceil((bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE * 0.01);
 	weapon->m_multishot += bonus_multishot;
 	weapon->m_rate_of_fire -= bonus_rate_of_fire * FIRST_LEVEL_RATE_OF_FIRE * 0.01;
 
@@ -487,7 +487,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot)
 	if (weapon->m_multishot > 1)
 	{
 		int sprite_size = is_bot ? ASSUMED_BOT_SIZE : ASSUMED_SHIP_SIZE;
-		weapon->m_xspread = RandomizeIntBetweenValues(0, sprite_size * 2 / weapon->m_multishot);
+		weapon->m_xspread = RandomizeIntBetweenValues(MIN_WEAPON_XSPREAD, sprite_size * 2 / weapon->m_multishot);
 	}
 
 	//saving level and credits used

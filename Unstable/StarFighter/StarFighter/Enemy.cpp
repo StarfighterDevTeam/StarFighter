@@ -1058,58 +1058,57 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			float BeastScaleScore = RandomizeFloatBetweenValues(LootTable_BeastScale[loot_class]);
 
 			//Calculation of the bonus "credits" for the loot
-			int loot_credits_ = ceil(BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(m_level));
+			int loot_credits_ = ceil(BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(m_level + 1));
 
 			//Equipment type
 			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
 
-			//-----CHOSING RANDOM PROPERTIES-----
-			int properties_to_choose_from = LootTable_MaxPropertiesPerEquipmentType[equipment_type_roll];
-
-			//"Spending credits" on item stats
-			switch (equipment_type_roll)
-			{
-				case (int)EquipmentType::Engine:
-				{
-					this->setEquipmentLoot(Equipment::CreateRandomEngine(loot_credits_, m_level));
-					break;
-				}
-
-				case (int)EquipmentType::Armor:
-				{
-					this->setEquipmentLoot(Equipment::CreateRandomArmor(loot_credits_, m_level));
-					break;
-				}
-				
-				case (int)EquipmentType::Shield:
-				{
-					this->setEquipmentLoot(Equipment::CreateRandomShield(loot_credits_, m_level));
-					break;
-				}
-
-				case (int)EquipmentType::Module:
-				{				   
-					this->setEquipmentLoot(Equipment::CreateRandomModule(loot_credits_, m_level));
-					break;
-				}
-
-				case (int)EquipmentType::NBVAL_Equipment://WEAPON DROP
-				{
-					this->setWeaponLoot(Weapon::CreateRandomWeapon(loot_credits_, m_level, false));
-					break;
-				}
-			}
+			//"Spending credits" on item stats and assigning the equipment/weapon as a loot
+			AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, m_level + 1, this);
 		}
 
 		else
 		{
 			//MONEY DROP
 			int money = RandomizeIntBetweenRatios(1.0f * XPTable_PerEnemyClass[loot_class] * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100, LootTable_BeastScale[loot_class]);
-			this->setMoney(money);//looting money
+			this->m_money = money;//looting money
 		}
 	}
 
 	return true;
+}
+
+bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int credits, int level, GameObject* object)
+{
+	switch (equipment_type)
+	{
+		case (int)EquipmentType::Engine:
+		{
+			return object->setEquipmentLoot(Equipment::CreateRandomEngine(credits, level));
+		}
+
+		case (int)EquipmentType::Armor:
+		{
+			return object->setEquipmentLoot(Equipment::CreateRandomArmor(credits, level));
+		}
+
+		case (int)EquipmentType::Shield:
+		{
+			return object->setEquipmentLoot(Equipment::CreateRandomShield(credits, level));
+		}
+
+		case (int)EquipmentType::Module:
+		{
+			return object->setEquipmentLoot(Equipment::CreateRandomModule(credits, level));
+		}
+
+		case (int)EquipmentType::NBVAL_Equipment://WEAPON DROP
+		{
+			return object->setWeaponLoot(Weapon::CreateRandomWeapon(credits, level, false));
+		}
+	}
+
+	return false;
 }
 
 int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_to_choose_from, int p)

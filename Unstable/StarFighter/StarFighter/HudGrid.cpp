@@ -124,7 +124,7 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 	}
 }
 
-int ObjectGrid::isCursorColling(GameObject& cursor)
+int ObjectGrid::isCursorColliding(GameObject& cursor)
 {
 	if (!cursor.m_visible)
 	{
@@ -133,7 +133,6 @@ int ObjectGrid::isCursorColling(GameObject& cursor)
 	else
 	{
 		//1st test
-
 		sf::FloatRect gridBounds(sf::Vector2f(grid[0][0]->getPosition().x - GRID_SLOT_SIZE / 2, grid[0][0]->getPosition().y - GRID_SLOT_SIZE / 2),
 			sf::Vector2f(GRID_SLOT_SIZE * squares.y, GRID_SLOT_SIZE * squares.x));
 
@@ -161,7 +160,6 @@ int ObjectGrid::isCursorColling(GameObject& cursor)
 		}
 		return -1;
 	}
-
 }
 
 bool ObjectGrid::HighlightCell(int index)
@@ -186,15 +184,21 @@ bool ObjectGrid::HighlightCell(int index)
 
 bool ObjectGrid::GarbageCell(int index)
 {
-	GameObject* tmp_ptr = getCellPointerFromIntIndex(index);
-	if (tmp_ptr != NULL)
+	int r = index % squares.y;
+	int l = index / squares.y;
+
+	if (l > squares.x)
 	{
-		delete tmp_ptr;
-		tmp_ptr = NULL;
+		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to garbage a pointer from a grid cell index that doesn't exist.\n");
+	}
+
+	if (grid[l][r])
+	{
+		delete grid[l][r];
+		grid[l][r] = NULL;
 		return true;
 	}
-	tmp_ptr = NULL;
-	LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to garbage an empty grid cell.\n");
+
 	return false;
 }
 
@@ -207,6 +211,21 @@ bool ObjectGrid::CleanFocus()
 		return true;
 	}
 	return false;
+}
+
+void ObjectGrid::ClearGrid()
+{
+	for (int i = 0; i < this->squares.x; i++)
+	{
+		for (int j = 0; j < this->squares.y; j++)
+		{
+			if (grid[i][j] != NULL)
+			{
+				delete grid[i][j];
+				grid[i][j] = NULL;
+			}
+		}
+	}
 }
 
 GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
@@ -225,6 +244,22 @@ GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
 
 void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject)
 {
+	if (index < 0)
+	{
+		for (int i = 0; i < this->squares.x; i++)
+		{
+			for (int j = 0; j < this->squares.y; j++)
+			{
+				if (grid[i][j] == NULL)
+				{
+					grid[i][j] = GameObject;
+					return;
+				}
+			}
+		}
+		return;
+	}
+
 	int r = index % squares.y;
 	int l = index / squares.y;
 

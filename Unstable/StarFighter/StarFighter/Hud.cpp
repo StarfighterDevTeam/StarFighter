@@ -16,35 +16,35 @@ PlayerHud::PlayerHud()
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8+1));
 }
 
-void PlayerHud::Init(int m_armor, int m_shield, int xp, int xp_max)
+void PlayerHud::Init(int armor, int shield, int xp, int xp_max)
 {
 	backgroundColor.setSize(sf::Vector2f(SCENE_SIZE_X * 1.0f / 3, SCENE_SIZE_Y));
 	backgroundColor.setFillColor(sf::Color(10, 10, 10, 128));//dark grey
 	backgroundColor.setOrigin(0, 0);
 	backgroundColor.setPosition(0, 0);
 
-	armorBar.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
+	armorBar.setSize(sf::Vector2f(1 + armor, ARMOR_BAR_SIZE_Y));
 	armorBar.setFillColor(sf::Color(COLOR_GREEN_R_VALUE, COLOR_GREEN_G_VALUE, COLOR_GREEN_B_VALUE, COLOR_GREEN_A_VALUE));//green
 	//armorBar.setOutlineThickness(1);
 	//armorBar.setOutlineColor(sf::Color(255, 255, 255));
 	armorBar.setOrigin(0, 0);
 	armorBar.setPosition(HUD_LEFT_MARGIN, 10);
 
-	shieldBar.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
+	shieldBar.setSize(sf::Vector2f(1 + shield, SHIELD_BAR_SIZE_Y));
 	shieldBar.setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
 	//shieldBar.setOutlineThickness(1);
 	//shieldBar.setOutlineColor(sf::Color(255, 255, 255));
 	shieldBar.setOrigin(0, 0);
 	shieldBar.setPosition(HUD_LEFT_MARGIN, 20 + ARMOR_BAR_SIZE_Y);
 
-	armorBarContainer.setSize(sf::Vector2f(1 + m_armor, ARMOR_BAR_SIZE_Y));
+	armorBarContainer.setSize(sf::Vector2f(1 + armor, ARMOR_BAR_SIZE_Y));
 	armorBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
 	armorBarContainer.setOutlineThickness(1);
 	armorBarContainer.setOutlineColor(sf::Color(255, 255, 255));
 	armorBarContainer.setOrigin(0, 0);
 	armorBarContainer.setPosition(HUD_LEFT_MARGIN, 10);
 
-	shieldBarContainer.setSize(sf::Vector2f(1 + m_shield, SHIELD_BAR_SIZE_Y));
+	shieldBarContainer.setSize(sf::Vector2f(1 + shield, SHIELD_BAR_SIZE_Y));
 	shieldBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
 	shieldBarContainer.setOutlineThickness(1);
 	shieldBarContainer.setOutlineColor(sf::Color(255, 255, 255));
@@ -61,7 +61,7 @@ void PlayerHud::Init(int m_armor, int m_shield, int xp, int xp_max)
 	itemStatsPanel.setOrigin(0, 0);
 	itemStatsPanel.setPosition(HUD_LEFT_MARGIN, (3 * ARMOR_BAR_SIZE_Y) + 40);
 
-	if (m_shield > 0)
+	if (shield > 0)
 	{
 		this->has_shield = true;
 	}
@@ -162,32 +162,32 @@ void PlayerHud::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
 	this->hud_cursor->setAnimationLine(animation_index);
 }
 
-void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_max, int m_money, int m_graze_count, int m_hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
+void PlayerHud::Update(int armor, int armor_max, int shield, int shield_max, int money, int graze_count, int hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
 	int focused_item_type, string f_name, int f_level, int f_xp, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen,
 	int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
 	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
 {
 	//armor and shield
-	if (m_armor <=0)
+	if (armor <=0)
 	{
 		armorBar.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 		armorBarContainer.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 	}
 	else
 	{
-		if (m_armor < m_shield)
+		if (armor < shield)
 		{
-			armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max), ARMOR_BAR_SIZE_Y));
-			armorBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_armor_max / m_shield_max, ARMOR_BAR_SIZE_Y));
+			armorBar.setSize(sf::Vector2f(1 + (1.0f * armor / armor_max * ARMOR_BAR_SIZE_X * armor_max / shield_max), ARMOR_BAR_SIZE_Y));
+			armorBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * armor_max / shield_max, ARMOR_BAR_SIZE_Y));
 		}
 		else
 		{
-			armorBar.setSize(sf::Vector2f(1 + (1.0f * m_armor / m_armor_max * ARMOR_BAR_SIZE_X), ARMOR_BAR_SIZE_Y));
+			armorBar.setSize(sf::Vector2f(1 + (1.0f * armor / armor_max * ARMOR_BAR_SIZE_X), ARMOR_BAR_SIZE_Y));
 			armorBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, ARMOR_BAR_SIZE_Y));
 		}
 	}
 
-	if (m_shield <=0) 
+	if (shield <=0) 
 	{
 		shieldBar.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
 		shieldBarContainer.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
@@ -195,37 +195,37 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 	}	
 	else
 	{
-		if (m_shield < m_armor)
+		if (shield < armor)
 		{
-			shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max), SHIELD_BAR_SIZE_Y));
-			shieldBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_shield_max / m_armor_max, SHIELD_BAR_SIZE_Y));
+			shieldBar.setSize(sf::Vector2f(1 + (1.0f * shield / shield_max * ARMOR_BAR_SIZE_X * shield_max / armor_max), SHIELD_BAR_SIZE_Y));
+			shieldBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * shield_max / armor_max, SHIELD_BAR_SIZE_Y));
 		}
 		else
 		{
-			shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_shield / m_shield_max * ARMOR_BAR_SIZE_X), SHIELD_BAR_SIZE_Y));
+			shieldBar.setSize(sf::Vector2f(1 + (1.0f * shield / shield_max * ARMOR_BAR_SIZE_X), SHIELD_BAR_SIZE_Y));
 			shieldBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
 		}
 		this->has_shield = true;
 	}
 
 	ostringstream ss_life;
-	ss_life << m_armor;// << " / " << m_armor_max;
+	ss_life << armor;// << " / " << armor_max;
 	LifeText.setString(ss_life.str());
 	LifeText.setPosition(HUD_LEFT_MARGIN + armorBar.getGlobalBounds().width / 2 - LifeText.getGlobalBounds().width / 2, 10 + LifeText.getGlobalBounds().height / 2);
 
 	ostringstream ss_shield;
-	ss_shield << m_shield;// << " / " << m_shield_max;
+	ss_shield << shield;// << " / " << shield_max;
 	ShieldText.setString(ss_shield.str());
 	ShieldText.setPosition(HUD_LEFT_MARGIN + shieldBar.getGlobalBounds().width / 2 - ShieldText.getGlobalBounds().width / 2, 20 + ARMOR_BAR_SIZE_Y + ShieldText.getGlobalBounds().height / 2);
 
 	//money
 	ostringstream ss_m;
-	ss_m << m_money;
+	ss_m << money;
 	Money.setString(ss_m.str()+"$");
 
 	//graze
 	ostringstream ss_g;
-	ss_g << m_graze_count;
+	ss_g << graze_count;
 	GrazeScore.setString("Graze: "+ ss_g.str());
 
 	//level
@@ -245,7 +245,7 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 	if (!hub)
 	{
 		ostringstream ss_bg;
-		ss_bg  << " (" << m_hazard_level+1 << ")";
+		ss_bg  << " (" << hazard_level+1 << ")";
 		SceneName.setString(scene_name + ss_bg.str());
 	} 
 	else
@@ -297,29 +297,25 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		{
 			hud_cursor->setAnimationLine(Cursor_NormalState);
 		}
-		
 	}
 
 	if (has_focus)
 	{
 		//HUD cursor collides with an item?
-		int hovered_index_ = fakeShipGrid.isCursorColling(*hud_cursor);
+		int hovered_index_ = fakeShipGrid.isCursorColliding(*hud_cursor);
 		if (hovered_index_ < 0)
 		{
 			//we test the equipment grid
-			hovered_index_ = fakeEquipmentGrid.isCursorColling(*hud_cursor);
+			hovered_index_ = fakeEquipmentGrid.isCursorColliding(*hud_cursor);
 			if (hovered_index_ > -1)//the equipment grid is focused
 			{
 				fakeEquipmentGrid.HighlightCell(hovered_index_);
+				focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
 				if (equipmentGrid.getCellPointerFromIntIndex(hovered_index_) != NULL)
 				{
 					if (!has_prioritary_cursor_feedback)
 					{
 						hud_cursor->setAnimationLine(Cursor_ActionState);
-					}
-					if (focused_item != equipmentGrid.getCellPointerFromIntIndex(hovered_index_))
-					{
-						focused_item = equipmentGrid.getCellPointerFromIntIndex(hovered_index_);
 					}
 				}
 				else
@@ -328,7 +324,6 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 					{
 						hud_cursor->setAnimationLine(Cursor_HighlightState);
 					}
-					focused_item = NULL;
 				}
 				focused_grid_and_index = sf::Vector2i((int)HudGrid_EquipmentGrid, hovered_index_);
 			}
@@ -344,7 +339,6 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 		}
 		else//the ship grid is focused
 		{
-			
 			fakeShipGrid.HighlightCell(hovered_index_);
 			if (!has_prioritary_cursor_feedback)
 			{
@@ -371,180 +365,8 @@ void PlayerHud::Update(int m_armor, int m_armor_max, int m_shield, int m_shield_
 	}
 	
 	//ITEM STATS PANEL DISPLAY
-	ostringstream ss_stats;
-	if (this->focused_item != NULL)
-	{
-		switch (focused_item_type)
-		{
-			case Engine:
-			{
-				ss_stats << "THRUSTER: " << f_name << "\nSpeed: " << f_max_speed << "\nHyperspeed: " << f_hyperspeed << "\nContact damage: " << f_damage;
-				break;
-			}
-			case Armor:
-			{
-				ss_stats << "HULL: " << f_name << "\nHull pts: " << f_armor;
-				break;
-			}
-			case Shield:
-			{
-				ss_stats << "SHIELD: " << f_name << "\nMax shield pts: " << f_shield << "\nShield regen/sec: " << f_shield_regen;
-				break;
-			}
-			case Module:
-			{
-				ss_stats << "MODULE: " << f_name;
-				if (f_bot)
-				{
-					ss_stats << " \nAdding 1 drone. Drone stats:";
-					if (f_shot_mode != NoShotMode)
-					{
-						ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_damage;
-					}
-					else
-					{
-						ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
-					}
-
-					ss_stats << "\nDamage: " << f_damage;
-					ss_stats << "\nAmmo speed: " << f_ammo_speed;
-					ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec";
-
-					if (f_multishot > 1)
-					{
-						ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
-					}
-					else
-					{
-						ss_stats << "\nSingle shot";
-					}
-					if (f_rafale > 0)
-					{
-						ss_stats << "\nRafale: " << f_rafale << " (cooldown: " << f_rafale_cooldown << " sec";
-					}
-
-					if (f_shot_mode != NoShotMode)
-					{
-						ss_stats << "\nFiring style: ";
-						switch (f_shot_mode)
-						{
-							case AlternateShotMode:
-							{
-								ss_stats << "Alternating shots";
-								break;
-							}
-							case AscendingShotMode:
-							{
-								ss_stats << "Ascending shots";
-								break;
-							}
-							case DescendingShotMode:
-							{
-								ss_stats << "Descending shots";
-								break;
-							}
-						}
-					}
-
-					if (f_target_seaking != NO_SEAKING)
-					{
-						switch (f_target_seaking)
-						{
-							case SEAKING:
-							case SUPER_SEAKING:
-							{
-								ss_stats << "\nSeaking target";
-								break;
-							}
-							case SEMI_SEAKING:
-							{
-								ss_stats << "\nSeaking target once per rafale";
-								break;
-							}
-						}
-					}
-				}
-				else
-				{
-					ss_stats << "\nNo effect";
-				}
-				break;
-			}
-			case NBVAL_Equipment:
-			{
-				ss_stats << "MAIN WEAPON: " << f_name;
-				if (f_shot_mode != NoShotMode)
-				{
-					ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_damage;
-				}
-				else
-				{
-					ss_stats << "\nDPS: " << (floor)(1 / f_rate_of_fire * 100) / 100 * f_multishot * f_damage;
-				}
-				ss_stats << "\nDamage: " << f_damage;
-				ss_stats << "\nAmmo speed: " << f_ammo_speed;
-				ss_stats << "\nFire rate: " << (floor)(1 / f_rate_of_fire * 100) / 100 << " shots/sec";
-
-				if (f_multishot > 1)
-				{
-					ss_stats << "\nMultishot: " << f_multishot << "\nSpread: " << f_xspread << "\nDispersion: " << f_dispersion << "°";
-				}
-				else
-				{
-					ss_stats << "\nSingle shot";
-				}
-				if (f_rafale > 0)
-				{
-					ss_stats << "\nRafale: " << f_rafale << " (cooldown: " << f_rafale_cooldown << " sec";
-				}
-				if (f_shot_mode != NoShotMode)
-				{
-					ss_stats << "\nFiring style: ";
-					switch (f_shot_mode)
-					{
-						case AlternateShotMode:
-						{
-							ss_stats << "Alternating shots";
-							break;
-						}
-						case AscendingShotMode:
-						{
-							ss_stats << "Ascending shots";
-							break;
-						}
-						case DescendingShotMode:
-						{
-							ss_stats << "Descending shots";
-							break;
-						}
-					}
-				}
-
-				if (f_target_seaking != NO_SEAKING)
-				{
-					switch (f_target_seaking)
-					{
-						case SEAKING:
-						case SUPER_SEAKING:
-						{
-							ss_stats << "\nSeaking target";
-							break;
-						}
-						case SEMI_SEAKING:
-						{
-							ss_stats << "\nSeaking target once per rafale";
-							break;
-						}
-					}
-				}
-				break;
-			}
-		}
-		ss_stats << "\nLevel: " << f_level << " (+" << f_xp << " XP)";
-	}
-
-	itemStatsText.setString(ss_stats.str());
-	//todo
+	InteractionPanel::UpdateItemStatsText(&itemStatsText, focused_item_type, f_name, f_level, f_xp, f_max_speed, f_hyperspeed,
+		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
 }
 
 void PlayerHud::Draw(sf::RenderTexture& offscreen)
