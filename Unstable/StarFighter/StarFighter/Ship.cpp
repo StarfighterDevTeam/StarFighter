@@ -764,6 +764,7 @@ void Ship::ManageSlowMotion()
 			else
 			{
 				(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
+				printf("normal\n");
 			}
 		}
 	}
@@ -781,9 +782,10 @@ void Ship::ManageHyperspeed()
 		m_isHyperspeeding = true;
 		(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
 	}
-	else if (!m_isSlowMotion)
+	else if (!m_isSlowMotion && !m_isFocusedOnHud)
 	{
 		(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
+		printf("normal h\n");
 	}
 }
 
