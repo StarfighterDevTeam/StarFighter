@@ -49,6 +49,27 @@ enum GrazeLevels
 	NB_GRAZE_LEVELS,//4
 };
 
+enum PlayerInputStates
+{
+	Input_Released,//0
+	Input_JustPressed,//1
+	Input_Pressed,//2
+};
+
+enum PlayerActions
+{
+	Action_Idle,
+	Action_Firing,
+	Action_Braking,
+	Action_Hyperspeeding,
+	Action_Slowmotion,
+	Action_OpeningHud,
+	Action_ChangingResolution,
+	Action_Recall,
+	Action_DebugCommand,
+	NBVAL_PlayerActions,
+};
+
 class ShipModel
 {
 public:
@@ -126,6 +147,7 @@ public :
 	void ManageHyperspeed();
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageInteractions(sf::Vector2f input_directions);
+	void GetInputs();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
 	void ManageOpeningHud(bool is_sell_available = false);
 	void ManageImmunity();
@@ -154,6 +176,8 @@ public :
 	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class);
 
 	void ManageInteractionPanelIndex(size_t number_of_options);
+
+	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 
 	Portal* m_targetPortal;
 	bool m_is_sell_available;

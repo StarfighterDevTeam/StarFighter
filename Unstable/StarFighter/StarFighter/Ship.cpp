@@ -351,6 +351,11 @@ void Ship::Init()
 	m_textureName = m_ship_model->m_textureName;
 	m_frameNumber = m_ship_model->m_frameNumber;
 
+	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
+	{
+		m_inputs_states[i] = Input_Released;
+	}
+
 	//fake texture
 	m_transparent = !m_ship_model->m_fake_textureName.empty();
 
@@ -691,6 +696,30 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 	}
+}
+
+void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
+{
+	if (input_guy_boolean)
+	{
+		m_inputs_states[action] = m_inputs_states[action] == Input_Released ? Input_JustPressed : Input_Pressed;
+	}
+	else
+	{
+		m_inputs_states[action] = Input_Released;
+	}
+}
+
+void Ship::UpdatePlayerActions()
+{
+	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isBraking(), Action_Braking);
+	GetInputState(InputGuy::isHyperspeeding(), Action_Hyperspeeding);
+	GetInputState(InputGuy::isSlowMotion(), Action_Slowmotion);
+	GetInputState(InputGuy::isOpeningHud(), Action_OpeningHud);
+	GetInputState(InputGuy::isChangingResolution(), Action_ChangingResolution);
+	GetInputState(InputGuy::setAutomaticFire(), Action_SettingAutomaticFire);
+	GetInputState(InputGuy::isUsingDebugCommand(), Action_DebugCommand);
 }
 
 void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction)
