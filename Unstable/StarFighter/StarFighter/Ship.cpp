@@ -288,14 +288,10 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_shield_regen = 0;
 	m_disable_inputs = false;
 	m_disable_fire = false;
-	m_isBraking = false;
-	m_isHyperspeeding = false;
-	m_isSlowMotion = false;
 	m_disabledHyperspeed = false;
 	m_graze_count = 0;
 	m_graze_level = 0;
 	m_last_hazard_level_played = 0;
-	m_is_sell_available = false;
 	m_disable_bots = true;
 
 	m_level = 1;
@@ -311,14 +307,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_trail->m_offset = sf::Vector2f(0, (m_size.y / 2) + (m_trail->m_size.y / 2));
 
 	(*CurrentGame).addToScene(m_trail, LayerType::FakeShipLayer, GameObjectType::Neutral);
-	m_fire_key_repeat = false;
-	m_slowmo_key_repeat = false;
-	m_hud_key_repeat = false;
 	m_interactionType = No_Interaction;
-	m_isFiringButtonPressed = true;//will be updated to false in the update function if button released
-	m_wasBrakingButtonPressed = true;
-	m_isBrakingButtonHeldPressed = false;
-	m_wasHyperspeedingButtonPressed = true;
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
 	m_equipment_loot = NULL;
@@ -533,7 +522,7 @@ void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
 }
 
 //Inputs
-void Ship::UpdatePlayerActions()
+void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isFiring(), Action_Firing);
 	GetInputState(InputGuy::isBraking(), Action_Braking);
@@ -571,15 +560,21 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (ManageVisibility())
 	{
-		//Debug command
-		UpdateAction(Action_DebugCommand, Input_Tap, true);
-		if (m_actions_states[Action_DebugCommand])
+		//Resetting
+		if (m_isCollidingWithInteractiveObject != PortalInteraction && m_interactionType != PortalInteraction)
 		{
-			(*CurrentGame).killGameObjectLayer(EnemyObject);
+			m_targetPortal = NULL;
+		}
+		if (m_isCollidingWithInteractiveObject != ShopInteraction)
+		{
+			m_targetShop = NULL;
 		}
 
-		ManageImmunity();
+		m_movingX = false;
+		m_movingY = false;
+		m_moving = false;
 
+		ManageImmunity();
 		ManageShieldRegen(deltaTime, hyperspeedMultiplier);
 
 		sf::Vector2f directions = InputGuy::getDirections();
@@ -591,50 +586,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		GameObject::update(deltaTime, hyperspeedMultiplier);
 
 		ScreenBorderContraints();
-
 		SettingTurnAnimations();
-
 		ManageFeedbackExpiration(deltaTime);		
-	}
-}
-
-void Ship::ManageOpeningHud(bool is_sell_available)
-{
-	if (m_actions_states[Action_OpeningHud])
-	{
-		//specific to shop "sell" menu
-		if (is_sell_available)
-		{
-			m_is_sell_available = false;
-			(*CurrentGame).m_hud.has_focus = false;
-			(*CurrentGame).m_interactionPanel->m_cursor->m_visible = true;
-			(*CurrentGame).m_hud.hud_cursor->m_visible = false;
-			return;
-		}
-
-		//now for the "normal" cases
-		m_isFocusedOnHud = !m_isFocusedOnHud;
-
-		m_HUD_state = HUD_OpeningEquipment;
-
-		(*CurrentGame).m_hud.has_focus = m_isFocusedOnHud;
-
-		m_disable_fire = m_isFocusedOnHud;
-		if ((*CurrentGame).m_direction == NO_DIRECTION)
-		{
-			m_disable_fire = true;
-		}
-
-		if (m_isFocusedOnHud && !m_actions_states[Action_Slowmotion])
-		{
-			(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
-			m_actions_states[Action_Slowmotion] = true;
-		}
-		else if (!m_isFocusedOnHud && !m_actions_states[Action_Slowmotion])
-		{
-			(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
-			m_actions_states[Action_Slowmotion] = false;
-		}
 	}
 }
 
@@ -734,59 +687,74 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 }
 
+void Ship::UpdateHUDStates()
+{
+	if (m_HUD_state != HUD_OpeningEquipment)
+	{
+		if (m_targetPortal && m_targetPortal->m_state == PortalOpen && !m_actions_states[Action_Firing])
+		{
+			if (m_HUD_state != HUD_PortalInteraction)
+			{
+				InitPortalPanelInfos();
+			}
+			m_HUD_state = HUD_PortalInteraction;
+		}
+		else if (m_targetShop)
+		{
+			if (m_HUD_state != HUD_ShopMainMenu)
+			{
+				InitShopPanelInfos();
+			}
+			if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_ShopSellMenu)
+			{
+				m_HUD_state = HUD_ShopMainMenu;
+			}
+		}
+		else if (m_HUD_state == HUD_PortalInteraction || m_HUD_state == HUD_ShopMainMenu)
+		{
+			m_HUD_state = HUD_Idle;
+		}
+	}
+}
+
 void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction)
 {
 	if (!m_disable_inputs)
 	{
-		//Resetting
-		if (m_isCollidingWithInteractiveObject != PortalInteraction && m_interactionType != PortalInteraction)
-		{
-			m_targetPortal = NULL;
-		}
-		if (m_isCollidingWithInteractiveObject != ShopInteraction)
-		{
-			m_targetShop = NULL;
-		}
-		
-		m_movingX = false;
-		m_movingY = false;
-		m_moving = false;
-
 		//Registering inputs
-		UpdatePlayerActions();
-		
-		//Update HUD state
-		if (m_HUD_state != HUD_OpeningEquipment)
+		UpdateInputStates();
+
+		//Debug command
+		if (UpdateAction(Action_DebugCommand, Input_Tap, true))
 		{
-			if (m_targetPortal && m_targetPortal->m_state == PortalOpen && !m_actions_states[Action_Firing])
-			{
-				if (m_HUD_state != HUD_PortalInteraction)
-				{
-					InitPortalPanelInfos();
-				}
-				m_HUD_state = HUD_PortalInteraction;
-			}
-			else if (m_targetShop)
-			{
-				if (m_HUD_state != HUD_ShopMainMenu)
-				{
-					InitShopPanelInfos();
-				}
-				if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_ShopSellMenu)
-				{
-					m_HUD_state = HUD_ShopMainMenu;
-				}
-			}
-			else if (m_HUD_state == HUD_PortalInteraction || m_HUD_state == HUD_ShopMainMenu)
-			{
-				m_HUD_state = HUD_Idle;
-			}
+			(*CurrentGame).killGameObjectLayer(EnemyObject);
 		}
+
+		//Update HUD state
+		UpdateHUDStates();
 
 		//EQUIPMENT HUD
 		if (m_HUD_state == HUD_OpeningEquipment)
 		{
-			ManageHudControls(inputs_direction);
+			//Cursor movement
+			MoveCursor((*CurrentGame).m_hud.hud_cursor, inputs_direction);
+
+			//Swapping items
+			if (m_inputs_states[Action_Firing] == Input_Tap && (*CurrentGame).getHudFocusedItem() != NULL)
+				//if (UpdateAction(Action_Firing, Input_Tap, (*CurrentGame).getHudFocusedItem() != NULL))
+			{
+				SwappingItems();
+			}
+			//Garbaging item
+			else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && (*CurrentGame).getHudFocusedItem() != NULL)
+			{
+				GarbagingItem();
+			}
+			else
+			{
+				(*CurrentGame).m_hud.has_prioritary_cursor_feedback = false;
+			}
+			m_previously_focused_item = (*CurrentGame).getHudFocusedItem();
 
 			//Closing hud
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
@@ -808,7 +776,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				(*CurrentGame).m_hud.has_focus = true;
 				(*CurrentGame).m_interactionPanel->m_cursor->m_visible = false;
 				(*CurrentGame).m_hud.hud_cursor->m_visible = true;
-				m_is_sell_available = true;
 			}
 
 			//interaction: buy item
@@ -823,13 +790,25 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				(*CurrentGame).SetShopMenu(ShopMainMenu);
 				m_HUD_state = HUD_ShopMainMenu;
 				(*CurrentGame).m_hud.has_focus = false;
-				m_is_sell_available = false;
 			}
 		}
 		//SHOP SELL
 		else if (m_HUD_state == HUD_ShopSellMenu)
 		{
-			ManageHudControls(inputs_direction);
+			//Cursor movement
+			MoveCursor((*CurrentGame).m_hud.hud_cursor, inputs_direction);
+
+			//Swapping items
+			if (m_inputs_states[Action_Firing] == Input_Tap && (*CurrentGame).getHudFocusedItem() != NULL)
+				//if (UpdateAction(Action_Firing, Input_Tap, (*CurrentGame).getHudFocusedItem() != NULL))
+			{
+				SwappingItems();
+			}
+			//Selling item
+			else if (m_inputs_states[Action_Braking] == Input_Tap && (*CurrentGame).getHudFocusedItem() != NULL)
+			{
+				SellingItem();
+			}
 			
 			//Switch to buy menu
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
@@ -838,7 +817,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				(*CurrentGame).m_hud.has_focus = false;
 				(*CurrentGame).m_interactionPanel->m_cursor->m_visible = true;
 				(*CurrentGame).m_hud.hud_cursor->m_visible = false;
-				m_is_sell_available = false;
+				(*CurrentGame).m_hud.focused_item = NULL;
 			}
 
 			//exit
@@ -847,7 +826,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				(*CurrentGame).SetShopMenu(ShopMainMenu);
 				m_HUD_state = HUD_ShopMainMenu;
 				(*CurrentGame).m_hud.has_focus = false;
-				m_is_sell_available = false;
 			}
 		}
 		else
@@ -972,47 +950,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 			}
 		}
-
-		//if (!m_isFocusedOnHud)
-		//{
-		//	if ((*CurrentGame).GetShopMenu() == ShopMainMenu)
-		//	{	
-		//		ManageOpeningHud();
-		//
-		//		ManageAcceleration(inputs_direction);
-		//
-		//		ManageSlowMotion();
-		//
-		//		ManageHyperspeed();
-		//
-		//		ManageInteractions(inputs_direction);
-		//
-		//		ManageFiring(deltaTime, hyperspeedMultiplier);
-		//
-		//		ManageBraking();
-		//	}
-		//	else if ((*CurrentGame).GetShopMenu() == ShopBuyMenu)
-		//	{
-		//		//sell
-		//		if (m_is_sell_available)
-		//		{
-		//			ManageOpeningHud(true);
-		//			ManageHudControls(inputs_direction);
-		//		}
-		//		//buy
-		//		else
-		//		{
-		//			ManageInteractions(inputs_direction);
-		//		}
-		//	}
-		//}
-		////HUD controls
-		//else
-		//{
-		//	ManageOpeningHud();
-		//
-		//	ManageHudControls(inputs_direction);
-		//}
 		
 		IdleDecelleration(deltaTime);
 	}
@@ -1176,55 +1113,52 @@ void Ship::SellingItem()
 	//interaction
 	if ((*CurrentGame).getHudFocusedItem() != NULL)
 	{
-		//specific case of shop "sell" menu
-		if (m_is_sell_available)
+		if ((*CurrentGame).getHudFocusedItem() != NULL)
 		{
-			if ((*CurrentGame).getHudFocusedItem() != NULL)
+			//(*CurrentGame).InsertObjectInGrid((*CurrentGame).m_interactionPanel->m_shopGrid, *(*CurrentGame).getHudFocusedItem(), -1);
+			(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex(-1, (*CurrentGame).getHudFocusedItem());
+			int equip_type = (*CurrentGame).getHudFocusedItem()->m_weapon_loot ? NBVAL_Equipment : (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_equipmentType;
+
+			//let's begin with selling equiped items
+			if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_ShipGrid)
 			{
-				//(*CurrentGame).InsertObjectInGrid((*CurrentGame).m_interactionPanel->m_shopGrid, *(*CurrentGame).getHudFocusedItem(), -1);
-				(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex(-1, (*CurrentGame).getHudFocusedItem());
-				int equip_type = (*CurrentGame).getHudFocusedItem()->m_weapon_loot ? NBVAL_Equipment : (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_equipmentType;
-
-				//let's begin with selling equiped items
-				if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_ShipGrid)
+				if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
 				{
-					if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
-					{
-						m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-						m_weapon = NULL;
-						(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
-					}
-					else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
-					{
-						m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-						m_equipment[equip_type] = NULL;
-						(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
-					}
+					m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					m_weapon = NULL;
+					(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
 				}
-				//same for stash grid (without the need to clean the equipment)
-				if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+				else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
 				{
-					if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
-					{
-						m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-						(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
-
-					}
-					else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
-					{
-						m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-						(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
-					}
+					m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					m_equipment[equip_type] = NULL;
+					(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
 				}
+			}
+			//same for stash grid (without the need to clean the equipment)
+			if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+			{
+				if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
+				{
+					m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
 
-				Ship::SaveItems(ITEMS_SAVE_FILE, this);
-				(*CurrentGame).m_hud.focused_item = NULL;
+				}
+				else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
+				{
+					m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
+				}
 			}
 
-			SavePlayerMoney(MONEY_SAVE_FILE, this);
-
-			return;
+			Ship::SaveItems(ITEMS_SAVE_FILE, this);
+			(*CurrentGame).m_hud.focused_item = NULL;
 		}
+
+		SavePlayerMoney(MONEY_SAVE_FILE, this);
+
+		return;
+		
 	}
 }
 
@@ -1321,7 +1255,6 @@ void Ship::GarbagingItem()
 				SaveItems(ITEMS_SAVE_FILE, this);
 
 				m_brakingHoldingClock.restart();
-				m_isBrakingButtonHeldPressed = false;
 				(*CurrentGame).m_hud.has_prioritary_cursor_feedback = false;
 			}
 			else
@@ -1338,35 +1271,6 @@ void Ship::GarbagingItem()
 			}
 		}
 	}
-}
-
-void Ship::ManageHudControls(sf::Vector2f inputs_directions)
-{
-	//movement
-	MoveCursor((*CurrentGame).m_hud.hud_cursor, inputs_directions);
-	
-	//Swapping items
-	if (m_inputs_states[Action_Firing] == Input_Tap && (*CurrentGame).getHudFocusedItem() != NULL)
-	//if (UpdateAction(Action_Firing, Input_Tap, (*CurrentGame).getHudFocusedItem() != NULL))
-	{
-		SwappingItems();
-	}
-	//Selling item
-	else if (m_inputs_states[Action_Braking] == Input_Tap && m_is_sell_available && (*CurrentGame).getHudFocusedItem() != NULL)
-	{
-		SellingItem();
-	}
-	//Garbaging item
-	else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && !m_is_sell_available && (*CurrentGame).getHudFocusedItem() != NULL)
-	{
-		GarbagingItem();
-	}
-	else
-	{
-		(*CurrentGame).m_hud.has_prioritary_cursor_feedback = false;
-	}
-	
-	m_previously_focused_item = (*CurrentGame).getHudFocusedItem();
 }
 
 void Ship::SettingTurnAnimations()
@@ -1471,7 +1375,6 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 						(*CurrentGame).m_hud.has_focus = true;
 						(*CurrentGame).m_interactionPanel->m_cursor->m_visible = false;
 						(*CurrentGame).m_hud.hud_cursor->m_visible = true;
-						m_is_sell_available = true;
 					}
 					
 					//interaction: buy item
@@ -1486,7 +1389,6 @@ void Ship::ManageInteractions(sf::Vector2f input_directions)
 						(*CurrentGame).SetShopMenu(ShopMainMenu);
 						m_HUD_state = HUD_ShopMainMenu;
 						(*CurrentGame).m_hud.has_focus = false;
-						m_is_sell_available = false;
 					}
 					break;
 				}

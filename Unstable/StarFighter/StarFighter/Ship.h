@@ -154,24 +154,18 @@ public :
 	bool ManageVisibility();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
-	void ManageBraking();
-	void ManageSlowMotion();
-	void ManageHyperspeed();
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageInteractions(sf::Vector2f input_directions);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
-	void UpdatePlayerActions();
+	void UpdateInputStates();
+	void UpdateHUDStates();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
-	void ManageOpeningHud(bool is_sell_available = false);
 	void ManageImmunity();
 	bool ResplenishHealth();
-	void ManageHudControls(sf::Vector2f inputs_directions);
-	void TestingInputsRelease();
 	void ManageFeedbackExpiration(sf::Time deltaTime);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
 	void SettingTurnAnimations();
-	PlayerHud ship_hud;
 
 	void Respawn() override;
 	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
@@ -209,14 +203,9 @@ public :
 	void SwappingItems();
 
 	Portal* m_targetPortal;
-	bool m_is_sell_available;
 	Shop* m_targetShop;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
-	bool m_wasHyperspeedingButtonPressed;
-	bool m_isFiringButtonPressed;
-	bool m_wasBrakingButtonPressed;
-	bool m_isBrakingButtonHeldPressed;
 	sf::Clock m_brakingHoldingClock;
 	GameObject* m_previously_focused_item;
 
@@ -241,12 +230,6 @@ public :
 	bool m_disable_inputs;
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	Aura* m_trail;
-	bool m_fire_key_repeat;
-	bool m_slowmo_key_repeat;
-	bool m_hud_key_repeat;
-	bool m_isBraking;
-	bool m_isHyperspeeding;
-	bool m_isSlowMotion;
 	bool m_disabledHyperspeed;
 	InteractionType m_interactionType;
 
