@@ -51,9 +51,9 @@ enum GrazeLevels
 
 enum PlayerInputStates
 {
-	Input_Released,//0
-	Input_JustPressed,//1
-	Input_Pressed,//2
+	Input_Release,//0
+	Input_Tap,//1
+	Input_Hold,//2
 };
 
 enum PlayerActions
@@ -65,15 +65,27 @@ enum PlayerActions
 	Action_Slowmotion,
 	Action_OpeningHud,
 	Action_ChangingResolution,
+	Action_AutomaticFire,
 	Action_Recall,
 	Action_DebugCommand,
 	NBVAL_PlayerActions,
+};
+
+enum HUDStates
+{
+	HUD_Idle,
+	HUD_PortalInteraction,
+	HUD_OpeningEquipment,
+	HUD_ShopMainMenu,
+	HUD_ShopBuyMenu,
+	HUD_ShopSellMenu,
 };
 
 class ShipModel
 {
 public:
 	ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
+	~ShipModel();
 	std::string m_textureName;
 	sf::Vector2f m_size;
 	int m_frameNumber;
@@ -147,7 +159,8 @@ public :
 	void ManageHyperspeed();
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageInteractions(sf::Vector2f input_directions);
-	void GetInputs();
+	void GetInputState(bool input_guy_boolean, PlayerActions action);
+	void UpdatePlayerActions();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
 	void ManageOpeningHud(bool is_sell_available = false);
 	void ManageImmunity();
@@ -168,6 +181,11 @@ public :
 	void cleanWeapon(bool no_save = false);
 	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
 	static GameObject* CloneWeaponIntoGameObject(Weapon* new_weapon);
+
+	void CleanGarbagedEquipments();
+
+	vector<Equipment*> m_garbageEquipments;
+	vector<Weapon*> m_garbageWeapons;
 	
 	void Death() override;
 	bool GetLoot(GameObject& object) override;
@@ -176,8 +194,19 @@ public :
 	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class);
 
 	void ManageInteractionPanelIndex(size_t number_of_options);
+	void InitPortalPanelInfos();
+	void InitShopPanelInfos();
+	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions);
 
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
+	bool m_actions_states[NBVAL_PlayerActions];
+	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
+	HUDStates m_HUD_state;
+
+	void BuyingItem();
+	void SellingItem();
+	void GarbagingItem();
+	void SwappingItems();
 
 	Portal* m_targetPortal;
 	bool m_is_sell_available;
@@ -202,6 +231,7 @@ public :
 	vector<Bot*> m_bot_list;
 	FX* m_FX_death;
 	void GenerateBots(GameObject* target);
+	void SetBotsVisibility(bool visible);
 	void DestroyBots();
 	void GenerateFakeShip(GameObject* target);
 	FakeShip* m_fake_ship;

@@ -5,8 +5,7 @@ extern Game* CurrentGame;
 Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : GameObject(position, speed,  textureName, size)
 {
 	m_collider_type = GameObjectType::FriendlyFire;
-	m_visible = true;
-	m_visible = true;
+	m_visible = false;
 	m_isOnScene = true;
 	m_DontGarbageMe = true;
 	m_radius = 0;
@@ -16,6 +15,7 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 	m_damage = 0;
 	m_key_repeat = false;
 	m_display_name = "Bot";
+	m_target = NULL;
 }
 
 Bot::~Bot()
@@ -36,72 +36,67 @@ void Bot::setTarget (GameObject* target)
 
 void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = m_speed;
-	float l_hyperspeedMultiplier = 1.0f;
-
-	if (m_target != NULL)
+	if (m_visible)
 	{
-		newposition.x = m_target->getPosition().x;
-		newposition.y = m_target->getPosition().y;
-		m_disable_fire = m_target->m_disable_fire;
-	}
-	else
-	{
-		if (hyperspeedMultiplier > 1)
+		static sf::Vector2f newposition, offset, newspeed;
+		newspeed = m_speed;
+		float l_hyperspeedMultiplier = 1.0f;
+
+		if (m_target != NULL)
 		{
-			newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
-			newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
+			newposition.x = m_target->getPosition().x;
+			newposition.y = m_target->getPosition().y;
+			m_disable_fire = m_target->m_disable_fire;
 		}
-		else if (hyperspeedMultiplier < 1.0f)
+		else
 		{
-			l_hyperspeedMultiplier = hyperspeedMultiplier;
-			newspeed.x *= l_hyperspeedMultiplier;
-			newspeed.y *= l_hyperspeedMultiplier;
+			if (hyperspeedMultiplier > 1)
+			{
+				newspeed.x += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).x;
+				newspeed.y += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
+			}
+			else if (hyperspeedMultiplier < 1.0f)
+			{
+				l_hyperspeedMultiplier = hyperspeedMultiplier;
+				newspeed.x *= l_hyperspeedMultiplier;
+				newspeed.y *= l_hyperspeedMultiplier;
+			}
+
+			newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+			newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 		}
 
-		newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-		newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+		//call bobbyPattern
+		offset = m_Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
+		offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
+		newposition.x += offset.x;
+		newposition.y += offset.y;
+
+		//bot spread value
+		sf::Vector2f spread = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, m_spread);
+		newposition.x += spread.x;
+		newposition.y += spread.y;
+
+		this->setPosition(newposition.x, newposition.y);
+
+		//rotation
+		this->rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
+
+		AnimatedSprite::update(deltaTime);
 	}
 	
-	//call bobbyPattern
-	offset = m_Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
-	offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
-	newposition.x += offset.x;
-	newposition.y += offset.y;
+}
 
-	//bot spread value
-	sf::Vector2f spread = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, m_spread);
-	newposition.x += spread.x;
-	newposition.y += spread.y;
-
-	this->setPosition(newposition.x,newposition.y);
-
-	//rotation
-	this->rotate(m_rotation_speed*deltaTime.asSeconds() * l_hyperspeedMultiplier);
-
-	//auto fire option (F key)
-	if (InputGuy::setAutomaticFire())
-	{
-		if (!m_key_repeat)
-		{
-			m_automatic_fire = !m_automatic_fire;
-			m_key_repeat = true;
-		}
-	}
-	else
-	{
-		m_key_repeat = false;
-	}
-
+void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
+{
 	//automatic fire
 	if (m_weapon != NULL && m_target != NULL)
 	{
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && (m_target->m_isCollidingWithInteractiveObject == No_Interaction) && !m_target->m_disable_fire)
+			if (!m_disable_fire && !m_target->m_disable_fire)
 			{
-				if (InputGuy::isFiring() || m_automatic_fire)
+				if (firing || m_automatic_fire)
 				{
 					//calculating the angle we want to face, if any
 					float target_angle = getRotation();
@@ -141,8 +136,6 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 	}
-
-	AnimatedSprite::update(deltaTime);
 }
 
 Bot* Bot::Clone()

@@ -818,7 +818,7 @@ bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
 {
 	if (m_hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL)
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
+		//LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
 		GameObject* tmpShip = m_hud.shipGrid.getCellPointerFromIntIndex(index_ship);
 		//Equipement > Ship
 		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
@@ -828,7 +828,7 @@ bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Equiping ship #'%d'", index_ship + 1));
+		//LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Equiping ship #'%d'", index_ship + 1));
 		//Equipement > Ship
 		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
 		//Equipment = NULL

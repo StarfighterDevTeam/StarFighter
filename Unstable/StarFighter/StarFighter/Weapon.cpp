@@ -77,11 +77,11 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (hyperspeedMultiplier < 1.0f)
 	{
-		this->m_readyFireTimer += deltaTime * hyperspeedMultiplier;
+		m_readyFireTimer += deltaTime * hyperspeedMultiplier;
 	}
 	else
 	{
-		this->m_readyFireTimer += deltaTime;
+		m_readyFireTimer += deltaTime;
 	}
 
 	bool rafale_ended = true;
