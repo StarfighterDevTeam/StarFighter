@@ -13,6 +13,13 @@ enum ShopOptions
 	NBVAL_ShopOptions,
 };
 
+enum ShopBuyOptions
+{
+	ShopBuy_Buy,
+	ShopBuy_SwitchToSell,
+	NBVAL_ShopBuyOptions,
+};
+
 enum ShopMenus
 {
 	ShopMainMenu,

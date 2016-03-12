@@ -218,24 +218,19 @@ void Game::drawScene()
 			{
 				m_mainScreen.draw(*(*it));
 			}
-			for (std::list<SFPanel*>::iterator it = m_sceneSFPanels.begin(); it != m_sceneSFPanels.end(); it++)
-			{
-				if ((*it) == NULL)
-				{
-					printf("NULL pointer SF Panel\n");
-					continue;
-				}
-				(*(*it)).Draw(m_mainScreen);
-			}
 			for (std::list<Text*>::iterator it = m_sceneFeedbackTexts.begin(); it != m_sceneFeedbackTexts.end(); it++)
 			{
 				m_mainScreen.draw(*(*it));
 			}
-			
 		}
 		else if (i == PanelLayer && m_direction == NO_DIRECTION)
 		{
 			this->m_interactionPanel->Draw(m_mainScreen);
+
+			for (std::list<SFPanel*>::iterator it = m_sceneSFPanels.begin(); it != m_sceneSFPanels.end(); it++)
+			{
+				(*(*it)).Draw(m_mainScreen);
+			}
 		}
 		else
 		{

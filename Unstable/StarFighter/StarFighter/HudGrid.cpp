@@ -37,6 +37,11 @@ int ObjectGrid::getFocusIntIndex()
 	return (focus.y + (focus.x * this->squares.y));
 }
 
+int ObjectGrid::GetIntIndex(sf::Vector2i index)
+{
+	return index.y + (index.x * squares.y);
+}
+
 bool ObjectGrid::insertObject(GameObject& object, int index, bool overwrite_existing)
 {
 	//if no specific index is provided, we look for the first empty slot...
@@ -46,18 +51,20 @@ bool ObjectGrid::insertObject(GameObject& object, int index, bool overwrite_exis
 		{
 			for (int j = 0; j < this->squares.y; j++)
 			{
-				if (grid[i][j] == NULL || overwrite_existing)
+				if (grid[i][j] == NULL)
 				{
-					if (overwrite_existing)
-					{
-						delete grid[i][j];
-					}
 					grid[i][j] = &object;
 					grid[i][j]->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + this->position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + this->position.y + (i * GRID_SLOT_SIZE)));
-
 					return true;
 				}
 			}
+		}
+		//overwrite last item if no free cell found
+		if (overwrite_existing)
+		{
+			delete grid[squares.x - 1][squares.y - 1];
+			grid[squares.x - 1][squares.y - 1] = &object;
+			return true;
 		}
 		//no free slot found
 		return false;
@@ -65,17 +72,17 @@ bool ObjectGrid::insertObject(GameObject& object, int index, bool overwrite_exis
 	//...otherwise we head directly to the requested index
 	else
 	{
+		if (index > squares.x * squares.y - 1)
+		{
+			return false;
+		}
+
 		int r = index % squares.y;
 		int l = index / squares.y;
 
 		//case: doesn't fit the number of slots available in the interface
-		if (l > squares.x)
-		{
-			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to add an equipment to the HUD (shipGrid) for an equipment type that has no slot planned.\n");
-			return false;
-		}
 		//case: the requested slot is free
-		else if (grid[l][r] == NULL || overwrite_existing)
+		if (grid[l][r] == NULL || overwrite_existing)
 		{
 			if (overwrite_existing)
 			{

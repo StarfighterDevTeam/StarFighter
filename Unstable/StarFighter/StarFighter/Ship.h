@@ -189,7 +189,7 @@ public :
 	void ManageInteractionPanelIndex(size_t number_of_options);
 	void InitPortalPanelInfos();
 	void InitShopPanelInfos();
-	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions);
+	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container);
 
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 	bool m_actions_states[NBVAL_PlayerActions];

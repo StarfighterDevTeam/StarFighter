@@ -11,6 +11,7 @@ enum SFPanelTypes
 	SFPanel_Inventory,
 	SFPanel_DoubleInventory,
 	SFPanel_Portal,
+	SFPanel_Shop,
 };
 
 class SFPanel : public sf::RectangleShape
@@ -31,6 +32,10 @@ public:
 
 	virtual void SetSelectedOptionIndex(int index);
 	virtual int GetSelectedOptionIndex();
+	virtual GameObject* GetCursor();
+	virtual GameObject* GetFocusedItem();
+	virtual ObjectGrid* GetGrid();
+	virtual sf::Vector2i GetFocusedIndex();
 };
 
 #endif // SFPANEL_H_INCLUDED

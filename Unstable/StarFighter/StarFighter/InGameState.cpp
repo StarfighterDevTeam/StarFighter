@@ -137,6 +137,10 @@ void InGameState::Update(Time deltaTime)
 			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
 		}
 	}
+	if ((*CurrentGame).playerShip->m_SFPanel)
+	{
+		printf("panel : %d\n", (*CurrentGame).playerShip->m_SFPanel->m_panel_type);
+	}
 
 	////synchronizing shop interface with HUD interface
 	//GameObject* obj = (*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->m_previouslyCollidingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
@@ -756,13 +760,19 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 	{
 		case SFPanel_Inventory:
 		{
-			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(360, 500), playerShip);
+			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip);
 			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
 			break;
 		}
 		case SFPanel_Portal:
 		{
-			playerShip->m_SFPanel = new SFPortalPanel(sf::Vector2f(360, 400), playerShip);
+			playerShip->m_SFPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
+			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+			break;
+		}
+		case SFPanel_Shop:
+		{
+			playerShip->m_SFPanel = new SFShopPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
 			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
 			break;
 		}

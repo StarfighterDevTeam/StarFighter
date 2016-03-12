@@ -18,7 +18,7 @@ public:
 
 	size_t m_options;
 	sf::Text* m_options_text;
-	GameObject* m_arrow;
+	GameObject m_arrow;
 	int m_selected_option_index;
 };
 
@@ -27,9 +27,15 @@ class SFPortalPanel : public SFMenuPanel
 public:
 	SFPortalPanel(sf::Vector2f size, Ship* playerShip);
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
-	void Draw(sf::RenderTexture& screen) override;
 
 	Directions m_direction;
+};
+
+class SFShopPanel : public SFMenuPanel
+{
+public:
+	SFShopPanel(sf::Vector2f size, Ship* playerShip);
+	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 };
 
 #endif // SFMENU_H_INCLUDED

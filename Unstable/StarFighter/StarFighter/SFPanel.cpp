@@ -60,3 +60,27 @@ int SFPanel::GetSelectedOptionIndex()
 	return -1;
 	//see override function in SFMenuPanel and other types of SF panels
 }
+
+GameObject* SFPanel::GetCursor()
+{
+	return NULL;
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+GameObject* SFPanel::GetFocusedItem()
+{
+	return NULL;
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+ObjectGrid* SFPanel::GetGrid()
+{
+	return NULL;
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+sf::Vector2i SFPanel::GetFocusedIndex()
+{
+	return sf::Vector2i(-1, -1);
+	//see override function in SFMenuPanel and other types of SF panels
+}

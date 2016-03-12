@@ -50,7 +50,8 @@ public:
 	bool CleanFocus();
 	GameObject* getCellPointerFromIntIndex(int index);
 	int getFocusIntIndex();
-	void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject);
+	int GetIntIndex(sf::Vector2i index);
+	void setCellPointerForIntIndex(int index, GameObject* GameObject);
 	void ClearGrid();
 };
 
