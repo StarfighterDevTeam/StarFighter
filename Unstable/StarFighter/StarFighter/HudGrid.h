@@ -45,6 +45,7 @@ public:
 	sf::Vector2i focus;
 	int isCursorColliding(GameObject& cursor);
 	bool HighlightCell(int index);
+	bool SetCellHighlightState(int index, SlotFeedbackStates highlight_state);
 	bool GarbageCell(int index);
 	bool CleanFocus();
 	GameObject* getCellPointerFromIntIndex(int index);

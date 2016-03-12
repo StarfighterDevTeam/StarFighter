@@ -117,39 +117,60 @@ void InGameState::Update(Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
-	//synchronizing shop interface with HUD interface
-	GameObject* obj = (*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->m_previouslyCollidingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
-	if (obj)
+	//Create and destroy HUD panels
+	//case 1: creating a panel
+	if ((*CurrentGame).playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).playerShip->m_SFPanel)
 	{
-		if (obj->m_weapon_loot)
+		DestroySFPanel((*CurrentGame).playerShip);
+	}
+	else if ((*CurrentGame).playerShip->m_is_asking_SFPanel != SFPanel_None)
+	{
+		//case 2: destroying a panel
+		if (!(*CurrentGame).playerShip->m_SFPanel)
 		{
-			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(NBVAL_Equipment);
-			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(NBVAL_Equipment)->getPosition());
-			//displaying stats of focused item in shop
-			SendFocusedItemDataToHintPanel(obj, deltaTime);
-			(*CurrentGame).m_hud.has_focus = true;
+			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
 		}
-		else if (obj->m_equipment_loot)
+		//case 3: changing panel
+		else if ((*CurrentGame).playerShip->m_SFPanel->m_panel_type != (*CurrentGame).playerShip->m_is_asking_SFPanel)
 		{
-			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType);
-			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType)->getPosition());
-			//displaying stats of focused item in shop
-			SendFocusedItemDataToHintPanel(obj, deltaTime);
-			(*CurrentGame).m_hud.has_focus = true;
+			DestroySFPanel((*CurrentGame).playerShip);
+			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
 		}
 	}
 
-	//displaying stats of focused item in the HUD...
-	if ((*CurrentGame).getHudFocusedItem())
-	{
-		SendFocusedItemDataToHUD((*CurrentGame).getHudFocusedItem(), deltaTime);
-	}
-	else //...else not bothering with it
-	{
-		(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
-			(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION);
-	}
-
+	////synchronizing shop interface with HUD interface
+	//GameObject* obj = (*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->m_previouslyCollidingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
+	//if (obj)
+	//{
+	//	if (obj->m_weapon_loot)
+	//	{
+	//		(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(NBVAL_Equipment);
+	//		(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(NBVAL_Equipment)->getPosition());
+	//		//displaying stats of focused item in shop
+	//		SendFocusedItemDataToHintPanel(obj, deltaTime);
+	//		(*CurrentGame).m_hud.has_focus = true;
+	//	}
+	//	else if (obj->m_equipment_loot)
+	//	{
+	//		(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType);
+	//		(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType)->getPosition());
+	//		//displaying stats of focused item in shop
+	//		SendFocusedItemDataToHintPanel(obj, deltaTime);
+	//		(*CurrentGame).m_hud.has_focus = true;
+	//	}
+	//}
+	//
+	////displaying stats of focused item in the HUD...
+	//if ((*CurrentGame).getHudFocusedItem())
+	//{
+	//	SendFocusedItemDataToHUD((*CurrentGame).getHudFocusedItem(), deltaTime);
+	//}
+	//else //...else not bothering with it
+	//{
+	//	(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
+	//		(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION);
+	//}
+	
 	this->mainWindow->clear();
 }
 
@@ -717,4 +738,33 @@ void InGameState::RespawnInLastHub()
 	//resetting ship
 	(*CurrentGame).playerShip->Respawn();
 	(*CurrentGame).playerShip->setPosition(sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO));
+}
+
+void InGameState::DestroySFPanel(Ship* playerShip)
+{
+	if (playerShip->m_SFPanel)
+	{
+		(*CurrentGame).removeFromFeedbacks(playerShip->m_SFPanel);
+		delete playerShip->m_SFPanel;
+		playerShip->m_SFPanel = NULL;
+	}
+}
+
+void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
+{
+	switch (panel_type)
+	{
+		case SFPanel_Inventory:
+		{
+			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(360, 500), playerShip);
+			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+			break;
+		}
+		case SFPanel_Portal:
+		{
+			playerShip->m_SFPanel = new SFPortalPanel(sf::Vector2f(360, 400), playerShip);
+			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+			break;
+		}
+	}
 }

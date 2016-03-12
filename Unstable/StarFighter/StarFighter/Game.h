@@ -10,6 +10,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Hud.h"
+#include "SFPanel.h"
 
 class Ship;
 
@@ -22,6 +23,13 @@ enum TargetScan
 	TARGET_IN_RANGE,//2
 };
 
+enum FontsStyle
+{
+	Font_Arial,//0
+	Font_Terminator,//1
+	NBVAL_FontsStyle,//2
+};
+
 struct Game
 {
 public:
@@ -29,8 +37,10 @@ public:
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType m_layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
+	void addToFeedbacks(SFPanel* panel);
 	void addToFeedbacks(Text* text);
 	void removeFromFeedbacks(RectangleShape* feedback);
+	void removeFromFeedbacks(SFPanel* panel);
 	void removeFromFeedbacks(Text* text);
 
 	void updateScene(Time deltaTime);
@@ -53,6 +63,8 @@ public:
 	sf::Vector2i m_screen_size;
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
+
+	sf::Font* m_font[NBVAL_FontsStyle];
 
 	//methods v2
 	bool InsertObjectInGrid(ObjectGrid& grid, GameObject& object, int index = 0);
@@ -111,6 +123,7 @@ private:
 	RenderWindow *m_window;
 
 	std::list<RectangleShape*> m_sceneFeedbackBars;
+	std::list<SFPanel*> m_sceneSFPanels;
 	std::list<Text*> m_sceneFeedbackTexts;
 	std::vector<GameObject*> m_sceneGameObjects;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];

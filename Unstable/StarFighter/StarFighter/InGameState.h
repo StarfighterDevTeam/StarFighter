@@ -1,6 +1,8 @@
 #ifndef METAGAME_H_INCLUDED
 #define METAGAME_H_INCLUDED
 
+#include "SFInventoryPanel.h"
+#include "SFMenuPanel.h"
 #include "Scene.h"
 #include "GameState.h"
 #include <fstream>
@@ -37,6 +39,9 @@ public:
 
 	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_);
 	void RespawnInLastHub();
+
+	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
+	static void DestroySFPanel(Ship* playerShip);
 
 private:
 	sf::RenderWindow* mainWindow;

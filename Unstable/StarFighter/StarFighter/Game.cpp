@@ -30,6 +30,25 @@ void Game::init(RenderWindow* window)
 
 	m_hud.Init(0, 0, 0, 1);
 	m_interactionPanel = new InteractionPanel();
+
+	try
+	{
+		m_font[Font_Arial] = new sf::Font();
+		if (!m_font[Font_Arial]->loadFromFile("Assets/Fonts/arial.ttf"))
+		{
+			
+		}
+		m_font[Font_Terminator] = new sf::Font();
+		if (!m_font[Font_Terminator]->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		{
+
+		}
+	}
+	catch (const std::exception & ex)
+	{
+		//An error occured
+		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+	}
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -67,6 +86,11 @@ void Game::addToFeedbacks(RectangleShape* feedback)
 	m_sceneFeedbackBars.push_back(feedback);
 }
 
+void Game::addToFeedbacks(SFPanel* panel)
+{
+	m_sceneSFPanels.push_back(panel);
+}
+
 void Game::addToFeedbacks(Text* text)
 {
 	m_sceneFeedbackTexts.push_back(text);
@@ -75,6 +99,11 @@ void Game::addToFeedbacks(Text* text)
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
 	m_sceneFeedbackBars.remove(feedback);
+}
+
+void Game::removeFromFeedbacks(SFPanel* panel)
+{
+	m_sceneSFPanels.remove(panel);
 }
 
 void Game::removeFromFeedbacks(Text* text)
@@ -93,9 +122,6 @@ void Game::updateScene(Time deltaTime)
 	//Clean garbage
 	cleanGarbage();
 
-	//Checking colisions
-	colisionChecksV2();
-
 	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 
 	for (int i = 0; i < sceneGameObjectsSize; i++)
@@ -113,6 +139,9 @@ void Game::updateScene(Time deltaTime)
 
 		m_sceneGameObjects[i]->updatePostCollision();
 	}
+
+	//Checking colisions
+	colisionChecksV2();
 
 	//Collect the dust
 	collectGarbage();
@@ -189,10 +218,20 @@ void Game::drawScene()
 			{
 				m_mainScreen.draw(*(*it));
 			}
+			for (std::list<SFPanel*>::iterator it = m_sceneSFPanels.begin(); it != m_sceneSFPanels.end(); it++)
+			{
+				if ((*it) == NULL)
+				{
+					printf("NULL pointer SF Panel\n");
+					continue;
+				}
+				(*(*it)).Draw(m_mainScreen);
+			}
 			for (std::list<Text*>::iterator it = m_sceneFeedbackTexts.begin(); it != m_sceneFeedbackTexts.end(); it++)
 			{
 				m_mainScreen.draw(*(*it));
 			}
+			
 		}
 		else if (i == PanelLayer && m_direction == NO_DIRECTION)
 		{

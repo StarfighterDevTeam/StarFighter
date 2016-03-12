@@ -162,6 +162,27 @@ int ObjectGrid::isCursorColliding(GameObject& cursor)
 	}
 }
 
+bool ObjectGrid::SetCellHighlightState(int index, SlotFeedbackStates highlight_state)
+{
+	if (index < 0 || index >= squares.x * squares.y)
+	{
+		return false;
+	}
+
+	int r = index % squares.y;
+	int l = index / squares.y;
+
+	if (!grid[l][r])
+	{
+		return false;
+	}
+
+	grid[l][r]->setAnimationLine(highlight_state);
+	focus = sf::Vector2i(r, l);
+	return true;
+	
+}
+
 bool ObjectGrid::HighlightCell(int index)
 {
 	int r = index % squares.y;

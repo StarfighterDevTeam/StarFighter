@@ -4,7 +4,6 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-
 // ----------------SHIP MODEL ---------------
 ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
 {
@@ -315,6 +314,9 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_isFocusedOnHud = false;
 	m_previously_focused_item = NULL;
 
+	m_SFPanel = NULL;
+	m_is_asking_SFPanel = SFPanel_None;
+
 	m_previouslyCollidingWithInteractiveObject = No_Interaction;
 	m_isCollidingWithInteractiveObject = No_Interaction;
 	m_HUD_state = HUD_Idle;
@@ -560,7 +562,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (ManageVisibility())
 	{
-		//Resetting
+		//Resetting flags
 		if (m_isCollidingWithInteractiveObject != PortalInteraction && m_interactionType != PortalInteraction)
 		{
 			m_targetPortal = NULL;
@@ -569,11 +571,12 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			m_targetShop = NULL;
 		}
-
 		m_movingX = false;
 		m_movingY = false;
 		m_moving = false;
+		m_is_asking_SFPanel = SFPanel_None;
 
+		//Update
 		ManageImmunity();
 		ManageShieldRegen(deltaTime, hyperspeedMultiplier);
 
@@ -587,7 +590,13 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 		ScreenBorderContraints();
 		SettingTurnAnimations();
-		ManageFeedbackExpiration(deltaTime);		
+		ManageFeedbackExpiration(deltaTime);
+
+		//Update HUD
+		if (m_SFPanel)
+		{
+			m_SFPanel->Update(deltaTime, directions);
+		}
 	}
 }
 
@@ -900,19 +909,22 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			else if (m_HUD_state == HUD_PortalInteraction)
 			{
 				//Up and down in options
-				if (UpdateAction(Action_Braking, Input_Tap, (*CurrentGame).GetSelectedIndex() < m_targetPortal->m_max_unlocked_hazard_level))
+				if (m_SFPanel)
 				{
-					(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() + 1);
-				}
-				else if (UpdateAction(Action_Hyperspeeding, Input_Tap, (*CurrentGame).GetSelectedIndex() > 0))
-				{
-					(*CurrentGame).SetSelectedIndex((*CurrentGame).GetSelectedIndex() - 1);
-				}
+					if (UpdateAction(Action_Braking, Input_Tap, m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level))
+					{
+						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
+					}
+					else if (UpdateAction(Action_Hyperspeeding, Input_Tap, m_SFPanel->GetSelectedOptionIndex() > 0))
+					{
+						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
+					}
 
-				//Entering portal
-				if (UpdateAction(Action_Firing, Input_Tap, true))
-				{
-					m_interactionType = PortalInteraction;//this triggers transition in InGameState update
+					//Entering portal
+					if (UpdateAction(Action_Firing, Input_Tap, true))
+					{
+						m_interactionType = PortalInteraction;//this triggers transition in InGameState update
+					}
 				}
 			}
 			//SHOP MAIN
@@ -1347,56 +1359,6 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	}
 }
 
-void Ship::ManageInteractions(sf::Vector2f input_directions)
-{
-	//using portals and shops
-	m_interactionType = No_Interaction;
-
-	if (m_isCollidingWithInteractiveObject != No_Interaction)
-	{
-		//INTERACTIONS WITH SHOP
-		if (m_isCollidingWithInteractiveObject == ShopInteraction)
-		{
-			assert(m_targetShop != NULL);
-
-			switch ((*CurrentGame).GetShopMenu())
-			{
-				
-				//BUY SHOP MENU
-				case ShopBuyMenu:
-				{
-					//movement
-					MoveCursor((*CurrentGame).m_interactionPanel->m_cursor, input_directions);
-
-					//interaction: switch to sell menu
-					if (UpdateAction(Action_OpeningHud, Input_Tap, true))
-					{
-						m_HUD_state = HUD_ShopSellMenu;
-						(*CurrentGame).m_hud.has_focus = true;
-						(*CurrentGame).m_interactionPanel->m_cursor->m_visible = false;
-						(*CurrentGame).m_hud.hud_cursor->m_visible = true;
-					}
-					
-					//interaction: buy item
-					if (m_inputs_states[Action_Braking] == Input_Tap && (*CurrentGame).m_interactionPanel->m_focused_item)
-					{
-						BuyingItem();
-					}
-
-					//exit
-					if (m_inputs_states[Action_Slowmotion] == Input_Tap)
-					{
-						(*CurrentGame).SetShopMenu(ShopMainMenu);
-						m_HUD_state = HUD_ShopMainMenu;
-						(*CurrentGame).m_hud.has_focus = false;
-					}
-					break;
-				}
-			}
-		}
-	}
-}
-
 void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class)
 {
 	assert(shop != NULL);
@@ -1572,6 +1534,11 @@ void Ship::GetPortal(GameObject* object)
 {
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
+
+	//if (!m_SFPanel || (m_SFPanel->m_panel_type != SFPanel_Portal))
+	//{
+		m_is_asking_SFPanel = SFPanel_Portal;
+	//}
 }
 
 void Ship::GetShop(GameObject* object)

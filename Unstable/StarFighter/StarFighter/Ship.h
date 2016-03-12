@@ -155,7 +155,6 @@ public :
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
-	void ManageInteractions(sf::Vector2f input_directions);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
 	void UpdateInputStates();
 	void UpdateHUDStates();
@@ -205,6 +204,9 @@ public :
 	Portal* m_targetPortal;
 	Shop* m_targetShop;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
+
+	SFPanel* m_SFPanel;
+	SFPanelTypes m_is_asking_SFPanel;
 
 	sf::Clock m_brakingHoldingClock;
 	GameObject* m_previously_focused_item;
