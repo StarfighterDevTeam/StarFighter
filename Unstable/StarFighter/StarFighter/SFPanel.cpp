@@ -8,8 +8,8 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	m_playerShip = NULL;
 
 	sf::Color _darkblue = sf::Color::Color(6, 87, 94, 255);//dark blue-green
-
 	sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
+	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
 
 	setSize(size);
 	setOrigin(sf::Vector2f(size.x / 2, size.y / 2));
@@ -24,6 +24,10 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	//actions text
 	m_actions_text.setCharacterSize(18);
 	m_actions_text.setColor(_yellow);
+
+	//body text
+	m_text.setCharacterSize(18);
+	m_text.setColor(_white);
 }
 
 SFPanel::~SFPanel()

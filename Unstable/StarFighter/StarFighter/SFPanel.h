@@ -8,6 +8,7 @@ class Ship;
 enum SFPanelTypes
 {
 	SFPanel_None,
+	SFPanel_ItemStats,
 	SFPanel_Inventory,
 	SFPanel_DoubleInventory,
 	SFPanel_Portal,
@@ -17,6 +18,7 @@ enum SFPanelTypes
 class SFPanel : public sf::RectangleShape
 {
 public:
+	SFPanel(){};
 	SFPanel(sf::Vector2f size, SFPanelTypes panel_type);
 	~SFPanel();
 	virtual void Update(sf::Time deltaTime, sf::Vector2f inputs_directions);

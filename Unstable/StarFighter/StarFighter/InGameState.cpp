@@ -273,7 +273,7 @@ void InGameState::SendFocusedItemDataToHUD(GameObject* focused_item, Time deltaT
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
-	(*CurrentGame).drawHud();
+	//(*CurrentGame).drawHud();
 }
 
 void InGameState::Release()
