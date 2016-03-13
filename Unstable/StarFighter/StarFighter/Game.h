@@ -13,6 +13,7 @@
 #include "SFPanel.h"
 
 class Ship;
+class Scene;
 
 using namespace sf;
 
@@ -91,6 +92,7 @@ public:
 	int m_hazard;
 	int m_hazardSpawned;
 	float m_BeastScoreBonus;
+	Scene* m_currentScene;
 
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);

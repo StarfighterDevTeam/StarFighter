@@ -77,7 +77,7 @@ GameObject* SFPanel::GetFocusedItem()
 	//see override function in SFMenuPanel and other types of SF panels
 }
 
-ObjectGrid* SFPanel::GetGrid()
+ObjectGrid* SFPanel::GetGrid(bool fake_grid, size_t grid)
 {
 	return NULL;
 	//see override function in SFMenuPanel and other types of SF panels
@@ -86,5 +86,17 @@ ObjectGrid* SFPanel::GetGrid()
 sf::Vector2i SFPanel::GetFocusedIndex()
 {
 	return sf::Vector2i(-1, -1);
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+void SFPanel::ClearHighlight()
+{
+	return;
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+void SFPanel::ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid)
+{
+	return;
 	//see override function in SFMenuPanel and other types of SF panels
 }

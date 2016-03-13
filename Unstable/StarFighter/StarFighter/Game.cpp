@@ -31,6 +31,9 @@ void Game::init(RenderWindow* window)
 	m_hud.Init(0, 0, 0, 1);
 	m_interactionPanel = new InteractionPanel();
 
+	playerShip = NULL;
+	m_currentScene = NULL;
+
 	try
 	{
 		m_font[Font_Arial] = new sf::Font();

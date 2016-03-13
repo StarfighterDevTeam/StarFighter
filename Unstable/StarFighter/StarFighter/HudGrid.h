@@ -53,6 +53,7 @@ public:
 	int GetIntIndex(sf::Vector2i index);
 	void setCellPointerForIntIndex(int index, GameObject* GameObject);
 	void ClearGrid();
+	void ClearHighlight();
 };
 
 #endif // HUDGRID_H_INCLUDED

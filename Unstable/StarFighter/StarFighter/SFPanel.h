@@ -36,8 +36,10 @@ public:
 	virtual int GetSelectedOptionIndex();
 	virtual GameObject* GetCursor();
 	virtual GameObject* GetFocusedItem();
-	virtual ObjectGrid* GetGrid();
+	virtual ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1);
 	virtual sf::Vector2i GetFocusedIndex();
+	virtual void ClearHighlight();
+	virtual void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid);
 };
 
 #endif // SFPANEL_H_INCLUDED

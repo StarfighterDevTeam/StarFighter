@@ -54,31 +54,28 @@ void InGameState::Initialize(Player player)
 		//or create a new save file
 		Ship::SavePlayerMoney(MONEY_SAVE_FILE, m_playerShip);
 	}
+
 	m_playerShip->Init();
 	m_playerShip->ResplenishHealth();
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
 
-	//initalizing equipment in HUD
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");
+	//initializing HUD
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing HUD...");
+	m_playerShip->m_HUD_SFPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
+	(*CurrentGame).addToFeedbacks(m_playerShip->m_HUD_SFPanel);
+
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		if (m_playerShip->m_equipment[i] != NULL)
 		{
 			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-			if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, i))
-			{
-				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
-			}
+			m_playerShip->m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(i, capsule);
 		}
 	}
-	
-	if (m_playerShip->m_weapon != NULL)
+	if (m_playerShip->m_weapon)
 	{
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-		if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment))
-		{
-			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize a weapon item from the ship config to the HUD Ship grid\n");
-		}
+		m_playerShip->m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
 	}
 	LOGGER_WRITE(Logger::Priority::DEBUG, "HUD initialization completed\n");
 
@@ -136,10 +133,6 @@ void InGameState::Update(Time deltaTime)
 			DestroySFPanel((*CurrentGame).playerShip);
 			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
 		}
-	}
-	if ((*CurrentGame).playerShip->m_SFPanel)
-	{
-		printf("panel : %d\n", (*CurrentGame).playerShip->m_SFPanel->m_panel_type);
 	}
 
 	////synchronizing shop interface with HUD interface
@@ -630,6 +623,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene = m_nextScene;
 				m_nextScene = NULL;
 				(*CurrentGame).m_direction = m_currentScene->m_direction;
+				(*CurrentGame).m_currentScene = m_currentScene;
 
 				//Save scenes
 				AddToKnownScenes(m_currentScene->m_name);
@@ -760,7 +754,7 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 	{
 		case SFPanel_Inventory:
 		{
-			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip);
+			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false);
 			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
 			break;
 		}

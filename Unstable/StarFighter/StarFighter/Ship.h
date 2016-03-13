@@ -190,6 +190,7 @@ public :
 	void InitPortalPanelInfos();
 	void InitShopPanelInfos();
 	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container);
+	void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* grid);
 
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 	bool m_actions_states[NBVAL_PlayerActions];
@@ -207,6 +208,7 @@ public :
 
 	SFPanel* m_SFPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+	SFPanel* m_HUD_SFPanel;
 
 	sf::Clock m_brakingHoldingClock;
 	GameObject* m_previously_focused_item;

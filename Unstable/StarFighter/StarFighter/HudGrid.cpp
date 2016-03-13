@@ -256,6 +256,20 @@ void ObjectGrid::ClearGrid()
 	}
 }
 
+void ObjectGrid::ClearHighlight()
+{
+	for (int i = 0; i < squares.x; i++)
+	{
+		for (int j = 0; j < squares.y; j++)
+		{
+			if (grid[i][j])
+			{
+				grid[i][j]->setAnimationLine(Slot_NormalState);
+			}
+		}
+	}
+}
+
 GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
 {
 	int r = index % squares.y;

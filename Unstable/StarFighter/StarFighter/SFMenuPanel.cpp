@@ -79,7 +79,6 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		m_actions_text.setString(ss_helpNavigation.str());
 
 		//size and position of panel
-		//sf::Vector2f l_size = sf::Vector2f(INTERACTION_PANEL_WIDTH, (2 * INTERACTION_PANEL_MARGIN_TOP) + (INTERACTION_INTERLINE * (NB_HAZARD_LEVELS + 3)) + m_title_text.getCharacterSize() + (m_options_text[0].getCharacterSize() * m_options));
 		setSize(size);
 		setOrigin(size.x / 2, size.y / 2);
 		sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
