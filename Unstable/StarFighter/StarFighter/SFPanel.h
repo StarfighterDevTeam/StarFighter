@@ -36,8 +36,12 @@ public:
 	virtual int GetSelectedOptionIndex();
 	virtual GameObject* GetCursor();
 	virtual GameObject* GetFocusedItem();
+	virtual void SetFocusedItem(GameObject* item);
 	virtual ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1);
 	virtual sf::Vector2i GetFocusedIndex();
+	virtual int GetFocusedGrid();
+	virtual bool GetPrioritaryFeedback();
+	virtual void SetPrioritaryFeedback(bool has_priotiary_feedback);
 	virtual void ClearHighlight();
 	virtual void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid);
 };

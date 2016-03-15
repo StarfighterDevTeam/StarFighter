@@ -77,6 +77,11 @@ GameObject* SFPanel::GetFocusedItem()
 	//see override function in SFMenuPanel and other types of SF panels
 }
 
+void SFPanel::SetFocusedItem(GameObject* item)
+{
+
+}
+
 ObjectGrid* SFPanel::GetGrid(bool fake_grid, size_t grid)
 {
 	return NULL;
@@ -86,6 +91,24 @@ ObjectGrid* SFPanel::GetGrid(bool fake_grid, size_t grid)
 sf::Vector2i SFPanel::GetFocusedIndex()
 {
 	return sf::Vector2i(-1, -1);
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+int SFPanel::GetFocusedGrid()
+{
+	return -1;
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+bool SFPanel::GetPrioritaryFeedback()
+{
+	return false;
+	//see override function in SFMenuPanel and other types of SF panels
+}
+
+void SFPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
+{
+	return;
 	//see override function in SFMenuPanel and other types of SF panels
 }
 

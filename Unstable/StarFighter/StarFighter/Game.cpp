@@ -828,53 +828,6 @@ bool Game::InsertObjectInEquipmentGrid(GameObject& object, int index)
 	return result;
 }
 
-
-bool Game::SwapObjectBetweenGrids(ObjectGrid& grid, ObjectGrid& grid2, int index1, int index2)
-{
-	if (grid.getCellPointerFromIntIndex(index1) != NULL)
-	{
-		GameObject* tmpObj1 = grid.getCellPointerFromIntIndex(index1);
-		//Equipement > Ship
-		grid.setCellPointerForIntIndex(index1, grid2.getCellPointerFromIntIndex(index2));
-		//Ship > equipement
-		grid2.setCellPointerForIntIndex(index2, tmpObj1);
-		tmpObj1 = NULL;
-	}
-	else
-	{
-		//Equipement > Ship
-		grid.setCellPointerForIntIndex(index1, grid2.getCellPointerFromIntIndex(index2));
-		//Equipment = NULL
-		grid2.setCellPointerForIntIndex(index2, NULL);
-	}
-
-	return true;
-}
-
-bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
-{
-	if (m_hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL)
-	{
-		//LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
-		GameObject* tmpShip = m_hud.shipGrid.getCellPointerFromIntIndex(index_ship);
-		//Equipement > Ship
-		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
-		//Ship > equipement
-		m_hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, tmpShip);
-		tmpShip = NULL;
-	}
-	else
-	{
-		//LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Equiping ship #'%d'", index_ship + 1));
-		//Equipement > Ship
-		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
-		//Equipment = NULL
-		m_hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, NULL);
-	}
-
-	return true;
-}
-
 void Game::GarbageObjectInGrid(int grid_id, int index)
 {
 	m_hud.GarbageObjectInGrid(grid_id, index);

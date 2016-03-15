@@ -74,7 +74,6 @@ public:
 	//methods v1
 	bool InsertObjectInShipGrid(GameObject& object, int index = 0);
 	bool InsertObjectInEquipmentGrid(GameObject& object, int index=-1);
-	bool SwapEquipObjectInShipGrid(int index_ship, int index_equipment);
 
 	void GarbageObjectInGrid(int grid_id, int index);
 	GameObject* getHudFocusedItem();

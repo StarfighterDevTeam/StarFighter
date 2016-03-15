@@ -20,8 +20,13 @@ public:
 	void Draw(sf::RenderTexture& screen) override;
 	GameObject* GetCursor() override;
 	GameObject* GetFocusedItem() override;
+
+	void SetFocusedItem(GameObject* item) override;
 	sf::Vector2i GetFocusedIndex() override;
+	int GetFocusedGrid() override;
 	ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1) override;
+	bool GetPrioritaryFeedback() override;
+	void SetPrioritaryFeedback(bool has_priotiary_feedback) override;
 	void ClearHighlight() override;
 	void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid) override;
 
@@ -40,6 +45,7 @@ public:
 	bool m_use_two_grids;
 	int m_focused_grid;
 	SFItemStatsPanel* m_item_stats_panel;
+	bool m_has_prioritary_feedback;
 
 	Ship* m_playerShip;
 };

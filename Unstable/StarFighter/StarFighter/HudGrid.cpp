@@ -270,6 +270,28 @@ void ObjectGrid::ClearHighlight()
 	}
 }
 
+bool ObjectGrid::SwapObjectsBetweenGrids(ObjectGrid& grid, ObjectGrid& grid2, int index1, int index2)
+{
+	if (grid.getCellPointerFromIntIndex(index1) != NULL)
+	{
+		GameObject* tmpObj1 = grid.getCellPointerFromIntIndex(index1);
+		//Equipement > Ship
+		grid.setCellPointerForIntIndex(index1, grid2.getCellPointerFromIntIndex(index2));
+		//Ship > equipement
+		grid2.setCellPointerForIntIndex(index2, tmpObj1);
+		tmpObj1 = NULL;
+	}
+	else
+	{
+		//Equipement > Ship
+		grid.setCellPointerForIntIndex(index1, grid2.getCellPointerFromIntIndex(index2));
+		//Equipment = NULL
+		grid2.setCellPointerForIntIndex(index2, NULL);
+	}
+
+	return true;
+}
+
 GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
 {
 	int r = index % squares.y;

@@ -52,182 +52,182 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 		{
 			case Engine:
 			{
-						   Equipment* obj = object->m_equipment_loot;
-						   ss_itam_name << "THRUSTER: " << obj->m_display_name;
-						   ss_stats << "Speed: " << obj->m_max_speed << "\nHyperspeed: " << obj->m_hyperspeed << "\nContact damage: " << obj->m_damage;
-						   ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
-						   ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-						   break;
+				Equipment* obj = object->m_equipment_loot;
+				ss_itam_name << "THRUSTER: " << obj->m_display_name;
+				ss_stats << "Speed: " << obj->m_max_speed << "\nHyperspeed: " << obj->m_hyperspeed << "\nContact damage: " << obj->m_damage;
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				break;
 			}
 			case Armor:
 			{
-						  Equipment* obj = object->m_equipment_loot;
-						  ss_itam_name << "HULL: " << obj->m_display_name;
-						  ss_stats << "Hull pts: " << obj->m_armor;
-						  ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
-						  ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-						  break;
+				Equipment* obj = object->m_equipment_loot;
+				ss_itam_name << "HULL: " << obj->m_display_name;
+				ss_stats << "Hull pts: " << obj->m_armor;
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				break;
 			}
 			case Shield:
 			{
-						   Equipment* obj = object->m_equipment_loot;
-						   ss_itam_name << "SHIELD: " << obj->m_display_name;
-						   ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: " << obj->m_shield_regen;
-						   ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
-						   ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-						   break;
+				Equipment* obj = object->m_equipment_loot;
+				ss_itam_name << "SHIELD: " << obj->m_display_name;
+				ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: " << obj->m_shield_regen;
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				break;
 			}
 			case Module:
 			{
-						   Equipment* obj = object->m_equipment_loot;
-						   ss_itam_name << "MODULE: " << obj->m_display_name;
-						   if (obj->m_bot)
-						   {
-							   ss_stats << "Adding 1 drone. Drone stats:";
-							   if (obj->m_bot->m_weapon->m_shot_mode != NoShotMode)
-							   {
-								   ss_stats << "\nDPS: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bot->m_weapon->m_ammunition->m_damage;
-							   }
-							   else
-							   {
-								   ss_stats << "\nDPS: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bot->m_weapon->m_multishot * obj->m_bot->m_weapon->m_ammunition->m_damage;
-							   }
+				Equipment* obj = object->m_equipment_loot;
+				ss_itam_name << "MODULE: " << obj->m_display_name;
+				if (obj->m_bot)
+				{
+					ss_stats << "Adding 1 drone. Drone stats:";
+					if (obj->m_bot->m_weapon->m_shot_mode != NoShotMode)
+					{
+						ss_stats << "\nDPS: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bot->m_weapon->m_ammunition->m_damage;
+					}
+					else
+					{
+						ss_stats << "\nDPS: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bot->m_weapon->m_multishot * obj->m_bot->m_weapon->m_ammunition->m_damage;
+					}
 
-							   ss_stats << "\nDamage: " << obj->m_bot->m_weapon->m_ammunition->m_damage;
-							   ss_stats << "\nAmmo speed: " << obj->m_bot->m_weapon->m_ammunition->m_speed.y;
-							   ss_stats << "\nFire rate: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 << " shots/sec";
+					ss_stats << "\nDamage: " << obj->m_bot->m_weapon->m_ammunition->m_damage;
+					ss_stats << "\nAmmo speed: " << obj->m_bot->m_weapon->m_ammunition->m_speed.y;
+					ss_stats << "\nFire rate: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 << " shots/sec";
 
-							   if (obj->m_bot->m_weapon->m_multishot > 1)
-							   {
-								   ss_stats << "\nMultishot: " << obj->m_bot->m_weapon->m_multishot << "\nSpread: " << obj->m_bot->m_weapon->m_xspread << "\nDispersion: " << obj->m_bot->m_weapon->m_dispersion << "°";
-							   }
-							   else
-							   {
-								   ss_stats << "\nSingle shot";
-							   }
-							   if (obj->m_bot->m_weapon->m_rafale > 0)
-							   {
-								   ss_stats << "\nRafale: " << obj->m_bot->m_weapon->m_rafale << " (cooldown: " << obj->m_bot->m_weapon->m_rafale_cooldown << " sec";
-							   }
+					if (obj->m_bot->m_weapon->m_multishot > 1)
+					{
+						ss_stats << "\nMultishot: " << obj->m_bot->m_weapon->m_multishot << "\nSpread: " << obj->m_bot->m_weapon->m_xspread << "\nDispersion: " << obj->m_bot->m_weapon->m_dispersion << "°";
+					}
+					else
+					{
+						ss_stats << "\nSingle shot";
+					}
+					if (obj->m_bot->m_weapon->m_rafale > 0)
+					{
+						ss_stats << "\nRafale: " << obj->m_bot->m_weapon->m_rafale << " (cooldown: " << obj->m_bot->m_weapon->m_rafale_cooldown << " sec";
+					}
 
-							   if (obj->m_bot->m_weapon->m_multishot != NoShotMode)
-							   {
-								   ss_stats << "\nFiring style: ";
-								   switch (obj->m_bot->m_weapon->m_shot_mode)
-								   {
-									   case AlternateShotMode:
-									   {
-																 ss_stats << "Alternating shots";
-																 break;
-									   }
-									   case AscendingShotMode:
-									   {
-																 ss_stats << "Ascending shots";
-																 break;
-									   }
-									   case DescendingShotMode:
-									   {
-																  ss_stats << "Descending shots";
-																  break;
-									   }
-								   }
-							   }
+					if (obj->m_bot->m_weapon->m_multishot != NoShotMode)
+					{
+						ss_stats << "\nFiring style: ";
+						switch (obj->m_bot->m_weapon->m_shot_mode)
+						{
+							case AlternateShotMode:
+							{
+														ss_stats << "Alternating shots";
+														break;
+							}
+							case AscendingShotMode:
+							{
+														ss_stats << "Ascending shots";
+														break;
+							}
+							case DescendingShotMode:
+							{
+														ss_stats << "Descending shots";
+														break;
+							}
+						}
+					}
 
-							   if (obj->m_bot->m_weapon->m_target_seaking != NO_SEAKING)
-							   {
-								   switch (obj->m_bot->m_weapon->m_target_seaking)
-								   {
-									   case SEAKING:
-									   case SUPER_SEAKING:
-									   {
-															 ss_stats << "\nSeaking target";
-															 break;
-									   }
-									   case SEMI_SEAKING:
-									   {
-															ss_stats << "\nSeaking target once per rafale";
-															break;
-									   }
-								   }
-							   }
-						   }
-						   else
-						   {
-							   ss_stats << "\nNo effect";
-						   }
-						   break;
+					if (obj->m_bot->m_weapon->m_target_seaking != NO_SEAKING)
+					{
+						switch (obj->m_bot->m_weapon->m_target_seaking)
+						{
+							case SEAKING:
+							case SUPER_SEAKING:
+							{
+													ss_stats << "\nSeaking target";
+													break;
+							}
+							case SEMI_SEAKING:
+							{
+												ss_stats << "\nSeaking target once per rafale";
+												break;
+							}
+						}
+					}
+				}
+				else
+				{
+					ss_stats << "\nNo effect";
+				}
+				break;
 			}
 			case NBVAL_Equipment:
 			{
-									Weapon* obj = object->m_weapon_loot;
-									ss_itam_name << "MAIN WEAPON: " << obj->m_display_name;
-									if (obj->m_shot_mode != NoShotMode)
-									{
-										ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_ammunition->m_damage;
-									}
-									else
-									{
-										ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
-									}
-									ss_stats << "\nDamage: " << obj->m_ammunition->m_damage;
-									ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
-									ss_stats << "\nFire rate: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 << " shots/sec";
+				Weapon* obj = object->m_weapon_loot;
+				ss_itam_name << "MAIN WEAPON: " << obj->m_display_name;
+				if (obj->m_shot_mode != NoShotMode)
+				{
+					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_ammunition->m_damage;
+				}
+				else
+				{
+					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
+				}
+				ss_stats << "\nDamage: " << obj->m_ammunition->m_damage;
+				ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
+				ss_stats << "\nFire rate: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 << " shots/sec";
 
-									if (obj->m_multishot > 1)
-									{
-										ss_stats << "\nMultishot: " << obj->m_multishot << "\nSpread: " << obj->m_xspread << "\nDispersion: " << obj->m_dispersion << "°";
-									}
-									else
-									{
-										ss_stats << "\nSingle shot";
-									}
-									if (obj->m_rafale > 0)
-									{
-										ss_stats << "\nRafale: " << obj->m_rafale << " (cooldown: " << obj->m_rafale_cooldown << " sec";
-									}
-									if (obj->m_shot_mode != NoShotMode)
-									{
-										ss_stats << "\nFiring style: ";
-										switch (obj->m_shot_mode)
-										{
-											case AlternateShotMode:
-											{
-																	  ss_stats << "Alternating shots";
-																	  break;
-											}
-											case AscendingShotMode:
-											{
-																	  ss_stats << "Ascending shots";
-																	  break;
-											}
-											case DescendingShotMode:
-											{
-																	   ss_stats << "Descending shots";
-																	   break;
-											}
-										}
-									}
+				if (obj->m_multishot > 1)
+				{
+					ss_stats << "\nMultishot: " << obj->m_multishot << "\nSpread: " << obj->m_xspread << "\nDispersion: " << obj->m_dispersion << "°";
+				}
+				else
+				{
+					ss_stats << "\nSingle shot";
+				}
+				if (obj->m_rafale > 0)
+				{
+					ss_stats << "\nRafale: " << obj->m_rafale << " (cooldown: " << obj->m_rafale_cooldown << " sec";
+				}
+				if (obj->m_shot_mode != NoShotMode)
+				{
+					ss_stats << "\nFiring style: ";
+					switch (obj->m_shot_mode)
+					{
+						case AlternateShotMode:
+						{
+													ss_stats << "Alternating shots";
+													break;
+						}
+						case AscendingShotMode:
+						{
+													ss_stats << "Ascending shots";
+													break;
+						}
+						case DescendingShotMode:
+						{
+													ss_stats << "Descending shots";
+													break;
+						}
+					}
+				}
 
-									if (obj->m_target_seaking != NO_SEAKING)
-									{
-										switch (obj->m_target_seaking)
-										{
-											case SEAKING:
-											case SUPER_SEAKING:
-											{
-																  ss_stats << "\nSeaking target";
-																  break;
-											}
-											case SEMI_SEAKING:
-											{
-																 ss_stats << "\nSeaking target once per rafale";
-																 break;
-											}
-										}
-									}
-									ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
-									ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-									break;
+				if (obj->m_target_seaking != NO_SEAKING)
+				{
+					switch (obj->m_target_seaking)
+					{
+						case SEAKING:
+						case SUPER_SEAKING:
+						{
+												ss_stats << "\nSeaking target";
+												break;
+						}
+						case SEMI_SEAKING:
+						{
+												ss_stats << "\nSeaking target once per rafale";
+												break;
+						}
+					}
+				}
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				break;
 			}
 		}
 
@@ -245,6 +245,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	m_playerShip = playerShip;
 	m_item_stats_panel = NULL;
 	m_focused_grid = 0;
+	m_has_prioritary_feedback = false;
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -375,7 +376,8 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 		m_focused_item = NULL;
 
 		//cursor feedback
-		m_cursor.setAnimationLine(Cursor_NormalState);
+		if (!m_has_prioritary_feedback)
+			m_cursor.setAnimationLine(Cursor_NormalState);
 
 		//destroy stats panel
 		if (m_item_stats_panel)
@@ -402,7 +404,8 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 		//item hovered
 		if (m_focused_item)
 		{
-			m_cursor.setAnimationLine(Cursor_ActionState);
+			if (!m_has_prioritary_feedback)
+				m_cursor.setAnimationLine(Cursor_ActionState);
 
 			//update item stats panel
 			if (previous_focused_item != m_focused_item)
@@ -412,13 +415,13 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
 				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y));
-				printf("item stats updated - ");
 			}
 		}
 		//empty cell
 		else
 		{
-			m_cursor.setAnimationLine(Cursor_HighlightState);
+			if (!m_has_prioritary_feedback)
+				m_cursor.setAnimationLine(Cursor_HighlightState);
 			//destroy stats panels
 			if (m_item_stats_panel)
 			{
@@ -463,7 +466,8 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 		m_focused_item = NULL;
 
 		//cursor feedback
-		m_cursor.setAnimationLine(Cursor_NormalState);
+		if (!m_has_prioritary_feedback)
+			m_cursor.setAnimationLine(Cursor_NormalState);
 
 		//destroy stats panel
 		if (m_item_stats_panel)
@@ -493,7 +497,8 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 		//item hovered
 		if (m_focused_item)
 		{
-			m_cursor.setAnimationLine(Cursor_ActionState);
+			if (!m_has_prioritary_feedback)
+				m_cursor.setAnimationLine(Cursor_ActionState);
 
 			//update item stats panel
 			if (previous_focused_item != m_focused_item)
@@ -508,7 +513,8 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 		//empty cell
 		else
 		{
-			m_cursor.setAnimationLine(Cursor_HighlightState);
+			if (!m_has_prioritary_feedback)
+				m_cursor.setAnimationLine(Cursor_HighlightState);
 			//destroy stats panels
 			if (m_item_stats_panel)
 			{
@@ -545,6 +551,21 @@ GameObject* SFInventoryPanel::GetFocusedItem()
 	return m_focused_item;
 }
 
+void SFInventoryPanel::SetFocusedItem(GameObject* item)
+{
+	m_focused_item = item;
+}
+
+bool SFInventoryPanel::GetPrioritaryFeedback()
+{
+	return m_has_prioritary_feedback;
+}
+
+void SFInventoryPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
+{
+	m_has_prioritary_feedback = has_priotiary_feedback;
+}
+
 ObjectGrid* SFInventoryPanel::GetGrid(bool fake_grid, size_t grid)
 {
 	if (grid == 2 && m_use_two_grids)
@@ -577,6 +598,12 @@ sf::Vector2i SFInventoryPanel::GetFocusedIndex()
 	return m_focused_cell_index;
 }
 
+int SFInventoryPanel::GetFocusedGrid()
+{
+	return m_focused_grid;
+}
+
+//HUD PANEL
 SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(size, playerShip, SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS, true, EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS)
 {
 	setOrigin(0, 0);
@@ -758,7 +785,7 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	m_level_text.setString(ss_slash.str());
 
 	m_xpBar.setSize(sf::Vector2f((1.0f * m_playerShip->m_xp / m_playerShip->m_xp_max) * XP_BAR_SIZE_X, SHIELD_BAR_SIZE_Y));
-	m_level_text.setPosition(m_level_text.getPosition().x, m_xpBar.getPosition().y + m_level_text.getGlobalBounds().height / 2);
+	m_level_text.setPosition(m_level_text.getPosition().x, m_xpBar.getPosition().y);
 
 	//money
 	ostringstream ss_m;

@@ -757,21 +757,20 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			MoveCursor(m_HUD_SFPanel->GetCursor(), inputs_direction, deltaTime, m_HUD_SFPanel);
 
 			//Swapping items
-			if (m_inputs_states[Action_Firing] == Input_Tap && (*CurrentGame).getHudFocusedItem() != NULL)
-				//if (UpdateAction(Action_Firing, Input_Tap, (*CurrentGame).getHudFocusedItem() != NULL))
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
 			{
 				SwappingItems();
 			}
 			//Garbaging item
-			else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && (*CurrentGame).getHudFocusedItem() != NULL)
+			else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_HUD_SFPanel->GetFocusedItem())
 			{
 				GarbagingItem();
 			}
 			else
 			{
-				(*CurrentGame).m_hud.has_prioritary_cursor_feedback = false;
+				m_HUD_SFPanel->SetPrioritaryFeedback(false);
 			}
-			m_previously_focused_item = (*CurrentGame).getHudFocusedItem();
+			m_previously_focused_item = m_HUD_SFPanel->GetFocusedItem();
 
 			//Closing hud
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
@@ -820,13 +819,12 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			MoveCursor(m_HUD_SFPanel->GetCursor(), inputs_direction, deltaTime, m_HUD_SFPanel);
 
 			//Swapping items
-			if (m_inputs_states[Action_Firing] == Input_Tap && (*CurrentGame).getHudFocusedItem() != NULL)
-				//if (UpdateAction(Action_Firing, Input_Tap, (*CurrentGame).getHudFocusedItem() != NULL))
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
 			{
 				SwappingItems();
 			}
 			//Selling item
-			else if (m_inputs_states[Action_Braking] == Input_Tap && (*CurrentGame).getHudFocusedItem() != NULL)
+			else if (m_inputs_states[Action_Braking] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
 			{
 				SellingItem();
 			}
@@ -1158,136 +1156,158 @@ void Ship::BuyingItem()
 void Ship::SellingItem()
 {
 	//interaction
-	if ((*CurrentGame).getHudFocusedItem() != NULL)
+	if (m_HUD_SFPanel && m_SFPanel && m_HUD_SFPanel->GetFocusedItem())
 	{
-		if ((*CurrentGame).getHudFocusedItem() != NULL)
+		//move item
+		int focused_grid = m_HUD_SFPanel->GetFocusedGrid();
+		int focused_index = m_HUD_SFPanel->GetGrid(false, focused_grid)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
+		m_SFPanel->GetGrid()->insertObject(*m_HUD_SFPanel->GetFocusedItem(), -1, false);
+		m_HUD_SFPanel->GetGrid(false, focused_grid)->setCellPointerForIntIndex(focused_index, NULL);
+
+		//get the money
+		int equip_type = m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
+		if (equip_type == NBVAL_Equipment)
 		{
-			//(*CurrentGame).InsertObjectInGrid((*CurrentGame).m_interactionPanel->m_shopGrid, *(*CurrentGame).getHudFocusedItem(), -1);
-			(*CurrentGame).m_interactionPanel->m_shopGrid.setCellPointerForIntIndex(-1, (*CurrentGame).getHudFocusedItem());
-			int equip_type = (*CurrentGame).getHudFocusedItem()->m_weapon_loot ? NBVAL_Equipment : (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_equipmentType;
-
-			//let's begin with selling equiped items
-			if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_ShipGrid)
-			{
-				if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
-				{
-					m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					m_weapon = NULL;
-					(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
-				}
-				else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
-				{
-					m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					m_equipment[equip_type] = NULL;
-					(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
-				}
-			}
-			//same for stash grid (without the need to clean the equipment)
-			if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
-			{
-				if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
-				{
-					m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
-
-				}
-				else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
-				{
-					m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
-				}
-			}
-
-			Ship::SaveItems(ITEMS_SAVE_FILE, this);
-			(*CurrentGame).m_hud.focused_item = NULL;
+			m_money += m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+		}
+		else
+		{
+			m_money += m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 		}
 
-		SavePlayerMoney(MONEY_SAVE_FILE, this);
+		//desequip if swapped from equipped items
+		if (m_HUD_SFPanel->GetFocusedGrid() == 1)
+		{
+			if (equip_type == NBVAL_Equipment)
+			{
+				m_weapon = NULL;
+			}
+			else
+			{
+				m_equipment[focused_index] = NULL;
+			}
+		}
 
-		return;
-		
+		////let's begin with selling equiped items
+		//if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_ShipGrid)
+		//{
+		//	if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
+		//	{
+		//		m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+		//		m_weapon = NULL;
+		//		(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
+		//	}
+		//	else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
+		//	{
+		//		m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+		//		m_equipment[equip_type] = NULL;
+		//		(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
+		//	}
+		//}
+		////same for stash grid (without the need to clean the equipment)
+		//if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+		//{
+		//	if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
+		//	{
+		//		m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+		//		(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
+		//
+		//	}
+		//	else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
+		//	{
+		//		m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+		//		(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
+		//	}
+		//}
+
+		Ship::SaveItems(ITEMS_SAVE_FILE, this);
+		(*CurrentGame).m_hud.focused_item = NULL;
 	}
+
+	SavePlayerMoney(MONEY_SAVE_FILE, this);
+
+	return;	
 }
 
 void Ship::SwappingItems()
 {
 	//"normal" hud interactions
-	if ((*CurrentGame).getHudFocusedItem() != NULL)
+	if (m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
 	{
-		if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
+		GameObject* tmp_ptr = m_HUD_SFPanel->GetFocusedItem();
+		int equip_index_ = m_HUD_SFPanel->GetGrid(false, 2)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
+
+		if (tmp_ptr->m_equipment_loot)
 		{
-			GameObject* tmp_ptr = (*CurrentGame).getHudFocusedItem();
-			int equip_index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
+			int ship_index_ = tmp_ptr->m_equipment_loot->m_equipmentType;
 
-			if (tmp_ptr->getEquipmentLoot() != NULL)
+			//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+			if (ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_))
 			{
-				int ship_index_ = tmp_ptr->getEquipmentLoot()->m_equipmentType;
-
-				//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-				if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
-				{
-					//if this succeeds, we can actually equip the item
-					Equipment* new_equipment = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getEquipmentLoot()->Clone();
-					this->setShipEquipment(new_equipment, true);
-					new_equipment = NULL;
-				}
+				//if this succeeds, we can actually equip the item
+				Equipment* new_equipment = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
+				this->setShipEquipment(new_equipment, true);
+				new_equipment = NULL;
 			}
-			else if (tmp_ptr->getWeaponLoot() != NULL)
-			{
-				int ship_index_ = NBVAL_Equipment;
-
-				//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-				if ((*CurrentGame).SwapEquipObjectInShipGrid(ship_index_, equip_index_))
-				{
-					//if this succeeds, we can actually equip the item
-					Weapon* new_weapon = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(ship_index_)->getWeaponLoot()->Clone();
-					this->setShipWeapon(new_weapon, true);
-					new_weapon = NULL;
-				}
-			}
-			else
-			{
-				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
-			}
-
-			tmp_ptr = NULL;
 		}
+		else if (tmp_ptr->m_weapon_loot)
+		{
+			int ship_index_ = NBVAL_Equipment;
+
+			//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
+			if (ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_))
+			{
+				//if this succeeds, we can actually equip the item
+				Weapon* new_weapon = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
+				this->setShipWeapon(new_weapon, true);
+				new_weapon = NULL;
+			}
+		}
+		else
+		{
+			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+		}
+
+		tmp_ptr = NULL;
 	}
 }
 
 void Ship::GarbagingItem()
 {
-	if (m_inputs_states[Action_Braking] == Input_Tap)
+	if (m_inputs_states[Action_Braking] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
 	{
 		m_brakingHoldingClock.restart();
-		(*CurrentGame).m_hud.has_prioritary_cursor_feedback = true;
+		m_HUD_SFPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8, false);
+		m_HUD_SFPanel->SetPrioritaryFeedback(true);
 	}
-	else if ((*CurrentGame).m_hud.has_prioritary_cursor_feedback)
+	else if (m_HUD_SFPanel->GetPrioritaryFeedback())
 	{
-		if ((*CurrentGame).getHudFocusedItem() != m_previously_focused_item)
+		if (m_HUD_SFPanel->GetFocusedItem() != m_previously_focused_item || m_inputs_states[Action_Braking] != Input_Hold)
 		{
 			m_brakingHoldingClock.restart();
-			(*CurrentGame).m_hud.has_prioritary_cursor_feedback = false;
+			m_HUD_SFPanel->SetPrioritaryFeedback(false);
 		}
-		else if ((*CurrentGame).getHudFocusedItem() != NULL)
+		else// if (m_HUD_SFPanel->GetFocusedItem())
 		{
 			if (m_brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
 			{
-				(*CurrentGame).m_hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
+				m_HUD_SFPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
 				if (m_brakingHoldingClock.getElapsedTime().asSeconds() < HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8)
-					(*CurrentGame).m_hud.hud_cursor->setAnimationLine(Cursor_Focus1_8);
+					m_HUD_SFPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
 
 				int equip_type = NBVAL_Equipment;
-				if ((*CurrentGame).getHudFocusedItem()->getEquipmentLoot() != NULL)
+				if (m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot)
 				{
-					equip_type = (*CurrentGame).getHudFocusedItem()->getEquipmentLoot()->m_equipmentType;
+					equip_type = m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
 				}
 				//garbage in hud
-				int grid_id_ = (*CurrentGame).getHudFocusedGridAndIndex().x;
-				int index_ = (*CurrentGame).getHudFocusedGridAndIndex().y;
-				(*CurrentGame).GarbageObjectInGrid(grid_id_, index_);
+				int grid_id_ = m_HUD_SFPanel->GetFocusedGrid();
+				int index_ = m_HUD_SFPanel->GetGrid(false, grid_id_)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
+				delete m_HUD_SFPanel->GetGrid(false, grid_id_)->grid[m_HUD_SFPanel->GetFocusedIndex().x][m_HUD_SFPanel->GetFocusedIndex().y];
+				m_HUD_SFPanel->GetGrid(false, grid_id_)->setCellPointerForIntIndex(index_, NULL);
+
 				//garbage for real
-				if (grid_id_ == (int)HudGrid_ShipGrid)
+				if (m_HUD_SFPanel->GetFocusedGrid() == 1)
 				{
 					if (equip_type == NBVAL_Equipment)
 					{
@@ -1302,16 +1322,15 @@ void Ship::GarbagingItem()
 				SaveItems(ITEMS_SAVE_FILE, this);
 
 				m_brakingHoldingClock.restart();
-				(*CurrentGame).m_hud.has_prioritary_cursor_feedback = false;
 			}
+			//holding feedback
 			else
 			{
 				for (int k = 0; k < HUD_CURSOR_HOLDING_FRACTIONS; k++)
 				{
 					if (m_brakingHoldingClock.getElapsedTime().asSeconds() < (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / HUD_CURSOR_HOLDING_FRACTIONS) * (k + 1))
 					{
-						(*CurrentGame).setRemovingCursorAnimation((CursorFeedbackStates)(Cursor_Focus1_8 + k));
-						(*CurrentGame).m_hud.has_prioritary_cursor_feedback = true;
+						m_HUD_SFPanel->GetCursor()->setAnimationLine((CursorFeedbackStates)(Cursor_Focus1_8 + k));
 						break;
 					}
 				}
@@ -2020,19 +2039,19 @@ int Ship::SaveItems(string file, Ship* ship)
 		data << "Weapon ";
 		Ship::SaveWeaponData(data, ship->m_weapon, true);
 
-		for (size_t i = 0; i < EQUIPMENT_GRID_NB_LINES; i++)
+		for (size_t i = 0; i < ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.x; i++)
 		{
-			for (size_t j = 0; j < EQUIPMENT_GRID_NB_ROWS; j++)
+			for (size_t j = 0; j < ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.y; j++)
 			{
-				if ((*CurrentGame).m_hud.equipmentGrid.grid[i][j])
+				if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j])
 				{
-					if ((*CurrentGame).m_hud.equipmentGrid.grid[i][j]->m_equipment_loot)
+					if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot)
 					{
-						Ship::SaveEquipmentData(data, (*CurrentGame).m_hud.equipmentGrid.grid[i][j]->m_equipment_loot, false);
+						Ship::SaveEquipmentData(data, ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot, false);
 					}
-					else if ((*CurrentGame).m_hud.equipmentGrid.grid[i][j]->m_weapon_loot)
+					else if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot)
 					{
-						Ship::SaveWeaponData(data, (*CurrentGame).m_hud.equipmentGrid.grid[i][j]->m_weapon_loot, false);
+						Ship::SaveWeaponData(data, ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot, false);
 					}
 					else
 					{
@@ -2397,33 +2416,37 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 				std::istringstream(line) >> equipment_type;
 
 				int index = i - NBVAL_Equipment - 1;
-				int r = index % (*CurrentGame).m_hud.equipmentGrid.squares.y;
-				int l = index / (*CurrentGame).m_hud.equipmentGrid.squares.y;
-
-				if ((*CurrentGame).m_hud.equipmentGrid.grid[l][r])
+				if (!ship->m_HUD_SFPanel)
 				{
-					(*CurrentGame).GarbageObjectInGrid(HudGrid_ShipGrid, index);
+					printf("Error: <!> in Ship::LoadPlayerItems() <!> this ship doesn't have a HUD panel.\n");
 				}
-
-				if (equipment_type.compare("0") != 0)
+				else
 				{
-					if ((*CurrentGame).m_hud.equipmentGrid.grid[l][r])
+					int r = index % ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.y;
+					int l = index / ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.y;
+
+					if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[l][r])
 					{
-						delete (*CurrentGame).m_hud.equipmentGrid.grid[l][r];
+						delete ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[l][r];
+						ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[l][r] = NULL;
 					}
-					if (equipment_type.compare("Weapon") == 0)
+					
+					if (equipment_type.compare("0") != 0)
 					{
-						Weapon* weapon = Ship::LoadWeaponFromLine(line);
-						GameObject* capsule = ship->CloneWeaponIntoGameObject(weapon);
-						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
-						delete weapon;
-					}
-					else
-					{
-						Equipment* equipment = Ship::LoadEquipmentFromLine(line);
-						GameObject* capsule = ship->CloneEquipmentIntoGameObject(equipment);
-						(*CurrentGame).InsertObjectInEquipmentGrid(*capsule, index);
-						delete equipment;
+						if (equipment_type.compare("Weapon") == 0)
+						{
+							Weapon* weapon = Ship::LoadWeaponFromLine(line);
+							GameObject* capsule = ship->CloneWeaponIntoGameObject(weapon);
+							ship->m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
+							delete weapon;
+						}
+						else
+						{
+							Equipment* equipment = Ship::LoadEquipmentFromLine(line);
+							GameObject* capsule = ship->CloneEquipmentIntoGameObject(equipment);
+							ship->m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
+							delete equipment;
+						}
 					}
 				}
 			}

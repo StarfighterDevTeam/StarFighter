@@ -42,6 +42,11 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetPlayerShip(m_playerShip);
 	m_playerShip->m_respawnSceneName = m_currentScene->m_name;
 
+	//initializing HUD
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing HUD...");
+	m_playerShip->m_HUD_SFPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
+	(*CurrentGame).addToFeedbacks(m_playerShip->m_HUD_SFPanel);
+
 	//Load saved items
 	if (!Ship::LoadPlayerItems(ITEMS_SAVE_FILE, m_playerShip))
 	{
@@ -58,11 +63,6 @@ void InGameState::Initialize(Player player)
 	m_playerShip->Init();
 	m_playerShip->ResplenishHealth();
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
-
-	//initializing HUD
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing HUD...");
-	m_playerShip->m_HUD_SFPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
-	(*CurrentGame).addToFeedbacks(m_playerShip->m_HUD_SFPanel);
 
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
