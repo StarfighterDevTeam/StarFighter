@@ -231,7 +231,7 @@ public :
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	Aura* m_trail;
 	bool m_disabledHyperspeed;
-	InteractionType m_interactionType;
+	bool m_is_asking_scene_transition;
 
 	int getFighterIntStatValue(FighterStats stat) override;
 	float getFighterFloatStatValue(FighterStats stat) override;

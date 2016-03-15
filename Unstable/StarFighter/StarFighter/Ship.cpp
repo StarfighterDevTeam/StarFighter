@@ -292,6 +292,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_graze_level = 0;
 	m_last_hazard_level_played = 0;
 	m_disable_bots = true;
+	m_is_asking_scene_transition = false;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -306,7 +307,6 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_trail->m_offset = sf::Vector2f(0, (m_size.y / 2) + (m_trail->m_size.y / 2));
 
 	(*CurrentGame).addToScene(m_trail, LayerType::FakeShipLayer, GameObjectType::Neutral);
-	m_interactionType = No_Interaction;
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
 	m_equipment_loot = NULL;
@@ -563,7 +563,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (ManageVisibility())
 	{
 		//Resetting flags
-		if (m_isCollidingWithInteractiveObject != PortalInteraction && m_interactionType != PortalInteraction)
+		if (m_isCollidingWithInteractiveObject != PortalInteraction && !m_is_asking_scene_transition)
 		{
 			m_targetPortal = NULL;
 		}
@@ -575,7 +575,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		m_movingY = false;
 		m_moving = false;
 		m_is_asking_SFPanel = SFPanel_None;
-		m_interactionType = No_Interaction;
+		m_is_asking_scene_transition = false;
 
 		//Update
 		ManageImmunity();
@@ -877,7 +877,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 				if (m_actions_states[Action_Hyperspeeding])
 				{
-					(*CurrentGame).m_hyperspeedMultiplier = 180;// m_hyperspeed;
+					(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
 				}
 				else if (m_actions_states[Action_Slowmotion] && !m_disabledHyperspeed)
 				{
@@ -937,7 +937,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//Entering portal
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					m_interactionType = PortalInteraction;//this triggers transition in InGameState update
+					m_is_asking_scene_transition = true;//this triggers transition in InGameState update
 				}
 			}
 			//SHOP MAIN
@@ -956,7 +956,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//Select
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					m_interactionType = ShopInteraction;
 					switch (m_SFPanel->GetSelectedOptionIndex())
 					{
 						case ShopHeal:

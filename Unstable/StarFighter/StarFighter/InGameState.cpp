@@ -350,7 +350,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//player takes exit?
-				if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
+				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 				{
 					m_currentScene->m_bg->SetPortalsState(PortalState::PortalGhost);
 
@@ -517,7 +517,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 		{
 			m_currentScene->m_bg->SetPortalsState(PortalState::PortalOpen);
 			//player takes exit?
-			if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
+			if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 			{
 				m_currentScene->m_bg->SetPortalsState(PortalState::PortalGhost);
 				bool reverse = false;

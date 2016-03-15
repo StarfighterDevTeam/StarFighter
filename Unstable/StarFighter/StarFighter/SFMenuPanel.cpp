@@ -85,7 +85,7 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		if (m_direction != NO_DIRECTION)
 		{
 			sf::Vector2f l_sizeNormalized = GameObject::getSize_for_Direction(m_direction, size);
-			position = GameObject::getPosition_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y - INTERACTION_PANEL_OFFSET_Y));
+			position = GameObject::getPosition_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y/2 + INTERACTION_PANEL_OFFSET_Y));
 		}
 		setPosition(position.x, position.y);
 
