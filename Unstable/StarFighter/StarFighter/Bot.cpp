@@ -20,9 +20,10 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 
 Bot::~Bot()
 {
-	if (m_weapon != NULL)
+	if (m_weapon)
 	{
-		m_weapon->~Weapon();
+		delete m_weapon;
+		m_weapon = NULL;
 	}
 }
 
@@ -90,11 +91,11 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 {
 	//automatic fire
-	if (m_weapon != NULL && m_target != NULL)
+	if (m_weapon)
 	{
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && !m_target->m_disable_fire)
+			if (!m_disable_fire && m_target && !m_target->m_disable_fire)
 			{
 				if (firing || m_automatic_fire)
 				{

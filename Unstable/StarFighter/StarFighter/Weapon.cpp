@@ -25,14 +25,18 @@ Weapon::Weapon(Ammo* Ammunition)
 	m_display_name = "Laser";
 	m_level = 1;
 	m_credits = 0;
+	m_readyFireTimer = sf::seconds(0);
 
 	m_ammunition = Ammunition;
 }
 
 Weapon::~Weapon()
 {
-	delete m_ammunition;
-	m_ammunition = NULL;
+	if (m_ammunition)
+	{
+		delete m_ammunition;
+		m_ammunition = NULL;
+	}
 }
 
 void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)

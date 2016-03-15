@@ -575,6 +575,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		m_movingY = false;
 		m_moving = false;
 		m_is_asking_SFPanel = SFPanel_None;
+		m_interactionType = No_Interaction;
 
 		//Update
 		ManageImmunity();
@@ -747,13 +748,10 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		UpdateHUDStates();
 
 		//EQUIPMENT HUD
-		if (m_HUD_state == HUD_OpeningEquipment)
+		if (m_HUD_state == HUD_OpeningEquipment && m_HUD_SFPanel)
 		{
 			//Cursor movement
-			if (m_HUD_SFPanel)
-			{
-				m_HUD_SFPanel->GetCursor()->m_visible = true;
-			}
+			m_HUD_SFPanel->GetCursor()->m_visible = true;
 			MoveCursor(m_HUD_SFPanel->GetCursor(), inputs_direction, deltaTime, m_HUD_SFPanel);
 
 			//Swapping items
@@ -788,7 +786,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//Cursor movement
 			MoveCursor(m_SFPanel->GetCursor(), inputs_direction, deltaTime, m_SFPanel);
 			//Force HUD cursor on equivalent object
-			m_HUD_SFPanel->ForceCursorOnEquivalentObjectInGrid(m_SFPanel->GetFocusedItem(), m_HUD_SFPanel->GetGrid(true));
+			m_HUD_SFPanel->GetCursor()->m_visible = m_SFPanel->GetFocusedItem();
+			if (m_HUD_SFPanel->GetCursor()->m_visible)
+			{
+				m_HUD_SFPanel->ForceCursorOnEquivalentObjectInGrid(m_SFPanel->GetFocusedItem(), m_HUD_SFPanel->GetGrid(true));
+			}
 
 			//Switch to sell menu
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
@@ -810,6 +812,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
+				m_HUD_SFPanel->GetCursor()->m_visible = false;
 			}
 		}
 		//SHOP SELL
@@ -842,6 +845,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
+				m_HUD_SFPanel->GetCursor()->m_visible = false;
 			}
 		}
 		else
@@ -864,6 +868,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			m_movingY = inputs_direction.y != 0;
 			ManageAcceleration(inputs_direction);
 
+			//IDLE (COMBAT)
 			if (m_HUD_state == HUD_Idle)
 			{
 				//Slow_motion and hyperspeed
@@ -889,7 +894,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					//Bots automatic fire option
 					for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 					{
-						(*it)->m_automatic_fire = !(*it)->m_automatic_fire;
+						(*it)->m_automatic_fire = m_actions_states[Action_AutomaticFire];
 					}
 				}
 
@@ -912,16 +917,19 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 			}
 			//PORTAL
-			else if (m_HUD_state == HUD_PortalInteraction && m_SFPanel)
+			else if (m_HUD_state == HUD_PortalInteraction)
 			{
-				//Up and down in options
-				if (UpdateAction(Action_Braking, Input_Tap, m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level))
+				//Up and down in options, IF LEVEL CHOOSER IS AVAILABLE
+				if (m_SFPanel)
 				{
-					m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
-				}
-				else if (UpdateAction(Action_Hyperspeeding, Input_Tap, m_SFPanel->GetSelectedOptionIndex() > 0))
-				{
-					m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
+					if (UpdateAction(Action_Braking, Input_Tap, m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level))
+					{
+						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
+					}
+					else if (UpdateAction(Action_Hyperspeeding, Input_Tap, m_SFPanel->GetSelectedOptionIndex() > 0))
+					{
+						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
+					}
 				}
 
 				//Entering portal
@@ -1240,28 +1248,20 @@ void Ship::SwappingItems()
 		if (tmp_ptr->m_equipment_loot)
 		{
 			int ship_index_ = tmp_ptr->m_equipment_loot->m_equipmentType;
-
-			//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-			if (ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_))
-			{
-				//if this succeeds, we can actually equip the item
-				Equipment* new_equipment = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
-				this->setShipEquipment(new_equipment, true);
-				new_equipment = NULL;
-			}
+			ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_);
+			
+			Equipment* new_equipment = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
+			this->setShipEquipment(new_equipment, true);
+			new_equipment = NULL;
 		}
 		else if (tmp_ptr->m_weapon_loot)
 		{
 			int ship_index_ = NBVAL_Equipment;
-
-			//if there is no item we don't need to swap items, just equip it. Otherwise, we do a swap between the grids
-			if (ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_))
-			{
-				//if this succeeds, we can actually equip the item
-				Weapon* new_weapon = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
-				this->setShipWeapon(new_weapon, true);
-				new_weapon = NULL;
-			}
+			ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_);
+			
+			Weapon* new_weapon = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
+			this->setShipWeapon(new_weapon, true);
+			new_weapon = NULL;
 		}
 		else
 		{
@@ -1539,15 +1539,13 @@ bool Ship::GetLoot(GameObject& object)
 		if (this->setShipEquipment(object.getEquipmentLoot()))
 		{
 			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
-			(*CurrentGame).InsertObjectInShipGrid(*capsule, object.getEquipmentLoot()->m_equipmentType);
+			m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType);
 		}
 		else
 		{
 			//...else we put it in the stash
-			(*CurrentGame).InsertObjectInEquipmentGrid(*capsule);
+			m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
 		}
-		//object.releaseEquipmentLoot();
-		//object.releaseWeaponLoot();
 		return true;
 	}
 
@@ -1558,15 +1556,13 @@ bool Ship::GetLoot(GameObject& object)
 		if (this->setShipWeapon(object.getWeaponLoot()))
 		{
 			//if the ship config does not have a weapon already, we equip it and update the HUD
-			(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment);
+			m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, NBVAL_Equipment);
 		}
 		else
 		{
 			//...else we put it in the stash
-			(*CurrentGame).InsertObjectInEquipmentGrid(*capsule);
+			m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
 		}
-		//object.releaseEquipmentLoot();
-		//object.releaseWeaponLoot();
 		return true;
 	}
 
@@ -1586,8 +1582,10 @@ void Ship::GetPortal(GameObject* object)
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
 
-	m_is_asking_SFPanel = SFPanel_Portal;
-	
+	if ((*CurrentGame).m_direction == NO_DIRECTION)
+	{
+		m_is_asking_SFPanel = SFPanel_Portal;
+	}	
 }
 
 void Ship::GetShop(GameObject* object)
@@ -2677,7 +2675,6 @@ void Ship::DestroyBots()
 	{
 		(*it)->m_visible = false;
 		(*it)->m_GarbageMe = true;
-		(*it)->m_DontGarbageMe = false;
 	}
 	m_bot_list.clear();
 

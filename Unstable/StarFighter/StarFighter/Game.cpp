@@ -226,7 +226,7 @@ void Game::drawScene()
 				m_mainScreen.draw(*(*it));
 			}
 		}
-		else if (i == PanelLayer && m_direction == NO_DIRECTION)
+		else if (i == PanelLayer)
 		{
 			this->m_interactionPanel->Draw(m_mainScreen);
 
