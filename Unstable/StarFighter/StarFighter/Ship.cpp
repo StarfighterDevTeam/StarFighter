@@ -924,11 +924,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//Up and down in options, IF LEVEL CHOOSER IS AVAILABLE
 				if (m_SFPanel)
 				{
-					if (m_actions_states[Action_Braking] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
+					if (m_inputs_states[Action_Braking] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
 					{
 						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
 					}
-					else if (m_actions_states[Action_Hyperspeeding] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() > 0)
+					else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() > 0)
 					{
 						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
 					}
