@@ -1096,7 +1096,7 @@ void Ship::BuyingItem()
 			//else we equip if directly
 			else
 			{
-				setShipWeapon(m_SFPanel->GetFocusedItem()->m_weapon_loot);
+				setShipWeapon(m_SFPanel->GetFocusedItem()->m_weapon_loot->Clone());
 				m_money -= m_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, m_SFPanel->GetFocusedItem());
 				m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
@@ -1123,7 +1123,7 @@ void Ship::BuyingItem()
 			//else we equip if directly
 			else
 			{
-				setShipEquipment(m_SFPanel->GetFocusedItem()->m_equipment_loot);
+				setShipEquipment(m_SFPanel->GetFocusedItem()->m_equipment_loot->Clone());
 				m_money -= m_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFPanel->GetFocusedItem());
 				m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
@@ -1160,48 +1160,17 @@ void Ship::SellingItem()
 		{
 			if (equip_type == NBVAL_Equipment)
 			{
-				m_weapon = NULL;
+				cleanWeapon(true);
 			}
 			else
 			{
-				m_equipment[focused_index] = NULL;
+				cleanEquipment(equip_type, true);
 			}
 		}
 
-		////let's begin with selling equiped items
-		//if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_ShipGrid)
-		//{
-		//	if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
-		//	{
-		//		m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-		//		m_weapon = NULL;
-		//		(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
-		//	}
-		//	else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
-		//	{
-		//		m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-		//		m_equipment[equip_type] = NULL;
-		//		(*CurrentGame).m_hud.shipGrid.setCellPointerForIntIndex(equip_type, NULL);
-		//	}
-		//}
-		////same for stash grid (without the need to clean the equipment)
-		//if ((*CurrentGame).getHudFocusedGridAndIndex().x == (int)HudGrid_EquipmentGrid)
-		//{
-		//	if ((*CurrentGame).getHudFocusedItem()->m_weapon_loot)
-		//	{
-		//		m_money += (*CurrentGame).getHudFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-		//		(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
-		//
-		//	}
-		//	else if ((*CurrentGame).getHudFocusedItem()->m_equipment_loot)
-		//	{
-		//		m_money += (*CurrentGame).getHudFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-		//		(*CurrentGame).m_hud.equipmentGrid.setCellPointerForIntIndex((*CurrentGame).m_hud.fakeEquipmentGrid.isCursorColliding(*(*CurrentGame).m_hud.hud_cursor), NULL);
-		//	}
-		//}
-
 		Ship::SaveItems(ITEMS_SAVE_FILE, this);
-		(*CurrentGame).m_hud.focused_item = NULL;
+		
+		//(*CurrentGame).m_hud.focused_item = NULL;
 	}
 
 	SavePlayerMoney(MONEY_SAVE_FILE, this);
