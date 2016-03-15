@@ -1475,41 +1475,59 @@ GameObject* Ship::CloneWeaponIntoGameObject(Weapon* new_weapon)
 bool Ship::GetLoot(GameObject& object)
 {
 	//EQUIPMENT
-	if (object.getEquipmentLoot() != NULL)
+	if (object.m_equipment_loot)
 	{
-		GameObject* capsule = CloneEquipmentIntoGameObject(object.getEquipmentLoot());
-		if (this->setShipEquipment(object.getEquipmentLoot()))
+		bool success = false;
+		GameObject* capsule = CloneEquipmentIntoGameObject(object.m_equipment_loot);
+		//stash it
+		if (m_equipment[object.m_equipment_loot->m_equipmentType])
 		{
-			//if the ship config does not have any equipment of this type on, we equip it and update the HUD
-			m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType);
+			success = m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
 		}
+		//equip it
 		else
 		{
-			//...else we put it in the stash
-			m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
+			setShipEquipment(object.m_equipment_loot->Clone());
+			//and update HUD
+			success = m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType, true);
 		}
-		return true;
+		
+		if (success)
+		{
+			delete object.m_equipment_loot;
+			object.m_equipment_loot = NULL;
+		}
+		
+		return success;
 	}
-
 	//WEAPON
-	if (object.getWeaponLoot() != NULL)
+	else if (object.m_weapon_loot)
 	{
-		GameObject* capsule = CloneWeaponIntoGameObject(object.getWeaponLoot());
-		if (this->setShipWeapon(object.getWeaponLoot()))
+		bool success = false;
+		GameObject* capsule = CloneWeaponIntoGameObject(object.m_weapon_loot);
+		//stash it
+		if (m_weapon)
 		{
-			//if the ship config does not have a weapon already, we equip it and update the HUD
-			m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, NBVAL_Equipment);
+			success = m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
 		}
+		//equip it
 		else
 		{
-			//...else we put it in the stash
-			m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
+			setShipWeapon(object.m_weapon_loot->Clone());
+			//and update HUD
+			success = m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, NBVAL_Equipment, true);
 		}
-		return true;
-	}
 
+		if (success)
+		{
+			delete object.m_weapon_loot;
+			object.m_weapon_loot = NULL;
+		}
+
+		return success;
+	}
 	//MONEY
-	if (object.m_money > 0)
+	else if (object.m_money > 0)
 	{
 		get_money_from(object);
 		Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
