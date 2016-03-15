@@ -30,6 +30,28 @@ void Game::init(RenderWindow* window)
 
 	m_hud.Init(0, 0, 0, 1);
 	m_interactionPanel = new InteractionPanel();
+
+	playerShip = NULL;
+	m_currentScene = NULL;
+
+	try
+	{
+		m_font[Font_Arial] = new sf::Font();
+		if (!m_font[Font_Arial]->loadFromFile("Assets/Fonts/arial.ttf"))
+		{
+			
+		}
+		m_font[Font_Terminator] = new sf::Font();
+		if (!m_font[Font_Terminator]->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		{
+
+		}
+	}
+	catch (const std::exception & ex)
+	{
+		//An error occured
+		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+	}
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -67,6 +89,11 @@ void Game::addToFeedbacks(RectangleShape* feedback)
 	m_sceneFeedbackBars.push_back(feedback);
 }
 
+void Game::addToFeedbacks(SFPanel* panel)
+{
+	m_sceneSFPanels.push_back(panel);
+}
+
 void Game::addToFeedbacks(Text* text)
 {
 	m_sceneFeedbackTexts.push_back(text);
@@ -75,6 +102,11 @@ void Game::addToFeedbacks(Text* text)
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
 	m_sceneFeedbackBars.remove(feedback);
+}
+
+void Game::removeFromFeedbacks(SFPanel* panel)
+{
+	m_sceneSFPanels.remove(panel);
 }
 
 void Game::removeFromFeedbacks(Text* text)
@@ -93,9 +125,6 @@ void Game::updateScene(Time deltaTime)
 	//Clean garbage
 	cleanGarbage();
 
-	//Checking colisions
-	colisionChecksV2();
-
 	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 
 	for (int i = 0; i < sceneGameObjectsSize; i++)
@@ -113,6 +142,9 @@ void Game::updateScene(Time deltaTime)
 
 		m_sceneGameObjects[i]->updatePostCollision();
 	}
+
+	//Checking colisions
+	colisionChecksV2();
 
 	//Collect the dust
 	collectGarbage();
@@ -194,9 +226,14 @@ void Game::drawScene()
 				m_mainScreen.draw(*(*it));
 			}
 		}
-		else if (i == PanelLayer && m_direction == NO_DIRECTION)
+		else if (i == PanelLayer)
 		{
 			this->m_interactionPanel->Draw(m_mainScreen);
+
+			for (std::list<SFPanel*>::iterator it = m_sceneSFPanels.begin(); it != m_sceneSFPanels.end(); it++)
+			{
+				(*(*it)).Draw(m_mainScreen);
+			}
 		}
 		else
 		{
@@ -789,53 +826,6 @@ bool Game::InsertObjectInEquipmentGrid(GameObject& object, int index)
 	bool result = m_hud.equipmentGrid.insertObject(object, index);
 
 	return result;
-}
-
-
-bool Game::SwapObjectBetweenGrids(ObjectGrid& grid, ObjectGrid& grid2, int index1, int index2)
-{
-	if (grid.getCellPointerFromIntIndex(index1) != NULL)
-	{
-		GameObject* tmpObj1 = grid.getCellPointerFromIntIndex(index1);
-		//Equipement > Ship
-		grid.setCellPointerForIntIndex(index1, grid2.getCellPointerFromIntIndex(index2));
-		//Ship > equipement
-		grid2.setCellPointerForIntIndex(index2, tmpObj1);
-		tmpObj1 = NULL;
-	}
-	else
-	{
-		//Equipement > Ship
-		grid.setCellPointerForIntIndex(index1, grid2.getCellPointerFromIntIndex(index2));
-		//Equipment = NULL
-		grid2.setCellPointerForIntIndex(index2, NULL);
-	}
-
-	return true;
-}
-
-bool Game::SwapEquipObjectInShipGrid(int index_ship, int index_equipment)
-{
-	if (m_hud.shipGrid.getCellPointerFromIntIndex(index_ship) != NULL)
-	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Swapping ship #'%d' to eq. # %d", index_ship + 1, index_equipment + 1));
-		GameObject* tmpShip = m_hud.shipGrid.getCellPointerFromIntIndex(index_ship);
-		//Equipement > Ship
-		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
-		//Ship > equipement
-		m_hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, tmpShip);
-		tmpShip = NULL;
-	}
-	else
-	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Equiping ship #'%d'", index_ship + 1));
-		//Equipement > Ship
-		m_hud.shipGrid.setCellPointerForIntIndex(index_ship, m_hud.equipmentGrid.getCellPointerFromIntIndex(index_equipment));
-		//Equipment = NULL
-		m_hud.equipmentGrid.setCellPointerForIntIndex(index_equipment, NULL);
-	}
-
-	return true;
 }
 
 void Game::GarbageObjectInGrid(int grid_id, int index)

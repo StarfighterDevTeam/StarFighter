@@ -45,12 +45,16 @@ public:
 	sf::Vector2i focus;
 	int isCursorColliding(GameObject& cursor);
 	bool HighlightCell(int index);
+	bool SetCellHighlightState(int index, SlotFeedbackStates highlight_state);
 	bool GarbageCell(int index);
 	bool CleanFocus();
 	GameObject* getCellPointerFromIntIndex(int index);
 	int getFocusIntIndex();
-	void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject);
+	int GetIntIndex(sf::Vector2i index);
+	void setCellPointerForIntIndex(int index, GameObject* GameObject);
 	void ClearGrid();
+	void ClearHighlight();
+	static bool SwapObjectsBetweenGrids(ObjectGrid& grid1, ObjectGrid& grid2, int index1, int index2);
 };
 
 #endif // HUDGRID_H_INCLUDED

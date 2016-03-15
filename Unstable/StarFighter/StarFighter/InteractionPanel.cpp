@@ -228,7 +228,7 @@ GameObject* InteractionPanel::UpdateShopInteraction(sf::Time deltaTime)
 
 sf::Vector2f InteractionPanel::GetShopBuyPanelSize()
 {
-	return sf::Vector2f((2 * INTERACTION_PANEL_MARGIN_SIDES) + (SHOP_GRID_NB_ROWS * SHOP_GRID_SLOT_SIZE), (2 * INTERACTION_PANEL_MARGIN_TOP) + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) + m_textDestination.getCharacterSize() + (m_textHelpNavigation.getCharacterSize() * 5));
+	return sf::Vector2f((2 * INTERACTION_PANEL_MARGIN_SIDES) + (SHOP_GRID_NB_ROWS * SHOP_GRID_SLOT_SIZE), (2 * INTERACTION_PANEL_MARGIN_TOP) + (SHOP_GRID_NB_LINES * SHOP_GRID_SLOT_SIZE) + m_textDestination.getCharacterSize() + m_textHelpNavigation.getGlobalBounds().height);
 }
 
 void InteractionPanel::UpdatePortalInteraction(int max_unlocked_hazard_level)

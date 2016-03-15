@@ -1,6 +1,8 @@
 #ifndef METAGAME_H_INCLUDED
 #define METAGAME_H_INCLUDED
 
+#include "SFInventoryPanel.h"
+#include "SFMenuPanel.h"
 #include "Scene.h"
 #include "GameState.h"
 #include <fstream>
@@ -28,15 +30,15 @@ public:
 	int GetSceneHazardLevelUnlocked(string scene_name);
 	void InGameStateMachineCheck(sf::Time deltaTime);
 
-	void SendFocusedItemDataToHUD(GameObject* focused_item, Time deltaTime);
-	void SendFocusedItemDataToHintPanel(GameObject* focused_item, Time deltaTime);
-
 	sf::Clock m_clockHubExit;
 	sf::Clock m_bossSpawnCountdown;
 	bool m_hasDisplayedDestructionRatio;
 
 	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_);
 	void RespawnInLastHub();
+
+	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
+	static void DestroySFPanel(Ship* playerShip);
 
 private:
 	sf::RenderWindow* mainWindow;

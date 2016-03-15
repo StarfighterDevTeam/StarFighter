@@ -29,6 +29,8 @@ public:
 	sf::Vector2f m_spread;
 	bool m_automatic_fire;
 	bool m_key_repeat;
+
+	void Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool hyperspeeding);
 };
 
 

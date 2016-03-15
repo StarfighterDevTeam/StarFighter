@@ -25,14 +25,18 @@ Weapon::Weapon(Ammo* Ammunition)
 	m_display_name = "Laser";
 	m_level = 1;
 	m_credits = 0;
+	m_readyFireTimer = sf::seconds(0);
 
 	m_ammunition = Ammunition;
 }
 
 Weapon::~Weapon()
 {
-	delete m_ammunition;
-	m_ammunition = NULL;
+	if (m_ammunition)
+	{
+		delete m_ammunition;
+		m_ammunition = NULL;
+	}
 }
 
 void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)
@@ -77,11 +81,11 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (hyperspeedMultiplier < 1.0f)
 	{
-		this->m_readyFireTimer += deltaTime * hyperspeedMultiplier;
+		m_readyFireTimer += deltaTime * hyperspeedMultiplier;
 	}
 	else
 	{
-		this->m_readyFireTimer += deltaTime;
+		m_readyFireTimer += deltaTime;
 	}
 
 	bool rafale_ended = true;
@@ -111,7 +115,7 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 	return m_firing_ready;
 }
 
-void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
+void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime)
 {
 	if (m_multishot > 1)
 	{

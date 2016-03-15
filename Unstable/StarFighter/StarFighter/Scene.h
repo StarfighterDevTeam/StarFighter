@@ -80,7 +80,6 @@ private:
 	vector<EnemyBase*> m_enemies_ranked_by_class[NBVAL_EnemyClass];
 	int m_total_class_probability[NBVAL_EnemyClass];
 	int m_hazard_level;
-
 };
 
 #endif // STARFIGHTER_H_INCLUDED

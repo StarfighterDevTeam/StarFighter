@@ -42,6 +42,11 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetPlayerShip(m_playerShip);
 	m_playerShip->m_respawnSceneName = m_currentScene->m_name;
 
+	//initializing HUD
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing HUD...");
+	m_playerShip->m_HUD_SFPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
+	(*CurrentGame).addToFeedbacks(m_playerShip->m_HUD_SFPanel);
+
 	//Load saved items
 	if (!Ship::LoadPlayerItems(ITEMS_SAVE_FILE, m_playerShip))
 	{
@@ -54,45 +59,40 @@ void InGameState::Initialize(Player player)
 		//or create a new save file
 		Ship::SavePlayerMoney(MONEY_SAVE_FILE, m_playerShip);
 	}
+
 	m_playerShip->Init();
 	m_playerShip->ResplenishHealth();
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
 
-	//initalizing equipment in HUD
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing equipment in HUD...");
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		if (m_playerShip->m_equipment[i] != NULL)
 		{
 			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-			if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, i))
-			{
-				LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize an equipment item from the ship config to the HUD Ship grid\n");
-			}
+			m_playerShip->m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(i, capsule);
 		}
 	}
-	
-	if (m_playerShip->m_weapon != NULL)
+	if (m_playerShip->m_weapon)
 	{
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-		if (!(*CurrentGame).InsertObjectInShipGrid(*capsule, NBVAL_Equipment))
-		{
-			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: could not initialize a weapon item from the ship config to the HUD Ship grid\n");
-		}
+		m_playerShip->m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
 	}
 	LOGGER_WRITE(Logger::Priority::DEBUG, "HUD initialization completed\n");
 
 	//ship
 	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
 	{
+		(*CurrentGame).playerShip->m_disable_fire = false;
 		(*CurrentGame).playerShip->m_disabledHyperspeed = false;
-		(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
+		(*CurrentGame).playerShip->m_disable_bots = false;
+		(*CurrentGame).playerShip->SetBotsVisibility(true);
 	}
 	else
 	{
 		(*CurrentGame).playerShip->m_disable_fire = true;
 		(*CurrentGame).playerShip->m_disabledHyperspeed = true;
 		(*CurrentGame).playerShip->m_disable_bots = true;
+		(*CurrentGame).playerShip->SetBotsVisibility(false);
 	}
 	(*CurrentGame).playerShip->GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -114,144 +114,34 @@ void InGameState::Update(Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
-	//synchronizing shop interface with HUD interface
-	GameObject* obj = (*CurrentGame).UpdateInteractionPanel((*CurrentGame).playerShip->m_previouslyCollidingWithInteractiveObject, (*CurrentGame).playerShip->GetFocusedPortalMaxUnlockedHazardLevel(), deltaTime);
-	if (obj)
+	//Create and destroy HUD panels
+	//case 1: creating a panel
+	if ((*CurrentGame).playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).playerShip->m_SFPanel)
 	{
-		if (obj->m_weapon_loot)
+		DestroySFPanel((*CurrentGame).playerShip);
+	}
+	else if ((*CurrentGame).playerShip->m_is_asking_SFPanel != SFPanel_None)
+	{
+		//case 2: destroying a panel
+		if (!(*CurrentGame).playerShip->m_SFPanel)
 		{
-			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(NBVAL_Equipment);
-			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(NBVAL_Equipment)->getPosition());
-			//displaying stats of focused item in shop
-			SendFocusedItemDataToHintPanel(obj, deltaTime);
-			(*CurrentGame).m_hud.has_focus = true;
+			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
 		}
-		else if (obj->m_equipment_loot)
+		//case 3: changing panel
+		else if ((*CurrentGame).playerShip->m_SFPanel->m_panel_type != (*CurrentGame).playerShip->m_is_asking_SFPanel)
 		{
-			(*CurrentGame).m_hud.focused_item = (*CurrentGame).m_hud.shipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType);
-			(*CurrentGame).m_hud.hud_cursor->setPosition((*CurrentGame).m_hud.fakeShipGrid.getCellPointerFromIntIndex(obj->m_equipment_loot->m_equipmentType)->getPosition());
-			//displaying stats of focused item in shop
-			SendFocusedItemDataToHintPanel(obj, deltaTime);
-			(*CurrentGame).m_hud.has_focus = true;
+			DestroySFPanel((*CurrentGame).playerShip);
+			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
 		}
 	}
-	//if we are not in the "sell" menu then we might be in the "buy" menu where those values should be reset
-	else if (!(*CurrentGame).playerShip->m_is_sell_available && (*CurrentGame).GetShopMenu() == ShopBuyMenu)
-	{
-		(*CurrentGame).m_hud.focused_item = NULL;
-		(*CurrentGame).m_hud.has_focus = false;
-	}
-
-	//displaying stats of focused item in the HUD...
-	if ((*CurrentGame).getHudFocusedItem())
-	{
-		SendFocusedItemDataToHUD((*CurrentGame).getHudFocusedItem(), deltaTime);
-	}
-	else //...else not bothering with it
-	{
-		(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
-			(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION);
-	}
-
+	
 	this->mainWindow->clear();
-}
-
-void InGameState::SendFocusedItemDataToHintPanel(GameObject* focused_item, Time deltaTime)
-{
-	//displaying stats of focused item in the HUD...
-	GameObject* tmp_ptr = focused_item;
-	int equip_index_ = NBVAL_Equipment;
-	if (tmp_ptr->getEquipmentLoot() != NULL)
-	{
-		equip_index_ = tmp_ptr->getEquipmentLoot()->m_equipmentType;
-	}
-
-	if (equip_index_ == NBVAL_Equipment)
-	{
-		Weapon* tmp_weapon = tmp_ptr->getWeaponLoot();
-
-		InteractionPanel::UpdateItemStatsText(&(*CurrentGame).m_interactionPanel->m_itemStatsText, equip_index_, tmp_weapon->m_display_name, tmp_weapon->m_level, tmp_weapon->m_credits, -1, -1, -1, -1, -1, tmp_weapon->m_ammunition->m_damage, false, tmp_weapon->m_ammunition->m_speed.y, tmp_weapon->m_ammunition->m_Pattern.currentPattern, tmp_weapon->m_multishot,
-			tmp_weapon->m_xspread, tmp_weapon->m_rate_of_fire, tmp_weapon->m_shot_mode, tmp_weapon->m_dispersion, tmp_weapon->m_rafale, tmp_weapon->m_rafale_cooldown, tmp_weapon->m_target_seaking);
-
-		tmp_weapon = NULL;
-	}
-	else
-	{
-		Equipment* tmp_equipment = tmp_ptr->getEquipmentLoot();
-
-		if (!tmp_equipment->m_bot)
-		{
-			InteractionPanel::UpdateItemStatsText(&(*CurrentGame).m_interactionPanel->m_itemStatsText, equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_max_speed, tmp_equipment->m_hyperspeed, tmp_equipment->m_armor,
-				tmp_equipment->m_shield, tmp_equipment->m_shield_regen, tmp_equipment->m_damage, tmp_equipment->m_bot);
-		}
-		else
-		{
-			//todo : clean getEquipmentHyperspeed() etc...
-			InteractionPanel::UpdateItemStatsText(&(*CurrentGame).m_interactionPanel->m_itemStatsText, equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_bot->m_Pattern.patternSpeed, tmp_equipment->m_hyperspeed, tmp_equipment->m_bot->m_armor_max,
-				tmp_equipment->m_bot->m_shield_max, tmp_equipment->m_bot->m_shield_regen, tmp_equipment->m_bot->m_weapon->m_ammunition->m_damage, tmp_equipment->m_bot, tmp_equipment->m_bot->m_weapon->m_ammunition->m_speed.y,
-				tmp_equipment->m_bot->m_weapon->m_ammunition->m_Pattern.currentPattern, tmp_equipment->m_bot->m_weapon->m_multishot, tmp_equipment->m_bot->m_weapon->m_xspread, tmp_equipment->m_bot->m_weapon->m_rate_of_fire,
-				tmp_equipment->m_bot->m_weapon->m_shot_mode, tmp_equipment->m_bot->m_weapon->m_dispersion, tmp_equipment->m_bot->m_weapon->m_rafale, tmp_equipment->m_bot->m_weapon->m_rafale_cooldown, tmp_equipment->m_bot->m_weapon->m_target_seaking);
-		}
-
-		tmp_equipment = NULL;
-	}
-
-	tmp_ptr = NULL;
-}
-
-void InGameState::SendFocusedItemDataToHUD(GameObject* focused_item, Time deltaTime)
-{
-	//displaying stats of focused item in the HUD...
-	GameObject* tmp_ptr = focused_item;
-	int equip_index_ = NBVAL_Equipment;
-	if (tmp_ptr->getEquipmentLoot() != NULL)
-	{
-		equip_index_ = tmp_ptr->getEquipmentLoot()->m_equipmentType;
-	}
-
-	if (equip_index_ == NBVAL_Equipment)
-	{
-		Weapon* tmp_weapon = tmp_ptr->getWeaponLoot();
-
-		(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money, (*CurrentGame).playerShip->m_graze_count,
-			m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
-			equip_index_, tmp_weapon->m_display_name, tmp_weapon->m_level, tmp_weapon->m_credits, -1, -1, -1, -1, -1, tmp_weapon->m_ammunition->m_damage, false, tmp_weapon->m_ammunition->m_speed.y, tmp_weapon->m_ammunition->m_Pattern.currentPattern, tmp_weapon->m_multishot,
-			tmp_weapon->m_xspread, tmp_weapon->m_rate_of_fire, tmp_weapon->m_shot_mode, tmp_weapon->m_dispersion, tmp_weapon->m_rafale, tmp_weapon->m_rafale_cooldown, tmp_weapon->m_target_seaking);
-
-		tmp_weapon = NULL;
-	}
-	else
-	{
-		Equipment* tmp_equipment = tmp_ptr->getEquipmentLoot();
-
-		if (!tmp_equipment->m_bot)
-		{
-			(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
-				(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
-				equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_max_speed, tmp_equipment->m_hyperspeed, tmp_equipment->m_armor,
-				tmp_equipment->m_shield, tmp_equipment->m_shield_regen, tmp_equipment->m_damage, tmp_equipment->m_bot);
-		}
-		else
-		{
-			//todo : clean getEquipmentHyperspeed() etc...
-			(*CurrentGame).updateHud((*CurrentGame).playerShip->m_armor, (*CurrentGame).playerShip->m_armor_max, (*CurrentGame).playerShip->m_shield, (*CurrentGame).playerShip->m_shield_max, (*CurrentGame).playerShip->m_money,
-				(*CurrentGame).playerShip->m_graze_count, m_currentScene->getSceneHazardLevelValue(), m_currentScene->m_bg->m_display_name, (*CurrentGame).playerShip->m_level, (*CurrentGame).playerShip->m_level_max, (*CurrentGame).playerShip->m_xp, (*CurrentGame).playerShip->m_xp_max, deltaTime, m_currentScene->m_direction == NO_DIRECTION,
-				equip_index_, tmp_equipment->m_display_name, tmp_equipment->m_level, tmp_equipment->m_credits, tmp_equipment->m_bot->m_Pattern.patternSpeed, tmp_equipment->m_hyperspeed, tmp_equipment->m_bot->m_armor_max,
-				tmp_equipment->m_bot->m_shield_max, tmp_equipment->m_bot->m_shield_regen, tmp_equipment->m_bot->m_weapon->m_ammunition->m_damage, tmp_equipment->m_bot, tmp_equipment->m_bot->m_weapon->m_ammunition->m_speed.y,
-				tmp_equipment->m_bot->m_weapon->m_ammunition->m_Pattern.currentPattern, tmp_equipment->m_bot->m_weapon->m_multishot, tmp_equipment->m_bot->m_weapon->m_xspread, tmp_equipment->m_bot->m_weapon->m_rate_of_fire,
-				tmp_equipment->m_bot->m_weapon->m_shot_mode, tmp_equipment->m_bot->m_weapon->m_dispersion, tmp_equipment->m_bot->m_weapon->m_rafale, tmp_equipment->m_bot->m_weapon->m_rafale_cooldown, tmp_equipment->m_bot->m_weapon->m_target_seaking);
-		}
-
-		tmp_equipment = NULL;
-	}
-
-	tmp_ptr = NULL;
 }
 
 void InGameState::Draw()
 {
 	(*CurrentGame).drawScene();
-	(*CurrentGame).drawHud();
+	//(*CurrentGame).drawHud();
 }
 
 void InGameState::Release()
@@ -460,7 +350,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//player takes exit?
-				if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
+				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 				{
 					m_currentScene->m_bg->SetPortalsState(PortalState::PortalGhost);
 
@@ -473,7 +363,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					}
 
 					string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
-					m_nextScene = new Scene(nextScene_filename, (*CurrentGame).m_interactionPanel->m_selected_index, reverse, false);
+					m_nextScene = new Scene(nextScene_filename, m_currentScene->getSceneHazardLevelValue(), reverse, false);
+					
 					//remembering linked scenes to hazard break later
 					if (!m_currentScene->m_canHazardBreak)
 					{
@@ -533,10 +424,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LayerType::LootLayer);
-				if (m_nextScene->m_direction == Directions::NO_DIRECTION)
-				{
-					(*CurrentGame).garbageLayer(LayerType::BotLayer);
-				}
 
 				m_IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
 			}
@@ -565,7 +452,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					m_IG_State = InGameStateMachine::HUB_ROAMING;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = true;
 					(*CurrentGame).playerShip->m_disable_bots = true;
-					(*CurrentGame).playerShip->DestroyBots();
+					(*CurrentGame).playerShip->SetBotsVisibility(false);
 				}
 				else
 				{
@@ -573,7 +460,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).playerShip->m_disable_fire = false;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = false;
 					(*CurrentGame).playerShip->m_disable_bots = false;
-					(*CurrentGame).playerShip->GenerateBots((*CurrentGame).playerShip);
+					(*CurrentGame).playerShip->SetBotsVisibility(true);
 					
 					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -608,6 +495,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene = m_nextScene;
 				m_nextScene = NULL;
 				(*CurrentGame).m_direction = m_currentScene->m_direction;
+				(*CurrentGame).m_currentScene = m_currentScene;
 
 				//Save scenes
 				AddToKnownScenes(m_currentScene->m_name);
@@ -629,7 +517,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 		{
 			m_currentScene->m_bg->SetPortalsState(PortalState::PortalOpen);
 			//player takes exit?
-			if ((*CurrentGame).playerShip->m_interactionType == PortalInteraction)
+			if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 			{
 				m_currentScene->m_bg->SetPortalsState(PortalState::PortalGhost);
 				bool reverse = false;
@@ -639,8 +527,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 				string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
 				(*CurrentGame).m_direction = (*CurrentGame).playerShip->m_targetPortal->m_direction;
-				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).m_interactionPanel->m_selected_index, reverse, false);
-				(*CurrentGame).playerShip->m_last_hazard_level_played = (*CurrentGame).m_interactionPanel->m_selected_index;
+				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).playerShip->m_SFPanel->GetSelectedOptionIndex(), reverse, false);
+				(*CurrentGame).playerShip->m_last_hazard_level_played = (*CurrentGame).playerShip->m_SFPanel->GetSelectedOptionIndex();
 				UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
 				m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
 
@@ -697,7 +585,6 @@ void InGameState::RespawnInLastHub()
 	(*CurrentGame).garbageLayer(LayerType::EnemyFireLayer);
 	(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer);
 	(*CurrentGame).garbageLayer(LayerType::ExplosionLayer);
-	(*CurrentGame).garbageLayer(LayerType::BotLayer);
 	(*CurrentGame).garbageLayer(LayerType::LootLayer);
 
 	//loading last visited hub
@@ -720,4 +607,39 @@ void InGameState::RespawnInLastHub()
 	//resetting ship
 	(*CurrentGame).playerShip->Respawn();
 	(*CurrentGame).playerShip->setPosition(sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO));
+}
+
+void InGameState::DestroySFPanel(Ship* playerShip)
+{
+	if (playerShip->m_SFPanel)
+	{
+		(*CurrentGame).removeFromFeedbacks(playerShip->m_SFPanel);
+		delete playerShip->m_SFPanel;
+		playerShip->m_SFPanel = NULL;
+	}
+}
+
+void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
+{
+	switch (panel_type)
+	{
+		case SFPanel_Inventory:
+		{
+			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false);
+			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+			break;
+		}
+		case SFPanel_Portal:
+		{
+			playerShip->m_SFPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
+			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+			break;
+		}
+		case SFPanel_Shop:
+		{
+			playerShip->m_SFPanel = new SFShopPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
+			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+			break;
+		}
+	}
 }

@@ -113,6 +113,9 @@
     <ClCompile Include="Portal.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SFInventoryPanel.cpp" />
+    <ClCompile Include="SFPanel.cpp" />
+    <ClCompile Include="SFMenuPanel.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Shop.cpp" />
@@ -154,6 +157,9 @@
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SFInventoryPanel.h" />
+    <ClInclude Include="SFPanel.h" />
+    <ClInclude Include="SFMenuPanel.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Shop.h" />
     <ClInclude Include="StarFighter.h" />

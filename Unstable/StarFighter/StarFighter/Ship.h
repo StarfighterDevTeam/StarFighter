@@ -49,10 +49,43 @@ enum GrazeLevels
 	NB_GRAZE_LEVELS,//4
 };
 
+enum PlayerInputStates
+{
+	Input_Release,//0
+	Input_Tap,//1
+	Input_Hold,//2
+};
+
+enum PlayerActions
+{
+	Action_Idle,
+	Action_Firing,
+	Action_Braking,
+	Action_Hyperspeeding,
+	Action_Slowmotion,
+	Action_OpeningHud,
+	Action_ChangingResolution,
+	Action_AutomaticFire,
+	Action_Recall,
+	Action_DebugCommand,
+	NBVAL_PlayerActions,
+};
+
+enum HUDStates
+{
+	HUD_Idle,
+	HUD_PortalInteraction,
+	HUD_OpeningEquipment,
+	HUD_ShopMainMenu,
+	HUD_ShopBuyMenu,
+	HUD_ShopSellMenu,
+};
+
 class ShipModel
 {
 public:
 	ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
+	~ShipModel();
 	std::string m_textureName;
 	sf::Vector2f m_size;
 	int m_frameNumber;
@@ -121,22 +154,17 @@ public :
 	bool ManageVisibility();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
-	void ManageBraking();
-	void ManageSlowMotion();
-	void ManageHyperspeed();
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
-	void ManageInteractions(sf::Vector2f input_directions);
+	void GetInputState(bool input_guy_boolean, PlayerActions action);
+	void UpdateInputStates();
+	void UpdateHUDStates();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
-	void ManageOpeningHud(bool is_sell_available = false);
 	void ManageImmunity();
 	bool ResplenishHealth();
-	void ManageHudControls(sf::Vector2f inputs_directions);
-	void TestingInputsRelease();
 	void ManageFeedbackExpiration(sf::Time deltaTime);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
 	void SettingTurnAnimations();
-	PlayerHud ship_hud;
 
 	void Respawn() override;
 	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
@@ -146,24 +174,38 @@ public :
 	void cleanWeapon(bool no_save = false);
 	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
 	static GameObject* CloneWeaponIntoGameObject(Weapon* new_weapon);
+
+	void CleanGarbagedEquipments();
+
+	vector<Equipment*> m_garbageEquipments;
+	vector<Weapon*> m_garbageWeapons;
 	
 	void Death() override;
 	bool GetLoot(GameObject& object) override;
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
 	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class);
+	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container);
+	void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* grid);
 
-	void ManageInteractionPanelIndex(size_t number_of_options);
+	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
+	bool m_actions_states[NBVAL_PlayerActions];
+	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
+	HUDStates m_HUD_state;
+
+	void BuyingItem();
+	void SellingItem();
+	void GarbagingItem();
+	void SwappingItems();
 
 	Portal* m_targetPortal;
-	bool m_is_sell_available;
 	Shop* m_targetShop;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
-	bool m_wasHyperspeedingButtonPressed;
-	bool m_isFiringButtonPressed;
-	bool m_wasBrakingButtonPressed;
-	bool m_isBrakingButtonHeldPressed;
+	SFPanel* m_SFPanel;
+	SFPanelTypes m_is_asking_SFPanel;
+	SFPanel* m_HUD_SFPanel;
+
 	sf::Clock m_brakingHoldingClock;
 	GameObject* m_previously_focused_item;
 
@@ -178,6 +220,7 @@ public :
 	vector<Bot*> m_bot_list;
 	FX* m_FX_death;
 	void GenerateBots(GameObject* target);
+	void SetBotsVisibility(bool visible);
 	void DestroyBots();
 	void GenerateFakeShip(GameObject* target);
 	FakeShip* m_fake_ship;
@@ -187,14 +230,8 @@ public :
 	bool m_disable_inputs;
 	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
 	Aura* m_trail;
-	bool m_fire_key_repeat;
-	bool m_slowmo_key_repeat;
-	bool m_hud_key_repeat;
-	bool m_isBraking;
-	bool m_isHyperspeeding;
-	bool m_isSlowMotion;
 	bool m_disabledHyperspeed;
-	InteractionType m_interactionType;
+	bool m_is_asking_scene_transition;
 
 	int getFighterIntStatValue(FighterStats stat) override;
 	float getFighterFloatStatValue(FighterStats stat) override;

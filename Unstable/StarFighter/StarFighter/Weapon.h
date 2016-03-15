@@ -25,7 +25,7 @@ public:
 	sf::Vector2f m_speed;
 	bool m_firing_ready;
 
-	void Fire(GameObjectType m_collider_type, sf::Time deltaTime = sf::seconds(0), float hyperspeedMultiplier = 1.0f);
+	void Fire(GameObjectType m_collider_type, sf::Time deltaTime = sf::seconds(0));
 	bool isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier);
 	void CreateBullet(GameObjectType collider_type, float offsetX=0, float dispersion=0);
 
