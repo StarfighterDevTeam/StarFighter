@@ -115,7 +115,7 @@ bool Weapon::isFiringReady(sf::Time deltaTime, float hyperspeedMultiplier)
 	return m_firing_ready;
 }
 
-void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime, float hyperspeedMultiplier)
+void Weapon::Fire(GameObjectType collider_type, sf::Time deltaTime)
 {
 	if (m_multishot > 1)
 	{

@@ -88,14 +88,14 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	
 }
 
-void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
+void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool hyperspeeding)
 {
 	//automatic fire
 	if (m_weapon)
 	{
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && m_target && !m_target->m_disable_fire)
+			if (!m_disable_fire && m_target && !m_target->m_disable_fire && !hyperspeeding)
 			{
 				if (firing || m_automatic_fire)
 				{
@@ -132,7 +132,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing)
 					}
 
 					m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
-					m_weapon->Fire(GameObjectType::FriendlyFire, deltaTime, hyperspeedMultiplier);
+					m_weapon->Fire(GameObjectType::FriendlyFire, deltaTime);
 				}
 			}
 		}

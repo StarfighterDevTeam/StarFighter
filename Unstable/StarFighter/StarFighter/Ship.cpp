@@ -694,7 +694,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 					}
 
 					m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
-					m_weapon->Fire(FriendlyFire, deltaTime, hyperspeedMultiplier);
+					m_weapon->Fire(FriendlyFire, deltaTime);
 				}
 			}
 		}
@@ -739,7 +739,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		UpdateInputStates();
 
 		//Debug command
-		if (UpdateAction(Action_DebugCommand, Input_Tap, true))
+		if (m_inputs_states[Action_DebugCommand] == Input_Tap)
 		{
 			(*CurrentGame).killGameObjectLayer(EnemyObject);
 		}
@@ -769,6 +769,14 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_HUD_SFPanel->SetPrioritaryFeedback(false);
 			}
 			m_previously_focused_item = m_HUD_SFPanel->GetFocusedItem();
+
+			//Weapon firing
+			ManageFiring(deltaTime, hyperspeedMultiplier);
+			//Bots firing
+			for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+			{
+				(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
+			}
 
 			//Closing hud
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
@@ -892,6 +900,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire))
 				{
 					//Bots automatic fire option
+					m_automatic_fire = m_actions_states[Action_AutomaticFire];
 					for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 					{
 						(*it)->m_automatic_fire = m_actions_states[Action_AutomaticFire];
@@ -900,12 +909,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 				//Firing button
 				UpdateAction(Action_Firing, Input_Hold, !m_disable_fire);
+
 				//Weapon firing
 				ManageFiring(deltaTime, hyperspeedMultiplier);
 				//Bots firing
 				for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 				{
-					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing]);
+					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
 				}
 
 				//Braking and speed malus on firing
@@ -922,18 +932,18 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//Up and down in options, IF LEVEL CHOOSER IS AVAILABLE
 				if (m_SFPanel)
 				{
-					if (UpdateAction(Action_Braking, Input_Tap, m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level))
+					if (m_actions_states[Action_Braking] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
 					{
 						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
 					}
-					else if (UpdateAction(Action_Hyperspeeding, Input_Tap, m_SFPanel->GetSelectedOptionIndex() > 0))
+					else if (m_actions_states[Action_Hyperspeeding] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() > 0)
 					{
 						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
 					}
 				}
 
 				//Entering portal
-				if (UpdateAction(Action_Firing, Input_Tap, true))
+				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
 					m_interactionType = PortalInteraction;//this triggers transition in InGameState update
 				}
@@ -942,17 +952,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			else if (m_HUD_state == HUD_ShopMainMenu && m_SFPanel)
 			{
 				//Up and down in options
-				if (UpdateAction(Action_Braking, Input_Tap, m_SFPanel->GetSelectedOptionIndex() < NBVAL_ShopOptions - 1))
+				if (m_inputs_states[Action_Braking] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() < NBVAL_ShopOptions - 1)
 				{
 					m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
 				}
-				else if (UpdateAction(Action_Hyperspeeding, Input_Tap, m_SFPanel->GetSelectedOptionIndex() > 0))
+				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() > 0)
 				{
 					m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
 				}
 
 				//Select
-				if (UpdateAction(Action_Firing, Input_Tap, true))
+				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
 					m_interactionType = ShopInteraction;
 					switch (m_SFPanel->GetSelectedOptionIndex())

@@ -407,7 +407,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							(*it)->setPosition(getPosition().x + (*it)->m_weapon_current_offset.x, getPosition().y + (*it)->m_weapon_current_offset.y);
 							(*it)->m_face_target = m_face_target;
 
-							(*it)->Fire(GameObjectType::EnemyFire, deltaTime, hyperspeedMultiplier);
+							(*it)->Fire(GameObjectType::EnemyFire, deltaTime);
 							{
 								m_shots_fired++;
 							}

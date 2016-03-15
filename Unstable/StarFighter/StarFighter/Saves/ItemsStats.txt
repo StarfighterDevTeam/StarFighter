@@ -12,8 +12,8 @@ Engine Engine 3 33 Assets/2D/Equipment/Thruster.png 48 48 1 0 0 0 1.33 0 0 0 0 0
 0
 Armor Armor 3 24 Assets/2D/Equipment/Armor.png 48 48 1 0 0 0 0 123 0 0 12 0
 Engine Engine 4 56 Assets/2D/Equipment/Thruster.png 48 48 1 0 0 0 1.56 0 0 0 0 0
-Module Module 1 1 Assets/2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 Bot Assets/2D/bot.png 32 32 1 -50 0 0 0 Laser Assets/2D/Equipment/laser_blue1.png 48 48 1 0.1 0 0.8 2 21 0 0 0 Ammo 5 2200 0 Assets/2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
-Module Module 1 1 Assets/2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 Bot Assets/2D/bot.png 32 32 1 -50 0 0 0 Laser Assets/2D/Equipment/laser_blue1.png 48 48 1 0.1 0 0.8 2 21 0 0 0 Ammo 5 2200 0 Assets/2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
+0
+0
 0
 0
 0
