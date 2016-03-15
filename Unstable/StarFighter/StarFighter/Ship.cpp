@@ -707,18 +707,10 @@ void Ship::UpdateHUDStates()
 	{
 		if (m_targetPortal && m_targetPortal->m_state == PortalOpen && !m_actions_states[Action_Firing])
 		{
-			if (m_HUD_state != HUD_PortalInteraction)
-			{
-				InitPortalPanelInfos();
-			}
 			m_HUD_state = HUD_PortalInteraction;
 		}
 		else if (m_targetShop)
 		{
-			if (m_HUD_state != HUD_ShopMainMenu)
-			{
-				InitShopPanelInfos();
-			}
 			if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_ShopSellMenu)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
@@ -739,7 +731,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		UpdateInputStates();
 
 		//Debug command
-		if (m_inputs_states[Action_DebugCommand] == Input_Tap)
+		if (m_inputs_states[Action_DebugCommand] == Input_Tap || m_inputs_states[Action_DebugCommand] == Input_Hold)
 		{
 			(*CurrentGame).killGameObjectLayer(EnemyObject);
 		}
@@ -885,7 +877,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 				if (m_actions_states[Action_Hyperspeeding])
 				{
-					(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
+					(*CurrentGame).m_hyperspeedMultiplier = 180;// m_hyperspeed;
 				}
 				else if (m_actions_states[Action_Slowmotion] && !m_disabledHyperspeed)
 				{
@@ -989,35 +981,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 	else
 	{
 		m_isFocusedOnHud = false;
-	}
-}
-
-void Ship::InitPortalPanelInfos()
-{
-	if (m_targetPortal)
-	{
-		//Updating interaction panel informations
-		(*CurrentGame).SetSelectedDirection(m_targetPortal->m_direction);
-
-		assert(m_targetPortal->m_destination_name.compare("0") != 0);
-
-		(*CurrentGame).SetSelectedDestination(m_targetPortal->m_display_name);
-		//default value = max
-		if (m_previouslyCollidingWithInteractiveObject != PortalInteraction)
-		{
-			(*CurrentGame).SetSelectedIndex(m_last_hazard_level_played <= m_targetPortal->m_max_unlocked_hazard_level ? m_last_hazard_level_played : m_targetPortal->m_max_unlocked_hazard_level);
-		}
-	}
-}
-
-void Ship::InitShopPanelInfos()
-{
-	(*CurrentGame).SetSelectedDestination(m_targetShop->m_display_name);
-
-	//default value = first choice
-	if (m_previouslyCollidingWithInteractiveObject != ShopInteraction)
-	{
-		(*CurrentGame).SetSelectedIndex(0);
 	}
 }
 
@@ -1484,6 +1447,7 @@ void Ship::Respawn()
 	{
 		m_fake_ship->m_visible = true;
 	}
+	SetBotsVisibility(true);
 	m_isOnScene = true;
 	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
 	pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, pos);
@@ -1500,7 +1464,7 @@ void Ship::Death()
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
 	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
-
+	SetBotsVisibility(false);
 	m_visible = false;
 	if (m_fake_ship)
 	{
@@ -2687,7 +2651,6 @@ void Ship::DestroyBots()
 		(*it)->m_GarbageMe = true;
 	}
 	m_bot_list.clear();
-
 }
 
 void Ship::GenerateFakeShip(GameObject* target)

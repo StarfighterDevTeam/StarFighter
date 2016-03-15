@@ -185,10 +185,6 @@ public :
 	void GetPortal(GameObject* object) override;
 	void GetShop(GameObject* object) override;
 	static void FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class);
-
-	void ManageInteractionPanelIndex(size_t number_of_options);
-	void InitPortalPanelInfos();
-	void InitShopPanelInfos();
 	void MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Time deltaTime, SFPanel* container);
 	void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* grid);
 

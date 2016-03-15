@@ -424,10 +424,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LayerType::LootLayer);
-				if (m_nextScene->m_direction == Directions::NO_DIRECTION)
-				{
-					(*CurrentGame).garbageLayer(LayerType::BotLayer);
-				}
 
 				m_IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
 			}
@@ -589,7 +585,6 @@ void InGameState::RespawnInLastHub()
 	(*CurrentGame).garbageLayer(LayerType::EnemyFireLayer);
 	(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer);
 	(*CurrentGame).garbageLayer(LayerType::ExplosionLayer);
-	(*CurrentGame).garbageLayer(LayerType::BotLayer);
 	(*CurrentGame).garbageLayer(LayerType::LootLayer);
 
 	//loading last visited hub

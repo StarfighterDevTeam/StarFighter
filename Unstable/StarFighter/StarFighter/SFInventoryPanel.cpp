@@ -667,7 +667,6 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_framerate_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_framerate_text.setCharacterSize(15);
 		m_framerate_text.setColor(sf::Color::Yellow);
-		m_framerate_text.setStyle(sf::Text::Bold);
 
 		//positioning panel content
 		float text_height = 0;
@@ -810,7 +809,9 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	}
 
 	//framerate
-	m_framerate_text.setString(TextUtils::format("fps=%.0f", 1 / (deltaTime.asMilliseconds() * 0.001)));
+	ostringstream ss_frame;
+	ss_frame << "fps= " << (int)(1 / (deltaTime.asMilliseconds() * 0.001));
+	m_framerate_text.setString(ss_frame.str());
 }
 
 void SFHUDPanel::Draw(sf::RenderTexture& screen)
