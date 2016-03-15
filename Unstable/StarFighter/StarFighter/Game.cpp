@@ -15,8 +15,6 @@ void Game::init(RenderWindow* window)
 	m_window = window;
 	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
 	m_mainScreen.setSmooth(true);
-	m_hubScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
-	m_hubScreen.setSmooth(true);
 
 	m_sceneChronometer.restart();
 	m_scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
@@ -27,9 +25,6 @@ void Game::init(RenderWindow* window)
 	m_BeastScoreBonus = 0;
 	m_direction = Directions::NO_DIRECTION;
 	m_hyperspeedMultiplier = 1.0f;
-
-	m_hud.Init(0, 0, 0, 1);
-	m_interactionPanel = new InteractionPanel();
 
 	playerShip = NULL;
 	m_currentScene = NULL;
@@ -150,51 +145,6 @@ void Game::updateScene(Time deltaTime)
 	collectGarbage();
 }
 
-void Game::updateHud(int armor, int armor_max, int shield, int shield_max, int money, int graze_count, int hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
-	int focused_item_type, string f_name, int f_level, int f_xp, float f_max_speed, float f_hyperspeed, int f_armor, int f_shield, int f_shield_regen,
-	int f_damage, bool f_bot, float f_ammo_speed, PatternType f_pattern,
-	int f_multishot, int f_xspread, float f_rate_of_fire, ShotMode f_shot_mode, float f_dispersion, int f_rafale, float f_rafale_cooldown, TargetSeaking f_target_seaking)
-{
-	m_hud.Update(armor, armor_max, shield, shield_max, money, graze_count, hazard_level, scene_name, level, level_max, xp, xp_max, deltaTime, hub, focused_item_type, f_name, f_level, f_xp, f_max_speed, f_hyperspeed,
-		f_armor, f_shield, f_shield_regen, f_damage, f_bot, f_ammo_speed, f_pattern, f_multishot, f_xspread, f_rate_of_fire, f_shot_mode, f_dispersion, f_rafale, f_rafale_cooldown, f_target_seaking);
-}
-
-GameObject* Game::UpdateInteractionPanel(InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime)
-{
-	return this->m_interactionPanel->Update(interaction, max_unlocked_hazard_level, deltaTime);
-	
-}
-
-void Game::SetShopMenu(ShopMenus menu)
-{
-	this->m_interactionPanel->m_currentShopMenu = menu;
-}
-
-ShopMenus Game::GetShopMenu()
-{
-	return this->m_interactionPanel->m_currentShopMenu;
-}
-
-void Game::SetSelectedIndex(int index_)
-{
-	this->m_interactionPanel->m_selected_index = index_;
-}
-
-void Game::SetSelectedDirection(Directions direction_)
-{
-	this->m_interactionPanel->m_direction = direction_;
-}
-
-void Game::SetSelectedDestination(string destination_)
-{
-	this->m_interactionPanel->m_textDestination.setString(destination_);
-}
-
-int Game::GetSelectedIndex()
-{
-	return this->m_interactionPanel->m_selected_index;
-}
-
 void Game::killGameObjectLayer(GameObjectType m_layer)
 {
 	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[m_layer].begin(); it != m_sceneGameObjectsTyped[m_layer].end(); it++)
@@ -228,8 +178,6 @@ void Game::drawScene()
 		}
 		else if (i == PanelLayer)
 		{
-			this->m_interactionPanel->Draw(m_mainScreen);
-
 			for (std::list<SFPanel*>::iterator it = m_sceneSFPanels.begin(); it != m_sceneSFPanels.end(); it++)
 			{
 				(*(*it)).Draw(m_mainScreen);
@@ -259,17 +207,6 @@ void Game::drawScene()
 	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
 	temp.setPosition(sf::Vector2f(m_scale_factor.x * black_stripe, 0));
 	m_window->draw(temp);
-}
-
-void Game::drawHud()
-{
-	m_hud.Draw(m_hubScreen);
-	m_hubScreen.display();
-	sf::Sprite temp(m_hubScreen.getTexture());
-	temp.scale(m_scale_factor.x, m_scale_factor.y);
-	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
-	temp.setPosition(sf::Vector2f(m_scale_factor.x * (black_stripe + SCENE_SIZE_X), 0));
-	m_window->draw(temp);
 
 	//adding black stripes on the left and right
 	sf::RectangleShape blackStripeLeft, blackStripeRight;
@@ -283,30 +220,6 @@ void Game::drawHud()
 	blackStripeRight.setPosition(sf::Vector2f(m_scale_factor.x * (REF_WINDOW_RESOLUTION_X - black_stripe), 0));
 	m_window->draw(blackStripeLeft);
 	m_window->draw(blackStripeRight);
-}
-
-GameObject* Game::getHudFocusedItem()
-{
-	return m_hud.focused_item;
-}
-
-sf::Vector2i Game::getHudFocusedGridAndIndex()
-{
-	return m_hud.focused_grid_and_index;
-}
-
-sf::Vector2i Game::getHudFocusedIndexWithinGrid(HudGridsIndex grid_)
-{
-	switch (grid_)
-	{
-	case HudGrid_ShipGrid:
-		return m_hud.fakeShipGrid.focus;
-
-	case HudGrid_EquipmentGrid:
-		return m_hud.fakeEquipmentGrid.focus;
-	}
-
-	return sf::Vector2i(-1, -1);
 }
 
 void Game::colisionChecksV2()
@@ -805,37 +718,6 @@ void Game::WakeUpEnemiesWithName(string m_display_name)
 			(*it)->m_wake_up = true;
 		}
 	}
-}
-
-bool Game::InsertObjectInGrid(ObjectGrid& grid, GameObject& object, int index)
-{
-	bool result = grid.insertObject(object, index);
-
-	return result;
-}
-
-bool Game::InsertObjectInShipGrid(GameObject& object, int index)
-{
-	bool result = m_hud.shipGrid.insertObject(object, index);
-
-	return result;
-}
-
-bool Game::InsertObjectInEquipmentGrid(GameObject& object, int index)
-{
-	bool result = m_hud.equipmentGrid.insertObject(object, index);
-
-	return result;
-}
-
-void Game::GarbageObjectInGrid(int grid_id, int index)
-{
-	m_hud.GarbageObjectInGrid(grid_id, index);
-}
-
-void Game::setRemovingCursorAnimation(CursorFeedbackStates animation_index)
-{
-	m_hud.setRemovingCursorAnimation(animation_index);
 }
 
 int Game::GetPlayerStatsMultiplierForLevel(int level_)

@@ -9,7 +9,6 @@
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "Hud.h"
 #include "SFPanel.h"
 
 class Ship;
@@ -45,12 +44,7 @@ public:
 	void removeFromFeedbacks(Text* text);
 
 	void updateScene(Time deltaTime);
-	void updateHud(int armor, int armor_max, int shield, int shield_max, int money, int graze_count, int hazard_level, std::string scene_name, int level, int level_max, int xp, int xp_max, sf::Time deltaTime, bool hub,
-		int focused_item_type = -1, string f_name = "", int f_level = 1, int f_xp = 0, float f_max_speed = 0, float f_hyperspeed = 1, int f_armor = 1, int f_shield = 0, int f_shield_regen = 0, 
-		int f_damage = 0, bool f_bot = false, float f_ammo_speed = 0, PatternType f_pattern = NoMovePattern,
-		int f_multishot = 1, int f_xspread = 0, float f_rate_of_fire = 1, ShotMode f_shot_mode = NoShotMode, float f_dispersion = 0, int f_rafale = 0, float f_rafale_cooldown = 0, TargetSeaking f_target_seaking = NO_SEAKING);
 	void drawScene();
-	void drawHud();
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
@@ -59,27 +53,11 @@ public:
 	void SetLayerRotation(LayerType m_layer, float angle);
 
 	sf::RenderTexture m_mainScreen;
-	sf::RenderTexture m_hubScreen;
-	PlayerHud m_hud;
 	sf::Vector2i m_screen_size;
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
 
 	sf::Font* m_font[NBVAL_FontsStyle];
-
-	//methods v2
-	bool InsertObjectInGrid(ObjectGrid& grid, GameObject& object, int index = 0);
-	bool SwapObjectBetweenGrids(ObjectGrid& grid, ObjectGrid& grid2, int index1, int index2);
-
-	//methods v1
-	bool InsertObjectInShipGrid(GameObject& object, int index = 0);
-	bool InsertObjectInEquipmentGrid(GameObject& object, int index=-1);
-
-	void GarbageObjectInGrid(int grid_id, int index);
-	GameObject* getHudFocusedItem();
-	sf::Vector2i getHudFocusedGridAndIndex();
-	sf::Vector2i getHudFocusedIndexWithinGrid(HudGridsIndex grid_);
-	void setRemovingCursorAnimation(CursorFeedbackStates animation_index);
 
 	bool isLastEnemyDead();
 	int getHazard();
@@ -100,15 +78,6 @@ public:
 	TargetScan FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	float GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	void WakeUpEnemiesWithName(string m_display_name);
-
-	InteractionPanel* m_interactionPanel;
-	GameObject* UpdateInteractionPanel (InteractionType interaction, int max_unlocked_hazard_level, sf::Time deltaTime);
-	void SetSelectedIndex(int index_);
-	void SetSelectedDirection(Directions direction_);
-	void SetSelectedDestination(string destination_);
-	int GetSelectedIndex();
-	void SetShopMenu(ShopMenus menu);
-	ShopMenus GetShopMenu();
 
 	int GetPlayerStatsMultiplierForLevel(int level_);
 	int GetEnemiesStatsMultiplierForLevel(int level_);

@@ -20,7 +20,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	int p = 0;
 	int enemy_count = 0;
 
-	m_textHazardBreak.setFont(*(*CurrentGame).m_hud.font2);
+	m_textHazardBreak.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_textHazardBreak.setCharacterSize(30);
 	m_textHazardBreak.setColor(sf::Color(255, 255, 255, 255));
 

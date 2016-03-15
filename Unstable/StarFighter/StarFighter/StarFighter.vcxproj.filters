@@ -48,9 +48,6 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Hud.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="Ammo.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -111,9 +108,6 @@
     <ClCompile Include="CollisionUtils.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="InteractionPanel.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="Shop.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -159,9 +153,6 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Hud.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
@@ -231,9 +222,6 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CollisionUtils.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="InteractionPanel.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Shop.h">

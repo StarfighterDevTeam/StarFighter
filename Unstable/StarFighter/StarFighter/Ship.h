@@ -7,7 +7,6 @@
 #include "AnimatedSprite.hpp"
 #include "TextureLoader.h"
 #include "Assets.h"
-#include "Hud.h"
 #include "InputGuy.h"
 #include <cmath>
 #include "Bot.h"
@@ -80,6 +79,15 @@ enum HUDStates
 	HUD_ShopBuyMenu,
 	HUD_ShopSellMenu,
 };
+
+enum ShopOptions
+{
+	ShopHeal,
+	ShopBuy,
+	ShopStellarMap,
+	NBVAL_ShopOptions,
+};
+
 
 class ShipModel
 {

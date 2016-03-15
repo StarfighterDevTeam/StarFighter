@@ -156,7 +156,7 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 		
 		m_options_text[ShopHeal].setString("Heal");
 		m_options_text[ShopBuy].setString("Buy/Sell");
-		m_options_text[StellarMap].setString("Stellar map");
+		m_options_text[ShopStellarMap].setString("Stellar map");
 
 		ostringstream ss_helpNavigation;
 		ss_helpNavigation << "\n\n\nFire: select\nBrake: down\nHyperspeed: up";
