@@ -703,7 +703,20 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 
 void Ship::UpdateHUDStates()
 {
-	if (m_HUD_state != HUD_OpeningEquipment)
+	//test
+	//if (m_targetDialogs.empty())
+	//{
+	//	m_targetDialogs.push_back(Enemy::LoadDialog("Dial_V3_01"));
+	//	m_targetDialogs.push_back(Enemy::LoadDialog("Dial_V3_02"));
+	//	(*CurrentGame).m_waiting_for_dialog_validation = true;
+	//}
+	
+	if (!m_targetDialogs.empty())
+	{
+		m_is_asking_SFPanel = SFPanel_Dialog;
+		m_HUD_state = HUD_Dialog;
+	}
+	else if (m_HUD_state != HUD_OpeningEquipment)
 	{
 		if (m_targetPortal && m_targetPortal->m_state == PortalOpen && !m_actions_states[Action_Firing])
 		{
@@ -716,10 +729,14 @@ void Ship::UpdateHUDStates()
 				m_HUD_state = HUD_ShopMainMenu;
 			}
 		}
-		else if (m_HUD_state == HUD_PortalInteraction || m_HUD_state == HUD_ShopMainMenu)
+		else
 		{
 			m_HUD_state = HUD_Idle;
 		}
+		//else if (m_HUD_state == HUD_PortalInteraction || m_HUD_state == HUD_ShopMainMenu)
+		//{
+		//	m_HUD_state = HUD_Idle;
+		//}
 	}
 }
 
@@ -739,8 +756,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		//Update HUD state
 		UpdateHUDStates();
 
+		//DIALOG
+		if (m_HUD_state == HUD_Dialog && m_HUD_SFPanel)
+		{
+			//Continue
+			if (m_inputs_states[Action_Firing] == Input_Tap)
+			{
+				ContinueDialog();
+			}
+		}
 		//EQUIPMENT HUD
-		if (m_HUD_state == HUD_OpeningEquipment && m_HUD_SFPanel)
+		else if (m_HUD_state == HUD_OpeningEquipment && m_HUD_SFPanel)
 		{
 			//Cursor movement
 			m_HUD_SFPanel->GetCursor()->m_visible = true;
@@ -1542,7 +1568,7 @@ void Ship::GetPortal(GameObject* object)
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
 
-	if ((*CurrentGame).m_direction == NO_DIRECTION)
+	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation)
 	{
 		m_is_asking_SFPanel = SFPanel_Portal;
 	}	
@@ -1553,13 +1579,16 @@ void Ship::GetShop(GameObject* object)
 	m_targetShop = (Shop*)(object);
 	m_isCollidingWithInteractiveObject = ShopInteraction;
 
-	if (m_HUD_state == HUD_ShopBuyMenu || m_HUD_state == HUD_ShopSellMenu)
+	if (!(*CurrentGame).m_waiting_for_dialog_validation)
 	{
-		m_is_asking_SFPanel = SFPanel_Inventory;
-	}
-	else
-	{
-		m_is_asking_SFPanel = SFPanel_Shop;
+		if (m_HUD_state == HUD_ShopBuyMenu || m_HUD_state == HUD_ShopSellMenu)
+		{
+			m_is_asking_SFPanel = SFPanel_Inventory;
+		}
+		else
+		{
+			m_is_asking_SFPanel = SFPanel_Shop;
+		}
 	}
 }
 
@@ -2647,4 +2676,19 @@ void Ship::GenerateFakeShip(GameObject* target)
 		m_fake_ship = new FakeShip(target, m_ship_model->m_fake_textureName, m_ship_model->m_fake_size, m_ship_model->m_fake_frameNumber, ShipAnimations::NB_ShipAnimations);
 		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, GameObjectType::FakePlayerShip);
 	}
+}
+
+void Ship::ContinueDialog()
+{
+	string next = m_SFPanel->GetDialog()->m_next_dialog_name;
+	if (m_SFPanel && !m_SFPanel->GetDialog()->m_next_dialog_name.empty() && m_SFPanel->GetDialog()->m_next_dialog_name.compare("0") != 0)
+	{
+		m_is_asking_SFPanel = SFPanel_DialogNext;
+	}
+	else
+	{
+		(*CurrentGame).m_waiting_for_dialog_validation = false;
+		//m_targetDialogs.clear();
+	}
+	m_targetDialogs.erase(m_targetDialogs.begin());
 }

@@ -30,6 +30,7 @@
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
 class Loot;
+class Dialog;
 
 enum ShipAnimations
 {
@@ -78,6 +79,7 @@ enum HUDStates
 	HUD_ShopMainMenu,
 	HUD_ShopBuyMenu,
 	HUD_ShopSellMenu,
+	HUD_Dialog,
 };
 
 enum ShopOptions
@@ -205,9 +207,11 @@ public :
 	void SellingItem();
 	void GarbagingItem();
 	void SwappingItems();
+	void ContinueDialog();
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;
+	vector<Dialog*> m_targetDialogs;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
 	SFPanel* m_SFPanel;

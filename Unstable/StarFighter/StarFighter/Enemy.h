@@ -66,6 +66,7 @@ public:
 	sf::Time m_enemyTimer;
 
 	static Phase* LoadPhase(string name);
+	static Dialog* LoadDialog(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);
 	static FX* LoadFX(string name);

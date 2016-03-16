@@ -626,20 +626,27 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		case SFPanel_Inventory:
 		{
 			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false);
-			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
 			break;
 		}
 		case SFPanel_Portal:
 		{
 			playerShip->m_SFPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
-			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
 			break;
 		}
 		case SFPanel_Shop:
 		{
 			playerShip->m_SFPanel = new SFShopPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
-			(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+			break;
+		}
+		case SFPanel_DialogNext:
+		{
+			playerShip->m_is_asking_SFPanel = SFPanel_Dialog;
+		}
+		case SFPanel_Dialog:
+		{
+			playerShip->m_SFPanel = new SFDialogPanel(sf::Vector2f(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT), playerShip);
 			break;
 		}
 	}
+	(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
 }

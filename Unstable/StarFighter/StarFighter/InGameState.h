@@ -1,6 +1,7 @@
 #ifndef METAGAME_H_INCLUDED
 #define METAGAME_H_INCLUDED
 
+#include "SFDialogPanel.h"
 #include "SFInventoryPanel.h"
 #include "SFMenuPanel.h"
 #include "Scene.h"

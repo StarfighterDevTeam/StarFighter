@@ -2,8 +2,8 @@
 #define PHASE_H_INCLUDED
 
 #include "GameObject.h"
-#include "Weapon.h"
 #include "TextUtils.h"
+#include "Dialog.h"
 
 enum ConditionData
 {
@@ -59,6 +59,7 @@ enum EnemyPhaseData
 	PHASE_OPERATOR_2,
 	PHASE_VALUE_2,
 	PHASE_TRANSITION_2,
+	PHASE_DIALOG_NAME,
 };
 
 enum ConditionType
@@ -117,6 +118,7 @@ public:
 	vector<ConditionTransition*> m_transitions_list;
 	string m_wake_up_name;
 	Weapon* m_welcomeWeapon;
+	vector <Dialog*> m_dialogs;
 
 	static ConditionTransition* ConditionLoader(vector<string> line_data, int index);
 };

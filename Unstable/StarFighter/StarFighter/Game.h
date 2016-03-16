@@ -57,6 +57,8 @@ public:
 	float m_hyperspeedMultiplier;
 	float m_vspeed;
 
+	bool m_waiting_for_dialog_validation;
+
 	sf::Font* m_font[NBVAL_FontsStyle];
 
 	bool isLastEnemyDead();

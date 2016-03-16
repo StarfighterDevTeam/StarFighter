@@ -4,6 +4,7 @@
 #include "HudGrid.h"
 
 class Ship;
+class Dialog;
 
 enum SFPanelTypes
 {
@@ -13,6 +14,8 @@ enum SFPanelTypes
 	SFPanel_DoubleInventory,
 	SFPanel_Portal,
 	SFPanel_Shop,
+	SFPanel_Dialog,
+	SFPanel_DialogNext,
 };
 
 class SFPanel : public sf::RectangleShape
@@ -42,6 +45,9 @@ public:
 	virtual int GetFocusedGrid();
 	virtual bool GetPrioritaryFeedback();
 	virtual void SetPrioritaryFeedback(bool has_priotiary_feedback);
+	
+	virtual Dialog* GetDialog();
+
 	virtual void ClearHighlight();
 	virtual void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid);
 };

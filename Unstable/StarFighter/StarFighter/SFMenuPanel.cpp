@@ -114,11 +114,9 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		m_actions_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height - m_actions_text.getGlobalBounds().height/2);
 		text_height += m_actions_text.getGlobalBounds().height;
 		//default selected index
-		//if (m_playerShip->m_previouslyCollidingWithInteractiveObject != PortalInteraction)
-		//{
 		m_selected_option_index = (m_playerShip->m_last_hazard_level_played <= m_playerShip->m_targetPortal->m_max_unlocked_hazard_level ? m_playerShip->m_last_hazard_level_played : m_playerShip->m_targetPortal->m_max_unlocked_hazard_level);
-		//}
-		}
+		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height - 1);
+	}
 }
 
 void SFPortalPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
@@ -192,10 +190,9 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 		m_actions_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
 		text_height += m_actions_text.getGlobalBounds().height;
 		//default selected index
-		//if (m_playerShip->m_previouslyCollidingWithInteractiveObject != ShopInteraction)
-		//{
 		m_selected_option_index = 0;
-			//}
+		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[0].getGlobalBounds().height - 1);
+
 	}
 }
 

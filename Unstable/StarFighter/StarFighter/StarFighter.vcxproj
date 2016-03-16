@@ -92,6 +92,7 @@
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Bot.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
+    <ClCompile Include="Dialog.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyGenerator.cpp" />
     <ClCompile Include="EnemyPool.cpp" />
@@ -111,6 +112,7 @@
     <ClCompile Include="Portal.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SFDialogPanel.cpp" />
     <ClCompile Include="SFInventoryPanel.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFMenuPanel.cpp" />
@@ -129,6 +131,7 @@
     <ClInclude Include="Background.h" />
     <ClInclude Include="Bot.h" />
     <ClInclude Include="CollisionUtils.h" />
+    <ClInclude Include="Dialog.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyGenerator.h" />
     <ClInclude Include="EnemyPool.h" />
@@ -153,6 +156,7 @@
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SFDialogPanel.h" />
     <ClInclude Include="SFInventoryPanel.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFMenuPanel.h" />

@@ -20,6 +20,13 @@ Loot::Loot (sf::Vector2f position, sf::Vector2f speed, std::string textureName, 
 
 void Loot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	//dialog blocking the update?
+	if ((*CurrentGame).m_waiting_for_dialog_validation)
+	{
+		AnimatedSprite::update(deltaTime);
+		return;
+	}
+
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = m_speed;
 

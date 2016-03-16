@@ -55,6 +55,7 @@
 #define BOT_FILE "Assets/Scripts/Generated/Bot.csv"
 #define SCENES_FILE "Assets/Scripts/Generated/Scenes.csv"
 #define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
+#define DIALOGS_FILE "Assets/Scripts/Generated/Dialogs.csv"
 
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30

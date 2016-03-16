@@ -112,6 +112,12 @@ void SFPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
 	//see override function in SFMenuPanel and other types of SF panels
 }
 
+Dialog* SFPanel::GetDialog()
+{
+	return NULL;
+	//see override function in SFDialogPanel
+}
+
 void SFPanel::ClearHighlight()
 {
 	return;

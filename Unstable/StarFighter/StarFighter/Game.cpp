@@ -28,6 +28,7 @@ void Game::init(RenderWindow* window)
 
 	playerShip = NULL;
 	m_currentScene = NULL;
+	m_waiting_for_dialog_validation = false;
 
 	try
 	{
@@ -163,6 +164,21 @@ void Game::drawScene()
 {
 	m_mainScreen.clear();
 
+	//adding black stripes on the left and right
+	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
+	sf::RectangleShape blackStripeLeft, blackStripeRight;
+	blackStripeLeft.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
+	blackStripeRight.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
+	blackStripeLeft.setFillColor(sf::Color(0, 0, 0, 255));
+	blackStripeRight.setFillColor(sf::Color(0, 0, 0, 255));
+	blackStripeLeft.setOrigin(0, 0);
+	blackStripeRight.setOrigin(0, 0);
+	blackStripeLeft.setPosition(0, 0);
+	blackStripeRight.setPosition(sf::Vector2f(m_scale_factor.x * (REF_WINDOW_RESOLUTION_X - black_stripe), 0));
+	m_window->draw(blackStripeLeft);
+	m_window->draw(blackStripeRight);
+
+	//drawing stuff
 	for (int i = 0; i < NBVAL_Layer; i++)
 	{
 		if (i == FeedbacksLayer)
@@ -204,22 +220,11 @@ void Game::drawScene()
 	m_mainScreen.display();
 	sf::Sprite temp(m_mainScreen.getTexture());
 	temp.scale(m_scale_factor.x, m_scale_factor.y);
-	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
+	
 	temp.setPosition(sf::Vector2f(m_scale_factor.x * black_stripe, 0));
 	m_window->draw(temp);
 
-	//adding black stripes on the left and right
-	sf::RectangleShape blackStripeLeft, blackStripeRight;
-	blackStripeLeft.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
-	blackStripeRight.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
-	blackStripeLeft.setFillColor(sf::Color(0, 0, 0, 255));
-	blackStripeRight.setFillColor(sf::Color(0, 0, 0, 255));
-	blackStripeLeft.setOrigin(0, 0);
-	blackStripeRight.setOrigin(0, 0);
-	blackStripeLeft.setPosition(0, 0);
-	blackStripeRight.setPosition(sf::Vector2f(m_scale_factor.x * (REF_WINDOW_RESOLUTION_X - black_stripe), 0));
-	m_window->draw(blackStripeLeft);
-	m_window->draw(blackStripeRight);
+	
 }
 
 void Game::colisionChecksV2()

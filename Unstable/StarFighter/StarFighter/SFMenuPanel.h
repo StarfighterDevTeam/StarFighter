@@ -14,8 +14,6 @@ public:
 	void SFMenuPanel::SetSelectedOptionIndex(int index) override;
 	int GetSelectedOptionIndex() override;
 
-	SFMenuPanel* Clone();
-
 	size_t m_options;
 	sf::Text* m_options_text;
 	GameObject m_arrow;

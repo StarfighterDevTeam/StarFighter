@@ -127,6 +127,13 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	UpdateHealthBars(deltaTime);
 	
+	//dialog blocking the update?
+	if ((*CurrentGame).m_waiting_for_dialog_validation)
+	{
+		AnimatedSprite::update(deltaTime);
+		return;
+	}
+
 	//slow motion
 	if (hyperspeedMultiplier < 1.0f)
 	{
@@ -847,7 +854,49 @@ void Enemy::setPhase(Phase* phase)
 		(*CurrentGame).WakeUpEnemiesWithName(phase->m_wake_up_name);
 	}
 
+	//dialogs
+	if (!phase->m_dialogs.empty())
+	{
+		if (!(*CurrentGame).m_waiting_for_dialog_validation)
+		{
+			(*CurrentGame).playerShip->m_is_asking_SFPanel = SFPanel_Dialog;
+			size_t dialogsVectorSize = phase->m_dialogs.size();
+			for (size_t i = 0; i < dialogsVectorSize; i++)
+			{
+				(*CurrentGame).playerShip->m_targetDialogs.push_back(phase->m_dialogs[i]->Clone());
+			}
+			(*CurrentGame).m_waiting_for_dialog_validation = true;
+		}
+	}
+
 	m_phaseTimer = sf::seconds(0);
+}
+
+Dialog* Enemy::LoadDialog(string name)
+{
+	vector<vector<string>> dialogConfig = *(FileLoaderUtils::FileLoader(DIALOGS_FILE));
+
+	for (std::vector<vector<string>>::iterator it = (dialogConfig).begin(); it != (dialogConfig).end(); it++)
+	{
+		if ((*it)[DIALOG_NAME].compare(name) == 0)
+		{
+			Dialog* dialog = new Dialog();
+
+			dialog->m_name = name;
+			dialog->m_fade_in = atof((*it)[DIALOG_FADE_IN].c_str());
+			dialog->m_fade_out = atof((*it)[DIALOG_FADE_OUT].c_str());
+			dialog->m_enemy_speaking = (*it)[DIALOG_ENEMY_SPEAKING].compare("enemy") == 0 ? true : false;
+			dialog->m_duration = atof((*it)[DIALOG_DURATION].c_str());
+			dialog->m_title = (*it)[DIALOG_TITLE];
+			dialog->m_body = (*it)[DIALOG_BODY];
+			dialog->m_picture_name = (*it)[DIALOG_PICTURE];
+			dialog->m_next_dialog_name = (*it)[DIALOG_NEXT];
+
+			return dialog;
+		}
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Dialog '%s'. Please check the config file", name));
 }
 
 Phase* Enemy::LoadPhase(string name)
@@ -885,7 +934,6 @@ Phase* Enemy::LoadPhase(string name)
 			phase->m_rotation_speed = stoi((*it)[EnemyPhaseData::PHASE_ROTATION_SPEED]);
 
 			//loading modifier (immune to damage, etc.)
-			
 			for (int i = 0; i < 2; i++)
 			{
 				Modifier l_new_modifier = Modifier::NoModifier;
@@ -950,6 +998,18 @@ Phase* Enemy::LoadPhase(string name)
 			if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("0") != 0)
 			{
 				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION_2));
+			}
+
+			//loading dialogs
+			if ((*it)[EnemyPhaseData::PHASE_DIALOG_NAME].compare("0") != 0)
+			{
+				Dialog* dialog = Enemy::LoadDialog((*it)[EnemyPhaseData::PHASE_DIALOG_NAME]);
+				phase->m_dialogs.push_back(dialog);
+				while (!dialog->m_next_dialog_name.empty() && dialog->m_next_dialog_name.compare("0") != 0)
+				{
+					dialog = Enemy::LoadDialog(dialog->m_next_dialog_name);
+					phase->m_dialogs.push_back(dialog);
+				}
 			}
 
 			return phase;
