@@ -58,6 +58,7 @@ public:
 	float m_vspeed;
 
 	bool m_waiting_for_dialog_validation;
+	sf::Clock m_end_dialog_clock;
 
 	sf::Font* m_font[NBVAL_FontsStyle];
 

@@ -95,7 +95,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool
 	{
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && m_target && !m_target->m_disable_fire && !hyperspeeding)
+			if (!m_disable_fire && m_target && !m_target->m_disable_fire && !hyperspeeding && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY)
 			{
 				if (firing || m_automatic_fire)
 				{

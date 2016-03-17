@@ -1,3 +1,5 @@
 dialog_name,fade_in,fade_out,enemy_speaking,duration,title,body,picture,next
-Dial_V3_01,0,0,enemy,0,Titre,blablabla,Assets/2D/Dialogs/Captain.png,Dial_V3_02
-Dial_V3_02,0,0,0,0,Titre2 ,blablabla2,Assets/2D/Dialogs/Captain.png,0
+Dial_V3_01,1,0,enemy,0,Titre,blablabla,Assets/2D/Dialogs/Captain.png,Dial_V3_02
+Dial_V3_02,0,0,0,0,Titre2 ,blablabla2,Assets/2D/Dialogs/Captain.png,Dial_V3_03
+Dial_V3_03,0,0,enemy,0,Titre2 ,blablabla2,Assets/2D/Dialogs/Captain.png,Dial_V3_04
+Dial_V3_04,1,1,0,0,Titre2 ,blablabla2,Assets/2D/Dialogs/Captain.png,0

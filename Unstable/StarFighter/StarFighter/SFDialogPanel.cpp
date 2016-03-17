@@ -15,14 +15,16 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 	sf::Vector2f position = sf::Vector2f(DIALOG_PANEL_OFFSET_X + size.x / 2, SCENE_SIZE_Y - DIALOG_PANEL_OFFSET_Y - size.y / 2);
 	if (m_dialog->m_enemy_speaking)
 	{
-		setPosition(GameObject::getPosition_for_Direction(DIRECTION_DOWN, position));
+		Directions direction = (*CurrentGame).m_direction == DIRECTION_DOWN ? DIRECTION_UP : DIRECTION_DOWN;
+		setPosition(GameObject::getPosition_for_Direction(direction, position));
 		setFillColor(sf::Color(255, 27, 27, 50));
 		setOutlineColor(sf::Color(255, 0, 0, 255));
 		m_title_text.setColor(sf::Color(255, 0, 0, 255));
 	}
 	else
 	{
-		setPosition(position);
+		Directions direction = (*CurrentGame).m_direction == DIRECTION_DOWN ? DIRECTION_DOWN : DIRECTION_UP;
+		setPosition(GameObject::getPosition_for_Direction(direction, position));
 		setFillColor(sf::Color(27, 27, 255, 50));
 		setOutlineColor(sf::Color(0, 0, 255, 255));
 		m_title_text.setColor(sf::Color(0, 0, 255, 255));

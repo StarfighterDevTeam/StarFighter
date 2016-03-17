@@ -24,8 +24,8 @@ public:
 	Dialog();
 	Dialog* Clone();
 	string m_name;
-	float m_fade_in;
-	float m_fade_out;
+	bool m_fade_in;
+	bool m_fade_out;
 	bool m_enemy_speaking;
 	float m_duration;
 	string m_title;

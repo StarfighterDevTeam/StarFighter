@@ -655,7 +655,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && !m_actions_states[Action_Hyperspeeding])
+			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY && !m_actions_states[Action_Hyperspeeding])
 			{
 				if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
 				{
@@ -742,6 +742,8 @@ void Ship::UpdateHUDStates()
 
 void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction)
 {
+	m_hyperspeed = 100;
+
 	if (!m_disable_inputs)
 	{
 		//Registering inputs
@@ -794,6 +796,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 			{
 				(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
+			}
+			if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
+			{
+				m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
+				m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
 			}
 
 			//Closing hud
@@ -958,6 +965,19 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					{
 						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
 					}
+				}
+
+				//Weapon firing
+				ManageFiring(deltaTime, hyperspeedMultiplier);
+				//Bots firing
+				for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+				{
+					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
+				}
+				if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
+				{
+					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
+					m_speed.y *= SHIP_BRAKING_MALUS_SPEED;
 				}
 
 				//Entering portal
@@ -2688,7 +2708,7 @@ void Ship::ContinueDialog()
 	else
 	{
 		(*CurrentGame).m_waiting_for_dialog_validation = false;
-		//m_targetDialogs.clear();
+		(*CurrentGame).m_end_dialog_clock.restart();
 	}
 	m_targetDialogs.erase(m_targetDialogs.begin());
 }

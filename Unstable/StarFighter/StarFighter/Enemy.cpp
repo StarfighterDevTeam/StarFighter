@@ -128,7 +128,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	UpdateHealthBars(deltaTime);
 	
 	//dialog blocking the update?
-	if ((*CurrentGame).m_waiting_for_dialog_validation)
+	if ((*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() < END_OF_DIALOGS_DELAY)
 	{
 		AnimatedSprite::update(deltaTime);
 		return;
@@ -883,8 +883,8 @@ Dialog* Enemy::LoadDialog(string name)
 			Dialog* dialog = new Dialog();
 
 			dialog->m_name = name;
-			dialog->m_fade_in = atof((*it)[DIALOG_FADE_IN].c_str());
-			dialog->m_fade_out = atof((*it)[DIALOG_FADE_OUT].c_str());
+			dialog->m_fade_in = (bool)(stoi((*it)[DIALOG_FADE_IN]));
+			dialog->m_fade_out = (bool)(stoi((*it)[DIALOG_FADE_OUT]));
 			dialog->m_enemy_speaking = (*it)[DIALOG_ENEMY_SPEAKING].compare("enemy") == 0 ? true : false;
 			dialog->m_duration = atof((*it)[DIALOG_DURATION].c_str());
 			dialog->m_title = (*it)[DIALOG_TITLE];
