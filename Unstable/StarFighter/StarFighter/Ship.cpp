@@ -742,8 +742,6 @@ void Ship::UpdateHUDStates()
 
 void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction)
 {
-	m_hyperspeed = 100;
-
 	if (!m_disable_inputs)
 	{
 		//Registering inputs

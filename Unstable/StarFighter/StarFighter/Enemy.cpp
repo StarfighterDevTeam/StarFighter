@@ -892,6 +892,10 @@ Dialog* Enemy::LoadDialog(string name)
 			dialog->m_picture_name = (*it)[DIALOG_PICTURE];
 			dialog->m_next_dialog_name = (*it)[DIALOG_NEXT];
 
+			TextureLoader *loader;
+			loader = TextureLoader::getInstance();
+			loader->loadTexture(dialog->m_picture_name, DIALOG_PANEL_PORTRAIT_SIZE_X, DIALOG_PANEL_PORTRAIT_SIZE_X);
+
 			return dialog;
 		}
 	}
