@@ -3,7 +3,7 @@
 
 #include "Scene.h"
 
-#define STELLARMAP_SCALE			50
+#define STELLARMAP_SCALE			70
 #define STELLAR_SEGMENT_THICKNESS	4
 
 class StellarHub : public sf::RectangleShape
@@ -45,6 +45,9 @@ public:
 
 	void SetPosition(sf::Vector2f position);
 	void Draw(sf::RenderTexture& screen);
+	void DrawNodes(sf::RenderTexture& screen);
+	void DrawSegments(sf::RenderTexture& screen);
+	void DrawHub(sf::RenderTexture& screen);
 };
 
 class SFMapPanel : public SFPanel
@@ -68,8 +71,9 @@ public:
 private:
 	vector<StellarHub*> m_checked_hubs;
 	vector <string> m_checked_scenes;
-	bool UpdateCheckedHubs(StellarHub* new_hub);
-	bool UpdateCheckedScenes(string new_scene);
+
+	bool IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked);
+	bool UpdateCheckedHubs(string new_hub);
 };
 
 #endif // SFMAPPANEL_H_INCLUDED
