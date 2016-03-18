@@ -6,41 +6,10 @@ void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
-	
-	//Load knownScenes, hazard levels and current scene from save file
-	if (!LoadPlayerSave(player.m_save_file).empty())
-	{
-		player.m_currentSceneFile = LoadPlayerSave(player.m_save_file);
-	}
-	else
-	{
-		//New game save
-		player.m_currentSceneFile = "Vanguard_Hub0";
-		AddToKnownScenes(player.m_currentSceneFile);
-		SavePlayer(PLAYER_SAVE_FILE);
-	}
-	m_currentSceneSave = player.m_currentSceneFile;
 
-	//Loading current scene
-	m_currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevelUnlocked(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
-	UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
-
-	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
-	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
-	{
-		m_IG_State = InGameStateMachine::SCROLLING;
-		ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
-	}
-	else
-	{
-		m_IG_State = InGameStateMachine::HUB_ROAMING;
-	}
-	
 	//creating new ship
 	m_playerShip = FileLoader::LoadShipConfig("default");
-	m_playerShip->setPosition(ship_pos);
 	(*CurrentGame).SetPlayerShip(m_playerShip);
-	m_playerShip->m_respawnSceneName = m_currentScene->m_name;
 
 	//initializing HUD
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing HUD...");
@@ -79,7 +48,39 @@ void InGameState::Initialize(Player player)
 	}
 	LOGGER_WRITE(Logger::Priority::DEBUG, "HUD initialization completed\n");
 
-	//ship
+	//Load knownScenes, hazard levels and current scene from save file
+	if (!LoadPlayerSave(player.m_save_file).empty())
+	{
+		player.m_currentSceneFile = LoadPlayerSave(player.m_save_file);
+	}
+	else
+	{
+		//New game save
+		player.m_currentSceneFile = "Vanguard_Hub0";
+		AddToKnownScenes(player.m_currentSceneFile);
+		SavePlayer(PLAYER_SAVE_FILE);
+	}
+	m_currentSceneSave = player.m_currentSceneFile;
+
+	//Loading current scene
+	m_currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevelUnlocked(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
+	UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
+	(*CurrentGame).m_currentScene = m_currentScene;
+
+	//setting ship initialparameters
+	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
+	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
+	{
+		m_IG_State = InGameStateMachine::SCROLLING;
+		ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
+	}
+	else
+	{
+		m_IG_State = InGameStateMachine::HUB_ROAMING;
+	}
+	m_playerShip->setPosition(ship_pos);
+	m_playerShip->m_respawnSceneName = m_currentScene->m_name;
+
 	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
 	{
 		(*CurrentGame).playerShip->m_disable_fire = false;
@@ -115,14 +116,14 @@ void InGameState::Update(Time deltaTime)
 	(*CurrentGame).updateScene(deltaTime);
 
 	//Create and destroy HUD panels
-	//case 1: creating a panel
+	//case 1: destroying a panel
 	if ((*CurrentGame).playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).playerShip->m_SFPanel)
 	{
 		DestroySFPanel((*CurrentGame).playerShip);
 	}
 	else if ((*CurrentGame).playerShip->m_is_asking_SFPanel != SFPanel_None)
 	{
-		//case 2: destroying a panel
+		//case 2: creating a panel
 		if (!(*CurrentGame).playerShip->m_SFPanel)
 		{
 			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
@@ -149,57 +150,77 @@ void InGameState::Release()
 	//TODO
 }
 
-bool InGameState::AddToKnownScenes(string scene_name)
+bool InGameState::AddToKnownScenes(string scene_name, Ship* playerShip)
 {
+	if (!playerShip)
+	{
+		return false;
+	}
+
 	m_currentSceneSave = scene_name;
-	map<string, int>::iterator it = m_knownScenes.find(scene_name);
+	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene_name);
 
 	//if scene not already known
-	if (it == m_knownScenes.end())
+	if (it == playerShip->m_knownScenes.end())
 	{
 		//add it to the map of known scenes
-		m_knownScenes.insert(pair<string, int>(scene_name, 0));
+		playerShip->m_knownScenes.insert(pair<string, int>(scene_name, 0));
 		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Adding '%s' to known scenes.\n", (char*)scene_name.c_str()));
 		return true;
 	}
 	return false;
 }
 
-void InGameState::SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level)
+void InGameState::SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip)
 {
-	map<string, int>::iterator it = m_knownScenes.find(scene_name);
+	if (!playerShip)
+	{
+		return;
+	}
+
+	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene_name);
 	if (hazard_level > NB_HAZARD_LEVELS - 1)
 	{
 		hazard_level = NB_HAZARD_LEVELS - 1;
 	}
-	if (it != m_knownScenes.end())
+	if (it != playerShip->m_knownScenes.end())
 	{
-		m_knownScenes[scene_name] = hazard_level;
+		playerShip->m_knownScenes[scene_name] = hazard_level;
 	}
 }
 
-int InGameState::GetSceneHazardLevelUnlocked(string scene_name)
+int InGameState::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip)
 {
-	map<string, int>::iterator it = m_knownScenes.find(scene_name);
+	if (!playerShip)
+	{
+		return -1;
+	}
+
+	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene_name);
 
 	//if scene is known
-	if (it != m_knownScenes.end())
+	if (it != playerShip->m_knownScenes.end())
 	{
-		return m_knownScenes[scene_name];
+		return playerShip->m_knownScenes[scene_name];
 	}
 	//else
 	return 0;
 }
 
-int InGameState::SavePlayer(string file)
+int InGameState::SavePlayer(string file, Ship* playerShip)
 {
+	if (!playerShip)
+	{
+		return -1;
+	}
+
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving known scenes and current scene in profile.\n");
 
 	ofstream data(file.c_str(), ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
 		// instructions
-		for (map<string, int>::iterator it = m_knownScenes.begin(); it != m_knownScenes.end(); it++)
+		for (map<string, int>::iterator it = playerShip->m_knownScenes.begin(); it != playerShip->m_knownScenes.end(); it++)
 		{
 			data << it->first.c_str() << " " << it->second;
 			if (it->first.c_str() == m_currentSceneSave)
@@ -219,8 +240,13 @@ int InGameState::SavePlayer(string file)
 	return 0;
 }
 
-string InGameState::LoadPlayerSave(string file)
+string InGameState::LoadPlayerSave(string file, Ship* playerShip)
 {
+	if (!playerShip)
+	{
+		return "";
+	}
+
 	string return_current_scene;
 
 	std::ifstream  data(file, ios::in);
@@ -237,7 +263,7 @@ string InGameState::LoadPlayerSave(string file)
 				
 			std::istringstream(line) >> scene >> level >> current_scene;
 
-			m_knownScenes.insert(std::pair<string, int>(scene, level));
+			playerShip->m_knownScenes.insert(std::pair<string, int>(scene, level));
 			if (current_scene.compare("!") == 0)
 			{
 				return_current_scene = scene;
@@ -545,34 +571,34 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 	}
 }
 
-void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_)
+void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip)
 {
 	//getting the max hazard value for the upcoming scene
-	map<string, int>::iterator it = m_knownScenes.find(scene_->m_name);
-	if (it != m_knownScenes.end())
+	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene->m_name);
+	if (it != playerShip->m_knownScenes.end())
 	{
-		scene_->m_hazard_level_unlocked = m_knownScenes[scene_->m_name];
+		scene->m_hazard_level_unlocked = playerShip->m_knownScenes[scene->m_name];
 	}
 	else
 	{
 		//destination is not know yet -> default max hazard value
-		scene_->m_hazard_level_unlocked = 0;
+		scene->m_hazard_level_unlocked = 0;
 	}
 
 	//loading the scene's portals with the info about their respective max hazard values
 	for (int i = 0; i < Directions::NO_DIRECTION; i++)
 	{
-		if (scene_->m_bg->m_portals[(Directions)i] != NULL)
+		if (scene->m_bg->m_portals[(Directions)i] != NULL)
 		{
-			map<string, int>::iterator it = m_knownScenes.find(scene_->m_bg->m_portals[(Directions)i]->m_destination_name);
-			if (it != m_knownScenes.end())
+			map<string, int>::iterator it = playerShip->m_knownScenes.find(scene->m_bg->m_portals[(Directions)i]->m_destination_name);
+			if (it != playerShip->m_knownScenes.end())
 			{
-				scene_->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = m_knownScenes[scene_->m_bg->m_portals[(Directions)i]->m_destination_name];
+				scene->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = playerShip->m_knownScenes[scene->m_bg->m_portals[(Directions)i]->m_destination_name];
 			}
 			else
 			{
 				//destination is not know yet -> default max hazard value
-				scene_->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = 0;
+				scene->m_bg->m_portals[(Directions)i]->m_max_unlocked_hazard_level = 0;
 			}
 		}
 	}
@@ -645,6 +671,11 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		case SFPanel_Dialog:
 		{
 			playerShip->m_SFPanel = new SFDialogPanel(sf::Vector2f(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT), playerShip);
+			break;
+		}
+		case SFPanel_Map:
+		{
+			playerShip->m_SFPanel = new SFMapPanel(sf::Vector2f(STELLARMAP_PANEL_WIDTH, STELLARMAP_PANEL_HEIGHT), playerShip);
 			break;
 		}
 	}

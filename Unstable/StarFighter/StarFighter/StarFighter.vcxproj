@@ -114,6 +114,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SFDialogPanel.cpp" />
     <ClCompile Include="SFInventoryPanel.cpp" />
+    <ClCompile Include="SFMapPanel.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFMenuPanel.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SFDialogPanel.h" />
     <ClInclude Include="SFInventoryPanel.h" />
+    <ClInclude Include="SFMapPanel.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFMenuPanel.h" />
     <ClInclude Include="Ship.h" />

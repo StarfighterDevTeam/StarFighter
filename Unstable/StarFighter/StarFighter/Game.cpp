@@ -223,8 +223,6 @@ void Game::drawScene()
 	
 	temp.setPosition(sf::Vector2f(m_scale_factor.x * black_stripe, 0));
 	m_window->draw(temp);
-
-	
 }
 
 void Game::colisionChecksV2()

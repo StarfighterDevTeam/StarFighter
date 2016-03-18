@@ -1,6 +1,7 @@
 #ifndef METAGAME_H_INCLUDED
 #define METAGAME_H_INCLUDED
 
+#include "SFMapPanel.h"
 #include "SFDialogPanel.h"
 #include "SFInventoryPanel.h"
 #include "SFMenuPanel.h"
@@ -10,13 +11,14 @@
 #include <iostream>
 #include <sstream>
 
+extern Game* CurrentGame;
+
 class InGameState : public GameState
 {
 public:
 	Ship* m_playerShip;
 	Scene* m_currentScene;
 	Scene* m_nextScene;
-	map<string, int> m_knownScenes;
 	string m_currentSceneSave;
 	InGameStateMachine m_IG_State;
 
@@ -24,18 +26,19 @@ public:
 	void Update(Time deltaTime);
 	void Draw();
 	void Release();
-	int SavePlayer(string file);
-	string LoadPlayerSave(string file);
-	bool AddToKnownScenes(string scene_name);
-	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level);
-	int GetSceneHazardLevelUnlocked(string scene_name);
+	int SavePlayer(string file, Ship* playerShip = (*CurrentGame).playerShip);
+	string LoadPlayerSave(string file, Ship* playerShip = (*CurrentGame).playerShip);
+	bool AddToKnownScenes(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
+	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip = (*CurrentGame).playerShip);
+	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
+
 	void InGameStateMachineCheck(sf::Time deltaTime);
 
 	sf::Clock m_clockHubExit;
 	sf::Clock m_bossSpawnCountdown;
 	bool m_hasDisplayedDestructionRatio;
 
-	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene_);
+	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip = (*CurrentGame).playerShip);
 	void RespawnInLastHub();
 
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);

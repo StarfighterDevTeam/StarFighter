@@ -724,7 +724,7 @@ void Ship::UpdateHUDStates()
 		}
 		else if (m_targetShop)
 		{
-			if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_ShopSellMenu)
+			if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
 			}
@@ -879,6 +879,14 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_HUD_SFPanel->GetCursor()->m_visible = false;
 			}
 		}
+		else if (m_HUD_state == HUD_ShopStellarMap)
+		{
+				//exit
+			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
+			{
+				m_HUD_state = HUD_ShopMainMenu;
+			}
+		}
 		else
 		{
 			//Opening hud
@@ -1009,10 +1017,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						}
 						case ShopBuy:
 						{
-							m_is_asking_SFPanel = SFPanel_Inventory;
 							m_HUD_state = HUD_ShopBuyMenu;
 							m_HUD_SFPanel->GetCursor()->m_visible = true;
 							break;
+						}
+						case ShopStellarMap:
+						{
+							m_HUD_state = HUD_ShopStellarMap;
 						}
 					}
 				}
@@ -1602,6 +1613,10 @@ void Ship::GetShop(GameObject* object)
 		if (m_HUD_state == HUD_ShopBuyMenu || m_HUD_state == HUD_ShopSellMenu)
 		{
 			m_is_asking_SFPanel = SFPanel_Inventory;
+		}
+		else if (m_HUD_state == HUD_ShopStellarMap)
+		{
+			m_is_asking_SFPanel = SFPanel_Map;
 		}
 		else
 		{

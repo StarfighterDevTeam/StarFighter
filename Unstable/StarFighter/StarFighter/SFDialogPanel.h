@@ -1,5 +1,5 @@
-#ifndef SFDIALOG_H_INCLUDED
-#define SFDIALOG_H_INCLUDED
+#ifndef SFDIALOGPANEL_H_INCLUDED
+#define SFDIALOGPANEL_H_INCLUDED
 
 #include "Scene.h"
 #include "Dialog.h"
@@ -17,4 +17,4 @@ public:
 	GameObject m_picture;
 };
 
-#endif // SFDIALOG_H_INCLUDED
+#endif // SFDIALOGPANEL_H_INCLUDED

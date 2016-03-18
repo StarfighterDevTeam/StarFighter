@@ -79,6 +79,7 @@ enum HUDStates
 	HUD_ShopMainMenu,
 	HUD_ShopBuyMenu,
 	HUD_ShopSellMenu,
+	HUD_ShopStellarMap,
 	HUD_Dialog,
 };
 
@@ -189,6 +190,8 @@ public :
 
 	vector<Equipment*> m_garbageEquipments;
 	vector<Weapon*> m_garbageWeapons;
+
+	map<string, int> m_knownScenes;
 	
 	void Death() override;
 	bool GetLoot(GameObject& object) override;
