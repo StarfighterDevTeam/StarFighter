@@ -1,4 +1,4 @@
-#,filename,width,height,vspeed,Vertical/Horizontal,,
+#,filename,width,height,vspeed,Vertical/Horizontal,1,
 bg,Assets/2D/Backgrounds/BGVertical_1.png,1080,5400,75,V,,
 #,enemies_name,proba,enemy_class,Level,spawnCost,repeatChance,MissChance
 enemy,V_Alpha2,1,1,11,3,0.3f,0.30f

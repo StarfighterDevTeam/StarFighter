@@ -27,15 +27,15 @@ StellarNode::StellarNode()
 	m_coordinates = sf::Vector2f(0, 0);
 }
 
-StellarSegment::StellarSegment(bool vertical)
+StellarSegment::StellarSegment(bool vertical, float segment_size)
 {
-	sf::Vector2f size = vertical ? sf::Vector2f(STELLAR_SEGMENT_THICKNESS, STELLARMAP_SCALE) : sf::Vector2f(STELLARMAP_SCALE, STELLAR_SEGMENT_THICKNESS);
+	m_size_on_stellar_map = segment_size;
+	sf::Vector2f size = vertical ? sf::Vector2f(STELLAR_SEGMENT_THICKNESS, STELLARMAP_SCALE * segment_size) : sf::Vector2f(STELLARMAP_SCALE * segment_size, STELLAR_SEGMENT_THICKNESS);
 	setSize(size);
 	setOrigin(sf::Vector2f(getSize().x / 2, getSize().y / 2));
 	setFillColor(sf::Color::White);
 
 	m_coordinates = sf::Vector2f(0, 0);
-	m_size_on_stellar_map = 1;
 }
 
 StellarBranch::StellarBranch()
@@ -65,13 +65,6 @@ void StellarBranch::SetPosition(sf::Vector2f position)
 			m_nodes[i]->setPosition(sf::Vector2f(position.x + m_nodes[i]->m_coordinates.x * STELLARMAP_SCALE, position.y - m_nodes[i]->m_coordinates.y * STELLARMAP_SCALE));
 		}
 	}
-}
-
-void StellarBranch::Draw(sf::RenderTexture& screen)
-{
-	
-
-	
 }
 
 void StellarBranch::DrawHub(sf::RenderTexture& screen)
@@ -211,7 +204,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 			//create a new branch
 			StellarBranch* new_branch = new StellarBranch();
 			m_branches.push_back(new_branch);
-			printf("\n\nBranch created (from %s)\n", starting_scene.c_str());
+			//printf("\n\nBranch created (from %s)\n", starting_scene.c_str());
 
 			//start looping until reaching a hub (= branch ending)
 			vector<string> scenes_to_scan;
@@ -244,7 +237,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 					continue;
 				}
 				//Hub found?
-				printf("Scene scanned: %s (direction: %d)\n", links[direction].c_str(), direction);
+				//printf("Scene scanned: %s (direction: %d)\n", links[direction].c_str(), direction);
 				if (ScanScene(scene_filename, links[direction], (Directions)direction, starting_coordinates_))
 				{
 					//if hub is not known yet: SCAN-CEPTION: repeat process with this new hub, until we reached all known hubs
@@ -281,7 +274,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 						
 					}
 
-					printf("Segment created: %s\n", segment->m_display_name.c_str());
+					//printf("Segment created: %s\n", segment->m_display_name.c_str());
 
 					m_checked_scenes.push_back(links[direction]);
 					segment = NULL;
@@ -305,19 +298,13 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 			//case hub reached
 			if (hub)
 			{
-				//hud already known?
-				//if (UpdateCheckedHubs(scene))
-				//{
-					//element not found: create a new hub
-					StellarHub* new_hub = new StellarHub(scene);
-					new_hub->m_coordinates = starting_coordinates;
-					new_hub->m_display_name = scene;
-					m_branches.back()->m_hub = new_hub;
-					//m_checked_hubs.push_back(m_branches.back()->m_hub);
+				//create new hub
+				StellarHub* new_hub = new StellarHub(scene);
+				new_hub->m_coordinates = starting_coordinates;
+				new_hub->m_display_name = scene;
+				m_branches.back()->m_hub = new_hub;
 
-					printf("Hub created: %s\n", scene.c_str());
-					
-				//}
+				//printf("Hub created: %s\n", scene.c_str());
 
 				return true;
 			}
@@ -331,15 +318,16 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 					m_branches.back()->m_nodes.push_back(new_node);
 					new_node->m_coordinates = starting_coordinates;
 
-					printf("Node created\n");
+					//printf("Node created\n");
 				}
 
 				//create new segment
-				StellarSegment* new_segment = new StellarSegment(vertical);
+				float segment_size = atof((*it)[BACKGROUND_SIZE_ON_STELLARMAP].c_str());
+				StellarSegment* new_segment = new StellarSegment(vertical, segment_size);
 				m_branches.back()->m_segments.push_back(new_segment);
 				new_segment->m_display_name = scene;
 
-				//new_segment->m_size_on_stellar_map = atof((*it)[BACKGROUND_VERTICAL].c_str());
+				new_segment->m_size_on_stellar_map = segment_size;
 				new_segment->m_coordinates.x = starting_coordinates.x + ((direction == DIRECTION_RIGHT) - (direction == DIRECTION_LEFT)) * new_segment->m_size_on_stellar_map / 2;
 				new_segment->m_coordinates.y = starting_coordinates.y + ((direction == DIRECTION_UP) - (direction == DIRECTION_DOWN)) * new_segment->m_size_on_stellar_map / 2;
 
@@ -347,22 +335,6 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 			}
 		}
 	}
-}
-
-bool SFMapPanel::UpdateCheckedHubs(string new_hub)
-{
-	size_t checkedHubsVectorSize = m_checked_hubs.size();
-	for (size_t i = 0; i < checkedHubsVectorSize; i++)
-	{
-		//element found
-		if (m_checked_hubs[i]->m_display_name.compare(new_hub) == 0)
-		{
-			return false;
-		}
-	}
-
-	//element not found
-	return true;
 }
 
 

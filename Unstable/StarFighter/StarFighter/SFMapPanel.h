@@ -19,7 +19,7 @@ public:
 class StellarSegment : public sf::RectangleShape
 {
 public:
-	StellarSegment(bool vertical);
+	StellarSegment(bool vertical, float segment_size);
 	sf::Vector2f m_coordinates;
 	string m_display_name;
 	int m_max_hazard_unlocked;
@@ -44,7 +44,6 @@ public:
 	Directions m_direction;
 
 	void SetPosition(sf::Vector2f position);
-	void Draw(sf::RenderTexture& screen);
 	void DrawNodes(sf::RenderTexture& screen);
 	void DrawSegments(sf::RenderTexture& screen);
 	void DrawHub(sf::RenderTexture& screen);
@@ -69,11 +68,8 @@ public:
 	size_t m_scenesConfigSize;
 
 private:
-	vector<StellarHub*> m_checked_hubs;
 	vector <string> m_checked_scenes;
-
 	bool IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked);
-	bool UpdateCheckedHubs(string new_hub);
 };
 
 #endif // SFMAPPANEL_H_INCLUDED
