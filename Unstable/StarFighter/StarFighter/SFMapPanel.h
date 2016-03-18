@@ -70,6 +70,7 @@ public:
 private:
 	vector <string> m_checked_scenes;
 	bool IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked);
+	bool IsSceneKnownByThePlayer(string new_scene);
 };
 
 #endif // SFMAPPANEL_H_INCLUDED

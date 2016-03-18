@@ -200,6 +200,12 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				//scene has already been scanned, no need to created a new branch
 				continue;
 			}
+			//scene has been scouted by the player?
+			else if (!IsSceneKnownByThePlayer(links[direction]))
+			{
+				//scene is not known by the plauer
+				continue;
+			}
 
 			//create a new branch
 			StellarBranch* new_branch = new StellarBranch();
@@ -217,6 +223,11 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				if (IsSceneAlreadyChecked(links[direction],  false))
 				{
 					//scene has already been scanned
+					continue;
+				}
+				else if (!IsSceneKnownByThePlayer(links[direction]))
+				{
+					//scene is not known by the plauer
 					continue;
 				}
 
@@ -356,6 +367,16 @@ bool SFMapPanel::IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked
 		m_checked_scenes.push_back(new_scene);
 	}
 	return false;
+}
+
+bool SFMapPanel::IsSceneKnownByThePlayer(string new_scene)
+{
+	size_t knownScenesVectorSize = m_playerShip->m_knownScenes.size();
+
+	map<string, int>::iterator it = m_playerShip->m_knownScenes.find(new_scene);
+
+	//if scene not already known
+	return it != m_playerShip->m_knownScenes.end();
 }
 
 void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
