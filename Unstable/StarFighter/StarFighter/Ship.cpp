@@ -885,6 +885,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//Cursor movement
 			MoveCursor(m_SFPanel->GetCursor(), inputs_direction, deltaTime, m_SFPanel);
 
+			//Teleportation
+			if (m_SFPanel->GetTeleportationCost() > 0 && m_money >= m_SFPanel->GetTeleportationCost())
+			{
+				if (m_inputs_states[Action_Firing] == Input_Tap)
+				{
+					m_HUD_state = HUD_Idle;
+					Teleport(m_SFPanel->GetTeleportationDestination());
+					m_money -= m_SFPanel->GetTeleportationCost();
+				}
+			}
+
 			//exit
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
@@ -2730,4 +2741,9 @@ void Ship::ContinueDialog()
 		(*CurrentGame).m_end_dialog_clock.restart();
 	}
 	m_targetDialogs.erase(m_targetDialogs.begin());
+}
+
+void Ship::Teleport(string destination_name)
+{
+	//TODO
 }

@@ -211,6 +211,7 @@ public :
 	void GarbagingItem();
 	void SwappingItems();
 	void ContinueDialog();
+	void Teleport(string destination_name);
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;

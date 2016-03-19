@@ -66,10 +66,12 @@ public:
 class SFStellarInfoPanel : public SFPanel
 {
 public:
-	SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size);
-	SFStellarInfoPanel(StellarHub* hub, sf::Vector2f size);
-	SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size);
+	SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size, Ship* playerShip);
+	SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playerShip);
+	SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size, Ship* playerShip);
 	void Draw(sf::RenderTexture& screen) override;
+
+	GameObject m_arrow;
 };
 
 class SFMapPanel : public SFPanel
@@ -80,6 +82,8 @@ public:
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
 	GameObject* GetCursor() override;
+	int GetTeleportationCost() override;
+	string GetTeleportationDestination() override;
 
 	SFStellarInfoPanel* m_info_panel;
 	StellarHub* m_current_hub;
@@ -93,12 +97,15 @@ public:
 	size_t m_scenesConfigSize;
 
 	GameObject m_cursor;
+	int m_teleportation_cost;
+	string m_targeted_location;
 
 private:
 	vector <string> m_checked_scenes;
 	bool IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked);
 	bool IsSceneKnownByThePlayer(string new_scene);
 	int GetMaxHazardLevelUnlocked(string new_scene);
+	int ComputeTeleportationCost(StellarHub* destination);
 };
 
 #endif // SFMAPPANEL_H_INCLUDED

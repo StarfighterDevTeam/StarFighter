@@ -49,6 +49,8 @@ public:
 	virtual int GetFocusedGrid();
 	virtual bool GetPrioritaryFeedback();
 	virtual void SetPrioritaryFeedback(bool has_priotiary_feedback);
+	virtual int GetTeleportationCost();
+	virtual string GetTeleportationDestination();
 	
 	virtual Dialog* GetDialog();
 

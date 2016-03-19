@@ -125,6 +125,18 @@ void SFPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
 	//see override function in SFMenuPanel and other types of SF panels
 }
 
+int SFPanel::GetTeleportationCost()
+{
+	return -1;
+	//see override function in SFMapPanel and other types of SF panels
+}
+
+string SFPanel::GetTeleportationDestination()
+{
+	return "";
+	//see override function in SFMapPanel and other types of SF panels
+}
+
 Dialog* SFPanel::GetDialog()
 {
 	return NULL;

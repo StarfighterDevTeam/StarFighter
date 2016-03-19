@@ -145,8 +145,10 @@ void StellarBranch::DrawSegments(sf::RenderTexture& screen)
 }
 
 //STELLAR INFO PANEL
-SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size) : SFPanel(size, SFPanel_MapInfo)
+SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_MapInfo)
 {
+	m_playerShip = playerShip;
+
 	setSize(size);
 	setOrigin(size.x / 2, size.y / 2);
 	setFillColor(sf::Color(20, 20, 20, 230));//dark grey
@@ -157,23 +159,49 @@ SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size)
 	m_title_text.setCharacterSize(18);
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-
 }
 
-SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, sf::Vector2f size) : SFStellarInfoPanel(hub->getPosition(), size)
+SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playerShip) : SFStellarInfoPanel(hub->getPosition(), size, playerShip)
 {
 	if (hub)
 	{
+		m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
+			sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
+
 		//text content
 		m_title_text.setString(hub->m_display_name.c_str());
 
+		bool teleportation_available = teleportation_cost > 0;
+		ostringstream ss;
+		if (teleportation_available)
+		{
+			ss << "Teleportation: $" << teleportation_cost;
+			if (playerShip->m_money < teleportation_cost)
+			{
+				m_text.setColor(sf::Color(80, 80, 80, 255));//greyed
+				ss << " (insufficient credits)";
+			}
+		}
+		else
+		{
+			ss << "Current location";
+		}
+		m_text.setString(ss.str());
+		
 		float text_height = 0;
 		text_height += m_title_text.getGlobalBounds().height / 2;
-		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x * teleportation_available, getPosition().y - getSize().y / 2 + text_height);
+
+		text_height += m_title_text.getGlobalBounds().height + INTERACTION_INTERLINE;
+		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x * teleportation_available, getPosition().y - getSize().y / 2 + text_height);
+
+		text_height += m_text.getGlobalBounds().height / 2;
+		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - getSize().x / 2, m_text.getPosition().y + m_text.getCharacterSize() / 2 + 3);//+3 because fuck this, I can't get it positionned properly
+		m_arrow.m_visible = teleportation_available;
 	}
 }
 
-SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size) : SFStellarInfoPanel(segment->getPosition(), size)
+SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size, Ship* playerShip) : SFStellarInfoPanel(segment->getPosition(), size, playerShip)
 {
 	if (segment)
 	{
@@ -184,6 +212,7 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f siz
 		ss << "Hazard level unlocked: " << segment->m_max_hazard_unlocked + 1 << " / " << NB_HAZARD_LEVELS;
 		m_text.setString(ss.str());
 
+		m_arrow.m_visible = false;
 
 		//text position
 		float text_height = 0;
@@ -203,6 +232,11 @@ void SFStellarInfoPanel::Draw(sf::RenderTexture& screen)
 
 		screen.draw(m_title_text);
 		screen.draw(m_text);
+
+		if (m_arrow.m_visible)
+		{
+			screen.draw(m_arrow);
+		}
 	}
 }
 
@@ -211,6 +245,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 {
 	m_playerShip = playerShip;
 	m_info_panel = NULL;
+	m_teleportation_cost = 0;
 
 	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
@@ -277,7 +312,9 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 							{
 								delete m_info_panel;
 							}
-							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y));
+							m_teleportation_cost = ComputeTeleportationCost(m_branches[i]->m_hub);
+							m_targeted_location = m_branches[i]->m_hub->m_display_name;
+							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, m_teleportation_cost, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 						}
 					}
 					else
@@ -304,7 +341,8 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 							{
 								delete m_info_panel;
 							}
-							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y));
+							m_targeted_location = m_branches[i]->m_segments[j]->m_display_name;
+							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 						}
 					}
 					else
@@ -333,6 +371,8 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		{
 			delete m_info_panel;
 			m_info_panel = NULL;
+			m_teleportation_cost = 0;
+			m_targeted_location = "";
 		}
 	}
 }
@@ -375,6 +415,26 @@ GameObject* SFMapPanel::GetCursor()
 	return &m_cursor;
 }
 
+int SFMapPanel::GetTeleportationCost()
+{
+	if (!m_info_panel)
+	{
+		return -1;
+	}
+
+	return m_teleportation_cost;
+}
+
+string SFMapPanel::GetTeleportationDestination()
+{
+	if (!m_info_panel)
+	{
+		return "";
+	}
+
+	return m_targeted_location;
+}
+
 void SFMapPanel::UpdateBranchesPosition()
 {
 	if (!m_branches.empty())
@@ -384,6 +444,23 @@ void SFMapPanel::UpdateBranchesPosition()
 		{
 			m_branches[i]->SetPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
 		}
+	}
+}
+
+int SFMapPanel::ComputeTeleportationCost(StellarHub* destination)
+{
+	if (destination && m_current_hub)
+	{
+		int diff_x = m_current_hub->m_coordinates.x - destination->m_coordinates.x;
+		int diff_y = m_current_hub->m_coordinates.y - destination->m_coordinates.y;
+
+		int cost = (diff_x + diff_y) * (diff_x + diff_y) * STELLARMAP_TELEPORTATION_COST;//exponential cost: distance as the crow flies ^4)
+
+		return cost;
+	}
+	else
+	{
+		return -1;
 	}
 }
 
