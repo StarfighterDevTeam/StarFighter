@@ -879,12 +879,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_HUD_SFPanel->GetCursor()->m_visible = false;
 			}
 		}
+		//STELLAR MAP
 		else if (m_HUD_state == HUD_ShopStellarMap)
 		{
-				//exit
+			//Cursor movement
+			MoveCursor(m_SFPanel->GetCursor(), inputs_direction, deltaTime, m_SFPanel);
+
+			//exit
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
+				m_SFPanel->GetCursor()->m_visible = true;
 			}
 		}
 		else
@@ -1024,6 +1029,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						case ShopStellarMap:
 						{
 							m_HUD_state = HUD_ShopStellarMap;
+							break;
 						}
 					}
 				}

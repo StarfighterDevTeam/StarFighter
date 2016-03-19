@@ -5,12 +5,13 @@ extern Game* CurrentGame;
 //COMPONENTS
 StellarHub::StellarHub()
 {
-	setSize(sf::Vector2f(16, 16));
+	setSize(sf::Vector2f(24, 24));
 	setOrigin(sf::Vector2f(getSize().x / 2, getSize().y / 2));
 	setFillColor(sf::Color::Red);
 
 	m_distance_to_current_position = 0;
 	m_coordinates = sf::Vector2f(0, 0);
+	m_feedback_state = StellarComponent_NormalState;
 }
 
 StellarHub::StellarHub(string hub_name) : StellarHub()
@@ -18,13 +19,34 @@ StellarHub::StellarHub(string hub_name) : StellarHub()
 	m_display_name = hub_name;
 }
 
+bool StellarHub::Update(GameObject& cursor, bool forbid_collision)
+{
+	bool cursor_colliding = SFPanel::IsCursorCollidingWithRectangle(cursor, *this);
+	if (cursor_colliding && !forbid_collision)
+	{
+		if (m_feedback_state != StellarComponent_HighlightState)
+		{
+			m_feedback_state = StellarComponent_HighlightState;
+			setFillColor(sf::Color::Yellow);
+		}
+	}
+	else if (m_feedback_state != StellarComponent_NormalState)
+	{
+		m_feedback_state = StellarComponent_NormalState;
+		setFillColor(sf::Color::Red);
+	}
+
+	return cursor_colliding && !forbid_collision;
+}
+
 StellarNode::StellarNode()
 {
 	setRadius(4);
 	setOrigin(sf::Vector2f(getRadius(), getRadius()));
-	setFillColor(sf::Color::Red);
+	setFillColor(sf::Color(120, 120, 255, 255));//blue-grey
 
 	m_coordinates = sf::Vector2f(0, 0);
+	m_feedback_state = StellarComponent_NormalState;
 }
 
 StellarSegment::StellarSegment(bool vertical, float segment_size)
@@ -36,6 +58,28 @@ StellarSegment::StellarSegment(bool vertical, float segment_size)
 	setFillColor(sf::Color::White);
 
 	m_coordinates = sf::Vector2f(0, 0);
+	m_feedback_state = StellarComponent_NormalState;
+}
+
+bool StellarSegment::Update(GameObject& cursor, bool forbid_collision)
+{
+	bool cursor_colliding = SFPanel::IsCursorCollidingWithRectangle(cursor, *this);
+
+	if (cursor_colliding && !forbid_collision)
+	{
+		if (m_feedback_state != StellarComponent_HighlightState)
+		{
+			m_feedback_state = StellarComponent_HighlightState;
+			setFillColor(sf::Color::Yellow);
+		}
+	}
+	else if (m_feedback_state != StellarComponent_NormalState)
+	{
+		m_feedback_state = StellarComponent_NormalState;
+		setFillColor(sf::Color::White);
+	}
+
+	return cursor_colliding && !forbid_collision;
 }
 
 StellarBranch::StellarBranch()
@@ -104,6 +148,10 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 {
 	m_playerShip = playerShip;
 
+	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
+		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
+	m_cursor.setPosition(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2);
+
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	setOutlineThickness(2);
@@ -138,6 +186,84 @@ SFMapPanel::~SFMapPanel()
 	
 }
 
+void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
+{
+	//check collisions, with priority on hubs over segments, and only chose one element to highlight
+	if (!m_branches.empty())
+	{
+		bool already_colllided_with_a_hub = false;
+		bool already_colllided_with_a_segment = false;
+
+		if (!m_branches.empty())
+		{
+			size_t branchesVectorSize = m_branches.size();
+
+			for (size_t i = 0; i < branchesVectorSize; i++)
+			{
+				//flag if we have already collided with a hub
+				if (!already_colllided_with_a_hub)
+				{
+					already_colllided_with_a_hub = m_branches[i]->m_hub->Update(m_cursor, false);
+				}
+				else
+				{
+					m_branches[i]->m_hub->Update(m_cursor, true);
+				}
+			}
+			
+			for (size_t i = 0; i < branchesVectorSize; i++)
+			{
+				size_t segmentsVectorSize = m_branches[i]->m_segments.size();
+				for (size_t j = 0; j < segmentsVectorSize; j++)
+				{
+					//flag if we have already collided with a segment
+					if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
+					{
+						already_colllided_with_a_segment = m_branches[i]->m_segments[j]->Update(m_cursor, false);
+					}
+					else
+					{
+						m_branches[i]->m_segments[j]->Update(m_cursor, true);
+					}
+				}
+			}
+		}
+	}
+}
+
+void SFMapPanel::Draw(sf::RenderTexture& screen)
+{
+	if (m_visible)
+	{
+		SFPanel::Draw(screen);
+		//screen.draw(m_title_text);
+
+		//specific content to be drawn on a separate RenderTexture
+		if (!m_branches.empty())
+		{
+			size_t branchesVectorSize = m_branches.size();
+			for (size_t i = 0; i < branchesVectorSize; i++)
+			{
+				//m_branches[i]->Draw(screen);
+				m_branches[i]->DrawSegments(screen);
+			}
+			for (size_t i = 0; i < branchesVectorSize; i++)
+			{
+				//m_branches[i]->Draw(screen);
+				m_branches[i]->DrawNodes(screen);
+				m_branches[i]->DrawHub(screen);
+			}
+		}
+
+		screen.draw(m_cursor);
+	}
+}
+
+GameObject* SFMapPanel::GetCursor()
+{
+	return &m_cursor;
+}
+
 void SFMapPanel::UpdateBranchesPosition()
 {
 	if (!m_branches.empty())
@@ -157,7 +283,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 		printf("ERROR: <!> loading an empty stellar hub or with an empty name, in SFMapPanel::ScanBranches().\n");
 		return;
 	}
-	
+
 	//scene already checked?
 	if (IsSceneAlreadyChecked(starting_scene, true))
 	{
@@ -220,7 +346,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				links[direction] = scenes_to_scan.front();//update loop to match currently scanned segment
 				scenes_to_scan.clear();
 				//scene already checked?
-				if (IsSceneAlreadyChecked(links[direction],  false))
+				if (IsSceneAlreadyChecked(links[direction], false))
 				{
 					//scene has already been scanned
 					continue;
@@ -282,7 +408,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 					{
 						//segment->m_display_name = links[direction];
 						scenes_to_scan.push_back(next_scene_name);
-						
+
 					}
 
 					//printf("Segment created: %s\n", segment->m_display_name.c_str());
@@ -292,7 +418,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				}
 			}
 		}
-	}		
+	}
 }
 
 bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direction, sf::Vector2f starting_coordinates)
@@ -348,7 +474,6 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 	}
 }
 
-
 bool SFMapPanel::IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked)
 {
 	size_t checkedScenesVectorSize = m_checked_scenes.size();
@@ -377,35 +502,4 @@ bool SFMapPanel::IsSceneKnownByThePlayer(string new_scene)
 
 	//if scene not already known
 	return it != m_playerShip->m_knownScenes.end();
-}
-
-void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
-{
-
-}
-
-void SFMapPanel::Draw(sf::RenderTexture& screen)
-{
-	if (m_visible)
-	{
-		SFPanel::Draw(screen);
-		//screen.draw(m_title_text);
-
-		//specific content to be drawn on a separate RenderTexture
-		if (!m_branches.empty())
-		{
-			size_t branchesVectorSize = m_branches.size();
-			for (size_t i = 0; i < branchesVectorSize; i++)
-			{
-				//m_branches[i]->Draw(screen);
-				m_branches[i]->DrawSegments(screen);
-			}
-			for (size_t i = 0; i < branchesVectorSize; i++)
-			{
-				//m_branches[i]->Draw(screen);
-				m_branches[i]->DrawNodes(screen);
-				m_branches[i]->DrawHub(screen);
-			}
-		}
-	}
 }

@@ -35,6 +35,19 @@ SFPanel::~SFPanel()
 	m_playerShip = NULL;
 }
 
+
+bool SFPanel::IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object)
+{
+	if (!cursor.m_visible)
+	{
+		return false;
+	}
+
+	sf::IntRect boundsA(SimpleCollision::FToIRect(object.getGlobalBounds()));
+	sf::IntRect boundsB(SimpleCollision::FToIRect(cursor.getGlobalBounds()));
+	return boundsA.intersects(boundsB);
+}
+
 void SFPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//see override function in SFMenuPanel and other types of SF panels

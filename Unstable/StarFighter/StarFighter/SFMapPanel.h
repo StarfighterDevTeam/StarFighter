@@ -6,6 +6,12 @@
 #define STELLARMAP_SCALE			70
 #define STELLAR_SEGMENT_THICKNESS	4
 
+enum StellarComponentStates
+{
+	StellarComponent_NormalState,
+	StellarComponent_HighlightState,
+};
+
 class StellarHub : public sf::RectangleShape
 {
 public:
@@ -14,6 +20,9 @@ public:
 	sf::Vector2f m_coordinates;
 	string m_display_name;
 	float m_distance_to_current_position;
+	StellarComponentStates m_feedback_state;
+
+	bool Update(GameObject& cursor, bool forbid_collision);
 };
 
 class StellarSegment : public sf::RectangleShape
@@ -24,6 +33,9 @@ public:
 	string m_display_name;
 	int m_max_hazard_unlocked;
 	float m_size_on_stellar_map;
+	StellarComponentStates m_feedback_state;
+
+	bool Update(GameObject& cursor, bool forbid_collision);
 };
 
 class StellarNode : public sf::CircleShape
@@ -31,6 +43,7 @@ class StellarNode : public sf::CircleShape
 public:
 	StellarNode();
 	sf::Vector2f m_coordinates;
+	StellarComponentStates m_feedback_state;
 };
 
 class StellarBranch
@@ -56,6 +69,7 @@ public:
 	~SFMapPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
+	GameObject* GetCursor() override;
 
 	StellarHub* m_current_hub;
 	vector<StellarBranch*> m_branches;
@@ -66,6 +80,8 @@ public:
 
 	vector<vector<string>> m_scenesConfig;
 	size_t m_scenesConfigSize;
+
+	GameObject m_cursor;
 
 private:
 	vector <string> m_checked_scenes;

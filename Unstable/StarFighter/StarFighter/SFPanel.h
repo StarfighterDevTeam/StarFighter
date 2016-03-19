@@ -2,6 +2,7 @@
 #define SFPANEL_H_INCLUDED
 
 #include "HudGrid.h"
+#include "Includes/SimpleCollision.hpp"
 
 class Ship;
 class Dialog;
@@ -27,6 +28,7 @@ public:
 	~SFPanel();
 	virtual void Update(sf::Time deltaTime, sf::Vector2f inputs_directions);
 	virtual void Draw(sf::RenderTexture& screen);
+	static bool IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object);
 	
 	sf::Text m_title_text;
 	sf::Text m_text;
