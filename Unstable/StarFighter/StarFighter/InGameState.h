@@ -26,7 +26,7 @@ public:
 	void Update(Time deltaTime);
 	void Draw();
 	void Release();
-	int SavePlayer(string file, Ship* playerShip = (*CurrentGame).playerShip);
+	int SavePlayer(string file, bool save_position, Ship* playerShip = (*CurrentGame).playerShip);
 	string LoadPlayerSave(string file, Ship* playerShip = (*CurrentGame).playerShip);
 	bool AddToKnownScenes(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
 	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip = (*CurrentGame).playerShip);

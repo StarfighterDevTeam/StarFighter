@@ -58,7 +58,7 @@ void InGameState::Initialize(Player player)
 		//New game save
 		player.m_currentSceneFile = "Vanguard_Hub0";
 		AddToKnownScenes(player.m_currentSceneFile);
-		SavePlayer(PLAYER_SAVE_FILE);
+		SavePlayer(PLAYER_SAVE_FILE, true);
 	}
 	m_currentSceneSave = player.m_currentSceneFile;
 
@@ -207,7 +207,7 @@ int InGameState::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip
 	return 0;
 }
 
-int InGameState::SavePlayer(string file, Ship* playerShip)
+int InGameState::SavePlayer(string file, bool save_position, Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -223,7 +223,7 @@ int InGameState::SavePlayer(string file, Ship* playerShip)
 		for (map<string, int>::iterator it = playerShip->m_knownScenes.begin(); it != playerShip->m_knownScenes.end(); it++)
 		{
 			data << it->first.c_str() << " " << it->second;
-			if (it->first.c_str() == m_currentSceneSave)
+			if (it->first.c_str() == m_currentSceneSave && save_position)
 			{
 				data << " " << "!";
 			}
@@ -527,8 +527,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				AddToKnownScenes(m_currentScene->m_name);
 				if (m_currentScene->m_direction == Directions::NO_DIRECTION)
 				{
-					SavePlayer(PLAYER_SAVE_FILE);
+					SavePlayer(PLAYER_SAVE_FILE, true);
 					m_playerShip->m_respawnSceneName = m_currentScene->m_name;
+				}
+				else
+				{
+					SavePlayer(PLAYER_SAVE_FILE, false);
 				}
 
 				//Giving control back to the player

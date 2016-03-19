@@ -11,5 +11,6 @@ Vanguard_V1 2
 Vanguard_V2 2
 Vanguard_V3 1
 Vanguard_V4 1
+Vanguard_V5 0
 Vanguard_V8 1
 Vanguard_V9 1
