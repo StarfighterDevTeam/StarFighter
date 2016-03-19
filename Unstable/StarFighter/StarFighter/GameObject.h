@@ -111,9 +111,9 @@ public:
 	static int GaussianBlurDistribution(int x);
 
 protected:
-	sf::Vector2f initial_position;
-	Animation defaultAnimation;
-	Animation* currentAnimation;
+	sf::Vector2f m_initial_position;
+	Animation m_defaultAnimation;
+	Animation* m_currentAnimation;
 
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
 	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber = 1);

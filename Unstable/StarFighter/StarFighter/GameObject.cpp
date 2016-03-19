@@ -29,6 +29,12 @@ GameObject::GameObject()
 
 void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
+	//are we already playing this animation?
+	if (m_currentAnimationIndex == animation && (keep_frame_index || m_currentAnimation->getSize() == 1))
+	{
+		return;
+	}
+
 	//bulletproof verifications
 	if (animation >= this->m_animationNumber)
 	{
@@ -42,22 +48,22 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 
 	//now let's load the new animation
 	Animation* anim = new Animation();
-	anim->setSpriteSheet(*this->defaultAnimation.getSpriteSheet());
-	for (size_t j = 0; j < this->defaultAnimation.getSize(); j++)
+	anim->setSpriteSheet(*this->m_defaultAnimation.getSpriteSheet());
+	for (size_t j = 0; j < this->m_defaultAnimation.getSize(); j++)
 	{
 		size_t n = j / this->m_frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
 		if (n == animation)
 		{
-			anim->addFrame(this->defaultAnimation.getFrame(j));
+			anim->addFrame(this->m_defaultAnimation.getFrame(j));
 		}
 	}
 
-	if (currentAnimation)
-		delete currentAnimation;
-	this->currentAnimation = anim;
+	if (m_currentAnimation)
+		delete m_currentAnimation;
+	this->m_currentAnimation = anim;
 	anim = NULL;
-	this->play(*currentAnimation, keep_frame_index);
+	this->play(*m_currentAnimation, keep_frame_index);
 	this->m_currentAnimationIndex = animation;
 }
 
@@ -65,23 +71,23 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 {
 	this->m_animationNumber = animationNumber;
 	this->m_frameNumber = frameNumber;
-	this->initial_position = sf::Vector2f(position.x, position.y);
+	this->m_initial_position = sf::Vector2f(position.x, position.y);
 	this->m_size.x = ((*texture).getSize().x / frameNumber);
 	this->m_size.y = ((*texture).getSize().y / animationNumber);
 
 	this->m_collider_type = GameObjectType::BackgroundObject;
-	this->defaultAnimation.setSpriteSheet(*texture);
+	this->m_defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < animationNumber; j++)
 	{
 		for (int i = 0; i < frameNumber; i++)
 		{
 			int x = ((*texture).getSize().x / frameNumber)*(i);
 			int y = ((*texture).getSize().y / animationNumber)*(j);
-			this->defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
+			this->m_defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
 		}
 	}
 	
-	this->currentAnimation = NULL;
+	this->m_currentAnimation = NULL;
 	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
 	this->speed = speed;
