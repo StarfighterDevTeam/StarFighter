@@ -316,6 +316,16 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		}
 	}
 
+	//Update cursor state
+	if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
+	{
+		m_cursor.setAnimationLine(Cursor_NormalState);
+	}
+	else
+	{
+		m_cursor.setAnimationLine(Cursor_HighlightState);
+	}
+
 	//Delete stellar map info panel if not needed anymore
 	if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
 	{

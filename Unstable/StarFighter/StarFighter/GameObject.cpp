@@ -29,6 +29,12 @@ GameObject::GameObject()
 
 void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
+	//are we already playing this animation?
+	if (m_currentAnimationIndex == animation && (keep_frame_index || m_currentAnimation->getSize() == 1))
+	{
+		return;
+	}
+
 	//bulletproof verifications
 	if (animation >= m_animationNumber)
 	{

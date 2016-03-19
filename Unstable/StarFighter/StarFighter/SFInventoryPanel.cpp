@@ -766,12 +766,12 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ostringstream ss_life;
 	ss_life << m_playerShip->m_armor;// << " / " << armor_max;
 	m_life_text.setString(ss_life.str());
-	m_life_text.setPosition(m_armorBar.getPosition().x + m_armorBar.getSize().x / 2, m_armorBar.getPosition().y + m_life_text.getGlobalBounds().height / 2);
+	m_life_text.setPosition(m_armorBar.getPosition().x + m_armorBar.getSize().x / 2 - m_life_text.getGlobalBounds().width/2, m_armorBar.getPosition().y + m_life_text.getGlobalBounds().height / 2);
 
 	ostringstream ss_shield;
 	ss_shield << m_playerShip->m_shield;// << " / " << shield_max;
 	m_shield_text.setString(ss_shield.str());
-	m_shield_text.setPosition(m_shieldBar.getPosition().x + m_shieldBar.getSize().x / 2, m_shieldBar.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
+	m_shield_text.setPosition(m_shieldBar.getPosition().x + m_shieldBar.getSize().x / 2 - m_shield_text.getGlobalBounds().width / 2, m_shieldBar.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
 
 	//level
 	ostringstream ss_slash;
