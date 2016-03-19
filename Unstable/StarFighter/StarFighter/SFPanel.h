@@ -18,6 +18,7 @@ enum SFPanelTypes
 	SFPanel_Dialog,
 	SFPanel_DialogNext,
 	SFPanel_Map,
+	SFPanel_MapInfo,
 };
 
 class SFPanel : public sf::RectangleShape

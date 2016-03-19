@@ -59,6 +59,7 @@ StellarSegment::StellarSegment(bool vertical, float segment_size)
 
 	m_coordinates = sf::Vector2f(0, 0);
 	m_feedback_state = StellarComponent_NormalState;
+	m_max_hazard_unlocked = HAZARD_LEVEL_1 + 1;
 }
 
 bool StellarSegment::Update(GameObject& cursor, bool forbid_collision)
@@ -143,10 +144,73 @@ void StellarBranch::DrawSegments(sf::RenderTexture& screen)
 	}
 }
 
+//STELLAR INFO PANEL
+SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size) : SFPanel(size, SFPanel_MapInfo)
+{
+	setSize(size);
+	setOrigin(size.x / 2, size.y / 2);
+	setFillColor(sf::Color(20, 20, 20, 230));//dark grey
+	setOutlineThickness(0);
+	setPosition(sf::Vector2f(position.x + size.x / 2 + STELLARMAP_INFO_PANEL_POSITION_X, position.y + STELLARMAP_INFO_PANEL_POSITION_Y));
+
+	//texts
+	m_title_text.setCharacterSize(18);
+	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+
+}
+
+SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, sf::Vector2f size) : SFStellarInfoPanel(hub->getPosition(), size)
+{
+	if (hub)
+	{
+		//text content
+		m_title_text.setString(hub->m_display_name.c_str());
+
+		float text_height = 0;
+		text_height += m_title_text.getGlobalBounds().height / 2;
+		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+	}
+}
+
+SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size) : SFStellarInfoPanel(segment->getPosition(), size)
+{
+	if (segment)
+	{
+		//text content
+		m_title_text.setString(segment->m_display_name.c_str());
+
+		ostringstream ss;
+		ss << "Hazard level unlocked: " << segment->m_max_hazard_unlocked + 1 << " / " << NB_HAZARD_LEVELS;
+		m_text.setString(ss.str());
+
+
+		//text position
+		float text_height = 0;
+		text_height += m_title_text.getGlobalBounds().height / 2;
+		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+
+		text_height += m_title_text.getCharacterSize() + INTERACTION_INTERLINE;
+		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+	}
+}
+
+void SFStellarInfoPanel::Draw(sf::RenderTexture& screen)
+{
+	if (m_visible)
+	{
+		SFPanel::Draw(screen);
+
+		screen.draw(m_title_text);
+		screen.draw(m_text);
+	}
+}
+
 //MAP PANEL
 SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_Map)
 {
 	m_playerShip = playerShip;
+	m_info_panel = NULL;
 
 	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
@@ -189,25 +253,37 @@ SFMapPanel::~SFMapPanel()
 void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//check collisions, with priority on hubs over segments, and only chose one element to highlight
+	bool already_colllided_with_a_hub = false;
+	bool already_colllided_with_a_segment = false;
+
 	if (!m_branches.empty())
 	{
-		bool already_colllided_with_a_hub = false;
-		bool already_colllided_with_a_segment = false;
-
 		if (!m_branches.empty())
 		{
 			size_t branchesVectorSize = m_branches.size();
-
 			for (size_t i = 0; i < branchesVectorSize; i++)
 			{
-				//flag if we have already collided with a hub
-				if (!already_colllided_with_a_hub)
+				if (m_branches[i]->m_hub)
 				{
-					already_colllided_with_a_hub = m_branches[i]->m_hub->Update(m_cursor, false);
-				}
-				else
-				{
-					m_branches[i]->m_hub->Update(m_cursor, true);
+					//flag if we have already collided with a hub
+					if (!already_colllided_with_a_hub)
+					{
+						already_colllided_with_a_hub = m_branches[i]->m_hub->Update(m_cursor, false);
+						//create info panel
+						if (already_colllided_with_a_hub)
+						{
+							//delete old panel if existing
+							if (m_info_panel)
+							{
+								delete m_info_panel;
+							}
+							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y));
+						}
+					}
+					else
+					{
+						m_branches[i]->m_hub->Update(m_cursor, true);
+					}
 				}
 			}
 			
@@ -220,6 +296,16 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 					if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
 					{
 						already_colllided_with_a_segment = m_branches[i]->m_segments[j]->Update(m_cursor, false);
+						//create info panel
+						if (already_colllided_with_a_segment)
+						{
+							//delete old panel if existing
+							if (m_info_panel)
+							{
+								delete m_info_panel;
+							}
+							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y));
+						}
 					}
 					else
 					{
@@ -227,6 +313,16 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 					}
 				}
 			}
+		}
+	}
+
+	//Delete stellar map info panel if not needed anymore
+	if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
+	{
+		if (m_info_panel)
+		{
+			delete m_info_panel;
+			m_info_panel = NULL;
 		}
 	}
 }
@@ -256,6 +352,11 @@ void SFMapPanel::Draw(sf::RenderTexture& screen)
 		}
 
 		screen.draw(m_cursor);
+
+		if (m_info_panel)
+		{
+			m_info_panel->Draw(screen);
+		}
 	}
 }
 
@@ -468,6 +569,8 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 				new_segment->m_coordinates.x = starting_coordinates.x + ((direction == DIRECTION_RIGHT) - (direction == DIRECTION_LEFT)) * new_segment->m_size_on_stellar_map / 2;
 				new_segment->m_coordinates.y = starting_coordinates.y + ((direction == DIRECTION_UP) - (direction == DIRECTION_DOWN)) * new_segment->m_size_on_stellar_map / 2;
 
+				new_segment->m_max_hazard_unlocked = GetMaxHazardLevelUnlocked(scene);
+
 				return false;
 			}
 		}
@@ -502,4 +605,21 @@ bool SFMapPanel::IsSceneKnownByThePlayer(string new_scene)
 
 	//if scene not already known
 	return it != m_playerShip->m_knownScenes.end();
+}
+
+int SFMapPanel::GetMaxHazardLevelUnlocked(string new_scene)
+{
+	size_t knownScenesVectorSize = m_playerShip->m_knownScenes.size();
+
+	map<string, int>::iterator it = m_playerShip->m_knownScenes.find(new_scene);
+
+	//if scene not already known
+	if (it != m_playerShip->m_knownScenes.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		return -1;
+	}
 }

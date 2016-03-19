@@ -62,6 +62,16 @@ public:
 	void DrawHub(sf::RenderTexture& screen);
 };
 
+
+class SFStellarInfoPanel : public SFPanel
+{
+public:
+	SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size);
+	SFStellarInfoPanel(StellarHub* hub, sf::Vector2f size);
+	SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size);
+	void Draw(sf::RenderTexture& screen) override;
+};
+
 class SFMapPanel : public SFPanel
 {
 public:
@@ -71,6 +81,7 @@ public:
 	void Draw(sf::RenderTexture& screen) override;
 	GameObject* GetCursor() override;
 
+	SFStellarInfoPanel* m_info_panel;
 	StellarHub* m_current_hub;
 	vector<StellarBranch*> m_branches;
 
@@ -87,6 +98,7 @@ private:
 	vector <string> m_checked_scenes;
 	bool IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked);
 	bool IsSceneKnownByThePlayer(string new_scene);
+	int GetMaxHazardLevelUnlocked(string new_scene);
 };
 
 #endif // SFMAPPANEL_H_INCLUDED
