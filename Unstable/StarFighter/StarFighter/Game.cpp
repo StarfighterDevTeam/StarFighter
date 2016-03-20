@@ -163,19 +163,7 @@ void Game::drawScene()
 {
 	m_mainScreen.clear();
 
-	//adding black stripes on the left and right
 	float black_stripe = (REF_WINDOW_RESOLUTION_X - (SCENE_SIZE_X * 4.0f / 3)) / 2;
-	sf::RectangleShape blackStripeLeft, blackStripeRight;
-	blackStripeLeft.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
-	blackStripeRight.setSize(sf::Vector2f(m_scale_factor.x * black_stripe, m_scale_factor.y * REF_WINDOW_RESOLUTION_Y));
-	blackStripeLeft.setFillColor(sf::Color(0, 0, 0, 255));
-	blackStripeRight.setFillColor(sf::Color(0, 0, 0, 255));
-	blackStripeLeft.setOrigin(0, 0);
-	blackStripeRight.setOrigin(0, 0);
-	blackStripeLeft.setPosition(0, 0);
-	blackStripeRight.setPosition(sf::Vector2f(m_scale_factor.x * (REF_WINDOW_RESOLUTION_X - black_stripe), 0));
-	m_window->draw(blackStripeLeft);
-	m_window->draw(blackStripeRight);
 
 	//drawing stuff
 	for (int i = 0; i < NBVAL_Layer; i++)
@@ -190,6 +178,22 @@ void Game::drawScene()
 			{
 				m_mainScreen.draw(*(*it));
 			}
+		}
+		else if (i == BlackStripesLayer)
+		{
+			//adding black stripes on the left and right
+			
+			sf::RectangleShape blackStripeRight;// , blackStripeLeft;
+			//blackStripeLeft.setSize(sf::Vector2f(black_stripe, REF_WINDOW_RESOLUTION_Y));
+			blackStripeRight.setSize(sf::Vector2f(black_stripe, REF_WINDOW_RESOLUTION_Y));
+			//blackStripeLeft.setFillColor(sf::Color(0, 0, 0, 255));
+			blackStripeRight.setFillColor(sf::Color(0, 0, 0, 255));
+			//blackStripeLeft.setOrigin(0, 0);
+			blackStripeRight.setOrigin(0, 0);
+			//blackStripeLeft.setPosition(200, 0);
+			blackStripeRight.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - 2*black_stripe, 0));
+			//m_mainScreen.draw(blackStripeLeft);
+			m_mainScreen.draw(blackStripeRight);
 		}
 		else if (i == PanelLayer)
 		{

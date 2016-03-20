@@ -58,13 +58,14 @@ void InGameState::Initialize(Player player)
 		//New game save
 		player.m_currentSceneFile = "Vanguard_Hub0";
 		AddToKnownScenes(player.m_currentSceneFile);
-		SavePlayer(PLAYER_SAVE_FILE, true);
+		SavePlayer(PLAYER_SAVE_FILE);
 	}
-	m_currentSceneSave = player.m_currentSceneFile;
+
+	m_playerShip->m_currentScene_name = player.m_currentSceneFile;
 	m_currentScene = NULL;
 
 	//Loading current scene
-	SpawnInScene(m_currentSceneSave);
+	SpawnInScene(m_playerShip->m_currentScene_name);
 
 	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
 	{
@@ -148,7 +149,7 @@ bool InGameState::AddToKnownScenes(string scene_name, Ship* playerShip)
 		return false;
 	}
 
-	m_currentSceneSave = scene_name;
+	playerShip->m_currentScene_name = scene_name;
 	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene_name);
 
 	//if scene not already known
@@ -198,7 +199,7 @@ int InGameState::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip
 	return 0;
 }
 
-int InGameState::SavePlayer(string file, bool save_position, Ship* playerShip)
+int InGameState::SavePlayer(string file, Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -214,7 +215,7 @@ int InGameState::SavePlayer(string file, bool save_position, Ship* playerShip)
 		for (map<string, int>::iterator it = playerShip->m_knownScenes.begin(); it != playerShip->m_knownScenes.end(); it++)
 		{
 			data << it->first.c_str() << " " << it->second;
-			if (it->first.c_str() == m_currentSceneSave && save_position)
+			if (it->first.c_str() == playerShip->m_respawnSceneName)
 			{
 				data << " " << "!";
 			}
@@ -511,8 +512,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene = m_nextScene;
 				m_nextScene = NULL;
 				(*CurrentGame).m_direction = m_currentScene->m_direction;
-				//(*CurrentGame).m_currentScene = m_currentScene;
-
 				m_playerShip->m_currentScene_name = m_currentScene->m_name;
 				m_playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
 
@@ -520,12 +519,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				AddToKnownScenes(m_currentScene->m_name);
 				if (m_currentScene->m_direction == Directions::NO_DIRECTION)
 				{
-					SavePlayer(PLAYER_SAVE_FILE, true);
+					SavePlayer(PLAYER_SAVE_FILE);
 					m_playerShip->m_respawnSceneName = m_currentScene->m_name;
 				}
 				else
 				{
-					SavePlayer(PLAYER_SAVE_FILE, false);
+					SavePlayer(PLAYER_SAVE_FILE);
 				}
 
 				//Giving control back to the player
@@ -680,7 +679,6 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		}
 		m_currentScene = new Scene(scene_name, 0, false, true);
 		playerShip->m_currentScene_name = m_currentScene->m_name;
-		playerShip->m_respawnSceneName = m_currentScene->m_name;
 		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
 
 		//position
@@ -693,12 +691,12 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		else
 		{
 			m_IG_State = InGameStateMachine::HUB_ROAMING;
+			playerShip->m_respawnSceneName = m_currentScene->m_name;
 		}
 		m_playerShip->setPosition(ship_pos);
 
 		UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
 
-		m_IG_State = InGameStateMachine::HUB_ROAMING;
-		(*CurrentGame).m_direction = NO_DIRECTION;
+		SavePlayer(PLAYER_SAVE_FILE);
 	}
 }

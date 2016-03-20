@@ -50,9 +50,8 @@ enum LayerType
 	PlayerShipLayer,
 	EnemyFireLayer,
 
+	BlackStripesLayer,
 	PanelLayer,
-	HudObject,
-	HudCursor,
 	NBVAL_Layer
 };
 

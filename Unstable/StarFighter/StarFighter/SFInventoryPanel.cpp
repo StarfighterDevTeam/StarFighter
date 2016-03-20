@@ -816,6 +816,13 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 
 void SFHUDPanel::Draw(sf::RenderTexture& screen)
 {
+	sf::RectangleShape black_background;
+	black_background.setSize(this->getSize());
+	black_background.setOrigin(this->getOrigin());
+	black_background.setPosition(this->getPosition());
+	black_background.setFillColor(sf::Color(0, 0, 0, 255));
+	screen.draw(black_background);
+
 	SFInventoryPanel::Draw(screen);
 
 	screen.draw(m_armorBarContainer);
