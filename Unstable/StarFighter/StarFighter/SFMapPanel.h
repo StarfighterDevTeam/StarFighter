@@ -34,6 +34,7 @@ public:
 	int m_max_hazard_unlocked;
 	float m_size_on_stellar_map;
 	StellarComponentStates m_feedback_state;
+	bool m_vertical;
 
 	bool Update(GameObject& cursor, bool forbid_collision);
 };
@@ -94,6 +95,7 @@ public:
 	vector<StellarBranch*> m_branches;
 
 	void UpdateBranchesPosition(bool into_real_coordinates, bool into_fake_coordinates);
+	sf::FloatRect GetStellarMapKnownSize();
 	void ScanBranches(string starting_scene, Directions direction, sf::Vector2f starting_coordinates);
 	bool ScanScene(string scene_filename, string scene, Directions direction, sf::Vector2f starting_coordinates);
 
@@ -110,9 +112,11 @@ private:
 	bool IsSceneKnownByThePlayer(string new_scene);
 	int GetMaxHazardLevelUnlocked(string new_scene);
 	int ComputeTeleportationCost(StellarHub* destination);
+	static void GetMaxCoordinates(sf::Vector2f* current_max_horizontal, sf::Vector2f* current_max_vertical, sf::Vector2f object_coordinates);
 
 	sf::RenderTexture m_texture;
 	sf::Vector2f m_scroll_offset;
+	sf::FloatRect m_map_content_area;
 };
 
 #endif // SFMAPPANEL_H_INCLUDED

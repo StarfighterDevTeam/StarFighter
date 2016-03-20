@@ -296,8 +296,11 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	//scan branches around
 	ScanBranches(mother_branch->m_hub->m_display_name, NO_DIRECTION, sf::Vector2f(0,0));
 
+	//get size of the known area
+	m_map_content_area = GetStellarMapKnownSize();
+
 	//set position of all elements, based on their computed coordinates
-	//UpdateBranchesPosition(true, false);
+	UpdateBranchesPosition(false, false);
 }
 
 SFMapPanel::~SFMapPanel()
@@ -309,7 +312,6 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//Scrolling
 	GetScrollingInput(m_cursor, deltaTime);
-	//UpdateBranchesPosition(false, true);
 
 	//check collisions, with priority on hubs over segments, and only chose one element to highlight
 	bool already_colllided_with_a_hub = false;
@@ -480,26 +482,37 @@ void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
 	{
 		sf::Vector2f speed = sf::Vector2f(cursor.getPosition().x - this->getPosition().x, cursor.getPosition().y - this->getPosition().y);
 		GameObject::NormalizeSpeed(&speed, STELLARMAP_SCROLLING_SPEED);
-		m_scroll_offset.x -= speed.x * deltaTime.asSeconds();
-		m_scroll_offset.y -= speed.y * deltaTime.asSeconds();
+		if (abs(speed.x) > STELLARMAP_SCROLLING_MIN_SPEED)
+		{
+			m_scroll_offset.x -= speed.x * deltaTime.asSeconds();
+		}
+		if (abs(speed.y) > STELLARMAP_SCROLLING_MIN_SPEED)
+		{
+			m_scroll_offset.y -= speed.y * deltaTime.asSeconds();
+		}
 	}
 
 	//constraints
-	if (m_scroll_offset.x < -STELLARMAP_REAL_SIZE_X / 2)
+	float left_border = -getSize().x / 2 + m_map_content_area.left + STELLARMAP_MARGIN_SIDES_WIDTH;
+	float right_border = getSize().x / 2 - (m_map_content_area.width + m_map_content_area.left) - STELLARMAP_MARGIN_SIDES_WIDTH;
+	float up_border = -getSize().y / 2 + m_map_content_area.top + STELLARMAP_MARGIN_SIDES_WIDTH;
+	float down_border = getSize().y / 2 - (m_map_content_area.height - m_map_content_area.top) - STELLARMAP_MARGIN_SIDES_WIDTH;
+
+	if (m_scroll_offset.x < left_border)
 	{
-		m_scroll_offset.x = - STELLARMAP_REAL_SIZE_X / 2;
+		m_scroll_offset.x = left_border;
 	}
-	if (m_scroll_offset.x > STELLARMAP_REAL_SIZE_X / 2)
+	if (m_scroll_offset.x > right_border)
 	{
-		m_scroll_offset.x = STELLARMAP_REAL_SIZE_X / 2;
+		m_scroll_offset.x = right_border;
 	}
-	if (m_scroll_offset.y < -STELLARMAP_REAL_SIZE_Y / 2)
+	if (m_scroll_offset.y < up_border)
 	{
-		m_scroll_offset.y = -STELLARMAP_REAL_SIZE_Y / 2;
+		m_scroll_offset.y = up_border;
 	}
-	if (m_scroll_offset.y > STELLARMAP_REAL_SIZE_Y / 2)
+	if (m_scroll_offset.y > down_border)
 	{
-		m_scroll_offset.y = STELLARMAP_REAL_SIZE_Y / 2;
+		m_scroll_offset.y = down_border;
 	}
 }
 
@@ -525,6 +538,65 @@ void SFMapPanel::UpdateBranchesPosition(bool into_real_coordinates, bool into_fa
 			}
 		}
 	}
+}
+
+void SFMapPanel::GetMaxCoordinates(sf::Vector2f* current_max_horizontal, sf::Vector2f* current_max_vertical, sf::Vector2f object_coordinates)
+{
+	if (object_coordinates.x < current_max_horizontal->x)
+	{
+		current_max_horizontal->x = object_coordinates.x;
+	}
+	if (object_coordinates.x > current_max_horizontal->y)
+	{
+		current_max_horizontal->y = object_coordinates.x;
+	}
+	if (object_coordinates.y < current_max_vertical->x)
+	{
+		current_max_vertical->x = object_coordinates.y;
+	}
+	if (object_coordinates.y > current_max_vertical->y)
+	{
+		current_max_vertical->y = object_coordinates.y;
+	}
+}
+
+sf::FloatRect SFMapPanel::GetStellarMapKnownSize()
+{
+	sf::Vector2f max_vertical = sf::Vector2f(0, 0);
+	sf::Vector2f max_horizontal = sf::Vector2f(0, 0);
+
+	if (!m_branches.empty())
+	{
+		size_t branchesVectorSize = m_branches.size();
+		for (size_t i = 0; i < branchesVectorSize; i++)
+		{
+			if (m_branches[i]->m_hub)
+			{
+				GetMaxCoordinates(&max_horizontal, &max_vertical, m_branches[i]->m_hub->m_coordinates);
+			}
+
+			size_t segmentsVectorSize = m_branches[i]->m_segments.size();
+			for (size_t j = 0; j < segmentsVectorSize; j++)
+			{
+				bool vertical_segment = m_branches[i]->m_segments[j]->m_vertical;
+				bool minimum_value_modified = vertical_segment ? m_branches[i]->m_segments[j]->m_coordinates.y < 0 : m_branches[i]->m_segments[j]->m_coordinates.x < 0;
+				int axis = minimum_value_modified ? -1 : 1;
+
+				GetMaxCoordinates(&max_horizontal, &max_vertical, sf::Vector2f(m_branches[i]->m_segments[j]->m_coordinates.x + 0.5*axis*!vertical_segment, m_branches[i]->m_segments[j]->m_coordinates.y + 0.5*axis*vertical_segment));
+			}
+
+			size_t nodesVectorSize = m_branches[i]->m_nodes.size();
+			for (size_t j = 0; j < nodesVectorSize; j++)
+			{
+				GetMaxCoordinates(&max_horizontal, &max_vertical, m_branches[i]->m_nodes[j]->m_coordinates);
+			}
+		}
+	}
+
+	float width = (max_horizontal.y - max_horizontal.x) * STELLARMAP_SCALE;
+	float height = (max_vertical.y - max_vertical.x) * STELLARMAP_SCALE;
+
+	return sf::FloatRect(max_horizontal.x * STELLARMAP_SCALE, max_vertical.y * STELLARMAP_SCALE, width, height);
 }
 
 int SFMapPanel::ComputeTeleportationCost(StellarHub* destination)
@@ -658,6 +730,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 					float size_of_new_segment = segment->m_size_on_stellar_map;
 					starting_coordinates_.x += (((Directions)direction == DIRECTION_RIGHT) - ((Directions)direction == DIRECTION_LEFT)) * size_of_new_segment;
 					starting_coordinates_.y += (((Directions)direction == DIRECTION_UP) - ((Directions)direction == DIRECTION_DOWN)) * size_of_new_segment;
+					segment->m_vertical = ((Directions)direction == DIRECTION_UP || (Directions)direction == DIRECTION_DOWN);
 
 					//get next linked scene name
 					string next_scene_name;
