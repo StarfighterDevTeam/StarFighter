@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
+ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
 {
 	m_max_speed = max_speed;
 	m_deceleration = deceleration;
@@ -13,6 +13,7 @@ ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, fl
 	m_armor = armor;
 	m_shield = shield;
 	m_shield_regen = shield_regen;
+	m_shield_recovery_time = shield_recovery_time;
 	m_damage = damage;
 	m_textureName = textureName;
 	m_size = size;
@@ -62,7 +63,7 @@ Equipment::~Equipment()
 Equipment* Equipment::Clone()
 {
 	Equipment* new_equipment = new Equipment();
-	new_equipment->Init(m_equipmentType, m_max_speed, m_acceleration, m_deceleration, m_hyperspeed, m_armor, m_shield, m_shield_regen, m_damage, m_textureName, m_size, m_frameNumber, m_display_name);
+	new_equipment->Init(m_equipmentType, m_max_speed, m_acceleration, m_deceleration, m_hyperspeed, m_armor, m_shield, m_shield_regen, m_shield_recovery_time, m_damage, m_textureName, m_size, m_frameNumber, m_display_name);
 	new_equipment->m_display_name = m_display_name;
 	if (m_bot)
 	{
@@ -74,7 +75,7 @@ Equipment* Equipment::Clone()
 	return new_equipment;
 }
 
-void Equipment::Init(int equipmentType, float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
+void Equipment::Init(int equipmentType, float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
 {
 	m_max_speed = max_speed;
 	m_deceleration = deceleration;
@@ -83,6 +84,7 @@ void Equipment::Init(int equipmentType, float max_speed, float acceleration, flo
 	m_armor = armor;
 	m_shield = shield;
 	m_shield_regen = shield_regen;
+	m_shield_recovery_time = shield_recovery_time;
 	m_damage = damage;
 	m_size.x = size.x;
 	m_size.y = size.y;
@@ -126,7 +128,7 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
+	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -151,6 +153,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 	//Spending credits on the possible bonuses
 	int bonus_shield = 0;
 	int bonus_shield_regen = 0;
+	int bonus_shield_recovery = 0;
 
 	int loot_credits_remaining = credits_;
 
@@ -167,7 +170,12 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 				bonus_shield_regen++;
 				break;
 			}
-
+			case 1://shield regen
+			{
+				loot_credits_remaining--;
+				bonus_shield_recovery++;
+				break;
+			}
 			default://shield
 			{
 				loot_credits_remaining--;
@@ -179,16 +187,19 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
+	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
 	equipment->m_shield = FIRST_LEVEL_SHIELD * multiplier_;
 	equipment->m_shield_regen = FIRST_LEVEL_SHIELD_REGEN * multiplier_;
+	equipment->m_shield_recovery_time = 0;
 
 	//allocating bonuses to the weapon
 	equipment->m_shield += bonus_shield * FIRST_LEVEL_SHIELD * 0.01;
 	equipment->m_shield_regen += ceil(bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
+	equipment->m_shield_regen += ceil(bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
+	equipment->m_shield_recovery_time -= bonus_shield_recovery * FIRST_LEVEL_SHIELD_RECOVERY_TIME * 0.01;
 
 	//saving level and credits used
 	equipment->m_level = level;
@@ -206,7 +217,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
+	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -231,7 +242,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 
 	//Initialisation
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
+	equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
 
 	Bot* bot = new Bot(sf::Vector2f(0, 0), sf::Vector2f(0, 0), BOT_FILENAME, sf::Vector2f(BOT_SIZE, BOT_SIZE));
 	bot->m_radius = 500;
@@ -351,6 +362,7 @@ void Ship::Init()
 		m_shield = m_shield_max;
 	}
 	m_shield_regen = getFighterIntStatValue(Fighter_ShieldRegen);
+	m_shield_recovery_time = getFighterFloatStatValue(Fighter_ShieldRecovery);
 	m_damage = getFighterIntStatValue(Fighter_ContactDamage);
 	m_size = !m_ship_model->m_fake_textureName.empty() ? m_ship_model->m_fake_size : m_ship_model->m_size;
 	m_textureName = m_ship_model->m_textureName;
@@ -622,29 +634,32 @@ bool Ship::ManageVisibility()
 void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//sheld regen if not maximum
-	static double shield_regen_buffer = 0;
-	if (m_shield < m_shield_max)
+	if (m_shield > 0 || m_shield_recovery_clock.getElapsedTime().asSeconds() > m_shield_recovery_time)
 	{
-		if (hyperspeedMultiplier < 1.0f)
+		static double shield_regen_buffer = 0;
+		if (m_shield < m_shield_max)
 		{
-			shield_regen_buffer += m_shield_regen * deltaTime.asSeconds() * hyperspeedMultiplier;
-		}
-		else
-		{
-			shield_regen_buffer += m_shield_regen * deltaTime.asSeconds();
-		}
+			if (hyperspeedMultiplier < 1.0f)
+			{
+				shield_regen_buffer += m_shield_regen * deltaTime.asSeconds() * hyperspeedMultiplier;
+			}
+			else
+			{
+				shield_regen_buffer += m_shield_regen * deltaTime.asSeconds();
+			}
 
-		if (shield_regen_buffer > 1)
-		{
-			double intpart;
-			shield_regen_buffer = modf(shield_regen_buffer, &intpart);
-			m_shield += intpart;
-		}
+			if (shield_regen_buffer > 1)
+			{
+				double intpart;
+				shield_regen_buffer = modf(shield_regen_buffer, &intpart);
+				m_shield += intpart;
+			}
 
-		//canceling over-regen
-		if (m_shield > m_shield_max)
-		{
-			m_shield = m_shield_max;
+			//canceling over-regen
+			if (m_shield > m_shield_max)
+			{
+				m_shield = m_shield_max;
+			}
 		}
 	}
 }
@@ -1734,6 +1749,10 @@ void Ship::damage_from(GameObject& object)
 		if (object.m_damage > m_shield)
 		{
 			m_armor -= (object.m_damage - m_shield);
+			if (m_shield > 0)
+			{
+				m_shield_recovery_clock.restart();
+			}
 			m_shield = 0;
 		}
 		else
@@ -1919,6 +1938,9 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data << equipment->m_armor << " ";
 		data << equipment->m_shield << " ";
 		data << equipment->m_shield_regen << " ";
+		data.precision(3);
+		data << equipment->m_shield_recovery_time << " ";
+		data.precision(0);
 		data << equipment->m_damage << " ";
 
 		if (equipment->m_bot)
@@ -2147,6 +2169,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	int armor;
 	int shield;
 	int shield_regen;
+	float shield_recovery;
 	int damage;
 
 	string bot_name;
@@ -2196,7 +2219,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	}
 	else
 	{
-		ss >> level >> credits >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> armor >> shield >> shield_regen >> damage >> bot_name;
+		ss >> level >> credits >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> armor >> shield >> shield_regen >> shield_recovery >> damage >> bot_name;
 
 		if (bot_name.compare("0") == 0)
 		{
@@ -2258,7 +2281,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 		type = Module;
 	}
 
-	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, armor, shield, shield_regen, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
+	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, armor, shield, shield_regen, shield_recovery, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
 	equipment->m_level = level;
 	equipment->m_credits = credits;
 	if (bot_name.compare("0") != 0)
@@ -2549,6 +2572,11 @@ float Ship::getFighterFloatStatValue(FighterStats stat)
 					equipment_value += m_equipment[i]->m_deceleration;
 					break;
 				}
+				case Fighter_ShieldRecovery:
+				{
+					equipment_value += m_equipment[i]->m_shield_recovery_time;
+					break;
+				}
 				default:
 				{
 					equipment_value += 0;
@@ -2583,6 +2611,11 @@ float Ship::getFighterFloatStatValue(FighterStats stat)
 		{
 			new_stat_value = m_ship_model->m_deceleration + equipment_value;
 			break;				 
+		}
+		case Fighter_ShieldRecovery:
+		{
+			new_stat_value = m_ship_model->m_shield_recovery_time + equipment_value;
+			break;
 		}
 		default:
 		{

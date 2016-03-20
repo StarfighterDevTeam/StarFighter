@@ -72,7 +72,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			{
 				Equipment* obj = object->m_equipment_loot;
 				ss_itam_name << "SHIELD: " << obj->m_display_name;
-				ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: " << obj->m_shield_regen;
+				ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: " << obj->m_shield_regen << "\nShield recovery: " << obj->m_shield_recovery_time << "sec";
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
@@ -117,18 +117,18 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						{
 							case AlternateShotMode:
 							{
-														ss_stats << "Alternating shots";
-														break;
+								ss_stats << "Alternating shots";
+								break;
 							}
 							case AscendingShotMode:
 							{
-														ss_stats << "Ascending shots";
-														break;
+								ss_stats << "Ascending shots";
+								break;
 							}
 							case DescendingShotMode:
 							{
-														ss_stats << "Descending shots";
-														break;
+								ss_stats << "Descending shots";
+								break;
 							}
 						}
 					}
@@ -140,13 +140,13 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 							case SEAKING:
 							case SUPER_SEAKING:
 							{
-													ss_stats << "\nSeaking target";
-													break;
+								ss_stats << "\nSeaking target";
+								break;
 							}
 							case SEMI_SEAKING:
 							{
-												ss_stats << "\nSeaking target once per rafale";
-												break;
+								ss_stats << "\nSeaking target once per rafale";
+								break;
 							}
 						}
 					}
@@ -725,14 +725,14 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		return;
 	}
 
-	if (m_playerShip->m_armor <= 0)
+	if (m_playerShip->m_armor_max <= 0)
 	{
 		m_armorBar.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 		m_armorBarContainer.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
 	}
 	else
 	{
-		if (m_playerShip->m_armor < m_playerShip->m_shield)
+		if (m_playerShip->m_armor_max < m_playerShip->m_shield_max)
 		{
 			m_armorBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_armor / m_playerShip->m_armor_max * ARMOR_BAR_SIZE_X * m_playerShip->m_armor_max / m_playerShip->m_shield_max), ARMOR_BAR_SIZE_Y));
 			m_armorBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_playerShip->m_armor_max / m_playerShip->m_shield_max, ARMOR_BAR_SIZE_Y));
@@ -744,14 +744,14 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		}
 	}
 
-	if (m_playerShip->m_shield <= 0)
+	if (m_playerShip->m_shield_max <= 0)
 	{
 		m_shieldBar.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
 		m_shieldBarContainer.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
 	}
 	else
 	{
-		if (m_playerShip->m_shield < m_playerShip->m_armor)
+		if (m_playerShip->m_shield_max < m_playerShip->m_armor_max)
 		{
 			m_shieldBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_shield / m_playerShip->m_shield_max * ARMOR_BAR_SIZE_X * m_playerShip->m_shield_max / m_playerShip->m_armor_max), SHIELD_BAR_SIZE_Y));
 			m_shieldBarContainer.setSize(sf::Vector2f(1 + 1.0f * ARMOR_BAR_SIZE_X * m_playerShip->m_shield_max / m_playerShip->m_armor_max, SHIELD_BAR_SIZE_Y));
@@ -764,12 +764,12 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	}
 
 	ostringstream ss_life;
-	ss_life << m_playerShip->m_armor;// << " / " << armor_max;
+	ss_life << m_playerShip->m_armor << "/" << m_playerShip->m_armor_max;
 	m_life_text.setString(ss_life.str());
 	m_life_text.setPosition(m_armorBar.getPosition().x + m_armorBar.getSize().x / 2 - m_life_text.getGlobalBounds().width/2, m_armorBar.getPosition().y + m_life_text.getGlobalBounds().height / 2);
 
 	ostringstream ss_shield;
-	ss_shield << m_playerShip->m_shield;// << " / " << shield_max;
+	ss_shield << m_playerShip->m_shield << "/" << m_playerShip->m_shield_max;
 	m_shield_text.setString(ss_shield.str());
 	m_shield_text.setPosition(m_shieldBar.getPosition().x + m_shieldBar.getSize().x / 2 - m_shield_text.getGlobalBounds().width / 2, m_shieldBar.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
 

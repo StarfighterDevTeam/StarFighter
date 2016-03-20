@@ -25,6 +25,7 @@ enum FighterStats
 	Fighter_Shield,
 	Fighter_ShieldMax,
 	Fighter_ShieldRegen,
+	Fighter_ShieldRecovery,
 	Fighter_ContactDamage,
 	Fighter_MaxSpeed,
 	Fighter_Acceleration,
@@ -247,6 +248,7 @@ public:
 	int m_shield;
 	int m_shield_max;
 	int m_shield_regen;
+	float m_shield_recovery_time;
 	sf::Vector2f m_speed;
 	PatternBobby m_Pattern;
 	float m_diag;

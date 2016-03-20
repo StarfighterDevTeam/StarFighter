@@ -174,7 +174,8 @@ Equipment* FileLoader::LoadEquipment(string name)
 			Equipment* i = new Equipment();
 
 			i-> Init(EquipmentType::NBVAL_Equipment, stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION]), stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
-				stoi((*it)[EquipmentData::EQUIPMENT_HYPERSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
+				stoi((*it)[EquipmentData::EQUIPMENT_HYPERSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), 
+				atof((*it)[EquipmentData::EQUIPMENT_SHIELD_RECOVERY].c_str()), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
 				(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])),
 				stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 
@@ -224,7 +225,8 @@ ShipModel* FileLoader::LoadShipModel(string name)
 			if((*it)[EquipmentData::EQUIPMENT_NAME].compare(name) == 0)
 			{
 				ShipModel* s = new ShipModel(stoi((*it)[EquipmentData::EQUIPMENT_MAXSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ACCELERATION]), stoi((*it)[EquipmentData::EQUIPMENT_DECCELERATION]), 
-					stoi((*it)[EquipmentData::EQUIPMENT_HYPERSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
+					stoi((*it)[EquipmentData::EQUIPMENT_HYPERSPEED]), stoi((*it)[EquipmentData::EQUIPMENT_ARMOR]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD]), stoi((*it)[EquipmentData::EQUIPMENT_SHIELD_REGEN]), 
+					atof((*it)[EquipmentData::EQUIPMENT_SHIELD_RECOVERY].c_str()), stoi((*it)[EquipmentData::EQUIPMENT_DAMAGE]),
 					(*it)[EquipmentData::EQUIPMENT_IMAGE_NAME], Vector2f(stoi((*it)[EquipmentData::EQUIPMENT_WIDTH]), stoi((*it)[EquipmentData::EQUIPMENT_HEIGHT])), 
 					stoi((*it)[EquipmentData::EQUIPMENT_FRAMES]), (*it)[EquipmentData::EQUIPMENT_NAME]);
 
