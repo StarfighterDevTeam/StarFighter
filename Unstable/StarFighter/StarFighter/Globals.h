@@ -215,6 +215,7 @@
 #define FIRST_LEVEL_MULTISHOT							2
 #define FIRST_LEVEL_RATE_OF_FIRE						0.1f
 #define FIRST_LEVEL_HYPERSPEED							1.0f
+#define FIRST_LEVEL_FUEL								100
 #define DEFAULT_AMMO_SPEED								2200
 #define ASSUMED_SHIP_SIZE								70
 #define ASSUMED_BOT_SIZE								32

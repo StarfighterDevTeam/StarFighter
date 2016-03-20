@@ -785,8 +785,8 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//fuel
 	if (m_playerShip->m_hyperspeed_fuel_max <= 0)
 	{
-		m_shieldBar.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
-		m_shieldBarContainer.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
+		m_fuelBar.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
+		m_fuelBarContainer.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
 	}
 	else
 	{

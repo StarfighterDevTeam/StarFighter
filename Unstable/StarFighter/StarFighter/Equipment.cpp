@@ -215,7 +215,32 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
-	int bonus_hyperspeed = credits_;
+	int loot_credits_remaining = credits_;
+
+	int bonus_hyperspeed = 0;
+	int bonus_fuel = 0;
+
+	while (loot_credits_remaining > 0)
+	{
+		int random_type_of_bonus = RandomizeIntBetweenValues(0, 2);
+
+		//spending the credits in the chosen bonus
+		switch (random_type_of_bonus)
+		{
+			case 0://hyperspeed
+			{
+				loot_credits_remaining--;
+				bonus_hyperspeed++;
+				break;
+			}
+			default://fuel
+			{
+				loot_credits_remaining--;
+				bonus_fuel++;
+				break;
+			}
+		}
+	}
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
@@ -224,9 +249,11 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
 	equipment->m_hyperspeed = FIRST_LEVEL_HYPERSPEED * multiplier_;
+	equipment->m_hyperspeed_fuel = FIRST_LEVEL_FUEL * multiplier_;
 
 	//allocating bonuses to the weapon
 	equipment->m_hyperspeed += bonus_hyperspeed * FIRST_LEVEL_HYPERSPEED * 0.01;
+	equipment->m_hyperspeed_fuel += bonus_fuel * FIRST_LEVEL_FUEL * 0.01;
 
 	//saving level and credits used
 	equipment->m_level = level;
