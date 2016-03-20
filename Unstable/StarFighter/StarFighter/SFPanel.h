@@ -51,6 +51,7 @@ public:
 	virtual void SetPrioritaryFeedback(bool has_priotiary_feedback);
 	virtual string GetTeleportationDestination();
 	virtual int GetTeleportationCost();
+	virtual void SetMapViewOffset(sf::Vector2f offset);
 	
 	virtual Dialog* GetDialog();
 

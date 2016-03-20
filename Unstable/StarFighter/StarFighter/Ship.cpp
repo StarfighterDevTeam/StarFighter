@@ -893,8 +893,15 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				{
 					Teleport(m_SFPanel->GetTeleportationDestination());
 					m_money -= m_SFPanel->GetTeleportationCost();
+					SavePlayerMoney(MONEY_SAVE_FILE, this);
 					m_HUD_state = HUD_Idle;
 				}
+			}
+
+			//Center view
+			if (m_inputs_states[Action_Braking] == Input_Tap)
+			{
+				CenterMapView();
 			}
 
 			//exit
@@ -2748,4 +2755,9 @@ void Ship::ContinueDialog()
 void Ship::Teleport(string destination_name)
 {
 	m_is_asking_teleportation = destination_name;
+}
+
+void Ship::CenterMapView(sf::Vector2f offset)
+{
+	m_SFPanel->SetMapViewOffset(offset);
 }

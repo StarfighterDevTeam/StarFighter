@@ -87,6 +87,7 @@ public:
 	GameObject* GetCursor() override;
 	int GetTeleportationCost() override;
 	string GetTeleportationDestination() override;
+	void SetMapViewOffset(sf::Vector2f offset) override;
 
 	void GetScrollingInput(GameObject& cursor, sf::Time deltaTime);
 
@@ -103,6 +104,7 @@ public:
 	size_t m_scenesConfigSize;
 
 	GameObject m_cursor;
+	GameObject m_ship;
 	int m_teleportation_cost;
 	string m_targeted_location;
 

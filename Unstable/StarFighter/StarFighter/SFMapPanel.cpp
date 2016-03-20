@@ -264,20 +264,50 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	m_info_panel = NULL;
 	m_teleportation_cost = 0;
 
+	//panel position and color
+	setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
+	setFillColor(sf::Color(20, 20, 20, 240));//dark grey
+	setOutlineThickness(0);
+
+	//panel content
+	//cursor
 	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
 	m_cursor.setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
 
+	//ship miniature
+	sf::Vector2f ship_size = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_size : playerShip->m_size;
+	string ship_texture = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_textureName : playerShip->m_textureName;
+	int frameNumber = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_frameNumber : playerShip->m_frameNumber;
+	int animationNumber = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_animationNumber : playerShip->m_animationNumber;
+
+	m_ship = GameObject(this->getPosition(), sf::Vector2f(0, 0), ship_texture, ship_size, sf::Vector2f(ship_size.x/2, ship_size.y/2), animationNumber, frameNumber);
+	m_ship.setPosition(sf::Vector2f(this->getPosition()));
+	m_ship.setScale(STELLARMAP_SHIP_MINIATURE_SCALE, STELLARMAP_SHIP_MINIATURE_SCALE);
+
+	//texts
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	setOutlineThickness(2);
+	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
+	float text_height = INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height / 2;
+	m_title_text.setString("STELLAR MAP");
+	m_title_text.setPosition(sf::Vector2f(getPosition().x - m_title_text.getGlobalBounds().width / 2, getPosition().y - getSize().y / 2 + text_height));
+
+	text_height += m_title_text.getGlobalBounds().height/2 + INTERACTION_INTERBLOCK;
+	ostringstream ss_text;
+	ss_text << "Current location: " << playerShip->m_currentScene_name;
+	m_text.setString(ss_text.str());
+	m_text.setPosition(sf::Vector2f(getPosition().x - m_text.getGlobalBounds().width / 2, getPosition().y - getSize().y / 2 + text_height));
+
+	ostringstream ss_helpNavigation;
+	ss_helpNavigation << "\n\n\Slowmotion: exit\nBrake: center map view\nMove cursor on borders: scroll map\nSelect location, then press Fire: teleport";
+	m_actions_text.setString(ss_helpNavigation.str());
+	m_actions_text.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + getSize().y / 2 - 2 * INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height));
+
+	//render texture
 	m_texture.create((unsigned int)size.x, (unsigned int)size.y);
 	m_scroll_offset = sf::Vector2f(0, 0);
-	
-	//panel position and color
-	setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
-	setFillColor(sf::Color(20, 20, 20, 240));//dark grey
 
 	//CONSTRUCTION OF THE MAP
 	//Loading the list of all scenes, contained in SCENES_FILE
@@ -305,13 +335,24 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 
 SFMapPanel::~SFMapPanel()
 {
-	
+
+}
+
+void SFMapPanel::SetMapViewOffset(sf::Vector2f offset)
+{
+	m_scroll_offset = offset;
+	m_cursor.setPosition(getPosition().x + offset.x, getPosition().y + offset.y);
 }
 
 void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//Scrolling
 	GetScrollingInput(m_cursor, deltaTime);
+	UpdateBranchesPosition(false, false);
+	if (m_current_hub)
+	{
+		m_ship.setPosition(m_current_hub->getPosition());
+	}
 
 	//check collisions, with priority on hubs over segments, and only chose one element to highlight
 	bool already_colllided_with_a_hub = false;
@@ -408,28 +449,27 @@ void SFMapPanel::Draw(sf::RenderTexture& screen)
 {
 	if (m_visible)
 	{
-		//############
-
 		SFPanel::Draw(screen);
-		//screen.draw(m_title_text);
+
+		screen.draw(m_title_text);
+		screen.draw(m_text);
+		screen.draw(m_actions_text);
 
 		//Scrollable content
-		m_texture.clear(sf::Color(255, 0, 0, 50));
+		m_texture.clear(sf::Color(0, 0, 0, 50));
 
 		//specific content to be drawn on a separate RenderTexture
 		UpdateBranchesPosition(true, false);//offset coordinates to match the RenderTexture coordinates
-
+	
 		if (!m_branches.empty())
 		{
 			size_t branchesVectorSize = m_branches.size();
 			for (size_t i = 0; i < branchesVectorSize; i++)
 			{
-				//m_branches[i]->Draw(screen);
 				m_branches[i]->DrawSegments(m_texture);
 			}
 			for (size_t i = 0; i < branchesVectorSize; i++)
 			{
-				//m_branches[i]->Draw(screen);
 				m_branches[i]->DrawNodes(m_texture);
 				m_branches[i]->DrawHub(m_texture);
 			}
@@ -444,6 +484,7 @@ void SFMapPanel::Draw(sf::RenderTexture& screen)
 		temp.setPosition(this->getPosition());
 		screen.draw(temp);
 
+		screen.draw(m_ship);
 		screen.draw(m_cursor);
 
 		if (m_info_panel)

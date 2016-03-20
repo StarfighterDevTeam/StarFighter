@@ -206,8 +206,9 @@ public :
 
 	PlayerInputStates m_inputs_states[NBVAL_PlayerActions];
 	bool m_actions_states[NBVAL_PlayerActions];
-	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 	HUDStates m_HUD_state;
+
+	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 
 	void BuyingItem();
 	void SellingItem();
@@ -215,6 +216,7 @@ public :
 	void SwappingItems();
 	void ContinueDialog();
 	void Teleport(string destination_name);
+	void CenterMapView(sf::Vector2f offset = sf::Vector2f(0, 0));
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;

@@ -131,6 +131,11 @@ int SFPanel::GetTeleportationCost()
 	//see override function in SFMapPanel and other types of SF panels
 }
 
+void SFPanel::SetMapViewOffset(sf::Vector2f offset)
+{
+
+}
+
 string SFPanel::GetTeleportationDestination()
 {
 	return "";
