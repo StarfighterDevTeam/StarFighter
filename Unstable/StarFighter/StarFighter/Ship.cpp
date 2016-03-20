@@ -293,6 +293,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_last_hazard_level_played = 0;
 	m_disable_bots = true;
 	m_is_asking_scene_transition = false;
+	m_currentScene_hazard = 0;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -560,8 +561,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//clean the dust
 	CleanGarbagedEquipments();
 
-	if (ManageVisibility())
-	{
+	//ManageVisibility();
+	
 		//Resetting flags
 		if (m_isCollidingWithInteractiveObject != PortalInteraction && !m_is_asking_scene_transition)
 		{
@@ -602,7 +603,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		{
 			m_HUD_SFPanel->Update(deltaTime, directions);
 		}
-	}
+	
 }
 
 bool Ship::ManageVisibility()
@@ -890,9 +891,9 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			{
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					m_HUD_state = HUD_Idle;
 					Teleport(m_SFPanel->GetTeleportationDestination());
 					m_money -= m_SFPanel->GetTeleportationCost();
+					m_HUD_state = HUD_Idle;
 				}
 			}
 
@@ -1478,25 +1479,25 @@ bool Ship::ResplenishHealth()
 
 void Ship::Respawn()
 {
-	m_armor = getFighterIntStatValue(Fighter_ArmorMax);
-	m_shield = getFighterIntStatValue(Fighter_ShieldMax);
-	m_speed.x = 0;
-	m_speed.y = 0;
-	m_visible = true;
-	if (!m_ship_model->m_fake_textureName.empty())
-	{
-		m_fake_ship->m_visible = true;
-	}
-	SetBotsVisibility(true);
-	m_isOnScene = true;
-	sf::Vector2f pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO);
-	pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, pos);
-	this->setPosition(pos);
-
+	Init();
+	//GenerateBots(this);
+	ResplenishHealth();
+	SetVisibility(true);
+	SetBotsVisibility((*CurrentGame).m_direction != NO_DIRECTION);
+	
 	m_immune = true;
 	m_immunityTimer.restart();
+}
 
-	GenerateBots(this);
+void Ship::SetVisibility(bool visible)
+{
+	m_visible = visible;
+	if (m_fake_ship)
+	{
+		m_fake_ship->m_visible = visible;
+	}
+
+	SetBotsVisibility(visible);
 }
 
 void Ship::Death()
@@ -1504,13 +1505,14 @@ void Ship::Death()
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
 	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
-	SetBotsVisibility(false);
-	m_visible = false;
-	if (m_fake_ship)
-	{
-		m_fake_ship->m_visible = false;
-	}
-	(*CurrentGame).garbageLayer(AuraLayer);
+
+	SetVisibility(false);
+	m_graze_count = 0;
+	m_graze_level = 0;
+
+	//DestroyBots();
+
+	//(*CurrentGame).garbageLayer(AuraLayer);
 
 	//losing xp
 	//int death_xp_penalty_ = floor(this->xp_max * XP_DEATH_MALUS_PERCENTAGE);
@@ -2745,5 +2747,5 @@ void Ship::ContinueDialog()
 
 void Ship::Teleport(string destination_name)
 {
-	//TODO
+	m_is_asking_teleportation = destination_name;
 }

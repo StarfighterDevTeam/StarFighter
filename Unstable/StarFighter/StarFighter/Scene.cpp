@@ -136,6 +136,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 									}
 								}
 
+
+
 								//Displaying the portals
 								(*CurrentGame).addToScene(m_bg->m_portals[(Directions)i], LayerType::PortalLayer, GameObjectType::PortalObject);
 							}
@@ -294,6 +296,35 @@ Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene
 	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
 }
 
+Scene::~Scene()
+{
+	if (m_bg)
+	{
+		for (int i = 0; i < Directions::NO_DIRECTION; i++)
+		{
+			if (m_bg->m_portals[(Directions)i])
+			{
+				m_bg->m_portals[(Directions)i]->m_GarbageMe = true;
+			}
+		}
+
+		if (m_bg->m_shop)
+		{
+			m_bg->m_shop->m_GarbageMe = true;
+		}
+
+		m_bg->m_GarbageMe = true;
+	}
+
+	m_boss_list.clear();
+
+	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
+	{
+		m_enemies_ranked_by_class[i].clear();
+	}
+	m_sceneEnemyGenerators.clear();
+}
+
 void Scene::DisplayDestructions(bool hazard_break)
 {
 	ostringstream ss;
@@ -319,32 +350,6 @@ void Scene::DisplayDestructions(bool hazard_break)
 	}
 
 	(*CurrentGame).addToFeedbacks(&this->m_textHazardBreak);
-}
-
-void Scene::DestroyScene()
-{
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
-	{
-		if (m_bg->m_portals[(Directions)i] != NULL)
-		{
-			m_bg->m_portals[(Directions)i]->m_GarbageMe = true;
-		}
-	}
-
-	if (m_bg->m_shop != NULL)
-	{
-		m_bg->m_shop->m_GarbageMe = true;
-	}
-
-	m_bg->m_GarbageMe = true;
-
-	m_boss_list.clear();
-
-	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
-	{
-		m_enemies_ranked_by_class[i].clear();
-	}
-	m_sceneEnemyGenerators.clear();
 }
 
 void Scene::GenerateEnemiesv2(Time deltaTime)

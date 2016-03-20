@@ -268,7 +268,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	StellarBranch* mother_branch = new StellarBranch();
 	m_current_hub = new StellarHub();
 	mother_branch->m_hub = m_current_hub;
-	mother_branch->m_hub->m_display_name = (*CurrentGame).m_currentScene->m_name;
+	mother_branch->m_hub->m_display_name = m_playerShip->m_currentScene_name;
 	mother_branch->SetPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
 	m_branches.push_back(mother_branch);
 	//m_checked_hubs.push_back(m_current_hub);
@@ -341,7 +341,8 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 							{
 								delete m_info_panel;
 							}
-							m_targeted_location = m_branches[i]->m_segments[j]->m_display_name;
+							m_teleportation_cost = -1;
+							m_targeted_location = "";
 							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 						}
 					}
@@ -371,7 +372,7 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		{
 			delete m_info_panel;
 			m_info_panel = NULL;
-			m_teleportation_cost = 0;
+			m_teleportation_cost = -1;
 			m_targeted_location = "";
 		}
 	}
@@ -417,21 +418,11 @@ GameObject* SFMapPanel::GetCursor()
 
 int SFMapPanel::GetTeleportationCost()
 {
-	if (!m_info_panel)
-	{
-		return -1;
-	}
-
 	return m_teleportation_cost;
 }
 
 string SFMapPanel::GetTeleportationDestination()
 {
-	if (!m_info_panel)
-	{
-		return "";
-	}
-
 	return m_targeted_location;
 }
 

@@ -33,6 +33,7 @@ public:
 	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
 
 	void InGameStateMachineCheck(sf::Time deltaTime);
+	void SpawnInScene(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
 
 	sf::Clock m_clockHubExit;
 	sf::Clock m_bossSpawnCountdown;

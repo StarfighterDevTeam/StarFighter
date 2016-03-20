@@ -797,13 +797,13 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	m_graze_text.setString("Graze: " + ss_g.str());
 
 	//scene name
-	if ((*CurrentGame).m_currentScene)
+	if (!m_playerShip->m_currentScene_name.empty())
 	{
 		ostringstream ss_bg;
-		ss_bg << (*CurrentGame).m_currentScene->m_name;
+		ss_bg << m_playerShip->m_currentScene_name;
 		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
-			ss_bg << " (" << (*CurrentGame).m_currentScene->getSceneHazardLevelValue() + 1 << ")";
+			ss_bg << " (" << m_playerShip->m_currentScene_hazard + 1 << ")";
 		}
 		m_scene_text.setString(ss_bg.str());
 	}

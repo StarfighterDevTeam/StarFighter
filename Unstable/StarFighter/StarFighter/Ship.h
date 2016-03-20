@@ -191,8 +191,11 @@ public :
 	vector<Equipment*> m_garbageEquipments;
 	vector<Weapon*> m_garbageWeapons;
 
+	string m_currentScene_name;
+	int m_currentScene_hazard;
 	map<string, int> m_knownScenes;
 	
+	void SetVisibility(bool visible);
 	void Death() override;
 	bool GetLoot(GameObject& object) override;
 	void GetPortal(GameObject* object) override;
@@ -221,6 +224,7 @@ public :
 	SFPanel* m_SFPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 	SFPanel* m_HUD_SFPanel;
+	string m_is_asking_teleportation;
 
 	sf::Clock m_brakingHoldingClock;
 	GameObject* m_previously_focused_item;

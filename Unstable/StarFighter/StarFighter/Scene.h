@@ -35,6 +35,7 @@ public:
 	//Scene(string name, ShipConfig* shipConf);
 	Scene(string name, int hazard_level, bool reverse_scene=false, bool first_scene=false);
 	Scene(string name);
+	~Scene();
 	void GenerateEnemies(Time deltaTime);
 	void GenerateBoss();
 	void LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
@@ -44,7 +45,6 @@ public:
 	bool m_hazardbreak_has_occurred;
 
 	float getSceneBeastScore();
-	void DestroyScene();
 
 	Background* m_bg;
 	Directions m_direction;

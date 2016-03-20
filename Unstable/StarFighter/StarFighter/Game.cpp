@@ -27,7 +27,6 @@ void Game::init(RenderWindow* window)
 	m_hyperspeedMultiplier = 1.0f;
 
 	playerShip = NULL;
-	m_currentScene = NULL;
 	m_waiting_for_dialog_validation = false;
 
 	try

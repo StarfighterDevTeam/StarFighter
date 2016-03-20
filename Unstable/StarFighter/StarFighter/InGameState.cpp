@@ -61,25 +61,10 @@ void InGameState::Initialize(Player player)
 		SavePlayer(PLAYER_SAVE_FILE, true);
 	}
 	m_currentSceneSave = player.m_currentSceneFile;
+	m_currentScene = NULL;
 
 	//Loading current scene
-	m_currentScene = new Scene(player.m_currentSceneFile, GetSceneHazardLevelUnlocked(player.m_currentSceneFile), player.reverse_scene, true);//first_scene = true
-	UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
-	(*CurrentGame).m_currentScene = m_currentScene;
-
-	//setting ship initialparameters
-	sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
-	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
-	{
-		m_IG_State = InGameStateMachine::SCROLLING;
-		ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
-	}
-	else
-	{
-		m_IG_State = InGameStateMachine::HUB_ROAMING;
-	}
-	m_playerShip->setPosition(ship_pos);
-	m_playerShip->m_respawnSceneName = m_currentScene->m_name;
+	SpawnInScene(m_currentSceneSave);
 
 	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
 	{
@@ -108,6 +93,12 @@ void InGameState::Update(Time deltaTime)
 	if (!(*CurrentGame).playerShip->m_visible)
 	{
 		RespawnInLastHub();
+		//SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
+	}
+	if (!(*CurrentGame).playerShip->m_is_asking_teleportation.empty())
+	{
+		SpawnInScene((*CurrentGame).playerShip->m_is_asking_teleportation);
+		(*CurrentGame).playerShip->m_is_asking_teleportation = "";
 	}
 
 	InGameStateMachineCheck(deltaTime);
@@ -516,12 +507,14 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//Wiping the previous background and swapping with the new one
-				m_currentScene->DestroyScene();
 				delete m_currentScene;
 				m_currentScene = m_nextScene;
 				m_nextScene = NULL;
 				(*CurrentGame).m_direction = m_currentScene->m_direction;
-				(*CurrentGame).m_currentScene = m_currentScene;
+				//(*CurrentGame).m_currentScene = m_currentScene;
+
+				m_playerShip->m_currentScene_name = m_currentScene->m_name;
+				m_playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
 
 				//Save scenes
 				AddToKnownScenes(m_currentScene->m_name);
@@ -556,6 +549,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					reverse = true;
 				}
 				string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
+
 				(*CurrentGame).m_direction = (*CurrentGame).playerShip->m_targetPortal->m_direction;
 				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).playerShip->m_SFPanel->GetSelectedOptionIndex(), reverse, false);
 				(*CurrentGame).playerShip->m_last_hazard_level_played = (*CurrentGame).playerShip->m_SFPanel->GetSelectedOptionIndex();
@@ -618,16 +612,7 @@ void InGameState::RespawnInLastHub()
 	(*CurrentGame).garbageLayer(LayerType::LootLayer);
 
 	//loading last visited hub
-	string nextScene_filename = (*CurrentGame).playerShip->m_respawnSceneName;
-	m_nextScene = new Scene(nextScene_filename, 0, false, true);
-	UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
-
-	//Wiping the previous background and swapping with the new one
-	m_currentScene->DestroyScene();
-	delete m_currentScene;
-	m_currentScene = m_nextScene;
-	m_nextScene = NULL;
-	(*CurrentGame).m_direction = m_currentScene->m_direction;
+	SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
 
 	//Applying hub modifiers to gameplay
 	(*CurrentGame).playerShip->m_disabledHyperspeed = true;
@@ -636,7 +621,6 @@ void InGameState::RespawnInLastHub()
 
 	//resetting ship
 	(*CurrentGame).playerShip->Respawn();
-	(*CurrentGame).playerShip->setPosition(sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO));
 }
 
 void InGameState::DestroySFPanel(Ship* playerShip)
@@ -684,4 +668,37 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		}
 	}
 	(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+}
+
+void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
+{
+	if (playerShip)
+	{
+		if (m_currentScene)
+		{
+			delete m_currentScene;
+		}
+		m_currentScene = new Scene(scene_name, 0, false, true);
+		playerShip->m_currentScene_name = m_currentScene->m_name;
+		playerShip->m_respawnSceneName = m_currentScene->m_name;
+		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
+
+		//position
+		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
+		if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
+		{
+			m_IG_State = InGameStateMachine::SCROLLING;
+			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
+		}
+		else
+		{
+			m_IG_State = InGameStateMachine::HUB_ROAMING;
+		}
+		m_playerShip->setPosition(ship_pos);
+
+		UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
+
+		m_IG_State = InGameStateMachine::HUB_ROAMING;
+		(*CurrentGame).m_direction = NO_DIRECTION;
+	}
 }
