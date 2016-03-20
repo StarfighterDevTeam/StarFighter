@@ -53,7 +53,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			case Engine:
 			{
 				Equipment* obj = object->m_equipment_loot;
-				ss_itam_name << "THRUSTER: " << obj->m_display_name;
+				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
+				ss_itam_name << "THRUSTER: " << standard_name;
 				ss_stats << "Hyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
@@ -62,7 +63,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			case Armor:
 			{
 				Equipment* obj = object->m_equipment_loot;
-				ss_itam_name << "HULL: " << obj->m_display_name;
+				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
+				ss_itam_name << "HULL: " << standard_name;
 				ss_stats << "Hull pts: " << obj->m_armor;
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
@@ -71,7 +73,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			case Shield:
 			{
 				Equipment* obj = object->m_equipment_loot;
-				ss_itam_name << "SHIELD: " << obj->m_display_name;
+				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
+				ss_itam_name << "SHIELD: " << standard_name;
 				ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: " << obj->m_shield_regen << "\nShield recovery: " << obj->m_shield_recovery_time << "sec";
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
@@ -80,7 +83,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			case Module:
 			{
 				Equipment* obj = object->m_equipment_loot;
-				ss_itam_name << "MODULE: " << obj->m_display_name;
+				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
+				ss_itam_name << "MODULE: " << standard_name;
 				if (obj->m_bot)
 				{
 					ss_stats << "Adding 1 drone. Drone stats:";
@@ -162,7 +166,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			case NBVAL_Equipment:
 			{
 				Weapon* obj = object->m_weapon_loot;
-				ss_itam_name << "MAIN WEAPON: " << obj->m_display_name;
+				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
+				ss_itam_name << "MAIN WEAPON: " << standard_name;
 				if (obj->m_shot_mode != NoShotMode)
 				{
 					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_ammunition->m_damage;

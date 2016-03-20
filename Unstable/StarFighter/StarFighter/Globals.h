@@ -237,5 +237,6 @@ int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
 float MaxBetweenValues(sf::Vector2f values);
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 
 #endif // GLOBALS_H_INCLUDED
