@@ -56,7 +56,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "THRUSTER: " << standard_name;
 				ss_stats << "Hyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
 			}
@@ -66,7 +66,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "HULL: " << standard_name;
 				ss_stats << "Hull pts: " << obj->m_armor;
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
 			}
@@ -76,7 +76,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "SHIELD: " << standard_name;
 				ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: " << obj->m_shield_regen << "\nShield recovery: " << obj->m_shield_recovery_time << "sec";
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
 			}
@@ -159,7 +159,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				{
 					ss_stats << "\nNo effect";
 				}
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
 			}
@@ -232,7 +232,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						}
 					}
 				}
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
 			}

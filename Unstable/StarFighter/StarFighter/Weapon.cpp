@@ -25,6 +25,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	m_display_name = "Laser";
 	m_level = 1;
 	m_credits = 0;
+	m_quality = 0;
 	m_readyFireTimer = sf::seconds(0);
 
 	m_ammunition = Ammunition;
@@ -373,6 +374,7 @@ Weapon* Weapon::Clone()
 
 	weapon->m_level = this->m_level;
 	weapon->m_credits = this->m_credits;
+	weapon->m_quality = this->m_quality;
 
 	return weapon;
 }
@@ -399,7 +401,7 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 	return fire_direction;
 }
 
-Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot)
+Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float quality)
 {
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
@@ -497,6 +499,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot)
 	//saving level and credits used
 	weapon->m_level = level;
 	weapon->m_credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	weapon->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return weapon;
 }

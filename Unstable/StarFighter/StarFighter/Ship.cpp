@@ -1204,7 +1204,7 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, Enem
 		int loot_credits_ = ceil(random_beast_scale / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(shop->m_level + 1));
 		int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
 
-		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, shop->m_level, shop))
+		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, shop->m_level, shop, random_beast_scale))
 		{
 			GameObject* capsule = NULL;
 			if (equipment_type_roll < NBVAL_Equipment)
@@ -1674,6 +1674,7 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data << equipment->m_display_name << " ";
 		data << equipment->m_level << " ";
 		data << equipment->m_credits << " ";
+		data << equipment->m_quality << " ";
 		data << equipment->m_textureName << " ";
 		data << equipment->m_size.x << " ";
 		data << equipment->m_size.y << " ";
@@ -1762,6 +1763,7 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 		{
 			data << weapon->m_level << " ";
 			data << weapon->m_credits << " ";
+			data << weapon->m_quality << " ";
 		}
 		data << weapon->m_textureName << " ";
 		data << weapon->m_size.x << " ";
@@ -1909,6 +1911,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	string texture_name;
 	int level;
 	int credits;
+	float quality;
 	int width;
 	int height;
 	int frames;
@@ -1970,7 +1973,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	}
 	else
 	{
-		ss >> level >> credits >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> hyperspeed_fuel >> armor >> shield >> shield_regen >> shield_recovery >> damage >> bot_name;
+		ss >> level >> credits >> quality >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> hyperspeed_fuel >> armor >> shield >> shield_regen >> shield_recovery >> damage >> bot_name;
 
 		if (bot_name.compare("0") == 0)
 		{
@@ -2035,6 +2038,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, hyperspeed_fuel, armor, shield, shield_regen, shield_recovery, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
 	equipment->m_level = level;
 	equipment->m_credits = credits;
+	equipment->m_quality = quality;
 	if (bot_name.compare("0") != 0)
 	{
 		Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), bot_texture_name, sf::Vector2f(bot_width, bot_height));
@@ -2117,6 +2121,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	string weapon_texture_name;
 	int weapon_level;
 	int weapon_credits;
+	float weapon_quality;
 	int weapon_width;
 	int weapon_height;
 	int weapon_frames;
@@ -2143,7 +2148,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	float ammo_pattern_arg2;
 	string ammo_explosion_name;
 
-	ss >> weapon_level >> weapon_credits >> weapon_texture_name >> weapon_width >> weapon_height >> weapon_frames >> weapon_rate_of_fire >>
+	ss >> weapon_level >> weapon_credits >> weapon_quality >> weapon_texture_name >> weapon_width >> weapon_height >> weapon_frames >> weapon_rate_of_fire >>
 		weapon_rafale >> rafale_cooldown >> weapon_multishot >> weapon_xspread >> weapon_dispersion >> weapon_shot_mode
 		>> weapon_target_seaking >> ammo_name >> ammo_damage >> ammo_speed >> ammo_range >> ammo_texture_name >> ammo_width >> ammo_height >>
 		ammo_frames >> ammo_explosion_name >> ammo_pattern_type;
@@ -2178,6 +2183,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	weapon->m_display_name = display_name;
 	weapon->m_level = weapon_level;
 	weapon->m_credits = weapon_credits;
+	weapon->m_quality = weapon_quality;
 	weapon->m_fire_direction = Vector2i(0, -1);
 	weapon->m_rate_of_fire = weapon_rate_of_fire;
 	weapon->m_shot_mode = (ShotMode)weapon_shot_mode;

@@ -1127,7 +1127,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
 
 			//"Spending credits" on item stats and assigning the equipment/weapon as a loot
-			AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, m_level + 1, this);
+			AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, m_level + 1, this, BeastScaleScore);
 		}
 
 		else
@@ -1141,33 +1141,33 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 	return true;
 }
 
-bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int credits, int level, GameObject* object)
+bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int credits, int level, GameObject* object, float quality)
 {
 	switch (equipment_type)
 	{
 		case (int)EquipmentType::Engine:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomEngine(credits, level));
+			return object->setEquipmentLoot(Equipment::CreateRandomEngine(credits, level, quality));
 		}
 
 		case (int)EquipmentType::Armor:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomArmor(credits, level));
+			return object->setEquipmentLoot(Equipment::CreateRandomArmor(credits, level, quality));
 		}
 
 		case (int)EquipmentType::Shield:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomShield(credits, level));
+			return object->setEquipmentLoot(Equipment::CreateRandomShield(credits, level, quality));
 		}
 
 		case (int)EquipmentType::Module:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomModule(credits, level));
+			return object->setEquipmentLoot(Equipment::CreateRandomModule(credits, level, quality));
 		}
 
 		case (int)EquipmentType::NBVAL_Equipment://WEAPON DROP
 		{
-			return object->setWeaponLoot(Weapon::CreateRandomWeapon(credits, level, false));
+			return object->setWeaponLoot(Weapon::CreateRandomWeapon(credits, level, false, quality));
 		}
 	}
 
