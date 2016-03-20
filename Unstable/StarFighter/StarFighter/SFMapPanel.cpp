@@ -708,11 +708,11 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				continue;
 			}
 			//scene has been scouted by the player?
-			else if (!IsSceneKnownByThePlayer(links[direction]))
-			{
-				//scene is not known by the plauer
-				continue;
-			}
+			//else if (!IsSceneKnownByThePlayer(links[direction]))
+			//{
+			//	//scene is not known by the plauer
+			//	continue;
+			//}
 
 			//create a new branch
 			StellarBranch* new_branch = new StellarBranch();
@@ -732,7 +732,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 					//scene has already been scanned
 					continue;
 				}
-				else if (!IsSceneKnownByThePlayer(links[direction]))
+				else if (!IsSceneKnownByThePlayer(links[direction]) && !m_branches.back()->m_segments.empty())
 				{
 					//scene is not known by the plauer
 					continue;
@@ -790,7 +790,6 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 					{
 						//segment->m_display_name = links[direction];
 						scenes_to_scan.push_back(next_scene_name);
-
 					}
 
 					//printf("Segment created: %s\n", segment->m_display_name.c_str());
@@ -851,6 +850,11 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 				new_segment->m_coordinates.y = starting_coordinates.y + ((direction == DIRECTION_UP) - (direction == DIRECTION_DOWN)) * new_segment->m_size_on_stellar_map / 2;
 
 				new_segment->m_max_hazard_unlocked = GetMaxHazardLevelUnlocked(scene);
+				//scenes that have not been explored yet, but that has been scouted (player has seen the portal leading to it), should be displayed as the minimal hazard unlocked (instead of the -1 error code)
+				if (new_segment->m_max_hazard_unlocked < 0)
+				{
+					new_segment->m_max_hazard_unlocked = 0;
+				}
 
 				return false;
 			}
