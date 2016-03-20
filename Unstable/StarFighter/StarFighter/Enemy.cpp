@@ -68,64 +68,63 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	}
 }
 
-void Enemy::UpdateHealthBars(sf::Time deltaTime)
+void Enemy::UpdateHealthBars()
 {
 	//health bars feedbacks
-	if (m_feedbackTimer > sf::seconds(0))
+	float angle_rad = GameObject::getRotation_for_Direction((*CurrentGame).m_direction) / 180 * M_PI;
+		
+	m_armorBar.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
+	m_armorBarContainer.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
+
+	//TODO: screen borders constraints
+	//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), armorBar->getSize()));
+	//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
+
+	//update size (damage)
+	m_armorBar.setSize(sf::Vector2f(1.0f * m_armor / m_armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	if (m_feedbackTimer <= sf::seconds(0))
 	{
-		m_feedbackTimer -= deltaTime;
-
-		float angle_rad = GameObject::getRotation_for_Direction((*CurrentGame).m_direction) / 180 * M_PI;
+		(*CurrentGame).removeFromFeedbacks(&m_armorBar);
+		(*CurrentGame).removeFromFeedbacks(&m_armorBarContainer);
+	}
 		
-		m_armorBar.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
-		m_armorBarContainer.setPosition(getPosition().x - (m_armorBar_offsetY * sin(angle_rad)), getPosition().y + (m_armorBar_offsetY * cos(angle_rad)));
+	m_shieldBar.setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
+	m_shieldBarContainer.setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
 
-		//TODO: screen borders constraints
-		//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), armorBar->getSize()));
-		//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), armorBarContainer->getSize()));
+	//TODO: screen borders constraints
+	//shieldBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBar->getPosition(), shieldBar->getSize()));
+	//shieldBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
+	//if shield bar touches screen, we need to move both bars
+	//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+	//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
 
-		//update size (damage)
-		m_armorBar.setSize(sf::Vector2f(1.0f * m_armor / m_armor_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
-		if (m_feedbackTimer <= sf::seconds(0))
-		{
-			(*CurrentGame).removeFromFeedbacks(&m_armorBar);
-			(*CurrentGame).removeFromFeedbacks(&m_armorBarContainer);
-		}
-		
-		m_shieldBar.setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
-		m_shieldBarContainer.setPosition(getPosition().x - (m_shieldBar_offsetY * sin(angle_rad)), getPosition().y + (m_shieldBar_offsetY * cos(angle_rad)));
+	m_shieldBar.setSize(sf::Vector2f(1.0f * m_shield / m_shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
 
-		//TODO: screen borders constraints
-		//shieldBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBar->getPosition(), shieldBar->getSize()));
-		//shieldBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, shieldBarContainer->getPosition(), shieldBar->getSize()));
-		//if shield bar touches screen, we need to move both bars
-		//armorBar->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBar->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
-		//armorBarContainer->setPosition(GameObject::ApplyScreenBordersConstraints((*CurrentGame).m_direction, armorBarContainer->getPosition(), sf::Vector2f(armorBar->getSize().x, armorBar->getSize().y + (2 * offsetBetweenHealthBars) + (2 * shieldBarContainer->getSize().y))));
+	if (m_feedbackTimer <= sf::seconds(0))
+	{
+		(*CurrentGame).removeFromFeedbacks(&m_shieldBar);
+		(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
+	}
 
-		m_shieldBar.setSize(sf::Vector2f(1.0f * m_shield / m_shield_max * ENEMY_HP_BAR_CONTAINER_SIZE_X, ENEMY_HP_BAR_CONTAINER_SIZE_Y));
+	//update enemy level display
+	if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
+		m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_armorBarContainer.getGlobalBounds().width / 2 - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, m_armorBarContainer.getPosition().y - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
+	else if ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)
+		m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y, m_armorBarContainer.getPosition().y - m_armorBarContainer.getGlobalBounds().height / 2 - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X));
 
-		if (m_feedbackTimer <= sf::seconds(0))
-		{
-			(*CurrentGame).removeFromFeedbacks(&m_shieldBar);
-			(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
-		}
-
-		//update enemy level display
-		if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
-			m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_armorBarContainer.getGlobalBounds().width / 2 - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X, m_armorBarContainer.getPosition().y - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y));
-		else if ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)
-			m_enemyLevel.setPosition(sf::Vector2f(m_armorBarContainer.getPosition().x - m_enemyLevel.getGlobalBounds().width / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_Y, m_armorBarContainer.getPosition().y - m_armorBarContainer.getGlobalBounds().height / 2 - m_enemyLevel.getGlobalBounds().height / 2 - ENEMY_LEVEL_DISPLAY_OFFSET_X));
-
-		if (m_feedbackTimer <= sf::seconds(0))
-		{
-			(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
-		}
+	if (m_feedbackTimer <= sf::seconds(0))
+	{
+		(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
 	}
 }
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	UpdateHealthBars(deltaTime);
+	if (m_feedbackTimer > sf::seconds(0))
+	{
+		m_feedbackTimer -= deltaTime;
+		UpdateHealthBars();
+	}
 	
 	//dialog blocking the update?
 	if ((*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() < END_OF_DIALOGS_DELAY)

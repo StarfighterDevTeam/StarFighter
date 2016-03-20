@@ -443,6 +443,7 @@ void Scene::SpawnEnemy(int enemy_class)
 	//RANDOM POSITION
 	sf::Vector2f pos = enemy->getRandomXSpawnPosition((*CurrentGame).m_direction, enemy->m_size);
 	enemy->setPosition(pos);
+	enemy->UpdateHealthBars();//update health bar position
 	(*CurrentGame).addToScene(enemy, EnemyObjectLayer, EnemyObject);
 
 	//counting spawned enemies

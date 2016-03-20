@@ -35,7 +35,7 @@ class Enemy : public GameObject
 public:
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber = 1, int animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
-	void UpdateHealthBars(sf::Time deltaTime);
+	void UpdateHealthBars();
 
 	vector<Weapon*> m_weapons_list;
 	FX* m_FX_death;
