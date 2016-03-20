@@ -54,7 +54,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			{
 				Equipment* obj = object->m_equipment_loot;
 				ss_itam_name << "THRUSTER: " << obj->m_display_name;
-				ss_stats << "Speed: " << obj->m_max_speed << "\nHyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
+				ss_stats << "Hyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
@@ -110,7 +110,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						ss_stats << "\nRafale: " << obj->m_bot->m_weapon->m_rafale << " (cooldown: " << obj->m_bot->m_weapon->m_rafale_cooldown << " sec";
 					}
 
-					if (obj->m_bot->m_weapon->m_multishot != NoShotMode)
+					if (obj->m_bot->m_weapon->m_shot_mode != NoShotMode)
 					{
 						ss_stats << "\nFiring style: ";
 						switch (obj->m_bot->m_weapon->m_shot_mode)
@@ -155,6 +155,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				{
 					ss_stats << "\nNo effect";
 				}
+				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
+				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
 			}
 			case NBVAL_Equipment:
@@ -192,18 +194,18 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 					{
 						case AlternateShotMode:
 						{
-													ss_stats << "Alternating shots";
-													break;
+							ss_stats << "Alternating shots";
+							break;
 						}
 						case AscendingShotMode:
 						{
-													ss_stats << "Ascending shots";
-													break;
+							ss_stats << "Ascending shots";
+							break;
 						}
 						case DescendingShotMode:
 						{
-													ss_stats << "Descending shots";
-													break;
+							ss_stats << "Descending shots";
+							break;
 						}
 					}
 				}
@@ -215,13 +217,13 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						case SEAKING:
 						case SUPER_SEAKING:
 						{
-												ss_stats << "\nSeaking target";
-												break;
+							ss_stats << "\nSeaking target";
+							break;
 						}
 						case SEMI_SEAKING:
 						{
-												ss_stats << "\nSeaking target once per rafale";
-												break;
+							ss_stats << "\nSeaking target once per rafale";
+							break;
 						}
 					}
 				}
@@ -680,6 +682,8 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_framerate_text.setCharacterSize(15);
 		m_framerate_text.setColor(sf::Color::Yellow);
 
+		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+
 		//positioning panel content
 		float text_height = 0;
 		text_height += 10;
@@ -700,7 +704,10 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		text_height += 10 + ARMOR_BAR_SIZE_Y;//+20?
 		m_xpBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
-		text_height += ITEM_STATS_PANEL_SIZE_Y + INTERACTION_INTERBLOCK;
+		text_height += INTERACTION_INTERBLOCK + ARMOR_BAR_SIZE_Y;
+		m_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+
+		text_height += ITEM_STATS_PANEL_SIZE_Y;
 		
 		m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
 		m_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
@@ -848,6 +855,45 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ostringstream ss_frame;
 	ss_frame << "fps= " << (int)(1 / (deltaTime.asMilliseconds() * 0.001));
 	m_framerate_text.setString(ss_frame.str());
+
+	//ship global stats
+	ostringstream ss_ship_stats;
+	float DPS = 0;
+	if (m_playerShip->m_weapon)
+	{
+		if (m_playerShip->m_weapon->m_shot_mode != NoShotMode)
+		{
+			DPS += (floor)(1 / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage;
+		}
+		else
+		{
+			DPS += (floor)(1 / m_playerShip->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_weapon->m_ammunition->m_damage * m_playerShip->m_weapon->m_multishot;
+		}
+		
+	}
+	if (!m_playerShip->m_bot_list.empty())
+	{
+		size_t botsVectorSize = m_playerShip->m_bot_list.size();
+		for (size_t i = 0; i < botsVectorSize; i++)
+		{
+			if (m_playerShip->m_bot_list[i]->m_weapon)
+			{
+				if (m_playerShip->m_bot_list[i]->m_weapon->m_shot_mode != NoShotMode)
+				{
+					DPS += (floor)(1 / m_playerShip->m_bot_list[i]->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_bot_list[i]->m_weapon->m_ammunition->m_damage;
+				}
+				else
+				{
+					DPS += (floor)(1 / m_playerShip->m_bot_list[i]->m_weapon->m_rate_of_fire * 100) / 100 * m_playerShip->m_bot_list[i]->m_weapon->m_ammunition->m_damage *m_playerShip->m_bot_list[i]->m_weapon->m_multishot;
+				} 
+			}
+		}
+	}
+
+	ss_ship_stats << "DPS: " << DPS;
+	ss_ship_stats << "\nContact damage: " << m_playerShip->m_damage << "\nHyperspeed: " << m_playerShip->m_hyperspeed << "\nFuel: " << m_playerShip->m_hyperspeed_fuel_max
+		<< "\nShield regen: " << m_playerShip->m_shield_regen << "/sec" << "\nShield recovery: " << m_playerShip->m_shield_recovery_time << "sec";
+	m_text.setString(ss_ship_stats.str());
 }
 
 void SFHUDPanel::Draw(sf::RenderTexture& screen)
@@ -883,4 +929,5 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	screen.draw(m_level_text);
 	screen.draw(m_scene_text);
 	screen.draw(m_framerate_text);
+	screen.draw(m_text);
 }
