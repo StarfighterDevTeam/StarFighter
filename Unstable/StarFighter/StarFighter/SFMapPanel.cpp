@@ -153,6 +153,7 @@ SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size,
 	setOrigin(size.x / 2, size.y / 2);
 	setFillColor(sf::Color(20, 20, 20, 230));//dark grey
 	setOutlineThickness(0);
+
 	setPosition(sf::Vector2f(position.x + size.x / 2 + STELLARMAP_INFO_PANEL_POSITION_X, position.y + STELLARMAP_INFO_PANEL_POSITION_Y));
 
 	//texts
@@ -240,6 +241,22 @@ void SFStellarInfoPanel::Draw(sf::RenderTexture& screen)
 	}
 }
 
+sf::Vector2f SFStellarInfoPanel::GetRealCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size)
+{
+	float x = rendered_coordinates.x - panel_position.x + panel_size.x / 2;
+	float y = rendered_coordinates.y - panel_position.y + panel_size.y / 2;
+
+	return sf::Vector2f(x, y);
+}
+
+sf::Vector2f SFStellarInfoPanel::GetFakeCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size)
+{
+	float x = rendered_coordinates.x + panel_position.x - panel_size.x / 2;
+	float y = rendered_coordinates.y + panel_position.y - panel_size.y / 2;
+
+	return sf::Vector2f(x, y);
+}
+
 //MAP PANEL
 SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_Map)
 {
@@ -249,11 +266,14 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 
 	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
-	m_cursor.setPosition(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2);
+	m_cursor.setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	setOutlineThickness(2);
+
+	m_texture.create((unsigned int)size.x, (unsigned int)size.y);
+	m_scroll_offset = sf::Vector2f(0, 0);
 	
 	//panel position and color
 	setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
@@ -277,7 +297,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	ScanBranches(mother_branch->m_hub->m_display_name, NO_DIRECTION, sf::Vector2f(0,0));
 
 	//set position of all elements, based on their computed coordinates
-	UpdateBranchesPosition();
+	//UpdateBranchesPosition(true, false);
 }
 
 SFMapPanel::~SFMapPanel()
@@ -287,6 +307,10 @@ SFMapPanel::~SFMapPanel()
 
 void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
+	//Scrolling
+	GetScrollingInput(m_cursor, deltaTime);
+	//UpdateBranchesPosition(false, true);
+
 	//check collisions, with priority on hubs over segments, and only chose one element to highlight
 	bool already_colllided_with_a_hub = false;
 	bool already_colllided_with_a_segment = false;
@@ -382,25 +406,41 @@ void SFMapPanel::Draw(sf::RenderTexture& screen)
 {
 	if (m_visible)
 	{
+		//############
+
 		SFPanel::Draw(screen);
 		//screen.draw(m_title_text);
 
+		//Scrollable content
+		m_texture.clear(sf::Color(255, 0, 0, 50));
+
 		//specific content to be drawn on a separate RenderTexture
+		UpdateBranchesPosition(true, false);//offset coordinates to match the RenderTexture coordinates
+
 		if (!m_branches.empty())
 		{
 			size_t branchesVectorSize = m_branches.size();
 			for (size_t i = 0; i < branchesVectorSize; i++)
 			{
 				//m_branches[i]->Draw(screen);
-				m_branches[i]->DrawSegments(screen);
+				m_branches[i]->DrawSegments(m_texture);
 			}
 			for (size_t i = 0; i < branchesVectorSize; i++)
 			{
 				//m_branches[i]->Draw(screen);
-				m_branches[i]->DrawNodes(screen);
-				m_branches[i]->DrawHub(screen);
+				m_branches[i]->DrawNodes(m_texture);
+				m_branches[i]->DrawHub(m_texture);
 			}
 		}
+
+		m_texture.display();
+		UpdateBranchesPosition(false, false);//undo offset to get match into real coordinates for calculations
+		sf::Sprite temp(m_texture.getTexture());
+		unsigned int sizex = m_texture.getSize().x;
+		float posx = this->getPosition().x;
+		temp.setOrigin(this->getOrigin());
+		temp.setPosition(this->getPosition());
+		screen.draw(temp);
 
 		screen.draw(m_cursor);
 
@@ -426,14 +466,63 @@ string SFMapPanel::GetTeleportationDestination()
 	return m_targeted_location;
 }
 
-void SFMapPanel::UpdateBranchesPosition()
+void SFMapPanel::GetScrollingInput(GameObject& cursor, sf::Time deltaTime)
+{
+	if (!cursor.m_visible)
+	{
+		return;
+	}
+
+	sf::FloatRect inside_rect = FloatRect(getPosition().x - getSize().x / 2 + STELLARMAP_SCROLLING_AREA_WIDTH, getPosition().y - getSize().y / 2 + STELLARMAP_SCROLLING_AREA_WIDTH,
+		getSize().x - 2 * STELLARMAP_SCROLLING_AREA_WIDTH, getSize().y - 2 * STELLARMAP_SCROLLING_AREA_WIDTH);
+
+	if (!inside_rect.contains(cursor.getPosition()))
+	{
+		sf::Vector2f speed = sf::Vector2f(cursor.getPosition().x - this->getPosition().x, cursor.getPosition().y - this->getPosition().y);
+		GameObject::NormalizeSpeed(&speed, STELLARMAP_SCROLLING_SPEED);
+		m_scroll_offset.x -= speed.x * deltaTime.asSeconds();
+		m_scroll_offset.y -= speed.y * deltaTime.asSeconds();
+	}
+
+	//constraints
+	if (m_scroll_offset.x < -STELLARMAP_REAL_SIZE_X / 2)
+	{
+		m_scroll_offset.x = - STELLARMAP_REAL_SIZE_X / 2;
+	}
+	if (m_scroll_offset.x > STELLARMAP_REAL_SIZE_X / 2)
+	{
+		m_scroll_offset.x = STELLARMAP_REAL_SIZE_X / 2;
+	}
+	if (m_scroll_offset.y < -STELLARMAP_REAL_SIZE_Y / 2)
+	{
+		m_scroll_offset.y = -STELLARMAP_REAL_SIZE_Y / 2;
+	}
+	if (m_scroll_offset.y > STELLARMAP_REAL_SIZE_Y / 2)
+	{
+		m_scroll_offset.y = STELLARMAP_REAL_SIZE_Y / 2;
+	}
+}
+
+void SFMapPanel::UpdateBranchesPosition(bool into_real_coordinates, bool into_fake_coordinates)
 {
 	if (!m_branches.empty())
 	{
 		size_t branchesVectorSize = m_branches.size();
 		for (size_t i = 0; i < branchesVectorSize; i++)
 		{
-			m_branches[i]->SetPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
+			sf::Vector2f pos = sf::Vector2f(this->getPosition().x + m_scroll_offset.x, this->getPosition().y + m_scroll_offset.y);
+			if (into_real_coordinates)
+			{
+				m_branches[i]->SetPosition(SFStellarInfoPanel::GetRealCoordinates(pos, getPosition(), getSize()));
+			}
+			else if (into_fake_coordinates)
+			{
+				m_branches[i]->SetPosition(SFStellarInfoPanel::GetFakeCoordinates(pos, getPosition(), getSize()));
+			}
+			else
+			{
+				m_branches[i]->SetPosition(pos);
+			}
 		}
 	}
 }

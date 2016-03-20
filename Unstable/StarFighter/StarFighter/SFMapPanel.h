@@ -70,6 +70,8 @@ public:
 	SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, sf::Vector2f size, Ship* playerShip);
 	SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f size, Ship* playerShip);
 	void Draw(sf::RenderTexture& screen) override;
+	static sf::Vector2f GetRealCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size);
+	static sf::Vector2f GetFakeCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size);
 
 	GameObject m_arrow;
 };
@@ -85,11 +87,13 @@ public:
 	int GetTeleportationCost() override;
 	string GetTeleportationDestination() override;
 
+	void GetScrollingInput(GameObject& cursor, sf::Time deltaTime);
+
 	SFStellarInfoPanel* m_info_panel;
 	StellarHub* m_current_hub;
 	vector<StellarBranch*> m_branches;
 
-	void UpdateBranchesPosition();
+	void UpdateBranchesPosition(bool into_real_coordinates, bool into_fake_coordinates);
 	void ScanBranches(string starting_scene, Directions direction, sf::Vector2f starting_coordinates);
 	bool ScanScene(string scene_filename, string scene, Directions direction, sf::Vector2f starting_coordinates);
 
@@ -106,6 +110,9 @@ private:
 	bool IsSceneKnownByThePlayer(string new_scene);
 	int GetMaxHazardLevelUnlocked(string new_scene);
 	int ComputeTeleportationCost(StellarHub* destination);
+
+	sf::RenderTexture m_texture;
+	sf::Vector2f m_scroll_offset;
 };
 
 #endif // SFMAPPANEL_H_INCLUDED
