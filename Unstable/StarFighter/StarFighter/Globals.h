@@ -66,6 +66,7 @@
 #define ARMOR_BAR_SIZE_X								320
 #define ARMOR_BAR_SIZE_Y								20
 #define SHIELD_BAR_SIZE_Y								20
+#define FUEL_BAR_SIZE_Y									14
 
 #define XP_BAR_SIZE_X									320
 #define XP_BAR_SIZE_Y									16
@@ -190,6 +191,10 @@
 #define MIN_VALUE_OF_MULTISHOT							2
 #define MAX_RATE_OF_FIRE_BONUS							90
 #define MIN_WEAPON_XSPREAD								10
+
+//HYPERSPEED
+#define HYPERSPEED_CONSUMPTION_FOR_CRUISING				1
+#define HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION			3
 
 //LEVELING
 #define FIRST_LEVEL_MAX									20

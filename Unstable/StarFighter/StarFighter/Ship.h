@@ -211,6 +211,9 @@ public :
 	static void SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_type);
 	static void SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool skip_level = false);
 
+	int m_hyperspeed_fuel_max;
+	float m_hyperspeed_fuel;
+
 	float m_hyperspeed;
 	float m_max_speed;
 	float m_acceleration;

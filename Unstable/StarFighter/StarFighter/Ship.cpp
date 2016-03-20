@@ -80,6 +80,11 @@ void Ship::Init()
 	m_deceleration = getFighterFloatStatValue(Fighter_Deceleration);
 	m_acceleration = getFighterFloatStatValue(Fighter_Acceleration);
 	m_hyperspeed = getFighterFloatStatValue(Fighter_Hyperspeed);
+	m_hyperspeed_fuel_max = getFighterIntStatValue(Fighter_HyperspeedFuel);
+	if (m_hyperspeed_fuel > m_hyperspeed_fuel_max)
+	{
+		m_hyperspeed_fuel = m_hyperspeed_fuel_max;
+	}
 	m_armor_max = getFighterIntStatValue(Fighter_ArmorMax);
 	if (m_armor > m_armor_max)
 	{
@@ -682,13 +687,23 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disabledHyperspeed);
 				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disabledHyperspeed);
 
-				if (m_actions_states[Action_Hyperspeeding])
+				if (m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0)
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
+					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_CRUISING * deltaTime.asSeconds();
+					if (m_hyperspeed_fuel < 0)
+					{
+						m_hyperspeed_fuel = 0;
+					}
 				}
-				else if (m_actions_states[Action_Slowmotion] && !m_disabledHyperspeed)
+				else if (m_actions_states[Action_Slowmotion] && !m_disabledHyperspeed && m_hyperspeed_fuel > 0)
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
+					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
+					if (m_hyperspeed_fuel < 0)
+					{
+						m_hyperspeed_fuel = 0;
+					}
 				}
 				else
 				{
@@ -1225,6 +1240,11 @@ bool Ship::ResplenishHealth()
 		m_shield = m_shield_max;
 		hasHealthToResplenish = true;
 	}
+	if (m_hyperspeed_fuel < m_hyperspeed_fuel_max)
+	{
+		m_hyperspeed_fuel = m_hyperspeed_fuel_max;
+		hasHealthToResplenish = true;
+	}
 	return hasHealthToResplenish;
 }
 
@@ -1664,6 +1684,7 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data.precision(3);
 		data << equipment->m_hyperspeed << " ";
 		data.precision(0);
+		data << equipment->m_hyperspeed_fuel << " ";
 		data << equipment->m_armor << " ";
 		data << equipment->m_shield << " ";
 		data << equipment->m_shield_regen << " ";
@@ -1895,6 +1916,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	float deceleration;
 	float acceleration;
 	float hyperspeed;
+	int hyperspeed_fuel;
 	int armor;
 	int shield;
 	int shield_regen;
@@ -1948,7 +1970,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	}
 	else
 	{
-		ss >> level >> credits >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> armor >> shield >> shield_regen >> shield_recovery >> damage >> bot_name;
+		ss >> level >> credits >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> hyperspeed_fuel >> armor >> shield >> shield_regen >> shield_recovery >> damage >> bot_name;
 
 		if (bot_name.compare("0") == 0)
 		{
@@ -2010,7 +2032,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 		type = Module;
 	}
 
-	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, armor, shield, shield_regen, shield_recovery, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
+	equipment->Init(type, max_speed, acceleration, deceleration, hyperspeed, hyperspeed_fuel, armor, shield, shield_regen, shield_recovery, damage, texture_name, sf::Vector2f(width, height), frames, display_name);
 	equipment->m_level = level;
 	equipment->m_credits = credits;
 	if (bot_name.compare("0") != 0)
@@ -2389,6 +2411,11 @@ int Ship::getFighterIntStatValue(FighterStats stat)
 					equipment_value += m_equipment[i]->m_shield_regen;
 					break;
 				}
+				case Fighter_HyperspeedFuel:
+				{
+					equipment_value += m_equipment[i]->m_hyperspeed_fuel;
+					break;
+				}
 				case Fighter_ContactDamage:
 				{
 					equipment_value += m_equipment[i]->m_damage;
@@ -2432,6 +2459,11 @@ int Ship::getFighterIntStatValue(FighterStats stat)
 		case Fighter_ShieldRegen:
 		{
 			new_stat_value = m_ship_model->m_shield_regen + equipment_value;
+			break;
+		}
+		case Fighter_HyperspeedFuel:
+		{
+			new_stat_value = m_ship_model->m_hyperspeed_fuel + equipment_value;
 			break;
 		}
 		case Fighter_ContactDamage:

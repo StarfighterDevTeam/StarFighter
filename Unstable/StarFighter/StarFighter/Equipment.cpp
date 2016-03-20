@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP MODEL ---------------
-ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
+ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int hyperspeed_fuel, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
 {
 	m_max_speed = max_speed;
 	m_deceleration = deceleration;
@@ -21,6 +21,7 @@ ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, fl
 	m_display_name = display_name;
 	m_bot = NULL;
 	m_hyperspeed = hyperspeed;
+	m_hyperspeed_fuel = hyperspeed_fuel;
 }
 
 ShipModel::~ShipModel()
@@ -63,7 +64,7 @@ Equipment::~Equipment()
 Equipment* Equipment::Clone()
 {
 	Equipment* new_equipment = new Equipment();
-	new_equipment->Init(m_equipmentType, m_max_speed, m_acceleration, m_deceleration, m_hyperspeed, m_armor, m_shield, m_shield_regen, m_shield_recovery_time, m_damage, m_textureName, m_size, m_frameNumber, m_display_name);
+	new_equipment->Init(m_equipmentType, m_max_speed, m_acceleration, m_deceleration, m_hyperspeed, m_hyperspeed_fuel, m_armor, m_shield, m_shield_regen, m_shield_recovery_time, m_damage, m_textureName, m_size, m_frameNumber, m_display_name);
 	new_equipment->m_display_name = m_display_name;
 	if (m_bot)
 	{
@@ -75,12 +76,13 @@ Equipment* Equipment::Clone()
 	return new_equipment;
 }
 
-void Equipment::Init(int equipmentType, float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
+void Equipment::Init(int equipmentType, float max_speed, float acceleration, float deceleration, float hyperspeed, int hyperspeed_fuel, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name)
 {
 	m_max_speed = max_speed;
 	m_deceleration = deceleration;
 	m_acceleration = acceleration;
 	m_hyperspeed = hyperspeed;
+	m_hyperspeed_fuel = hyperspeed_fuel;
 	m_armor = armor;
 	m_shield = shield;
 	m_shield_regen = shield_regen;
@@ -128,7 +130,7 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
+	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -187,7 +189,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
+	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -217,7 +219,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
+	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -242,7 +244,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level)
 
 	//Initialisation
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
+	equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
 
 	Bot* bot = new Bot(sf::Vector2f(0, 0), sf::Vector2f(0, 0), BOT_FILENAME, sf::Vector2f(BOT_SIZE, BOT_SIZE));
 	bot->m_radius = 500;

@@ -31,6 +31,7 @@ enum FighterStats
 	Fighter_Acceleration,
 	Fighter_Deceleration,
 	Fighter_Hyperspeed,
+	Fighter_HyperspeedFuel,
 	Fighter_Credits,
 	Fighter_Level,
 	NBVAL_FighterStats,

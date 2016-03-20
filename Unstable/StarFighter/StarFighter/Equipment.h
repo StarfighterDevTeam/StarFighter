@@ -18,7 +18,7 @@
 class ShipModel
 {
 public:
-	ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
+	ShipModel(float max_speed, float acceleration, float deceleration, float hyperspeed, int hyperspeed_fuel, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
 	~ShipModel();
 	std::string m_textureName;
 	sf::Vector2f m_size;
@@ -33,19 +33,20 @@ public:
 	int m_armor;
 	int m_shield;
 	int m_shield_regen;
-	float m_shield_recovery_time;
+	int m_hyperspeed_fuel;
 	int m_damage;
 
 	float m_deceleration;
 	float m_acceleration;
 	float m_max_speed;
 	float m_hyperspeed;
+	float m_shield_recovery_time;
 };
 
 class Equipment
 {
 public:
-	void Init(int equipmentType, float max_speed, float acceleration, float deceleration, float hyperspeed, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
+	void Init(int equipmentType, float max_speed, float acceleration, float deceleration, float hyperspeed, int m_hyperspeed_fuel, int armor, int shield, int shield_regen, float shield_recovery_time, int damage, std::string textureName, sf::Vector2f size, int frameNumber, std::string display_name);
 	Equipment();
 	~Equipment();
 	Equipment* Clone();
@@ -68,11 +69,12 @@ public:
 	int m_armor;
 	int m_shield;
 	int m_shield_regen;
-	float m_shield_recovery_time;
+	int m_hyperspeed_fuel;
 	int m_damage;
 	int m_level;
 	int m_credits;
 
+	float m_shield_recovery_time;
 	float m_hyperspeed;
 	float m_max_speed;
 	float m_acceleration;

@@ -54,7 +54,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 			{
 				Equipment* obj = object->m_equipment_loot;
 				ss_itam_name << "THRUSTER: " << obj->m_display_name;
-				ss_stats << "Speed: " << obj->m_max_speed << "\nHyperspeed: " << obj->m_hyperspeed << "\nContact damage: " << obj->m_damage;
+				ss_stats << "Speed: " << obj->m_max_speed << "\nHyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
@@ -623,6 +623,9 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_shieldBar.setFillColor(sf::Color(COLOR_BLUE_R_VALUE, COLOR_BLUE_G_VALUE, COLOR_BLUE_B_VALUE, COLOR_BLUE_A_VALUE));//blue
 		m_shieldBar.setOrigin(0, 0);
 
+		m_fuelBar.setFillColor(sf::Color(COLOR_YELLOW_R_VALUE, COLOR_YELLOW_G_VALUE, COLOR_YELLOW_B_VALUE, COLOR_YELLOW_A_VALUE));//yellow
+		m_fuelBar.setOrigin(0, 0);
+
 		//m_armorBarContainer.setSize(sf::Vector2f(1 + playerShip->m_armor_max, ARMOR_BAR_SIZE_Y));
 		m_armorBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
 		m_armorBarContainer.setOutlineThickness(1);
@@ -634,6 +637,11 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_shieldBarContainer.setOutlineThickness(1);
 		m_shieldBarContainer.setOutlineColor(sf::Color(255, 255, 255));
 		m_shieldBarContainer.setOrigin(0, 0);
+
+		m_fuelBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
+		m_fuelBarContainer.setOutlineThickness(1);
+		m_fuelBarContainer.setOutlineColor(sf::Color(255, 255, 255));
+		m_fuelBarContainer.setOrigin(0, 0);
 
 		m_xpBar.setSize(sf::Vector2f((1.0f * playerShip->m_xp / playerShip->m_xp_max) * XP_BAR_SIZE_X, XP_BAR_SIZE_Y));
 		m_xpBar.setFillColor(sf::Color(COLOR_LIGHT_BLUE_R_VALUE, COLOR_LIGHT_BLUE_G_VALUE, COLOR_LIGHT_BLUE_B_VALUE, COLOR_LIGHT_BLUE_A_VALUE));//light blue
@@ -647,6 +655,10 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_shield_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_shield_text.setCharacterSize(10);
 		m_shield_text.setColor(_white);
+
+		m_fuel_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
+		m_fuel_text.setCharacterSize(10);
+		m_fuel_text.setColor(_white);
 
 		m_money_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_money_text.setCharacterSize(20);
@@ -679,6 +691,11 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_shield_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + ARMOR_BAR_SIZE_X / 2, text_height);
 		m_shieldBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 		m_shieldBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+
+		text_height += 10 + ARMOR_BAR_SIZE_Y;
+		m_fuel_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + ARMOR_BAR_SIZE_X / 2, text_height);
+		m_fuelBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+		m_fuelBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 		
 		text_height += 10 + ARMOR_BAR_SIZE_Y;//+20?
 		m_xpBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
@@ -719,12 +736,13 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	SFInventoryPanel::Update(deltaTime, inputs_directions);
 
-	//armor and shield
+	
 	if (!m_playerShip)
 	{
 		return;
 	}
 
+	//armor
 	if (m_playerShip->m_armor_max <= 0)
 	{
 		m_armorBar.setSize(sf::Vector2f(1, ARMOR_BAR_SIZE_Y));
@@ -744,6 +762,7 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		}
 	}
 
+	//shield
 	if (m_playerShip->m_shield_max <= 0)
 	{
 		m_shieldBar.setSize(sf::Vector2f(1, SHIELD_BAR_SIZE_Y));
@@ -763,6 +782,18 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		}
 	}
 
+	//fuel
+	if (m_playerShip->m_hyperspeed_fuel_max <= 0)
+	{
+		m_shieldBar.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
+		m_shieldBarContainer.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
+	}
+	else
+	{
+		m_fuelBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_hyperspeed_fuel / m_playerShip->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X), FUEL_BAR_SIZE_Y));
+		m_fuelBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
+	}
+
 	ostringstream ss_life;
 	ss_life << m_playerShip->m_armor << "/" << m_playerShip->m_armor_max;
 	m_life_text.setString(ss_life.str());
@@ -772,6 +803,11 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ss_shield << m_playerShip->m_shield << "/" << m_playerShip->m_shield_max;
 	m_shield_text.setString(ss_shield.str());
 	m_shield_text.setPosition(m_shieldBar.getPosition().x + m_shieldBar.getSize().x / 2 - m_shield_text.getGlobalBounds().width / 2, m_shieldBar.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
+
+	ostringstream ss_fuel;
+	ss_fuel << (int)m_playerShip->m_hyperspeed_fuel << "/" << m_playerShip->m_hyperspeed_fuel_max;
+	m_fuel_text.setString(ss_fuel.str());
+	m_fuel_text.setPosition(m_fuelBar.getPosition().x + m_fuelBar.getSize().x / 2 - m_fuel_text.getGlobalBounds().width / 2, m_fuelBar.getPosition().y + 1);//because it works :/
 
 	//level
 	ostringstream ss_slash;
@@ -834,6 +870,13 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 		screen.draw(m_shieldBar);
 		screen.draw(m_shield_text);
 	}
+	if (m_playerShip && m_playerShip->m_hyperspeed_fuel_max > 0)
+	{
+		screen.draw(m_fuelBarContainer);
+		screen.draw(m_fuelBar);
+		screen.draw(m_fuel_text);
+	}
+
 	screen.draw(m_money_text);
 	screen.draw(m_graze_text);
 	screen.draw(m_xpBar);
