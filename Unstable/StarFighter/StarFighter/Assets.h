@@ -54,7 +54,7 @@
 #define EQUIPMENT_SIZE					48
 #define BOT_SIZE						32
 #define EMPTYSLOT_FILENAME				"Assets/2D/HUD/EmptySlot.png"
-#define EMPTYSLOT_ANIMATION_NUMBER		2
+#define EMPTYSLOT_ANIMATION_NUMBER		3
 #define GRID_SLOT_SIZE					64
 
 #define FX_EXPLOSION_FILENAME				"Assets/2D/FX_explosion.png"

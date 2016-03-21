@@ -5,7 +5,7 @@ ObjectGrid::ObjectGrid()
 	this->focus = sf::Vector2i(-1, -1);
 }
 
-ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake)
+ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake, bool fill_with_grey)
 {
 	for (int i = 0; i < squares.x; i++)
 	{
@@ -19,6 +19,17 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 				empty_slot->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
 
 				grid[i][j] = empty_slot;
+			}
+			else if (fill_with_grey)
+			{
+				GameObject* grey_slot = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE),
+					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, EMPTYSLOT_ANIMATION_NUMBER);
+
+				grey_slot->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
+
+				grid[i][j] = grey_slot;
+				grey_slot->m_visible = false;
+				grey_slot->setAnimationLine(2);
 			}
 			else
 			{
@@ -123,7 +134,7 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 	{
 		for (int j = 0; j < this->squares.y; j++)
 		{
-			if (grid[i][j] != NULL)
+			if (grid[i][j] && grid[i][j]->m_visible)
 			{
 				offscreen.draw(*grid[i][j]);
 			}

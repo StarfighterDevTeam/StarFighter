@@ -75,6 +75,7 @@ public:
 	static sf::Vector2f GetFakeCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size);
 
 	GameObject m_arrow;
+	string m_location_name;
 };
 
 class SFMapPanel : public SFPanel

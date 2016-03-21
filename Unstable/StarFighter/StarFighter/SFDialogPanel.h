@@ -15,6 +15,8 @@ public:
 
 	Dialog* m_dialog;
 	GameObject m_picture;
+	sf::Vector2f m_target_position;
+	bool m_is_downscreen;
 };
 
 #endif // SFDIALOGPANEL_H_INCLUDED

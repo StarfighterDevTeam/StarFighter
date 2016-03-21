@@ -169,6 +169,8 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, 
 		m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
 			sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
 
+		m_location_name = hub->m_display_name;
+
 		//text content
 		m_title_text.setString(hub->m_display_name.c_str());
 
@@ -206,6 +208,8 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarSegment* segment, sf::Vector2f siz
 {
 	if (segment)
 	{
+		m_location_name = segment->m_display_name;
+
 		//text content
 		m_title_text.setString(segment->m_display_name.c_str());
 
@@ -374,14 +378,18 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 						//create info panel
 						if (already_colllided_with_a_hub)
 						{
-							//delete old panel if existing
-							if (m_info_panel)
+							//are we hovering a new location that requires to create a new info panel?
+							if (!m_info_panel || (m_info_panel && m_branches[i]->m_hub->m_display_name != m_info_panel->m_location_name))
 							{
-								delete m_info_panel;
+								//delete old panel if existing
+								if (m_info_panel)
+								{
+									delete m_info_panel;
+								}
+								m_teleportation_cost = ComputeTeleportationCost(m_branches[i]->m_hub);
+								m_targeted_location = m_branches[i]->m_hub->m_display_name;
+								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, m_teleportation_cost, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 							}
-							m_teleportation_cost = ComputeTeleportationCost(m_branches[i]->m_hub);
-							m_targeted_location = m_branches[i]->m_hub->m_display_name;
-							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_hub, m_teleportation_cost, sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 						}
 					}
 					else
@@ -403,14 +411,18 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 						//create info panel
 						if (already_colllided_with_a_segment)
 						{
-							//delete old panel if existing
-							if (m_info_panel)
+							//are we hovering a new location that requires to create a new info panel?
+							if (!m_info_panel || (m_info_panel && m_branches[i]->m_segments[j]->m_display_name != m_info_panel->m_location_name))
 							{
-								delete m_info_panel;
+								//delete old panel if existing
+								if (m_info_panel)
+								{
+									delete m_info_panel;
+								}
+								m_teleportation_cost = -1;
+								m_targeted_location = "";
+								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 							}
-							m_teleportation_cost = -1;
-							m_targeted_location = "";
-							m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 						}
 					}
 					else
@@ -646,6 +658,14 @@ int SFMapPanel::ComputeTeleportationCost(StellarHub* destination)
 	{
 		int diff_x = m_current_hub->m_coordinates.x - destination->m_coordinates.x;
 		int diff_y = m_current_hub->m_coordinates.y - destination->m_coordinates.y;
+		if (diff_x < 0)
+		{
+			diff_x = -diff_x;
+		}
+		if (diff_y < 0)
+		{
+			diff_y = -diff_y;
+		}
 
 		int cost = (diff_x + diff_y) * (diff_x + diff_y) * STELLARMAP_TELEPORTATION_COST;//exponential cost: distance as the crow flies ^4)
 

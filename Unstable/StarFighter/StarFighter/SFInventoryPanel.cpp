@@ -244,7 +244,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 }
 
 //INVENTORY PANEL
-SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, size_t nb_lines2, size_t nb_rows2) : SFPanel(size, SFPanel_Inventory)
+SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, bool use_grey_if_no_money, size_t nb_lines2, size_t nb_rows2) : SFPanel(size, SFPanel_Inventory)
 {
 	m_focused_item = NULL;
 	m_focused_cell_index = sf::Vector2i(-1, -1);
@@ -253,6 +253,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	m_item_stats_panel = NULL;
 	m_focused_grid = 0;
 	m_has_prioritary_feedback = false;
+	m_use_grey_if_no_money = use_grey_if_no_money;
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -268,6 +269,11 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	{
 		m_fake_grid2 = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines2, nb_rows2), true);
 		m_grid2 = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines2, nb_rows2), false);
+	}
+
+	if (use_grey_if_no_money)
+	{
+		m_grey_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), false, true);
 	}
 
 	//texts
@@ -308,7 +314,12 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 		m_fake_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 		m_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	}
-	
+
+	if (m_use_grey_if_no_money)
+	{
+		m_grey_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	}
+
 	text_height += m_fake_grid.squares.y * GRID_SLOT_SIZE + ((int)m_use_two_grids * m_fake_grid2.squares.y * GRID_SLOT_SIZE) + INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height / 2;
 	text_height += INTERACTION_INTERBLOCK + INTERACTION_INTERBLOCK;//don't know why but it's currently required to get to the correct position
 	m_actions_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
@@ -340,6 +351,28 @@ void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions
 	{
 		GetHoveredObjectInTwoGrids(m_grid, m_fake_grid, m_grid2, m_fake_grid2);
 	}
+
+	//cover cells with a semi-transparent black if player doesn't have the money required
+	//if (m_use_grey_if_no_money)
+	{
+		for (int i = 0; i < m_grey_grid.squares.x; i++)
+		{
+			for (int j = 0; j < m_grey_grid.squares.y; j++)
+			{
+				if (m_grid.grid[i][j])
+				{
+					if (m_grid.grid[i][j]->m_equipment_loot)
+					{
+						m_grey_grid.grid[i][j]->m_visible = m_playerShip->m_money < m_grid.grid[i][j]->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					}
+					else if (m_grid.grid[i][j]->m_weapon_loot)
+					{
+						m_grey_grid.grid[i][j]->m_visible = m_playerShip->m_money < m_grid.grid[i][j]->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					}
+				}
+			}
+		}
+	}
 }
 
 void SFInventoryPanel::Draw(sf::RenderTexture& screen)
@@ -355,6 +388,8 @@ void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 			m_fake_grid2.Draw(screen);
 			m_grid2.Draw(screen);
 		}
+		m_grey_grid.Draw(screen);
+
 		screen.draw(m_title_text);
 		screen.draw(m_actions_text);
 		if (m_cursor.m_visible)
@@ -611,7 +646,7 @@ int SFInventoryPanel::GetFocusedGrid()
 }
 
 //HUD PANEL
-SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(size, playerShip, SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS, true, EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS)
+SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(size, playerShip, SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS, true, false, EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS)
 {
 	setOrigin(0, 0);
 	setFillColor(sf::Color(10, 10, 10, 128));//dark grey

@@ -14,7 +14,7 @@ public:
 class SFInventoryPanel : public SFPanel
 {
 public:
-	SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, size_t nb_lines2 = 0, size_t nb_rows2 = 0);
+	SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, bool use_grey_if_no_money, size_t nb_lines2 = 0, size_t nb_rows2 = 0);
 	~SFInventoryPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
@@ -42,10 +42,12 @@ public:
 	ObjectGrid m_fake_grid;
 	ObjectGrid m_grid2;
 	ObjectGrid m_fake_grid2;
+	ObjectGrid m_grey_grid;
 	bool m_use_two_grids;
 	int m_focused_grid;
 	SFItemStatsPanel* m_item_stats_panel;
 	bool m_has_prioritary_feedback;
+	bool m_use_grey_if_no_money;
 
 	Ship* m_playerShip;
 };

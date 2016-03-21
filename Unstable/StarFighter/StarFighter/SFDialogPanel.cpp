@@ -11,20 +11,26 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	setOutlineThickness(2);
 
+	//is dialog displayed up or down
+	m_is_downscreen = (*CurrentGame).m_direction == DIRECTION_DOWN ? m_dialog->m_enemy_speaking : !m_dialog->m_enemy_speaking;
+
 	//panel position and color
-	sf::Vector2f position = sf::Vector2f(DIALOG_PANEL_OFFSET_X + size.x / 2, SCENE_SIZE_Y - DIALOG_PANEL_OFFSET_Y - size.y / 2);
+	setPosition(sf::Vector2f(DIALOG_PANEL_OFFSET_X + size.x / 2, SCENE_SIZE_Y - DIALOG_PANEL_OFFSET_Y - size.y / 2));
+	m_target_position = sf::Vector2f(-size.x / 2, SCENE_SIZE_Y - DIALOG_PANEL_OFFSET_Y - size.y / 2);
+	if (!m_is_downscreen)
+	{
+		setPosition(GameObject::getPosition_for_Direction(DIRECTION_DOWN, getPosition()));
+		m_target_position = GameObject::getPosition_for_Direction(DIRECTION_DOWN, m_target_position);
+	}
+	
 	if (m_dialog->m_enemy_speaking)
 	{
-		Directions direction = (*CurrentGame).m_direction == DIRECTION_DOWN ? DIRECTION_UP : DIRECTION_DOWN;
-		setPosition(GameObject::getPosition_for_Direction(direction, position));
 		setFillColor(sf::Color(255, 27, 27, 50));
 		setOutlineColor(sf::Color(255, 0, 0, 255));
 		m_title_text.setColor(sf::Color(255, 0, 0, 255));
 	}
 	else
 	{
-		Directions direction = (*CurrentGame).m_direction == DIRECTION_DOWN ? DIRECTION_DOWN : DIRECTION_UP;
-		setPosition(GameObject::getPosition_for_Direction(direction, position));
 		setFillColor(sf::Color(27, 27, 255, 50));
 		setOutlineColor(sf::Color(0, 0, 255, 255));
 		m_title_text.setColor(sf::Color(0, 0, 255, 255));
@@ -56,7 +62,18 @@ SFDialogPanel::~SFDialogPanel()
 
 void SFDialogPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
-	
+	//fade in
+	if (m_dialog && m_dialog->m_fade_in)
+	{
+		if (m_is_downscreen && getPosition().x < m_target_position.x)
+		{
+			setPosition(getPosition().x + 1, getPosition().y);
+		}
+		else if (!m_is_downscreen && getPosition().x > m_target_position.x)
+		{
+			setPosition(getPosition().x - 1, getPosition().y);
+		}
+	}
 }
 
 void SFDialogPanel::Draw(sf::RenderTexture& screen)
