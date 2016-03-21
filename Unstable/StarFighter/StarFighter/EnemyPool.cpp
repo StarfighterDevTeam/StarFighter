@@ -38,7 +38,7 @@ void EnemyPool::CreateCluster()
 
 	for (std::vector<EnemyPoolElement*>::iterator it = m_enemyCluster->begin() ; it != m_enemyCluster->end(); ++it)
 	{
-		if ( (*(*it)).m_enemy_class != EnemyClass::ENEMYPOOL_VOID)
+		if ( (*(*it)).m_enemy_class != ENEMYPOOL_VOID)
 		{
 			Enemy* n = (*it)->m_enemy->Clone();
 			n->m_visible = true;
@@ -53,9 +53,9 @@ void EnemyPool::CreateCluster()
 			n->setPosition(sf::Vector2f(m_position.x + offset_x_, m_position.y + offset_y_));
 				
 				n->m_enemy_class = (*it)->m_enemy_class;
-				//n->enemy_class = EnemyClass::ENEMYPOOL_GAMMA;
+				//n->enemy_class = ENEMYPOOL_GAMMA;
 
-			(*CurrentGame).addToScene(n,LayerType::EnemyObjectLayer, GameObjectType::EnemyObject);
+			(*CurrentGame).addToScene(n,EnemyObjectLayer, EnemyObject);
 		}
 		index++;
 	}

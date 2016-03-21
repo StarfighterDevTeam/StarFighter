@@ -2,7 +2,7 @@
 
 PatternBobby::PatternBobby()
 {
-	this->currentPattern = PatternType::NoMovePattern;
+	this->currentPattern = NoMovePattern;
 }
 
 PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
@@ -10,34 +10,34 @@ PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
 	PatternBobby* bobby = new PatternBobby();
 
 	vector<float>* v = new vector<float>;
-	PatternType pattern_type = PatternType::NoMovePattern;
+	PatternType pattern_type = NoMovePattern;
 
 	if (line_data[index].compare("0") != 0)
 	{
-		bobby->patternSpeed = stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_SPEED]);//angular speed, horizontal speed
+		bobby->patternSpeed = stoi(line_data[index + BOBBY_PATTERN_SPEED]);//angular speed, horizontal speed
 
 		if (line_data[index].compare("line") == 0)
 		{
-			pattern_type = PatternType::Line_;
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2])); // opposite sign of speed (-1), random sign (0), normal (1)
+			pattern_type = Line_;
+			v->push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2])); // opposite sign of speed (-1), random sign (0), normal (1)
 		}
 		else if (line_data[index].compare("circle") == 0)
 		{
-			pattern_type = PatternType::Circle_;
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
+			pattern_type = Circle_;
+			v->push_back(stoi(line_data[index + BOBBY_PATTERN_ARG1])); // radius
+			v->push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
 		}
 		else if (line_data[index].compare("oscillator") == 0)
 		{
-			pattern_type = PatternType::Oscillator;
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // radius
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
+			pattern_type = Oscillator;
+			v->push_back(stoi(line_data[index + BOBBY_PATTERN_ARG1])); // radius
+			v->push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2]));  // counterclockwise (-1), random (0), clockwise (1)
 		}
 		else if (line_data[index].compare("rectangle") == 0)
 		{
-			pattern_type = PatternType::Rectangle_;
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG1])); // width
-			v->push_back(stoi(line_data[index + BobbyPatternData::BOBBY_PATTERN_ARG2]));  // height
+			pattern_type = Rectangle_;
+			v->push_back(stoi(line_data[index + BOBBY_PATTERN_ARG1])); // width
+			v->push_back(stoi(line_data[index + BOBBY_PATTERN_ARG2]));  // height
 		}
 	}
 
@@ -59,7 +59,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 
 	switch(this->currentPattern)
 	{
-		case PatternType::Line_:
+		case Line_:
 		{
 			//ARGS 
 			// 0 = opposite speed ?
@@ -76,7 +76,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 			break;
 		}
 
-		case PatternType::Rectangle_:
+		case Rectangle_:
 		{
 			//ARGS 
 			// 0 = width
@@ -90,7 +90,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 			break;
 		}
 
-		case PatternType::Circle_:
+		case Circle_:
 		{
 			//ARGS 
 			// 0 = rayon
@@ -111,7 +111,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
 			break;
 		}
 
-		case PatternType::Oscillator:
+		case Oscillator:
 		{
 			//ARGS 
 			// 0 = amplitude
@@ -144,14 +144,14 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 
 	switch(this->currentPattern)
 	{
-		case PatternType::NoMovePattern:
+		case NoMovePattern:
 		{
 			offset.x=0;
 			offset.y=0;
 			break;
 		}
 	
-		case PatternType::Line_:
+		case Line_:
 		{
 			//ARGS 
 			// 0 = xspeed
@@ -160,7 +160,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			break;							
 		}
 
-		case PatternType::Rectangle_:
+		case Rectangle_:
 		{
 			//ARGS 
 			// 0 = longueur
@@ -234,7 +234,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			break;
 		}
 
-		case PatternType::Circle_:
+		case Circle_:
 		{
 			//ARGS 
 			// 0 = rayon
@@ -269,7 +269,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			break;
 		}
 
-		case PatternType::Oscillator:
+		case Oscillator:
 		{
 			//ARGS 
 			// 0 = rayon

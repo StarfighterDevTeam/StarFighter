@@ -23,7 +23,7 @@ void Game::init(RenderWindow* window)
 
 	resetHazard();;//initalisation of the scoring system
 	m_BeastScoreBonus = 0;
-	m_direction = Directions::NO_DIRECTION;
+	m_direction = NO_DIRECTION;
 	m_hyperspeedMultiplier = 1.0f;
 
 	playerShip = NULL;
@@ -45,7 +45,7 @@ void Game::init(RenderWindow* window)
 	catch (const std::exception & ex)
 	{
 		//An error occured
-		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+		LOGGER_WRITE(Logger::LERROR, ex.what());
 	}
 }
 
@@ -234,13 +234,13 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[EnemyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -257,7 +257,7 @@ void Game::colisionChecksV2()
 					(*it2)->Death();
 
 					//FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
-					//this->addToScene(explosion, LayerType::ExplosionLayer, GameObjectType::Neutral);
+					//this->addToScene(explosion, ExplosionLayer, Neutral);
 					//hide destroyed item
 					if ((*it1)->m_armor <= 0)
 					{
@@ -270,7 +270,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Enemy objects
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -305,7 +305,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Loot
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::LootObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::LootObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LootObject].begin(); it2 != m_sceneGameObjectsTyped[LootObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -322,7 +322,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Portal
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::PortalObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::PortalObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[PortalObject].begin(); it2 != m_sceneGameObjectsTyped[PortalObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -334,7 +334,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Shop
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::ShopObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::ShopObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[ShopObject].begin(); it2 != m_sceneGameObjectsTyped[ShopObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -347,13 +347,13 @@ void Game::colisionChecksV2()
 	}
 
 	//Then, check if any allied bullet collide with any enemy
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[EnemyObject].begin(); it1 != m_sceneGameObjectsTyped[EnemyObject].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Player bullets on enemy
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[FriendlyFire].begin(); it2 != m_sceneGameObjectsTyped[FriendlyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -376,12 +376,12 @@ void Game::colisionChecksV2()
 	}
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::FakePlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::FakePlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[FakePlayerShip].begin(); it1 != m_sceneGameObjectsTyped[FakePlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::LootObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::LootObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LootObject].begin(); it2 != m_sceneGameObjectsTyped[LootObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -714,7 +714,7 @@ float Game::GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_po
 
 void Game::WakeUpEnemiesWithName(string m_display_name)
 {
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[EnemyObject].begin(); it != m_sceneGameObjectsTyped[EnemyObject].end(); it++)
 	{
 		if (*it == NULL)
 			continue;

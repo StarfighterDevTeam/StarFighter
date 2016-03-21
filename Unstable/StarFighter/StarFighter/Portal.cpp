@@ -3,7 +3,7 @@
 Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_DontGarbageMe = true;
-	m_state = PortalState::PortalOpen;
+	m_state = PortalOpen;
 }
 
 void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -21,7 +21,7 @@ void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			setAnimationLine(PortalAnimation::PortalCloseIdle, false);
 
 		}
-		else if (m_currentAnimationIndex == PortalAnimation::PortalCloseIdle && m_state == PortalState::PortalInvisible)
+		else if (m_currentAnimationIndex == PortalAnimation::PortalCloseIdle && m_state == PortalInvisible)
 		{
 			m_visible = false;
 		}

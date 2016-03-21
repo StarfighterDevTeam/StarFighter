@@ -5,14 +5,14 @@ Game* CurrentGame;
 
 int main()
 {
-	LOGGER_START(Logger::Priority::DEBUG, "");
+	LOGGER_START(Logger::DEBUG, "");
 
 	//Load Configuration
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Configurations");
+	LOGGER_WRITE(Logger::DEBUG, "Loading Configurations");
 	PREFS = new PrefsManager();
 
 	//Init SFML Window
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing SFML Window");
+	LOGGER_WRITE(Logger::DEBUG, "Initializing SFML Window");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
 
@@ -29,7 +29,7 @@ int main()
 
 
 	//Music
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
+	LOGGER_WRITE(Logger::DEBUG, "Loading Musics");
 	sf::Music SpaceCowboys;
 	if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
 		//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
@@ -47,13 +47,13 @@ int main()
 	sf::Clock deltaClock;
 
 	//Initializing player
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing player");
+	LOGGER_WRITE(Logger::DEBUG, "Initializing player");
 	Player player;
 	player.Init(&renderWindow);
 	player.m_currentSceneFile = "Vanguard_Hub0";
 
 	//Loading InGame state
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Starting game");
+	LOGGER_WRITE(Logger::DEBUG, "Starting game");
 	GameManager gameManager;
 	InGameState inGameState;
 	gameManager.PushState(inGameState, player);
@@ -69,7 +69,7 @@ int main()
 	};
 	bool fullscreen = false;
 	WindowResolutions resolution = RESOLUTION_1600x900;
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initialization complete. Starting main loop...");
+	LOGGER_WRITE(Logger::DEBUG, "Initialization complete. Starting main loop...");
 
 	//Main loop
 	while (renderWindow.isOpen())

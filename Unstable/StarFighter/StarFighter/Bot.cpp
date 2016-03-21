@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size)  : GameObject(position, speed,  textureName, size)
 {
-	m_collider_type = GameObjectType::FriendlyFire;
+	m_collider_type = FriendlyFire;
 	m_visible = false;
 	m_isOnScene = true;
 	m_DontGarbageMe = true;
@@ -103,7 +103,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool
 					float target_angle = getRotation();
 					if (m_weapon->m_target_seaking != NO_SEAKING || (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index == 0))
 					{
-						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, getPosition()), 360);
+						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 					}
 					float current_angle = getRotation();
 					float delta = current_angle - target_angle;
@@ -132,7 +132,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool
 					}
 
 					m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
-					m_weapon->Fire(GameObjectType::FriendlyFire, deltaTime);
+					m_weapon->Fire(FriendlyFire, deltaTime);
 				}
 			}
 		}

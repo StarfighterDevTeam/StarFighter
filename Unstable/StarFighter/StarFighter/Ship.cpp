@@ -10,13 +10,13 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 
 	m_automatic_fire = false;
 
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		m_equipment[i] = NULL;
 	}
 	m_weapon = NULL;
 	m_fake_ship = NULL;
-	m_collider_type = GameObjectType::PlayerShip;
+	m_collider_type = PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
 	m_visible = true;
@@ -40,14 +40,14 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_xp = 0;
 	m_xp_max = XP_MAX_FIRST_LEVEL;
 
-	m_combo_aura[GrazeLevels::GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
-	m_combo_aura[GrazeLevels::GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
-	m_combo_aura[GrazeLevels::GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
+	m_combo_aura[GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
+	m_combo_aura[GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
+	m_combo_aura[GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
 	m_trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	m_trail->m_visible = false;
 	m_trail->m_offset = sf::Vector2f(0, (m_size.y / 2) + (m_trail->m_size.y / 2));
 
-	(*CurrentGame).addToScene(m_trail, LayerType::FakeShipLayer, GameObjectType::Neutral);
+	(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
 	m_equipment_loot = NULL;
@@ -111,7 +111,7 @@ void Ship::Init()
 	{
 		m_bot_list.push_back(m_ship_model->m_bot);
 	}
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		if (m_equipment[i] != NULL)
 		{
@@ -413,7 +413,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 					float target_angle = getRotation();
 					if (m_weapon->m_target_seaking != NO_SEAKING || (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index == 0))
 					{
-						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::EnemyObject, getPosition()), 360);
+						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 					}
 
 					float current_angle = getRotation();
@@ -1045,7 +1045,7 @@ void Ship::SwappingItems()
 		}
 		else
 		{
-			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+			LOGGER_WRITE(Logger::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 		}
 
 		tmp_ptr = NULL;
@@ -1127,19 +1127,19 @@ void Ship::SettingTurnAnimations()
 
 	if (!m_ship_model->m_fake_textureName.empty())
 	{
-		if (x > 0 && m_currentAnimationIndex != ShipAnimations::ShipTurningRight && !m_disable_inputs)
+		if (x > 0 && m_currentAnimationIndex != ShipTurningRight && !m_disable_inputs)
 		{
-			m_currentAnimationIndex = ShipAnimations::ShipTurningRight;
+			m_currentAnimationIndex = ShipTurningRight;
 		}
 
-		else if (x < 0 && m_currentAnimationIndex != ShipAnimations::ShipTurningLeft && !m_disable_inputs)
+		else if (x < 0 && m_currentAnimationIndex != ShipTurningLeft && !m_disable_inputs)
 		{
-			m_currentAnimationIndex = ShipAnimations::ShipTurningLeft;
+			m_currentAnimationIndex = ShipTurningLeft;
 		}
 
-		else if ((x == 0 && m_currentAnimationIndex != ShipAnimations::ShipIdle) || m_disable_inputs)
+		else if ((x == 0 && m_currentAnimationIndex != ShipIdle) || m_disable_inputs)
 		{
-			m_currentAnimationIndex = ShipAnimations::ShipIdle;
+			m_currentAnimationIndex = ShipIdle;
 		}
 	}
 }
@@ -1202,7 +1202,7 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, Enem
 		//double random_number = (double)rand() / (RAND_MAX);
 		float random_beast_scale = RandomizeFloatBetweenValues(LootTable_BeastScale_Base[loot_class]);
 		int loot_credits_ = ceil(random_beast_scale / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(shop->m_level + 1));
-		int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
+		int equipment_type_roll = rand() % ((int)NBVAL_Equipment + 1);//+1 is for the weapon type
 
 		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, shop->m_level, shop, random_beast_scale))
 		{
@@ -1275,7 +1275,7 @@ void Ship::Death()
 {
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-	(*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
+	(*CurrentGame).addToScene(myFX, ExplosionLayer, Neutral);
 
 	SetVisibility(false);
 	m_graze_count = 0;
@@ -1415,14 +1415,14 @@ void Ship::GetShop(GameObject* object)
 	}
 }
 
-static int GrazeLevelsThresholds[GrazeLevels::NB_GRAZE_LEVELS] = { 0, 100, 500, 1500 };
-static float GrazeLevelsBeastBonus[GrazeLevels::NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
+static int GrazeLevelsThresholds[NB_GRAZE_LEVELS] = { 0, 100, 500, 1500 };
+static float GrazeLevelsBeastBonus[NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
 
 void Ship::GetGrazing()
 {
 	m_graze_count++;
 
-	if (m_graze_level < GrazeLevels::NB_GRAZE_LEVELS - 1)
+	if (m_graze_level < NB_GRAZE_LEVELS - 1)
 	{
 		if (m_graze_count >= GrazeLevelsThresholds[m_graze_level + 1])
 		{
@@ -1454,7 +1454,7 @@ void Ship::GetGrazing()
 				default:
 				{
 					m_graze_level = 0;
-					LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
+					LOGGER_WRITE(Logger::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
 					break;
 				}
 			}
@@ -1476,7 +1476,7 @@ float Ship::getShipBeastScore()
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", this->graze_level);
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", this->graze_level);
 		m_graze_count = 0;
 		m_graze_level = 0;
 	}
@@ -1589,7 +1589,7 @@ int Ship::UpdateShipLevel()
 //SAVING AND LOADING ITEMS AND MONEY
 int Ship::SavePlayerMoney(string file, Ship* ship)
 {
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving money in profile.\n");
+	LOGGER_WRITE(Logger::DEBUG, "Saving money in profile.\n");
 	assert(ship != NULL);
 
 	ofstream data(file.c_str(), ios::in | ios::trunc);
@@ -1609,7 +1609,7 @@ int Ship::SavePlayerMoney(string file, Ship* ship)
 
 bool Ship::LoadPlayerMoney(string file, Ship* ship)
 {
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading items from profile.\n");
+	LOGGER_WRITE(Logger::DEBUG, "Loading items from profile.\n");
 	assert(ship != NULL);
 
 	std::ifstream  data(file, ios::in);
@@ -1815,7 +1815,7 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 
 int Ship::SaveItems(string file, Ship* ship)
 {
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving items in profile.\n");
+	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
 	assert(ship != NULL);
 
 	ofstream data(file.c_str(), ios::in | ios::trunc);
@@ -2204,7 +2204,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 
 bool Ship::LoadPlayerItems(string file, Ship* ship)
 {
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading items from profile.\n");
+	LOGGER_WRITE(Logger::DEBUG, "Loading items from profile.\n");
 	assert(ship != NULL);
 
 	std::ifstream  data(file, ios::in);
@@ -2303,7 +2303,7 @@ float Ship::getFighterFloatStatValue(FighterStats stat)
 	float new_stat_value = 0;
 	float equipment_value = 0;
 
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		if (m_equipment[i])
 		{
@@ -2388,7 +2388,7 @@ int Ship::getFighterIntStatValue(FighterStats stat)
 	int new_stat_value = 0;
 	int equipment_value = 0;
 
-	for (int i = 0; i < EquipmentType::NBVAL_Equipment; i++)
+	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		if (m_equipment[i])
 		{
@@ -2505,7 +2505,7 @@ void Ship::GenerateBots(GameObject* target)
 		(*it)->setTarget(target);
 		(*it)->rotate(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 		(*it)->m_visible = !m_disable_bots;
-		(*CurrentGame).addToScene((*it), LayerType::BotLayer, GameObjectType::Neutral);
+		(*CurrentGame).addToScene((*it), BotLayer, Neutral);
 	}
 }
 
@@ -2532,8 +2532,8 @@ void Ship::GenerateFakeShip(GameObject* target)
 	assert(m_ship_model != NULL);
 	if (!m_ship_model->m_fake_textureName.empty())
 	{
-		m_fake_ship = new FakeShip(target, m_ship_model->m_fake_textureName, m_ship_model->m_fake_size, m_ship_model->m_fake_frameNumber, ShipAnimations::NB_ShipAnimations);
-		(*CurrentGame).addToScene(m_fake_ship, LayerType::FakeShipLayer, GameObjectType::FakePlayerShip);
+		m_fake_ship = new FakeShip(target, m_ship_model->m_fake_textureName, m_ship_model->m_fake_size, m_ship_model->m_fake_frameNumber, NB_ShipAnimations);
+		(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
 	}
 }
 

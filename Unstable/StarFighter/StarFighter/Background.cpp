@@ -10,7 +10,7 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 	sf::Vector2f size_ = GameObject::getSize_for_Direction(direction, size);
 	this->setPosition_Y_for_Direction(direction, sf::Vector2f(size_.x / 2, (-size_.y / 2) + first_screen_offset), true);
 
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	for (int i = 0; i < NO_DIRECTION; i++)
 	{
 		m_portals[(Directions)i] = NULL;
 	}
@@ -40,7 +40,7 @@ void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	setPosition(newposition.x, newposition.y);
 
 	//portals follow the background
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	for (int i = 0; i < NO_DIRECTION; i++)
 	{
 		if (m_portals[(Directions)i] != NULL)
 		{
@@ -58,41 +58,41 @@ void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 void Background::SetPortalsState(PortalState m_state)
 {
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	for (int i = 0; i < NO_DIRECTION; i++)
 	{
 		if (m_portals[(Directions)i] != NULL)
 		{
 			switch (m_state)
 			{
-				case PortalState::PortalGhost:
+				case PortalGhost:
 				{
-					m_portals[(Directions)i]->m_state = PortalState::PortalGhost;
+					m_portals[(Directions)i]->m_state = PortalGhost;
 					m_portals[(Directions)i]->m_visible = true;
 					m_portals[(Directions)i]->setGhost(true);
 					break;
 				}
 
-				case PortalState::PortalClose:
+				case PortalClose:
 				{
-					m_portals[(Directions)i]->m_state = PortalState::PortalClose;
+					m_portals[(Directions)i]->m_state = PortalClose;
 					m_portals[(Directions)i]->m_visible = true;
 					m_portals[(Directions)i]->setGhost(false);
 					m_portals[(Directions)i]->Close();
 					break;
 				}
 
-				case PortalState::PortalOpen:
+				case PortalOpen:
 				{
-					m_portals[(Directions)i]->m_state = PortalState::PortalOpen;
+					m_portals[(Directions)i]->m_state = PortalOpen;
 					m_portals[(Directions)i]->m_visible = true;
 					m_portals[(Directions)i]->setGhost(false);
 					m_portals[(Directions)i]->Open();
 					break;
 				}
 
-				case PortalState::PortalInvisible:
+				case PortalInvisible:
 				{
-					m_portals[(Directions)i]->m_state = PortalState::PortalInvisible;
+					m_portals[(Directions)i]->m_state = PortalInvisible;
 					m_portals[(Directions)i]->setGhost(false);
 					m_portals[(Directions)i]->Close();
 					break;

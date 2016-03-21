@@ -176,7 +176,7 @@ public :
 
 	bool m_disable_bots;
 	bool m_disable_inputs;
-	Aura* m_combo_aura[GrazeLevels::NB_GRAZE_LEVELS];
+	Aura* m_combo_aura[NB_GRAZE_LEVELS];
 	Aura* m_trail;
 	bool m_disabledHyperspeed;
 	bool m_is_asking_scene_transition;

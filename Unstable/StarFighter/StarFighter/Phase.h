@@ -88,8 +88,8 @@ enum Modifier
 {
 	NoModifier,
 	Immune,
-	Ghost,//no collision + alpha mask
-	Death,//suicide
+	GhostModifier,//no collision + alpha mask
+	DeathModifier,//suicide
 	FaceTarget,//rotate to always face player
 	ResetFacing,//rotate to always face player
 	Bouncing,//bounces on scene borders

@@ -18,68 +18,68 @@ ConditionTransition::ConditionTransition(ConditionType condition, FloatCompare o
 ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 {
 	//loading condition type
-	ConditionType cond = ConditionType::NoCondition;
+	ConditionType cond = NoCondition;
 	if (line_data[index].compare("positionV") == 0)
 	{
-		cond = ConditionType::VerticalPosition;
+		cond = VerticalPosition;
 	}
 	else if (line_data[index].compare("positionH") == 0)
 	{
-		cond = ConditionType::HorizontalPosition;
+		cond = HorizontalPosition;
 	}
 	else if (line_data[index].compare("phaseClock") == 0)
 	{
-		cond = ConditionType::phaseClock;
+		cond = phaseClock;
 	}
 	else if (line_data[index].compare("enemyClock") == 0)
 	{
-		cond = ConditionType::enemyClock;
+		cond = enemyClock;
 	}
 	else if (line_data[index].compare("life") == 0)
 	{
-		cond = ConditionType::LifePourcentage;
+		cond = LifePourcentage;
 	}
 	else if (line_data[index].compare("shield") == 0)
 	{
-		cond = ConditionType::ShieldPourcentage;
+		cond = ShieldPourcentage;
 	}
 	else if (line_data[index].compare("wakeUp") == 0)
 	{
-		cond = ConditionType::wakeUp;
+		cond = wakeUp;
 	}
 	else if (line_data[index].compare("proximity") == 0)
 	{
-		cond = ConditionType::EnemyProximity;
+		cond = EnemyProximity;
 	}
 	else if (line_data[index].compare("shotsFired") == 0)
 	{
-		cond = ConditionType::ShotsFired;
+		cond = ShotsFired;
 	}
 
 	//loading operator type
-	FloatCompare op = FloatCompare::ERROR_COMPARE;
-	if (cond != ConditionType::wakeUp)
+	FloatCompare op = ERROR_COMPARE;
+	if (cond != wakeUp)
 	{
 		if (line_data[index + CONDITION_OPERATOR].compare("greater") == 0)
 		{
-			op = FloatCompare::GREATHER_THAN;
+			op = GREATHER_THAN;
 		}
 		else if (line_data[index + CONDITION_OPERATOR].compare("lesser") == 0)
 		{
-			op = FloatCompare::LESSER_THAN;
+			op = LESSER_THAN;
 		}
 		else if (line_data[index + CONDITION_OPERATOR].compare("equal") == 0)
 		{
-			op = FloatCompare::EQUAL_TO;
+			op = EQUAL_TO;
 		}
 		else
 		{
-			LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition 1 of enemy phase named 'EnemyPhases.csv'. Please check config file"));
+			LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Invalid operator found when loading condition of transition 1 of enemy phase named 'EnemyPhases.csv'. Please check config file"));
 		}
 	}
 
 	float value = 0;
-	if (cond != ConditionType::wakeUp)
+	if (cond != wakeUp)
 	{
 		value = stoi(line_data[index + CONDITION_VALUE]);
 	}

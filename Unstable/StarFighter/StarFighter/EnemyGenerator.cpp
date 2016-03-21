@@ -7,7 +7,7 @@ EnemyGenerator::EnemyGenerator(float spawnCost, int enemyClass, float spawnRepea
 
 	if (spawnRepeatProbability + spawnMissProbability > 1)
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error in scene config file: repeat probability + miss probability should always be <= 1");
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error in scene config file: repeat probability + miss probability should always be <= 1");
 	}
 	m_spawnRepeatProbability = spawnRepeatProbability;
 	m_spawnMissProbability = spawnMissProbability;

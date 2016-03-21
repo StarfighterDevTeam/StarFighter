@@ -8,7 +8,7 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	m_duration = duration;
 	m_visible = true;
 	m_isOnScene = true;
-	m_collider_type = GameObjectType::Neutral;
+	m_collider_type = Neutral;
 	m_frameNumber = frameNumber;
 	m_display_name = "explosion_S_blue";
 }

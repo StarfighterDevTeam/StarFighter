@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x/2, size.y/2), frameNumber, animationNumber)
 {
-	m_collider_type = GameObjectType::EnemyObject;
+	m_collider_type = EnemyObject;
 	m_visible = true;
 	m_angspeed = 0;
 	m_radius = 0;
@@ -64,7 +64,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	catch (const std::exception & ex)
 	{
 		//An error occured
-		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+		LOGGER_WRITE(Logger::LERROR, ex.what());
 	}
 }
 
@@ -195,7 +195,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
 		{
-			l_ghost = l_ghost || (m_currentPhase->m_modifiers[i] == Ghost);
+			l_ghost = l_ghost || (m_currentPhase->m_modifiers[i] == GhostModifier);
 		}
 	}
 	setGhost(l_ghost || hyperspeedMultiplier > 1.0f);
@@ -293,7 +293,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 	else if (m_face_target)
 	{
-		target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
+		target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, this->getPosition()), 360);
 		isNearestTargetIsKnown = true;
 	}
 
@@ -309,7 +309,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				if ((*it)->m_target_seaking == SEAKING || ((*it)->m_target_seaking == SEMI_SEAKING && (*it)->m_rafale_index == 0))
 				{
-					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(GameObjectType::PlayerShip, this->getPosition()), 360);
+					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, this->getPosition()), 360);
 				}
 			}
 		}
@@ -413,7 +413,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 							(*it)->setPosition(getPosition().x + (*it)->m_weapon_current_offset.x, getPosition().y + (*it)->m_weapon_current_offset.y);
 							(*it)->m_face_target = m_face_target;
 
-							(*it)->Fire(GameObjectType::EnemyFire, deltaTime);
+							(*it)->Fire(EnemyFire, deltaTime);
 							{
 								m_shots_fired++;
 							}
@@ -549,7 +549,7 @@ bool Enemy::CheckCondition()
 	{
 		switch ((*it)->m_condition)
 		{
-			case ConditionType::VerticalPosition:
+			case VerticalPosition:
 			{
 				FloatCompare result = this->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
 				if (result == (*it)->m_op)
@@ -561,7 +561,7 @@ bool Enemy::CheckCondition()
 				break;
 			}
 
-			case ConditionType::HorizontalPosition:
+			case HorizontalPosition:
 			{
 				FloatCompare result = this->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				if (result == (*it)->m_op)
@@ -573,14 +573,14 @@ bool Enemy::CheckCondition()
 				break;
 			}
 		
-			case ConditionType::phaseClock:
+			case phaseClock:
 			{
-				if ((this->m_phaseTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::GREATHER_THAN)
+				if ((this->m_phaseTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATHER_THAN)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
 				}
-				else if ((this->m_phaseTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::LESSER_THAN)
+				else if ((this->m_phaseTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == LESSER_THAN)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
@@ -589,15 +589,15 @@ bool Enemy::CheckCondition()
 				break;
 			}
 		
-			case ConditionType::enemyClock:
+			case enemyClock:
 			{
-				if ((this->m_enemyTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::GREATHER_THAN)
+				if ((this->m_enemyTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATHER_THAN)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					this->m_enemyTimer = sf::seconds(0);
 					return true;
 				}
-				else if ((this->m_enemyTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == FloatCompare::LESSER_THAN)
+				else if ((this->m_enemyTimer < sf::seconds((*it)->m_value)) && (*it)->m_op == LESSER_THAN)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					this->m_enemyTimer = sf::seconds(0);
@@ -607,15 +607,15 @@ bool Enemy::CheckCondition()
 				break;
 			}
 		
-			case ConditionType::LifePourcentage:
+			case LifePourcentage:
 			{
-				if ((100.0f * m_armor / m_armor_max >= (*it)->m_value) && (((*it)->m_op == FloatCompare::GREATHER_THAN) || ((*it)->m_op == FloatCompare::EQUAL_TO)))
+				if ((100.0f * m_armor / m_armor_max >= (*it)->m_value) && (((*it)->m_op == GREATHER_THAN) || ((*it)->m_op == EQUAL_TO)))
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 
 					return true;
 				}
-				else if ((100.0f * m_armor / m_armor_max <= (*it)->m_value) && (((*it)->m_op == FloatCompare::LESSER_THAN) || ((*it)->m_op == FloatCompare::EQUAL_TO)))
+				else if ((100.0f * m_armor / m_armor_max <= (*it)->m_value) && (((*it)->m_op == LESSER_THAN) || ((*it)->m_op == EQUAL_TO)))
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
@@ -623,10 +623,10 @@ bool Enemy::CheckCondition()
 				break;
 			}
 		
-			case ConditionType::ShieldPourcentage:
+			case ShieldPourcentage:
 			{
 				//Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
-				if ((*it)->m_op == FloatCompare::GREATHER_THAN)
+				if ((*it)->m_op == GREATHER_THAN)
 				{
 					if (m_shield_max == 0)
 					{
@@ -639,7 +639,7 @@ bool Enemy::CheckCondition()
 					}
 					break;
 				}
-				else if ((*it)->m_op == FloatCompare::LESSER_THAN)
+				else if ((*it)->m_op == LESSER_THAN)
 				{
 					if (this->m_shield_max == 0)
 					{
@@ -653,7 +653,7 @@ bool Enemy::CheckCondition()
 					}
 					break;
 				}
-				else if ((*it)->m_op == FloatCompare::EQUAL_TO)
+				else if ((*it)->m_op == EQUAL_TO)
 				{
 					if (m_shield_max == 0)
 					{
@@ -673,7 +673,7 @@ bool Enemy::CheckCondition()
 				}
 			}
 
-			case ConditionType::wakeUp:
+			case wakeUp:
 			{
 				if (this->m_wake_up)
 				{
@@ -683,19 +683,19 @@ bool Enemy::CheckCondition()
 				break;
 			}
 
-			case ConditionType::EnemyProximity:
+			case EnemyProximity:
 			{
-				if ((*it)->m_op == FloatCompare::GREATHER_THAN)
+				if ((*it)->m_op == GREATHER_THAN)
 				{
-					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_OUT_OF_RANGE)
+					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_OUT_OF_RANGE)
 					{
 						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
 					}
 				}
-				else if ((*it)->m_op == FloatCompare::LESSER_THAN || (*it)->m_op == FloatCompare::EQUAL_TO)
+				else if ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO)
 				{
-					if ((*CurrentGame).FoundNearestGameObject(GameObjectType::PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_IN_RANGE)
+					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_IN_RANGE)
 					{
 						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
@@ -704,9 +704,9 @@ bool Enemy::CheckCondition()
 				break;
 			}
 
-			case ConditionType::ShotsFired:
+			case ShotsFired:
 			{
-				if ((*it)->m_op == FloatCompare::GREATHER_THAN)
+				if ((*it)->m_op == GREATHER_THAN)
 				{
 					if (this->m_shots_fired >= (*it)->m_value)
 					{
@@ -714,7 +714,7 @@ bool Enemy::CheckCondition()
 						return true;
 					}
 				}
-				else if ((*it)->m_op == FloatCompare::EQUAL_TO)
+				else if ((*it)->m_op == EQUAL_TO)
 				{
 					if (this->m_shots_fired == (*it)->m_value)
 					{
@@ -722,7 +722,7 @@ bool Enemy::CheckCondition()
 						return true;
 					}
 				}
-				else if ((*it)->m_op == FloatCompare::LESSER_THAN)
+				else if ((*it)->m_op == LESSER_THAN)
 				{
 					if (this->m_shots_fired < (*it)->m_value)
 					{
@@ -759,47 +759,47 @@ void Enemy::setPhase(Phase* phase)
 	{
 		switch (phase->m_modifiers[i])
 		{
-			case Modifier::NoModifier:
+			case NoModifier:
 			{
 				//do nothing
 				break;
 			}
-			case Modifier::Immune:
+			case Immune:
 			{
 				m_immune = true;
 				break;
 			}
-			case Modifier::Ghost:
+			case GhostModifier:
 			{
 				setGhost(true);
 				break;
 			}
-			case Modifier::Death:
+			case DeathModifier:
 			{
 				Death();
 				break;
 			}
-			case Modifier::FaceTarget:
+			case FaceTarget:
 			{
 				m_face_target = true;
 				break;
 			}
-			case Modifier::ResetFacing:
+			case ResetFacing:
 			{
 				m_reset_facing = true;
 				break;
 			}
-			case Modifier::Bouncing:
+			case Bouncing:
 			{
 				m_bouncing = BouncingEverywhere;
 				break;
 			}
-			case Modifier::BouncingH:
+			case BouncingH:
 			{
 				m_bouncing = BouncingHorizontal;
 				break;
 			}
-			case Modifier::BouncingV:
+			case BouncingV:
 			{
 				m_bouncing = BouncingVertical;
 				break;
@@ -828,14 +828,14 @@ void Enemy::setPhase(Phase* phase)
 		phase->m_welcomeWeapon->setPosition(this->getPosition().x + weapon_offset_x, this->getPosition().y + weapon_offset_y);
 		phase->m_welcomeWeapon->m_shot_angle = theta;
 
-		phase->m_welcomeWeapon->Fire(GameObjectType::EnemyFire);
+		phase->m_welcomeWeapon->Fire(EnemyFire);
 	}
 
 	//setting up wake_up condition
 	bool wake_up_condition_exists = false;
 	for (std::vector<ConditionTransition*>::iterator it = (phase->m_transitions_list.begin()); it != (phase->m_transitions_list.end()); it++)
 	{
-		if ((*it)->m_condition == ConditionType::wakeUp)
+		if ((*it)->m_condition == wakeUp)
 		{
 			m_wake_up = false;
 			wake_up_condition_exists = true;
@@ -899,7 +899,7 @@ Dialog* Enemy::LoadDialog(string name)
 		}
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Dialog '%s'. Please check the config file", name));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Dialog '%s'. Please check the config file", (char*)name.c_str()));
 }
 
 Phase* Enemy::LoadPhase(string name)
@@ -913,8 +913,8 @@ Phase* Enemy::LoadPhase(string name)
 			Phase* phase = new Phase();
 
 			phase->m_name = name;
-			phase->m_display_name = (*it)[EnemyPhaseData::PHASE_NAME];
-			phase->m_vspeed = stoi((*it)[EnemyPhaseData::PHASE_VSPEED]);
+			phase->m_display_name = (*it)[PHASE_NAME];
+			phase->m_vspeed = stoi((*it)[PHASE_VSPEED]);
 
 			//loading weapons and ammos
 			for (int i = 0; i < 6; i++)
@@ -930,49 +930,49 @@ Phase* Enemy::LoadPhase(string name)
 			}
 
 			//loading phases
-			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), EnemyPhaseData::PHASE_PATTERN);
+			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), PHASE_PATTERN);
 			phase->m_Pattern = m_bobby;
 
 			//loading rotation speed
-			phase->m_rotation_speed = stoi((*it)[EnemyPhaseData::PHASE_ROTATION_SPEED]);
+			phase->m_rotation_speed = stoi((*it)[PHASE_ROTATION_SPEED]);
 
 			//loading modifier (immune to damage, etc.)
 			for (int i = 0; i < 2; i++)
 			{
-				Modifier l_new_modifier = Modifier::NoModifier;
-				if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("0") != 0)
+				Modifier l_new_modifier = NoModifier;
+				if ((*it)[PHASE_MODIFIER + i].compare("0") != 0)
 				{
-					if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("immune") == 0)
+					if ((*it)[PHASE_MODIFIER + i].compare("immune") == 0)
 					{
-						l_new_modifier = Modifier::Immune;
+						l_new_modifier = Immune;
 					}
-					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("ghost") == 0)
+					else if ((*it)[PHASE_MODIFIER + i].compare("ghost") == 0)
 					{
-						l_new_modifier = Modifier::Ghost;
+						l_new_modifier = GhostModifier;
 					}
-					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("death") == 0)
+					else if ((*it)[PHASE_MODIFIER + i].compare("death") == 0)
 					{
-						l_new_modifier = Modifier::Death;
+						l_new_modifier = DeathModifier;
 					}
-					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("face_target") == 0)
+					else if ((*it)[PHASE_MODIFIER + i].compare("face_target") == 0)
 					{
-						l_new_modifier = Modifier::FaceTarget;
+						l_new_modifier = FaceTarget;
 					}
-					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("reset_facing") == 0)
+					else if ((*it)[PHASE_MODIFIER + i].compare("reset_facing") == 0)
 					{
-						l_new_modifier = Modifier::ResetFacing;
+						l_new_modifier = ResetFacing;
 					}
-					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("bouncing") == 0)
+					else if ((*it)[PHASE_MODIFIER + i].compare("bouncing") == 0)
 					{
-						l_new_modifier = Modifier::Bouncing;
+						l_new_modifier = Bouncing;
 					}
-					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("bouncingH") == 0)
+					else if ((*it)[PHASE_MODIFIER + i].compare("bouncingH") == 0)
 					{
-						l_new_modifier = Modifier::BouncingH;
+						l_new_modifier = BouncingH;
 					}
-					else if ((*it)[EnemyPhaseData::PHASE_MODIFIER + i].compare("bouncingV") == 0)
+					else if ((*it)[PHASE_MODIFIER + i].compare("bouncingV") == 0)
 					{
-						l_new_modifier = Modifier::BouncingV;
+						l_new_modifier = BouncingV;
 					}
 				}
 
@@ -980,33 +980,33 @@ Phase* Enemy::LoadPhase(string name)
 			}
 
 			//loading welcome shot
-			if ((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON].compare("0") != 0)
+			if ((*it)[PHASE_WELCOME_WEAPON].compare("0") != 0)
 			{
-				phase->m_welcomeWeapon = Enemy::LoadWeapon((*it)[EnemyPhaseData::PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[EnemyPhaseData::PHASE_WELCOME_AMMO]));
+				phase->m_welcomeWeapon = Enemy::LoadWeapon((*it)[PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[PHASE_WELCOME_AMMO]));
 				phase->m_hasWelcomeShot = true;
 			}
 			
 			//load enemies (by name) to wake up
-			if ((*it)[EnemyPhaseData::PHASE_WAKEUP].compare("0") != 0)
+			if ((*it)[PHASE_WAKEUP].compare("0") != 0)
 			{
-				phase->m_wake_up_name = (*it)[EnemyPhaseData::PHASE_WAKEUP];
+				phase->m_wake_up_name = (*it)[PHASE_WAKEUP];
 				phase->m_hasWakeUp = true;
 			}
 
 			//loading transition to next phase
-			if ((*it)[EnemyPhaseData::PHASE_CONDITION].compare("0") != 0)
+			if ((*it)[PHASE_CONDITION].compare("0") != 0)
 			{
-				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION));
+				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), PHASE_CONDITION));
 			}
-			if ((*it)[EnemyPhaseData::PHASE_CONDITION_2].compare("0") != 0)
+			if ((*it)[PHASE_CONDITION_2].compare("0") != 0)
 			{
-				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), EnemyPhaseData::PHASE_CONDITION_2));
+				phase->m_transitions_list.push_back(Phase::ConditionLoader((*it), PHASE_CONDITION_2));
 			}
 
 			//loading dialogs
-			if ((*it)[EnemyPhaseData::PHASE_DIALOG_NAME].compare("0") != 0)
+			if ((*it)[PHASE_DIALOG_NAME].compare("0") != 0)
 			{
-				Dialog* dialog = Enemy::LoadDialog((*it)[EnemyPhaseData::PHASE_DIALOG_NAME]);
+				Dialog* dialog = Enemy::LoadDialog((*it)[PHASE_DIALOG_NAME]);
 				phase->m_dialogs.push_back(dialog);
 				while (!dialog->m_next_dialog_name.empty() && dialog->m_next_dialog_name.compare("0") != 0)
 				{
@@ -1019,14 +1019,14 @@ Phase* Enemy::LoadPhase(string name)
 		}
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPhase '%s'. Please check the config file", name));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find EnemyPhase '%s'. Please check the config file", (char*)name.c_str()));
 }
 
 void Enemy::Death()
 {
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(getPosition().x, getPosition().y);
-	(*CurrentGame).addToScene(myFX,LayerType::ExplosionLayer, GameObjectType::Neutral);
+	(*CurrentGame).addToScene(myFX,ExplosionLayer, Neutral);
 
 	//Score
 	(*CurrentGame).m_hazard += m_money;
@@ -1064,21 +1064,21 @@ void Enemy::GenerateLoot()
 	{
 		Loot* new_loot = new Loot(getPosition(), speed, m_weapon_loot->m_textureName, m_weapon_loot->m_size, m_weapon_loot->m_display_name);
 		new_loot->get_weapon_from(*this);
-		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, LootLayer, LootObject);
 	}
 
 	else if (m_equipment_loot != NULL)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, m_equipment_loot->m_textureName, m_equipment_loot->m_size, m_equipment_loot->m_display_name);
 		new_loot->get_equipment_from(*this);
-		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, LootLayer, LootObject);
 	}
 
 	else if (m_money > 0)
 	{
 		Loot* new_loot = new Loot(this->getPosition(), speed, LOOT_FILENAME, sf::Vector2f(LOOT_HEIGHT, LOOT_WIDTH), "Money");
 		new_loot->setMoney(m_money);
-		(*CurrentGame).addToScene((GameObject*)new_loot, LayerType::LootLayer, GameObjectType::LootObject);
+		(*CurrentGame).addToScene((GameObject*)new_loot, LootLayer, LootObject);
 	}
 	else
 	{
@@ -1099,10 +1099,10 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 	else
 	{
 		//setting min and max beast score values
-		sf::Vector2f LootTable_BeastScale[EnemyClass::NBVAL_EnemyClass];
-		for (int b = 0; b < EnemyClass::NBVAL_EnemyClass; b++)
+		sf::Vector2f LootTable_BeastScale[NBVAL_EnemyClass];
+		for (int b = 0; b < NBVAL_EnemyClass; b++)
 		{
-			if (b != EnemyClass::ENEMYPOOL_VOID && b != EnemyClass::ENEMYPOOL_ZETA)
+			if (b != ENEMYPOOL_VOID && b != ENEMYPOOL_ZETA)
 			{
 				LootTable_BeastScale[b].x = LootTable_BeastScale_Base[b].x + BeastScaleBonus;
 				LootTable_BeastScale[b].y = LootTable_BeastScale_Base[b].y + BeastScaleBonus;
@@ -1124,7 +1124,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			int loot_credits_ = ceil(BeastScaleScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(m_level + 1));
 
 			//Equipment type
-			int equipment_type_roll = rand() % ((int)EquipmentType::NBVAL_Equipment + 1);//+1 is for the weapon type
+			int equipment_type_roll = rand() % ((int)NBVAL_Equipment + 1);//+1 is for the weapon type
 
 			//"Spending credits" on item stats and assigning the equipment/weapon as a loot
 			AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, m_level + 1, this, BeastScaleScore);
@@ -1145,27 +1145,27 @@ bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int credits, int
 {
 	switch (equipment_type)
 	{
-		case (int)EquipmentType::Engine:
+		case (int)Engine:
 		{
 			return object->setEquipmentLoot(Equipment::CreateRandomEngine(credits, level, quality));
 		}
 
-		case (int)EquipmentType::Armor:
+		case (int)Armor:
 		{
 			return object->setEquipmentLoot(Equipment::CreateRandomArmor(credits, level, quality));
 		}
 
-		case (int)EquipmentType::Shield:
+		case (int)Shield:
 		{
 			return object->setEquipmentLoot(Equipment::CreateRandomShield(credits, level, quality));
 		}
 
-		case (int)EquipmentType::Module:
+		case (int)Module:
 		{
 			return object->setEquipmentLoot(Equipment::CreateRandomModule(credits, level, quality));
 		}
 
-		case (int)EquipmentType::NBVAL_Equipment://WEAPON DROP
+		case (int)NBVAL_Equipment://WEAPON DROP
 		{
 			return object->setWeaponLoot(Weapon::CreateRandomWeapon(credits, level, false, quality));
 		}
@@ -1194,49 +1194,49 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		if ((*it)[0].compare(name) == 0)
 		{
 			Weapon* weapon = new Weapon(ammo);
-			weapon->m_display_name = (*it)[WeaponData::WEAPON_DISPLAY_NAME];
+			weapon->m_display_name = (*it)[WEAPON_DISPLAY_NAME];
 			weapon->m_fire_direction = Vector2i(0, fire_direction);
-			weapon->m_rate_of_fire = atof((*it)[WeaponData::WEAPON_RATE_OF_FIRE].c_str());
-			weapon->m_shot_mode = ShotMode::NoShotMode;
+			weapon->m_rate_of_fire = atof((*it)[WEAPON_RATE_OF_FIRE].c_str());
+			weapon->m_shot_mode = NoShotMode;
 
-			weapon->m_multishot = stoi((*it)[WeaponData::WEAPON_MULTISHOT]);
+			weapon->m_multishot = stoi((*it)[WEAPON_MULTISHOT]);
 			if (weapon->m_multishot > 1)
 			{
-				weapon->m_xspread = stoi((*it)[WeaponData::WEAPON_XSPREAD]);
-				weapon->m_dispersion = stoi((*it)[WeaponData::WEAPON_DISPERSION]);
-				if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("0") != 0)
+				weapon->m_xspread = stoi((*it)[WEAPON_XSPREAD]);
+				weapon->m_dispersion = stoi((*it)[WEAPON_DISPERSION]);
+				if ((*it)[WEAPON_ALTERNATE].compare("0") != 0)
 				{
-					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("alternate") == 0)
+					if ((*it)[WEAPON_ALTERNATE].compare("alternate") == 0)
 						weapon->m_shot_mode = AlternateShotMode;
-					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending") == 0)
+					if ((*it)[WEAPON_ALTERNATE].compare("ascending") == 0)
 						weapon->m_shot_mode = AscendingShotMode;
-					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending") == 0)
+					if ((*it)[WEAPON_ALTERNATE].compare("descending") == 0)
 						weapon->m_shot_mode = DescendingShotMode;
-					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("ascending2") == 0)
+					if ((*it)[WEAPON_ALTERNATE].compare("ascending2") == 0)
 						weapon->m_shot_mode = Ascending2ShotMode;
-					if ((*it)[WeaponData::WEAPON_ALTERNATE].compare("descending2") == 0)
+					if ((*it)[WEAPON_ALTERNATE].compare("descending2") == 0)
 						weapon->m_shot_mode = Descending2ShotMode;
 				}
 			}
 			
-			weapon->m_rafale = stoi((*it)[WeaponData::WEAPON_RAFALE]);
+			weapon->m_rafale = stoi((*it)[WEAPON_RAFALE]);
 			if (weapon->m_rafale != 0)
 			{
-				weapon->m_rafale_cooldown = atof((*it)[WeaponData::WEAPON_RAFALE_COOLDOWN].c_str());
+				weapon->m_rafale_cooldown = atof((*it)[WEAPON_RAFALE_COOLDOWN].c_str());
 			}
 				
-			weapon->m_textureName = (*it)[WeaponData::WEAPON_IMAGE_NAME];
-			weapon->m_size = sf::Vector2f(stoi((*it)[WeaponData::WEAPON_WIDTH]), stoi((*it)[WeaponData::WEAPON_HEIGHT]));
-			weapon->m_frameNumber = stoi((*it)[WeaponData::WEAPON_FRAMES]);
-			weapon->m_angle_offset = stoi((*it)[WeaponData::WEAPON_ANGLE_OFFSET]);
+			weapon->m_textureName = (*it)[WEAPON_IMAGE_NAME];
+			weapon->m_size = sf::Vector2f(stoi((*it)[WEAPON_WIDTH]), stoi((*it)[WEAPON_HEIGHT]));
+			weapon->m_frameNumber = stoi((*it)[WEAPON_FRAMES]);
+			weapon->m_angle_offset = stoi((*it)[WEAPON_ANGLE_OFFSET]);
 
-			if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("0") != 0)
+			if ((*it)[WEAPON_TARGET_SEAKING].compare("0") != 0)
 			{
-				if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
+				if ((*it)[WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
 					weapon->m_target_seaking = SEMI_SEAKING;
-				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("seaking") == 0)
+				else if ((*it)[WEAPON_TARGET_SEAKING].compare("seaking") == 0)
 					weapon->m_target_seaking = SEAKING;
-				else if ((*it)[WeaponData::WEAPON_TARGET_SEAKING].compare("super_seaking") == 0)
+				else if ((*it)[WEAPON_TARGET_SEAKING].compare("super_seaking") == 0)
 					weapon->m_target_seaking = SUPER_SEAKING;
 			}
 
@@ -1244,7 +1244,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 		}
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file", name));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Weapon '%s'. Please check the config file", (char*)name.c_str()));
 }
 
 Ammo* Enemy::LoadAmmo(string name)
@@ -1255,20 +1255,20 @@ Ammo* Enemy::LoadAmmo(string name)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
-			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, stoi((*it)[AmmoData::AMMO_SPEED])), (*it)[AmmoData::AMMO_IMAGE_NAME],
-				Vector2f(stoi((*it)[AmmoData::AMMO_WIDTH]), stoi((*it)[AmmoData::AMMO_HEIGHT])), stoi((*it)[AmmoData::AMMO_DAMAGE]), LoadFX((*it)[AmmoData::AMMO_FX]));
-			new_ammo->m_display_name = (*it)[AmmoData::AMMO_NAME];
-			new_ammo->m_range = stoi((*it)[AmmoData::AMMO_RANGE]);
+			Ammo* new_ammo = new Ammo(Vector2f(0, 0), Vector2f(0, stoi((*it)[AMMO_SPEED])), (*it)[AMMO_IMAGE_NAME],
+				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_DAMAGE]), LoadFX((*it)[AMMO_FX]));
+			new_ammo->m_display_name = (*it)[AMMO_NAME];
+			new_ammo->m_range = stoi((*it)[AMMO_RANGE]);
 			
-			PatternBobby* bobby = PatternBobby::PatternLoader((*it), AmmoData::AMMO_PATTERN);
+			PatternBobby* bobby = PatternBobby::PatternLoader((*it), AMMO_PATTERN);
 			new_ammo->m_Pattern.SetPattern(bobby->currentPattern, bobby->patternSpeed, bobby->patternParams);
 
-			new_ammo->m_rotation_speed = stoi((*it)[AmmoData::AMMO_ROTATION_SPEED]);
+			new_ammo->m_rotation_speed = stoi((*it)[AMMO_ROTATION_SPEED]);
 			return new_ammo;
 		}
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file", name));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file", (char*)name.c_str()));
 }
 
 FX* Enemy::LoadFX(string name)
@@ -1277,20 +1277,20 @@ FX* Enemy::LoadFX(string name)
 
 	for (std::vector<vector<string>>::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
 	{
-		if ((*it)[FXData::FX_TYPE].compare("explosion") == 0)
+		if ((*it)[FX_TYPE].compare("explosion") == 0)
 		{
-			if ((*it)[FXData::FX_NAME].compare(name) == 0)
+			if ((*it)[FX_NAME].compare(name) == 0)
 			{
-				float duration = atof(((*it)[FXData::FX_DURATION]).c_str());
-				FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*it)[FXData::FX_FILENAME], Vector2f(stoi((*it)[FXData::FX_WIDTH]), stoi((*it)[FXData::FX_HEIGHT])), stoi((*it)[FXData::FX_FRAMES]), sf::seconds(duration));
-				myFX->m_display_name = (*it)[FXData::FX_NAME];
+				float duration = atof(((*it)[FX_DURATION]).c_str());
+				FX* myFX = new FX(Vector2f(0, 0), Vector2f(0, 0), (*it)[FX_FILENAME], Vector2f(stoi((*it)[FX_WIDTH]), stoi((*it)[FX_HEIGHT])), stoi((*it)[FX_FRAMES]), sf::seconds(duration));
+				myFX->m_display_name = (*it)[FX_NAME];
 
 				return myFX;
 			}
 		}
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file", name));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find FX '%s'. Please check the config file", (char*)name.c_str()));
 
 }
 

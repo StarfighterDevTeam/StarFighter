@@ -4,10 +4,10 @@ extern Game* CurrentGame;
 
 void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene, bool first_scene)
 {
-	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading scene '%s'", (char*)name.c_str()));
+	LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading scene '%s'", (char*)name.c_str()));
 	srand(time(NULL));
 	m_name = name;
-	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
+	for (int i = 0; i < NBVAL_EnemyClass; i++)
 	{
 		m_total_class_probability[i] = 0;
 	}
@@ -33,10 +33,10 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
 				//Loading the linked scene names
-				m_links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
-				m_links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
-				m_links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
-				m_links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
+				m_links[DIRECTION_UP] = (*it)[SCENE_LINK_UP];
+				m_links[DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
+				m_links[DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
+				m_links[DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
 
 				m_canHazardBreak = ((*it)[SCENE_HAZARD_BREAK].compare("1") == 0) ? true : false;
 
@@ -48,7 +48,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
-						m_direction = Directions::NO_DIRECTION;
+						m_direction = NO_DIRECTION;
 						bool hub = false;
 
 						m_vspeed = stoi((*it)[BACKGROUND_VSPEED]);
@@ -60,22 +60,22 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						{
 							if (!reverse_scene)
 							{
-								m_direction = Directions::DIRECTION_UP;
+								m_direction = DIRECTION_UP;
 							}
 							else
 							{
-								m_direction = Directions::DIRECTION_DOWN;
+								m_direction = DIRECTION_DOWN;
 							}
 						}
 						else if ((*it)[BACKGROUND_VERTICAL].compare("H") == 0)
 						{
 							if (!reverse_scene)
 							{
-								m_direction = Directions::DIRECTION_RIGHT;
+								m_direction = DIRECTION_RIGHT;
 							}
 							else
 							{
-								m_direction = Directions::DIRECTION_LEFT;
+								m_direction = DIRECTION_LEFT;
 							}
 						}
 						else
@@ -99,15 +99,15 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 						if (hub)
 						{
-							m_direction = Directions::NO_DIRECTION;
+							m_direction = NO_DIRECTION;
 						}
 						
 						m_bg = new Background(sf::Vector2f(0, 0), speed, (*it)[BACKGROUND_NAME], sf::Vector2f(w, h), (*CurrentGame).m_direction, first_screen_offset);
 						m_bg->m_display_name = scene_name;
-						(*CurrentGame).addToScene(m_bg, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
+						(*CurrentGame).addToScene(m_bg, BackgroundLayer, BackgroundObject);
 
 						//Getting the display name of the scene and loading it into the scene portals
-						for (int i = 0; i < Directions::NO_DIRECTION; i++)
+						for (int i = 0; i < NO_DIRECTION; i++)
 						{
 							if (m_links[(Directions)i].compare("0") != 0)
 							{
@@ -137,17 +137,17 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								}
 
 								//Displaying the portals
-								(*CurrentGame).addToScene(m_bg->m_portals[(Directions)i], LayerType::PortalLayer, GameObjectType::PortalObject);
+								(*CurrentGame).addToScene(m_bg->m_portals[(Directions)i], PortalLayer, PortalObject);
 							}
 						}
 
 						if (first_scene)
 						{
-							m_bg->SetPortalsState(PortalState::PortalOpen);
+							m_bg->SetPortalsState(PortalOpen);
 						}
 						else
 						{
-							m_bg->SetPortalsState(PortalState::PortalGhost);
+							m_bg->SetPortalsState(PortalGhost);
 						}
 					}
 					else if ((*it)[0].compare("shop") == 0)
@@ -164,7 +164,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						//creating shop content
 						Ship::FillShopWithRandomObjets(NUMBER_OF_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_ALPHA);
 						Ship::FillShopWithRandomObjets(NUMBER_OF_RARE_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_BETA);
-						LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Filling scene '%s' shop with new items.\n", (char*)name.c_str()));
+						LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Filling scene '%s' shop with new items.\n", (char*)name.c_str()));
 
 					}
 					//Loading enemies
@@ -216,7 +216,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 						m_generating_boss = true;
 					}
 
-					if (enemy_count != 0 && m_direction != Directions::NO_DIRECTION)
+					if (enemy_count != 0 && m_direction != NO_DIRECTION)
 					{
 						m_generating_enemies = true;
 						m_spawnClock.restart();
@@ -228,7 +228,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	catch (const std::exception & ex)
 	{
 		//An error occured
-		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+		LOGGER_WRITE(Logger::LERROR, ex.what());
 	}
 }
 
@@ -244,10 +244,10 @@ Scene::Scene(string name)
 			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
 				//Loading the linked scene names
-				m_links[Directions::DIRECTION_UP] = (*it)[SCENE_LINK_UP];
-				m_links[Directions::DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
-				m_links[Directions::DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
-				m_links[Directions::DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
+				m_links[DIRECTION_UP] = (*it)[SCENE_LINK_UP];
+				m_links[DIRECTION_DOWN] = (*it)[SCENE_LINK_DOWN];
+				m_links[DIRECTION_RIGHT] = (*it)[SCENE_LINK_RIGHT];
+				m_links[DIRECTION_LEFT] = (*it)[SCENE_LINK_LEFT];
 				std::string scene_name = (*it)[SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
@@ -263,7 +263,7 @@ Scene::Scene(string name)
 			}
 
 			//Drawing link zones and texts
-			for (int i = 0; i < Directions::NO_DIRECTION; i++)
+			for (int i = 0; i < NO_DIRECTION; i++)
 			{
 				if (m_links[(Directions)i].compare("0") != 0)
 				{
@@ -283,7 +283,7 @@ Scene::Scene(string name)
 	catch (const std::exception & ex)
 	{
 		//An error occured
-		LOGGER_WRITE(Logger::Priority::LERROR, ex.what());
+		LOGGER_WRITE(Logger::LERROR, ex.what());
 	}
 }
 
@@ -291,14 +291,14 @@ Scene::Scene(string name, int hazard_level, bool reverse_scene, bool first_scene
 {
 	LoadSceneFromFile(name, hazard_level, reverse_scene, first_scene);
 
-	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
+	LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Scene '%s' loaded.", (char*)name.c_str()));
 }
 
 Scene::~Scene()
 {
 	if (m_bg)
 	{
-		for (int i = 0; i < Directions::NO_DIRECTION; i++)
+		for (int i = 0; i < NO_DIRECTION; i++)
 		{
 			if (m_bg->m_portals[(Directions)i])
 			{
@@ -316,7 +316,7 @@ Scene::~Scene()
 
 	m_boss_list.clear();
 
-	for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
+	for (int i = 0; i < NBVAL_EnemyClass; i++)
 	{
 		m_enemies_ranked_by_class[i].clear();
 	}
@@ -492,12 +492,12 @@ void Scene::GenerateEnemies(Time deltaTime)
 
 		//chosing a random enemy within a class of enemies
 		//for each sceneEnemyClassesAvailable[i]
-		Enemy* random_enemy_within_class[EnemyClass::NBVAL_EnemyClass];
+		Enemy* random_enemy_within_class[NBVAL_EnemyClass];
 
 		//Attention si total class probability vaut 0 ça va crasher - division par zéro oblige. du coup il faut vérifier que ce n'est pas égal à 0.
-		int dice_roll = (rand() % (m_total_class_probability[EnemyClass::ENEMYPOOL_ALPHA])) + 1;
+		int dice_roll = (rand() % (m_total_class_probability[ENEMYPOOL_ALPHA])) + 1;
 
-		for (int i = 0; i < EnemyClass::NBVAL_EnemyClass; i++)
+		for (int i = 0; i < NBVAL_EnemyClass; i++)
 		{
 			for (std::vector<EnemyBase*>::iterator it = m_enemies_ranked_by_class[i].begin(); it != m_enemies_ranked_by_class[i].end(); ++it)
 			{
@@ -518,7 +518,7 @@ void Scene::GenerateEnemies(Time deltaTime)
 			// arg0 = enemy class
 			// arg1 = move pattern
 			//if arg0 != VOID
-			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[EnemyClass::ENEMYPOOL_ALPHA], EnemyClass::ENEMYPOOL_ALPHA, PatternType::NoMovePattern);
+			EnemyPoolElement* e = new EnemyPoolElement(random_enemy_within_class[ENEMYPOOL_ALPHA], ENEMYPOOL_ALPHA, NoMovePattern);
 			if (e->m_enemy->m_size.x > max_enemy_size.x)
 			{
 				max_enemy_size.x = e->m_enemy->m_size.x;
@@ -550,7 +550,7 @@ void Scene::HazardBreak()
 		m_hazard_level_unlocked++;
 	}
 	
-	LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Hazard level up: %d/5\n", m_hazard_level + 1));
+	LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Hazard level up: %d/5\n", m_hazard_level + 1));
 }
 
 float Scene::getSceneBeastScore()
@@ -562,7 +562,7 @@ float Scene::getSceneBeastScore()
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", m_hazard_level);
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", m_hazard_level);
 		m_hazard_level = 0;
 	}
 

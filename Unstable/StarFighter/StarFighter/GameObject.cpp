@@ -79,7 +79,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_size.x = ((*texture).getSize().x / frameNumber);
 	m_size.y = ((*texture).getSize().y / animationNumber);
 
-	m_collider_type = GameObjectType::BackgroundObject;
+	m_collider_type = BackgroundObject;
 	m_defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < m_animationNumber; j++)
 	{
@@ -377,19 +377,19 @@ sf::Vector2f GameObject::getSpeed_for_Scrolling(Directions direction, float vspe
 {
 	sf::Vector2f speed = sf::Vector2f(0, 0);
 
-	if (direction == Directions::DIRECTION_UP)
+	if (direction == DIRECTION_UP)
 	{
 		speed.y = vspeed;
 	}
-	else if (direction == Directions::DIRECTION_DOWN)
+	else if (direction == DIRECTION_DOWN)
 	{
 		speed.y = -vspeed;
 	}
-	else if (direction == Directions::DIRECTION_RIGHT)
+	else if (direction == DIRECTION_RIGHT)
 	{
 		speed.x = -vspeed;
 	}
-	else if (direction == Directions::DIRECTION_LEFT)
+	else if (direction == DIRECTION_LEFT)
 	{
 		speed.x = vspeed;
 	}
@@ -402,20 +402,20 @@ sf::Vector2f GameObject::getSpeed_to_LocationWhileSceneSwap(Directions current_d
 	sf::Vector2f speed = sf::Vector2f(0, 0);
 
 	sf::Vector2f future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_Y_RATIO)));
-	if (future_direction == Directions::NO_DIRECTION)
+	if (future_direction == NO_DIRECTION)
 	{
 		future_pos = GameObject::getPosition_for_Direction(future_direction, sf::Vector2f((SCENE_SIZE_X*STARTSCENE_X_RATIO), (SCENE_SIZE_Y*STARTSCENE_X_RATIO)));
 	}
 
-	if (current_direction == Directions::DIRECTION_UP || current_direction == Directions::DIRECTION_DOWN
-		|| future_direction == Directions::DIRECTION_UP || future_direction == Directions::DIRECTION_DOWN)
+	if (current_direction == DIRECTION_UP || current_direction == DIRECTION_DOWN
+		|| future_direction == DIRECTION_UP || future_direction == DIRECTION_DOWN)
 	{
 		speed.x = vspeed * ((future_pos.x) - sprite_position.x) / SCENE_SIZE_Y;
 		speed.y = vspeed * ((future_pos.y) - sprite_position.y) / SCENE_SIZE_Y;
 	}
 
-	else if (current_direction == Directions::DIRECTION_RIGHT || current_direction == Directions::DIRECTION_LEFT
-		|| future_direction == Directions::DIRECTION_RIGHT || future_direction == Directions::DIRECTION_LEFT)
+	else if (current_direction == DIRECTION_RIGHT || current_direction == DIRECTION_LEFT
+		|| future_direction == DIRECTION_RIGHT || future_direction == DIRECTION_LEFT)
 	{
 		speed.x = vspeed * ((future_pos.x) - sprite_position.x) / SCENE_SIZE_X;
 		speed.y = vspeed * ((future_pos.y) - sprite_position.y) / SCENE_SIZE_X;
@@ -428,11 +428,11 @@ sf::Vector2i GameObject::getDirectionMultiplier(Directions direction)
 {
 	int x = 1;
 	int y = 1;
-	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_RIGHT)
+	if (direction == DIRECTION_DOWN || direction == DIRECTION_RIGHT)
 	{
 		x *= -1;
 	}
-	if (direction == Directions::DIRECTION_DOWN || direction == Directions::DIRECTION_LEFT)
+	if (direction == DIRECTION_DOWN || direction == DIRECTION_LEFT)
 	{
 		y *= -1;
 	}
@@ -442,7 +442,7 @@ sf::Vector2i GameObject::getDirectionMultiplier(Directions direction)
 
 sf::Vector2f GameObject::getSize_for_Direction(Directions direction, sf::Vector2f size)
 {
-	if (direction == Directions::DIRECTION_LEFT || direction == Directions::DIRECTION_RIGHT)
+	if (direction == DIRECTION_LEFT || direction == DIRECTION_RIGHT)
 	{
 		return sf::Vector2f(size.y, size.x);
 	}
@@ -454,7 +454,7 @@ sf::Vector2f GameObject::getSize_for_Direction(Directions direction, sf::Vector2
 
 sf::Vector2i GameObject::getSize_for_Direction(Directions direction, sf::Vector2i size)
 {
-	if (direction == Directions::DIRECTION_LEFT || direction == Directions::DIRECTION_RIGHT)
+	if (direction == DIRECTION_LEFT || direction == DIRECTION_RIGHT)
 	{
 		return sf::Vector2i(size.y, size.x);
 	}
@@ -491,15 +491,15 @@ sf::Vector2f GameObject::getSpeed_for_Direction(Directions direction, sf::Vector
 
 float GameObject::getRotation_for_Direction(Directions direction)
 {
-	if (direction == Directions::DIRECTION_DOWN)
+	if (direction == DIRECTION_DOWN)
 	{
 		return 180;
 	}
-	else if (direction == Directions::DIRECTION_RIGHT)
+	else if (direction == DIRECTION_RIGHT)
 	{
 		return 90;
 	}
-	else if (direction == Directions::DIRECTION_LEFT)
+	else if (direction == DIRECTION_LEFT)
 	{
 		return 270;
 	}
@@ -514,12 +514,12 @@ sf::Vector2f GameObject::getPosition_for_Direction(Directions direction, sf::Vec
 	float x = position.x;
 	float y = position.y;
 
-	if (direction == Directions::DIRECTION_DOWN)
+	if (direction == DIRECTION_DOWN)
 	{
 		x = SCENE_SIZE_X - x;
 		y = SCENE_SIZE_Y - y;
 	}
-	else if (direction == Directions::DIRECTION_RIGHT)
+	else if (direction == DIRECTION_RIGHT)
 	{
 		if (rescale)
 		{
@@ -530,7 +530,7 @@ sf::Vector2f GameObject::getPosition_for_Direction(Directions direction, sf::Vec
 		x = SCENE_SIZE_X - y;
 		y = x_;
 	}
-	else if (direction == Directions::DIRECTION_LEFT)
+	else if (direction == DIRECTION_LEFT)
 	{
 		if (rescale)
 		{
@@ -547,51 +547,51 @@ sf::Vector2f GameObject::getPosition_for_Direction(Directions direction, sf::Vec
 
 FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
-	if (direction == Directions::DIRECTION_UP)
+	if (direction == DIRECTION_UP)
 	{
 		if (this->getPosition().y > target_position.y)
 		{
-			return FloatCompare::GREATHER_THAN;
+			return GREATHER_THAN;
 		}
 		else if (this->getPosition().y == target_position.y)
 		{
-			return FloatCompare::EQUAL_TO;
+			return EQUAL_TO;
 		}
 		else
 		{
-			return FloatCompare::LESSER_THAN;
+			return LESSER_THAN;
 		}
 	}
 
-	else if (direction == Directions::DIRECTION_DOWN)
+	else if (direction == DIRECTION_DOWN)
 	{
 		if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
 		{
-			return FloatCompare::GREATHER_THAN;
+			return GREATHER_THAN;
 		}
 		else if (this->getPosition().y == SCENE_SIZE_Y - target_position.y)
 		{
-			return FloatCompare::EQUAL_TO;
+			return EQUAL_TO;
 		}
 		else
 		{
-			return FloatCompare::LESSER_THAN;
+			return LESSER_THAN;
 		}
 	}
 
-	else if (direction == Directions::DIRECTION_RIGHT)
+	else if (direction == DIRECTION_RIGHT)
 	{
 		if (this->getPosition().x < SCENE_SIZE_X - target_position.x)
 		{
-			return FloatCompare::GREATHER_THAN;
+			return GREATHER_THAN;
 		}
 		if (this->getPosition().x == SCENE_SIZE_X - target_position.x)
 		{
-			return FloatCompare::EQUAL_TO;
+			return EQUAL_TO;
 		}
 		else
 		{
-			return FloatCompare::LESSER_THAN;
+			return LESSER_THAN;
 		}
 	}
 
@@ -599,15 +599,15 @@ FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direct
 	{
 		if (this->getPosition().x > target_position.x)
 		{
-			return FloatCompare::GREATHER_THAN;
+			return GREATHER_THAN;
 		}
 		else if (this->getPosition().x == target_position.x)
 		{
-			return FloatCompare::EQUAL_TO;
+			return EQUAL_TO;
 		}
 		else
 		{
-			return FloatCompare::LESSER_THAN;
+			return LESSER_THAN;
 		}
 	}
 }
@@ -615,51 +615,51 @@ FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direct
 FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	{
-		if (direction == Directions::DIRECTION_UP)
+		if (direction == DIRECTION_UP)
 		{
 			if (this->getPosition().x > target_position.x)
 			{
-				return FloatCompare::GREATHER_THAN;
+				return GREATHER_THAN;
 			}
 			else if (this->getPosition().x == target_position.x)
 			{
-				return FloatCompare::EQUAL_TO;
+				return EQUAL_TO;
 			}
 			else
 			{
-				return FloatCompare::LESSER_THAN;
+				return LESSER_THAN;
 			}
 		}
 
-		else if (direction == Directions::DIRECTION_DOWN)
+		else if (direction == DIRECTION_DOWN)
 		{
 			if (this->getPosition().x < SCENE_SIZE_X - target_position.x)
 			{
-				return FloatCompare::GREATHER_THAN;
+				return GREATHER_THAN;
 			}
 			else if (this->getPosition().x == SCENE_SIZE_X - target_position.x)
 			{
-				return FloatCompare::EQUAL_TO;
+				return EQUAL_TO;
 			}
 			else
 			{
-				return FloatCompare::LESSER_THAN;
+				return LESSER_THAN;
 			}
 		}
 
-		else if (direction == Directions::DIRECTION_RIGHT)
+		else if (direction == DIRECTION_RIGHT)
 		{
 			if (this->getPosition().y > target_position.y)
 			{
-				return FloatCompare::GREATHER_THAN;
+				return GREATHER_THAN;
 			}
 			if (this->getPosition().y == target_position.y)
 			{
-				return FloatCompare::EQUAL_TO;
+				return EQUAL_TO;
 			}
 			else
 			{
-				return FloatCompare::LESSER_THAN;
+				return LESSER_THAN;
 			}
 		}
 
@@ -667,15 +667,15 @@ FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direct
 		{
 			if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
 			{
-				return FloatCompare::GREATHER_THAN;
+				return GREATHER_THAN;
 			}
 			else if (this->getPosition().y == SCENE_SIZE_Y - target_position.y)
 			{
-				return FloatCompare::EQUAL_TO;
+				return EQUAL_TO;
 			}
 			else
 			{
-				return FloatCompare::LESSER_THAN;
+				return LESSER_THAN;
 			}
 		}
 	}
@@ -683,7 +683,7 @@ FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direct
 
 sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::Vector2f target_position, bool centered)
 {
-	if (direction == Directions::DIRECTION_UP || direction == Directions::NO_DIRECTION)
+	if (direction == DIRECTION_UP || direction == NO_DIRECTION)
 	{
 		if (!centered)
 		{
@@ -697,7 +697,7 @@ sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::V
 		}
 	}
 
-	else if (direction == Directions::DIRECTION_DOWN)
+	else if (direction == DIRECTION_DOWN)
 	{
 		if (!centered)
 		{
@@ -711,7 +711,7 @@ sf::Vector2f GameObject::setPosition_Y_for_Direction(Directions direction, sf::V
 		}
 	}
 
-	else if (direction == Directions::DIRECTION_RIGHT)
+	else if (direction == DIRECTION_RIGHT)
 	{
 		if (!centered)
 		{
@@ -759,7 +759,7 @@ sf::Vector2f GameObject::getRandomXSpawnPosition(Directions direction, sf::Vecto
 	//cutting clusters bigger than the scene (+ debug message)
 	if ((allowed_spread*GameObject::getDirectionMultiplier(direction).y) < 0)
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("ERROR: Error in calculation of 'allowed_spread' value in enemy generation. This value leads out of screen.\n"));
 	}
 
 	//random value inside the allowed spread

@@ -55,13 +55,13 @@ public:
 	int getSceneHazardLevelUnlockedValue();
 	int getSceneHazardLevelValue();
 
-	std::string m_links[Directions::NO_DIRECTION];
+	std::string m_links[NO_DIRECTION];
 
 	vector<EnemyGenerator*> m_sceneEnemyGenerators;
 
 	void GenerateEnemiesv2(Time deltaTime);
 	void SpawnEnemy(int enemy_class);
-	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)EnemyClass::NBVAL_EnemyClass);
+	void CollateralSpawnCost(float collateral_cost, float collateral_multiplier = 0, int below_enemy_class = (int)NBVAL_EnemyClass);
 	void ApplyHazardLevelModifiers(int hazard_level, Enemy& enemy);
 
 	void HazardBreak();

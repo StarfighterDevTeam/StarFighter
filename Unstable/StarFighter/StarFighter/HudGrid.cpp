@@ -95,7 +95,7 @@ bool ObjectGrid::insertObject(GameObject& object, int index, bool overwrite_exis
 		}
 		else
 		{
-			LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to add an equipement on an existing ship equipment slot.\n");
+			LOGGER_WRITE(Logger::DEBUG, "<!> Error: Trying to add an equipement on an existing ship equipment slot.\n");
 			return false;
 		}
 	}
@@ -198,7 +198,7 @@ bool ObjectGrid::HighlightCell(int index)
 	//case: error in index calculation
 	if (l > squares.x)
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to highlight a grid cell index that doesn't exist.\n");
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error: Trying to highlight a grid cell index that doesn't exist.\n");
 		return false;
 	}
 	//case: the requested slot is free
@@ -217,7 +217,7 @@ bool ObjectGrid::GarbageCell(int index)
 
 	if (l > squares.x)
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to garbage a pointer from a grid cell index that doesn't exist.\n");
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error: Trying to garbage a pointer from a grid cell index that doesn't exist.\n");
 	}
 
 	if (grid[l][r])
@@ -299,7 +299,7 @@ GameObject* ObjectGrid::getCellPointerFromIntIndex(int index)
 
 	if (l > squares.x)
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
 	}
 
 	return this->grid[l][r];
@@ -329,7 +329,7 @@ void ObjectGrid::setCellPointerForIntIndex(int index, GameObject* GameObject)
 
 	if (l > squares.x)
 	{
-		LOGGER_WRITE(Logger::Priority::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error: Trying to get a pointer from a grid cell index that doesn't exist.\n");
 	}
 	this->grid[l][r] = GameObject;
 	if (GameObject != NULL)

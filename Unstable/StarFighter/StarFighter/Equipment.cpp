@@ -45,7 +45,7 @@ Equipment::Equipment()
 	m_size.y = EQUIPMENT_SIZE;
 	m_textureName = EMPTYSLOT_FILENAME;
 	m_frameNumber = 0;
-	m_equipmentType = EquipmentType::Armor;
+	m_equipmentType = Armor;
 	m_bot = NULL;
 	m_level = 1;
 	m_credits = 0;
@@ -134,7 +134,7 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level, float quality)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
+	equipment->Init((int)Armor, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, ARMOR_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Armor");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -194,7 +194,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level, float quality)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
+	equipment->Init((int)Shield, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, SHIELD_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Shield");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -250,7 +250,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level, float quality)
 
 	//Creating the item
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
+	equipment->Init((int)Engine, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, THRUSTER_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Engine");
 
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
@@ -278,7 +278,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level, float quality)
 
 	//Initialisation
 	Equipment* equipment = new Equipment();
-	equipment->Init((int)EquipmentType::Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
+	equipment->Init((int)Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
 
 	Bot* bot = new Bot(sf::Vector2f(0, 0), sf::Vector2f(0, 0), BOT_FILENAME, sf::Vector2f(BOT_SIZE, BOT_SIZE));
 	bot->m_radius = 500;
@@ -288,7 +288,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level, float quality)
 	vector<float>* v = new vector<float>;
 	//v->push_back(bot->radius); // rayon 500px
 	//v->push_back(1);  // clockwise (>)
-	PatternType pattern_type = PatternType::NoMovePattern;
+	PatternType pattern_type = NoMovePattern;
 	bot->m_Pattern.SetPattern(pattern_type, bot->m_vspeed, v); //vitesse angulaire (degres/s)
 
 	bot->m_weapon = weapon;

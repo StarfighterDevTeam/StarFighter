@@ -12,7 +12,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetPlayerShip(m_playerShip);
 
 	//initializing HUD
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing HUD...");
+	LOGGER_WRITE(Logger::DEBUG, "Initializing HUD...");
 	m_playerShip->m_HUD_SFPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
 	(*CurrentGame).addToFeedbacks(m_playerShip->m_HUD_SFPanel);
 
@@ -31,7 +31,7 @@ void InGameState::Initialize(Player player)
 
 	m_playerShip->Init();
 	m_playerShip->ResplenishHealth();
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Playership loaded\n");
+	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
@@ -46,7 +46,7 @@ void InGameState::Initialize(Player player)
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
 		m_playerShip->m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
 	}
-	LOGGER_WRITE(Logger::Priority::DEBUG, "HUD initialization completed\n");
+	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
 	//Load knownScenes, hazard levels and current scene from save file
 	if (!LoadPlayerSave(player.m_save_file).empty())
@@ -67,7 +67,7 @@ void InGameState::Initialize(Player player)
 	//Loading current scene
 	SpawnInScene(m_playerShip->m_currentScene_name);
 
-	if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
+	if ((*CurrentGame).m_direction != NO_DIRECTION)
 	{
 		(*CurrentGame).playerShip->m_disable_fire = false;
 		(*CurrentGame).playerShip->m_disabledHyperspeed = false;
@@ -82,10 +82,10 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).playerShip->SetBotsVisibility(false);
 	}
 	(*CurrentGame).playerShip->GenerateFakeShip((*CurrentGame).playerShip);
-	(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-	(*CurrentGame).SetLayerRotation(LayerType::BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-	(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
+	(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+	(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+	(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+	(*CurrentGame).addToScene((*CurrentGame).playerShip, PlayerShipLayer, PlayerShip);
 }
 
 void InGameState::Update(Time deltaTime)
@@ -157,7 +157,7 @@ bool InGameState::AddToKnownScenes(string scene_name, Ship* playerShip)
 	{
 		//add it to the map of known scenes
 		playerShip->m_knownScenes.insert(pair<string, int>(scene_name, 0));
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Adding '%s' to known scenes.\n", (char*)scene_name.c_str()));
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Adding '%s' to known scenes.\n", (char*)scene_name.c_str()));
 		return true;
 	}
 	return false;
@@ -206,7 +206,7 @@ int InGameState::SavePlayer(string file, Ship* playerShip)
 		return -1;
 	}
 
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Saving known scenes and current scene in profile.\n");
+	LOGGER_WRITE(Logger::DEBUG, "Saving known scenes and current scene in profile.\n");
 
 	ofstream data(file.c_str(), ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
@@ -288,15 +288,15 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene->GenerateEnemiesv2(deltaTime);
 			}
 			//Scrolling until the background reaches its end
-			if ((*CurrentGame).m_direction == Directions::NO_DIRECTION)
+			if ((*CurrentGame).m_direction == NO_DIRECTION)
 			{
 				m_IG_State = InGameStateMachine::LAST_SCREEN;
 			}
 			else
 			{
 				//when last screen is reached
-				if (m_currentScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::GREATHER_THAN
-					|| m_currentScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2)) == FloatCompare::EQUAL_TO)
+				if (m_currentScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2)) == GREATHER_THAN
+					|| m_currentScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2)) == EQUAL_TO)
 				{
 					//Correct the position
 					m_currentScene->m_bg->setPosition_Y_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2));
@@ -317,7 +317,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					m_IG_State = InGameStateMachine::LAST_SCREEN;
 
 					//Wipe out enemies that were spawned offscren
-					(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer, true);
+					(*CurrentGame).garbageLayer(EnemyObjectLayer, true);
 				}
 			}
 
@@ -332,7 +332,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				//scene generates boss? (or boss is dead, eitherway)
 				if (m_currentScene->m_generating_boss)
 				{
-					m_currentScene->m_bg->SetPortalsState(PortalState::PortalInvisible);
+					m_currentScene->m_bg->SetPortalsState(PortalInvisible);
 					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
 					{
 						m_currentScene->GenerateBoss();
@@ -361,7 +361,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 							(*CurrentGame).resetHazard();
 						}
 
-						m_currentScene->m_bg->SetPortalsState(PortalState::PortalOpen);
+						m_currentScene->m_bg->SetPortalsState(PortalOpen);
 
 						m_hasDisplayedDestructionRatio = true;
 					}
@@ -370,12 +370,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				//player takes exit?
 				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 				{
-					m_currentScene->m_bg->SetPortalsState(PortalState::PortalGhost);
+					m_currentScene->m_bg->SetPortalsState(PortalGhost);
 
 					(*CurrentGame).removeFromFeedbacks(&(m_currentScene->m_textHazardBreak));
 
 					bool reverse = false;
-					if ((*CurrentGame).playerShip->m_targetPortal->m_direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == Directions::DIRECTION_LEFT)
+					if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
 					{
 						reverse = true;
 					}
@@ -407,7 +407,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					m_bossSpawnCountdown.restart();
 				}
-				m_currentScene->m_bg->SetPortalsState(PortalState::PortalClose);
+				m_currentScene->m_bg->SetPortalsState(PortalClose);
 			}
 
 			break;
@@ -428,8 +428,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 		case InGameStateMachine::TRANSITION_PHASE1_2:
 		{
 			//When the playership reaches the scene border, we can start the swapping of scenes, while replacing him on the right starting position for the next scene
-			if ((*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == FloatCompare::LESSER_THAN
-				|| (*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == FloatCompare::EQUAL_TO)
+			if ((*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == LESSER_THAN
+				|| (*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == EQUAL_TO)
 			{
 				//Correction of playership position
 				(*CurrentGame).playerShip->setPosition_Y_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2));
@@ -440,8 +440,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).m_vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
-				(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
-				(*CurrentGame).garbageLayer(LayerType::LootLayer);
+				(*CurrentGame).garbageLayer(FriendlyFireLayer);
+				(*CurrentGame).garbageLayer(LootLayer);
 
 				m_IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
 			}
@@ -454,8 +454,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			float wn = m_nextScene->m_bg->m_size.x;
 			float hn = m_nextScene->m_bg->m_size.y;
 			//When the new scene is completely swapped, we can wrap up the replacement and restart scrolling (or do what the Hubs do if the scene is a Hub)
-			if (m_nextScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::GREATHER_THAN
-				|| m_nextScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == FloatCompare::EQUAL_TO)
+			if (m_nextScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == GREATHER_THAN
+				|| m_nextScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == EQUAL_TO)
 			{
 
 				//Correction of the scenes position
@@ -465,7 +465,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling(m_nextScene->m_direction, m_nextScene->m_vspeed);
 				(*CurrentGame).m_vspeed = m_nextScene->m_vspeed;
 
-				if (m_nextScene->m_direction == Directions::NO_DIRECTION)
+				if (m_nextScene->m_direction == NO_DIRECTION)
 				{
 					m_IG_State = InGameStateMachine::HUB_ROAMING;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = true;
@@ -480,10 +480,10 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).playerShip->m_disable_bots = false;
 					(*CurrentGame).playerShip->SetBotsVisibility(true);
 					
-					(*CurrentGame).SetLayerRotation(LayerType::PlayerShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-					(*CurrentGame).SetLayerRotation(LayerType::FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-					(*CurrentGame).SetLayerRotation(LayerType::BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-					(*CurrentGame).SetLayerRotation(LayerType::FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					(*CurrentGame).SetLayerRotation(PlayerShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 				}
 
 				//Saving the hazard level change
@@ -517,7 +517,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 				//Save scenes
 				AddToKnownScenes(m_currentScene->m_name);
-				if (m_currentScene->m_direction == Directions::NO_DIRECTION)
+				if (m_currentScene->m_direction == NO_DIRECTION)
 				{
 					SavePlayer(PLAYER_SAVE_FILE);
 					m_playerShip->m_respawnSceneName = m_currentScene->m_name;
@@ -537,13 +537,13 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 		case InGameStateMachine::HUB_ROAMING:
 		{
-			m_currentScene->m_bg->SetPortalsState(PortalState::PortalOpen);
+			m_currentScene->m_bg->SetPortalsState(PortalOpen);
 			//player takes exit?
 			if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 			{
-				m_currentScene->m_bg->SetPortalsState(PortalState::PortalGhost);
+				m_currentScene->m_bg->SetPortalsState(PortalGhost);
 				bool reverse = false;
-				if ((*CurrentGame).playerShip->m_targetPortal->m_direction == Directions::DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == Directions::DIRECTION_LEFT)
+				if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
 				{
 					reverse = true;
 				}
@@ -583,7 +583,7 @@ void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* player
 	}
 
 	//loading the scene's portals with the info about their respective max hazard values
-	for (int i = 0; i < Directions::NO_DIRECTION; i++)
+	for (int i = 0; i < NO_DIRECTION; i++)
 	{
 		if (scene->m_bg->m_portals[(Directions)i] != NULL)
 		{
@@ -604,11 +604,11 @@ void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* player
 void InGameState::RespawnInLastHub()
 {
 	//cleaning layers
-	(*CurrentGame).garbageLayer(LayerType::FriendlyFireLayer);
-	(*CurrentGame).garbageLayer(LayerType::EnemyFireLayer);
-	(*CurrentGame).garbageLayer(LayerType::EnemyObjectLayer);
-	(*CurrentGame).garbageLayer(LayerType::ExplosionLayer);
-	(*CurrentGame).garbageLayer(LayerType::LootLayer);
+	(*CurrentGame).garbageLayer(FriendlyFireLayer);
+	(*CurrentGame).garbageLayer(EnemyFireLayer);
+	(*CurrentGame).garbageLayer(EnemyObjectLayer);
+	(*CurrentGame).garbageLayer(ExplosionLayer);
+	(*CurrentGame).garbageLayer(LootLayer);
 
 	//loading last visited hub
 	SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
@@ -683,7 +683,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 
 		//position
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
-		if ((*CurrentGame).m_direction != Directions::NO_DIRECTION)
+		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
 			m_IG_State = InGameStateMachine::SCROLLING;
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));

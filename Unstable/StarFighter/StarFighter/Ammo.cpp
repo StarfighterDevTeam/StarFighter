@@ -39,7 +39,7 @@ void Ammo::Death()
 {
 	FX* myFX = m_explosion->Clone();
 	myFX->setPosition(this->getPosition().x, this->getPosition().y);
-    (*CurrentGame).addToScene(myFX, LayerType::ExplosionLayer, GameObjectType::Neutral);
+    (*CurrentGame).addToScene(myFX, ExplosionLayer, Neutral);
 
 	m_visible = false;
 	m_GarbageMe = true;

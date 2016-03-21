@@ -146,7 +146,6 @@ enum EnemyData
 	ENEMY_PHASE,//23
 };
 
-
 enum EnemyPoolData
 {
 	ENEMYPOOL_NAME,//0
@@ -157,8 +156,6 @@ enum EnemyPoolData
 	ENEMYPOOL_VSPEED,//5
 	ENEMYPOOL_TRIGGERY_PATTERN,//6
 };
-
-
 
 enum BotData
 {
@@ -188,7 +185,7 @@ class FileLoader
 public:
 	static Ship* LoadShipConfig(string name);
 	static ShipModel* LoadShipModel(string name);
-	static EnemyBase*  LoadEnemyBase(string m_name, int m_probability, int m_enemyClass);
+	static EnemyBase*  LoadEnemyBase(string name, int probability, int enemyClass);
 	static EnemyPool*  LoadEnemyPool(string name);
 	static Weapon* LoadWeapon(string name, int fire_direction, Ammo* ammo);
 	static Ammo* LoadAmmo(string name);
