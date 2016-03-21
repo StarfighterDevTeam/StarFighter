@@ -8,8 +8,8 @@ using namespace std;
 class FileLoaderUtils
 {
 public:
-	static vector<vector<string>>* FileLoader(string name){
-		vector<vector<string>>* fileConfig = new vector<vector<string>>;
+	static vector<vector<string> >* FileLoader(string name){
+		vector<vector<string> >* fileConfig = new vector<vector<string> >;
 
 		std::ifstream  data(name);
 

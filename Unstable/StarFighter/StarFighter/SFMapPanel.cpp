@@ -825,8 +825,8 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direction, sf::Vector2f starting_coordinates)
 {
 	//Loading the particular scene that we want to load
-	vector<vector<string>> config = *(FileLoaderUtils::FileLoader(scene_filename));
-	for (std::vector<vector<string>>::iterator it = config.begin(); it != config.end(); it++)
+	vector<vector<string> > config = *(FileLoaderUtils::FileLoader(scene_filename));
+	for (std::vector<vector<string> >::iterator it = config.begin(); it != config.end(); it++)
 	{
 		if ((*it)[0].compare("bg") == 0)
 		{

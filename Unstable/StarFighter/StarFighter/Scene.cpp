@@ -26,9 +26,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
-		vector<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
+		vector<vector<string> > scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
 
-		for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+		for (std::vector<vector<string> >::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 		{
 			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
@@ -43,8 +43,8 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 				std::string scene_name = (*it)[SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
-				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[SCENE_FILENAME]));
-				for (std::vector<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
+				vector<vector<string> > config = *(FileLoaderUtils::FileLoader((*it)[SCENE_FILENAME]));
+				for (std::vector<vector<string> >::iterator it = (config).begin(); it != (config).end(); it++)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
@@ -128,7 +128,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 								m_bg->m_portals[(Directions)i]->m_destination_name = m_links[(Directions)i];
 
 								//Getting the string of the "display name" for a each linked scene
-								for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+								for (std::vector<vector<string> >::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 								{
 									if ((*it)[SCENE_NAME].compare(m_links[(Directions)i]) == 0)
 									{
@@ -237,9 +237,9 @@ Scene::Scene(string name)
 	m_name = name;
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
-		vector<vector<string>> scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
+		vector<vector<string> > scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
 
-		for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+		for (std::vector<vector<string> >::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 		{
 			if ((*it)[SCENE_NAME].compare(name) == 0)
 			{
@@ -251,8 +251,8 @@ Scene::Scene(string name)
 				std::string scene_name = (*it)[SCENE_DISPLAYNAME];
 
 				//Loading the particular scene that we want to load
-				vector<vector<string>> config = *(FileLoaderUtils::FileLoader((*it)[SCENE_FILENAME]));
-				for (std::vector<vector<string>>::iterator it = (config).begin(); it != (config).end(); it++)
+				vector<vector<string> > config = *(FileLoaderUtils::FileLoader((*it)[SCENE_FILENAME]));
+				for (std::vector<vector<string> >::iterator it = (config).begin(); it != (config).end(); it++)
 				{
 					if ((*it)[0].compare("bg") == 0)
 					{
@@ -268,7 +268,7 @@ Scene::Scene(string name)
 				if (m_links[(Directions)i].compare("0") != 0)
 				{
 					//Getting the string of the "display name" for a each linked scene
-					for (std::vector<vector<string>>::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
+					for (std::vector<vector<string> >::iterator it = (scenesConfig).begin(); it != (scenesConfig).end(); it++)
 					{
 						if ((*it)[SCENE_NAME].compare(m_links[(Directions)i]) == 0)
 						{

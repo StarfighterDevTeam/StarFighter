@@ -101,7 +101,7 @@ public:
 	void ScanBranches(string starting_scene, Directions direction, sf::Vector2f starting_coordinates);
 	bool ScanScene(string scene_filename, string scene, Directions direction, sf::Vector2f starting_coordinates);
 
-	vector<vector<string>> m_scenesConfig;
+	vector<vector<string> > m_scenesConfig;
 	size_t m_scenesConfigSize;
 
 	GameObject m_cursor;
@@ -110,7 +110,7 @@ public:
 	string m_targeted_location;
 
 private:
-	vector <string> m_checked_scenes;
+	vector<string> m_checked_scenes;
 	bool IsSceneAlreadyChecked(string new_scene, bool add_if_not_checked);
 	bool IsSceneKnownByThePlayer(string new_scene);
 	int GetMaxHazardLevelUnlocked(string new_scene);

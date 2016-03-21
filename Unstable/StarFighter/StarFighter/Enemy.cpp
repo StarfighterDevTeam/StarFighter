@@ -873,9 +873,9 @@ void Enemy::setPhase(Phase* phase)
 
 Dialog* Enemy::LoadDialog(string name)
 {
-	vector<vector<string>> dialogConfig = *(FileLoaderUtils::FileLoader(DIALOGS_FILE));
+	vector<vector<string> > dialogConfig = *(FileLoaderUtils::FileLoader(DIALOGS_FILE));
 
-	for (std::vector<vector<string>>::iterator it = (dialogConfig).begin(); it != (dialogConfig).end(); it++)
+	for (std::vector<vector<string> >::iterator it = (dialogConfig).begin(); it != (dialogConfig).end(); it++)
 	{
 		if ((*it)[DIALOG_NAME].compare(name) == 0)
 		{
@@ -904,9 +904,9 @@ Dialog* Enemy::LoadDialog(string name)
 
 Phase* Enemy::LoadPhase(string name)
 {
-	vector<vector<string>> phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
+	vector<vector<string> > phaseConfig = *(FileLoaderUtils::FileLoader(PHASES_FILE));
 
-	for (std::vector<vector<string>>::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
+	for (std::vector<vector<string> >::iterator it = (phaseConfig).begin(); it != (phaseConfig).end(); it++)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
@@ -1187,9 +1187,9 @@ int Enemy::GetChosenProperty(vector<int> *properties_roll_table, int properties_
 
 Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 {
-	vector<vector<string>> weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
+	vector<vector<string> > weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
 
-	for (std::vector<vector<string>>::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
+	for (std::vector<vector<string> >::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
@@ -1249,9 +1249,9 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 
 Ammo* Enemy::LoadAmmo(string name)
 {
-	vector<vector<string>> ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
+	vector<vector<string> > ammoConfig = *(FileLoaderUtils::FileLoader(AMMO_FILE));
 
-	for (std::vector<vector<string>>::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
+	for (std::vector<vector<string> >::iterator it = (ammoConfig).begin(); it != (ammoConfig).end(); it++)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
@@ -1273,9 +1273,9 @@ Ammo* Enemy::LoadAmmo(string name)
 
 FX* Enemy::LoadFX(string name)
 {
-	vector<vector<string>>FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
+	vector<vector<string> >FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
 
-	for (std::vector<vector<string>>::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
+	for (std::vector<vector<string> >::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
 	{
 		if ((*it)[FX_TYPE].compare("explosion") == 0)
 		{
