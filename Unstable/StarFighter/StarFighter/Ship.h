@@ -171,7 +171,6 @@ public :
 	void GenerateBots(GameObject* target);
 	void SetBotsVisibility(bool visible);
 	void DestroyBots();
-	void GenerateFakeShip(GameObject* target);
 	FakeShip* m_fake_ship;
 	bool m_automatic_fire;
 

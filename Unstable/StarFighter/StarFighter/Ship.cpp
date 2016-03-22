@@ -6,6 +6,11 @@ using namespace sf;
 
 Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), ship_model->m_textureName, ship_model->m_size, Vector2f((ship_model->m_size.x / 2), (ship_model->m_size.y / 2)), ship_model->m_frameNumber)
 {
+	if (!ship_model)
+	{
+		return;
+	}
+
 	m_ship_model = ship_model;
 
 	m_automatic_fire = false;
@@ -15,7 +20,6 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 		m_equipment[i] = NULL;
 	}
 	m_weapon = NULL;
-	m_fake_ship = NULL;
 	m_collider_type = PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
@@ -40,12 +44,20 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_xp = 0;
 	m_xp_max = XP_MAX_FIRST_LEVEL;
 
+	m_fake_ship = NULL;
+	if (!ship_model->m_fake_textureName.empty())
+	{
+		m_fake_ship = new FakeShip(this, ship_model->m_fake_textureName, ship_model->m_fake_size, ship_model->m_fake_frameNumber, NB_ShipAnimations);
+		(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
+	}
+
 	m_combo_aura[GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
 	m_combo_aura[GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
 	m_combo_aura[GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
 	m_trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	m_trail->m_visible = false;
-	m_trail->m_offset = sf::Vector2f(0, (m_size.y / 2) + (m_trail->m_size.y / 2));
+	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
+	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
 
 	(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
 	m_targetPortal = NULL;
@@ -2577,16 +2589,6 @@ void Ship::DestroyBots()
 		(*it)->m_GarbageMe = true;
 	}
 	m_bot_list.clear();
-}
-
-void Ship::GenerateFakeShip(GameObject* target)
-{
-	assert(m_ship_model != NULL);
-	if (!m_ship_model->m_fake_textureName.empty())
-	{
-		m_fake_ship = new FakeShip(target, m_ship_model->m_fake_textureName, m_ship_model->m_fake_size, m_ship_model->m_fake_frameNumber, NB_ShipAnimations);
-		(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
-	}
 }
 
 void Ship::ContinueDialog()

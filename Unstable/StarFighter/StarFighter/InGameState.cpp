@@ -81,7 +81,7 @@ void InGameState::Initialize(Player player)
 		(*CurrentGame).playerShip->m_disable_bots = true;
 		(*CurrentGame).playerShip->SetBotsVisibility(false);
 	}
-	(*CurrentGame).playerShip->GenerateFakeShip((*CurrentGame).playerShip);
+	//(*CurrentGame).playerShip->GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
