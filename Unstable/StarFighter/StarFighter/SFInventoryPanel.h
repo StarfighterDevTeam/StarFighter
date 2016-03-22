@@ -6,9 +6,13 @@
 class SFItemStatsPanel : public SFPanel
 {
 public:
-	SFItemStatsPanel(GameObject* object, sf::Vector2f size);
+	SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, bool item_in_shop);
+	~SFItemStatsPanel();
 	void DisplayItemStats(GameObject* object);
 	void Draw(sf::RenderTexture& screen) override;
+
+	GameObject m_arrow;
+	sf::Text* m_options_text;
 };
 
 class SFInventoryPanel : public SFPanel

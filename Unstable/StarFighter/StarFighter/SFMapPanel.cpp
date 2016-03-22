@@ -181,7 +181,7 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, 
 			ss << "Teleportation: $" << teleportation_cost;
 			if (playerShip->m_money < teleportation_cost)
 			{
-				m_text.setColor(sf::Color(80, 80, 80, 255));//greyed
+				m_text.setColor(sf::Color(255, 50, 50, 255));//red
 				ss << " (insufficient credits)";
 			}
 		}

@@ -3,7 +3,7 @@
 extern Game* CurrentGame;
 
 //ITEMS STATS PANEL
-SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size) : SFPanel(size, SFPanel_ItemStats)
+SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, bool item_in_shop) : SFPanel(size, SFPanel_ItemStats)
 {
 	if (object)
 	{
@@ -13,10 +13,21 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size) : SFPa
 		setOutlineThickness(0);
 		setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
 
+		m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
+			sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
+		m_arrow.m_visible = false;
+
 		//texts
 		m_title_text.setCharacterSize(18);
 		m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+
+		m_options_text = new sf::Text[3];
+		for (size_t i = 0; i < 3; i++)
+		{
+			m_options_text[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
+			m_options_text[i].setCharacterSize(18);
+		}
 
 		DisplayItemStats(object);
 
@@ -26,7 +37,45 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size) : SFPa
 
 		text_height += m_title_text.getCharacterSize() + INTERACTION_INTERLINE;
 		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+
+		for (size_t i = 0; i < 3; i++)
+		{
+			if (i == 0)
+			{
+				text_height += INTERACTION_INTERBLOCK + m_text.getGlobalBounds().height;
+			}
+			else
+			{
+				text_height += INTERACTION_INTERLINE;
+			}
+			text_height += m_options_text[i].getGlobalBounds().height;
+			m_options_text[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+		}
+
+		if (item_in_shop)
+		{
+			int price = object->m_equipment_loot ? object->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS : object->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+			ostringstream ss_buy;
+			ss_buy << "Buy: $" << price;
+			if (playerShip->m_money < price)
+			{
+				m_options_text[0].setColor(sf::Color(255, 50, 50, 255));//red
+				ss_buy << " (insufficient credits)";
+			}
+			m_options_text[0].setString(ss_buy.str());
+
+			m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+			m_arrow.m_visible = true;
+		}
+		
+
+		
 	}
+}
+
+SFItemStatsPanel::~SFItemStatsPanel()
+{
+	delete[] m_options_text;
 }
 
 void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
@@ -37,6 +86,15 @@ void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
 
 		screen.draw(m_title_text);
 		screen.draw(m_text);
+		for (size_t i = 0; i < 3; i++)
+		{
+			screen.draw(m_options_text[i]);
+		}
+		screen.draw(m_actions_text);
+		if (m_arrow.m_visible)
+		{
+			screen.draw(m_arrow);
+		}
 	}
 }
 
@@ -456,7 +514,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y));
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFPanel);
 			}
 		}
 		//empty cell
@@ -549,7 +607,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y));
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFPanel);
 			}
 		}
 		//empty cell
