@@ -641,6 +641,11 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false, true);
 			break;
 		}
+		case SFPanel_Action:
+		{
+			playerShip->m_SFPanel = new SFOneActionPanel(sf::Vector2f(ACTION_PANEL_WIDTH, ACTION_PANEL_HEIGHT), playerShip);
+			break;
+		}
 		case SFPanel_Portal:
 		{
 			playerShip->m_SFPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);

@@ -1438,7 +1438,11 @@ void Ship::GetPortal(GameObject* object)
 	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation)
 	{
 		m_is_asking_SFPanel = SFPanel_Portal;
-	}	
+	}
+	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation)
+	{
+		m_is_asking_SFPanel = SFPanel_Action;
+	}
 }
 
 void Ship::GetShop(GameObject* object)

@@ -56,6 +56,56 @@ int SFMenuPanel::GetSelectedOptionIndex()
 	return m_selected_option_index;
 }
 
+//------------------ONE ACTION MENU------------
+SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size, SFPanel_Action, 1, playerShip)
+{
+	if (m_playerShip && m_playerShip->m_targetPortal)
+	{
+		//direction
+		m_direction = m_playerShip->m_targetPortal->m_direction;
+
+		//texts strings
+		m_title_text.setString(m_playerShip->m_targetPortal->m_display_name);
+
+		m_options_text[0].setString("Enter");
+
+		//m_actions_text.setString("Press Fire");
+
+		//size and position of panel
+		setSize(size);
+		setOrigin(size.x / 2, size.y / 2);
+		sf::Vector2f position = sf::Vector2f((SCENE_SIZE_X / 2) + (PORTAL_WIDTH / 2) + INTERACTION_PANEL_OFFSET_Y, SCENE_SIZE_Y / 2);
+		if (m_direction != NO_DIRECTION)
+		{
+			sf::Vector2f l_sizeNormalized = GameObject::getSize_for_Direction(m_direction, size);
+			position = GameObject::getPosition_for_Direction(m_direction, sf::Vector2f(SCENE_SIZE_X / 2, PORTAL_HEIGHT + l_sizeNormalized.y / 2 + INTERACTION_PANEL_OFFSET_Y));
+		}
+		setPosition(position.x, position.y);
+
+		//positioning of panel's content
+		float text_height = 0;
+		text_height += m_title_text.getGlobalBounds().height / 2;
+		m_title_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+
+		//options texts
+		text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height / 2;
+		m_options_text[0].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+
+		//actions texts
+		//text_height += INTERACTION_INTERBLOCK + m_options_text[0].getGlobalBounds().height;
+		//m_actions_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height - m_actions_text.getGlobalBounds().height / 2);
+		//text_height += m_actions_text.getGlobalBounds().height;
+		//default selected index
+		m_selected_option_index = 0;
+		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height - 2);
+	}
+}
+
+void SFOneActionPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
+{
+
+}
+
 //-------------------PORTAL MENU----------------
 SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size, SFPanel_Portal, NB_HAZARD_LEVELS, playerShip)
 {

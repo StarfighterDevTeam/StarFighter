@@ -20,6 +20,15 @@ public:
 	int m_selected_option_index;
 };
 
+class SFOneActionPanel : public SFMenuPanel
+{
+public:
+	SFOneActionPanel(sf::Vector2f size, Ship* playerShip);
+	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
+
+	Directions m_direction;
+};
+
 class SFPortalPanel : public SFMenuPanel
 {
 public:

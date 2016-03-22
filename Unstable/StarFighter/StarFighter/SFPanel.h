@@ -14,6 +14,7 @@ enum SFPanelTypes
 	SFPanel_ItemStats,
 	SFPanel_Inventory,
 	SFPanel_DoubleInventory,
+	SFPanel_Action,
 	SFPanel_Portal,
 	SFPanel_Shop,
 	SFPanel_Dialog,
