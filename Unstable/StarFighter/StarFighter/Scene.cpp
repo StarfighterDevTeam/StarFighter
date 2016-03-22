@@ -20,10 +20,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	int p = 0;
 	int enemy_count = 0;
 
-	m_textHazardBreak.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_textHazardBreak.setCharacterSize(30);
-	m_textHazardBreak.setColor(sf::Color(255, 255, 255, 255));
-
 	try {
 		//Loading the list of all scenes, contained in SCENES_FILE
 		vector<vector<string> > scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
@@ -323,31 +319,46 @@ Scene::~Scene()
 	m_sceneEnemyGenerators.clear();
 }
 
+void Scene::PlayTitleFeedback()
+{
+	//feedback
+	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
+	sf::Vector2f position = sf::Vector2f(SCENE_SIZE_X / 2, SCENE_TITLE_OFFSET_Y);
+	position = m_direction == DIRECTION_DOWN ? GameObject::getPosition_for_Direction(m_direction, position) : position;
+	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 30, _white, position);
+	ostringstream ss;
+	ss << this->m_name;
+	text_feedback->setString(ss.str());
+	SFTextPop* pop_feedback = new SFTextPop(text_feedback, SCENE_POP_TIME_NOT_FADED, SCENE_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
+	delete text_feedback;
+	(*CurrentGame).addToFeedbacks(pop_feedback);
+}
+
 void Scene::DisplayDestructions(bool hazard_break)
 {
 	ostringstream ss;
-	stringstream ratio;
-	ratio.precision(4);
-	ratio << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned;
+	ss.precision(1);
+	ss << fixed;
+	ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).m_hazardSpawned << ": " << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned << "%";
+	//feedback
+	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
+	sf::Vector2f position = sf::Vector2f(SCENE_SIZE_X / 2, DESTRUCTIONS_DISPLAY_OFFSET_Y);
+	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Arial], 24, _white, position);
+	text_feedback->setString(ss.str());
+	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_TIME_NOT_FADED, DESTRUCTIONS_DISPLAY_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
+	(*CurrentGame).addToFeedbacks(pop_feedback);
 
-	ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).m_hazardSpawned << " [" << ratio.str() << "%]";
 	if (hazard_break)
 	{
-		ss << "\n\n          HAZARD BREAK!!!";
+		text_feedback->setString("HAZARD BREAK!!!");
+		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_TIME_NOT_FADED, DESTRUCTIONS_DISPLAY_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y - pop_feedback->getGlobalBounds().height - INTERACTION_INTERBLOCK));
+		(*CurrentGame).addToFeedbacks(pop_feedback2);
 	}
-	m_textHazardBreak.setString(ss.str());
-
-	if (m_direction != DIRECTION_DOWN)
-	{
-		
-		m_textHazardBreak.setPosition(sf::Vector2f((SCENE_SIZE_X / 2) - (m_textHazardBreak.getLocalBounds().width / 2), ENDSCENE_SCORE_DISPLAY_POSITION_Y));
-	}
-	else
-	{
-		m_textHazardBreak.setPosition(sf::Vector2f((SCENE_SIZE_X / 2) - (m_textHazardBreak.getLocalBounds().width / 2), SCENE_SIZE_Y - ENDSCENE_SCORE_DISPLAY_POSITION_Y));
-	}
-
-	(*CurrentGame).addToFeedbacks(&this->m_textHazardBreak);
+	
+	delete text_feedback;
 }
 
 void Scene::GenerateEnemiesv2(Time deltaTime)

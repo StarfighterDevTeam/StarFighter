@@ -14,6 +14,7 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 	m_distance_not_faded = distance_not_faded;
 	m_distance_faded = distance_faded;
 	m_total_pop_time = total_pop_time;
+	m_time_not_faded = 0;
 
 	m_alpha = 255;
 	m_offset = offset;
@@ -27,6 +28,13 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 		m_target = NULL;
 	}
 }
+
+
+SFTextPop::SFTextPop(SFText* text, float time_not_faded, float total_pop_time, GameObject* target, sf::Vector2f offset) : SFTextPop(text, 0, 0, total_pop_time, target, offset)
+{
+	m_time_not_faded = time_not_faded;
+}
+
 SFTextPop::~SFTextPop()
 {
 	m_target = NULL;
@@ -35,7 +43,7 @@ SFTextPop::~SFTextPop()
 void SFTextPop::update(Time deltaTime)
 {
 	float total_pop_distance = m_distance_not_faded + m_distance_faded;
-	float pop_time_not_faded = m_total_pop_time * (m_distance_not_faded / (m_distance_not_faded + m_distance_faded));
+	float pop_time_not_faded = m_time_not_faded > 0 ? m_time_not_faded : m_total_pop_time * (m_distance_not_faded / (m_distance_not_faded + m_distance_faded));
 	float pop_time_faded = m_total_pop_time - pop_time_not_faded;
 
 	if (m_target)

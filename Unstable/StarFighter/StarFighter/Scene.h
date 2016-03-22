@@ -39,6 +39,7 @@ public:
 	void GenerateEnemies(Time deltaTime);
 	void GenerateBoss();
 	void LoadSceneFromFile(string name, int hazard_level, bool reverse_scene = false, bool first_scene = false);
+	void PlayTitleFeedback();
 
 	string m_name;
 	float m_vspeed;
@@ -69,8 +70,6 @@ public:
 	int m_hazard_level_unlocked;
 	bool m_canHazardBreak;
 	vector <string> m_scenesLinkedToUpdate;
-	sf::Text m_textHazardBreak;
-	sf::Font* m_fontHazardBreak;
 
 	void DisplayDestructions(bool hazard_break = false);
 	bool IsLastSceneBeforeHub();

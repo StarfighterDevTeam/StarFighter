@@ -372,8 +372,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					m_currentScene->m_bg->SetPortalsState(PortalGhost);
 
-					(*CurrentGame).removeFromFeedbacks(&(m_currentScene->m_textHazardBreak));
-
 					bool reverse = false;
 					if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
 					{
@@ -530,6 +528,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				//Giving control back to the player
 				(*CurrentGame).playerShip->m_disable_inputs = false;
 				(*CurrentGame).playerShip->m_speed = sf::Vector2f(0, 0);
+
+				//Play scene title feedback
+				m_currentScene->PlayTitleFeedback();
 			}
 
 			break;
