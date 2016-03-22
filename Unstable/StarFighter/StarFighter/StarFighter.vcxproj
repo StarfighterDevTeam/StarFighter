@@ -118,6 +118,8 @@
     <ClCompile Include="SFMapPanel.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFMenuPanel.cpp" />
+    <ClCompile Include="SFText.cpp" />
+    <ClCompile Include="SFTextPop.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Shop.cpp" />
@@ -164,6 +166,8 @@
     <ClInclude Include="SFMapPanel.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFMenuPanel.h" />
+    <ClInclude Include="SFText.h" />
+    <ClInclude Include="SFTextPop.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Shop.h" />
     <ClInclude Include="StarFighter.h" />

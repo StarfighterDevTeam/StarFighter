@@ -220,6 +220,12 @@
 #define ASSUMED_SHIP_SIZE								70
 #define ASSUMED_BOT_SIZE								32
 
+//TEXTPOP FEEDBACK
+#define TEXT_POP_DISTANCE_NOT_FADED						40
+#define TEXT_POP_DISTANCE_FADE_OUT						60
+#define TEXT_POP_TOTAL_TIME								1.0f
+#define TEXT_POP_OFFSET_Y								50
+
 enum HazardLevels
 {
 	HAZARD_LEVEL_1,//0

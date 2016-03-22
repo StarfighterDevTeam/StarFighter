@@ -9,6 +9,7 @@
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "SFText.h"
 #include "SFPanel.h"
 
 class Ship;
@@ -39,6 +40,7 @@ public:
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(SFPanel* panel);
 	void addToFeedbacks(Text* text);
+	void addToFeedbacks(SFText* text);
 	void removeFromFeedbacks(RectangleShape* feedback);
 	void removeFromFeedbacks(SFPanel* panel);
 	void removeFromFeedbacks(Text* text);
@@ -88,6 +90,7 @@ public:
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
+	void AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 	Clock m_sceneChronometer;
 
@@ -97,10 +100,12 @@ private:
 	std::list<RectangleShape*> m_sceneFeedbackBars;
 	std::list<SFPanel*> m_sceneSFPanels;
 	std::list<Text*> m_sceneFeedbackTexts;
+	std::vector<SFText*> sceneFeedbackSFTexts;
 	std::vector<GameObject*> m_sceneGameObjects;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
 	std::vector<GameObject*> m_garbage;
+	std::vector<SFText*> m_garbageTexts;
 };
 
 #endif // GAME_H_INCLUDED

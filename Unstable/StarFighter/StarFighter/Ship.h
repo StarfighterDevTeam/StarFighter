@@ -2,6 +2,7 @@
 #define SHIP_H_INCLUDED
 
 #include "Equipment.h"
+#include "SFTextPop.h"
 
 #define SHIP_START_X                0
 #define SHIP_START_Y                0

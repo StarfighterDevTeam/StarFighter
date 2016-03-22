@@ -947,7 +947,7 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	//money
 	ostringstream ss_m;
 	ss_m << m_playerShip->m_money;
-	m_money_text.setString(ss_m.str() + "$");
+	m_money_text.setString("$ " + ss_m.str());
 
 	//graze
 	ostringstream ss_g;

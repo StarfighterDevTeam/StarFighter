@@ -682,6 +682,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		{
 			delete m_currentScene;
 		}
+		(*CurrentGame).garbageLayer(FeedbacksLayer);
 		m_currentScene = new Scene(scene_name, 0, false, true);
 		playerShip->m_currentScene_name = m_currentScene->m_name;
 		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();

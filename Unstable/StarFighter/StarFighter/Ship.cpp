@@ -1434,7 +1434,21 @@ bool Ship::GetLoot(GameObject& object)
 	//MONEY
 	else if (object.m_money > 0)
 	{
+		//feedback
+		sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
+		SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 18, _yellow, getPosition());
+		ostringstream ss;
+		ss << "$ " << object.m_money;
+		text_feedback->setString(ss.str());
+		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+		SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, - size.y / 2 - TEXT_POP_OFFSET_Y));
+		pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+		delete text_feedback;
+		(*CurrentGame).addToFeedbacks(pop_feedback);
+
+		//transfer money
 		get_money_from(object);
+
 		Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 		return true;
 	}

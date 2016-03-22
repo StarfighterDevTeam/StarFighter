@@ -94,6 +94,14 @@ void Game::addToFeedbacks(Text* text)
 	m_sceneFeedbackTexts.push_back(text);
 }
 
+void Game::addToFeedbacks(SFText* text)
+{
+	if (text)
+	{
+		AddGameObjectToVector(text, &this->sceneFeedbackSFTexts);
+	}
+}
+
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
 	m_sceneFeedbackBars.remove(feedback);
@@ -141,6 +149,16 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
+	//SFTextPop (text feedbacks)
+	size_t sceneTextPopFeedbacksSize = this->sceneFeedbackSFTexts.size();
+	for (size_t i = 0; i < sceneTextPopFeedbacksSize; i++)
+	{
+		if (this->sceneFeedbackSFTexts[i] == NULL)
+			continue;
+
+		this->sceneFeedbackSFTexts[i]->update(deltaTime);
+	}
+
 	//Collect the dust
 	collectGarbage();
 }
@@ -177,6 +195,16 @@ void Game::drawScene()
 			for (std::list<Text*>::iterator it = m_sceneFeedbackTexts.begin(); it != m_sceneFeedbackTexts.end(); it++)
 			{
 				m_mainScreen.draw(*(*it));
+			}
+			for (std::vector<SFText*>::iterator it = this->sceneFeedbackSFTexts.begin(); it != this->sceneFeedbackSFTexts.end(); it++)
+			{
+				if (*it == NULL)
+					continue;
+
+				if ((*(*it)).m_visible)
+				{
+					m_mainScreen.draw(*(*it));
+				}
 			}
 		}
 		else if (i == BlackStripesLayer)
@@ -484,6 +512,22 @@ void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* v
 	vector->push_back(pGameObject);
 }
 
+void Game::AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector)
+{
+	const size_t vectorSize = vector->size();
+	for (size_t i = 0; i < vectorSize; i++)
+	{
+		if ((*vector)[i] == NULL)
+		{
+			(*vector)[i] = pSFText;
+			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
+		}
+	}
+
+	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
+	vector->push_back(pSFText);
+}
+
 void Game::collectGarbage()
 {
 	sf::Clock dt;
@@ -521,6 +565,20 @@ void Game::collectGarbage()
 				m_garbage.push_back(*it);
 				continue;
 			}
+		}
+	}
+
+	//Texts and feedbacks
+	for (std::vector<SFText*>::iterator it = (this->sceneFeedbackSFTexts).begin(); it != (this->sceneFeedbackSFTexts).end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		//Content flagged for deletion
+		if ((**it).m_GarbageMe)
+		{
+			m_garbageTexts.push_back(*it);
+			continue;
 		}
 	}
 
