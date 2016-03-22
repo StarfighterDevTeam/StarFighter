@@ -785,6 +785,10 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_graze_text.setCharacterSize(14);
 		m_graze_text.setColor(_white);
 
+		m_beastscore_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_beastscore_text.setCharacterSize(14);
+		m_beastscore_text.setColor(_white);
+
 		m_level_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_level_text.setCharacterSize(14);
 		m_level_text.setColor(_white);
@@ -822,7 +826,7 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		text_height += INTERACTION_INTERBLOCK + ARMOR_BAR_SIZE_Y;
 		m_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
-		text_height += ITEM_STATS_PANEL_SIZE_Y;
+		text_height += ITEM_STATS_PANEL_SIZE_Y - INTERACTION_INTERBLOCK;
 		
 		m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
 		m_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
@@ -844,6 +848,9 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_graze_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
 		text_height += INTERACTION_SHOP_INTERLINE + m_graze_text.getCharacterSize();
+		m_beastscore_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+
+		text_height += INTERACTION_SHOP_INTERLINE + m_beastscore_text.getCharacterSize();
 		m_framerate_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 	}
 	
@@ -954,6 +961,16 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ss_g << m_playerShip->m_graze_count;
 	m_graze_text.setString("Graze: " + ss_g.str());
 
+	//Beast score
+	ostringstream ss_beast;
+	float quality_graze = m_playerShip->getShipBeastScore() / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
+	float quality_hazard = Scene::getSceneBeastScore(m_playerShip->m_currentScene_hazard) / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
+	ss_beast.precision(0);
+	ss_beast << fixed;
+	ss_beast << "Drop quality: +" << quality_graze + quality_hazard << "%";
+	ss_beast << ": " << quality_graze << " (graze) +" << quality_hazard << " (hazard)";
+	m_beastscore_text.setString(ss_beast.str());
+
 	//scene name
 	if (!m_playerShip->m_currentScene_name.empty())
 	{
@@ -1040,6 +1057,7 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 
 	screen.draw(m_money_text);
 	screen.draw(m_graze_text);
+	screen.draw(m_beastscore_text);
 	screen.draw(m_xpBar);
 	screen.draw(m_level_text);
 	screen.draw(m_scene_text);

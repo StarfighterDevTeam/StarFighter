@@ -553,17 +553,17 @@ void Scene::HazardBreak()
 	LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Hazard level up: %d/5\n", m_hazard_level + 1));
 }
 
-float Scene::getSceneBeastScore()
+float Scene::getSceneBeastScore(int for_hazard_level)
 {
 	float bonus = 0;
-	if (m_hazard_level < HazardLevels::NB_HAZARD_LEVELS && m_hazard_level >= 0)
+	if (for_hazard_level < HazardLevels::NB_HAZARD_LEVELS && for_hazard_level >= 0)
 	{
-		bonus = HazardLevelsBeastBonus[m_hazard_level];
+		bonus = HazardLevelsBeastBonus[for_hazard_level];
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", m_hazard_level);
-		m_hazard_level = 0;
+		LOGGER_WRITE(Logger::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", level);
+		for_hazard_level = 0;
 	}
 
 	return bonus;

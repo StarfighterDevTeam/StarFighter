@@ -103,7 +103,7 @@ void InGameState::Update(Time deltaTime)
 	}
 
 	InGameStateMachineCheck(deltaTime);
-	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore());
+	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
 
 	(*CurrentGame).updateScene(deltaTime);
 

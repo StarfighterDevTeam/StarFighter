@@ -44,7 +44,7 @@ public:
 	float m_vspeed;
 	bool m_hazardbreak_has_occurred;
 
-	float getSceneBeastScore();
+	static float getSceneBeastScore(int for_hazard_level);
 
 	Background* m_bg;
 	Directions m_direction;

@@ -667,9 +667,11 @@ void Game::resetHazard(int hazard_overkill)
 	m_hazardSpawned = 0;
 }
 
-void Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore)
+float Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore)
 {
 	m_BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
+	return m_BeastScoreBonus;
+
 }
 
 TargetScan Game::FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range)

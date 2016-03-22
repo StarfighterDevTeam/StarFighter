@@ -78,6 +78,7 @@ public:
 	sf::Text m_money_text;
 	sf::Text m_level_text;
 	sf::Text m_graze_text;
+	sf::Text m_beastscore_text;
 	sf::Text m_framerate_text;
 	sf::Text m_scene_text;
 };

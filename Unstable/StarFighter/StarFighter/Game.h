@@ -77,7 +77,7 @@ public:
 
 	Ship* playerShip;
 	void SetPlayerShip(Ship* m_playerShip);
-	void GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
+	float GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
 
 	TargetScan FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	float GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
