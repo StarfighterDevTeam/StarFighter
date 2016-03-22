@@ -6,6 +6,7 @@
 
 class Ship;
 class Dialog;
+class SFItemStatsPanel;
 
 enum SFPanelTypes
 {
@@ -52,6 +53,8 @@ public:
 	virtual string GetTeleportationDestination();
 	virtual int GetTeleportationCost();
 	virtual void SetMapViewOffset(sf::Vector2f offset);
+	virtual SFItemStatsPanel* GetItemStatsPanel();
+	virtual void SetItemStatsPanel(SFItemStatsPanel* panel);
 	
 	virtual Dialog* GetDialog();
 

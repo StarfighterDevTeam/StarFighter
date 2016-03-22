@@ -8,7 +8,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 	if (object)
 	{
 		setSize(size);
-		setOrigin(size.x/2, size.y/2);
+		setOrigin(size.x / 2, size.y / 2);
 		setFillColor(sf::Color(20, 20, 20, 230));//dark grey
 		setOutlineThickness(0);
 		setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
@@ -22,12 +22,8 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
-		m_options_text = new sf::Text[3];
-		for (size_t i = 0; i < 3; i++)
-		{
-			m_options_text[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
-			m_options_text[i].setCharacterSize(18);
-		}
+		m_options_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_options_text.setCharacterSize(18);
 
 		DisplayItemStats(object);
 
@@ -38,20 +34,10 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		text_height += m_title_text.getCharacterSize() + INTERACTION_INTERLINE;
 		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
-		for (size_t i = 0; i < 3; i++)
-		{
-			if (i == 0)
-			{
-				text_height += INTERACTION_INTERBLOCK + m_text.getGlobalBounds().height;
-			}
-			else
-			{
-				text_height += INTERACTION_INTERLINE;
-			}
-			text_height += m_options_text[i].getGlobalBounds().height;
-			m_options_text[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
-		}
+		text_height += m_text.getGlobalBounds().height;
 
+		//Action texts
+		//BUY
 		if (item_in_shop)
 		{
 			int price = object->m_equipment_loot ? object->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS : object->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
@@ -59,23 +45,47 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			ss_buy << "Buy: $" << price;
 			if (playerShip->m_money < price)
 			{
-				m_options_text[0].setColor(sf::Color(255, 50, 50, 255));//red
+				m_options_text.setColor(sf::Color(255, 50, 50, 255));//red
 				ss_buy << " (insufficient credits)";
 			}
-			m_options_text[0].setString(ss_buy.str());
-
-			m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+			m_options_text.setString(ss_buy.str());
 			m_arrow.m_visible = true;
 		}
-		
+		//SELL
+		else if (playerShip && playerShip->m_HUD_state == HUD_ShopSellMenu)
+		{
+			int price = object->m_equipment_loot ? object->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS : object->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+			ostringstream ss_sell;
+			ss_sell << "Sell: $" << price;
+			m_options_text.setString(ss_sell.str());
+			m_arrow.m_visible = true;
+		}
+		else if (playerShip && playerShip->m_HUD_state == HUD_OpeningEquipment)
+		{
+			//DESEQUIP
+			if (playerShip->m_HUD_SFPanel && playerShip->m_HUD_SFPanel->GetFocusedGrid() == 1)
+			{
+				m_options_text.setString("Desequip");
+				m_arrow.m_visible = true;
+			}
+			//EQUIP
+			else if (playerShip->m_HUD_SFPanel && playerShip->m_HUD_SFPanel->GetFocusedGrid() == 2)
+			{
+				m_options_text.setString("Equip");
+				m_arrow.m_visible = true;
+			}
+		}
 
-		
+		text_height += m_options_text.getGlobalBounds().height;
+		m_options_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+		text_height += m_options_text.getGlobalBounds().height / 2 + 2;//because fuck this
+		m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 	}
 }
 
 SFItemStatsPanel::~SFItemStatsPanel()
 {
-	delete[] m_options_text;
+	
 }
 
 void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
@@ -86,10 +96,7 @@ void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
 
 		screen.draw(m_title_text);
 		screen.draw(m_text);
-		for (size_t i = 0; i < 3; i++)
-		{
-			screen.draw(m_options_text[i]);
-		}
+		screen.draw(m_options_text);
 		screen.draw(m_actions_text);
 		if (m_arrow.m_visible)
 		{
@@ -659,6 +666,16 @@ void SFInventoryPanel::SetFocusedItem(GameObject* item)
 bool SFInventoryPanel::GetPrioritaryFeedback()
 {
 	return m_has_prioritary_feedback;
+}
+
+SFItemStatsPanel* SFInventoryPanel::GetItemStatsPanel()
+{
+	return m_item_stats_panel;
+}
+
+void SFInventoryPanel::SetItemStatsPanel(SFItemStatsPanel* panel)
+{
+	m_item_stats_panel = panel;
 }
 
 void SFInventoryPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)

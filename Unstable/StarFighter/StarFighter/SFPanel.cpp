@@ -119,6 +119,17 @@ bool SFPanel::GetPrioritaryFeedback()
 	//see override function in SFMenuPanel and other types of SF panels
 }
 
+SFItemStatsPanel* SFPanel::GetItemStatsPanel()
+{
+	return NULL;
+	//see override function in SFInventoryPanel and other types of SF panels
+}
+
+void SFPanel::SetItemStatsPanel(SFItemStatsPanel* panel)
+{
+	return;
+}
+
 void SFPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
 {
 	return;

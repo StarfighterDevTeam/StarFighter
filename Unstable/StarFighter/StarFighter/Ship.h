@@ -139,7 +139,8 @@ public :
 	void BuyingItem();
 	void SellingItem();
 	void GarbagingItem();
-	void SwappingItems();
+	void EquipItem();
+	void DesequipItem();
 	void ContinueDialog();
 	void Teleport(string destination_name);
 	void CenterMapView(sf::Vector2f offset = sf::Vector2f(0, 0));

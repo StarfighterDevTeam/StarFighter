@@ -525,13 +525,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//Swapping items
 			if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
 			{
-				SwappingItems();
+				EquipItem();
+			}
+			else if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 1)
+			{
+				DesequipItem();
 			}
 			//Garbaging item
-			else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_HUD_SFPanel->GetFocusedItem())
-			{
-				GarbagingItem();
-			}
+			//else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_HUD_SFPanel->GetFocusedItem())
+			//{
+			//	GarbagingItem();
+			//}
 			else
 			{
 				m_HUD_SFPanel->SetPrioritaryFeedback(false);
@@ -581,6 +585,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_SFPanel->GetCursor()->m_visible = false;
 				m_HUD_SFPanel->ClearHighlight();
 				m_SFPanel->ClearHighlight();
+
+				if (m_HUD_SFPanel->GetItemStatsPanel())
+				{
+					m_HUD_SFPanel->SetFocusedItem(NULL);
+				}
 			}
 
 			//interaction: buy item
@@ -603,12 +612,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			MoveCursor(m_HUD_SFPanel->GetCursor(), inputs_direction, deltaTime, m_HUD_SFPanel);
 
 			//Swapping items
-			if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
-			{
-				SwappingItems();
-			}
+			//if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
+			//{
+			//	SwappingItems();
+			//}
 			//Selling item
-			else if (m_inputs_states[Action_Braking] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
+			//else if (m_inputs_states[Action_Braking] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
 			{
 				SellingItem();
 			}
@@ -620,6 +630,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_SFPanel->GetCursor()->m_visible = true;
 				m_HUD_SFPanel->ClearHighlight();
 				m_SFPanel->ClearHighlight();
+
+				if (m_HUD_SFPanel->GetItemStatsPanel())
+				{
+					m_HUD_SFPanel->SetFocusedItem(NULL);
+				}
 			}
 
 			//exit
@@ -1017,9 +1032,9 @@ void Ship::SellingItem()
 	return;	
 }
 
-void Ship::SwappingItems()
+void Ship::EquipItem()
 {
-	//"normal" hud interactions
+	//Equip
 	if (m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
 	{
 		GameObject* tmp_ptr = m_HUD_SFPanel->GetFocusedItem();
@@ -1029,7 +1044,7 @@ void Ship::SwappingItems()
 		{
 			int ship_index_ = tmp_ptr->m_equipment_loot->m_equipmentType;
 			ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_);
-			
+
 			Equipment* new_equipment = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
 			this->setShipEquipment(new_equipment, true);
 			new_equipment = NULL;
@@ -1038,10 +1053,43 @@ void Ship::SwappingItems()
 		{
 			int ship_index_ = NBVAL_Equipment;
 			ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_);
-			
+
 			Weapon* new_weapon = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
 			this->setShipWeapon(new_weapon, true);
 			new_weapon = NULL;
+		}
+		else
+		{
+			LOGGER_WRITE(Logger::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+		}
+
+		tmp_ptr = NULL;
+	}
+}
+
+void Ship::DesequipItem()
+{
+	//Desequip
+	if (m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 1)
+	{
+		GameObject* tmp_ptr = m_HUD_SFPanel->GetFocusedItem();
+		int ship_index_ = m_HUD_SFPanel->GetGrid(false, 1)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
+
+		if (tmp_ptr->m_equipment_loot)
+		{
+			if (m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
+			{
+				cleanEquipment(ship_index_);
+				m_HUD_SFPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+			}
+		}
+		else if (tmp_ptr->m_weapon_loot)
+		{
+			if (m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
+			{
+				cleanWeapon(ship_index_);
+				m_HUD_SFPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+			}
 		}
 		else
 		{

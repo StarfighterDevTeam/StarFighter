@@ -3,13 +3,6 @@
 
 #include "GameObject.h"
 
-enum HudGridsIndex
-{
-	HudGrid_NoFocus,
-	HudGrid_ShipGrid,
-	HudGrid_EquipmentGrid,
-};
-
 enum SlotFeedbackStates
 {
 	Slot_NormalState,

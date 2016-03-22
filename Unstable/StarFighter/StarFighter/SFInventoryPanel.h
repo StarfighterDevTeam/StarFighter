@@ -12,7 +12,7 @@ public:
 	void Draw(sf::RenderTexture& screen) override;
 
 	GameObject m_arrow;
-	sf::Text* m_options_text;
+	sf::Text m_options_text;
 };
 
 class SFInventoryPanel : public SFPanel
@@ -30,6 +30,8 @@ public:
 	int GetFocusedGrid() override;
 	ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1) override;
 	bool GetPrioritaryFeedback() override;
+	SFItemStatsPanel* GetItemStatsPanel() override;
+	void SetItemStatsPanel(SFItemStatsPanel* panel) override;
 	void SetPrioritaryFeedback(bool has_priotiary_feedback) override;
 	void ClearHighlight() override;
 	void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid) override;
