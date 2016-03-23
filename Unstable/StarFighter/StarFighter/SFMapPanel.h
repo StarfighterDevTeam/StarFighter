@@ -99,10 +99,7 @@ public:
 	void UpdateBranchesPosition(bool into_real_coordinates, bool into_fake_coordinates);
 	sf::FloatRect GetStellarMapKnownSize();
 	void ScanBranches(string starting_scene, Directions direction, sf::Vector2f starting_coordinates);
-	bool ScanScene(string scene_filename, string scene, Directions direction, sf::Vector2f starting_coordinates);
-
-	vector<vector<string> > m_scenesConfig;
-	size_t m_scenesConfigSize;
+	bool ScanScene(string scene_name, Directions direction, sf::Vector2f starting_coordinates);
 
 	GameObject m_cursor;
 	GameObject m_ship;

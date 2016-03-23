@@ -314,10 +314,6 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	m_scroll_offset = sf::Vector2f(0, 0);
 
 	//CONSTRUCTION OF THE MAP
-	//Loading the list of all scenes, contained in SCENES_FILE
-	m_scenesConfig = *(FileLoaderUtils::FileLoader(SCENES_FILE));
-	m_scenesConfigSize = m_scenesConfig.size();
-
 	//start with current hub
 	StellarBranch* mother_branch = new StellarBranch();
 	m_current_hub = new StellarHub();
@@ -694,22 +690,23 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 
 	//get linked scenes
 	string links[NO_DIRECTION] = { "0", "0", "0", "0" };
-	for (int i = 0; i < m_scenesConfigSize; i++)
+	size_t allScenesVectorSize = (*CurrentGame).m_generalScenesConfig.size();
+	for (size_t i = 0; i < allScenesVectorSize; i++)
 	{
-		if (m_scenesConfig[i][SCENE_NAME].compare(starting_scene) == 0)
+		if ((*CurrentGame).m_generalScenesConfig[i][SCENE_NAME].compare(starting_scene) == 0)
 		{
 			//all directions
 			if (direction == NO_DIRECTION)
 			{
-				links[DIRECTION_UP] = m_scenesConfig[i][SCENE_LINK_UP];
-				links[DIRECTION_DOWN] = m_scenesConfig[i][SCENE_LINK_DOWN];
-				links[DIRECTION_RIGHT] = m_scenesConfig[i][SCENE_LINK_RIGHT];
-				links[DIRECTION_LEFT] = m_scenesConfig[i][SCENE_LINK_LEFT];
+				links[DIRECTION_UP] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_UP];
+				links[DIRECTION_DOWN] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_DOWN];
+				links[DIRECTION_RIGHT] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_RIGHT];
+				links[DIRECTION_LEFT] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_LEFT];
 			}
 			//forced direction
 			else
 			{
-				links[direction] = m_scenesConfig[i][SCENE_LINK_UP + direction];
+				links[direction] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_UP + direction];
 			}
 			break;
 		}
@@ -760,11 +757,11 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 
 				//Get filename of the next scene to scan
 				string scene_filename;
-				for (int i = 0; i < m_scenesConfigSize; i++)
+				for (size_t j = 0; j < allScenesVectorSize; j++)
 				{
-					if (m_scenesConfig[i][SCENE_NAME].compare(links[direction]) == 0)
+					if ((*CurrentGame).m_generalScenesConfig[j][SCENE_NAME].compare(links[direction]) == 0)
 					{
-						scene_filename = m_scenesConfig[i][SCENE_FILENAME];
+						scene_filename = (*CurrentGame).m_generalScenesConfig[j][SCENE_FILENAME];
 						break;
 					}
 				}
@@ -776,7 +773,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				}
 				//Hub found?
 				//printf("Scene scanned: %s (direction: %d)\n", links[direction].c_str(), direction);
-				if (ScanScene(scene_filename, links[direction], (Directions)direction, starting_coordinates_))
+				if (ScanScene(links[direction], (Directions)direction, starting_coordinates_))
 				{
 					//if hub is not known yet: SCAN-CEPTION: repeat process with this new hub, until we reached all known hubs
 					if (m_branches.back()->m_hub &&!links[direction].empty() && links[direction].compare("0") != 0)
@@ -795,12 +792,12 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 
 					//get next linked scene name
 					string next_scene_name;
-					for (size_t i = 0; i < m_scenesConfigSize; i++)
+					for (size_t j = 0; j < allScenesVectorSize; j++)
 					{
-						if (m_scenesConfig[i][SCENE_NAME].compare(links[direction]) == 0)
+						if ((*CurrentGame).m_generalScenesConfig[j][SCENE_NAME].compare(links[direction]) == 0)
 						{
 							//Loading the linked scene names
-							next_scene_name = m_scenesConfig[i][SCENE_LINK_UP + direction];
+							next_scene_name = (*CurrentGame).m_generalScenesConfig[j][SCENE_LINK_UP + direction];
 							break;
 						}
 					}
@@ -822,24 +819,24 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 	}
 }
 
-bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direction, sf::Vector2f starting_coordinates)
+bool SFMapPanel::ScanScene(string scene_name, Directions direction, sf::Vector2f starting_coordinates)
 {
 	//Loading the particular scene that we want to load
-	vector<vector<string> > config = *(FileLoaderUtils::FileLoader(scene_filename));
-	for (std::vector<vector<string> >::iterator it = config.begin(); it != config.end(); it++)
+	size_t sceneVectorSize = (*CurrentGame).m_sceneConfigs[scene_name].size();
+	for (size_t i = 0; i < sceneVectorSize; i++)
 	{
-		if ((*it)[0].compare("bg") == 0)
+		if ((*CurrentGame).m_sceneConfigs[scene_name][i][0].compare("bg") == 0)
 		{
-			bool hub = (*it)[BACKGROUND_VERTICAL].compare("H") != 0 && (*it)[BACKGROUND_VERTICAL].compare("V") != 0;
-			bool vertical = (*it)[BACKGROUND_VERTICAL].compare("V") == 0;
+			bool hub = (*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_VERTICAL].compare("H") != 0 && (*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_VERTICAL].compare("V") != 0;
+			bool vertical = (*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_VERTICAL].compare("V") == 0;
 
 			//case hub reached
 			if (hub)
 			{
 				//create new hub
-				StellarHub* new_hub = new StellarHub(scene);
+				StellarHub* new_hub = new StellarHub(scene_name);
 				new_hub->m_coordinates = starting_coordinates;
-				new_hub->m_display_name = scene;
+				new_hub->m_display_name = scene_name;
 				m_branches.back()->m_hub = new_hub;
 
 				//printf("Hub created: %s\n", scene.c_str());
@@ -860,16 +857,16 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 				}
 
 				//create new segment
-				float segment_size = atof((*it)[BACKGROUND_SIZE_ON_STELLARMAP].c_str());
+				float segment_size = atof((*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_SIZE_ON_STELLARMAP].c_str());
 				StellarSegment* new_segment = new StellarSegment(vertical, segment_size);
 				m_branches.back()->m_segments.push_back(new_segment);
-				new_segment->m_display_name = scene;
+				new_segment->m_display_name = scene_name;
 
 				new_segment->m_size_on_stellar_map = segment_size;
 				new_segment->m_coordinates.x = starting_coordinates.x + ((direction == DIRECTION_RIGHT) - (direction == DIRECTION_LEFT)) * new_segment->m_size_on_stellar_map / 2;
 				new_segment->m_coordinates.y = starting_coordinates.y + ((direction == DIRECTION_UP) - (direction == DIRECTION_DOWN)) * new_segment->m_size_on_stellar_map / 2;
 
-				new_segment->m_max_hazard_unlocked = GetMaxHazardLevelUnlocked(scene);
+				new_segment->m_max_hazard_unlocked = GetMaxHazardLevelUnlocked(scene_name);
 				//scenes that have not been explored yet, but that has been scouted (player has seen the portal leading to it), should be displayed as the minimal hazard unlocked (instead of the -1 error code)
 				if (new_segment->m_max_hazard_unlocked < 0)
 				{
@@ -878,6 +875,8 @@ bool SFMapPanel::ScanScene(string scene_filename, string scene, Directions direc
 
 				return false;
 			}
+
+			break;
 		}
 	}
 }
