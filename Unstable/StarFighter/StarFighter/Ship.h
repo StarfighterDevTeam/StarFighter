@@ -85,9 +85,11 @@ class Ship : public GameObject
 {
 public :
 	Ship(ShipModel* ship_model);
+	~Ship();
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void updatePostCollision() override;
+	void Draw(sf::RenderTexture& screen) override;
 	void ManageDebugCommand();
 	bool ManageVisibility();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
@@ -103,6 +105,7 @@ public :
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
 	void SettingTurnAnimations();
+	void RotateShip(float angle);
 
 	void Respawn() override;
 	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
@@ -177,7 +180,7 @@ public :
 
 	bool m_disable_bots;
 	bool m_disable_inputs;
-	Aura* m_combo_aura[NB_GRAZE_LEVELS];
+	Aura* m_combo_aura;
 	Aura* m_trail;
 	bool m_disabledHyperspeed;
 	bool m_is_asking_scene_transition;

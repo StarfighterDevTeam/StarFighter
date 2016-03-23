@@ -242,10 +242,7 @@ void Game::drawScene()
 
 				if ((*(*it)).m_visible)
 				{
-					if (!(*(*it)).m_transparent)
-					{
-						m_mainScreen.draw((*(*it)));
-					}
+					(*it)->Draw(m_mainScreen);	
 				}
 			}
 		}

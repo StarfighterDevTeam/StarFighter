@@ -480,8 +480,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).playerShip->m_disabledHyperspeed = false;
 					(*CurrentGame).playerShip->m_disable_bots = false;
 					(*CurrentGame).playerShip->SetBotsVisibility(true);
-					
-					(*CurrentGame).SetLayerRotation(PlayerShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					(*CurrentGame).playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+
 					(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 					(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 					(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));

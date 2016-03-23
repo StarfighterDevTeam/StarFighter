@@ -200,6 +200,7 @@ public:
 	virtual void update(sf::Time deltaTime, float hyperspeedMultiplier = 1);
 	virtual void updateAnimation(sf::Time deltaTime);
 	virtual void updatePostCollision();
+	virtual void Draw(sf::RenderTexture& screen);
 
 	bool m_visible;
 	bool m_isOnScene;

@@ -58,7 +58,7 @@
 #define DIALOGS_FILE "Assets/Scripts/Generated/Dialogs.csv"
 
 #define PIXEL_PERFECT_COLLISION							true
-#define GRAZE_DISTANCE									30
+#define GRAZE_DISTANCE									50
 #define SHIP_BRAKING_MALUS_SPEED						0.50f
 #define END_OF_DIALOGS_DELAY							1.5f
 

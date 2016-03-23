@@ -77,15 +77,17 @@ void Aura::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	newposition.y = m_target->getPosition().y + newoffset.y;
 	setPosition(newposition.x,newposition.y);
 
-	if (m_visible)
-	{
-		AnimatedSprite::update(deltaTime);
-	}
-	else
-	{
-		//if the Aura is not visible, we don't display it and reset its animation to frame 0
-		m_currentFrame = 0;
-	}
+	AnimatedSprite::update(deltaTime);
+	
+	//if (m_visible)
+	//{
+	//	AnimatedSprite::update(deltaTime);
+	//}
+	//else
+	//{
+	//	//if the Aura is not visible, we don't display it and reset its animation to frame 0
+	//	m_currentFrame = 0;
+	//}
 }
 
 Aura* Aura::Clone()

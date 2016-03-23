@@ -13,8 +13,6 @@ public:
 
 	FX* Clone();
 
-	int m_frameNumber;
-
 private:
 	sf::Clock m_deltaClockExploding;
 	bool m_exploding;
@@ -31,10 +29,6 @@ public:
 
 	GameObject* m_target;
 	sf::Vector2f m_offset;
-
-private:
-	sf::Clock m_deltaClockExploding;
-	sf::Time m_duration;
 };
 
 class FakeShip : public Aura

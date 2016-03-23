@@ -48,18 +48,17 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	if (!ship_model->m_fake_textureName.empty())
 	{
 		m_fake_ship = new FakeShip(this, ship_model->m_fake_textureName, ship_model->m_fake_size, ship_model->m_fake_frameNumber, NB_ShipAnimations);
-		(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
+		//(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
 	}
 
-	m_combo_aura[GRAZE_LEVEL_RED] = new Aura(this, "Assets/2D/FX/Aura_RedGlow.png", sf::Vector2f(150, 150), 3);
-	m_combo_aura[GRAZE_LEVEL_BLUE] = new Aura(this, "Assets/2D/FX/Aura_BlueGlow.png", sf::Vector2f(150, 150), 3);
-	m_combo_aura[GRAZE_LEVEL_WHITE] = new Aura(this, "Assets/2D/FX/Aura_WhiteGlow.png", sf::Vector2f(150, 150), 3);
+	m_combo_aura = new Aura(this, "Assets/2D/FX/Aura_Graze.png", sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
+	//(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
+
 	m_trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
-	m_trail->m_visible = false;
 	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
+	//(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
 
-	(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
 	m_equipment_loot = NULL;
@@ -82,6 +81,37 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	}
 
 	Init();
+}
+
+Ship::~Ship()
+{
+	for (int i = 0; i < NBVAL_Equipment; i++)
+	{
+		if (m_equipment[i])
+		{
+			delete m_equipment[i];
+		}
+	}
+	if (m_ship_model)
+	{
+		delete m_ship_model;
+	}
+	if (m_weapon)
+	{
+		delete m_weapon;
+	}
+	if (m_combo_aura)
+	{
+		delete m_combo_aura;
+	}
+	if (m_fake_ship)
+	{
+		delete m_fake_ship;
+	}
+	if (m_trail)
+	{
+		delete m_trail;
+	}
 }
 
 void Ship::Init()
@@ -320,48 +350,60 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	CleanGarbagedEquipments();
 
 	//ManageVisibility();
-	
-		//Resetting flags
-		if (m_isCollidingWithInteractiveObject != PortalInteraction && !m_is_asking_scene_transition)
-		{
-			m_targetPortal = NULL;
-		}
-		if (m_isCollidingWithInteractiveObject != ShopInteraction)
-		{
-			m_targetShop = NULL;
-		}
-		m_movingX = false;
-		m_movingY = false;
-		m_moving = false;
-		m_is_asking_SFPanel = SFPanel_None;
-		m_is_asking_scene_transition = false;
+	//Resetting flags
+	if (m_isCollidingWithInteractiveObject != PortalInteraction && !m_is_asking_scene_transition)
+	{
+		m_targetPortal = NULL;
+	}
+	if (m_isCollidingWithInteractiveObject != ShopInteraction)
+	{
+		m_targetShop = NULL;
+	}
+	m_movingX = false;
+	m_movingY = false;
+	m_moving = false;
+	m_is_asking_SFPanel = SFPanel_None;
+	m_is_asking_scene_transition = false;
 
-		//Update
-		ManageImmunity();
-		ManageShieldRegen(deltaTime, hyperspeedMultiplier);
+	//Update
+	ManageImmunity();
+	ManageShieldRegen(deltaTime, hyperspeedMultiplier);
 
-		sf::Vector2f directions = InputGuy::getDirections();
+	sf::Vector2f directions = InputGuy::getDirections();
 
-		ManageInputs(deltaTime, hyperspeedMultiplier, directions);
+	ManageInputs(deltaTime, hyperspeedMultiplier, directions);
 
-		m_trail->m_visible = (hyperspeedMultiplier > 1.0f);
+	m_trail->m_visible = (hyperspeedMultiplier > 1.0f);
 
-		GameObject::update(deltaTime, hyperspeedMultiplier);
+	GameObject::update(deltaTime, hyperspeedMultiplier);
 
-		ScreenBorderContraints();
-		SettingTurnAnimations();
-		ManageFeedbackExpiration(deltaTime);
+	ScreenBorderContraints();
+	SettingTurnAnimations();
+	ManageFeedbackExpiration(deltaTime);
 
-		//Update HUD
-		if (m_SFPanel)
-		{
-			m_SFPanel->Update(deltaTime, directions);
-		}
-		if (m_HUD_SFPanel)
-		{
-			m_HUD_SFPanel->Update(deltaTime, directions);
-		}
-	
+	//Update HUD
+	if (m_SFPanel)
+	{
+		m_SFPanel->Update(deltaTime, directions);
+	}
+	if (m_HUD_SFPanel)
+	{
+		m_HUD_SFPanel->Update(deltaTime, directions);
+	}
+
+	//member objects follow
+	if (m_combo_aura)
+	{
+		m_combo_aura->update(deltaTime, hyperspeedMultiplier);
+	}
+	if (m_trail)
+	{
+		m_trail->update(deltaTime, hyperspeedMultiplier);
+	}
+	if (m_fake_ship)
+	{
+		m_fake_ship->update(deltaTime, hyperspeedMultiplier);
+	}
 }
 
 bool Ship::ManageVisibility()
@@ -1204,6 +1246,22 @@ void Ship::SettingTurnAnimations()
 	}
 }
 
+void Ship::RotateShip(float angle)
+{
+	if (m_fake_ship)
+	{
+		m_fake_ship->setRotation(angle);
+	}
+	if (m_combo_aura)
+	{
+		m_combo_aura->setRotation(angle);
+	}
+	if (m_trail)
+	{
+		m_trail->setRotation(angle);
+	}
+}
+
 void Ship::ScreenBorderContraints()
 {
 	//screen borders contraints	correction
@@ -1506,35 +1564,19 @@ void Ship::GetGrazing()
 		{
 			//Graze level up
 			m_graze_level++;
-			switch (m_graze_level)
+			if (m_combo_aura && m_graze_level > 0 && m_graze_level < NB_GRAZE_LEVELS)
 			{
-				case GRAZE_LEVEL_RED:
+				//update aura
+				if (m_graze_level > GRAZE_LEVEL_NONE + 1)
 				{
-					(*CurrentGame).garbageLayer(AuraLayer);
-					Aura* combo_aura = this->m_combo_aura[GRAZE_LEVEL_RED]->Clone();
-					(*CurrentGame).addToScene(combo_aura, AuraLayer, Neutral);
-					break;
+					m_combo_aura->setAnimationLine(m_graze_level, true);
 				}
-				case GRAZE_LEVEL_BLUE:
+				//"new" aura
+				else
 				{
-					(*CurrentGame).garbageLayer(AuraLayer);
-					Aura* combo_aura = this->m_combo_aura[GRAZE_LEVEL_BLUE]->Clone();
-					(*CurrentGame).addToScene(combo_aura, AuraLayer, Neutral);
-					break;
+					m_combo_aura->setAnimationLine(m_graze_level, false);
 				}
-				case GRAZE_LEVEL_WHITE:
-				{
-					(*CurrentGame).garbageLayer(AuraLayer);
-					Aura* combo_aura = this->m_combo_aura[GRAZE_LEVEL_WHITE]->Clone();
-					(*CurrentGame).addToScene(combo_aura, AuraLayer, Neutral);
-					break;
-				}
-				default:
-				{
-					m_graze_level = 0;
-					LOGGER_WRITE(Logger::DEBUG, "<!> Error, entering a GrazeLevels case that does not exist. Combo aura cannot be generated\n");
-					break;
-				}
+				
 			}
 		}
 	}
@@ -1589,7 +1631,10 @@ void Ship::damage_from(GameObject& object)
 	}
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;
-	(*CurrentGame).garbageLayer(AuraLayer);
+	if (m_combo_aura)
+	{
+		m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);
+	}
 }
 
 
@@ -2375,6 +2420,28 @@ void Ship::updatePostCollision()
 	m_isCollidingWithInteractiveObject = No_Interaction;
 }
 
+void Ship::Draw(sf::RenderTexture& screen)
+{
+	if (m_trail)
+	{
+		m_trail->Draw(screen);
+		if (m_trail->m_visible)
+		{
+			printf("");
+		}
+	}
+	if (m_combo_aura)
+	{
+		m_combo_aura->Draw(screen);
+	}
+	
+	GameObject::Draw(screen);
+
+	if (m_fake_ship)
+	{
+		m_fake_ship->Draw(screen);
+	}
+}
 
 float Ship::getFighterFloatStatValue(FighterStats stat)
 {

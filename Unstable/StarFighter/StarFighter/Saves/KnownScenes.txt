@@ -5,8 +5,8 @@ Vanguard_H4 1
 Vanguard_Hub0 0
 Vanguard_Hub1 0
 Vanguard_Hub2 0
-Vanguard_Hub4 0
-Vanguard_Hub5 0 !
+Vanguard_Hub4 0 !
+Vanguard_Hub5 0
 Vanguard_V1 2
 Vanguard_V2 2
 Vanguard_V3 1
