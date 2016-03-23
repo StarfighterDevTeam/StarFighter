@@ -1,73 +1,101 @@
 #include "SFTextPop.h"
 
-SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target, sf::Vector2f offset)
+extern Game* CurrentGame;
+
+SFTextPop::SFTextPop()
+{
+
+}
+
+SFTextPop::SFTextPop(SFText* text, float time_fade_in, float time_not_faded, float time_fade_out, GameObject* target, float speed_y, sf::Vector2f offset)
 {
 	setFont(*text->getFont());
 	setCharacterSize(text->getCharacterSize());
 	setColor(text->getColor());
 	setString(text->getString());
-	setPosition(sf::Vector2f(text->getPosition().x + offset.x, text->getPosition().y + offset.y));
-
-	m_visible = text->m_visible;
-	m_GarbageMe = false;
-
-	m_distance_not_faded = distance_not_faded;
-	m_distance_faded = distance_faded;
-	m_total_pop_time = total_pop_time;
-	m_time_not_faded = 0;
-
-	m_alpha = 255;
-	m_offset = offset;
-
 	if (target)
 	{
-		m_target = target;
+		setPosition(sf::Vector2f(target->getPosition().x + offset.x, target->getPosition().y + offset.y));
 	}
 	else
 	{
-		m_target = NULL;
+		setPosition(sf::Vector2f(text->getPosition().x + offset.x, text->getPosition().y + offset.y));
 	}
-}
+	
+	m_visible = text->m_visible;
+	m_GarbageMe = false;
+	m_alpha = time_fade_in > 0 ? 0 : 255;
 
-
-SFTextPop::SFTextPop(SFText* text, float time_not_faded, float total_pop_time, GameObject* target, sf::Vector2f offset) : SFTextPop(text, 0, 0, total_pop_time, target, offset)
-{
+	m_time_fade_in = time_fade_in;
 	m_time_not_faded = time_not_faded;
+	m_time_fade_out = time_fade_out;
+	m_target = target;
+	m_speed_y = speed_y;
+	m_offset = offset;
+	m_time = sf::seconds(0);
 }
 
-SFTextPop::~SFTextPop()
+void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 {
-	m_target = NULL;
-}
-
-void SFTextPop::update(Time deltaTime)
-{
-	float total_pop_distance = m_distance_not_faded + m_distance_faded;
-	float pop_time_not_faded = m_time_not_faded > 0 ? m_time_not_faded : m_total_pop_time * (m_distance_not_faded / (m_distance_not_faded + m_distance_faded));
-	float pop_time_faded = m_total_pop_time - pop_time_not_faded;
-
-	if (m_target)
+	if (hyperspeedMultiplier < 1.0f)
 	{
-		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width / 2 + m_offset.x, m_target->getPosition().y - m_target->m_size.y / 2 + m_offset.y - (total_pop_distance / m_total_pop_time * m_timer_clock.getElapsedTime().asSeconds())));
+		m_time += deltaTime * hyperspeedMultiplier;
 	}
 	else
 	{
-		setPosition(sf::Vector2f(getPosition().x, getPosition().y - (total_pop_distance / m_total_pop_time * deltaTime.asSeconds())));
+		m_time += deltaTime;
 	}
 
-	if (m_timer_clock.getElapsedTime().asSeconds() > pop_time_not_faded)
+	//fade in
+	if (m_time.asSeconds() < m_time_fade_in)
 	{
-		Uint8 decay_ = (Uint8)(ceil(deltaTime.asSeconds() * 255 / pop_time_faded));
-		if (m_alpha - decay_ > 0)
+		Uint8 alpha_change = (Uint8)(ceil(deltaTime.asSeconds() * hyperspeedMultiplier * 255 / m_time_fade_in));
+		if (m_alpha + alpha_change < 255)
 		{
-			m_alpha -= decay_;
+			m_alpha += alpha_change;
+		}
+		else
+		{
+			m_alpha = 255;
+		}
+		//apply new alpha value
+		setColor(Color(getColor().r, getColor().g, getColor().b, m_alpha));
+	}
+	//fade out
+	else if (m_time.asSeconds() > m_time_fade_in + m_time_not_faded)
+	{
+		Uint8 alpha_change = (Uint8)(ceil(deltaTime.asSeconds() * hyperspeedMultiplier * 255 / m_time_fade_out));
+		if (m_alpha - alpha_change > 0)
+		{
+			m_alpha -= alpha_change;
 		}
 		else
 		{
 			m_alpha = 0;
 			m_GarbageMe = true;
+			m_visible = false;
 		}
-
+		//apply new alpha value
 		setColor(Color(getColor().r, getColor().g, getColor().b, m_alpha));
+	}
+
+	//move
+	float newspeed = m_speed_y;
+	if (hyperspeedMultiplier > 1)
+	{
+		newspeed += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
+	}
+	else if (hyperspeedMultiplier < 1)
+	{
+		newspeed = m_speed_y * hyperspeedMultiplier;
+	}
+
+	if (m_target)
+	{
+		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width / 2 + m_offset.x, m_target->getPosition().y - m_target->m_size.y / 2 + m_offset.y - newspeed * deltaTime.asSeconds()));
+	}
+	else
+	{
+		setPosition(sf::Vector2f(getPosition().x, getPosition().y - newspeed * deltaTime.asSeconds()));
 	}
 }

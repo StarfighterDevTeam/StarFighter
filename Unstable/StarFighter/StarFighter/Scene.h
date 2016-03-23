@@ -3,6 +3,7 @@
 
 #include "FileLoader.h"
 #include "EnemyGenerator.h"
+#include "SFTextPop.h"
 
 using namespace std;
 

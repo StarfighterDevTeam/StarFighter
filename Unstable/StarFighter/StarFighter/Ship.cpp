@@ -1504,8 +1504,9 @@ bool Ship::GetLoot(GameObject& object)
 		ss << "$ " << object.m_money;
 		text_feedback->setString(ss.str());
 		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
-		SFTextPop* pop_feedback = new SFTextPop(text_feedback, TEXT_POP_DISTANCE_NOT_FADED, TEXT_POP_DISTANCE_FADE_OUT, TEXT_POP_TOTAL_TIME, NULL, sf::Vector2f(0, - size.y / 2 - TEXT_POP_OFFSET_Y));
-		pop_feedback->setPosition(sf::Vector2f(getPosition().x - pop_feedback->getGlobalBounds().width / 2, getPosition().y));
+		text_feedback->setPosition(getPosition());
+		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
+		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 		delete text_feedback;
 		(*CurrentGame).addToFeedbacks(pop_feedback);
 
@@ -1524,11 +1525,11 @@ void Ship::GetPortal(GameObject* object)
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
 
-	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation)
+	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_state == PortalOpen)
 	{
 		m_is_asking_SFPanel = SFPanel_Portal;
 	}
-	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation)
+	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_state == PortalOpen)
 	{
 		m_is_asking_SFPanel = SFPanel_Action;
 	}

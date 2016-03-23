@@ -443,6 +443,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_nextScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).garbageLayer(FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LootLayer);
+				(*CurrentGame).garbageLayer(FeedbacksLayer);
 
 				m_IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
 			}

@@ -101,7 +101,7 @@ void Game::addToFeedbacks(SFText* text)
 {
 	if (text)
 	{
-		AddGameObjectToVector(text, &this->sceneFeedbackSFTexts);
+		AddGameObjectToVector(text, &this->m_sceneFeedbackSFTexts);
 	}
 }
 
@@ -153,13 +153,13 @@ void Game::updateScene(Time deltaTime)
 	colisionChecksV2();
 
 	//SFTextPop (text feedbacks)
-	size_t sceneTextPopFeedbacksSize = this->sceneFeedbackSFTexts.size();
+	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
 	for (size_t i = 0; i < sceneTextPopFeedbacksSize; i++)
 	{
-		if (this->sceneFeedbackSFTexts[i] == NULL)
+		if (m_sceneFeedbackSFTexts[i] == NULL)
 			continue;
 
-		this->sceneFeedbackSFTexts[i]->update(deltaTime);
+		m_sceneFeedbackSFTexts[i]->update(deltaTime, m_hyperspeedMultiplier);
 	}
 
 	//Collect the dust
@@ -199,7 +199,7 @@ void Game::drawScene()
 			{
 				m_mainScreen.draw(*(*it));
 			}
-			for (std::vector<SFText*>::iterator it = this->sceneFeedbackSFTexts.begin(); it != this->sceneFeedbackSFTexts.end(); it++)
+			for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
 			{
 				if (*it == NULL)
 					continue;
@@ -493,6 +493,25 @@ void Game::cleanGarbage()
 		delete pCurGameObject;
 	}
 
+	//Texts and feedbacks
+	size_t garbageTextsSize = m_garbageTexts.size();
+	for (size_t i = 0; i < garbageTextsSize; i++)
+	{
+		SFText*    pSFText = m_garbageTexts[i];
+
+		size_t VectorTextsSize = m_sceneFeedbackSFTexts.size();
+		for (size_t j = 0; j < VectorTextsSize; j++)
+		{
+			if (m_sceneFeedbackSFTexts[j] == pSFText)
+			{
+				m_sceneFeedbackSFTexts[j] = NULL;
+				break;
+			}
+		}
+
+		delete pSFText;
+	}
+
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -534,6 +553,7 @@ void Game::collectGarbage()
 	dt.restart();
 
 	m_garbage.clear();
+	m_garbageTexts.clear();
 
 	for (std::vector<GameObject*>::iterator it = (m_sceneGameObjects).begin(); it != (m_sceneGameObjects).end(); it++)
 	{
@@ -569,7 +589,7 @@ void Game::collectGarbage()
 	}
 
 	//Texts and feedbacks
-	for (std::vector<SFText*>::iterator it = (this->sceneFeedbackSFTexts).begin(); it != (this->sceneFeedbackSFTexts).end(); it++)
+	for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -586,10 +606,10 @@ void Game::collectGarbage()
 
 }
 
-void Game::garbageLayer(LayerType m_layer, bool only_offscene)
+void Game::garbageLayer(LayerType layer, bool only_offscene)
 {
 	int clear_count = 0;
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[m_layer].begin(); it != m_sceneGameObjectsLayered[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[layer].begin(); it != m_sceneGameObjectsLayered[layer].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
@@ -601,7 +621,7 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 				(*it)->m_GarbageMe = true;
 				clear_count++;
 				//don't count them as "spawned" enemies if we cut them off this way
-				if (m_layer == EnemyObjectLayer)
+				if (layer == EnemyObjectLayer)
 				{
 					m_hazardSpawned -= (*it)->m_money;
 				}
@@ -613,10 +633,22 @@ void Game::garbageLayer(LayerType m_layer, bool only_offscene)
 			(*it)->m_isOnScene = false;
 			(*it)->m_GarbageMe = true;
 			//don't count them as "spawned" enemies if we cut them off this way
-			if (m_layer == EnemyObjectLayer)
+			if (layer == EnemyObjectLayer)
 			{
 				m_hazardSpawned -= (*it)->m_money;
 			}
+		}
+	}
+
+	if (layer == FeedbacksLayer)
+	{
+		for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
+		{
+			if (*it == NULL)
+				continue;
+
+			(*it)->m_visible = false;
+			(*it)->m_GarbageMe = true;
 		}
 	}
 }

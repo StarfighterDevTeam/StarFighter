@@ -50,9 +50,9 @@ public:
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
-	void garbageLayer(LayerType m_layer, bool only_offscene = false);
-	void killGameObjectLayer(GameObjectType m_layer);
-	void SetLayerRotation(LayerType m_layer, float angle);
+	void garbageLayer(LayerType layer, bool only_offscene = false);
+	void killGameObjectLayer(GameObjectType layer);
+	void SetLayerRotation(LayerType layer, float angle);
 
 	sf::RenderTexture m_mainScreen;
 	sf::Vector2i m_screen_size;
@@ -103,7 +103,7 @@ private:
 	std::list<RectangleShape*> m_sceneFeedbackBars;
 	std::list<SFPanel*> m_sceneSFPanels;
 	std::list<Text*> m_sceneFeedbackTexts;
-	std::vector<SFText*> sceneFeedbackSFTexts;
+	std::vector<SFText*> m_sceneFeedbackSFTexts;
 	std::vector<GameObject*> m_sceneGameObjects;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];

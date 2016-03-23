@@ -323,7 +323,7 @@ void Scene::PlayTitleFeedback()
 	ostringstream ss;
 	ss << this->m_name;
 	text_feedback->setString(ReplaceAll(ss.str(), "_", " "));
-	SFTextPop* pop_feedback = new SFTextPop(text_feedback, SCENE_POP_TIME_NOT_FADED, SCENE_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+	SFTextPop* pop_feedback = new SFTextPop(text_feedback, SCENE_TILE_FADE_IN_TIME, SCENE_TILE_NOT_FADED_TIME, SCENE_TILE_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
 	delete text_feedback;
 	(*CurrentGame).addToFeedbacks(pop_feedback);
@@ -340,14 +340,14 @@ void Scene::DisplayDestructions(bool hazard_break)
 	sf::Vector2f position = sf::Vector2f(SCENE_SIZE_X / 2, DESTRUCTIONS_DISPLAY_OFFSET_Y);
 	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 24, _white, position);
 	text_feedback->setString(ss.str());
-	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_TIME_NOT_FADED, DESTRUCTIONS_DISPLAY_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
 	(*CurrentGame).addToFeedbacks(pop_feedback);
 
 	if (hazard_break)
 	{
 		text_feedback->setString("HAZARD BREAK!!!");
-		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_TIME_NOT_FADED, DESTRUCTIONS_DISPLAY_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
+		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y - pop_feedback->getGlobalBounds().height - INTERACTION_INTERBLOCK));
 		(*CurrentGame).addToFeedbacks(pop_feedback2);
 	}

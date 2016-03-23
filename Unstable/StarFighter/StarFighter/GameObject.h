@@ -52,6 +52,7 @@ enum LayerType
 	PlayerShipLayer,
 	EnemyFireLayer,
 
+	
 	BlackStripesLayer,
 	PanelLayer,
 	NBVAL_Layer

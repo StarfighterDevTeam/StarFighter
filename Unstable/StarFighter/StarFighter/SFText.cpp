@@ -12,7 +12,7 @@ SFText::SFText(const sf::Font* font, unsigned int size, sf::Color color, sf::Vec
 	m_GarbageMe = false;
 }
 
-void SFText::update(Time deltaTime)
+void SFText::update(Time deltaTime, float hyperspeedMultiplier)
 {
 	//see override function in class SFTextPop
 }
