@@ -980,7 +980,7 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 		{
 			ss_bg << " (" << m_playerShip->m_currentScene_hazard + 1 << ")";
 		}
-		m_scene_text.setString(ss_bg.str());
+		m_scene_text.setString(ReplaceAll(ss_bg.str(), "_", " "));
 	}
 
 	//framerate

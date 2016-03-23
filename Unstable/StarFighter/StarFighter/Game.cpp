@@ -37,9 +37,12 @@ void Game::init(RenderWindow* window)
 			
 		}
 		m_font[Font_Terminator] = new sf::Font();
-		if (!m_font[Font_Terminator]->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		if (!m_font[Font_Terminator]->loadFromFile("Assets/Fonts/terminator_custom_nfi.ttf"))
 		{
+			if (!m_font[Font_Terminator]->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+			{
 
+			}
 		}
 	}
 	catch (const std::exception & ex)

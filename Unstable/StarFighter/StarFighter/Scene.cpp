@@ -328,7 +328,7 @@ void Scene::PlayTitleFeedback()
 	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 30, _white, position);
 	ostringstream ss;
 	ss << this->m_name;
-	text_feedback->setString(ss.str());
+	text_feedback->setString(ReplaceAll(ss.str(), "_", " "));
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, SCENE_POP_TIME_NOT_FADED, SCENE_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
 	delete text_feedback;
@@ -340,11 +340,11 @@ void Scene::DisplayDestructions(bool hazard_break)
 	ostringstream ss;
 	ss.precision(1);
 	ss << fixed;
-	ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).m_hazardSpawned << ": " << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned << "%";
+	ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).m_hazardSpawned << " [" << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned << "%]";
 	//feedback
 	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
 	sf::Vector2f position = sf::Vector2f(SCENE_SIZE_X / 2, DESTRUCTIONS_DISPLAY_OFFSET_Y);
-	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Arial], 24, _white, position);
+	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 24, _white, position);
 	text_feedback->setString(ss.str());
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_TIME_NOT_FADED, DESTRUCTIONS_DISPLAY_POP_TOTAL_TIME, NULL, sf::Vector2f(0, 0));
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
