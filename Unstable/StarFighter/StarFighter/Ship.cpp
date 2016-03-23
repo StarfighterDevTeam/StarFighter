@@ -504,6 +504,8 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 
 					m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
 					m_weapon->Fire(FriendlyFire, deltaTime);
+
+					(*CurrentGame).PlaySFX(SFX_Fire);
 				}
 			}
 		}
@@ -1253,6 +1255,7 @@ void Ship::SettingTurnAnimations()
 
 void Ship::RotateShip(float angle)
 {
+	setRotation(angle);
 	if (m_fake_ship)
 	{
 		m_fake_ship->setRotation(angle);
@@ -1403,6 +1406,8 @@ void Ship::Death()
 	SetVisibility(false);
 	m_graze_count = 0;
 	m_graze_level = 0;
+
+	(*CurrentGame).PlaySFX(SFX_Death);
 
 	//DestroyBots();
 

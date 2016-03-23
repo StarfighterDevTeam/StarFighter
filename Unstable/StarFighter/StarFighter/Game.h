@@ -11,9 +11,25 @@
 #include <math.h>
 #include "SFText.h"
 #include "SFPanel.h"
+#include <SFML/Audio.hpp>
 
 class Ship;
 class Scene;
+
+enum SFX_Bank
+{
+	SFX_Fire,
+	SFX_Death,
+	SFX_Kill,
+	SFX_BigKill,
+	SFX_MoneyLoot,
+	SFX_ItemLoot,
+	SFX_Equip,
+	SFX_Teleport,
+	SFX_BuyOrSell,
+	//SFX_Menu,
+	NBVAL_SFX_BANK,
+};
 
 using namespace sf;
 
@@ -89,6 +105,22 @@ public:
 
 	vector<vector<string> > m_generalScenesConfig;
 	map<string, vector<vector<string> > > m_sceneConfigs;
+
+	//SFX
+	int LoadSFX();
+	void PlaySFX(SFX_Bank sfx_name);
+	sf::SoundBuffer soundBuffers[NBVAL_SFX_BANK];
+	sf::Sound soundsFire;
+	sf::Sound soundsDeath;
+	sf::Sound soundsKill;
+	sf::Sound soundsBigKill;
+	bool m_SFX_Activated;
+	void SetSFXVolume(bool activate_sfx);
+
+	//Music
+	sf::Music m_curMusic;
+	bool m_Music_Activated;
+	void SetMusicVolume(bool activate_music);
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);

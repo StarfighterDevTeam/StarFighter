@@ -1043,6 +1043,16 @@ void Enemy::Death()
 	m_visible = false;
 	m_isOnScene = false;
 	m_GarbageMe = true;
+
+	if (m_enemy_class < ENEMYPOOL_DELTA)
+	{
+		(*CurrentGame).PlaySFX(SFX_Kill);
+	}
+	else
+	{
+		(*CurrentGame).PlaySFX(SFX_BigKill);
+	}
+	
 }
 
 void Enemy::Destroy()

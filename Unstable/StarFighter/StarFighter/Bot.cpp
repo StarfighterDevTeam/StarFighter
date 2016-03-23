@@ -133,6 +133,8 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool
 
 					m_weapon->setPosition(getPosition().x + m_weapon->m_weapon_current_offset.x, getPosition().y + m_weapon->m_weapon_current_offset.y);
 					m_weapon->Fire(FriendlyFire, deltaTime);
+
+					(*CurrentGame).PlaySFX(SFX_Fire);
 				}
 			}
 		}

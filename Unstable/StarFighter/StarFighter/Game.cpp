@@ -29,6 +29,23 @@ void Game::init(RenderWindow* window)
 	playerShip = NULL;
 	m_waiting_for_dialog_validation = false;
 
+	//Sounds
+	m_SFX_Activated = true;
+	LoadSFX();
+
+	//Music
+	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
+	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
+	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
+	if (m_curMusic.openFromFile("Assets/Music/SpaceCowboys.ogg"))
+	{
+		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated);
+		m_curMusic.play();
+		m_curMusic.setLoop(true);
+	}
+
 	try
 	{
 		m_font[Font_Arial] = new sf::Font();
@@ -52,6 +69,19 @@ void Game::init(RenderWindow* window)
 	}
 }
 
+void Game::SetSFXVolume(bool activate_sfx)
+{
+	soundsFire.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsDeath.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsKill.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	soundsBigKill.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+}
+
+void Game::SetMusicVolume(bool activate_music)
+{
+	m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * activate_music);
+}
+
 sf::RenderWindow* Game::getMainWindow()
 {
 	return m_window;
@@ -60,6 +90,55 @@ sf::RenderWindow* Game::getMainWindow()
 void Game::SetPlayerShip(Ship* m_playerShip)
 {
 	this->playerShip = m_playerShip;
+}
+
+int Game::LoadSFX()
+{
+	if (!soundBuffers[SFX_Fire].loadFromFile("Assets/Sounds/laser_repeat.ogg"))
+		return -1;
+	if (!soundBuffers[SFX_Kill].loadFromFile("Assets/Sounds/kill.ogg"))
+		return -1;
+	if (!soundBuffers[SFX_BigKill].loadFromFile("Assets/Sounds/big_kill.ogg"))
+		return -1;
+	if (!soundBuffers[SFX_Death].loadFromFile("Assets/Sounds/death.ogg"))
+		return -1;
+
+	soundsFire.setBuffer(soundBuffers[SFX_Fire]);
+	soundsKill.setBuffer(soundBuffers[SFX_Kill]);
+	soundsBigKill.setBuffer(soundBuffers[SFX_BigKill]);
+	soundsDeath.setBuffer(soundBuffers[SFX_Death]);
+
+	soundsFire.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsKill.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsBigKill.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	soundsDeath.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	return 0;
+}
+
+void Game::PlaySFX(SFX_Bank sfx_name)
+{
+	//if (sfx_name == SFX_Bounce)
+	//{
+	//	int i = RandomizeIntBetweenValues(0, 4);
+	//	soundsBounce[i].play();
+	//}
+	if (sfx_name == SFX_Fire)
+	{
+		soundsFire.play();
+	}
+	if (sfx_name == SFX_Kill)
+	{
+		soundsKill.play();
+	}
+	if (sfx_name == SFX_BigKill)
+	{
+		soundsBigKill.play();
+	}
+	if (sfx_name == SFX_Death)
+	{
+		soundsDeath.play();
+	}
 }
 
 void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)
