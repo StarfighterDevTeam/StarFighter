@@ -87,6 +87,9 @@ public:
 	int GetEnemiesStatsMultiplierForLevel(int level_);
 	int GetBonusStatsMultiplierToBeOnParForLevel(int level_);
 
+	vector<vector<string> > m_generalScenesConfig;
+	map<string, vector<vector<string> > > m_sceneConfigs;
+
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

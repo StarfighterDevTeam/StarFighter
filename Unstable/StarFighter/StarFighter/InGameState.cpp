@@ -64,7 +64,10 @@ void InGameState::Initialize(Player player)
 	m_playerShip->m_currentScene_name = player.m_currentSceneFile;
 	m_currentScene = NULL;
 
-	//Loading current scene
+	//Loading all scenes
+	LoadAllScenes(SCENES_FILE);
+
+	//Creating current scene
 	SpawnInScene(m_playerShip->m_currentScene_name);
 
 	if ((*CurrentGame).m_direction != NO_DIRECTION)
@@ -706,4 +709,20 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 
 		SavePlayer(PLAYER_SAVE_FILE);
 	}
+}
+
+void InGameState::LoadAllScenes(string scenes_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all scenes scripts.");
+	(*CurrentGame).m_generalScenesConfig = *(FileLoaderUtils::FileLoader(scenes_file));
+
+	size_t scenesVectorSize = (*CurrentGame).m_generalScenesConfig.size();
+	for (size_t scene = 0; scene < scenesVectorSize; scene++)
+	{
+		if (!(*CurrentGame).m_generalScenesConfig[scene][SCENE_FILENAME].empty() && (*CurrentGame).m_generalScenesConfig[scene][SCENE_FILENAME].compare("0") != 0)
+		{
+			(*CurrentGame).m_sceneConfigs.insert(std::map<string, vector<vector<string> >>::value_type((*CurrentGame).m_generalScenesConfig[scene][SCENE_NAME], *(FileLoaderUtils::FileLoader((*CurrentGame).m_generalScenesConfig[scene][SCENE_FILENAME]))));
+		}
+	}
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }

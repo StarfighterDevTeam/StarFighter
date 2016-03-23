@@ -30,6 +30,7 @@ public:
 	bool AddToKnownScenes(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
 	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip = (*CurrentGame).playerShip);
 	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
+	void LoadAllScenes(string scenes_file);
 
 	void InGameStateMachineCheck(sf::Time deltaTime);
 	void SpawnInScene(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
