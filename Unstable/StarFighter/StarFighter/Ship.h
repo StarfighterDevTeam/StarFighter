@@ -89,7 +89,6 @@ public :
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void updatePostCollision() override;
-	void Draw(sf::RenderTexture& screen) override;
 	void ManageDebugCommand();
 	bool ManageVisibility();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);

@@ -48,16 +48,16 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	if (!ship_model->m_fake_textureName.empty())
 	{
 		m_fake_ship = new FakeShip(this, ship_model->m_fake_textureName, ship_model->m_fake_size, ship_model->m_fake_frameNumber, NB_ShipAnimations);
-		//(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
+		(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
 	}
 
 	m_combo_aura = new Aura(this, "Assets/2D/FX/Aura_Graze.png", sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
-	//(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
+	(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
 
 	m_trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
-	//(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
+	(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
 
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
@@ -100,17 +100,22 @@ Ship::~Ship()
 	{
 		delete m_weapon;
 	}
+
+	//game objects
 	if (m_combo_aura)
 	{
-		delete m_combo_aura;
+		m_combo_aura->m_GarbageMe = true;
+		m_combo_aura->m_visible = false;
 	}
 	if (m_fake_ship)
 	{
-		delete m_fake_ship;
+		m_fake_ship->m_GarbageMe = true;
+		m_fake_ship->m_visible = false;
 	}
 	if (m_trail)
 	{
-		delete m_trail;
+		m_trail->m_GarbageMe = true;
+		m_trail->m_visible = false;
 	}
 }
 
@@ -2418,29 +2423,6 @@ void Ship::updatePostCollision()
 {
 	m_previouslyCollidingWithInteractiveObject = m_isCollidingWithInteractiveObject;
 	m_isCollidingWithInteractiveObject = No_Interaction;
-}
-
-void Ship::Draw(sf::RenderTexture& screen)
-{
-	if (m_trail)
-	{
-		m_trail->Draw(screen);
-		if (m_trail->m_visible)
-		{
-			printf("");
-		}
-	}
-	if (m_combo_aura)
-	{
-		m_combo_aura->Draw(screen);
-	}
-	
-	GameObject::Draw(screen);
-
-	if (m_fake_ship)
-	{
-		m_fake_ship->Draw(screen);
-	}
 }
 
 float Ship::getFighterFloatStatValue(FighterStats stat)

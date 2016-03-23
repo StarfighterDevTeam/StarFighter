@@ -33,7 +33,6 @@ void GameObject::Draw(sf::RenderTexture& screen)
 	{
 		screen.draw(*this);
 	}
-	//see override in class Ship
 }
 
 void GameObject::setAnimationLine(int animation, bool keep_frame_index)
