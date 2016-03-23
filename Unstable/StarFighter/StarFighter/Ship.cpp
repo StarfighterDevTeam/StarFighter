@@ -872,6 +872,9 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						case ShopHeal:
 						{
 							ResplenishHealth();
+
+							//(*CurrentGame).PlaySFX(SFX_Heal);
+
 							break;
 						}
 						case ShopBuy:
@@ -1016,7 +1019,11 @@ void Ship::BuyingItem()
 				m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, m_SFPanel->GetFocusedItem());
 				m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+
+				(*CurrentGame).PlaySFX(SFX_Equip);
 			}
+
+			(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 		}
 	}
 	//case of equipment hovered
@@ -1033,6 +1040,8 @@ void Ship::BuyingItem()
 					m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 					Ship::SaveItems(ITEMS_SAVE_FILE, this);
+
+					
 				}
 			}
 			//else we equip if directly
@@ -1043,7 +1052,11 @@ void Ship::BuyingItem()
 				m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFPanel->GetFocusedItem());
 				m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+
+				(*CurrentGame).PlaySFX(SFX_Equip);
 			}
+
+			(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 		}
 	}
 }
@@ -1081,7 +1094,11 @@ void Ship::SellingItem()
 			{
 				cleanEquipment(equip_type, true);
 			}
+
+			(*CurrentGame).PlaySFX(SFX_Equip);
 		}
+
+		(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 
 		Ship::SaveItems(ITEMS_SAVE_FILE, this);
 		
@@ -1124,6 +1141,8 @@ void Ship::EquipItem()
 			LOGGER_WRITE(Logger::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 		}
 
+		(*CurrentGame).PlaySFX(SFX_Equip);
+
 		tmp_ptr = NULL;
 	}
 }
@@ -1156,6 +1175,8 @@ void Ship::DesequipItem()
 		{
 			LOGGER_WRITE(Logger::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
 		}
+
+		(*CurrentGame).PlaySFX(SFX_Equip);
 
 		tmp_ptr = NULL;
 	}
@@ -1407,7 +1428,7 @@ void Ship::Death()
 	m_graze_count = 0;
 	m_graze_level = 0;
 
-	(*CurrentGame).PlaySFX(SFX_Death);
+	(*CurrentGame).PlaySFX(SFX_BigKill);
 
 	//DestroyBots();
 
@@ -1471,6 +1492,11 @@ bool Ship::GetLoot(GameObject& object)
 			object.m_equipment_loot = NULL;
 		}
 		
+		if (success)
+		{
+			(*CurrentGame).PlaySFX(SFX_MoneyLoot);
+		}
+
 		return success;
 	}
 	//WEAPON
@@ -1497,6 +1523,11 @@ bool Ship::GetLoot(GameObject& object)
 			object.m_weapon_loot = NULL;
 		}
 
+		if (success)
+		{
+			(*CurrentGame).PlaySFX(SFX_MoneyLoot);
+		}
+
 		return success;
 	}
 	//MONEY
@@ -1517,6 +1548,8 @@ bool Ship::GetLoot(GameObject& object)
 
 		//transfer money
 		get_money_from(object);
+
+		(*CurrentGame).PlaySFX(SFX_MoneyLoot);
 
 		Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 		return true;
@@ -2678,6 +2711,8 @@ void Ship::ContinueDialog()
 void Ship::Teleport(string destination_name)
 {
 	m_is_asking_teleportation = destination_name;
+
+	(*CurrentGame).PlaySFX(SFX_Teleport);
 }
 
 void Ship::CenterMapView(sf::Vector2f offset)

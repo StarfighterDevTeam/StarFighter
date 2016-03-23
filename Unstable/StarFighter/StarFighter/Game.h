@@ -19,15 +19,15 @@ class Scene;
 enum SFX_Bank
 {
 	SFX_Fire,
-	SFX_Death,
 	SFX_Kill,
 	SFX_BigKill,
 	SFX_MoneyLoot,
-	SFX_ItemLoot,
 	SFX_Equip,
 	SFX_Teleport,
 	SFX_BuyOrSell,
-	//SFX_Menu,
+	SFX_PortalOpening,
+	SFX_EnteringPortal,
+	//SFX_Heal,
 	NBVAL_SFX_BANK,
 };
 
@@ -109,7 +109,9 @@ public:
 	//SFX
 	int LoadSFX();
 	void PlaySFX(SFX_Bank sfx_name);
-	sf::SoundBuffer soundBuffers[NBVAL_SFX_BANK];
+
+	sf::SoundBuffer m_soundBuffers[NBVAL_SFX_BANK];
+	map<SFX_Bank, sf::Sound> m_sounds;
 	sf::Sound soundsFire;
 	sf::Sound soundsDeath;
 	sf::Sound soundsKill;

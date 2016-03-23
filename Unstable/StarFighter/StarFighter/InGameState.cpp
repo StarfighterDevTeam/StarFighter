@@ -374,6 +374,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 				{
 					m_currentScene->m_bg->SetPortalsState(PortalGhost);
+					
+					(*CurrentGame).PlaySFX(SFX_EnteringPortal);
 
 					bool reverse = false;
 					if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
@@ -546,6 +548,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 			{
 				m_currentScene->m_bg->SetPortalsState(PortalGhost);
+
+				(*CurrentGame).PlaySFX(SFX_EnteringPortal);
+
 				bool reverse = false;
 				if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
 				{

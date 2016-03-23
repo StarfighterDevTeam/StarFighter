@@ -94,51 +94,41 @@ void Game::SetPlayerShip(Ship* m_playerShip)
 
 int Game::LoadSFX()
 {
-	if (!soundBuffers[SFX_Fire].loadFromFile("Assets/Sounds/laser_repeat.ogg"))
+	if (!m_soundBuffers[SFX_Fire].loadFromFile("Assets/Sounds/laser_repeat.ogg"))
 		return -1;
-	if (!soundBuffers[SFX_Kill].loadFromFile("Assets/Sounds/kill.ogg"))
+	if (!m_soundBuffers[SFX_Kill].loadFromFile("Assets/Sounds/kill.ogg"))
 		return -1;
-	if (!soundBuffers[SFX_BigKill].loadFromFile("Assets/Sounds/big_kill.ogg"))
+	if (!m_soundBuffers[SFX_BigKill].loadFromFile("Assets/Sounds/big_kill.ogg"))
 		return -1;
-	if (!soundBuffers[SFX_Death].loadFromFile("Assets/Sounds/death.ogg"))
+	if (!m_soundBuffers[SFX_Teleport].loadFromFile("Assets/Sounds/teleport.ogg"))
+		return -1;
+	if (!m_soundBuffers[SFX_BuyOrSell].loadFromFile("Assets/Sounds/trade.ogg"))
+		return -1;
+	if (!m_soundBuffers[SFX_MoneyLoot].loadFromFile("Assets/Sounds/money_loot.ogg"))
+		return -1;
+	if (!m_soundBuffers[SFX_Equip].loadFromFile("Assets/Sounds/equip.ogg"))
+		return -1;
+	//if (!m_soundBuffers[SFX_Heal].loadFromFile("Assets/Sounds/heal.ogg"))
+	//	return -1;
+	if (!m_soundBuffers[SFX_PortalOpening].loadFromFile("Assets/Sounds/gate_opening.ogg"))
+		return -1;
+	if (!m_soundBuffers[SFX_EnteringPortal].loadFromFile("Assets/Sounds/entering_portal.ogg"))
 		return -1;
 
-	soundsFire.setBuffer(soundBuffers[SFX_Fire]);
-	soundsKill.setBuffer(soundBuffers[SFX_Kill]);
-	soundsBigKill.setBuffer(soundBuffers[SFX_BigKill]);
-	soundsDeath.setBuffer(soundBuffers[SFX_Death]);
-
-	soundsFire.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
-	soundsKill.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
-	soundsBigKill.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
-	soundsDeath.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	for (size_t i = 0; i < NBVAL_SFX_BANK; i++)
+	{
+		sf::Sound* new_sound = new sf::Sound;
+		new_sound->setBuffer(m_soundBuffers[i]);
+		new_sound->setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+		m_sounds.insert(map<SFX_Bank, sf::Sound>::value_type((SFX_Bank)i, *new_sound));
+	}
 
 	return 0;
 }
 
 void Game::PlaySFX(SFX_Bank sfx_name)
 {
-	//if (sfx_name == SFX_Bounce)
-	//{
-	//	int i = RandomizeIntBetweenValues(0, 4);
-	//	soundsBounce[i].play();
-	//}
-	if (sfx_name == SFX_Fire)
-	{
-		soundsFire.play();
-	}
-	if (sfx_name == SFX_Kill)
-	{
-		soundsKill.play();
-	}
-	if (sfx_name == SFX_BigKill)
-	{
-		soundsBigKill.play();
-	}
-	if (sfx_name == SFX_Death)
-	{
-		soundsDeath.play();
-	}
+	m_sounds[sfx_name].play();
 }
 
 void Game::addToScene(GameObject *object, LayerType m_layer, GameObjectType type)

@@ -1,5 +1,7 @@
 #include "Portal.h"
 
+extern Game* CurrentGame;
+
 Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_DontGarbageMe = true;
@@ -35,6 +37,8 @@ void Portal::Open()
 	if (m_currentAnimationIndex != PortalAnimation::PortalOpening && m_currentAnimationIndex != PortalAnimation::PortalOpenIdle)
 	{
 		setAnimationLine(PortalAnimation::PortalOpening, false);
+
+		(*CurrentGame).PlaySFX(SFX_PortalOpening);
 	}
 }
 
