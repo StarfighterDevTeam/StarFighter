@@ -48,6 +48,7 @@ public:
 	virtual void SetFocusedItem(GameObject* item);
 	virtual ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1);
 	virtual sf::Vector2i GetFocusedIndex();
+	virtual int GetFocusedIntIndex();
 	virtual int GetFocusedGrid();
 	virtual bool GetPrioritaryFeedback();
 	virtual void SetPrioritaryFeedback(bool has_priotiary_feedback);

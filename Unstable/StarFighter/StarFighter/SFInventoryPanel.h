@@ -18,7 +18,7 @@ public:
 class SFInventoryPanel : public SFPanel
 {
 public:
-	SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, bool use_grey_if_no_money, size_t nb_lines2 = 0, size_t nb_rows2 = 0);
+	SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, bool is_shop, size_t nb_lines2 = 0, size_t nb_rows2 = 0);
 	~SFInventoryPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
@@ -27,6 +27,7 @@ public:
 
 	void SetFocusedItem(GameObject* item) override;
 	sf::Vector2i GetFocusedIndex() override;
+	int GetFocusedIntIndex() override;
 	int GetFocusedGrid() override;
 	ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1) override;
 	bool GetPrioritaryFeedback() override;
@@ -57,7 +58,7 @@ public:
 	int m_focused_grid;
 	SFItemStatsPanel* m_item_stats_panel;
 	bool m_has_prioritary_feedback;
-	bool m_use_grey_if_no_money;
+	bool m_is_shop;
 
 	Ship* m_playerShip;
 };

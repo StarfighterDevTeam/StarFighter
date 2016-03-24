@@ -6,6 +6,15 @@ Shop::Shop(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 	m_level = 1;
 }
 
+Shop::~Shop()
+{
+	size_t itemsVectorSize = m_items.size();
+	for (size_t i = 0; i < itemsVectorSize; i++)
+	{
+		delete m_items[i];
+	}
+}
+
 void Shop::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	AnimatedSprite::update(deltaTime);

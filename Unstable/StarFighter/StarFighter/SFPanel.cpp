@@ -81,42 +81,48 @@ int SFPanel::GetSelectedOptionIndex()
 GameObject* SFPanel::GetCursor()
 {
 	return NULL;
-	//see override function in SFMenuPanel and other types of SF panels
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 GameObject* SFPanel::GetFocusedItem()
 {
 	return NULL;
-	//see override function in SFMenuPanel and other types of SF panels
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 void SFPanel::SetFocusedItem(GameObject* item)
 {
-
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 ObjectGrid* SFPanel::GetGrid(bool fake_grid, size_t grid)
 {
 	return NULL;
-	//see override function in SFMenuPanel and other types of SF panels
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 sf::Vector2i SFPanel::GetFocusedIndex()
 {
 	return sf::Vector2i(-1, -1);
-	//see override function in SFMenuPanel and other types of SF panels
+	//see override function in SFInventoryPanel and other types of SF panels
+}
+
+int SFPanel::GetFocusedIntIndex()
+{
+	return -1;
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 int SFPanel::GetFocusedGrid()
 {
 	return -1;
-	//see override function in SFMenuPanel and other types of SF panels
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 bool SFPanel::GetPrioritaryFeedback()
 {
 	return false;
-	//see override function in SFMenuPanel and other types of SF panels
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 SFItemStatsPanel* SFPanel::GetItemStatsPanel()
@@ -128,12 +134,13 @@ SFItemStatsPanel* SFPanel::GetItemStatsPanel()
 void SFPanel::SetItemStatsPanel(SFItemStatsPanel* panel)
 {
 	return;
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 void SFPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
 {
 	return;
-	//see override function in SFMenuPanel and other types of SF panels
+	//see override function in SFInventoryPanel and other types of SF panels
 }
 
 int SFPanel::GetTeleportationCost()

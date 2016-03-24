@@ -309,8 +309,14 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 }
 
 //INVENTORY PANEL
-SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, bool use_grey_if_no_money, size_t nb_lines2, size_t nb_rows2) : SFPanel(size, SFPanel_Inventory)
+SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, bool is_shop, size_t nb_lines2, size_t nb_rows2) : SFPanel(size, SFPanel_Inventory)
 {
+	ObjectGrid* griiid = NULL;
+	if (playerShip->m_HUD_SFPanel)
+		griiid = playerShip->m_HUD_SFPanel->GetGrid();
+	if (playerShip->m_HUD_SFPanel)
+	printf("posy : %f\n", griiid->grid[0][1]->getPosition().y);
+
 	m_focused_item = NULL;
 	m_focused_cell_index = sf::Vector2i(-1, -1);
 	m_use_two_grids = use_two_grids;
@@ -318,7 +324,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	m_item_stats_panel = NULL;
 	m_focused_grid = 0;
 	m_has_prioritary_feedback = false;
-	m_use_grey_if_no_money = use_grey_if_no_money;
+	m_is_shop = is_shop;
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -338,13 +344,15 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 		m_quality_grid2 = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines2, nb_rows2), false, false, true);
 	}
 
-	if (use_grey_if_no_money)
+	if (is_shop)
 	{
 		m_grey_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), false, true);
 	}
 
+	if (playerShip->m_HUD_SFPanel)
+	printf("posy : %f\n", griiid->grid[0][1]->getPosition().y);
 	//texts
-	if (m_playerShip && m_playerShip->m_targetShop)
+	if (is_shop && m_playerShip && m_playerShip->m_targetShop)
 	{
 		//texts strings
 		m_title_text.setString(m_playerShip->m_targetShop->m_display_name);
@@ -353,9 +361,14 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 		size_t vectorItemsInShopSize = m_playerShip->m_targetShop->m_items.size();
 		for (size_t i = 0; i < vectorItemsInShopSize; i++)
 		{
+			if (playerShip->m_HUD_SFPanel)
+				printf("posy : %f (%d)", griiid->grid[0][1]->getPosition().y, i);
 			m_grid.insertObject(*m_playerShip->m_targetShop->m_items[i], i, true);
+			if (playerShip->m_HUD_SFPanel)
+				printf(" post posy : %f\n", griiid->grid[0][1]->getPosition().y);
 		}
 	}
+	
 	ostringstream ss_helpNavigation;
 	ss_helpNavigation << "\n\n\nFire: buy\nStart: switch to equipment panel";
 	m_actions_text.setString(ss_helpNavigation.str());
@@ -365,6 +378,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	setOrigin(size.x / 2, size.y / 2);
 	setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
 
+
 	//positioning panel content
 	float text_height = 0;
 	text_height += m_title_text.getGlobalBounds().height / 2;
@@ -372,9 +386,24 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 
 	text_height += INTERACTION_INTERBLOCK;
 	text_height += INTERACTION_INTERBLOCK;
+
+	if (playerShip->m_HUD_SFPanel)
+		printf("posy : %f\n", griiid->grid[0][1]->getPosition().y);
+
 	m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+
+	if (playerShip->m_HUD_SFPanel)
+		printf("posy (fake) : %f\n", griiid->grid[0][1]->getPosition().y);
 	m_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+
+
+	if (playerShip->m_HUD_SFPanel)
+		printf("posy (grid): %f\n", griiid->grid[0][1]->getPosition().y);
+
 	m_quality_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+
+	if (playerShip->m_HUD_SFPanel)
+	printf("posy (quality) : %f\n\n", griiid->grid[0][1]->getPosition().y);
 
 	if (m_use_two_grids)
 	{
@@ -384,7 +413,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 		m_quality_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	}
 
-	if (m_use_grey_if_no_money)
+	if (m_is_shop)
 	{
 		m_grey_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	}
@@ -427,7 +456,7 @@ void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions
 	}
 
 	//cover cells with a semi-transparent black if player doesn't have the money required
-	//if (m_use_grey_if_no_money)
+	//if (m_is_shop)
 	{
 		for (int i = 0; i < m_grey_grid.squares.x; i++)
 		{
@@ -455,7 +484,7 @@ void SFInventoryPanel::UpdateBackgroundColors(ObjectGrid color_grid, ObjectGrid 
 	{
 		for (int j = 0; j < color_grid.squares.y; j++)
 		{
-			if (color_grid.grid[i][j] && i <= object_grid.squares.x && j <= object_grid.squares.y)
+			if (color_grid.grid[i][j] && i < object_grid.squares.x && j < object_grid.squares.y)
 			{
 				if (object_grid.grid[i][j])
 				{
@@ -537,6 +566,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 
 	if (hovered_index < 0)//case: no cell is hovered
 	{
+		m_focused_grid = 0;
 		m_focused_cell_index.x = -1;
 		m_focused_cell_index.y = -1;
 		m_focused_item = NULL;
@@ -557,6 +587,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 	else//case: a cell is hovered
 	{
 		//update knowledge of focused index
+		m_focused_grid = 1;
 		m_focused_cell_index.x = hovered_index / fake_grid.squares.y;
 		m_focused_cell_index.y = hovered_index % fake_grid.squares.y;
 
@@ -772,6 +803,22 @@ void SFInventoryPanel::ClearHighlight()
 sf::Vector2i SFInventoryPanel::GetFocusedIndex()
 {
 	return m_focused_cell_index;
+}
+
+int SFInventoryPanel::GetFocusedIntIndex()
+{
+	if (m_focused_grid == 1)
+	{
+		return m_focused_cell_index.y + (m_focused_cell_index.x * m_grid.squares.y);
+	}
+	else if (m_focused_grid == 2)
+	{
+		return m_focused_cell_index.y + (m_focused_cell_index.x * m_grid2.squares.y);
+	}
+	else
+	{
+		return -1;//error code
+	}
 }
 
 int SFInventoryPanel::GetFocusedGrid()

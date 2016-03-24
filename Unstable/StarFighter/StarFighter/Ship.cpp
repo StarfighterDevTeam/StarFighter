@@ -995,6 +995,7 @@ void Ship::MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Ti
 
 void Ship::BuyingItem()
 {
+	bool success = false;
 	//case of weapon hovered
 	if (m_SFPanel && m_SFPanel->GetFocusedItem()->m_weapon_loot)
 	{
@@ -1009,6 +1010,8 @@ void Ship::BuyingItem()
 					m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 					Ship::SaveItems(ITEMS_SAVE_FILE, this);
+
+					success = true;
 				}
 			}
 			//else we equip if directly
@@ -1021,9 +1024,9 @@ void Ship::BuyingItem()
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
-			}
 
-			(*CurrentGame).PlaySFX(SFX_BuyOrSell);
+				success = true;
+			}
 		}
 	}
 	//case of equipment hovered
@@ -1041,7 +1044,7 @@ void Ship::BuyingItem()
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 					Ship::SaveItems(ITEMS_SAVE_FILE, this);
 
-					
+					success = true;
 				}
 			}
 			//else we equip if directly
@@ -1054,10 +1057,20 @@ void Ship::BuyingItem()
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
-			}
 
-			(*CurrentGame).PlaySFX(SFX_BuyOrSell);
+				success = true;
+			}
 		}
+	}
+
+	//if the exchange actually happened...
+	if (success)
+	{
+		//play feedbacks
+		(*CurrentGame).PlaySFX(SFX_BuyOrSell);
+
+		//save shop: flag object as missing
+		m_targetShop->m_items.erase(m_targetShop->m_items.begin() + m_SFPanel->GetFocusedIntIndex());
 	}
 }
 
@@ -1066,46 +1079,53 @@ void Ship::SellingItem()
 	//interaction
 	if (m_HUD_SFPanel && m_SFPanel && m_HUD_SFPanel->GetFocusedItem())
 	{
+		
+
 		//move item
 		int focused_grid = m_HUD_SFPanel->GetFocusedGrid();
 		int focused_index = m_HUD_SFPanel->GetGrid(false, focused_grid)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
-		m_SFPanel->GetGrid()->insertObject(*m_HUD_SFPanel->GetFocusedItem(), -1, false);
-		m_HUD_SFPanel->GetGrid(false, focused_grid)->setCellPointerForIntIndex(focused_index, NULL);
+		bool success = m_SFPanel->GetGrid()->insertObject(*m_HUD_SFPanel->GetFocusedItem(), -1, false);
+		//check that shop grid is not full
+		if (success)
+		{
+			//save shop: flag object as added into shop
+			m_targetShop->m_items.push_back(m_HUD_SFPanel->GetFocusedItem());
 
-		//get the money
-		int equip_type = m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
-		if (equip_type == NBVAL_Equipment)
-		{
-			m_money += m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-		}
-		else
-		{
-			m_money += m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-		}
+			//finish moving the object
+			m_HUD_SFPanel->GetGrid(false, focused_grid)->setCellPointerForIntIndex(focused_index, NULL);
 
-		//desequip if swapped from equipped items
-		if (m_HUD_SFPanel->GetFocusedGrid() == 1)
-		{
+			//get the money
+			int equip_type = m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
 			if (equip_type == NBVAL_Equipment)
 			{
-				cleanWeapon(true);
+				m_money += m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			}
 			else
 			{
-				cleanEquipment(equip_type, true);
+				m_money += m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			}
 
-			(*CurrentGame).PlaySFX(SFX_Equip);
+			//desequip if swapped from equipped items
+			if (m_HUD_SFPanel->GetFocusedGrid() == 1)
+			{
+				if (equip_type == NBVAL_Equipment)
+				{
+					cleanWeapon(true);
+				}
+				else
+				{
+					cleanEquipment(equip_type, true);
+				}
+
+				(*CurrentGame).PlaySFX(SFX_Equip);
+			}
+
+			(*CurrentGame).PlaySFX(SFX_BuyOrSell);
+
+			Ship::SaveItems(ITEMS_SAVE_FILE, this);
+			Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 		}
-
-		(*CurrentGame).PlaySFX(SFX_BuyOrSell);
-
-		Ship::SaveItems(ITEMS_SAVE_FILE, this);
-		
-		//(*CurrentGame).m_hud.focused_item = NULL;
 	}
-
-	SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 	return;	
 }
