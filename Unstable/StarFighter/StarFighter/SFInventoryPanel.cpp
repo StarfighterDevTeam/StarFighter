@@ -926,17 +926,17 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ostringstream ss_life;
 	ss_life << m_playerShip->m_armor << "/" << m_playerShip->m_armor_max;
 	m_life_text.setString(ss_life.str());
-	m_life_text.setPosition(m_armorBar.getPosition().x + m_armorBar.getSize().x / 2 - m_life_text.getGlobalBounds().width/2, m_armorBar.getPosition().y + m_life_text.getGlobalBounds().height / 2);
+	m_life_text.setPosition(m_armorBarContainer.getPosition().x + m_armorBarContainer.getSize().x / 2 - m_life_text.getGlobalBounds().width / 2, m_armorBarContainer.getPosition().y + m_life_text.getGlobalBounds().height / 2);
 
 	ostringstream ss_shield;
 	ss_shield << m_playerShip->m_shield << "/" << m_playerShip->m_shield_max;
 	m_shield_text.setString(ss_shield.str());
-	m_shield_text.setPosition(m_shieldBar.getPosition().x + m_shieldBar.getSize().x / 2 - m_shield_text.getGlobalBounds().width / 2, m_shieldBar.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
+	m_shield_text.setPosition(m_shieldBarContainer.getPosition().x + m_shieldBarContainer.getSize().x / 2 - m_shield_text.getGlobalBounds().width / 2, m_shieldBarContainer.getPosition().y + m_shield_text.getGlobalBounds().height / 2);
 
 	ostringstream ss_fuel;
 	ss_fuel << (int)m_playerShip->m_hyperspeed_fuel << "/" << m_playerShip->m_hyperspeed_fuel_max;
 	m_fuel_text.setString(ss_fuel.str());
-	m_fuel_text.setPosition(m_fuelBar.getPosition().x + m_fuelBar.getSize().x / 2 - m_fuel_text.getGlobalBounds().width / 2, m_fuelBar.getPosition().y + 1);//because it works :/
+	m_fuel_text.setPosition(m_fuelBarContainer.getPosition().x + m_fuelBarContainer.getSize().x / 2 - m_fuel_text.getGlobalBounds().width / 2, m_fuelBarContainer.getPosition().y + 1);//because it works :/
 
 	//level
 	ostringstream ss_slash;

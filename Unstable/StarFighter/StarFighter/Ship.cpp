@@ -1498,7 +1498,7 @@ bool Ship::GetLoot(GameObject& object)
 		
 		if (success)
 		{
-			(*CurrentGame).PlaySFX(SFX_MoneyLoot);
+			(*CurrentGame).PlaySFX(SFX_Equip);
 		}
 
 		return success;
@@ -1529,7 +1529,7 @@ bool Ship::GetLoot(GameObject& object)
 
 		if (success)
 		{
-			(*CurrentGame).PlaySFX(SFX_MoneyLoot);
+			(*CurrentGame).PlaySFX(SFX_Equip);
 		}
 
 		return success;
