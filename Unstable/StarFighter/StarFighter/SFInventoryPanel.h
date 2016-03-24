@@ -40,14 +40,18 @@ public:
 
 	GameObject* GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid fake_grid);
 	GameObject* GetHoveredObjectInTwoGrids(ObjectGrid grid, ObjectGrid fake_grid, ObjectGrid grid2, ObjectGrid fake_grid2);
+	void UpdateBackgroundColors(ObjectGrid color_grid, ObjectGrid object_grid);
+	EquipmentQuality GetItemQualityClass(float quality);
 
 	GameObject m_cursor;
 	GameObject* m_focused_item;
 	sf::Vector2i m_focused_cell_index;
 	ObjectGrid m_grid;
 	ObjectGrid m_fake_grid;
+	ObjectGrid m_quality_grid;
 	ObjectGrid m_grid2;
 	ObjectGrid m_fake_grid2;
+	ObjectGrid m_quality_grid2;
 	ObjectGrid m_grey_grid;
 	bool m_use_two_grids;
 	int m_focused_grid;

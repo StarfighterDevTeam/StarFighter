@@ -28,11 +28,12 @@ class ObjectGrid
 {
 public:
 	ObjectGrid();
-	ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake = false, bool fill_with_grey = false);
+	ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake = false, bool fill_with_grey = false, bool fill_with_colored_background = false);
 	void SetGridPosition(sf::Vector2f position);
 	bool insertObject(GameObject& object, int index = -1, bool overwrite_existing = false);
 	GameObject* grid[EQUIPMENT_GRID_NB_LINES][EQUIPMENT_GRID_NB_ROWS];
 	void Draw(sf::RenderTexture& offscreen);
+	void Draw(sf::RenderTexture& offscreen, sf::Color background_color);
 	sf::Vector2f position;
 	sf::Vector2i squares;
 	sf::Vector2i focus;

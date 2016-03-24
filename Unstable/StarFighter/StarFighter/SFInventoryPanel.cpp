@@ -329,11 +329,13 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 
 	m_fake_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), true);
 	m_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), false);
+	m_quality_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), false, false, true);
 	
 	if (m_use_two_grids)
 	{
 		m_fake_grid2 = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines2, nb_rows2), true);
 		m_grid2 = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines2, nb_rows2), false);
+		m_quality_grid2 = ObjectGrid(sf::Vector2f(EQUIPMENT_GRID_OFFSET_POS_X, EQUIPMENT_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines2, nb_rows2), false, false, true);
 	}
 
 	if (use_grey_if_no_money)
@@ -372,12 +374,14 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	text_height += INTERACTION_INTERBLOCK;
 	m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	m_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_quality_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 	if (m_use_two_grids)
 	{
 		text_height += INTERACTION_INTERBLOCK + m_fake_grid.squares.y*GRID_SLOT_SIZE;
 		m_fake_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 		m_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+		m_quality_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	}
 
 	if (m_use_grey_if_no_money)
@@ -405,8 +409,12 @@ SFInventoryPanel::~SFInventoryPanel()
 		m_item_stats_panel = NULL;
 	}
 }
+
 void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
+	//update background colors
+	UpdateBackgroundColors(m_quality_grid, m_grid);
+
 	//update hovered item and highlight feedbacks
 	if (!m_use_two_grids)
 	{
@@ -415,6 +423,7 @@ void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions
 	else
 	{
 		GetHoveredObjectInTwoGrids(m_grid, m_fake_grid, m_grid2, m_fake_grid2);
+		UpdateBackgroundColors(m_quality_grid2, m_grid2);
 	}
 
 	//cover cells with a semi-transparent black if player doesn't have the money required
@@ -440,6 +449,53 @@ void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions
 	}
 }
 
+void SFInventoryPanel::UpdateBackgroundColors(ObjectGrid color_grid, ObjectGrid object_grid)
+{
+	for (int i = 0; i < color_grid.squares.x; i++)
+	{
+		for (int j = 0; j < color_grid.squares.y; j++)
+		{
+			if (color_grid.grid[i][j] && i <= object_grid.squares.x && j <= object_grid.squares.y)
+			{
+				if (object_grid.grid[i][j])
+				{
+					float quality = object_grid.grid[i][j]->m_equipment_loot ? object_grid.grid[i][j]->m_equipment_loot->m_quality : (object_grid.grid[i][j]->m_weapon_loot ? object_grid.grid[i][j]->m_weapon_loot->m_quality : 0);
+					color_grid.grid[i][j]->setAnimationLine(GetItemQualityClass(quality));
+					color_grid.grid[i][j]->m_visible = true;
+				}
+				else
+				{
+					color_grid.grid[i][j]->m_visible = false;
+				}
+			}
+			else if (color_grid.grid[i][j])
+			{
+				color_grid.grid[i][j]->m_visible = false;
+			}
+		}
+	}
+}
+
+EquipmentQuality SFInventoryPanel::GetItemQualityClass(float quality)
+{
+	if (quality < 25)
+	{
+		return ItemQuality_Poor;
+	}
+	else if (quality < 50)
+	{
+		return ItemQuality_Medium;
+	}
+	else if (quality < 75)
+	{
+		return ItemQuality_Good;
+	}
+	else 
+	{
+		return ItemQuality_Epic;
+	}
+}
+
 void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 {
 	if (m_visible)
@@ -447,10 +503,13 @@ void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 		SFPanel::Draw(screen);
 
 		m_fake_grid.Draw(screen);
+		m_quality_grid.Draw(screen);
 		m_grid.Draw(screen);
+		
 		if (m_use_two_grids)
 		{
 			m_fake_grid2.Draw(screen);
+			m_quality_grid2.Draw(screen);
 			m_grid2.Draw(screen);
 		}
 		m_grey_grid.Draw(screen);
@@ -830,10 +889,12 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		
 		m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
 		m_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
+		m_quality_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
 
 		text_height += m_fake_grid.squares.x * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK;
 		m_fake_grid2.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
 		m_grid2.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
+		m_quality_grid2.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
 
 		text_height += m_fake_grid2.squares.x * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK;
 		m_money_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);

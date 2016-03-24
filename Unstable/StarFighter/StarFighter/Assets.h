@@ -51,6 +51,7 @@
 #define MODULE_FILENAME			"Assets/2D/Equipment/Module.png"
 #define BOT_FILENAME			"Assets/2D/bot.png"
 
+#define QUALITY_BACKGROUND		"Assets/2D/Equipment/quality_background.png"
 #define EQUIPMENT_SIZE					48
 #define BOT_SIZE						32
 #define EMPTYSLOT_FILENAME				"Assets/2D/HUD/EmptySlot.png"

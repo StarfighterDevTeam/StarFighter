@@ -5,7 +5,7 @@ ObjectGrid::ObjectGrid()
 	this->focus = sf::Vector2i(-1, -1);
 }
 
-ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake, bool fill_with_grey)
+ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake, bool fill_with_grey, bool fill_with_colored_background)
 {
 	for (int i = 0; i < squares.x; i++)
 	{
@@ -30,6 +30,16 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 				grid[i][j] = grey_slot;
 				grey_slot->m_visible = false;
 				grey_slot->setAnimationLine(2);
+			}
+			else if (fill_with_colored_background)
+			{
+				GameObject* colored_slot = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), QUALITY_BACKGROUND, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE),
+					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, NBVAL_ItemQuality);
+
+				colored_slot->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
+
+				grid[i][j] = colored_slot;
+				colored_slot->m_visible = false;
 			}
 			else
 			{

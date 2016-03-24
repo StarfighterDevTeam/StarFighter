@@ -186,6 +186,15 @@ enum EquipmentType {
 	NBVAL_Equipment//4
 };
 
+enum EquipmentQuality
+{
+	ItemQuality_Poor,
+	ItemQuality_Medium,
+	ItemQuality_Good,
+	ItemQuality_Epic,
+	NBVAL_ItemQuality,
+};
+
 
 
 class GameObject : public AnimatedSprite
