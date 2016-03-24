@@ -284,7 +284,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 	switch (m_IG_State)
 	{
-		case InGameStateMachine::SCROLLING:
+		case SCROLLING:
 		{
 			if (m_currentScene->m_generating_enemies)
 			{
@@ -293,7 +293,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			//Scrolling until the background reaches its end
 			if ((*CurrentGame).m_direction == NO_DIRECTION)
 			{
-				m_IG_State = InGameStateMachine::LAST_SCREEN;
+				m_IG_State = LAST_SCREEN;
 			}
 			else
 			{
@@ -317,7 +317,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					}
 					
 					m_hasDisplayedDestructionRatio = false;
-					m_IG_State = InGameStateMachine::LAST_SCREEN;
+					m_IG_State = LAST_SCREEN;
 
 					//Wipe out enemies that were spawned offscren
 					(*CurrentGame).garbageLayer(EnemyObjectLayer, true);
@@ -327,7 +327,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			break;
 		}
 
-		case InGameStateMachine::LAST_SCREEN:
+		case LAST_SCREEN:
 		{	
 			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
 			if ((*CurrentGame).isLastEnemyDead())
@@ -338,8 +338,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					m_currentScene->m_bg->SetPortalsState(PortalInvisible);
 					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
 					{
+						(*CurrentGame).PlayMusic(Music_Boss);
 						m_currentScene->GenerateBoss();
-						m_IG_State = InGameStateMachine::BOSS_FIGHT;
+						m_IG_State = BOSS_FIGHT;
 					}
 				}
 				else
@@ -400,7 +401,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).playerShip->m_disable_fire = true;
 					(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
 
-					m_IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
+					m_IG_State = TRANSITION_PHASE1_2;
 				}
 			}
 			//clearing enemies that have spawned out of the scene size
@@ -416,19 +417,19 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			break;
 		}
 
-		case InGameStateMachine::BOSS_FIGHT:
+		case BOSS_FIGHT:
 		{
 			//is boss dead?
 			if ((*CurrentGame).isLastEnemyDead())
 			{
 				m_currentScene->m_generating_boss = false;
-				m_IG_State = InGameStateMachine::LAST_SCREEN;
+				m_IG_State = LAST_SCREEN;
 			}
 
 			break;
 		}
 
-		case InGameStateMachine::TRANSITION_PHASE1_2:
+		case TRANSITION_PHASE1_2:
 		{
 			//When the playership reaches the scene border, we can start the swapping of scenes, while replacing him on the right starting position for the next scene
 			if ((*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == LESSER_THAN
@@ -447,13 +448,13 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).garbageLayer(LootLayer);
 				(*CurrentGame).garbageLayer(FeedbacksLayer);
 
-				m_IG_State = InGameStateMachine::TRANSITION_PHASE2_2;
+				m_IG_State = TRANSITION_PHASE2_2;
 			}
 
 			break;
 		}
 
-		case InGameStateMachine::TRANSITION_PHASE2_2:
+		case TRANSITION_PHASE2_2:
 		{
 			float wn = m_nextScene->m_bg->m_size.x;
 			float hn = m_nextScene->m_bg->m_size.y;
@@ -471,22 +472,22 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 				if (m_nextScene->m_direction == NO_DIRECTION)
 				{
-					m_IG_State = InGameStateMachine::HUB_ROAMING;
+					m_IG_State = HUB_ROAMING;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = true;
 					(*CurrentGame).playerShip->m_disable_bots = true;
 					(*CurrentGame).playerShip->SetBotsVisibility(false);
 				}
 				else
 				{
-					m_IG_State = InGameStateMachine::SCROLLING;
+					m_IG_State = SCROLLING;
 					(*CurrentGame).playerShip->m_disable_fire = false;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = false;
 					(*CurrentGame).playerShip->m_disable_bots = false;
 					(*CurrentGame).playerShip->SetBotsVisibility(true);
 					(*CurrentGame).playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
-					(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-					(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					//(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					//(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 				}
 
 				//Saving the hazard level change
@@ -525,6 +526,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					SavePlayer(PLAYER_SAVE_FILE);
 					m_playerShip->m_respawnSceneName = m_currentScene->m_name;
+
+					
 				}
 				else
 				{
@@ -535,17 +538,22 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).playerShip->m_disable_inputs = false;
 				(*CurrentGame).playerShip->m_speed = sf::Vector2f(0, 0);
 
-				//Play scene title feedback if we come from a hub
+				//Play scene title feedback if we come from a hub + music changes
 				if (previous_direction == NO_DIRECTION)
 				{
 					m_currentScene->PlayTitleFeedback();
+					(*CurrentGame).PlayMusic(Music_Scene);
+				}
+				if (m_currentScene->m_direction == NO_DIRECTION)
+				{
+					(*CurrentGame).PlayMusic(Music_Hub);
 				}
 			}
 
 			break;
 		}
 
-		case InGameStateMachine::HUB_ROAMING:
+		case HUB_ROAMING:
 		{
 			m_currentScene->m_bg->SetPortalsState(PortalOpen);
 			//player takes exit?
@@ -573,7 +581,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).playerShip->m_disable_fire = true;
 				(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
 				
-				m_IG_State = InGameStateMachine::TRANSITION_PHASE1_2;
+				m_IG_State = TRANSITION_PHASE1_2;
 			}
 
 			break;
@@ -704,12 +712,12 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
 		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
-			m_IG_State = InGameStateMachine::SCROLLING;
+			m_IG_State = SCROLLING;
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
 		}
 		else
 		{
-			m_IG_State = InGameStateMachine::HUB_ROAMING;
+			m_IG_State = HUB_ROAMING;
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
 		}
 		m_playerShip->setPosition(ship_pos);

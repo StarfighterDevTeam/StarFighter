@@ -31,6 +31,14 @@ enum SFX_Bank
 	NBVAL_SFX_BANK,
 };
 
+enum Music_Bank
+{
+	Music_Hub,
+	Music_Scene,
+	Music_Boss,
+	NBVAL_MUSIC_BANK,
+};
+
 using namespace sf;
 
 enum TargetScan
@@ -112,17 +120,18 @@ public:
 
 	sf::SoundBuffer m_soundBuffers[NBVAL_SFX_BANK];
 	map<SFX_Bank, sf::Sound> m_sounds;
-	sf::Sound soundsFire;
-	sf::Sound soundsDeath;
-	sf::Sound soundsKill;
-	sf::Sound soundsBigKill;
 	bool m_SFX_Activated;
 	void SetSFXVolume(bool activate_sfx);
 
 	//Music
 	sf::Music m_curMusic;
+	float m_music_fader;
+	bool m_asking_music_fade_out;
 	bool m_Music_Activated;
 	void SetMusicVolume(bool activate_music);
+	void PlayMusic(Music_Bank music);
+	void ManageMusicTransitions(sf::Time deltaTime);
+	string m_next_music_name;
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);

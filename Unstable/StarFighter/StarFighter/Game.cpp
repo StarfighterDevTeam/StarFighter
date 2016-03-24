@@ -36,17 +36,14 @@ void Game::init(RenderWindow* window)
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	m_Music_Activated = false;
+	m_Music_Activated = true;
+	m_music_fader = 0;
+	m_asking_music_fade_out = false;
 	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
-	if (m_curMusic.openFromFile("Assets/Music/SpaceCowboys.ogg"))
-	{
-		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated);
-		m_curMusic.play();
-		m_curMusic.setLoop(true);
-	}
+	PlayMusic(Music_Hub);
 
 	try
 	{
@@ -73,15 +70,85 @@ void Game::init(RenderWindow* window)
 
 void Game::SetSFXVolume(bool activate_sfx)
 {
-	soundsFire.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
-	soundsDeath.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
-	soundsKill.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
-	soundsBigKill.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	typedef std::map<SFX_Bank, sf::Sound>::iterator it_type;
+	for (it_type iterator = m_sounds.begin(); iterator != m_sounds.end(); iterator++)
+	{
+		iterator->second.setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	}
 }
 
 void Game::SetMusicVolume(bool activate_music)
 {
 	m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * activate_music);
+}
+
+void Game::PlayMusic(Music_Bank music)
+{
+	if (!m_Music_Activated)
+		return;
+
+	//choose the right music file
+	switch (music)
+	{
+		case Music_Hub:
+		{
+			m_next_music_name = "Assets/Music/Hub.ogg";
+			break;
+		}
+		case Music_Scene:
+		{
+			m_next_music_name = "Assets/Music/Scene.ogg";
+			break;
+		}
+		case Music_Boss:
+		{
+			m_next_music_name = "Assets/Music/Boss.ogg";
+			break;
+		}
+	}
+
+	m_asking_music_fade_out = true;
+}
+
+void Game::ManageMusicTransitions(sf::Time deltaTime)
+{
+	if (!m_Music_Activated)
+		return;
+
+	//fade out previous music
+	if (m_asking_music_fade_out)
+	{
+		float volume_change = 100.f / MUSIC_FADE_OUT_TIME * deltaTime.asSeconds();
+		if (m_music_fader - volume_change > 0)
+		{
+			m_music_fader -= volume_change;
+		}
+		else
+		{
+			m_music_fader = 0;
+			//load new music
+			m_curMusic.openFromFile(m_next_music_name);
+			m_curMusic.play();
+			m_curMusic.setLoop(true);
+			m_asking_music_fade_out = false;
+		}
+		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated * m_music_fader / 100);
+	}
+
+	//fade in new music
+	if (!m_asking_music_fade_out && m_music_fader < 100)
+	{
+		float volume_change = 100.f / MUSIC_FADE_IN_TIME * deltaTime.asSeconds();
+		if (m_music_fader + volume_change < 100)
+		{
+			m_music_fader += volume_change;
+		}
+		else
+		{
+			m_music_fader = 100;
+		}
+		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated * m_music_fader / 100);
+	}
 }
 
 sf::RenderWindow* Game::getMainWindow()
@@ -235,6 +302,9 @@ void Game::updateScene(Time deltaTime)
 
 	//Collect the dust
 	collectGarbage();
+
+	//Update music transitions
+	ManageMusicTransitions(deltaTime);
 }
 
 void Game::killGameObjectLayer(GameObjectType m_layer)

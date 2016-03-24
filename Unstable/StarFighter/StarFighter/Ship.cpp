@@ -1289,6 +1289,10 @@ void Ship::RotateShip(float angle)
 	{
 		m_trail->setRotation(angle);
 	}
+	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+	{
+		(*it)->setRotation(angle);
+	}
 }
 
 void Ship::ScreenBorderContraints()

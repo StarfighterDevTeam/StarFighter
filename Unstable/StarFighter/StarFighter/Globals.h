@@ -24,8 +24,11 @@
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
-#define DEFAULT_MUSIC_VOLUME					30
-#define DEFAULT_SFX_VOLUME						20
+#define DEFAULT_MUSIC_VOLUME					50
+#define DEFAULT_SFX_VOLUME						30
+#define MUSIC_FADE_IN_TIME						2.f
+#define MUSIC_FADE_OUT_TIME						2.f
+
 
 #define TIME_BEFORE_BOSS_SPAWN					2
 #define ENDSCENE_TRANSITION_SPEED_UP			1000
