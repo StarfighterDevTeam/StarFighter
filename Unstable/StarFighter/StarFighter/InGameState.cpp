@@ -511,6 +511,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//Wiping the previous background and swapping with the new one
+				Directions previous_direction = m_currentScene->m_direction;
 				delete m_currentScene;
 				m_currentScene = m_nextScene;
 				m_nextScene = NULL;
@@ -534,8 +535,11 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).playerShip->m_disable_inputs = false;
 				(*CurrentGame).playerShip->m_speed = sf::Vector2f(0, 0);
 
-				//Play scene title feedback
-				m_currentScene->PlayTitleFeedback();
+				//Play scene title feedback if we come from a hub
+				if (previous_direction == NO_DIRECTION)
+				{
+					m_currentScene->PlayTitleFeedback();
+				}
 			}
 
 			break;

@@ -62,22 +62,31 @@ StellarSegment::StellarSegment(bool vertical, float segment_size)
 	m_max_hazard_unlocked = HAZARD_LEVEL_1 + 1;
 }
 
-bool StellarSegment::Update(GameObject& cursor, bool forbid_collision)
+bool StellarSegment::Update(GameObject& cursor, bool forbid_collision, vector<StellarSegment*> branch_segments)
 {
 	bool cursor_colliding = SFPanel::IsCursorCollidingWithRectangle(cursor, *this);
+
+	//highlighting one segment results in highlighting all segments of the branch
+	size_t branchSegmentsVectorSize = branch_segments.size();
 
 	if (cursor_colliding && !forbid_collision)
 	{
 		if (m_feedback_state != StellarComponent_HighlightState)
 		{
-			m_feedback_state = StellarComponent_HighlightState;
-			setFillColor(sf::Color::Yellow);
+			for (size_t i = 0; i < branchSegmentsVectorSize; i++)
+			{
+				branch_segments[i]->m_feedback_state = StellarComponent_HighlightState;
+				branch_segments[i]->setFillColor(sf::Color::Yellow);
+			}
 		}
 	}
 	else if (m_feedback_state != StellarComponent_NormalState)
 	{
-		m_feedback_state = StellarComponent_NormalState;
-		setFillColor(sf::Color::White);
+		for (size_t i = 0; i < branchSegmentsVectorSize; i++)
+		{
+			branch_segments[i]->m_feedback_state = StellarComponent_NormalState;
+			branch_segments[i]->setFillColor(sf::Color::White);
+		}
 	}
 
 	return cursor_colliding && !forbid_collision;
@@ -403,7 +412,7 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 					//flag if we have already collided with a segment
 					if (!already_colllided_with_a_hub && !already_colllided_with_a_segment)
 					{
-						already_colllided_with_a_segment = m_branches[i]->m_segments[j]->Update(m_cursor, false);
+						already_colllided_with_a_segment = m_branches[i]->m_segments[j]->Update(m_cursor, false, m_branches[i]->m_segments);
 						//create info panel
 						if (already_colllided_with_a_segment)
 						{
@@ -419,11 +428,14 @@ void SFMapPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 								m_targeted_location = "";
 								m_info_panel = new SFStellarInfoPanel(m_branches[i]->m_segments[j], sf::Vector2f(STELLARMAP_INFO_PANEL_SIZE_X, STELLARMAP_INFO_PANEL_SIZE_Y), m_playerShip);
 							}
+
+							break;
 						}
 					}
 					else
 					{
-						m_branches[i]->m_segments[j]->Update(m_cursor, true);
+						StellarSegment* first_segment = m_branches[i]->m_segments.empty() ? NULL : m_branches[i]->m_segments.front();
+						m_branches[i]->m_segments[j]->Update(m_cursor, true, m_branches[i]->m_segments);
 					}
 				}
 			}
@@ -859,8 +871,8 @@ bool SFMapPanel::ScanScene(string scene_name, Directions direction, sf::Vector2f
 				//create new segment
 				float segment_size = atof((*CurrentGame).m_sceneConfigs[scene_name][i][BACKGROUND_SIZE_ON_STELLARMAP].c_str());
 				StellarSegment* new_segment = new StellarSegment(vertical, segment_size);
+				new_segment->m_display_name = m_branches.back()->m_segments.empty() ? scene_name : m_branches.back()->m_segments.front()->m_display_name;
 				m_branches.back()->m_segments.push_back(new_segment);
-				new_segment->m_display_name = scene_name;
 
 				new_segment->m_size_on_stellar_map = segment_size;
 				new_segment->m_coordinates.x = starting_coordinates.x + ((direction == DIRECTION_RIGHT) - (direction == DIRECTION_LEFT)) * new_segment->m_size_on_stellar_map / 2;

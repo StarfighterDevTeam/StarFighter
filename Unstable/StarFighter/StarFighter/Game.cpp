@@ -32,9 +32,11 @@ void Game::init(RenderWindow* window)
 	//Sounds
 	m_SFX_Activated = true;
 	LoadSFX();
+	
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
+	m_Music_Activated = false;
 	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))

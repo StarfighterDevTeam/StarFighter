@@ -36,7 +36,7 @@ public:
 	StellarComponentStates m_feedback_state;
 	bool m_vertical;
 
-	bool Update(GameObject& cursor, bool forbid_collision);
+	bool Update(GameObject& cursor, bool forbid_collision, vector<StellarSegment*> branch_segments);
 };
 
 class StellarNode : public sf::CircleShape

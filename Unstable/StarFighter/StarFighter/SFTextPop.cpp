@@ -83,7 +83,7 @@ void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 	float newspeed = m_speed_y;
 	if (hyperspeedMultiplier > 1)
 	{
-		newspeed += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * (*CurrentGame).m_vspeed).y;
+		newspeed += GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, (hyperspeedMultiplier - 1) * newspeed).y;
 	}
 	else if (hyperspeedMultiplier < 1)
 	{
