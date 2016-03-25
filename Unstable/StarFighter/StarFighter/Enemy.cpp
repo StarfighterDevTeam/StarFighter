@@ -884,10 +884,14 @@ Dialog* Enemy::LoadDialog(string name)
 			dialog->m_name = name;
 			dialog->m_fade_in = (bool)(stoi((*it)[DIALOG_FADE_IN]));
 			dialog->m_fade_out = (bool)(stoi((*it)[DIALOG_FADE_OUT]));
-			dialog->m_enemy_speaking = (*it)[DIALOG_ENEMY_SPEAKING].compare("enemy") == 0 ? true : false;
+			dialog->m_enemy_speaking = (*it)[DIALOG_ENEMY_SPEAKING].compare("0") != 0;
 			dialog->m_duration = atof((*it)[DIALOG_DURATION].c_str());
 			dialog->m_title = (*it)[DIALOG_TITLE];
+			dialog->m_title = ReplaceAll(dialog->m_title, "_", " ");
+			dialog->m_title = ReplaceAll(dialog->m_title, "[COMA]", ",");
 			dialog->m_body = (*it)[DIALOG_BODY];
+			dialog->m_body = ReplaceAll(dialog->m_body, "_", " ");
+			dialog->m_body = ReplaceAll(dialog->m_body, "[COMA]", ",");
 			dialog->m_picture_name = (*it)[DIALOG_PICTURE];
 			dialog->m_next_dialog_name = (*it)[DIALOG_NEXT];
 

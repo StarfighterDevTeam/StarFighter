@@ -311,12 +311,6 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 //INVENTORY PANEL
 SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t nb_lines, size_t nb_rows, bool use_two_grids, bool is_shop, size_t nb_lines2, size_t nb_rows2) : SFPanel(size, SFPanel_Inventory)
 {
-	ObjectGrid* griiid = NULL;
-	if (playerShip->m_HUD_SFPanel)
-		griiid = playerShip->m_HUD_SFPanel->GetGrid();
-	if (playerShip->m_HUD_SFPanel)
-	printf("posy : %f\n", griiid->grid[0][1]->getPosition().y);
-
 	m_focused_item = NULL;
 	m_focused_cell_index = sf::Vector2i(-1, -1);
 	m_use_two_grids = use_two_grids;
@@ -349,8 +343,6 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 		m_grey_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), false, true);
 	}
 
-	if (playerShip->m_HUD_SFPanel)
-	printf("posy : %f\n", griiid->grid[0][1]->getPosition().y);
 	//texts
 	if (is_shop && m_playerShip && m_playerShip->m_targetShop)
 	{
@@ -361,11 +353,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 		size_t vectorItemsInShopSize = m_playerShip->m_targetShop->m_items.size();
 		for (size_t i = 0; i < vectorItemsInShopSize; i++)
 		{
-			if (playerShip->m_HUD_SFPanel)
-				printf("posy : %f (%d)", griiid->grid[0][1]->getPosition().y, i);
 			m_grid.insertObject(*m_playerShip->m_targetShop->m_items[i], i, true);
-			if (playerShip->m_HUD_SFPanel)
-				printf(" post posy : %f\n", griiid->grid[0][1]->getPosition().y);
 		}
 	}
 	
@@ -387,23 +375,11 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	text_height += INTERACTION_INTERBLOCK;
 	text_height += INTERACTION_INTERBLOCK;
 
-	if (playerShip->m_HUD_SFPanel)
-		printf("posy : %f\n", griiid->grid[0][1]->getPosition().y);
-
 	m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
-	if (playerShip->m_HUD_SFPanel)
-		printf("posy (fake) : %f\n", griiid->grid[0][1]->getPosition().y);
 	m_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
-
-	if (playerShip->m_HUD_SFPanel)
-		printf("posy (grid): %f\n", griiid->grid[0][1]->getPosition().y);
-
 	m_quality_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-
-	if (playerShip->m_HUD_SFPanel)
-	printf("posy (quality) : %f\n\n", griiid->grid[0][1]->getPosition().y);
 
 	if (m_use_two_grids)
 	{

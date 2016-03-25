@@ -16,6 +16,24 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 	}
 }
 
+Background::~Background()
+{
+	if (m_shop)
+	{
+		m_shop->m_GarbageMe = true;
+		m_shop->m_visible = false;
+	}
+
+	for (int i = 0; i < NO_DIRECTION; i++)
+	{
+		if (m_portals[(Directions)i])
+		{
+			m_portals[(Directions)i]->m_GarbageMe = true;
+			m_portals[(Directions)i]->m_visible = false;
+		}
+	}
+}
+
 void Background::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	static sf::Vector2f newposition, newspeed;

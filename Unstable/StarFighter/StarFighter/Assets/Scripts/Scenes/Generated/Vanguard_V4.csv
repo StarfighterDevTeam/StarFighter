@@ -13,5 +13,3 @@ boss,V_AlphaGold2,5,0.4,-0.1,4,,
 boss,V_AlphaGold3,5,0.5,-0.05,4,,
 boss,V_AlphaGold1,5,0.3,-0.15,4,,
 boss,V_AlphaGold5,5,0.7,-0.15,4,,
-#,fade_in,fade_out,enemy,duration,title,body,picture
-dialog,0,0,0,0,Titre,blablabla,Assets/2D/Dialogs/Captain.png

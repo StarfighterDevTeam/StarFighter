@@ -514,14 +514,6 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 
 void Ship::UpdateHUDStates()
 {
-	//test
-	//if (m_targetDialogs.empty())
-	//{
-	//	m_targetDialogs.push_back(Enemy::LoadDialog("Dial_V3_01"));
-	//	m_targetDialogs.push_back(Enemy::LoadDialog("Dial_V3_02"));
-	//	(*CurrentGame).m_waiting_for_dialog_validation = true;
-	//}
-	
 	if (!m_targetDialogs.empty())
 	{
 		m_is_asking_SFPanel = SFPanel_Dialog;

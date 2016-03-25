@@ -37,6 +37,12 @@ void GameObject::Draw(sf::RenderTexture& screen)
 
 void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
+	//because yeah, if you don't have an animation, this is not happening
+	if (m_animationNumber == 0)
+	{
+		return;
+	}
+
 	//are we already playing this animation?
 	if (m_currentAnimationIndex == animation && (keep_frame_index || (m_currentAnimation && m_currentAnimation->getSize() == 1)))
 	{

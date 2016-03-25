@@ -6,6 +6,8 @@ Portal::Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 {
 	m_DontGarbageMe = true;
 	m_state = PortalOpen;
+	//m_direction == NO_DIRECTION;
+	//m_offset = sf::Vector2f(0, 0);
 }
 
 void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -13,17 +15,17 @@ void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (!m_GarbageMe)
 	{
 		//update animations (transitioning frop opening to open and from closing to close)
-		if (m_currentAnimationIndex == PortalAnimation::PortalOpening && m_currentFrame + 2 > m_currentAnimation->getSize())
+		if (m_currentAnimationIndex == PortalOpening && m_currentFrame + 2 > m_currentAnimation->getSize())
 		{
-			setAnimationLine(PortalAnimation::PortalOpenIdle, false);
+			setAnimationLine(PortalOpenIdle, false);
 			
 		}
-		else if (m_currentAnimationIndex == PortalAnimation::PortalClosing && m_currentFrame + 2 > m_currentAnimation->getSize())
+		else if (m_currentAnimationIndex == PortalClosing && m_currentFrame + 2 > m_currentAnimation->getSize())
 		{
-			setAnimationLine(PortalAnimation::PortalCloseIdle, false);
+			setAnimationLine(PortalCloseIdle, false);
 
 		}
-		else if (m_currentAnimationIndex == PortalAnimation::PortalCloseIdle && m_state == PortalInvisible)
+		else if (m_currentAnimationIndex == PortalCloseIdle && m_state == PortalInvisible)
 		{
 			m_visible = false;
 		}
@@ -34,9 +36,9 @@ void Portal::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 void Portal::Open()
 {
-	if (m_currentAnimationIndex != PortalAnimation::PortalOpening && m_currentAnimationIndex != PortalAnimation::PortalOpenIdle)
+	if (m_currentAnimationIndex != PortalOpening && m_currentAnimationIndex != PortalOpenIdle)
 	{
-		setAnimationLine(PortalAnimation::PortalOpening, false);
+		setAnimationLine(PortalOpening, false);
 
 		(*CurrentGame).PlaySFX(SFX_PortalOpening);
 	}
@@ -44,8 +46,8 @@ void Portal::Open()
 
 void Portal::Close()
 {
-	if (m_currentAnimationIndex != PortalAnimation::PortalClosing && m_currentAnimationIndex != PortalAnimation::PortalCloseIdle)
+	if (m_currentAnimationIndex != PortalClosing && m_currentAnimationIndex != PortalCloseIdle)
 	{
-		setAnimationLine(PortalAnimation::PortalClosing, false);
+		setAnimationLine(PortalClosing, false);
 	}
 }

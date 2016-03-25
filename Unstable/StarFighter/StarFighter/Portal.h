@@ -26,12 +26,13 @@ class Portal : public GameObject
 public:
 	Portal(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	void Open();
+	void Close();
+
 	std::string m_destination_name;
 	int m_max_unlocked_hazard_level;
 	sf::Vector2f m_offset;//respect to the background
 	PortalState m_state;
-	void Open();
-	void Close();
 	Directions m_direction;
 };
 
