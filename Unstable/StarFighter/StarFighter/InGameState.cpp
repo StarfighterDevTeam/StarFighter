@@ -74,6 +74,7 @@ void InGameState::Initialize(Player player)
 	{
 		(*CurrentGame).playerShip->m_disable_fire = false;
 		(*CurrentGame).playerShip->m_disabledHyperspeed = false;
+		(*CurrentGame).playerShip->m_disableSlowmotion = false;
 		(*CurrentGame).playerShip->m_disable_bots = false;
 		(*CurrentGame).playerShip->SetBotsVisibility(true);
 	}
@@ -81,6 +82,7 @@ void InGameState::Initialize(Player player)
 	{
 		(*CurrentGame).playerShip->m_disable_fire = true;
 		(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+		(*CurrentGame).playerShip->m_disableSlowmotion = true;
 		(*CurrentGame).playerShip->m_disable_bots = true;
 		(*CurrentGame).playerShip->SetBotsVisibility(false);
 	}
@@ -399,6 +401,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					//Putting the player on rails
 					(*CurrentGame).playerShip->m_disable_inputs = true;
 					(*CurrentGame).playerShip->m_disable_fire = true;
+					(*CurrentGame).playerShip->m_disableSlowmotion = true;
 					(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
 
 					m_IG_State = TRANSITION_PHASE1_2;
@@ -474,6 +477,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					m_IG_State = HUB_ROAMING;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+					(*CurrentGame).playerShip->m_disableSlowmotion = true;
 					(*CurrentGame).playerShip->m_disable_bots = true;
 					(*CurrentGame).playerShip->SetBotsVisibility(false);
 				}
@@ -482,6 +486,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					m_IG_State = SCROLLING;
 					(*CurrentGame).playerShip->m_disable_fire = false;
 					(*CurrentGame).playerShip->m_disabledHyperspeed = false;
+					(*CurrentGame).playerShip->m_disableSlowmotion = false;
 					(*CurrentGame).playerShip->m_disable_bots = false;
 					(*CurrentGame).playerShip->SetBotsVisibility(true);
 					(*CurrentGame).playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -636,6 +641,7 @@ void InGameState::RespawnInLastHub()
 
 	//Applying hub modifiers to gameplay
 	(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+	(*CurrentGame).playerShip->m_disableSlowmotion = true;
 	(*CurrentGame).playerShip->m_disable_fire = true;
 	m_IG_State = HUB_ROAMING;
 

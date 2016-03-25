@@ -182,6 +182,7 @@ public :
 	Aura* m_combo_aura;
 	Aura* m_trail;
 	bool m_disabledHyperspeed;
+	bool m_disableSlowmotion;
 	bool m_is_asking_scene_transition;
 
 	int getFighterIntStatValue(FighterStats stat) override;

@@ -32,6 +32,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_disable_inputs = false;
 	m_disable_fire = false;
 	m_disabledHyperspeed = false;
+	m_disableSlowmotion = false;
 	m_graze_count = 0;
 	m_graze_level = 0;
 	m_last_hazard_level_played = 0;
@@ -736,7 +737,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				m_HUD_state = HUD_OpeningEquipment;
 				m_HUD_SFPanel->GetCursor()->m_visible = true;
 				
-				if (!m_disabledHyperspeed)
+				if (!m_disableSlowmotion)
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
 				}
@@ -752,7 +753,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (m_HUD_state == HUD_Idle)
 			{
 				//Slow_motion and hyperspeed
-				UpdateAction(Action_Slowmotion, Input_Tap, !m_disabledHyperspeed);
+				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disabledHyperspeed);
 
 				if (m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0)
@@ -764,7 +765,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						m_hyperspeed_fuel = 0;
 					}
 				}
-				else if (m_actions_states[Action_Slowmotion] && !m_disabledHyperspeed && m_hyperspeed_fuel > 0)
+				else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0)
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
 					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
