@@ -329,11 +329,19 @@ void Scene::DisplayDestructions(bool hazard_break)
 	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
 	(*CurrentGame).addToFeedbacks(pop_feedback);
 
-	if (hazard_break)
+	if (hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
 	{
 		text_feedback->setString("HAZARD BREAK!!!");
 		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y - pop_feedback->getGlobalBounds().height - INTERACTION_INTERBLOCK));
+		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y + pop_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK));
+		(*CurrentGame).addToFeedbacks(pop_feedback2);
+	}
+	else if (!hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
+	{
+		text_feedback->setString("Score 100% to unlock next hazard level");
+		text_feedback->setCharacterSize(18);
+		SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+		pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, position.y + pop_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK));
 		(*CurrentGame).addToFeedbacks(pop_feedback2);
 	}
 	
@@ -562,6 +570,11 @@ float Scene::getSceneBeastScore(int for_hazard_level)
 int Scene::getSceneHazardLevelUnlockedValue()
 {
 	return m_hazard_level_unlocked;
+}
+
+void Scene::setSceneHazardLevelUnlockedValue(int hazard_unlocked_value)
+{
+	m_hazard_level_unlocked = hazard_unlocked_value;
 }
 
 int Scene::getSceneHazardLevelValue()

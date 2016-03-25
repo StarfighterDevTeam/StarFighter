@@ -353,10 +353,10 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 						if (m_currentScene->m_canHazardBreak)
 						{
 							//what is our destruction ratio? (displaying score). 100% = Hazard break
-							if ((*CurrentGame).getHazard() - (*CurrentGame).m_hazardSpawned == 0)
+							if ((*CurrentGame).getHazard() == (*CurrentGame).m_hazardSpawned && m_currentScene->getSceneHazardLevelUnlockedValue() == m_currentScene->getSceneHazardLevelValue())
 							{
-								m_currentScene->HazardBreak();
 								m_currentScene->DisplayDestructions(true);
+								m_currentScene->HazardBreak();
 							}
 							else
 							{
@@ -600,12 +600,12 @@ void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* player
 	map<string, int>::iterator it = playerShip->m_knownScenes.find(scene->m_name);
 	if (it != playerShip->m_knownScenes.end())
 	{
-		scene->m_hazard_level_unlocked = playerShip->m_knownScenes[scene->m_name];
+		scene->setSceneHazardLevelUnlockedValue(playerShip->m_knownScenes[scene->m_name]);
 	}
 	else
 	{
 		//destination is not know yet -> default max hazard value
-		scene->m_hazard_level_unlocked = 0;
+		scene->setSceneHazardLevelUnlockedValue(0);
 	}
 
 	//loading the scene's portals with the info about their respective max hazard values

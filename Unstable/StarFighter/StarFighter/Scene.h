@@ -57,6 +57,7 @@ public:
 	int m_level;
 
 	int getSceneHazardLevelUnlockedValue();
+	void setSceneHazardLevelUnlockedValue(int hazard_unlocked_value);
 	int getSceneHazardLevelValue();
 
 	std::string m_links[NO_DIRECTION];
@@ -70,7 +71,6 @@ public:
 
 	void HazardBreak();
 
-	int m_hazard_level_unlocked;
 	bool m_canHazardBreak;
 	vector <string> m_scenesLinkedToUpdate;
 
@@ -82,6 +82,7 @@ private:
 	vector<EnemyBase*> m_enemies_ranked_by_class[NBVAL_EnemyClass];
 	int m_total_class_probability[NBVAL_EnemyClass];
 	int m_hazard_level;
+	int m_hazard_level_unlocked;
 };
 
 #endif // STARFIGHTER_H_INCLUDED

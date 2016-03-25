@@ -1,22 +1,7 @@
-1 -858993460
 Vanguard_H1 1
 Vanguard_H2 1
-Vanguard_H3 1
-Vanguard_H4 1
-Vanguard_H5 1
-Vanguard_H6 1
-Vanguard_Hub0 1
-Vanguard_Hub1 1 !
-Vanguard_Hub4 1
-Vanguard_Hub5 1
-Vanguard_Hub6 1
-Vanguard_V1 2
-Vanguard_V10 1
-Vanguard_V2 2
-Vanguard_V3 1
-Vanguard_V4 1
-Vanguard_V5 1
-Vanguard_V6 1
-Vanguard_V7 1
-Vanguard_V8 1
-Vanguard_V9 1
+Vanguard_Hub0 0
+Vanguard_Hub1 0 !
+Vanguard_Hub4 0
+Vanguard_V1 4
+Vanguard_V2 4
