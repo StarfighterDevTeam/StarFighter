@@ -1444,6 +1444,8 @@ void Ship::Death()
 	SetVisibility(false);
 	m_graze_count = 0;
 	m_graze_level = 0;
+	m_HUD_state = HUD_Idle;
+	m_HUD_SFPanel->GetCursor()->m_visible = false;
 
 	(*CurrentGame).PlaySFX(SFX_BigKill);
 
