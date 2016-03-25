@@ -120,7 +120,11 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		for (size_t i = 0; i < m_options; i++)
 		{
 			stringstream ss;
-			ss << "Hazard " << i + 1;
+			ss << "Hazard " << i + 1 << " (Level " << stoi((*CurrentGame).m_generalScenesConfig[m_playerShip->m_targetPortal->m_destination_name][SCENE_LEVEL]) + i << ")";
+			if (m_playerShip->m_targetPortal->m_max_unlocked_hazard_level == i)
+			{
+				//ss << "-> Score 100.0% to unlock next hazard level";
+			}
 			m_options_text[i].setString(ss.str());
 		}
 

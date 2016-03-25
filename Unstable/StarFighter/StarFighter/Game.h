@@ -111,7 +111,7 @@ public:
 	int GetEnemiesStatsMultiplierForLevel(int level_);
 	int GetBonusStatsMultiplierToBeOnParForLevel(int level_);
 
-	vector<vector<string> > m_generalScenesConfig;
+	map<string, vector<string> > m_generalScenesConfig;
 	map<string, vector<vector<string> > > m_sceneConfigs;
 
 	//SFX

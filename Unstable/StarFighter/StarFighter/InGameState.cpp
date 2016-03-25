@@ -737,15 +737,23 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 void InGameState::LoadAllScenes(string scenes_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading all scenes scripts.");
-	(*CurrentGame).m_generalScenesConfig = *(FileLoaderUtils::FileLoader(scenes_file));
 
-	size_t scenesVectorSize = (*CurrentGame).m_generalScenesConfig.size();
-	for (size_t scene = 0; scene < scenesVectorSize; scene++)
+	vector<vector<string> > generalScenesConfig = *(FileLoaderUtils::FileLoader(scenes_file));
+	size_t allScenesVectorSize = generalScenesConfig.size();
+	for (size_t i = 0; i < allScenesVectorSize; i++)
 	{
-		if (!(*CurrentGame).m_generalScenesConfig[scene][SCENE_FILENAME].empty() && (*CurrentGame).m_generalScenesConfig[scene][SCENE_FILENAME].compare("0") != 0)
+		(*CurrentGame).m_generalScenesConfig.insert(std::map<string, vector<string> >::value_type(generalScenesConfig[i][SCENE_NAME], generalScenesConfig[i]));
+	}
+
+	for (size_t j = 0; j < allScenesVectorSize; j++)
+	{
+		if (!generalScenesConfig[j][SCENE_FILENAME].empty() && generalScenesConfig[j][SCENE_FILENAME].compare("0") != 0)
 		{
-			(*CurrentGame).m_sceneConfigs.insert(std::map<string, vector<vector<string> >>::value_type((*CurrentGame).m_generalScenesConfig[scene][SCENE_NAME], *(FileLoaderUtils::FileLoader((*CurrentGame).m_generalScenesConfig[scene][SCENE_FILENAME]))));
+			(*CurrentGame).m_sceneConfigs.insert(std::map<string, vector<vector<string> > >::value_type(generalScenesConfig[j][SCENE_NAME], *(FileLoaderUtils::FileLoader(generalScenesConfig[j][SCENE_FILENAME]))));
 		}
 	}
+
+	generalScenesConfig.clear();
+
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }

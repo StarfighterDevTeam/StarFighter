@@ -10,6 +10,7 @@ StellarHub::StellarHub()
 	setFillColor(sf::Color::Red);
 
 	m_distance_to_current_position = 0;
+	m_level = 1;
 	m_coordinates = sf::Vector2f(0, 0);
 	m_feedback_state = StellarComponent_NormalState;
 }
@@ -676,6 +677,7 @@ int SFMapPanel::ComputeTeleportationCost(StellarHub* destination)
 		}
 
 		int cost = (diff_x + diff_y) * (diff_x + diff_y) * STELLARMAP_TELEPORTATION_COST;//exponential cost: distance as the crow flies ^4)
+		//int cost = (diff_x + diff_y) * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(destination->m_level) * 0.01 * STELLARMAP_TELEPORTATION_COST;
 
 		return cost;
 	}
@@ -702,26 +704,18 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 
 	//get linked scenes
 	string links[NO_DIRECTION] = { "0", "0", "0", "0" };
-	size_t allScenesVectorSize = (*CurrentGame).m_generalScenesConfig.size();
-	for (size_t i = 0; i < allScenesVectorSize; i++)
+	//all directions
+	if (direction == NO_DIRECTION)
 	{
-		if ((*CurrentGame).m_generalScenesConfig[i][SCENE_NAME].compare(starting_scene) == 0)
-		{
-			//all directions
-			if (direction == NO_DIRECTION)
-			{
-				links[DIRECTION_UP] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_UP];
-				links[DIRECTION_DOWN] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_DOWN];
-				links[DIRECTION_RIGHT] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_RIGHT];
-				links[DIRECTION_LEFT] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_LEFT];
-			}
-			//forced direction
-			else
-			{
-				links[direction] = (*CurrentGame).m_generalScenesConfig[i][SCENE_LINK_UP + direction];
-			}
-			break;
-		}
+		links[DIRECTION_UP] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_UP];
+		links[DIRECTION_DOWN] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_DOWN];
+		links[DIRECTION_RIGHT] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_RIGHT];
+		links[DIRECTION_LEFT] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_LEFT];
+	}
+	//forced direction
+	else
+	{
+		links[direction] = (*CurrentGame).m_generalScenesConfig[starting_scene][SCENE_LINK_UP + direction];
 	}
 
 	//scan linked scenes
@@ -768,15 +762,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 				}
 
 				//Get filename of the next scene to scan
-				string scene_filename;
-				for (size_t j = 0; j < allScenesVectorSize; j++)
-				{
-					if ((*CurrentGame).m_generalScenesConfig[j][SCENE_NAME].compare(links[direction]) == 0)
-					{
-						scene_filename = (*CurrentGame).m_generalScenesConfig[j][SCENE_FILENAME];
-						break;
-					}
-				}
+				string scene_filename = (*CurrentGame).m_generalScenesConfig[links[direction]][SCENE_FILENAME];
 
 				//Scan the file
 				if (scene_filename.empty())
@@ -803,16 +789,7 @@ void SFMapPanel::ScanBranches(string starting_scene, Directions direction, sf::V
 					segment->m_vertical = ((Directions)direction == DIRECTION_UP || (Directions)direction == DIRECTION_DOWN);
 
 					//get next linked scene name
-					string next_scene_name;
-					for (size_t j = 0; j < allScenesVectorSize; j++)
-					{
-						if ((*CurrentGame).m_generalScenesConfig[j][SCENE_NAME].compare(links[direction]) == 0)
-						{
-							//Loading the linked scene names
-							next_scene_name = (*CurrentGame).m_generalScenesConfig[j][SCENE_LINK_UP + direction];
-							break;
-						}
-					}
+					string next_scene_name = (*CurrentGame).m_generalScenesConfig[links[direction]][SCENE_LINK_UP + direction];
 
 					//register the name of the next scene and register it as a scene to scan
 					if (!next_scene_name.empty())
@@ -849,6 +826,7 @@ bool SFMapPanel::ScanScene(string scene_name, Directions direction, sf::Vector2f
 				StellarHub* new_hub = new StellarHub(scene_name);
 				new_hub->m_coordinates = starting_coordinates;
 				new_hub->m_display_name = scene_name;
+				new_hub->m_level = stoi((*CurrentGame).m_generalScenesConfig[scene_name][SCENE_LEVEL]);
 				m_branches.back()->m_hub = new_hub;
 
 				//printf("Hub created: %s\n", scene.c_str());

@@ -21,6 +21,7 @@ public:
 	string m_display_name;
 	float m_distance_to_current_position;
 	StellarComponentStates m_feedback_state;
+	int m_level;
 
 	bool Update(GameObject& cursor, bool forbid_collision);
 };

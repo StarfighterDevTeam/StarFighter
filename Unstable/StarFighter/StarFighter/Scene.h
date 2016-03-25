@@ -28,6 +28,7 @@ enum ScenesData
 	SCENE_LINK_RIGHT,
 	SCENE_LINK_LEFT,
 	SCENE_HAZARD_BREAK,
+	SCENE_LEVEL,
 };
 
 class Scene
@@ -53,6 +54,7 @@ public:
 	bool m_generating_enemies;
 	bool m_generating_boss;
 	sf::Clock m_spawnClock;
+	int m_level;
 
 	int getSceneHazardLevelUnlockedValue();
 	int getSceneHazardLevelValue();
