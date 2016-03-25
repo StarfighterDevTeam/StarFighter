@@ -111,6 +111,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 	{
 		int focused_item_type = object->m_weapon_loot ? NBVAL_Equipment : object->m_equipment_loot->m_equipmentType;
 		ostringstream ss_stats;
+		ss_stats << fixed;
+		ss_stats.precision(0);
 		ostringstream ss_itam_name;
 		//if focused item != NULL
 		switch (focused_item_type)
@@ -140,7 +142,11 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				Equipment* obj = object->m_equipment_loot;
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "SHIELD: " << standard_name;
-				ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: " << obj->m_shield_regen << "\nShield recovery: " << obj->m_shield_recovery_time << "sec";
+				ss_stats << "Max shield pts: " << obj->m_shield << "\nShield regen/sec: ";
+				ss_stats.precision(1);
+				ss_stats << obj->m_shield_regen << "\nShield recovery: ";
+				ss_stats.precision(0);
+				ss_stats << obj->m_shield_recovery_time << "sec";
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				break;
@@ -164,7 +170,9 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 
 					ss_stats << "\nDamage: " << obj->m_bot->m_weapon->m_ammunition->m_damage;
 					ss_stats << "\nAmmo speed: " << obj->m_bot->m_weapon->m_ammunition->m_speed.y;
+					ss_stats.precision(1);
 					ss_stats << "\nFire rate: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 << " shots/sec";
+					ss_stats.precision(0);
 
 					if (obj->m_bot->m_weapon->m_multishot > 1)
 					{
@@ -235,15 +243,19 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_itam_name << "MAIN WEAPON: " << standard_name;
 				if (obj->m_shot_mode != NoShotMode)
 				{
+					ss_stats.precision(0);
 					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_ammunition->m_damage;
 				}
 				else
 				{
+					ss_stats.precision(0);
 					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
 				}
 				ss_stats << "\nDamage: " << obj->m_ammunition->m_damage;
 				ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
+				ss_stats.precision(1);
 				ss_stats << "\nFire rate: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 << " shots/sec";
+				ss_stats.precision(0);
 
 				if (obj->m_multishot > 1)
 				{
@@ -464,9 +476,17 @@ void SFInventoryPanel::UpdateBackgroundColors(ObjectGrid color_grid, ObjectGrid 
 			{
 				if (object_grid.grid[i][j])
 				{
-					float quality = object_grid.grid[i][j]->m_equipment_loot ? object_grid.grid[i][j]->m_equipment_loot->m_quality : (object_grid.grid[i][j]->m_weapon_loot ? object_grid.grid[i][j]->m_weapon_loot->m_quality : 0);
-					color_grid.grid[i][j]->setAnimationLine(GetItemQualityClass(quality));
-					color_grid.grid[i][j]->m_visible = true;
+					float quality = object_grid.grid[i][j]->m_equipment_loot ? object_grid.grid[i][j]->m_equipment_loot->m_quality : (object_grid.grid[i][j]->m_weapon_loot ? object_grid.grid[i][j]->m_weapon_loot->m_quality : -1);
+					if (quality < 0)
+					{
+						color_grid.grid[i][j]->m_visible = false;
+						printf("Error in SFInventoryPanel::UpdateBackgroundColors(): trying to get the quality of an item that doesn't have any equipment or weapon.\n");
+					}
+					else
+					{
+						color_grid.grid[i][j]->setAnimationLine((int)GetItemQualityClass(quality));
+						color_grid.grid[i][j]->m_visible = true;
+					}
 				}
 				else
 				{

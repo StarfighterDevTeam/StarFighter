@@ -418,10 +418,15 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float q
 
 		//checking bonus limitations
 		bool can_buy_multishot = credits_ > cost_per_multishot;
-		bool can_buy_rate_of_fire = bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS && floor(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * credits_ / 100))) != FIRST_LEVEL_AMMO_DAMAGE;
+		bool can_buy_rate_of_fire = bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS;
+		bool can_buy_damage = floor(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * credits_ / 100))) != FIRST_LEVEL_AMMO_DAMAGE;
 
 		//and chosing among the authorized ones
-		if (can_buy_multishot && can_buy_rate_of_fire)
+		if (!can_buy_damage)
+		{
+			random_type_of_bonus = 2;
+		}
+		else if (can_buy_multishot && can_buy_rate_of_fire)
 		{
 			random_type_of_bonus = RandomizeIntBetweenValues(0, 2);
 		}
@@ -485,8 +490,8 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float q
 	weapon->m_rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE;
 
 	//allocating bonuses to the weapon
-	weapon->m_ammunition->m_damage += ceil((bonus_damage + CREDITS_COST_PER_ONE_MULTISHOT * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE * 0.01);
 	weapon->m_multishot += bonus_multishot;
+	weapon->m_ammunition->m_damage += ceil((bonus_damage + cost_per_multishot * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE / weapon->m_multishot * 0.01);
 	weapon->m_rate_of_fire -= bonus_rate_of_fire * FIRST_LEVEL_RATE_OF_FIRE * 0.01;
 
 	//spread of multishot weapons
