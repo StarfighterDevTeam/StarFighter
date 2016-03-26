@@ -480,7 +480,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY)
+			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY && !m_actions_states[Action_Recalling])
 			{
 				if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
 				{
@@ -809,7 +809,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//Auto fire option (F key)
-				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire && !m_actions_states[Action_Recalling]))
+				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire))
 				{
 					//Bots automatic fire option
 					m_automatic_fire = m_actions_states[Action_AutomaticFire];
@@ -820,14 +820,14 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//Firing button
-				UpdateAction(Action_Firing, Input_Hold, !m_disable_fire && !m_actions_states[Action_Recalling]);
+				UpdateAction(Action_Firing, Input_Hold, !m_disable_fire);
 
 				//Weapon firing
 				ManageFiring(deltaTime, hyperspeedMultiplier);
 				//Bots firing
 				for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 				{
-					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding]);
+					(*it)->Fire(deltaTime, (*CurrentGame).m_hyperspeedMultiplier, m_actions_states[Action_Firing], m_actions_states[Action_Hyperspeeding] || m_actions_states[Action_Recalling]);
 				}
 
 				//Braking and speed malus on firing
