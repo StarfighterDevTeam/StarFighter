@@ -20,7 +20,6 @@ public:
 	sf::Vector2f m_target_position;
 	bool m_is_downscreen;
 	sf::Clock m_duration_clock;
-	GameObject m_arrow;
 };
 
 #endif // SFDIALOGPANEL_H_INCLUDED

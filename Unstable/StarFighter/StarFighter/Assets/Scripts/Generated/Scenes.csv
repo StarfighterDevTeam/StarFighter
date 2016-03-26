@@ -1,4 +1,6 @@
 #scene_name,filename,display_name,link_UP,link_DOWN,link_RIGHT,link_LEFT,HazardBreak,Level
+Vanguard_HubIntro,Assets/Scripts/Scenes/Generated/Vanguard_HubIntro.csv,Vanguard Hub Intro,Vanguard_VIntro,0,0,0,0,1
+Vanguard_VIntro,Assets/Scripts/Scenes/Generated/Vanguard_VIntro.csv,Vanguard V Intro,Vanguard_Hub0,0,0,0,0,1
 Vanguard_Hub0,Assets/Scripts/Scenes/Generated/Vanguard_Hub0.csv,Vanguard Hub 0,Vanguard_V1,0,0,0,0,1
 Vanguard_Hub1,Assets/Scripts/Scenes/Generated/Vanguard_Hub1.csv,Vanguard Hub 1,Vanguard_V3,Vanguard_V1,Vanguard_H1,0,0,3
 Vanguard_Hub2,Assets/Scripts/Scenes/Generated/Vanguard_Hub2.csv,Vanguard Hub 2,Vanguard_V5,Vanguard_V3,Vanguard_H3,0,0,5

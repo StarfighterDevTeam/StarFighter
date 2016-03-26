@@ -1,0 +1,10 @@
+#,filename,width,height,vspeed,Vertical/Horizontal,Size Stellarmap,
+bg,Assets/2D/Backgrounds/BGVertical_1.png,1080,5400,200,V,1,
+#,enemies_name,proba,enemy_class,level,spawnCost,repeatChance,missChance
+enemy,V_Alpha1,1,1,1,8,0,0.2
+enemy,V_Zeta_01,1,0,1,0.4,0.5,0.7
+enemy,V_Zeta_02,1,0,1,0.4,0.5,0.7
+enemy,V_Zeta_03,1,0,1,0.4,0.5,0.7
+enemy,V_Zeta_04,1,0,1,0.4,0.5,0.7
+enemy,V_Zeta_05,1,0,1,0.4,0.5,0.7
+enemy,V_Zeta_06,1,0,1,0.4,0.5,0.7

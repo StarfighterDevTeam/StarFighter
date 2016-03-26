@@ -26,6 +26,7 @@ void InGameState::Initialize(Player player)
 	if (!Ship::LoadPlayerMoney(MONEY_SAVE_FILE, m_playerShip))
 	{
 		//or create a new save file
+		m_playerShip->m_money = STARTING_MONEY;
 		Ship::SavePlayerMoney(MONEY_SAVE_FILE, m_playerShip);
 	}
 
@@ -56,7 +57,7 @@ void InGameState::Initialize(Player player)
 	else
 	{
 		//New game save
-		player.m_currentSceneFile = "Vanguard_Hub0";
+		player.m_currentSceneFile = "Vanguard_HubIntro";
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer(PLAYER_SAVE_FILE);
 	}

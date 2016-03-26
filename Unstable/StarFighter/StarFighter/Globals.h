@@ -24,6 +24,8 @@
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
+#define STARTING_MONEY							50
+
 #define DEFAULT_MUSIC_VOLUME					50
 #define DEFAULT_SFX_VOLUME						50
 #define MUSIC_FADE_IN_TIME						2.f
