@@ -143,6 +143,18 @@ void SFPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
 	//see override function in SFInventoryPanel and other types of SF panels
 }
 
+float SFPanel::GetDuration()
+{
+	return -1;
+	//see override function in SFDialogPanel and other types of SF panels
+}
+
+float SFPanel::GetDurationClockElpased()
+{
+	return -1;
+	//see override function in SFDialogPanel and other types of SF panels
+}
+
 int SFPanel::GetTeleportationCost()
 {
 	return -1;

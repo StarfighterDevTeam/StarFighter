@@ -57,6 +57,8 @@ public:
 	virtual void SetMapViewOffset(sf::Vector2f offset);
 	virtual SFItemStatsPanel* GetItemStatsPanel();
 	virtual void SetItemStatsPanel(SFItemStatsPanel* panel);
+	virtual float GetDuration();
+	virtual float GetDurationClockElpased();
 	
 	virtual Dialog* GetDialog();
 
