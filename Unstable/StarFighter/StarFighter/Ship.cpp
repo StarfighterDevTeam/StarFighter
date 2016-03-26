@@ -82,13 +82,13 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	}
 
 	//feedback
-	//sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
-	//SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 18, _white, getPosition());
-	//sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
-	//m_recall_text = new SFTextPop(text_feedback, 0, -1, 0, this, 0, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
-	//m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
-	//delete text_feedback;
-	//(*CurrentGame).addToFeedbacks(m_recall_text);
+	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
+	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 14, _white, getPosition());
+	sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+	m_recall_text = new SFTextPop(text_feedback, 0, -1, 0, this, 0, sf::Vector2f(0, -size.y / 2));
+	m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
+	delete text_feedback;
+	(*CurrentGame).addToFeedbacks(m_recall_text);
 
 	Init();
 }
@@ -480,7 +480,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		if (m_weapon->isFiringReady(deltaTime, hyperspeedMultiplier))
 		{
-			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY && !m_actions_states[Action_Hyperspeeding])
+			if (!m_disable_fire && (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() > END_OF_DIALOGS_DELAY)
 			{
 				if (m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
 				{
@@ -762,14 +762,28 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
 			m_movingX = inputs_direction.x != 0;
 			m_movingY = inputs_direction.y != 0;
-			ManageAcceleration(inputs_direction);
+			if (!m_actions_states[Action_Recalling])
+			{
+				ManageAcceleration(inputs_direction);
+			}
 
 			//IDLE (COMBAT)
 			if (m_HUD_state == HUD_Idle)
 			{
+				//Recalling back to last hub
+				UpdateAction(Action_Recalling, Input_Hold, !m_disableRecall);
+				if (m_actions_states[Action_Recalling])
+				{
+					Recalling();
+				}
+				else
+				{
+					m_recall_text->m_visible = false;
+				}
+
 				//Slow_motion and hyperspeed
+				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disableHyperspeed && !m_actions_states[Action_Recalling]);
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
-				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disableHyperspeed);
 
 				if (m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0)
 				{
@@ -780,33 +794,22 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						m_hyperspeed_fuel = 0;
 					}
 				}
-				else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0)
-				{
-					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
-					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
-					if (m_hyperspeed_fuel < 0)
-					{
-						m_hyperspeed_fuel = 0;
-					}
-				}
-				else
+				//else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0 && !m_actions_states[Action_Recalling] && m_recall_clock.getElapsedTime().asSeconds() > MIN_TIME_FOR_RECALL_TO_HUB)
+				//{
+				//	(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
+				//	m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
+				//	if (m_hyperspeed_fuel < 0)
+				//	{
+				//		m_hyperspeed_fuel = 0;
+				//	}
+				//}
+				else if (!m_actions_states[Action_Recalling])
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
 				}
 
-				//Recalling back to last hub
-				UpdateAction(Action_Recalling, Input_Hold, !m_disableRecall);
-				if (m_actions_states[Action_Recalling])
-				{
-					Recalling();
-				}
-				else
-				{
-					m_recall_clock.restart();
-				}
-
 				//Auto fire option (F key)
-				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire))
+				if (UpdateAction(Action_AutomaticFire, Input_Tap, !m_disable_fire && !m_actions_states[Action_Recalling]))
 				{
 					//Bots automatic fire option
 					m_automatic_fire = m_actions_states[Action_AutomaticFire];
@@ -817,7 +820,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//Firing button
-				UpdateAction(Action_Firing, Input_Hold, !m_disable_fire);
+				UpdateAction(Action_Firing, Input_Hold, !m_disable_fire && !m_actions_states[Action_Recalling]);
 
 				//Weapon firing
 				ManageFiring(deltaTime, hyperspeedMultiplier);
@@ -828,7 +831,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//Braking and speed malus on firing
-				UpdateAction(Action_Braking, Input_Hold, true);
+				UpdateAction(Action_Braking, Input_Hold, !m_actions_states[Action_Recalling]);
 				if (m_actions_states[Action_Braking] || m_actions_states[Action_Firing] || m_actions_states[Action_AutomaticFire])
 				{
 					m_speed.x *= SHIP_BRAKING_MALUS_SPEED;
@@ -1286,16 +1289,26 @@ void Ship::GarbagingItem()
 
 void Ship::Recalling()
 {
-	//ostringstream ss;
-	//ss << "Recalling...(" << (int)(m_recall_clock.getElapsedTime().asSeconds() * 100 / TIME_FOR_RECALL_TO_HUB) << ")";
-	//m_recall_text->setString(ss.str());
-	//m_recall_text->m_visible = true;
+	if (!m_disableSlowmotion)
+	{
+		(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
+	}
+
+	ostringstream ss;
+	ss << "Recalling...(" << (int)(m_recall_clock.getElapsedTime().asSeconds() * 100 / TIME_FOR_RECALL_TO_HUB) << "%)";
+	m_recall_text->setString(ss.str());
+
+	if (m_recall_clock.getElapsedTime().asSeconds() > MIN_TIME_FOR_RECALL_TO_HUB && !m_recall_text->m_visible)
+	{
+		m_recall_text->m_visible = true;
+		m_recall_clock.restart();
+	}
 
 	if (m_recall_clock.getElapsedTime().asSeconds() > TIME_FOR_RECALL_TO_HUB)
 	{
 		Teleport(m_respawnSceneName);
 		m_recall_clock.restart();
-		//m_recall_text->m_visible = false;
+		m_recall_text->m_visible = false;
 	}
 }
 
@@ -1377,7 +1390,7 @@ void Ship::ScreenBorderContraints()
 void Ship::IdleDecelleration(sf::Time deltaTime)
 {
 	//idle deceleration
-	if (!m_movingX || m_HUD_state == HUD_OpeningEquipment)
+	if (!m_movingX || m_HUD_state == HUD_OpeningEquipment || m_actions_states[Action_Recalling])
 	{
 		m_speed.x -= (m_speed.x) * deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 
@@ -1385,7 +1398,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 			m_speed.x = 0;
 	}
 
-	if (!m_movingY || m_HUD_state == HUD_OpeningEquipment)
+	if (!m_movingY || m_HUD_state == HUD_OpeningEquipment || m_actions_states[Action_Recalling])
 	{
 		m_speed.y -= (m_speed.y)*deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 

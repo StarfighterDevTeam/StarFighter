@@ -17,6 +17,7 @@ public:
 	SFText* Clone();
 	bool m_visible;
 	bool m_GarbageMe;
+	bool m_DontGarbageMe;
 };
 
 #endif // SFTEXT_H_INCLUDED

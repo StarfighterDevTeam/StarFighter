@@ -785,7 +785,7 @@ void Game::garbageLayer(LayerType layer, bool only_offscene)
 	{
 		for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
 		{
-			if (*it == NULL)
+			if (*it == NULL || (*it)->m_DontGarbageMe)
 				continue;
 
 			(*it)->m_visible = false;

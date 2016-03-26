@@ -93,7 +93,6 @@ void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 	if (m_target)
 	{
 		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width / 2 + m_offset.x, m_target->getPosition().y - m_target->m_size.y / 2 + m_offset.y - newspeed * deltaTime.asSeconds()));
-		printf("pos x: %f, pos y: %f\n", getPosition().x, getPosition().y);
 	}
 	else
 	{

@@ -10,6 +10,7 @@ SFText::SFText(const sf::Font* font, unsigned int size, sf::Color color, sf::Vec
 
 	m_visible = true;
 	m_GarbageMe = false;
+	m_DontGarbageMe = false;
 }
 
 void SFText::update(Time deltaTime, float hyperspeedMultiplier)
