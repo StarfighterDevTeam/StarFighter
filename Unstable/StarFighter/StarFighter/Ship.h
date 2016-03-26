@@ -53,10 +53,10 @@ enum PlayerActions
 	Action_Braking,
 	Action_Hyperspeeding,
 	Action_Slowmotion,
+	Action_Recalling,
 	Action_OpeningHud,
 	Action_ChangingResolution,
 	Action_AutomaticFire,
-	Action_Recall,
 	Action_DebugCommand,
 	NBVAL_PlayerActions,
 };
@@ -145,6 +145,7 @@ public :
 	void EquipItem();
 	void DesequipItem();
 	void ContinueDialog();
+	void Recalling();
 	void Teleport(string destination_name);
 	void CenterMapView(sf::Vector2f offset = sf::Vector2f(0, 0));
 
@@ -181,17 +182,19 @@ public :
 	bool m_disable_inputs;
 	Aura* m_combo_aura;
 	Aura* m_trail;
-	bool m_disabledHyperspeed;
+	bool m_disableHyperspeed;
+	bool m_disableRecall;
 	bool m_disableSlowmotion;
 	bool m_is_asking_scene_transition;
+	SFTextPop* m_recall_text;
 
 	int getFighterIntStatValue(FighterStats stat) override;
 	float getFighterFloatStatValue(FighterStats stat) override;
 
-	bool m_isFocusedOnHud;
-
 	string m_respawnSceneName;
 	int m_last_hazard_level_played;
+
+	sf::Clock m_recall_clock;
 
 	int m_graze_count;
 	int m_graze_level;

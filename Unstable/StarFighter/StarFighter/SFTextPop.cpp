@@ -62,7 +62,7 @@ void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 		setColor(Color(getColor().r, getColor().g, getColor().b, m_alpha));
 	}
 	//fade out
-	else if (m_time.asSeconds() > m_time_fade_in + m_time_not_faded)
+	else if (m_time_not_faded >= 0 && m_time.asSeconds() > m_time_fade_in + m_time_not_faded)
 	{
 		Uint8 alpha_change = (Uint8)(ceil(deltaTime.asSeconds() * hyperspeedMultiplier * 255 / m_time_fade_out));
 		if (m_alpha - alpha_change > 0)
@@ -93,6 +93,7 @@ void SFTextPop::update(Time deltaTime, float hyperspeedMultiplier)
 	if (m_target)
 	{
 		setPosition(sf::Vector2f(m_target->getPosition().x - getGlobalBounds().width / 2 + m_offset.x, m_target->getPosition().y - m_target->m_size.y / 2 + m_offset.y - newspeed * deltaTime.asSeconds()));
+		printf("pos x: %f, pos y: %f\n", getPosition().x, getPosition().y);
 	}
 	else
 	{

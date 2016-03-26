@@ -70,23 +70,6 @@ void InGameState::Initialize(Player player)
 	//Creating current scene
 	SpawnInScene(m_playerShip->m_currentScene_name);
 
-	if ((*CurrentGame).m_direction != NO_DIRECTION)
-	{
-		(*CurrentGame).playerShip->m_disable_fire = false;
-		(*CurrentGame).playerShip->m_disabledHyperspeed = false;
-		(*CurrentGame).playerShip->m_disableSlowmotion = false;
-		(*CurrentGame).playerShip->m_disable_bots = false;
-		(*CurrentGame).playerShip->SetBotsVisibility(true);
-	}
-	else
-	{
-		(*CurrentGame).playerShip->m_disable_fire = true;
-		(*CurrentGame).playerShip->m_disabledHyperspeed = true;
-		(*CurrentGame).playerShip->m_disableSlowmotion = true;
-		(*CurrentGame).playerShip->m_disable_bots = true;
-		(*CurrentGame).playerShip->SetBotsVisibility(false);
-	}
-	//(*CurrentGame).playerShip->GenerateFakeShip((*CurrentGame).playerShip);
 	(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -309,7 +292,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).m_vspeed = 0;
 
 					//Disable hyperspeed capacity
-					(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+					(*CurrentGame).playerShip->m_disableHyperspeed = true;
+					(*CurrentGame).playerShip->m_disableRecall = true;
 
 					//Stop spawning enemies
 					m_currentScene->m_generating_enemies = false;
@@ -476,18 +460,20 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if (m_nextScene->m_direction == NO_DIRECTION)
 				{
 					m_IG_State = HUB_ROAMING;
-					(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+					(*CurrentGame).playerShip->m_disableHyperspeed = true;
 					(*CurrentGame).playerShip->m_disableSlowmotion = true;
 					(*CurrentGame).playerShip->m_disable_bots = true;
+					(*CurrentGame).playerShip->m_disableRecall = true;
 					(*CurrentGame).playerShip->SetBotsVisibility(false);
 				}
 				else
 				{
 					m_IG_State = SCROLLING;
 					(*CurrentGame).playerShip->m_disable_fire = false;
-					(*CurrentGame).playerShip->m_disabledHyperspeed = false;
+					(*CurrentGame).playerShip->m_disableHyperspeed = false;
 					(*CurrentGame).playerShip->m_disableSlowmotion = false;
 					(*CurrentGame).playerShip->m_disable_bots = false;
+					(*CurrentGame).playerShip->m_disableRecall = false;
 					(*CurrentGame).playerShip->SetBotsVisibility(true);
 					(*CurrentGame).playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
@@ -640,9 +626,10 @@ void InGameState::RespawnInLastHub()
 	SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
 
 	//Applying hub modifiers to gameplay
-	(*CurrentGame).playerShip->m_disabledHyperspeed = true;
+	(*CurrentGame).playerShip->m_disableHyperspeed = true;
 	(*CurrentGame).playerShip->m_disableSlowmotion = true;
 	(*CurrentGame).playerShip->m_disable_fire = true;
+	(*CurrentGame).playerShip->m_disableRecall = true;
 	m_IG_State = HUB_ROAMING;
 
 	//resetting ship
@@ -718,11 +705,23 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
 		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
+			(*CurrentGame).playerShip->m_disable_fire = false;
+			(*CurrentGame).playerShip->m_disableHyperspeed = false;
+			(*CurrentGame).playerShip->m_disableSlowmotion = false;
+			(*CurrentGame).playerShip->m_disable_bots = false;
+			(*CurrentGame).playerShip->m_disableRecall = false;
+			(*CurrentGame).playerShip->SetBotsVisibility(true);
 			m_IG_State = SCROLLING;
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
 		}
 		else
 		{
+			(*CurrentGame).playerShip->m_disable_fire = true;
+			(*CurrentGame).playerShip->m_disableHyperspeed = true;
+			(*CurrentGame).playerShip->m_disableSlowmotion = true;
+			(*CurrentGame).playerShip->m_disable_bots = true;
+			(*CurrentGame).playerShip->m_disableRecall = true;
+			(*CurrentGame).playerShip->SetBotsVisibility(false);
 			m_IG_State = HUB_ROAMING;
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
 		}

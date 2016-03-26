@@ -31,8 +31,9 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_shield_regen = 0;
 	m_disable_inputs = false;
 	m_disable_fire = false;
-	m_disabledHyperspeed = false;
+	m_disableHyperspeed = false;
 	m_disableSlowmotion = false;
+	m_disableRecall = false;
 	m_graze_count = 0;
 	m_graze_level = 0;
 	m_last_hazard_level_played = 0;
@@ -64,7 +65,6 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_targetShop = NULL;
 	m_equipment_loot = NULL;
 	m_weapon_loot = NULL;
-	m_isFocusedOnHud = false;
 	m_previously_focused_item = NULL;
 
 	m_SFPanel = NULL;
@@ -80,6 +80,15 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 		m_inputs_states[i] = Input_Release;
 		m_actions_states[i] = false;
 	}
+
+	//feedback
+	//sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
+	//SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 18, _white, getPosition());
+	//sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+	//m_recall_text = new SFTextPop(text_feedback, 0, -1, 0, this, 0, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
+	//m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
+	//delete text_feedback;
+	//(*CurrentGame).addToFeedbacks(m_recall_text);
 
 	Init();
 }
@@ -117,6 +126,11 @@ Ship::~Ship()
 	{
 		m_trail->m_GarbageMe = true;
 		m_trail->m_visible = false;
+	}
+	if (m_recall_text)
+	{
+		m_recall_text->m_GarbageMe = true;
+		m_recall_text->m_visible = false;
 	}
 }
 
@@ -325,6 +339,7 @@ void Ship::UpdateInputStates()
 	GetInputState(InputGuy::isBraking(), Action_Braking);
 	GetInputState(InputGuy::isHyperspeeding(), Action_Hyperspeeding);
 	GetInputState(InputGuy::isSlowMotion(), Action_Slowmotion);
+	GetInputState(InputGuy::isSlowMotion(), Action_Recalling);
 	GetInputState(InputGuy::isOpeningHud(), Action_OpeningHud);
 	GetInputState(InputGuy::isChangingResolution(), Action_ChangingResolution);
 	GetInputState(InputGuy::setAutomaticFire(), Action_AutomaticFire);
@@ -754,7 +769,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			{
 				//Slow_motion and hyperspeed
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
-				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disabledHyperspeed);
+				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disableHyperspeed);
 
 				if (m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0)
 				{
@@ -777,6 +792,17 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				else
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
+				}
+
+				//Recalling back to last hub
+				UpdateAction(Action_Recalling, Input_Hold, !m_disableRecall);
+				if (m_actions_states[Action_Recalling])
+				{
+					Recalling();
+				}
+				else
+				{
+					m_recall_clock.restart();
 				}
 
 				//Auto fire option (F key)
@@ -887,10 +913,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		}
 		
 		IdleDecelleration(deltaTime);
-	}
-	else
-	{
-		m_isFocusedOnHud = false;
 	}
 }
 
@@ -1262,6 +1284,21 @@ void Ship::GarbagingItem()
 	}
 }
 
+void Ship::Recalling()
+{
+	//ostringstream ss;
+	//ss << "Recalling...(" << (int)(m_recall_clock.getElapsedTime().asSeconds() * 100 / TIME_FOR_RECALL_TO_HUB) << ")";
+	//m_recall_text->setString(ss.str());
+	//m_recall_text->m_visible = true;
+
+	if (m_recall_clock.getElapsedTime().asSeconds() > TIME_FOR_RECALL_TO_HUB)
+	{
+		Teleport(m_respawnSceneName);
+		m_recall_clock.restart();
+		//m_recall_text->m_visible = false;
+	}
+}
+
 void Ship::SettingTurnAnimations()
 {
 	//setting animation
@@ -1340,7 +1377,7 @@ void Ship::ScreenBorderContraints()
 void Ship::IdleDecelleration(sf::Time deltaTime)
 {
 	//idle deceleration
-	if (!m_movingX || m_isFocusedOnHud == true)
+	if (!m_movingX || m_HUD_state == HUD_OpeningEquipment)
 	{
 		m_speed.x -= (m_speed.x) * deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 
@@ -1348,7 +1385,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 			m_speed.x = 0;
 	}
 
-	if (!m_movingY || m_isFocusedOnHud == true)
+	if (!m_movingY || m_HUD_state == HUD_OpeningEquipment)
 	{
 		m_speed.y -= (m_speed.y)*deltaTime.asSeconds()*(getFighterFloatStatValue(Fighter_Deceleration) / 100);
 
