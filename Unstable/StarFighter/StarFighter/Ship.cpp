@@ -579,7 +579,15 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		if (m_HUD_state == HUD_Dialog && m_HUD_SFPanel)
 		{
 			//Continue
-			if (m_inputs_states[Action_Firing] == Input_Tap)
+			//if (m_inputs_states[Action_Firing] == Input_Tap)
+			//{
+			//	ContinueDialog();
+			//}
+			if (m_SFPanel && m_SFPanel->GetDuration() == 0 && m_inputs_states[Action_Firing] == Input_Tap)
+			{
+				ContinueDialog();
+			}
+			else if (m_SFPanel && m_SFPanel->GetDuration() > 0 && m_SFPanel->GetDurationClockElpased() > m_SFPanel->GetDuration())
 			{
 				ContinueDialog();
 			}
@@ -1632,11 +1640,11 @@ void Ship::GetPortal(GameObject* object)
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
 
-	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_state == PortalOpen)
+	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
 	{
 		m_is_asking_SFPanel = SFPanel_Portal;
 	}
-	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_state == PortalOpen)
+	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
 	{
 		m_is_asking_SFPanel = SFPanel_Action;
 	}

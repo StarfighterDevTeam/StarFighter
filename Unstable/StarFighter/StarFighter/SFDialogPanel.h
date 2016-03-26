@@ -12,11 +12,15 @@ public:
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
 	Dialog* GetDialog() override;
+	float GetDuration() override;
+	float GetDurationClockElpased() override;
 
 	Dialog* m_dialog;
 	GameObject m_picture;
 	sf::Vector2f m_target_position;
 	bool m_is_downscreen;
+	sf::Clock m_duration_clock;
+	GameObject m_arrow;
 };
 
 #endif // SFDIALOGPANEL_H_INCLUDED

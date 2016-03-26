@@ -91,3 +91,13 @@ Dialog* SFDialogPanel::GetDialog()
 {
 	return m_dialog;
 }
+
+float SFDialogPanel::GetDuration()
+{
+	return m_dialog->m_duration;
+}
+
+float SFDialogPanel::GetDurationClockElpased()
+{
+	return m_duration_clock.getElapsedTime().asSeconds();
+}
