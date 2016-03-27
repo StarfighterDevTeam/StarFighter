@@ -208,9 +208,14 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 		//loading optional scripts
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("script") == 0)
 		{
-			for (int j = 1; j < NBVAL_SceneScripts; j++)
+			for (int j = 0; j < NBVAL_SceneScripts; j++)
 			{
-				m_scripts[j] = (bool)stoi((*CurrentGame).m_sceneConfigs[name][i][j]);
+				m_scripts[j] = (bool)stoi((*CurrentGame).m_sceneConfigs[name][i][j+1]);
+			}
+
+			if (m_scripts[SceneScript_PortalOpenDuringBoss])
+			{
+				m_bg->SetPortalsState(PortalOpen);
 			}
 		}
 

@@ -8,3 +8,5 @@ enemy,V_Zeta_03,1,0,1,0.25,0.2,0.7
 enemy,V_Zeta_04,1,0,1,0.25,0.2,0.7
 enemy,V_Zeta_05,1,0,1,0.25,0.2,0.7
 enemy,V_Zeta_06,1,0,1,0.25,0.2,0.7
+#,portal_open_during_boss,,,,,,
+script,1,,,,,,

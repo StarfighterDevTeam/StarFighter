@@ -33,7 +33,6 @@ enum ScenesData
 
 enum SceneScriptData
 {
-	SceneScript_Data,
 	SceneScript_PortalOpenDuringBoss,
 	NBVAL_SceneScripts,
 };

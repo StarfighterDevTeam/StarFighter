@@ -1,14 +1,14 @@
-Engine 0
-Armor 0
+Engine Engine 1 1 19.1135 Assets/2D/Equipment/Thruster.png 48 48 1 0 0 0 1 101 0 0 0 0 0 0
+Armor Armor 1 1 16.5377 Assets/2D/Equipment/Armor.png 48 48 1 0 0 0 0 0 101 0 0 0 10 0
 Shield 0
-Module 0
-Weapon 0
-0
-0
-0
-0
-0
-0
+Module Module 1 1 12.8987 Assets/2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 0 0 Bot Assets/2D/bot.png 32 32 1 -50 0 0 0 Laser Assets/2D/Equipment/laser_blue1.png 48 48 1 0.099 0 0.8 2 32 0 0 0 Ammo 5 2200 0 Assets/2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
+Weapon Laser 1 1 18.176 Assets/2D/Equipment/laser_blue1.png 48 48 1 0.099 0 0.8 2 43 0 0 0 Ammo 5 2200 0 Assets/2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
+Engine Engine 1 1 16.1187 Assets/2D/Equipment/Thruster.png 48 48 1 0 0 0 1.01 100 0 0 0 0 0 0
+Shield Shield 1 1 20.6931 Assets/2D/Equipment/Shield.png 48 48 1 0 0 0 0 0 0 101 10 0 0 0
+Module Module 1 1 18.3987 Assets/2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 0 0 Bot Assets/2D/bot.png 32 32 1 -50 0 0 0 Laser Assets/2D/Equipment/laser_blue1.png 48 48 1 0.099 0 0.8 2 13 0 0 0 Ammo 5 2200 0 Assets/2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
+Engine Engine 1 1 15.7619 Assets/2D/Equipment/Thruster.png 48 48 1 0 0 0 1.01 100 0 0 0 0 0 0
+Weapon Laser 1 1 17.5088 Assets/2D/Equipment/laser_blue1.png 48 48 1 0.099 0 0.8 2 23 0 0 0 Ammo 5 2200 0 Assets/2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
+Armor Armor 1 1 20.5928 Assets/2D/Equipment/Armor.png 48 48 1 0 0 0 0 0 101 0 0 0 10 0
 0
 0
 0

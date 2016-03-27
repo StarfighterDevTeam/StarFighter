@@ -136,11 +136,14 @@ public:
 	string m_next_music_name;
 	Music_Bank m_curMusic_type;
 
+	//utilitary methods
+	static void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
+	static void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
+	static bool isVectorEmpty(vector <GameObject*>* vector);
+
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);
-	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
-	void AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector);
-	bool isVectorEmpty(vector <GameObject*>* vector);
+	
 	Clock m_sceneChronometer;
 
 	float m_movementClock;

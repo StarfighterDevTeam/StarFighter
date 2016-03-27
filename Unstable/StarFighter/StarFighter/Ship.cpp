@@ -1034,6 +1034,7 @@ void Ship::MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Ti
 void Ship::BuyingItem()
 {
 	bool success = false;
+	int shop_index = m_SFPanel->GetFocusedIntIndex();
 	//case of weapon hovered
 	if (m_SFPanel && m_SFPanel->GetFocusedItem()->m_weapon_loot)
 	{
@@ -1108,7 +1109,7 @@ void Ship::BuyingItem()
 		(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 
 		//save shop: flag object as missing
-		m_targetShop->m_items.erase(m_targetShop->m_items.begin() + m_SFPanel->GetFocusedIntIndex());
+		m_targetShop->m_items[shop_index] = NULL;
 	}
 }
 
@@ -1117,8 +1118,6 @@ void Ship::SellingItem()
 	//interaction
 	if (m_HUD_SFPanel && m_SFPanel && m_HUD_SFPanel->GetFocusedItem())
 	{
-		
-
 		//move item
 		int focused_grid = m_HUD_SFPanel->GetFocusedGrid();
 		int focused_index = m_HUD_SFPanel->GetGrid(false, focused_grid)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
@@ -1127,7 +1126,7 @@ void Ship::SellingItem()
 		if (success)
 		{
 			//save shop: flag object as added into shop
-			m_targetShop->m_items.push_back(m_HUD_SFPanel->GetFocusedItem());
+			Game::AddGameObjectToVector(m_HUD_SFPanel->GetFocusedItem(), &m_targetShop->m_items);
 
 			//finish moving the object
 			m_HUD_SFPanel->GetGrid(false, focused_grid)->setCellPointerForIntIndex(focused_index, NULL);
@@ -1543,6 +1542,7 @@ GameObject* Ship::CloneEquipmentIntoGameObject(Equipment* new_equipment)
 
 	GameObject* capsule = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), new_equipment->m_textureName, new_equipment->m_size, sf::Vector2f(new_equipment->m_size.x / 2, new_equipment->m_size.y / 2), new_equipment->m_frameNumber);
 	capsule->setEquipmentLoot(new_equipment->Clone());
+	capsule->m_display_name = new_equipment->m_display_name;
 
 	return capsule;
 }
@@ -1553,6 +1553,7 @@ GameObject* Ship::CloneWeaponIntoGameObject(Weapon* new_weapon)
 
 	GameObject* capsule = new GameObject(new_weapon->getPosition(), sf::Vector2f(0, 0), new_weapon->m_textureName, new_weapon->m_size, sf::Vector2f(new_weapon->m_size.x / 2, new_weapon->m_size.y / 2), new_weapon->m_frameNumber);
 	capsule->setWeaponLoot(new_weapon->Clone());
+	capsule->m_display_name = new_weapon->m_display_name;
 
 	return capsule;
 }

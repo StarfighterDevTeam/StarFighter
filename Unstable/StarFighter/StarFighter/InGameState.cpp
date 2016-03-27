@@ -718,6 +718,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			(*CurrentGame).playerShip->SetBotsVisibility(true);
 			m_IG_State = SCROLLING;
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
+			(*CurrentGame).PlayMusic(Music_Scene);
 		}
 		else
 		{
@@ -729,6 +730,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			(*CurrentGame).playerShip->SetBotsVisibility(false);
 			m_IG_State = HUB_ROAMING;
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
+			(*CurrentGame).PlayMusic(Music_Hub);
 		}
 		m_playerShip->setPosition(ship_pos);
 

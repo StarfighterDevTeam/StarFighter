@@ -11,8 +11,13 @@ Shop::~Shop()
 	size_t itemsVectorSize = m_items.size();
 	for (size_t i = 0; i < itemsVectorSize; i++)
 	{
-		delete m_items[i];
+		if (m_items[i])
+		{
+			delete m_items[i];
+			m_items[i] = NULL;
+		}
 	}
+	m_items.clear();
 }
 
 void Shop::update(sf::Time deltaTime, float hyperspeedMultiplier)

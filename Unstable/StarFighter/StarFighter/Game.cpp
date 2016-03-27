@@ -43,8 +43,8 @@ void Game::init(RenderWindow* window)
 	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
 	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
-	PlayMusic(Music_Hub);
 
+	//Fonts
 	try
 	{
 		m_font[Font_Arial] = new sf::Font();
@@ -84,6 +84,11 @@ void Game::SetMusicVolume(bool activate_music)
 
 void Game::PlayMusic(Music_Bank music)
 {
+	if (music == m_curMusic_type)
+	{
+		return;
+	}
+
 	m_curMusic_type = music;
 
 	if (!m_Music_Activated)
@@ -241,7 +246,7 @@ void Game::addToFeedbacks(SFText* text)
 {
 	if (text)
 	{
-		AddGameObjectToVector(text, &this->m_sceneFeedbackSFTexts);
+		AddSFTextToVector(text, &this->m_sceneFeedbackSFTexts);
 	}
 }
 
@@ -674,7 +679,7 @@ void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* v
 	vector->push_back(pGameObject);
 }
 
-void Game::AddGameObjectToVector(SFText* pSFText, vector<SFText*>* vector)
+void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)
 {
 	const size_t vectorSize = vector->size();
 	for (size_t i = 0; i < vectorSize; i++)
