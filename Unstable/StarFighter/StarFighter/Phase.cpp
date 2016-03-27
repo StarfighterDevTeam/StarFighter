@@ -4,6 +4,7 @@ Phase::Phase()
 {
 	m_hasWakeUp = false;
 	m_hasWelcomeShot = false;
+	m_freeze_player = false;
 	m_Pattern = new PatternBobby();
 }
 

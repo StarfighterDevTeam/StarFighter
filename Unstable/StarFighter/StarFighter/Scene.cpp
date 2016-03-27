@@ -17,6 +17,11 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 	m_hazardbreak_has_occurred = false;
 	m_canHazardBreak = false;
 
+	for (int i = 0; i < NBVAL_SceneScripts; i++)
+	{
+		m_scripts[i] = false;
+	}
+
 	int p = 0;
 	int enemy_count = 0;
 	
@@ -194,9 +199,19 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			sf::Vector2f boss_pos = sf::Vector2f(atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
 			boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
 			boss->m_enemy->setPosition(boss_pos);
+			boss->m_enemy->setRotation(stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_ROTATION]));
 
 			m_boss_list.push_back(boss);
 			m_generating_boss = true;
+		}
+
+		//loading optional scripts
+		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("script") == 0)
+		{
+			for (int j = 1; j < NBVAL_SceneScripts; j++)
+			{
+				m_scripts[j] = (bool)stoi((*CurrentGame).m_sceneConfigs[name][i][j]);
+			}
 		}
 
 		if (enemy_count != 0 && m_direction != NO_DIRECTION)
@@ -454,7 +469,7 @@ void Scene::GenerateBoss()
 		m_boss->m_enemy_class = (EnemyClass)((*it)->m_enemyclass);
 		(*CurrentGame).addToScene(m_boss, EnemyObjectLayer, EnemyObject);
 
-		m_boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+		m_boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) + m_boss->getRotation());
 		m_boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
 		//counting spawned enemies

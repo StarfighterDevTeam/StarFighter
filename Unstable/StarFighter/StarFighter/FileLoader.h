@@ -63,6 +63,7 @@ enum SceneDataBoss
 	BOSS_CLASS,//2
 	BOSS_SPAWN_X,//3
 	BOSS_SPAWN_Y,//4
+	BOSS_SPAWN_ROTATION,//4
 	BOSS_LEVEL,//5
 };
 

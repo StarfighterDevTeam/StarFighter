@@ -31,6 +31,13 @@ enum ScenesData
 	SCENE_LEVEL,//8
 };
 
+enum SceneScriptData
+{
+	SceneScript_Data,
+	SceneScript_PortalOpenDuringBoss,
+	NBVAL_SceneScripts,
+};
+
 class Scene
 {
 public:
@@ -55,6 +62,7 @@ public:
 	bool m_generating_boss;
 	sf::Clock m_spawnClock;
 	int m_level;
+	bool m_scripts[NBVAL_SceneScripts];
 
 	int getSceneHazardLevelUnlockedValue();
 	void setSceneHazardLevelUnlockedValue(int hazard_unlocked_value);

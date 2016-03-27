@@ -513,6 +513,7 @@ Enemy* Enemy::Clone()
 	enemy->m_radius = this->m_radius;
 
 	enemy->m_rotation_speed = this->m_rotation_speed;
+	enemy->setRotation(this->getRotation());
 
 	if (!m_phases.empty())
 	{
@@ -804,6 +805,15 @@ void Enemy::setPhase(Phase* phase)
 				m_bouncing = BouncingVertical;
 				break;
 			}
+			case FreezePlayer:
+			{	
+				//todo
+				break;
+			}
+			default:
+			{
+
+			}
 		}
 	}
 
@@ -977,6 +987,10 @@ Phase* Enemy::LoadPhase(string name)
 					else if ((*it)[PHASE_MODIFIER + i].compare("bouncingV") == 0)
 					{
 						l_new_modifier = BouncingV;
+					}
+					else if ((*it)[PHASE_MODIFIER + i].compare("freeze") == 0)
+					{
+						l_new_modifier = FreezePlayer;
 					}
 				}
 

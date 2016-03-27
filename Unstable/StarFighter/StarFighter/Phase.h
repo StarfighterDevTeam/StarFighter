@@ -95,6 +95,7 @@ enum Modifier
 	Bouncing,//bounces on scene borders
 	BouncingH,//bounces on horizontal scene borders only
 	BouncingV,//bounces on horizontal scene borders only
+	FreezePlayer,//disable player inputs
 };
 
 //forward declaration
@@ -114,6 +115,7 @@ public:
 	float m_vspeed;
 	float m_rotation_speed;
 	bool m_hasWakeUp;
+	bool m_freeze_player;
 	bool m_hasWelcomeShot;
 	vector<ConditionTransition*> m_transitions_list;
 	string m_wake_up_name;
