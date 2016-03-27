@@ -75,6 +75,7 @@ public:
 	bool m_reset_facing;
 	BouncingType m_bouncing;
 	int m_shots_fired;
+	bool m_input_blocker;
 
 	sf::RectangleShape m_armorBar;
 	sf::RectangleShape m_armorBarContainer;

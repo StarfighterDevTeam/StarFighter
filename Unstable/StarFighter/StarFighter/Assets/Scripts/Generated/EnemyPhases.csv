@@ -58,11 +58,11 @@ V_Gamma3_Routine,0,V_Gamma3_laserL,V_laserM_Vfast,0,0,V_Gamma3_laserR,V_laserM_V
 V_Gamma3_Exit,-80,V_Gamma3_laserL,V_laserM_Vfast,0,0,V_Gamma3_laserR,V_laserM_Vfast,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,0,0,0,0,,0,,,,0,,,,0
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 V_AlphaGold_Intro_Entry,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,,wakeUp,,,V_AlphaGold_Intro_Move,0,,,,0
-V_AlphaGold_Intro_Move,-200,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,freeze,ghost,0,0,,wakeUp,greater,3,V_AlphaGold_Intro_Warning,0,,,,0
-V_AlphaGold_Intro_Warning,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,freeze,ghost,0,0,,0,greater,3,V_AlphaGold_Intro_Last,0,,,,0
+V_AlphaGold_Intro_Move,-200,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,,wakeUp,greater,3,V_AlphaGold_Intro_Warning,0,,,,0
+V_AlphaGold_Intro_Warning,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,,0,greater,3,V_AlphaGold_Intro_Last,0,,,,0
 V_BetaGold_Intro_Entry,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,,proximity,greater,600,V_BetaGold_Intro_Move,0,,,,0
 V_BetaGold_Intro_Move,-200,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,freeze,ghost,V_AlphaGold_Intro,0,,positionV,lesser,800,V_BetaGold_Intro_Warning,0,,,,0
-V_BetaGold_Intro_Warning,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,V_AlphaGold_Intro,0,,proximity,greater,300,V_BetaGold_Intro_Move2,0,,,,Dial_Hub_Intro_01
+V_BetaGold_Intro_Warning,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,V_AlphaGold_Intro,0,,proximity,greater,570,V_BetaGold_Intro_Move2,0,,,,Dial_Hub_Intro_01
 V_BetaGold_Intro_Move2,-200,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,freeze,ghost,0,0,,positionV,lesser,550,V_BetaGold_Intro_Last,0,,,,0
 V_BetaGold_Intro_Last,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,,0,greater,3,0,0,,,,Dial_Hub_Intro_03
 #,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

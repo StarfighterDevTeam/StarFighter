@@ -559,6 +559,25 @@ sf::Vector2f GameObject::getPosition_for_Direction(Directions direction, sf::Vec
 	return sf::Vector2f(x, y);
 }
 
+float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)
+{
+	assert(object1 != NULL);
+	assert(object2 != NULL);
+
+	Vector2f current_diff = sf::Vector2f(object1->getPosition().x - object2->getPosition().x, object1->getPosition().y - object2->getPosition().y);
+	return GetAbsoluteSpeed(current_diff);
+}
+
+float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
+{
+	const float a = speed_.x;
+	const float b = speed_.y;
+	float s = (a * a) + (b * b);
+	s = sqrt(s);
+	s = floor(s);
+	return s;
+}
+
 FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)
 {
 	if (direction == DIRECTION_UP)

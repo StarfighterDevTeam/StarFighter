@@ -152,6 +152,7 @@ public :
 	Portal* m_targetPortal;
 	Shop* m_targetShop;
 	vector<Dialog*> m_targetDialogs;
+	GameObject* m_input_blocker;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
 	SFPanel* m_SFPanel;

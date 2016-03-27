@@ -40,6 +40,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_disable_bots = true;
 	m_is_asking_scene_transition = false;
 	m_currentScene_hazard = 0;
+	m_input_blocker = NULL;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -591,6 +592,12 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			{
 				ContinueDialog();
 			}
+		}
+		//Enemy blocking movement?
+		else if (m_input_blocker)
+		{
+			m_speed = sf::Vector2f(0, 0);
+			return;
 		}
 		//EQUIPMENT HUD
 		else if (m_HUD_state == HUD_OpeningEquipment && m_HUD_SFPanel)
@@ -1640,11 +1647,11 @@ void Ship::GetPortal(GameObject* object)
 	m_targetPortal = (Portal*)(object);
 	m_isCollidingWithInteractiveObject = PortalInteraction;
 
-	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
+	if ((*CurrentGame).m_direction == NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_is_asking_SFPanel != SFPanel_Dialog && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
 	{
 		m_is_asking_SFPanel = SFPanel_Portal;
 	}
-	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
+	else if ((*CurrentGame).m_direction != NO_DIRECTION && !(*CurrentGame).m_waiting_for_dialog_validation && m_is_asking_SFPanel != SFPanel_Dialog && m_targetPortal->m_currentAnimationIndex == PortalOpenIdle)
 	{
 		m_is_asking_SFPanel = SFPanel_Action;
 	}
