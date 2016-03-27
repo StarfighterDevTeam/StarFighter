@@ -42,7 +42,7 @@ public:
 	bool m_hasDisplayedDestructionRatio;
 
 	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip = (*CurrentGame).playerShip);
-	void RespawnInLastHub();
+	void RespawnInLastSafePoint();
 
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
 	static void DestroySFPanel(Ship* playerShip);

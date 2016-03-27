@@ -15,6 +15,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_bouncing = NoBouncing;
 	m_enemyTimer = sf::seconds(0);
 	m_level = 1;
+	m_input_blocker = false;
 
 	//life bars
 	m_feedbackTimer = sf::seconds(0);
@@ -369,6 +370,13 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 	}
 
+	//transition blocking firing and phase transitioning?
+	if ((*CurrentGame).m_waiting_for_scene_transition)
+	{
+		AnimatedSprite::update(deltaTime);
+		return;
+	}
+
 	//automatic fire
 	if (!m_weapons_list.empty())
 	{
@@ -511,6 +519,7 @@ Enemy* Enemy::Clone()
 	enemy->m_Pattern = this->m_Pattern;
 	enemy->m_angspeed = this->m_angspeed;
 	enemy->m_radius = this->m_radius;
+	enemy->m_input_blocker = this->m_input_blocker;
 
 	enemy->m_rotation_speed = this->m_rotation_speed;
 	enemy->setRotation(this->getRotation());
@@ -571,6 +580,30 @@ bool Enemy::CheckCondition()
 					return true;
 				}
 			
+				break;
+			}
+
+			case PlayerVerticalPosition:
+			{
+				FloatCompare result = (*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
+				if (result == (*it)->m_op)
+				{
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+					return true;
+				}
+
+				break;
+			}
+
+			case PlayerHorizontalPosition:
+			{
+				FloatCompare result = (*CurrentGame).playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
+				if (result == (*it)->m_op)
+				{
+					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+					return true;
+				}
+
 				break;
 			}
 		
@@ -686,9 +719,11 @@ bool Enemy::CheckCondition()
 
 			case EnemyProximity:
 			{
+				//float distance = GameObject::GetDistanceBetweenObjects(this, (*CurrentGame).playerShip);
 				if ((*it)->m_op == GREATHER_THAN)
 				{
-					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_OUT_OF_RANGE)
+					//if (distance > (*it)->m_value)
+					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TARGET_OUT_OF_RANGE)
 					{
 						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
@@ -696,7 +731,8 @@ bool Enemy::CheckCondition()
 				}
 				else if ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO)
 				{
-					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TargetScan::TARGET_IN_RANGE)
+					//if (distance <= (*it)->m_value)
+					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TARGET_IN_RANGE)
 					{
 						this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 						return true;
@@ -806,8 +842,8 @@ void Enemy::setPhase(Phase* phase)
 				break;
 			}
 			case FreezePlayer:
-			{	
-				//todo
+			{
+				phase->m_freeze_player = true;
 				break;
 			}
 			default:
@@ -874,6 +910,21 @@ void Enemy::setPhase(Phase* phase)
 			{
 				(*CurrentGame).playerShip->m_targetDialogs.push_back(phase->m_dialogs[i]->Clone());
 			}
+		}
+	}
+
+	//freeze player?
+	if (phase->m_freeze_player)
+	{
+		//lock player
+		(*CurrentGame).playerShip->m_input_blocker = this;
+	}
+	else
+	{
+		//unlock player
+		if ((*CurrentGame).playerShip->m_input_blocker == this)
+		{
+			(*CurrentGame).playerShip->m_input_blocker = NULL;
 		}
 	}
 
@@ -1073,7 +1124,12 @@ void Enemy::Death()
 	{
 		(*CurrentGame).PlaySFX(SFX_BigKill);
 	}
-	
+
+	//unlock player if blocked
+	if ((*CurrentGame).playerShip->m_input_blocker == this)
+	{
+		(*CurrentGame).playerShip->m_input_blocker = NULL;
+	}
 }
 
 void Enemy::Destroy()

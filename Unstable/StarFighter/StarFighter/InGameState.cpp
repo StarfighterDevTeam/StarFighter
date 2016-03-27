@@ -63,6 +63,7 @@ void InGameState::Initialize(Player player)
 	}
 
 	m_playerShip->m_currentScene_name = player.m_currentSceneFile;
+	m_playerShip->m_respawnSceneName = player.m_currentSceneFile;
 	m_currentScene = NULL;
 
 	//Loading all scenes
@@ -82,7 +83,7 @@ void InGameState::Update(Time deltaTime)
 	//automatic respawn if dead
 	if (!(*CurrentGame).playerShip->m_visible)
 	{
-		RespawnInLastHub();
+		RespawnInLastSafePoint();
 		//SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
 	}
 	if (!(*CurrentGame).playerShip->m_is_asking_teleportation.empty())
@@ -528,6 +529,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).playerShip->m_disable_inputs = false;
 				(*CurrentGame).playerShip->m_speed = sf::Vector2f(0, 0);
 
+				(*CurrentGame).m_waiting_for_scene_transition = false;
+				(*CurrentGame).playerShip->m_immune = false;
+
 				//Play scene title feedback if we come from a hub + music changes
 				if (previous_direction == NO_DIRECTION)
 				{
@@ -612,7 +616,7 @@ void InGameState::UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* player
 	}
 }
 
-void InGameState::RespawnInLastHub()
+void InGameState::RespawnInLastSafePoint()
 {
 	//cleaning layers
 	(*CurrentGame).garbageLayer(FriendlyFireLayer);
@@ -623,13 +627,6 @@ void InGameState::RespawnInLastHub()
 
 	//loading last visited hub
 	SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
-
-	//Applying hub modifiers to gameplay
-	(*CurrentGame).playerShip->m_disableHyperspeed = true;
-	(*CurrentGame).playerShip->m_disableSlowmotion = true;
-	(*CurrentGame).playerShip->m_disable_fire = true;
-	(*CurrentGame).playerShip->m_disableRecall = true;
-	m_IG_State = HUB_ROAMING;
 
 	//resetting ship
 	(*CurrentGame).playerShip->Respawn();
@@ -791,6 +788,9 @@ void InGameState::PlayerTakesExit()
 	(*CurrentGame).playerShip->m_disable_fire = true;
 	(*CurrentGame).playerShip->m_disableSlowmotion = true;
 	(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
+	
+	(*CurrentGame).m_waiting_for_scene_transition = true;
+	(*CurrentGame).playerShip->m_immune = true;
 
 	m_IG_State = TRANSITION_PHASE1_2;
 }

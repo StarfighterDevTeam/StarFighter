@@ -28,11 +28,11 @@ void Game::init(RenderWindow* window)
 
 	playerShip = NULL;
 	m_waiting_for_dialog_validation = false;
+	m_waiting_for_scene_transition = false;
 
 	//Sounds
 	m_SFX_Activated = true;
 	LoadSFX();
-	
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");

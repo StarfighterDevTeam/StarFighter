@@ -74,6 +74,8 @@ enum ConditionType
 	wakeUp,
 	EnemyProximity,
 	ShotsFired,
+	PlayerVerticalPosition,
+	PlayerHorizontalPosition,
 };
 
 enum BouncingType

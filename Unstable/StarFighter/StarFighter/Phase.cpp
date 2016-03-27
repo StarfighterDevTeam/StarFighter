@@ -56,6 +56,14 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 	{
 		cond = ShotsFired;
 	}
+	else if (line_data[index].compare("playerPosX") == 0)
+	{
+		cond = PlayerHorizontalPosition;
+	}
+	else if (line_data[index].compare("playerPosY") == 0)
+	{
+		cond = PlayerVerticalPosition;
+	}
 
 	//loading operator type
 	FloatCompare op = ERROR_COMPARE;

@@ -64,7 +64,7 @@ enum SceneDataBoss
 	BOSS_SPAWN_X,//3
 	BOSS_SPAWN_Y,//4
 	BOSS_SPAWN_ROTATION,//4
-	BOSS_LEVEL,//5
+	BOSS_LEVEL,//5 obsolete
 };
 
 enum SceneDataBackground

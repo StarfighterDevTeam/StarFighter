@@ -534,7 +534,10 @@ void Ship::UpdateHUDStates()
 	if (!m_targetDialogs.empty())
 	{
 		m_is_asking_SFPanel = SFPanel_Dialog;
-		m_HUD_state = HUD_Dialog;
+		if (m_targetDialogs.front()->m_duration == 0)
+		{
+			m_HUD_state = HUD_Dialog;
+		}
 	}
 	else if (m_HUD_state != HUD_OpeningEquipment)
 	{
@@ -576,6 +579,12 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		//Update HUD state
 		UpdateHUDStates();
 
+		//Update dialogs that have a limited lifespam
+		if (!m_targetDialogs.empty() && m_SFPanel && m_SFPanel->GetDuration() > 0 && m_SFPanel->GetDurationClockElpased() > m_SFPanel->GetDuration())
+		{
+			ContinueDialog();
+		}
+
 		//DIALOG
 		if (m_HUD_state == HUD_Dialog && m_HUD_SFPanel)
 		{
@@ -585,10 +594,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//	ContinueDialog();
 			//}
 			if (m_SFPanel && m_SFPanel->GetDuration() == 0 && m_inputs_states[Action_Firing] == Input_Tap)
-			{
-				ContinueDialog();
-			}
-			else if (m_SFPanel && m_SFPanel->GetDuration() > 0 && m_SFPanel->GetDurationClockElpased() > m_SFPanel->GetDuration())
 			{
 				ContinueDialog();
 			}
@@ -1487,6 +1492,7 @@ void Ship::Respawn()
 	
 	m_immune = true;
 	m_immunityTimer.restart();
+	m_disable_inputs = false;
 }
 
 void Ship::SetVisibility(bool visible)
@@ -1512,11 +1518,12 @@ void Ship::Death()
 	m_HUD_state = HUD_Idle;
 	m_HUD_SFPanel->GetCursor()->m_visible = false;
 
+	m_targetDialogs.clear();
+	m_input_blocker = NULL;
+	m_speed = sf::Vector2f(0, 0);
+	m_disable_inputs = true;
+
 	(*CurrentGame).PlaySFX(SFX_BigKill);
-
-	//DestroyBots();
-
-	//(*CurrentGame).garbageLayer(AuraLayer);
 
 	//losing xp
 	//int death_xp_penalty_ = floor(this->xp_max * XP_DEATH_MALUS_PERCENTAGE);
