@@ -7,6 +7,11 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 	m_playerShip = playerShip;
 	m_dialog = playerShip->m_targetDialogs.front();
 
+	if (m_dialog->m_duration == 0)
+	{
+		(*CurrentGame).m_waiting_for_dialog_validation = true;
+	}
+
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	setOutlineThickness(2);

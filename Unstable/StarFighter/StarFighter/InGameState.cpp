@@ -316,8 +316,28 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 		case LAST_SCREEN:
 		{	
+			//Optional script to skip boss procedures, for scripted missions
+			if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss])
+			{
+				if (m_currentScene->m_generating_boss)
+				{
+					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
+					{
+						(*CurrentGame).PlayMusic(Music_Boss);
+						m_currentScene->GenerateBoss();
+						m_currentScene->m_generating_boss = false;
+					}
+				}
+
+				//player takes exit?
+				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
+				{
+					PlayerTakesExit();
+				}
+			}
+
 			//When enemies, loots and enemy bullets on scene are dead, we can start the transition to the next scene
-			if ((*CurrentGame).isLastEnemyDead())
+			else if ((*CurrentGame).isLastEnemyDead())
 			{
 				//scene generates boss? (or boss is dead, eitherway)
 				if (m_currentScene->m_generating_boss)
@@ -361,35 +381,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				//player takes exit?
 				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
 				{
-					m_currentScene->m_bg->SetPortalsState(PortalGhost);
-					
-					(*CurrentGame).PlaySFX(SFX_EnteringPortal);
-
-					bool reverse = false;
-					if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
-					{
-						reverse = true;
-					}
-
-					string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
-					m_nextScene = new Scene(nextScene_filename, m_currentScene->getSceneHazardLevelValue(), reverse, false);
-					
-					//remembering linked scenes to hazard break later
-					if (!m_currentScene->m_canHazardBreak)
-					{
-						m_nextScene->m_scenesLinkedToUpdate.push_back(m_currentScene->m_name);
-					}
-					UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
-
-					m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
-
-					//Putting the player on rails
-					(*CurrentGame).playerShip->m_disable_inputs = true;
-					(*CurrentGame).playerShip->m_disable_fire = true;
-					(*CurrentGame).playerShip->m_disableSlowmotion = true;
-					(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
-
-					m_IG_State = TRANSITION_PHASE1_2;
+					PlayerTakesExit();
 				}
 			}
 			//clearing enemies that have spawned out of the scene size
@@ -435,6 +427,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).garbageLayer(FriendlyFireLayer);
 				(*CurrentGame).garbageLayer(LootLayer);
 				(*CurrentGame).garbageLayer(FeedbacksLayer);
+
+				//Optional script to skip boss procedures, for scripted missions, so they may still be alive at this point
+				if (m_currentScene->m_scripts[SceneScript_PortalOpenDuringBoss])
+				{
+					(*CurrentGame).SetLayerSpeed(EnemyObjectLayer, m_nextScene->m_bg->m_speed);
+				}
 
 				m_IG_State = TRANSITION_PHASE2_2;
 			}
@@ -762,4 +760,37 @@ void InGameState::LoadAllScenes(string scenes_file)
 	generalScenesConfig.clear();
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void InGameState::PlayerTakesExit()
+{
+	m_currentScene->m_bg->SetPortalsState(PortalGhost);
+
+	(*CurrentGame).PlaySFX(SFX_EnteringPortal);
+
+	bool reverse = false;
+	if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
+	{
+		reverse = true;
+	}
+
+	string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
+	m_nextScene = new Scene(nextScene_filename, m_currentScene->getSceneHazardLevelValue(), reverse, false);
+
+	//remembering linked scenes to hazard break later
+	if (!m_currentScene->m_canHazardBreak)
+	{
+		m_nextScene->m_scenesLinkedToUpdate.push_back(m_currentScene->m_name);
+	}
+	UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
+
+	m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
+
+	//Putting the player on rails
+	(*CurrentGame).playerShip->m_disable_inputs = true;
+	(*CurrentGame).playerShip->m_disable_fire = true;
+	(*CurrentGame).playerShip->m_disableSlowmotion = true;
+	(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
+
+	m_IG_State = TRANSITION_PHASE1_2;
 }

@@ -874,7 +874,6 @@ void Enemy::setPhase(Phase* phase)
 			{
 				(*CurrentGame).playerShip->m_targetDialogs.push_back(phase->m_dialogs[i]->Clone());
 			}
-			(*CurrentGame).m_waiting_for_dialog_validation = true;
 		}
 	}
 

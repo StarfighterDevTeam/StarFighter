@@ -35,6 +35,8 @@ public:
 	void InGameStateMachineCheck(sf::Time deltaTime);
 	void SpawnInScene(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
 
+	void PlayerTakesExit();
+
 	sf::Clock m_clockHubExit;
 	sf::Clock m_bossSpawnCountdown;
 	bool m_hasDisplayedDestructionRatio;

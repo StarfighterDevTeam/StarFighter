@@ -1,5 +1,11 @@
-#,filename,width,height,vspeed,Vertical/Horizontal,
-bg,Assets/2D/Backgrounds/BGIntro.png,1080,1080,0,V,
-#,name,enemy_class,spawnX,spawnY,rotation,Level
-#,portal_open_during_boss,,,,,
-script,1,,,,,
+#,filename,width,height,vspeed,Vertical/Horizontal,,,,
+bg,Assets/2D/Backgrounds/BGIntro.png,1080,1080,0,V,,,,
+#,name,enemy_class,spawnX,spawnY,rotation,Level,,,
+boss,V_BetaGold_Intro,0,0.5,1.05,180,1,,1.05,0
+boss,V_AlphaGold_Intro,0,0.6,1.1,180,1,,1.1,0
+boss,V_AlphaGold_Intro,0,0.4,1.1,180,1,,1.1,0
+boss,V_AlphaGold_Intro,0,0.5,1.2,180,1,,1.2,0
+boss,V_AlphaGold_Intro,0,0.3,1.15,180,1,,1.15,0
+boss,V_AlphaGold_Intro,0,0.7,1.15,180,1,,1.15,0
+#,portal_open_during_boss,,,,,,,,
+script,1,,,,,,,,

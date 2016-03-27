@@ -794,14 +794,25 @@ void Game::garbageLayer(LayerType layer, bool only_offscene)
 	}
 }
 
-void Game::SetLayerRotation(LayerType m_layer, float angle)
+void Game::SetLayerRotation(LayerType layer, float angle)
 {
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[m_layer].begin(); it != m_sceneGameObjectsLayered[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[layer].begin(); it != m_sceneGameObjectsLayered[layer].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
 		(*it)->setRotation(angle);
+	}
+}
+
+void Game::SetLayerSpeed(LayerType layer, sf::Vector2f speed)
+{
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsLayered[layer].begin(); it != m_sceneGameObjectsLayered[layer].end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		(*it)->m_speed = speed;
 	}
 }
 
