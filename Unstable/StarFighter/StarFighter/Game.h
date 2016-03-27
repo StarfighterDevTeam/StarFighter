@@ -134,6 +134,7 @@ public:
 	void PlayMusic(Music_Bank music);
 	void ManageMusicTransitions(sf::Time deltaTime);
 	string m_next_music_name;
+	Music_Bank m_curMusic_type;
 
 private:
 	void SetMovementFromPattern(Vector2f* move, float delta_t, int movepattern_type);

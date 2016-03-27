@@ -24,6 +24,7 @@
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
+#define STARTING_SCENE							"Vanguard_HubIntro"
 #define STARTING_MONEY							50
 
 #define DEFAULT_MUSIC_VOLUME					50

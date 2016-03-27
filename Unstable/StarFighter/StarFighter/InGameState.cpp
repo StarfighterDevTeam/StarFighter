@@ -57,13 +57,12 @@ void InGameState::Initialize(Player player)
 	else
 	{
 		//New game save
-		player.m_currentSceneFile = "Vanguard_HubIntro";
+		player.m_currentSceneFile = STARTING_SCENE;
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer(PLAYER_SAVE_FILE);
 	}
 
 	m_playerShip->m_currentScene_name = player.m_currentSceneFile;
-	m_playerShip->m_respawnSceneName = player.m_currentSceneFile;
 	m_currentScene = NULL;
 
 	//Loading all scenes
@@ -533,7 +532,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).playerShip->m_immune = false;
 
 				//Play scene title feedback if we come from a hub + music changes
-				if (previous_direction == NO_DIRECTION)
+				if (previous_direction == NO_DIRECTION || (*CurrentGame).m_curMusic_type != Music_Scene)
 				{
 					m_currentScene->PlayTitleFeedback();
 					(*CurrentGame).PlayMusic(Music_Scene);
@@ -626,6 +625,10 @@ void InGameState::RespawnInLastSafePoint()
 	(*CurrentGame).garbageLayer(LootLayer);
 
 	//loading last visited hub
+	if ((*CurrentGame).playerShip->m_respawnSceneName.empty())
+	{
+		(*CurrentGame).playerShip->m_respawnSceneName = STARTING_SCENE;
+	}
 	SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
 
 	//resetting ship

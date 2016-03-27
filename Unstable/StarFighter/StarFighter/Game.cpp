@@ -84,6 +84,8 @@ void Game::SetMusicVolume(bool activate_music)
 
 void Game::PlayMusic(Music_Bank music)
 {
+	m_curMusic_type = music;
+
 	if (!m_Music_Activated)
 		return;
 
