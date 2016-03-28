@@ -891,6 +891,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
 					m_is_asking_scene_transition = true;//this triggers transition in InGameState update
+					m_immune = true;
 				}
 			}
 			//SHOP MAIN

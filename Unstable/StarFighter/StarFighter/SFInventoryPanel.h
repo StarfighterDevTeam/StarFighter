@@ -86,6 +86,7 @@ public:
 	sf::Text m_beastscore_text;
 	sf::Text m_framerate_text;
 	sf::Text m_scene_text;
+	sf::Text m_hazardscore_text;
 };
 
 #endif // SFINVENTORYPANEL_H_INCLUDED

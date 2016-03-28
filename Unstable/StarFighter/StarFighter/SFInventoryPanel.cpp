@@ -887,6 +887,10 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_graze_text.setCharacterSize(14);
 		m_graze_text.setColor(_white);
 
+		m_hazardscore_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_hazardscore_text.setCharacterSize(14);
+		m_hazardscore_text.setColor(_white);
+
 		m_beastscore_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_beastscore_text.setCharacterSize(14);
 		m_beastscore_text.setColor(_white);
@@ -928,7 +932,7 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		text_height += INTERACTION_INTERBLOCK + ARMOR_BAR_SIZE_Y;
 		m_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
-		text_height += ITEM_STATS_PANEL_SIZE_Y - INTERACTION_INTERBLOCK;
+		text_height += ITEM_STATS_PANEL_SIZE_Y - INTERACTION_INTERBLOCK - INTERACTION_INTERLINE;//because fuck this
 		
 		m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
 		m_grid.SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + text_height));
@@ -942,7 +946,7 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		text_height += m_fake_grid2.squares.x * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK;
 		m_money_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
-		text_height += INTERACTION_SHOP_INTERLINE + m_money_text.getCharacterSize();
+		text_height += m_money_text.getCharacterSize();
 		m_level_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
 		text_height += INTERACTION_SHOP_INTERLINE + m_level_text.getCharacterSize();
@@ -952,6 +956,9 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_graze_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
 		text_height += INTERACTION_SHOP_INTERLINE + m_graze_text.getCharacterSize();
+		m_hazardscore_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+
+		text_height += INTERACTION_SHOP_INTERLINE + m_hazardscore_text.getCharacterSize();
 		m_beastscore_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
 		text_height += INTERACTION_SHOP_INTERLINE + m_beastscore_text.getCharacterSize();
@@ -1065,6 +1072,11 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	ss_g << m_playerShip->m_graze_count;
 	m_graze_text.setString("Graze: " + ss_g.str());
 
+	//score
+	ostringstream ss_sc;
+	ss_sc << (*CurrentGame).m_hazard << " / " << (*CurrentGame).m_hazardSpawned;
+	m_hazardscore_text.setString("Score: " + ss_sc.str());
+
 	//Beast score
 	ostringstream ss_beast;
 	float quality_graze = m_playerShip->getShipBeastScore() / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
@@ -1161,6 +1173,7 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 
 	screen.draw(m_money_text);
 	screen.draw(m_graze_text);
+	screen.draw(m_hazardscore_text);
 	screen.draw(m_beastscore_text);
 	screen.draw(m_xpBar);
 	screen.draw(m_level_text);

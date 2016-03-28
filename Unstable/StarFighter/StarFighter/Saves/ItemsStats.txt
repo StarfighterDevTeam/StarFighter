@@ -1,0 +1,35 @@
+Engine 0
+Armor 0
+Shield 0
+Module Module 2 11 13.9314 Assets/2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 0 0 Bot Assets/2D/bot.png 32 32 1 -50 0 0 0 Laser Assets/2D/Equipment/laser_blue1.png 48 48 1 0.099 0 0.8 2 24 0 0 0 Ammo 5 2200 0 Assets/2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
+Weapon 0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0

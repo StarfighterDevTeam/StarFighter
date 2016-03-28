@@ -374,9 +374,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 							{
 								m_currentScene->DisplayDestructions();
 							}
-
-							//eitherway, reset the score
-							(*CurrentGame).resetHazard();
 						}
 
 						m_currentScene->m_bg->SetPortalsState(PortalOpen);
@@ -471,6 +468,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).playerShip->m_disable_bots = true;
 					(*CurrentGame).playerShip->m_disableRecall = true;
 					(*CurrentGame).playerShip->SetBotsVisibility(false);
+
+					(*CurrentGame).resetHazard();
 				}
 				else
 				{
@@ -754,6 +753,8 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			m_IG_State = HUB_ROAMING;
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
 
+			(*CurrentGame).resetHazard();
+
 			if (!m_currentScene->m_scene_music.empty())
 			{
 				(*CurrentGame).PlayMusic(Music_Hub, m_currentScene->m_scene_music);
@@ -826,7 +827,6 @@ void InGameState::PlayerTakesExit()
 	(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
 	
 	(*CurrentGame).m_waiting_for_scene_transition = true;
-	(*CurrentGame).playerShip->m_immune = true;
 
 	m_IG_State = TRANSITION_PHASE1_2;
 }
