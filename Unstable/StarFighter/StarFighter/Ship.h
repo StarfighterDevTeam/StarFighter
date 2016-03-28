@@ -155,9 +155,9 @@ public :
 	GameObject* m_input_blocker;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
-	SFPanel* m_SFPanel;
+	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
-	SFPanel* m_HUD_SFPanel;
+	SFPanel* m_SFHudPanel;
 	string m_is_asking_teleportation;
 
 	sf::Clock m_brakingHoldingClock;

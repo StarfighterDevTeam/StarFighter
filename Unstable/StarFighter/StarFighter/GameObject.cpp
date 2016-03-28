@@ -279,11 +279,6 @@ void GameObject::Death()
 
 }
 
-void GameObject::Destroy()
-{
-
-}
-
 void GameObject::GenerateLoot()
 {
 

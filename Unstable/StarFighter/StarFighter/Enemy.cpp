@@ -1132,7 +1132,7 @@ void Enemy::Death()
 	}
 }
 
-void Enemy::Destroy()
+Enemy::~Enemy()
 {
 	(*CurrentGame).removeFromFeedbacks(&m_armorBar);
 	(*CurrentGame).removeFromFeedbacks(&m_armorBarContainer);

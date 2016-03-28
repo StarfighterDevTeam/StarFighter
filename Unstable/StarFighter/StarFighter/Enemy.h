@@ -34,14 +34,13 @@ class Enemy : public GameObject
 {
 public:
 	Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, FX* FX_death, int frameNumber = 1, int animationNumber = 1);
+	~Enemy();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void UpdateHealthBars();
+	Enemy* Clone(); void Death() override;
 
 	vector<Weapon*> m_weapons_list;
 	FX* m_FX_death;
-
-	Enemy* Clone();void Death() override;
-	void Destroy() override;
 
 	float m_radius;
 	float m_angspeed;

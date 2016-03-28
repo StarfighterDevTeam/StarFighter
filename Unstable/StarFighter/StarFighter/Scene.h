@@ -31,6 +31,13 @@ enum ScenesData
 	SCENE_LEVEL,//8
 };
 
+enum ScenesDialogData
+{
+	SCENE_DIALOG,//0
+	SCENE_DIALOG_NAME,//1
+	SCENE_DIALOG_TIME,//2
+};
+
 enum SceneScriptData
 {
 	SceneScript_PortalOpenDuringBoss,
@@ -62,6 +69,9 @@ public:
 	sf::Clock m_spawnClock;
 	int m_level;
 	bool m_scripts[NBVAL_SceneScripts];
+	//map<float, vector<Dialog*> > m_dialogs;
+	vector<pair<float, vector<Dialog*> > > m_dialogs;
+	sf::Clock m_scene_clock;
 
 	int getSceneHazardLevelUnlockedValue();
 	void setSceneHazardLevelUnlockedValue(int hazard_unlocked_value);

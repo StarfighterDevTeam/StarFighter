@@ -7,3 +7,6 @@ Dial_Hub_Intro_02,0,0,0,0,Wisteria,Try_and_catch_me?,Assets/2D/Dialogs/Katyusha.
 Dial_Hub_Intro_03,0,0,1,0,Captain_Ellias,You_have_no_chance_of_surviving_through_this_asteroid_field.,Assets/2D/Dialogs/Captain.png,Dial_Hub_Intro_04
 Dial_Hub_Intro_04,0,0,0,0,Wisteria,Let_us_see_if_that's_true[COMA]_Captain.,Assets/2D/Dialogs/Katyusha.png,0
 Dial_Hub_Intro_05,0,0,1,2,Captain_Ellias,Ahaha_that's_a_stupid_move_Wisteria._At_all_ships[COMA]_FIRE_AT_WILL!!!,Assets/2D/Dialogs/Captain.png,0
+Dial_VIntro_01,0,0,0,4,Board_computer,Wisteria[COMA]_we_must_avoid_collision_at_all_cost.,Assets/2D/Dialogs/Computer.png,Dial_VIntro_02
+Dial_VIntro_02,0,0,0,6,Board_computer,Use_the_aerobrakes_to_fly_carefully_[Hold_X_Key].,Assets/2D/Dialogs/Computer.png,0
+Dial_VIntro_03,0,0,0,6,Wisteria,I'm_pretty_sure_I_can_slam_those_ships_without_too_much_harm...,Assets/2D/Dialogs/Katyusha.png,0

@@ -185,8 +185,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 
 			m_enemies_ranked_by_class[e->m_enemyclass].push_back(e);
 		}
-
-		//loading boss
+		//Loading boss
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("boss") == 0)
 		{
 			EnemyBase* boss = FileLoader::LoadEnemyBase((*CurrentGame).m_sceneConfigs[name][i][BOSS], 1, stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_CLASS]));
@@ -204,8 +203,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			m_boss_list.push_back(boss);
 			m_generating_boss = true;
 		}
-
-		//loading optional scripts
+		//Loading optional scripts
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("script") == 0)
 		{
 			for (int j = 0; j < NBVAL_SceneScripts; j++)
@@ -217,6 +215,20 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			{
 				m_bg->SetPortalsState(PortalOpen);
 			}
+		}
+		//Loading dialogs
+		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("dialog") == 0)
+		{
+			Dialog* dialog = Enemy::LoadDialog((*CurrentGame).m_sceneConfigs[name][i][SCENE_DIALOG_NAME]);
+			vector<Dialog*> chained_dialogs;
+			chained_dialogs.push_back(dialog);
+			while (!dialog->m_next_dialog_name.empty() && dialog->m_next_dialog_name.compare("0") != 0)
+			{
+				dialog = Enemy::LoadDialog(dialog->m_next_dialog_name);
+				chained_dialogs.push_back(dialog);
+			}
+			//m_dialogs.insert(map<float, vector<Dialog*> >::value_type(stoi((*CurrentGame).m_sceneConfigs[name][i][SCENE_DIALOG_TIME]), chained_dialogs));
+			m_dialogs.push_back(std::make_pair(stoi((*CurrentGame).m_sceneConfigs[name][i][SCENE_DIALOG_TIME]), chained_dialogs));
 		}
 
 		if (enemy_count != 0 && m_direction != NO_DIRECTION)

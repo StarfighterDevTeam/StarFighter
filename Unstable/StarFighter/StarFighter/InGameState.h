@@ -43,6 +43,7 @@ public:
 
 	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip = (*CurrentGame).playerShip);
 	void RespawnInLastSafePoint();
+	void CheckScriptedDialogs();
 
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
 	static void DestroySFPanel(Ship* playerShip);

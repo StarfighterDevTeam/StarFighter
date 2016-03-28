@@ -225,7 +225,6 @@ public:
 	virtual void Respawn();
 	GameObject* Clone();
 	virtual void Death();
-	virtual void Destroy();
 	virtual void GenerateLoot();
 
 	void addMoney(int loot_value);

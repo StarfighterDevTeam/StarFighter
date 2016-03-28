@@ -635,8 +635,6 @@ void Game::cleanGarbage()
 			}
 		}
 
-		pCurGameObject->Destroy();//destructor function
-
 		// A la fin, on delete l'élément
 		delete pCurGameObject;
 	}

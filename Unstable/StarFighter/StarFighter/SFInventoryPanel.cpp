@@ -63,13 +63,13 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		else if (playerShip && playerShip->m_HUD_state == HUD_OpeningEquipment)
 		{
 			//DESEQUIP
-			if (playerShip->m_HUD_SFPanel && playerShip->m_HUD_SFPanel->GetFocusedGrid() == 1)
+			if (playerShip->m_SFHudPanel && playerShip->m_SFHudPanel->GetFocusedGrid() == 1)
 			{
 				m_options_text.setString("Desequip");
 				m_arrow.m_visible = true;
 			}
 			//EQUIP
-			else if (playerShip->m_HUD_SFPanel && playerShip->m_HUD_SFPanel->GetFocusedGrid() == 2)
+			else if (playerShip->m_SFHudPanel && playerShip->m_SFHudPanel->GetFocusedGrid() == 2)
 			{
 				m_options_text.setString("Equip");
 				m_arrow.m_visible = true;
@@ -607,7 +607,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFPanel);
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFTargetPanel);
 			}
 		}
 		//empty cell
@@ -700,7 +700,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFPanel);
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFTargetPanel);
 			}
 		}
 		//empty cell

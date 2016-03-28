@@ -68,9 +68,9 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_weapon_loot = NULL;
 	m_previously_focused_item = NULL;
 
-	m_SFPanel = NULL;
+	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
-	m_HUD_SFPanel = NULL;
+	m_SFHudPanel = NULL;
 
 	m_previouslyCollidingWithInteractiveObject = No_Interaction;
 	m_isCollidingWithInteractiveObject = No_Interaction;
@@ -404,13 +404,13 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	ManageFeedbackExpiration(deltaTime);
 
 	//Update HUD
-	if (m_SFPanel)
+	if (m_SFTargetPanel)
 	{
-		m_SFPanel->Update(deltaTime, directions);
+		m_SFTargetPanel->Update(deltaTime, directions);
 	}
-	if (m_HUD_SFPanel)
+	if (m_SFHudPanel)
 	{
-		m_HUD_SFPanel->Update(deltaTime, directions);
+		m_SFHudPanel->Update(deltaTime, directions);
 	}
 
 	//member objects follow
@@ -580,20 +580,20 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		UpdateHUDStates();
 
 		//Update dialogs that have a limited lifespam
-		if (!m_targetDialogs.empty() && m_SFPanel && m_SFPanel->GetDuration() > 0 && m_SFPanel->GetDurationClockElpased() > m_SFPanel->GetDuration())
+		if (!m_targetDialogs.empty() && m_SFTargetPanel && m_SFTargetPanel->GetDuration() > 0 && m_SFTargetPanel->GetDurationClockElpased() > m_SFTargetPanel->GetDuration())
 		{
 			ContinueDialog();
 		}
 
 		//DIALOG
-		if (m_HUD_state == HUD_Dialog && m_HUD_SFPanel)
+		if (m_HUD_state == HUD_Dialog && m_SFHudPanel)
 		{
 			//Continue
 			//if (m_inputs_states[Action_Firing] == Input_Tap)
 			//{
 			//	ContinueDialog();
 			//}
-			if (m_SFPanel && m_SFPanel->GetDuration() == 0 && m_inputs_states[Action_Firing] == Input_Tap)
+			if (m_SFTargetPanel && m_SFTargetPanel->GetDuration() == 0 && m_inputs_states[Action_Firing] == Input_Tap)
 			{
 				ContinueDialog();
 			}
@@ -605,31 +605,31 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			return;
 		}
 		//EQUIPMENT HUD
-		else if (m_HUD_state == HUD_OpeningEquipment && m_HUD_SFPanel)
+		else if (m_HUD_state == HUD_OpeningEquipment && m_SFHudPanel)
 		{
 			//Cursor movement
-			m_HUD_SFPanel->GetCursor()->m_visible = true;
-			MoveCursor(m_HUD_SFPanel->GetCursor(), inputs_direction, deltaTime, m_HUD_SFPanel);
+			m_SFHudPanel->GetCursor()->m_visible = true;
+			MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
 
 			//Swapping items
-			if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 2)
 			{
 				EquipItem();
 			}
-			else if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 1)
+			else if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 1)
 			{
 				DesequipItem();
 			}
 			//Garbaging item
-			//else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_HUD_SFPanel->GetFocusedItem())
+			//else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_SFHudPanel->GetFocusedItem())
 			//{
 			//	GarbagingItem();
 			//}
 			else
 			{
-				m_HUD_SFPanel->SetPrioritaryFeedback(false);
+				m_SFHudPanel->SetPrioritaryFeedback(false);
 			}
-			m_previously_focused_item = m_HUD_SFPanel->GetFocusedItem();
+			m_previously_focused_item = m_SFHudPanel->GetFocusedItem();
 
 			//Weapon firing
 			ManageFiring(deltaTime, hyperspeedMultiplier);
@@ -648,41 +648,41 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
 			{
 				m_HUD_state = HUD_Idle;
-				if (m_HUD_SFPanel)
+				if (m_SFHudPanel)
 				{
-					m_HUD_SFPanel->GetCursor()->m_visible = false;
+					m_SFHudPanel->GetCursor()->m_visible = false;
 				}
 			}
 		}
 		//SHOP BUY
-		else if (m_HUD_state == HUD_ShopBuyMenu && m_SFPanel)
+		else if (m_HUD_state == HUD_ShopBuyMenu && m_SFTargetPanel)
 		{
 			//Cursor movement
-			MoveCursor(m_SFPanel->GetCursor(), inputs_direction, deltaTime, m_SFPanel);
+			MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
 			//Force HUD cursor on equivalent object
-			m_HUD_SFPanel->GetCursor()->m_visible = m_SFPanel->GetFocusedItem();
-			if (m_HUD_SFPanel->GetCursor()->m_visible)
+			m_SFHudPanel->GetCursor()->m_visible = m_SFTargetPanel->GetFocusedItem();
+			if (m_SFHudPanel->GetCursor()->m_visible)
 			{
-				m_HUD_SFPanel->ForceCursorOnEquivalentObjectInGrid(m_SFPanel->GetFocusedItem(), m_HUD_SFPanel->GetGrid(true));
+				m_SFHudPanel->ForceCursorOnEquivalentObjectInGrid(m_SFTargetPanel->GetFocusedItem(), m_SFHudPanel->GetGrid(true));
 			}
 
 			//Switch to sell menu
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
 			{
 				m_HUD_state = HUD_ShopSellMenu;
-				m_HUD_SFPanel->GetCursor()->m_visible = true;
-				m_SFPanel->GetCursor()->m_visible = false;
-				m_HUD_SFPanel->ClearHighlight();
-				m_SFPanel->ClearHighlight();
+				m_SFHudPanel->GetCursor()->m_visible = true;
+				m_SFTargetPanel->GetCursor()->m_visible = false;
+				m_SFHudPanel->ClearHighlight();
+				m_SFTargetPanel->ClearHighlight();
 
-				if (m_HUD_SFPanel->GetItemStatsPanel())
+				if (m_SFHudPanel->GetItemStatsPanel())
 				{
-					m_HUD_SFPanel->SetFocusedItem(NULL);
+					m_SFHudPanel->SetFocusedItem(NULL);
 				}
 			}
 
 			//interaction: buy item
-			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFPanel->GetFocusedItem())
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFTargetPanel->GetFocusedItem())
 			{
 				BuyingItem();    
 			}
@@ -691,23 +691,23 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
-				m_HUD_SFPanel->GetCursor()->m_visible = false;
+				m_SFHudPanel->GetCursor()->m_visible = false;
 			}
 		}
 		//SHOP SELL
 		else if (m_HUD_state == HUD_ShopSellMenu)
 		{
 			//Cursor movement
-			MoveCursor(m_HUD_SFPanel->GetCursor(), inputs_direction, deltaTime, m_HUD_SFPanel);
+			MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
 
 			//Swapping items
-			//if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
+			//if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 2)
 			//{
 			//	SwappingItems();
 			//}
 			//Selling item
-			//else if (m_inputs_states[Action_Braking] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
-			if (m_inputs_states[Action_Firing] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
+			//else if (m_inputs_states[Action_Braking] == Input_Tap && m_SFHudPanel->GetFocusedItem())
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem())
 			{
 				SellingItem();
 			}
@@ -716,13 +716,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
 			{
 				m_HUD_state = HUD_ShopBuyMenu;
-				m_SFPanel->GetCursor()->m_visible = true;
-				m_HUD_SFPanel->ClearHighlight();
-				m_SFPanel->ClearHighlight();
+				m_SFTargetPanel->GetCursor()->m_visible = true;
+				m_SFHudPanel->ClearHighlight();
+				m_SFTargetPanel->ClearHighlight();
 
-				if (m_HUD_SFPanel->GetItemStatsPanel())
+				if (m_SFHudPanel->GetItemStatsPanel())
 				{
-					m_HUD_SFPanel->SetFocusedItem(NULL);
+					m_SFHudPanel->SetFocusedItem(NULL);
 				}
 			}
 
@@ -730,22 +730,22 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
-				m_HUD_SFPanel->GetCursor()->m_visible = false;
+				m_SFHudPanel->GetCursor()->m_visible = false;
 			}
 		}
 		//STELLAR MAP
 		else if (m_HUD_state == HUD_ShopStellarMap)
 		{
 			//Cursor movement
-			MoveCursor(m_SFPanel->GetCursor(), inputs_direction, deltaTime, m_SFPanel);
+			MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
 
 			//Teleportation
-			if (m_SFPanel->GetTeleportationCost() > 0 && m_money >= m_SFPanel->GetTeleportationCost())
+			if (m_SFTargetPanel->GetTeleportationCost() > 0 && m_money >= m_SFTargetPanel->GetTeleportationCost())
 			{
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					Teleport(m_SFPanel->GetTeleportationDestination());
-					m_money -= m_SFPanel->GetTeleportationCost();
+					Teleport(m_SFTargetPanel->GetTeleportationDestination());
+					m_money -= m_SFTargetPanel->GetTeleportationCost();
 					SavePlayerMoney(MONEY_SAVE_FILE, this);
 					m_HUD_state = HUD_Idle;
 				}
@@ -761,7 +761,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
-				m_SFPanel->GetCursor()->m_visible = true;
+				m_SFTargetPanel->GetCursor()->m_visible = true;
 			}
 		}
 		else
@@ -770,7 +770,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
 			{
 				m_HUD_state = HUD_OpeningEquipment;
-				m_HUD_SFPanel->GetCursor()->m_visible = true;
+				m_SFHudPanel->GetCursor()->m_visible = true;
 				
 				if (!m_disableSlowmotion)
 				{
@@ -862,15 +862,15 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			else if (m_HUD_state == HUD_PortalInteraction)
 			{
 				//Up and down in options, IF LEVEL CHOOSER IS AVAILABLE
-				if (m_SFPanel)
+				if (m_SFTargetPanel)
 				{
-					if (m_inputs_states[Action_Braking] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
+					if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() < m_targetPortal->m_max_unlocked_hazard_level)
 					{
-						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
+						m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() + 1);
 					}
-					else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() > 0)
+					else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() > 0)
 					{
-						m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
+						m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() - 1);
 					}
 				}
 
@@ -894,22 +894,22 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 			}
 			//SHOP MAIN
-			else if (m_HUD_state == HUD_ShopMainMenu && m_SFPanel)
+			else if (m_HUD_state == HUD_ShopMainMenu && m_SFTargetPanel)
 			{
 				//Up and down in options
-				if (m_inputs_states[Action_Braking] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() < NBVAL_ShopOptions - 1)
+				if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() < NBVAL_ShopOptions - 1)
 				{
-					m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() + 1);
+					m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() + 1);
 				}
-				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFPanel->GetSelectedOptionIndex() > 0)
+				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() > 0)
 				{
-					m_SFPanel->SetSelectedOptionIndex(m_SFPanel->GetSelectedOptionIndex() - 1);
+					m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() - 1);
 				}
 
 				//Select
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					switch (m_SFPanel->GetSelectedOptionIndex())
+					switch (m_SFTargetPanel->GetSelectedOptionIndex())
 					{
 						case ShopHeal:
 						{
@@ -922,7 +922,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						case ShopBuy:
 						{
 							m_HUD_state = HUD_ShopBuyMenu;
-							m_HUD_SFPanel->GetCursor()->m_visible = true;
+							m_SFHudPanel->GetCursor()->m_visible = true;
 							break;
 						}
 						case ShopStellarMap:
@@ -1034,19 +1034,19 @@ void Ship::MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Ti
 void Ship::BuyingItem()
 {
 	bool success = false;
-	int shop_index = m_SFPanel->GetFocusedIntIndex();
+	int shop_index = m_SFTargetPanel->GetFocusedIntIndex();
 	//case of weapon hovered
-	if (m_SFPanel && m_SFPanel->GetFocusedItem()->m_weapon_loot)
+	if (m_SFTargetPanel && m_SFTargetPanel->GetFocusedItem()->m_weapon_loot)
 	{
-		if (m_money >= m_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
+		if (m_money >= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
 		{
 			//if weapon already possessed, we try to put the item in stash
 			if (m_weapon)
 			{
-				if (m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*m_SFPanel->GetFocusedItem()))
+				if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
-					m_money -= m_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
+					m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 					Ship::SaveItems(ITEMS_SAVE_FILE, this);
 
@@ -1056,10 +1056,10 @@ void Ship::BuyingItem()
 			//else we equip if directly
 			else
 			{
-				setShipWeapon(m_SFPanel->GetFocusedItem()->m_weapon_loot->Clone());
-				m_money -= m_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-				m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, m_SFPanel->GetFocusedItem());
-				m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
+				setShipWeapon(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->Clone());
+				m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
+				m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1069,17 +1069,17 @@ void Ship::BuyingItem()
 		}
 	}
 	//case of equipment hovered
-	else if (m_SFPanel && m_SFPanel->GetFocusedItem()->m_equipment_loot)
+	else if (m_SFTargetPanel && m_SFTargetPanel->GetFocusedItem()->m_equipment_loot)
 	{
-		if (m_money >= m_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
+		if (m_money >= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
 		{
 			//if equipment already possessed, we try to put the item in stash
-			if (m_equipment[m_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType])
+			if (m_equipment[m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType])
 			{
-				if (m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*m_SFPanel->GetFocusedItem()))
+				if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
-					m_money -= m_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
+					m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 					Ship::SaveItems(ITEMS_SAVE_FILE, this);
 
@@ -1089,10 +1089,10 @@ void Ship::BuyingItem()
 			//else we equip if directly
 			else
 			{
-				setShipEquipment(m_SFPanel->GetFocusedItem()->m_equipment_loot->Clone());
-				m_money -= m_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-				m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFPanel->GetFocusedItem());
-				m_SFPanel->GetGrid()->setCellPointerForIntIndex(m_SFPanel->GetGrid()->GetIntIndex(m_SFPanel->GetFocusedIndex()), NULL);
+				setShipEquipment(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->Clone());
+				m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
+				m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1116,34 +1116,34 @@ void Ship::BuyingItem()
 void Ship::SellingItem()
 {
 	//interaction
-	if (m_HUD_SFPanel && m_SFPanel && m_HUD_SFPanel->GetFocusedItem())
+	if (m_SFHudPanel && m_SFTargetPanel && m_SFHudPanel->GetFocusedItem())
 	{
 		//move item
-		int focused_grid = m_HUD_SFPanel->GetFocusedGrid();
-		int focused_index = m_HUD_SFPanel->GetGrid(false, focused_grid)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
-		bool success = m_SFPanel->GetGrid()->insertObject(*m_HUD_SFPanel->GetFocusedItem(), -1, false);
+		int focused_grid = m_SFHudPanel->GetFocusedGrid();
+		int focused_index = m_SFHudPanel->GetGrid(false, focused_grid)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
+		bool success = m_SFTargetPanel->GetGrid()->insertObject(*m_SFHudPanel->GetFocusedItem(), -1, false);
 		//check that shop grid is not full
 		if (success)
 		{
 			//save shop: flag object as added into shop
-			Game::AddGameObjectToVector(m_HUD_SFPanel->GetFocusedItem(), &m_targetShop->m_items);
+			Game::AddGameObjectToVector(m_SFHudPanel->GetFocusedItem(), &m_targetShop->m_items);
 
 			//finish moving the object
-			m_HUD_SFPanel->GetGrid(false, focused_grid)->setCellPointerForIntIndex(focused_index, NULL);
+			m_SFHudPanel->GetGrid(false, focused_grid)->setCellPointerForIntIndex(focused_index, NULL);
 
 			//get the money
-			int equip_type = m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
+			int equip_type = m_SFHudPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_SFHudPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
 			if (equip_type == NBVAL_Equipment)
 			{
-				m_money += m_HUD_SFPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				m_money += m_SFHudPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			}
 			else
 			{
-				m_money += m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				m_money += m_SFHudPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			}
 
 			//desequip if swapped from equipped items
-			if (m_HUD_SFPanel->GetFocusedGrid() == 1)
+			if (m_SFHudPanel->GetFocusedGrid() == 1)
 			{
 				if (equip_type == NBVAL_Equipment)
 				{
@@ -1170,26 +1170,26 @@ void Ship::SellingItem()
 void Ship::EquipItem()
 {
 	//Equip
-	if (m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 2)
+	if (m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 2)
 	{
-		GameObject* tmp_ptr = m_HUD_SFPanel->GetFocusedItem();
-		int equip_index_ = m_HUD_SFPanel->GetGrid(false, 2)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
+		GameObject* tmp_ptr = m_SFHudPanel->GetFocusedItem();
+		int equip_index_ = m_SFHudPanel->GetGrid(false, 2)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
 
 		if (tmp_ptr->m_equipment_loot)
 		{
 			int ship_index_ = tmp_ptr->m_equipment_loot->m_equipmentType;
-			ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_);
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
 
-			Equipment* new_equipment = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
+			Equipment* new_equipment = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
 			this->setShipEquipment(new_equipment, true);
 			new_equipment = NULL;
 		}
 		else if (tmp_ptr->m_weapon_loot)
 		{
 			int ship_index_ = NBVAL_Equipment;
-			ObjectGrid::SwapObjectsBetweenGrids(*m_HUD_SFPanel->GetGrid(false, 1), *m_HUD_SFPanel->GetGrid(false, 2), ship_index_, equip_index_);
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
 
-			Weapon* new_weapon = m_HUD_SFPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
+			Weapon* new_weapon = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
 			this->setShipWeapon(new_weapon, true);
 			new_weapon = NULL;
 		}
@@ -1207,25 +1207,25 @@ void Ship::EquipItem()
 void Ship::DesequipItem()
 {
 	//Desequip
-	if (m_HUD_SFPanel->GetFocusedItem() && m_HUD_SFPanel->GetFocusedGrid() == 1)
+	if (m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 1)
 	{
-		GameObject* tmp_ptr = m_HUD_SFPanel->GetFocusedItem();
-		int ship_index_ = m_HUD_SFPanel->GetGrid(false, 1)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
+		GameObject* tmp_ptr = m_SFHudPanel->GetFocusedItem();
+		int ship_index_ = m_SFHudPanel->GetGrid(false, 1)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
 
 		if (tmp_ptr->m_equipment_loot)
 		{
-			if (m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
+			if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
 			{
 				cleanEquipment(ship_index_);
-				m_HUD_SFPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
 			}
 		}
 		else if (tmp_ptr->m_weapon_loot)
 		{
-			if (m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
+			if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
 			{
 				cleanWeapon(ship_index_);
-				m_HUD_SFPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
 			}
 		}
 		else
@@ -1241,40 +1241,40 @@ void Ship::DesequipItem()
 
 void Ship::GarbagingItem()
 {
-	if (m_inputs_states[Action_Braking] == Input_Tap && m_HUD_SFPanel->GetFocusedItem())
+	if (m_inputs_states[Action_Braking] == Input_Tap && m_SFHudPanel->GetFocusedItem())
 	{
 		m_brakingHoldingClock.restart();
-		m_HUD_SFPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8, false);
-		m_HUD_SFPanel->SetPrioritaryFeedback(true);
+		m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8, false);
+		m_SFHudPanel->SetPrioritaryFeedback(true);
 	}
-	else if (m_HUD_SFPanel->GetPrioritaryFeedback())
+	else if (m_SFHudPanel->GetPrioritaryFeedback())
 	{
-		if (m_HUD_SFPanel->GetFocusedItem() != m_previously_focused_item || m_inputs_states[Action_Braking] != Input_Hold)
+		if (m_SFHudPanel->GetFocusedItem() != m_previously_focused_item || m_inputs_states[Action_Braking] != Input_Hold)
 		{
 			m_brakingHoldingClock.restart();
-			m_HUD_SFPanel->SetPrioritaryFeedback(false);
+			m_SFHudPanel->SetPrioritaryFeedback(false);
 		}
-		else// if (m_HUD_SFPanel->GetFocusedItem())
+		else// if (m_SFHudPanel->GetFocusedItem())
 		{
 			if (m_brakingHoldingClock.getElapsedTime() > sf::seconds(HUD_HOLD_TIME_BEFORE_REMOVE_ITEM))
 			{
-				m_HUD_SFPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
+				m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
 				if (m_brakingHoldingClock.getElapsedTime().asSeconds() < HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / 8)
-					m_HUD_SFPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
+					m_SFHudPanel->GetCursor()->setAnimationLine(Cursor_Focus1_8);
 
 				int equip_type = NBVAL_Equipment;
-				if (m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot)
+				if (m_SFHudPanel->GetFocusedItem()->m_equipment_loot)
 				{
-					equip_type = m_HUD_SFPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
+					equip_type = m_SFHudPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
 				}
 				//garbage in hud
-				int grid_id_ = m_HUD_SFPanel->GetFocusedGrid();
-				int index_ = m_HUD_SFPanel->GetGrid(false, grid_id_)->GetIntIndex(m_HUD_SFPanel->GetFocusedIndex());
-				delete m_HUD_SFPanel->GetGrid(false, grid_id_)->grid[m_HUD_SFPanel->GetFocusedIndex().x][m_HUD_SFPanel->GetFocusedIndex().y];
-				m_HUD_SFPanel->GetGrid(false, grid_id_)->setCellPointerForIntIndex(index_, NULL);
+				int grid_id_ = m_SFHudPanel->GetFocusedGrid();
+				int index_ = m_SFHudPanel->GetGrid(false, grid_id_)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
+				delete m_SFHudPanel->GetGrid(false, grid_id_)->grid[m_SFHudPanel->GetFocusedIndex().x][m_SFHudPanel->GetFocusedIndex().y];
+				m_SFHudPanel->GetGrid(false, grid_id_)->setCellPointerForIntIndex(index_, NULL);
 
 				//garbage for real
-				if (m_HUD_SFPanel->GetFocusedGrid() == 1)
+				if (m_SFHudPanel->GetFocusedGrid() == 1)
 				{
 					if (equip_type == NBVAL_Equipment)
 					{
@@ -1297,7 +1297,7 @@ void Ship::GarbagingItem()
 				{
 					if (m_brakingHoldingClock.getElapsedTime().asSeconds() < (1.0f * HUD_HOLD_TIME_BEFORE_REMOVE_ITEM / HUD_CURSOR_HOLDING_FRACTIONS) * (k + 1))
 					{
-						m_HUD_SFPanel->GetCursor()->setAnimationLine((CursorFeedbackStates)(Cursor_Focus1_8 + k));
+						m_SFHudPanel->GetCursor()->setAnimationLine((CursorFeedbackStates)(Cursor_Focus1_8 + k));
 						break;
 					}
 				}
@@ -1515,7 +1515,7 @@ void Ship::Death()
 	m_graze_count = 0;
 	m_graze_level = 0;
 	m_HUD_state = HUD_Idle;
-	m_HUD_SFPanel->GetCursor()->m_visible = false;
+	m_SFHudPanel->GetCursor()->m_visible = false;
 
 	m_targetDialogs.clear();
 	m_input_blocker = NULL;
@@ -1568,14 +1568,14 @@ bool Ship::GetLoot(GameObject& object)
 		//stash it
 		if (m_equipment[object.m_equipment_loot->m_equipmentType])
 		{
-			success = m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
+			success = m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
 		}
 		//equip it
 		else
 		{
 			setShipEquipment(object.m_equipment_loot->Clone());
 			//and update HUD
-			success = m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType, true);
+			success = m_SFHudPanel->GetGrid(false, 1)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType, true);
 		}
 		
 		if (success)
@@ -1599,14 +1599,14 @@ bool Ship::GetLoot(GameObject& object)
 		//stash it
 		if (m_weapon)
 		{
-			success = m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
+			success = m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
 		}
 		//equip it
 		else
 		{
 			setShipWeapon(object.m_weapon_loot->Clone());
 			//and update HUD
-			success = m_HUD_SFPanel->GetGrid(false, 1)->insertObject(*capsule, NBVAL_Equipment, true);
+			success = m_SFHudPanel->GetGrid(false, 1)->insertObject(*capsule, NBVAL_Equipment, true);
 		}
 
 		if (success)
@@ -2118,19 +2118,19 @@ int Ship::SaveItems(string file, Ship* ship)
 		data << "Weapon ";
 		Ship::SaveWeaponData(data, ship->m_weapon, true);
 
-		for (size_t i = 0; i < ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.x; i++)
+		for (size_t i = 0; i < ship->m_SFHudPanel->GetGrid(false, 2)->squares.x; i++)
 		{
-			for (size_t j = 0; j < ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.y; j++)
+			for (size_t j = 0; j < ship->m_SFHudPanel->GetGrid(false, 2)->squares.y; j++)
 			{
-				if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j])
+				if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j])
 				{
-					if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot)
+					if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot)
 					{
-						Ship::SaveEquipmentData(data, ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot, false);
+						Ship::SaveEquipmentData(data, ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot, false);
 					}
-					else if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot)
+					else if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot)
 					{
-						Ship::SaveWeaponData(data, ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot, false);
+						Ship::SaveWeaponData(data, ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot, false);
 					}
 					else
 					{
@@ -2501,19 +2501,19 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 				std::istringstream(line) >> equipment_type;
 
 				int index = i - NBVAL_Equipment - 1;
-				if (!ship->m_HUD_SFPanel)
+				if (!ship->m_SFHudPanel)
 				{
 					printf("Error: <!> in Ship::LoadPlayerItems() <!> this ship doesn't have a HUD panel.\n");
 				}
 				else
 				{
-					int r = index % ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.y;
-					int l = index / ship->m_HUD_SFPanel->GetGrid(false, 2)->squares.y;
+					int r = index % ship->m_SFHudPanel->GetGrid(false, 2)->squares.y;
+					int l = index / ship->m_SFHudPanel->GetGrid(false, 2)->squares.y;
 
-					if (ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[l][r])
+					if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[l][r])
 					{
-						delete ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[l][r];
-						ship->m_HUD_SFPanel->GetGrid(false, 2)->grid[l][r] = NULL;
+						delete ship->m_SFHudPanel->GetGrid(false, 2)->grid[l][r];
+						ship->m_SFHudPanel->GetGrid(false, 2)->grid[l][r] = NULL;
 					}
 					
 					if (equipment_type.compare("0") != 0)
@@ -2522,14 +2522,14 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 						{
 							Weapon* weapon = Ship::LoadWeaponFromLine(line);
 							GameObject* capsule = ship->CloneWeaponIntoGameObject(weapon);
-							ship->m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
+							ship->m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
 							delete weapon;
 						}
 						else
 						{
 							Equipment* equipment = Ship::LoadEquipmentFromLine(line);
 							GameObject* capsule = ship->CloneEquipmentIntoGameObject(equipment);
-							ship->m_HUD_SFPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
+							ship->m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
 							delete equipment;
 						}
 					}
@@ -2787,8 +2787,8 @@ void Ship::DestroyBots()
 
 void Ship::ContinueDialog()
 {
-	string next = m_SFPanel->GetDialog()->m_next_dialog_name;
-	if (m_SFPanel && !m_SFPanel->GetDialog()->m_next_dialog_name.empty() && m_SFPanel->GetDialog()->m_next_dialog_name.compare("0") != 0)
+ 	string next = m_SFTargetPanel->GetDialog()->m_next_dialog_name;
+	if (m_SFTargetPanel && !m_SFTargetPanel->GetDialog()->m_next_dialog_name.empty() && m_SFTargetPanel->GetDialog()->m_next_dialog_name.compare("0") != 0)
 	{
 		m_is_asking_SFPanel = SFPanel_DialogNext;
 	}
@@ -2809,5 +2809,5 @@ void Ship::Teleport(string destination_name)
 
 void Ship::CenterMapView(sf::Vector2f offset)
 {
-	m_SFPanel->SetMapViewOffset(offset);
+	m_SFTargetPanel->SetMapViewOffset(offset);
 }

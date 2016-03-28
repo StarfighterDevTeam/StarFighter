@@ -13,8 +13,8 @@ void InGameState::Initialize(Player player)
 
 	//initializing HUD
 	LOGGER_WRITE(Logger::DEBUG, "Initializing HUD...");
-	m_playerShip->m_HUD_SFPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
-	(*CurrentGame).addToFeedbacks(m_playerShip->m_HUD_SFPanel);
+	m_playerShip->m_SFHudPanel = (SFPanel*)(new SFHUDPanel(sf::Vector2f(SCENE_SIZE_X / 3, SCENE_SIZE_Y), m_playerShip));
+	(*CurrentGame).addToFeedbacks(m_playerShip->m_SFHudPanel);
 
 	//Load saved items
 	if (!Ship::LoadPlayerItems(ITEMS_SAVE_FILE, m_playerShip))
@@ -39,13 +39,13 @@ void InGameState::Initialize(Player player)
 		if (m_playerShip->m_equipment[i] != NULL)
 		{
 			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-			m_playerShip->m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(i, capsule);
+			m_playerShip->m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(i, capsule);
 		}
 	}
 	if (m_playerShip->m_weapon)
 	{
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-		m_playerShip->m_HUD_SFPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
+		m_playerShip->m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
 	}
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
@@ -91,6 +91,13 @@ void InGameState::Update(Time deltaTime)
 		(*CurrentGame).playerShip->m_is_asking_teleportation = "";
 	}
 
+	//Scene dialogs
+	if (m_currentScene && !m_currentScene->m_dialogs.empty())
+	{
+		CheckScriptedDialogs();
+	}
+
+	//State machine
 	InGameStateMachineCheck(deltaTime);
 	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
 
@@ -98,19 +105,19 @@ void InGameState::Update(Time deltaTime)
 
 	//Create and destroy HUD panels
 	//case 1: destroying a panel
-	if ((*CurrentGame).playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).playerShip->m_SFPanel)
+	if ((*CurrentGame).playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).playerShip->m_SFTargetPanel)
 	{
 		DestroySFPanel((*CurrentGame).playerShip);
 	}
 	else if ((*CurrentGame).playerShip->m_is_asking_SFPanel != SFPanel_None)
 	{
 		//case 2: creating a panel
-		if (!(*CurrentGame).playerShip->m_SFPanel)
+		if (!(*CurrentGame).playerShip->m_SFTargetPanel)
 		{
 			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
 		}
 		//case 3: changing panel
-		else if ((*CurrentGame).playerShip->m_SFPanel->m_panel_type != (*CurrentGame).playerShip->m_is_asking_SFPanel)
+		else if ((*CurrentGame).playerShip->m_SFTargetPanel->m_panel_type != (*CurrentGame).playerShip->m_is_asking_SFPanel)
 		{
 			DestroySFPanel((*CurrentGame).playerShip);
 			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
@@ -564,8 +571,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
 
 				(*CurrentGame).m_direction = (*CurrentGame).playerShip->m_targetPortal->m_direction;
-				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).playerShip->m_SFPanel->GetSelectedOptionIndex(), reverse, false);
-				(*CurrentGame).playerShip->m_last_hazard_level_played = (*CurrentGame).playerShip->m_SFPanel->GetSelectedOptionIndex();
+				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).playerShip->m_SFTargetPanel->GetSelectedOptionIndex(), reverse, false);
+				(*CurrentGame).playerShip->m_last_hazard_level_played = (*CurrentGame).playerShip->m_SFTargetPanel->GetSelectedOptionIndex();
 				UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
 				m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
 
@@ -637,11 +644,11 @@ void InGameState::RespawnInLastSafePoint()
 
 void InGameState::DestroySFPanel(Ship* playerShip)
 {
-	if (playerShip->m_SFPanel)
+	if (playerShip->m_SFTargetPanel)
 	{
-		(*CurrentGame).removeFromFeedbacks(playerShip->m_SFPanel);
-		delete playerShip->m_SFPanel;
-		playerShip->m_SFPanel = NULL;
+		(*CurrentGame).removeFromFeedbacks(playerShip->m_SFTargetPanel);
+		delete playerShip->m_SFTargetPanel;
+		playerShip->m_SFTargetPanel = NULL;
 	}
 }
 
@@ -651,22 +658,22 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 	{
 		case SFPanel_Inventory:
 		{
-			playerShip->m_SFPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false, true);
+			playerShip->m_SFTargetPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false, true);
 			break;
 		}
 		case SFPanel_Action:
 		{
-			playerShip->m_SFPanel = new SFOneActionPanel(sf::Vector2f(ACTION_PANEL_WIDTH, ACTION_PANEL_HEIGHT), playerShip);
+			playerShip->m_SFTargetPanel = new SFOneActionPanel(sf::Vector2f(ACTION_PANEL_WIDTH, ACTION_PANEL_HEIGHT), playerShip);
 			break;
 		}
 		case SFPanel_Portal:
 		{
-			playerShip->m_SFPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
+			playerShip->m_SFTargetPanel = new SFPortalPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
 			break;
 		}
 		case SFPanel_Shop:
 		{
-			playerShip->m_SFPanel = new SFShopPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
+			playerShip->m_SFTargetPanel = new SFShopPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
 			break;
 		}
 		case SFPanel_DialogNext:
@@ -675,16 +682,16 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		}
 		case SFPanel_Dialog:
 		{
-			playerShip->m_SFPanel = new SFDialogPanel(sf::Vector2f(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT), playerShip);
+			playerShip->m_SFTargetPanel = new SFDialogPanel(sf::Vector2f(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT), playerShip);
 			break;
 		}
 		case SFPanel_Map:
 		{
-			playerShip->m_SFPanel = new SFMapPanel(sf::Vector2f(STELLARMAP_PANEL_WIDTH, STELLARMAP_PANEL_HEIGHT), playerShip);
+			playerShip->m_SFTargetPanel = new SFMapPanel(sf::Vector2f(STELLARMAP_PANEL_WIDTH, STELLARMAP_PANEL_HEIGHT), playerShip);
 			break;
 		}
 	}
-	(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFPanel);
+	(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFTargetPanel);
 }
 
 void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
@@ -718,7 +725,6 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			(*CurrentGame).playerShip->SetBotsVisibility(true);
 			m_IG_State = SCROLLING;
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
-			(*CurrentGame).PlayMusic(Music_Scene);
 		}
 		else
 		{
@@ -730,7 +736,6 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			(*CurrentGame).playerShip->SetBotsVisibility(false);
 			m_IG_State = HUB_ROAMING;
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
-			(*CurrentGame).PlayMusic(Music_Hub);
 		}
 		m_playerShip->setPosition(ship_pos);
 
@@ -798,4 +803,23 @@ void InGameState::PlayerTakesExit()
 	(*CurrentGame).playerShip->m_immune = true;
 
 	m_IG_State = TRANSITION_PHASE1_2;
+}
+
+void InGameState::CheckScriptedDialogs()
+{
+	size_t dialogsVectorSize = m_currentScene->m_dialogs.size();
+	for (size_t i = 0; i < dialogsVectorSize; i++)
+	{
+		if (m_currentScene->m_dialogs[i].first > 0 && m_currentScene->m_scene_clock.getElapsedTime().asSeconds() > m_currentScene->m_dialogs[i].first)
+		{
+			size_t chainedDialogsVectorSize = m_currentScene->m_dialogs[i].second.size();
+			for (size_t j = 0; j < chainedDialogsVectorSize; j++)
+			{
+				(*CurrentGame).playerShip->m_targetDialogs.push_back(m_currentScene->m_dialogs[i].second[j]->Clone());
+			}
+
+			m_currentScene->m_dialogs[i].first = -1;//flag it as read
+			break;
+		}
+	}
 }

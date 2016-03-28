@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_Dialog)
 {
 	m_playerShip = playerShip;
-	m_dialog = playerShip->m_targetDialogs.front();
+ 	m_dialog = playerShip->m_targetDialogs.front();
 
 	if (m_dialog->m_duration == 0)
 	{
