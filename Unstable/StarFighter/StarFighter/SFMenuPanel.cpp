@@ -206,7 +206,7 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 		//texts strings
 		m_title_text.setString(m_playerShip->m_targetShop->m_display_name);
 		
-		m_options_text[ShopHeal].setString("Heal");
+		//m_options_text[ShopHeal].setString("Heal");
 		m_options_text[ShopBuy].setString("Buy/Sell");
 		m_options_text[ShopStellarMap].setString("Stellar map");
 
@@ -245,7 +245,7 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 		text_height += m_actions_text.getGlobalBounds().height;
 		//default selected index
 		m_selected_option_index = 0;
-		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[0].getGlobalBounds().height - 1);
+		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[0].getGlobalBounds().height - 5);//because fuck this
 
 	}
 }
@@ -253,7 +253,7 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 void SFShopPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//arrow
-	m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[0].getGlobalBounds().height - 1);
+	m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[0].getGlobalBounds().height - 5);//because fuck this
 	//should be the selected option index's text global bounds, but for some reason it's inconsistent, based on what characters are used in the text, so let us use the same reference index for height
 	//m_arrow->setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height - 1);
 

@@ -25,15 +25,15 @@ public:
 	void Update(Time deltaTime);
 	void Draw();
 	void Release();
-	int SavePlayer(string file, Ship* playerShip = (*CurrentGame).playerShip);
-	string LoadPlayerSave(string file, Ship* playerShip = (*CurrentGame).playerShip);
-	bool AddToKnownScenes(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
-	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip = (*CurrentGame).playerShip);
-	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
+	int SavePlayer(string file, Ship* playerShip = (*CurrentGame).m_playerShip);
+	string LoadPlayerSave(string file, Ship* playerShip = (*CurrentGame).m_playerShip);
+	bool AddToKnownScenes(string scene_name, Ship* playerShip = (*CurrentGame).m_playerShip);
+	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip = (*CurrentGame).m_playerShip);
+	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip = (*CurrentGame).m_playerShip);
 	void LoadAllScenes(string scenes_file);
 
 	void InGameStateMachineCheck(sf::Time deltaTime);
-	void SpawnInScene(string scene_name, Ship* playerShip = (*CurrentGame).playerShip);
+	void SpawnInScene(string scene_name, Ship* playerShip = (*CurrentGame).m_playerShip);
 
 	void PlayerTakesExit();
 
@@ -41,7 +41,7 @@ public:
 	sf::Clock m_bossSpawnCountdown;
 	bool m_hasDisplayedDestructionRatio;
 
-	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip = (*CurrentGame).playerShip);
+	void UpdatePortalsMaxUnlockedHazardLevel(Scene* scene, Ship* playerShip = (*CurrentGame).m_playerShip);
 	void RespawnInLastSafePoint();
 	void CheckScriptedDialogs();
 

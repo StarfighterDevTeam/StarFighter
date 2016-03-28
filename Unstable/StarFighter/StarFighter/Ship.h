@@ -75,7 +75,7 @@ enum HUDStates
 
 enum ShopOptions
 {
-	ShopHeal,
+	//ShopHeal,
 	ShopBuy,
 	ShopStellarMap,
 	NBVAL_ShopOptions,
@@ -100,6 +100,7 @@ public :
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
 	void ManageImmunity();
 	bool ResplenishHealth();
+	void RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel);
 	void ManageFeedbackExpiration(sf::Time deltaTime);
 	void IdleDecelleration(sf::Time deltaTime);
 	void ScreenBorderContraints();
@@ -166,7 +167,7 @@ public :
 	void GetGrazing() override;
 	int getGrazeCount();
 	float getShipBeastScore();
-	void damage_from (GameObject& object) override;
+	void GetDamageFrom (GameObject& object) override;
 
 	Equipment* m_equipment[NBVAL_Equipment];
 	ShipModel* m_ship_model;

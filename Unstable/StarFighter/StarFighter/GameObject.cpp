@@ -216,7 +216,7 @@ void GameObject::setGhost(bool ghost)
 //	this->setPosition(target->getPosition().x, target->getPosition().x);
 //}
 
-void GameObject::damage_from(GameObject& object)
+void GameObject::GetDamageFrom(GameObject& object)
 {
 	if (!m_immune)
 	{

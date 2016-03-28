@@ -976,7 +976,6 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	SFInventoryPanel::Update(deltaTime, inputs_directions);
 
-	
 	if (!m_playerShip)
 	{
 		return;

@@ -88,6 +88,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_recall_text = new SFTextPop(text_feedback, 0, -1, 0, this, 0, sf::Vector2f(0, -size.y / 2));
 	m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
+	m_recall_text->m_DontGarbageMe = true;
 	delete text_feedback;
 	(*CurrentGame).addToFeedbacks(m_recall_text);
 
@@ -912,14 +913,14 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				{
 					switch (m_SFTargetPanel->GetSelectedOptionIndex())
 					{
-						case ShopHeal:
-						{
-							ResplenishHealth();
-
-							//(*CurrentGame).PlaySFX(SFX_Heal);
-
-							break;
-						}
+						//case ShopHeal:
+						//{
+						//	ResplenishHealth();
+						//
+						//	//(*CurrentGame).PlaySFX(SFX_Heal);
+						//
+						//	break;
+						//}
 						case ShopBuy:
 						{
 							m_HUD_state = HUD_ShopBuyMenu;
@@ -1482,6 +1483,36 @@ bool Ship::ResplenishHealth()
 	return hasHealthToResplenish;
 }
 
+void Ship::RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel)
+{
+	if (HUB_FAST_REGEN_DURATION == 0)
+	{
+		ResplenishHealth();
+		return;
+	}
+
+	float armor_regen_f = 1.0f * m_armor_max / HUB_FAST_REGEN_DURATION * deltaTime.asSeconds();
+	int armor_regen = armor_regen_f + 1;
+	if (m_armor < m_armor_max && armor)
+	{
+		m_armor = m_armor + armor_regen <= m_armor_max ? m_armor + armor_regen : m_armor_max;
+	}
+
+	float shield_regen_f = 1.0f * m_shield_max / HUB_FAST_REGEN_DURATION * deltaTime.asSeconds();
+	int shield_regen = shield_regen_f + 1;
+	if (m_shield < m_shield_max && shield)
+	{
+		m_shield = m_shield + armor_regen <= m_shield_max ? m_shield + shield_regen : m_shield_max;
+	}
+
+	float hyperspeed_fuel_regen_f = 1.0f * m_hyperspeed_fuel_max / HUB_FAST_REGEN_DURATION * deltaTime.asSeconds();
+	int hyperspeed_fuel_regen = hyperspeed_fuel_regen_f + 1;
+	if (m_hyperspeed_fuel < m_hyperspeed_fuel_max && hyperspeed_fuel)
+	{
+		m_hyperspeed_fuel = m_hyperspeed_fuel + hyperspeed_fuel_regen <= m_hyperspeed_fuel_max ? m_hyperspeed_fuel + hyperspeed_fuel_regen : m_hyperspeed_fuel_max;
+	}
+}
+
 void Ship::Respawn()
 {
 	Init();
@@ -1741,7 +1772,7 @@ float Ship::getShipBeastScore()
 	return bonus;
 }
 
-void Ship::damage_from(GameObject& object)
+void Ship::GetDamageFrom(GameObject& object)
 {
 	if (!m_immune)
 	{
@@ -1755,16 +1786,14 @@ void Ship::damage_from(GameObject& object)
 		if (object.m_damage > m_shield)
 		{
 			m_armor -= (object.m_damage - m_shield);
-			if (m_shield > 0)
-			{
-				m_shield_recovery_clock.restart();
-			}
 			m_shield = 0;
 		}
 		else
 		{
 			m_shield -= object.m_damage;
 		}
+
+		m_shield_recovery_clock.restart();
 	}
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;

@@ -24,6 +24,7 @@ SFTextPop::SFTextPop(SFText* text, float time_fade_in, float time_not_faded, flo
 	
 	m_visible = text->m_visible;
 	m_GarbageMe = false;
+	m_DontGarbageMe = false;
 	m_alpha = time_fade_in > 0 ? 0 : 255;
 
 	m_time_fade_in = time_fade_in;

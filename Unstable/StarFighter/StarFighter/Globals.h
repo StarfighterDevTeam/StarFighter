@@ -43,6 +43,7 @@
 #define HUB_EXIT_Y_MAX_RATIO					0.75f
 #define HUB_EXIT_TIMER							1.f
 #define HUB_LINK_NAME_OFFSET_RATIO				0.3f
+#define HUB_FAST_REGEN_DURATION					4.f
 
 #define	GHOST_ALPHA_VALUE						120
 #define DAMAGE_FEEDBACK_TIME					0.04f

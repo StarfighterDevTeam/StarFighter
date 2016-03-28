@@ -26,7 +26,7 @@ void Game::init(RenderWindow* window)
 	m_direction = NO_DIRECTION;
 	m_hyperspeedMultiplier = 1.0f;
 
-	playerShip = NULL;
+	m_playerShip = NULL;
 	m_waiting_for_dialog_validation = false;
 	m_waiting_for_scene_transition = false;
 
@@ -172,9 +172,9 @@ sf::RenderWindow* Game::getMainWindow()
 	return m_window;
 }
 
-void Game::SetPlayerShip(Ship* m_playerShip)
+void Game::SetPlayerShip(Ship* playerShip)
 {
-	this->playerShip = m_playerShip;
+	m_playerShip = playerShip;
 }
 
 int Game::LoadSFX()
@@ -437,7 +437,7 @@ void Game::colisionChecksV2()
 				if (SimpleCollision::AreColliding((*it1), (*it2)))
 				{
 					//Do something (like, kill ship) -> OK
-					(*it1)->damage_from(*(*it2));
+					(*it1)->GetDamageFrom(*(*it2));
 					//explosion
 					(*it2)->Death();
 
@@ -463,7 +463,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, kill ship)
-				(*it1)->damage_from(*(*it2));
+				(*it1)->GetDamageFrom(*(*it2));
 				//explosion
 				//TO DO : explosion impact enemy vs ship
 
@@ -476,7 +476,7 @@ void Game::colisionChecksV2()
 				}
 
 				//player may also deal contact damage to enemy ships
-				(*it2)->damage_from(*(*it1));
+				(*it2)->GetDamageFrom(*(*it1));
 
 				//TODO: display contact feedback (small explosion?)
 
@@ -547,7 +547,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something (like, kill the enemy ship ?)
-				(*it1)->damage_from(*(*it2));
+				(*it1)->GetDamageFrom(*(*it2));
 				//explosion
 				(*it2)->Death();
 
@@ -865,9 +865,9 @@ void Game::resetHazard(int hazard_overkill)
 	m_hazardSpawned = 0;
 }
 
-float Game::GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore)
+float Game::GetBeastScoreBonus(float playerShipBeastScore, float sceneBeastScore)
 {
-	m_BeastScoreBonus = m_playerShipBeastScore + m_sceneBeastScore;
+	m_BeastScoreBonus = playerShipBeastScore + sceneBeastScore;
 	return m_BeastScoreBonus;
 
 }
@@ -970,14 +970,14 @@ float Game::GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_po
 	return angle;
 }
 
-void Game::WakeUpEnemiesWithName(string m_display_name)
+void Game::WakeUpEnemiesWithName(string display_name)
 {
 	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[EnemyObject].begin(); it != m_sceneGameObjectsTyped[EnemyObject].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->m_display_name == m_display_name)
+		if ((*it)->m_display_name == display_name)
 		{
 			(*it)->m_wake_up = true;
 		}

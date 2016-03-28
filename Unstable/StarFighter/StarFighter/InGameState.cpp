@@ -74,21 +74,21 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
-	(*CurrentGame).addToScene((*CurrentGame).playerShip, PlayerShipLayer, PlayerShip);
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 }
 
 void InGameState::Update(Time deltaTime)
 {
 	//automatic respawn if dead
-	if (!(*CurrentGame).playerShip->m_visible)
+	if (!(*CurrentGame).m_playerShip->m_visible)
 	{
 		RespawnInLastSafePoint();
-		//SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
+		//SpawnInScene((*CurrentGame).m_playerShip->m_respawnSceneName);
 	}
-	if (!(*CurrentGame).playerShip->m_is_asking_teleportation.empty())
+	if (!(*CurrentGame).m_playerShip->m_is_asking_teleportation.empty())
 	{
-		SpawnInScene((*CurrentGame).playerShip->m_is_asking_teleportation);
-		(*CurrentGame).playerShip->m_is_asking_teleportation = "";
+		SpawnInScene((*CurrentGame).m_playerShip->m_is_asking_teleportation);
+		(*CurrentGame).m_playerShip->m_is_asking_teleportation = "";
 	}
 
 	//Scene dialogs
@@ -99,28 +99,28 @@ void InGameState::Update(Time deltaTime)
 
 	//State machine
 	InGameStateMachineCheck(deltaTime);
-	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
+	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).m_playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
 
 	(*CurrentGame).updateScene(deltaTime);
 
 	//Create and destroy HUD panels
 	//case 1: destroying a panel
-	if ((*CurrentGame).playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).playerShip->m_SFTargetPanel)
+	if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).m_playerShip->m_SFTargetPanel)
 	{
-		DestroySFPanel((*CurrentGame).playerShip);
+		DestroySFPanel((*CurrentGame).m_playerShip);
 	}
-	else if ((*CurrentGame).playerShip->m_is_asking_SFPanel != SFPanel_None)
+	else if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel != SFPanel_None)
 	{
 		//case 2: creating a panel
-		if (!(*CurrentGame).playerShip->m_SFTargetPanel)
+		if (!(*CurrentGame).m_playerShip->m_SFTargetPanel)
 		{
-			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
+			CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
 		}
 		//case 3: changing panel
-		else if ((*CurrentGame).playerShip->m_SFTargetPanel->m_panel_type != (*CurrentGame).playerShip->m_is_asking_SFPanel)
+		else if ((*CurrentGame).m_playerShip->m_SFTargetPanel->m_panel_type != (*CurrentGame).m_playerShip->m_is_asking_SFPanel)
 		{
-			DestroySFPanel((*CurrentGame).playerShip);
-			CreateSFPanel((*CurrentGame).playerShip->m_is_asking_SFPanel, (*CurrentGame).playerShip);
+			DestroySFPanel((*CurrentGame).m_playerShip);
+			CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
 		}
 	}
 	
@@ -272,8 +272,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 {
 	float w = m_currentScene->m_bg->m_size.x;
 	float h = m_currentScene->m_bg->m_size.y;
-	float w_ = (*CurrentGame).playerShip->m_size.x;
-	float h_ = (*CurrentGame).playerShip->m_size.y;
+	float w_ = (*CurrentGame).m_playerShip->m_size.x;
+	float h_ = (*CurrentGame).m_playerShip->m_size.y;
 
 	switch (m_IG_State)
 	{
@@ -300,8 +300,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).m_vspeed = 0;
 
 					//Disable hyperspeed capacity
-					(*CurrentGame).playerShip->m_disableHyperspeed = true;
-					(*CurrentGame).playerShip->m_disableRecall = true;
+					(*CurrentGame).m_playerShip->m_disableHyperspeed = true;
+					(*CurrentGame).m_playerShip->m_disableRecall = true;
 
 					//Stop spawning enemies
 					m_currentScene->m_generating_enemies = false;
@@ -335,9 +335,14 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 						(*CurrentGame).m_curMusic_type = Music_Boss;//but we don't actually play Music_Boss so the scripted music is not overriden, because it's not really a boss, since you can pass it
 					}
 				}
+				
+				if ((*CurrentGame).isLastEnemyDead())
+				{
+					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, true, true, true);
+				}
 
 				//player takes exit?
-				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
+				if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition)
 				{
 					PlayerTakesExit();
 				}
@@ -359,6 +364,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 				else
 				{
+					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
+
 					if (!m_hasDisplayedDestructionRatio)
 					{
 						//is the scene capable of hazard break? (= last scene before hub)
@@ -383,7 +390,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//player takes exit?
-				if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
+				if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition)
 				{
 					PlayerTakesExit();
 				}
@@ -416,14 +423,14 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 		case TRANSITION_PHASE1_2:
 		{
 			//When the playership reaches the scene border, we can start the swapping of scenes, while replacing him on the right starting position for the next scene
-			if ((*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == LESSER_THAN
-				|| (*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == EQUAL_TO)
+			if ((*CurrentGame).m_playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == LESSER_THAN
+				|| (*CurrentGame).m_playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2)) == EQUAL_TO)
 			{
 				//Correction of playership position
-				(*CurrentGame).playerShip->setPosition_Y_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2));
+				(*CurrentGame).m_playerShip->setPosition_Y_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w_ / 2, h_ / 2));
 
-				(*CurrentGame).playerShip->m_speed = GameObject::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).m_direction, m_nextScene->m_direction, ENDSCENE_TRANSITION_SPEED_DOWN,
-					(*CurrentGame).playerShip->getPosition());
+				(*CurrentGame).m_playerShip->m_speed = GameObject::getSpeed_to_LocationWhileSceneSwap((*CurrentGame).m_direction, m_nextScene->m_direction, ENDSCENE_TRANSITION_SPEED_DOWN,
+					(*CurrentGame).m_playerShip->getPosition());
 
 				m_currentScene->m_bg->m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_DOWN);
 				(*CurrentGame).m_vspeed = ENDSCENE_TRANSITION_SPEED_DOWN;
@@ -463,24 +470,24 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if (m_nextScene->m_direction == NO_DIRECTION)
 				{
 					m_IG_State = HUB_ROAMING;
-					(*CurrentGame).playerShip->m_disableHyperspeed = true;
-					(*CurrentGame).playerShip->m_disableSlowmotion = true;
-					(*CurrentGame).playerShip->m_disable_bots = true;
-					(*CurrentGame).playerShip->m_disableRecall = true;
-					(*CurrentGame).playerShip->SetBotsVisibility(false);
+					(*CurrentGame).m_playerShip->m_disableHyperspeed = true;
+					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
+					(*CurrentGame).m_playerShip->m_disable_bots = true;
+					(*CurrentGame).m_playerShip->m_disableRecall = true;
+					(*CurrentGame).m_playerShip->SetBotsVisibility(false);
 
 					(*CurrentGame).resetHazard();
 				}
 				else
 				{
 					m_IG_State = SCROLLING;
-					(*CurrentGame).playerShip->m_disable_fire = false;
-					(*CurrentGame).playerShip->m_disableHyperspeed = false;
-					(*CurrentGame).playerShip->m_disableSlowmotion = false;
-					(*CurrentGame).playerShip->m_disable_bots = false;
-					(*CurrentGame).playerShip->m_disableRecall = false;
-					(*CurrentGame).playerShip->SetBotsVisibility(true);
-					(*CurrentGame).playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					(*CurrentGame).m_playerShip->m_disable_fire = false;
+					(*CurrentGame).m_playerShip->m_disableHyperspeed = false;
+					(*CurrentGame).m_playerShip->m_disableSlowmotion = false;
+					(*CurrentGame).m_playerShip->m_disable_bots = false;
+					(*CurrentGame).m_playerShip->m_disableRecall = false;
+					(*CurrentGame).m_playerShip->SetBotsVisibility(true);
+					(*CurrentGame).m_playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
 					//(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 					//(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -531,11 +538,11 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				}
 
 				//Giving control back to the player
-				(*CurrentGame).playerShip->m_disable_inputs = false;
-				(*CurrentGame).playerShip->m_speed = sf::Vector2f(0, 0);
+				(*CurrentGame).m_playerShip->m_disable_inputs = false;
+				(*CurrentGame).m_playerShip->m_speed = sf::Vector2f(0, 0);
 
 				(*CurrentGame).m_waiting_for_scene_transition = false;
-				(*CurrentGame).playerShip->m_immune = false;
+				(*CurrentGame).m_playerShip->m_immune = false;
 
 				//Play scene title feedback if we come from a hub + music changes
 				if (previous_direction == NO_DIRECTION || (*CurrentGame).m_curMusic_type != Music_Scene)
@@ -563,30 +570,33 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 		case HUB_ROAMING:
 		{
 			m_currentScene->m_bg->SetPortalsState(PortalOpen);
+			
+			(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, true, true, true);
+
 			//player takes exit?
-			if ((*CurrentGame).playerShip->m_is_asking_scene_transition)
+			if ((*CurrentGame).m_playerShip->m_is_asking_scene_transition)
 			{
 				m_currentScene->m_bg->SetPortalsState(PortalGhost);
 
 				(*CurrentGame).PlaySFX(SFX_EnteringPortal);
 
 				bool reverse = false;
-				if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
+				if ((*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
 				{
 					reverse = true;
 				}
-				string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
+				string nextScene_filename = (*CurrentGame).m_playerShip->m_targetPortal->m_destination_name;
 
-				(*CurrentGame).m_direction = (*CurrentGame).playerShip->m_targetPortal->m_direction;
-				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).playerShip->m_SFTargetPanel->GetSelectedOptionIndex(), reverse, false);
-				(*CurrentGame).playerShip->m_last_hazard_level_played = (*CurrentGame).playerShip->m_SFTargetPanel->GetSelectedOptionIndex();
+				(*CurrentGame).m_direction = (*CurrentGame).m_playerShip->m_targetPortal->m_direction;
+				m_nextScene = new Scene(nextScene_filename, (*CurrentGame).m_playerShip->m_SFTargetPanel->GetSelectedOptionIndex(), reverse, false);
+				(*CurrentGame).m_playerShip->m_last_hazard_level_played = (*CurrentGame).m_playerShip->m_SFTargetPanel->GetSelectedOptionIndex();
 				UpdatePortalsMaxUnlockedHazardLevel(m_nextScene);
 				m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
 
 				//Putting the player on rails
-				(*CurrentGame).playerShip->m_disable_inputs = true;
-				(*CurrentGame).playerShip->m_disable_fire = true;
-				(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
+				(*CurrentGame).m_playerShip->m_disable_inputs = true;
+				(*CurrentGame).m_playerShip->m_disable_fire = true;
+				(*CurrentGame).m_playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
 				
 				m_IG_State = TRANSITION_PHASE1_2;
 			}
@@ -639,14 +649,14 @@ void InGameState::RespawnInLastSafePoint()
 	(*CurrentGame).garbageLayer(LootLayer);
 
 	//loading last visited hub
-	if ((*CurrentGame).playerShip->m_respawnSceneName.empty())
+	if ((*CurrentGame).m_playerShip->m_respawnSceneName.empty())
 	{
-		(*CurrentGame).playerShip->m_respawnSceneName = STARTING_SCENE;
+		(*CurrentGame).m_playerShip->m_respawnSceneName = STARTING_SCENE;
 	}
-	SpawnInScene((*CurrentGame).playerShip->m_respawnSceneName);
+	SpawnInScene((*CurrentGame).m_playerShip->m_respawnSceneName);
 
 	//resetting ship
-	(*CurrentGame).playerShip->Respawn();
+	(*CurrentGame).m_playerShip->Respawn();
 }
 
 void InGameState::DestroySFPanel(Ship* playerShip)
@@ -698,7 +708,7 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 			break;
 		}
 	}
-	(*CurrentGame).addToFeedbacks((*CurrentGame).playerShip->m_SFTargetPanel);
+	(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFTargetPanel);
 }
 
 void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
@@ -724,12 +734,12 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
 		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
-			(*CurrentGame).playerShip->m_disable_fire = false;
-			(*CurrentGame).playerShip->m_disableHyperspeed = false;
-			(*CurrentGame).playerShip->m_disableSlowmotion = false;
-			(*CurrentGame).playerShip->m_disable_bots = false;
-			(*CurrentGame).playerShip->m_disableRecall = false;
-			(*CurrentGame).playerShip->SetBotsVisibility(true);
+			(*CurrentGame).m_playerShip->m_disable_fire = false;
+			(*CurrentGame).m_playerShip->m_disableHyperspeed = false;
+			(*CurrentGame).m_playerShip->m_disableSlowmotion = false;
+			(*CurrentGame).m_playerShip->m_disable_bots = false;
+			(*CurrentGame).m_playerShip->m_disableRecall = false;
+			(*CurrentGame).m_playerShip->SetBotsVisibility(true);
 			m_IG_State = SCROLLING;
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
 
@@ -744,12 +754,12 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		}
 		else
 		{
-			(*CurrentGame).playerShip->m_disable_fire = true;
-			(*CurrentGame).playerShip->m_disableHyperspeed = true;
-			(*CurrentGame).playerShip->m_disableSlowmotion = true;
-			(*CurrentGame).playerShip->m_disable_bots = true;
-			(*CurrentGame).playerShip->m_disableRecall = true;
-			(*CurrentGame).playerShip->SetBotsVisibility(false);
+			(*CurrentGame).m_playerShip->m_disable_fire = true;
+			(*CurrentGame).m_playerShip->m_disableHyperspeed = true;
+			(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
+			(*CurrentGame).m_playerShip->m_disable_bots = true;
+			(*CurrentGame).m_playerShip->m_disableRecall = true;
+			(*CurrentGame).m_playerShip->SetBotsVisibility(false);
 			m_IG_State = HUB_ROAMING;
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
 
@@ -803,12 +813,12 @@ void InGameState::PlayerTakesExit()
 	(*CurrentGame).PlaySFX(SFX_EnteringPortal);
 
 	bool reverse = false;
-	if ((*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
+	if ((*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_DOWN || (*CurrentGame).m_playerShip->m_targetPortal->m_direction == DIRECTION_LEFT)
 	{
 		reverse = true;
 	}
 
-	string nextScene_filename = (*CurrentGame).playerShip->m_targetPortal->m_destination_name;
+	string nextScene_filename = (*CurrentGame).m_playerShip->m_targetPortal->m_destination_name;
 	m_nextScene = new Scene(nextScene_filename, m_currentScene->getSceneHazardLevelValue(), reverse, false);
 
 	//remembering linked scenes to hazard break later
@@ -821,10 +831,10 @@ void InGameState::PlayerTakesExit()
 	m_nextScene->m_bg->m_speed = sf::Vector2f(0, 0);
 
 	//Putting the player on rails
-	(*CurrentGame).playerShip->m_disable_inputs = true;
-	(*CurrentGame).playerShip->m_disable_fire = true;
-	(*CurrentGame).playerShip->m_disableSlowmotion = true;
-	(*CurrentGame).playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
+	(*CurrentGame).m_playerShip->m_disable_inputs = true;
+	(*CurrentGame).m_playerShip->m_disable_fire = true;
+	(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
+	(*CurrentGame).m_playerShip->m_speed = -GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, ENDSCENE_TRANSITION_SPEED_UP);
 	
 	(*CurrentGame).m_waiting_for_scene_transition = true;
 
@@ -841,7 +851,7 @@ void InGameState::CheckScriptedDialogs()
 			size_t chainedDialogsVectorSize = m_currentScene->m_dialogs[i].second.size();
 			for (size_t j = 0; j < chainedDialogsVectorSize; j++)
 			{
-				(*CurrentGame).playerShip->m_targetDialogs.push_back(m_currentScene->m_dialogs[i].second[j]->Clone());
+				(*CurrentGame).m_playerShip->m_targetDialogs.push_back(m_currentScene->m_dialogs[i].second[j]->Clone());
 			}
 
 			m_currentScene->m_dialogs[i].first = -1;//flag it as read

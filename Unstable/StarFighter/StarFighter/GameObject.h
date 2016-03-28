@@ -220,7 +220,7 @@ public:
 	LayerType m_layer;
 	sf::Vector2f m_size;
 
-	virtual void damage_from(GameObject& object);
+	virtual void GetDamageFrom(GameObject& object);
 	string getName();
 	virtual void Respawn();
 	GameObject* Clone();

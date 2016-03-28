@@ -463,7 +463,7 @@ void Enemy::RotateFeedbacks(float angle)
 	m_shieldBarContainer.setRotation(angle);
 }
 
-void Enemy::damage_from(GameObject& object)
+void Enemy::GetDamageFrom(GameObject& object)
 {
 	if (!m_immune)
 	{
@@ -585,7 +585,7 @@ bool Enemy::CheckCondition()
 
 			case PlayerVerticalPosition:
 			{
-				FloatCompare result = (*CurrentGame).playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
+				FloatCompare result = (*CurrentGame).m_playerShip->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value / SCENE_SIZE_Y * SCENE_SIZE_X, (*it)->m_value));
 				if (result == (*it)->m_op)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
@@ -597,7 +597,7 @@ bool Enemy::CheckCondition()
 
 			case PlayerHorizontalPosition:
 			{
-				FloatCompare result = (*CurrentGame).playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
+				FloatCompare result = (*CurrentGame).m_playerShip->compare_posX_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f((*it)->m_value, (*it)->m_value / SCENE_SIZE_X * SCENE_SIZE_Y));
 				if (result == (*it)->m_op)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
@@ -719,7 +719,7 @@ bool Enemy::CheckCondition()
 
 			case EnemyProximity:
 			{
-				//float distance = GameObject::GetDistanceBetweenObjects(this, (*CurrentGame).playerShip);
+				//float distance = GameObject::GetDistanceBetweenObjects(this, (*CurrentGame).m_playerShip);
 				if ((*it)->m_op == GREATHER_THAN)
 				{
 					//if (distance > (*it)->m_value)
@@ -904,11 +904,11 @@ void Enemy::setPhase(Phase* phase)
 	{
 		if (!(*CurrentGame).m_waiting_for_dialog_validation)
 		{
-			(*CurrentGame).playerShip->m_is_asking_SFPanel = SFPanel_Dialog;
+			(*CurrentGame).m_playerShip->m_is_asking_SFPanel = SFPanel_Dialog;
 			size_t dialogsVectorSize = phase->m_dialogs.size();
 			for (size_t i = 0; i < dialogsVectorSize; i++)
 			{
-				(*CurrentGame).playerShip->m_targetDialogs.push_back(phase->m_dialogs[i]->Clone());
+				(*CurrentGame).m_playerShip->m_targetDialogs.push_back(phase->m_dialogs[i]->Clone());
 			}
 		}
 	}
@@ -917,14 +917,14 @@ void Enemy::setPhase(Phase* phase)
 	if (phase->m_freeze_player)
 	{
 		//lock player
-		(*CurrentGame).playerShip->m_input_blocker = this;
+		(*CurrentGame).m_playerShip->m_input_blocker = this;
 	}
 	else
 	{
 		//unlock player
-		if ((*CurrentGame).playerShip->m_input_blocker == this)
+		if ((*CurrentGame).m_playerShip->m_input_blocker == this)
 		{
-			(*CurrentGame).playerShip->m_input_blocker = NULL;
+			(*CurrentGame).m_playerShip->m_input_blocker = NULL;
 		}
 	}
 
@@ -1104,7 +1104,7 @@ void Enemy::Death()
 	}
 
 	//Player XP
-	//(*CurrentGame).playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
+	//(*CurrentGame).m_playerShip->gain_xp(XPTable_PerEnemyClass[this->enemy_class]);
 
 	//Loot
 	if (CreateRandomLootv2(m_enemy_class, (*CurrentGame).m_BeastScoreBonus))
@@ -1126,9 +1126,9 @@ void Enemy::Death()
 	}
 
 	//unlock player if blocked
-	if ((*CurrentGame).playerShip->m_input_blocker == this)
+	if ((*CurrentGame).m_playerShip->m_input_blocker == this)
 	{
-		(*CurrentGame).playerShip->m_input_blocker = NULL;
+		(*CurrentGame).m_playerShip->m_input_blocker = NULL;
 	}
 }
 

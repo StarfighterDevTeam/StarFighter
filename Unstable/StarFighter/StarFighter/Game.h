@@ -101,13 +101,14 @@ public:
 	int m_hazardSpawned;
 	float m_BeastScoreBonus;
 
-	Ship* playerShip;
-	void SetPlayerShip(Ship* m_playerShip);
-	float GetBeastScoreBonus(float m_playerShipBeastScore, float m_sceneBeastScore);
+	Ship* m_playerShip;
+
+	void SetPlayerShip(Ship* playerShip);
+	float GetBeastScoreBonus(float playerShipBeastScore, float sceneBeastScore);
 
 	TargetScan FoundNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
 	float GetAngleToNearestGameObject(GameObjectType type, sf::Vector2f ref_position, float range = 0);
-	void WakeUpEnemiesWithName(string m_display_name);
+	void WakeUpEnemiesWithName(string display_name);
 
 	int GetPlayerStatsMultiplierForLevel(int level_);
 	int GetEnemiesStatsMultiplierForLevel(int level_);
