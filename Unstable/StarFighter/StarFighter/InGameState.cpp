@@ -330,9 +330,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					if (m_bossSpawnCountdown.getElapsedTime() > sf::seconds(TIME_BEFORE_BOSS_SPAWN))
 					{
-						(*CurrentGame).PlayMusic(Music_Boss);
 						m_currentScene->GenerateBoss();
 						m_currentScene->m_generating_boss = false;
+						(*CurrentGame).m_curMusic_type = Music_Boss;//but we don't actually play Music_Boss so the scripted music is not overriden, because it's not really a boss, since you can pass it
 					}
 				}
 
@@ -542,7 +542,15 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if (previous_direction == NO_DIRECTION || (*CurrentGame).m_curMusic_type != Music_Scene)
 				{
 					m_currentScene->PlayTitleFeedback();
-					(*CurrentGame).PlayMusic(Music_Scene);
+
+					if (!m_currentScene->m_scene_music.empty())
+					{
+						(*CurrentGame).PlayMusic(Music_Scene, m_currentScene->m_scene_music);
+					}
+					else
+					{
+						(*CurrentGame).PlayMusic(Music_Scene);
+					}
 				}
 				if (m_currentScene->m_direction == NO_DIRECTION)
 				{
@@ -725,6 +733,15 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			(*CurrentGame).playerShip->SetBotsVisibility(true);
 			m_IG_State = SCROLLING;
 			ship_pos = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_Y_RATIO));
+
+			if (!m_currentScene->m_scene_music.empty())
+			{
+				(*CurrentGame).PlayMusic(Music_Scene, m_currentScene->m_scene_music);
+			}
+			else
+			{
+				(*CurrentGame).PlayMusic(Music_Scene);
+			}
 		}
 		else
 		{
@@ -736,6 +753,15 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			(*CurrentGame).playerShip->SetBotsVisibility(false);
 			m_IG_State = HUB_ROAMING;
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
+
+			if (!m_currentScene->m_scene_music.empty())
+			{
+				(*CurrentGame).PlayMusic(Music_Hub, m_currentScene->m_scene_music);
+			}
+			else
+			{
+				(*CurrentGame).PlayMusic(Music_Hub);
+			}
 		}
 		m_playerShip->setPosition(ship_pos);
 

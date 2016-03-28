@@ -131,7 +131,7 @@ public:
 	bool m_asking_music_fade_out;
 	bool m_Music_Activated;
 	void SetMusicVolume(bool activate_music);
-	void PlayMusic(Music_Bank music);
+	void PlayMusic(Music_Bank music, string specific_filename = "");
 	void ManageMusicTransitions(sf::Time deltaTime);
 	string m_next_music_name;
 	Music_Bank m_curMusic_type;

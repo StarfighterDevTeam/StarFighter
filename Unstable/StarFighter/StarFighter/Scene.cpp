@@ -230,6 +230,11 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			//m_dialogs.insert(map<float, vector<Dialog*> >::value_type(stoi((*CurrentGame).m_sceneConfigs[name][i][SCENE_DIALOG_TIME]), chained_dialogs));
 			m_dialogs.push_back(std::make_pair(stoi((*CurrentGame).m_sceneConfigs[name][i][SCENE_DIALOG_TIME]), chained_dialogs));
 		}
+		//Loading specific music
+		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("music") == 0)
+		{
+			m_scene_music = (*CurrentGame).m_sceneConfigs[name][i][1];
+		}
 
 		if (enemy_count != 0 && m_direction != NO_DIRECTION)
 		{

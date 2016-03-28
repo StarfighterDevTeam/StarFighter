@@ -9,3 +9,5 @@ boss,V_AlphaGold_Intro,0,0.3,1.25,180,,,1.15,-0.1
 boss,V_AlphaGold_Intro,0,0.7,1.25,180,,,1.15,-0.1
 #,portal_open_during_boss,,,,,,,,
 script,1,,,,,,,,
+#,music_filename,,,,,,,,
+music,Assets/Music/Boss.ogg,,,,,,,,

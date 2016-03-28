@@ -82,7 +82,7 @@ void Game::SetMusicVolume(bool activate_music)
 	m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * activate_music);
 }
 
-void Game::PlayMusic(Music_Bank music)
+void Game::PlayMusic(Music_Bank music, string specific_filename)
 {
 	if (music == m_curMusic_type)
 	{
@@ -94,23 +94,32 @@ void Game::PlayMusic(Music_Bank music)
 	if (!m_Music_Activated)
 		return;
 
-	//choose the right music file
-	switch (music)
+	//filename has been specified?
+	if (!specific_filename.empty())
 	{
-		case Music_Hub:
+		m_next_music_name = specific_filename;
+	}
+	//default musics
+	else
+	{
+		//choose the right music file
+		switch (music)
 		{
-			m_next_music_name = "Assets/Music/Hub.ogg";
-			break;
-		}
-		case Music_Scene:
-		{
-			m_next_music_name = "Assets/Music/Scene.ogg";
-			break;
-		}
-		case Music_Boss:
-		{
-			m_next_music_name = "Assets/Music/Boss.ogg";
-			break;
+			case Music_Hub:
+			{
+				m_next_music_name = "Assets/Music/Hub.ogg";
+				break;
+			}
+			case Music_Scene:
+			{
+				m_next_music_name = "Assets/Music/Scene.ogg";
+				break;
+			}
+			case Music_Boss:
+			{
+				m_next_music_name = "Assets/Music/Boss.ogg";
+				break;
+			}
 		}
 	}
 

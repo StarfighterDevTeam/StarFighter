@@ -72,6 +72,7 @@ public:
 	//map<float, vector<Dialog*> > m_dialogs;
 	vector<pair<float, vector<Dialog*> > > m_dialogs;
 	sf::Clock m_scene_clock;
+	string m_scene_music;
 
 	int getSceneHazardLevelUnlockedValue();
 	void setSceneHazardLevelUnlockedValue(int hazard_unlocked_value);
