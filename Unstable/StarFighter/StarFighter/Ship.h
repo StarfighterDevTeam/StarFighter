@@ -71,6 +71,7 @@ enum HUDStates
 	HUD_ShopSellMenu,
 	HUD_ShopStellarMap,
 	HUD_Dialog,
+	HUD_Trade,
 };
 
 enum ShopOptions

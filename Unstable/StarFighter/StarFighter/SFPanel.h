@@ -21,6 +21,24 @@ enum SFPanelTypes
 	SFPanel_DialogNext,
 	SFPanel_Map,
 	SFPanel_MapInfo,
+	SFPanel_Trade,
+};
+
+enum TradeGrids
+{
+	Trade_ShopGrid,
+	Trade_EquippedGrid,
+	Trade_StashGrid,
+	NBVAL_TradeGrids//3
+};
+
+enum FocusedItemStates
+{
+	FocusedItem_Equip,
+	FocusedItem_Desequip,
+	FocusedItem_Buy,
+	FocusedItem_SellOrEquip,
+	FocusedItem_SellOrDesequip,
 };
 
 class SFPanel : public sf::RectangleShape
@@ -59,6 +77,8 @@ public:
 	virtual void SetItemStatsPanel(SFItemStatsPanel* panel);
 	virtual float GetDuration();
 	virtual float GetDurationClockElpased();
+	virtual int GetItemsStatsPanelIndex();
+	virtual void SetItemsStatsPanelIndex(int index);
 	
 	virtual Dialog* GetDialog();
 

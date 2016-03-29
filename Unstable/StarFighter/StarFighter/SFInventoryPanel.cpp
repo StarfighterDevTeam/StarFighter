@@ -3,7 +3,7 @@
 extern Game* CurrentGame;
 
 //ITEMS STATS PANEL
-SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, bool item_in_shop) : SFPanel(size, SFPanel_ItemStats)
+SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state) : SFPanel(size, SFPanel_ItemStats)
 {
 	if (object)
 	{
@@ -12,6 +12,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		setFillColor(sf::Color(20, 20, 20, 230));//dark grey
 		setOutlineThickness(0);
 		setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
+		m_selected_option_index = 0;
 
 		m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
 			sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
@@ -21,9 +22,10 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		m_title_text.setCharacterSize(18);
 		m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-
-		m_options_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		m_options_text.setCharacterSize(18);
+		m_options_text[0].setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_options_text[0].setCharacterSize(18);
+		m_options_text[1].setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_options_text[1].setCharacterSize(18);
 
 		DisplayItemStats(object);
 
@@ -38,54 +40,73 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 
 		//Action texts
 		//BUY
-		if (item_in_shop)
+		if (item_state == FocusedItem_Buy)
 		{
 			int price = object->m_equipment_loot ? object->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS : object->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			ostringstream ss_buy;
 			ss_buy << "Buy: $" << price;
 			if (playerShip->m_money < price)
 			{
-				m_options_text.setColor(sf::Color(255, 50, 50, 255));//red
+				m_options_text[0].setColor(sf::Color(255, 50, 50, 255));//red
 				ss_buy << " (insufficient credits)";
 			}
-			m_options_text.setString(ss_buy.str());
+			
+			m_options_text[0].setString(ss_buy.str());
 			m_arrow.m_visible = true;
 		}
 		//SELL
-		else if (playerShip && playerShip->m_HUD_state == HUD_ShopSellMenu)
+		else if (item_state == FocusedItem_SellOrEquip || item_state == FocusedItem_SellOrDesequip)
 		{
 			int price = object->m_equipment_loot ? object->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS : object->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			ostringstream ss_sell;
 			ss_sell << "Sell: $" << price;
-			m_options_text.setString(ss_sell.str());
+			m_options_text[0].setString(ss_sell.str());
 			m_arrow.m_visible = true;
+
+			//SELL / EQUIP
+			if (item_state == FocusedItem_SellOrEquip)
+			{
+				m_options_text[1].setString("Equip");
+			}
+			//SELL / DESEQUIP
+			else if (item_state == FocusedItem_SellOrDesequip)
+			{
+				m_options_text[1].setString("Desequip");
+			}
 		}
-		else if (playerShip && playerShip->m_HUD_state == HUD_OpeningEquipment)
+		//EQUIP
+		else if (item_state == FocusedItem_Equip)
 		{
-			//DESEQUIP
-			if (playerShip->m_SFHudPanel && playerShip->m_SFHudPanel->GetFocusedGrid() == 1)
-			{
-				m_options_text.setString("Desequip");
-				m_arrow.m_visible = true;
-			}
-			//EQUIP
-			else if (playerShip->m_SFHudPanel && playerShip->m_SFHudPanel->GetFocusedGrid() == 2)
-			{
-				m_options_text.setString("Equip");
-				m_arrow.m_visible = true;
-			}
+			m_options_text[0].setString("Equip");
+		}
+		//DESEQUIP
+		else if (item_state == FocusedItem_Desequip)
+		{
+			m_options_text[0].setString("Desequip");
 		}
 
-		text_height += m_options_text.getGlobalBounds().height;
-		m_options_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
-		text_height += m_options_text.getGlobalBounds().height / 2 + 2;//because fuck this
-		m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+		//options texts
+		for (size_t i = 0; i < 2; i++)
+		{
+			text_height += INTERACTION_INTERLINE;
+			text_height += m_options_text[i].getGlobalBounds().height;
+			m_options_text[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+			if (i == 0)
+			{
+				m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height + m_options_text[0].getCharacterSize());
+			}
+		}
 	}
 }
 
 SFItemStatsPanel::~SFItemStatsPanel()
 {
-	
+
+}
+
+void SFItemStatsPanel::Update()
+{
+	m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height / 2 + 3);
 }
 
 void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
@@ -96,7 +117,10 @@ void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
 
 		screen.draw(m_title_text);
 		screen.draw(m_text);
-		screen.draw(m_options_text);
+		for (size_t i = 0; i < 2; i++)
+		{
+			screen.draw(m_options_text[i]);
+		}
 		screen.draw(m_actions_text);
 		if (m_arrow.m_visible)
 		{
@@ -338,6 +362,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 
 	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
 		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
+	m_cursor.m_visible = true;
 
 	m_fake_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), true);
 	m_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(nb_lines, nb_rows), false);
@@ -607,7 +632,8 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFTargetPanel);
+				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Equip : FocusedItem_Desequip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
 			}
 		}
 		//empty cell
@@ -700,7 +726,8 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, this == m_playerShip->m_SFTargetPanel);
+				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Equip : FocusedItem_Desequip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
 			}
 		}
 		//empty cell
@@ -1179,4 +1206,360 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	screen.draw(m_scene_text);
 	screen.draw(m_framerate_text);
 	screen.draw(m_text);
+}
+
+//TRADE PANEL
+SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPanel_Trade)
+{
+	m_focused_item = NULL;
+	m_focused_cell_index = sf::Vector2i(-1, -1);
+	m_playerShip = playerShip;
+	m_item_stats_panel = NULL;
+	m_focused_grid = 0;
+
+	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_title_text2.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_title_text2.setCharacterSize(m_title_text.getCharacterSize());
+	m_title_text2.setColor(m_title_text.getColor());
+	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+
+	m_cursor = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES + (EQUIPMENT_GRID_SLOT_SIZE / 2), SHIP_GRID_OFFSET_POS_Y + (EQUIPMENT_GRID_SLOT_SIZE / 2)),
+		sf::Vector2f(0, 0), HUD_CURSOR_TEXTURE_NAME, sf::Vector2f(HUD_CURSOR_WIDTH, HUD_CURSOR_HEIGHT), sf::Vector2f(HUD_CURSOR_WIDTH / 2, HUD_CURSOR_HEIGHT / 2), 1, (Cursor_Focus8_8 + 1));
+
+	m_fake_grid[Trade_ShopGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS), true);
+	m_grid[Trade_ShopGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS), false);
+	m_quality_grid[Trade_ShopGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS), false, false, true);
+
+	m_fake_grid[Trade_StashGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), true);
+	m_grid[Trade_StashGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false);
+	m_quality_grid[Trade_StashGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false, false, true);
+
+	m_fake_grid[Trade_EquippedGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
+	m_grid[Trade_EquippedGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
+	m_quality_grid[Trade_EquippedGrid] = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false, false, true);
+
+	m_grey_grid = ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS), false, true);
+
+	//texts
+	if (playerShip)
+	{
+		//player name and content
+		m_title_text2.setString(m_playerShip->m_display_name);
+		//copy player grids into trade panel
+		for (size_t i = 0; i < m_grid[Trade_EquippedGrid].squares.x; i++)
+		{
+			for (size_t j = 0; j < m_grid[Trade_EquippedGrid].squares.y; j++)
+			{
+				if (i < playerShip->m_SFHudPanel->GetGrid()->squares.x && j < playerShip->m_SFHudPanel->GetGrid()->squares.y && playerShip->m_SFHudPanel->GetGrid()->grid[i][j])
+				{
+					m_grid[Trade_EquippedGrid].grid[i][j] = playerShip->m_SFHudPanel->GetGrid()->grid[i][j]->Clone();
+				}
+			}
+		}
+		for (size_t i = 0; i < m_grid[Trade_StashGrid].squares.x; i++)
+		{
+			for (size_t j = 0; j < m_grid[Trade_StashGrid].squares.y; j++)
+			{
+				if (i < playerShip->m_SFHudPanel->GetGrid(false, 2)->squares.x && j < playerShip->m_SFHudPanel->GetGrid(false, 2)->squares.y && playerShip->m_SFHudPanel->GetGrid(false, 2)->grid[i][j])
+				{
+					m_grid[Trade_StashGrid].grid[i][j] = playerShip->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->Clone();
+				}
+			}
+		}
+
+		//shop name and items
+		if (m_playerShip->m_targetShop)
+		{
+			m_title_text.setString(m_playerShip->m_targetShop->m_display_name);
+
+			//insert shop content in grid
+			size_t vectorItemsInShopSize = m_playerShip->m_targetShop->m_items.size();
+			for (size_t i = 0; i < vectorItemsInShopSize; i++)
+			{
+				m_grid[Trade_ShopGrid].insertObject(*m_playerShip->m_targetShop->m_items[i], i, true);
+			}
+		}
+	}
+
+	ostringstream ss_helpNavigation;
+	ss_helpNavigation << "\n\n\nFire: buy\nStart: switch to equipment panel";
+	m_actions_text.setString(ss_helpNavigation.str());
+
+	//size and position
+	setSize(size);
+	setOrigin(size.x / 2, size.y / 2);
+	setPosition(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2));
+
+	//positioning panel content
+	float text_height = 0;
+
+	text_height += m_title_text.getGlobalBounds().height / 2;
+	m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+	m_title_text2.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+
+	text_height += INTERACTION_INTERBLOCK;
+	text_height += INTERACTION_INTERBLOCK;
+
+	m_fake_grid[Trade_ShopGrid].SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_grid[Trade_ShopGrid].SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_quality_grid[Trade_ShopGrid].SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_grey_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+
+	m_fake_grid[Trade_EquippedGrid].SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_grid[Trade_EquippedGrid].SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_quality_grid[Trade_EquippedGrid].SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+
+	float text_height2 = text_height += INTERACTION_INTERBLOCK + m_fake_grid[Trade_EquippedGrid].grid[0][0]->m_size.y;
+	m_fake_grid[Trade_StashGrid].SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height2));
+	m_grid[Trade_StashGrid].SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height2));
+	m_quality_grid[Trade_StashGrid].SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height2));
+
+	text_height += m_fake_grid[Trade_ShopGrid].squares.y * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height / 2;
+	text_height += INTERACTION_INTERBLOCK + INTERACTION_INTERBLOCK;//don't know why but it's currently required to get to the correct position
+	m_actions_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+	text_height += m_actions_text.getGlobalBounds().height;
+
+	//init cursor position on first cell
+	m_cursor.setPosition(m_fake_grid[Trade_ShopGrid].grid[0][0]->getPosition().x, m_fake_grid[Trade_ShopGrid].grid[0][0]->getPosition().y);
+
+	//build separator between shop items and player items
+	m_separator.setSize(sf::Vector2f(1, size.y));
+	m_separator.setOrigin(m_separator.getSize().x / 2, m_separator.getSize().y/2);
+	m_separator.setPosition(getPosition());
+	m_separator.setFillColor(getOutlineColor());
+}
+
+void SFTradePanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
+{
+	//update background colors
+	SFInventoryPanel::UpdateBackgroundColors(m_quality_grid[Trade_ShopGrid], m_grid[Trade_ShopGrid]);
+	SFInventoryPanel::UpdateBackgroundColors(m_quality_grid[Trade_EquippedGrid], m_grid[Trade_EquippedGrid]);
+	SFInventoryPanel::UpdateBackgroundColors(m_quality_grid[Trade_StashGrid], m_grid[Trade_StashGrid]);
+
+	//update hovered item and highlight feedbacks
+	GetHoveredObjectInGrid();
+
+	//Update selected index in item stats panel
+	if (m_item_stats_panel)
+	{
+		m_item_stats_panel->Update();
+	}
+
+	//cover cells with a semi-transparent black if player doesn't have the money required
+	//if (m_is_shop)
+	{
+		for (int i = 0; i < m_grey_grid.squares.x; i++)
+		{
+			for (int j = 0; j < m_grey_grid.squares.y; j++)
+			{
+				if (m_grid[Trade_ShopGrid].grid[i][j])
+				{
+					if (m_grid[Trade_ShopGrid].grid[i][j]->m_equipment_loot)
+					{
+						m_grey_grid.grid[i][j]->m_visible = m_playerShip->m_money < m_grid[Trade_ShopGrid].grid[i][j]->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					}
+					else if (m_grid[Trade_ShopGrid].grid[i][j]->m_weapon_loot)
+					{
+						m_grey_grid.grid[i][j]->m_visible = m_playerShip->m_money < m_grid[Trade_ShopGrid].grid[i][j]->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					}
+				}
+			}
+		}
+	}
+}
+
+void SFTradePanel::Draw(sf::RenderTexture& screen)
+{
+	if (m_visible)
+	{
+		SFPanel::Draw(screen);
+
+		screen.draw(m_separator);
+		screen.draw(m_title_text);
+		screen.draw(m_title_text2);
+		screen.draw(m_actions_text);
+		for (size_t i = 0; i < NBVAL_TradeGrids; i++)
+		{
+			m_fake_grid[i].Draw(screen);
+			m_quality_grid[i].Draw(screen);
+			m_grid[i].Draw(screen);
+		}
+		m_grey_grid.Draw(screen);
+		if (m_item_stats_panel)
+		{
+			m_item_stats_panel->Draw(screen);
+		}
+		if (m_cursor.m_visible)
+		{
+			screen.draw(m_cursor);
+		}
+	}
+}
+
+GameObject* SFTradePanel::GetHoveredObjectInGrid()
+{
+	//reset previous highlight
+	for (size_t i = 0; i < NBVAL_TradeGrids; i++)
+	{
+		m_fake_grid[i].ClearHighlight();
+	}
+
+	//getting hovered cell's index
+	int hovered_index = 0;
+	for (size_t i = 0; i < NBVAL_TradeGrids; i++)
+	{
+		hovered_index = m_fake_grid[i].isCursorColliding(m_cursor);
+		if (hovered_index >= 0)
+		{
+			m_focused_grid = i;
+			break;
+		}
+	}
+
+	//case: no cell is hovered
+	if (hovered_index < 0)
+	{
+		m_focused_grid = 0;//identify which grid is focused
+		m_focused_cell_index.x = -1;
+		m_focused_cell_index.y = -1;
+		m_focused_item = NULL;
+
+		m_cursor.setAnimationLine(Cursor_NormalState);
+
+		//destroy stats panel
+		if (m_item_stats_panel)
+		{
+			delete m_item_stats_panel;
+			m_item_stats_panel = NULL;
+		}
+
+		return m_focused_item;
+	}
+	//case: a cell is hovered
+	else
+	{
+		//update knowledge of focused index
+		m_focused_cell_index.x = hovered_index / m_fake_grid[m_focused_grid].squares.y;
+		m_focused_cell_index.y = hovered_index % m_fake_grid[m_focused_grid].squares.y;
+
+		//highlight new focused cell
+		m_fake_grid[m_focused_grid].SetCellHighlightState(hovered_index, Slot_HighlightState);
+
+		//update focused item
+		GameObject* previous_focused_item = m_focused_item;
+		m_focused_item = m_grid[m_focused_grid].grid[m_focused_cell_index.x][m_focused_cell_index.y];
+
+		//item hovered
+		if (m_focused_item)
+		{
+			m_cursor.setAnimationLine(Cursor_ActionState);
+
+			//update item stats panel
+			if (previous_focused_item != m_focused_item)
+			{
+				delete m_item_stats_panel;
+			}
+			if (!previous_focused_item || previous_focused_item != m_focused_item)
+			{
+				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Equip : FocusedItem_Desequip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
+			}
+		}
+		//empty cell
+		else
+		{
+			m_cursor.setAnimationLine(Cursor_HighlightState);
+
+			//destroy stats panels
+			if (m_item_stats_panel)
+			{
+				delete m_item_stats_panel;
+				m_item_stats_panel = NULL;
+			}
+		}
+
+		previous_focused_item = NULL;
+		return m_focused_item;
+	}
+}
+
+GameObject* SFTradePanel::GetCursor()
+{
+	return &m_cursor;
+}
+
+GameObject* SFTradePanel::GetFocusedItem()
+{
+	return m_focused_item;
+}
+
+void SFTradePanel::SetFocusedItem(GameObject* item)
+{
+	m_focused_item = item;
+}
+
+sf::Vector2i SFTradePanel::GetFocusedIndex()
+{
+	return m_focused_cell_index;
+}
+
+int SFTradePanel::GetFocusedIntIndex()
+{
+	return m_focused_cell_index.y + (m_focused_cell_index.x * m_grid[m_focused_grid].squares.y);
+}
+
+int SFTradePanel::GetFocusedGrid()
+{
+	return m_focused_grid;
+}
+
+ObjectGrid* SFTradePanel::GetGrid(bool fake_grid, size_t grid)
+{
+	if (fake_grid)
+	{
+		return &m_fake_grid[grid];
+	}
+	else
+	{
+		return &m_grid[grid];
+	}
+}
+
+SFItemStatsPanel* SFTradePanel::GetItemStatsPanel()
+{
+	return m_item_stats_panel;
+}
+
+void SFTradePanel::SetItemStatsPanel(SFItemStatsPanel* panel)
+{
+	m_item_stats_panel = panel;
+}
+
+void SFTradePanel::ClearHighlight()
+{
+	for (size_t i = 0; i < NBVAL_TradeGrids; i++)
+	{
+		m_fake_grid[i].ClearHighlight();
+	}
+}
+
+int SFTradePanel::GetItemsStatsPanelIndex()
+{
+	if (m_item_stats_panel)
+	{
+		return m_item_stats_panel->m_selected_option_index;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+void SFTradePanel::SetItemsStatsPanelIndex(int index)
+{
+	if (m_item_stats_panel)
+	{
+		m_item_stats_panel->m_selected_option_index = index;
+	}
 }

@@ -19,6 +19,8 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	{
 		m_equipment[i] = NULL;
 	}
+
+	m_display_name = "Wisteria";
 	m_weapon = NULL;
 	m_collider_type = PlayerShip;
 	m_moving = false;
@@ -548,7 +550,7 @@ void Ship::UpdateHUDStates()
 		}
 		else if (m_targetShop)
 		{
-			if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
+			if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_Trade)// m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
 			}
@@ -655,83 +657,29 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 			}
 		}
-		//SHOP BUY
-		else if (m_HUD_state == HUD_ShopBuyMenu && m_SFTargetPanel)
+		//TRADE MENU (SHOP)
+		else if (m_HUD_state == HUD_Trade && m_SFTargetPanel)
 		{
 			//Cursor movement
 			MoveCursor(m_SFTargetPanel->GetCursor(), inputs_direction, deltaTime, m_SFTargetPanel);
-			//Force HUD cursor on equivalent object
-			m_SFHudPanel->GetCursor()->m_visible = m_SFTargetPanel->GetFocusedItem();
-			if (m_SFHudPanel->GetCursor()->m_visible)
-			{
-				m_SFHudPanel->ForceCursorOnEquivalentObjectInGrid(m_SFTargetPanel->GetFocusedItem(), m_SFHudPanel->GetGrid(true));
-			}
-
-			//Switch to sell menu
-			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
-			{
-				m_HUD_state = HUD_ShopSellMenu;
-				m_SFHudPanel->GetCursor()->m_visible = true;
-				m_SFTargetPanel->GetCursor()->m_visible = false;
-				m_SFHudPanel->ClearHighlight();
-				m_SFTargetPanel->ClearHighlight();
-
-				if (m_SFHudPanel->GetItemStatsPanel())
-				{
-					m_SFHudPanel->SetFocusedItem(NULL);
-				}
-			}
 
 			//interaction: buy item
-			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFTargetPanel->GetFocusedItem())
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFTargetPanel->GetFocusedGrid() == Trade_ShopGrid && m_SFTargetPanel->GetFocusedItem())
 			{
-				BuyingItem();    
+				//BuyingItem();    
+			}
+
+			//interaction: sell item
+			if (m_inputs_states[Action_Firing] == Input_Tap && (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid || m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid) && m_SFTargetPanel->GetFocusedItem())
+			{
+				//SellingItem();
 			}
 
 			//exit
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
-				m_SFHudPanel->GetCursor()->m_visible = false;
-			}
-		}
-		//SHOP SELL
-		else if (m_HUD_state == HUD_ShopSellMenu)
-		{
-			//Cursor movement
-			MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
-
-			//Swapping items
-			//if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 2)
-			//{
-			//	SwappingItems();
-			//}
-			//Selling item
-			//else if (m_inputs_states[Action_Braking] == Input_Tap && m_SFHudPanel->GetFocusedItem())
-			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem())
-			{
-				SellingItem();
-			}
-			
-			//Switch to buy menu
-			if (UpdateAction(Action_OpeningHud, Input_Tap, true))
-			{
-				m_HUD_state = HUD_ShopBuyMenu;
-				m_SFTargetPanel->GetCursor()->m_visible = true;
-				m_SFHudPanel->ClearHighlight();
-				m_SFTargetPanel->ClearHighlight();
-
-				if (m_SFHudPanel->GetItemStatsPanel())
-				{
-					m_SFHudPanel->SetFocusedItem(NULL);
-				}
-			}
-
-			//exit
-			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
-			{
-				m_HUD_state = HUD_ShopMainMenu;
-				m_SFHudPanel->GetCursor()->m_visible = false;
+				m_SFTargetPanel->GetCursor()->m_visible = false;
 			}
 		}
 		//STELLAR MAP
@@ -923,8 +871,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						//}
 						case ShopBuy:
 						{
-							m_HUD_state = HUD_ShopBuyMenu;
-							m_SFHudPanel->GetCursor()->m_visible = true;
+							m_HUD_state = HUD_Trade;
+							m_SFHudPanel->GetCursor()->m_visible = false;
 							break;
 						}
 						case ShopStellarMap:
@@ -1704,9 +1652,10 @@ void Ship::GetShop(GameObject* object)
 
 	if (!(*CurrentGame).m_waiting_for_dialog_validation)
 	{
-		if (m_HUD_state == HUD_ShopBuyMenu || m_HUD_state == HUD_ShopSellMenu)
+		if (m_HUD_state == HUD_ShopBuyMenu || m_HUD_state == HUD_ShopSellMenu || m_HUD_state == HUD_Trade)
 		{
-			m_is_asking_SFPanel = SFPanel_Inventory;
+			//m_is_asking_SFPanel = SFPanel_Inventory;
+			m_is_asking_SFPanel = SFPanel_Trade;
 		}
 		else if (m_HUD_state == HUD_ShopStellarMap)
 		{
