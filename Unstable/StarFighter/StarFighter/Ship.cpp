@@ -666,13 +666,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//interaction: buy item
 			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFTargetPanel->GetFocusedGrid() == Trade_ShopGrid && m_SFTargetPanel->GetFocusedItem())
 			{
-				//BuyingItem();    
+				BuyingItem();    
 			}
 
 			//interaction: sell item
 			if (m_inputs_states[Action_Firing] == Input_Tap && (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid || m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid) && m_SFTargetPanel->GetFocusedItem())
 			{
-				//SellingItem();
+				SellingItem();
 			}
 
 			//exit
@@ -993,10 +993,10 @@ void Ship::BuyingItem()
 			//if weapon already possessed, we try to put the item in stash
 			if (m_weapon)
 			{
-				if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
+				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
 					m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
+					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 					Ship::SaveItems(ITEMS_SAVE_FILE, this);
 
@@ -1008,8 +1008,8 @@ void Ship::BuyingItem()
 			{
 				setShipWeapon(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->Clone());
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-				m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
-				m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
+				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
+				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1026,10 +1026,10 @@ void Ship::BuyingItem()
 			//if equipment already possessed, we try to put the item in stash
 			if (m_equipment[m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType])
 			{
-				if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
+				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
 					m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-					m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
+					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 					Ship::SaveItems(ITEMS_SAVE_FILE, this);
 
@@ -1041,8 +1041,8 @@ void Ship::BuyingItem()
 			{
 				setShipEquipment(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->Clone());
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
-				m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
-				m_SFTargetPanel->GetGrid()->setCellPointerForIntIndex(m_SFTargetPanel->GetGrid()->GetIntIndex(m_SFTargetPanel->GetFocusedIndex()), NULL);
+				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
+				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1066,34 +1066,34 @@ void Ship::BuyingItem()
 void Ship::SellingItem()
 {
 	//interaction
-	if (m_SFHudPanel && m_SFTargetPanel && m_SFHudPanel->GetFocusedItem())
+	if (m_SFTargetPanel->GetFocusedItem())
 	{
 		//move item
-		int focused_grid = m_SFHudPanel->GetFocusedGrid();
-		int focused_index = m_SFHudPanel->GetGrid(false, focused_grid)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
-		bool success = m_SFTargetPanel->GetGrid()->insertObject(*m_SFHudPanel->GetFocusedItem(), -1, false);
+		//int focused_index = m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->GetIntIndex(m_SFTargetPanel->GetFocusedIndex());
+		int focused_index = m_SFTargetPanel->GetFocusedIntIndex();
+		bool success = m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem(), -1, false);
 		//check that shop grid is not full
 		if (success)
 		{
 			//save shop: flag object as added into shop
-			Game::AddGameObjectToVector(m_SFHudPanel->GetFocusedItem(), &m_targetShop->m_items);
+			Game::AddGameObjectToVector(m_SFTargetPanel->GetFocusedItem(), &m_targetShop->m_items);
 
 			//finish moving the object
-			m_SFHudPanel->GetGrid(false, focused_grid)->setCellPointerForIntIndex(focused_index, NULL);
+			m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->setCellPointerForIntIndex(focused_index, NULL);
 
 			//get the money
-			int equip_type = m_SFHudPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_SFHudPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
+			int equip_type = m_SFTargetPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
 			if (equip_type == NBVAL_Equipment)
 			{
-				m_money += m_SFHudPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				m_money += m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			}
 			else
 			{
-				m_money += m_SFHudPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				m_money += m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 			}
 
 			//desequip if swapped from equipped items
-			if (m_SFHudPanel->GetFocusedGrid() == 1)
+			if (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid)
 			{
 				if (equip_type == NBVAL_Equipment)
 				{

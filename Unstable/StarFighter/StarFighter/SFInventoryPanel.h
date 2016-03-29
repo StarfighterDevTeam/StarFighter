@@ -95,6 +95,7 @@ class SFTradePanel : public SFPanel
 {
 public:
 	SFTradePanel(sf::Vector2f size, Ship* playerShip);
+	~SFTradePanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
 

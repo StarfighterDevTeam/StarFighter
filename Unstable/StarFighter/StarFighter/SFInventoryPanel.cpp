@@ -1330,6 +1330,11 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, 
 	m_separator.setFillColor(getOutlineColor());
 }
 
+SFTradePanel::~SFTradePanel()
+{
+	
+}
+
 void SFTradePanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//update background colors
