@@ -986,7 +986,7 @@ void Ship::BuyingItem()
 	bool success = false;
 	int shop_index = m_SFTargetPanel->GetFocusedIntIndex();
 	//case of weapon hovered
-	if (m_SFTargetPanel && m_SFTargetPanel->GetFocusedItem()->m_weapon_loot)
+	if (m_SFTargetPanel->GetFocusedItem()->m_weapon_loot)
 	{
 		if (m_money >= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS)
 		{
@@ -995,6 +995,7 @@ void Ship::BuyingItem()
 			{
 				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
+					m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 					m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
@@ -1010,6 +1011,7 @@ void Ship::BuyingItem()
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
 				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
+				m_SFHudPanel->GetGrid(false, 1)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1028,6 +1030,7 @@ void Ship::BuyingItem()
 			{
 				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
+					m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 					m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
@@ -1043,6 +1046,7 @@ void Ship::BuyingItem()
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
 				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
+				m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1080,6 +1084,7 @@ void Ship::SellingItem()
 
 			//finish moving the object
 			m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->setCellPointerForIntIndex(focused_index, NULL);
+
 
 			//get the money
 			int equip_type = m_SFTargetPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
