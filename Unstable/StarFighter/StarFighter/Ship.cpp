@@ -1011,7 +1011,7 @@ void Ship::BuyingItem()
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
 				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-				m_SFHudPanel->GetGrid(false, 1)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
+				m_SFHudPanel->GetGrid(false, 1)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), NBVAL_Equipment);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1046,7 +1046,7 @@ void Ship::BuyingItem()
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
 				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-				m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
+				m_SFHudPanel->GetGrid(false, 1)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1073,7 +1073,6 @@ void Ship::SellingItem()
 	if (m_SFTargetPanel->GetFocusedItem())
 	{
 		//move item
-		//int focused_index = m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->GetIntIndex(m_SFTargetPanel->GetFocusedIndex());
 		int focused_index = m_SFTargetPanel->GetFocusedIntIndex();
 		bool success = m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem(), -1, false);
 		//check that shop grid is not full
@@ -1084,7 +1083,16 @@ void Ship::SellingItem()
 
 			//finish moving the object
 			m_SFTargetPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->setCellPointerForIntIndex(focused_index, NULL);
-
+			if (m_SFHudPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->getCellPointerFromIntIndex(focused_index)->m_equipment_loot)
+			{
+				m_SFHudPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->getCellPointerFromIntIndex(focused_index)->m_equipment_loot = NULL;
+			}
+			if (m_SFHudPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->getCellPointerFromIntIndex(focused_index)->m_weapon_loot)
+			{
+				m_SFHudPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->getCellPointerFromIntIndex(focused_index)->m_weapon_loot = NULL;
+			}
+			delete m_SFHudPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->getCellPointerFromIntIndex(focused_index);
+			m_SFHudPanel->GetGrid(false, m_SFTargetPanel->GetFocusedGrid())->setCellPointerForIntIndex(focused_index, NULL);
 
 			//get the money
 			int equip_type = m_SFTargetPanel->GetFocusedItem()->m_weapon_loot ? NBVAL_Equipment : m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
