@@ -31,7 +31,7 @@ public:
 	sf::Vector2i GetFocusedIndex() override;
 	int GetFocusedIntIndex() override;
 	int GetFocusedGrid() override;
-	ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1) override;
+	ObjectGrid* GetGrid(bool fake_grid = false, int grid = 1) override;
 	bool GetPrioritaryFeedback() override;
 	SFItemStatsPanel* GetItemStatsPanel() override;
 	void SetItemStatsPanel(SFItemStatsPanel* panel) override;
@@ -106,11 +106,13 @@ public:
 	sf::Vector2i GetFocusedIndex() override;
 	int GetFocusedIntIndex() override;
 	int GetFocusedGrid() override;
-	ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1) override;
+	ObjectGrid* GetGrid(bool fake_grid = false, int grid = 1) override;
 	SFItemStatsPanel* GetItemStatsPanel() override;
 	int GetItemsStatsPanelIndex() override;
 	void SetItemsStatsPanelIndex(int index) override;
 	void SetItemStatsPanel(SFItemStatsPanel* panel) override;
+
+	int GetItemsStatsPanelNumberOfOptions() override;
 	void ClearHighlight() override;
 
 	GameObject* GetHoveredObjectInGrid();

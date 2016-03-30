@@ -56,6 +56,7 @@ public:
 	sf::Text m_actions_text;
 	bool m_visible;
 	SFPanelTypes m_panel_type;
+	size_t m_number_of_options;
 
 	Ship* m_playerShip;
 
@@ -64,7 +65,7 @@ public:
 	virtual GameObject* GetCursor();
 	virtual GameObject* GetFocusedItem();
 	virtual void SetFocusedItem(GameObject* item);
-	virtual ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1);
+	virtual ObjectGrid* GetGrid(bool fake_grid = false, int grid = 1);
 	virtual sf::Vector2i GetFocusedIndex();
 	virtual int GetFocusedIntIndex();
 	virtual int GetFocusedGrid();
@@ -79,6 +80,7 @@ public:
 	virtual float GetDurationClockElpased();
 	virtual int GetItemsStatsPanelIndex();
 	virtual void SetItemsStatsPanelIndex(int index);
+	virtual int GetItemsStatsPanelNumberOfOptions();
 	
 	virtual Dialog* GetDialog();
 

@@ -657,7 +657,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 			}
 		}
-		//TRADE MENU (SHOP)
+		//TRADE (BUY/SELL)
 		else if (m_HUD_state == HUD_Trade && m_SFTargetPanel)
 		{
 			//Cursor movement
@@ -669,10 +669,38 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				BuyingItem();    
 			}
 
-			//interaction: sell item
+			//interaction: sell, equip, desequip item
 			if (m_inputs_states[Action_Firing] == Input_Tap && (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid || m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid) && m_SFTargetPanel->GetFocusedItem())
 			{
-				SellingItem();
+				if (m_SFTargetPanel->GetItemsStatsPanelIndex() == 0)
+				{
+					SellingItem();
+				}
+				else
+				{
+					if (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid)
+					{
+						DesequipItem();
+					}
+					else if (m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid)
+					{
+						EquipItem();
+					}
+				}
+				
+			}
+
+			//Up and down in options
+			if (m_SFTargetPanel->GetItemStatsPanel())
+			{
+				if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() < m_SFTargetPanel->GetItemsStatsPanelNumberOfOptions() - 1)
+				{
+					m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() + 1);
+				}
+				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() > 0)
+				{
+					m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() - 1);
+				}
 			}
 
 			//exit
@@ -1143,6 +1171,11 @@ void Ship::EquipItem()
 			int ship_index_ = tmp_ptr->m_equipment_loot->m_equipmentType;
 			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
 
+			if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
+			{
+				ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
+			}
+
 			Equipment* new_equipment = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
 			this->setShipEquipment(new_equipment, true);
 			new_equipment = NULL;
@@ -1151,6 +1184,11 @@ void Ship::EquipItem()
 		{
 			int ship_index_ = NBVAL_Equipment;
 			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
+
+			if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
+			{
+				ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
+			}
 
 			Weapon* new_weapon = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
 			this->setShipWeapon(new_weapon, true);
@@ -1181,6 +1219,12 @@ void Ship::DesequipItem()
 			{
 				cleanEquipment(ship_index_);
 				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+
+				if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
+				{
+					m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr);
+					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
+				}
 			}
 		}
 		else if (tmp_ptr->m_weapon_loot)
@@ -1189,6 +1233,12 @@ void Ship::DesequipItem()
 			{
 				cleanWeapon(ship_index_);
 				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+
+				if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
+				{
+					m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr);
+					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
+				}
 			}
 		}
 		else

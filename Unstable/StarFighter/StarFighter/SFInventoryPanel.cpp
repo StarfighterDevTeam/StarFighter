@@ -16,7 +16,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 
 		m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
 			sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
-		m_arrow.m_visible = false;
+		m_arrow.m_visible = true;
 
 		//texts
 		m_title_text.setCharacterSize(18);
@@ -52,7 +52,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			}
 			
 			m_options_text[0].setString(ss_buy.str());
-			m_arrow.m_visible = true;
+			m_number_of_options = 1;
 		}
 		//SELL
 		else if (item_state == FocusedItem_SellOrEquip || item_state == FocusedItem_SellOrDesequip)
@@ -61,7 +61,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			ostringstream ss_sell;
 			ss_sell << "Sell: $" << price;
 			m_options_text[0].setString(ss_sell.str());
-			m_arrow.m_visible = true;
+			m_number_of_options = 2;
 
 			//SELL / EQUIP
 			if (item_state == FocusedItem_SellOrEquip)
@@ -78,11 +78,13 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		else if (item_state == FocusedItem_Equip)
 		{
 			m_options_text[0].setString("Equip");
+			m_number_of_options = 1;
 		}
 		//DESEQUIP
 		else if (item_state == FocusedItem_Desequip)
 		{
 			m_options_text[0].setString("Desequip");
+			m_number_of_options = 1;
 		}
 
 		//options texts
@@ -93,7 +95,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			m_options_text[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
 			if (i == 0)
 			{
-				m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height + m_options_text[0].getCharacterSize());
+				m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height + m_options_text[0].getCharacterSize() - 6);//because fuck this
 			}
 		}
 	}
@@ -106,7 +108,7 @@ SFItemStatsPanel::~SFItemStatsPanel()
 
 void SFItemStatsPanel::Update()
 {
-	m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height / 2 + 3);
+	m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getCharacterSize() - 6);//because fuck this
 }
 
 void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
@@ -454,6 +456,12 @@ SFInventoryPanel::~SFInventoryPanel()
 
 void SFInventoryPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
+	//update item stats panel
+	if (m_item_stats_panel)
+	{
+		m_item_stats_panel->Update();
+	}
+
 	//update background colors
 	UpdateBackgroundColors(m_quality_grid, m_grid);
 
@@ -632,7 +640,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Equip : FocusedItem_Desequip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
+				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Desequip : FocusedItem_Equip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
 				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
 			}
 		}
@@ -726,7 +734,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Equip : FocusedItem_Desequip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
+				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Desequip : FocusedItem_Equip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
 				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
 			}
 		}
@@ -796,7 +804,7 @@ void SFInventoryPanel::SetPrioritaryFeedback(bool has_priotiary_feedback)
 	m_has_prioritary_feedback = has_priotiary_feedback;
 }
 
-ObjectGrid* SFInventoryPanel::GetGrid(bool fake_grid, size_t grid)
+ObjectGrid* SFInventoryPanel::GetGrid(bool fake_grid, int grid)
 {
 	if (grid == 2 && m_use_two_grids)
 	{
@@ -1277,7 +1285,10 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, 
 			size_t vectorItemsInShopSize = m_playerShip->m_targetShop->m_items.size();
 			for (size_t i = 0; i < vectorItemsInShopSize; i++)
 			{
-				m_grid[Trade_ShopGrid].insertObject(*m_playerShip->m_targetShop->m_items[i], i, true);
+				if (m_playerShip->m_targetShop->m_items[i])
+				{
+					m_grid[Trade_ShopGrid].insertObject(*m_playerShip->m_targetShop->m_items[i], i, true);
+				}
 			}
 		}
 	}
@@ -1467,7 +1478,7 @@ GameObject* SFTradePanel::GetHoveredObjectInGrid()
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
-				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Equip : FocusedItem_Desequip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
+				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Desequip : FocusedItem_Equip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
 				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
 			}
 		}
@@ -1519,7 +1530,7 @@ int SFTradePanel::GetFocusedGrid()
 	return m_focused_grid;
 }
 
-ObjectGrid* SFTradePanel::GetGrid(bool fake_grid, size_t grid)
+ObjectGrid* SFTradePanel::GetGrid(bool fake_grid, int grid)
 {
 	if (fake_grid)
 	{
@@ -1566,5 +1577,17 @@ void SFTradePanel::SetItemsStatsPanelIndex(int index)
 	if (m_item_stats_panel)
 	{
 		m_item_stats_panel->m_selected_option_index = index;
+	}
+}
+
+int SFTradePanel::GetItemsStatsPanelNumberOfOptions()
+{
+	if (m_item_stats_panel)
+	{
+		return m_item_stats_panel->m_number_of_options;
+	}
+	else
+	{
+		return -1;
 	}
 }

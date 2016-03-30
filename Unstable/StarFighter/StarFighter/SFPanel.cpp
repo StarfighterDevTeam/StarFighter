@@ -95,7 +95,7 @@ void SFPanel::SetFocusedItem(GameObject* item)
 	//see override function in SFInventoryPanel and other types of SF panels
 }
 
-ObjectGrid* SFPanel::GetGrid(bool fake_grid, size_t grid)
+ObjectGrid* SFPanel::GetGrid(bool fake_grid, int grid)
 {
 	return NULL;
 	//see override function in SFInventoryPanel and other types of SF panels
@@ -163,6 +163,12 @@ int SFPanel::GetItemsStatsPanelIndex()
 
 void SFPanel::SetItemsStatsPanelIndex(int index)
 {
+	//see override function in SFTradePanel and other types of SF panels
+}
+
+int SFPanel::GetItemsStatsPanelNumberOfOptions()
+{
+	return -1;
 	//see override function in SFTradePanel and other types of SF panels
 }
 
