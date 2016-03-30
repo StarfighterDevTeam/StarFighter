@@ -680,11 +680,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				{
 					if (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid)
 					{
-						DesequipItem();
+						DesequipItemFromTradePanel();
 					}
 					else if (m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid)
 					{
-						EquipItem();
+						EquipItemFromTradePanel();
 					}
 				}
 				
@@ -1205,6 +1205,49 @@ void Ship::EquipItem()
 	}
 }
 
+void Ship::EquipItemFromTradePanel()
+{
+	//Equip
+	if (m_SFTargetPanel->GetFocusedItem() && m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid)
+	{
+		GameObject* tmp_ptr = m_SFTargetPanel->GetFocusedItem();
+		int equip_index_ = m_SFTargetPanel->GetFocusedIntIndex();
+
+		if (tmp_ptr->m_equipment_loot)
+		{
+			int ship_index_ = tmp_ptr->m_equipment_loot->m_equipmentType;
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, Trade_EquippedGrid), *m_SFHudPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
+
+			Equipment* new_equipment = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
+			this->setShipEquipment(new_equipment, true);
+			new_equipment = NULL;
+		}
+		else if (tmp_ptr->m_weapon_loot)
+		{
+			int ship_index_ = NBVAL_Equipment;
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
+
+			if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
+			{
+				ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
+			}
+
+			Weapon* new_weapon = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
+			this->setShipWeapon(new_weapon, true);
+			new_weapon = NULL;
+		}
+		else
+		{
+			LOGGER_WRITE(Logger::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+		}
+
+		(*CurrentGame).PlaySFX(SFX_Equip);
+
+		tmp_ptr = NULL;
+	}
+}
+
 void Ship::DesequipItem()
 {
 	//Desequip
@@ -1219,12 +1262,6 @@ void Ship::DesequipItem()
 			{
 				cleanEquipment(ship_index_);
 				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
-
-				if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
-				{
-					m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr);
-					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
-				}
 			}
 		}
 		else if (tmp_ptr->m_weapon_loot)
@@ -1233,12 +1270,6 @@ void Ship::DesequipItem()
 			{
 				cleanWeapon(ship_index_);
 				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
-
-				if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
-				{
-					m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr);
-					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
-				}
 			}
 		}
 		else
@@ -1249,6 +1280,49 @@ void Ship::DesequipItem()
 		(*CurrentGame).PlaySFX(SFX_Equip);
 
 		tmp_ptr = NULL;
+	}
+}
+
+void Ship::DesequipItemFromTradePanel()
+{
+	//Desequip
+	if (m_SFTargetPanel->GetFocusedItem() && m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid)
+	{
+		GameObject* tmp_ptr = m_SFTargetPanel->GetFocusedItem();
+		int ship_index_ = m_SFTargetPanel->GetFocusedIntIndex();
+		GameObject* tmp_ptr2 = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->getCellPointerFromIntIndex(ship_index_);
+
+		if (tmp_ptr->m_equipment_loot)
+		{
+			if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr))
+			{
+				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
+
+				m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr2);
+				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
+				cleanEquipment(ship_index_);
+			}
+		}
+		else if (tmp_ptr->m_weapon_loot)
+		{
+			if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr))
+			{
+				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
+
+				m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr2);
+				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
+				cleanWeapon();
+			}
+		}
+		else
+		{
+			LOGGER_WRITE(Logger::DEBUG, "<!> Error: trying to swap an item that has no equipment or weapon.\n");
+		}
+
+		(*CurrentGame).PlaySFX(SFX_Equip);
+
+		tmp_ptr = NULL;
+		tmp_ptr2 = NULL;
 	}
 }
 
