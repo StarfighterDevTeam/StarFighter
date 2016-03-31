@@ -1,5 +1,81 @@
 #include "SFPanel.h"
 
+
+//ACTION BOX
+SFActionBox::SFActionBox(sf::Vector2f position, string action1, string action2, string action3, string action4)
+{
+	setPosition(position);
+
+	float offset = 20;
+	float text_margin = 4;
+	for (int i = 0; i < 4; i++)
+	{
+		m_boxes[i].setSize(sf::Vector2f(24, 24));
+		m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y/2);
+		
+		m_texts[i].setCharacterSize(14);
+		m_texts[i].setColor(Color::White);
+
+		switch (i)
+		{
+			//down (A)
+			case 0:
+			{
+				m_boxes[i].setPosition(sf::Vector2f(getPosition().x, getPosition().y - offset/2));
+				m_boxes[i].setFillColor(sf::Color::Green);
+
+				m_texts[i].setString(action1);
+				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_texts[i].getGlobalBounds().width/2, m_boxes[i].getPosition().y + m_boxes[i].getSize().y / 2 + text_margin);
+				break;
+			}
+			//left (X)
+			case 1:
+			{
+				m_boxes[i].setPosition(sf::Vector2f(getPosition().x - offset, getPosition().y));
+				m_boxes[i].setFillColor(sf::Color::Blue);
+
+				m_texts[i].setString(action2);
+				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_boxes[i].getSize().x / 2 - text_margin - m_texts[i].getGlobalBounds().width, m_boxes[i].getPosition().y);
+				break;
+			}
+			//right (B)
+			case 2:
+			{
+				m_boxes[i].setPosition(sf::Vector2f(getPosition().x + offset, getPosition().y));
+				m_boxes[i].setFillColor(sf::Color::Red);
+
+				m_texts[i].setString(action3);
+				m_texts[i].setPosition(m_boxes[i].getPosition().x + m_boxes[i].getSize().x / 2 + text_margin + m_texts[i].getGlobalBounds().width, m_boxes[i].getPosition().y);
+				break;
+			}
+			//up (Y)
+			case 3:
+			{
+				m_boxes[i].setPosition(sf::Vector2f(getPosition().x, getPosition().y + offset/2));
+				m_boxes[i].setFillColor(sf::Color::Yellow);
+
+				m_texts[i].setString(action4);
+				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_texts[i].getGlobalBounds().width / 2, m_boxes[i].getPosition().y - m_boxes[i].getSize().y / 2 - text_margin);
+				break;
+			}
+		}
+	}
+}
+
+void SFActionBox::Draw(sf::RenderTexture& screen)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (!m_texts[i].getString().isEmpty())
+		{
+			screen.draw(m_texts[i]);
+			screen.draw(m_boxes[i]);
+		}
+	}
+}
+
+
+//PANEL
 SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 {
 	setSize(size);

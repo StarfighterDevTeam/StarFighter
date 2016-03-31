@@ -41,6 +41,16 @@ enum FocusedItemStates
 	FocusedItem_SellOrDesequip,
 };
 
+class SFActionBox : public sf::RectangleShape
+{
+public:
+	SFActionBox(sf::Vector2f position, string action1, string action2, string action3, string action4);
+	void Draw(sf::RenderTexture& screen);
+
+	sf::RectangleShape m_boxes[4];
+	sf::Text m_texts[4];
+};
+
 class SFPanel : public sf::RectangleShape
 {
 public:
