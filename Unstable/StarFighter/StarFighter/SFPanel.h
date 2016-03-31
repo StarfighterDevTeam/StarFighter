@@ -44,7 +44,7 @@ enum FocusedItemStates
 class SFActionBox : public sf::RectangleShape
 {
 public:
-	SFActionBox(sf::Vector2f position, string action1, string action2, string action3, string action4);
+	SFActionBox(sf::Vector2f position, sf::Font* font, string action1, string action2, string action3, string action4);
 	void Draw(sf::RenderTexture& screen);
 
 	sf::RectangleShape m_boxes[4];

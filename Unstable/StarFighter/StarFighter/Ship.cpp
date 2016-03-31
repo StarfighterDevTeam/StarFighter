@@ -550,7 +550,7 @@ void Ship::UpdateHUDStates()
 		}
 		else if (m_targetShop)
 		{
-			if (m_HUD_state != HUD_ShopBuyMenu && m_HUD_state != HUD_Trade)// m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
+			if (m_HUD_state != HUD_ShopStellarMap && m_HUD_state != HUD_Trade)// m_HUD_state != HUD_ShopSellMenu && m_HUD_state != HUD_ShopStellarMap)
 			{
 				m_HUD_state = HUD_ShopMainMenu;
 			}
@@ -1789,7 +1789,7 @@ void Ship::GetShop(GameObject* object)
 
 	if (!(*CurrentGame).m_waiting_for_dialog_validation)
 	{
-		if (m_HUD_state == HUD_ShopBuyMenu || m_HUD_state == HUD_ShopSellMenu || m_HUD_state == HUD_Trade)
+		if (m_HUD_state == HUD_Trade)
 		{
 			//m_is_asking_SFPanel = SFPanel_Inventory;
 			m_is_asking_SFPanel = SFPanel_Trade;

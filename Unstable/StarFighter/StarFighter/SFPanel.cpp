@@ -2,7 +2,7 @@
 
 
 //ACTION BOX
-SFActionBox::SFActionBox(sf::Vector2f position, string action1, string action2, string action3, string action4)
+SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, string action2, string action3, string action4)
 {
 	setPosition(position);
 
@@ -13,6 +13,7 @@ SFActionBox::SFActionBox(sf::Vector2f position, string action1, string action2, 
 		m_boxes[i].setSize(sf::Vector2f(24, 24));
 		m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y/2);
 		
+		m_texts[i].setFont(*font);
 		m_texts[i].setCharacterSize(14);
 		m_texts[i].setColor(Color::White);
 
@@ -60,6 +61,9 @@ SFActionBox::SFActionBox(sf::Vector2f position, string action1, string action2, 
 			}
 		}
 	}
+
+	//setSize(sf::Vector2f(m_texts[1].getGlobalBounds().width + m_boxes[0].getSize().x + 2 * offset + m_texts[3].getGlobalBounds().width, m_texts[0].getGlobalBounds().height + offset + m_boxes[0].getSize().y + m_texts[3].getGlobalBounds().height));
+	//setPosition(getPosition().x - getSize().x / 2, getPosition().y);
 }
 
 void SFActionBox::Draw(sf::RenderTexture& screen)
