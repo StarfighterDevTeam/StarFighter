@@ -527,10 +527,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				AddToKnownScenes(m_currentScene->m_name);
 				if (m_currentScene->m_direction == NO_DIRECTION)
 				{
-					SavePlayer(PLAYER_SAVE_FILE);
 					m_playerShip->m_respawnSceneName = m_currentScene->m_name;
-
-					
+					SavePlayer(PLAYER_SAVE_FILE);
 				}
 				else
 				{

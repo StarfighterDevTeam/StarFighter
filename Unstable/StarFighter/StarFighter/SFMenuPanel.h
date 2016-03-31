@@ -29,7 +29,6 @@ public:
 	void Draw(sf::RenderTexture& screen) override;
 
 	Directions m_direction;
-	SFActionBox* m_action_box;
 };
 
 class SFPortalPanel : public SFMenuPanel
