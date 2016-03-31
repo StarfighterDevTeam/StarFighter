@@ -343,10 +343,10 @@ void Ship::UpdateInputStates()
 	GetInputState(InputGuy::isBraking(), Action_Braking);
 	GetInputState(InputGuy::isHyperspeeding(), Action_Hyperspeeding);
 	GetInputState(InputGuy::isSlowMotion(), Action_Slowmotion);
-	GetInputState(InputGuy::isSlowMotion(), Action_Recalling);
+	GetInputState(InputGuy::isRecalling(), Action_Recalling);
 	GetInputState(InputGuy::isOpeningHud(), Action_OpeningHud);
 	GetInputState(InputGuy::isChangingResolution(), Action_ChangingResolution);
-	GetInputState(InputGuy::setAutomaticFire(), Action_AutomaticFire);
+	//GetInputState(InputGuy::setAutomaticFire(), Action_AutomaticFire);
 	GetInputState(InputGuy::isUsingDebugCommand(), Action_DebugCommand);
 }
 
@@ -791,15 +791,15 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						m_hyperspeed_fuel = 0;
 					}
 				}
-				//else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0 && !m_actions_states[Action_Recalling] && m_recall_clock.getElapsedTime().asSeconds() > MIN_TIME_FOR_RECALL_TO_HUB)
-				//{
-				//	(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
-				//	m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
-				//	if (m_hyperspeed_fuel < 0)
-				//	{
-				//		m_hyperspeed_fuel = 0;
-				//	}
-				//}
+				else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0 && !m_actions_states[Action_Recalling] && m_recall_clock.getElapsedTime().asSeconds() > MIN_TIME_FOR_RECALL_TO_HUB)
+				{
+					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed * SLOW_MOTION_MULTIPLIER;
+					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
+					if (m_hyperspeed_fuel < 0)
+					{
+						m_hyperspeed_fuel = 0;
+					}
+				}
 				else if (!m_actions_states[Action_Recalling])
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;

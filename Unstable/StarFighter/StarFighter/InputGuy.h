@@ -18,6 +18,7 @@ public:
 	static bool isHyperspeeding();
 	static bool isSlowMotion();
 	static bool setAutomaticFire();
+	static bool isRecalling();
 	static bool isChangingResolution();
 	static bool isOpeningHud();
 	static bool isUsingDebugCommand();

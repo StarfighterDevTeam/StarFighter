@@ -73,7 +73,23 @@ bool InputGuy::isBraking()
 	return false;
 }
 
-bool InputGuy::setAutomaticFire()
+//bool InputGuy::setAutomaticFire()
+//{
+//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+//	{
+//		return true;
+//	}
+//
+//	if (sf::Joystick::isConnected(0))
+//	{
+//		if (sf::Joystick::isButtonPressed(0, 5))
+//			return true;
+//	}
+//
+//	return false;
+//}
+
+bool InputGuy::isRecalling()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
 	{
