@@ -21,6 +21,34 @@ enum SFPanelTypes
 	SFPanel_DialogNext,
 	SFPanel_Map,
 	SFPanel_MapInfo,
+	SFPanel_Trade,
+};
+
+enum TradeGrids
+{
+	Trade_ShopGrid,
+	Trade_EquippedGrid,
+	Trade_StashGrid,
+	NBVAL_TradeGrids//3
+};
+
+enum FocusedItemStates
+{
+	FocusedItem_Equip,
+	FocusedItem_Desequip,
+	FocusedItem_Buy,
+	FocusedItem_SellOrEquip,
+	FocusedItem_SellOrDesequip,
+};
+
+class SFActionBox : public sf::RectangleShape
+{
+public:
+	SFActionBox(sf::Vector2f position, sf::Font* font, string action1, string action2, string action3, string action4);
+	void Draw(sf::RenderTexture& screen);
+
+	sf::RectangleShape m_boxes[4];
+	sf::Text m_texts[4];
 };
 
 class SFPanel : public sf::RectangleShape
@@ -38,6 +66,7 @@ public:
 	sf::Text m_actions_text;
 	bool m_visible;
 	SFPanelTypes m_panel_type;
+	size_t m_number_of_options;
 
 	Ship* m_playerShip;
 
@@ -46,7 +75,7 @@ public:
 	virtual GameObject* GetCursor();
 	virtual GameObject* GetFocusedItem();
 	virtual void SetFocusedItem(GameObject* item);
-	virtual ObjectGrid* GetGrid(bool fake_grid = false, size_t grid = 1);
+	virtual ObjectGrid* GetGrid(bool fake_grid = false, int grid = 1);
 	virtual sf::Vector2i GetFocusedIndex();
 	virtual int GetFocusedIntIndex();
 	virtual int GetFocusedGrid();
@@ -59,6 +88,9 @@ public:
 	virtual void SetItemStatsPanel(SFItemStatsPanel* panel);
 	virtual float GetDuration();
 	virtual float GetDurationClockElpased();
+	virtual int GetItemsStatsPanelIndex();
+	virtual void SetItemsStatsPanelIndex(int index);
+	virtual int GetItemsStatsPanelNumberOfOptions();
 	
 	virtual Dialog* GetDialog();
 

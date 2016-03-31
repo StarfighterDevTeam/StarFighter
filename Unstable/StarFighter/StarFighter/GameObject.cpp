@@ -260,6 +260,8 @@ GameObject* GameObject::Clone()
 	clone->m_display_name = this->m_display_name;
 	clone->m_collider_type = this->m_collider_type;
 	clone->m_layer = this->m_layer;
+	clone->m_equipment_loot = this->m_equipment_loot;//cautious: we are not cloning those, it's just shared reference. The clone should NOT be deleting them.
+	clone->m_weapon_loot = this->m_weapon_loot;//cautious: we are not cloning those, it's just shared reference. The clone should NOT be deleting them.
 
 	return clone;
 }

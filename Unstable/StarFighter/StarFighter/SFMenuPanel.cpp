@@ -98,12 +98,25 @@ SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playerShip) : SFMenu
 		//default selected index
 		m_selected_option_index = 0;
 		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height - 2);
+	
+		//action box
+		//m_action_box = new SFActionBox(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), text_height), (*CurrentGame).m_font[Font_Arial], "Enter", "", "", "");
 	}
+}
+
+SFOneActionPanel::~SFOneActionPanel()
+{
+
 }
 
 void SFOneActionPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 
+}
+
+void SFOneActionPanel::Draw(sf::RenderTexture& screen)
+{
+	SFMenuPanel::Draw(screen);
 }
 
 //-------------------PORTAL MENU----------------

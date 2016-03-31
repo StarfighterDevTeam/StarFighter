@@ -71,6 +71,7 @@ enum HUDStates
 	HUD_ShopSellMenu,
 	HUD_ShopStellarMap,
 	HUD_Dialog,
+	HUD_Trade,
 };
 
 enum ShopOptions
@@ -144,7 +145,9 @@ public :
 	void SellingItem();
 	void GarbagingItem();
 	void EquipItem();
+	void EquipItemFromTradePanel();
 	void DesequipItem();
+	void DesequipItemFromTradePanel();
 	void ContinueDialog();
 	void Recalling();
 	void Teleport(string destination_name);
