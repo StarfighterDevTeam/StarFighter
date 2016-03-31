@@ -6,7 +6,7 @@
 class SFItemStatsPanel : public SFPanel
 {
 public:
-	SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state);
+	SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state, bool comparison);
 	~SFItemStatsPanel();
 	void DisplayItemStats(GameObject* object);
 	void Draw(sf::RenderTexture& screen) override;
@@ -15,6 +15,9 @@ public:
 	GameObject m_arrow;
 	sf::Text m_options_text[2];
 	int m_selected_option_index;
+	bool m_comparison;
+
+	sf::Text m_title_text_comparison;
 };
 
 class SFInventoryPanel : public SFPanel
@@ -46,6 +49,8 @@ public:
 	static void UpdateBackgroundColors(ObjectGrid color_grid, ObjectGrid object_grid);
 	static EquipmentQuality GetItemQualityClass(float quality);
 
+	GameObject* GetEquivalentEquippedItem(Ship* playerShip, GameObject* item);
+
 	GameObject m_cursor;
 	GameObject* m_focused_item;
 	sf::Vector2i m_focused_cell_index;
@@ -59,6 +64,7 @@ public:
 	bool m_use_two_grids;
 	int m_focused_grid;
 	SFItemStatsPanel* m_item_stats_panel;
+	SFItemStatsPanel* m_item_stats_panel_compare;
 	bool m_has_prioritary_feedback;
 	bool m_is_shop;
 
@@ -117,6 +123,8 @@ public:
 
 	GameObject* GetHoveredObjectInGrid();
 
+	GameObject* GetEquivalentEquippedItem(Ship* playerShip, GameObject* item);
+
 	GameObject m_cursor;
 	GameObject* m_focused_item;
 	sf::Vector2i m_focused_cell_index;
@@ -126,6 +134,7 @@ public:
 	ObjectGrid m_grey_grid;
 	int m_focused_grid;
 	SFItemStatsPanel* m_item_stats_panel;
+	SFItemStatsPanel* m_item_stats_panel_compare;
 
 	sf::Text m_title_text2;
 	sf::RectangleShape m_separator;

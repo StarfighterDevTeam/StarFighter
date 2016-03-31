@@ -3,7 +3,7 @@
 extern Game* CurrentGame;
 
 //ITEMS STATS PANEL
-SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state) : SFPanel(size, SFPanel_ItemStats)
+SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* playerShip, FocusedItemStates item_state, bool comparison) : SFPanel(size, SFPanel_ItemStats)
 {
 	if (object)
 	{
@@ -11,12 +11,29 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		setOrigin(size.x / 2, size.y / 2);
 		setFillColor(sf::Color(20, 20, 20, 230));//dark grey
 		setOutlineThickness(0);
-		setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
+		m_comparison = comparison;
+
+		if (!comparison)
+		{
+			setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
+		}
+		else
+		{
+			if (item_state == FocusedItem_Buy || item_state == FocusedItem_SellOrEquip)
+			{
+				setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X + size.x + ITEM_STATS_COMPARE_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
+			}
+			else if (item_state == FocusedItem_Equip)
+			{
+				setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X - size.x - ITEM_STATS_COMPARE_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
+			}
+		}
+		
 		m_selected_option_index = 0;
 
 		m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
 			sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
-		m_arrow.m_visible = true;
+		m_arrow.m_visible = !comparison;
 
 		//texts
 		m_title_text.setCharacterSize(18);
@@ -27,9 +44,52 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		m_options_text[1].setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_options_text[1].setCharacterSize(18);
 
-		DisplayItemStats(object);
+		m_title_text_comparison.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_title_text_comparison.setCharacterSize(m_title_text.getCharacterSize());
+		m_title_text_comparison.setColor(m_title_text.getColor());
 
 		float text_height = 0;
+		
+		if (comparison)
+		{
+			int equip_type = object->m_equipment_loot ? object->m_equipment_loot->m_equipmentType : (object->m_weapon_loot ? NBVAL_Equipment : -1);
+			GameObject* equipped_object = playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type];
+			if (equipped_object)
+			{
+				m_title_text_comparison.setString("EQUIPPED");
+				text_height += m_title_text_comparison.getGlobalBounds().height / 2;
+				m_title_text_comparison.setPosition(getPosition().x - m_title_text_comparison.getGlobalBounds().width/2, getPosition().y - getSize().y / 2 + text_height);
+				text_height += INTERACTION_INTERLINE + m_title_text_comparison.getGlobalBounds().height;
+
+				DisplayItemStats(equipped_object);
+			}
+
+			equipped_object = NULL;
+		}
+		else
+		{
+			//if (item_state != FocusedItem_Desequip)
+			//{
+				if (item_state == FocusedItem_Equip || item_state == FocusedItem_SellOrEquip)
+				{
+					m_title_text_comparison.setString("INVENTORY");
+				}
+				else if (item_state == FocusedItem_Buy)
+				{
+					m_title_text_comparison.setString("SHOP");
+				}
+				else
+				{
+					m_title_text_comparison.setString("EQUIPPED");
+				}
+				text_height += m_title_text_comparison.getGlobalBounds().height / 2;
+				m_title_text_comparison.setPosition(getPosition().x - m_title_text_comparison.getGlobalBounds().width / 2, getPosition().y - getSize().y / 2 + text_height);
+				text_height += INTERACTION_INTERLINE + m_title_text_comparison.getGlobalBounds().height;
+			//}
+
+			DisplayItemStats(object);
+		}
+
 		text_height += m_title_text.getGlobalBounds().height / 2;
 		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
@@ -37,6 +97,11 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
 		text_height += m_text.getGlobalBounds().height;
+
+		if (comparison)
+		{
+			return;
+		}
 
 		//Action texts
 		//BUY
@@ -118,6 +183,10 @@ void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
 		SFPanel::Draw(screen);
 
 		screen.draw(m_title_text);
+		if (!m_title_text_comparison.getString().isEmpty())
+		{
+			screen.draw(m_title_text_comparison);
+		}
 		screen.draw(m_text);
 		for (size_t i = 0; i < 2; i++)
 		{
@@ -354,6 +423,7 @@ SFInventoryPanel::SFInventoryPanel(sf::Vector2f size, Ship* playerShip, size_t n
 	m_use_two_grids = use_two_grids;
 	m_playerShip = playerShip;
 	m_item_stats_panel = NULL;
+	m_item_stats_panel_compare = NULL;
 	m_focused_grid = 0;
 	m_has_prioritary_feedback = false;
 	m_is_shop = is_shop;
@@ -451,6 +521,11 @@ SFInventoryPanel::~SFInventoryPanel()
 	{
 		delete m_item_stats_panel;
 		m_item_stats_panel = NULL;
+	}
+	if (m_item_stats_panel_compare)
+	{
+		delete m_item_stats_panel_compare;
+		m_item_stats_panel_compare = NULL;
 	}
 }
 
@@ -582,6 +657,10 @@ void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 		{
 			m_item_stats_panel->Draw(screen);
 		}
+		if (m_item_stats_panel_compare)
+		{
+			m_item_stats_panel_compare->Draw(screen);
+		}
 	}
 }
 
@@ -641,7 +720,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid(ObjectGrid grid, ObjectGrid
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
 				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Desequip : FocusedItem_Equip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state, false);
 			}
 		}
 		//empty cell
@@ -702,6 +781,11 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 			delete m_item_stats_panel;
 			m_item_stats_panel = NULL;
 		}
+		if (m_item_stats_panel_compare)
+		{
+			delete m_item_stats_panel_compare;
+			m_item_stats_panel_compare = NULL;
+		}
 
 		return m_focused_item;
 	}
@@ -731,11 +815,29 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 			if (previous_focused_item != m_focused_item)
 			{
 				delete m_item_stats_panel;
+				if (m_item_stats_panel_compare)
+				{
+					delete m_item_stats_panel_compare;
+					m_item_stats_panel_compare = NULL;
+				}
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
 				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Desequip : FocusedItem_Equip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state, false);
+			}
+			//update compare panel
+			if (GetEquivalentEquippedItem(m_playerShip, m_focused_item))
+			{
+				m_item_stats_panel_compare = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, FocusedItem_Equip, true);
+			}
+			else
+			{
+				if (m_item_stats_panel_compare)
+				{
+					delete m_item_stats_panel_compare;
+					m_item_stats_panel_compare = NULL;
+				}
 			}
 		}
 		//empty cell
@@ -749,11 +851,29 @@ GameObject* SFInventoryPanel::GetHoveredObjectInTwoGrids(ObjectGrid grid, Object
 				delete m_item_stats_panel;
 				m_item_stats_panel = NULL;
 			}
+			if (m_item_stats_panel_compare)
+			{
+				delete m_item_stats_panel_compare;
+				m_item_stats_panel_compare = NULL;
+			}
 		}
 
 		previous_focused_item = NULL;
 		focused_grid = NULL;
 		return m_focused_item;
+	}
+}
+
+GameObject* SFInventoryPanel::GetEquivalentEquippedItem(Ship* playerShip, GameObject* item)
+{
+	int equip_type = item->m_equipment_loot ? item->m_equipment_loot->m_equipmentType : (item->m_weapon_loot ? NBVAL_Equipment : -1);
+	if (playerShip && playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type] && playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type] != item)
+	{
+		return playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type];
+	}
+	else
+	{
+		return NULL;
 	}
 }
 
@@ -1223,6 +1343,7 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, 
 	m_focused_cell_index = sf::Vector2i(-1, -1);
 	m_playerShip = playerShip;
 	m_item_stats_panel = NULL;
+	m_item_stats_panel_compare = NULL;
 	m_focused_grid = 0;
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -1343,7 +1464,16 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, 
 
 SFTradePanel::~SFTradePanel()
 {
-	
+	if (m_item_stats_panel)
+	{
+		delete m_item_stats_panel;
+		m_item_stats_panel = NULL;
+	}
+	if (m_item_stats_panel_compare)
+	{
+		delete m_item_stats_panel_compare;
+		m_item_stats_panel_compare = NULL;
+	}
 }
 
 void SFTradePanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
@@ -1406,6 +1536,10 @@ void SFTradePanel::Draw(sf::RenderTexture& screen)
 		{
 			m_item_stats_panel->Draw(screen);
 		}
+		if (m_item_stats_panel_compare)
+		{
+			m_item_stats_panel_compare->Draw(screen);
+		}
 		if (m_cursor.m_visible)
 		{
 			screen.draw(m_cursor);
@@ -1449,6 +1583,11 @@ GameObject* SFTradePanel::GetHoveredObjectInGrid()
 			delete m_item_stats_panel;
 			m_item_stats_panel = NULL;
 		}
+		if (m_item_stats_panel_compare)
+		{
+			delete m_item_stats_panel_compare;
+			m_item_stats_panel_compare = NULL;
+		}
 
 		return m_focused_item;
 	}
@@ -1475,11 +1614,29 @@ GameObject* SFTradePanel::GetHoveredObjectInGrid()
 			if (previous_focused_item != m_focused_item)
 			{
 				delete m_item_stats_panel;
+				if (m_item_stats_panel_compare)
+				{
+					delete m_item_stats_panel_compare;
+					m_item_stats_panel_compare = NULL;
+				}
 			}
 			if (!previous_focused_item || previous_focused_item != m_focused_item)
 			{
 				FocusedItemStates item_state = this == m_playerShip->m_SFHudPanel ? (m_focused_grid == 1 ? FocusedItem_Desequip : FocusedItem_Equip) : (m_focused_grid == Trade_ShopGrid ? FocusedItem_Buy : (m_focused_grid == Trade_EquippedGrid ? FocusedItem_SellOrDesequip : FocusedItem_SellOrEquip));
-				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state);
+				m_item_stats_panel = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state, false);
+				//update compare panel
+				if (GetEquivalentEquippedItem(m_playerShip, m_focused_item))
+				{
+					m_item_stats_panel_compare = new SFItemStatsPanel(m_focused_item, sf::Vector2f(ITEM_STATS_PANEL_SIZE_X, ITEM_STATS_PANEL_SIZE_Y), m_playerShip, item_state, true);
+				}
+				else
+				{
+					if (m_item_stats_panel_compare)
+					{
+						delete m_item_stats_panel_compare;
+						m_item_stats_panel_compare = NULL;
+					}
+				}
 			}
 		}
 		//empty cell
@@ -1492,6 +1649,11 @@ GameObject* SFTradePanel::GetHoveredObjectInGrid()
 			{
 				delete m_item_stats_panel;
 				m_item_stats_panel = NULL;
+			}
+			if (m_item_stats_panel_compare)
+			{
+				delete m_item_stats_panel_compare;
+				m_item_stats_panel_compare = NULL;
 			}
 		}
 
@@ -1589,5 +1751,18 @@ int SFTradePanel::GetItemsStatsPanelNumberOfOptions()
 	else
 	{
 		return -1;
+	}
+}
+
+GameObject* SFTradePanel::GetEquivalentEquippedItem(Ship* playerShip, GameObject* item)
+{
+	int equip_type = item->m_equipment_loot ? item->m_equipment_loot->m_equipmentType : (item->m_weapon_loot ? NBVAL_Equipment : -1);
+	if (playerShip && playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type] && playerShip->m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type] != item)
+	{
+		return playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type];
+	}
+	else
+	{
+		return NULL;
 	}
 }
