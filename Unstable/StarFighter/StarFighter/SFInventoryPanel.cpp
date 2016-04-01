@@ -12,6 +12,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		setFillColor(sf::Color(20, 20, 20, 230));//dark grey
 		setOutlineThickness(0);
 		m_comparison = comparison;
+		m_number_of_options = 0;
 
 		if (!comparison)
 		{
@@ -33,7 +34,17 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 
 		m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
 			sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
+
 		m_arrow.m_visible = !comparison;
+
+		m_buttons[0] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+			sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+		m_buttons[1] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_X_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+			sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+		m_buttons[2] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_Y_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+			sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+		m_buttons[3] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_B_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+			sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
 
 		//texts
 		m_title_text.setCharacterSize(18);
@@ -163,6 +174,10 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 				m_arrow.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height + m_options_text[0].getCharacterSize() - 6);//because fuck this
 			}
 		}
+		for (size_t i = 0; i < m_number_of_options; i++)
+		{
+			m_buttons[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_options_text[i].getPosition().y + m_options_text[i].getCharacterSize() - 7);
+		}
 	}
 }
 
@@ -193,9 +208,14 @@ void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
 			screen.draw(m_options_text[i]);
 		}
 		screen.draw(m_actions_text);
-		if (m_arrow.m_visible)
+		//if (m_arrow.m_visible)
+		//{
+		//	screen.draw(m_arrow);
+		//}
+		for (size_t i = 0; i < m_number_of_options; i++)
 		{
-			screen.draw(m_arrow);
+			screen.draw(m_options_text[i]);
+			screen.draw(m_buttons[i]);
 		}
 	}
 }
@@ -1346,6 +1366,12 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, 
 	m_item_stats_panel_compare = NULL;
 	m_focused_grid = 0;
 
+	m_buttons = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_B_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+	m_options_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_options_text.setCharacterSize(18);
+	m_options_text.setString("Quit");
+
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_title_text2.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_title_text2.setCharacterSize(m_title_text.getCharacterSize());
@@ -1449,8 +1475,8 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, 
 
 	text_height += m_fake_grid[Trade_ShopGrid].squares.y * GRID_SLOT_SIZE + INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height / 2;
 	text_height += INTERACTION_INTERBLOCK + INTERACTION_INTERBLOCK;//don't know why but it's currently required to get to the correct position
-	m_actions_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
-	text_height += m_actions_text.getGlobalBounds().height;
+	//m_actions_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+	//text_height += m_actions_text.getGlobalBounds().height;
 
 	//init cursor position on first cell
 	m_cursor.setPosition(m_fake_grid[Trade_ShopGrid].grid[0][0]->getPosition().x, m_fake_grid[Trade_ShopGrid].grid[0][0]->getPosition().y);
@@ -1460,6 +1486,11 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, 
 	m_separator.setOrigin(m_separator.getSize().x / 2, m_separator.getSize().y/2);
 	m_separator.setPosition(getPosition());
 	m_separator.setFillColor(getOutlineColor());
+
+	//quit button
+	m_options_text.setPosition(getPosition().x - getSize().x/4 - m_options_text.getGlobalBounds().width / 2 + m_buttons.m_size.x , getPosition().y - getSize().y / 2 + text_height);
+	m_buttons.setPosition(m_options_text.getPosition().x - m_buttons.m_size.x, m_options_text.getPosition().y + m_options_text.getCharacterSize() - m_buttons.m_size.y / 2 +1);
+
 }
 
 SFTradePanel::~SFTradePanel()
@@ -1524,7 +1555,7 @@ void SFTradePanel::Draw(sf::RenderTexture& screen)
 		screen.draw(m_separator);
 		screen.draw(m_title_text);
 		screen.draw(m_title_text2);
-		screen.draw(m_actions_text);
+		//screen.draw(m_actions_text);
 		for (size_t i = 0; i < NBVAL_TradeGrids; i++)
 		{
 			m_fake_grid[i].Draw(screen);
@@ -1544,6 +1575,9 @@ void SFTradePanel::Draw(sf::RenderTexture& screen)
 		{
 			screen.draw(m_cursor);
 		}
+
+		screen.draw(m_options_text);
+		screen.draw(m_buttons);
 	}
 }
 

@@ -159,6 +159,10 @@ SFStellarInfoPanel::SFStellarInfoPanel(sf::Vector2f position, sf::Vector2f size,
 {
 	m_playerShip = playerShip;
 
+	m_buttons = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+	m_buttons.m_visible = false;
+
 	setSize(size);
 	setOrigin(size.x / 2, size.y / 2);
 	setFillColor(sf::Color(20, 20, 20, 230));//dark grey
@@ -206,11 +210,13 @@ SFStellarInfoPanel::SFStellarInfoPanel(StellarHub* hub, int teleportation_cost, 
 		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x * teleportation_available, getPosition().y - getSize().y / 2 + text_height);
 
 		text_height += m_title_text.getGlobalBounds().height + INTERACTION_INTERLINE;
-		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x * teleportation_available, getPosition().y - getSize().y / 2 + text_height);
+		m_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES + m_buttons.m_size.x * teleportation_available, getPosition().y - getSize().y / 2 + text_height);
 
 		text_height += m_text.getGlobalBounds().height / 2;
 		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - getSize().x / 2, m_text.getPosition().y + m_text.getCharacterSize() / 2 + 3);//+3 because fuck this, I can't get it positionned properly
-		m_arrow.m_visible = teleportation_available;
+		
+		m_buttons.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - getSize().x / 2, m_text.getPosition().y + m_text.getCharacterSize() / 2 + 3);//+3 because fuck this, I can't get it positionned properly		m_buttons.m_visible = teleportation_available;
+		m_buttons.m_visible = teleportation_available;
 	}
 }
 
@@ -248,9 +254,9 @@ void SFStellarInfoPanel::Draw(sf::RenderTexture& screen)
 		screen.draw(m_title_text);
 		screen.draw(m_text);
 
-		if (m_arrow.m_visible)
+		if (m_buttons.m_visible)
 		{
-			screen.draw(m_arrow);
+			screen.draw(m_buttons);
 		}
 	}
 }
@@ -295,7 +301,7 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	int frameNumber = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_frameNumber : playerShip->m_frameNumber;
 	int animationNumber = playerShip->m_fake_ship ? playerShip->m_fake_ship->m_animationNumber : playerShip->m_animationNumber;
 
-	m_ship = GameObject(this->getPosition(), sf::Vector2f(0, 0), ship_texture, ship_size, sf::Vector2f(ship_size.x/2, ship_size.y/2), animationNumber, frameNumber);
+	m_ship = GameObject(this->getPosition(), sf::Vector2f(0, 0), ship_texture, ship_size, sf::Vector2f(ship_size.x / 2, ship_size.y / 2), animationNumber, frameNumber);
 	m_ship.setPosition(sf::Vector2f(this->getPosition()));
 	m_ship.setScale(STELLARMAP_SHIP_MINIATURE_SCALE, STELLARMAP_SHIP_MINIATURE_SCALE);
 
@@ -304,20 +310,39 @@ SFMapPanel::SFMapPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size, SFPa
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
+	//buttons
+	m_new_action_texts[0].setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_new_action_texts[1].setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_new_action_texts[0].setCharacterSize(18);
+	m_new_action_texts[1].setCharacterSize(18);
+	m_new_action_texts[0].setColor(Color::White);
+	m_new_action_texts[1].setColor(Color::White);
+	m_new_action_texts[0].setString("Center map");
+	m_new_action_texts[1].setString("Exit");
+
+	m_buttons[0] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_X_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+
+	m_buttons[1] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_B_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
+		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+
 	float text_height = INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height / 2;
 	m_title_text.setString("STELLAR MAP");
 	m_title_text.setPosition(sf::Vector2f(getPosition().x - m_title_text.getGlobalBounds().width / 2, getPosition().y - getSize().y / 2 + text_height));
 
-	text_height += m_title_text.getGlobalBounds().height/2 + INTERACTION_INTERBLOCK;
+	text_height += m_title_text.getGlobalBounds().height / 2 + INTERACTION_INTERBLOCK;
 	ostringstream ss_text;
 	ss_text << "Current location: " << playerShip->m_currentScene_name;
 	m_text.setString(ss_text.str());
 	m_text.setPosition(sf::Vector2f(getPosition().x - m_text.getGlobalBounds().width / 2, getPosition().y - getSize().y / 2 + text_height));
 
-	ostringstream ss_helpNavigation;
-	ss_helpNavigation << "\n\n\Slowmotion: exit\nBrake: center map view\nMove cursor on borders: scroll map\nSelect location, then press Fire: teleport";
-	m_actions_text.setString(ss_helpNavigation.str());
-	m_actions_text.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + getSize().y / 2 - 2 * INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height));
+	float text_height2 = getPosition().y + getSize().y / 2 - 4*INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height;
+	m_new_action_texts[0].setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + 2*INTERACTION_INTERBLOCK + m_buttons[0].m_size.x, text_height2));
+	m_buttons[0].setPosition(sf::Vector2f(m_new_action_texts[0].getPosition().x - m_buttons[0].m_size.x, text_height2 + m_new_action_texts[0].getCharacterSize() / 2 + 2));
+
+	text_height2 += INTERACTION_INTERLINE + m_new_action_texts[0].getCharacterSize();
+	m_new_action_texts[1].setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + 2*INTERACTION_INTERBLOCK + m_buttons[1].m_size.x, text_height2));
+	m_buttons[1].setPosition(sf::Vector2f(m_new_action_texts[1].getPosition().x - m_buttons[1].m_size.x, text_height2 + m_new_action_texts[1].getCharacterSize()/2 + 2));
 
 	//render texture
 	m_texture.create((unsigned int)size.x, (unsigned int)size.y);
@@ -474,7 +499,10 @@ void SFMapPanel::Draw(sf::RenderTexture& screen)
 
 		screen.draw(m_title_text);
 		screen.draw(m_text);
-		screen.draw(m_actions_text);
+		screen.draw(m_new_action_texts[0]);
+		screen.draw(m_new_action_texts[1]);
+		screen.draw(m_buttons[0]);
+		screen.draw(m_buttons[1]);
 
 		//Scrollable content
 		m_texture.clear(sf::Color(0, 0, 0, 50));

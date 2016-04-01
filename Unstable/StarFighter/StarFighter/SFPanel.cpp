@@ -8,6 +8,10 @@ SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, 
 
 	float offset = 20;
 	float text_margin = 4;
+
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	
 	for (int i = 0; i < 4; i++)
 	{
 		m_boxes[i].setSize(sf::Vector2f(24, 24));
@@ -17,6 +21,7 @@ SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, 
 		m_texts[i].setCharacterSize(14);
 		m_texts[i].setColor(Color::White);
 
+
 		switch (i)
 		{
 			//down (A)
@@ -24,6 +29,9 @@ SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, 
 			{
 				m_boxes[i].setPosition(sf::Vector2f(getPosition().x, getPosition().y - offset/2));
 				m_boxes[i].setFillColor(sf::Color::Green);
+				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_A.png", 16, 16);
+				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
+				m_boxes[i].setTexture(texture);
 
 				m_texts[i].setString(action1);
 				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_texts[i].getGlobalBounds().width/2, m_boxes[i].getPosition().y + m_boxes[i].getSize().y / 2 + text_margin);
@@ -34,6 +42,9 @@ SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, 
 			{
 				m_boxes[i].setPosition(sf::Vector2f(getPosition().x - offset, getPosition().y));
 				m_boxes[i].setFillColor(sf::Color::Blue);
+				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_X.png", 16, 16);
+				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
+				m_boxes[i].setTexture(texture);
 
 				m_texts[i].setString(action2);
 				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_boxes[i].getSize().x / 2 - text_margin - m_texts[i].getGlobalBounds().width, m_boxes[i].getPosition().y);
@@ -44,6 +55,9 @@ SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, 
 			{
 				m_boxes[i].setPosition(sf::Vector2f(getPosition().x + offset, getPosition().y));
 				m_boxes[i].setFillColor(sf::Color::Red);
+				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_B.png", 16, 16);
+				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
+				m_boxes[i].setTexture(texture);
 
 				m_texts[i].setString(action3);
 				m_texts[i].setPosition(m_boxes[i].getPosition().x + m_boxes[i].getSize().x / 2 + text_margin + m_texts[i].getGlobalBounds().width, m_boxes[i].getPosition().y);
@@ -54,6 +68,9 @@ SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, 
 			{
 				m_boxes[i].setPosition(sf::Vector2f(getPosition().x, getPosition().y + offset/2));
 				m_boxes[i].setFillColor(sf::Color::Yellow);
+				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_Y.png", 16, 16);
+				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
+				m_boxes[i].setTexture(texture);
 
 				m_texts[i].setString(action4);
 				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_texts[i].getGlobalBounds().width / 2, m_boxes[i].getPosition().y - m_boxes[i].getSize().y / 2 - text_margin);

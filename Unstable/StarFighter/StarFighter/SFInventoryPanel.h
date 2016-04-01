@@ -13,6 +13,7 @@ public:
 	void Update();
 
 	GameObject m_arrow;
+	GameObject m_buttons[4];
 	sf::Text m_options_text[2];
 	int m_selected_option_index;
 	bool m_comparison;
@@ -138,6 +139,9 @@ public:
 
 	sf::Text m_title_text2;
 	sf::RectangleShape m_separator;
+
+	GameObject m_buttons;
+	sf::Text m_options_text;
 
 	Ship* m_playerShip;
 };

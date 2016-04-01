@@ -670,38 +670,43 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			}
 
 			//interaction: sell, equip, desequip item
-			if (m_inputs_states[Action_Firing] == Input_Tap && (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid || m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid) && m_SFTargetPanel->GetFocusedItem())
+			if ((m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid || m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid) && m_SFTargetPanel->GetFocusedItem())
 			{
-				if (m_SFTargetPanel->GetItemsStatsPanelIndex() == 0)
+				//Sell
+				if (m_inputs_states[Action_Firing] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() == 0)
 				{
 					SellingItem();
 				}
+				//equip / desequip
 				else
 				{
-					if (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid)
+					if (m_inputs_states[Action_Braking] == Input_Tap)
 					{
-						DesequipItemFromTradePanel();
-					}
-					else if (m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid)
-					{
-						EquipItemFromTradePanel();
+						if (m_SFTargetPanel->GetFocusedGrid() == Trade_EquippedGrid)
+						{
+							DesequipItemFromTradePanel();
+						}
+						else if (m_SFTargetPanel->GetFocusedGrid() == Trade_StashGrid)
+						{
+							EquipItemFromTradePanel();
+						}
 					}
 				}
-				
 			}
 
 			//Up and down in options
-			if (m_SFTargetPanel->GetItemStatsPanel())
-			{
-				if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() < m_SFTargetPanel->GetItemsStatsPanelNumberOfOptions() - 1)
-				{
-					m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() + 1);
-				}
-				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() > 0)
-				{
-					m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() - 1);
-				}
-			}
+			//if (m_SFTargetPanel->GetItemStatsPanel())
+			//{
+			//	if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() < m_SFTargetPanel->GetItemsStatsPanelNumberOfOptions() - 1)
+			//	{
+			//		m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() + 1);
+			//	}
+			//	else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() > 0)
+			//	{
+			//		m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() - 1);
+			//	}
+			//}
+			//
 
 			//exit
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
@@ -875,40 +880,52 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			else if (m_HUD_state == HUD_ShopMainMenu && m_SFTargetPanel)
 			{
 				//Up and down in options
-				if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() < NBVAL_ShopOptions - 1)
-				{
-					m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() + 1);
-				}
-				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() > 0)
-				{
-					m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() - 1);
-				}
+				//if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() < NBVAL_ShopOptions - 1)
+				//{
+				//	m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() + 1);
+				//}
+				//else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetSelectedOptionIndex() > 0)
+				//{
+				//	m_SFTargetPanel->SetSelectedOptionIndex(m_SFTargetPanel->GetSelectedOptionIndex() - 1);
+				//}
 
 				//Select
+				//if (m_inputs_states[Action_Firing] == Input_Tap)
+				//{
+				//	switch (m_SFTargetPanel->GetSelectedOptionIndex())
+				//	{
+				//		//case ShopHeal:
+				//		//{
+				//		//	ResplenishHealth();
+				//		//
+				//		//	//(*CurrentGame).PlaySFX(SFX_Heal);
+				//		//
+				//		//	break;
+				//		//}
+				//		case ShopBuy:
+				//		{
+				//			m_HUD_state = HUD_Trade;
+				//			m_SFHudPanel->GetCursor()->m_visible = false;
+				//			break;
+				//		}
+				//		case ShopStellarMap:
+				//		{
+				//			m_HUD_state = HUD_ShopStellarMap;
+				//			break;
+				//		}
+				//	}
+				//}
+
+				//A: Enter shop
 				if (m_inputs_states[Action_Firing] == Input_Tap)
 				{
-					switch (m_SFTargetPanel->GetSelectedOptionIndex())
-					{
-						//case ShopHeal:
-						//{
-						//	ResplenishHealth();
-						//
-						//	//(*CurrentGame).PlaySFX(SFX_Heal);
-						//
-						//	break;
-						//}
-						case ShopBuy:
-						{
-							m_HUD_state = HUD_Trade;
-							m_SFHudPanel->GetCursor()->m_visible = false;
-							break;
-						}
-						case ShopStellarMap:
-						{
-							m_HUD_state = HUD_ShopStellarMap;
-							break;
-						}
-					}
+					m_HUD_state = HUD_Trade;
+					m_SFHudPanel->GetCursor()->m_visible = false;
+				}
+				//X: Enter stellar map
+				else if (m_inputs_states[Action_Braking] == Input_Tap)
+				{
+					m_HUD_state = HUD_ShopStellarMap;
 				}
 			}
 		}
