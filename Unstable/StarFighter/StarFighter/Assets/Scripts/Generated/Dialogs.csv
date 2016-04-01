@@ -1,5 +1,5 @@
 dialog_name,fade_in,fade_out,enemy_speaking,duration,title,body,picture,next
-Dial_V3_01,1,0,1,3,Captain_Ellias,Wisteria[COMA]_your_vagrancy_ends_here._Surrender_now!,Assets/2D/Dialogs/Captain.png,Dial_V3_02
+Dial_V3_01,1,0,1,0,Captain_Ellias,Wisteria[COMA]_your_vagrancy_ends_here._Surrender_now!,Assets/2D/Dialogs/Captain.png,Dial_V3_02
 Dial_V3_02,0,0,0,0,Wisteria,Yeah[COMA]_right._I'm_in_sort_of_a_hurry_so[COMA]_just_let_me_pass[COMA]_okay?,Assets/2D/Dialogs/Katyusha.png,Dial_V3_03
 Dial_V3_03,0,1,1,0,Captain_Ellias,I_see...so_there_is_no_point_trying_to_talk_you_into_reason._Guards[COMA]_get_her!,Assets/2D/Dialogs/Captain.png,0
 Dial_Hub_Intro_01,1,0,1,0,Captain_Ellias,Wister!_Don't_you_make_a_move[COMA]_rogue._You_are_under_arrest.,Assets/2D/Dialogs/Captain.png,Dial_Hub_Intro_02
