@@ -11,7 +11,7 @@ public:
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	virtual void Draw(sf::RenderTexture& screen);
 
-	void SFMenuPanel::SetSelectedOptionIndex(int index) override;
+	void SetSelectedOptionIndex(int index) override;
 	int GetSelectedOptionIndex() override;
 
 	size_t m_options;

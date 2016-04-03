@@ -1,5 +1,7 @@
 #include "StarFighter.h"
-#include "resource.h"
+#ifdef WIN32
+	#include "resource.h"
+#endif
 
 Game* CurrentGame;
 

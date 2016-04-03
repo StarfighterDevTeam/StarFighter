@@ -1867,7 +1867,7 @@ float Ship::getShipBeastScore()
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::DEBUG, "<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", this->graze_level);
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", m_graze_level));
 		m_graze_count = 0;
 		m_graze_level = 0;
 	}

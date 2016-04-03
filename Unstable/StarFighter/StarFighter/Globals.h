@@ -7,6 +7,7 @@
 #include "TextUtils.h"
 #include "Logger.h"
 #include <assert.h>
+#include <math.h>
 
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 #define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
