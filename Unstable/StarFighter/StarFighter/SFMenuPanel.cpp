@@ -5,34 +5,14 @@ extern Game* CurrentGame;
 SFMenuPanel::SFMenuPanel(sf::Vector2f size, SFPanelTypes panel_type, size_t options, Ship* playerShip) : SFPanel(size, panel_type)
 {
 	m_options = options;
-	m_options_text = new sf::Text[options];
-	m_selected_option_index = 0;
 	m_playerShip = playerShip;
-	m_arrow = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_ARROW_FILENAME, sf::Vector2f(INTERACTION_ARROW_WIDTH, INTERACTION_ARROW_HEIGHT),
-		sf::Vector2f(INTERACTION_ARROW_WIDTH / 2, INTERACTION_ARROW_HEIGHT / 2));
-
-	m_buttons[0] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
-		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
-	m_buttons[1] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_X_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
-		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
-	m_buttons[2] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_Y_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
-		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
-	m_buttons[3] = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_B_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
-		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
 
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	//options texts
-	for (size_t i = 0; i < options; i++)
-	{
-		m_options_text[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
-		m_options_text[i].setCharacterSize(18);
-	}
-	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 }
 
 SFMenuPanel::~SFMenuPanel()
 {
-	delete[] m_options_text;
+	
 }
 
 void SFMenuPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
@@ -46,28 +26,12 @@ void SFMenuPanel::Draw(sf::RenderTexture& screen)
 	{
 		SFPanel::Draw(screen);
 		screen.draw(m_title_text);
-		for (size_t i = 0; i < m_options; i++)
+
+		if (m_actions)
 		{
-			screen.draw(m_options_text[i]);
-		}
-		//screen.draw(m_actions_text);
-		//screen.draw(m_arrow);
-		for (size_t i = 0; i < m_options; i++)
-		{
-			screen.draw(m_options_text[i]);
-			screen.draw(m_buttons[i]);
+			m_actions->Draw(screen);
 		}
 	}
-}
-
-void SFMenuPanel::SetSelectedOptionIndex(int index)
-{
-	m_selected_option_index = index;
-}
-
-int SFMenuPanel::GetSelectedOptionIndex()
-{
-	return m_selected_option_index;
 }
 
 //------------------ONE ACTION MENU------------
@@ -81,9 +45,9 @@ SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playerShip) : SFMenu
 		//texts strings
 		m_title_text.setString(m_playerShip->m_targetPortal->m_display_name);
 
-		m_options_text[0].setString("Enter");
-
-		//m_actions_text.setString("Press Fire");
+		//options texts
+		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+		m_actions->SetString("Enter", ActionButton_A);
 
 		//size and position of panel
 		setSize(size);
@@ -99,41 +63,12 @@ SFOneActionPanel::SFOneActionPanel(sf::Vector2f size, Ship* playerShip) : SFMenu
 		//positioning of panel's content
 		float text_height = 0;
 		text_height += m_title_text.getGlobalBounds().height / 2;
-		m_title_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
 		//options texts
-		text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height / 2;
-		m_options_text[0].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
-
-		//actions texts
-		//text_height += INTERACTION_INTERBLOCK + m_options_text[0].getGlobalBounds().height;
-		//m_actions_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height - m_actions_text.getGlobalBounds().height / 2);
-		//text_height += m_actions_text.getGlobalBounds().height;
-		//default selected index
-		m_selected_option_index = 0;
-		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height - 2);
-		for (size_t i = 0; i < m_options; i++)
-		{
-			m_buttons[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_options_text[i].getPosition().y + m_options_text[i].getCharacterSize() - m_buttons[i].m_size.y/2);
-		}
-		//action box
-		//m_action_box = new SFActionBox(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), text_height), (*CurrentGame).m_font[Font_Arial], "Enter", "", "", "");
+		text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height;
+		m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	}
-}
-
-SFOneActionPanel::~SFOneActionPanel()
-{
-
-}
-
-void SFOneActionPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
-{
-
-}
-
-void SFOneActionPanel::Draw(sf::RenderTexture& screen)
-{
-	SFMenuPanel::Draw(screen);
 }
 
 //-------------------PORTAL MENU----------------
@@ -147,7 +82,14 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		//texts strings
 		m_title_text.setString(m_playerShip->m_targetPortal->m_display_name);
 
-		for (size_t i = 0; i < m_options; i++)
+		//options texts
+		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+		m_actions->SetString("Enter", ActionButton_A);
+		m_actions->SetString("Hazard up", ActionButton_Y);
+		m_actions->SetString("Hazard down", ActionButton_X);
+
+		m_actions_with_selection = new SFActionBoxWithSelection();
+		for (int i = 0; i < NB_HAZARD_LEVELS; i++)
 		{
 			stringstream ss;
 			ss << "Hazard " << i + 1 << " (Level " << stoi((*CurrentGame).m_generalScenesConfig[m_playerShip->m_targetPortal->m_destination_name][SCENE_LEVEL]) + i << ")";
@@ -155,12 +97,17 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 			{
 				//ss << "-> Score 100.0% to unlock next hazard level";
 			}
-			m_options_text[i].setString(ss.str());
-		}
+			m_actions_with_selection->AddOption(ss.str(), (*CurrentGame).m_font[Font_Arial]);
 
-		ostringstream ss_helpNavigation;
-		ss_helpNavigation << "\n\n\nFire: select\nBrake: down\nHyperspeed: up";
-		m_actions_text.setString(ss_helpNavigation.str());
+			if (i > m_playerShip->m_targetPortal->m_max_unlocked_hazard_level)
+			{
+				m_actions_with_selection->m_texts[i].setColor(sf::Color(80, 80, 80, 255));//greyed
+			}
+			else
+			{
+				m_actions_with_selection->m_texts[i].setColor(sf::Color(255, 255, 255, 255));//white
+			}
+		}
 
 		//size and position of panel
 		setSize(size);
@@ -176,91 +123,57 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		//positioning of panel's content
 		float text_height = 0;
 		text_height += m_title_text.getGlobalBounds().height / 2;
-		m_title_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
 		//options texts
-		for (size_t i = 0; i < m_options; i++)
-		{
-			if (i == 0)
-			{
-				text_height += INTERACTION_INTERBLOCK;
-			}
-			else
-			{
-				text_height += INTERACTION_INTERLINE;
-			}
-			text_height += m_options_text[i].getGlobalBounds().height;
-			m_options_text[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
-		}
+		text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height/2;
+		m_actions_with_selection->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
-		//buttons
-		m_new_action_texts[0].setFont(*(*CurrentGame).m_font[Font_Arial]);
-		m_new_action_texts[0].setCharacterSize(18);
-		m_new_action_texts[0].setString("Hazard up");
-		m_new_action_texts[1].setFont(*(*CurrentGame).m_font[Font_Arial]);
-		m_new_action_texts[1].setCharacterSize(18);
-		m_new_action_texts[1].setString("Hazard down");
-		
-		text_height += INTERACTION_INTERBLOCK + INTERACTION_INTERBLOCK + INTERACTION_INTERBLOCK + INTERACTION_INTERBLOCK+ m_new_action_texts[0].getGlobalBounds().height;
-		m_new_action_texts[0].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height - m_actions_text.getGlobalBounds().height / 2);
-		
-		text_height += INTERACTION_INTERLINE + m_new_action_texts[0].getCharacterSize();
-		m_new_action_texts[1].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height - m_actions_text.getGlobalBounds().height / 2);
+		text_height += 9*INTERACTION_INTERBLOCK;
+		m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
-		m_buttons[0].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getCharacterSize() - m_buttons[0].m_size.y / 2 +1);
-		m_buttons[2].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_new_action_texts[0].getPosition().y + m_new_action_texts[0].getCharacterSize() - m_buttons[2].m_size.y / 2 +1);
-		m_buttons[1].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_new_action_texts[1].getPosition().y + m_new_action_texts[1].getCharacterSize() - m_buttons[1].m_size.y / 2 +1);
-
-		//actions texts
-		
-		m_actions_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height - m_actions_text.getGlobalBounds().height/2);
-		text_height += m_actions_text.getGlobalBounds().height;
 		//default selected index
 		m_selected_option_index = (m_playerShip->m_last_hazard_level_played <= m_playerShip->m_targetPortal->m_max_unlocked_hazard_level ? m_playerShip->m_last_hazard_level_played : m_playerShip->m_targetPortal->m_max_unlocked_hazard_level);
-		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height + 3);
+		m_actions_with_selection->SetSelectedAction(m_selected_option_index);
 	}
+}
+
+void SFPortalPanel::SetSelectedOptionIndex(int index)
+{
+	m_selected_option_index = index;
+
+	//update feedback of selected index
+	m_actions_with_selection->SetSelectedAction(m_selected_option_index);
+}
+
+int SFPortalPanel::GetSelectedOptionIndex()
+{
+	return m_selected_option_index;
 }
 
 void SFPortalPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
-	//arrow
-	m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height/2 + 3);
-	m_buttons[0].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getCharacterSize() - m_buttons[0].m_size.y / 2 +1);
-
-
 	//updating greyed out options
 	if (m_visible)
 	{
 		if (m_playerShip && m_playerShip->m_targetPortal)
 		{
-			for (int i = 0; i < NB_HAZARD_LEVELS; i++)
+			if (m_selected_option_index == 0)
 			{
-				if (i > m_playerShip->m_targetPortal->m_max_unlocked_hazard_level)
-				{
-					m_options_text[i].setColor(sf::Color(80, 80, 80, 255));//greyed
-				}
-				else
-				{
-					m_options_text[i].setColor(sf::Color(255, 255, 255, 255));//white
-				}
+				m_actions->m_texts[ActionButton_Y].setColor(sf::Color(80, 80, 80, 255));//greyed
+			}
+			else
+			{
+				m_actions->m_texts[ActionButton_Y].setColor(sf::Color(255, 255, 255, 255));//white
+			}
 
-				if (m_selected_option_index == 0)
-				{
-					m_new_action_texts[0].setColor(sf::Color(80, 80, 80, 255));//greyed
-				}
-				else
-				{
-					m_new_action_texts[0].setColor(sf::Color(255, 255, 255, 255));//white
-				}
-
-				if (m_selected_option_index == m_playerShip->m_targetPortal->m_max_unlocked_hazard_level)
-				{
-					m_new_action_texts[1].setColor(sf::Color(80, 80, 80, 255));//greyed
-				}
-				else
-				{
-					m_new_action_texts[1].setColor(sf::Color(255, 255, 255, 255));//white
-				}
+			if (m_selected_option_index == m_playerShip->m_targetPortal->m_max_unlocked_hazard_level)
+			{
+				m_actions->m_texts[ActionButton_X].setColor(sf::Color(80, 80, 80, 255));//greyed
+			}
+			else
+			{
+				m_actions->m_texts[ActionButton_X].setColor(sf::Color(255, 255, 255, 255));//white
 			}
 		}
 	}
@@ -272,24 +185,14 @@ void SFPortalPanel::Draw(sf::RenderTexture& screen)
 	{
 		SFPanel::Draw(screen);
 		screen.draw(m_title_text);
-		for (size_t i = 0; i < m_options; i++)
+		
+		if (m_actions_with_selection)
 		{
-			screen.draw(m_options_text[i]);
+			m_actions_with_selection->Draw(screen);
 		}
-		//screen.draw(m_actions_text);
-		//screen.draw(m_arrow);
-		for (size_t i = 0; i < m_options; i++)
+		if (m_actions)
 		{
-			screen.draw(m_options_text[i]);
-		}
-		for (size_t i = 0; i < 3; i++)
-		{
-			screen.draw(m_buttons[i]);
-			
-		}
-		for (size_t i = 0; i < 2; i++)
-		{
-			screen.draw(m_new_action_texts[i]);
+			m_actions->Draw(screen);
 		}
 	}
 }
@@ -301,14 +204,10 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 	{
 		//texts strings
 		m_title_text.setString(m_playerShip->m_targetShop->m_display_name);
-		
-		//m_options_text[ShopHeal].setString("Heal");
-		m_options_text[ShopBuy].setString("Buy/Sell");
-		m_options_text[ShopStellarMap].setString("Stellar map");
 
-		ostringstream ss_helpNavigation;
-		ss_helpNavigation << "\n\n\nFire: select\nBrake: down\nHyperspeed: up";
-		m_actions_text.setString(ss_helpNavigation.str());
+		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+		m_actions->SetString("Buy/Sell", ActionButton_A);
+		m_actions->SetString("Stellar map", ActionButton_X);
 
 		//size and position
 		setSize(size);
@@ -318,62 +217,10 @@ SFShopPanel::SFShopPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(size
 		//positioning panel content
 		float text_height = 0;
 		text_height += m_title_text.getGlobalBounds().height / 2;
-		m_title_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
+		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
 		//options texts
-		for (size_t i = 0; i < m_options; i++)
-		{
-			if (i == 0)
-			{
-				text_height += INTERACTION_INTERBLOCK;
-			}
-			else
-			{
-				text_height += INTERACTION_SHOP_INTERLINE;
-			}
-			text_height += m_options_text[i].getGlobalBounds().height;
-			m_options_text[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
-		}
-		for (size_t i = 0; i < m_options; i++)
-		{
-			m_buttons[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_options_text[i].getPosition().y + m_options_text[i].getCharacterSize() - m_buttons[i].m_size.y / 2 +2);
-		}
-
-		//actions texts
-		text_height += INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height / 2;
-		m_actions_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + m_arrow.m_size.x - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
-		text_height += m_actions_text.getGlobalBounds().height;
-		//default selected index
-		m_selected_option_index = 0;
-		m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[0].getGlobalBounds().height - 5);//because fuck this
-
-	}
-}
-
-void SFShopPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
-{
-	//arrow
-	m_arrow.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[0].getGlobalBounds().height - 5);//because fuck this
-	//should be the selected option index's text global bounds, but for some reason it's inconsistent, based on what characters are used in the text, so let us use the same reference index for height
-	//m_arrow->setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), m_options_text[m_selected_option_index].getPosition().y + m_options_text[m_selected_option_index].getGlobalBounds().height - 1);
-
-	//updating greyed out options
-	if (m_visible)
-	{
-		if (m_playerShip && m_playerShip->m_targetShop)
-		{
-			for (int i = 0; i < m_options; i++)
-			{
-				bool condition = true;//dynamic condition that can be used, such as checking player's money
-				if (!condition)
-				{
-					m_options_text[i].setColor(sf::Color(80, 80, 80, 255));//greyed
-				}
-				else
-				{
-					m_options_text[i].setColor(sf::Color(255, 255, 255, 255));//white
-				}
-			}
-		}
+		text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height;
+		m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 	}
 }

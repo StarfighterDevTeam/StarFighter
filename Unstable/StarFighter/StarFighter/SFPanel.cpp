@@ -2,90 +2,67 @@
 
 
 //ACTION BOX
-SFActionBox::SFActionBox(sf::Vector2f position, sf::Font* font, string action1, string action2, string action3, string action4)
+SFActionBox::SFActionBox(sf::Font* font)
 {
-	setPosition(position);
-
-	float offset = 20;
-	float text_margin = 4;
-
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NBVAL_ActionButtons; i++)
 	{
-		m_boxes[i].setSize(sf::Vector2f(24, 24));
-		m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y/2);
-		
-		m_texts[i].setFont(*font);
-		m_texts[i].setCharacterSize(14);
-		m_texts[i].setColor(Color::White);
-
-
+		string filename;
 		switch (i)
 		{
-			//down (A)
-			case 0:
+			case ActionButton_A:
 			{
-				m_boxes[i].setPosition(sf::Vector2f(getPosition().x, getPosition().y - offset/2));
-				m_boxes[i].setFillColor(sf::Color::Green);
-				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_A.png", 16, 16);
-				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
-				m_boxes[i].setTexture(texture);
-
-				m_texts[i].setString(action1);
-				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_texts[i].getGlobalBounds().width/2, m_boxes[i].getPosition().y + m_boxes[i].getSize().y / 2 + text_margin);
+				filename = INTERACTION_BUTTON_A_FILENAME;
 				break;
 			}
-			//left (X)
-			case 1:
+			case ActionButton_X:
 			{
-				m_boxes[i].setPosition(sf::Vector2f(getPosition().x - offset, getPosition().y));
-				m_boxes[i].setFillColor(sf::Color::Blue);
-				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_X.png", 16, 16);
-				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
-				m_boxes[i].setTexture(texture);
-
-				m_texts[i].setString(action2);
-				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_boxes[i].getSize().x / 2 - text_margin - m_texts[i].getGlobalBounds().width, m_boxes[i].getPosition().y);
+				filename = INTERACTION_BUTTON_X_FILENAME;
 				break;
 			}
-			//right (B)
-			case 2:
+			case ActionButton_Y:
 			{
-				m_boxes[i].setPosition(sf::Vector2f(getPosition().x + offset, getPosition().y));
-				m_boxes[i].setFillColor(sf::Color::Red);
-				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_B.png", 16, 16);
-				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
-				m_boxes[i].setTexture(texture);
-
-				m_texts[i].setString(action3);
-				m_texts[i].setPosition(m_boxes[i].getPosition().x + m_boxes[i].getSize().x / 2 + text_margin + m_texts[i].getGlobalBounds().width, m_boxes[i].getPosition().y);
+				filename = INTERACTION_BUTTON_Y_FILENAME;
 				break;
 			}
-			//up (Y)
-			case 3:
+			case ActionButton_B:
 			{
-				m_boxes[i].setPosition(sf::Vector2f(getPosition().x, getPosition().y + offset/2));
-				m_boxes[i].setFillColor(sf::Color::Yellow);
-				sf::Texture* texture = loader->loadTexture("Assets/2D/HUD/Button_Y.png", 16, 16);
-				m_boxes[i].setOrigin(m_boxes[i].getSize().x / 2, m_boxes[i].getSize().y / 2);
-				m_boxes[i].setTexture(texture);
-
-				m_texts[i].setString(action4);
-				m_texts[i].setPosition(m_boxes[i].getPosition().x - m_texts[i].getGlobalBounds().width / 2, m_boxes[i].getPosition().y - m_boxes[i].getSize().y / 2 - text_margin);
+				filename = INTERACTION_BUTTON_B_FILENAME;
 				break;
 			}
 		}
-	}
 
-	//setSize(sf::Vector2f(m_texts[1].getGlobalBounds().width + m_boxes[0].getSize().x + 2 * offset + m_texts[3].getGlobalBounds().width, m_texts[0].getGlobalBounds().height + offset + m_boxes[0].getSize().y + m_texts[3].getGlobalBounds().height));
-	//setPosition(getPosition().x - getSize().x / 2, getPosition().y);
+		assert(!filename.empty());
+
+		m_boxes[i] = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), filename, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+
+		m_texts[i].setFont(*font);
+		m_texts[i].setCharacterSize(18);
+		m_texts[i].setColor(Color::White);
+	}
+}
+
+void SFActionBox::SetString(string button_name, ActionButtons button)
+{
+	m_texts[button].setString(button_name);
+}
+
+void SFActionBox::SetPosition(sf::Vector2f position)
+{
+	int j = 0;
+	for (int i = 0; i < NBVAL_ActionButtons; i++)
+	{
+		if (!m_texts[i].getString().isEmpty())
+		{
+			m_boxes[i].setPosition(position.x + m_boxes[i].m_size.x / 2, position.y + m_boxes[i].m_size.y / 2 + (m_boxes[i].m_size.y / 2 + INTERACTION_INTERBLOCK) * j);
+			m_texts[i].setPosition(m_boxes[i].getPosition().x + m_boxes[i].m_size.x + INTERACTION_BUTTON_MARGIN, m_boxes[i].getPosition().y - m_texts[i].getGlobalBounds().height/2 - 3);//because fuck this
+			j++;
+		}	
+	}
 }
 
 void SFActionBox::Draw(sf::RenderTexture& screen)
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NBVAL_ActionButtons; i++)
 	{
 		if (!m_texts[i].getString().isEmpty())
 		{
@@ -95,6 +72,64 @@ void SFActionBox::Draw(sf::RenderTexture& screen)
 	}
 }
 
+//ACTION BOX WITH SELECTION
+SFActionBoxWithSelection::SFActionBoxWithSelection()
+{
+	m_box = GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT), sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
+	m_selected_index = -1;
+}
+
+void SFActionBoxWithSelection::AddOption(string option_name, sf::Font* font)
+{
+	sf::Text new_option;
+	new_option.setFont(*font);
+	new_option.setCharacterSize(18);
+	new_option.setColor(sf::Color::White);
+	new_option.setString(option_name);
+
+	m_texts.push_back(new_option);
+}
+
+void SFActionBoxWithSelection::SetSelectedAction(int index)
+{
+	m_selected_index = index;
+	m_box.setPosition(m_texts[m_selected_index].getPosition().x - m_box.m_size.x - INTERACTION_BUTTON_MARGIN, m_texts[m_selected_index].getPosition().y + m_box.m_size.y - 5);//because fuck this
+}
+
+void SFActionBoxWithSelection::SetPosition(sf::Vector2f position)
+{
+	int j = 0;
+	int buttonsVectorSize = m_texts.size();
+	for (int i = 0; i < buttonsVectorSize; i++)
+	{
+		if (!m_texts[i].getString().isEmpty())
+		{
+			if (m_selected_index == j)
+			{
+				m_box.setPosition(position.x + m_box.m_size.x / 2, position.y + m_box.m_size.y / 2 + (m_box.m_size.y / 2 + INTERACTION_INTERBLOCK) * j);
+			}
+
+			m_texts[i].setPosition(position.x + m_box.m_size.x + m_box.m_size.x / 2 + INTERACTION_BUTTON_MARGIN, position.y + m_texts[i].getGlobalBounds().height / 2 + (m_box.m_size.y / 2 + INTERACTION_INTERBLOCK) * j);
+			j++;
+		}
+	}
+}
+
+void SFActionBoxWithSelection::Draw(sf::RenderTexture& screen)
+{
+	size_t optionsVectorSize = m_texts.size();
+	if (optionsVectorSize > 0)
+	{
+		screen.draw(m_box);
+	}
+	for (int i = 0; i < optionsVectorSize; i++)
+	{
+		if (!m_texts[i].getString().isEmpty())
+		{
+			screen.draw(m_texts[i]);
+		}
+	}
+}
 
 //PANEL
 SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
@@ -103,6 +138,7 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	m_visible = true;
 	m_panel_type = panel_type;
 	m_playerShip = NULL;
+	m_actions = NULL;
 
 	sf::Color _darkblue = sf::Color::Color(6, 87, 94, 255);//dark blue-green
 	sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
@@ -118,10 +154,6 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 	m_title_text.setCharacterSize(20);
 	m_title_text.setColor(_yellow);
 
-	//actions text
-	m_actions_text.setCharacterSize(18);
-	m_actions_text.setColor(_yellow);
-
 	//body text
 	m_text.setCharacterSize(18);
 	m_text.setColor(_white);
@@ -129,9 +161,12 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 
 SFPanel::~SFPanel()
 {
-	m_playerShip = NULL;
+	if (m_actions)
+	{
+		delete m_actions;
+		m_actions = NULL;
+	}
 }
-
 
 bool SFPanel::IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object)
 {

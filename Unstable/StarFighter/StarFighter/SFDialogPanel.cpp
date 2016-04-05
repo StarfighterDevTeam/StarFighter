@@ -55,24 +55,24 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 	text_height += m_title_text.getCharacterSize() + INTERACTION_INTERLINE + m_text.getGlobalBounds().height / 2;
 	m_text.setPosition(getPosition().x - getSize().x / 2 + m_picture.m_size.x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
-	//buttons
-	m_actions_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_actions_text.setCharacterSize(18);
-	m_actions_text.setColor(Color::White);
-	ostringstream ss;
-	if (m_dialog->m_next_dialog_name.empty() || m_dialog->m_next_dialog_name.compare("0") == 0)
+	//actions text
+	if (m_dialog->m_duration == 0)
 	{
-		ss << "Continue";
+		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
+
+		ostringstream ss;
+		if (m_dialog->m_next_dialog_name.empty() || m_dialog->m_next_dialog_name.compare("0") == 0)
+		{
+			ss << "Continue";
+		}
+		else
+		{
+			ss << "Next";
+		}
+
+		m_actions->SetString(ss.str(), ActionButton_A);
+		m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + m_picture.m_size.x + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y + getSize().y / 2 - 2 * INTERACTION_INTERBLOCK));
 	}
-	else
-	{
-		ss << "Next";
-	}
-	m_actions_text.setString(ss.str());
-	m_buttons = GameObject(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, INTERACTION_PANEL_MARGIN_TOP), sf::Vector2f(0, 0), INTERACTION_BUTTON_A_FILENAME, sf::Vector2f(INTERACTION_BUTTON_WIDTH, INTERACTION_BUTTON_HEIGHT),
-		sf::Vector2f(INTERACTION_BUTTON_WIDTH / 2, INTERACTION_BUTTON_HEIGHT / 2));
-	m_actions_text.setPosition(getPosition().x - getSize().x / 2 + m_picture.m_size.x + INTERACTION_INTERBLOCK +INTERACTION_BUTTON_MARGIN + m_buttons.m_size.x, getPosition().y + getSize().y / 2 - INTERACTION_INTERBLOCK - m_actions_text.getCharacterSize());
-	m_buttons.setPosition(m_actions_text.getPosition().x - m_buttons.m_size.x, m_actions_text.getPosition().y + m_actions_text.getCharacterSize() - 6);
 }
 
 SFDialogPanel::~SFDialogPanel()
@@ -109,10 +109,9 @@ void SFDialogPanel::Draw(sf::RenderTexture& screen)
 		screen.draw(m_text);
 		screen.draw(m_picture);
 
-		if (m_dialog->m_duration == 0)
+		if (m_actions)
 		{
-			screen.draw(m_actions_text);
-			screen.draw(m_buttons);
+			m_actions->Draw(screen);
 		}
 	}
 }

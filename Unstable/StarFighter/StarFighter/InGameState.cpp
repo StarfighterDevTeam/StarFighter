@@ -39,13 +39,13 @@ void InGameState::Initialize(Player player)
 		if (m_playerShip->m_equipment[i] != NULL)
 		{
 			GameObject* capsule = Ship::CloneEquipmentIntoGameObject(m_playerShip->m_equipment[i]);
-			m_playerShip->m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(i, capsule);
+			m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(i, capsule);
 		}
 	}
 	if (m_playerShip->m_weapon)
 	{
 		GameObject* capsule = Ship::CloneWeaponIntoGameObject(m_playerShip->m_weapon);
-		m_playerShip->m_SFHudPanel->GetGrid()->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
+		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, capsule);
 	}
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
@@ -671,11 +671,6 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 {
 	switch (panel_type)
 	{
-		case SFPanel_Inventory:
-		{
-			playerShip->m_SFTargetPanel = new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false, true);
-			break;
-		}
 		case SFPanel_Trade:
 		{
 			playerShip->m_SFTargetPanel = new SFTradePanel(sf::Vector2f(TRADE_PANEL_WIDTH, TRADE_PANEL_HEIGHT), playerShip);//new SFInventoryPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INVENTORY_PANEL_HEIGHT), playerShip, SHOP_GRID_NB_LINES, SHOP_GRID_NB_ROWS, false, true);
@@ -693,7 +688,7 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		}
 		case SFPanel_Shop:
 		{
-			playerShip->m_SFTargetPanel = new SFShopPanel(sf::Vector2f(INTERACTION_PANEL_WIDTH, INTERACTION_PANEL_HEIGHT), playerShip);
+			playerShip->m_SFTargetPanel = new SFShopPanel(sf::Vector2f(SHOP_PANEL_WIDTH, SHOP_PANEL_HEIGHT), playerShip);
 			break;
 		}
 		case SFPanel_DialogNext:

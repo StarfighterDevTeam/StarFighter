@@ -597,7 +597,7 @@ float Scene::getSceneBeastScore(int for_hazard_level)
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::DEBUG, "<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", level);
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("<!> Error, The scene has a 'hazard_level' (%d) beyond existing values\n", for_hazard_level));
 		for_hazard_level = 0;
 	}
 

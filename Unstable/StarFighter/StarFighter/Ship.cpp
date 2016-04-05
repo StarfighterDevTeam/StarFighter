@@ -615,11 +615,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			MoveCursor(m_SFHudPanel->GetCursor(), inputs_direction, deltaTime, m_SFHudPanel);
 
 			//Swapping items
-			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 2)
+			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == Trade_StashGrid)
 			{
 				EquipItem();
 			}
-			else if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 1)
+			else if (m_inputs_states[Action_Firing] == Input_Tap && m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == Trade_EquippedGrid)
 			{
 				DesequipItem();
 			}
@@ -1040,7 +1040,7 @@ void Ship::BuyingItem()
 			{
 				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
-					m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
+					m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 					m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
@@ -1056,7 +1056,7 @@ void Ship::BuyingItem()
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
 				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-				m_SFHudPanel->GetGrid(false, 1)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), NBVAL_Equipment);
+				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), NBVAL_Equipment);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1075,7 +1075,7 @@ void Ship::BuyingItem()
 			{
 				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
-					m_SFHudPanel->GetGrid(false, 2)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
+					m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 					m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
@@ -1091,7 +1091,7 @@ void Ship::BuyingItem()
 				m_money -= m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
 				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
 				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-				m_SFHudPanel->GetGrid(false, 1)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType);
+				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType);
 				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
 				(*CurrentGame).PlaySFX(SFX_Equip);
@@ -1178,36 +1178,36 @@ void Ship::SellingItem()
 void Ship::EquipItem()
 {
 	//Equip
-	if (m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 2)
+	if (m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == Trade_StashGrid)
 	{
 		GameObject* tmp_ptr = m_SFHudPanel->GetFocusedItem();
-		int equip_index_ = m_SFHudPanel->GetGrid(false, 2)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
+		int equip_index_ = m_SFHudPanel->GetGrid(false, Trade_StashGrid)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
 
 		if (tmp_ptr->m_equipment_loot)
 		{
 			int ship_index_ = tmp_ptr->m_equipment_loot->m_equipmentType;
-			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, Trade_EquippedGrid), *m_SFHudPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 
 			if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
 			{
 				ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 			}
 
-			Equipment* new_equipment = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
+			Equipment* new_equipment = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
 			this->setShipEquipment(new_equipment, true);
 			new_equipment = NULL;
 		}
 		else if (tmp_ptr->m_weapon_loot)
 		{
 			int ship_index_ = NBVAL_Equipment;
-			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, Trade_EquippedGrid), *m_SFHudPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 
 			if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
 			{
 				ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 			}
 
-			Weapon* new_weapon = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
+			Weapon* new_weapon = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
 			this->setShipWeapon(new_weapon, true);
 			new_weapon = NULL;
 		}
@@ -1236,21 +1236,21 @@ void Ship::EquipItemFromTradePanel()
 			ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, Trade_EquippedGrid), *m_SFHudPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 
-			Equipment* new_equipment = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
+			Equipment* new_equipment = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->getCellPointerFromIntIndex(ship_index_)->m_equipment_loot->Clone();
 			this->setShipEquipment(new_equipment, true);
 			new_equipment = NULL;
 		}
 		else if (tmp_ptr->m_weapon_loot)
 		{
 			int ship_index_ = NBVAL_Equipment;
-			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, 1), *m_SFHudPanel->GetGrid(false, 2), ship_index_, equip_index_);
+			ObjectGrid::SwapObjectsBetweenGrids(*m_SFHudPanel->GetGrid(false, Trade_EquippedGrid), *m_SFHudPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 
 			if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Trade)
 			{
 				ObjectGrid::SwapObjectsBetweenGrids(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid), *m_SFTargetPanel->GetGrid(false, Trade_StashGrid), ship_index_, equip_index_);
 			}
 
-			Weapon* new_weapon = m_SFHudPanel->GetGrid(false, 1)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
+			Weapon* new_weapon = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->getCellPointerFromIntIndex(ship_index_)->m_weapon_loot->Clone();
 			this->setShipWeapon(new_weapon, true);
 			new_weapon = NULL;
 		}
@@ -1268,25 +1268,25 @@ void Ship::EquipItemFromTradePanel()
 void Ship::DesequipItem()
 {
 	//Desequip
-	if (m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == 1)
+	if (m_SFHudPanel->GetFocusedItem() && m_SFHudPanel->GetFocusedGrid() == Trade_EquippedGrid)
 	{
 		GameObject* tmp_ptr = m_SFHudPanel->GetFocusedItem();
-		int ship_index_ = m_SFHudPanel->GetGrid(false, 1)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
+		int ship_index_ = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
 
 		if (tmp_ptr->m_equipment_loot)
 		{
-			if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
+			if (m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr))
 			{
 				cleanEquipment(ship_index_);
-				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
 			}
 		}
 		else if (tmp_ptr->m_weapon_loot)
 		{
-			if (m_SFHudPanel->GetGrid(false, 2)->insertObject(*tmp_ptr))
+			if (m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*tmp_ptr))
 			{
 				cleanWeapon(ship_index_);
-				m_SFHudPanel->GetGrid(false, 1)->setCellPointerForIntIndex(ship_index_, NULL);
+				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(ship_index_, NULL);
 			}
 		}
 		else
@@ -1378,7 +1378,7 @@ void Ship::GarbagingItem()
 				m_SFHudPanel->GetGrid(false, grid_id_)->setCellPointerForIntIndex(index_, NULL);
 
 				//garbage for real
-				if (m_SFHudPanel->GetFocusedGrid() == 1)
+				if (m_SFHudPanel->GetFocusedGrid() == Trade_EquippedGrid)
 				{
 					if (equip_type == NBVAL_Equipment)
 					{
@@ -1702,14 +1702,14 @@ bool Ship::GetLoot(GameObject& object)
 		//stash it
 		if (m_equipment[object.m_equipment_loot->m_equipmentType])
 		{
-			success = m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
+			success = m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*capsule, -1);
 		}
 		//equip it
 		else
 		{
 			setShipEquipment(object.m_equipment_loot->Clone());
 			//and update HUD
-			success = m_SFHudPanel->GetGrid(false, 1)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType, true);
+			success = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType, true);
 		}
 		
 		if (success)
@@ -1733,14 +1733,14 @@ bool Ship::GetLoot(GameObject& object)
 		//stash it
 		if (m_weapon)
 		{
-			success = m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, -1);
+			success = m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*capsule, -1);
 		}
 		//equip it
 		else
 		{
 			setShipWeapon(object.m_weapon_loot->Clone());
 			//and update HUD
-			success = m_SFHudPanel->GetGrid(false, 1)->insertObject(*capsule, NBVAL_Equipment, true);
+			success = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, NBVAL_Equipment, true);
 		}
 
 		if (success)
@@ -1808,7 +1808,6 @@ void Ship::GetShop(GameObject* object)
 	{
 		if (m_HUD_state == HUD_Trade)
 		{
-			//m_is_asking_SFPanel = SFPanel_Inventory;
 			m_is_asking_SFPanel = SFPanel_Trade;
 		}
 		else if (m_HUD_state == HUD_ShopStellarMap)
@@ -1867,7 +1866,7 @@ float Ship::getShipBeastScore()
 	}
 	else
 	{
-		LOGGER_WRITE(Logger::DEBUG, "<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", this->graze_level);
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("<!> Error, The ship has a 'graze_level' (%d) beyond existing values\n", m_graze_level));
 		m_graze_count = 0;
 		m_graze_level = 0;
 	}
@@ -2251,19 +2250,19 @@ int Ship::SaveItems(string file, Ship* ship)
 		data << "Weapon ";
 		Ship::SaveWeaponData(data, ship->m_weapon, true);
 
-		for (size_t i = 0; i < ship->m_SFHudPanel->GetGrid(false, 2)->squares.x; i++)
+		for (size_t i = 0; i < ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->squares.x; i++)
 		{
-			for (size_t j = 0; j < ship->m_SFHudPanel->GetGrid(false, 2)->squares.y; j++)
+			for (size_t j = 0; j < ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->squares.y; j++)
 			{
-				if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j])
+				if (ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[i][j])
 				{
-					if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot)
+					if (ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[i][j]->m_equipment_loot)
 					{
-						Ship::SaveEquipmentData(data, ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_equipment_loot, false);
+						Ship::SaveEquipmentData(data, ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[i][j]->m_equipment_loot, false);
 					}
-					else if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot)
+					else if (ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[i][j]->m_weapon_loot)
 					{
-						Ship::SaveWeaponData(data, ship->m_SFHudPanel->GetGrid(false, 2)->grid[i][j]->m_weapon_loot, false);
+						Ship::SaveWeaponData(data, ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[i][j]->m_weapon_loot, false);
 					}
 					else
 					{
@@ -2640,13 +2639,13 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 				}
 				else
 				{
-					int r = index % ship->m_SFHudPanel->GetGrid(false, 2)->squares.y;
-					int l = index / ship->m_SFHudPanel->GetGrid(false, 2)->squares.y;
+					int r = index % ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->squares.y;
+					int l = index / ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->squares.y;
 
-					if (ship->m_SFHudPanel->GetGrid(false, 2)->grid[l][r])
+					if (ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[l][r])
 					{
-						delete ship->m_SFHudPanel->GetGrid(false, 2)->grid[l][r];
-						ship->m_SFHudPanel->GetGrid(false, 2)->grid[l][r] = NULL;
+						delete ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[l][r];
+						ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->grid[l][r] = NULL;
 					}
 					
 					if (equipment_type.compare("0") != 0)
@@ -2655,14 +2654,14 @@ bool Ship::LoadPlayerItems(string file, Ship* ship)
 						{
 							Weapon* weapon = Ship::LoadWeaponFromLine(line);
 							GameObject* capsule = ship->CloneWeaponIntoGameObject(weapon);
-							ship->m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
+							ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*capsule, index, true);
 							delete weapon;
 						}
 						else
 						{
 							Equipment* equipment = Ship::LoadEquipmentFromLine(line);
 							GameObject* capsule = ship->CloneEquipmentIntoGameObject(equipment);
-							ship->m_SFHudPanel->GetGrid(false, 2)->insertObject(*capsule, index, true);
+							ship->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*capsule, index, true);
 							delete equipment;
 						}
 					}

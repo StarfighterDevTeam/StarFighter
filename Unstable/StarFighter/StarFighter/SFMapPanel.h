@@ -75,8 +75,6 @@ public:
 	static sf::Vector2f GetRealCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size);
 	static sf::Vector2f GetFakeCoordinates(sf::Vector2f rendered_coordinates, sf::Vector2f panel_position, sf::Vector2f panel_size);
 
-	GameObject m_buttons;
-	GameObject m_arrow;
 	string m_location_name;
 };
 
@@ -107,9 +105,6 @@ public:
 	GameObject m_ship;
 	int m_teleportation_cost;
 	string m_targeted_location;
-
-	sf::Text m_new_action_texts[2];
-	GameObject m_buttons[2];
 
 private:
 	vector<string> m_checked_scenes;

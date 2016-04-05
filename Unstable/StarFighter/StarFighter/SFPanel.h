@@ -12,8 +12,7 @@ enum SFPanelTypes
 {
 	SFPanel_None,
 	SFPanel_ItemStats,
-	SFPanel_Inventory,
-	SFPanel_DoubleInventory,
+	SFPanel_HUD,
 	SFPanel_Action,
 	SFPanel_Portal,
 	SFPanel_Shop,
@@ -26,10 +25,19 @@ enum SFPanelTypes
 
 enum TradeGrids
 {
-	Trade_ShopGrid,
 	Trade_EquippedGrid,
 	Trade_StashGrid,
+	Trade_ShopGrid,
 	NBVAL_TradeGrids//3
+};
+
+enum ActionButtons
+{
+	ActionButton_A,
+	ActionButton_X,
+	ActionButton_Y,
+	ActionButton_B,
+	NBVAL_ActionButtons,//4
 };
 
 enum FocusedItemStates
@@ -44,11 +52,28 @@ enum FocusedItemStates
 class SFActionBox : public sf::RectangleShape
 {
 public:
-	SFActionBox(sf::Vector2f position, sf::Font* font, string action1, string action2, string action3, string action4);
+	SFActionBox(sf::Font* font);
+	void SetString(string button_name, ActionButtons button);
+	void SetPosition(sf::Vector2f position);
 	void Draw(sf::RenderTexture& screen);
 
-	sf::RectangleShape m_boxes[4];
-	sf::Text m_texts[4];
+	GameObject m_boxes[NBVAL_ActionButtons];
+	sf::Text m_texts[NBVAL_ActionButtons];
+};
+
+class SFActionBoxWithSelection : public sf::RectangleShape
+{
+public:
+	SFActionBoxWithSelection();
+	~SFActionBoxWithSelection(){};
+	void AddOption(string option_name, sf::Font* font);
+	void SetPosition(sf::Vector2f position);
+	void SetSelectedAction(int index);
+	void Draw(sf::RenderTexture& screen);
+
+	GameObject m_box;
+	vector<sf::Text> m_texts;
+	int m_selected_index;
 };
 
 class SFPanel : public sf::RectangleShape
@@ -63,10 +88,11 @@ public:
 	
 	sf::Text m_title_text;
 	sf::Text m_text;
-	sf::Text m_actions_text;
 	bool m_visible;
 	SFPanelTypes m_panel_type;
 	size_t m_number_of_options;
+
+	SFActionBox* m_actions;
 
 	Ship* m_playerShip;
 
@@ -75,7 +101,7 @@ public:
 	virtual GameObject* GetCursor();
 	virtual GameObject* GetFocusedItem();
 	virtual void SetFocusedItem(GameObject* item);
-	virtual ObjectGrid* GetGrid(bool fake_grid = false, int grid = 1);
+	virtual ObjectGrid* GetGrid(bool fake_grid, int grid);
 	virtual sf::Vector2i GetFocusedIndex();
 	virtual int GetFocusedIntIndex();
 	virtual int GetFocusedGrid();
