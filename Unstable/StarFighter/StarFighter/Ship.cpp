@@ -758,6 +758,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed;
 				}
+
+				m_actions_states[Action_Firing] = false;
 			}
 
 			//Moving
