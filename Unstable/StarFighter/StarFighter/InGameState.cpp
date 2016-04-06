@@ -339,6 +339,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if ((*CurrentGame).isLastEnemyDead())
 				{
 					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, true, true, true);
+					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
 				}
 
 				//player takes exit?
@@ -543,7 +544,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				(*CurrentGame).m_playerShip->m_immune = false;
 
 				//Play scene title feedback if we come from a hub + music changes
-				if (previous_direction == NO_DIRECTION || (*CurrentGame).m_curMusic_type != Music_Scene)
+				if (previous_direction == NO_DIRECTION || (*CurrentGame).m_curMusic_type == Music_Hub)
 				{
 					m_currentScene->PlayTitleFeedback();
 
