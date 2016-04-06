@@ -113,7 +113,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		//BUY
 		if (item_state == FocusedItem_Buy)
 		{
-			int price = object->m_equipment_loot ? object->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS : object->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+			int price = object->m_equipment_loot ? GameObject::GetPrice(object->m_equipment_loot->m_credits, object->m_equipment_loot->m_quality) : GameObject::GetPrice(object->m_weapon_loot->m_credits, object->m_weapon_loot->m_quality);
 			ostringstream ss_buy;
 			ss_buy << "Buy: $" << price;
 			if (playerShip->m_money < price)
@@ -132,7 +132,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		//SELL
 		else if (item_state == FocusedItem_SellOrEquip || item_state == FocusedItem_SellOrDesequip)
 		{
-			int price = object->m_equipment_loot ? object->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS : object->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+			int price = object->m_equipment_loot ? GameObject::GetPrice(object->m_equipment_loot->m_credits, object->m_equipment_loot->m_quality) : GameObject::GetPrice(object->m_weapon_loot->m_credits, object->m_weapon_loot->m_quality);
 			ostringstream ss_sell;
 			ss_sell << "Sell: $" << price;
 			//m_options_text[0].setString(ss_sell.str());
@@ -238,7 +238,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_itam_name << "THRUSTER: " << standard_name;
 				ss_stats << "Hyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case Armor:
@@ -248,7 +248,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_itam_name << "HULL: " << standard_name;
 				ss_stats << "Hull pts: " << obj->m_armor;
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case Shield:
@@ -262,7 +262,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_stats.precision(0);
 				ss_stats << obj->m_shield_recovery_time << "sec";
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case Module:
@@ -347,7 +347,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 					ss_stats << "\nNo effect";
 				}
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case NBVAL_Equipment:
@@ -424,7 +424,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 					}
 				}
 				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << obj->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 		}
@@ -558,11 +558,11 @@ void SFInventoryPanel::UpdateGreyMaskOnInsufficientCredits(ObjectGrid* grey_grid
 			{
 				if (grid->grid[i][j]->m_equipment_loot)
 				{
-					grey_grid->grid[i][j]->m_visible = playerShip->m_money < grid->grid[i][j]->m_equipment_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					grey_grid->grid[i][j]->m_visible = playerShip->m_money < GameObject::GetPrice(grid->grid[i][j]->m_equipment_loot->m_credits, grid->grid[i][j]->m_equipment_loot->m_quality);
 				}
 				else if (grid->grid[i][j]->m_weapon_loot)
 				{
-					grey_grid->grid[i][j]->m_visible = playerShip->m_money < grid->grid[i][j]->m_weapon_loot->m_credits * MONEY_COST_OF_LOOT_CREDITS;
+					grey_grid->grid[i][j]->m_visible = playerShip->m_money < GameObject::GetPrice(grid->grid[i][j]->m_weapon_loot->m_credits, grid->grid[i][j]->m_weapon_loot->m_quality);
 				}
 			}
 		}

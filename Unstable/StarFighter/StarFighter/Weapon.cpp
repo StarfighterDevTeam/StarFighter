@@ -403,6 +403,7 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 
 Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float quality)
 {
+	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	int cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), level - 1));
@@ -417,9 +418,9 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float q
 		int random_type_of_bonus = -1;
 
 		//checking bonus limitations
-		bool can_buy_multishot = credits_ > cost_per_multishot;
+		bool can_buy_multishot = loot_credits_remaining > cost_per_multishot;
 		bool can_buy_rate_of_fire = bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS;
-		bool can_buy_damage = floor(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * credits_ / 100))) != FIRST_LEVEL_AMMO_DAMAGE;
+		bool can_buy_damage = floor(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * loot_credits_remaining / 100))) != FIRST_LEVEL_AMMO_DAMAGE;
 
 		//and chosing among the authorized ones
 		if (!can_buy_damage)
@@ -503,7 +504,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float q
 
 	//saving level and credits used
 	weapon->m_level = level;
-	weapon->m_credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	weapon->m_credits = credits_;
 	weapon->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return weapon;

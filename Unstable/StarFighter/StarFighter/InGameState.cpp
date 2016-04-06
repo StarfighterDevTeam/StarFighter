@@ -338,8 +338,9 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				
 				if ((*CurrentGame).isLastEnemyDead())
 				{
-					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, true, true, true);
+					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
+					(*CurrentGame).m_playerShip->m_disableRecall = false;
 				}
 
 				//player takes exit?
@@ -366,6 +367,8 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				else
 				{
 					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
+					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
+					(*CurrentGame).m_playerShip->m_disableRecall = false;
 
 					if (!m_hasDisplayedDestructionRatio)
 					{

@@ -384,6 +384,11 @@ void GameObject::GetGrazing()
 	//see overide function in class Ship
 }
 
+int GameObject::GetPrice(int credits, float quality)
+{
+	return credits * MONEY_COST_OF_LOOT_CREDITS * quality * 0.01 * 2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES;
+}
+
 sf::Vector2f GameObject::getSpeed_for_Scrolling(Directions direction, float vspeed)
 {
 	sf::Vector2f speed = sf::Vector2f(0, 0);

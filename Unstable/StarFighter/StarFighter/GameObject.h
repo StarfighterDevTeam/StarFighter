@@ -246,6 +246,7 @@ public:
 	bool setWeaponLoot(Weapon* weapon);
 	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
+	static int GetPrice(int credits, float quality);
 
 	InteractionType m_isCollidingWithInteractiveObject;
 	InteractionType m_previouslyCollidingWithInteractiveObject;

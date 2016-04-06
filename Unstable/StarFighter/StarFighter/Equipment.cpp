@@ -102,6 +102,7 @@ void Equipment::Init(int equipmentType, float max_speed, float acceleration, flo
 
 Equipment* Equipment::CreateRandomArmor(int credits_, int level, float quality)
 {
+	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
@@ -147,7 +148,7 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level, float quality)
 
 	//saving level and credits used
 	equipment->m_level = level;
-	equipment->m_credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	equipment->m_credits = credits_;
 	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
@@ -155,6 +156,7 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level, float quality)
 
 Equipment* Equipment::CreateRandomShield(int credits_, int level, float quality)
 {
+	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
@@ -210,7 +212,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level, float quality)
 
 	//saving level and credits used
 	equipment->m_level = level;
-	equipment->m_credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	equipment->m_credits = credits_;
 	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
@@ -218,6 +220,7 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level, float quality)
 
 Equipment* Equipment::CreateRandomEngine(int credits_, int level, float quality)
 {
+	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
@@ -263,7 +266,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level, float quality)
 
 	//saving level and credits used
 	equipment->m_level = level;
-	equipment->m_credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	equipment->m_credits = credits_;
 	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
@@ -271,6 +274,7 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level, float quality)
 
 Equipment* Equipment::CreateRandomModule(int credits_, int level, float quality)
 {
+	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
 
 	//Spending credits on the possible bonuses
@@ -296,7 +300,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level, float quality)
 
 	//saving level and credits used
 	equipment->m_level = level;
-	equipment->m_credits = credits_ + ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	equipment->m_credits = credits_;
 	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
