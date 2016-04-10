@@ -13,6 +13,38 @@
 		870937941CBB04B3002FAC79 /* nice_music.ogg in Resources */ = {isa = PBXBuildFile; fileRef = 870937931CBB04B3002FAC79 /* nice_music.ogg */; };
 		870937961CBB04B3002FAC79 /* sansation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 870937951CBB04B3002FAC79 /* sansation.ttf */; };
 		870937981CBB04B3002FAC79 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 870937971CBB04B3002FAC79 /* icon.png */; };
+		870937E61CBB0972002FAC79 /* Ammo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8709379E1CBB0972002FAC79 /* Ammo.cpp */; };
+		870937E71CBB0972002FAC79 /* AnimatedSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937A01CBB0972002FAC79 /* AnimatedSprite.cpp */; };
+		870937E81CBB0972002FAC79 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937A21CBB0972002FAC79 /* Animation.cpp */; };
+		870937E91CBB0972002FAC79 /* Background.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937A51CBB0972002FAC79 /* Background.cpp */; };
+		870937EA1CBB0972002FAC79 /* Bot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937A71CBB0972002FAC79 /* Bot.cpp */; };
+		870937EB1CBB0972002FAC79 /* CollisionUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937A91CBB0972002FAC79 /* CollisionUtils.cpp */; };
+		870937EC1CBB0972002FAC79 /* Enemy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937AB1CBB0972002FAC79 /* Enemy.cpp */; };
+		870937ED1CBB0972002FAC79 /* EnemyGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937AD1CBB0972002FAC79 /* EnemyGenerator.cpp */; };
+		870937EE1CBB0972002FAC79 /* EnemyPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937AF1CBB0972002FAC79 /* EnemyPool.cpp */; };
+		870937EF1CBB0972002FAC79 /* FileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937B11CBB0972002FAC79 /* FileLoader.cpp */; };
+		870937F01CBB0972002FAC79 /* FX.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937B41CBB0972002FAC79 /* FX.cpp */; };
+		870937F11CBB0972002FAC79 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937B61CBB0972002FAC79 /* Game.cpp */; };
+		870937F21CBB0972002FAC79 /* GameManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937B81CBB0972002FAC79 /* GameManager.cpp */; };
+		870937F31CBB0972002FAC79 /* Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937BB1CBB0972002FAC79 /* Globals.cpp */; };
+		870937F41CBB0972002FAC79 /* Hud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937BE1CBB0972002FAC79 /* Hud.cpp */; };
+		870937F51CBB0972002FAC79 /* HudGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C01CBB0972002FAC79 /* HudGrid.cpp */; };
+		870937F61CBB0972002FAC79 /* Independant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C21CBB0972002FAC79 /* Independant.cpp */; };
+		870937F71CBB0972002FAC79 /* InGameState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C41CBB0972002FAC79 /* InGameState.cpp */; };
+		870937F81CBB0972002FAC79 /* InputGuy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C61CBB0972002FAC79 /* InputGuy.cpp */; };
+		870937F91CBB0972002FAC79 /* InteractionPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C81CBB0972002FAC79 /* InteractionPanel.cpp */; };
+		870937FA1CBB0972002FAC79 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937CB1CBB0972002FAC79 /* Logger.cpp */; };
+		870937FB1CBB0972002FAC79 /* Loot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937CD1CBB0972002FAC79 /* Loot.cpp */; };
+		870937FC1CBB0972002FAC79 /* PatternBobby.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937CF1CBB0972002FAC79 /* PatternBobby.cpp */; };
+		870937FD1CBB0972002FAC79 /* Phase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937D11CBB0972002FAC79 /* Phase.cpp */; };
+		870937FE1CBB0972002FAC79 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937D31CBB0972002FAC79 /* Player.cpp */; };
+		870937FF1CBB0972002FAC79 /* Portal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937D51CBB0972002FAC79 /* Portal.cpp */; };
+		870938001CBB0972002FAC79 /* PrefsManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937D71CBB0972002FAC79 /* PrefsManager.cpp */; };
+		870938011CBB0972002FAC79 /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937DA1CBB0972002FAC79 /* Scene.cpp */; };
+		870938021CBB0972002FAC79 /* Ship.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937DC1CBB0972002FAC79 /* Ship.cpp */; };
+		870938031CBB0972002FAC79 /* Shop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937DE1CBB0972002FAC79 /* Shop.cpp */; };
+		870938041CBB0972002FAC79 /* StarFighter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937E01CBB0972002FAC79 /* StarFighter.cpp */; };
+		870938051CBB0972002FAC79 /* Weapon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937E41CBB0972002FAC79 /* Weapon.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +57,78 @@
 		870937931CBB04B3002FAC79 /* nice_music.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = nice_music.ogg; sourceTree = "<group>"; };
 		870937951CBB04B3002FAC79 /* sansation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sansation.ttf; sourceTree = "<group>"; };
 		870937971CBB04B3002FAC79 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		8709379E1CBB0972002FAC79 /* Ammo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ammo.cpp; sourceTree = SOURCE_ROOT; };
+		8709379F1CBB0972002FAC79 /* Ammo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ammo.h; sourceTree = SOURCE_ROOT; };
+		870937A01CBB0972002FAC79 /* AnimatedSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnimatedSprite.cpp; sourceTree = SOURCE_ROOT; };
+		870937A11CBB0972002FAC79 /* AnimatedSprite.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnimatedSprite.hpp; sourceTree = SOURCE_ROOT; };
+		870937A21CBB0972002FAC79 /* Animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Animation.cpp; sourceTree = SOURCE_ROOT; };
+		870937A31CBB0972002FAC79 /* Animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Animation.hpp; sourceTree = SOURCE_ROOT; };
+		870937A41CBB0972002FAC79 /* Assets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Assets.h; sourceTree = SOURCE_ROOT; };
+		870937A51CBB0972002FAC79 /* Background.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Background.cpp; sourceTree = SOURCE_ROOT; };
+		870937A61CBB0972002FAC79 /* Background.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Background.h; sourceTree = SOURCE_ROOT; };
+		870937A71CBB0972002FAC79 /* Bot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bot.cpp; sourceTree = SOURCE_ROOT; };
+		870937A81CBB0972002FAC79 /* Bot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bot.h; sourceTree = SOURCE_ROOT; };
+		870937A91CBB0972002FAC79 /* CollisionUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionUtils.cpp; sourceTree = SOURCE_ROOT; };
+		870937AA1CBB0972002FAC79 /* CollisionUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollisionUtils.h; sourceTree = SOURCE_ROOT; };
+		870937AB1CBB0972002FAC79 /* Enemy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Enemy.cpp; sourceTree = SOURCE_ROOT; };
+		870937AC1CBB0972002FAC79 /* Enemy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Enemy.h; sourceTree = SOURCE_ROOT; };
+		870937AD1CBB0972002FAC79 /* EnemyGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EnemyGenerator.cpp; sourceTree = SOURCE_ROOT; };
+		870937AE1CBB0972002FAC79 /* EnemyGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnemyGenerator.h; sourceTree = SOURCE_ROOT; };
+		870937AF1CBB0972002FAC79 /* EnemyPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EnemyPool.cpp; sourceTree = SOURCE_ROOT; };
+		870937B01CBB0972002FAC79 /* EnemyPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnemyPool.h; sourceTree = SOURCE_ROOT; };
+		870937B11CBB0972002FAC79 /* FileLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileLoader.cpp; sourceTree = SOURCE_ROOT; };
+		870937B21CBB0972002FAC79 /* FileLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileLoader.h; sourceTree = SOURCE_ROOT; };
+		870937B31CBB0972002FAC79 /* FileLoadUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileLoadUtils.h; sourceTree = SOURCE_ROOT; };
+		870937B41CBB0972002FAC79 /* FX.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FX.cpp; sourceTree = SOURCE_ROOT; };
+		870937B51CBB0972002FAC79 /* FX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FX.h; sourceTree = SOURCE_ROOT; };
+		870937B61CBB0972002FAC79 /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = SOURCE_ROOT; };
+		870937B71CBB0972002FAC79 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = SOURCE_ROOT; };
+		870937B81CBB0972002FAC79 /* GameManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameManager.cpp; sourceTree = SOURCE_ROOT; };
+		870937B91CBB0972002FAC79 /* GameManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameManager.h; sourceTree = SOURCE_ROOT; };
+		870937BA1CBB0972002FAC79 /* GameState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameState.h; sourceTree = SOURCE_ROOT; };
+		870937BB1CBB0972002FAC79 /* Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Globals.cpp; sourceTree = SOURCE_ROOT; };
+		870937BC1CBB0972002FAC79 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = SOURCE_ROOT; };
+		870937BD1CBB0972002FAC79 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = SOURCE_ROOT; };
+		870937BE1CBB0972002FAC79 /* Hud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Hud.cpp; sourceTree = SOURCE_ROOT; };
+		870937BF1CBB0972002FAC79 /* Hud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hud.h; sourceTree = SOURCE_ROOT; };
+		870937C01CBB0972002FAC79 /* HudGrid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HudGrid.cpp; sourceTree = SOURCE_ROOT; };
+		870937C11CBB0972002FAC79 /* HudGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HudGrid.h; sourceTree = SOURCE_ROOT; };
+		870937C21CBB0972002FAC79 /* Independant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Independant.cpp; sourceTree = SOURCE_ROOT; };
+		870937C31CBB0972002FAC79 /* Independant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Independant.h; sourceTree = SOURCE_ROOT; };
+		870937C41CBB0972002FAC79 /* InGameState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InGameState.cpp; sourceTree = SOURCE_ROOT; };
+		870937C51CBB0972002FAC79 /* InGameState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InGameState.h; sourceTree = SOURCE_ROOT; };
+		870937C61CBB0972002FAC79 /* InputGuy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InputGuy.cpp; sourceTree = SOURCE_ROOT; };
+		870937C71CBB0972002FAC79 /* InputGuy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputGuy.h; sourceTree = SOURCE_ROOT; };
+		870937C81CBB0972002FAC79 /* InteractionPanel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InteractionPanel.cpp; sourceTree = SOURCE_ROOT; };
+		870937C91CBB0972002FAC79 /* InteractionPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InteractionPanel.h; sourceTree = SOURCE_ROOT; };
+		870937CA1CBB0972002FAC79 /* IPatternHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPatternHandler.h; sourceTree = SOURCE_ROOT; };
+		870937CB1CBB0972002FAC79 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = SOURCE_ROOT; };
+		870937CC1CBB0972002FAC79 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = SOURCE_ROOT; };
+		870937CD1CBB0972002FAC79 /* Loot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Loot.cpp; sourceTree = SOURCE_ROOT; };
+		870937CE1CBB0972002FAC79 /* Loot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loot.h; sourceTree = SOURCE_ROOT; };
+		870937CF1CBB0972002FAC79 /* PatternBobby.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PatternBobby.cpp; sourceTree = SOURCE_ROOT; };
+		870937D01CBB0972002FAC79 /* PatternBobby.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PatternBobby.h; sourceTree = SOURCE_ROOT; };
+		870937D11CBB0972002FAC79 /* Phase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Phase.cpp; sourceTree = SOURCE_ROOT; };
+		870937D21CBB0972002FAC79 /* Phase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Phase.h; sourceTree = SOURCE_ROOT; };
+		870937D31CBB0972002FAC79 /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = SOURCE_ROOT; };
+		870937D41CBB0972002FAC79 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = SOURCE_ROOT; };
+		870937D51CBB0972002FAC79 /* Portal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Portal.cpp; sourceTree = SOURCE_ROOT; };
+		870937D61CBB0972002FAC79 /* Portal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Portal.h; sourceTree = SOURCE_ROOT; };
+		870937D71CBB0972002FAC79 /* PrefsManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PrefsManager.cpp; sourceTree = SOURCE_ROOT; };
+		870937D81CBB0972002FAC79 /* PrefsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefsManager.h; sourceTree = SOURCE_ROOT; };
+		870937D91CBB0972002FAC79 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = SOURCE_ROOT; };
+		870937DA1CBB0972002FAC79 /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = SOURCE_ROOT; };
+		870937DB1CBB0972002FAC79 /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = SOURCE_ROOT; };
+		870937DC1CBB0972002FAC79 /* Ship.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ship.cpp; sourceTree = SOURCE_ROOT; };
+		870937DD1CBB0972002FAC79 /* Ship.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ship.h; sourceTree = SOURCE_ROOT; };
+		870937DE1CBB0972002FAC79 /* Shop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shop.cpp; sourceTree = SOURCE_ROOT; };
+		870937DF1CBB0972002FAC79 /* Shop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shop.h; sourceTree = SOURCE_ROOT; };
+		870937E01CBB0972002FAC79 /* StarFighter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StarFighter.cpp; sourceTree = SOURCE_ROOT; };
+		870937E11CBB0972002FAC79 /* StarFighter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StarFighter.h; sourceTree = SOURCE_ROOT; };
+		870937E21CBB0972002FAC79 /* TextureLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureLoader.h; sourceTree = SOURCE_ROOT; };
+		870937E31CBB0972002FAC79 /* TextUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextUtils.h; sourceTree = SOURCE_ROOT; };
+		870937E41CBB0972002FAC79 /* Weapon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Weapon.cpp; sourceTree = SOURCE_ROOT; };
+		870937E51CBB0972002FAC79 /* Weapon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Weapon.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +161,78 @@
 		870937881CBB04B3002FAC79 /* StarFighter */ = {
 			isa = PBXGroup;
 			children = (
+				8709379E1CBB0972002FAC79 /* Ammo.cpp */,
+				8709379F1CBB0972002FAC79 /* Ammo.h */,
+				870937A01CBB0972002FAC79 /* AnimatedSprite.cpp */,
+				870937A11CBB0972002FAC79 /* AnimatedSprite.hpp */,
+				870937A21CBB0972002FAC79 /* Animation.cpp */,
+				870937A31CBB0972002FAC79 /* Animation.hpp */,
+				870937A41CBB0972002FAC79 /* Assets.h */,
+				870937A51CBB0972002FAC79 /* Background.cpp */,
+				870937A61CBB0972002FAC79 /* Background.h */,
+				870937A71CBB0972002FAC79 /* Bot.cpp */,
+				870937A81CBB0972002FAC79 /* Bot.h */,
+				870937A91CBB0972002FAC79 /* CollisionUtils.cpp */,
+				870937AA1CBB0972002FAC79 /* CollisionUtils.h */,
+				870937AB1CBB0972002FAC79 /* Enemy.cpp */,
+				870937AC1CBB0972002FAC79 /* Enemy.h */,
+				870937AD1CBB0972002FAC79 /* EnemyGenerator.cpp */,
+				870937AE1CBB0972002FAC79 /* EnemyGenerator.h */,
+				870937AF1CBB0972002FAC79 /* EnemyPool.cpp */,
+				870937B01CBB0972002FAC79 /* EnemyPool.h */,
+				870937B11CBB0972002FAC79 /* FileLoader.cpp */,
+				870937B21CBB0972002FAC79 /* FileLoader.h */,
+				870937B31CBB0972002FAC79 /* FileLoadUtils.h */,
+				870937B41CBB0972002FAC79 /* FX.cpp */,
+				870937B51CBB0972002FAC79 /* FX.h */,
+				870937B61CBB0972002FAC79 /* Game.cpp */,
+				870937B71CBB0972002FAC79 /* Game.h */,
+				870937B81CBB0972002FAC79 /* GameManager.cpp */,
+				870937B91CBB0972002FAC79 /* GameManager.h */,
+				870937BA1CBB0972002FAC79 /* GameState.h */,
+				870937BB1CBB0972002FAC79 /* Globals.cpp */,
+				870937BC1CBB0972002FAC79 /* Globals.h */,
+				870937BD1CBB0972002FAC79 /* Header.h */,
+				870937BE1CBB0972002FAC79 /* Hud.cpp */,
+				870937BF1CBB0972002FAC79 /* Hud.h */,
+				870937C01CBB0972002FAC79 /* HudGrid.cpp */,
+				870937C11CBB0972002FAC79 /* HudGrid.h */,
+				870937C21CBB0972002FAC79 /* Independant.cpp */,
+				870937C31CBB0972002FAC79 /* Independant.h */,
+				870937C41CBB0972002FAC79 /* InGameState.cpp */,
+				870937C51CBB0972002FAC79 /* InGameState.h */,
+				870937C61CBB0972002FAC79 /* InputGuy.cpp */,
+				870937C71CBB0972002FAC79 /* InputGuy.h */,
+				870937C81CBB0972002FAC79 /* InteractionPanel.cpp */,
+				870937C91CBB0972002FAC79 /* InteractionPanel.h */,
+				870937CA1CBB0972002FAC79 /* IPatternHandler.h */,
+				870937CB1CBB0972002FAC79 /* Logger.cpp */,
+				870937CC1CBB0972002FAC79 /* Logger.h */,
+				870937CD1CBB0972002FAC79 /* Loot.cpp */,
+				870937CE1CBB0972002FAC79 /* Loot.h */,
+				870937CF1CBB0972002FAC79 /* PatternBobby.cpp */,
+				870937D01CBB0972002FAC79 /* PatternBobby.h */,
+				870937D11CBB0972002FAC79 /* Phase.cpp */,
+				870937D21CBB0972002FAC79 /* Phase.h */,
+				870937D31CBB0972002FAC79 /* Player.cpp */,
+				870937D41CBB0972002FAC79 /* Player.h */,
+				870937D51CBB0972002FAC79 /* Portal.cpp */,
+				870937D61CBB0972002FAC79 /* Portal.h */,
+				870937D71CBB0972002FAC79 /* PrefsManager.cpp */,
+				870937D81CBB0972002FAC79 /* PrefsManager.h */,
+				870937D91CBB0972002FAC79 /* resource.h */,
+				870937DA1CBB0972002FAC79 /* Scene.cpp */,
+				870937DB1CBB0972002FAC79 /* Scene.h */,
+				870937DC1CBB0972002FAC79 /* Ship.cpp */,
+				870937DD1CBB0972002FAC79 /* Ship.h */,
+				870937DE1CBB0972002FAC79 /* Shop.cpp */,
+				870937DF1CBB0972002FAC79 /* Shop.h */,
+				870937E01CBB0972002FAC79 /* StarFighter.cpp */,
+				870937E11CBB0972002FAC79 /* StarFighter.h */,
+				870937E21CBB0972002FAC79 /* TextureLoader.h */,
+				870937E31CBB0972002FAC79 /* TextUtils.h */,
+				870937E41CBB0972002FAC79 /* Weapon.cpp */,
+				870937E51CBB0972002FAC79 /* Weapon.h */,
 				8709378B1CBB04B3002FAC79 /* ResourcePath.mm */,
 				8709378D1CBB04B3002FAC79 /* ResourcePath.hpp */,
 				8709378E1CBB04B3002FAC79 /* main.cpp */,
@@ -172,8 +348,40 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				870937F31CBB0972002FAC79 /* Globals.cpp in Sources */,
+				870937FF1CBB0972002FAC79 /* Portal.cpp in Sources */,
+				870937F61CBB0972002FAC79 /* Independant.cpp in Sources */,
+				870937FE1CBB0972002FAC79 /* Player.cpp in Sources */,
+				870938041CBB0972002FAC79 /* StarFighter.cpp in Sources */,
+				870937F01CBB0972002FAC79 /* FX.cpp in Sources */,
+				870937F91CBB0972002FAC79 /* InteractionPanel.cpp in Sources */,
+				870937F21CBB0972002FAC79 /* GameManager.cpp in Sources */,
+				870937ED1CBB0972002FAC79 /* EnemyGenerator.cpp in Sources */,
+				870937EB1CBB0972002FAC79 /* CollisionUtils.cpp in Sources */,
+				870937F41CBB0972002FAC79 /* Hud.cpp in Sources */,
+				870937EF1CBB0972002FAC79 /* FileLoader.cpp in Sources */,
+				870937E61CBB0972002FAC79 /* Ammo.cpp in Sources */,
+				870937F81CBB0972002FAC79 /* InputGuy.cpp in Sources */,
+				870937EE1CBB0972002FAC79 /* EnemyPool.cpp in Sources */,
+				870937F71CBB0972002FAC79 /* InGameState.cpp in Sources */,
+				870937E71CBB0972002FAC79 /* AnimatedSprite.cpp in Sources */,
+				870938001CBB0972002FAC79 /* PrefsManager.cpp in Sources */,
+				870938021CBB0972002FAC79 /* Ship.cpp in Sources */,
+				870937EC1CBB0972002FAC79 /* Enemy.cpp in Sources */,
+				870938031CBB0972002FAC79 /* Shop.cpp in Sources */,
+				870938011CBB0972002FAC79 /* Scene.cpp in Sources */,
+				870937FB1CBB0972002FAC79 /* Loot.cpp in Sources */,
+				870937FA1CBB0972002FAC79 /* Logger.cpp in Sources */,
+				870937FC1CBB0972002FAC79 /* PatternBobby.cpp in Sources */,
 				8709378F1CBB04B3002FAC79 /* main.cpp in Sources */,
+				870937EA1CBB0972002FAC79 /* Bot.cpp in Sources */,
+				870937E91CBB0972002FAC79 /* Background.cpp in Sources */,
+				870937FD1CBB0972002FAC79 /* Phase.cpp in Sources */,
 				8709378C1CBB04B3002FAC79 /* ResourcePath.mm in Sources */,
+				870937E81CBB0972002FAC79 /* Animation.cpp in Sources */,
+				870937F11CBB0972002FAC79 /* Game.cpp in Sources */,
+				870937F51CBB0972002FAC79 /* HudGrid.cpp in Sources */,
+				870938051CBB0972002FAC79 /* Weapon.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
