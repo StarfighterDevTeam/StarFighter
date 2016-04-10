@@ -1540,10 +1540,9 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, Enem
 	{
 		//double random_number = (double)rand() / (RAND_MAX);
 		float random_beast_scale = RandomizeFloatBetweenValues(LootTable_BeastScale_Base[loot_class]);
-		int loot_credits_ = ceil(random_beast_scale / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(shop->m_level + 1));
 		int equipment_type_roll = rand() % ((int)NBVAL_Equipment + 1);//+1 is for the weapon type
 
-		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, shop->m_level, shop, random_beast_scale))
+		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, shop->m_level, shop, random_beast_scale))
 		{
 			GameObject* capsule = NULL;
 			if (equipment_type_roll < NBVAL_Equipment)

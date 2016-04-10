@@ -61,10 +61,10 @@ public:
 	sf::Vector2f m_fake_size;
 	int m_fake_frameNumber;
 
-	static Equipment* CreateRandomArmor(int credits_, int level, float quality);
-	static Equipment* CreateRandomShield(int credits_, int level, float quality);
-	static Equipment* CreateRandomEngine(int credits_, int level, float quality);
-	static Equipment* CreateRandomModule(int credits_, int level, float quality);
+	static Equipment* CreateRandomArmor(int level, float beastScore);
+	static Equipment* CreateRandomShield(int level, float beastScore);
+	static Equipment* CreateRandomEngine(int level, float beastScore);
+	static Equipment* CreateRandomModule(int level, float beastScore);
 
 	int m_armor;
 	int m_shield;

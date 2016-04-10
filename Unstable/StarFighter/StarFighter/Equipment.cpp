@@ -100,10 +100,10 @@ void Equipment::Init(int equipmentType, float max_speed, float acceleration, flo
 	m_equipmentType = equipmentType;
 }
 
-Equipment* Equipment::CreateRandomArmor(int credits_, int level, float quality)
+Equipment* Equipment::CreateRandomArmor(int level, float beastScore)
 {
-	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
-	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 
 	//Spending credits on the possible bonuses
 	int bonus_armor = 0;
@@ -149,15 +149,15 @@ Equipment* Equipment::CreateRandomArmor(int credits_, int level, float quality)
 	//saving level and credits used
 	equipment->m_level = level;
 	equipment->m_credits = credits_;
-	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
 }
 
-Equipment* Equipment::CreateRandomShield(int credits_, int level, float quality)
+Equipment* Equipment::CreateRandomShield(int level, float beastScore)
 {
-	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
-	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 
 	//Spending credits on the possible bonuses
 	int bonus_shield = 0;
@@ -213,15 +213,15 @@ Equipment* Equipment::CreateRandomShield(int credits_, int level, float quality)
 	//saving level and credits used
 	equipment->m_level = level;
 	equipment->m_credits = credits_;
-	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
 }
 
-Equipment* Equipment::CreateRandomEngine(int credits_, int level, float quality)
+Equipment* Equipment::CreateRandomEngine(int level, float beastScore)
 {
-	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
-	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 
 	//Spending credits on the possible bonuses
 	int loot_credits_remaining = credits_;
@@ -267,18 +267,18 @@ Equipment* Equipment::CreateRandomEngine(int credits_, int level, float quality)
 	//saving level and credits used
 	equipment->m_level = level;
 	equipment->m_credits = credits_;
-	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
 }
 
-Equipment* Equipment::CreateRandomModule(int credits_, int level, float quality)
+Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 {
-	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
-	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 
 	//Spending credits on the possible bonuses
-	Weapon* weapon = Weapon::CreateRandomWeapon(floor(credits_ * BOT_STATS_MULTIPLIER), level, true, quality);
+	Weapon* weapon = Weapon::CreateRandomWeapon(level, true, beastScore);
 
 	//Initialisation
 	Equipment* equipment = new Equipment();
@@ -301,7 +301,7 @@ Equipment* Equipment::CreateRandomModule(int credits_, int level, float quality)
 	//saving level and credits used
 	equipment->m_level = level;
 	equipment->m_credits = credits_;
-	equipment->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return equipment;
 }

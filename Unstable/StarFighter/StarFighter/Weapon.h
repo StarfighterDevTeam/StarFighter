@@ -67,7 +67,7 @@ public:
 	sf::Vector2i getFireDirection_for_Direction (Directions direction);
 	Weapon* Clone();
 
-	static Weapon* CreateRandomWeapon(int credits_, int level, bool is_bot, float quality);
+	static Weapon* CreateRandomWeapon(int level, bool is_bot, float beastScore);
 
 private:
 	bool m_fire_pattern_return;

@@ -1214,7 +1214,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 			int equipment_type_roll = rand() % ((int)NBVAL_Equipment + 1);//+1 is for the weapon type
 
 			//"Spending credits" on item stats and assigning the equipment/weapon as a loot
-			AssignRandomEquipment((EquipmentType)equipment_type_roll, loot_credits_, m_level + 1, this, BeastScaleScore);
+			AssignRandomEquipment((EquipmentType)equipment_type_roll, m_level + 1, this, BeastScaleScore);
 		}
 
 		else
@@ -1228,33 +1228,33 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 	return true;
 }
 
-bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int credits, int level, GameObject* object, float quality)
+bool Enemy::AssignRandomEquipment(EquipmentType equipment_type, int level, GameObject* object, float beastScore)
 {
 	switch (equipment_type)
 	{
 		case (int)Engine:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomEngine(credits, level, quality));
+			return object->setEquipmentLoot(Equipment::CreateRandomEngine(level, beastScore));
 		}
 
 		case (int)Armor:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomArmor(credits, level, quality));
+			return object->setEquipmentLoot(Equipment::CreateRandomArmor(level, beastScore));
 		}
 
 		case (int)Shield:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomShield(credits, level, quality));
+			return object->setEquipmentLoot(Equipment::CreateRandomShield(level, beastScore));
 		}
 
 		case (int)Module:
 		{
-			return object->setEquipmentLoot(Equipment::CreateRandomModule(credits, level, quality));
+			return object->setEquipmentLoot(Equipment::CreateRandomModule(level, beastScore));
 		}
 
 		case (int)NBVAL_Equipment://WEAPON DROP
 		{
-			return object->setWeaponLoot(Weapon::CreateRandomWeapon(credits, level, false, quality));
+			return object->setWeaponLoot(Weapon::CreateRandomWeapon(level, false, beastScore));
 		}
 	}
 

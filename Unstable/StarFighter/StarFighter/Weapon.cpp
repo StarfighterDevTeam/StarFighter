@@ -401,11 +401,11 @@ sf::Vector2i Weapon::getFireDirection_for_Direction(Directions direction)
 	return fire_direction;
 }
 
-Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float quality)
+Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 {
-	credits_ += ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
-	credits_ += credits_ == 0 ? LOOT_CREDITS_DEFAULT_BONUS : 0;
-
+	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
+	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
+	
 	int cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), level - 1));
 	//Spending credits on the possible bonuses
 	int bonus_multishot = 0;
@@ -413,6 +413,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float q
 	int bonus_rate_of_fire = 0;
 
 	int loot_credits_remaining = credits_;
+	loot_credits_remaining *= is_bot ? BOT_STATS_MULTIPLIER : 1;
 	while (loot_credits_remaining > 0)
 	{
 		int random_type_of_bonus = -1;
@@ -505,7 +506,7 @@ Weapon* Weapon::CreateRandomWeapon(int credits_, int level, bool is_bot, float q
 	//saving level and credits used
 	weapon->m_level = level;
 	weapon->m_credits = credits_;
-	weapon->m_quality = quality * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+	weapon->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	return weapon;
 }
