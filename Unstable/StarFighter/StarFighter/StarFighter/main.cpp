@@ -20,7 +20,7 @@
 // Here is a small helper for you ! Have a look.
 #include "ResourcePath.hpp"
 
-int main(int, char const**)
+int sample_main(int, char const**)
 {
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");

@@ -27,12 +27,9 @@
 		870937F11CBB0972002FAC79 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937B61CBB0972002FAC79 /* Game.cpp */; };
 		870937F21CBB0972002FAC79 /* GameManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937B81CBB0972002FAC79 /* GameManager.cpp */; };
 		870937F31CBB0972002FAC79 /* Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937BB1CBB0972002FAC79 /* Globals.cpp */; };
-		870937F41CBB0972002FAC79 /* Hud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937BE1CBB0972002FAC79 /* Hud.cpp */; };
 		870937F51CBB0972002FAC79 /* HudGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C01CBB0972002FAC79 /* HudGrid.cpp */; };
-		870937F61CBB0972002FAC79 /* Independant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C21CBB0972002FAC79 /* Independant.cpp */; };
 		870937F71CBB0972002FAC79 /* InGameState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C41CBB0972002FAC79 /* InGameState.cpp */; };
 		870937F81CBB0972002FAC79 /* InputGuy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C61CBB0972002FAC79 /* InputGuy.cpp */; };
-		870937F91CBB0972002FAC79 /* InteractionPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937C81CBB0972002FAC79 /* InteractionPanel.cpp */; };
 		870937FA1CBB0972002FAC79 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937CB1CBB0972002FAC79 /* Logger.cpp */; };
 		870937FB1CBB0972002FAC79 /* Loot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937CD1CBB0972002FAC79 /* Loot.cpp */; };
 		870937FC1CBB0972002FAC79 /* PatternBobby.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937CF1CBB0972002FAC79 /* PatternBobby.cpp */; };
@@ -45,6 +42,16 @@
 		870938031CBB0972002FAC79 /* Shop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937DE1CBB0972002FAC79 /* Shop.cpp */; };
 		870938041CBB0972002FAC79 /* StarFighter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937E01CBB0972002FAC79 /* StarFighter.cpp */; };
 		870938051CBB0972002FAC79 /* Weapon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870937E41CBB0972002FAC79 /* Weapon.cpp */; };
+		8709381A1CBB0ECF002FAC79 /* Dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938061CBB0ECF002FAC79 /* Dialog.cpp */; };
+		8709381B1CBB0ECF002FAC79 /* Equipment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938081CBB0ECF002FAC79 /* Equipment.cpp */; };
+		8709381C1CBB0ECF002FAC79 /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8709380A1CBB0ECF002FAC79 /* GameObject.cpp */; };
+		8709381D1CBB0ECF002FAC79 /* SFDialogPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8709380C1CBB0ECF002FAC79 /* SFDialogPanel.cpp */; };
+		8709381E1CBB0ECF002FAC79 /* SFInventoryPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8709380E1CBB0ECF002FAC79 /* SFInventoryPanel.cpp */; };
+		8709381F1CBB0ECF002FAC79 /* SFMapPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938101CBB0ECF002FAC79 /* SFMapPanel.cpp */; };
+		870938201CBB0ECF002FAC79 /* SFMenuPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938121CBB0ECF002FAC79 /* SFMenuPanel.cpp */; };
+		870938211CBB0ECF002FAC79 /* SFPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938141CBB0ECF002FAC79 /* SFPanel.cpp */; };
+		870938221CBB0ECF002FAC79 /* SFText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938161CBB0ECF002FAC79 /* SFText.cpp */; };
+		870938231CBB0ECF002FAC79 /* SFTextPop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938181CBB0ECF002FAC79 /* SFTextPop.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -89,18 +96,12 @@
 		870937BB1CBB0972002FAC79 /* Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Globals.cpp; sourceTree = SOURCE_ROOT; };
 		870937BC1CBB0972002FAC79 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = SOURCE_ROOT; };
 		870937BD1CBB0972002FAC79 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = SOURCE_ROOT; };
-		870937BE1CBB0972002FAC79 /* Hud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Hud.cpp; sourceTree = SOURCE_ROOT; };
-		870937BF1CBB0972002FAC79 /* Hud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hud.h; sourceTree = SOURCE_ROOT; };
 		870937C01CBB0972002FAC79 /* HudGrid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HudGrid.cpp; sourceTree = SOURCE_ROOT; };
 		870937C11CBB0972002FAC79 /* HudGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HudGrid.h; sourceTree = SOURCE_ROOT; };
-		870937C21CBB0972002FAC79 /* Independant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Independant.cpp; sourceTree = SOURCE_ROOT; };
-		870937C31CBB0972002FAC79 /* Independant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Independant.h; sourceTree = SOURCE_ROOT; };
 		870937C41CBB0972002FAC79 /* InGameState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InGameState.cpp; sourceTree = SOURCE_ROOT; };
 		870937C51CBB0972002FAC79 /* InGameState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InGameState.h; sourceTree = SOURCE_ROOT; };
 		870937C61CBB0972002FAC79 /* InputGuy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InputGuy.cpp; sourceTree = SOURCE_ROOT; };
 		870937C71CBB0972002FAC79 /* InputGuy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputGuy.h; sourceTree = SOURCE_ROOT; };
-		870937C81CBB0972002FAC79 /* InteractionPanel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InteractionPanel.cpp; sourceTree = SOURCE_ROOT; };
-		870937C91CBB0972002FAC79 /* InteractionPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InteractionPanel.h; sourceTree = SOURCE_ROOT; };
 		870937CA1CBB0972002FAC79 /* IPatternHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPatternHandler.h; sourceTree = SOURCE_ROOT; };
 		870937CB1CBB0972002FAC79 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = SOURCE_ROOT; };
 		870937CC1CBB0972002FAC79 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = SOURCE_ROOT; };
@@ -129,6 +130,27 @@
 		870937E31CBB0972002FAC79 /* TextUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextUtils.h; sourceTree = SOURCE_ROOT; };
 		870937E41CBB0972002FAC79 /* Weapon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Weapon.cpp; sourceTree = SOURCE_ROOT; };
 		870937E51CBB0972002FAC79 /* Weapon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Weapon.h; sourceTree = SOURCE_ROOT; };
+		870938061CBB0ECF002FAC79 /* Dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dialog.cpp; sourceTree = SOURCE_ROOT; };
+		870938071CBB0ECF002FAC79 /* Dialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Dialog.h; sourceTree = SOURCE_ROOT; };
+		870938081CBB0ECF002FAC79 /* Equipment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Equipment.cpp; sourceTree = SOURCE_ROOT; };
+		870938091CBB0ECF002FAC79 /* Equipment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Equipment.h; sourceTree = SOURCE_ROOT; };
+		8709380A1CBB0ECF002FAC79 /* GameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameObject.cpp; sourceTree = SOURCE_ROOT; };
+		8709380B1CBB0ECF002FAC79 /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = SOURCE_ROOT; };
+		8709380C1CBB0ECF002FAC79 /* SFDialogPanel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFDialogPanel.cpp; sourceTree = SOURCE_ROOT; };
+		8709380D1CBB0ECF002FAC79 /* SFDialogPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFDialogPanel.h; sourceTree = SOURCE_ROOT; };
+		8709380E1CBB0ECF002FAC79 /* SFInventoryPanel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFInventoryPanel.cpp; sourceTree = SOURCE_ROOT; };
+		8709380F1CBB0ECF002FAC79 /* SFInventoryPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFInventoryPanel.h; sourceTree = SOURCE_ROOT; };
+		870938101CBB0ECF002FAC79 /* SFMapPanel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFMapPanel.cpp; sourceTree = SOURCE_ROOT; };
+		870938111CBB0ECF002FAC79 /* SFMapPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFMapPanel.h; sourceTree = SOURCE_ROOT; };
+		870938121CBB0ECF002FAC79 /* SFMenuPanel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFMenuPanel.cpp; sourceTree = SOURCE_ROOT; };
+		870938131CBB0ECF002FAC79 /* SFMenuPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFMenuPanel.h; sourceTree = SOURCE_ROOT; };
+		870938141CBB0ECF002FAC79 /* SFPanel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFPanel.cpp; sourceTree = SOURCE_ROOT; };
+		870938151CBB0ECF002FAC79 /* SFPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFPanel.h; sourceTree = SOURCE_ROOT; };
+		870938161CBB0ECF002FAC79 /* SFText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFText.cpp; sourceTree = SOURCE_ROOT; };
+		870938171CBB0ECF002FAC79 /* SFText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFText.h; sourceTree = SOURCE_ROOT; };
+		870938181CBB0ECF002FAC79 /* SFTextPop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFTextPop.cpp; sourceTree = SOURCE_ROOT; };
+		870938191CBB0ECF002FAC79 /* SFTextPop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTextPop.h; sourceTree = SOURCE_ROOT; };
+		870938241CBB0EE0002FAC79 /* SimpleCollision.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SimpleCollision.hpp; path = Includes/SimpleCollision.hpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +183,27 @@
 		870937881CBB04B3002FAC79 /* StarFighter */ = {
 			isa = PBXGroup;
 			children = (
+				870938241CBB0EE0002FAC79 /* SimpleCollision.hpp */,
+				870938061CBB0ECF002FAC79 /* Dialog.cpp */,
+				870938071CBB0ECF002FAC79 /* Dialog.h */,
+				870938081CBB0ECF002FAC79 /* Equipment.cpp */,
+				870938091CBB0ECF002FAC79 /* Equipment.h */,
+				8709380A1CBB0ECF002FAC79 /* GameObject.cpp */,
+				8709380B1CBB0ECF002FAC79 /* GameObject.h */,
+				8709380C1CBB0ECF002FAC79 /* SFDialogPanel.cpp */,
+				8709380D1CBB0ECF002FAC79 /* SFDialogPanel.h */,
+				8709380E1CBB0ECF002FAC79 /* SFInventoryPanel.cpp */,
+				8709380F1CBB0ECF002FAC79 /* SFInventoryPanel.h */,
+				870938101CBB0ECF002FAC79 /* SFMapPanel.cpp */,
+				870938111CBB0ECF002FAC79 /* SFMapPanel.h */,
+				870938121CBB0ECF002FAC79 /* SFMenuPanel.cpp */,
+				870938131CBB0ECF002FAC79 /* SFMenuPanel.h */,
+				870938141CBB0ECF002FAC79 /* SFPanel.cpp */,
+				870938151CBB0ECF002FAC79 /* SFPanel.h */,
+				870938161CBB0ECF002FAC79 /* SFText.cpp */,
+				870938171CBB0ECF002FAC79 /* SFText.h */,
+				870938181CBB0ECF002FAC79 /* SFTextPop.cpp */,
+				870938191CBB0ECF002FAC79 /* SFTextPop.h */,
 				8709379E1CBB0972002FAC79 /* Ammo.cpp */,
 				8709379F1CBB0972002FAC79 /* Ammo.h */,
 				870937A01CBB0972002FAC79 /* AnimatedSprite.cpp */,
@@ -193,18 +236,12 @@
 				870937BB1CBB0972002FAC79 /* Globals.cpp */,
 				870937BC1CBB0972002FAC79 /* Globals.h */,
 				870937BD1CBB0972002FAC79 /* Header.h */,
-				870937BE1CBB0972002FAC79 /* Hud.cpp */,
-				870937BF1CBB0972002FAC79 /* Hud.h */,
 				870937C01CBB0972002FAC79 /* HudGrid.cpp */,
 				870937C11CBB0972002FAC79 /* HudGrid.h */,
-				870937C21CBB0972002FAC79 /* Independant.cpp */,
-				870937C31CBB0972002FAC79 /* Independant.h */,
 				870937C41CBB0972002FAC79 /* InGameState.cpp */,
 				870937C51CBB0972002FAC79 /* InGameState.h */,
 				870937C61CBB0972002FAC79 /* InputGuy.cpp */,
 				870937C71CBB0972002FAC79 /* InputGuy.h */,
-				870937C81CBB0972002FAC79 /* InteractionPanel.cpp */,
-				870937C91CBB0972002FAC79 /* InteractionPanel.h */,
 				870937CA1CBB0972002FAC79 /* IPatternHandler.h */,
 				870937CB1CBB0972002FAC79 /* Logger.cpp */,
 				870937CC1CBB0972002FAC79 /* Logger.h */,
@@ -348,20 +385,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8709381B1CBB0ECF002FAC79 /* Equipment.cpp in Sources */,
+				870938221CBB0ECF002FAC79 /* SFText.cpp in Sources */,
 				870937F31CBB0972002FAC79 /* Globals.cpp in Sources */,
+				8709381C1CBB0ECF002FAC79 /* GameObject.cpp in Sources */,
 				870937FF1CBB0972002FAC79 /* Portal.cpp in Sources */,
-				870937F61CBB0972002FAC79 /* Independant.cpp in Sources */,
+				870938211CBB0ECF002FAC79 /* SFPanel.cpp in Sources */,
+				8709381E1CBB0ECF002FAC79 /* SFInventoryPanel.cpp in Sources */,
 				870937FE1CBB0972002FAC79 /* Player.cpp in Sources */,
 				870938041CBB0972002FAC79 /* StarFighter.cpp in Sources */,
 				870937F01CBB0972002FAC79 /* FX.cpp in Sources */,
-				870937F91CBB0972002FAC79 /* InteractionPanel.cpp in Sources */,
 				870937F21CBB0972002FAC79 /* GameManager.cpp in Sources */,
 				870937ED1CBB0972002FAC79 /* EnemyGenerator.cpp in Sources */,
 				870937EB1CBB0972002FAC79 /* CollisionUtils.cpp in Sources */,
-				870937F41CBB0972002FAC79 /* Hud.cpp in Sources */,
 				870937EF1CBB0972002FAC79 /* FileLoader.cpp in Sources */,
 				870937E61CBB0972002FAC79 /* Ammo.cpp in Sources */,
 				870937F81CBB0972002FAC79 /* InputGuy.cpp in Sources */,
+				8709381A1CBB0ECF002FAC79 /* Dialog.cpp in Sources */,
 				870937EE1CBB0972002FAC79 /* EnemyPool.cpp in Sources */,
 				870937F71CBB0972002FAC79 /* InGameState.cpp in Sources */,
 				870937E71CBB0972002FAC79 /* AnimatedSprite.cpp in Sources */,
@@ -373,6 +413,8 @@
 				870937FB1CBB0972002FAC79 /* Loot.cpp in Sources */,
 				870937FA1CBB0972002FAC79 /* Logger.cpp in Sources */,
 				870937FC1CBB0972002FAC79 /* PatternBobby.cpp in Sources */,
+				870938231CBB0ECF002FAC79 /* SFTextPop.cpp in Sources */,
+				870938201CBB0ECF002FAC79 /* SFMenuPanel.cpp in Sources */,
 				8709378F1CBB04B3002FAC79 /* main.cpp in Sources */,
 				870937EA1CBB0972002FAC79 /* Bot.cpp in Sources */,
 				870937E91CBB0972002FAC79 /* Background.cpp in Sources */,
@@ -380,6 +422,8 @@
 				8709378C1CBB04B3002FAC79 /* ResourcePath.mm in Sources */,
 				870937E81CBB0972002FAC79 /* Animation.cpp in Sources */,
 				870937F11CBB0972002FAC79 /* Game.cpp in Sources */,
+				8709381D1CBB0ECF002FAC79 /* SFDialogPanel.cpp in Sources */,
+				8709381F1CBB0ECF002FAC79 /* SFMapPanel.cpp in Sources */,
 				870937F51CBB0972002FAC79 /* HudGrid.cpp in Sources */,
 				870938051CBB0972002FAC79 /* Weapon.cpp in Sources */,
 			);
@@ -519,6 +563,7 @@
 				8709379D1CBB04B3002FAC79 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
