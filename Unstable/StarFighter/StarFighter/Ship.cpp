@@ -22,6 +22,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 
 	m_display_name = "Wisteria";
 	m_weapon = NULL;
+	m_FX_death = NULL;
 	m_collider_type = PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
@@ -114,6 +115,17 @@ Ship::~Ship()
 	{
 		delete m_weapon;
 	}
+	if (m_FX_death)
+	{
+		delete m_FX_death;
+	}
+
+	size_t botListSize = m_bot_list.size();
+	for (size_t i = 0; i < botListSize; i++)
+	{
+		delete m_bot_list[i];
+	}
+	m_bot_list.clear();
 
 	//game objects
 	if (m_combo_aura)

@@ -34,6 +34,7 @@ void InGameState::Initialize(Player player)
 	m_playerShip->ResplenishHealth();
 	LOGGER_WRITE(Logger::DEBUG, "Playership loaded\n");
 
+	//Update HUD items
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
 		if (m_playerShip->m_equipment[i] != NULL)
@@ -60,6 +61,9 @@ void InGameState::Initialize(Player player)
 		player.m_currentSceneFile = STARTING_SCENE;
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer(PLAYER_SAVE_FILE);
+		UpdateShipConfig(m_playerShip, "intro");
+		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->ClearGrid();
+		Ship::SaveItems(ITEMS_SAVE_FILE, m_playerShip);
 	}
 
 	m_playerShip->m_currentScene_name = player.m_currentSceneFile;
@@ -75,6 +79,67 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+}
+
+void InGameState::UpdateShipConfig(Ship* ship, string config_name)
+{
+	if (!ship || config_name.empty())
+		return;
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading ship config file");
+	try
+	{
+		vector<vector<string> > shipConfig = *(FileLoaderUtils::FileLoader(SHIP_FILE));
+
+		for (std::vector<vector<string> >::iterator it = (shipConfig).begin(); it != (shipConfig).end(); it++)
+		{
+			if ((*it)[SHIPCONFIG_NAME].compare(config_name) == 0)
+			{
+				//Clear equipped items
+				ship->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->ClearGrid();
+
+				//Loading equipment
+				for (int i = 0; i < NBVAL_Equipment; i++)
+				{
+					if ((*it)[i + 1].compare("0") != 0)
+					{
+						ship->setShipEquipment(FileLoader::LoadEquipment((*it)[i + 1]), true);
+
+						GameObject* capsule = Ship::CloneEquipmentIntoGameObject(ship->m_equipment[i]);
+						ship->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, i);
+					}
+					else if (ship->m_equipment[i])
+					{
+						delete ship->m_equipment[i];
+						ship->m_equipment[i] = NULL;
+					}
+				}
+
+				//Loading weapon
+				if ((*it)[SHIPCONFIG_WEAPON].compare("0") != 0)
+				{
+					ship->setShipWeapon(FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[SHIPCONFIG_AMMO])), true);
+
+					GameObject* capsule = Ship::CloneWeaponIntoGameObject(ship->m_weapon);
+					ship->m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, NBVAL_Equipment);
+				}
+				else if (ship->m_weapon)
+				{
+					delete ship->m_weapon;
+					ship->m_weapon = NULL;
+				}
+
+				return;
+			}
+		}
+	}
+	catch (const std::exception & ex)
+	{
+		//An error occured
+		LOGGER_WRITE(Logger::LERROR, ex.what());
+	}
+
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ship config '%s'. Please check the config file", (char*)config_name.c_str()));
 }
 
 void InGameState::Update(Time deltaTime)

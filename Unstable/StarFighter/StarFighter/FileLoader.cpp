@@ -19,20 +19,24 @@ Ship* FileLoader::LoadShipConfig(string name)
 
 				//Loading equipment
 				LOGGER_WRITE(Logger::DEBUG, "Loading ship equipment\n");
-				//shipC->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_AIRBRAKE]), false);
-				//shipC->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_ENGINE]), false);
-				//shipC->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_MODULE]), false);
-				//shipC->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_ARMOR]), false);
-				//shipC->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_SHIELD]), false);//false because of shipC->Init() below that will recompute the ship config stats
+				if ((*it)[SHIPCONFIG_ENGINE].compare("0") != 0)
+					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_ENGINE]), false, true);
+				if ((*it)[SHIPCONFIG_MODULE].compare("0") != 0)
+					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_MODULE]), false, true);
+				if ((*it)[SHIPCONFIG_ARMOR].compare("0") != 0)
+					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_ARMOR]), false, true);
+				if ((*it)[SHIPCONFIG_SHIELD].compare("0") != 0)
+					ship->setShipEquipment(FileLoader::LoadEquipment((*it)[SHIPCONFIG_SHIELD]), false, true);//false because of shipC->Init() below that will recompute the ship config stats
 
 				//Loading FX
-				ship->m_FX_death = FileLoader::LoadFX((*it)[SHIPCONFIG_DEATH_FX]);
-
+				if ((*it)[SHIPCONFIG_DEATH_FX].compare("0") != 0)
+					ship->m_FX_death = FileLoader::LoadFX((*it)[SHIPCONFIG_DEATH_FX]);
+	
 				//Loading weapon
 				if ((*it)[SHIPCONFIG_WEAPON].compare("0") != 0)
 				{
 					LOGGER_WRITE(Logger::DEBUG, "Loading ship weapon\n");
-					//ship->m_weapon = FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[SHIPCONFIG_AMMO]));//false because of shipC->Init() below that will recompute the ship config stats
+					ship->m_weapon = FileLoader::LoadWeapon((*it)[SHIPCONFIG_WEAPON], -1, FileLoader::LoadAmmo((*it)[SHIPCONFIG_AMMO]));//false because of shipC->Init() below that will recompute the ship config stats
 				}
 
 				//Computing the ship config
@@ -48,7 +52,7 @@ Ship* FileLoader::LoadShipConfig(string name)
 		LOGGER_WRITE(Logger::LERROR,ex.what());
 	}
 
-	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ammo '%s'. Please check the config file", (char*)name.c_str()));
+	throw invalid_argument(TextUtils::format("Config file error: Unable to find Ship config '%s'. Please check the config file", (char*)name.c_str()));
 }
 
 EnemyPool* FileLoader::LoadEnemyPool(string name)
