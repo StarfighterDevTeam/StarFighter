@@ -52,6 +52,7 @@
 		870938211CBB0ECF002FAC79 /* SFPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938141CBB0ECF002FAC79 /* SFPanel.cpp */; };
 		870938221CBB0ECF002FAC79 /* SFText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938161CBB0ECF002FAC79 /* SFText.cpp */; };
 		870938231CBB0ECF002FAC79 /* SFTextPop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 870938181CBB0ECF002FAC79 /* SFTextPop.cpp */; };
+		870938271CBB142B002FAC79 /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 870938261CBB142B002FAC79 /* Assets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -151,6 +152,7 @@
 		870938181CBB0ECF002FAC79 /* SFTextPop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SFTextPop.cpp; sourceTree = SOURCE_ROOT; };
 		870938191CBB0ECF002FAC79 /* SFTextPop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFTextPop.h; sourceTree = SOURCE_ROOT; };
 		870938241CBB0EE0002FAC79 /* SimpleCollision.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SimpleCollision.hpp; path = Includes/SimpleCollision.hpp; sourceTree = SOURCE_ROOT; };
+		870938261CBB142B002FAC79 /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -290,6 +292,7 @@
 		870937901CBB04B3002FAC79 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				870938261CBB142B002FAC79 /* Assets */,
 				870937911CBB04B3002FAC79 /* cute_image.jpg */,
 				870937931CBB04B3002FAC79 /* nice_music.ogg */,
 				870937951CBB04B3002FAC79 /* sansation.ttf */,
@@ -355,6 +358,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				870938271CBB142B002FAC79 /* Assets in Resources */,
 				870937981CBB04B3002FAC79 /* icon.png in Resources */,
 				870937961CBB04B3002FAC79 /* sansation.ttf in Resources */,
 				870937941CBB04B3002FAC79 /* nice_music.ogg in Resources */,

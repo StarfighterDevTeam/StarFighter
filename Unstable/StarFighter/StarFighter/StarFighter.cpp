@@ -23,7 +23,7 @@ int main()
 
 	//Icon
 	sf::Image icon = sf::Image();
-	icon.loadFromFile(ICON_SHIP_PNG);
+	icon.loadFromFile(makePath(ICON_SHIP_PNG));
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	//Title

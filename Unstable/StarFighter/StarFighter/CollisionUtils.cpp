@@ -92,7 +92,7 @@ namespace Collision
 	bool CreateTextureAndBitmask(sf::Texture &LoadInto, const std::string& Filename)
 	{
 		sf::Image img;
-		if (!img.loadFromFile(Filename))
+		if (!img.loadFromFile(makePath(Filename)))
 			return false;
 		if (!LoadInto.loadFromImage(img))
 			return false;
