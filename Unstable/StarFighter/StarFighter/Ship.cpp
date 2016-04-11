@@ -57,10 +57,10 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 		(*CurrentGame).addToScene(m_fake_ship, FakeShipLayer, FakePlayerShip);
 	}
 
-	m_combo_aura = new Aura(this, "Assets/2D/FX/Aura_Graze.png", sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
+	m_combo_aura = new Aura(this, makePath("Assets/2D/FX/Aura_Graze.png"), sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
 	(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
 
-	m_trail = new Aura(this, "Assets/2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
+	m_trail = new Aura(this, makePath("Assets/2D/FX/Aura_HyperspeedTrail.png"), sf::Vector2f(70, 34), 3, 1);
 	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
 	(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
@@ -1572,7 +1572,7 @@ void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, Enem
 		}
 		else
 		{
-			printf("<!> Error: could not generate equipment in Shop, with Enemy::AssignRandomEquipment(), on i=%d\n", i);
+			printf("<!> Error: could not generate equipment in Shop, with Enemy::AssignRandomEquipment(), on i=%zu\n", i);
 		}
 	}
 }

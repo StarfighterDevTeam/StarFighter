@@ -9,6 +9,8 @@
 #include <assert.h>
 #include <math.h>
 
+std::string makePath(const std::string& srcPath);
+
 #define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
 #define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
 #define MONEY_SAVE_FILE							"Saves/Money.txt"

@@ -51,7 +51,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	try
 	{
 		m_font = new sf::Font();
-		if (!m_font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+		if (!m_font->loadFromFile(makePath("Assets/Fonts/terminator_real_nfi.ttf")))
 		{
 			// error
 			//TODO: font loader

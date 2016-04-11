@@ -1,11 +1,22 @@
 #include "Globals.h"
 
+#ifdef __APPLE__
+    #include "ResourcePath.hpp"
+#endif
+
 sf::RenderWindow *window;
 
 //to do OPTIM
 //std::unique_ptr<sf::RenderWindow> window;
 
-
+std::string makePath(const std::string& srcPath)
+{
+#ifdef __APPLE__
+    return resourcePath() + srcPath;
+#else
+    return srcPath;
+#endif
+}
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values)
 {
