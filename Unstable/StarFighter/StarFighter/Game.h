@@ -102,6 +102,7 @@ public:
 	float m_BeastScoreBonus;
 
 	Ship* m_playerShip;
+	bool m_Pause;
 
 	void SetPlayerShip(Ship* playerShip);
 	float GetBeastScoreBonus(float playerShipBeastScore, float sceneBeastScore);

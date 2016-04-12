@@ -29,6 +29,7 @@ void Game::init(RenderWindow* window)
 	m_playerShip = NULL;
 	m_waiting_for_dialog_validation = false;
 	m_waiting_for_scene_transition = false;
+	m_Pause = false;
 
 	//Sounds
 	m_SFX_Activated = true;
@@ -80,6 +81,7 @@ void Game::SetSFXVolume(bool activate_sfx)
 void Game::SetMusicVolume(bool activate_music)
 {
 	m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * activate_music);
+	m_Music_Activated = activate_music;
 }
 
 void Game::PlayMusic(Music_Bank music, string specific_filename)

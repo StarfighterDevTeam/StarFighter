@@ -153,6 +153,26 @@ bool InputGuy::isOpeningHud()
 	return false;
 }
 
+bool InputGuy::isMuting()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isPausing()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 Vector2f InputGuy::getDirections()
 {
 	short dirX = 0;

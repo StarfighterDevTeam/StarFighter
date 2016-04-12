@@ -22,6 +22,9 @@ public:
 	static bool isChangingResolution();
 	static bool isOpeningHud();
 	static bool isUsingDebugCommand();
+
+	static bool isMuting();
+	static bool isPausing();
 };
 
 

@@ -58,6 +58,8 @@ enum PlayerActions
 	Action_ChangingResolution,
 	Action_AutomaticFire,
 	Action_DebugCommand,
+	Action_Muting,
+	Action_Pausing,
 	NBVAL_PlayerActions,
 };
 
