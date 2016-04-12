@@ -193,9 +193,25 @@ void Ship::Init()
 	{
 		if (m_equipment[i] != NULL)
 		{
-			if (m_equipment[i]->m_bot)
+			if (!m_equipment[i]->m_bots.empty())
 			{
-				m_bot_list.push_back(m_equipment[i]->m_bot);
+				size_t botsVectorSize = m_equipment[i]->m_bots.size();
+				for (size_t j = 0; j < botsVectorSize; j++)
+				{
+					m_bot_list.push_back(m_equipment[i]->m_bots[j]);
+
+					//bots auto spreading based on number of bots
+					if (j > 0)
+					{
+						if (m_equipment[i]->m_bots[j]->m_Pattern.currentPattern == NoMovePattern)
+						{
+							int s = j % 2 == 0 ? 1 : -1;
+							int x = j % 2;
+
+							m_equipment[i]->m_bots[j]->m_spread.x *= s * x;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -233,7 +249,7 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 		return false;
 	}
 
-	if (overwrite_existing && m_equipment[equipment->m_equipmentType] && m_equipment[equipment->m_equipmentType]->m_bot)
+	if (overwrite_existing && m_equipment[equipment->m_equipmentType] && !m_equipment[equipment->m_equipmentType]->m_bots.empty())
 	{
 		DestroyBots();
 	}
@@ -247,7 +263,7 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 	
 	Init();
 
-	if (equipment->m_bot)
+	if (!equipment->m_bots.empty())
 	{
 		GenerateBots(this);
 	}
@@ -286,7 +302,7 @@ void Ship::cleanEquipment(int equipment_type, bool no_save)
 {
 	if (m_equipment[equipment_type])
 	{
-		if (m_equipment[equipment_type]->m_bot)
+		if (!m_equipment[equipment_type]->m_bots.empty())
 		{
 			DestroyBots();
 		}
@@ -2103,18 +2119,19 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data.precision(0);
 		data << equipment->m_damage << " ";
 
-		if (equipment->m_bot)
+		if (!equipment->m_bots.empty())
 		{
-			data << equipment->m_bot->m_display_name << " ";
-			data << equipment->m_bot->m_textureName << " ";
-			data << equipment->m_bot->m_size.x << " ";
-			data << equipment->m_bot->m_size.y << " ";
-			data << equipment->m_bot->m_frameNumber << " ";
-			data << equipment->m_bot->m_spread.x << " ";
-			data << equipment->m_bot->m_spread.y << " ";
-			data << equipment->m_bot->m_rotation_speed << " ";
-			data << equipment->m_bot->m_Pattern.currentPattern << " ";
-			switch (equipment->m_bot->m_Pattern.currentPattern)
+			data << equipment->m_bots.front()->m_display_name << " ";
+			data << equipment->m_bots.size();
+			data << equipment->m_bots.front()->m_textureName << " ";
+			data << equipment->m_bots.front()->m_size.x << " ";
+			data << equipment->m_bots.front()->m_size.y << " ";
+			data << equipment->m_bots.front()->m_frameNumber << " ";
+			data << equipment->m_bots.front()->m_spread.x << " ";
+			data << equipment->m_bots.front()->m_spread.y << " ";
+			data << equipment->m_bots.front()->m_rotation_speed << " ";
+			data << equipment->m_bots.front()->m_Pattern.currentPattern << " ";
+			switch (equipment->m_bots.front()->m_Pattern.currentPattern)
 			{
 				case NoMovePattern:
 				{
@@ -2122,22 +2139,22 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 				}
 				case Line_:
 				{
-					data << equipment->m_bot->m_Pattern.patternSpeed << " ";
-					data << &equipment->m_bot->m_Pattern.patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_Pattern.patternSpeed << " ";
+					data << &equipment->m_bots.front()->m_Pattern.patternParams[1] << " ";
 					break;
 				}
 				default:
 				{
-					data << equipment->m_bot->m_Pattern.patternSpeed << " ";
-					data << &equipment->m_bot->m_Pattern.patternParams[0] << " ";
-					data << &equipment->m_bot->m_Pattern.patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_Pattern.patternSpeed << " ";
+					data << &equipment->m_bots.front()->m_Pattern.patternParams[0] << " ";
+					data << &equipment->m_bots.front()->m_Pattern.patternParams[1] << " ";
 					break;
 				}
 			}
 
-			if (equipment->m_bot->m_weapon)
+			if (equipment->m_bots.front()->m_weapon)
 			{
-				Ship::SaveWeaponData(data, equipment->m_bot->m_weapon, true, true);
+				Ship::SaveWeaponData(data, equipment->m_bots.front()->m_weapon, true, true);
 				return;
 			}
 			else
@@ -2336,6 +2353,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	int damage;
 
 	string bot_name;
+	int bot_number;
 	string bot_texture_name;
 	int bot_width;
 	int bot_height;
@@ -2390,7 +2408,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 		}
 		else
 		{
-			ss >> bot_texture_name >> bot_width >> bot_height >> bot_frames >> bot_spread_x >> bot_spread_y >> bot_rotation_speed >> bot_pattern_type;
+			ss >> bot_number >> bot_texture_name >> bot_width >> bot_height >> bot_frames >> bot_spread_x >> bot_spread_y >> bot_rotation_speed >> bot_pattern_type;
 			if (bot_pattern_type == Line_)
 			{
 				ss >> bot_pattern_speed >> bot_pattern_arg2;
@@ -2509,7 +2527,10 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			bot->m_weapon = weapon;
 		}
 
-		equipment->m_bot = bot;
+		for (int i = 0; i < bot_number; i++)
+		{
+			equipment->m_bots.push_back(bot);
+		}
 	}
 
 	return equipment;

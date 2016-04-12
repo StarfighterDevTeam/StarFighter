@@ -55,7 +55,7 @@ public:
 	int m_frameNumber;
 	std::string m_display_name;
 	int m_equipmentType;
-	Bot* m_bot;
+	vector<Bot*> m_bots;
 
 	std::string m_fake_textureName;
 	sf::Vector2f m_fake_size;

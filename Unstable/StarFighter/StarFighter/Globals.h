@@ -203,6 +203,9 @@ std::string makePath(const std::string& srcPath);
 #define BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES			3.0f
 #define CREDITS_COST_PER_ONE_MULTISHOT					10
 #define COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL		0.4
+#define CREDITS_COST_PER_ONE_ADDITIONAL_BOT				50
+#define COST_PER_ONE_BOT_MULTIPLIER_PER_LEVEL			0.6
+#define MAX_NUMBER_OF_BOTS_PER_ITEM						4
 #define MIN_VALUE_OF_MULTISHOT							2
 #define MAX_RATE_OF_FIRE_BONUS							90
 #define MIN_WEAPON_XSPREAD								10
@@ -235,6 +238,7 @@ std::string makePath(const std::string& srcPath);
 #define ASSUMED_SHIP_SIZE								70
 #define ASSUMED_BOT_SIZE								32
 #define WEAPON_MIN_VSPEED_VALUE							300
+#define WEAPON_CHANCE_OF_ALTERNATE						0.3f
 
 //TEXTPOP FEEDBACK
 #define MONEY_LOOT_DISPLAY_NOT_FADED_TIME				0.8f

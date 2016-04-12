@@ -479,6 +479,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	weapon->m_textureName = LASER_BLUE_FILENAME;
 	weapon->m_size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
 	weapon->m_frameNumber = 1;
+	weapon->m_shot_mode = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) > WEAPON_CHANCE_OF_ALTERNATE ? NoShotMode : AlternateShotMode;
 
 	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
 

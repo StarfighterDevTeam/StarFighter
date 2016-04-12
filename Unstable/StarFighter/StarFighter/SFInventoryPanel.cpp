@@ -247,8 +247,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "THRUSTER: " << standard_name;
 				ss_stats << "Hyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
+				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
+				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case Armor:
@@ -257,8 +257,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "HULL: " << standard_name;
 				ss_stats << "Hull pts: " << obj->m_armor;
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
+				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
+				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case Shield:
@@ -271,8 +271,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_stats << obj->m_shield_regen << "\nShield recovery: ";
 				ss_stats.precision(0);
 				ss_stats << obj->m_shield_recovery_time << "sec";
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
+				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
+				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case Module:
@@ -280,63 +280,65 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				Equipment* obj = object->m_equipment_loot;
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "MODULE: " << standard_name;
-				if (obj->m_bot)
+				if (!obj->m_bots.empty())
 				{
-					ss_stats << "Adding 1 drone. Drone stats:";
-					if (obj->m_bot->m_weapon->m_shot_mode != NoShotMode)
-					{
-						ss_stats << "\nDPS: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bot->m_weapon->m_ammunition->m_damage;
-					}
-					else
-					{
-						ss_stats << "\nDPS: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bot->m_weapon->m_multishot * obj->m_bot->m_weapon->m_ammunition->m_damage;
-					}
+					ss_stats << "Adding " << obj->m_bots.size() << " drone. Drone stats:";
+					//if (obj->m_bots.front()->m_weapon->m_shot_mode != NoShotMode)
+					//{
+					//	ss_stats << "\nDPS: " << (floor)(1 / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
+					//}
+					//else
+					//{
+						ss_stats << "\nDPS: " << (floor)(1 / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 * obj->m_bots.front()->m_weapon->m_multishot * obj->m_bots.front()->m_weapon->m_ammunition->m_damage * obj->m_bots.size();
+					//}
 
-					ss_stats << "\nDamage: " << obj->m_bot->m_weapon->m_ammunition->m_damage;
-					ss_stats << "\nAmmo speed: " << obj->m_bot->m_weapon->m_ammunition->m_speed.y;
+					ss_stats << "\nDamage: " << obj->m_bots.front()->m_weapon->m_ammunition->m_damage;
+					ss_stats << "\nAmmo speed: " << obj->m_bots.front()->m_weapon->m_ammunition->m_speed.y;
 					ss_stats.precision(1);
-					ss_stats << "\nFire rate: " << (floor)(1 / obj->m_bot->m_weapon->m_rate_of_fire * 100) / 100 << " shots/sec";
+					ss_stats << "\nFire rate: " << (floor)(1 / obj->m_bots.front()->m_weapon->m_rate_of_fire * 100) / 100 << " shots/sec";
 					ss_stats.precision(0);
 
-					if (obj->m_bot->m_weapon->m_multishot > 1)
+					if (obj->m_bots.front()->m_weapon->m_multishot > 1)
 					{
-						ss_stats << "\nMultishot: " << obj->m_bot->m_weapon->m_multishot << "\nSpread: " << obj->m_bot->m_weapon->m_xspread << "\nDispersion: " << obj->m_bot->m_weapon->m_dispersion << "°";
+						ss_stats << "\nMultishot: " << obj->m_bots.front()->m_weapon->m_multishot << "\nSpread: " << obj->m_bots.front()->m_weapon->m_xspread << "\nDispersion: " << obj->m_bots.front()->m_weapon->m_dispersion << "°";
 					}
 					else
 					{
 						ss_stats << "\nSingle shot";
 					}
-					if (obj->m_bot->m_weapon->m_rafale > 0)
+					if (obj->m_bots.front()->m_weapon->m_rafale > 0)
 					{
-						ss_stats << "\nRafale: " << obj->m_bot->m_weapon->m_rafale << " (cooldown: " << obj->m_bot->m_weapon->m_rafale_cooldown << " sec";
+						ss_stats << "\nRafale: " << obj->m_bots.front()->m_weapon->m_rafale << " (cooldown: " << obj->m_bots.front()->m_weapon->m_rafale_cooldown << " sec";
 					}
 
-					if (obj->m_bot->m_weapon->m_shot_mode != NoShotMode)
+					ss_stats << "\nFiring style: ";
+					switch (obj->m_bots.front()->m_weapon->m_shot_mode)
 					{
-						ss_stats << "\nFiring style: ";
-						switch (obj->m_bot->m_weapon->m_shot_mode)
+						case NoShotMode:
 						{
-							case AlternateShotMode:
-							{
-								ss_stats << "Alternating shots";
-								break;
-							}
-							case AscendingShotMode:
-							{
-								ss_stats << "Ascending shots";
-								break;
-							}
-							case DescendingShotMode:
-							{
-								ss_stats << "Descending shots";
-								break;
-							}
+							ss_stats << "Parallel shots";
+							break;
+						}
+						case AlternateShotMode:
+						{
+							ss_stats << "Alternating shots";
+							break;
+						}
+						case AscendingShotMode:
+						{
+							ss_stats << "Ascending shots";
+							break;
+						}
+						case DescendingShotMode:
+						{
+							ss_stats << "Descending shots";
+							break;
 						}
 					}
 
-					if (obj->m_bot->m_weapon->m_target_seaking != NO_SEAKING)
+					if (obj->m_bots.front()->m_weapon->m_target_seaking != NO_SEAKING)
 					{
-						switch (obj->m_bot->m_weapon->m_target_seaking)
+						switch (obj->m_bots.front()->m_weapon->m_target_seaking)
 						{
 							case SEAKING:
 							case SUPER_SEAKING:
@@ -356,8 +358,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				{
 					ss_stats << "\nNo effect";
 				}
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
+				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
+				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 			case NBVAL_Equipment:
@@ -365,16 +367,16 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				Weapon* obj = object->m_weapon_loot;
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "MAIN WEAPON: " << standard_name;
-				if (obj->m_shot_mode != NoShotMode)
-				{
-					ss_stats.precision(0);
-					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_ammunition->m_damage;
-				}
-				else
-				{
+				//if (obj->m_shot_mode != NoShotMode)
+				//{
+				//	ss_stats.precision(0);
+				//	ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_ammunition->m_damage;
+				//}
+				//else
+				//{
 					ss_stats.precision(0);
 					ss_stats << "DPS: " << (floor)(1 / obj->m_rate_of_fire * 100) / 100 * obj->m_multishot * obj->m_ammunition->m_damage;
-				}
+				//}
 				ss_stats << "\nDamage: " << obj->m_ammunition->m_damage;
 				ss_stats << "\nAmmo speed: " << obj->m_ammunition->m_speed.y;
 				ss_stats.precision(1);
@@ -393,26 +395,29 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				{
 					ss_stats << "\nRafale: " << obj->m_rafale << " (cooldown: " << obj->m_rafale_cooldown << " sec";
 				}
-				if (obj->m_shot_mode != NoShotMode)
+				
+				ss_stats << "\nFiring style: ";
+				switch (obj->m_shot_mode)
 				{
-					ss_stats << "\nFiring style: ";
-					switch (obj->m_shot_mode)
+					case NoShotMode:
 					{
-						case AlternateShotMode:
-						{
-							ss_stats << "Alternating shots";
-							break;
-						}
-						case AscendingShotMode:
-						{
-							ss_stats << "Ascending shots";
-							break;
-						}
-						case DescendingShotMode:
-						{
-							ss_stats << "Descending shots";
-							break;
-						}
+						ss_stats << "Parallel shots";
+						break;
+					}
+					case AlternateShotMode:
+					{
+						ss_stats << "Alternating shots";
+						break;
+					}
+					case AscendingShotMode:
+					{
+						ss_stats << "Ascending shots";
+						break;
+					}
+					case DescendingShotMode:
+					{
+						ss_stats << "Descending shots";
+						break;
 					}
 				}
 
@@ -433,8 +438,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						}
 					}
 				}
-				ss_stats << "\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
-				ss_stats << "\nMoney value: " << GameObject::GetPrice(obj->m_credits, obj->m_quality);
+				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
+				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
 			}
 		}

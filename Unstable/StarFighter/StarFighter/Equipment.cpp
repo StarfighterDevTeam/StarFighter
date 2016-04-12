@@ -46,7 +46,6 @@ Equipment::Equipment()
 	m_textureName = EMPTYSLOT_FILENAME;
 	m_frameNumber = 0;
 	m_equipmentType = Armor;
-	m_bot = NULL;
 	m_level = 1;
 	m_credits = 0;
 	m_quality = 0;
@@ -54,11 +53,7 @@ Equipment::Equipment()
 
 Equipment::~Equipment()
 {
-	if (m_bot)
-	{
-		//delete m_bot; -> garbaged
-		m_bot = NULL;
-	}
+	m_bots.clear();
 
 	m_level = 1;
 	m_credits = 0;
@@ -69,9 +64,13 @@ Equipment* Equipment::Clone()
 	Equipment* new_equipment = new Equipment();
 	new_equipment->Init(m_equipmentType, m_max_speed, m_acceleration, m_deceleration, m_hyperspeed, m_hyperspeed_fuel, m_armor, m_shield, m_shield_regen, m_shield_recovery_time, m_damage, m_textureName, m_size, m_frameNumber, m_display_name);
 	new_equipment->m_display_name = m_display_name;
-	if (m_bot)
+	if (!m_bots.empty())
 	{
-		new_equipment->m_bot = m_bot->Clone();
+		size_t botsVectorSize = m_bots.size();
+		for (size_t i = 0; i < botsVectorSize; i++)
+		{
+			new_equipment->m_bots.push_back(m_bots[i]->Clone());
+		}
 	}
 	new_equipment->m_level = m_level;
 	new_equipment->m_credits = m_credits;
@@ -277,6 +276,20 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 
+	int cost_per_bot = floor(CREDITS_COST_PER_ONE_ADDITIONAL_BOT * pow((1 + COST_PER_ONE_BOT_MULTIPLIER_PER_LEVEL), level - 1));
+
+	//buying additional bots?
+	int loot_credits_remaining = credits_;
+	int number_of_bots = 0;
+	bool can_buy_additional_bot = true;
+	while (can_buy_additional_bot)
+	{
+		number_of_bots++;
+		loot_credits_remaining -= number_of_bots == 0 ? 0 : cost_per_bot;
+		can_buy_additional_bot = loot_credits_remaining > cost_per_bot && number_of_bots < MAX_NUMBER_OF_BOTS_PER_ITEM;
+	}
+	loot_credits_remaining = credits_ / number_of_bots;
+
 	//Spending credits on the possible bonuses
 	Weapon* weapon = Weapon::CreateRandomWeapon(level, true, beastScore);
 
@@ -296,7 +309,11 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 	bot->m_Pattern.SetPattern(pattern_type, bot->m_vspeed, v); //vitesse angulaire (degres/s)
 
 	bot->m_weapon = weapon;
-	equipment->m_bot = bot;
+
+	for (int i = 0; i < number_of_bots; i++)
+	{
+		equipment->m_bots.push_back(bot);
+	}
 
 	//saving level and credits used
 	equipment->m_level = level;

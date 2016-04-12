@@ -185,7 +185,7 @@ Equipment* FileLoader::LoadEquipment(string name)
 
 			if ((*it)[EQUIPMENT_BOT].compare("0") != 0)
 			{
-				i->m_bot = LoadBot((*it)[EQUIPMENT_BOT]);
+				i->m_bots.push_back(LoadBot((*it)[EQUIPMENT_BOT]));
 			}
 
 			if(!(*it)[EQUIPMENT_FAKE_TEXTURE].compare("0") == 0 && !(*it)[EQUIPMENT_FAKE_WIDTH].compare("0") == 0
