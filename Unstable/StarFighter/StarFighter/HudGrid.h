@@ -49,6 +49,8 @@ public:
 	void ClearGrid();
 	void ClearHighlight();
 	static bool SwapObjectsBetweenGrids(ObjectGrid& grid1, ObjectGrid& grid2, int index1, int index2);
+
+	bool m_visible;
 };
 
 #endif // HUDGRID_H_INCLUDED

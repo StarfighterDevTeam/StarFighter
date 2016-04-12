@@ -2,11 +2,14 @@
 
 ObjectGrid::ObjectGrid()
 {
-	this->focus = sf::Vector2i(-1, -1);
+	focus = sf::Vector2i(-1, -1);
+	m_visible = true;
 }
 
 ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_with_fake, bool fill_with_grey, bool fill_with_colored_background)
 {
+	m_visible = true;
+
 	for (int i = 0; i < squares.x; i++)
 	{
 		for (int j = 0; j < squares.y; j++)
@@ -140,13 +143,16 @@ void ObjectGrid::SetGridPosition(sf::Vector2f position)
 
 void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 {
-	for (int i = 0; i < this->squares.x; i++)
+	if (m_visible)
 	{
-		for (int j = 0; j < this->squares.y; j++)
+		for (int i = 0; i < this->squares.x; i++)
 		{
-			if (grid[i][j] && grid[i][j]->m_visible)
+			for (int j = 0; j < this->squares.y; j++)
 			{
-				offscreen.draw(*grid[i][j]);
+				if (grid[i][j] && grid[i][j]->m_visible)
+				{
+					offscreen.draw(*grid[i][j]);
+				}
 			}
 		}
 	}

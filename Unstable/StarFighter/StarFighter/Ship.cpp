@@ -765,6 +765,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			{
 				m_HUD_state = HUD_OpeningEquipment;
 				m_SFHudPanel->GetCursor()->m_visible = true;
+				//init cursor position on first cell
+				if (m_SFHudPanel->GetGrid(true, Trade_EquippedGrid) && m_SFHudPanel->GetGrid(true, Trade_EquippedGrid)->grid[0][0])
+				{
+					m_SFHudPanel->GetCursor()->setPosition(m_SFHudPanel->GetGrid(true, Trade_EquippedGrid)->grid[0][0]->getPosition().x, m_SFHudPanel->GetGrid(true, Trade_EquippedGrid)->grid[0][0]->getPosition().y);
+				}
 				
 				if (!m_disableSlowmotion)
 				{

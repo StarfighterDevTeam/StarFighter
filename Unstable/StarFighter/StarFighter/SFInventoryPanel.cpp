@@ -32,7 +32,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			m_overblock.setSize(this->getSize());
 			m_overblock.setOrigin(this->getOrigin());
 			m_overblock.setPosition(this->getPosition());
-			m_overblock.setFillColor(sf::Color(0, 0, 0, 120));
+			m_overblock.setFillColor(sf::Color(0, 0, 0, GHOST_ALPHA_VALUE));
 		}
 		
 		m_selected_option_index = 0;
@@ -577,8 +577,27 @@ void SFInventoryPanel::UpdateGreyMaskOnInsufficientCredits(ObjectGrid* grey_grid
 			}
 		}
 	}
-
 }
+
+void SFInventoryPanel::SetGridSlotsVisibility(ObjectGrid* grid, bool visible)
+{
+	if (!grid)
+	{
+		return;
+	}
+
+	for (int i = 0; i < grid->squares.x; i++)
+	{
+		for (int j = 0; j < grid->squares.y; j++)
+		{
+			if (grid->grid[i][j])
+			{
+				grid->grid[i][j]->m_visible = visible;
+			}
+		}
+	}
+}
+
 
 void SFInventoryPanel::UpdateBackgroundColors(ObjectGrid* color_grid, ObjectGrid* object_grid)
 {
@@ -933,10 +952,14 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 	m_fake_grid[Trade_StashGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), true);
 	m_grid[Trade_StashGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false);
 	m_quality_grid[Trade_StashGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false, false, true);
+	m_grey_grid[Trade_StashGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(EQUIPMENT_GRID_NB_LINES, EQUIPMENT_GRID_NB_ROWS), false, true, false);
+	SetGridSlotsVisibility(m_grey_grid[Trade_StashGrid], true);
 
 	m_fake_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
 	m_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
 	m_quality_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false, false, true);
+	m_grey_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false, true, false);
+	SetGridSlotsVisibility(m_grey_grid[Trade_EquippedGrid], true);
 
 	if (playerShip)
 	{
@@ -1081,11 +1104,13 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_fake_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_quality_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
+		m_grey_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 	
 		text_height += INTERACTION_INTERBLOCK + m_fake_grid[Trade_EquippedGrid]->squares.x*GRID_SLOT_SIZE;
 		m_fake_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
-		m_quality_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));	
+		m_quality_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
+		m_grey_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 
 		//lower part
 		text_height += INTERACTION_INTERBLOCK + m_fake_grid[Trade_StashGrid]->squares.x*GRID_SLOT_SIZE;
@@ -1120,6 +1145,14 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	SFInventoryPanel::Update(deltaTime, inputs_directions);
+
+	for (int i = 0; i < NBVAL_TradeGrids; i++)
+	{
+		if (m_grey_grid[i])
+		{
+			m_grey_grid[i]->m_visible = !m_cursor.m_visible;
+		}
+	}
 
 	if (!m_playerShip)
 	{
