@@ -16,6 +16,8 @@ public:
 	int m_selected_option_index;
 	bool m_comparison;
 
+	sf::RectangleShape m_overblock;
+
 	sf::Text m_title_text_comparison;
 };
 

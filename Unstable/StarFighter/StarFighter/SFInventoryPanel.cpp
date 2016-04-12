@@ -28,6 +28,11 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			{
 				setPosition(object->getPosition().x + size.x / 2 + ITEM_STATS_SHOP_OFFSET_X - size.x - ITEM_STATS_COMPARE_OFFSET_X, object->getPosition().y + size.y / 2 + ITEM_STATS_SHOP_OFFSET_Y);
 			}
+
+			m_overblock.setSize(this->getSize());
+			m_overblock.setOrigin(this->getOrigin());
+			m_overblock.setPosition(this->getPosition());
+			m_overblock.setFillColor(sf::Color(0, 0, 0, 120));
 		}
 		
 		m_selected_option_index = 0;
@@ -205,6 +210,11 @@ void SFItemStatsPanel::Draw(sf::RenderTexture& screen)
 		if (m_actions)
 		{
 			m_actions->Draw(screen);
+		}
+
+		if (m_comparison)
+		{
+			screen.draw(m_overblock);
 		}
 
 		//for (size_t i = 0; i < 2; i++)
