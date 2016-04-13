@@ -1937,6 +1937,11 @@ void Ship::GetDamageFrom(GameObject& object)
 	{
 		m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);
 	}
+
+	if (m_armor <= 0)
+	{
+		Death();
+	}
 }
 
 

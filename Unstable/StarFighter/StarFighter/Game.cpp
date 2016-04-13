@@ -442,16 +442,6 @@ void Game::colisionChecksV2()
 					(*it1)->GetDamageFrom(*(*it2));
 					//explosion
 					(*it2)->Death();
-
-					//FX* explosion = new FX (sf::Vector2f((*it2)->getPosition().x, (*it2)->getPosition().y),sf::Vector2f(0,0), FX_EXPLOSION_FILENAME, sf::Vector2f(FX_EXPLOSION_WIDTH, FX_EXPLOSION_HEIGHT), FX_EXPLOSION_FRAME_NUMBER, sf::seconds(FX_MEDIUM_EXPLOSION_DURATION));
-					//this->addToScene(explosion, ExplosionLayer, Neutral);
-					//hide destroyed item
-					if ((*it1)->m_armor <= 0)
-					{
-						(*it1)->Death();
-						//we all deserve another chance...
-						//(*it1)->Respawn();
-					}
 				}
 			}
 		}
@@ -466,28 +456,11 @@ void Game::colisionChecksV2()
 			{
 				//Do something (like, kill ship)
 				(*it1)->GetDamageFrom(*(*it2));
-				//explosion
-				//TO DO : explosion impact enemy vs ship
-
-				//death of player?
-				if ((*it1)->m_armor <= 0)
-				{
-					(*it1)->Death();
-					//we all deserve another chance...
-					//(*it1)->Respawn();
-				}
 
 				//player may also deal contact damage to enemy ships
 				(*it2)->GetDamageFrom(*(*it1));
 
 				//TODO: display contact feedback (small explosion?)
-
-				//death of enemy ship?
-				if ((*it2)->m_armor <= 0)
-				{
-					(*it2)->Death();
-					
-				}
 			}
 		}
 
@@ -552,12 +525,6 @@ void Game::colisionChecksV2()
 				(*it1)->GetDamageFrom(*(*it2));
 				//explosion
 				(*it2)->Death();
-
-				//death
-				if ((*it1)->m_armor <= 0)
-				{
-					(*it1)->Death();
-				}
 			}
 		}
 	}

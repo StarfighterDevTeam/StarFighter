@@ -229,7 +229,12 @@ void GameObject::GetDamageFrom(GameObject& object)
 		else
 		{
 			m_shield -= object.m_damage;
-		}		
+		}
+
+		if (m_armor <= 0)
+		{
+			Death();
+		}
 	}
 }
 

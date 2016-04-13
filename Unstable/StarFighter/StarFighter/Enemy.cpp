@@ -131,6 +131,17 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if ((*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() < END_OF_DIALOGS_DELAY)
 	{
 		AnimatedSprite::update(deltaTime);
+
+		//damage feedback expires?
+		if (m_color_timer > sf::seconds(0))
+		{
+			m_color_timer -= deltaTime;
+			setColor(m_color);
+			if (m_color_timer < sf::seconds(0))
+			{
+				setColor(Color(255, 255, 255, 255));
+			}
+		}
 		return;
 	}
 
@@ -434,17 +445,6 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	AnimatedSprite::update(deltaTime);
 
-	//damage feedback expires?
-	if (m_color_timer > sf::seconds(0))
-	{
-		m_color_timer -= deltaTime;
-		setColor(m_color);
-		if (m_color_timer < sf::seconds(0))
-		{
-			setColor(Color(255, 255, 255, 255));
-		}
-	}
-
 	//phases
 	if (!m_phases.empty())
 	{
@@ -490,6 +490,11 @@ void Enemy::GetDamageFrom(GameObject& object)
 		else
 		{
 			m_shield -= object.m_damage;
+		}
+
+		if (m_armor <= 0)
+		{
+			Death();
 		}
 	}
 }
@@ -643,6 +648,11 @@ bool Enemy::CheckCondition()
 		
 			case LifePourcentage:
 			{
+				if ((*it)->m_value == 0)
+				{
+					break;//case of "death" condition handled in method Death(), when the enemy dies precisely
+				}
+
 				if ((100.0f * m_armor / m_armor_max >= (*it)->m_value) && (((*it)->m_op == GREATHER_THAN) || ((*it)->m_op == EQUAL_TO)))
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
@@ -1129,6 +1139,16 @@ void Enemy::Death()
 	if ((*CurrentGame).m_playerShip->m_input_blocker == this)
 	{
 		(*CurrentGame).m_playerShip->m_input_blocker = NULL;
+	}
+
+	//phase transition "Death" (post-mortem phase of 1 frame)
+	for (std::vector<ConditionTransition*>::iterator it = m_currentPhase->m_transitions_list.begin(); it != m_currentPhase->m_transitions_list.end(); it++)
+	{
+		if ((*it)->m_condition == LifePourcentage && (*it)->m_value == 0 && ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO))
+		{
+			this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+		}
+		break;
 	}
 }
 

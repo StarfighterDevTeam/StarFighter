@@ -61,7 +61,7 @@ void InGameState::Initialize(Player player)
 		player.m_currentSceneFile = STARTING_SCENE;
 		AddToKnownScenes(player.m_currentSceneFile);
 		SavePlayer(PLAYER_SAVE_FILE);
-		UpdateShipConfig(m_playerShip, "intro");
+		//UpdateShipConfig(m_playerShip, "intro");
 		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->ClearGrid();
 		Ship::SaveItems(ITEMS_SAVE_FILE, m_playerShip);
 	}
