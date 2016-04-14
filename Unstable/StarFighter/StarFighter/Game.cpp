@@ -40,23 +40,23 @@ void Game::init(RenderWindow* window)
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
-	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
-	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
-	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
-	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
+	//if (!SpaceCowboys.openFromFile("Music/SpaceCowboys.ogg"))
+	//if (!SpaceCowboys.openFromFile("Music/CrimeaDigital.ogg"))
+	//if (!SpaceCowboys.openFromFile("Music/Rebecca.ogg"))
+	//if (!SpaceCowboys.openFromFile("Music/Daft Punk - Derezzed.ogg"))
 
 	//Fonts
 	try
 	{
 		m_font[Font_Arial] = new sf::Font();
-		if (!m_font[Font_Arial]->loadFromFile(makePath("Assets/Fonts/arial.ttf")))
+		if (!m_font[Font_Arial]->loadFromFile(makePath("Fonts/arial.ttf")))
 		{
 			
 		}
 		m_font[Font_Terminator] = new sf::Font();
-		if (!m_font[Font_Terminator]->loadFromFile(makePath("Assets/Fonts/terminator_custom_nfi.ttf")))
+		if (!m_font[Font_Terminator]->loadFromFile(makePath("Fonts/terminator_custom_nfi.ttf")))
 		{
-			if (!m_font[Font_Terminator]->loadFromFile(makePath("Assets/Fonts/terminator_real_nfi.ttf")))
+			if (!m_font[Font_Terminator]->loadFromFile(makePath("Fonts/terminator_real_nfi.ttf")))
 			{
 
 			}
@@ -99,7 +99,7 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 	//filename has been specified?
 	if (!specific_filename.empty())
 	{
-		m_next_music_name = specific_filename;
+		m_next_music_name = makePath(specific_filename);
 	}
 	//default musics
 	else
@@ -109,17 +109,17 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 		{
 			case Music_Hub:
 			{
-				m_next_music_name = makePath("Assets/Music/Hub.ogg");
+				m_next_music_name = makePath("Music/Hub.ogg");
 				break;
 			}
 			case Music_Scene:
 			{
-				m_next_music_name = makePath("Assets/Music/Scene.ogg");
+				m_next_music_name = makePath("Music/Scene.ogg");
 				break;
 			}
 			case Music_Boss:
 			{
-				m_next_music_name = makePath("Assets/Music/Boss.ogg");
+				m_next_music_name = makePath("Music/Boss.ogg");
 				break;
 			}
 		}
@@ -181,25 +181,25 @@ void Game::SetPlayerShip(Ship* playerShip)
 
 int Game::LoadSFX()
 {
-	if (!m_soundBuffers[SFX_Fire].loadFromFile(makePath("Assets/Sounds/laser_repeat.ogg")))
+	if (!m_soundBuffers[SFX_Fire].loadFromFile(makePath("Sounds/laser_repeat.ogg")))
 		return -1;
-	if (!m_soundBuffers[SFX_Kill].loadFromFile(makePath("Assets/Sounds/kill.ogg")))
+	if (!m_soundBuffers[SFX_Kill].loadFromFile(makePath("Sounds/kill.ogg")))
 		return -1;
-	if (!m_soundBuffers[SFX_BigKill].loadFromFile(makePath("Assets/Sounds/big_kill.ogg")))
+	if (!m_soundBuffers[SFX_BigKill].loadFromFile(makePath("Sounds/big_kill.ogg")))
 		return -1;
-	if (!m_soundBuffers[SFX_Teleport].loadFromFile(makePath("Assets/Sounds/teleport.ogg")))
+	if (!m_soundBuffers[SFX_Teleport].loadFromFile(makePath("Sounds/teleport.ogg")))
 		return -1;
-	if (!m_soundBuffers[SFX_BuyOrSell].loadFromFile(makePath("Assets/Sounds/trade.ogg")))
+	if (!m_soundBuffers[SFX_BuyOrSell].loadFromFile(makePath("Sounds/trade.ogg")))
 		return -1;
-	if (!m_soundBuffers[SFX_MoneyLoot].loadFromFile(makePath("Assets/Sounds/money_loot.ogg")))
+	if (!m_soundBuffers[SFX_MoneyLoot].loadFromFile(makePath("Sounds/money_loot.ogg")))
 		return -1;
-	if (!m_soundBuffers[SFX_Equip].loadFromFile(makePath("Assets/Sounds/equip.ogg")))
+	if (!m_soundBuffers[SFX_Equip].loadFromFile(makePath("Sounds/equip.ogg")))
 		return -1;
-	//if (!m_soundBuffers[SFX_Heal].loadFromFile(makePath("Assets/Sounds/heal.ogg")))
+	//if (!m_soundBuffers[SFX_Heal].loadFromFile(makePath("Sounds/heal.ogg")))
 	//	return -1;
-	if (!m_soundBuffers[SFX_PortalOpening].loadFromFile(makePath("Assets/Sounds/gate_opening.ogg")))
+	if (!m_soundBuffers[SFX_PortalOpening].loadFromFile(makePath("Sounds/gate_opening.ogg")))
 		return -1;
-	if (!m_soundBuffers[SFX_EnteringPortal].loadFromFile(makePath("Assets/Sounds/entering_portal.ogg")))
+	if (!m_soundBuffers[SFX_EnteringPortal].loadFromFile(makePath("Sounds/entering_portal.ogg")))
 		return -1;
 
 	for (size_t i = 0; i < NBVAL_SFX_BANK; i++)

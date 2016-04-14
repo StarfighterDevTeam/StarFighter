@@ -1,5 +1,5 @@
 #,filename,width,height,vspeed,Vertical/Horizontal,,,,
-bg,Assets/2D/Backgrounds/BGIntro.png,1080,1080,0,V,,,,
+bg,2D/Backgrounds/BGIntro.png,1080,1080,0,V,,,,
 #,name,enemy_class,spawnX,spawnY,rotation,,,,
 boss,V_BetaGold_Intro,0,0.5,1.15,180,,,1.05,-0.1
 boss,V_AlphaGold_Intro,0,0.6,1.2,180,,,1.1,-0.1
@@ -10,4 +10,4 @@ boss,V_AlphaGold_Intro,0,0.7,1.25,180,,,1.15,-0.1
 #,portal_open_during_boss,,,,,,,,
 script,1,,,,,,,,
 #,music_filename,,,,,,,,
-music,Assets/Music/Boss.ogg,,,,,,,,
+music,Music/Boss.ogg,,,,,,,,

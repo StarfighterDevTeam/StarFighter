@@ -59,17 +59,17 @@ std::string makePath(const std::string& srcPath);
 #define HUD_CURSOR_SPEED							700
 #define HUD_HOLD_TIME_BEFORE_REMOVE_ITEM			1.0f
 
-#define SHIP_FILE "Assets/Scripts/Generated/Ship.csv"
-#define ENEMY_FILE	"Assets/Scripts/Generated/Enemies.csv"
-#define WEAPON_FILE	"Assets/Scripts/Generated/Weapons.csv"
-#define AMMO_FILE "Assets/Scripts/Generated/Ammo.csv"
-#define ENEMYPOOL_FILE "Assets/Scripts/Generated/EnemyPool.csv"
-#define FX_FILE "Assets/Scripts/Generated/FX.csv"
-#define EQUIPMENT_FILE "Assets/Scripts/Generated/Equipment.csv"
-#define BOT_FILE "Assets/Scripts/Generated/Bot.csv"
-#define SCENES_FILE "Assets/Scripts/Generated/Scenes.csv"
-#define PHASES_FILE	"Assets/Scripts/Generated/EnemyPhases.csv"
-#define DIALOGS_FILE "Assets/Scripts/Generated/Dialogs.csv"
+#define SHIP_FILE "Scripts/Generated/Ship.csv"
+#define ENEMY_FILE	"Scripts/Generated/Enemies.csv"
+#define WEAPON_FILE	"Scripts/Generated/Weapons.csv"
+#define AMMO_FILE "Scripts/Generated/Ammo.csv"
+#define ENEMYPOOL_FILE "Scripts/Generated/EnemyPool.csv"
+#define FX_FILE "Scripts/Generated/FX.csv"
+#define EQUIPMENT_FILE "Scripts/Generated/Equipment.csv"
+#define BOT_FILE "Scripts/Generated/Bot.csv"
+#define SCENES_FILE "Scripts/Generated/Scenes.csv"
+#define PHASES_FILE	"Scripts/Generated/EnemyPhases.csv"
+#define DIALOGS_FILE "Scripts/Generated/Dialogs.csv"
 
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									50
@@ -103,10 +103,10 @@ std::string makePath(const std::string& srcPath);
 #define INTERACTION_BUTTON_WIDTH				16
 #define INTERACTION_BUTTON_HEIGHT				16
 #define INTERACTION_BUTTON_MARGIN				4
-#define INTERACTION_BUTTON_A_FILENAME			"Assets/2D/HUD/Button_A.png"
-#define INTERACTION_BUTTON_X_FILENAME			"Assets/2D/HUD/Button_X.png"
-#define INTERACTION_BUTTON_Y_FILENAME			"Assets/2D/HUD/Button_Y.png"
-#define INTERACTION_BUTTON_B_FILENAME			"Assets/2D/HUD/Button_B.png"
+#define INTERACTION_BUTTON_A_FILENAME			"2D/HUD/Button_A.png"
+#define INTERACTION_BUTTON_X_FILENAME			"2D/HUD/Button_X.png"
+#define INTERACTION_BUTTON_Y_FILENAME			"2D/HUD/Button_Y.png"
+#define INTERACTION_BUTTON_B_FILENAME			"2D/HUD/Button_B.png"
 
 //TRADE PANEL
 #define TRADE_PANEL_WIDTH						360*2

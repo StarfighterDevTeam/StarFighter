@@ -14,7 +14,7 @@ std::string makePath(const std::string& srcPath)
 #ifdef __APPLE__
     return resourcePath() + srcPath;
 #else
-    return srcPath;
+	return "Assets/" + srcPath;
 #endif
 }
 

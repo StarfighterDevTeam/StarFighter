@@ -1,4 +1,4 @@
 #,filename,width,height,vspeed,Vertical/Horizontal
-bg,Assets/2D/Backgrounds/BGHub_1.png,1080,1080,0,0
+bg,2D/Backgrounds/BGHub_1.png,1080,1080,0,0
 #,filename,width,height,level,
-shop,Assets/2D/PNJ/station.png,319,158,11,
+shop,2D/PNJ/station.png,319,158,11,

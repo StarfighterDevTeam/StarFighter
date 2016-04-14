@@ -472,8 +472,8 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	}
 
 	//Creating the item
-	FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Assets/2D/FX_explosion_S_blue.png", sf::Vector2f(320, 236), 2, sf::seconds(0.4f));
-	Ammo* ammo = new Ammo(sf::Vector2f(0, 0), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "Assets/2D/Equipment/laser_blue.png", sf::Vector2f(6, 32), -1, fx);
+	FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/FX_explosion_S_blue.png", sf::Vector2f(320, 236), 2, sf::seconds(0.4f));
+	Ammo* ammo = new Ammo(sf::Vector2f(0, 0), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "2D/Equipment/laser_blue.png", sf::Vector2f(6, 32), -1, fx);
 	Weapon* weapon = new Weapon(ammo);
 	weapon->m_fire_direction = Vector2i(0, -1);
 	weapon->m_textureName = LASER_BLUE_FILENAME;
