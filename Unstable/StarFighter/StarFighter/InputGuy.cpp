@@ -121,6 +121,16 @@ bool InputGuy::isUsingDebugCommand()
 	return false;
 }
 
+bool InputGuy::spawnInSandbox()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F4))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isChangingResolution()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F3))

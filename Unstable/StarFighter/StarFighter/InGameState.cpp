@@ -73,6 +73,7 @@ void InGameState::Initialize(Player player)
 	LoadAllScenes(SCENES_FILE);
 
 	//Creating current scene
+	m_nextScene = NULL;
 	SpawnInScene(m_playerShip->m_currentScene_name);
 
 	(*CurrentGame).SetLayerRotation(FakeShipLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -144,6 +145,14 @@ void InGameState::UpdateShipConfig(Ship* ship, string config_name)
 
 void InGameState::Update(Time deltaTime)
 {
+	//debug command
+	#ifndef NDEBUG
+		if (InputGuy::spawnInSandbox())
+		{
+			SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
+		}
+	#endif
+
 	//automatic respawn if dead
 	if (!(*CurrentGame).m_playerShip->m_visible)
 	{
@@ -589,6 +598,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				m_currentScene = m_nextScene;
 				m_nextScene = NULL;
 				(*CurrentGame).m_direction = m_currentScene->m_direction;
+				(*CurrentGame).m_vspeed = m_currentScene->m_vspeed;
 				m_playerShip->m_currentScene_name = m_currentScene->m_name;
 				m_playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
 
@@ -786,6 +796,11 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		{
 			delete m_currentScene;
 		}
+		if (m_nextScene)
+		{
+			delete m_nextScene;
+			m_nextScene = NULL;
+		}
 		//cleaning layers
 		(*CurrentGame).garbageLayer(FriendlyFireLayer);
 		(*CurrentGame).garbageLayer(EnemyFireLayer);
@@ -796,6 +811,9 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		m_currentScene = new Scene(scene_name, 0, false, true);
 		playerShip->m_currentScene_name = m_currentScene->m_name;
 		playerShip->m_currentScene_hazard = m_currentScene->getSceneHazardLevelValue();
+		
+		//speed
+		(*CurrentGame).m_vspeed = m_currentScene->m_vspeed;
 
 		//position
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);

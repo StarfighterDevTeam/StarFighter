@@ -329,6 +329,8 @@ Scene::~Scene()
 		}
 
 		m_bg->m_GarbageMe = true;
+		m_bg->m_visible = false;
+		m_bg = NULL;
 	}
 
 	m_boss_list.clear();

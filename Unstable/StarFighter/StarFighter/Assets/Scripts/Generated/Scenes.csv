@@ -1,4 +1,5 @@
 #scene_name,filename,display_name,link_UP,link_DOWN,link_RIGHT,link_LEFT,HazardBreak,Level
+Sandbox,Assets/Scripts/Scenes/Generated/Sandbox.csv,Sandbox,0,0,0,0,0,1
 Vanguard_HubIntro,Assets/Scripts/Scenes/Generated/Vanguard_HubIntro.csv,Vanguard Hub Intro,Vanguard_VIntro,0,0,0,0,1
 Vanguard_VIntro,Assets/Scripts/Scenes/Generated/Vanguard_VIntro.csv,Vanguard V Intro,Vanguard_Hub0,0,0,0,0,1
 Vanguard_Hub0,Assets/Scripts/Scenes/Generated/Vanguard_Hub0.csv,Vanguard Hub 0,Vanguard_V1,0,0,0,0,1

@@ -6,6 +6,7 @@ Background::Background(sf::Vector2f position, sf::Vector2f speed, std::string te
 {
 	m_shop = NULL;
 	m_visible = true;
+	m_DontGarbageMe = true;
 	
 	sf::Vector2f size_ = GameObject::getSize_for_Direction(direction, size);
 	this->setPosition_Y_for_Direction(direction, sf::Vector2f(size_.x / 2, (-size_.y / 2) + first_screen_offset), true);

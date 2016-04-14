@@ -172,7 +172,7 @@ void Enemy::UpdateBossPhaseFeedbacks()
 	else
 	{
 		m_bossPhaseBar.setFillColor(sf::Color(GHOST_ALPHA_VALUE, 0, 0, GHOST_ALPHA_VALUE/2));//red
-		m_bossPhaseBarContainer.setFillColor(sf::Color(0, 0, 0, GHOST_ALPHA_VALUE/2));//black
+		m_bossPhaseBarContainer.setFillColor(sf::Color(0, 0, 0, GHOST_ALPHA_VALUE));//black
 	}
 }
 
@@ -299,7 +299,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 		
-		if (m_bouncing != BouncingHorizontal && hyperspeedMultiplier <= 1)
+		if (m_bouncing != BouncingHorizontal)
 		{
 			if (newposition.y < m_size.y / 2)
 			{
@@ -309,7 +309,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
+					printf("speed: %f", m_speed.y);
 					m_currentPhase->m_Pattern->patternSpeed *= -1;
+					printf(", speed: %f\n\n", m_speed.y);
 				}
 				this->setPosition(newposition.x, this->m_size.y / 2);
 			}
@@ -322,7 +324,9 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
+					printf("speed: %f", m_speed.y);
 					m_currentPhase->m_Pattern->patternSpeed *= -1;
+					printf(", speed: %f\n\n", m_speed.y);
 				}
 				this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 			}
