@@ -199,6 +199,7 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
 			boss->m_enemy->setPosition(boss_pos);
 			boss->m_enemy->setRotation(stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_ROTATION]));
+			boss->m_enemy->m_boss = true;
 
 			m_boss_list.push_back(boss);
 			m_generating_boss = true;
@@ -315,12 +316,16 @@ Scene::~Scene()
 			if (m_bg->m_portals[(Directions)i])
 			{
 				m_bg->m_portals[(Directions)i]->m_GarbageMe = true;
+				m_bg->m_portals[(Directions)i]->m_visible = false;
+				m_bg->m_portals[(Directions)i] = NULL;
 			}
 		}
 
 		if (m_bg->m_shop)
 		{
 			m_bg->m_shop->m_GarbageMe = true;
+			m_bg->m_shop->m_visible = false;
+			m_bg->m_shop = NULL;
 		}
 
 		m_bg->m_GarbageMe = true;
@@ -487,15 +492,21 @@ void Scene::GenerateBoss()
 {
 	for (std::vector<EnemyBase*>::iterator it = m_boss_list.begin(); it != m_boss_list.end(); ++it)
 	{
-		Enemy* m_boss = (*it)->m_enemy->Clone();
-		m_boss->m_enemy_class = (EnemyClass)((*it)->m_enemyclass);
-		(*CurrentGame).addToScene(m_boss, EnemyObjectLayer, EnemyObject);
+		Enemy* boss = (*it)->m_enemy->Clone();
+		boss->m_enemy_class = (EnemyClass)((*it)->m_enemyclass);
+		(*CurrentGame).addToScene(boss, EnemyObjectLayer, EnemyObject);
 
-		m_boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) + m_boss->getRotation());
-		m_boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+		if (boss->m_boss)
+		{
+			(*CurrentGame).addToFeedbacks(&boss->m_bossPhaseBarContainer);
+			(*CurrentGame).addToFeedbacks(&boss->m_bossPhaseBar);
+		}
+
+		boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) + boss->getRotation());
+		boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 
 		//counting spawned enemies
-		(*CurrentGame).m_hazardSpawned += m_boss->m_money;
+		(*CurrentGame).m_hazardSpawned += boss->m_money;
 	}
 }
 

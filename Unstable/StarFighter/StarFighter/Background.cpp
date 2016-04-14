@@ -22,6 +22,7 @@ Background::~Background()
 	{
 		m_shop->m_GarbageMe = true;
 		m_shop->m_visible = false;
+		m_shop = NULL;
 	}
 
 	for (int i = 0; i < NO_DIRECTION; i++)
@@ -30,6 +31,7 @@ Background::~Background()
 		{
 			m_portals[(Directions)i]->m_GarbageMe = true;
 			m_portals[(Directions)i]->m_visible = false;
+			m_portals[(Directions)i] = NULL;
 		}
 	}
 }

@@ -85,8 +85,13 @@ public:
 	float m_armorBar_offsetY;
 	float m_shieldBar_offsetY;
 
+	bool m_boss;
+	sf::RectangleShape m_bossPhaseBar;
+	sf::RectangleShape m_bossPhaseBarContainer;
+
 	//float offsetBetweenHealthBars;
 	void RotateFeedbacks(float angle);
+	void UpdateBossPhaseFeedbacks();
 
 	sf::Time m_feedbackTimer;
 

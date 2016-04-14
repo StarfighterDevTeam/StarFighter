@@ -16,6 +16,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_enemyTimer = sf::seconds(0);
 	m_level = 1;
 	m_input_blocker = false;
+	m_boss = false;
 
 	//life bars
 	m_feedbackTimer = sf::seconds(0);
@@ -47,6 +48,20 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	//m_shieldBarContainer->setOutlineColor(sf::Color(0, 255, 255, 128));
 	m_shieldBarContainer.setOrigin(ENEMY_HP_BAR_CONTAINER_SIZE_X / 2, ENEMY_HP_BAR_CONTAINER_SIZE_Y / 2);
 	m_shieldBarContainer.setPosition(getPosition().x, getPosition().y - m_size.y / 2 - 1.5 * ENEMY_HP_BAR_CONTAINER_SIZE_Y - ENEMY_HP_BAR_OFFSET_Y - ENEMY_SHIELD_BAR_OFFSET_Y);
+
+	m_bossPhaseBar.setSize(sf::Vector2f(m_size.x, BOSS_PHASE_BAR_CONTAINER_SIZE_Y));
+	m_bossPhaseBar.setFillColor(sf::Color(255, 0, 0, GHOST_ALPHA_VALUE));//red
+	m_bossPhaseBar.setOutlineThickness(0);
+	m_bossPhaseBar.setOrigin(m_size.x / 2, BOSS_PHASE_BAR_CONTAINER_SIZE_Y / 2);
+	m_bossPhaseBar.setPosition(getPosition().x, SCENE_SIZE_Y - BOSS_PHASE_BAR_CONTAINER_SIZE_Y);
+	m_bossPhaseBar.setSize(getSize_for_Direction((*CurrentGame).m_direction, m_bossPhaseBar.getSize()));
+
+	m_bossPhaseBarContainer.setSize(sf::Vector2f(m_size.x, BOSS_PHASE_BAR_CONTAINER_SIZE_Y));
+	m_bossPhaseBarContainer.setFillColor(sf::Color(0, 0, 0, GHOST_ALPHA_VALUE));//black
+	m_bossPhaseBarContainer.setOutlineThickness(0);
+	m_bossPhaseBarContainer.setOrigin(m_size.x / 2, BOSS_PHASE_BAR_CONTAINER_SIZE_Y / 2);
+	m_bossPhaseBarContainer.setPosition(getPosition().x, SCENE_SIZE_Y - BOSS_PHASE_BAR_CONTAINER_SIZE_Y);
+	m_bossPhaseBarContainer.setSize(getSize_for_Direction((*CurrentGame).m_direction, m_bossPhaseBarContainer.getSize()));
 
 	try
 	{
@@ -119,6 +134,48 @@ void Enemy::UpdateHealthBars()
 	}
 }
 
+void Enemy::UpdateBossPhaseFeedbacks()
+{
+	//boss phase bar
+	int armor_max = m_armor_max;
+	//if (!m_phases.empty())
+	//{
+	//	for (std::vector<ConditionTransition*>::iterator it = (this->m_currentPhase->m_transitions_list.begin()); it != (this->m_currentPhase->m_transitions_list.end()); it++)
+	//	{
+	//		if ((*it)->m_condition == LifePourcentage)
+	//		{
+	//			armor_max = (1 - (*it)->m_value*0.01) * m_armor_max;
+	//			break;
+	//		}
+	//	}
+	//}
+	sf::Vector2f size = sf::Vector2f(1.0f * m_armor / armor_max * m_size.x, BOSS_PHASE_BAR_CONTAINER_SIZE_Y);
+	size = getSize_for_Direction((*CurrentGame).m_direction, size);
+	m_bossPhaseBar.setSize(size);
+
+	float ship_size = (*CurrentGame).m_playerShip->m_fake_ship ? (*CurrentGame).m_playerShip->m_fake_ship->m_size.y : (*CurrentGame).m_playerShip->m_size.y;
+	//sf::Vector2f position = sf::Vector2f(getPosition().x, SCENE_SIZE_Y - ship_size - BOSS_PHASE_BAR_CONTAINER_SIZE_Y - BOSS_PHASE_BAR_MARGIN);
+	sf::Vector2f position = sf::Vector2f(getPosition().x, (*CurrentGame).m_playerShip->getPosition().y + ship_size / 2 + BOSS_PHASE_BAR_CONTAINER_SIZE_Y / 2 + BOSS_PHASE_BAR_MARGIN);
+	if (position.y > SCENE_SIZE_Y - BOSS_PHASE_BAR_CONTAINER_SIZE_Y / 2 - BOSS_PHASE_BAR_MARGIN)
+	{
+		position.y = SCENE_SIZE_Y - BOSS_PHASE_BAR_CONTAINER_SIZE_Y / 2 - BOSS_PHASE_BAR_MARGIN;
+	}
+	position = GameObject::getPosition_for_Direction((*CurrentGame).m_direction, position);
+	m_bossPhaseBar.setPosition(position);
+	m_bossPhaseBarContainer.setPosition(position);
+
+	if ((*CurrentGame).m_waiting_for_dialog_validation || m_immune || m_ghost || !m_visible || (*CurrentGame).m_playerShip->GameObject::compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, getPosition()) == LESSER_THAN)
+	{
+		m_bossPhaseBar.setFillColor(sf::Color(0, 0, 0, 0));
+		m_bossPhaseBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
+	}
+	else
+	{
+		m_bossPhaseBar.setFillColor(sf::Color(GHOST_ALPHA_VALUE, 0, 0, GHOST_ALPHA_VALUE/2));//red
+		m_bossPhaseBarContainer.setFillColor(sf::Color(0, 0, 0, GHOST_ALPHA_VALUE/2));//black
+	}
+}
+
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if (m_feedbackTimer > sf::seconds(0))
@@ -127,6 +184,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		UpdateHealthBars();
 	}
 	
+	UpdateBossPhaseFeedbacks();
+
 	//dialog blocking the update?
 	if ((*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_end_dialog_clock.getElapsedTime().asSeconds() < END_OF_DIALOGS_DELAY)
 	{
@@ -528,6 +587,7 @@ Enemy* Enemy::Clone()
 
 	enemy->m_rotation_speed = this->m_rotation_speed;
 	enemy->setRotation(this->getRotation());
+	enemy->m_boss = this->m_boss;
 
 	if (!m_phases.empty())
 	{
@@ -904,7 +964,7 @@ void Enemy::setPhase(Phase* phase)
 	}
 
 	//waking up enemies
-	if (phase->m_hasWakeUp)
+	if (!phase->m_wake_up_name.empty())
 	{
 		(*CurrentGame).WakeUpEnemiesWithName(phase->m_wake_up_name);
 	}
@@ -1068,7 +1128,6 @@ Phase* Enemy::LoadPhase(string name)
 			if ((*it)[PHASE_WAKEUP].compare("0") != 0)
 			{
 				phase->m_wake_up_name = (*it)[PHASE_WAKEUP];
-				phase->m_hasWakeUp = true;
 			}
 
 			//loading transition to next phase
@@ -1142,13 +1201,16 @@ void Enemy::Death()
 	}
 
 	//phase transition "Death" (post-mortem phase of 1 frame)
-	for (std::vector<ConditionTransition*>::iterator it = m_currentPhase->m_transitions_list.begin(); it != m_currentPhase->m_transitions_list.end(); it++)
+	if (!m_phases.empty())
 	{
-		if ((*it)->m_condition == LifePourcentage && (*it)->m_value == 0 && ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO))
+		for (std::vector<ConditionTransition*>::iterator it = m_currentPhase->m_transitions_list.begin(); it != m_currentPhase->m_transitions_list.end(); it++)
 		{
-			this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+			if ((*it)->m_condition == LifePourcentage && (*it)->m_value == 0 && ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO))
+			{
+				this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+			}
+			break;
 		}
-		break;
 	}
 }
 
@@ -1161,6 +1223,12 @@ Enemy::~Enemy()
 	(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
 	
 	(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
+
+	if (m_boss)
+	{
+		(*CurrentGame).removeFromFeedbacks(&m_bossPhaseBar);
+		(*CurrentGame).removeFromFeedbacks(&m_bossPhaseBarContainer);
+	}
 }
 
 void Enemy::GenerateLoot()
