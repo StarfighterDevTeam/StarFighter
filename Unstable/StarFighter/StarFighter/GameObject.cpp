@@ -291,6 +291,35 @@ void GameObject::GenerateLoot()
 
 }
 
+void GameObject::ShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
+{
+	static double shield_regen_buffer = 0;
+	if (m_shield_max > 0 && m_shield < m_shield_max)
+	{
+		if (hyperspeedMultiplier < 1.0f)
+		{
+			shield_regen_buffer += m_shield_regen * deltaTime.asSeconds() * hyperspeedMultiplier;
+		}
+		else
+		{
+			shield_regen_buffer += m_shield_regen * deltaTime.asSeconds();
+		}
+
+		if (shield_regen_buffer > 1)
+		{
+			double intpart;
+			shield_regen_buffer = modf(shield_regen_buffer, &intpart);
+			m_shield += intpart;
+		}
+
+		//canceling over-regen
+		if (m_shield > m_shield_max)
+		{
+			m_shield = m_shield_max;
+		}
+	}
+}
+
 bool GameObject::GetLoot(GameObject& object)
 {
 	if (this->get_money_from(object) || this->get_equipment_from(object) || this->get_weapon_from(object))

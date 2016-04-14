@@ -217,31 +217,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	}
 
 	//shield regen if not maximum
-	static double shield_regen_buffer = 0;
-	if (m_shield < m_shield_max && m_shield_max > 0)
-	{
-		if (hyperspeedMultiplier < 1.0f)
-		{
-			shield_regen_buffer += m_shield_regen*deltaTime.asSeconds() * hyperspeedMultiplier;
-		}
-		else
-		{
-			shield_regen_buffer += m_shield_regen*deltaTime.asSeconds();
-		}
-		
-		if (shield_regen_buffer > 1)
-		{
-			double intpart;
-			shield_regen_buffer = modf(shield_regen_buffer, &intpart);
-			m_shield += intpart;
-		}
-
-		//canceling over-regen
-		if (m_shield > m_shield_max)
-		{
-			m_shield = m_shield_max;
-		}
-	}
+	ShieldRegen(deltaTime, hyperspeedMultiplier);
 
 	//movement
 	static sf::Vector2f newposition, offset, newspeed;

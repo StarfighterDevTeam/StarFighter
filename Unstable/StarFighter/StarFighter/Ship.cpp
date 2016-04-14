@@ -420,6 +420,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	//Update
 	ManageImmunity();
+	
 	ManageShieldRegen(deltaTime, hyperspeedMultiplier);
 
 	sf::Vector2f directions = InputGuy::getDirections();
@@ -474,34 +475,15 @@ bool Ship::ManageVisibility()
 
 void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	if ((*CurrentGame).m_waiting_for_dialog_validation)
+	{
+		return;
+	}
+
 	//sheld regen if not maximum
 	if (m_shield > 0 || m_shield_recovery_clock.getElapsedTime().asSeconds() > m_shield_recovery_time)
 	{
-		static double shield_regen_buffer = 0;
-		if (m_shield < m_shield_max)
-		{
-			if (hyperspeedMultiplier < 1.0f)
-			{
-				shield_regen_buffer += m_shield_regen * deltaTime.asSeconds() * hyperspeedMultiplier;
-			}
-			else
-			{
-				shield_regen_buffer += m_shield_regen * deltaTime.asSeconds();
-			}
-
-			if (shield_regen_buffer > 1)
-			{
-				double intpart;
-				shield_regen_buffer = modf(shield_regen_buffer, &intpart);
-				m_shield += intpart;
-			}
-
-			//canceling over-regen
-			if (m_shield > m_shield_max)
-			{
-				m_shield = m_shield_max;
-			}
-		}
+		ShieldRegen(deltaTime, hyperspeedMultiplier);
 	}
 }
 
@@ -602,10 +584,12 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		UpdateInputStates();
 
 		//Debug command
-		if (m_inputs_states[Action_DebugCommand] == Input_Tap || m_inputs_states[Action_DebugCommand] == Input_Hold)
-		{
-			(*CurrentGame).killGameObjectLayer(EnemyObject);
-		}
+		#ifndef NDEBUG
+			if (m_inputs_states[Action_DebugCommand] == Input_Tap || m_inputs_states[Action_DebugCommand] == Input_Hold)
+			{
+				(*CurrentGame).killGameObjectLayer(EnemyObject);
+			}
+		#endif
 
 		//Update HUD state
 		UpdateHUDStates();

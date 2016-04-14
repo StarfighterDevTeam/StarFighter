@@ -226,6 +226,7 @@ public:
 	GameObject* Clone();
 	virtual void Death();
 	virtual void GenerateLoot();
+	void ShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 
 	void addMoney(int loot_value);
 	void setMoney(int loot_value);

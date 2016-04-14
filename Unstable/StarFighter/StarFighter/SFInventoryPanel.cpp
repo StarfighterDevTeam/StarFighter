@@ -246,7 +246,10 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				Equipment* obj = object->m_equipment_loot;
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "THRUSTER: " << standard_name;
-				ss_stats << "Hyperspeed: " << obj->m_hyperspeed << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
+				ss_stats.precision(2);
+				ss_stats << "Hyperspeed: " << obj->m_hyperspeed;
+				ss_stats.precision(0);
+				ss_stats<< "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
 				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
@@ -695,14 +698,7 @@ void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 		{
 			screen.draw(m_cursor);
 		}
-		if (m_item_stats_panel)
-		{
-			m_item_stats_panel->Draw(screen);
-		}
-		if (m_item_stats_panel_compare)
-		{
-			m_item_stats_panel_compare->Draw(screen);
-		}
+	
 		if (m_actions)
 		{
 			m_actions->Draw(screen);
@@ -1362,6 +1358,15 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	screen.draw(m_scene_text);
 	screen.draw(m_framerate_text);
 	screen.draw(m_text);
+
+	if (m_item_stats_panel)
+	{
+		m_item_stats_panel->Draw(screen);
+	}
+	if (m_item_stats_panel_compare)
+	{
+		m_item_stats_panel_compare->Draw(screen);
+	}
 }
 
 //TRADE PANEL
@@ -1496,6 +1501,15 @@ void SFTradePanel::Draw(sf::RenderTexture& screen)
 		screen.draw(m_separator);
 		screen.draw(m_title_text);
 		screen.draw(m_title_text2);
+
+		if (m_item_stats_panel)
+		{
+			m_item_stats_panel->Draw(screen);
+		}
+		if (m_item_stats_panel_compare)
+		{
+			m_item_stats_panel_compare->Draw(screen);
+		}
 	}
 }
 
