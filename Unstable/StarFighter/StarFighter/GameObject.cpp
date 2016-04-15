@@ -620,7 +620,7 @@ FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direct
 	{
 		if (this->getPosition().y > target_position.y)
 		{
-			return GREATHER_THAN;
+			return GREATER_THAN;
 		}
 		else if (this->getPosition().y == target_position.y)
 		{
@@ -636,7 +636,7 @@ FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direct
 	{
 		if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
 		{
-			return GREATHER_THAN;
+			return GREATER_THAN;
 		}
 		else if (this->getPosition().y == SCENE_SIZE_Y - target_position.y)
 		{
@@ -652,7 +652,7 @@ FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direct
 	{
 		if (this->getPosition().x < SCENE_SIZE_X - target_position.x)
 		{
-			return GREATHER_THAN;
+			return GREATER_THAN;
 		}
 		if (this->getPosition().x == SCENE_SIZE_X - target_position.x)
 		{
@@ -668,7 +668,7 @@ FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direct
 	{
 		if (this->getPosition().x > target_position.x)
 		{
-			return GREATHER_THAN;
+			return GREATER_THAN;
 		}
 		else if (this->getPosition().x == target_position.x)
 		{
@@ -688,7 +688,7 @@ FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direct
 		{
 			if (this->getPosition().x > target_position.x)
 			{
-				return GREATHER_THAN;
+				return GREATER_THAN;
 			}
 			else if (this->getPosition().x == target_position.x)
 			{
@@ -704,7 +704,7 @@ FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direct
 		{
 			if (this->getPosition().x < SCENE_SIZE_X - target_position.x)
 			{
-				return GREATHER_THAN;
+				return GREATER_THAN;
 			}
 			else if (this->getPosition().x == SCENE_SIZE_X - target_position.x)
 			{
@@ -720,7 +720,7 @@ FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direct
 		{
 			if (this->getPosition().y > target_position.y)
 			{
-				return GREATHER_THAN;
+				return GREATER_THAN;
 			}
 			if (this->getPosition().y == target_position.y)
 			{
@@ -736,7 +736,7 @@ FloatCompare GameObject::compare_posX_withTarget_for_Direction(Directions direct
 		{
 			if (this->getPosition().y < SCENE_SIZE_Y - target_position.y)
 			{
-				return GREATHER_THAN;
+				return GREATER_THAN;
 			}
 			else if (this->getPosition().y == SCENE_SIZE_Y - target_position.y)
 			{

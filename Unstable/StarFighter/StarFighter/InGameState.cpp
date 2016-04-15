@@ -365,7 +365,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			else
 			{
 				//when last screen is reached
-				if (m_currentScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2)) == GREATHER_THAN
+				if (m_currentScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2)) == GREATER_THAN
 					|| m_currentScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(w / 2, h / 2)) == EQUAL_TO)
 				{
 					//Correct the position
@@ -534,7 +534,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 			float wn = m_nextScene->m_bg->m_size.x;
 			float hn = m_nextScene->m_bg->m_size.y;
 			//When the new scene is completely swapped, we can wrap up the replacement and restart scrolling (or do what the Hubs do if the scene is a Hub)
-			if (m_nextScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == GREATHER_THAN
+			if (m_nextScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == GREATER_THAN
 				|| m_nextScene->m_bg->compare_posY_withTarget_for_Direction((*CurrentGame).m_direction, sf::Vector2f(SCENE_SIZE_X - (wn / 2), SCENE_SIZE_Y - (hn / 2))) == EQUAL_TO)
 			{
 

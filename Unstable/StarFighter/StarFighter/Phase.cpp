@@ -70,7 +70,7 @@ ConditionTransition* Phase::ConditionLoader(vector<string> line_data, int index)
 	{
 		if (line_data[index + CONDITION_OPERATOR].compare("greater") == 0)
 		{
-			op = GREATHER_THAN;
+			op = GREATER_THAN;
 		}
 		else if (line_data[index + CONDITION_OPERATOR].compare("lesser") == 0)
 		{

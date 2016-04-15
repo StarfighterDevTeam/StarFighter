@@ -159,7 +159,7 @@ enum FloatCompare
 {
 	LESSER_THAN,
 	EQUAL_TO,
-	GREATHER_THAN,
+	GREATER_THAN,
 	ERROR_COMPARE,
 };
 

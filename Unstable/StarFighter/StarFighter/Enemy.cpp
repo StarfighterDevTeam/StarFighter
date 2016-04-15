@@ -654,7 +654,7 @@ bool Enemy::CheckCondition()
 		
 			case phaseClock:
 			{
-				if ((this->m_phaseTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATHER_THAN)
+				if ((this->m_phaseTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATER_THAN)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					return true;
@@ -670,7 +670,7 @@ bool Enemy::CheckCondition()
 		
 			case enemyClock:
 			{
-				if ((this->m_enemyTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATHER_THAN)
+				if ((this->m_enemyTimer > sf::seconds((*it)->m_value)) && (*it)->m_op == GREATER_THAN)
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 					this->m_enemyTimer = sf::seconds(0);
@@ -693,7 +693,7 @@ bool Enemy::CheckCondition()
 					break;//case of "death" condition handled in method Death(), when the enemy dies precisely
 				}
 
-				if ((100.0f * m_armor / m_armor_max >= (*it)->m_value) && (((*it)->m_op == GREATHER_THAN) || ((*it)->m_op == EQUAL_TO)))
+				if ((100.0f * m_armor / m_armor_max >= (*it)->m_value) && (((*it)->m_op == GREATER_THAN) || ((*it)->m_op == EQUAL_TO)))
 				{
 					this->setPhase(this->getPhase((*it)->m_nextPhase_name));
 
@@ -710,7 +710,7 @@ bool Enemy::CheckCondition()
 			case ShieldPourcentage:
 			{
 				//Caution, we don't want to be diving 0 / 0, so we need to handle separately the cases where ShieldMax worth 0 (enemy using no shield).
-				if ((*it)->m_op == GREATHER_THAN)
+				if ((*it)->m_op == GREATER_THAN)
 				{
 					if (m_shield_max == 0)
 					{
@@ -770,7 +770,7 @@ bool Enemy::CheckCondition()
 			case EnemyProximity:
 			{
 				//float distance = GameObject::GetDistanceBetweenObjects(this, (*CurrentGame).m_playerShip);
-				if ((*it)->m_op == GREATHER_THAN)
+				if ((*it)->m_op == GREATER_THAN)
 				{
 					//if (distance > (*it)->m_value)
 					if ((*CurrentGame).FoundNearestGameObject(PlayerShip, this->getPosition(), (*it)->m_value) == TARGET_OUT_OF_RANGE)
@@ -793,7 +793,7 @@ bool Enemy::CheckCondition()
 
 			case ShotsFired:
 			{
-				if ((*it)->m_op == GREATHER_THAN)
+				if ((*it)->m_op == GREATER_THAN)
 				{
 					if (this->m_shots_fired >= (*it)->m_value)
 					{
