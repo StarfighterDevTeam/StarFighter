@@ -1,9 +1,9 @@
-Engine Engine 1 2 15.0786 2D/Equipment/Thruster.png 48 48 1 0 0 0 1 102 0 0 0 0 0 0
+Engine Engine 6 52 24.9858 2D/Equipment/Thruster.png 48 48 1 0 0 0 1.5 170 0 0 0 0 0 0
 Armor 0
 Shield 0
-Module 0
+Module Module 5 35 16.4865 2D/Equipment/Module.png 48 48 1 0 0 0 0 0 0 0 0 0 0 Bot 1 2D/bot.png 32 32 1 -50 0 0 0 Laser 2D/Equipment/laser_blue1.png 48 48 1 0.088 0 0.8 2 20 0 0 0 Ammo 6 2200 0 2D/Equipment/laser_blue.png 6 32 1 explosion_S_blue 0
 Weapon 0
-0
+Engine Engine 5 34 13.3415 2D/Equipment/Thruster.png 48 48 1 0 0 0 1.4 146 0 0 0 0 0 0
 0
 0
 0

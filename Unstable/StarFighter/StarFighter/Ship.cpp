@@ -2111,7 +2111,7 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		if (!equipment->m_bots.empty())
 		{
 			data << equipment->m_bots.front()->m_display_name << " ";
-			data << equipment->m_bots.size();
+			data << equipment->m_bots.size() << " ";
 			data << equipment->m_bots.front()->m_textureName << " ";
 			data << equipment->m_bots.front()->m_size.x << " ";
 			data << equipment->m_bots.front()->m_size.y << " ";
