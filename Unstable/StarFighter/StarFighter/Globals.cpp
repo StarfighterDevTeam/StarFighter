@@ -12,7 +12,7 @@ sf::RenderWindow *window;
 std::string makePath(const std::string& srcPath)
 {
 #ifdef __APPLE__
-    return resourcePath() + srcPath;
+    return resourcePath() + "Assets/" + srcPath;
 #else
 	return "Assets/" + srcPath;
 #endif
