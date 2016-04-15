@@ -309,9 +309,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
-					printf("speed: %f", m_speed.y);
-					m_currentPhase->m_Pattern->patternSpeed *= -1;
-					printf(", speed: %f\n\n", m_speed.y);
+					m_Pattern.patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, this->m_size.y / 2);
 			}
@@ -324,9 +322,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
-					printf("speed: %f", m_speed.y);
-					m_currentPhase->m_Pattern->patternSpeed *= -1;
-					printf(", speed: %f\n\n", m_speed.y);
+					m_Pattern.patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 			}

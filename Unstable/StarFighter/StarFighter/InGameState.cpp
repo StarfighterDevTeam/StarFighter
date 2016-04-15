@@ -815,6 +815,9 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		//speed
 		(*CurrentGame).m_vspeed = m_currentScene->m_vspeed;
 
+		//rotation
+		(*CurrentGame).m_playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+
 		//position
 		sf::Vector2f ship_pos = sf::Vector2f(SCENE_SIZE_X*STARTSCENE_X_RATIO, SCENE_SIZE_Y*STARTSCENE_X_RATIO);
 		if ((*CurrentGame).m_direction != NO_DIRECTION)

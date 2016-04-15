@@ -25,6 +25,7 @@ void Game::init(RenderWindow* window)
 	m_BeastScoreBonus = 0;
 	m_direction = NO_DIRECTION;
 	m_hyperspeedMultiplier = 1.0f;
+	m_vspeed = 0;
 
 	m_playerShip = NULL;
 	m_waiting_for_dialog_validation = false;
