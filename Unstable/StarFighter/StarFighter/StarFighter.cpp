@@ -122,6 +122,7 @@ int main()
 			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
 			{
 				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
+				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
 			}
 
 			//Pausing
