@@ -1175,6 +1175,13 @@ void Enemy::GenerateLoot()
 
 bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, bool force_BeastScale, float BeastScale_min, float BeastScale_max)
 {
+
+	//Debug commands
+	#ifndef NDEBUG
+		//Enemy::AssignRandomEquipment(Shield, 3, this, 6.f);
+		//return true;
+	#endif
+
 	setMoney(0);
 	double random_number = (double)rand() / (RAND_MAX);
 

@@ -240,14 +240,14 @@ public:
 
 	bool get_equipment_from(GameObject& object);
 	bool setEquipmentLoot(Equipment* equipment);
-	void releaseEquipmentLoot();
 	Equipment* getEquipmentLoot();
 
 	bool get_weapon_from(GameObject& object);
 	bool setWeaponLoot(Weapon* weapon);
-	void releaseWeaponLoot();
 	Weapon* getWeaponLoot();
+	
 	static int GetPrice(int credits, float quality);
+	bool clearLoots();
 
 	InteractionType m_isCollidingWithInteractiveObject;
 	InteractionType m_previouslyCollidingWithInteractiveObject;

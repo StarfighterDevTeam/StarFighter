@@ -374,11 +374,6 @@ Equipment* GameObject::getEquipmentLoot()
 	return m_equipment_loot;
 }
 
-void GameObject::releaseEquipmentLoot()
-{
-	m_equipment_loot = NULL;
-}
-
 bool GameObject::get_weapon_from(GameObject& object)
 {
 	if (object.m_weapon_loot != NULL && m_weapon_loot == NULL)
@@ -411,9 +406,28 @@ Weapon* GameObject::getWeaponLoot()
 	return m_weapon_loot;
 }
 
-void GameObject::releaseWeaponLoot()
+bool GameObject::clearLoots()
 {
-	m_weapon_loot = NULL;
+	bool something_cleared = false;
+	if (m_equipment_loot)
+	{
+		delete m_equipment_loot;
+		m_equipment_loot = NULL;
+		something_cleared = true;
+	}
+	if (m_weapon_loot)
+	{
+		delete m_weapon_loot;
+		m_weapon_loot = NULL;
+		something_cleared = true;
+	}
+	if (m_money > 0)
+	{
+		m_money = 0;
+		something_cleared = true;
+	}
+	
+	return something_cleared;
 }
 
 void GameObject::GetGrazing()
