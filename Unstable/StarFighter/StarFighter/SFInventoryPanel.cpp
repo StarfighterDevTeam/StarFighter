@@ -12,7 +12,6 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		setFillColor(sf::Color(20, 20, 20, 230));//dark grey
 		setOutlineThickness(0);
 		m_comparison = comparison;
-		m_number_of_options = 0;
 
 		if (!comparison)
 		{
@@ -131,8 +130,6 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			{
 				m_actions->m_texts[ActionButton_A].setColor(sf::Color(255, 50, 50, 255));//red
 			}
-
-			m_number_of_options = 1;
 		}
 		//SELL
 		else if (item_state == FocusedItem_SellOrEquip || item_state == FocusedItem_SellOrDesequip)
@@ -142,7 +139,6 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 			ss_sell << "Sell: $" << price;
 			//m_options_text[0].setString(ss_sell.str());
 			m_actions->SetString(ss_sell.str(), ActionButton_A);
-			m_number_of_options = 2;
 
 			//SELL / EQUIP
 			if (item_state == FocusedItem_SellOrEquip)
@@ -162,30 +158,19 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		{
 			//m_options_text[0].setString("Equip");
 			m_actions->SetString("Equip", ActionButton_A);
-			m_number_of_options = 1;
+			m_actions->SetString("(hold) Throw", ActionButton_X);
 		}
 		//DESEQUIP
 		else if (item_state == FocusedItem_Desequip)
 		{
 			//m_options_text[0].setString("Desequip");
 			m_actions->SetString("Desequip", ActionButton_A);
-			m_number_of_options = 1;
+			m_actions->SetString("hold) Throw", ActionButton_X);
 		}
 
 		//options texts
 		text_height += INTERACTION_INTERBLOCK + m_text.getGlobalBounds().height;
 		m_actions->SetPosition(sf::Vector2f(getPosition().x - (getSize().x / 2) + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-
-		//for (size_t i = 0; i < 2; i++)
-		//{
-		//	text_height += INTERACTION_INTERLINE;
-		//	text_height += m_options_text[i].getGlobalBounds().height;
-		//	m_options_text[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2), getPosition().y - getSize().y / 2 + text_height);
-		//}
-		//for (size_t i = 0; i < m_number_of_options; i++)
-		//{
-		//	m_buttons[i].setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES - (getSize().x / 2) - INTERACTION_BUTTON_MARGIN, m_options_text[i].getPosition().y + m_options_text[i].getCharacterSize() - 7);
-		//}
 	}
 }
 
@@ -786,7 +771,10 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid()
 		//item hovered
 		if (m_focused_item)
 		{
-			m_cursor.setAnimationLine(Cursor_ActionState);
+			if (!m_has_prioritary_feedback)
+			{
+				m_cursor.setAnimationLine(Cursor_ActionState);
+			}
 
 			//update item stats panel
 			if (previous_focused_item != m_focused_item)
@@ -820,6 +808,7 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid()
 		//empty cell
 		else
 		{
+			
 			m_cursor.setAnimationLine(Cursor_HighlightState);
 
 			//destroy stats panels
@@ -942,18 +931,6 @@ void SFInventoryPanel::SetItemsStatsPanelIndex(int index)
 	if (m_item_stats_panel)
 	{
 		m_item_stats_panel->m_selected_option_index = index;
-	}
-}
-
-int SFInventoryPanel::GetItemsStatsPanelNumberOfOptions()
-{
-	if (m_item_stats_panel)
-	{
-		return m_item_stats_panel->m_number_of_options;
-	}
-	else
-	{
-		return -1;
 	}
 }
 

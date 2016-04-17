@@ -90,7 +90,6 @@ public:
 	sf::Text m_text;
 	bool m_visible;
 	SFPanelTypes m_panel_type;
-	size_t m_number_of_options;
 
 	SFActionBox* m_actions;
 
@@ -116,7 +115,6 @@ public:
 	virtual float GetDurationClockElpased();
 	virtual int GetItemsStatsPanelIndex();
 	virtual void SetItemsStatsPanelIndex(int index);
-	virtual int GetItemsStatsPanelNumberOfOptions();
 	
 	virtual Dialog* GetDialog();
 

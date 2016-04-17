@@ -11,13 +11,9 @@ public:
 	void DisplayItemStats(GameObject* object);
 	void Draw(sf::RenderTexture& screen) override;
 
-	//GameObject m_buttons[4];
-	//sf::Text m_options_text[2];
 	int m_selected_option_index;
 	bool m_comparison;
-
 	sf::RectangleShape m_overblock;
-
 	sf::Text m_title_text_comparison;
 };
 
@@ -44,7 +40,6 @@ public:
 	void ForceCursorOnEquivalentObjectInGrid(GameObject* focused_object, ObjectGrid* fake_grid) override;
 	int GetItemsStatsPanelIndex() override;
 	void SetItemsStatsPanelIndex(int index) override;
-	int GetItemsStatsPanelNumberOfOptions() override;
 
 	SFInventoryPanel* Clone();
 	static void UpdateBackgroundColors(ObjectGrid* color_grid, ObjectGrid* object_grid);

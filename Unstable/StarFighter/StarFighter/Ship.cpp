@@ -636,10 +636,10 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				DesequipItem();
 			}
 			//Garbaging item
-			//else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_SFHudPanel->GetFocusedItem())
-			//{
-			//	GarbagingItem();
-			//}
+			else if ((m_inputs_states[Action_Braking] == Input_Tap || m_inputs_states[Action_Braking] == Input_Hold) && m_SFHudPanel->GetFocusedItem())
+			{
+				GarbagingItem();
+			}
 			else
 			{
 				m_SFHudPanel->SetPrioritaryFeedback(false);
@@ -705,20 +705,6 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					}
 				}
 			}
-
-			//Up and down in options
-			//if (m_SFTargetPanel->GetItemStatsPanel())
-			//{
-			//	if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() < m_SFTargetPanel->GetItemsStatsPanelNumberOfOptions() - 1)
-			//	{
-			//		m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() + 1);
-			//	}
-			//	else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && m_SFTargetPanel->GetItemsStatsPanelIndex() > 0)
-			//	{
-			//		m_SFTargetPanel->SetItemsStatsPanelIndex(m_SFTargetPanel->GetItemsStatsPanelIndex() - 1);
-			//	}
-			//}
-			//
 
 			//exit
 			if (m_inputs_states[Action_Slowmotion] == Input_Tap)
@@ -1391,10 +1377,8 @@ void Ship::GarbagingItem()
 					equip_type = m_SFHudPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
 				}
 				//garbage in hud
-				int grid_id_ = m_SFHudPanel->GetFocusedGrid();
-				int index_ = m_SFHudPanel->GetGrid(false, grid_id_)->GetIntIndex(m_SFHudPanel->GetFocusedIndex());
-				delete m_SFHudPanel->GetGrid(false, grid_id_)->grid[m_SFHudPanel->GetFocusedIndex().x][m_SFHudPanel->GetFocusedIndex().y];
-				m_SFHudPanel->GetGrid(false, grid_id_)->setCellPointerForIntIndex(index_, NULL);
+				delete m_SFHudPanel->GetGrid(false, m_SFHudPanel->GetFocusedGrid())->grid[m_SFHudPanel->GetFocusedIndex().x][m_SFHudPanel->GetFocusedIndex().y];
+				m_SFHudPanel->GetGrid(false, m_SFHudPanel->GetFocusedGrid())->setCellPointerForIntIndex(m_SFHudPanel->GetFocusedIntIndex(), NULL);
 
 				//garbage for real
 				if (m_SFHudPanel->GetFocusedGrid() == Trade_EquippedGrid)

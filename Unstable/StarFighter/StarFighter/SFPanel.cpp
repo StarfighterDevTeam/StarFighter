@@ -298,12 +298,6 @@ void SFPanel::SetItemsStatsPanelIndex(int index)
 	//see override function in SFTradePanel and other types of SF panels
 }
 
-int SFPanel::GetItemsStatsPanelNumberOfOptions()
-{
-	return -1;
-	//see override function in SFTradePanel and other types of SF panels
-}
-
 int SFPanel::GetTeleportationCost()
 {
 	return -1;
