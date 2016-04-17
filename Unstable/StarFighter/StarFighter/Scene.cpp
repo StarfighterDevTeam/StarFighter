@@ -199,7 +199,6 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
 			boss->m_enemy->setPosition(boss_pos);
 			boss->m_enemy->setRotation(stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_ROTATION]));
-			boss->m_enemy->m_boss = true;
 
 			m_boss_list.push_back(boss);
 			m_generating_boss = true;
@@ -497,12 +496,6 @@ void Scene::GenerateBoss()
 		Enemy* boss = (*it)->m_enemy->Clone();
 		boss->m_enemy_class = (EnemyClass)((*it)->m_enemyclass);
 		(*CurrentGame).addToScene(boss, EnemyObjectLayer, EnemyObject);
-
-		if (boss->m_boss)
-		{
-			(*CurrentGame).addToFeedbacks(&boss->m_bossPhaseBarContainer);
-			(*CurrentGame).addToFeedbacks(&boss->m_bossPhaseBar);
-		}
 
 		boss->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) + boss->getRotation());
 		boss->RotateFeedbacks(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));

@@ -1894,27 +1894,30 @@ float Ship::getShipBeastScore()
 
 void Ship::GetDamageFrom(GameObject& object)
 {
-	if (!m_immune)
+	if (m_immune || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
 	{
-		if (!m_ship_model->m_fake_textureName.empty())
-		{
-			assert(m_fake_ship != NULL);
-			m_fake_ship->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
-		}
-		this->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
-
-		if (object.m_damage > m_shield)
-		{
-			m_armor -= (object.m_damage - m_shield);
-			m_shield = 0;
-		}
-		else
-		{
-			m_shield -= object.m_damage;
-		}
-
-		m_shield_recovery_clock.restart();
+		return;
 	}
+
+	if (!m_ship_model->m_fake_textureName.empty())
+	{
+		assert(m_fake_ship != NULL);
+		m_fake_ship->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+	}
+	this->setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+
+	if (object.m_damage > m_shield)
+	{
+		m_armor -= (object.m_damage - m_shield);
+		m_shield = 0;
+	}
+	else
+	{
+		m_shield -= object.m_damage;
+	}
+
+	m_shield_recovery_clock.restart();
+	
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;
 	if (m_combo_aura)
