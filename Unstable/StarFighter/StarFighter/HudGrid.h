@@ -7,6 +7,13 @@ enum SlotFeedbackStates
 {
 	Slot_NormalState,
 	Slot_HighlightState,
+	Slot_GreyState,
+	Slot_EngineFake,
+	Slot_ArmorFake,
+	Slot_ShieldFake,
+	Slot_ModuleFake,
+	Slot_WeaponFake,
+	Slot_NBVALFeedbackStates,
 };
 
 enum CursorFeedbackStates

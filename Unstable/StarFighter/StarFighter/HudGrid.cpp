@@ -17,7 +17,7 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 			if (fill_with_fake)
 			{
 				GameObject* empty_slot = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE),
-					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, EMPTYSLOT_ANIMATION_NUMBER);
+					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, Slot_NBVALFeedbackStates);
 
 				empty_slot->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
 
@@ -26,7 +26,7 @@ ObjectGrid::ObjectGrid(sf::Vector2f position, sf::Vector2i squares, bool fill_wi
 			else if (fill_with_grey)
 			{
 				GameObject* grey_slot = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), EMPTYSLOT_FILENAME, sf::Vector2f(GRID_SLOT_SIZE, GRID_SLOT_SIZE),
-					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, EMPTYSLOT_ANIMATION_NUMBER);
+					sf::Vector2f(GRID_SLOT_SIZE / 2, GRID_SLOT_SIZE / 2), 1, Slot_NBVALFeedbackStates);
 
 				grey_slot->setPosition(sf::Vector2f((GRID_SLOT_SIZE / 2) + position.x + (j * GRID_SLOT_SIZE), (GRID_SLOT_SIZE / 2) + position.y + (i * GRID_SLOT_SIZE)));
 

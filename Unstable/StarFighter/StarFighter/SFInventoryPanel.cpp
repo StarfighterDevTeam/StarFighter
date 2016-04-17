@@ -715,6 +715,22 @@ GameObject* SFInventoryPanel::GetHoveredObjectInGrid()
 		{
 			m_fake_grid[i]->ClearHighlight();
 		}
+
+		if (i == Trade_EquippedGrid)
+		{
+			//reset empty slots feebdacks
+			for (int j = 0; j < NBVAL_Equipment + 1; j++)
+			{
+				if (m_grid[Trade_EquippedGrid]->grid[0][j])
+				{
+					m_fake_grid[Trade_EquippedGrid]->grid[0][j]->setAnimationLine(Slot_NormalState);
+				}
+				else
+				{
+					m_fake_grid[Trade_EquippedGrid]->grid[0][j]->setAnimationLine(Slot_EngineFake + j);
+				}
+			}
+		}
 	}
 
 	//getting hovered cell's index
@@ -961,6 +977,12 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 	m_quality_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false, false, true);
 	m_grey_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false, true, false);
 	SetGridSlotsVisibility(m_grey_grid[Trade_EquippedGrid], true);
+
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Engine]->setAnimationLine(Slot_EngineFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Armor]->setAnimationLine(Slot_ArmorFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Shield]->setAnimationLine(Slot_ShieldFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Module]->setAnimationLine(Slot_ModuleFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][NBVAL_Equipment]->setAnimationLine(Slot_WeaponFake);
 
 	if (playerShip)
 	{
@@ -1402,6 +1424,12 @@ SFTradePanel::SFTradePanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPan
 	m_fake_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), true);
 	m_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false);
 	m_quality_grid[Trade_EquippedGrid] = new ObjectGrid(sf::Vector2f(INTERACTION_PANEL_MARGIN_SIDES, SHIP_GRID_OFFSET_POS_Y), sf::Vector2i(SHIP_GRID_NB_LINES, SHIP_GRID_NB_ROWS), false, false, true);
+
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Engine]->setAnimationLine(Slot_EngineFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Armor]->setAnimationLine(Slot_ArmorFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Shield]->setAnimationLine(Slot_ShieldFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][Module]->setAnimationLine(Slot_ModuleFake);
+	m_fake_grid[Trade_EquippedGrid]->grid[0][NBVAL_Equipment]->setAnimationLine(Slot_WeaponFake);
 
 	//texts
 	if (playerShip)
