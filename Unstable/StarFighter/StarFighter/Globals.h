@@ -86,7 +86,7 @@ std::string makePath(const std::string& srcPath);
 #define FUEL_BAR_SIZE_Y									14
 #define XP_BAR_SIZE_X									320
 #define XP_BAR_SIZE_Y									16
-#define GRID_POSITION_Y									420
+#define GRID_POSITION_Y									360
 
 //INTERACTION PANEL
 #define INTERACTION_PANEL_OFFSET_Y				20

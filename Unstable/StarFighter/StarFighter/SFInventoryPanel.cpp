@@ -1005,46 +1005,6 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_fuel_text.setCharacterSize(10);
 		m_fuel_text.setColor(_white);
 
-		//inventory grids
-
-		//positioning panel content
-		//float text_height = 0;
-		//text_height += m_title_text.getGlobalBounds().height / 2;
-		//m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
-		//
-		//text_height += INTERACTION_INTERBLOCK;
-		//text_height += INTERACTION_INTERBLOCK;
-
-		//m_fake_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-		//
-		//m_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-		//
-		//m_quality_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-		//
-		//if (m_use_two_grids)
-		//{
-		//	text_height += INTERACTION_INTERBLOCK + m_fake_grid.squares.y*GRID_SLOT_SIZE;
-		//	m_fake_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-		//	m_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-		//	m_quality_grid2.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-		//}
-		//
-		//if (m_is_shop)
-		//{
-		//	m_grey_grid.SetGridPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
-		//}
-
-		//text_height += m_fake_grid.squares.y * GRID_SLOT_SIZE + ((int)m_use_two_grids * m_fake_grid2.squares.y * GRID_SLOT_SIZE) + INTERACTION_INTERBLOCK - m_actions_text.getGlobalBounds().height / 2;
-		//text_height += INTERACTION_INTERBLOCK + INTERACTION_INTERBLOCK;//don't know why but it's currently required to get to the correct position
-		//m_actions_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
-		//text_height += m_actions_text.getGlobalBounds().height;
-		//
-		////init cursor position on first cell
-		//if (m_fake_grid.grid[0][0])
-		//{
-		//	m_cursor.setPosition(m_fake_grid.grid[0][0]->getPosition().x, m_fake_grid.grid[0][0]->getPosition().y);
-		//}
-
 		//lower part
 		m_money_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_money_text.setCharacterSize(20);
@@ -1076,6 +1036,16 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 
 		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
+		m_equipment_title.setFont(*(*CurrentGame).m_font[Font_Terminator]);
+		m_equipment_title.setCharacterSize(14);
+		m_equipment_title.setColor(sf::Color::White);
+		m_equipment_title.setString("EQUIPMENT");
+
+		m_inventory_title.setFont(*(*CurrentGame).m_font[Font_Terminator]);
+		m_inventory_title.setCharacterSize(14);
+		m_inventory_title.setColor(sf::Color::White);
+		m_inventory_title.setString("INVENTORY");
+
 		//positioning panel content
 		float text_height = 0;
 		text_height += 10;
@@ -1101,19 +1071,25 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 
 		//grids
 		text_height = GRID_POSITION_Y;
+		m_equipment_title.setPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
+		text_height += m_equipment_title.getCharacterSize() + INTERACTION_INTERLINE*2;
+
 		m_fake_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_quality_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_grey_grid[Trade_EquippedGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 	
 		text_height += INTERACTION_INTERBLOCK + m_fake_grid[Trade_EquippedGrid]->squares.x*GRID_SLOT_SIZE;
+		m_inventory_title.setPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
+		text_height += m_inventory_title.getCharacterSize() + INTERACTION_INTERLINE * 2;
+
 		m_fake_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_quality_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 		m_grey_grid[Trade_StashGrid]->SetGridPosition(sf::Vector2f(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height));
 
 		//lower part
-		text_height += INTERACTION_INTERBLOCK + m_fake_grid[Trade_StashGrid]->squares.x*GRID_SLOT_SIZE;
+		text_height += INTERACTION_INTERBLOCK*2 + m_fake_grid[Trade_StashGrid]->squares.x*GRID_SLOT_SIZE;
 		m_money_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 
 		text_height += m_money_text.getCharacterSize();
@@ -1145,6 +1121,18 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	SFInventoryPanel::Update(deltaTime, inputs_directions);
+
+	if (m_cursor.m_visible)
+	{
+		m_equipment_title.setColor(sf::Color(255, 255, 255, 255));
+		m_inventory_title.setColor(sf::Color(255, 255, 255, 255));
+	}
+	else
+	{
+		m_equipment_title.setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+		m_inventory_title.setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+	}
+	
 
 	for (int i = 0; i < NBVAL_TradeGrids; i++)
 	{
@@ -1331,6 +1319,9 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	screen.draw(black_background);
 
 	SFInventoryPanel::Draw(screen);
+
+	screen.draw(m_equipment_title);
+	screen.draw(m_inventory_title);
 
 	screen.draw(m_armorBarContainer);
 	screen.draw(m_armorBar);
