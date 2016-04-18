@@ -1,6 +1,4 @@
 #,filename,width,height,vspeed,Vertical/Horizontal,Size Stellarmap,
 bg,2D/Backgrounds/BGSandbox.png,1200,1200,100,H,1,
 #,enemies_name,proba,enemy_class,level,spawnCost,repeatChance,missChance
-enemy,V_Alpha2,0,1,1,1,0,0
-#,boss_name,enemy_class,spawnX,spawnY,rotation,,
-boss,V_AlphaGold1,5,0.3,-0.15,0,,
+enemy,V_Sigma1,1,1,1,1,0,0

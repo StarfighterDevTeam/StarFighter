@@ -23,8 +23,8 @@ V_Alpha2_Entry,180,0,,,,0,,,0.5f,0,,,,0,,,,0,,,,0,,,,0,,,0,0,ghost,0,0,0,,positi
 V_Alpha2_StrafeRandom,0,V_Alpha2_laserInt,V_laserM,0,0,V_Alpha2_laserExt,V_laserM,0,0.5f,0,,,,0,,,,0,,,,0,,,,line,100,0,0,0,bouncing,0,0,0,,enemyClock,greater,15,V_Alpha2_Exit,0,,,,0
 V_Alpha2_Exit,-100,V_Alpha2_laserInt,V_laserM,0,0,V_Alpha2_laserExt,V_laserM,0,0.5f,0,,,,0,,,,0,,,,0,,,,0,8,1000,0,0,0,0,0,0,,0,,,,0,,,,0
 V_Alpha3_Entry,120,V_Alpha3_laser,V_laserM,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,0,0,0,0,0,0,,0,,,,0,,,,0
-V_Sigma1_Entry,200,V_Sigma1_laser,V_laserM_abitslow,0,0,V_Sigma1_laser90,V_laserM_abitslow,0,0,V_Sigma1_laser180,V_laserM_abitslow,0,0,V_Sigma1_laser270,V_laserM_abitslow,0,0,0,,,,0,,,,line,250,0,0,150,bouncing,0,0,0,,phaseClock,greater,15,V_Sigma1_Exit,0,,,,0
-V_Sigma1_Exit,200,V_Sigma1_laser,V_laserM_abitslow,0,0,V_Sigma1_laser90,V_laserM_abitslow,0,0,V_Sigma1_laser180,V_laserM_abitslow,0,0,V_Sigma1_laser270,V_laserM_abitslow,0,0,0,,,,0,,,,line,250,0,0,150,bouncingH,0,0,0,,0,,,,0,,,,0
+V_Sigma1_Entry,80,V_Sigma1_laser,V_laserM_abitslow,0,0,V_Sigma1_laser90,V_laserM_abitslow,0,0,V_Sigma1_laser180,V_laserM_abitslow,0,0,V_Sigma1_laser270,V_laserM_abitslow,0,0,0,,,,0,,,,line,250,0,0,150,bouncingH,0,0,0,,positionV,greater,550,V_Sigma1_Exit,0,,,,0
+V_Sigma1_Exit,300,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,line,250,0,0,150,bouncingH,0,0,0,,0,,,,0,,,,0
 V_Sigma2_Entry,300,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,300,0,0,150,ghost,0,0,0,,positionV,greater,400,V_Sigma2_Routine,0,,,,0
 V_Sigma2_Routine,-50,V_Sigma2_laser,V_laserM_abitslow,0,0,V_Sigma2_laser90,V_laserM_abitslow,0,0,V_Sigma2_laser180,V_laserM_abitslow,0,0,V_Sigma2_laser270,V_laserM_abitslow,0,0,0,,,,0,,,,line,200,0,0,250,bouncingH,0,0,0,,phaseClock,greater,15,V_Sigma2_Exit,0,,,,0
 V_Sigma2_Exit,-50,V_Sigma2_laser,V_laserM_abitslow,0,0,V_Sigma2_laser90,V_laserM_abitslow,0,0,V_Sigma2_laser180,V_laserM_abitslow,0,0,V_Sigma2_laser270,V_laserM_abitslow,0,0,0,,,,0,,,,line,200,0,0,250,bouncingH,0,0,0,,0,,,,0,,,,0

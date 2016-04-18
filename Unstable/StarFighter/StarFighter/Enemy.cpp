@@ -211,7 +211,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 
 	if (m_bouncing != NoBouncing)
 	{
-		if (m_bouncing != BouncingVertical)
+		if ((m_bouncing != BouncingVertical && ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN))
+			|| (m_bouncing != BouncingHorizontal && ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)))
 		{
 			if (newposition.x < this->m_size.x / 2)
 			{
@@ -240,7 +241,8 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 		}
 		
-		if (m_bouncing != BouncingHorizontal)
+		if ((m_bouncing != BouncingHorizontal && ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN))
+			|| (m_bouncing != BouncingVertical && ((*CurrentGame).m_direction == DIRECTION_LEFT || (*CurrentGame).m_direction == DIRECTION_RIGHT)))
 		{
 			if (newposition.y < m_size.y / 2)
 			{
