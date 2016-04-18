@@ -151,6 +151,8 @@ void ObjectGrid::Draw(sf::RenderTexture& offscreen)
 			{
 				if (grid[i][j] && grid[i][j]->m_visible)
 				{
+					sf::Text item_level;
+					item_level.setCharacterSize(14);
 					offscreen.draw(*grid[i][j]);
 				}
 			}

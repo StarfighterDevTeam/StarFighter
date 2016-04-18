@@ -654,6 +654,51 @@ EquipmentQuality SFInventoryPanel::GetItemQualityClass(float quality)
 	}
 }
 
+void SFInventoryPanel::DrawItemLevels(sf::RenderTexture& screen)
+{
+	for (int i = 0; i < NBVAL_TradeGrids; i++)
+	{
+		if (m_grid[i])
+		{
+			for (int j = 0; j < m_grid[i]->squares.x; j++)
+			{
+				for (int k = 0; k < m_grid[i]->squares.y; k++)
+				{
+					if (m_grid[i]->grid[j][k])
+					{
+						sf::Text item_level;
+						item_level.setCharacterSize(11);
+
+						if (m_cursor.m_visible)
+						{
+							item_level.setColor(sf::Color(255, 255, 255, 255));
+						}
+						else
+						{
+							item_level.setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE/2));
+						}
+						
+						item_level.setFont(*(*CurrentGame).m_font[Font_Terminator]);
+						int equip_type = m_grid[i]->grid[j][k]->m_equipment_loot ? m_grid[i]->grid[j][k]->m_equipment_loot->m_equipmentType : (m_grid[i]->grid[j][k]->m_weapon_loot ? NBVAL_Equipment : -1);
+						ostringstream ss;
+						if (equip_type == NBVAL_Equipment)
+						{
+							ss << m_grid[i]->grid[j][k]->m_weapon_loot->m_level;
+						}
+						else if (equip_type >= 0 && equip_type < NBVAL_Equipment)
+						{
+							ss << m_grid[i]->grid[j][k]->m_equipment_loot->m_level;
+						}
+						item_level.setString(ss.str());
+						item_level.setPosition(sf::Vector2f(m_grid[i]->grid[j][k]->getPosition().x + m_grid[i]->grid[j][k]->m_size.x / 2 - item_level.getGlobalBounds().width *3/4, m_grid[i]->grid[j][k]->getPosition().y + m_grid[i]->grid[j][k]->m_size.y / 2 - item_level.getCharacterSize()*3/4));
+						screen.draw(item_level);
+					}
+				}
+			}
+		}
+	}
+}
+
 void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 {
 	if (m_visible)
@@ -679,6 +724,8 @@ void SFInventoryPanel::Draw(sf::RenderTexture& screen)
 				m_grey_grid[i]->Draw(screen);
 			}
 		}
+
+		DrawItemLevels(screen);
 
 		screen.draw(m_title_text);
 		if (m_cursor.m_visible)

@@ -24,6 +24,7 @@ public:
 	~SFInventoryPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
+	void DrawItemLevels(sf::RenderTexture& screen);
 	GameObject* GetCursor() override;
 	GameObject* GetFocusedItem() override;
 
