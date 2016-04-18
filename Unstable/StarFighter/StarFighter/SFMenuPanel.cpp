@@ -112,7 +112,7 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 				}
 				else if (m_playerShip->m_targetPortal->m_level + i == m_playerShip->m_level +1)
 				{
-					m_actions_with_selection->m_texts[i].setColor(sf::Color(255, 40, 40, 255));//red
+					m_actions_with_selection->m_texts[i].setColor(sf::Color(240, 150, 60, 255));//orange
 				}
 				else if (m_playerShip->m_targetPortal->m_level + i > m_playerShip->m_level + 1)
 				{
