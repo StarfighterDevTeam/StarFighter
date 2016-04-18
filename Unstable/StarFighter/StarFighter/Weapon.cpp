@@ -406,7 +406,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 	
-	int cost_per_multishot;
+	int cost_per_multishot = 0;
 	//Spending credits on the possible bonuses
 	int bonus_multishot = 0;
 	int bonus_damage = 0;

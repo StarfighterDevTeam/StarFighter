@@ -98,14 +98,30 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 				//ss << "-> Score 100.0% to unlock next hazard level";
 			}
 			m_actions_with_selection->AddOption(ss.str(), (*CurrentGame).m_font[Font_Arial]);
-
+			
+			//text color
 			if (i > m_playerShip->m_targetPortal->m_max_unlocked_hazard_level)
 			{
 				m_actions_with_selection->m_texts[i].setColor(sf::Color(80, 80, 80, 255));//greyed
 			}
 			else
 			{
-				m_actions_with_selection->m_texts[i].setColor(sf::Color(255, 255, 255, 255));//white
+				if (m_playerShip->m_targetPortal->m_level + i < m_playerShip->m_level)
+				{
+					m_actions_with_selection->m_texts[i].setColor(sf::Color(40, 255, 40, 255));//green
+				}
+				else if (m_playerShip->m_targetPortal->m_level + i == m_playerShip->m_level +1)
+				{
+					m_actions_with_selection->m_texts[i].setColor(sf::Color(255, 40, 40, 255));//red
+				}
+				else if (m_playerShip->m_targetPortal->m_level + i > m_playerShip->m_level + 1)
+				{
+					m_actions_with_selection->m_texts[i].setColor(sf::Color(255, 40, 40, 255));//red
+				}
+				else
+				{
+					m_actions_with_selection->m_texts[i].setColor(sf::Color::White);
+				}
 			}
 		}
 

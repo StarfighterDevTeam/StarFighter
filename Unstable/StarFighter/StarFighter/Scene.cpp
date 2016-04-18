@@ -124,6 +124,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 					//Getting the string of the "display name" for a each linked scene
 					m_bg->m_portals[(Directions)i]->m_display_name = (*CurrentGame).m_generalScenesConfig[m_links[(Directions)i]][SCENE_DISPLAYNAME];
 
+					//Getting the level of each linked scene
+					m_bg->m_portals[(Directions)i]->m_level = stoi((*CurrentGame).m_generalScenesConfig[m_links[(Directions)i]][SCENE_LEVEL]);
+
 					//Displaying the portals
 					(*CurrentGame).addToScene(m_bg->m_portals[(Directions)i], PortalLayer, PortalObject);
 				}

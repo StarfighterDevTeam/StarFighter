@@ -34,6 +34,7 @@ public:
 	sf::Vector2f m_offset;//respect to the background
 	PortalState m_state;
 	Directions m_direction;
+	int m_level;
 };
 
 #endif //PORTAL_H_INCLUDED
