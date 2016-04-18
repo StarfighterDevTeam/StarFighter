@@ -312,7 +312,14 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 
 	for (int i = 0; i < number_of_bots; i++)
 	{
-		equipment->m_bots.push_back(bot);
+		if (i == 0)
+		{
+			equipment->m_bots.push_back(bot);
+		}
+		else
+		{
+			equipment->m_bots.push_back(bot->Clone());
+		}
 	}
 
 	//saving level and credits used

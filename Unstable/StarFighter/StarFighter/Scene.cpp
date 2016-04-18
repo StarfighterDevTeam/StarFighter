@@ -150,10 +150,14 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			(*CurrentGame).addToScene(m_bg->m_shop, PortalLayer, ShopObject);
 
 			//creating shop content
-			Ship::FillShopWithRandomObjets(NUMBER_OF_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_ALPHA);
-			Ship::FillShopWithRandomObjets(NUMBER_OF_RARE_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_BETA);
-			LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Filling scene '%s' shop with new items.\n", (char*)name.c_str()));
-
+			//Ship::FillShopWithRandomObjets(NUMBER_OF_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_ALPHA, -1);
+			//Ship::FillShopWithRandomObjets(NUMBER_OF_RARE_OBJECTS_GENERATED_IN_SHOP, m_bg->m_shop, ENEMYPOOL_BETA, -1);
+			//LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Filling scene '%s' shop with new items.\n", (char*)name.c_str()));
+			Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Engine);
+			Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Armor);
+			Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Shield);
+			Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)Module);
+			Ship::FillShopWithRandomObjets(1, m_bg->m_shop, ENEMYPOOL_ALPHA, (int)NBVAL_Equipment);
 		}
 		//Loading enemies
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("enemy") == 0)

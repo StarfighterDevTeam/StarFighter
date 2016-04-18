@@ -1178,7 +1178,7 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 
 	//Debug commands
 	#ifndef NDEBUG
-		//Enemy::AssignRandomEquipment(Shield, 3, this, 6.f);
+		//Enemy::AssignRandomEquipment(Module, 50, this, 6.f);
 		//return true;
 	#endif
 

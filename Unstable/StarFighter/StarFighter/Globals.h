@@ -211,6 +211,8 @@ std::string makePath(const std::string& srcPath);
 #define MIN_VALUE_OF_MULTISHOT							2
 #define MAX_RATE_OF_FIRE_BONUS							90
 #define MIN_WEAPON_XSPREAD								10
+#define MIN_MULTISHOTS_FOR_DISPERSION					5
+#define MIN_MULTISHOTS_FOR_DISPERSION_FOR_BOT			4
 
 //HYPERSPEED
 #define HYPERSPEED_CONSUMPTION_FOR_CRUISING				1
@@ -241,6 +243,10 @@ std::string makePath(const std::string& srcPath);
 #define ASSUMED_BOT_SIZE								32
 #define WEAPON_MIN_VSPEED_VALUE							300
 #define WEAPON_CHANCE_OF_ALTERNATE						0.3f
+#define WEAPON_CHANCE_OF_DISPERSION						0.3f
+#define WEAPON_MIN_DISPERSION							30
+#define WEAPON_MAX_DISPERSION							120
+#define WEAPON_MAX_DISPERSION_FOR_BOT					45
 
 //TEXTPOP FEEDBACK
 #define MONEY_LOOT_DISPLAY_NOT_FADED_TIME				0.8f

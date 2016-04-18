@@ -165,7 +165,7 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		{
 			//m_options_text[0].setString("Desequip");
 			m_actions->SetString("Desequip", ActionButton_A);
-			m_actions->SetString("hold) Throw", ActionButton_X);
+			m_actions->SetString("(hold) Throw", ActionButton_X);
 		}
 
 		//options texts
@@ -288,7 +288,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 
 					if (obj->m_bots.front()->m_weapon->m_multishot > 1)
 					{
-						ss_stats << "\nMultishot: " << obj->m_bots.front()->m_weapon->m_multishot << "\nSpread: " << obj->m_bots.front()->m_weapon->m_xspread << "\nDispersion: " << obj->m_bots.front()->m_weapon->m_dispersion << "°";
+						//ss_stats << "\nMultishot: " << obj->m_bots.front()->m_weapon->m_multishot << "\nSpread: " << obj->m_bots.front()->m_weapon->m_xspread << "\nDispersion: " << obj->m_bots.front()->m_weapon->m_dispersion << "°";
+						ss_stats << "\nMultishot: " << obj->m_bots.front()->m_weapon->m_multishot << "\nDispersion: " << obj->m_bots.front()->m_weapon->m_dispersion << "°";
 					}
 					else
 					{
@@ -373,7 +374,8 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 
 				if (obj->m_multishot > 1)
 				{
-					ss_stats << "\nMultishot: " << obj->m_multishot << "\nSpread: " << obj->m_xspread << "\nDispersion: " << obj->m_dispersion << "°";
+					//ss_stats << "\nMultishot: " << obj->m_multishot << "\nSpread: " << obj->m_xspread << "\nDispersion: " << obj->m_dispersion << "°";
+					ss_stats << "\nMultishot: " << obj->m_multishot << "\nDispersion: " << obj->m_dispersion << "°";
 				}
 				else
 				{

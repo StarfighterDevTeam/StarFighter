@@ -406,11 +406,12 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 	
-	int cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), level - 1));
+	int cost_per_multishot;
 	//Spending credits on the possible bonuses
 	int bonus_multishot = 0;
 	int bonus_damage = 0;
 	int bonus_rate_of_fire = 0;
+	int dispersion = 0;//flag
 
 	int loot_credits_remaining = credits_;
 	loot_credits_remaining *= is_bot ? BOT_STATS_MULTIPLIER : 1;
@@ -419,12 +420,13 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 		int random_type_of_bonus = -1;
 
 		//checking bonus limitations
-		bool can_buy_multishot = loot_credits_remaining > cost_per_multishot;
+		cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), bonus_multishot));
+		bool can_buy_multishot = loot_credits_remaining > cost_per_multishot && dispersion >= 0;
 		bool can_buy_rate_of_fire = bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS;
 		bool can_buy_damage = floor(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * loot_credits_remaining / 100))) != FIRST_LEVEL_AMMO_DAMAGE;
 
 		//and chosing among the authorized ones
-		if (!can_buy_damage)
+		if (!can_buy_damage && can_buy_rate_of_fire)
 		{
 			random_type_of_bonus = 2;
 		}
@@ -469,6 +471,20 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 		default:
 			break;
 		}
+
+		//dispersion weapon?
+		int min_multishots_for_dispersion = is_bot ? MIN_MULTISHOTS_FOR_DISPERSION_FOR_BOT - MIN_VALUE_OF_MULTISHOT : MIN_MULTISHOTS_FOR_DISPERSION - MIN_VALUE_OF_MULTISHOT;
+		if (bonus_multishot == min_multishots_for_dispersion && dispersion >= 0)
+		{
+			if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WEAPON_CHANCE_OF_DISPERSION)
+			{
+				dispersion = 1;
+			}
+			else
+			{
+				dispersion = -1;
+			}
+		}
 	}
 
 	//Creating the item
@@ -500,8 +516,14 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	//spread of multishot weapons
 	if (weapon->m_multishot > 1)
 	{
-		int sprite_size = is_bot ? ASSUMED_BOT_SIZE : ASSUMED_SHIP_SIZE;
-		weapon->m_xspread = RandomizeIntBetweenValues(MIN_WEAPON_XSPREAD, sprite_size * 2 / weapon->m_multishot);
+		//int sprite_size = is_bot ? ASSUMED_BOT_SIZE : ASSUMED_SHIP_SIZE;
+		//weapon->m_xspread = RandomizeIntBetweenValues(MIN_WEAPON_XSPREAD, sprite_size * 2 / weapon->m_multishot);
+		weapon->m_xspread = MIN_WEAPON_XSPREAD;
+		
+		if (dispersion > 0)
+		{
+			weapon->m_dispersion = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_DISPERSION, is_bot ? WEAPON_MAX_DISPERSION_FOR_BOT : WEAPON_MAX_DISPERSION));
+		}
 	}
 
 	//saving level and credits used

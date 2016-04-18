@@ -199,18 +199,6 @@ void Ship::Init()
 				for (size_t j = 0; j < botsVectorSize; j++)
 				{
 					m_bot_list.push_back(m_equipment[i]->m_bots[j]);
-
-					//bots auto spreading based on number of bots
-					if (j > 0)
-					{
-						if (m_equipment[i]->m_bots[j]->m_Pattern.currentPattern == NoMovePattern)
-						{
-							int s = j % 2 == 0 ? 1 : -1;
-							int x = j % 2;
-
-							m_equipment[i]->m_bots[j]->m_spread.x *= s * x;
-						}
-					}
 				}
 			}
 		}
@@ -1533,15 +1521,22 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	}
 }
 
-void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class)
+void Ship::FillShopWithRandomObjets(size_t num_spawned_objects, Shop* shop, EnemyClass loot_class, int equipment_type)
 {
 	assert(shop != NULL);
+
+	//Specific equipment type requested?
+	int equipment_type_roll = equipment_type;
+	if (equipment_type_roll < 0 || equipment_type_roll > NBVAL_Equipment)
+	{
+		equipment_type_roll = rand() % ((int)NBVAL_Equipment + 1);//+1 is for the weapon type
+	}
+
 	//Generate random loots in shop
 	for (size_t i = 0; i < num_spawned_objects; i++)
 	{
 		//double random_number = (double)rand() / (RAND_MAX);
 		float random_beast_scale = RandomizeFloatBetweenValues(LootTable_BeastScale_Base[loot_class]);
-		int equipment_type_roll = rand() % ((int)NBVAL_Equipment + 1);//+1 is for the weapon type
 
 		if (Enemy::AssignRandomEquipment((EquipmentType)equipment_type_roll, shop->m_level, shop, random_beast_scale))
 		{
@@ -2505,7 +2500,14 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 
 		for (int i = 0; i < bot_number; i++)
 		{
-			equipment->m_bots.push_back(bot);
+			if (i == 0)
+			{
+				equipment->m_bots.push_back(bot);
+			}
+			else
+			{
+				equipment->m_bots.push_back(bot->Clone());
+			}
 		}
 	}
 
@@ -2903,14 +2905,26 @@ int Ship::getFighterIntStatValue(FighterStats stat)
 
 void Ship::GenerateBots(GameObject* target)
 {
-	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
+	int j = 0;
+	for (std::vector<Bot*>::iterator it = m_bot_list.begin(); it != m_bot_list.end(); it++)
 	{
 		(*it)->m_automatic_fire = m_automatic_fire;
-		(*it)->m_spread = GameObject::getSize_for_Direction((*CurrentGame).m_direction, (*it)->m_spread);
+		//(*it)->m_spread = GameObject::getSize_for_Direction((*CurrentGame).m_direction, (*it)->m_spread);
 		(*it)->setTarget(target);
-		(*it)->rotate(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+		(*it)->setRotation(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 		(*it)->m_visible = !m_disable_bots;
 		(*CurrentGame).addToScene((*it), BotLayer, Neutral);
+
+		//bots auto spreading based on number of bots
+		if ((*it)->m_Pattern.currentPattern == NoMovePattern)
+		{
+			int s = j % 2 == 0 ? 1 : -1;
+			int x = j / 2;
+
+			(*it)->m_spread.x *= s * (1+x);
+
+			j++;
+		}
 	}
 }
 
