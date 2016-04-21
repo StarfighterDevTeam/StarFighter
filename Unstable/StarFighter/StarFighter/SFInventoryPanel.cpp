@@ -300,30 +300,30 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						ss_stats << "\nRafale: " << obj->m_bots.front()->m_weapon->m_rafale << " (cooldown: " << obj->m_bots.front()->m_weapon->m_rafale_cooldown << " sec";
 					}
 
-					ss_stats << "\nFiring style: ";
-					switch (obj->m_bots.front()->m_weapon->m_shot_mode)
-					{
-						case NoShotMode:
-						{
-							ss_stats << "Parallel shots";
-							break;
-						}
-						case AlternateShotMode:
-						{
-							ss_stats << "Alternating shots";
-							break;
-						}
-						case AscendingShotMode:
-						{
-							ss_stats << "Ascending shots";
-							break;
-						}
-						case DescendingShotMode:
-						{
-							ss_stats << "Descending shots";
-							break;
-						}
-					}
+					//ss_stats << "\nFiring style: ";
+					//switch (obj->m_bots.front()->m_weapon->m_shot_mode)
+					//{
+					//	case NoShotMode:
+					//	{
+					//		ss_stats << "Parallel shots";
+					//		break;
+					//	}
+					//	case AlternateShotMode:
+					//	{
+					//		ss_stats << "Alternating shots";
+					//		break;
+					//	}
+					//	case AscendingShotMode:
+					//	{
+					//		ss_stats << "Ascending shots";
+					//		break;
+					//	}
+					//	case DescendingShotMode:
+					//	{
+					//		ss_stats << "Descending shots";
+					//		break;
+					//	}
+					//}
 
 					if (obj->m_bots.front()->m_weapon->m_target_seaking != NO_SEAKING)
 					{
@@ -386,30 +386,30 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 					ss_stats << "\nRafale: " << obj->m_rafale << " (cooldown: " << obj->m_rafale_cooldown << " sec";
 				}
 				
-				ss_stats << "\nFiring style: ";
-				switch (obj->m_shot_mode)
-				{
-					case NoShotMode:
-					{
-						ss_stats << "Parallel shots";
-						break;
-					}
-					case AlternateShotMode:
-					{
-						ss_stats << "Alternating shots";
-						break;
-					}
-					case AscendingShotMode:
-					{
-						ss_stats << "Ascending shots";
-						break;
-					}
-					case DescendingShotMode:
-					{
-						ss_stats << "Descending shots";
-						break;
-					}
-				}
+				//ss_stats << "\nFiring style: ";
+				//switch (obj->m_shot_mode)
+				//{
+				//	case NoShotMode:
+				//	{
+				//		ss_stats << "Parallel shots";
+				//		break;
+				//	}
+				//	case AlternateShotMode:
+				//	{
+				//		ss_stats << "Alternating shots";
+				//		break;
+				//	}
+				//	case AscendingShotMode:
+				//	{
+				//		ss_stats << "Ascending shots";
+				//		break;
+				//	}
+				//	case DescendingShotMode:
+				//	{
+				//		ss_stats << "Descending shots";
+				//		break;
+				//	}
+				//}
 
 				if (obj->m_target_seaking != NO_SEAKING)
 				{

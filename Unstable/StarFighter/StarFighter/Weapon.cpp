@@ -474,7 +474,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 
 		//dispersion weapon?
 		int min_multishots_for_dispersion = is_bot ? MIN_MULTISHOTS_FOR_DISPERSION_FOR_BOT - MIN_VALUE_OF_MULTISHOT : MIN_MULTISHOTS_FOR_DISPERSION - MIN_VALUE_OF_MULTISHOT;
-		if (bonus_multishot == min_multishots_for_dispersion && dispersion >= 0)
+		if (bonus_multishot == min_multishots_for_dispersion && dispersion == 0)
 		{
 			if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WEAPON_CHANCE_OF_DISPERSION)
 			{
@@ -495,7 +495,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	weapon->m_textureName = LASER_BLUE_FILENAME;
 	weapon->m_size = sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE);
 	weapon->m_frameNumber = 1;
-	weapon->m_shot_mode = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) > WEAPON_CHANCE_OF_ALTERNATE ? NoShotMode : AlternateShotMode;
+	//weapon->m_shot_mode = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) > WEAPON_CHANCE_OF_ALTERNATE ? NoShotMode : AlternateShotMode;
 
 	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
 

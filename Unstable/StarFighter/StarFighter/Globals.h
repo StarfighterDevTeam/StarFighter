@@ -243,7 +243,7 @@ std::string makePath(const std::string& srcPath);
 #define ASSUMED_BOT_SIZE								32
 #define WEAPON_MIN_VSPEED_VALUE							300
 #define WEAPON_CHANCE_OF_ALTERNATE						0.3f
-#define WEAPON_CHANCE_OF_DISPERSION						0.3f
+#define WEAPON_CHANCE_OF_DISPERSION						0.5f
 #define WEAPON_MIN_DISPERSION							30
 #define WEAPON_MAX_DISPERSION							120
 #define WEAPON_MAX_DISPERSION_FOR_BOT					45
