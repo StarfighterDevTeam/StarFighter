@@ -149,7 +149,9 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 			m_bg->m_shop = new Shop(sf::Vector2f(SCENE_SIZE_X / 2, SCENE_SIZE_Y / 2), sf::Vector2f(0, 0), (*CurrentGame).m_sceneConfigs[name][i][SHOP_TEXTURE_NAME], sf::Vector2f(w_, h_), sf::Vector2f(w_ / 2, h_ / 2));
 			m_bg->m_shop->m_level = m_level;// = stoi((*CurrentGame).m_sceneConfigs[name][i][SHOP_LEVEL]);
 			m_bg->m_shop->m_visible = true;
-			m_bg->m_shop->m_display_name = m_bg->m_display_name + " Shop";
+			ostringstream ss;
+			ss << m_bg->m_display_name << " Shop (Level " << m_bg->m_shop->m_level << ")";
+			m_bg->m_shop->m_display_name = ss.str();
 			(*CurrentGame).addToScene(m_bg->m_shop, PortalLayer, ShopObject);
 
 			//creating shop content
