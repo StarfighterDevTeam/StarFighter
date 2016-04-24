@@ -144,7 +144,7 @@ public :
 
 	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 
-	void BuyingItem();
+	void BuyingItem(bool equip_directly = false);
 	void SellingItem();
 	void GarbagingItem();
 	void EquipItem();

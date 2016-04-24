@@ -692,7 +692,13 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 			//interaction: buy item
 			if (m_inputs_states[Action_Firing] == Input_Tap && m_SFTargetPanel->GetFocusedGrid() == Trade_ShopGrid && m_SFTargetPanel->GetFocusedItem())
 			{
-				BuyingItem();    
+				BuyingItem(true);    
+			}
+
+			//interaction: buy item and equip it directly
+			if (m_inputs_states[Action_Braking] == Input_Tap && m_SFTargetPanel->GetFocusedGrid() == Trade_ShopGrid && m_SFTargetPanel->GetFocusedItem())
+			{
+				BuyingItem();
 			}
 
 			//interaction: sell, equip, desequip item
@@ -1045,7 +1051,7 @@ void Ship::MoveCursor(GameObject* cursor, sf::Vector2f inputs_directions, sf::Ti
 }
 
 
-void Ship::BuyingItem()
+void Ship::BuyingItem(bool equip_directly)
 {
 	bool success = false;
 	int shop_index = m_SFTargetPanel->GetFocusedIntIndex();
@@ -1055,7 +1061,7 @@ void Ship::BuyingItem()
 		if (m_money >= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_quality))
 		{
 			//if weapon already possessed, we try to put the item in stash
-			if (m_weapon)
+			if (m_weapon && !equip_directly)
 			{
 				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
@@ -1071,26 +1077,44 @@ void Ship::BuyingItem()
 			//else we equip if directly
 			else
 			{
-				setShipWeapon(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->Clone());
-				m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_quality);
-				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
-				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), NBVAL_Equipment);
-				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+				//buy + equip ?
+				if (m_weapon && equip_directly)
+				{
+					//try unequip current weapon
+					if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][NBVAL_Equipment]))
+					{
+						cleanWeapon();
+						m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, NULL);
+						m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][NBVAL_Equipment]);
+						m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, NULL);
+						success = true;
+					}
+				}
 
-				(*CurrentGame).PlaySFX(SFX_Equip);
+				if (!equip_directly || success)
+				{
+					setShipWeapon(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->Clone());
+					m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_quality);
+					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
+					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
+					m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), NBVAL_Equipment);
+					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
-				success = true;
+					(*CurrentGame).PlaySFX(SFX_Equip);
+
+					success = true;
+				}
 			}
 		}
 	}
 	//case of equipment hovered
 	else if (m_SFTargetPanel && m_SFTargetPanel->GetFocusedItem()->m_equipment_loot)
 	{
+		int equip_type = m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType;
 		if (m_money >= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_quality))
 		{
 			//if equipment already possessed, we try to put the item in stash
-			if (m_equipment[m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType])
+			if (m_equipment[equip_type] && !equip_directly)
 			{
 				if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()))
 				{
@@ -1106,16 +1130,33 @@ void Ship::BuyingItem()
 			//else we equip if directly
 			else
 			{
-				setShipEquipment(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->Clone());
-				m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_quality);
-				m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
-				m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-				m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType);
-				Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+				//buy + equip ?
+				if (m_equipment[equip_type] && equip_directly)
+				{
+					//try unequip current weapon
+					if (m_SFTargetPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type]))
+					{
+						cleanEquipment(equip_type);
+						m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(equip_type, NULL);
+						m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->grid[0][equip_type]);
+						m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(equip_type, NULL);
+						success = true;
+					}
+				}
 
-				(*CurrentGame).PlaySFX(SFX_Equip);
+				if (!equip_directly || success)
+				{
+					setShipEquipment(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->Clone());
+					m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_quality);
+					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
+					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
+					m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType);
+					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
 
-				success = true;
+					(*CurrentGame).PlaySFX(SFX_Equip);
+
+					success = true;
+				}
 			}
 		}
 	}

@@ -118,17 +118,27 @@ SFItemStatsPanel::SFItemStatsPanel(GameObject* object, sf::Vector2f size, Ship* 
 		if (item_state == FocusedItem_Buy)
 		{
 			int price = object->m_equipment_loot ? GameObject::GetPrice(object->m_equipment_loot->m_credits, object->m_equipment_loot->m_quality) : GameObject::GetPrice(object->m_weapon_loot->m_credits, object->m_weapon_loot->m_quality);
+			
+			ostringstream ss_buy_and_equip;
+			ss_buy_and_equip << "Buy and equip: $" << price;
+			if (playerShip->m_money < price)
+			{
+				ss_buy_and_equip << " (insufficient credits)";
+			}
+			m_actions->SetString(ss_buy_and_equip.str(), ActionButton_A);
+
 			ostringstream ss_buy;
 			ss_buy << "Buy: $" << price;
 			if (playerShip->m_money < price)
 			{
 				ss_buy << " (insufficient credits)";
 			}
+			m_actions->SetString(ss_buy.str(), ActionButton_X);
 
-			m_actions->SetString(ss_buy.str(), ActionButton_A);
 			if (playerShip->m_money < price)
 			{
 				m_actions->m_texts[ActionButton_A].setColor(sf::Color(255, 50, 50, 255));//red
+				m_actions->m_texts[ActionButton_X].setColor(sf::Color(255, 50, 50, 255));//red
 			}
 		}
 		//SELL
