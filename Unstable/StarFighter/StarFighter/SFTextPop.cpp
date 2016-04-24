@@ -11,7 +11,8 @@ SFTextPop::SFTextPop(SFText* text, float time_fade_in, float time_not_faded, flo
 {
 	setFont(*text->getFont());
 	setCharacterSize(text->getCharacterSize());
-	setColor(text->getColor());
+	m_alpha = time_fade_in > 0 ? 0 : 255;
+	setColor(sf::Color(text->getColor().r, text->getColor().g, text->getColor().b, m_alpha));
 	setString(text->getString());
 	if (target)
 	{
@@ -25,7 +26,6 @@ SFTextPop::SFTextPop(SFText* text, float time_fade_in, float time_not_faded, flo
 	m_visible = text->m_visible;
 	m_GarbageMe = false;
 	m_DontGarbageMe = false;
-	m_alpha = time_fade_in > 0 ? 0 : 255;
 
 	m_time_fade_in = time_fade_in;
 	m_time_not_faded = time_not_faded;

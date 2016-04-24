@@ -72,7 +72,7 @@ std::string makePath(const std::string& srcPath);
 #define DIALOGS_FILE "Scripts/Generated/Dialogs.csv"
 
 #define PIXEL_PERFECT_COLLISION							true
-#define GRAZE_DISTANCE									50
+#define GRAZE_DISTANCE									70
 #define SHIP_BRAKING_MALUS_SPEED						0.50f
 #define END_OF_DIALOGS_DELAY							0
 
@@ -216,7 +216,7 @@ std::string makePath(const std::string& srcPath);
 
 //HYPERSPEED
 #define HYPERSPEED_CONSUMPTION_FOR_CRUISING				1
-#define HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION			0.25
+#define HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION			1
 
 //LEVELING
 #define FIRST_LEVEL_MAX									20
@@ -253,6 +253,9 @@ std::string makePath(const std::string& srcPath);
 #define MONEY_LOOT_DISPLAY_FADE_OUT_TIME				1.f
 #define MONEY_LOOT_DISPLAY_SPEED_Y						50
 #define TEXT_POP_OFFSET_Y								10
+
+#define GRAZE_UP_DISPLAY_NOT_FADED_TIME					0.6f
+#define GRAZE_UP_DISPLAY_FADE_OUT_TIME					0.4f
 
 #define SCENE_TITLE_OFFSET_Y							150
 #define SCENE_TILE_FADE_IN_TIME							1.0f

@@ -33,9 +33,9 @@ enum ShipAnimations
 enum GrazeLevels
 {
 	GRAZE_LEVEL_NONE,//0
-	GRAZE_LEVEL_RED,//1
 	GRAZE_LEVEL_BLUE,//2
-	GRAZE_LEVEL_WHITE,//3
+	GRAZE_LEVEL_RED,//1
+	GRAZE_LEVEL_YELLOW,//3
 	NB_GRAZE_LEVELS,//4
 };
 
@@ -92,6 +92,7 @@ public :
 	void Init();
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	void updatePostCollision() override;
+	void Draw(sf::RenderTexture& screen) override;
 	void ManageDebugCommand();
 	bool ManageVisibility();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
@@ -205,6 +206,7 @@ public :
 
 	int m_graze_count;
 	int m_graze_level;
+	sf::CircleShape m_graze_radius_feedback;;
 
 	int GetFocusedPortalMaxUnlockedHazardLevel();
 

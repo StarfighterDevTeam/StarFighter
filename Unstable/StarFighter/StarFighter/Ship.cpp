@@ -58,12 +58,19 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	}
 
 	m_combo_aura = new Aura(this, "2D/FX/Aura_Graze.png", sf::Vector2f(50, 50), 3, NB_GRAZE_LEVELS);
-	(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
+	//(*CurrentGame).addToScene(m_combo_aura, AuraLayer, Neutral);
 
 	m_trail = new Aura(this, "2D/FX/Aura_HyperspeedTrail.png", sf::Vector2f(70, 34), 3, 1);
 	sf::Vector2f real_size = m_fake_ship ? m_fake_ship->m_size : m_size;
 	m_trail->m_offset = sf::Vector2f(0, (real_size.y / 2) + (m_trail->m_size.y / 2));
 	(*CurrentGame).addToScene(m_trail, FakeShipLayer, Neutral);
+
+	m_graze_radius_feedback.setRadius(GRAZE_DISTANCE);
+	m_graze_radius_feedback.setOrigin(sf::Vector2f(m_graze_radius_feedback.getRadius(), m_graze_radius_feedback.getRadius()));
+	m_graze_radius_feedback.setFillColor(sf::Color(0, 0, 0, 0));
+	m_graze_radius_feedback.setOutlineThickness(1);
+	m_graze_radius_feedback.setOutlineColor(sf::Color(255, 255, 255, 30));
+	m_graze_radius_feedback.setPosition(getPosition());
 
 	m_targetPortal = NULL;
 	m_targetShop = NULL;
@@ -446,6 +453,21 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	{
 		m_fake_ship->update(deltaTime, hyperspeedMultiplier);
 	}
+	
+	m_graze_radius_feedback.setPosition(getPosition());
+}
+
+void Ship::Draw(sf::RenderTexture& screen)
+{
+	if (m_visible)
+	{
+		this->GameObject::Draw(screen);
+
+		if ((*CurrentGame).m_direction != NO_DIRECTION && (*CurrentGame).m_vspeed != 0)
+		{
+			screen.draw(m_graze_radius_feedback);
+		}
+	}
 }
 
 bool Ship::ManageVisibility()
@@ -789,15 +811,15 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						m_hyperspeed_fuel = 0;
 					}
 				}
-				else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0 && !m_actions_states[Action_Recalling] && m_recall_clock.getElapsedTime().asSeconds() > MIN_TIME_FOR_RECALL_TO_HUB)
-				{
-					(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed * SLOW_MOTION_MULTIPLIER;
-					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
-					if (m_hyperspeed_fuel < 0)
-					{
-						m_hyperspeed_fuel = 0;
-					}
-				}
+				//else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0 && !m_actions_states[Action_Recalling] && m_recall_clock.getElapsedTime().asSeconds() > MIN_TIME_FOR_RECALL_TO_HUB)
+				//{
+				//	(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed * SLOW_MOTION_MULTIPLIER;
+				//	m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION * deltaTime.asSeconds();
+				//	if (m_hyperspeed_fuel < 0)
+				//	{
+				//		m_hyperspeed_fuel = 0;
+				//	}
+				//}
 				else if (!m_actions_states[Action_Recalling])
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
@@ -1764,7 +1786,7 @@ bool Ship::GetLoot(GameObject& object)
 		text_feedback->setString(ss.str());
 		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
 		text_feedback->setPosition(getPosition());
-		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
+		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
 		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 		delete text_feedback;
 		(*CurrentGame).addToFeedbacks(pop_feedback);
@@ -1831,6 +1853,49 @@ void Ship::GetGrazing()
 		{
 			//Graze level up
 			m_graze_level++;
+			sf::Color color = sf::Color::White;
+			switch (m_graze_level)
+			{
+				case GRAZE_LEVEL_BLUE:
+				{
+					color = sf::Color(0, 155, 255, 20);
+					m_graze_radius_feedback.setOutlineColor(color);
+					break;
+				}
+				case GRAZE_LEVEL_RED:
+				{
+					color = sf::Color(255, 0, 0, 20);
+					m_graze_radius_feedback.setOutlineColor(color);
+					break;
+				}
+				case GRAZE_LEVEL_YELLOW:
+				{
+					color = sf::Color(255, 255, 255, 20);
+					m_graze_radius_feedback.setOutlineColor(color);
+					break;
+				}
+			}
+
+			//Text feedback
+			SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 14, color, getPosition());
+			ostringstream ss;
+			if (m_graze_level < NB_GRAZE_LEVELS - 1)
+			{
+				ss << "Graze level+";
+			}
+			else
+			{
+				ss << "Graze level MAX";
+			}
+			text_feedback->setString(ss.str());
+			sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+			text_feedback->setPosition(getPosition());
+			SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
+			pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
+			delete text_feedback;
+			(*CurrentGame).addToFeedbacks(pop_feedback);
+
+			//Aura
 			if (m_combo_aura && m_graze_level > 0 && m_graze_level < NB_GRAZE_LEVELS)
 			{
 				//update aura
@@ -1899,6 +1964,7 @@ void Ship::GetDamageFrom(GameObject& object)
 	
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;
+	m_graze_radius_feedback.setOutlineColor(sf::Color(255, 255, 0, 20));
 	if (m_combo_aura)
 	{
 		m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);
