@@ -465,7 +465,11 @@ void Ship::Draw(sf::RenderTexture& screen)
 
 		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
+			sf::Color color = m_graze_radius_feedback.getOutlineColor();
+			float s = 0.25 + 3*abs(sin(2*m_graze_sinus_clock.getElapsedTime().asSeconds())) / 4 ;
+			m_graze_radius_feedback.setOutlineColor(sf::Color(color.r, color.g, color.b, color.a * s));
 			screen.draw(m_graze_radius_feedback);
+			m_graze_radius_feedback.setOutlineColor(color);
 		}
 	}
 }

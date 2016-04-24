@@ -206,7 +206,8 @@ public :
 
 	int m_graze_count;
 	int m_graze_level;
-	sf::CircleShape m_graze_radius_feedback;;
+	sf::CircleShape m_graze_radius_feedback;
+	sf::Clock m_graze_sinus_clock;
 
 	int GetFocusedPortalMaxUnlockedHazardLevel();
 
