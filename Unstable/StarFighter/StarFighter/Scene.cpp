@@ -168,49 +168,55 @@ void Scene::LoadSceneFromFile(string name, int hazard_level, bool reverse_scene,
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("enemy") == 0)
 		{
 			EnemyBase* e = FileLoader::LoadEnemyBase((*CurrentGame).m_sceneConfigs[name][i][ENEMY], stoi((*CurrentGame).m_sceneConfigs[name][i][ENEMY_PROBABILITY]), stoi((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS]));
-			e->m_enemy->m_level = m_level;//stoi((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_LEVEL]);
-			e->m_enemy->ApplyLevelModifiers();
-
-			//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
-			if (e->m_enemy->m_phases.empty())
+			if (e)
 			{
-				e->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, e->m_enemy->m_speed.y);
+				e->m_enemy->m_level = m_level;//stoi((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_LEVEL]);
+				e->m_enemy->ApplyLevelModifiers();
+
+				//if the enemy has phases, the direction will be handled by Enemy::SetPhase(). if not, we set it here
+				if (e->m_enemy->m_phases.empty())
+				{
+					e->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, e->m_enemy->m_speed.y);
+				}
+
+				//setting enemy generators: we need to create one generator per class
+				if (m_total_class_probability[e->m_enemyclass] == 0)
+				{
+					float l_spawnCost = stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[this->getSceneHazardLevelValue()];
+					EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->m_enemyclass, stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_REPEAT_CHANCE]), stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_MISS_CHANCE]));
+					generator->m_spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
+					m_sceneEnemyGenerators.push_back(generator);
+				}
+
+				//setting probabilities of spawn within enemy class
+				e->m_proba_min = m_total_class_probability[e->m_enemyclass];
+				e->m_proba_max = e->m_proba_min + e->m_probability;
+				m_total_class_probability[e->m_enemyclass] = e->m_proba_max;
+				enemy_count += e->m_proba_max;
+
+				m_enemies_ranked_by_class[e->m_enemyclass].push_back(e);
 			}
-
-			//setting enemy generators: we need to create one generator per class
-			if (m_total_class_probability[e->m_enemyclass] == 0)
-			{
-				float l_spawnCost = stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_SPAWNCOST]) / spawnCostMultiplierTable[this->getSceneHazardLevelValue()];
-				EnemyGenerator* generator = new EnemyGenerator(l_spawnCost, e->m_enemyclass, stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_REPEAT_CHANCE]), stof((*CurrentGame).m_sceneConfigs[name][i][ENEMY_CLASS_MISS_CHANCE]));
-				generator->m_spawnCostCollateralMultiplier = spawnCostCollateralMultiplierTable[this->getSceneHazardLevelValue()];
-				m_sceneEnemyGenerators.push_back(generator);
-			}
-
-			//setting probabilities of spawn within enemy class
-			e->m_proba_min = m_total_class_probability[e->m_enemyclass];
-			e->m_proba_max = e->m_proba_min + e->m_probability;
-			m_total_class_probability[e->m_enemyclass] = e->m_proba_max;
-			enemy_count += e->m_proba_max;
-
-			m_enemies_ranked_by_class[e->m_enemyclass].push_back(e);
 		}
 		//Loading boss
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("boss") == 0)
 		{
 			EnemyBase* boss = FileLoader::LoadEnemyBase((*CurrentGame).m_sceneConfigs[name][i][BOSS], 1, stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_CLASS]));
-			boss->m_enemy->m_level = m_level;//stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_LEVEL]);
-
-			if (boss->m_enemy->m_phases.empty())
+			if (boss)
 			{
-				boss->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, boss->m_enemy->m_speed.y);
-			}
-			sf::Vector2f boss_pos = sf::Vector2f(atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
-			boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
-			boss->m_enemy->setPosition(boss_pos);
-			boss->m_enemy->setRotation(stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_ROTATION]));
+				boss->m_enemy->m_level = m_level;//stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_LEVEL]);
 
-			m_boss_list.push_back(boss);
-			m_generating_boss = true;
+				if (boss->m_enemy->m_phases.empty())
+				{
+					boss->m_enemy->m_speed = GameObject::getSpeed_for_Scrolling(m_direction, boss->m_enemy->m_speed.y);
+				}
+				sf::Vector2f boss_pos = sf::Vector2f(atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_X].c_str()) * SCENE_SIZE_X, atof((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_Y].c_str()) * SCENE_SIZE_Y);
+				boss_pos = GameObject::getPosition_for_Direction(m_direction, boss_pos);
+				boss->m_enemy->setPosition(boss_pos);
+				boss->m_enemy->setRotation(stoi((*CurrentGame).m_sceneConfigs[name][i][BOSS_SPAWN_ROTATION]));
+
+				m_boss_list.push_back(boss);
+				m_generating_boss = true;
+			}
 		}
 		//Loading optional scripts
 		else if ((*CurrentGame).m_sceneConfigs[name][i][0].compare("script") == 0)

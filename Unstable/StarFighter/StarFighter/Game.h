@@ -117,6 +117,7 @@ public:
 
 	map<string, vector<string> > m_generalScenesConfig;
 	map<string, vector<vector<string> > > m_sceneConfigs;
+	map<string, vector<string> > m_enemiesConfig;
 
 	//SFX
 	int LoadSFX();

@@ -31,6 +31,7 @@ public:
 	void SaveSceneHazardLevelUnlocked(string scene_name, int hazard_level, Ship* playerShip = (*CurrentGame).m_playerShip);
 	int GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip = (*CurrentGame).m_playerShip);
 	void LoadAllScenes(string scenes_file);
+	void LoadAllEnemies(string enemies_file);
 	void UpdateShipConfig(Ship* ship, string config_name);
 
 	void InGameStateMachineCheck(sf::Time deltaTime);

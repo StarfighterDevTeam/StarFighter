@@ -1487,7 +1487,7 @@ void Ship::RotateShip(float angle)
 	if (m_trail)
 	{
 		m_trail->setRotation(angle);
-	}
+}	
 	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 	{
 		(*it)->setRotation(angle);
@@ -1847,7 +1847,7 @@ void Ship::GetShop(GameObject* object)
 	}
 }
 
-static int GrazeLevelsThresholds[NB_GRAZE_LEVELS] = { 0, 100, 500, 1500 };
+static int GrazeLevelsThresholds[NB_GRAZE_LEVELS] = { 0, 200, 1000, 2000 };
 static float GrazeLevelsBeastBonus[NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
 
 void Ship::GetGrazing()

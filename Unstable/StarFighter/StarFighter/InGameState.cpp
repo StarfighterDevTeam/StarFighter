@@ -72,6 +72,9 @@ void InGameState::Initialize(Player player)
 	//Loading all scenes
 	LoadAllScenes(SCENES_FILE);
 
+	//Loading all enemies
+	LoadAllEnemies(ENEMY_FILE);
+
 	//Creating current scene
 	m_nextScene = NULL;
 	SpawnInScene(m_playerShip->m_currentScene_name);
@@ -890,6 +893,22 @@ void InGameState::LoadAllScenes(string scenes_file)
 	}
 
 	generalScenesConfig.clear();
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void InGameState::LoadAllEnemies(string enemies_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all enemies.");
+
+	vector<vector<string> > enemiesConfig = *(FileLoaderUtils::FileLoader(enemies_file));
+	size_t allEnemiesVectorSize = enemiesConfig.size();
+	for (size_t i = 0; i < allEnemiesVectorSize; i++)
+	{
+		(*CurrentGame).m_enemiesConfig.insert(std::map<string, vector<string> >::value_type(enemiesConfig[i][ENEMY_NAME], enemiesConfig[i]));
+	}
+
+	enemiesConfig.clear();
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }
