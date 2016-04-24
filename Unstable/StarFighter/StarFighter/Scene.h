@@ -60,6 +60,10 @@ public:
 	float m_vspeed;
 	bool m_hazardbreak_has_occurred;
 
+	int m_score_destruction;
+	int m_score_graze;
+	int m_score_total;
+
 	static float getSceneBeastScore(int for_hazard_level);
 
 	Background* m_bg;
@@ -92,7 +96,9 @@ public:
 	bool m_canHazardBreak;
 	vector <string> m_scenesLinkedToUpdate;
 
-	void DisplayDestructions(bool hazard_break = false);
+	bool CheckHazardBreakConditions();
+	void DisplayDestructions(bool hazard_break = false);//OLD: to remove
+	void DisplayScore(bool hazard_break = false);
 	bool IsLastSceneBeforeHub();
 
 private:

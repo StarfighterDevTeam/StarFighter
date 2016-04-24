@@ -85,8 +85,8 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		//options texts
 		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
 		m_actions->SetString("Enter", ActionButton_A);
-		m_actions->SetString("Hazard up", ActionButton_Y);
-		m_actions->SetString("Hazard down", ActionButton_X);
+		m_actions->SetString("Hazard down", ActionButton_Y);
+		m_actions->SetString("Hazard up", ActionButton_X);
 
 		m_actions_with_selection = new SFActionBoxWithSelection();
 		for (int i = 0; i < NB_HAZARD_LEVELS; i++)

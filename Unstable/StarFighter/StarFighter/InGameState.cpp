@@ -450,14 +450,14 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 						if (m_currentScene->m_canHazardBreak)
 						{
 							//what is our destruction ratio? (displaying score). 100% = Hazard break
-							if ((*CurrentGame).getHazard() == (*CurrentGame).m_hazardSpawned && m_currentScene->getSceneHazardLevelUnlockedValue() == m_currentScene->getSceneHazardLevelValue())
+							if (m_currentScene->CheckHazardBreakConditions() && m_currentScene->getSceneHazardLevelUnlockedValue() == m_currentScene->getSceneHazardLevelValue())
 							{
-								m_currentScene->DisplayDestructions(true);
+								m_currentScene->DisplayScore(true);
 								m_currentScene->HazardBreak();
 							}
 							else
 							{
-								m_currentScene->DisplayDestructions();
+								m_currentScene->DisplayScore();
 							}
 						}
 

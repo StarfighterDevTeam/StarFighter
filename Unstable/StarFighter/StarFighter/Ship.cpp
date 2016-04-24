@@ -463,7 +463,7 @@ void Ship::Draw(sf::RenderTexture& screen)
 	{
 		this->GameObject::Draw(screen);
 
-		if ((*CurrentGame).m_direction != NO_DIRECTION && (*CurrentGame).m_vspeed != 0)
+		if ((*CurrentGame).m_direction != NO_DIRECTION)
 		{
 			screen.draw(m_graze_radius_feedback);
 		}
@@ -1492,6 +1492,12 @@ void Ship::RotateShip(float angle)
 	{
 		(*it)->setRotation(angle);
 	}
+	int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -2 : 1;
+	if (m_recall_text)
+	{
+		m_recall_text->m_offset.y = s*(-m_size.y/2);
+		//m_recall_text->setPosition(sf::Vector2f(m_recall_text->getPosition().x - m_recall_text->getGlobalBounds().width / 2, m_recall_text->getPosition().y));
+	}
 }
 
 void Ship::ScreenBorderContraints()
@@ -1786,7 +1792,8 @@ bool Ship::GetLoot(GameObject& object)
 		text_feedback->setString(ss.str());
 		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
 		text_feedback->setPosition(getPosition());
-		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
+		int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -1 : 1;
+		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, MONEY_LOOT_DISPLAY_NOT_FADED_TIME, MONEY_LOOT_DISPLAY_FADE_OUT_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
 		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 		delete text_feedback;
 		(*CurrentGame).addToFeedbacks(pop_feedback);
@@ -1890,7 +1897,8 @@ void Ship::GetGrazing()
 			text_feedback->setString(ss.str());
 			sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
 			text_feedback->setPosition(getPosition());
-			SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, -size.y / 2 - TEXT_POP_OFFSET_Y));
+			int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -1 : 1;
+			SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
 			pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 			delete text_feedback;
 			(*CurrentGame).addToFeedbacks(pop_feedback);

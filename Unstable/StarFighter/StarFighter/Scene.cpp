@@ -366,7 +366,47 @@ void Scene::PlayTitleFeedback()
 	(*CurrentGame).addToFeedbacks(pop_feedback);
 }
 
-void Scene::DisplayDestructions(bool hazard_break)
+bool Scene::CheckHazardBreakConditions()
+{
+	//Score = destruction rank + graze rank
+	//RANKS: 0 = D, 1 = C, 2 = B, 3 = A, 4 = S, 5 = SS
+
+	//Destruction
+	if ((*CurrentGame).getHazard() == (*CurrentGame).m_hazardSpawned)
+	{
+		m_score_destruction = 4;//S
+	}
+	else if (1.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned > 0.95)
+	{
+		m_score_destruction = 3;//A
+	}
+	else if (1.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned > 0.8)
+	{
+		m_score_destruction = 2;//B
+	}
+	else
+	{
+		m_score_destruction = 1;//C
+	}
+
+	//Graze
+	m_score_graze = (*CurrentGame).m_playerShip->m_graze_level + 1;
+
+	//Total
+	m_score_total = (m_score_destruction + m_score_graze) / 2;
+	if (m_score_destruction == 1 && m_score_graze == 1)
+	{
+		m_score_total = 0;//C + C = D
+	}
+	if (m_score_destruction == 4 && m_score_graze == 4)
+	{
+		m_score_total = 5;//S + S = SS
+	}
+
+	return m_score_total >= 4;//S rank minimum for hazard break
+}
+
+void Scene::DisplayDestructions(bool hazard_break)//OLD: to remove
 {
 	ostringstream ss;
 	ss.precision(1);
@@ -397,6 +437,170 @@ void Scene::DisplayDestructions(bool hazard_break)
 		(*CurrentGame).addToFeedbacks(pop_feedback2);
 	}
 	
+	delete text_feedback;
+}
+
+void Scene::DisplayScore(bool hazard_break)
+{
+	//Display
+	ostringstream ss_destruction;
+	ss_destruction.precision(1);
+	ss_destruction << fixed;
+	//ss << "Destructions: " << (*CurrentGame).getHazard() << " / " << (*CurrentGame).m_hazardSpawned << " [" << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned << "%]";
+	ss_destruction << "Destructions: " << 100.0f * (*CurrentGame).getHazard() / (*CurrentGame).m_hazardSpawned << "%";
+	switch (m_score_destruction)
+	{
+		case 1:
+		{
+			ss_destruction << " -> Rank C";
+			break;
+		}
+		case 2:
+		{
+				  ss_destruction << " -> Rank B";
+			break;
+		}
+		case 3:
+		{
+				  ss_destruction << " -> Rank A";
+			break;
+		}
+		case 4:
+		{
+				  ss_destruction << " -> Rank S";
+			break;
+		}
+	}
+
+	ostringstream ss_graze;
+	ss_graze << "Graze: " << (*CurrentGame).m_playerShip->m_graze_level << " / " << NB_GRAZE_LEVELS - 1;
+	switch (m_score_graze)
+	{
+		case 1:
+		{
+			ss_graze << " -> Rank C";
+			break;
+		}
+		case 2:
+		{
+			ss_graze << " -> Rank B";
+			break;
+		}
+		case 3:
+		{
+			ss_graze << " -> Rank A";
+			break;
+		}
+		case 4:
+		{
+			ss_graze << " -> Rank S";
+			break;
+		}
+	}
+
+	ostringstream ss_total;
+	ss_total << "Score total: ";
+	switch (m_score_total)
+	{
+		case 0:
+		{
+			ss_total << " Rank D";
+			break;
+		}
+		case 1:
+		{
+			ss_total << " Rank C";
+			break;
+		}
+		case 2:
+		{
+			ss_total << " Rank B";
+			break;
+		}
+		case 3:
+		{
+			ss_total << " Rank A";
+			break;
+		}
+		case 4:
+		{
+			ss_total << " Rank S";
+			break;
+		}
+		case 5:
+		{
+			ss_total << " Rank S+";
+			break;
+		}
+	}
+
+	float text_height = 0;
+
+	//destruction
+	sf::Color _white = sf::Color::Color(255, 255, 255, 255);//white
+	sf::Vector2f position = sf::Vector2f(SCENE_SIZE_X / 2, DESTRUCTIONS_DISPLAY_OFFSET_Y);
+	SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 24, _white, position);
+	text_feedback->setString(ss_destruction.str());
+	SFTextPop* pop_feedback = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+	pop_feedback->setPosition(sf::Vector2f(position.x - pop_feedback->getGlobalBounds().width / 2, position.y));
+	text_height = position.y;
+	(*CurrentGame).addToFeedbacks(pop_feedback);
+
+	//graze
+	text_feedback->setString(ss_graze.str());
+	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+	SFTextPop* pop_feedback2 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+	pop_feedback2->setPosition(sf::Vector2f(position.x - pop_feedback2->getGlobalBounds().width / 2, text_height));
+	(*CurrentGame).addToFeedbacks(pop_feedback2);
+
+	//total
+	text_feedback->setString(ss_total.str());
+	sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
+	text_feedback->setColor(_yellow);
+	text_height += text_feedback->getGlobalBounds().height + 3*INTERACTION_INTERBLOCK;
+	SFTextPop* pop_feedback3 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+	pop_feedback3->setPosition(sf::Vector2f(position.x - pop_feedback3->getGlobalBounds().width / 2, text_height));
+	(*CurrentGame).addToFeedbacks(pop_feedback3);
+
+	if (hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
+	{
+		text_feedback->setString("Next hazard level unlocked!!");
+		text_feedback->setCharacterSize(18);
+		sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
+		text_feedback->setColor(_yellow);
+		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
+		(*CurrentGame).addToFeedbacks(pop_feedback4);
+	}
+	else if (!hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
+	{
+		text_feedback->setString("Get a total S Rank to unlock next hazard level");
+		text_feedback->setCharacterSize(18);
+		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
+		(*CurrentGame).addToFeedbacks(pop_feedback4);
+	}
+	else if (m_hazard_level < m_hazard_level_unlocked)
+	{
+		text_feedback->setString("Hazard level already beaten");
+		text_feedback->setCharacterSize(18);
+		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
+		(*CurrentGame).addToFeedbacks(pop_feedback4);
+	}
+	else if (m_hazard_level == NB_HAZARD_LEVELS - 1)
+	{
+		text_feedback->setString("Max hazard level reached");
+		text_feedback->setCharacterSize(18);
+		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
+		(*CurrentGame).addToFeedbacks(pop_feedback4);
+	}
+
 	delete text_feedback;
 }
 
