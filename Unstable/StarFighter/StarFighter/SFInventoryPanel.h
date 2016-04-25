@@ -80,6 +80,7 @@ public:
 	sf::RectangleShape m_shieldBarContainer;
 	sf::RectangleShape m_fuelBar;
 	sf::RectangleShape m_fuelBarContainer;
+	sf::RectangleShape m_fuelBarOverblock;
 	sf::RectangleShape m_xpBar;
 	sf::Text m_life_text;
 	sf::Text m_shield_text;

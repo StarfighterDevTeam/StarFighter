@@ -1032,6 +1032,10 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_fuelBar.setFillColor(sf::Color(COLOR_YELLOW_R_VALUE, COLOR_YELLOW_G_VALUE, COLOR_YELLOW_B_VALUE, COLOR_YELLOW_A_VALUE));//yellow
 		m_fuelBar.setOrigin(0, 0);
 
+		m_fuelBarOverblock.setFillColor(sf::Color(0, 0, 0, GHOST_ALPHA_VALUE));//black
+		m_fuelBarOverblock.setOrigin(0, 0);
+		m_fuelBarOverblock.setOutlineThickness(0);
+
 		m_armorBarContainer.setFillColor(sf::Color(0, 0, 0, 0));
 		m_armorBarContainer.setOutlineThickness(1);
 		m_armorBarContainer.setOutlineColor(sf::Color(255, 255, 255));
@@ -1121,6 +1125,7 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_fuel_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + ARMOR_BAR_SIZE_X / 2, text_height);
 		m_fuelBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 		m_fuelBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+		m_fuelBarOverblock.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
 		
 		text_height += 10 + ARMOR_BAR_SIZE_Y;
 		m_xpBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
@@ -1251,11 +1256,21 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	{
 		m_fuelBar.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
 		m_fuelBarContainer.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
+		m_fuelBarOverblock.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
 	}
 	else
 	{
 		m_fuelBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_hyperspeed_fuel / m_playerShip->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X), FUEL_BAR_SIZE_Y));
 		m_fuelBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
+		if (m_playerShip->m_hyperspeed_fuel > m_playerShip->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER)
+		{
+			m_fuelBarOverblock.setSize(sf::Vector2f(1.0f * m_playerShip->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER / m_playerShip->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
+			m_fuelBarOverblock.setPosition(sf::Vector2f(m_fuelBar.getPosition().x + m_fuelBar.getSize().x - m_fuelBarOverblock.getSize().x, m_fuelBar.getPosition().y));
+		}
+		else
+		{
+			m_fuelBarOverblock.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
+		}
 	}
 
 	ostringstream ss_life;
@@ -1395,6 +1410,7 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	{
 		screen.draw(m_fuelBarContainer);
 		screen.draw(m_fuelBar);
+		screen.draw(m_fuelBarOverblock);
 		screen.draw(m_fuel_text);
 	}
 

@@ -830,6 +830,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//		m_hyperspeed_fuel = 0;
 				//	}
 				//}
+				else if (m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER) && !m_actions_states[Action_Recalling] && !m_immune)
+				{
+					m_hyperspeed_fuel -= m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER;
+					Bomb();
+				}
 				else if (!m_actions_states[Action_Recalling])
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = 1.0f;
@@ -976,6 +981,11 @@ void Ship::ManageImmunity()
 		if (m_immunityTimer.getElapsedTime() > sf::seconds(2))
 		{
 			m_immune = false;
+			setColor(sf::Color(255, 255, 255, 255));
+			if (m_fake_ship)
+			{
+				m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
+			}
 		}
 	}
 
@@ -1490,6 +1500,19 @@ void Ship::Recalling()
 		Teleport(m_respawnSceneName);
 		m_recall_clock.restart();
 		m_recall_text->m_visible = false;
+	}
+}
+
+void Ship::Bomb()
+{
+	m_immunityTimer.restart();
+	m_immune = true;
+	(*CurrentGame).killGameObjectLayer(EnemyObject);
+	(*CurrentGame).killGameObjectLayer(EnemyFire);
+	setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+	if (m_fake_ship)
+	{
+		m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 	}
 }
 

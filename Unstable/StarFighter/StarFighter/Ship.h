@@ -155,6 +155,7 @@ public :
 	void Recalling();
 	void Teleport(string destination_name);
 	void CenterMapView(sf::Vector2f offset = sf::Vector2f(0, 0));
+	void Bomb();
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;
