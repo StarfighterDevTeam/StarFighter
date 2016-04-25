@@ -124,6 +124,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Shop.cpp" />
     <ClCompile Include="StarFighter.cpp" />
+    <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Shop.h" />
     <ClInclude Include="StarFighter.h" />
+    <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>

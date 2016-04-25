@@ -11,6 +11,8 @@
 #include <math.h>
 #include "SFText.h"
 #include "SFPanel.h"
+#include "Stroboscopic.h"
+
 #include <SFML/Audio.hpp>
 
 class Ship;

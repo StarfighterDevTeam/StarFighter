@@ -49,10 +49,10 @@ enum LayerType
 	FriendlyFireLayer,
 	FakeShipLayer,
 	LootLayer,
+	PlayerStroboscopicLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
 
-	
 	BlackStripesLayer,
 	PanelLayer,
 	NBVAL_Layer
@@ -303,6 +303,7 @@ public:
 
 	//utilitary methods
 	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
+	static void ScaleSpeed(sf::Vector2f* vector, float target_value);
 
 	int m_money;
 	Equipment* m_equipment_loot;

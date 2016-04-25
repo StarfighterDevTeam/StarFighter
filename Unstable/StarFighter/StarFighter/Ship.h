@@ -156,6 +156,9 @@ public :
 	void Teleport(string destination_name);
 	void CenterMapView(sf::Vector2f offset = sf::Vector2f(0, 0));
 	void Bomb();
+	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
+
+	sf::Clock m_stroboscopic_effect_clock;
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;
