@@ -497,6 +497,12 @@ void Ship::ManageJump()
 			{
 				m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
 			}
+
+			//"stroboscopic effect"
+			if (m_jump_clock.getElapsedTime().asSeconds() < 0.2)
+			{
+				PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
+			}
 		}
 	}
 }

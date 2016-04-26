@@ -34,7 +34,7 @@ bool InputGuy::isHyperspeeding()
 
 	if (sf::Joystick::isConnected(0))
 	{
-		if (sf::Joystick::isButtonPressed(0, 3))// Y button
+		if (sf::Joystick::isButtonPressed(0, 4)) //Left upper trigger
 			return true;
 	}
 
@@ -114,7 +114,7 @@ bool InputGuy::isUsingDebugCommand()
 
 	if (sf::Joystick::isConnected(0))
 	{
-		if (sf::Joystick::isButtonPressed(0, 4)) //Left upper trigger
+		if (sf::Joystick::isButtonPressed(0, 3))// Y button
 			return true;
 	}
 
