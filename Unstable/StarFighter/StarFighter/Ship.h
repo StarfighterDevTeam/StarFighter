@@ -94,7 +94,8 @@ public :
 	void updatePostCollision() override;
 	void Draw(sf::RenderTexture& screen) override;
 	void ManageDebugCommand();
-	bool ManageVisibility();
+	bool IsVisible();
+	void ManageJump();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
@@ -157,8 +158,10 @@ public :
 	void CenterMapView(sf::Vector2f offset = sf::Vector2f(0, 0));
 	void Bomb();
 	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
+	void Jump();
 
 	sf::Clock m_stroboscopic_effect_clock;
+	sf::Clock m_jump_clock;
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;

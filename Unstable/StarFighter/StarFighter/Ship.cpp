@@ -440,6 +440,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		m_SFHudPanel->Update(deltaTime, directions);
 	}
 
+	ManageJump();
+
 	//member objects follow
 	if (m_combo_aura)
 	{
@@ -474,7 +476,32 @@ void Ship::Draw(sf::RenderTexture& screen)
 	}
 }
 
-bool Ship::ManageVisibility()
+void Ship::ManageJump()
+{
+	if (m_jump_clock.getElapsedTime().asSeconds() < SHIP_JUMPING_IMMUNITY_DURATION)
+	{
+		if ((*CurrentGame).m_direction == NO_DIRECTION)
+		{
+			setColor(sf::Color(255, 255, 255, 255));
+			if (m_fake_ship)
+			{
+				m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
+			}
+		}
+		else
+		{
+			sf::Uint8 alpha = m_jump_clock.getElapsedTime().asSeconds() / SHIP_JUMPING_IMMUNITY_DURATION * (255 - GHOST_ALPHA_VALUE);
+
+			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
+			if (m_fake_ship)
+			{
+				m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
+			}
+		}
+	}
+}
+
+bool Ship::IsVisible()
 {
 	//no update on invisible ship (=dead)
 	if (m_fake_ship)
@@ -812,7 +839,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disableHyperspeed && !m_actions_states[Action_Recalling]);
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 
-				if (m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0)
+				if (m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0 && !m_moving)
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
 					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_CRUISING * deltaTime.asSeconds();
@@ -821,6 +848,14 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 						m_hyperspeed_fuel = 0;
 					}
 				}
+
+				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableHyperspeed && m_hyperspeed_fuel >= SHIP_JUMPING_COST && m_moving)
+				{
+					m_hyperspeed_fuel -= SHIP_JUMPING_COST;
+
+					Jump();
+				}
+
 				//else if (m_actions_states[Action_Slowmotion] && !m_disableSlowmotion && m_hyperspeed_fuel > 0 && !m_actions_states[Action_Recalling] && m_recall_clock.getElapsedTime().asSeconds() > MIN_TIME_FOR_RECALL_TO_HUB)
 				//{
 				//	(*CurrentGame).m_hyperspeedMultiplier = 1.0f / m_hyperspeed * SLOW_MOTION_MULTIPLIER;
@@ -975,6 +1010,13 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 
 void Ship::ManageImmunity()
 {
+	//no collision?
+	m_ghost = m_color.a < 255;
+	if (m_fake_ship)
+	{
+		m_fake_ship->m_ghost = m_fake_ship->m_color.a < 255;
+	}
+
 	//immunity frames after death
 	if (m_immune)
 	{
@@ -1514,6 +1556,15 @@ void Ship::Bomb()
 	{
 		m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
 	}
+}
+
+void Ship::Jump()
+{
+	ScaleSpeed(&m_speed, SHIP_JUMPING_SPEED);
+
+	PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
+
+	m_jump_clock.restart();
 }
 
 void Ship::SettingTurnAnimations()
@@ -3117,11 +3168,18 @@ void Ship::CenterMapView(sf::Vector2f offset)
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 {
-	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
+	if (m_fake_ship)
 	{
-		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
-		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+		m_fake_ship->PlayStroboscopicEffect(effect_duration, time_between_poses);
+	}
+	else
+	{
+		if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
+		{
+			Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
+			(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
 
-		m_stroboscopic_effect_clock.restart();
+			m_stroboscopic_effect_clock.restart();
+		}
 	}
 }

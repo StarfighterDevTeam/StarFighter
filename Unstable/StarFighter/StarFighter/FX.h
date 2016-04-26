@@ -37,6 +37,9 @@ public:
 	FakeShip(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber = 1);
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	bool GetLoot(GameObject& GameObject) override;
+	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
+
+	sf::Clock m_stroboscopic_effect_clock;
 };
 
 #endif // FX_H_INCLUDED

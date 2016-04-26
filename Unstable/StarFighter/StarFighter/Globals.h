@@ -217,6 +217,9 @@ std::string makePath(const std::string& srcPath);
 //HYPERSPEED
 #define HYPERSPEED_CONSUMPTION_FOR_CRUISING				1
 #define HYPERSPEED_CONSUMPTION_FOR_SLOWMOTION			1
+#define SHIP_JUMPING_SPEED								20000
+#define SHIP_JUMPING_COST								20
+#define SHIP_JUMPING_IMMUNITY_DURATION					0.5
 
 //LEVELING
 #define FIRST_LEVEL_MAX									20
