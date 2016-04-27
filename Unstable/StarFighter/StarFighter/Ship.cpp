@@ -1149,7 +1149,7 @@ void Ship::BuyingItem(bool equip_directly)
 					}
 				}
 
-				if (!equip_directly || success)
+				if (!equip_directly || success || !m_weapon)
 				{
 					setShipWeapon(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->Clone());
 					m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_quality);
@@ -1202,7 +1202,7 @@ void Ship::BuyingItem(bool equip_directly)
 					}
 				}
 
-				if (!equip_directly || success)
+				if (!equip_directly || success || !m_equipment[equip_type])
 				{
 					setShipEquipment(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->Clone());
 					m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_quality);
