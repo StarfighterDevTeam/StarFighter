@@ -150,9 +150,15 @@ void InGameState::Update(Time deltaTime)
 {
 	//debug command
 	#ifndef NDEBUG
-		if (InputGuy::spawnInSandbox())
+		if (InputGuy::spawnInSandbox() && !(*CurrentGame).m_waiting_for_dialog_validation)
 		{
 			SpawnInScene("Sandbox", (*CurrentGame).m_playerShip);
+		}
+
+		if (InputGuy::reloadCSVs())
+		{
+			(*CurrentGame).m_enemiesConfig.clear();
+			LoadAllEnemies(ENEMY_FILE);
 		}
 	#endif
 

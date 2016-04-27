@@ -131,6 +131,16 @@ bool InputGuy::spawnInSandbox()
 	return false;
 }
 
+bool InputGuy::reloadCSVs()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F7))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isChangingResolution()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F3))

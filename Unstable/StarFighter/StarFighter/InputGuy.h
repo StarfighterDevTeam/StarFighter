@@ -23,6 +23,7 @@ public:
 	static bool isOpeningHud();
 	static bool isUsingDebugCommand();
 	static bool spawnInSandbox();
+	static bool reloadCSVs();
 
 	static bool isMuting();
 	static bool isPausing();
