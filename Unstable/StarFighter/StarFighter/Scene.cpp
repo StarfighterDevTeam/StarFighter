@@ -399,6 +399,10 @@ bool Scene::CheckHazardBreakConditions()
 	m_score_graze = (*CurrentGame).m_playerShip->m_graze_level + 1;
 
 	//Total
+	if (m_score_total % 2 == 1 && m_score_total < 8)
+	{
+		m_score_total++;//because we want A + S to make a total of S.
+	}
 	m_score_total = (m_score_destruction + m_score_graze) / 2;
 	if (m_score_destruction == 1 && m_score_graze == 1)
 	{

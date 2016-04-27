@@ -147,7 +147,7 @@ std::string makePath(const std::string& srcPath);
 #define BOSS_PHASE_BAR_MARGIN							4
 
 //ITEM STATS DISPLAY
-#define ITEM_STATS_PANEL_SIZE_X							320
+#define ITEM_STATS_PANEL_SIZE_X							420
 #define ITEM_STATS_PANEL_SIZE_Y							380
 #define ITEM_STATS_PANEL_POSITION_X						20
 #define ITEM_STATS_PANEL_POSITION_Y						80
@@ -226,7 +226,7 @@ std::string makePath(const std::string& srcPath);
 #define XP_MAX_FIRST_LEVEL								100
 #define XP_MAX_INCREASE_PER_LEVEL						0.50
 #define XP_DEATH_MALUS_PERCENTAGE						0.05
-#define PLAYER_LEVELING_STATS_MULTIPLIER				0.06
+#define PLAYER_LEVELING_STATS_MULTIPLIER				0.04
 #define ENEMIES_LEVELING_STATS_MULTIPLIER				0.10
 #define BOT_STATS_MULTIPLIER							0.35
 #define BOMB_DEFAULT_NUMBER								4
