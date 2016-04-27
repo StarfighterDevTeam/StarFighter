@@ -71,3 +71,4 @@ V_AlphaGold_sniper,Vanguard AlphaGold Sniper,2D/Equipment/laser_red.png,48,48,1,
 V_BetaGold_dragonball,Vanguard BetaGold Dragonballs,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2f,7,2.f,2,20,0,0,0,seaking
 V_BetaGold_laser,Vanguard BetaGold Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.02f,5,2.22f,10,0,120,ascending2,0,semi_seaking
 V_AlphaGold_laser_double,Vanguard AlphaGold Laser Double,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3f,15,3.f,3,0,30,alternate,0,seaking
+V_BetaGold_dragonball_arc,Vanguard BetaGold Dragonballs Arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8f,0,3.f,12,0,120,0,0,0
