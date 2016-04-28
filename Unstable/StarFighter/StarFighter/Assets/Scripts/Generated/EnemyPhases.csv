@@ -110,3 +110,4 @@ V_BetaGold_Phase1_Start,0,0,V_laserM,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,gho
 V_BetaGold_Phase1_Routine,0,0,V_fireball_Vfast,0,0,V_BetaGold_laser,V_laserM_fast,0,0,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,0,0,0,,life,lesser,50,V_BetaGold_Phase1_End,0,,,,0
 V_BetaGold_Phase1_End,0,0,V_laserM,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,immune,0,0,0,,phaseClock,greater,2,V_BetaGold_Phase2_Routine,0,,,,0
 V_BetaGold_Phase2_Routine,0,V_Alpha1_laser,V_laserM,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,0,0,0,,0,greater,1,V_BetaGold_Phase1_Routine,0,,,,0
+V_BetaGold_Intro_Test,0,0,V_laserM,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,oscillator,50,200,0,0,0,0,0,0,,0,greater,1,V_BetaGold_Phase1_Routine,0,,,,0

@@ -35,3 +35,4 @@ V_AlphaGold4,500,0,0,100,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_AlphaGold.png,
 V_AlphaGold5,500,0,0,100,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Entry5
 V_BetaGold_Intro,3000,0,0,500,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_BetaGold.png,288,390,1,50,death_explosion,50,0,,,,0,V_BetaGold_Intro_Entry
 V_AlphaGold_Intro,500,0,0,100,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_AlphaGold.png,69,84,3,110,death_explosion,10,0,,,,0,V_AlphaGold_Intro_Entry
+V_BetaGold_Test,3000,0,0,500,0,cf. phase,0,cf. phase,0,,2D/Vanguard/V_BetaGold.png,288,390,1,50,death_explosion,50,0,,,,0,V_BetaGold_Intro_Test

@@ -131,7 +131,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float>*
  			this->_curSandboxPosition_polar = sf::Vector2f(patternParams->at(0)/2, patternParams->at(1)*M_PI/180); // r = ampl/2 + converting angle to radians
 			this->_curSandboxPosition_cartesian = ToCartesianCoords(this->_curSandboxPosition_polar);
 
-			this->_currTheta = 0; //starting @the middle. -PI/2 to start at the left max value
+			this->_currTheta = M_PI/2; //starting @the middle. -PI/2 to start at the left max value
 
 			break;
 		}
@@ -278,6 +278,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 
 			//Updating our current theta [modulo 2PI]
 			this->_currTheta = fmod(this->_currTheta + seconds*this->patternSpeed, 2*M_PI);
+			printf("theta : %f, ", _currTheta);
 
 			//Our next position (r is updated according to cos(theta))
 			next.x = this->_curSandboxPosition_polar.x*cos(this->_currTheta);
@@ -289,6 +290,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			{
 				offset.x = this->patternParams->at(1) * (next.x - this->_curSandboxPosition_cartesian.x);
 				offset.y = this->patternParams->at(1) * (next.y - this->_curSandboxPosition_cartesian.y);
+				printf("next : %f, offset.x : %f\n\n", next.x, offset.x);
 			}
 			//or the new position only:
 			else
