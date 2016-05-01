@@ -53,7 +53,6 @@ private:
 
 	float m_distance_left;
 	float m_currTheta;
-	float m_firstLoop;
 };
 
 

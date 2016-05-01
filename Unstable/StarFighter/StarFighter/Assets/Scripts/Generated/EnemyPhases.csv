@@ -32,7 +32,7 @@ V_Sigma3_Entry,250,V_Sigma3_laser,V_laserM_abitslow,0,0.5,V_Sigma3_laser180,V_la
 V_Sigma3_Exit,250,V_Sigma3_laser,V_laserM_abitslow,0,0.5,V_Sigma3_laser180,V_laserM_abitslow,0,0.5,V_Sigma3_laser,V_laserM_slow,0,0.5,V_Sigma3_laser180,V_laserM_slow,0,0.5,0,,,,0,,,,line,350,0,0,0,250,bouncing,0,0,0,,0,,,,0,,,,0
 V_Beta1_Entry,250,0,V_missile,0,0,0,V_fireball,0,0,0,,,,0,,,,0,,,,0,,,,0,,,0,0,0,0,0,0,0,,positionV,greater,230,V_Beta1_Routine,0,,,,0
 V_Beta1_Routine,0,V_Beta1_dragonball,V_fireball,0,0,V_Beta1_laser_supportL,V_laserM_fast,0,0,V_Beta1_laser_supportR,V_laserM_fast,,,0,,,,0,,,,0,,,,0,70,100,1,0,150,face_target,0,0,0,,shield,lesser,0,V_Beta1_Berserk,phaseClock,greater,8,V_Beta1_Exit,0
-V_Beta1_Berserk,150,V_Beta1_dragonballNoLock,V_fireball,0,1,V_Beta1_laser_supportL_exit,V_laserM_fast,0,1,V_Beta1_laser_supportR_exit,V_laserM_fast,1,,0,,,,0,,,,0,,,,oscillator,100,100,0,0,150,reset_facing,0,0,0,,0,,,,0,,,,0
+V_Beta1_Berserk,150,V_Beta1_dragonballNoLock,V_fireball,0,1,V_Beta1_laser_supportL_exit,V_laserM_fast,0,1,V_Beta1_laser_supportR_exit,V_laserM_fast,1,,0,,,,0,,,,0,,,,oscillator,100,100,0,1,150,reset_facing,0,0,0,,0,,,,0,,,,0
 V_Beta1_Exit,-150,0,V_missile,0,0,0,V_fireball,0,0,0,,,,0,,,,0,,,,0,,,,0,,,0,0,150,reset_facing,0,0,0,,0,greater,230,V_Beta1_Routine,0,,,,0
 V_Beta2_Entry,250,0,V_missile,0,0,0,V_fireball,0,0,0,,,,0,,,,0,,,,0,,,,0,,,0,0,0,ghost,0,0,0,,positionV,greater,150,V_Beta2_Routine,0,,,,0
 V_Beta2_Routine,0,V_Beta2_dragonball,V_fireball_slow,0,0,V_Beta2_laser_support40,V_laserM,0,0,V_Beta2_laser_support180,V_laserM,0,0,V_Beta2_laser_support320,V_laserM,0,0,0,,,,0,,,,0,,,0,0,80,face_target,0,0,0,,shotsFired,greater,111,V_Beta2_Move,0,,,,0
@@ -102,7 +102,7 @@ V_AlphaGold_Routine5_4,0,V_AlphaGold_laser_double,V_laserM_Vfast,-10,0,V_AlphaGo
 V_AlphaGold_Death,0,0,V_laserM,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,0,0,V_BetaGold,0,,0,,,,0,,,,0
 V_BetaGold_Entry,120,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,immune,0,0,0,,wakeUp,0,0,V_BetaGold_Wait,0,,,,0
 V_BetaGold_Wait,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,2.f,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait4,0,,,,0
-V_BetaGold_Wait4,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,oscillator,20,200,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait3,0,,,,0
+V_BetaGold_Wait4,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,oscillator,80,200,0,1,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait3,0,,,,0
 V_BetaGold_Wait3,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait2,0,,,,0
 V_BetaGold_Wait2,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait1,0,,,,0
 V_BetaGold_Wait1,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Phase1_Start,0,,,,0
