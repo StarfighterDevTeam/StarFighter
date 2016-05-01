@@ -511,7 +511,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	//allocating bonuses to the weapon
 	weapon->m_multishot += bonus_multishot;
 	weapon->m_ammunition->m_damage += ceil((bonus_damage + cost_per_multishot * bonus_multishot) * FIRST_LEVEL_AMMO_DAMAGE / weapon->m_multishot * 0.01);
-	weapon->m_rate_of_fire -= bonus_rate_of_fire * FIRST_LEVEL_RATE_OF_FIRE * 0.01;
+	weapon->m_rate_of_fire = FIRST_LEVEL_RATE_OF_FIRE / (1 + bonus_rate_of_fire * 0.01);
 
 	//spread of multishot weapons
 	if (weapon->m_multishot > 1)
@@ -530,6 +530,11 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	weapon->m_level = level;
 	weapon->m_credits = credits_;
 	weapon->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	#ifndef NDEBUG
+	if (!is_bot)
+		printf("\nNew weapon created: level %d, quality %f, xp: %d, bonus_multishot: %d, bonus_damage: %d, bonus_rof: %d\n\n", level, weapon->m_quality, credits_, bonus_multishot, bonus_damage, bonus_rate_of_fire);
+	#endif
 
 	return weapon;
 }
