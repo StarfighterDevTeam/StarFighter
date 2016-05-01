@@ -102,7 +102,7 @@ V_AlphaGold_Routine5_4,0,V_AlphaGold_laser_double,V_laserM_Vfast,-10,0,V_AlphaGo
 V_AlphaGold_Death,0,0,V_laserM,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,0,0,V_BetaGold,0,,0,,,,0,,,,0
 V_BetaGold_Entry,120,0,,,,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,immune,0,0,0,,wakeUp,0,0,V_BetaGold_Wait,0,,,,0
 V_BetaGold_Wait,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,2.f,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait4,0,,,,0
-V_BetaGold_Wait4,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,oscillator,80,200,0,1,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait3,0,,,,0
+V_BetaGold_Wait4,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,oscillator,40,200,0,1,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait3,0,,,,0
 V_BetaGold_Wait3,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait2,0,,,,0
 V_BetaGold_Wait2,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Wait1,0,,,,0
 V_BetaGold_Wait1,0,V_BetaGold_dragonball_arc,V_fireball_slow,0,0,0,,,,0,,,,0,,,,0,,,,0,,,,0,10,0,0,0,0,ghost,0,0,0,,wakeUp,0,0,V_BetaGold_Phase1_Start,0,,,,0

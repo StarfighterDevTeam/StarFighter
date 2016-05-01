@@ -843,14 +843,73 @@ void Enemy::setPhase(Phase* phase)
 		}
 	}
 
-	//clearing old weapons and setting new ones
-	m_weapons_list.clear();
-	for (std::vector<Weapon*>::iterator it = phase->m_weapons_list.begin(); it != phase->m_weapons_list.end(); it++)
+	//weapons
+	//check if identical weapons
+	bool identical_weapons = false;
+	size_t weaponsVectorSize = m_weapons_list.size();
+	if (weaponsVectorSize > 0 && weaponsVectorSize == phase->m_weapons_list.size())
 	{
-		m_weapons_list.push_back((*it)->Clone());
+		for (size_t i = 0; i < weaponsVectorSize; i++)
+		{
+			if (m_weapons_list[i]->m_display_name != phase->m_weapons_list[i]->m_display_name)
+			{
+				break;
+			}
+
+			if (i == weaponsVectorSize - 1)
+			{
+				identical_weapons = true;
+			}
+		}
+	}
+	//clearing old weapons and setting new ones
+	if (!identical_weapons)
+	{
+		m_weapons_list.clear();
+		for (std::vector<Weapon*>::iterator it = phase->m_weapons_list.begin(); it != phase->m_weapons_list.end(); it++)
+		{
+			m_weapons_list.push_back((*it)->Clone());
+		}
 	}
 
 	//movement
+	//check if identical patterns
+	bool identical_patterns = false;
+	if (m_Pattern.m_currentPattern == phase->m_Pattern->m_currentPattern)
+	{
+		if (m_Pattern.m_currentPattern == NoMovePattern)
+		{
+			identical_patterns = true;
+		}
+		else if (m_Pattern.m_patternSpeed == phase->m_Pattern->m_patternSpeed)
+		{
+			size_t paramsVectorSize = m_Pattern.m_patternParams.size();
+			if (paramsVectorSize == phase->m_Pattern->m_patternParams.size())
+			{
+				if (paramsVectorSize == 0)
+				{
+					identical_patterns = true;
+				}
+				else
+				{
+					for (size_t i = 0; i < paramsVectorSize; i++)
+					{
+						if (m_Pattern.m_patternParams[i] != phase->m_Pattern->m_patternParams[i])
+						{
+							break;
+						}
+
+						if (i == paramsVectorSize - 1)
+						{
+							identical_patterns = true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//if (!identical_patterns)
 	m_Pattern.SetPattern(phase->m_Pattern->m_currentPattern, phase->m_Pattern->m_patternSpeed, phase->m_Pattern->m_patternParams); //vitesse angulaire (degres/s)
 	m_rotation_speed = phase->m_rotation_speed;
 
