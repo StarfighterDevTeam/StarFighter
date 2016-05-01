@@ -206,7 +206,6 @@ Equipment* Equipment::CreateRandomShield(int level, float beastScore)
 	//allocating bonuses to the weapon
 	equipment->m_shield += bonus_shield * FIRST_LEVEL_SHIELD * 0.01;
 	equipment->m_shield_regen += ceil(bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
-	equipment->m_shield_regen += ceil(bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
 	equipment->m_shield_recovery_time = FIRST_LEVEL_SHIELD_RECOVERY_TIME / (1 + bonus_shield_recovery * 0.01);
 
 	//saving level and credits used
