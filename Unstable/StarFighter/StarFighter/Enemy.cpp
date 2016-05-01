@@ -218,7 +218,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 				{
-					m_Pattern.patternSpeed *= -1;
+					m_Pattern.m_patternSpeed *= -1;
 				}
 				else
 				{
@@ -231,7 +231,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			{
 				if ((*CurrentGame).m_direction == DIRECTION_UP || (*CurrentGame).m_direction == DIRECTION_DOWN)
 				{
-					m_Pattern.patternSpeed *= -1;
+					m_Pattern.m_patternSpeed *= -1;
 				}
 				else
 				{
@@ -252,7 +252,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
-					m_Pattern.patternSpeed *= -1;
+					m_Pattern.m_patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, this->m_size.y / 2);
 			}
@@ -265,7 +265,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 				}
 				else
 				{
-					m_Pattern.patternSpeed *= -1;
+					m_Pattern.m_patternSpeed *= -1;
 				}
 				this->setPosition(newposition.x, SCENE_SIZE_Y - this->m_size.y / 2);
 			}
@@ -851,7 +851,7 @@ void Enemy::setPhase(Phase* phase)
 	}
 
 	//movement
-	m_Pattern.SetPattern(phase->m_Pattern->currentPattern, phase->m_Pattern->patternSpeed, phase->m_Pattern->patternParams); //vitesse angulaire (degres/s)
+	m_Pattern.SetPattern(phase->m_Pattern->m_currentPattern, phase->m_Pattern->m_patternSpeed, phase->m_Pattern->m_patternParams); //vitesse angulaire (degres/s)
 	m_rotation_speed = phase->m_rotation_speed;
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
@@ -1357,7 +1357,7 @@ Ammo* Enemy::LoadAmmo(string name)
 			new_ammo->m_range = stoi((*it)[AMMO_RANGE]);
 			
 			PatternBobby* bobby = PatternBobby::PatternLoader((*it), AMMO_PATTERN);
-			new_ammo->m_Pattern.SetPattern(bobby->currentPattern, bobby->patternSpeed, bobby->patternParams);
+			new_ammo->m_Pattern.SetPattern(bobby->m_currentPattern, bobby->m_patternSpeed, bobby->m_patternParams);
 
 			new_ammo->m_rotation_speed = stoi((*it)[AMMO_ROTATION_SPEED]);
 			return new_ammo;

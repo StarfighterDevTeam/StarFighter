@@ -142,7 +142,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 		}
 
 		PatternBobby* m_bobby = PatternBobby::PatternLoader((*CurrentGame).m_enemiesConfig[name], ENEMY_PATTERN);
-		base->m_enemy->m_Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
+		base->m_enemy->m_Pattern.SetPattern(m_bobby->m_currentPattern, m_bobby->m_patternSpeed, m_bobby->m_patternParams);
 
 		base->m_enemy->m_rotation_speed = stoi((*CurrentGame).m_enemiesConfig[name][ENEMY_ROTATION_SPEED]);
 	}
@@ -274,7 +274,7 @@ Bot* FileLoader::LoadBot(string name)
 			bot->m_spread = Vector2f(stoi((*it)[BOT_XSPREAD]), stoi((*it)[BOT_YSPREAD]));
 
 			PatternBobby* m_bobby = PatternBobby::PatternLoader((*it), BOT_PATTERN);
-			bot->m_Pattern.SetPattern(m_bobby->currentPattern, m_bobby->patternSpeed, m_bobby->patternParams);
+			bot->m_Pattern.SetPattern(m_bobby->m_currentPattern, m_bobby->m_patternSpeed, m_bobby->m_patternParams);
 
 			bot->m_rotation_speed = stoi((*it)[BOT_ROTATION_SPEED]);
 

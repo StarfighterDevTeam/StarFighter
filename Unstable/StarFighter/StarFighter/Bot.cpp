@@ -167,5 +167,5 @@ void Bot::setRadius(float m_radius, float clockwise)
 	vector<float>* v = new vector<float>;
 	v->push_back(m_radius);
 	v->push_back(clockwise);  // clockwise (>)
-	this->m_Pattern.SetPattern(this->m_Pattern.currentPattern,this->m_vspeed,v); //vitesse angulaire (degres/s)in
+	this->m_Pattern.SetPattern(this->m_Pattern.m_currentPattern,this->m_vspeed,v); //vitesse angulaire (degres/s)in
 }

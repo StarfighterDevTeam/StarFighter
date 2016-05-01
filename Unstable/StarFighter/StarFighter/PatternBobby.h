@@ -26,6 +26,7 @@ enum BobbyPatternData
 	BOBBY_PATTERN_SPEED,//1
 	BOBBY_PATTERN_ARG1,//2
 	BOBBY_PATTERN_ARG2,//3
+	BOBBY_PATTERN_ARG3,//4
 };
 
 class PatternBobby : virtual public IPatternHandler
@@ -37,22 +38,22 @@ public:
 	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
 	static PatternBobby* PatternLoader(vector<string> line_data, int index);
 
-	PatternType currentPattern;
-	vector<float>* patternParams;
-	float patternSpeed;
+	PatternType m_currentPattern;
+	vector<float>* m_patternParams;
+	float m_patternSpeed;
 
 private:
 	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);
 	void ToCartesianCoords(sf::Vector2f* polarCoords);
 	void CheckArgSize(size_t expected);
 
-	sf::Vector2i _direction;
-	sf::Vector2f _curSandboxPosition_cartesian;
-	sf::Vector2f _curSandboxPosition_polar;
+	sf::Vector2i m_direction;
+	sf::Vector2f m_curSandboxPosition_cartesian;
+	sf::Vector2f m_curSandboxPosition_polar;
 
-	float _distance_left;
-	float _currTheta;
-
+	float m_distance_left;
+	float m_currTheta;
+	float m_firstLoop;
 };
 
 
