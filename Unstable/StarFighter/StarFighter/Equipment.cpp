@@ -302,11 +302,11 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 	bot->m_vspeed = 300;
 	bot->m_spread = sf::Vector2f(-50, 0);
 
-	vector<float>* v = new vector<float>;
+	vector<float> patternParams;
 	//v->push_back(bot->radius); // rayon 500px
 	//v->push_back(1);  // clockwise (>)
 	PatternType pattern_type = NoMovePattern;
-	bot->m_Pattern.SetPattern(pattern_type, bot->m_vspeed, v); //vitesse angulaire (degres/s)
+	bot->m_Pattern.SetPattern(pattern_type, bot->m_vspeed, patternParams); //vitesse angulaire (degres/s)
 
 	bot->m_weapon = weapon;
 

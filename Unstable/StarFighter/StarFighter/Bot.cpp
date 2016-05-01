@@ -164,8 +164,8 @@ Bot* Bot::Clone()
 
 void Bot::setRadius(float m_radius, float clockwise)
 {
-	vector<float>* v = new vector<float>;
-	v->push_back(m_radius);
-	v->push_back(clockwise);  // clockwise (>)
-	this->m_Pattern.SetPattern(this->m_Pattern.m_currentPattern,this->m_vspeed,v); //vitesse angulaire (degres/s)in
+	vector<float> patternParams;
+	patternParams.push_back(m_radius);
+	patternParams.push_back(clockwise);  // clockwise (>)
+	m_Pattern.SetPattern(m_Pattern.m_currentPattern, m_vspeed, patternParams); //vitesse angulaire (degres/s)in
 }

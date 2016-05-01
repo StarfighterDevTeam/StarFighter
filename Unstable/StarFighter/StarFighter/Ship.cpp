@@ -2646,13 +2646,13 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 		if (bot->m_Pattern.m_currentPattern == Line_)
 		{
 			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
-			bot->m_Pattern.m_patternParams->push_back(bot_pattern_arg2);
+			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
 		}
 		else if (bot->m_Pattern.m_currentPattern > NoMovePattern)
 		{
 			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
-			bot->m_Pattern.m_patternParams->push_back(bot_pattern_arg1);
-			bot->m_Pattern.m_patternParams->push_back(bot_pattern_arg2);
+			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg1);
+			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
 		}
 
 		if (bot_weapon_name.compare("0") == 0)
@@ -2668,13 +2668,13 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			if (ammo->m_Pattern.m_currentPattern == Line_)
 			{
 				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
-				ammo->m_Pattern.m_patternParams->push_back(bot_ammo_pattern_arg2);
+				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
 			}
 			else if (ammo->m_Pattern.m_currentPattern > NoMovePattern)
 			{
 				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
-				ammo->m_Pattern.m_patternParams->push_back(bot_ammo_pattern_arg1);
-				ammo->m_Pattern.m_patternParams->push_back(bot_ammo_pattern_arg2);
+				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg1);
+				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
 			}
 
 			Weapon* weapon = new Weapon(ammo);
@@ -2777,13 +2777,13 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	if (ammo->m_Pattern.m_currentPattern == Line_)
 	{
 		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
-		ammo->m_Pattern.m_patternParams->push_back(ammo_pattern_arg2);
+		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
 	}
 	else if (ammo->m_Pattern.m_currentPattern > NoMovePattern)
 	{
 		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
-		ammo->m_Pattern.m_patternParams->push_back(ammo_pattern_arg1);
-		ammo->m_Pattern.m_patternParams->push_back(ammo_pattern_arg2);
+		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg1);
+		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
 	}
 
 	Weapon* weapon = new Weapon(ammo);
