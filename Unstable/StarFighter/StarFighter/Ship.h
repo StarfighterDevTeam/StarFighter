@@ -95,7 +95,7 @@ public :
 	void Draw(sf::RenderTexture& screen) override;
 	void ManageDebugCommand();
 	bool IsVisible();
-	void ManageJump();
+	void ManageJumpFeedbacks();
 	void ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
 	void ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier);
@@ -162,6 +162,7 @@ public :
 
 	sf::Clock m_stroboscopic_effect_clock;
 	sf::Clock m_jump_clock;
+	bool m_is_jumping;
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;

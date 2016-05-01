@@ -44,6 +44,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_is_asking_scene_transition = false;
 	m_currentScene_hazard = 0;
 	m_input_blocker = NULL;
+	m_is_jumping = false;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -440,7 +441,7 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		m_SFHudPanel->Update(deltaTime, directions);
 	}
 
-	ManageJump();
+	ManageJumpFeedbacks();
 
 	//member objects follow
 	if (m_combo_aura)
@@ -476,9 +477,9 @@ void Ship::Draw(sf::RenderTexture& screen)
 	}
 }
 
-void Ship::ManageJump()
+void Ship::ManageJumpFeedbacks()
 {
-	if (m_jump_clock.getElapsedTime().asSeconds() < SHIP_JUMPING_IMMUNITY_DURATION)
+	if (m_jump_clock.getElapsedTime().asSeconds() < SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
 	{
 		if ((*CurrentGame).m_direction == NO_DIRECTION)
 		{
@@ -490,7 +491,7 @@ void Ship::ManageJump()
 		}
 		else
 		{
-			sf::Uint8 alpha = m_jump_clock.getElapsedTime().asSeconds() / SHIP_JUMPING_IMMUNITY_DURATION * (255 - GHOST_ALPHA_VALUE);
+			sf::Uint8 alpha = m_jump_clock.getElapsedTime().asSeconds() / (SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED) * (255 - GHOST_ALPHA_VALUE);
 
 			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
 			if (m_fake_ship)
@@ -1007,6 +1008,19 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
+	if (m_is_jumping)
+	{
+		if (m_is_jumping && m_jump_clock.getElapsedTime().asSeconds() > SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
+		{
+			m_is_jumping = false;
+			m_speed = sf::Vector2f(0, 0);
+		}
+		else
+		{
+			return;
+		}
+	}
+
 	m_speed.x += inputs_direction.x*getFighterFloatStatValue(Fighter_Acceleration);
 	m_speed.y += inputs_direction.y*getFighterFloatStatValue(Fighter_Acceleration);
 
@@ -1567,6 +1581,7 @@ void Ship::Bomb()
 void Ship::Jump()
 {
 	ScaleSpeed(&m_speed, SHIP_JUMPING_SPEED);
+	m_is_jumping = true;
 
 	PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
 
@@ -1656,6 +1671,11 @@ void Ship::ScreenBorderContraints()
 
 void Ship::IdleDecelleration(sf::Time deltaTime)
 {
+	if (m_is_jumping)
+	{
+		return;
+	}
+
 	//idle deceleration
 	if (!m_movingX || m_HUD_state == HUD_OpeningEquipment || m_actions_states[Action_Recalling])
 	{
