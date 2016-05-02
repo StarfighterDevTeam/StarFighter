@@ -222,6 +222,7 @@ std::string makePath(const std::string& srcPath);
 #define SHIP_JUMPING_DISTANCE							250.f
 #define SHIP_JUMPING_COST								20
 #define SHIP_JUMPING_IMMUNITY_DURATION					0.6
+#define SHIP_BOMBING_IMMUNITY_DURATION					2
 
 //LEVELING
 #define FIRST_LEVEL_MAX									20

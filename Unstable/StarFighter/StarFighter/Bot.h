@@ -18,6 +18,7 @@ public:
 	~Bot();
 
 	void update(sf::Time deltaTime, float hyperspeedMultiplier) override;
+	void setGhost(bool ghost) override;
 	Weapon* m_weapon;
 	GameObject* m_target;
 	Bot* Clone();

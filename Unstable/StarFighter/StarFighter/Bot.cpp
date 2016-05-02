@@ -88,6 +88,11 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	
 }
 
+void Bot::setGhost(bool ghost)
+{
+	GameObject::setGhost(ghost || m_damage == 0);
+}
+
 void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool hyperspeeding)
 {
 	//automatic fire

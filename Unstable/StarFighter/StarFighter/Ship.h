@@ -104,6 +104,7 @@ public :
 	void UpdateHUDStates();
 	void ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vector2f inputs_direction);
 	void ManageImmunity();
+	void ManageGhost(sf::Time deltaTime);
 	bool ResplenishHealth();
 	void RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyperspeed_fuel);
 	void ManageFeedbackExpiration(sf::Time deltaTime);
@@ -164,6 +165,7 @@ public :
 	sf::Clock m_stroboscopic_effect_clock;
 	sf::Clock m_jump_clock;
 	bool m_is_jumping;
+	sf::Time m_ghost_timer;
 
 	Portal* m_targetPortal;
 	Shop* m_targetShop;

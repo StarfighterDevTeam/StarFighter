@@ -399,7 +399,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//clean the dust
 	CleanGarbagedEquipments();
 
-	//ManageVisibility();
 	//Resetting flags
 	if (m_isCollidingWithInteractiveObject != PortalInteraction && !m_is_asking_scene_transition)
 	{
@@ -416,8 +415,6 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	m_is_asking_scene_transition = false;
 
 	//Update
-	ManageImmunity();
-	
 	ManageShieldRegen(deltaTime, hyperspeedMultiplier);
 
 	sf::Vector2f directions = InputGuy::getDirections();
@@ -442,6 +439,8 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		m_SFHudPanel->Update(deltaTime, directions);
 	}
 
+	ManageGhost(deltaTime);
+	ManageImmunity();
 	ManageJumpFeedbacks();
 
 	//member objects follow
@@ -480,33 +479,38 @@ void Ship::Draw(sf::RenderTexture& screen)
 
 void Ship::ManageJumpFeedbacks()
 {
-	if (m_jump_clock.getElapsedTime().asSeconds() < SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
+	if (m_is_jumping)
 	{
-		if ((*CurrentGame).m_direction == NO_DIRECTION)
-		{
-			setColor(sf::Color(255, 255, 255, 255));
-			if (m_fake_ship)
-			{
-				m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
-			}
-		}
-		else
-		{
-			sf::Uint8 alpha = m_jump_clock.getElapsedTime().asSeconds() / (SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED) * (255 - GHOST_ALPHA_VALUE);
-
-			setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
-			if (m_fake_ship)
-			{
-				m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
-			}
-
-			//"stroboscopic effect"
-			if (m_jump_clock.getElapsedTime().asSeconds() < 0.2)
-			{
-				PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
-			}
-		}
+		PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
 	}
+
+	//if (m_jump_clock.getElapsedTime().asSeconds() < SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED)
+	//{
+	//	if ((*CurrentGame).m_direction == NO_DIRECTION)
+	//	{
+	//		setColor(sf::Color(255, 255, 255, 255));
+	//		if (m_fake_ship)
+	//		{
+	//			m_fake_ship->setColor(sf::Color(255, 255, 255, 255));
+	//		}
+	//	}
+	//	else
+	//	{
+	//		sf::Uint8 alpha = m_jump_clock.getElapsedTime().asSeconds() / (SHIP_JUMPING_DISTANCE / SHIP_JUMPING_SPEED) * (255 - GHOST_ALPHA_VALUE);
+	//
+	//		setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
+	//		if (m_fake_ship)
+	//		{
+	//			m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE + alpha));
+	//		}
+	//
+	//		//"stroboscopic effect"
+	//		if (m_jump_clock.getElapsedTime().asSeconds() < 0.2)
+	//		{
+	//			PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
+	//		}
+	//	}
+	//}
 }
 
 bool Ship::IsVisible()
@@ -1029,15 +1033,25 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 	GameObject::NormalizeSpeed(&m_speed, getFighterFloatStatValue(Fighter_MaxSpeed));
 }
 
+void Ship::ManageGhost(sf::Time deltaTime)
+{
+	//ghost status expires?
+	if (m_ghost_timer > sf::seconds(0))
+	{
+		m_ghost_timer -= deltaTime;
+		if (m_ghost_timer < sf::seconds(0))
+		{
+			setGhost(false);
+		}
+		else
+		{
+			setGhost(true);
+		}
+	}
+}
+
 void Ship::ManageImmunity()
 {
-	//no collision?
-	m_ghost = m_color.a < 255;
-	if (m_fake_ship)
-	{
-		m_fake_ship->m_ghost = m_fake_ship->m_color.a < 255;
-	}
-
 	//immunity frames after death
 	if (m_immune)
 	{
@@ -1568,14 +1582,13 @@ void Ship::Recalling()
 
 void Ship::Bomb()
 {
-	m_immunityTimer.restart();
-	m_immune = true;
 	(*CurrentGame).killGameObjectLayer(EnemyObject);
 	(*CurrentGame).killGameObjectLayer(EnemyFire);
-	setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
-	if (m_fake_ship)
+
+	//ghost
+	if (m_ghost_timer < sf::seconds(SHIP_BOMBING_IMMUNITY_DURATION))
 	{
-		m_fake_ship->setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+		m_ghost_timer = sf::seconds(SHIP_BOMBING_IMMUNITY_DURATION);
 	}
 }
 
@@ -1583,6 +1596,12 @@ void Ship::Jump()
 {
 	ScaleSpeed(&m_speed, SHIP_JUMPING_SPEED);
 	m_is_jumping = true;
+
+	//ghost
+	if (m_ghost_timer < sf::seconds(SHIP_JUMPING_IMMUNITY_DURATION))
+	{
+		m_ghost_timer = sf::seconds(SHIP_JUMPING_IMMUNITY_DURATION);
+	}
 
 	PlayStroboscopicEffect(sf::seconds(0.1), sf::seconds(0.01));
 
@@ -1792,6 +1811,10 @@ void Ship::setGhost(bool ghost)
 	if (m_fake_ship)
 	{
 		m_fake_ship->GameObject::setGhost(ghost);
+	}
+	for (std::vector<Bot*>::iterator it = m_bot_list.begin(); it != m_bot_list.end(); it++)
+	{
+		(*it)->Bot::setGhost(ghost);
 	}
 }
 
@@ -3176,6 +3199,7 @@ void Ship::SetBotsVisibility(bool visible)
 	for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 	{
 		(*it)->m_visible = visible;
+		(*it)->setGhost(m_ghost);
 	}
 }
 
