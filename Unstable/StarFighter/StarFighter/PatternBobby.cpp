@@ -285,7 +285,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			next.y = m_curSandboxPosition_polar.y;
 			ToCartesianCoords(&next);
 
-			printf("theta : %f, next: %f\n", m_currTheta, next.x);
+			//printf("theta : %f, next: %f\n", m_currTheta, next.x);
 			//first oscillation of a "centered" oscillator pattern is twice smaller. here we detect that this first oscillation is over and we switch back to full amplitude oscillations
 			
 			//return offset = diff between new and old position

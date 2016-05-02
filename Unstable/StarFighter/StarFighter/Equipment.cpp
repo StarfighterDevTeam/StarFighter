@@ -164,10 +164,12 @@ Equipment* Equipment::CreateRandomShield(int level, float beastScore)
 	int bonus_shield_recovery = 0;
 
 	int loot_credits_remaining = credits_;
+	
+	bool can_buy_shield_regen = loot_credits_remaining > 20;
 
 	while (loot_credits_remaining > 0)
 	{
-		int random_type_of_bonus = RandomizeIntBetweenValues(0, 3);
+		int random_type_of_bonus = can_buy_shield_regen ? RandomizeIntBetweenValues(0, 3) : RandomizeIntBetweenValues(1, 3);
 
 		//spending the credits in the chosen bonus
 		switch (random_type_of_bonus)
@@ -206,7 +208,7 @@ Equipment* Equipment::CreateRandomShield(int level, float beastScore)
 	//allocating bonuses to the weapon
 	equipment->m_shield += bonus_shield * FIRST_LEVEL_SHIELD * 0.01;
 	equipment->m_shield_regen += ceil(bonus_shield_regen * FIRST_LEVEL_SHIELD_REGEN * 0.01);
-	equipment->m_shield_recovery_time = FIRST_LEVEL_SHIELD_RECOVERY_TIME / (1 + bonus_shield_recovery * 0.01);
+	equipment->m_shield_recovery_time -= FIRST_LEVEL_SHIELD_RECOVERY_TIME - FIRST_LEVEL_SHIELD_RECOVERY_TIME / (1 + bonus_shield_recovery * 0.01);
 
 	//saving level and credits used
 	equipment->m_level = level;
@@ -266,6 +268,30 @@ Equipment* Equipment::CreateRandomEngine(int level, float beastScore)
 	equipment->m_level = level;
 	equipment->m_credits = credits_;
 	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	//epic stats
+	if (Game::GetItemQualityClass(equipment->m_quality) == ItemQuality_Epic)
+	{
+		int random_epic_ability = RandomizeIntBetweenValues(0, 1);
+
+		switch (random_epic_ability)
+		{
+			case 0://cruising
+			{
+				//todo
+				break;
+			}
+			case 1://jumping
+			{
+				//todo	  
+				break;
+			}
+		}
+	}
+
+	#ifndef NDEBUG
+		printf("\nNew engine created: level %d, quality %f, xp: %d, bonus_hyperspeed: %d, bonus_fuel: %d\n\n", level, equipment->m_quality, credits_, bonus_hyperspeed, bonus_fuel);
+	#endif
 
 	return equipment;
 }

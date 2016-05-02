@@ -46,7 +46,6 @@ public:
 	static void UpdateBackgroundColors(ObjectGrid* color_grid, ObjectGrid* object_grid);
 	static void UpdateGreyMaskOnInsufficientCredits(ObjectGrid* grey_grid, ObjectGrid* grid, Ship* playerShip);
 	static void SetGridSlotsVisibility(ObjectGrid* grid, bool visible);
-	static EquipmentQuality GetItemQualityClass(float quality);
 
 	GameObject* GetHoveredObjectInGrid();
 	GameObject* GetEquivalentEquippedItem(Ship* playerShip, GameObject* item);

@@ -40,9 +40,7 @@ public:
 	sf::Time m_readyFireTimer;
 	Ammo* m_ammunition;
 	bool m_isReadyToFire;
-	TargetSeaking m_target_seaking;
-
-	void SeakTarget(GameObjectType collider_type);
+	TargetHoming m_target_homing;
 
 	//special weapon abilities
 	int m_multishot;

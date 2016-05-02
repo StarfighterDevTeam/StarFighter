@@ -106,7 +106,7 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool
 				{
 					//calculating the angle we want to face, if any
 					float target_angle = getRotation();
-					if (m_weapon->m_target_seaking != NO_SEAKING || (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index == 0))
+					if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
 					{
 						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 					}
@@ -118,14 +118,14 @@ void Bot::Fire(sf::Time deltaTime, float hyperspeedMultiplier, bool firing, bool
 						delta += 360;
 
 					float theta = getRotation() / 180 * M_PI;
-					if (m_weapon->m_target_seaking != NO_SEAKING)
+					if (m_weapon->m_target_homing != NO_HOMING)
 					{
 						theta -= delta / 180 * M_PI;
 					}
 
-					if (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
+					if (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
 					{
-						//semi-seaking and rafale not ended = no update of target or weapon position
+						//semi-HOMING and rafale not ended = no update of target or weapon position
 					}
 					else
 					{

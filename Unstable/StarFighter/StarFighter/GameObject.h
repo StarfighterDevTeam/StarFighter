@@ -75,15 +75,15 @@ enum WeaponData
 	WEAPON_DISPERSION,
 	WEAPON_ALTERNATE,
 	WEAPON_ANGLE_OFFSET,
-	WEAPON_TARGET_SEAKING,
+	WEAPON_TARGET_HOMING,
 };
 
-enum TargetSeaking
+enum TargetHoming
 {
-	NO_SEAKING,
-	SEMI_SEAKING,//aim once every rafale
-	SEAKING,//aim once every bullt
-	SUPER_SEAKING,//bullet follows target
+	NO_HOMING,
+	SEMI_HOMING,//aim once every rafale
+	HOMING,//aim once every bullt
+	SUPER_HOMING,//bullet follows target
 };
 
 enum ShotMode
@@ -195,8 +195,6 @@ enum EquipmentQuality
 	ItemQuality_Epic,
 	NBVAL_ItemQuality,
 };
-
-
 
 class GameObject : public AnimatedSprite
 {

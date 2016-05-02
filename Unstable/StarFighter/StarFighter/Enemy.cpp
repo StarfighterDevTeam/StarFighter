@@ -297,7 +297,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			//now acquire target is the weapons needs to
 			if (!isNearestTargetIsKnown)//maybe we know it already?
 			{
-				if ((*it)->m_target_seaking == SEAKING || ((*it)->m_target_seaking == SEMI_SEAKING && (*it)->m_rafale_index == 0))
+				if ((*it)->m_target_homing == HOMING || ((*it)->m_target_homing == SEMI_HOMING && (*it)->m_rafale_index == 0))
 				{
 					target_angle = fmod(180 + GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(PlayerShip, this->getPosition()), 360);
 				}
@@ -308,10 +308,10 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 			(*it)->m_isReadyToFire = false;
 		}
 
-		//semi-seaking and rafale not ended or alternated multishot not ended need to keep the enemy oriented to the same target if it's "semi_seaking"
+		//semi-HOMING and rafale not ended or alternated multishot not ended need to keep the enemy oriented to the same target if it's "semi_HOMING"
 		if (m_face_target)
 		{
-			if ((*it)->m_target_seaking == SEMI_SEAKING && (*it)->m_rafale > 0 && (((*it)->m_rafale_index > 0 && (*it)->m_rafale_index < (*it)->m_rafale) || ((*it)->m_multishot > 1 && (*it)->m_shot_index > 0)))
+			if ((*it)->m_target_homing == SEMI_HOMING && (*it)->m_rafale > 0 && (((*it)->m_rafale_index > 0 && (*it)->m_rafale_index < (*it)->m_rafale) || ((*it)->m_multishot > 1 && (*it)->m_shot_index > 0)))
 			{
 				isDoneFiringOnLockedTarget = false;
 			}
@@ -387,15 +387,15 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 						}
 						else
 						{
-							if ((*it)->m_target_seaking == SEMI_SEAKING && (*it)->m_rafale > 0 && (((*it)->m_rafale_index > 0 && (*it)->m_rafale_index < (*it)->m_rafale) || ((*it)->m_multishot > 1 && (*it)->m_shot_index > 0)))
+							if ((*it)->m_target_homing == SEMI_HOMING && (*it)->m_rafale > 0 && (((*it)->m_rafale_index > 0 && (*it)->m_rafale_index < (*it)->m_rafale) || ((*it)->m_multishot > 1 && (*it)->m_shot_index > 0)))
 							{
-								//semi-seaking and rafale not ended or alternated multishot not ended = no update of target or weapon position
+								//semi-HOMING and rafale not ended or alternated multishot not ended = no update of target or weapon position
 							}
 							else
 							{
 								//here we add delta so that we virtually move the weapon around the enemy, so that he can always shoot at 360 degrees with the same nice spread
 								float theta = (getRotation() + (*it)->m_angle_offset) / 180 * M_PI;
-								if ((*it)->m_target_seaking != NO_SEAKING)
+								if ((*it)->m_target_homing != NO_HOMING)
 								{
 									theta -= delta / 180 * M_PI;
 								}
@@ -1239,8 +1239,8 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 
 	//Debug commands
 	#ifndef NDEBUG
-		//Enemy::AssignRandomEquipment(Module, 50, this, 6.f);
-		//return true;
+		Enemy::AssignRandomEquipment(NBVAL_Equipment, 30, this, 6.f);
+		return true;
 	#endif
 
 	setMoney(0);
@@ -1385,14 +1385,14 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 			weapon->m_frameNumber = stoi((*it)[WEAPON_FRAMES]);
 			weapon->m_angle_offset = stoi((*it)[WEAPON_ANGLE_OFFSET]);
 
-			if ((*it)[WEAPON_TARGET_SEAKING].compare("0") != 0)
+			if ((*it)[WEAPON_TARGET_HOMING].compare("0") != 0)
 			{
-				if ((*it)[WEAPON_TARGET_SEAKING].compare("semi_seaking") == 0)
-					weapon->m_target_seaking = SEMI_SEAKING;
-				else if ((*it)[WEAPON_TARGET_SEAKING].compare("seaking") == 0)
-					weapon->m_target_seaking = SEAKING;
-				else if ((*it)[WEAPON_TARGET_SEAKING].compare("super_seaking") == 0)
-					weapon->m_target_seaking = SUPER_SEAKING;
+				if ((*it)[WEAPON_TARGET_HOMING].compare("semi_homing") == 0)
+					weapon->m_target_homing = SEMI_HOMING;
+				else if ((*it)[WEAPON_TARGET_HOMING].compare("homing") == 0)
+					weapon->m_target_homing = HOMING;
+				else if ((*it)[WEAPON_TARGET_HOMING].compare("super_homing") == 0)
+					weapon->m_target_homing = SUPER_HOMING;
 			}
 
 			return weapon;

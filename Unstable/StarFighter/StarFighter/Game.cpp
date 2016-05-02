@@ -971,3 +971,23 @@ int Game::GetBonusStatsMultiplierToBeOnParForLevel(int level_)
 	int result_ = GetEnemiesStatsMultiplierForLevel(level_) - GetPlayerStatsMultiplierForLevel(level_);
 	return result_;
 }
+
+EquipmentQuality Game::GetItemQualityClass(float quality)
+{
+	if (quality < 25)
+	{
+		return ItemQuality_Poor;
+	}
+	else if (quality < 50)
+	{
+		return ItemQuality_Medium;
+	}
+	else if (quality < 75)
+	{
+		return ItemQuality_Good;
+	}
+	else
+	{
+		return ItemQuality_Epic;
+	}
+}

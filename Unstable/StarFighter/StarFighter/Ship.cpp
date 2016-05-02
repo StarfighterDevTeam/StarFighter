@@ -553,7 +553,7 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 				{
 					//calculating the angle we want to face, if any
 					float target_angle = getRotation();
-					if (m_weapon->m_target_seaking != NO_SEAKING || (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index == 0))
+					if (m_weapon->m_target_homing != NO_HOMING || (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index == 0))
 					{
 						target_angle = fmod(GameObject::getRotation_for_Direction((*CurrentGame).m_direction) - (*CurrentGame).GetAngleToNearestGameObject(EnemyObject, getPosition()), 360);
 					}
@@ -567,14 +567,14 @@ void Ship::ManageFiring(sf::Time deltaTime, float hyperspeedMultiplier)
 
 					//float theta = (this->getRotation() - delta) / 180 * M_PI;
 					float theta = getRotation() / 180 * M_PI;
-					if (m_weapon->m_target_seaking != NO_SEAKING)
+					if (m_weapon->m_target_homing != NO_HOMING)
 					{
 						theta -= delta / 180 * M_PI;
 					}
 
-					if (m_weapon->m_target_seaking == SEMI_SEAKING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
+					if (m_weapon->m_target_homing == SEMI_HOMING && m_weapon->m_rafale_index > 0 && m_weapon->m_rafale_index < m_weapon->m_rafale)
 					{
-						//semi-seaking and rafale not ended = no update of target or weapon position
+						//semi-HOMING and rafale not ended = no update of target or weapon position
 					}
 					else
 					{
@@ -2444,7 +2444,7 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 		data << weapon->m_xspread << " ";
 		data << weapon->m_dispersion << " ";
 		data << (int)weapon->m_shot_mode << " ";
-		data << (int)weapon->m_target_seaking << " ";
+		data << (int)weapon->m_target_homing << " ";
 
 		data << weapon->m_ammunition->m_display_name << " ";
 		data << weapon->m_ammunition->m_damage << " ";
@@ -2615,7 +2615,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	float bot_weapon_xspread;
 	float bot_weapon_dispersion;
 	int bot_weapon_shot_mode;
-	int bot_weapon_target_seaking;
+	int bot_weapon_target_homing;
 
 	string bot_ammo_name;
 	int bot_ammo_damage;
@@ -2664,7 +2664,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			{
 				ss >> bot_weapon_texture_name >> bot_weapon_width >> bot_weapon_height >> bot_weapon_frames >> bot_weapon_rate_of_fire >>
 					bot_weapon_rafale >> bot_rafale_cooldown >> bot_weapon_multishot >> bot_weapon_xspread >> bot_weapon_dispersion >> bot_weapon_shot_mode
-					>> bot_weapon_target_seaking;
+					>> bot_weapon_target_homing;
 
 				ss >> bot_ammo_name >> bot_ammo_damage >> bot_ammo_speed >> bot_ammo_range >> bot_ammo_texture_name >> bot_ammo_width >> bot_ammo_height >>
 					bot_ammo_frames >> bot_ammo_explosion_name >> bot_ammo_pattern_type;
@@ -2759,7 +2759,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			weapon->m_textureName = bot_weapon_texture_name;
 			weapon->m_size = sf::Vector2f(bot_weapon_width, bot_weapon_height);
 			weapon->m_frameNumber = bot_weapon_frames;
-			weapon->m_target_seaking = (TargetSeaking)bot_weapon_target_seaking;
+			weapon->m_target_homing = (TargetHoming)bot_weapon_target_homing;
 
 			bot->m_weapon = weapon;
 		}
@@ -2806,7 +2806,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	float weapon_xspread;
 	float weapon_dispersion;
 	int weapon_shot_mode;
-	int weapon_target_seaking;
+	int weapon_target_homing;
 
 	string ammo_name;
 	int ammo_damage;
@@ -2824,7 +2824,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 
 	ss >> weapon_level >> weapon_credits >> weapon_quality >> weapon_texture_name >> weapon_width >> weapon_height >> weapon_frames >> weapon_rate_of_fire >>
 		weapon_rafale >> rafale_cooldown >> weapon_multishot >> weapon_xspread >> weapon_dispersion >> weapon_shot_mode
-		>> weapon_target_seaking >> ammo_name >> ammo_damage >> ammo_speed >> ammo_range >> ammo_texture_name >> ammo_width >> ammo_height >>
+		>> weapon_target_homing >> ammo_name >> ammo_damage >> ammo_speed >> ammo_range >> ammo_texture_name >> ammo_width >> ammo_height >>
 		ammo_frames >> ammo_explosion_name >> ammo_pattern_type;
 	if (ammo_pattern_type == Line_)
 	{
@@ -2871,7 +2871,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	weapon->m_textureName = weapon_texture_name;
 	weapon->m_size = sf::Vector2f(weapon_width, weapon_height);
 	weapon->m_frameNumber = weapon_frames;
-	weapon->m_target_seaking = (TargetSeaking)weapon_target_seaking;
+	weapon->m_target_homing = (TargetHoming)weapon_target_homing;
 
 	return weapon;
 }

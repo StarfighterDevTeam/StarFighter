@@ -15,7 +15,7 @@ Weapon::Weapon(Ammo* Ammunition)
 	m_rafale_cooldown = 0.8f;
 	m_rafale = 0;
 	m_rafale_index = 0;
-	m_target_seaking = NO_SEAKING;
+	m_target_homing = NO_HOMING;
 	m_shot_mode = NoShotMode;
 	m_angle_offset = 0;
 	m_delay = 0.f;
@@ -363,7 +363,7 @@ Weapon* Weapon::Clone()
 	weapon->m_dispersion = this->m_dispersion;
 	weapon->m_rafale = this->m_rafale;
 	weapon->m_rafale_cooldown = this->m_rafale_cooldown;
-	weapon->m_target_seaking = this->m_target_seaking;
+	weapon->m_target_homing = this->m_target_homing;
 	weapon->m_angle_offset = this->m_angle_offset;
 	weapon->m_delay = this->m_delay;
 	weapon->m_weaponOffset = this->m_weaponOffset;
@@ -421,7 +421,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 
 		//checking bonus limitations
 		cost_per_multishot = floor(CREDITS_COST_PER_ONE_MULTISHOT * pow((1 + COST_PER_ONE_MULTISHOT_MULTIPLIER_PER_LEVEL), bonus_multishot));
-		bool can_buy_multishot = loot_credits_remaining > cost_per_multishot && dispersion >= 0;
+		bool can_buy_multishot = loot_credits_remaining > cost_per_multishot;
 		bool can_buy_rate_of_fire = bonus_rate_of_fire < MAX_RATE_OF_FIRE_BONUS;
 		bool can_buy_damage = floor(FIRST_LEVEL_AMMO_DAMAGE * (1 + (1.0f * loot_credits_remaining / 100))) != FIRST_LEVEL_AMMO_DAMAGE;
 
@@ -450,26 +450,26 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 		//spending the credits in the chosen bonus
 		switch (random_type_of_bonus)
 		{
-		case 0://multishot
-		{
-			loot_credits_remaining -= cost_per_multishot;
-			bonus_multishot++;
-			break;
-		}
-		case 1://flat bonus damage
-		{
-			loot_credits_remaining--;
-			bonus_damage++;
-			break;
-		}
-		case 2://rate of fire
-		{
-			loot_credits_remaining--;
-			bonus_rate_of_fire++;
-			break;
-		}
-		default:
-			break;
+			case 0://multishot
+			{
+				loot_credits_remaining -= cost_per_multishot;
+				bonus_multishot++;
+				break;
+			}
+			case 1://flat bonus damage
+			{
+				loot_credits_remaining--;
+				bonus_damage++;
+				break;
+			}
+			case 2://rate of fire
+			{
+				loot_credits_remaining--;
+				bonus_rate_of_fire++;
+				break;
+			}
+			default:
+				break;
 		}
 
 		//dispersion weapon?
@@ -499,7 +499,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 
 	//weapon->ammunition->speed.y = RandomizeFloatBetweenValues(sf::Vector2f(500, DEFAULT_AMMO_SPEED));
 
-	weapon->m_target_seaking = NO_SEAKING;
+	weapon->m_target_homing = NO_HOMING;
 	weapon->m_ammunition->m_speed.y = DEFAULT_AMMO_SPEED;
 
 	//Base item stats
@@ -531,9 +531,30 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	weapon->m_credits = credits_;
 	weapon->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
+	//epic stats
+	if (Game::GetItemQualityClass(weapon->m_quality) == ItemQuality_Epic)
+	{
+		int random_epic_ability = RandomizeIntBetweenValues(0, 1);
+
+		switch (random_epic_ability)
+		{
+			case 0:
+			{
+				weapon->m_target_homing = SUPER_HOMING;
+				break;
+			}
+			case 1:
+			{
+				weapon->m_ammunition->m_Pattern.SetPattern(Oscillator, 200, { 70, 0, 1 });
+				weapon->m_ammunition->m_speed.y *= 0.5;
+				break;
+			}
+		}
+	}
+
 	#ifndef NDEBUG
-	if (!is_bot)
-		printf("\nNew weapon created: level %d, quality %f, xp: %d, bonus_multishot: %d, bonus_damage: %d, bonus_rof: %d\n\n", level, weapon->m_quality, credits_, bonus_multishot, bonus_damage, bonus_rate_of_fire);
+		if (!is_bot)
+			printf("\nNew weapon created: level %d, quality %f, xp: %d, bonus_multishot: %d, bonus_damage: %d, bonus_rof: %d\n\n", level, weapon->m_quality, credits_, bonus_multishot, bonus_damage, bonus_rate_of_fire);
 	#endif
 
 	return weapon;

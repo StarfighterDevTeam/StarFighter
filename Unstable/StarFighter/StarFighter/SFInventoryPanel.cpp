@@ -335,22 +335,27 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 					//	}
 					//}
 
-					if (obj->m_bots.front()->m_weapon->m_target_seaking != NO_SEAKING)
+					if (obj->m_bots.front()->m_weapon->m_target_homing != NO_HOMING)
 					{
-						switch (obj->m_bots.front()->m_weapon->m_target_seaking)
+						switch (obj->m_bots.front()->m_weapon->m_target_homing)
 						{
-							case SEAKING:
-							case SUPER_SEAKING:
+							case HOMING:
+							case SUPER_HOMING:
 							{
-								ss_stats << "\nSeaking target";
+								ss_stats << "\nEpic ability: target homing";
 								break;
 							}
-							case SEMI_SEAKING:
+							case SEMI_HOMING:
 							{
-								ss_stats << "\nSeaking target once per rafale";
+								ss_stats << "\nEpic ability: target homing per salvo";
 								break;
 							}
 						}
+					}
+
+					if (obj->m_bots.front()->m_weapon->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
+					{
+						ss_stats << "\nEpic ability: waving trajectory";
 					}
 				}
 				else
@@ -421,23 +426,29 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				//	}
 				//}
 
-				if (obj->m_target_seaking != NO_SEAKING)
+				if (obj->m_target_homing != NO_HOMING)
 				{
-					switch (obj->m_target_seaking)
+					switch (obj->m_target_homing)
 					{
-						case SEAKING:
-						case SUPER_SEAKING:
+						case HOMING:
+						case SUPER_HOMING:
 						{
-							ss_stats << "\nSeaking target";
+							ss_stats << "\nEpic ability: target homing";
 							break;
 						}
-						case SEMI_SEAKING:
+						case SEMI_HOMING:
 						{
-							ss_stats << "\nSeaking target once per rafale";
+							ss_stats << "\nEpic ability: target homing per salvo";
 							break;
 						}
 					}
 				}
+
+				if (obj->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
+				{
+					ss_stats << "\nEpic ability: waving trajectory";
+				}
+
 				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
@@ -627,7 +638,7 @@ void SFInventoryPanel::UpdateBackgroundColors(ObjectGrid* color_grid, ObjectGrid
 					}
 					else
 					{
-						color_grid->grid[i][j]->setAnimationLine((int)GetItemQualityClass(quality));
+						color_grid->grid[i][j]->setAnimationLine((int)Game::GetItemQualityClass(quality));
 						color_grid->grid[i][j]->m_visible = true;
 					}
 				}
@@ -641,26 +652,6 @@ void SFInventoryPanel::UpdateBackgroundColors(ObjectGrid* color_grid, ObjectGrid
 				color_grid->grid[i][j]->m_visible = false;
 			}
 		}
-	}
-}
-
-EquipmentQuality SFInventoryPanel::GetItemQualityClass(float quality)
-{
-	if (quality < 25)
-	{
-		return ItemQuality_Poor;
-	}
-	else if (quality < 50)
-	{
-		return ItemQuality_Medium;
-	}
-	else if (quality < 75)
-	{
-		return ItemQuality_Good;
-	}
-	else 
-	{
-		return ItemQuality_Epic;
 	}
 }
 
