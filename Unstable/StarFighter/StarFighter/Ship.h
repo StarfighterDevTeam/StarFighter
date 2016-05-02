@@ -111,6 +111,7 @@ public :
 	void ScreenBorderContraints();
 	void SettingTurnAnimations();
 	void RotateShip(float angle);
+	void setGhost(bool ghost) override;
 
 	void Respawn() override;
 	bool setShipEquipment(Equipment* equipment, bool overwrite = false, bool no_save = false);
@@ -178,7 +179,7 @@ public :
 	sf::Clock m_brakingHoldingClock;
 	GameObject* m_previously_focused_item;
 
-	void GetGrazing() override;
+	void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier) override;
 	int getGrazeCount();
 	float getShipBeastScore();
 	void GetDamageFrom (GameObject& object) override;

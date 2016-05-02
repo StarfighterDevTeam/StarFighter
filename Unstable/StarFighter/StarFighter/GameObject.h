@@ -236,7 +236,7 @@ public:
 	virtual bool GetLoot(GameObject& object);
 	virtual void GetPortal(GameObject* object);
 	virtual void GetShop(GameObject* object);
-	void setGhost(bool ghost);
+	virtual void setGhost(bool ghost);
 	void setAnimationLine(int animation_line, bool keep_frame_index = false);
 
 	bool get_equipment_from(GameObject& object);
@@ -253,7 +253,7 @@ public:
 	InteractionType m_isCollidingWithInteractiveObject;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
 
-	virtual void GetGrazing();
+	virtual void GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier);
 	void GetPolarMovement(sf::Vector2f* np);
 
 	int m_damage;

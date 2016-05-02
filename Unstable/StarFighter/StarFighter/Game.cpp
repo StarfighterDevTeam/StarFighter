@@ -307,7 +307,7 @@ void Game::updateScene(Time deltaTime)
 	}
 
 	//Checking colisions
-	colisionChecksV2();
+	colisionChecksV2(deltaTime);
 
 	//SFTextPop (text feedbacks)
 	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
@@ -416,7 +416,7 @@ void Game::drawScene()
 	m_window->draw(temp);
 }
 
-void Game::colisionChecksV2()
+void Game::colisionChecksV2(Time deltaTime)
 {
 	sf::Clock dt;
 	dt.restart();
@@ -435,7 +435,7 @@ void Game::colisionChecksV2()
 
 			if (SimpleCollision::IsGrazing((*it1), (*it2)))
 			{
-				(*it1)->GetGrazing();
+				(*it1)->GetGrazing(deltaTime, m_hyperspeedMultiplier);
 
 				if (SimpleCollision::AreColliding((*it1), (*it2)))
 				{

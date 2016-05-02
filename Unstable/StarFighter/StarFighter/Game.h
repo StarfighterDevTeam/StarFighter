@@ -73,7 +73,7 @@ public:
 
 	void updateScene(Time deltaTime);
 	void drawScene();
-	void colisionChecksV2();
+	void colisionChecksV2(Time deltaTime);
 	void cleanGarbage();
 	void collectGarbage();
 	void garbageLayer(LayerType layer, bool only_offscene = false);

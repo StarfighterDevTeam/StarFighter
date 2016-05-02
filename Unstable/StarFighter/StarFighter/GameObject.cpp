@@ -440,7 +440,7 @@ bool GameObject::clearLoots()
 	return something_cleared;
 }
 
-void GameObject::GetGrazing()
+void GameObject::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//see overide function in class Ship
 }

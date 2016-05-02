@@ -1785,6 +1785,15 @@ void Ship::RegenHealthFast(sf::Time deltaTime, bool armor, bool shield, bool hyp
 	}
 }
 
+void Ship::setGhost(bool ghost)
+{
+	GameObject::setGhost(ghost);
+	if (m_fake_ship)
+	{
+		m_fake_ship->GameObject::setGhost(ghost);
+	}
+}
+
 void Ship::Respawn()
 {
 	Init();
@@ -1995,9 +2004,22 @@ void Ship::GetShop(GameObject* object)
 static int GrazeLevelsThresholds[NB_GRAZE_LEVELS] = { 0, 200, 1000, 2000 };
 static float GrazeLevelsBeastBonus[NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
 
-void Ship::GetGrazing()
+void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 {
-	m_graze_count++;
+	if ((*CurrentGame).m_waiting_for_dialog_validation)
+	{
+		return;
+	}
+
+	static double graze_count_buffer = 0;
+	graze_count_buffer += GRAZE_PER_SECOND_AND_PER_BULLET * deltaTime.asSeconds() * hyperspeedMultiplier;
+
+	if (graze_count_buffer > 1)
+	{
+		double intpart;
+		graze_count_buffer = modf(graze_count_buffer, &intpart);
+		m_graze_count += intpart;
+	}
 
 	if (m_graze_level < NB_GRAZE_LEVELS - 1)
 	{
