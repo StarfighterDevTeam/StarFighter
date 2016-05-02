@@ -73,6 +73,7 @@ std::string makePath(const std::string& srcPath);
 
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									70
+#define GRAZE_PER_SECOND_AND_PER_BULLET					100
 #define SHIP_BRAKING_MALUS_SPEED						0.50f
 #define END_OF_DIALOGS_DELAY							0
 
@@ -86,7 +87,7 @@ std::string makePath(const std::string& srcPath);
 #define FUEL_BAR_SIZE_Y									14
 #define XP_BAR_SIZE_X									320
 #define XP_BAR_SIZE_Y									16
-#define GRID_POSITION_Y									360
+#define GRID_POSITION_Y									350
 
 //INTERACTION PANEL
 #define INTERACTION_PANEL_OFFSET_Y				20

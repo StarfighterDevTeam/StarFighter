@@ -396,7 +396,25 @@ bool Scene::CheckHazardBreakConditions()
 	}
 
 	//Graze
-	m_score_graze = (*CurrentGame).m_playerShip->m_graze_level + 1;
+	//m_score_graze = (*CurrentGame).m_playerShip->m_graze_level + 1;
+
+	//Hits taken
+	if ((*CurrentGame).m_playerShip->m_hits_taken == 0)//untouched
+	{
+		m_score_graze = 4;//S
+	}
+	else if ((*CurrentGame).m_playerShip->m_hits_taken < 4)//1-3 hits taken
+	{
+		m_score_graze = 3;//A
+	}
+	else if ((*CurrentGame).m_playerShip->m_hits_taken < 11)//4-10 hits taken
+	{
+		m_score_graze = 2;//B
+	}
+	else//>10 hits taken
+	{
+		m_score_graze = 1;//C
+	}
 
 	//Total
 	if (m_score_total % 2 == 1 && m_score_total < 8)
@@ -467,23 +485,24 @@ void Scene::DisplayScore(bool hazard_break)
 		}
 		case 2:
 		{
-				  ss_destruction << " -> Rank B";
+			ss_destruction << " -> Rank B";
 			break;
 		}
 		case 3:
 		{
-				  ss_destruction << " -> Rank A";
+			ss_destruction << " -> Rank A";
 			break;
 		}
 		case 4:
 		{
-				  ss_destruction << " -> Rank S";
+			ss_destruction << " -> Rank S";
 			break;
 		}
 	}
 
 	ostringstream ss_graze;
-	ss_graze << "Graze: " << (*CurrentGame).m_playerShip->m_graze_level << " / " << NB_GRAZE_LEVELS - 1;
+	//ss_graze << "Graze: " << (*CurrentGame).m_playerShip->m_graze_level << " / " << NB_GRAZE_LEVELS - 1;
+	ss_graze << "Hits taken: " << (*CurrentGame).m_playerShip->m_hits_taken;
 	switch (m_score_graze)
 	{
 		case 1:

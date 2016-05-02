@@ -574,7 +574,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					(*CurrentGame).m_playerShip->m_disable_bots = false;
 					(*CurrentGame).m_playerShip->m_disableRecall = false;
 					(*CurrentGame).m_playerShip->SetBotsVisibility(true);
-					(*CurrentGame).m_playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
+					(*CurrentGame).m_playerShip->RotateShip(GameObject::getRotation_for_Direction((*CurrentGame).m_direction));					
 
 					//(*CurrentGame).SetLayerRotation(BotLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
 					//(*CurrentGame).SetLayerRotation(FeedbacksLayer, GameObject::getRotation_for_Direction((*CurrentGame).m_direction));
@@ -621,6 +621,12 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				else
 				{
 					SavePlayer(PLAYER_SAVE_FILE);
+				}
+
+				//Resetting counting of hits taken for scene score
+				if (m_currentScene->m_direction == NO_DIRECTION)
+				{
+					(*CurrentGame).m_playerShip->m_hits_taken = 0;
 				}
 
 				//Giving control back to the player
@@ -861,6 +867,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 			playerShip->m_respawnSceneName = m_currentScene->m_name;
 
 			(*CurrentGame).resetHazard();
+			(*CurrentGame).m_playerShip->m_hits_taken = 0;
 
 			if (!m_currentScene->m_scene_music.empty())
 			{

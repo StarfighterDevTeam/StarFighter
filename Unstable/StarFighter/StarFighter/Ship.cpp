@@ -45,6 +45,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_currentScene_hazard = 0;
 	m_input_blocker = NULL;
 	m_is_jumping = false;
+	m_hits_taken = 0;
 
 	m_level = 1;
 	m_level_max = FIRST_LEVEL_MAX;
@@ -2001,7 +2002,7 @@ void Ship::GetShop(GameObject* object)
 	}
 }
 
-static int GrazeLevelsThresholds[NB_GRAZE_LEVELS] = { 0, 200, 1000, 2000 };
+static int GrazeLevelsThresholds[NB_GRAZE_LEVELS] = { 0, 500, 1500, 3000 };
 static float GrazeLevelsBeastBonus[NB_GRAZE_LEVELS] = { 0.0f, 0.2f, 0.4f, 0.6f };
 
 void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
@@ -2140,6 +2141,7 @@ void Ship::GetDamageFrom(GameObject& object)
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;
 	m_graze_radius_feedback.setOutlineColor(sf::Color(255, 255, 0, 20));
+	m_hits_taken++;
 	if (m_combo_aura)
 	{
 		m_combo_aura->setAnimationLine(GRAZE_LEVEL_NONE);

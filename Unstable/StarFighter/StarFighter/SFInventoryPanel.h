@@ -92,6 +92,7 @@ public:
 	sf::Text m_framerate_text;
 	sf::Text m_scene_text;
 	sf::Text m_hazardscore_text;
+	sf::Text m_hitstaken_text;
 
 	sf::Text m_equipment_title;
 	sf::Text m_inventory_title;
