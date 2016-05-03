@@ -37,6 +37,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_disableHyperspeed = false;
 	m_disableSlowmotion = false;
 	m_disableRecall = false;
+	m_disableJump = false;
 	m_graze_count = 0;
 	m_graze_level = 0;
 	m_last_hazard_level_played = 0;
@@ -863,7 +864,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				}
 
 				//jump
-				else if (CanJump() && m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableHyperspeed && m_hyperspeed_fuel >= SHIP_JUMPING_COST && m_moving)
+				else if (CanJump() && m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableJump && m_hyperspeed_fuel >= SHIP_JUMPING_COST && m_moving)
 				{
 					m_hyperspeed_fuel -= SHIP_JUMPING_COST;
 

@@ -205,6 +205,7 @@ public :
 	Aura* m_combo_aura;
 	Aura* m_trail;
 	bool m_disableHyperspeed;
+	bool m_disableJump;
 	bool m_disableRecall;
 	bool m_disableSlowmotion;
 	bool m_is_asking_scene_transition;

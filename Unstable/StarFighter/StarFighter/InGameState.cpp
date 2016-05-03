@@ -558,6 +558,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					m_IG_State = HUB_ROAMING;
 					(*CurrentGame).m_playerShip->m_disableHyperspeed = true;
+					(*CurrentGame).m_playerShip->m_disableJump = true;
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
 					(*CurrentGame).m_playerShip->m_disable_bots = true;
 					(*CurrentGame).m_playerShip->m_disableRecall = true;
@@ -570,6 +571,7 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 					m_IG_State = SCROLLING;
 					(*CurrentGame).m_playerShip->m_disable_fire = false;
 					(*CurrentGame).m_playerShip->m_disableHyperspeed = false;
+					(*CurrentGame).m_playerShip->m_disableJump = false;
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = false;
 					(*CurrentGame).m_playerShip->m_disable_bots = false;
 					(*CurrentGame).m_playerShip->m_disableRecall = false;
@@ -839,6 +841,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		{
 			(*CurrentGame).m_playerShip->m_disable_fire = false;
 			(*CurrentGame).m_playerShip->m_disableHyperspeed = false;
+			(*CurrentGame).m_playerShip->m_disableJump = false;
 			(*CurrentGame).m_playerShip->m_disableSlowmotion = false;
 			(*CurrentGame).m_playerShip->m_disable_bots = false;
 			(*CurrentGame).m_playerShip->m_disableRecall = false;
@@ -859,6 +862,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 		{
 			(*CurrentGame).m_playerShip->m_disable_fire = true;
 			(*CurrentGame).m_playerShip->m_disableHyperspeed = true;
+			(*CurrentGame).m_playerShip->m_disableJump = true;
 			(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
 			(*CurrentGame).m_playerShip->m_disable_bots = true;
 			(*CurrentGame).m_playerShip->m_disableRecall = true;
