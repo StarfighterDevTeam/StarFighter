@@ -14,14 +14,17 @@ public:
 		return sf::IntRect((int)f.left, (int)f.top, (int)f.width, (int)f.height);
 	}
 
-	static bool AreColliding(const GameObject* GameObjectA, const GameObject* GameObjectB) {
+	static bool AreColliding(const GameObject* GameObjectA, const GameObject* GameObjectB, bool check_if_ghost = true) {
 		// If not visibe, let's not even bother with the collision
 		if (!GameObjectA->m_visible || !(GameObjectB->m_visible))
 			return false;
 
 		//ghost is a property that prevents an object from colliding, so by definition we exclude it
-		if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
-			return false;
+		if (check_if_ghost)
+		{
+			if (GameObjectA->m_ghost || (GameObjectB->m_ghost))
+				return false;
+		}
 
 		if (!GameObjectA->m_isOnScene || !(GameObjectB->m_isOnScene))
 			return false;

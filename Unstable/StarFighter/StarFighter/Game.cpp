@@ -471,7 +471,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (SimpleCollision::AreColliding((*it1), (*it2), false))
 			{
 				//Do something (like, take the loot)
 				if ((*it1)->GetLoot((*(*it2))))
@@ -541,7 +541,7 @@ void Game::colisionChecksV2(Time deltaTime)
 			if (*it2 == NULL)
 				continue;
 
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			if (SimpleCollision::AreColliding((*it1), (*it2), false))
 			{
 				//Do something (like, take the loot)
 				if ((*it1)->GetLoot((*(*it2))))
