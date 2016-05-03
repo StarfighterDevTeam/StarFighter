@@ -22,6 +22,9 @@ ShipModel::ShipModel(float max_speed, float acceleration, float deceleration, fl
 	m_bot = NULL;
 	m_hyperspeed = hyperspeed;
 	m_hyperspeed_fuel = hyperspeed_fuel;
+	m_can_hyperspeed = false;
+	m_can_jump = false;
+	m_bombs = 0;
 }
 
 ShipModel::~ShipModel()
@@ -49,6 +52,9 @@ Equipment::Equipment()
 	m_level = 1;
 	m_credits = 0;
 	m_quality = 0;
+	m_can_hyperspeed = false;
+	m_can_jump = false;
+	m_bombs = 0;
 }
 
 Equipment::~Equipment()
@@ -75,6 +81,9 @@ Equipment* Equipment::Clone()
 	new_equipment->m_level = m_level;
 	new_equipment->m_credits = m_credits;
 	new_equipment->m_quality = m_quality;
+	new_equipment->m_bombs = m_bombs;
+	new_equipment->m_can_hyperspeed = m_can_hyperspeed;
+	new_equipment->m_can_jump = m_can_jump;
 
 	return new_equipment;
 }
@@ -149,6 +158,9 @@ Equipment* Equipment::CreateRandomArmor(int level, float beastScore)
 	equipment->m_level = level;
 	equipment->m_credits = credits_;
 	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
+
+	//bombs
+	equipment->m_bombs = BOMB_DEFAULT_NUMBER;
 
 	return equipment;
 }
@@ -270,20 +282,20 @@ Equipment* Equipment::CreateRandomEngine(int level, float beastScore)
 	equipment->m_quality = beastScore * 100 / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES);
 
 	//epic stats
-	if (Game::GetItemQualityClass(equipment->m_quality) == ItemQuality_Epic)
+	if (Game::GetItemQualityClass(equipment->m_quality) >= ItemQuality_Medium)
 	{
-		int random_epic_ability = RandomizeIntBetweenValues(0, 1);
+		int random_ability = RandomizeIntBetweenValues(0, 1);
 
-		switch (random_epic_ability)
+		switch (random_ability)
 		{
 			case 0://cruising
 			{
-				//todo
+				equipment->m_can_hyperspeed = true;
 				break;
 			}
 			case 1://jumping
 			{
-				//todo	  
+				equipment->m_can_jump = true;
 				break;
 			}
 		}

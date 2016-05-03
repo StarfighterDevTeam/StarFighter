@@ -41,6 +41,10 @@ public:
 	float m_max_speed;
 	float m_hyperspeed;
 	float m_shield_recovery_time;
+
+	bool m_can_hyperspeed;
+	bool m_can_jump;
+	int m_bombs;
 };
 
 class Equipment
@@ -80,6 +84,10 @@ public:
 	float m_max_speed;
 	float m_acceleration;
 	float m_deceleration;
+
+	bool m_can_hyperspeed;
+	bool m_can_jump;
+	int m_bombs;
 };
 
 #endif // EQUIPMENT_H_INCLUDED

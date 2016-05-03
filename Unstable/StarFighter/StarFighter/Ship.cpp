@@ -851,7 +851,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Hyperspeeding, Input_Hold, !m_disableHyperspeed && !m_actions_states[Action_Recalling]);
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 
-				if (m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0 && !m_moving)
+				//hyperspeed
+				if (CanHyperspeed() && m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0 && !m_moving)
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
 					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_CRUISING * deltaTime.asSeconds();
@@ -861,7 +862,8 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 					}
 				}
 
-				else if (m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableHyperspeed && m_hyperspeed_fuel >= SHIP_JUMPING_COST && m_moving)
+				//jump
+				else if (CanJump() && m_inputs_states[Action_Hyperspeeding] == Input_Tap && !m_disableHyperspeed && m_hyperspeed_fuel >= SHIP_JUMPING_COST && m_moving)
 				{
 					m_hyperspeed_fuel -= SHIP_JUMPING_COST;
 
@@ -877,9 +879,11 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//		m_hyperspeed_fuel = 0;
 				//	}
 				//}
-				else if (m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER) && !m_actions_states[Action_Recalling] && !m_immune)
+
+				//bomb
+				else if (GetNumberOfBombs() > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / GetNumberOfBombs()) && !m_actions_states[Action_Recalling] && !m_immune)
 				{
-					m_hyperspeed_fuel -= m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER;
+					m_hyperspeed_fuel -= m_hyperspeed_fuel_max / GetNumberOfBombs();
 					Bomb();
 				}
 				else if (!m_actions_states[Action_Recalling])
@@ -2355,6 +2359,9 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data << equipment->m_shield_recovery_time << " ";
 		data.precision(0);
 		data << equipment->m_damage << " ";
+		data << equipment->m_bombs << " ";
+		data << equipment->m_can_hyperspeed << " ";
+		data << equipment->m_can_jump << " ";
 
 		if (!equipment->m_bots.empty())
 		{
@@ -2380,11 +2387,19 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
 					break;
 				}
-				default:
+				case Circle_:
 				{
 					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
 					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
 					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
+					break;
+				}
+				case Oscillator:
+				{
+					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
+					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
+					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
+					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[2] << " ";
 					break;
 				}
 			}
@@ -2461,11 +2476,18 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
 			data << &weapon->m_ammunition->m_Pattern.m_patternParams[1];
 		}
-		else if (weapon->m_ammunition->m_Pattern.m_currentPattern > NoMovePattern)
+		else if (weapon->m_ammunition->m_Pattern.m_currentPattern == Circle_)
 		{
 			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
 			data << &weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
 			data << &weapon->m_ammunition->m_Pattern.m_patternParams[1];
+		}
+		else if (weapon->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
+		{
+			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
+			data << &weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
+			data << &weapon->m_ammunition->m_Pattern.m_patternParams[1] << " ";
+			data << &weapon->m_ammunition->m_Pattern.m_patternParams[2];
 		}
 	}
 	else
@@ -2588,6 +2610,9 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	int shield_regen;
 	float shield_recovery;
 	int damage;
+	int bombs;
+	bool can_hyperspeed;
+	bool can_jump;
 
 	string bot_name;
 	int bot_number;
@@ -2602,6 +2627,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	int bot_pattern_type;
 	float bot_pattern_arg1;
 	float bot_pattern_arg2;
+	float bot_pattern_arg3;
 
 	string bot_weapon_name;
 	string bot_weapon_texture_name;
@@ -2629,6 +2655,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	float bot_ammo_pattern_speed;
 	float bot_ammo_pattern_arg1;
 	float bot_ammo_pattern_arg2;
+	float bot_ammo_pattern_arg3;
 	string bot_ammo_explosion_name;
 
 	if (display_name.compare("0") == 0)
@@ -2637,7 +2664,8 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	}
 	else
 	{
-		ss >> level >> credits >> quality >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> hyperspeed_fuel >> armor >> shield >> shield_regen >> shield_recovery >> damage >> bot_name;
+		ss >> level >> credits >> quality >> texture_name >> width >> height >> frames >> max_speed >> deceleration >> acceleration >> hyperspeed >> hyperspeed_fuel 
+			>> armor >> shield >> shield_regen >> shield_recovery >> damage >> bombs >> can_hyperspeed >> can_jump >> bot_name;
 
 		if (bot_name.compare("0") == 0)
 		{
@@ -2650,9 +2678,13 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			{
 				ss >> bot_pattern_speed >> bot_pattern_arg2;
 			}
-			else if (bot_pattern_type > NoMovePattern)
+			else if (bot_pattern_type == Circle_)
 			{
 				ss >> bot_pattern_speed >> bot_pattern_arg1 >> bot_pattern_arg2;
+			}
+			else if (bot_pattern_type == Oscillator)
+			{
+				ss >> bot_pattern_speed >> bot_pattern_arg1 >> bot_pattern_arg2 >> bot_pattern_arg3;
 			}
 
 			ss >> bot_weapon_name;
@@ -2673,9 +2705,13 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 				{
 					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_arg2;
 				}
-				else if (bot_ammo_pattern_type >> NoMovePattern)
+				else if (bot_ammo_pattern_type == Circle_)
 				{
 					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_arg1 >> bot_ammo_pattern_arg2;
+				}
+				else if (bot_ammo_pattern_type == Oscillator)
+				{
+					ss >> bot_ammo_pattern_speed >> bot_ammo_pattern_arg1 >> bot_ammo_pattern_arg2 >> bot_ammo_pattern_arg3;
 				}
 			}
 		}
@@ -2703,6 +2739,10 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 	equipment->m_level = level;
 	equipment->m_credits = credits;
 	equipment->m_quality = quality;
+	equipment->m_bombs = bombs;
+	equipment->m_can_hyperspeed = can_hyperspeed;
+	equipment->m_can_jump = can_jump;
+
 	if (bot_name.compare("0") != 0)
 	{
 		Bot* bot = new Bot(Vector2f(0, 0), Vector2f(0, 0), bot_texture_name, sf::Vector2f(bot_width, bot_height));
@@ -2715,11 +2755,18 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
 		}
-		else if (bot->m_Pattern.m_currentPattern > NoMovePattern)
+		else if (bot->m_Pattern.m_currentPattern == Circle_)
 		{
 			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg1);
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
+		}
+		else if (bot->m_Pattern.m_currentPattern == Circle_)
+		{
+			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
+			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg1);
+			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
+			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg3);
 		}
 
 		if (bot_weapon_name.compare("0") == 0)
@@ -2737,11 +2784,18 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
 				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
 			}
-			else if (ammo->m_Pattern.m_currentPattern > NoMovePattern)
+			else if (ammo->m_Pattern.m_currentPattern == Circle_)
 			{
 				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
 				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg1);
 				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
+			}
+			else if (ammo->m_Pattern.m_currentPattern == Oscillator)
+			{
+				ammo->m_Pattern.m_patternSpeed = bot_ammo_pattern_speed;
+				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg1);
+				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg2);
+				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg3);
 			}
 
 			Weapon* weapon = new Weapon(ammo);
@@ -2820,6 +2874,7 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	float ammo_pattern_speed;
 	float ammo_pattern_arg1;
 	float ammo_pattern_arg2;
+	float ammo_pattern_arg3;
 	string ammo_explosion_name;
 
 	ss >> weapon_level >> weapon_credits >> weapon_quality >> weapon_texture_name >> weapon_width >> weapon_height >> weapon_frames >> weapon_rate_of_fire >>
@@ -2830,9 +2885,13 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	{
 		ss >> ammo_pattern_speed >> ammo_pattern_arg2;
 	}
-	else if (ammo_pattern_type > NoMovePattern)
+	else if (ammo_pattern_type == Circle_)
 	{
 		ss >> ammo_pattern_speed >> ammo_pattern_arg1 >> ammo_pattern_arg2;
+	}
+	else if (ammo_pattern_type == Oscillator)
+	{
+		ss >> ammo_pattern_speed >> ammo_pattern_arg1 >> ammo_pattern_arg2 >> ammo_pattern_arg3;
 	}
 
 	EquipmentType type = NBVAL_Equipment;
@@ -2846,11 +2905,18 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
 		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
 	}
-	else if (ammo->m_Pattern.m_currentPattern > NoMovePattern)
+	else if (ammo->m_Pattern.m_currentPattern == Circle_)
 	{
 		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
 		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg1);
 		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
+	}
+	else if (ammo->m_Pattern.m_currentPattern == Circle_)
+	{
+		ammo->m_Pattern.m_patternSpeed = ammo_pattern_speed;
+		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg1);
+		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg2);
+		ammo->m_Pattern.m_patternParams.push_back(ammo_pattern_arg3);
 	}
 
 	Weapon* weapon = new Weapon(ammo);
@@ -3256,4 +3322,56 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 			m_stroboscopic_effect_clock.restart();
 		}
 	}
+}
+
+bool Ship::CanHyperspeed()
+{
+	if (m_ship_model && m_ship_model->m_can_hyperspeed)
+	{
+		return true;
+	}
+	for (int i = 0; i < NBVAL_Equipment; i++)
+	{
+		if (m_equipment[i] && m_equipment[i]->m_can_hyperspeed)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Ship::CanJump()
+{
+	if (m_ship_model && m_ship_model->m_can_jump)
+	{
+		return true;
+	}
+	for (int i = 0; i < NBVAL_Equipment; i++)
+	{
+		if (m_equipment[i] && m_equipment[i]->m_can_jump)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int Ship::GetNumberOfBombs()
+{
+	int bombs = 0;
+	if (m_ship_model)
+	{
+		bombs += m_ship_model->m_bombs;
+	}
+	for (int i = 0; i < NBVAL_Equipment; i++)
+	{
+		if (m_equipment[i])
+		{
+			bombs += m_equipment[i]->m_bombs;
+		}
+	}
+
+	return bombs;
 }

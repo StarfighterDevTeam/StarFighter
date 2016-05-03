@@ -122,6 +122,9 @@ public :
 	void cleanWeapon(bool no_save = false);
 	static GameObject* CloneEquipmentIntoGameObject(Equipment* new_equipment);
 	static GameObject* CloneWeaponIntoGameObject(Weapon* new_weapon);
+	bool CanHyperspeed();
+	bool CanJump();
+	int GetNumberOfBombs();
 
 	void CleanGarbagedEquipments();
 

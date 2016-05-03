@@ -1238,10 +1238,10 @@ bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, boo
 {
 
 	//Debug commands
-	#ifndef NDEBUG
-		Enemy::AssignRandomEquipment(NBVAL_Equipment, 30, this, 6.f);
-		return true;
-	#endif
+	//#ifndef NDEBUG
+	//	Enemy::AssignRandomEquipment(Engine, 30, this, 6.f);
+	//	return true;
+	//#endif
 
 	setMoney(0);
 	double random_number = (double)rand() / (RAND_MAX);

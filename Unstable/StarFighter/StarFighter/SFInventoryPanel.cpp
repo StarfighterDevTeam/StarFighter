@@ -244,7 +244,17 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_stats.precision(2);
 				ss_stats << "Hyperspeed: " << obj->m_hyperspeed;
 				ss_stats.precision(0);
-				ss_stats<< "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
+				ss_stats << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
+				
+				if (obj->m_can_hyperspeed)
+				{
+					ss_stats << "\n\nUnique ability: cruise (hold Y or LCtrl)";
+				}
+				if (obj->m_can_jump)
+				{
+					ss_stats << "\n\nUnique ability: warp (press Y or LCtrl + direction)";
+				}
+
 				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
@@ -255,6 +265,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				string standard_name = ReplaceAll(obj->m_display_name, "_", " ");
 				ss_itam_name << "HULL: " << standard_name;
 				ss_stats << "Hull pts: " << obj->m_armor;
+				ss_stats << "\n\nBombs: " << obj->m_bombs << " (press B or LShift, requires Fuel)";
 				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";
 				ss_stats << "\nMoney value: $" << GameObject::GetPrice(obj->m_credits, obj->m_quality);
 				break;
