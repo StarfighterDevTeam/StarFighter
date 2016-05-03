@@ -417,11 +417,11 @@ bool Scene::CheckHazardBreakConditions()
 	}
 
 	//Total
-	if (m_score_total % 2 == 1 && m_score_total < 8)
-	{
-		m_score_total++;//because we want A + S to make a total of S.
-	}
 	m_score_total = (m_score_destruction + m_score_graze) / 2;
+	if ((m_score_destruction + m_score_graze) % 2 == 1 && (m_score_destruction + m_score_graze) < 8)
+	{
+		m_score_total++;//because we want to round up A + S = S
+	}
 	if (m_score_destruction == 1 && m_score_graze == 1)
 	{
 		m_score_total = 0;//C + C = D
