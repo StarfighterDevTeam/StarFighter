@@ -347,11 +347,27 @@ Scene::~Scene()
 		m_bg = NULL;
 	}
 
-	m_boss_list.clear();
-
 	for (int i = 0; i < NBVAL_EnemyClass; i++)
 	{
+		size_t enemiesVectorSize = m_enemies_ranked_by_class[i].size();
+		for (size_t j = 0; j < enemiesVectorSize; j++)
+		{
+			delete m_enemies_ranked_by_class[i][j];
+		}
 		m_enemies_ranked_by_class[i].clear();
+	}
+
+	size_t bossVectorSize = m_boss_list.size();
+	for (size_t i = 0; i < bossVectorSize; i++)
+	{
+		delete m_boss_list[i];
+	}
+	m_boss_list.clear();
+
+	size_t generatosrVectorSize = m_sceneEnemyGenerators.size();
+	for (size_t i = 0; i < generatosrVectorSize; i++)
+	{
+		delete m_sceneEnemyGenerators[i];
 	}
 	m_sceneEnemyGenerators.clear();
 }

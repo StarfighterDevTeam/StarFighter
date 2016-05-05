@@ -1202,6 +1202,13 @@ Enemy::~Enemy()
 	(*CurrentGame).removeFromFeedbacks(&m_shieldBarContainer);
 	
 	(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
+
+	//weapons
+	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
+	{
+		delete (*it);
+	}
+	m_weapons_list.clear();
 }
 
 void Enemy::GenerateLoot()

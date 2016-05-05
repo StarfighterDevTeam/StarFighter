@@ -20,11 +20,7 @@ Bot::Bot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf:
 
 Bot::~Bot()
 {
-	if (m_weapon)
-	{
-		delete m_weapon;
-		m_weapon = NULL;
-	}
+	delete m_weapon;
 }
 
 void Bot::setTarget (GameObject* target)

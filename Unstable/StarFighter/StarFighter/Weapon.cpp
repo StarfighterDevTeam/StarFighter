@@ -33,11 +33,7 @@ Weapon::Weapon(Ammo* Ammunition)
 
 Weapon::~Weapon()
 {
-	if (m_ammunition)
-	{
-		delete m_ammunition;
-		m_ammunition = NULL;
-	}
+	delete m_ammunition;
 }
 
 void Weapon::CreateBullet(GameObjectType m_collider_type, float offsetX, float dispersion)

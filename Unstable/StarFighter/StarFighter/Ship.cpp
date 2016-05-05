@@ -112,23 +112,13 @@ Ship::~Ship()
 {
 	for (int i = 0; i < NBVAL_Equipment; i++)
 	{
-		if (m_equipment[i])
-		{
-			delete m_equipment[i];
-		}
+		delete m_equipment[i];
+		
 	}
-	if (m_ship_model)
-	{
-		delete m_ship_model;
-	}
-	if (m_weapon)
-	{
-		delete m_weapon;
-	}
-	if (m_FX_death)
-	{
-		delete m_FX_death;
-	}
+
+	delete m_ship_model;
+	delete m_weapon;
+	delete m_FX_death;
 
 	size_t botListSize = m_bot_list.size();
 	for (size_t i = 0; i < botListSize; i++)
