@@ -102,6 +102,7 @@ private:
 struct EnemyBase
 {
 public:
+	~EnemyBase();
 	Enemy* m_enemy;
 	int m_probability;
 	int m_enemyclass;

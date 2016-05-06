@@ -846,6 +846,11 @@ void Enemy::setPhase(Phase* phase)
 				phase->m_freeze_player = true;
 				break;
 			}
+			case KillBullets:
+			{
+				(*CurrentGame).killGameObjectLayer(EnemyFire);
+				break;
+			}
 			default:
 			{
 
@@ -1110,6 +1115,10 @@ Phase* Enemy::LoadPhase(string name)
 					{
 						l_new_modifier = FreezePlayer;
 					}
+					else if ((*it)[PHASE_MODIFIER + i].compare("kill_bullets") == 0)
+					{
+						l_new_modifier = KillBullets;
+					}
 				}
 
 				phase->m_modifiers.push_back(l_new_modifier);
@@ -1205,8 +1214,8 @@ void Enemy::Death()
 			if ((*it)->m_condition == LifePourcentage && (*it)->m_value == 0 && ((*it)->m_op == LESSER_THAN || (*it)->m_op == EQUAL_TO))
 			{
 				this->setPhase(this->getPhase((*it)->m_nextPhase_name));
+				break;
 			}
-			break;
 		}
 	}
 }
@@ -1226,7 +1235,6 @@ Enemy::~Enemy()
 		delete (*it);
 	}
 	m_weapons_list.clear();
-
 	m_phases.clear();
 }
 
@@ -1501,4 +1509,14 @@ void Enemy::ApplyLevelModifiers()
 	this->setMoney(m_money *= 1.0f * (*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level) / 100);
 
 	m_enemyLevel.setString(to_string(m_level));
+}
+
+EnemyBase::~EnemyBase()
+{
+	if (m_enemy)
+	{
+		m_enemy->DeletePhases();
+	}
+	
+	delete m_enemy;
 }

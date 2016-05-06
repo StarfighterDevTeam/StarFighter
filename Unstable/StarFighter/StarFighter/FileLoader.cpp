@@ -113,12 +113,17 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 			l_phasesToBeLoaded.erase(l_phasesToBeLoaded.begin());
 
 			//Do we have other phases to load that we have not loaded already?
-			for (vector<ConditionTransition*>::iterator it = (phase->m_transitions_list).begin(); it != (phase->m_transitions_list).end(); it++)
+			for (vector<ConditionTransition*>::iterator it = phase->m_transitions_list.begin(); it != phase->m_transitions_list.end(); it++)
 			{
 				vector<string>::iterator nextPhase = find(l_loadedPhases.begin(), l_loadedPhases.end(), (*it)->m_nextPhase_name);
 				if (nextPhase == l_loadedPhases.end())
 				{
-					l_phasesToBeLoaded.push_back((*it)->m_nextPhase_name);
+					//already flagged as a phase to be loaded?
+					vector<string>::iterator nextPhaseNotAlreadyLoading = find(l_phasesToBeLoaded.begin(), l_phasesToBeLoaded.end(), (*it)->m_nextPhase_name);
+					if (nextPhaseNotAlreadyLoading == l_phasesToBeLoaded.end())
+					{
+						l_phasesToBeLoaded.push_back((*it)->m_nextPhase_name);
+					}
 				}
 			}
 		}

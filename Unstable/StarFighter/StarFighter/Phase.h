@@ -99,6 +99,7 @@ enum Modifier
 	BouncingH,//bounces on horizontal scene borders only
 	BouncingV,//bounces on horizontal scene borders only
 	FreezePlayer,//disable player inputs
+	KillBullets,//get all enemy bullets on screen to explode
 };
 
 //forward declaration
