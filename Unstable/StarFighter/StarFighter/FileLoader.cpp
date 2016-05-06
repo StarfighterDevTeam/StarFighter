@@ -77,7 +77,7 @@ EnemyBase* FileLoader::LoadEnemyBase(string name, int probability, int enemyClas
 {
 	if ((*CurrentGame).m_enemiesConfig[name].empty())
 	{
-		LOGGER_WRITE(Logger::DEBUG, ("Enemy name cannot be found in (*CurrentGame).m_enemiesConfig: '%s'. Please check the ENEMY config file", (char*)name.c_str()));
+		LOGGER_WRITE(Logger::DEBUG, ("\n<!>Enemy name cannot be found in (*CurrentGame).m_enemiesConfig: '%s'. Please check the ENEMY config file", (char*)name.c_str()));
 		return NULL;
 	}
 

@@ -49,7 +49,7 @@
 #define SHIELD_FILENAME			"2D/Equipment/Shield.png"
 #define THRUSTER_FILENAME		"2D/Equipment/Thruster.png"
 #define MODULE_FILENAME			"2D/Equipment/Module.png"
-#define BOT_FILENAME			"2D/bot.png"
+#define BOT_FILENAME			"2D/Equipment/bot.png"
 
 #define QUALITY_BACKGROUND		"2D/Equipment/quality_background.png"
 #define EQUIPMENT_SIZE					48
@@ -57,7 +57,7 @@
 #define EMPTYSLOT_FILENAME				"2D/HUD/EmptySlot.png"
 #define GRID_SLOT_SIZE					64
 
-#define FX_EXPLOSION_FILENAME				"2D/FX_explosion.png"
+#define FX_EXPLOSION_FILENAME				"2D/FX/FX_explosion.png"
 #define FX_EXPLOSION_WIDTH					320
 #define FX_EXPLOSION_HEIGHT					236
 #define FX_EXPLOSION_FRAME_NUMBER			4
@@ -75,14 +75,6 @@
 #define LOOT_WIDTH					32
 #define LOOT_HEIGHT					32
 #define LOOT_SPEED_Y				50.f
-
-#define ENEMYX_FILENAME				"2D/enemyX.png"
-#define ENEMYX_WIDTH				32
-#define ENEMYX_HEIGHT				32
-
-#define ENEMYY_FILENAME				"2D/enemyY.png"
-#define ENEMYY_WIDTH				32
-#define ENEMYY_HEIGHT				32
 
 //HAZARD BREAK DISPLAY
 #define ENDSCENE_SCORE_DISPLAY_POSITION_Y	300
