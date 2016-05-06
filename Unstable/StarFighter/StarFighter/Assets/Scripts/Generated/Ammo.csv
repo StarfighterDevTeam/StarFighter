@@ -19,6 +19,7 @@ V_laserM_Vfast,20,600,0,2D/Vanguard/V_laserM.png,15,33,1,explosion_S,0,,,,,0
 V_laserM_slow,20,230,0,2D/Vanguard/V_laserM.png,15,33,1,explosion_S,0,,,,,0
 V_ballM_slow,30,230,0,2D/Vanguard/V_ballM.png,33,33,1,explosion_S,0,,,,,0
 V_fireball,150,600,0,2D/Vanguard/V_fireball.png,30,42,1,explosion_S,0,,,,,0
+V_fireball_Vslow,100,250,0,2D/Vanguard/V_fireball.png,30,42,1,explosion_S,0,,,,,0
 V_fireball_slow,150,400,0,2D/Vanguard/V_fireball.png,30,42,1,explosion_S,0,,,,,0
 V_fireball_fast,150,700,0,2D/Vanguard/V_fireball.png,30,42,1,explosion_S,0,,,,,0
 V_fireball_Vfast,150,800,0,2D/Vanguard/V_fireball.png,30,42,1,explosion_S,0,,,,,0

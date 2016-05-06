@@ -72,3 +72,5 @@ V_BetaGold_dragonball,Vanguard BetaGold Dragonballs,2D/Equipment/laser_red.png,4
 V_BetaGold_laser,Vanguard BetaGold Laser,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.02f,5,2.22f,10,0,120,ascending2,0,semi_homing
 V_AlphaGold_laser_double,Vanguard AlphaGold Laser Double,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.3f,15,3.f,3,0,30,alternate,0,homing
 V_BetaGold_dragonball_arc,Vanguard BetaGold Dragonballs Arc,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.8f,0,3.f,12,0,120,0,0,0
+V_BetaGold_dragonball_homing,Vanguard BetaGold Dragonballs Homing,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.2,1,0,3,20,7,alternate,0,homing
+V_BetaGold_dragonball_arc_alt,Vanguard BetaGold Dragonballs Arc Alt,2D/Equipment/laser_red.png,48,48,1,Sounds/laser.ogg,0.01,1,0.2f,16,0,150,ascending,0,0

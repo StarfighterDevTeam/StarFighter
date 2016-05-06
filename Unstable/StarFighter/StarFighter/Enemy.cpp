@@ -16,6 +16,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_enemyTimer = sf::seconds(0);
 	m_level = 1;
 	m_input_blocker = false;
+	m_currentPhase = NULL;
 
 	//life bars
 	m_feedbackTimer = sf::seconds(0);
@@ -768,7 +769,6 @@ bool Enemy::CheckCondition()
 void Enemy::setPhase(Phase* phase)
 {
 	assert(phase != NULL);
-	m_currentPhase = phase;
 	m_shots_fired = 0;
 
 	m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, phase->m_vspeed);
@@ -782,7 +782,7 @@ void Enemy::setPhase(Phase* phase)
 	setGhost(false);
 
 	//load new stats
-	for (int i = 0; i < m_currentPhase->m_modifiers.size(); i++)
+	for (int i = 0; i < phase->m_modifiers.size(); i++)
 	{
 		switch (phase->m_modifiers[i])
 		{
@@ -875,15 +875,15 @@ void Enemy::setPhase(Phase* phase)
 	//movement
 	//check if identical patterns
 	bool identical_patterns = false;
-	if (m_Pattern.m_currentPattern == phase->m_Pattern->m_currentPattern)
+	if (m_currentPhase && m_currentPhase->m_Pattern->m_currentPattern == phase->m_Pattern->m_currentPattern)
 	{
-		if (m_Pattern.m_currentPattern == NoMovePattern)
+		if (m_currentPhase->m_Pattern->m_currentPattern == NoMovePattern)
 		{
 			identical_patterns = true;
 		}
-		else if (m_Pattern.m_patternSpeed == phase->m_Pattern->m_patternSpeed)
+		else if (m_currentPhase->m_Pattern->m_patternSpeed == phase->m_Pattern->m_patternSpeed)
 		{
-			size_t paramsVectorSize = m_Pattern.m_patternParams.size();
+			size_t paramsVectorSize = m_currentPhase->m_Pattern->m_patternParams.size();
 			if (paramsVectorSize == phase->m_Pattern->m_patternParams.size())
 			{
 				if (paramsVectorSize == 0)
@@ -894,7 +894,7 @@ void Enemy::setPhase(Phase* phase)
 				{
 					for (size_t i = 0; i < paramsVectorSize; i++)
 					{
-						if (m_Pattern.m_patternParams[i] != phase->m_Pattern->m_patternParams[i])
+						if (m_currentPhase->m_Pattern->m_patternParams[i] != phase->m_Pattern->m_patternParams[i])
 						{
 							break;
 						}
@@ -909,9 +909,11 @@ void Enemy::setPhase(Phase* phase)
 		}
 	}
 
-	//if (!identical_patterns)
-	m_Pattern.SetPattern(phase->m_Pattern->m_currentPattern, phase->m_Pattern->m_patternSpeed, phase->m_Pattern->m_patternParams); //vitesse angulaire (degres/s)
-	m_rotation_speed = phase->m_rotation_speed;
+	if (!identical_patterns)
+	{
+		m_Pattern.SetPattern(phase->m_Pattern->m_currentPattern, phase->m_Pattern->m_patternSpeed, phase->m_Pattern->m_patternParams); //vitesse angulaire (degres/s)
+		m_rotation_speed = phase->m_rotation_speed;
+	}
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
 	if (phase->m_hasWelcomeShot)
@@ -978,6 +980,8 @@ void Enemy::setPhase(Phase* phase)
 	}
 
 	m_phaseTimer = sf::seconds(0);
+
+	m_currentPhase = phase;
 }
 
 Dialog* Enemy::LoadDialog(string name)

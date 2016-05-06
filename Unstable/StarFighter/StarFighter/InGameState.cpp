@@ -809,15 +809,9 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 {
 	if (playerShip)
 	{
-		if (m_currentScene)
-		{
-			delete m_currentScene;
-		}
-		if (m_nextScene)
-		{
-			delete m_nextScene;
-			m_nextScene = NULL;
-		}
+		delete m_currentScene;
+		delete m_nextScene;
+
 		//cleaning layers
 		(*CurrentGame).garbageLayer(FriendlyFireLayer);
 		(*CurrentGame).garbageLayer(EnemyFireLayer);
