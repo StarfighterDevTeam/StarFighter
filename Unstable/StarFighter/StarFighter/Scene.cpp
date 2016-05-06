@@ -352,6 +352,7 @@ Scene::~Scene()
 		size_t enemiesVectorSize = m_enemies_ranked_by_class[i].size();
 		for (size_t j = 0; j < enemiesVectorSize; j++)
 		{
+			m_enemies_ranked_by_class[i][j]->m_enemy->DeletePhases();
 			delete m_enemies_ranked_by_class[i][j];
 		}
 		m_enemies_ranked_by_class[i].clear();
@@ -360,6 +361,7 @@ Scene::~Scene()
 	size_t bossVectorSize = m_boss_list.size();
 	for (size_t i = 0; i < bossVectorSize; i++)
 	{
+		m_boss_list[i]->m_enemy->DeletePhases();
 		delete m_boss_list[i];
 	}
 	m_boss_list.clear();

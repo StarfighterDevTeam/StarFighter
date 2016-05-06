@@ -843,7 +843,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				UpdateAction(Action_Slowmotion, Input_Tap, !m_disableSlowmotion);
 
 				//hyperspeed
-				if (CanHyperspeed() && m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0 && !m_moving)
+				if (CanHyperspeed() && m_actions_states[Action_Hyperspeeding] && m_hyperspeed_fuel > 0)
 				{
 					(*CurrentGame).m_hyperspeedMultiplier = m_hyperspeed;
 					m_hyperspeed_fuel -= m_hyperspeed * HYPERSPEED_CONSUMPTION_FOR_CRUISING * deltaTime.asSeconds();
@@ -3282,6 +3282,7 @@ void Ship::ContinueDialog()
 		(*CurrentGame).m_waiting_for_dialog_validation = false;
 		(*CurrentGame).m_end_dialog_clock.restart();
 	}
+	delete m_targetDialogs.front();
 	m_targetDialogs.erase(m_targetDialogs.begin());
 }
 

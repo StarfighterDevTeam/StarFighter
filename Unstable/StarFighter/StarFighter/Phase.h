@@ -108,6 +108,7 @@ class Phase
 {
 public:
 	Phase();
+	~Phase();
 	string m_display_name;
 	string m_name;
 	vector<Weapon*> m_weapons_list;
@@ -118,7 +119,6 @@ public:
 	float m_vspeed;
 	float m_rotation_speed;
 	bool m_freeze_player;
-	bool m_hasWelcomeShot;
 	vector<ConditionTransition*> m_transitions_list;
 	string m_wake_up_name;
 	Weapon* m_welcomeWeapon;

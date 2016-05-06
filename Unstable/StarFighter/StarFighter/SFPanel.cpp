@@ -161,11 +161,7 @@ SFPanel::SFPanel(sf::Vector2f size, SFPanelTypes panel_type)
 
 SFPanel::~SFPanel()
 {
-	if (m_actions)
-	{
-		delete m_actions;
-		m_actions = NULL;
-	}
+	delete m_actions;
 }
 
 bool SFPanel::IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object)

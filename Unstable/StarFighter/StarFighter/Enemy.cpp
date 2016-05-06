@@ -122,6 +122,11 @@ void Enemy::UpdateHealthBars()
 
 void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	if (m_GarbageMe)
+	{
+		return;
+	}
+
 	if (m_feedbackTimer > sf::seconds(0))
 	{
 		m_feedbackTimer -= deltaTime;
@@ -510,14 +515,14 @@ Enemy* Enemy::Clone()
 	enemy->m_rotation_speed = this->m_rotation_speed;
 	enemy->setRotation(this->getRotation());
 
-	if (!m_phases.empty())
+	if (!this->m_phases.empty())
 	{
-		enemy->m_currentPhase = this->m_currentPhase;
-		enemy->setPhase(this->m_currentPhase);
+		//enemy->m_currentPhase = this->m_currentPhase; 
 		for (std::vector<Phase*>::iterator it = (this->m_phases.begin()); it != (this->m_phases.end()); it++)
 		{
 			enemy->m_phases.push_back((*it));
 		}
+		enemy->setPhase(enemy->m_phases.front());
 	}
 
 	enemy->m_level = this->m_level;
@@ -541,7 +546,7 @@ Phase* Enemy::getPhase(string phaseName)
 
 bool Enemy::CheckCondition()
 {
-	for (std::vector<ConditionTransition*>::iterator it = (this->m_currentPhase->m_transitions_list.begin()); it != (this->m_currentPhase->m_transitions_list.end()); it++)
+	for (std::vector<ConditionTransition*>::iterator it = this->m_currentPhase->m_transitions_list.begin(); it != this->m_currentPhase->m_transitions_list.end(); it++)
 	{
 		switch ((*it)->m_condition)
 		{
@@ -768,7 +773,12 @@ bool Enemy::CheckCondition()
 
 void Enemy::setPhase(Phase* phase)
 {
-	assert(phase != NULL);
+	if (!phase)
+	{
+		m_currentPhase = NULL;
+		return;
+	}
+
 	m_shots_fired = 0;
 
 	m_speed = GameObject::getSpeed_for_Scrolling((*CurrentGame).m_direction, phase->m_vspeed);
@@ -843,6 +853,8 @@ void Enemy::setPhase(Phase* phase)
 		}
 	}
 
+	m_rotation_speed = phase->m_rotation_speed;
+
 	//weapons
 	//check if identical weapons
 	bool identical_weapons = false;
@@ -865,7 +877,12 @@ void Enemy::setPhase(Phase* phase)
 	//clearing old weapons and setting new ones
 	if (!identical_weapons)
 	{
+		for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
+		{
+			delete (*it);
+		}
 		m_weapons_list.clear();
+
 		for (std::vector<Weapon*>::iterator it = phase->m_weapons_list.begin(); it != phase->m_weapons_list.end(); it++)
 		{
 			m_weapons_list.push_back((*it)->Clone());
@@ -912,11 +929,10 @@ void Enemy::setPhase(Phase* phase)
 	if (!identical_patterns)
 	{
 		m_Pattern.SetPattern(phase->m_Pattern->m_currentPattern, phase->m_Pattern->m_patternSpeed, phase->m_Pattern->m_patternParams); //vitesse angulaire (degres/s)
-		m_rotation_speed = phase->m_rotation_speed;
 	}
 
 	//welcome shot: shot once at the beginning of the phase (actually used as a post-mortem "good-bye"shoot)
-	if (phase->m_hasWelcomeShot)
+	if (phase->m_welcomeWeapon)
 	{
 		float theta = this->getRotation() / 180 * M_PI;
 		float weapon_offset_x = phase->m_welcomeWeapon->m_weaponOffset.x - m_size.y / 2 * sin(theta);
@@ -1042,7 +1058,6 @@ Phase* Enemy::LoadPhase(string name)
 					m_weapon->m_weaponOffset.x = atof((*it)[PHASE_WEAPON_OFFSET + (i * 4)].c_str());
 					m_weapon->m_delay = atof((*it)[PHASE_WEAPON_DELAY + (i * 4)].c_str());
 					phase->m_weapons_list.push_back(m_weapon);
-					
 				}
 			}
 
@@ -1104,7 +1119,6 @@ Phase* Enemy::LoadPhase(string name)
 			if ((*it)[PHASE_WELCOME_WEAPON].compare("0") != 0)
 			{
 				phase->m_welcomeWeapon = Enemy::LoadWeapon((*it)[PHASE_WELCOME_WEAPON], 1, Enemy::LoadAmmo((*it)[PHASE_WELCOME_AMMO]));
-				phase->m_hasWelcomeShot = true;
 			}
 			
 			//load enemies (by name) to wake up
@@ -1207,12 +1221,22 @@ Enemy::~Enemy()
 	
 	(*CurrentGame).removeFromFeedbacks(&m_enemyLevel);
 
-	//weapons
 	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
 	{
 		delete (*it);
 	}
 	m_weapons_list.clear();
+
+	m_phases.clear();
+}
+
+void Enemy::DeletePhases()
+{
+	for (std::vector<Phase*>::iterator it = m_phases.begin(); it != m_phases.end(); it++)
+	{
+		delete (*it);
+	}
+	m_phases.clear();
 }
 
 void Enemy::GenerateLoot()

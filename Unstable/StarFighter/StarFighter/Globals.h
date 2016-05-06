@@ -28,7 +28,7 @@ std::string makePath(const std::string& srcPath);
 #define STARTSCENE_Y_RATIO						0.85f
 
 #define STARTING_SCENE							"Vanguard_HubIntro"
-#define STARTING_MONEY							100
+#define STARTING_MONEY							150
 
 #define DEFAULT_MUSIC_VOLUME					50
 #define DEFAULT_SFX_VOLUME						50

@@ -8,7 +8,6 @@ class SFDialogPanel : public SFPanel
 {
 public:
 	SFDialogPanel(sf::Vector2f size, Ship* playerShip);
-	~SFDialogPanel();
 	void Update(sf::Time deltaTime, sf::Vector2f inputs_directions) override;
 	void Draw(sf::RenderTexture& screen) override;
 	Dialog* GetDialog() override;

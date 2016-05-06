@@ -47,6 +47,11 @@ void Ammo::Death()
 
 void Ammo::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	if (m_GarbageMe)
+	{
+		return;
+	}
+
 	sf::Vector2f newspeed = m_speed;
 	float new_ref_speed = m_ref_speed;
 	if (hyperspeedMultiplier > 1)

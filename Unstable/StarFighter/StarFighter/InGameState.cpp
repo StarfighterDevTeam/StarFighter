@@ -384,7 +384,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 
 					//Disable hyperspeed capacity
 					(*CurrentGame).m_playerShip->m_disableHyperspeed = true;
-					(*CurrentGame).m_playerShip->m_disableRecall = true;
 
 					//Stop spawning enemies
 					m_currentScene->m_generating_enemies = false;
@@ -423,7 +422,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
-					(*CurrentGame).m_playerShip->m_disableRecall = false;
 				}
 
 				//player takes exit?
@@ -451,7 +449,6 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				{
 					(*CurrentGame).m_playerShip->RegenHealthFast(deltaTime, false, true, false);
 					(*CurrentGame).m_playerShip->m_disableSlowmotion = true;
-					(*CurrentGame).m_playerShip->m_disableRecall = false;
 
 					if (!m_hasDisplayedDestructionRatio)
 					{

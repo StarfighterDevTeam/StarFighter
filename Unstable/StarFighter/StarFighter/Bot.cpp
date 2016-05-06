@@ -33,6 +33,11 @@ void Bot::setTarget (GameObject* target)
 
 void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 {
+	if (m_GarbageMe)
+	{
+		return;
+	}
+
 	if (m_visible)
 	{
 		static sf::Vector2f newposition, offset, newspeed;

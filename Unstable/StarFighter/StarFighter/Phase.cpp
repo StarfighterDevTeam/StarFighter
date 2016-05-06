@@ -2,9 +2,34 @@
 
 Phase::Phase()
 {
-	m_hasWelcomeShot = false;
+	m_welcomeWeapon = NULL;
 	m_freeze_player = false;
 	m_Pattern = new PatternBobby();
+}
+
+Phase::~Phase()
+{
+	for (std::vector<Weapon*>::iterator it = m_weapons_list.begin(); it != m_weapons_list.end(); it++)
+	{
+		delete (*it);
+	}
+	m_weapons_list.clear();
+
+	delete m_welcomeWeapon;
+
+	for (std::vector<Dialog*>::iterator it = m_dialogs.begin(); it != m_dialogs.end(); it++)
+	{
+		delete (*it);
+	}
+	m_dialogs.clear();
+
+	for (std::vector<ConditionTransition*>::iterator it = m_transitions_list.begin(); it != m_transitions_list.end(); it++)
+	{
+		delete (*it);
+	}
+	m_transitions_list.clear();
+
+	delete m_Pattern;
 }
 
 ConditionTransition::ConditionTransition(ConditionType condition, FloatCompare op, float value, std::string nextPhase_name)

@@ -75,15 +75,6 @@ SFDialogPanel::SFDialogPanel(sf::Vector2f size, Ship* playerShip) : SFPanel(size
 	}
 }
 
-SFDialogPanel::~SFDialogPanel()
-{
-	if (m_dialog)
-	{
-		delete m_dialog;
-		m_dialog = NULL;
-	}
-}
-
 void SFDialogPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 {
 	//fade in
