@@ -83,7 +83,7 @@ enum TargetHoming
 	NO_HOMING,
 	SEMI_HOMING,//aim once every rafale
 	HOMING,//aim once every bullet
-	SUPER_HOMING,//bullet follows target
+	//SUPER_HOMING,//bullet follows target
 };
 
 enum ShotMode

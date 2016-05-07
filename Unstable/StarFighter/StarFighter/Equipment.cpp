@@ -313,8 +313,8 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 	int credits_ = ((*CurrentGame).GetPlayerStatsMultiplierForLevel(level) - 100);
 	credits_ += ceil(beastScore / BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES * (*CurrentGame).GetBonusStatsMultiplierToBeOnParForLevel(level + 1));
 
-	int cost_per_bot = floor(CREDITS_COST_PER_ONE_ADDITIONAL_BOT * pow((1 + COST_PER_ONE_BOT_MULTIPLIER_PER_LEVEL), level - 1));
-
+	int cost_per_bot = CREDITS_COST_PER_ONE_ADDITIONAL_BOT;
+	
 	//buying additional bots?
 	int loot_credits_remaining = credits_;
 	int number_of_bots = 0;
@@ -323,8 +323,10 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 	{
 		number_of_bots++;
 		loot_credits_remaining -= number_of_bots == 0 ? 0 : cost_per_bot;
+		cost_per_bot = floor(cost_per_bot * pow((1 + COST_PER_ONE_BOT_MULTIPLIER_PER_LEVEL), number_of_bots));
 		can_buy_additional_bot = loot_credits_remaining > cost_per_bot && number_of_bots < MAX_NUMBER_OF_BOTS_PER_ITEM;
 	}
+
 	loot_credits_remaining = credits_ / number_of_bots;
 
 	//Spending credits on the possible bonuses
@@ -335,14 +337,35 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 	equipment->Init((int)Module, 0, 0, 0.f, 0.f, 0, 0, 0, 0, 0, 0, MODULE_FILENAME, sf::Vector2f(EQUIPMENT_SIZE, EQUIPMENT_SIZE), 1, "Module");
 
 	Bot* bot = new Bot(sf::Vector2f(0, 0), sf::Vector2f(0, 0), BOT_FILENAME, sf::Vector2f(BOT_SIZE, BOT_SIZE));
-	bot->m_radius = 500;
-	bot->m_vspeed = 300;
 	bot->m_spread = sf::Vector2f(-50, 0);
-
+	PatternType pattern_type = NoMovePattern;
 	vector<float> patternParams;
 	//v->push_back(bot->radius); // rayon 500px
 	//v->push_back(1);  // clockwise (>)
-	PatternType pattern_type = NoMovePattern;
+	int random_pattern_type = RandomizeIntBetweenValues(0, 2);
+	switch (random_pattern_type)
+	{
+		case 1:
+		{
+			pattern_type = Oscillator;
+			bot->m_vspeed = 100;
+			patternParams.push_back(50);
+			int clockwise = ((rand() % 2) * 2) - 1;
+			patternParams.push_back(clockwise);
+			patternParams.push_back(1);
+			break;
+		}
+		case 2:
+		{
+			pattern_type = Circle_;
+			bot->m_vspeed = 400;
+			patternParams.push_back(50);
+			int clockwise = ((rand() % 2) * 2) - 1;
+			patternParams.push_back(clockwise);
+			break;
+		}
+	}
+	
 	bot->m_Pattern.SetPattern(pattern_type, bot->m_vspeed, patternParams); //vitesse angulaire (degres/s)
 
 	bot->m_weapon = weapon;
@@ -355,7 +378,14 @@ Equipment* Equipment::CreateRandomModule(int level, float beastScore)
 		}
 		else
 		{
-			equipment->m_bots.push_back(bot->Clone());
+			Bot* new_bot = bot->Clone();
+
+			//bots auto spreading based on number of bots
+			int s = i % 2 == 0 ? 1 : -1;
+			int x = i / 2;
+			new_bot->m_spread.x *= s * (1 + x);
+
+			equipment->m_bots.push_back(new_bot);
 		}
 	}
 

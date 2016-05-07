@@ -254,6 +254,8 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 	if (!equipment->m_bots.empty())
 	{
 		GenerateBots(this);
+
+		
 	}
 	
 	if (!no_save)
@@ -1906,19 +1908,16 @@ bool Ship::GetLoot(GameObject& object)
 		//equip it
 		else
 		{
-			setShipEquipment(object.m_equipment_loot->Clone());
+			setShipEquipment(object.m_equipment_loot->Clone(), true);
 			//and update HUD
 			success = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, object.m_equipment_loot->m_equipmentType, true);
 		}
 		
 		if (success)
 		{
-			delete object.m_equipment_loot;
-			object.m_equipment_loot = NULL;
-		}
-		
-		if (success)
-		{
+			delete object.m_weapon_loot;
+			object.m_weapon_loot = NULL;
+			Ship::SaveItems(ITEMS_SAVE_FILE, this);
 			(*CurrentGame).PlaySFX(SFX_Equip);
 		}
 
@@ -1937,7 +1936,7 @@ bool Ship::GetLoot(GameObject& object)
 		//equip it
 		else
 		{
-			setShipWeapon(object.m_weapon_loot->Clone());
+			setShipWeapon(object.m_weapon_loot->Clone(), true);
 			//and update HUD
 			success = m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*capsule, NBVAL_Equipment, true);
 		}
@@ -1946,10 +1945,7 @@ bool Ship::GetLoot(GameObject& object)
 		{
 			delete object.m_weapon_loot;
 			object.m_weapon_loot = NULL;
-		}
-
-		if (success)
-		{
+			Ship::SaveItems(ITEMS_SAVE_FILE, this);
 			(*CurrentGame).PlaySFX(SFX_Equip);
 		}
 
@@ -2376,22 +2372,22 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 				case Line_:
 				{
 					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
-					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
 					break;
 				}
 				case Circle_:
 				{
 					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
-					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
-					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
+					data << equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
 					break;
 				}
 				case Oscillator:
 				{
 					data << equipment->m_bots.front()->m_Pattern.m_patternSpeed << " ";
-					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
-					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
-					data << &equipment->m_bots.front()->m_Pattern.m_patternParams[2] << " ";
+					data << equipment->m_bots.front()->m_Pattern.m_patternParams[0] << " ";
+					data << equipment->m_bots.front()->m_Pattern.m_patternParams[1] << " ";
+					data << equipment->m_bots.front()->m_Pattern.m_patternParams[2] << " ";
 					break;
 				}
 			}
@@ -2466,20 +2462,20 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 		if (weapon->m_ammunition->m_Pattern.m_currentPattern == Line_)
 		{
 			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
-			data << &weapon->m_ammunition->m_Pattern.m_patternParams[1];
+			data << weapon->m_ammunition->m_Pattern.m_patternParams[1];
 		}
 		else if (weapon->m_ammunition->m_Pattern.m_currentPattern == Circle_)
 		{
 			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
-			data << &weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
-			data << &weapon->m_ammunition->m_Pattern.m_patternParams[1];
+			data << weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
+			data << weapon->m_ammunition->m_Pattern.m_patternParams[1];
 		}
 		else if (weapon->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
 		{
 			data << " " << weapon->m_ammunition->m_Pattern.m_patternSpeed << " ";
-			data << &weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
-			data << &weapon->m_ammunition->m_Pattern.m_patternParams[1] << " ";
-			data << &weapon->m_ammunition->m_Pattern.m_patternParams[2];
+			data << weapon->m_ammunition->m_Pattern.m_patternParams[0] << " ";
+			data << weapon->m_ammunition->m_Pattern.m_patternParams[1] << " ";
+			data << weapon->m_ammunition->m_Pattern.m_patternParams[2];
 		}
 	}
 	else
@@ -2741,6 +2737,7 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 		bot->m_display_name = bot_name;
 		bot->m_spread = sf::Vector2f(bot_spread_x, bot_spread_y);
 		bot->m_rotation_speed = bot_rotation_speed;
+
 		bot->m_Pattern.m_currentPattern = (PatternType)bot_pattern_type;
 		if (bot->m_Pattern.m_currentPattern == Line_)
 		{
@@ -2753,13 +2750,15 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg1);
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
 		}
-		else if (bot->m_Pattern.m_currentPattern == Circle_)
+		else if (bot->m_Pattern.m_currentPattern == Oscillator)
 		{
 			bot->m_Pattern.m_patternSpeed = bot_pattern_speed;
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg1);
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg2);
 			bot->m_Pattern.m_patternParams.push_back(bot_pattern_arg3);
 		}
+
+		bot->m_Pattern.StartPattern();
 
 		if (bot_weapon_name.compare("0") == 0)
 		{
@@ -2790,6 +2789,8 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 				ammo->m_Pattern.m_patternParams.push_back(bot_ammo_pattern_arg3);
 			}
 
+			ammo->m_Pattern.StartPattern();
+
 			Weapon* weapon = new Weapon(ammo);
 			weapon->m_display_name = bot_weapon_name;
 			weapon->m_fire_direction = Vector2i(0, -1);
@@ -2818,7 +2819,14 @@ Equipment* Ship::LoadEquipmentFromLine(string line)
 			}
 			else
 			{
-				equipment->m_bots.push_back(bot->Clone());
+				Bot* new_bot = bot->Clone();
+
+				//bots auto spreading based on number of bots
+				int s = i % 2 == 0 ? 1 : -1;
+				int x = i / 2;
+				new_bot->m_spread.x *= s * (1 + x);
+
+				equipment->m_bots.push_back(new_bot);
 			}
 		}
 	}
@@ -3240,15 +3248,19 @@ void Ship::GenerateBots(GameObject* target)
 		(*CurrentGame).addToScene((*it), BotLayer, Neutral);
 
 		//bots auto spreading based on number of bots
-		if ((*it)->m_Pattern.m_currentPattern == NoMovePattern)
-		{
-			int s = j % 2 == 0 ? 1 : -1;
-			int x = j / 2;
+		//int s = j % 2 == 0 ? 1 : -1;
+		//int x = j / 2;
+		//(*it)->m_spread.x *= s * (1 + x);
+		//j++;
 
-			(*it)->m_spread.x *= s * (1+x);
-
-			j++;
-		}
+		//bots auto spreading based on number of bots
+		//for (int i = 0; i < number_of_bots; i++)
+		//{
+		//	int s = i % 2 == 0 ? 1 : -1;
+		//	int x = i / 2;
+		//	bot->m_spread.x *= s * (1 + x);
+		//}
+		
 	}
 }
 

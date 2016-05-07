@@ -35,12 +35,14 @@ class PatternBobby : virtual public IPatternHandler
 public:
 	PatternBobby();
 	void SetPattern(PatternType pt, float patternSpeed, vector<float> args);
+	void StartPattern();
 	sf::Vector2f GetOffset(float seconds, bool absolute_coordinate = false) override;
 	static PatternBobby* PatternLoader(vector<string> line_data, int index);
 
 	PatternType m_currentPattern;
 	vector<float> m_patternParams;
 	float m_patternSpeed;
+	float m_patternSpeedInRadian;
 
 private:
 	sf::Vector2f ToCartesianCoords(sf::Vector2f polarCoords);

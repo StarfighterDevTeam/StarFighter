@@ -1285,7 +1285,7 @@ void Enemy::GenerateLoot()
 bool Enemy::CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus, bool force_BeastScale, float BeastScale_min, float BeastScale_max)
 {
 
-	//Debug commands
+	////Debug commands
 	//#ifndef NDEBUG
 	//	Enemy::AssignRandomEquipment(Engine, 30, this, 6.f);
 	//	return true;
@@ -1439,8 +1439,6 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 					weapon->m_target_homing = SEMI_HOMING;
 				else if ((*it)[WEAPON_TARGET_HOMING].compare("homing") == 0)
 					weapon->m_target_homing = HOMING;
-				else if ((*it)[WEAPON_TARGET_HOMING].compare("super_homing") == 0)
-					weapon->m_target_homing = SUPER_HOMING;
 			}
 
 			return weapon;

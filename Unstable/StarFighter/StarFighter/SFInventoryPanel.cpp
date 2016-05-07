@@ -351,7 +351,6 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 						switch (obj->m_bots.front()->m_weapon->m_target_homing)
 						{
 							case HOMING:
-							case SUPER_HOMING:
 							{
 								ss_stats << "\nEpic ability: target homing";
 								break;
@@ -437,12 +436,16 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				//	}
 				//}
 
+				if (obj->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
+				{
+					ss_stats << "\nEpic ability: waving trajectory";
+				}
+
 				if (obj->m_target_homing != NO_HOMING)
 				{
 					switch (obj->m_target_homing)
 					{
 						case HOMING:
-						case SUPER_HOMING:
 						{
 							ss_stats << "\nEpic ability: target homing";
 							break;
@@ -453,11 +456,6 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 							break;
 						}
 					}
-				}
-
-				if (obj->m_ammunition->m_Pattern.m_currentPattern == Oscillator)
-				{
-					ss_stats << "\nEpic ability: waving trajectory";
 				}
 
 				ss_stats << "\n\nLevel: " << obj->m_level << " (+" << obj->m_credits << " XP" << ". Quality: " << (int)obj->m_quality << "%)";

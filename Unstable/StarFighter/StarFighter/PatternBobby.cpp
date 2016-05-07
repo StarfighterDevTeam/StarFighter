@@ -46,6 +46,11 @@ PatternBobby* PatternBobby::PatternLoader(vector<string> line_data, int index)
 	return bobby;
 }
 
+void PatternBobby::StartPattern()
+{
+	SetPattern(m_currentPattern, m_patternSpeed, m_patternParams);
+}
+
 void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float> args)
 {
 	//Note that patternSpeed is 
@@ -103,7 +108,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float> 
 				//random between 1 and -1
 				m_patternParams[1] = ((rand() % 2) * 2) - 1;
 			}
-			m_patternSpeed = patternSpeed*M_PI/180; //converting speed to radians
+			m_patternSpeedInRadian = patternSpeed*M_PI / 180; //converting speed to radians
 			m_curSandboxPosition_polar = sf::Vector2f(m_patternParams[0], -M_PI_2*m_patternParams[1]); //starts on top of the circle (-pi/2)
 			m_curSandboxPosition_cartesian = ToCartesianCoords(m_curSandboxPosition_polar);
 
@@ -126,7 +131,7 @@ void PatternBobby::SetPattern(PatternType pt, float patternSpeed, vector<float> 
 				m_patternParams[1] = ((rand() % 2) * 2) - 1;
 			}
 
-			m_patternSpeed = patternSpeed*2*M_PI/m_patternParams[0]; //converting speed to radians (2pi = 1 amplitude)
+			m_patternSpeedInRadian = patternSpeed * 2 * M_PI / m_patternParams[0]; //converting speed to radians (2pi = 1 amplitude)
 
 			m_curSandboxPosition_polar = sf::Vector2f(m_patternParams[0] / 2, m_patternParams[1] * M_PI / 180); // r = ampl/2 + converting angle to radians
 			
@@ -245,7 +250,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			static sf::Vector2f next;
 
 			//Updating our current theta [modulo 2PI]
-			new_angle = m_curSandboxPosition_polar.y + (m_patternParams[1] >= 0 ? seconds*m_patternSpeed : -seconds*m_patternSpeed);
+			new_angle = m_curSandboxPosition_polar.y + (m_patternParams[1] >= 0 ? seconds*m_patternSpeedInRadian : -seconds*m_patternSpeedInRadian);
 			m_curSandboxPosition_polar.y = fmod(new_angle, 2*M_PI);
 
 			//Our next position:
@@ -278,7 +283,7 @@ sf::Vector2f  PatternBobby::GetOffset(float seconds, bool absolute_coordinate)
 			static sf::Vector2f next;
 
 			//Updating our current theta [modulo 2PI]
-			m_currTheta = fmod(m_currTheta + seconds*m_patternSpeed, 2*M_PI);
+			m_currTheta = fmod(m_currTheta + seconds*m_patternSpeedInRadian, 2 * M_PI);
 
 			//Our next position (r is updated according to cos(theta))
 			next.x = m_curSandboxPosition_polar.x*cos(m_currTheta);
