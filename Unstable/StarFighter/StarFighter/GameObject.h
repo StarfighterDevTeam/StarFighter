@@ -220,6 +220,7 @@ public:
 	sf::Vector2f m_size;
 
 	virtual void GetDamageFrom(GameObject& object);
+	virtual void GetDamage(int damage);
 	string getName();
 	virtual void Respawn();
 	GameObject* Clone();

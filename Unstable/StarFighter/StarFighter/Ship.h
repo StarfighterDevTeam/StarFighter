@@ -125,6 +125,7 @@ public :
 	bool CanHyperspeed();
 	bool CanJump();
 	int GetNumberOfBombs();
+	int GetBombsDamage();
 
 	void CleanGarbagedEquipments();
 

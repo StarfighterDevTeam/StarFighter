@@ -326,15 +326,29 @@ void Game::updateScene(Time deltaTime)
 	ManageMusicTransitions(deltaTime);
 }
 
-void Game::killGameObjectLayer(GameObjectType m_layer)
+void Game::killGameObjectLayer(GameObjectType layer)
 {
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[m_layer].begin(); it != m_sceneGameObjectsTyped[m_layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[layer].begin(); it != m_sceneGameObjectsTyped[layer].end(); it++)
 	{
 		if ((*it) != NULL)
 		{
 			if ((*it)->m_isOnScene)
 			{
 				(*it)->Death();
+			}
+		}
+	}
+}
+
+void Game::damageGameObjectLayer(GameObjectType layer, int damage)
+{
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[layer].begin(); it != m_sceneGameObjectsTyped[layer].end(); it++)
+	{
+		if ((*it) != NULL)
+		{
+			if ((*it)->m_isOnScene)
+			{
+				(*it)->GetDamage(damage);
 			}
 		}
 	}

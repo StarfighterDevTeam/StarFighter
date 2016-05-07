@@ -1,0 +1,61 @@
+﻿
+my additional adjustments 
+i used the json method/see screenshots for reference
+
+
+in the events
+
+'Set character width' to 28 for " "   (space)
+
++ set line height to 0
+
+spritefont properties
+
+i modified character spacing to 0
+and lineheight to -5
+
+
+################################################################################
+
+Character width: 59
+Character height: 59
+Character set: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:?!-_~#"'&()[]|`\/@°+=*$£€<>%
+
+################################################################################
+Copy the following JSON text and paste into the Array.Load command INSIDE the default quotes.
+
+{""c2array"":true,""size"":[2,30,1],""data"":[[[17],[18],[19],[20],[23],[24],[25],[26],[30],[31],[33],[34],[36],[37],[38],[39],[40],[41],[42],[43],[44],[45],[46],[47],[48],[49],[50],[51],[54],[57]],[[""i.'""],[""I:|""],["",!""],["";""],[""l""],[""1[""],[""]""],[""\""`°""],["")""],[""j(*""],[""+<>""],[""fr-=$""],[""t""],[""csz~""],[""_@""],[""ah&\\/""],[""bdegnopquy37?""],[""k""],[""CEFJ59""],[""LZv2468""],[""T#""],[""AGPSYx""],[""BDHNU""],[""KR""],[""OQ""],[""VXm""],[""€%""],[""M0£""],[""w""],[""W""]]]}
+
+################################################################################
+These are the details for building the character widths manually, with the SpriteFont  'Set character width' action.
+
+17	"i.'"
+18	"I:|"
+19	",!"
+20	";"
+23	"l"
+24	"1["
+25	"]"
+26	"""`°"
+30	")"
+31	"j(*"
+33	"+<>"
+34	"fr-=$"
+36	"t"
+37	"csz~"
+38	"_@"
+39	"ah&\/"
+40	"bdegnopquy37?"
+41	"k"
+42	"CEFJ59"
+43	"LZv2468"
+44	"T#"
+45	"AGPSYx"
+46	"BDHNU"
+47	"KR"
+48	"OQ"
+49	"VXm"
+50	"€%"
+51	"M0£"
+54	"w"
+57	"W"

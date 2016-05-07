@@ -228,27 +228,31 @@ void GameObject::setGhost(bool ghost)
 
 void GameObject::GetDamageFrom(GameObject& object)
 {
+	GetDamage(object.m_damage);
+}
+
+void GameObject::GetDamage(int damage)
+{
 	if (m_immune)
 	{
 		return;
 	}
 
-	setColor(Color(255,0,0,255), sf::seconds(DAMAGE_FEEDBACK_TIME));
-	if (object.m_damage > m_shield)
+	setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
+	if (damage > m_shield)
 	{
-		m_armor -= (object.m_damage - m_shield);
+		m_armor -= (damage - m_shield);
 		m_shield = 0;
 	}
 	else
 	{
-		m_shield -= object.m_damage;
+		m_shield -= damage;
 	}
 
 	if (m_armor <= 0)
 	{
 		Death();
 	}
-	
 }
 
 bool GameObject::get_money_from(GameObject& object)

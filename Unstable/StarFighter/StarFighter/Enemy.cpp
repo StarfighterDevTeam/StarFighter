@@ -449,6 +449,11 @@ void Enemy::RotateFeedbacks(float angle)
 
 void Enemy::GetDamageFrom(GameObject& object)
 {
+	GetDamage(object.m_damage);
+}
+
+void Enemy::GetDamage(int damage)
+{
 	if (m_immune || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
 	{
 		return;
@@ -469,14 +474,14 @@ void Enemy::GetDamageFrom(GameObject& object)
 	m_feedbackTimer = sf::seconds(ENEMY_HEALTH_FEEDBACK_TIME);
 	setColor(Color(255, 0, 0, 255), sf::seconds(DAMAGE_FEEDBACK_TIME));
 
-	if (object.m_damage > m_shield)
+	if (damage > m_shield)
 	{
-		m_armor -= (object.m_damage - m_shield);
+		m_armor -= (damage - m_shield);
 		m_shield = 0;
 	}
 	else
 	{
-		m_shield -= object.m_damage;
+		m_shield -= damage;
 	}
 
 	if (m_armor <= 0)

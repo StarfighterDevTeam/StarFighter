@@ -1271,14 +1271,14 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 	{
 		m_fuelBar.setSize(sf::Vector2f(1 + (1.0f * m_playerShip->m_hyperspeed_fuel / m_playerShip->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X), FUEL_BAR_SIZE_Y));
 		m_fuelBarContainer.setSize(sf::Vector2f(1 + ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
-		if (m_playerShip->m_hyperspeed_fuel > m_playerShip->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER)
+		if (m_playerShip->GetNumberOfBombs() > 0 && m_playerShip->m_hyperspeed_fuel > m_playerShip->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER)
 		{
 			m_fuelBarOverblock.setSize(sf::Vector2f(1.0f * m_playerShip->m_hyperspeed_fuel_max / BOMB_DEFAULT_NUMBER / m_playerShip->m_hyperspeed_fuel_max * ARMOR_BAR_SIZE_X, FUEL_BAR_SIZE_Y));
 			m_fuelBarOverblock.setPosition(sf::Vector2f(m_fuelBar.getPosition().x + m_fuelBar.getSize().x - m_fuelBarOverblock.getSize().x, m_fuelBar.getPosition().y));
 		}
 		else
 		{
-			m_fuelBarOverblock.setSize(sf::Vector2f(1, FUEL_BAR_SIZE_Y));
+			m_fuelBarOverblock.setSize(sf::Vector2f(0, FUEL_BAR_SIZE_Y));
 		}
 	}
 

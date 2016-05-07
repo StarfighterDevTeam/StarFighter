@@ -232,7 +232,8 @@ std::string makePath(const std::string& srcPath);
 #define PLAYER_LEVELING_STATS_MULTIPLIER				0.04
 #define ENEMIES_LEVELING_STATS_MULTIPLIER				0.10
 #define BOT_STATS_MULTIPLIER							0.35
-#define BOMB_DEFAULT_NUMBER								4
+#define BOMB_DEFAULT_NUMBER								3
+#define BOMB_FIRST_LEVEL_DAMAGE							200
 
 #define LOOT_CREDITS_DEFAULT_BONUS						1
 #define FIRST_LEVEL_ARMOR								150

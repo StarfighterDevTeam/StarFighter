@@ -50,6 +50,7 @@ public:
 	bool CreateRandomLootv2(EnemyClass loot_class, float BeastScaleBonus = 0, bool force_BeastScale = false, float BeastScale_min = 0.0f, float BeastScale_max = 6.0f);
 	static bool AssignRandomEquipment(EquipmentType equipment_type, int level, GameObject* object, float beastScore);
 	void GetDamageFrom(GameObject& object) override;
+	void GetDamage(int damage) override;
 
 	EnemyClass m_enemy_class;
 

@@ -1577,7 +1577,8 @@ void Ship::Recalling()
 
 void Ship::Bomb()
 {
-	(*CurrentGame).killGameObjectLayer(EnemyObject);
+	int i = GetBombsDamage();
+	(*CurrentGame).damageGameObjectLayer(EnemyObject, GetBombsDamage());
 	(*CurrentGame).killGameObjectLayer(EnemyFire);
 
 	//ghost
@@ -3366,4 +3367,9 @@ int Ship::GetNumberOfBombs()
 	}
 
 	return bombs;
+}
+
+int Ship::GetBombsDamage()
+{
+	return GetNumberOfBombs() > 0 ? BOMB_FIRST_LEVEL_DAMAGE*(*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level)*0.01 : 0;
 }
