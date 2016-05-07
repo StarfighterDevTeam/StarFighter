@@ -255,6 +255,7 @@ std::string makePath(const std::string& srcPath);
 #define WEAPON_MIN_DISPERSION							30
 #define WEAPON_MAX_DISPERSION							120
 #define WEAPON_MAX_DISPERSION_FOR_BOT					45
+#define WEAPON_HOMING_DAMAGE_MALUS						0.15
 
 //TEXTPOP FEEDBACK
 #define MONEY_LOOT_DISPLAY_NOT_FADED_TIME				0.8f

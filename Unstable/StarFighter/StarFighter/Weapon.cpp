@@ -536,7 +536,8 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 		{
 			case 0:
 			{
-				weapon->m_target_homing = SUPER_HOMING;
+				weapon->m_target_homing = HOMING;
+				weapon->m_ammunition->m_damage * (1 - WEAPON_HOMING_DAMAGE_MALUS);
 				break;
 			}
 			case 1:

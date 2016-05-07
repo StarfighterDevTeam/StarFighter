@@ -419,11 +419,11 @@ bool Scene::CheckHazardBreakConditions()
 	{
 		m_score_graze = 4;//S
 	}
-	else if ((*CurrentGame).m_playerShip->m_hits_taken < 4)//1-3 hits taken
+	else if ((*CurrentGame).m_playerShip->m_hits_taken < 6)//1-5 hits taken
 	{
 		m_score_graze = 3;//A
 	}
-	else if ((*CurrentGame).m_playerShip->m_hits_taken < 11)//4-10 hits taken
+	else if ((*CurrentGame).m_playerShip->m_hits_taken < 16)//6-15 hits taken
 	{
 		m_score_graze = 2;//B
 	}
