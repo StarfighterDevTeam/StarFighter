@@ -148,11 +148,11 @@ Equipment* Equipment::CreateRandomArmor(int level, float beastScore)
 	//Base item stats
 	float multiplier_ = (*CurrentGame).GetPlayerStatsMultiplierForLevel(level) * 0.01;
 	equipment->m_armor = FIRST_LEVEL_ARMOR * multiplier_;
-	equipment->m_damage = FIRST_LEVEL_COLLISION_DAMAGE * multiplier_;
+	//equipment->m_damage = FIRST_LEVEL_COLLISION_DAMAGE * multiplier_;
 
 	//allocating bonuses to the weapon
 	equipment->m_armor += bonus_armor * FIRST_LEVEL_ARMOR * 0.01;
-	equipment->m_damage += bonus_damage * FIRST_LEVEL_COLLISION_DAMAGE * 0.01;
+	//equipment->m_damage += bonus_damage * FIRST_LEVEL_COLLISION_DAMAGE * 0.01;
 
 	//saving level and credits used
 	equipment->m_level = level;

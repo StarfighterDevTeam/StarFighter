@@ -244,7 +244,7 @@ void SFItemStatsPanel::DisplayItemStats(GameObject* object)
 				ss_stats.precision(2);
 				ss_stats << "Hyperspeed: " << obj->m_hyperspeed;
 				ss_stats.precision(0);
-				ss_stats << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel << "\nContact damage: " << obj->m_damage;
+				ss_stats << "\nHyperspeed fuel: " << obj->m_hyperspeed_fuel;// << "\nContact damage: " << obj->m_damage;
 				
 				if (obj->m_can_hyperspeed)
 				{

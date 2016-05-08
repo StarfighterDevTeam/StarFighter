@@ -72,6 +72,9 @@ void InGameState::Initialize(Player player)
 	//Loading all scenes
 	LoadAllScenes(SCENES_FILE);
 
+	//Loading all FX
+	LoadAllFX(FX_FILE);
+
 	//Loading all enemies
 	LoadAllEnemies(ENEMY_FILE);
 
@@ -917,6 +920,22 @@ void InGameState::LoadAllEnemies(string enemies_file)
 	}
 
 	enemiesConfig.clear();
+
+	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
+}
+
+void InGameState::LoadAllFX(string FX_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading all FX.");
+
+	vector<vector<string> > FXConfig = *(FileLoaderUtils::FileLoader(FX_file));
+	size_t allFXVectorSize = FXConfig.size();
+	for (size_t i = 0; i < allFXVectorSize; i++)
+	{
+		(*CurrentGame).m_FXConfig.insert(std::map<string, vector<string> >::value_type(FXConfig[i][FX_NAME], FXConfig[i]));
+	}
+
+	FXConfig.clear();
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading complete.");
 }

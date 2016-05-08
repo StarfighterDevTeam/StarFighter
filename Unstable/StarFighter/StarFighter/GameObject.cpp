@@ -126,6 +126,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_equipment_loot = NULL;
 	m_weapon_loot = NULL;
 	m_isCollidingWithInteractiveObject = No_Interaction;
+	m_collision_timer = sf::seconds(-1);
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -228,12 +229,22 @@ void GameObject::setGhost(bool ghost)
 
 void GameObject::GetDamageFrom(GameObject& object)
 {
-	GetDamage(object.m_damage);
+	if (object.m_collision_timer < sf::seconds(0))
+	{
+		GetDamage(object.m_damage);
+
+		object.m_collision_timer = sf::seconds(TIME_BETWEEN_COLLISION_DAMAGE_TICK);
+	}
 }
 
 void GameObject::GetDamage(int damage)
 {
 	if (m_immune)
+	{
+		return;
+	}
+
+	if (damage == 0)
 	{
 		return;
 	}
@@ -643,6 +654,63 @@ float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 	s = sqrt(s);
 	s = floor(s);
 	return s;
+}
+
+float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
+{
+	const float a = curSpeed.x;
+	const float b = curSpeed.y;
+
+	if (a == 0 && b == 0)
+		return 0.f;
+
+	float distance_to_obj = (a * a) + (b * b);
+	distance_to_obj = sqrt(distance_to_obj);
+
+	float angle;
+	angle = acos(a / distance_to_obj);
+
+	if (b < 0)
+	{
+		angle = -angle;
+	}
+
+	angle += M_PI_2;
+	//angle = (fmod(angle, 2 * M_PI));
+
+	return angle;
+}
+
+float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2)
+{
+	assert(ref_object != NULL);
+	assert(object2 != NULL);
+
+	return GetAngleRadBetweenPositions(ref_object->getPosition(), object2->getPosition());
+}
+
+float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2)
+{
+	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, ref_position.y - position2.y);
+	float target_angle = GetAngleRadForSpeed(diff);
+
+	const float a = diff.x;
+	const float b = diff.y;
+
+	float distance_to_obj = (a * a) + (b * b);
+	distance_to_obj = sqrt(distance_to_obj);
+
+	float angle;
+	angle = acos(a / distance_to_obj);
+
+	if (b < 0)
+	{
+		angle = -angle;
+	}
+
+	angle += M_PI_2;
+
+	return angle;
 }
 
 FloatCompare GameObject::compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position)

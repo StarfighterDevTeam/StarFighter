@@ -415,6 +415,15 @@ void Ship::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	ManageInputs(deltaTime, hyperspeedMultiplier, directions);
 
 	m_trail->m_visible = (hyperspeedMultiplier > 1.0f);
+	//slow motion
+	if (hyperspeedMultiplier < 1.0f)
+	{
+		m_collision_timer -= deltaTime * hyperspeedMultiplier;
+	}
+	else
+	{
+		m_collision_timer -= deltaTime;
+	}
 
 	GameObject::update(deltaTime, hyperspeedMultiplier);
 
@@ -2134,6 +2143,31 @@ void Ship::GetDamageFrom(GameObject& object)
 		return;
 	}
 
+	if (object.m_damage == 0)
+	{
+		return;
+	}
+
+	if (object.m_collision_timer >= sf::seconds(0))
+	{
+		return;
+	}
+	else
+	{
+		object.m_collision_timer = sf::seconds(TIME_BETWEEN_COLLISION_DAMAGE_TICK);
+
+		if (object.m_collider_type == EnemyObject)
+		{
+			string fx_name = "explosion_S";
+			float duration = atof(((*CurrentGame).m_FXConfig[fx_name][FX_DURATION]).c_str());
+			FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), 2, sf::seconds(duration));
+			
+			float angle = GameObject::GetAngleRadBetweenObjects(this, &object);
+			fx->setPosition(getPosition().x - sin(angle)*GetShipSize().x/2, getPosition().y + cos(angle)*GetShipSize().y/2);
+			(*CurrentGame).addToScene(fx, ExplosionLayer, Neutral);
+		}
+	}
+
 	if (!m_ship_model->m_fake_textureName.empty())
 	{
 		assert(m_fake_ship != NULL);
@@ -2179,6 +2213,13 @@ int Ship::GetFocusedPortalMaxUnlockedHazardLevel()
 	{
 		return m_targetPortal->m_max_unlocked_hazard_level;
 	}
+}
+
+sf::Vector2f Ship::GetShipSize()
+{
+	sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+	size = GameObject::getSize_for_Direction((*CurrentGame).m_direction, size);
+	return size;
 }
 
 //void Ship::gain_xp(int xp_earned_)

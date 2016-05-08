@@ -71,13 +71,13 @@ std::string makePath(const std::string& srcPath);
 #define PHASES_FILE	"Scripts/Generated/EnemyPhases.csv"
 #define DIALOGS_FILE "Scripts/Generated/Dialogs.csv"
 
+//GAME RULES
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									70
 #define GRAZE_PER_SECOND_AND_PER_BULLET					100
 #define SHIP_BRAKING_MALUS_SPEED						0.50f
 #define END_OF_DIALOGS_DELAY							0
-
-//ENEMY TUNING
+#define TIME_BETWEEN_COLLISION_DAMAGE_TICK				1
 #define SLOW_MOTION_MULTIPLIER							2.5
 
 //HUD

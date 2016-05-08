@@ -130,6 +130,7 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	if (m_feedbackTimer > sf::seconds(0))
 	{
 		m_feedbackTimer -= deltaTime;
+		m_collision_timer -= deltaTime;
 		UpdateHealthBars();
 	}
 
@@ -154,13 +155,15 @@ void Enemy::update(sf::Time deltaTime, float hyperspeedMultiplier)
 	//slow motion
 	if (hyperspeedMultiplier < 1.0f)
 	{
-		m_phaseTimer += deltaTime * hyperspeedMultiplier;;
-		m_enemyTimer += deltaTime * hyperspeedMultiplier;;
+		m_phaseTimer += deltaTime * hyperspeedMultiplier;
+		m_enemyTimer += deltaTime * hyperspeedMultiplier;
+		m_collision_timer -= deltaTime * hyperspeedMultiplier;
 	}
 	else
 	{
 		m_phaseTimer += deltaTime;
 		m_enemyTimer += deltaTime;
+		m_collision_timer -= deltaTime;
 	}
 
 	//shield regen if not maximum
@@ -449,12 +452,22 @@ void Enemy::RotateFeedbacks(float angle)
 
 void Enemy::GetDamageFrom(GameObject& object)
 {
-	GetDamage(object.m_damage);
+	if (object.m_collision_timer < sf::seconds(0))
+	{
+		GetDamage(object.m_damage);
+
+		object.m_collision_timer = sf::seconds(TIME_BETWEEN_COLLISION_DAMAGE_TICK);
+	}
 }
 
 void Enemy::GetDamage(int damage)
 {
 	if (m_immune || (*CurrentGame).m_waiting_for_dialog_validation || (*CurrentGame).m_waiting_for_scene_transition)
+	{
+		return;
+	}
+
+	if (damage == 0)
 	{
 		return;
 	}
@@ -1392,7 +1405,7 @@ Weapon* Enemy::LoadWeapon(string name, int fire_direction, Ammo* ammo)
 {
 	vector<vector<string> > weaponConfig = *(FileLoaderUtils::FileLoader(WEAPON_FILE));
 
-	for (std::vector<vector<string> >::iterator it = (weaponConfig).begin(); it != (weaponConfig).end(); it++)
+	for (std::vector<vector<string> >::iterator it = weaponConfig.begin(); it != weaponConfig.end(); it++)
 	{
 		if ((*it)[0].compare(name) == 0)
 		{
@@ -1460,6 +1473,11 @@ Ammo* Enemy::LoadAmmo(string name)
 				Vector2f(stoi((*it)[AMMO_WIDTH]), stoi((*it)[AMMO_HEIGHT])), stoi((*it)[AMMO_DAMAGE]), LoadFX((*it)[AMMO_FX]));
 			new_ammo->m_display_name = (*it)[AMMO_NAME];
 			new_ammo->m_range = stoi((*it)[AMMO_RANGE]);
+
+			if (!(*it)[AMMO_FX].empty())
+			{
+				new_ammo->m_explosion->m_display_name = (*it)[AMMO_FX];
+			}
 			
 			PatternBobby* bobby = PatternBobby::PatternLoader((*it), AMMO_PATTERN);
 			new_ammo->m_Pattern.SetPattern(bobby->m_currentPattern, bobby->m_patternSpeed, bobby->m_patternParams);
@@ -1476,7 +1494,7 @@ FX* Enemy::LoadFX(string name)
 {
 	vector<vector<string> >FXConfig = *(FileLoaderUtils::FileLoader(FX_FILE));
 
-	for (std::vector<vector<string> >::iterator it = (FXConfig).begin(); it != (FXConfig).end(); it++)
+	for (std::vector<vector<string> >::iterator it = FXConfig.begin(); it != FXConfig.end(); it++)
 	{
 		if ((*it)[FX_TYPE].compare("explosion") == 0)
 		{

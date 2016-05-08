@@ -274,6 +274,7 @@ public:
 	int m_animationNumber;
 	int m_frameNumber;
 	int m_currentAnimationIndex;
+	sf::Time m_collision_timer;
 
 	//TIPS:
 	// direction = the scene border you refer too
@@ -292,6 +293,9 @@ public:
 	static sf::Vector2f getPosition_for_Direction(Directions direction, sf::Vector2f position, bool rescale = true);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetAbsoluteSpeed(sf::Vector2f speed_);
+	static float GetAngleRadForSpeed(sf::Vector2f curSpeed);
+	static float GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2);
+	static float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
 
 	FloatCompare compare_posY_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
 	FloatCompare compare_posX_withTarget_for_Direction(Directions direction, sf::Vector2f target_position);
