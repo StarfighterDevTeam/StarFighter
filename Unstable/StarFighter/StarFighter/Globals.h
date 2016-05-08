@@ -77,7 +77,7 @@ std::string makePath(const std::string& srcPath);
 #define GRAZE_PER_SECOND_AND_PER_BULLET					100
 #define SHIP_BRAKING_MALUS_SPEED						0.50f
 #define END_OF_DIALOGS_DELAY							0
-#define TIME_BETWEEN_COLLISION_DAMAGE_TICK				1
+#define TIME_BETWEEN_COLLISION_DAMAGE_TICK				0.5
 #define SLOW_MOTION_MULTIPLIER							2.5
 
 //HUD

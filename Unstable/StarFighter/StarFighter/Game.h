@@ -54,6 +54,7 @@ enum FontsStyle
 {
 	Font_Arial,//0
 	Font_Terminator,//1
+	Font_RType_Cyan,//1
 	NBVAL_FontsStyle,//2
 };
 

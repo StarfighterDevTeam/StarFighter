@@ -62,6 +62,12 @@ void Game::init(RenderWindow* window)
 
 			}
 		}
+
+		m_font[Font_RType_Cyan] = new sf::Font();
+		if (!m_font[Font_RType_Cyan]->loadFromFile(makePath("Fonts/RType_Cyan.ttf")))
+		{
+
+		}
 	}
 	catch (const std::exception & ex)
 	{
