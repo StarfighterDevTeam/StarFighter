@@ -227,6 +227,12 @@ public :
 	sf::Clock m_graze_sinus_clock;
 	int m_hits_taken;
 
+	int m_combo_count;
+	int m_combo_count_max;
+	int m_combo_level;
+
+	void AddComboCount(int value) override;
+
 	int GetFocusedPortalMaxUnlockedHazardLevel();
 
 	int m_level;

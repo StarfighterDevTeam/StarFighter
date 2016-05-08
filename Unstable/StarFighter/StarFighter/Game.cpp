@@ -326,23 +326,31 @@ void Game::updateScene(Time deltaTime)
 	ManageMusicTransitions(deltaTime);
 }
 
-void Game::killGameObjectLayer(GameObjectType layer)
+void Game::killGameObjectType(GameObjectType type)
 {
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[layer].begin(); it != m_sceneGameObjectsTyped[layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type].begin(); it != m_sceneGameObjectsTyped[type].end(); it++)
 	{
 		if ((*it) != NULL)
 		{
 			if ((*it)->m_isOnScene)
 			{
 				(*it)->Death();
+
+				//Combo
+				if (type == EnemyFire)
+				{
+					GameObject* obj = (GameObject*)m_playerShip;
+					obj->AddComboCount(10);
+					obj = NULL;
+				}
 			}
 		}
 	}
 }
 
-void Game::damageGameObjectLayer(GameObjectType layer, int damage)
+void Game::damageGameObjectType(GameObjectType type, int damage)
 {
-	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[layer].begin(); it != m_sceneGameObjectsTyped[layer].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type].begin(); it != m_sceneGameObjectsTyped[type].end(); it++)
 	{
 		if ((*it) != NULL)
 		{

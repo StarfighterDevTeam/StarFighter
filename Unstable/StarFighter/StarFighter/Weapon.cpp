@@ -488,6 +488,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 	string fx_name = "explosion_S";
 	float duration = atof(((*CurrentGame).m_FXConfig[fx_name][FX_DURATION]).c_str());
 	FX* fx = new FX(sf::Vector2f(0, 0), sf::Vector2f(0, 0), (*CurrentGame).m_FXConfig[fx_name][FX_FILENAME], sf::Vector2f(stoi((*CurrentGame).m_FXConfig[fx_name][FX_WIDTH]), stoi((*CurrentGame).m_FXConfig[fx_name][FX_HEIGHT])), 2, sf::seconds(duration));
+	fx->m_display_name = fx_name;
 	Ammo* ammo = new Ammo(sf::Vector2f(0, 0), sf::Vector2f(0, WEAPON_MIN_VSPEED_VALUE), "2D/Equipment/laser_blue.png", sf::Vector2f(6, 32), -1, fx);
 	Weapon* weapon = new Weapon(ammo);
 	weapon->m_fire_direction = Vector2i(0, -1);

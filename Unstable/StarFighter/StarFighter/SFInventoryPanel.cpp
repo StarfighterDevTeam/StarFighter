@@ -1055,7 +1055,24 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 		m_xpBar.setFillColor(sf::Color(COLOR_LIGHT_BLUE_R_VALUE, COLOR_LIGHT_BLUE_G_VALUE, COLOR_LIGHT_BLUE_B_VALUE, COLOR_LIGHT_BLUE_A_VALUE));//light blue
 		m_xpBar.setOrigin(0, 0);
 
-		sf::Color _white = sf::Color::Color(255, 255, 255, 200);//semi-transparent white
+		m_comboBar.setSize(sf::Vector2f((1.0f * playerShip->m_combo_count / playerShip->m_combo_count_max) * COMBO_BAR_SIZE_X, COMBO_BAR_SIZE_Y));
+		m_comboBar.setFillColor(sf::Color(COLOR_LIGHT_BLUE_R_VALUE, COLOR_LIGHT_BLUE_G_VALUE, COLOR_LIGHT_BLUE_B_VALUE, COLOR_LIGHT_BLUE_A_VALUE));//light blue
+		m_comboBar.setOrigin(0, 0);
+
+		m_comboBarContainer.setSize(sf::Vector2f(COMBO_BAR_SIZE_X, COMBO_BAR_SIZE_Y));
+		m_comboBarContainer.setFillColor(sf::Color(0, 0, 0, 255));//light blue
+		m_comboBarContainer.setOutlineThickness(1);
+		m_comboBarContainer.setOutlineColor(sf::Color(255, 255, 255));
+		m_comboBarContainer.setOrigin(0, 0);
+
+		sf::Color _white = sf::Color::Color(255, 255, 255, 180);//semi-transparent white
+
+		m_text.setColor(_white);
+
+		m_combo_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
+		m_combo_text.setCharacterSize(18);
+		m_combo_text.setColor(_white);
+		
 		m_life_text.setFont(*(*CurrentGame).m_font[Font_Terminator]);
 		m_life_text.setCharacterSize(10);
 		m_life_text.setColor(_white);
@@ -1136,6 +1153,11 @@ SFHUDPanel::SFHUDPanel(sf::Vector2f size, Ship* playerShip) : SFInventoryPanel(s
 
 		text_height += INTERACTION_INTERBLOCK + ARMOR_BAR_SIZE_Y;
 		m_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+
+		text_height = GRID_POSITION_Y - COMBO_BAR_SIZE_Y - 2*INTERACTION_INTERBLOCK;
+		m_comboBar.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+		m_comboBarContainer.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES, text_height);
+		m_combo_text.setPosition(getPosition().x + INTERACTION_PANEL_MARGIN_SIDES + COMBO_BAR_SIZE_X + m_combo_text.getGlobalBounds().width / 2 + 8, text_height - 4);
 
 		//grids
 		text_height = GRID_POSITION_Y;
@@ -1279,6 +1301,12 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 			m_fuelBarOverblock.setSize(sf::Vector2f(0, FUEL_BAR_SIZE_Y));
 		}
 	}
+
+	//Combo
+	m_comboBar.setSize(sf::Vector2f((1.0f * m_playerShip->m_combo_count / m_playerShip->m_combo_count_max * COMBO_BAR_SIZE_X), COMBO_BAR_SIZE_Y));
+	ostringstream ss_combo;
+	ss_combo << "x" << m_playerShip->m_combo_level << " Combo"; 
+	m_combo_text.setString(ss_combo.str());
 
 	ostringstream ss_life;
 	ss_life << m_playerShip->m_armor << "/" << m_playerShip->m_armor_max;
@@ -1436,6 +1464,11 @@ void SFHUDPanel::Draw(sf::RenderTexture& screen)
 	screen.draw(m_scene_text);
 	screen.draw(m_framerate_text);
 	screen.draw(m_text);
+
+	//Combo
+	screen.draw(m_comboBarContainer);
+	screen.draw(m_comboBar);
+	screen.draw(m_combo_text);
 
 	if (m_item_stats_panel)
 	{

@@ -455,6 +455,11 @@ bool GameObject::clearLoots()
 	return something_cleared;
 }
 
+void GameObject::AddComboCount(int value)
+{
+	//see overide function in class Ship
+}
+
 void GameObject::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	//see overide function in class Ship

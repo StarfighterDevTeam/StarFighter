@@ -53,6 +53,10 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 	m_xp = 0;
 	m_xp_max = XP_MAX_FIRST_LEVEL;
 
+	m_combo_count = 0;
+	m_combo_count_max = COMBO_COUNT_FIRST_LEVEL;
+	m_combo_level = 1;
+
 	m_fake_ship = NULL;
 	if (!ship_model->m_fake_textureName.empty())
 	{
@@ -642,7 +646,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 		#ifndef NDEBUG
 			if (m_inputs_states[Action_DebugCommand] == Input_Tap || m_inputs_states[Action_DebugCommand] == Input_Hold)
 			{
-				(*CurrentGame).killGameObjectLayer(EnemyObject);
+				(*CurrentGame).killGameObjectType(EnemyObject);
 			}
 		#endif
 
@@ -1589,8 +1593,8 @@ void Ship::Recalling()
 void Ship::Bomb()
 {
 	int i = GetBombsDamage();
-	(*CurrentGame).damageGameObjectLayer(EnemyObject, GetBombsDamage());
-	(*CurrentGame).killGameObjectLayer(EnemyFire);
+	(*CurrentGame).damageGameObjectType(EnemyObject, GetBombsDamage());
+	(*CurrentGame).killGameObjectType(EnemyFire);
 
 	//ghost
 	if (m_ghost_timer < sf::seconds(SHIP_BOMBING_IMMUNITY_DURATION))
@@ -2044,6 +2048,9 @@ void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 		double intpart;
 		graze_count_buffer = modf(graze_count_buffer, &intpart);
 		m_graze_count += intpart;
+
+		//Combo
+		AddComboCount(intpart);
 	}
 
 	if (m_graze_level < NB_GRAZE_LEVELS - 1)
@@ -2076,24 +2083,24 @@ void Ship::GetGrazing(sf::Time deltaTime, float hyperspeedMultiplier)
 			}
 
 			//Text feedback
-			SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 14, color, getPosition());
-			ostringstream ss;
-			if (m_graze_level < NB_GRAZE_LEVELS - 1)
-			{
-				ss << "Graze level+";
-			}
-			else
-			{
-				ss << "Graze level MAX";
-			}
-			text_feedback->setString(ss.str());
-			sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
-			text_feedback->setPosition(getPosition());
-			int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -1 : 1;
-			SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
-			pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
-			delete text_feedback;
-			(*CurrentGame).addToFeedbacks(pop_feedback);
+			//SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 14, color, getPosition());
+			//ostringstream ss;
+			//if (m_graze_level < NB_GRAZE_LEVELS - 1)
+			//{
+			//	ss << "Graze level+";
+			//}
+			//else
+			//{
+			//	ss << "Graze level MAX";
+			//}
+			//text_feedback->setString(ss.str());
+			//sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+			//text_feedback->setPosition(getPosition());
+			//int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -1 : 1;
+			//SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
+			//pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
+			//delete text_feedback;
+			//(*CurrentGame).addToFeedbacks(pop_feedback);
 
 			//Aura
 			if (m_combo_aura && m_graze_level > 0 && m_graze_level < NB_GRAZE_LEVELS)
@@ -2187,6 +2194,9 @@ void Ship::GetDamageFrom(GameObject& object)
 
 	m_shield_recovery_clock.restart();
 	
+	//Combo
+	(*CurrentGame).m_playerShip->AddComboCount(-(*CurrentGame).m_playerShip->m_combo_count_max / 2);
+
 	m_graze_count = 0;
 	m_graze_level = GRAZE_LEVEL_NONE;
 	m_graze_radius_feedback.setOutlineColor(sf::Color(255, 255, 0, 20));
@@ -3425,4 +3435,85 @@ int Ship::GetNumberOfBombs()
 int Ship::GetBombsDamage()
 {
 	return GetNumberOfBombs() > 0 ? BOMB_FIRST_LEVEL_DAMAGE*(*CurrentGame).GetEnemiesStatsMultiplierForLevel(m_level)*0.01 : 0;
+}
+
+void Ship::AddComboCount(int value)
+{
+	if (value == 0)
+	{
+		return;
+	}
+	
+	int current_combo_level = m_combo_level;
+
+	if (value > 0)
+	{
+		while (value > 0)
+		{
+			if (m_combo_count + value >= m_combo_count_max)
+			{
+				value -= (m_combo_count_max - m_combo_count);
+				m_combo_level++;
+				m_combo_count_max = COMBO_COUNT_FIRST_LEVEL * pow(1 + COMBO_LEVEL_COUNT_MULTIPLIER, m_combo_level);
+				m_combo_count = 0;
+			}
+			else
+			{
+				m_combo_count += value;
+				value = 0;
+			}
+		}
+	}
+	else if (value < 0)
+	{
+		value = -value;
+		while (value > 0)
+		{
+			if (value >= m_combo_count + 1)
+			{
+				if (m_combo_level > 1)
+				{
+					value -= (m_combo_count + 1);
+					m_combo_level--;
+					m_combo_count_max = COMBO_COUNT_FIRST_LEVEL * pow(1 + COMBO_LEVEL_COUNT_MULTIPLIER, m_combo_level);
+					m_combo_count = m_combo_count_max - 1;
+				}
+				else
+				{
+					m_combo_count = 0;
+					value = 0;
+				}
+			}
+			else
+			{
+				m_combo_count -= value;
+				value = 0;
+			}
+		}
+	}
+
+	//Text feedback
+	if (current_combo_level != m_combo_level)
+	{
+		sf::Color color;
+		ostringstream ss;
+		ss << "Combo x" << m_combo_level;
+		if (current_combo_level < m_combo_level)
+		{
+			color = sf::Color::Green;
+		}
+		else
+		{
+			color = sf::Color::Red;
+		}
+		SFText* text_feedback = new SFText((*CurrentGame).m_font[Font_Terminator], 16, color, getPosition());
+		text_feedback->setString(ss.str());
+		sf::Vector2f size = m_fake_ship ? m_fake_ship->m_size : m_size;
+		text_feedback->setPosition(getPosition());
+		int s = (*CurrentGame).m_direction == DIRECTION_DOWN ? -1 : 1;
+		SFTextPop* pop_feedback = new SFTextPop(text_feedback, 0, GRAZE_UP_DISPLAY_NOT_FADED_TIME, GRAZE_UP_DISPLAY_NOT_FADED_TIME, NULL, s*MONEY_LOOT_DISPLAY_SPEED_Y, sf::Vector2f(0, s*(-size.y / 2 - TEXT_POP_OFFSET_Y)));
+		pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
+		delete text_feedback;
+		(*CurrentGame).addToFeedbacks(pop_feedback);
+	}
 }

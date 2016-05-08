@@ -87,6 +87,8 @@ std::string makePath(const std::string& srcPath);
 #define FUEL_BAR_SIZE_Y									14
 #define XP_BAR_SIZE_X									320
 #define XP_BAR_SIZE_Y									16
+#define COMBO_BAR_SIZE_X								160
+#define COMBO_BAR_SIZE_Y								16
 #define GRID_POSITION_Y									350
 
 //INTERACTION PANEL
@@ -217,9 +219,13 @@ std::string makePath(const std::string& srcPath);
 #define ENEMIES_LEVELING_STATS_MULTIPLIER				0.10
 #define BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES			3.0f
 
+//COMBO
+#define COMBO_COUNT_FIRST_LEVEL							200
+#define COMBO_LEVEL_COUNT_MULTIPLIER					0.5f //+50% per level
+
 //BOMBS
 #define BOMB_DEFAULT_NUMBER								3
-#define BOMB_FIRST_LEVEL_DAMAGE							200
+#define BOMB_FIRST_LEVEL_DAMAGE							300
 
 //ITEMS STATS
 #define LOOT_CREDITS_DEFAULT_BONUS						1

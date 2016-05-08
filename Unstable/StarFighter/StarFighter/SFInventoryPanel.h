@@ -93,6 +93,10 @@ public:
 	sf::Text m_hazardscore_text;
 	sf::Text m_hitstaken_text;
 
+	sf::Text m_combo_text;
+	sf::RectangleShape m_comboBar;
+	sf::RectangleShape m_comboBarContainer;
+
 	sf::Text m_equipment_title;
 	sf::Text m_inventory_title;
 };

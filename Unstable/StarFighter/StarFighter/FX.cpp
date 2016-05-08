@@ -9,7 +9,6 @@ FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::V
 	m_visible = true;
 	m_isOnScene = true;
 	m_collider_type = Neutral;
-	m_display_name = "explosion";
 }
 
 void FX::update(sf::Time deltaTime, float hyperspeedMultiplier)

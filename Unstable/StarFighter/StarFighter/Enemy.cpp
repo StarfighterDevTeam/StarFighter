@@ -866,7 +866,7 @@ void Enemy::setPhase(Phase* phase)
 			}
 			case KillBullets:
 			{
-				(*CurrentGame).killGameObjectLayer(EnemyFire);
+				(*CurrentGame).killGameObjectType(EnemyFire);
 				break;
 			}
 			default:
@@ -1188,6 +1188,9 @@ void Enemy::Death()
 	FX* myFX = m_FX_death->Clone();
 	myFX->setPosition(getPosition().x, getPosition().y);
 	(*CurrentGame).addToScene(myFX,ExplosionLayer, Neutral);
+
+	//Combo
+	(*CurrentGame).m_playerShip->AddComboCount(m_enemy_class * 100);
 
 	//Score
 	(*CurrentGame).m_hazard += m_money;

@@ -248,6 +248,7 @@ public:
 	
 	static int GetPrice(int credits, float quality);
 	bool clearLoots();
+	virtual void AddComboCount(int value);
 
 	InteractionType m_isCollidingWithInteractiveObject;
 	InteractionType m_previouslyCollidingWithInteractiveObject;
