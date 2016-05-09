@@ -447,7 +447,8 @@ bool Scene::CheckHazardBreakConditions()
 		m_score_total = 5;//S + S = SS
 	}
 
-	return m_score_total >= 4;//S rank minimum for hazard break
+	//return m_score_total >= 4;//S rank minimum for hazard break
+	return true;
 }
 
 void Scene::DisplayDestructions(bool hazard_break)//OLD: to remove
@@ -602,49 +603,58 @@ void Scene::DisplayScore(bool hazard_break)
 	text_feedback->setString(ss_total.str());
 	sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
 	text_feedback->setColor(_yellow);
-	text_height += text_feedback->getGlobalBounds().height + 3*INTERACTION_INTERBLOCK;
+	text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 	SFTextPop* pop_feedback3 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 	pop_feedback3->setPosition(sf::Vector2f(position.x - pop_feedback3->getGlobalBounds().width / 2, text_height));
 	(*CurrentGame).addToFeedbacks(pop_feedback3);
 
 	if (hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
 	{
-		text_feedback->setString("Next hazard level unlocked!!");
+		text_feedback->setString("STAGE CLEARED! Next hazard level unlocked!!");
 		text_feedback->setCharacterSize(18);
 		sf::Color _yellow = sf::Color::Color(255, 209, 53, 255);//yellow
 		text_feedback->setColor(_yellow);
-		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
 		(*CurrentGame).addToFeedbacks(pop_feedback4);
 	}
 	else if (!hazard_break && m_hazard_level == m_hazard_level_unlocked && m_hazard_level < NB_HAZARD_LEVELS - 1)
 	{
-		text_feedback->setString("Get a total S Rank to unlock next hazard level");
+		text_feedback->setString("STAGE CLEARED! Get a total S Rank to unlock next hazard level");
 		text_feedback->setCharacterSize(18);
-		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
 		(*CurrentGame).addToFeedbacks(pop_feedback4);
 	}
-	else if (m_hazard_level < m_hazard_level_unlocked)
+	else
 	{
-		text_feedback->setString("Hazard level already beaten");
+		text_feedback->setString("STAGE CLEARED! Hazard level already beaten");
 		text_feedback->setCharacterSize(18);
-		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+		text_height += text_feedback->getGlobalBounds().height + 2*INTERACTION_INTERBLOCK;
 		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
 		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
 		(*CurrentGame).addToFeedbacks(pop_feedback4);
 	}
-	else if (m_hazard_level == NB_HAZARD_LEVELS - 1)
-	{
-		text_feedback->setString("Max hazard level reached");
-		text_feedback->setCharacterSize(18);
-		text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
-		SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
-		pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
-		(*CurrentGame).addToFeedbacks(pop_feedback4);
-	}
+	//else if (m_hazard_level < m_hazard_level_unlocked)
+	//{
+	//	text_feedback->setString("Hazard level already beaten");
+	//	text_feedback->setCharacterSize(18);
+	//	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+	//	SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+	//	pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
+	//	(*CurrentGame).addToFeedbacks(pop_feedback4);
+	//}
+	//else if (m_hazard_level == NB_HAZARD_LEVELS - 1)
+	//{
+	//	text_feedback->setString("Max hazard level reached");
+	//	text_feedback->setCharacterSize(18);
+	//	text_height += text_feedback->getGlobalBounds().height + INTERACTION_INTERBLOCK;
+	//	SFTextPop* pop_feedback4 = new SFTextPop(text_feedback, DESTRUCTIONS_DISPLAY_FADE_IN_TIME, DESTRUCTIONS_DISPLAY_NOT_FADED_TIME, DESTRUCTIONS_DISPLAY_FADE_OUT_TIME, NULL, 0, sf::Vector2f(0, 0));
+	//	pop_feedback4->setPosition(sf::Vector2f(position.x - pop_feedback4->getGlobalBounds().width / 2, text_height));
+	//	(*CurrentGame).addToFeedbacks(pop_feedback4);
+	//}
 
 	delete text_feedback;
 }

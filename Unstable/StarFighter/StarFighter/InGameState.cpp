@@ -185,8 +185,12 @@ void InGameState::Update(Time deltaTime)
 
 	//State machine
 	InGameStateMachineCheck(deltaTime);
-	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).m_playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
 
+	//Get "beast score" bonus
+	(*CurrentGame).GetBeastScoreBonus((*CurrentGame).m_playerShip->m_combo_level * 0.01 * MAX_BEAST_SCALE, m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
+	//(*CurrentGame).GetBeastScoreBonus((*CurrentGame).m_playerShip->getShipBeastScore(), m_currentScene->getSceneBeastScore(m_currentScene->getSceneHazardLevelValue()));
+
+	//Update scene
 	(*CurrentGame).updateScene(deltaTime);
 
 	//Create and destroy HUD panels

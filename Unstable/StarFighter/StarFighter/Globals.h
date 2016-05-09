@@ -218,6 +218,7 @@ std::string makePath(const std::string& srcPath);
 #define PLAYER_LEVELING_STATS_MULTIPLIER				0.04
 #define ENEMIES_LEVELING_STATS_MULTIPLIER				0.10
 #define BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES			3.0f
+#define MAX_BEAST_SCALE									6.0f
 
 //COMBO
 #define COMBO_COUNT_FIRST_LEVEL							200
@@ -260,7 +261,8 @@ std::string makePath(const std::string& srcPath);
 #define WEAPON_MIN_DISPERSION							20
 #define WEAPON_MAX_DISPERSION							60
 #define WEAPON_MAX_DISPERSION_FOR_BOT					60
-#define WEAPON_HOMING_DAMAGE_MALUS						0.15
+#define WEAPON_HOMING_DAMAGE_MALUS						0.2
+#define WEAPON_DISPERSION_DAMAGE_MALUS					0.2
 
 //TEXTPOP FEEDBACK
 #define MONEY_LOOT_DISPLAY_NOT_FADED_TIME				0.8f

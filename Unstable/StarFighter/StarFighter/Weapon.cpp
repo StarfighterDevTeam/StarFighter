@@ -523,6 +523,7 @@ Weapon* Weapon::CreateRandomWeapon(int level, bool is_bot, float beastScore)
 		if (dispersion > 0)
 		{
 			weapon->m_dispersion = RandomizeFloatBetweenValues(sf::Vector2f(WEAPON_MIN_DISPERSION, is_bot ? WEAPON_MAX_DISPERSION_FOR_BOT : WEAPON_MAX_DISPERSION));
+			weapon->m_ammunition->m_damage *= (1 + WEAPON_DISPERSION_DAMAGE_MALUS);
 		}
 	}
 

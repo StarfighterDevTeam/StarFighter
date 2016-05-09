@@ -1358,12 +1358,13 @@ void SFHUDPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 
 	//Beast score
 	ostringstream ss_beast;
-	float quality_graze = m_playerShip->getShipBeastScore() / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
+	//float quality_graze = m_playerShip->getShipBeastScore() / MAX_BEAST_SCALE * 100;
+	float quality_combo = m_playerShip->m_combo_level;
 	float quality_hazard = Scene::getSceneBeastScore(m_playerShip->m_currentScene_hazard) / (2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES) * 100;
 	ss_beast.precision(0);
 	ss_beast << fixed;
-	ss_beast << "Drop quality: +" << quality_graze + quality_hazard << "%";
-	ss_beast << ": " << quality_graze << " (graze) +" << quality_hazard << " (hazard)";
+	//ss_beast << "Drop quality: +" << quality_graze + quality_hazard << "%";
+	ss_beast << "Drop quality: +" << quality_combo + quality_hazard << "% (combo +" << quality_combo << "%, hazard +" << quality_hazard << "%)";
 	m_beastscore_text.setString(ss_beast.str());
 
 	//scene name

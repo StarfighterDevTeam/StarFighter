@@ -55,7 +55,7 @@ Ship::Ship(ShipModel* ship_model) : GameObject(Vector2f(0, 0), Vector2f(0, 0), s
 
 	m_combo_count = 0;
 	m_combo_count_max = COMBO_COUNT_FIRST_LEVEL;
-	m_combo_level = 1;
+	m_combo_level = 0;
 
 	m_fake_ship = NULL;
 	if (!ship_model->m_fake_textureName.empty())
@@ -3471,7 +3471,7 @@ void Ship::AddComboCount(int value)
 		{
 			if (value >= m_combo_count + 1)
 			{
-				if (m_combo_level > 1)
+				if (m_combo_level > 0)
 				{
 					value -= (m_combo_count + 1);
 					m_combo_level--;
