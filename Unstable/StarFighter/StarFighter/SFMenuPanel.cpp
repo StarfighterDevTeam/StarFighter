@@ -76,11 +76,15 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 {
 	if (m_playerShip && m_playerShip->m_targetPortal)
 	{	
+		m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+
 		//direction
 		m_direction = m_playerShip->m_targetPortal->m_direction;
 
 		//texts strings
-		m_title_text.setString(m_playerShip->m_targetPortal->m_display_name);
+		ostringstream ss_title;
+		ss_title << m_playerShip->m_targetPortal->m_display_name << " (Level " << stoi((*CurrentGame).m_generalScenesConfig[m_playerShip->m_targetPortal->m_destination_name][SCENE_LEVEL]) << ")";
+		m_title_text.setString(ss_title.str());
 
 		//options texts
 		m_actions = new SFActionBox((*CurrentGame).m_font[Font_Arial]);
@@ -92,7 +96,7 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		for (int i = 0; i < NB_HAZARD_LEVELS; i++)
 		{
 			stringstream ss;
-			ss << "Hazard " << i + 1 << " (Level " << stoi((*CurrentGame).m_generalScenesConfig[m_playerShip->m_targetPortal->m_destination_name][SCENE_LEVEL]) + i << ")";
+			ss << "Hazard " << i + 1;
 			if (m_playerShip->m_targetPortal->m_max_unlocked_hazard_level == i)
 			{
 				//ss << "-> Score 100.0% to unlock next hazard level";
@@ -140,12 +144,16 @@ SFPortalPanel::SFPortalPanel(sf::Vector2f size, Ship* playerShip) : SFMenuPanel(
 		float text_height = 0;
 		text_height += m_title_text.getGlobalBounds().height / 2;
 		m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
-
+		
 		//options texts
 		text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height/2;
 		m_actions_with_selection->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
-		text_height += 9*INTERACTION_INTERBLOCK;
+		//hint texts
+		m_text.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES + 130, getPosition().y - getSize().y / 2 + text_height + 7));
+
+		//actions texts
+		text_height += 8*INTERACTION_INTERBLOCK;
 		m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 		//default selected index
@@ -192,6 +200,18 @@ void SFPortalPanel::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
 				m_actions->m_texts[ActionButton_X].setColor(sf::Color(255, 255, 255, 255));//white
 			}
 		}
+
+		//hint text
+		if (m_selected_option_index > 0)
+		{
+			ostringstream ss;
+			ss << "Bonus:\n+" << (int)(HazardLevelsBeastBonus[m_selected_option_index]*100/(2 * BEAST_SCALE_TO_BE_ON_PAR_WITH_ENEMIES)) << "% quality drop\n\n" << "Malus:\n+" << (enemySpeedModifierTable[m_selected_option_index] - 1) * 100 << "% enemy presence\n" << "+" << (enemySpeedModifierTable[m_selected_option_index] - 1) * 100 << "% enemy speed and bullets speed";
+			m_text.setString(ss.str());
+		}
+		else
+		{
+			m_text.setString("");
+		}
 	}
 }
 
@@ -201,6 +221,7 @@ void SFPortalPanel::Draw(sf::RenderTexture& screen)
 	{
 		SFPanel::Draw(screen);
 		screen.draw(m_title_text);
+		screen.draw(m_text);
 		
 		if (m_actions_with_selection)
 		{

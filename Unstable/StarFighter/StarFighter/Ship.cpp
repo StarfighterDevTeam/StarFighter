@@ -945,6 +945,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 
 				//Weapon firing
 				ManageFiring(deltaTime, hyperspeedMultiplier);
+
 				//Bots firing
 				for (std::vector<Bot*>::iterator it = (m_bot_list.begin()); it != (m_bot_list.end()); it++)
 				{

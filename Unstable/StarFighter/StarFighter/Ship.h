@@ -22,6 +22,8 @@ class Loot;
 class Dialog;
 class ShipModel;
 
+static float HazardLevelsBeastBonus[HazardLevels::NB_HAZARD_LEVELS] = { 0.0, 0.5, 1.0, 1.5, 2.0 };
+
 enum ShipAnimations
 {
 	ShipIdle,//0
