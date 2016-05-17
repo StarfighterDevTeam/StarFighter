@@ -69,7 +69,17 @@ void Bot::update(sf::Time deltaTime, float hyperspeedMultiplier)
 		}
 
 		//call bobbyPattern
-		offset = m_Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
+		//offset = m_Pattern.GetOffset(deltaTime.asSeconds() * l_hyperspeedMultiplier, true);
+
+		if (hyperspeedMultiplier < 1.0f)
+		{
+			offset = m_Pattern.GetOffset(deltaTime.asSeconds() * hyperspeedMultiplier, true);
+		}
+		else
+		{
+			offset = m_Pattern.GetOffset(deltaTime.asSeconds(), true);
+		}
+
 		offset = GameObject::getSpeed_for_Direction((*CurrentGame).m_direction, offset);
 		newposition.x += offset.x;
 		newposition.y += offset.y;
