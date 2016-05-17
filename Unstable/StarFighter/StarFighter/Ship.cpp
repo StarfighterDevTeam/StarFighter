@@ -887,7 +887,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				//}
 
 				//bomb
-				else if (GetNumberOfBombs() > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / GetNumberOfBombs()) && !m_actions_states[Action_Recalling] && !m_immune)
+				else if ((*CurrentGame).m_direction != NO_DIRECTION && GetNumberOfBombs() > 0 && m_inputs_states[Action_Slowmotion] == Input_Tap && m_hyperspeed_fuel > (m_hyperspeed_fuel_max / GetNumberOfBombs()) && !m_actions_states[Action_Recalling] && !m_immune)
 				{
 					m_hyperspeed_fuel -= m_hyperspeed_fuel_max / GetNumberOfBombs();
 					Bomb();
