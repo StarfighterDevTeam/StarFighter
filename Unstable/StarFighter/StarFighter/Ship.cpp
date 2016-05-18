@@ -263,7 +263,7 @@ bool Ship::setShipEquipment(Equipment* equipment, bool overwrite_existing, bool 
 	}
 	
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE, this);
+		Ship::SaveItems(this);
 
 	return true;
 }
@@ -287,7 +287,7 @@ bool Ship::setShipWeapon(Weapon* weapon, bool overwrite_existing, bool no_save)
 	Init();
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE, this);
+		Ship::SaveItems(this);
 	
 	return true;
 }
@@ -307,7 +307,7 @@ void Ship::cleanEquipment(int equipment_type, bool no_save)
 	}
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE, this);
+		Ship::SaveItems(this);
 }
 
 void Ship::cleanWeapon(bool no_save)
@@ -321,7 +321,7 @@ void Ship::cleanWeapon(bool no_save)
 	}
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE, this);
+		Ship::SaveItems(this);
 }
 
 void Ship::setShipModel(ShipModel* ship_model, bool no_save)
@@ -342,7 +342,7 @@ void Ship::setShipModel(ShipModel* ship_model, bool no_save)
 	}
 
 	if (!no_save)
-		Ship::SaveItems(ITEMS_SAVE_FILE, this);
+		Ship::SaveItems(this);
 }
 
 void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
@@ -791,7 +791,7 @@ void Ship::ManageInputs(sf::Time deltaTime, float hyperspeedMultiplier, sf::Vect
 				{
 					Teleport(m_SFTargetPanel->GetTeleportationDestination());
 					m_money -= m_SFTargetPanel->GetTeleportationCost();
-					SavePlayerMoney(MONEY_SAVE_FILE, this);
+					SavePlayerMoney(this);
 					m_HUD_state = HUD_Idle;
 				}
 			}
@@ -1166,8 +1166,8 @@ void Ship::BuyingItem(bool equip_directly)
 					m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 					m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_weapon_loot->m_quality);
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
-					Ship::SaveItems(ITEMS_SAVE_FILE, this);
+					Ship::SavePlayerMoney(this);
+					Ship::SaveItems(this);
 
 					success = true;
 				}
@@ -1196,7 +1196,7 @@ void Ship::BuyingItem(bool equip_directly)
 					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(NBVAL_Equipment, m_SFTargetPanel->GetFocusedItem());
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), NBVAL_Equipment);
-					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+					Ship::SavePlayerMoney(this);
 
 					(*CurrentGame).PlaySFX(SFX_Equip);
 
@@ -1219,8 +1219,8 @@ void Ship::BuyingItem(bool equip_directly)
 					m_SFHudPanel->GetGrid(false, Trade_StashGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone());
 					m_money -= GameObject::GetPrice(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_credits, m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_quality);
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
-					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
-					Ship::SaveItems(ITEMS_SAVE_FILE, this);
+					Ship::SavePlayerMoney(this);
+					Ship::SaveItems(this);
 
 					success = true;
 				}
@@ -1249,7 +1249,7 @@ void Ship::BuyingItem(bool equip_directly)
 					m_SFTargetPanel->GetGrid(false, Trade_EquippedGrid)->setCellPointerForIntIndex(m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType, m_SFTargetPanel->GetFocusedItem());
 					m_SFTargetPanel->GetGrid(false, Trade_ShopGrid)->setCellPointerForIntIndex(shop_index, NULL);
 					m_SFHudPanel->GetGrid(false, Trade_EquippedGrid)->insertObject(*m_SFTargetPanel->GetFocusedItem()->Clone(), m_SFTargetPanel->GetFocusedItem()->m_equipment_loot->m_equipmentType);
-					Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+					Ship::SavePlayerMoney(this);
 
 					(*CurrentGame).PlaySFX(SFX_Equip);
 
@@ -1325,8 +1325,8 @@ void Ship::SellingItem()
 
 			(*CurrentGame).PlaySFX(SFX_BuyOrSell);
 
-			Ship::SaveItems(ITEMS_SAVE_FILE, this);
-			Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+			Ship::SaveItems(this);
+			Ship::SavePlayerMoney(this);
 		}
 	}
 
@@ -1546,7 +1546,7 @@ void Ship::GarbagingItem()
 					}
 				}
 				//Save items
-				SaveItems(ITEMS_SAVE_FILE, this);
+				SaveItems(this);
 
 				m_brakingHoldingClock.restart();
 			}
@@ -1931,7 +1931,7 @@ bool Ship::GetLoot(GameObject& object)
 		{
 			delete object.m_weapon_loot;
 			object.m_weapon_loot = NULL;
-			Ship::SaveItems(ITEMS_SAVE_FILE, this);
+			Ship::SaveItems(this);
 			(*CurrentGame).PlaySFX(SFX_Equip);
 		}
 
@@ -1959,7 +1959,7 @@ bool Ship::GetLoot(GameObject& object)
 		{
 			delete object.m_weapon_loot;
 			object.m_weapon_loot = NULL;
-			Ship::SaveItems(ITEMS_SAVE_FILE, this);
+			Ship::SaveItems(this);
 			(*CurrentGame).PlaySFX(SFX_Equip);
 		}
 
@@ -1987,7 +1987,7 @@ bool Ship::GetLoot(GameObject& object)
 
 		(*CurrentGame).PlaySFX(SFX_MoneyLoot);
 
-		Ship::SavePlayerMoney(MONEY_SAVE_FILE, this);
+		Ship::SavePlayerMoney(this);
 		return true;
 	}
 
@@ -2293,12 +2293,14 @@ int Ship::UpdateShipLevel()
 }
 
 //SAVING AND LOADING ITEMS AND MONEY
-int Ship::SavePlayerMoney(string file, Ship* ship)
+int Ship::SavePlayerMoney(Ship* ship)
 {
+	createDirectory(getSavesPath());
+	
 	LOGGER_WRITE(Logger::DEBUG, "Saving money in profile.\n");
 	assert(ship != NULL);
 
-	ofstream data(file.c_str(), ios::in | ios::trunc);
+	ofstream data(string(getSavesPath()) + MONEY_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
 		data << "Money " << ship->m_money << endl;
@@ -2313,12 +2315,12 @@ int Ship::SavePlayerMoney(string file, Ship* ship)
 	return 0;
 }
 
-bool Ship::LoadPlayerMoney(string file, Ship* ship)
+bool Ship::LoadPlayerMoney(Ship* ship)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading items from profile.\n");
 	assert(ship != NULL);
 
-	std::ifstream  data(file, ios::in);
+	std::ifstream  data(string(getSavesPath()) + MONEY_SAVE_FILE, ios::in);
 
 	if (data) // si ouverture du fichier réussie
 	{
@@ -2538,12 +2540,14 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 	data << endl;
 }
 
-int Ship::SaveItems(string file, Ship* ship)
+int Ship::SaveItems(Ship* ship)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
 	assert(ship != NULL);
 
-	ofstream data(file.c_str(), ios::in | ios::trunc);
+	createDirectory(getSavesPath());
+	
+	ofstream data(string(getSavesPath()) + ITEMS_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
 		// instructions
@@ -2994,12 +2998,12 @@ Weapon* Ship::LoadWeaponFromLine(string line)
 	return weapon;
 }
 
-bool Ship::LoadPlayerItems(string file, Ship* ship)
+bool Ship::LoadPlayerItems(Ship* ship)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading items from profile.\n");
 	assert(ship != NULL);
 
-	std::ifstream  data(file, ios::in);
+	std::ifstream  data(string(getSavesPath()) + ITEMS_SAVE_FILE, ios::in);
 
 	if (data) // si ouverture du fichier réussie
 	{

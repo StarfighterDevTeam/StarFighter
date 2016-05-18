@@ -10,10 +10,18 @@
 #include <math.h>
 
 std::string makePath(const std::string& srcPath);
+void createDirectory(const char* path);
+const char* getSavesPath();
 
-#define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
-#define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
-#define MONEY_SAVE_FILE							"Saves/Money.txt"
+#ifdef __APPLE__
+	#define PLAYER_SAVE_FILE						"KnownScenes.txt"
+	#define ITEMS_SAVE_FILE							"ItemsStats.txt"
+	#define MONEY_SAVE_FILE							"Money.txt"
+#else
+	#define PLAYER_SAVE_FILE						"Saves/KnownScenes.txt"
+	#define ITEMS_SAVE_FILE							"Saves/ItemsStats.txt"
+	#define MONEY_SAVE_FILE							"Saves/Money.txt"
+#endif
 
 #define	REF_WINDOW_RESOLUTION_X					1920
 #define REF_WINDOW_RESOLUTION_Y					1080

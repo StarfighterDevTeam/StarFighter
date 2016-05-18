@@ -17,17 +17,17 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToFeedbacks(m_playerShip->m_SFHudPanel);
 
 	//Load saved items
-	if (!Ship::LoadPlayerItems(ITEMS_SAVE_FILE, m_playerShip))
+	if (!Ship::LoadPlayerItems(m_playerShip))
 	{
 		//or create a new save file
-		Ship::SaveItems(ITEMS_SAVE_FILE, m_playerShip);
+		Ship::SaveItems(m_playerShip);
 	}
 	//load money
-	if (!Ship::LoadPlayerMoney(MONEY_SAVE_FILE, m_playerShip))
+	if (!Ship::LoadPlayerMoney(m_playerShip))
 	{
 		//or create a new save file
 		m_playerShip->m_money = STARTING_MONEY;
-		Ship::SavePlayerMoney(MONEY_SAVE_FILE, m_playerShip);
+		Ship::SavePlayerMoney(m_playerShip);
 	}
 
 	m_playerShip->Init();
@@ -51,19 +51,20 @@ void InGameState::Initialize(Player player)
 	LOGGER_WRITE(Logger::DEBUG, "HUD initialization completed\n");
 
 	//Load knownScenes, hazard levels and current scene from save file
-	if (!LoadPlayerSave(player.m_save_file).empty())
+	string playerSave = LoadPlayerSave();
+	if (!playerSave.empty())
 	{
-		player.m_currentSceneFile = LoadPlayerSave(player.m_save_file);
+		player.m_currentSceneFile = playerSave;
 	}
 	else
 	{
 		//New game save
 		player.m_currentSceneFile = STARTING_SCENE;
 		AddToKnownScenes(player.m_currentSceneFile);
-		SavePlayer(PLAYER_SAVE_FILE);
+		SavePlayer();
 		//UpdateShipConfig(m_playerShip, "intro");
 		m_playerShip->m_SFHudPanel->GetGrid(false, Trade_StashGrid)->ClearGrid();
-		Ship::SaveItems(ITEMS_SAVE_FILE, m_playerShip);
+		Ship::SaveItems(m_playerShip);
 	}
 
 	m_playerShip->m_currentScene_name = player.m_currentSceneFile;
@@ -285,7 +286,7 @@ int InGameState::GetSceneHazardLevelUnlocked(string scene_name, Ship* playerShip
 	return 0;
 }
 
-int InGameState::SavePlayer(string file, Ship* playerShip)
+int InGameState::SavePlayer(Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -294,7 +295,9 @@ int InGameState::SavePlayer(string file, Ship* playerShip)
 
 	LOGGER_WRITE(Logger::DEBUG, "Saving known scenes and current scene in profile.\n");
 
-	ofstream data(file.c_str(), ios::in | ios::trunc);
+	createDirectory(getSavesPath());
+	
+	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
 		// instructions
@@ -318,7 +321,7 @@ int InGameState::SavePlayer(string file, Ship* playerShip)
 	return 0;
 }
 
-string InGameState::LoadPlayerSave(string file, Ship* playerShip)
+string InGameState::LoadPlayerSave(Ship* playerShip)
 {
 	if (!playerShip)
 	{
@@ -327,7 +330,7 @@ string InGameState::LoadPlayerSave(string file, Ship* playerShip)
 
 	string return_current_scene;
 
-	std::ifstream  data(file, ios::in);
+	std::ifstream  data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
 
 	if (data) // si ouverture du fichier réussie
 	{
@@ -622,11 +625,11 @@ void InGameState::InGameStateMachineCheck(sf::Time deltaTime)
 				if (m_currentScene->m_direction == NO_DIRECTION)
 				{
 					m_playerShip->m_respawnSceneName = m_currentScene->m_name;
-					SavePlayer(PLAYER_SAVE_FILE);
+					SavePlayer();
 				}
 				else
 				{
-					SavePlayer(PLAYER_SAVE_FILE);
+					SavePlayer();
 				}
 
 				//Resetting counting of hits taken for scene score
@@ -884,7 +887,7 @@ void InGameState::SpawnInScene(string scene_name, Ship* playerShip)
 
 		UpdatePortalsMaxUnlockedHazardLevel(m_currentScene);
 
-		SavePlayer(PLAYER_SAVE_FILE);
+		SavePlayer();
 	}
 }
 

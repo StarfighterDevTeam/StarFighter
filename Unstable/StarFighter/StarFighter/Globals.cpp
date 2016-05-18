@@ -2,6 +2,7 @@
 
 #ifdef __APPLE__
     #include "ResourcePath.hpp"
+	#include "sys/stat.h"
 #endif
 
 sf::RenderWindow *window;
@@ -15,6 +16,24 @@ std::string makePath(const std::string& srcPath)
     return resourcePath() + "Assets/" + srcPath;
 #else
 	return "Assets/" + srcPath;
+#endif
+}
+
+void createDirectory(const char* path)
+{
+#ifdef __APPLE__
+	mkdir(path, 0777);
+#else
+	//::CreateDirectory(path, NULL);	// TODO: to be implemented on Windows
+#endif
+}
+
+const char* getSavesPath()
+{
+#ifdef __APPLE__
+	return "~/Library/Application Support/StarFighter/Saves/";
+#else
+	return "";	// TODO: should use %APPDATA% / "My Games/Saves" on Windows
 #endif
 }
 
