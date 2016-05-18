@@ -2295,8 +2295,6 @@ int Ship::UpdateShipLevel()
 //SAVING AND LOADING ITEMS AND MONEY
 int Ship::SavePlayerMoney(Ship* ship)
 {
-	createDirectory(getSavesPath());
-	
 	LOGGER_WRITE(Logger::DEBUG, "Saving money in profile.\n");
 	assert(ship != NULL);
 
@@ -2545,8 +2543,6 @@ int Ship::SaveItems(Ship* ship)
 	LOGGER_WRITE(Logger::DEBUG, "Saving items in profile.\n");
 	assert(ship != NULL);
 
-	createDirectory(getSavesPath());
-	
 	ofstream data(string(getSavesPath()) + ITEMS_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{

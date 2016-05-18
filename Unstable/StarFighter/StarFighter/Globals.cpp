@@ -19,10 +19,11 @@ std::string makePath(const std::string& srcPath)
 #endif
 }
 
-void createDirectory(const char* path)
+void createSavesDirectory()
 {
 #ifdef __APPLE__
-	mkdir(path, 0777);
+	mkdir("~/Library/Application Support/StarFighter", 0755);
+	mkdir("~/Library/Application Support/StarFighter/Saves", 0755);
 #else
 	//::CreateDirectory(path, NULL);	// TODO: to be implemented on Windows
 #endif

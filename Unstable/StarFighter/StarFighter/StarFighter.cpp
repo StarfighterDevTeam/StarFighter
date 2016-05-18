@@ -3,12 +3,16 @@
 	#include "resource.h"
 #endif
 
+#include <sys/stat.h>
+
 Game* CurrentGame;
 
 int main()
 {
 	LOGGER_START(Logger::DEBUG, "");
 
+	createSavesDirectory();
+	
 	//Load Configuration
 	LOGGER_WRITE(Logger::DEBUG, "Loading Configurations");
 	PREFS = new PrefsManager();

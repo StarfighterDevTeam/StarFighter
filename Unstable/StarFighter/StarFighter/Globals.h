@@ -10,7 +10,7 @@
 #include <math.h>
 
 std::string makePath(const std::string& srcPath);
-void createDirectory(const char* path);
+void createSavesDirectory();
 const char* getSavesPath();
 
 #ifdef __APPLE__

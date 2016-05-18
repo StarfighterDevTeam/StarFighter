@@ -295,8 +295,6 @@ int InGameState::SavePlayer(Ship* playerShip)
 
 	LOGGER_WRITE(Logger::DEBUG, "Saving known scenes and current scene in profile.\n");
 
-	createDirectory(getSavesPath());
-	
 	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
