@@ -22,8 +22,11 @@ std::string makePath(const std::string& srcPath)
 void createSavesDirectory()
 {
 #ifdef __APPLE__
-	mkdir("~/Library/Application Support/StarFighter", 0755);
-	mkdir("~/Library/Application Support/StarFighter/Saves", 0755);
+	char strPath[1024];
+	snprintf(strPath, sizeof(strPath), "%s/Library/Application Support/StarFighter", getenv("HOME"));
+	mkdir(strPath, 0755);
+	snprintf(strPath, sizeof(strPath), "%s/Library/Application Support/StarFighter/Saves", getenv("HOME"));
+	mkdir(strPath, 0755);
 #else
 	//::CreateDirectory(path, NULL);	// TODO: to be implemented on Windows
 #endif
