@@ -35,7 +35,9 @@ void createSavesDirectory()
 const char* getSavesPath()
 {
 #ifdef __APPLE__
-	return "~/Library/Application Support/StarFighter/Saves/";
+	static char strPath[1024];
+	snprintf(strPath, sizeof(strPath), "%s/Library/Application Support/StarFighter/Saves/", getenv("HOME"));
+	return strPath;
 #else
 	return "";	// TODO: should use %APPDATA% / "My Games/Saves" on Windows
 #endif
