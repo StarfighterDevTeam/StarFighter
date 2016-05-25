@@ -56,6 +56,7 @@ public:
 	sf::Vector2f m_scale_factor;
 
 	Ship* m_playerShip;
+	bool m_pause;
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;

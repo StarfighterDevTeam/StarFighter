@@ -35,56 +35,6 @@ bool InputGuy::isFiring(ControlerType device)
 	return false;
 }
 
-bool InputGuy::isSwitchingRotation(ControlerType device)
-{
-	if (device == AllControlDevices || device == KeyboardControl)
-	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-		{
-			return true;
-		}
-	}
-
-	if (device == AllControlDevices || device >= JoystickControl1)
-	{
-		int joystick = device - JoystickControl1;
-		if (device == AllControlDevices)
-			joystick = 0;// = joystick 1
-		if (sf::Joystick::isConnected(joystick))
-		{
-			if (sf::Joystick::isButtonPressed(joystick, 3))// Y button
-				return true;
-		}
-	}
-
-	return false;
-}
-
-bool InputGuy::isTackling(ControlerType device)
-{
-	if (device == AllControlDevices || device == KeyboardControl)
-	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
-		{
-			return true;
-		}
-	}
-
-	if (device == AllControlDevices || device >= JoystickControl1)
-	{
-		int joystick = device - JoystickControl1;
-		if (device == AllControlDevices)
-			joystick = 0;// = joystick 1
-		if (sf::Joystick::isConnected(joystick))
-		{
-			if (sf::Joystick::isButtonPressed(joystick, 2)) // X button
-				return true;
-		}
-	}
-
-	return false;
-}
-
 bool InputGuy::isRestartingScript()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))
@@ -128,6 +78,26 @@ bool InputGuy::isChangingResolution()
 	{
 		if (sf::Joystick::isButtonPressed(0, 7)) //Start button
 			return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isMuting()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isPausing()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+	{
+		return true;
 	}
 
 	return false;

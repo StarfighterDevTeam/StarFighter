@@ -18,6 +18,10 @@ void Ship::Init()
 	m_movingX = m_movingY = false;
 	m_disable_inputs = false;
 	m_controllerType = AllControlDevices;
+	for (size_t i = 0; i < NBVAL_PlayerActions; i++)
+	{
+		m_actions_states[i] = false;
+	}
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -52,6 +56,14 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	ManageAcceleration(inputs_direction);
+	
+	//Action input
+	UpdateInputStates();
+	if (m_inputs_states[Action_Firing] == Input_Tap)
+	{
+		//do some action
+	}
+
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
 	UpdateRotation();
@@ -171,11 +183,97 @@ void Ship::UpdateRotation()
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 {
-	if (stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
+	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
 	{
 		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
 		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
 
-		stroboscopic_effect_clock.restart();
+		m_stroboscopic_effect_clock.restart();
+	}
+}
+
+void Ship::UpdateInputStates()
+{
+	GetInputState(InputGuy::isFiring(), Action_Firing);
+}
+
+bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
+{
+	if (state_required == Input_Tap && condition && m_inputs_states[action] == Input_Tap)
+	{
+		m_actions_states[action] = !m_actions_states[action];
+		return true;
+	}
+	else if (state_required == Input_Hold && condition)
+	{
+		m_actions_states[action] = m_inputs_states[action];
+		return true;
+	}
+	else if (!condition)
+	{
+		m_actions_states[action] = false;
+	}
+	return false;
+}
+
+void Ship::GetInputState(bool input_guy_boolean, PlayerActions action)
+{
+	if (input_guy_boolean)
+	{
+		m_inputs_states[action] = m_inputs_states[action] == Input_Release ? Input_Tap : Input_Hold;
+	}
+	else
+	{
+		m_inputs_states[action] = Input_Release;
+	}
+}
+
+//SAVE AND LOAD LOCAL FILE
+int Ship::SaveShip(Ship* ship)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Saving game in local file.\n");
+	assert(ship != NULL);
+
+	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		data << "Save ";// << ship->m_speed.x << endl;
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No existing save file founded. A new file is going to be created.\n" << endl;
+	}
+
+	return 0;
+}
+
+bool Ship::LoadShip(Ship* ship)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading ship from local file.\n");
+	assert(ship != NULL);
+
+	std::ifstream  data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+		while (std::getline(data, line))
+		{
+			std::istringstream ss(line);
+
+			string saved_content;
+			ss >> saved_content;
+			//ship->content = saved_content;
+		}
+
+		data.close();  // on ferme le fichier
+		return true;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No save file found. A new file is going to be created.\n" << endl;
+		return false;
 	}
 }

@@ -27,7 +27,6 @@ int main()
 	//Title
 	renderWindow.setTitle("StarFighter Engine");
 
-
 	//Game initialization
 	CurrentGame = new Game();
 
@@ -124,17 +123,47 @@ int main()
 			renderWindow.setTitle("StarFighter Engine");
 		}
 
+		if ((*CurrentGame).m_playerShip)
+		{
+			//Muting
+			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isMuting(), Action_Muting);
+			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
+			{
+				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
+				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
+			}
+
+			//Pausing
+			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isPausing(), Action_Pausing);
+			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Pausing, Input_Tap, true))
+			{
+				(*CurrentGame).m_pause = (*CurrentGame).m_playerShip->m_actions_states[Action_Pausing];
+
+				if ((*CurrentGame).m_pause)
+				{
+					(*CurrentGame).m_curMusic.pause();
+				}
+				else
+				{
+					(*CurrentGame).m_curMusic.play();
+				}
+			}
+		}
+
 		dt = deltaClock.restart();
 
-		//Update
-		gameManager.GetCurrentState()->Update(dt);
+		if (!(*CurrentGame).m_pause)
+		{
+			//Update
+			gameManager.GetCurrentState()->Update(dt);
 
-		//Draw
-		gameManager.GetCurrentState()->Draw();
-		//sfgui.Display(renderWindow);
+			//Draw
+			gameManager.GetCurrentState()->Draw();
+			//sfgui.Display(renderWindow);
 
-		//Diplay
-		renderWindow.display();
+			//Diplay
+			renderWindow.display();
+		}
 	}
 
 	return 0;

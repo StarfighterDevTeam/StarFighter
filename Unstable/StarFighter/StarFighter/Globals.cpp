@@ -5,7 +5,38 @@ sf::RenderWindow *window;
 //to do OPTIM
 //std::unique_ptr<sf::RenderWindow> window;
 
+std::string makePath(const std::string& srcPath)
+{
+#ifdef __APPLE__
+	return resourcePath() + "Assets/" + srcPath;
+#else
+	return "Assets/" + srcPath;
+#endif
+}
 
+void createSavesDirectory()
+{
+#ifdef __APPLE__
+	char strPath[1024];
+	snprintf(strPath, sizeof(strPath), "%s/Library/Application Support/StarFighter", getenv("HOME"));
+	mkdir(strPath, 0755);
+	snprintf(strPath, sizeof(strPath), "%s/Library/Application Support/StarFighter/Saves", getenv("HOME"));
+	mkdir(strPath, 0755);
+#else
+	//::CreateDirectory(path, NULL);	// TODO: to be implemented on Windows
+#endif
+}
+
+const char* getSavesPath()
+{
+#ifdef __APPLE__
+	static char strPath[1024];
+	snprintf(strPath, sizeof(strPath), "%s/Library/Application Support/StarFighter/Saves/", getenv("HOME"));
+	return strPath;
+#else
+	return "";	// TODO: should use %APPDATA% / "My Games/Saves" on Windows
+#endif
+}
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values)
 {
@@ -73,3 +104,12 @@ float MaxBetweenValues(sf::Vector2f values)
 	return max;
 }
 
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
+{
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	}
+	return str;
+}
