@@ -7,6 +7,7 @@
 #include "TextUtils.h"
 #include "Logger.h"
 #include <assert.h>
+#include <math.h>
 
 std::string makePath(const std::string& srcPath);
 void createSavesDirectory();

@@ -5,7 +5,6 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-
 Ship::Ship()
 {
 	

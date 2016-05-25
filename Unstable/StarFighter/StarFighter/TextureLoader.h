@@ -14,21 +14,21 @@ class TextureLoader
 {
 private:
 	// Constructeur/destructeur
-	TextureLoader ()
-		: _value (0) { }
-	~TextureLoader () { }
+	TextureLoader()
+		: _value(0) { }
+	~TextureLoader() { }
 
 	//Loaded textures with counter
 	std::map<std::string, sf::Texture*> _loadedTextures;
 
 public:
 	// Interface publique
-	sf::Texture* loadTexture (std::string filename, int sizeX, int sizeY)
-	{ 
+	sf::Texture* loadTexture(std::string filename, int sizeX, int sizeY)
+	{
 		//Do we already have this loaded ?
 		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
 
-		if(it != this->_loadedTextures.end())
+		if (it != this->_loadedTextures.end())
 		{
 			//element found;
 			return it->second;	//Return the texture*
@@ -38,7 +38,7 @@ public:
 		sf::Texture* texture = new sf::Texture;
 		if (!(*texture).loadFromFile(filename, sf::IntRect(0, 0, sizeX, sizeY)))
 		{
-			throw invalid_argument(TextUtils::format("TextureLoad error: Unable to load texture from file '%s'",(char*)filename.c_str()));
+			throw invalid_argument(TextUtils::format("TextureLoad error: Unable to load texture from file '%s'", (char*)filename.c_str()));
 		}
 
 		//Add the texture
@@ -84,33 +84,33 @@ public:
 		return texture;
 	}
 
-	void unloadTexture (std::string filename)
-	{ 
+	void unloadTexture(std::string filename)
+	{
 		//Do we already have this loaded ?
 		std::map<std::string, sf::Texture*>::iterator it = this->_loadedTextures.find(filename);
 
-		if(it != this->_loadedTextures.end())
+		if (it != this->_loadedTextures.end())
 		{
 			//element found;
 			sf::Texture* texture = it->second;
 			//Removing it from the array
-			this->_loadedTextures.erase (filename);     
+			this->_loadedTextures.erase(filename);
 			//Cleaning memory
 			delete texture;
 		}
 	}
 
 	// Fonctions de création et destruction du singleton
-	static TextureLoader *getInstance ()
+	static TextureLoader *getInstance()
 	{
 		if (NULL == _singleton)
 		{
-			_singleton =  new TextureLoader;
+			_singleton = new TextureLoader;
 		}
 		return _singleton;
 	}
 
-	static void kill ()
+	static void kill()
 	{
 		if (NULL != _singleton)
 		{

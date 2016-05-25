@@ -1,5 +1,8 @@
 #include "StarFighter.h"
-#include "resource.h"
+
+#ifdef WIN32
+	#include "resource.h"
+#endif
 
 Game* CurrentGame;
 
@@ -118,7 +121,7 @@ int main()
 			renderWindow.setKeyRepeatEnabled(false);
 			renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
 			sf::Image icon = sf::Image();
-			icon.loadFromFile(ICON_SHIP_PNG);
+			icon.loadFromFile(makePath(ICON_SHIP_PNG));
 			renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 			renderWindow.setTitle("StarFighter Engine");
 		}

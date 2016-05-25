@@ -32,14 +32,14 @@ void Game::init(RenderWindow* window)
 
 	//fonts
 	m_font[Font_Terminator] = new sf::Font();
-	if (!m_font[Font_Terminator]->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+	if (!m_font[Font_Terminator]->loadFromFile(makePath("Fonts/terminator_real_nfi.ttf")))
 	{
 		// error
 		//TODO: font loader
 	}
 
 	m_font[Font_Arial] = new sf::Font();
-	if (!m_font[Font_Arial]->loadFromFile("Assets/Fonts/arial.ttf"))
+	if (!m_font[Font_Arial]->loadFromFile(makePath("Fonts/arial.ttf")))
 	{
 		// error
 		//TODO: font loader
@@ -64,7 +64,7 @@ void Game::SetSFXVolume(bool activate_sfx)
 
 int Game::LoadSFX()
 {
-	if (!m_soundBuffers[0].loadFromFile("Assets/Sounds/laser.ogg"))
+	if (!m_soundBuffers[0].loadFromFile(makePath("Sounds/laser.ogg")))
 		return -1;
 
 	m_soundsLaser[0].setBuffer(m_soundBuffers[0]);
@@ -113,7 +113,7 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 		{
 			case Music_Main:
 			{
-				m_next_music_name = "Assets/Music/Main.ogg";
+				m_next_music_name = makePath("Music/Main.ogg");
 				break;
 			}
 		}
