@@ -2333,6 +2333,7 @@ bool Ship::LoadPlayerMoney(Ship* ship)
 		}
 		
 		data.close();  // on ferme le fichier
+		return true;
 	}
 	else  // si l'ouverture a échoué
 	{
