@@ -63,29 +63,29 @@ public:
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
-	bool visible;
-	bool isOnScene;
-	bool GarbageMe;
-	bool DontGarbageMe;
+
+	bool m_visible;
+	bool m_isOnScene;
+	bool m_GarbageMe;
+	bool m_DontGarbageMe;
 	GameObjectType m_collider_type;
 	LayerType m_layer;
 	sf::Vector2f m_size;
-	sf::Vector2f getGameObjectSpeed();
+
 	string getName();
-	virtual void Respawn();
 	GameObject* Clone();
+	void setGhost(bool ghost);
 	
-	float diag;
-	bool ghost;
-	void setGhost(bool m_ghost);
-	float rotation_speed;
+	float m_diag;
+	bool m_ghost;
+	float m_rotation_speed;
 	int m_animationNumber;
 	int m_frameNumber;
 	int m_currentAnimationIndex;
 	std::string m_textureName;
-	sf::Vector2f speed;
+	sf::Vector2f m_speed;
 
-	//Utilitary methodes
+	//Utilitary methods
 	float GetAbsoluteSpeed();
 	static float GetAbsoluteSpeed(sf::Vector2f speed_);
 	float GetAbsoluteSpeedSquared();

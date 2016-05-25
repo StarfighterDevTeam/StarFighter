@@ -40,9 +40,9 @@ public :
 	sf::Clock stroboscopic_effect_clock;
 
 private:
-	bool moving;
-	bool movingX;
-	bool movingY;
+	bool m_moving;
+	bool m_movingX;
+	bool m_movingY;
 };
 
 #endif // SHIP_H_INCLUDED

@@ -7,7 +7,7 @@ using namespace sf;
 Stroboscopic::Stroboscopic(sf::Time decade_time, GameObject* parent) : GameObject(parent->getPosition(), sf::Vector2f(0, 0), parent->m_textureName, parent->m_size, sf::Vector2f(parent->m_size.x/2, parent->m_size.y/2), parent->m_frameNumber, parent->m_animationNumber)
 {
 	m_alpha = 255;
-	m_decade_time = decade_time;
+	m_decay_time = decade_time;
 
 	//getting a one-framed animation (the current frame and animation)
 	Animation* anim = new Animation();
@@ -28,15 +28,15 @@ Stroboscopic::~Stroboscopic()
 
 void Stroboscopic::update(sf::Time deltaTime)
 {
-	Uint8 decade_ = (Uint8)(ceil(deltaTime.asSeconds() * 255 / m_decade_time.asSeconds()));
-    if (m_alpha - decade_ > 0)
+	Uint8 decay = (Uint8)(ceil(deltaTime.asSeconds() * 255 / m_decay_time.asSeconds()));
+	if (m_alpha - decay > 0)
 	{
-		m_alpha -= decade_;
+		m_alpha -= decay;
 	}
 	else
 	{
 		m_alpha = 0;
-		GarbageMe = true;
+		m_GarbageMe = true;
 	}
 
 	setColor(Color(255, 255, 255, m_alpha));

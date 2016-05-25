@@ -21,6 +21,13 @@ class Ship;
 enum SFX_Bank
 {
 	SFX_Laser,
+	NBVAL_SFX_BANK,
+};
+
+enum Music_Bank
+{
+	Music_Main,
+	NBVAL_MUSIC_BANK,
 };
 
 using namespace sf;
@@ -41,51 +48,59 @@ public:
 	void colisionChecksV2();
 	void cleanGarbage();
 	void collectGarbage();
-	sf::RenderTexture mainScreen;
-	sf::Vector2i screen_size;
-	float hyperspeedMultiplier;
-	float vspeed;
-	sf::Vector2f scale_factor;
 
-	Ship* playerShip;
-	void SetPlayerShip(Ship* m_playerShip);
+	sf::RenderTexture m_mainScreen;
+	sf::Vector2i m_screen_size;
+	float m_hyperspeedMultiplier;
+	float m_vspeed;
+	sf::Vector2f m_scale_factor;
 
-	sf::View view;
-	sf::Vector2f map_size;
+	Ship* m_playerShip;
 
+	sf::View m_view;
+	sf::Vector2f m_map_size;
 
-	//utiliary methods
+	//Utiliary methods
 	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
 	GameObject* GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object);
 	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
 
 	//Fonts
-	sf::Font* font;
-	sf::Font* font2;
+	sf::Font* m_font;
+	sf::Font* m_font2;
 
 	//SFX
 	int LoadSFX();
 	void PlaySFX(SFX_Bank sfx_name);
-	sf::SoundBuffer soundBuffers[1];
-	sf::Sound soundsLaser[1];
-	bool m_SFX_Activated;
 	void SetSFXVolume(bool activate_sfx);
+
+	sf::SoundBuffer m_soundBuffers[1];
+	sf::Sound m_soundsLaser[1];
+	bool m_SFX_Activated;
 
 	//Music
 	sf::Music m_curMusic;
 	bool m_Music_Activated;
+	string m_next_music_name;
+	Music_Bank m_curMusic_type;
+	float m_music_fader;
+	bool m_asking_music_fade_out;
+
 	void SetMusicVolume(bool activate_music);
+	void PlayMusic(Music_Bank music, string specific_filename = "");
+	void ManageMusicTransitions(sf::Time deltaTime);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
-	RenderWindow *window;
-	std::list<RectangleShape*> sceneFeedbackBars;
-	std::list<Text*> sceneFeedbackTexts;
-	std::vector<GameObject*> sceneGameObjects;
-	std::vector<GameObject*> sceneGameObjectsLayered[NBVAL_Layer];
-	std::vector<GameObject*> sceneGameObjectsTyped[NBVAL_GameObject];
-	std::vector<GameObject*> garbage;
+
+	RenderWindow* m_window;
+	std::list<RectangleShape*> m_sceneFeedbackBars;
+	std::list<Text*> m_sceneFeedbackTexts;
+	std::vector<GameObject*> m_sceneGameObjects;
+	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
+	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
+	std::vector<GameObject*> m_garbage;
 };
 
 #endif // GAME_H_INCLUDED

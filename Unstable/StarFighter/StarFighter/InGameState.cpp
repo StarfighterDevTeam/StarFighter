@@ -9,16 +9,16 @@ void InGameState::Initialize(Player player)
 	
 	//intégration placeholder
 	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
-	(*CurrentGame).SetPlayerShip(playerShip);
-	(*CurrentGame).addToScene((*CurrentGame).playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
+	(*CurrentGame).m_playerShip = playerShip;
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 
 	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
 	(*CurrentGame).addToScene(background, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
 
 	//HACK
-	(*CurrentGame).map_size = background->m_size;
-	(*CurrentGame).view.setCenter((*CurrentGame).playerShip->getPosition());
-	(*CurrentGame).playerShip->SetControllerType(AllControlDevices);
+	(*CurrentGame).m_map_size = background->m_size;
+	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
+	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -43,19 +43,19 @@ void InGameState::Release()
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
 {
-	(*CurrentGame).view.move(sf::Vector2f((*CurrentGame).playerShip->speed.x * deltaTime.asSeconds(), (*CurrentGame).playerShip->speed.y * deltaTime.asSeconds()));
+	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y * deltaTime.asSeconds()));
 
 	//Map border constraints
-	const float x = (*CurrentGame).view.getSize().x / 2;
-	const float y = (*CurrentGame).view.getSize().y / 2;
-	const float a = (*CurrentGame).playerShip->getPosition().x;
-	const float b = (*CurrentGame).playerShip->getPosition().y;
+	const float x = (*CurrentGame).m_view.getSize().x / 2;
+	const float y = (*CurrentGame).m_view.getSize().y / 2;
+	const float a = (*CurrentGame).m_playerShip->getPosition().x;
+	const float b = (*CurrentGame).m_playerShip->getPosition().y;
 	if (a < x)
-		(*CurrentGame).view.setCenter(x, (*CurrentGame).view.getCenter().y);
-	if (a >(*CurrentGame).map_size.x - x)
-		(*CurrentGame).view.setCenter((*CurrentGame).map_size.x - x, (*CurrentGame).view.getCenter().y);
+		(*CurrentGame).m_view.setCenter(x, (*CurrentGame).m_view.getCenter().y);
+	if (a >(*CurrentGame).m_map_size.x - x)
+		(*CurrentGame).m_view.setCenter((*CurrentGame).m_map_size.x - x, (*CurrentGame).m_view.getCenter().y);
 	if (b < y)
-		(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, y);
-	if (b >(*CurrentGame).map_size.y - y)
-		(*CurrentGame).view.setCenter((*CurrentGame).view.getCenter().x, (*CurrentGame).map_size.y - y);
+		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, y);
+	if (b >(*CurrentGame).m_map_size.y - y)
+		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, (*CurrentGame).m_map_size.y - y);
 }

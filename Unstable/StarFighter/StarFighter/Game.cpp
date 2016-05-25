@@ -12,70 +12,63 @@ const char* GameObjectTypeValues[] =
 
 void Game::init(RenderWindow* window)
 {
-	this->window = window;
-	this->mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
-	this->mainScreen.setSmooth(true);
+	m_playerShip = NULL;
 
-	scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
-	scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
-	screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+	m_window = window;
+	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
+	m_mainScreen.setSmooth(true);
 
-	view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
-	view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	m_scale_factor.x = 1.0f * WINDOW_RESOLUTION_X / REF_WINDOW_RESOLUTION_X;
+	m_scale_factor.y = 1.0f * WINDOW_RESOLUTION_Y / REF_WINDOW_RESOLUTION_Y;
+	m_screen_size = sf::Vector2i(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y);
+
+	m_view.setCenter(sf::Vector2f(REF_WINDOW_RESOLUTION_X / 2, REF_WINDOW_RESOLUTION_Y / 2));
+	m_view.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 	//view.zoom(0.3f);
 
 	//default value
-	map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
 	//fonts
-	font = new sf::Font();
-	if (!font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+	m_font = new sf::Font();
+	if (!m_font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
 	{
 		// error
 		//TODO: font loader
 	}
 
-	font2 = new sf::Font();
-	if (!font2->loadFromFile("Assets/Fonts/arial.ttf"))
+	m_font2 = new sf::Font();
+	if (!m_font2->loadFromFile("Assets/Fonts/arial.ttf"))
 	{
 		// error
 		//TODO: font loader
 	}
-
-	//TODO: save in local preferences
-	m_Music_Activated = false;
-	m_SFX_Activated = false;
 
 	//Sounds
 	LoadSFX();
+	m_SFX_Activated = true;
 
 	//Music
 	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
-	//if (!SpaceCowboys.openFromFile("Assets/Music/SpaceCowboys.ogg"))
-	//if (!SpaceCowboys.openFromFile("Assets/Music/CrimeaDigital.ogg"))
-	//if (!SpaceCowboys.openFromFile("Assets/Music/Rebecca.ogg"))
-	//if (!SpaceCowboys.openFromFile("Assets/Music/Daft Punk - Derezzed.ogg"))
-	if (m_curMusic.openFromFile("Assets/Music/Tron_End_Titles.ogg"))
-	{
-		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated);
-		m_curMusic.play();
-		m_curMusic.setLoop(true);
-	}
+	m_Music_Activated = true;
+	m_music_fader = 0;
+	m_asking_music_fade_out = false;
+	PlayMusic(Music_Main);
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
 {
-	soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 }
 
 int Game::LoadSFX()
 {
-	if (!soundBuffers[0].loadFromFile("Assets/Sounds/laser.ogg"))
+	if (!m_soundBuffers[0].loadFromFile("Assets/Sounds/laser.ogg"))
 		return -1;
 
-	soundsLaser[0].setBuffer(soundBuffers[0]);
+	m_soundsLaser[0].setBuffer(m_soundBuffers[0]);
 
-	soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	m_soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
 	return 0;
@@ -85,18 +78,93 @@ void Game::PlaySFX(SFX_Bank sfx_name)
 {
 	if (sfx_name == SFX_Laser)
 	{
-		soundsLaser[0].play();
+		m_soundsLaser[0].play();
+	}
+}
+
+void Game::SetMusicVolume(bool activate_music)
+{
+	m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * activate_music);
+}
+
+void Game::PlayMusic(Music_Bank music, string specific_filename)
+{
+	if (music == m_curMusic_type)
+	{
+		return;
+	}
+
+	m_curMusic_type = music;
+
+	if (!m_Music_Activated)
+		return;
+
+	//filename has been specified?
+	if (!specific_filename.empty())
+	{
+		m_next_music_name = specific_filename;
+	}
+	//default musics
+	else
+	{
+		//choose the right music file
+		switch (music)
+		{
+			case Music_Main:
+			{
+				m_next_music_name = "Assets/Music/Main.ogg";
+				break;
+			}
+		}
+	}
+
+	m_asking_music_fade_out = true;
+}
+
+void Game::ManageMusicTransitions(sf::Time deltaTime)
+{
+	if (!m_Music_Activated)
+		return;
+
+	//fade out previous music
+	if (m_asking_music_fade_out)
+	{
+		float volume_change = 100.f / MUSIC_FADE_OUT_TIME * deltaTime.asSeconds();
+		if (m_music_fader - volume_change > 0)
+		{
+			m_music_fader -= volume_change;
+		}
+		else
+		{
+			m_music_fader = 0;
+			//load new music
+			m_curMusic.openFromFile(m_next_music_name);
+			m_curMusic.play();
+			m_curMusic.setLoop(true);
+			m_asking_music_fade_out = false;
+		}
+		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated * m_music_fader / 100);
+	}
+
+	//fade in new music
+	if (!m_asking_music_fade_out && m_music_fader < 100)
+	{
+		float volume_change = 100.f / MUSIC_FADE_IN_TIME * deltaTime.asSeconds();
+		if (m_music_fader + volume_change < 100)
+		{
+			m_music_fader += volume_change;
+		}
+		else
+		{
+			m_music_fader = 100;
+		}
+		m_curMusic.setVolume(DEFAULT_MUSIC_VOLUME * m_Music_Activated * m_music_fader / 100);
 	}
 }
 
 sf::RenderWindow* Game::getMainWindow()
 {
-	return this->window;
-}
-
-void Game::SetPlayerShip(Ship* m_playerShip)
-{
-	this->playerShip = m_playerShip;
+	return m_window;
 }
 
 void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
@@ -109,9 +177,9 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 
 	if (((int)layer >= 0 && (int)layer < NBVAL_Layer) && (type >= 0 && type < NBVAL_GameObject))
 	{
-		AddGameObjectToVector(object, &this->sceneGameObjectsTyped[(int)type]);
-		AddGameObjectToVector(object, &this->sceneGameObjectsLayered[(int)layer]);
-		AddGameObjectToVector(object, &this->sceneGameObjects);
+		AddGameObjectToVector(object, &this->m_sceneGameObjectsTyped[(int)type]);
+		AddGameObjectToVector(object, &this->m_sceneGameObjectsLayered[(int)layer]);
+		AddGameObjectToVector(object, &this->m_sceneGameObjects);
 	}
 	else
 	{
@@ -121,22 +189,22 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 
 void Game::addToFeedbacks(RectangleShape* feedback)
 {
-	sceneFeedbackBars.push_back(feedback);
+	m_sceneFeedbackBars.push_back(feedback);
 }
 
 void Game::addToFeedbacks(Text* text)
 {
-	sceneFeedbackTexts.push_back(text);
+	m_sceneFeedbackTexts.push_back(text);
 }
 
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
-	sceneFeedbackBars.remove(feedback);
+	m_sceneFeedbackBars.remove(feedback);
 }
 
 void Game::removeFromFeedbacks(Text* text)
 {
-	sceneFeedbackTexts.remove(text);
+	m_sceneFeedbackTexts.remove(text);
 }
 
 void Game::updateScene(Time deltaTime)
@@ -144,8 +212,8 @@ void Game::updateScene(Time deltaTime)
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
 
 	//TODO: Updating screen resolution
-	scale_factor.x = 1.0f * screen_size.x / REF_WINDOW_RESOLUTION_X;
-	scale_factor.y = 1.0f * screen_size.y / REF_WINDOW_RESOLUTION_Y;
+	m_scale_factor.x = 1.0f * m_screen_size.x / REF_WINDOW_RESOLUTION_X;
+	m_scale_factor.y = 1.0f * m_screen_size.y / REF_WINDOW_RESOLUTION_Y;
 
 	//Clean garbage
 	cleanGarbage();
@@ -153,58 +221,62 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
-	size_t sceneGameObjectsSize = this->sceneGameObjects.size();
+	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
-		if (this->sceneGameObjects[i] == NULL)
+		if (this->m_sceneGameObjects[i] == NULL)
 			continue;
 
-		this->sceneGameObjects[i]->update(deltaTime);
+		this->m_sceneGameObjects[i]->update(deltaTime);
 	}
 
 	//Collect the dust
 	collectGarbage();
 
-	mainScreen.setView(view);
+	//Update music transitions
+	ManageMusicTransitions(deltaTime);
+
+	//Update view
+	m_mainScreen.setView(m_view);
 }
 
 void Game::drawScene()
 {
-	this->mainScreen.clear();
+	m_mainScreen.clear();
 
 	for (int i = 0; i < NBVAL_Layer; i++)
 	{
 		if (i == FeedbacksLayer)
 		{
-			for (std::list<RectangleShape*>::iterator it = this->sceneFeedbackBars.begin(); it != this->sceneFeedbackBars.end(); it++)
+			for (std::list<RectangleShape*>::iterator it = this->m_sceneFeedbackBars.begin(); it != this->m_sceneFeedbackBars.end(); it++)
 			{
-				mainScreen.draw(*(*it));
+				m_mainScreen.draw(*(*it));
 			}
-			for (std::list<Text*>::iterator it = this->sceneFeedbackTexts.begin(); it != this->sceneFeedbackTexts.end(); it++)
+			for (std::list<Text*>::iterator it = this->m_sceneFeedbackTexts.begin(); it != this->m_sceneFeedbackTexts.end(); it++)
 			{
-				mainScreen.draw(*(*it));
+				m_mainScreen.draw(*(*it));
 			}
 		}
 		else
 		{
-			for (std::vector<GameObject*>::iterator it = this->sceneGameObjectsLayered[i].begin(); it != this->sceneGameObjectsLayered[i].end(); it++)
+			for (std::vector<GameObject*>::iterator it = this->m_sceneGameObjectsLayered[i].begin(); it != this->m_sceneGameObjectsLayered[i].end(); it++)
 			{
 				if (*it == NULL)
 					continue;
 
-				if ((*(*it)).visible)
+				if ((*(*it)).m_visible)
 				{
-					this->mainScreen.draw((*(*it)));
+					m_mainScreen.draw((*(*it)));
 				}
 			}
 		}
 	}
 
-	this->mainScreen.display();
-	sf::Sprite temp(this->mainScreen.getTexture());
-	temp.scale(scale_factor.x, scale_factor.y);
+	m_mainScreen.display();
+	sf::Sprite temp(m_mainScreen.getTexture());
+	temp.scale(m_scale_factor.x, m_scale_factor.y);
 	temp.setPosition(sf::Vector2f(0, 0));
-	this->window->draw(temp);
+	m_window->draw(temp);
 }
 
 void Game::colisionChecksV2()
@@ -213,13 +285,13 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -240,32 +312,32 @@ void Game::cleanGarbage()
 	dt.restart();
 
 	// On "cache" les size, pour éviter d'appeler des fonctions à chaque itération
-	const size_t garbageSize = this->garbage.size();
-	const size_t sceneGameObjectsSize = this->sceneGameObjects.size();
+	const size_t garbageSize = m_garbage.size();
+	const size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	//Size layer
 	size_t sceneGameObjectsLayeredSize[NBVAL_Layer];
 	for (int layer = 0; layer < NBVAL_Layer; layer++)
 	{
-		sceneGameObjectsLayeredSize[layer] = this->sceneGameObjectsLayered[layer].size();
+		sceneGameObjectsLayeredSize[layer] = m_sceneGameObjectsLayered[layer].size();
 	}
 	//Size ind type
 	size_t sceneGameObjectsTypedSize[NBVAL_GameObject];
 	for (int layer = 0; layer < NBVAL_GameObject; layer++)
 	{
-		sceneGameObjectsTypedSize[layer] = this->sceneGameObjectsTyped[layer].size();
+		sceneGameObjectsTypedSize[layer] = m_sceneGameObjectsTyped[layer].size();
 	}
 
 	//Scene GameObjects
 	for (size_t i = 0; i < garbageSize; i++)
 	{
-		GameObject*    pCurGameObject = this->garbage[i];
+		GameObject*    pCurGameObject = m_garbage[i];
 
 		// On remet à NULL lorsqu'on a trouvé un élément à dégager
 		for (size_t j = 0; j < sceneGameObjectsSize; j++)
 		{
-			if (this->sceneGameObjects[j] == pCurGameObject)
+			if (m_sceneGameObjects[j] == pCurGameObject)
 			{
-				this->sceneGameObjects[j] = NULL;
+				m_sceneGameObjects[j] = NULL;
 				break;
 			}
 		}
@@ -274,9 +346,9 @@ void Game::cleanGarbage()
 		const int layer = pCurGameObject->m_layer;
 		for (size_t j = 0; j < sceneGameObjectsLayeredSize[layer]; j++)
 		{
-			if (this->sceneGameObjectsLayered[layer][j] == pCurGameObject)
+			if (m_sceneGameObjectsLayered[layer][j] == pCurGameObject)
 			{
-				this->sceneGameObjectsLayered[layer][j] = NULL;
+				m_sceneGameObjectsLayered[layer][j] = NULL;
 				break;
 			}
 		}
@@ -285,9 +357,9 @@ void Game::cleanGarbage()
 		const int type = pCurGameObject->m_collider_type;
 		for (size_t j = 0; j < sceneGameObjectsTypedSize[type]; j++)
 		{
-			if (this->sceneGameObjectsTyped[type][j] == pCurGameObject)
+			if (m_sceneGameObjectsTyped[type][j] == pCurGameObject)
 			{
-				this->sceneGameObjectsTyped[type][j] = NULL;
+				m_sceneGameObjectsTyped[type][j] = NULL;
 				break;
 			}
 		}
@@ -322,36 +394,36 @@ void Game::collectGarbage()
 	sf::Clock dt;
 	dt.restart();
 
-	this->garbage.clear();
+	m_garbage.clear();
 
-	for (std::vector<GameObject*>::iterator it = (this->sceneGameObjects).begin(); it != (this->sceneGameObjects).end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjects.begin(); it != m_sceneGameObjects.end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
 		//Content flagged for deletion
-		if ((**it).GarbageMe)
+		if ((**it).m_GarbageMe)
 		{
-			this->garbage.push_back(*it);
+			m_garbage.push_back(*it);
 			continue;
 		}
 
-		if (!(**it).isOnScene)
+		if (!(**it).m_isOnScene)
 		{
 			//objects that are spawning out of screen are not deleted
-			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= map_size.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= map_size.y))
+			if (((**it).getPosition().x + ((**it).m_size.x) / 2 >= 0 && (**it).getPosition().x - ((**it).m_size.x) / 2 <= m_map_size.x) && ((**it).getPosition().y + ((**it).m_size.y) / 2 >= 0 && (**it).getPosition().y - ((**it).m_size.y) / 2 <= m_map_size.y))
 			{
-				(**it).isOnScene = true;
+				(**it).m_isOnScene = true;
 			}
 		}
 
 		//Content that went on scene and then exited have to be deleted
-		if (!(**it).DontGarbageMe && (**it).isOnScene)
+		if (!(**it).m_DontGarbageMe && (**it).m_isOnScene)
 		{
-			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > map_size.x
-				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > map_size.y)
+			if ((**it).getPosition().x + ((**it).m_size.x) / 2 < 0 || (**it).getPosition().x - ((**it).m_size.x) / 2 > m_map_size.x
+				|| (**it).getPosition().y + ((**it).m_size.y) / 2 < 0 || (**it).getPosition().y - ((**it).m_size.y) / 2 > m_map_size.y)
 			{
-				this->garbage.push_back(*it);
+				m_garbage.push_back(*it);
 				continue;
 			}
 		}
@@ -364,12 +436,12 @@ GameObject* Game::GetClosestObject(const sf::Vector2f position, GameObjectType t
 {
 	float shortest_distance = -1;
 	GameObject* returned_obj = NULL;
-	for (std::vector<GameObject*>::iterator it = sceneGameObjectsTyped[type_of_closest_object].begin(); it != sceneGameObjectsTyped[type_of_closest_object].end(); it++)
+	for (std::vector<GameObject*>::iterator it = m_sceneGameObjectsTyped[type_of_closest_object].begin(); it != m_sceneGameObjectsTyped[type_of_closest_object].end(); it++)
 	{
 		if (*it == NULL)
 			continue;
 
-		if ((*it)->isOnScene && !(*it)->ghost && (*it)->visible)
+		if ((*it)->m_isOnScene && !(*it)->m_ghost && (*it)->m_visible)
 		{
 			const float a = position.x - (*it)->getPosition().x;
 			const float b = position.y - (*it)->getPosition().y;
@@ -396,5 +468,5 @@ GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType typ
 
 std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
 {
-	return sceneGameObjectsTyped[type];
+	return m_sceneGameObjectsTyped[type];
 }

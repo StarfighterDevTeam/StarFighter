@@ -28,9 +28,13 @@
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
+//MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100
+#define MUSIC_FADE_IN_TIME						2.f
+#define MUSIC_FADE_OUT_TIME						2.f
 
+//TEXT POP FEEDBACK
 #define TEXT_POP_OFFSET_Y							10
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
