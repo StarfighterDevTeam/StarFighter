@@ -7,6 +7,7 @@
 #include <sstream>
 #include "Game.h"
 #include "Ship.h"
+#include "SFPanelSpecific.h"
 
 class GameObject;
 
@@ -20,6 +21,8 @@ public:
 	void Draw();
 	void Release();
 	void UpdateCamera(sf::Time deltaTime);
+	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
+	static void DestroySFPanel(Ship* playerShip);
 
 private:
 	sf::RenderWindow* mainWindow;

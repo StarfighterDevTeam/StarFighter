@@ -31,15 +31,15 @@ void Game::init(RenderWindow* window)
 	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
 	//fonts
-	m_font = new sf::Font();
-	if (!m_font->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
+	m_font[Font_Terminator] = new sf::Font();
+	if (!m_font[Font_Terminator]->loadFromFile("Assets/Fonts/terminator_real_nfi.ttf"))
 	{
 		// error
 		//TODO: font loader
 	}
 
-	m_font2 = new sf::Font();
-	if (!m_font2->loadFromFile("Assets/Fonts/arial.ttf"))
+	m_font[Font_Arial] = new sf::Font();
+	if (!m_font[Font_Arial]->loadFromFile("Assets/Fonts/arial.ttf"))
 	{
 		// error
 		//TODO: font loader
@@ -198,6 +198,19 @@ void Game::addToFeedbacks(Text* text)
 	m_sceneFeedbackTexts.push_back(text);
 }
 
+void Game::addToFeedbacks(SFPanel* panel)
+{
+	m_sceneFeedbackSFPanels.push_back(panel);
+}
+
+void Game::addToFeedbacks(SFText* text)
+{
+	if (text)
+	{
+		AddSFTextToVector(text, &this->m_sceneFeedbackSFTexts);
+	}
+}
+
 void Game::removeFromFeedbacks(RectangleShape* feedback)
 {
 	m_sceneFeedbackBars.remove(feedback);
@@ -206,6 +219,11 @@ void Game::removeFromFeedbacks(RectangleShape* feedback)
 void Game::removeFromFeedbacks(Text* text)
 {
 	m_sceneFeedbackTexts.remove(text);
+}
+
+void Game::removeFromFeedbacks(SFPanel* panel)
+{
+	m_sceneFeedbackSFPanels.remove(panel);
 }
 
 void Game::updateScene(Time deltaTime)
@@ -229,6 +247,16 @@ void Game::updateScene(Time deltaTime)
 			continue;
 
 		this->m_sceneGameObjects[i]->update(deltaTime);
+	}
+
+	//SFTextPop (text feedbacks)
+	size_t sceneTextPopFeedbacksSize = m_sceneFeedbackSFTexts.size();
+	for (size_t i = 0; i < sceneTextPopFeedbacksSize; i++)
+	{
+		if (m_sceneFeedbackSFTexts[i] == NULL)
+			continue;
+
+		m_sceneFeedbackSFTexts[i]->update(deltaTime);
 	}
 
 	//Collect the dust
@@ -371,6 +399,25 @@ void Game::cleanGarbage()
 		delete pCurGameObject;
 	}
 
+	//Texts and feedbacks
+	size_t garbageTextsSize = m_garbageTexts.size();
+	for (size_t i = 0; i < garbageTextsSize; i++)
+	{
+		SFText*    pSFText = m_garbageTexts[i];
+
+		size_t VectorTextsSize = m_sceneFeedbackSFTexts.size();
+		for (size_t j = 0; j < VectorTextsSize; j++)
+		{
+			if (m_sceneFeedbackSFTexts[j] == pSFText)
+			{
+				m_sceneFeedbackSFTexts[j] = NULL;
+				break;
+			}
+		}
+
+		delete pSFText;
+	}
+
 	//printf("| Clean: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -390,12 +437,29 @@ void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* v
 	vector->push_back(pGameObject);
 }
 
+void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)
+{
+	const size_t vectorSize = vector->size();
+	for (size_t i = 0; i < vectorSize; i++)
+	{
+		if ((*vector)[i] == NULL)
+		{
+			(*vector)[i] = pSFText;
+			return; // ayé, on a trouvé un free slot, inséré, maintenant on a fini
+		}
+	}
+
+	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
+	vector->push_back(pSFText);
+}
+
 void Game::collectGarbage()
 {
 	sf::Clock dt;
 	dt.restart();
 
 	m_garbage.clear();
+	m_garbageTexts.clear();
 
 	for (std::vector<GameObject*>::iterator it = m_sceneGameObjects.begin(); it != m_sceneGameObjects.end(); it++)
 	{
@@ -427,6 +491,20 @@ void Game::collectGarbage()
 				m_garbage.push_back(*it);
 				continue;
 			}
+		}
+	}
+
+	//Texts and feedbacks
+	for (std::vector<SFText*>::iterator it = m_sceneFeedbackSFTexts.begin(); it != m_sceneFeedbackSFTexts.end(); it++)
+	{
+		if (*it == NULL)
+			continue;
+
+		//Content flagged for deletion
+		if ((**it).m_GarbageMe)
+		{
+			m_garbageTexts.push_back(*it);
+			continue;
 		}
 	}
 

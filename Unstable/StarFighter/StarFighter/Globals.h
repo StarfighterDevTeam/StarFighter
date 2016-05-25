@@ -46,6 +46,17 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 //TEXT POP FEEDBACK
 #define TEXT_POP_OFFSET_Y							10
 
+#define INTERACTION_BUTTON_A_FILENAME			"2D/HUD/Button_A.png"
+#define INTERACTION_BUTTON_X_FILENAME			"2D/HUD/Button_X.png"
+#define INTERACTION_BUTTON_Y_FILENAME			"2D/HUD/Button_Y.png"
+#define INTERACTION_BUTTON_B_FILENAME			"2D/HUD/Button_B.png"
+#define INTERACTION_BUTTON_WIDTH				16
+#define INTERACTION_BUTTON_HEIGHT				16
+#define INTERACTION_BUTTON_MARGIN				4
+#define INTERACTION_INTERBLOCK					20
+#define SFPANEL_SPECIFIC_WIDTH					200
+#define SFPANEL_SPECIFIC_HEIGHT					100
+
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);

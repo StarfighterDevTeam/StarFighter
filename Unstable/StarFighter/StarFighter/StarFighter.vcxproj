@@ -99,6 +99,8 @@
     <ClCompile Include="InGameState.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
+    <ClCompile Include="SFPanel.cpp" />
+    <ClCompile Include="SFPanelSpecific.cpp" />
     <ClCompile Include="SFText.cpp" />
     <ClCompile Include="SFTextPop.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -124,6 +126,8 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SFPanel.h" />
+    <ClInclude Include="SFPanelSpecific.h" />
     <ClInclude Include="SFText.h" />
     <ClInclude Include="SFTextPop.h" />
     <ClInclude Include="Ship.h" />

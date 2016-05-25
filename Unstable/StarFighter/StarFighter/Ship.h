@@ -64,6 +64,9 @@ public :
 
 	sf::Clock m_stroboscopic_effect_clock;
 
+	SFPanel* m_SFTargetPanel;
+	SFPanelTypes m_is_asking_SFPanel;
+
 private:
 	bool m_moving;
 	bool m_movingX;

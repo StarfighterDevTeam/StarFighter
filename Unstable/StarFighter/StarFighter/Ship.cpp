@@ -22,6 +22,9 @@ void Ship::Init()
 	{
 		m_actions_states[i] = false;
 	}
+
+	m_SFTargetPanel = NULL;
+	m_is_asking_SFPanel = SFPanel_None;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)

@@ -15,6 +15,7 @@
 
 #include "Glow.h"
 #include "Stroboscopic.h"
+#include "SFPanel.h"
 
 class Ship;
 
@@ -30,6 +31,13 @@ enum Music_Bank
 	NBVAL_MUSIC_BANK,
 };
 
+enum FontsStyle
+{
+	Font_Arial,//0
+	Font_Terminator,//1
+	NBVAL_FontsStyle,//2
+};
+
 using namespace sf;
 
 struct Game
@@ -40,8 +48,11 @@ public:
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);
 	void addToFeedbacks(Text* text);
+	void addToFeedbacks(SFText* text);
+	void addToFeedbacks(SFPanel* panel);
 	void removeFromFeedbacks(RectangleShape* feedback);
 	void removeFromFeedbacks(Text* text);
+	void removeFromFeedbacks(SFPanel* panel);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -67,8 +78,7 @@ public:
 	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
 
 	//Fonts
-	sf::Font* m_font;
-	sf::Font* m_font2;
+	sf::Font* m_font[NBVAL_FontsStyle];
 
 	//SFX
 	int LoadSFX();
@@ -93,15 +103,19 @@ public:
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
+	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 
 	RenderWindow* m_window;
 	std::list<RectangleShape*> m_sceneFeedbackBars;
 	std::list<Text*> m_sceneFeedbackTexts;
+	std::list<SFPanel*> m_sceneFeedbackSFPanels;
+	std::vector<SFText*> m_sceneFeedbackSFTexts;
 	std::vector<GameObject*> m_sceneGameObjects;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
 	std::vector<GameObject*> m_garbage;
+	std::vector<SFText*> m_garbageTexts;
 };
 
 #endif // GAME_H_INCLUDED

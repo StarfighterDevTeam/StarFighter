@@ -8,12 +8,6 @@
 #define SHIP_HEIGHT			64
 #define SHIP_NB_FRAMES		3
 
-#define PORTAL_TEXTURE_NAME		"Assets/2D/World/Portal.png"
-#define PORTAL_WIDTH			192
-#define PORTAL_HEIGHT			192
-#define PORTAL_FRAMES			4
-#define PORTAL_ANIMATIONS		4
-
 #define HUD_CURSOR_TEXTURE_NAME			"Assets/2D/HUD/cursor.png"
 #define HUD_CURSOR_WIDTH				33
 #define HUD_CURSOR_HEIGHT				32

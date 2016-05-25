@@ -33,6 +33,27 @@ void InGameState::Update(sf::Time deltaTime)
 	//move camera
 	UpdateCamera(deltaTime);
 
+	//Create and destroy HUD panels
+	//case 1: destroying a panel
+	if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).m_playerShip->m_SFTargetPanel)
+	{
+		DestroySFPanel((*CurrentGame).m_playerShip);
+	}
+	else if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel != SFPanel_None)
+	{
+		//case 2: creating a panel
+		if (!(*CurrentGame).m_playerShip->m_SFTargetPanel)
+		{
+			CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
+		}
+		//case 3: changing panel
+		else if ((*CurrentGame).m_playerShip->m_SFTargetPanel->m_panel_type != (*CurrentGame).m_playerShip->m_is_asking_SFPanel)
+		{
+			DestroySFPanel((*CurrentGame).m_playerShip);
+			CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
+		}
+	}
+
 	this->mainWindow->clear();
 }
 
@@ -63,4 +84,27 @@ void InGameState::UpdateCamera(sf::Time deltaTime)
 		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, y);
 	if (b >(*CurrentGame).m_map_size.y - y)
 		(*CurrentGame).m_view.setCenter((*CurrentGame).m_view.getCenter().x, (*CurrentGame).m_map_size.y - y);
+}
+
+void InGameState::DestroySFPanel(Ship* playerShip)
+{
+	if (playerShip->m_SFTargetPanel)
+	{
+		(*CurrentGame).removeFromFeedbacks(playerShip->m_SFTargetPanel);
+		delete playerShip->m_SFTargetPanel;
+		playerShip->m_SFTargetPanel = NULL;
+	}
+}
+
+void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
+{
+	switch (panel_type)
+	{
+		case SFPanel_Specific:
+		{
+			playerShip->m_SFTargetPanel = new SFPanelSpecific(sf::Vector2f(SFPANEL_SPECIFIC_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_Specific, playerShip);
+			break;
+		}
+	}
+	(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFTargetPanel);
 }
