@@ -161,6 +161,9 @@
     <ClInclude Include="SFPanelSpecific.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="FileLoadUtils.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc">

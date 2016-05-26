@@ -113,6 +113,7 @@
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Assets.h" />
     <ClInclude Include="CollisionUtils.h" />
+    <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />

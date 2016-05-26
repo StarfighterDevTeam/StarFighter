@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Ship.h"
 #include "SFPanelSpecific.h"
+#include "FileLoadUtils.h"
 
 class GameObject;
 
@@ -23,6 +24,7 @@ public:
 	void UpdateCamera(sf::Time deltaTime);
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
 	static void DestroySFPanel(Ship* playerShip);
+	static void LoadCSVFile(string scenes_file);
 
 private:
 	sf::RenderWindow* mainWindow;

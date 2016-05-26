@@ -18,6 +18,9 @@ void InGameState::Initialize(Player player)
 		Ship::SaveShip(playerShip);
 	}
 
+	//Loading scripts
+	LoadCSVFile(SHIP_CSV_FILE);
+
 	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
 	(*CurrentGame).addToScene(background, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
 
@@ -107,4 +110,18 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 		}
 	}
 	(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFTargetPanel);
+}
+
+void InGameState::LoadCSVFile(string scenes_file)
+{
+	LOGGER_WRITE(Logger::DEBUG, "Loading scripts.");
+
+	vector<vector<string> > allConfigs = *(FileLoaderUtils::FileLoader(scenes_file));
+	size_t allConfigVectorSize = allConfigs.size();
+	for (size_t i = 0; i < allConfigVectorSize; i++)
+	{
+		(*CurrentGame).m_gameObjectsConfig.insert(std::map<string, vector<string> >::value_type(allConfigs[i][0], allConfigs[i]));
+	}
+
+	allConfigs.clear();
 }

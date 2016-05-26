@@ -101,6 +101,9 @@ public:
 	void PlayMusic(Music_Bank music, string specific_filename = "");
 	void ManageMusicTransitions(sf::Time deltaTime);
 
+	//CSV data
+	map<string, vector<string> > m_gameObjectsConfig;
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
