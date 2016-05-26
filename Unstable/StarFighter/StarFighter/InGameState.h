@@ -9,6 +9,7 @@
 #include "Ship.h"
 #include "SFPanelSpecific.h"
 #include "FileLoadUtils.h"
+#include "Starship.h"
 
 class GameObject;
 
