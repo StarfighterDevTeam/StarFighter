@@ -38,7 +38,7 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
-	PortalObject,
+	LocationObject,
 	ShopObject,
 	LootObject,
 	PlayerShip,

@@ -6,11 +6,27 @@ void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
+
+	//Loading scripts
+	LoadCSVFile(ORE_CSV_FILE);
 	
-	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
+	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
+	playerShip->m_visible = false;
 	(*CurrentGame).m_playerShip = playerShip;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 
+	Miner* miner = new Miner(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/Miner1.png", sf::Vector2f(69, 84), sf::Vector2f(34.5, 42), 3);
+	(*CurrentGame).addToScene(miner, PlayerShipLayer, PlayerShip);
+
+	OreField* ore_field = new OreField(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	(*CurrentGame).addToScene(ore_field, PortalLayer, LocationObject);
+	ore_field->m_drill_sucess_rates[OreType_Iron] = 0.30f;
+	ore_field->m_drill_sucess_rates[OreType_Silver] = 0.10f;
+	//ore_field->m_drill_sucess_rates[OreType_Gold] = 0.01f;
+	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
+
+	miner->m_location = ore_field;
+	
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
 	{
@@ -18,11 +34,8 @@ void InGameState::Initialize(Player player)
 		Ship::SaveShip(playerShip);
 	}
 
-	//Loading scripts
-	LoadCSVFile(SHIP_CSV_FILE);
-
-	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
-	(*CurrentGame).addToScene(background, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
+	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = background->m_size;
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
@@ -116,12 +129,5 @@ void InGameState::LoadCSVFile(string scenes_file)
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading scripts.");
 
-	vector<vector<string> > allConfigs = *(FileLoaderUtils::FileLoader(scenes_file));
-	size_t allConfigVectorSize = allConfigs.size();
-	for (size_t i = 0; i < allConfigVectorSize; i++)
-	{
-		(*CurrentGame).m_gameObjectsConfig.insert(std::map<string, vector<string> >::value_type(allConfigs[i][0], allConfigs[i]));
-	}
-
-	allConfigs.clear();
+	(*CurrentGame).m_oreConfig = *(FileLoaderUtils::FileLoader(scenes_file));
 }

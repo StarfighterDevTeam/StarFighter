@@ -59,7 +59,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define SFPANEL_SPECIFIC_HEIGHT					100
 
 //CSV DATA
-#define SHIP_CSV_FILE							"Scripts/Generated/Ship.csv"
+#define ORE_CSV_FILE							"Scripts/Generated/Ore.csv"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
@@ -68,5 +68,6 @@ int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
 float MaxBetweenValues(sf::Vector2f values);
+float MinBetweenValues(sf::Vector2f values);
 
 #endif // GLOBALS_H_INCLUDED

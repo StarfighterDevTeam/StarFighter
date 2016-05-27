@@ -1,0 +1,4 @@
+#ore_name,weight,extraction_time,price
+iron,1,4.f,10
+silver,4,10f.,60
+gold,10,20.f,150

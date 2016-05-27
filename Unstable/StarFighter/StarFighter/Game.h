@@ -102,7 +102,7 @@ public:
 	void ManageMusicTransitions(sf::Time deltaTime);
 
 	//CSV data
-	map<string, vector<string> > m_gameObjectsConfig;
+	vector<vector<string> > m_oreConfig;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

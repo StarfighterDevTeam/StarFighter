@@ -11,11 +11,11 @@ int main()
 	LOGGER_START(Logger::Priority::DEBUG, "");
 
 	//Load Configuration
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Configurations");
+	LOGGER_WRITE(Logger::DEBUG, "Loading Configurations");
 	PREFS = new PrefsManager();
 
 	//Init SFML Window
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing SFML Window");
+	LOGGER_WRITE(Logger::DEBUG, "Initializing SFML Window");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
 
@@ -41,12 +41,12 @@ int main()
 	sf::Clock deltaClock;
 
 	//Initializing player
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initializing player");
+	LOGGER_WRITE(Logger::DEBUG, "Initializing player");
 	Player player;
 	player.Init(&renderWindow);
 
 	//Loading InGame state
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Starting game");
+	LOGGER_WRITE(Logger::DEBUG, "Starting game");
 	GameManager gameManager;
 	InGameState inGameState;
 	gameManager.PushState(inGameState, player);
@@ -62,7 +62,7 @@ int main()
 	};
 	bool fullscreen = false;
 	WindowResolutions resolution = RESOLUTION_1600x900;
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Initialization complete. Starting main loop...");
+	LOGGER_WRITE(Logger::DEBUG, "Initialization complete. Starting main loop...");
 
 	//Main loop
 	while (renderWindow.isOpen())
