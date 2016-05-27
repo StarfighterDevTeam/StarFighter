@@ -7,9 +7,9 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 	
-	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "Assets/2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
+	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
 	(*CurrentGame).m_playerShip = playerShip;
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
+	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
@@ -21,8 +21,8 @@ void InGameState::Initialize(Player player)
 	//Loading scripts
 	LoadCSVFile(SHIP_CSV_FILE);
 
-	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "Assets/2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
-	(*CurrentGame).addToScene(background, LayerType::BackgroundLayer, GameObjectType::BackgroundObject);
+	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = background->m_size;
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());

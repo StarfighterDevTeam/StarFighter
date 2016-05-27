@@ -37,11 +37,11 @@ SFPanelSpecific::SFPanelSpecific(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	//positioning of panel's content
 	float text_height = 0;
 	text_height += m_title_text.getGlobalBounds().height / 2;
-	m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+	m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
 
 	//options texts
 	text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height;
-	m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 }
 
 SFPanelSpecific::~SFPanelSpecific()

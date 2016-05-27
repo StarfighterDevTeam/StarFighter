@@ -89,9 +89,6 @@
     <ClInclude Include="Animation.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Assets.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="AnimatedSprite.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>

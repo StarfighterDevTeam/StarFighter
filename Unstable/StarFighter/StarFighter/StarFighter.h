@@ -8,7 +8,6 @@
 #include "Globals.h"
 #include "PrefsManager.h"
 #include "TextureLoader.h"
-#include "Assets.h"
 #include "GameObject.h"
 #include "Game.h"
 #include "Logger.h"

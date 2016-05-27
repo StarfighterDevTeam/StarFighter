@@ -50,7 +50,7 @@ void Game::init(RenderWindow* window)
 	m_SFX_Activated = true;
 
 	//Music
-	LOGGER_WRITE(Logger::Priority::DEBUG, "Loading Musics");
+	LOGGER_WRITE(Logger::DEBUG, "Loading Musics");
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;

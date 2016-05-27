@@ -29,6 +29,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
+#define ICON_SHIP_PNG							"Icons/ShipModel_icon.png"
+
 #define	GHOST_ALPHA_VALUE						120
 
 #define JOYSTICK_MIN_AXIS_VALUE					25
@@ -55,6 +57,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define INTERACTION_BUTTON_HEIGHT				16
 #define INTERACTION_BUTTON_MARGIN				4
 #define INTERACTION_INTERBLOCK					20
+#define INTERACTION_MARGIN_SIDES				12
 #define SFPANEL_SPECIFIC_WIDTH					200
 #define SFPANEL_SPECIFIC_HEIGHT					100
 
@@ -68,5 +71,6 @@ int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
 float MaxBetweenValues(sf::Vector2f values);
+float MinBetweenValues(sf::Vector2f values);
 
 #endif // GLOBALS_H_INCLUDED

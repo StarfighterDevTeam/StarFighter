@@ -5,9 +5,10 @@
 #include <string>
 #include <map>
 #include <tuple>
-#include "Assets.h"
 #include "TextUtils.h"
 #include "Logger.h"
+
+std::string makePath(const std::string& srcPath);
 
 //NB: this is a singleton
 class TextureLoader
@@ -36,14 +37,14 @@ public:
 
 		//Not found, load the texture
 		sf::Texture* texture = new sf::Texture;
-		if (!(*texture).loadFromFile(filename, sf::IntRect(0, 0, sizeX, sizeY)))
+		if (!(*texture).loadFromFile(makePath(filename), sf::IntRect(0, 0, sizeX, sizeY)))
 		{
 			throw invalid_argument(TextUtils::format("TextureLoad error: Unable to load texture from file '%s'", (char*)filename.c_str()));
 		}
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
 		return texture;
 	}
 
@@ -80,7 +81,7 @@ public:
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		LOGGER_WRITE(Logger::Priority::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
 		return texture;
 	}
 
