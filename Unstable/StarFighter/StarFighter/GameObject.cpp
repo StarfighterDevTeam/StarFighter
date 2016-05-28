@@ -295,6 +295,11 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 	return GetDistanceBetweenPositions(object1->getPosition(), object2->getPosition());
 }
 
+size_t GameObject::GetLightYearsBetweenObjects(GameObject* object1, GameObject* object2)
+{
+	return (size_t)(GetDistanceBetweenObjects(object1, object2) / LIGHTYEAR_IN_PIXELS);
+}
+
 float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);

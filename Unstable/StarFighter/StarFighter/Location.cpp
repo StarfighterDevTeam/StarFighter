@@ -8,6 +8,9 @@ using namespace sf;
 Location::Location(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_type = LocationType_None;
+
+	m_stock = 0;
+	m_stock_max = 100;
 }
 
 Location::~Location()
@@ -31,6 +34,7 @@ OreField::OreField(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	}
 
 	m_min_ore_weight = 0;
+	m_drill_slots = 10;
 }
 
 OreField::~OreField()
@@ -58,4 +62,20 @@ size_t OreField::GetLightestOreWeight()
 	}
 
 	return min < 0 ? 0 : (size_t)min;
+}
+
+//PLANET
+Planet::Planet(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Location(position, speed, textureName, size, origin, frameNumber, animationNumber)
+{
+	m_type = LocationType_Planet;
+}
+
+Planet::~Planet()
+{
+
+}
+
+void Planet::update(sf::Time deltaTime)
+{
+	Location::update(deltaTime);
 }

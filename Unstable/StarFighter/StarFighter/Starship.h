@@ -4,6 +4,18 @@
 #include "Location.h"
 #include "Ore.h"
 
+enum StarshipState
+{
+	StarshipState_Idle,
+	StarshipState_MovingToLocation,
+	StarshipState_Searching,
+	StarshipState_Drilling,
+	StarshipState_Extracting,
+	StarshipState_Loading,
+	StarshipState_CarryToBase,
+	StarshipState_Unloading,
+};
+
 class Starship : public GameObject
 {
 public :
@@ -12,6 +24,15 @@ public :
 	virtual ~Starship();
 	void update(sf::Time deltaTime) override;
 
+	bool AssignToLocation(Location* location);
+	bool ManageFuel();
+	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
+	virtual void SetStarshipState(StarshipState state);
+
+	Location* m_location;
+	StarshipState m_state;
+	size_t m_assigned_fuel;
+	bool m_arrived_at_distination;
 	string m_display_name;
 
 	int m_scout_range;
@@ -20,32 +41,20 @@ public :
 
 	int m_armor;
 
-	float m_fuel_max;
-	float m_fuel;
+	size_t m_fuel_max;
+	size_t m_fuel;
 	float m_speed_max;
 
 	int m_stock_max;
 	int m_stock;
 
 	size_t m_nb_drills;
-	size_t m_current_drill_attempts;
+	size_t m_remaining_drills;
 
 	sf::Clock m_drill_clock;
 	float m_drill_duration;
 
 	sf::Clock m_extraction_clock;
-
-	Location* m_location;
-};
-
-enum MiningState
-{
-	Mining_MovingToLocation,
-	Mining_Searching,
-	Mining_Drilling,
-	Mining_Extracting,
-	Mining_Loading,
-	Mining_CarryToBase,
 };
 
 class Miner : public Starship
@@ -60,10 +69,10 @@ public:
 	void Extract(Ore* ore);
 	Ore* GetRandomOre(OreField* ore_field);
 	void LoadOre(Ore* ore);
-	void SetMiningState(MiningState state);
+	void SetStarshipState(StarshipState state) override;
 	bool IsNewDrillAttemptAvailable();
+	size_t UnloadCarriage();
 
-	MiningState m_mining_state;
 	float m_drill_sucess_rate_bonus;
 	float m_extraction_duration_bonus;
 	Ore* m_ore_found;

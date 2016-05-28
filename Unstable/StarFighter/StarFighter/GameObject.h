@@ -20,7 +20,7 @@ class Loot;
 
 enum LayerType {
 	BackgroundLayer,
-	PortalLayer,
+	LocationLayer,
 	PlayerStroboscopicLayer,
 	ExplosionLayer,
 	EnemyObjectLayer,
@@ -84,6 +84,9 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+
+	//StarMiner specific
+	static size_t GetLightYearsBetweenObjects(GameObject* object1, GameObject* object2);
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

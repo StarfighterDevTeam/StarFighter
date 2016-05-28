@@ -2,6 +2,8 @@
 
 extern Game* CurrentGame;
 
+#define MAP_SIZE			4000
+
 void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
@@ -10,22 +12,26 @@ void InGameState::Initialize(Player player)
 	//Loading scripts
 	LoadCSVFile(ORE_CSV_FILE);
 	
-	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
+	Ship* playerShip = new Ship(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
 	playerShip->m_visible = false;
 	(*CurrentGame).m_playerShip = playerShip;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 
-	Miner* miner = new Miner(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/Miner1.png", sf::Vector2f(69, 84), sf::Vector2f(34.5, 42), 3);
+	Miner* miner = new Miner(sf::Vector2f(MAP_SIZE / 2 + 200, MAP_SIZE/2 - 300), sf::Vector2f(0, 0), "2D/Miner1.png", sf::Vector2f(69, 84), sf::Vector2f(34.5, 42), 3);
 	(*CurrentGame).addToScene(miner, PlayerShipLayer, PlayerShip);
 
-	OreField* ore_field = new OreField(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
-	(*CurrentGame).addToScene(ore_field, PortalLayer, LocationObject);
-	ore_field->m_drill_sucess_rates[OreType_Iron] = 0.30f;
-	ore_field->m_drill_sucess_rates[OreType_Silver] = 0.10f;
+	Planet* planet = new Planet(sf::Vector2f(MAP_SIZE / 2 - 500, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
+
+	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
+	ore_field->m_drill_sucess_rates[OreType_Iron] = 0.10f;
+	ore_field->m_drill_sucess_rates[OreType_Silver] = 0.80f;
 	//ore_field->m_drill_sucess_rates[OreType_Gold] = 0.01f;
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 
-	miner->m_location = ore_field;
+	//miner->m_location = ore_field;
+	miner->AssignToLocation(ore_field);
 	
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
@@ -37,7 +43,7 @@ void InGameState::Initialize(Player player)
 	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
-	(*CurrentGame).m_map_size = background->m_size;
+	(*CurrentGame).m_map_size = sf::Vector2f(MAP_SIZE, MAP_SIZE);
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 }
