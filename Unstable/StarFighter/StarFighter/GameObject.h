@@ -21,6 +21,7 @@ class Loot;
 enum LayerType {
 	BackgroundLayer,
 	LocationLayer,
+	StarshipLayer,
 	PlayerStroboscopicLayer,
 	ExplosionLayer,
 	EnemyObjectLayer,
@@ -40,7 +41,7 @@ enum GameObjectType {
 	BackgroundObject,
 	LocationObject,
 	ShopObject,
-	LootObject,
+	StarshipObject,
 	PlayerShip,
 	FakePlayerShip,
 	FriendlyFire,
@@ -87,6 +88,10 @@ public:
 
 	//StarMiner specific
 	static size_t GetLightYearsBetweenObjects(GameObject* object1, GameObject* object2);
+	virtual void HoverObject(GameObject* object);
+
+	bool m_hovered;
+	bool m_selected;
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

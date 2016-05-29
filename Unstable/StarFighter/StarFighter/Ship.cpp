@@ -24,6 +24,8 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+	m_hovered_object = NULL;
+	m_selected_object = NULL;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -63,7 +65,7 @@ void Ship::update(sf::Time deltaTime)
 	UpdateInputStates();
 	if (m_inputs_states[Action_Firing] == Input_Tap)
 	{
-		//do some action
+		SelectObject(m_hovered_object);
 	}
 
 	MaxSpeedConstraints();
@@ -277,5 +279,35 @@ bool Ship::LoadShip(Ship* ship)
 	{
 		cerr << "DEBUG: No save file found. A new file is going to be created.\n" << endl;
 		return false;
+	}
+}
+
+void Ship::HoverObject(GameObject* object)
+{
+	if (object != m_hovered_object && m_hovered_object)
+	{
+		m_hovered_object->m_hovered = false;
+	}
+
+	m_hovered_object = object;
+
+	if (object)
+	{
+		object->m_hovered = true;
+	}
+}
+
+void Ship::SelectObject(GameObject* object)
+{
+	if (object != m_selected_object && m_selected_object)
+	{
+		m_selected_object->m_selected = false;
+	}
+
+	m_selected_object = object;
+
+	if (object)
+	{
+		object->m_selected = true;
 	}
 }

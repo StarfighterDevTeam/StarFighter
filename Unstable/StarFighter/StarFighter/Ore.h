@@ -15,6 +15,7 @@ enum OreData
 	OreData_Extraction,
 	OreData_Price,
 	OreData_Propulsion,
+	OreData_PropulsionSpeedBonus,
 };
 
 class Ore : public GameObject
@@ -31,6 +32,7 @@ public :
 	size_t m_price;
 	size_t m_propulsion;
 	float m_extraction_duration;
+	float m_propulsion_speed_bonus;
 };
 
 #endif // ORE_H_INCLUDED

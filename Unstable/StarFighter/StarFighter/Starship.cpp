@@ -22,6 +22,7 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_assigned_propulsion = 0;
 	m_arrived_at_distination = false;
 	m_propulsion = 0;
+	m_propulsion_speed_bonus = 0;
 
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i) 
 	{
@@ -234,6 +235,8 @@ size_t Starship::ConsummePropulsion(size_t distance)
 		}
 	}
 
+	m_propulsion_speed_bonus = stof((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_PropulsionSpeedBonus]);
+
 	return propulsion_consummed;
 }
 
@@ -262,7 +265,7 @@ bool Starship::AssignToLocation(Location* location)
 	//Move to location
 	m_speed.x = location->getPosition().x - this->getPosition().x;
 	m_speed.y = location->getPosition().y - this->getPosition().y;
-	NormalizeSpeed(&m_speed, m_speed_max);
+	NormalizeSpeed(&m_speed, m_speed_max * (1+m_propulsion_speed_bonus));
 
 	m_propulsion -= AssignPropulsionToTravel(propulsion_required);
 	m_arrived_at_distination = false;

@@ -11,7 +11,7 @@
 #define SHIP_START_Y                540
 #define SHIP_ACCELERATION	        2000.0f
 #define SHIP_DECCELERATION_COEF		5000.0f
-#define SHIP_MAX_SPEED				400.0f
+#define SHIP_MAX_SPEED				600.0f
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
@@ -66,6 +66,12 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	GameObject* m_hovered_object;
+	GameObject* m_selected_object;
+
+	void HoverObject(GameObject* object) override;
+	void SelectObject(GameObject* object);
 
 private:
 	bool m_moving;

@@ -52,6 +52,7 @@ public :
 	map<string, size_t> m_fuel_tanks;
 	map<string, size_t> m_fuel_assigned;
 	float m_speed_max;
+	float m_propulsion_speed_bonus;
 
 	int m_stock_max;
 	int m_stock;

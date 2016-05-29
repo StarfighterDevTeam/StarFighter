@@ -314,22 +314,54 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
-		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		bool is_colliding = false;
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[StarshipObject].begin(); it2 != m_sceneGameObjectsTyped[StarshipObject].end(); it2++)
 		{
+			if (is_colliding)
+			{
+				break;
+			}
+
 			if (*it2 == NULL)
 				continue;
 			
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				
+				is_colliding = true;
+				(*it1)->HoverObject(*it2);
+				break;
 			}
+		}
+
+		
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LocationObject].begin(); it2 != m_sceneGameObjectsTyped[LocationObject].end(); it2++)
+		{
+			if (is_colliding)
+			{
+				break;
+			}
+
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				is_colliding = true;
+				(*it1)->HoverObject(*it2);
+			}
+		}
+
+		(*it1)->setAnimationLine(is_colliding);
+		if (!is_colliding)
+		{
+			(*it1)->HoverObject(NULL);
 		}
 	}
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
