@@ -114,6 +114,16 @@ float MinBetweenValues(sf::Vector2f values)
 	return min;
 }
 
+size_t MinBetweenSizeTValues(size_t value1, size_t value2)
+{
+	float min = value1;
+	if (value2 < min)
+	{
+		min = value2;
+	}
+	return min;
+}
+
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
 {
 	size_t start_pos = 0;

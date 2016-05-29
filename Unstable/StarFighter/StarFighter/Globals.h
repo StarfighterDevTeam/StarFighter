@@ -73,5 +73,6 @@ int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
 float MaxBetweenValues(sf::Vector2f values);
 float MinBetweenValues(sf::Vector2f values);
+size_t MinBetweenSizeTValues(size_t value1, size_t value2);
 
 #endif // GLOBALS_H_INCLUDED

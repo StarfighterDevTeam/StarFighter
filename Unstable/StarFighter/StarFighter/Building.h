@@ -9,7 +9,8 @@ enum BuildingData
 	BuildingData_TextureName,
 	BuildingData_Slots,
 	BuildingData_Stock,
-	BuildingData_OreExploited,
+	BuildingData_CanExtractOre,
+	BuildingData_ExtractionDurationBonus,
 };
 
 class Building : public GameObject
@@ -22,11 +23,16 @@ public :
 
 	static Building* CreateBuilding(string name);
 
+	bool Extract(Ore* ore);
+
 	string m_display_name;
-	string m_ore_exploitable;
 	size_t m_stock;
 	size_t m_stock_max;
 	size_t m_slots;
+	bool m_can_extract_ore;
+	sf::Clock m_extraction_clock;
+	float m_extraction_duration_bonus;
+	Ore* m_current_extraction;
 };
 
 #endif // BUILDING_H_INCLUDED

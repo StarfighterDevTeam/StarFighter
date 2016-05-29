@@ -25,13 +25,18 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	bool AssignToLocation(Location* location);
-	bool ManageFuel();
+	size_t LoadFuel(string ore_name, size_t quantity);
+	bool LoadRequiredPropulsion(Location* location, size_t propulsion_missing);
+	size_t AssignPropulsionToTravel(size_t distance);
+	size_t ConsummePropulsion(size_t distance);
+	bool ManagePropulsion();
 	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
 	virtual void SetStarshipState(StarshipState state);
+	string GetBestPropulsionAvailable();
 
 	Location* m_location;
 	StarshipState m_state;
-	size_t m_assigned_fuel;
+	size_t m_assigned_propulsion;
 	bool m_arrived_at_distination;
 	string m_display_name;
 
@@ -40,9 +45,12 @@ public :
 	//Weapon* m_weapon;
 
 	int m_armor;
-
-	size_t m_fuel_max;
 	size_t m_fuel;
+	size_t m_fuel_max;
+	size_t m_propulsion;
+	string m_current_fuel_type;
+	map<string, size_t> m_fuel_tanks;
+	map<string, size_t> m_fuel_assigned;
 	float m_speed_max;
 
 	int m_stock_max;
@@ -71,13 +79,13 @@ public:
 	void LoadOre(Ore* ore);
 	void SetStarshipState(StarshipState state) override;
 	bool IsNewDrillAttemptAvailable();
-	size_t UnloadCarriage();
+	void UnloadCarriage(Location* location);
 
 	float m_drill_sucess_rate_bonus;
 	float m_extraction_duration_bonus;
 	Ore* m_ore_found;
 
-	vector<Ore*> m_ores_carried;
+	map<string, size_t> m_ores_carried;
 };
 
 #endif // STARSHIP_H_INCLUDED

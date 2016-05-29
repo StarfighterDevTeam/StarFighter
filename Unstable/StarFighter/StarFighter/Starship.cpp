@@ -11,16 +11,26 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 
 	m_scout_range = 0;
 	m_armor = 1;
+	m_fuel = 0;
 	m_fuel_max = 100;
-	m_fuel = 100;
 	m_speed_max = 100;
 	m_stock_max = 0;
 	m_stock = 0;
 	m_nb_drills = 0;
 	m_drill_duration = 1.f;
 	m_location= NULL;
-	m_assigned_fuel = 0;
+	m_assigned_propulsion = 0;
 	m_arrived_at_distination = false;
+	m_propulsion = 0;
+
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i) 
+	{
+		if ((size_t)stoi(i->second[OreData_Propulsion]) > 0)
+		{
+			m_fuel_tanks.insert(map<string, size_t>::value_type(i->first, 0));
+			m_fuel_assigned.insert(map<string, size_t>::value_type(i->first, 0));
+		}
+	}
 }
 
 Starship::~Starship()
@@ -34,7 +44,7 @@ void Starship::update(sf::Time deltaTime)
 	{
 		case StarshipState_MovingToLocation:
 		{
-			ManageFuel();
+			ManagePropulsion();
 			CheckIfArrivedAtDestination(deltaTime);
 			
 			break;
@@ -62,6 +72,171 @@ void Starship::SetStarshipState(StarshipState state)
 	}
 }
 
+string Starship::GetBestPropulsionAvailable()
+{
+	size_t propulsion = 0;
+	string selected_fuel;
+	for (map<string, size_t>::iterator i = m_fuel_tanks.begin(); i != m_fuel_tanks.end(); ++i)
+	{
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		{
+			selected_fuel = i->first;
+			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		}
+	}
+
+	return selected_fuel;
+}
+
+size_t Starship::LoadFuel(string ore_name, size_t quantity)
+{
+	if (ore_name.empty())
+	{
+		return 0;
+	}
+
+	size_t quantity_accepted = (m_fuel_max - m_fuel) / (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
+	size_t quantity_loaded = MinBetweenSizeTValues(quantity_accepted, quantity);
+	m_fuel_tanks[ore_name] += quantity_loaded;
+	m_fuel += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
+	m_propulsion += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Propulsion]);
+
+	printf("Fuel loading: stock (%d/%d), %s quantity loaded / %d: %d (new propulsion: %d).\n", m_fuel, m_fuel_max, ore_name.c_str(), quantity_loaded, quantity, m_propulsion);
+
+	return quantity_loaded;
+}
+
+bool Starship::LoadRequiredPropulsion(Location* location, size_t propulsion_missing)
+{
+	if (!location || !m_arrived_at_distination)
+	{
+		return false;
+	}
+
+	string fuel_type_selected = location->GetBestPropulsionAvailable();
+	if (fuel_type_selected.empty())
+	{
+		return false;
+	}
+
+	size_t propulsion_required = propulsion_missing;
+	map<string, size_t> virtual_storage = location->m_ores_stored;
+	map<string, size_t> assigned_storage;
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
+	{
+		assigned_storage[i->first] = 0;
+	}
+
+	while (!fuel_type_selected.empty() && propulsion_required > 0)
+	{
+		size_t quantity_assigned = MinBetweenSizeTValues(virtual_storage[fuel_type_selected], propulsion_required / (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]));
+		virtual_storage[fuel_type_selected] -= quantity_assigned;
+		assigned_storage[fuel_type_selected] += quantity_assigned;
+		propulsion_required -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+
+		//resolving round up cases (some fuel will be wasted)
+		if (propulsion_required > 0 && propulsion_required < (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]) && virtual_storage[fuel_type_selected] > 0)
+		{
+			virtual_storage[fuel_type_selected]--;
+			assigned_storage[fuel_type_selected]++;
+			propulsion_required = 0;
+		}
+
+		if (propulsion_required > 0)
+		{
+			if (fuel_type_selected == GetBestPropulsionAvailable())
+			{
+				break;
+			}
+			else
+			{
+				fuel_type_selected = GetBestPropulsionAvailable();
+			}
+		}
+	}
+
+	//found enough propulsion?
+	if (propulsion_required == 0)
+	{
+		for (map<string, size_t>::iterator i = assigned_storage.begin(); i != assigned_storage.end(); ++i)
+		{
+			m_fuel_tanks[i->first] += i->second;
+			location->m_ores_stored[i->first] -= i->second;
+			location->m_stock -= i->second * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
+		}
+
+		printf("Got %d of the propulsion required from planet's fuel.\n", propulsion_missing);
+		m_propulsion += propulsion_missing;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+size_t Starship::AssignPropulsionToTravel(size_t distance)
+{
+	size_t propulsion_assigned = 0;
+	size_t distance_remaining = distance;
+
+	string fuel_type_selected = GetBestPropulsionAvailable();
+	while (!fuel_type_selected.empty() && distance_remaining > 0)
+	{
+		size_t quantity_assigned = MinBetweenSizeTValues(m_fuel_tanks[fuel_type_selected], distance_remaining / (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]));
+		m_fuel_tanks[fuel_type_selected] -= quantity_assigned;
+		m_fuel_assigned[fuel_type_selected] += quantity_assigned;
+		propulsion_assigned += quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+		distance_remaining -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+
+		//resolving round up cases (some fuel will be wasted)
+		if (distance_remaining > 0 && distance_remaining < (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]) && m_fuel_tanks[fuel_type_selected] > 0)
+		{
+			m_fuel_tanks[fuel_type_selected]--;
+			m_fuel_assigned[fuel_type_selected]++;
+			propulsion_assigned += (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+			distance_remaining = 0;
+		}
+
+		if (distance_remaining > 0)
+		{
+			fuel_type_selected = GetBestPropulsionAvailable();
+		}
+	}
+
+	return propulsion_assigned;
+}
+
+size_t Starship::ConsummePropulsion(size_t distance)
+{
+	size_t propulsion_consummed = 0;
+	size_t distance_remaining = distance;
+
+	string fuel_type_selected = GetBestPropulsionAvailable();
+	while (!fuel_type_selected.empty() && distance_remaining > 0)
+	{
+		size_t quantity_assigned = MinBetweenSizeTValues(m_fuel_assigned[fuel_type_selected], distance_remaining / (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]));
+		m_fuel_assigned[fuel_type_selected] -= quantity_assigned;
+		m_fuel -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
+		propulsion_consummed += quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+		distance_remaining -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+
+		//resolving round up cases (no waste)
+		if (distance_remaining > 0 && distance_remaining < (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]) && m_fuel_assigned[fuel_type_selected] > 0)
+		{
+			return propulsion_consummed;
+		}
+
+		if (distance_remaining > 0)
+		{
+			fuel_type_selected = GetBestPropulsionAvailable();
+		}
+	}
+
+	return propulsion_consummed;
+}
+
 bool Starship::AssignToLocation(Location* location)
 {
 	if (!location)
@@ -75,21 +250,21 @@ bool Starship::AssignToLocation(Location* location)
 	}
 
 	size_t distance = GetLightYearsBetweenObjects(this, location);
-	if (m_fuel < distance)
+	size_t propulsion_required = location->CanSupplyFuel() ? distance : 2*distance;//prepare for a back and forth if destination cannot supply fuel
+	if (m_propulsion < propulsion_required && !LoadRequiredPropulsion(m_location, propulsion_required - m_propulsion))
 	{
-		//printf("Location too far: distance is %d, fuel remaining is %d.\n", distance, m_fuel);
-		//SetStarshipState(StarshipState_Idle);
+		printf("Trying to assign to location too far: distance is %d, propulsion remaining is %d (%d missing).\n", distance, m_propulsion, propulsion_required - m_propulsion);
 		return false;
 	}
 
-	printf("Assigning to location %s (distance: %d, current fuel: %d).\n", location->m_display_name.c_str(), distance, m_fuel);
+	printf("Assigning to location %s (distance: %d, current propulsion: %d).\n", location->m_display_name.c_str(), propulsion_required, m_propulsion);
 
 	//Move to location
 	m_speed.x = location->getPosition().x - this->getPosition().x;
 	m_speed.y = location->getPosition().y - this->getPosition().y;
 	NormalizeSpeed(&m_speed, m_speed_max);
 
-	m_assigned_fuel = distance;
+	m_propulsion -= AssignPropulsionToTravel(propulsion_required);
 	m_arrived_at_distination = false;
 	m_location = location;
 	SetStarshipState(StarshipState_MovingToLocation);
@@ -97,7 +272,7 @@ bool Starship::AssignToLocation(Location* location)
 	return true;
 }
 
-bool Starship::ManageFuel()
+bool Starship::ManagePropulsion()
 {
 	if (!m_location || m_arrived_at_distination)
 	{
@@ -105,11 +280,24 @@ bool Starship::ManageFuel()
 	}
 
 	size_t distance_remaining = GetLightYearsBetweenObjects(this, m_location);
-	if (distance_remaining < m_assigned_fuel)
+	if (distance_remaining < m_assigned_propulsion)
 	{
-		m_fuel -= (m_assigned_fuel - distance_remaining);
-		m_assigned_fuel = distance_remaining;
-		
+		size_t propulsion_to_consumme = m_assigned_propulsion - distance_remaining;
+		ConsummePropulsion(propulsion_to_consumme);
+		m_assigned_propulsion -= propulsion_to_consumme;
+
+		//finish by a waste?
+		if (distance_remaining == 0)
+		{
+			for (map<string, size_t>::iterator i = m_fuel_assigned.begin(); i != m_fuel_assigned.end(); ++i)
+			{
+				size_t fuel_remaining = i->second * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+				i->second = 0;
+				m_fuel -= fuel_remaining;
+			}
+
+			m_assigned_propulsion = 0;
+		}
 	}
 
 	return true;
@@ -139,7 +327,6 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 Miner::Miner(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Starship(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	m_fuel_max = 100;
-	m_fuel = 240;
 	m_speed_max = 150;
 	m_stock_max = 100;
 	m_nb_drills = 2;
@@ -149,6 +336,11 @@ Miner::Miner(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_extraction_duration_bonus = 0.5f;
 
 	m_ore_found = NULL;
+
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
+	{
+		m_ores_carried[i->first] = 0;
+	}
 }
 
 Miner::~Miner()
@@ -212,9 +404,8 @@ void Miner::update(sf::Time deltaTime)
 		}
 		case StarshipState_Unloading:
 		{
-			size_t carriage_unloaded = UnloadCarriage();
-			printf("%d weight of ore (Planet: %d/%d).\n\n", carriage_unloaded, m_location->m_stock, m_location->m_stock_max);
-
+			UnloadCarriage(m_location);
+			
 			GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
 			Location* tmp_location = (Location*)tmp_obj;
 
@@ -283,7 +474,7 @@ void Miner::LoadOre(Ore* ore)
 		return;
 	}
 
-	m_ores_carried.push_back(ore);
+	m_ores_carried[ore->m_display_name]++;
 	m_stock += ore->m_weight;
 	printf("Ore loading successfull.\n\n");
 }
@@ -340,7 +531,6 @@ void Miner::SetStarshipState(StarshipState state)
 		}
 		case StarshipState_Unloading:
 		{
-			printf("Unloading carriage: ");
 			break;
 		}
 		default:
@@ -374,59 +564,28 @@ bool Miner::IsNewDrillAttemptAvailable()
 	}
 }
 
-size_t Miner::UnloadCarriage()
+void Miner::UnloadCarriage(Location* location)
 {
-	if (!m_location)
+	if (!location || location != m_location || !m_arrived_at_distination)
 	{
-		return 0;
+		return;
 	}
 
 	m_current_drill_attempts = 0;
 
-	size_t stock_unloaded = 0;
-	size_t CarriageVectorSize = m_ores_carried.size();
-	for (size_t i = 0; i < CarriageVectorSize; i++)
+	for (map<string, size_t>::iterator i = m_ores_carried.begin(); i != m_ores_carried.end(); i++)
 	{
-		if (m_location->m_stock + m_ores_carried[i]->m_weight <= m_stock_max)
+		if (i->second > 0)
 		{
-			m_location->m_ores_stored.push_back(m_ores_carried[i]);
-			m_stock -= m_ores_carried[i]->m_weight;
-			m_location->m_stock += m_ores_carried[i]->m_weight;
+			size_t quantity_accepted = (m_location->m_stock_max - m_location->m_stock) / (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+			size_t quantity_unloaded = MinBetweenSizeTValues(quantity_accepted, i->second);
+			m_location->m_ores_stored[i->first] += quantity_unloaded;
+			m_location->m_stock += quantity_unloaded * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+			m_ores_carried[i->first] -= quantity_unloaded;
 
-			stock_unloaded += m_ores_carried[i]->m_weight;
-		}
-
-		if (m_location->m_stock == m_stock_max && i != CarriageVectorSize - 1)
-		{
-			//todo can be improved by checking min weight among carriage
-			break;
-		}
-		
-	}
-
-	vector<Ore*> remaining_ores_carried;
-	size_t StorageVectorSize = m_location->m_ores_stored.size();
-
-	for (size_t i = 0; i < CarriageVectorSize; i++)
-	{
-		bool found = false;
-		for (size_t j = 0; j < StorageVectorSize; j++)
-		{
-			if (m_ores_carried[i] == m_location->m_ores_stored[j])
-			{
-				found = true;
-				break;
-			}
-		}
-
-		if (!found)
-		{
-			remaining_ores_carried.push_back(m_ores_carried[i]);
+			printf("\n%s unloaded on planet: quantity %d, total weight of %d (Planet new stock: %d/%d).\n", i->first.c_str(), quantity_unloaded, quantity_unloaded*(size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]), m_location->m_stock, m_location->m_stock_max);
 		}
 	}
 
-	m_ores_carried = remaining_ores_carried;
-	remaining_ores_carried.clear();
-
-	return stock_unloaded;
+	
 }

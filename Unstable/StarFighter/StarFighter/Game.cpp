@@ -54,7 +54,7 @@ void Game::init(RenderWindow* window)
 	m_Music_Activated = true;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
-	PlayMusic(Music_Main);
+	//PlayMusic(Music_Main);
 }
 
 void Game::SetSFXVolume(bool activate_sfx)

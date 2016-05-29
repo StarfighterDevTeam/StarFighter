@@ -19,12 +19,15 @@ public :
 	virtual ~Location();
 	void update(sf::Time deltaTime) override;
 
+	string GetBestPropulsionAvailable();
+	virtual bool CanSupplyFuel();
+
 	string m_display_name;
 	LocationType m_type;
 
 	size_t m_stock;
 	size_t m_stock_max;
-	vector<Ore*> m_ores_stored;
+	map<string, size_t> m_ores_stored;
 	bool m_fuel_refill;
 };
 
@@ -38,6 +41,11 @@ public:
 
 	bool Build(string name);
 	size_t GetNbSlotsTaken();
+
+	Ore* GetRandomOre();
+	void Harvest();
+	bool Stock(Ore* ore);
+	virtual bool CanSupplyFuel();
 
 	map<string, float> m_drill_sucess_rates;
 	size_t m_building_slots;

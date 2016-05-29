@@ -10,10 +10,11 @@
 enum OreData
 {
 	OreData_Name,
+	OreData_TextureName,
 	OreData_Weight,
 	OreData_Extraction,
 	OreData_Price,
-	OreData_TextureName,
+	OreData_Propulsion,
 };
 
 class Ore : public GameObject
@@ -28,6 +29,7 @@ public :
 	string m_display_name;
 	size_t m_weight;
 	size_t m_price;
+	size_t m_propulsion;
 	float m_extraction_duration;
 };
 

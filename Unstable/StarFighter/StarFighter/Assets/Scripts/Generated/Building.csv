@@ -1,2 +1,2 @@
-#building_name,texture_name,slots,stock_max,ore_exploited
-refinery,2D/Refinery1.png,1,10,oil
+#building_name,texture_name,slots,stock_max,can_extract_ore,extraction_duration_bonus
+refinery,2D/Refinery1.png,1,10,1,0.f

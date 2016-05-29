@@ -17,22 +17,23 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_playerShip = playerShip;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, LayerType::PlayerShipLayer, GameObjectType::PlayerShip);
 
-	Miner* miner = new Miner(sf::Vector2f(MAP_SIZE / 2 + 200, MAP_SIZE/2 - 300), sf::Vector2f(0, 0), "2D/Miner1.png", sf::Vector2f(69, 84), sf::Vector2f(34.5, 42), 3);
+	Miner* miner = new Miner(sf::Vector2f(MAP_SIZE / 2 - 700, MAP_SIZE/2 - 300), sf::Vector2f(0, 0), "2D/Miner1.png", sf::Vector2f(69, 84), sf::Vector2f(34.5, 42), 3);
 	(*CurrentGame).addToScene(miner, PlayerShipLayer, PlayerShip);
+	miner->m_fuel_tanks["oil"] = miner->m_fuel_max;
+	miner->LoadFuel("oil", 150);
 
 	Planet* planet = new Planet(sf::Vector2f(MAP_SIZE / 2 - 500, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
-	planet->m_drill_sucess_rates.insert(map<string, float>::value_type("oil", 1.0f));
+	planet->m_drill_sucess_rates["oil"] = 1.0f;
 	planet->Build("refinery");
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
-	ore_field->m_drill_sucess_rates.insert(map<string, float>::value_type("iron", 0.90f));
-	ore_field->m_drill_sucess_rates.insert(map<string, float>::value_type("silver", 0.10f));
+	ore_field->m_drill_sucess_rates["iron"] = 0.90f;
+	ore_field->m_drill_sucess_rates["silver"] = 0.10f;
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 
-	//miner->m_location = ore_field;
-	miner->AssignToLocation(ore_field);
+	miner->AssignToLocation(planet);
 	
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))

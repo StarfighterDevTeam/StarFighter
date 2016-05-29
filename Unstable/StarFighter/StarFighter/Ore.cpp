@@ -29,6 +29,7 @@ Ore* Ore::CreateOre(string name)
 	new_ore->m_weight = (size_t)stoi((*CurrentGame).m_oreConfig[name][OreData_Weight]);
 	new_ore->m_price = (size_t)stoi((*CurrentGame).m_oreConfig[name][OreData_Price]);
 	new_ore->m_extraction_duration = atof((*CurrentGame).m_oreConfig[name][OreData_Extraction].c_str());
+	new_ore->m_propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[name][OreData_Propulsion]);
 
 	return new_ore;
 }
