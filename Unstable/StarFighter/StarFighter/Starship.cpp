@@ -48,6 +48,20 @@ void Starship::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 }
 
+void Starship::SetStarshipState(StarshipState state)
+{
+	m_state = state;
+
+	switch (state)
+	{
+		case StarshipState_MovingToLocation:
+		{
+
+			break;
+		}
+	}
+}
+
 bool Starship::AssignToLocation(Location* location)
 {
 	if (!location)
@@ -63,8 +77,12 @@ bool Starship::AssignToLocation(Location* location)
 	size_t distance = GetLightYearsBetweenObjects(this, location);
 	if (m_fuel < distance)
 	{
+		//printf("Location too far: distance is %d, fuel remaining is %d.\n", distance, m_fuel);
+		//SetStarshipState(StarshipState_Idle);
 		return false;
 	}
+
+	printf("Assigning to location %s (distance: %d, current fuel: %d).\n", location->m_display_name.c_str(), distance, m_fuel);
 
 	//Move to location
 	m_speed.x = location->getPosition().x - this->getPosition().x;
@@ -89,7 +107,9 @@ bool Starship::ManageFuel()
 	size_t distance_remaining = GetLightYearsBetweenObjects(this, m_location);
 	if (distance_remaining < m_assigned_fuel)
 	{
+		m_fuel -= (m_assigned_fuel - distance_remaining);
 		m_assigned_fuel = distance_remaining;
+		
 	}
 
 	return true;
@@ -115,32 +135,15 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 	return false;
 }
 
-void Starship::SetStarshipState(StarshipState state)
-{
-	m_state = state;
-
-	switch (state)
-	{
-		case StarshipState_MovingToLocation:
-		{
-
-			break;
-		}
-	}
-}
-
 //MINER
 Miner::Miner(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Starship(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	m_scout_range = 0;
-	m_armor = 1;
 	m_fuel_max = 100;
-	m_fuel = 100;
-	m_speed_max = 50;
+	m_fuel = 240;
+	m_speed_max = 150;
 	m_stock_max = 100;
-	m_stock = 0;
 	m_nb_drills = 2;
-	m_remaining_drills = 0;
+	m_current_drill_attempts = 0;
 	m_drill_duration = 3.f;
 	m_drill_sucess_rate_bonus = 0.01f;
 	m_extraction_duration_bonus = 0.5f;
@@ -231,14 +234,14 @@ void Miner::Drill()
 {
 	if (m_location && m_location->m_type == LocationType_OreField && m_state == StarshipState_Drilling)
 	{
-		if (m_nb_drills > 0 && m_remaining_drills < m_nb_drills)
+		if (m_nb_drills > 0 && m_current_drill_attempts < m_nb_drills)
 		{
 			//Drilling attempt
 			if (m_drill_clock.getElapsedTime().asSeconds() > m_drill_duration)
 			{
 				OreField* field = (OreField*)m_location;
 				m_ore_found = GetRandomOre(field);
-				m_remaining_drills++;
+				m_current_drill_attempts++;
 				if (m_ore_found)
 				{
 					printf("Ore found: %s\n", m_ore_found->m_display_name.c_str());
@@ -289,15 +292,15 @@ Ore* Miner::GetRandomOre(OreField* ore_field)
 {
 	if (ore_field)
 	{
-		for (size_t i = 0; i < NBVAL_OreTypes; i++)
+		for (map<string, float>::iterator i = ore_field->m_drill_sucess_rates.begin(); i != ore_field->m_drill_sucess_rates.end(); ++i)
 		{
-			if (ore_field->m_drill_sucess_rates[i] == 0)
+			if (i->second == 0)
 			{
 				continue;
 			}
-			if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < ore_field->m_drill_sucess_rates[i] + m_drill_sucess_rate_bonus)
+			if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < i->second + m_drill_sucess_rate_bonus)
 			{
-				Ore* new_ore = Ore::CreateOre((OreType)i);
+				Ore* new_ore = Ore::CreateOre(i->first);
 				return new_ore;
 			}
 		}
@@ -316,7 +319,7 @@ void Miner::SetStarshipState(StarshipState state)
 		{
 			m_drill_clock.restart();
 			m_ore_found = NULL;
-			printf("Starting drill attempt (%d/%d).\n", m_remaining_drills+1, m_nb_drills);
+			printf("Starting drill attempt (%d/%d).\n", m_current_drill_attempts+1, m_nb_drills);
 			break;
 		}
 		case StarshipState_Searching:
@@ -333,7 +336,6 @@ void Miner::SetStarshipState(StarshipState state)
 		case StarshipState_CarryToBase:
 		{
 			printf("\nCarry to base.\n");
-			m_remaining_drills = 0;
 			break;
 		}
 		case StarshipState_Unloading:
@@ -351,9 +353,9 @@ void Miner::SetStarshipState(StarshipState state)
 bool Miner::IsNewDrillAttemptAvailable()
 {
 	OreField* field = (OreField*)m_location;
-	if (m_remaining_drills == m_nb_drills || m_stock >= m_stock_max - field->m_min_ore_weight)
+	if (m_current_drill_attempts == m_nb_drills || m_stock >= m_stock_max - field->m_min_ore_weight)
 	{
-		if (m_remaining_drills == m_nb_drills)
+		if (m_current_drill_attempts == m_nb_drills)
 		{
 			printf("Drill attempts exhausted.\n");
 		}
@@ -379,8 +381,9 @@ size_t Miner::UnloadCarriage()
 		return 0;
 	}
 
-	size_t stock_unloaded = 0;
+	m_current_drill_attempts = 0;
 
+	size_t stock_unloaded = 0;
 	size_t CarriageVectorSize = m_ores_carried.size();
 	for (size_t i = 0; i < CarriageVectorSize; i++)
 	{
@@ -395,10 +398,35 @@ size_t Miner::UnloadCarriage()
 
 		if (m_location->m_stock == m_stock_max && i != CarriageVectorSize - 1)
 		{
-			return stock_unloaded;
+			//todo can be improved by checking min weight among carriage
+			break;
 		}
 		
 	}
+
+	vector<Ore*> remaining_ores_carried;
+	size_t StorageVectorSize = m_location->m_ores_stored.size();
+
+	for (size_t i = 0; i < CarriageVectorSize; i++)
+	{
+		bool found = false;
+		for (size_t j = 0; j < StorageVectorSize; j++)
+		{
+			if (m_ores_carried[i] == m_location->m_ores_stored[j])
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if (!found)
+		{
+			remaining_ores_carried.push_back(m_ores_carried[i]);
+		}
+	}
+
+	m_ores_carried = remaining_ores_carried;
+	remaining_ores_carried.clear();
 
 	return stock_unloaded;
 }

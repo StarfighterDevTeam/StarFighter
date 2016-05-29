@@ -10,7 +10,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).init(this->mainWindow);
 
 	//Loading scripts
-	LoadCSVFile(ORE_CSV_FILE);
+	LoadCSVFiles();
 	
 	Ship* playerShip = new Ship(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
 	playerShip->m_visible = false;
@@ -22,12 +22,13 @@ void InGameState::Initialize(Player player)
 
 	Planet* planet = new Planet(sf::Vector2f(MAP_SIZE / 2 - 500, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
+	planet->m_drill_sucess_rates.insert(map<string, float>::value_type("oil", 1.0f));
+	planet->Build("refinery");
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
-	ore_field->m_drill_sucess_rates[OreType_Iron] = 0.10f;
-	ore_field->m_drill_sucess_rates[OreType_Silver] = 0.80f;
-	//ore_field->m_drill_sucess_rates[OreType_Gold] = 0.01f;
+	ore_field->m_drill_sucess_rates.insert(map<string, float>::value_type("iron", 0.90f));
+	ore_field->m_drill_sucess_rates.insert(map<string, float>::value_type("silver", 0.10f));
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 
 	//miner->m_location = ore_field;
@@ -131,9 +132,25 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 	(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFTargetPanel);
 }
 
-void InGameState::LoadCSVFile(string scenes_file)
+void InGameState::LoadCSVFiles()
 {
 	LOGGER_WRITE(Logger::DEBUG, "Loading scripts.");
 
-	(*CurrentGame).m_oreConfig = *(FileLoaderUtils::FileLoader(scenes_file));
+	//ore data
+	vector<vector<string> > oreConfig = *(FileLoaderUtils::FileLoader(ORE_CSV_FILE));
+	size_t oreVectorSize = oreConfig.size();
+	for (size_t i = 0; i < oreVectorSize; i++)
+	{
+		(*CurrentGame).m_oreConfig.insert(std::map<string, vector<string> >::value_type(oreConfig[i][OreData_Name], oreConfig[i]));
+	}
+	oreConfig.clear();
+
+	//building data
+	vector<vector<string> > buildingConfig = *(FileLoaderUtils::FileLoader(BUILDING_CSV_FILE));
+	size_t buildingVectorSize = buildingConfig.size();
+	for (size_t i = 0; i < buildingVectorSize; i++)
+	{
+		(*CurrentGame).m_buildingConfig.insert(std::map<string, vector<string> >::value_type(buildingConfig[i][BuildingData_Name], buildingConfig[i]));
+	}
+	buildingConfig.clear();
 }

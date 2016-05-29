@@ -19,35 +19,16 @@ void Ore::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 }
 
-Ore* Ore::CreateOre(OreType type)
+Ore* Ore::CreateOre(string name)
 {
-	string textureName;
-	switch (type)
-	{
-		case (OreType_Iron):
-		{
-			textureName = "2D/ore_iron.png";
-			break;
-		}
-		case (OreType_Silver) :
-		{
-			textureName = "2D/ore_silver.png";
-			break;
-		}
-		case (OreType_Gold) :
-		{
-			textureName = "2D/ore_gold.png";
-			break;
-		}
-	}
+	string textureName = (*CurrentGame).m_oreConfig[name][OreData_TextureName];
 
 	Ore* new_ore = new Ore(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(100, 100), sf::Vector2f(50, 50));
-	new_ore->m_type = type;
 
-	new_ore->m_display_name = (*CurrentGame).m_oreConfig[(int)type][OreData_Name];
-	new_ore->m_weight = stoi((*CurrentGame).m_oreConfig[(int)type][OreData_Weight]);
-	new_ore->m_price = stoi((*CurrentGame).m_oreConfig[(int)type][OreData_Price]);
-	new_ore->m_extraction_duration = atof((*CurrentGame).m_oreConfig[(int)type][OreData_Extraction].c_str());
+	new_ore->m_display_name = (*CurrentGame).m_oreConfig[name][OreData_Name];
+	new_ore->m_weight = (size_t)stoi((*CurrentGame).m_oreConfig[name][OreData_Weight]);
+	new_ore->m_price = (size_t)stoi((*CurrentGame).m_oreConfig[name][OreData_Price]);
+	new_ore->m_extraction_duration = atof((*CurrentGame).m_oreConfig[name][OreData_Extraction].c_str());
 
 	return new_ore;
 }

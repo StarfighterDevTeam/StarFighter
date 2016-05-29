@@ -49,7 +49,7 @@ public :
 	int m_stock;
 
 	size_t m_nb_drills;
-	size_t m_remaining_drills;
+	size_t m_current_drill_attempts;
 
 	sf::Clock m_drill_clock;
 	float m_drill_duration;
