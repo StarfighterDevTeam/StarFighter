@@ -536,6 +536,7 @@ void Ship::ManageShieldRegen(sf::Time deltaTime, float hyperspeedMultiplier)
 {
 	if ((*CurrentGame).m_waiting_for_dialog_validation)
 	{
+		AnimatedSprite::update(deltaTime);
 		return;
 	}
 
