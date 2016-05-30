@@ -154,16 +154,41 @@ size_t Planet::GetNbSlotsTaken()
 	return slots_taken;
 }
 
-bool Planet::Build(string name)
+bool Planet::Build(string name, bool ignore_cost)
 {
 	size_t slots_taken = GetNbSlotsTaken();
 	if ((size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_Slots]) + slots_taken > m_building_slots)
 	{	
 		return false;
 	}
+	
+	//check cost
+	if (!ignore_cost)
+	{
+		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].empty() && m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]))
+		{
+			return false;
+		}
+		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].empty() && m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]))
+		{
+			return false;
+		}
+	}
 
 	Building* new_building = Building::CreateBuilding(name);
 	m_buildings.push_back(new_building);
+	//pay the cost
+	if (!ignore_cost)
+	{
+		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].empty())
+		{
+			m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] -= (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]);
+		}
+		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].empty())
+		{
+			m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] -= (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]);
+		}
+	}
 
 	printf("\nBuilding %s successfully (Planet: %d/10 slots).\n\n", name.c_str(), slots_taken + new_building->m_slots, m_building_slots);
 

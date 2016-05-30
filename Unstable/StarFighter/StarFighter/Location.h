@@ -39,7 +39,7 @@ public:
 	virtual ~Planet();
 	void update(sf::Time deltaTime) override;
 
-	bool Build(string name);
+	bool Build(string name, bool ignore_cost);
 	size_t GetNbSlotsTaken();
 
 	Ore* GetRandomOre();

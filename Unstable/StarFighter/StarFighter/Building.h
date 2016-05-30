@@ -11,6 +11,10 @@ enum BuildingData
 	BuildingData_Stock,
 	BuildingData_CanExtractOre,
 	BuildingData_ExtractionDurationBonus,
+	BuildingData_OreCostType1,
+	BuildingData_OreCostQuantity1,
+	BuildingData_OreCostType2,
+	BuildingData_OreCostQuantity2,
 };
 
 class Building : public GameObject
@@ -33,6 +37,8 @@ public :
 	sf::Clock m_extraction_clock;
 	float m_extraction_duration_bonus;
 	Ore* m_current_extraction;
+
+	map<string, size_t> m_cost;
 };
 
 #endif // BUILDING_H_INCLUDED

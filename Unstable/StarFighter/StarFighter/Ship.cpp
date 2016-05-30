@@ -67,6 +67,10 @@ void Ship::update(sf::Time deltaTime)
 	{
 		SelectObject(m_hovered_object);
 	}
+	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected)
+	{
+		
+	}
 
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
@@ -199,6 +203,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isAssigning(), Action_Assigning);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)

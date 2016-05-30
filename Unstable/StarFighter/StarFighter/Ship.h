@@ -19,6 +19,7 @@ enum PlayerActions
 {
 	Action_Idle,
 	Action_Firing,
+	Action_Assigning,
 	Action_Muting,
 	Action_Pausing,
 	NBVAL_PlayerActions,

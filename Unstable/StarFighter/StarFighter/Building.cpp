@@ -13,6 +13,11 @@ Building::Building(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_can_extract_ore = false;
 	m_extraction_duration_bonus = 0;
 	m_current_extraction = NULL;
+
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); i++)
+	{
+		m_cost.insert(map<string, size_t>::value_type(i->first, 0));
+	}
 }
 
 Building::~Building()
@@ -31,6 +36,16 @@ Building* Building::CreateBuilding(string name)
 	new_building->m_stock_max = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_Stock]);
 	new_building->m_can_extract_ore = stoi((*CurrentGame).m_buildingConfig[name][BuildingData_CanExtractOre]) == 1;
 	new_building->m_extraction_duration_bonus = stof((*CurrentGame).m_buildingConfig[name][BuildingData_ExtractionDurationBonus]);
+
+	//cost
+	if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].empty())
+	{
+		new_building->m_cost[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]);
+	}
+	if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].empty())
+	{
+		new_building->m_cost[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]);
+	}
 
 	return new_building;
 }

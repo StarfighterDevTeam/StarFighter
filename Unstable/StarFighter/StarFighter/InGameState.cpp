@@ -26,8 +26,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
 	planet->m_drill_sucess_rates["oil"] = 0.5f;
 	planet->m_drill_sucess_rates["deuterium"] = 0.5f;
-	planet->Build("refinery");
-	planet->Build("refinery");
+	planet->Build("refinery", true);
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
