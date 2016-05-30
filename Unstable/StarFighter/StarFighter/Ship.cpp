@@ -2389,16 +2389,12 @@ void Ship::SaveEquipmentData(ofstream& data, Equipment* equipment, bool skip_typ
 		data << equipment->m_max_speed << " ";
 		data << equipment->m_deceleration << " ";
 		data << equipment->m_acceleration << " ";
-		data.precision(3);
 		data << equipment->m_hyperspeed << " ";
-		data.precision(0);
 		data << equipment->m_hyperspeed_fuel << " ";
 		data << equipment->m_armor << " ";
 		data << equipment->m_shield << " ";
 		data << equipment->m_shield_regen << " ";
-		data.precision(3);
 		data << equipment->m_shield_recovery_time << " ";
-		data.precision(0);
 		data << equipment->m_damage << " ";
 		data << equipment->m_bombs << " ";
 		data << equipment->m_can_hyperspeed << " ";
@@ -2488,13 +2484,9 @@ void Ship::SaveWeaponData(ofstream& data, Weapon* weapon, bool skip_type, bool s
 		data << weapon->m_size.x << " ";
 		data << weapon->m_size.y << " ";
 		data << weapon->m_frameNumber << " ";
-		data.precision(3);
 		data << weapon->m_rate_of_fire << " ";
-		data.precision(0);
 		data << weapon->m_rafale << " ";
-		data.precision(3);
 		data << weapon->m_rafale_cooldown << " ";
-		data.precision(0);
 
 		data << weapon->m_multishot << " ";
 		data << weapon->m_xspread << " ";
