@@ -1022,3 +1022,9 @@ int GameObject::getFighterIntStatValue(FighterStats stat)
 		}
 	}
 }
+
+bool GameObject::CheckCondition()
+{
+	//see override in Enemy class
+	return false;
+}

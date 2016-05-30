@@ -60,7 +60,7 @@ public:
 
 	vector <Phase*> m_phases;
 
-	bool CheckCondition();
+	bool CheckCondition() override;
 
 	sf::Time m_phaseTimer;
 	sf::Time m_enemyTimer;

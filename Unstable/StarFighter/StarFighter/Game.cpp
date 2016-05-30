@@ -972,6 +972,7 @@ void Game::WakeUpEnemiesWithName(string display_name)
 		if ((*it)->m_display_name == display_name)
 		{
 			(*it)->m_wake_up = true;
+			(*it)->CheckCondition();//apply phase change directly
 		}
 	}
 }

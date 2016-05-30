@@ -318,6 +318,7 @@ public:
 
 	virtual float getFighterFloatStatValue(FighterStats stat);
 	virtual int getFighterIntStatValue(FighterStats stat);
+	virtual bool CheckCondition();
 
 protected:
 	sf::Vector2f m_initial_position;

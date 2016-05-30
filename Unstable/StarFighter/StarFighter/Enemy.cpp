@@ -968,20 +968,22 @@ void Enemy::setPhase(Phase* phase)
 	}
 
 	//setting up wake_up condition
-	bool wake_up_condition_exists = false;
-	for (std::vector<ConditionTransition*>::iterator it = (phase->m_transitions_list.begin()); it != (phase->m_transitions_list.end()); it++)
-	{
-		if ((*it)->m_condition == wakeUp)
-		{
-			m_wake_up = false;
-			wake_up_condition_exists = true;
-		}
-	}
-	//reset the flag "wake_up" if this phase doesn't use the condition (it means the awakening has been skipped by another phase transition
-	if (!wake_up_condition_exists)
-	{
-		m_wake_up = true;
-	}
+	m_wake_up = false;
+
+	//bool wake_up_condition_exists = false;
+	//for (std::vector<ConditionTransition*>::iterator it = (phase->m_transitions_list.begin()); it != (phase->m_transitions_list.end()); it++)
+	//{
+	//	if ((*it)->m_condition == wakeUp)
+	//	{
+	//		m_wake_up = false;
+	//		wake_up_condition_exists = true;
+	//	}
+	//}
+	////reset the flag "wake_up" if this phase doesn't use the condition (it means the awakening has been skipped by another phase transition
+	//if (!wake_up_condition_exists)
+	//{
+	//	m_wake_up = true;
+	//}
 
 	//waking up enemies
 	if (!phase->m_wake_up_name.empty())
