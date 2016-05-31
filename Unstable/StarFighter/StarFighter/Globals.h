@@ -64,6 +64,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 //CSV DATA
 #define ORE_CSV_FILE							"Scripts/Generated/Ore.csv"
 #define BUILDING_CSV_FILE						"Scripts/Generated/Building.csv"
+#define STARSHIP_CSV_FILE						"Scripts/Generated/Starship.csv"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

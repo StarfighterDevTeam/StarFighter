@@ -197,20 +197,35 @@ bool Planet::Build(string name, bool ignore_cost)
 
 Ore* Planet::GetRandomOre()
 {
+	string ore_found;
+	float min_drill_rate = 0;
+
 	for (map<string, float>::iterator i = m_drill_sucess_rates.begin(); i != m_drill_sucess_rates.end(); ++i)
 	{
+		
 		if (i->second == 0)
 		{
 			continue;
 		}
 		if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < i->second)
 		{
-			Ore* new_ore = Ore::CreateOre(i->first);
-			return new_ore;
+			if (ore_found.empty() || i->second < min_drill_rate)
+			{
+				ore_found = i->first;
+				min_drill_rate = i->second;
+			}
 		}
 	}
-	
-	return NULL;
+
+	if (ore_found.empty())
+	{
+		return NULL;
+	}
+	else
+	{
+		Ore* new_ore = Ore::CreateOre(ore_found);
+		return new_ore;
+	}
 }
 
 void Planet::Harvest()

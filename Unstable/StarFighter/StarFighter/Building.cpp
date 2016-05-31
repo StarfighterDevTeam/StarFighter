@@ -47,6 +47,11 @@ Building* Building::CreateBuilding(string name)
 		new_building->m_cost[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]);
 	}
 
+	if (!(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1].empty())
+	{
+		new_building->m_starship_productions.push_back((*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1]);
+	}
+
 	return new_building;
 }
 

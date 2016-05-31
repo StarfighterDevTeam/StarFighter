@@ -15,6 +15,7 @@ enum BuildingData
 	BuildingData_OreCostQuantity1,
 	BuildingData_OreCostType2,
 	BuildingData_OreCostQuantity2,
+	BuildingData_StarshipProduction1,
 };
 
 class Building : public GameObject
@@ -39,6 +40,7 @@ public :
 	Ore* m_current_extraction;
 
 	map<string, size_t> m_cost;
+	vector<string> m_starship_productions;
 };
 
 #endif // BUILDING_H_INCLUDED

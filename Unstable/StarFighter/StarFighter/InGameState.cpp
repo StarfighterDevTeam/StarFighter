@@ -24,8 +24,8 @@ void InGameState::Initialize(Player player)
 
 	Planet* planet = new Planet(sf::Vector2f(MAP_SIZE / 2 - 500, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
-	planet->m_drill_sucess_rates["oil"] = 0.5f;
-	planet->m_drill_sucess_rates["deuterium"] = 0.5f;
+	planet->m_drill_sucess_rates["oil"] = 1.0f;
+	planet->m_drill_sucess_rates["deuterium"] = 0.1f;
 	planet->Build("refinery", true);
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
@@ -34,7 +34,7 @@ void InGameState::Initialize(Player player)
 	ore_field->m_drill_sucess_rates["silver"] = 0.10f;
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 
-	miner->AssignToLocation(planet);
+	//miner->AssignToLocation(planet);
 	
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
@@ -155,4 +155,13 @@ void InGameState::LoadCSVFiles()
 		(*CurrentGame).m_buildingConfig.insert(std::map<string, vector<string> >::value_type(buildingConfig[i][BuildingData_Name], buildingConfig[i]));
 	}
 	buildingConfig.clear();
+
+	//starship data
+	vector<vector<string> > starshipConfig = *(FileLoaderUtils::FileLoader(STARSHIP_CSV_FILE));
+	size_t starshipVectorSize = starshipConfig.size();
+	for (size_t i = 0; i < starshipVectorSize; i++)
+	{
+		(*CurrentGame).m_starshipConfig.insert(std::map<string, vector<string> >::value_type(starshipConfig[i][StarshipData_Name], starshipConfig[i]));
+	}
+	starshipConfig.clear();
 }

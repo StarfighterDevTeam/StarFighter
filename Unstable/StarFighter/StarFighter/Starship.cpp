@@ -10,27 +10,43 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	SetStarshipState(StarshipState_Idle);
 
 	m_scout_range = 0;
-	m_armor = 1;
+	m_armor_max = 1;
+	m_armor = m_armor_max;
 	m_fuel = 0;
 	m_fuel_max = 100;
 	m_speed_max = 100;
 	m_stock_max = 0;
 	m_stock = 0;
 	m_nb_drills = 0;
-	m_drill_duration = 1.f;
 	m_location= NULL;
 	m_assigned_propulsion = 0;
 	m_arrived_at_distination = false;
 	m_propulsion = 0;
 	m_propulsion_speed_bonus = 0;
 
-	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i) 
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
 		if ((size_t)stoi(i->second[OreData_Propulsion]) > 0)
 		{
 			m_fuel_tanks.insert(map<string, size_t>::value_type(i->first, 0));
 			m_fuel_assigned.insert(map<string, size_t>::value_type(i->first, 0));
 		}
+	}
+
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); i++)
+	{
+		m_cost.insert(map<string, size_t>::value_type(i->first, 0));
+	}
+
+	//mining
+	m_current_drill_attempts = 0;
+	m_drill_duration = 3.f;
+	m_drill_sucess_rate_bonus = 0.01f;
+	m_extraction_duration_bonus = 0.5f;
+	m_ore_found = NULL;
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
+	{
+		m_ores_carried[i->first] = 0;
 	}
 }
 
@@ -68,6 +84,37 @@ void Starship::SetStarshipState(StarshipState state)
 		case StarshipState_MovingToLocation:
 		{
 
+			break;
+		}
+		case StarshipState_Drilling:
+		{
+			m_drill_clock.restart();
+			m_ore_found = NULL;
+			printf("Starting drill attempt (%d/%d).\n", m_current_drill_attempts + 1, m_nb_drills);
+			break;
+		}
+		case StarshipState_Searching:
+		{
+
+			break;
+		}
+		case StarshipState_Extracting:
+		{
+			printf("Extraction...");
+			m_extraction_clock.restart();
+			break;
+		}
+		case StarshipState_CarryToBase:
+		{
+			printf("\nCarry to base.\n");
+			break;
+		}
+		case StarshipState_Unloading:
+		{
+			break;
+		}
+		default:
+		{
 			break;
 		}
 	}
@@ -326,6 +373,40 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 	return false;
 }
 
+Starship* Starship::CreateStarship(string name)
+{
+	if (name.empty())
+	{
+		return NULL;
+	}
+
+	string textureName = (*CurrentGame).m_starshipConfig[name][StarshipData_TextureName];
+	
+	Starship* new_starship = new Starship(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, sf::Vector2f(69, 84), sf::Vector2f(34.5, 42), 3, 1);
+
+	//cost
+	if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].empty())
+	{
+		new_starship->m_cost[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1]] = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity1]);
+	}
+	if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].empty())
+	{
+		new_starship->m_cost[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]);
+	}
+
+	new_starship->m_armor_max = stoi((*CurrentGame).m_starshipConfig[name][StarshipData_Armor]);
+	new_starship->m_fuel_max = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_FuelMax]);
+	new_starship->m_speed_max = stof((*CurrentGame).m_starshipConfig[name][StarshipData_SpeedMax]);
+	new_starship->m_stock_max = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_StockMax]);
+
+	new_starship->m_nb_drills = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_NbDrills]);
+	new_starship->m_drill_sucess_rate_bonus = stof((*CurrentGame).m_starshipConfig[name][StarshipData_DrillSuccessRateBonus]);
+	new_starship->m_drill_duration = stof((*CurrentGame).m_starshipConfig[name][StarshipData_DrillDuration]);
+	new_starship->m_extraction_duration_bonus = stof((*CurrentGame).m_starshipConfig[name][StarshipData_ExtractionDurationBonus]);
+
+	return new_starship;
+}
+
 //MINER
 Miner::Miner(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Starship(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
@@ -412,7 +493,7 @@ void Miner::update(sf::Time deltaTime)
 			GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
 			Location* tmp_location = (Location*)tmp_obj;
 
-			AssignToLocation(tmp_location);
+			//AssignToLocation(tmp_location);
 			break;
 		}
 		default:
@@ -424,7 +505,7 @@ void Miner::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 }
 
-void Miner::Drill()
+void Starship::Drill()
 {
 	if (m_location && m_location->m_type == LocationType_OreField && m_state == StarshipState_Drilling)
 	{
@@ -451,7 +532,7 @@ void Miner::Drill()
 	}
 }
 
-void Miner::Extract(Ore* ore)
+void Starship::Extract(Ore* ore)
 {
 	if (ore && m_state == StarshipState_Extracting)
 	{
@@ -464,7 +545,7 @@ void Miner::Extract(Ore* ore)
 	}
 }
 
-void Miner::LoadOre(Ore* ore)
+void Starship::LoadOre(Ore* ore)
 {
 	if (!ore)
 	{
@@ -482,7 +563,7 @@ void Miner::LoadOre(Ore* ore)
 	printf("Ore loading successfull.\n\n");
 }
 
-Ore* Miner::GetRandomOre(OreField* ore_field)
+Ore* Starship::GetRandomOre(OreField* ore_field)
 {
 	if (ore_field)
 	{
@@ -503,47 +584,7 @@ Ore* Miner::GetRandomOre(OreField* ore_field)
 	return NULL;
 }
 
-void Miner::SetStarshipState(StarshipState state)
-{
-	Starship::SetStarshipState(state);
-
-	switch (state)
-	{
-		case StarshipState_Drilling:
-		{
-			m_drill_clock.restart();
-			m_ore_found = NULL;
-			printf("Starting drill attempt (%d/%d).\n", m_current_drill_attempts+1, m_nb_drills);
-			break;
-		}
-		case StarshipState_Searching:
-		{
-			
-			break;
-		}
-		case StarshipState_Extracting:
-		{
-			printf("Extraction...");
-			m_extraction_clock.restart();
-			break;
-		}
-		case StarshipState_CarryToBase:
-		{
-			printf("\nCarry to base.\n");
-			break;
-		}
-		case StarshipState_Unloading:
-		{
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-}
-
-bool Miner::IsNewDrillAttemptAvailable()
+bool Starship::IsNewDrillAttemptAvailable()
 {
 	OreField* field = (OreField*)m_location;
 	if (m_current_drill_attempts == m_nb_drills || m_stock >= m_stock_max - field->m_min_ore_weight)
@@ -567,7 +608,7 @@ bool Miner::IsNewDrillAttemptAvailable()
 	}
 }
 
-void Miner::UnloadCarriage(Location* location)
+void Starship::UnloadCarriage(Location* location)
 {
 	if (!location || location != m_location || !m_arrived_at_distination)
 	{

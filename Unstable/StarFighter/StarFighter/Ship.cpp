@@ -67,9 +67,11 @@ void Ship::update(sf::Time deltaTime)
 	{
 		SelectObject(m_hovered_object);
 	}
-	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected)
+	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object && m_hovered_object && m_selected_object->m_collider_type == StarshipObject && m_hovered_object->m_collider_type == LocationObject)
 	{
-		
+		Starship* starship = (Starship*)m_selected_object;
+		Location* location = (Location*)m_hovered_object;
+		starship->AssignToLocation(location);
 	}
 
 	MaxSpeedConstraints();
