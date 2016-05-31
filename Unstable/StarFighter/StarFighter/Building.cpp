@@ -18,6 +18,11 @@ Building::Building(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	{
 		m_cost.insert(map<string, size_t>::value_type(i->first, 0));
 	}
+
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_starshipConfig.begin(); i != (*CurrentGame).m_starshipConfig.end(); i++)
+	{
+		m_starship_productions.insert(map<string, size_t>::value_type(i->first, 0));
+	}
 }
 
 Building::~Building()
@@ -47,9 +52,10 @@ Building* Building::CreateBuilding(string name)
 		new_building->m_cost[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]);
 	}
 
+	//productions
 	if (!(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1].empty())
 	{
-		new_building->m_starship_productions.push_back((*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1]);
+		new_building->m_starship_productions[(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1]]++;
 	}
 
 	return new_building;

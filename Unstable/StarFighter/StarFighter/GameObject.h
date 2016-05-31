@@ -51,6 +51,50 @@ enum GameObjectType {
 	NBVAL_GameObject
 };
 
+enum StarshipData
+{
+	StarshipData_Name,
+	StarshipData_TextureName,
+	StarshipData_OreCostType1,
+	StarshipData_OreCostQuantity1,
+	StarshipData_OreCostType2,
+	StarshipData_OreCostQuantity2,
+	StarshipData_Armor,
+	StarshipData_FuelMax,
+	StarshipData_SpeedMax,
+	StarshipData_StockMax,
+	StarshipData_NbDrills,
+	StarshipData_DrillDuration,//Miner specifics
+	StarshipData_DrillSuccessRateBonus,
+	StarshipData_ExtractionDurationBonus,
+};
+
+enum OreData
+{
+	OreData_Name,
+	OreData_TextureName,
+	OreData_Weight,
+	OreData_Extraction,
+	OreData_Price,
+	OreData_Propulsion,
+	OreData_PropulsionSpeedBonus,
+};
+
+enum BuildingData
+{
+	BuildingData_Name,
+	BuildingData_TextureName,
+	BuildingData_Slots,
+	BuildingData_Stock,
+	BuildingData_CanExtractOre,
+	BuildingData_ExtractionDurationBonus,
+	BuildingData_OreCostType1,
+	BuildingData_OreCostQuantity1,
+	BuildingData_OreCostType2,
+	BuildingData_OreCostQuantity2,
+	BuildingData_StarshipProduction1,
+};
+
 class GameObject : public AnimatedSprite
 {
 public:

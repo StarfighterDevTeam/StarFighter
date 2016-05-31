@@ -7,17 +7,6 @@
 #include "Game.h"
 #include "SFTextPop.h"
 
-enum OreData
-{
-	OreData_Name,
-	OreData_TextureName,
-	OreData_Weight,
-	OreData_Extraction,
-	OreData_Price,
-	OreData_Propulsion,
-	OreData_PropulsionSpeedBonus,
-};
-
 class Ore : public GameObject
 {
 public :

@@ -3,21 +3,6 @@
 
 #include "Ore.h"
 
-enum BuildingData
-{
-	BuildingData_Name,
-	BuildingData_TextureName,
-	BuildingData_Slots,
-	BuildingData_Stock,
-	BuildingData_CanExtractOre,
-	BuildingData_ExtractionDurationBonus,
-	BuildingData_OreCostType1,
-	BuildingData_OreCostQuantity1,
-	BuildingData_OreCostType2,
-	BuildingData_OreCostQuantity2,
-	BuildingData_StarshipProduction1,
-};
-
 class Building : public GameObject
 {
 public :
@@ -40,7 +25,7 @@ public :
 	Ore* m_current_extraction;
 
 	map<string, size_t> m_cost;
-	vector<string> m_starship_productions;
+	map<string, size_t> m_starship_productions;
 };
 
 #endif // BUILDING_H_INCLUDED

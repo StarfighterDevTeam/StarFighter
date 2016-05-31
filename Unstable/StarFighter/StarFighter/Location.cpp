@@ -5,10 +5,8 @@ extern Game* CurrentGame;
 using namespace sf;
 
 //LOCATION
-Location::Location(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Location::Location(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : StockEntity(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	m_type = LocationType_None;
-
 	m_stock = 0;
 	m_stock_max = 100;
 	m_fuel_refill = false;
@@ -29,34 +27,9 @@ bool Location::CanSupplyFuel()
 	return false;
 }
 
-string Location::GetBestPropulsionAvailable()
-{
-	size_t propulsion = 0;
-	string selected_fuel;
-
-	for (map<string, size_t >::iterator i = m_ores_stored.begin(); i != m_ores_stored.end(); ++i)
-	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
-		{
-			selected_fuel = i->first;
-			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
-		}
-	}
-
-	return selected_fuel;
-}
-
 //ORE FIELD
 OreField::OreField(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Location(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	m_type = LocationType_OreField;
-
-	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i) 
-	{
-		m_drill_sucess_rates.insert(map<string, float>::value_type(i->first, 0));
-	}
-
-	m_min_ore_weight = 0;
 	m_drill_slots = 10;
 }
 
@@ -70,41 +43,17 @@ void OreField::update(sf::Time deltaTime)
 	Location::update(deltaTime);
 }
 
-size_t OreField::GetLightestOreWeight()
-{
-	int min = -1;
-	for (map<string, float>::iterator i = m_drill_sucess_rates.begin(); i != m_drill_sucess_rates.end(); ++i)
-	{
-		if (i->second > 0)
-		{
-			if (stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]) < min || min < 0)
-			{
-				min = stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
-			}
-		}
-	}
-
-	return min < 0 ? 0 : (size_t)min;
-}
-
 //PLANET
 Planet::Planet(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Location(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	m_type = LocationType_Planet;
-
 	m_fuel_refill = true;
 
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
-		m_drill_sucess_rates.insert(map<string, float>::value_type(i->first, 0));
+		m_ore_presence_rates.insert(map<string, float>::value_type(i->first, 0));
 	}
 
 	m_building_slots = 10;
-	//for (size_t i = 0; i < m_building_slots; i++)
-	//{
-	//	Building* building = NULL;
-	//	m_buildings.push_back(building);
-	//}
 }
 
 Planet::~Planet()
@@ -139,6 +88,23 @@ bool Planet::CanSupplyFuel()
 	return false;
 }
 
+string Location::GetBestPropulsionAvailable()
+{
+	size_t propulsion = 0;
+	string selected_fuel;
+
+	for (map<string, size_t >::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); ++i)
+	{
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		{
+			selected_fuel = i->first;
+			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		}
+	}
+
+	return selected_fuel;
+}
+
 size_t Planet::GetNbSlotsTaken()
 {
 	size_t slots_taken = 0;
@@ -165,11 +131,11 @@ bool Planet::Build(string name, bool ignore_cost)
 	//check cost
 	if (!ignore_cost)
 	{
-		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].empty() && m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]))
+		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].empty() && m_ores_stocked[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]))
 		{
 			return false;
 		}
-		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].empty() && m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]))
+		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].empty() && m_ores_stocked[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]))
 		{
 			return false;
 		}
@@ -177,16 +143,17 @@ bool Planet::Build(string name, bool ignore_cost)
 
 	Building* new_building = Building::CreateBuilding(name);
 	m_buildings.push_back(new_building);
+
 	//pay the cost
 	if (!ignore_cost)
 	{
 		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].empty())
 		{
-			m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] -= (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]);
+			m_ores_stocked[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] -= (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]);
 		}
 		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].empty())
 		{
-			m_ores_stored[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] -= (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]);
+			m_ores_stocked[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] -= (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]);
 		}
 	}
 
@@ -195,37 +162,55 @@ bool Planet::Build(string name, bool ignore_cost)
 	return true;
 }
 
-Ore* Planet::GetRandomOre()
+bool Planet::Produce(string name, bool ignore_cost)
 {
-	string ore_found;
-	float min_drill_rate = 0;
-
-	for (map<string, float>::iterator i = m_drill_sucess_rates.begin(); i != m_drill_sucess_rates.end(); ++i)
+	size_t nb_productions = 0;
+	size_t buildingsVectorSize = m_buildings.size();
+	for (size_t i = 0; i < buildingsVectorSize; i++)
 	{
-		
-		if (i->second == 0)
+		if (m_buildings[i])
 		{
-			continue;
-		}
-		if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < i->second)
-		{
-			if (ore_found.empty() || i->second < min_drill_rate)
-			{
-				ore_found = i->first;
-				min_drill_rate = i->second;
-			}
+			nb_productions += m_buildings[i]->m_starship_productions[name];
 		}
 	}
 
-	if (ore_found.empty())
+	if (nb_productions == 0)
 	{
-		return NULL;
+		return false;
 	}
-	else
+	
+
+	//check cost
+	if (!ignore_cost)
 	{
-		Ore* new_ore = Ore::CreateOre(ore_found);
-		return new_ore;
+		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].empty() && m_ores_stocked[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity1]))
+		{
+			return false;
+		}
+		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].empty() && m_ores_stocked[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]))
+		{
+			return false;
+		}
 	}
+
+	Starship* new_starship = Starship::CreateStarship(name);
+	new_starship->setPosition(getPosition());
+	(*CurrentGame).addToScene(new_starship, StarshipLayer, StarshipObject);
+
+	//pay the cost
+	if (!ignore_cost)
+	{
+		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].empty())
+		{
+			m_ores_stocked[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1]] -= (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity1]);
+		}
+		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].empty())
+		{
+			m_ores_stocked[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] -= (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]);
+		}
+	}
+
+	return true;
 }
 
 void Planet::Harvest()
@@ -246,25 +231,5 @@ void Planet::Harvest()
 			}
 		}
 	}
-}
-
-bool Planet::Stock(Ore* ore)
-{
-	if (!ore)
-	{
-		return false;
-	}
-
-	if (ore->m_weight + m_stock > m_stock_max)
-	{
-		return false;
-	}
-
-	m_stock += ore->m_weight;
-	m_ores_stored[ore->m_display_name] ++;
-
-	printf("Extracted: %s, stored successfully (Planet stock: %d/%d).\n", ore->m_display_name.c_str(), m_stock, m_stock_max);
-
-	return true;
 }
 

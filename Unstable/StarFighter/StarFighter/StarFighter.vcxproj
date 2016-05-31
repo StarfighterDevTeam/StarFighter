@@ -109,6 +109,7 @@
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="Starship.cpp" />
+    <ClCompile Include="StockEntity.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
   </ItemGroup>
@@ -141,6 +142,7 @@
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="Starship.h" />
+    <ClInclude Include="StockEntity.h" />
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
   </ItemGroup>

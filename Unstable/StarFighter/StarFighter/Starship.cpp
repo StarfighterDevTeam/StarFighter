@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 //STARSHIP
-Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : StockEntity(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	SetStarshipState(StarshipState_Idle);
 
@@ -64,6 +64,54 @@ void Starship::update(sf::Time deltaTime)
 			ManagePropulsion();
 			CheckIfArrivedAtDestination(deltaTime);
 			
+			break;
+		}
+		case StarshipState_Idle:
+		{
+			if (m_location)
+			{
+				if (m_location->CanBeDrilled())
+				{
+					SetStarshipState(StarshipState_Drilling);
+				}
+				else if (m_location->CanSupplyFuel())
+				{
+					SetStarshipState(StarshipState_Unloading);
+				}
+			}
+		}
+		case StarshipState_Drilling:
+		{
+			Drill();
+			break;
+		}
+		case StarshipState_Extracting:
+		{
+			Extract(m_ore_found);
+			break;
+		}
+		case StarshipState_Loading:
+		{
+			Stock(m_ore_found);
+			IsNewDrillAttemptAvailable();
+			break;
+		}
+		case StarshipState_CarryToBase:
+		{
+			GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).front();
+			StockEntity* tmp_location = (StockEntity*)tmp_obj;
+
+			AssignToLocation(tmp_location);
+			break;
+		}
+		case StarshipState_Unloading:
+		{
+			UnloadCarriage(m_location);
+
+			GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
+			StockEntity* tmp_location = (StockEntity*)tmp_obj;
+
+			//AssignToLocation(tmp_location);
 			break;
 		}
 		default:
@@ -154,7 +202,7 @@ size_t Starship::LoadFuel(string ore_name, size_t quantity)
 	return quantity_loaded;
 }
 
-bool Starship::LoadRequiredPropulsion(Location* location, size_t propulsion_missing)
+bool Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing)
 {
 	if (!location || !m_arrived_at_distination)
 	{
@@ -168,7 +216,7 @@ bool Starship::LoadRequiredPropulsion(Location* location, size_t propulsion_miss
 	}
 
 	size_t propulsion_required = propulsion_missing;
-	map<string, size_t> virtual_storage = location->m_ores_stored;
+	map<string, size_t> virtual_storage = location->m_ores_stocked;
 	map<string, size_t> assigned_storage;
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
@@ -209,7 +257,7 @@ bool Starship::LoadRequiredPropulsion(Location* location, size_t propulsion_miss
 		for (map<string, size_t>::iterator i = assigned_storage.begin(); i != assigned_storage.end(); ++i)
 		{
 			m_fuel_tanks[i->first] += i->second;
-			location->m_ores_stored[i->first] -= i->second;
+			location->m_ores_stocked[i->first] -= i->second;
 			location->m_stock -= i->second * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
 		}
 
@@ -287,7 +335,7 @@ size_t Starship::ConsummePropulsion(size_t distance)
 	return propulsion_consummed;
 }
 
-bool Starship::AssignToLocation(Location* location)
+bool Starship::AssignToLocation(StockEntity* location)
 {
 	if (!location)
 	{
@@ -407,115 +455,16 @@ Starship* Starship::CreateStarship(string name)
 	return new_starship;
 }
 
-//MINER
-Miner::Miner(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Starship(position, speed, textureName, size, origin, frameNumber, animationNumber)
-{
-	m_fuel_max = 100;
-	m_speed_max = 150;
-	m_stock_max = 100;
-	m_nb_drills = 2;
-	m_current_drill_attempts = 0;
-	m_drill_duration = 3.f;
-	m_drill_sucess_rate_bonus = 0.01f;
-	m_extraction_duration_bonus = 0.5f;
-
-	m_ore_found = NULL;
-
-	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
-	{
-		m_ores_carried[i->first] = 0;
-	}
-}
-
-Miner::~Miner()
-{
-
-}
-
-void Miner::update(sf::Time deltaTime)
-{
-	Starship::update(deltaTime);
-
-	switch (m_state)
-	{
-		case StarshipState_Idle:
-		{
-			if (m_location)
-			{
-				switch (m_location->m_type)
-				{
-					case LocationType_OreField:
-					{
-						SetStarshipState(StarshipState_Drilling);
-						break;
-					}
-					case LocationType_Planet:
-					{
-						SetStarshipState(StarshipState_Unloading);
-						break;
-					}
-					default:
-					{
-
-						break;
-					}
-				}
-			}
-		}
-		case StarshipState_Drilling:
-		{
-			Drill();
-			break;
-		}
-		case StarshipState_Extracting:
-		{
-			Extract(m_ore_found);
-			break;
-		}
-		case StarshipState_Loading:
-		{
-			LoadOre(m_ore_found);
-			IsNewDrillAttemptAvailable();
-			break;
-		}
-		case StarshipState_CarryToBase:
-		{
-			GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).front();
-			Location* tmp_location = (Location*)tmp_obj;
-
-			AssignToLocation(tmp_location);
-			break;
-		}
-		case StarshipState_Unloading:
-		{
-			UnloadCarriage(m_location);
-			
-			GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
-			Location* tmp_location = (Location*)tmp_obj;
-
-			//AssignToLocation(tmp_location);
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-
-	GameObject::update(deltaTime);
-}
-
 void Starship::Drill()
 {
-	if (m_location && m_location->m_type == LocationType_OreField && m_state == StarshipState_Drilling)
+	if (m_location && m_location->CanBeDrilled() && m_state == StarshipState_Drilling)
 	{
 		if (m_nb_drills > 0 && m_current_drill_attempts < m_nb_drills)
 		{
 			//Drilling attempt
 			if (m_drill_clock.getElapsedTime().asSeconds() > m_drill_duration)
 			{
-				OreField* field = (OreField*)m_location;
-				m_ore_found = GetRandomOre(field);
+				m_ore_found = m_location->GetRandomOre();
 				m_current_drill_attempts++;
 				if (m_ore_found)
 				{
@@ -545,55 +494,15 @@ void Starship::Extract(Ore* ore)
 	}
 }
 
-void Starship::LoadOre(Ore* ore)
-{
-	if (!ore)
-	{
-		return;
-	}
-
-	if (m_stock + ore->m_weight > m_stock_max)
-	{
-		printf("Ore loading unsuccessful: insufficient stock.\n");
-		return;
-	}
-
-	m_ores_carried[ore->m_display_name]++;
-	m_stock += ore->m_weight;
-	printf("Ore loading successfull.\n\n");
-}
-
-Ore* Starship::GetRandomOre(OreField* ore_field)
-{
-	if (ore_field)
-	{
-		for (map<string, float>::iterator i = ore_field->m_drill_sucess_rates.begin(); i != ore_field->m_drill_sucess_rates.end(); ++i)
-		{
-			if (i->second == 0)
-			{
-				continue;
-			}
-			if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < i->second + m_drill_sucess_rate_bonus)
-			{
-				Ore* new_ore = Ore::CreateOre(i->first);
-				return new_ore;
-			}
-		}
-	}
-
-	return NULL;
-}
-
 bool Starship::IsNewDrillAttemptAvailable()
 {
-	OreField* field = (OreField*)m_location;
-	if (m_current_drill_attempts == m_nb_drills || m_stock >= m_stock_max - field->m_min_ore_weight)
+	if (m_current_drill_attempts == m_nb_drills || m_stock >= m_stock_max - m_location->m_min_ore_weight)
 	{
 		if (m_current_drill_attempts == m_nb_drills)
 		{
 			printf("Drill attempts exhausted.\n");
 		}
-		else if (m_stock >= m_stock_max - field->m_min_ore_weight)
+		else if (m_stock >= m_stock_max - m_location->m_min_ore_weight)
 		{
 			printf("Stock full.\n");
 		}
@@ -608,7 +517,7 @@ bool Starship::IsNewDrillAttemptAvailable()
 	}
 }
 
-void Starship::UnloadCarriage(Location* location)
+void Starship::UnloadCarriage(StockEntity* location)
 {
 	if (!location || location != m_location || !m_arrived_at_distination)
 	{
@@ -623,13 +532,11 @@ void Starship::UnloadCarriage(Location* location)
 		{
 			size_t quantity_accepted = (m_location->m_stock_max - m_location->m_stock) / (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
 			size_t quantity_unloaded = MinBetweenSizeTValues(quantity_accepted, i->second);
-			m_location->m_ores_stored[i->first] += quantity_unloaded;
+			m_location->m_ores_stocked[i->first] += quantity_unloaded;
 			m_location->m_stock += quantity_unloaded * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
 			m_ores_carried[i->first] -= quantity_unloaded;
 
 			printf("\n%s unloaded on planet: quantity %d, total weight of %d (Planet new stock: %d/%d).\n", i->first.c_str(), quantity_unloaded, quantity_unloaded*(size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]), m_location->m_stock, m_location->m_stock_max);
 		}
 	}
-
-	
 }

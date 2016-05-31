@@ -3,15 +3,10 @@
 
 #include "Ore.h"
 #include "Building.h"
+#include "StockEntity.h"
+#include "Starship.h"
 
-enum LocationType
-{
-	LocationType_None,
-	LocationType_OreField,
-	LocationType_Planet,
-};
-
-class Location : public GameObject
+class Location : public StockEntity
 {
 public :
 	Location() {};
@@ -19,15 +14,9 @@ public :
 	virtual ~Location();
 	void update(sf::Time deltaTime) override;
 
-	string GetBestPropulsionAvailable();
 	virtual bool CanSupplyFuel();
+	string GetBestPropulsionAvailable() override;
 
-	string m_display_name;
-	LocationType m_type;
-
-	size_t m_stock;
-	size_t m_stock_max;
-	map<string, size_t> m_ores_stored;
 	bool m_fuel_refill;
 };
 
@@ -40,14 +29,11 @@ public:
 	void update(sf::Time deltaTime) override;
 
 	bool Build(string name, bool ignore_cost);
+	bool Produce(string name, bool ignore_cost);
 	size_t GetNbSlotsTaken();
-
-	Ore* GetRandomOre();
 	void Harvest();
-	bool Stock(Ore* ore);
-	virtual bool CanSupplyFuel();
+	bool CanSupplyFuel() override;
 
-	map<string, float> m_drill_sucess_rates;
 	size_t m_building_slots;
 	vector<Building*> m_buildings;
 };
@@ -60,11 +46,7 @@ public:
 	virtual ~OreField();
 	void update(sf::Time deltaTime) override;
 
-	size_t GetLightestOreWeight();
-
 	size_t m_drill_slots;
-	map<string, float> m_drill_sucess_rates;
-	size_t m_min_ore_weight;
 };
 
 #endif // LOCATION_H_INCLUDED
