@@ -72,6 +72,13 @@ void Ship::update(sf::Time deltaTime)
 
 	GameObject::update(deltaTime);
 
+	//HUD
+	m_is_asking_SFPanel = SFPanel_None;
+	if (m_SFTargetPanel)
+	{
+		m_SFTargetPanel->Update(deltaTime);
+	}
+
 	ScreenBorderContraints();	
 }
 

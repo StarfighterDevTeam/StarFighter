@@ -49,7 +49,7 @@ SFPanelSpecific::~SFPanelSpecific()
 	
 }
 
-void SFPanelSpecific::Update(sf::Time deltaTime, sf::Vector2f inputs_directions)
+void SFPanelSpecific::Update(sf::Time deltaTime)
 {
 	
 }

@@ -55,7 +55,7 @@ public:
 	SFPanel(){};
 	SFPanel(sf::Vector2f size, SFPanelTypes panel_type);
 	~SFPanel();
-	virtual void Update(sf::Time deltaTime, sf::Vector2f inputs_directions);
+	virtual void Update(sf::Time deltaTime);
 	virtual void Draw(sf::RenderTexture& screen);
 	static bool IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object);
 	
