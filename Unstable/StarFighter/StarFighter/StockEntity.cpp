@@ -34,24 +34,21 @@ string StockEntity::GetBestPropulsionAvailable()
 	return "";
 }
 
-bool StockEntity::Stock(Ore* ore)
+size_t StockEntity::Stock(string ore_name, size_t quantity)
 {
-	if (!ore)
+	if (ore_name.empty())
 	{
-		return false;
+		return 0;
 	}
 
-	if (m_stock + ore->m_weight > m_stock_max)
-	{
-		printf("Ore loading unsuccessful: insufficient stock.\n");
-		return false;
-	}
+	size_t quantity_accepted = (m_stock_max - m_stock) / (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
+	size_t quantity_loaded = MinBetweenSizeTValues(quantity_accepted, quantity);
+	m_ores_stocked[ore_name] += quantity_loaded;
+	m_stock += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
 
-	m_ores_stocked[ore->m_display_name]++;
-	m_stock += ore->m_weight;
-	printf("Ore loading successfull.\n\n");
+	printf("Stocking ore: stock (%d/%d), %s stocked: %d/%d requested.\n", m_stock, m_stock_max, ore_name.c_str(), quantity_loaded, quantity);
 
-	return true;
+	return quantity_loaded;
 }
 
 bool StockEntity::CanSupplyFuel()

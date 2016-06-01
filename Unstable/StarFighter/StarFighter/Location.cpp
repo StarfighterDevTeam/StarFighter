@@ -178,7 +178,6 @@ bool Planet::Produce(string name, bool ignore_cost)
 	{
 		return false;
 	}
-	
 
 	//check cost
 	if (!ignore_cost)
@@ -195,6 +194,8 @@ bool Planet::Produce(string name, bool ignore_cost)
 
 	Starship* new_starship = Starship::CreateStarship(name);
 	new_starship->setPosition(getPosition());
+	new_starship->m_target_location = this;
+	new_starship->m_base_location = this;
 	(*CurrentGame).addToScene(new_starship, StarshipLayer, StarshipObject);
 
 	//pay the cost
@@ -223,7 +224,7 @@ void Planet::Harvest()
 			Ore* ore = GetRandomOre();
 			if (m_buildings[i]->Extract(ore))
 			{
-				if (Stock(ore))
+				if (Stock(ore->m_display_name, 1))
 				{
 					m_buildings[i]->m_current_extraction = NULL;
 					m_buildings[i]->m_extraction_clock.restart();

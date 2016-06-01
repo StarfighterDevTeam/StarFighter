@@ -35,10 +35,14 @@ public :
 	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
 	void SetStarshipState(StarshipState state);
 	string GetBestPropulsionAvailable() override;
+	string GetBestPropulsionAvailable(map<string, size_t> fuel_tank);
 
-	StockEntity* m_location;
+	StockEntity* m_target_location;
+	StockEntity* m_base_location;
+	StockEntity* m_task_location;
+
 	StarshipState m_state;
-	size_t m_assigned_propulsion;
+	size_t m_propulsion_assigned;
 	bool m_arrived_at_distination;
 	map<string, size_t> m_cost;
 	int m_scout_range;
@@ -69,8 +73,6 @@ public :
 	float m_drill_duration;
 	sf::Clock m_extraction_clock;
 	Ore* m_ore_found;
-
-	map<string, size_t> m_ores_carried;
 };
 
 #endif // STARSHIP_H_INCLUDED

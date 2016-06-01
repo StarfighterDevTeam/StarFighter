@@ -14,7 +14,7 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	virtual string GetBestPropulsionAvailable();
-	bool Stock(Ore* ore);
+	size_t Stock(string ore_name, size_t quantity);
 	virtual bool CanSupplyFuel();
 	bool CanBeDrilled();
 	size_t GetLightestOreWeight();
