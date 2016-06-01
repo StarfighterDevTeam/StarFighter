@@ -27,8 +27,9 @@ public :
 	static Starship* CreateStarship(string name);
 
 	bool AssignToLocation(StockEntity* location);
+	bool MoveToLocation(StockEntity* location);
 	size_t LoadFuel(string ore_name, size_t quantity);
-	bool LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing);
+	size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing);
 	size_t AssignPropulsionToTravel(size_t distance);
 	size_t ConsummePropulsion(size_t distance);
 	bool ManagePropulsion();
@@ -64,7 +65,6 @@ public :
 	void Drill();
 	void Extract(Ore* ore);
 	bool IsNewDrillAttemptAvailable();
-	void UnloadCarriage(StockEntity* location);
 
 	float m_drill_sucess_rate_bonus;
 	float m_extraction_duration_bonus;

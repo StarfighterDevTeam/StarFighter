@@ -22,7 +22,7 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_base_location = NULL;
 	m_task_location = NULL;
 	m_propulsion_assigned = 0;
-	m_arrived_at_distination = false;
+	m_arrived_at_distination = true;
 	m_propulsion = 0;
 	m_propulsion_speed_bonus = 0;
 
@@ -66,18 +66,11 @@ void Starship::update(sf::Time deltaTime)
 		}
 		case StarshipState_Idle:
 		{
-			//if (m_target_location)
-			//{
-			//	if (m_target_location->CanBeDrilled())
-			//	{
-			//		SetStarshipState(StarshipState_Drilling);
-			//	}
-			//	else if (m_target_location->CanSupplyFuel())
-			//	{
-			//		SetStarshipState(StarshipState_Unloading);
-			//	}
-			//}
-			 break;
+			if (m_task_location)
+			{
+				MoveToLocation(m_task_location);
+			}
+			break;
 		}
 		case StarshipState_Drilling:
 		{
@@ -91,26 +84,37 @@ void Starship::update(sf::Time deltaTime)
 		}
 		case StarshipState_Loading:
 		{
-			Stock(m_ore_found->m_display_name, 1);
-			IsNewDrillAttemptAvailable();
+			if (m_ore_found)
+			{
+				Stock(m_ore_found->m_display_name, 1);
+				m_ore_found = NULL;
+				IsNewDrillAttemptAvailable();
+			}
+			else
+			{
+				m_target_location->UnloadCarriage(this);//Loading
+				MoveToLocation(m_base_location);
+			}
+			
 			break;
 		}
 		case StarshipState_CarryToBase:
 		{
 			//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).front();
 			//StockEntity* tmp_location = (StockEntity*)tmp_obj;
-			AssignToLocation(m_base_location);
-			//AssignToLocation(tmp_location);
+			MoveToLocation(m_base_location);
+			//MoveToLocation(tmp_location);
 			break;
 		}
 		case StarshipState_Unloading:
 		{
 			UnloadCarriage(m_target_location);
+			m_current_drill_attempts = 0;
 
 			//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
 			//StockEntity* tmp_location = (StockEntity*)tmp_obj;
-			AssignToLocation(m_task_location);
-			//AssignToLocation(tmp_location);
+			MoveToLocation(m_task_location);
+			//MoveToLocation(tmp_location);
 			break;
 		}
 		default:
@@ -153,6 +157,10 @@ void Starship::SetStarshipState(StarshipState state)
 		case StarshipState_CarryToBase:
 		{
 			printf("\nCarry to base.\n");
+			break;
+		}
+		case StarshipState_Loading:
+		{
 			break;
 		}
 		case StarshipState_Unloading:
@@ -216,17 +224,17 @@ size_t Starship::LoadFuel(string ore_name, size_t quantity)
 	return quantity_loaded;
 }
 
-bool Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing)
+size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing)
 {
-	if (!location || propulsion_missing == 0)
+	if (!location || location != m_target_location || !m_arrived_at_distination || !location->CanSupplyFuel() || propulsion_missing == 0)
 	{
-		return false;
+		return propulsion_missing;
 	}
 
 	string fuel_type_selected = location->GetBestPropulsionAvailable();
 	if (fuel_type_selected.empty())
 	{
-		return false;
+		return propulsion_missing;
 	}
 
 	size_t propulsion_required = propulsion_missing;
@@ -278,11 +286,11 @@ bool Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion_m
 		printf("Got %d of the propulsion required from planet's fuel.\n", propulsion_missing);
 		m_propulsion += propulsion_missing;
 
-		return true;
+		return 0;
 	}
 	else
 	{
-		return false;
+		return propulsion_required;
 	}
 }
 
@@ -351,6 +359,60 @@ size_t Starship::ConsummePropulsion(size_t distance)
 
 bool Starship::AssignToLocation(StockEntity* location)
 {
+	//what to do when assigning a ship to a location?
+	if (!location || m_target_location == location)
+	{
+		return false;
+	}
+
+	if (location->CanBeDrilled())
+	{
+		if (m_target_location == m_task_location)
+		{
+			if (MoveToLocation(location))
+			{
+				m_task_location = location;
+			}
+		}
+		else if (m_target_location == m_base_location)
+		{
+			m_task_location = location;
+		}
+		else
+		{
+			if (MoveToLocation(location))
+			{
+				m_task_location = location;
+			}
+		}
+	}
+	else if (location->CanSupplyFuel())
+	{
+		if (m_target_location == m_task_location)
+		{
+			if (MoveToLocation(location))
+			{
+				m_task_location = NULL;
+			}
+		}
+		else if (m_target_location == m_base_location)
+		{
+			m_task_location = location;
+		}
+		else
+		{
+			if (MoveToLocation(location))
+			{
+				m_task_location = location;
+			}
+		}
+	}
+
+	return true;
+}
+
+bool Starship::MoveToLocation(StockEntity* location)
+{
 	if (!location || !m_base_location)
 	{
 		return false;
@@ -364,10 +426,14 @@ bool Starship::AssignToLocation(StockEntity* location)
 	size_t distance = GetLightYearsBetweenObjects(this, location);
 	size_t distance_return = GetLightYearsBetweenObjects(location, m_base_location);
 	size_t propulsion_required = location->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
-	if (m_propulsion_assigned < propulsion_required && m_propulsion < propulsion_required && !LoadRequiredPropulsion(m_base_location, propulsion_required - m_propulsion))
+	if (m_propulsion_assigned + m_propulsion < propulsion_required)
 	{
-		printf("Trying to assign to location too far: distance is %d, propulsion remaining is %d (%d missing).\n", distance, m_propulsion, propulsion_required - m_propulsion);
-		return false;
+		size_t propulsion_missing = LoadRequiredPropulsion(m_base_location, propulsion_required - m_propulsion);
+		if (propulsion_missing > 0)
+		{
+			printf("Trying to assign to location too far: distance is %d, propulsion remaining is %d (%d missing).\n", distance, m_propulsion, propulsion_missing);
+			return false;
+		}
 	}
 
 	printf("Assigning to location %s (distance: %d, current propulsion: %d).\n", location->m_display_name.c_str(), propulsion_required, m_propulsion);
@@ -382,14 +448,14 @@ bool Starship::AssignToLocation(StockEntity* location)
 	m_propulsion_assigned = propulsion_assigned;
 	m_arrived_at_distination = false;
 	m_target_location = location;
-	if (location->CanSupplyFuel())
-	{
-		m_base_location = location;
-	}
-	else if (location->CanBeDrilled())
-	{
-		m_task_location = location;
-	}
+	//if (location->CanSupplyFuel())
+	//{
+	//	m_base_location = location;
+	//}
+	//else if (location->CanBeDrilled())
+	//{
+	//	m_task_location = location;
+	//}
 	SetStarshipState(StarshipState_MovingToLocation);
 
 	return true;
@@ -446,7 +512,15 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 		}
 		if (m_target_location == m_task_location)
 		{
-			SetStarshipState(StarshipState_Searching);
+			if (m_target_location->CanBeDrilled())
+			{
+				SetStarshipState(StarshipState_Searching);
+			}
+			else
+			{
+				SetStarshipState(StarshipState_Loading);
+				m_current_drill_attempts = m_nb_drills;
+			}
 		}
 
 		return true;
@@ -476,6 +550,7 @@ Starship* Starship::CreateStarship(string name)
 		new_starship->m_cost[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]);
 	}
 
+	new_starship->m_display_name = (*CurrentGame).m_starshipConfig[name][StarshipData_Name];
 	new_starship->m_armor_max = stoi((*CurrentGame).m_starshipConfig[name][StarshipData_Armor]);
 	new_starship->m_fuel_max = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_FuelMax]);
 	new_starship->m_speed_max = stof((*CurrentGame).m_starshipConfig[name][StarshipData_SpeedMax]);
@@ -548,29 +623,5 @@ bool Starship::IsNewDrillAttemptAvailable()
 	{
 		SetStarshipState(StarshipState_Drilling);
 		return true;
-	}
-}
-
-void Starship::UnloadCarriage(StockEntity* location)
-{
-	if (!location || location != m_target_location || !m_arrived_at_distination)
-	{
-		return;
-	}
-
-	m_current_drill_attempts = 0;
-
-	for (map<string, size_t>::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); i++)
-	{
-		if (i->second > 0)
-		{
-			size_t quantity_accepted = (m_target_location->m_stock_max - m_target_location->m_stock) / (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
-			size_t quantity_unloaded = MinBetweenSizeTValues(quantity_accepted, i->second);
-			m_target_location->m_ores_stocked[i->first] += quantity_unloaded;
-			m_target_location->m_stock += quantity_unloaded * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
-			m_ores_stocked[i->first] -= quantity_unloaded;
-
-			printf("\n%s unloaded on planet: quantity %d, total weight of %d (Planet new stock: %d/%d).\n", i->first.c_str(), quantity_unloaded, quantity_unloaded*(size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]), m_target_location->m_stock, m_target_location->m_stock_max);
-		}
 	}
 }

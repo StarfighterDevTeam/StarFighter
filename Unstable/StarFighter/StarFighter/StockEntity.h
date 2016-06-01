@@ -18,7 +18,9 @@ public :
 	virtual bool CanSupplyFuel();
 	bool CanBeDrilled();
 	size_t GetLightestOreWeight();
+	string GetMostExpansiveOreAvailable();
 	Ore* GetRandomOre();
+	void UnloadCarriage(StockEntity* location);
 
 	string m_display_name;
 	int m_stock_max;

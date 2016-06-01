@@ -87,6 +87,24 @@ size_t StockEntity::GetLightestOreWeight()
 	return min < 0 ? 0 : (size_t)min;
 }
 
+string StockEntity::GetMostExpansiveOreAvailable()
+{
+	string ore;
+	int max = -1;
+	for (map<string, size_t>::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); ++i)
+	{
+		if (i->second > 0)
+		{
+			if (stoi((*CurrentGame).m_oreConfig[i->first][OreData_Price]) > max || max < 0)
+			{
+				max = stoi((*CurrentGame).m_oreConfig[i->first][OreData_Price]);
+				ore = i->first;
+			}
+		}
+	}
+
+	return ore;
+}
 
 Ore* StockEntity::GetRandomOre()
 {
@@ -118,4 +136,26 @@ Ore* StockEntity::GetRandomOre()
 		Ore* new_ore = Ore::CreateOre(ore_found);
 		return new_ore;
 	}
+}
+
+void StockEntity::UnloadCarriage(StockEntity* location)
+{
+	if (!location)
+	{
+		return;
+	}
+
+	for (map<string, size_t>::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); i++)
+	{
+		if (i->second > 0)
+		{
+			size_t quantity_accepted = (location->m_stock_max - location->m_stock) / (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+			size_t quantity_unloaded = MinBetweenSizeTValues(quantity_accepted, m_ores_stocked[i->first]);
+			location->m_ores_stocked[i->first] += quantity_unloaded;
+			location->m_stock += quantity_unloaded * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+			m_ores_stocked[i->first] -= quantity_unloaded;
+
+			printf("\n%s unloaded on planet: quantity %d, total weight of %d (Planet new stock: %d/%d).\n", i->first.c_str(), quantity_unloaded, quantity_unloaded*(size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]), location->m_stock, location->m_stock_max);
+		}
+	}	
 }
