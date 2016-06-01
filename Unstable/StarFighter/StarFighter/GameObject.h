@@ -135,9 +135,6 @@ public:
 	static size_t GetLightYearsBetweenObjects(GameObject* object1, GameObject* object2);
 	virtual void HoverObject(GameObject* object);
 
-	bool m_hovered;
-	bool m_selected;
-
 	//Utilitary methods
 	float GetAbsoluteSpeed();
 	static float GetAbsoluteSpeed(sf::Vector2f speed_);

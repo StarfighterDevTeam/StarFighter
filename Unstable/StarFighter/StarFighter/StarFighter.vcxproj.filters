@@ -81,9 +81,6 @@
     <ClCompile Include="SFPanel.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="SFPanelSpecific.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="Starship.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="StockEntity.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SFUnitInfoPanel.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -173,9 +173,6 @@
     <ClInclude Include="SFPanel.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="SFPanelSpecific.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="FileLoadUtils.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -192,6 +189,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="StockEntity.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="SFUnitInfoPanel.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

@@ -26,12 +26,14 @@ void InGameState::Initialize(Player player)
 	planet->Produce("miner", true);
 	planet->Load("oil", 50);
 	planet->Load("deuterium", 30);
+	planet->m_display_name = "Planète mère";
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
 	ore_field->m_ore_presence_rates["iron"] = 0.90f;
 	ore_field->m_ore_presence_rates["silver"] = 0.10f;
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
+	ore_field->m_display_name = "Champ de minerais";
 	
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
@@ -122,9 +124,9 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 {
 	switch (panel_type)
 	{
-		case SFPanel_Specific:
+		case SFPanel_UnitInfoPanel:
 		{
-			playerShip->m_SFTargetPanel = new SFPanelSpecific(sf::Vector2f(SFPANEL_SPECIFIC_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_Specific, playerShip);
+			playerShip->m_SFTargetPanel = new SFUnitInfoPanel(sf::Vector2f(SFPANEL_SPECIFIC_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_UnitInfoPanel, playerShip);
 			break;
 		}
 	}

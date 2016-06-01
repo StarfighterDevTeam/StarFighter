@@ -74,6 +74,37 @@ void Ship::update(sf::Time deltaTime)
 		starship->AssignToLocation(location);
 	}
 
+	//Hud
+	m_is_asking_SFPanel = SFPanel_None;
+	if (m_hovered_object)
+	{
+		if (m_SFTargetPanel && m_SFTargetPanel->GetUnit() && m_SFTargetPanel->GetUnit() != m_hovered_object)
+		{
+			//don't display it yet, first we need to destroy the previous panel
+		}
+		else
+		{
+			m_is_asking_SFPanel = SFPanel_UnitInfoPanel;
+		}
+	}
+	else if (m_selected_object)
+	{
+		if (m_SFTargetPanel && m_SFTargetPanel->GetUnit() && m_SFTargetPanel->GetUnit() != m_selected_object)
+		{
+			//don't display it yet, first we need to destroy the previous panel
+		}
+		else
+		{
+			m_is_asking_SFPanel = SFPanel_UnitInfoPanel;
+		}
+	}
+	if (m_SFTargetPanel)
+	{
+		sf::Vector2f position = sf::Vector2f(m_SFTargetPanel->getSize().x / 2 + m_SFTargetPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + getPosition().x, m_SFTargetPanel->getSize().y / 2 + m_SFTargetPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + getPosition().y);
+		m_SFTargetPanel->setPosition(position);
+		m_SFTargetPanel->Update(deltaTime);
+	}
+
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
 	UpdateRotation();
@@ -293,14 +324,16 @@ void Ship::HoverObject(GameObject* object)
 {
 	if (object != m_hovered_object && m_hovered_object)
 	{
-		m_hovered_object->m_hovered = false;
+		StockEntity* entity = (StockEntity*)m_hovered_object;
+		entity->m_hovered = false;
 	}
 
 	m_hovered_object = object;
 
 	if (object)
 	{
-		object->m_hovered = true;
+		StockEntity* entity = (StockEntity*)object;
+		entity->m_hovered = true;
 	}
 }
 
@@ -308,13 +341,15 @@ void Ship::SelectObject(GameObject* object)
 {
 	if (object != m_selected_object && m_selected_object)
 	{
-		m_selected_object->m_selected = false;
+		StockEntity* entity = (StockEntity*)m_selected_object;
+		entity->m_selected = false;
 	}
 
 	m_selected_object = object;
 
 	if (object)
 	{
-		object->m_selected = true;
+		StockEntity* entity = (StockEntity*)object;
+		entity->m_selected = true;
 	}
 }

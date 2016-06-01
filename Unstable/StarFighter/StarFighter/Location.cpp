@@ -19,7 +19,7 @@ Location::~Location()
 
 void Location::update(sf::Time deltaTime)
 {
-	GameObject::update(deltaTime);
+	StockEntity::update(deltaTime);
 }
 
 bool Location::CanSupplyFuel()

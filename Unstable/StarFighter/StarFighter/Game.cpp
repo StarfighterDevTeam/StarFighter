@@ -286,6 +286,13 @@ void Game::drawScene()
 				m_mainScreen.draw(*(*it));
 			}
 		}
+		else if (i == PanelLayer)
+		{
+			for (std::list<SFPanel*>::iterator it = this->m_sceneFeedbackSFPanels.begin(); it != this->m_sceneFeedbackSFPanels.end(); it++)
+			{
+				(*(*it)).Draw(m_mainScreen);
+			}
+		}
 		else
 		{
 			for (std::vector<GameObject*>::iterator it = this->m_sceneGameObjectsLayered[i].begin(); it != this->m_sceneGameObjectsLayered[i].end(); it++)
@@ -338,7 +345,6 @@ void Game::colisionChecksV2()
 				break;
 			}
 		}
-
 		
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LocationObject].begin(); it2 != m_sceneGameObjectsTyped[LocationObject].end(); it2++)
 		{

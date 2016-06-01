@@ -120,7 +120,7 @@ void Starship::update(sf::Time deltaTime)
 		}
 	}
 
-	GameObject::update(deltaTime);
+	StockEntity::update(deltaTime);
 }
 
 void Starship::SetStarshipState(StarshipState state)

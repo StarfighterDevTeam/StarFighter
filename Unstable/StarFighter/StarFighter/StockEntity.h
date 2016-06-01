@@ -39,6 +39,9 @@ public :
 	map<string, size_t> m_fuel_tanks;
 	
 	map<string, float> m_ore_presence_rates;
+
+	bool m_hovered;
+	bool m_selected;
 };
 
 #endif // STARSHIP_H_INCLUDED

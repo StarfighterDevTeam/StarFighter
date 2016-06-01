@@ -12,6 +12,9 @@ StockEntity::StockEntity(sf::Vector2f position, sf::Vector2f speed, std::string 
 	m_fuel = 0;
 	m_fuel_max = 0;
 
+	m_hovered = false;
+	m_selected = false;
+
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
 		if (stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) == 0)
@@ -33,7 +36,21 @@ StockEntity::~StockEntity()
 
 void StockEntity::update(sf::Time deltaTime)
 {
-	//see override in class Starship and Location
+	//selection and hovering feedbacks
+	if (m_selected)
+	{
+		setColor(sf::Color(255, 0, 0, 255));
+	}
+	else if (m_hovered)
+	{
+		setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+	}
+	else
+	{
+		setColor(sf::Color(255, 255, 255, 255));
+	}
+
+	GameObject::update(deltaTime);
 }
 
 string StockEntity::GetBestPropulsionAvailable()

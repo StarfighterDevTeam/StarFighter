@@ -7,7 +7,7 @@
 #include <sstream>
 #include "Game.h"
 #include "Ship.h"
-#include "SFPanelSpecific.h"
+#include "SFUnitInfoPanel.h"
 #include "FileLoadUtils.h"
 #include "Starship.h"
 
