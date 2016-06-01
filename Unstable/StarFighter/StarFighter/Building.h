@@ -16,8 +16,8 @@ public :
 	bool Extract(Ore* ore);
 
 	string m_display_name;
-	size_t m_stock;
 	size_t m_stock_max;
+	size_t m_fuel_max;
 	size_t m_slots;
 	bool m_can_extract_ore;
 	sf::Clock m_extraction_clock;

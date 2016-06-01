@@ -13,21 +13,31 @@ public :
 
 	void update(sf::Time deltaTime) override;
 
-	virtual string GetBestPropulsionAvailable();
-	size_t Stock(string ore_name, size_t quantity);
+	string GetBestPropulsionAvailable();
+	static string GetBestPropulsionAvailable(map<string, size_t> fuel_tank);
+	size_t LoadOre(string ore_name, size_t quantity);
+	size_t Load(string ore_name, size_t quantity);
 	virtual bool CanSupplyFuel();
 	bool CanBeDrilled();
 	size_t GetLightestOreWeight();
 	string GetMostExpansiveOreAvailable();
 	Ore* GetRandomOre();
 	void UnloadCarriage(StockEntity* location);
+	virtual size_t LoadFuel(string ore_name, size_t quantity);
+	virtual size_t GetStockMax();
+	virtual size_t GetFuelMax();
 
 	string m_display_name;
+
 	int m_stock_max;
 	int m_stock;
+	map<string, size_t> m_ores_stocked;
 	size_t m_min_ore_weight;
 
-	map<string, size_t> m_ores_stocked;
+	size_t m_fuel;
+	size_t m_fuel_max;
+	map<string, size_t> m_fuel_tanks;
+	
 	map<string, float> m_ore_presence_rates;
 };
 

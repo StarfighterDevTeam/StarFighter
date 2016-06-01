@@ -24,7 +24,20 @@ void Location::update(sf::Time deltaTime)
 
 bool Location::CanSupplyFuel()
 {
+	//see override in class Planet
 	return false;
+}
+
+size_t Location::GetStockMax()
+{
+	//see override in class Planet
+	return StockEntity::GetStockMax();
+}
+
+size_t Location::GetFuelMax()
+{
+	//see override in class Planet
+	return StockEntity::GetFuelMax();
 }
 
 //ORE FIELD
@@ -54,6 +67,10 @@ Planet::Planet(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 	}
 
 	m_building_slots = 10;
+	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_starshipConfig.begin(); i != (*CurrentGame).m_starshipConfig.end(); ++i)
+	{
+		m_starship_productions.insert(map<string, size_t>::value_type(i->first, 0));
+	}
 }
 
 Planet::~Planet()
@@ -76,33 +93,43 @@ void Planet::update(sf::Time deltaTime)
 
 bool Planet::CanSupplyFuel()
 {
-	size_t buildingsVectorSize = m_buildings.size();
-	for (size_t i = 0; i < buildingsVectorSize; i++)
-	{
-		if (m_buildings[i]->m_can_extract_ore)
-		{
-			return true;
-		}
-	}
-
-	return false;
+	return GetStockMax() > 0;
 }
 
-string Location::GetBestPropulsionAvailable()
+size_t Planet::GetStockMax()
 {
-	size_t propulsion = 0;
-	string selected_fuel;
-
-	for (map<string, size_t >::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); ++i)
+	size_t stock_max = 0;
+	size_t BuildingsVectorSize = m_buildings.size();
+	for (size_t i = 0; i < BuildingsVectorSize; i++)
 	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		if (m_buildings[i])
 		{
-			selected_fuel = i->first;
-			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+			stock_max += m_buildings[i]->m_stock_max;
+		}	
+	}
+
+	m_stock_max = stock_max;
+	m_stock = MinBetweenSizeTValues(m_stock_max, m_stock);
+
+	return m_stock_max;
+}
+
+size_t Planet::GetFuelMax()
+{
+	size_t fuel_max = 0;
+	size_t BuildingsVectorSize = m_buildings.size();
+	for (size_t i = 0; i < BuildingsVectorSize; i++)
+	{
+		if (m_buildings[i])
+		{
+			fuel_max += m_buildings[i]->m_fuel_max;
 		}
 	}
 
-	return selected_fuel;
+	m_fuel_max = fuel_max;
+	m_fuel = MinBetweenSizeTValues(m_fuel_max, m_fuel);
+
+	return m_fuel_max;
 }
 
 size_t Planet::GetNbSlotsTaken()
@@ -158,6 +185,14 @@ bool Planet::Build(string name, bool ignore_cost)
 	}
 
 	printf("\nBuilding %s successfully (Planet: %d/10 slots).\n\n", name.c_str(), slots_taken + new_building->m_slots, m_building_slots);
+
+	//Update location's data
+	GetStockMax();
+	GetFuelMax();
+	for (map<string, size_t>::iterator i = new_building->m_starship_productions.begin(); i != new_building->m_starship_productions.end(); ++i)
+	{
+		m_starship_productions[i->first] += new_building->m_starship_productions[i->first];
+	}
 
 	return true;
 }
@@ -224,7 +259,7 @@ void Planet::Harvest()
 			Ore* ore = GetRandomOre();
 			if (m_buildings[i]->Extract(ore))
 			{
-				if (Stock(ore->m_display_name, 1))
+				if (Load(ore->m_display_name, 1))
 				{
 					m_buildings[i]->m_current_extraction = NULL;
 					m_buildings[i]->m_extraction_clock.restart();

@@ -15,7 +15,8 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	virtual bool CanSupplyFuel();
-	string GetBestPropulsionAvailable() override;
+	virtual size_t GetStockMax();
+	virtual size_t GetFuelMax();
 
 	bool m_fuel_refill;
 };
@@ -33,9 +34,12 @@ public:
 	size_t GetNbSlotsTaken();
 	void Harvest();
 	bool CanSupplyFuel() override;
+	size_t GetStockMax() override;
+	size_t GetFuelMax() override;
 
 	size_t m_building_slots;
 	vector<Building*> m_buildings;
+	map<string, size_t> m_starship_productions;
 };
 
 class OreField : public Location

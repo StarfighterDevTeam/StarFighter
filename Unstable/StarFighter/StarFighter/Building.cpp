@@ -7,8 +7,8 @@ using namespace sf;
 //BUILDING
 Building::Building(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	m_stock = 0;
 	m_stock_max = 0;
+	m_fuel_max = 0;
 	m_slots = 1;
 	m_can_extract_ore = false;
 	m_extraction_duration_bonus = 0;
@@ -39,6 +39,7 @@ Building* Building::CreateBuilding(string name)
 	new_building->m_display_name = (*CurrentGame).m_buildingConfig[name][BuildingData_Name];
 	new_building->m_slots = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_Slots]);
 	new_building->m_stock_max = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_Stock]);
+	new_building->m_fuel_max = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_Fuel]);
 	new_building->m_can_extract_ore = stoi((*CurrentGame).m_buildingConfig[name][BuildingData_CanExtractOre]) == 1;
 	new_building->m_extraction_duration_bonus = stof((*CurrentGame).m_buildingConfig[name][BuildingData_ExtractionDurationBonus]);
 
@@ -53,7 +54,7 @@ Building* Building::CreateBuilding(string name)
 	}
 
 	//productions
-	if (!(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1].empty())
+	if (!(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1].empty() && (*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1].compare("0") != 0)
 	{
 		new_building->m_starship_productions[(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1]]++;
 	}

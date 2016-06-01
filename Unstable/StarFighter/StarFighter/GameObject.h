@@ -86,6 +86,7 @@ enum BuildingData
 	BuildingData_TextureName,
 	BuildingData_Slots,
 	BuildingData_Stock,
+	BuildingData_Fuel,
 	BuildingData_CanExtractOre,
 	BuildingData_ExtractionDurationBonus,
 	BuildingData_OreCostType1,

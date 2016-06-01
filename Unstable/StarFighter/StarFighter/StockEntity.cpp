@@ -6,15 +6,23 @@ using namespace sf;
 
 StockEntity::StockEntity(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-
-	m_stock_max = 0;
 	m_stock = 0;
+	m_stock_max = 0;
 	m_min_ore_weight = 0;
+	m_fuel = 0;
+	m_fuel_max = 0;
 
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
-		m_ores_stocked[i->first] = 0;
-		m_ore_presence_rates[i->first] = 0;
+		if (stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) == 0)
+		{
+			m_ores_stocked.insert(map<string, size_t>::value_type(i->first, 0));
+			m_ore_presence_rates.insert(map<string, size_t>::value_type(i->first, 0));
+		}
+		else
+		{
+			m_fuel_tanks.insert(map<string, size_t>::value_type(i->first, 0));
+		}
 	}
 }
 
@@ -30,18 +38,63 @@ void StockEntity::update(sf::Time deltaTime)
 
 string StockEntity::GetBestPropulsionAvailable()
 {
-	//see override in class Starship and Location
-	return "";
+	size_t propulsion = 0;
+	string selected_fuel;
+
+	for (map<string, size_t>::iterator i = m_fuel_tanks.begin(); i != m_fuel_tanks.end(); ++i)
+	{
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		{
+			selected_fuel = i->first;
+			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		}
+	}
+
+	return selected_fuel;
 }
 
-size_t StockEntity::Stock(string ore_name, size_t quantity)
+string StockEntity::GetBestPropulsionAvailable(map<string, size_t> fuel_tank)
+{
+	size_t propulsion = 0;
+	string selected_fuel;
+	for (map<string, size_t>::iterator i = fuel_tank.begin(); i != fuel_tank.end(); ++i)
+	{
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		{
+			selected_fuel = i->first;
+			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		}
+	}
+
+	return selected_fuel;
+}
+
+size_t StockEntity::Load(string ore_name, size_t quantity)
 {
 	if (ore_name.empty())
 	{
 		return 0;
 	}
 
-	size_t quantity_accepted = (m_stock_max - m_stock) / (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
+	bool is_fuel = stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Propulsion]) > 0;
+	if (is_fuel)
+	{
+		return LoadFuel(ore_name, quantity);
+	}
+	else
+	{
+		return LoadOre(ore_name, quantity);
+	}
+}
+
+size_t StockEntity::LoadOre(string ore_name, size_t quantity)
+{
+	if (ore_name.empty())
+	{
+		return 0;
+	}
+
+	size_t quantity_accepted = (GetStockMax() - m_stock) / (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
 	size_t quantity_loaded = MinBetweenSizeTValues(quantity_accepted, quantity);
 	m_ores_stocked[ore_name] += quantity_loaded;
 	m_stock += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
@@ -51,10 +104,39 @@ size_t StockEntity::Stock(string ore_name, size_t quantity)
 	return quantity_loaded;
 }
 
+size_t StockEntity::LoadFuel(string ore_name, size_t quantity)
+{
+	if (ore_name.empty())
+	{
+		return 0;
+	}
+
+	size_t quantity_accepted = (GetFuelMax() - m_fuel) / (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
+	size_t quantity_loaded = MinBetweenSizeTValues(quantity_accepted, quantity);
+	m_fuel_tanks[ore_name] += quantity_loaded;
+	m_fuel += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
+
+	printf("Fuel loading: stock (%d/%d), %s quantity loaded / %d: %d.\n", m_fuel, m_fuel_max, ore_name.c_str(), quantity_loaded, quantity);
+
+	return quantity_loaded;
+}
+
 bool StockEntity::CanSupplyFuel()
 {
 	//see override in class Starship and Location
 	return false;
+}
+
+size_t StockEntity::GetStockMax()
+{
+	//see override in class Planet
+	return m_fuel_max;
+}
+
+size_t StockEntity::GetFuelMax()
+{
+	//see override in class Planet
+	return m_fuel_max;
 }
 
 bool StockEntity::CanBeDrilled()

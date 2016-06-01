@@ -12,11 +12,8 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_scout_range = 0;
 	m_armor_max = 1;
 	m_armor = m_armor_max;
-	m_fuel = 0;
 	m_fuel_max = 100;
 	m_speed_max = 100;
-	m_stock_max = 0;
-	m_stock = 0;
 	m_nb_drills = 0;
 	m_target_location = NULL;
 	m_base_location = NULL;
@@ -86,7 +83,7 @@ void Starship::update(sf::Time deltaTime)
 		{
 			if (m_ore_found)
 			{
-				Stock(m_ore_found->m_display_name, 1);
+				LoadOre(m_ore_found->m_display_name, 1);
 				m_ore_found = NULL;
 				IsNewDrillAttemptAvailable();
 			}
@@ -174,52 +171,10 @@ void Starship::SetStarshipState(StarshipState state)
 	}
 }
 
-string Starship::GetBestPropulsionAvailable()
-{
-	size_t propulsion = 0;
-	string selected_fuel;
-	for (map<string, size_t>::iterator i = m_fuel_tanks.begin(); i != m_fuel_tanks.end(); ++i)
-	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
-		{
-			selected_fuel = i->first;
-			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
-		}
-	}
-
-	return selected_fuel;
-}
-
-string Starship::GetBestPropulsionAvailable(map<string, size_t> fuel_tank)
-{
-	size_t propulsion = 0;
-	string selected_fuel;
-	for (map<string, size_t>::iterator i = fuel_tank.begin(); i != fuel_tank.end(); ++i)
-	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
-		{
-			selected_fuel = i->first;
-			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
-		}
-	}
-
-	return selected_fuel;
-}
-
 size_t Starship::LoadFuel(string ore_name, size_t quantity)
 {
-	if (ore_name.empty())
-	{
-		return 0;
-	}
-
-	size_t quantity_accepted = (m_fuel_max - m_fuel) / (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
-	size_t quantity_loaded = MinBetweenSizeTValues(quantity_accepted, quantity);
-	m_fuel_tanks[ore_name] += quantity_loaded;
-	m_fuel += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
-	m_propulsion += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Propulsion]);
-
-	printf("Fuel loading: stock (%d/%d), %s quantity loaded / %d: %d (new propulsion: %d).\n", m_fuel, m_fuel_max, ore_name.c_str(), quantity_loaded, quantity, m_propulsion);
+	size_t quantity_loaded = StockEntity::LoadFuel(ore_name, quantity);
+	m_propulsion += quantity_loaded * (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Propulsion]);
 
 	return quantity_loaded;
 }
@@ -238,7 +193,7 @@ size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion
 	}
 
 	size_t propulsion_required = propulsion_missing;
-	map<string, size_t> virtual_storage = location->m_ores_stocked;
+	map<string, size_t> virtual_storage = location->m_fuel_tanks;
 	map<string, size_t> assigned_storage;
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
@@ -279,8 +234,8 @@ size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion
 		for (map<string, size_t>::iterator i = assigned_storage.begin(); i != assigned_storage.end(); ++i)
 		{
 			m_fuel_tanks[i->first] += i->second;
-			location->m_ores_stocked[i->first] -= i->second;
-			location->m_stock -= i->second * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
+			location->m_fuel_tanks[i->first] -= i->second;
+			location->m_fuel -= i->second * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
 		}
 
 		printf("Got %d of the propulsion required from planet's fuel.\n", propulsion_missing);

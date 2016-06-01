@@ -24,8 +24,8 @@ void InGameState::Initialize(Player player)
 	planet->Build("refinery", true);
 	planet->Build("factory", true);
 	planet->Produce("miner", true);
-	planet->Stock("oil", 50);
-	planet->Stock("deuterium", 30);
+	planet->Load("oil", 50);
+	planet->Load("deuterium", 30);
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
