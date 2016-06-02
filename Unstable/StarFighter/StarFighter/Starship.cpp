@@ -52,6 +52,7 @@ Starship::~Starship()
 
 void Starship::update(sf::Time deltaTime)
 {
+	printf("propulsion: %d\n", m_propulsion);
 	switch (m_state)
 	{
 		case StarshipState_MovingToLocation:
@@ -333,46 +334,43 @@ bool Starship::AssignToLocation(StockEntity* location)
 		return false;
 	}
 
-	if (location->CanBeDrilled())
-	{
-		if (m_target_location == m_task_location)
+	if (m_target_location == m_task_location)//forth
+	{	
+		if (location->CanSupplyFuel())
 		{
+			//go to planet and cancel task
 			if (MoveToLocation(location))
 			{
-				m_task_location = location;
-			}
-		}
-		else if (m_target_location == m_base_location)
-		{
-			m_task_location = location;
-		}
-		else
-		{
-			if (MoveToLocation(location))
-			{
-				m_task_location = location;
-			}
-		}
-	}
-	else if (location->CanSupplyFuel())
-	{
-		if (m_target_location == m_task_location)
-		{
-			if (MoveToLocation(location))
-			{
+				m_base_location = location;
 				m_task_location = NULL;
 			}
 		}
-		else if (m_target_location == m_base_location)
+
+		if (location->CanBeDrilled())
 		{
-			m_task_location = NULL;
-		}
-		else
-		{
+			//accept new task?
 			if (MoveToLocation(location))
 			{
 				m_task_location = location;
+				m_task_location = NULL;
 			}
+			
+		}
+	}
+	else if (m_target_location == m_base_location)//back
+	{
+		if (location->CanSupplyFuel())
+		{
+			//accept new base?
+			if (MoveToLocation(location))
+			{
+				m_base_location = location;
+			}
+		}
+		else if (location->CanBeDrilled())
+		{
+			//accept new next task
+			m_task_location = location;
 		}
 	}
 
@@ -412,6 +410,7 @@ bool Starship::MoveToLocation(StockEntity* location)
 	NormalizeSpeed(&m_speed, m_speed_max);
 
 	size_t propulsion_assigned = AssignPropulsionToTravel(propulsion_required);
+	propulsion_assigned = MinBetweenSizeTValues(propulsion_assigned, m_propulsion);
 	m_propulsion -= propulsion_assigned;
 	m_propulsion_assigned += propulsion_assigned;
 	m_arrived_at_distination = false;

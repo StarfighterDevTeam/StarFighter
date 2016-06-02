@@ -23,12 +23,20 @@ void InGameState::Initialize(Player player)
 	planet->m_ore_presence_rates["deuterium"] = 0.1f;
 	planet->Build("refinery", true);
 	planet->Build("refinery", true);
-	planet->Build("refinery", true);
 	planet->Build("factory", true);
 	planet->Produce("miner", true);
 	planet->Load("oil", 50);
 	planet->Load("deuterium", 30);
 	planet->m_display_name = "Planète mère";
+
+	Planet* planet2 = new Planet(sf::Vector2f(MAP_SIZE / 2 - 600, MAP_SIZE / 2 - 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	(*CurrentGame).addToScene(planet2, LocationLayer, LocationObject);
+	planet2->m_ore_presence_rates["oil"] = 1.0f;
+	planet2->m_ore_presence_rates["deuterium"] = 0.5f;
+	planet2->Build("refinery", true);
+	planet2->Load("oil", 50);
+	planet2->Load("deuterium", 30);
+	planet2->m_display_name = "Colonie";
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
@@ -36,6 +44,13 @@ void InGameState::Initialize(Player player)
 	ore_field->m_ore_presence_rates["silver"] = 0.10f;
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 	ore_field->m_display_name = "Champ de minerais";
+
+	OreField* ore_field2 = new OreField(sf::Vector2f(MAP_SIZE / 2 - 100, MAP_SIZE / 2 - 300), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	(*CurrentGame).addToScene(ore_field2, LocationLayer, LocationObject);
+	ore_field2->m_ore_presence_rates["gold"] = 0.30f;
+	ore_field2->m_ore_presence_rates["silver"] = 0.70f;
+	ore_field2->m_min_ore_weight = ore_field->GetLightestOreWeight();
+	ore_field2->m_display_name = "Champ de minerais rares";
 	
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
