@@ -22,6 +22,8 @@ void InGameState::Initialize(Player player)
 	planet->m_ore_presence_rates["oil"] = 1.0f;
 	planet->m_ore_presence_rates["deuterium"] = 0.1f;
 	planet->Build("refinery", true);
+	planet->Build("refinery", true);
+	planet->Build("refinery", true);
 	planet->Build("factory", true);
 	planet->Produce("miner", true);
 	planet->Load("oil", 50);

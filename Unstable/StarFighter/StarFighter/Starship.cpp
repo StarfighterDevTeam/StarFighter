@@ -365,7 +365,7 @@ bool Starship::AssignToLocation(StockEntity* location)
 		}
 		else if (m_target_location == m_base_location)
 		{
-			m_task_location = location;
+			m_task_location = NULL;
 		}
 		else
 		{

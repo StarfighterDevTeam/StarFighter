@@ -113,7 +113,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 		}
 	}
 
-	//drill stats
+	//ship stats
 	if (entity->m_collider_type == StarshipObject)
 	{
 		Starship* starship = (Starship*)entity;
@@ -211,6 +211,27 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 		else
 		{
 			ss_text << "current location";
+		}
+
+		//location
+		ss_text << "\n\nBase location: ";
+		if (starship->m_base_location)
+		{
+			ss_text << starship->m_base_location->m_display_name;
+		}
+		else
+		{
+			ss_text << "none";
+		}
+
+		ss_text << "\nTask location: ";
+		if (starship->m_task_location)
+		{
+			ss_text << starship->m_task_location->m_display_name;
+		}
+		else
+		{
+			ss_text << "none";
 		}
 	}
 
