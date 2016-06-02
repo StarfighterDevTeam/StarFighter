@@ -58,7 +58,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define INTERACTION_BUTTON_HEIGHT				16
 #define INTERACTION_BUTTON_MARGIN				4
 #define INTERACTION_INTERBLOCK					20
-#define SFPANEL_SPECIFIC_WIDTH					250
+#define SFPANEL_SPECIFIC_WIDTH					380
 #define SFPANEL_SPECIFIC_HEIGHT					250
 
 //CSV DATA

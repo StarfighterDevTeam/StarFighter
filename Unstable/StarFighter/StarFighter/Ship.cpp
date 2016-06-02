@@ -50,6 +50,13 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		SelectObject((*CurrentGame).GetSceneGameObjectsTyped(StarshipObject).front());
+	}
+
+	ManageHud(deltaTime);
+
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
 
 	if (!m_disable_inputs)
@@ -74,6 +81,19 @@ void Ship::update(sf::Time deltaTime)
 		starship->AssignToLocation(location);
 	}
 
+	
+
+	MaxSpeedConstraints();
+	IdleDecelleration(deltaTime);
+	UpdateRotation();
+
+	GameObject::update(deltaTime);
+
+	ScreenBorderContraints();	
+}
+
+void Ship::ManageHud(sf::Time deltaTime)
+{
 	//Hud
 	m_is_asking_SFPanel = SFPanel_None;
 	if (m_hovered_object)
@@ -104,14 +124,6 @@ void Ship::update(sf::Time deltaTime)
 		m_SFTargetPanel->setPosition(position);
 		m_SFTargetPanel->Update(deltaTime);
 	}
-
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
-	UpdateRotation();
-
-	GameObject::update(deltaTime);
-
-	ScreenBorderContraints();	
 }
 
 bool Ship::ScreenBorderContraints()

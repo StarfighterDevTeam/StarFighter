@@ -253,6 +253,7 @@ void StockEntity::UnloadCarriage(StockEntity* location)
 			location->m_ores_stocked[i->first] += quantity_unloaded;
 			location->m_stock += quantity_unloaded * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
 			m_ores_stocked[i->first] -= quantity_unloaded;
+			m_stock -= quantity_unloaded * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
 
 			printf("\n%s unloaded on planet: quantity %d, total weight of %d (Planet new stock: %d/%d).\n", i->first.c_str(), quantity_unloaded, quantity_unloaded*(size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]), location->m_stock, location->m_stock_max);
 		}

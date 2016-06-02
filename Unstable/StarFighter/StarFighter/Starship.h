@@ -29,7 +29,7 @@ public :
 	bool AssignToLocation(StockEntity* location);
 	bool MoveToLocation(StockEntity* location);
 	size_t LoadFuel(string ore_name, size_t quantity) override;
-	size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing);
+	size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation);
 	size_t AssignPropulsionToTravel(size_t distance);
 	size_t ConsummePropulsion(size_t distance);
 	bool ManagePropulsion();
@@ -38,6 +38,7 @@ public :
 	void Drill();
 	void Extract(Ore* ore);
 	bool IsNewDrillAttemptAvailable();
+	string GetBestAssignedPropulsionAvailable();
 
 	StockEntity* m_target_location;
 	StockEntity* m_base_location;
@@ -52,10 +53,10 @@ public :
 	//Weapon* m_weapon;
 	int m_armor;
 	int m_armor_max;
+	float m_speed_max;
 	size_t m_propulsion;
 	string m_current_fuel_type;
 	map<string, size_t> m_fuel_assigned;
-	float m_speed_max;
 	float m_propulsion_speed_bonus;
 	size_t m_nb_drills;
 	float m_drill_sucess_rate_bonus;

@@ -110,7 +110,11 @@ void Starship::update(sf::Time deltaTime)
 
 			//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
 			//StockEntity* tmp_location = (StockEntity*)tmp_obj;
-			MoveToLocation(m_task_location);
+			if (!MoveToLocation(m_task_location))
+			{
+				SetStarshipState(StarshipState_Idle);
+			}
+			
 			//MoveToLocation(tmp_location);
 			break;
 		}
@@ -179,9 +183,9 @@ size_t Starship::LoadFuel(string ore_name, size_t quantity)
 	return quantity_loaded;
 }
 
-size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing)
+size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation)
 {
-	if (!location || location != m_target_location || !m_arrived_at_distination || !location->CanSupplyFuel() || propulsion_missing == 0)
+	if (!location || !m_arrived_at_distination || propulsion_missing == 0)
 	{
 		return propulsion_missing;
 	}
@@ -217,23 +221,28 @@ size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion
 
 		if (propulsion_required > 0)
 		{
-			if (fuel_type_selected == GetBestPropulsionAvailable(virtual_storage))
+			if (fuel_type_selected == StockEntity::GetBestPropulsionAvailable(virtual_storage))
 			{
 				break;
 			}
 			else
 			{
-				fuel_type_selected = GetBestPropulsionAvailable(virtual_storage);
+				fuel_type_selected = StockEntity::GetBestPropulsionAvailable(virtual_storage);
 			}
 		}
 	}
 
 	//found enough propulsion?
-	if (propulsion_required == 0)
+	if (simulation)
+	{
+		return propulsion_required;
+	}
+	else if (propulsion_required == 0)
 	{
 		for (map<string, size_t>::iterator i = assigned_storage.begin(); i != assigned_storage.end(); ++i)
 		{
 			m_fuel_tanks[i->first] += i->second;
+			m_fuel += i->second * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
 			location->m_fuel_tanks[i->first] -= i->second;
 			location->m_fuel -= i->second * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
 		}
@@ -252,7 +261,8 @@ size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion
 size_t Starship::AssignPropulsionToTravel(size_t distance)
 {
 	size_t propulsion_assigned = 0;
-	size_t distance_remaining = distance;
+	//subtracting fuel already assigned from the distance to cover
+	size_t distance_remaining = m_propulsion_assigned == 0 ? distance : (distance > m_propulsion_assigned ? distance - m_propulsion_assigned : 0);
 
 	string fuel_type_selected = GetBestPropulsionAvailable();
 	while (!fuel_type_selected.empty() && distance_remaining > 0)
@@ -286,7 +296,7 @@ size_t Starship::ConsummePropulsion(size_t distance)
 	size_t propulsion_consummed = 0;
 	size_t distance_remaining = distance;
 
-	string fuel_type_selected = GetBestPropulsionAvailable(m_fuel_assigned);
+	string fuel_type_selected = GetBestAssignedPropulsionAvailable();
 	while (!fuel_type_selected.empty() && distance_remaining > 0)
 	{
 		size_t quantity_assigned = MinBetweenSizeTValues(m_fuel_assigned[fuel_type_selected], distance_remaining / (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]));
@@ -294,20 +304,23 @@ size_t Starship::ConsummePropulsion(size_t distance)
 		m_fuel -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
 		propulsion_consummed += quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
 		distance_remaining -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+		m_propulsion_assigned -= propulsion_consummed;
 
 		//resolving round up cases (no waste)
 		if (distance_remaining > 0 && distance_remaining < (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]) && m_fuel_assigned[fuel_type_selected] > 0)
 		{
 			return propulsion_consummed;
 		}
+		
 
 		if (distance_remaining > 0)
 		{
-			fuel_type_selected = GetBestPropulsionAvailable(m_fuel_assigned);
+			fuel_type_selected = GetBestAssignedPropulsionAvailable();
 		}
 	}
 
 	m_propulsion_speed_bonus = stof((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_PropulsionSpeedBonus]);
+	ScaleSpeed(&m_speed, m_speed_max * (1 + m_propulsion_speed_bonus));
 
 	return propulsion_consummed;
 }
@@ -383,7 +396,7 @@ bool Starship::MoveToLocation(StockEntity* location)
 	size_t propulsion_required = location->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
 	if (m_propulsion_assigned + m_propulsion < propulsion_required)
 	{
-		size_t propulsion_missing = LoadRequiredPropulsion(m_base_location, propulsion_required - m_propulsion);
+		size_t propulsion_missing = LoadRequiredPropulsion(m_base_location, propulsion_required - m_propulsion, false);
 		if (propulsion_missing > 0)
 		{
 			printf("Trying to assign to location too far: distance is %d, propulsion remaining is %d (%d missing).\n", distance, m_propulsion, propulsion_missing);
@@ -396,11 +409,11 @@ bool Starship::MoveToLocation(StockEntity* location)
 	//Move to location
 	m_speed.x = location->getPosition().x - this->getPosition().x;
 	m_speed.y = location->getPosition().y - this->getPosition().y;
-	NormalizeSpeed(&m_speed, m_speed_max * (1+m_propulsion_speed_bonus));
+	NormalizeSpeed(&m_speed, m_speed_max);
 
 	size_t propulsion_assigned = AssignPropulsionToTravel(propulsion_required);
 	m_propulsion -= propulsion_assigned;
-	m_propulsion_assigned = propulsion_assigned;
+	m_propulsion_assigned += propulsion_assigned;
 	m_arrived_at_distination = false;
 	m_target_location = location;
 	//if (location->CanSupplyFuel())
@@ -426,10 +439,8 @@ bool Starship::ManagePropulsion()
 	size_t distance_remaining = m_target_location == m_base_location ? GetLightYearsBetweenObjects(this, m_target_location) : GetLightYearsBetweenObjects(this, m_target_location) + GetLightYearsBetweenObjects(m_target_location, m_base_location);
 	if (distance_remaining < m_propulsion_assigned)
 	{
-		
 		size_t propulsion_to_consumme = m_propulsion_assigned - distance_remaining;
 		ConsummePropulsion(propulsion_to_consumme);
-		m_propulsion_assigned -= propulsion_to_consumme;
 
 		//finish by a waste?
 		if (distance_remaining == 0)
@@ -579,4 +590,21 @@ bool Starship::IsNewDrillAttemptAvailable()
 		SetStarshipState(StarshipState_Drilling);
 		return true;
 	}
+}
+
+string Starship::GetBestAssignedPropulsionAvailable()
+{
+	size_t propulsion = 0;
+	string selected_fuel;
+
+	for (map<string, size_t>::iterator i = m_fuel_assigned.begin(); i != m_fuel_assigned.end(); ++i)
+	{
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		{
+			selected_fuel = i->first;
+			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		}
+	}
+
+	return selected_fuel;
 }

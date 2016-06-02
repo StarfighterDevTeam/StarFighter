@@ -39,7 +39,7 @@ bool InputGuy::isAssigning(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 		{
 			return true;
 		}

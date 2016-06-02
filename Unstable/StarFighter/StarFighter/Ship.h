@@ -50,6 +50,7 @@ public :
 	bool ScreenBorderContraints();
 	void MaxSpeedConstraints();
 	void UpdateRotation();
+	void ManageHud(sf::Time deltaTime);
 
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
