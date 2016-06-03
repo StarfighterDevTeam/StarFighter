@@ -122,7 +122,7 @@ void SFActionBoxWithSelection::Draw(sf::RenderTexture& screen)
 	{
 		screen.draw(m_box);
 	}
-	for (int i = 0; i < optionsVectorSize; i++)
+	for (size_t i = 0; i < optionsVectorSize; i++)
 	{
 		if (!m_texts[i].getString().isEmpty())
 		{

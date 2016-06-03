@@ -29,9 +29,9 @@ public :
 
 	string m_display_name;
 
-	int m_stock_max;
-	int m_stock;
-	map<string, size_t> m_ores_stocked;
+	size_t m_stock_max;
+	size_t m_stock;
+	std::map<string, size_t> m_ores_stocked;
 	size_t m_min_ore_weight;
 
 	size_t m_fuel;

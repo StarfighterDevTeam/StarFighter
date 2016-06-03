@@ -199,19 +199,23 @@ bool Planet::Build(string name, bool ignore_cost)
 
 bool Planet::Produce(string name, bool ignore_cost)
 {
-	size_t nb_productions = 0;
-	size_t buildingsVectorSize = m_buildings.size();
-	for (size_t i = 0; i < buildingsVectorSize; i++)
+	//check production capacity
+	if (!ignore_cost)
 	{
-		if (m_buildings[i])
+		size_t nb_productions = 0;
+		size_t buildingsVectorSize = m_buildings.size();
+		for (size_t i = 0; i < buildingsVectorSize; i++)
 		{
-			nb_productions += m_buildings[i]->m_starship_productions[name];
+			if (m_buildings[i])
+			{
+				nb_productions += m_buildings[i]->m_starship_productions[name];
+			}
 		}
-	}
 
-	if (nb_productions == 0)
-	{
-		return false;
+		if (nb_productions == 0)
+		{
+			return false;
+		}
 	}
 
 	//check cost

@@ -28,8 +28,6 @@ public:
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFiles();
 
-	StellarMap* m_stellarmap;
-
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

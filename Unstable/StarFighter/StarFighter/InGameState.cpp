@@ -2,8 +2,6 @@
 
 extern Game* CurrentGame;
 
-#define MAP_SIZE			4000
-
 void InGameState::Initialize(Player player)
 {
 	this->mainWindow = player.m_playerWindow;
@@ -37,6 +35,7 @@ void InGameState::Initialize(Player player)
 	planet2->Load("oil", 50);
 	planet2->Load("deuterium", 30);
 	planet2->m_display_name = "Colonie";
+	planet2->Produce("probe", true);
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
@@ -66,7 +65,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
-	m_stellarmap = new StellarMap();
+	(*CurrentGame).m_stellarmap = new StellarMap();
 }
 
 void InGameState::Update(sf::Time deltaTime)

@@ -42,6 +42,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define LIGHTYEAR_IN_PIXELS							10
 #define STELLAR_ZONE_SIZE							500
 #define STELLAR_ZONES_PER_LINE						40
+#define CHANCE_OF_LOCATION_IN_ZONE					0.4f
+#define MIN_DISTANCE_BETWEEN_LOCATIONS				200
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50

@@ -17,7 +17,12 @@
 #include "Stroboscopic.h"
 #include "SFPanel.h"
 
+#include "StellarMapVirtual.h"
+
 class Ship;
+class StellarMap;
+
+#define MAP_SIZE			4000
 
 enum SFX_Bank
 {
@@ -100,6 +105,10 @@ public:
 	void SetMusicVolume(bool activate_music);
 	void PlayMusic(Music_Bank music, string specific_filename = "");
 	void ManageMusicTransitions(sf::Time deltaTime);
+
+	//StarMiner specific
+	StellarMapVirtual* m_stellarmap;
+	bool RevealObjectsAtPosition(sf::Vector2f position, float range, GameObjectType type);
 
 	//CSV data
 	map<string, vector<string> > m_oreConfig;

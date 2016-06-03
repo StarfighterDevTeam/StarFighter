@@ -62,12 +62,14 @@ enum StarshipData
 	StarshipData_OreCostQuantity2,
 	StarshipData_Armor,
 	StarshipData_FuelMax,
+	StarshipData_Combustion,
 	StarshipData_SpeedMax,
 	StarshipData_StockMax,
 	StarshipData_NbDrills,
 	StarshipData_DrillDuration,//Miner specifics
 	StarshipData_DrillSuccessRateBonus,
 	StarshipData_ExtractionDurationBonus,
+	StarshipData_ScoutRange,
 };
 
 enum OreData

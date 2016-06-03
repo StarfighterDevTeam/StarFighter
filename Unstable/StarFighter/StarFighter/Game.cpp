@@ -590,3 +590,31 @@ std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
 {
 	return m_sceneGameObjectsTyped[type];
 }
+
+//STARTMINER SPECIFIC
+bool Game::RevealObjectsAtPosition(sf::Vector2f position, float range, GameObjectType type)
+{
+	bool element_revealed = false;
+	if (type < NBVAL_GameObject)
+	{
+		size_t specificVectorSize = m_sceneGameObjectsTyped[type].size();
+		for (size_t i = 0; i < specificVectorSize; i++)
+		{
+			if (m_sceneGameObjectsTyped[type][i] && !m_sceneGameObjectsTyped[type][i]->m_visible)
+			{
+				float distance = GameObject::GetDistanceBetweenPositions(m_sceneGameObjectsTyped[type][i]->getPosition(), position);
+				if (distance < range)
+				{
+					m_sceneGameObjectsTyped[type][i]->m_visible = true;
+					element_revealed = true;
+				}
+			}
+		}
+	
+		return element_revealed;
+	}
+	else
+	{
+		return false;//not supported
+	}
+}

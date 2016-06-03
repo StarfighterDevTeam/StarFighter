@@ -40,6 +40,12 @@ public :
 	bool IsNewDrillAttemptAvailable();
 	string GetBestAssignedPropulsionAvailable();
 
+	sf::Vector2u GetCurrentZone();
+	void UpdateZoneKnowledge();
+	bool Scout();
+
+	sf::Vector2u m_current_zone;
+
 	StockEntity* m_target_location;
 	StockEntity* m_base_location;
 	StockEntity* m_task_location;
@@ -48,13 +54,14 @@ public :
 	size_t m_propulsion_assigned;
 	bool m_arrived_at_distination;
 	map<string, size_t> m_cost;
-	int m_scout_range;
+	float m_scout_range;
 
 	//Weapon* m_weapon;
 	int m_armor;
 	int m_armor_max;
 	float m_speed_max;
 	size_t m_propulsion;
+	size_t m_combustion;
 	string m_current_fuel_type;
 	map<string, size_t> m_fuel_assigned;
 	float m_propulsion_speed_bonus;

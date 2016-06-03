@@ -1,2 +1,3 @@
-#starship_name,texture_name,cost_ore_type1,cost_ore_quantity1,cost_ore_type2,cost_ore_quantity2,armor,fuel_max,speed_max,stock_max,nb_drills,drill_duration,drill_sucess_rate_bonus,extraction_duration_bonus
-miner,2D/Miner1.png,iron,10,silver,2,1,100,150,100,2,3.f,0.01f,0.5f
+#starship_name,texture_name,cost_ore_type1,cost_ore_quantity1,cost_ore_type2,cost_ore_quantity2,armor,fuel_max,combustion,speed_max,stock_max,nb_drills,drill_duration,drill_sucess_rate_bonus,extraction_duration_bonus,scout_range
+miner,2D/Miner1.png,iron,10,silver,2,1,100,3,150,100,2,3.f,0.01f,0.5f,0
+probe,2D/Probe1.png,iron,0,silver,0,1,100,1,300,100,0,3.f,0.01f,0.5f,400

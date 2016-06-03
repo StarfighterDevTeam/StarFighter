@@ -22,6 +22,8 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_arrived_at_distination = true;
 	m_propulsion = 0;
 	m_propulsion_speed_bonus = 0;
+	m_combustion = 0;
+	m_current_zone = GetCurrentZone();
 
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
@@ -52,6 +54,14 @@ Starship::~Starship()
 
 void Starship::update(sf::Time deltaTime)
 {
+	if (m_scout_range > 0)
+	{
+		Scout();
+	}
+
+	//update memory of position within the stellar map (which grid cell are we in?)
+	UpdateZoneKnowledge();
+	
 	switch (m_state)
 	{
 		case StarshipState_MovingToLocation:
@@ -173,6 +183,33 @@ void Starship::SetStarshipState(StarshipState state)
 			break;
 		}
 	}
+}
+
+sf::Vector2u Starship::GetCurrentZone()
+{
+	return (*CurrentGame).m_stellarmap->GetZoneIndex(getPosition());
+}
+
+void Starship::UpdateZoneKnowledge()
+{
+	m_current_zone = GetCurrentZone();
+
+	string key = StellarMapVirtual::GetVectorString(m_current_zone);
+	if (!(*CurrentGame).m_stellarmap->isZoneKnown(key))
+	{
+		if (!(*CurrentGame).m_stellarmap->isZoneGenerated(key))
+		{	
+			(*CurrentGame).m_stellarmap->m_known_zones.insert(map<string, bool>::value_type(key, false));
+		}
+		(*CurrentGame).m_stellarmap->m_known_zones[key] = true;
+	
+		(*CurrentGame).m_stellarmap->ExpandKnownStellarMap(m_current_zone);
+	}
+}
+
+bool Starship::Scout()
+{
+	return (*CurrentGame).RevealObjectsAtPosition(getPosition(), m_scout_range, LocationObject);
 }
 
 size_t Starship::LoadFuel(string ore_name, size_t quantity)
@@ -517,13 +554,16 @@ Starship* Starship::CreateStarship(string name)
 	new_starship->m_display_name = (*CurrentGame).m_starshipConfig[name][StarshipData_Name];
 	new_starship->m_armor_max = stoi((*CurrentGame).m_starshipConfig[name][StarshipData_Armor]);
 	new_starship->m_fuel_max = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_FuelMax]);
+	new_starship->m_combustion = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_Combustion]);
 	new_starship->m_speed_max = stof((*CurrentGame).m_starshipConfig[name][StarshipData_SpeedMax]);
 	new_starship->m_stock_max = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_StockMax]);
 
 	new_starship->m_nb_drills = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_NbDrills]);
 	new_starship->m_drill_sucess_rate_bonus = stof((*CurrentGame).m_starshipConfig[name][StarshipData_DrillSuccessRateBonus]);
-	new_starship->m_drill_duration = stof((*CurrentGame).m_starshipConfig[name][StarshipData_DrillDuration]);
+	new_starship->m_drill_duration = (float)(stof((*CurrentGame).m_starshipConfig[name][StarshipData_DrillDuration]));
 	new_starship->m_extraction_duration_bonus = stof((*CurrentGame).m_starshipConfig[name][StarshipData_ExtractionDurationBonus]);
+
+	new_starship->m_scout_range = (float)(stof((*CurrentGame).m_starshipConfig[name][StarshipData_ScoutRange]));
 
 	return new_starship;
 }

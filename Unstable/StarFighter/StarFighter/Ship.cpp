@@ -74,14 +74,25 @@ void Ship::update(sf::Time deltaTime)
 	{
 		SelectObject(m_hovered_object);
 	}
-	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object && m_hovered_object && m_selected_object->m_collider_type == StarshipObject && m_hovered_object->m_collider_type == LocationObject)
+	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object && m_selected_object->m_collider_type == StarshipObject)
 	{
 		Starship* starship = (Starship*)m_selected_object;
-		Location* location = (Location*)m_hovered_object;
-		starship->AssignToLocation(location);
+
+		if (m_hovered_object && m_hovered_object->m_collider_type == LocationObject)
+		{
+			Location* location = (Location*)m_hovered_object;
+
+			if (starship->m_nb_drills > 0)
+			{
+				starship->AssignToLocation(location);
+			}
+		}
+		else if (starship->m_scout_range > 0)
+		{
+			starship->setPosition(getPosition());
+		}
 	}
 
-	
 
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
@@ -260,7 +271,7 @@ bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, 
 	}
 	else if (state_required == Input_Hold && condition)
 	{
-		m_actions_states[action] = m_inputs_states[action];
+		m_actions_states[action] = m_inputs_states[action] == Input_Hold;
 		return true;
 	}
 	else if (!condition)

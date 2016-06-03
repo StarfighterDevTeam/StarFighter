@@ -247,6 +247,9 @@ bool operator ==(const Vector2<T>& left, const Vector2<T>& right);
 template <typename T>
 bool operator !=(const Vector2<T>& left, const Vector2<T>& right);
 
+template <typename T>
+bool operator <(const Vector2<T>& left, const Vector2<T>& right){ return left.x < left.y || right.x < right.y; };
+
 #include <SFML/System/Vector2.inl>
 
 // Define the most common types
