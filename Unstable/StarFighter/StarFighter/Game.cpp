@@ -277,11 +277,14 @@ void Game::drawScene()
 	{
 		if (i == FeedbacksLayer)
 		{
-			for (std::list<RectangleShape*>::iterator it = this->m_sceneFeedbackBars.begin(); it != this->m_sceneFeedbackBars.end(); it++)
+			for (std::list<Text*>::iterator it = this->m_sceneFeedbackTexts.begin(); it != this->m_sceneFeedbackTexts.end(); it++)
 			{
 				m_mainScreen.draw(*(*it));
 			}
-			for (std::list<Text*>::iterator it = this->m_sceneFeedbackTexts.begin(); it != this->m_sceneFeedbackTexts.end(); it++)
+		}
+		else if (i == StellarMapLayer)
+		{
+			for (std::list<RectangleShape*>::iterator it = this->m_sceneFeedbackBars.begin(); it != this->m_sceneFeedbackBars.end(); it++)
 			{
 				m_mainScreen.draw(*(*it));
 			}

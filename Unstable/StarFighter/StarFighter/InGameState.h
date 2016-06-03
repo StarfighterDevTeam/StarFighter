@@ -10,6 +10,7 @@
 #include "SFUnitInfoPanel.h"
 #include "FileLoadUtils.h"
 #include "Starship.h"
+#include "StellarMap.h"
 
 class GameObject;
 
@@ -26,6 +27,8 @@ public:
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFiles();
+
+	StellarMap* m_stellarmap;
 
 private:
 	sf::RenderWindow* mainWindow;

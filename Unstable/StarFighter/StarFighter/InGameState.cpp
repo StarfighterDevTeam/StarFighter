@@ -59,12 +59,14 @@ void InGameState::Initialize(Player player)
 		Ship::SaveShip(playerShip);
 	}
 
-	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
-	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+	//GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
+	//(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = sf::Vector2f(MAP_SIZE, MAP_SIZE);
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
+
+	m_stellarmap = new StellarMap();
 }
 
 void InGameState::Update(sf::Time deltaTime)

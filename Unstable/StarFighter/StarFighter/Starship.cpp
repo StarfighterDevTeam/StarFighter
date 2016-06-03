@@ -52,7 +52,6 @@ Starship::~Starship()
 
 void Starship::update(sf::Time deltaTime)
 {
-	printf("propulsion: %d\n", m_propulsion);
 	switch (m_state)
 	{
 		case StarshipState_MovingToLocation:
