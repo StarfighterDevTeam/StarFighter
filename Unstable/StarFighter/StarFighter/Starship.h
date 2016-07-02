@@ -14,6 +14,7 @@ enum StarshipState
 	StarshipState_Loading,
 	StarshipState_CarryToBase,
 	StarshipState_Unloading,
+	StarshipState_Scanning,
 };
 
 class Starship : public StockEntity
@@ -36,6 +37,7 @@ public :
 	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
 	void SetStarshipState(StarshipState state);
 	void Drill();
+	void Scan();
 	void Extract(Ore* ore);
 	bool IsNewDrillAttemptAvailable();
 	string GetBestAssignedPropulsionAvailable();
@@ -73,6 +75,7 @@ public :
 	float m_drill_duration;
 	sf::Clock m_extraction_clock;
 	Ore* m_ore_found;
+	sf::Clock m_scan_clock;
 };
 
 #endif // STARSHIP_H_INCLUDED

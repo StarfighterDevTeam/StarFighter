@@ -27,6 +27,14 @@ GameObject::GameObject()
 
 }
 
+void GameObject::Draw(sf::RenderTexture& screen)
+{
+	if (m_visible)
+	{
+		screen.draw(*this);
+	}
+}
+
 void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 {
 	//are we already playing this animation?
@@ -128,10 +136,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 
 GameObject::~GameObject()
 {
-	//TODO
-
-	//delete this->equipment_loot;
-	//delete this->weapon_loot;
+	
 }
 
 void GameObject::update(sf::Time deltaTime)

@@ -78,13 +78,13 @@ void StellarMapVirtual::ExpandKnownStellarMap(sf::Vector2u zone_index)
 			{
 				string key = GetVectorString(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1));
 				m_known_zones.insert(map<string, bool>::value_type(key, false));
-				GenerateRandomZoneContent(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1));
+				Location* location = GenerateRandomZoneContent(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1), false);
 			}
 		}
 	}
 }
 
-bool StellarMapVirtual::GenerateRandomZoneContent(sf::Vector2u zone_index)
+Location* StellarMapVirtual::GenerateRandomZoneContent(sf::Vector2u zone_index, bool visible)
 {
 	return false;
 }

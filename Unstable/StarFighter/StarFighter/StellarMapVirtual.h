@@ -7,6 +7,8 @@
 using namespace std;
 using namespace sf;
 
+class Location;
+
 class StellarZone : public sf::RectangleShape
 {
 public:
@@ -32,7 +34,7 @@ public :
 	void ExpandKnownStellarMap(sf::Vector2u zone_index);
 	static string GetVectorString(sf::Vector2u vector);
 
-	virtual bool GenerateRandomZoneContent(sf::Vector2u zone_index);
+	virtual Location* GenerateRandomZoneContent(sf::Vector2u zone_index, bool visible);
 	
 	StellarZone* m_zones[STELLAR_ZONES_PER_LINE][STELLAR_ZONES_PER_LINE];
 	map<string, bool> m_known_zones;

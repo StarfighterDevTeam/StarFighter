@@ -9,7 +9,7 @@ class StockEntity : public GameObject
 public :
 	StockEntity() {};
 	StockEntity(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
-	virtual ~StockEntity();
+	~StockEntity();
 
 	void update(sf::Time deltaTime) override;
 
@@ -26,6 +26,8 @@ public :
 	virtual size_t LoadFuel(string ore_name, size_t quantity);
 	virtual size_t GetStockMax();
 	virtual size_t GetFuelMax();
+
+	bool m_identified;
 
 	string m_display_name;
 

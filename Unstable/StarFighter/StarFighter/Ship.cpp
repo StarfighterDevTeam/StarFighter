@@ -50,6 +50,15 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	if (m_hovered_object && m_hovered_object->m_GarbageMe)
+	{
+		m_hovered_object = NULL;
+	}
+	if (m_selected_object && m_selected_object->m_GarbageMe)
+	{
+		m_selected_object = NULL;
+	}
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		SelectObject((*CurrentGame).GetSceneGameObjectsTyped(StarshipObject).front());
@@ -82,7 +91,11 @@ void Ship::update(sf::Time deltaTime)
 		{
 			Location* location = (Location*)m_hovered_object;
 
-			if (starship->m_nb_drills > 0)
+			if (starship->m_scout_range > 0)
+			{
+				starship->AssignToLocation(location);
+			}
+			else if (starship->m_nb_drills > 0)
 			{
 				starship->AssignToLocation(location);
 			}

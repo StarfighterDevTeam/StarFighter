@@ -26,6 +26,7 @@ void InGameState::Initialize(Player player)
 	planet->Load("oil", 50);
 	planet->Load("deuterium", 30);
 	planet->m_display_name = "Planète mère";
+	planet->m_identified = true;
 
 	Planet* planet2 = new Planet(sf::Vector2f(MAP_SIZE / 2 - 600, MAP_SIZE / 2 - 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(planet2, LocationLayer, LocationObject);
@@ -36,6 +37,7 @@ void InGameState::Initialize(Player player)
 	planet2->Load("deuterium", 30);
 	planet2->m_display_name = "Colonie";
 	planet2->Produce("probe", true);
+	planet2->m_identified = true;
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
@@ -43,6 +45,7 @@ void InGameState::Initialize(Player player)
 	ore_field->m_ore_presence_rates["silver"] = 0.10f;
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 	ore_field->m_display_name = "Champ de minerais";
+	ore_field->m_identified = true;
 
 	OreField* ore_field2 = new OreField(sf::Vector2f(MAP_SIZE / 2 - 100, MAP_SIZE / 2 - 300), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field2, LocationLayer, LocationObject);

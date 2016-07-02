@@ -19,7 +19,7 @@ public :
 	virtual ~StellarMap();
 	void update(sf::Time deltaTime) override;
 
-	bool GenerateRandomZoneContent(sf::Vector2u zone_index) override;
+	Location* GenerateRandomZoneContent(sf::Vector2u zone_index, bool visible) override;
 	//void ExpandKnownStellarMap(sf::Vector2u zone_index) override;
 
 	//StellarZone* m_zones[STELLAR_ZONES_PER_LINE][STELLAR_ZONES_PER_LINE];

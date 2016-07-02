@@ -15,6 +15,8 @@ StockEntity::StockEntity(sf::Vector2f position, sf::Vector2f speed, std::string 
 	m_hovered = false;
 	m_selected = false;
 
+	m_identified = false;
+
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
 		if (stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) == 0)
@@ -31,7 +33,7 @@ StockEntity::StockEntity(sf::Vector2f position, sf::Vector2f speed, std::string 
 
 StockEntity::~StockEntity()
 {
-
+	
 }
 
 void StockEntity::update(sf::Time deltaTime)

@@ -38,6 +38,12 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
+//UNKNOWN TEXTURES
+#define UNKNOWN_PLANET_TEXTURE						"2D/UnknownPlanet.png"
+#define UNKNOWN_OREFIELD_TEXTURE					"2D/UnknownField.png"
+
+#define SCAN_DURATION								5.f
+
 //DISTANCES
 #define LIGHTYEAR_IN_PIXELS							10
 #define STELLAR_ZONE_SIZE							500

@@ -36,7 +36,7 @@ void StellarMap::update(sf::Time deltaTime)
 	
 }
 
-bool StellarMap::GenerateRandomZoneContent(sf::Vector2u zone_index)
+Location* StellarMap::GenerateRandomZoneContent(sf::Vector2u zone_index, bool visible)
 {
 	if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < CHANCE_OF_LOCATION_IN_ZONE)
 	{
@@ -72,7 +72,7 @@ bool StellarMap::GenerateRandomZoneContent(sf::Vector2u zone_index)
 
 			if (tries > 10)
 			{
-				return false;
+				return NULL;
 			}
 		}
 
@@ -88,14 +88,14 @@ bool StellarMap::GenerateRandomZoneContent(sf::Vector2u zone_index)
 		planet->Load("oil", 50);
 		planet->Load("deuterium", 30);
 		planet->m_display_name = "Planète mère";
-		planet->m_visible = false;
+		planet->m_visible = visible;
 
-		return true;
+		return planet;
 	}
 	else
 	{
-		return false;
+		return NULL;
 	}
 
-	return false;
+	return NULL;
 }
