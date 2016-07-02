@@ -9,17 +9,36 @@ Location::Location(sf::Vector2f position, sf::Vector2f speed, std::string textur
 {
 	m_stock = 0;
 	m_stock_max = 100;
-	m_fuel_refill = false;
+
+	m_unknown_sprite = new GameObject(position, speed, UNKNOWN_PLANET_TEXTURE, size);
 }
 
 Location::~Location()
 {
-
+	delete m_unknown_sprite;
 }
 
 void Location::update(sf::Time deltaTime)
 {
 	StockEntity::update(deltaTime);
+}
+
+void Location::Draw(sf::RenderTexture& screen)
+{
+	if (m_visible)
+	{
+		if (!m_identified)
+		{
+			if (m_unknown_sprite)
+			{
+				screen.draw(*m_unknown_sprite);
+			}
+		}
+		else
+		{
+			screen.draw(*this);
+		}
+	}
 }
 
 bool Location::CanSupplyFuel()
@@ -59,8 +78,6 @@ void OreField::update(sf::Time deltaTime)
 //PLANET
 Planet::Planet(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Location(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	m_fuel_refill = true;
-
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
 		m_ore_presence_rates.insert(map<string, float>::value_type(i->first, 0));
@@ -235,6 +252,7 @@ bool Planet::Produce(string name, bool ignore_cost)
 	new_starship->setPosition(getPosition());
 	new_starship->m_target_location = this;
 	new_starship->m_base_location = this;
+	new_starship->m_identified = true;
 	(*CurrentGame).addToScene(new_starship, StarshipLayer, StarshipObject);
 
 	//pay the cost

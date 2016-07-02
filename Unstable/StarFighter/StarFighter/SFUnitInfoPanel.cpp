@@ -15,12 +15,27 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	if (playerShip->m_hovered_object)
 	{
 		entity = (StockEntity*)playerShip->m_hovered_object;
-		ss_title << entity->m_display_name;
+		if (entity->m_identified)
+		{
+			ss_title << entity->m_display_name;
+		}
+		else
+		{
+			ss_title << "???";
+		}
+		
 	}
 	else if (playerShip->m_selected_object)
 	{
 		entity = (StockEntity*)playerShip->m_selected_object;
-		ss_title << entity->m_display_name;
+		if (entity->m_identified)
+		{
+			ss_title << entity->m_display_name;
+		}
+		else
+		{
+			ss_title << "???";
+		}
 	}
 	m_unit = entity;
 
@@ -34,134 +49,150 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	//text
 	ostringstream ss_text;
 
-	ostringstream ss_ore;
-	string contains_ore;
-	ostringstream ss_fuel;
-	string contains_fuel;
-
-	//ore stocked
-	for (map<string, size_t>::iterator i = entity->m_ores_stocked.begin(); i != entity->m_ores_stocked.end(); i++)
+	if (!entity->m_identified)
 	{
-		ss_ore << "\n" << i->first << ": " << i->second;
-	}
-	contains_ore = ss_ore.str();
-	if (!contains_ore.empty())
-	{
-		ss_text << "Ore: " << entity->m_stock << " / " << entity->GetStockMax() << contains_ore;
-	}
-
-	//fuel
-	if (entity->m_collider_type == StarshipObject)
-	{
-		Starship* starship = (Starship*)entity;
-		for (map<string, size_t>::iterator i = entity->m_fuel_tanks.begin(); i != entity->m_fuel_tanks.end(); i++)
-		{
-			ss_fuel << "\n" << i->first << ": " << i->second + starship->m_fuel_assigned[i->first];
-		}
+		ss_text << "Unknown object";
 	}
 	else
 	{
-		for (map<string, size_t>::iterator i = entity->m_fuel_tanks.begin(); i != entity->m_fuel_tanks.end(); i++)
+		ostringstream ss_ore;
+		string contains_ore;
+		ostringstream ss_fuel;
+		string contains_fuel;
+
+		//ore stocked
+		for (map<string, size_t>::iterator i = entity->m_ores_stocked.begin(); i != entity->m_ores_stocked.end(); i++)
 		{
-			ss_fuel << "\n" << i->first << ": " << i->second;
+			ss_ore << "\n" << i->first << ": " << i->second;
 		}
-	}
-	
-	contains_fuel = ss_fuel.str();
-	if (!contains_fuel.empty())
-	{
+		contains_ore = ss_ore.str();
 		if (!contains_ore.empty())
 		{
-			ss_text << "\n\n";
+			ss_text << "Ore: " << entity->m_stock << " / " << entity->GetStockMax() << contains_ore;
 		}
-		ss_text << "Fuel: " << entity->m_fuel << " / " << entity->GetFuelMax() << contains_fuel;
-	}
 
-	//drill rates
-	if (entity->m_collider_type == LocationObject)
-	{
-		ss_text << "\n\nRessources:";
-		for (map<string, float>::iterator i = entity->m_ore_presence_rates.begin(); i != entity->m_ore_presence_rates.end(); i++)
+		//fuel
+		if (entity->m_collider_type == StarshipObject)
 		{
-			ss_text << "\n" << i->first << ": " << i->second * 100 << ("%");
-		}
-	}
-
-	//buildings
-	if (entity->m_collider_type == LocationObject && entity->CanSupplyFuel())
-	{
-		Planet* planet = (Planet*)entity;
-		size_t buildingsVectorSize = planet->m_buildings.size();
-		ss_text << "\n\nBuildings: " << buildingsVectorSize << "/" << planet->m_building_slots;
-		for (size_t i = 0; i < buildingsVectorSize; i++)
-		{
-			if (planet->m_buildings[i])
+			Starship* starship = (Starship*)entity;
+			for (map<string, size_t>::iterator i = entity->m_fuel_tanks.begin(); i != entity->m_fuel_tanks.end(); i++)
 			{
-				ss_text << "\n" << planet->m_buildings[i]->m_display_name;
+				ss_fuel << "\n" << i->first << ": " << i->second + starship->m_fuel_assigned[i->first];
 			}
 		}
-	}
-
-	//productions
-	if (entity->m_collider_type == LocationObject && entity->CanSupplyFuel())
-	{
-		Planet* planet = (Planet*)entity;
-		ss_text << "\n\nProductions:";
-		for (map<string, size_t>::iterator i = planet->m_starship_productions.begin(); i != planet->m_starship_productions.end(); i++)
+		else
 		{
-			ss_text << "\n" << i->first << " (level " << i->second << ")";
-		}
-	}
-
-	//ship stats
-	if (entity->m_collider_type == StarshipObject)
-	{
-		Starship* starship = (Starship*)entity;
-		ss_text << "\n\nDrill attempts: " << starship->m_current_drill_attempts << "/" << starship->m_nb_drills;
-		ss_text << "\nStatus: ";
-		switch (starship->m_state)
-		{
-			case StarshipState_Idle:
+			for (map<string, size_t>::iterator i = entity->m_fuel_tanks.begin(); i != entity->m_fuel_tanks.end(); i++)
 			{
-				if (starship->m_target_location)
+				ss_fuel << "\n" << i->first << ": " << i->second;
+			}
+		}
+
+		contains_fuel = ss_fuel.str();
+		if (!contains_fuel.empty())
+		{
+			if (!contains_ore.empty())
+			{
+				ss_text << "\n\n";
+			}
+			ss_text << "Fuel: " << entity->m_fuel << " / " << entity->GetFuelMax() << contains_fuel;
+		}
+
+		//drill rates
+		if (entity->m_collider_type == LocationObject)
+		{
+			ss_text << "\n\nRessources:";
+			for (map<string, float>::iterator i = entity->m_ore_presence_rates.begin(); i != entity->m_ore_presence_rates.end(); i++)
+			{
+				ss_text << "\n" << i->first << ": " << i->second * 100 << ("%");
+			}
+		}
+
+		//buildings
+		if (entity->m_collider_type == LocationObject && entity->CanSupplyFuel())
+		{
+			Planet* planet = (Planet*)entity;
+			size_t buildingsVectorSize = planet->m_buildings.size();
+			ss_text << "\n\nBuildings: " << buildingsVectorSize << "/" << planet->m_building_slots;
+			for (size_t i = 0; i < buildingsVectorSize; i++)
+			{
+				if (planet->m_buildings[i])
 				{
-					ss_text << "waiting for fuel";
+					ss_text << "\n" << planet->m_buildings[i]->m_display_name;
 				}
-				else
+			}
+		}
+
+		//productions
+		if (entity->m_collider_type == LocationObject && entity->CanSupplyFuel())
+		{
+			Planet* planet = (Planet*)entity;
+			ss_text << "\n\nProductions:";
+			for (map<string, size_t>::iterator i = planet->m_starship_productions.begin(); i != planet->m_starship_productions.end(); i++)
+			{
+				ss_text << "\n" << i->first << " (level " << i->second << ")";
+			}
+		}
+
+		//ship stats
+		if (entity->m_collider_type == StarshipObject)
+		{
+			Starship* starship = (Starship*)entity;
+			if (starship->m_nb_drills > 0)
+			{
+				ss_text << "\n\nDrill attempts: " << starship->m_current_drill_attempts << "/" << starship->m_nb_drills;
+			}
+			ss_text << "\nStatus: ";
+			switch (starship->m_state)
+			{
+				case StarshipState_Idle:
 				{
-					ss_text << "waiting for orders";
+					if (starship->m_target_location)
+					{
+						ss_text << "waiting for fuel";
+					}
+					else
+					{
+						ss_text << "waiting for orders";
+					}
+
+					break;
 				}
-				
-				break;
-			}
-			case StarshipState_Drilling:
-			{
-				ss_text << "drilling...";
-				break;
-			}
-			case StarshipState_Searching:
-			{
-				ss_text << "searching drill location";
-				break;
-			}
-			case StarshipState_Unloading:
-			{
-				ss_text << "unloading";
-				break;
-			}
-			case StarshipState_MovingToLocation:
-			{
-				ss_text << "moving to location";
-				break;
-			}
-			case StarshipState_Extracting:
-			{
-				ss_text << "extracting: " << starship->m_ore_found->m_display_name;
-				break;
-			}
-			default:
-			{
-				break;
+				case StarshipState_Drilling:
+				{
+					ss_text << "drilling...";
+					break;
+				}
+				case StarshipState_Searching:
+				{
+					ss_text << "searching drill location";
+					break;
+				}
+				case StarshipState_Unloading:
+				{
+					ss_text << "unloading";
+					break;
+				}
+				case StarshipState_MovingToLocation:
+				{
+					ss_text << "moving to location";
+					break;
+				}
+				case StarshipState_Extracting:
+				{
+					ss_text << "extracting: " << starship->m_ore_found->m_display_name;
+					break;
+				}
+				case StarshipState_Scanning:
+				{
+					ss_text.precision(4);
+					ss_text << "scanning: " << starship->m_scan_clock.getElapsedTime().asSeconds() / SCAN_DURATION * 100 << "%";
+					break;
+				}
+				default:
+				{
+					break;
+				}
 			}
 		}
 	}

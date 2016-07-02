@@ -128,6 +128,11 @@ void Starship::update(sf::Time deltaTime)
 			//MoveToLocation(tmp_location);
 			break;
 		}
+		case StarshipState_Scanning:
+		{
+			Scan();
+			break;
+		}
 		default:
 		{
 			break;
@@ -178,6 +183,11 @@ void Starship::SetStarshipState(StarshipState state)
 		{
 			break;
 		}
+		case StarshipState_Scanning:
+		{
+			m_scan_clock.restart();
+			break;
+		}
 		default:
 		{
 			break;
@@ -202,6 +212,7 @@ void Starship::UpdateZoneKnowledge()
 			(*CurrentGame).m_stellarmap->m_known_zones.insert(map<string, bool>::value_type(key, false));
 		}
 		(*CurrentGame).m_stellarmap->m_known_zones[key] = true;
+		(*CurrentGame).m_stellarmap->m_zones[m_current_zone.x][m_current_zone.y]->setOutlineColor(sf::Color(255, 255, 255, 128));
 	
 		(*CurrentGame).m_stellarmap->ExpandKnownStellarMap(m_current_zone);
 	}
@@ -370,7 +381,18 @@ bool Starship::AssignToLocation(StockEntity* location)
 		return false;
 	}
 
-	if (m_target_location == m_task_location)//forth
+	if (m_scout_range > 0 && !m_task_location)
+	{
+		if (!location->m_identified)
+		{
+			//accept task (and there is no coming back)
+			if (MoveToLocation(location))
+			{
+				m_task_location = location;
+			}
+		}
+	}
+	else if (m_target_location == m_task_location)//forth
 	{	
 		if (location->CanSupplyFuel())
 		{
@@ -513,14 +535,21 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 		}
 		if (m_target_location == m_task_location)
 		{
-			if (m_target_location->CanBeDrilled())
+			if (m_scout_range > 0)
 			{
-				SetStarshipState(StarshipState_Searching);
+				SetStarshipState(StarshipState_Scanning);
 			}
 			else
 			{
-				SetStarshipState(StarshipState_Loading);
-				m_current_drill_attempts = m_nb_drills;
+				if (m_target_location->CanBeDrilled())
+				{
+					SetStarshipState(StarshipState_Searching);
+				}
+				else
+				{
+					SetStarshipState(StarshipState_Loading);
+					m_current_drill_attempts = m_nb_drills;
+				}
 			}
 		}
 
@@ -590,6 +619,19 @@ void Starship::Drill()
 					IsNewDrillAttemptAvailable();
 				}
 			}
+		}
+	}
+}
+
+void Starship::Scan()
+{
+	if (m_target_location && m_arrived_at_distination && m_state == StarshipState_Scanning)
+	{
+		if (m_scan_clock.getElapsedTime().asSeconds() > SCAN_DURATION)
+		{
+			m_target_location->m_identified = true;
+			m_GarbageMe = true;
+			m_visible = false;
 		}
 	}
 }
