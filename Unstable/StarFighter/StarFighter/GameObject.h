@@ -97,6 +97,7 @@ enum BuildingData
 	BuildingData_OreCostType2,
 	BuildingData_OreCostQuantity2,
 	BuildingData_StarshipProduction1,
+	BuildingData_StarshipProduction2,
 };
 
 class GameObject : public AnimatedSprite

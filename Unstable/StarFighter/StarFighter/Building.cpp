@@ -58,6 +58,10 @@ Building* Building::CreateBuilding(string name)
 	{
 		new_building->m_starship_productions[(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction1]]++;
 	}
+	if (!(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction2].empty() && (*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction2].compare("0") != 0)
+	{
+		new_building->m_starship_productions[(*CurrentGame).m_buildingConfig[name][BuildingData_StarshipProduction2]]++;
+	}
 
 	return new_building;
 }
