@@ -17,7 +17,7 @@ void InGameState::Initialize(Player player)
 
 	Planet* planet = new Planet(sf::Vector2f(MAP_SIZE / 2 - 500, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
-	planet->m_ore_presence_rates["oil"] = 1.0f;
+	planet->m_ore_presence_rates["oil"] = 0.9f;
 	planet->m_ore_presence_rates["deuterium"] = 0.1f;
 	planet->Build("refinery", true);
 	planet->Build("refinery", true);
@@ -30,7 +30,7 @@ void InGameState::Initialize(Player player)
 
 	Planet* planet2 = new Planet(sf::Vector2f(MAP_SIZE / 2 - 600, MAP_SIZE / 2 - 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(planet2, LocationLayer, LocationObject);
-	planet2->m_ore_presence_rates["oil"] = 1.0f;
+	planet2->m_ore_presence_rates["oil"] = 0.5f;
 	planet2->m_ore_presence_rates["deuterium"] = 0.5f;
 	planet2->Build("refinery", true);
 	planet2->Load("oil", 50);

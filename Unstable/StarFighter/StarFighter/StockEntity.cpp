@@ -210,7 +210,7 @@ string StockEntity::GetMostExpansiveOreAvailable()
 Ore* StockEntity::GetRandomOre()
 {
 	string ore_found;
-	float min_drill_rate = 0;
+	float p = 0;
 
 	for (map<string, float>::iterator i = m_ore_presence_rates.begin(); i != m_ore_presence_rates.end(); ++i)
 	{
@@ -218,13 +218,15 @@ Ore* StockEntity::GetRandomOre()
 		{
 			continue;
 		}
-		if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < i->second)
+		
+		if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < i->second + p)
 		{
-			if (ore_found.empty() || i->second < min_drill_rate)
-			{
 				ore_found = i->first;
-				min_drill_rate = i->second;
-			}
+				break;
+		}
+		else
+		{
+			p += i->second;
 		}
 	}
 
