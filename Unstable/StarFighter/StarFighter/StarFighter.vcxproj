@@ -102,6 +102,7 @@
     <ClCompile Include="Ore.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
+    <ClCompile Include="SFContextInfoPanel.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFUnitInfoPanel.cpp" />
     <ClCompile Include="SFText.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SFContextInfoPanel.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFUnitInfoPanel.h" />
     <ClInclude Include="SFText.h" />

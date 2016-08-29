@@ -11,6 +11,7 @@ enum SFPanelTypes
 {
 	SFPanel_None,
 	SFPanel_UnitInfoPanel,
+	SFPanel_ContextInfoPanel,
 };
 
 enum ActionButtons
