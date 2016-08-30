@@ -22,8 +22,9 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_arrived_at_distination = true;
 	m_propulsion = 0;
 	m_propulsion_speed_bonus = 0;
-	m_combustion = 0;
 	m_current_zone = GetCurrentZone();
+	m_weight = 0;
+	m_total_weight = 0;
 
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
@@ -448,8 +449,11 @@ bool Starship::MoveToLocation(StockEntity* location)
 	}
 
 	size_t distance = GetLightYearsBetweenObjects(this, location);
-	size_t distance_return = GetLightYearsBetweenObjects(location, m_base_location);
-	size_t propulsion_required = location->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
+	//size_t distance_return = GetLightYearsBetweenObjects(location, m_base_location);
+	//size_t propulsion_required = location->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
+	//propulsion_required *= GetTotalWeight();
+
+	size_t propulsion_required = GetPropulsionRequired(location);
 	if (m_propulsion_assigned + m_propulsion < propulsion_required)
 	{
 		size_t propulsion_missing = LoadRequiredPropulsion(m_base_location, propulsion_required - m_propulsion, false);
@@ -583,7 +587,7 @@ Starship* Starship::CreateStarship(string name)
 	new_starship->m_display_name = (*CurrentGame).m_starshipConfig[name][StarshipData_Name];
 	new_starship->m_armor_max = stoi((*CurrentGame).m_starshipConfig[name][StarshipData_Armor]);
 	new_starship->m_fuel_max = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_FuelMax]);
-	new_starship->m_combustion = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_Combustion]);
+	new_starship->m_weight = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_Weight]);
 	new_starship->m_speed_max = stof((*CurrentGame).m_starshipConfig[name][StarshipData_SpeedMax]);
 	new_starship->m_stock_max = (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_StockMax]);
 
@@ -687,4 +691,28 @@ string Starship::GetBestAssignedPropulsionAvailable()
 	}
 
 	return selected_fuel;
+}
+
+size_t Starship::GetTotalWeight()
+{
+	size_t ore_storage_weight = 0;
+	for (map<string, size_t>::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); ++i)
+	{
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) == 0)//fuel is not computed in storage weight
+		{
+			ore_storage_weight += (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]) * i->second;
+		}
+	}
+
+	return m_weight + ore_storage_weight;
+}
+
+size_t Starship::GetPropulsionRequired(GameObject* destination)
+{
+	size_t distance = GameObject::GetLightYearsBetweenObjects(this, destination);
+	size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, m_base_location);
+	size_t propulsion_required = destination->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
+	propulsion_required *= GetTotalWeight();
+
+	return propulsion_required;
 }

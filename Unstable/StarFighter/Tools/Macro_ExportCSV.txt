@@ -1,0 +1,45 @@
+Sub Main
+
+End Sub
+
+Function GetFilename As String
+If (Not GlobalScope.BasicLibraries.isLibraryLoaded("Tools")) Then
+GlobalScope.BasicLibraries.LoadLibrary("Tools")
+End If
+GetFilename = FileNameoutofPath(thisComponent.getURL(), "/")
+' Replace %20 with a whitespace
+GetFilename = ReplaceStr(GetFilename, "%20", " ")
+' Removing the .ods extension
+GetFilename = ReplaceStr(GetFilename, ".ods", "")
+End Function
+REM Return a string with str1 replaced with str2
+Function ReplaceStr(myString As String, str1 As String, str2 As String)
+ReplaceStr = join(split(myString, str1), str2)
+End Function
+
+sub ExportCSV
+rem ----------------------------------------------------------------------
+rem define variables
+dim document   as object
+dim dispatcher as object
+rem ----------------------------------------------------------------------
+rem get access to the document
+document   = ThisComponent.CurrentController.Frame
+dispatcher = createUnoService("com.sun.star.frame.DispatchHelper")
+' get current path without the file name
+BasicLibraries.loadLibrary("Tools")
+path=DirectoryNameoutofPath(ThisComponent.getURL(),"/")
+
+rem ----------------------------------------------------------------------
+dim args1(2) as new com.sun.star.beans.PropertyValue
+args1(0).Name = "URL"
+args1(0).Value = path & "/Generated/" & GetFilename & ".csv"
+args1(1).Name = "FilterName"
+args1(1).Value = "Text - txt - csv (StarCalc)"
+args1(2).Name = "FilterOptions"
+args1(2).Value = "44,34,76,1,,0,false,true,true"
+
+dispatcher.executeDispatch(document, ".uno:SaveAs", "", 0, args1())
+
+
+end sub

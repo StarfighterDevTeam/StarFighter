@@ -1,6 +1,5 @@
 #ore_name,texture_name,weight,extraction_time,price,propulsion,propulsion_speed_bonus
 iron,2D/ore_iron.png,1,4.f,10,0,0
-silver,2D/ore_silver.png,4,10f.,60,0,0
-gold,2D/ore_gold.png,10,20.f,150,0,0
+silver,2D/ore_silver.png,1,10f.,60,0,0
 oil,2D/ore_oil.png,1,0.5f,1,1,0
 deuterium,2D/ore_deuterium.png,1,5.f,3,3,0

@@ -62,7 +62,7 @@ enum StarshipData
 	StarshipData_OreCostQuantity2,
 	StarshipData_Armor,
 	StarshipData_FuelMax,
-	StarshipData_Combustion,
+	StarshipData_Weight,
 	StarshipData_SpeedMax,
 	StarshipData_StockMax,
 	StarshipData_NbDrills,
@@ -139,6 +139,7 @@ public:
 	//StarMiner specific
 	static size_t GetLightYearsBetweenObjects(GameObject* object1, GameObject* object2);
 	virtual void HoverObject(GameObject* object);
+	virtual bool CanSupplyFuel();
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

@@ -452,3 +452,9 @@ void GameObject::HoverObject(GameObject* object)
 {
 	//see override function in class Ship
 }
+
+bool GameObject::CanSupplyFuel()
+{
+	//see override function in class Starship or Location
+	return false;
+}

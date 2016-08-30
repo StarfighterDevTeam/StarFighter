@@ -214,8 +214,9 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 				if (distance > 0)
 				{
 					Starship* starship = (Starship*)playerShip->m_selected_object;
-					size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, starship->m_base_location);
-					size_t propulsion_required = entity->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
+					//size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, starship->m_base_location);
+					//size_t propulsion_required = entity->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
+					size_t propulsion_required = starship->GetPropulsionRequired(destination);
 					size_t propulsion_missing = starship->m_propulsion + starship->m_propulsion_assigned > propulsion_required ? 0 : propulsion_required - starship->m_propulsion - starship->m_propulsion_assigned;
 					ss_text << "\nPropulsion available: ";
 					if (propulsion_missing == 0)

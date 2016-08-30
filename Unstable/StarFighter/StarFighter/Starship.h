@@ -41,6 +41,8 @@ public :
 	void Extract(Ore* ore);
 	bool IsNewDrillAttemptAvailable();
 	string GetBestAssignedPropulsionAvailable();
+	size_t GetTotalWeight();
+	size_t GetPropulsionRequired(GameObject* destination);
 
 	sf::Vector2u GetCurrentZone();
 	void UpdateZoneKnowledge();
@@ -62,8 +64,9 @@ public :
 	int m_armor;
 	int m_armor_max;
 	float m_speed_max;
+	size_t m_weight;
+	size_t m_total_weight;
 	size_t m_propulsion;
-	size_t m_combustion;
 	string m_current_fuel_type;
 	map<string, size_t> m_fuel_assigned;
 	float m_propulsion_speed_bonus;
