@@ -21,7 +21,7 @@ public :
 	bool CanBeDrilled();
 	size_t GetLightestOreWeight();
 	string GetMostExpansiveOreAvailable();
-	Ore* GetRandomOre();
+	Ore* GetRandomOre(bool ore_with_propulsion = true, bool ore_without_propulsion = true);
 	void UnloadCarriage(StockEntity* location);
 	virtual size_t LoadFuel(string ore_name, size_t quantity);
 	virtual size_t GetStockMax();

@@ -219,6 +219,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 					size_t propulsion_required = starship->GetPropulsionRequired(destination);
 					size_t propulsion_missing = starship->m_propulsion + starship->m_propulsion_assigned > propulsion_required ? 0 : propulsion_required - starship->m_propulsion - starship->m_propulsion_assigned;
 					ss_text << "\nPropulsion available: ";
+
 					if (propulsion_missing == 0)
 					{
 						ss_text << starship->m_propulsion + starship->m_propulsion_assigned;

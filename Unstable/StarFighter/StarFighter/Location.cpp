@@ -278,7 +278,20 @@ void Planet::Harvest()
 	{
 		if (m_buildings[i] && m_buildings[i]->m_can_extract_ore)
 		{
-			Ore* ore = GetRandomOre();
+			Ore* ore = GetRandomOre(false, true);
+			if (m_buildings[i]->Extract(ore))
+			{
+				if (Load(ore->m_display_name, 1))
+				{
+					m_buildings[i]->m_current_extraction = NULL;
+					m_buildings[i]->m_extraction_clock.restart();
+				}
+			}
+		}
+
+		if (m_buildings[i] && m_buildings[i]->m_can_extract_fuel)
+		{
+			Ore* ore = GetRandomOre(true, false);
 			if (m_buildings[i]->Extract(ore))
 			{
 				if (Load(ore->m_display_name, 1))

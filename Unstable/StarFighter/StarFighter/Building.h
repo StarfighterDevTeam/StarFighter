@@ -20,6 +20,7 @@ public :
 	size_t m_fuel_max;
 	size_t m_slots;
 	bool m_can_extract_ore;
+	bool m_can_extract_fuel;
 	sf::Clock m_extraction_clock;
 	float m_extraction_duration_bonus;
 	Ore* m_current_extraction;

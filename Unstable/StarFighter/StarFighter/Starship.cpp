@@ -340,10 +340,10 @@ size_t Starship::AssignPropulsionToTravel(size_t distance)
 	return propulsion_assigned;
 }
 
-size_t Starship::ConsummePropulsion(size_t distance)
+size_t Starship::ConsummePropulsion(size_t propulsion_to_consumme)
 {
 	size_t propulsion_consummed = 0;
-	size_t distance_remaining = distance;
+	size_t distance_remaining = propulsion_to_consumme;
 
 	string fuel_type_selected = GetBestAssignedPropulsionAvailable();
 	while (!fuel_type_selected.empty() && distance_remaining > 0)
@@ -351,9 +351,17 @@ size_t Starship::ConsummePropulsion(size_t distance)
 		size_t quantity_assigned = MinBetweenSizeTValues(m_fuel_assigned[fuel_type_selected], distance_remaining / (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]));
 		m_fuel_assigned[fuel_type_selected] -= quantity_assigned;
 		m_fuel -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
-		propulsion_consummed += quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
-		distance_remaining -= quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
-		m_propulsion_assigned -= propulsion_consummed;
+		size_t production_consummed_this_fuel_type = quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+		propulsion_consummed += production_consummed_this_fuel_type;
+		distance_remaining -= production_consummed_this_fuel_type;
+
+		if (production_consummed_this_fuel_type > m_propulsion_assigned)
+		{
+			printf("bug");
+		}
+
+		m_propulsion_assigned -= production_consummed_this_fuel_type;
+
 
 		//resolving round up cases (no waste)
 		if (distance_remaining > 0 && distance_remaining < (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]) && m_fuel_assigned[fuel_type_selected] > 0)

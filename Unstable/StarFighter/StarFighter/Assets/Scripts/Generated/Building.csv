@@ -1,6 +1,6 @@
-#building_name,texture_name,slots,ore_max,fuel_max,can_extract_ore,extraction_duration_bonus,cost_ore_type_1,cost_ore_quantity_1,cost_ore_type_2,cost_ore_quantity_2,unit_production_1,unit_production_2
-refinery,2D/Refinery1.png,1,0,100,1,0.f,iron,10,0,0,0,0
-drill_station,2D/Refinery1.png,1,100,0,1,0.f,iron,10,0,0,0,0
-factory,2D/Factory1.png,4,0,0,0,0.f,iron,20,silver,4,miner,probe
-ore_container,2D/Refinery1.png,1,1000,0,0,0.f,iron,10,0,0,0,0
-fuel_tanks,2D/Refinery1.png,1,0,1000,0,0.f,iron,10,0,0,0,0
+#building_name,texture_name,slots,ore_max,fuel_max,can_extract_ore,can_extract_fuel,extraction_duration_bonus,cost_ore_type_1,cost_ore_quantity_1,cost_ore_type_2,cost_ore_quantity_2,unit_production_1,unit_production_2
+refinery,2D/Refinery1.png,1,0,100,0,1,0.f,iron,10,0,0,0,0
+drill_station,2D/Refinery1.png,1,100,0,1,0,0.f,iron,10,0,0,0,0
+factory,2D/Factory1.png,4,0,0,0,0,0.f,iron,20,silver,4,miner,probe
+ore_container,2D/Refinery1.png,1,1000,0,0,0,0.f,iron,10,0,0,0,0
+fuel_tanks,2D/Refinery1.png,1,0,1000,0,0,0.f,iron,10,0,0,0,0

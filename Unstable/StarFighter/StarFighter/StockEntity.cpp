@@ -207,13 +207,23 @@ string StockEntity::GetMostExpansiveOreAvailable()
 	return ore;
 }
 
-Ore* StockEntity::GetRandomOre()
+Ore* StockEntity::GetRandomOre(bool ore_with_propulsion, bool ore_without_propulsion)
 {
 	string ore_found;
 	float p = 0;
 
 	for (map<string, float>::iterator i = m_ore_presence_rates.begin(); i != m_ore_presence_rates.end(); ++i)
 	{
+		if (!ore_with_propulsion && (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > 0)
+		{
+			continue;
+		}
+
+		if (!ore_without_propulsion && (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) == 0)
+		{
+			continue;
+		}
+
 		if (i->second == 0)
 		{
 			continue;

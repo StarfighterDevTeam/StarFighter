@@ -45,7 +45,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define SCAN_DURATION								5.f
 
 //DISTANCES
-#define LIGHTYEAR_IN_PIXELS							10
+#define LIGHTYEAR_IN_PIXELS							100
 #define STELLAR_ZONE_SIZE							500
 #define STELLAR_ZONES_PER_LINE						40
 #define CHANCE_OF_LOCATION_IN_ZONE					0.4f

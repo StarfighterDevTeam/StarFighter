@@ -32,7 +32,7 @@ public :
 	size_t LoadFuel(string ore_name, size_t quantity) override;
 	size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation);
 	size_t AssignPropulsionToTravel(size_t distance);
-	size_t ConsummePropulsion(size_t distance);
+	size_t ConsummePropulsion(size_t propulsion_to_consumme);
 	bool ManagePropulsion();
 	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
 	void SetStarshipState(StarshipState state);

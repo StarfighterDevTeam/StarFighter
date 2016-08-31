@@ -11,6 +11,7 @@ Building::Building(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_fuel_max = 0;
 	m_slots = 1;
 	m_can_extract_ore = false;
+	m_can_extract_fuel = false;
 	m_extraction_duration_bonus = 0;
 	m_current_extraction = NULL;
 
@@ -41,6 +42,7 @@ Building* Building::CreateBuilding(string name)
 	new_building->m_stock_max = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_Stock]);
 	new_building->m_fuel_max = (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_Fuel]);
 	new_building->m_can_extract_ore = stoi((*CurrentGame).m_buildingConfig[name][BuildingData_CanExtractOre]) == 1;
+	new_building->m_can_extract_fuel = stoi((*CurrentGame).m_buildingConfig[name][BuildingData_CanExtractFuel]) == 1;
 	new_building->m_extraction_duration_bonus = stof((*CurrentGame).m_buildingConfig[name][BuildingData_ExtractionDurationBonus]);
 
 	//cost

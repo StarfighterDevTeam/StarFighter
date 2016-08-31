@@ -91,6 +91,7 @@ enum BuildingData
 	BuildingData_Stock,
 	BuildingData_Fuel,
 	BuildingData_CanExtractOre,
+	BuildingData_CanExtractFuel,
 	BuildingData_ExtractionDurationBonus,
 	BuildingData_OreCostType1,
 	BuildingData_OreCostQuantity1,
