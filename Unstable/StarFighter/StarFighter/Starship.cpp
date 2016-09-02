@@ -704,13 +704,13 @@ string Starship::GetBestAssignedPropulsionAvailable()
 size_t Starship::GetTotalWeight()
 {
 	size_t ore_storage_weight = 0;
-	for (map<string, size_t>::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); ++i)
-	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) == 0)//fuel is not computed in storage weight
-		{
-			ore_storage_weight += (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]) * i->second;
-		}
-	}
+	//for (map<string, size_t>::iterator i = m_ores_stocked.begin(); i != m_ores_stocked.end(); ++i)
+	//{
+	//	if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) == 0)//fuel is not computed in storage weight
+	//	{
+	//		ore_storage_weight += (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]) * i->second;
+	//	}
+	//}
 
 	return m_weight + ore_storage_weight;
 }
