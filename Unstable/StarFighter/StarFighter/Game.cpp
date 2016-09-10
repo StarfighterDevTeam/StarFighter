@@ -279,11 +279,27 @@ void Game::drawScene()
 		{
 			for (std::list<RectangleShape*>::iterator it = this->m_sceneFeedbackBars.begin(); it != this->m_sceneFeedbackBars.end(); it++)
 			{
+				if (*it == NULL)
+					continue;
+
 				m_mainScreen.draw(*(*it));
 			}
 			for (std::list<Text*>::iterator it = this->m_sceneFeedbackTexts.begin(); it != this->m_sceneFeedbackTexts.end(); it++)
 			{
+				if (*it == NULL)
+					continue;
+
 				m_mainScreen.draw(*(*it));
+			}
+			for (std::vector<SFText*>::iterator it = this->m_sceneFeedbackSFTexts.begin(); it != this->m_sceneFeedbackSFTexts.end(); it++)
+			{
+				if (*it == NULL)
+					continue;
+
+				if ((*(*it)).m_visible)
+				{
+					m_mainScreen.draw(*(*it));
+				}
 			}
 		}
 		else if (i == PanelLayer)
@@ -555,4 +571,14 @@ GameObject* Game::GetClosestObject(const GameObject* ref_obj, GameObjectType typ
 std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
 {
 	return m_sceneGameObjectsTyped[type];
+}
+
+void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY)
+{
+	SFText* text_feedback = new SFText(m_font[font], 16, color, sf::Vector2f(position.x, position.y), team);
+	SFTextPop* pop_feedback = new SFTextPop(text_feedback, distance_not_faded, distance_faded, total_pop_time, follow_target, offset_positionY);
+	pop_feedback->setString(text);
+	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
+	delete text_feedback;
+	addToFeedbacks(pop_feedback);
 }

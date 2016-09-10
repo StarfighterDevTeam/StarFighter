@@ -9,7 +9,7 @@ class SFTextPop : public SFText
 {
 public:
 	SFTextPop() {};
-	SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target);
+	SFTextPop(SFText* text, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* target, float offset_positionY);
 	~SFTextPop() {};
 	void update(Time deltaTime) override;
 
@@ -19,6 +19,7 @@ public:
 	sf::Clock m_timer_clock;
 	Uint8 m_alpha;
 	GameObject* m_target;
+	float m_offset_positionY;
 };
 
 #endif // SFTEXTPOP_H_INCLUDED

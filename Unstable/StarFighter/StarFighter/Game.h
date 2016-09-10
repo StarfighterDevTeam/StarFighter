@@ -16,6 +16,7 @@
 #include "Glow.h"
 #include "Stroboscopic.h"
 #include "SFPanel.h"
+#include "SFTextPop.h"
 
 class Ship;
 
@@ -53,6 +54,7 @@ public:
 	void removeFromFeedbacks(RectangleShape* feedback);
 	void removeFromFeedbacks(Text* text);
 	void removeFromFeedbacks(SFPanel* panel);
+	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
