@@ -1,5 +1,0 @@
-#bot_name,armor,shield,shield_regen,damage,weapon_name,ammo_name,image,width,height,frames,explosion,pattern,angspeed,radius,clockwise,rotation_speed,xspread,yspread
-bot_blue,0,0,0,0,laser_bot,laser_blue,Assets/2D/Equipment/bot_blue.png,32,32,1,death_explosion,circle,250,50,1,0,0,0
-bot_red,0,0,0,0,laser_bot,laser_blue,Assets/2D/Equipment/bot_red.png,32,32,1,death_explosion,rectangle,150,50,50,0,100,0
-bot_green,0,0,0,0,laser_bot,laser_blue,Assets/2D/Equipment/bot_green.png,32,32,1,death_explosion,0,150,200,0,0,50,0
-bot,0,0,0,0,laser_bot,laser_blue,Assets/2D/Equipment/bot.png,32,32,1,death_explosion,circle,150,200,1,0,-50,0
