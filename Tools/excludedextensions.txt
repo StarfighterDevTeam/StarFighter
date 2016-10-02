@@ -1,0 +1,13 @@
+.ods
+.pdb
+.ico
+.cpp
+.h
+.hpp
+.db
+.sln
+.vcxproj
+.vcxproj.filters
+.sdf
+.opensdf
+.ilk
