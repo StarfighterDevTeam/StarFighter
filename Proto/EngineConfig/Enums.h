@@ -22,6 +22,11 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
+enum InteractionType
+{
+	No_Interaction,
+};
+
 enum PlayerActions
 {
 	Action_Idle,
