@@ -50,6 +50,8 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	m_hasClicked = false;
+
 	if (m_hovered_object && m_hovered_object->m_GarbageMe)
 	{
 		m_hovered_object = NULL;
@@ -57,6 +59,14 @@ void Ship::update(sf::Time deltaTime)
 	if (m_selected_object && m_selected_object->m_GarbageMe)
 	{
 		m_selected_object = NULL;
+	}
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		// left click...
+		sf::Vector2i mousepos = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+		setPosition((*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view));
+		m_hasClicked = true;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -79,7 +89,8 @@ void Ship::update(sf::Time deltaTime)
 	
 	//Action input
 	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
+	//if (m_inputs_states[Action_Firing] == Input_Tap)
+	if (m_hasClicked)
 	{
 		SelectObject(m_hovered_object);
 	}
