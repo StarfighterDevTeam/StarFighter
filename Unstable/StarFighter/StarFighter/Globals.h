@@ -40,6 +40,10 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
+//ASSETS
+#define ITEM_SIZE								64
+
+
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100

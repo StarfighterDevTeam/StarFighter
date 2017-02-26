@@ -14,8 +14,6 @@ public:
 
 	sf::RenderWindow* m_playerWindow;
 	std::string m_save_file;
-	
-	bool reverse_scene;
 
 };
 

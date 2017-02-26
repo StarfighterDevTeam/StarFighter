@@ -42,6 +42,7 @@ enum GameObjectType {
 	ShopObject,
 	LootObject,
 	PlayerShip,
+	AgentObject,
 	FakePlayerShip,
 	FriendlyFire,
 	Neutral,

@@ -86,6 +86,7 @@
     <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Agent.cpp" />
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
@@ -95,9 +96,11 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="InGameState.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Police.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFPanelSpecific.cpp" />
@@ -105,10 +108,13 @@
     <ClCompile Include="SFTextPop.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StarFighter.cpp" />
+    <ClCompile Include="Stratagem.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
+    <ClCompile Include="Walker.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Agent.h" />
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="CollisionUtils.h" />
@@ -121,9 +127,11 @@
     <ClInclude Include="Includes\SimpleCollision.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="InGameState.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Police.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SFPanel.h" />
@@ -132,8 +140,10 @@
     <ClInclude Include="SFTextPop.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
+    <ClInclude Include="Stratagem.h" />
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
+    <ClInclude Include="Walker.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />
