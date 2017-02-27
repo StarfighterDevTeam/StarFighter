@@ -437,3 +437,10 @@ int GameObject::GaussianBlurDistribution(int x)
 {
 	return x*x;
 }
+
+// PICKPOCKETS SPECIFIC
+
+void GameObject::Collide(GameObject* target)
+{
+	//see override function in class Ship
+}

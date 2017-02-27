@@ -27,6 +27,14 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_map_size = background->m_size;
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
+
+	// PICK POCKETS SPECIFIC
+	Walker* walker1 = new Walker(sf::Vector2f(300, 300), sf::Vector2f(0, 0), "2D/savannah1.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
+	(*CurrentGame).addToScene(walker1, AgentLayer, AgentObject);
+
+	Walker* walker2 = new Walker(sf::Vector2f(330, 300), sf::Vector2f(0, 0), "2D/savannah2.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
+	(*CurrentGame).addToScene(walker2, AgentLayer, AgentObject);
+
 }
 
 void InGameState::Update(sf::Time deltaTime)

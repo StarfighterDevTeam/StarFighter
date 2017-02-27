@@ -7,6 +7,9 @@
 #include "Game.h"
 #include "SFTextPop.h"
 
+#include "Walker.h"
+#include "Police.h"
+
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
 #define SHIP_ACCELERATION	        2000.0f
@@ -66,6 +69,13 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	// PICKPOCKETS SPECIFIC
+	vector<GameObject*> m_collisions;
+	GameObject* m_current_collision;
+
+	void Collide(GameObject* target) override;
+	bool GetCurrentCollision();
 
 private:
 	bool m_moving;

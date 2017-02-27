@@ -27,6 +27,7 @@ enum LayerType {
 	AuraLayer,
 	FeedbacksLayer,
 	FriendlyFireLayer,
+	AgentLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
 
@@ -85,6 +86,9 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+
+	//PICKPOCKETS SPECIFIC
+	virtual void Collide(GameObject* target);
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

@@ -24,6 +24,9 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	//PICKPOCKETS SPECIFIC
+	m_current_collision = NULL;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -38,12 +41,38 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	
+	m_collisions.clear();
+	m_current_collision = NULL;
 }
 
 void Ship::SetControllerType(ControlerType contoller)
 {
 	m_controllerType = contoller;
+}
+
+bool Ship::GetCurrentCollision()
+{
+	if (m_collisions.empty())
+	{
+		m_current_collision = NULL;
+	}
+	else
+	{
+		if (std::find(m_collisions.begin(), m_collisions.end(), m_current_collision) != m_collisions.end())
+		{
+			//keep current collision
+		}
+		else
+		{
+			//new collision
+			m_current_collision = m_collisions.front();
+			printf("new collision: %s \n", m_current_collision->m_textureName.c_str());
+		}
+
+		m_collisions.clear();
+	}
+
+	return m_current_collision;
 }
 
 void Ship::update(sf::Time deltaTime)
@@ -59,6 +88,9 @@ void Ship::update(sf::Time deltaTime)
 
 	ManageAcceleration(inputs_direction);
 	
+	//PICKPOCKETS COLLISIONS
+	GetCurrentCollision();
+
 	//Action input
 	UpdateInputStates();
 	if (m_inputs_states[Action_Firing] == Input_Tap)
@@ -286,4 +318,14 @@ bool Ship::LoadShip(Ship* ship)
 		cerr << "DEBUG: No save file found. A new file is going to be created.\n" << endl;
 		return false;
 	}
+}
+
+//PICKPOCKETS SPECIFIC
+
+void Ship::Collide(GameObject* target)
+{
+	if (!target)
+		return;
+
+	m_collisions.push_back(target);
 }
