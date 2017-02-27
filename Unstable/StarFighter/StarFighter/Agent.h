@@ -18,6 +18,9 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	vector<Item*> m_items;
+
+	void GenerateItems();
+	Stratagem* GetRandomStratagem(ItemType item_type);
 };
 
 #endif // AGENT_H_INCLUDED

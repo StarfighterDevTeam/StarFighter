@@ -11,12 +11,13 @@ class Item : public GameObject
 {
 public :
 	Item();
+	Item(ItemType item_type);
 	Item(std::string textureName, int frameNumber = 1);
-	void Init();
 	virtual ~Item();
 	void update(sf::Time deltaTime) override;
 
 	Stratagem* m_stratagem;
+	ItemType m_item_type;
 };
 
 #endif // ITEM_H_INCLUDED

@@ -38,3 +38,23 @@ void Agent::update(sf::Time deltaTime)
 {
 	GameObject::update(deltaTime);
 }
+
+void Agent::GenerateItems()
+{
+	int nb_items = RandomizeIntBetweenValues(0, 5);
+	for (int i = 0; i < nb_items; i++)
+	{
+		ItemType item_type = (ItemType)RandomizeIntBetweenValues(0, NB_ItemTypes-1);
+		if (item_type != 0)
+		{
+			Item* new_item = new Item(item_type);
+			m_items.push_back(new_item);
+		}
+	}
+}
+
+Stratagem* Agent::GetRandomStratagem(ItemType item_type)
+{
+	Stratagem* new_stratagem = new Stratagem(item_type);
+	return new_stratagem;
+}
