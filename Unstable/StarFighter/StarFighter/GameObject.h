@@ -73,6 +73,7 @@ public:
 	GameObjectType m_collider_type;
 	LayerType m_layer;
 	sf::Vector2f m_size;
+	string m_display_name;
 
 	string getName();
 	GameObject* Clone();

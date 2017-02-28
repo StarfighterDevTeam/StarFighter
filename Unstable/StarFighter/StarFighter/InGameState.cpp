@@ -111,9 +111,9 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 {
 	switch (panel_type)
 	{
-		case SFPanel_Specific:
+	case SFPanel_Stratagem:
 		{
-			playerShip->m_SFTargetPanel = new SFPanelSpecific(sf::Vector2f(SFPANEL_SPECIFIC_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_Specific, playerShip);
+			playerShip->m_SFTargetPanel = new SFStratagemPanel(sf::Vector2f(SFSTRATAGEM_PANEL_WIDTH, SFSTRATAGEM_PANEL_HEIGHT), SFPanel_Stratagem, playerShip);
 			break;
 		}
 	}

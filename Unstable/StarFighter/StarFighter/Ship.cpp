@@ -90,7 +90,7 @@ void Ship::update(sf::Time deltaTime)
 	
 	//PICKPOCKETS COLLISIONS
 	GetCurrentCollision();
-
+	
 	//Action input
 	UpdateInputStates();
 	if (m_inputs_states[Action_Firing] == Input_Tap)
@@ -110,6 +110,10 @@ void Ship::update(sf::Time deltaTime)
 	if (m_SFTargetPanel)
 	{
 		m_SFTargetPanel->Update(deltaTime);
+	}
+	if (m_current_collision)
+	{
+		m_is_asking_SFPanel = SFPanel_Stratagem;
 	}
 
 	ScreenBorderContraints();	

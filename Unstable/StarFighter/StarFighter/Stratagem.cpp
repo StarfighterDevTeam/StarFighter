@@ -20,7 +20,7 @@ Stratagem::Stratagem(int nb_code)
 
 	for (int i = 0; i < nb_code; i++)
 	{
-		code[i] = RandomizeIntBetweenValues(1, 4);
+		m_code[i] = RandomizeIntBetweenValues(1, 4);
 	}
 }
 
@@ -28,7 +28,7 @@ void Stratagem::Init()
 {
 	for (int i = 0; i < MAX_CODES; i++)
 	{
-		code[i] = 0;
+		m_code[i] = 0;
 	}
 }
 

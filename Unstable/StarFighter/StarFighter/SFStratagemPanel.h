@@ -1,0 +1,35 @@
+#ifndef SFSTRATAGEMPANEL_H_INCLUDED
+#define SFSTRATAGEMPANEL_H_INCLUDED
+
+#include "Game.h"
+#include "Ship.h"
+
+class ItemBox
+{
+public:
+	ItemBox();
+	void Init(Item* item, GameObject& code_sprite);
+	~ItemBox();
+	Item* m_item;
+	GameObject* m_codes[MAX_CODES];
+	GameObject* m_item_image;
+	SFText m_item_text;
+
+	void Draw(sf::RenderTexture& screen);
+	void SetPosition(sf::Vector2f position);
+};
+
+class SFStratagemPanel : public SFPanel
+{
+public:
+	SFStratagemPanel(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip);
+	~SFStratagemPanel();
+	virtual void Update(sf::Time deltaTime);
+	virtual void Draw(sf::RenderTexture& screen);
+
+	Item* m_current_stratagem;
+	GameObject m_code;
+	ItemBox m_boxes[MAX_ITEMS_PER_AGENT];
+};
+
+#endif // SFSTRATAGEMPANEL_H_INCLUDED

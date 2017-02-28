@@ -40,9 +40,13 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
-//ASSETS
-#define ITEM_SIZE								64
+//GAME SETTINGS
+#define MAX_ITEMS_PER_AGENT				5
 
+//ASSETS
+#define ITEM_SIZE								32
+#define ITEM_NAME_SIZE							128
+#define CODE_SIZE								32
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
@@ -53,6 +57,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 //TEXT POP FEEDBACK
 #define TEXT_POP_OFFSET_Y							10
 
+#define CODE_BUTTON_ARROW						"2D/arrow.png"
 #define INTERACTION_BUTTON_A_FILENAME			"2D/HUD/Button_A.png"
 #define INTERACTION_BUTTON_X_FILENAME			"2D/HUD/Button_X.png"
 #define INTERACTION_BUTTON_Y_FILENAME			"2D/HUD/Button_Y.png"
@@ -62,8 +67,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define INTERACTION_BUTTON_MARGIN				4
 #define INTERACTION_INTERBLOCK					20
 #define INTERACTION_MARGIN_SIDES				12
-#define SFPANEL_SPECIFIC_WIDTH					200
-#define SFPANEL_SPECIFIC_HEIGHT					100
+#define SFSTRATAGEM_PANEL_WIDTH					390
+#define SFSTRATAGEM_PANEL_HEIGHT				110
 
 //CSV DATA
 #define SHIP_CSV_FILE							"Scripts/Generated/Ship.csv"

@@ -24,7 +24,7 @@ public :
 	void Init();
 	virtual ~Stratagem();
 
-	int code[MAX_CODES];
+	int m_code[MAX_CODES];
 };
 
 #endif // STRATAGEM_H_INCLUDED

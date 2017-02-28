@@ -15,6 +15,7 @@ public :
 	Item(std::string textureName, int frameNumber = 1);
 	virtual ~Item();
 	void update(sf::Time deltaTime) override;
+	Item* Clone();
 
 	Stratagem* m_stratagem;
 	ItemType m_item_type;

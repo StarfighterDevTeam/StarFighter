@@ -7,7 +7,7 @@
 #include <sstream>
 #include "Game.h"
 #include "Ship.h"
-#include "SFPanelSpecific.h"
+#include "SFStratagemPanel.h"
 #include "FileLoadUtils.h"
 
 class GameObject;

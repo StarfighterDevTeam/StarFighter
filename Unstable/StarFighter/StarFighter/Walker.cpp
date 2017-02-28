@@ -7,12 +7,14 @@ using namespace sf;
 // ----------------SHIP ---------------
 Walker::Walker()
 {
-	
+	Init();
 }
 
 void Walker::Init()
 {
 	Agent::Init();
+
+	m_display_name = "Walker";
 
 	GenerateItems();
 }

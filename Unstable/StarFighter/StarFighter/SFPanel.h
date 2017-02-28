@@ -10,7 +10,7 @@ class SFItemStatsPanel;
 enum SFPanelTypes
 {
 	SFPanel_None,
-	SFPanel_Specific,
+	SFPanel_Stratagem,
 };
 
 enum ActionButtons
