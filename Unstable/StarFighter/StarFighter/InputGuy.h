@@ -29,6 +29,11 @@ public:
 	static bool isRestartingScript();
 	static bool isMuting();
 	static bool isPausing();
+
+	static bool isCoding1(ControlerType device = AllControlDevices);
+	static bool isCoding2(ControlerType device = AllControlDevices);
+	static bool isCoding3(ControlerType device = AllControlDevices);
+	static bool isCoding4(ControlerType device = AllControlDevices);
 };
 
 

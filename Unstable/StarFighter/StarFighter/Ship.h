@@ -24,6 +24,10 @@ enum PlayerActions
 	Action_Firing,
 	Action_Muting,
 	Action_Pausing,
+	Action_Coding1,
+	Action_Coding2,
+	Action_Coding3,
+	Action_Coding4,
 	NBVAL_PlayerActions,
 };
 

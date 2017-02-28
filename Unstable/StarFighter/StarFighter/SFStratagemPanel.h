@@ -4,6 +4,14 @@
 #include "Game.h"
 #include "Ship.h"
 
+enum CodeAnimations
+{
+	Code_Normal,
+	Code_Validated,
+	Code_Invalid,
+	NBVAL_CodeAnimations,//3
+};
+
 class ItemBox
 {
 public:
@@ -17,6 +25,8 @@ public:
 
 	void Draw(sf::RenderTexture& screen);
 	void SetPosition(sf::Vector2f position);
+
+	int m_current_code_index;
 };
 
 class SFStratagemPanel : public SFPanel
@@ -24,12 +34,16 @@ class SFStratagemPanel : public SFPanel
 public:
 	SFStratagemPanel(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip);
 	~SFStratagemPanel();
-	virtual void Update(sf::Time deltaTime);
-	virtual void Draw(sf::RenderTexture& screen);
+	void Update(sf::Time deltaTime) override;
+	void Draw(sf::RenderTexture& screen) override;
 
 	Item* m_current_stratagem;
 	GameObject m_code;
 	ItemBox m_boxes[MAX_ITEMS_PER_AGENT];
+
+	int m_current_code[MAX_CODES];
+
+	void CheckCodeInput(int input) override;
 };
 
 #endif // SFSTRATAGEMPANEL_H_INCLUDED

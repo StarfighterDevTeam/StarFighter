@@ -99,6 +99,27 @@ void Ship::update(sf::Time deltaTime)
 		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	}
 
+	//check stratagem inputs
+	if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Stratagem)
+	{
+		if (m_inputs_states[Action_Coding1] == Input_Tap)
+		{
+			m_SFTargetPanel->CheckCodeInput(1);
+		}
+		else if (m_inputs_states[Action_Coding2] == Input_Tap)
+		{
+			m_SFTargetPanel->CheckCodeInput(2);
+		}
+		else if (m_inputs_states[Action_Coding3] == Input_Tap)
+		{
+			m_SFTargetPanel->CheckCodeInput(3);
+		}
+		else if (m_inputs_states[Action_Coding4] == Input_Tap)
+		{
+			m_SFTargetPanel->CheckCodeInput(4);
+		}
+	}
+
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
 	UpdateRotation();
@@ -241,6 +262,11 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isFiring(), Action_Firing);
+
+	GetInputState(InputGuy::isCoding1(), Action_Coding1);
+	GetInputState(InputGuy::isCoding2(), Action_Coding2);
+	GetInputState(InputGuy::isCoding3(), Action_Coding3);
+	GetInputState(InputGuy::isCoding4(), Action_Coding4);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)

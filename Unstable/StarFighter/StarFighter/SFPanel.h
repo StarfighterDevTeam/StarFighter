@@ -58,6 +58,8 @@ public:
 	virtual void Update(sf::Time deltaTime);
 	virtual void Draw(sf::RenderTexture& screen);
 	static bool IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object);
+
+	virtual void CheckCodeInput(int input);
 	
 	sf::Text m_title_text;
 	sf::Text m_text;

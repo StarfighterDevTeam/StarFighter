@@ -167,3 +167,43 @@ Vector2f InputGuy::getDirections(ControlerType device)
 
 	return Vector2f(x, y);
 }
+
+bool InputGuy::isCoding1(ControlerType device)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isCoding2(ControlerType device)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::J))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isCoding3(ControlerType device)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::H))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isCoding4(ControlerType device)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
+	{
+		return true;
+	}
+
+	return false;
+}

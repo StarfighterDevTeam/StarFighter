@@ -188,3 +188,8 @@ void SFPanel::Draw(sf::RenderTexture& screen)
 		screen.draw(*this);
 	}
 }
+
+void SFPanel::CheckCodeInput(int input)
+{
+	//see override function in specific types of SFPanels
+}
