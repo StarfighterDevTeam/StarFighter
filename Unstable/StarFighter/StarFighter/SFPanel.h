@@ -6,6 +6,7 @@
 class Ship;
 class Dialog;
 class SFItemStatsPanel;
+class Item;
 
 enum SFPanelTypes
 {

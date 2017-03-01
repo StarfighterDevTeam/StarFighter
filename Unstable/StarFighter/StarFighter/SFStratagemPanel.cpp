@@ -215,134 +215,120 @@ void SFStratagemPanel::CheckCodeInput(int input)
 		}
 	}
 
-	//reset feedbacks
 	if (!stratagem_in_progress)
+	{
+		for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)//test all codes
+		{
+			if (!m_boxes[i].m_item)
+			{
+				break;
+			}
+			if (input == m_boxes[i].m_item->m_stratagem->m_code[m_boxes[i].m_current_code_index])//code successful | TODO : check if m_item and m_stratagem exist
+			{
+				m_boxes[i].m_codes[m_boxes[i].m_current_code_index]->setAnimationLine(Code_Validated);
+				m_boxes[i].m_current_code_index++;
+
+				if (m_boxes[i].m_current_code_index == MAX_CODES || m_boxes[i].m_item->m_stratagem->m_code[m_boxes[i].m_current_code_index] == 0)//code complete ?
+				{
+					m_boxes[i].m_current_code_index = 0;
+
+					printf("\nitem stolen!!\n");
+
+					//reset all feedbacks
+					for (size_t k = 0; k < MAX_ITEMS_PER_AGENT; k++)
+					{
+						for (int l = 0; l < MAX_CODES; l++)
+						{
+							if (m_boxes[k].m_codes[l] > 0)
+							{
+								m_boxes[k].m_codes[l]->setAnimationLine(Code_Normal);
+							}
+						}
+					}
+				}
+			}
+			else// code failed
+			{
+				for (size_t j = 0; j < MAX_CODES; j++)
+				{
+					if (m_boxes[i].m_codes[j] > 0)
+					{
+						m_boxes[i].m_codes[j]->setAnimationLine(Code_Invalid);
+					}
+				}
+			}
+		}
+
+	}
+	else //if (stratagem_in_progress == true)
 	{
 		for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
 		{
-			for (int j = 0; j < MAX_CODES; j++)
+			if (!m_boxes[i].m_item)
 			{
-				if (m_boxes[i].m_codes[j] && m_boxes[i].m_codes[j]->m_currentAnimationIndex != Code_Normal)
+				break;
+			}
+			if (m_boxes[i].m_current_code_index > 0)//test only codes in progress
+			{
+				if (input == m_boxes[i].m_item->m_stratagem->m_code[m_boxes[i].m_current_code_index])//code successful | TODO : check if m_item and m_stratagem exist
 				{
-					m_boxes[i].m_codes[j]->setAnimationLine(Code_Normal);
+					m_boxes[i].m_codes[m_boxes[i].m_current_code_index]->setAnimationLine(Code_Validated);
+					m_boxes[i].m_current_code_index++;
+
+					if (m_boxes[i].m_current_code_index == MAX_CODES || m_boxes[i].m_item->m_stratagem->m_code[m_boxes[i].m_current_code_index] == 0)//code complete ?
+					{
+						m_boxes[i].m_current_code_index = 0;
+
+						printf("\nitem stolen!!\n");
+
+						//reset all feedbacks
+						for (size_t k = 0; k < MAX_ITEMS_PER_AGENT; k++)
+						{
+							for (int l = 0; l < MAX_CODES; l++)
+							{
+								if (m_boxes[k].m_codes[l] > 0)
+								{
+									m_boxes[k].m_codes[l]->setAnimationLine(Code_Normal);
+								}
+							}
+						}
+					}
+				}
+				else// code failed
+				{
+					for (size_t j = 0; j < MAX_CODES; j++)
+					{
+						m_boxes[i].m_current_code_index = 0;
+
+						if (m_boxes[i].m_codes[j] > 0)
+						{
+							m_boxes[i].m_codes[j]->setAnimationLine(Code_Invalid);
+						}
+					}
 				}
 			}
 		}
 	}
 
+	//reset feedbacks ?
+	stratagem_in_progress = false;
 	for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
 	{
-		if (!stratagem_in_progress)
+		if (m_boxes[i].m_current_code_index > 0)
 		{
-			//sucessful input
-			if (m_boxes[i].m_item && m_boxes[i].m_item->m_stratagem && input == m_boxes[i].m_item->m_stratagem->m_code[0])
-			{
-				m_boxes[i].m_current_code_index++;
-				m_boxes[i].m_codes[0]->setAnimationLine(Code_Validated);
-			}
-			else 
-			{
-				//code failed
-				m_boxes[i].m_current_code_index = 0;
-				for (int j = 0; j < MAX_CODES; j++)
-				{
-					if (m_boxes[i].m_codes[j] && m_boxes[i].m_codes[j]->m_currentAnimationIndex != Code_Invalid)
-					{
-						m_boxes[i].m_codes[j]->setAnimationLine(Code_Invalid);
-					}
-				}
-				//reset feedbacks ?
-				stratagem_in_progress = false;
-				for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
-				{
-					if (m_boxes[i].m_current_code_index > 0)
-					{
-						stratagem_in_progress = true;
-						break;
-					}
-				}
-			}
+			stratagem_in_progress = true;
+			break;
 		}
-		else
+	}
+	if (!stratagem_in_progress)
+	{
+		for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
 		{
-			//code in progress
-			if (m_boxes[i].m_current_code_index > 0)
+			for (size_t j = 0; j < MAX_CODES; j++)
 			{
-				if (input == m_boxes[i].m_item->m_stratagem->m_code[m_boxes[i].m_current_code_index])
+				if (m_boxes[i].m_codes[j] > 0)
 				{
-					m_boxes[i].m_codes[m_boxes[i].m_current_code_index]->setAnimationLine(Code_Validated);
-
-					//code completed?
-					if (!m_boxes[i].m_codes[m_boxes[i].m_current_code_index + 1])
-					{
-						//code complete!
-						printf("\nitem stolen!!\n");
-						m_boxes[i].m_current_code_index = 0;
-						
-						//reset feedbacks
-						for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
-						{
-							for (int j = 0; j < MAX_CODES; j++)
-							{
-								if (m_boxes[i].m_codes[j] && m_boxes[i].m_codes[j]->m_currentAnimationIndex != Code_Normal)
-								{
-									m_boxes[i].m_codes[j]->setAnimationLine(Code_Normal);
-								}
-							}
-						}
-						if (!stratagem_in_progress)
-						{
-							for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
-							{
-								for (int j = 0; j < MAX_CODES; j++)
-								{
-									if (m_boxes[i].m_codes[j] && m_boxes[i].m_codes[j]->m_currentAnimationIndex != Code_Normal)
-									{
-										m_boxes[i].m_codes[j]->setAnimationLine(Code_Normal);
-									}
-								}
-							}
-						}
-					}
-					else
-					{
-						m_boxes[i].m_current_code_index++;
-					}
-				}
-				else
-				{
-					//code failed
-					m_boxes[i].m_current_code_index = 0;
-					for (int j = 0; j < MAX_CODES; j++)
-					{
-						if (m_boxes[i].m_codes[j] && m_boxes[i].m_codes[j]->m_currentAnimationIndex != Code_Invalid)
-						{
-							m_boxes[i].m_codes[j]->setAnimationLine(Code_Invalid);
-						}
-					}
-					//reset feedbacks ?
-					stratagem_in_progress = false;
-					for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
-					{
-						if (m_boxes[i].m_current_code_index > 0)
-						{
-							stratagem_in_progress = true;
-							break;
-						}
-					}
-					if (!stratagem_in_progress)
-					{
-						for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
-						{
-							for (int j = 0; j < MAX_CODES; j++)
-							{
-								if (m_boxes[i].m_codes[j] && m_boxes[i].m_codes[j]->m_currentAnimationIndex != Code_Normal)
-								{
-									m_boxes[i].m_codes[j]->setAnimationLine(Code_Normal);
-								}
-							}
-						}
-					}
+					m_boxes[i].m_codes[j]->setAnimationLine(Code_Normal);
 				}
 			}
 		}
