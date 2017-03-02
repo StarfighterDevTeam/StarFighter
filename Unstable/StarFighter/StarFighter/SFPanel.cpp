@@ -189,7 +189,8 @@ void SFPanel::Draw(sf::RenderTexture& screen)
 	}
 }
 
-void SFPanel::CheckCodeInput(int input)
+Item* SFPanel::CheckCodeInput(int input)
 {
 	//see override function in specific types of SFPanels
+	return NULL;
 }

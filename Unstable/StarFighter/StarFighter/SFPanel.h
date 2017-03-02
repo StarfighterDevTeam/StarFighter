@@ -60,7 +60,7 @@ public:
 	virtual void Draw(sf::RenderTexture& screen);
 	static bool IsCursorCollidingWithRectangle(GameObject& cursor, RectangleShape& object);
 
-	virtual void CheckCodeInput(int input);
+	virtual Item* CheckCodeInput(int input);
 	
 	sf::Text m_title_text;
 	sf::Text m_text;

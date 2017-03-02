@@ -43,6 +43,12 @@ Ship::~Ship()
 {
 	m_collisions.clear();
 	m_current_collision = NULL;
+	
+	size_t itemsVectorSize = m_items.size();
+	for (size_t i = 0; i < itemsVectorSize; i++)
+	{
+		delete m_items[i];
+	}
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -102,21 +108,29 @@ void Ship::update(sf::Time deltaTime)
 	//check stratagem inputs
 	if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Stratagem)
 	{
+		Item* item_stolen = NULL;
 		if (m_inputs_states[Action_Coding1] == Input_Tap)
 		{
-			m_SFTargetPanel->CheckCodeInput(1);
+			item_stolen = m_SFTargetPanel->CheckCodeInput(1);
 		}
 		else if (m_inputs_states[Action_Coding2] == Input_Tap)
 		{
-			m_SFTargetPanel->CheckCodeInput(2);
+			item_stolen = m_SFTargetPanel->CheckCodeInput(2);
 		}
 		else if (m_inputs_states[Action_Coding3] == Input_Tap)
 		{
-			m_SFTargetPanel->CheckCodeInput(3);
+			item_stolen = m_SFTargetPanel->CheckCodeInput(3);
 		}
 		else if (m_inputs_states[Action_Coding4] == Input_Tap)
 		{
-			m_SFTargetPanel->CheckCodeInput(4);
+			item_stolen = m_SFTargetPanel->CheckCodeInput(4);
+		}
+
+		//stealing item from the agent
+		if (item_stolen)
+		{
+			printf("Item stolen!\n");
+			m_items.push_back(item_stolen);
 		}
 	}
 

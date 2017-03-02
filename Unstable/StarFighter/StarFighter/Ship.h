@@ -77,6 +77,7 @@ public :
 	// PICKPOCKETS SPECIFIC
 	vector<GameObject*> m_collisions;
 	GameObject* m_current_collision;
+	vector<Item*> m_items;
 
 	void Collide(GameObject* target) override;
 	bool GetCurrentCollision();

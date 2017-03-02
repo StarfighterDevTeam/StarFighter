@@ -265,8 +265,9 @@ void SFStratagemPanel::Draw(sf::RenderTexture& screen)
 	}
 }
 
-void SFStratagemPanel::CheckCodeInput(int input)
+Item* SFStratagemPanel::CheckCodeInput(int input)
 {
+	Item* item_stolen = NULL;
 	Agent* agent = (Agent*)m_playerShip->m_current_collision;
 
 	//is there a code in progress?
@@ -297,7 +298,7 @@ void SFStratagemPanel::CheckCodeInput(int input)
 				{
 					m_boxes[i].m_current_code_index = 0;
 
-					printf("\nitem stolen!!\n");
+					item_stolen = m_boxes[i].m_item;
 
 					m_boxes[i].m_item = NULL;
 					agent->m_items[i] = NULL;
@@ -351,7 +352,7 @@ void SFStratagemPanel::CheckCodeInput(int input)
 					{
 						m_boxes[i].m_current_code_index = 0;
 
-						printf("\nitem stolen!!\n");
+						item_stolen = m_boxes[i].m_item;
 
 						m_boxes[i].m_item = NULL;
 						agent->m_items[i] = NULL;
@@ -413,4 +414,6 @@ void SFStratagemPanel::CheckCodeInput(int input)
 			}
 		}
 	}
+
+	return item_stolen;
 }

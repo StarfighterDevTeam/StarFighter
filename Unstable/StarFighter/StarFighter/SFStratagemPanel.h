@@ -44,7 +44,7 @@ public:
 
 	int m_current_code[MAX_CODES];
 
-	void CheckCodeInput(int input) override;
+	Item* CheckCodeInput(int input) override;
 };
 
 #endif // SFSTRATAGEMPANEL_H_INCLUDED
