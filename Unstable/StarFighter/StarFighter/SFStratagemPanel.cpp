@@ -56,6 +56,10 @@ void ItemBox::Init(Item* item, GameObject& code_sprite)
 
 void ItemBox::Draw(sf::RenderTexture& screen)
 {
+	if (!m_item)
+	{
+		return;
+	}
 	screen.draw(m_item_text);
 	if (m_item_image)
 	{
@@ -102,6 +106,29 @@ ItemBox::~ItemBox()
 			delete m_codes[i];
 		}
 	}
+}
+
+void ItemBox::CopyAndDelete(ItemBox& item_to_copy)
+{
+	//copy
+	m_item = item_to_copy.m_item;
+	for (size_t i = 0; i < MAX_CODES; i++)
+	{
+		m_codes[i] = item_to_copy.m_codes[i];
+	}
+	m_item_image = item_to_copy.m_item_image;
+	m_item_text = item_to_copy.m_item_text;
+	m_current_code_index = item_to_copy.m_current_code_index;
+
+	//delete
+	item_to_copy.m_item = NULL;
+	for (size_t i = 0; i < MAX_CODES; i++)
+	{
+		item_to_copy.m_codes[i] = NULL;
+	}
+	item_to_copy.m_item_image = NULL;
+	item_to_copy.m_item_text.setString("");
+	item_to_copy.m_current_code_index = 0;
 }
 
 // PANEL
@@ -156,15 +183,22 @@ SFStratagemPanel::SFStratagemPanel(sf::Vector2f size, SFPanelTypes panel_type, S
 	//stratagems (1 item = 1 box of codes)
 	text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height;
 
+	size_t j = 0;
 	for (size_t i = 0; i < itemsVectorSize; i++)
 	{
-		if (i > 0)
-		{
-			text_height += ITEM_SIZE + STRATAGEM_PANEL_SPACE_BETWEEN_LINES;
-		}
-
 		m_boxes[i].Init(agent->m_items[i], m_code);
-		m_boxes[i].SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+
+		if (m_boxes[i].m_item)
+		{
+			if (j > 0)
+			{
+				text_height += ITEM_SIZE + STRATAGEM_PANEL_SPACE_BETWEEN_LINES;
+			}
+
+			j++;
+
+			m_boxes[i].SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+		}
 	}
 }
 
@@ -175,7 +209,36 @@ SFStratagemPanel::~SFStratagemPanel()
 
 void SFStratagemPanel::Update(sf::Time deltaTime)
 {
-	
+	Agent* agent = (Agent*)m_playerShip->m_current_collision;
+	if (!agent)
+	{
+		return;
+	}
+
+	//positioning of panel's content
+	float text_height = 0;
+	text_height += m_title_text.getGlobalBounds().height / 2;
+
+	m_title_text.setPosition(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height);
+
+	//stratagems (1 item = 1 box of codes)
+	text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height;
+	size_t itemsVectorSize = agent->m_items.size();
+	size_t j = 0;
+	for (size_t i = 0; i < itemsVectorSize; i++)
+	{
+		if (m_boxes[i].m_item)
+		{
+			if (j > 0)
+			{
+				text_height += ITEM_SIZE + STRATAGEM_PANEL_SPACE_BETWEEN_LINES;
+			}
+
+			j++;
+
+			m_boxes[i].SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+		}
+	}
 }
 
 void SFStratagemPanel::Draw(sf::RenderTexture& screen)
@@ -204,6 +267,8 @@ void SFStratagemPanel::Draw(sf::RenderTexture& screen)
 
 void SFStratagemPanel::CheckCodeInput(int input)
 {
+	Agent* agent = (Agent*)m_playerShip->m_current_collision;
+
 	//is there a code in progress?
 	bool stratagem_in_progress = false;
 	for (size_t i = 0; i < MAX_ITEMS_PER_AGENT; i++)
@@ -221,7 +286,7 @@ void SFStratagemPanel::CheckCodeInput(int input)
 		{
 			if (!m_boxes[i].m_item)
 			{
-				break;
+				continue;
 			}
 			if (input == m_boxes[i].m_item->m_stratagem->m_code[m_boxes[i].m_current_code_index])//code successful | TODO : check if m_item and m_stratagem exist
 			{
@@ -233,6 +298,13 @@ void SFStratagemPanel::CheckCodeInput(int input)
 					m_boxes[i].m_current_code_index = 0;
 
 					printf("\nitem stolen!!\n");
+
+					m_boxes[i].m_item = NULL;
+					agent->m_items[i] = NULL;
+					//for (size_t s = i; s++; s < MAX_CODES)
+					//{
+					//	m_boxes[s].CopyAndDelete(m_boxes[s + 1]);
+					//}
 
 					//reset all feedbacks
 					for (size_t k = 0; k < MAX_ITEMS_PER_AGENT; k++)
@@ -266,7 +338,7 @@ void SFStratagemPanel::CheckCodeInput(int input)
 		{
 			if (!m_boxes[i].m_item)
 			{
-				break;
+				continue;
 			}
 			if (m_boxes[i].m_current_code_index > 0)//test only codes in progress
 			{
@@ -280,6 +352,14 @@ void SFStratagemPanel::CheckCodeInput(int input)
 						m_boxes[i].m_current_code_index = 0;
 
 						printf("\nitem stolen!!\n");
+
+						m_boxes[i].m_item = NULL;
+						agent->m_items[i] = NULL;
+
+						//for (size_t s = i; s++; s < MAX_CODES)
+						//{
+						//	m_boxes[s].CopyAndDelete(m_boxes[s + 1]);
+						//}
 
 						//reset all feedbacks
 						for (size_t k = 0; k < MAX_ITEMS_PER_AGENT; k++)

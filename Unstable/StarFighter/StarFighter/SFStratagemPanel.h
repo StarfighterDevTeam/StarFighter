@@ -25,6 +25,7 @@ public:
 
 	void Draw(sf::RenderTexture& screen);
 	void SetPosition(sf::Vector2f position);
+	void CopyAndDelete(ItemBox& item_to_copy);
 
 	int m_current_code_index;
 };
