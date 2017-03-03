@@ -3,6 +3,13 @@
 
 #include "Agent.h"
 
+enum WalkerState
+{
+	Walker_Undecided,
+	Walker_Idle,
+	Walker_Walk,
+};
+
 class Walker : public Agent
 {
 public :
@@ -12,6 +19,14 @@ public :
 	void Init();
 	virtual ~Walker();
 	void update(sf::Time deltaTime) override;
+
+	void SetRandomWalkRoutine();
+	void SetRandomIdleRoutine();
+
+	WalkerState m_state;
+	sf::Clock m_phaseClock;
+	float m_phaseTime;
+	float m_standardSpeed;
 };
 
 #endif // WALKER_H_INCLUDED

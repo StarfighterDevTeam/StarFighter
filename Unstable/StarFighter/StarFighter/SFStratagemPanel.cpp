@@ -302,10 +302,6 @@ Item* SFStratagemPanel::CheckCodeInput(int input)
 
 					m_boxes[i].m_item = NULL;
 					agent->m_items[i] = NULL;
-					//for (size_t s = i; s++; s < MAX_CODES)
-					//{
-					//	m_boxes[s].CopyAndDelete(m_boxes[s + 1]);
-					//}
 
 					//reset all feedbacks
 					for (size_t k = 0; k < MAX_ITEMS_PER_AGENT; k++)
@@ -356,11 +352,6 @@ Item* SFStratagemPanel::CheckCodeInput(int input)
 
 						m_boxes[i].m_item = NULL;
 						agent->m_items[i] = NULL;
-
-						//for (size_t s = i; s++; s < MAX_CODES)
-						//{
-						//	m_boxes[s].CopyAndDelete(m_boxes[s + 1]);
-						//}
 
 						//reset all feedbacks
 						for (size_t k = 0; k < MAX_ITEMS_PER_AGENT; k++)

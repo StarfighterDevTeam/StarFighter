@@ -7,7 +7,7 @@ using namespace sf;
 // ----------------SHIP ---------------
 Agent::Agent()
 {
-	
+	Init();
 }
 
 void Agent::Init()

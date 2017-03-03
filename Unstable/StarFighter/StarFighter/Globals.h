@@ -40,8 +40,17 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
-//GAME SETTINGS
+//AGENT
 #define MAX_ITEMS_PER_AGENT				5
+#define WALKER_IDLE_MIN_WAIT_TIME		1.f
+#define WALKER_IDLE_MAX_WAIT_TIME		5.f
+#define WALKER_IDLE_MIN_WALK_TIME		1.f
+#define WALKER_IDLE_MAX_WALK_TIME		3.f
+#define WALKER_MIN_SPEED				50.f
+#define WALKER_MAX_SPEED				150.f
+#define WALKER_SPEED_UP_VARIANCE		1.30f
+#define WALKER_SLOW_DOWN_VARIANCE		0.70f
+#define WALKER_CHANCE_OF_WALKING		0.70f
 
 //ASSETS
 #define ITEM_SIZE								32
