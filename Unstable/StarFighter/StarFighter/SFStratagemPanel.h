@@ -41,6 +41,8 @@ public:
 	Item* m_current_stratagem;
 	GameObject m_code;
 	ItemBox m_boxes[MAX_ITEMS_PER_AGENT];
+	sf::RectangleShape m_rect;
+	sf::RectangleShape m_rectContainer;
 
 	int m_current_code[MAX_CODES];
 

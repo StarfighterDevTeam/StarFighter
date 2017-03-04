@@ -55,47 +55,47 @@ void Walker::update(sf::Time deltaTime)
 {
 	Agent::update(deltaTime);
 
-	switch (m_state)
-	{
-		case Walker_Undecided:
-		{
-			m_state = Walker_Idle;
-			SetRandomIdleRoutine();
-			m_phaseClock.restart();
-		}
-		case Walker_Idle:
-		{
-			//phase out?
-			if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
-			{
-				m_state = Walker_Walk;
-				SetRandomWalkRoutine();
-				m_phaseClock.restart();
-			}
-			break;
-		}
-		case Walker_Walk:
-		{
-			//phase out?
-			if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
-			{
-				m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_WALKING ? Walker_Walk : Walker_Idle;
-				switch (m_state)
-				{
-					case Walker_Walk:
-					{
-						SetRandomWalkRoutine();
-						break;
-					}
-					case Walker_Idle:
-					{
-						SetRandomIdleRoutine();
-						break;
-					}
-				}
-				m_phaseClock.restart();
-			}
-			break;
-		}
-	}
+	//switch (m_state)
+	//{
+	//	case Walker_Undecided:
+	//	{
+	//		m_state = Walker_Idle;
+	//		SetRandomIdleRoutine();
+	//		m_phaseClock.restart();
+	//	}
+	//	case Walker_Idle:
+	//	{
+	//		//phase out?
+	//		if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
+	//		{
+	//			m_state = Walker_Walk;
+	//			SetRandomWalkRoutine();
+	//			m_phaseClock.restart();
+	//		}
+	//		break;
+	//	}
+	//	case Walker_Walk:
+	//	{
+	//		//phase out?
+	//		if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
+	//		{
+	//			m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_WALKING ? Walker_Walk : Walker_Idle;
+	//			switch (m_state)
+	//			{
+	//				case Walker_Walk:
+	//				{
+	//					SetRandomWalkRoutine();
+	//					break;
+	//				}
+	//				case Walker_Idle:
+	//				{
+	//					SetRandomIdleRoutine();
+	//					break;
+	//				}
+	//			}
+	//			m_phaseClock.restart();
+	//		}
+	//		break;
+	//	}
+	//}
 }

@@ -27,6 +27,7 @@ void Ship::Init()
 
 	//PICKPOCKETS SPECIFIC
 	m_current_collision = NULL;
+	m_awerenessTick = 0;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -56,7 +57,7 @@ void Ship::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
-bool Ship::GetCurrentCollision()
+bool Ship::GetCurrentCollision(sf::Time deltaTime)
 {
 	if (m_collisions.empty())
 	{
@@ -72,7 +73,7 @@ bool Ship::GetCurrentCollision()
 		{
 			//new collision
 			m_current_collision = m_collisions.front();
-			printf("new collision: %s \n", m_current_collision->m_textureName.c_str());
+			//printf("new collision: %s \n", m_current_collision->m_textureName.c_str());
 		}
 
 		m_collisions.clear();
@@ -95,7 +96,7 @@ void Ship::update(sf::Time deltaTime)
 	ManageAcceleration(inputs_direction);
 	
 	//PICKPOCKETS COLLISIONS
-	GetCurrentCollision();
+	GetCurrentCollision(deltaTime);
 	
 	//Action input
 	UpdateInputStates();
@@ -105,9 +106,26 @@ void Ship::update(sf::Time deltaTime)
 		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	}
 
-	//check stratagem inputs
+	//interaction with agents
+	Agent* agent = (Agent*)m_current_collision;
+	for (std::map<Agent*, float>::iterator it = m_awareness_map.begin(); it != m_awareness_map.end(); it++)
+	{
+		if (it->first == NULL)
+			continue;
+
+		if (it->first != agent)
+		{
+			it->second -= deltaTime.asSeconds() * WALKER_AWARENESS_REDUCTION_PER_SECOND;
+		}
+		else
+		{
+			it->second += deltaTime.asSeconds() * WALKER_AWARENESS_RAISE_PER_SECOND;
+		}
+	}
+
 	if (m_SFTargetPanel && m_SFTargetPanel->m_panel_type == SFPanel_Stratagem)
 	{
+		//check inputs
 		Item* item_stolen = NULL;
 		if (m_inputs_states[Action_Coding1] == Input_Tap)
 		{
@@ -131,6 +149,15 @@ void Ship::update(sf::Time deltaTime)
 		{
 			printf("Item stolen!\n");
 			m_items.push_back(item_stolen);
+		}
+
+		if (m_awareness_map[agent] > 1)
+		{
+			m_awareness_map[agent] = 1;
+		}
+		if (m_awareness_map[agent] < 0)
+		{
+			m_awareness_map[agent] = 0;
 		}
 	}
 
@@ -372,4 +399,10 @@ void Ship::Collide(GameObject* target)
 		return;
 
 	m_collisions.push_back(target);
+}
+
+void Ship::RemoveFromAwarenessMap(GameObject* agent)
+{
+	Agent* agent_ = (Agent*)agent;
+	m_awareness_map.erase(agent_);
 }

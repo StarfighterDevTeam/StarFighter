@@ -444,3 +444,8 @@ void GameObject::Collide(GameObject* target)
 {
 	//see override function in class Ship
 }
+
+void GameObject::RemoveFromAwarenessMap(GameObject* agent)
+{
+	//see override function in class Ship
+}

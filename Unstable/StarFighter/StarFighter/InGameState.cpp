@@ -21,7 +21,8 @@ void InGameState::Initialize(Player player)
 	//Loading scripts
 	LoadCSVFile(SHIP_CSV_FILE);
 
-	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
+	//GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
+	GameObject* background = new GameObject(sf::Vector2f(2250, 1551), sf::Vector2f(0, 0), "2D/city.jpg", sf::Vector2f(4500, 3102), sf::Vector2f(2250, 1551));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = background->m_size;
@@ -31,10 +32,11 @@ void InGameState::Initialize(Player player)
 	// PICK POCKETS SPECIFIC
 	Walker* walker1 = new Walker(sf::Vector2f(300, 300), sf::Vector2f(0, 0), "2D/savannah1.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
 	(*CurrentGame).addToScene(walker1, AgentLayer, AgentObject);
+	(*CurrentGame).m_playerShip->m_awareness_map.insert(std::pair<Agent*, float>(walker1, 0));
 
 	Walker* walker2 = new Walker(sf::Vector2f(500, 300), sf::Vector2f(0, 0), "2D/savannah2.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
 	(*CurrentGame).addToScene(walker2, AgentLayer, AgentObject);
-
+	(*CurrentGame).m_playerShip->m_awareness_map.insert(std::pair<Agent*, float>(walker2, 0));
 }
 
 void InGameState::Update(sf::Time deltaTime)

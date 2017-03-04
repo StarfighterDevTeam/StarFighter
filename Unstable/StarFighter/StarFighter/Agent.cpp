@@ -32,6 +32,9 @@ Agent::~Agent()
 		delete (*it);
 	}
 	m_items.clear();
+
+	GameObject* ship = (GameObject*)(*CurrentGame).m_playerShip;
+	ship->RemoveFromAwarenessMap(this);
 }
 
 void Agent::update(sf::Time deltaTime)
@@ -44,7 +47,7 @@ void Agent::GenerateItems()
 	int nb_items = RandomizeIntBetweenValues(1, MAX_ITEMS_PER_AGENT);
 	for (int i = 0; i < nb_items; i++)
 	{
-		ItemType item_type = (ItemType)RandomizeIntBetweenValues(0, NB_ItemTypes-1);
+		ItemType item_type = (ItemType)RandomizeIntBetweenValues(1, NB_ItemTypes-1);
 		if (item_type != 0)
 		{
 			Item* new_item = new Item(item_type);

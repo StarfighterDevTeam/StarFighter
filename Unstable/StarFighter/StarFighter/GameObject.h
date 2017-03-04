@@ -90,6 +90,7 @@ public:
 
 	//PICKPOCKETS SPECIFIC
 	virtual void Collide(GameObject* target);
+	virtual void RemoveFromAwarenessMap(GameObject* agent);
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

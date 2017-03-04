@@ -162,6 +162,12 @@ SFStratagemPanel::SFStratagemPanel(sf::Vector2f size, SFPanelTypes panel_type, S
 	ss_title << playerShip->m_current_collision->m_display_name;
 	m_title_text.setString(ss_title.str());
 
+	//awareness gauge
+	m_rectContainer.setSize(sf::Vector2f(SFSTRATAGEM_PANEL_WIDTH - 2*INTERACTION_MARGIN_SIDES, SFSTRATAGEM_PANEL_AWARENESS_HEIGHT));
+	m_rectContainer.setFillColor(sf::Color::Black);
+	m_rect.setSize(sf::Vector2f(1, SFSTRATAGEM_PANEL_AWARENESS_HEIGHT));
+	m_rect.setFillColor(sf::Color::Green);
+
 	//size and position of panel
 	size_t itemsVectorSize = agent->m_items.size();
 	if (itemsVectorSize > 1)
@@ -200,6 +206,11 @@ SFStratagemPanel::SFStratagemPanel(sf::Vector2f size, SFPanelTypes panel_type, S
 			m_boxes[i].SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 		}
 	}
+
+	//awareness gauge
+	text_height += INTERACTION_INTERBLOCK;
+	m_rectContainer.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_rect.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 }
 
 SFStratagemPanel::~SFStratagemPanel()
@@ -239,6 +250,13 @@ void SFStratagemPanel::Update(sf::Time deltaTime)
 			m_boxes[i].SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 		}
 	}
+
+	//awareness gauge
+	text_height += ITEM_SIZE + STRATAGEM_PANEL_SPACE_BETWEEN_LINES + INTERACTION_INTERBLOCK;
+	m_rectContainer.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+	m_rect.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
+
+	m_rect.setSize(sf::Vector2f(m_playerShip->m_awareness_map[agent] * (SFSTRATAGEM_PANEL_WIDTH - 2 * INTERACTION_MARGIN_SIDES), SFSTRATAGEM_PANEL_AWARENESS_HEIGHT));
 }
 
 void SFStratagemPanel::Draw(sf::RenderTexture& screen)
@@ -262,6 +280,9 @@ void SFStratagemPanel::Draw(sf::RenderTexture& screen)
 				m_boxes[i].Draw(screen);
 			}
 		}
+
+		screen.draw(m_rectContainer);
+		screen.draw(m_rect);
 	}
 }
 
@@ -269,6 +290,8 @@ Item* SFStratagemPanel::CheckCodeInput(int input)
 {
 	Item* item_stolen = NULL;
 	Agent* agent = (Agent*)m_playerShip->m_current_collision;
+
+	m_playerShip->m_awareness_map[agent] += WALKER_AWARENESS_PER_CODE;
 
 	//is there a code in progress?
 	bool stratagem_in_progress = false;

@@ -14,7 +14,7 @@
 #define SHIP_START_Y                540
 #define SHIP_ACCELERATION	        2000.0f
 #define SHIP_DECCELERATION_COEF		5000.0f
-#define SHIP_MAX_SPEED				600.0f
+#define SHIP_MAX_SPEED				250.0f
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
@@ -78,9 +78,12 @@ public :
 	vector<GameObject*> m_collisions;
 	GameObject* m_current_collision;
 	vector<Item*> m_items;
+	map<Agent*, float> m_awareness_map;
+	float m_awerenessTick;
 
 	void Collide(GameObject* target) override;
-	bool GetCurrentCollision();
+	bool GetCurrentCollision(sf::Time deltaTime);
+	void RemoveFromAwarenessMap(GameObject* agent) override;
 
 private:
 	bool m_moving;
