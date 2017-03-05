@@ -7,6 +7,7 @@ enum WalkerState
 {
 	Walker_Undecided,
 	Walker_Idle,
+	Walker_Pivot,
 	Walker_Walk,
 };
 
@@ -31,6 +32,7 @@ public :
 
 	void SetRandomWalkRoutine();
 	void SetRandomIdleRoutine();
+	void SetRandomPivotRoutine();
 
 	WalkerState m_state;
 	WalkerAwareness m_awareness;

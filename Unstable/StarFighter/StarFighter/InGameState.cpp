@@ -34,9 +34,9 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(walker1, AgentLayer, AgentObject);
 	(*CurrentGame).m_playerShip->m_awareness_map.insert(std::pair<Agent*, float>(walker1, 0));
 
-	Walker* walker2 = new Walker(sf::Vector2f(500, 300), sf::Vector2f(0, 0), "2D/savannah2.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
-	(*CurrentGame).addToScene(walker2, AgentLayer, AgentObject);
-	(*CurrentGame).m_playerShip->m_awareness_map.insert(std::pair<Agent*, float>(walker2, 0));
+	//Walker* walker2 = new Walker(sf::Vector2f(500, 300), sf::Vector2f(0, 0), "2D/savannah2.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
+	//(*CurrentGame).addToScene(walker2, AgentLayer, AgentObject);
+	//(*CurrentGame).m_playerShip->m_awareness_map.insert(std::pair<Agent*, float>(walker2, 0));
 }
 
 void InGameState::Update(sf::Time deltaTime)

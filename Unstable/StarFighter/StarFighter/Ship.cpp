@@ -118,11 +118,11 @@ void Ship::update(sf::Time deltaTime)
 			//vision test
 			float current_distance = GameObject::GetDistanceBetweenPositions(getPosition(), it->first->getPosition());
 			float current_angle = GameObject::GetAngleRadBetweenPositions(getPosition(), it->first->getPosition()) * 180 / M_PI - it->first->getRotation();
-			printf("distance: %f, angle: %f ", current_distance, current_angle);
+			//printf("distance: %f, angle: %f ", current_distance, current_angle);
 
 			if (current_distance < it->first->m_vision_range && current_angle < it->first->m_vision_angle / 2 && current_angle > -it->first->m_vision_angle / 2)
 			{
-				printf("vision\n");
+				//printf("vision\n");
 				if (it->second < WALKER_AWARENESS_MAX_ON_SIGHT)
 				{
 					it->second += deltaTime.asSeconds() * WALKER_AWARENESS_RAISE_ON_SIGHT;
@@ -130,7 +130,7 @@ void Ship::update(sf::Time deltaTime)
 			}
 			else
 			{
-				printf("pas vision\n");
+				//printf("pas vision\n");
 				it->second -= deltaTime.asSeconds() * WALKER_AWARENESS_REDUCTION_ON_IDLE;
 			}
 		}

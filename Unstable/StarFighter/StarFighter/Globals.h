@@ -48,9 +48,11 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define WALKER_IDLE_MAX_WALK_TIME					3.f
 #define WALKER_MIN_SPEED							50.f
 #define WALKER_MAX_SPEED							150.f
+#define WALKER_ANGULAR_SPEED						50.f
 #define WALKER_SPEED_UP_VARIANCE					1.30f
 #define WALKER_SLOW_DOWN_VARIANCE					0.70f
-#define WALKER_CHANCE_OF_WALKING					0.70f
+#define WALKER_CHANCE_OF_WALKING					0.30f
+#define WALKER_CHANCE_OF_PIVOTING					0.70f
 #define WALKER_AWARENESS_PER_CODE					0.10f
 #define WALKER_AWARENESS_RAISE_ON_COLLISION			0.25f
 #define WALKER_AWARENESS_RAISE_ON_SIGHT				0.02f

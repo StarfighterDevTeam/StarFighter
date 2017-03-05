@@ -20,6 +20,7 @@ void Walker::Init()
 	m_standardSpeed = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_MIN_SPEED, WALKER_MAX_SPEED));
 	m_vision_range = 300;
 	m_vision_angle = 90;
+	m_angular_speed = WALKER_ANGULAR_SPEED;
 
 	m_vision_cone = (*CurrentGame).m_vision_cone_90->Clone();
 	m_vision_cone->m_DontGarbageMe = true;
@@ -54,12 +55,21 @@ void Walker::SetRandomIdleRoutine()
 	m_phaseTime = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_IDLE_MIN_WAIT_TIME, WALKER_IDLE_MAX_WAIT_TIME));
 }
 
+void Walker::SetRandomPivotRoutine()
+{
+	m_speed.x = 0;
+	m_speed.y = 0;
+	m_desired_angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
+}
+
 void Walker::SetRandomWalkRoutine()
 {
 	float speed = RandomizeFloatBetweenValues(sf::Vector2f(m_standardSpeed * WALKER_SLOW_DOWN_VARIANCE, m_standardSpeed * WALKER_SPEED_UP_VARIANCE));
-	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	SetSpeedVectorFromAbsoluteSpeedAndAngle(speed, angle);
-	setRotation(angle * 180 / M_PI - 180);
+	m_desired_angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
+	//SetSpeedVectorFromAbsoluteSpeedAndAngle(speed, angle);
+	//setRotation(angle * 180 / M_PI - 180);
+	//m_desired_angle = angle * 180 / M_PI - 180;
+	m_desired_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(speed, m_desired_angle / 180 * M_PI - M_PI);
 	m_phaseTime = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_IDLE_MIN_WALK_TIME, WALKER_IDLE_MAX_WALK_TIME));
 }
 
@@ -140,8 +150,42 @@ void Walker::update(sf::Time deltaTime)
 			//phase out?
 			if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
 			{
-				m_state = Walker_Walk;
-				SetRandomWalkRoutine();
+				m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_PIVOTING ? Walker_Pivot : Walker_Walk;
+				switch (m_state)
+				{
+					case Walker_Pivot:
+					{
+						SetRandomPivotRoutine();
+						break;
+					}
+					case Walker_Walk:
+					{
+						SetRandomWalkRoutine();
+						break;
+					}
+				}
+				m_phaseClock.restart();
+			}
+			break;
+		}
+		case Walker_Pivot:
+		{
+			if (!TurnToDesiredAngle(deltaTime))
+			{
+				m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_WALKING ? Walker_Walk : Walker_Idle;
+				switch (m_state)
+				{
+					case Walker_Walk:
+					{
+						SetRandomWalkRoutine();
+						break;
+					}
+					case Walker_Idle:
+					{
+						SetRandomIdleRoutine();
+						break;
+					}
+				}
 				m_phaseClock.restart();
 			}
 			break;
@@ -166,6 +210,18 @@ void Walker::update(sf::Time deltaTime)
 					}
 				}
 				m_phaseClock.restart();
+			}
+			else
+			{
+				//rotation finished? let's move on to destination
+				if (!TurnToDesiredAngle(deltaTime))
+				{
+					m_speed = m_desired_speed;
+				}
+				else
+				{
+					m_phaseClock.restart();
+				}
 			}
 			break;
 		}

@@ -22,7 +22,11 @@ public :
 	float m_vision_angle;
 	GameObject* m_vision_cone;
 	float m_max_current_awareness;
+	float m_angular_speed;
+	float m_desired_angle;
+	sf::Vector2f m_desired_speed;
 
+	bool TurnToDesiredAngle(sf::Time deltaTime);
 	void GenerateItems();
 	Stratagem* GetRandomStratagem(ItemType item_type);
 
