@@ -30,7 +30,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
 	// PICK POCKETS SPECIFIC
-	Walker* walker1 = new Walker(sf::Vector2f(300, 300), sf::Vector2f(0, 0), "2D/savannah1.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
+	Walker* walker1 = new Walker(sf::Vector2f(600, 600), sf::Vector2f(0, 0), "2D/savannah1.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
 	(*CurrentGame).addToScene(walker1, AgentLayer, AgentObject);
 	(*CurrentGame).m_playerShip->m_awareness_map.insert(std::pair<Agent*, float>(walker1, 0));
 

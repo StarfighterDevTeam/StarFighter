@@ -10,6 +10,15 @@ enum WalkerState
 	Walker_Walk,
 };
 
+enum WalkerAwareness
+{
+	Walker_Unaware,
+	Walker_Casual,
+	Walker_Suspicious,
+	Walker_Angry,
+	Walker_Mad,
+};
+
 class Walker : public Agent
 {
 public :
@@ -24,6 +33,7 @@ public :
 	void SetRandomIdleRoutine();
 
 	WalkerState m_state;
+	WalkerAwareness m_awareness;
 	sf::Clock m_phaseClock;
 	float m_phaseTime;
 	float m_standardSpeed;

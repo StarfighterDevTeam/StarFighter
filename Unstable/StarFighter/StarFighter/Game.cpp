@@ -55,6 +55,9 @@ void Game::init(RenderWindow* window)
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	PlayMusic(Music_Main);
+
+	//PICKPOCKETS SPECIFIC
+	m_vision_cone_90 = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/vision_cone_90.png", sf::Vector2f(600, 600), sf::Vector2f(300, 300), 1, 1);
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -240,6 +243,8 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
+
+	//Update of game objects
 	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
@@ -579,4 +584,20 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
+}
+
+float Game::GetCurrentMaxAwareness(GameObject* agent)
+{
+	float max = 0;
+	size_t playersVectorSize = m_sceneGameObjectsTyped[PlayerShip].size();
+	for (size_t i = 0; i < playersVectorSize; i++)
+	{
+		float cur = m_sceneGameObjectsTyped[PlayerShip][i]->GetCurrentAwareness(agent);
+		if (max < cur)
+		{
+			max = cur;
+		}
+	}
+
+	return max;
 }

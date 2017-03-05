@@ -449,3 +449,9 @@ void GameObject::RemoveFromAwarenessMap(GameObject* agent)
 {
 	//see override function in class Ship
 }
+
+float GameObject::GetCurrentAwareness(GameObject* agent)
+{
+	//see override function in class Ship
+	return 0;
+}

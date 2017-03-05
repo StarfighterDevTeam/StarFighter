@@ -16,7 +16,16 @@ void Walker::Init()
 
 	m_display_name = "Walker";
 	m_state = Walker_Undecided;
+	m_awareness = Walker_Unaware;
 	m_standardSpeed = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_MIN_SPEED, WALKER_MAX_SPEED));
+	m_vision_range = 300;
+	m_vision_angle = 90;
+
+	m_vision_cone = (*CurrentGame).m_vision_cone_90->Clone();
+	m_vision_cone->m_DontGarbageMe = true;
+	m_vision_cone->setPosition(getPosition());
+	m_vision_cone->setColor(sf::Color(75, 195, 10, GHOST_ALPHA_VALUE));
+	(*CurrentGame).addToScene(m_vision_cone, VisionConeLayer, VisionConeObject);
 
 	GenerateItems();
 }
@@ -33,7 +42,9 @@ Walker::Walker(sf::Vector2f position, sf::Vector2f speed, std::string textureNam
 
 Walker::~Walker()
 {
-	
+	m_vision_cone->m_GarbageMe = true;
+	m_vision_cone->m_visible = false;
+	m_vision_cone = NULL;
 }
 
 void Walker::SetRandomIdleRoutine()
@@ -48,6 +59,7 @@ void Walker::SetRandomWalkRoutine()
 	float speed = RandomizeFloatBetweenValues(sf::Vector2f(m_standardSpeed * WALKER_SLOW_DOWN_VARIANCE, m_standardSpeed * WALKER_SPEED_UP_VARIANCE));
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	SetSpeedVectorFromAbsoluteSpeedAndAngle(speed, angle);
+	setRotation(angle * 180 / M_PI - 180);
 	m_phaseTime = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_IDLE_MIN_WALK_TIME, WALKER_IDLE_MAX_WALK_TIME));
 }
 
@@ -55,47 +67,107 @@ void Walker::update(sf::Time deltaTime)
 {
 	Agent::update(deltaTime);
 
-	//switch (m_state)
-	//{
-	//	case Walker_Undecided:
-	//	{
-	//		m_state = Walker_Idle;
-	//		SetRandomIdleRoutine();
-	//		m_phaseClock.restart();
-	//	}
-	//	case Walker_Idle:
-	//	{
-	//		//phase out?
-	//		if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
-	//		{
-	//			m_state = Walker_Walk;
-	//			SetRandomWalkRoutine();
-	//			m_phaseClock.restart();
-	//		}
-	//		break;
-	//	}
-	//	case Walker_Walk:
-	//	{
-	//		//phase out?
-	//		if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
-	//		{
-	//			m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_WALKING ? Walker_Walk : Walker_Idle;
-	//			switch (m_state)
-	//			{
-	//				case Walker_Walk:
-	//				{
-	//					SetRandomWalkRoutine();
-	//					break;
-	//				}
-	//				case Walker_Idle:
-	//				{
-	//					SetRandomIdleRoutine();
-	//					break;
-	//				}
-	//			}
-	//			m_phaseClock.restart();
-	//		}
-	//		break;
-	//	}
-	//}
+	//update vision cone
+	if (m_vision_cone)
+	{
+		m_vision_cone->setPosition(getPosition());
+		m_vision_cone->setRotation(getRotation());
+
+		//who is the most suspicious player?
+		m_max_current_awareness = (*CurrentGame).GetCurrentMaxAwareness(this);
+		if (m_max_current_awareness < WALKER_AWARENESS_THRESHOLD_CASUAL)
+		{
+			m_awareness = Walker_Unaware;
+		}
+		else if (m_max_current_awareness < WALKER_AWARENESS_THRESHOLD_SUSPICIOUS)
+		{
+			m_awareness = Walker_Casual;
+		}
+		else if (m_max_current_awareness < WALKER_AWARENESS_THRESHOLD_ANGRY)
+		{
+			m_awareness = Walker_Suspicious;
+		}
+		else if (m_max_current_awareness < WALKER_AWARENESS_THRESHOLD_MAD)
+		{
+			m_awareness = Walker_Angry;
+		}
+		else
+		{
+			m_awareness = Walker_Mad;
+		}
+
+		switch (m_awareness)
+		{
+			case Walker_Unaware:
+			{
+				m_vision_cone->setColor(sf::Color(75, 195, 10, GHOST_ALPHA_VALUE));
+				break;
+			}
+			case Walker_Casual:
+			{
+				m_vision_cone->setColor(sf::Color(255, 242, 0, GHOST_ALPHA_VALUE));
+				break;
+			}
+			case Walker_Suspicious:
+			{
+				m_vision_cone->setColor(sf::Color(255, 109, 21, GHOST_ALPHA_VALUE));
+				break;
+			}
+			case Walker_Angry:
+			{
+				m_vision_cone->setColor(sf::Color(255, 44, 32, GHOST_ALPHA_VALUE));
+				break;
+			}
+			case Walker_Mad:
+			{
+				m_vision_cone->setColor(sf::Color(0, 0, 0, GHOST_ALPHA_VALUE));
+				break;
+			}
+		}
+	}
+
+	//update movement
+	switch (m_state)
+	{
+		case Walker_Undecided:
+		{
+			m_state = Walker_Idle;
+			SetRandomIdleRoutine();
+			m_phaseClock.restart();
+		}
+		case Walker_Idle:
+		{
+			//phase out?
+			if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
+			{
+				m_state = Walker_Walk;
+				SetRandomWalkRoutine();
+				m_phaseClock.restart();
+			}
+			break;
+		}
+		case Walker_Walk:
+		{
+			//phase out?
+			if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
+			{
+				m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_WALKING ? Walker_Walk : Walker_Idle;
+				switch (m_state)
+				{
+					case Walker_Walk:
+					{
+						SetRandomWalkRoutine();
+						break;
+					}
+					case Walker_Idle:
+					{
+						SetRandomIdleRoutine();
+						break;
+					}
+				}
+				m_phaseClock.restart();
+			}
+			break;
+		}
+	}
 }

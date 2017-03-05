@@ -24,9 +24,9 @@ enum LayerType {
 	PlayerStroboscopicLayer,
 	ExplosionLayer,
 	EnemyObjectLayer,
-	AuraLayer,
+	VisionConeLayer,
 	FeedbacksLayer,
-	FriendlyFireLayer,
+	
 	AgentLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
@@ -39,16 +39,11 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
-	PortalObject,
-	ShopObject,
-	LootObject,
 	PlayerShip,
 	AgentObject,
+	VisionConeObject,
 	FakePlayerShip,
-	FriendlyFire,
 	Neutral,
-	EnemyFire,
-	EnemyObject,
 	NBVAL_GameObject
 };
 
@@ -91,6 +86,7 @@ public:
 	//PICKPOCKETS SPECIFIC
 	virtual void Collide(GameObject* target);
 	virtual void RemoveFromAwarenessMap(GameObject* agent);
+	virtual float GetCurrentAwareness(GameObject* agent);
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

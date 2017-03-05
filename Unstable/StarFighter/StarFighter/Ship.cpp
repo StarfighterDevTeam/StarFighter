@@ -115,11 +115,29 @@ void Ship::update(sf::Time deltaTime)
 
 		if (it->first != agent)
 		{
-			it->second -= deltaTime.asSeconds() * WALKER_AWARENESS_REDUCTION_PER_SECOND;
+			//vision test
+			float current_distance = GameObject::GetDistanceBetweenPositions(getPosition(), it->first->getPosition());
+			float current_angle = GameObject::GetAngleRadBetweenPositions(getPosition(), it->first->getPosition()) * 180 / M_PI - it->first->getRotation();
+			printf("distance: %f, angle: %f ", current_distance, current_angle);
+
+			if (current_distance < it->first->m_vision_range && current_angle < it->first->m_vision_angle / 2 && current_angle > -it->first->m_vision_angle / 2)
+			{
+				printf("vision\n");
+				if (it->second < WALKER_AWARENESS_MAX_ON_SIGHT)
+				{
+					it->second += deltaTime.asSeconds() * WALKER_AWARENESS_RAISE_ON_SIGHT;
+				}
+			}
+			else
+			{
+				printf("pas vision\n");
+				it->second -= deltaTime.asSeconds() * WALKER_AWARENESS_REDUCTION_ON_IDLE;
+			}
 		}
 		else
 		{
-			it->second += deltaTime.asSeconds() * WALKER_AWARENESS_RAISE_PER_SECOND;
+			//collision malus
+			it->second += deltaTime.asSeconds() * WALKER_AWARENESS_RAISE_ON_COLLISION;
 		}
 	}
 
@@ -405,4 +423,10 @@ void Ship::RemoveFromAwarenessMap(GameObject* agent)
 {
 	Agent* agent_ = (Agent*)agent;
 	m_awareness_map.erase(agent_);
+}
+
+float Ship::GetCurrentAwareness(GameObject* agent)
+{
+	Agent* agent_ = (Agent*)agent;
+	return m_awareness_map[agent_];
 }

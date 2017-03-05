@@ -289,7 +289,12 @@ void SFStratagemPanel::Draw(sf::RenderTexture& screen)
 Item* SFStratagemPanel::CheckCodeInput(int input)
 {
 	Item* item_stolen = NULL;
+	
 	Agent* agent = (Agent*)m_playerShip->m_current_collision;
+	if (!agent)
+	{
+		return item_stolen;
+	}
 
 	m_playerShip->m_awareness_map[agent] += WALKER_AWARENESS_PER_CODE;
 

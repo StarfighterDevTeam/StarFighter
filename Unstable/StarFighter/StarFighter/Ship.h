@@ -84,6 +84,7 @@ public :
 	void Collide(GameObject* target) override;
 	bool GetCurrentCollision(sf::Time deltaTime);
 	void RemoveFromAwarenessMap(GameObject* agent) override;
+	float GetCurrentAwareness(GameObject* agent) override;
 
 private:
 	bool m_moving;

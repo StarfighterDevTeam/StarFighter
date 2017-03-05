@@ -18,6 +18,10 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	vector<Item*> m_items;
+	float m_vision_range;
+	float m_vision_angle;
+	GameObject* m_vision_cone;
+	float m_max_current_awareness;
 
 	void GenerateItems();
 	Stratagem* GetRandomStratagem(ItemType item_type);

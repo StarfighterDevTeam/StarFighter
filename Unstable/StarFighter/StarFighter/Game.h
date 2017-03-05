@@ -106,6 +106,10 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
+	//PICKPOCKETS SPECIFIC
+	GameObject* m_vision_cone_90;
+	float GetCurrentMaxAwareness(GameObject* agent);
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
