@@ -2,6 +2,7 @@
 #define GAME_H_INCLUDED
 
 #include "Globals.h"
+#include "Tile.h"
 #include "GameObject.h"
 #include <list>
 #include <vector>

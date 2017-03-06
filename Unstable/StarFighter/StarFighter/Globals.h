@@ -40,6 +40,11 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
+//TILES
+#define TILE_SIZE				64;
+#define NB_TILE_LINES			7;
+#define NB_TILE_ROWS			6;
+
 //AGENT
 #define MAX_ITEMS_PER_AGENT							5
 #define WALKER_IDLE_MIN_WAIT_TIME					1.f
