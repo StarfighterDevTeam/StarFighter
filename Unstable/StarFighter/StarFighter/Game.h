@@ -109,7 +109,14 @@ public:
 
 	//PICKPOCKETS SPECIFIC
 	GameObject* m_vision_cone_90;
+	GameObject* m_tile;
 	float GetCurrentMaxAwareness(GameObject* agent);
+	vector<TileType> m_tile_types;
+	vector<GameObject*> m_tiles;
+
+	static int GetTilePosX(size_t tile_index);
+	static int GetTilePosY(size_t tile_index);
+	static size_t GetTileIndex(int pos_x, int pos_y);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

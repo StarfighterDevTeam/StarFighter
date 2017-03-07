@@ -18,9 +18,6 @@ public :
 	Tile(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	void Init();
 	virtual ~Tile();
-
-	TileType m_type;
-	size_t m_index;
 	
 	//a* pathfinding
 	int m_heuristic;

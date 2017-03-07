@@ -12,20 +12,20 @@ void Agent::Init()
 	m_desired_speed = sf::Vector2f(0,0);
 
 	//Pathfind
-	m_nb_tile_lines = NB_TILE_LINES;
-	m_nb_tile_rows = NB_TILE_ROWS;
-	m_tile_size = TILE_SIZE;
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_lines = (int)(*CurrentGame).m_map_size.x / tile_size;
+	const int nb_tile_rows = (int)(*CurrentGame).m_map_size.y / tile_size;
+	for (size_t i = 0; i < nb_tile_lines * nb_tile_rows + 1; i++)
+	{
+		Tile new_tile;
+		m_tiles.push_back(new_tile);
+	}
 
-	//m_nb_tile_lines = (*CurrentGame).map_size.x / TILE_SIZE +1;
-	//m_nb_tile_rows = (*CurrentGame).map_size.y / TILE_SIZE +1;
-	m_current_tile = GetTileIndex((int)(getPosition().x / m_tile_size + 1), (int)(getPosition().y / m_tile_size + 1));
-	
-	m_tiles[16].m_type = Tile_Building;
-	m_tiles[26].m_type = Tile_Building;
-	m_tiles[28].m_type = Tile_Building;
-	m_tiles[34].m_type = Tile_Building;
+	int posX = getPosition().x / tile_size + 1;
+	int posY = getPosition().y / tile_size + 1;
+	m_current_tile = Game::GetTileIndex(posX, posY);
 
-	FindShortedPath(14, 35);
+	FindShortedPath(1, 10);
 }
 
 Agent::Agent()
@@ -54,6 +54,7 @@ Agent::~Agent()
 	GameObject* ship = (GameObject*)(*CurrentGame).m_playerShip;
 	ship->RemoveFromAwarenessMap(this);
 
+	m_tiles.clear();
 	m_open_list_pathfind.clear();
 	m_closed_list_pathfind.clear();
 	m_current_path.clear();
@@ -62,6 +63,12 @@ Agent::~Agent()
 void Agent::update(sf::Time deltaTime)
 {
 	GameObject::update(deltaTime);
+
+	const int m_tile_size = TILE_SIZE;
+	int posX = getPosition().x / m_tile_size + 1;
+	int posY = getPosition().y / m_tile_size + 1;
+	m_current_tile = Game::GetTileIndex(posX, posY);
+	//printf("current tile: %d, posX: %f, posY :%f\n", m_current_tile, getPosition().x, getPosition().y);
 }
 
 void Agent::GenerateItems()
@@ -133,43 +140,28 @@ bool Agent::TurnToDesiredAngle(sf::Time deltaTime)
 }
 
 //PATHFIND
-int Agent::GetTilePosX(size_t tile_index)
-{
-	int pos_x = (tile_index - 1) % m_nb_tile_rows + 1;
-	return pos_x;
-}
-
-int Agent::GetTilePosY(size_t tile_index)
-{
-	int pos_y = (tile_index - 1) / m_nb_tile_rows + 1;
-	//pos_y++;
-	return pos_y;
-}
-
-size_t Agent::GetTileIndex(int pos_x, int pos_y)
-{
-	size_t index = pos_x;
-	index += (pos_y - 1) * m_nb_tile_rows;
-	return index;
-}
-
 void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 {
 	m_closed_list_pathfind.push_back(index);
 	m_open_list_pathfind.remove(index);
-	printf("New tile added to closed list: %d, posX=%d, posY=%d\n", index, GetTilePosX(index), GetTilePosY(index));
+	printf("New tile added to closed list: %d, posX=%d, posY=%d\n", index, Game::GetTilePosX(index), Game::GetTilePosY(index));
 
-	const int pos1_x = GetTilePosX(index);
-	const int pos1_y = GetTilePosY(index);
+	const int pos1_x = Game::GetTilePosX(index);
+	const int pos1_y = Game::GetTilePosY(index);
 
 	//are we arrived at destination?
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_lines = (int)(*CurrentGame).m_map_size.x / tile_size;
+	const int nb_tile_rows = (int)(*CurrentGame).m_map_size.y / tile_size;
+	//const int nb_tile_lines = NB_TILE_LINES;
+	//const int nb_tile_rows = NB_TILE_ROWS;
 	for (int j = -1; j < 2; j++)
 	{
 		for (int i = -1; i < 2; i++)
 		{
-			if (pos1_x + i > 0 && pos1_x + i < m_nb_tile_lines + 1 && pos1_y + j > 0 && pos1_y + j < m_nb_tile_rows + 1)
+			if (pos1_x + i > 0 && pos1_x + i < nb_tile_lines + 1 && pos1_y + j > 0 && pos1_y + j < nb_tile_rows + 1)
 			{
-				size_t next_index = GetTileIndex(pos1_x + i, pos1_y + j);
+				size_t next_index = Game::GetTileIndex(pos1_x + i, pos1_y + j);
 				if (next_index == target_index)
 				{
 					m_tiles[target_index].m_parent = index;
@@ -184,10 +176,10 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 	{
 		for (int i = -1; i < 2; i++)
 		{
-			if (pos1_x + i > 0 && pos1_x + i < m_nb_tile_lines + 1 && pos1_y + j > 0 && pos1_y + j < m_nb_tile_rows + 1)
+			if (pos1_x + i > 0 && pos1_x + i < nb_tile_lines + 1 && pos1_y + j > 0 && pos1_y + j < nb_tile_rows + 1)
 			{
-				size_t next_index = GetTileIndex(pos1_x + i, pos1_y + j);
-				if (m_tiles[next_index].m_type != Tile_Building)
+				size_t next_index = Game::GetTileIndex(pos1_x + i, pos1_y + j);
+				if ((*CurrentGame).m_tile_types[next_index] != Tile_Building)
 				{
 					//tiles that are legitimate to compute	
 					if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), next_index) == m_closed_list_pathfind.end())//tile unknown until now
@@ -198,8 +190,8 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 							m_open_list_pathfind.push_back(next_index);
 
 							//compute Heuristic value
-							int pos2_x = GetTilePosX(target_index);
-							int pos2_y = GetTilePosY(target_index);
+							int pos2_x = Game::GetTilePosX(target_index);
+							int pos2_y = Game::GetTilePosY(target_index);
 
 							int H_value_x = (pos1_x + i) > pos2_x ? (pos1_x + i) - pos2_x : pos2_x - (pos1_x + i);
 							int H_value_y = (pos1_y + j) > pos2_y ? (pos1_y + j) - pos2_y : pos2_y - (pos1_y + j);
@@ -236,7 +228,7 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 
 void Agent::FindShortedPath(size_t start_index, size_t target_index)
 {
-	if (start_index == target_index || m_tiles[target_index].m_type == Tile_Building)
+	if (start_index == target_index || (*CurrentGame).m_tile_types[target_index] == Tile_Building)
 	{
 		return;
 	}

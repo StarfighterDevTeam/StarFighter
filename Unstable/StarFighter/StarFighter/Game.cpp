@@ -1,6 +1,8 @@
 #include "Game.h"
 #define stringify(x)  #x
 
+extern Game* CurrentGame;
+
 const char* GameObjectTypeValues[] =
 {
 	stringify(BackgroundObject),
@@ -28,7 +30,11 @@ void Game::init(RenderWindow* window)
 	//view.zoom(0.3f);
 
 	//default value
-	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	//GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
+	GameObject* background = new GameObject(sf::Vector2f(2240, 1536), sf::Vector2f(0, 0), "2D/city_old.jpg", sf::Vector2f(4480, 3072), sf::Vector2f(2240, 1536));
+	addToScene(background, BackgroundLayer, BackgroundObject);
+	m_map_size = background->m_size;
+	//m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
 
 	//fonts
 	m_font[Font_Terminator] = new sf::Font();
@@ -58,6 +64,32 @@ void Game::init(RenderWindow* window)
 
 	//PICKPOCKETS SPECIFIC
 	m_vision_cone_90 = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/vision_cone_90.png", sf::Vector2f(600, 600), sf::Vector2f(300, 300), 1, 1);
+
+	//Pathfind
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_rows = (int)m_map_size.x / tile_size;
+	const int nb_tile_lines = (int)m_map_size.y / tile_size;
+	TileType new_tile = NBVAL_TileTtype;
+	m_tile_types.push_back(new_tile);
+	for (size_t i = 0; i < nb_tile_lines * nb_tile_rows; i++)
+	{
+		new_tile = Tile_Street;
+		m_tile_types.push_back(new_tile);
+	}
+
+	//Map
+	//for (size_t i = 1; i < nb_tile_lines * nb_tile_rows + 1; i++)
+	//{
+	//	float posX = Game::GetTilePosX(i) * tile_size - tile_size / 2;
+	//	float posY = Game::GetTilePosY(i) * tile_size - tile_size / 2;
+	//	GameObject* new_tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 2);
+	//	new_tile->setPosition(sf::Vector2f(posX, posY));
+	//	new_tile->setAnimationLine(m_tile_types[i]);
+	//	addToScene(new_tile, TileLayer, BackgroundObject);
+	//}
+
+	m_tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 2);
+	addToScene(m_tile, TileLayer, BackgroundObject);
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -276,6 +308,10 @@ void Game::updateScene(Time deltaTime)
 
 void Game::drawScene()
 {
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_rows = (int)m_map_size.x / tile_size;
+	const int nb_tile_lines = (int)m_map_size.y / tile_size;
+
 	m_mainScreen.clear();
 
 	for (int i = 0; i < NBVAL_Layer; i++)
@@ -313,6 +349,35 @@ void Game::drawScene()
 			{
 				(*(*it)).Draw(m_mainScreen);
 			}
+		}
+		else if (i == TileLayer)
+		{
+			for (size_t i = 1; i < nb_tile_lines * nb_tile_rows + 1; i++)
+			{
+				float posX = Game::GetTilePosX(i) * tile_size - tile_size / 2;
+				float posY = Game::GetTilePosY(i) * tile_size - tile_size / 2;
+				m_tile->setPosition(sf::Vector2f(posX, posY));
+				m_tile->setAnimationLine(m_tile_types[i]);
+				m_mainScreen.draw(*m_tile);
+			}
+			//const int tile_size = TILE_SIZE;
+			//size_t tilesVectorSize = m_tile_types.size();
+			//for (size_t t = 1; t < tilesVectorSize; t++)
+			//{
+			//	float posX = Game::GetTilePosX(t) * tile_size - tile_size / 2;
+			//	float posY = Game::GetTilePosY(t) * tile_size - tile_size / 2;
+			//	m_tile->setPosition(sf::Vector2f(posX, posY));
+			//	if (m_tile->m_animationNumber < 0)
+			//	{
+			//		printf("bug");
+			//	}
+			//	else
+			//	{
+			//		printf("tuile_");
+			//	}
+			//	m_tile->setAnimationLine(m_tile_types[t]);
+			//	m_mainScreen.draw(*m_tile);
+			//}
 		}
 		else
 		{
@@ -600,4 +665,29 @@ float Game::GetCurrentMaxAwareness(GameObject* agent)
 	}
 
 	return max;
+}
+
+int Game::GetTilePosX(size_t tile_index)
+{
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_rows = (int)(*CurrentGame).m_map_size.x / tile_size;
+	int pos_x = (tile_index - 1) % nb_tile_rows + 1;
+	return pos_x;
+}
+
+int Game::GetTilePosY(size_t tile_index)
+{
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_rows = (int)(*CurrentGame).m_map_size.x / tile_size;
+	int pos_y = (tile_index - 1) / nb_tile_rows + 1;
+	return pos_y;
+}
+
+size_t Game::GetTileIndex(int pos_x, int pos_y)
+{
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_rows = (int)(*CurrentGame).m_map_size.x / tile_size;
+	size_t index = pos_x;
+	index += (pos_y - 1) * nb_tile_rows;
+	return index;
 }

@@ -42,8 +42,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 //TILES
 #define TILE_SIZE				64;
-#define NB_TILE_LINES			7;
-#define NB_TILE_ROWS			6;
+//#define NB_TILE_LINES			8;
+//#define NB_TILE_ROWS			9;
 
 //AGENT
 #define MAX_ITEMS_PER_AGENT							5

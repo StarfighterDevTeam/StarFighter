@@ -35,15 +35,10 @@ public :
 	//pathfind
 	void FindShortedPath(size_t start_index, size_t target_index);
 	void IteratePathFindingOnIndex(size_t index, size_t target_index);
-	int GetTilePosX(size_t tile_index);
-	int GetTilePosY(size_t tile_index);
-	size_t GetTileIndex(int pos_x, int pos_y);
 	list<size_t> m_closed_list_pathfind;
 	list<size_t> m_open_list_pathfind;
-	Tile m_tiles[42 + 1];
-	int m_nb_tile_lines;
-	int m_nb_tile_rows;
-	int m_tile_size;
+	vector<Tile> m_tiles;
+	
 	size_t m_current_tile;
 	list<size_t> m_current_path;
 };
