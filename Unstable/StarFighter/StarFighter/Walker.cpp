@@ -7,13 +7,11 @@ using namespace sf;
 // ----------------SHIP ---------------
 Walker::Walker()
 {
-	Init();
+	Walker::Init();
 }
 
 void Walker::Init()
 {
-	Agent::Init();
-
 	m_display_name = "Walker";
 	m_state = Walker_Undecided;
 	m_awareness = Walker_Unaware;
@@ -33,12 +31,12 @@ void Walker::Init()
 
 Walker::Walker(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : Agent(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	Init();
+	Walker::Init();
 }
 
 Walker::Walker(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : Agent(position, speed, textureName, size)
 {
-	Init();
+	Walker::Init();
 }
 
 Walker::~Walker()
@@ -50,6 +48,7 @@ Walker::~Walker()
 
 void Walker::SetRandomIdleRoutine()
 {
+	printf("idle routine | \n");
 	m_speed.x = 0;
 	m_speed.y = 0;
 	m_phaseTime = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_IDLE_MIN_WAIT_TIME, WALKER_IDLE_MAX_WAIT_TIME));
@@ -57,6 +56,7 @@ void Walker::SetRandomIdleRoutine()
 
 void Walker::SetRandomPivotRoutine()
 {
+	printf("pivot routine | \n");
 	m_speed.x = 0;
 	m_speed.y = 0;
 	m_desired_angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
@@ -64,13 +64,26 @@ void Walker::SetRandomPivotRoutine()
 
 void Walker::SetRandomWalkRoutine()
 {
-	float speed = RandomizeFloatBetweenValues(sf::Vector2f(m_standardSpeed * WALKER_SLOW_DOWN_VARIANCE, m_standardSpeed * WALKER_SPEED_UP_VARIANCE));
-	m_desired_angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
+	m_desired_speed = RandomizeFloatBetweenValues(sf::Vector2f(m_standardSpeed * WALKER_SLOW_DOWN_VARIANCE, m_standardSpeed * WALKER_SPEED_UP_VARIANCE));
+	
+	//m_desired_angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
+	printf("walk routine | ");
+	size_t random_waypoint = m_current_tile;
+	while (random_waypoint == m_current_tile)
+	{
+		random_waypoint = (size_t)RandomizeIntBetweenValues(1, m_tiles.size());
+	}
+	
+	FindShortestPathTo((size_t)random_waypoint);
+	printf("final waypoint: %d\n", random_waypoint);
+	GoToWaypoint(m_current_path.front());
+	printf("current waypoint: %d\n", m_current_path.front());
+	
 	//SetSpeedVectorFromAbsoluteSpeedAndAngle(speed, angle);
 	//setRotation(angle * 180 / M_PI - 180);
 	//m_desired_angle = angle * 180 / M_PI - 180;
-	m_desired_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(speed, m_desired_angle / 180 * M_PI - M_PI);
-	m_phaseTime = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_IDLE_MIN_WALK_TIME, WALKER_IDLE_MAX_WALK_TIME));
+	//m_speed = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_desired_speed, m_desired_angle / 180 * M_PI - M_PI);
+	m_phaseTime = RandomizeFloatBetweenValues(sf::Vector2f(WALKER_MIN_WALK_TIME, WALKER_MAX_WALK_TIME));
 }
 
 void Walker::update(sf::Time deltaTime)
@@ -192,7 +205,7 @@ void Walker::update(sf::Time deltaTime)
 		}
 		case Walker_Walk:
 		{
-			//phase out?
+			//time out?
 			if (m_phaseClock.getElapsedTime().asSeconds() > m_phaseTime)
 			{
 				m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_WALKING ? Walker_Walk : Walker_Idle;
@@ -216,7 +229,46 @@ void Walker::update(sf::Time deltaTime)
 				//rotation finished? let's move on to destination
 				if (!TurnToDesiredAngle(deltaTime))
 				{
-					m_speed = m_desired_speed;
+					float remaining_distance_squared = GameObject::GetDistanceSquaredBetweenPositions(getPosition(), m_desired_destination);
+					//printf("remaining: %f, desired speed:%f, actual speed:%f\n", remaining_distance_squared, m_desired_speed*m_desired_speed, GetAbsoluteSpeedSquared());
+					if (remaining_distance_squared <= m_desired_speed*m_desired_speed * deltaTime.asSeconds() * deltaTime.asSeconds())
+					{
+						//what is the next waypoint?
+						m_current_path.pop_front();
+						if (!m_current_path.empty())
+						{
+							GoToWaypoint(m_current_path.front());
+							SetSpeedVectorFromAbsoluteSpeedAndAngle(m_desired_speed, m_desired_angle / 180 * M_PI - M_PI);
+							printf("current waypoint: %d\n", m_current_path.front());
+						}
+						else//arrived at destination
+						{
+							setPosition(m_desired_destination);
+							m_speed = sf::Vector2f(0, 0);
+
+							//next phase
+							m_state = RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < WALKER_CHANCE_OF_WALKING ? Walker_Walk : Walker_Idle;
+							switch (m_state)
+							{
+								case Walker_Walk:
+								{
+									SetRandomWalkRoutine();
+									break;
+								}
+								case Walker_Idle:
+								{
+									SetRandomIdleRoutine();
+									break;
+								}
+							}
+							m_phaseClock.restart();
+						}
+					}
+					else
+					{
+						SetSpeedVectorFromAbsoluteSpeedAndAngle(m_desired_speed, m_desired_angle / 180 * M_PI - M_PI);
+						//printf("desired angle: %f, current angle: %f, movX: %f, movY:%f\n", m_desired_angle, getRotation(), m_speed.x, m_speed.y);
+					}
 				}
 				else
 				{

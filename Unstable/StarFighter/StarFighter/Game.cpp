@@ -88,6 +88,8 @@ void Game::init(RenderWindow* window)
 	//	addToScene(new_tile, TileLayer, BackgroundObject);
 	//}
 
+	//m_tile_types[14] = Tile_Building;
+
 	m_tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 2);
 	addToScene(m_tile, TileLayer, BackgroundObject);
 }

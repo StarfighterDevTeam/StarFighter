@@ -24,16 +24,21 @@ public :
 	float m_max_current_awareness;
 	float m_angular_speed;
 	float m_desired_angle;
-	sf::Vector2f m_desired_speed;
+	float m_desired_speed;
+	sf::Vector2f m_desired_destination;
+	sf::Clock m_angleClock;
 
 	bool TurnToDesiredAngle(sf::Time deltaTime);
+	void GoToWaypoint(size_t index);
+	void UpdateAngleToDestination();
 	void GenerateItems();
 	Stratagem* GetRandomStratagem(ItemType item_type);
 
 	void Roaming();
 
 	//pathfind
-	void FindShortedPath(size_t start_index, size_t target_index);
+	void FindShortestPath(size_t start_index, size_t target_index);
+	void FindShortestPathTo(size_t target_index);
 	void IteratePathFindingOnIndex(size_t index, size_t target_index);
 	list<size_t> m_closed_list_pathfind;
 	list<size_t> m_open_list_pathfind;
