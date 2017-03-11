@@ -248,12 +248,14 @@ void Ship::update(sf::Time deltaTime)
 		{
 			size_t current_tile = Game::GetTileIndex((*CurrentGame).m_editor_cursor->getPosition().x / tile_size + 1, (*CurrentGame).m_editor_cursor->getPosition().y / tile_size + 1);
 			(*CurrentGame).m_tile_types[current_tile] = (*CurrentGame).m_tile_types[current_tile] >= NBVAL_TileTtype - 1 ? (TileType)0 : (TileType)((*CurrentGame).m_tile_types[current_tile] + 1);
+			SaveShip(this);
 		}
 
 		if (m_inputs_states[Action_EditorPreviousType] == Input_Tap)
 		{
 			size_t current_tile = Game::GetTileIndex((*CurrentGame).m_editor_cursor->getPosition().x / tile_size + 1, (*CurrentGame).m_editor_cursor->getPosition().y / tile_size + 1);
 			(*CurrentGame).m_tile_types[current_tile] = (*CurrentGame).m_tile_types[current_tile] == (TileType)0 ? (TileType)(NBVAL_TileTtype - 1) : (TileType)((*CurrentGame).m_tile_types[current_tile] - 1);
+			SaveShip(this);
 		}
 	}
 }
@@ -432,9 +434,18 @@ int Ship::SaveShip(Ship* ship)
 	LOGGER_WRITE(Logger::DEBUG, "Saving game in local file.\n");
 	assert(ship != NULL);
 
-	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
+	ofstream data(string(getSavesPath()) + EDITOR_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
+		const int tile_size = TILE_SIZE;
+		const int nb_tile_rows = (*CurrentGame).m_map_size.x / tile_size;
+		const int nb_tile_lines = (*CurrentGame).m_map_size.y / tile_size;
+		
+		for (size_t i = 1; i < nb_tile_lines * nb_tile_rows + 1; i++)
+		{
+			data << (*CurrentGame).m_tile_types[i] << " ";
+		}
+
 		data << "Save ";// << ship->m_speed.x << endl;
 
 		data.close();  // on ferme le fichier
@@ -452,7 +463,7 @@ bool Ship::LoadShip(Ship* ship)
 	LOGGER_WRITE(Logger::DEBUG, "Loading ship from local file.\n");
 	assert(ship != NULL);
 
-	std::ifstream  data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
+	std::ifstream  data(string(getSavesPath()) + EDITOR_SAVE_FILE, ios::in);
 
 	if (data) // si ouverture du fichier réussie
 	{
@@ -461,9 +472,19 @@ bool Ship::LoadShip(Ship* ship)
 		{
 			std::istringstream ss(line);
 
-			string saved_content;
-			ss >> saved_content;
-			//ship->content = saved_content;
+			//string saved_content;
+			//ss >> saved_content;
+
+			const int tile_size = TILE_SIZE;
+			const int nb_tile_rows = (*CurrentGame).m_map_size.x / tile_size;
+			const int nb_tile_lines = (*CurrentGame).m_map_size.y / tile_size;
+
+			for (size_t i = 1; i < nb_tile_lines * nb_tile_rows + 1; i++)
+			{
+				int tile_type;
+				ss >> tile_type;
+				(*CurrentGame).m_tile_types[i] = (TileType)tile_type;
+			}
 		}
 
 		data.close();  // on ferme le fichier

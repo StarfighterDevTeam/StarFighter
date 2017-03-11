@@ -69,7 +69,7 @@ void Walker::SetRandomWalkRoutine()
 	//m_desired_angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	printf("walk routine | ");
 	size_t random_waypoint = m_current_tile;
-	while (random_waypoint == m_current_tile)
+	while (random_waypoint == m_current_tile || (*CurrentGame).m_tile_types[random_waypoint] == Tile_Building)
 	{
 		random_waypoint = (size_t)RandomizeIntBetweenValues(1, m_tiles.size());
 	}

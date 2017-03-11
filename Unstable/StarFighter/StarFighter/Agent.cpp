@@ -146,6 +146,11 @@ bool Agent::TurnToDesiredAngle(sf::Time deltaTime)
 
 void Agent::GoToWaypoint(size_t index)
 {
+	if ((*CurrentGame).m_tile_types[index] == Tile_Building)
+	{
+		//to do
+	}
+
 	const int m_tile_size = TILE_SIZE;
 	//sf::Vector2f pos1 = sf::Vector2f(m_tile_size * Game::GetTilePosX(m_current_tile) - m_tile_size / 2, m_tile_size * Game::GetTilePosY(m_current_tile) - m_tile_size / 2);
 	m_desired_destination = sf::Vector2f(m_tile_size * Game::GetTilePosX(index) - m_tile_size / 2, m_tile_size * Game::GetTilePosY(index) - m_tile_size / 2);
