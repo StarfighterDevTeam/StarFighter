@@ -100,10 +100,17 @@ void Ship::update(sf::Time deltaTime)
 	
 	//Action input
 	UpdateInputStates();
+	if (m_inputs_states[Action_EditorMode] == Input_Tap)
+	{
+		(*CurrentGame).m_editorMode = !(*CurrentGame).m_editorMode;
+		(*CurrentGame).m_editor_cursor->m_visible = (*CurrentGame).m_editorMode;
+		printf("Editor mode = %d\n", (int)(*CurrentGame).m_editorMode);
+	}
+
 	if (m_inputs_states[Action_Firing] == Input_Tap)
 	{
 		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
 	}
 
 	//interaction with agents
@@ -196,7 +203,59 @@ void Ship::update(sf::Time deltaTime)
 		m_is_asking_SFPanel = SFPanel_Stratagem;
 	}
 
-	ScreenBorderContraints();	
+	ScreenBorderContraints();
+
+	//Editor mode only
+	const int tile_size = TILE_SIZE;
+	const int nb_tile_rows = (int)(*CurrentGame).m_map_size.x / tile_size;
+	const int nb_tile_lines = (int)(*CurrentGame).m_map_size.y / tile_size;
+
+	if ((*CurrentGame).m_editorMode)
+	{
+		if (m_inputs_states[Action_EditorUp] == Input_Tap)
+		{
+			if ((*CurrentGame).m_editor_cursor->getPosition().y > tile_size / 2)
+			{
+				(*CurrentGame).m_editor_cursor->setPosition((*CurrentGame).m_editor_cursor->getPosition().x, (float)((*CurrentGame).m_editor_cursor->getPosition().y - tile_size));
+			}
+		}
+
+		if (m_inputs_states[Action_EditorRight] == Input_Tap)
+		{
+			if ((*CurrentGame).m_editor_cursor->getPosition().x < tile_size * (nb_tile_rows - 0.5))
+			{
+				(*CurrentGame).m_editor_cursor->setPosition((float)((*CurrentGame).m_editor_cursor->getPosition().x + tile_size), (*CurrentGame).m_editor_cursor->getPosition().y);
+			}
+		}
+
+		if (m_inputs_states[Action_EditorDown] == Input_Tap)
+		{
+			if ((*CurrentGame).m_editor_cursor->getPosition().y < tile_size * (nb_tile_lines - 0.5))
+			{
+				(*CurrentGame).m_editor_cursor->setPosition((*CurrentGame).m_editor_cursor->getPosition().x, (float)((*CurrentGame).m_editor_cursor->getPosition().y + tile_size));
+			}
+		}
+
+		if (m_inputs_states[Action_EditorLeft] == Input_Tap)
+		{
+			if ((*CurrentGame).m_editor_cursor->getPosition().x > tile_size / 2)
+			{
+				(*CurrentGame).m_editor_cursor->setPosition((float)((*CurrentGame).m_editor_cursor->getPosition().x - tile_size), (*CurrentGame).m_editor_cursor->getPosition().y);
+			}
+		}
+
+		if (m_inputs_states[Action_EditorNextType] == Input_Tap)
+		{
+			size_t current_tile = Game::GetTileIndex((*CurrentGame).m_editor_cursor->getPosition().x / tile_size + 1, (*CurrentGame).m_editor_cursor->getPosition().y / tile_size + 1);
+			(*CurrentGame).m_tile_types[current_tile] = (*CurrentGame).m_tile_types[current_tile] >= NBVAL_TileTtype - 1 ? (TileType)0 : (TileType)((*CurrentGame).m_tile_types[current_tile] + 1);
+		}
+
+		if (m_inputs_states[Action_EditorPreviousType] == Input_Tap)
+		{
+			size_t current_tile = Game::GetTileIndex((*CurrentGame).m_editor_cursor->getPosition().x / tile_size + 1, (*CurrentGame).m_editor_cursor->getPosition().y / tile_size + 1);
+			(*CurrentGame).m_tile_types[current_tile] = (*CurrentGame).m_tile_types[current_tile] == (TileType)0 ? (TileType)(NBVAL_TileTtype - 1) : (TileType)((*CurrentGame).m_tile_types[current_tile] - 1);
+		}
+	}
 }
 
 bool Ship::ScreenBorderContraints()
@@ -326,6 +385,14 @@ void Ship::UpdateInputStates()
 	GetInputState(InputGuy::isCoding2(), Action_Coding2);
 	GetInputState(InputGuy::isCoding3(), Action_Coding3);
 	GetInputState(InputGuy::isCoding4(), Action_Coding4);
+
+	GetInputState(InputGuy::isEditorMode(), Action_EditorMode);
+	GetInputState(InputGuy::isEditorUp(), Action_EditorUp);
+	GetInputState(InputGuy::isEditorRight(), Action_EditorRight);
+	GetInputState(InputGuy::isEditorDown(), Action_EditorDown);
+	GetInputState(InputGuy::isEditorLeft(), Action_EditorLeft);
+	GetInputState(InputGuy::isEditorNextTile(), Action_EditorNextType);
+	GetInputState(InputGuy::isEditorPreviousTile(), Action_EditorPreviousType);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)

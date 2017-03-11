@@ -28,6 +28,13 @@ enum PlayerActions
 	Action_Coding2,
 	Action_Coding3,
 	Action_Coding4,
+	Action_EditorMode,
+	Action_EditorUp,
+	Action_EditorRight,
+	Action_EditorDown,
+	Action_EditorLeft,
+	Action_EditorNextType,
+	Action_EditorPreviousType,
 	NBVAL_PlayerActions,
 };
 

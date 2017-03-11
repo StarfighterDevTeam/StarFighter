@@ -114,6 +114,9 @@ public:
 	vector<TileType> m_tile_types;
 	vector<GameObject*> m_tiles;
 
+	bool m_editorMode;
+	GameObject* m_editor_cursor;
+
 	static int GetTilePosX(size_t tile_index);
 	static int GetTilePosY(size_t tile_index);
 	static size_t GetTileIndex(int pos_x, int pos_y);

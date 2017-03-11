@@ -111,19 +111,19 @@ Vector2f InputGuy::getDirections(ControlerType device)
 	//Keyboard inputs
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			dirX++;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
 			dirY--;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			dirX--;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
 			dirY++;
 		}
@@ -201,6 +201,76 @@ bool InputGuy::isCoding3(ControlerType device)
 bool InputGuy::isCoding4(ControlerType device)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorMode()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorUp()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorRight()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorDown()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorLeft()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorNextTile()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorPreviousTile()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
 	{
 		return true;
 	}

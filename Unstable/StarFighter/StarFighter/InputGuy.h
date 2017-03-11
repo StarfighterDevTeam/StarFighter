@@ -34,6 +34,14 @@ public:
 	static bool isCoding2(ControlerType device = AllControlDevices);
 	static bool isCoding3(ControlerType device = AllControlDevices);
 	static bool isCoding4(ControlerType device = AllControlDevices);
+
+	static bool isEditorMode();
+	static bool isEditorUp();
+	static bool isEditorRight();
+	static bool isEditorDown();
+	static bool isEditorLeft();
+	static bool isEditorNextTile();
+	static bool isEditorPreviousTile();
 };
 
 

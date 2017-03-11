@@ -92,6 +92,12 @@ void Game::init(RenderWindow* window)
 
 	m_tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 2);
 	addToScene(m_tile, TileLayer, BackgroundObject);
+
+	//Editor mode
+	m_editorMode = false;
+	m_editor_cursor = new GameObject(sf::Vector2f(tile_size / 2, tile_size / 2), sf::Vector2f(0, 0), "2D/editor_cursor.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
+	addToScene(m_editor_cursor, EditorLayer, BackgroundObject);
+	m_editor_cursor->m_visible = false;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
