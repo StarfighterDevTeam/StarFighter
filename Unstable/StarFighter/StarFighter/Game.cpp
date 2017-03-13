@@ -90,7 +90,7 @@ void Game::init(RenderWindow* window)
 
 	//m_tile_types[14] = Tile_Building;
 
-	m_tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 2);
+	m_tile = new GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/tile.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, NBVAL_TileTtype);
 	addToScene(m_tile, TileLayer, BackgroundObject);
 
 	//Editor mode
@@ -366,6 +366,9 @@ void Game::drawScene()
 				float posY = Game::GetTilePosY(i) * tile_size - tile_size / 2;
 				m_tile->setPosition(sf::Vector2f(posX, posY));
 				m_tile->setAnimationLine(m_tile_types[i]);
+				//m_tile->setAnimationLine(m_tile_types[i] / 4);
+				//m_tile->setRotation(90 * m_tile_types[i] % 4);
+				//float coucou = 90 * m_tile_types[i] % 4;
 				m_mainScreen.draw(*m_tile);
 			}
 			//const int tile_size = TILE_SIZE;

@@ -6,7 +6,24 @@
 enum TileType
 {
 	Tile_Street,
+	Tile_Street_1,
+	Tile_Street_2,
+	Tile_Street_3,
+	Tile_StreetAngle_0,
+	Tile_StreetAngle_1,
+	Tile_StreetAngle_2,
+	Tile_StreetAngle_3,
+	Tile_StreetAngleExternal_0,
+	Tile_StreetAngleExternal_1,
+	Tile_StreetAngleExternal_2,
+	Tile_StreetAngleExternal_3,
+	Tile_Road,
+	//Tile_RoadVertical,
 	Tile_Building,
+	Tile_RoadAngle_0,
+	Tile_RoadAngle_1,
+	Tile_RoadAngle_2,
+	Tile_RoadAngle_3,
 	NBVAL_TileTtype,
 };
 
