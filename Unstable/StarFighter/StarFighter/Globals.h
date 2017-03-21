@@ -54,8 +54,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define WALKER_IDLE_MAX_WAIT_TIME					5.f
 #define WALKER_MIN_WALK_TIME						119.f
 #define WALKER_MAX_WALK_TIME						120.f
-#define WALKER_MIN_SPEED							250.f
-#define WALKER_MAX_SPEED							350.f
+#define WALKER_MIN_SPEED							150.f
+#define WALKER_MAX_SPEED							250.f
 #define WALKER_ANGULAR_SPEED						50.f
 #define WALKER_SPEED_UP_VARIANCE					1.30f
 #define WALKER_SLOW_DOWN_VARIANCE					0.70f

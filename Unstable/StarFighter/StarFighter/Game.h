@@ -113,6 +113,7 @@ public:
 	float GetCurrentMaxAwareness(GameObject* agent);
 	vector<TileType> m_tile_types;
 	vector<GameObject*> m_tiles;
+	bool IsTileBlocking(size_t index);
 
 	bool m_editorMode;
 	GameObject* m_editor_cursor;

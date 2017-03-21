@@ -146,7 +146,7 @@ bool Agent::TurnToDesiredAngle(sf::Time deltaTime)
 
 void Agent::GoToWaypoint(size_t index)
 {
-	if ((*CurrentGame).m_tile_types[index] == Tile_Building)
+	if ((*CurrentGame).IsTileBlocking(index))// m_tile_types[index] == Tile_Building)
 	{
 		//to do
 	}
@@ -206,7 +206,7 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 			if (pos1_x + i > 0 && pos1_x + i < nb_tile_lines + 1 && pos1_y + j > 0 && pos1_y + j < nb_tile_rows + 1)
 			{
 				size_t next_index = Game::GetTileIndex(pos1_x + i, pos1_y + j);
-				if ((*CurrentGame).m_tile_types[next_index] != Tile_Building)
+				if (!(*CurrentGame).IsTileBlocking(next_index))// m_tile_types[next_index] != Tile_Building)
 				{
 					//tiles that are legitimate to compute	
 					if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), next_index) == m_closed_list_pathfind.end())//tile unknown until now
@@ -253,9 +253,9 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 	}
 }
 
-void Agent::FindShortestPath(size_t start_index, size_t target_index)
+void Agent::FindShortestPath(size_t start_index, size_t target_index, bool next_path)
 {
-	if (start_index == target_index || (*CurrentGame).m_tile_types[target_index] == Tile_Building)
+	if (start_index == target_index || (*CurrentGame).IsTileBlocking(target_index))// m_tile_types[target_index] == Tile_Building)
 	{
 		return;
 	}
@@ -281,18 +281,35 @@ void Agent::FindShortestPath(size_t start_index, size_t target_index)
 	}
 
 	//path found
-	m_current_path.clear();
-	size_t way_point = target_index;
-	while (way_point != start_index)
+	if (!next_path)
 	{
-		m_current_path.push_front(way_point);
-		if (m_tiles[way_point].m_parent == 0)
+		m_current_path.clear();
+		size_t way_point = target_index;
+		while (way_point != start_index)
 		{
-			printf("BUG waypoint = 0, child tile: %d\n", way_point);
+			m_current_path.push_front(way_point);
+			if (m_tiles[way_point].m_parent == 0)
+			{
+				printf("BUG waypoint = 0, child tile: %d\n", way_point);
+			}
+			way_point = m_tiles[way_point].m_parent;
 		}
-		way_point = m_tiles[way_point].m_parent;
 	}
-
+	else
+	{
+		m_next_path.clear();
+		size_t way_point = target_index;
+		while (way_point != start_index)
+		{
+			m_next_path.push_front(way_point);
+			if (m_tiles[way_point].m_parent == 0)
+			{
+				printf("BUG waypoint = 0, child tile: %d\n", way_point);
+			}
+			way_point = m_tiles[way_point].m_parent;
+		}
+	}
+	
 	//clear data
 	size_t tilesVectorSize = m_tiles.size();
 	for (size_t i = 1; i < tilesVectorSize; i++)
@@ -306,7 +323,7 @@ void Agent::FindShortestPath(size_t start_index, size_t target_index)
 	m_closed_list_pathfind.clear();
 }
 
-void Agent::FindShortestPathTo(size_t target_index)
+void Agent::FindShortestPathTo(size_t target_index, bool next_path)
 {
 	const int tile_size = TILE_SIZE;
 	int posX = getPosition().x / tile_size + 1;

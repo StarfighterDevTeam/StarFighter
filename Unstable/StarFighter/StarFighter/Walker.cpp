@@ -68,14 +68,48 @@ void Walker::SetRandomWalkRoutine()
 	
 	//m_desired_angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	printf("walk routine | ");
-	size_t random_waypoint = m_current_tile;
-	while (random_waypoint == m_current_tile || (*CurrentGame).m_tile_types[random_waypoint] == Tile_Building)
+
+	if (m_next_path.empty())
 	{
-		random_waypoint = (size_t)RandomizeIntBetweenValues(1, m_tiles.size());
+		size_t random_waypoint = m_current_tile;
+		while (random_waypoint == m_current_tile || (*CurrentGame).IsTileBlocking(random_waypoint)) //m_tile_types[random_waypoint] == Tile_Building)
+		{
+			random_waypoint = (size_t)RandomizeIntBetweenValues(1, m_tiles.size());
+		}
+
+		//calculate path
+		FindShortestPathTo(random_waypoint);
+		printf("final waypoint: %d\n", random_waypoint);
+
+		//calculate the next path in advance (to be multihreaded)
+		size_t next_random_waypoint = random_waypoint;
+		while (next_random_waypoint == random_waypoint || (*CurrentGame).IsTileBlocking(next_random_waypoint))// m_tile_types[next_random_waypoint] == Tile_Building)
+		{
+			next_random_waypoint = (size_t)RandomizeIntBetweenValues(1, m_tiles.size());
+		}
+
+		FindShortestPath(random_waypoint, next_random_waypoint, true);
 	}
-	
-	FindShortestPathTo((size_t)random_waypoint);
-	printf("final waypoint: %d\n", random_waypoint);
+	else
+	{
+		//get next path that was already calculated
+		for (list<size_t>::iterator it = m_next_path.begin(); it != m_next_path.end(); it++)
+		{
+			m_current_path.push_back(*it);
+		}
+		m_next_path.clear();
+
+		size_t next_destination = m_current_path.back();
+		size_t next_random_waypoint = next_destination;
+		while (next_random_waypoint == next_destination || (*CurrentGame).IsTileBlocking(next_random_waypoint))// m_tile_types[next_random_waypoint] == Tile_Building)
+		{
+			next_random_waypoint = (size_t)RandomizeIntBetweenValues(1, m_tiles.size());
+		}
+
+		FindShortestPath(next_destination, next_random_waypoint, true);
+	}
+
+	//go to next waypoint of current path
 	GoToWaypoint(m_current_path.front());
 	printf("current waypoint: %d\n", m_current_path.front());
 	
@@ -239,7 +273,7 @@ void Walker::update(sf::Time deltaTime)
 						{
 							GoToWaypoint(m_current_path.front());
 							SetSpeedVectorFromAbsoluteSpeedAndAngle(m_desired_speed, m_desired_angle / 180 * M_PI - M_PI);
-							printf("current waypoint: %d\n", m_current_path.front());
+							printf("current waypoint: %d (blocking: %d)\n", m_current_path.front(), (int)(*CurrentGame).IsTileBlocking(m_current_path.front()));
 						}
 						else//arrived at destination
 						{

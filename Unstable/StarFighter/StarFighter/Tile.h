@@ -5,6 +5,7 @@
 
 enum TileType
 {
+	Tile_Building,
 	Tile_Street,
 	Tile_Street_1,
 	Tile_Street_2,
@@ -19,8 +20,7 @@ enum TileType
 	Tile_StreetAngleExternal_3,
 	Tile_Park_0,
 	Tile_Road,
-	//Tile_RoadVertical,
-	Tile_Building,
+	Tile_RoadVertical,
 	Tile_RoadAngle_0,
 	Tile_RoadAngle_1,
 	Tile_RoadAngle_2,

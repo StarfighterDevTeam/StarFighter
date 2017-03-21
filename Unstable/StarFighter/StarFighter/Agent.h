@@ -37,8 +37,8 @@ public :
 	void Roaming();
 
 	//pathfind
-	void FindShortestPath(size_t start_index, size_t target_index);
-	void FindShortestPathTo(size_t target_index);
+	void FindShortestPath(size_t start_index, size_t target_index, bool next_path = false);
+	void FindShortestPathTo(size_t target_index, bool next_path = false);
 	void IteratePathFindingOnIndex(size_t index, size_t target_index);
 	list<size_t> m_closed_list_pathfind;
 	list<size_t> m_open_list_pathfind;
@@ -46,6 +46,7 @@ public :
 	
 	size_t m_current_tile;
 	list<size_t> m_current_path;
+	list<size_t> m_next_path;
 };
 
 #endif // AGENT_H_INCLUDED

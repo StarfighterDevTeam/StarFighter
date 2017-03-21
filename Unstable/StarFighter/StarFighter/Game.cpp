@@ -678,6 +678,20 @@ float Game::GetCurrentMaxAwareness(GameObject* agent)
 	return max;
 }
 
+bool Game::IsTileBlocking(size_t index)
+{
+	TileType type = m_tile_types[index];
+
+	return type == Tile_Building
+		|| type == Tile_Road
+		|| type == Tile_RoadVertical
+		|| type == Tile_RoadAngle_1
+		|| type == Tile_RoadAngle_2
+		|| type == Tile_RoadAngle_3
+		|| type == Tile_Park_0
+		;
+}
+
 int Game::GetTilePosX(size_t tile_index)
 {
 	const int tile_size = TILE_SIZE;
