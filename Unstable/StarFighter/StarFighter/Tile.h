@@ -17,6 +17,7 @@ enum TileType
 	Tile_StreetAngleExternal_1,
 	Tile_StreetAngleExternal_2,
 	Tile_StreetAngleExternal_3,
+	Tile_Park_0,
 	Tile_Road,
 	//Tile_RoadVertical,
 	Tile_Building,
