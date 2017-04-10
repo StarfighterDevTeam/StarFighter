@@ -44,7 +44,7 @@ public:
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'\n", (char*)filename.c_str()));
 		return texture;
 	}
 
@@ -81,7 +81,7 @@ public:
 
 		//Add the texture
 		this->_loadedTextures[filename] = texture;
-		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'", (char*)filename.c_str()));
+		LOGGER_WRITE(Logger::DEBUG, TextUtils::format("Loading texture from file '%s'\n", (char*)filename.c_str()));
 		return texture;
 	}
 

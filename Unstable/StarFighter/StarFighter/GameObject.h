@@ -89,6 +89,8 @@ public:
 	virtual void Collide(GameObject* target);
 	virtual void RemoveFromAwarenessMap(GameObject* agent);
 	virtual float GetCurrentAwareness(GameObject* agent);
+	virtual void FindShortestPath(size_t start_index, size_t target_index);
+	virtual void FindShortestPathTo(size_t target_index);
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

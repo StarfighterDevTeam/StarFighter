@@ -12,6 +12,11 @@ const char* GameObjectTypeValues[] =
 	stringify(EnemyObject)
 };
 
+Game::Game() : m_thread_pathfind(&StaticPathfindCalculation)
+{
+	
+}
+
 void Game::init(RenderWindow* window)
 {
 	m_playerShip = NULL;
@@ -98,6 +103,9 @@ void Game::init(RenderWindow* window)
 	m_editor_cursor = new GameObject(sf::Vector2f(tile_size / 2, tile_size / 2), sf::Vector2f(0, 0), "2D/editor_cursor.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 1, 1);
 	addToScene(m_editor_cursor, EditorLayer, BackgroundObject);
 	m_editor_cursor->m_visible = false;
+
+	//Threads
+	m_thread_pathfind.launch();
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -715,4 +723,41 @@ size_t Game::GetTileIndex(int pos_x, int pos_y)
 	size_t index = pos_x;
 	index += (pos_y - 1) * nb_tile_rows;
 	return index;
+}
+
+
+void Game::StaticPathfindCalculation()
+{
+	(*CurrentGame).PathfindCalculation();
+}
+
+void Game::PathfindCalculation()
+{
+	int coucou = 0;
+	while (1)
+	{
+		PathfindJob job;
+
+		m_pathfind_jobs_mutex.lock();
+		if (!m_pathfind_jobs.empty())
+		{
+			job = m_pathfind_jobs.front();
+			m_pathfind_jobs.pop_front();
+		}
+		m_pathfind_jobs_mutex.unlock();
+
+
+			//size_t pathfindJobsVectorSize = m_pathfind_jobs.size();
+			//for (PathfindJob& job : m_pathfind_jobs)
+			//{
+			//	job.m_object->FindShortestPath(job.m_index_A, job.m_index_B);//TODO : purgatoire
+			//}
+
+		if (job.m_object)
+		{
+			printf("je travaille (%d)\n", coucou);
+			job.m_object->FindShortestPath(job.m_index_A, job.m_index_B);//TODO : purgatoire
+			printf("j'ai fini de travailler (%d)\n", coucou);
+		}
+	}
 }

@@ -462,3 +462,12 @@ float GameObject::GetCurrentAwareness(GameObject* agent)
 	return 0;
 }
 
+void GameObject::FindShortestPath(size_t start_index, size_t target_index)
+{
+	//see override function in class Agent
+}
+
+void GameObject::FindShortestPathTo(size_t target_index)
+{
+	//see override function in class Agent
+}

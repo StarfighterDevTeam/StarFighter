@@ -25,6 +25,8 @@ void Agent::Init()
 	int posX = getPosition().x / tile_size + 1;
 	int posY = getPosition().y / tile_size + 1;
 	m_current_tile = Game::GetTileIndex(posX, posY);
+	m_next_path_ready = false;
+	m_next_path_calculation = false;
 }
 
 Agent::Agent()
@@ -67,6 +69,9 @@ void Agent::update(sf::Time deltaTime)
 	int posX = getPosition().x / m_tile_size + 1;
 	int posY = getPosition().y / m_tile_size + 1;
 	m_current_tile = Game::GetTileIndex(posX, posY);
+
+	UpdatePathfind();
+
 	//printf("current tile: %d, posX: %f, posY :%f\n", m_current_tile, getPosition().x, getPosition().y);
 
 	//if (m_angleClock.getElapsedTime().asSeconds() > ANGLE_UPDATE_TIME)
@@ -186,13 +191,16 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 	{
 		for (int i = -1; i < 2; i++)
 		{
-			if (pos1_x + i > 0 && pos1_x + i < nb_tile_lines + 1 && pos1_y + j > 0 && pos1_y + j < nb_tile_rows + 1)
+			if (!((j < 0 && i < 0) || (j < 0 && i > 0) || (j > 0 && i < 0) || (j> 0 && i > 0)))// <!> don't scan diagonals for this game
 			{
-				size_t next_index = Game::GetTileIndex(pos1_x + i, pos1_y + j);
-				if (next_index == target_index)
+				if (pos1_x + i > 0 && pos1_x + i < nb_tile_lines + 1 && pos1_y + j > 0 && pos1_y + j < nb_tile_rows + 1)
 				{
-					m_tiles[target_index].m_parent = index;
-					return;
+					size_t next_index = Game::GetTileIndex(pos1_x + i, pos1_y + j);
+					if (next_index == target_index)
+					{
+						m_tiles[target_index].m_parent = index;
+						return;
+					}
 				}
 			}
 		}
@@ -208,7 +216,7 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 				size_t next_index = Game::GetTileIndex(pos1_x + i, pos1_y + j);
 				if (!(*CurrentGame).IsTileBlocking(next_index))// m_tile_types[next_index] != Tile_Building)
 				{
-					//tiles that are legitimate to compute	
+					//tiles that are legitimate to compute
 					if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), next_index) == m_closed_list_pathfind.end())//tile unknown until now
 					{
 						if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), next_index) == m_open_list_pathfind.end())
@@ -242,7 +250,8 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 							int movement_cost = ((i < 0 && j < 0) || (i < 0 && j > 0) || (i > 0 && j < 0) || (i > 0 && j > 0)) ? 14 : 10;//movement cost
 							if (m_tiles[index].m_movement_cost + movement_cost < m_tiles[next_index].m_movement_cost)
 							{
-								m_tiles[next_index].m_parent = index;//comment to remove diagonal movements
+								m_tiles[next_index].m_movement_cost = m_tiles[index].m_movement_cost + movement_cost;
+								m_tiles[next_index].m_parent = index;
 								//printf("Parent updated from index %d to index %d\n", next_index, index);
 							}
 						}
@@ -253,7 +262,7 @@ void Agent::IteratePathFindingOnIndex(size_t index, size_t target_index)
 	}
 }
 
-void Agent::FindShortestPath(size_t start_index, size_t target_index, bool next_path)
+void Agent::FindShortestPath(size_t start_index, size_t target_index)
 {
 	if (start_index == target_index || (*CurrentGame).IsTileBlocking(target_index))// m_tile_types[target_index] == Tile_Building)
 	{
@@ -281,34 +290,19 @@ void Agent::FindShortestPath(size_t start_index, size_t target_index, bool next_
 	}
 
 	//path found
-	if (!next_path)
+	m_next_path.clear();
+	size_t way_point = target_index;
+	while (way_point != start_index)
 	{
-		m_current_path.clear();
-		size_t way_point = target_index;
-		while (way_point != start_index)
+		m_next_path.push_front(way_point);
+		if (m_tiles[way_point].m_parent == 0)
 		{
-			m_current_path.push_front(way_point);
-			if (m_tiles[way_point].m_parent == 0)
-			{
-				printf("BUG waypoint = 0, child tile: %d\n", way_point);
-			}
-			way_point = m_tiles[way_point].m_parent;
+			printf("BUG waypoint = 0, child tile: %d\n", way_point);
 		}
+		way_point = m_tiles[way_point].m_parent;
 	}
-	else
-	{
-		m_next_path.clear();
-		size_t way_point = target_index;
-		while (way_point != start_index)
-		{
-			m_next_path.push_front(way_point);
-			if (m_tiles[way_point].m_parent == 0)
-			{
-				printf("BUG waypoint = 0, child tile: %d\n", way_point);
-			}
-			way_point = m_tiles[way_point].m_parent;
-		}
-	}
+
+	
 	
 	//clear data
 	size_t tilesVectorSize = m_tiles.size();
@@ -321,9 +315,12 @@ void Agent::FindShortestPath(size_t start_index, size_t target_index, bool next_
 	}
 	m_open_list_pathfind.clear();
 	m_closed_list_pathfind.clear();
+
+	m_next_path_calculation = false;
+	m_next_path_ready = true;
 }
 
-void Agent::FindShortestPathTo(size_t target_index, bool next_path)
+void Agent::FindShortestPathTo(size_t target_index)
 {
 	const int tile_size = TILE_SIZE;
 	int posX = getPosition().x / tile_size + 1;
@@ -331,4 +328,35 @@ void Agent::FindShortestPathTo(size_t target_index, bool next_path)
 	m_current_tile = Game::GetTileIndex(posX, posY);
 
 	FindShortestPath(m_current_tile, target_index);
+}
+
+void Agent::UpdatePathfind()
+{
+	if (m_current_path.empty() && m_next_path_ready)
+	{
+		m_current_path = m_next_path;
+		m_next_path.clear();
+		m_next_path_ready = false;
+	}
+
+	if (m_next_path.empty() && !m_next_path_calculation)
+	{
+		size_t destination = m_current_path.empty() ? m_current_tile : m_current_path.back();
+		size_t random_waypoint = destination;
+		while (random_waypoint == destination || (*CurrentGame).IsTileBlocking(random_waypoint)) //m_tile_types[random_waypoint] == Tile_Building)
+		{
+			random_waypoint = (size_t)RandomizeIntBetweenValues(1, m_tiles.size());
+		}
+
+		printf("final waypoint: %d\n", random_waypoint);
+
+		//calculate path
+		m_next_path_calculation = true;
+		PathfindJob job{ destination, random_waypoint, this };
+		(*CurrentGame).m_pathfind_jobs_mutex.lock();
+		(*CurrentGame).m_pathfind_jobs.push_back(job);
+		(*CurrentGame).m_pathfind_jobs_mutex.unlock();
+	}
+
+	//printf("current path: %d, next path: %d\n", m_current_path.size(), m_next_path.size());
 }

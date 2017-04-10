@@ -21,6 +21,15 @@
 
 class Ship;
 
+struct PathfindJob
+{
+	PathfindJob(){ m_index_A = 0; m_index_B = 0; m_object = NULL; };
+	PathfindJob(size_t index_A, size_t index_B, GameObject* object){ m_index_A = index_A; m_index_B = index_B; m_object = object; };
+	size_t m_index_A;
+	size_t m_index_B;
+	GameObject* m_object;
+};
+
 enum SFX_Bank
 {
 	SFX_Laser,
@@ -45,6 +54,7 @@ using namespace sf;
 struct Game
 {
 public:
+	Game();
 	void init(RenderWindow* window);
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
@@ -114,6 +124,11 @@ public:
 	vector<TileType> m_tile_types;
 	vector<GameObject*> m_tiles;
 	bool IsTileBlocking(size_t index);
+	static void StaticPathfindCalculation();
+	void PathfindCalculation();
+	Thread m_thread_pathfind;
+	Mutex m_pathfind_jobs_mutex;
+	list<PathfindJob> m_pathfind_jobs;
 
 	bool m_editorMode;
 	GameObject* m_editor_cursor;

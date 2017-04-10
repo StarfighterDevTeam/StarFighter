@@ -37,9 +37,10 @@ public :
 	void Roaming();
 
 	//pathfind
-	void FindShortestPath(size_t start_index, size_t target_index, bool next_path = false);
-	void FindShortestPathTo(size_t target_index, bool next_path = false);
+	void FindShortestPath(size_t start_index, size_t target_index) override;
+	void FindShortestPathTo(size_t target_index) override;
 	void IteratePathFindingOnIndex(size_t index, size_t target_index);
+	void UpdatePathfind();
 	list<size_t> m_closed_list_pathfind;
 	list<size_t> m_open_list_pathfind;
 	vector<Tile> m_tiles;
@@ -47,6 +48,8 @@ public :
 	size_t m_current_tile;
 	list<size_t> m_current_path;
 	list<size_t> m_next_path;
+	volatile bool m_next_path_ready;
+	volatile bool m_next_path_calculation;
 };
 
 #endif // AGENT_H_INCLUDED

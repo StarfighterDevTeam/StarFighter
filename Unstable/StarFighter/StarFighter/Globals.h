@@ -60,8 +60,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define WALKER_SPEED_UP_VARIANCE					1.30f
 #define WALKER_SLOW_DOWN_VARIANCE					0.70f
 
-#define WALKER_CHANCE_OF_WALKING					0.50f
-#define WALKER_CHANCE_OF_PIVOTING					0.50f
+#define WALKER_CHANCE_OF_WALKING					0.60f
 
 #define WALKER_AWARENESS_PER_CODE					0.10f
 #define WALKER_AWARENESS_RAISE_ON_COLLISION			0.25f
