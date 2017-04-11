@@ -47,11 +47,18 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define FLOCKING_BASE_SPEED_MAX				200
 
 #define FLOCKING_PREVIOUS_SPEED_WEIGHT		5.0f
-#define FLOCKING_COHESION_WEIGHT			0.5f
-#define FLOCKING_ALIGNMENT_WEIGHT			0.1f
+#define FLOCKING_COHESION_WEIGHT			0.8f
+#define FLOCKING_ALIGNMENT_WEIGHT			0.15f
 #define FLOCKING_SEPARATION_WEIGHT			2.0f
+#define FLOCKING_CHANGE_DIR_WEIGHT			100.0f
 
 #define FLOCKING_SEPARATION_RADIUS			50
+
+//BOIDS
+#define MIN_CHANGE_DIR_TIME					1.f
+#define MAX_CHANGE_DIR_TIME					4.f
+#define MIN_CHANGE_DIR_ANGLE				20.f
+#define MAX_CHANGE_DIR_ANGLE				90.f
 
 
 //MUSIC

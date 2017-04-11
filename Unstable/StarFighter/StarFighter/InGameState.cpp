@@ -10,6 +10,7 @@ void InGameState::Initialize(Player player)
 	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
 	(*CurrentGame).m_playerShip = playerShip;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+	playerShip->m_visible = false;
 
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))

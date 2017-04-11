@@ -6,21 +6,28 @@ using namespace sf;
 
 Boid::Boid()
 {
-
+	Boid::Init();
 }
 
 Boid::Boid(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
 {
+	Boid::Init();
+
 	//random speed, direction and color
 	float speed_ = RandomizeFloatBetweenValues(sf::Vector2f(FLOCKING_BASE_SPEED_MIN, FLOCKING_BASE_SPEED_MAX));
 	float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	SetSpeedVectorFromAbsoluteSpeedAndAngle(speed_, angle_);
+	SetSpeedVectorFromAbsoluteSpeedAndAngle(speed_, angle_ * M_PI / 180);
 	m_previous_speed = m_speed;
 	setRotation(angle_ * 180 / M_PI - 180);
 	int r = RandomizeIntBetweenValues(0, 255);
 	int g = RandomizeIntBetweenValues(0, 255);
 	int b = RandomizeIntBetweenValues(0, 255);
 	setColor(sf::Color(r, g, b, 255));
+}
+
+void Boid::Init()
+{
+	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(MIN_CHANGE_DIR_TIME, MAX_CHANGE_DIR_TIME));
 }
 
 Boid::~Boid()
@@ -50,33 +57,48 @@ void Boid::update(sf::Time deltaTime)
 		m_speed.y *= -1;
 	}
 
+	//Change direction randomly
+	sf::Vector2f change_dir = sf::Vector2f(0, 0);
+	if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
+	{
+		m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(MIN_CHANGE_DIR_TIME, MAX_CHANGE_DIR_TIME));
+		m_change_dir_clock.restart();
+
+		int dir = RandomizeIntBetweenValues(0, 1);
+		dir = dir == 0 ? -1 : 1;
+		float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*MIN_CHANGE_DIR_ANGLE, getRotation() + dir*MAX_CHANGE_DIR_ANGLE)) - 180;
+		//float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() - MAX_CHANGE_DIR_ANGLE, getRotation() + MAX_CHANGE_DIR_ANGLE)) - 180;
+
+		change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
+		//SetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
+		//setRotation(angle_ - 180);
+	}
+
 	//Flocking
 	//1. cohesion
 	m_avg_position = GetAveragePosition();
 	sf::Vector2f cohesion_vector = sf::Vector2f(m_avg_position.x - getPosition().x, m_avg_position.y - getPosition().y);
 	NormalizeSpeed(&cohesion_vector, FLOCKING_MAX_SPEED);
 	
-
+	
 	//2. alignment
 	m_avg_speed = GetAverageSpeed();
 	sf::Vector2f alignment_vector = sf::Vector2f(m_avg_speed.x - m_speed.x, m_avg_speed.y - m_speed.y);
 	NormalizeSpeed(&alignment_vector, FLOCKING_MAX_SPEED);
-
+	
 	//3. separation
 	sf::Vector2f separation_vector = Separate();
 	NormalizeSpeed(&separation_vector, FLOCKING_MAX_SPEED);
-
+	
 	//Sum up vectors and normalize speed
 	m_previous_speed.x = m_speed.x;
 	m_previous_speed.y = m_speed.y;
-
-	m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
-	m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
-	//m_speed.x /= 1.0f + FLOCKING_PREVIOUS_SPEED_WEIGHT + FLOCKING_COHESION_WEIGHT + FLOCKING_ALIGNMENT_WEIGHT + FLOCKING_SEPARATION_WEIGHT;
-	//m_speed.y /= 1.0f + FLOCKING_PREVIOUS_SPEED_WEIGHT + FLOCKING_COHESION_WEIGHT + FLOCKING_ALIGNMENT_WEIGHT + FLOCKING_SEPARATION_WEIGHT;
-
+	
+	m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT + change_dir.x * FLOCKING_CHANGE_DIR_WEIGHT;
+	m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT + change_dir.y * FLOCKING_CHANGE_DIR_WEIGHT;
+	
 	NormalizeSpeed(&m_speed, FLOCKING_MAX_SPEED);
-
+	
 	float angle = GetAngleRadForSpeed(m_speed);
 	setRotation(angle * 180 / M_PI);
 }
