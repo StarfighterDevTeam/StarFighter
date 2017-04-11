@@ -167,3 +167,13 @@ Vector2f InputGuy::getDirections(ControlerType device)
 
 	return Vector2f(x, y);
 }
+
+bool InputGuy::isSpawningBoid()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::B))
+	{
+		return true;
+	}
+
+	return false;
+}

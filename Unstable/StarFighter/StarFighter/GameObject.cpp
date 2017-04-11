@@ -437,3 +437,14 @@ int GameObject::GaussianBlurDistribution(int x)
 {
 	return x*x;
 }
+
+//ATLANTIS SPECIFICS
+void GameObject::AddToBoidNeighbours(GameObject* boid)
+{
+	//see override function in class Boid
+}
+
+void GameObject::ClearBoidNeighbours()
+{
+	//see override function in class Boid
+}

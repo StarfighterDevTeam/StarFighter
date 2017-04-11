@@ -40,6 +40,20 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PIXEL_PERFECT_COLLISION							true
 #define GRAZE_DISTANCE									30
 
+//FLOCKING
+#define FLOCKING_RADIUS						100
+#define FLOCKING_MAX_SPEED					220
+#define FLOCKING_BASE_SPEED_MIN				100
+#define FLOCKING_BASE_SPEED_MAX				200
+
+#define FLOCKING_PREVIOUS_SPEED_WEIGHT		5.0f
+#define FLOCKING_COHESION_WEIGHT			0.5f
+#define FLOCKING_ALIGNMENT_WEIGHT			0.1f
+#define FLOCKING_SEPARATION_WEIGHT			2.0f
+
+#define FLOCKING_SEPARATION_RADIUS			50
+
+
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100

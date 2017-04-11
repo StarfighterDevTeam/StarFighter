@@ -88,6 +88,7 @@
   <ItemGroup>
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Boid.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
@@ -111,6 +112,7 @@
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="Boid.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="Game.h" />

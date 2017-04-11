@@ -6,6 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
+#include "Boid.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -21,6 +22,7 @@ enum PlayerActions
 	Action_Firing,
 	Action_Muting,
 	Action_Pausing,
+	Action_SpawnBoid,
 	NBVAL_PlayerActions,
 };
 

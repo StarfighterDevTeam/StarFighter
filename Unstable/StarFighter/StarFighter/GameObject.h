@@ -30,6 +30,7 @@ enum LayerType {
 	PlayerShipLayer,
 	EnemyFireLayer,
 
+	FishLayer,
 	PanelLayer,
 	HudObject,
 	HudCursor,
@@ -45,6 +46,7 @@ enum GameObjectType {
 	FakePlayerShip,
 	FriendlyFire,
 	Neutral,
+	FishObject,
 	EnemyFire,
 	EnemyObject,
 	NBVAL_GameObject
@@ -109,6 +111,10 @@ public:
 	static int GetPixelDistanceFromEdge(int pixel_index, int width, int height);
 	static void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);
 	static int GaussianBlurDistribution(int x);
+
+	//ATLANTIS SPECIFICS
+	virtual void AddToBoidNeighbours(GameObject* boid);
+	virtual void ClearBoidNeighbours();
 
 protected:
 	sf::Vector2f m_initial_position;

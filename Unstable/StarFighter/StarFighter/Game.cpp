@@ -240,6 +240,8 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
+	GroupBoids();
+
 	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
@@ -581,4 +583,28 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
+}
+
+//ATLANTIS SPECIFICS
+void Game::GroupBoids()
+{
+	float radius = FLOCKING_RADIUS;
+
+	for (GameObject* boid : m_sceneGameObjectsTyped[FishObject])
+	{
+		if (boid)
+		{
+			boid->ClearBoidNeighbours();
+			for (GameObject* boid2 : m_sceneGameObjectsTyped[FishObject])
+			{
+				if (boid2 && boid2 != boid)
+				{
+					if (GameObject::GetDistanceBetweenObjects(boid, boid2) < radius)
+					{
+						boid->AddToBoidNeighbours(boid2);
+					}
+				}
+			}
+		}
+	}
 }

@@ -106,6 +106,9 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
+	//ATLANTIS SPECIFIC
+	void GroupBoids();
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);

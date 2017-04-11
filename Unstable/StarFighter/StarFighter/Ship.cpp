@@ -64,7 +64,18 @@ void Ship::update(sf::Time deltaTime)
 	if (m_inputs_states[Action_Firing] == Input_Tap)
 	{
 		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		//(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+	}
+
+	if (m_inputs_states[Action_SpawnBoid] == Input_Tap)
+	{
+		sf::Vector2i mousepos = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+		sf::Vector2f boid_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view);
+		if (boid_pos.x > 0 && boid_pos.x < REF_WINDOW_RESOLUTION_X && boid_pos.y > 0 && boid_pos.y < REF_WINDOW_RESOLUTION_Y)
+		{
+			Boid* boid = new Boid(boid_pos, "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+			(*CurrentGame).addToScene(boid, FishLayer, FishObject);
+		}	
 	}
 
 	MaxSpeedConstraints();
@@ -205,6 +216,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isSpawningBoid(), Action_SpawnBoid);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
