@@ -6,23 +6,133 @@
 
 Game* CurrentGame;
 
+int carre[9];
+int sum = -1;
+int try_count = 0;
+int max_number = 30;
+
+void InitCarre(int a, int b, int c)
+{
+	carre[0] = a;
+	carre[1] = b;
+	carre[2] = c;
+
+	sum = carre[0] * carre[0] + carre[1] * carre[1] + carre[2] * carre[2];
+	printf("Init: a=%d, b=%d, c=%d | sum=%d\n", a, b, c, sum);
+}
+
+int ComputeCarre6()
+{
+	for (int i = 1; i < max_number; i++)
+	{
+		if (i == carre[0] || i == carre[1] || i == carre[2] || i == carre[4] || i == carre[7] || i == carre[8])
+		{
+			continue;
+		}
+
+		try_count++;
+		int sum2 = carre[2] * carre[2] + carre[4] * carre[4] + i*i;
+		if (sum2 == sum)
+		{
+			carre[6] = i;
+			printf("\n\n## MATCH ##\n\n");
+			return i;
+		}
+		else
+		{
+			try_count++;
+			printf("   try %d: i=%d; j=%d; k=%d; l=%d| sum=%d \n", try_count, carre[4], carre[7], carre[8], i, sum2);
+		}
+	}
+
+	return -1;
+}
+
+int ComputeCarre8()
+{
+	for (int i = 1; i < max_number; i++)
+	{
+		if (i == carre[0] || i == carre[1] || i == carre[2] || i == carre[4] || i == carre[7])
+		{
+			continue;
+		}
+
+		try_count++;
+		int sum2 = carre[0] * carre[0] + carre[4] * carre[4] + i*i;
+		if (sum2 == sum)
+		{
+			carre[8] = i;
+			//printf("\n\n## MATCH ##\n\n");
+			ComputeCarre6();
+			return i;
+		}
+		else
+		{
+			try_count++;
+			printf("   try %d: i=%d; j=%d; k=%d| sum=%d \n", try_count, carre[4], carre[7], i, sum2);
+		}
+	}
+
+	return -1;
+}
+
+sf::Vector2i ComputeCarre4And7()
+{
+	for (int i = 1; i < max_number; i++)
+	{
+		if (i == carre[0] || i == carre[1] || i == carre[2])
+		{
+			continue;
+		}
+
+
+		for (int j = 1; j < max_number; j++)
+		{
+			if (j == carre[0] || j == carre[1] || j == carre[2] || j == i)
+			{
+				continue;
+			}
+
+			int sum2 = carre[1] * carre[1] + i*i + j*j;
+			
+			if (sum2 == sum)
+			{
+				carre[4] = i;
+				carre[7] = j;
+				//printf("\n\n## MATCH ##\n\n");
+				ComputeCarre8();
+				return sf::Vector2i(i, j);
+			}
+			else
+			{
+				try_count++;
+				printf("   try %d: i=%d; j=%d | sum=%d \n", try_count, i, j, sum2);
+			}
+		}
+	}
+
+	return sf::Vector2i(-1, -1);
+}
+
+
+
 int main()
 {
-	LOGGER_START(Logger::DEBUG, "");
-
-	//Load Configuration
-	LOGGER_WRITE(Logger::DEBUG, "Loading Configurations");
-	PREFS = new PrefsManager();
-
-	//Init SFML Window
-	LOGGER_WRITE(Logger::DEBUG, "Initializing SFML Window");
+	//LOGGER_START(Logger::DEBUG, "");
+	//
+	////Load Configuration
+	//LOGGER_WRITE(Logger::DEBUG, "Loading Configurations");
+	//PREFS = new PrefsManager();
+	//
+	////Init SFML Window
+	//LOGGER_WRITE(Logger::DEBUG, "Initializing SFML Window");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
-
-	//Refresh rate
-	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
-
-	//Icon
+	//
+	////Refresh rate
+	//renderWindow.setFramerateLimit(60);
+	//
+	////Icon
 	sf::Image icon = sf::Image();
 	icon.loadFromFile(makePath(ICON_SHIP_PNG));
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -30,144 +140,79 @@ int main()
 	//Title
 	renderWindow.setTitle("StarFighter Engine");
 
-	//Game initialization
-	CurrentGame = new Game();
+	////Game initialization
+	//CurrentGame = new Game();
+	//
+	////Random seed
+	//srand(time(NULL));
+	//
+	////update
+	//sf::Time dt;
+	//sf::Clock deltaClock;
+	//
+	////Initializing player
+	//LOGGER_WRITE(Logger::DEBUG, "Initializing player");
+	//Player player;
+	//player.Init(&renderWindow);
+	//
+	////Loading InGame state
+	//LOGGER_WRITE(Logger::DEBUG, "Starting game");
+	//GameManager gameManager;
+	//InGameState inGameState;
+	//gameManager.PushState(inGameState, player);
+	//
+	////Handling various window resolutions
+	//enum WindowResolutions
+	//{
+	//	RESOLUTION_1600x900,
+	//	RESOLUTION_1920x1080_FullScreen,
+	//	RESOLUTION_1280x720,
+	//	RESOLUTION_1920x1080,
+	//	NBVAL_RESOLUTIONS,
+	//};
+	//bool fullscreen = false;
+	//WindowResolutions resolution = RESOLUTION_1600x900;
+	//LOGGER_WRITE(Logger::DEBUG, "Initialization complete. Starting main loop...");
 
-	//Random seed
-	srand(time(NULL));
-
-	//update
-	sf::Time dt;
-	sf::Clock deltaClock;
-
-	//Initializing player
-	LOGGER_WRITE(Logger::DEBUG, "Initializing player");
-	Player player;
-	player.Init(&renderWindow);
-
-	//Loading InGame state
-	LOGGER_WRITE(Logger::DEBUG, "Starting game");
-	GameManager gameManager;
-	InGameState inGameState;
-	gameManager.PushState(inGameState, player);
-
-	//Handling various window resolutions
-	enum WindowResolutions
-	{
-		RESOLUTION_1600x900,
-		RESOLUTION_1920x1080_FullScreen,
-		RESOLUTION_1280x720,
-		RESOLUTION_1920x1080,
-		NBVAL_RESOLUTIONS,
-	};
-	bool fullscreen = false;
-	WindowResolutions resolution = RESOLUTION_1600x900;
-	LOGGER_WRITE(Logger::DEBUG, "Initialization complete. Starting main loop...");
+	
 
 	//Main loop
 	while (renderWindow.isOpen())
 	{
-		sf::Event event;
-		while (renderWindow.pollEvent(event))
+		int a = 1;
+		int b = 2;
+		int c = 3;
+
+		for (int a = 1; a < max_number; a++)
 		{
-			if (event.type == sf::Event::Closed)
+			for (int b = 1; b < max_number; b++)
 			{
-				renderWindow.close();
-			}
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-		{
-			renderWindow.close();
-		}
-
-		//Resolution switch
-		if (InputGuy::isChangingResolution())
-		{
-			resolution = (WindowResolutions)(((int)resolution +1) % (NBVAL_RESOLUTIONS - 1));
-			switch (resolution)
-			{
-				case RESOLUTION_1600x900:
+				if (b == a)
 				{
-					fullscreen = false;
-					renderWindow.create(VideoMode(1600, 900), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1600, 900);
-					break;
+					continue;
 				}
-				case RESOLUTION_1920x1080_FullScreen:
-				{
-					fullscreen = true;
-					renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
-					break;
-				}
-				case RESOLUTION_1280x720:
-				{
-					fullscreen = false;
-					renderWindow.create(VideoMode(1280, 720), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1280, 720);
-					break;
-				}
-				case RESOLUTION_1920x1080:
-				{
-					fullscreen = false;
-					renderWindow.create(VideoMode(1920, 1080), "StarFighter Engine", (fullscreen ? Style::Fullscreen : Style::Resize | Style::Close));
-					(*CurrentGame).m_screen_size = sf::Vector2i(1920, 1080);
-					break;
-				}
-			}
 
-			//setting parameters again, because they are lost on calling renderWindow.create
-			renderWindow.setKeyRepeatEnabled(false);
-			renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
-			sf::Image icon = sf::Image();
-			icon.loadFromFile(makePath(ICON_SHIP_PNG));
-			renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-			renderWindow.setTitle("StarFighter Engine");
-		}
-
-		if ((*CurrentGame).m_playerShip)
-		{
-			//Muting
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isMuting(), Action_Muting);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
-			{
-				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-			}
-
-			//Pausing
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isPausing(), Action_Pausing);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Pausing, Input_Tap, true))
-			{
-				(*CurrentGame).m_pause = (*CurrentGame).m_playerShip->m_actions_states[Action_Pausing];
-
-				if ((*CurrentGame).m_pause)
+				for (int c = 1; c < max_number; c++)
 				{
-					(*CurrentGame).m_curMusic.pause();
-				}
-				else
-				{
-					(*CurrentGame).m_curMusic.play();
+					if (c == a || c == b)
+					{
+						continue;
+					}
+
+					InitCarre(a, b, c);
+					ComputeCarre4And7();
 				}
 			}
 		}
 
-		dt = deltaClock.restart();
-
-		if (!(*CurrentGame).m_pause)
+		while (1)
 		{
-			//Update
-			gameManager.GetCurrentState()->Update(dt);
 
-			//Draw
-			gameManager.GetCurrentState()->Draw();
-			//sfgui.Display(renderWindow);
-
-			//Diplay
-			renderWindow.display();
 		}
+		
+		
 	}
 
 	return 0;
 }
+
