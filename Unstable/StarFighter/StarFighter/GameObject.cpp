@@ -106,9 +106,9 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture(textureName, size.x*frameNumber, size.y*animationNumber);
-	this->m_textureName = textureName;
+	m_textureName = textureName;
 
-	this->setOrigin(size.x / 2, size.y / 2);
+	setOrigin(size.x / 2, size.y / 2);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
 }
@@ -299,6 +299,12 @@ float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
 	return GetAbsoluteSpeed(current_diff);
+}
+
+float GameObject::GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
+{
+	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
+	return GetAbsoluteSpeedSquared(current_diff);
 }
 
 bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
