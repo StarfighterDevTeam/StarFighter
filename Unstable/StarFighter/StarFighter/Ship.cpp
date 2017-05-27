@@ -381,7 +381,7 @@ bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, 
 	}
 	else if (state_required == Input_Hold && condition)
 	{
-		m_actions_states[action] = m_inputs_states[action];
+		m_actions_states[action] = m_inputs_states[action] == Input_Hold;
 		return true;
 	}
 	else if (!condition)
