@@ -16,6 +16,18 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 	Init(position, speed, texture, 1);
 }
 
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
+{
+	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, 0);
+	ostringstream ss;
+	ss << "rectangle_" << (int)size.x << "_" << (int)size.y << "_" << color.r << "_" << color.g << "_" << color.b << "_" << color.a;
+	string textureName = ss.str();
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture(textureName, size.x, size.y, pixels);
+	Init(position, speed, texture);
+}
+
 string GameObject::getName()
 {
 	vector<string> s1 = TextUtils::split(this->m_textureName, '/');
@@ -71,7 +83,6 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 {
 	this->m_animationNumber = animationNumber;
 	this->m_frameNumber = frameNumber;
-	this->m_initial_position = sf::Vector2f(position.x, position.y);
 	this->m_size.x = ((*texture).getSize().x / frameNumber);
 	this->m_size.y = ((*texture).getSize().y / animationNumber);
 
@@ -442,4 +453,35 @@ void GameObject::GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int h
 int GameObject::GaussianBlurDistribution(int x)
 {
 	return x*x;
+}
+
+sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color color, int stroke_size)
+{
+	//pixel array creation
+	const int W = size.x;
+	const int H = size.y;
+
+	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
+
+	for (int i = 0; i < W * H * 4; i += 4)
+	{
+		pixels[i] = color.r;			// R
+		pixels[i + 1] = color.g;		// G
+		pixels[i + 2] = color.b;	// B
+		pixels[i + 3] = 255;
+	}
+	//inside stroke
+	for (int i = 0; i < W * H * 4; i += 4)
+	{
+		if (stroke_size < 1 || (i / 4) <= W * (stroke_size) || (i / 4) >(H - 1 * (stroke_size))*W || (i / 4) % W <= 0 + ((stroke_size)-1) || (i / 4) % W >= (W - 1 * (stroke_size))) // A
+		{
+			pixels[i + 3] = 255;
+		}
+		else
+		{
+			pixels[i + 3] = RECTANGLE_INSIDE_ALPHA;
+		}
+	}
+
+	return pixels;
 }

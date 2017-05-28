@@ -56,7 +56,11 @@ public:
 	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
 	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
+	GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size);
 	GameObject();
+	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber = 1, int animationNumber = 1);
+	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1, int animationNumber = 1);
+	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels);
 
 	~GameObject();
 
@@ -111,16 +115,8 @@ public:
 	static void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);
 	static int GaussianBlurDistribution(int x);
 
-protected:
-	sf::Vector2f m_initial_position;
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
-
-	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture);
-	void Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber = 1);
-	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber = 1, int animationNumber = 1);
-	void Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber, sf::Uint8* pixels);
-	
 };
 
 #endif // GameObject_H_INCLUDED
