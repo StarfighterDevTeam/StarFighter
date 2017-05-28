@@ -6,6 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
+#include "Lane.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -35,8 +36,7 @@ class Ship : public GameObject
 {
 public :
 	Ship();
-	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
-	Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size);
+	Ship(Lane* lane, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	void Init();
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
@@ -66,6 +66,12 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	//SWORDFISH
+	Lane* m_lane;
+	float m_angular_speed;
+	float m_angle_offset;
+	void UpdatePosition();
 
 private:
 	bool m_moving;

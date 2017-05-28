@@ -75,7 +75,8 @@ float MaxBetweenValues(sf::Vector2f values);
 float MinBetweenValues(sf::Vector2f values);
 
 //SWORDFISH
-#define LANE_OFFSET_Z					200.f
-
+#define LANE_OFFSET_Z					300.f
+#define SWORDFISH_ANGULAR_SPEED			5.f
+#define SWORDFISH_HEIGHT_DEFAULT		20.f
 
 #endif // GLOBALS_H_INCLUDED

@@ -26,14 +26,14 @@ void Ship::Init()
 	m_is_asking_SFPanel = SFPanel_None;
 }
 
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+Ship::Ship(Lane* lane, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(sf::Vector2f(0,0), speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	this->Init();
-}
+	m_lane = lane;
+	setPosition(sf::Vector2f(lane->getPosition().x, lane->getPosition().y));
 
-Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : GameObject(position, speed, textureName, size)
-{
-	this->Init();
+	m_angular_speed = SWORDFISH_ANGULAR_SPEED;
+	m_angle_offset = 0.f;
 }
 
 Ship::~Ship()
@@ -57,31 +57,50 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	ManageAcceleration(inputs_direction);
+	//ManageAcceleration(inputs_direction);
 	
 	//Action input
-	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
-	{
-		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
-	}
+	//UpdateInputStates();
+	//if (m_inputs_states[Action_Firing] == Input_Tap)
+	//{
+	//	//do some action
+	//	(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+	//}
+	//
+	//MaxSpeedConstraints();
+	//IdleDecelleration(deltaTime);
+	//UpdateRotation();
 
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
-	UpdateRotation();
+	UpdatePosition();
 
-	GameObject::update(deltaTime);
+	AnimatedSprite::update(deltaTime);
 
 	//HUD
-	m_is_asking_SFPanel = SFPanel_None;
-	if (m_SFTargetPanel)
-	{
-		m_SFTargetPanel->Update(deltaTime);
-	}
+	//m_is_asking_SFPanel = SFPanel_None;
+	//if (m_SFTargetPanel)
+	//{
+	//	m_SFTargetPanel->Update(deltaTime);
+	//}
 
 	ScreenBorderContraints();	
 }
+
+void Ship::UpdatePosition()
+{
+	sf::Vector2f default_pos = sf::Vector2f(m_lane->m_spawner->getPosition().x, m_lane->m_spawner->getPosition().y);
+	sf::Vector2f offset;
+	float rad_angle = -(m_lane->m_lane_angle + m_angle_offset) * M_PI / 180.f;
+	rad_angle -= M_PI_2;
+	offset.x = (LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * cos(rad_angle);
+	offset.y = -(LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * sin(rad_angle);
+	offset.x = offset.x < 0 ? ceil(offset.x) : floor(offset.x);
+	offset.y = offset.y < 0 ? ceil(offset.y) : floor(offset.y);
+
+	setPosition(sf::Vector2f(default_pos.x + offset.x, default_pos.y + offset.y));
+	setRotation(m_lane->m_lane_angle + m_angle_offset);
+}
+
+
 
 bool Ship::ScreenBorderContraints()
 {
