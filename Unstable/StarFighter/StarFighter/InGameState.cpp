@@ -27,6 +27,17 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_map_size = background->m_size;
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
+
+	//SWORDFISH
+	
+	//Spawner
+	GameObject* spawner = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/spawner.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+	(*CurrentGame).addToScene(spawner, SpawnerLayer, BackgroundObject);
+
+	//Lane
+	//GameObject* lane = new GameObject(sf::Vector2f(990, 740), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(300, 16));
+	Lane* lane = new Lane(spawner);
+	(*CurrentGame).addToScene(lane, LaneLayer, BackgroundObject);
 }
 
 void InGameState::Update(sf::Time deltaTime)

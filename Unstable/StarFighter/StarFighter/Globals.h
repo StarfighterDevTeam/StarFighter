@@ -74,4 +74,8 @@ float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
 float MaxBetweenValues(sf::Vector2f values);
 float MinBetweenValues(sf::Vector2f values);
 
+//SWORDFISH
+#define LANE_OFFSET_Z					200.f
+
+
 #endif // GLOBALS_H_INCLUDED
