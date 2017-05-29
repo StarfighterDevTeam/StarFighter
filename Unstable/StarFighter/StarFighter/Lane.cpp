@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 using namespace sf;
 
 // ----------------SHIP ---------------
-Lane::Lane(GameObject* spawner) : GameObject(sf::Vector2f(990, 740), sf::Vector2f(0, 0), "2D/lane.png", sf::Vector2f(400, 32))
+Lane::Lane(GameObject* spawner, string csv_file) : GameObject(sf::Vector2f(990, 740), sf::Vector2f(0, 0), "2D/lane.png", sf::Vector2f(400, 32))
 								//GameObject(sf::Vector2f(990, 740), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(400, 32))
 {
 	m_spawner = spawner;
@@ -13,6 +13,46 @@ Lane::Lane(GameObject* spawner) : GameObject(sf::Vector2f(990, 740), sf::Vector2
 	m_lane_width = m_size.x;
 	m_position_delta = 0.f;
 	m_angle_delta = 0.f;
+
+	m_csv_file = csv_file;
+	LOGGER_WRITE(Logger::DEBUG, "Loading lane scripts");
+
+	vector<vector<string> > laneConfig = *(FileLoaderUtils::FileLoader(csv_file));
+	size_t laneConfigVectorSize = laneConfig.size();
+	for (size_t i = 0; i < laneConfigVectorSize; i++)
+	{
+		LaneData new_data;
+		new_data.m_width = stof(laneConfig[i][LaneData_Width]);
+		new_data.m_angle = stof(laneConfig[i][LaneData_Angle]);
+		new_data.m_counter = stoi(laneConfig[i][LaneData_Counter]);
+		m_lane_data.push_back(new_data);
+	}
+	laneConfig.clear();
+
+	m_period_clock.restart();
+	BuildNextLanePeriod();
+	
+}
+
+bool Lane::BuildNextLanePeriod()
+{
+	if (!m_lane_data.empty())
+	{
+		float new_angle = m_lane_data.front().m_angle;
+		float new_width = m_lane_data.front().m_width;
+		m_period_counter = m_lane_data.front().m_counter;
+		
+		m_lane_data.erase(m_lane_data.begin());
+
+		RotateLane(new_angle - m_lane_angle);
+		ScaleLane(new_width);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void Lane::update(sf::Time deltaTime)
@@ -20,8 +60,26 @@ void Lane::update(sf::Time deltaTime)
 	m_angle_delta = 0.f;
 	m_position_delta = 0.f;
 
-	Rotate(10*deltaTime.asSeconds());
+	if (m_period_clock.getElapsedTime().asSeconds() > LANE_PERIOD_IN_SECONDS)
+	{
+		m_period_counter--;
+		if (m_period_counter == 0)
+		{
+			if (BuildNextLanePeriod())
+			{
+				m_period_clock.restart();
+			}
+		}
+		else
+		{
+			m_period_clock.restart();
+		}
+	}
 
+	//RotateLane(10*deltaTime.asSeconds());
+	//ScaleLane(600);
+
+	//Apply new width and angle
 	sf::Vector2f default_pos = sf::Vector2f(m_spawner->getPosition().x, m_spawner->getPosition().y );
 	sf::Vector2f offset;
 	float rad_angle = -m_lane_angle * M_PI / 180.f;
@@ -33,8 +91,9 @@ void Lane::update(sf::Time deltaTime)
 	sf::Vector2f old_position = getPosition();
 
 	setPosition(sf::Vector2f(default_pos.x + offset.x, default_pos.y + offset.y));
-	setRotation(m_lane_angle);
+	
 
+	//Stock delta of position and angle in memory for the swordfish to know about them during its update
 	float distance_moved = sqrt((old_position.x - getPosition().x)*(old_position.x - getPosition().x) + (old_position.y - getPosition().y)*(old_position.y - getPosition().y));
 	if (m_angle_delta > 0)
 	{
@@ -48,8 +107,21 @@ void Lane::update(sf::Time deltaTime)
 	AnimatedSprite::update(deltaTime);
 }
 
-void Lane::Rotate(float deg_angle)
+void Lane::RotateLane(float deg_angle)
 {
 	m_lane_angle += deg_angle;
 	m_angle_delta = deg_angle;
+	setRotation(m_lane_angle);
+
+	printf("rotate : %f, new angle : %f\n", deg_angle, m_lane_angle);
+}
+
+void Lane::ScaleLane(float width)
+{
+	if (width == m_lane_width)
+		return;
+
+	sf::Vector2f factor = sf::Vector2f(width / m_lane_width, 1);
+	scale(factor);
+	m_lane_width = width;
 }

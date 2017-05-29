@@ -63,7 +63,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define SFPANEL_SPECIFIC_HEIGHT					100
 
 //CSV DATA
-#define SHIP_CSV_FILE							"Scripts/Generated/Ship.csv"
+#define LANE_CSV_FILE							"Scripts/Generated/Lane.csv"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
@@ -76,6 +76,8 @@ float MinBetweenValues(sf::Vector2f values);
 
 //SWORDFISH
 #define LANE_OFFSET_Z						300.f
+#define LANE_PERIOD_IN_SECONDS				2.f
+
 #define SWORDFISH_LATERAL_ACCELERATION	    2000.0f
 #define SWORDFISH_DIVE_ACCELERATION		    20.0f
 #define SWORDFISH_DECCELERATION_COEF		5000.0f

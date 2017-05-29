@@ -4,11 +4,29 @@
 #include "Globals.h"
 #include "GameObject.h"
 #include "Game.h"
+#include "FileLoadUtils.h"
+
+enum LaneDataFields
+{
+	LaneData_Id,
+	LaneData_Width,
+	LaneData_Angle,
+	LaneData_Counter,
+};
+
+class LaneData
+{
+public:
+	float m_width;
+	float m_angle;
+	size_t m_counter;
+};
+
 
 class Lane : public GameObject
 {
 public :
-	Lane(GameObject* spawner);
+	Lane(GameObject* spawner, string csv_file);
 	void update(sf::Time deltaTime) override;
 
 	GameObject* m_spawner;
@@ -17,7 +35,13 @@ public :
 	float m_position_delta;
 	float m_angle_delta;
 
-	void Rotate(float deg_angle);
+	void RotateLane(float deg_angle);
+	void ScaleLane(float width);
+	bool BuildNextLanePeriod();
+	vector<LaneData> m_lane_data;
+	string m_csv_file;
+	sf::Clock m_period_clock;
+	size_t m_period_counter;
 };
 
 #endif // LANE_H_INCLUDED

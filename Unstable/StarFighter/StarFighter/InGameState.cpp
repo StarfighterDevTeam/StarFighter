@@ -17,7 +17,7 @@ void InGameState::Initialize(Player player)
 	//}
 
 	//Loading scripts
-	//LoadCSVFile(SHIP_CSV_FILE);
+	//LoadCSVFile(LANE_CSV_FILE);
 
 	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
@@ -29,7 +29,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(spawner, SpawnerLayer, BackgroundObject);
 
 	//Lane
-	Lane* lane = new Lane(spawner);
+	Lane* lane = new Lane(spawner, LANE_CSV_FILE);
 	(*CurrentGame).addToScene(lane, LaneLayer, LaneObject);
 
 	//Swordfish
