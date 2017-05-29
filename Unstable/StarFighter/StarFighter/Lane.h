@@ -34,13 +34,15 @@ public :
 	float m_lane_width;
 	float m_position_delta;
 	float m_angle_delta;
+	float m_width_delta;
 
 	void RotateLane(float deg_angle);
 	void ScaleLane(float width);
-	bool BuildNextLanePeriod();
+	bool CreateNextLanePeriod();
 	vector<LaneData> m_lane_data;
 	string m_csv_file;
 	sf::Clock m_period_clock;
+	sf::Clock m_change_clock;
 	size_t m_period_counter;
 };
 

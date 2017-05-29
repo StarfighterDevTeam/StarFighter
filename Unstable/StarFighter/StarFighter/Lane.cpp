@@ -12,6 +12,8 @@ Lane::Lane(GameObject* spawner, string csv_file) : GameObject(sf::Vector2f(990, 
 	m_lane_angle = 0.f;
 	m_lane_width = m_size.x;
 	m_position_delta = 0.f;
+
+	m_width_delta = 0.f;
 	m_angle_delta = 0.f;
 
 	m_csv_file = csv_file;
@@ -30,11 +32,12 @@ Lane::Lane(GameObject* spawner, string csv_file) : GameObject(sf::Vector2f(990, 
 	laneConfig.clear();
 
 	m_period_clock.restart();
-	BuildNextLanePeriod();
-	
+	m_change_clock.restart();
+
+	CreateNextLanePeriod();
 }
 
-bool Lane::BuildNextLanePeriod()
+bool Lane::CreateNextLanePeriod()
 {
 	if (!m_lane_data.empty())
 	{
@@ -44,8 +47,14 @@ bool Lane::BuildNextLanePeriod()
 		
 		m_lane_data.erase(m_lane_data.begin());
 
-		RotateLane(new_angle - m_lane_angle);
-		ScaleLane(new_width);
+		//RotateLane(new_angle - m_lane_angle);
+		//ScaleLane(new_width);
+		m_width_delta = new_width - m_lane_width;
+		m_angle_delta = new_angle - m_lane_angle;
+
+		m_change_clock.restart();
+
+		printf("Build new lane period: width:%f, angle:%f\n", new_width, new_angle);
 
 		return true;
 	}
@@ -57,7 +66,6 @@ bool Lane::BuildNextLanePeriod()
 
 void Lane::update(sf::Time deltaTime)
 {
-	m_angle_delta = 0.f;
 	m_position_delta = 0.f;
 
 	if (m_period_clock.getElapsedTime().asSeconds() > LANE_PERIOD_IN_SECONDS)
@@ -65,7 +73,7 @@ void Lane::update(sf::Time deltaTime)
 		m_period_counter--;
 		if (m_period_counter == 0)
 		{
-			if (BuildNextLanePeriod())
+			if (CreateNextLanePeriod())
 			{
 				m_period_clock.restart();
 			}
@@ -74,6 +82,18 @@ void Lane::update(sf::Time deltaTime)
 		{
 			m_period_clock.restart();
 		}
+	}
+
+	if (m_change_clock.getElapsedTime().asSeconds() < LANE_CHANGE_IN_SECONDS)
+	{
+		ScaleLane(m_lane_width + m_width_delta*deltaTime.asSeconds()/LANE_CHANGE_IN_SECONDS);
+		RotateLane(m_angle_delta*deltaTime.asSeconds() / LANE_CHANGE_IN_SECONDS);
+		//printf("clock: %f\n", m_change_clock.getElapsedTime().asSeconds());
+	}
+	else
+	{
+		m_angle_delta = 0.f;
+		m_width_delta = 0.f;
 	}
 
 	//RotateLane(10*deltaTime.asSeconds());
@@ -91,7 +111,6 @@ void Lane::update(sf::Time deltaTime)
 	sf::Vector2f old_position = getPosition();
 
 	setPosition(sf::Vector2f(default_pos.x + offset.x, default_pos.y + offset.y));
-	
 
 	//Stock delta of position and angle in memory for the swordfish to know about them during its update
 	float distance_moved = sqrt((old_position.x - getPosition().x)*(old_position.x - getPosition().x) + (old_position.y - getPosition().y)*(old_position.y - getPosition().y));
@@ -110,10 +129,7 @@ void Lane::update(sf::Time deltaTime)
 void Lane::RotateLane(float deg_angle)
 {
 	m_lane_angle += deg_angle;
-	m_angle_delta = deg_angle;
 	setRotation(m_lane_angle);
-
-	printf("rotate : %f, new angle : %f\n", deg_angle, m_lane_angle);
 }
 
 void Lane::ScaleLane(float width)
