@@ -32,8 +32,8 @@ Ship::Ship(Lane* lane, sf::Vector2f speed, std::string textureName, sf::Vector2f
 	m_lane = lane;
 	setPosition(sf::Vector2f(lane->getPosition().x, lane->getPosition().y));
 
-	m_angular_speed = SWORDFISH_ANGULAR_SPEED;
-	m_angle_offset = 0.f;
+	m_angular_speed = SWORDFISH_MAX_SPEED;
+	m_position_offset = 0.f;
 }
 
 Ship::~Ship()
@@ -57,50 +57,73 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	//ManageAcceleration(inputs_direction);
+	ManageAcceleration(inputs_direction);
 	
 	//Action input
-	//UpdateInputStates();
+	UpdateInputStates();
 	//if (m_inputs_states[Action_Firing] == Input_Tap)
 	//{
 	//	//do some action
 	//	(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	//}
-	//
-	//MaxSpeedConstraints();
-	//IdleDecelleration(deltaTime);
+	
+	MaxSpeedConstraints();
+	IdleDecelleration(deltaTime);
 	//UpdateRotation();
 
-	UpdatePosition();
+	UpdatePosition(deltaTime);
 
 	AnimatedSprite::update(deltaTime);
-
-	//HUD
-	//m_is_asking_SFPanel = SFPanel_None;
-	//if (m_SFTargetPanel)
-	//{
-	//	m_SFTargetPanel->Update(deltaTime);
-	//}
-
-	ScreenBorderContraints();	
 }
 
-void Ship::UpdatePosition()
+void Ship::UpdatePosition(sf::Time deltaTime)
 {
+	//stick to lane
 	sf::Vector2f default_pos = sf::Vector2f(m_lane->m_spawner->getPosition().x, m_lane->m_spawner->getPosition().y);
 	sf::Vector2f offset;
-	float rad_angle = -(m_lane->m_lane_angle + m_angle_offset) * M_PI / 180.f;
-	rad_angle -= M_PI_2;
-	offset.x = (LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * cos(rad_angle);
-	offset.y = -(LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * sin(rad_angle);
+	float rad_angle = -(m_lane->m_lane_angle) * M_PI / 180.f;
+	offset.x = (LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * sin(rad_angle);
+	offset.y = (LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * cos(rad_angle);
 	offset.x = offset.x < 0 ? ceil(offset.x) : floor(offset.x);
 	offset.y = offset.y < 0 ? ceil(offset.y) : floor(offset.y);
 
-	setPosition(sf::Vector2f(default_pos.x + offset.x, default_pos.y + offset.y));
-	setRotation(m_lane->m_lane_angle + m_angle_offset);
+
+	//apply current swordfish offset
+	//compute triangular wave function
+	
+	//get input and apply lane limits
+	m_position_offset += m_speed.x * deltaTime.asSeconds();
+	if (m_position_offset >= m_lane->m_lane_width / 2)
+	{
+		m_position_offset = m_lane->m_lane_width / 2;
+	}
+	if (m_position_offset <= -m_lane->m_lane_width / 2)
+	{
+		m_position_offset = -m_lane->m_lane_width / 2;
+	}
+	
+	//int r = m_lane->m_lane_angle / 180;
+	//float lane_period = r >= 1 ? m_lane->m_lane_angle - (r*180) : m_lane->m_lane_angle;
+	//float vertical_ratio = lane_period /= 90.f;
+	//int q = (int)lane_period % 90;
+	//vertical_ratio -= q % 2 == 0 ? 0 : (vertical_ratio - q) * 2;
+	//float pos_ratio_X = 1 - vertical_ratio;
+	//float diagonal_ratio = 2*vertical_ratio;
+	//diagonal_ratio -= diagonal_ratio > 1 ? (diagonal_ratio - 1) * 2 : 0;
+	//
+	//sf::Vector2f move_offset;
+	//move_offset.x = m_position_offset * pos_ratio_X;// *(1 + diagonal_ratio*(sqrt(2) - 1)));
+	//move_offset.y = m_position_offset * (1 - pos_ratio_X);// *(1 + diagonal_ratio*(sqrt(2) - 1));
+
+	float pos_ratio_X = cos(m_lane->m_lane_angle * M_PI / 180.f);
+	float pos_ratio_Y = sin(m_lane->m_lane_angle * M_PI / 180.f);
+	sf::Vector2f move_offset;
+	move_offset.x = m_position_offset * pos_ratio_X;
+	move_offset.y = m_position_offset * pos_ratio_Y;
+
+	setPosition(sf::Vector2f(default_pos.x + offset.x + move_offset.x, default_pos.y + offset.y + move_offset.y));
+	setRotation(m_lane->m_lane_angle);
 }
-
-
 
 bool Ship::ScreenBorderContraints()
 {
@@ -142,40 +165,35 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	//idle decceleration
 	if (!m_movingX)
 	{
-		m_speed.x -= m_speed.x*deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
+		m_speed.x -= m_speed.x*deltaTime.asSeconds()* SWORDFISH_DECCELERATION_COEF / 100.f;
 
-		if (abs(m_speed.x) < SHIP_MIN_SPEED)
+		if (abs(m_speed.x) < SWORDFISH_MIN_SPEED)
 			m_speed.x = 0;
 	}
 
 	if (!m_movingY)
 	{
-		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
+		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SWORDFISH_DECCELERATION_COEF / 100.f;
 
-		if (abs(m_speed.y) < SHIP_MIN_SPEED)
+		if (abs(m_speed.y) < SWORDFISH_MIN_SPEED)
 			m_speed.y = 0;
 	}
 }
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
+	m_speed.x += inputs_direction.x* SWORDFISH_ACCELERATION;
 
 	//max speed constraints
-	if (abs(m_speed.x) > SHIP_MAX_SPEED)
+	if (abs(m_speed.x) > m_angular_speed)
 	{
-		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
-	if (abs(m_speed.y) > SHIP_MAX_SPEED)
-	{
-		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+		m_speed.x = m_speed.x > 0 ? m_angular_speed : -m_angular_speed;
 	}
 }
 
 void Ship::MaxSpeedConstraints()
 {
-	float ship_max_speed = SHIP_MAX_SPEED;
+	float ship_max_speed = m_angular_speed;
 
 	//max speed constraints
 	NormalizeSpeed(&m_speed, ship_max_speed);

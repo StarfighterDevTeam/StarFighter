@@ -13,6 +13,7 @@ public :
 
 	GameObject* m_spawner;
 	float m_lane_angle;
+	float m_lane_width;
 };
 
 #endif // LANE_H_INCLUDED

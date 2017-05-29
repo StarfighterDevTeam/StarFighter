@@ -67,7 +67,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
-float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);
+float ProrataBetweenThreshold(float value, sf::Vector2f min_max_threshold);
 int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
@@ -76,7 +76,10 @@ float MinBetweenValues(sf::Vector2f values);
 
 //SWORDFISH
 #define LANE_OFFSET_Z					300.f
-#define SWORDFISH_ANGULAR_SPEED			5.f
+#define SWORDFISH_ACCELERATION	        2000.0f
+#define SWORDFISH_DECCELERATION_COEF	5000.0f
+#define SWORDFISH_MAX_SPEED				200.0f
+#define SWORDFISH_MIN_SPEED				50.0f
 #define SWORDFISH_HEIGHT_DEFAULT		20.f
 
 #endif // GLOBALS_H_INCLUDED

@@ -70,8 +70,8 @@ public :
 	//SWORDFISH
 	Lane* m_lane;
 	float m_angular_speed;
-	float m_angle_offset;
-	void UpdatePosition();
+	float m_position_offset;
+	void UpdatePosition(sf::Time deltaTime);
 
 private:
 	bool m_moving;

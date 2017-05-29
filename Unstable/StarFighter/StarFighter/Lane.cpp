@@ -10,6 +10,7 @@ Lane::Lane(GameObject* spawner) : GameObject(sf::Vector2f(990, 740), sf::Vector2
 {
 	m_spawner = spawner;
 	m_lane_angle = 0.f;
+	m_lane_width = m_size.x;
 }
 
 void Lane::update(sf::Time deltaTime)
@@ -17,9 +18,8 @@ void Lane::update(sf::Time deltaTime)
 	sf::Vector2f default_pos = sf::Vector2f(m_spawner->getPosition().x, m_spawner->getPosition().y );
 	sf::Vector2f offset;
 	float rad_angle = -m_lane_angle * M_PI / 180.f;
-	rad_angle -= M_PI_2;
-	offset.x = LANE_OFFSET_Z * cos(rad_angle);
-	offset.y = -LANE_OFFSET_Z * sin(rad_angle);
+	offset.x = LANE_OFFSET_Z * sin(rad_angle);
+	offset.y = LANE_OFFSET_Z * cos(rad_angle);
 	offset.x = offset.x < 0 ? ceil(offset.x) : floor(offset.x);
 	offset.y = offset.y < 0 ? ceil(offset.y) : floor(offset.y);
 
