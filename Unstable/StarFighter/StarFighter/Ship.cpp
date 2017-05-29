@@ -79,20 +79,22 @@ void Ship::update(sf::Time deltaTime)
 void Ship::UpdatePosition(sf::Time deltaTime)
 {
 	//stick to lane
-	sf::Vector2f default_pos = sf::Vector2f(m_lane->m_spawner->getPosition().x, m_lane->m_spawner->getPosition().y);
-	sf::Vector2f offset;
-	float rad_angle = -(m_lane->m_lane_angle) * M_PI / 180.f;
-	offset.x = (LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * sin(rad_angle);
-	offset.y = (LANE_OFFSET_Z - SWORDFISH_HEIGHT_DEFAULT) * cos(rad_angle);
-	offset.x = offset.x < 0 ? ceil(offset.x) : floor(offset.x);
-	offset.y = offset.y < 0 ? ceil(offset.y) : floor(offset.y);
-
+	sf::Vector2f spawner_pos = sf::Vector2f(m_lane->m_spawner->getPosition().x, m_lane->m_spawner->getPosition().y);
+	sf::Vector2f lane_pos;
+	
+	float lane_rad_angle = -(m_lane->m_lane_angle) * M_PI / 180.f;
+	lane_pos.x = (LANE_OFFSET_Z - SWORDFISH_DEPTH_DEFAULT) * sin(lane_rad_angle);
+	lane_pos.y = (LANE_OFFSET_Z - SWORDFISH_DEPTH_DEFAULT) * cos(lane_rad_angle);
+	lane_pos.x = lane_pos.x < 0 ? ceil(lane_pos.x) : floor(lane_pos.x);
+	lane_pos.y = lane_pos.y < 0 ? ceil(lane_pos.y) : floor(lane_pos.y);
 
 	//apply current swordfish offset
 	//compute triangular wave function
 	
 	//get input and apply lane limits
 	m_position_offset += m_speed.x * deltaTime.asSeconds();
+	m_position_offset += m_lane->m_position_delta;
+
 	if (m_position_offset >= m_lane->m_lane_width / 2)
 	{
 		m_position_offset = m_lane->m_lane_width / 2;
@@ -121,7 +123,7 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	move_offset.x = m_position_offset * pos_ratio_X;
 	move_offset.y = m_position_offset * pos_ratio_Y;
 
-	setPosition(sf::Vector2f(default_pos.x + offset.x + move_offset.x, default_pos.y + offset.y + move_offset.y));
+	setPosition(sf::Vector2f(spawner_pos.x + lane_pos.x + move_offset.x, spawner_pos.y + lane_pos.y + move_offset.y));
 	setRotation(m_lane->m_lane_angle);
 }
 
@@ -182,7 +184,7 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	m_speed.x += inputs_direction.x* SWORDFISH_ACCELERATION;
+	m_speed.x += inputs_direction.x* SWORDFISH_LATERAL_ACCELERATION;
 
 	//max speed constraints
 	if (abs(m_speed.x) > m_angular_speed)

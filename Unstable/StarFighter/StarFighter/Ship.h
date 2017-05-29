@@ -16,6 +16,14 @@
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
+enum Swordfish_States
+{
+	Swordfish_Idle,
+	Swordfish_Diving,
+	Swordfish_Depth,
+	Swordfish_
+};
+
 enum PlayerActions
 {
 	Action_Idle,

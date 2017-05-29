@@ -11,10 +11,17 @@ Lane::Lane(GameObject* spawner) : GameObject(sf::Vector2f(990, 740), sf::Vector2
 	m_spawner = spawner;
 	m_lane_angle = 0.f;
 	m_lane_width = m_size.x;
+	m_position_delta = 0.f;
+	m_angle_delta = 0.f;
 }
 
 void Lane::update(sf::Time deltaTime)
 {
+	m_angle_delta = 0.f;
+	m_position_delta = 0.f;
+
+	Rotate(10*deltaTime.asSeconds());
+
 	sf::Vector2f default_pos = sf::Vector2f(m_spawner->getPosition().x, m_spawner->getPosition().y );
 	sf::Vector2f offset;
 	float rad_angle = -m_lane_angle * M_PI / 180.f;
@@ -23,8 +30,26 @@ void Lane::update(sf::Time deltaTime)
 	offset.x = offset.x < 0 ? ceil(offset.x) : floor(offset.x);
 	offset.y = offset.y < 0 ? ceil(offset.y) : floor(offset.y);
 
+	sf::Vector2f old_position = getPosition();
+
 	setPosition(sf::Vector2f(default_pos.x + offset.x, default_pos.y + offset.y));
 	setRotation(m_lane_angle);
 
+	float distance_moved = sqrt((old_position.x - getPosition().x)*(old_position.x - getPosition().x) + (old_position.y - getPosition().y)*(old_position.y - getPosition().y));
+	if (m_angle_delta > 0)
+	{
+		m_position_delta = distance_moved;
+	}
+	else if (m_angle_delta < 0)
+	{
+		m_position_delta = -distance_moved;
+	}
+
 	AnimatedSprite::update(deltaTime);
+}
+
+void Lane::Rotate(float deg_angle)
+{
+	m_lane_angle += deg_angle;
+	m_angle_delta = deg_angle;
 }

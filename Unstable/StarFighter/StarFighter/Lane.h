@@ -12,8 +12,12 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	GameObject* m_spawner;
-	float m_lane_angle;
+	float m_lane_angle;//in degrees
 	float m_lane_width;
+	float m_position_delta;
+	float m_angle_delta;
+
+	void Rotate(float deg_angle);
 };
 
 #endif // LANE_H_INCLUDED
