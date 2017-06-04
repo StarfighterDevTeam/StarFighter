@@ -25,11 +25,11 @@ void InGameState::Initialize(Player player)
 	//SWORDFISH
 	
 	//Spawner
-	GameObject* spawner = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/spawner.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+	Spawner* spawner = new Spawner(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/spawner.png", sf::Vector2f(32, 32), LANE_CSV_FILE);
 	(*CurrentGame).addToScene(spawner, SpawnerLayer, BackgroundObject);
 
 	//Lane
-	Lane* lane = new Lane(spawner, LANE_CSV_FILE);
+	Lane* lane = new Lane(spawner);
 	(*CurrentGame).addToScene(lane, LaneLayer, LaneObject);
 
 	//Swordfish
