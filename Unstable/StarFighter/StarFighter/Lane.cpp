@@ -32,7 +32,7 @@ Lane::Lane(Spawner* spawner) : GameObject(sf::Vector2f(990, 740), sf::Vector2f(0
 	m_spawner = spawner;
 	m_lane_angle = 0.f;
 	m_lane_width = m_size.x;
-	m_lane_offset = sf::Vector2f(0.f, 0.f);
+	m_lane_offset = sf::Vector2f(0.f, LANE_OFFSET_Y);
 
 	m_center_delta = 0.f;
 	m_offset_delta = sf::Vector2f(0.f, 0.f);
@@ -62,7 +62,7 @@ bool Lane::CreateNextLanePeriod()
 		m_width_delta = new_width - m_lane_width;
 		m_angle_delta = new_angle - m_lane_angle;
 		m_offset_delta.x = new_offset.x - m_lane_offset.x;
-		m_offset_delta.y = new_offset.y - m_lane_offset.y;
+		m_offset_delta.y = LANE_OFFSET_Y + new_offset.y - m_lane_offset.y;
 
 		m_change_clock.restart();
 
@@ -78,7 +78,7 @@ bool Lane::CreateNextLanePeriod()
 
 void Lane::update(sf::Time deltaTime)
 {
-	m_center_delta = 0.f;
+	m_center_delta = 0.f;//used to compensate the swordfish's position when the lane is rotating
 
 	if (m_period_clock.getElapsedTime().asSeconds() > LANE_PERIOD_IN_SECONDS)
 	{
@@ -115,17 +115,18 @@ void Lane::update(sf::Time deltaTime)
 	//ScaleLane(600);
 
 	//Apply new width, angle and offset
-	sf::Vector2f default_pos = sf::Vector2f(m_spawner->getPosition().x, m_spawner->getPosition().y );
+	sf::Vector2f spawner_pos = sf::Vector2f(m_spawner->getPosition().x, m_spawner->getPosition().y);
+
 	sf::Vector2f offset;
 	float rad_angle = -m_lane_angle * M_PI / 180.f;
-	offset.x = LANE_OFFSET_Z * sin(rad_angle);
-	offset.y = LANE_OFFSET_Z * cos(rad_angle);
+	offset.x = m_lane_offset.y * sin(rad_angle);
+	offset.y = m_lane_offset.y * cos(rad_angle);
 	offset.x = offset.x < 0 ? ceil(offset.x) : floor(offset.x);
 	offset.y = offset.y < 0 ? ceil(offset.y) : floor(offset.y);
 
 	sf::Vector2f old_position = getPosition();
 
-	setPosition(sf::Vector2f(default_pos.x + offset.x + m_lane_offset.x, default_pos.y + offset.y + m_lane_offset.y));
+	setPosition(sf::Vector2f(spawner_pos.x + offset.x, spawner_pos.y + offset.y));
 
 	//Stock delta of position and angle in memory for the swordfish to know about them during its update
 	float distance_moved = sqrt((old_position.x - getPosition().x)*(old_position.x - getPosition().x) + (old_position.y - getPosition().y)*(old_position.y - getPosition().y));

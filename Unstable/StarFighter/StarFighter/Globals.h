@@ -75,7 +75,7 @@ float MaxBetweenValues(sf::Vector2f values);
 float MinBetweenValues(sf::Vector2f values);
 
 //SWORDFISH
-#define LANE_OFFSET_Z						300.f
+#define LANE_OFFSET_Y						300.f
 #define LANE_PERIOD_IN_SECONDS				2.f
 #define LANE_CHANGE_IN_SECONDS				1.f
 

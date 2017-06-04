@@ -83,8 +83,8 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	sf::Vector2f lane_pos;
 	
 	float lane_rad_angle = -(m_lane->m_lane_angle) * M_PI / 180.f;
-	lane_pos.x = (LANE_OFFSET_Z + m_lane->m_lane_offset.y - SWORDFISH_DEPTH_DEFAULT) * sin(lane_rad_angle);
-	lane_pos.y = (LANE_OFFSET_Z + m_lane->m_lane_offset.y - SWORDFISH_DEPTH_DEFAULT) * cos(lane_rad_angle);
+	lane_pos.x = (m_lane->m_lane_offset.y - SWORDFISH_DEPTH_DEFAULT) * sin(lane_rad_angle);
+	lane_pos.y = (m_lane->m_lane_offset.y - SWORDFISH_DEPTH_DEFAULT) * cos(lane_rad_angle);
 	lane_pos.x = lane_pos.x < 0 ? ceil(lane_pos.x) : floor(lane_pos.x);
 	lane_pos.y = lane_pos.y < 0 ? ceil(lane_pos.y) : floor(lane_pos.y);
 
