@@ -95,9 +95,11 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	//get input and apply lane limits
 	m_position_offset.x += m_speed.x * deltaTime.asSeconds();
 	m_position_offset.y += m_speed.y * deltaTime.asSeconds();
+	printf("speed: %f\n", m_speed.y);
 
 	m_position_offset.x += m_lane->m_center_delta;
 
+	//limits
 	if (m_position_offset.x >= m_lane->m_lane_width / 2)
 	{
 		m_position_offset.x = m_lane->m_lane_width / 2;
@@ -106,25 +108,23 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	{
 		m_position_offset.x = -m_lane->m_lane_width / 2;
 	}
-	
-	//int r = m_lane->m_lane_angle / 180;
-	//float lane_period = r >= 1 ? m_lane->m_lane_angle - (r*180) : m_lane->m_lane_angle;
-	//float vertical_ratio = lane_period /= 90.f;
-	//int q = (int)lane_period % 90;
-	//vertical_ratio -= q % 2 == 0 ? 0 : (vertical_ratio - q) * 2;
-	//float pos_ratio_X = 1 - vertical_ratio;
-	//float diagonal_ratio = 2*vertical_ratio;
-	//diagonal_ratio -= diagonal_ratio > 1 ? (diagonal_ratio - 1) * 2 : 0;
-	//
-	//sf::Vector2f move_offset;
-	//move_offset.x = m_position_offset * pos_ratio_X;// *(1 + diagonal_ratio*(sqrt(2) - 1)));
-	//move_offset.y = m_position_offset * (1 - pos_ratio_X);// *(1 + diagonal_ratio*(sqrt(2) - 1));
+
+	if (m_position_offset.y > SWORDFISH_DEPTH_MAX)
+	{
+		m_position_offset.y = SWORDFISH_DEPTH_MAX;
+		m_speed.y = 0;
+	}
+	if (m_position_offset.y < 0)//to be replaced when Air jumps are implemented
+	{
+		m_position_offset.y = 0;
+		m_speed.y = 0;
+	}
 
 	float pos_ratio_X = cos(m_lane->m_lane_angle * M_PI / 180.f);
 	float pos_ratio_Y = sin(m_lane->m_lane_angle * M_PI / 180.f);
 	sf::Vector2f move_offset;
-	move_offset.x = m_position_offset.x * pos_ratio_X;
-	move_offset.y = m_position_offset.x * pos_ratio_Y + m_position_offset.y;
+	move_offset.x = m_position_offset.x * pos_ratio_X + m_position_offset.y * pos_ratio_Y;
+	move_offset.y = m_position_offset.x * pos_ratio_Y + m_position_offset.y * pos_ratio_X;
 
 	setPosition(sf::Vector2f(spawner_pos.x + lane_pos.x + move_offset.x, spawner_pos.y + lane_pos.y + move_offset.y));
 	setRotation(m_lane->m_lane_angle);
@@ -176,17 +176,17 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 			m_speed.x = 0;
 	}
 
-	if (!m_movingY)
-	{
-		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SWORDFISH_DECCELERATION_COEF / 100.f;
+	//if (!m_movingY)
+	//{
+	//	m_speed.y -= m_speed.y*deltaTime.asSeconds()*SWORDFISH_DECCELERATION_COEF / 100.f;
+	//
+	//	if (abs(m_speed.y) < SWORDFISH_MIN_SPEED)
+	//		m_speed.y = 0;
+	//}
 
-		if (abs(m_speed.y) < SWORDFISH_MIN_SPEED)
-			m_speed.y = 0;
-	}
-
-	if (m_position_offset.y > 0)
+	if (!m_movingY && m_position_offset.y > 0)
 	{
-		m_speed.y -= SWORDFISH_ARCHIMED_THRUST;
+		m_speed.y -= SWORDFISH_ARCHIMED_ACCELERATION;
 	}
 }
 
@@ -207,7 +207,14 @@ void Ship::MaxSpeedConstraints()
 	float ship_max_speed = m_angular_speed;
 
 	//max speed constraints
-	NormalizeSpeed(&m_speed, ship_max_speed);
+	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED)
+	{
+		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_SPEED : -SWORDFISH_MAX_SPEED;
+	}
+	if (abs(m_speed.y) > SWORDFISH_MAX_DIVE_SPEED)
+	{
+		m_speed.y = m_speed.y > 0 ? SWORDFISH_MAX_DIVE_SPEED : -SWORDFISH_MAX_DIVE_SPEED;
+	}
 }
 
 void Ship::UpdateRotation()
