@@ -50,7 +50,7 @@ public :
 	void update(sf::Time deltaTime) override;
 	
 	void ManageHudControls(sf::Vector2f inputs_directions);
-	void ManageAcceleration(sf::Vector2f inputs_direction);
+	void ManageAcceleration(sf::Vector2f inputs_direction, sf::Time deltaTime);
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
 	void MaxSpeedConstraints();
@@ -78,7 +78,7 @@ public :
 	//SWORDFISH
 	Lane* m_lane;
 	float m_angular_speed;
-	float m_position_offset;
+	sf::Vector2f m_position_offset;
 	void UpdatePosition(sf::Time deltaTime);
 
 private:

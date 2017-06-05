@@ -33,7 +33,8 @@ Ship::Ship(Lane* lane, sf::Vector2f speed, std::string textureName, sf::Vector2f
 	setPosition(sf::Vector2f(lane->getPosition().x, lane->getPosition().y));
 
 	m_angular_speed = SWORDFISH_MAX_SPEED;
-	m_position_offset = 0.f;
+	m_position_offset.x = 0.f;
+	m_position_offset.y = 0.f;
 }
 
 Ship::~Ship()
@@ -57,7 +58,7 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	ManageAcceleration(inputs_direction);
+	ManageAcceleration(inputs_direction, deltaTime);
 	
 	//Action input
 	UpdateInputStates();
@@ -92,16 +93,18 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	//compute triangular wave function
 	
 	//get input and apply lane limits
-	m_position_offset += m_speed.x * deltaTime.asSeconds();
-	m_position_offset += m_lane->m_center_delta;
+	m_position_offset.x += m_speed.x * deltaTime.asSeconds();
+	m_position_offset.y += m_speed.y * deltaTime.asSeconds();
 
-	if (m_position_offset >= m_lane->m_lane_width / 2)
+	m_position_offset.x += m_lane->m_center_delta;
+
+	if (m_position_offset.x >= m_lane->m_lane_width / 2)
 	{
-		m_position_offset = m_lane->m_lane_width / 2;
+		m_position_offset.x = m_lane->m_lane_width / 2;
 	}
-	if (m_position_offset <= -m_lane->m_lane_width / 2)
+	if (m_position_offset.x <= -m_lane->m_lane_width / 2)
 	{
-		m_position_offset = -m_lane->m_lane_width / 2;
+		m_position_offset.x = -m_lane->m_lane_width / 2;
 	}
 	
 	//int r = m_lane->m_lane_angle / 180;
@@ -120,8 +123,8 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	float pos_ratio_X = cos(m_lane->m_lane_angle * M_PI / 180.f);
 	float pos_ratio_Y = sin(m_lane->m_lane_angle * M_PI / 180.f);
 	sf::Vector2f move_offset;
-	move_offset.x = m_position_offset * pos_ratio_X;
-	move_offset.y = m_position_offset * pos_ratio_Y;
+	move_offset.x = m_position_offset.x * pos_ratio_X;
+	move_offset.y = m_position_offset.x * pos_ratio_Y + m_position_offset.y;
 
 	setPosition(sf::Vector2f(spawner_pos.x + lane_pos.x + move_offset.x, spawner_pos.y + lane_pos.y + move_offset.y));
 	setRotation(m_lane->m_lane_angle);
@@ -180,11 +183,17 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 		if (abs(m_speed.y) < SWORDFISH_MIN_SPEED)
 			m_speed.y = 0;
 	}
+
+	if (m_position_offset.y > 0)
+	{
+		m_speed.y -= SWORDFISH_ARCHIMED_THRUST;
+	}
 }
 
-void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
+void Ship::ManageAcceleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
 {
 	m_speed.x += inputs_direction.x* SWORDFISH_LATERAL_ACCELERATION;
+	m_speed.y += inputs_direction.y > 0 ? inputs_direction.y*SWORDFISH_DIVE_ACCELERATION : 0.f;
 
 	//max speed constraints
 	if (abs(m_speed.x) > m_angular_speed)
