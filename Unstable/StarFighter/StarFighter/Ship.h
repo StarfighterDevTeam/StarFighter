@@ -51,9 +51,8 @@ public :
 	
 	void ManageHudControls(sf::Vector2f inputs_directions);
 	void ManageAcceleration(sf::Vector2f inputs_direction, sf::Time deltaTime);
-	void IdleDecelleration(sf::Time deltaTime);
+	void IdleDecelleration(sf::Vector2f inputs_direction, sf::Time deltaTime);
 	bool ScreenBorderContraints();
-	void MaxSpeedConstraints();
 	void UpdateRotation();
 
 	bool m_disable_inputs;
@@ -77,7 +76,6 @@ public :
 
 	//SWORDFISH
 	Lane* m_lane;
-	float m_angular_speed;
 	sf::Vector2f m_position_offset;
 	void UpdatePosition(sf::Time deltaTime);
 

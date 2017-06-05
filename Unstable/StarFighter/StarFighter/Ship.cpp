@@ -32,7 +32,6 @@ Ship::Ship(Lane* lane, sf::Vector2f speed, std::string textureName, sf::Vector2f
 	m_lane = lane;
 	setPosition(sf::Vector2f(lane->getPosition().x, lane->getPosition().y));
 
-	m_angular_speed = SWORDFISH_MAX_SPEED;
 	m_position_offset.x = 0.f;
 	m_position_offset.y = 0.f;
 }
@@ -59,7 +58,6 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	ManageAcceleration(inputs_direction, deltaTime);
-	
 	//Action input
 	UpdateInputStates();
 	//if (m_inputs_states[Action_Firing] == Input_Tap)
@@ -68,8 +66,7 @@ void Ship::update(sf::Time deltaTime)
 	//	(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	//}
 	
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
+	IdleDecelleration(inputs_direction, deltaTime);
 	//UpdateRotation();
 
 	UpdatePosition(deltaTime);
@@ -94,8 +91,21 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	
 	//get input and apply lane limits
 	m_position_offset.x += m_speed.x * deltaTime.asSeconds();
+
+	float offset_y_before_moving = m_position_offset.y;
+
+	
 	m_position_offset.y += m_speed.y * deltaTime.asSeconds();
-	printf("speed: %f\n", m_speed.y);
+	if (offset_y_before_moving > 0 && m_position_offset.y <= 0)//return to surface
+	{
+		m_speed.y = 0;
+		m_position_offset.y = 0;
+	}
+	if (offset_y_before_moving < 0 && m_position_offset.y >= 0)//jump into surface
+	{
+		m_speed.y = 0;
+		m_position_offset.y = 0;
+	}
 
 	m_position_offset.x += m_lane->m_center_delta;
 
@@ -112,11 +122,6 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 	if (m_position_offset.y > SWORDFISH_DEPTH_MAX)
 	{
 		m_position_offset.y = SWORDFISH_DEPTH_MAX;
-		m_speed.y = 0;
-	}
-	if (m_position_offset.y < 0)//to be replaced when Air jumps are implemented
-	{
-		m_position_offset.y = 0;
 		m_speed.y = 0;
 	}
 
@@ -165,7 +170,38 @@ bool Ship::ScreenBorderContraints()
 	return touched_screen_border;
 }
 
-void Ship::IdleDecelleration(sf::Time deltaTime)
+void Ship::ManageAcceleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
+{
+	m_speed.x += inputs_direction.x* SWORDFISH_LATERAL_ACCELERATION;
+	//if (m_position_offset.y >= 0)
+	//{
+	//	m_speed.y += inputs_direction.y > 0 ? inputs_direction.y*SWORDFISH_DIVE_ACCELERATION : 0.f;
+	//
+	//	if (abs(m_speed.y) > SWORDFISH_MAX_DIVE_SPEED)
+	//	{
+	//		m_speed.y = m_speed.y > 0 ? SWORDFISH_MAX_DIVE_SPEED : -SWORDFISH_MAX_DIVE_SPEED;
+	//	}
+	//}
+
+	if (m_position_offset.y == 0)
+	{
+		m_speed.y += inputs_direction.y < 0 ? inputs_direction.y*SWORDFISH_AIRJUMP_ACCELERATION : 0.f;//jump
+		m_speed.y += inputs_direction.y > 0 ? inputs_direction.y*SWORDFISH_DIVE_ACCELERATION : 0.f;//dive
+	}
+	
+	//max speed constraints
+	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED)
+	{
+		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_SPEED : -SWORDFISH_MAX_SPEED;
+	}
+
+	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED)
+	{
+		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_SPEED : -SWORDFISH_MAX_SPEED;
+	}
+}
+
+void Ship::IdleDecelleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
 {
 	//idle decceleration
 	if (!m_movingX)
@@ -176,44 +212,14 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 			m_speed.x = 0;
 	}
 
-	//if (!m_movingY)
-	//{
-	//	m_speed.y -= m_speed.y*deltaTime.asSeconds()*SWORDFISH_DECCELERATION_COEF / 100.f;
-	//
-	//	if (abs(m_speed.y) < SWORDFISH_MIN_SPEED)
-	//		m_speed.y = 0;
-	//}
-
-	if (!m_movingY && m_position_offset.y > 0)
+	if (m_position_offset.y > 0 && (inputs_direction.y <= 0 || m_position_offset.y < SWORDFISH_DEPTH_MAX))
 	{
 		m_speed.y -= SWORDFISH_ARCHIMED_ACCELERATION;
 	}
-}
 
-void Ship::ManageAcceleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
-{
-	m_speed.x += inputs_direction.x* SWORDFISH_LATERAL_ACCELERATION;
-	m_speed.y += inputs_direction.y > 0 ? inputs_direction.y*SWORDFISH_DIVE_ACCELERATION : 0.f;
-
-	//max speed constraints
-	if (abs(m_speed.x) > m_angular_speed)
+	if (m_position_offset.y < 0)
 	{
-		m_speed.x = m_speed.x > 0 ? m_angular_speed : -m_angular_speed;
-	}
-}
-
-void Ship::MaxSpeedConstraints()
-{
-	float ship_max_speed = m_angular_speed;
-
-	//max speed constraints
-	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED)
-	{
-		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_SPEED : -SWORDFISH_MAX_SPEED;
-	}
-	if (abs(m_speed.y) > SWORDFISH_MAX_DIVE_SPEED)
-	{
-		m_speed.y = m_speed.y > 0 ? SWORDFISH_MAX_DIVE_SPEED : -SWORDFISH_MAX_DIVE_SPEED;
+		m_speed.y += SWORDFISH_GRAVITY_ACCELERATION;
 	}
 }
 
