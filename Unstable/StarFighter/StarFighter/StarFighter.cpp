@@ -6,118 +6,57 @@
 
 Game* CurrentGame;
 
-int carre[9];
-int sum = -1;
-int try_count = 0;
-int max_number = 30;
-
-void InitCarre(int a, int b, int c)
-{
-	carre[0] = a;
-	carre[1] = b;
-	carre[2] = c;
-
-	sum = carre[0] * carre[0] + carre[1] * carre[1] + carre[2] * carre[2];
-	printf("Init: a=%d, b=%d, c=%d | sum=%d\n", a, b, c, sum);
-}
-
-int ComputeCarre6()
-{
-	for (int i = 1; i < max_number; i++)
-	{
-		if (i == carre[0] || i == carre[1] || i == carre[2] || i == carre[4] || i == carre[7] || i == carre[8])
-		{
-			continue;
-		}
-
-		try_count++;
-		int sum2 = carre[2] * carre[2] + carre[4] * carre[4] + i*i;
-		if (sum2 == sum)
-		{
-			carre[6] = i;
-			printf("\n\n## MATCH ##\n\n");
-			return i;
-		}
-		else
-		{
-			try_count++;
-			printf("   try %d: i=%d; j=%d; k=%d; l=%d| sum=%d \n", try_count, carre[4], carre[7], carre[8], i, sum2);
-		}
-	}
-
-	return -1;
-}
-
-int ComputeCarre8()
-{
-	for (int i = 1; i < max_number; i++)
-	{
-		if (i == carre[0] || i == carre[1] || i == carre[2] || i == carre[4] || i == carre[7])
-		{
-			continue;
-		}
-
-		try_count++;
-		int sum2 = carre[0] * carre[0] + carre[4] * carre[4] + i*i;
-		if (sum2 == sum)
-		{
-			carre[8] = i;
-			//printf("\n\n## MATCH ##\n\n");
-			ComputeCarre6();
-			return i;
-		}
-		else
-		{
-			try_count++;
-			printf("   try %d: i=%d; j=%d; k=%d| sum=%d \n", try_count, carre[4], carre[7], i, sum2);
-		}
-	}
-
-	return -1;
-}
-
-sf::Vector2i ComputeCarre4And7()
-{
-	for (int i = 1; i < max_number; i++)
-	{
-		if (i == carre[0] || i == carre[1] || i == carre[2])
-		{
-			continue;
-		}
-
-
-		for (int j = 1; j < max_number; j++)
-		{
-			if (j == carre[0] || j == carre[1] || j == carre[2] || j == i)
-			{
-				continue;
-			}
-
-			int sum2 = carre[1] * carre[1] + i*i + j*j;
-			
-			if (sum2 == sum)
-			{
-				carre[4] = i;
-				carre[7] = j;
-				//printf("\n\n## MATCH ##\n\n");
-				ComputeCarre8();
-				return sf::Vector2i(i, j);
-			}
-			else
-			{
-				try_count++;
-				printf("   try %d: i=%d; j=%d | sum=%d \n", try_count, i, j, sum2);
-			}
-		}
-	}
-
-	return sf::Vector2i(-1, -1);
-}
-
 
 
 int main()
 {
+	float win_ratio_expected = 0.4f;//calculé en fonction de l'ELO des deux joueurs. Ici j'ai mis un 80% de gagner pour le joueur 1.
+	srand(time(NULL));
+	float match_result = ((double)rand() / (RAND_MAX));
+	bool p1_wins_match = match_result <= win_ratio_expected;//on détermine aléatoirement le gagnant du match, pour commencer : est-ce que le joueur 1 a gagné le match ?
+
+	int sets = 5;//nombre de sets max, selon les règles de la partie.
+	int sets_to_win = sets / 2 + 1;
+	int sets_winner_won = 0;
+	int sets_loser_won = 0;
+	int games_to_win = 6;//nombre de jeux à gagner dans le set, selon les règles de la partie.
+
+	int games_p1[] = { 0, 0, 0, 0, 0 };//un tableau pour mémoriser le résultat de chaque set pour chaque joueur. J'ai fait un tableau de taille maximum (5 sets)
+	int games_p2[5] = { 0, 0, 0, 0, 0 };
+
+	int i = 0;//compteur de sets joués
+
+	while (sets_winner_won < sets_to_win)//tant que le gagnant n'atteint pas le nombre de sets requis pour gagner le match...
+	{
+		int games_won_by_set_winner = games_to_win;//on fixe le score du gagnant du set comme étant le nombre de jeux requis pour le gagner
+
+		float set_result = ((double)rand() / (RAND_MAX));
+		bool p1_wins_set = set_result <= win_ratio_expected;//on détermine aléatoirement le gagnant du set : est-ce que le joueur 1 a gagné le set ?
+		if (sets_loser_won == sets_to_win - 1 && p1_wins_match != p1_wins_set)//on empêche le perdant de gagner le set décisif en inversant le résultat du tirage aléatoire dans ce cas
+		{
+			set_result = 1 - set_result;
+			p1_wins_set = p1_wins_match;
+		}
+
+		sets_winner_won += p1_wins_match ? p1_wins_set : !p1_wins_set;//ajouter un set à celui qui gagne le set
+		sets_loser_won += p1_wins_match ? !p1_wins_set : p1_wins_set;
+
+		float win_margin = abs(win_ratio_expected - set_result);//win_margin : mesure à quel point il a gagné le set ; est-ce qu'il l'a écrasé ou pas (écart par rapport au résultat attendu). En absolu car on connait déjà le gagnant du set.
+		int games_won_by_set_loser = games_to_win - (int)ceil(games_to_win * win_margin);//on détermine le nombre de jeux marqués par le perdant du set au pro rata du win_margin.
+
+		if (games_won_by_set_loser >= games_to_win - 1)//cas des victoires 7-5 ou 7-6, il faut donc donner un jeu de plus au gagnant
+		{
+			games_won_by_set_winner++;
+		}
+
+		games_p1[i] = p1_wins_set*games_won_by_set_winner + !p1_wins_set*games_won_by_set_loser;//on enregistre le résultat du set pour chaque joueur (si le joueur 1 a gagné le set, on lui attribue le montant de jeux du gagnant du set, et vice-versa)
+		games_p2[i] = !p1_wins_set*games_won_by_set_winner + p1_wins_set*games_won_by_set_loser;
+
+		i++;
+	}
+
+	printf("score:\n%d %d %d %d %d\n%d %d %d %d %d", games_p1[0], games_p1[1], games_p1[2], games_p1[3], games_p1[4], games_p2[0], games_p2[1], games_p2[2], games_p2[3], games_p2[4]);//affichage du résultat final (j'affiche 0-0 pour les sets qui n'ont pas été joués pour faire vite, mais il ne faudra évidemment pas les afficher)
+
 	//LOGGER_START(Logger::DEBUG, "");
 	//
 	////Load Configuration
@@ -138,72 +77,12 @@ int main()
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	//Title
-	renderWindow.setTitle("StarFighter Engine");
-
-	////Game initialization
-	//CurrentGame = new Game();
-	//
-	////Random seed
-	//srand(time(NULL));
-	//
-	////update
-	//sf::Time dt;
-	//sf::Clock deltaClock;
-	//
-	////Initializing player
-	//LOGGER_WRITE(Logger::DEBUG, "Initializing player");
-	//Player player;
-	//player.Init(&renderWindow);
-	//
-	////Loading InGame state
-	//LOGGER_WRITE(Logger::DEBUG, "Starting game");
-	//GameManager gameManager;
-	//InGameState inGameState;
-	//gameManager.PushState(inGameState, player);
-	//
-	////Handling various window resolutions
-	//enum WindowResolutions
-	//{
-	//	RESOLUTION_1600x900,
-	//	RESOLUTION_1920x1080_FullScreen,
-	//	RESOLUTION_1280x720,
-	//	RESOLUTION_1920x1080,
-	//	NBVAL_RESOLUTIONS,
-	//};
-	//bool fullscreen = false;
-	//WindowResolutions resolution = RESOLUTION_1600x900;
-	//LOGGER_WRITE(Logger::DEBUG, "Initialization complete. Starting main loop...");
-
-	
+	renderWindow.setTitle("StarFighter Engine");	
 
 	//Main loop
 	while (renderWindow.isOpen())
 	{
-		int a = 1;
-		int b = 2;
-		int c = 3;
-
-		for (int a = 1; a < max_number; a++)
-		{
-			for (int b = 1; b < max_number; b++)
-			{
-				if (b == a)
-				{
-					continue;
-				}
-
-				for (int c = 1; c < max_number; c++)
-				{
-					if (c == a || c == b)
-					{
-						continue;
-					}
-
-					InitCarre(a, b, c);
-					ComputeCarre4And7();
-				}
-			}
-		}
+		
 
 		while (1)
 		{
