@@ -96,6 +96,7 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 
 	
 	m_position_offset.y += m_speed.y * deltaTime.asSeconds();
+
 	if (offset_y_before_moving > 0 && m_position_offset.y <= 0)//return to surface
 	{
 		m_speed.y = 0;
@@ -185,26 +186,29 @@ void Ship::ManageAcceleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
 
 	if (m_position_offset.y == 0)
 	{
-		m_speed.y += inputs_direction.y < 0 ? inputs_direction.y*SWORDFISH_AIRJUMP_ACCELERATION : 0.f;//jump
-		m_speed.y += inputs_direction.y > 0 ? inputs_direction.y*SWORDFISH_DIVE_ACCELERATION : 0.f;//dive
+		m_speed.y += inputs_direction.y < 0 ? -SWORDFISH_AIRJUMP_ACCELERATION : 0.f;//jump
+		m_speed.y += inputs_direction.y > 0 ? SWORDFISH_DIVE_ACCELERATION : 0.f;//dive
 	}
 	
 	//max speed constraints
-	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED)
+	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED && m_position_offset.y == 0)
 	{
 		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_SPEED : -SWORDFISH_MAX_SPEED;
 	}
-
-	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED)
+	if (abs(m_speed.x) > SWORDFISH_MAX_AIRJUMP_LATERAL_SPEED && m_position_offset.y < 0)
 	{
-		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_SPEED : -SWORDFISH_MAX_SPEED;
+		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_AIRJUMP_LATERAL_SPEED : -SWORDFISH_MAX_AIRJUMP_LATERAL_SPEED;
+	}
+	if (abs(m_speed.x) > SWORDFISH_MAX_DIVE_LATERAL_SPEED && m_position_offset.y > 0)
+	{
+		m_speed.x = m_speed.x > 0 ? SWORDFISH_MAX_DIVE_LATERAL_SPEED : -SWORDFISH_MAX_DIVE_LATERAL_SPEED;
 	}
 }
 
 void Ship::IdleDecelleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
 {
 	//idle decceleration
-	if (!m_movingX)
+	if (!m_movingX && m_position_offset.y == 0)
 	{
 		m_speed.x -= m_speed.x*deltaTime.asSeconds()* SWORDFISH_DECCELERATION_COEF / 100.f;
 
