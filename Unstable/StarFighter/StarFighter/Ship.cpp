@@ -126,11 +126,9 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 		m_speed.y = 0;
 	}
 
-	float pos_ratio_X = cos(m_lane->m_lane_angle * M_PI / 180.f);
-	float pos_ratio_Y = sin(m_lane->m_lane_angle * M_PI / 180.f);
 	sf::Vector2f move_offset;
-	move_offset.x = m_position_offset.x * pos_ratio_X + m_position_offset.y * pos_ratio_Y;
-	move_offset.y = m_position_offset.x * pos_ratio_Y + m_position_offset.y * pos_ratio_X;
+	move_offset.x = m_position_offset.x * cos(-lane_rad_angle) + m_position_offset.y * sin(lane_rad_angle);
+	move_offset.y = m_position_offset.x * sin(-lane_rad_angle) + m_position_offset.y * cos(lane_rad_angle);
 
 	setPosition(sf::Vector2f(spawner_pos.x + lane_pos.x + move_offset.x, spawner_pos.y + lane_pos.y + move_offset.y));
 	setRotation(m_lane->m_lane_angle);
