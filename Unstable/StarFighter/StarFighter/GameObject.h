@@ -24,17 +24,19 @@ enum LayerType {
 	
 	ExplosionLayer,
 	
-	FeedbacksLayer,
 	LaneLayer,
 	AuraLayer,
 	PlayerStroboscopicLayer,
+
+	SardineLayer,
 	PlayerShipLayer,
 	
-	SpawnerLayer,
-	
+	FeedbacksLayer,
+
 	PanelLayer,
 	HudObject,
 	HudCursor,
+
 	NBVAL_Layer
 };
 
@@ -44,6 +46,7 @@ enum GameObjectType {
 	ShopObject,
 	LootObject,
 	LaneObject,
+	SardineObject,
 	PlayerShip,
 	FakePlayerShip,
 	FriendlyFire,
@@ -70,6 +73,8 @@ public:
 	virtual void update(sf::Time deltaTime);
 	virtual void updateAnimation(sf::Time deltaTime);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
+
+	void Move(sf::Vector2f speed);
 
 	bool m_visible;
 	bool m_isOnScene;
@@ -120,6 +125,9 @@ public:
 
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
+
+	//SWORDFISH
+	virtual void SardineCollision(GameObject* sardine);
 };
 
 #endif // GameObject_H_INCLUDED

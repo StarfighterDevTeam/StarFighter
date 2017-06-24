@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "SFTextPop.h"
 #include "Lane.h"
+#include "Sardine.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -78,6 +79,11 @@ public :
 	Lane* m_lane;
 	sf::Vector2f m_position_offset;
 	void UpdatePosition(sf::Time deltaTime);
+	void SardineCollision(GameObject* sardine) override;
+	void EatSardine(Sardine* sardine);
+	
+	Sardine* m_sardine_hovered;
+
 
 private:
 	bool m_moving;

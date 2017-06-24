@@ -24,13 +24,15 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	m_sardine_hovered = NULL;
 }
 
 Ship::Ship(Lane* lane, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(sf::Vector2f(0,0), speed, textureName, size, origin, frameNumber, animationNumber)
 {
 	this->Init();
 	m_lane = lane;
-	setPosition(sf::Vector2f(lane->getPosition().x, lane->getPosition().y));
+	setPosition(sf::Vector2f(lane->getPosition().x, SWORDFISH_INITIAL_OFFSET_Y));
 
 	m_position_offset.x = 0.f;
 	m_position_offset.y = 0.f;
@@ -60,11 +62,13 @@ void Ship::update(sf::Time deltaTime)
 	ManageAcceleration(inputs_direction, deltaTime);
 	//Action input
 	UpdateInputStates();
-	//if (m_inputs_states[Action_Firing] == Input_Tap)
-	//{
-	//	//do some action
-	//	(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
-	//}
+
+	if (m_inputs_states[Action_Firing] == Input_Tap && m_sardine_hovered)
+	{
+		//Eat the sardine
+		EatSardine(m_sardine_hovered);
+		m_sardine_hovered = NULL;
+	}
 	
 	IdleDecelleration(inputs_direction, deltaTime);
 	//UpdateRotation();
@@ -72,19 +76,14 @@ void Ship::update(sf::Time deltaTime)
 	UpdatePosition(deltaTime);
 
 	AnimatedSprite::update(deltaTime);
+
+	m_sardine_hovered = NULL;
 }
 
 void Ship::UpdatePosition(sf::Time deltaTime)
 {
 	//stick to lane
-	sf::Vector2f spawner_pos = sf::Vector2f(m_lane->m_spawner->getPosition().x, m_lane->m_spawner->getPosition().y);
-	sf::Vector2f lane_pos;
-	
-	float lane_rad_angle = -(m_lane->m_lane_angle) * M_PI / 180.f;
-	lane_pos.x = (m_lane->m_lane_offset.y - SWORDFISH_DEPTH_DEFAULT) * sin(lane_rad_angle);
-	lane_pos.y = (m_lane->m_lane_offset.y - SWORDFISH_DEPTH_DEFAULT) * cos(lane_rad_angle);
-	lane_pos.x = lane_pos.x < 0 ? ceil(lane_pos.x) : floor(lane_pos.x);
-	lane_pos.y = lane_pos.y < 0 ? ceil(lane_pos.y) : floor(lane_pos.y);
+	sf::Vector2f lane_pos = m_lane->getPosition();
 
 	//apply current swordfish offset
 	//compute triangular wave function
@@ -94,21 +93,23 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 
 	float offset_y_before_moving = m_position_offset.y;
 
-	
 	m_position_offset.y += m_speed.y * deltaTime.asSeconds();
 
-	if (offset_y_before_moving > 0 && m_position_offset.y <= 0)//return to surface
-	{
-		m_speed.y = 0;
-		m_position_offset.y = 0;
-	}
-	if (offset_y_before_moving < 0 && m_position_offset.y >= 0)//jump into surface
-	{
-		m_speed.y = 0;
-		m_position_offset.y = 0;
-	}
+	//if (offset_y_before_moving > 0 && m_position_offset.y <= 0)//return to surface
+	//{
+	//	m_speed.y = 0;
+	//	m_position_offset.y = 0;
+	//}
+	//if (offset_y_before_moving < 0 && m_position_offset.y >= 0)//jump into surface
+	//{
+	//	m_speed.y = 0;
+	//	m_position_offset.y = 0;
+	//}
 
-	m_position_offset.x += m_lane->m_center_delta;
+	float a = m_position_offset.x;
+	float b = m_lane->m_offset_moved;
+	a += b;
+	m_position_offset.x += m_lane->m_offset_moved;
 
 	//limits
 	if (m_position_offset.x >= m_lane->m_lane_width / 2)
@@ -120,18 +121,13 @@ void Ship::UpdatePosition(sf::Time deltaTime)
 		m_position_offset.x = -m_lane->m_lane_width / 2;
 	}
 
-	if (m_position_offset.y > SWORDFISH_DEPTH_MAX)
-	{
-		m_position_offset.y = SWORDFISH_DEPTH_MAX;
-		m_speed.y = 0;
-	}
+	//if (m_position_offset.y > SWORDFISH_DEPTH_MAX)
+	//{
+	//	m_position_offset.y = SWORDFISH_DEPTH_MAX;
+	//	m_speed.y = 0;
+	//}
 
-	sf::Vector2f move_offset;
-	move_offset.x = m_position_offset.x * cos(-lane_rad_angle) + m_position_offset.y * sin(lane_rad_angle);
-	move_offset.y = m_position_offset.x * sin(-lane_rad_angle) + m_position_offset.y * cos(lane_rad_angle);
-
-	setPosition(sf::Vector2f(spawner_pos.x + lane_pos.x + move_offset.x, spawner_pos.y + lane_pos.y + move_offset.y));
-	setRotation(m_lane->m_lane_angle);
+	setPosition(sf::Vector2f(lane_pos.x + m_position_offset.x, lane_pos.y + 3 * m_lane->m_size.y / 8 + m_position_offset.y));
 }
 
 bool Ship::ScreenBorderContraints()
@@ -172,21 +168,12 @@ bool Ship::ScreenBorderContraints()
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
 {
 	m_speed.x += inputs_direction.x* SWORDFISH_LATERAL_ACCELERATION;
-	//if (m_position_offset.y >= 0)
-	//{
-	//	m_speed.y += inputs_direction.y > 0 ? inputs_direction.y*SWORDFISH_DIVE_ACCELERATION : 0.f;
-	//
-	//	if (abs(m_speed.y) > SWORDFISH_MAX_DIVE_SPEED)
-	//	{
-	//		m_speed.y = m_speed.y > 0 ? SWORDFISH_MAX_DIVE_SPEED : -SWORDFISH_MAX_DIVE_SPEED;
-	//	}
-	//}
 
-	if (m_position_offset.y == 0)
-	{
-		m_speed.y += inputs_direction.y < 0 ? -SWORDFISH_AIRJUMP_ACCELERATION : 0.f;//jump
-		m_speed.y += inputs_direction.y > 0 ? SWORDFISH_DIVE_ACCELERATION : 0.f;//dive
-	}
+	//if (m_position_offset.y == 0)
+	//{
+	//	m_speed.y += inputs_direction.y < 0 ? -SWORDFISH_AIRJUMP_ACCELERATION : 0.f;//jump
+	//	m_speed.y += inputs_direction.y > 0 ? SWORDFISH_DIVE_ACCELERATION : 0.f;//dive
+	//}
 	
 	//max speed constraints
 	if (abs(m_speed.x) > SWORDFISH_MAX_SPEED && m_position_offset.y == 0)
@@ -214,15 +201,15 @@ void Ship::IdleDecelleration(sf::Vector2f inputs_direction, sf::Time deltaTime)
 			m_speed.x = 0;
 	}
 
-	if (m_position_offset.y > 0 && (inputs_direction.y <= 0 || m_position_offset.y < SWORDFISH_DEPTH_MAX))
-	{
-		m_speed.y -= SWORDFISH_ARCHIMED_ACCELERATION;
-	}
-
-	if (m_position_offset.y < 0)
-	{
-		m_speed.y += SWORDFISH_GRAVITY_ACCELERATION;
-	}
+	//if (m_position_offset.y > 0 && (inputs_direction.y <= 0 || m_position_offset.y < SWORDFISH_DEPTH_MAX))
+	//{
+	//	m_speed.y -= SWORDFISH_ARCHIMED_ACCELERATION;
+	//}
+	//
+	//if (m_position_offset.y < 0)
+	//{
+	//	m_speed.y += SWORDFISH_GRAVITY_ACCELERATION;
+	//}
 }
 
 void Ship::UpdateRotation()
@@ -348,5 +335,24 @@ bool Ship::LoadShip(Ship* ship)
 	{
 		cerr << "DEBUG: No save file found. A new file is going to be created.\n" << endl;
 		return false;
+	}
+}
+
+void Ship::SardineCollision(GameObject* sardine)
+{
+	if (sardine)
+	{
+		Sardine* collision_sardine = (Sardine*)sardine;
+		m_sardine_hovered = collision_sardine;
+	}
+}
+
+void Ship::EatSardine(Sardine* sardine)
+{
+	if (sardine)
+	{
+		sardine->m_GarbageMe = true;
+		sardine->m_visible = false;
+		(*CurrentGame).CreateSFTextPop("+10", Font_Arial, 30, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, this, -m_size.y / 2 - 20);
 	}
 }

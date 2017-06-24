@@ -34,6 +34,11 @@ string GameObject::getName()
 	return *(s1.end() - 1);
 }
 
+void GameObject::Move(sf::Vector2f speed)
+{
+	setPosition(sf::Vector2f(getPosition().x + speed.x, getPosition().y + speed.y));
+}
+
 GameObject::GameObject()
 {
 
@@ -484,4 +489,10 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 	}
 
 	return pixels;
+}
+
+//SWORDFISH
+void GameObject::SardineCollision(GameObject* sardine)
+{
+	//see override function in class Ship
 }

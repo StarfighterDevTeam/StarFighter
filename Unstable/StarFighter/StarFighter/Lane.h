@@ -5,58 +5,57 @@
 #include "GameObject.h"
 #include "Game.h"
 #include "FileLoadUtils.h"
+#include "Sardine.h"
 
 enum LaneDataFields
 {
 	LaneData_Id,
 	LaneData_Width,
-	LaneData_Angle,
 	LaneData_OffsetX,
-	LaneData_OffsetY,
-	LaneData_Counter,
+	LaneData_Sardine_1_4,
+	LaneData_Sardine_2_4,
+	LaneData_Sardine_3_4,
+	LaneData_Sardine_4_4,
 };
 
 class LaneData
 {
 public:
 	float m_width;
-	float m_angle;
-	sf::Vector2f m_offset;
-	size_t m_counter;
-};
-
-class Spawner : public GameObject
-{
-public:
-	Spawner(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, string csv_file);
-
-	string m_csv_file;
-	vector<LaneData> m_lane_data;
+	float m_offset;
+	size_t m_sardine[4];
+	//size_t m_counter;
 };
 
 class Lane : public GameObject
 {
 public :
-	Lane(Spawner* spawner);
+	Lane(string csv_file, float bpm);
+
+	string m_csv_file;
+	sf::Vector2f m_initial_position;
+	float m_bpm;
+
 	void update(sf::Time deltaTime) override;
 
-	Spawner* m_spawner;
-	float m_lane_angle;//in degrees
+	vector<LaneData> m_lane_data;
 	float m_lane_width;
-	sf::Vector2f m_lane_offset;
+	float m_lane_offset;
+	size_t m_sardine[4];
+	bool m_first_period;
+	//size_t m_period_counter;
 
-	float m_center_delta;
-	float m_angle_delta;
 	float m_width_delta;
-	sf::Vector2f m_offset_delta;
+	float m_offset_delta;
+	float m_offset_moved;
 
-	void RotateLane(float deg_angle);
 	void ScaleLane(float width);
 	bool CreateNextLanePeriod();
+	void CreateSardine(SardineType type);
 	
 	sf::Clock m_period_clock;
 	sf::Clock m_change_clock;
-	size_t m_period_counter;
+	
 };
 
 #endif // LANE_H_INCLUDED

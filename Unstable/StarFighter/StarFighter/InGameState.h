@@ -10,6 +10,7 @@
 #include "SFPanelSpecific.h"
 #include "FileLoadUtils.h"
 #include "Lane.h"
+#include "Sardine.h"
 
 class GameObject;
 

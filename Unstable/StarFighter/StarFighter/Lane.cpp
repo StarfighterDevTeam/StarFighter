@@ -4,10 +4,12 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-
-Spawner::Spawner(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, string csv_file) : GameObject(position, speed, textureName, size)
+Lane::Lane(string csv_file, float bpm) : GameObject(sf::Vector2f(990, 400), sf::Vector2f(0, 0), "2D/lane.png", sf::Vector2f(400, 1200))
 {
 	m_csv_file = csv_file;
+	m_bpm = bpm;
+	m_initial_position = getPosition();
+	m_first_period = true;
 
 	LOGGER_WRITE(Logger::DEBUG, "Loading lane scripts");
 
@@ -17,28 +19,28 @@ Spawner::Spawner(sf::Vector2f position, sf::Vector2f speed, std::string textureN
 	{
 		LaneData new_data;
 		new_data.m_width = stof(laneConfig[i][LaneData_Width]);
-		new_data.m_angle = stof(laneConfig[i][LaneData_Angle]);
-		new_data.m_offset.x = stof(laneConfig[i][LaneData_OffsetX]);
-		new_data.m_offset.y = stof(laneConfig[i][LaneData_OffsetY]);
-		new_data.m_counter = stoi(laneConfig[i][LaneData_Counter]);
+		new_data.m_offset = stof(laneConfig[i][LaneData_OffsetX]);
+		for (size_t j = 0; j < 4; j++)
+		{
+			new_data.m_sardine[j] = stoi(laneConfig[i][LaneData_Sardine_1_4 + j]);
+		}
+		
+		//new_data.m_counter = stoi(laneConfig[i][LaneData_Counter]);
 		m_lane_data.push_back(new_data);
 	}
 	laneConfig.clear();
-}
 
-Lane::Lane(Spawner* spawner) : GameObject(sf::Vector2f(990, 740), sf::Vector2f(0, 0), "2D/lane.png", sf::Vector2f(400, 32))
-								//GameObject(sf::Vector2f(990, 740), sf::Vector2f(0, 0), sf::Color::Blue, sf::Vector2f(400, 32))
-{
-	m_spawner = spawner;
-	m_lane_angle = 0.f;
 	m_lane_width = m_size.x;
-	m_lane_offset = sf::Vector2f(0.f, LANE_OFFSET_Y);
+	m_lane_offset = 0.f;
+	m_offset_moved = 0.f;
 
-	m_center_delta = 0.f;
-	m_offset_delta = sf::Vector2f(0.f, 0.f);
-
+	m_offset_delta = 0.f;
 	m_width_delta = 0.f;
-	m_angle_delta = 0.f;
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		m_sardine[i] = 0;
+	}
 
 	m_period_clock.restart();
 	m_change_clock.restart();
@@ -48,27 +50,43 @@ Lane::Lane(Spawner* spawner) : GameObject(sf::Vector2f(990, 740), sf::Vector2f(0
 
 bool Lane::CreateNextLanePeriod()
 {
-	if (!m_spawner->m_lane_data.empty())
+	if (!m_lane_data.empty())
 	{
-		float new_angle = m_spawner->m_lane_data.front().m_angle;
-		float new_width = m_spawner->m_lane_data.front().m_width;
-		sf::Vector2f new_offset = sf::Vector2f(m_spawner->m_lane_data.front().m_offset.x, m_spawner->m_lane_data.front().m_offset.y);
-		m_period_counter = m_spawner->m_lane_data.front().m_counter;
+		if (m_first_period)
+		{
+			for (size_t i = 0; i < 4; i++)
+			{
+				m_sardine[i] = m_lane_data.front().m_sardine[i];//always load sardines one lane period in advance, so they can be spawned upfront
+			}
+			m_first_period = false;
+
+			return true;
+		}
+		else
+		{
+			float new_width = m_lane_data.front().m_width;
+			float new_offset = m_lane_data.front().m_offset;
+
+			if (m_lane_data.size() > 1)
+			{
+				for (size_t i = 0; i < 4; i++)
+				{
+					m_sardine[i] = m_lane_data[1].m_sardine[i];//always load sardines one lane period in advance, so they can be spawned upfront
+				}
+			}
+
+			m_lane_data.erase(m_lane_data.begin());
+
+			m_width_delta = new_width - m_lane_width;
+			m_offset_delta = new_offset - m_lane_offset;
+
+			m_change_clock.restart();
+
+			printf("Build new lane period: width:%f, offsetX: %f\n", new_width, new_offset);
+
+			return true;
+		}
 		
-		m_spawner->m_lane_data.erase(m_spawner->m_lane_data.begin());
-
-		//RotateLane(new_angle - m_lane_angle);
-		//ScaleLane(new_width);
-		m_width_delta = new_width - m_lane_width;
-		m_angle_delta = new_angle - m_lane_angle;
-		m_offset_delta.x = new_offset.x - m_lane_offset.x;
-		m_offset_delta.y = LANE_OFFSET_Y + new_offset.y - m_lane_offset.y;
-
-		m_change_clock.restart();
-
-		printf("Build new lane period: width:%f, angle:%f, offsetX: %f, offsetY: %f\n", new_width, new_angle, new_offset.x, new_offset.y);
-
-		return true;
 	}
 	else
 	{
@@ -76,76 +94,61 @@ bool Lane::CreateNextLanePeriod()
 	}
 }
 
+void Lane::CreateSardine(SardineType type)
+{
+	Sardine* new_sardine = new Sardine(type, this);
+
+	//float next_offset_delta = m_lane_data.front().m_offset - m_lane_offset;
+	//new_sardine->setPosition(sf::Vector2f(getPosition().x + next_offset_delta, SWORDFISH_INITIAL_OFFSET_Y - 4.f * 4.f * m_bpm));//spawning in the future X position of the lane
+	
+	new_sardine->setPosition(sf::Vector2f(getPosition().x, SWORDFISH_INITIAL_OFFSET_Y - 2.f * 4.f * m_bpm));//spawning in the future X position of the lane
+	new_sardine->m_speed.y = 4.f*m_bpm;
+
+	(*CurrentGame).addToScene(new_sardine, SardineLayer, SardineObject);
+}
+
 void Lane::update(sf::Time deltaTime)
 {
-	m_center_delta = 0.f;//used to compensate the swordfish's position when the lane is rotating
-
-	if (m_period_clock.getElapsedTime().asSeconds() > LANE_PERIOD_IN_SECONDS)
+	if (m_period_clock.getElapsedTime().asSeconds() > 4.0f * 60.f / m_bpm) // LANE_PERIOD_IN_SECONDS)
 	{
-		m_period_counter--;
-		if (m_period_counter == 0)
-		{
-			if (CreateNextLanePeriod())
-			{
-				m_period_clock.restart();
-			}
-		}
-		else
+		if (CreateNextLanePeriod())
 		{
 			m_period_clock.restart();
 		}
 	}
-
-	//Interpolation to new values of offset, angle and width
-	if (m_change_clock.getElapsedTime().asSeconds() < LANE_CHANGE_IN_SECONDS)
+	
+	//Spawn sardines
+	for (size_t i = 0; i < 4; i++)
 	{
-		ScaleLane(m_lane_width + m_width_delta*deltaTime.asSeconds()/LANE_CHANGE_IN_SECONDS);
-		RotateLane(m_angle_delta*deltaTime.asSeconds() / LANE_CHANGE_IN_SECONDS);
-		m_lane_offset.x += m_offset_delta.x*deltaTime.asSeconds() / LANE_CHANGE_IN_SECONDS;
-		m_lane_offset.y += m_offset_delta.y*deltaTime.asSeconds() / LANE_CHANGE_IN_SECONDS;
+		if (m_period_clock.getElapsedTime().asSeconds() > 1.0f * i * 60.f / m_bpm && m_sardine[i] > 0)
+		{
+			CreateSardine(SardineType_Tap);
+			m_sardine[i] = 0;
+			printf("Create Sardine %d\n", i+1);
+		}
+	}
+
+	//Interpolation to new values of offset and width
+	if (m_change_clock.getElapsedTime().asSeconds() < 4.0f * 60.f / m_bpm) //LANE_CHANGE_IN_SECONDS)
+	{
+		ScaleLane(m_lane_width + m_width_delta*deltaTime.asSeconds() / 1.0f * 60.f / m_bpm); //LANE_CHANGE_IN_SECONDS);
+		m_lane_offset += m_offset_delta*deltaTime.asSeconds() / 1.0f * 60.f / m_bpm; //LANE_CHANGE_IN_SECONDS;
 		//printf("clock: %f\n", m_change_clock.getElapsedTime().asSeconds());
 	}
 	else
 	{
-		m_angle_delta = 0.f;
 		m_width_delta = 0.f;
+		m_offset_delta = 0.f;
 	}
 
-	//RotateLane(10*deltaTime.asSeconds());
-	//ScaleLane(600);
+	//float offset;
+	//offset = offset < 0 ? ceil(offset) : floor(offset);
 
-	//Apply new width, angle and offset
-	sf::Vector2f spawner_pos = sf::Vector2f(m_spawner->getPosition().x, m_spawner->getPosition().y);
-
-	sf::Vector2f offset;
-	float rad_angle = -m_lane_angle * M_PI / 180.f;
-	offset.x = m_lane_offset.y * sin(rad_angle);
-	offset.y = m_lane_offset.y * cos(rad_angle);
-	offset.x = offset.x < 0 ? ceil(offset.x) : floor(offset.x);
-	offset.y = offset.y < 0 ? ceil(offset.y) : floor(offset.y);
-
-	sf::Vector2f old_position = getPosition();
-
-	setPosition(sf::Vector2f(spawner_pos.x + offset.x, spawner_pos.y + offset.y));
-
-	//Stock delta of position and angle in memory for the swordfish to know about them during its update
-	float distance_moved = sqrt((old_position.x - getPosition().x)*(old_position.x - getPosition().x) + (old_position.y - getPosition().y)*(old_position.y - getPosition().y));
-	if (m_angle_delta > 0)
-	{
-		m_center_delta = distance_moved;
-	}
-	else if (m_angle_delta < 0)
-	{
-		m_center_delta = -distance_moved;
-	}
+	float old_position_x = getPosition().x;
+	setPosition(sf::Vector2f(m_initial_position.x + m_lane_offset, m_initial_position.y));
+	m_offset_moved = old_position_x - getPosition().x;
 
 	AnimatedSprite::update(deltaTime);
-}
-
-void Lane::RotateLane(float deg_angle)
-{
-	m_lane_angle += deg_angle;
-	setRotation(m_lane_angle);
 }
 
 void Lane::ScaleLane(float width)
