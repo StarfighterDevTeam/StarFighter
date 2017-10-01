@@ -7,6 +7,8 @@ void InGameState::Initialize(Player player)
 	this->mainWindow = player.m_playerWindow;
 	(*CurrentGame).init(this->mainWindow);
 
+	(*CurrentGame).m_stellarmap = new StellarMap();
+
 	//Loading scripts
 	LoadCSVFiles();
 	
@@ -15,7 +17,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_playerShip = playerShip;
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 
-	Planet* planet = new Planet(sf::Vector2f(MAP_SIZE / 2 - 500, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	Planet* planet = new Planet(sf::Vector2f(MAP_SIZE / 2 - 300, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
 	planet->m_ore_presence_rates["oil"] = 0.9f;
 	planet->m_ore_presence_rates["deuterium"] = 0.1f;
@@ -39,20 +41,21 @@ void InGameState::Initialize(Player player)
 	planet2->Produce("probe", true);
 	planet2->m_identified = true;
 
-	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2, MAP_SIZE/2), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2 + 200, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
 	ore_field->m_ore_presence_rates["iron"] = 0.90f;
 	ore_field->m_ore_presence_rates["silver"] = 0.10f;
 	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 	ore_field->m_display_name = "Champ de minerais";
 	ore_field->m_identified = true;
+	(*CurrentGame).m_stellarmap->SetZoneAsKnown(sf::Vector2u(4, 4));
 
-	OreField* ore_field2 = new OreField(sf::Vector2f(MAP_SIZE / 2 - 100, MAP_SIZE / 2 - 300), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
-	(*CurrentGame).addToScene(ore_field2, LocationLayer, LocationObject);
-	ore_field2->m_ore_presence_rates["gold"] = 0.30f;
-	ore_field2->m_ore_presence_rates["silver"] = 0.70f;
-	ore_field2->m_min_ore_weight = ore_field->GetLightestOreWeight();
-	ore_field2->m_display_name = "Champ de minerais rares";
+	//OreField* ore_field2 = new OreField(sf::Vector2f(MAP_SIZE / 2 - 10, MAP_SIZE / 2 - 300), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
+	//(*CurrentGame).addToScene(ore_field2, LocationLayer, LocationObject);
+	//ore_field2->m_ore_presence_rates["gold"] = 0.30f;
+	//ore_field2->m_ore_presence_rates["silver"] = 0.70f;
+	//ore_field2->m_min_ore_weight = ore_field->GetLightestOreWeight();
+	//ore_field2->m_display_name = "Champ de minerais rares";
 	
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
@@ -68,7 +71,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
-	(*CurrentGame).m_stellarmap = new StellarMap();
+	
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -77,6 +80,7 @@ void InGameState::Update(sf::Time deltaTime)
 	UpdateCamera(deltaTime);
 
 	(*CurrentGame).updateScene(deltaTime);
+	(*CurrentGame).m_stellarmap->update(deltaTime);
 
 	//Create and destroy HUD panels
 	//case 1: destroying a panel

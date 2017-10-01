@@ -212,8 +212,9 @@ void Starship::UpdateZoneKnowledge()
 		{	
 			(*CurrentGame).m_stellarmap->m_known_zones.insert(map<string, bool>::value_type(key, false));
 		}
-		(*CurrentGame).m_stellarmap->m_known_zones[key] = true;
-		(*CurrentGame).m_stellarmap->m_zones[m_current_zone.x][m_current_zone.y]->setOutlineColor(sf::Color(255, 255, 255, 128));
+		(*CurrentGame).m_stellarmap->SetZoneAsKnown(m_current_zone);
+		//(*CurrentGame).m_stellarmap->m_known_zones[key] = true;
+		//(*CurrentGame).m_stellarmap->m_zones[m_current_zone.x][m_current_zone.y]->setOutlineColor(sf::Color(255, 255, 255, 128));
 	
 		(*CurrentGame).m_stellarmap->ExpandKnownStellarMap(m_current_zone);
 	}

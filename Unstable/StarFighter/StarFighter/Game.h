@@ -118,7 +118,6 @@ public:
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
-	bool isVectorEmpty(vector <GameObject*>* vector);
 
 	RenderWindow* m_window;
 	std::list<RectangleShape*> m_sceneFeedbackBars;

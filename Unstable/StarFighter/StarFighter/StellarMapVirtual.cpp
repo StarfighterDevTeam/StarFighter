@@ -6,7 +6,7 @@
 StellarZone::StellarZone()
 {
 	setSize(sf::Vector2f(STELLAR_ZONE_SIZE, STELLAR_ZONE_SIZE));
-	setFillColor(sf::Color(0, 0, 0, 0));
+	setFillColor(sf::Color(0, 0, 0, 255));
 	setOutlineThickness(1);
 	setOutlineColor(sf::Color(0, 0, 255, 128));
 }
@@ -67,8 +67,14 @@ bool StellarMapVirtual::isZoneKnown(string key)
 	return i != m_known_zones.end() && i->second == true;
 }
 
+void StellarMapVirtual::SetZoneAsKnown(sf::Vector2u zone_index)
+{
+	//see override function in StellarMap class
+}
+
 void StellarMapVirtual::ExpandKnownStellarMap(sf::Vector2u zone_index)
 {
+	//generate zones around a designated zone, if they do not exist yet
 	for (size_t i = 0; i <= 2; i++)
 	{
 		for (size_t j = 0; j <= 2; j++)
@@ -76,9 +82,10 @@ void StellarMapVirtual::ExpandKnownStellarMap(sf::Vector2u zone_index)
 			string key = GetVectorString(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1));
 			if (!isZoneGenerated(key))
 			{
-				string key = GetVectorString(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1));
 				m_known_zones.insert(map<string, bool>::value_type(key, false));
-				Location* location = GenerateRandomZoneContent(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1), false);
+
+				//Location* location = GenerateRandomZoneContent(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1), false);
+				GenerateRandomZoneContent(sf::Vector2u(zone_index.x + i - 1, zone_index.y + j - 1), false);
 			}
 		}
 	}
@@ -86,5 +93,6 @@ void StellarMapVirtual::ExpandKnownStellarMap(sf::Vector2u zone_index)
 
 Location* StellarMapVirtual::GenerateRandomZoneContent(sf::Vector2u zone_index, bool visible)
 {
-	return false;
+	//see override function in StellarMap class
+	return NULL;
 }

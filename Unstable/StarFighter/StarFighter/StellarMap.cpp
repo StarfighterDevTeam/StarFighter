@@ -36,6 +36,15 @@ void StellarMap::update(sf::Time deltaTime)
 	
 }
 
+void StellarMap::SetZoneAsKnown(sf::Vector2u zone_index)
+{
+	string key = GetVectorString(zone_index);
+	m_known_zones[key] = true;
+
+	m_zones[zone_index.x][zone_index.y]->m_zone_name.setColor(sf::Color(0, 255, 0, 128));
+	m_zones[zone_index.x][zone_index.y]->setFillColor(sf::Color(255, 255, 255, 28));
+}
+
 Location* StellarMap::GenerateRandomZoneContent(sf::Vector2u zone_index, bool visible)
 {
 	if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < CHANCE_OF_LOCATION_IN_ZONE)

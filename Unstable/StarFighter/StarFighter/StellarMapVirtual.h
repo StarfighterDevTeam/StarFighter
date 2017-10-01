@@ -33,6 +33,7 @@ public :
 	bool isZoneKnown(string key);
 	void ExpandKnownStellarMap(sf::Vector2u zone_index);
 	static string GetVectorString(sf::Vector2u vector);
+	virtual void SetZoneAsKnown(sf::Vector2u zone_index);
 
 	virtual Location* GenerateRandomZoneContent(sf::Vector2u zone_index, bool visible);
 	
