@@ -78,8 +78,6 @@ void InGameState::Update(sf::Time deltaTime)
 
 	(*CurrentGame).updateScene(deltaTime);
 
-	
-
 	//Create and destroy HUD panels
 	//case 1: destroying a panel
 	if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).m_playerShip->m_SFTargetPanel)

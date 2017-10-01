@@ -61,11 +61,14 @@ void Ship::update(sf::Time deltaTime)
 		m_selected_object = NULL;
 	}
 
+	// left click...
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+	sf::Vector2f mousepos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
+	
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
 		// left click...
-		sf::Vector2i mousepos = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
-		setPosition((*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view));
+		setPosition(mousepos);
 		m_hasClicked = true;
 	}
 
@@ -77,6 +80,31 @@ void Ship::update(sf::Time deltaTime)
 	ManageHud(deltaTime);
 
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
+	//mouse scroll ?
+	if (inputs_direction == sf::Vector2f(0, 0))
+	{
+		const float x = (*CurrentGame).m_view.getSize().x / 2;
+		const float y = (*CurrentGame).m_view.getSize().y / 2;
+		const float a = (*CurrentGame).m_view.getCenter().x;
+		const float b = (*CurrentGame).m_view.getCenter().y;
+
+		if (mousepos.x > a + x - MOUSE_SCROLL_MARGIN)
+		{
+			inputs_direction.x = 1.0f;
+		}
+		if (mousepos.x < a - x + MOUSE_SCROLL_MARGIN)
+		{
+			inputs_direction.x = -1.0f;
+		}
+		if (mousepos.y < b - y + MOUSE_SCROLL_MARGIN)
+		{
+			inputs_direction.y = -1.0f;
+		}
+		if (mousepos.y > b + y - MOUSE_SCROLL_MARGIN)
+		{
+			inputs_direction.y = 1.0f;
+		}
+	}
 
 	if (!m_disable_inputs)
 	{
@@ -85,6 +113,10 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
+	//stick to mouse
+	setPosition(mousepos);
+
+	//keyboard move
 	ManageAcceleration(inputs_direction);
 	
 	//Action input

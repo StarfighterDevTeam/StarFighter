@@ -45,7 +45,7 @@ void StockEntity::update(sf::Time deltaTime)
 	}
 	else if (m_hovered)
 	{
-		setColor(sf::Color(255, 255, 255, GHOST_ALPHA_VALUE));
+		setColor(sf::Color(0, 255, 0, GHOST_ALPHA_VALUE));
 	}
 	else
 	{
