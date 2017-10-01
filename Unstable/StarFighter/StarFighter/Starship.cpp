@@ -26,6 +26,16 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_weight = 0;
 	m_total_weight = 0;
 
+	m_scout_circle.setRadius(1);
+	m_scout_circle.setFillColor(sf::Color(0, 0, 255, 20));
+	m_scout_circle.setOutlineThickness(2);
+	m_scout_circle.setOutlineColor(sf::Color(0, 0, 255, 255));
+
+	m_travel_circle.setRadius(1);
+	m_travel_circle.setFillColor(sf::Color(0, 255, 0, 20));
+	m_travel_circle.setOutlineThickness(2);
+	m_travel_circle.setOutlineColor(sf::Color(0, 255, 0, 255));
+
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
 		if ((size_t)stoi(i->second[OreData_Propulsion]) > 0)
@@ -141,6 +151,31 @@ void Starship::update(sf::Time deltaTime)
 	}
 
 	StockEntity::update(deltaTime);
+
+	m_scout_circle.setRadius(m_scout_range);
+	m_scout_circle.setPosition(sf::Vector2f(getPosition().x - m_scout_range, getPosition().y - m_scout_range));
+
+	float propulsion_available = 300;
+	m_travel_circle.setRadius(propulsion_available);
+	m_travel_circle.setPosition(sf::Vector2f(getPosition().x - propulsion_available, getPosition().y - propulsion_available));
+}
+
+void Starship::Draw(sf::RenderTexture& screen)
+{
+	if (m_selected && m_visible)
+	{
+		if (m_scout_range > 0 && (m_state == StarshipState_MovingToZone))
+		{
+			screen.draw(m_scout_circle);
+		}
+		
+		if (m_state != StarshipState_MovingToZone)
+		{
+			screen.draw(m_travel_circle);
+		}
+	}
+
+	GameObject::Draw(screen);
 }
 
 void Starship::SetStarshipState(StarshipState state)
@@ -149,10 +184,14 @@ void Starship::SetStarshipState(StarshipState state)
 
 	switch (state)
 	{
-		case StarshipState_MovingToLocation:
-		{
-			break;
-		}
+		//case StarshipState_MovingToLocation:
+		//{
+		//	break;
+		//}
+		//case StarshipState_MovingToZone:
+		//{
+		//	break;
+		//}
 		case StarshipState_Drilling:
 		{
 			m_drill_clock.restart();

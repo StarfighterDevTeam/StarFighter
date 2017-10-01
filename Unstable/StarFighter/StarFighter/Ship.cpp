@@ -145,7 +145,9 @@ void Ship::update(sf::Time deltaTime)
 		}
 		else if (starship->m_scout_range > 0)
 		{
+			//cruise to zone
 			starship->setPosition(getPosition());
+			starship->SetStarshipState(StarshipState_MovingToZone);
 		}
 	}
 

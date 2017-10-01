@@ -8,6 +8,7 @@ enum StarshipState
 {
 	StarshipState_Idle,
 	StarshipState_MovingToLocation,
+	StarshipState_MovingToZone,
 	StarshipState_Searching,
 	StarshipState_Drilling,
 	StarshipState_Extracting,
@@ -24,6 +25,7 @@ public :
 	Starship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
 	virtual ~Starship();
 	void update(sf::Time deltaTime) override;
+	void Draw(sf::RenderTexture& screen);
 
 	static Starship* CreateStarship(string name);
 
@@ -79,6 +81,9 @@ public :
 	sf::Clock m_extraction_clock;
 	Ore* m_ore_found;
 	sf::Clock m_scan_clock;
+
+	CircleShape m_scout_circle;
+	CircleShape m_travel_circle;
 };
 
 #endif // STARSHIP_H_INCLUDED
