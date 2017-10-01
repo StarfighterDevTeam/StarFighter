@@ -284,7 +284,8 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	//	m_actions_with_selection->AddOption(ss.str(), (*CurrentGame).m_font[Font_Arial]);
 	//}
 
-	sf::Vector2f position = sf::Vector2f(size.x / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + playerShip->getPosition().x, size.y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + playerShip->getPosition().y);
+	sf::Vector2f position = sf::Vector2f(size.x / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + (*CurrentGame).m_view.getCenter().x, size.y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + (*CurrentGame).m_view.getCenter().y);
+	//sf::Vector2f position = sf::Vector2f((*CurrentGame).m_view.getCenter().x, (*CurrentGame).m_view.getCenter().y);
 	setPosition(position.x, position.y);
 
 	//positioning of panel's content
@@ -304,7 +305,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	text_height += m_text.getGlobalBounds().height;
 	setSize(sf::Vector2f(getSize().x, text_height));
 	setOrigin(sf::Vector2f(getOrigin().x, text_height / 2));
-	sf::Vector2f position_new = sf::Vector2f(getPosition().x, getSize().y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + m_playerShip->getPosition().y);
+	sf::Vector2f position_new = sf::Vector2f(getPosition().x, getSize().y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + (*CurrentGame).m_view.getCenter().y);
 	setPosition(position_new.x, position_new.y);
 }
 

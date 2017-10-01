@@ -73,10 +73,12 @@ void InGameState::Initialize(Player player)
 
 void InGameState::Update(sf::Time deltaTime)
 {
-	(*CurrentGame).updateScene(deltaTime);
-
 	//move camera
 	UpdateCamera(deltaTime);
+
+	(*CurrentGame).updateScene(deltaTime);
+
+	
 
 	//Create and destroy HUD panels
 	//case 1: destroying a panel
