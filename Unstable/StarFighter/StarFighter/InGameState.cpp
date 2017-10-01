@@ -119,8 +119,8 @@ void InGameState::UpdateCamera(sf::Time deltaTime)
 	//Map border constraints
 	const float x = (*CurrentGame).m_view.getSize().x / 2;
 	const float y = (*CurrentGame).m_view.getSize().y / 2;
-	const float a = (*CurrentGame).m_playerShip->getPosition().x;
-	const float b = (*CurrentGame).m_playerShip->getPosition().y;
+	const float a = (*CurrentGame).m_view.getCenter().x;
+	const float b = (*CurrentGame).m_view.getCenter().y;
 	if (a < x)
 		(*CurrentGame).m_view.setCenter(x, (*CurrentGame).m_view.getCenter().y);
 	if (a >(*CurrentGame).m_map_size.x - x)
