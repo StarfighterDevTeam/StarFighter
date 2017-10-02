@@ -67,7 +67,6 @@ void Ship::update(sf::Time deltaTime)
 	
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
-		// left click...
 		setPosition(mousepos);
 		m_hasClicked = true;
 	}

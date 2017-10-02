@@ -155,9 +155,10 @@ void Starship::update(sf::Time deltaTime)
 	m_scout_circle.setRadius(m_scout_range);
 	m_scout_circle.setPosition(sf::Vector2f(getPosition().x - m_scout_range, getPosition().y - m_scout_range));
 
-	float propulsion_available = 300;
-	m_travel_circle.setRadius(propulsion_available);
-	m_travel_circle.setPosition(sf::Vector2f(getPosition().x - propulsion_available, getPosition().y - propulsion_available));
+	float propulsion_available = GetPropulsionAvailable();
+	float propulsion_radius = propulsion_available * LIGHTYEAR_IN_PIXELS;
+	m_travel_circle.setRadius(propulsion_radius);
+	m_travel_circle.setPosition(sf::Vector2f(getPosition().x - propulsion_radius, getPosition().y - propulsion_radius));
 }
 
 void Starship::Draw(sf::RenderTexture& screen)
@@ -293,6 +294,7 @@ size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion
 		assigned_storage[i->first] = 0;
 	}
 
+	//fill the required propulsion with the best fuel type available, recursively
 	while (!fuel_type_selected.empty() && propulsion_required > 0)
 	{
 		size_t quantity_assigned = MinBetweenSizeTValues(virtual_storage[fuel_type_selected], propulsion_required / (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]));
@@ -430,51 +432,37 @@ bool Starship::AssignToLocation(StockEntity* location)
 		return false;
 	}
 
-	if (m_scout_range > 0 && !m_task_location)
+	if (!MoveToLocation(location))
+	{
+		return false;
+	}
+
+	if (m_scout_range > 0 && !m_task_location)//scout mission?
 	{
 		if (!location->m_identified)
 		{
 			//accept task (and there is no coming back)
-			if (MoveToLocation(location))
-			{
-				m_task_location = location;
-			}
+			m_task_location = location;
 		}
 	}
-	else if (m_target_location == m_task_location)//forth
+	else if (m_target_location != m_base_location)//change base location?
 	{	
 		if (location->CanSupplyFuel())
 		{
 			//go to planet and cancel task
-			if (MoveToLocation(location))
-			{
-				m_base_location = location;
-				m_task_location = NULL;
-			}
+			m_task_location = NULL;
 		}
 
-		if (location->CanBeDrilled())
+		if (location->CanBeDrilled())//new drilling task?
 		{
 			//accept new task?
-			if (MoveToLocation(location))
-			{
-				m_task_location = location;
-				m_task_location = NULL;
-			}
-			
+			m_task_location = location;
+			m_task_location = NULL;
 		}
 	}
-	else if (m_target_location == m_base_location)//back
+	else if (m_target_location != m_task_location)//new drilling task?
 	{
-		if (location->CanSupplyFuel())
-		{
-			//accept new base?
-			if (MoveToLocation(location))
-			{
-				m_base_location = location;
-			}
-		}
-		else if (location->CanBeDrilled())
+		if (location->CanBeDrilled())
 		{
 			//accept new next task
 			m_task_location = location;
@@ -763,4 +751,62 @@ size_t Starship::GetPropulsionRequired(GameObject* destination)
 	propulsion_required *= GetTotalWeight();
 
 	return propulsion_required;
+}
+
+size_t Starship::GetPropulsionAvailable()
+{
+	size_t propulsion_available = 0;
+	size_t fuel = 0;
+
+	//fuel in ship's tanks
+	for (map<string, size_t>::iterator i = m_fuel_tanks.begin(); i != m_fuel_tanks.end(); ++i)
+	{
+		propulsion_available += i->second * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		fuel += i->second * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+	}
+	for (map<string, size_t>::iterator i = m_fuel_assigned.begin(); i != m_fuel_assigned.end(); ++i)
+	{
+		propulsion_available += i->second * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		fuel += i->second * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+	}
+
+	//fuel from current location
+	StockEntity* location = NULL;
+	if (m_state == StarshipState_Idle || m_state == StarshipState_Unloading)
+	{
+		location = m_base_location;
+	}
+	else if (m_state == StarshipState_Loading || m_state == StarshipState_Drilling || m_state == StarshipState_Extracting || m_state == StarshipState_Searching)
+	{
+		location = m_task_location;
+	}
+	if (location)
+	{
+		map<string, size_t> virtual_storage = location->m_fuel_tanks;
+
+		string fuel_type_selected = location->GetBestPropulsionAvailable();
+		
+		while (!fuel_type_selected.empty() && fuel < GetFuelMax())
+		{
+			size_t fuel_required = GetFuelMax() - fuel;
+			size_t quantity_assigned = MinBetweenSizeTValues(virtual_storage[fuel_type_selected], fuel_required / (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]));
+			virtual_storage[fuel_type_selected] -= quantity_assigned;
+			fuel += quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Weight]);
+			propulsion_available += quantity_assigned * (size_t)stoi((*CurrentGame).m_oreConfig[fuel_type_selected][OreData_Propulsion]);
+
+			if (fuel < GetFuelMax())
+			{
+				if (fuel_type_selected == StockEntity::GetBestPropulsionAvailable(virtual_storage))
+				{
+					break;
+				}
+				else
+				{
+					fuel_type_selected = StockEntity::GetBestPropulsionAvailable(virtual_storage);
+				}
+			}
+		}
+	}
+	
+	return propulsion_available;
 }

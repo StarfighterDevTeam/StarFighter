@@ -98,6 +98,12 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 			ss_text << "Fuel: " << entity->m_fuel << " / " << entity->GetFuelMax() << contains_fuel;
 		}
 
+		if (entity->m_collider_type == StarshipObject)
+		{
+			Starship* starship = (Starship*)entity;
+			ss_text << "\nPropulsion available: " << starship->GetPropulsionAvailable();
+		}
+		
 		//drill rates
 		if (entity->m_collider_type == LocationObject)
 		{
@@ -197,7 +203,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 		}
 	}
 
-	//distance
+	//distance to destination
 	if (playerShip->m_selected_object && playerShip->m_selected_object->m_collider_type == StarshipObject)
 	{
 		Starship* starship = (Starship*)playerShip->m_selected_object;
@@ -216,19 +222,11 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 					Starship* starship = (Starship*)playerShip->m_selected_object;
 					//size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, starship->m_base_location);
 					//size_t propulsion_required = entity->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
+					size_t propulsion_available = starship->GetPropulsionAvailable();
 					size_t propulsion_required = starship->GetPropulsionRequired(destination);
-					size_t propulsion_missing = starship->m_propulsion + starship->m_propulsion_assigned > propulsion_required ? 0 : propulsion_required - starship->m_propulsion - starship->m_propulsion_assigned;
-					ss_text << "\nPropulsion available: ";
 
-					if (propulsion_missing == 0)
-					{
-						ss_text << starship->m_propulsion + starship->m_propulsion_assigned;
-					}
-					else
-					{
-						ss_text << propulsion_missing - starship->LoadRequiredPropulsion(starship->m_base_location, propulsion_missing, true);
-					}
-					ss_text << " / " << propulsion_required << " required";
+					size_t propulsion_missing = starship->m_propulsion + starship->m_propulsion_assigned > propulsion_required ? 0 : propulsion_required - starship->m_propulsion - starship->m_propulsion_assigned;
+					ss_text << "\nPropulsion available: " << propulsion_available << " / " << propulsion_required << " required";
 
 					if (!starship->m_arrived_at_distination)
 					{

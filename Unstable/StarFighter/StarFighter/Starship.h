@@ -45,6 +45,7 @@ public :
 	string GetBestAssignedPropulsionAvailable();
 	size_t GetTotalWeight();
 	size_t GetPropulsionRequired(GameObject* destination);
+	size_t GetPropulsionAvailable();
 
 	sf::Vector2u GetCurrentZone();
 	void UpdateZoneKnowledge();
