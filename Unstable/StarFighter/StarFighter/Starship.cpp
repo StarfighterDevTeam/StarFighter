@@ -156,7 +156,7 @@ void Starship::update(sf::Time deltaTime)
 	m_scout_circle.setPosition(sf::Vector2f(getPosition().x - m_scout_range, getPosition().y - m_scout_range));
 
 	float propulsion_available = GetPropulsionAvailable();
-	float propulsion_radius = propulsion_available * LIGHTYEAR_IN_PIXELS;
+	float propulsion_radius = propulsion_available * LIGHTYEAR_IN_PIXELS / GetTotalWeight();
 	m_travel_circle.setRadius(propulsion_radius);
 	m_travel_circle.setPosition(sf::Vector2f(getPosition().x - propulsion_radius, getPosition().y - propulsion_radius));
 }

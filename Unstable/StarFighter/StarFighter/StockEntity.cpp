@@ -132,11 +132,15 @@ size_t StockEntity::LoadFuel(string ore_name, size_t quantity)
 
 	size_t quantity_accepted = (GetFuelMax() - m_fuel) / (size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
 	size_t quantity_loaded = MinBetweenSizeTValues(quantity_accepted, quantity);
-	m_fuel_tanks[ore_name] += quantity_loaded;
-	m_fuel += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
 
-	printf("Fuel loading: stock (%d/%d), %s quantity loaded / %d: %d.\n", m_fuel, m_fuel_max, ore_name.c_str(), quantity_loaded, quantity);
+	if (quantity_loaded > 0)
+	{
+		m_fuel_tanks[ore_name] += quantity_loaded;
+		m_fuel += quantity_loaded*(size_t)stoi((*CurrentGame).m_oreConfig[ore_name][OreData_Weight]);
 
+		printf("Fuel loading: stock (%d/%d), %s quantity loaded / %d: %d.\n", m_fuel, m_fuel_max, ore_name.c_str(), quantity_loaded, quantity);
+	}
+	
 	return quantity_loaded;
 }
 

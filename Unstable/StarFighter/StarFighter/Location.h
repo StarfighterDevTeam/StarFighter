@@ -31,7 +31,7 @@ public:
 	void update(sf::Time deltaTime) override;
 
 	bool Build(string name, bool ignore_cost);
-	bool Produce(string name, bool ignore_cost);
+	Starship* Produce(string name, bool ignore_cost);
 	size_t GetNbSlotsTaken();
 	void Harvest();
 	bool CanSupplyFuel() override;

@@ -91,8 +91,8 @@ Location* StellarMap::GenerateRandomZoneContent(sf::Vector2u zone_index, bool vi
 		(*CurrentGame).addToScene(planet, LocationLayer, LocationObject);
 		planet->m_ore_presence_rates["oil"] = 1.0f;
 		planet->m_ore_presence_rates["deuterium"] = 0.1f;
-		planet->Build("refinery", true);
-		planet->Build("refinery", true);
+		//planet->Build("refinery", true);
+		//planet->Build("refinery", true);
 		planet->Build("factory", true);
 		planet->Load("oil", 50);
 		planet->Load("deuterium", 30);

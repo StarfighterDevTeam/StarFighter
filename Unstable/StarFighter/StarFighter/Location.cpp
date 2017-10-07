@@ -214,7 +214,7 @@ bool Planet::Build(string name, bool ignore_cost)
 	return true;
 }
 
-bool Planet::Produce(string name, bool ignore_cost)
+Starship* Planet::Produce(string name, bool ignore_cost)
 {
 	//check production capacity
 	if (!ignore_cost)
@@ -231,7 +231,7 @@ bool Planet::Produce(string name, bool ignore_cost)
 
 		if (nb_productions == 0)
 		{
-			return false;
+			return NULL;
 		}
 	}
 
@@ -240,11 +240,11 @@ bool Planet::Produce(string name, bool ignore_cost)
 	{
 		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].empty() && m_ores_stocked[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity1]))
 		{
-			return false;
+			return NULL;
 		}
 		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].empty() && m_ores_stocked[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]))
 		{
-			return false;
+			return NULL;
 		}
 	}
 
@@ -268,7 +268,7 @@ bool Planet::Produce(string name, bool ignore_cost)
 		}
 	}
 
-	return true;
+	return new_starship;
 }
 
 void Planet::Harvest()

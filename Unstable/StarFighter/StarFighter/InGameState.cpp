@@ -25,9 +25,11 @@ void InGameState::Initialize(Player player)
 	planet->Build("refinery", true);
 	planet->Build("factory", true);
 	planet->Build("ore_container", true);
-	planet->Produce("miner", true);
-	planet->Load("oil", 50);
-	planet->Load("deuterium", 30);
+	planet->Build("fuel_tanks", true);
+	Starship* miner = planet->Produce("miner", true);
+	miner->Load("oil", 5);
+	//planet->Load("oil", 50);
+	//planet->Load("deuterium", 30);
 	planet->m_display_name = "Planète mère";
 	planet->m_identified = true;
 
@@ -35,7 +37,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(planet2, LocationLayer, LocationObject);
 	planet2->m_ore_presence_rates["oil"] = 0.5f;
 	planet2->m_ore_presence_rates["deuterium"] = 0.5f;
-	planet2->Build("refinery", true);
+	//planet2->Build("refinery", true);
 	planet2->Build("ore_container", true);
 	planet2->Load("oil", 50);
 	planet2->Load("deuterium", 30);
