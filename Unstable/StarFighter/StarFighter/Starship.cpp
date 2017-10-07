@@ -457,7 +457,6 @@ bool Starship::AssignToLocation(StockEntity* location)
 		{
 			//accept new task?
 			m_task_location = location;
-			m_task_location = NULL;
 		}
 	}
 	else if (m_target_location != m_task_location)//new drilling task?

@@ -70,7 +70,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define INTERACTION_INTERBLOCK					20
 #define SFPANEL_SPECIFIC_WIDTH					380
 #define SFPANEL_SPECIFIC_HEIGHT					250
-#define MOUSE_SCROLL_MARGIN						10.f
+#define MOUSE_SCROLL_MARGIN						100.f
 
 //CSV DATA
 #define ORE_CSV_FILE							"Scripts/Generated/Ore.csv"
