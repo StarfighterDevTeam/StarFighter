@@ -291,7 +291,10 @@ size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion
 	map<string, size_t> assigned_storage;
 	for (map<string, vector<string> >::iterator i = (*CurrentGame).m_oreConfig.begin(); i != (*CurrentGame).m_oreConfig.end(); ++i)
 	{
-		assigned_storage[i->first] = 0;
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > 0)
+		{
+			assigned_storage[i->first] = 0;
+		}
 	}
 
 	//fill the required propulsion with the best fuel type available, recursively
@@ -494,7 +497,7 @@ bool Starship::MoveToLocation(StockEntity* location)
 		size_t propulsion_missing = LoadRequiredPropulsion(m_base_location, propulsion_required - m_propulsion, false);
 		if (propulsion_missing > 0)
 		{
-			printf("Trying to assign to location too far: distance is %d, propulsion remaining is %d (%d missing).\n", distance, m_propulsion, propulsion_missing);
+			//printf("Trying to assign to location too far: distance is %d, propulsion remaining is %d (%d missing).\n", distance, m_propulsion, propulsion_missing);
 			return false;
 		}
 	}

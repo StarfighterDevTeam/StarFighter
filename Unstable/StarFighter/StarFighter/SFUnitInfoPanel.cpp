@@ -314,7 +314,7 @@ SFUnitInfoPanel::~SFUnitInfoPanel()
 
 void SFUnitInfoPanel::Update(sf::Time deltaTime)
 {
-	
+
 }
 
 void SFUnitInfoPanel::Draw(sf::RenderTexture& screen)
