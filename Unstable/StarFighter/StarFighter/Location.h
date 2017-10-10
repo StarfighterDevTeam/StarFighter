@@ -35,7 +35,7 @@ public:
 	size_t GetNbSlotsTaken();
 	void Harvest();
 	bool CanSupplyFuel() override;
-	size_t GetStockMax() override;
+	size_t GetOreMax() override;
 	size_t GetFuelMax() override;
 
 	size_t m_building_slots;

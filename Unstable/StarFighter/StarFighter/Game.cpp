@@ -619,3 +619,8 @@ bool Game::RevealObjectsAtPosition(sf::Vector2f position, float range, GameObjec
 		return false;//not supported
 	}
 }
+
+bool Game::IsFuel(string ore_name)
+{
+	return (size_t)stoi(m_oreConfig[ore_name][OreData_Propulsion]) > 0;
+}

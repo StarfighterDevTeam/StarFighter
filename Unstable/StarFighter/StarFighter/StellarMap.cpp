@@ -94,8 +94,8 @@ Location* StellarMap::GenerateRandomZoneContent(sf::Vector2u zone_index, bool vi
 		//planet->Build("refinery", true);
 		//planet->Build("refinery", true);
 		planet->Build("factory", true);
-		planet->Load("oil", 50);
-		planet->Load("deuterium", 30);
+		planet->LoadInStock("oil", 50);
+		planet->LoadInStock("deuterium", 30);
 		planet->m_display_name = "Planète mère";
 		planet->m_visible = visible;
 

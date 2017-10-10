@@ -61,10 +61,11 @@ enum StarshipData
 	StarshipData_OreCostType2,
 	StarshipData_OreCostQuantity2,
 	StarshipData_Armor,
-	StarshipData_FuelMax,
+	StarshipData_FuelTankMax,
 	StarshipData_Weight,
 	StarshipData_SpeedMax,
-	StarshipData_StockMax,
+	StarshipData_OreStockMax,
+	StarshipData_FuelStockMax,
 	StarshipData_NbDrills,
 	StarshipData_DrillDuration,//Miner specifics
 	StarshipData_DrillSuccessRateBonus,

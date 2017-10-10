@@ -135,11 +135,11 @@ void Ship::update(sf::Time deltaTime)
 
 			if (starship->m_scout_range > 0)
 			{
-				starship->AssignToLocation(location);
+				//starship->AssignToLocation(location);
 			}
 			else if (starship->m_nb_drills > 0)
 			{
-				starship->AssignToLocation(location);
+				//starship->AssignToLocation(location);
 			}
 		}
 		else if (starship->m_scout_range > 0)

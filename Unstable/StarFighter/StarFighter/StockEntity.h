@@ -15,30 +15,25 @@ public :
 
 	string GetBestPropulsionAvailable();
 	static string GetBestPropulsionAvailable(map<string, size_t> fuel_tank);
-	size_t LoadOre(string ore_name, size_t quantity);
-	size_t Load(string ore_name, size_t quantity);
+	size_t LoadInStock(string resource_name, size_t quantity);
 	virtual bool CanSupplyFuel();
 	bool CanBeDrilled();
-	size_t GetLightestOreWeight();
-	string GetMostExpansiveOreAvailable();
-	Ore* GetRandomOre(bool ore_with_propulsion = true, bool ore_without_propulsion = true);
+	Ore* DigRandomOre(bool can_be_fuel = true, bool can_be_ore = true);
 	void UnloadCarriage(StockEntity* location);
-	virtual size_t LoadFuel(string ore_name, size_t quantity);
-	virtual size_t GetStockMax();
+	virtual size_t GetOreMax();
 	virtual size_t GetFuelMax();
 
 	bool m_identified;
 
 	string m_display_name;
 
-	size_t m_stock_max;
-	size_t m_stock;
-	std::map<string, size_t> m_ores_stocked;
-	size_t m_min_ore_weight;
+	size_t m_ore_stock_max;
+	size_t m_current_ore_stock;
+	std::map<string, size_t> m_ore_stock;
 
-	size_t m_fuel;
-	size_t m_fuel_max;
-	map<string, size_t> m_fuel_tanks;
+	size_t m_fuel_stock_max;
+	size_t m_current_fuel_stock;
+	map<string, size_t> m_fuel_stock;
 	
 	map<string, float> m_ore_presence_rates;
 

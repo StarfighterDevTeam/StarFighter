@@ -27,7 +27,7 @@ void InGameState::Initialize(Player player)
 	planet->Build("ore_container", true);
 	planet->Build("fuel_tanks", true);
 	Starship* miner = planet->Produce("miner", true);
-	miner->Load("oil", 5);
+	miner->LoadFuelTank("oil", 100);
 	//planet->Load("oil", 50);
 	//planet->Load("deuterium", 30);
 	planet->m_display_name = "Planète mère";
@@ -39,8 +39,10 @@ void InGameState::Initialize(Player player)
 	planet2->m_ore_presence_rates["deuterium"] = 0.5f;
 	//planet2->Build("refinery", true);
 	planet2->Build("ore_container", true);
-	planet2->Load("oil", 50);
-	planet2->Load("deuterium", 30);
+	planet2->LoadInStock("oil", 50);
+	planet2->LoadInStock("deuterium", 30);
+	planet2->LoadInStock("iron", 30);
+	planet2->LoadInStock("silver", 30);
 	planet2->m_display_name = "Colonie";
 	planet2->Produce("probe", true);
 	planet2->m_identified = true;
@@ -49,7 +51,6 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);
 	ore_field->m_ore_presence_rates["iron"] = 0.90f;
 	ore_field->m_ore_presence_rates["silver"] = 0.10f;
-	ore_field->m_min_ore_weight = ore_field->GetLightestOreWeight();
 	ore_field->m_display_name = "Champ de minerais";
 	ore_field->m_identified = true;
 	(*CurrentGame).m_stellarmap->SetZoneAsKnown(sf::Vector2u(4, 4));

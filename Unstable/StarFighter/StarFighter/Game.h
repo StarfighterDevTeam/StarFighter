@@ -109,6 +109,7 @@ public:
 	//StarMiner specific
 	StellarMapVirtual* m_stellarmap;
 	bool RevealObjectsAtPosition(sf::Vector2f position, float range, GameObjectType type);
+	bool IsFuel(string ore_name);
 
 	//CSV data
 	map<string, vector<string> > m_oreConfig;

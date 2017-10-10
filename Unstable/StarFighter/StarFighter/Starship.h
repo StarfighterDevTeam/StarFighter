@@ -29,23 +29,22 @@ public :
 
 	static Starship* CreateStarship(string name);
 
-	bool AssignToLocation(StockEntity* location);
-	bool MoveToLocation(StockEntity* location);
-	size_t LoadFuel(string ore_name, size_t quantity) override;
-	size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation);
-	size_t AssignPropulsionToTravel(size_t distance);
-	size_t ConsummePropulsion(size_t propulsion_to_consumme);
-	bool ManagePropulsion();
+	//bool AssignToLocation(StockEntity* location);
+	//bool AssignMission(StockEntity* location);
+	//bool MoveToLocation(StockEntity* location);
+	size_t LoadFuelTank(string fuel_name, size_t quantity);
+	//size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation);
+	//size_t AssignPropulsionToTravel(size_t distance);
+	//size_t ConsummePropulsion(size_t propulsion_to_consumme);
+	//bool ManagePropulsion();
 	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
 	void SetStarshipState(StarshipState state);
 	void Drill();
 	void Scan();
 	void Extract(Ore* ore);
 	bool IsNewDrillAttemptAvailable();
-	string GetBestAssignedPropulsionAvailable();
-	size_t GetTotalWeight();
+	//string GetBestAssignedPropulsionAvailable();
 	size_t GetPropulsionRequired(GameObject* destination);
-	size_t GetPropulsionAvailable();
 
 	sf::Vector2u GetCurrentZone();
 	void UpdateZoneKnowledge();
@@ -53,25 +52,25 @@ public :
 
 	sf::Vector2u m_current_zone;
 
-	StockEntity* m_target_location;
+	StockEntity* m_current_destination;
 	StockEntity* m_base_location;
-	StockEntity* m_task_location;
+	StockEntity* m_mission_location;
+	StockEntity* m_current_location;
 
 	StarshipState m_state;
-	size_t m_propulsion_assigned;
 	bool m_arrived_at_distination;
 	map<string, size_t> m_cost;
 	float m_scout_range;
+	pair<string, size_t> m_fuel_tank;
+	size_t m_fuel_tank_max;
 
 	//Weapon* m_weapon;
 	int m_armor;
 	int m_armor_max;
 	float m_speed_max;
 	size_t m_weight;
-	size_t m_total_weight;
 	size_t m_propulsion;
 	string m_current_fuel_type;
-	map<string, size_t> m_fuel_assigned;
 	float m_propulsion_speed_bonus;
 	size_t m_nb_drills;
 	float m_drill_sucess_rate_bonus;
