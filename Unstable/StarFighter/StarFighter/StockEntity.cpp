@@ -92,23 +92,23 @@ size_t StockEntity::LoadInStock(string resource_name, size_t quantity)
 {
 	bool is_fuel = (*CurrentGame).IsFuel(resource_name);
 
+	size_t ore_weight = (size_t)stoi((*CurrentGame).m_oreConfig[resource_name][OreData_Weight]);
+
 	if (is_fuel)
 	{
 		//load no more than the max
-		GetFuelMax();
-		size_t quantity_accepted = quantity > m_fuel_stock_max - m_current_fuel_stock ? m_fuel_stock_max - m_current_fuel_stock : quantity;
+		GetFuelMax();//update max value
+		size_t quantity_accepted = quantity * ore_weight > m_fuel_stock_max - m_current_fuel_stock ? (m_fuel_stock_max - m_current_fuel_stock) / ore_weight : quantity;
 		m_fuel_stock[resource_name] += quantity_accepted;
-		m_current_fuel_stock += quantity_accepted;
+		m_current_fuel_stock += quantity_accepted * ore_weight;
 
 		return quantity_accepted;
 	}
 	else
 	{
 		//load no more than the max
-		size_t ore_weight = (size_t)stoi((*CurrentGame).m_oreConfig[resource_name][OreData_Weight]);
-
-		GetOreMax();
-		size_t quantity_accepted = quantity*ore_weight > (m_ore_stock_max - m_current_ore_stock) ? (m_ore_stock_max - m_current_ore_stock) / ore_weight : quantity;
+		GetOreMax();//update max value
+		size_t quantity_accepted = quantity * ore_weight > (m_ore_stock_max - m_current_ore_stock) ? (m_ore_stock_max - m_current_ore_stock) / ore_weight : quantity;
 		m_ore_stock[resource_name] += quantity_accepted;
 		m_current_ore_stock += quantity_accepted * ore_weight;
 

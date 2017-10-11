@@ -53,9 +53,9 @@ public :
 	sf::Vector2u m_current_zone;
 
 	StockEntity* m_current_destination;
-	StockEntity* m_base_location;
-	StockEntity* m_mission_location;
 	StockEntity* m_current_location;
+	StockEntity* m_mission_base_location;
+	StockEntity* m_mission_task_location;
 
 	StarshipState m_state;
 	bool m_arrived_at_distination;

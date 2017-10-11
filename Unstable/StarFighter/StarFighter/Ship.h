@@ -20,7 +20,7 @@
 enum PlayerActions
 {
 	Action_Idle,
-	Action_Firing,
+	Action_Select,
 	Action_Assigning,
 	Action_Muting,
 	Action_Pausing,
@@ -73,7 +73,6 @@ public :
 
 	GameObject* m_hovered_object;
 	GameObject* m_selected_object;
-	bool m_hasClicked;
 
 	void HoverObject(GameObject* object) override;
 	void SelectObject(GameObject* object);

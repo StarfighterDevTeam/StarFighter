@@ -1,10 +1,10 @@
 #include "InputGuy.h"
 
-bool InputGuy::isFiring(ControlerType device)
+bool InputGuy::isSelecting(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			return true;
 		}

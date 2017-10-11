@@ -50,8 +50,7 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	m_hasClicked = false;
-
+	//cleaning selection and highlight from elements that are going to be garbaged next frame
 	if (m_hovered_object && m_hovered_object->m_GarbageMe)
 	{
 		m_hovered_object = NULL;
@@ -61,25 +60,15 @@ void Ship::update(sf::Time deltaTime)
 		m_selected_object = NULL;
 	}
 
-	// left click...
+	//get mouse coordinates
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
 	sf::Vector2f mousepos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
-	
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		setPosition(mousepos);
-		m_hasClicked = true;
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		SelectObject((*CurrentGame).GetSceneGameObjectsTyped(StarshipObject).front());
-	}
 
 	ManageHud(deltaTime);
 
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
-	//mouse scroll ?
+
+	//mouse scroll on screen borders
 	if (inputs_direction == sf::Vector2f(0, 0))
 	{
 		const float x = (*CurrentGame).m_view.getSize().x / 2;
@@ -112,18 +101,19 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	//stick to mouse
+	//cursor sticks to mouse at all time
 	setPosition(mousepos);
 
-	//keyboard move
+	//keyboard moves camera
 	ManageAcceleration(inputs_direction);
 	
-	//Action input
+	//Get action inputs
 	UpdateInputStates();
-	//if (m_inputs_states[Action_Firing] == Input_Tap)
-	if (m_hasClicked)
+	
+	//Selection
+	if (m_inputs_states[Action_Select] == Input_Tap)
 	{
-		SelectObject(m_hovered_object);
+		SelectObject(m_hovered_object);//this function resists null ptr
 	}
 	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object && m_selected_object->m_collider_type == StarshipObject)
 	{
@@ -308,7 +298,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 void Ship::UpdateInputStates()
 {
-	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isSelecting(), Action_Select);
 	GetInputState(InputGuy::isAssigning(), Action_Assigning);
 }
 

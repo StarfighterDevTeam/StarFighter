@@ -16,8 +16,8 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_speed_max = 100;
 	m_nb_drills = 0;
 	m_current_destination = NULL;
-	m_base_location = NULL;
-	m_mission_location = NULL;
+	m_mission_base_location = NULL;
+	m_mission_task_location = NULL;
 	m_current_location = NULL;
 	m_arrived_at_distination = true;
 	m_propulsion = 0;
@@ -83,9 +83,9 @@ void Starship::update(sf::Time deltaTime)
 		}
 		case StarshipState_Idle:
 		{
-			if (m_mission_location)
+			if (m_mission_task_location)
 			{
-				//MoveToLocation(m_mission_location);
+				//MoveToLocation(m_mission_task_location);
 			}
 			break;
 		}
@@ -110,7 +110,7 @@ void Starship::update(sf::Time deltaTime)
 			else
 			{
 				m_current_destination->UnloadCarriage(this);//Loading
-				//MoveToLocation(m_base_location);
+				//MoveToLocation(m_mission_base_location);
 			}
 			
 			break;
@@ -119,7 +119,7 @@ void Starship::update(sf::Time deltaTime)
 		{
 			//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).front();
 			//StockEntity* tmp_location = (StockEntity*)tmp_obj;
-			//MoveToLocation(m_base_location);
+			//MoveToLocation(m_mission_base_location);
 			//MoveToLocation(tmp_location);
 			break;
 		}
@@ -130,7 +130,7 @@ void Starship::update(sf::Time deltaTime)
 
 			//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
 			//StockEntity* tmp_location = (StockEntity*)tmp_obj;
-			//if (!MoveToLocation(m_mission_location))
+			//if (!MoveToLocation(m_mission_task_location))
 			//{
 			//	SetStarshipState(StarshipState_Idle);
 			//}
@@ -443,34 +443,34 @@ bool Starship::AssignToLocation(StockEntity* location)
 		return false;
 	}
 
-	if (m_scout_range > 0 && !m_mission_location)//scout mission?
+	if (m_scout_range > 0 && !m_mission_task_location)//scout mission?
 	{
 		if (!location->m_identified)
 		{
 			//accept task (and there is no coming back)
-			m_mission_location = location;
+			m_mission_task_location = location;
 		}
 	}
-	else if (m_current_destination != m_base_location)//change base location?
+	else if (m_current_destination != m_mission_base_location)//change base location?
 	{	
 		if (location->CanSupplyFuel())
 		{
 			//go to planet and cancel task
-			m_mission_location = NULL;
+			m_mission_task_location = NULL;
 		}
 
 		if (location->CanBeDrilled())//new drilling task?
 		{
 			//accept new task?
-			m_mission_location = location;
+			m_mission_task_location = location;
 		}
 	}
-	else if (m_current_destination != m_mission_location)//new drilling task?
+	else if (m_current_destination != m_mission_task_location)//new drilling task?
 	{
 		if (location->CanBeDrilled())
 		{
 			//accept new next task
-			m_mission_location = location;
+			m_mission_task_location = location;
 		}
 	}
 
@@ -481,7 +481,7 @@ bool Starship::AssignToLocation(StockEntity* location)
 
 bool Starship::MoveToLocation(StockEntity* location)
 {
-	if (!location || !m_base_location)
+	if (!location || !m_mission_base_location)
 	{
 		return false;
 	}
@@ -492,14 +492,14 @@ bool Starship::MoveToLocation(StockEntity* location)
 	}
 
 	size_t distance = GetLightYearsBetweenObjects(this, location);
-	//size_t distance_return = GetLightYearsBetweenObjects(location, m_base_location);
+	//size_t distance_return = GetLightYearsBetweenObjects(location, m_mission_base_location);
 	//size_t propulsion_required = location->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
 	//propulsion_required *= GetTotalWeight();
 
 	size_t propulsion_required = GetPropulsionRequired(location);
 	if (m_propulsion_assigned + m_propulsion < propulsion_required)
 	{
-		size_t propulsion_missing = LoadRequiredPropulsion(m_base_location, propulsion_required - m_propulsion, false);
+		size_t propulsion_missing = LoadRequiredPropulsion(m_mission_base_location, propulsion_required - m_propulsion, false);
 		if (propulsion_missing > 0)
 		{
 			//printf("Trying to assign to location too far: distance is %d, propulsion remaining is %d (%d missing).\n", distance, m_propulsion, propulsion_missing);
@@ -522,11 +522,11 @@ bool Starship::MoveToLocation(StockEntity* location)
 	m_current_destination = location;
 	//if (location->CanSupplyFuel())
 	//{
-	//	m_base_location = location;
+	//	m_mission_base_location = location;
 	//}
 	//else if (location->CanBeDrilled())
 	//{
-	//	m_mission_location = location;
+	//	m_mission_task_location = location;
 	//}
 	SetStarshipState(StarshipState_MovingToLocation);
 
@@ -535,12 +535,12 @@ bool Starship::MoveToLocation(StockEntity* location)
 
 bool Starship::ManagePropulsion()
 {
-	if (!m_current_destination || !m_base_location || m_arrived_at_distination)
+	if (!m_current_destination || !m_mission_base_location || m_arrived_at_distination)
 	{
 		return false;
 	}
 
-	size_t distance_remaining = m_current_destination == m_base_location ? GetLightYearsBetweenObjects(this, m_current_destination) : GetLightYearsBetweenObjects(this, m_current_destination) + GetLightYearsBetweenObjects(m_current_destination, m_base_location);
+	size_t distance_remaining = m_current_destination == m_mission_base_location ? GetLightYearsBetweenObjects(this, m_current_destination) : GetLightYearsBetweenObjects(this, m_current_destination) + GetLightYearsBetweenObjects(m_current_destination, m_mission_base_location);
 	if (distance_remaining < m_propulsion_assigned)
 	{
 		size_t propulsion_to_consumme = m_propulsion_assigned - distance_remaining;
@@ -579,11 +579,11 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 		m_arrived_at_distination = true;
 		m_current_location = m_current_destination;
 
-		if (m_current_destination == m_base_location)
+		if (m_current_destination == m_mission_base_location)
 		{
 			SetStarshipState(StarshipState_Unloading);
 		}
-		if (m_current_destination == m_mission_location)
+		if (m_current_destination == m_mission_task_location)
 		{
 			if (m_scout_range > 0)
 			{
@@ -739,7 +739,7 @@ bool Starship::IsNewDrillAttemptAvailable()
 size_t Starship::GetPropulsionRequired(GameObject* destination)
 {
 	size_t distance = GameObject::GetLightYearsBetweenObjects(this, destination);
-	size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, m_base_location);
+	size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, m_mission_base_location);
 	size_t propulsion_required = destination->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
 	propulsion_required *= m_weight;
 

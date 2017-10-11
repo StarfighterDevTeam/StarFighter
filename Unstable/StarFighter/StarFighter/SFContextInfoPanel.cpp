@@ -4,7 +4,7 @@ extern Game* CurrentGame;
 
 SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Ship* playerShip) : SFPanel(size, panel_type)
 {
-	m_playerShip = playerShip;
+	/*m_playerShip = playerShip;
 	m_title_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -214,7 +214,7 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 				if (distance > 0)
 				{
 					//Starship* starship = (Starship*)playerShip->m_selected_object;
-					//size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, starship->m_base_location);
+					//size_t distance_return = GameObject::GetLightYearsBetweenObjects(destination, starship->m_mission_base_location);
 					//size_t propulsion_required = entity->CanSupplyFuel() ? distance : distance + distance_return;//prepare for a back and forth if destination cannot supply fuel
 					//size_t propulsion_missing = starship->m_propulsion + starship->m_propulsion_assigned > propulsion_required ? 0 : propulsion_required - starship->m_propulsion - starship->m_propulsion_assigned;
 					//ss_text << "\nPropulsion available: ";
@@ -224,7 +224,7 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 					//}
 					//else
 					//{
-					//	ss_text << propulsion_missing - starship->LoadRequiredPropulsion(starship->m_base_location, propulsion_missing, true);
+					//	ss_text << propulsion_missing - starship->LoadRequiredPropulsion(starship->m_mission_base_location, propulsion_missing, true);
 					//}
 					//ss_text << " / " << propulsion_required << " required";
 					//
@@ -246,9 +246,9 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 
 		//location
 		ss_text << "\n\nBase location: ";
-		if (starship->m_base_location)
+		if (starship->m_mission_base_location)
 		{
-			ss_text << starship->m_base_location->m_display_name;
+			ss_text << starship->m_mission_base_location->m_display_name;
 		}
 		else
 		{
@@ -256,9 +256,9 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 		}
 
 		ss_text << "\nTask location: ";
-		if (starship->m_mission_location)
+		if (starship->m_mission_task_location)
 		{
-			ss_text << starship->m_mission_location->m_display_name;
+			ss_text << starship->m_mission_task_location->m_display_name;
 		}
 		else
 		{
@@ -304,6 +304,8 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 	setOrigin(sf::Vector2f(getOrigin().x, text_height / 2));
 	sf::Vector2f position_new = sf::Vector2f(getPosition().x, getSize().y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + m_playerShip->getPosition().y);
 	setPosition(position_new.x, position_new.y);
+
+	*/
 }
 
 SFContextInfoPanel::~SFContextInfoPanel()

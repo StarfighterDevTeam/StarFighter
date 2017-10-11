@@ -250,8 +250,7 @@ Starship* Planet::Produce(string name, bool ignore_cost)
 
 	Starship* new_starship = Starship::CreateStarship(name);
 	new_starship->setPosition(getPosition());
-	new_starship->m_current_destination = this;
-	new_starship->m_base_location = this;
+	new_starship->m_current_location = this;
 	new_starship->m_identified = true;
 	(*CurrentGame).addToScene(new_starship, StarshipLayer, StarshipObject);
 
