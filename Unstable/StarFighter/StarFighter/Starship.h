@@ -9,13 +9,24 @@ enum StarshipState
 	StarshipState_Idle,
 	StarshipState_MovingToLocation,
 	StarshipState_MovingToZone,
-	StarshipState_Searching,
+	StarshipState_Scouting,
 	StarshipState_Drilling,
 	StarshipState_Extracting,
 	StarshipState_Loading,
 	StarshipState_CarryToBase,
 	StarshipState_Unloading,
 	StarshipState_Scanning,
+};
+
+enum StarshipMission
+{
+	StarshipMission_Idle,
+	StarshipMission_MoveToLocation,
+	StarshipMission_Scout,
+	StarshipMission_Scan,
+	StarshipMission_Drill,
+	StarshipMission_Load,
+	StarshipMission_Unload,
 };
 
 class Starship : public StockEntity
@@ -46,19 +57,25 @@ public :
 	//string GetBestAssignedPropulsionAvailable();
 	size_t GetPropulsionRequired(GameObject* destination);
 
+	bool AssignMission(StarshipMission mission, sf::Vector2f destination, StockEntity* task_location = NULL, StockEntity* base_location = NULL);
+	void ManageMission(sf::Time deltaTime);
+	bool ArrivingAtDestination(sf::Time deltaTime);
+
 	sf::Vector2u GetCurrentZone();
 	void UpdateZoneKnowledge();
 	bool Scout();
 
 	sf::Vector2u m_current_zone;
 
-	StockEntity* m_current_destination;
+	StockEntity* m_current_destination_location;
 	StockEntity* m_current_location;
 	StockEntity* m_mission_base_location;
 	StockEntity* m_mission_task_location;
+	StarshipMission m_mission;
+	sf::Vector2f m_current_destination_coordinates;
 
 	StarshipState m_state;
-	bool m_arrived_at_distination;
+	bool m_arrived_at_destination;
 	map<string, size_t> m_cost;
 	float m_scout_range;
 	pair<string, size_t> m_fuel_tank;

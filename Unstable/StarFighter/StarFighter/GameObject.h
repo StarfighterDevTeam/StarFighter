@@ -150,6 +150,7 @@ public:
 	static float GetAbsoluteSpeedSquared(sf::Vector2f speed_);
 	static sf::Vector2f GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
 	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
+	sf::Vector2f SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed);
 
 	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
 	static void ScaleSpeed(sf::Vector2f* vector, float target_value);

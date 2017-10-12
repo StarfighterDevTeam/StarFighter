@@ -110,11 +110,13 @@ void Ship::update(sf::Time deltaTime)
 	//Get action inputs
 	UpdateInputStates();
 	
-	//Selection
+	//Selection (left click)
 	if (m_inputs_states[Action_Select] == Input_Tap)
 	{
 		SelectObject(m_hovered_object);//this function resists null ptr
 	}
+
+	//Action (right click) - assigning a starship to a mission
 	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object && m_selected_object->m_collider_type == StarshipObject)
 	{
 		Starship* starship = (Starship*)m_selected_object;
@@ -132,11 +134,12 @@ void Ship::update(sf::Time deltaTime)
 				//starship->AssignToLocation(location);
 			}
 		}
+		//scout mission ?
 		else if (starship->m_scout_range > 0)
 		{
 			//cruise to zone
-			starship->setPosition(getPosition());
-			starship->SetStarshipState(StarshipState_MovingToZone);
+			//starship->setPosition(getPosition());
+			starship->AssignMission(StarshipMission_Scout, getPosition());
 		}
 	}
 

@@ -292,6 +292,18 @@ void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, f
 	m_speed.y = absolute_speed * cos(curAngle);
 }
 
+sf::Vector2f GameObject::SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed)
+{
+	sf::Vector2f vector_to_destination = coordinates - getPosition();
+
+	sf::Vector2f move = vector_to_destination;
+	ScaleSpeed(&move, speed);
+
+	m_speed = move;
+
+	return m_speed;
+}
+
 float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)
 {
 	assert(object1 != NULL);

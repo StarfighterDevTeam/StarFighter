@@ -9,17 +9,19 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 {
 	SetStarshipState(StarshipState_Idle);
 
+	m_mission = StarshipMission_Idle;
+
 	m_scout_range = 0;
 	m_armor_max = 1;
 	m_armor = m_armor_max;
 	m_fuel_tank_max = 100;
 	m_speed_max = 100;
 	m_nb_drills = 0;
-	m_current_destination = NULL;
+	m_current_destination_location = NULL;
 	m_mission_base_location = NULL;
 	m_mission_task_location = NULL;
 	m_current_location = NULL;
-	m_arrived_at_distination = true;
+	m_arrived_at_destination = true;
 	m_propulsion = 0;
 	m_propulsion_speed_bonus = 0;
 	m_current_zone = GetCurrentZone();
@@ -64,6 +66,12 @@ Starship::~Starship()
 
 void Starship::update(sf::Time deltaTime)
 {
+	if (m_mission != StarshipMission_Idle)
+	{
+		ManageMission(deltaTime);
+	}
+
+
 	if (m_scout_range > 0)
 	{
 		Scout();
@@ -72,82 +80,82 @@ void Starship::update(sf::Time deltaTime)
 	//update memory of position within the stellar map (which grid cell are we in?)
 	UpdateZoneKnowledge();
 	
-	switch (m_state)
-	{
-		case StarshipState_MovingToLocation:
-		{
-			//ManagePropulsion();
-			CheckIfArrivedAtDestination(deltaTime);
-			
-			break;
-		}
-		case StarshipState_Idle:
-		{
-			if (m_mission_task_location)
-			{
-				//MoveToLocation(m_mission_task_location);
-			}
-			break;
-		}
-		case StarshipState_Drilling:
-		{
-			Drill();
-			break;
-		}
-		case StarshipState_Extracting:
-		{
-			Extract(m_ore_found);
-			break;
-		}
-		case StarshipState_Loading:
-		{
-			if (m_ore_found)
-			{
-				LoadInStock(m_ore_found->m_display_name, 1);
-				m_ore_found = NULL;
-				IsNewDrillAttemptAvailable();
-			}
-			else
-			{
-				m_current_destination->UnloadCarriage(this);//Loading
-				//MoveToLocation(m_mission_base_location);
-			}
-			
-			break;
-		}
-		case StarshipState_CarryToBase:
-		{
-			//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).front();
-			//StockEntity* tmp_location = (StockEntity*)tmp_obj;
-			//MoveToLocation(m_mission_base_location);
-			//MoveToLocation(tmp_location);
-			break;
-		}
-		case StarshipState_Unloading:
-		{
-			UnloadCarriage(m_current_destination);
-			m_current_drill_attempts = 0;
-
-			//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
-			//StockEntity* tmp_location = (StockEntity*)tmp_obj;
-			//if (!MoveToLocation(m_mission_task_location))
-			//{
-			//	SetStarshipState(StarshipState_Idle);
-			//}
-			
-			//MoveToLocation(tmp_location);
-			break;
-		}
-		case StarshipState_Scanning:
-		{
-			Scan();
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
+	//switch (m_state)
+	//{
+	//	case StarshipState_MovingToLocation:
+	//	{
+	//		//ManagePropulsion();
+	//		//CheckIfArrivedAtDestination(deltaTime);
+	//		
+	//		break;
+	//	}
+	//	case StarshipState_Idle:
+	//	{
+	//		if (m_mission_task_location)
+	//		{
+	//			//MoveToLocation(m_mission_task_location);
+	//		}
+	//		break;
+	//	}
+	//	case StarshipState_Drilling:
+	//	{
+	//		Drill();
+	//		break;
+	//	}
+	//	case StarshipState_Extracting:
+	//	{
+	//		Extract(m_ore_found);
+	//		break;
+	//	}
+	//	case StarshipState_Loading:
+	//	{
+	//		if (m_ore_found)
+	//		{
+	//			LoadInStock(m_ore_found->m_display_name, 1);
+	//			m_ore_found = NULL;
+	//			IsNewDrillAttemptAvailable();
+	//		}
+	//		else
+	//		{
+	//			m_current_destination_location->UnloadCarriage(this);//Loading
+	//			//MoveToLocation(m_mission_base_location);
+	//		}
+	//		
+	//		break;
+	//	}
+	//	case StarshipState_CarryToBase:
+	//	{
+	//		//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).front();
+	//		//StockEntity* tmp_location = (StockEntity*)tmp_obj;
+	//		//MoveToLocation(m_mission_base_location);
+	//		//MoveToLocation(tmp_location);
+	//		break;
+	//	}
+	//	case StarshipState_Unloading:
+	//	{
+	//		UnloadCarriage(m_current_destination_location);
+	//		m_current_drill_attempts = 0;
+	//
+	//		//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
+	//		//StockEntity* tmp_location = (StockEntity*)tmp_obj;
+	//		//if (!MoveToLocation(m_mission_task_location))
+	//		//{
+	//		//	SetStarshipState(StarshipState_Idle);
+	//		//}
+	//		
+	//		//MoveToLocation(tmp_location);
+	//		break;
+	//	}
+	//	case StarshipState_Scanning:
+	//	{
+	//		Scan();
+	//		break;
+	//	}
+	//	default:
+	//	{
+	//		break;
+	//	}
+	//}
 
 	StockEntity::update(deltaTime);
 
@@ -188,10 +196,11 @@ void Starship::SetStarshipState(StarshipState state)
 		//{
 		//	break;
 		//}
-		//case StarshipState_MovingToZone:
-		//{
-		//	break;
-		//}
+		case StarshipState_MovingToZone:
+		{
+			printf("Exploration begins: going to zone %d-%d.\n", (*CurrentGame).m_stellarmap->GetZoneIndex(m_current_destination_coordinates));
+			break;
+		}
 		case StarshipState_Drilling:
 		{
 			m_drill_clock.restart();
@@ -199,7 +208,7 @@ void Starship::SetStarshipState(StarshipState state)
 			printf("Starting drill attempt (%d/%d).\n", m_current_drill_attempts + 1, m_nb_drills);
 			break;
 		}
-		case StarshipState_Searching:
+		case StarshipState_Scouting:
 		{
 			SetStarshipState(StarshipState_Drilling);
 			break;
@@ -277,7 +286,7 @@ size_t Starship::LoadFuelTank(string fuel_name, size_t quantity)
 /*
 size_t Starship::LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation)
 {
-	if (!location || !m_arrived_at_distination || propulsion_missing == 0)
+	if (!location || !m_arrived_at_destination || propulsion_missing == 0)
 	{
 		return propulsion_missing;
 	}
@@ -433,7 +442,7 @@ size_t Starship::ConsummePropulsion(size_t propulsion_to_consumme)
 bool Starship::AssignToLocation(StockEntity* location)
 {
 	//what to do when assigning a ship to a location?
-	if (!location || m_current_destination == location)
+	if (!location || m_current_destination_location == location)
 	{
 		return false;
 	}
@@ -451,7 +460,7 @@ bool Starship::AssignToLocation(StockEntity* location)
 			m_mission_task_location = location;
 		}
 	}
-	else if (m_current_destination != m_mission_base_location)//change base location?
+	else if (m_current_destination_location != m_mission_base_location)//change base location?
 	{	
 		if (location->CanSupplyFuel())
 		{
@@ -465,7 +474,7 @@ bool Starship::AssignToLocation(StockEntity* location)
 			m_mission_task_location = location;
 		}
 	}
-	else if (m_current_destination != m_mission_task_location)//new drilling task?
+	else if (m_current_destination_location != m_mission_task_location)//new drilling task?
 	{
 		if (location->CanBeDrilled())
 		{
@@ -486,7 +495,7 @@ bool Starship::MoveToLocation(StockEntity* location)
 		return false;
 	}
 
-	if (location == m_current_destination)
+	if (location == m_current_destination_location)
 	{
 		return false;
 	}
@@ -518,8 +527,8 @@ bool Starship::MoveToLocation(StockEntity* location)
 	propulsion_assigned = MinBetweenSizeTValues(propulsion_assigned, m_propulsion);
 	m_propulsion -= propulsion_assigned;
 	m_propulsion_assigned += propulsion_assigned;
-	m_arrived_at_distination = false;
-	m_current_destination = location;
+	m_arrived_at_destination = false;
+	m_current_destination_location = location;
 	//if (location->CanSupplyFuel())
 	//{
 	//	m_mission_base_location = location;
@@ -535,12 +544,12 @@ bool Starship::MoveToLocation(StockEntity* location)
 
 bool Starship::ManagePropulsion()
 {
-	if (!m_current_destination || !m_mission_base_location || m_arrived_at_distination)
+	if (!m_current_destination_location || !m_mission_base_location || m_arrived_at_destination)
 	{
 		return false;
 	}
 
-	size_t distance_remaining = m_current_destination == m_mission_base_location ? GetLightYearsBetweenObjects(this, m_current_destination) : GetLightYearsBetweenObjects(this, m_current_destination) + GetLightYearsBetweenObjects(m_current_destination, m_mission_base_location);
+	size_t distance_remaining = m_current_destination_location == m_mission_base_location ? GetLightYearsBetweenObjects(this, m_current_destination_location) : GetLightYearsBetweenObjects(this, m_current_destination_location) + GetLightYearsBetweenObjects(m_current_destination_location, m_mission_base_location);
 	if (distance_remaining < m_propulsion_assigned)
 	{
 		size_t propulsion_to_consumme = m_propulsion_assigned - distance_remaining;
@@ -567,23 +576,23 @@ bool Starship::ManagePropulsion()
 
 bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 {
-	if (!m_current_destination)
+	if (!m_current_destination_location)
 	{
 		return false;
 	}
 
-	if (GetDistanceBetweenObjects(this, m_current_destination) < this->GetAbsoluteSpeed() * deltaTime.asSeconds())
+	if (GetDistanceBetweenObjects(this, m_current_destination_location) < this->GetAbsoluteSpeed() * deltaTime.asSeconds())
 	{
-		setPosition(m_current_destination->getPosition());
+		setPosition(m_current_destination_location->getPosition());
 		m_speed = sf::Vector2f(0, 0);
-		m_arrived_at_distination = true;
-		m_current_location = m_current_destination;
+		m_arrived_at_destination = true;
+		m_current_location = m_current_destination_location;
 
-		if (m_current_destination == m_mission_base_location)
+		if (m_current_destination_location == m_mission_base_location)
 		{
 			SetStarshipState(StarshipState_Unloading);
 		}
-		if (m_current_destination == m_mission_task_location)
+		if (m_current_destination_location == m_mission_task_location)
 		{
 			if (m_scout_range > 0)
 			{
@@ -591,9 +600,9 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 			}
 			else
 			{
-				if (m_current_destination->CanBeDrilled())
+				if (m_current_destination_location->CanBeDrilled())
 				{
-					SetStarshipState(StarshipState_Searching);
+					SetStarshipState(StarshipState_Scouting);
 				}
 				else
 				{
@@ -650,14 +659,14 @@ Starship* Starship::CreateStarship(string name)
 
 void Starship::Drill()
 {
-	if (m_current_destination && m_current_destination->CanBeDrilled() && m_state == StarshipState_Drilling)
+	if (m_current_destination_location && m_current_destination_location->CanBeDrilled() && m_state == StarshipState_Drilling)
 	{
 		if (m_nb_drills > 0 && m_current_drill_attempts < m_nb_drills)
 		{
 			//Drilling attempt
 			if (m_drill_clock.getElapsedTime().asSeconds() > m_drill_duration)
 			{
-				m_ore_found = m_current_destination->DigRandomOre();
+				m_ore_found = m_current_destination_location->DigRandomOre();
 				m_current_drill_attempts++;
 				if (m_ore_found)
 				{
@@ -676,11 +685,11 @@ void Starship::Drill()
 
 void Starship::Scan()
 {
-	if (m_current_destination && m_arrived_at_distination && m_state == StarshipState_Scanning)
+	if (m_current_destination_location && m_arrived_at_destination && m_state == StarshipState_Scanning)
 	{
 		if (m_scan_clock.getElapsedTime().asSeconds() > SCAN_DURATION)
 		{
-			m_current_destination->m_identified = true;
+			m_current_destination_location->m_identified = true;
 			m_GarbageMe = true;
 			m_visible = false;
 		}
@@ -744,4 +753,87 @@ size_t Starship::GetPropulsionRequired(GameObject* destination)
 	propulsion_required *= m_weight;
 
 	return propulsion_required;
+}
+
+bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, StockEntity* task_location, StockEntity* base_location)
+{
+	switch (mission)
+	{
+		case StarshipMission_Scout:
+		{
+			m_mission = mission;
+			SetSpeedForConstantSpeedToDestination(destination, m_speed_max);
+
+			m_current_destination_coordinates = destination;
+
+			m_current_destination_location = NULL;
+			m_mission_base_location = NULL;
+			m_mission_task_location = NULL;
+
+			SetStarshipState(StarshipState_MovingToZone);
+			break;
+		}
+	}
+
+	return false;
+}
+
+void Starship::ManageMission(sf::Time deltaTime)
+{
+	if (ArrivingAtDestination(deltaTime))
+	{
+		switch (m_mission)
+		{
+		case StarshipMission_Scout:
+			SetStarshipState(StarshipState_Scanning);
+			break;
+		}
+	}
+
+//	if (m_current_destination_location == m_mission_base_location)
+//	{
+//		SetStarshipState(StarshipState_Unloading);
+//	}
+//	if (m_current_destination_location == m_mission_task_location)
+//	{
+//		if (m_scout_range > 0)
+//		{
+//			SetStarshipState(StarshipState_Scanning);
+//		}
+//		else
+//		{
+//			if (m_current_destination_location->CanBeDrilled())
+//			{
+//				SetStarshipState(StarshipState_Scouting);
+//			}
+//			else
+//			{
+//				SetStarshipState(StarshipState_Loading);
+//				m_current_drill_attempts = m_nb_drills;
+//			}
+//		}
+//	}
+//
+//	return true;
+//}
+//
+//return false;
+}
+
+bool Starship::ArrivingAtDestination(sf::Time deltaTime)
+{
+	//going to coordinates or going to a location's coordinates?
+	sf::Vector2f destination = m_mission == StarshipMission_Scout ? m_current_destination_coordinates : m_current_destination_location->getPosition();
+
+	//are we supposed to arrive at destination at the next frame?
+	if (GetDistanceBetweenPositions(getPosition(), destination) < GetAbsoluteSpeed() * deltaTime.asSeconds())
+	{
+		//yes? let's land then!
+		setPosition(destination);
+		m_speed = sf::Vector2f(0, 0);
+		m_arrived_at_destination = true;
+		m_current_location = m_current_destination_location;
+	}
+
+	return m_arrived_at_destination;
 }

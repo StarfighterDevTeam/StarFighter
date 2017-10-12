@@ -153,7 +153,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 			{
 				case StarshipState_Idle:
 				{
-					if (starship->m_current_destination)
+					if (starship->m_current_destination_location)
 					{
 						ss_text << "waiting for fuel";
 					}
@@ -169,7 +169,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 					ss_text << "drilling...";
 					break;
 				}
-				case StarshipState_Searching:
+				case StarshipState_Scouting:
 				{
 					ss_text << "searching drill location";
 					break;
@@ -207,7 +207,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	if (playerShip->m_selected_object && playerShip->m_selected_object->m_collider_type == StarshipObject)
 	{
 		Starship* starship = (Starship*)playerShip->m_selected_object;
-		GameObject* destination = entity != starship && entity->m_collider_type == LocationObject ? (GameObject*)entity : starship->m_current_destination;
+		GameObject* destination = entity != starship && entity->m_collider_type == LocationObject ? (GameObject*)entity : starship->m_current_destination_location;
 
 		size_t distance = GameObject::GetLightYearsBetweenObjects(playerShip->m_selected_object, destination);
 		ss_text << "\n\nDistance: ";
@@ -228,7 +228,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 					//size_t propulsion_missing = starship->m_propulsion + starship->m_propulsion_assigned > propulsion_required ? 0 : propulsion_required - starship->m_propulsion - starship->m_propulsion_assigned;
 					//ss_text << "\nPropulsion available: " << propulsion_available << " / " << propulsion_required << " required";
 					//
-					//if (!starship->m_arrived_at_distination)
+					//if (!starship->m_arrived_at_destination)
 					//{
 					//	string current_fuel = starship->GetBestAssignedPropulsionAvailable();
 					//	if (!current_fuel.empty())
