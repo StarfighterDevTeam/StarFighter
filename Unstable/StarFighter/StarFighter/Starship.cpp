@@ -683,17 +683,14 @@ void Starship::Drill()
 	}
 }
 
-void Starship::Scan()
+bool Starship::Scan(StockEntity* entity)
 {
-	if (m_current_destination_location && m_arrived_at_destination && m_state == StarshipState_Scanning)
+	if (m_scan_clock.getElapsedTime().asSeconds() > SCAN_DURATION)
 	{
-		if (m_scan_clock.getElapsedTime().asSeconds() > SCAN_DURATION)
-		{
-			m_current_destination_location->m_identified = true;
-			m_GarbageMe = true;
-			m_visible = false;
-		}
+		entity->m_identified = true;
 	}
+
+	return  entity->m_identified;
 }
 
 void Starship::Extract(Ore* ore)
@@ -757,11 +754,13 @@ size_t Starship::GetPropulsionRequired(GameObject* destination)
 
 bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, StockEntity* task_location, StockEntity* base_location)
 {
+	m_mission = mission;
+	m_arrived_at_destination = false;
+
 	switch (mission)
 	{
 		case StarshipMission_Scout:
 		{
-			m_mission = mission;
 			SetSpeedForConstantSpeedToDestination(destination, m_speed_max);
 
 			m_current_destination_coordinates = destination;
@@ -773,6 +772,17 @@ bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, 
 			SetStarshipState(StarshipState_MovingToZone);
 			break;
 		}
+		case StarshipMission_Scan:
+		{
+			SetSpeedForConstantSpeedToDestination(task_location->getPosition(), m_speed_max);
+
+			m_current_destination_location = task_location;
+			m_mission_base_location = NULL;
+			m_mission_task_location = task_location;
+
+			SetStarshipState(StarshipState_MovingToLocation);
+			break;
+		}
 	}
 
 	return false;
@@ -780,13 +790,33 @@ bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, 
 
 void Starship::ManageMission(sf::Time deltaTime)
 {
-	if (ArrivingAtDestination(deltaTime))
+	if (!m_arrived_at_destination && ArrivingAtDestination(deltaTime))
 	{
 		switch (m_mission)
 		{
-		case StarshipMission_Scout:
-			SetStarshipState(StarshipState_Scanning);
-			break;
+			case StarshipMission_Scout:
+				m_visible = false;
+				m_GarbageMe = true;
+				//SetStarshipState(StarshipState_Scanning);
+				break;
+			case StarshipMission_Scan:
+				//SetStarshipState(StarshipState_Scanning);
+				m_scan_clock.restart();
+				break;
+		}
+	}
+
+	if (m_arrived_at_destination)
+	{
+		switch (m_mission)
+		{
+			case StarshipMission_Scan:
+				if (Scan(m_mission_task_location))
+				{
+					m_visible = false;
+					m_GarbageMe = true;
+				}
+				break;
 		}
 	}
 

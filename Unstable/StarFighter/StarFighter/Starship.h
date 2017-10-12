@@ -51,7 +51,7 @@ public :
 	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
 	void SetStarshipState(StarshipState state);
 	void Drill();
-	void Scan();
+	bool Scan(StockEntity* entity);
 	void Extract(Ore* ore);
 	bool IsNewDrillAttemptAvailable();
 	//string GetBestAssignedPropulsionAvailable();

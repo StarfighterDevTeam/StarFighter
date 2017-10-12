@@ -45,6 +45,7 @@ void InGameState::Initialize(Player player)
 	planet2->LoadInStock("silver", 30);
 	planet2->m_display_name = "Colonie";
 	planet2->Produce("probe", true);
+	planet2->Produce("probe", true);
 	planet2->m_identified = true;
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2 + 200, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);

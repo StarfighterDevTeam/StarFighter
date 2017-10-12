@@ -125,9 +125,13 @@ void Ship::update(sf::Time deltaTime)
 		{
 			Location* location = (Location*)m_hovered_object;
 
+			//scan mission?
 			if (starship->m_scout_range > 0)
 			{
-				//starship->AssignToLocation(location);
+				if (starship->m_mission == StarshipMission_Idle)
+				{
+					starship->AssignMission(StarshipMission_Scan, sf::Vector2f(0, 0), location, NULL);
+				}
 			}
 			else if (starship->m_nb_drills > 0)
 			{
@@ -137,9 +141,10 @@ void Ship::update(sf::Time deltaTime)
 		//scout mission ?
 		else if (starship->m_scout_range > 0)
 		{
-			//cruise to zone
-			//starship->setPosition(getPosition());
-			starship->AssignMission(StarshipMission_Scout, getPosition());
+			if (starship->m_mission == StarshipMission_Idle)
+			{
+				starship->AssignMission(StarshipMission_Scout, getPosition());
+			}
 		}
 	}
 
