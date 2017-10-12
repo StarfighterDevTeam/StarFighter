@@ -292,6 +292,18 @@ sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_
 	return speed;
 }
 
+sf::Vector2f GameObject::SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed)
+{
+	sf::Vector2f vector_to_destination = coordinates - getPosition();
+
+	sf::Vector2f move = vector_to_destination;
+	ScaleSpeed(&move, speed);
+
+	m_speed = move;
+
+	return m_speed;
+}
+
 void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
 	m_speed.x = -absolute_speed * sin(curAngle);
