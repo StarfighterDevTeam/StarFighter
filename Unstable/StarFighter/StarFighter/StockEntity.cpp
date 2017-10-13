@@ -197,8 +197,10 @@ void StockEntity::UnloadCarriage(StockEntity* location)
 	{
 		size_t quantity_unloaded = location->LoadInStock(i->first, i->second);
 
+		size_t ore_weight = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+
 		m_ore_stock[i->first] -= quantity_unloaded;
-		m_current_ore_stock -= quantity_unloaded;
+		m_current_ore_stock -= quantity_unloaded * ore_weight;
 	}	
 
 	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); i++)
@@ -208,4 +210,6 @@ void StockEntity::UnloadCarriage(StockEntity* location)
 		m_fuel_stock[i->first] -= quantity_unloaded;
 		m_current_fuel_stock -= quantity_unloaded;
 	}
+
+	printf("Unloading.\n");
 }

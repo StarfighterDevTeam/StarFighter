@@ -121,27 +121,25 @@ void Ship::update(sf::Time deltaTime)
 	{
 		Starship* starship = (Starship*)m_selected_object;
 
-		if (m_hovered_object && m_hovered_object->m_collider_type == LocationObject)
+		if (starship->m_mission == StarshipMission_Idle)
 		{
-			Location* location = (Location*)m_hovered_object;
-
-			//scan mission?
-			if (starship->m_scout_range > 0)
+			if (m_hovered_object && m_hovered_object->m_collider_type == LocationObject)
 			{
-				if (starship->m_mission == StarshipMission_Idle)
+				Location* location = (Location*)m_hovered_object;
+
+				//scan mission?
+				if (starship->m_scout_range > 0)
 				{
 					starship->AssignMission(StarshipMission_Scan, sf::Vector2f(0, 0), location, NULL);
 				}
+				//mining mission?
+				else if (starship->m_nb_drills > 0)
+				{
+					starship->AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), location, starship->m_current_location);
+				}
 			}
-			else if (starship->m_nb_drills > 0)
-			{
-				//starship->AssignToLocation(location);
-			}
-		}
-		//scout mission ?
-		else if (starship->m_scout_range > 0)
-		{
-			if (starship->m_mission == StarshipMission_Idle)
+			//scout mission ?
+			else if (starship->m_scout_range > 0)
 			{
 				starship->AssignMission(StarshipMission_Scout, getPosition());
 			}

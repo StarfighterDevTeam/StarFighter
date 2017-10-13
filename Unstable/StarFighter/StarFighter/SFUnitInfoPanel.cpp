@@ -146,7 +146,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 			Starship* starship = (Starship*)entity;
 			if (starship->m_nb_drills > 0)
 			{
-				ss_text << "\n\nDrill attempts: " << starship->m_current_drill_attempts << "/" << starship->m_nb_drills;
+				ss_text << "\n\nDrill attempts: " << starship->m_drill_attempts << "/" << starship->m_nb_drills;
 			}
 			ss_text << "\nStatus: ";
 			switch (starship->m_state)

@@ -52,7 +52,7 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	}
 
 	//mining
-	m_current_drill_attempts = 0;
+	m_drill_attempts = 0;
 	m_drill_duration = 3.f;
 	m_drill_sucess_rate_bonus = 0.01f;
 	m_extraction_duration_bonus = 0.5f;
@@ -134,7 +134,7 @@ void Starship::update(sf::Time deltaTime)
 	//	case StarshipState_Unloading:
 	//	{
 	//		UnloadCarriage(m_current_destination_location);
-	//		m_current_drill_attempts = 0;
+	//		m_drill_attempts = 0;
 	//
 	//		//GameObject* tmp_obj = (*CurrentGame).GetSceneGameObjectsTyped(LocationObject).back();
 	//		//StockEntity* tmp_location = (StockEntity*)tmp_obj;
@@ -205,7 +205,7 @@ void Starship::SetStarshipState(StarshipState state)
 		{
 			m_drill_clock.restart();
 			m_ore_found = NULL;
-			printf("Starting drill attempt (%d/%d).\n", m_current_drill_attempts + 1, m_nb_drills);
+			printf("Starting drill attempt (%d/%d).\n", m_drill_attempts + 1, m_nb_drills);
 			break;
 		}
 		case StarshipState_Scouting:
@@ -607,7 +607,7 @@ bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 				else
 				{
 					SetStarshipState(StarshipState_Loading);
-					m_current_drill_attempts = m_nb_drills;
+					m_drill_attempts = m_nb_drills;
 				}
 			}
 		}
@@ -657,30 +657,30 @@ Starship* Starship::CreateStarship(string name)
 	return new_starship;
 }
 
-void Starship::Drill()
+Ore* Starship::Drill()
 {
-	if (m_current_destination_location && m_current_destination_location->CanBeDrilled() && m_state == StarshipState_Drilling)
+	//Drilling attempt
+	if (m_drill_clock.getElapsedTime().asSeconds() > m_drill_duration)
 	{
-		if (m_nb_drills > 0 && m_current_drill_attempts < m_nb_drills)
+		m_drill_attempts++;
+
+		m_ore_found = m_mission_task_location->DigRandomOre();
+		
+		if (m_ore_found)
 		{
-			//Drilling attempt
-			if (m_drill_clock.getElapsedTime().asSeconds() > m_drill_duration)
-			{
-				m_ore_found = m_current_destination_location->DigRandomOre();
-				m_current_drill_attempts++;
-				if (m_ore_found)
-				{
-					printf("Ore found: %s\n", m_ore_found->m_display_name.c_str());
-					SetStarshipState(StarshipState_Extracting);
-				}
-				else
-				{
-					printf("No ore found.\n");
-					IsNewDrillAttemptAvailable();
-				}
-			}
+			printf("Ore found: %s\n", m_ore_found->m_display_name.c_str());
+			printf("Extraction...");
+			m_extraction_clock.restart();
 		}
+		else
+		{
+			printf("No ore found.\n");
+		}
+
+		return m_ore_found;
 	}
+
+	return NULL;
 }
 
 bool Starship::Scan(StockEntity* entity)
@@ -693,24 +693,27 @@ bool Starship::Scan(StockEntity* entity)
 	return  entity->m_identified;
 }
 
-void Starship::Extract(Ore* ore)
+bool Starship::Extract(Ore* ore)
 {
-	if (ore && m_state == StarshipState_Extracting)
+	//Extract
+	if (m_extraction_clock.getElapsedTime().asSeconds() > MaxBetweenValues(sf::Vector2f(ore->m_extraction_duration - m_extraction_duration_bonus, 0)))
 	{
-		//Extract
-		if (m_extraction_clock.getElapsedTime().asSeconds() > MaxBetweenValues(sf::Vector2f(ore->m_extraction_duration - m_extraction_duration_bonus, 0)))
-		{
-			printf("extraction complete. Loading ore.\n");
-			SetStarshipState(StarshipState_Loading);
-		}
+		printf("complete. Loading ore.\n");
+		return true;
 	}
+	else
+	{
+		m_state = StarshipState_Extracting;
+	}
+
+	return false;
 }
 
 bool Starship::IsNewDrillAttemptAvailable()
 {
-	if (m_current_drill_attempts == m_nb_drills || m_current_ore_stock >= m_ore_stock_max)
+	if (m_drill_attempts == m_nb_drills || m_current_ore_stock >= m_ore_stock_max)
 	{
-		if (m_current_drill_attempts == m_nb_drills)
+		if (m_drill_attempts == m_nb_drills)
 		{
 			printf("Drill attempts exhausted.\n");
 		}
@@ -769,7 +772,7 @@ bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, 
 			m_mission_base_location = NULL;
 			m_mission_task_location = NULL;
 
-			SetStarshipState(StarshipState_MovingToZone);
+			//SetStarshipState(StarshipState_MovingToZone);
 			break;
 		}
 		case StarshipMission_Scan:
@@ -780,7 +783,17 @@ bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, 
 			m_mission_base_location = NULL;
 			m_mission_task_location = task_location;
 
-			SetStarshipState(StarshipState_MovingToLocation);
+			//SetStarshipState(StarshipState_MovingToLocation);
+			break;
+		}
+		case StarshipMission_Drill:
+		{
+			SetSpeedForConstantSpeedToDestination(task_location->getPosition(), m_speed_max);
+
+			m_current_destination_location = task_location;
+			m_mission_base_location = base_location;
+			m_mission_task_location = task_location;
+
 			break;
 		}
 	}
@@ -797,11 +810,27 @@ void Starship::ManageMission(sf::Time deltaTime)
 			case StarshipMission_Scout:
 				m_visible = false;
 				m_GarbageMe = true;
-				//SetStarshipState(StarshipState_Scanning);
 				break;
 			case StarshipMission_Scan:
-				//SetStarshipState(StarshipState_Scanning);
 				m_scan_clock.restart();
+				break;
+			case StarshipMission_Drill:
+				if (m_current_destination_location == m_mission_task_location)
+				{
+					m_state = StarshipState_Drilling;
+					m_drill_clock.restart();
+					printf("Starting drill attempt (%d/%d).\n", m_drill_attempts + 1, m_nb_drills);
+				}
+				else
+				{
+					m_state = StarshipState_Unloading;
+					UnloadCarriage(m_current_location);
+					m_drill_attempts = 0;
+					m_arrived_at_destination = false;
+					m_current_destination_location = m_mission_task_location;
+					SetSpeedForConstantSpeedToDestination(m_mission_task_location->getPosition(), m_speed_max);
+				}
+				 
 				break;
 		}
 	}
@@ -816,6 +845,31 @@ void Starship::ManageMission(sf::Time deltaTime)
 					m_visible = false;
 					m_GarbageMe = true;
 				}
+				break;
+			case StarshipMission_Drill:
+				if (m_ore_found || Drill() != NULL)
+				{
+					if (Extract(m_ore_found))
+					{
+						LoadInStock(m_ore_found->m_display_name, 1);
+						m_ore_found = NULL;
+						m_drill_clock.restart();
+
+						//time to go back?
+						if (m_drill_attempts >= m_nb_drills)
+						{
+							m_state = StarshipState_CarryToBase;
+							m_arrived_at_destination = false;
+							m_current_destination_location = m_mission_base_location;
+							SetSpeedForConstantSpeedToDestination(m_mission_base_location->getPosition(), m_speed_max);
+						}
+						else
+						{
+							printf("Starting drill attempt (%d/%d).\n", m_drill_attempts + 1, m_nb_drills);
+						}
+					}
+				}
+				
 				break;
 		}
 	}
@@ -839,7 +893,7 @@ void Starship::ManageMission(sf::Time deltaTime)
 //			else
 //			{
 //				SetStarshipState(StarshipState_Loading);
-//				m_current_drill_attempts = m_nb_drills;
+//				m_drill_attempts = m_nb_drills;
 //			}
 //		}
 //	}

@@ -50,9 +50,9 @@ public :
 	//bool ManagePropulsion();
 	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
 	void SetStarshipState(StarshipState state);
-	void Drill();
+	Ore* Drill();
 	bool Scan(StockEntity* entity);
-	void Extract(Ore* ore);
+	bool Extract(Ore* ore);
 	bool IsNewDrillAttemptAvailable();
 	//string GetBestAssignedPropulsionAvailable();
 	size_t GetPropulsionRequired(GameObject* destination);
@@ -92,7 +92,7 @@ public :
 	size_t m_nb_drills;
 	float m_drill_sucess_rate_bonus;
 	float m_extraction_duration_bonus;
-	size_t m_current_drill_attempts;
+	size_t m_drill_attempts;
 	sf::Clock m_drill_clock;
 	float m_drill_duration;
 	sf::Clock m_extraction_clock;
