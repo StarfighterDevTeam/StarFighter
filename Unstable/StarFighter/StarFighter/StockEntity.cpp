@@ -201,8 +201,6 @@ void StockEntity::UnloadCarriage(StockEntity* entity)
 
 		m_ore_stock[i->first] -= quantity_unloaded;
 		m_current_ore_stock -= quantity_unloaded * ore_weight;
-
-		printf("Unloading %f %s.\n", quantity_unloaded, i->first);
 	}	
 
 	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); i++)
@@ -211,8 +209,6 @@ void StockEntity::UnloadCarriage(StockEntity* entity)
 
 		m_fuel_stock[i->first] -= quantity_unloaded;
 		m_current_fuel_stock -= quantity_unloaded;
-
-		printf("Unloading %f %s.\n", quantity_unloaded, i->first);
 	}
 }
 

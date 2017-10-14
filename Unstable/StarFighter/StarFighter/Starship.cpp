@@ -21,6 +21,7 @@ Starship::Starship(sf::Vector2f position, sf::Vector2f speed, std::string textur
 	m_mission_base_location = NULL;
 	m_mission_task_location = NULL;
 	m_current_location = NULL;
+	m_loop_mission = false;
 	m_arrived_at_destination = true;
 	m_propulsion = 0;
 	m_propulsion_speed_bonus = 0;
@@ -541,38 +542,33 @@ bool Starship::MoveToLocation(StockEntity* location)
 
 	return true;
 }
-
-bool Starship::ManagePropulsion()
-{
-	if (!m_current_destination_location || !m_mission_base_location || m_arrived_at_destination)
-	{
-		return false;
-	}
-
-	size_t distance_remaining = m_current_destination_location == m_mission_base_location ? GetLightYearsBetweenObjects(this, m_current_destination_location) : GetLightYearsBetweenObjects(this, m_current_destination_location) + GetLightYearsBetweenObjects(m_current_destination_location, m_mission_base_location);
-	if (distance_remaining < m_propulsion_assigned)
-	{
-		size_t propulsion_to_consumme = m_propulsion_assigned - distance_remaining;
-		ConsummePropulsion(propulsion_to_consumme);
-
-		//finish by a waste?
-		if (distance_remaining == 0)
-		{
-			for (map<string, size_t>::iterator i = m_fuel_assigned.begin(); i != m_fuel_assigned.end(); ++i)
-			{
-				size_t fuel_remaining = i->second * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
-				i->second = 0;
-				m_fuel -= fuel_remaining;
-			}
-
-			m_propulsion_assigned = 0;
-		}
-	}
-
-	return true;
-}
-
 */
+//bool Starship::ManagePropulsion()
+//{
+//	size_t distance_remaining = m_current_destination_location == m_mission_base_location ? GetLightYearsBetweenObjects(this, m_current_destination_location) : GetLightYearsBetweenObjects(this, m_current_destination_location) + GetLightYearsBetweenObjects(m_current_destination_location, m_mission_base_location);
+//	if (distance_remaining < m_propulsion_assigned)
+//	{
+//		size_t propulsion_to_consumme = m_propulsion_assigned - distance_remaining;
+//		ConsummePropulsion(propulsion_to_consumme);
+//
+//		//finish by a waste?
+//		if (distance_remaining == 0)
+//		{
+//			for (map<string, size_t>::iterator i = m_fuel_assigned.begin(); i != m_fuel_assigned.end(); ++i)
+//			{
+//				size_t fuel_remaining = i->second * (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
+//				i->second = 0;
+//				m_fuel -= fuel_remaining;
+//			}
+//
+//			m_propulsion_assigned = 0;
+//		}
+//	}
+//
+//	return true;
+//}
+
+/*
 
 bool Starship::CheckIfArrivedAtDestination(sf::Time deltaTime)
 {
@@ -709,25 +705,6 @@ bool Starship::Extract(Ore* ore)
 	return false;
 }
 
-bool Starship::IsNewDrillAttemptAvailable()
-{
-	if (m_drill_attempts == m_nb_drills || m_current_ore_stock >= m_ore_stock_max)
-	{
-		if (m_drill_attempts == m_nb_drills)
-		{
-			printf("Drill attempts exhausted.\n");
-		}
-	
-		SetStarshipState(StarshipState_CarryToBase);
-		return false;
-	}
-	else
-	{
-		SetStarshipState(StarshipState_Drilling);
-		return true;
-	}
-}
-
 //string Starship::GetBestAssignedPropulsionAvailable()
 //{
 //	size_t propulsion = 0;
@@ -773,6 +750,7 @@ bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, 
 			m_mission_task_location = NULL;
 
 			//SetStarshipState(StarshipState_MovingToZone);
+			return true;
 			break;
 		}
 		case StarshipMission_Scan:
@@ -784,15 +762,24 @@ bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, 
 			m_mission_task_location = task_location;
 
 			//SetStarshipState(StarshipState_MovingToLocation);
+			return true;
 			break;
 		}
 		case StarshipMission_Drill:
 		{
+			if (!CheckIfEnoughFuelToDestination(task_location->getPosition()))
+			{
+				return false;
+			}
+
 			SetSpeedForConstantSpeedToDestination(task_location->getPosition(), m_speed_max);
 
 			m_current_destination_location = task_location;
 			m_mission_base_location = base_location;
 			m_mission_task_location = task_location;
+
+			m_loop_mission = true;
+			return true;
 
 			break;
 		}
@@ -825,14 +812,24 @@ void Starship::ManageMission(sf::Time deltaTime)
 				{
 					UnloadCarriage(m_current_location);
 					m_drill_attempts = 0;
-					//m_arrived_at_destination = false;
-					//m_current_destination_location = m_mission_task_location;
-					//SetSpeedForConstantSpeedToDestination(m_mission_task_location->getPosition(), m_speed_max);
-					m_state = StarshipState_Idle;
-					m_mission = StarshipMission_Idle;
-					m_mission_task_location = NULL;
-					m_mission_base_location = NULL;
-					m_current_destination_location = NULL;
+
+					if (m_loop_mission)
+					{
+						if (CheckIfEnoughFuelToDestination(m_mission_task_location->getPosition()))
+						{
+							m_arrived_at_destination = false;
+							m_current_destination_location = m_mission_task_location;
+							SetSpeedForConstantSpeedToDestination(m_mission_task_location->getPosition(), m_speed_max);
+						}
+					}
+					else
+					{
+						m_state = StarshipState_Idle;
+						m_mission = StarshipMission_Idle;
+						m_mission_task_location = NULL;
+						m_mission_base_location = NULL;
+						m_current_destination_location = NULL;
+					}
 				}
 				 
 				break;
@@ -924,4 +921,13 @@ bool Starship::ArrivingAtDestination(sf::Time deltaTime)
 	}
 
 	return m_arrived_at_destination;
+}
+
+bool Starship::CheckIfEnoughFuelToDestination(sf::Vector2f destination)
+{
+	size_t distance = (size_t)GetDistanceBetweenPositions(getPosition(), destination) / LIGHTYEAR_IN_PIXELS;
+
+	size_t propulsion_available = m_fuel_tank.second * (size_t)stoi((*CurrentGame).m_oreConfig[m_fuel_tank.first][OreData_Propulsion]);
+
+	return distance <= propulsion_available;
 }

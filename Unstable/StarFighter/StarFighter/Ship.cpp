@@ -76,19 +76,19 @@ void Ship::update(sf::Time deltaTime)
 		const float a = (*CurrentGame).m_view.getCenter().x;
 		const float b = (*CurrentGame).m_view.getCenter().y;
 
-		if (mousepos.x > a + x - MOUSE_SCROLL_MARGIN && mousepos.x < a + x)
+		if (mousepos.x > a + x - MOUSE_SCROLL_MARGIN && mousepos.x < a + x && mousepos.y < b + y && mousepos.y > b - y)
 		{
 			inputs_direction.x = 1.0f;
 		}
-		if (mousepos.x < a - x + MOUSE_SCROLL_MARGIN && mousepos.x > a - x)
+		if (mousepos.x < a - x + MOUSE_SCROLL_MARGIN && mousepos.x > a - x && mousepos.y < b + y && mousepos.y > b - y)
 		{
 			inputs_direction.x = -1.0f;
 		}
-		if (mousepos.y < b - y + MOUSE_SCROLL_MARGIN && mousepos.y > b - y)
+		if (mousepos.y < b - y + MOUSE_SCROLL_MARGIN && mousepos.y > b - y && mousepos.x > a - x && mousepos.x < a + x)
 		{
 			inputs_direction.y = -1.0f;
 		}
-		if (mousepos.y > b + y - MOUSE_SCROLL_MARGIN && mousepos.y < b + y)
+		if (mousepos.y > b + y - MOUSE_SCROLL_MARGIN && mousepos.y < b + y && mousepos.x > a - x && mousepos.x < a + x)
 		{
 			inputs_direction.y = 1.0f;
 		}

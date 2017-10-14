@@ -27,7 +27,7 @@ void InGameState::Initialize(Player player)
 	planet->Build("ore_container", true);
 	planet->Build("fuel_tanks", true);
 	Starship* miner = planet->Produce("miner", true);
-	miner->LoadFuelTank("oil", 100);
+	miner->LoadFuelTank("oil", 10);
 	planet->LoadInStock("oil", 150);
 	planet->LoadInStock("deuterium", 30);
 	planet->m_display_name = "Planète mère";

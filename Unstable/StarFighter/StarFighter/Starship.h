@@ -53,13 +53,14 @@ public :
 	Ore* Drill();
 	bool Scan(StockEntity* entity);
 	bool Extract(Ore* ore);
-	bool IsNewDrillAttemptAvailable();
 	//string GetBestAssignedPropulsionAvailable();
 	size_t GetPropulsionRequired(GameObject* destination);
 
 	bool AssignMission(StarshipMission mission, sf::Vector2f destination, StockEntity* task_location = NULL, StockEntity* base_location = NULL);
 	void ManageMission(sf::Time deltaTime);
 	bool ArrivingAtDestination(sf::Time deltaTime);
+	bool CheckIfEnoughFuelToDestination(sf::Vector2f destination);
+
 
 	sf::Vector2u GetCurrentZone();
 	void UpdateZoneKnowledge();
@@ -73,6 +74,7 @@ public :
 	StockEntity* m_mission_task_location;
 	StarshipMission m_mission;
 	sf::Vector2f m_current_destination_coordinates;
+	bool m_loop_mission;
 
 	StarshipState m_state;
 	bool m_arrived_at_destination;
