@@ -60,6 +60,8 @@ public :
 	void ManageMission(sf::Time deltaTime);
 	bool ArrivingAtDestination(sf::Time deltaTime);
 	bool CheckIfEnoughFuelToDestination(sf::Vector2f destination);
+	size_t GetFuelCostToDestination(sf::Vector2f destination);
+	size_t GetPropulsionAvailable();
 
 
 	sf::Vector2u GetCurrentZone();
