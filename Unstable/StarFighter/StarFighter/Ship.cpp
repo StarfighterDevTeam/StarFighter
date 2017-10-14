@@ -117,33 +117,52 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	//Action (right click) - assigning a starship to a mission
-	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object && m_selected_object->m_collider_type == StarshipObject)
+	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object)
 	{
-		Starship* starship = (Starship*)m_selected_object;
-
-		if (starship->m_mission == StarshipMission_Idle)
+		if (m_selected_object->m_collider_type == StarshipObject)
 		{
-			if (m_hovered_object && m_hovered_object->m_collider_type == LocationObject)
-			{
-				Location* location = (Location*)m_hovered_object;
+			Starship* starship = (Starship*)m_selected_object;
 
-				//scan mission?
-				if (starship->m_scout_range > 0)
-				{
-					starship->AssignMission(StarshipMission_Scan, sf::Vector2f(0, 0), location, NULL);
-				}
-				//mining mission?
-				else if (starship->m_nb_drills > 0)
-				{
-					starship->AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), location, starship->m_current_location);
-				}
-			}
-			//scout mission ?
-			else if (starship->m_scout_range > 0)
+			if (starship->m_mission == StarshipMission_Idle)
 			{
-				starship->AssignMission(StarshipMission_Scout, getPosition());
+				if (m_hovered_object && m_hovered_object->m_collider_type == LocationObject)
+				{
+					Location* location = (Location*)m_hovered_object;
+
+					//scan mission?
+					if (starship->m_scout_range > 0 && !location->m_identified)
+					{
+						starship->AssignMission(StarshipMission_Scan, sf::Vector2f(0, 0), location, NULL);
+					}
+					//mining mission?
+					else if (starship->m_nb_drills > 0 && location->m_identified)
+					{
+						starship->AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), location, starship->m_current_location);
+					}
+				}
+				//scout mission ?
+				else if (starship->m_scout_range > 0)
+				{
+					starship->AssignMission(StarshipMission_Scout, getPosition());
+				}
 			}
 		}
+		else if (m_selected_object->m_collider_type == LocationObject)
+		{
+			Location* location = (Location*)m_selected_object;
+
+			if (m_hovered_object && m_hovered_object->m_collider_type == StarshipObject)
+			{
+				Starship* starship = (Starship*)m_hovered_object;
+
+				if (starship->m_current_location == location)
+				{
+					location->SupplyOilTank(starship->m_fuel_tank, *starship);
+				}
+			
+			}
+		}
+		
 	}
 
 	MaxSpeedConstraints();

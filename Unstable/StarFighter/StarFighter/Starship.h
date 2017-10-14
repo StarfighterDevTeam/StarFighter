@@ -43,7 +43,7 @@ public :
 	//bool AssignToLocation(StockEntity* location);
 	//bool AssignMission(StockEntity* location);
 	//bool MoveToLocation(StockEntity* location);
-	size_t LoadFuelTank(string fuel_name, size_t quantity);
+	size_t LoadFuelTank(string fuel_name, size_t quantity) override;
 	//size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation);
 	//size_t AssignPropulsionToTravel(size_t distance);
 	//size_t ConsummePropulsion(size_t propulsion_to_consumme);

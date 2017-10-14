@@ -191,25 +191,50 @@ Ore* StockEntity::DigRandomOre(bool can_be_fuel, bool can_be_ore)
 	}
 }
 
-void StockEntity::UnloadCarriage(StockEntity* location)
+void StockEntity::UnloadCarriage(StockEntity* entity)
 {
 	for (map<string, size_t>::iterator i = m_ore_stock.begin(); i != m_ore_stock.end(); i++)
 	{
-		size_t quantity_unloaded = location->LoadInStock(i->first, i->second);
+		size_t quantity_unloaded = entity->LoadInStock(i->first, i->second);
 
 		size_t ore_weight = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Weight]);
 
 		m_ore_stock[i->first] -= quantity_unloaded;
 		m_current_ore_stock -= quantity_unloaded * ore_weight;
+
+		printf("Unloading %f %s.\n", quantity_unloaded, i->first);
 	}	
 
 	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); i++)
 	{
-		size_t quantity_unloaded = location->LoadInStock(i->first, i->second);
+		size_t quantity_unloaded = entity->LoadInStock(i->first, i->second);
 
 		m_fuel_stock[i->first] -= quantity_unloaded;
 		m_current_fuel_stock -= quantity_unloaded;
+
+		printf("Unloading %f %s.\n", quantity_unloaded, i->first);
+	}
+}
+
+size_t StockEntity::SupplyOilTank(pair<string, size_t>& starship_fuel_tank, StockEntity& starship)
+{
+	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); ++i)
+	{
+		if (i->second > 0 && (starship_fuel_tank.first == i->first || starship_fuel_tank.second == 0))
+		{
+			size_t quantity_accepted = starship.LoadFuelTank(i->first, i->second);
+			m_fuel_stock[i->first] -= quantity_accepted;
+			m_current_fuel_stock -= quantity_accepted;
+
+			return quantity_accepted;
+		}
 	}
 
-	printf("Unloading.\n");
+	return 0;
+}
+
+size_t StockEntity::LoadFuelTank(string fuel_name, size_t quantity)
+{
+	//see override function in Starship class
+	return 0;
 }

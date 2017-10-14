@@ -823,12 +823,16 @@ void Starship::ManageMission(sf::Time deltaTime)
 				}
 				else
 				{
-					m_state = StarshipState_Unloading;
 					UnloadCarriage(m_current_location);
 					m_drill_attempts = 0;
-					m_arrived_at_destination = false;
-					m_current_destination_location = m_mission_task_location;
-					SetSpeedForConstantSpeedToDestination(m_mission_task_location->getPosition(), m_speed_max);
+					//m_arrived_at_destination = false;
+					//m_current_destination_location = m_mission_task_location;
+					//SetSpeedForConstantSpeedToDestination(m_mission_task_location->getPosition(), m_speed_max);
+					m_state = StarshipState_Idle;
+					m_mission = StarshipMission_Idle;
+					m_mission_task_location = NULL;
+					m_mission_base_location = NULL;
+					m_current_destination_location = NULL;
 				}
 				 
 				break;

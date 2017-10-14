@@ -28,8 +28,8 @@ void InGameState::Initialize(Player player)
 	planet->Build("fuel_tanks", true);
 	Starship* miner = planet->Produce("miner", true);
 	miner->LoadFuelTank("oil", 100);
-	//planet->Load("oil", 50);
-	//planet->Load("deuterium", 30);
+	planet->LoadInStock("oil", 150);
+	planet->LoadInStock("deuterium", 30);
 	planet->m_display_name = "Planète mère";
 	planet->m_identified = true;
 
