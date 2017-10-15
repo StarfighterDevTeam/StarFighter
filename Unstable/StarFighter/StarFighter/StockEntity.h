@@ -13,8 +13,6 @@ public :
 
 	void update(sf::Time deltaTime) override;
 
-	string GetBestPropulsionAvailable();
-	static string GetBestPropulsionAvailable(map<string, size_t> fuel_tank);
 	size_t LoadInStock(string resource_name, size_t quantity);
 	virtual bool CanSupplyFuel();
 	bool CanBeDrilled();

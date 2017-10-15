@@ -39,22 +39,10 @@ public :
 	void Draw(sf::RenderTexture& screen);
 
 	static Starship* CreateStarship(string name);
-
-	//bool AssignToLocation(StockEntity* location);
-	//bool AssignMission(StockEntity* location);
-	//bool MoveToLocation(StockEntity* location);
 	size_t LoadFuelTank(string fuel_name, size_t quantity) override;
-	//size_t LoadRequiredPropulsion(StockEntity* location, size_t propulsion_missing, bool simulation);
-	//size_t AssignPropulsionToTravel(size_t distance);
-	//size_t ConsummePropulsion(size_t propulsion_to_consumme);
-	//bool ManagePropulsion();
-	bool CheckIfArrivedAtDestination(sf::Time deltaTime);
-	void SetStarshipState(StarshipState state);
 	Ore* Drill();
 	bool Scan(StockEntity* entity);
 	bool Extract(Ore* ore);
-	//string GetBestAssignedPropulsionAvailable();
-	size_t GetPropulsionRequired(GameObject* destination);
 
 	bool AssignMission(StarshipMission mission, sf::Vector2f destination, StockEntity* task_location = NULL, StockEntity* base_location = NULL);
 	void ManageMission(sf::Time deltaTime);

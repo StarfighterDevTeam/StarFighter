@@ -8,7 +8,6 @@ StockEntity::StockEntity(sf::Vector2f position, sf::Vector2f speed, std::string 
 {
 	m_current_ore_stock = 0;
 	m_ore_stock_max = 0;
-	//m_min_ore_weight = 0;
 	m_current_fuel_stock = 0;
 	m_fuel_stock_max = 0;
 
@@ -53,39 +52,6 @@ void StockEntity::update(sf::Time deltaTime)
 	}
 
 	GameObject::update(deltaTime);
-}
-
-string StockEntity::GetBestPropulsionAvailable()
-{
-	size_t propulsion = 0;
-	string selected_fuel;
-
-	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); ++i)
-	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
-		{
-			selected_fuel = i->first;
-			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
-		}
-	}
-
-	return selected_fuel;
-}
-
-string StockEntity::GetBestPropulsionAvailable(map<string, size_t> fuel_tank)
-{
-	size_t propulsion = 0;
-	string selected_fuel;
-	for (map<string, size_t>::iterator i = fuel_tank.begin(); i != fuel_tank.end(); ++i)
-	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
-		{
-			selected_fuel = i->first;
-			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
-		}
-	}
-
-	return selected_fuel;
 }
 
 size_t StockEntity::LoadInStock(string resource_name, size_t quantity)
