@@ -39,6 +39,7 @@ void InGameState::Initialize(Player player)
 	planet2->m_ore_presence_rates["deuterium"] = 0.5f;
 	//planet2->Build("refinery", true);
 	planet2->Build("ore_container", true);
+	planet2->Build("fuel_tanks", true);
 	planet2->LoadInStock("oil", 50);
 	planet2->LoadInStock("deuterium", 30);
 	planet2->LoadInStock("iron", 30);

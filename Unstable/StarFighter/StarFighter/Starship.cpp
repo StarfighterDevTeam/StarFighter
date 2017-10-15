@@ -187,6 +187,8 @@ Starship* Starship::CreateStarship(string name)
 
 Ore* Starship::Drill()
 {
+	m_state = StarshipState_Drilling;
+
 	//Drilling attempt
 	if (m_drill_clock.getElapsedTime().asSeconds() > m_drill_duration)
 	{
@@ -316,6 +318,7 @@ bool Starship::AssignMission(StarshipMission mission, sf::Vector2f destination, 
 
 			m_mission = mission;
 			m_arrived_at_destination = false;
+			m_state = StarshipState_MovingToLocation;
 
 			return true;
 		}
