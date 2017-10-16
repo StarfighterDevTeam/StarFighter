@@ -25,7 +25,7 @@ public:
 	void Release();
 	void UpdateCamera(sf::Time deltaTime);
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
-	static void DestroySFPanel(Ship* playerShip);
+	static void DestroySFPanel(SFPanelTypes panel_type, Ship* playerShip);
 	static void LoadCSVFiles();
 
 private:

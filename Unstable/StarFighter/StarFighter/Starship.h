@@ -50,6 +50,7 @@ public :
 	bool CheckIfEnoughFuelToDestination(sf::Vector2f destination);
 	size_t GetFuelCostToDestination(sf::Vector2f destination);
 	size_t GetPropulsionAvailable();
+	size_t UnloadFuelTank(StockEntity* entity);
 
 
 	sf::Vector2u GetCurrentZone();

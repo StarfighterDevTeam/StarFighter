@@ -17,9 +17,10 @@ public :
 	virtual bool CanSupplyFuel();
 	bool CanBeDrilled();
 	Ore* DigRandomOre(bool can_be_fuel = true, bool can_be_ore = true);
-	void UnloadCarriage(StockEntity* entity);
-	size_t SupplyOilTank(pair<string, size_t>& starship_fuel_tank, StockEntity& starship);
+	void UnloadStocks(StockEntity* entity);
+	size_t SupplyFuelTank(pair<string, size_t>& starship_fuel_tank, StockEntity& starship);
 	virtual size_t LoadFuelTank(string fuel_name, size_t quantity);
+	string GetBestPropulsionAvailable();
 	virtual size_t GetOreMax();
 	virtual size_t GetFuelMax();
 

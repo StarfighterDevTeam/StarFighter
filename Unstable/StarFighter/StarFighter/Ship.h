@@ -68,8 +68,10 @@ public :
 
 	sf::Clock m_stroboscopic_effect_clock;
 
-	SFPanel* m_SFTargetPanel;
-	SFPanelTypes m_is_asking_SFPanel;
+	SFPanel* m_SFUnitInfoPanel;
+	bool m_is_asking_SFUnitPanel;
+	SFPanel* m_SFContextInfoPanel;
+	bool m_is_asking_SFContextPanel;
 
 	GameObject* m_hovered_object;
 	GameObject* m_selected_object;

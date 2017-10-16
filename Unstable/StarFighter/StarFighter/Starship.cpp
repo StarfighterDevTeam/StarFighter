@@ -198,8 +198,8 @@ Ore* Starship::Drill()
 		
 		if (m_ore_found)
 		{
-			printf("Ore found: %s\n", m_ore_found->m_display_name.c_str());
-			printf("Extraction...");
+			//printf("Ore found: %s\n", m_ore_found->m_display_name.c_str());
+			//printf("Extraction...");
 			m_extraction_clock.restart();
 		}
 		else
@@ -226,9 +226,8 @@ bool Starship::Scan(StockEntity* entity)
 bool Starship::Extract(Ore* ore)
 {
 	//Extract
-	if (m_extraction_clock.getElapsedTime().asSeconds() > MaxBetweenValues(sf::Vector2f(ore->m_extraction_duration - m_extraction_duration_bonus, 0)))
+	if (m_extraction_clock.getElapsedTime().asSeconds() > ore->m_extraction_duration * (1 - m_extraction_duration_bonus))
 	{
-		printf("complete. Loading ore.\n");
 		return true;
 	}
 	else
@@ -347,14 +346,17 @@ void Starship::ManageMission(sf::Time deltaTime)
 					m_drill_clock.restart();
 					printf("Starting drill attempt (%d/%d).\n", m_drill_attempts + 1, m_nb_drills);
 				}
-				else
+				else//ship is back to base location
 				{
-					UnloadCarriage(m_current_location);
+					UnloadStocks(m_current_location);
 					m_drill_attempts = 0;
 
 					if (m_loop_mission)
 					{
-						AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), m_mission_task_location, m_mission_base_location);
+						if (!AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), m_mission_task_location, m_mission_base_location))
+						{
+							AssignMission(StarshipMission_Idle, sf::Vector2f(0, 0), NULL, NULL);
+						}
 					}
 					else
 					{
@@ -402,10 +404,15 @@ void Starship::ManageMission(sf::Time deltaTime)
 								m_current_destination_location = m_mission_base_location;
 								SetSpeedForConstantSpeedToDestination(m_mission_base_location->getPosition(), m_speed_max);
 							}
+							else
+							{
+								m_state = StarshipState_Idle;
+							}
 						}
 						else
 						{
 							printf("Starting drill attempt (%d/%d).\n", m_drill_attempts + 1, m_nb_drills);
+							m_state = StarshipState_Drilling;
 						}
 					}
 				}
@@ -464,4 +471,13 @@ size_t Starship::GetPropulsionAvailable()
 	size_t propulsion_available = m_fuel_tank.second * (size_t)stoi((*CurrentGame).m_oreConfig[m_fuel_tank.first][OreData_Propulsion]);
 
 	return propulsion_available;
+}
+
+size_t Starship::UnloadFuelTank(StockEntity* entity)
+{
+	size_t quantity_unloaded = entity->LoadInStock(m_fuel_tank.first, m_fuel_tank.second);
+
+	m_fuel_tank.second -= quantity_unloaded;
+
+	return quantity_unloaded;
 }

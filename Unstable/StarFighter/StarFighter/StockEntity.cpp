@@ -157,7 +157,7 @@ Ore* StockEntity::DigRandomOre(bool can_be_fuel, bool can_be_ore)
 	}
 }
 
-void StockEntity::UnloadCarriage(StockEntity* entity)
+void StockEntity::UnloadStocks(StockEntity* entity)
 {
 	for (map<string, size_t>::iterator i = m_ore_stock.begin(); i != m_ore_stock.end(); i++)
 	{
@@ -178,25 +178,47 @@ void StockEntity::UnloadCarriage(StockEntity* entity)
 	}
 }
 
-size_t StockEntity::SupplyOilTank(pair<string, size_t>& starship_fuel_tank, StockEntity& starship)
+size_t StockEntity::SupplyFuelTank(pair<string, size_t>& starship_fuel_tank, StockEntity& starship)
 {
-	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); ++i)
+	//we'll use the best fuel available in stock - ideally
+	string fuel_selected = GetBestPropulsionAvailable();
+	if (fuel_selected.empty())
 	{
-		if (i->second > 0 && (starship_fuel_tank.first == i->first || starship_fuel_tank.second == 0))
-		{
-			size_t quantity_accepted = starship.LoadFuelTank(i->first, i->second);
-			m_fuel_stock[i->first] -= quantity_accepted;
-			m_current_fuel_stock -= quantity_accepted;
-
-			return quantity_accepted;
-		}
+		return 0;//no fuel available at all
 	}
 
-	return 0;
+	//only one type of fuel accepted at once, so if a fuel already exists in the tank, we can only supply with the same kind
+	if (starship_fuel_tank.second > 0)
+	{
+		fuel_selected = starship_fuel_tank.first;
+	}
+
+	size_t quantity_accepted = starship.LoadFuelTank(fuel_selected, m_fuel_stock[fuel_selected]);
+	m_fuel_stock[fuel_selected] -= quantity_accepted;
+	m_current_fuel_stock -= quantity_accepted;
+
+	return quantity_accepted;
 }
 
 size_t StockEntity::LoadFuelTank(string fuel_name, size_t quantity)
 {
 	//see override function in Starship class
 	return 0;
+}
+
+string StockEntity::GetBestPropulsionAvailable()
+{
+	size_t propulsion = 0;
+	string selected_fuel;
+
+	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); ++i)
+	{
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		{
+			selected_fuel = i->first;
+			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+		}
+	}
+
+	return selected_fuel;
 }

@@ -84,33 +84,6 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 			ss_text << "\n\nFuel stock: " << entity->m_current_fuel_stock << " / " << entity->GetFuelMax();
 			ss_text << contains_fuel;//list of ores stocked
 		}
-
-		//fuel stocked
-		//if (entity->m_collider_type == StarshipObject)
-		//{
-		//	Starship* starship = (Starship*)entity;
-		//	for (map<string, size_t>::iterator i = entity->m_fuel_stock.begin(); i != entity->m_fuel_stock.end(); i++)
-		//	{
-		//		//ss_fuel << "\n" << i->first << ": " << i->second + starship->m_fuel_assigned[i->first];
-		//	}
-		//}
-		//else
-		//{
-		//	for (map<string, size_t>::iterator i = entity->m_fuel_stock.begin(); i != entity->m_fuel_stock.end(); i++)
-		//	{
-		//		ss_fuel << "\n" << i->first << ": " << i->second;
-		//	}
-		//}
-		//
-		//contains_fuel = ss_fuel.str();
-		//if (!contains_fuel.empty())
-		//{
-		//	if (!contains_ore.empty())
-		//	{
-		//		ss_text << "\n\n";
-		//	}
-		//	ss_text << "Fuel: " << entity->m_current_fuel_stock << " / " << entity->GetFuelMax() << contains_fuel;
-		//}
 		
 		//drill rates
 		if (entity->m_collider_type == LocationObject)
@@ -175,19 +148,29 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 
 						case StarshipState_Drilling:
 						{
-							ss_text << "\nDrilling";
+							int int_percent = starship->m_drill_clock.getElapsedTime().asSeconds() / starship->m_drill_duration * 10000;
+							float percent = 1.0f * int_percent / 100;
+							ss_text << "\nDrilling...(" << percent << "%)";
 							break;
 						}
 
 						case StarshipState_Extracting:
 						{
-							ss_text << "\nExtracting";
+							int int_percent = starship->m_extraction_clock.getElapsedTime().asSeconds() / (starship->m_ore_found->m_extraction_duration * (1 - starship->m_extraction_duration_bonus)) * 10000;
+							float percent = 1.0f * int_percent / 100;
+							ss_text << "\nExtracting...(" << percent << "%)";
 							break;
 						}
 
 						case StarshipState_CarryToBase:
 						{
 							ss_text << "\nReturning to base location";
+							break;
+						}
+
+						case StarshipState_Idle:
+						{
+							ss_text << "\nOut of fuel";
 							break;
 						}
 
@@ -217,36 +200,8 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 			//fuel tank
 			ss_text << "\n\nFuel tank:" << starship->m_fuel_tank.second << " / " << starship->m_fuel_tank_max;
 			ss_text << "\n" << starship->m_fuel_tank.first << ": " << starship->m_fuel_tank.second;
-
-			//	contains_fuel = ss_fuel.str();
-			//if (!contains_fuel.empty())
-			//{
-			//	ss_text << "\n\nFuel stock: " << entity->m_current_fuel_stock << " / " << entity->GetFuelMax();
-			//	ss_text << contains_fuel;//list of ores stocked
-			//}
 		}
 	}
-
-		//location
-		//ss_text << "\n\nBase location: ";
-		//if (starship->m_mission_base_location)
-		//{
-		//	ss_text << starship->m_mission_base_location->m_display_name;
-		//}
-		//else
-		//{
-		//	ss_text << "none";
-		//}
-		//
-		//ss_text << "\nTask location: ";
-		//if (starship->m_mission_task_location)
-		//{
-		//	ss_text << starship->m_mission_task_location->m_display_name;
-		//}
-		//else
-		//{
-		//	ss_text << "none";
-		//}
 
 	m_text.setString(ss_text.str());
 

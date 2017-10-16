@@ -22,8 +22,10 @@ void Ship::Init()
 		m_actions_states[i] = false;
 	}
 
-	m_SFTargetPanel = NULL;
-	m_is_asking_SFPanel = SFPanel_None;
+	m_SFUnitInfoPanel = NULL;
+	m_is_asking_SFUnitPanel = false;
+	m_SFContextInfoPanel = NULL;
+	m_is_asking_SFContextPanel = false;
 	m_hovered_object = NULL;
 	m_selected_object = NULL;
 }
@@ -129,8 +131,13 @@ void Ship::update(sf::Time deltaTime)
 				{
 					Location* location = (Location*)m_hovered_object;
 
+					//unload fuel?
+					if (location == starship->m_current_location)
+					{
+						starship->UnloadFuelTank(location);
+					}
 					//scan mission?
-					if (starship->m_scout_range > 0 && !location->m_identified)
+					else if (starship->m_scout_range > 0 && !location->m_identified)
 					{
 						starship->AssignMission(StarshipMission_Scan, sf::Vector2f(0, 0), location, NULL);
 					}
@@ -157,7 +164,7 @@ void Ship::update(sf::Time deltaTime)
 
 				if (starship->m_current_location == location)
 				{
-					location->SupplyOilTank(starship->m_fuel_tank, *starship);
+					location->SupplyFuelTank(starship->m_fuel_tank, *starship);
 				}
 			
 			}
@@ -177,34 +184,44 @@ void Ship::update(sf::Time deltaTime)
 void Ship::ManageHud(sf::Time deltaTime)
 {
 	//Hud
-	m_is_asking_SFPanel = SFPanel_None;
+	m_is_asking_SFUnitPanel = false;
+	m_is_asking_SFContextPanel = false;
+
 	if (m_hovered_object)
 	{
-		if (m_SFTargetPanel && m_SFTargetPanel->GetUnit() && m_SFTargetPanel->GetUnit() != m_hovered_object)
+		if (m_SFUnitInfoPanel && m_SFUnitInfoPanel->GetUnit() && m_SFUnitInfoPanel->GetUnit() != m_hovered_object)
 		{
 			//don't display it yet, first we need to destroy the previous panel
 		}
 		else
 		{
-			m_is_asking_SFPanel = SFPanel_UnitInfoPanel;
+			m_is_asking_SFUnitPanel = true;
 		}
 	}
 	else if (m_selected_object)
 	{
-		if (m_SFTargetPanel && m_SFTargetPanel->GetUnit() && m_SFTargetPanel->GetUnit() != m_selected_object)
+		if (m_SFUnitInfoPanel && m_SFUnitInfoPanel->GetUnit() && m_SFUnitInfoPanel->GetUnit() != m_selected_object)
 		{
 			//don't display it yet, first we need to destroy the previous panel
 		}
 		else
 		{
-			m_is_asking_SFPanel = SFPanel_UnitInfoPanel;
+			m_is_asking_SFUnitPanel = true;
 		}
 	}
-	if (m_SFTargetPanel)
+
+	if (m_SFUnitInfoPanel)
 	{
-		sf::Vector2f position = sf::Vector2f(m_SFTargetPanel->getSize().x / 2 + m_SFTargetPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + getPosition().x, m_SFTargetPanel->getSize().y / 2 + m_SFTargetPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + getPosition().y);
-		m_SFTargetPanel->setPosition(position);
-		m_SFTargetPanel->Update(deltaTime);
+		sf::Vector2f position = sf::Vector2f(m_SFUnitInfoPanel->getSize().x / 2 + m_SFUnitInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + getPosition().x, m_SFUnitInfoPanel->getSize().y / 2 + m_SFUnitInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + getPosition().y);
+		m_SFUnitInfoPanel->setPosition(position);
+		m_SFUnitInfoPanel->Update(deltaTime);
+	}
+
+	if (m_SFContextInfoPanel)
+	{
+		sf::Vector2f position = sf::Vector2f(m_SFContextInfoPanel->getSize().x / 2 + m_SFContextInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().x / 2 + getPosition().x, m_SFContextInfoPanel->getSize().y / 2 + m_SFContextInfoPanel->getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + getPosition().y);
+		m_SFContextInfoPanel->setPosition(position);
+		m_SFContextInfoPanel->Update(deltaTime);
 	}
 }
 
