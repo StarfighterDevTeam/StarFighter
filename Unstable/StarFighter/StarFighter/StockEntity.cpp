@@ -125,7 +125,7 @@ Ore* StockEntity::DigRandomOre(bool can_be_fuel, bool can_be_ore)
 			continue;
 		}
 
-		if (!can_be_ore && !(*CurrentGame).IsFuel(i->first) == 0)
+		if (!can_be_ore && !(*CurrentGame).IsFuel(i->first))
 		{
 			continue;
 		}

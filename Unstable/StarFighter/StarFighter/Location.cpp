@@ -110,7 +110,7 @@ void Planet::update(sf::Time deltaTime)
 
 bool Planet::CanSupplyFuel()
 {
-	return GetStockMax() > 0;
+	return GetFuelMax() > 0;
 }
 
 size_t Planet::GetOreMax()
