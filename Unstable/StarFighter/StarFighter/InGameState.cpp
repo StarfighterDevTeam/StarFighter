@@ -112,11 +112,11 @@ void InGameState::Update(sf::Time deltaTime)
 
 	//Create and destroy Context info panel (HUD)
 	//case 1: destroying a panel
-	if ((*CurrentGame).m_playerShip->m_is_asking_SFContextPanel == false && (*CurrentGame).m_playerShip->m_SFContextInfoPanel)
+	if ((*CurrentGame).m_playerShip->m_is_asking_SFContextPanel_string.empty() && (*CurrentGame).m_playerShip->m_SFContextInfoPanel)
 	{
 		DestroySFPanel(SFPanel_ContextInfoPanel, (*CurrentGame).m_playerShip);
 	}
-	else if ((*CurrentGame).m_playerShip->m_is_asking_SFContextPanel == true)
+	else if (!(*CurrentGame).m_playerShip->m_is_asking_SFContextPanel_string.empty())
 	{
 		//case 2: creating a panel
 		if (!(*CurrentGame).m_playerShip->m_SFContextInfoPanel)
@@ -190,13 +190,13 @@ void InGameState::CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip)
 	{
 		case SFPanel_UnitInfoPanel:
 		{
-			playerShip->m_SFUnitInfoPanel = new SFUnitInfoPanel(sf::Vector2f(SFPANEL_SPECIFIC_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_UnitInfoPanel, playerShip);
+			playerShip->m_SFUnitInfoPanel = new SFUnitInfoPanel(sf::Vector2f(SFPANEL_UNITINFO_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_UnitInfoPanel, playerShip);
 			(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFUnitInfoPanel);
 			break;
 		}
 		case SFPanel_ContextInfoPanel:
 		{
-			playerShip->m_SFContextInfoPanel = new SFUnitInfoPanel(sf::Vector2f(SFPANEL_SPECIFIC_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_UnitInfoPanel, playerShip);
+			playerShip->m_SFContextInfoPanel = new SFContextInfoPanel(sf::Vector2f(SFPANEL_CONTEXTINFO_WIDTH, SFPANEL_SPECIFIC_HEIGHT), SFPanel_ContextInfoPanel, playerShip);
 			(*CurrentGame).addToFeedbacks((*CurrentGame).m_playerShip->m_SFContextInfoPanel);
 			break;
 		}

@@ -71,7 +71,8 @@ public :
 	SFPanel* m_SFUnitInfoPanel;
 	bool m_is_asking_SFUnitPanel;
 	SFPanel* m_SFContextInfoPanel;
-	bool m_is_asking_SFContextPanel;
+	string m_is_asking_SFContextPanel_string;
+	sf::Vector2f m_mouse_pos;
 
 	GameObject* m_hovered_object;
 	GameObject* m_selected_object;

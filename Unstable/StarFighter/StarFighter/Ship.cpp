@@ -25,7 +25,7 @@ void Ship::Init()
 	m_SFUnitInfoPanel = NULL;
 	m_is_asking_SFUnitPanel = false;
 	m_SFContextInfoPanel = NULL;
-	m_is_asking_SFContextPanel = false;
+	m_is_asking_SFContextPanel_string = "";
 	m_hovered_object = NULL;
 	m_selected_object = NULL;
 }
@@ -64,7 +64,7 @@ void Ship::update(sf::Time deltaTime)
 
 	//get mouse coordinates
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
-	sf::Vector2f mousepos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
+	m_mouse_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
 
 	ManageHud(deltaTime);
 
@@ -78,19 +78,19 @@ void Ship::update(sf::Time deltaTime)
 		const float a = (*CurrentGame).m_view.getCenter().x;
 		const float b = (*CurrentGame).m_view.getCenter().y;
 
-		if (mousepos.x > a + x - MOUSE_SCROLL_MARGIN && mousepos.x < a + x && mousepos.y < b + y && mousepos.y > b - y)
+		if (m_mouse_pos.x > a + x - MOUSE_SCROLL_MARGIN && m_mouse_pos.x < a + x && m_mouse_pos.y < b + y && m_mouse_pos.y > b - y)
 		{
 			inputs_direction.x = 1.0f;
 		}
-		if (mousepos.x < a - x + MOUSE_SCROLL_MARGIN && mousepos.x > a - x && mousepos.y < b + y && mousepos.y > b - y)
+		if (m_mouse_pos.x < a - x + MOUSE_SCROLL_MARGIN && m_mouse_pos.x > a - x && m_mouse_pos.y < b + y && m_mouse_pos.y > b - y)
 		{
 			inputs_direction.x = -1.0f;
 		}
-		if (mousepos.y < b - y + MOUSE_SCROLL_MARGIN && mousepos.y > b - y && mousepos.x > a - x && mousepos.x < a + x)
+		if (m_mouse_pos.y < b - y + MOUSE_SCROLL_MARGIN && m_mouse_pos.y > b - y && m_mouse_pos.x > a - x && m_mouse_pos.x < a + x)
 		{
 			inputs_direction.y = -1.0f;
 		}
-		if (mousepos.y > b + y - MOUSE_SCROLL_MARGIN && mousepos.y < b + y && mousepos.x > a - x && mousepos.x < a + x)
+		if (m_mouse_pos.y > b + y - MOUSE_SCROLL_MARGIN && m_mouse_pos.y < b + y && m_mouse_pos.x > a - x && m_mouse_pos.x < a + x)
 		{
 			inputs_direction.y = 1.0f;
 		}
@@ -104,7 +104,7 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	//cursor sticks to mouse at all time
-	setPosition(mousepos);
+	setPosition(m_mouse_pos);
 
 	//keyboard moves camera
 	ManageAcceleration(inputs_direction);
@@ -118,8 +118,8 @@ void Ship::update(sf::Time deltaTime)
 		SelectObject(m_hovered_object);//this function resists null ptr
 	}
 
-	//Action (right click) - assigning a starship to a mission
-	if (m_inputs_states[Action_Assigning] == Input_Tap && m_selected_object)
+	//Action (right click)
+	if (m_selected_object)
 	{
 		if (m_selected_object->m_collider_type == StarshipObject)
 		{
@@ -134,23 +134,43 @@ void Ship::update(sf::Time deltaTime)
 					//unload fuel?
 					if (location == starship->m_current_location)
 					{
-						starship->UnloadFuelTank(location);
+						m_is_asking_SFContextPanel_string = "Unload fuel tank";
+						//Action (right click)
+						if (m_inputs_states[Action_Assigning] == Input_Tap)
+						{
+							starship->UnloadFuelTank(location);
+						}
 					}
 					//scan mission?
 					else if (starship->m_scout_range > 0 && !location->m_identified)
 					{
-						starship->AssignMission(StarshipMission_Scan, sf::Vector2f(0, 0), location, NULL);
+						m_is_asking_SFContextPanel_string = "Scan";
+						//Action (right click)
+						if (m_inputs_states[Action_Assigning] == Input_Tap)
+						{
+							starship->AssignMission(StarshipMission_Scan, sf::Vector2f(0, 0), location, NULL);
+						}
 					}
 					//mining mission?
 					else if (starship->m_nb_drills > 0 && location->m_identified)
 					{
-						starship->AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), location, starship->m_current_location);
+						m_is_asking_SFContextPanel_string = "Drill";
+						//Action (right click)
+						if (m_inputs_states[Action_Assigning] == Input_Tap)
+						{
+							starship->AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), location, starship->m_current_location);
+						}
 					}
 				}
 				//scout mission ?
-				else if (starship->m_scout_range > 0)
+				else if (starship->m_scout_range > 0 && !m_hovered_object)
 				{
-					starship->AssignMission(StarshipMission_Scout, getPosition());
+					m_is_asking_SFContextPanel_string = "Scout";
+					//Action (right click)
+					if (m_inputs_states[Action_Assigning] == Input_Tap)
+					{
+						starship->AssignMission(StarshipMission_Scout, getPosition());
+					}
 				}
 			}
 		}
@@ -164,13 +184,17 @@ void Ship::update(sf::Time deltaTime)
 
 				if (starship->m_current_location == location)
 				{
-					location->SupplyFuelTank(starship->m_fuel_tank, *starship);
+					m_is_asking_SFContextPanel_string = "Supply fuel tank";
+					//Action (right click)
+					if (m_inputs_states[Action_Assigning] == Input_Tap)
+					{
+						location->SupplyFuelTank(starship->m_fuel_tank, *starship);
+					}
 				}
-			
 			}
 		}
-		
 	}
+	
 
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
@@ -185,7 +209,7 @@ void Ship::ManageHud(sf::Time deltaTime)
 {
 	//Hud
 	m_is_asking_SFUnitPanel = false;
-	m_is_asking_SFContextPanel = false;
+	m_is_asking_SFContextPanel_string = "";
 
 	if (m_hovered_object)
 	{

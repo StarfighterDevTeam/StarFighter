@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Ship.h"
 #include "SFUnitInfoPanel.h"
+#include "SFContextInfoPanel.h"
 #include "FileLoadUtils.h"
 #include "Starship.h"
 #include "StellarMap.h"

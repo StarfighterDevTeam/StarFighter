@@ -233,11 +233,11 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 	m_text.setPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 	//options texts
-	text_height += INTERACTION_INTERBLOCK + m_title_text.getGlobalBounds().height;
+	
 	//m_actions->SetPosition(sf::Vector2f(getPosition().x - getSize().x / 2 + INTERACTION_PANEL_MARGIN_SIDES, getPosition().y - getSize().y / 2 + text_height));
 
 	//dynamic size
-	text_height += m_text.getGlobalBounds().height;
+	text_height += INTERACTION_INTERBLOCK + m_text.getGlobalBounds().height;
 	setSize(sf::Vector2f(getSize().x, text_height));
 	setOrigin(sf::Vector2f(getOrigin().x, text_height / 2));
 	sf::Vector2f position_new = sf::Vector2f(getPosition().x, getSize().y / 2 + getOutlineThickness() - (*CurrentGame).m_mainScreen.getSize().y / 2 + (*CurrentGame).m_view.getCenter().y);
