@@ -24,6 +24,9 @@ enum PlayerActions
 	Action_Assigning,
 	Action_Muting,
 	Action_Pausing,
+	Action_Produce_1,
+	Action_Produce_2,
+	Action_Produce_3,
 	NBVAL_PlayerActions,
 };
 

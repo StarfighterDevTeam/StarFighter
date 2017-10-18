@@ -388,31 +388,31 @@ void Starship::ManageMission(sf::Time deltaTime)
 				{
 					if (Extract(m_ore_found))
 					{
-						LoadInStock(m_ore_found->m_display_name, 1);
-						m_ore_found = NULL;
-						m_drill_clock.restart();
-
+						if (m_state != StarshipState_CarryToBase)
+						{
+							LoadInStock(m_ore_found->m_display_name, 1);
+							m_drill_clock.restart();
+						}
+						
 						//time to go back?
 						if (m_drill_attempts >= m_nb_drills)
 						{
+							m_state = StarshipState_CarryToBase;
+
 							if (CheckIfEnoughFuelToDestination(m_mission_base_location->getPosition()))
 							{
 								m_fuel_tank.second -= GetFuelCostToDestination(m_mission_base_location->getPosition());
-
-								m_state = StarshipState_CarryToBase;
 								m_arrived_at_destination = false;
 								m_current_destination_location = m_mission_base_location;
 								SetSpeedForConstantSpeedToDestination(m_mission_base_location->getPosition(), m_speed_max);
-							}
-							else
-							{
-								m_state = StarshipState_Idle;
+								m_ore_found = NULL;
 							}
 						}
 						else
 						{
 							printf("Starting drill attempt (%d/%d).\n", m_drill_attempts + 1, m_nb_drills);
 							m_state = StarshipState_Drilling;
+							m_ore_found = NULL;
 						}
 					}
 				}
@@ -461,6 +461,11 @@ bool Starship::CheckIfEnoughFuelToDestination(sf::Vector2f destination)
 
 size_t Starship::GetFuelCostToDestination(sf::Vector2f destination)
 {
+	if (getPosition() == destination)
+	{
+		return 0;
+	}
+
 	size_t propulsion_required = (size_t)(GetDistanceBetweenPositions(getPosition(), destination) / m_speed_max * m_weight) + 1;
 
 	return propulsion_required;

@@ -63,6 +63,36 @@ bool InputGuy::isAssigning(ControlerType device)
 	return false;
 }
 
+bool InputGuy::isProducing1()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isProducing2()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isProducing3()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isRestartingScript()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))

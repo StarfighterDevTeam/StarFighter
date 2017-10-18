@@ -25,6 +25,9 @@ public:
 	static Vector2f getDirections(ControlerType device = AllControlDevices);
 	static bool isSelecting(ControlerType device = AllControlDevices);
 	static bool isAssigning(ControlerType device = AllControlDevices);
+	static bool isProducing1();
+	static bool isProducing2();
+	static bool isProducing3();
 	static bool isChangingResolution();
 	static bool isUsingDebugCommand();
 	static bool isRestartingScript();

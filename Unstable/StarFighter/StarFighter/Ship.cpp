@@ -192,6 +192,21 @@ void Ship::update(sf::Time deltaTime)
 					}
 				}
 			}
+
+			if (m_inputs_states[Action_Produce_1] == Input_Tap)
+			{
+				location->Produce("miner", false);
+			}
+
+			if (m_inputs_states[Action_Produce_2] == Input_Tap)
+			{
+				location->Produce("probe", false);
+			}
+
+			if (m_inputs_states[Action_Produce_3] == Input_Tap)
+			{
+				location->Produce("cargo", false);
+			}
 		}
 	}
 	
@@ -366,6 +381,9 @@ void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isSelecting(), Action_Select);
 	GetInputState(InputGuy::isAssigning(), Action_Assigning);
+	GetInputState(InputGuy::isProducing1(), Action_Produce_1);
+	GetInputState(InputGuy::isProducing2(), Action_Produce_2);
+	GetInputState(InputGuy::isProducing3(), Action_Produce_3);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)

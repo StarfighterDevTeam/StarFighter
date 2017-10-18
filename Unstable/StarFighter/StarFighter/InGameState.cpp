@@ -34,10 +34,10 @@ void InGameState::Initialize(Player player)
 	planet->m_identified = true;
 
 	Planet* planet2 = new Planet(sf::Vector2f(MAP_SIZE / 2 - 600, MAP_SIZE / 2 - 200), sf::Vector2f(0, 0), "2D/Planet1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
-	(*CurrentGame).addToScene(planet2, LocationLayer, LocationObject);
+	//(*CurrentGame).addToScene(planet2, LocationLayer, LocationObject);
 	planet2->m_ore_presence_rates["oil"] = 0.5f;
 	planet2->m_ore_presence_rates["deuterium"] = 0.5f;
-	//planet2->Build("refinery", true);
+	planet2->Build("refinery", true);
 	planet2->Build("ore_container", true);
 	planet2->Build("fuel_tanks", true);
 	planet2->LoadInStock("oil", 50);
@@ -45,9 +45,9 @@ void InGameState::Initialize(Player player)
 	planet2->LoadInStock("iron", 30);
 	planet2->LoadInStock("silver", 30);
 	planet2->m_display_name = "Colonie";
-	planet2->Produce("probe", true);
-	planet2->Produce("probe", true);
-	planet2->m_identified = true;
+	//planet2->Produce("probe", true);
+	//planet2->Produce("probe", true);
+	planet2->m_identified = false;
 
 	OreField* ore_field = new OreField(sf::Vector2f(MAP_SIZE / 2 + 200, MAP_SIZE/2 + 200), sf::Vector2f(0, 0), "2D/Field1.png", sf::Vector2f(150, 150), sf::Vector2f(75, 75), 1);
 	(*CurrentGame).addToScene(ore_field, LocationLayer, LocationObject);

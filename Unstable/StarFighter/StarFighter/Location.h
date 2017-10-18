@@ -18,6 +18,7 @@ public :
 	virtual bool CanSupplyFuel();
 	virtual size_t GetStockMax();
 	virtual size_t GetFuelMax();
+	virtual Starship* Produce(string name, bool ignore_cost);
 
 	GameObject* m_unknown_sprite;
 };
@@ -31,7 +32,7 @@ public:
 	void update(sf::Time deltaTime) override;
 
 	bool Build(string name, bool ignore_cost);
-	Starship* Produce(string name, bool ignore_cost);
+	Starship* Produce(string name, bool ignore_cost) override;
 	size_t GetNbSlotsTaken();
 	void Harvest();
 	bool CanSupplyFuel() override;

@@ -54,8 +54,14 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 		{
 			if (!starship->CheckIfEnoughFuelToDestination(playerShip->m_mouse_pos))
 			{
-				ss_text << " (insufficient fuel)";
+				ss_text << " (insufficient fuel: " << starship->GetPropulsionAvailable() << " / " << starship->GetFuelCostToDestination(playerShip->m_mouse_pos) << " required)";
 				m_text.setColor(sf::Color(255, 0, 0, 255));
+			}
+			else
+			{
+				size_t fuel_cost = starship->GetFuelCostToDestination(playerShip->m_mouse_pos);
+				if (fuel_cost > 0)
+					ss_text << " (fuel cost: )" << fuel_cost;
 			}
 		}
 		else if (entity->m_collider_type == LocationObject)
@@ -63,8 +69,14 @@ SFContextInfoPanel::SFContextInfoPanel(sf::Vector2f size, SFPanelTypes panel_typ
 			Location* location = (Location*)entity;
 			if (!starship->CheckIfEnoughFuelToDestination(location->getPosition()))
 			{
-				ss_text << " (insufficient fuel)";
+				ss_text << " (insufficient fuel: " << starship->GetPropulsionAvailable() << " / " << starship->GetFuelCostToDestination(location->getPosition()) << " required)";
 				m_text.setColor(sf::Color(255, 0, 0, 255));
+			}
+			else
+			{
+				size_t fuel_cost = starship->GetFuelCostToDestination(location->getPosition());
+				if (fuel_cost > 0)
+					ss_text << " (fuel cost: " << fuel_cost << ")";
 			}
 		}
 	}
