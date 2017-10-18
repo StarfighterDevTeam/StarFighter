@@ -158,7 +158,7 @@ SFUnitInfoPanel::SFUnitInfoPanel(sf::Vector2f size, SFPanelTypes panel_type, Shi
 						{
 							int int_percent = starship->m_extraction_clock.getElapsedTime().asSeconds() / (starship->m_ore_found->m_extraction_duration * (1 - starship->m_extraction_duration_bonus)) * 10000;
 							float percent = 1.0f * int_percent / 100;
-							ss_text << "\nExtracting...(" << percent << "%)";
+							ss_text << "\nExtracting " << starship->m_ore_found->m_display_name << "...(" << percent << "%)";
 							break;
 						}
 

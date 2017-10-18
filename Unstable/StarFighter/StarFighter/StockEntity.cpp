@@ -213,10 +213,10 @@ string StockEntity::GetBestPropulsionAvailable()
 
 	for (map<string, size_t>::iterator i = m_fuel_stock.begin(); i != m_fuel_stock.end(); ++i)
 	{
-		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) > propulsion && i->second > 0)
+		if ((size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) * i->second > propulsion)
 		{
 			selected_fuel = i->first;
-			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]);
+			propulsion = (size_t)stoi((*CurrentGame).m_oreConfig[i->first][OreData_Propulsion]) * i->second;
 		}
 	}
 

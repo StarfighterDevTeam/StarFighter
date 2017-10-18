@@ -161,7 +161,34 @@ void Ship::update(sf::Time deltaTime)
 							starship->AssignMission(StarshipMission_Drill, sf::Vector2f(0, 0), location, starship->m_current_location);
 						}
 					}
+					else
+					{
+						m_is_asking_SFContextPanel_string = "Move to location";
+						//Action (right click)
+						if (m_inputs_states[Action_Assigning] == Input_Tap)
+						{
+							starship->AssignMission(StarshipMission_MoveToLocation, sf::Vector2f(0, 0), location, NULL);
+						}
+					}
 				}
+
+				//supply other ship in fuel?
+				if (m_hovered_object && m_hovered_object != m_selected_object && m_hovered_object->m_collider_type == StarshipObject)
+				{
+					Starship* starship2 = (Starship*)m_hovered_object;
+					if (starship->m_current_location == starship2->m_current_location)
+					{
+						m_is_asking_SFContextPanel_string = "Supply fuel tank";
+						//Action (right click)
+						if (m_inputs_states[Action_Assigning] == Input_Tap)
+						{
+							{
+								starship->UnloadFuelTank(starship2);
+							}
+						}
+					}
+				}
+
 				//scout mission ?
 				else if (starship->m_scout_range > 0 && !m_hovered_object)
 				{

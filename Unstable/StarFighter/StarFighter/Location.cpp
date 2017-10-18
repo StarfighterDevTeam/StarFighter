@@ -181,11 +181,11 @@ bool Planet::Build(string name, bool ignore_cost)
 	//check cost
 	if (!ignore_cost)
 	{
-		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].empty() && m_ore_stock[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]))
+		if ((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1].compare("0") != 0 && m_ore_stock[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity1]))
 		{
 			return false;
 		}
-		if (!(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].empty() && m_ore_stock[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]))
+		if ((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2].compare("0") != 0 && m_ore_stock[(*CurrentGame).m_buildingConfig[name][BuildingData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_buildingConfig[name][BuildingData_OreCostQuantity2]))
 		{
 			return false;
 		}
@@ -244,11 +244,11 @@ Starship* Planet::Produce(string name, bool ignore_cost)
 	//check cost
 	if (!ignore_cost)
 	{
-		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].empty() && m_ore_stock[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity1]))
+		if ((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].compare("0") != 0 && m_ore_stock[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity1]))
 		{
 			return NULL;
 		}
-		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].empty() && m_ore_stock[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]))
+		if ((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].compare("0") != 0 && m_ore_stock[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] < (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]))
 		{
 			return NULL;
 		}
@@ -263,11 +263,11 @@ Starship* Planet::Produce(string name, bool ignore_cost)
 	//pay the cost
 	if (!ignore_cost)
 	{
-		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].empty())
+		if ((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1].compare("0") != 0)
 		{
 			m_ore_stock[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType1]] -= (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity1]);
 		}
-		if (!(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].empty())
+		if ((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2].compare("0") != 0)
 		{
 			m_ore_stock[(*CurrentGame).m_starshipConfig[name][StarshipData_OreCostType2]] -= (size_t)stoi((*CurrentGame).m_starshipConfig[name][StarshipData_OreCostQuantity2]);
 		}

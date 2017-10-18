@@ -7,6 +7,7 @@
 enum StarshipState
 {
 	StarshipState_Idle,
+	StarshipState_IdleReturn,
 	StarshipState_MovingToLocation,
 	StarshipState_MovingToZone,
 	StarshipState_Scouting,
@@ -51,6 +52,7 @@ public :
 	size_t GetFuelCostToDestination(sf::Vector2f destination);
 	size_t GetPropulsionAvailable();
 	size_t UnloadFuelTank(StockEntity* entity);
+	size_t GetFuelConsumptionForPropulsion(size_t propulsion_required);
 
 
 	sf::Vector2u GetCurrentZone();
