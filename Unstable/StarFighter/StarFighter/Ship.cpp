@@ -24,6 +24,11 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	//MICRO BOATS
+	m_thrust = 0.f;
+	m_orientation = 0.f;
+	m_reverse_move = false;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -38,7 +43,7 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	
+
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -57,19 +62,78 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	ManageAcceleration(inputs_direction);
+
+	//MICRO BOATS
+
+	//Get thurst
+	if (inputs_direction.y < 0)//------------------------------------------> up
+	{
+		m_thrust -= deltaTime.asSeconds() * SHIP_ACCELERATION_FORWARD;
+		if (m_thrust < -SHIP_MAX_SPEED_FORWARD)
+		{
+			m_thrust = -SHIP_MAX_SPEED_FORWARD;
+		}
+	}
+	else if (inputs_direction.y > 0)//-------------------------------------> down
+	{
+		if (m_thrust >= 0)
+		{
+			m_thrust += deltaTime.asSeconds() * SHIP_ACCELERATION_BACKWARD;
+		}
+		else 
+		{
+			m_thrust -= deltaTime.asSeconds() * SHIP_BRAKE_SPEED;
+		}
+
+		if (m_thrust > SHIP_MAX_SPEED_BACKWARD)
+		{
+			m_thrust = SHIP_MAX_SPEED_BACKWARD;
+		}
+	}
+	else//-----------------------------------------------------------------> idle = deceleration
+	{
+		if (m_thrust > 0)
+		{
+			if (m_thrust > SHIP_MIN_SPEED)
+				m_thrust -= deltaTime.asSeconds() * SHIP_DECELERATION;
+			else
+				m_thrust = 0;
+		}
+		else if (m_thrust < 0)
+		{
+			if (m_thrust < -SHIP_MIN_SPEED)
+				m_thrust += deltaTime.asSeconds() * SHIP_DECELERATION;
+			else
+				m_thrust = 0;
+		}
+	}
+	
+	//Thrust and orientation converted into speed
+	SetSpeedVectorFromAbsoluteSpeedAndAngle(m_thrust, m_orientation * M_PI / 180);
+
+	//Min speed
+	//if (GetAbsoluteSpeed() < SHIP_MIN_SPEED)
+	//{
+	//	m_speed = sf::Vector2f(0, 0);
+	//}
+
+	//Update
+	setRotation(m_orientation);
+
+	//Feedback
+	printf("thrust: %f, orientation: %f\n", m_thrust, m_orientation);
 	
 	//Action input
-	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
-	{
-		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
-	}
+	//UpdateInputStates();
+	//if (m_inputs_states[Action_Firing] == Input_Tap)
+	//{
+	//	//do some action
+	//	(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+	//}
 
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
-	UpdateRotation();
+	//MaxSpeedConstraints();
+	//IdleDecelleration(deltaTime);
+	//UpdateRotation();
 
 	GameObject::update(deltaTime);
 
@@ -116,50 +180,6 @@ bool Ship::ScreenBorderContraints()
 	}
 
 	return touched_screen_border;
-}
-
-void Ship::IdleDecelleration(sf::Time deltaTime)
-{
-	//idle decceleration
-	if (!m_movingX)
-	{
-		m_speed.x -= m_speed.x*deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
-
-		if (abs(m_speed.x) < SHIP_MIN_SPEED)
-			m_speed.x = 0;
-	}
-
-	if (!m_movingY)
-	{
-		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
-
-		if (abs(m_speed.y) < SHIP_MIN_SPEED)
-			m_speed.y = 0;
-	}
-}
-
-void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
-{
-	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
-
-	//max speed constraints
-	if (abs(m_speed.x) > SHIP_MAX_SPEED)
-	{
-		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
-	if (abs(m_speed.y) > SHIP_MAX_SPEED)
-	{
-		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
-}
-
-void Ship::MaxSpeedConstraints()
-{
-	float ship_max_speed = SHIP_MAX_SPEED;
-
-	//max speed constraints
-	NormalizeSpeed(&m_speed, ship_max_speed);
 }
 
 void Ship::UpdateRotation()

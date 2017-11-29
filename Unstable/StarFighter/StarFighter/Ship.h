@@ -7,13 +7,16 @@
 #include "Game.h"
 #include "SFTextPop.h"
 
-#define SHIP_START_X                990
-#define SHIP_START_Y                540
-#define SHIP_ACCELERATION	        2000.0f
-#define SHIP_DECCELERATION_COEF		5000.0f
-#define SHIP_MAX_SPEED				400.0f
-#define SHIP_MIN_SPEED				50.0f
-#define SHIP_SPRITE_RATE_SEC        0.2f
+#define SHIP_START_X					990
+#define SHIP_START_Y					540
+#define SHIP_ACCELERATION_FORWARD		200.0f
+#define SHIP_BRAKE_SPEED				400.0f
+#define SHIP_ACCELERATION_BACKWARD		100.0f
+#define SHIP_DECELERATION				100.0f
+#define SHIP_MAX_SPEED_FORWARD			350.0f
+#define SHIP_MAX_SPEED_BACKWARD			150.0f
+#define SHIP_MIN_SPEED					20.0f
+#define SHIP_SPRITE_RATE_SEC			0.2f
 
 enum PlayerActions
 {
@@ -40,12 +43,7 @@ public :
 	void Init();
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
-	
-	void ManageHudControls(sf::Vector2f inputs_directions);
-	void ManageAcceleration(sf::Vector2f inputs_direction);
-	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
-	void MaxSpeedConstraints();
 	void UpdateRotation();
 
 	bool m_disable_inputs;
@@ -66,6 +64,11 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	//MICRO BOATS
+	float m_thrust;
+	float m_orientation;
+	bool m_reverse_move;
 
 private:
 	bool m_moving;
