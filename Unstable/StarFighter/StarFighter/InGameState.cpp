@@ -29,7 +29,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
 	// LEVEL DESIGN
-	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(100, 100));
+	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(1000, 900));
 }
 
 void InGameState::Update(sf::Time deltaTime)

@@ -51,6 +51,26 @@ bool InputGuy::isRestartingScript()
 	return false;
 }
 
+bool InputGuy::isEditorMode()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputGuy::isEditorFast()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isUsingDebugCommand()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
@@ -115,18 +135,18 @@ Vector2f InputGuy::getDirections(ControlerType device)
 		{
 			dirX++;
 		}
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-		//{
-		//	dirY--;
-		//}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			dirY--;
+		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			dirX--;
 		}
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-		//{
-		//	dirY++;
-		//}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			dirY++;
+		}
 	}
 
 	//Conputing directions

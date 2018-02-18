@@ -22,6 +22,8 @@ enum PlayerActions
 	Action_Firing,
 	Action_Muting,
 	Action_Pausing,
+	Action_EditorMode,
+	Action_EditorFast,
 	NBVAL_PlayerActions,
 };
 

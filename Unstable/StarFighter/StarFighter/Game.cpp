@@ -55,6 +55,12 @@ void Game::init(RenderWindow* window)
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	PlayMusic(Music_Main);
+
+	//Editor mode
+	m_editorMode = false;
+	m_editor_cursor = new GameObject(sf::Vector2f(900, 500), sf::Vector2f(0, 0), "2D/editor_cursor.png", sf::Vector2f(9, 9), sf::Vector2f(4, 4), 1, 1);
+	addToScene(m_editor_cursor, EditorLayer, BackgroundObject);
+	m_editor_cursor->m_visible = false;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)

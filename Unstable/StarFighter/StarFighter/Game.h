@@ -106,6 +106,10 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
+	//Editor Mode
+	bool m_editorMode;
+	GameObject* m_editor_cursor;
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);

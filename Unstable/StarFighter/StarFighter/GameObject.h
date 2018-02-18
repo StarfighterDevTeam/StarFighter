@@ -34,6 +34,8 @@ enum LayerType {
 	PanelLayer,
 	HudObject,
 	HudCursor,
+
+	EditorLayer,
 	NBVAL_Layer
 };
 

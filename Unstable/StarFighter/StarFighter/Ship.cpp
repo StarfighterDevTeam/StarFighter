@@ -57,31 +57,70 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	ManageAcceleration(inputs_direction);
-	
 	//Action input
 	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
+	if (m_inputs_states[Action_EditorMode] == Input_Tap)
 	{
-		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		(*CurrentGame).m_editorMode = !(*CurrentGame).m_editorMode;
+		(*CurrentGame).m_editor_cursor->m_visible = (*CurrentGame).m_editorMode;
+		printf("Editor mode = %d\n", (int)(*CurrentGame).m_editorMode);
 	}
 
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
-	//UpdateRotation();
-	ChooseAnimation();
-
-	GameObject::update(deltaTime);
-
-	//HUD
-	m_is_asking_SFPanel = SFPanel_None;
-	if (m_SFTargetPanel)
+	if (!(*CurrentGame).m_editorMode)
 	{
-		m_SFTargetPanel->Update(deltaTime);
-	}
+		ManageAcceleration(inputs_direction);
 
-	ScreenBorderContraints();	
+		MaxSpeedConstraints();
+		IdleDecelleration(deltaTime);
+		//UpdateRotation();
+		ChooseAnimation();
+
+		GameObject::update(deltaTime);
+
+		//HUD
+		m_is_asking_SFPanel = SFPanel_None;
+		if (m_SFTargetPanel)
+		{
+			m_SFTargetPanel->Update(deltaTime);
+		}
+
+		ScreenBorderContraints();
+	}
+	
+	//Editor mode only
+	else
+	{
+		if (inputs_direction.x > 0 && (*CurrentGame).m_editor_cursor->getPosition().x < (*CurrentGame).m_map_size.x)
+		{
+			m_inputs_states[Action_EditorFast] != Input_Hold ? (*CurrentGame).m_editor_cursor->move(sf::Vector2f(1, 0)) : (*CurrentGame).m_editor_cursor->move(sf::Vector2f(10, 0));
+		}
+		if (inputs_direction.x < 0 && (*CurrentGame).m_editor_cursor->getPosition().x > 0)
+		{
+			m_inputs_states[Action_EditorFast] != Input_Hold ? (*CurrentGame).m_editor_cursor->move(sf::Vector2f(-1, 0)) : (*CurrentGame).m_editor_cursor->move(sf::Vector2f(-10, 0));
+		}
+		if (inputs_direction.y > 0 && (*CurrentGame).m_editor_cursor->getPosition().y > 0)
+		{
+			m_inputs_states[Action_EditorFast] != Input_Hold ? (*CurrentGame).m_editor_cursor->move(sf::Vector2f(0, 1)) : (*CurrentGame).m_editor_cursor->move(sf::Vector2f(0, 10));
+		}
+		if (inputs_direction.y < 0 && (*CurrentGame).m_editor_cursor->getPosition().y < (*CurrentGame).m_map_size.y)
+		{
+			m_inputs_states[Action_EditorFast] != Input_Hold ? (*CurrentGame).m_editor_cursor->move(sf::Vector2f(0, -1)) : (*CurrentGame).m_editor_cursor->move(sf::Vector2f(0, -10));
+		}
+
+		//if (m_inputs_states[Action_EditorNextType] == Input_Tap)
+		//{
+		//	size_t current_tile = Game::GetTileIndex((*CurrentGame).m_editor_cursor->getPosition().x / tile_size + 1, (*CurrentGame).m_editor_cursor->getPosition().y / tile_size + 1);
+		//	(*CurrentGame).m_tile_types[current_tile] = (*CurrentGame).m_tile_types[current_tile] >= NBVAL_TileTtype - 1 ? (TileType)0 : (TileType)((*CurrentGame).m_tile_types[current_tile] + 1);
+		//	SaveShip(this);
+		//}
+		//
+		//if (m_inputs_states[Action_EditorPreviousType] == Input_Tap)
+		//{
+		//	size_t current_tile = Game::GetTileIndex((*CurrentGame).m_editor_cursor->getPosition().x / tile_size + 1, (*CurrentGame).m_editor_cursor->getPosition().y / tile_size + 1);
+		//	(*CurrentGame).m_tile_types[current_tile] = (*CurrentGame).m_tile_types[current_tile] == (TileType)0 ? (TileType)(NBVAL_TileTtype - 1) : (TileType)((*CurrentGame).m_tile_types[current_tile] - 1);
+		//	SaveShip(this);
+		//}
+	}
 }
 
 bool Ship::ScreenBorderContraints()
@@ -142,17 +181,17 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
 	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
+	//m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
 
 	//max speed constraints
 	if (abs(m_speed.x) > SHIP_MAX_SPEED)
 	{
 		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
 	}
-	if (abs(m_speed.y) > SHIP_MAX_SPEED)
-	{
-		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
+	//if (abs(m_speed.y) > SHIP_MAX_SPEED)
+	//{
+	//	m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+	//}
 }
 
 void Ship::MaxSpeedConstraints()
@@ -224,6 +263,8 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isEditorMode(), Action_EditorMode);
+	GetInputState(InputGuy::isEditorFast(), Action_EditorFast);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
