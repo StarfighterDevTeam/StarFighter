@@ -69,7 +69,8 @@ void Ship::update(sf::Time deltaTime)
 
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
-	UpdateRotation();
+	//UpdateRotation();
+	ChooseAnimation();
 
 	GameObject::update(deltaTime);
 
@@ -189,6 +190,24 @@ void Ship::UpdateRotation()
 	{
 		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI));
 	}
+}
+
+int Ship::ChooseAnimation()
+{
+	if (m_speed.x > 0)
+	{
+		setAnimationLine(Animation_WalkRight, false);
+	}
+	else if (m_speed.x < 0)
+	{
+		setAnimationLine(Animation_WalkLeft, false);
+	}
+	else
+	{
+		setAnimationLine(m_currentAnimationIndex, false);
+	}
+
+	return m_currentAnimationIndex;
 }
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)

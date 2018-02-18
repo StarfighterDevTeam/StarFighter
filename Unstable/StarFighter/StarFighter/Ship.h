@@ -31,6 +31,13 @@ enum PlayerInputStates
 	Input_Hold,//2
 };
 
+enum PlayerAnimations
+{
+	Animation_Idle,
+	Animation_WalkRight,
+	Animation_WalkLeft,
+};
+
 class Ship : public GameObject
 {
 public :
@@ -47,6 +54,7 @@ public :
 	bool ScreenBorderContraints();
 	void MaxSpeedConstraints();
 	void UpdateRotation();
+	int ChooseAnimation();
 
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
