@@ -1,8 +1,8 @@
 #include "GameObject.h"
 
-GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int m_frameNumber, int m_animationNumber) : AnimatedSprite()
+GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
-	Init(position, speed, textureName, size, m_frameNumber, m_animationNumber);
+	Init(position, speed, textureName, size, frameNumber, animationNumber);
 	this->setOrigin(origin.x, origin.y);
 }
 
