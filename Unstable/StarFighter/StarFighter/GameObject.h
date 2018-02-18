@@ -20,6 +20,7 @@ class Loot;
 
 enum LayerType {
 	BackgroundLayer,
+	BlockLayer,
 	PortalLayer,
 	PlayerStroboscopicLayer,
 	ExplosionLayer,
@@ -38,6 +39,7 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
+	BlockObject,
 	PortalObject,
 	ShopObject,
 	LootObject,

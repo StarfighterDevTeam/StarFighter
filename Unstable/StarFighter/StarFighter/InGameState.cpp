@@ -27,6 +27,9 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).m_map_size = background->m_size;
 	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
+
+	// LEVEL DESIGN
+	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(100, 100));
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -124,4 +127,12 @@ void InGameState::LoadCSVFile(string scenes_file)
 	}
 
 	allConfigs.clear();
+}
+
+Block* InGameState::CreateBlock(Block_Type bloc_type, sf::Vector2f position)
+{
+	Block* block = new Block(bloc_type, position);
+	(*CurrentGame).addToScene(block, BlockLayer, BlockObject);
+
+	return block;
 }

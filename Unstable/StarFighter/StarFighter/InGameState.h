@@ -26,6 +26,8 @@ public:
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFile(string scenes_file);
 
+	Block* CreateBlock(Block_Type bloc_type, sf::Vector2f position);
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
