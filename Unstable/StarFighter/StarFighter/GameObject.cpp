@@ -149,11 +149,13 @@ GameObject::~GameObject()
 void GameObject::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->m_speed;
+	newspeed = m_speed;
 	
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+
+	m_old_position = getPosition();
 
 	this->setPosition(newposition.x, newposition.y);
 
@@ -497,4 +499,30 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 	}
 
 	return pixels;
+}
+
+//PIRATE SPECIFIC
+
+bool GameObject::GroundContact()
+{
+	//see override function in Ship()
+	return false;
+}
+
+bool GameObject::Land(float coordinate)
+{
+	//see override function in Ship()
+	return false;
+}
+
+bool GameObject::HitWallFromLeft(float coordinate)
+{
+	//see override function in Ship()
+	return false;
+}
+
+bool GameObject::HitWallFromRight(float coordinate)
+{
+	//see override function in Ship()
+	return false;
 }

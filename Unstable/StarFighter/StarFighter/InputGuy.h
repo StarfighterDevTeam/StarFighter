@@ -23,7 +23,7 @@ class InputGuy
 {
 public:
 	static Vector2f getDirections(ControlerType device = AllControlDevices);
-	static bool isFiring(ControlerType device = AllControlDevices);
+	static bool isJumping(ControlerType device = AllControlDevices);
 	static bool isChangingResolution();
 	static bool isUsingDebugCommand();
 	static bool isRestartingScript();

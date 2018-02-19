@@ -92,6 +92,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+	sf::Vector2f m_old_position;
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();
@@ -122,6 +123,12 @@ public:
 
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
+
+	//Pirate specific
+	virtual bool GroundContact();
+	virtual bool Land(float coordinate);
+	virtual bool HitWallFromLeft(float coordinate);
+	virtual bool HitWallFromRight(float coordinate);
 };
 
 #endif // GameObject_H_INCLUDED

@@ -1,6 +1,6 @@
 #include "InputGuy.h"
 
-bool InputGuy::isFiring(ControlerType device)
+bool InputGuy::isJumping(ControlerType device)
 {
 	if (device == AllControlDevices || device == KeyboardControl)
 	{

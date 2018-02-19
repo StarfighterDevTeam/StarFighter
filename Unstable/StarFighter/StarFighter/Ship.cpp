@@ -24,6 +24,8 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	m_state = PlayerJump_Idle;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -69,8 +71,9 @@ void Ship::update(sf::Time deltaTime)
 	if (!(*CurrentGame).m_editorMode)
 	{
 		ManageAcceleration(inputs_direction);
+		ManageJump();
 
-		MaxSpeedConstraints();
+		//MaxSpeedConstraints();
 		IdleDecelleration(deltaTime);
 		//UpdateRotation();
 		ChooseAnimation();
@@ -85,6 +88,9 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		ScreenBorderContraints();
+
+		if (m_speed.y != 0)
+		printf("speed = %f\n", m_speed.y);
 	}
 	
 	//Editor mode only
@@ -169,37 +175,54 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 			m_speed.x = 0;
 	}
 
-	if (!m_movingY)
-	{
-		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
-
-		if (abs(m_speed.y) < SHIP_MIN_SPEED)
-			m_speed.y = 0;
-	}
+	//if (!m_movingY)
+	//{
+	//	m_speed.y -= m_speed.y*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
+	//
+	//	if (abs(m_speed.y) < SHIP_MIN_SPEED)
+	//		m_speed.y = 0;
+	//}
 }
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
 	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	//m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
+
+	//m_speed.y += inputs_direction.y* SHIP_JUMP_ACCELERATION;
 
 	//max speed constraints
-	if (abs(m_speed.x) > SHIP_MAX_SPEED)
+	if (abs(m_speed.x) > SHIP_MAX_SPEED_HORIZONTAL)
 	{
-		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED_HORIZONTAL : -SHIP_MAX_SPEED_HORIZONTAL;
 	}
-	//if (abs(m_speed.y) > SHIP_MAX_SPEED)
-	//{
-	//	m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	//}
+	if (abs(m_speed.y) > SHIP_MAX_SPEED_VERTICAL)
+	{
+		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED_VERTICAL : -SHIP_MAX_SPEED_VERTICAL;
+	}
 }
 
 void Ship::MaxSpeedConstraints()
 {
-	float ship_max_speed = SHIP_MAX_SPEED;
+	//float ship_max_speed = SHIP_MAX_SPEED;
+	//
+	////max speed constraints
+	//NormalizeSpeed(&m_speed, ship_max_speed);
+}
 
-	//max speed constraints
-	NormalizeSpeed(&m_speed, ship_max_speed);
+void Ship::ManageJump()
+{
+	//Jump
+	if (m_state == PlayerJump_Idle && m_inputs_states[Action_Jumping] == Input_Tap)
+	{
+		m_speed.y -= SHIP_JUMP_ACCELERATION;
+		m_state = PlayerJump_Jumping;
+	}
+
+	//Gravity
+	if (m_state == PlayerJump_Jumping || m_state == PlayerJump_Falling)
+	{
+		m_speed.y += SHIP_GRAVITY;
+	}
 }
 
 void Ship::UpdateRotation()
@@ -262,7 +285,7 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 void Ship::UpdateInputStates()
 {
-	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isJumping(), Action_Jumping);
 	GetInputState(InputGuy::isEditorMode(), Action_EditorMode);
 	GetInputState(InputGuy::isEditorFast(), Action_EditorFast);
 }
@@ -344,6 +367,41 @@ bool Ship::LoadShip(Ship* ship)
 	else  // si l'ouverture a échoué
 	{
 		cerr << "DEBUG: No save file found. A new file is going to be created.\n" << endl;
-		return false;
+		return false; 
 	}
+}
+
+bool Ship::GroundContact()
+{
+	bool current_state = m_state;
+	m_state = PlayerJump_Falling;
+
+	return (current_state == PlayerJump_Idle);
+}
+
+bool Ship::Land(float coordinate)
+{
+	bool current_state = m_state;
+	m_state = PlayerJump_Idle;
+
+	m_speed.y = 0;
+	setPosition(sf::Vector2f(getPosition().x, coordinate - m_size.y / 2));
+
+	return (current_state != PlayerJump_Idle);
+}
+
+bool Ship::HitWallFromLeft(float coordinate)
+{
+	m_speed.x = 0;
+	setPosition(sf::Vector2f(coordinate - m_size.x / 2, getPosition().y));
+
+	return false;
+}
+
+bool Ship::HitWallFromRight(float coordinate)
+{
+	m_speed.x = 0;
+	setPosition(sf::Vector2f(coordinate + m_size.x / 2, getPosition().y));
+
+	return false;
 }

@@ -39,6 +39,16 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
+enum CollisionDirection
+{
+	Collision_None,
+	Collision_GroundContact,
+	Collision_Left,
+	Collision_Right,
+	Collision_Top,
+	Collision_Bot,
+};
+
 using namespace sf;
 
 struct Game
@@ -109,6 +119,9 @@ public:
 	//Editor Mode
 	bool m_editorMode;
 	GameObject* m_editor_cursor;
+
+	//Pirate specific
+	CollisionDirection BlockCollision(GameObject* player, GameObject* block);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

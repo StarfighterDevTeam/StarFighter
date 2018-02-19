@@ -12,14 +12,17 @@
 #define SHIP_START_Y                540
 #define SHIP_ACCELERATION	        2000.0f
 #define SHIP_DECCELERATION_COEF		5000.0f
-#define SHIP_MAX_SPEED				400.0f
+#define SHIP_MAX_SPEED_HORIZONTAL	400.0f
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
+#define SHIP_JUMP_ACCELERATION	    800.f
+#define SHIP_GRAVITY				30.0f
+#define SHIP_MAX_SPEED_VERTICAL		3000.f
 
 enum PlayerActions
 {
 	Action_Idle,
-	Action_Firing,
+	Action_Jumping,
 	Action_Muting,
 	Action_Pausing,
 	Action_EditorMode,
@@ -41,6 +44,13 @@ enum PlayerAnimations
 	Animation_WalkLeft,
 };
 
+enum PlayerJumpState
+{
+	PlayerJump_Idle,
+	PlayerJump_Jumping,
+	PlayerJump_Falling,
+};
+
 class Ship : public GameObject
 {
 public :
@@ -53,6 +63,7 @@ public :
 	
 	void ManageHudControls(sf::Vector2f inputs_directions);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
+	void ManageJump();
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
 	void MaxSpeedConstraints();
@@ -77,6 +88,13 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	PlayerJumpState m_state;
+
+	bool GroundContact() override;
+	bool Land(float coordinate) override;
+	bool HitWallFromLeft(float coordinate) override;
+	bool HitWallFromRight(float coordinate) override;
 
 private:
 	bool m_moving;
