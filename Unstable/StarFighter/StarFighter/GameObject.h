@@ -79,6 +79,7 @@ public:
 	GameObjectType m_collider_type;
 	LayerType m_layer;
 	sf::Vector2f m_size;
+	sf::Vector2f m_size_hitbox;
 
 	string getName();
 	GameObject* Clone();
@@ -125,10 +126,11 @@ public:
 	Animation* m_currentAnimation;
 
 	//Pirate specific
-	virtual bool GroundContact();
 	virtual bool Land(float coordinate);
+	virtual bool Fall();
 	virtual bool HitWallFromLeft(float coordinate);
 	virtual bool HitWallFromRight(float coordinate);
+	virtual bool HitCeiling(float coordinate);
 };
 
 #endif // GameObject_H_INCLUDED

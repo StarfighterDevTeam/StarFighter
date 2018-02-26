@@ -9,6 +9,7 @@ void InGameState::Initialize(Player player)
 	
 	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(56, 88), sf::Vector2f(28, 44), 4, 3);
 	(*CurrentGame).m_playerShip = playerShip;
+	playerShip->Respawn();
 	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 
 	//Load saved file
@@ -30,6 +31,8 @@ void InGameState::Initialize(Player player)
 
 	// LEVEL DESIGN
 	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(1000, 900));
+	//CreateBlock(Block_Subground1_Cannon, sf::Vector2f(1192, 800));
+	CreateBlock(Block_Subground2_Hublot, sf::Vector2f(1000, 600));
 }
 
 void InGameState::Update(sf::Time deltaTime)

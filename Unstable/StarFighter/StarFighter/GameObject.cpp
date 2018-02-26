@@ -503,13 +503,13 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 
 //PIRATE SPECIFIC
 
-bool GameObject::GroundContact()
+bool GameObject::Land(float coordinate)
 {
 	//see override function in Ship()
 	return false;
 }
 
-bool GameObject::Land(float coordinate)
+bool GameObject::Fall()
 {
 	//see override function in Ship()
 	return false;
@@ -522,6 +522,12 @@ bool GameObject::HitWallFromLeft(float coordinate)
 }
 
 bool GameObject::HitWallFromRight(float coordinate)
+{
+	//see override function in Ship()
+	return false;
+}
+
+bool GameObject::HitCeiling(float coordinate)
 {
 	//see override function in Ship()
 	return false;

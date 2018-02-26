@@ -27,6 +27,7 @@ enum PlayerActions
 	Action_Pausing,
 	Action_EditorMode,
 	Action_EditorFast,
+	Action_Respawn,
 	NBVAL_PlayerActions,
 };
 
@@ -90,11 +91,13 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 
 	PlayerJumpState m_state;
-
-	bool GroundContact() override;
 	bool Land(float coordinate) override;
+	bool Fall() override;
 	bool HitWallFromLeft(float coordinate) override;
 	bool HitWallFromRight(float coordinate) override;
+	bool HitCeiling(float coordinate) override;
+
+	void Respawn();
 
 private:
 	bool m_moving;

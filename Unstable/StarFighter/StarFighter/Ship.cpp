@@ -26,6 +26,7 @@ void Ship::Init()
 	m_is_asking_SFPanel = SFPanel_None;
 
 	m_state = PlayerJump_Idle;
+	m_size_hitbox = sf::Vector2f(22, 88);
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -50,6 +51,11 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	if (m_inputs_states[Action_Respawn] == Input_Tap)
+	{
+		Respawn();
+	}
+
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
 
 	if (!m_disable_inputs)
@@ -89,8 +95,8 @@ void Ship::update(sf::Time deltaTime)
 
 		ScreenBorderContraints();
 
-		if (m_speed.y != 0)
-		printf("speed = %f\n", m_speed.y);
+		//if (m_speed.y != 0)
+		//printf("speed = %f\n", m_speed.y);
 	}
 	
 	//Editor mode only
@@ -210,8 +216,7 @@ void Ship::MaxSpeedConstraints()
 }
 
 void Ship::ManageJump()
-{
-	//Jump
+{	//Jump
 	if (m_state == PlayerJump_Idle && m_inputs_states[Action_Jumping] == Input_Tap)
 	{
 		m_speed.y -= SHIP_JUMP_ACCELERATION;
@@ -288,6 +293,7 @@ void Ship::UpdateInputStates()
 	GetInputState(InputGuy::isJumping(), Action_Jumping);
 	GetInputState(InputGuy::isEditorMode(), Action_EditorMode);
 	GetInputState(InputGuy::isEditorFast(), Action_EditorFast);
+	GetInputState(InputGuy::isRestartingScript(), Action_Respawn);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
@@ -371,14 +377,6 @@ bool Ship::LoadShip(Ship* ship)
 	}
 }
 
-bool Ship::GroundContact()
-{
-	bool current_state = m_state;
-	m_state = PlayerJump_Falling;
-
-	return (current_state == PlayerJump_Idle);
-}
-
 bool Ship::Land(float coordinate)
 {
 	bool current_state = m_state;
@@ -390,10 +388,18 @@ bool Ship::Land(float coordinate)
 	return (current_state != PlayerJump_Idle);
 }
 
+bool Ship::Fall()
+{
+	bool current_state = m_state;
+	m_state = PlayerJump_Falling;
+	
+	return (current_state != PlayerJump_Falling);
+}
+
 bool Ship::HitWallFromLeft(float coordinate)
 {
 	m_speed.x = 0;
-	setPosition(sf::Vector2f(coordinate - m_size.x / 2, getPosition().y));
+	setPosition(sf::Vector2f(coordinate - m_size_hitbox.x / 2, getPosition().y));
 
 	return false;
 }
@@ -401,7 +407,21 @@ bool Ship::HitWallFromLeft(float coordinate)
 bool Ship::HitWallFromRight(float coordinate)
 {
 	m_speed.x = 0;
-	setPosition(sf::Vector2f(coordinate + m_size.x / 2, getPosition().y));
+	setPosition(sf::Vector2f(coordinate + m_size_hitbox.x / 2, getPosition().y));
 
 	return false;
+}
+
+bool Ship::HitCeiling(float coordinate)
+{
+	m_speed.y = 0;
+	setPosition(sf::Vector2f(getPosition().x, coordinate + m_size_hitbox.y / 2));
+
+	return false;
+}
+
+void Ship::Respawn()
+{
+	setPosition(sf::Vector2f(1000, 500));
+	m_state = PlayerJump_Idle;
 }
