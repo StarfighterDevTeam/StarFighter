@@ -660,7 +660,7 @@ CollisionDirection Game::BlockCollision(GameObject* player, GameObject* block)
 	dist2 = GameObject::DistancePointToSement(player_x2, player_y1, block_x1, block_y2, block_x2, block_y2);
 	dist3 = GameObject::DistancePointToSement(player->m_old_position.x, player_y1, block_x1, block_y2, block_x2, block_y2);
 
-	if (dist1 == 0 || dist2 == 0 || dist3 == 0)
+	if (dist1 == 1 || dist2 == 1 || dist3 == 1)
 	{
 		ground_contact = true;
 	}

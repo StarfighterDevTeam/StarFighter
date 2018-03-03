@@ -32,7 +32,13 @@ void InGameState::Initialize(Player player)
 	// LEVEL DESIGN
 	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(1000, 900));
 	//CreateBlock(Block_Subground1_Cannon, sf::Vector2f(1192, 800));
-	CreateBlock(Block_Subground2_Hublot, sf::Vector2f(1000, 600));
+	CreateBlock(Block_Subground2_Hublot, sf::Vector2f(808, 350));
+	//CreateBlock(Block_Subground2_Hublot, sf::Vector2f(1000, 600));
+	CreateBlock(Block_Subground2_Hublot, sf::Vector2f(1192, 600));
+
+	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(700, 750));
+	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(450, 650));
+	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(350, 500));
 }
 
 void InGameState::Update(sf::Time deltaTime)

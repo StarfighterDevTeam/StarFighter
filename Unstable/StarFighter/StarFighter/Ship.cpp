@@ -383,7 +383,7 @@ bool Ship::Land(float coordinate)
 	m_state = PlayerJump_Idle;
 
 	m_speed.y = 0;
-	setPosition(sf::Vector2f(getPosition().x, coordinate - m_size.y / 2));
+	setPosition(sf::Vector2f(getPosition().x, coordinate - (m_size.y / 2) - 1)); // 1 pixel above ground
 
 	return (current_state != PlayerJump_Idle);
 }
