@@ -125,6 +125,9 @@ public:
 	//Pirate specific
 	CollisionDirection BlockCollision(GameObject* player, GameObject* block);
 
+	CollisionDirection BlockCollisionHorizontal(GameObject* player, GameObject* block);
+	CollisionDirection BlockCollisionVertical(GameObject* player, GameObject* block);
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);

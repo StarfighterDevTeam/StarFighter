@@ -356,26 +356,16 @@ void Game::colisionChecksV2()
 		enum HangPossibilities {HangNone, NoHangCollisionLeft, NoHangCollisionRight, HangLeft, HangRight};
 		HangPossibilities hang = HangNone;
 
+
+		//Horizontal collisions
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::BlockObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::BlockObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
 
-			CollisionDirection collision_dir = BlockCollision((*it1), (*it2));
-			if (collision_dir == Collision_GroundContact)
-			{
-				ground_contact = true;
-			}
-			else if (collision_dir == Collision_Top)
-			{
-				(*it1)->Land((*it2)->getPosition().y - (*it2)->m_size.y / 2);
-				ground_contact = true;
-			}
-			else if (collision_dir == Collision_Bot)
-			{
-				(*it1)->HitCeiling((*it2)->getPosition().y + (*it2)->m_size.y / 2);
-			}
-			else if (collision_dir == Collision_Left)
+			//CollisionDirection collision_dir = BlockCollision((*it1), (*it2));
+			CollisionDirection collision_dir = BlockCollisionHorizontal((*it1), (*it2));
+			if (collision_dir == Collision_Left)
 			{
 				//(*it1)->HitWallFromLeft((*it2)->getPosition().x - (*it2)->m_size.x / 2);
 
@@ -384,6 +374,7 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x - (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = NoHangCollisionLeft;
+					printf("no hang left\n");
 				}
 				
 			}
@@ -396,6 +387,7 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x + (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = NoHangCollisionRight;
+					printf("no hang right\n");
 				}
 			}
 			else if (collision_dir == Collision_HangLeft)
@@ -405,6 +397,7 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x - (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = HangLeft;
+					printf("hand left\n");
 				}
 			}
 			else if (collision_dir == Collision_HangRight)
@@ -414,12 +407,9 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x + (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = HangRight;
+					printf("hand right\n");
 				}
 			}
-		}
-		if (!ground_contact)
-		{
-			(*it1)->Fall();
 		}
 		switch (hang)
 		{
@@ -446,6 +436,34 @@ void Game::colisionChecksV2()
 			default:
 				break;
 		}
+
+		//Vertical collisions
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::BlockObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::BlockObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			CollisionDirection collision_dir = BlockCollisionVertical((*it1), (*it2));
+			if (collision_dir == Collision_GroundContact)
+			{
+				ground_contact = true;
+			}
+			else if (collision_dir == Collision_Top)
+			{
+				(*it1)->Land((*it2)->getPosition().y - (*it2)->m_size.y / 2);
+				ground_contact = true;
+			}
+			else if (collision_dir == Collision_Bot)
+			{
+				(*it1)->HitCeiling((*it2)->getPosition().y + (*it2)->m_size.y / 2);
+			}
+			
+		}
+		if (!ground_contact)
+		{
+			(*it1)->Fall();
+		}
+
 
 		//Enemy bullets hitting the player
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
@@ -689,7 +707,8 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 }
 
 //PIRATE SPECIFIC
-CollisionDirection Game::BlockCollision(GameObject* player, GameObject* block)
+
+/*CollisionDirection Game::BlockCollision(GameObject* player, GameObject* block)
 {
 	float block_x1 = block->getPosition().x - block->m_size.x / 2;
 	float block_x2 = block->getPosition().x + block->m_size.x / 2;
@@ -740,12 +759,12 @@ CollisionDirection Game::BlockCollision(GameObject* player, GameObject* block)
 
 	//FROM THE BOTTOM ?
 
-	//dist1 = GameObject::DistancePointToSement(player_x1, player_y2,					block_x1, block_y1, block_x2, block_y1);
-	//dist2 = GameObject::DistancePointToSement(player_x2, player_y2,					block_x1, block_y1, block_x2, block_y1);
-	//dist3 = GameObject::DistancePointToSement(player->m_old_position.x, player_y2,	block_x1, block_y1, block_x2, block_y1);
+	dist1 = GameObject::DistancePointToSement(player_x1, player_y2,					block_x1, block_y1, block_x2, block_y1);
+	dist2 = GameObject::DistancePointToSement(player_x2, player_y2,					block_x1, block_y1, block_x2, block_y1);
+	dist3 = GameObject::DistancePointToSement(player->m_old_position.x, player_y2,	block_x1, block_y1, block_x2, block_y1);
 	//
 	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
-	if (player->m_speed.y < 0
+	if (player->m_speed.y < 0 && player_future_x2 > block_x1 && player_future_x2 < block_x2
 		&&
 		(GameObject::IntersectSegments(block_x1, block_y1, block_x2, block_y1,		player->m_old_position.x,	player_y2, player->getPosition().x, player_future_y2, collision_coord_x, collision_coord_y)//mid
 		|| GameObject::IntersectSegments(block_x1, block_y1, block_x2, block_y1,	player_x2,					player_y2, player_future_x2, player_future_y2, collision_coord_x, collision_coord_y)//bot
@@ -801,5 +820,144 @@ CollisionDirection Game::BlockCollision(GameObject* player, GameObject* block)
 	//if no collision found:
 	//return Collision_None;
 	return ground_contact ? Collision_GroundContact : Collision_None;
+}*/
 
+CollisionDirection Game::BlockCollisionHorizontal(GameObject* player, GameObject* block)
+{
+	float block_x1 = block->getPosition().x - block->m_size.x / 2;
+	float block_x2 = block->getPosition().x + block->m_size.x / 2;
+	float block_y1 = block->getPosition().y + block->m_size.y / 2;
+	float block_y2 = block->getPosition().y - block->m_size.y / 2;
+
+	float player_x1 = player->m_old_position.x - player->m_size_hitbox.x / 2;
+	float player_x2 = player->m_old_position.x + player->m_size_hitbox.x / 2;
+	float player_y1 = player->m_old_position.y + player->m_size_hitbox.y / 2;
+	float player_y2 = player->m_old_position.y - player->m_size_hitbox.y / 2;
+
+	float player_future_x1 = player->getPosition().x - player->m_size_hitbox.x / 2;
+	float player_future_x2 = player->getPosition().x + player->m_size_hitbox.x / 2;
+	float player_future_y1 = player->getPosition().y + player->m_size_hitbox.y / 2;
+	float player_future_y2 = player->getPosition().y - player->m_size_hitbox.y / 2;
+
+	float* collision_coord_x = NULL;
+	float* collision_coord_y = NULL;
+
+	float dist1, dist2, dist3;
+	bool ground_contact = false;
+
+	//FROM THE LEFT ?
+	//dist1 = GameObject::DistancePointToSement(player_x2, player_y1,					block_x1, block_y1, block_x1, block_y2);
+	//dist2 = GameObject::DistancePointToSement(player_x2, player_y2,					block_x1, block_y1, block_x1, block_y2);
+	//dist3 = GameObject::DistancePointToSement(player_x2, player->m_old_position.y,	block_x1, block_y1, block_x1, block_y2);
+
+	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
+	if (player->m_speed.x > 0
+		&&
+		(GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player->m_old_position.y, player_future_x2, player->getPosition().y, collision_coord_x, collision_coord_y)//mid
+		|| GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player_y1, player_future_x2, player_future_y1, collision_coord_x, collision_coord_y)//bot
+		|| GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player_y2, player_future_x2, player_future_y2, collision_coord_x, collision_coord_y)))//top
+	{
+		if (player_y2 < block_y2 || player_future_y2 < block_y2)
+		{
+			return Collision_HangLeft;
+		}
+		else
+		{
+			return Collision_Left;
+		}
+	}
+
+	//FROM THE RIGHT ?
+	dist1 = GameObject::DistancePointToSement(player_x1, player_y1, block_x2, block_y1, block_x2, block_y2);
+	dist2 = GameObject::DistancePointToSement(player_x1, player_y2, block_x2, block_y1, block_x2, block_y2);
+	dist3 = GameObject::DistancePointToSement(player_x1, player->m_old_position.y, block_x2, block_y1, block_x2, block_y2);
+
+	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
+	if (player->m_speed.x < 0
+		&&
+		(GameObject::IntersectSegments(block_x2, block_y1, block_x2, block_y2, player_x1, player->m_old_position.y, player_future_x1, player->getPosition().y, collision_coord_x, collision_coord_y)//mid
+		|| GameObject::IntersectSegments(block_x2, block_y1, block_x2, block_y2, player_x1, player_y1, player_future_x1, player_future_y1, collision_coord_x, collision_coord_y)//bot
+		|| GameObject::IntersectSegments(block_x2, block_y1, block_x2, block_y2, player_x1, player_y2, player_future_x1, player_future_y2, collision_coord_x, collision_coord_y)))//top
+	{
+		if (player_y2 < block_y2 || player_future_y2 < block_y2)
+		{
+			return Collision_HangRight;
+		}
+		else
+		{
+			return Collision_Right;
+		}
+	}
+
+	return Collision_None;
+}
+
+CollisionDirection Game::BlockCollisionVertical(GameObject* player, GameObject* block)
+{
+	float block_x1 = block->getPosition().x - block->m_size.x / 2;
+	float block_x2 = block->getPosition().x + block->m_size.x / 2;
+	float block_y1 = block->getPosition().y + block->m_size.y / 2;
+	float block_y2 = block->getPosition().y - block->m_size.y / 2;
+
+	float player_x1 = player->m_old_position.x - player->m_size_hitbox.x / 2;
+	float player_x2 = player->m_old_position.x + player->m_size_hitbox.x / 2;
+	float player_y1 = player->m_old_position.y + player->m_size_hitbox.y / 2;
+	float player_y2 = player->m_old_position.y - player->m_size_hitbox.y / 2;
+
+	float player_future_x1 = player->getPosition().x - player->m_size_hitbox.x / 2;
+	float player_future_x2 = player->getPosition().x + player->m_size_hitbox.x / 2;
+	float player_future_y1 = player->getPosition().y + player->m_size_hitbox.y / 2;
+	float player_future_y2 = player->getPosition().y - player->m_size_hitbox.y / 2;
+
+	float* collision_coord_x = NULL;
+	float* collision_coord_y = NULL;
+
+	float dist1, dist2, dist3;
+	bool ground_contact = false;
+
+	//FROM THE TOP ?
+	//float fafa = GameObject::DistancePointToSement(player_x1, player_y1, block_x1, block_y2, block_x2, block_y2);
+	//if (fafa < 15)
+	//{
+	//	printf("dist : %f | cur pos y : %f | future pos y : %f\n", fafa, player_y1, player_future_y1);
+	//}
+
+	dist1 = GameObject::DistancePointToSement(player_x1, player_y1, block_x1, block_y2, block_x2, block_y2);
+	dist2 = GameObject::DistancePointToSement(player_x2, player_y1, block_x1, block_y2, block_x2, block_y2);
+	dist3 = GameObject::DistancePointToSement(player->m_old_position.x, player_y1, block_x1, block_y2, block_x2, block_y2);
+
+	if (dist1 == 1 || dist2 == 1 || dist3 == 1)
+	{
+		ground_contact = true;
+	}
+
+	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
+	if (player->m_speed.y > 0
+		&&
+		(GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y2, player->m_old_position.x, player_y1, player->getPosition().x, player_future_y1, collision_coord_x, collision_coord_y)//mid
+		|| GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y2, player_x2, player_y1, player_future_x2, player_future_y1, collision_coord_x, collision_coord_y)//bot
+		|| GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y2, player_x1, player_y1, player_future_x1, player_future_y1, collision_coord_x, collision_coord_y)))//top
+	{
+		return Collision_Top;
+	}
+
+	//FROM THE BOTTOM ?
+
+	dist1 = GameObject::DistancePointToSement(player_x1, player_y2, block_x1, block_y1, block_x2, block_y1);
+	dist2 = GameObject::DistancePointToSement(player_x2, player_y2, block_x1, block_y1, block_x2, block_y1);
+	dist3 = GameObject::DistancePointToSement(player->m_old_position.x, player_y2, block_x1, block_y1, block_x2, block_y1);
+	//
+	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
+	if (player->m_speed.y < 0 && player_future_x2 > block_x1 && player_future_x2 < block_x2
+		&&
+		(GameObject::IntersectSegments(block_x1, block_y1, block_x2, block_y1, player->m_old_position.x, player_y2, player->getPosition().x, player_future_y2, collision_coord_x, collision_coord_y)//mid
+		|| GameObject::IntersectSegments(block_x1, block_y1, block_x2, block_y1, player_x2, player_y2, player_future_x2, player_future_y2, collision_coord_x, collision_coord_y)//bot
+		|| GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y1, player_x1, player_y2, player_future_x1, player_future_y2, collision_coord_x, collision_coord_y)))//top
+	{
+		return Collision_Bot;
+	}
+
+	//if no collision found:
+	//return Collision_None;
+	return ground_contact ? Collision_GroundContact : Collision_None;
 }

@@ -35,6 +35,7 @@ void InGameState::Initialize(Player player)
 	CreateBlock(Block_Subground2_Hublot, sf::Vector2f(808, 350));
 	//CreateBlock(Block_Subground2_Hublot, sf::Vector2f(1000, 600));
 	CreateBlock(Block_Subground2_Hublot, sf::Vector2f(1192, 600));
+	CreateBlock(Block_Subground2_Hublot, sf::Vector2f(1192, 700));
 
 	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(700, 750));
 	CreateBlock(Block_Subground1_Cannon, sf::Vector2f(450, 650));

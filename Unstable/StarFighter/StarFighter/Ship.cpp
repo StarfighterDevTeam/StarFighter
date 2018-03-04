@@ -411,7 +411,7 @@ bool Ship::Fall()
 bool Ship::HitWallFromLeft(float coordinate)
 {
 	m_speed.x = 0;
-	setPosition(sf::Vector2f(coordinate + m_size_hitbox.x / 2, getPosition().y));
+	setPosition(sf::Vector2f(coordinate - m_size_hitbox.x / 2, getPosition().y));
 
 	return false;
 }
@@ -419,7 +419,7 @@ bool Ship::HitWallFromLeft(float coordinate)
 bool Ship::HitWallFromRight(float coordinate)
 {
 	m_speed.x = 0;
-	setPosition(sf::Vector2f(coordinate - m_size_hitbox.x / 2, getPosition().y));
+	setPosition(sf::Vector2f(coordinate + m_size_hitbox.x / 2, getPosition().y));
 
 	return false;
 }
@@ -429,7 +429,7 @@ bool Ship::HitCeiling(float coordinate)
 	m_speed.y = 0;
 	setPosition(sf::Vector2f(getPosition().x, coordinate + m_size_hitbox.y / 2));
 
-	return false;
+  	return false;
 }
 
 bool Ship::HangToWallFromLeft(float coordinate_x, float edge_height)
