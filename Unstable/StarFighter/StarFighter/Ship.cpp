@@ -79,6 +79,8 @@ void Ship::update(sf::Time deltaTime)
 		ManageAcceleration(inputs_direction);
 		ManageJump();
 
+		
+
 		//MaxSpeedConstraints();
 		IdleDecelleration(deltaTime);
 		//UpdateRotation();
@@ -217,16 +219,22 @@ void Ship::MaxSpeedConstraints()
 
 void Ship::ManageJump()
 {	//Jump
-	if (m_state == PlayerJump_Idle && m_inputs_states[Action_Jumping] == Input_Tap)
+	if ((m_state == PlayerJump_Idle || m_state == PlayerJump_Hanging) && m_inputs_states[Action_Jumping] == Input_Tap)
 	{
 		m_speed.y -= SHIP_JUMP_ACCELERATION;
-		m_state = PlayerJump_Jumping;
+		m_state = PlayerJump_Jumping;    
 	}
 
 	//Gravity
 	if (m_state == PlayerJump_Jumping || m_state == PlayerJump_Falling)
 	{
 		m_speed.y += SHIP_GRAVITY;
+	}
+
+	//Hanging to an edge prevents movement
+	if (m_state == PlayerJump_Hanging)
+	{
+		m_speed = sf::Vector2f(0, 0);
 	}
 }
 
@@ -391,7 +399,11 @@ bool Ship::Land(float coordinate)
 bool Ship::Fall()
 {
 	bool current_state = m_state;
-	m_state = PlayerJump_Falling;
+	
+	if (m_state != PlayerJump_Hanging)
+	{
+		m_state = PlayerJump_Falling;
+	}
 	
 	return (current_state != PlayerJump_Falling);
 }
@@ -399,7 +411,7 @@ bool Ship::Fall()
 bool Ship::HitWallFromLeft(float coordinate)
 {
 	m_speed.x = 0;
-	setPosition(sf::Vector2f(coordinate - m_size_hitbox.x / 2, getPosition().y));
+	setPosition(sf::Vector2f(coordinate + m_size_hitbox.x / 2, getPosition().y));
 
 	return false;
 }
@@ -407,7 +419,7 @@ bool Ship::HitWallFromLeft(float coordinate)
 bool Ship::HitWallFromRight(float coordinate)
 {
 	m_speed.x = 0;
-	setPosition(sf::Vector2f(coordinate + m_size_hitbox.x / 2, getPosition().y));
+	setPosition(sf::Vector2f(coordinate - m_size_hitbox.x / 2, getPosition().y));
 
 	return false;
 }
@@ -418,6 +430,41 @@ bool Ship::HitCeiling(float coordinate)
 	setPosition(sf::Vector2f(getPosition().x, coordinate + m_size_hitbox.y / 2));
 
 	return false;
+}
+
+bool Ship::HangToWallFromLeft(float coordinate_x, float edge_height)
+{
+	//m_speed.x = 0;
+	//m_speed.y = 0;
+	//m_state = PlayerJump_Hanging;
+	//setPosition(sf::Vector2f(coordinate_x - m_size_hitbox.x / 2, getPosition().y));
+	bool current_state = m_state;
+
+	m_speed.x = 0;
+	m_speed.y = 0;
+	setPosition(sf::Vector2f(coordinate_x - m_size_hitbox.x / 2, edge_height));
+	//
+	m_state = PlayerJump_Hanging;
+
+	return (current_state != PlayerJump_Hanging);
+}
+
+bool Ship::HangToWallFromRight(float coordinate_x, float edge_height)
+{
+	//m_speed.x = 0;
+	//m_speed.y = 0;
+	//m_state = PlayerJump_Hanging;
+	//setPosition(sf::Vector2f(coordinate_x + m_size_hitbox.x / 2, getPosition().y));
+
+	bool current_state = m_state;
+
+	m_speed.x = 0;
+	m_speed.y = 0;
+	setPosition(sf::Vector2f(coordinate_x + m_size_hitbox.x / 2, edge_height));
+
+	m_state = PlayerJump_Hanging;
+
+	return (current_state != PlayerJump_Hanging);
 }
 
 void Ship::Respawn()

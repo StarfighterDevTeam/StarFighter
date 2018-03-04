@@ -50,6 +50,8 @@ enum PlayerJumpState
 	PlayerJump_Idle,
 	PlayerJump_Jumping,
 	PlayerJump_Falling,
+	PlayerJump_Hanging,
+	PlayerJump_PullingUp,
 };
 
 class Ship : public GameObject
@@ -96,6 +98,8 @@ public :
 	bool HitWallFromLeft(float coordinate) override;
 	bool HitWallFromRight(float coordinate) override;
 	bool HitCeiling(float coordinate) override;
+	bool HangToWallFromLeft(float coordinate_x, float edge_height) override;
+	bool HangToWallFromRight(float coordinate_x, float edge_height) override;
 
 	void Respawn();
 

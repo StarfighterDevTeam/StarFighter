@@ -131,6 +131,8 @@ public:
 	virtual bool HitWallFromLeft(float coordinate);
 	virtual bool HitWallFromRight(float coordinate);
 	virtual bool HitCeiling(float coordinate);
+	virtual bool HangToWallFromLeft(float coordinate_x, float edge_height);
+	virtual bool HangToWallFromRight(float coordinate_x, float edge_height);
 };
 
 #endif // GameObject_H_INCLUDED

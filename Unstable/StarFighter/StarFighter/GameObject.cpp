@@ -532,3 +532,15 @@ bool GameObject::HitCeiling(float coordinate)
 	//see override function in Ship()
 	return false;
 }
+
+bool GameObject::HangToWallFromLeft(float coordinate_x, float edge_height)
+{
+	//see override function in Ship()
+	return false;
+}
+
+bool GameObject::HangToWallFromRight(float coordinate_x, float edge_height)
+{
+	//see override function in Ship()
+	return false;
+}

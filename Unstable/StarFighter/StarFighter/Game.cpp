@@ -351,6 +351,11 @@ void Game::colisionChecksV2()
 
 		//Hitting blocks
 		bool ground_contact = false;
+		float edge_height = -1;
+		float collision_coord_x;
+		enum HangPossibilities {HangNone, NoHangCollisionLeft, NoHangCollisionRight, HangLeft, HangRight};
+		HangPossibilities hang = HangNone;
+
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::BlockObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::BlockObject].end(); it2++)
 		{
 			if (*it2 == NULL)
@@ -372,16 +377,74 @@ void Game::colisionChecksV2()
 			}
 			else if (collision_dir == Collision_Left)
 			{
-				(*it1)->HitWallFromLeft((*it2)->getPosition().x - (*it2)->m_size.x / 2);
+				//(*it1)->HitWallFromLeft((*it2)->getPosition().x - (*it2)->m_size.x / 2);
+
+				if (edge_height < 0 || (*it2)->getPosition().y - (*it2)->m_size.y / 2 < edge_height)
+				{
+					collision_coord_x = (*it2)->getPosition().x - (*it2)->m_size.x / 2;
+					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
+					hang = NoHangCollisionLeft;
+				}
+				
 			}
 			else if (collision_dir == Collision_Right)
 			{
-				(*it1)->HitWallFromRight((*it2)->getPosition().x + (*it2)->m_size.x / 2);
+				//(*it1)->HitWallFromRight((*it2)->getPosition().x + (*it2)->m_size.x / 2);
+
+				if (edge_height < 0 || (*it2)->getPosition().y - (*it2)->m_size.y / 2 < edge_height)
+				{
+					collision_coord_x = (*it2)->getPosition().x + (*it2)->m_size.x / 2;
+					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
+					hang = NoHangCollisionRight;
+				}
+			}
+			else if (collision_dir == Collision_HangLeft)
+			{
+				if (edge_height < 0 || (*it2)->getPosition().y - (*it2)->m_size.y / 2 < edge_height)
+				{
+					collision_coord_x = (*it2)->getPosition().x - (*it2)->m_size.x / 2;
+					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
+					hang = HangLeft;
+				}
+			}
+			else if (collision_dir == Collision_HangRight)
+			{
+				if (edge_height < 0 || (*it2)->getPosition().y - (*it2)->m_size.y / 2 < edge_height)
+				{
+					collision_coord_x = (*it2)->getPosition().x + (*it2)->m_size.x / 2;
+					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
+					hang = HangRight;
+				}
 			}
 		}
 		if (!ground_contact)
 		{
 			(*it1)->Fall();
+		}
+		switch (hang)
+		{
+			case NoHangCollisionLeft:
+			{
+				(*it1)->HitWallFromLeft(collision_coord_x);
+				break;
+			}
+			case NoHangCollisionRight:
+			{
+				(*it1)->HitWallFromLeft(collision_coord_x);
+				break;
+			}
+			case HangLeft:
+			{
+				(*it1)->HangToWallFromLeft(collision_coord_x, edge_height);
+				break;
+			}
+			case HangRight:
+			{
+				(*it1)->HangToWallFromRight(collision_coord_x, edge_height);
+				break;
+			}
+			default:
+				break;
 		}
 
 		//Enemy bullets hitting the player
@@ -703,7 +766,14 @@ CollisionDirection Game::BlockCollision(GameObject* player, GameObject* block)
 		||	GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player_y1, player_future_x2, player_future_y1,							collision_coord_x, collision_coord_y)//bot
 		||	GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player_y2, player_future_x2, player_future_y2,							collision_coord_x,collision_coord_y)))//top
 	{
-		return Collision_Left;
+		if (player_y2 < block_y2 || player_future_y2 < block_y2)
+		{
+			return Collision_HangLeft;
+		}
+		else
+		{
+			return Collision_Left;
+		}
 	}
 
 	//FROM THE RIGHT ?
@@ -718,7 +788,14 @@ CollisionDirection Game::BlockCollision(GameObject* player, GameObject* block)
 		||	GameObject::IntersectSegments(block_x2, block_y1, block_x2, block_y2, player_x1, player_y1,					player_future_x1, player_future_y1,			collision_coord_x, collision_coord_y)//bot
 		||	GameObject::IntersectSegments(block_x2, block_y1, block_x2, block_y2, player_x1, player_y2,					player_future_x1, player_future_y2,			collision_coord_x, collision_coord_y)))//top
 	{
-		return Collision_Right;
+		if (player_y2 < block_y2 || player_future_y2 < block_y2)
+		{
+			return Collision_HangRight;
+		}
+		else
+		{
+			return Collision_Right;
+		}
 	}
 
 	//if no collision found:

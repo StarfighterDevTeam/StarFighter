@@ -47,6 +47,8 @@ enum CollisionDirection
 	Collision_Right,
 	Collision_Top,
 	Collision_Bot,
+	Collision_HangLeft,
+	Collision_HangRight,
 };
 
 using namespace sf;
