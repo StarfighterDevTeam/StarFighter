@@ -442,7 +442,7 @@ bool Ship::HangToWallFromLeft(float coordinate_x, float edge_height)
 
 	m_speed.x = 0;
 	m_speed.y = 0;
-	setPosition(sf::Vector2f(coordinate_x - m_size_hitbox.x / 2, edge_height));
+	setPosition(sf::Vector2f(coordinate_x - m_size_hitbox.x / 2, edge_height + m_size_hitbox.y / 2));
 	//
 	m_state = PlayerJump_Hanging;
 
@@ -460,7 +460,7 @@ bool Ship::HangToWallFromRight(float coordinate_x, float edge_height)
 
 	m_speed.x = 0;
 	m_speed.y = 0;
-	setPosition(sf::Vector2f(coordinate_x + m_size_hitbox.x / 2, edge_height));
+	setPosition(sf::Vector2f(coordinate_x + m_size_hitbox.x / 2, edge_height + m_size_hitbox.y / 2));
 
 	m_state = PlayerJump_Hanging;
 

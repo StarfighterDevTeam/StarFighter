@@ -374,7 +374,6 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x - (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = NoHangCollisionLeft;
-					printf("no hang left\n");
 				}
 				
 			}
@@ -387,7 +386,6 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x + (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = NoHangCollisionRight;
-					printf("no hang right\n");
 				}
 			}
 			else if (collision_dir == Collision_HangLeft)
@@ -397,7 +395,6 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x - (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = HangLeft;
-					printf("hand left\n");
 				}
 			}
 			else if (collision_dir == Collision_HangRight)
@@ -407,7 +404,6 @@ void Game::colisionChecksV2()
 					collision_coord_x = (*it2)->getPosition().x + (*it2)->m_size.x / 2;
 					edge_height = (*it2)->getPosition().y - (*it2)->m_size.y / 2;
 					hang = HangRight;
-					printf("hand right\n");
 				}
 			}
 		}
@@ -420,7 +416,7 @@ void Game::colisionChecksV2()
 			}
 			case NoHangCollisionRight:
 			{
-				(*it1)->HitWallFromLeft(collision_coord_x);
+				(*it1)->HitWallFromRight(collision_coord_x);
 				break;
 			}
 			case HangLeft:
@@ -851,18 +847,20 @@ CollisionDirection Game::BlockCollisionHorizontal(GameObject* player, GameObject
 	//dist3 = GameObject::DistancePointToSement(player_x2, player->m_old_position.y,	block_x1, block_y1, block_x1, block_y2);
 
 	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
-	if (player->m_speed.x > 0
-		&&
+	if (//player->m_speed.x > 0
+		//&&
 		(GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player->m_old_position.y, player_future_x2, player->getPosition().y, collision_coord_x, collision_coord_y)//mid
 		|| GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player_y1, player_future_x2, player_future_y1, collision_coord_x, collision_coord_y)//bot
 		|| GameObject::IntersectSegments(block_x1, block_y1, block_x1, block_y2, player_x2, player_y2, player_future_x2, player_future_y2, collision_coord_x, collision_coord_y)))//top
 	{
-		if (player_y2 < block_y2 || player_future_y2 < block_y2)
+		if (player_y2 < block_y2 && player_future_y2 > block_y2)
 		{
+			printf("hang\n");
 			return Collision_HangLeft;
 		}
-		else
+		else if (player->m_speed.x > 0)
 		{
+			printf("hit\n");
 			return Collision_Left;
 		}
 	}
@@ -879,7 +877,7 @@ CollisionDirection Game::BlockCollisionHorizontal(GameObject* player, GameObject
 		|| GameObject::IntersectSegments(block_x2, block_y1, block_x2, block_y2, player_x1, player_y1, player_future_x1, player_future_y1, collision_coord_x, collision_coord_y)//bot
 		|| GameObject::IntersectSegments(block_x2, block_y1, block_x2, block_y2, player_x1, player_y2, player_future_x1, player_future_y2, collision_coord_x, collision_coord_y)))//top
 	{
-		if (player_y2 < block_y2 || player_future_y2 < block_y2)
+		if (player_y2 < block_y2 && player_future_y2 > block_y2)
 		{
 			return Collision_HangRight;
 		}
@@ -934,9 +932,9 @@ CollisionDirection Game::BlockCollisionVertical(GameObject* player, GameObject* 
 	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
 	if (player->m_speed.y > 0
 		&&
-		(GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y2, player->m_old_position.x, player_y1, player->getPosition().x, player_future_y1, collision_coord_x, collision_coord_y)//mid
-		|| GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y2, player_x2, player_y1, player_future_x2, player_future_y1, collision_coord_x, collision_coord_y)//bot
-		|| GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y2, player_x1, player_y1, player_future_x1, player_future_y1, collision_coord_x, collision_coord_y)))//top
+		(GameObject::IntersectSegments(		block_x1 + 1, block_y2, block_x2 - 1, block_y2, player->m_old_position.x, player_y1, player->getPosition().x, player_future_y1, collision_coord_x, collision_coord_y)//mid
+		|| GameObject::IntersectSegments(	block_x1 + 1, block_y2, block_x2 - 1, block_y2, player_x2, player_y1, player_future_x2, player_future_y1, collision_coord_x, collision_coord_y)//bot
+		|| GameObject::IntersectSegments(	block_x1 + 1, block_y2, block_x2 - 1, block_y2, player_x1, player_y1, player_future_x1, player_future_y1, collision_coord_x, collision_coord_y)))//top
 	{
 		return Collision_Top;
 	}
@@ -950,9 +948,9 @@ CollisionDirection Game::BlockCollisionVertical(GameObject* player, GameObject* 
 	//if (dist1 > 0 && dist2 > 0 && dist3 > 0
 	if (player->m_speed.y < 0 && player_future_x2 > block_x1 && player_future_x2 < block_x2
 		&&
-		(GameObject::IntersectSegments(block_x1, block_y1, block_x2, block_y1, player->m_old_position.x, player_y2, player->getPosition().x, player_future_y2, collision_coord_x, collision_coord_y)//mid
-		|| GameObject::IntersectSegments(block_x1, block_y1, block_x2, block_y1, player_x2, player_y2, player_future_x2, player_future_y2, collision_coord_x, collision_coord_y)//bot
-		|| GameObject::IntersectSegments(block_x1, block_y2, block_x2, block_y1, player_x1, player_y2, player_future_x1, player_future_y2, collision_coord_x, collision_coord_y)))//top
+		(GameObject::IntersectSegments(		block_x1 + 1, block_y1, block_x2 - 1, block_y1, player->m_old_position.x, player_y2, player->getPosition().x, player_future_y2, collision_coord_x, collision_coord_y)//mid
+		|| GameObject::IntersectSegments(	block_x1 + 1, block_y1, block_x2 - 1, block_y1, player_x2, player_y2, player_future_x2, player_future_y2, collision_coord_x, collision_coord_y)//bot
+		|| GameObject::IntersectSegments(	block_x1 + 1, block_y2, block_x2 - 1, block_y1, player_x1, player_y2, player_future_x1, player_future_y2, collision_coord_x, collision_coord_y)))//top
 	{
 		return Collision_Bot;
 	}
