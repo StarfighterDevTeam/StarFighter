@@ -4,9 +4,13 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Block::Block(Block_Type block_type, sf::Vector2f position)
+Block::Block(Block_Type block_type, sf::Vector2f position, Move_Pattern pattern, float pattern_amplitude, float pattern_speed)
 {
 	m_block_type = block_type;
+
+	m_pattern = pattern;
+	m_pattern_amplitude = pattern_amplitude;
+	m_pattern_speed = pattern_speed;
 
 	string textureName;
 	sf::Vector2f textureSize = sf::Vector2f(-1, -1);
@@ -44,5 +48,14 @@ Block::Block(Block_Type block_type, sf::Vector2f position)
 
 void Block::update(sf::Time deltaTime)
 {
-	AnimatedSprite::update(deltaTime);
+	switch (m_pattern)
+	{
+		case Move_Pattern_None:
+		break;
+	
+		case Move_Pattern_Horizontal:
+		break;
+	}
+
+	GameObject::update(deltaTime);
 }
