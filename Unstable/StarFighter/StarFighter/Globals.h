@@ -50,7 +50,6 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define FLOCKING_COHESION_WEIGHT			0.8f
 #define FLOCKING_ALIGNMENT_WEIGHT			0.15f
 #define FLOCKING_SEPARATION_WEIGHT			2.0f
-#define FLOCKING_CHANGE_DIR_WEIGHT			100.0f
 
 #define FLOCKING_SEPARATION_RADIUS			50
 
