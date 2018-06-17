@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "SFTextPop.h"
 #include "Boid.h"
+#include "Predator.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -23,6 +24,7 @@ enum PlayerActions
 	Action_Muting,
 	Action_Pausing,
 	Action_SpawnBoid,
+	Action_SpawnPredator,
 	Action_Flee,
 	NBVAL_PlayerActions,
 };

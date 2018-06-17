@@ -590,12 +590,12 @@ void Game::GroupBoids()
 {
 	float radius = FLOCKING_RADIUS;
 
-	for (GameObject* boid : m_sceneGameObjectsTyped[FishObject])
+	for (GameObject* boid : m_sceneGameObjectsTyped[BoidObject])
 	{
 		if (boid)
 		{
 			boid->ClearBoidNeighbours();
-			for (GameObject* boid2 : m_sceneGameObjectsTyped[FishObject])
+			for (GameObject* boid2 : m_sceneGameObjectsTyped[BoidObject])
 			{
 				if (boid2 && boid2 != boid)
 				{

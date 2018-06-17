@@ -137,13 +137,13 @@ GameObject::~GameObject()
 void GameObject::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->m_speed;
+	newspeed = m_speed;
 	
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
-	this->setPosition(newposition.x, newposition.y);
+	setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
 }
@@ -449,9 +449,10 @@ void GameObject::ClearBoidNeighbours()
 	//see override function in class Boid
 }
 
-bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_angle)
+bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float threat_angle)
 {
-	float distance = GetDistanceBetweenPositions(getPosition(), threat_pos);
+	float distance = GetDistanceBetweenPositions(getPosition(), threat_pos) - m_diag - threat_diag_size;
+
 	float angle = GetAngleRadBetweenPositions(getPosition(), threat_pos) * 180 / M_PI;
 
 	float delta_angle = angle - threat_angle;
@@ -465,5 +466,5 @@ bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_angle)
 		return true;
 	}
 	
-	return false;;
+	return false;
 }

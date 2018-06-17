@@ -74,8 +74,19 @@ void Ship::update(sf::Time deltaTime)
 		if (boid_pos.x > 0 && boid_pos.x < REF_WINDOW_RESOLUTION_X && boid_pos.y > 0 && boid_pos.y < REF_WINDOW_RESOLUTION_Y)
 		{
 			Boid* boid = new Boid(boid_pos, "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
-			(*CurrentGame).addToScene(boid, FishLayer, FishObject);
+			(*CurrentGame).addToScene(boid, BoidLayer, BoidObject);
 		}	
+	}
+
+	if (m_inputs_states[Action_SpawnPredator] == Input_Tap)
+	{
+		sf::Vector2i mousepos = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+		sf::Vector2f predator_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view);
+		if (predator_pos.x > 0 && predator_pos.x < REF_WINDOW_RESOLUTION_X && predator_pos.y > 0 && predator_pos.y < REF_WINDOW_RESOLUTION_Y)
+		{
+			Predator* predator = new Predator(predator_pos, "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+			(*CurrentGame).addToScene(predator, PredatorLayer, PredatorObject);
+		}
 	}
 
 	if (m_inputs_states[Action_Flee] == Input_Tap)
@@ -83,11 +94,11 @@ void Ship::update(sf::Time deltaTime)
 		sf::Vector2i mousepos = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
 		sf::Vector2f threat_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view);
 		
-		Boid* boid = (Boid*)(*CurrentGame).GetSceneGameObjectsTyped(FishObject).front();
+		Boid* boid = (Boid*)(*CurrentGame).GetSceneGameObjectsTyped(BoidObject).front();
 		Threat threat;
 		threat.m_pos = threat_pos;
 		threat.m_angle = 0.f;
-		if (boid->IsThreat(threat.m_pos, threat.m_angle))
+		if (boid->IsThreat(threat.m_pos, 0.f, threat.m_angle))
 		{
 			boid->m_threats.push_back(threat);
 		}
@@ -232,6 +243,7 @@ void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isFiring(), Action_Firing);
 	GetInputState(InputGuy::isSpawningBoid(), Action_SpawnBoid);
+	GetInputState(InputGuy::isSpawningPredator(), Action_SpawnPredator);
 	GetInputState(InputGuy::isFleeing(), Action_Flee);
 }
 

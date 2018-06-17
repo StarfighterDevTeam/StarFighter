@@ -30,7 +30,8 @@ enum LayerType {
 	PlayerShipLayer,
 	EnemyFireLayer,
 
-	FishLayer,
+	PredatorLayer,
+	BoidLayer,
 	PanelLayer,
 	HudObject,
 	HudCursor,
@@ -46,7 +47,8 @@ enum GameObjectType {
 	FakePlayerShip,
 	FriendlyFire,
 	Neutral,
-	FishObject,
+	BoidObject,
+	PredatorObject,
 	EnemyFire,
 	EnemyObject,
 	NBVAL_GameObject
@@ -86,6 +88,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+	sf::Vector2f m_previous_speed;
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();
@@ -115,7 +118,7 @@ public:
 	//ATLANTIS SPECIFICS
 	virtual void AddToBoidNeighbours(GameObject* boid);
 	virtual void ClearBoidNeighbours();
-	bool IsThreat(sf::Vector2f threat_pos, float threat_angle);
+	bool IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float threat_angle);
 
 protected:
 	sf::Vector2f m_initial_position;

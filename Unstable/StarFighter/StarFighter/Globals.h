@@ -54,17 +54,28 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 //FLEEING
 #define FLEEING_MAX_SPEED					500
 #define FLEEING_RADIUS						100
-#define FLEEING_ANGLE						30
+#define FLEEING_ANGLE						90
 #define FLEEING_DURATION					0.4f
 
 #define FLOCKING_SEPARATION_RADIUS			50
 
 //BOIDS
-#define MIN_CHANGE_DIR_TIME					1.f
-#define MAX_CHANGE_DIR_TIME					4.f
-#define MIN_CHANGE_DIR_ANGLE				20.f
-#define MAX_CHANGE_DIR_ANGLE				90.f
+#define BOID_MIN_CHANGE_DIR_TIME			1.f
+#define BOID_MAX_CHANGE_DIR_TIME			4.f
+#define BOID_MIN_CHANGE_DIR_ANGLE			20.f
+#define BOID_MAX_CHANGE_DIR_ANGLE			90.f
 
+//PREDATORS
+#define PREDATOR_MIN_CHANGE_DIR_TIME		5.f
+#define PREDATOR_MAX_CHANGE_DIR_TIME		15.f
+#define PREDATOR_MIN_CHANGE_DIR_ANGLE		30.f
+#define PREDATOR_MAX_CHANGE_DIR_ANGLE		150.f
+
+#define PREDATOR_MAX_SPEED					220
+#define PREDATOR_BASE_SPEED_MIN				150
+#define PREDATOR_BASE_SPEED_MAX				300
+#define PREDATOR_CHASING_RADIUS				200
+#define PREDATOR_ATTACK_RADIUS				50
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50

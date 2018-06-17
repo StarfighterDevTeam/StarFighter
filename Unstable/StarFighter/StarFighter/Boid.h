@@ -10,6 +10,7 @@ struct Threat
 	sf::Vector2f m_pos;
 	sf::Clock m_clock;
 	float m_angle;
+	GameObject* m_object;
 };
 
 
@@ -26,7 +27,6 @@ public :
 	void AddToBoidNeighbours(GameObject* boid) override;
 	void ClearBoidNeighbours() override;
 
-	sf::Vector2f m_previous_speed;
 	vector<Boid*> m_boid_neighbours;
 	sf::Vector2f m_avg_position;
 	sf::Vector2f GetAveragePosition();

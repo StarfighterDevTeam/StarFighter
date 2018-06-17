@@ -178,6 +178,16 @@ bool InputGuy::isSpawningBoid()
 	return false;
 }
 
+bool InputGuy::isSpawningPredator()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::V))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool InputGuy::isFleeing()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))

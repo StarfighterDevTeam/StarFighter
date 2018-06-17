@@ -27,7 +27,7 @@ Boid::Boid(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf
 
 void Boid::Init()
 {
-	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(MIN_CHANGE_DIR_TIME, MAX_CHANGE_DIR_TIME));
+	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(BOID_MIN_CHANGE_DIR_TIME, BOID_MAX_CHANGE_DIR_TIME));
 }
 
 Boid::~Boid()
@@ -92,12 +92,12 @@ void Boid::update(sf::Time deltaTime)
 			sf::Vector2f change_dir = sf::Vector2f(0, 0);
 			if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
 			{
-				m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(MIN_CHANGE_DIR_TIME, MAX_CHANGE_DIR_TIME));
+				m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(BOID_MIN_CHANGE_DIR_TIME, BOID_MAX_CHANGE_DIR_TIME));
 				m_change_dir_clock.restart();
 
 				int dir = RandomizeIntBetweenValues(0, 1);
 				dir = dir == 0 ? -1 : 1;
-				float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*MIN_CHANGE_DIR_ANGLE, getRotation() + dir*MAX_CHANGE_DIR_ANGLE)) - 180;
+				float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*BOID_MIN_CHANGE_DIR_ANGLE, getRotation() + dir*BOID_MAX_CHANGE_DIR_ANGLE)) - 180;
 
 				change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
 
@@ -248,37 +248,84 @@ sf::Vector2f Boid::Flee(sf::Vector2f threat_pos)
 
 void Boid::UpdateThreats()
 {
-	vector<Threat> updated_threats;
+	vector<Threat> existing_threats;
 
+	//scanning all existing threats
+	for (GameObject* predator : (*CurrentGame).GetSceneGameObjectsTyped(PredatorObject))
+	{
+		if (predator)
+		{
+			if (this->IsThreat(predator->getPosition(), predator->m_diag, predator->getRotation()))
+			{
+				Threat threat;
+				threat.m_pos = predator->getPosition();
+				threat.m_angle = predator->getRotation();
+				threat.m_object = predator;
+				existing_threats.push_back(threat);
+			}
+		}
+	}
+
+	for (Threat new_threat : existing_threats)
+	{
+		bool found = false;
+		for (Threat threat : m_threats)
+		{
+			//threat already known? then simply refresh the clock
+			if (new_threat.m_object == threat.m_object)
+			{
+				threat.m_clock.restart();
+				found = true;
+				continue;
+			}
+		}
+		//new threat identified
+		if (!found)
+		{
+			m_threats.push_back(new_threat);
+		}
+	}
+
+	//remanence of threat
+	vector<Threat> updated_threats;
 	for (Threat threat : m_threats)
 	{
-		//float distance = GetDistanceBetweenPositions(getPosition(), threat.m_pos);
-		//float angle = GetAngleRadBetweenPositions(getPosition(), threat.m_pos) * 180 / M_PI;
-		//
-		//float delta_angle = angle - threat.m_angle;
-		//if (delta_angle > 180)
-		//	delta_angle -= 360;
-		//else if (delta_angle < -180)
-		//	delta_angle += 360;
-
-		//printf("angle to boid : %f |  threat angle : %f | delta angle: %f", angle, threat.m_angle, delta_angle);
-		//if (delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
-		//{
-		//	printf(" THREAT!!!");
-		//}
-		//printf("\n");
-
-		//if (distance < FLEEING_RADIUS && delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
-		if (this->IsThreat(threat.m_pos, threat.m_angle))
-		{
-			threat.m_clock.restart();
-		}
-
 		if (threat.m_clock.getElapsedTime().asSeconds() < FLEEING_DURATION)
 		{
 			updated_threats.push_back(threat);
 		}
 	}
-
 	m_threats = updated_threats;
+
+	//for (Threat threat : m_threats)
+	//{
+	//	//float distance = GetDistanceBetweenPositions(getPosition(), threat.m_pos);
+	//	//float angle = GetAngleRadBetweenPositions(getPosition(), threat.m_pos) * 180 / M_PI;
+	//	//
+	//	//float delta_angle = angle - threat.m_angle;
+	//	//if (delta_angle > 180)
+	//	//	delta_angle -= 360;
+	//	//else if (delta_angle < -180)
+	//	//	delta_angle += 360;
+	//
+	//	//printf("angle to boid : %f |  threat angle : %f | delta angle: %f", angle, threat.m_angle, delta_angle);
+	//	//if (delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
+	//	//{
+	//	//	printf(" THREAT!!!");
+	//	//}
+	//	//printf("\n");
+	//
+	//	//if (distance < FLEEING_RADIUS && delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
+	//	if (this->IsThreat(threat.m_pos, threat.m_angle))
+	//	{
+	//		threat.m_clock.restart();
+	//	}
+	//
+	//	if (threat.m_clock.getElapsedTime().asSeconds() < FLEEING_DURATION)
+	//	{
+	//		updated_threats.push_back(threat);
+	//	}
+	//}
+	//
+	//m_threats = updated_threats;
 }
