@@ -80,8 +80,10 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PREDATOR_MAX_SPEED					220
 #define PREDATOR_BASE_SPEED_MIN				150
 #define PREDATOR_BASE_SPEED_MAX				300
-#define PREDATOR_CHASING_RADIUS				200
+#define PREDATOR_CHASING_RADIUS				150
+#define PREDATOR_CHASING_ANGLE				40.f
 #define PREDATOR_ATTACK_RADIUS				50
+#define PREDATOR_SCALE						4.f
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50

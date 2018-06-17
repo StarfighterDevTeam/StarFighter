@@ -15,8 +15,12 @@ public :
 	virtual ~Predator();
 	void update(sf::Time deltaTime) override;
 
+	void UpdatePrey();
+
 	float m_change_dir_time;
 	sf::Clock m_change_dir_clock;
+
+	GameObject* m_prey;
 };
 
 #endif // BOID_H_INCLUDED

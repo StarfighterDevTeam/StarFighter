@@ -471,6 +471,26 @@ bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float
 	return false;
 }
 
+bool GameObject::IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle)
+{
+	float distance = GetDistanceBetweenPositions(getPosition(), prey_pos) - m_diag - prey_diag_size;
+
+	float angle = GetAngleRadBetweenPositions(prey_pos, getPosition()) * 180 / M_PI;
+
+	float delta_angle = angle - prey_angle;
+	if (delta_angle > 180)
+		delta_angle -= 360;
+	else if (delta_angle < -180)
+		delta_angle += 360;
+
+	if (distance < PREDATOR_CHASING_RADIUS && delta_angle > -PREDATOR_CHASING_ANGLE / 2 && delta_angle < PREDATOR_CHASING_ANGLE / 2)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 sf::Vector2f GameObject::AvoidBorders()
 {
 	sf::Vector2f avoid_vector = sf::Vector2f(0, 0);

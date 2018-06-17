@@ -23,12 +23,12 @@ Predator::Predator(sf::Vector2f position, std::string textureName, sf::Vector2f 
 	int g = RandomizeIntBetweenValues(0, 255);
 	int b = RandomizeIntBetweenValues(0, 255);
 	setColor(sf::Color(r, g, b, 255));
+	m_prey = NULL;
 
-	float predator_scale = 5.f;
-	setScale(sf::Vector2f(predator_scale, predator_scale));
-	m_size.x *= predator_scale;
-	m_size.y *= predator_scale;
-	m_diag *= predator_scale;
+	setScale(sf::Vector2f(PREDATOR_SCALE, PREDATOR_SCALE));
+	m_size.x *= PREDATOR_SCALE;
+	m_size.y *= PREDATOR_SCALE;
+	m_diag *= PREDATOR_SCALE;
 }
 
 void Predator::Init()
@@ -45,7 +45,7 @@ void Predator::update(sf::Time deltaTime)
 {
 	GameObject::update(deltaTime);
 
-	//UpdateThreats();
+	UpdatePrey();
 
 	//Sum up vectors and normalize speed
 	m_previous_speed.x = m_speed.x;
@@ -76,40 +76,75 @@ void Predator::update(sf::Time deltaTime)
 
 	if (!bounced)
 	{
-		//Avoid Borders
-		sf::Vector2f avoid_borders = AvoidBorders();
-
-		//Change direction randomly
-		sf::Vector2f change_dir = sf::Vector2f(0, 0);
-		if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
+		if (m_prey)
 		{
-			m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_MIN_CHANGE_DIR_TIME, PREDATOR_MAX_CHANGE_DIR_TIME));
-			m_change_dir_clock.restart();
-
-			int dir = RandomizeIntBetweenValues(0, 1);
-			dir = dir == 0 ? -1 : 1;
-			float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*PREDATOR_MIN_CHANGE_DIR_ANGLE, getRotation() + dir*PREDATOR_MAX_CHANGE_DIR_ANGLE)) - 180;
-
-			change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
-
-			m_speed.x = change_dir.x;
-			m_speed.y = change_dir.y;
+			sf::Vector2f chase_vector = sf::Vector2f(m_prey->getPosition().x - getPosition().x, m_prey->getPosition().y - getPosition().y);
+			ScaleSpeed(&chase_vector, GetAbsoluteSpeed());
+			m_speed = chase_vector;
 		}
-		
-		//printf("speed: (%f, %f) | avoid (%f, %f)", m_speed.x, m_speed.y, avoid_borders.x * AVOID_BORDERS_WEIGHT, avoid_borders.y * AVOID_BORDERS_WEIGHT);
+		else
+		{
+			//Avoid Borders
+			sf::Vector2f avoid_borders = AvoidBorders();
 
-		
+			//Change direction randomly
+			sf::Vector2f change_dir = sf::Vector2f(0, 0);
+			if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
+			{
+				m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_MIN_CHANGE_DIR_TIME, PREDATOR_MAX_CHANGE_DIR_TIME));
+				m_change_dir_clock.restart();
+
+				int dir = RandomizeIntBetweenValues(0, 1);
+				dir = dir == 0 ? -1 : 1;
+				float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*PREDATOR_MIN_CHANGE_DIR_ANGLE, getRotation() + dir*PREDATOR_MAX_CHANGE_DIR_ANGLE)) - 180;
+
+				change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
+
+				m_speed.x = change_dir.x;
+				m_speed.y = change_dir.y;
+			}
+
 			m_speed.x = m_speed.x + avoid_borders.x * PREDATOR_AVOID_BORDERS_WEIGHT;
 			m_speed.y = m_speed.y + avoid_borders.y * PREDATOR_AVOID_BORDERS_WEIGHT;
-		
-		//printf(" new speed: (%f, %f)\n", m_speed.x, m_speed.y);
-		
 
-		NormalizeSpeed(&m_speed, PREDATOR_MAX_SPEED);
-
-		//printf(" norm speed: (%f, %f)\n", m_speed.x, m_speed.y);
+			NormalizeSpeed(&m_speed, PREDATOR_MAX_SPEED);
+		}
 	}
 	
 	float angle = GetAngleRadForSpeed(m_speed);
 	setRotation(angle * 180 / M_PI);
+}
+
+void Predator::UpdatePrey()
+{
+	//end of previous chase
+	if (m_prey)
+	{
+		if (this->IsPrey(m_prey->getPosition(), m_prey->m_diag, this->getRotation()) == false)
+		{
+			m_prey = NULL;
+		}
+	}
+
+	if (!m_prey)
+	{
+		//scanning all existing preys
+		float min_dist = -1;
+		for (GameObject* boid : (*CurrentGame).GetSceneGameObjectsTyped(BoidObject))
+		{
+			if (boid)
+			{
+				//choose closest target as a prey
+				if (this->IsPrey(boid->getPosition(), boid->m_diag, this->getRotation()))
+				{
+					float dist = GetDistanceBetweenPositions(this->getPosition(), boid->getPosition());
+					if (min_dist < 0 || dist < min_dist)
+					{
+						min_dist = dist;
+						m_prey = boid;
+					}
+				}
+			}
+		}
+	}
 }

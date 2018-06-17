@@ -119,6 +119,7 @@ public:
 	virtual void AddToBoidNeighbours(GameObject* boid);
 	virtual void ClearBoidNeighbours();
 	bool IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float threat_angle);
+	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle);
 	sf::Vector2f AvoidBorders();
 
 	int m_avoiding_x;
