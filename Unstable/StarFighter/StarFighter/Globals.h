@@ -45,9 +45,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 //FLOCKING
 #define FLOCKING_RADIUS						100
-#define FLOCKING_MAX_SPEED					220
-#define FLOCKING_BASE_SPEED_MIN				100
-#define FLOCKING_BASE_SPEED_MAX				200
+#define FLOCKING_BASE_SPEED_MIN				210
+#define FLOCKING_BASE_SPEED_MAX				210
 
 #define FLOCKING_PREVIOUS_SPEED_WEIGHT		5.0f
 #define FLOCKING_COHESION_WEIGHT			0.8f
@@ -57,9 +56,9 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 //FLEEING
 #define FLEEING_MAX_SPEED					500
-#define FLEEING_RADIUS						150.f
+#define FLEEING_RADIUS						100.f
 #define FLEEING_ANGLE						120
-#define FLEEING_DURATION					0.4f
+#define FLEEING_DURATION					0.8f
 
 #define FLOCKING_SEPARATION_RADIUS			50
 
@@ -79,16 +78,15 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 #define PREDATOR_SCALE						4.f
 
-#define PREDATOR_MAX_SPEED					220
-#define PREDATOR_BASE_SPEED_MIN				150
-#define PREDATOR_BASE_SPEED_MAX				300
+#define PREDATOR_BASE_SPEED_MIN				230
+#define PREDATOR_BASE_SPEED_MAX				230
 
 #define PREDATOR_CHASING_ANGLE				70.f
 #define PREDATOR_CHASING_RADIUS				200.f
-#define PREDATOR_ATTACK_DURATION			0.5f
-#define PREDATOR_ATTACK_RADIUS				100.f
+#define PREDATOR_ATTACK_DURATION			0.4f
+#define PREDATOR_ATTACK_RADIUS				80.f
 #define PREDATOR_ATTACK_SPEED				800
-#define PREDATOR_EATING_RADIUS				4.f
+#define PREDATOR_EATING_RADIUS				0.f
 #define PREDATOR_EATING_COOLDOWN			1.f
 
 

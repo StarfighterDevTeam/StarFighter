@@ -26,8 +26,8 @@ void Ship::Init()
 	m_is_asking_SFPanel = SFPanel_None;
 
 #define DEBUG_FAST_SPAWN
-	int nb_predator = 1;
-	int nb_boid = 30;
+	int nb_predator = 2;
+	int nb_boid = 50;
 #ifdef DEBUG_FAST_SPAWN
 	{
 		for (int i = 0; i < nb_predator; i++)

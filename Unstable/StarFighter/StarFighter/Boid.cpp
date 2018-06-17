@@ -14,10 +14,9 @@ Boid::Boid(sf::Vector2f position, std::string textureName, sf::Vector2f size, sf
 	Boid::Init();
 
 	//random speed, direction and color
-	float speed_ = RandomizeFloatBetweenValues(sf::Vector2f(FLOCKING_BASE_SPEED_MIN, FLOCKING_BASE_SPEED_MAX));
+	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(FLOCKING_BASE_SPEED_MIN, FLOCKING_BASE_SPEED_MAX));
 	float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	SetSpeedVectorFromAbsoluteSpeedAndAngle(speed_, angle_ * M_PI / 180);
-	m_previous_speed = m_speed;
+	SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ * M_PI / 180);
 	setRotation(angle_ * 180 / M_PI - 180);
 	int r = RandomizeIntBetweenValues(0, 255);
 	int g = RandomizeIntBetweenValues(0, 255);
@@ -40,10 +39,6 @@ void Boid::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 
 	UpdateThreats();
-
-	//Sum up vectors and normalize speed
-	m_previous_speed.x = m_speed.x;
-	m_previous_speed.y = m_speed.y;
 
 	//bounce on screen borders
 	bool bounced = false;
@@ -70,7 +65,18 @@ void Boid::update(sf::Time deltaTime)
 
 	if (!bounced)
 	{
-		//Avoid Borders
+		//Avoid Borders (if possible in the same way as boid neighbours)
+		for (Boid* boid : m_boid_neighbours)
+		{
+			if (m_avoiding_x != boid->m_avoiding_x && boid->m_avoiding_x != 0)
+			{
+				m_avoiding_x = boid->m_avoiding_x;
+			}
+			if (m_avoiding_y != boid->m_avoiding_y && boid->m_avoiding_y != 0)
+			{
+				m_avoiding_y = boid->m_avoiding_y;
+			}
+		}
 		sf::Vector2f avoid_borders = AvoidBorders();
 
 		//Flee threats
@@ -95,9 +101,35 @@ void Boid::update(sf::Time deltaTime)
 		}
 		else
 		{
+
+			//Flocking
+			//1. cohesion
+			m_avg_position = GetAveragePosition();
+			sf::Vector2f cohesion_vector = sf::Vector2f(m_avg_position.x - getPosition().x, m_avg_position.y - getPosition().y);
+			NormalizeSpeed(&cohesion_vector, m_randomized_speed);
+
+			//2. alignment
+			m_avg_speed = GetAverageSpeed();
+			sf::Vector2f alignment_vector = sf::Vector2f(m_avg_speed.x - m_speed.x, m_avg_speed.y - m_speed.y);
+			NormalizeSpeed(&alignment_vector, m_randomized_speed);
+
+			//3. separation
+			sf::Vector2f separation_vector = Separate();
+			NormalizeSpeed(&separation_vector, m_randomized_speed);
+
+			//TOTAL
+			m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
+			m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
+		
+			NormalizeSpeed(&m_speed, m_randomized_speed);
+
+			m_speed.x = m_speed.x + avoid_borders.x * FLOCKING_AVOID_BORDERS_WEIGHT;
+			m_speed.y = m_speed.y + avoid_borders.y * FLOCKING_AVOID_BORDERS_WEIGHT;
+			NormalizeSpeed(&m_speed, m_randomized_speed);
+
 			//Change direction randomly
 			sf::Vector2f change_dir = sf::Vector2f(0, 0);
-			if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
+			if (m_boid_neighbours.empty() && m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
 			{
 				m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(BOID_MIN_CHANGE_DIR_TIME, BOID_MAX_CHANGE_DIR_TIME));
 				m_change_dir_clock.restart();
@@ -111,30 +143,6 @@ void Boid::update(sf::Time deltaTime)
 				m_speed.x = change_dir.x;
 				m_speed.y = change_dir.y;
 			}
-
-			//Flocking
-			//1. cohesion
-			m_avg_position = GetAveragePosition();
-			sf::Vector2f cohesion_vector = sf::Vector2f(m_avg_position.x - getPosition().x, m_avg_position.y - getPosition().y);
-			NormalizeSpeed(&cohesion_vector, FLOCKING_MAX_SPEED);
-
-			//2. alignment
-			m_avg_speed = GetAverageSpeed();
-			sf::Vector2f alignment_vector = sf::Vector2f(m_avg_speed.x - m_speed.x, m_avg_speed.y - m_speed.y);
-			NormalizeSpeed(&alignment_vector, FLOCKING_MAX_SPEED);
-
-			//3. separation
-			sf::Vector2f separation_vector = Separate();
-			NormalizeSpeed(&separation_vector, FLOCKING_MAX_SPEED);
-
-			m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
-			m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
-		
-			NormalizeSpeed(&m_speed, FLOCKING_MAX_SPEED);
-
-			m_speed.x = m_speed.x + avoid_borders.x * FLOCKING_AVOID_BORDERS_WEIGHT;
-			m_speed.y = m_speed.y + avoid_borders.y * FLOCKING_AVOID_BORDERS_WEIGHT;
-			NormalizeSpeed(&m_speed, FLOCKING_MAX_SPEED);
 		}
 	}
 

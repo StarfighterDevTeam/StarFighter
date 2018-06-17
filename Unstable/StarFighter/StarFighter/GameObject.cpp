@@ -451,9 +451,9 @@ void GameObject::ClearBoidNeighbours()
 	//see override function in class Boid
 }
 
-bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float threat_angle)
+bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_size , float threat_angle)
 {
-	float distance = GetDistanceBetweenPositions(getPosition(), threat_pos) - m_diag - threat_diag_size;
+	float distance = GetDistanceBetweenPositions(getPosition(), threat_pos) - m_diag - threat_size;
 
 	float angle = GetAngleRadBetweenPositions(getPosition(), threat_pos) * 180 / M_PI;
 
@@ -473,7 +473,7 @@ bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float
 
 bool GameObject::IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle)
 {
-	float distance = GetDistanceBetweenPositions(getPosition(), prey_pos) - m_diag - prey_diag_size;
+	float distance = GetDistanceBetweenPositions(getPosition(), prey_pos) - m_size.y / 2 - prey_diag_size;
 
 	float angle = GetAngleRadBetweenPositions(prey_pos, getPosition()) * 180 / M_PI;
 

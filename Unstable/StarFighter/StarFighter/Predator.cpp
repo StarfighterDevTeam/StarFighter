@@ -14,10 +14,9 @@ Predator::Predator(sf::Vector2f position, std::string textureName, sf::Vector2f 
 	Predator::Init();
 
 	//random speed, direction and color
-	float speed_ = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_BASE_SPEED_MIN, PREDATOR_BASE_SPEED_MAX));
+	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_BASE_SPEED_MIN, PREDATOR_BASE_SPEED_MAX));
 	float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	SetSpeedVectorFromAbsoluteSpeedAndAngle(speed_, angle_ * M_PI / 180);
-	m_previous_speed = m_speed;
+	SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ * M_PI / 180);
 	setRotation(angle_ * 180 / M_PI - 180);
 	int r = RandomizeIntBetweenValues(0, 255);
 	int g = RandomizeIntBetweenValues(0, 255);
@@ -46,10 +45,6 @@ void Predator::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 
 	UpdatePrey();
-
-	//Sum up vectors and normalize speed
-	m_previous_speed.x = m_speed.x;
-	m_previous_speed.y = m_speed.y;
 
 	//bounce on screen borders
 	bool bounced = false;
@@ -84,7 +79,7 @@ void Predator::update(sf::Time deltaTime)
 			m_speed = chase_vector;
 
 			//attacking prey
-			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition()) - m_diag - m_prey->m_diag;
+			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition()) - m_size.y / 2 - m_prey->m_diag;
 			if (distance < PREDATOR_ATTACK_RADIUS && m_eating_clock.getElapsedTime().asSeconds() > PREDATOR_EATING_COOLDOWN && m_chasing_clock.getElapsedTime().asSeconds() < PREDATOR_ATTACK_DURATION)
 			{
 				ScaleSpeed(&m_speed, PREDATOR_ATTACK_SPEED);
@@ -134,14 +129,12 @@ void Predator::update(sf::Time deltaTime)
 			m_speed.x = m_speed.x + avoid_borders.x * PREDATOR_AVOID_BORDERS_WEIGHT;
 			m_speed.y = m_speed.y + avoid_borders.y * PREDATOR_AVOID_BORDERS_WEIGHT;
 
-			NormalizeSpeed(&m_speed, PREDATOR_MAX_SPEED);
+			ScaleSpeed(&m_speed, m_randomized_speed);
 		}
 	}
 	
 	float angle = GetAngleRadForSpeed(m_speed);
 	setRotation(angle * 180 / M_PI);
-
-	printf("clock : %f\n", m_chasing_clock.getElapsedTime().asSeconds());
 }
 
 void Predator::UpdatePrey()

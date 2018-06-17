@@ -88,7 +88,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
-	sf::Vector2f m_previous_speed;
+	float m_randomized_speed;
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();
@@ -118,7 +118,7 @@ public:
 	//ATLANTIS SPECIFICS
 	virtual void AddToBoidNeighbours(GameObject* boid);
 	virtual void ClearBoidNeighbours();
-	bool IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float threat_angle);
+	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle);
 	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle);
 	sf::Vector2f AvoidBorders();
 
