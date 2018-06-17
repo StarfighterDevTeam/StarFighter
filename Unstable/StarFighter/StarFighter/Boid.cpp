@@ -39,6 +39,8 @@ void Boid::update(sf::Time deltaTime)
 {
 	GameObject::update(deltaTime);
 
+	UpdateThreats();
+
 	//Sum up vectors and normalize speed
 	m_previous_speed.x = m_speed.x;
 	m_previous_speed.y = m_speed.y;
@@ -68,24 +70,41 @@ void Boid::update(sf::Time deltaTime)
 
 	if (!bounced)
 	{
-		//Change direction randomly
-		sf::Vector2f change_dir = sf::Vector2f(0, 0);
-		if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
+		//Flee threats
+		sf::Vector2f flee_vector = sf::Vector2f(0, 0);
+		if (!m_threats.empty())
 		{
-			m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(MIN_CHANGE_DIR_TIME, MAX_CHANGE_DIR_TIME));
+			for (Threat threat : m_threats)
+			{
+				//Flee all possible threats at the same time
+				flee_vector += Flee(threat.m_pos);
+			}
+			
+			ScaleSpeed(&flee_vector, FLEEING_MAX_SPEED);
+			m_speed = flee_vector;
+
+			//cosmetical: we don't want to change direction straight away after fleeing
 			m_change_dir_clock.restart();
-
-			int dir = RandomizeIntBetweenValues(0, 1);
-			dir = dir == 0 ? -1 : 1;
-			float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*MIN_CHANGE_DIR_ANGLE, getRotation() + dir*MAX_CHANGE_DIR_ANGLE)) - 180;
-
-			change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
-
-			m_speed.x = change_dir.x;
-			m_speed.y = change_dir.y;
 		}
 		else
 		{
+			//Change direction randomly
+			sf::Vector2f change_dir = sf::Vector2f(0, 0);
+			if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
+			{
+				m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(MIN_CHANGE_DIR_TIME, MAX_CHANGE_DIR_TIME));
+				m_change_dir_clock.restart();
+
+				int dir = RandomizeIntBetweenValues(0, 1);
+				dir = dir == 0 ? -1 : 1;
+				float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*MIN_CHANGE_DIR_ANGLE, getRotation() + dir*MAX_CHANGE_DIR_ANGLE)) - 180;
+
+				change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
+
+				m_speed.x = change_dir.x;
+				m_speed.y = change_dir.y;
+			}
+
 			//Flocking
 			//1. cohesion
 			m_avg_position = GetAveragePosition();
@@ -103,10 +122,12 @@ void Boid::update(sf::Time deltaTime)
 
 			m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
 			m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
+		
+			NormalizeSpeed(&m_speed, FLOCKING_MAX_SPEED);
 		}
-	}
 
-	NormalizeSpeed(&m_speed, FLOCKING_MAX_SPEED);
+		
+	}
 
 	float angle = GetAngleRadForSpeed(m_speed);
 	setRotation(angle * 180 / M_PI);
@@ -216,4 +237,48 @@ sf::Vector2f Boid::Separate()
 	sum_y /= 1.f * count;
 
 	return sf::Vector2f(sum_x, sum_y);
+}
+
+sf::Vector2f Boid::Flee(sf::Vector2f threat_pos)
+{
+	sf::Vector2f flee_vector = sf::Vector2f(getPosition().x - threat_pos.x, getPosition().y - threat_pos.y);
+
+	return flee_vector;
+}
+
+void Boid::UpdateThreats()
+{
+	vector<Threat> updated_threats;
+
+	for (Threat threat : m_threats)
+	{
+		//float distance = GetDistanceBetweenPositions(getPosition(), threat.m_pos);
+		//float angle = GetAngleRadBetweenPositions(getPosition(), threat.m_pos) * 180 / M_PI;
+		//
+		//float delta_angle = angle - threat.m_angle;
+		//if (delta_angle > 180)
+		//	delta_angle -= 360;
+		//else if (delta_angle < -180)
+		//	delta_angle += 360;
+
+		//printf("angle to boid : %f |  threat angle : %f | delta angle: %f", angle, threat.m_angle, delta_angle);
+		//if (delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
+		//{
+		//	printf(" THREAT!!!");
+		//}
+		//printf("\n");
+
+		//if (distance < FLEEING_RADIUS && delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
+		if (this->IsThreat(threat.m_pos, threat.m_angle))
+		{
+			threat.m_clock.restart();
+		}
+
+		if (threat.m_clock.getElapsedTime().asSeconds() < FLEEING_DURATION)
+		{
+			updated_threats.push_back(threat);
+		}
+	}
+
+	m_threats = updated_threats;
 }

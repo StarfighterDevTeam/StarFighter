@@ -51,6 +51,12 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define FLOCKING_ALIGNMENT_WEIGHT			0.15f
 #define FLOCKING_SEPARATION_WEIGHT			2.0f
 
+//FLEEING
+#define FLEEING_MAX_SPEED					500
+#define FLEEING_RADIUS						100
+#define FLEEING_ANGLE						30
+#define FLEEING_DURATION					0.4f
+
 #define FLOCKING_SEPARATION_RADIUS			50
 
 //BOIDS

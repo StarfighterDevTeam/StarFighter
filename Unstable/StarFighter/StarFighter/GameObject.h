@@ -115,6 +115,7 @@ public:
 	//ATLANTIS SPECIFICS
 	virtual void AddToBoidNeighbours(GameObject* boid);
 	virtual void ClearBoidNeighbours();
+	bool IsThreat(sf::Vector2f threat_pos, float threat_angle);
 
 protected:
 	sf::Vector2f m_initial_position;

@@ -448,3 +448,22 @@ void GameObject::ClearBoidNeighbours()
 {
 	//see override function in class Boid
 }
+
+bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_angle)
+{
+	float distance = GetDistanceBetweenPositions(getPosition(), threat_pos);
+	float angle = GetAngleRadBetweenPositions(getPosition(), threat_pos) * 180 / M_PI;
+
+	float delta_angle = angle - threat_angle;
+	if (delta_angle > 180)
+		delta_angle -= 360;
+	else if (delta_angle < -180)
+		delta_angle += 360;
+
+	if (distance < FLEEING_RADIUS && delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
+	{
+		return true;
+	}
+	
+	return false;;
+}

@@ -5,6 +5,14 @@
 #include "Game.h"
 #include "GameObject.h"
 
+struct Threat
+{
+	sf::Vector2f m_pos;
+	sf::Clock m_clock;
+	float m_angle;
+};
+
+
 class Boid : public GameObject
 {
 public :
@@ -25,6 +33,10 @@ public :
 	sf::Vector2f m_avg_speed;
 	sf::Vector2f GetAverageSpeed();
 	sf::Vector2f Separate();
+
+	sf::Vector2f Flee(sf::Vector2f threat_pos);
+	vector<Threat> m_threats;
+	void UpdateThreats();
 
 	float m_change_dir_time;
 	sf::Clock m_change_dir_clock;

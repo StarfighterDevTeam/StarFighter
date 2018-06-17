@@ -30,6 +30,7 @@ public:
 	static bool isMuting();
 	static bool isPausing();
 	static bool isSpawningBoid();
+	static bool isFleeing();
 };
 
 

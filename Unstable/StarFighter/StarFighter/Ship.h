@@ -23,6 +23,7 @@ enum PlayerActions
 	Action_Muting,
 	Action_Pausing,
 	Action_SpawnBoid,
+	Action_Flee,
 	NBVAL_PlayerActions,
 };
 

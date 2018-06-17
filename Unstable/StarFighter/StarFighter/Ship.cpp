@@ -78,6 +78,21 @@ void Ship::update(sf::Time deltaTime)
 		}	
 	}
 
+	if (m_inputs_states[Action_Flee] == Input_Tap)
+	{
+		sf::Vector2i mousepos = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+		sf::Vector2f threat_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view);
+		
+		Boid* boid = (Boid*)(*CurrentGame).GetSceneGameObjectsTyped(FishObject).front();
+		Threat threat;
+		threat.m_pos = threat_pos;
+		threat.m_angle = 0.f;
+		if (boid->IsThreat(threat.m_pos, threat.m_angle))
+		{
+			boid->m_threats.push_back(threat);
+		}
+	}
+
 	MaxSpeedConstraints();
 	IdleDecelleration(deltaTime);
 	UpdateRotation();
@@ -217,6 +232,7 @@ void Ship::UpdateInputStates()
 {
 	GetInputState(InputGuy::isFiring(), Action_Firing);
 	GetInputState(InputGuy::isSpawningBoid(), Action_SpawnBoid);
+	GetInputState(InputGuy::isFleeing(), Action_Flee);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)

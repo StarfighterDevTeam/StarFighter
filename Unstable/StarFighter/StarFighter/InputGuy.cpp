@@ -177,3 +177,13 @@ bool InputGuy::isSpawningBoid()
 
 	return false;
 }
+
+bool InputGuy::isFleeing()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+	{
+		return true;
+	}
+
+	return false;
+}
