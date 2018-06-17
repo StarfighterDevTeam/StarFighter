@@ -69,36 +69,38 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
 {
-	this->m_animationNumber = animationNumber;
-	this->m_frameNumber = frameNumber;
-	this->m_initial_position = sf::Vector2f(position.x, position.y);
-	this->m_size.x = ((*texture).getSize().x / frameNumber);
-	this->m_size.y = ((*texture).getSize().y / animationNumber);
+	m_animationNumber = animationNumber;
+	m_frameNumber = frameNumber;
+	m_initial_position = sf::Vector2f(position.x, position.y);
+	m_size.x = ((*texture).getSize().x / frameNumber);
+	m_size.y = ((*texture).getSize().y / animationNumber);
 
-	this->m_collider_type = GameObjectType::BackgroundObject;
-	this->m_defaultAnimation.setSpriteSheet(*texture);
+	m_collider_type = GameObjectType::BackgroundObject;
+	m_defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < animationNumber; j++)
 	{
 		for (int i = 0; i < frameNumber; i++)
 		{
 			int x = ((*texture).getSize().x / frameNumber)*(i);
 			int y = ((*texture).getSize().y / animationNumber)*(j);
-			this->m_defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
 		}
 	}
 	
-	this->m_currentAnimation = NULL;
-	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
+	m_currentAnimation = NULL;
+	setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
-	this->m_speed = speed;
-	this->setPosition(position.x, position.y);
-	this->m_visible = true;
-	this->m_isOnScene = false;
-	this->m_GarbageMe = false;
-	this->m_DontGarbageMe = false;
-	this->m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
-	this->m_ghost = false;
-	this->m_rotation_speed = 0.f;
+	m_speed = speed;
+	setPosition(position.x, position.y);
+	m_visible = true;
+	m_isOnScene = false;
+	m_GarbageMe = false;
+	m_DontGarbageMe = false;
+	m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	m_ghost = false;
+	m_rotation_speed = 0.f;
+	m_avoiding_x = 0;
+	m_avoiding_y = 0;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -467,4 +469,48 @@ bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_diag_size, float
 	}
 	
 	return false;
+}
+
+sf::Vector2f GameObject::AvoidBorders()
+{
+	sf::Vector2f avoid_vector = sf::Vector2f(0, 0);
+
+	bool left_or_right = RandomizeIntBetweenValues(0, 1) == 1 ? true : false;
+	int lr = left_or_right ? 1 : -1;
+
+	if (getPosition().x - (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.x  < 0 && m_speed.x < 0)
+	{
+		lr = m_avoiding_y == 0 ? lr : m_avoiding_y;
+		m_avoiding_y = m_avoiding_y == 0 ? lr : m_avoiding_y;
+		avoid_vector += sf::Vector2f(0, 1.f * lr);
+	}
+	if (getPosition().x + (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.x > REF_WINDOW_RESOLUTION_X  && m_speed.x > 0)
+	{
+		lr = m_avoiding_y == 0 ? lr : m_avoiding_y;
+		m_avoiding_y = m_avoiding_y == 0 ? lr : m_avoiding_y;
+		avoid_vector += sf::Vector2f(0, 1.f * lr);
+	}
+	if (getPosition().y - (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.y < 0 && m_speed.y < 0)
+	{
+		lr = m_avoiding_x == 0 ? lr : m_avoiding_x;
+		m_avoiding_x = m_avoiding_x == 0 ? lr : m_avoiding_x;
+		avoid_vector += sf::Vector2f(1.f * lr, 0);
+	}
+	if (getPosition().y + (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.y > REF_WINDOW_RESOLUTION_Y && m_speed.y > 0)
+	{
+		lr = m_avoiding_x == 0 ? lr : m_avoiding_x;
+		m_avoiding_x = m_avoiding_x == 0 ? lr : m_avoiding_x;
+		avoid_vector += sf::Vector2f(1.f * lr, 0);
+	}
+
+	if (avoid_vector.x == 0)
+	{
+		m_avoiding_x = 0;
+	}
+	if (avoid_vector.y == 0)
+	{
+		m_avoiding_y = 0;
+	}
+
+	return avoid_vector;
 }

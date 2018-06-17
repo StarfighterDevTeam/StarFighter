@@ -76,7 +76,9 @@ void Predator::update(sf::Time deltaTime)
 
 	if (!bounced)
 	{
-		
+		//Avoid Borders
+		sf::Vector2f avoid_borders = AvoidBorders();
+
 		//Change direction randomly
 		sf::Vector2f change_dir = sf::Vector2f(0, 0);
 		if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
@@ -94,7 +96,18 @@ void Predator::update(sf::Time deltaTime)
 			m_speed.y = change_dir.y;
 		}
 		
+		//printf("speed: (%f, %f) | avoid (%f, %f)", m_speed.x, m_speed.y, avoid_borders.x * AVOID_BORDERS_WEIGHT, avoid_borders.y * AVOID_BORDERS_WEIGHT);
+
+		
+			m_speed.x = m_speed.x + avoid_borders.x * PREDATOR_AVOID_BORDERS_WEIGHT;
+			m_speed.y = m_speed.y + avoid_borders.y * PREDATOR_AVOID_BORDERS_WEIGHT;
+		
+		//printf(" new speed: (%f, %f)\n", m_speed.x, m_speed.y);
+		
+
 		NormalizeSpeed(&m_speed, PREDATOR_MAX_SPEED);
+
+		//printf(" norm speed: (%f, %f)\n", m_speed.x, m_speed.y);
 	}
 	
 	float angle = GetAngleRadForSpeed(m_speed);

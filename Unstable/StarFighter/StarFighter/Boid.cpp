@@ -70,6 +70,9 @@ void Boid::update(sf::Time deltaTime)
 
 	if (!bounced)
 	{
+		//Avoid Borders
+		sf::Vector2f avoid_borders = AvoidBorders();
+
 		//Flee threats
 		sf::Vector2f flee_vector = sf::Vector2f(0, 0);
 		if (!m_threats.empty())
@@ -82,6 +85,10 @@ void Boid::update(sf::Time deltaTime)
 			
 			ScaleSpeed(&flee_vector, FLEEING_MAX_SPEED);
 			m_speed = flee_vector;
+
+			m_speed.x = m_speed.x + avoid_borders.x * FLOCKING_AVOID_BORDERS_WEIGHT;
+			m_speed.y = m_speed.y + avoid_borders.y * FLOCKING_AVOID_BORDERS_WEIGHT;
+			NormalizeSpeed(&m_speed, FLEEING_MAX_SPEED);
 
 			//cosmetical: we don't want to change direction straight away after fleeing
 			m_change_dir_clock.restart();
@@ -124,9 +131,11 @@ void Boid::update(sf::Time deltaTime)
 			m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
 		
 			NormalizeSpeed(&m_speed, FLOCKING_MAX_SPEED);
-		}
 
-		
+			m_speed.x = m_speed.x + avoid_borders.x * FLOCKING_AVOID_BORDERS_WEIGHT;
+			m_speed.y = m_speed.y + avoid_borders.y * FLOCKING_AVOID_BORDERS_WEIGHT;
+			NormalizeSpeed(&m_speed, FLOCKING_MAX_SPEED);
+		}
 	}
 
 	float angle = GetAngleRadForSpeed(m_speed);
