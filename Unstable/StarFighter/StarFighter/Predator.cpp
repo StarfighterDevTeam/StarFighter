@@ -84,8 +84,8 @@ void Predator::update(sf::Time deltaTime)
 			m_speed = chase_vector;
 
 			//attacking prey
-			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition());
-			if (distance < PREDATOR_ATTACK_RADIUS)
+			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition()) - m_diag - m_prey->m_diag;
+			if (distance < PREDATOR_ATTACK_RADIUS && m_eating_clock.getElapsedTime().asSeconds() > PREDATOR_EATING_COOLDOWN && m_chasing_clock.getElapsedTime().asSeconds() < PREDATOR_ATTACK_DURATION)
 			{
 				ScaleSpeed(&m_speed, PREDATOR_ATTACK_SPEED);
 
@@ -95,11 +95,22 @@ void Predator::update(sf::Time deltaTime)
 					m_prey->m_GarbageMe = true;
 					m_prey->m_visible = false;
 					m_prey = NULL;
+					(*CurrentGame).m_boids_eaten++;
+					(*CurrentGame).m_boids_alive--;
+					m_eating_clock.restart();
+					printf("Boids alive: %d\n", (*CurrentGame).m_boids_alive);
 				}
 			}
+			else
+			{
+				m_chasing_clock.restart();
+			}
 		}
-		else
+		
+		if (m_prey == NULL)
 		{
+			m_chasing_clock.restart();
+
 			//Avoid Borders
 			sf::Vector2f avoid_borders = AvoidBorders();
 
@@ -129,6 +140,8 @@ void Predator::update(sf::Time deltaTime)
 	
 	float angle = GetAngleRadForSpeed(m_speed);
 	setRotation(angle * 180 / M_PI);
+
+	printf("clock : %f\n", m_chasing_clock.getElapsedTime().asSeconds());
 }
 
 void Predator::UpdatePrey()

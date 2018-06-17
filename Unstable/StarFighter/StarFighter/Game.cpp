@@ -55,6 +55,11 @@ void Game::init(RenderWindow* window)
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	PlayMusic(Music_Main);
+
+	//ATLANTIS specific
+	m_boids_alive = 0;
+	m_predators_alive = 0;
+	m_boids_eaten = 0;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -172,6 +177,15 @@ void Game::addToScene(GameObject *object, LayerType layer, GameObjectType type)
 {
 	object->m_layer = layer;
 	object->m_collider_type = type;
+
+	if (type == BoidObject)
+	{
+		m_boids_alive++;
+	}
+	if (type == PredatorObject)
+	{
+		m_predators_alive++;
+	}
 
 	//Window resolution adjustements
 	//object->setScale(scale_factor.x, scale_factor.y);

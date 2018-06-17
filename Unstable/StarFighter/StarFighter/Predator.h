@@ -22,6 +22,8 @@ public :
 	sf::Clock m_change_dir_clock;
 
 	GameObject* m_prey;
+	sf::Clock m_eating_clock;
+	sf::Clock m_chasing_clock;
 };
 
 #endif // BOID_H_INCLUDED

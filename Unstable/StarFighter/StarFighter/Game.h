@@ -109,6 +109,10 @@ public:
 	//ATLANTIS SPECIFIC
 	void GroupBoids();
 
+	int m_boids_alive;
+	int m_predators_alive;
+	int m_boids_eaten;
+
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
