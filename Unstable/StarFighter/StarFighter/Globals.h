@@ -57,7 +57,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 //FLEEING
 #define FLEEING_MAX_SPEED					500
-#define FLEEING_RADIUS						100
+#define FLEEING_RADIUS						80
 #define FLEEING_ANGLE						90
 #define FLEEING_DURATION					0.4f
 
@@ -77,13 +77,18 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 #define PREDATOR_AVOID_BORDERS_WEIGHT		50.0f
 
+#define PREDATOR_SCALE						4.f
+
 #define PREDATOR_MAX_SPEED					220
 #define PREDATOR_BASE_SPEED_MIN				150
 #define PREDATOR_BASE_SPEED_MAX				300
-#define PREDATOR_CHASING_RADIUS				150
-#define PREDATOR_CHASING_ANGLE				40.f
-#define PREDATOR_ATTACK_RADIUS				50
-#define PREDATOR_SCALE						4.f
+
+#define PREDATOR_CHASING_ANGLE				70.f
+#define PREDATOR_CHASING_RADIUS				200
+#define PREDATOR_ATTACK_RADIUS				150
+#define PREDATOR_ATTACK_SPEED				800
+#define PREDATOR_EATING_RADIUS				30
+
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50

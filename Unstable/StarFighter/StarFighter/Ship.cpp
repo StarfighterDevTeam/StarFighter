@@ -24,6 +24,27 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+//#define DEBUG_FAST_SPAWN
+	int nb_predator = 1;
+	int nb_boid = 30;
+#ifdef DEBUG_FAST_SPAWN
+	{
+		for (int i = 0; i < nb_predator; i++)
+		{
+			sf::Vector2f predator_pos = sf::Vector2f(RandomizeFloatBetweenValues(sf::Vector2f(200, 1800)), RandomizeFloatBetweenValues(sf::Vector2f(200, 800)));
+			Predator* predator = new Predator(predator_pos, "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+			(*CurrentGame).addToScene(predator, PredatorLayer, PredatorObject);
+		}
+
+		for (int i = 0; i < nb_boid; i++)
+		{
+			sf::Vector2f boid_pos = sf::Vector2f(RandomizeFloatBetweenValues(sf::Vector2f(200, 1800)), RandomizeFloatBetweenValues(sf::Vector2f(200, 800)));
+			Boid* boid = new Boid(boid_pos, "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+			(*CurrentGame).addToScene(boid, BoidLayer, BoidObject);
+		}
+	}
+#endif
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)

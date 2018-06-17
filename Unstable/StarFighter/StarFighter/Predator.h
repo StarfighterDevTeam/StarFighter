@@ -16,6 +16,7 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	void UpdatePrey();
+	void Attack();
 
 	float m_change_dir_time;
 	sf::Clock m_change_dir_clock;

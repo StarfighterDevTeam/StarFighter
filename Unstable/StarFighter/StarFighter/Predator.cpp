@@ -78,9 +78,25 @@ void Predator::update(sf::Time deltaTime)
 	{
 		if (m_prey)
 		{
+			//chasing prey
 			sf::Vector2f chase_vector = sf::Vector2f(m_prey->getPosition().x - getPosition().x, m_prey->getPosition().y - getPosition().y);
 			ScaleSpeed(&chase_vector, GetAbsoluteSpeed());
 			m_speed = chase_vector;
+
+			//attacking prey
+			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition());
+			if (distance < PREDATOR_ATTACK_RADIUS)
+			{
+				ScaleSpeed(&m_speed, PREDATOR_ATTACK_SPEED);
+
+				//eating prey
+				if (distance < PREDATOR_EATING_RADIUS)
+				{
+					m_prey->m_GarbageMe = true;
+					m_prey->m_visible = false;
+					m_prey = NULL;
+				}
+			}
 		}
 		else
 		{
@@ -125,7 +141,7 @@ void Predator::UpdatePrey()
 			m_prey = NULL;
 		}
 	}
-
+	
 	if (!m_prey)
 	{
 		//scanning all existing preys
