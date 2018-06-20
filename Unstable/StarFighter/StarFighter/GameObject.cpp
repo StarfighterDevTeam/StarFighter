@@ -440,6 +440,14 @@ int GameObject::GaussianBlurDistribution(int x)
 	return x*x;
 }
 
+void GameObject::ScaleObject(float scale)
+{
+	setScale(sf::Vector2f(scale, scale));
+	m_size.x *= scale;
+	m_size.y *= scale;
+	m_diag *= scale;
+}
+
 //ATLANTIS SPECIFICS
 void GameObject::AddToBoidNeighbours(GameObject* boid)
 {
@@ -533,4 +541,10 @@ sf::Vector2f GameObject::AvoidBorders()
 	}
 
 	return avoid_vector;
+}
+
+bool GameObject::IsGrown()
+{
+	//see override function in class Boid
+	return false;
 }

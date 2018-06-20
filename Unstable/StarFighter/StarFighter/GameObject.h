@@ -32,6 +32,7 @@ enum LayerType {
 
 	PredatorLayer,
 	BoidLayer,
+	BabyBoidLayer,
 	PanelLayer,
 	HudObject,
 	HudCursor,
@@ -48,6 +49,7 @@ enum GameObjectType {
 	FriendlyFire,
 	Neutral,
 	BoidObject,
+	BabyBoidObject,
 	PredatorObject,
 	EnemyFire,
 	EnemyObject,
@@ -115,12 +117,15 @@ public:
 	static void GlowEffect(int blur_radius, sf::Uint8* pixels, int width, int height, int stroke_size = 0);
 	static int GaussianBlurDistribution(int x);
 
+	void ScaleObject(float scale);
+
 	//ATLANTIS SPECIFICS
 	virtual void AddToBoidNeighbours(GameObject* boid);
 	virtual void ClearBoidNeighbours();
 	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle);
 	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle);
 	sf::Vector2f AvoidBorders();
+	virtual bool IsGrown();
 
 	int m_avoiding_x;
 	int m_avoiding_y;

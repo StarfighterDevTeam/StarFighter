@@ -85,10 +85,18 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PREDATOR_CHASING_RADIUS				200.f
 #define PREDATOR_ATTACK_DURATION			0.4f
 #define PREDATOR_ATTACK_RADIUS				80.f
-#define PREDATOR_ATTACK_SPEED				800
+#define PREDATOR_ATTACK_SPEED				1000
 #define PREDATOR_EATING_RADIUS				0.f
-#define PREDATOR_EATING_COOLDOWN			1.f
+#define PREDATOR_EATING_COOLDOWN			0.5f
 
+//EGGS AND BABIES
+#define EGG_LAYING_COOLDOWN						10.f
+#define EGG_LAYING_CHANCE						0.30f//0.05f
+#define EGG_NB_MIN								3
+#define EGG_NB_MAX								8
+#define EGG_LAYING_TIME_BETWEEN_TWO_EGGS		1.f
+#define BABY_BOID_SCALE							0.5f
+#define BABY_GROWTH_DURATION					20.f
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50

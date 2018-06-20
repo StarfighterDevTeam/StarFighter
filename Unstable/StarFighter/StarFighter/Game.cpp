@@ -613,9 +613,12 @@ void Game::GroupBoids()
 			{
 				if (boid2 && boid2 != boid)
 				{
-					if (GameObject::GetDistanceBetweenObjects(boid, boid2) < radius)
+					if (boid->m_color == boid2->m_color)
 					{
-						boid->AddToBoidNeighbours(boid2);
+						if (GameObject::GetDistanceBetweenObjects(boid, boid2) < radius)
+						{
+							boid->AddToBoidNeighbours(boid2);
+						}
 					}
 				}
 			}

@@ -13,6 +13,15 @@ struct Threat
 	GameObject* m_object;
 };
 
+enum BoidState
+{
+	Boid_Swimming_Solo,
+	Boid_Swimming_Flocked,
+	Boid_Fornicating,
+	Boid_Laying_Egg,
+	NB_BOID_STATES,
+};
+
 
 class Boid : public GameObject
 {
@@ -38,8 +47,19 @@ public :
 	vector<Threat> m_threats;
 	void UpdateThreats();
 
+	void EggLaying();
+	void Growing();
+	bool Boid::IsGrown() override;
+
 	float m_change_dir_time;
 	sf::Clock m_change_dir_clock;
+
+	sf::Clock m_egg_clock;
+	sf::Clock m_between_two_eggs_clock;
+	sf::Clock m_growth_clock;
+	int m_eggs;
+	int m_growth;
+	BoidState m_state;
 };
 
 #endif // BOID_H_INCLUDED

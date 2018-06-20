@@ -24,10 +24,7 @@ Predator::Predator(sf::Vector2f position, std::string textureName, sf::Vector2f 
 	setColor(sf::Color(r, g, b, 255));
 	m_prey = NULL;
 
-	setScale(sf::Vector2f(PREDATOR_SCALE, PREDATOR_SCALE));
-	m_size.x *= PREDATOR_SCALE;
-	m_size.y *= PREDATOR_SCALE;
-	m_diag *= PREDATOR_SCALE;
+	ScaleObject(PREDATOR_SCALE);
 }
 
 void Predator::Init()
@@ -154,7 +151,7 @@ void Predator::UpdatePrey()
 		float min_dist = -1;
 		for (GameObject* boid : (*CurrentGame).GetSceneGameObjectsTyped(BoidObject))
 		{
-			if (boid)
+			if (boid && boid->IsGrown())
 			{
 				//choose closest target as a prey
 				if (this->IsPrey(boid->getPosition(), boid->m_diag, this->getRotation()))
