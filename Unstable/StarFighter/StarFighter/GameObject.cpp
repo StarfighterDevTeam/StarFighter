@@ -297,10 +297,24 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 	return GetDistanceBetweenPositions(object1->getPosition(), object2->getPosition());
 }
 
+float GameObject::GetDistanceSquaredBetweenObjects(GameObject* object1, GameObject* object2)
+{
+	assert(object1 != NULL);
+	assert(object2 != NULL);
+
+	return GetDistanceSquaredBetweenPositions(object1->getPosition(), object2->getPosition());
+}
+
 float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
 	return GetAbsoluteSpeed(current_diff);
+}
+
+float GameObject::GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
+{
+	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
+	return GetAbsoluteSpeedSquared(current_diff);
 }
 
 bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
@@ -454,6 +468,22 @@ void GameObject::AddToBoidNeighbours(GameObject* boid)
 	//see override function in class Boid
 }
 
+void GameObject::AddToBoidThreats(GameObject* predator)
+{
+	//see override function in class Boid
+}
+
+void GameObject::AddToPreys(GameObject* boid)
+{
+	//see override function in class Predator
+}
+
+bool GameObject::HasPrey()
+{
+	//see override function in class Predator
+	return false;
+}
+
 void GameObject::ClearBoidNeighbours()
 {
 	//see override function in class Boid
@@ -479,8 +509,13 @@ bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_size , float thr
 	return false;
 }
 
-bool GameObject::IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle)
+bool GameObject::IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle, bool is_grown)
 {
+	if (!is_grown)
+	{
+		return false;
+	}
+
 	float distance = GetDistanceBetweenPositions(getPosition(), prey_pos) - m_size.y / 2 - prey_diag_size;
 
 	float angle = GetAngleRadBetweenPositions(prey_pos, getPosition()) * 180 / M_PI;

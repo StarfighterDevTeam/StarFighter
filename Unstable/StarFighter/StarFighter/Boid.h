@@ -35,6 +35,7 @@ public :
 
 	void AddToBoidNeighbours(GameObject* boid) override;
 	void ClearBoidNeighbours() override;
+	void AddToBoidThreats(GameObject* predator) override;
 
 	vector<Boid*> m_boid_neighbours;
 	sf::Vector2f m_avg_position;

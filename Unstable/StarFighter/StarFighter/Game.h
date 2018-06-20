@@ -107,8 +107,6 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//ATLANTIS SPECIFIC
-	void GroupBoids();
-
 	int m_boids_alive;
 	int m_predators_alive;
 	int m_boids_eaten;

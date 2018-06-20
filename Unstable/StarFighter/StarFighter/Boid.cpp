@@ -42,9 +42,9 @@ void Boid::update(sf::Time deltaTime)
 {
 	GameObject::update(deltaTime);
 
-	if (!m_boid_neighbours.empty() && m_state == Boid_Swimming_Solo)
+	if (m_state == Boid_Swimming_Solo || m_state == Boid_Swimming_Flocked)
 	{
-		m_state = Boid_Swimming_Flocked;
+		m_state = m_boid_neighbours.empty() ? Boid_Swimming_Solo : Boid_Swimming_Flocked;
 	}
 
 	UpdateThreats();
@@ -92,7 +92,7 @@ void Boid::update(sf::Time deltaTime)
 
 			//Flee threats
 			sf::Vector2f flee_vector = sf::Vector2f(0, 0);
-			if (!m_threats.empty() && m_growth == 100)//babies don't know how to flee threats
+			if (!m_threats.empty() && IsGrown())//babies don't know how to flee threats
 			{
 				for (Threat threat : m_threats)
 				{
@@ -176,6 +176,31 @@ void Boid::AddToBoidNeighbours(GameObject* boid)
 void Boid::ClearBoidNeighbours()
 {
 	m_boid_neighbours.clear();
+}
+
+void Boid::AddToBoidThreats(GameObject* predator)
+{
+	bool found = false;
+	for (Threat threat : m_threats)
+	{
+		//threat already known? then simply refresh the clock
+		if (threat.m_object == predator)
+		{
+			threat.m_clock.restart();
+			found = true;
+			continue;
+		}
+	}
+	//new threat identified
+	if (!found)
+	{
+		Threat new_threat;
+		new_threat.m_object = predator;
+		new_threat.m_pos = predator->getPosition();
+		new_threat.m_angle = predator->getRotation();
+
+		m_threats.push_back(new_threat);
+	}
 }
 
 sf::Vector2f Boid::GetAveragePosition()
@@ -276,44 +301,6 @@ sf::Vector2f Boid::Flee(sf::Vector2f threat_pos)
 
 void Boid::UpdateThreats()
 {
-	vector<Threat> existing_threats;
-
-	//scanning all existing threats
-	for (GameObject* predator : (*CurrentGame).GetSceneGameObjectsTyped(PredatorObject))
-	{
-		if (predator)
-		{
-			if (this->IsThreat(predator->getPosition(), predator->m_diag, predator->getRotation()))
-			{
-				Threat threat;
-				threat.m_pos = predator->getPosition();
-				threat.m_angle = predator->getRotation();
-				threat.m_object = predator;
-				existing_threats.push_back(threat);
-			}
-		}
-	}
-
-	for (Threat new_threat : existing_threats)
-	{
-		bool found = false;
-		for (Threat threat : m_threats)
-		{
-			//threat already known? then simply refresh the clock
-			if (new_threat.m_object == threat.m_object)
-			{
-				threat.m_clock.restart();
-				found = true;
-				continue;
-			}
-		}
-		//new threat identified
-		if (!found)
-		{
-			m_threats.push_back(new_threat);
-		}
-	}
-
 	//remanence of threat
 	vector<Threat> updated_threats;
 	for (Threat threat : m_threats)
@@ -324,38 +311,6 @@ void Boid::UpdateThreats()
 		}
 	}
 	m_threats = updated_threats;
-
-	//for (Threat threat : m_threats)
-	//{
-	//	//float distance = GetDistanceBetweenPositions(getPosition(), threat.m_pos);
-	//	//float angle = GetAngleRadBetweenPositions(getPosition(), threat.m_pos) * 180 / M_PI;
-	//	//
-	//	//float delta_angle = angle - threat.m_angle;
-	//	//if (delta_angle > 180)
-	//	//	delta_angle -= 360;
-	//	//else if (delta_angle < -180)
-	//	//	delta_angle += 360;
-	//
-	//	//printf("angle to boid : %f |  threat angle : %f | delta angle: %f", angle, threat.m_angle, delta_angle);
-	//	//if (delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
-	//	//{
-	//	//	printf(" THREAT!!!");
-	//	//}
-	//	//printf("\n");
-	//
-	//	//if (distance < FLEEING_RADIUS && delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
-	//	if (this->IsThreat(threat.m_pos, threat.m_angle))
-	//	{
-	//		threat.m_clock.restart();
-	//	}
-	//
-	//	if (threat.m_clock.getElapsedTime().asSeconds() < FLEEING_DURATION)
-	//	{
-	//		updated_threats.push_back(threat);
-	//	}
-	//}
-	//
-	//m_threats = updated_threats;
 }
 
 void Boid::Growing()
@@ -378,6 +333,8 @@ void Boid::Growing()
 			m_size.x = 32;
 			m_size.y = 32;
 			m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+
+			m_egg_clock.restart();
 		}
 	}
 }

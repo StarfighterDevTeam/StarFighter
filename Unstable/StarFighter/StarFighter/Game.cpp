@@ -254,8 +254,6 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
-	GroupBoids();
-
 	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
@@ -352,25 +350,52 @@ void Game::colisionChecksV2()
 	sf::Clock dt;
 	dt.restart();
 
-	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::BoidObject].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::BoidObject].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
-		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		(*it1)->ClearBoidNeighbours();
+
+		//Grouping boids
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::BoidObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::BoidObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
-			
-			if (SimpleCollision::AreColliding((*it1), (*it2)))
+
+			if (it1 == it2)
+				continue;
+
+			if ((*it1)->m_color == (*it2)->m_color)
 			{
-				//Do something 
-				
+				if (GameObject::GetDistanceSquaredBetweenObjects((*it1), (*it2)) < FLOCKING_RADIUS * FLOCKING_RADIUS)
+				{
+					(*it1)->AddToBoidNeighbours(*it2);
+				}
+			}
+		}
+
+		//Preys identify predators, and predators identify preys
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::PredatorObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::PredatorObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if ((*it1)->IsThreat((*it2)->getPosition(), (*it2)->m_size.y, (*it2)->getRotation()))
+			{
+				(*it1)->AddToBoidThreats((*it2));
+			}
+
+			if ((*it2)->HasPrey() == false)
+			{
+				if ((*it2)->IsPrey((*it1)->getPosition(), (*it1)->m_diag, (*it2)->getRotation(), (*it1)->IsGrown()))
+				{
+					(*it2)->AddToPreys((*it1));
+				}
 			}
 		}
 	}
+
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 
@@ -597,31 +622,4 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
-}
-
-//ATLANTIS SPECIFICS
-void Game::GroupBoids()
-{
-	float radius = FLOCKING_RADIUS;
-
-	for (GameObject* boid : m_sceneGameObjectsTyped[BoidObject])
-	{
-		if (boid)
-		{
-			boid->ClearBoidNeighbours();
-			for (GameObject* boid2 : m_sceneGameObjectsTyped[BoidObject])
-			{
-				if (boid2 && boid2 != boid)
-				{
-					if (boid->m_color == boid2->m_color)
-					{
-						if (GameObject::GetDistanceBetweenObjects(boid, boid2) < radius)
-						{
-							boid->AddToBoidNeighbours(boid2);
-						}
-					}
-				}
-			}
-		}
-	}
 }

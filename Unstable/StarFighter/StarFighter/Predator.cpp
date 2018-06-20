@@ -136,34 +136,22 @@ void Predator::update(sf::Time deltaTime)
 
 void Predator::UpdatePrey()
 {
-	//end of previous chase
+	//end of previous chase?
 	if (m_prey)
 	{
-		if (this->IsPrey(m_prey->getPosition(), m_prey->m_diag, this->getRotation()) == false)
+		if (this->IsPrey(m_prey->getPosition(), m_prey->m_diag, this->getRotation(), m_prey->IsGrown()) == false)
 		{
 			m_prey = NULL;
 		}
 	}
-	
-	if (!m_prey)
-	{
-		//scanning all existing preys
-		float min_dist = -1;
-		for (GameObject* boid : (*CurrentGame).GetSceneGameObjectsTyped(BoidObject))
-		{
-			if (boid && boid->IsGrown())
-			{
-				//choose closest target as a prey
-				if (this->IsPrey(boid->getPosition(), boid->m_diag, this->getRotation()))
-				{
-					float dist = GetDistanceBetweenPositions(this->getPosition(), boid->getPosition());
-					if (min_dist < 0 || dist < min_dist)
-					{
-						min_dist = dist;
-						m_prey = boid;
-					}
-				}
-			}
-		}
-	}
+}
+
+bool Predator::HasPrey()
+{
+	return m_prey;
+}
+
+void Predator::AddToPreys(GameObject* boid)
+{
+	m_prey = boid;
 }

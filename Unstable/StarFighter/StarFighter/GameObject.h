@@ -32,7 +32,6 @@ enum LayerType {
 
 	PredatorLayer,
 	BoidLayer,
-	BabyBoidLayer,
 	PanelLayer,
 	HudObject,
 	HudCursor,
@@ -49,7 +48,6 @@ enum GameObjectType {
 	FriendlyFire,
 	Neutral,
 	BoidObject,
-	BabyBoidObject,
 	PredatorObject,
 	EnemyFire,
 	EnemyObject,
@@ -105,7 +103,9 @@ public:
 	static void AddSpeed(sf::Vector2f* vector, float added_value);
 	static float GetAngleRadForSpeed(sf::Vector2f curSpeed);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
+	static float GetDistanceSquaredBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
+	static float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 	static float GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2);
 	static float GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2);
 	static bool IntersectSegments(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float *i_x = NULL, float *i_y = NULL);
@@ -121,9 +121,12 @@ public:
 
 	//ATLANTIS SPECIFICS
 	virtual void AddToBoidNeighbours(GameObject* boid);
+	virtual void AddToBoidThreats(GameObject* predator);
+	virtual void AddToPreys(GameObject* boid);
+	virtual bool HasPrey();
 	virtual void ClearBoidNeighbours();
 	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle);
-	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle);
+	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle, bool is_grown);
 	sf::Vector2f AvoidBorders();
 	virtual bool IsGrown();
 
