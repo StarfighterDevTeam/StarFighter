@@ -89,6 +89,7 @@ public:
 	std::string m_textureName;
 	sf::Vector2f m_speed;
 	float m_randomized_speed;
+	bool m_collision_check_begun;
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

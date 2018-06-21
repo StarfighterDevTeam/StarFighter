@@ -101,6 +101,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_rotation_speed = 0.f;
 	m_avoiding_x = 0;
 	m_avoiding_y = 0;
+	m_collision_check_begun = false;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
