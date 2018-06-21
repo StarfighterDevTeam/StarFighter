@@ -361,8 +361,9 @@ void Game::colisionChecksV2()
 		if (ptr1->m_collision_check_begun == false)
 		{
 			ptr1->ClearBoidNeighbours();
-			ptr1->m_collision_check_begun = true;
 		}
+
+		ptr1->m_collision_check_begun = false;
 	
 		//Grouping boids
 		if (i != BoidVectorSize - 1)
