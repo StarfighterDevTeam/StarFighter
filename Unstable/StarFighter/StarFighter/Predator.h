@@ -5,6 +5,15 @@
 #include "Game.h"
 #include "GameObject.h"
 
+enum PredatorState
+{
+	Predator_Swimming,
+	Predator_Chasing,
+	Predator_Attacking,
+	Predator_Eating,
+	NB_PREDATOR_STATES,
+};
+
 class Predator : public GameObject
 {
 public :
@@ -15,18 +24,21 @@ public :
 	virtual ~Predator();
 	void update(sf::Time deltaTime) override;
 
-	void UpdatePrey();
+	
 	void Attack();
 	void AddToPreys(GameObject* boid) override;
-	bool HasPrey() override;
-	void Eat(GameObject* prey) override;
+	void SetPrey(GameObject* prey) override;
+	bool Eat(GameObject* prey) override;
+	GameObject* GetPrey() override;
 
 	float m_change_dir_time;
 	sf::Clock m_change_dir_clock;
 
 	GameObject* m_prey;
-	sf::Clock m_eating_clock;
-	sf::Clock m_chasing_clock;
+	sf::Clock m_attack_duration_clock;
+	sf::Clock m_attack_cooldown_clock;
+
+	PredatorState m_state;
 };
 
 #endif // BOID_H_INCLUDED

@@ -479,12 +479,6 @@ void GameObject::AddToPreys(GameObject* boid)
 	//see override function in class Predator
 }
 
-bool GameObject::HasPrey()
-{
-	//see override function in class Predator
-	return false;
-}
-
 void GameObject::ClearBoidNeighbours()
 {
 	//see override function in class Boid
@@ -585,7 +579,19 @@ bool GameObject::IsGrown()
 	return false;
 }
 
-void GameObject::Eat(GameObject* prey)
+bool GameObject::Eat(GameObject* prey)
+{
+	//see override function in class Predator
+	return false;
+}
+
+GameObject* GameObject::GetPrey()
+{
+	//see override function in class Predator
+	return NULL;
+}
+
+void GameObject::SetPrey(GameObject* prey)
 {
 	//see override function in class Predator
 }

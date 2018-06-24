@@ -148,7 +148,7 @@ void Boid::update(sf::Time deltaTime)
 					dir = dir == 0 ? -1 : 1;
 					float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*BOID_MIN_CHANGE_DIR_ANGLE, getRotation() + dir*BOID_MAX_CHANGE_DIR_ANGLE)) - 180;
 
-					change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
+					change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ / 180 * M_PI);
 
 					m_speed.x = change_dir.x;
 					m_speed.y = change_dir.y;
@@ -366,7 +366,7 @@ void Boid::EggLaying()
 				baby_boid->setColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
 				baby_boid->m_growth = 100 * BABY_BOID_SCALE;
 				float angle = (getRotation()) * M_PI / 180;
-				baby_boid->SetSpeedVectorFromAbsoluteSpeedAndAngle(baby_boid->GetAbsoluteSpeed(), angle);
+				baby_boid->SetSpeedVectorFromAbsoluteSpeedAndAngle(baby_boid->m_randomized_speed, angle);
 
 				(*CurrentGame).addToScene(baby_boid, BoidLayer, BoidObject);
 

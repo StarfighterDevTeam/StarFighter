@@ -84,6 +84,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PREDATOR_CHASING_ANGLE				70.f
 #define PREDATOR_CHASING_RADIUS				200.f
 #define PREDATOR_ATTACK_DURATION			0.4f
+#define PREDATOR_ATTACK_COOLDOWN			1.0f
 #define PREDATOR_ATTACK_RADIUS				80.f
 #define PREDATOR_ATTACK_SPEED				1000
 #define PREDATOR_EATING_RADIUS				0.f

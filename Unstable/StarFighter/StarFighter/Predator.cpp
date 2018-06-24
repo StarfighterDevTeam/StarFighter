@@ -29,6 +29,7 @@ Predator::Predator(sf::Vector2f position, std::string textureName, sf::Vector2f 
 
 void Predator::Init()
 {
+	m_state = Predator_Swimming;
 	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(PREDATOR_MIN_CHANGE_DIR_TIME, PREDATOR_MAX_CHANGE_DIR_TIME));
 }
 
@@ -40,8 +41,6 @@ Predator::~Predator()
 void Predator::update(sf::Time deltaTime)
 {
 	GameObject::update(deltaTime);
-
-	UpdatePrey();
 
 	//bounce on screen borders
 	bool bounced = false;
@@ -70,26 +69,55 @@ void Predator::update(sf::Time deltaTime)
 	{
 		if (m_prey)
 		{
-			//chasing prey
+			//vector to prey
 			sf::Vector2f chase_vector = sf::Vector2f(m_prey->getPosition().x - getPosition().x, m_prey->getPosition().y - getPosition().y);
-			ScaleSpeed(&chase_vector, GetAbsoluteSpeed());
-			m_speed = chase_vector;
 
-			//attacking prey
-			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition()) - m_size.y / 2 - m_prey->m_diag;
-			if (distance < PREDATOR_ATTACK_RADIUS && m_eating_clock.getElapsedTime().asSeconds() > PREDATOR_EATING_COOLDOWN && m_attack_clock.getElapsedTime().asSeconds() < PREDATOR_ATTACK_DURATION)
+			
+
+			//chasing prey
+			if (chase_vector != Vector2f(0, 0) && m_attack_cooldown_clock.getElapsedTime().asSeconds() > PREDATOR_ATTACK_COOLDOWN)
 			{
-				ScaleSpeed(&m_speed, PREDATOR_ATTACK_SPEED);
-				m_attack_cooldown_clock.restart();
+				ScaleSpeed(&chase_vector, m_randomized_speed);
+				m_speed = chase_vector;
+				if (m_state == Predator_Swimming)
+				{
+					m_state = Predator_Chasing;
+				}
 			}
 			else
 			{
-				m_attack_clock.restart();
+				if (m_state == Predator_Chasing)
+				{
+					m_state = Predator_Swimming;
+				}
+			}
+			
+			//attacking prey?
+			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition()) - m_size.y / 2 - m_prey->m_diag;
+			if (m_state == Predator_Chasing && distance < PREDATOR_ATTACK_RADIUS && m_attack_cooldown_clock.getElapsedTime().asSeconds() > PREDATOR_ATTACK_COOLDOWN)
+			{
+				m_state = Predator_Attacking;
+				m_attack_duration_clock.restart();
+			}
+
+			if (m_state == Predator_Attacking)
+			{
+				m_attack_cooldown_clock.restart();
+
+				if (m_attack_duration_clock.getElapsedTime().asSeconds() < PREDATOR_ATTACK_DURATION)
+				{
+					ScaleSpeed(&m_speed, PREDATOR_ATTACK_SPEED);
+				}
+				else
+				{
+					m_state = Predator_Chasing;
+					m_attack_duration_clock.restart();
+				}
 			}
 		}
 		else
 		{
-			m_attack_clock.restart();
+			m_state = Predator_Swimming;
 
 			//Avoid Borders
 			sf::Vector2f avoid_borders = AvoidBorders();
@@ -105,7 +133,7 @@ void Predator::update(sf::Time deltaTime)
 				dir = dir == 0 ? -1 : 1;
 				float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*PREDATOR_MIN_CHANGE_DIR_ANGLE, getRotation() + dir*PREDATOR_MAX_CHANGE_DIR_ANGLE)) - 180;
 
-				change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(GetAbsoluteSpeed(), angle_ / 180 * M_PI);
+				change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ / 180 * M_PI);
 
 				m_speed.x = change_dir.x;
 				m_speed.y = change_dir.y;
@@ -120,23 +148,8 @@ void Predator::update(sf::Time deltaTime)
 	
 	float angle = GetAngleRadForSpeed(m_speed);
 	setRotation(angle * 180 / M_PI);
-}
 
-void Predator::UpdatePrey()
-{
-	//end of previous chase?
-	if (m_prey)
-	{
-		if (this->IsPrey(m_prey->getPosition(), m_prey->m_diag, this->getRotation(), m_prey->IsGrown()) == false)
-		{
-			m_prey = NULL;
-		}
-	}
-}
-
-bool Predator::HasPrey()
-{
-	return m_prey;
+	//printf("attack clock: %f | attack cooldown: %f | state: %d | speed: %f\n", m_attack_duration_clock.getElapsedTime().asSeconds(), m_attack_cooldown_clock.getElapsedTime().asSeconds(), m_state, GetAbsoluteSpeed());
 }
 
 void Predator::AddToPreys(GameObject* boid)
@@ -144,15 +157,33 @@ void Predator::AddToPreys(GameObject* boid)
 	m_prey = boid;
 }
 
-void Predator::Eat(GameObject* prey)
+bool Predator::Eat(GameObject* prey)
 {
 	assert(prey != NULL);
 
-	prey->m_GarbageMe = true;
-	prey->m_visible = false;
-	m_prey = NULL;
-	(*CurrentGame).m_boids_eaten++;
-	(*CurrentGame).m_boids_alive--;
-	m_eating_clock.restart();
-	printf("Boids alive: %d\n", (*CurrentGame).m_boids_alive);
+	if (m_state == Predator_Attacking)
+	{
+		prey->m_GarbageMe = true;
+		prey->m_visible = false;
+		m_prey = NULL;
+		(*CurrentGame).m_boids_eaten++;
+		(*CurrentGame).m_boids_alive--;
+		m_state = Predator_Swimming;
+		ScaleSpeed(&m_speed, m_randomized_speed);
+		printf("Boids alive: %d\n", (*CurrentGame).m_boids_alive);
+
+		return true;
+	}
+
+	return false;
+}
+
+GameObject* Predator::GetPrey()
+{
+	return m_prey;
+}
+
+void Predator::SetPrey(GameObject* prey)
+{
+	m_prey = prey;
 }

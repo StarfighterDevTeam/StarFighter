@@ -124,13 +124,14 @@ public:
 	virtual void AddToBoidNeighbours(GameObject* boid);
 	virtual void AddToBoidThreats(GameObject* predator);
 	virtual void AddToPreys(GameObject* boid);
-	virtual bool HasPrey();
 	virtual void ClearBoidNeighbours();
 	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle);
 	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle, bool is_grown);
 	sf::Vector2f AvoidBorders();
 	virtual bool IsGrown();
-	virtual void Eat(GameObject* prey);
+	virtual bool Eat(GameObject* prey);
+	virtual GameObject* GetPrey();
+	virtual void SetPrey(GameObject* prey);
 
 	int m_avoiding_x;
 	int m_avoiding_y;

@@ -401,92 +401,40 @@ void Game::colisionChecksV2()
 			if (ptr2 == NULL)
 				continue;
 	
+			//prey vs predator
 			if (ptr1->IsThreat(ptr2->getPosition(), ptr2->m_size.y, ptr2->getRotation()))
 			{
 				ptr1->AddToBoidThreats(ptr2);
 			}
 	
-			if (ptr2->HasPrey() == false)
+			//predator vs prey
+			GameObject* prey = ptr2->GetPrey();
+			if (prey != NULL)
+			{
+				//previous prey no longer valid?
+				if (ptr2->IsPrey(prey->getPosition(), prey->m_diag, ptr2->getRotation(), prey->IsGrown()) == false)
+				{
+					ptr2->SetPrey(NULL);
+					prey = NULL;
+				}
+				else //try to eat it!
+				{
+					if (Collision::PixelPerfectTest(ptr1, ptr2, 127))//127=MinAlphaLimitForCollision
+					{
+						ptr2->Eat(ptr1);
+					}
+				}
+			}
+
+			if (prey == NULL)
 			{
 				if (ptr2->IsPrey(ptr1->getPosition(), ptr1->m_diag, ptr2->getRotation(), ptr1->IsGrown()))
 				{
 					ptr2->AddToPreys(ptr1);
 				}
 			}
-			else
-			{
-				if (Collision::PixelPerfectTest(ptr1, ptr2, 127))//127=MinAlphaLimitForCollision
-				{
-					ptr2->Eat(ptr1);
-				}
-			}
 		}
 	}
-
-
-
-
-
-
-	//for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::BoidObject].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::BoidObject].end(); it1++)
-	//{
-	//	if (*it1 == NULL)
-	//		continue;
-	//
-	//	if ((*it1)->m_collision_check_begun == false)
-	//	{
-	//		(*it1)->ClearBoidNeighbours();
-	//		(*it1)->m_collision_check_begun = true;
-	//	}
-	//	
-	//	//Grouping boids
-	//
-	//	std::vector<GameObject*>::iterator TEST = m_sceneGameObjectsTyped[GameObjectType::BoidObject].end();
-	//
-	//	if (it1 != m_sceneGameObjectsTyped[GameObjectType::BoidObject].end())
-	//	{
-	//		for (std::vector<GameObject*>::iterator it2 = it1 + 1; it2 != m_sceneGameObjectsTyped[GameObjectType::BoidObject].end(); it2++)
-	//		{
-	//			if (*it2 == NULL)
-	//				continue;
-	//
-	//			if ((*it2)->m_collision_check_begun == false)
-	//			{
-	//				(*it2)->ClearBoidNeighbours();
-	//				(*it2)->m_collision_check_begun = true;
-	//			}
-	//
-	//			if ((*it1)->m_color == (*it2)->m_color)
-	//			{
-	//				if (GameObject::GetDistanceSquaredBetweenObjects((*it1), (*it2)) < FLOCKING_RADIUS * FLOCKING_RADIUS)
-	//				{
-	//					(*it1)->AddToBoidNeighbours(*it2);
-	//					(*it2)->AddToBoidNeighbours(*it1);
-	//				}
-	//			}
-	//		}
-	//	}
-	//	
-	//	//Preys identify predators, and predators identify preys
-	//	for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::PredatorObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::PredatorObject].end(); it2++)
-	//	{
-	//		if (*it2 == NULL)
-	//			continue;
-	//
-	//		if ((*it1)->IsThreat((*it2)->getPosition(), (*it2)->m_size.y, (*it2)->getRotation()))
-	//		{
-	//			(*it1)->AddToBoidThreats((*it2));
-	//		}
-	//
-	//		if ((*it2)->HasPrey() == false)
-	//		{
-	//			if ((*it2)->IsPrey((*it1)->getPosition(), (*it1)->m_diag, (*it2)->getRotation(), (*it1)->IsGrown()))
-	//			{
-	//				(*it2)->AddToPreys((*it1));
-	//			}
-	//		}
-	//	}
-	//}
 
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
