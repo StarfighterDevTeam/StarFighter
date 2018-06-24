@@ -413,6 +413,13 @@ void Game::colisionChecksV2()
 					ptr2->AddToPreys(ptr1);
 				}
 			}
+			else
+			{
+				if (Collision::PixelPerfectTest(ptr1, ptr2, 127))//127=MinAlphaLimitForCollision
+				{
+					ptr2->Eat(ptr1);
+				}
+			}
 		}
 	}
 

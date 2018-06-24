@@ -19,6 +19,7 @@ public :
 	void Attack();
 	void AddToPreys(GameObject* boid) override;
 	bool HasPrey() override;
+	void Eat(GameObject* prey) override;
 
 	float m_change_dir_time;
 	sf::Clock m_change_dir_clock;

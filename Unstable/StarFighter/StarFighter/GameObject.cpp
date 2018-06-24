@@ -584,3 +584,8 @@ bool GameObject::IsGrown()
 	//see override function in class Boid
 	return false;
 }
+
+void GameObject::Eat(GameObject* prey)
+{
+	//see override function in class Predator
+}

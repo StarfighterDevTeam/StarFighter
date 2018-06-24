@@ -77,31 +77,19 @@ void Predator::update(sf::Time deltaTime)
 
 			//attacking prey
 			float distance = GetDistanceBetweenPositions(getPosition(), m_prey->getPosition()) - m_size.y / 2 - m_prey->m_diag;
-			if (distance < PREDATOR_ATTACK_RADIUS && m_eating_clock.getElapsedTime().asSeconds() > PREDATOR_EATING_COOLDOWN && m_chasing_clock.getElapsedTime().asSeconds() < PREDATOR_ATTACK_DURATION)
+			if (distance < PREDATOR_ATTACK_RADIUS && m_eating_clock.getElapsedTime().asSeconds() > PREDATOR_EATING_COOLDOWN && m_attack_clock.getElapsedTime().asSeconds() < PREDATOR_ATTACK_DURATION)
 			{
 				ScaleSpeed(&m_speed, PREDATOR_ATTACK_SPEED);
-
-				//eating prey
-				if (distance < PREDATOR_EATING_RADIUS)
-				{
-					m_prey->m_GarbageMe = true;
-					m_prey->m_visible = false;
-					m_prey = NULL;
-					(*CurrentGame).m_boids_eaten++;
-					(*CurrentGame).m_boids_alive--;
-					m_eating_clock.restart();
-					printf("Boids alive: %d\n", (*CurrentGame).m_boids_alive);
-				}
+				m_attack_cooldown_clock.restart();
 			}
 			else
 			{
-				m_chasing_clock.restart();
+				m_attack_clock.restart();
 			}
 		}
-		
-		if (m_prey == NULL)
+		else
 		{
-			m_chasing_clock.restart();
+			m_attack_clock.restart();
 
 			//Avoid Borders
 			sf::Vector2f avoid_borders = AvoidBorders();
@@ -154,4 +142,17 @@ bool Predator::HasPrey()
 void Predator::AddToPreys(GameObject* boid)
 {
 	m_prey = boid;
+}
+
+void Predator::Eat(GameObject* prey)
+{
+	assert(prey != NULL);
+
+	prey->m_GarbageMe = true;
+	prey->m_visible = false;
+	m_prey = NULL;
+	(*CurrentGame).m_boids_eaten++;
+	(*CurrentGame).m_boids_alive--;
+	m_eating_clock.restart();
+	printf("Boids alive: %d\n", (*CurrentGame).m_boids_alive);
 }

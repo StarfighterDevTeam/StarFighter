@@ -130,6 +130,7 @@ public:
 	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle, bool is_grown);
 	sf::Vector2f AvoidBorders();
 	virtual bool IsGrown();
+	virtual void Eat(GameObject* prey);
 
 	int m_avoiding_x;
 	int m_avoiding_y;
