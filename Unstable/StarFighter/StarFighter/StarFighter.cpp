@@ -155,17 +155,24 @@ int main()
 
 		dt = deltaClock.restart();
 
-		if (!(*CurrentGame).m_pause)
+		if (dt.asSeconds() < 0.3f)
 		{
-			//Update
-			gameManager.GetCurrentState()->Update(dt);
+			if (!(*CurrentGame).m_pause)
+			{
+				//Update
+				gameManager.GetCurrentState()->Update(dt);
 
-			//Draw
-			gameManager.GetCurrentState()->Draw();
-			//sfgui.Display(renderWindow);
+				//Draw
+				gameManager.GetCurrentState()->Draw();
+				//sfgui.Display(renderWindow);
 
-			//Diplay
-			renderWindow.display();
+				//Diplay
+				renderWindow.display();
+			}
+		}
+		else
+		{
+			LOGGER_WRITE(Logger::DEBUG, "FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT");
 		}
 	}
 
