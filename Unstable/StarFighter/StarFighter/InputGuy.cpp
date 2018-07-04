@@ -190,7 +190,7 @@ bool InputGuy::isSpawningPredator()
 
 bool InputGuy::isFleeing()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
 		return true;
 	}

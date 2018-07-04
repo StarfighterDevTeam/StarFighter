@@ -105,7 +105,7 @@ void Ship::update(sf::Time deltaTime)
 		sf::Vector2f predator_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view);
 		if (predator_pos.x > 0 && predator_pos.x < REF_WINDOW_RESOLUTION_X && predator_pos.y > 0 && predator_pos.y < REF_WINDOW_RESOLUTION_Y)
 		{
-			Predator* predator = new Predator(predator_pos, "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+			Predator* predator = new Predator(predator_pos, "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16), 1, 1);
 			(*CurrentGame).addToScene(predator, PredatorLayer, PredatorObject);
 		}
 	}
@@ -114,15 +114,12 @@ void Ship::update(sf::Time deltaTime)
 	{
 		sf::Vector2i mousepos = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
 		sf::Vector2f threat_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos, (*CurrentGame).m_view);
-		
-		Boid* boid = (Boid*)(*CurrentGame).GetSceneGameObjectsTyped(BoidObject).front();
-		Threat threat;
-		threat.m_pos = threat_pos;
-		threat.m_angle = 0.f;
-		if (boid->IsThreat(threat.m_pos, 0.f, threat.m_angle))
-		{
-			boid->m_threats.push_back(threat);
-		}
+
+		(*CurrentGame).AddVirtualThreat(threat_pos);
+
+		//FX
+		FX* fx = new FX(threat_pos, sf::Vector2f(0, 0), "2D/FX_VirtualThreat.png", sf::Vector2f(147.f, 147.f), 30, 1);
+		(*CurrentGame).addToScene(fx, ExplosionLayer, Neutral);
 	}
 
 	MaxSpeedConstraints();

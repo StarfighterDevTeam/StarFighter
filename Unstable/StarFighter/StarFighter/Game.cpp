@@ -663,3 +663,26 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
 }
+
+//ATLANTIS SPECIFIC
+bool Game::AddVirtualThreat(sf::Vector2f pos)
+{
+	bool added = false;
+
+	size_t BoidVectorSize = m_sceneGameObjectsTyped[GameObjectType::BoidObject].size();
+	for (size_t i = 0; i < BoidVectorSize; i++)
+	{
+		GameObject* ptr1 = m_sceneGameObjectsTyped[GameObjectType::BoidObject][i];
+
+		if (ptr1 == NULL)
+			continue;
+
+		if (ptr1->IsThreat(pos, 200, 0, true))
+		{
+			ptr1->AddToBoidThreats(pos);
+			added = true;
+		}
+	}
+
+	return added;
+}

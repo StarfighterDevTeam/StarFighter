@@ -148,7 +148,10 @@ void GameObject::update(sf::Time deltaTime)
 
 	setPosition(newposition.x, newposition.y);
 
-	AnimatedSprite::update(deltaTime);
+	if (m_frameNumber > 1)
+	{
+		AnimatedSprite::update(deltaTime);
+	}
 }
 
 void GameObject::updateAnimation(sf::Time deltaTime)
@@ -474,6 +477,11 @@ void GameObject::AddToBoidThreats(GameObject* predator)
 	//see override function in class Boid
 }
 
+void GameObject::AddToBoidThreats(sf::Vector2f pos)
+{
+	//see override function in class Boid
+}
+
 void GameObject::AddToPreys(GameObject* boid)
 {
 	//see override function in class Predator
@@ -484,7 +492,7 @@ void GameObject::ClearBoidNeighbours()
 	//see override function in class Boid
 }
 
-bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_size , float threat_angle)
+bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle, bool multidirectional)
 {
 	float distance = GetDistanceBetweenPositions(getPosition(), threat_pos) - m_diag - threat_size;
 
@@ -496,7 +504,7 @@ bool GameObject::IsThreat(sf::Vector2f threat_pos, float threat_size , float thr
 	else if (delta_angle < -180)
 		delta_angle += 360;
 
-	if (distance < FLEEING_RADIUS && delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2)
+	if (distance < FLEEING_RADIUS && ((delta_angle > -FLEEING_ANGLE / 2 && delta_angle < FLEEING_ANGLE / 2) || multidirectional))
 	{
 		return true;
 	}

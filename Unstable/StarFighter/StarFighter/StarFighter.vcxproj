@@ -90,6 +90,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Boid.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
+    <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="Boid.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="FileLoadUtils.h" />
+    <ClInclude Include="FX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />

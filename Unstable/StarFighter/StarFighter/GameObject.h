@@ -123,9 +123,10 @@ public:
 	//ATLANTIS SPECIFICS
 	virtual void AddToBoidNeighbours(GameObject* boid);
 	virtual void AddToBoidThreats(GameObject* predator);
+	virtual void AddToBoidThreats(sf::Vector2f pos);
 	virtual void AddToPreys(GameObject* boid);
 	virtual void ClearBoidNeighbours();
-	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle);
+	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle, bool multidirectional=false);
 	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle, bool is_grown);
 	sf::Vector2f AvoidBorders();
 	virtual bool IsGrown();

@@ -8,6 +8,7 @@
 #include "SFTextPop.h"
 #include "Boid.h"
 #include "Predator.h"
+#include "FX.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540

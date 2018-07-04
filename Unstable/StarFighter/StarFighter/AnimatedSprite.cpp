@@ -160,22 +160,25 @@ void AnimatedSprite::update(sf::Time deltaTime)
 		// if current time is bigger then the frame time advance one frame
 		if (m_currentTime >= m_frameTime)
 		{
+			//skip several frames if frameTime is inferior to the duration of one frame
+			std::size_t nb_frames = std::size_t(m_currentTime.asMicroseconds() / m_frameTime.asMicroseconds());
+
 			// reset time, but keep the remainder
 			m_currentTime = sf::microseconds(m_currentTime.asMicroseconds() % m_frameTime.asMicroseconds());
 
 			// get next Frame index
-			if (m_currentFrame + 1 < m_animation->getSize())
-				m_currentFrame++;
+			if (m_currentFrame + nb_frames < m_animation->getSize())
+				m_currentFrame += nb_frames;
 			else
 			{
 				// animation has ended
-				m_currentFrame = 0; // reset to start
+				m_currentFrame = m_currentFrame + nb_frames - m_animation->getSize(); // restart anim at the desired frame
 
 				if (!m_isLooped)
 				{
+					m_currentFrame = 0;
 					m_isPaused = true;
 				}
-
 			}
 
 			// set the current frame, not reseting the time

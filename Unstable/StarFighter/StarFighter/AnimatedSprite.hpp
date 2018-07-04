@@ -33,12 +33,12 @@
 #include "Animation.hpp"
 #include "Globals.h"
 
-#define TIME_BETWEEN_ANIMATION_FRAMES			0.2f
+#define TIME_BETWEEN_ANIMATION_FRAMES			0.01f
 
 class AnimatedSprite : public sf::Drawable, public sf::Transformable
 {
 public:
-	explicit AnimatedSprite(sf::Time frameTime = sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES), bool paused = false, bool looped = true);
+	explicit AnimatedSprite(sf::Time frameTime = sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES), bool paused = false, bool looped = false);
 
 	void update(sf::Time deltaTime);
 	void setAnimation(const Animation& animation, bool keep_frame_index = false);

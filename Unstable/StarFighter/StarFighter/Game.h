@@ -110,6 +110,7 @@ public:
 	int m_boids_alive;
 	int m_predators_alive;
 	int m_boids_eaten;
+	bool AddVirtualThreat(sf::Vector2f pos);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

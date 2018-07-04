@@ -203,6 +203,16 @@ void Boid::AddToBoidThreats(GameObject* predator)
 	}
 }
 
+void Boid::AddToBoidThreats(sf::Vector2f pos)
+{
+	Threat new_threat;
+	new_threat.m_object = NULL;
+	new_threat.m_pos = pos;
+
+	m_threats.push_back(new_threat);
+	
+}
+
 sf::Vector2f Boid::GetAveragePosition()
 {
 	int size = m_boid_neighbours.size();
@@ -295,6 +305,7 @@ sf::Vector2f Boid::Separate()
 sf::Vector2f Boid::Flee(sf::Vector2f threat_pos)
 {
 	sf::Vector2f flee_vector = sf::Vector2f(getPosition().x - threat_pos.x, getPosition().y - threat_pos.y);
+	ScaleSpeed(&flee_vector, FLEEING_MAX_SPEED);
 
 	return flee_vector;
 }
