@@ -30,7 +30,6 @@ void Boid::Init()
 	setColor(sf::Color(r, g, b, 255));
 	m_eggs = RandomizeIntBetweenValues(EGG_NB_MIN, EGG_NB_MAX);
 	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(BOID_MIN_CHANGE_DIR_TIME, BOID_MAX_CHANGE_DIR_TIME));
-	
 }
 
 Boid::~Boid()
@@ -40,8 +39,6 @@ Boid::~Boid()
 
 void Boid::update(sf::Time deltaTime)
 {
-	GameObject::update(deltaTime);
-
 	if (m_state == Boid_Swimming_Solo || m_state == Boid_Swimming_Flocked)
 	{
 		m_state = m_boid_neighbours.empty() ? Boid_Swimming_Solo : Boid_Swimming_Flocked;
@@ -76,20 +73,6 @@ void Boid::update(sf::Time deltaTime)
 
 		if (!bounced)
 		{
-			//Avoid Borders (if possible in the same way as boid neighbours)
-			for (Boid* boid : m_boid_neighbours)
-			{
-				if (m_avoiding_x != boid->m_avoiding_x && boid->m_avoiding_x != 0)
-				{
-					m_avoiding_x = boid->m_avoiding_x;
-				}
-				if (m_avoiding_y != boid->m_avoiding_y && boid->m_avoiding_y != 0)
-				{
-					m_avoiding_y = boid->m_avoiding_y;
-				}
-			}
-			sf::Vector2f avoid_borders = AvoidBorders();
-
 			//Flee threats
 			sf::Vector2f flee_vector = sf::Vector2f(0, 0);
 			if (!m_threats.empty() && IsGrown())//babies don't know how to flee threats
@@ -103,8 +86,8 @@ void Boid::update(sf::Time deltaTime)
 				ScaleSpeed(&flee_vector, FLEEING_MAX_SPEED);
 				m_speed = flee_vector;
 
-				m_speed.x = m_speed.x + avoid_borders.x * FLOCKING_AVOID_BORDERS_WEIGHT;
-				m_speed.y = m_speed.y + avoid_borders.y * FLOCKING_AVOID_BORDERS_WEIGHT;
+				//m_speed.x = m_speed.x + avoid_borders.x * FLOCKING_AVOID_BORDERS_WEIGHT;
+				//m_speed.y = m_speed.y + avoid_borders.y * FLOCKING_AVOID_BORDERS_WEIGHT;
 				NormalizeSpeed(&m_speed, FLEEING_MAX_SPEED);
 
 				//cosmetical: we don't want to change direction straight away after fleeing
@@ -132,9 +115,6 @@ void Boid::update(sf::Time deltaTime)
 				m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
 
 				NormalizeSpeed(&m_speed, m_randomized_speed);
-
-				m_speed.x = m_speed.x + avoid_borders.x * FLOCKING_AVOID_BORDERS_WEIGHT;
-				m_speed.y = m_speed.y + avoid_borders.y * FLOCKING_AVOID_BORDERS_WEIGHT;
 				NormalizeSpeed(&m_speed, m_randomized_speed);
 
 				//Change direction randomly
@@ -146,8 +126,83 @@ void Boid::update(sf::Time deltaTime)
 
 					int dir = RandomizeIntBetweenValues(0, 1);
 					dir = dir == 0 ? -1 : 1;
-					float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(getRotation() + dir*BOID_MIN_CHANGE_DIR_ANGLE, getRotation() + dir*BOID_MAX_CHANGE_DIR_ANGLE)) - 180;
+					float angle_increment = RandomizeFloatBetweenValues(sf::Vector2f(dir*BOID_MIN_CHANGE_DIR_ANGLE, dir*BOID_MAX_CHANGE_DIR_ANGLE));
 
+					//correction to avoid screen borders
+					float border_size = 200.0f;
+					if (getPosition().x < border_size)
+					{
+						if (m_speed.y < 0)
+						{
+							if (angle_increment < 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+						if (m_speed.y > 0)
+						{
+							if (angle_increment > 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+					}
+
+					if (getPosition().x > REF_WINDOW_RESOLUTION_X - border_size)
+					{
+						if (m_speed.y < 0)
+						{
+							if (angle_increment > 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+						if (m_speed.y > 0)
+						{
+							if (angle_increment < 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+					}
+
+					if (getPosition().y < border_size)
+					{
+						if (m_speed.x < 0)
+						{
+							if (angle_increment > 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+						if (m_speed.x > 0)
+						{
+							if (angle_increment < 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+					}
+
+					if (getPosition().y > REF_WINDOW_RESOLUTION_Y - border_size)
+					{
+						if (m_speed.x < 0)
+						{
+							if (angle_increment < 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+						if (m_speed.x > 0)
+						{
+							if (angle_increment > 0)
+							{
+								angle_increment = -angle_increment;
+							}
+						}
+					}
+					
+					float angle_ = getRotation() + angle_increment;
 					change_dir = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ / 180 * M_PI);
 
 					m_speed.x = change_dir.x;
@@ -155,13 +210,17 @@ void Boid::update(sf::Time deltaTime)
 				}
 			}
 		}
-
-		float angle = GetAngleRadForSpeed(m_speed);
-		setRotation(angle * 180 / M_PI);
 	}
 
 	EggLaying();
 	Growing();
+
+	//Avoid borders
+	AvoidBorders(m_speed, deltaTime);
+
+	UpdateRotation();
+
+	GameObject::update(deltaTime);
 }
 
 void Boid::AddToBoidNeighbours(GameObject* boid)

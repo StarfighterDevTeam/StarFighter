@@ -52,7 +52,6 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define FLOCKING_COHESION_WEIGHT			0.8f
 #define FLOCKING_ALIGNMENT_WEIGHT			0.15f
 #define FLOCKING_SEPARATION_WEIGHT			2.0f
-#define FLOCKING_AVOID_BORDERS_WEIGHT		200.0f
 
 //FLEEING
 #define FLEEING_MAX_SPEED					500
@@ -73,8 +72,6 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define PREDATOR_MAX_CHANGE_DIR_TIME		15.f
 #define PREDATOR_MIN_CHANGE_DIR_ANGLE		30.f
 #define PREDATOR_MAX_CHANGE_DIR_ANGLE		150.f
-
-#define PREDATOR_AVOID_BORDERS_WEIGHT		50.0f
 
 #define PREDATOR_SCALE						4.f
 

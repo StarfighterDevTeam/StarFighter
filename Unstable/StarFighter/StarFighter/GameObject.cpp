@@ -99,8 +99,6 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	m_ghost = false;
 	m_rotation_speed = 0.f;
-	m_avoiding_x = 0;
-	m_avoiding_y = 0;
 	m_collision_check_begun = false;
 }
 
@@ -246,6 +244,15 @@ float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 	return angle;
 }
 
+void GameObject::UpdateRotation()
+{
+	if (m_speed != sf::Vector2f(0, 0))
+	{
+		float angle = GetAngleRadForSpeed(m_speed);
+		setRotation(angle * 180 / M_PI);
+	}
+}
+
 float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2)
 {
 	assert(ref_object != NULL);
@@ -281,16 +288,16 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
 	sf::Vector2f speed;
-	speed.x = -absolute_speed * sin(curAngle);
-	speed.y = absolute_speed * cos(curAngle);
+	speed.x = absolute_speed * sin(curAngle);
+	speed.y = -absolute_speed * cos(curAngle);
 
 	return speed;
 }
 
 void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
 {
-	m_speed.x = -absolute_speed * sin(curAngle);
-	m_speed.y = absolute_speed * cos(curAngle);
+	m_speed.x = absolute_speed * sin(curAngle);
+	m_speed.y = -absolute_speed * cos(curAngle);
 }
 
 float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)
@@ -537,48 +544,43 @@ bool GameObject::IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_
 	return false;
 }
 
-sf::Vector2f GameObject::AvoidBorders()
+bool GameObject::AvoidBorders(sf::Vector2f &speed, sf::Time deltaTime)
 {
-	sf::Vector2f avoid_vector = sf::Vector2f(0, 0);
+	if (IsGoingToTouchBorders(speed, getPosition(), m_size, deltaTime) == true)
+	{
+		sf::Vector2f avoid_vector = speed;
+		float increment = 0;
+		float absolute_speed = GetAbsoluteSpeed(speed);
+		float angle = GetAngleRadForSpeed(speed);
+		float step = 0.15;
 
-	bool left_or_right = RandomizeIntBetweenValues(0, 1) == 1 ? true : false;
-	int lr = left_or_right ? 1 : -1;
+		float new_angle = 0;
 
-	if (getPosition().x - (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.x  < 0 && m_speed.x < 0)
-	{
-		lr = m_avoiding_y == 0 ? lr : m_avoiding_y;
-		m_avoiding_y = m_avoiding_y == 0 ? lr : m_avoiding_y;
-		avoid_vector += sf::Vector2f(0, 1.f * lr);
-	}
-	if (getPosition().x + (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.x > REF_WINDOW_RESOLUTION_X  && m_speed.x > 0)
-	{
-		lr = m_avoiding_y == 0 ? lr : m_avoiding_y;
-		m_avoiding_y = m_avoiding_y == 0 ? lr : m_avoiding_y;
-		avoid_vector += sf::Vector2f(0, 1.f * lr);
-	}
-	if (getPosition().y - (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.y < 0 && m_speed.y < 0)
-	{
-		lr = m_avoiding_x == 0 ? lr : m_avoiding_x;
-		m_avoiding_x = m_avoiding_x == 0 ? lr : m_avoiding_x;
-		avoid_vector += sf::Vector2f(1.f * lr, 0);
-	}
-	if (getPosition().y + (AVOID_BORDERS_RADIUS_COEFF + 0.5) * m_size.y > REF_WINDOW_RESOLUTION_Y && m_speed.y > 0)
-	{
-		lr = m_avoiding_x == 0 ? lr : m_avoiding_x;
-		m_avoiding_x = m_avoiding_x == 0 ? lr : m_avoiding_x;
-		avoid_vector += sf::Vector2f(1.f * lr, 0);
-	}
+		while (IsGoingToTouchBorders(avoid_vector, getPosition(), m_size, deltaTime) == true)
+		{
+			if (increment >= 0)
+			{
+				increment = -increment;
+				increment -= step;
+			}
+			else //if (increment < 0)
+			{
+				increment = -increment;
+			}
 
-	if (avoid_vector.x == 0)
-	{
-		m_avoiding_x = 0;
-	}
-	if (avoid_vector.y == 0)
-	{
-		m_avoiding_y = 0;
-	}
+			new_angle = angle + increment;
 
-	return avoid_vector;
+			avoid_vector = GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(absolute_speed, new_angle);
+		}
+
+		speed = avoid_vector;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool GameObject::IsGrown()
@@ -602,4 +604,30 @@ GameObject* GameObject::GetPrey()
 void GameObject::SetPrey(GameObject* prey)
 {
 	//see override function in class Predator
+}
+
+bool GameObject::IsGoingToTouchBorders(sf::Vector2f speed, sf::Vector2f position, sf::Vector2f size, sf::Time deltaTime)
+{
+	bool touching_borders = false;
+
+	float border_test_duration = 0.7f;// X = impact with screen border in X sec at current speed
+
+	if (position.x + speed.x*border_test_duration - size.x / 2 < 0 && speed.x < 0)
+	{
+		touching_borders = true;
+	}
+	if (position.x + speed.x*border_test_duration + size.x / 2 > REF_WINDOW_RESOLUTION_X  && speed.x > 0)
+	{
+		touching_borders = true;
+	}
+	if (position.y + speed.y*border_test_duration - size.y / 2 < 0 && speed.y < 0)
+	{
+		touching_borders = true;
+	}
+	if (position.y + speed.y*border_test_duration + size.y / 2 > REF_WINDOW_RESOLUTION_Y && speed.y > 0)
+	{
+		touching_borders = true;
+	}
+
+	return touching_borders;
 }

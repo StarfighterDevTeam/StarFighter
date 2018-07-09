@@ -40,8 +40,6 @@ Predator::~Predator()
 
 void Predator::update(sf::Time deltaTime)
 {
-	GameObject::update(deltaTime);
-
 	//bounce on screen borders
 	bool bounced = false;
 	if (getPosition().x - m_size.x / 2 < 0 && m_speed.x < 0)
@@ -71,8 +69,6 @@ void Predator::update(sf::Time deltaTime)
 		{
 			//vector to prey
 			sf::Vector2f chase_vector = sf::Vector2f(m_prey->getPosition().x - getPosition().x, m_prey->getPosition().y - getPosition().y);
-
-			
 
 			//chasing prey
 			if (chase_vector != Vector2f(0, 0) && m_attack_cooldown_clock.getElapsedTime().asSeconds() > PREDATOR_ATTACK_COOLDOWN)
@@ -119,9 +115,6 @@ void Predator::update(sf::Time deltaTime)
 		{
 			m_state = Predator_Swimming;
 
-			//Avoid Borders
-			sf::Vector2f avoid_borders = AvoidBorders();
-
 			//Change direction randomly
 			sf::Vector2f change_dir = sf::Vector2f(0, 0);
 			if (m_change_dir_clock.getElapsedTime().asSeconds() > m_change_dir_time)
@@ -139,17 +132,16 @@ void Predator::update(sf::Time deltaTime)
 				m_speed.y = change_dir.y;
 			}
 
-			m_speed.x = m_speed.x + avoid_borders.x * PREDATOR_AVOID_BORDERS_WEIGHT;
-			m_speed.y = m_speed.y + avoid_borders.y * PREDATOR_AVOID_BORDERS_WEIGHT;
-
 			ScaleSpeed(&m_speed, m_randomized_speed);
 		}
 	}
 	
-	float angle = GetAngleRadForSpeed(m_speed);
-	setRotation(angle * 180 / M_PI);
+	//Avoid borders
+	AvoidBorders(m_speed, deltaTime);
 
-	//printf("attack clock: %f | attack cooldown: %f | state: %d | speed: %f\n", m_attack_duration_clock.getElapsedTime().asSeconds(), m_attack_cooldown_clock.getElapsedTime().asSeconds(), m_state, GetAbsoluteSpeed());
+	UpdateRotation();
+
+	GameObject::update(deltaTime);
 }
 
 void Predator::AddToPreys(GameObject* boid)

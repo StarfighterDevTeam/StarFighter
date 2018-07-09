@@ -128,14 +128,17 @@ public:
 	virtual void ClearBoidNeighbours();
 	bool IsThreat(sf::Vector2f threat_pos, float threat_size, float threat_angle, bool multidirectional=false);
 	bool IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_angle, bool is_grown);
-	sf::Vector2f AvoidBorders();
+	
 	virtual bool IsGrown();
 	virtual bool Eat(GameObject* prey);
 	virtual GameObject* GetPrey();
 	virtual void SetPrey(GameObject* prey);
+	
 
-	int m_avoiding_x;
-	int m_avoiding_y;
+	//could be upper "fish" class
+	bool AvoidBorders(sf::Vector2f &speed, sf::Time deltaTime);
+	bool IsGoingToTouchBorders(sf::Vector2f speed, sf::Vector2f position, sf::Vector2f size, sf::Time deltaTime);
+	void UpdateRotation();
 
 protected:
 	sf::Vector2f m_initial_position;
