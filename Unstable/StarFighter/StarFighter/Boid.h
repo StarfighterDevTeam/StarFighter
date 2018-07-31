@@ -46,6 +46,7 @@ public :
 	sf::Vector2f Separate();
 
 	sf::Vector2f Flee(sf::Vector2f threat_pos);
+	float FleeByAngle(sf::Vector2f threat_pos);
 	vector<Threat> m_threats;
 	void UpdateThreats();
 
@@ -56,12 +57,16 @@ public :
 	float m_change_dir_time;
 	sf::Clock m_change_dir_clock;
 
+	float m_egg_cooldown;
 	sf::Clock m_egg_clock;
 	sf::Clock m_between_two_eggs_clock;
 	sf::Clock m_growth_clock;
 	int m_eggs;
 	int m_growth;
 	BoidState m_state;
+
+	sf::Vector2f m_oscillation_offset;
+	sf::Clock m_oscillation_clock;
 };
 
 #endif // BOID_H_INCLUDED

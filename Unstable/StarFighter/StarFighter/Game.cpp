@@ -412,7 +412,7 @@ void Game::colisionChecksV2()
 			if (prey != NULL)
 			{
 				//previous prey no longer valid?
-				if (ptr2->IsPrey(prey->getPosition(), prey->m_diag, ptr2->getRotation(), prey->IsGrown()) == false)
+				if (prey->m_garbageMe || ptr2->IsPrey(prey->getPosition(), prey->m_diag, ptr2->getRotation(), prey->IsGrown()) == false)
 				{
 					ptr2->SetPrey(NULL);
 					prey = NULL;
@@ -428,7 +428,7 @@ void Game::colisionChecksV2()
 
 			if (prey == NULL)
 			{
-				if (ptr2->IsPrey(ptr1->getPosition(), ptr1->m_diag, ptr2->getRotation(), ptr1->IsGrown()))
+				if (ptr2->IsPrey(ptr1->getPosition(), ptr1->m_diag, ptr2->getRotation(), ptr1->IsGrown()) == true)
 				{
 					ptr2->AddToPreys(ptr1);
 				}
@@ -571,7 +571,7 @@ void Game::collectGarbage()
 			continue;
 
 		//Content flagged for deletion
-		if ((**it).m_GarbageMe)
+		if ((**it).m_garbageMe)
 		{
 			m_garbage.push_back(*it);
 			continue;
@@ -605,7 +605,7 @@ void Game::collectGarbage()
 			continue;
 
 		//Content flagged for deletion
-		if ((**it).m_GarbageMe)
+		if ((**it).m_garbageMe)
 		{
 			m_garbageTexts.push_back(*it);
 			continue;
@@ -685,4 +685,15 @@ bool Game::AddVirtualThreat(sf::Vector2f pos)
 	}
 
 	return added;
+}
+
+void Game::WipePrey(GameObject* prey)
+{
+	for (GameObject* predator : m_sceneGameObjectsTyped[PredatorObject])
+	{
+		if (predator && predator->GetPrey() == prey)
+		{
+			predator->SetPrey(NULL);
+		}
+	}
 }

@@ -70,11 +70,12 @@ public:
 
 	bool m_visible;
 	bool m_isOnScene;
-	bool m_GarbageMe;
+	bool m_garbageMe;
 	bool m_DontGarbageMe;
 	GameObjectType m_collider_type;
 	LayerType m_layer;
 	sf::Vector2f m_size;
+	
 
 	string getName();
 	GameObject* Clone();
@@ -137,7 +138,7 @@ public:
 
 	//could be upper "fish" class
 	bool AvoidBorders(sf::Vector2f &speed, sf::Time deltaTime);
-	bool IsGoingToTouchBorders(sf::Vector2f speed, sf::Vector2f position, sf::Vector2f size, sf::Time deltaTime);
+	bool IsGoingToTouchBorders(sf::Vector2f speed, sf::Vector2f position, sf::Vector2f size, sf::Time deltaTime, int &border_touched);
 	void UpdateRotation();
 
 protected:

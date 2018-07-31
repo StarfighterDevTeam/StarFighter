@@ -23,7 +23,7 @@ void Ship::Init()
 	}
 
 	m_SFTargetPanel = NULL;
-	m_is_asking_SFPanel = SFPanel_None;
+	m_is_asking_SFPanel = SFPanel_Specific;
 
 //#define DEBUG_FAST_SPAWN
 	int nb_predator = 2;
@@ -129,7 +129,7 @@ void Ship::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 
 	//HUD
-	m_is_asking_SFPanel = SFPanel_None;
+	//m_is_asking_SFPanel = SFPanel_None;
 	if (m_SFTargetPanel)
 	{
 		m_SFTargetPanel->Update(deltaTime);

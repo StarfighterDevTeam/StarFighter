@@ -23,13 +23,19 @@ void Boid::Init()
 	m_randomized_speed = RandomizeFloatBetweenValues(sf::Vector2f(FLOCKING_BASE_SPEED_MIN, FLOCKING_BASE_SPEED_MAX));
 	float angle_ = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, angle_ * M_PI / 180);
+
 	setRotation(angle_ * 180 / M_PI - 180);
-	int r = RandomizeIntBetweenValues(50, 255);
+
+	int r = RandomizeIntBetweenValues(50, 200);
 	int g = RandomizeIntBetweenValues(50, 255);
 	int b = RandomizeIntBetweenValues(50, 255);
 	setColor(sf::Color(r, g, b, 255));
 	m_eggs = RandomizeIntBetweenValues(EGG_NB_MIN, EGG_NB_MAX);
+	m_egg_cooldown = RandomizeFloatBetweenValues(sf::Vector2f(EGG_LAYING_COOLDOWN_MIN, EGG_LAYING_COOLDOWN_MAX));
 	m_change_dir_time = RandomizeFloatBetweenValues(sf::Vector2f(BOID_MIN_CHANGE_DIR_TIME, BOID_MAX_CHANGE_DIR_TIME));
+
+	m_oscillation_offset.x = 0;
+	m_oscillation_offset.y = 0;
 }
 
 Boid::~Boid()
@@ -75,14 +81,17 @@ void Boid::update(sf::Time deltaTime)
 		{
 			//Flee threats
 			sf::Vector2f flee_vector = sf::Vector2f(0, 0);
+			float flee_angle = 0;
 			if (!m_threats.empty() && IsGrown())//babies don't know how to flee threats
 			{
 				for (Threat threat : m_threats)
 				{
 					//Flee all possible threats at the same time
 					flee_vector += Flee(threat.m_pos);
+					//flee_angle += FleeByAngle(threat.m_pos);
 				}
 
+				//flee_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(FLEEING_MAX_SPEED, flee_angle);
 				ScaleSpeed(&flee_vector, FLEEING_MAX_SPEED);
 				m_speed = flee_vector;
 
@@ -114,7 +123,6 @@ void Boid::update(sf::Time deltaTime)
 				m_speed.x = m_speed.x * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.x * FLOCKING_COHESION_WEIGHT + alignment_vector.x * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.x * FLOCKING_SEPARATION_WEIGHT;
 				m_speed.y = m_speed.y * FLOCKING_PREVIOUS_SPEED_WEIGHT + cohesion_vector.y * FLOCKING_COHESION_WEIGHT + alignment_vector.y * FLOCKING_ALIGNMENT_WEIGHT + separation_vector.y * FLOCKING_SEPARATION_WEIGHT;
 
-				NormalizeSpeed(&m_speed, m_randomized_speed);
 				NormalizeSpeed(&m_speed, m_randomized_speed);
 
 				//Change direction randomly
@@ -215,12 +223,33 @@ void Boid::update(sf::Time deltaTime)
 	EggLaying();
 	Growing();
 
-	//Avoid borders
-	AvoidBorders(m_speed, deltaTime);
+	//AvoidBorders(m_speed, deltaTime);
+
+	//oscillation
+	bool isOscillating = m_state != Boid_Laying_Egg;// && m_state != Boid_Swimming_Flocked;
+	if (isOscillating)
+	{
+		float growth_ratio = m_growth / 100.f;
+		float oscillation_speed = GetAbsoluteSpeed() * BOID_OSCILLATION_FREQUENCY * growth_ratio;
+		float angle = GetAngleRadForSpeed(m_speed);
+		m_oscillation_offset.x = BOID_OSCILLATION_AMPLITUDE * growth_ratio * sin(m_oscillation_clock.getElapsedTime().asSeconds() * oscillation_speed) * cos(angle);// cos(m_oscillation_clock.getElapsedTime().asSeconds() * oscillation_speed) * cos(angle) + sin(m_oscillation_clock.getElapsedTime().asSeconds() * oscillation_speed) * sin(angle);
+		m_oscillation_offset.y = BOID_OSCILLATION_AMPLITUDE * growth_ratio * sin(m_oscillation_clock.getElapsedTime().asSeconds() * oscillation_speed) * sin(angle);// *oscillation_speed);// *sin(angle);// +BOID_OSCILLATION_AMPLITUDE * cos(m_oscillation_clock.getElapsedTime().asSeconds() * oscillation_speed) * cos(angle);
+
+		m_speed += m_oscillation_offset;
+	}
+	else
+	{
+		m_oscillation_clock.restart();
+	}
 
 	UpdateRotation();
 
 	GameObject::update(deltaTime);
+
+	if (isOscillating)
+	{
+		m_speed -= m_oscillation_offset;//oscillations are just cosmetical, so they must be ignored from further speed calculations
+	}
 }
 
 void Boid::AddToBoidNeighbours(GameObject* boid)
@@ -364,9 +393,16 @@ sf::Vector2f Boid::Separate()
 sf::Vector2f Boid::Flee(sf::Vector2f threat_pos)
 {
 	sf::Vector2f flee_vector = sf::Vector2f(getPosition().x - threat_pos.x, getPosition().y - threat_pos.y);
-	ScaleSpeed(&flee_vector, FLEEING_MAX_SPEED);
 
+	ScaleSpeed(&flee_vector, FLEEING_MAX_SPEED);
 	return flee_vector;
+}
+
+float Boid::FleeByAngle(sf::Vector2f threat_pos)
+{
+	float flee_angle = GetAngleRadBetweenPositions(getPosition(), threat_pos);
+
+	return flee_angle;
 }
 
 void Boid::UpdateThreats()
@@ -416,49 +452,42 @@ bool Boid::IsGrown()
 
 void Boid::EggLaying()
 {
-	if (m_growth < 100 || m_eggs == 0 || !m_threats.empty())
+	if (m_growth < 100 || m_eggs == 0 || !m_threats.empty())//condition to star laying egggs
 	{
 		m_egg_clock.restart();
 		return;
 	}
 
-	if (m_egg_clock.getElapsedTime().asSeconds() > EGG_LAYING_COOLDOWN || m_state == Boid_Laying_Egg)
+	if (m_egg_clock.getElapsedTime().asSeconds() > m_egg_cooldown || m_state == Boid_Laying_Egg)//the second condition has purpose when laying egg has already started, then we want to ignore threats
 	{
-		if (RandomizeFloatBetweenValues(sf::Vector2f(0, 1)) < EGG_LAYING_CHANCE || m_state == Boid_Laying_Egg)
-		{
-			m_state = Boid_Laying_Egg;
-			m_speed = sf::Vector2f(0, 0);
+		m_state = Boid_Laying_Egg;
+		m_speed = sf::Vector2f(0, 0);
 
-			if (m_between_two_eggs_clock.getElapsedTime().asSeconds() > EGG_LAYING_TIME_BETWEEN_TWO_EGGS)
+		if (m_between_two_eggs_clock.getElapsedTime().asSeconds() > EGG_LAYING_TIME_BETWEEN_TWO_EGGS)
+		{
+			Boid* baby_boid = new Boid(getPosition(), "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
+			baby_boid->ScaleObject(BABY_BOID_SCALE);
+			baby_boid->setColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
+			baby_boid->m_growth = 100 * BABY_BOID_SCALE;
+			float angle = (getRotation() + 180) * M_PI / 180;
+			baby_boid->SetSpeedVectorFromAbsoluteSpeedAndAngle(baby_boid->m_randomized_speed, angle);
+
+			(*CurrentGame).addToScene(baby_boid, BoidLayer, BoidObject);
+
+			m_between_two_eggs_clock.restart();
+			m_eggs--;
+
+			if (m_eggs == 0)
 			{
-				Boid* baby_boid = new Boid(getPosition(), "2D/boid.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16));
-				baby_boid->ScaleObject(BABY_BOID_SCALE);
-				baby_boid->setColor(sf::Color(m_color.r, m_color.g, m_color.b, 255));
-				baby_boid->m_growth = 100 * BABY_BOID_SCALE;
-				float angle = (getRotation()) * M_PI / 180;
-				baby_boid->SetSpeedVectorFromAbsoluteSpeedAndAngle(baby_boid->m_randomized_speed, angle);
-
-				(*CurrentGame).addToScene(baby_boid, BoidLayer, BoidObject);
-
-				m_between_two_eggs_clock.restart();
-				m_eggs--;
-
-				if (m_eggs == 0)
-				{
-					m_change_dir_clock.restart();
-					SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, (getRotation() - 180) * M_PI / 180);
-					m_state = Boid_Swimming_Solo;
-				}
+				m_change_dir_clock.restart();
+				SetSpeedVectorFromAbsoluteSpeedAndAngle(m_randomized_speed, getRotation() * M_PI / 180);
+				m_state = Boid_Swimming_Solo;
+				m_egg_clock.restart();
 			}
-		}
-		else
-		{
-			m_egg_clock.restart();
 		}
 	}
 	else
 	{
 		m_between_two_eggs_clock.restart();
 	}
-
 }

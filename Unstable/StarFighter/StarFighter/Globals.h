@@ -45,8 +45,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 //FLOCKING
 #define FLOCKING_RADIUS						100
-#define FLOCKING_BASE_SPEED_MIN				210
-#define FLOCKING_BASE_SPEED_MAX				210
+#define FLOCKING_BASE_SPEED_MIN				170
+#define FLOCKING_BASE_SPEED_MAX				170
 
 #define FLOCKING_PREVIOUS_SPEED_WEIGHT		5.0f
 #define FLOCKING_COHESION_WEIGHT			0.8f
@@ -67,6 +67,9 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define BOID_MIN_CHANGE_DIR_ANGLE			20.f
 #define BOID_MAX_CHANGE_DIR_ANGLE			90.f
 
+#define BOID_OSCILLATION_FREQUENCY			0.04f
+#define BOID_OSCILLATION_AMPLITUDE			30.f
+
 //PREDATORS
 #define PREDATOR_MIN_CHANGE_DIR_TIME		5.f
 #define PREDATOR_MAX_CHANGE_DIR_TIME		15.f
@@ -75,21 +78,21 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 #define PREDATOR_SCALE						4.f
 
-#define PREDATOR_BASE_SPEED_MIN				230
-#define PREDATOR_BASE_SPEED_MAX				230
+#define PREDATOR_BASE_SPEED_MIN				240
+#define PREDATOR_BASE_SPEED_MAX				240
 
 #define PREDATOR_CHASING_ANGLE				70.f
 #define PREDATOR_CHASING_RADIUS				200.f
 #define PREDATOR_ATTACK_DURATION			0.4f
 #define PREDATOR_ATTACK_COOLDOWN			1.0f
-#define PREDATOR_ATTACK_RADIUS				80.f
-#define PREDATOR_ATTACK_SPEED				1000
+#define PREDATOR_ATTACK_RADIUS				120.f
+#define PREDATOR_ATTACK_SPEED				1200
 #define PREDATOR_EATING_RADIUS				0.f
 #define PREDATOR_EATING_COOLDOWN			0.5f
 
 //EGGS AND BABIES
-#define EGG_LAYING_COOLDOWN						10.f
-#define EGG_LAYING_CHANCE						0.30f//0.05f
+#define EGG_LAYING_COOLDOWN_MIN					8.f
+#define EGG_LAYING_COOLDOWN_MAX					30.f
 #define EGG_NB_MIN								3
 #define EGG_NB_MAX								8
 #define EGG_LAYING_TIME_BETWEEN_TWO_EGGS		1.f

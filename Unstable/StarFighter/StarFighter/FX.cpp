@@ -25,7 +25,7 @@ void FX::update(sf::Time deltaTime)
 	if (m_currentFrame == 0)
 	{
 		m_visible = false;
-		m_GarbageMe = true;
+		m_garbageMe = true;
 	}
 }
 

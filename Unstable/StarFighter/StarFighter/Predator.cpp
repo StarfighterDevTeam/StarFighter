@@ -21,7 +21,7 @@ Predator::Predator(sf::Vector2f position, std::string textureName, sf::Vector2f 
 	int r = RandomizeIntBetweenValues(0, 255);
 	int g = RandomizeIntBetweenValues(0, 255);
 	int b = RandomizeIntBetweenValues(0, 255);
-	setColor(sf::Color(r, g, b, 255));
+	setColor(sf::Color(255, 0, 0, 255));
 	m_prey = NULL;
 
 	ScaleObject(PREDATOR_SCALE);
@@ -137,7 +137,7 @@ void Predator::update(sf::Time deltaTime)
 	}
 	
 	//Avoid borders
-	AvoidBorders(m_speed, deltaTime);
+	//AvoidBorders(m_speed, deltaTime);
 
 	UpdateRotation();
 
@@ -155,14 +155,14 @@ bool Predator::Eat(GameObject* prey)
 
 	if (m_state == Predator_Attacking)
 	{
-		prey->m_GarbageMe = true;
+		prey->m_garbageMe = true;
 		prey->m_visible = false;
-		m_prey = NULL;
+		(*CurrentGame).WipePrey(prey);
 		(*CurrentGame).m_boids_eaten++;
 		(*CurrentGame).m_boids_alive--;
 		m_state = Predator_Swimming;
 		ScaleSpeed(&m_speed, m_randomized_speed);
-		printf("Boids alive: %d\n", (*CurrentGame).m_boids_alive);
+		printf("Boids alive: %d (EAT)\n", (*CurrentGame).m_boids_alive);
 
 		return true;
 	}

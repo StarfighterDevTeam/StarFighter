@@ -94,7 +94,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	setPosition(position.x, position.y);
 	m_visible = true;
 	m_isOnScene = false;
-	m_GarbageMe = false;
+	m_garbageMe = false;
 	m_DontGarbageMe = false;
 	m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	m_ghost = false;
@@ -246,9 +246,10 @@ float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 
 void GameObject::UpdateRotation()
 {
+	float angle = 0.f;
 	if (m_speed != sf::Vector2f(0, 0))
 	{
-		float angle = GetAngleRadForSpeed(m_speed);
+		angle = GetAngleRadForSpeed(m_speed);
 		setRotation(angle * 180 / M_PI);
 	}
 }
@@ -546,39 +547,124 @@ bool GameObject::IsPrey(sf::Vector2f prey_pos, float prey_diag_size, float prey_
 
 bool GameObject::AvoidBorders(sf::Vector2f &speed, sf::Time deltaTime)
 {
-	if (IsGoingToTouchBorders(speed, getPosition(), m_size, deltaTime) == true)
+	int border_touched = 0;
+	if (IsGoingToTouchBorders(speed, getPosition(), m_size, deltaTime, border_touched) == true)
 	{
 		sf::Vector2f avoid_vector = speed;
+
+		int clockwise;
+		if (border_touched == 1)//left
+		{
+			if (m_speed.y < 0)
+			{
+				clockwise = 1;
+			}
+			else
+			{
+				clockwise = -1;
+			}
+		}
+
+		if (border_touched == 2)//right
+		{
+			if (m_speed.y < 0)
+			{
+				clockwise = -1;
+			}
+			else
+			{
+				clockwise = 1;
+			}
+		}
+			
+
+		if (border_touched == 3)//up
+		{
+			if (m_speed.x < 0)
+			{
+				clockwise = -1;
+			}
+			else
+			{
+				clockwise = 1;
+			}
+		}
+
+		if (border_touched == 4)//down
+		{
+			if (m_speed.x < 0)
+			{
+				clockwise = 1;
+			}
+			else
+			{
+				clockwise = -1;
+			}
+		}
+
 		float increment = 0;
 		float absolute_speed = GetAbsoluteSpeed(speed);
 		float angle = GetAngleRadForSpeed(speed);
-		float step = 0.15;
-
+		float step = 0.05;
 		float new_angle = 0;
 
-		while (IsGoingToTouchBorders(avoid_vector, getPosition(), m_size, deltaTime) == true)
+		if (m_collider_type == BoidObject)
+			printf("J'entre dans le if car mon vector est %f, %f, et je vais toucher\n", speed.x, speed.y);
+
+		
+		while (increment == 0 || IsGoingToTouchBorders(avoid_vector, getPosition(), m_size, deltaTime, border_touched) == true)
 		{
-			if (increment >= 0)
-			{
-				increment = -increment;
-				increment -= step;
-			}
-			else //if (increment < 0)
-			{
-				increment = -increment;
-			}
+			//if (increment >= 0)
+			//{
+			//	increment = -increment;
+			//	increment -= step;
+			//}
+			//else //if (increment < 0)
+			//{
+			//	increment = -increment;
+			//}
+
+			increment += step * clockwise;
 
 			new_angle = angle + increment;
+			if (m_collider_type == BoidObject)
+				printf("\n\nincrement : %f", increment);
 
 			avoid_vector = GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(absolute_speed, new_angle);
 		}
 
+		//if (increment < 0)
+		//{
+		//	increment = -increment;
+		//	new_angle = angle + increment;
+		//	if (m_collider_type == BoidObject)
+		//		printf("increment extra : %f\n", increment);
+		//	sf::Vector2f avoid_vector2 = GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(absolute_speed, new_angle);
+		//	if (IsGoingToTouchBorders(avoid_vector2, getPosition(), m_size, deltaTime) == false)
+		//	{
+		//		if (m_collider_type == BoidObject)
+		//		printf("AVOID VECTOR 2 (%f, %f) vs VECTOR 1 (%f, %f)\n", avoid_vector2.x, avoid_vector2.y, avoid_vector.x, avoid_vector.y);
+		//		avoid_vector = avoid_vector2;
+		//	}
+		//
+		//}
+
+		if (m_collider_type == BoidObject)
+		{
+			printf("increment final: %f | vector final %f, %f\n\n", increment, avoid_vector.x, avoid_vector.y);
+			printf("speed avant: %f, %f | vector: %f, %f\n", speed.x, speed.y, avoid_vector.x, avoid_vector.y);
+			speed = avoid_vector;
+			printf("speed après: %f, %f\n", speed.x, speed.y);
+		}
+	
 		speed = avoid_vector;
 
 		return true;
 	}
 	else
 	{
+		if (m_collider_type == BoidObject)
+			printf("no problemo\n");
 		return false;
 	}
 }
@@ -606,28 +692,43 @@ void GameObject::SetPrey(GameObject* prey)
 	//see override function in class Predator
 }
 
-bool GameObject::IsGoingToTouchBorders(sf::Vector2f speed, sf::Vector2f position, sf::Vector2f size, sf::Time deltaTime)
+bool GameObject::IsGoingToTouchBorders(sf::Vector2f speed, sf::Vector2f position, sf::Vector2f size, sf::Time deltaTime, int &border_touched)
 {
-	bool touching_borders = false;
+	border_touched = 0;
 
 	float border_test_duration = 0.7f;// X = impact with screen border in X sec at current speed
 
+	if (m_collider_type == BoidObject)
+		printf("test vector: %f, %f\n", speed.x, speed.y);
+
 	if (position.x + speed.x*border_test_duration - size.x / 2 < 0 && speed.x < 0)
 	{
-		touching_borders = true;
+		border_touched = 1;
+
+		if (m_collider_type == BoidObject)
+			printf("touching border: left. pos: %f, %f. vector: %f, %f\n", position.x, position.y, speed.x, speed.y);
 	}
 	if (position.x + speed.x*border_test_duration + size.x / 2 > REF_WINDOW_RESOLUTION_X  && speed.x > 0)
 	{
-		touching_borders = true;
+		border_touched = 2;
+
+		if (m_collider_type == BoidObject)
+			printf("touching border: right. pos: %f, %f. vector: %f, %f\n", position.x, position.y, speed.x, speed.y);
 	}
 	if (position.y + speed.y*border_test_duration - size.y / 2 < 0 && speed.y < 0)
 	{
-		touching_borders = true;
+		border_touched = 3;
+
+		if (m_collider_type == BoidObject)
+			printf("touching border: up. pos: %f, %f. vector: %f, %f\n", position.x, position.y, speed.x, speed.y);
 	}
 	if (position.y + speed.y*border_test_duration + size.y / 2 > REF_WINDOW_RESOLUTION_Y && speed.y > 0)
 	{
-		touching_borders = true;
+		border_touched = 4;
+
+		if (m_collider_type == BoidObject)
+			printf("touching border: down. pos: %f, %f. vector: %f, %f\n", position.x, position.y, speed.x, speed.y);
 	}
 
-	return touching_borders;
+	return border_touched > 0;
 }

@@ -111,6 +111,7 @@ public:
 	int m_predators_alive;
 	int m_boids_eaten;
 	bool AddVirtualThreat(sf::Vector2f pos);
+	void WipePrey(GameObject* prey);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

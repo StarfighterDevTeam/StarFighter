@@ -12,7 +12,7 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 	m_alliance = text->m_alliance;
 	m_offset_positionY = offset_positionY;
 
-	m_GarbageMe = false;
+	m_garbageMe = false;
 
 	m_distance_not_faded = distance_not_faded;
 	m_distance_faded = distance_faded;
@@ -56,7 +56,7 @@ void SFTextPop::update(Time deltaTime)
 		else
 		{
 			m_alpha = 0;
-			m_GarbageMe = true;
+			m_garbageMe = true;
 			m_visible = false;
 		}
 
