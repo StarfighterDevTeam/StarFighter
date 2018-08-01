@@ -81,13 +81,13 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
 {
-	this->m_animationNumber = animationNumber;
-	this->m_frameNumber = frameNumber;
-	this->m_size.x = ((*texture).getSize().x / frameNumber);
-	this->m_size.y = ((*texture).getSize().y / animationNumber);
+	m_animationNumber = animationNumber;
+	m_frameNumber = frameNumber;
+	m_size.x = ((*texture).getSize().x / frameNumber);
+	m_size.y = ((*texture).getSize().y / animationNumber);
 
-	this->m_collider_type = GameObjectType::BackgroundObject;
-	this->m_defaultAnimation.setSpriteSheet(*texture);
+	m_collider_type = GameObjectType::BackgroundObject;
+	m_defaultAnimation.setSpriteSheet(*texture);
 	for (int j = 0; j < animationNumber; j++)
 	{
 		for (int i = 0; i < frameNumber; i++)
@@ -98,18 +98,26 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 		}
 	}
 	
-	this->m_currentAnimation = NULL;
-	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
+	m_currentAnimation = NULL;
+	setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
-	this->m_speed = speed;
-	this->setPosition(position.x, position.y);
-	this->m_visible = true;
-	this->m_isOnScene = false;
-	this->m_GarbageMe = false;
-	this->m_DontGarbageMe = false;
-	this->m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
-	this->m_ghost = false;
-	this->m_rotation_speed = 0.f;
+	m_speed = speed;
+	setPosition(position.x, position.y);
+	m_visible = true;
+	m_isOnScene = false;
+	m_GarbageMe = false;
+	m_DontGarbageMe = false;
+	m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	m_ghost = false;
+	m_rotation_speed = 0.f;
+
+	//debug
+	m_center_feedback.setRadius(4);
+	m_center_feedback.setOrigin(sf::Vector2f(4, 4));
+	m_center_feedback.setFillColor(sf::Color(255, 255, 255, 255));
+	m_center_feedback.setOutlineThickness(1);
+	m_center_feedback.setOutlineColor(sf::Color(0, 0, 0, 255));
+	m_center_feedback.setPosition(getPosition());
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -159,6 +167,9 @@ void GameObject::update(sf::Time deltaTime)
 	this->setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
+
+	//debug
+	m_center_feedback.setPosition(getPosition());
 }
 
 void GameObject::updateAnimation(sf::Time deltaTime)
@@ -503,4 +514,14 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 void GameObject::CollisionWithEnemy(GameObject* enemy)
 {
 	//override in class Ship
+}
+
+void GameObject::Draw(sf::RenderTexture& screen)
+{
+	screen.draw(*this);
+
+	if (m_visible)
+	{
+		screen.draw(m_center_feedback);
+	}
 }

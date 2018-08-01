@@ -6,6 +6,7 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
+#include "FX.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -47,6 +48,7 @@ public :
 	void Init();
 	virtual ~Ship();
 	void update(sf::Time deltaTime) override;
+	void Draw(sf::RenderTexture& screen) override;
 	
 	void ManageHudControls(sf::Vector2f inputs_directions);
 	void ManageAcceleration(sf::Vector2f inputs_direction);
@@ -85,6 +87,8 @@ public :
 
 	void CollisionWithEnemy(GameObject* enemy) override;
 
+	//debug
+	CircleShape m_dash_radius_feedback;
 
 private:
 	bool m_moving;

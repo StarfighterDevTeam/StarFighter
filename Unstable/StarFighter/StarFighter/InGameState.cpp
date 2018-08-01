@@ -26,6 +26,10 @@ void InGameState::Initialize(Player player)
 	wufeng->setColor(sf::Color(255, 0, 0, 255));
 	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
 
+	Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y + 200), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	wufeng2->setColor(sf::Color(255, 0, 0, 255));
+	(*CurrentGame).addToScene(wufeng2, EnemyObjectLayer, EnemyObject);
+
 	//Loot
 	Loot* qi = new Loot(sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y - 200), sf::Vector2f(0, 0), "2D/qi.png", sf::Vector2f(20, 24), sf::Vector2f(10, 12));
 	qi->setColor(sf::Color(0, 255, 0, 255));

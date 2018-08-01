@@ -320,7 +320,8 @@ void Game::drawScene()
 				{
 					sf::Vector2f pos = (*it)->getPosition();
 					(*it)->setPosition(sf::Vector2f((*it)->getPosition().x / ISO_FACTOR_X, (*it)->getPosition().y / ISO_FACTOR_Y));
-					m_mainScreen.draw((*(*it)));
+					//m_mainScreen.draw((*(*it)));
+					(*it)->Draw(m_mainScreen);
 					(*it)->setPosition(pos);
 				}
 			}
@@ -603,31 +604,46 @@ GameObject* Game::getDashTarget(float dash_radius)
 {
 	float angle_min = -1;
 	GameObject* player = (GameObject*)m_playerShip;
+	float cur_rotation = player->getRotation() * M_PI / 180.f;
 	GameObject* target = NULL;
 
+	int i = 0;
 	for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyObject])
 	{
 		if (enemy != NULL)
 		{
+			enemy->m_center_feedback.setFillColor(sf::Color(255, 255, 255, 255));
+
 			float distance = GameObject::GetDistanceBetweenPositions(player->getPosition(), enemy->getPosition());
 			if (distance > dash_radius)
 			{
 				continue;
 			}
 
-			float angle = GameObject::GetAngleRadBetweenPositions(player->getPosition(), enemy->getPosition());
+			float rotation = GameObject::GetAngleRadBetweenPositions(enemy->getPosition(), player->getPosition());
+			float angle = cur_rotation - rotation;
 			if (angle < 0)
 			{
 				angle = -angle;
 			}
-			printf("angle dash target scanning: %f\n", angle);
 
-			if (angle_min < 0 || angle < angle_min)
+			printf("scan %d: %f\n", i, angle);
+
+			if (angle_min < 0 || angle < angle_min || 2*M_PI - angle < angle_min)
 			{
 				target = enemy;
 				angle_min = angle;
+				printf("OK %d: %f\n", i, angle_min);
 			}
+
+			i++;
+
 		}
+	}
+
+	if (target)
+	{
+		target->m_center_feedback.setFillColor(sf::Color(0, 255, 0, 255));
 	}
 
 	return target;

@@ -34,6 +34,14 @@ void Ship::Init()
 
 	m_dash_radius = DASH_RADIUS;
 	m_dash_speed = DASH_SPEED;
+
+	//debug
+	m_dash_radius_feedback.setRadius(m_dash_radius);
+	m_dash_radius_feedback.setOrigin(sf::Vector2f(m_dash_radius, m_dash_radius));
+	m_dash_radius_feedback.setFillColor(sf::Color(0, 0, 0, 0));
+	m_dash_radius_feedback.setOutlineThickness(1);
+	m_dash_radius_feedback.setOutlineColor(sf::Color(255, 255, 255, 30));
+	m_dash_radius_feedback.setPosition(getPosition());
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -73,6 +81,7 @@ void Ship::update(sf::Time deltaTime)
 	UpdateInputStates();
 	
 	//DASH
+	GameObject* dash_enemy = (*CurrentGame).getDashTarget(m_dash_radius);
 	if (m_state == Character_Idle)
 	{
 		ManageAcceleration(inputs_direction);
@@ -86,12 +95,11 @@ void Ship::update(sf::Time deltaTime)
 			float cur_angle = (getRotation() - 180) / 180 * M_PI;
 			sf::Vector2f dash_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_dash_radius, cur_angle);
 
-			GameObject* enemy = (*CurrentGame).getDashTarget(m_dash_radius);
-			if (enemy)
+			if (dash_enemy)
 			{
-				m_dash_enemy = enemy;
+				m_dash_enemy = dash_enemy;
 
-				dash_vector = enemy->getPosition() - getPosition();
+				dash_vector = m_dash_enemy->getPosition() - getPosition();
 
 				m_overdash_distance = GetAbsoluteSpeed(dash_vector) * 0.5f;
 				dash_vector += dash_vector * 0.5f;
@@ -157,7 +165,11 @@ void Ship::update(sf::Time deltaTime)
 		m_SFTargetPanel->Update(deltaTime);
 	}
 
-	ScreenBorderContraints();	
+	ScreenBorderContraints();
+
+	m_dash_radius_feedback.setPosition(getPosition());
+	m_dash_radius_feedback.setRadius(m_dash_radius);
+	m_dash_radius_feedback.setOrigin(sf::Vector2f(m_dash_radius, m_dash_radius));
 }
 
 bool Ship::ScreenBorderContraints()
@@ -370,5 +382,15 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 	if (enemy == m_dash_enemy)
 	{
 		m_dash_enemy = NULL;
+	}
+}
+
+void Ship::Draw(sf::RenderTexture& screen)
+{
+	GameObject::Draw(screen);
+
+	if (m_visible)
+	{
+		screen.draw(m_dash_radius_feedback);
 	}
 }
