@@ -11,7 +11,7 @@ Ship::Ship()
 }
 
 #define DASH_RADIUS					300.f
-#define DASH_SPEED					800
+#define DASH_SPEED					1800
 #define DASH_COOLDOWN				1.f
 
 
@@ -468,4 +468,10 @@ bool Ship::DealDamage(int dmg)
 void Ship::Death()
 {
 	m_visible = false;
+}
+
+void Ship::GetLoot(GameObject* loot)
+{
+	loot->m_GarbageMe = true;
+	loot->m_visible = false;
 }

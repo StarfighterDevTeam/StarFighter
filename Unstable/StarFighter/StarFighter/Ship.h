@@ -97,6 +97,7 @@ public :
 	void SetDashEnemy(GameObject* enemy) override;
 	bool DealDamage(int dmg) override;
 	void Death() override;
+	void GetLoot(GameObject* loot) override;
 
 	//debug
 	CircleShape m_dash_radius_feedback;

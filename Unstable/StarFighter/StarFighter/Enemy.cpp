@@ -66,4 +66,5 @@ bool Enemy::DealDamage(int dmg)
 void Enemy::Death()
 {
 	m_GarbageMe = true;
+	m_visible = false;
 }

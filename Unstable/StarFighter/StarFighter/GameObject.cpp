@@ -539,10 +539,16 @@ void GameObject::SetDashEnemy(GameObject* enemy)
 
 bool GameObject::DealDamage(int dmg)
 {
+	//see override function in class Ship and Enemy
 	return false;
 }
 
 void GameObject::Death()
 {
+	//see override function in class Ship and Enemy
+}
 
+void GameObject::GetLoot(GameObject* loot)
+{
+	//see override function in class Ship
 }

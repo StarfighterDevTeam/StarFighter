@@ -95,6 +95,7 @@ public:
 	virtual void SetDashEnemy(GameObject* enemy);
 	virtual bool DealDamage(int dmg);
 	virtual void Death();
+	virtual void GetLoot(GameObject* loot);
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();
