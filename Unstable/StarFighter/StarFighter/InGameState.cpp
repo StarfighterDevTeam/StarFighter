@@ -21,6 +21,17 @@ void InGameState::Initialize(Player player)
 	//Loading scripts
 	LoadCSVFile(SHIP_CSV_FILE);
 
+	//Enemy
+	Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + 200, SHIP_START_Y + 200), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	wufeng->setColor(sf::Color(255, 0, 0, 255));
+	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
+
+	//Loot
+	Loot* qi = new Loot(sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y - 200), sf::Vector2f(0, 0), "2D/qi.png", sf::Vector2f(20, 24), sf::Vector2f(10, 12));
+	qi->setColor(sf::Color(0, 255, 0, 255));
+	(*CurrentGame).addToScene(qi, LootObjectLayer, LootObject);
+
+	//Map
 	GameObject* background = new GameObject(sf::Vector2f(1980, 1080), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980 * 2, 1080 * 2), sf::Vector2f(1980, 1080));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
@@ -72,7 +83,7 @@ void InGameState::Release()
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
 {
-	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y * deltaTime.asSeconds()));//3D Iso = movement on Y axis are twice slower on screen due to the perspective
+	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y / 2 * deltaTime.asSeconds()));//3D Iso = movement on Y axis are twice slower on screen due to the perspective
 
 	//Map border constraints
 	const float x = (*CurrentGame).m_view.getSize().x / 2;

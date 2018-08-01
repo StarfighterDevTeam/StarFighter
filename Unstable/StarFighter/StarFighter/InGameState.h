@@ -9,6 +9,8 @@
 #include "Ship.h"
 #include "SFPanelSpecific.h"
 #include "FileLoadUtils.h"
+#include "Enemy.h"
+#include "Loot.h"
 
 class GameObject;
 

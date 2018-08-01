@@ -27,6 +27,7 @@ enum LayerType {
 	AuraLayer,
 	FeedbacksLayer,
 	FriendlyFireLayer,
+	LootObjectLayer,
 	PlayerShipLayer,
 	EnemyFireLayer,
 
