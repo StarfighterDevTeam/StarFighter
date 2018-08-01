@@ -91,6 +91,10 @@ public:
 	std::string m_textureName;
 	sf::Vector2f m_speed;
 	virtual void CollisionWithEnemy(GameObject* enemy);
+	virtual GameObject* GetDashEnemy();
+	virtual void SetDashEnemy(GameObject* enemy);
+	virtual bool DealDamage(int dmg);
+	virtual void Death();
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

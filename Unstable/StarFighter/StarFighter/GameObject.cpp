@@ -513,7 +513,7 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 
 void GameObject::CollisionWithEnemy(GameObject* enemy)
 {
-	//override in class Ship
+	//see override function in class Ship
 }
 
 void GameObject::Draw(sf::RenderTexture& screen)
@@ -524,4 +524,25 @@ void GameObject::Draw(sf::RenderTexture& screen)
 	{
 		screen.draw(m_center_feedback);
 	}
+}
+
+GameObject* GameObject::GetDashEnemy()
+{
+	//see override function in class Ship
+	return NULL;
+}
+
+void GameObject::SetDashEnemy(GameObject* enemy)
+{
+	//see override function in class Ship
+}
+
+bool GameObject::DealDamage(int dmg)
+{
+	return false;
+}
+
+void GameObject::Death()
+{
+
 }

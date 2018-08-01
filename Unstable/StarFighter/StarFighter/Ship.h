@@ -84,8 +84,19 @@ public :
 	GameObject* m_dash_enemy;
 	float m_dash_speed;
 	float m_dash_radius;
+	float m_dash_cooldown;
+	sf::Clock m_dash_cooldown_clock;
+	bool m_dash_first_time;
+
+	//melee
+	int m_dmg;
+	int m_hp;
 
 	void CollisionWithEnemy(GameObject* enemy) override;
+	GameObject* GetDashEnemy() override;
+	void SetDashEnemy(GameObject* enemy) override;
+	bool DealDamage(int dmg) override;
+	void Death() override;
 
 	//debug
 	CircleShape m_dash_radius_feedback;

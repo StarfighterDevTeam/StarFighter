@@ -592,7 +592,7 @@ std::vector<GameObject*> Game::GetSceneGameObjectsTyped(GameObjectType type)
 
 void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY)
 {
-	SFText* text_feedback = new SFText(m_font[font], 16, color, sf::Vector2f(position.x, position.y), team);
+	SFText* text_feedback = new SFText(m_font[font], size, color, sf::Vector2f(position.x, position.y), team);
 	SFTextPop* pop_feedback = new SFTextPop(text_feedback, distance_not_faded, distance_faded, total_pop_time, follow_target, offset_positionY);
 	pop_feedback->setString(text);
 	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
@@ -607,7 +607,6 @@ GameObject* Game::getDashTarget(float dash_radius)
 	float cur_rotation = player->getRotation() * M_PI / 180.f;
 	GameObject* target = NULL;
 
-	int i = 0;
 	for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyObject])
 	{
 		if (enemy != NULL)
@@ -627,17 +626,11 @@ GameObject* Game::getDashTarget(float dash_radius)
 				angle = -angle;
 			}
 
-			printf("scan %d: %f\n", i, angle);
-
 			if (angle_min < 0 || angle < angle_min || 2*M_PI - angle < angle_min)
 			{
 				target = enemy;
 				angle_min = angle;
-				printf("OK %d: %f\n", i, angle_min);
 			}
-
-			i++;
-
 		}
 	}
 

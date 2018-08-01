@@ -14,6 +14,9 @@ public :
 	~Enemy();
 	void update(sf::Time deltaTime) override;
 
+	bool DealDamage(int dmg) override;
+	void Death() override;
+
 	int m_hp;
 };
 

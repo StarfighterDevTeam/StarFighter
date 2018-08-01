@@ -12,6 +12,7 @@ Ship::Ship()
 
 #define DASH_RADIUS					300.f
 #define DASH_SPEED					2000.f
+#define DASH_COOLDOWN				1.f
 
 
 void Ship::Init()
@@ -34,12 +35,18 @@ void Ship::Init()
 
 	m_dash_radius = DASH_RADIUS;
 	m_dash_speed = DASH_SPEED;
+	m_dash_cooldown = DASH_COOLDOWN;
+
+	m_dash_first_time = true;
+
+	m_hp = 3;
+	m_dmg = 1;
 
 	//debug
 	m_dash_radius_feedback.setRadius(m_dash_radius);
 	m_dash_radius_feedback.setOrigin(sf::Vector2f(m_dash_radius, m_dash_radius));
 	m_dash_radius_feedback.setFillColor(sf::Color(0, 0, 0, 0));
-	m_dash_radius_feedback.setOutlineThickness(1);
+	m_dash_radius_feedback.setOutlineThickness(2);
 	m_dash_radius_feedback.setOutlineColor(sf::Color(255, 255, 255, 30));
 	m_dash_radius_feedback.setPosition(getPosition());
 }
@@ -88,30 +95,36 @@ void Ship::update(sf::Time deltaTime)
 
 		if (m_inputs_states[Action_Firing] == Input_Tap)
 		{
-			//do some action
-			(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
-			m_state = Character_Dash;
-
-			float cur_angle = (getRotation() - 180) / 180 * M_PI;
-			sf::Vector2f dash_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_dash_radius, cur_angle);
-
-			if (dash_enemy)
+			if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
 			{
-				m_dash_enemy = dash_enemy;
+				//do some action
 
-				dash_vector = m_dash_enemy->getPosition() - getPosition();
+				m_dash_first_time = false;
 
-				m_overdash_distance = GetAbsoluteSpeed(dash_vector) * 0.5f;
-				dash_vector += dash_vector * 0.5f;
+				(*CurrentGame).CreateSFTextPop("Dash", Font_Arial, 24, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
+				m_state = Character_Dash;
+
+				float cur_angle = (getRotation() - 180) / 180 * M_PI;
+				sf::Vector2f dash_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_dash_radius, cur_angle);
+
+				if (dash_enemy)
+				{
+					m_dash_enemy = dash_enemy;
+
+					dash_vector = m_dash_enemy->getPosition() - getPosition();
+
+					m_overdash_distance = GetAbsoluteSpeed(dash_vector) * 0.5f;
+					dash_vector += dash_vector * 0.5f;
+				}
+
+				//dash_vector = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));;
+				m_dash_target = getPosition() + dash_vector;
+
+				m_speed = dash_vector;
+				//m_speed = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));
+				//m_speed = dash_vector;
+				ScaleSpeed(&m_speed, m_dash_speed);
 			}
-
-			//dash_vector = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));;
-			m_dash_target = getPosition() + dash_vector;
-
-			m_speed = dash_vector;
-			//m_speed = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));
-			//m_speed = dash_vector;
- 			ScaleSpeed(&m_speed, m_dash_speed);
 		}
 	}
 
@@ -143,9 +156,12 @@ void Ship::update(sf::Time deltaTime)
 			m_speed = sf::Vector2f(0, 0);
 			setPosition(m_dash_target);
 			m_state = Character_Idle;
+			m_dash_cooldown_clock.restart();
 		}
+
+		PlayStroboscopicEffect(sf::seconds(0.1f), sf::seconds(0.005f));
 		
-		printf("Speed: %f, %f (angle: %f)\n", m_speed.x, m_speed.y, GetAngleRadBetweenPositions(getPosition(), m_dash_target));
+		//printf("Speed: %f, %f (angle: %f)\n", m_speed.x, m_speed.y, GetAngleRadBetweenPositions(getPosition(), m_dash_target));
 	}
 
 	//MaxSpeedConstraints();
@@ -165,11 +181,36 @@ void Ship::update(sf::Time deltaTime)
 		m_SFTargetPanel->Update(deltaTime);
 	}
 
-	ScreenBorderContraints();
+	if (ScreenBorderContraints())
+	{
+		if (m_state == Character_Dash)
+		{
+			m_state = Character_Idle;
+			m_speed = sf::Vector2f(0, 0);
+			m_dash_cooldown_clock.restart();
+		}
+	}
 
+	//debug
 	m_dash_radius_feedback.setPosition(getPosition());
 	m_dash_radius_feedback.setRadius(m_dash_radius);
 	m_dash_radius_feedback.setOrigin(sf::Vector2f(m_dash_radius, m_dash_radius));
+
+	if (m_state == Character_Idle)
+	{
+		if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
+		{
+			m_center_feedback.setFillColor(sf::Color(255, 255, 255, 255));
+		}
+		else
+		{
+			m_center_feedback.setFillColor(sf::Color(255, 128, 0, 255));
+		}
+	}
+	if (m_state == Character_Dash)
+	{
+		m_center_feedback.setFillColor(sf::Color(255, 0, 0, 255));
+	}
 }
 
 bool Ship::ScreenBorderContraints()
@@ -381,6 +422,12 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 {
 	if (enemy == m_dash_enemy)
 	{
+		m_dash_enemy->DealDamage(m_dmg);
+
+		ostringstream ss;
+		ss << "-" << m_dmg;
+		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Red, m_dash_enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
+
 		m_dash_enemy = NULL;
 	}
 }
@@ -393,4 +440,32 @@ void Ship::Draw(sf::RenderTexture& screen)
 	{
 		screen.draw(m_dash_radius_feedback);
 	}
+}
+
+GameObject* Ship::GetDashEnemy()
+{
+	return m_dash_enemy;
+}
+
+void Ship::SetDashEnemy(GameObject* enemy)
+{
+	m_dash_enemy = enemy;
+}
+
+bool Ship::DealDamage(int dmg)
+{
+	m_hp -= dmg;
+
+	if (m_hp <= 0)
+	{
+		Death();
+		return true;
+	}
+
+	return false;
+}
+
+void Ship::Death()
+{
+	m_visible = false;
 }
