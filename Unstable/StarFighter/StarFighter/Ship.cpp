@@ -24,6 +24,9 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	m_state = Character_Idle;
+	m_dash_enemy = NULL;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -46,6 +49,9 @@ void Ship::SetControllerType(ControlerType contoller)
 	m_controllerType = contoller;
 }
 
+#define DASH_SPEED					1200
+#define DASH_DEFAULT_DISTANCE		300
+
 void Ship::update(sf::Time deltaTime)
 {
 	m_previous_speed = m_speed;
@@ -59,18 +65,80 @@ void Ship::update(sf::Time deltaTime)
 		m_movingY = inputs_direction.y != 0;
 	}
 
-	ManageAcceleration(inputs_direction);
-	
 	//Action input
 	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
+	
+	//DASH
+	if (m_state == Character_Idle)
 	{
-		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		ManageAcceleration(inputs_direction);
+
+		if (m_inputs_states[Action_Firing] == Input_Tap)
+		{
+			//do some action
+			(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
+			m_state = Character_Dash;
+
+			float cur_angle = (getRotation() - 180) / 180 * M_PI;
+			sf::Vector2f dash_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(DASH_DEFAULT_DISTANCE, cur_angle);
+
+			GameObject* enemy = (*CurrentGame).getDashTarget();
+			if (enemy)
+			{
+				m_dash_enemy = enemy;
+
+				dash_vector = enemy->getPosition() - getPosition();
+
+				m_overdash_distance = GetAbsoluteSpeed(dash_vector) * 0.5f;
+				dash_vector += dash_vector * 0.5f;
+			}
+
+			m_dash_target = getPosition() + dash_vector;
+
+			m_speed = sf::Vector2f(dash_vector.x, dash_vector.y * 2);
+ 			ScaleSpeed(&m_speed, DASH_SPEED);
+		}
 	}
 
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
+	if (m_state == Character_Dash)
+	{
+		sf::Vector2f dash_vector = m_dash_target - getPosition();
+
+		//enemy position update
+		if (m_dash_enemy != NULL)
+		{
+			dash_vector = m_dash_enemy->getPosition() - getPosition();
+
+			sf::Vector2f overdash_vector = dash_vector;
+			ScaleSpeed(&overdash_vector, m_overdash_distance);
+		
+			dash_vector += overdash_vector;
+		
+			m_dash_target = getPosition() + dash_vector;
+		}
+
+		float dist_to_target = GetDistanceBetweenPositions(getPosition(), m_dash_target);
+		if (dist_to_target > DASH_SPEED * deltaTime.asSeconds())
+		{
+			//m_speed = dash_vector;
+			//ScaleSpeed(&m_speed, DASH_SPEED);
+		}
+		else
+		{
+			m_speed = sf::Vector2f(0, 0);
+			setPosition(m_dash_target);
+			m_state = Character_Idle;
+		}
+		
+		printf("Speed: %f, %f (angle: %f)\n", m_speed.x, m_speed.y, GetAngleRadBetweenPositions(getPosition(), m_dash_target));
+	}
+
+	//MaxSpeedConstraints();
+	if (m_state == Character_Idle)
+	{
+		IdleDecelleration(deltaTime);
+	}
+	
 	UpdateRotation();
 
 	GameObject::update(deltaTime);
@@ -125,25 +193,19 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 	//idle decceleration
 	if (!m_movingX)
 	{
-		m_speed.x -= m_speed.x*deltaTime.asSeconds()* SHIP_DECCELERATION_COEF / 100.f;
-
-		if (abs(m_speed.x) < SHIP_MIN_SPEED)
-			m_speed.x = 0;
+		m_speed.x = 0;
 	}
 
 	if (!m_movingY)
 	{
-		m_speed.y -= m_speed.y*deltaTime.asSeconds()*SHIP_DECCELERATION_COEF / 100.f;
-
-		if (abs(m_speed.y) < SHIP_MIN_SPEED)
-			m_speed.y = 0;
+		m_speed.y = 0;
 	}
 }
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
 	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	m_speed.y += inputs_direction.y*SHIP_ACCELERATION;
+	m_speed.y += inputs_direction.y *SHIP_ACCELERATION;
 
 	//max speed constraints
 	if (abs(m_speed.x) > SHIP_MAX_SPEED)
@@ -293,5 +355,13 @@ bool Ship::LoadShip(Ship* ship)
 	{
 		cerr << "DEBUG: No save file found. A new file is going to be created.\n" << endl;
 		return false;
+	}
+}
+
+void Ship::CollisionWithEnemy(GameObject* enemy)
+{
+	if (enemy == m_dash_enemy)
+	{
+		m_dash_enemy = NULL;
 	}
 }

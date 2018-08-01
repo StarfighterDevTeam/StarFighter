@@ -342,6 +342,19 @@ void Game::colisionChecksV2()
 		if (*it1 == NULL)
 			continue;
 
+		//Player hitting enemy
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it1)->CollisionWithEnemy(*it2);
+			}
+		}
+
 		//Enemy bullets hitting the player
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
 		{
@@ -581,4 +594,41 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
+}
+
+
+#define DASH_RADIUS		300
+
+GameObject* Game::getDashTarget()
+{
+	float angle_min = -1;
+	GameObject* player = (GameObject*)m_playerShip;
+	GameObject* target = NULL;
+
+	for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyObject])
+	{
+		if (enemy != NULL)
+		{
+			float distance = GameObject::GetDistanceBetweenPositions(player->getPosition(), enemy->getPosition());
+			if (distance > DASH_RADIUS)
+			{
+				continue;
+			}
+
+			float angle = GameObject::GetAngleRadBetweenPositions(player->getPosition(), enemy->getPosition());
+			if (angle < 0)
+			{
+				angle = -angle;
+			}
+			printf("angle dash target scanning: %f\n", angle);
+
+			if (angle_min < 0 || angle < angle_min)
+			{
+				target = enemy;
+				angle_min = angle;
+			}
+		}
+	}
+
+	return target;
 }

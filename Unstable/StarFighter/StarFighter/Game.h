@@ -103,6 +103,8 @@ public:
 	void PlayMusic(Music_Bank music, string specific_filename = "");
 	void ManageMusicTransitions(sf::Time deltaTime);
 
+	GameObject* getDashTarget();
+
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 

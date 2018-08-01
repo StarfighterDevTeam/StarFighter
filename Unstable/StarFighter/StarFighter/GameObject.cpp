@@ -321,7 +321,7 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 
 float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
-	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
+	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, (position1.y - position2.y));
 	return GetAbsoluteSpeed(current_diff);
 }
 
@@ -497,4 +497,9 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 	}
 
 	return pixels;
+}
+
+void GameObject::CollisionWithEnemy(GameObject* enemy)
+{
+	//override in class Ship
 }

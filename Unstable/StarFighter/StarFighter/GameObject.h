@@ -89,6 +89,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+	virtual void CollisionWithEnemy(GameObject* enemy);
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

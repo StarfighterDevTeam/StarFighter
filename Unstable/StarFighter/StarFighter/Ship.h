@@ -10,7 +10,7 @@
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
 #define SHIP_ACCELERATION	        2000.0f
-#define SHIP_DECCELERATION_COEF		5000.0f
+#define SHIP_DECCELERATION_COEF		0.f
 #define SHIP_MAX_SPEED				400.0f
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
@@ -29,6 +29,12 @@ enum PlayerInputStates
 	Input_Release,//0
 	Input_Tap,//1
 	Input_Hold,//2
+};
+
+enum CharacterStates
+{
+	Character_Idle,
+	Character_Dash,
 };
 
 class Ship : public GameObject
@@ -66,6 +72,13 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	CharacterStates m_state;
+	sf::Vector2f m_dash_target;
+	float m_overdash_distance;
+	GameObject* m_dash_enemy;
+	void CollisionWithEnemy(GameObject* enemy) override;
+
 
 private:
 	bool m_moving;
