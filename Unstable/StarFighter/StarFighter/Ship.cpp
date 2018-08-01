@@ -48,6 +48,8 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	m_previous_speed = m_speed;
+
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
 
 	if (!m_disable_inputs)
@@ -164,6 +166,12 @@ void Ship::MaxSpeedConstraints()
 
 void Ship::UpdateRotation()
 {
+	//anti ghost-inputs, helps cleaning movements especially when the character stops
+	if (m_speed != m_previous_speed)
+	{
+		return;
+	}
+
 	//turning toward targeted position
 	if (m_speed.x == 0 && m_speed.y == 0)
 	{

@@ -148,7 +148,8 @@ GameObject::~GameObject()
 void GameObject::update(sf::Time deltaTime)
 {
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->m_speed;
+
+	newspeed = sf::Vector2f(m_speed.x, m_speed.y / 2);//3D Iso = movement on Y axis are twice slower on screen due to the perspective
 	
 	//Basic movement (initial vector)
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();

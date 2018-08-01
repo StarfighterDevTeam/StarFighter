@@ -21,7 +21,7 @@ void InGameState::Initialize(Player player)
 	//Loading scripts
 	LoadCSVFile(SHIP_CSV_FILE);
 
-	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
+	GameObject* background = new GameObject(sf::Vector2f(1980, 1080), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980 * 2, 1080 * 2), sf::Vector2f(1980, 1080));
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = background->m_size;
@@ -72,7 +72,7 @@ void InGameState::Release()
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
 {
-	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y * deltaTime.asSeconds()));
+	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y * deltaTime.asSeconds()));//3D Iso = movement on Y axis are twice slower on screen due to the perspective
 
 	//Map border constraints
 	const float x = (*CurrentGame).m_view.getSize().x / 2;

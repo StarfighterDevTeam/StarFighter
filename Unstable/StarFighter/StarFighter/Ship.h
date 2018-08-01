@@ -71,6 +71,8 @@ private:
 	bool m_moving;
 	bool m_movingX;
 	bool m_movingY;
+
+	sf::Vector2f m_previous_speed;
 };
 
 #endif // SHIP_H_INCLUDED
