@@ -10,6 +10,10 @@ Ship::Ship()
 	
 }
 
+#define DASH_RADIUS					300.f
+#define DASH_SPEED					2000.f
+
+
 void Ship::Init()
 {
 	m_collider_type = GameObjectType::PlayerShip;
@@ -27,6 +31,9 @@ void Ship::Init()
 
 	m_state = Character_Idle;
 	m_dash_enemy = NULL;
+
+	m_dash_radius = DASH_RADIUS;
+	m_dash_speed = DASH_SPEED;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -48,9 +55,6 @@ void Ship::SetControllerType(ControlerType contoller)
 {
 	m_controllerType = contoller;
 }
-
-#define DASH_SPEED					1200
-#define DASH_DEFAULT_DISTANCE		300
 
 void Ship::update(sf::Time deltaTime)
 {
@@ -80,9 +84,9 @@ void Ship::update(sf::Time deltaTime)
 			m_state = Character_Dash;
 
 			float cur_angle = (getRotation() - 180) / 180 * M_PI;
-			sf::Vector2f dash_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(DASH_DEFAULT_DISTANCE, cur_angle);
+			sf::Vector2f dash_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_dash_radius, cur_angle);
 
-			GameObject* enemy = (*CurrentGame).getDashTarget();
+			GameObject* enemy = (*CurrentGame).getDashTarget(m_dash_radius);
 			if (enemy)
 			{
 				m_dash_enemy = enemy;
@@ -93,10 +97,13 @@ void Ship::update(sf::Time deltaTime)
 				dash_vector += dash_vector * 0.5f;
 			}
 
+			//dash_vector = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));;
 			m_dash_target = getPosition() + dash_vector;
 
-			m_speed = sf::Vector2f(dash_vector.x, dash_vector.y * 2);
- 			ScaleSpeed(&m_speed, DASH_SPEED);
+			m_speed = dash_vector;
+			//m_speed = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));
+			//m_speed = dash_vector;
+ 			ScaleSpeed(&m_speed, m_dash_speed);
 		}
 	}
 

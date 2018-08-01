@@ -29,6 +29,9 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define STARTSCENE_X_RATIO						0.5f
 #define STARTSCENE_Y_RATIO						0.85f
 
+#define ISO_FACTOR_X							1.0f
+#define ISO_FACTOR_Y							1.0f//0.5f
+
 #define ICON_SHIP_PNG							"Icons/ShipModel_icon.png"
 
 #define	GHOST_ALPHA_VALUE						120

@@ -318,7 +318,10 @@ void Game::drawScene()
 
 				if ((*(*it)).m_visible)
 				{
+					sf::Vector2f pos = (*it)->getPosition();
+					(*it)->setPosition(sf::Vector2f((*it)->getPosition().x / ISO_FACTOR_X, (*it)->getPosition().y / ISO_FACTOR_Y));
 					m_mainScreen.draw((*(*it)));
+					(*it)->setPosition(pos);
 				}
 			}
 		}
@@ -596,10 +599,7 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	addToFeedbacks(pop_feedback);
 }
 
-
-#define DASH_RADIUS		300
-
-GameObject* Game::getDashTarget()
+GameObject* Game::getDashTarget(float dash_radius)
 {
 	float angle_min = -1;
 	GameObject* player = (GameObject*)m_playerShip;
@@ -610,7 +610,7 @@ GameObject* Game::getDashTarget()
 		if (enemy != NULL)
 		{
 			float distance = GameObject::GetDistanceBetweenPositions(player->getPosition(), enemy->getPosition());
-			if (distance > DASH_RADIUS)
+			if (distance > dash_radius)
 			{
 				continue;
 			}

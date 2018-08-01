@@ -15,6 +15,7 @@
 #define SHIP_MIN_SPEED				50.0f
 #define SHIP_SPRITE_RATE_SEC        0.2f
 
+
 enum PlayerActions
 {
 	Action_Idle,
@@ -74,9 +75,14 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 
 	CharacterStates m_state;
+
+	//dash
 	sf::Vector2f m_dash_target;
 	float m_overdash_distance;
 	GameObject* m_dash_enemy;
+	float m_dash_speed;
+	float m_dash_radius;
+
 	void CollisionWithEnemy(GameObject* enemy) override;
 
 

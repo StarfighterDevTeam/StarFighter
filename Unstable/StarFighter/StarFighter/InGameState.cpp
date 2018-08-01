@@ -83,7 +83,7 @@ void InGameState::Release()
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
 {
-	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y / 2 * deltaTime.asSeconds()));//3D Iso = movement on Y axis are twice slower on screen due to the perspective
+	(*CurrentGame).m_view.move(sf::Vector2f((*CurrentGame).m_playerShip->m_speed.x * ISO_FACTOR_X * deltaTime.asSeconds(), (*CurrentGame).m_playerShip->m_speed.y * ISO_FACTOR_Y * deltaTime.asSeconds()));//3D Iso = movement on Y axis are twice slower on screen due to the perspective
 
 	//Map border constraints
 	const float x = (*CurrentGame).m_view.getSize().x / 2;
