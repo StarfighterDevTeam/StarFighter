@@ -18,7 +18,7 @@
 enum PlayerActions
 {
 	Action_Idle,
-	Action_Firing,
+	Action_Jumping,
 	Action_Muting,
 	Action_Pausing,
 	NBVAL_PlayerActions,
@@ -29,6 +29,14 @@ enum PlayerInputStates
 	Input_Release,//0
 	Input_Tap,//1
 	Input_Hold,//2
+};
+
+enum CharacterStates
+{
+	Character_Ground,//0
+	Character_Jump1,//1
+	Character_Dash1,//2
+	Character_Fall1,//2
 };
 
 class Ship : public GameObject
@@ -56,6 +64,9 @@ public :
 	void SetControllerType(ControlerType contoller);
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
 	void UpdateInputStates();
+	void ManageInputs(sf::Time deltaTime);
+	void Jump();
+	float JumpEasing(float jump_ratio);
 	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
 	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 
@@ -66,6 +77,11 @@ public :
 
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
+
+	CharacterStates m_state;
+	sf::Clock m_jump_clock;
+	float m_jump_altitude;
+	float m_jump_duration;
 
 private:
 	bool m_moving;

@@ -110,6 +110,9 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	this->m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	this->m_ghost = false;
 	this->m_rotation_speed = 0.f;
+
+	m_speed_z = 0.f;
+	m_altitude = 0.f;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -153,7 +156,13 @@ void GameObject::update(sf::Time deltaTime)
 	
 	//Basic movement (initial vector)
 	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds() - m_speed_z;
+
+	if (m_speed.y < 0)
+	{
+		float diff = getPosition().y - newposition.y;
+		printf("diff y : %f\n", diff);
+	}
 
 	this->setPosition(newposition.x, newposition.y);
 

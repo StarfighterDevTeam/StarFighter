@@ -6,8 +6,8 @@
 #include <iostream>
 #include <sstream>
 #include "Game.h"
-#include "Ship.h"
 #include "SFPanelSpecific.h"
+#include "Ship.h"
 #include "FileLoadUtils.h"
 #include "Enemy.h"
 #include "Loot.h"

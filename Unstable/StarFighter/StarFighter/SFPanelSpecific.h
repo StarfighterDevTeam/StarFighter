@@ -2,6 +2,7 @@
 #define SFMENU_H_INCLUDED
 
 #include "Game.h"
+#include "Ship.h"
 
 class SFPanelSpecific : public SFPanel
 {

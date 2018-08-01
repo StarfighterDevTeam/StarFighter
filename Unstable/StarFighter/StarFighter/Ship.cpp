@@ -24,6 +24,8 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	m_state = Character_Ground;
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -63,20 +65,17 @@ void Ship::update(sf::Time deltaTime)
 	
 	//Action input
 	UpdateInputStates();
-	if (m_inputs_states[Action_Firing] == Input_Tap)
-	{
-		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
-	}
 
-	MaxSpeedConstraints();
-	IdleDecelleration(deltaTime);
+	ManageInputs(deltaTime);
+
+	//MaxSpeedConstraints();
+	//IdleDecelleration(deltaTime);
 	UpdateRotation();
 
 	GameObject::update(deltaTime);
 
 	//HUD
-	m_is_asking_SFPanel = SFPanel_None;
+	m_is_asking_SFPanel = SFPanel_Specific;//SFPanel_None - normally it is reset to None, but here we are using this panel as debug info
 	if (m_SFTargetPanel)
 	{
 		m_SFTargetPanel->Update(deltaTime);
@@ -210,9 +209,103 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 	}
 }
 
+#define JUMP_ALTITUDE		100.f
+#define JUMP_DURATION		1.0f
+#define FALL_SPEED			800
+
+void Ship::Jump()
+{
+	(*CurrentGame).CreateSFTextPop("jump", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
+}
+
+float Ship::JumpEasing(float jump_ratio)
+{
+	if (jump_ratio < 0)
+	{
+		jump_ratio = 0.f;
+	}
+
+	if (jump_ratio > 1.0f)
+	{
+		jump_ratio = 1.f;
+	}
+
+	float output;
+
+	output = jump_ratio;
+
+	return output;
+}
+
+void Ship::ManageInputs(sf::Time deltaTime)
+{
+	//m_speed.x = 0;
+	//m_speed.y = 0;
+	float previous_altitude = m_altitude;
+
+	bool asking_jump = m_inputs_states[Action_Jumping] == Input_Tap;
+
+	if (m_state == Character_Fall1)
+	{
+		if (asking_jump)
+		{
+
+		}
+		else // fall
+		{
+			//setPosition(sf::Vector2f(getPosition().x, getPosition().y - FALL_SPEED * deltaTime.asSeconds()));
+		}
+		
+	}
+
+	if (m_state == Character_Ground)
+	{
+		m_speed_z = 0;
+
+		if (asking_jump)
+		{
+			Jump();
+			m_state = Character_Jump1;
+			m_jump_altitude = JUMP_ALTITUDE;
+			m_jump_duration = JUMP_DURATION;
+			m_jump_clock.restart();
+		}
+	}
+
+	if (m_state == Character_Jump1)
+	{
+		//float jump_step = (m_jump_target_altitude - m_jump_current_altitude) * 60 / JUMP_FRAMES * deltaTime.asSeconds();
+		//float jump_step = 1.0f * 60 / JUMP_FRAMES * deltaTime.asSeconds();
+		//
+		//if (m_jump_current_altitude + jump_step < m_jump_target_altitude)//rising up
+		//{
+		//	m_jump_current_altitude += jump_step;
+		//}
+		//else
+		//{
+		//	m_jump_current_altitude = m_jump_target_altitude;
+		//	m_state = Character_Fall1;
+		//}
+
+		float jump_ratio = m_jump_clock.getElapsedTime().asSeconds() / m_jump_duration;
+		m_altitude = m_jump_altitude * JumpEasing(jump_ratio);
+		m_speed_z = m_altitude - previous_altitude;
+
+		if (jump_ratio >= 1.0f)
+		{
+			m_state = Character_Fall1;
+			m_speed_z = 0;
+			printf("COUCOU\n");
+		}
+		
+
+		//m_speed.y -= 2*m_speed_z;
+	}
+}
+
 void Ship::UpdateInputStates()
 {
-	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isFiring(), Action_Jumping);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
