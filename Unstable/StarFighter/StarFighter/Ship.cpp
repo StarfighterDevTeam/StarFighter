@@ -11,7 +11,7 @@ Ship::Ship()
 }
 
 #define DASH_RADIUS					300.f
-#define DASH_SPEED					2000.f
+#define DASH_SPEED					800
 #define DASH_COOLDOWN				1.f
 
 
@@ -148,8 +148,8 @@ void Ship::update(sf::Time deltaTime)
 		float dist_to_target = GetDistanceBetweenPositions(getPosition(), m_dash_target);
 		if (dist_to_target > DASH_SPEED * deltaTime.asSeconds())
 		{
-			//m_speed = dash_vector;
-			//ScaleSpeed(&m_speed, DASH_SPEED);
+			m_speed = dash_vector;
+			ScaleSpeed(&m_speed, DASH_SPEED);
 		}
 		else
 		{
