@@ -35,6 +35,34 @@ bool InputGuy::isFiring(ControlerType device)
 	return false;
 }
 
+bool InputGuy::isDashing(ControlerType device)
+{
+	if (device == AllControlDevices || device == KeyboardControl)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+		{
+			return true;
+		}
+	}
+
+	if (device == AllControlDevices || device >= JoystickControl1)
+	{
+		int joystick = device - JoystickControl1;
+		if (device == AllControlDevices)
+			joystick = 0;// = joystick 1
+
+		if (sf::Joystick::isConnected(joystick))
+		{
+			if (sf::Joystick::isButtonPressed(joystick,2))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool InputGuy::isRestartingScript()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))

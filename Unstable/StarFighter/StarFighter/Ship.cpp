@@ -31,19 +31,22 @@ void Ship::Init()
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
 
-	m_state = Character_Idle;
+	m_move_state = Character_Idle;
 	m_dash_enemy = NULL;
 
 	m_dash_radius = DASH_RADIUS;
 	m_dash_speed = DASH_SPEED;
 	m_dash_cooldown = DASH_COOLDOWN;
 
+	m_is_attacking = false;
+	m_melee_weapon = new Weapon(Weapon_Katana);
+	(*CurrentGame).addToScene(m_melee_weapon, FriendlyFireLayer, FriendlyFire);
+
 	m_dash_first_time = true;
 	m_immune_first_time = true;
 
 	m_hp_max = 3;
 	m_hp = m_hp_max;
-	m_dmg = 1;
 
 	//debug
 	m_dash_radius_feedback.setRadius(m_dash_radius);
@@ -66,7 +69,12 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	
+	if (m_melee_weapon)
+	{
+		m_melee_weapon->m_GarbageMe = true;
+		m_melee_weapon->m_visible = false;
+		m_melee_weapon = NULL;
+	}
 }
 
 void Ship::SetControllerType(ControlerType contoller)
@@ -77,6 +85,7 @@ void Ship::SetControllerType(ControlerType contoller)
 void Ship::update(sf::Time deltaTime)
 {
 	m_previous_speed = m_speed;
+	bool starting_melee_attacking = false;
 
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
 
@@ -92,11 +101,51 @@ void Ship::update(sf::Time deltaTime)
 	
 	//DASH
 	GameObject* dash_enemy = (*CurrentGame).getDashTarget(m_dash_radius);
-	if (m_state == Character_Idle)
+	if (m_move_state == Character_Idle)
 	{
 		ManageAcceleration(inputs_direction);
 
-		if (m_inputs_states[Action_Firing] == Input_Tap && IsImmune() == false)
+		//Melee
+		if (m_is_attacking)//reset
+		{
+			if (m_melee_clock.getElapsedTime().asSeconds() > m_melee_weapon->m_melee_duration)
+			{
+				m_is_attacking = false;
+				m_melee_weapon->m_visible = false;
+				//m_melee_weapon->setScale(sf::Vector2f(0.f, m_melee_weapon->m_melee_range.y));
+				//m_melee_weapon->setScale(sf::Vector2f(0.f, 1.f));
+				m_melee_weapon->Extend(sf::Vector2f(0.f, 1.f));
+			}
+		}
+
+		if (m_inputs_states[Action_Melee] == Input_Tap)//start attack
+		{
+			if (m_melee_weapon && !m_is_attacking)
+			{
+				m_is_attacking = true;
+				starting_melee_attacking = true;
+				m_melee_weapon->m_visible = true;
+				m_melee_clock.restart();
+			}
+		}
+
+		if (m_is_attacking)//update
+		{
+			float ratio = m_melee_clock.getElapsedTime().asSeconds() / m_melee_weapon->m_melee_duration;
+			if (ratio > 1.0f)
+			{
+				ratio = 1.0f;
+			}
+			//m_melee_weapon->setScale(sf::Vector2f(m_melee_weapon->m_melee_range.x * ratio, m_melee_weapon->m_melee_range.y));
+			//sf::Vector2f scale;
+			//scale.x = 1.f / m_melee_weapon->m_size.x * m_melee_weapon->m_melee_range.x;
+			//scale.y = 1.f / m_melee_weapon->m_size.y * m_melee_weapon->m_melee_range.y;
+			//m_melee_weapon->setScale(sf::Vector2f(ratio * scale.x, scale.y));
+			m_melee_weapon->Extend(sf::Vector2f(ratio, 1.f));
+		}
+
+		//Dash?
+		if (m_inputs_states[Action_Dash] == Input_Tap)// && IsImmune() == false)
 		{
 			if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
 			{
@@ -104,7 +153,7 @@ void Ship::update(sf::Time deltaTime)
 				m_dash_first_time = false;
 
 				(*CurrentGame).CreateSFTextPop("Dash", Font_Arial, 24, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
-				m_state = Character_Dash;
+				m_move_state = Character_Dash;
 
 				float cur_angle = (getRotation() - 180) / 180 * M_PI;
 				sf::Vector2f dash_vector = GetSpeedVectorFromAbsoluteSpeedAndAngle(m_dash_radius, cur_angle);
@@ -130,7 +179,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
-	if (m_state == Character_Dash)
+	if (m_move_state == Character_Dash)
 	{
 		sf::Vector2f dash_vector = m_dash_target - getPosition();
 
@@ -157,7 +206,7 @@ void Ship::update(sf::Time deltaTime)
 		{
 			m_speed = sf::Vector2f(0, 0);
 			setPosition(m_dash_target);
-			m_state = Character_Idle;
+			m_move_state = Character_Idle;
 			m_dash_cooldown_clock.restart();
 		}
 
@@ -167,7 +216,7 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	//MaxSpeedConstraints();
-	if (m_state == Character_Idle)
+	if (m_move_state == Character_Idle)
 	{
 		IdleDecelleration(deltaTime);
 	}
@@ -195,20 +244,25 @@ void Ship::update(sf::Time deltaTime)
 
 	if (ScreenBorderContraints())
 	{
-		if (m_state == Character_Dash)
+		if (m_move_state == Character_Dash)
 		{
-			m_state = Character_Idle;
+			m_move_state = Character_Idle;
 			m_speed = sf::Vector2f(0, 0);
 			m_dash_cooldown_clock.restart();
 		}
 	}
+
+	//if (starting_melee_attacking)
+	//{
+		UpdateMeleeWeaponPosition();
+	//}
 
 	//debug
 	m_dash_radius_feedback.setPosition(getPosition());
 	m_dash_radius_feedback.setRadius(m_dash_radius);
 	m_dash_radius_feedback.setOrigin(sf::Vector2f(m_dash_radius, m_dash_radius));
 
-	if (m_state == Character_Idle)
+	if (m_move_state == Character_Idle)
 	{
 		if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
 		{
@@ -219,15 +273,34 @@ void Ship::update(sf::Time deltaTime)
 			m_center_feedback.setFillColor(sf::Color(255, 128, 0, 255));
 		}
 	}
-	if (m_state == Character_Dash)
+	if (m_move_state == Character_Dash)
 	{
 		m_center_feedback.setFillColor(sf::Color(255, 0, 0, 255));
 	}
 
-	if (IsImmune())
-	{
-		m_center_feedback.setFillColor(sf::Color(0, 0, 0, 255));
-	}
+	//if (IsImmune())
+	//{
+	//	m_center_feedback.setFillColor(sf::Color(0, 0, 0, 255));
+	//}
+}
+
+void Ship::UpdateMeleeWeaponPosition()
+{
+	//weapon placement
+	float angle = getRotation() * M_PI / 180.f;
+
+	sf::Vector2f size = sf::Vector2f(m_melee_weapon->getScale().x * m_melee_weapon->m_size.x, m_melee_weapon->getScale().y * m_melee_weapon->m_size.y);
+
+	sf::Vector2f weapon_offset;
+	//weapon_offset.x = (m_size.x / 2 + m_melee_weapon->m_melee_range.x / 2) * sin(angle);
+	//weapon_offset.y = -(m_size.x / 2 + m_melee_weapon->m_melee_range.x / 2) * cos(angle);
+	//m_melee_weapon->setOrigin(m_melee_weapon->m_melee_range * 0.5f);
+	weapon_offset.x = (m_size.x / 2 + size.x / 2) * sin(angle);
+	weapon_offset.y = -(m_size.x / 2 + size.x / 2) * cos(angle);
+	m_melee_weapon->setPosition(getPosition() + weapon_offset);
+	m_melee_weapon->setRotation(getRotation() - 90);
+
+	//printf("ANGLE: %f | OFFSET: %f , %f | SIZE : %f , %f | ORIGIN: %f, %f\n", angle, weapon_offset.x, weapon_offset.y, size.x, size.y, size.x * 0.5f, size.y * 0.5f);
 }
 
 bool Ship::IsImmune()
@@ -358,7 +431,8 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 void Ship::UpdateInputStates()
 {
-	GetInputState(InputGuy::isFiring(), Action_Firing);
+	GetInputState(InputGuy::isFiring(), Action_Melee);
+	GetInputState(InputGuy::isDashing(), Action_Dash);
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
@@ -446,15 +520,16 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 {
 	if (enemy == m_dash_enemy)
 	{
-		m_dash_enemy->DealDamage(m_dmg);
+		int dmg = m_melee_weapon ? m_melee_weapon->m_dmg : 0;
+		m_dash_enemy->DealDamage(dmg);
 
 		ostringstream ss;
-		ss << "-" << m_dmg;
+		ss << "-" << dmg;
 		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, m_dash_enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
 
 		m_dash_enemy = NULL;
 	}
-	else if (m_state != Character_Dash)
+	else if (m_move_state != Character_Dash)
 	{
 		Enemy* enemy_ = (Enemy*)enemy;
 		if (DealDamage(enemy_->m_dmg))
@@ -470,7 +545,7 @@ void Ship::Draw(sf::RenderTexture& screen)
 {
 	GameObject::Draw(screen);
 
-	if (m_visible && IsImmune() == false)
+	if (m_visible)// && IsImmune() == false)
 	{
 		screen.draw(m_dash_radius_feedback);
 	}

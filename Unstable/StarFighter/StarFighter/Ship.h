@@ -8,6 +8,7 @@
 #include "SFTextPop.h"
 #include "FX.h"
 #include "Enemy.h"
+#include "Weapon.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -21,7 +22,8 @@
 enum PlayerActions
 {
 	Action_Idle,
-	Action_Firing,
+	Action_Melee,
+	Action_Dash,
 	Action_Muting,
 	Action_Pausing,
 	NBVAL_PlayerActions,
@@ -34,7 +36,7 @@ enum PlayerInputStates
 	Input_Hold,//2
 };
 
-enum CharacterStates
+enum MoveStates
 {
 	Character_Idle,
 	Character_Dash,
@@ -57,6 +59,7 @@ public :
 	bool ScreenBorderContraints();
 	void MaxSpeedConstraints();
 	void UpdateRotation();
+	void UpdateMeleeWeaponPosition();
 
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
@@ -77,7 +80,7 @@ public :
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 
-	CharacterStates m_state;
+	MoveStates m_move_state;
 
 	//dash
 	sf::Vector2f m_dash_target;
@@ -90,7 +93,10 @@ public :
 	bool m_dash_first_time;
 
 	//melee
-	int m_dmg;
+	Weapon* m_melee_weapon;
+	sf::Clock m_melee_clock;
+	bool m_is_attacking;
+
 	int m_hp;
 	int m_hp_max;
 

@@ -23,8 +23,6 @@ sf::Uint8* Glow::CreateGlowFrame(GameObject* parent, sf::Color color, int glow_t
 
 	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
 
-	ostringstream ss;
-
 	for (int i = 0; i < W * H * 4; i += 4)
 	{
 		pixels[i] = color.r;		// R

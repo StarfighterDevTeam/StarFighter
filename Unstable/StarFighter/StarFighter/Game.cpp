@@ -240,13 +240,17 @@ void Game::updateScene(Time deltaTime)
 	//Checking colisions
 	colisionChecksV2();
 
-	size_t sceneGameObjectsSize = this->m_sceneGameObjects.size();
+	size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	for (size_t i = 0; i < sceneGameObjectsSize; i++)
 	{
 		if (this->m_sceneGameObjects[i] == NULL)
 			continue;
 
-		this->m_sceneGameObjects[i]->update(deltaTime);
+		if (i == FriendlyFire)
+		{
+			printf("");
+		}
+		m_sceneGameObjects[i]->update(deltaTime);
 	}
 
 	//SFTextPop (text feedbacks)
@@ -385,6 +389,29 @@ void Game::colisionChecksV2()
 			}
 		}
 	}
+
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		if ((*it1)->m_visible == false)
+			continue;
+
+		//Weapon hitting enemy
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it1)->CollisionWithEnemy(*it2);
+			}
+		}
+	}
+
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
 }
 

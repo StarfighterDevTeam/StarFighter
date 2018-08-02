@@ -513,7 +513,7 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 
 void GameObject::CollisionWithEnemy(GameObject* enemy)
 {
-	//see override function in class Ship
+	//see override function in class Ship and Weapon
 }
 
 void GameObject::Draw(sf::RenderTexture& screen)
