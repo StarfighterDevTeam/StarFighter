@@ -246,10 +246,6 @@ void Game::updateScene(Time deltaTime)
 		if (this->m_sceneGameObjects[i] == NULL)
 			continue;
 
-		if (i == FriendlyFire)
-		{
-			printf("");
-		}
 		m_sceneGameObjects[i]->update(deltaTime);
 	}
 

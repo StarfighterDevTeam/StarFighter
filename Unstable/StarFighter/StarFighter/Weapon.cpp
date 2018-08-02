@@ -69,11 +69,17 @@ void Weapon::Draw(sf::RenderTexture& screen)
 
 void Weapon::CollisionWithEnemy(GameObject* enemy)
 {
-	enemy->DealDamage(m_dmg);
+	std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy);
+	if (it == m_enemies_tagged.end())
+	{
+		m_enemies_tagged.push_back(enemy);
 
-	ostringstream ss;
-	ss << "-" << m_dmg;
-	(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
+		enemy->DealDamage(m_dmg);
+
+		ostringstream ss;
+		ss << "-" << m_dmg;
+		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
+	}
 }
 
 void Weapon::Extend(sf::Vector2f ratio)

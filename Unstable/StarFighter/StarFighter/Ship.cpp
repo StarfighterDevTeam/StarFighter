@@ -99,7 +99,7 @@ void Ship::update(sf::Time deltaTime)
 	//Action input
 	UpdateInputStates();
 	
-	//DASH
+	//ATTACKS
 	GameObject* dash_enemy = (*CurrentGame).getDashTarget(m_dash_radius);
 	if (m_move_state == Character_Idle)
 	{
@@ -115,6 +115,7 @@ void Ship::update(sf::Time deltaTime)
 				//m_melee_weapon->setScale(sf::Vector2f(0.f, m_melee_weapon->m_melee_range.y));
 				//m_melee_weapon->setScale(sf::Vector2f(0.f, 1.f));
 				m_melee_weapon->Extend(sf::Vector2f(0.f, 1.f));
+				m_melee_weapon->m_enemies_tagged.clear();
 			}
 		}
 
@@ -587,8 +588,12 @@ void Ship::Death()
 	m_visible = false;
 }
 
-void Ship::GetLoot(GameObject* loot)
+void Ship::GetLoot(GameObject* object)
 {
-	loot->m_GarbageMe = true;
-	loot->m_visible = false;
+	object->m_GarbageMe = true;
+	object->m_visible = false;
+
+	Loot* loot = (Loot*)object;
+	//bonus
+	m_melee_weapon->m_melee_range += loot->m_melee_range_bonus;
 }

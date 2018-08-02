@@ -6,9 +6,10 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
-#include "FX.h"
 #include "Enemy.h"
 #include "Weapon.h"
+#include "Loot.h"
+#include "FX.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -109,7 +110,7 @@ public :
 	void SetDashEnemy(GameObject* enemy) override;
 	bool DealDamage(int dmg) override;
 	void Death() override;
-	void GetLoot(GameObject* loot) override;
+	void GetLoot(GameObject* object) override;
 	bool IsImmune();
 
 	//debug

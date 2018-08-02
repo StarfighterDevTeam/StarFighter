@@ -26,6 +26,8 @@ public:
 	sf::Vector2f m_melee_range;
 	float m_melee_duration;
 
+	vector<GameObject*> m_enemies_tagged;
+
 	WeaponTypes m_type;
 };
 
