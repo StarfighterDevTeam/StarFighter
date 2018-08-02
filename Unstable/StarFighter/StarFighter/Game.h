@@ -74,6 +74,8 @@ public:
 	sf::View m_view;
 	sf::Vector2f m_map_size;
 
+	int GetEnemyRatings();
+
 	//Utiliary methods
 	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
 	GameObject* GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object);

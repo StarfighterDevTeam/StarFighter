@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "SFTextPop.h"
 #include "FX.h"
+#include "Enemy.h"
 
 #define SHIP_START_X                990
 #define SHIP_START_Y                540
@@ -91,6 +92,11 @@ public :
 	//melee
 	int m_dmg;
 	int m_hp;
+	int m_hp_max;
+
+	sf::Clock m_immune_dmg_clock;
+	bool m_immune_first_time;
+	Uint8 m_alpha_color;
 
 	void CollisionWithEnemy(GameObject* enemy) override;
 	GameObject* GetDashEnemy() override;
@@ -98,6 +104,7 @@ public :
 	bool DealDamage(int dmg) override;
 	void Death() override;
 	void GetLoot(GameObject* loot) override;
+	bool IsImmune();
 
 	//debug
 	CircleShape m_dash_radius_feedback;

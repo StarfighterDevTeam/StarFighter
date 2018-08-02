@@ -21,15 +21,6 @@ void InGameState::Initialize(Player player)
 	//Loading scripts
 	LoadCSVFile(SHIP_CSV_FILE);
 
-	//Enemy
-	Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + 200, SHIP_START_Y + 200), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	wufeng->setColor(sf::Color(255, 0, 0, 255));
-	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
-
-	Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y + 200), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	wufeng2->setColor(sf::Color(255, 0, 0, 255));
-	(*CurrentGame).addToScene(wufeng2, EnemyObjectLayer, EnemyObject);
-
 	//Loot
 	Loot* qi = new Loot(sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y - 200), sf::Vector2f(0, 0), "2D/qi.png", sf::Vector2f(20, 24), sf::Vector2f(10, 12));
 	qi->setColor(sf::Color(0, 255, 0, 255));
@@ -47,6 +38,22 @@ void InGameState::Initialize(Player player)
 void InGameState::Update(sf::Time deltaTime)
 {
 	(*CurrentGame).updateScene(deltaTime);
+
+	//Spawn enemies
+	while ((*CurrentGame).GetEnemyRatings() < 6)
+	{
+		Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + RandomizeFloatBetweenValues(sf::Vector2f(300, -300)), SHIP_START_Y + RandomizeFloatBetweenValues(sf::Vector2f(300, -300))), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+		wufeng->setColor(sf::Color(255, 0, 0, 255));
+		(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
+	}
+
+	//Respawn player
+	if ((*CurrentGame).m_playerShip->m_visible == false)
+	{
+		(*CurrentGame).m_playerShip->m_visible = true;
+		(*CurrentGame).m_playerShip->setPosition(sf::Vector2f(SHIP_START_X, SHIP_START_Y));
+		(*CurrentGame).m_playerShip->m_hp = (*CurrentGame).m_playerShip->m_hp_max;
+	}
 
 	//move camera
 	UpdateCamera(deltaTime);

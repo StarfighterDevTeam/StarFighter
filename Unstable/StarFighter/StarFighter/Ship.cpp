@@ -14,6 +14,7 @@ Ship::Ship()
 #define DASH_SPEED					1800
 #define DASH_COOLDOWN				1.f
 
+#define IMMUNE_DMG_DURATION			2.f
 
 void Ship::Init()
 {
@@ -38,8 +39,10 @@ void Ship::Init()
 	m_dash_cooldown = DASH_COOLDOWN;
 
 	m_dash_first_time = true;
+	m_immune_first_time = true;
 
-	m_hp = 3;
+	m_hp_max = 3;
+	m_hp = m_hp_max;
 	m_dmg = 1;
 
 	//debug
@@ -93,12 +96,11 @@ void Ship::update(sf::Time deltaTime)
 	{
 		ManageAcceleration(inputs_direction);
 
-		if (m_inputs_states[Action_Firing] == Input_Tap)
+		if (m_inputs_states[Action_Firing] == Input_Tap && IsImmune() == false)
 		{
 			if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
 			{
 				//do some action
-
 				m_dash_first_time = false;
 
 				(*CurrentGame).CreateSFTextPop("Dash", Font_Arial, 24, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
@@ -172,6 +174,16 @@ void Ship::update(sf::Time deltaTime)
 	
 	UpdateRotation();
 
+	if (IsImmune() == true)
+	{
+		m_alpha_color = 255 * cos(m_immune_dmg_clock.getElapsedTime().asSeconds() * 10);
+	}
+	else
+	{
+		m_alpha_color = 255;
+	}
+	setColor(sf::Color(255, 255, 255, m_alpha_color));
+
 	GameObject::update(deltaTime);
 
 	//HUD
@@ -211,6 +223,18 @@ void Ship::update(sf::Time deltaTime)
 	{
 		m_center_feedback.setFillColor(sf::Color(255, 0, 0, 255));
 	}
+
+	if (IsImmune())
+	{
+		m_center_feedback.setFillColor(sf::Color(0, 0, 0, 255));
+	}
+}
+
+bool Ship::IsImmune()
+{
+	bool immune = m_immune_dmg_clock.getElapsedTime().asSeconds() < IMMUNE_DMG_DURATION && m_immune_first_time == false;
+
+	return immune;
 }
 
 bool Ship::ScreenBorderContraints()
@@ -426,9 +450,19 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 
 		ostringstream ss;
 		ss << "-" << m_dmg;
-		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Red, m_dash_enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
+		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, m_dash_enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
 
 		m_dash_enemy = NULL;
+	}
+	else if (m_state != Character_Dash)
+	{
+		Enemy* enemy_ = (Enemy*)enemy;
+		if (DealDamage(enemy_->m_dmg))
+		{
+			ostringstream ss;
+			ss << "-" << enemy_->m_dmg;
+			(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Red, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
+		}
 	}
 }
 
@@ -436,7 +470,7 @@ void Ship::Draw(sf::RenderTexture& screen)
 {
 	GameObject::Draw(screen);
 
-	if (m_visible)
+	if (m_visible && IsImmune() == false)
 	{
 		screen.draw(m_dash_radius_feedback);
 	}
@@ -454,15 +488,23 @@ void Ship::SetDashEnemy(GameObject* enemy)
 
 bool Ship::DealDamage(int dmg)
 {
-	m_hp -= dmg;
-
-	if (m_hp <= 0)
+	if (IsImmune() == false)
 	{
-		Death();
+		m_immune_first_time = false;
+		m_immune_dmg_clock.restart();
+		m_hp -= dmg;
+
+		if (m_hp <= 0)
+		{
+			Death();
+		}
+
 		return true;
 	}
-
-	return false;
+	else
+	{
+		return false;
+	}
 }
 
 void Ship::Death()

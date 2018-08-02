@@ -18,6 +18,10 @@ public :
 	void Death() override;
 
 	int m_hp;
+	int m_hp_max;
+	int m_dmg;
+	int GetRating() override;
+
 };
 
 #endif // ENEMY_H_INCLUDED

@@ -654,3 +654,18 @@ GameObject* Game::getDashTarget(float dash_radius)
 
 	return target;
 }
+
+int Game::GetEnemyRatings()
+{
+	int rating = 0;
+
+	for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyObject])
+	{
+		if (enemy != NULL)
+		{
+			rating += enemy->GetRating();
+		}
+	}
+
+   	return rating;
+}

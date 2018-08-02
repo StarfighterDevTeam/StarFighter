@@ -96,6 +96,7 @@ public:
 	virtual bool DealDamage(int dmg);
 	virtual void Death();
 	virtual void GetLoot(GameObject* loot);
+	virtual int GetRating();
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();

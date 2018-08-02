@@ -6,7 +6,9 @@ using namespace sf;
 
 Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	m_hp = 2;
+	m_hp_max = 2;
+	m_hp = m_hp_max;
+	m_dmg = 1;
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	SetSpeedVectorFromAbsoluteSpeedAndAngle(200, angle * M_PI / 180);
@@ -20,7 +22,6 @@ Enemy::~Enemy()
 		playerShip->SetDashEnemy(NULL);
 	}
 }
-
 
 void Enemy::update(sf::Time deltaTime)
 {
@@ -67,4 +68,14 @@ void Enemy::Death()
 {
 	m_GarbageMe = true;
 	m_visible = false;
+}
+
+int Enemy::GetRating()
+{
+	int rating = 0;
+
+	rating += m_hp_max;
+	rating += m_dmg;
+
+	return rating;
 }

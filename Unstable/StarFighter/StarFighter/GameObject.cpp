@@ -552,3 +552,9 @@ void GameObject::GetLoot(GameObject* loot)
 {
 	//see override function in class Ship
 }
+
+int GameObject::GetRating()
+{
+	//see override function in class Enemy
+	return 0;
+}
