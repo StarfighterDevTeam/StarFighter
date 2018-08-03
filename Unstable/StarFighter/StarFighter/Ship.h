@@ -60,7 +60,7 @@ public :
 	bool ScreenBorderContraints();
 	void MaxSpeedConstraints();
 	void UpdateRotation();
-	void UpdateMeleeWeaponPosition();
+	//void UpdateMeleeWeaponPosition();
 
 	bool m_disable_inputs;
 	ControlerType m_controllerType;
@@ -92,6 +92,8 @@ public :
 	float m_dash_cooldown;
 	sf::Clock m_dash_cooldown_clock;
 	bool m_dash_first_time;
+	int m_dash_streak;
+	vector<GameObject*> m_dash_enemies_tagged;
 
 	//melee
 	Weapon* m_melee_weapon;

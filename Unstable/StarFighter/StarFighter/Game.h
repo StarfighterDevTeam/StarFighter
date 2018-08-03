@@ -106,6 +106,7 @@ public:
 	void ManageMusicTransitions(sf::Time deltaTime);
 
 	GameObject* getDashTarget(float dash_radius);
+	GameObject* getDashTargetWithBlacklist(float dash_radius, vector<GameObject*> enemies_tagged);
 
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;

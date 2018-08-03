@@ -28,9 +28,9 @@ enum LayerType {
 	FeedbacksLayer,
 	LootObjectLayer,
 
-	FriendlyFireLayer,
+	PlayerMeleeWeaponLayer,
 	PlayerShipLayer,
-	EnemyFireLayer,
+	EnemyMeleeWeaponLayer,
 
 	PanelLayer,
 	HudObject,
@@ -45,9 +45,9 @@ enum GameObjectType {
 	LootObject,
 	PlayerShip,
 	FakePlayerShip,
-	FriendlyFire,
+	PlayerMeleeWeapon,
 	Neutral,
-	EnemyFire,
+	EnemyMeleeWeapon,
 	EnemyObject,
 	NBVAL_GameObject
 };
@@ -99,19 +99,24 @@ public:
 	virtual void GetLoot(GameObject* loot);
 	virtual int GetRating();
 
+	bool BounceOnBorders(sf::Vector2f area_size);
+	void UpdateWeaponPosition(GameObject* weapon);
+
 	//Utilitary methods
 	float GetAbsoluteSpeed();
 	static float GetAbsoluteSpeed(sf::Vector2f speed_);
 	float GetAbsoluteSpeedSquared();
 	static float GetAbsoluteSpeedSquared(sf::Vector2f speed_);
-	static sf::Vector2f GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
+	static sf::Vector2f GetVectorFromLengthAndAngle(float absolute_speed, float curAngle);
 	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
 	sf::Vector2f SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed);
 
-	static bool NormalizeSpeed(sf::Vector2f* vector, float max_value);
-	static void ScaleSpeed(sf::Vector2f* vector, float target_value);
-	static void AddSpeed(sf::Vector2f* vector, float added_value);
+	static bool NormalizeVector(sf::Vector2f* vector, float max_value);
+	static void ScaleVector(sf::Vector2f* vector, float target_value);
+	static void AddValueToVector(sf::Vector2f* vector, float added_value);
 	static float GetAngleRadForSpeed(sf::Vector2f curSpeed);
+	static float GetAngleRadToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
+	static float GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position);
 	static float GetDistanceBetweenObjects(GameObject* object1, GameObject* object2);
 	static float GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);
 	static float GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2);

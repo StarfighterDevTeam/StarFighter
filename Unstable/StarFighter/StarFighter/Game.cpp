@@ -5,8 +5,8 @@ const char* GameObjectTypeValues[] =
 {
 	stringify(BackgroundObject),
 	stringify(PlayerShip),
-	stringify(FriendlyFire),
-	stringify(EnemyFire),
+	stringify(PlayerMeleeWeapon),
+	stringify(EnemyMeleeWeapon),
 	stringify(EnemyObject)
 };
 
@@ -373,7 +373,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Enemy bullets hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyFire].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyFire].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -386,7 +386,7 @@ void Game::colisionChecksV2()
 		}
 	}
 
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::FriendlyFire].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerMeleeWeapon].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerMeleeWeapon].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
@@ -655,17 +655,93 @@ GameObject* Game::getDashTarget(float dash_radius)
 				continue;
 			}
 
-			float rotation = GameObject::GetAngleRadBetweenPositions(enemy->getPosition(), player->getPosition());
-			float angle = cur_rotation - rotation;
-			if (angle < 0)
-			{
-				angle = -angle;
-			}
+			//float rotation = GameObject::GetAngleRadBetweenPositions(enemy->getPosition(), player->getPosition());
+			//float angle = cur_rotation - rotation;
 
-			if (angle_min < 0 || angle < angle_min || 2*M_PI - angle < angle_min)
+			////float angle = GameObject::GetAngleRadBetweenPositions(enemy->getPosition(), player->getPosition());
+			////float delta_angle = angle - (player->getRotation() * M_PI / 180.f);
+			////if (delta_angle > M_PI)
+			////	delta_angle -= 2 * M_PI;
+			////else if (delta_angle < -M_PI)
+			////	delta_angle += 2 * M_PI;
+			////
+			////if (delta_angle < 0)
+			////	delta_angle = -delta_angle;
+
+			float delta_angle = GameObject::GetAngleRadToTargetPosition(player->getPosition(), player->getRotation(), enemy->getPosition());
+
+			if (delta_angle < 0)
+				delta_angle = -delta_angle;
+
+			//if (delta_angle > M_PI_2)
+			//	continue;
+
+			if (angle_min < 0 || delta_angle < angle_min)
 			{
 				target = enemy;
-				angle_min = angle;
+				angle_min = delta_angle;
+			}
+
+			//if (delta_angle < -M_PI_2 || delta_angle > M_PI_2)
+			//{
+			//	continue;
+			//}
+			//
+			//if (angle < 0)
+			//{
+			//	angle = -angle;
+			//}
+
+			//if (angle_min < 0 || angle < angle_min || 2*M_PI - angle < angle_min)
+			//{
+			//	target = enemy;
+			//	angle_min = angle;
+			//}
+		}
+	}
+
+	if (target)
+	{
+		target->m_center_feedback.setFillColor(sf::Color(0, 255, 0, 255));
+	}
+
+	return target;
+}
+
+GameObject* Game::getDashTargetWithBlacklist(float dash_radius, vector<GameObject*> enemies_tagged)
+{
+	float angle_min = -1;
+	GameObject* player = (GameObject*)m_playerShip;
+	float cur_rotation = player->getRotation() * M_PI / 180.f;
+	GameObject* target = NULL;
+
+	for (GameObject* enemy : m_sceneGameObjectsTyped[EnemyObject])
+	{
+		if (enemy != NULL)
+		{
+			enemy->m_center_feedback.setFillColor(sf::Color(255, 255, 255, 255));
+
+			std::vector<GameObject*>::iterator it = find(enemies_tagged.begin(), enemies_tagged.end(), enemy);
+			if (it != enemies_tagged.end())
+			{
+				continue;
+			}
+			
+			float distance = GameObject::GetDistanceBetweenPositions(player->getPosition(), enemy->getPosition());
+			if (distance > dash_radius)
+			{
+				continue;
+			}
+
+			float delta_angle = GameObject::GetAngleRadToTargetPosition(player->getPosition(), player->getRotation(), enemy->getPosition());
+
+			if (delta_angle < 0)
+				delta_angle = -delta_angle;
+
+			if (angle_min < 0 || delta_angle < angle_min)
+			{
+				target = enemy;
+				angle_min = delta_angle;
 			}
 		}
 	}

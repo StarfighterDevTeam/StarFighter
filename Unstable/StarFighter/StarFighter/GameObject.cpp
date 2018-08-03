@@ -259,9 +259,32 @@ float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 	}
 
 	angle += M_PI_2;
-	//angle = (fmod(angle, 2 * M_PI));
 
 	return angle;
+}
+
+float GameObject::GetAngleRadToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
+{
+	float angle = GameObject::GetAngleRadBetweenPositions(target_position, ref_position);
+	float delta_angle = angle - (ref_rotation_in_deg * M_PI / 180.f);
+	if (delta_angle > M_PI)
+		delta_angle -= M_PI * 2;
+	else if (delta_angle < -M_PI)
+		delta_angle += M_PI * 2;
+
+	return delta_angle;
+}
+
+float GameObject::GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
+{
+	float angle = GameObject::GetAngleRadBetweenPositions(target_position, ref_position) * 180.f / M_PI;
+	float delta_angle = angle - ref_rotation_in_deg;
+	if (delta_angle > 180)
+		delta_angle -= 180.f * 2;
+	else if (delta_angle < -180)
+		delta_angle += 180.f * 2;
+
+	return delta_angle;
 }
 
 float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2)
@@ -296,7 +319,7 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 	return angle;
 }
 
-sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
+sf::Vector2f GameObject::GetVectorFromLengthAndAngle(float absolute_speed, float curAngle)
 {
 	sf::Vector2f speed;
 	speed.x = -absolute_speed * sin(curAngle);
@@ -310,7 +333,7 @@ sf::Vector2f GameObject::SetSpeedForConstantSpeedToDestination(sf::Vector2f coor
 	sf::Vector2f vector_to_destination = coordinates - getPosition();
 
 	sf::Vector2f move = vector_to_destination;
-	ScaleSpeed(&move, speed);
+	ScaleVector(&move, speed);
 
 	m_speed = move;
 
@@ -343,7 +366,7 @@ float GameObject::GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf:
 	return GetAbsoluteSpeedSquared(current_diff);
 }
 
-bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
+bool GameObject::NormalizeVector(sf::Vector2f* vector, float max_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return true;
@@ -360,7 +383,7 @@ bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 	return false;
 }
 
-void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
+void GameObject::ScaleVector(sf::Vector2f* vector, float target_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return;
@@ -370,7 +393,7 @@ void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
 	vector->y *= p;
 }
 
-void GameObject::AddSpeed(sf::Vector2f* vector, float added_value)
+void GameObject::AddValueToVector(sf::Vector2f* vector, float added_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return;
@@ -557,4 +580,43 @@ int GameObject::GetRating()
 {
 	//see override function in class Enemy
 	return 0;
+}
+
+bool GameObject::BounceOnBorders(sf::Vector2f area_size)
+{
+	bool bounced = false;
+	if (getPosition().x - m_size.x / 2 < 0 && m_speed.x < 0)
+	{
+		m_speed.x *= -1;
+		bounced = true;
+	}
+	if (getPosition().x + m_size.x / 2 > area_size.x  && m_speed.x > 0)
+	{
+		m_speed.x *= -1;
+		bounced = true;
+	}
+	if (getPosition().y - m_size.y / 2 < 0 && m_speed.y < 0)
+	{
+		m_speed.y *= -1;
+		bounced = true;
+	}
+	if (getPosition().y + m_size.y / 2 > area_size.y && m_speed.y > 0)
+	{
+		m_speed.y *= -1;
+		bounced = true;
+	}
+
+	return bounced;
+}
+
+void GameObject::UpdateWeaponPosition(GameObject* weapon)
+{
+	float angle = (getRotation() - 180.f) * M_PI / 180.f;
+
+	sf::Vector2f size = sf::Vector2f(weapon->getScale().x * weapon->m_size.x, weapon->getScale().y * weapon->m_size.y);
+
+	sf::Vector2f weapon_offset = GetVectorFromLengthAndAngle(m_size.y * getScale().y / 2 + size.x / 2, angle);//weapons are being coded in X avis instead of Y axis, for no good reason: it's just more practical to picture in the mind
+
+	weapon->setPosition(getPosition() + weapon_offset);
+	weapon->setRotation(getRotation() - 90);
 }
