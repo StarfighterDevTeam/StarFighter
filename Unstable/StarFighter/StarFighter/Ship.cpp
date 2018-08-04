@@ -326,23 +326,6 @@ void Ship::update(sf::Time deltaTime)
 	//}
 }
 
-//void Ship::UpdateMeleeWeaponPosition()
-//{
-//	//weapon placement
-//	float angle = (getRotation() - 180.f) * M_PI / 180.f;
-//
-//	sf::Vector2f size = sf::Vector2f(m_melee_weapon->getScale().x * m_melee_weapon->m_size.x, m_melee_weapon->getScale().y * m_melee_weapon->m_size.y);
-//
-//	//sf::Vector2f weapon_offset;
-//	sf::Vector2f weapon_offset = GetVectorFromLengthAndAngle(m_size.x / 2 + size.x / 2, angle);
-//	//weapon_offset.x = (m_size.x / 2 + size.x / 2) * sin(angle);
-//	//weapon_offset.y = -(m_size.x / 2 + size.x / 2) * cos(angle);
-//	m_melee_weapon->setPosition(getPosition() + weapon_offset);
-//	m_melee_weapon->setRotation(getRotation() - 90);
-//
-//	//printf("ANGLE: %f | OFFSET: %f , %f | SIZE : %f , %f | ORIGIN: %f, %f\n", angle, weapon_offset.x, weapon_offset.y, size.x, size.y, size.x * 0.5f, size.y * 0.5f);
-//}
-
 bool Ship::IsImmune()
 {
 	bool immune = m_immune_dmg_clock.getElapsedTime().asSeconds() < IMMUNE_DMG_DURATION && m_immune_first_time == false;

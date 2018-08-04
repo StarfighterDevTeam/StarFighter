@@ -673,6 +673,7 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 GameObject* Game::getDashTarget(float dash_radius)
 {
 	float angle_min = -1;
+	float distance_min = -1;
 	GameObject* player = (GameObject*)m_playerShip;
 	float cur_rotation = player->getRotation() * M_PI / 180.f;
 	GameObject* target = NULL;
@@ -689,47 +690,21 @@ GameObject* Game::getDashTarget(float dash_radius)
 				continue;
 			}
 
-			//float rotation = GameObject::GetAngleRadBetweenPositions(enemy->getPosition(), player->getPosition());
-			//float angle = cur_rotation - rotation;
-
-			////float angle = GameObject::GetAngleRadBetweenPositions(enemy->getPosition(), player->getPosition());
-			////float delta_angle = angle - (player->getRotation() * M_PI / 180.f);
-			////if (delta_angle > M_PI)
-			////	delta_angle -= 2 * M_PI;
-			////else if (delta_angle < -M_PI)
-			////	delta_angle += 2 * M_PI;
-			////
-			////if (delta_angle < 0)
-			////	delta_angle = -delta_angle;
-
-			float delta_angle = GameObject::GetAngleRadToTargetPosition(player->getPosition(), player->getRotation(), enemy->getPosition());
-
-			if (delta_angle < 0)
-				delta_angle = -delta_angle;
-
-			//if (delta_angle > M_PI_2)
-			//	continue;
-
-			if (angle_min < 0 || delta_angle < angle_min)
+			if (distance_min < 0 || distance < distance_min)
 			{
 				target = enemy;
-				angle_min = delta_angle;
+				distance_min = distance;
 			}
 
-			//if (delta_angle < -M_PI_2 || delta_angle > M_PI_2)
-			//{
-			//	continue;
-			//}
+			//float delta_angle = GameObject::GetAngleRadToTargetPosition(player->getPosition(), player->getRotation(), enemy->getPosition());
 			//
-			//if (angle < 0)
-			//{
-			//	angle = -angle;
-			//}
-
-			//if (angle_min < 0 || angle < angle_min || 2*M_PI - angle < angle_min)
+			//if (delta_angle < 0)
+			//	delta_angle = -delta_angle;
+			//
+			//if (angle_min < 0 || delta_angle < angle_min)
 			//{
 			//	target = enemy;
-			//	angle_min = angle;
+			//	angle_min = delta_angle;
 			//}
 		}
 	}
