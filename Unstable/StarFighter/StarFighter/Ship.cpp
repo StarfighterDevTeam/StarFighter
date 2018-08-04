@@ -200,8 +200,6 @@ void Ship::update(sf::Time deltaTime)
 			ScaleVector(&dash_vector, dash_distance);
 
 			m_dash_target = getPosition() + dash_vector;
-
-			printf("target: %f; %f\n", m_dash_target.x, m_dash_target.y);
 		}
 		else if (m_dash_streak >= 1)//dash combo?
 		{
@@ -559,9 +557,15 @@ bool Ship::DealDamage(int dmg)
 		m_immune_first_time = false;
 		m_immune_dmg_clock.restart();
 		m_hp -= dmg;
+
+		ostringstream ss;
+		ss << "-" << dmg;
+		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Red, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y*getScale().y / 2);
+
 		if (dmg > 0)
 		{
 			(*CurrentGame).PlaySFX(SFX_GruntPlayer);
+
 		}
 
 		if (m_hp <= 0)

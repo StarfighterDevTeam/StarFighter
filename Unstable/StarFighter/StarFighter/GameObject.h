@@ -78,6 +78,9 @@ public:
 	GameObjectType m_collider_type;
 	LayerType m_layer;
 	sf::Vector2f m_size;
+	bool m_flocking_test_begung;
+	vector<GameObject*> m_flocking_neighbours;
+	bool m_flocking;
 
 	string getName();
 	GameObject* Clone();

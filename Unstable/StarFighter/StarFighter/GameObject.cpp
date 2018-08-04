@@ -110,6 +110,8 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
 	m_ghost = false;
 	m_rotation_speed = 0.f;
+	m_flocking = false;
+	m_flocking_test_begung = false;
 
 	//debug
 	m_center_feedback.setRadius(4);

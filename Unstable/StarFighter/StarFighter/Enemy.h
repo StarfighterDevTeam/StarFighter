@@ -24,13 +24,17 @@ public :
 	int m_dmg;
 	float m_ref_speed;
 	int GetRating() override;
+	sf::Vector2f Flocking();
+	sf::Vector2f FlockingGetAveragePosition();
+	sf::Vector2f FlockingGetAverageSpeed();
+	sf::Vector2f FlockingSeparate();
 
 	//melee
 	Weapon* m_melee_weapon;
 	sf::Clock m_melee_cooldown_clock;
 	bool m_is_attacking;
 	float m_melee_cooldown;
-	//void UpdateMeleeWeaponPosition();
+	
 };
 
 #endif // ENEMY_H_INCLUDED

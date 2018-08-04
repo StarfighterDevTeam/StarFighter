@@ -44,6 +44,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 #define GRAZE_DISTANCE									30
 #define RECTANGLE_INSIDE_ALPHA							100
 
+#define FLOCKING_RADIUS						100
+
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100

@@ -362,13 +362,13 @@ void Game::colisionChecksV2()
 	dt.restart();
 
 	//First, Checks if the ship has been touched by an enemy/enemy bullet
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerShip].end(); it1++)
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerShip].begin(); it1 != m_sceneGameObjectsTyped[PlayerShip].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
 
 		//Player getting loots
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::LootObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::LootObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LootObject].begin(); it2 != m_sceneGameObjectsTyped[LootObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -381,7 +381,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Player hitting enemy
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -394,7 +394,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Enemy weapon hitting the player
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyMeleeWeapon].begin(); it2 != m_sceneGameObjectsTyped[EnemyMeleeWeapon].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -407,7 +407,54 @@ void Game::colisionChecksV2()
 		}
 	}
 
-	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[GameObjectType::PlayerMeleeWeapon].begin(); it1 != m_sceneGameObjectsTyped[GameObjectType::PlayerMeleeWeapon].end(); it1++)
+	//Enemy flocking
+	size_t EnemyVectorSize = m_sceneGameObjectsTyped[EnemyObject].size();
+	for (size_t i = 0; i < EnemyVectorSize; i++)
+	{
+		GameObject* ptr1 = m_sceneGameObjectsTyped[EnemyObject][i];
+
+		if (ptr1 == NULL)
+			continue;
+
+		if (ptr1->m_flocking == false)
+			continue;
+
+		if (ptr1->m_flocking_test_begung == false)
+		{
+			ptr1->m_flocking_neighbours.clear();
+		}
+
+		ptr1->m_flocking_test_begung = false;
+
+		if (i != EnemyVectorSize - 1)
+		{
+			for (size_t j = i + 1; j < EnemyVectorSize; j++)
+			{
+				GameObject* ptr2 = m_sceneGameObjectsTyped[EnemyObject][j];
+
+				if (ptr2 == NULL)
+					continue;
+
+				if (ptr2->m_flocking == false)
+					continue;
+
+				if (ptr2->m_flocking_test_begung == false)
+				{
+					ptr2->m_flocking_neighbours.clear();
+					ptr2->m_flocking_test_begung = true;
+				}
+
+				if (GameObject::GetDistanceSquaredBetweenPositions(ptr1->getPosition(), ptr2->getPosition()) < FLOCKING_RADIUS * FLOCKING_RADIUS)
+				{
+					ptr1->m_flocking_neighbours.push_back(ptr2);
+					ptr2->m_flocking_neighbours.push_back(ptr1);
+				}
+			}
+		}
+	}
+	
+	//Player weapon
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerMeleeWeapon].begin(); it1 != m_sceneGameObjectsTyped[PlayerMeleeWeapon].end(); it1++)
 	{
 		if (*it1 == NULL)
 			continue;
@@ -416,7 +463,7 @@ void Game::colisionChecksV2()
 			continue;
 
 		//Weapon hitting enemy
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyObject].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyObject].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;
@@ -429,7 +476,7 @@ void Game::colisionChecksV2()
 		}
 
 		//Weapon hitting weapon
-		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].end(); it2++)
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyMeleeWeapon].begin(); it2 != m_sceneGameObjectsTyped[EnemyMeleeWeapon].end(); it2++)
 		{
 			if (*it2 == NULL)
 				continue;

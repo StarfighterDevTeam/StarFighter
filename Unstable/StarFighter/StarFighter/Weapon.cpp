@@ -102,11 +102,6 @@ void Weapon::CollisionWithEnemy(GameObject* enemy)
 		m_enemies_tagged.push_back(enemy);
 		
 		enemy->DealDamage(m_dmg);
-
-		ostringstream ss;
-		ss << "-" << m_dmg;
-		sf::Color color = enemy->m_collider_type == PlayerShip ? sf:: Color::Red : sf::Color::Blue;
-		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, color, enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
 	}
 }
 
