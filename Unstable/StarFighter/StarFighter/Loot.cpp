@@ -4,9 +4,27 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Loot::Loot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+#define LOOT_BONUS_MELEE_RANGE			100.f
+
+Loot::Loot(LootTypes type, sf::Vector2f position)
 {
-	m_melee_range_bonus = sf::Vector2f(50, 0);
+	m_type = type;
+	
+	switch (type)
+	{
+		case Loot_BonusMeleeRange:
+		{
+			Init(position, sf::Vector2f(0, 0), "2D/qi.png", sf::Vector2f(20, 24), 1, 1);
+			m_melee_range_bonus = sf::Vector2f(LOOT_BONUS_MELEE_RANGE, 0);
+			break;
+		}
+		case Loot_WeaponSpear:
+		{
+			Init(position, sf::Vector2f(0, 0), "2D/spear.png", sf::Vector2f(100, 60), 1, 1);
+			m_weapon_type = Weapon_Spear;
+			break;
+		}
+	}
 }
 
 void Loot::update(sf::Time deltaTime)

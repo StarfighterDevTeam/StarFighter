@@ -86,7 +86,6 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	m_previous_speed = m_speed;
 	bool starting_melee_attacking = false;
 
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
@@ -262,8 +261,6 @@ void Ship::update(sf::Time deltaTime)
 	{
 		IdleDecelleration(deltaTime);
 	}
-	
-	UpdateRotation();
 
 	if (IsImmune() == true)
 	{
@@ -276,6 +273,8 @@ void Ship::update(sf::Time deltaTime)
 	setColor(sf::Color(255, 255, 255, m_alpha_color));
 
 	GameObject::update(deltaTime);
+
+	UpdateRotation();
 
 	//HUD
 	m_is_asking_SFPanel = SFPanel_None;
@@ -422,41 +421,6 @@ void Ship::MaxSpeedConstraints()
 
 	//max speed constraints
 	NormalizeVector(&m_speed, ship_max_speed);
-}
-
-void Ship::UpdateRotation()
-{
-	//anti ghost-inputs, helps cleaning movements especially when the character stops
-	if (m_speed != m_previous_speed)
-	{
-		return;
-	}
-
-	//turning toward targeted position
-	if (m_speed.x == 0 && m_speed.y == 0)
-	{
-		//do nothing
-	}
-	else if (m_speed.x == 0 && m_speed.y > 0)
-	{
-		setRotation(180);
-	}
-	else if (m_speed.x == 0 && m_speed.y < 0)
-	{
-		setRotation(0);
-	}
-	else if (m_speed.y == 0 && m_speed.x > 0)
-	{
-		setRotation(90);
-	}
-	else if (m_speed.y == 0 && m_speed.x < 0)
-	{
-		setRotation(270);
-	}
-	else
-	{
-		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI));
-	}
 }
 
 void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
@@ -647,6 +611,25 @@ void Ship::Death()
 	m_hp = m_hp_max;
 }
 
+bool Ship::GetMeleeWeapon(Weapon* weapon)
+{
+	if (weapon->m_type == m_melee_weapon->m_type)
+	{
+		return false;
+	}
+
+	m_melee_weapon->m_melee_range = weapon->m_melee_range;
+	m_melee_weapon->m_melee_duration = weapon->m_melee_duration;
+	m_melee_weapon->m_piercing = weapon->m_piercing;
+
+	m_melee_weapon->m_color = weapon->m_color;
+
+	m_melee_weapon->m_enemies_tagged.clear();
+	m_melee_weapon->m_visible = false;
+
+	return true;
+}
+
 void Ship::GetLoot(GameObject* object)
 {
 	object->m_GarbageMe = true;
@@ -654,5 +637,22 @@ void Ship::GetLoot(GameObject* object)
 
 	Loot* loot = (Loot*)object;
 	//bonus
-	m_melee_weapon->m_melee_range += loot->m_melee_range_bonus;
+	switch (loot->m_type)
+	{
+		case Loot_BonusMeleeRange:
+		{
+			m_melee_weapon->m_melee_range += loot->m_melee_range_bonus;
+			break;
+		}
+
+		case Loot_WeaponKatana:
+		case Loot_WeaponSpear:
+		{
+			Weapon* weapon = new Weapon(this, loot->m_weapon_type);
+			GetMeleeWeapon(weapon);
+			delete weapon;
+			weapon = NULL;
+			break;
+		}
+	}
 }

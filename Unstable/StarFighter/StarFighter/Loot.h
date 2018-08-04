@@ -4,14 +4,26 @@
 #include "Globals.h"
 #include "Game.h"
 #include "GameObject.h"
+#include "Weapon.h"
+
+enum LootTypes
+{
+	Loot_WeaponKatana,
+	Loot_WeaponSpear,
+	Loot_BonusMeleeRange,
+	NBVAL_LOOT_TYPES,
+};
 
 class Loot : public GameObject
 {
 public :
-	Loot(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
+	Loot(LootTypes type, sf::Vector2f position);
 	void update(sf::Time deltaTime) override;
 
+	LootTypes m_type;
+
 	sf::Vector2f m_melee_range_bonus;
+	WeaponTypes m_weapon_type;
 };
 
 #endif // LOOT_H_INCLUDED

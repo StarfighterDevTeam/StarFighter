@@ -8,6 +8,7 @@
 enum WeaponTypes
 {
 	Weapon_Katana,
+	Weapon_Spear,
 };
 
 
@@ -27,6 +28,7 @@ public:
 	sf::Vector2f m_melee_range;
 	float m_melee_duration;
 	sf::Clock m_melee_clock;
+	bool m_piercing;
 
 	vector<GameObject*> m_enemies_tagged;
 

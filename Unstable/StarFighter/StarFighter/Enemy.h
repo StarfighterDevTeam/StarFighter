@@ -22,6 +22,7 @@ public :
 	int m_hp;
 	int m_hp_max;
 	int m_dmg;
+	float m_ref_speed;
 	int GetRating() override;
 
 	//melee

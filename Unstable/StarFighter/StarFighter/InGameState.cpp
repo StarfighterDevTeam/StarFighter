@@ -22,9 +22,12 @@ void InGameState::Initialize(Player player)
 	LoadCSVFile(SHIP_CSV_FILE);
 
 	//Loot
-	Loot* qi = new Loot(sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y - 200), sf::Vector2f(0, 0), "2D/qi.png", sf::Vector2f(20, 24), sf::Vector2f(10, 12));
+	Loot* qi = new Loot(Loot_BonusMeleeRange, sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y - 200));
 	qi->setColor(sf::Color(0, 255, 0, 255));
 	(*CurrentGame).addToScene(qi, LootObjectLayer, LootObject);
+
+	Loot* spear = new Loot(Loot_WeaponSpear, sf::Vector2f(SHIP_START_X + 500, SHIP_START_Y - 200));
+	(*CurrentGame).addToScene(spear, LootObjectLayer, LootObject);
 
 	//enemies
 

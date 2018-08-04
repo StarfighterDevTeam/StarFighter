@@ -10,6 +10,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_hp = m_hp_max;
 	m_dmg = 1;
 	m_melee_cooldown = 2.f;
+	m_ref_speed = 150.f;
 
 	m_is_attacking = false;
 	m_melee_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
@@ -38,6 +39,15 @@ void Enemy::update(sf::Time deltaTime)
 {
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
+
+	if (m_melee_weapon->m_owner == NULL)
+	{
+		printf("");
+	}
+
+	//Chase player
+	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
+	SetSpeedForConstantSpeedToDestination(player->getPosition(), m_ref_speed);
 
 	//Melee
 	bool starting_melee_attacking = false;
@@ -80,6 +90,8 @@ void Enemy::update(sf::Time deltaTime)
 	UpdateWeaponPosition(m_melee_weapon);
 
 	GameObject::update(deltaTime);
+
+	UpdateRotation();
 }
 
 bool Enemy::DealDamage(int dmg)

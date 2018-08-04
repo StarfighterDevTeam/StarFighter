@@ -59,7 +59,6 @@ public :
 	void IdleDecelleration(sf::Time deltaTime);
 	bool ScreenBorderContraints();
 	void MaxSpeedConstraints();
-	void UpdateRotation();
 	//void UpdateMeleeWeaponPosition();
 
 	bool m_disable_inputs;
@@ -97,6 +96,7 @@ public :
 
 	//melee
 	Weapon* m_melee_weapon;
+	bool GetMeleeWeapon(Weapon* weapon);
 	bool m_is_attacking;
 
 	int m_hp;
@@ -121,8 +121,6 @@ private:
 	bool m_moving;
 	bool m_movingX;
 	bool m_movingY;
-
-	sf::Vector2f m_previous_speed;
 };
 
 #endif // SHIP_H_INCLUDED

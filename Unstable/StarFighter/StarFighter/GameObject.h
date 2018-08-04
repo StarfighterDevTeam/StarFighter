@@ -102,6 +102,7 @@ public:
 
 	bool BounceOnBorders(sf::Vector2f area_size);
 	void UpdateWeaponPosition(GameObject* weapon);
+	void UpdateRotation();
 
 	//Utilitary methods
 	float GetAbsoluteSpeed();
@@ -136,6 +137,7 @@ public:
 	Animation* m_currentAnimation;
 
 	CircleShape m_center_feedback;
+	sf::Vector2f m_previous_speed;
 };
 
 #endif // GameObject_H_INCLUDED

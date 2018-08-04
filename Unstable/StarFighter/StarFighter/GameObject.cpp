@@ -155,6 +155,8 @@ GameObject::~GameObject()
 
 void GameObject::update(sf::Time deltaTime)
 {
+	m_previous_speed = m_speed;
+
 	static sf::Vector2f newposition, offset, newspeed;
 
 	//newspeed = sf::Vector2f(m_speed.x * ISO_FACTOR_X, m_speed.y * ISO_FACTOR_Y);//3D Iso = movement on Y axis are twice slower on screen due to the perspective
@@ -170,6 +172,41 @@ void GameObject::update(sf::Time deltaTime)
 
 	//debug
 	m_center_feedback.setPosition(getPosition());
+}
+
+void GameObject::UpdateRotation()
+{
+	//anti ghost-inputs, helps cleaning movements especially when the character stops
+	if (m_speed != m_previous_speed)
+	{
+		return;
+	}
+
+	//turning toward targeted position
+	if (m_speed.x == 0 && m_speed.y == 0)
+	{
+		//do nothing
+	}
+	else if (m_speed.x == 0 && m_speed.y > 0)
+	{
+		setRotation(180);
+	}
+	else if (m_speed.x == 0 && m_speed.y < 0)
+	{
+		setRotation(0);
+	}
+	else if (m_speed.y == 0 && m_speed.x > 0)
+	{
+		setRotation(90);
+	}
+	else if (m_speed.y == 0 && m_speed.x < 0)
+	{
+		setRotation(270);
+	}
+	else
+	{
+		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI));
+	}
 }
 
 void GameObject::updateAnimation(sf::Time deltaTime)

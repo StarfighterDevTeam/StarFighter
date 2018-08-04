@@ -7,22 +7,42 @@ extern Game* CurrentGame;
 //
 //}
 
-#define MELEE_RANGE_X				130.f
-#define MELEE_RANGE_Y				70.f
-#define MELEE_DURATION				0.2f
+#define MELEE_KATANA_RANGE_X			130.f
+#define MELEE_KATANA_RANGE_Y			70.f
+#define MELEE_KATANA_DURATION			0.2f
+
+#define MELEE_SPEAR_RANGE_X				230.f
+#define MELEE_SPEAR_RANGE_Y				40.f
+#define MELEE_SPEAR_DURATION			0.5f
 
 Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 {
 	m_owner = owner;
+	m_type = type;
+	m_color = color;
 
 	switch (type)
 	{
 		case Weapon_Katana:
 		{
-			InitWeapon(sf::Vector2f(MELEE_RANGE_X, MELEE_RANGE_Y), color);
+			m_melee_range = sf::Vector2f(MELEE_KATANA_RANGE_X, MELEE_KATANA_RANGE_Y);
+			m_melee_duration = MELEE_KATANA_DURATION;
+			m_dmg = 1;
+			m_piercing = false;
+			break;
+		}
+
+		case Weapon_Spear:
+		{	 
+			m_melee_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
+			m_melee_duration = MELEE_SPEAR_DURATION;
+			m_dmg = 1;
+			m_piercing = true;
 			break;
 		}
 	}
+
+	InitWeapon(m_melee_range, color);
 }
 
 void Weapon::InitWeapon(sf::Vector2f size, sf::Color color)// : GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/smiley.png", sf::Vector2f(200, 200), sf::Vector2f(100, 100))
@@ -52,13 +72,6 @@ void Weapon::InitWeapon(sf::Vector2f size, sf::Color color)// : GameObject(sf::V
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), ss.str(), sf::Vector2f(W, H), 1, 1, pixels);
 	
 	setColor(color);
-	m_color = color;
-
-	// INIT
-	m_melee_range = sf::Vector2f(MELEE_RANGE_X, MELEE_RANGE_Y);
-	m_melee_duration = MELEE_DURATION;
-	m_dmg = 1;
-
 	m_visible = false;
 	Extend(sf::Vector2f(0.f, 1.f));
 	//setScale(sf::Vector2f(0.f, m_melee_range.y));
@@ -78,11 +91,16 @@ void Weapon::Draw(sf::RenderTexture& screen)
 
 void Weapon::CollisionWithEnemy(GameObject* enemy)
 {
+	if (m_piercing == false && m_enemies_tagged.size() > 0)//piercing is the ability to hit several targets with one stroke
+	{
+		return;
+	}
+
 	std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy);
 	if (it == m_enemies_tagged.end())
 	{
 		m_enemies_tagged.push_back(enemy);
-
+		
 		enemy->DealDamage(m_dmg);
 
 		ostringstream ss;
