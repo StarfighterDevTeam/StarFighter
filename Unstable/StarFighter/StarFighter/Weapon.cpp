@@ -9,7 +9,7 @@ extern Game* CurrentGame;
 
 #define MELEE_RANGE_X				130.f
 #define MELEE_RANGE_Y				70.f
-#define MELEE_DURATION				10.3f
+#define MELEE_DURATION				0.3f
 
 Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 {
@@ -96,18 +96,16 @@ void Weapon::CollisionBetweenWeapons(GameObject* enemy_weapon)
 {
 	Weapon* weapon = (Weapon*)enemy_weapon;
 
-	//tagging the enemy weapon's owner so it won't be affected by further damage by this weapon (= parry mechanic)
-
 	std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), weapon->m_owner);
-	if (it == m_enemies_tagged.end())
+	std::vector<GameObject*>::iterator it2 = find(weapon->m_enemies_tagged.begin(), weapon->m_enemies_tagged.end(), m_owner);
+
+	//tagging the enemy weapon's owner so it won't be affected by further damage by this weapon (= parry mechanic)
+	//once an enemy is hit, he cannot be parried until our next stroke
+	if (it == m_enemies_tagged.end() && it2 == weapon->m_enemies_tagged.end())
 	{
 		m_enemies_tagged.push_back(weapon->m_owner);
 		setColor(sf::Color::White);
-	}
 
-	std::vector<GameObject*>::iterator it2 = find(weapon->m_enemies_tagged.begin(), weapon->m_enemies_tagged.end(), m_owner);
-	if (it2 == weapon->m_enemies_tagged.end())
-	{
 		weapon->m_enemies_tagged.push_back(m_owner);
 		weapon->setColor(sf::Color::White);
 	}
