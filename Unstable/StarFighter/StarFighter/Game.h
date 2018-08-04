@@ -22,7 +22,11 @@ class Ship;
 
 enum SFX_Bank
 {
-	SFX_Laser,
+	SFX_Parry,
+	SFX_Dash,
+	SFX_Melee,
+	SFX_GruntPlayer,
+	SFX_GruntEnemy,
 	NBVAL_SFX_BANK,
 };
 
@@ -89,8 +93,8 @@ public:
 	void PlaySFX(SFX_Bank sfx_name);
 	void SetSFXVolume(bool activate_sfx);
 
-	sf::SoundBuffer m_soundBuffers[1];
-	sf::Sound m_soundsLaser[1];
+	sf::SoundBuffer m_soundBuffers[5];
+	sf::Sound m_sounds[5];
 	bool m_SFX_Activated;
 
 	//Music

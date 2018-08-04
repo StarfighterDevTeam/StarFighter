@@ -9,7 +9,7 @@ extern Game* CurrentGame;
 
 #define MELEE_RANGE_X				130.f
 #define MELEE_RANGE_Y				70.f
-#define MELEE_DURATION				0.3f
+#define MELEE_DURATION				0.2f
 
 Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 {
@@ -108,6 +108,8 @@ void Weapon::CollisionBetweenWeapons(GameObject* enemy_weapon)
 
 		weapon->m_enemies_tagged.push_back(m_owner);
 		weapon->setColor(sf::Color::White);
+
+		(*CurrentGame).PlaySFX(SFX_Parry);
 	}
 }
 

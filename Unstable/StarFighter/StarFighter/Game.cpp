@@ -59,17 +59,41 @@ void Game::init(RenderWindow* window)
 
 void Game::SetSFXVolume(bool activate_sfx)
 {
-	m_soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 }
 
 int Game::LoadSFX()
 {
-	if (!m_soundBuffers[0].loadFromFile(makePath("Sounds/laser.ogg")))
+	if (!m_soundBuffers[0].loadFromFile(makePath("Sounds/parry.ogg")))
 		return -1;
 
-	m_soundsLaser[0].setBuffer(m_soundBuffers[0]);
+	if (!m_soundBuffers[1].loadFromFile(makePath("Sounds/dash.ogg")))
+		return -1;
 
-	m_soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	if (!m_soundBuffers[2].loadFromFile(makePath("Sounds/melee.ogg")))
+		return -1;
+
+	if (!m_soundBuffers[3].loadFromFile(makePath("Sounds/grunt0.ogg")))
+		return -1;
+
+	if (!m_soundBuffers[4].loadFromFile(makePath("Sounds/grunt1.ogg")))
+		return -1;
+
+	m_sounds[0].setBuffer(m_soundBuffers[0]);
+	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	m_sounds[1].setBuffer(m_soundBuffers[1]);
+	m_sounds[1].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	m_sounds[2].setBuffer(m_soundBuffers[2]);
+	m_sounds[2].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	m_sounds[3].setBuffer(m_soundBuffers[3]);
+	m_sounds[3].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	m_sounds[4].setBuffer(m_soundBuffers[4]);
+	m_sounds[4].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	
 	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
 	return 0;
@@ -77,10 +101,7 @@ int Game::LoadSFX()
 
 void Game::PlaySFX(SFX_Bank sfx_name)
 {
-	if (sfx_name == SFX_Laser)
-	{
-		m_soundsLaser[0].play();
-	}
+	m_sounds[(int)sfx_name].play();
 }
 
 void Game::SetMusicVolume(bool activate_music)
@@ -113,7 +134,7 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 		{
 			case Music_Main:
 			{
-				m_next_music_name = makePath("Music/Main.ogg");
+				m_next_music_name = makePath("Music/Zircon - The Koto Chill.ogg");
 				break;
 			}
 		}

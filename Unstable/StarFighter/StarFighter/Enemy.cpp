@@ -55,7 +55,7 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 
-	if (m_melee_cooldown_clock.getElapsedTime().asSeconds() > m_melee_cooldown)//condition for attack
+	if (m_melee_cooldown_clock.getElapsedTime().asSeconds() > m_melee_cooldown)//condition to start attack
 	{
 		if (m_melee_weapon && !m_is_attacking)
 		{
@@ -63,6 +63,7 @@ void Enemy::update(sf::Time deltaTime)
 			starting_melee_attacking = true;
 			m_melee_weapon->m_visible = true;
 			m_melee_weapon->m_melee_clock.restart();
+			(*CurrentGame).PlaySFX(SFX_Melee);
 		}
 	}
 
@@ -84,6 +85,11 @@ void Enemy::update(sf::Time deltaTime)
 bool Enemy::DealDamage(int dmg)
 {
 	m_hp -= dmg;
+
+	if (dmg > 0)
+	{
+		(*CurrentGame).PlaySFX(SFX_GruntEnemy);
+	}
 
 	if (m_hp <= 0)
 	{

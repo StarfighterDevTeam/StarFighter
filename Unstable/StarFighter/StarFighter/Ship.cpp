@@ -128,6 +128,7 @@ void Ship::update(sf::Time deltaTime)
 				starting_melee_attacking = true;
 				m_melee_weapon->m_visible = true;
 				m_melee_weapon->m_melee_clock.restart();
+				(*CurrentGame).PlaySFX(SFX_Melee);
 			}
 		}
 
@@ -147,7 +148,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		//Dash?
-		if (m_inputs_states[Action_Dash] == Input_Tap)// && IsImmune() == false)
+		if (m_inputs_states[Action_Dash] == Input_Tap)//start
 		{
 			if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
 			{
@@ -170,19 +171,18 @@ void Ship::update(sf::Time deltaTime)
 
 					dash_vector = m_dash_enemy->getPosition() - getPosition();
 
-					m_overdash_distance = DASH_OVERDASH_DISTANCE;//GetAbsoluteSpeed(dash_vector) * DASH_OVERDASH_FACTOR;
+					m_overdash_distance = DASH_OVERDASH_DISTANCE;
 					dash_distance = GetDistanceBetweenPositions(m_dash_enemy->getPosition(), getPosition()) + m_overdash_distance;
 					
 					ScaleVector(&dash_vector, dash_distance);
 				}
 
-				//dash_vector = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));;
 				m_dash_target = getPosition() + dash_vector;
 
 				m_speed = dash_vector;
-				//m_speed = sf::Vector2f(dash_vector.x * (1 / ISO_FACTOR_X), dash_vector.y * (1 / ISO_FACTOR_Y));
-				//m_speed = dash_vector;
 				ScaleVector(&m_speed, m_dash_speed);
+
+				(*CurrentGame).PlaySFX(SFX_Dash);
 			}
 		}
 	}
@@ -210,12 +210,6 @@ void Ship::update(sf::Time deltaTime)
 			{
 				GameObject* new_dash_enemy = (*CurrentGame).getDashTargetWithBlacklist(m_dash_radius, m_dash_enemies_tagged);
 
-				//std::vector<GameObject*>::iterator it = find(m_dash_enemies_tagged.begin(), m_dash_enemies_tagged.end(), new_dash_enemy);
-				//if (it != m_dash_enemies_tagged.end())
-				//{
-				//	new_dash_enemy = NULL;//never dash combo the same enemy twice
-				//}
-
 				if (new_dash_enemy)
 				{
 					m_dash_streak++;
@@ -236,6 +230,8 @@ void Ship::update(sf::Time deltaTime)
 					m_dash_target = getPosition() + dash_vector;
 					m_speed = dash_vector;
 					ScaleVector(&m_speed, m_dash_speed);
+
+					(*CurrentGame).PlaySFX(SFX_Dash);
 				}
 			}
 		}
@@ -616,6 +612,10 @@ bool Ship::DealDamage(int dmg)
 		m_immune_first_time = false;
 		m_immune_dmg_clock.restart();
 		m_hp -= dmg;
+		if (dmg > 0)
+		{
+			(*CurrentGame).PlaySFX(SFX_GruntPlayer);
+		}
 
 		if (m_hp <= 0)
 		{
