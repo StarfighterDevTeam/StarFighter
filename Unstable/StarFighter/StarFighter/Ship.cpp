@@ -42,7 +42,7 @@ void Ship::Init()
 	m_dash_streak = 0;
 
 	m_is_attacking = false;
-	m_melee_weapon = new Weapon(Weapon_Katana);
+	m_melee_weapon = new Weapon(this, Weapon_Katana);
 	(*CurrentGame).addToScene(m_melee_weapon, PlayerMeleeWeaponLayer, PlayerMeleeWeapon);
 
 	m_dash_first_time = true;
@@ -76,7 +76,6 @@ Ship::~Ship()
 	{
 		m_melee_weapon->m_GarbageMe = true;
 		m_melee_weapon->m_visible = false;
-		m_melee_weapon = NULL;
 	}
 }
 
@@ -111,15 +110,13 @@ void Ship::update(sf::Time deltaTime)
 		//Melee
 		if (m_is_attacking)//reset
 		{
-			if (m_melee_clock.getElapsedTime().asSeconds() > m_melee_weapon->m_melee_duration)
+			if (m_melee_weapon && m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() > m_melee_weapon->m_melee_duration)
 			{
 				m_is_attacking = false;
 				m_melee_weapon->m_visible = false;
-				//m_melee_weapon->setScale(sf::Vector2f(0.f, m_melee_weapon->m_melee_range.y));
-				//m_melee_weapon->setScale(sf::Vector2f(0.f, 1.f));
 				m_melee_weapon->Extend(sf::Vector2f(0.f, 1.f));
 				m_melee_weapon->m_enemies_tagged.clear();
-				m_melee_clock.restart();
+				m_melee_weapon->setColor(m_melee_weapon->m_color);
 			}
 		}
 
@@ -130,13 +127,13 @@ void Ship::update(sf::Time deltaTime)
 				m_is_attacking = true;
 				starting_melee_attacking = true;
 				m_melee_weapon->m_visible = true;
-				m_melee_clock.restart();
+				m_melee_weapon->m_melee_clock.restart();
 			}
 		}
 
 		if (m_is_attacking)//update
 		{
-			float ratio = m_melee_clock.getElapsedTime().asSeconds() / m_melee_weapon->m_melee_duration;
+			float ratio = m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() / m_melee_weapon->m_melee_duration;
 			if (ratio > 1.0f)
 			{
 				ratio = 1.0f;
@@ -639,9 +636,15 @@ void Ship::Death()
 
 	m_move_state = Character_Idle;
 	m_speed = sf::Vector2f(0, 0);
-	m_dash_enemy = 0;
+
+	m_dash_enemy = NULL;
 	m_dash_first_time = true;
 	m_immune_first_time = true;
+
+	//debug respawn
+	m_visible = true;
+	//setPosition(sf::Vector2f(SHIP_START_X, SHIP_START_Y));
+	m_hp = m_hp_max;
 }
 
 void Ship::GetLoot(GameObject* object)

@@ -97,7 +97,6 @@ public :
 
 	//melee
 	Weapon* m_melee_weapon;
-	sf::Clock m_melee_clock;
 	bool m_is_attacking;
 
 	int m_hp;

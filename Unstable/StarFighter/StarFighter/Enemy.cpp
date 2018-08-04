@@ -12,7 +12,7 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_melee_cooldown = 2.f;
 
 	m_is_attacking = false;
-	m_melee_weapon = new Weapon(Weapon_Katana);
+	m_melee_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
 	(*CurrentGame).addToScene(m_melee_weapon, EnemyMeleeWeaponLayer, EnemyMeleeWeapon);
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
@@ -26,6 +26,12 @@ Enemy::~Enemy()
 	{
 		playerShip->SetDashEnemy(NULL);
 	}
+
+	if (m_melee_weapon)
+	{
+		m_melee_weapon->m_GarbageMe = true;
+		m_melee_weapon->m_visible = false;
+	}
 }
 
 void Enemy::update(sf::Time deltaTime)
@@ -37,32 +43,32 @@ void Enemy::update(sf::Time deltaTime)
 	bool starting_melee_attacking = false;
 	if (m_is_attacking)//reset
 	{
-		if (m_melee_clock.getElapsedTime().asSeconds() > m_melee_weapon->m_melee_duration)
+		if (m_melee_weapon && m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() > m_melee_weapon->m_melee_duration)
 		{
 			m_is_attacking = false;
 			m_melee_weapon->m_visible = false;
-			//m_melee_weapon->setScale(sf::Vector2f(0.f, m_melee_weapon->m_melee_range.y));
-			//m_melee_weapon->setScale(sf::Vector2f(0.f, 1.f));
 			m_melee_weapon->Extend(sf::Vector2f(0.f, 1.f));
 			m_melee_weapon->m_enemies_tagged.clear();
-			m_melee_clock.restart();
+			m_melee_weapon->setColor(m_melee_weapon->m_color);
+
+			m_melee_cooldown_clock.restart();
 		}
 	}
 
-	if (m_melee_clock.getElapsedTime().asSeconds() > m_melee_cooldown)//condition for attack
+	if (m_melee_cooldown_clock.getElapsedTime().asSeconds() > m_melee_cooldown)//condition for attack
 	{
 		if (m_melee_weapon && !m_is_attacking)
 		{
 			m_is_attacking = true;
 			starting_melee_attacking = true;
 			m_melee_weapon->m_visible = true;
-			m_melee_clock.restart();
+			m_melee_weapon->m_melee_clock.restart();
 		}
 	}
 
 	if (m_is_attacking)//update
 	{
-		float ratio = m_melee_clock.getElapsedTime().asSeconds() / m_melee_weapon->m_melee_duration;
+		float ratio = m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() / m_melee_weapon->m_melee_duration;
 		if (ratio > 1.0f)
 		{
 			ratio = 1.0f;

@@ -26,7 +26,7 @@ public :
 
 	//melee
 	Weapon* m_melee_weapon;
-	sf::Clock m_melee_clock;
+	sf::Clock m_melee_cooldown_clock;
 	bool m_is_attacking;
 	float m_melee_cooldown;
 	//void UpdateMeleeWeaponPosition();

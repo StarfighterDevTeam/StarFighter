@@ -30,7 +30,7 @@ void InGameState::Initialize(Player player)
 
 	float step = 150;
 	Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	wufeng->setColor(sf::Color(255, 0, 0, 255));
+	//wufeng->setColor(sf::Color(255, 0, 0, 255));
 	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
 	wufeng->setScale(sf::Vector2f(0.2, 0.2));
 
@@ -90,17 +90,6 @@ void InGameState::Update(sf::Time deltaTime)
 	//	wufeng->setColor(sf::Color(255, 0, 0, 255));
 	//	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
 	//}
-
-	
-
-
-	//Respawn player
-	if ((*CurrentGame).m_playerShip->m_visible == false)
-	{
-		(*CurrentGame).m_playerShip->m_visible = true;
-		(*CurrentGame).m_playerShip->setPosition(sf::Vector2f(SHIP_START_X, SHIP_START_Y));
-		(*CurrentGame).m_playerShip->m_hp = (*CurrentGame).m_playerShip->m_hp_max;
-	}
 
 	//move camera
 	UpdateCamera(deltaTime);

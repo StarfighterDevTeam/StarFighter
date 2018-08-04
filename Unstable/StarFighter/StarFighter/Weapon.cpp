@@ -9,15 +9,17 @@ extern Game* CurrentGame;
 
 #define MELEE_RANGE_X				130.f
 #define MELEE_RANGE_Y				70.f
-#define MELEE_DURATION				0.1f
+#define MELEE_DURATION				10.3f
 
-Weapon::Weapon(WeaponTypes type)
+Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 {
+	m_owner = owner;
+
 	switch (type)
 	{
 		case Weapon_Katana:
 		{
-			InitWeapon(sf::Vector2f(MELEE_RANGE_X, MELEE_RANGE_Y), sf::Color(255, 255, 0, 255));
+			InitWeapon(sf::Vector2f(MELEE_RANGE_X, MELEE_RANGE_Y), color);
 			break;
 		}
 	}
@@ -33,17 +35,24 @@ void Weapon::InitWeapon(sf::Vector2f size, sf::Color color)// : GameObject(sf::V
 
 	for (int i = 0; i < W * H * 4; i += 4)
 	{
-		pixels[i] = color.r;		// R
-		pixels[i + 1] = color.g;	// G
-		pixels[i + 2] = color.b;	// B
-		pixels[i + 3] = color.a;	// A
+		//pixels[i] = color.r;		// R
+		//pixels[i + 1] = color.g;	// G
+		//pixels[i + 2] = color.b;	// B
+		//pixels[i + 3] = color.a;	// A
+		pixels[i]		= 255;	// R
+		pixels[i + 1]	= 255;	// G
+		pixels[i + 2]	= 255;	// B
+		pixels[i + 3]	= 255;	// A
 	}
 
 	ostringstream ss;
-	ss << "weapon_" << (int)size.x << "x" << (int)size.y << "_r" << (int)color.r << "_g" << (int)color.g << "_b" << (int)color.b << "_a" << (int)color.a;
-	
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), ss.str(), sf::Vector2f(W, H), 1, 1, pixels);
+	//ss << "weapon_" << (int)size.x << "x" << (int)size.y << "_r" << (int)color.r << "_g" << (int)color.g << "_b" << (int)color.b << "_a" << (int)color.a;
+	ss << "weapon_" << (int)size.x << "x" << (int)size.y;
 
+	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), ss.str(), sf::Vector2f(W, H), 1, 1, pixels);
+	
+	setColor(color);
+	m_color = color;
 
 	// INIT
 	m_melee_range = sf::Vector2f(MELEE_RANGE_X, MELEE_RANGE_Y);
@@ -78,7 +87,29 @@ void Weapon::CollisionWithEnemy(GameObject* enemy)
 
 		ostringstream ss;
 		ss << "-" << m_dmg;
-		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
+		sf::Color color = enemy->m_collider_type == PlayerShip ? sf:: Color::Red : sf::Color::Blue;
+		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, color, enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
+	}
+}
+
+void Weapon::CollisionBetweenWeapons(GameObject* enemy_weapon)
+{
+	Weapon* weapon = (Weapon*)enemy_weapon;
+
+	//tagging the enemy weapon's owner so it won't be affected by further damage by this weapon (= parry mechanic)
+
+	std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), weapon->m_owner);
+	if (it == m_enemies_tagged.end())
+	{
+		m_enemies_tagged.push_back(weapon->m_owner);
+		setColor(sf::Color::White);
+	}
+
+	std::vector<GameObject*>::iterator it2 = find(weapon->m_enemies_tagged.begin(), weapon->m_enemies_tagged.end(), m_owner);
+	if (it2 == weapon->m_enemies_tagged.end())
+	{
+		weapon->m_enemies_tagged.push_back(m_owner);
+		weapon->setColor(sf::Color::White);
 	}
 }
 

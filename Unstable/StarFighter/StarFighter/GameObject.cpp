@@ -539,6 +539,11 @@ void GameObject::CollisionWithEnemy(GameObject* enemy)
 	//see override function in class Ship and Weapon
 }
 
+void GameObject::CollisionBetweenWeapons(GameObject* enemy_weapon)
+{
+	//see override function in class Weapon
+}
+
 void GameObject::Draw(sf::RenderTexture& screen)
 {
 	screen.draw(*this);

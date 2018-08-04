@@ -372,7 +372,7 @@ void Game::colisionChecksV2()
 			}
 		}
 
-		//Enemy bullets hitting the player
+		//Enemy weapon hitting the player
 		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].end(); it2++)
 		{
 			if (*it2 == NULL)
@@ -381,7 +381,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				
+				(*it2)->CollisionWithEnemy(*it1);
 			}
 		}
 	}
@@ -404,6 +404,19 @@ void Game::colisionChecksV2()
 			{
 				//Do something 
 				(*it1)->CollisionWithEnemy(*it2);
+			}
+		}
+
+		//Weapon hitting weapon
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].begin(); it2 != m_sceneGameObjectsTyped[GameObjectType::EnemyMeleeWeapon].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it1)->CollisionBetweenWeapons(*it2);
 			}
 		}
 	}
