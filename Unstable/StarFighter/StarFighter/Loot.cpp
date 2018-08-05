@@ -24,6 +24,12 @@ Loot::Loot(LootTypes type, sf::Vector2f position)
 			m_weapon_type = Weapon_Spear;
 			break;
 		}
+		case Loot_WeaponShuriken:
+		{
+			Init(position, sf::Vector2f(0, 0), "2D/shuriken.png", sf::Vector2f(100, 100), 1, 1);
+			m_weapon_type = Weapon_Shuriken;
+			break;
+		}
 	}
 }
 

@@ -10,6 +10,7 @@ enum LootTypes
 {
 	Loot_WeaponKatana,
 	Loot_WeaponSpear,
+	Loot_WeaponShuriken,
 	Loot_BonusMeleeRange,
 	NBVAL_LOOT_TYPES,
 };

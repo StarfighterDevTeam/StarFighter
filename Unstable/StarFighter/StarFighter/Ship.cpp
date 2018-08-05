@@ -598,21 +598,31 @@ void Ship::Death()
 	m_hp = m_hp_max;
 }
 
-bool Ship::GetMeleeWeapon(Weapon* weapon)
+bool Ship::GetWeapon(Weapon* weapon)
 {
-	if (weapon->m_type == m_melee_weapon->m_type)
+	//Weapon* cur_weapon = weapon->m_ranged ? m_ranged_weapon : m_melee_weapon;
+	Weapon* cur_weapon = m_melee_weapon;
+
+	//no current weapon? keep it...
+	if (cur_weapon == NULL)
+	{
+		cur_weapon = new Weapon(this, weapon->m_type);
+	}
+	else if (cur_weapon->m_type == weapon->m_type)
 	{
 		return false;
 	}
-
-	m_melee_weapon->m_melee_range = weapon->m_melee_range;
-	m_melee_weapon->m_melee_duration = weapon->m_melee_duration;
-	m_melee_weapon->m_piercing = weapon->m_piercing;
-
-	m_melee_weapon->m_color = weapon->m_color;
-
-	m_melee_weapon->m_enemies_tagged.clear();
-	m_melee_weapon->m_visible = false;
+	
+	//...otherwise, apply new weapon's properties
+	cur_weapon->m_melee_range = weapon->m_melee_range;
+	cur_weapon->m_melee_duration = weapon->m_melee_duration;
+	cur_weapon->m_piercing = weapon->m_piercing;
+	cur_weapon->m_ranged = weapon->m_ranged;
+			
+	cur_weapon->m_color = weapon->m_color;
+			
+	cur_weapon->m_enemies_tagged.clear();
+	cur_weapon->m_visible = false;
 
 	return true;
 }
@@ -634,9 +644,10 @@ void Ship::GetLoot(GameObject* object)
 
 		case Loot_WeaponKatana:
 		case Loot_WeaponSpear:
+		case Loot_WeaponShuriken:
 		{
 			Weapon* weapon = new Weapon(this, loot->m_weapon_type);
-			GetMeleeWeapon(weapon);
+			GetWeapon(weapon);
 			delete weapon;
 			weapon = NULL;
 			break;

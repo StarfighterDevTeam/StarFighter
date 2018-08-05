@@ -29,6 +29,9 @@ void InGameState::Initialize(Player player)
 	Loot* spear = new Loot(Loot_WeaponSpear, sf::Vector2f(SHIP_START_X + 500, SHIP_START_Y - 200));
 	(*CurrentGame).addToScene(spear, LootObjectLayer, LootObject);
 
+	Loot* shuriken = new Loot(Loot_WeaponShuriken, sf::Vector2f(SHIP_START_X - 400, SHIP_START_Y - 200));
+	(*CurrentGame).addToScene(shuriken, LootObjectLayer, LootObject);
+
 	//enemies
 
 	float step = 150;

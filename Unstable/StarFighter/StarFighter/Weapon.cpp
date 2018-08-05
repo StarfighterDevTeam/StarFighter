@@ -20,6 +20,7 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 	m_owner = owner;
 	m_type = type;
 	m_color = color;
+	m_visible = false;
 
 	switch (type)
 	{
@@ -29,6 +30,9 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 			m_melee_duration = MELEE_KATANA_DURATION;
 			m_dmg = 1;
 			m_piercing = false;
+			m_ranged = false;
+
+			InitWeapon(m_melee_range, color);
 			break;
 		}
 
@@ -38,11 +42,24 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 			m_melee_duration = MELEE_SPEAR_DURATION;
 			m_dmg = 1;
 			m_piercing = true;
+			m_ranged = false;
+
+			InitWeapon(m_melee_range, color);
+			break;
+		}
+
+		case Weapon_Shuriken:
+		{
+			m_melee_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
+			m_melee_duration = MELEE_SPEAR_DURATION;
+			m_dmg = 1;
+			m_piercing = true;
+			m_ranged = true;
+
+			Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/range_shuriken.png", sf::Vector2f(32, 32), 1, 1);
 			break;
 		}
 	}
-
-	InitWeapon(m_melee_range, color);
 }
 
 void Weapon::InitWeapon(sf::Vector2f size, sf::Color color)// : GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/smiley.png", sf::Vector2f(200, 200), sf::Vector2f(100, 100))
@@ -72,7 +89,6 @@ void Weapon::InitWeapon(sf::Vector2f size, sf::Color color)// : GameObject(sf::V
 	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), ss.str(), sf::Vector2f(W, H), 1, 1, pixels);
 	
 	setColor(color);
-	m_visible = false;
 	Extend(sf::Vector2f(0.f, 1.f));
 	//setScale(sf::Vector2f(0.f, m_melee_range.y));
 	//setScale(sf::Vector2f(0.f, 1.f));
@@ -128,9 +144,12 @@ void Weapon::CollisionBetweenWeapons(GameObject* enemy_weapon)
 
 void Weapon::Extend(sf::Vector2f ratio)
 {
-	sf::Vector2f scale;
-	scale.x = 1.f / m_size.x * m_melee_range.x;
-	scale.y = 1.f / m_size.y * m_melee_range.y;
+	if (m_ranged == false)
+	{
+		sf::Vector2f scale;
+		scale.x = 1.f / m_size.x * m_melee_range.x;
+		scale.y = 1.f / m_size.y * m_melee_range.y;
 
-	setScale(sf::Vector2f(ratio.x * scale.x, ratio.y * scale.y));
+		setScale(sf::Vector2f(ratio.x * scale.x, ratio.y * scale.y));
+	}
 }

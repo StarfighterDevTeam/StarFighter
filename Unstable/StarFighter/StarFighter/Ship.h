@@ -96,7 +96,7 @@ public :
 
 	//melee
 	Weapon* m_melee_weapon;
-	bool GetMeleeWeapon(Weapon* weapon);
+	bool GetWeapon(Weapon* weapon);
 	bool m_is_attacking;
 
 	int m_hp;
