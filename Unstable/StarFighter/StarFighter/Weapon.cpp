@@ -15,50 +15,73 @@ extern Game* CurrentGame;
 #define MELEE_SPEAR_RANGE_Y				40.f
 #define MELEE_SPEAR_DURATION			0.5f
 
+#define RANGED_SHURIKEN_SPEED			1000.f
+#define RANGED_SHURIKEN_COOLDOWN		0.5f
+
 Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 {
 	m_owner = owner;
 	m_type = type;
 	m_color = color;
 	m_visible = false;
+	m_bullet = new Ammo(this->m_owner, sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/range_shuriken.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16), 1, 1);
+	LayerType layer = m_owner->m_layer == PlayerShipLayer ? PlayerBulletLayer : EnemyBulletLayer;
+	GameObjectType collider_type = m_owner->m_collider_type == PlayerShip ? PlayerBulletObject : EnemyBulletObject;
+	m_bullet->m_layer = layer;
+	m_bullet->m_collider_type = collider_type;
 
 	switch (type)
 	{
 		case Weapon_Katana:
 		{
-			m_melee_range = sf::Vector2f(MELEE_KATANA_RANGE_X, MELEE_KATANA_RANGE_Y);
-			m_melee_duration = MELEE_KATANA_DURATION;
+			m_range = sf::Vector2f(MELEE_KATANA_RANGE_X, MELEE_KATANA_RANGE_Y);
+			m_attack_duration = MELEE_KATANA_DURATION;
 			m_dmg = 1;
-			m_piercing = false;
-			m_ranged = false;
+			m_is_piercing = false;
+			m_is_ranged = false;
 
-			InitWeapon(m_melee_range, color);
+			InitWeapon(m_range, color);
 			break;
 		}
 
 		case Weapon_Spear:
 		{	 
-			m_melee_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
-			m_melee_duration = MELEE_SPEAR_DURATION;
+			m_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
+			m_attack_duration = MELEE_SPEAR_DURATION;
 			m_dmg = 1;
-			m_piercing = true;
-			m_ranged = false;
+			m_is_piercing = true;
+			m_is_ranged = false;
 
-			InitWeapon(m_melee_range, color);
+			InitWeapon(m_range, color);
 			break;
 		}
 
 		case Weapon_Shuriken:
 		{
-			m_melee_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
-			m_melee_duration = MELEE_SPEAR_DURATION;
+			m_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
+			m_attack_duration = RANGED_SHURIKEN_COOLDOWN;
 			m_dmg = 1;
-			m_piercing = true;
-			m_ranged = true;
+			m_is_piercing = true;
+			m_is_ranged = true;
+			m_bullet->m_textureName = "2D/range_shuriken.png";
+			m_bullet->m_size = sf::Vector2f(32, 32);
+			m_bullet->m_frameNumber = 1;
+			m_bullet_speed = RANGED_SHURIKEN_SPEED;
+			m_bullet_is_following_target = false;
+			m_bullet_is_unique = false;
 
 			Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/range_shuriken.png", sf::Vector2f(32, 32), 1, 1);
 			break;
 		}
+	}
+}
+
+Weapon::~Weapon()
+{
+	if (m_bullet)
+	{
+		delete m_bullet;
+		m_bullet = NULL;
 	}
 }
 
@@ -90,7 +113,7 @@ void Weapon::InitWeapon(sf::Vector2f size, sf::Color color)// : GameObject(sf::V
 	
 	setColor(color);
 	Extend(sf::Vector2f(0.f, 1.f));
-	//setScale(sf::Vector2f(0.f, m_melee_range.y));
+	//setScale(sf::Vector2f(0.f, m_range.y));
 	//setScale(sf::Vector2f(0.f, 1.f));
 }
 
@@ -107,7 +130,7 @@ void Weapon::Draw(sf::RenderTexture& screen)
 
 void Weapon::CollisionWithEnemy(GameObject* enemy)
 {
-	if (m_piercing == false && m_enemies_tagged.size() > 0)//piercing is the ability to hit several targets with one stroke
+	if (m_is_piercing == false && m_enemies_tagged.size() > 0)//piercing is the ability to hit several targets with one stroke
 	{
 		return;
 	}
@@ -144,12 +167,76 @@ void Weapon::CollisionBetweenWeapons(GameObject* enemy_weapon)
 
 void Weapon::Extend(sf::Vector2f ratio)
 {
-	if (m_ranged == false)
+	if (m_is_ranged == false)
 	{
 		sf::Vector2f scale;
-		scale.x = 1.f / m_size.x * m_melee_range.x;
-		scale.y = 1.f / m_size.y * m_melee_range.y;
+		scale.x = 1.f / m_size.x * m_range.x;
+		scale.y = 1.f / m_size.y * m_range.y;
 
 		setScale(sf::Vector2f(ratio.x * scale.x, ratio.y * scale.y));
 	}
+}
+
+Ammo* Weapon::Shoot()
+{
+	Ammo* bullet = new Ammo(this->m_owner, m_bullet_speed, m_bullet->m_textureName, m_bullet->m_size, m_bullet->m_size * 0.5f, m_bullet->m_frameNumber, 1);
+	(*CurrentGame).addToScene(bullet, m_bullet->m_layer, m_bullet->m_collider_type);
+
+	bullet->m_visible = true;
+
+	bullet->setPosition(getPosition());
+	bullet->setRotation(getRotation());
+
+	return bullet;
+}
+
+void Weapon::Shoot(float angle_rad)
+{
+	Ammo* bullet = Shoot();
+
+	bullet->SetSpeedVectorFromAbsoluteSpeedAndAngle(m_bullet_speed, angle_rad);
+}
+
+void Weapon::Shoot(GameObject* target)
+{
+	if (target)
+	{
+		Ammo* bullet = Shoot();
+		
+		bullet->SetSpeedForConstantSpeedToDestination(target->getPosition(), m_bullet_speed);
+
+		if (m_bullet_is_following_target)
+		{
+			bullet->m_target = target;
+		}
+	}
+	else
+	{
+		Shoot((getRotation() - 90.f) * M_PI / 180.f);
+	}
+}
+
+size_t Weapon::GetBulletFiredCount()
+{
+	size_t count = 0;
+
+	vector<GameObject*> bullets = (*CurrentGame).GetSceneGameObjectsTyped(m_bullet->m_collider_type);
+
+	size_t bulletsVectorSize = bullets.size();
+	for (size_t i = 0; i < bulletsVectorSize; i++)
+	{
+		if (bullets[i] == NULL)
+			continue;
+
+		if (bullets[i]->m_visible == false)
+			continue;
+
+		Ammo* bullet = (Ammo*)bullets[i];
+		if (bullet->m_owner = this->m_owner)
+		{
+			count++;
+		}
+	}
+
+	return count;
 }

@@ -95,7 +95,7 @@ public :
 	vector<GameObject*> m_dash_enemies_tagged;
 
 	//melee
-	Weapon* m_melee_weapon;
+	Weapon* m_weapon;
 	bool GetWeapon(Weapon* weapon);
 	bool m_is_attacking;
 

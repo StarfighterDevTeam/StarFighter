@@ -23,7 +23,7 @@ public :
 
 	LootTypes m_type;
 
-	sf::Vector2f m_melee_range_bonus;
+	sf::Vector2f m_range_bonus;
 	WeaponTypes m_weapon_type;
 };
 

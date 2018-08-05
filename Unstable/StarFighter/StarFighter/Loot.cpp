@@ -15,7 +15,7 @@ Loot::Loot(LootTypes type, sf::Vector2f position)
 		case Loot_BonusMeleeRange:
 		{
 			Init(position, sf::Vector2f(0, 0), "2D/qi.png", sf::Vector2f(20, 24), 1, 1);
-			m_melee_range_bonus = sf::Vector2f(LOOT_BONUS_MELEE_RANGE, 0);
+			m_range_bonus = sf::Vector2f(LOOT_BONUS_MELEE_RANGE, 0);
 			break;
 		}
 		case Loot_WeaponSpear:

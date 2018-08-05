@@ -28,9 +28,11 @@ enum LayerType {
 	FeedbacksLayer,
 	LootObjectLayer,
 
-	PlayerMeleeWeaponLayer,
+	PlayerWeaponLayer,
 	PlayerShipLayer,
-	EnemyMeleeWeaponLayer,
+	PlayerBulletLayer,
+	EnemyWeaponLayer,
+	EnemyBulletLayer,
 
 	PanelLayer,
 	HudObject,
@@ -45,9 +47,11 @@ enum GameObjectType {
 	LootObject,
 	PlayerShip,
 	FakePlayerShip,
-	PlayerMeleeWeapon,
+	PlayerWeaponObject,
+	PlayerBulletObject,
 	Neutral,
-	EnemyMeleeWeapon,
+	EnemyWeaponObject,
+	EnemyBulletObject,
 	EnemyObject,
 	NBVAL_GameObject
 };

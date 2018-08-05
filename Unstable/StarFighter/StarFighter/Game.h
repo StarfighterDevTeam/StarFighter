@@ -115,10 +115,11 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
-private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
+
+private:
 
 	RenderWindow* m_window;
 	std::list<RectangleShape*> m_sceneFeedbackBars;

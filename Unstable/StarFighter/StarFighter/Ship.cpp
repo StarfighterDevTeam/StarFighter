@@ -42,8 +42,8 @@ void Ship::Init()
 	m_dash_streak = 0;
 
 	m_is_attacking = false;
-	m_melee_weapon = new Weapon(this, Weapon_Katana);
-	(*CurrentGame).addToScene(m_melee_weapon, PlayerMeleeWeaponLayer, PlayerMeleeWeapon);
+	m_weapon = new Weapon(this, Weapon_Katana);
+	(*CurrentGame).addToScene(m_weapon, PlayerWeaponLayer, PlayerWeaponObject);
 
 	m_dash_first_time = true;
 	m_immune_first_time = true;
@@ -72,10 +72,10 @@ Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, s
 
 Ship::~Ship()
 {
-	if (m_melee_weapon)
+	if (m_weapon)
 	{
-		m_melee_weapon->m_GarbageMe = true;
-		m_melee_weapon->m_visible = false;
+		m_weapon->m_GarbageMe = true;
+		m_weapon->m_visible = false;
 	}
 }
 
@@ -86,8 +86,6 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	bool starting_melee_attacking = false;
-
 	sf::Vector2f inputs_direction = InputGuy::getDirections();
 
 	if (!m_disable_inputs)
@@ -99,51 +97,62 @@ void Ship::update(sf::Time deltaTime)
 
 	//Action input
 	UpdateInputStates();
-	
+
 	//ATTACKS
 	GameObject* dash_enemy = (*CurrentGame).getDashTarget(m_dash_radius);
 	if (m_move_state == Character_Idle)
 	{
 		ManageAcceleration(inputs_direction);
 
-		//Melee
+		//Attack
 		if (m_is_attacking)//reset
 		{
-			if (m_melee_weapon && m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() > m_melee_weapon->m_melee_duration)
+			if (m_weapon && m_weapon->m_attack_clock.getElapsedTime().asSeconds() > m_weapon->m_attack_duration)
 			{
-				m_is_attacking = false;
-				m_melee_weapon->m_visible = false;
-				m_melee_weapon->Extend(sf::Vector2f(0.f, 1.f));
-				m_melee_weapon->m_enemies_tagged.clear();
-				m_melee_weapon->setColor(m_melee_weapon->m_color);
+				m_weapon->m_visible = false;
+				m_weapon->Extend(sf::Vector2f(0.f, 1.f));
+				m_weapon->m_enemies_tagged.clear();
+				m_weapon->setColor(m_weapon->m_color);
+
+				if (m_weapon->m_is_ranged && m_weapon->m_bullet_is_unique && m_weapon->GetBulletFiredCount() > 0)
+				{
+					//do nothing
+				}
+				else
+				{
+					m_is_attacking = false;
+				}
 			}
 		}
 
 		if (m_inputs_states[Action_Melee] == Input_Tap)//start attack
 		{
-			if (m_melee_weapon && !m_is_attacking)
+			if (m_weapon && !m_is_attacking)
 			{
+				if (m_weapon->m_is_ranged == false)
+				{
+					m_weapon->m_visible = true;
+					(*CurrentGame).PlaySFX(SFX_Melee);
+				}
+				else
+				{
+					m_weapon->Shoot(dash_enemy);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
+				}
+
 				m_is_attacking = true;
-				starting_melee_attacking = true;
-				m_melee_weapon->m_visible = true;
-				m_melee_weapon->m_melee_clock.restart();
-				(*CurrentGame).PlaySFX(SFX_Melee);
+				m_weapon->m_attack_clock.restart();
 			}
 		}
 
 		if (m_is_attacking)//update
 		{
-			float ratio = m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() / m_melee_weapon->m_melee_duration;
+			float ratio = m_weapon->m_attack_clock.getElapsedTime().asSeconds() / m_weapon->m_attack_duration;
 			if (ratio > 1.0f)
 			{
 				ratio = 1.0f;
 			}
-			//m_melee_weapon->setScale(sf::Vector2f(m_melee_weapon->m_melee_range.x * ratio, m_melee_weapon->m_melee_range.y));
-			//sf::Vector2f scale;
-			//scale.x = 1.f / m_melee_weapon->m_size.x * m_melee_weapon->m_melee_range.x;
-			//scale.y = 1.f / m_melee_weapon->m_size.y * m_melee_weapon->m_melee_range.y;
-			//m_melee_weapon->setScale(sf::Vector2f(ratio * scale.x, scale.y));
-			m_melee_weapon->Extend(sf::Vector2f(ratio, 1.f));
+
+			m_weapon->Extend(sf::Vector2f(ratio, 1.f));
 		}
 
 		//Dash?
@@ -291,11 +300,7 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
-	//if (starting_melee_attacking)
-	//{
-		//UpdateMeleeWeaponPosition();
-		UpdateWeaponPosition(m_melee_weapon);
-	//}
+	UpdateWeaponPosition(m_weapon);
 
 	//debug
 	m_dash_radius_feedback.setPosition(getPosition());
@@ -508,7 +513,7 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 	{
 		if (GetDistanceBetweenObjects(enemy, this) < 16)//we don't aim for a pixel collision here but for a true proximity to the center of the enemy
 		{
-			int dmg = m_melee_weapon ? m_melee_weapon->m_dmg : 0;
+			int dmg = m_weapon ? m_weapon->m_dmg : 0;
 			m_dash_enemy->DealDamage(dmg);
 
 			ostringstream ss;
@@ -600,30 +605,40 @@ void Ship::Death()
 
 bool Ship::GetWeapon(Weapon* weapon)
 {
-	//Weapon* cur_weapon = weapon->m_ranged ? m_ranged_weapon : m_melee_weapon;
-	Weapon* cur_weapon = m_melee_weapon;
+	//Weapon* m_weapon = weapon->m_is_ranged ? m_is_ranged_weapon : m_weapon;
+	m_weapon;
 
 	//no current weapon? keep it...
-	if (cur_weapon == NULL)
+	if (m_weapon == NULL)
 	{
-		cur_weapon = new Weapon(this, weapon->m_type);
+		m_weapon = new Weapon(this, weapon->m_type);
 	}
-	else if (cur_weapon->m_type == weapon->m_type)
+	else if (m_weapon->m_type == weapon->m_type)
 	{
 		return false;
 	}
 	
 	//...otherwise, apply new weapon's properties
-	cur_weapon->m_melee_range = weapon->m_melee_range;
-	cur_weapon->m_melee_duration = weapon->m_melee_duration;
-	cur_weapon->m_piercing = weapon->m_piercing;
-	cur_weapon->m_ranged = weapon->m_ranged;
+	m_weapon->m_range = weapon->m_range;
+	m_weapon->m_attack_duration = weapon->m_attack_duration;
+	m_weapon->m_is_piercing = weapon->m_is_piercing;
+	m_weapon->m_is_ranged = weapon->m_is_ranged;
 			
-	cur_weapon->m_color = weapon->m_color;
+	m_weapon->m_color = weapon->m_color;
 			
-	cur_weapon->m_enemies_tagged.clear();
-	cur_weapon->m_visible = false;
+	m_weapon->m_enemies_tagged.clear();
+	m_weapon->m_visible = false;
 
+	if (weapon->m_is_ranged)
+	{
+		m_weapon->m_bullet->m_textureName = weapon->m_bullet->m_textureName;
+		m_weapon->m_bullet->m_size = weapon->m_bullet->m_size;
+		m_weapon->m_bullet->m_frameNumber = weapon->m_bullet->m_frameNumber;
+		m_weapon->m_bullet_speed = weapon->m_bullet_speed;
+		m_weapon->m_bullet_is_following_target = weapon->m_bullet_is_following_target;
+		m_weapon->m_bullet_is_unique = weapon->m_bullet_is_unique;
+	}
+	
 	return true;
 }
 
@@ -638,7 +653,7 @@ void Ship::GetLoot(GameObject* object)
 	{
 		case Loot_BonusMeleeRange:
 		{
-			m_melee_weapon->m_melee_range += loot->m_melee_range_bonus;
+			m_weapon->m_range += loot->m_range_bonus;
 			break;
 		}
 

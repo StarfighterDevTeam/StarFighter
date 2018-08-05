@@ -19,8 +19,8 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_ref_speed = 150.f;
 
 	m_is_attacking = false;
-	m_melee_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
-	(*CurrentGame).addToScene(m_melee_weapon, EnemyMeleeWeaponLayer, EnemyMeleeWeapon);
+	m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
+	(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	//SetSpeedVectorFromAbsoluteSpeedAndAngle(200, angle * M_PI / 180);
@@ -34,10 +34,10 @@ Enemy::~Enemy()
 		playerShip->SetDashEnemy(NULL);
 	}
 
-	if (m_melee_weapon)
+	if (m_weapon)
 	{
-		m_melee_weapon->m_GarbageMe = true;
-		m_melee_weapon->m_visible = false;
+		m_weapon->m_GarbageMe = true;
+		m_weapon->m_visible = false;
 	}
 }
 
@@ -160,7 +160,7 @@ void Enemy::update(sf::Time deltaTime)
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
 
-	if (m_melee_weapon->m_owner == NULL)
+	if (m_weapon->m_owner == NULL)
 	{
 		printf("BUG\n");//chasing a potential bug
 	}
@@ -175,16 +175,15 @@ void Enemy::update(sf::Time deltaTime)
 	SetSpeedForConstantSpeedToDestination(player->getPosition() + flocking_vector, m_ref_speed);
 
 	//Melee
-	bool starting_melee_attacking = false;
 	if (m_is_attacking)//reset
 	{
-		if (m_melee_weapon && m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() > m_melee_weapon->m_melee_duration)
+		if (m_weapon && m_weapon->m_attack_clock.getElapsedTime().asSeconds() > m_weapon->m_attack_duration)
 		{
 			m_is_attacking = false;
-			m_melee_weapon->m_visible = false;
-			m_melee_weapon->Extend(sf::Vector2f(0.f, 1.f));
-			m_melee_weapon->m_enemies_tagged.clear();
-			m_melee_weapon->setColor(m_melee_weapon->m_color);
+			m_weapon->m_visible = false;
+			m_weapon->Extend(sf::Vector2f(0.f, 1.f));
+			m_weapon->m_enemies_tagged.clear();
+			m_weapon->setColor(m_weapon->m_color);
 
 			m_melee_cooldown_clock.restart();
 		}
@@ -192,27 +191,26 @@ void Enemy::update(sf::Time deltaTime)
 
 	if (m_melee_cooldown_clock.getElapsedTime().asSeconds() > m_melee_cooldown)//condition to start attack
 	{
-		if (m_melee_weapon && !m_is_attacking)
+		if (m_weapon && !m_is_attacking)
 		{
 			m_is_attacking = true;
-			starting_melee_attacking = true;
-			m_melee_weapon->m_visible = true;
-			m_melee_weapon->m_melee_clock.restart();
+			m_weapon->m_visible = true;
+			m_weapon->m_attack_clock.restart();
 			(*CurrentGame).PlaySFX(SFX_Melee);
 		}
 	}
 
 	if (m_is_attacking)//update
 	{
-		float ratio = m_melee_weapon->m_melee_clock.getElapsedTime().asSeconds() / m_melee_weapon->m_melee_duration;
+		float ratio = m_weapon->m_attack_clock.getElapsedTime().asSeconds() / m_weapon->m_attack_duration;
 		if (ratio > 1.0f)
 		{
 			ratio = 1.0f;
 		}
-		m_melee_weapon->Extend(sf::Vector2f(ratio, 1.f));
+		m_weapon->Extend(sf::Vector2f(ratio, 1.f));
 	}
 
-	UpdateWeaponPosition(m_melee_weapon);
+	UpdateWeaponPosition(m_weapon);
 
 	GameObject::update(deltaTime);
 

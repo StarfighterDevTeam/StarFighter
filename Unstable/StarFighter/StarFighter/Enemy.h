@@ -30,7 +30,7 @@ public :
 	sf::Vector2f FlockingSeparate();
 
 	//melee
-	Weapon* m_melee_weapon;
+	Weapon* m_weapon;
 	sf::Clock m_melee_cooldown_clock;
 	bool m_is_attacking;
 	float m_melee_cooldown;
