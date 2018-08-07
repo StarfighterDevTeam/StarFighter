@@ -4,12 +4,15 @@ extern Game* CurrentGame;
 
 using namespace sf;
 
-Ammo::Ammo(GameObject* owner, float speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
+Ammo::Ammo(GameObject* owner, float speed, int dmg, bool is_piercing, bool can_be_parried, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), textureName, size, origin, frameNumber, animationNumber)
 {
 	m_ref_speed = speed;
 	m_target = NULL;
 	m_owner = owner;
 	m_visible = false;
+	m_dmg = dmg;
+	m_is_piercing = is_piercing;
+	m_can_be_parried = can_be_parried;
 }
 
 Ammo::Ammo(GameObject* owner, sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
@@ -21,7 +24,7 @@ Ammo::Ammo(GameObject* owner, sf::Vector2f position, sf::Vector2f speed, std::st
 
 Ammo::~Ammo()
 {
-	
+	printf("");
 }
 
 void Ammo::update(sf::Time deltaTime)
@@ -32,4 +35,28 @@ void Ammo::update(sf::Time deltaTime)
 	}
 
 	GameObject::update(deltaTime);
+}
+
+void Ammo::CollisionWithEnemy(GameObject* enemy)
+{
+	if (m_is_piercing == false)// && m_enemies_tagged.size() > 0)//piercing is the ability to hit several targets with one stroke
+	{
+		enemy->DealDamage(m_dmg);
+		m_GarbageMe = true;
+		m_visible = false;
+
+		printf("touché\n");
+	}
+	else
+	{
+		std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy);
+		if (it == m_enemies_tagged.end())
+		{
+			m_enemies_tagged.push_back(enemy);
+
+			enemy->DealDamage(m_dmg);
+
+			printf("touché\n");
+		}
+	}
 }

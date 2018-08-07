@@ -59,6 +59,7 @@ public:
 	void removeFromFeedbacks(Text* text);
 	void removeFromFeedbacks(SFPanel* panel);
 	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
+	void changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, GameObjectType new_type);
 
 	void updateScene(Time deltaTime);
 	void drawScene();
@@ -116,6 +117,10 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
+	void AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master);
+	void TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer);
+	void TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collider_type);
+	void GameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master, LayerType layer_to_copy = NBVAL_Layer, GameObjectType collider_type_to_copy = NBVAL_GameObject);
 	void AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector);
 	bool isVectorEmpty(vector <GameObject*>* vector);
 
@@ -129,6 +134,8 @@ private:
 	std::vector<GameObject*> m_sceneGameObjects;
 	std::vector<GameObject*> m_sceneGameObjectsLayered[NBVAL_Layer];
 	std::vector<GameObject*> m_sceneGameObjectsTyped[NBVAL_GameObject];
+	std::vector<GameObject*> m_sceneGameObjectsLayeredTemp[NBVAL_Layer];
+	std::vector<GameObject*> m_sceneGameObjectsTypedTemp[NBVAL_GameObject];
 	std::vector<GameObject*> m_garbage;
 	std::vector<SFText*> m_garbageTexts;
 };

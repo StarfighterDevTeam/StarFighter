@@ -23,8 +23,7 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 	m_owner = owner;
 	m_type = type;
 	m_color = color;
-	m_visible = false;
-	m_bullet = new Ammo(this->m_owner, sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/range_shuriken.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16), 1, 1);
+	m_bullet = new Ammo(owner, sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/range_shuriken.png", sf::Vector2f(32, 32), sf::Vector2f(16, 16), 1, 1);
 	LayerType layer = m_owner->m_layer == PlayerShipLayer ? PlayerBulletLayer : EnemyBulletLayer;
 	GameObjectType collider_type = m_owner->m_collider_type == PlayerShip ? PlayerBulletObject : EnemyBulletObject;
 	m_bullet->m_layer = layer;
@@ -39,6 +38,7 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 			m_dmg = 1;
 			m_is_piercing = false;
 			m_is_ranged = false;
+			m_can_be_parried = true;
 
 			InitWeapon(m_range, color);
 			break;
@@ -51,6 +51,7 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 			m_dmg = 1;
 			m_is_piercing = true;
 			m_is_ranged = false;
+			m_can_be_parried = false;
 
 			InitWeapon(m_range, color);
 			break;
@@ -61,19 +62,23 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 			m_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
 			m_attack_duration = RANGED_SHURIKEN_COOLDOWN;
 			m_dmg = 1;
-			m_is_piercing = true;
+			m_is_piercing = false;
 			m_is_ranged = true;
+
 			m_bullet->m_textureName = "2D/range_shuriken.png";
 			m_bullet->m_size = sf::Vector2f(32, 32);
 			m_bullet->m_frameNumber = 1;
 			m_bullet_speed = RANGED_SHURIKEN_SPEED;
 			m_bullet_is_following_target = false;
 			m_bullet_is_unique = false;
+			m_can_be_parried = true;
 
 			Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/range_shuriken.png", sf::Vector2f(32, 32), 1, 1);
 			break;
 		}
 	}
+
+	m_visible = false;
 }
 
 Weapon::~Weapon()
@@ -155,13 +160,45 @@ void Weapon::CollisionBetweenWeapons(GameObject* enemy_weapon)
 	//once an enemy is hit, he cannot be parried until our next stroke
 	if (it == m_enemies_tagged.end() && it2 == weapon->m_enemies_tagged.end())
 	{
-		m_enemies_tagged.push_back(weapon->m_owner);
-		setColor(sf::Color::White);
+		if (m_can_be_parried)
+		{
+			m_enemies_tagged.push_back(weapon->m_owner);
+			setColor(sf::Color::White);
+		}
 
-		weapon->m_enemies_tagged.push_back(m_owner);
-		weapon->setColor(sf::Color::White);
+		if (weapon->m_can_be_parried)
+		{
+			weapon->m_enemies_tagged.push_back(m_owner);
+			weapon->setColor(sf::Color::White);
+		}
 
-		(*CurrentGame).PlaySFX(SFX_Parry);
+		if (m_can_be_parried || weapon->m_can_be_parried)
+		{
+			(*CurrentGame).PlaySFX(SFX_Parry);
+		}
+	}
+}
+
+void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
+{
+	Ammo* bullet = (Ammo*)enemy_bullet;
+
+	if (bullet->m_can_be_parried)//deflecting enemy bullets and turning them into own bullets
+	{
+		if (m_is_piercing == false && m_enemies_tagged.size() > 0)//piercing is the ability to hit several targets with one stroke
+		{
+			return;
+		}
+
+		std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy_bullet);
+		if (it == m_enemies_tagged.end())
+		{
+			bullet->m_speed = -bullet->m_speed;
+
+			LayerType layer = bullet->m_layer == EnemyBulletLayer ? PlayerBulletLayer : EnemyBulletLayer;
+			GameObjectType type = bullet->m_collider_type == EnemyBulletObject ? PlayerBulletObject : EnemyBulletObject;
+			(*CurrentGame).changeObjectTypeAndLayer(bullet, layer, type);
+		}
 	}
 }
 
@@ -179,7 +216,7 @@ void Weapon::Extend(sf::Vector2f ratio)
 
 Ammo* Weapon::Shoot()
 {
-	Ammo* bullet = new Ammo(this->m_owner, m_bullet_speed, m_bullet->m_textureName, m_bullet->m_size, m_bullet->m_size * 0.5f, m_bullet->m_frameNumber, 1);
+	Ammo* bullet = new Ammo(m_owner, m_bullet_speed, m_dmg, m_is_piercing, m_can_be_parried, m_bullet->m_textureName, m_bullet->m_size, m_bullet->m_size * 0.5f, m_bullet->m_frameNumber, 1);
 	(*CurrentGame).addToScene(bullet, m_bullet->m_layer, m_bullet->m_collider_type);
 
 	bullet->m_visible = true;

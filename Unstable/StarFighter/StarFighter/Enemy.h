@@ -4,7 +4,7 @@
 #include "Globals.h"
 #include "Game.h"
 #include "GameObject.h"
-#include "Weapon.h"
+#include "Loot.h"
 #include "FX.h"
 
 class Ship;

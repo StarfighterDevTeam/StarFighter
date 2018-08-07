@@ -207,7 +207,7 @@ void GameObject::UpdateRotation()
 	}
 	else
 	{
-		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI));
+		setRotation((GetAngleRadForVector(m_speed) * 180 / (float)M_PI));
 	}
 }
 
@@ -239,7 +239,7 @@ GameObject* GameObject::Clone()
 	return clone;
 }
 
-float GameObject::GetAbsoluteSpeed()
+float GameObject::GetVectorLength()
 {
 	const float a = m_speed.x;
 	const float b = m_speed.y;
@@ -250,7 +250,7 @@ float GameObject::GetAbsoluteSpeed()
 	return s;
 }
 
-float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
+float GameObject::GetVectorLength(sf::Vector2f speed_)
 {
 	const float a = speed_.x;
 	const float b = speed_.y;
@@ -260,7 +260,7 @@ float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
 	return s;
 }
 
-float GameObject::GetAbsoluteSpeedSquared()
+float GameObject::GetVectorLengthSquared()
 {
 	const float a = m_speed.x;
 	const float b = m_speed.y;
@@ -269,7 +269,7 @@ float GameObject::GetAbsoluteSpeedSquared()
 	return s;
 }
 
-float GameObject::GetAbsoluteSpeedSquared(sf::Vector2f speed_)
+float GameObject::GetVectorLengthSquared(sf::Vector2f speed_)
 {
 	const float a = speed_.x;
 	const float b = speed_.y;
@@ -278,10 +278,10 @@ float GameObject::GetAbsoluteSpeedSquared(sf::Vector2f speed_)
 	return s;
 }
 
-float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
+float GameObject::GetAngleRadForVector(sf::Vector2f vector)
 {
-	const float a = curSpeed.x;
-	const float b = curSpeed.y;
+	const float a = vector.x;
+	const float b = vector.y;
 
 	if (a == 0 && b == 0)
 		return 0.f;
@@ -300,6 +300,31 @@ float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 	angle += M_PI_2;
 
 	return angle;
+}
+
+void GameObject::GetAngleRadAndLengthOfVector(sf::Vector2f vector, float* output_length, float* output_angle)
+{
+	const float a = vector.x;
+	const float b = vector.y;
+
+	if (a == 0 && b == 0)
+	{
+		*output_length = 0.f;
+		*output_angle = 0.f;
+		return;
+	}
+
+	*output_length = (a * a) + (b * b);
+	*output_length = sqrt(*output_length);
+
+	*output_angle = acos(a / *output_length);
+
+	if (b < 0)
+	{
+		*output_angle = -*output_angle;
+	}
+
+	*output_angle += M_PI_2;
 }
 
 float GameObject::GetAngleRadToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
@@ -337,7 +362,7 @@ float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* 
 float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2)
 {
 	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, ref_position.y - position2.y);
-	float target_angle = GetAngleRadForSpeed(diff);
+	float target_angle = GetAngleRadForVector(diff);
 
 	const float a = diff.x;
 	const float b = diff.y;
@@ -358,10 +383,29 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 	return angle;
 }
 
+sf::Vector2f GameObject::RotateVector(sf::Vector2f vector, float angle_rad)
+{
+	float length;// = GetVectorLength(*vector);
+	float angle;// = GetAngleRadForVector(*vector);
+	GetAngleRadAndLengthOfVector(vector, &length, &angle);
+
+	angle += angle_rad;
+
+	sf::Vector2f output_vector = GetVectorFromLengthAndAngle(length, angle);
+
+	return output_vector;
+}
+
+void GameObject::SetVectorRotation(sf::Vector2f* vector, float angle_rad)
+{
+	float length = GetVectorLength(*vector);
+	sf::Vector2f new_vector = GetVectorFromLengthAndAngle(length, angle_rad);
+}
+
 sf::Vector2f GameObject::GetVectorFromLengthAndAngle(float absolute_speed, float curAngle)
 {
 	sf::Vector2f speed;
-	speed.x = -absolute_speed * sin(curAngle);
+	speed.x = - absolute_speed * sin(curAngle);
 	speed.y = absolute_speed * cos(curAngle);
 
 	return speed;
@@ -396,13 +440,13 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, (position1.y - position2.y));
-	return GetAbsoluteSpeed(current_diff);
+	return GetVectorLength(current_diff);
 }
 
 float GameObject::GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
-	return GetAbsoluteSpeedSquared(current_diff);
+	return GetVectorLengthSquared(current_diff);
 }
 
 bool GameObject::NormalizeVector(sf::Vector2f* vector, float max_value)
@@ -437,7 +481,7 @@ void GameObject::AddValueToVector(sf::Vector2f* vector, float added_value)
 	if (vector->x == 0 && vector->y == 0)
 		return;
 
-	float target_value = GetAbsoluteSpeed(*vector) + added_value;
+	float target_value = GetVectorLength(*vector) + added_value;
 	float p = target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
 	vector->x *= p;
 	vector->y *= p;
@@ -579,6 +623,11 @@ void GameObject::CollisionWithEnemy(GameObject* enemy)
 }
 
 void GameObject::CollisionBetweenWeapons(GameObject* enemy_weapon)
+{
+	//see override function in class Weapon
+}
+
+void GameObject::CollisionWithBullet(GameObject* enemy_bullet)
 {
 	//see override function in class Weapon
 }

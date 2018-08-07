@@ -19,7 +19,8 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_ref_speed = 150.f;
 
 	m_is_attacking = false;
-	m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
+	//m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
+	m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
 	(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
@@ -179,13 +180,20 @@ void Enemy::update(sf::Time deltaTime)
 	{
 		if (m_weapon && m_weapon->m_attack_clock.getElapsedTime().asSeconds() > m_weapon->m_attack_duration)
 		{
-			m_is_attacking = false;
 			m_weapon->m_visible = false;
 			m_weapon->Extend(sf::Vector2f(0.f, 1.f));
 			m_weapon->m_enemies_tagged.clear();
 			m_weapon->setColor(m_weapon->m_color);
 
-			m_melee_cooldown_clock.restart();
+			if (m_weapon->m_is_ranged && m_weapon->m_bullet_is_unique && m_weapon->GetBulletFiredCount() > 0)
+			{
+				//do nothing
+			}
+			else
+			{
+				m_is_attacking = false;
+				m_melee_cooldown_clock.restart();
+			}
 		}
 	}
 
@@ -193,10 +201,18 @@ void Enemy::update(sf::Time deltaTime)
 	{
 		if (m_weapon && !m_is_attacking)
 		{
+			if (m_weapon->m_is_ranged == false)
+			{
+				m_weapon->m_visible = true;
+				(*CurrentGame).PlaySFX(SFX_Melee);
+			}
+			else
+			{
+				m_weapon->Shoot(player);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
+			}
+
 			m_is_attacking = true;
-			m_weapon->m_visible = true;
 			m_weapon->m_attack_clock.restart();
-			(*CurrentGame).PlaySFX(SFX_Melee);
 		}
 	}
 
@@ -223,7 +239,7 @@ bool Enemy::DealDamage(int dmg)
 
 	ostringstream ss;
 	ss << "-" << dmg;
-	(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y*getScale().y / 2);
+	(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 2, NULL, -m_size.y*getScale().y / 2);
 
 	if (dmg > 0)
 	{

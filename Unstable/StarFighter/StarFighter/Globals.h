@@ -76,6 +76,7 @@ float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);
 int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
 float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
+int RandomizeSign();
 float MaxBetweenValues(sf::Vector2f values);
 float MinBetweenValues(sf::Vector2f values);
 

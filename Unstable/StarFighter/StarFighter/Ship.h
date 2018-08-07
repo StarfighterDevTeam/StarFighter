@@ -7,7 +7,6 @@
 #include "Game.h"
 #include "SFTextPop.h"
 #include "Enemy.h"
-#include "Weapon.h"
 #include "Loot.h"
 #include "FX.h"
 

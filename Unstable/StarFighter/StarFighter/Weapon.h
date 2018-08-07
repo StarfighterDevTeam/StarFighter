@@ -25,6 +25,7 @@ public:
 	void Draw(sf::RenderTexture& screen) override;
 	void CollisionWithEnemy(GameObject* enemy) override;
 	void CollisionBetweenWeapons(GameObject* enemy_weapon) override;
+	void CollisionWithBullet(GameObject* enemy_bullet) override;
 
 	void Extend(sf::Vector2f ratio);
 	Ammo* Shoot();
@@ -41,6 +42,7 @@ public:
 	float m_bullet_speed;
 	bool m_bullet_is_following_target;
 	bool m_bullet_is_unique;
+	bool m_can_be_parried;
 	vector<GameObject*> m_enemies_tagged;
 	size_t GetBulletFiredCount();
 

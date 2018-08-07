@@ -40,33 +40,33 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
 	wufeng->setScale(sf::Vector2f(0.2, 0.2));
 
-	Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 2 * step, SHIP_START_Y), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	(*CurrentGame).addToScene(wufeng2, EnemyObjectLayer, EnemyObject);
-	wufeng2->setScale(sf::Vector2f(0.2, 0.2));
-
-	Enemy* wufeng3 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 3 * step, SHIP_START_Y + step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	(*CurrentGame).addToScene(wufeng3, EnemyObjectLayer, EnemyObject);
-	wufeng3->setScale(sf::Vector2f(0.2, 0.2));
-
-	Enemy* wufeng4 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 3 * step, SHIP_START_Y + 3 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	(*CurrentGame).addToScene(wufeng4, EnemyObjectLayer, EnemyObject);
-	wufeng4->setScale(sf::Vector2f(0.2, 0.2));
-
-	Enemy* wufeng5 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 2 * step, SHIP_START_Y + 4 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	(*CurrentGame).addToScene(wufeng5, EnemyObjectLayer, EnemyObject);
-	wufeng5->setScale(sf::Vector2f(0.2, 0.2));
-
-	Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y + 4 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	(*CurrentGame).addToScene(wufeng6, EnemyObjectLayer, EnemyObject);
-	wufeng6->setScale(sf::Vector2f(0.2, 0.2));
-
-	Enemy* wufeng7 = new Enemy(sf::Vector2f(SHIP_START_X + 100 - step, SHIP_START_Y + 3 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	(*CurrentGame).addToScene(wufeng7, EnemyObjectLayer, EnemyObject);
-	wufeng7->setScale(sf::Vector2f(0.2, 0.2));
-
-	Enemy* wufeng8 = new Enemy(sf::Vector2f(SHIP_START_X + 100 - step, SHIP_START_Y + step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
-	(*CurrentGame).addToScene(wufeng8, EnemyObjectLayer, EnemyObject);
-	wufeng8->setScale(sf::Vector2f(0.2, 0.2));
+	//Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 2 * step, SHIP_START_Y), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	//(*CurrentGame).addToScene(wufeng2, EnemyObjectLayer, EnemyObject);
+	//wufeng2->setScale(sf::Vector2f(0.2, 0.2));
+	//
+	//Enemy* wufeng3 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 3 * step, SHIP_START_Y + step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	//(*CurrentGame).addToScene(wufeng3, EnemyObjectLayer, EnemyObject);
+	//wufeng3->setScale(sf::Vector2f(0.2, 0.2));
+	//
+	//Enemy* wufeng4 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 3 * step, SHIP_START_Y + 3 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	//(*CurrentGame).addToScene(wufeng4, EnemyObjectLayer, EnemyObject);
+	//wufeng4->setScale(sf::Vector2f(0.2, 0.2));
+	//
+	//Enemy* wufeng5 = new Enemy(sf::Vector2f(SHIP_START_X + 100 + 2 * step, SHIP_START_Y + 4 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	//(*CurrentGame).addToScene(wufeng5, EnemyObjectLayer, EnemyObject);
+	//wufeng5->setScale(sf::Vector2f(0.2, 0.2));
+	//
+	//Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y + 4 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	//(*CurrentGame).addToScene(wufeng6, EnemyObjectLayer, EnemyObject);
+	//wufeng6->setScale(sf::Vector2f(0.2, 0.2));
+	//
+	//Enemy* wufeng7 = new Enemy(sf::Vector2f(SHIP_START_X + 100 - step, SHIP_START_Y + 3 * step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	//(*CurrentGame).addToScene(wufeng7, EnemyObjectLayer, EnemyObject);
+	//wufeng7->setScale(sf::Vector2f(0.2, 0.2));
+	//
+	//Enemy* wufeng8 = new Enemy(sf::Vector2f(SHIP_START_X + 100 - step, SHIP_START_Y + step), sf::Vector2f(0, 0), "2D/wufeng.png", sf::Vector2f(160, 286), sf::Vector2f(80, 143));
+	//(*CurrentGame).addToScene(wufeng8, EnemyObjectLayer, EnemyObject);
+	//wufeng8->setScale(sf::Vector2f(0.2, 0.2));
 	
 
 	//Map

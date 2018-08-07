@@ -228,7 +228,7 @@ void Ship::update(sf::Time deltaTime)
 
 					dash_vector = m_dash_enemy->getPosition() - getPosition();
 
-					m_overdash_distance = DASH_OVERDASH_DISTANCE;//GetAbsoluteSpeed(dash_vector) * DASH_OVERDASH_FACTOR;
+					m_overdash_distance = DASH_OVERDASH_DISTANCE;//GetVectorLength(dash_vector) * DASH_OVERDASH_FACTOR;
 					float dash_distance = GetDistanceBetweenPositions(m_dash_enemy->getPosition(), getPosition()) + m_overdash_distance;
 
 					ScaleVector(&dash_vector, dash_distance);
@@ -516,22 +516,13 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 			int dmg = m_weapon ? m_weapon->m_dmg : 0;
 			m_dash_enemy->DealDamage(dmg);
 
-			ostringstream ss;
-			ss << "-" << dmg;
-			(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Blue, m_dash_enemy->getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
-
 			m_dash_enemy = NULL;
 		}
 	}
 	else if (m_move_state != Character_Dash)
 	{
 		Enemy* enemy_ = (Enemy*)enemy;
-		if (DealDamage(enemy_->m_dmg))
-		{
-			ostringstream ss;
-			ss << "-" << enemy_->m_dmg;
-			(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Red, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2);
-		}
+		DealDamage(enemy_->m_dmg);
 	}
 }
 
@@ -565,7 +556,7 @@ bool Ship::DealDamage(int dmg)
 
 		ostringstream ss;
 		ss << "-" << dmg;
-		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Red, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y*getScale().y / 2);
+		(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 30, sf::Color::Red, getPosition(), PlayerBlue, 100, 50, 2, NULL, -m_size.y*getScale().y / 2);
 
 		if (dmg > 0)
 		{
@@ -623,6 +614,7 @@ bool Ship::GetWeapon(Weapon* weapon)
 	m_weapon->m_attack_duration = weapon->m_attack_duration;
 	m_weapon->m_is_piercing = weapon->m_is_piercing;
 	m_weapon->m_is_ranged = weapon->m_is_ranged;
+	m_weapon->m_can_be_parried = weapon->m_can_be_parried;
 			
 	m_weapon->m_color = weapon->m_color;
 			

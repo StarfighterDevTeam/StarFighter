@@ -247,6 +247,18 @@ void Game::removeFromFeedbacks(SFPanel* panel)
 	m_sceneFeedbackSFPanels.remove(panel);
 }
 
+void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, GameObjectType new_type)
+{
+	assert(((int)new_layer >= 0 && (int)new_layer < NBVAL_Layer) && (new_type >= 0 && new_type < NBVAL_GameObject));
+	{
+		//AddGameObjectToVector(object, &this->m_sceneGameObjectsTypedTemp[(int)new_type]);
+		//AddGameObjectToVector(object, &this->m_sceneGameObjectsLayeredTemp[(int)new_layer]);
+
+		m_sceneGameObjectsLayeredTemp[(int)new_layer].push_back(object);
+		m_sceneGameObjectsTypedTemp[(int)new_type].push_back(object);
+	}
+}
+
 void Game::updateScene(Time deltaTime)
 {
 	//printf("OnScene: %d / Collected: %d\n", this->sceneGameObjects.size(), this->garbage.size());
@@ -405,53 +417,66 @@ void Game::colisionChecksV2()
 				(*it2)->CollisionWithEnemy(*it1);
 			}
 		}
-	}
 
-	//Enemy flocking
-	size_t EnemyVectorSize = m_sceneGameObjectsTyped[EnemyObject].size();
-	for (size_t i = 0; i < EnemyVectorSize; i++)
-	{
-		GameObject* ptr1 = m_sceneGameObjectsTyped[EnemyObject][i];
-
-		if (ptr1 == NULL)
-			continue;
-
-		if (ptr1->m_flocking == false)
-			continue;
-
-		if (ptr1->m_flocking_test_begung == false)
+		//Enemy bullets hitting the player
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyBulletObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyBulletObject].end(); it2++)
 		{
-			ptr1->m_flocking_neighbours.clear();
-		}
+			if (*it2 == NULL)
+				continue;
 
-		ptr1->m_flocking_test_begung = false;
-
-		if (i != EnemyVectorSize - 1)
-		{
-			for (size_t j = i + 1; j < EnemyVectorSize; j++)
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
-				GameObject* ptr2 = m_sceneGameObjectsTyped[EnemyObject][j];
-
-				if (ptr2 == NULL)
-					continue;
-
-				if (ptr2->m_flocking == false)
-					continue;
-
-				if (ptr2->m_flocking_test_begung == false)
-				{
-					ptr2->m_flocking_neighbours.clear();
-					ptr2->m_flocking_test_begung = true;
-				}
-
-				if (GameObject::GetDistanceSquaredBetweenPositions(ptr1->getPosition(), ptr2->getPosition()) < FLOCKING_RADIUS * FLOCKING_RADIUS)
-				{
-					ptr1->m_flocking_neighbours.push_back(ptr2);
-					ptr2->m_flocking_neighbours.push_back(ptr1);
-				}
+				//Do something 
+				(*it2)->CollisionWithEnemy(*it1);
 			}
 		}
 	}
+
+	//Enemy flocking
+	//size_t EnemyVectorSize = m_sceneGameObjectsTyped[EnemyObject].size();
+	//for (size_t i = 0; i < EnemyVectorSize; i++)
+	//{
+	//	GameObject* ptr1 = m_sceneGameObjectsTyped[EnemyObject][i];
+	//
+	//	if (ptr1 == NULL)
+	//		continue;
+	//
+	//	if (ptr1->m_flocking == false)
+	//		continue;
+	//
+	//	if (ptr1->m_flocking_test_begung == false)
+	//	{
+	//		ptr1->m_flocking_neighbours.clear();
+	//	}
+	//
+	//	ptr1->m_flocking_test_begung = false;
+	//
+	//	if (i != EnemyVectorSize - 1)
+	//	{
+	//		for (size_t j = i + 1; j < EnemyVectorSize; j++)
+	//		{
+	//			GameObject* ptr2 = m_sceneGameObjectsTyped[EnemyObject][j];
+	//
+	//			if (ptr2 == NULL)
+	//				continue;
+	//
+	//			if (ptr2->m_flocking == false)
+	//				continue;
+	//
+	//			if (ptr2->m_flocking_test_begung == false)
+	//			{
+	//				ptr2->m_flocking_neighbours.clear();
+	//				ptr2->m_flocking_test_begung = true;
+	//			}
+	//
+	//			if (GameObject::GetDistanceSquaredBetweenPositions(ptr1->getPosition(), ptr2->getPosition()) < FLOCKING_RADIUS * FLOCKING_RADIUS)
+	//			{
+	//				ptr1->m_flocking_neighbours.push_back(ptr2);
+	//				ptr2->m_flocking_neighbours.push_back(ptr1);
+	//			}
+	//		}
+	//	}
+	//}
 	
 	//Player weapon
 	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerWeaponObject].begin(); it1 != m_sceneGameObjectsTyped[PlayerWeaponObject].end(); it1++)
@@ -487,9 +512,190 @@ void Game::colisionChecksV2()
 				(*it1)->CollisionBetweenWeapons(*it2);
 			}
 		}
+
+		//Weapon hitting bullets
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyBulletObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyBulletObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it1)->CollisionWithBullet(*it2);
+			}
+		}
+	}
+
+	//Player bullets
+	for (std::vector<GameObject*>::iterator it1 = m_sceneGameObjectsTyped[PlayerBulletObject].begin(); it1 != m_sceneGameObjectsTyped[PlayerBulletObject].end(); it1++)
+	{
+		if (*it1 == NULL)
+			continue;
+
+		if ((*it1)->m_visible == false)
+			continue;
+
+		//Bullet hitting enemy
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it1)->CollisionWithEnemy(*it2);
+			}
+		}
+
+		//Bullet hitting weapon
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyWeaponObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyWeaponObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it2)->CollisionWithBullet(*it1);
+			}
+		}
+
+		//Bullet hitting bullet
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[EnemyBulletObject].begin(); it2 != m_sceneGameObjectsTyped[EnemyBulletObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				//(*it1)->CollisionBetweenWeapons(*it2);
+			}
+		}
 	}
 
 	//printf("| Collision: %d \n",dt.getElapsedTime().asMilliseconds());
+}
+
+void Game::TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer)
+{
+	size_t current_index = 0;
+	size_t current_object = 0;
+
+	const size_t vectorSlaveSize = m_sceneGameObjectsLayeredTemp[layer].size();
+	for (size_t i = 0; i < vectorSlaveSize; i++)
+	{
+		if (m_sceneGameObjectsLayeredTemp[layer][i] == NULL)
+			continue;
+
+		const size_t vectorMasterSize = m_sceneGameObjectsLayered[layer].size();
+		for (size_t j = current_index; j < vectorMasterSize; j++)
+		{
+			//found a free slot
+			if (m_sceneGameObjectsLayered[layer][j] == NULL)
+			{
+				//cut from old layer
+				LayerType old_layer = m_sceneGameObjectsLayeredTemp[layer][i]->m_layer;
+				size_t previousVectorSize = m_sceneGameObjectsLayered[old_layer].size();
+				for (size_t l = 0; l < previousVectorSize; l++)
+				{
+					if (m_sceneGameObjectsLayered[old_layer][l] == m_sceneGameObjectsLayeredTemp[layer][i])
+					{
+						m_sceneGameObjectsLayered[old_layer][l] = NULL;
+					}
+				}
+
+				//then insert in new layer
+				m_sceneGameObjectsLayeredTemp[layer][i]->m_layer = layer;
+				m_sceneGameObjectsLayered[layer][j] = m_sceneGameObjectsLayeredTemp[layer][i];
+				current_index = j + 1;
+				current_object++;
+
+				break;
+			}
+		}
+
+		break;
+	}
+
+	for (size_t k = current_object; k < vectorSlaveSize; k++)
+	{
+		//cut from old layer
+		LayerType old_layer = m_sceneGameObjectsLayeredTemp[layer][k]->m_layer;
+		size_t previousVectorSize = m_sceneGameObjectsLayered[old_layer].size();
+		for (size_t l = 0; l < previousVectorSize; l++)
+		{
+			if (m_sceneGameObjectsLayered[old_layer][l] == m_sceneGameObjectsLayeredTemp[layer][k])
+			{
+				m_sceneGameObjectsLayered[old_layer][l] = NULL;
+			}
+		}
+
+		//then insert in new layer
+		m_sceneGameObjectsLayeredTemp[layer][k]->m_layer = layer;
+		m_sceneGameObjectsLayered[layer].push_back(m_sceneGameObjectsLayeredTemp[layer][k]);
+	}
+}
+
+void Game::TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collider_type)
+{
+	size_t current_index = 0;
+	size_t current_object = 0;
+
+	const size_t vectorSlaveSize = m_sceneGameObjectsTypedTemp[collider_type].size();
+	for (size_t i = 0; i < vectorSlaveSize; i++)
+	{
+		if (m_sceneGameObjectsTypedTemp[collider_type][i] == NULL)
+			continue;
+
+		const size_t vectorMasterSize = m_sceneGameObjectsTyped[collider_type].size();
+		for (size_t j = current_index; j < vectorMasterSize; j++)
+		{
+			if (m_sceneGameObjectsLayered[collider_type][j] == NULL)
+			{
+				//cut from old type
+				GameObjectType old_collider_type = m_sceneGameObjectsTypedTemp[collider_type][i]->m_collider_type;
+				size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider_type].size();
+				for (size_t l = 0; l < previousVectorSize; l++)
+				{
+					if (m_sceneGameObjectsTyped[old_collider_type][l] == m_sceneGameObjectsLayeredTemp[old_collider_type][i])
+					{
+						m_sceneGameObjectsTyped[old_collider_type][l] = NULL;
+					}
+				}
+
+				//then insert in new type
+				m_sceneGameObjectsTypedTemp[collider_type][i]->m_collider_type = collider_type;
+				m_sceneGameObjectsTyped[collider_type][j] = m_sceneGameObjectsTypedTemp[collider_type][i];
+				current_index = j + 1;
+				current_object++;
+
+				break;
+			}
+		}
+
+		break;
+	}
+
+	for (size_t k = current_object; k < vectorSlaveSize; k++)
+	{
+		//cut from old type
+		GameObjectType old_collider_type = m_sceneGameObjectsTypedTemp[collider_type][k]->m_collider_type;
+		size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider_type].size();
+		for (size_t l = 0; l < previousVectorSize; l++)
+		{
+			if (m_sceneGameObjectsTyped[old_collider_type][l] == m_sceneGameObjectsTypedTemp[collider_type][k])
+			{
+				m_sceneGameObjectsTyped[old_collider_type][l] = NULL;
+			}
+		}
+
+		//then insert in new type
+		m_sceneGameObjectsTypedTemp[collider_type][k]->m_collider_type = collider_type;
+		m_sceneGameObjectsTyped[collider_type].push_back(m_sceneGameObjectsTypedTemp[collider_type][k]);
+	}
 }
 
 void Game::cleanGarbage()
@@ -497,7 +703,22 @@ void Game::cleanGarbage()
 	sf::Clock dt;
 	dt.restart();
 
-	// On "cache" les size, pour éviter d'appeler des fonctions à chaque itération
+	// On traite les demandes de changements de type
+	size_t sceneGameObjectsLayeredTempSize[NBVAL_Layer];
+	for (int layer = 0; layer < NBVAL_Layer; layer++)
+	{
+		TransferGameObjectLayeredTempToSceneObjectsLayered((LayerType)layer);
+		m_sceneGameObjectsLayeredTemp[layer].clear();
+	}
+
+	size_t sceneGameObjectsTypedTempSize[NBVAL_GameObject];
+	for (int type = 0; type < NBVAL_GameObject; type++)
+	{
+		TransferGameObjectTypedTempToSceneObjectsTyped((GameObjectType)type);
+		m_sceneGameObjectsTypedTemp[type].clear();
+	}
+
+	// On mémorise les size, pour éviter d'appeler des fonctions à chaque itération
 	const size_t garbageSize = m_garbage.size();
 	const size_t sceneGameObjectsSize = m_sceneGameObjects.size();
 	//Size layer
@@ -508,9 +729,9 @@ void Game::cleanGarbage()
 	}
 	//Size ind type
 	size_t sceneGameObjectsTypedSize[NBVAL_GameObject];
-	for (int layer = 0; layer < NBVAL_GameObject; layer++)
+	for (int type = 0; type < NBVAL_GameObject; type++)
 	{
-		sceneGameObjectsTypedSize[layer] = m_sceneGameObjectsTyped[layer].size();
+		sceneGameObjectsTypedSize[type] = m_sceneGameObjectsTyped[type].size();
 	}
 
 	//Scene GameObjects
@@ -592,6 +813,36 @@ void Game::AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* v
 
 	// On n'arrive ici que dans le cas où on n'a pas trouvé de free slot => on rajoute à la fin
 	vector->push_back(pGameObject);
+}
+
+void Game::AddGameObjectVectorToVector(vector<GameObject*> vector_slave, vector<GameObject*>* vector_master)
+{
+	size_t current_index = 0;
+	size_t current_object = 0;
+
+	const size_t vectorSlaveSize = vector_slave.size();
+	for (size_t i = 0; i < vectorSlaveSize; i++)
+	{
+		const size_t vectorMasterSize = vector_master->size();
+		for (size_t j = current_index; j < vectorMasterSize; j++)
+		{
+			if ((*vector_master)[j] == NULL)
+			{
+				(*vector_master)[j] = vector_slave[i];
+				current_index = j + 1;
+				current_object++;
+
+				break;
+			}
+		}
+
+		break;
+	}
+
+	for (size_t k = current_object; k < vectorSlaveSize; k++)
+	{
+		vector_master->push_back(vector_slave[k]);
+	}
 }
 
 void Game::AddSFTextToVector(SFText* pSFText, vector<SFText*>* vector)
