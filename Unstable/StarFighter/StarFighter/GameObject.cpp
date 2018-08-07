@@ -18,14 +18,7 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
 {
-	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, 0);
-	ostringstream ss;
-	ss << "rectangle_" << (int)size.x << "_" << (int)size.y << "_" << color.r << "_" << color.g << "_" << color.b << "_" << color.a;
-	string textureName = ss.str();
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture(textureName, size.x, size.y, pixels);
-	Init(position, speed, texture);
+	Init(position, speed, color, size);
 }
 
 string GameObject::getName()
@@ -136,7 +129,20 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string tex
 	setOrigin(size.x / 2, size.y / 2);
 
 	Init(position, speed, texture, frameNumber, animationNumber);
+}
 
+void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
+{
+	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, 0);
+	ostringstream ss;
+	ss << "rectangle_" << (int)size.x << "_" << (int)size.y << "_" << color.r << "_" << color.g << "_" << color.b << "_" << color.a;
+	string textureName = ss.str();
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture(textureName, size.x, size.y, pixels);
+	Init(position, speed, texture, 1, 1);
+
+	setOrigin(size.x / 2, size.y / 2);
 }
 
 GameObject::~GameObject()
