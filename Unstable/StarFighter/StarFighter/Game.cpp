@@ -251,9 +251,6 @@ void Game::changeObjectTypeAndLayer(GameObject *object, LayerType new_layer, Gam
 {
 	assert(((int)new_layer >= 0 && (int)new_layer < NBVAL_Layer) && (new_type >= 0 && new_type < NBVAL_GameObject));
 	{
-		//AddGameObjectToVector(object, &this->m_sceneGameObjectsTypedTemp[(int)new_type]);
-		//AddGameObjectToVector(object, &this->m_sceneGameObjectsLayeredTemp[(int)new_layer]);
-
 		m_sceneGameObjectsLayeredTemp[(int)new_layer].push_back(object);
 		m_sceneGameObjectsTypedTemp[(int)new_type].push_back(object);
 	}
@@ -652,7 +649,6 @@ void Game::TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collide
 			continue;
 
 		const size_t vectorMasterSize = m_sceneGameObjectsTyped[collider_type].size();
-		printf("Transfert typed...(%d, %d)", vectorSlaveSize, vectorMasterSize);
 		for (size_t j = current_index; j < vectorMasterSize; j++)
 		{
 			if (m_sceneGameObjectsTyped[collider_type][j] == NULL)
@@ -699,9 +695,6 @@ void Game::TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collide
 		m_sceneGameObjectsTypedTemp[collider_type][k]->m_collider_type = collider_type;
 		m_sceneGameObjectsTyped[collider_type].push_back(m_sceneGameObjectsTypedTemp[collider_type][k]);
 	}
-
-	if (vectorSlaveSize > 0)
-		printf(" ok\n");
 }
 
 void Game::cleanGarbage()

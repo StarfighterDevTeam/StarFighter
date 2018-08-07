@@ -23,6 +23,8 @@ public :
 	bool m_is_piercing;
 	bool m_can_be_parried;
 	vector<GameObject*> m_enemies_tagged;
+
+	sf::Clock m_parry_clock;
 };
 
 #endif // AMMO_H_INCLUDED

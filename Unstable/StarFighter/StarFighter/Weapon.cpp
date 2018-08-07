@@ -7,6 +7,8 @@ extern Game* CurrentGame;
 //
 //}
 
+#define PARRY_BULLET_COOLDOWN			0.2f
+
 #define MELEE_KATANA_RANGE_X			130.f
 #define MELEE_KATANA_RANGE_Y			70.f
 #define MELEE_KATANA_DURATION			0.2f
@@ -159,17 +161,22 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 			return;
 		}
 
-		std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy_bullet);
-		if (it == m_enemies_tagged.end())
+		if (bullet->m_parry_clock.getElapsedTime().asSeconds() > PARRY_BULLET_COOLDOWN)
 		{
-			m_enemies_tagged.push_back(bullet);
+			std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy_bullet);
+			if (it == m_enemies_tagged.end())
+			{
+				m_enemies_tagged.push_back(bullet);
 
-			bullet->m_speed = -bullet->m_speed;
+				//bullet->m_speed = -bullet->m_speed;
+				bullet->m_speed = GetVectorFromLengthAndAngle(bullet->m_ref_speed, (getRotation() - 90) * M_PI / 180.f);
+				bullet->m_parry_clock.restart();
 
-			LayerType layer = bullet->m_layer == EnemyBulletLayer ? PlayerBulletLayer : EnemyBulletLayer;
-			GameObjectType type = bullet->m_collider_type == EnemyBulletObject ? PlayerBulletObject : EnemyBulletObject;
-			(*CurrentGame).changeObjectTypeAndLayer(bullet, layer, type);
-			("parry\n");
+				LayerType layer = bullet->m_layer == EnemyBulletLayer ? PlayerBulletLayer : EnemyBulletLayer;
+				GameObjectType type = bullet->m_collider_type == EnemyBulletObject ? PlayerBulletObject : EnemyBulletObject;
+				(*CurrentGame).changeObjectTypeAndLayer(bullet, layer, type);
+				printf("parry\n");
+			}
 		}
 	}
 }

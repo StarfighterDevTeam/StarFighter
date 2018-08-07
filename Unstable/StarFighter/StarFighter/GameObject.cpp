@@ -19,14 +19,6 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Texture *t
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color color, sf::Vector2f size)
 {
 	Init(position, speed, color, size);
-	//sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, 0);
-	//ostringstream ss;
-	//ss << "rectangle_" << (int)size.x << "_" << (int)size.y << "_" << color.r << "_" << color.g << "_" << color.b << "_" << color.a;
-	//string textureName = ss.str();
-	//TextureLoader *loader;
-	//loader = TextureLoader::getInstance();
-	//sf::Texture* texture = loader->loadTexture(textureName, size.x, size.y, pixels);
-	//Init(position, speed, texture);
 }
 
 string GameObject::getName()
@@ -416,11 +408,11 @@ void GameObject::SetVectorRotation(sf::Vector2f* vector, float angle_rad)
 	sf::Vector2f new_vector = GetVectorFromLengthAndAngle(length, angle_rad);
 }
 
-sf::Vector2f GameObject::GetVectorFromLengthAndAngle(float absolute_speed, float curAngle)
+sf::Vector2f GameObject::GetVectorFromLengthAndAngle(float absolute_speed, float angle_rad)
 {
 	sf::Vector2f speed;
-	speed.x = - absolute_speed * sin(curAngle);
-	speed.y = absolute_speed * cos(curAngle);
+	speed.x = -absolute_speed * sin(angle_rad);
+	speed.y = absolute_speed * cos(angle_rad);
 
 	return speed;
 }
@@ -437,10 +429,10 @@ sf::Vector2f GameObject::SetSpeedForConstantSpeedToDestination(sf::Vector2f coor
 	return m_speed;
 }
 
-void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
+void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float angle_rad)
 {
-	m_speed.x = -absolute_speed * sin(curAngle);
-	m_speed.y = absolute_speed * cos(curAngle);
+	m_speed.x = -absolute_speed * sin(angle_rad);
+	m_speed.y = absolute_speed * cos(angle_rad);
 }
 
 float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* object2)

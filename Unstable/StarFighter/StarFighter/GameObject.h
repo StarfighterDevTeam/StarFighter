@@ -118,8 +118,8 @@ public:
 	static float GetVectorLength(sf::Vector2f speed_);
 	float GetVectorLengthSquared();
 	static float GetVectorLengthSquared(sf::Vector2f speed_);
-	static sf::Vector2f GetVectorFromLengthAndAngle(float absolute_speed, float curAngle);
-	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle);
+	static sf::Vector2f GetVectorFromLengthAndAngle(float absolute_speed, float angle_rad);
+	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float angle_rad);
 	sf::Vector2f SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed);
 
 	static bool NormalizeVector(sf::Vector2f* vector, float max_value);

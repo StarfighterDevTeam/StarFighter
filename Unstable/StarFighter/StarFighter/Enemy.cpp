@@ -19,8 +19,8 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_ref_speed = 150.f;
 
 	m_is_attacking = false;
-	m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
-	//m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
+	//m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
+	m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
 	(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
