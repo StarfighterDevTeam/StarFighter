@@ -3,7 +3,7 @@
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, frameNumber, animationNumber);
-	this->setOrigin(origin.x, origin.y);
+	setOrigin(origin.x, origin.y);
 }
 
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
@@ -30,7 +30,7 @@ GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, sf::Color colo
 
 string GameObject::getName()
 {
-	vector<string> s1 = TextUtils::split(this->m_textureName, '/');
+	vector<string> s1 = TextUtils::split(m_textureName, '/');
 	return *(s1.end() - 1);
 }
 
@@ -48,10 +48,10 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 	}
 
 	//bulletproof verifications
-	if (animation >= this->m_animationNumber)
+	if (animation >= m_animationNumber)
 	{
-		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, this->m_animationNumber);
-		animation = this->m_animationNumber - 1;
+		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, m_animationNumber);
+		animation = m_animationNumber - 1;
 		if (animation < 0)
 		{
 			animation = 0;
@@ -61,55 +61,57 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 	//now let's load the new animation
 	Animation* anim = new Animation();
 	anim->setSpriteSheet(*this->m_defaultAnimation.getSpriteSheet());
-	for (size_t j = 0; j < this->m_defaultAnimation.getSize(); j++)
+	for (size_t j = 0; j < m_defaultAnimation.getSize(); j++)
 	{
-		size_t n = j / this->m_frameNumber;
+		size_t n = j / m_frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
 		if (n == animation)
 		{
-			anim->addFrame(this->m_defaultAnimation.getFrame(j));
+			anim->addFrame(m_defaultAnimation.getFrame(j));
 		}
 	}
 
 	if (m_currentAnimation)
 		delete m_currentAnimation;
-	this->m_currentAnimation = anim;
+
+	m_currentAnimation = anim;
 	anim = NULL;
-	this->play(*m_currentAnimation, keep_frame_index);
-	this->m_currentAnimationIndex = animation;
+	play(*m_currentAnimation, keep_frame_index);
+	m_currentAnimationIndex = animation;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
 {
-	this->m_animationNumber = animationNumber;
-	this->m_frameNumber = frameNumber;
-	this->m_size.x = ((*texture).getSize().x / frameNumber);
-	this->m_size.y = ((*texture).getSize().y / animationNumber);
+	m_animationNumber = animationNumber;
+	m_frameNumber = frameNumber;
+	m_size.x = ((*texture).getSize().x / frameNumber);
+	m_size.y = ((*texture).getSize().y / animationNumber);
 
-	this->m_collider_type = GameObjectType::BackgroundObject;
-	this->m_defaultAnimation.setSpriteSheet(*texture);
+	m_collider_type = GameObjectType::BackgroundObject;
+	m_defaultAnimation.setSpriteSheet(*texture);
+
 	for (int j = 0; j < animationNumber; j++)
 	{
 		for (int i = 0; i < frameNumber; i++)
 		{
 			int x = ((*texture).getSize().x / frameNumber)*(i);
 			int y = ((*texture).getSize().y / animationNumber)*(j);
-			this->m_defaultAnimation.addFrame(sf::IntRect(x, y, this->m_size.x, this->m_size.y));
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
 		}
 	}
 	
-	this->m_currentAnimation = NULL;
-	this->setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
+	m_currentAnimation = NULL;
+	setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
 	
-	this->m_speed = speed;
-	this->setPosition(position.x, position.y);
-	this->m_visible = true;
-	this->m_isOnScene = false;
-	this->m_GarbageMe = false;
-	this->m_DontGarbageMe = false;
-	this->m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
-	this->m_ghost = false;
-	this->m_rotation_speed = 0.f;
+	m_speed = speed;
+	setPosition(position.x, position.y);
+	m_visible = true;
+	m_isOnScene = false;
+	m_GarbageMe = false;
+	m_DontGarbageMe = false;
+	m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	m_ghost = false;
+	m_rotation_speed = 0.f;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber)
@@ -147,14 +149,16 @@ GameObject::~GameObject()
 
 void GameObject::update(sf::Time deltaTime)
 {
+	m_previous_speed = m_speed;
+
 	static sf::Vector2f newposition, offset, newspeed;
-	newspeed = this->m_speed;
+	newspeed = m_speed;
 	
 	//Basic movement (initial vector)
-	newposition.x = this->getPosition().x + (newspeed.x)*deltaTime.asSeconds();
-	newposition.y = this->getPosition().y + (newspeed.y)*deltaTime.asSeconds();
+	newposition.x = getPosition().x + (newspeed.x)*deltaTime.asSeconds();
+	newposition.y = getPosition().y + (newspeed.y)*deltaTime.asSeconds();
 
-	this->setPosition(newposition.x, newposition.y);
+	setPosition(newposition.x, newposition.y);
 
 	AnimatedSprite::update(deltaTime);
 }
@@ -198,10 +202,10 @@ float GameObject::GetAbsoluteSpeed()
 	return s;
 }
 
-float GameObject::GetAbsoluteSpeed(sf::Vector2f speed_)
+float GameObject::GetVectorLength(sf::Vector2f vector)
 {
-	const float a = speed_.x;
-	const float b = speed_.y;
+	const float a = vector.x;
+	const float b = vector.y;
 	float s = (a * a) + (b * b);
 	s = sqrt(s);
 	s = floor(s);
@@ -217,19 +221,68 @@ float GameObject::GetAbsoluteSpeedSquared()
 	return s;
 }
 
-float GameObject::GetAbsoluteSpeedSquared(sf::Vector2f speed_)
+float GameObject::GetVectorLengthSquared(sf::Vector2f vector)
 {
-	const float a = speed_.x;
-	const float b = speed_.y;
+	const float a = vector.x;
+	const float b = vector.y;
 	float s = (a * a) + (b * b);
 
 	return s;
 }
 
-float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
+void GameObject::GetAngleRadAndLengthOfVector(sf::Vector2f vector, float* output_length, float* output_angle)
 {
-	const float a = curSpeed.x;
-	const float b = curSpeed.y;
+	const float a = vector.x;
+	const float b = vector.y;
+
+	if (a == 0 && b == 0)
+	{
+		*output_length = 0.f;
+		*output_angle = 0.f;
+		return;
+	}
+
+	*output_length = (a * a) + (b * b);
+	*output_length = sqrt(*output_length);
+
+	*output_angle = acos(a / *output_length);
+
+	if (b < 0)
+	{
+		*output_angle = -*output_angle;
+	}
+
+	*output_angle += M_PI_2;
+}
+
+float GameObject::GetAngleRadToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
+{
+	float angle = GameObject::GetAngleRadBetweenPositions(target_position, ref_position);
+	float delta_angle = angle - (ref_rotation_in_deg * M_PI / 180.f);
+	if (delta_angle > M_PI)
+		delta_angle -= M_PI * 2;
+	else if (delta_angle < -M_PI)
+		delta_angle += M_PI * 2;
+
+	return delta_angle;
+}
+
+float GameObject::GetAngleDegToTargetPosition(sf::Vector2f ref_position, float ref_rotation_in_deg, sf::Vector2f target_position)
+{
+	float angle = GameObject::GetAngleRadBetweenPositions(target_position, ref_position) * 180.f / M_PI;
+	float delta_angle = angle - ref_rotation_in_deg;
+	if (delta_angle > 180)
+		delta_angle -= 180.f * 2;
+	else if (delta_angle < -180)
+		delta_angle += 180.f * 2;
+
+	return delta_angle;
+}
+
+float GameObject::GetAngleRadForVector(sf::Vector2f vector)
+{
+	const float a = vector.x;
+	const float b = vector.y;
 
 	if (a == 0 && b == 0)
 		return 0.f;
@@ -251,6 +304,34 @@ float GameObject::GetAngleRadForSpeed(sf::Vector2f curSpeed)
 	return angle;
 }
 
+sf::Vector2f GameObject::RotateVector(sf::Vector2f vector, float angle_rad)
+{
+	float length;
+	float angle;
+	GetAngleRadAndLengthOfVector(vector, &length, &angle);
+
+	angle += angle_rad;
+
+	sf::Vector2f output_vector = GetVectorFromLengthAndAngle(length, angle);
+
+	return output_vector;
+}
+
+void GameObject::SetVectorRotation(sf::Vector2f* vector, float angle_rad)
+{
+	float length = GetVectorLength(*vector);
+	sf::Vector2f new_vector = GetVectorFromLengthAndAngle(length, angle_rad);
+}
+
+sf::Vector2f GameObject::GetVectorFromLengthAndAngle(float absolute_speed, float curAngle)
+{
+	sf::Vector2f speed;
+	speed.x = -absolute_speed * sin(curAngle);
+	speed.y = absolute_speed * cos(curAngle);
+
+	return speed;
+}
+
 float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2)
 {
 	assert(ref_object != NULL);
@@ -262,7 +343,7 @@ float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* 
 float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vector2f position2)
 {
 	const sf::Vector2f diff = sf::Vector2f(ref_position.x - position2.x, ref_position.y - position2.y);
-	float target_angle = GetAngleRadForSpeed(diff);
+	float target_angle = GetAngleRadForVector(diff);
 
 	const float a = diff.x;
 	const float b = diff.y;
@@ -283,21 +364,12 @@ float GameObject::GetAngleRadBetweenPositions(sf::Vector2f ref_position, sf::Vec
 	return angle;
 }
 
-sf::Vector2f GameObject::GetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float curAngle)
-{
-	sf::Vector2f speed;
-	speed.x = -absolute_speed * sin(curAngle);
-	speed.y = absolute_speed * cos(curAngle);
-
-	return speed;
-}
-
 sf::Vector2f GameObject::SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed)
 {
 	sf::Vector2f vector_to_destination = coordinates - getPosition();
 
 	sf::Vector2f move = vector_to_destination;
-	ScaleSpeed(&move, speed);
+	ScaleVector(&move, speed);
 
 	m_speed = move;
 
@@ -321,16 +393,16 @@ float GameObject::GetDistanceBetweenObjects(GameObject* object1, GameObject* obj
 float GameObject::GetDistanceBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
-	return GetAbsoluteSpeed(current_diff);
+	return GetVectorLength(current_diff);
 }
 
 float GameObject::GetDistanceSquaredBetweenPositions(sf::Vector2f position1, sf::Vector2f position2)
 {
 	Vector2f current_diff = sf::Vector2f(position1.x - position2.x, position1.y - position2.y);
-	return GetAbsoluteSpeedSquared(current_diff);
+	return GetVectorLengthSquared(current_diff);
 }
 
-bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
+bool GameObject::NormalizeVector(sf::Vector2f* vector, float max_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return true;
@@ -347,7 +419,7 @@ bool GameObject::NormalizeSpeed(sf::Vector2f* vector, float max_value)
 	return false;
 }
 
-void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
+void GameObject::ScaleVector(sf::Vector2f* vector, float target_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return;
@@ -357,12 +429,12 @@ void GameObject::ScaleSpeed(sf::Vector2f* vector, float target_value)
 	vector->y *= p;
 }
 
-void GameObject::AddSpeed(sf::Vector2f* vector, float added_value)
+void GameObject::AddValueToVector(sf::Vector2f* vector, float added_value)
 {
 	if (vector->x == 0 && vector->y == 0)
 		return;
 
-	float target_value = GetAbsoluteSpeed(*vector) + added_value;
+	float target_value = GetVectorLength(*vector) + added_value;
 	float p = target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
 	vector->x *= p;
 	vector->y *= p;
@@ -496,4 +568,31 @@ sf::Uint8* GameObject::CreateRectangleWithStroke(sf::Vector2f size, sf::Color co
 	}
 
 	return pixels;
+}
+
+bool GameObject::BounceOnBorders(sf::Vector2f area_size)
+{
+	bool bounced = false;
+	if (getPosition().x - m_size.x / 2 < 0 && m_speed.x < 0)
+	{
+		m_speed.x *= -1;
+		bounced = true;
+	}
+	if (getPosition().x + m_size.x / 2 > area_size.x  && m_speed.x > 0)
+	{
+		m_speed.x *= -1;
+		bounced = true;
+	}
+	if (getPosition().y - m_size.y / 2 < 0 && m_speed.y < 0)
+	{
+		m_speed.y *= -1;
+		bounced = true;
+	}
+	if (getPosition().y + m_size.y / 2 > area_size.y && m_speed.y > 0)
+	{
+		m_speed.y *= -1;
+		bounced = true;
+	}
+
+	return bounced;
 }

@@ -94,6 +94,20 @@ float RandomizeFloatBetweenValues(sf::Vector2f min_max_values)
 	return random_value;
 }
 
+int RandomizeSign()
+{
+	//50% chance of being 1, 50% chance of being -1
+	int sign = 1;
+
+	int random_value = RandomizeIntBetweenValues(1, 2);
+	if (random_value > 1)
+	{
+		sign = -1;
+	}
+
+	return sign;
+}
+
 float MaxBetweenValues(sf::Vector2f values)
 {
 	float max = values.x;

@@ -159,7 +159,7 @@ void Ship::MaxSpeedConstraints()
 	float ship_max_speed = SHIP_MAX_SPEED;
 
 	//max speed constraints
-	NormalizeSpeed(&m_speed, ship_max_speed);
+	NormalizeVector(&m_speed, ship_max_speed);
 }
 
 void Ship::UpdateRotation()
@@ -187,7 +187,7 @@ void Ship::UpdateRotation()
 	}
 	else
 	{
-		setRotation((GetAngleRadForSpeed(m_speed) * 180 / (float)M_PI));
+		setRotation((GetAngleRadForVector(m_speed) * 180 / (float)M_PI));
 	}
 }
 
