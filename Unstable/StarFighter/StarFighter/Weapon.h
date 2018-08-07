@@ -19,8 +19,7 @@ class Weapon : public GameObject
 public:
 	Weapon(GameObject* owner, WeaponTypes type, sf::Color color = sf::Color::Yellow);
 	~Weapon();
-
-	void InitWeapon(sf::Vector2f size, sf::Color color);
+	
 	void update(sf::Time deltaTime) override;
 	void Draw(sf::RenderTexture& screen) override;
 	void CollisionWithEnemy(GameObject* enemy) override;

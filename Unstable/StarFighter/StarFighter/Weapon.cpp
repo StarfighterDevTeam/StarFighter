@@ -40,7 +40,7 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 			m_is_ranged = false;
 			m_can_be_parried = true;
 
-			InitWeapon(m_range, color);
+			Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(255, 255, 255,255), m_range);
 			break;
 		}
 
@@ -53,7 +53,7 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 			m_is_ranged = false;
 			m_can_be_parried = false;
 
-			InitWeapon(m_range, color);
+			Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(255, 255, 255, 255), m_range);
 			break;
 		}
 
@@ -78,7 +78,9 @@ Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
 		}
 	}
 
+	setColor(color);
 	m_visible = false;
+	Extend(sf::Vector2f(0.f, 1.f));
 }
 
 Weapon::~Weapon()
@@ -90,43 +92,10 @@ Weapon::~Weapon()
 	}
 }
 
-void Weapon::InitWeapon(sf::Vector2f size, sf::Color color)// : GameObject(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/smiley.png", sf::Vector2f(200, 200), sf::Vector2f(100, 100))
-{
-	//TEXTURE CREATION
-	const int W = size.x;
-	const int H = size.y;
-
-	sf::Uint8* pixels = new sf::Uint8[W * H * 4];
-
-	for (int i = 0; i < W * H * 4; i += 4)
-	{
-		//pixels[i] = color.r;		// R
-		//pixels[i + 1] = color.g;	// G
-		//pixels[i + 2] = color.b;	// B
-		//pixels[i + 3] = color.a;	// A
-		pixels[i]		= 255;	// R
-		pixels[i + 1]	= 255;	// G
-		pixels[i + 2]	= 255;	// B
-		pixels[i + 3]	= 255;	// A
-	}
-
-	ostringstream ss;
-	//ss << "weapon_" << (int)size.x << "x" << (int)size.y << "_r" << (int)color.r << "_g" << (int)color.g << "_b" << (int)color.b << "_a" << (int)color.a;
-	ss << "weapon_" << (int)size.x << "x" << (int)size.y;
-
-	Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), ss.str(), sf::Vector2f(W, H), 1, 1, pixels);
-	
-	setColor(color);
-	Extend(sf::Vector2f(0.f, 1.f));
-	//setScale(sf::Vector2f(0.f, m_range.y));
-	//setScale(sf::Vector2f(0.f, 1.f));
-}
-
 void Weapon::update(sf::Time deltaTime)
 {
 	AnimatedSprite::update(deltaTime);
 }
-
 
 void Weapon::Draw(sf::RenderTexture& screen)
 {
