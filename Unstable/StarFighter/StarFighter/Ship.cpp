@@ -12,7 +12,8 @@ Ship::Ship()
 
 void Ship::Init()
 {
-	m_collider_type = GameObjectType::PlayerShip;
+	m_layer = PlayerShipLayer;
+	m_collider_type = PlayerShip;
 	m_moving = false;
 	m_movingX = m_movingY = false;
 	m_disable_inputs = false;
