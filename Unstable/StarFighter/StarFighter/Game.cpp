@@ -630,6 +630,7 @@ void Game::TransferGameObjectLayeredTempToSceneObjectsLayered(LayerType layer)
 			if (m_sceneGameObjectsLayered[old_layer][l] == m_sceneGameObjectsLayeredTemp[layer][k])
 			{
 				m_sceneGameObjectsLayered[old_layer][l] = NULL;
+				continue;
 			}
 		}
 
@@ -651,18 +652,20 @@ void Game::TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collide
 			continue;
 
 		const size_t vectorMasterSize = m_sceneGameObjectsTyped[collider_type].size();
+		printf("Transfert typed...(%d, %d)", vectorSlaveSize, vectorMasterSize);
 		for (size_t j = current_index; j < vectorMasterSize; j++)
 		{
-			if (m_sceneGameObjectsLayered[collider_type][j] == NULL)
+			if (m_sceneGameObjectsTyped[collider_type][j] == NULL)
 			{
 				//cut from old type
 				GameObjectType old_collider_type = m_sceneGameObjectsTypedTemp[collider_type][i]->m_collider_type;
 				size_t previousVectorSize = m_sceneGameObjectsTyped[old_collider_type].size();
 				for (size_t l = 0; l < previousVectorSize; l++)
 				{
-					if (m_sceneGameObjectsTyped[old_collider_type][l] == m_sceneGameObjectsLayeredTemp[old_collider_type][i])
+					if (m_sceneGameObjectsTyped[old_collider_type][l] == m_sceneGameObjectsTypedTemp[collider_type][i])
 					{
 						m_sceneGameObjectsTyped[old_collider_type][l] = NULL;
+						continue;
 					}
 				}
 
@@ -696,6 +699,9 @@ void Game::TransferGameObjectTypedTempToSceneObjectsTyped(GameObjectType collide
 		m_sceneGameObjectsTypedTemp[collider_type][k]->m_collider_type = collider_type;
 		m_sceneGameObjectsTyped[collider_type].push_back(m_sceneGameObjectsTypedTemp[collider_type][k]);
 	}
+
+	if (vectorSlaveSize > 0)
+		printf(" ok\n");
 }
 
 void Game::cleanGarbage()

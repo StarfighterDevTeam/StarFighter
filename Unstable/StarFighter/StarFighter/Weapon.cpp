@@ -193,11 +193,14 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 		std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy_bullet);
 		if (it == m_enemies_tagged.end())
 		{
+			m_enemies_tagged.push_back(bullet);
+
 			bullet->m_speed = -bullet->m_speed;
 
 			LayerType layer = bullet->m_layer == EnemyBulletLayer ? PlayerBulletLayer : EnemyBulletLayer;
 			GameObjectType type = bullet->m_collider_type == EnemyBulletObject ? PlayerBulletObject : EnemyBulletObject;
 			(*CurrentGame).changeObjectTypeAndLayer(bullet, layer, type);
+			("parry\n");
 		}
 	}
 }
@@ -253,7 +256,7 @@ void Weapon::Shoot(GameObject* target)
 	}
 }
 
-size_t Weapon::GetBulletFiredCount()
+size_t Weapon::GetFiredBulletsCount()
 {
 	size_t count = 0;
 
@@ -273,6 +276,11 @@ size_t Weapon::GetBulletFiredCount()
 		{
 			count++;
 		}
+	}
+
+	if (count > 1)
+	{
+		printf("");
 	}
 
 	return count;

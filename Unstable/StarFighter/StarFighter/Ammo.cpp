@@ -44,8 +44,6 @@ void Ammo::CollisionWithEnemy(GameObject* enemy)
 		enemy->DealDamage(m_dmg);
 		m_GarbageMe = true;
 		m_visible = false;
-
-		printf("touché\n");
 	}
 	else
 	{
@@ -55,8 +53,6 @@ void Ammo::CollisionWithEnemy(GameObject* enemy)
 			m_enemies_tagged.push_back(enemy);
 
 			enemy->DealDamage(m_dmg);
-
-			printf("touché\n");
 		}
 	}
 }

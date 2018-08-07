@@ -44,7 +44,7 @@ public:
 	bool m_bullet_is_unique;
 	bool m_can_be_parried;
 	vector<GameObject*> m_enemies_tagged;
-	size_t GetBulletFiredCount();
+	size_t GetFiredBulletsCount();
 
 	WeaponTypes m_type;
 	GameObject* m_owner;

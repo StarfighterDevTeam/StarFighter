@@ -114,7 +114,7 @@ void Ship::update(sf::Time deltaTime)
 				m_weapon->m_enemies_tagged.clear();
 				m_weapon->setColor(m_weapon->m_color);
 
-				if (m_weapon->m_is_ranged && m_weapon->m_bullet_is_unique && m_weapon->GetBulletFiredCount() > 0)
+				if (m_weapon->m_is_ranged && m_weapon->m_bullet_is_unique && m_weapon->GetFiredBulletsCount() > 0)
 				{
 					//do nothing
 				}
