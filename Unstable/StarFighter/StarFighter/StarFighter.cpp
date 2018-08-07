@@ -74,13 +74,23 @@ int main()
 			{
 				renderWindow.close();
 			}
+			else if (event.type == sf::Event::GainedFocus)
+			{
+				(*CurrentGame).m_window_has_focus = true;
+				LOGGER_WRITE(Logger::DEBUG, "Window focus gained");
+			}
+			else if (event.type == sf::Event::LostFocus)
+			{
+				(*CurrentGame).m_window_has_focus = false;
+				LOGGER_WRITE(Logger::DEBUG, "Window focus lost");
+			}
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 		{
 			renderWindow.close();
 		}
-
+		
 		//Resolution switch
 		if (InputGuy::isChangingResolution())
 		{

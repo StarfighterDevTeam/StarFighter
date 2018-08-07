@@ -49,7 +49,11 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	sf::Vector2f inputs_direction = InputGuy::getDirections();
+	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
+	if ((*CurrentGame).m_window_has_focus)
+	{
+		inputs_direction = InputGuy::getDirections();
+	}
 
 	if (!m_disable_inputs)
 	{
@@ -205,7 +209,14 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 void Ship::UpdateInputStates()
 {
-	GetInputState(InputGuy::isFiring(), Action_Firing);
+	if ((*CurrentGame).m_window_has_focus)
+	{
+		GetInputState(InputGuy::isFiring(), Action_Firing);
+	}
+	else
+	{
+		GetInputState(false, Action_Firing);
+	}
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
