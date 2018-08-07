@@ -14,6 +14,7 @@ void Game::init(RenderWindow* window)
 {
 	m_playerShip = NULL;
 	m_pause = false;
+	m_window_has_focus = true;
 
 	m_window = window;
 	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);

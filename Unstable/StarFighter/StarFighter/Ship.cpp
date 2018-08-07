@@ -87,8 +87,12 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
-	sf::Vector2f inputs_direction = InputGuy::getDirections();
-
+	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
+	if ((*CurrentGame).m_window_has_focus)
+	{
+		inputs_direction= InputGuy::getDirections();
+	}
+		
 	if (!m_disable_inputs)
 	{
 		m_moving = inputs_direction.x != 0 || inputs_direction.y != 0;
@@ -423,8 +427,16 @@ void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 
 void Ship::UpdateInputStates()
 {
-	GetInputState(InputGuy::isFiring(), Action_Melee);
-	GetInputState(InputGuy::isDashing(), Action_Dash);
+	if ((*CurrentGame).m_window_has_focus)
+	{
+		GetInputState(InputGuy::isFiring(), Action_Melee);
+		GetInputState(InputGuy::isDashing(), Action_Dash);
+	}
+	else
+	{
+		GetInputState(false, Action_Melee);
+		GetInputState(false, Action_Dash);
+	}
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)
