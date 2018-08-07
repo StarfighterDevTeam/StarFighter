@@ -175,7 +175,8 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 				LayerType layer = bullet->m_layer == EnemyBulletLayer ? PlayerBulletLayer : EnemyBulletLayer;
 				GameObjectType type = bullet->m_collider_type == EnemyBulletObject ? PlayerBulletObject : EnemyBulletObject;
 				(*CurrentGame).changeObjectTypeAndLayer(bullet, layer, type);
-				printf("parry\n");
+
+				(*CurrentGame).PlaySFX(SFX_Parry);
 			}
 		}
 	}
