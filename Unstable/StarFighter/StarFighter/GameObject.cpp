@@ -602,3 +602,15 @@ bool GameObject::BounceOnBorders(sf::Vector2f area_size)
 
 	return bounced;
 }
+
+bool GameObject::IsInsideArea(sf::Vector2f coordinates, sf::Vector2f area_size)
+{
+	const int a = (int)this->getLocalBounds().width / 2;
+	const int b = (int)this->getLocalBounds().height / 2;
+	const int c = (int)area_size.x - this->getLocalBounds().width / 2;
+	const int d = (int)area_size.y - this->getLocalBounds().height / 2;
+
+	sf::IntRect boundsA(sf::IntRect(a, b, c, d));
+	sf::IntRect boundsB(sf::IntRect(coordinates.x - a, coordinates.y - b, coordinates.x + a, coordinates.y - b));
+	return boundsA.intersects(boundsB);
+}
