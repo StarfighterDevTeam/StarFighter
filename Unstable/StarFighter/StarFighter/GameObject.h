@@ -90,7 +90,7 @@ public:
 	string getName();
 	GameObject* Clone();
 	void setGhost(bool ghost);
-	bool Scale(sf::Vector2f factor);
+	bool ScaleObject(float scale);
 	
 	float m_diag;
 	bool m_ghost;

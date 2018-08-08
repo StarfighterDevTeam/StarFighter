@@ -236,14 +236,11 @@ void GameObject::setGhost(bool ghost)
 	}
 }
 
-bool GameObject::Scale(sf::Vector2f factor)
+bool GameObject::ScaleObject(float scale)
 {
-	//setScale(factor);
-	//
-	//m_size.x = m_size.x * factor.x;
-	//m_size.y = m_size.y * factor.y;
-	//
-	//m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+	setScale(sf::Vector2f(scale, scale));
+	m_size *= scale;
+	m_diag *= scale;
 
 	return true;
 }
