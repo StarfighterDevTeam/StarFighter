@@ -10,27 +10,38 @@ using namespace sf;
 #define FLOCKING_SEPARATION_WEIGHT			2.0f
 #define FLOCKING_SEPARATION_RADIUS			50.f
 
-Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
-{
-	m_hp_max = 2;
-	m_hp = m_hp_max;
-	m_dmg = 1;
-	m_melee_cooldown = 2.f;
-	m_ref_speed = 150.f;
+#define ENEMY_ROAMING_MIN_DURATION			1.f
+#define ENEMY_ROAMING_MAX_DURATION			5.f
+#define ENEMY_ROAMING_MIN_DISTANCE			100.f
+#define ENEMY_ROAMING_MAX_DISTANCE			400.f
+#define ENEMY_DASH_DISTANCE					100.f
+#define ENEMY_DASH_COOLDOWN					5.f
 
-	m_is_attacking = false;
-	//m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
-	m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
-	(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
-
-	//float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
-	//SetSpeedVectorFromAbsoluteSpeedAndAngle(200, angle * M_PI / 180);
-}
+//Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
+//{
+//	m_hp_max = 2;
+//	m_hp = m_hp_max;
+//	m_dmg = 1;
+//	m_attack_cooldown = 2.f;
+//	m_ref_speed = 150.f;
+//
+//	m_is_attacking = false;
+//	//m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
+//	m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
+//	(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
+//
+//	//float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
+//	//SetSpeedVectorFromAbsoluteSpeedAndAngle(200, angle * M_PI / 180);
+//}
 
 Enemy::Enemy(sf::Vector2f position, EnemyType type)
 {
 	m_type = type;
+	m_phase = EnemyPhase_Idle;
 	m_is_attacking = false;
+
+	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
+	setRotation(angle);
 
 	string textureName;
 	sf::Vector2f size;
@@ -46,10 +57,11 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 			m_hp_max = 2;
 			m_hp = m_hp_max;
 			m_dmg = 1;
-			m_melee_cooldown = 2.f;
-			m_ref_speed = 150.f;
+			m_attack_cooldown = 2.f;
+			m_ref_speed = 200.f;
 			textureName = "2D/wufeng.png";
 			size = sf::Vector2f(64, 114);
+			m_aggro_radius = 500.f;
 			break;
 		}
 	}
@@ -78,10 +90,25 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 
 	Init(position, sf::Vector2f(0, 0), textureName, size, frameNumber, animationNumber);
 
+	m_DontGarbageMe = true;
+
 	if (m_weapon)
 	{
 		(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
 	}
+
+	//AI
+	m_roam_duration = RandomizeFloatBetweenValues(sf::Vector2f(ENEMY_ROAMING_MIN_DURATION, ENEMY_ROAMING_MAX_DURATION));
+	m_destination = getPosition();
+	m_arrived_at_destination = true;
+
+	//debug
+	m_aggro_radius_feedback.setRadius(m_aggro_radius);
+	m_aggro_radius_feedback.setOrigin(sf::Vector2f(m_aggro_radius, m_aggro_radius));
+	m_aggro_radius_feedback.setFillColor(sf::Color(0, 0, 0, 0));
+	m_aggro_radius_feedback.setOutlineThickness(2);
+	m_aggro_radius_feedback.setOutlineColor(sf::Color(255, 0, 0, 80));
+	m_aggro_radius_feedback.setPosition(getPosition());
 }
 
 Enemy::~Enemy()
@@ -213,6 +240,44 @@ sf::Vector2f Enemy::Flocking()
 	return final_vector;
 }
 
+void Enemy::UpdateAI(sf::Time deltaTime)
+{
+	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
+
+	float dist_squared_to_player = GetDistanceSquaredBetweenPositions(getPosition(), player->getPosition());
+	if (dist_squared_to_player < m_aggro_radius * m_aggro_radius)
+	{
+		if (m_phase != EnemyPhase_FollowPlayer)
+		{
+			m_phase = EnemyPhase_FollowPlayer;
+		}
+	}
+	else
+	{
+		if (m_phase != EnemyPhase_Idle)
+		{
+			m_phase = EnemyPhase_Idle;
+
+			m_arrived_at_destination = true;
+			m_speed = sf::Vector2f(0, 0);
+			//m_roaming_clock.restart();
+			printf("GO TO ROAMING\n");
+		}
+	}
+
+	if (m_phase == EnemyPhase_Idle)
+	{
+		Roam(deltaTime);
+	}
+
+	if (m_phase == EnemyPhase_FollowPlayer)
+	{
+		if (FollowPlayer(player))
+		{
+			AttackPlayer(player);
+		}
+	}
+}
 void Enemy::update(sf::Time deltaTime)
 {
 	//bounce on screen borders
@@ -223,16 +288,10 @@ void Enemy::update(sf::Time deltaTime)
 		printf("BUG\n");//chasing a potential bug
 	}
 
-	//Chase player
-	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
-
 	//Flocking?
-	sf::Vector2f flocking_vector = m_flocking ? Flocking() : sf::Vector2f(0, 0);
+	//sf::Vector2f flocking_vector = m_flocking ? Flocking() : sf::Vector2f(0, 0);
 
-	//Follow player
-	SetSpeedForConstantSpeedToDestination(player->getPosition() + flocking_vector, m_ref_speed);
-
-	//Melee
+	//AI behaviour
 	if (m_is_attacking)//reset
 	{
 		if (m_weapon && m_weapon->m_attack_clock.getElapsedTime().asSeconds() > m_weapon->m_attack_duration)
@@ -249,29 +308,14 @@ void Enemy::update(sf::Time deltaTime)
 			else
 			{
 				m_is_attacking = false;
-				m_melee_cooldown_clock.restart();
+				m_attack_cooldown_clock.restart();
 			}
 		}
 	}
 
-	if (m_melee_cooldown_clock.getElapsedTime().asSeconds() > m_melee_cooldown)//condition to start attack
-	{
-		if (m_weapon && !m_is_attacking)
-		{
-			if (m_weapon->m_is_ranged == false)
-			{
-				m_weapon->m_visible = true;
-				(*CurrentGame).PlaySFX(SFX_Melee);
-			}
-			else
-			{
-				m_weapon->Shoot(player);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
-			}
-
-			m_is_attacking = true;
-			m_weapon->m_attack_clock.restart();
-		}
-	}
+	// # # #
+	UpdateAI(deltaTime);
+	// # # #
 
 	if (m_is_attacking)//update
 	{
@@ -288,6 +332,9 @@ void Enemy::update(sf::Time deltaTime)
 	GameObject::update(deltaTime);
 
 	UpdateRotation();
+
+	//debug
+	m_aggro_radius_feedback.setPosition(getPosition());
 }
 
 bool Enemy::DealDamage(int dmg)
@@ -326,4 +373,102 @@ int Enemy::GetRating()
 	rating += m_dmg;
 
 	return rating;
+}
+
+bool Enemy::FollowPlayer(GameObject* player)
+{
+	float range = m_weapon ? m_weapon->m_range.x + m_size.x / 2 : player->m_size.x + m_size.x / 2;
+	if (GetDistanceSquaredBetweenPositions(this->getPosition(), player->getPosition()) > range * range)
+	{
+		SetSpeedForConstantSpeedToDestination(player->getPosition(), m_ref_speed);
+		return false;
+	}
+	else
+	{
+		m_speed = sf::Vector2f(0, 0);
+		return true;
+	}
+}
+
+bool Enemy::AttackPlayer(GameObject* player)
+{
+	if (m_attack_cooldown_clock.getElapsedTime().asSeconds() > m_attack_cooldown)//condition to start attack
+	{
+		if (m_weapon && !m_is_attacking)
+		{
+			if (m_weapon->m_is_ranged == false)
+			{
+				m_weapon->m_visible = true;
+				(*CurrentGame).PlaySFX(SFX_Melee);
+			}
+			else
+			{
+				m_weapon->Shoot(player);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
+			}
+
+			m_is_attacking = true;
+			m_weapon->m_attack_clock.restart();
+		}
+	}
+
+	return m_is_attacking;
+}
+
+void Enemy::Draw(sf::RenderTexture& screen)
+{
+	GameObject::Draw(screen);
+
+	if (m_visible)
+	{
+		screen.draw(m_aggro_radius_feedback);
+	}
+}
+
+bool Enemy::Roam(sf::Time deltaTime)
+{
+	//arrived?
+	float dist_squared_to_destination = GetDistanceSquaredBetweenPositions(getPosition(), m_destination);
+	if (!m_arrived_at_destination)
+	{
+		if (dist_squared_to_destination < 16 * 16)
+		{
+			m_arrived_at_destination = true;
+			m_speed = sf::Vector2f(0, 0);
+			setPosition(m_destination);
+			m_roaming_clock.restart();
+		}
+		else
+		{
+			SetSpeedForConstantSpeedToDestination(m_destination, m_ref_speed);
+		}
+	}
+
+	//arrived = roam to a new destination
+	if (m_arrived_at_destination && m_roaming_clock.getElapsedTime().asSeconds() > m_roam_duration)
+	{
+		m_roam_duration = RandomizeFloatBetweenValues(sf::Vector2f(ENEMY_ROAMING_MIN_DURATION, ENEMY_ROAMING_MAX_DURATION));
+
+		float distance = RandomizeFloatBetweenValues(sf::Vector2f(ENEMY_ROAMING_MIN_DISTANCE, ENEMY_ROAMING_MAX_DISTANCE));
+		float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 2 * M_PI));
+
+		sf::Vector2f move = GetVectorFromLengthAndAngle(distance, angle);
+
+		if (IsInsideArea(getPosition() + move, (*CurrentGame).m_map_size))
+		{
+			m_destination = getPosition() + move;
+		}
+		else
+		{
+			printf("REROLL: destination: %f, %f, move: %f, %f\n", m_destination.x, m_destination.y, move.x, move.y);
+			move = - move;
+			m_destination = getPosition() + move;
+		}
+
+		SetSpeedForConstantSpeedToDestination(m_destination, m_ref_speed);
+		m_arrived_at_destination = false;
+
+		return true;
+	}
+	
+	return false;
 }

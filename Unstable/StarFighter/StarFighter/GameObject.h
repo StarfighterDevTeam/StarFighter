@@ -111,6 +111,7 @@ public:
 	virtual int GetRating();
 
 	bool BounceOnBorders(sf::Vector2f area_size);
+	bool IsInsideArea(sf::Vector2f coordinates, sf::Vector2f area_size);
 	void UpdateWeaponPosition(GameObject* weapon);
 	void UpdateRotation();
 

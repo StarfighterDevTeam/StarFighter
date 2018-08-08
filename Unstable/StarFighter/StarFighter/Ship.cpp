@@ -249,7 +249,6 @@ void Ship::update(sf::Time deltaTime)
 			}
 		}
 
-		
 		float dist_to_target = GetDistanceBetweenPositions(getPosition(), m_dash_target);
 		if (dist_to_target > DASH_SPEED * deltaTime.asSeconds())
 		{
@@ -311,8 +310,6 @@ void Ship::update(sf::Time deltaTime)
 
 	//debug
 	m_dash_radius_feedback.setPosition(getPosition());
-	m_dash_radius_feedback.setRadius(m_dash_radius);
-	m_dash_radius_feedback.setOrigin(sf::Vector2f(m_dash_radius, m_dash_radius));
 
 	if (m_move_state == Character_Idle)
 	{
@@ -566,7 +563,7 @@ void Ship::Draw(sf::RenderTexture& screen)
 {
 	GameObject::Draw(screen);
 
-	if (m_visible)// && IsImmune() == false)
+	if (m_visible)
 	{
 		screen.draw(m_dash_radius_feedback);
 	}

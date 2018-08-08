@@ -10,7 +10,7 @@
 #include "Loot.h"
 #include "FX.h"
 
-#define SHIP_START_X                990
+#define SHIP_START_X                200
 #define SHIP_START_Y                540
 #define SHIP_ACCELERATION	        2000.0f
 #define SHIP_DECCELERATION_COEF		0.f

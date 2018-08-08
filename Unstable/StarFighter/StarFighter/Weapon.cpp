@@ -17,7 +17,7 @@ extern Game* CurrentGame;
 #define MELEE_SPEAR_RANGE_Y				40.f
 #define MELEE_SPEAR_DURATION			0.5f
 
-#define RANGED_SHURIKEN_SPEED			1000.f
+#define RANGED_SHURIKEN_SPEED			800.f
 #define RANGED_SHURIKEN_COOLDOWN		0.5f
 
 Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
@@ -80,6 +80,7 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 		}
 	}
 
+	m_DontGarbageMe = true;
 	setColor(color);
 	m_visible = false;
 	Extend(sf::Vector2f(0.f, 1.f));
