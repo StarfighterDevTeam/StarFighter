@@ -20,7 +20,7 @@ extern Game* CurrentGame;
 #define RANGED_SHURIKEN_SPEED			1000.f
 #define RANGED_SHURIKEN_COOLDOWN		0.5f
 
-Weapon::Weapon(GameObject* owner, WeaponTypes type, sf::Color color)
+Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 {
 	m_owner = owner;
 	m_type = type;
@@ -120,7 +120,7 @@ void Weapon::CollisionWithEnemy(GameObject* enemy)
 	}
 }
 
-void Weapon::CollisionBetweenWeapons(GameObject* enemy_weapon)
+void Weapon::CollisionWithWeapon(GameObject* enemy_weapon)
 {
 	Weapon* weapon = (Weapon*)enemy_weapon;
 
@@ -253,11 +253,6 @@ size_t Weapon::GetFiredBulletsCount()
 		{
 			count++;
 		}
-	}
-
-	if (count > 1)
-	{
-		printf("");
 	}
 
 	return count;

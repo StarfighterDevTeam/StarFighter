@@ -6,7 +6,7 @@ using namespace sf;
 
 #define LOOT_BONUS_MELEE_RANGE			100.f
 
-Loot::Loot(LootTypes type, sf::Vector2f position)
+Loot::Loot(LootType type, sf::Vector2f position)
 {
 	m_type = type;
 	

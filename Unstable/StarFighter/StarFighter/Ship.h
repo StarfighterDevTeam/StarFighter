@@ -106,6 +106,8 @@ public :
 	Uint8 m_alpha_color;
 
 	void CollisionWithEnemy(GameObject* enemy) override;
+	void CollisionWithWeapon(GameObject* enemy_weapon) override;
+	void CollisionWithBullet(GameObject* enemy_bullet) override;
 	GameObject* GetDashEnemy() override;
 	void SetDashEnemy(GameObject* enemy) override;
 	bool DealDamage(int dmg) override;

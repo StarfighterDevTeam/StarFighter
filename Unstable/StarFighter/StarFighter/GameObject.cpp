@@ -3,7 +3,7 @@
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : AnimatedSprite()
 {
 	Init(position, speed, textureName, size, frameNumber, animationNumber);
-	this->setOrigin(origin.x, origin.y);
+	setOrigin(origin.x, origin.y);
 }
 
 GameObject::GameObject(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : AnimatedSprite()
@@ -54,22 +54,22 @@ void GameObject::setAnimationLine(int animation, bool keep_frame_index)
 	//now let's load the new animation
 	Animation* anim = new Animation();
 	anim->setSpriteSheet(*this->m_defaultAnimation.getSpriteSheet());
-	for (size_t j = 0; j < this->m_defaultAnimation.getSize(); j++)
+	for (size_t j = 0; j < m_defaultAnimation.getSize(); j++)
 	{
-		size_t n = j / this->m_frameNumber;
+		size_t n = j / m_frameNumber;
 		//when we have reached out to the correct line of animation frames, we put this line into the animation
 		if (n == animation)
 		{
-			anim->addFrame(this->m_defaultAnimation.getFrame(j));
+			anim->addFrame(m_defaultAnimation.getFrame(j));
 		}
 	}
 
 	if (m_currentAnimation)
 		delete m_currentAnimation;
-	this->m_currentAnimation = anim;
+	m_currentAnimation = anim;
 	anim = NULL;
-	this->play(*m_currentAnimation, keep_frame_index);
-	this->m_currentAnimationIndex = animation;
+	play(*m_currentAnimation, keep_frame_index);
+	m_currentAnimationIndex = animation;
 }
 
 void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *texture, int frameNumber, int animationNumber)
@@ -234,6 +234,18 @@ void GameObject::setGhost(bool ghost)
 		m_ghost = false;
 		setColor(Color(255, 255, 255, 255));
 	}
+}
+
+bool GameObject::Scale(sf::Vector2f factor)
+{
+	//setScale(factor);
+	//
+	//m_size.x = m_size.x * factor.x;
+	//m_size.y = m_size.y * factor.y;
+	//
+	//m_diag = (float)sqrt(((m_size.x / 2)*(m_size.x / 2)) + ((m_size.y / 2)*(m_size.y / 2)));
+
+	return true;
 }
 
 GameObject* GameObject::Clone()
@@ -628,7 +640,7 @@ void GameObject::CollisionWithEnemy(GameObject* enemy)
 	//see override function in class Ship and Weapon
 }
 
-void GameObject::CollisionBetweenWeapons(GameObject* enemy_weapon)
+void GameObject::CollisionWithWeapon(GameObject* enemy_weapon)
 {
 	//see override function in class Weapon
 }

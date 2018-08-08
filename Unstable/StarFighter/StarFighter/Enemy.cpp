@@ -23,8 +23,65 @@ Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName,
 	m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
 	(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
 
-	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
+	//float angle = RandomizeFloatBetweenValues(sf::Vector2f(0, 360));
 	//SetSpeedVectorFromAbsoluteSpeedAndAngle(200, angle * M_PI / 180);
+}
+
+Enemy::Enemy(sf::Vector2f position, EnemyType type)
+{
+	m_type = type;
+	m_is_attacking = false;
+
+	string textureName;
+	sf::Vector2f size;
+	int frameNumber = 1;
+	int animationNumber = 1;
+
+	switch (type)
+	{
+		case Enemy_Wufeng_Katana:
+		case Enemy_Wufeng_Spear:
+		case Enemy_Wufeng_Shuriken:
+		{
+			m_hp_max = 2;
+			m_hp = m_hp_max;
+			m_dmg = 1;
+			m_melee_cooldown = 2.f;
+			m_ref_speed = 150.f;
+			textureName = "2D/wufeng.png";
+			size = sf::Vector2f(64, 114);
+			break;
+		}
+	}
+
+	switch (type)
+	{
+		case Enemy_Wufeng_Katana:
+		{
+			m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
+			setColor(sf::Color::Cyan);
+			break;
+		}
+		case Enemy_Wufeng_Spear:
+		{
+			m_weapon = new Weapon(this, Weapon_Spear, sf::Color::Red);
+			setColor(sf::Color::Red);
+			break;
+		}
+		case Enemy_Wufeng_Shuriken:
+		{
+			m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
+			setColor(sf::Color::Magenta);
+			break;
+		}
+	}
+
+	Init(position, sf::Vector2f(0, 0), textureName, size, frameNumber, animationNumber);
+
+	if (m_weapon)
+	{
+		(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
+	}
 }
 
 Enemy::~Enemy()

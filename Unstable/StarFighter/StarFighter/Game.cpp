@@ -412,7 +412,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				(*it2)->CollisionWithEnemy(*it1);
+				(*it1)->CollisionWithWeapon(*it2);
 			}
 		}
 
@@ -425,7 +425,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				(*it2)->CollisionWithEnemy(*it1);
+				(*it1)->CollisionWithBullet(*it2);
 			}
 		}
 	}
@@ -507,7 +507,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				(*it1)->CollisionBetweenWeapons(*it2);
+				(*it1)->CollisionWithWeapon(*it2);
 			}
 		}
 

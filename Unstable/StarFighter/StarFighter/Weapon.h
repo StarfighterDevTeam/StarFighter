@@ -6,7 +6,7 @@
 #include "Game.h"
 #include "Ammo.h"
 
-enum WeaponTypes
+enum WeaponType
 {
 	Weapon_Katana,
 	Weapon_Spear,
@@ -17,13 +17,13 @@ enum WeaponTypes
 class Weapon : public GameObject
 {
 public:
-	Weapon(GameObject* owner, WeaponTypes type, sf::Color color = sf::Color::Yellow);
+	Weapon(GameObject* owner, WeaponType type, sf::Color color = sf::Color::Yellow);
 	~Weapon();
 	
 	void update(sf::Time deltaTime) override;
 	void Draw(sf::RenderTexture& screen) override;
 	void CollisionWithEnemy(GameObject* enemy) override;
-	void CollisionBetweenWeapons(GameObject* enemy_weapon) override;
+	void CollisionWithWeapon(GameObject* enemy_weapon) override;
 	void CollisionWithBullet(GameObject* enemy_bullet) override;
 
 	void Extend(sf::Vector2f ratio);
@@ -45,7 +45,7 @@ public:
 	vector<GameObject*> m_enemies_tagged;
 	size_t GetFiredBulletsCount();
 
-	WeaponTypes m_type;
+	WeaponType m_type;
 	GameObject* m_owner;
 };
 

@@ -10,6 +10,8 @@ Ship::Ship()
 	
 }
 
+#define PLAYER_DEFAULT_SPEED		500.f
+
 #define DASH_RADIUS					300.f
 #define DASH_SPEED					1800
 #define DASH_COOLDOWN				1.0f
@@ -63,12 +65,12 @@ void Ship::Init()
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 {
-	this->Init();
+	Init();
 }
 
 Ship::Ship(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size) : GameObject(position, speed, textureName, size)
 {
-	this->Init();
+	Init();
 }
 
 Ship::~Ship()
@@ -392,18 +394,21 @@ void Ship::IdleDecelleration(sf::Time deltaTime)
 
 void Ship::ManageAcceleration(sf::Vector2f inputs_direction)
 {
-	m_speed.x += inputs_direction.x* SHIP_ACCELERATION;
-	m_speed.y += inputs_direction.y *SHIP_ACCELERATION;
+	m_speed.x = inputs_direction.x * PLAYER_DEFAULT_SPEED;
+	m_speed.y = inputs_direction.y * PLAYER_DEFAULT_SPEED;
+
+	//m_speed.x += inputs_direction.x * SHIP_ACCELERATION;
+	//m_speed.y += inputs_direction.y * SHIP_ACCELERATION;
 
 	//max speed constraints
-	if (abs(m_speed.x) > SHIP_MAX_SPEED)
-	{
-		m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
-	if (abs(m_speed.y) > SHIP_MAX_SPEED)
-	{
-		m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
-	}
+	//if (abs(m_speed.x) > SHIP_MAX_SPEED)
+	//{
+	//	m_speed.x = m_speed.x > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+	//}
+	//if (abs(m_speed.y) > SHIP_MAX_SPEED)
+	//{
+	//	m_speed.y = m_speed.y > 0 ? SHIP_MAX_SPEED : -SHIP_MAX_SPEED;
+	//}
 }
 
 void Ship::MaxSpeedConstraints()
@@ -536,6 +541,24 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 	{
 		Enemy* enemy_ = (Enemy*)enemy;
 		DealDamage(enemy_->m_dmg);
+	}
+}
+
+void Ship::CollisionWithWeapon(GameObject* enemy_weapon)
+{
+	if (m_move_state != Character_Dash)
+	{
+		Weapon* weapon = (Weapon*)enemy_weapon;
+		DealDamage(weapon->m_dmg);
+	}
+}
+
+void Ship::CollisionWithBullet(GameObject* enemy_bullet)
+{
+	if (m_move_state != Character_Dash)
+	{
+		Ammo* bullet = (Ammo*)enemy_bullet;
+		DealDamage(bullet->m_dmg);
 	}
 }
 

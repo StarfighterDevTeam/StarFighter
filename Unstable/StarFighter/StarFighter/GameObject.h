@@ -90,6 +90,7 @@ public:
 	string getName();
 	GameObject* Clone();
 	void setGhost(bool ghost);
+	bool Scale(sf::Vector2f factor);
 	
 	float m_diag;
 	bool m_ghost;
@@ -100,7 +101,7 @@ public:
 	std::string m_textureName;
 	sf::Vector2f m_speed;
 	virtual void CollisionWithEnemy(GameObject* enemy);
-	virtual void CollisionBetweenWeapons(GameObject* enemy_weapon);
+	virtual void CollisionWithWeapon(GameObject* enemy_weapon);
 	virtual void CollisionWithBullet(GameObject* enemy_bullet);
 	virtual GameObject* GetDashEnemy();
 	virtual void SetDashEnemy(GameObject* enemy);
