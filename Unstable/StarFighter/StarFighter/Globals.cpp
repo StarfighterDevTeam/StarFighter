@@ -137,3 +137,40 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 	}
 	return str;
 }
+
+float Lerp(float value, float input_min, float input_max, float output_min, float output_max)
+{
+	if (input_min == input_max)
+		return output_min;
+
+	if (value < input_min)
+	{
+		value = input_min;
+	}
+
+	if (value > input_max)
+	{
+		value = input_max;
+	}
+
+	float ratio = (input_max - value) / (input_max - input_min);
+
+	float lerp = output_min + ratio * (output_max - output_min);
+
+	return lerp;
+}
+
+sf::Color GrayScaleColor(sf::Color input_color, float ratio)
+{
+	Uint8 r = input_color.r;
+	Uint8 g = input_color.g;
+	Uint8 b = input_color.b;
+
+	Uint8 avg = (r + g + b) / 3;
+
+	Uint8 r2 = Uint8(avg * ratio + r * (1 - ratio));
+	Uint8 g2 = Uint8(avg * ratio + g * (1 - ratio));
+	Uint8 b2 = Uint8(avg * ratio + b * (1 - ratio));
+
+	return sf::Color(r2, g2, b2, input_color.a);
+}
