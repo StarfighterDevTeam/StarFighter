@@ -162,7 +162,7 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 			return;
 		}
 
-		if (bullet->m_parry_clock.getElapsedTime().asSeconds() > PARRY_BULLET_COOLDOWN)
+		if (bullet->m_parry_first_time || bullet->m_parry_clock.getElapsedTime().asSeconds() > PARRY_BULLET_COOLDOWN)
 		{
 			std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy_bullet);
 			if (it == m_enemies_tagged.end())
@@ -172,6 +172,7 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 				//bullet->m_speed = -bullet->m_speed;
 				bullet->m_speed = GetVectorFromLengthAndAngle(bullet->m_ref_speed, (getRotation() - 90) * M_PI / 180.f);
 				bullet->m_parry_clock.restart();
+				bullet->m_parry_first_time = false;
 
 				LayerType layer = bullet->m_layer == EnemyBulletLayer ? PlayerBulletLayer : EnemyBulletLayer;
 				GameObjectType type = bullet->m_collider_type == EnemyBulletObject ? PlayerBulletObject : EnemyBulletObject;

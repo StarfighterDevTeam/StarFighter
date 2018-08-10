@@ -13,7 +13,7 @@ Ship::Ship()
 #define PLAYER_DEFAULT_SPEED		500.f
 
 #define DASH_RADIUS					300.f
-#define DASH_SPEED					1800
+#define DASH_SPEED					1500
 #define DASH_SLOWDOWN_SPEED			300
 #define DASH_COOLDOWN				1.0f
 //#define DASH_OVERDASH_FACTOR		1.f

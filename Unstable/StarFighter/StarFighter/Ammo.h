@@ -22,6 +22,7 @@ public :
 	int m_dmg;
 	bool m_is_piercing;
 	bool m_can_be_parried;
+	bool m_parry_first_time;
 	vector<GameObject*> m_enemies_tagged;
 
 	sf::Clock m_parry_clock;

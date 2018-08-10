@@ -13,6 +13,7 @@ Ammo::Ammo(GameObject* owner, float speed, int dmg, bool is_piercing, bool can_b
 	m_dmg = dmg;
 	m_is_piercing = is_piercing;
 	m_can_be_parried = can_be_parried;
+	m_parry_first_time = true;
 }
 
 Ammo::Ammo(GameObject* owner, sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
