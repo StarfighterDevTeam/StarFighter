@@ -109,6 +109,8 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_aggro_radius_feedback.setOutlineThickness(2);
 	m_aggro_radius_feedback.setOutlineColor(sf::Color(255, 0, 0, 80));
 	m_aggro_radius_feedback.setPosition(getPosition());
+
+
 }
 
 Enemy::~Enemy()
@@ -459,7 +461,6 @@ bool Enemy::Roam(sf::Time deltaTime)
 		}
 		else
 		{
-			printf("REROLL: destination: %f, %f, move: %f, %f\n", m_destination.x, m_destination.y, move.x, move.y);
 			move = - move;
 			m_destination = getPosition() + move;
 		}

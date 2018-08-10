@@ -14,6 +14,7 @@ Ship::Ship()
 
 #define DASH_RADIUS					300.f
 #define DASH_SPEED					1800
+#define DASH_SLOWDOWN_SPEED			300
 #define DASH_COOLDOWN				1.0f
 //#define DASH_OVERDASH_FACTOR		1.f
 #define DASH_OVERDASH_DISTANCE		250.f
@@ -53,6 +54,13 @@ void Ship::Init()
 
 	m_hp_max = 3;
 	m_hp = m_hp_max;
+
+	m_dash_target_feedback.setRadius(40);
+	m_dash_target_feedback.setOrigin(sf::Vector2f(40, 40));
+	m_dash_target_feedback.setFillColor(sf::Color(0, 0, 0, 0));
+	m_dash_target_feedback.setOutlineThickness(6);
+	m_dash_target_feedback.setOutlineColor(sf::Color(0, 255, 0, 100));
+	m_dash_target_feedback.setPosition(getPosition());
 
 	//debug
 	m_dash_radius_feedback.setRadius(m_dash_radius);
@@ -106,7 +114,8 @@ void Ship::update(sf::Time deltaTime)
 	UpdateInputStates();
 
 	//ATTACKS
-	GameObject* dash_enemy = (*CurrentGame).getDashTarget(m_dash_radius);
+	GameObject* dash_enemy = (*CurrentGame).getDashTargetWithBlacklist(m_dash_radius, m_dash_enemies_tagged);
+
 	if (m_move_state == Character_Idle)
 	{
 		ManageAcceleration(inputs_direction);
@@ -206,8 +215,7 @@ void Ship::update(sf::Time deltaTime)
 	{
 		sf::Vector2f dash_vector = m_dash_target - getPosition();
 
-		//enemy position update
-		if (m_dash_enemy != NULL)
+		if (m_dash_enemy != NULL)//start dash
 		{
 			dash_vector = m_dash_enemy->getPosition() - getPosition();
 
@@ -217,43 +225,47 @@ void Ship::update(sf::Time deltaTime)
 
 			m_dash_target = getPosition() + dash_vector;
 		}
-		else if (m_dash_streak >= 1)//dash combo?
+		else
 		{
-			if (m_inputs_states[Action_Dash] == Input_Tap)
+			if (m_dash_streak >= 1)//dash update: start combo?
 			{
-				GameObject* new_dash_enemy = (*CurrentGame).getDashTargetWithBlacklist(m_dash_radius, m_dash_enemies_tagged);
-
-				if (new_dash_enemy)
+				if (m_inputs_states[Action_Dash] == Input_Tap)
 				{
-					m_dash_streak++;
-					m_dash_enemy = new_dash_enemy;
-					m_dash_enemies_tagged.push_back(new_dash_enemy);
+					GameObject* new_dash_enemy = (*CurrentGame).getDashTargetWithBlacklist(m_dash_radius, m_dash_enemies_tagged);
 
-					ostringstream ss;
-					ss << "Dash (" << m_dash_streak << ")";
-					(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 24, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
+					if (new_dash_enemy)
+					{
+						m_dash_streak++;
+						m_dash_enemy = new_dash_enemy;
+						m_dash_enemies_tagged.push_back(new_dash_enemy);
 
-					dash_vector = m_dash_enemy->getPosition() - getPosition();
+						ostringstream ss;
+						ss << "Dash (" << m_dash_streak << ")";
+						(*CurrentGame).CreateSFTextPop(ss.str(), Font_Arial, 24, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
 
-					m_overdash_distance = DASH_OVERDASH_DISTANCE;//GetVectorLength(dash_vector) * DASH_OVERDASH_FACTOR;
-					float dash_distance = GetDistanceBetweenPositions(m_dash_enemy->getPosition(), getPosition()) + m_overdash_distance;
+						dash_vector = m_dash_enemy->getPosition() - getPosition();
 
-					ScaleVector(&dash_vector, dash_distance);
+						m_overdash_distance = DASH_OVERDASH_DISTANCE;//GetVectorLength(dash_vector) * DASH_OVERDASH_FACTOR;
+						float dash_distance = GetDistanceBetweenPositions(m_dash_enemy->getPosition(), getPosition()) + m_overdash_distance;
 
-					m_dash_target = getPosition() + dash_vector;
-					m_speed = dash_vector;
-					ScaleVector(&m_speed, m_dash_speed);
+						ScaleVector(&dash_vector, dash_distance);
 
-					(*CurrentGame).PlaySFX(SFX_Dash);
+						m_dash_target = getPosition() + dash_vector;
+						m_speed = dash_vector;
+						ScaleVector(&m_speed, m_dash_speed);
+
+						(*CurrentGame).PlaySFX(SFX_Dash);
+					}
 				}
 			}
 		}
 
 		float dist_to_target = GetDistanceBetweenPositions(getPosition(), m_dash_target);
-		if (dist_to_target > DASH_SPEED * deltaTime.asSeconds())
+		float dash_speed = m_dash_enemy || m_dash_streak == 0 ? DASH_SPEED : DASH_SLOWDOWN_SPEED;
+		if (dist_to_target > dash_speed * deltaTime.asSeconds())
 		{
 			m_speed = dash_vector;
-			ScaleVector(&m_speed, DASH_SPEED);
+			ScaleVector(&m_speed, dash_speed);
 		}
 		else//end of dash
 		{
@@ -307,6 +319,18 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	UpdateWeaponPosition(m_weapon);
+
+	if (dash_enemy && !m_dash_enemy && m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown)
+	{
+		m_dash_target_feedback.setOutlineColor(sf::Color(0, 255, 0, 100));
+		m_dash_target_feedback.setPosition(dash_enemy->getPosition());
+	}
+	else
+	{
+		m_dash_target_feedback.setOutlineColor(sf::Color(0, 0, 0, 0));
+	}
+
+	SetConditionalColor(sf::Color(200, 200, 200, 180), m_move_state == Character_Dash, true);
 
 	//debug
 	m_dash_radius_feedback.setPosition(getPosition());
@@ -566,6 +590,7 @@ void Ship::Draw(sf::RenderTexture& screen)
 	if (m_visible)
 	{
 		screen.draw(m_dash_radius_feedback);
+		screen.draw(m_dash_target_feedback);
 	}
 }
 

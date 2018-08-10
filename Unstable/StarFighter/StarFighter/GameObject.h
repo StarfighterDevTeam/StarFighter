@@ -90,6 +90,7 @@ public:
 	string getName();
 	GameObject* Clone();
 	void setGhost(bool ghost);
+	void SetConditionalColor(sf::Color color, bool condition, bool set_as_m_color);
 	bool ScaleObject(float scale);
 	
 	float m_diag;

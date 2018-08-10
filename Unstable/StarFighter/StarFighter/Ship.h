@@ -115,6 +115,8 @@ public :
 	void GetLoot(GameObject* object) override;
 	bool IsImmune();
 
+	CircleShape m_dash_target_feedback;
+
 	//debug
 	CircleShape m_dash_radius_feedback;
 

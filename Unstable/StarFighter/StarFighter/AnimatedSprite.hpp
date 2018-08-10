@@ -48,7 +48,7 @@ public:
 	void pause();
 	void stop();
 	void setLooped(bool looped);
-	void setColor(const sf::Color& color);
+	void setColor(const sf::Color& color, bool set_as_m_color = false);
 	const Animation* getAnimation() const;
 	sf::FloatRect getLocalBounds() const;
 	sf::FloatRect getGlobalBounds() const;

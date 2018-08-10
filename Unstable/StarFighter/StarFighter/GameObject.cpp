@@ -184,12 +184,6 @@ void GameObject::update(sf::Time deltaTime)
 
 void GameObject::UpdateRotation()
 {
-	//anti ghost-inputs, helps cleaning movements especially when the character stops
-	if (m_speed != m_previous_speed)
-	{
-		return;
-	}
-
 	//turning toward targeted position
 	if (m_speed.x == 0 && m_speed.y == 0)
 	{
@@ -233,6 +227,18 @@ void GameObject::setGhost(bool ghost)
 	{
 		m_ghost = false;
 		setColor(Color(255, 255, 255, 255));
+	}
+}
+
+void GameObject::SetConditionalColor(sf::Color color, bool condition, bool set_as_m_color)
+{
+	if (condition == true)
+	{
+		setColor(color, set_as_m_color);
+	}
+	else
+	{
+		setColor(Color(255, 255, 255, 255), set_as_m_color);
 	}
 }
 

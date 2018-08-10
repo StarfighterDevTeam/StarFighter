@@ -19,6 +19,8 @@ Stroboscopic::Stroboscopic(sf::Time decade_time, GameObject* parent) : GameObjec
 	this->play(*m_currentAnimation);
 
 	this->setRotation(parent->getRotation());
+
+	setColor(parent->m_color, true);
 }
 
 Stroboscopic::~Stroboscopic()
@@ -39,7 +41,7 @@ void Stroboscopic::update(sf::Time deltaTime)
 		m_GarbageMe = true;
 	}
 
-	setColor(Color(255, 255, 255, m_alpha));
+	setColor(Color(m_color.r, m_color.g, m_color.b, m_alpha));
 
 	AnimatedSprite::update(deltaTime);
 }
