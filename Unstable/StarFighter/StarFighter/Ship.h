@@ -93,10 +93,13 @@ public :
 	int m_dash_streak;
 	vector<GameObject*> m_dash_enemies_tagged;
 
-	//melee
+	//attack
 	Weapon* m_weapon;
 	bool GetWeapon(Weapon* weapon);
 	bool m_is_attacking;
+	sf::Clock m_attack_cooldown_clock;
+	float m_attack_cooldown;
+	bool m_attack_first_time;
 
 	int m_hp;
 	int m_hp_max;

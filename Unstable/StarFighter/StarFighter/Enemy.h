@@ -20,7 +20,7 @@ enum EnemyType
 enum EnemyPhase
 {
 	EnemyPhase_Idle,
-	EnemyPhase_FollowPlayer,
+	EnemyPhase_FollowTarget,
 };
 
 class Enemy : public GameObject
@@ -50,9 +50,11 @@ public :
 
 	//attack
 	Weapon* m_weapon;
-	sf::Clock m_attack_cooldown_clock;
 	bool m_is_attacking;
+	sf::Clock m_attack_cooldown_clock;
 	float m_attack_cooldown;
+	bool m_attack_first_time;
+	GameObject* CanParry();
 
 	//lateral dash
 	sf::Clock m_dash_cooldown_clock;
@@ -62,8 +64,8 @@ public :
 
 	//AI
 	void UpdateAI(sf::Time deltaTime);
-	bool FollowPlayer(GameObject* player);
-	bool AttackPlayer(GameObject* player);
+	bool FollowTarget(GameObject* target);
+	bool AttackTarget(GameObject* target);
 	bool Dash();
 	bool Roam(sf::Time deltaTime);
 	float m_roam_duration;

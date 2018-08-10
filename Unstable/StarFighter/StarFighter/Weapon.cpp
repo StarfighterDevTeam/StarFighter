@@ -9,9 +9,9 @@ extern Game* CurrentGame;
 
 #define PARRY_BULLET_COOLDOWN			0.2f
 
-#define MELEE_KATANA_RANGE_X			130.f
+#define MELEE_KATANA_RANGE_X			100.f
 #define MELEE_KATANA_RANGE_Y			70.f
-#define MELEE_KATANA_DURATION			0.2f
+#define MELEE_KATANA_DURATION			0.05f
 
 #define MELEE_SPEAR_RANGE_X				230.f
 #define MELEE_SPEAR_RANGE_Y				40.f

@@ -23,14 +23,14 @@ void InGameState::Initialize(Player player)
 	LoadCSVFile(SHIP_CSV_FILE);
 
 	//Loot
-	Loot* qi = new Loot(Loot_BonusMeleeRange, sf::Vector2f(SHIP_START_X - 200, SHIP_START_Y - 200));
+	Loot* qi = new Loot(Loot_BonusMeleeRange, sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y - 200));
 	qi->setColor(sf::Color(0, 255, 0, 255));
 	(*CurrentGame).addToScene(qi, LootObjectLayer, LootObject);
 
 	Loot* spear = new Loot(Loot_WeaponSpear, sf::Vector2f(SHIP_START_X + 500, SHIP_START_Y - 200));
 	(*CurrentGame).addToScene(spear, LootObjectLayer, LootObject);
 
-	Loot* shuriken = new Loot(Loot_WeaponShuriken, sf::Vector2f(SHIP_START_X - 400, SHIP_START_Y - 200));
+	Loot* shuriken = new Loot(Loot_WeaponShuriken, sf::Vector2f(SHIP_START_X + 200, SHIP_START_Y - 200));
 	(*CurrentGame).addToScene(shuriken, LootObjectLayer, LootObject);
 
 	//enemies
@@ -53,7 +53,7 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(wufeng5, EnemyObjectLayer, EnemyObject);
 	
 	Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 1400, SHIP_START_Y -200), Enemy_Wufeng_Shuriken);
-	(*CurrentGame).addToScene(wufeng6, EnemyObjectLayer, EnemyObject);
+	//(*CurrentGame).addToScene(wufeng6, EnemyObjectLayer, EnemyObject);
 	
 	//Enemy* wufeng7 = new Enemy(sf::Vector2f(SHIP_START_X + 300 - step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Shuriken);
 	//(*CurrentGame).addToScene(wufeng7, EnemyObjectLayer, EnemyObject);

@@ -21,6 +21,8 @@ Ship::Ship()
 
 #define IMMUNE_DMG_DURATION			2.f
 
+#define ATTACK_COOLDOWN				0.5f
+
 void Ship::Init()
 {
 	m_layer = PlayerShipLayer;
@@ -46,6 +48,8 @@ void Ship::Init()
 	m_dash_streak = 0;
 
 	m_is_attacking = false;
+	m_attack_cooldown = ATTACK_COOLDOWN;
+	m_attack_first_time = true;
 	m_weapon = new Weapon(this, Weapon_Katana);
 	(*CurrentGame).addToScene(m_weapon, PlayerWeaponLayer, PlayerWeaponObject);
 
@@ -137,28 +141,35 @@ void Ship::update(sf::Time deltaTime)
 				else
 				{
 					m_is_attacking = false;
+					m_attack_cooldown_clock.restart();
 				}
 			}
 		}
 
-		if (m_inputs_states[Action_Melee] == Input_Tap)//start attack
+		if (m_attack_first_time || m_attack_cooldown_clock.getElapsedTime().asSeconds() > m_attack_cooldown)
 		{
-			if (m_weapon && !m_is_attacking)
+			if (m_inputs_states[Action_Melee] == Input_Tap)//start attack
 			{
-				if (m_weapon->m_is_ranged == false)
+				if (m_weapon && !m_is_attacking)
 				{
-					m_weapon->m_visible = true;
-					(*CurrentGame).PlaySFX(SFX_Melee);
-				}
-				else
-				{
-					m_weapon->Shoot(dash_enemy);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
-				}
+					m_attack_first_time = false;
 
-				m_is_attacking = true;
-				m_weapon->m_attack_clock.restart();
+					if (m_weapon->m_is_ranged == false)
+					{
+						m_weapon->m_visible = true;
+						(*CurrentGame).PlaySFX(SFX_Melee);
+					}
+					else
+					{
+						m_weapon->Shoot(dash_enemy);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
+					}
+
+					m_is_attacking = true;
+					m_weapon->m_attack_clock.restart();
+				}
 			}
 		}
+		
 
 		if (m_is_attacking)//update
 		{
@@ -215,7 +226,7 @@ void Ship::update(sf::Time deltaTime)
 	{
 		sf::Vector2f dash_vector = m_dash_target - getPosition();
 
-		if (m_dash_enemy != NULL)//start dash
+		if (m_dash_enemy)//start dash
 		{
 			dash_vector = m_dash_enemy->getPosition() - getPosition();
 
@@ -261,7 +272,8 @@ void Ship::update(sf::Time deltaTime)
 		}
 
 		float dist_to_target = GetDistanceBetweenPositions(getPosition(), m_dash_target);
-		float dash_speed = m_dash_enemy || m_dash_streak == 0 ? DASH_SPEED : DASH_SLOWDOWN_SPEED;
+		//slow down if: 1) we have dashed 1 time already AND 2) there is another remaining valid target within range for another dash
+		float dash_speed = m_dash_enemy || m_dash_streak == 0 || !dash_enemy ? DASH_SPEED : DASH_SLOWDOWN_SPEED;
 		if (dist_to_target > dash_speed * deltaTime.asSeconds())
 		{
 			m_speed = dash_vector;
@@ -569,8 +581,7 @@ void Ship::CollisionWithWeapon(GameObject* enemy_weapon)
 {
 	if (m_move_state != Character_Dash)
 	{
-		Weapon* weapon = (Weapon*)enemy_weapon;
-		DealDamage(weapon->m_dmg);
+		enemy_weapon->CollisionWithEnemy(this);
 	}
 }
 
@@ -578,8 +589,7 @@ void Ship::CollisionWithBullet(GameObject* enemy_bullet)
 {
 	if (m_move_state != Character_Dash)
 	{
-		Ammo* bullet = (Ammo*)enemy_bullet;
-		DealDamage(bullet->m_dmg);
+		enemy_bullet->CollisionWithBullet(this);
 	}
 }
 

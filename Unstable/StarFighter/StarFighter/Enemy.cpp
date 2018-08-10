@@ -39,6 +39,7 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_type = type;
 	m_phase = EnemyPhase_Idle;
 	m_is_attacking = false;
+	m_attack_first_time = true;
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
 	setRotation(angle);
@@ -249,9 +250,9 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 	float dist_squared_to_player = GetDistanceSquaredBetweenPositions(getPosition(), player->getPosition());
 	if (dist_squared_to_player < m_aggro_radius * m_aggro_radius)
 	{
-		if (m_phase != EnemyPhase_FollowPlayer)
+		if (m_phase != EnemyPhase_FollowTarget)
 		{
-			m_phase = EnemyPhase_FollowPlayer;
+			m_phase = EnemyPhase_FollowTarget;
 		}
 	}
 	else
@@ -262,8 +263,6 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 
 			m_arrived_at_destination = true;
 			m_speed = sf::Vector2f(0, 0);
-			//m_roaming_clock.restart();
-			printf("GO TO ROAMING\n");
 		}
 	}
 
@@ -272,14 +271,60 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 		Roam(deltaTime);
 	}
 
-	if (m_phase == EnemyPhase_FollowPlayer)
+	if (m_phase == EnemyPhase_FollowTarget)
 	{
-		if (FollowPlayer(player))
+		//any emergency target to parry?
+		GameObject* target = CanParry();
+		if (target == NULL)
 		{
-			AttackPlayer(player);
+			target = player;
+		}
+
+		//follow the player (
+		if (FollowTarget(target))
+		{
+			AttackTarget(target);
 		}
 	}
 }
+
+GameObject* Enemy::CanParry()
+{
+	if (m_weapon == NULL)
+	{
+		return NULL;
+	}
+
+	//get player weapon
+	GameObject* closest_target = (*CurrentGame).GetClosestObject(this, PlayerWeaponObject);
+
+	//get player bullets and choose what's closest (and visible)
+	GameObject* closest_bullet = (*CurrentGame).GetClosestObject(this, PlayerBulletObject);
+	if (closest_bullet)
+	{
+		if (closest_target == NULL || !closest_target->m_visible || GetDistanceSquaredBetweenPositions(this->getPosition(), closest_bullet->getPosition()) < GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()))
+		{
+			closest_target = closest_bullet;
+		}
+	}
+
+	//target the selected object, if it exists and is in weapon range
+	if (closest_target && closest_target->m_visible)
+	{
+		if (GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()) < (m_weapon->m_range.x + m_size.y / 2) * (m_weapon->m_range.x + m_size.y / 2))
+		{
+			//melee weapon can parry anything ; but ranged weapon can only parry bullets, not weapons
+			if (m_weapon->m_is_ranged == false || closest_target->m_collider_type != PlayerWeaponObject)
+			{
+				//N.B: some weapons cannot be parried (m_can_be_parried) but we do not evaluate it, so AI can make kind of mistakes
+				return closest_target;
+			}
+		}
+	}
+	
+	return NULL;
+}
+
 void Enemy::update(sf::Time deltaTime)
 {
 	//bounce on screen borders
@@ -377,27 +422,31 @@ int Enemy::GetRating()
 	return rating;
 }
 
-bool Enemy::FollowPlayer(GameObject* player)
+bool Enemy::FollowTarget(GameObject* target)
 {
-	float range = m_weapon ? m_weapon->m_range.x + m_size.x / 2 : player->m_size.x + m_size.x / 2;
-	if (GetDistanceSquaredBetweenPositions(this->getPosition(), player->getPosition()) > range * range)
+	float range = m_weapon ? m_weapon->m_range.x + m_size.y / 2 : target->m_size.x + m_size.y / 2;
+	if (GetDistanceSquaredBetweenPositions(this->getPosition(), target->getPosition()) > range * range)
 	{
-		SetSpeedForConstantSpeedToDestination(player->getPosition(), m_ref_speed);
+		SetSpeedForConstantSpeedToDestination(target->getPosition(), m_ref_speed);
 		return false;
 	}
 	else
 	{
 		m_speed = sf::Vector2f(0, 0);
+		float angle_deg = GetAngleDegToTargetPosition(this->getPosition(), this->getRotation(), target->getPosition());
+		rotate(angle_deg);
 		return true;
 	}
 }
 
-bool Enemy::AttackPlayer(GameObject* player)
+bool Enemy::AttackTarget(GameObject* target)
 {
-	if (m_attack_cooldown_clock.getElapsedTime().asSeconds() > m_attack_cooldown)//condition to start attack
+	if (m_attack_first_time || m_attack_cooldown_clock.getElapsedTime().asSeconds() > m_attack_cooldown)//condition to start attack
 	{
 		if (m_weapon && !m_is_attacking)
 		{
+			m_attack_first_time = false;
+
 			if (m_weapon->m_is_ranged == false)
 			{
 				m_weapon->m_visible = true;
@@ -405,7 +454,7 @@ bool Enemy::AttackPlayer(GameObject* player)
 			}
 			else
 			{
-				m_weapon->Shoot(player);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
+				m_weapon->Shoot(target);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
 			}
 
 			m_is_attacking = true;
