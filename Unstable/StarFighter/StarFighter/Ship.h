@@ -106,7 +106,6 @@ public :
 
 	sf::Clock m_immune_dmg_clock;
 	bool m_immune_first_time;
-	Uint8 m_alpha_color;
 
 	void CollisionWithEnemy(GameObject* enemy) override;
 	void CollisionWithWeapon(GameObject* enemy_weapon) override;

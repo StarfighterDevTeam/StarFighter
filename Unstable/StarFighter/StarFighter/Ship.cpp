@@ -299,15 +299,8 @@ void Ship::update(sf::Time deltaTime)
 		IdleDecelleration(deltaTime);
 	}
 
-	if (IsImmune() == true)
-	{
-		m_alpha_color = 255 * cos(m_immune_dmg_clock.getElapsedTime().asSeconds() * 10);
-	}
-	else
-	{
-		m_alpha_color = 255;
-	}
-	setColor(sf::Color(255, 255, 255, m_alpha_color));
+	SetConditionalColor(sf::Color(200, 200, 200, 180), m_move_state == Character_Dash, true);
+	SetConditionalColor(sf::Color(255, 255, 255, 255 * cos(m_immune_dmg_clock.getElapsedTime().asSeconds() * 10)), IsImmune(), false);
 
 	GameObject::update(deltaTime);
 
@@ -341,8 +334,6 @@ void Ship::update(sf::Time deltaTime)
 	{
 		m_dash_target_feedback.setOutlineColor(sf::Color(0, 0, 0, 0));
 	}
-
-	SetConditionalColor(sf::Color(200, 200, 200, 180), m_move_state == Character_Dash, true);
 
 	//debug
 	m_dash_radius_feedback.setPosition(getPosition());
