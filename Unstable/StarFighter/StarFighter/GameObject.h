@@ -81,6 +81,7 @@ public:
 	string getName();
 	GameObject* Clone();
 	void setGhost(bool ghost);
+	void SetConditionalColor(sf::Color color, bool condition);
 	
 	float m_diag;
 	bool m_ghost;

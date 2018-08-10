@@ -188,6 +188,18 @@ void GameObject::setGhost(bool ghost)
 	}
 }
 
+void GameObject::SetConditionalColor(sf::Color color, bool condition)
+{
+	if (condition == true)
+	{
+		setColor(color);
+	}
+	else
+	{
+		setColor(Color(255, 255, 255, 255));
+	}
+}
+
 GameObject* GameObject::Clone()
 {
 	GameObject* clone = new GameObject(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, sf::Vector2f(this->m_size.x/2, this->m_size.y/2), this->m_frameNumber, this->m_animationNumber);
