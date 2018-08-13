@@ -63,3 +63,20 @@ void Ammo::CollisionWithEnemy(GameObject* enemy)
 		}
 	}
 }
+
+void Ammo::CollisionWithBullet(GameObject* enemy_bullet)
+{
+	Ammo* bullet = (Ammo*)enemy_bullet;
+
+	if (m_can_be_parried)
+	{
+		m_GarbageMe = true;
+		m_visible = false;
+	}
+
+	if (bullet->m_can_be_parried)
+	{
+		bullet->m_GarbageMe = true;
+		bullet->m_visible = false;
+	}
+}

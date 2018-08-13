@@ -569,7 +569,7 @@ void Game::colisionChecksV2()
 			if (SimpleCollision::AreColliding((*it1), (*it2)))
 			{
 				//Do something 
-				//(*it1)->CollisionBetweenWeapons(*it2);
+				(*it1)->CollisionWithBullet(*it2);
 			}
 		}
 	}
@@ -965,7 +965,7 @@ GameObject* Game::GetClosestObjectTypedIncoming(const GameObject* ref_obj, GameO
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
 				float angle_delta = GameObject::GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), ref_obj->getPosition());
-				if (angle_delta < 0)
+				if (angle_delta < 0)      
 					angle_delta = -angle_delta;
 
 				if (angle_delta < delta_angle_max)

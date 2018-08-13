@@ -17,6 +17,7 @@ public :
 	void update(sf::Time deltaTime) override;
 
 	void CollisionWithEnemy(GameObject* enemy) override;
+	void CollisionWithBullet(GameObject* enemy_bullet) override;
 
 	GameObject* m_owner;
 	GameObject* m_target;
