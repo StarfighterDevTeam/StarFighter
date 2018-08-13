@@ -39,7 +39,6 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_type = type;
 	m_phase = EnemyPhase_Idle;
 	m_is_attacking = false;
-	m_attack_first_time = true;
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
 	setRotation(angle);
@@ -97,6 +96,9 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	{
 		(*CurrentGame).addToScene(m_weapon, EnemyWeaponLayer, EnemyWeaponObject);
 	}
+
+	//TIMER
+	m_attack_cooldown_timer = m_attack_cooldown;
 
 	//AI
 	m_roam_duration = RandomizeFloatBetweenValues(sf::Vector2f(ENEMY_ROAMING_MIN_DURATION, ENEMY_ROAMING_MAX_DURATION));
@@ -319,7 +321,7 @@ GameObject* Enemy::CanParry()
 	GameObject* closest_target = (*CurrentGame).GetClosestObjectTyped(this, PlayerWeaponObject);
 
 	//get player bullets and choose what's closest (and visible)
- 	GameObject* closest_bullet = (*CurrentGame).GetClosestObjectTypedIncoming(this, PlayerBulletObject, 45.f);//it is useless to parry bullets whose trajectory is off
+ 	GameObject* closest_bullet = (*CurrentGame).GetClosestObjectTypedIncoming(this, PlayerBulletObject, 30.f);//it is useless to parry bullets whose trajectory is off
 	if (closest_bullet)
 	{
 		if (closest_target == NULL || !closest_target->m_visible || GetDistanceSquaredBetweenPositions(this->getPosition(), closest_bullet->getPosition()) < GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()))
@@ -332,8 +334,6 @@ GameObject* Enemy::CanParry()
 	if (closest_target && closest_target->m_visible)
 	{
 		float range = RangeToInterceptTarget(closest_target);
-		Weapon* weapon = (Weapon*)closest_target;
-		printf("range: %f (size: %f, range: %f)\n", range, (m_size.y / 2), (weapon->m_range.x));
 
 		if (GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()) < range * range)
 		{
@@ -351,6 +351,9 @@ GameObject* Enemy::CanParry()
 
 void Enemy::update(sf::Time deltaTime)
 {
+	//update timers
+	m_attack_cooldown_timer += deltaTime.asSeconds();
+
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
 
@@ -365,7 +368,7 @@ void Enemy::update(sf::Time deltaTime)
 	//AI behaviour
 	if (m_is_attacking)//reset
 	{
-		if (m_weapon && m_weapon->m_attack_clock.getElapsedTime().asSeconds() > m_weapon->m_attack_duration)
+		if (m_weapon && m_weapon->m_attack_timer > m_weapon->m_attack_duration)
 		{
 			m_weapon->m_visible = false;
 			m_weapon->Extend(sf::Vector2f(0.f, 1.f));
@@ -379,7 +382,7 @@ void Enemy::update(sf::Time deltaTime)
 			else
 			{
 				m_is_attacking = false;
-				m_attack_cooldown_clock.restart();
+				m_attack_cooldown_timer = 0.f;
 			}
 		}
 	}
@@ -390,7 +393,7 @@ void Enemy::update(sf::Time deltaTime)
 
 	if (m_is_attacking)//update
 	{
-		float ratio = m_weapon->m_attack_clock.getElapsedTime().asSeconds() / m_weapon->m_attack_duration;
+		float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
 		if (ratio > 1.0f)
 		{
 			ratio = 1.0f;
@@ -466,12 +469,10 @@ bool Enemy::FollowTarget(GameObject* target)
 
 bool Enemy::AttackTarget(GameObject* target)
 {
-	if (m_attack_first_time || m_attack_cooldown_clock.getElapsedTime().asSeconds() > m_attack_cooldown)//condition to start attack
+	if (m_attack_cooldown_timer > m_attack_cooldown)//condition to start attack
 	{
 		if (m_weapon && !m_is_attacking)
 		{
-			m_attack_first_time = false;
-
 			if (m_weapon->m_is_ranged == false)
 			{
 				m_weapon->m_visible = true;
@@ -483,7 +484,7 @@ bool Enemy::AttackTarget(GameObject* target)
 			}
 
 			m_is_attacking = true;
-			m_weapon->m_attack_clock.restart();
+ 			m_weapon->m_attack_timer = 0.f;
 		}
 	}
 

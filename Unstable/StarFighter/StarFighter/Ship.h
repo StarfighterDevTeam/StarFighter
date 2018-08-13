@@ -88,8 +88,7 @@ public :
 	float m_dash_speed;
 	float m_dash_radius;
 	float m_dash_cooldown;
-	sf::Clock m_dash_cooldown_clock;
-	bool m_dash_first_time;
+	float m_dash_cooldown_timer;
 	int m_dash_streak;
 	vector<GameObject*> m_dash_enemies_tagged;
 
@@ -97,15 +96,13 @@ public :
 	Weapon* m_weapon;
 	bool GetWeapon(Weapon* weapon);
 	bool m_is_attacking;
-	sf::Clock m_attack_cooldown_clock;
+	float m_attack_cooldown_timer;
 	float m_attack_cooldown;
-	bool m_attack_first_time;
 
 	int m_hp;
 	int m_hp_max;
 
-	sf::Clock m_immune_dmg_clock;
-	bool m_immune_first_time;
+	float m_immune_timer;
 
 	void CollisionWithEnemy(GameObject* enemy) override;
 	void CollisionWithWeapon(GameObject* enemy_weapon) override;

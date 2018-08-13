@@ -7,8 +7,6 @@ extern Game* CurrentGame;
 //
 //}
 
-#define PARRY_BULLET_COOLDOWN			0.2f
-
 #define MELEE_KATANA_RANGE_X			100.f
 #define MELEE_KATANA_RANGE_Y			70.f
 #define MELEE_KATANA_DURATION			0.1f
@@ -80,6 +78,7 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 		}
 	}
 
+	m_attack_timer = m_attack_duration;
 	m_DontGarbageMe = true;
 	setColor(color);
 	m_visible = false;
@@ -97,6 +96,9 @@ Weapon::~Weapon()
 
 void Weapon::update(sf::Time deltaTime)
 {
+	//update timers
+	m_attack_timer += deltaTime.asSeconds();
+
 	AnimatedSprite::update(deltaTime);
 }
 
@@ -162,7 +164,7 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 			return;
 		}
 
-		if (bullet->m_parry_first_time || bullet->m_parry_clock.getElapsedTime().asSeconds() > PARRY_BULLET_COOLDOWN)
+		if (bullet->m_parry_timer > PARRY_BULLET_COOLDOWN)
 		{
 			std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy_bullet);
 			if (it == m_enemies_tagged.end())
@@ -171,8 +173,7 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 
 				//bullet->m_speed = -bullet->m_speed;
 				bullet->m_speed = GetVectorFromLengthAndAngle(bullet->m_ref_speed, (getRotation() - 90) * M_PI / 180.f);
-				bullet->m_parry_clock.restart();
-				bullet->m_parry_first_time = false;
+				bullet->m_parry_timer = 0.f;
 
 				LayerType layer = bullet->m_layer == EnemyBulletLayer ? PlayerBulletLayer : EnemyBulletLayer;
 				GameObjectType type = bullet->m_collider_type == EnemyBulletObject ? PlayerBulletObject : EnemyBulletObject;

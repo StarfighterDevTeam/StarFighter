@@ -6,6 +6,8 @@
 #include "GameObject.h"
 #include "FX.h"
 
+#define PARRY_BULLET_COOLDOWN			0.2f
+
 class Ammo : public GameObject
 {
 public :
@@ -22,10 +24,9 @@ public :
 	int m_dmg;
 	bool m_is_piercing;
 	bool m_can_be_parried;
-	bool m_parry_first_time;
 	vector<GameObject*> m_enemies_tagged;
 
-	sf::Clock m_parry_clock;
+	float m_parry_timer;
 };
 
 #endif // AMMO_H_INCLUDED

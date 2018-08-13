@@ -45,16 +45,16 @@ void Ship::Init()
 	m_dash_radius = DASH_RADIUS;
 	m_dash_speed = DASH_SPEED;
 	m_dash_cooldown = DASH_COOLDOWN;
+	m_dash_cooldown_timer = m_dash_cooldown;
 	m_dash_streak = 0;
 
 	m_is_attacking = false;
 	m_attack_cooldown = ATTACK_COOLDOWN;
-	m_attack_first_time = true;
+	m_attack_cooldown_timer = m_attack_cooldown;
 	m_weapon = new Weapon(this, Weapon_Katana);
 	(*CurrentGame).addToScene(m_weapon, PlayerWeaponLayer, PlayerWeaponObject);
 
-	m_dash_first_time = true;
-	m_immune_first_time = true;
+	m_immune_timer = IMMUNE_DMG_DURATION;
 
 	m_hp_max = 3;
 	m_hp = m_hp_max;
@@ -101,6 +101,11 @@ void Ship::SetControllerType(ControlerType contoller)
 
 void Ship::update(sf::Time deltaTime)
 {
+	//update timers
+	m_immune_timer += deltaTime.asSeconds();
+	m_attack_cooldown_timer += deltaTime.asSeconds();
+	m_dash_cooldown_timer += deltaTime.asSeconds();
+
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
 	{
@@ -127,7 +132,7 @@ void Ship::update(sf::Time deltaTime)
 		//Attack
 		if (m_is_attacking)//reset
 		{
-			if (m_weapon && m_weapon->m_attack_clock.getElapsedTime().asSeconds() > m_weapon->m_attack_duration)
+			if (m_weapon && m_weapon->m_attack_timer > m_weapon->m_attack_duration)
 			{
 				m_weapon->m_visible = false;
 				m_weapon->Extend(sf::Vector2f(0.f, 1.f));
@@ -141,19 +146,17 @@ void Ship::update(sf::Time deltaTime)
 				else
 				{
 					m_is_attacking = false;
-					m_attack_cooldown_clock.restart();
+					m_attack_cooldown_timer = 0.f;
 				}
 			}
 		}
 
-		if (m_attack_first_time || m_attack_cooldown_clock.getElapsedTime().asSeconds() > m_attack_cooldown)
+		if (m_attack_cooldown_timer > m_attack_cooldown)
 		{
 			if (m_inputs_states[Action_Melee] == Input_Tap)//start attack
 			{
 				if (m_weapon && !m_is_attacking)
 				{
-					m_attack_first_time = false;
-
 					if (m_weapon->m_is_ranged == false)
 					{
 						m_weapon->m_visible = true;
@@ -165,7 +168,7 @@ void Ship::update(sf::Time deltaTime)
 					}
 
 					m_is_attacking = true;
-					m_weapon->m_attack_clock.restart();
+					m_weapon->m_attack_timer = 0.f;
 				}
 			}
 		}
@@ -173,7 +176,7 @@ void Ship::update(sf::Time deltaTime)
 
 		if (m_is_attacking)//update
 		{
-			float ratio = m_weapon->m_attack_clock.getElapsedTime().asSeconds() / m_weapon->m_attack_duration;
+			float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
 			if (ratio > 1.0f)
 			{
 				ratio = 1.0f;
@@ -185,10 +188,9 @@ void Ship::update(sf::Time deltaTime)
 		//Dash?
 		if (m_inputs_states[Action_Dash] == Input_Tap)//start
 		{
-			if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
+			if (m_dash_cooldown_timer > m_dash_cooldown)
 			{
 				m_dash_streak = 0;
-				m_dash_first_time = false;
 
 				(*CurrentGame).CreateSFTextPop("Dash", Font_Arial, 24, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
 				m_move_state = Character_Dash;
@@ -284,7 +286,7 @@ void Ship::update(sf::Time deltaTime)
 			m_speed = sf::Vector2f(0, 0);
 			setPosition(m_dash_target);
 			m_move_state = Character_Idle;
-			m_dash_cooldown_clock.restart();
+			m_dash_cooldown_timer = 0.f;
 			m_dash_enemies_tagged.clear();
 		}
 
@@ -300,7 +302,7 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	SetConditionalColor(sf::Color(200, 200, 200, 180), m_move_state == Character_Dash, true);
-	SetConditionalColor(sf::Color(255, 255, 255, 255 * cos(m_immune_dmg_clock.getElapsedTime().asSeconds() * 10)), IsImmune(), false);
+	SetConditionalColor(sf::Color(255, 255, 255, 255 * cos(m_immune_timer * 10)), IsImmune(), false);
 
 	GameObject::update(deltaTime);
 
@@ -319,13 +321,13 @@ void Ship::update(sf::Time deltaTime)
 		{
 			m_move_state = Character_Idle;
 			m_speed = sf::Vector2f(0, 0);
-			m_dash_cooldown_clock.restart();
+			m_dash_cooldown_timer = 0.f;
 		}
 	}
 
 	UpdateWeaponPosition(m_weapon);
 
-	if (dash_enemy && !m_dash_enemy && m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown)
+	if (dash_enemy && !m_dash_enemy && m_dash_cooldown_timer > m_dash_cooldown)
 	{
 		m_dash_target_feedback.setOutlineColor(sf::Color(0, 255, 0, 100));
 		m_dash_target_feedback.setPosition(dash_enemy->getPosition());
@@ -340,7 +342,7 @@ void Ship::update(sf::Time deltaTime)
 
 	if (m_move_state == Character_Idle)
 	{
-		if (m_dash_cooldown_clock.getElapsedTime().asSeconds() > m_dash_cooldown || m_dash_first_time)
+		if (m_dash_cooldown_timer > m_dash_cooldown)
 		{
 			m_center_feedback.setFillColor(sf::Color(255, 255, 255, 255));
 		}
@@ -362,7 +364,7 @@ void Ship::update(sf::Time deltaTime)
 
 bool Ship::IsImmune()
 {
-	bool immune = m_immune_dmg_clock.getElapsedTime().asSeconds() < IMMUNE_DMG_DURATION && m_immune_first_time == false;
+	bool immune = m_immune_timer < IMMUNE_DMG_DURATION;
 
 	return immune;
 }
@@ -609,8 +611,7 @@ bool Ship::DealDamage(int dmg)
 {
 	if (IsImmune() == false)
 	{
-		m_immune_first_time = false;
-		m_immune_dmg_clock.restart();
+		m_immune_timer = 0.f;
 		m_hp -= dmg;
 
 		ostringstream ss;
@@ -644,8 +645,9 @@ void Ship::Death()
 	m_speed = sf::Vector2f(0, 0);
 
 	m_dash_enemy = NULL;
-	m_dash_first_time = true;
-	m_immune_first_time = true;
+	m_dash_cooldown_timer = m_dash_cooldown;
+	m_immune_timer = IMMUNE_DMG_DURATION;
+	m_attack_cooldown_timer = m_attack_cooldown;
 
 	//debug respawn
 	m_visible = true;

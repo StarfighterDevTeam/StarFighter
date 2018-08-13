@@ -34,7 +34,7 @@ public:
 	int m_dmg;
 	sf::Vector2f m_range;
 	float m_attack_duration;
-	sf::Clock m_attack_clock;
+	float m_attack_timer;
 	bool m_is_piercing;
 	bool m_is_ranged;
 	Ammo* m_bullet;
