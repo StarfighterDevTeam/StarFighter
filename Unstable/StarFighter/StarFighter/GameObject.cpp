@@ -369,7 +369,7 @@ float GameObject::GetAngleDegToTargetPosition(sf::Vector2f ref_position, float r
 	else if (delta_angle < -180)
 		delta_angle += 180.f * 2;
 
-	return delta_angle;
+ 	return delta_angle;
 }
 
 float GameObject::GetAngleRadBetweenObjects(GameObject* ref_object, GameObject* object2)

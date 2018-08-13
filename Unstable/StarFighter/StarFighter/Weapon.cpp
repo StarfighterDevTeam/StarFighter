@@ -11,13 +11,13 @@ extern Game* CurrentGame;
 
 #define MELEE_KATANA_RANGE_X			100.f
 #define MELEE_KATANA_RANGE_Y			70.f
-#define MELEE_KATANA_DURATION			0.05f
+#define MELEE_KATANA_DURATION			0.1f
 
 #define MELEE_SPEAR_RANGE_X				230.f
 #define MELEE_SPEAR_RANGE_Y				40.f
 #define MELEE_SPEAR_DURATION			0.5f
 
-#define RANGED_SHURIKEN_SPEED			800.f
+#define RANGED_SHURIKEN_SPEED			500.f
 #define RANGED_SHURIKEN_COOLDOWN		0.5f
 
 Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)

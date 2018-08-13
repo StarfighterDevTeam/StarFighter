@@ -55,6 +55,7 @@ public :
 	float m_attack_cooldown;
 	bool m_attack_first_time;
 	GameObject* CanParry();
+	float RangeToInterceptTarget(GameObject* target);
 
 	//lateral dash
 	sf::Clock m_dash_cooldown_clock;

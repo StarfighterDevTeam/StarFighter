@@ -35,6 +35,9 @@ void Ammo::update(sf::Time deltaTime)
 		SetSpeedForConstantSpeedToDestination(m_target->getPosition(), m_ref_speed);
 	}
 
+	UpdateRotation();
+	rotate(M_PI);
+
 	GameObject::update(deltaTime);
 }
 

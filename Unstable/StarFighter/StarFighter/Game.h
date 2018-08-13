@@ -83,8 +83,9 @@ public:
 	int GetEnemyRatings();
 
 	//Utiliary methods
-	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
-	GameObject* GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object);
+	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, GameObjectType type_of_closest_object);
+	GameObject* GetClosestObjectTyped(const sf::Vector2f ref_position, GameObjectType type_of_closest_object);
+	GameObject* GetClosestObjectTypedIncoming(const GameObject* ref_obj, GameObjectType type_of_closest_object, float delta_angle_max);
 	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
 
 	//Fonts

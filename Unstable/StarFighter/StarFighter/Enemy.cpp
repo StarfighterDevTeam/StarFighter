@@ -275,17 +275,37 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 	{
 		//any emergency target to parry?
 		GameObject* target = CanParry();
-		if (target == NULL)
-		{
-			target = player;
-		}
-
-		//follow the player (
-		if (FollowTarget(target))
+		if (target != NULL)
 		{
 			AttackTarget(target);
 		}
+		else
+		{
+			target = player;
+			//follow the player (
+			if (FollowTarget(target))
+			{
+				AttackTarget(target);
+			}
+		}
 	}
+}
+
+float Enemy::RangeToInterceptTarget(GameObject* target)
+{
+	float range = m_weapon ? (m_size.y / 2) + m_weapon->m_range.x + (target->m_size.y / 2) : (m_size.y / 2) + (target->m_size.y / 2);
+	if (target->m_collider_type == PlayerBulletObject)
+	{
+		Ammo* bullet = (Ammo*)target;
+		range += bullet->m_ref_speed * m_weapon->m_attack_duration;
+	}
+	else if (target->m_collider_type == PlayerWeaponObject)
+	{
+		Weapon* weapon = (Weapon*)target;
+		range = (m_size.y / 2) + weapon->m_range.x; 
+	}
+
+	return range;
 }
 
 GameObject* Enemy::CanParry()
@@ -296,10 +316,10 @@ GameObject* Enemy::CanParry()
 	}
 
 	//get player weapon
-	GameObject* closest_target = (*CurrentGame).GetClosestObject(this, PlayerWeaponObject);
+	GameObject* closest_target = (*CurrentGame).GetClosestObjectTyped(this, PlayerWeaponObject);
 
 	//get player bullets and choose what's closest (and visible)
-	GameObject* closest_bullet = (*CurrentGame).GetClosestObject(this, PlayerBulletObject);
+ 	GameObject* closest_bullet = (*CurrentGame).GetClosestObjectTypedIncoming(this, PlayerBulletObject, 45.f);//it is useless to parry bullets whose trajectory is off
 	if (closest_bullet)
 	{
 		if (closest_target == NULL || !closest_target->m_visible || GetDistanceSquaredBetweenPositions(this->getPosition(), closest_bullet->getPosition()) < GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()))
@@ -311,7 +331,11 @@ GameObject* Enemy::CanParry()
 	//target the selected object, if it exists and is in weapon range
 	if (closest_target && closest_target->m_visible)
 	{
-		if (GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()) < (m_weapon->m_range.x + m_size.y / 2) * (m_weapon->m_range.x + m_size.y / 2))
+		float range = RangeToInterceptTarget(closest_target);
+		Weapon* weapon = (Weapon*)closest_target;
+		printf("range: %f (size: %f, range: %f)\n", range, (m_size.y / 2), (weapon->m_range.x));
+
+		if (GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()) < range * range)
 		{
 			//melee weapon can parry anything ; but ranged weapon can only parry bullets, not weapons
 			if (m_weapon->m_is_ranged == false || closest_target->m_collider_type != PlayerWeaponObject)
@@ -424,7 +448,8 @@ int Enemy::GetRating()
 
 bool Enemy::FollowTarget(GameObject* target)
 {
-	float range = m_weapon ? m_weapon->m_range.x + m_size.y / 2 : target->m_size.x + m_size.y / 2;
+	float range = m_weapon ? (m_size.y / 2) + m_weapon->m_range.x : (m_size.y / 2);
+	
 	if (GetDistanceSquaredBetweenPositions(this->getPosition(), target->getPosition()) > range * range)
 	{
 		SetSpeedForConstantSpeedToDestination(target->getPosition(), m_ref_speed);
