@@ -18,6 +18,7 @@ Ship::Ship()
 #define DASH_COOLDOWN				1.0f
 //#define DASH_OVERDASH_FACTOR		1.f
 #define DASH_OVERDASH_DISTANCE		250.f
+#define DASH_COMBO_SLOWMOTION		0.20f
 
 #define IMMUNE_DMG_DURATION			2.f
 
@@ -275,7 +276,16 @@ void Ship::update(sf::Time deltaTime)
 
 		float dist_to_target = GetDistanceBetweenPositions(getPosition(), m_dash_target);
 		//slow down if: 1) we have dashed 1 time already AND 2) there is another remaining valid target within range for another dash
-		float dash_speed = m_dash_enemy || m_dash_streak == 0 || !dash_enemy ? DASH_SPEED : DASH_SLOWDOWN_SPEED;
+		float dash_speed = DASH_SPEED;
+		if (!m_dash_enemy && m_dash_streak > 0 && dash_enemy)
+		{
+			(*CurrentGame).m_timescale = DASH_COMBO_SLOWMOTION;
+		}
+		else
+		{
+			(*CurrentGame).m_timescale = 1.f;
+		}
+
 		if (dist_to_target > dash_speed * deltaTime.asSeconds())
 		{
 			m_speed = dash_vector;
@@ -288,6 +298,7 @@ void Ship::update(sf::Time deltaTime)
 			m_move_state = Character_Idle;
 			m_dash_cooldown_timer = 0.f;
 			m_dash_enemies_tagged.clear();
+			(*CurrentGame).m_timescale = 1.f;
 		}
 
 		PlayStroboscopicEffect(sf::seconds(0.1f), sf::seconds(0.005f));

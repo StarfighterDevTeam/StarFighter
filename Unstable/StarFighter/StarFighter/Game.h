@@ -69,7 +69,7 @@ public:
 
 	sf::RenderTexture m_mainScreen;
 	sf::Vector2i m_screen_size;
-	float m_hyperspeedMultiplier;
+	float m_timescale;
 	float m_vspeed;
 	sf::Vector2f m_scale_factor;
 

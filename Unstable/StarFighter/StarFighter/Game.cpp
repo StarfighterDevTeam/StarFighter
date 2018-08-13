@@ -30,6 +30,7 @@ void Game::init(RenderWindow* window)
 
 	//default value
 	m_map_size = (sf::Vector2f(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y));
+	m_timescale = 1.f;
 
 	//fonts
 	m_font[Font_Terminator] = new sf::Font();
@@ -277,7 +278,7 @@ void Game::updateScene(Time deltaTime)
 		if (this->m_sceneGameObjects[i] == NULL)
 			continue;
 
-		m_sceneGameObjects[i]->update(deltaTime);
+		m_sceneGameObjects[i]->update(deltaTime * m_timescale);
 	}
 
 	//SFTextPop (text feedbacks)
