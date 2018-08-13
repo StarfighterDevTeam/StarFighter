@@ -249,6 +249,7 @@ void Ship::update(sf::Time deltaTime)
 
 					if (new_dash_enemy)
 					{
+						//dash combo
 						m_dash_streak++;
 						m_dash_enemy = new_dash_enemy;
 						m_dash_enemies_tagged.push_back(new_dash_enemy);
@@ -280,10 +281,12 @@ void Ship::update(sf::Time deltaTime)
 		if (!m_dash_enemy && m_dash_streak > 0 && dash_enemy)
 		{
 			(*CurrentGame).m_timescale = DASH_COMBO_SLOWMOTION;
+			(*CurrentGame).m_shader.setParameter("ratio", 0.75f);
 		}
 		else
 		{
 			(*CurrentGame).m_timescale = 1.f;
+			(*CurrentGame).m_shader.setParameter("ratio", 0.f);
 		}
 
 		if (dist_to_target > dash_speed * deltaTime.asSeconds())
@@ -299,6 +302,7 @@ void Ship::update(sf::Time deltaTime)
 			m_dash_cooldown_timer = 0.f;
 			m_dash_enemies_tagged.clear();
 			(*CurrentGame).m_timescale = 1.f;
+			(*CurrentGame).m_shader.setParameter("ratio", 0.f);
 		}
 
 		PlayStroboscopicEffect(sf::seconds(0.1f), sf::seconds(0.005f));

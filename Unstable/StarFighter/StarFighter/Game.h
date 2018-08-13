@@ -82,6 +82,8 @@ public:
 
 	int GetEnemyRatings();
 
+	sf::Shader m_shader;
+
 	//Utiliary methods
 	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, GameObjectType type_of_closest_object);
 	GameObject* GetClosestObjectTyped(const sf::Vector2f ref_position, GameObjectType type_of_closest_object);

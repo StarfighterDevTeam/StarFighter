@@ -143,7 +143,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 {
 	sf::Uint8* pixels = GameObject::CreateRectangleWithStroke(size, color, 0);
 	ostringstream ss;
-	ss << "rectangle_" << (int)size.x << "_" << (int)size.y << "_" << color.r << "_" << color.g << "_" << color.b << "_" << color.a;
+	ss << "rectangle_" << (int)size.x << "_" << (int)size.y << "_" << (int)color.r << "_" << (int)color.g << "_" << (int)color.b << "_" << (int)color.a;
 	string textureName = ss.str();
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();

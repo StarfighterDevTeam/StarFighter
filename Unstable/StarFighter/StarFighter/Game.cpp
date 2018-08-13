@@ -57,6 +57,17 @@ void Game::init(RenderWindow* window)
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	PlayMusic(Music_Main);
+
+	//Shader
+	if (sf::Shader::isAvailable())
+	{
+		string ahah = makePath("Effects/grayscale.vert");
+		if (m_shader.loadFromFile(makePath("Effects/grayscale.vert"), sf::Shader::Fragment))
+		{
+			m_shader.setParameter("ratio", 0.f);
+			m_shader.setParameter("texture", sf::Shader::CurrentTexture);
+		}
+	}
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -364,7 +375,7 @@ void Game::drawScene()
 	sf::Sprite temp(m_mainScreen.getTexture());
 	temp.scale(m_scale_factor.x, m_scale_factor.y);
 	temp.setPosition(sf::Vector2f(0, 0));
-	m_window->draw(temp);
+	m_window->draw(temp, &m_shader);
 }
 
 void Game::colisionChecksV2()
