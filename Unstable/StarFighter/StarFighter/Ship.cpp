@@ -730,8 +730,3 @@ void Ship::GetLoot(GameObject* object)
 		}
 	}
 }
-
-void Ship::AddGameObjectToScene(GameObject *object, LayerType layer, GameObjectType type)
-{
-	(*CurrentGame).addToScene(object, layer, type);
-}
