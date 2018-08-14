@@ -13,6 +13,7 @@ enum WeaponType
 	Weapon_Shuriken,
 };
 
+#define PLAYER_ATTACK_COOLDOWN				0.f
 
 class Weapon : public GameObject
 {
@@ -35,6 +36,7 @@ public:
 	sf::Vector2f m_range;
 	float m_attack_duration;
 	float m_attack_timer;
+	float m_attack_cooldown;
 	bool m_is_piercing;
 	bool m_is_ranged;
 	Ammo* m_bullet;

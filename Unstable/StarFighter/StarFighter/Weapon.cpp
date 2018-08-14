@@ -16,7 +16,7 @@ extern Game* CurrentGame;
 #define MELEE_SPEAR_DURATION			0.5f
 
 #define RANGED_SHURIKEN_SPEED			500.f
-#define RANGED_SHURIKEN_COOLDOWN		0.5f
+#define RANGED_SHURIKEN_COOLDOWN		0.1f
 
 Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 {
@@ -35,6 +35,7 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 		{
 			m_range = sf::Vector2f(MELEE_KATANA_RANGE_X, MELEE_KATANA_RANGE_Y);
 			m_attack_duration = MELEE_KATANA_DURATION;
+			m_attack_cooldown = PLAYER_ATTACK_COOLDOWN;
 			m_dmg = 1;
 			m_is_piercing = false;
 			m_is_ranged = false;
@@ -48,6 +49,7 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 		{	 
 			m_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
 			m_attack_duration = MELEE_SPEAR_DURATION;
+			m_attack_cooldown = PLAYER_ATTACK_COOLDOWN;
 			m_dmg = 1;
 			m_is_piercing = true;
 			m_is_ranged = false;
@@ -60,7 +62,8 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 		case Weapon_Shuriken:
 		{
 			m_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
-			m_attack_duration = RANGED_SHURIKEN_COOLDOWN;
+			m_attack_duration = 0.f;
+			m_attack_cooldown = RANGED_SHURIKEN_COOLDOWN;
 			m_dmg = 1;
 			m_is_piercing = false;
 			m_is_ranged = true;
@@ -164,7 +167,7 @@ void Weapon::CollisionWithBullet(GameObject* enemy_bullet)
 			return;
 		}
 
-		if (bullet->m_parry_timer > PARRY_BULLET_COOLDOWN)
+		if (bullet->m_parry_timer >= PARRY_BULLET_COOLDOWN)
 		{
 			std::vector<GameObject*>::iterator it = find(m_enemies_tagged.begin(), m_enemies_tagged.end(), enemy_bullet);
 			if (it == m_enemies_tagged.end())

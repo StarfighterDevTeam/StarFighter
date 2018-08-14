@@ -97,12 +97,12 @@ public :
 	bool GetWeapon(Weapon* weapon);
 	bool m_is_attacking;
 	float m_attack_cooldown_timer;
-	float m_attack_cooldown;
 
 	int m_hp;
 	int m_hp_max;
 
 	float m_immune_timer;
+	float m_afterdeath_timer;
 
 	void CollisionWithEnemy(GameObject* enemy) override;
 	void CollisionWithWeapon(GameObject* enemy_weapon) override;
@@ -111,8 +111,8 @@ public :
 	void SetDashEnemy(GameObject* enemy) override;
 	bool DealDamage(int dmg) override;
 	void Death() override;
+	void Respawn();
 	void GetLoot(GameObject* object) override;
-	bool IsImmune();
 
 	CircleShape m_dash_target_feedback;
 

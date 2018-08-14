@@ -250,7 +250,7 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
 
 	float dist_squared_to_player = GetDistanceSquaredBetweenPositions(getPosition(), player->getPosition());
-	if (dist_squared_to_player < m_aggro_radius * m_aggro_radius)
+	if (!player->m_ghost && player->m_visible && dist_squared_to_player < m_aggro_radius * m_aggro_radius)
 	{
 		if (m_phase != EnemyPhase_FollowTarget)
 		{
@@ -324,7 +324,7 @@ GameObject* Enemy::CanParry()
  	GameObject* closest_bullet = (*CurrentGame).GetClosestObjectTypedIncoming(this, PlayerBulletObject, 30.f);//it is useless to parry bullets whose trajectory is off
 	if (closest_bullet)
 	{
-		if (closest_target == NULL || !closest_target->m_visible || GetDistanceSquaredBetweenPositions(this->getPosition(), closest_bullet->getPosition()) < GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()))
+		if (closest_target == NULL || GetDistanceSquaredBetweenPositions(this->getPosition(), closest_bullet->getPosition()) < GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()))
 		{
 			closest_target = closest_bullet;
 		}
@@ -368,7 +368,7 @@ void Enemy::update(sf::Time deltaTime)
 	//AI behaviour
 	if (m_is_attacking)//reset
 	{
-		if (m_weapon && m_weapon->m_attack_timer > m_weapon->m_attack_duration)
+		if (m_weapon && m_weapon->m_attack_timer >= m_weapon->m_attack_duration)
 		{
 			m_weapon->m_visible = false;
 			m_weapon->Extend(sf::Vector2f(0.f, 1.f));
@@ -469,7 +469,7 @@ bool Enemy::FollowTarget(GameObject* target)
 
 bool Enemy::AttackTarget(GameObject* target)
 {
-	if (m_attack_cooldown_timer > m_attack_cooldown)//condition to start attack
+	if (m_attack_cooldown_timer >= m_attack_cooldown)//condition to start attack
 	{
 		if (m_weapon && !m_is_attacking)
 		{
