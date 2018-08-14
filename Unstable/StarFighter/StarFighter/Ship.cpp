@@ -18,7 +18,7 @@ Ship::Ship()
 #define DASH_COOLDOWN				1.0f
 //#define DASH_OVERDASH_FACTOR		1.f
 #define DASH_OVERDASH_DISTANCE		250.f
-#define DASH_COMBO_SLOWMOTION		0.20f
+#define DASH_COMBO_SLOWMOTION		0.1f
 
 #define IMMUNE_DMG_DURATION			2.f
 
@@ -39,6 +39,8 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
+
+	m_stroboscopic_effect_timer = 0.f;
 
 	m_move_state = Character_Idle;
 	m_dash_enemy = NULL;
@@ -106,6 +108,7 @@ void Ship::update(sf::Time deltaTime)
 	m_immune_timer += deltaTime.asSeconds();
 	m_attack_cooldown_timer += deltaTime.asSeconds();
 	m_dash_cooldown_timer += deltaTime.asSeconds();
+	m_stroboscopic_effect_timer += deltaTime.asSeconds();
 
 	sf::Vector2f inputs_direction = sf::Vector2f(0, 0);
 	if ((*CurrentGame).m_window_has_focus)
@@ -304,8 +307,6 @@ void Ship::update(sf::Time deltaTime)
 			(*CurrentGame).m_timescale = 1.f;
 			(*CurrentGame).m_shader.setParameter("ratio", 0.f);
 		}
-
-		PlayStroboscopicEffect(sf::seconds(0.1f), sf::seconds(0.005f));
 		
 		//printf("Speed: %f, %f (angle: %f)\n", m_speed.x, m_speed.y, GetAngleRadBetweenPositions(getPosition(), m_dash_target));
 	}
@@ -337,6 +338,9 @@ void Ship::update(sf::Time deltaTime)
 			m_move_state = Character_Idle;
 			m_speed = sf::Vector2f(0, 0);
 			m_dash_cooldown_timer = 0.f;
+			m_dash_enemies_tagged.clear();
+			(*CurrentGame).m_timescale = 1.f;
+			(*CurrentGame).m_shader.setParameter("ratio", 0.f);
 		}
 	}
 
@@ -458,17 +462,6 @@ void Ship::MaxSpeedConstraints()
 
 	//max speed constraints
 	NormalizeVector(&m_speed, ship_max_speed);
-}
-
-void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
-{
-	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
-	{
-		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
-		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
-
-		m_stroboscopic_effect_clock.restart();
-	}
 }
 
 void Ship::UpdateInputStates()
@@ -736,4 +729,9 @@ void Ship::GetLoot(GameObject* object)
 			break;
 		}
 	}
+}
+
+void Ship::AddGameObjectToScene(GameObject *object, LayerType layer, GameObjectType type)
+{
+	(*CurrentGame).addToScene(object, layer, type);
 }
