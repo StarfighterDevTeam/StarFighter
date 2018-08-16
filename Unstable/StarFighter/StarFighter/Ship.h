@@ -91,6 +91,8 @@ public :
 	float m_dash_cooldown_timer;
 	int m_dash_streak;
 	vector<GameObject*> m_dash_enemies_tagged;
+	size_t m_dash_ammo_current;
+	size_t m_dash_ammo_max;
 
 	//attack
 	Weapon* m_weapon;

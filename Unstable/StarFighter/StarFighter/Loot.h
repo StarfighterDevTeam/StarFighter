@@ -12,6 +12,7 @@ enum LootType
 	Loot_WeaponSpear,
 	Loot_WeaponShuriken,
 	Loot_BonusMeleeRange,
+	Loot_DashAmmo,
 	NBVAL_LOOT_TYPES,
 };
 
@@ -24,6 +25,7 @@ public :
 	LootType m_type;
 
 	sf::Vector2f m_range_bonus;
+	size_t m_dash_ammo;
 	WeaponType m_weapon_type;
 
 	float m_flotation_timer;

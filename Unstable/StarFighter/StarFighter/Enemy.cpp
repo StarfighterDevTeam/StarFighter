@@ -437,6 +437,9 @@ void Enemy::Death()
 {
 	m_GarbageMe = true;
 	m_visible = false;
+
+	Loot* loot = new Loot(Loot_DashAmmo, getPosition());
+	(*CurrentGame).addToScene(loot, LootObjectLayer, LootObject);
 }
 
 int Enemy::GetRating()
