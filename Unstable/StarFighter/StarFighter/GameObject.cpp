@@ -155,10 +155,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Color color
 
 GameObject::~GameObject()
 {
-	//TODO
 
-	//delete this->equipment_loot;
-	//delete this->weapon_loot;
 }
 
 void GameObject::update(sf::Time deltaTime)
@@ -176,7 +173,10 @@ void GameObject::update(sf::Time deltaTime)
 
 	this->setPosition(newposition.x, newposition.y);
 
-	AnimatedSprite::update(deltaTime);
+	if (m_frameNumber > 1)
+	{
+		AnimatedSprite::update(deltaTime);
+	}
 
 	//debug
 	m_center_feedback.setPosition(getPosition());
