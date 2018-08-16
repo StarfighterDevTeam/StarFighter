@@ -25,6 +25,8 @@ public :
 
 	sf::Vector2f m_range_bonus;
 	WeaponType m_weapon_type;
+
+	float m_flotation_timer;
 };
 
 #endif // LOOT_H_INCLUDED
