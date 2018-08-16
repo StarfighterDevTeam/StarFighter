@@ -141,7 +141,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 float Lerp(float value, float input_min, float input_max, float output_min, float output_max)
 {
 	if (input_min == input_max)
-		return output_min;
+		return output_max;
 
 	if (value < input_min)
 	{
@@ -153,11 +153,33 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 		value = input_max;
 	}
 
-	float ratio = (input_max - value) / (input_max - input_min);
+	float ratio = (value - input_min) / (input_max - input_min);
 
 	float lerp = output_min + ratio * (output_max - output_min);
 
 	return lerp;
+}
+
+float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max)
+{
+	if (input_min == input_max)
+		return output_max;
+
+	if (value < input_min)
+	{
+		value = input_min;
+	}
+	if (value > input_max)
+	{
+		value = input_max;
+	}
+
+	float ratio = (1 - cos(value * M_PI)) / 2;
+	//for stiffer curves, use "ratio = (1 - cos(value * value * M_PI)) / 2;"
+
+	float ouput = output_min + ratio * (output_max - output_min);
+
+	return ouput;
 }
 
 sf::Color GrayScaleColor(sf::Color input_color, float ratio)

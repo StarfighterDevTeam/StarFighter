@@ -6,8 +6,6 @@
 #include "AnimatedSprite.hpp"
 #include "TextUtils.h"
 #include <vector>
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "Globals.h"
 #include "SFText.h"
 

@@ -166,7 +166,10 @@ void GameObject::update(sf::Time deltaTime)
 
 	setPosition(newposition.x, newposition.y);
 
-	AnimatedSprite::update(deltaTime);
+	if (m_frameNumber > 1)
+	{
+		AnimatedSprite::update(deltaTime);
+	}
 }
 
 void GameObject::updateAnimation(sf::Time deltaTime)
