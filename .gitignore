@@ -216,3 +216,5 @@ pip-log.txt
 
 # Librairies
 !/Libraries/**
+Unstable/StarFighter/StarFighter/StarFighter.vcxproj
+Unstable/StarFighter/.vs/StarFighter/v15/Browse.VC.db

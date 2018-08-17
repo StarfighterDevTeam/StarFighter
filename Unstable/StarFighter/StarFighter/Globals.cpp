@@ -144,14 +144,10 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 		return output_max;
 
 	if (value < input_min)
-	{
-		value = input_min;
-	}
+		return output_min;
 
 	if (value > input_max)
-	{
-		value = input_max;
-	}
+		return output_max;
 
 	float ratio = (value - input_min) / (input_max - input_min);
 
@@ -166,13 +162,10 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 		return output_max;
 
 	if (value < input_min)
-	{
-		value = input_min;
-	}
+		return output_min;
+	
 	if (value > input_max)
-	{
-		value = input_max;
-	}
+		return output_max;
 
 	float ratio = (1 - cos(value * M_PI)) / 2;
 	//for stiffer curves, use "ratio = (1 - cos(value * value * M_PI)) / 2;"
