@@ -17,6 +17,8 @@ using namespace sf;
 #define ENEMY_DASH_DISTANCE					100.f
 #define ENEMY_DASH_COOLDOWN					5.f
 
+#define ENEMY_SUMMONING_RADIUS				100.f
+
 //Enemy::Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, origin, frameNumber, animationNumber)
 //{
 //	m_hp_max = 2;
@@ -39,6 +41,8 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_type = type;
 	m_phase = EnemyPhase_Idle;
 	m_is_attacking = false;
+	m_weapon = NULL;
+	m_enemy_summoned = NBVAL_ENEMYTYPES;
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
 	setRotation(angle);
@@ -62,6 +66,28 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 			textureName = "2D/wufeng.png";
 			size = sf::Vector2f(64, 114);
 			m_aggro_radius = 500.f;
+
+			//summoning
+			m_enemy_summoned = Enemy_Ghost;
+			m_summoning_cooldown_range = sf::Vector2f(3.f, 8.f);
+			m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
+			m_summoning_cooldown_timer = m_summoning_cooldown;
+			m_summoning_duration = 2.f;
+			m_summoning_timer = m_summoning_duration;
+
+			break;
+		}
+
+		case Enemy_Ghost:
+		{
+			m_hp_max = 1;
+			m_hp = m_hp_max;
+			m_dmg = 1;
+			m_attack_cooldown = 1.f;
+			m_ref_speed = 400.f;
+			textureName = "2D/ghost.png";
+			size = sf::Vector2f(32, 57);
+			m_aggro_radius = 8888.f;
 			break;
 		}
 	}
@@ -71,19 +97,24 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 		case Enemy_Wufeng_Katana:
 		{
 			m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
-			setColor(sf::Color::Cyan);
+			setColor(sf::Color::Cyan, true);
 			break;
 		}
 		case Enemy_Wufeng_Spear:
 		{
 			m_weapon = new Weapon(this, Weapon_Spear, sf::Color::Red);
-			setColor(sf::Color::Red);
+			setColor(sf::Color::Red, true);
 			break;
 		}
 		case Enemy_Wufeng_Shuriken:
 		{
 			m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
-			setColor(sf::Color::Magenta);
+			setColor(sf::Color::Magenta, true);
+			break;
+		}
+		case Enemy_Ghost:
+		{
+			setColor(sf::Color::Black, true);
 			break;
 		}
 	}
@@ -102,6 +133,7 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 
 	//AI
 	m_roam_duration = RandomizeFloatBetweenValues(sf::Vector2f(ENEMY_ROAMING_MIN_DURATION, ENEMY_ROAMING_MAX_DURATION));
+	m_roaming_timer = m_roam_duration;
 	m_destination = getPosition();
 	m_arrived_at_destination = true;
 
@@ -112,8 +144,6 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_aggro_radius_feedback.setOutlineThickness(2);
 	m_aggro_radius_feedback.setOutlineColor(sf::Color(255, 0, 0, 80));
 	m_aggro_radius_feedback.setPosition(getPosition());
-
-
 }
 
 Enemy::~Enemy()
@@ -252,19 +282,27 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 	float dist_squared_to_player = GetDistanceSquaredBetweenPositions(getPosition(), player->getPosition());
 	if (!player->m_ghost && player->m_visible && dist_squared_to_player < m_aggro_radius * m_aggro_radius)
 	{
-		if (m_phase != EnemyPhase_FollowTarget)
+		if (m_phase == EnemyPhase_Idle)
 		{
 			m_phase = EnemyPhase_FollowTarget;
 		}
 	}
 	else
 	{
-		if (m_phase != EnemyPhase_Idle)
+		if (m_phase == EnemyPhase_FollowTarget)
 		{
 			m_phase = EnemyPhase_Idle;
 
 			m_arrived_at_destination = true;
 			m_speed = sf::Vector2f(0, 0);
+		}
+	}
+
+	if (m_phase == EnemyPhase_Summoning)
+	{
+		if (Summon())
+		{
+			m_phase = EnemyPhase_Idle;
 		}
 	}
 
@@ -284,10 +322,18 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 		else
 		{
 			target = player;
-			//follow the player (
-			if (FollowTarget(target))
+			//follow the player
+			if (TrySummoning())
 			{
-				AttackTarget(target);
+				m_phase = EnemyPhase_Summoning;
+				m_speed = sf::Vector2f(0, 0);
+			}
+			else
+			{
+				if (FollowTarget(target))
+				{
+					AttackTarget(target);
+				}
 			}
 		}
 	}
@@ -353,14 +399,12 @@ void Enemy::update(sf::Time deltaTime)
 {
 	//update timers
 	m_attack_cooldown_timer += deltaTime.asSeconds();
+	m_roaming_timer += deltaTime.asSeconds();
+	m_summoning_cooldown_timer += deltaTime.asSeconds();
+	m_summoning_timer += deltaTime.asSeconds();
 
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
-
-	if (m_weapon->m_owner == NULL)
-	{
-		printf("BUG\n");//chasing a potential bug
-	}
 
 	//Flocking?
 	//sf::Vector2f flocking_vector = m_flocking ? Flocking() : sf::Vector2f(0, 0);
@@ -385,6 +429,11 @@ void Enemy::update(sf::Time deltaTime)
 				m_attack_cooldown_timer = 0.f;
 			}
 		}
+		else if (!m_weapon)
+		{
+			m_is_attacking = false;
+			m_attack_cooldown_timer = 0.f;
+		}
 	}
 
 	// # # #
@@ -393,15 +442,18 @@ void Enemy::update(sf::Time deltaTime)
 
 	if (m_is_attacking)//update
 	{
-		float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
-		if (ratio > 1.0f)
+		if (m_weapon)
 		{
-			ratio = 1.0f;
-		}
-		m_weapon->Extend(sf::Vector2f(ratio, 1.f));
-	}
+			float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
+			if (ratio > 1.0f)
+			{
+				ratio = 1.0f;
+			}
+			m_weapon->Extend(sf::Vector2f(ratio, 1.f));
 
-	UpdateWeaponPosition(m_weapon);
+			UpdateWeaponPosition(m_weapon);
+		}
+	}
 
 	GameObject::update(deltaTime);
 
@@ -437,6 +489,9 @@ void Enemy::Death()
 {
 	m_GarbageMe = true;
 	m_visible = false;
+
+	Loot* loot = new Loot(Loot_DashAmmo, getPosition());
+	(*CurrentGame).addToScene(loot, LootObjectLayer, LootObject);
 }
 
 int Enemy::GetRating()
@@ -451,6 +506,16 @@ int Enemy::GetRating()
 
 bool Enemy::FollowTarget(GameObject* target)
 {
+	  if (m_weapon && m_weapon->m_attack_timer < m_weapon->m_attack_duration)
+	{
+		return false;
+	}
+	
+	if (!m_weapon && m_attack_cooldown_timer < m_attack_cooldown)
+	{
+		return false;
+	}
+
 	float range = m_weapon ? (m_size.y / 2) + m_weapon->m_range.x : (m_size.y / 2);
 	
 	if (GetDistanceSquaredBetweenPositions(this->getPosition(), target->getPosition()) > range * range)
@@ -469,9 +534,9 @@ bool Enemy::FollowTarget(GameObject* target)
 
 bool Enemy::AttackTarget(GameObject* target)
 {
-	if (m_attack_cooldown_timer >= m_attack_cooldown)//condition to start attack
+	if (m_attack_cooldown_timer >= m_attack_cooldown && !m_is_attacking)//condition to start attack
 	{
-		if (m_weapon && !m_is_attacking)
+		if (m_weapon )
 		{
 			if (m_weapon->m_is_ranged == false)
 			{
@@ -483,9 +548,11 @@ bool Enemy::AttackTarget(GameObject* target)
 				m_weapon->Shoot(target);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
 			}
 
-			m_is_attacking = true;
- 			m_weapon->m_attack_timer = 0.f;
+			m_weapon->m_attack_timer = 0.f;
 		}
+
+		m_is_attacking = true;
+		m_attack_cooldown_timer = 0.f;
 	}
 
 	return m_is_attacking;
@@ -512,7 +579,7 @@ bool Enemy::Roam(sf::Time deltaTime)
 			m_arrived_at_destination = true;
 			m_speed = sf::Vector2f(0, 0);
 			setPosition(m_destination);
-			m_roaming_clock.restart();
+			m_roaming_timer = 0.f;
 		}
 		else
 		{
@@ -521,7 +588,7 @@ bool Enemy::Roam(sf::Time deltaTime)
 	}
 
 	//arrived = roam to a new destination
-	if (m_arrived_at_destination && m_roaming_clock.getElapsedTime().asSeconds() > m_roam_duration)
+	if (m_arrived_at_destination && m_roaming_timer > m_roam_duration)
 	{
 		m_roam_duration = RandomizeFloatBetweenValues(sf::Vector2f(ENEMY_ROAMING_MIN_DURATION, ENEMY_ROAMING_MAX_DURATION));
 
@@ -544,6 +611,60 @@ bool Enemy::Roam(sf::Time deltaTime)
 		m_arrived_at_destination = false;
 
 		return true;
+	}
+	
+	return false;
+}
+
+bool Enemy::TrySummoning()
+{
+	if (m_enemy_summoned != NBVAL_ENEMYTYPES)
+	{
+		if (m_summoning_cooldown_timer > m_summoning_cooldown)
+		{
+			//m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
+			//m_summoning_cooldown_timer = 0.f;
+			m_summoning_timer = 0.f;
+
+			//float random_angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
+			//sf::Vector2f random_position = getPosition() + GetVectorFromLengthAndAngle(m_diag + ENEMY_SUMMONING_RADIUS, random_angle);
+			//
+			//Enemy* invocation = new Enemy(random_position, m_enemy_summoned);
+			//(*CurrentGame).addToScene(invocation, EnemyObjectLayer, EnemyObject);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Enemy::Summon()
+{
+	
+
+	if (m_summoning_timer > m_summoning_duration)
+	{
+		m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
+		m_summoning_cooldown_timer = 0.f;
+
+		float random_angle = RandomizeFloatBetweenValues(sf::Vector2f(M_PI_2, 1.5 * M_PI_2));
+		random_angle *= RandomizeSign();
+		GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
+		float angle_to_player = GetAngleRadBetweenObjects(this, player);
+		float angle = angle_to_player + random_angle;
+		sf::Vector2f offset = GetVectorFromLengthAndAngle(m_diag + ENEMY_SUMMONING_RADIUS, angle);
+		sf::Vector2f random_position = getPosition() + offset;
+
+ 		Enemy* invocation = new Enemy(random_position, m_enemy_summoned);
+		(*CurrentGame).addToScene(invocation, EnemyObjectLayer, EnemyObject);
+
+		setColor(m_color);
+
+		return true;
+	}
+	else
+	{
+		setColor(sf::Color::White);
 	}
 	
 	return false;

@@ -14,6 +14,7 @@ enum EnemyType
 	Enemy_Wufeng_Katana,
 	Enemy_Wufeng_Spear,
 	Enemy_Wufeng_Shuriken,
+	Enemy_Ghost,
 	NBVAL_ENEMYTYPES,
 };
 
@@ -21,6 +22,7 @@ enum EnemyPhase
 {
 	EnemyPhase_Idle,
 	EnemyPhase_FollowTarget,
+	EnemyPhase_Summoning,
 };
 
 class Enemy : public GameObject
@@ -56,11 +58,21 @@ public :
 	GameObject* CanParry();
 	float RangeToInterceptTarget(GameObject* target);
 
-	//lateral dash
-	sf::Clock m_dash_cooldown_clock;
+	//lateral dash - TODO
+	//float m_dash_cooldown_clock;
 
 	//roaming
-	sf::Clock m_roaming_clock;
+	float m_roaming_timer;
+
+	//summoner
+	EnemyType m_enemy_summoned;
+	sf::Vector2f m_summoning_cooldown_range;
+	float m_summoning_cooldown;
+	float m_summoning_cooldown_timer;
+	float m_summoning_timer;
+	float m_summoning_duration;
+	bool TrySummoning();
+	bool Summon();
 
 	//AI
 	void UpdateAI(sf::Time deltaTime);

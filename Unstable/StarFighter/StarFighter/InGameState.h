@@ -12,6 +12,9 @@
 #include "Enemy.h"
 #include "Loot.h"
 
+#define DASH_BAR_WIDTH			80.f
+#define DASH_BAR_SPACING		20.f
+
 class GameObject;
 
 class InGameState : public GameState
@@ -27,6 +30,9 @@ public:
 	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFile(string scenes_file);
+
+	vector<SFRectangle*> m_dash_bars;
+	SFRectangle* InitDashBar(int index);
 
 private:
 	sf::RenderWindow* mainWindow;

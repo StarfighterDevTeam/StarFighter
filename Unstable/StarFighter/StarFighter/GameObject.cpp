@@ -260,7 +260,7 @@ GameObject* GameObject::Clone()
 	return clone;
 }
 
-float GameObject::GetVectorLength()
+float GameObject::GetAbsoluteSpeed()
 {
 	const float a = m_speed.x;
 	const float b = m_speed.y;

@@ -23,9 +23,9 @@ void InGameState::Initialize(Player player)
 	LoadCSVFile(SHIP_CSV_FILE);
 
 	//Loot
-	Loot* qi = new Loot(Loot_BonusMeleeRange, sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y - 200));
-	qi->setColor(sf::Color(0, 255, 0, 255));
-	(*CurrentGame).addToScene(qi, LootObjectLayer, LootObject);
+	//Loot* qi = new Loot(Loot_BonusMeleeRange, sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y - 200));
+	//qi->setColor(sf::Color(0, 255, 0, 255));
+	//(*CurrentGame).addToScene(qi, LootObjectLayer, LootObject);
 
 	Loot* spear = new Loot(Loot_WeaponSpear, sf::Vector2f(SHIP_START_X + 500, SHIP_START_Y - 200));
 	(*CurrentGame).addToScene(spear, LootObjectLayer, LootObject);
@@ -37,9 +37,12 @@ void InGameState::Initialize(Player player)
 
 	float step = 0;
 
+	Enemy* ghost = new Enemy(sf::Vector2f(SHIP_START_X + 1000, SHIP_START_Y + 100), Enemy_Ghost);
+	//(*CurrentGame).addToScene(ghost, EnemyObjectLayer, EnemyObject);
+
 	Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + 1000, SHIP_START_Y + 100), Enemy_Wufeng_Katana);
 	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
-
+	
 	//Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 2 * step, SHIP_START_Y), Enemy_Wufeng_Katana);
 	//(*CurrentGame).addToScene(wufeng2, EnemyObjectLayer, EnemyObject);
 	//
@@ -49,10 +52,10 @@ void InGameState::Initialize(Player player)
 	//Enemy* wufeng4 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 3 * step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Spear);
 	//(*CurrentGame).addToScene(wufeng4, EnemyObjectLayer, EnemyObject);
 	//
-	Enemy* wufeng5 = new Enemy(sf::Vector2f(SHIP_START_X + 1200 + 2 * step, SHIP_START_Y + 300), Enemy_Wufeng_Spear);
-	(*CurrentGame).addToScene(wufeng5, EnemyObjectLayer, EnemyObject);
-	
-	Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 1400, SHIP_START_Y -200), Enemy_Wufeng_Shuriken);
+	//Enemy* wufeng5 = new Enemy(sf::Vector2f(SHIP_START_X + 1200 + 2 * step, SHIP_START_Y + 300), Enemy_Wufeng_Spear);
+	//(*CurrentGame).addToScene(wufeng5, EnemyObjectLayer, EnemyObject);
+	//
+	//Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 1400, SHIP_START_Y -200), Enemy_Wufeng_Shuriken);
 	//(*CurrentGame).addToScene(wufeng6, EnemyObjectLayer, EnemyObject);
 	
 	//Enemy* wufeng7 = new Enemy(sf::Vector2f(SHIP_START_X + 300 - step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Shuriken);
@@ -107,6 +110,34 @@ void InGameState::Update(sf::Time deltaTime)
 		}
 	}
 
+	//HUD : update player dash counter
+	int dashBarsSize = m_dash_bars.size();
+	for (int i = 0; i < (*CurrentGame).m_playerShip->m_dash_ammo_max; i++)
+	{
+		if (i >= dashBarsSize)
+		{
+			m_dash_bars.push_back(InitDashBar(i));
+			(*CurrentGame).addToFeedbacks(m_dash_bars[i]);
+		}
+
+		if (i < (*CurrentGame).m_playerShip->m_dash_ammo_current)
+		{
+			m_dash_bars[i]->setFillColor(sf::Color(0, 255, 0, 255));
+		}
+		else
+		{
+			m_dash_bars[i]->setFillColor(sf::Color(0, 255, 0, 0));
+		}
+
+		m_dash_bars[i]->m_visible = true;
+	}
+
+	for (int i = (*CurrentGame).m_playerShip->m_dash_ammo_max; i < dashBarsSize; i++)
+	{
+		m_dash_bars[i]->m_visible = false;
+	}
+
+
 	this->mainWindow->clear();
 }
 
@@ -117,7 +148,26 @@ void InGameState::Draw()
 
 void InGameState::Release()
 {
-	//TODO
+	int dashBarsSize = m_dash_bars.size();
+	for (int i = 0; i < dashBarsSize; i++)
+	{
+		delete m_dash_bars[i];
+		m_dash_bars[i] = NULL;
+	}
+}
+
+SFRectangle* InGameState::InitDashBar(int index)
+{
+	SFRectangle* rect = new SFRectangle();
+
+	rect->setSize(sf::Vector2f(DASH_BAR_WIDTH, 10));
+	rect->setOrigin(rect->getSize() * 0.5f);
+	rect->setFillColor(sf::Color(0, 0, 0, 0));
+	rect->setOutlineThickness(2);
+	rect->setOutlineColor(sf::Color(255, 0, 0, 200));
+	rect->setPosition(sf::Vector2f((*CurrentGame).m_view.getCenter().x - (*CurrentGame).m_view.getSize().x / 2 + DASH_BAR_WIDTH / 2 + 30 + index*(DASH_BAR_WIDTH + DASH_BAR_SPACING), (*CurrentGame).m_view.getCenter().y - (*CurrentGame).m_view.getSize().y / 2 + 30));
+
+	return rect;
 }
 
 void InGameState::UpdateCamera(sf::Time deltaTime)
