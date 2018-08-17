@@ -14,6 +14,7 @@ enum EnemyType
 	Enemy_Wufeng_Katana,
 	Enemy_Wufeng_Spear,
 	Enemy_Wufeng_Shuriken,
+	Enemy_Ghost_Katana,
 	NBVAL_ENEMYTYPES,
 };
 

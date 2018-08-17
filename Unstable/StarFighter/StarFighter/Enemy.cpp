@@ -39,6 +39,7 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_type = type;
 	m_phase = EnemyPhase_Idle;
 	m_is_attacking = false;
+	m_weapon = NULL;
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
 	setRotation(angle);
@@ -64,6 +65,19 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 			m_aggro_radius = 500.f;
 			break;
 		}
+
+		case Enemy_Ghost_Katana:
+		{
+			m_hp_max = 1;
+			m_hp = m_hp_max;
+			m_dmg = 1;
+			m_attack_cooldown = 1.f;
+			m_ref_speed = 400.f;
+			textureName = "2D/ghost.png";
+			size = sf::Vector2f(32, 57);
+			m_aggro_radius = 8888.f;
+			break;
+		}
 	}
 
 	switch (type)
@@ -84,6 +98,11 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 		{
 			m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
 			setColor(sf::Color::Magenta);
+			break;
+		}
+		case Enemy_Ghost_Katana:
+		{
+			setColor(sf::Color::Black);
 			break;
 		}
 	}
@@ -112,8 +131,6 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_aggro_radius_feedback.setOutlineThickness(2);
 	m_aggro_radius_feedback.setOutlineColor(sf::Color(255, 0, 0, 80));
 	m_aggro_radius_feedback.setPosition(getPosition());
-
-
 }
 
 Enemy::~Enemy()
@@ -357,7 +374,7 @@ void Enemy::update(sf::Time deltaTime)
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
 
-	if (m_weapon->m_owner == NULL)
+	if (m_weapon && m_weapon->m_owner == NULL)
 	{
 		printf("BUG\n");//chasing a potential bug
 	}
@@ -385,6 +402,12 @@ void Enemy::update(sf::Time deltaTime)
 				m_attack_cooldown_timer = 0.f;
 			}
 		}
+		else if (!m_weapon)
+		{
+			m_is_attacking = false;
+			m_attack_cooldown_timer = 0.f;
+			printf("#2\n");
+		}
 	}
 
 	// # # #
@@ -393,15 +416,18 @@ void Enemy::update(sf::Time deltaTime)
 
 	if (m_is_attacking)//update
 	{
-		float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
-		if (ratio > 1.0f)
+		if (m_weapon)
 		{
-			ratio = 1.0f;
-		}
-		m_weapon->Extend(sf::Vector2f(ratio, 1.f));
-	}
+			float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
+			if (ratio > 1.0f)
+			{
+				ratio = 1.0f;
+			}
+			m_weapon->Extend(sf::Vector2f(ratio, 1.f));
 
-	UpdateWeaponPosition(m_weapon);
+			UpdateWeaponPosition(m_weapon);
+		}
+	}
 
 	GameObject::update(deltaTime);
 
@@ -454,6 +480,16 @@ int Enemy::GetRating()
 
 bool Enemy::FollowTarget(GameObject* target)
 {
+	if (m_weapon && m_weapon->m_attack_timer < m_weapon->m_attack_duration)
+	{
+		return false;
+	}
+	
+	if (!m_weapon && m_attack_cooldown_timer < m_attack_cooldown)
+	{
+		return false;
+	}
+
 	float range = m_weapon ? (m_size.y / 2) + m_weapon->m_range.x : (m_size.y / 2);
 	
 	if (GetDistanceSquaredBetweenPositions(this->getPosition(), target->getPosition()) > range * range)
@@ -472,9 +508,9 @@ bool Enemy::FollowTarget(GameObject* target)
 
 bool Enemy::AttackTarget(GameObject* target)
 {
-	if (m_attack_cooldown_timer >= m_attack_cooldown)//condition to start attack
+	if (m_attack_cooldown_timer >= m_attack_cooldown && !m_is_attacking)//condition to start attack
 	{
-		if (m_weapon && !m_is_attacking)
+		if (m_weapon )
 		{
 			if (m_weapon->m_is_ranged == false)
 			{
@@ -486,9 +522,12 @@ bool Enemy::AttackTarget(GameObject* target)
 				m_weapon->Shoot(target);//shoot an enemy. If no enemy found, it will shoot towards current rotation.
 			}
 
-			m_is_attacking = true;
- 			m_weapon->m_attack_timer = 0.f;
+			m_weapon->m_attack_timer = 0.f;
 		}
+
+		m_is_attacking = true;
+		m_attack_cooldown_timer = 0.f;
+		printf("#2\n");
 	}
 
 	return m_is_attacking;
