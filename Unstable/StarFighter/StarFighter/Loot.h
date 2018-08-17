@@ -29,6 +29,8 @@ public :
 	WeaponType m_weapon_type;
 
 	float m_flotation_timer;
+	float m_attraction_radius;
+	GameObject* m_attraction_target;
 };
 
 #endif // LOOT_H_INCLUDED

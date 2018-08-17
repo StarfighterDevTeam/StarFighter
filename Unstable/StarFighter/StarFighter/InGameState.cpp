@@ -23,9 +23,9 @@ void InGameState::Initialize(Player player)
 	LoadCSVFile(SHIP_CSV_FILE);
 
 	//Loot
-	Loot* qi = new Loot(Loot_BonusMeleeRange, sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y - 200));
-	qi->setColor(sf::Color(0, 255, 0, 255));
-	(*CurrentGame).addToScene(qi, LootObjectLayer, LootObject);
+	//Loot* qi = new Loot(Loot_BonusMeleeRange, sf::Vector2f(SHIP_START_X + 100, SHIP_START_Y - 200));
+	//qi->setColor(sf::Color(0, 255, 0, 255));
+	//(*CurrentGame).addToScene(qi, LootObjectLayer, LootObject);
 
 	Loot* spear = new Loot(Loot_WeaponSpear, sf::Vector2f(SHIP_START_X + 500, SHIP_START_Y - 200));
 	(*CurrentGame).addToScene(spear, LootObjectLayer, LootObject);
@@ -42,17 +42,17 @@ void InGameState::Initialize(Player player)
 
 	Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 2 * step, SHIP_START_Y), Enemy_Wufeng_Katana);
 	(*CurrentGame).addToScene(wufeng2, EnemyObjectLayer, EnemyObject);
-	//
-	//Enemy* wufeng3 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 3 * step, SHIP_START_Y + step), Enemy_Wufeng_Katana);
-	//(*CurrentGame).addToScene(wufeng3, EnemyObjectLayer, EnemyObject);
-	//
-	//Enemy* wufeng4 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 3 * step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Spear);
-	//(*CurrentGame).addToScene(wufeng4, EnemyObjectLayer, EnemyObject);
-	//
+	
+	Enemy* wufeng3 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 3 * step, SHIP_START_Y + step), Enemy_Wufeng_Katana);
+	(*CurrentGame).addToScene(wufeng3, EnemyObjectLayer, EnemyObject);
+	
+	Enemy* wufeng4 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 3 * step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Spear);
+	(*CurrentGame).addToScene(wufeng4, EnemyObjectLayer, EnemyObject);
+	
 	Enemy* wufeng5 = new Enemy(sf::Vector2f(SHIP_START_X + 1200 + 2 * step, SHIP_START_Y + 300), Enemy_Wufeng_Spear);
 	(*CurrentGame).addToScene(wufeng5, EnemyObjectLayer, EnemyObject);
-	
-	Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 1400, SHIP_START_Y -200), Enemy_Wufeng_Shuriken);
+	//
+	//Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 1400, SHIP_START_Y -200), Enemy_Wufeng_Shuriken);
 	//(*CurrentGame).addToScene(wufeng6, EnemyObjectLayer, EnemyObject);
 	
 	//Enemy* wufeng7 = new Enemy(sf::Vector2f(SHIP_START_X + 300 - step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Shuriken);

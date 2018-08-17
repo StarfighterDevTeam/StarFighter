@@ -115,7 +115,7 @@ public:
 	void UpdateRotation();
 
 	//Utilitary methods
-	float GetVectorLength();
+	float GetAbsoluteSpeed();
 	static float GetVectorLength(sf::Vector2f speed_);
 	float GetVectorLengthSquared();
 	static float GetVectorLengthSquared(sf::Vector2f speed_);
