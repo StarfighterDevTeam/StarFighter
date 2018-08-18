@@ -27,6 +27,7 @@ enum SFX_Bank
 	SFX_Melee,
 	SFX_GruntPlayer,
 	SFX_GruntEnemy,
+	SFX_Summon,
 	NBVAL_SFX_BANK,
 };
 
@@ -98,8 +99,8 @@ public:
 	void PlaySFX(SFX_Bank sfx_name);
 	void SetSFXVolume(bool activate_sfx);
 
-	sf::SoundBuffer m_soundBuffers[5];
-	sf::Sound m_sounds[5];
+	sf::SoundBuffer m_soundBuffers[6];
+	sf::Sound m_sounds[6];
 	bool m_SFX_Activated;
 
 	//Music

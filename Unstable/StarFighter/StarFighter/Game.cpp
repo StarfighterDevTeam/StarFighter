@@ -48,14 +48,13 @@ void Game::init(RenderWindow* window)
 	}
 
 	//Sounds
-	LoadSFX();
 	m_SFX_Activated = true;
+	LoadSFX();
 
 	//Music
 	LOGGER_WRITE(Logger::DEBUG, "Loading Musics");
-	m_Music_Activated = false;
+	m_Music_Activated = true;
 	m_music_fader = 0;
-	m_asking_music_fade_out = false;
 	PlayMusic(Music_Main);
 
 	//Shader
@@ -77,6 +76,7 @@ void Game::SetSFXVolume(bool activate_sfx)
 	m_sounds[2].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 	m_sounds[3].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 	m_sounds[4].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[5].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 }
 
 int Game::LoadSFX()
@@ -96,6 +96,9 @@ int Game::LoadSFX()
 	if (!m_soundBuffers[4].loadFromFile(makePath("Sounds/grunt1.ogg")))
 		return -1;
 
+	if (!m_soundBuffers[5].loadFromFile(makePath("Sounds/summon.ogg")))
+		return -1;
+
 	m_sounds[0].setBuffer(m_soundBuffers[0]);
 	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
@@ -110,6 +113,9 @@ int Game::LoadSFX()
 
 	m_sounds[4].setBuffer(m_soundBuffers[4]);
 	m_sounds[4].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	m_sounds[5].setBuffer(m_soundBuffers[5]);
+	m_sounds[5].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 	
 	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
@@ -118,7 +124,8 @@ int Game::LoadSFX()
 
 void Game::PlaySFX(SFX_Bank sfx_name)
 {
-	m_sounds[(int)sfx_name].play();
+	if (m_SFX_Activated)
+		m_sounds[(int)sfx_name].play();
 }
 
 void Game::SetMusicVolume(bool activate_music)

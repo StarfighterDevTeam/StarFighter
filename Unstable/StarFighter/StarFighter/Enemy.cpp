@@ -659,7 +659,8 @@ bool Enemy::Summon()
 		m_summoning_cooldown_timer = 0.f;
 
 		float random_angle = RandomizeFloatBetweenValues(sf::Vector2f(M_PI_2, 1.5 * M_PI_2));
-		random_angle *= RandomizeSign();
+		int s = RandomizeSign();
+		random_angle *= s;
 		GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
 		float angle_to_player = GetAngleRadBetweenObjects(this, player);
 		float angle = angle_to_player + random_angle;
@@ -667,9 +668,21 @@ bool Enemy::Summon()
 		sf::Vector2f random_position = getPosition() + offset;
 
  		Enemy* invocation = new Enemy(random_position, m_enemy_summoned);
-		(*CurrentGame).addToScene(invocation, EnemyObjectLayer, EnemyObject);
+		
+		//ensure invocation is summoned within map's borders
+		if (!invocation->IsInsideArea(random_position, (*CurrentGame).m_map_size))
+		{
+			random_angle *= -1;
+			angle = angle_to_player + random_angle;
+			offset = GetVectorFromLengthAndAngle(m_diag + ENEMY_SUMMONING_RADIUS, angle);
+			random_position = getPosition() + offset;
+		}
 
 		setColor(m_color);
+
+		(*CurrentGame).addToScene(invocation, EnemyObjectLayer, EnemyObject);
+
+		(*CurrentGame).PlaySFX(SFX_Summon);
 
 		return true;
 	}
