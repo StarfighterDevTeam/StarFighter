@@ -123,7 +123,13 @@ void Ship::update(sf::Time deltaTime)
 	m_stroboscopic_effect_timer += deltaTime.asSeconds();
 
 	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
+	{
 		m_hit_feedback_timer += deltaTime.asSeconds();
+		if (m_hit_feedback_timer >= HIT_FEEDBACK_DURATION && m_hp <= 0)
+		{
+			Death();
+		}
+	}
 
 	//reset color
 	setColor(m_color);
@@ -680,18 +686,9 @@ bool Ship::DealDamage(int dmg)
 			m_hit_feedback_timer = 0.f;
 			(*CurrentGame).PlaySFX(SFX_GruntPlayer);
 		}
-
-		if (m_hp <= 0)
-		{
-			Death();
-		}
-
-		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return m_hp <= 0;
 }
 
 void Ship::Death()

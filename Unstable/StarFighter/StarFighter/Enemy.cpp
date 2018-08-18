@@ -304,6 +304,8 @@ void Enemy::UpdateAI(sf::Time deltaTime)
 		if (Summon())
 		{
 			m_phase = EnemyPhase_Idle;
+			m_attack_cooldown_timer = 0.f;
+			m_roaming_timer = 0.f;
 		}
 	}
 
@@ -405,7 +407,13 @@ void Enemy::update(sf::Time deltaTime)
 	m_summoning_timer += deltaTime.asSeconds();
 
 	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
+	{
 		m_hit_feedback_timer += deltaTime.asSeconds();
+		if (m_hit_feedback_timer >= HIT_FEEDBACK_DURATION && m_hp <= 0)
+		{
+			Death();
+		}
+	}
 
 	//reset color
 	setColor(m_color);
@@ -489,13 +497,7 @@ bool Enemy::DealDamage(int dmg)
 		(*CurrentGame).PlaySFX(SFX_GruntEnemy);
 	}
 
-	if (m_hp <= 0)
-	{
-		Death();
-		return true;
-	}
-
-	return false;
+	return m_hp <= 0;
 }
 
 void Enemy::Death()
