@@ -85,6 +85,9 @@ public :
 	bool m_arrived_at_destination;
 	float m_aggro_radius;
 
+	//feedback
+	float m_hit_feedback_timer;
+
 	//debug
 	CircleShape m_aggro_radius_feedback;
 };

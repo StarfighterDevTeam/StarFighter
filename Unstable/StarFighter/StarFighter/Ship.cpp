@@ -73,6 +73,8 @@ void Ship::Init()
 	m_dash_target_feedback.setOutlineColor(sf::Color(0, 255, 0, 100));
 	m_dash_target_feedback.setPosition(getPosition());
 
+	m_hit_feedback_timer = HIT_FEEDBACK_DURATION;
+
 	//debug
 	m_dash_radius_feedback.setRadius(m_dash_radius);
 	m_dash_radius_feedback.setOrigin(sf::Vector2f(m_dash_radius, m_dash_radius));
@@ -119,6 +121,12 @@ void Ship::update(sf::Time deltaTime)
 		m_dash_cooldown_timer += deltaTime.asSeconds();
 
 	m_stroboscopic_effect_timer += deltaTime.asSeconds();
+
+	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
+		m_hit_feedback_timer += deltaTime.asSeconds();
+
+	//reset color
+	setColor(m_color);
 
 	//dead?
 	if (m_afterdeath_timer < AFTERDEATH_DURATION)
@@ -361,7 +369,12 @@ void Ship::update(sf::Time deltaTime)
 	}
 
 	SetConditionalColor(sf::Color(200, 200, 200, 180), m_move_state == Character_Dash, true);
-	SetConditionalColor(sf::Color(255, 255, 255, 255 * cos(m_immune_timer * 10)), m_immune_timer < IMMUNE_DMG_DURATION, false);
+	SetConditionalColor(sf::Color(m_color.r, m_color.g, m_color.b, 255 * cos(m_immune_timer * 10)), m_immune_timer < IMMUNE_DMG_DURATION, false);
+
+	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
+	{
+		setColor(sf::Color::Red);
+	}
 
 	GameObject::update(deltaTime);
 
@@ -664,8 +677,8 @@ bool Ship::DealDamage(int dmg)
 
 		if (dmg > 0)
 		{
+			m_hit_feedback_timer = 0.f;
 			(*CurrentGame).PlaySFX(SFX_GruntPlayer);
-
 		}
 
 		if (m_hp <= 0)

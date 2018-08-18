@@ -53,7 +53,7 @@ void Game::init(RenderWindow* window)
 
 	//Music
 	LOGGER_WRITE(Logger::DEBUG, "Loading Musics");
-	m_Music_Activated = true;
+	m_Music_Activated = false;
 	m_music_fader = 0;
 	m_asking_music_fade_out = false;
 	PlayMusic(Music_Main);
@@ -73,6 +73,10 @@ void Game::init(RenderWindow* window)
 void Game::SetSFXVolume(bool activate_sfx)
 {
 	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[1].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[2].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[3].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[4].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 }
 
 int Game::LoadSFX()

@@ -16,6 +16,8 @@ class Equipment;
 class Weapon;
 class Loot;
 
+#define HIT_FEEDBACK_DURATION				0.08f
+
 enum LayerType {
 	BackgroundLayer,
 	PortalLayer,

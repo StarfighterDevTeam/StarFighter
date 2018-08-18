@@ -116,7 +116,9 @@ public :
 	void Respawn();
 	void GetLoot(GameObject* object) override;
 
+	//feedbacks
 	CircleShape m_dash_target_feedback;
+	float m_hit_feedback_timer;
 
 	//debug
 	CircleShape m_dash_radius_feedback;

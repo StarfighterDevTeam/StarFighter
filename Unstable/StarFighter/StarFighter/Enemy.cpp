@@ -43,6 +43,7 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 	m_is_attacking = false;
 	m_weapon = NULL;
 	m_enemy_summoned = NBVAL_ENEMYTYPES;
+	m_hit_feedback_timer = HIT_FEEDBACK_DURATION;
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
 	setRotation(angle);
@@ -403,6 +404,12 @@ void Enemy::update(sf::Time deltaTime)
 	m_summoning_cooldown_timer += deltaTime.asSeconds();
 	m_summoning_timer += deltaTime.asSeconds();
 
+	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
+		m_hit_feedback_timer += deltaTime.asSeconds();
+
+	//reset color
+	setColor(m_color);
+
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
 
@@ -455,6 +462,11 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 
+	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
+	{
+		setColor(sf::Color::Red);
+	}
+
 	GameObject::update(deltaTime);
 
 	UpdateRotation();
@@ -473,6 +485,7 @@ bool Enemy::DealDamage(int dmg)
 
 	if (dmg > 0)
 	{
+		m_hit_feedback_timer = 0.f;
 		(*CurrentGame).PlaySFX(SFX_GruntEnemy);
 	}
 
@@ -640,8 +653,6 @@ bool Enemy::TrySummoning()
 
 bool Enemy::Summon()
 {
-	
-
 	if (m_summoning_timer > m_summoning_duration)
 	{
 		m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
