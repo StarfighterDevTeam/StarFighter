@@ -90,7 +90,7 @@ public:
 	void SetSFXVolume(bool activate_sfx);
 
 	sf::SoundBuffer m_soundBuffers[1];
-	sf::Sound m_soundsLaser[1];
+	sf::Sound m_sounds[1];
 	bool m_SFX_Activated;
 
 	//Music

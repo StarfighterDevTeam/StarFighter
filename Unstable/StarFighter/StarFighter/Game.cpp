@@ -47,20 +47,19 @@ void Game::init(RenderWindow* window)
 	}
 
 	//Sounds
-	LoadSFX();
 	m_SFX_Activated = true;
+	LoadSFX();
 
 	//Music
 	LOGGER_WRITE(Logger::DEBUG, "Loading Musics");
 	m_Music_Activated = true;
 	m_music_fader = 0;
-	m_asking_music_fade_out = false;
 	PlayMusic(Music_Main);
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
 {
-	m_soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 }
 
 int Game::LoadSFX()
@@ -68,9 +67,9 @@ int Game::LoadSFX()
 	if (!m_soundBuffers[0].loadFromFile(makePath("Sounds/laser.ogg")))
 		return -1;
 
-	m_soundsLaser[0].setBuffer(m_soundBuffers[0]);
+	m_sounds[0].setBuffer(m_soundBuffers[0]);
 
-	m_soundsLaser[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
 	return 0;
@@ -78,10 +77,8 @@ int Game::LoadSFX()
 
 void Game::PlaySFX(SFX_Bank sfx_name)
 {
-	if (sfx_name == SFX_Laser)
-	{
-		m_soundsLaser[0].play();
-	}
+	if (m_SFX_Activated)
+		m_sounds[sfx_name].play();
 }
 
 void Game::SetMusicVolume(bool activate_music)
