@@ -23,8 +23,6 @@ Ship::Ship()
 #define IMMUNE_DMG_DURATION				2.f
 #define AFTERDEATH_DURATION				2.f
 
-#define STROBOSCOPIC_EFFECT_FREQUENCY	0.005f
-
 void Ship::Init()
 {
 	m_layer = PlayerShipLayer;
@@ -40,8 +38,6 @@ void Ship::Init()
 
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
-
-	m_stroboscopic_effect_timer = 0.f;
 
 	m_move_state = Character_Idle;
 	m_dash_enemy = NULL;
@@ -120,7 +116,8 @@ void Ship::update(sf::Time deltaTime)
 	if (m_dash_cooldown_timer < m_dash_cooldown)
 		m_dash_cooldown_timer += deltaTime.asSeconds();
 
-	m_stroboscopic_effect_timer += deltaTime.asSeconds();
+	if (m_stroboscopic_effect_timer < STROBOSCOPIC_EFFECT_FREQUENCY)
+		m_stroboscopic_effect_timer += deltaTime.asSeconds();
 
 	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
 	{
@@ -382,6 +379,11 @@ void Ship::update(sf::Time deltaTime)
 		setColor(sf::Color::Red);
 	}
 
+	if (m_move_state == Character_Dash)
+	{
+		PlayStroboscopicEffect(sf::seconds(STROBOSCOPIC_EFFECT_DURATION), sf::seconds(STROBOSCOPIC_EFFECT_FREQUENCY));
+	}
+
 	GameObject::update(deltaTime);
 
 	UpdateRotation();
@@ -476,6 +478,17 @@ bool Ship::ScreenBorderContraints()
 	}
 
 	return touched_screen_border;
+}
+
+void Ship::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
+{
+	if (m_stroboscopic_effect_timer >= time_between_poses.asSeconds())
+	{
+		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
+		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+
+		m_stroboscopic_effect_timer = 0.f;
+	}
 }
 
 void Ship::IdleDecelleration(sf::Time deltaTime)

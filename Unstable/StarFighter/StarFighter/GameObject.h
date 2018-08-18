@@ -16,7 +16,10 @@ class Equipment;
 class Weapon;
 class Loot;
 
-#define HIT_FEEDBACK_DURATION				0.08f
+#define HIT_FEEDBACK_DURATION			0.08f
+
+#define STROBOSCOPIC_EFFECT_FREQUENCY	0.005f
+#define STROBOSCOPIC_EFFECT_DURATION	0.2f
 
 enum LayerType {
 	BackgroundLayer,
@@ -101,6 +104,7 @@ public:
 	int m_currentAnimationIndex;
 	std::string m_textureName;
 	sf::Vector2f m_speed;
+	float m_stroboscopic_effect_timer;
 	virtual void CollisionWithEnemy(GameObject* enemy);
 	virtual void CollisionWithWeapon(GameObject* enemy_weapon);
 	virtual void CollisionWithBullet(GameObject* enemy_bullet);

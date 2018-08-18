@@ -105,6 +105,7 @@ void GameObject::Init(sf::Vector2f position, sf::Vector2f speed, sf::Texture *te
 	m_rotation_speed = 0.f;
 	m_flocking = false;
 	m_flocking_test_begung = false;
+	m_stroboscopic_effect_timer = 0.f;
 
 	//debug
 	m_center_feedback.setRadius(4);

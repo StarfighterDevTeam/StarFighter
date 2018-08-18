@@ -14,8 +14,8 @@ using namespace sf;
 #define ENEMY_ROAMING_MAX_DURATION			5.f
 #define ENEMY_ROAMING_MIN_DISTANCE			100.f
 #define ENEMY_ROAMING_MAX_DISTANCE			400.f
-#define ENEMY_DASH_DISTANCE					100.f
-#define ENEMY_DASH_COOLDOWN					5.f
+
+#define ENEMY_DASH_SPEED					800.f
 
 #define ENEMY_SUMMONING_RADIUS				100.f
 
@@ -39,10 +39,11 @@ using namespace sf;
 Enemy::Enemy(sf::Vector2f position, EnemyType type)
 {
 	m_type = type;
-	m_phase = EnemyPhase_Idle;
+	m_state = EnemyState_Idle;
 	m_is_attacking = false;
 	m_weapon = NULL;
 	m_enemy_summoned = NBVAL_ENEMYTYPES;
+	m_dash_range = 0.f;
 	m_hit_feedback_timer = HIT_FEEDBACK_DURATION;
 
 	float angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
@@ -58,6 +59,7 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 		case Enemy_Wufeng_Katana:
 		case Enemy_Wufeng_Spear:
 		case Enemy_Wufeng_Shuriken:
+		case Enemy_Wufeng_Summoner:
 		{
 			m_hp_max = 2;
 			m_hp = m_hp_max;
@@ -68,17 +70,12 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 			size = sf::Vector2f(64, 114);
 			m_aggro_radius = 500.f;
 
-			//summoning
-			m_enemy_summoned = Enemy_Ghost;
-			m_summoning_cooldown_range = sf::Vector2f(3.f, 8.f);
-			m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
-			m_summoning_cooldown_timer = m_summoning_cooldown;
-			m_summoning_duration = 2.f;
-			m_summoning_timer = m_summoning_duration;
+			m_dash_range = 200.f;
+			m_dash_cooldown = 2.f;
+			m_dash_cooldown_timer = m_dash_cooldown;
 
 			break;
 		}
-
 		case Enemy_Ghost:
 		{
 			m_hp_max = 1;
@@ -104,13 +101,27 @@ Enemy::Enemy(sf::Vector2f position, EnemyType type)
 		case Enemy_Wufeng_Spear:
 		{
 			m_weapon = new Weapon(this, Weapon_Spear, sf::Color::Red);
-			setColor(sf::Color::Red, true);
+			setColor(sf::Color::Blue, true);
 			break;
 		}
 		case Enemy_Wufeng_Shuriken:
 		{
 			m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
 			setColor(sf::Color::Magenta, true);
+			break;
+		}
+		case Enemy_Wufeng_Summoner:
+		{
+			m_weapon = new Weapon(this, Weapon_Katana, sf::Color::Red);
+			setColor(sf::Color::Yellow, true);
+
+			//summoning
+			m_enemy_summoned = Enemy_Ghost;
+			m_summoning_cooldown_range = sf::Vector2f(3.f, 8.f);
+			m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
+			m_summoning_cooldown_timer = m_summoning_cooldown;
+			m_summoning_duration = 1.f;
+			m_summoning_timer = m_summoning_duration;
 			break;
 		}
 		case Enemy_Ghost:
@@ -278,64 +289,81 @@ sf::Vector2f Enemy::Flocking()
 
 void Enemy::UpdateAI(sf::Time deltaTime)
 {
+	if (m_state == EnemyState_Dash)
+	{
+		return;
+	}
+
 	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
 
 	float dist_squared_to_player = GetDistanceSquaredBetweenPositions(getPosition(), player->getPosition());
 	if (!player->m_ghost && player->m_visible && dist_squared_to_player < m_aggro_radius * m_aggro_radius)
 	{
-		if (m_phase == EnemyPhase_Idle)
+		if (m_state == EnemyState_Idle)
 		{
-			m_phase = EnemyPhase_FollowTarget;
+			m_state = EnemyState_FollowTarget;
 		}
 	}
 	else
 	{
-		if (m_phase == EnemyPhase_FollowTarget)
+		if (m_state == EnemyState_FollowTarget)
 		{
-			m_phase = EnemyPhase_Idle;
+			m_state = EnemyState_Idle;
 
 			m_arrived_at_destination = true;
 			m_speed = sf::Vector2f(0, 0);
 		}
 	}
 
-	if (m_phase == EnemyPhase_Summoning)
+	if (m_state == EnemyState_Summoning)
 	{
 		if (Summon())
 		{
-			m_phase = EnemyPhase_Idle;
+			m_state = EnemyState_Idle;
 			m_attack_cooldown_timer = 0.f;
 			m_roaming_timer = 0.f;
 		}
 	}
 
-	if (m_phase == EnemyPhase_Idle)
+	if (m_state == EnemyState_Idle)
 	{
 		Roam(deltaTime);
 	}
 
-	if (m_phase == EnemyPhase_FollowTarget)
+	if (m_state == EnemyState_FollowTarget)
 	{
-		//any emergency target to parry?
-		GameObject* target = CanParry();
-		if (target != NULL)
+		//1. DEFENSE
+
+		//any emergency to dodge?
+		GameObject* target = CanDodge();
+		if (target != NULL && DashAwayFromTarget(target))
 		{
-			AttackTarget(target);
+			m_state = EnemyState_Dash;
 		}
+		//any emergency target to parry?
 		else
 		{
-			target = player;
-			//follow the player
-			if (TrySummoning())
+			target = CanParry();
+			if (target != NULL)
 			{
-				m_phase = EnemyPhase_Summoning;
-				m_speed = sf::Vector2f(0, 0);
+				AttackTarget(target);
 			}
+			//2. ATTACK
 			else
 			{
-				if (FollowTarget(target))
+				target = player;
+				//follow the player
+				if (TrySummoning())
 				{
-					AttackTarget(target);
+					m_state = EnemyState_Summoning;
+					m_speed = sf::Vector2f(0, 0);
+				}
+				else
+				{
+					if (FollowTarget(target))
+					{
+						AttackTarget(target);
+					}
 				}
 			}
 		}
@@ -359,9 +387,27 @@ float Enemy::RangeToInterceptTarget(GameObject* target)
 	return range;
 }
 
+float Enemy::RangeToDodgeTarget(GameObject* target)
+{
+	float range = m_size.y / 2;
+	if (target->m_collider_type == PlayerBulletObject)
+	{
+		Ammo* bullet = (Ammo*)target;
+		range += bullet->m_ref_speed * (bullet->m_size.y / 2 + m_size.y / 2) / ENEMY_DASH_SPEED;
+	}
+	else if (target->m_collider_type == PlayerWeaponObject)
+	{
+		Weapon* weapon = (Weapon*)target;
+		range += weapon->m_range.x;
+	}
+
+	return range;
+}
+
+
 GameObject* Enemy::CanParry()
 {
-	if (m_weapon == NULL)
+	if (m_weapon == NULL || m_attack_cooldown_timer < m_attack_cooldown || m_is_attacking)//must be able to attack in order to parry
 	{
 		return NULL;
 	}
@@ -398,13 +444,92 @@ GameObject* Enemy::CanParry()
 	return NULL;
 }
 
+GameObject* Enemy::CanDodge()
+{
+	if (m_dash_range == 0 || m_dash_cooldown_timer < m_dash_cooldown)
+	{
+		return NULL;
+	}
+	
+	//get player weapon
+	GameObject* closest_target = (*CurrentGame).GetClosestObjectTyped(this, PlayerWeaponObject);
+
+	//get player bullets and choose what's closest (and visible)
+	GameObject* closest_bullet = (*CurrentGame).GetClosestObjectTypedIncoming(this, PlayerBulletObject, 30.f);//it is useless to parry bullets whose trajectory is off
+	if (closest_bullet)
+	{
+		if (closest_target == NULL || GetDistanceSquaredBetweenPositions(this->getPosition(), closest_bullet->getPosition()) < GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()))
+		{
+			closest_target = closest_bullet;
+		}
+	}
+
+	//target the selected object, if it exists and is in weapon range
+	if (closest_target && closest_target->m_visible)
+	{
+		float range = RangeToDodgeTarget(closest_target);
+
+		if (GetDistanceSquaredBetweenPositions(this->getPosition(), closest_target->getPosition()) < range * range)
+		{
+			return closest_target;
+		}
+	}
+
+	return NULL;
+}
+
+bool Enemy::DashAwayFromTarget(GameObject* target)
+{
+	float dash_angle = M_PI_2 * RandomizeSign();
+	GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
+	float angle_to_player = GetAngleRadBetweenObjects(this, player);
+	float angle = angle_to_player + dash_angle;
+	sf::Vector2f offset = GetVectorFromLengthAndAngle(m_dash_range, angle);
+	sf::Vector2f future_position = getPosition() + offset;
+
+	//ensure we end up in a position inside the map bounds
+	if (this->IsInsideArea(future_position, (*CurrentGame).m_map_size) == false)
+	{
+		dash_angle *= -1;
+		angle = angle_to_player + dash_angle;
+		offset = GetVectorFromLengthAndAngle(m_dash_range, angle);
+		future_position = getPosition() + offset;
+	}
+	if (this->IsInsideArea(future_position, (*CurrentGame).m_map_size) == false)
+	{
+		//still outside bounds? -> abort
+		return false;
+	}
+
+	ScaleVector(&offset, ENEMY_DASH_SPEED);
+	m_speed = offset;
+	m_dash_target = future_position;
+
+	m_ghost = true;
+
+	return true;
+}
+
 void Enemy::update(sf::Time deltaTime)
 {
 	//update timers
-	m_attack_cooldown_timer += deltaTime.asSeconds();
-	m_roaming_timer += deltaTime.asSeconds();
-	m_summoning_cooldown_timer += deltaTime.asSeconds();
-	m_summoning_timer += deltaTime.asSeconds();
+	if (m_attack_cooldown_timer < m_attack_cooldown)
+		m_attack_cooldown_timer += deltaTime.asSeconds();
+
+	if (m_roaming_timer < m_roam_duration)
+		m_roaming_timer += deltaTime.asSeconds();
+
+	if (m_summoning_cooldown_timer < m_summoning_cooldown)
+		m_summoning_cooldown_timer += deltaTime.asSeconds();
+	
+	if (m_summoning_timer < m_summoning_duration)
+		m_summoning_timer += deltaTime.asSeconds();
+
+	if (m_dash_cooldown_timer < m_dash_cooldown)
+		m_dash_cooldown_timer += deltaTime.asSeconds();
+
+	if (m_stroboscopic_effect_timer < STROBOSCOPIC_EFFECT_FREQUENCY)
+		m_stroboscopic_effect_timer += deltaTime.asSeconds();
 
 	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
 	{
@@ -421,10 +546,26 @@ void Enemy::update(sf::Time deltaTime)
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
 
-	//Flocking?
-	//sf::Vector2f flocking_vector = m_flocking ? Flocking() : sf::Vector2f(0, 0);
-
-	//AI behaviour
+	//end of dash?
+	if (m_state == EnemyState_Dash)
+	{
+		float dist_to_target = GetDistanceBetweenPositions(getPosition(), m_dash_target);
+		if (dist_to_target > ENEMY_DASH_SPEED * deltaTime.asSeconds())
+		{
+			sf::Vector2f dash_vector = m_dash_target - getPosition();
+			ScaleVector(&dash_vector, ENEMY_DASH_SPEED);
+			m_speed = dash_vector;
+		}
+		else
+		{
+			m_speed = sf::Vector2f(0, 0);
+			setPosition(m_dash_target);
+			m_dash_cooldown_timer = 0.f;
+			m_ghost = false;
+			m_state = EnemyState_Idle;
+		}
+	}
+	
 	if (m_is_attacking)//reset
 	{
 		if (m_weapon && m_weapon->m_attack_timer >= m_weapon->m_attack_duration)
@@ -451,7 +592,7 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 
-	// # # #
+	//AI strategy
 	UpdateAI(deltaTime);
 	// # # #
 
@@ -473,6 +614,12 @@ void Enemy::update(sf::Time deltaTime)
 	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
 	{
 		setColor(sf::Color::Red);
+	}
+
+	if (m_state == EnemyState_Dash)
+	{
+		PlayStroboscopicEffect(sf::seconds(STROBOSCOPIC_EFFECT_DURATION), sf::seconds(STROBOSCOPIC_EFFECT_FREQUENCY));
+		setColor(sf::Color(200, 200, 200, 180));
 	}
 
 	GameObject::update(deltaTime);
@@ -603,7 +750,7 @@ bool Enemy::Roam(sf::Time deltaTime)
 	}
 
 	//arrived = roam to a new destination
-	if (m_arrived_at_destination && m_roaming_timer > m_roam_duration)
+	if (m_arrived_at_destination && m_roaming_timer >= m_roam_duration)
 	{
 		m_roam_duration = RandomizeFloatBetweenValues(sf::Vector2f(ENEMY_ROAMING_MIN_DURATION, ENEMY_ROAMING_MAX_DURATION));
 
@@ -635,17 +782,9 @@ bool Enemy::TrySummoning()
 {
 	if (m_enemy_summoned != NBVAL_ENEMYTYPES)
 	{
-		if (m_summoning_cooldown_timer > m_summoning_cooldown)
+		if (m_summoning_cooldown_timer >= m_summoning_cooldown)
 		{
-			//m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
-			//m_summoning_cooldown_timer = 0.f;
 			m_summoning_timer = 0.f;
-
-			//float random_angle = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 360.f));
-			//sf::Vector2f random_position = getPosition() + GetVectorFromLengthAndAngle(m_diag + ENEMY_SUMMONING_RADIUS, random_angle);
-			//
-			//Enemy* invocation = new Enemy(random_position, m_enemy_summoned);
-			//(*CurrentGame).addToScene(invocation, EnemyObjectLayer, EnemyObject);
 			return true;
 		}
 	}
@@ -655,14 +794,13 @@ bool Enemy::TrySummoning()
 
 bool Enemy::Summon()
 {
-	if (m_summoning_timer > m_summoning_duration)
+	if (m_summoning_timer >= m_summoning_duration)
 	{
 		m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);
 		m_summoning_cooldown_timer = 0.f;
 
 		float random_angle = RandomizeFloatBetweenValues(sf::Vector2f(M_PI_2, 1.5 * M_PI_2));
-		int s = RandomizeSign();
-		random_angle *= s;
+		random_angle *= RandomizeSign();
 		GameObject* player = (GameObject*)(*CurrentGame).m_playerShip;
 		float angle_to_player = GetAngleRadBetweenObjects(this, player);
 		float angle = angle_to_player + random_angle;
@@ -671,13 +809,18 @@ bool Enemy::Summon()
 
  		Enemy* invocation = new Enemy(random_position, m_enemy_summoned);
 		
-		//ensure invocation is summoned within map's borders
-		if (!invocation->IsInsideArea(random_position, (*CurrentGame).m_map_size))
+		//ensure invocation is summoned inside the map bounds
+		if (invocation->IsInsideArea(random_position, (*CurrentGame).m_map_size) == false)
 		{
 			random_angle *= -1;
 			angle = angle_to_player + random_angle;
 			offset = GetVectorFromLengthAndAngle(m_diag + ENEMY_SUMMONING_RADIUS, angle);
 			random_position = getPosition() + offset;
+		}
+		if (invocation->IsInsideArea(random_position, (*CurrentGame).m_map_size) == false)
+		{
+			//still outside bounds? -> abort
+			return false;
 		}
 
 		setColor(m_color);
@@ -694,4 +837,15 @@ bool Enemy::Summon()
 	}
 	
 	return false;
+}
+
+void Enemy::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
+{
+	if (m_stroboscopic_effect_timer >= time_between_poses.asSeconds())
+	{
+		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
+		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
+
+		m_stroboscopic_effect_timer = 0.f;
+	}
 }

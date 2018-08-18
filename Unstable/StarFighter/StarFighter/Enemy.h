@@ -14,15 +14,17 @@ enum EnemyType
 	Enemy_Wufeng_Katana,
 	Enemy_Wufeng_Spear,
 	Enemy_Wufeng_Shuriken,
+	Enemy_Wufeng_Summoner,
 	Enemy_Ghost,
 	NBVAL_ENEMYTYPES,
 };
 
-enum EnemyPhase
+enum EnemyState
 {
-	EnemyPhase_Idle,
-	EnemyPhase_FollowTarget,
-	EnemyPhase_Summoning,
+	EnemyState_Idle,
+	EnemyState_FollowTarget,
+	EnemyState_Summoning,
+	EnemyState_Dash,
 };
 
 class Enemy : public GameObject
@@ -38,7 +40,7 @@ public :
 	void Death() override;
 
 	EnemyType m_type;
-	EnemyPhase m_phase;
+	EnemyState m_state;
 
 	int m_hp;
 	int m_hp_max;
@@ -57,12 +59,22 @@ public :
 	float m_attack_cooldown_timer;
 	GameObject* CanParry();
 	float RangeToInterceptTarget(GameObject* target);
+	float RangeToDodgeTarget(GameObject* target);
 
 	//lateral dash - TODO
 	//float m_dash_cooldown_clock;
 
 	//roaming
 	float m_roaming_timer;
+
+	//dash
+	float m_dash_range;
+	float m_dash_cooldown;
+	float m_dash_cooldown_timer;
+	GameObject* CanDodge();
+	bool DashAwayFromTarget(GameObject* target);
+	sf::Vector2f m_dash_target;
+	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
 
 	//summoner
 	EnemyType m_enemy_summoned;

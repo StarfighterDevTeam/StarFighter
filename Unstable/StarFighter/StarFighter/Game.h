@@ -14,7 +14,6 @@
 #include "InputGuy.h"
 
 #include "Glow.h"
-#include "Stroboscopic.h"
 #include "SFPanel.h"
 #include "SFTextPop.h"
 

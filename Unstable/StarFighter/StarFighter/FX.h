@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "GameObject.h"
 #include "Game.h"
+#include "Stroboscopic.h"
 
 class FX : public GameObject
 {

@@ -74,8 +74,6 @@ public :
 	static int Ship::SaveShip(Ship* ship);
 	static bool Ship::LoadShip(Ship* ship);
 
-	float m_stroboscopic_effect_timer;
-
 	SFPanel* m_SFTargetPanel;
 	SFPanelTypes m_is_asking_SFPanel;
 
