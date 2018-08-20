@@ -656,7 +656,10 @@ void Enemy::Death()
 	m_GarbageMe = true;
 	m_visible = false;
 
-	Loot* loot = new Loot(Loot_DashAmmo, getPosition());
+	//spawning random loot
+	LootType type = (LootType)RandomizeIntBetweenValues(0, NBVAL_LOOT_TYPES - 1);
+
+	Loot* loot = new Loot(type, getPosition());
 	(*CurrentGame).addToScene(loot, LootObjectLayer, LootObject);
 }
 

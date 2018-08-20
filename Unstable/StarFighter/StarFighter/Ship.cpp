@@ -658,7 +658,7 @@ void Ship::CollisionWithBullet(GameObject* enemy_bullet)
 {
 	if (m_move_state != Character_Dash)
 	{
-		enemy_bullet->CollisionWithBullet(this);
+		enemy_bullet->CollisionWithEnemy(this);
 	}
 }
 

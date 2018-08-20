@@ -31,6 +31,9 @@ public :
 	float m_flotation_timer;
 	float m_attraction_radius;
 	GameObject* m_attraction_target;
+
+	float m_expiration_timer;
+	float m_expiration_duration;
 };
 
 #endif // LOOT_H_INCLUDED
