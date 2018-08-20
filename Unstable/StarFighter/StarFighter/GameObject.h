@@ -117,6 +117,7 @@ public:
 
 	bool BounceOnBorders(sf::Vector2f area_size);
 	bool IsInsideArea(sf::Vector2f coordinates, sf::Vector2f area_size);
+	static bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
 	void UpdateWeaponPosition(GameObject* weapon);
 	void UpdateRotation();
 
@@ -127,7 +128,7 @@ public:
 	static float GetVectorLengthSquared(sf::Vector2f speed_);
 	static sf::Vector2f GetVectorFromLengthAndAngle(float absolute_speed, float angle_rad);
 	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float angle_rad);
-	sf::Vector2f SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed);
+	sf::Vector2f SetConstantSpeedToDestination(sf::Vector2f coordinates, float speed);
 
 	static bool NormalizeVector(sf::Vector2f* vector, float max_value);
 	static void ScaleVector(sf::Vector2f* vector, float target_value);

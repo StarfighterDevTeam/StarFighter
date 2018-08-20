@@ -35,7 +35,7 @@ void Ammo::update(sf::Time deltaTime)
 
 	if (m_target)
 	{
-		SetSpeedForConstantSpeedToDestination(m_target->getPosition(), m_ref_speed);
+		SetConstantSpeedToDestination(m_target->getPosition(), m_ref_speed);
 	}
 
 	UpdateRotation();

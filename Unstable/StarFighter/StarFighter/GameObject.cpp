@@ -433,7 +433,7 @@ sf::Vector2f GameObject::GetVectorFromLengthAndAngle(float absolute_speed, float
 	return speed;
 }
 
-sf::Vector2f GameObject::SetSpeedForConstantSpeedToDestination(sf::Vector2f coordinates, float speed)
+sf::Vector2f GameObject::SetConstantSpeedToDestination(sf::Vector2f coordinates, float speed)
 {
 	sf::Vector2f vector_to_destination = coordinates - getPosition();
 
@@ -726,14 +726,29 @@ bool GameObject::BounceOnBorders(sf::Vector2f area_size)
 
 bool GameObject::IsInsideArea(sf::Vector2f coordinates, sf::Vector2f area_size)
 {
-	const int a = (int)this->getLocalBounds().width / 2;
-	const int b = (int)this->getLocalBounds().height / 2;
-	const int c = (int)area_size.x - this->getLocalBounds().width / 2;
-	const int d = (int)area_size.y - this->getLocalBounds().height / 2;
+	sf::Vector2f bounds = sf::Vector2f(this->getLocalBounds().width, this->getLocalBounds().height);
+	return IsInsideArea(bounds, coordinates, area_size);
+}
 
-	sf::IntRect boundsA(sf::IntRect(a, b, c, d));
-	sf::IntRect boundsB(sf::IntRect(coordinates.x - a, coordinates.y - b, coordinates.x + a, coordinates.y - b));
-	return boundsA.intersects(boundsB);
+bool GameObject::IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size)
+{
+	const float a = coordinates.x - bounds.x / 2;
+	const float b = coordinates.x + bounds.x / 2;
+
+	const float x = area_size.x;
+
+	const float c = coordinates.y - bounds.y / 2;
+	const float d = coordinates.y + bounds.y / 2;
+
+	const float y = area_size.y;
+
+	bool is_inside_area = true;
+	if (a < 0 || b > x || c < 0 || d > y)
+	{
+		is_inside_area = false;
+	}
+
+	return is_inside_area;
 }
 
 void GameObject::UpdateWeaponPosition(GameObject* weapon)

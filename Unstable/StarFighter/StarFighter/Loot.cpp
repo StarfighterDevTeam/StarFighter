@@ -66,7 +66,7 @@ void Loot::update(sf::Time deltaTime)
 			if (GetDistanceSquaredBetweenPositions(getPosition(), attraction_target->getPosition()) < range* range)
 			{
 				m_attraction_target = attraction_target;
-				SetSpeedForConstantSpeedToDestination(m_attraction_target->getPosition(), 1.f);
+				SetConstantSpeedToDestination(m_attraction_target->getPosition(), 1.f);
 			}
 		}
 	}
@@ -80,7 +80,7 @@ void Loot::update(sf::Time deltaTime)
 	else//attraction
 	{
 		AddValueToVector(&m_speed, LOOT_ATTRACTION_ACCELERATION * deltaTime.asSeconds());
-		SetSpeedForConstantSpeedToDestination(m_attraction_target->getPosition(), GetAbsoluteSpeed());
+		SetConstantSpeedToDestination(m_attraction_target->getPosition(), GetAbsoluteSpeed());
 		//m_speed.x += ;
 		//m_speed.y += LOOT_ATTACTION_ACCELERATION * deltaTime.asSeconds();
 		//printf("m_speed.x : %f, m_speed.y: %f\n", m_speed.x, m_speed.y);

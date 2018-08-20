@@ -226,7 +226,7 @@ void Weapon::Shoot(GameObject* target)
 	{
 		Ammo* bullet = Shoot();
 		
-		bullet->SetSpeedForConstantSpeedToDestination(target->getPosition(), m_bullet_speed);
+		bullet->SetConstantSpeedToDestination(target->getPosition(), m_bullet_speed);
 
 		if (m_bullet_is_following_target)
 		{

@@ -36,7 +36,7 @@ void InGameState::Initialize(Player player)
 
 	float step = 0;
 
-	Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + 1000, SHIP_START_Y + 100), Enemy_Wufeng_Katana);
+	Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + 1000, SHIP_START_Y + 100), Enemy_Wufeng_Summoner);
 	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
 	
 	//Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 2 * step, SHIP_START_Y), Enemy_Wufeng_Katana);

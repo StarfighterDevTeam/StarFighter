@@ -52,6 +52,9 @@ public :
 	sf::Vector2f FlockingGetAverageSpeed();
 	sf::Vector2f FlockingSeparate();
 
+	//states
+	void SetEnemyState(EnemyState state);
+
 	//attack
 	Weapon* m_weapon;
 	bool m_is_attacking;
@@ -83,6 +86,7 @@ public :
 	float m_summoning_cooldown_timer;
 	float m_summoning_timer;
 	float m_summoning_duration;
+	sf::Vector2f* m_invocation_coordinates;
 	bool TrySummoning();
 	bool Summon();
 
@@ -90,11 +94,10 @@ public :
 	void UpdateAI(sf::Time deltaTime);
 	bool FollowTarget(GameObject* target);
 	bool AttackTarget(GameObject* target);
-	bool Dash();
 	bool Roam(sf::Time deltaTime);
 	float m_roam_duration;
-	sf::Vector2f m_destination;
-	bool m_arrived_at_destination;
+	sf::Vector2f m_roam_destination;
+	bool m_arrived_at_roam_destination;
 	float m_aggro_radius;
 
 	//feedback
