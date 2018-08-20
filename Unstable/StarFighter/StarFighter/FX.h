@@ -9,15 +9,13 @@
 class FX : public GameObject
 {
 public:
-	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, sf::Time duration, int animationNumber = 1);
+	FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber = 1);
 	void update(sf::Time deltaTime) override;
 
 	FX* Clone();
 
 private:
-	sf::Clock m_deltaClockExploding;
-	bool m_exploding;
-	sf::Time m_duration;
+	float m_duration_timer;
 };
 
 class Aura : public FX
@@ -39,7 +37,7 @@ public:
 	void update(sf::Time deltaTime) override;
 	void PlayStroboscopicEffect(Time effect_duration, Time time_between_poses);
 
-	sf::Clock m_stroboscopic_effect_clock;
+	float m_stroboscopic_effect_timer;
 };
 
 #endif // FX_H_INCLUDED

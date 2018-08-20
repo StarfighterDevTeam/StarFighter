@@ -23,7 +23,8 @@ class Loot;
 
 enum LayerType {
 	BackgroundLayer,
-	PortalLayer,
+	LandmarkFakeLayer,
+	LandmarkLayer,
 	PlayerStroboscopicLayer,
 	ExplosionLayer,
 	EnemyObjectLayer,
@@ -45,7 +46,8 @@ enum LayerType {
 
 enum GameObjectType {
 	BackgroundObject,
-	PortalObject,
+	LandmarkFakeObject,
+	LandmarkObject,
 	ShopObject,
 	LootObject,
 	PlayerShip,
@@ -114,7 +116,7 @@ public:
 	virtual void Death();
 	virtual void GetLoot(GameObject* loot);
 	virtual int GetRating();
-
+	
 	bool BounceOnBorders(sf::Vector2f area_size);
 	bool IsInsideArea(sf::Vector2f coordinates, sf::Vector2f area_size);
 	static bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);

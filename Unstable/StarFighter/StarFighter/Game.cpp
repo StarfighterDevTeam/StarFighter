@@ -77,6 +77,7 @@ void Game::SetSFXVolume(bool activate_sfx)
 	m_sounds[3].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 	m_sounds[4].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 	m_sounds[5].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
+	m_sounds[6].setVolume(DEFAULT_SFX_VOLUME * activate_sfx);
 }
 
 int Game::LoadSFX()
@@ -99,6 +100,9 @@ int Game::LoadSFX()
 	if (!m_soundBuffers[5].loadFromFile(makePath("Sounds/summon.ogg")))
 		return -1;
 
+	if (!m_soundBuffers[6].loadFromFile(makePath("Sounds/gong.ogg")))
+		return -1;
+
 	m_sounds[0].setBuffer(m_soundBuffers[0]);
 	m_sounds[0].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
@@ -116,6 +120,9 @@ int Game::LoadSFX()
 
 	m_sounds[5].setBuffer(m_soundBuffers[5]);
 	m_sounds[5].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
+
+	m_sounds[6].setBuffer(m_soundBuffers[6]);
+	m_sounds[6].setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 	
 	//soundsSwitch.setVolume(DEFAULT_SFX_VOLUME * m_SFX_Activated);
 
@@ -546,6 +553,19 @@ void Game::colisionChecksV2()
 				(*it1)->CollisionWithBullet(*it2);
 			}
 		}
+
+		//Weapon hitting landmarks
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LandmarkObject].begin(); it2 != m_sceneGameObjectsTyped[LandmarkObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it2)->CollisionWithWeapon(*it1);
+			}
+		}
 	}
 
 	//Player bullets
@@ -593,6 +613,19 @@ void Game::colisionChecksV2()
 			{
 				//Do something 
 				(*it1)->CollisionWithBullet(*it2);
+			}
+		}
+
+		//Weapon hitting landmarks
+		for (std::vector<GameObject*>::iterator it2 = m_sceneGameObjectsTyped[LandmarkObject].begin(); it2 != m_sceneGameObjectsTyped[LandmarkObject].end(); it2++)
+		{
+			if (*it2 == NULL)
+				continue;
+
+			if (SimpleCollision::AreColliding((*it1), (*it2)))
+			{
+				//Do something 
+				(*it2)->CollisionWithBullet(*it1);
 			}
 		}
 	}

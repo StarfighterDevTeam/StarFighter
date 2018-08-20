@@ -36,7 +36,7 @@ using namespace sf;
 //	//SetSpeedVectorFromAbsoluteSpeedAndAngle(200, angle * M_PI / 180);
 //}
 
-Enemy::Enemy(sf::Vector2f position, EnemyType type)
+Enemy::Enemy(EnemyType type, sf::Vector2f position)
 {
 	m_type = type;
 	SetEnemyState(EnemyState_Idle);
@@ -812,7 +812,7 @@ bool Enemy::Summon()
 		sf::Vector2f offset = GetVectorFromLengthAndAngle(m_diag + ENEMY_SUMMONING_RADIUS, angle);
 		sf::Vector2f random_position = getPosition() + offset;
 
-		Enemy* invocation = new Enemy(random_position, m_enemy_summoned);
+		Enemy* invocation = new Enemy(m_enemy_summoned, random_position);
 
 		if (invocation->IsInsideArea(random_position, (*CurrentGame).m_map_size) == false)
 		{
@@ -836,7 +836,7 @@ bool Enemy::Summon()
 	//summon
 	if (m_summoning_timer >= m_summoning_duration)
 	{
-		Enemy* invocation = new Enemy(*m_invocation_coordinates, m_enemy_summoned);
+		Enemy* invocation = new Enemy(m_enemy_summoned, *m_invocation_coordinates);
 		(*CurrentGame).addToScene(invocation, EnemyObjectLayer, EnemyObject);
 
 		m_summoning_cooldown = RandomizeFloatBetweenValues(m_summoning_cooldown_range);

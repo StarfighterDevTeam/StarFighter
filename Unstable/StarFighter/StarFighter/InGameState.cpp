@@ -36,30 +36,11 @@ void InGameState::Initialize(Player player)
 
 	float step = 0;
 
-	Enemy* wufeng = new Enemy(sf::Vector2f(SHIP_START_X + 1000, SHIP_START_Y + 100), Enemy_Wufeng_Summoner);
+	Enemy* wufeng = new Enemy(Enemy_Wufeng_Summoner, sf::Vector2f(SHIP_START_X + 1000, SHIP_START_Y + 100));
 	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
-	
-	//Enemy* wufeng2 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 2 * step, SHIP_START_Y), Enemy_Wufeng_Katana);
-	//(*CurrentGame).addToScene(wufeng2, EnemyObjectLayer, EnemyObject);
-	//
-	//Enemy* wufeng3 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 3 * step, SHIP_START_Y + step), Enemy_Wufeng_Katana);
-	//(*CurrentGame).addToScene(wufeng3, EnemyObjectLayer, EnemyObject);
-	//
-	//Enemy* wufeng4 = new Enemy(sf::Vector2f(SHIP_START_X + 300 + 3 * step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Spear);
-	//(*CurrentGame).addToScene(wufeng4, EnemyObjectLayer, EnemyObject);
-	//
-	//Enemy* wufeng5 = new Enemy(sf::Vector2f(SHIP_START_X + 1200 + 2 * step, SHIP_START_Y + 300), Enemy_Wufeng_Spear);
-	//(*CurrentGame).addToScene(wufeng5, EnemyObjectLayer, EnemyObject);
-	//
-	//Enemy* wufeng6 = new Enemy(sf::Vector2f(SHIP_START_X + 1400, SHIP_START_Y -200), Enemy_Wufeng_Shuriken);
-	//(*CurrentGame).addToScene(wufeng6, EnemyObjectLayer, EnemyObject);
-	
-	//Enemy* wufeng7 = new Enemy(sf::Vector2f(SHIP_START_X + 300 - step, SHIP_START_Y + 3 * step), Enemy_Wufeng_Shuriken);
-	//(*CurrentGame).addToScene(wufeng7, EnemyObjectLayer, EnemyObject);
-	//
-	//Enemy* wufeng8 = new Enemy(sf::Vector2f(SHIP_START_X + 300 - step, SHIP_START_Y + step), Enemy_Wufeng_Katana);
-	//(*CurrentGame).addToScene(wufeng8, EnemyObjectLayer, EnemyObject);
-	
+
+	Landmark* gong = new Landmark(Landmark_Gong, sf::Vector2f(1100, 200));
+	(*CurrentGame).addToScene(gong, LandmarkLayer, LandmarkObject);
 
 	//Map
 	GameObject* background = new GameObject(sf::Vector2f(1920 * 0.5, 1080 * 0.5), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1920, 1080), sf::Vector2f(1920 * 0.5, 1080 * 0.5));
@@ -132,7 +113,6 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		m_dash_bars[i]->m_visible = false;
 	}
-
 
 	this->mainWindow->clear();
 }

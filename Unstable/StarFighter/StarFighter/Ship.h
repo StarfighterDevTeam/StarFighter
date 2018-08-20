@@ -6,9 +6,8 @@
 #include "InputGuy.h"
 #include "Game.h"
 #include "SFTextPop.h"
-#include "Enemy.h"
-#include "Loot.h"
-#include "FX.h"
+#include "Landmark.h"// > Enemy > Loot > Weapon > Ammo > FX
+
 
 #define SHIP_START_X                200
 #define SHIP_START_Y                540

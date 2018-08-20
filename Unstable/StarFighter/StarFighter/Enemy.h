@@ -4,8 +4,7 @@
 #include "Globals.h"
 #include "Game.h"
 #include "GameObject.h"
-#include "Loot.h"
-#include "FX.h"
+#include "Loot.h"// > Weapon > Ammo > FX
 
 class Ship;
 
@@ -31,7 +30,7 @@ class Enemy : public GameObject
 {
 public :
 	//Enemy(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, sf::Vector2f origin, int frameNumber = 1, int animationNumber = 1);
-	Enemy(sf::Vector2f position, EnemyType type);
+	Enemy(EnemyType type, sf::Vector2f position);
 	~Enemy();
 	void update(sf::Time deltaTime) override;
 	void Draw(sf::RenderTexture& screen) override;

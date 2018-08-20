@@ -2,17 +2,20 @@
 
 extern Game* CurrentGame;
 
-FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, sf::Time duration, int animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2), frameNumber, animationNumber)
+FX::FX(sf::Vector2f position, sf::Vector2f speed, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber) : GameObject(position, speed, textureName, size, sf::Vector2f(size.x / 2, size.y / 2), frameNumber, animationNumber)
 {
-	//deltaClockExploding.restart();
-	m_duration = duration;
 	m_visible = true;
 	m_isOnScene = true;
 	m_collider_type = Neutral;
+	m_duration_timer = 0.f;
 }
 
 void FX::update(sf::Time deltaTime)
 {
+	//update timers
+	if (m_duration_timer < TIME_BETWEEN_ANIMATION_FRAMES * m_frameNumber)
+		m_duration_timer += deltaTime.asSeconds();
+
 	static sf::Vector2f newposition, offset, newspeed;
 	newspeed = m_speed;
 
@@ -22,7 +25,7 @@ void FX::update(sf::Time deltaTime)
 
 	this->setPosition(newposition.x, newposition.y);
 
-	if (m_deltaClockExploding.getElapsedTime() > sf::seconds(TIME_BETWEEN_ANIMATION_FRAMES*m_frameNumber)) 
+	if (m_duration_timer >= TIME_BETWEEN_ANIMATION_FRAMES * m_frameNumber)
 	{
 		m_visible = false;
 		m_GarbageMe = true;
@@ -34,11 +37,11 @@ void FX::update(sf::Time deltaTime)
 
 FX* FX::Clone()
 {
-	FX* new_FX = new FX(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_frameNumber, this->m_duration);
+	FX* new_FX = new FX(this->getPosition(), this->m_speed, this->m_textureName, this->m_size, this->m_frameNumber);
 	return new_FX;
 }
 
-Aura::Aura(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber) : FX(target->getPosition(), sf::Vector2f(0, 0), textureName, size, frameNumber, sf::seconds(0), animationNumber)
+Aura::Aura(GameObject* target, std::string textureName, sf::Vector2f size, int frameNumber, int animationNumber) : FX(target->getPosition(), sf::Vector2f(0, 0), textureName, size, frameNumber, animationNumber)
 {
 	m_target = target;
 	m_visible = true;
@@ -83,12 +86,13 @@ Aura* Aura::Clone()
 
 FakeShip::FakeShip(GameObject* m_target, std::string textureName, sf::Vector2f size, int m_frameNumber, int m_animationNumber) : Aura(m_target, textureName, size, m_frameNumber, m_animationNumber)
 {
-
+	m_stroboscopic_effect_timer = 0.f;
 }
 
 void FakeShip::update(sf::Time deltaTime)
 {
-	assert(m_target != NULL);
+	//update timers
+	m_stroboscopic_effect_timer += deltaTime.asSeconds();
 
 	if (m_target->m_currentAnimationIndex != m_currentAnimationIndex)
 	{
@@ -100,11 +104,11 @@ void FakeShip::update(sf::Time deltaTime)
 
 void FakeShip::PlayStroboscopicEffect(Time effect_duration, Time time_between_poses)
 {
-	if (m_stroboscopic_effect_clock.getElapsedTime().asSeconds() > time_between_poses.asSeconds())
+	if (m_stroboscopic_effect_timer > time_between_poses.asSeconds())
 	{
 		Stroboscopic* strobo = new Stroboscopic(effect_duration, this);
 		(*CurrentGame).addToScene(strobo, PlayerStroboscopicLayer, BackgroundObject);
 
-		m_stroboscopic_effect_clock.restart();
+		m_stroboscopic_effect_timer = 0.f;
 	}
 }
