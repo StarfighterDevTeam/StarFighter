@@ -445,6 +445,14 @@ sf::Vector2f GameObject::SetConstantSpeedToDestination(sf::Vector2f coordinates,
 	return m_speed;
 }
 
+float GameObject::SetRotationToTarget(sf::Vector2f target_position)
+{
+	float angle_deg = GetAngleDegToTargetPosition(getPosition(), getRotation(), target_position);
+	rotate(angle_deg);
+
+	return angle_deg;
+}
+
 void GameObject::SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float angle_rad)
 {
 	m_speed.x = -absolute_speed * sin(angle_rad);

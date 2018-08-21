@@ -432,7 +432,14 @@ void Ship::update(sf::Time deltaTime)
 
 	if (m_move_state != Character_Glide_Defense)
 	{
-		UpdateRotation();
+		if (dash_enemy == NULL)
+		{
+			UpdateRotation();
+		}
+		else
+		{
+			SetRotationToTarget(dash_enemy->getPosition());
+		}
 	}
 
 	//HUD

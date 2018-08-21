@@ -131,6 +131,7 @@ public:
 	static sf::Vector2f GetVectorFromLengthAndAngle(float absolute_speed, float angle_rad);
 	void SetSpeedVectorFromAbsoluteSpeedAndAngle(float absolute_speed, float angle_rad);
 	sf::Vector2f SetConstantSpeedToDestination(sf::Vector2f coordinates, float speed);
+	float SetRotationToTarget(sf::Vector2f target_position);
 
 	static bool NormalizeVector(sf::Vector2f* vector, float max_value);
 	static void ScaleVector(sf::Vector2f* vector, float target_value);
