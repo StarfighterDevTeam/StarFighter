@@ -77,8 +77,8 @@ public:
 	sf::Vector2f m_map_size;
 
 	//Utiliary methods
-	GameObject* GetClosestObject(const GameObject* ref_obj, GameObjectType type_of_closest_object);
-	GameObject* GetClosestObject(const sf::Vector2f position, GameObjectType type_of_closest_object);
+	GameObject* GetClosestObjectTyped(const GameObject* ref_obj, GameObjectType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
+	GameObject* GetClosestObjectTyped(const sf::Vector2f position, GameObjectType type_of_closest_object, float dist_max = 1.f, float angle_delta_max = -1.f);
 	std::vector<GameObject*> GetSceneGameObjectsTyped(GameObjectType type);
 
 	//Fonts
