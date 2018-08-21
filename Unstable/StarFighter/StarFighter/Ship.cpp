@@ -430,15 +430,33 @@ void Ship::update(sf::Time deltaTime)
 
 	GameObject::update(deltaTime);
 
+	//update rotation
 	if (m_move_state != Character_Glide_Defense)
 	{
-		if (dash_enemy == NULL)
+		GameObject* parry_target = NULL;
+		parry_target = (*CurrentGame).GetClosestObjectTypedIncoming(this, EnemyBulletObject, 30.f, m_dash_radius);
+		if (parry_target)
 		{
-			UpdateRotation();
+			SetRotationToTarget(parry_target->getPosition());
 		}
 		else
 		{
-			SetRotationToTarget(dash_enemy->getPosition());
+			if (dash_enemy)
+			{
+				SetRotationToTarget(dash_enemy->getPosition());
+			}
+			else
+			{
+				parry_target = (*CurrentGame).GetClosestObjectTyped(getPosition(), EnemyWeaponObject, m_dash_radius);
+				if (parry_target)
+				{
+					SetRotationToTarget(parry_target->getPosition());
+				}
+				else
+				{
+					UpdateRotation();
+				}
+			}
 		}
 	}
 
@@ -462,7 +480,10 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
-	UpdateWeaponPosition(m_weapon);
+	if (m_weapon)
+	{
+		UpdateWeaponPosition(m_weapon);
+	}
 
 	if (dash_enemy && !m_dash_enemy && m_dash_cooldown_timer >= m_dash_cooldown)
 	{

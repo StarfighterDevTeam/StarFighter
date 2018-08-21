@@ -111,7 +111,7 @@ Enemy::Enemy(EnemyType type, sf::Vector2f position)
 		{
 			m_weapon = new Weapon(this, Weapon_Shuriken, sf::Color::Red);
 			setColor(sf::Color::Magenta, true);
-			m_aggro_radius = 500.f;
+			m_aggro_radius = 700.f;
 			break;
 		}
 		case Enemy_Wufeng_Summoner:
@@ -639,21 +639,6 @@ void Enemy::update(sf::Time deltaTime)
 	//	m_hp = m_hp_max;
 	// # # #
 
-	if (m_is_attacking)//update
-	{
-		if (m_weapon)
-		{
-			float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
-			if (ratio > 1.0f)
-			{
-				ratio = 1.0f;
-			}
-			m_weapon->Extend(sf::Vector2f(ratio, 1.f));
-
-			UpdateWeaponPosition(m_weapon);
-		}
-	}
-
 	if (m_hit_feedback_timer < HIT_FEEDBACK_DURATION)
 	{
 		setColor(sf::Color::Red);
@@ -667,6 +652,23 @@ void Enemy::update(sf::Time deltaTime)
 
 	GameObject::update(deltaTime);
 
+	//update weapon
+	if (m_weapon)
+	{
+		if (m_is_attacking)
+		{
+			float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
+			if (ratio > 1.0f)
+			{
+				ratio = 1.0f;
+			}
+			m_weapon->Extend(sf::Vector2f(ratio, 1.f));
+		}
+
+		UpdateWeaponPosition(m_weapon);
+	}
+
+	//update rotation
 	if (m_state != EnemyState_GlideDefense)
 	{
 		UpdateRotation();
@@ -754,7 +756,7 @@ bool Enemy::AttackTarget(GameObject* target)
 {
 	if (m_attack_cooldown_timer >= m_attack_cooldown && !m_is_attacking)//condition to start attack
 	{
-		if (m_weapon )
+		if (m_weapon)
 		{
 			if (m_weapon->m_is_ranged == false)
 			{

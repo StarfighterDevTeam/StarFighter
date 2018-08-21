@@ -15,7 +15,8 @@ extern Game* CurrentGame;
 #define MELEE_SPEAR_RANGE_Y				40.f
 #define MELEE_SPEAR_DURATION			0.5f
 
-#define RANGED_SHURIKEN_SPEED			1000.f
+#define RANGED_SHURIKEN_RANGE			700.f
+#define RANGED_SHURIKEN_SPEED			800.f
 #define RANGED_SHURIKEN_COOLDOWN		0.1f
 
 Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
@@ -62,7 +63,7 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 
 		case Weapon_Shuriken:
 		{
-			m_range = sf::Vector2f(MELEE_SPEAR_RANGE_X, MELEE_SPEAR_RANGE_Y);
+			m_range = sf::Vector2f(RANGED_SHURIKEN_RANGE, RANGED_SHURIKEN_RANGE);
 			m_attack_duration = 0.f;
 			m_attack_cooldown = RANGED_SHURIKEN_COOLDOWN;
 			m_dmg = 1;

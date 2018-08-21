@@ -975,7 +975,7 @@ void Game::collectGarbage()
 	//printf("| Collect: %d ",dt.getElapsedTime().asMilliseconds());
 }
 
-GameObject* Game::GetClosestObjectTyped(const sf::Vector2f ref_position, GameObjectType type_of_closest_object)
+GameObject* Game::GetClosestObjectTyped(const sf::Vector2f ref_position, GameObjectType type_of_closest_object, float dist_max)
 {
 	float shortest_distance = -1;
 	GameObject* returned_obj = NULL;
@@ -993,8 +993,11 @@ GameObject* Game::GetClosestObjectTyped(const sf::Vector2f ref_position, GameObj
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
-				shortest_distance = distance_to_ref;
-				returned_obj = (*it);
+				if (distance_to_ref < dist_max)
+				{
+					shortest_distance = distance_to_ref;
+					returned_obj = (*it);
+				}
 			}
 		}
 	}
@@ -1002,7 +1005,7 @@ GameObject* Game::GetClosestObjectTyped(const sf::Vector2f ref_position, GameObj
 	return returned_obj;
 }
 
-GameObject* Game::GetClosestObjectTypedIncoming(const GameObject* ref_obj, GameObjectType type_of_closest_object, float delta_angle_max)
+GameObject* Game::GetClosestObjectTypedIncoming(const GameObject* ref_obj, GameObjectType type_of_closest_object, float delta_angle_max, float dist_max)
 {
 	float shortest_distance = -1;
 	GameObject* returned_obj = NULL;
@@ -1020,15 +1023,19 @@ GameObject* Game::GetClosestObjectTypedIncoming(const GameObject* ref_obj, GameO
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
-				float angle_delta = GameObject::GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), ref_obj->getPosition());
-				if (angle_delta < 0)      
-					angle_delta = -angle_delta;
-
-				if (angle_delta < delta_angle_max)
+				if (distance_to_ref > dist_max)
 				{
-					shortest_distance = distance_to_ref;
-					returned_obj = (*it);
+					float angle_delta = GameObject::GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), ref_obj->getPosition());
+					if (angle_delta < 0)
+						angle_delta = -angle_delta;
+
+					if (angle_delta < delta_angle_max)
+					{
+						shortest_distance = distance_to_ref;
+						returned_obj = (*it);
+					}
 				}
+				
 			}
 		}
 	}
