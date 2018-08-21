@@ -1023,7 +1023,7 @@ GameObject* Game::GetClosestObjectTypedIncoming(const GameObject* ref_obj, GameO
 			//if the item is the closest, or the first one to be found, we are selecting it as the target, unless a closer one shows up in a following iteration
 			if (distance_to_ref < shortest_distance || shortest_distance < 0)
 			{
-				if (distance_to_ref > dist_max)
+				if (distance_to_ref < dist_max)
 				{
 					float angle_delta = GameObject::GetAngleDegToTargetPosition((*it)->getPosition(), (*it)->getRotation(), ref_obj->getPosition());
 					if (angle_delta < 0)
