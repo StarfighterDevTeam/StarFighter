@@ -101,6 +101,7 @@ public:
 	bool BounceOnBorders(sf::Vector2f area_size);
 	bool IsInsideArea(sf::Vector2f coordinates, sf::Vector2f area_size);
 	static bool IsInsideArea(sf::Vector2f bounds, sf::Vector2f coordinates, sf::Vector2f area_size);
+	float SetRotationToTarget(sf::Vector2f target_position);
 
 	static bool NormalizeVector(sf::Vector2f* vector, float max_value);
 	static void ScaleVector(sf::Vector2f* vector, float target_value);

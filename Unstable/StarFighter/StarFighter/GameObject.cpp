@@ -344,6 +344,14 @@ void GameObject::SetVectorRotation(sf::Vector2f* vector, float angle_rad)
 	sf::Vector2f new_vector = GetVectorFromLengthAndAngle(length, angle_rad);
 }
 
+float GameObject::SetRotationToTarget(sf::Vector2f target_position)
+{
+	float angle_deg = GetAngleDegToTargetPosition(getPosition(), getRotation(), target_position);
+	rotate(angle_deg);
+
+	return angle_deg;
+}
+
 sf::Vector2f GameObject::GetVectorFromLengthAndAngle(float absolute_speed, float curAngle)
 {
 	sf::Vector2f speed;
