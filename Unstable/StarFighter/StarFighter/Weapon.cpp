@@ -15,7 +15,7 @@ extern Game* CurrentGame;
 #define MELEE_SPEAR_RANGE_Y				40.f
 #define MELEE_SPEAR_DURATION			0.5f
 
-#define RANGED_SHURIKEN_SPEED			500.f
+#define RANGED_SHURIKEN_SPEED			1000.f
 #define RANGED_SHURIKEN_COOLDOWN		0.1f
 
 Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
@@ -37,11 +37,12 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 			m_attack_duration = MELEE_KATANA_DURATION;
 			m_attack_cooldown = PLAYER_ATTACK_COOLDOWN;
 			m_dmg = 1;
-			m_is_piercing = false;
+			m_is_piercing = true;
 			m_is_ranged = false;
 			m_can_be_parried = true;
 
 			Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), sf::Color(255, 255, 255,255), m_range);
+			//Init(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "2D/katana_fx.png", sf::Vector2f(80, 71), 4, 2);
 			break;
 		}
 
@@ -84,6 +85,7 @@ Weapon::Weapon(GameObject* owner, WeaponType type, sf::Color color)
 	m_attack_timer = m_attack_duration;
 	m_DontGarbageMe = true;
 	setColor(color);
+	setLooped(false);
 	m_visible = false;
 	Extend(sf::Vector2f(0.f, 1.f));
 }
@@ -122,7 +124,7 @@ void Weapon::CollisionWithEnemy(GameObject* enemy)
 	{
 		m_enemies_tagged.push_back(enemy);
 		
-		enemy->DealDamage(m_dmg);
+		enemy->DealDamage(m_dmg, getPosition());
 	}
 }
 

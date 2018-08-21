@@ -10,6 +10,7 @@ void InGameState::Initialize(Player player)
 	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(96, 96), sf::Vector2f(48, 48));
 	(*CurrentGame).m_playerShip = playerShip;
 	(*CurrentGame).addToScene(playerShip, PlayerShipLayer, PlayerShip);
+	playerShip->setRotation(90);
 
 	//Load saved file
 	if (!Ship::LoadShip(playerShip))
@@ -36,7 +37,7 @@ void InGameState::Initialize(Player player)
 
 	float step = 0;
 
-	Enemy* wufeng = new Enemy(Enemy_Wufeng_Summoner, sf::Vector2f(SHIP_START_X + 1000, SHIP_START_Y + 100));
+	Enemy* wufeng = new Enemy(Enemy_Wufeng_Summoner, sf::Vector2f(500, SHIP_START_Y + 100));
 	(*CurrentGame).addToScene(wufeng, EnemyObjectLayer, EnemyObject);
 
 	Landmark* gong = new Landmark(Landmark_Gong, sf::Vector2f(1100, 200));

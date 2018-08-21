@@ -112,7 +112,7 @@ public:
 	virtual void CollisionWithBullet(GameObject* enemy_bullet);
 	virtual GameObject* GetDashEnemy();
 	virtual void SetDashEnemy(GameObject* enemy);
-	virtual bool DealDamage(int dmg);
+	virtual bool DealDamage(int dmg, sf::Vector2f dmg_source_position);
 	virtual void Death();
 	virtual void GetLoot(GameObject* loot);
 	virtual int GetRating();

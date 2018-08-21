@@ -675,7 +675,7 @@ void GameObject::SetDashEnemy(GameObject* enemy)
 	//see override function in class Ship
 }
 
-bool GameObject::DealDamage(int dmg)
+bool GameObject::DealDamage(int dmg, sf::Vector2f dmg_source_position)
 {
 	//see override function in class Ship and Enemy
 	return false;

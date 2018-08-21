@@ -551,6 +551,42 @@ void Enemy::update(sf::Time deltaTime)
 	//bounce on screen borders
 	bool bounced = BounceOnBorders((*CurrentGame).m_map_size);
 
+	//end of glide offense?
+	if (m_state == EnemyState_GlideOffense)
+	{
+		float speed = GetAbsoluteSpeed();
+
+		speed -= GLIDE_OFFENSE_DECREASE * deltaTime.asSeconds();
+
+		if (speed <= 0)
+		{
+			m_speed = sf::Vector2f(0, 0);
+			SetEnemyState(EnemyState_Idle);
+		}
+		else
+		{
+			ScaleVector(&m_speed, speed);
+		}
+	}
+
+	//end of glide defense?
+	if (m_state == EnemyState_GlideDefense)
+	{
+		float speed = GetAbsoluteSpeed();
+
+		speed -= GLIDE_DEFENSE_DECREASE * deltaTime.asSeconds();
+
+		if (speed <= 0)
+		{
+			m_speed = sf::Vector2f(0, 0);
+			SetEnemyState(EnemyState_Idle);
+		}
+		else
+		{
+			ScaleVector(&m_speed, speed);
+		}
+	}
+
 	//end of dash?
 	if (m_state == EnemyState_Dash)
 	{
@@ -570,7 +606,7 @@ void Enemy::update(sf::Time deltaTime)
 		}
 	}
 	
-	if (m_is_attacking)//reset
+	if (m_is_attacking)//reset attack
 	{
 		if (m_weapon && m_weapon->m_attack_timer >= m_weapon->m_attack_duration)
 		{
@@ -598,6 +634,9 @@ void Enemy::update(sf::Time deltaTime)
 
 	//AI strategy
 	UpdateAI(deltaTime);
+
+	//if (m_type != Enemy_Ghost)
+	//	m_hp = m_hp_max;
 	// # # #
 
 	if (m_is_attacking)//update
@@ -628,13 +667,16 @@ void Enemy::update(sf::Time deltaTime)
 
 	GameObject::update(deltaTime);
 
-	UpdateRotation();
+	if (m_state != EnemyState_GlideDefense)
+	{
+		UpdateRotation();
+	}
 
 	//debug
 	m_aggro_radius_feedback.setPosition(getPosition());
 }
 
-bool Enemy::DealDamage(int dmg)
+bool Enemy::DealDamage(int dmg, sf::Vector2f dmg_source_position)
 {
 	m_hp -= dmg;
 
@@ -646,6 +688,13 @@ bool Enemy::DealDamage(int dmg)
 	{
 		m_hit_feedback_timer = 0.f;
 		(*CurrentGame).PlaySFX(SFX_GruntEnemy);
+
+		//glide defense
+		SetEnemyState(EnemyState_GlideDefense);
+		sf::Vector2f speed_vector = getPosition() - dmg_source_position;
+		ScaleVector(&speed_vector, GLIDE_DEFENSE_SPEED);
+		NormalizeVector(&m_speed, m_ref_speed);
+		m_speed += speed_vector;
 	}
 
 	return m_hp <= 0;
@@ -722,6 +771,16 @@ bool Enemy::AttackTarget(GameObject* target)
 
 		m_is_attacking = true;
 		m_attack_cooldown_timer = 0.f;
+
+		//glide offense
+		if (m_weapon && !m_weapon->m_is_ranged)
+		{
+			SetEnemyState(EnemyState_GlideOffense);
+			sf::Vector2f speed_vector = GetVectorFromLengthAndAngle(1.f, (getRotation() - 180.f) * M_PI / 180.f);
+			ScaleVector(&speed_vector, GLIDE_OFFENSE_SPEED);
+			NormalizeVector(&m_speed, m_ref_speed);
+			m_speed += speed_vector;
+		}
 	}
 
 	return m_is_attacking;

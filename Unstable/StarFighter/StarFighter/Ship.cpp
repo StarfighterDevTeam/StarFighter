@@ -39,7 +39,7 @@ void Ship::Init()
 	m_SFTargetPanel = NULL;
 	m_is_asking_SFPanel = SFPanel_None;
 
-	m_move_state = Character_Idle;
+	SetMoveState(Character_Idle);
 	m_dash_enemy = NULL;
 
 	m_dash_radius = DASH_RADIUS;
@@ -163,6 +163,42 @@ void Ship::update(sf::Time deltaTime)
 	//Action input
 	UpdateInputStates();
 
+	//end of glide offense?
+	if (m_move_state == Character_Glide_Offense)
+	{
+		float speed = GetAbsoluteSpeed();
+
+ 		speed -= GLIDE_OFFENSE_DECREASE * deltaTime.asSeconds();
+
+		if (speed <= 0)
+		{
+			m_speed = sf::Vector2f(0, 0);
+			SetMoveState(Character_Idle);
+		}
+		else
+		{
+			ScaleVector(&m_speed, speed);
+		}
+	}
+
+	//end of glide defense?
+	if (m_move_state == Character_Glide_Defense)
+	{
+		float speed = GetAbsoluteSpeed();
+
+		speed -= GLIDE_DEFENSE_DECREASE * deltaTime.asSeconds();
+
+		if (speed <= 0)
+		{
+			m_speed = sf::Vector2f(0, 0);
+			SetMoveState(Character_Idle);
+		}
+		else
+		{
+			ScaleVector(&m_speed, speed);
+		}
+	}
+
 	//ATTACKS
 	GameObject* dash_enemy = NULL;
 	if (m_dash_ammo_current > 0)
@@ -170,32 +206,32 @@ void Ship::update(sf::Time deltaTime)
 		dash_enemy = (*CurrentGame).getDashTargetWithBlacklist(m_dash_radius, m_dash_enemies_tagged);
 	}
 
+	//Attack
+	if (m_is_attacking)//reset attack
+	{
+		if (m_weapon && m_weapon->m_attack_timer >= m_weapon->m_attack_duration)
+		{
+			m_weapon->m_visible = false;
+			m_weapon->Extend(sf::Vector2f(0.f, 1.f));
+			m_weapon->m_enemies_tagged.clear();
+			m_weapon->setColor(m_weapon->m_color);
+
+			if (m_weapon->m_is_ranged && m_weapon->m_bullet_is_unique && m_weapon->GetFiredBulletsCount() > 0)
+			{
+				//do nothing
+			}
+			else
+			{
+				m_is_attacking = false;
+				m_attack_cooldown_timer = 0.f;
+			}
+		}
+	}
+
 	if (m_move_state == Character_Idle)
 	{
 		ManageAcceleration(inputs_direction);
 
-		//Attack
-		if (m_is_attacking)//reset
-		{
-			if (m_weapon && m_weapon->m_attack_timer >= m_weapon->m_attack_duration)
-			{
-				m_weapon->m_visible = false;
-				m_weapon->Extend(sf::Vector2f(0.f, 1.f));
-				m_weapon->m_enemies_tagged.clear();
-				m_weapon->setColor(m_weapon->m_color);
-
-				if (m_weapon->m_is_ranged && m_weapon->m_bullet_is_unique && m_weapon->GetFiredBulletsCount() > 0)
-				{
-					//do nothing
-				}
-				else
-				{
-					m_is_attacking = false;
-					m_attack_cooldown_timer = 0.f;
-				}
-			}
-		}
-		
 		if (m_inputs_states[Action_Melee] == Input_Tap)//start attack
 		{
 			if (m_weapon && m_attack_cooldown_timer >= m_weapon->m_attack_cooldown)
@@ -214,22 +250,17 @@ void Ship::update(sf::Time deltaTime)
 
 					m_is_attacking = true;
 					m_weapon->m_attack_timer = 0.f;
-				}
-			}
-		}
-		
 
-		if (m_is_attacking)//update
-		{
-			if (m_weapon->m_attack_duration > 0)
-			{
-				float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
-				if (ratio > 1.0f)
-				{
-					ratio = 1.0f;
+					//glide offense
+					if (m_weapon && !m_weapon->m_is_ranged)
+					{
+						SetMoveState(Character_Glide_Offense);
+						sf::Vector2f speed_vector = GetVectorFromLengthAndAngle(1.f, (getRotation() - 180.f) * M_PI / 180.f);
+						ScaleVector(&speed_vector, GLIDE_OFFENSE_SPEED);
+						NormalizeVector(&m_speed, PLAYER_DEFAULT_SPEED);
+						m_speed += speed_vector;
+					}
 				}
-
-				m_weapon->Extend(sf::Vector2f(ratio, 1.f));
 			}
 		}
 
@@ -243,7 +274,7 @@ void Ship::update(sf::Time deltaTime)
 					m_dash_streak = 0;
 
 					(*CurrentGame).CreateSFTextPop("Dash", Font_Arial, 24, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y / 2 - 20);
-					m_move_state = Character_Dash;
+					SetMoveState(Character_Dash);
 
 					float cur_angle = (getRotation() - 180) / 180 * M_PI;
 
@@ -276,6 +307,20 @@ void Ship::update(sf::Time deltaTime)
 		}
 	}
 
+	if (m_is_attacking)//update
+	{
+		if (m_weapon->m_attack_duration > 0.f)
+		{
+			float ratio = m_weapon->m_attack_timer / m_weapon->m_attack_duration;
+			if (ratio > 1.0f)
+			{
+				ratio = 1.0f;
+			}
+
+			m_weapon->Extend(sf::Vector2f(ratio, 1.f));
+		}
+	}
+
 	if (m_move_state == Character_Dash)
 	{
 		sf::Vector2f dash_vector = m_dash_target - getPosition();
@@ -302,7 +347,6 @@ void Ship::update(sf::Time deltaTime)
 
 						if (new_dash_enemy)
 						{
-
 							//dash combo
 							m_dash_streak++;
 							m_dash_enemy = new_dash_enemy;
@@ -355,7 +399,7 @@ void Ship::update(sf::Time deltaTime)
 		{
 			m_speed = sf::Vector2f(0, 0);
 			setPosition(m_dash_target);
-			m_move_state = Character_Idle;
+			SetMoveState(Character_Idle);
 			m_dash_cooldown_timer = 0.f;
 			m_dash_enemies_tagged.clear();
 			(*CurrentGame).m_timescale = 1.f;
@@ -386,7 +430,10 @@ void Ship::update(sf::Time deltaTime)
 
 	GameObject::update(deltaTime);
 
-	UpdateRotation();
+	if (m_move_state != Character_Glide_Defense)
+	{
+		UpdateRotation();
+	}
 
 	//HUD
 	m_is_asking_SFPanel = SFPanel_None;
@@ -399,7 +446,7 @@ void Ship::update(sf::Time deltaTime)
 	{
 		if (m_move_state == Character_Dash)
 		{
-			m_move_state = Character_Idle;
+			SetMoveState(Character_Idle);
 			m_speed = sf::Vector2f(0, 0);
 			m_dash_cooldown_timer = 0.f;
 			m_dash_enemies_tagged.clear();
@@ -634,7 +681,7 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 		if (GetDistanceBetweenObjects(enemy, this) < 16)//we don't aim for a pixel collision here but for a true proximity to the center of the enemy
 		{
 			int dmg = m_weapon ? m_weapon->m_dmg : 0;
-			m_dash_enemy->DealDamage(dmg);
+			m_dash_enemy->DealDamage(dmg, getPosition());
 
 			m_dash_enemy = NULL;
 		}
@@ -642,7 +689,7 @@ void Ship::CollisionWithEnemy(GameObject* enemy)
 	else if (m_move_state != Character_Dash)
 	{
 		Enemy* enemy_ = (Enemy*)enemy;
-		DealDamage(enemy_->m_dmg);
+		DealDamage(enemy_->m_dmg, enemy->getPosition());
 	}
 }
 
@@ -683,7 +730,7 @@ void Ship::SetDashEnemy(GameObject* enemy)
 	m_dash_enemy = enemy;
 }
 
-bool Ship::DealDamage(int dmg)
+bool Ship::DealDamage(int dmg, sf::Vector2f dmg_source_position)
 {
 	if (m_immune_timer < IMMUNE_DMG_DURATION == false)
 	{
@@ -698,6 +745,13 @@ bool Ship::DealDamage(int dmg)
 		{
 			m_hit_feedback_timer = 0.f;
 			(*CurrentGame).PlaySFX(SFX_GruntPlayer);
+
+			//glide defense
+			SetMoveState(Character_Glide_Defense);
+			sf::Vector2f speed_vector = getPosition() - dmg_source_position;
+			ScaleVector(&speed_vector, GLIDE_DEFENSE_SPEED);
+			NormalizeVector(&m_speed, PLAYER_DEFAULT_SPEED);
+			m_speed += speed_vector;
 		}
 	}
 
@@ -709,7 +763,7 @@ void Ship::Death()
 	setGhost(true);
 	m_weapon->setGhost(true);
 
-	m_move_state = Character_Idle;
+	SetMoveState(Character_Idle);
 	m_speed = sf::Vector2f(0, 0);
 
 	m_dash_enemy = NULL;
@@ -812,5 +866,16 @@ void Ship::GetLoot(GameObject* object)
 			weapon = NULL;
 			break;
 		}
+	}
+}
+
+void Ship::SetMoveState(MoveStates state)
+{
+	m_move_state = state;
+
+	switch (state)
+	{
+	default:
+		break;
 	}
 }

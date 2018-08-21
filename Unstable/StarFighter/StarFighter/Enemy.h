@@ -6,6 +6,12 @@
 #include "GameObject.h"
 #include "Loot.h"// > Weapon > Ammo > FX
 
+#define GLIDE_OFFENSE_SPEED				700.f
+#define GLIDE_OFFENSE_DECREASE			7000.f	
+
+#define GLIDE_DEFENSE_SPEED				1000.f
+#define GLIDE_DEFENSE_DECREASE			7000.f	
+
 class Ship;
 
 enum EnemyType
@@ -24,6 +30,8 @@ enum EnemyState
 	EnemyState_FollowTarget,
 	EnemyState_Summoning,
 	EnemyState_Dash,
+	EnemyState_GlideOffense,
+	EnemyState_GlideDefense,
 };
 
 class Enemy : public GameObject
@@ -35,7 +43,7 @@ public :
 	void update(sf::Time deltaTime) override;
 	void Draw(sf::RenderTexture& screen) override;
 
-	bool DealDamage(int dmg) override;
+	bool DealDamage(int dmg, sf::Vector2f dmg_source_position) override;
 	void Death() override;
 
 	EnemyType m_type;

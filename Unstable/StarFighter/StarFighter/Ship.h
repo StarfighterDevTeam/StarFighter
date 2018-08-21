@@ -39,6 +39,8 @@ enum MoveStates
 {
 	Character_Idle,
 	Character_Dash,
+	Character_Glide_Offense,
+	Character_Glide_Defense,
 };
 
 class Ship : public GameObject
@@ -77,6 +79,7 @@ public :
 	SFPanelTypes m_is_asking_SFPanel;
 
 	MoveStates m_move_state;
+	void SetMoveState(MoveStates state);
 
 	//dash
 	sf::Vector2f m_dash_target;
@@ -108,7 +111,7 @@ public :
 	void CollisionWithBullet(GameObject* enemy_bullet) override;
 	GameObject* GetDashEnemy() override;
 	void SetDashEnemy(GameObject* enemy) override;
-	bool DealDamage(int dmg) override;
+	bool DealDamage(int dmg, sf::Vector2f dmg_source_position) override;
 	void Death() override;
 	void Respawn();
 	void GetLoot(GameObject* object) override;

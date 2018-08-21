@@ -48,7 +48,7 @@ void Ammo::CollisionWithEnemy(GameObject* enemy)
 {
 	if (m_is_piercing == false)// && m_enemies_tagged.size() > 0)//piercing is the ability to hit several targets with one stroke
 	{
-		enemy->DealDamage(m_dmg);
+		enemy->DealDamage(m_dmg, getPosition());
 		m_GarbageMe = true;
 		m_visible = false;
 	}
@@ -59,7 +59,7 @@ void Ammo::CollisionWithEnemy(GameObject* enemy)
 		{
 			m_enemies_tagged.push_back(enemy);
 
-			enemy->DealDamage(m_dmg);
+			enemy->DealDamage(m_dmg, getPosition());
 		}
 	}
 }
