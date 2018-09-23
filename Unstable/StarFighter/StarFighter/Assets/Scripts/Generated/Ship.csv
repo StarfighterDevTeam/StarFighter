@@ -1,2 +1,2 @@
-#shipconfig_name,speed
-default_config,500
+#red,green,blue,alpha,label
+0,255,0,0,0

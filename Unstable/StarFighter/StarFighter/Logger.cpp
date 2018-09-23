@@ -21,6 +21,9 @@ void Logger::Stop()
 
 void Logger::Write(Priority priority, const string& message)
 {
+	//NeuralNetwork hack
+	return;
+
 	if (instance.active && priority >= instance.minPriority)
 	{
 		// identify current output stream
