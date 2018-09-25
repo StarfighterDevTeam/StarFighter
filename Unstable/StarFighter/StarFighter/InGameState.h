@@ -12,13 +12,15 @@
 
 class GameObject;
 
-#define NEURAL_NETWORK_DEPTH				2
-#define NEURAL_NETWORK_HEIGHT				4
-#define NEURAL_NETWORK_ERROR_MARGIN			0.02
-#define NEURAL_NETWORK_LEARNING_RATE		0.5
+#define NEURAL_NETWORK_DEPTH						2
+#define NEURAL_NETWORK_HEIGHT						4
+#define NEURAL_NETWORK_ERROR_MARGIN					0.002
+#define NEURAL_NETWORK_LEARNING_RATE				0.01
+#define NEURAL_NETWORK_MOMENTUM						0.01
 
-#define DATASET_SIZE						100
-#define DATASET_SUPERVISED_LOT				75
+#define DATASET_SIZE								500
+#define DATASET_SUPERVISED_LOT						300
+#define DATASET_TESTING_LOT							100
 
 enum Label
 {
@@ -34,6 +36,13 @@ enum Features
 	GREEN,		//1
 	BLUE,		//2
 	NB_FEATURES,	//3
+};
+
+enum ActivationFunctions
+{
+	LINEAR,		//0
+	SIGMOID,	//1
+	THRESHOLD,	//2
 };
 
 class Data
@@ -65,10 +74,10 @@ class Neuron
 {
 public:
 	Neuron();
-	bool CorrectWeight(int index);
 
 	float m_value;
 	float m_weight[NEURAL_NETWORK_HEIGHT];
+	float m_previous_weight[NEURAL_NETWORK_HEIGHT];
 	float m_error;
 };
 
@@ -87,6 +96,7 @@ public:
 	float ActivationFunction(float x);
 	void FillWithData();
 	void Train();
+	void RestorePreviousWeight();
 	void DoNothing(){};
 	string GetLabelString(Label label)
 	{
