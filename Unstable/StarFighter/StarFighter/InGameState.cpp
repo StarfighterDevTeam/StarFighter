@@ -205,11 +205,16 @@ void InGameState::LoadCSVFile(string scenes_file)
 // NEURAL NETWORK
 Neuron::Neuron()
 {
+	float total_weight = 0;
 	for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
 	{
 		m_weight[j] = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f));
+		total_weight += m_weight[j];
 	}
-
+	for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
+	{
+		m_weight[j] = total_weight == 0 ? 0 : m_weight[j] / total_weight;
+	}
 }
 
 bool Neuron::CorrectWeight(int index)
@@ -285,11 +290,19 @@ NeuralNetwork::~NeuralNetwork()
 
 void NeuralNetwork::Train()
 {
-	for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
+	for (int d = 0; d < DATASET_SIZE; d++)
 	{
-		printf("\nTraining supervised on labelled data: %d/%d.\n", d, DATASET_SUPERVISED_LOT);
-		
-		Label input_label = m_labelled_dataset[d].m_label;
+		Label input_label;
+		if (d < DATASET_SUPERVISED_LOT)
+		{
+			printf("\nTraining supervised on labelled data: %d/%d.\n", d, DATASET_SUPERVISED_LOT-1);
+			input_label = m_labelled_dataset[d].m_label;
+		}
+		else
+		{
+			printf("\nTesting model on unlabelled data: %d/%d.\n", d - DATASET_SUPERVISED_LOT, DATASET_SIZE - DATASET_SUPERVISED_LOT-1);
+		}
+			
 		float error = -1;
 		float previous_error = -1;
 		float learning_rate = NEURAL_NETWORK_LEARNING_RATE;
@@ -309,8 +322,15 @@ void NeuralNetwork::Train()
 			//Convert data into Input features between 0 and 1
 			for (int f = 0; f < NB_FEATURES; f++)
 			{
-				//clamping values on entropy
-				m_input_layer[f]->m_value = Lerp(m_labelled_dataset[d].m_features[f], 0.f, 255.f, 0.f, 1.f);
+				//clamping values on entropy and feeding them into the Input layer
+				if (d < DATASET_SUPERVISED_LOT)
+				{
+					m_input_layer[f]->m_value = Lerp(m_labelled_dataset[d].m_features[f], 0.f, 255.f, 0.f, 1.f);
+				}
+				else
+				{
+					m_input_layer[f]->m_value = Lerp(m_unlabelled_dataset[d - DATASET_SUPERVISED_LOT].m_features[f], 0.f, 255.f, 0.f, 1.f);
+				}
 			}
 			m_input_layer[NB_FEATURES]->m_value = 1.f;//"1" channel
 
@@ -364,6 +384,8 @@ void NeuralNetwork::Train()
 			{
 				m_output_layer[0]->m_value += m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_value * m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0];
 				printf("%.3f * %.3f", m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_value, m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0]);
+				if (j < NEURAL_NETWORK_HEIGHT - 1)
+					printf(" + ");
 			}
 			printf(" = %.3f", m_output_layer[0]->m_value);
 
@@ -372,32 +394,69 @@ void NeuralNetwork::Train()
 			printf(" |->activation: %.3f\n", m_output_layer[0]->m_value);
 			
 			//Label recognition
-			if (input_label == IS_GREEN)
+			if (d < DATASET_SUPERVISED_LOT)
 			{
-				error = 1 - m_output_layer[0]->m_value;
+				if (input_label == IS_GREEN)
+				{
+					error = 1 - m_output_layer[0]->m_value;
+				}
+				else if (input_label == NOT_GREEN)
+				{
+					error = -m_output_layer[0]->m_value;
+				}
 			}
-			else if (input_label == NOT_GREEN)
+			else
 			{
-				error = m_output_layer[0]->m_value;
-			}
-			m_output_layer[0]->m_error = error;
+				//Control of predicted labels
+				if (m_output_layer[0]->m_value > 1 - NEURAL_NETWORK_ERROR_MARGIN)
+				{
+					if (d - DATASET_SUPERVISED_LOT % 2 == 1)
+					{
+						m_unlabelled_dataset[d - DATASET_SUPERVISED_LOT].m_label = IS_GREEN;
+						printf("\nTest data %d labelled as %s = SUCCESS.\n\n", d, GetLabelString(m_unlabelled_dataset[d - DATASET_SUPERVISED_LOT].m_label).c_str());
+						break;
+					}
+					else
+					{
+						printf("\nTest data %d labelled as %s = FAIL.\n\n", d - DATASET_SUPERVISED_LOT, "IS_GREEN");
+						error = - m_output_layer[0]->m_value;
+					}
+				}
+				else
+				{
+					if (d - DATASET_SUPERVISED_LOT % 2 == 0)
+					{
+						m_unlabelled_dataset[d - DATASET_SUPERVISED_LOT].m_label = NOT_GREEN;
+						printf("\nTest data %d labelled as %s = SUCCESS.\n\n", d, GetLabelString(m_unlabelled_dataset[d - DATASET_SUPERVISED_LOT].m_label).c_str());
+						break;
+					}
+					else
+					{
 
+						printf("\nTest data %d labelled as %s = FAIL.\n\n", d - DATASET_SUPERVISED_LOT, "NOT_GREEN");
+						error = 1 - m_output_layer[0]->m_value;
+					}
+				}
+			}
+			
 			//Success?
 			if (abs(error) < NEURAL_NETWORK_ERROR_MARGIN)
 			{
-				printf("Data %d successfully recognized (%d attempt(s)).\n", d, attempt);
+				printf("\nSupervised data %d successfully recognized as %s (%d attempt(s)).\n\n", d, GetLabelString(input_label).c_str(), attempt);
 				break;
 			}
 			//Error backpropagation
 			else
 			{
+				m_output_layer[0]->m_error = error;
+
 				//Learning rate moderation
 				float learning_rate = NEURAL_NETWORK_LEARNING_RATE;
-				if (abs(error) < 1 && abs(error) > abs(previous_error))
+				if (d > DATASET_SUPERVISED_LOT - 1 || (abs(error) < 1 && abs(error) > abs(previous_error)))
 				{
 					learning_rate *= 0.1;
 				}
-				printf("Error: %f (previous error: %f). Learning rate: %f\n", error, previous_error, learning_rate);
+				printf("\n>>Error: %f (previous error: %f). Learning rate: %f\n\n", error, previous_error, learning_rate);
 
 				//Hidden layers -> output layer
 				printf("Backpropagation|Output->Hidden %d:\n", NEURAL_NETWORK_DEPTH - 1);
@@ -479,9 +538,7 @@ float NeuralNetwork::ActivationFunction(float x)
 {
 	//float output_value = 1.f / (1 + pow((1 / 2, 71828), x));
 	float output_value = x;// = Bound(x, 0.f, 1.f);
-
-	return output_value;
-
+	
 	if (output_value > 0.5f)
 	{
 		output_value = 1.f;
@@ -491,7 +548,7 @@ float NeuralNetwork::ActivationFunction(float x)
 		output_value = 0.f;
 	}
 
-	
+	return output_value;
 }
 
 		/*

@@ -13,12 +13,12 @@
 class GameObject;
 
 #define NEURAL_NETWORK_DEPTH				2
-#define NEURAL_NETWORK_HEIGHT			4
-#define NEURAL_NETWORK_ERROR_MARGIN		0.02
-#define NEURAL_NETWORK_LEARNING_RATE		0.4
+#define NEURAL_NETWORK_HEIGHT				4
+#define NEURAL_NETWORK_ERROR_MARGIN			0.02
+#define NEURAL_NETWORK_LEARNING_RATE		0.5
 
 #define DATASET_SIZE						100
-#define DATASET_SUPERVISED_LOT			75
+#define DATASET_SUPERVISED_LOT				75
 
 enum Label
 {
@@ -88,10 +88,10 @@ public:
 	void FillWithData();
 	void Train();
 	void DoNothing(){};
-	string GetLabelString(int label)
+	string GetLabelString(Label label)
 	{
 		if (label == IS_GREEN)
-			return "GREEN";
+			return "IS_GREEN";
 		if (label == NOT_GREEN)
 			return "NOT GREEN";
 	};
