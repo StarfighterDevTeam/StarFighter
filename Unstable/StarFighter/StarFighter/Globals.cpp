@@ -156,6 +156,17 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 	return lerp;
 }
 
+float Bound(float value, float output_min, float output_max)
+{
+	if (value < output_min)
+		return output_min;
+
+	if (value > output_max)
+		return output_max;
+
+	return value;
+}
+
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max)
 {
 	if (input_min == input_max)

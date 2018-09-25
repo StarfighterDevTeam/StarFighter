@@ -12,87 +12,52 @@
 
 class GameObject;
 
-#define NEURAL_NETWORK_DEPTH		4
-#define NEURAL_NETWORK_HEIGHT		4
-#define NEURAL_NETWORK_FEATURES		4
+#define NEURAL_NETWORK_DEPTH				2
+#define NEURAL_NETWORK_HEIGHT			4
+#define NEURAL_NETWORK_ERROR_MARGIN		0.02
+#define NEURAL_NETWORK_LEARNING_RATE		0.4
+
+#define DATASET_SIZE						100
+#define DATASET_SUPERVISED_LOT			75
 
 enum Label
 {
-	GREEN,	//0
-	RED,	//1
-	BLUE,	//2
-	OTHER,	//3
+	IS_GREEN,	//0
+	NB_LABELS,	//1
+	NOT_GREEN,	//2
+	UNLABELLED,	//3
+};
+
+enum Features
+{
+	RED,			//0
+	GREEN,		//1
+	BLUE,		//2
+	NB_FEATURES,	//3
 };
 
 class Data
 {
 public:
-	int* m_red;
-	int* m_green;
-	int* m_blue;
-	int* m_alpha;
+	int m_features[NB_FEATURES];
+	Label m_label;
 
-	int* m_features[NEURAL_NETWORK_FEATURES];
-
-	Label* m_label;//"green"
-
-	Data()
+	Data(int red, int green, int blue, Label label)
 	{
-		m_red = new int(); 
-		m_red = 0;
-		m_green = new int();
-		m_green = 0;
-		m_blue = new int();
-		m_blue = 0;
-		m_alpha = new int();
-		m_alpha = 0;
-
-		m_label = NULL;
-
-		for (int f = 0; f < NEURAL_NETWORK_FEATURES; f++)
-		{
-			m_features[f] = new int();
-		}
-	}
-
-	Data(int* red, int* green, int* blue, int* alpha, Label* label)
-	{
-		m_red = new int();
-		m_red = red;
-		
-		m_green = new int();
-		m_green = green;
-		
-		m_blue = new int();
-		m_blue = blue;
-		
-		m_alpha = new int();
-		m_alpha = alpha;
-		
-		m_label = new Label();
+		m_features[RED] = red;
+		m_features[GREEN] = green;
+		m_features[BLUE] = blue;
+	
 		m_label = label;
-
-		for (int f = 0; f < NEURAL_NETWORK_FEATURES; f++)
-		{
-			m_features[f] = new int();
-		}
 	}
 
 	void Copy(Data data)
 	{
-		m_red = data.m_red;
-		m_green = data.m_green;
-		m_blue = data.m_blue;
-		m_alpha = data.m_alpha;
+		for (int f = 0; f < NB_FEATURES; f++)
+		{
+			m_features[f] = data.m_features[f];
+		}
 		m_label = data.m_label;
-	}
-
-	void GetFeatures()
-	{
-		m_features[0] = m_red;
-		m_features[1] = m_green;
-		m_features[2] = m_blue;
-		m_features[3] = m_alpha;
 	}
 };
 
@@ -100,27 +65,36 @@ class Neuron
 {
 public:
 	Neuron();
+	bool CorrectWeight(int index);
 
-	Data m_data;
+	float m_value;
 	float m_weight[NEURAL_NETWORK_HEIGHT];
+	float m_error;
 };
 
 class NeuralNetwork
 {
 public:
-
 	NeuralNetwork();
 	~NeuralNetwork();
 
-	Neuron* m_input_layer[NEURAL_NETWORK_FEATURES];
-	Neuron* m_output_layer[NEURAL_NETWORK_FEATURES];
-	Neuron* m_network[NEURAL_NETWORK_HEIGHT][NEURAL_NETWORK_DEPTH];
+	Neuron* m_input_layer[NB_FEATURES + 1];
+	Neuron* m_output_layer[NB_LABELS];
+	Neuron* m_hidden_layers[NEURAL_NETWORK_HEIGHT][NEURAL_NETWORK_DEPTH];
 	vector<Data> m_labelled_dataset;
 	vector<Data> m_unlabelled_dataset;
 
-	bool AddData(Data data);
-	bool Train();
+	float ActivationFunction(float x);
+	void FillWithData();
+	void Train();
 	void DoNothing(){};
+	string GetLabelString(int label)
+	{
+		if (label == IS_GREEN)
+			return "GREEN";
+		if (label == NOT_GREEN)
+			return "NOT GREEN";
+	};
 };
 
 class InGameState : public GameState
