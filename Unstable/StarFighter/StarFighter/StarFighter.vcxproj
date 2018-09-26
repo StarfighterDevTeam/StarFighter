@@ -86,60 +86,12 @@
     <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AnimatedSprite.cpp" />
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="CollisionUtils.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="Glow.cpp" />
-    <ClCompile Include="InputGuy.cpp" />
-    <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="InGameState.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PrefsManager.cpp" />
-    <ClCompile Include="SFPanel.cpp" />
-    <ClCompile Include="SFPanelSpecific.cpp" />
-    <ClCompile Include="SFText.cpp" />
-    <ClCompile Include="SFTextPop.cpp" />
-    <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StarFighter.cpp" />
-    <ClCompile Include="Stroboscopic.cpp" />
-    <ClCompile Include="TextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AnimatedSprite.hpp" />
-    <ClInclude Include="Animation.hpp" />
-    <ClInclude Include="CollisionUtils.h" />
-    <ClInclude Include="FileLoadUtils.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="Glow.h" />
-    <ClInclude Include="Includes\SimpleCollision.hpp" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="InputGuy.h" />
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="InGameState.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PrefsManager.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="SFPanel.h" />
-    <ClInclude Include="SFPanelSpecific.h" />
-    <ClInclude Include="SFText.h" />
-    <ClInclude Include="SFTextPop.h" />
-    <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
-    <ClInclude Include="Stroboscopic.h" />
-    <ClInclude Include="TextUtils.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="StarFighter.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Assets\Icons\ShipModel_icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
