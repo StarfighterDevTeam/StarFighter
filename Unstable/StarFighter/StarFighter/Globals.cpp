@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-int RandomizeIntBetweenRatios(int value, float min_value, float max_value)
+int RandomizeIntBetweenRatios(int value, double min_value, double max_value)
 {
 	double random_rate = ((double) rand() / RAND_MAX);
 	random_rate *= (max_value - min_value);
@@ -10,21 +10,21 @@ int RandomizeIntBetweenRatios(int value, float min_value, float max_value)
 	return i;
 }
 
-float RandomizeFloatBetweenRatios(float value, float min_value, float max_value)
+double RandomizeFloatBetweenRatios(double value, double min_value, double max_value)
 {
 	double random_rate = ((double) rand() / RAND_MAX);
 	random_rate *= (max_value - min_value);
 	random_rate += min_value;
-	float f = (float) (random_rate*value);
+	double f = (double) (random_rate*value);
 
 	return f;
 }
 
-float ProrataBetweenThreshold(float m_value, float min_threshold, float max_threshold)
+double ProrataBetweenThreshold(double m_value, double min_threshold, double max_threshold)
 {
-	float max = max_threshold - min_threshold;
-	float value = m_value - min_threshold;
-	float prorata = value / max;
+	double max = max_threshold - min_threshold;
+	double value = m_value - min_threshold;
+	double prorata = value / max;
 
 	return prorata;
 }
@@ -37,7 +37,7 @@ int RandomizeIntBetweenValues(int min_value, int max_value)
 	return random_value;
 }
 
-int RandomizeIntBetweenFloats(float min_value, float max_value)
+int RandomizeIntBetweenFloats(double min_value, double max_value)
 {
 	int min = floor(min_value + 0.5);
 	int max = floor(max_value + 0.5);
@@ -47,9 +47,9 @@ int RandomizeIntBetweenFloats(float min_value, float max_value)
 	return random_value;
 }
 
-float RandomizeFloatBetweenValues(float min_value, float max_value)
+double RandomizeFloatBetweenValues(double min_value, double max_value)
 {
-	float random_value = (float) ((double) rand() / RAND_MAX);
+	double random_value = (double) ((double) rand() / RAND_MAX);
 	random_value *= (max_value - min_value);
 	random_value += min_value;
 
@@ -70,9 +70,9 @@ int RandomizeSign()
 	return sign;
 }
 
-float MaxBetweenValues(float x, float y)
+double MaxBetweenValues(double x, double y)
 {
-	float max = x;
+	double max = x;
 	if (y > max)
 	{
 		max = y;
@@ -80,9 +80,9 @@ float MaxBetweenValues(float x, float y)
 	return max;
 }
 
-float MinBetweenValues(float x, float y)
+double MinBetweenValues(double x, double y)
 {
-	float min = x;
+	double min = x;
 	if (y < min)
 	{
 		min = y;
@@ -90,7 +90,7 @@ float MinBetweenValues(float x, float y)
 	return min;
 }
 
-float Lerp(float value, float input_min, float input_max, float output_min, float output_max)
+double Lerp(double value, double input_min, double input_max, double output_min, double output_max)
 {
 	if (input_min == input_max)
 		return output_max;
@@ -101,14 +101,14 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 	if (value > input_max)
 		return output_max;
 
-	float ratio = (value - input_min) / (input_max - input_min);
+	double ratio = (value - input_min) / (input_max - input_min);
 
-	float lerp = output_min + ratio * (output_max - output_min);
+	double lerp = output_min + ratio * (output_max - output_min);
 
 	return lerp;
 }
 
-float Bound(float value, float output_min, float output_max)
+double Bound(double value, double output_min, double output_max)
 {
 	if (value < output_min)
 		return output_min;
@@ -119,7 +119,7 @@ float Bound(float value, float output_min, float output_max)
 	return value;
 }
 
-float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max)
+double CosInterpolation(double value, double input_min, double input_max, double output_min, double output_max)
 {
 	if (input_min == input_max)
 		return output_max;
@@ -130,10 +130,10 @@ float CosInterpolation(float value, float input_min, float input_max, float outp
 	if (value > input_max)
 		return output_max;
 
-	float ratio = (1 - cos(value * M_PI)) / 2;
+	double ratio = (1 - cos(value * M_PI)) / 2;
 	//for stiffer curves, use "ratio = (1 - cos(value * value * M_PI)) / 2;"
 
-	float ouput = output_min + ratio * (output_max - output_min);
+	double ouput = output_min + ratio * (output_max - output_min);
 
 	return ouput;
 }

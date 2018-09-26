@@ -49,68 +49,77 @@ enum ActivationFunctions
 	LINEAR,		//0
 	SIGMOID,	//1
 	THRESHOLD,	//2
-	TAHN,		//3
+	TANH,		//3
+};
+
+enum LayerType
+{
+	InputLayer,		//0
+	HiddenLayer,	//1
+	OutpuLayer,		//2
 };
 
 class Data
 {
 public:
-	int m_features[NB_FEATURES];
+	Data(vector<int> features, Label label);
+	Data(Label label);
+
+	vector<int> m_features;
 	Label m_label;
-
-	Data(int red, int green, int blue, Label label)
-	{
-		m_features[RED] = red;
-		m_features[GREEN] = green;
-		m_features[BLUE] = blue;
-
-		m_label = label;
-	}
-
-	void Copy(Data data)
-	{
-		for (int f = 0; f < NB_FEATURES; f++)
-		{
-			m_features[f] = data.m_features[f];
-		}
-		m_label = data.m_label;
-	}
 };
 
 class Neuron
 {
 public:
-	Neuron();
+	double m_value;
+	vector <double> m_weights;
+	vector <double> m_previous_weights;
+	double m_error;
 
-	float m_value;
-	float m_weight[NEURAL_NETWORK_HEIGHT];
-	float m_previous_weight[NEURAL_NETWORK_HEIGHT];
-	float m_error;
+	static float RandomizeWeight();
+};
+
+class Layer
+{
+public:
+	Layer(int nb_neuron, LayerType type);
+
+	LayerType m_type;
+	int m_nb_neurons;
+	vector<Neuron> m_neurons;
 };
 
 class NeuralNetwork
 {
 public:
 	NeuralNetwork();
-	~NeuralNetwork();
 
-	Neuron* m_input_layer[NB_FEATURES + 1];
-	Neuron* m_output_layer[NB_LABELS];
-	Neuron* m_hidden_layers[NEURAL_NETWORK_HEIGHT][NEURAL_NETWORK_DEPTH];
-	vector<Data> m_labelled_dataset;
-	vector<Data> m_unlabelled_dataset;
+	void AddLayer(int nb_neuron, LayerType type);
+	vector<Layer> m_layers;
+	int m_nb_layers;
+	vector<Data> m_dataset;
 
-	float ActivationFunction(float x);
-	void FillWithData();
-	void Train();
+	void Training();
+
+	double m_error;//error
+	double m_learning_rate;
+	double m_momentum;
+	ActivationFunctions m_function;
+
+	double ActivationFunction(double x);
+	void CreateDataset();
+	//void Train();
 	void RestorePreviousWeight();
 	void DoNothing(){};
-	string GetLabelString(Label label)
+	static string GetLabelString(Label label)
 	{
 		if (label == IS_GREEN)
 			return "IS_GREEN";
 		if (label == NOT_GREEN)
 			return "NOT GREEN";
+		if (label == UNLABELLED)
+			return "UNLABELLED";
 	};
 };
 

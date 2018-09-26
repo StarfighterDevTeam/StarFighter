@@ -5,11 +5,10 @@ int main()
 	NeuralNetwork NeuralNetwork;
 
 	//Input labelled data
-	NeuralNetwork.FillWithData();
+	NeuralNetwork.CreateDataset();
 
 	//Train on labelled data
-	printf("\nTraining neural network\n");
-	NeuralNetwork.Train();
+	//NeuralNetwork.Train();
 
 	bool dejavu = false;
 	while (1)
@@ -24,143 +23,161 @@ int main()
 	return 0;
 }
 
-
-Neuron::Neuron()
+Data::Data(vector<int> features, Label label)
 {
-	float total_weight = 0;
-	for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-	{
-		m_weight[j] = RandomizeFloatBetweenValues(0.f, 1.f);
-		total_weight += m_weight[j];
-	}
-	for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-	{
-		m_weight[j] = total_weight == 0 ? 0 : m_weight[j] / total_weight;
-
-		m_previous_weight[j] = m_weight[j];
-	}
+	m_features = features;
+	m_label = label;
 }
 
-
-NeuralNetwork::NeuralNetwork()
+Data::Data(Label label)
 {
-	//Input layer
-	for (int f = 0; f < NB_FEATURES + 1; f++)
-	{
-		Neuron* neuron = new Neuron();
-		m_input_layer[f] = neuron;
-	}
+	int red, blue, green = 0;
 
-	//Hidden layers
-	for (int i = 0; i < NEURAL_NETWORK_DEPTH; i++)
+	if (label == IS_GREEN)
 	{
-		for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
+		red = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
+		green = RandomizeIntBetweenValues((int)(255 * (1 - NEURAL_NETWORK_ERROR_MARGIN)), 255);
+		blue = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
+	}
+	else if (label == NOT_GREEN)
+	{
+		red = RandomizeIntBetweenValues(0, 255);
+		green = RandomizeIntBetweenValues(0, (int)((1 - NEURAL_NETWORK_ERROR_MARGIN) * 255));
+		blue = RandomizeIntBetweenValues(0, 255);
+	}
+	else
+	{
+		int r = RandomizeIntBetweenValues(0, 1);
+		if (r % 2 == 0)
 		{
-			Neuron* neuron = new Neuron();
-			m_hidden_layers[i][j] = neuron;
-		}
-	}
-
-	//Output layer
-	for (int k = 0; k < NB_LABELS; k++)
-	{
-		Neuron* neuron = new Neuron();
-		m_output_layer[k] = neuron;
-	}
-
-	printf("Welcome. Neural network created:\n- input layer of %d features\n- %d hidden layers of %d neurons.\n- output layer of %d labels\n\n", NB_FEATURES + 1, NEURAL_NETWORK_DEPTH, NEURAL_NETWORK_HEIGHT, NB_LABELS);
-}
-
-NeuralNetwork::~NeuralNetwork()
-{
-	for (int f = 0; f < NB_FEATURES + 1; f++)
-	{
-		delete m_input_layer[f];
-		m_input_layer[f] = NULL;
-	}
-
-	for (int i = 0; i < NEURAL_NETWORK_HEIGHT; i++)
-	{
-		for (int j = 0; j < NEURAL_NETWORK_DEPTH; j++)
-		{
-			delete m_hidden_layers[i][j];
-			m_hidden_layers[i][j] = NULL;
-		}
-	}
-
-	for (int k = 0; k < NB_LABELS; k++)
-	{
-		delete m_output_layer[k];
-		m_output_layer[k] = NULL;
-	}
-}
-
-void NeuralNetwork::FillWithData()
-{
-	for (int i = 0; i < DATASET_SIZE; i++)
-	{
-		int red, green, blue = 0;
-		Label label;
-
-		//labelled examples
-		if (i < DATASET_SUPERVISED_LOT + DATASET_TESTING_LOT)
-		{
-			if (i % 2 == 0)
-			{
-				//green examples
-				red = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
-				green = RandomizeIntBetweenValues((int)(255 * (1 - NEURAL_NETWORK_ERROR_MARGIN)), 255);
-				blue = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
-
-				label = IS_GREEN;
-			}
-			else
-			{
-				//not green examples
-				red = RandomizeIntBetweenValues(0, 255);
-				green = RandomizeIntBetweenValues(0, (int)((1 - NEURAL_NETWORK_ERROR_MARGIN) * 255));
-				blue = RandomizeIntBetweenValues(0, 255);
-				label = NOT_GREEN;
-			}
-		}
-		else //unlabelled examples
-		{
-			if (i % 2 == 0)
-			{
-				//green examples
-				red = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
-				green = RandomizeIntBetweenValues((int)(255 * (1 - NEURAL_NETWORK_ERROR_MARGIN)), 255);
-				blue = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
-			}
-			else
-			{
-				//not green examples
-				red = RandomizeIntBetweenValues(0, 255);
-				green = RandomizeIntBetweenValues(0, (int)((1 - NEURAL_NETWORK_ERROR_MARGIN) * 255));
-				blue = RandomizeIntBetweenValues(0, 255);
-			}
-
-			label = UNLABELLED;
-		}
-
-		Data data(red, green, blue, label);
-
-		if (label == UNLABELLED)
-		{
-			m_unlabelled_dataset.push_back(data);
-			printf("Add Unlabbeled Data: SUCCESS (%d unlabelled data).\n", m_unlabelled_dataset.size());
+			//green examples
+			red = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
+			green = RandomizeIntBetweenValues((int)(255 * (1 - NEURAL_NETWORK_ERROR_MARGIN)), 255);
+			blue = RandomizeIntBetweenValues(0, (int)(NEURAL_NETWORK_ERROR_MARGIN * 255));
 		}
 		else
 		{
-			m_labelled_dataset.push_back(data);
-			printf("Add Labbeled Data: SUCCESS (%d labelled data).\n", m_labelled_dataset.size());
+			//not green examples
+			red = RandomizeIntBetweenValues(0, 255);
+			green = RandomizeIntBetweenValues(0, (int)((1 - NEURAL_NETWORK_ERROR_MARGIN) * 255));
+			blue = RandomizeIntBetweenValues(0, 255);
+		}
+	}
+
+	m_features.push_back(red);
+	m_features.push_back(green);
+	m_features.push_back(blue);
+	m_features.push_back(label);
+
+	//if (label != UNLABELLED)
+	//{
+	//	printf("Data created: %d, %d, %d, labelled as %s.\n", red, green, blue, NeuralNetwork::GetLabelString(label).c_str());
+	//}
+	//else
+	//{
+	//	printf("Data created: %d, %d, %d, unlabelled.\n", red, green, blue);
+	//}
+}
+
+
+float Neuron::RandomizeWeight()
+{
+	float random_weight = RandomizeFloatBetweenValues(0.f, 1.f);
+	return random_weight;
+}
+
+Layer::Layer(int nb_neuron, LayerType type)
+{
+	for (int i = 0; i < nb_neuron + 1; i++)//+1 for the bias neuron
+	{
+		m_neurons.push_back(Neuron());
+	}
+
+	m_nb_neurons = nb_neuron + 1;//+1 for the bias neuron
+	m_type = type;
+}
+
+
+//NEURAL NETWORK
+NeuralNetwork::NeuralNetwork()
+{
+	m_nb_layers = 0;
+
+	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
+	m_momentum = NEURAL_NETWORK_MOMENTUM;
+	m_function = TANH;
+
+	//Input layer
+	AddLayer(NB_FEATURES, InputLayer);
+
+	//Hidden layers
+	AddLayer(3, HiddenLayer);
+	AddLayer(2, HiddenLayer);
+
+	//Output layer
+	AddLayer(NB_LABELS, OutpuLayer);
+}
+
+void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
+{
+	//Connnect previous layer's neurons
+	if (!m_layers.empty())
+	{
+		Layer &previousLayer = m_layers.back();
+		int previousLayerSize = previousLayer.m_neurons.size();
+		for (int i = 0; i < previousLayerSize; i++)
+		{
+			for (int j = 0; j < nb_neuron; j++)
+			{
+				double weight = Neuron::RandomizeWeight();
+				previousLayer.m_neurons[i].m_weights.push_back(weight);
+			}
+		}
+	}
+
+	//Create the new layer
+	m_layers.push_back(Layer(nb_neuron, type));
+	m_nb_layers++;
+}
+
+void NeuralNetwork::CreateDataset()
+{
+	for (int i = 0; i < DATASET_SIZE; i++)
+	{
+		if (i < DATASET_SUPERVISED_LOT + DATASET_TESTING_LOT)
+		{
+			int r = RandomizeIntBetweenValues(0, 1);
+			if (r % 2 == 0)
+			{
+				m_dataset.push_back(Data(IS_GREEN));
+			}
+			else
+			{
+				m_dataset.push_back(Data(NOT_GREEN));
+			}
+		}
+		//else
+		//{
+		//	m_dataset.push_back(Data(UNLABELLED));
+		//}
+
+		if (i == DATASET_SIZE - 1)
+		{
+			printf("Dataset created: %d data items.\n", i + 1);
 		}
 	}
 }
 
+void NeuralNetwork::Training()
+{
+	//to rewrite
+}
+
+/*
+
 void NeuralNetwork::Train()
 {
-	float learning_rate = NEURAL_NETWORK_LEARNING_RATE;
+	double learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 
 	for (int d = 0; d < DATASET_SIZE; d++)
 	{
@@ -179,9 +196,9 @@ void NeuralNetwork::Train()
 			break;//todo : test unlabelled examples
 		}
 
-		float error = -1;
-		float previous_error = -1;
-		float learning_rate = NEURAL_NETWORK_LEARNING_RATE;
+		double error = -1;
+		double previous_error = -1;
+		double learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 		int attempt = 0;
 
 		while (abs(error) > NEURAL_NETWORK_ERROR_MARGIN)
@@ -345,8 +362,8 @@ void NeuralNetwork::Train()
 
 				//Hidden layers -> output layer
 				printf("Backpropagation|Output->Hidden %d:\n", NEURAL_NETWORK_DEPTH - 1);
-				float total_weight = 0;
-				float previous_weight[NEURAL_NETWORK_HEIGHT];
+				double total_weight = 0;
+				double previous_weight[NEURAL_NETWORK_HEIGHT];
 				for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
 				{
 					previous_weight[j] = m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0];
@@ -354,11 +371,11 @@ void NeuralNetwork::Train()
 				}
 				for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
 				{
-					float synaptic_weight = total_weight == 0 ? 0 : previous_weight[j] / total_weight;
+					double synaptic_weight = total_weight == 0 ? 0 : previous_weight[j] / total_weight;
 
 					m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_error = m_output_layer[0]->m_error * synaptic_weight * learning_rate;
 
-					float new_weight = previous_weight[j] * (1 + m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_error);
+					double new_weight = previous_weight[j] * (1 + m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_error);
 					new_weight = Bound(new_weight, 0.f, 1.f);
 					m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_previous_weight[0] = m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0];
 					m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0] = new_weight;
@@ -379,11 +396,11 @@ void NeuralNetwork::Train()
 						}
 						for (int k = 0; k < NEURAL_NETWORK_HEIGHT; k++)
 						{
-							float synaptic_weight = total_weight == 0 ? 0 : previous_weight[k] / total_weight;
+							double synaptic_weight = total_weight == 0 ? 0 : previous_weight[k] / total_weight;
 
 							m_hidden_layers[i - 1][k]->m_error = m_hidden_layers[i][j]->m_error * synaptic_weight * learning_rate;
 
-							float new_weight = previous_weight[k] * (1 + m_hidden_layers[i - 1][j]->m_error);
+							double new_weight = previous_weight[k] * (1 + m_hidden_layers[i - 1][j]->m_error);
 							new_weight = Bound(new_weight, 0.f, 1.f);
 							m_hidden_layers[i - 1][k]->m_previous_weight[j] = m_hidden_layers[i - 1][k]->m_weight[j];
 							m_hidden_layers[i - 1][k]->m_weight[j] = new_weight;
@@ -404,11 +421,11 @@ void NeuralNetwork::Train()
 					}
 					for (int f = 0; f < NB_FEATURES + 1; f++)
 					{
-						float synaptic_weight = total_weight == 0 ? 0 : previous_weight[f] / total_weight;
+						double synaptic_weight = total_weight == 0 ? 0 : previous_weight[f] / total_weight;
 
 						m_input_layer[f]->m_error = m_hidden_layers[0][j]->m_error * synaptic_weight * learning_rate;
 
-						float new_weight = previous_weight[f] * (1 + m_input_layer[f]->m_error);
+						double new_weight = previous_weight[f] * (1 + m_input_layer[f]->m_error);
 						new_weight = Bound(new_weight, 0.f, 1.f);
 						m_input_layer[f]->m_previous_weight[j] = m_input_layer[f]->m_weight[j];
 						m_input_layer[f]->m_weight[j] = new_weight;
@@ -453,19 +470,20 @@ void NeuralNetwork::RestorePreviousWeight()
 	}
 }
 
-float NeuralNetwork::ActivationFunction(float x)
+*/
+
+double NeuralNetwork::ActivationFunction(double x)
 {
-	float output_value = 0.f;
-	ActivationFunctions function = SIGMOID;
+	double output_value = 0.f;
 
 	//LINEAR
-	if (function == LINEAR)
+	if (m_function == LINEAR)
 	{
 		output_value = x;
 	}
 
 	//THRESHOLD
-	if (function == THRESHOLD)
+	if (m_function == THRESHOLD)
 	{
 		if (x > 0.5f)
 		{
@@ -478,13 +496,13 @@ float NeuralNetwork::ActivationFunction(float x)
 	}
 
 	//SIGMOID
-	if (function == SIGMOID)
+	if (m_function == SIGMOID)
 	{
 		output_value = 1.f / (1 + pow((1 / 2, 71828), x));
 	}
 
-	//SIGMOID
-	if (function == TAHN)
+	//TANH
+	if (m_function == TANH)
 	{
 		output_value = tanh(x);
 	}
