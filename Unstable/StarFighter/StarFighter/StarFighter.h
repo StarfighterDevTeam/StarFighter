@@ -24,9 +24,8 @@ using namespace std;
 #define NEURAL_NETWORK_LEARNING_RATE				0.01
 #define NEURAL_NETWORK_MOMENTUM						0.01
 
-#define DATASET_SIZE								500
+#define DATASET_SIZE									500
 #define DATASET_SUPERVISED_LOT						300
-#define DATASET_TESTING_LOT							100
 
 enum Label
 {
@@ -38,16 +37,16 @@ enum Label
 
 enum Features
 {
-	RED,			//0
+	RED,				//0
 	GREEN,			//1
 	BLUE,			//2
-	NB_FEATURES,	//3
+	NB_FEATURES,		//3
 };
 
-enum ActivationFunctions
+enum FunctionType
 {
 	LINEAR,		//0
-	SIGMOID,	//1
+	SIGMOID,		//1
 	THRESHOLD,	//2
 	TANH,		//3
 };
@@ -55,17 +54,17 @@ enum ActivationFunctions
 enum LayerType
 {
 	InputLayer,		//0
-	HiddenLayer,	//1
+	HiddenLayer,		//1
 	OutpuLayer,		//2
 };
 
 class Data
 {
 public:
-	Data(vector<int> features, Label label);
+	Data(vector<double> features, Label label);
 	Data(Label label);
 
-	vector<int> m_features;
+	vector<double> m_features;
 	Label m_label;
 };
 
@@ -73,9 +72,11 @@ class Neuron
 {
 public:
 	double m_value;
+	double m_input_value;
 	vector <double> m_weights;
 	vector <double> m_previous_weights;
 	double m_error;
+	double m_gradient;
 
 	static float RandomizeWeight();
 };
@@ -102,12 +103,18 @@ public:
 
 	void Training();
 
+	void InitInputLayer(const Data &data);
+	void FeedForward();
+	void ErrorCalculation(const Data &data);
+	void BackPropagation();
+
 	double m_error;//error
 	double m_learning_rate;
 	double m_momentum;
-	ActivationFunctions m_function;
+	FunctionType m_function;
 
-	double ActivationFunction(double x);
+	double TransferFunction(double x, FunctionType function);
+	double TransferFunctionDerivative(double x, FunctionType function);
 	void CreateDataset();
 	//void Train();
 	void RestorePreviousWeight();
