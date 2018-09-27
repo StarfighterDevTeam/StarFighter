@@ -116,8 +116,6 @@ Layer::Layer(int nb_neuron, LayerType type)
 NeuralNetwork::NeuralNetwork()
 {
 	m_nb_layers = 0;
-	m_attempts = 0;
-	m_error = 0.f;
 
 	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 	m_momentum = NEURAL_NETWORK_MOMENTUM;
@@ -184,16 +182,24 @@ void NeuralNetwork::CreateDataset()
 
 void NeuralNetwork::Training()
 {
+	m_average_error = 0.f;
+	m_overall_attempts = 0;
+	m_success = 0;
+
 	//Supervised training data
 	for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
 	{
 		m_attempts = 0;
+		m_error = NEURAL_NETWORK_ERROR_MARGIN;
+		
+		printf("Input data %d.\n", d);
 		InitInputLayer(m_dataset[d]);
 
-		while (m_error > NEURAL_NETWORK_ERROR_MARGIN || m_attempts < 1000)
+		while (m_error > NEURAL_NETWORK_ERROR_MARGIN || m_attempts < NEURAL_NETWORK_MAX_ATTEMPTS)
 		{
 			m_attempts++;
-			printf("\nAttempt n°: %d.\n", m_attempts);
+			m_overall_attempts++;
+			printf("\nAttempts: %d (overall attempts: %d).\n", m_attempts, m_overall_attempts);
 			FeedForward();
 
 			ErrorCalculation(m_dataset[d]);
@@ -201,8 +207,18 @@ void NeuralNetwork::Training()
 			GradientBackPropagation();
 
 			WeightsUpdate();
+
+			if (m_error <= NEURAL_NETWORK_ERROR_MARGIN)
+			{
+				m_success++;
+				break;
+			}
 		}
 	}
+
+	m_average_error = m_average_error / m_overall_attempts;
+	printf("\nOverall attempts: %d for %d data (Average attempts per data: %d). Success: %d/%d (%.2f%%).\n", m_overall_attempts, DATASET_SUPERVISED_LOT, m_overall_attempts / DATASET_SUPERVISED_LOT, m_success, DATASET_SUPERVISED_LOT, 100.f*m_success / DATASET_SUPERVISED_LOT);
+	printf("AVERAGE RMSE: %f.\n", m_average_error);
 
 	this->DoNothing();
 }
@@ -279,6 +295,7 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 
 	//Error
 	printf("Error calculation.\n");
+	double previous_error = m_attempts == 1 ? 0.f : m_error;
 	m_error = 0.f;
 	Layer &outputLayer = m_layers.back();
 
@@ -291,8 +308,18 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	}
 	m_error *= 1.f / outputLayer.m_nb_neurons;
 	m_error = sqrt(m_error);//Root Means Square Error
+	
+	if (m_attempts == 1)
+	{
+		printf("RMSE: %f\n", m_error);
+	}
+	else
+	{
+		printf("RMSE: %f (previous RMSE: %f). Progression: %f (%.2f%%).\n", m_error, previous_error, previous_error - m_error, (previous_error - m_error) / previous_error);
+	}
+	
 
-	printf("RMSE: %f\n", m_error);
+	m_average_error += m_error;
 }
 
 void NeuralNetwork::GradientBackPropagation()

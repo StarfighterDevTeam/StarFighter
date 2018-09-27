@@ -18,14 +18,14 @@ using namespace std;
 
 #include "Globals.h"
 
-#define NEURAL_NETWORK_DEPTH						2
+#define NEURAL_NETWORK_DEPTH							2
 #define NEURAL_NETWORK_HEIGHT						4
 #define NEURAL_NETWORK_ERROR_MARGIN					0.02
-#define NEURAL_NETWORK_LEARNING_RATE				0.01
+#define NEURAL_NETWORK_LEARNING_RATE					0.01
 #define NEURAL_NETWORK_MOMENTUM						0.5
-#define NEURAL_NETWORK_MAX_ATTEMPTS					1000
+#define NEURAL_NETWORK_MAX_ATTEMPTS					300
 
-#define DATASET_SIZE								500
+#define DATASET_SIZE									500
 #define DATASET_SUPERVISED_LOT						300
 
 enum Label
@@ -110,11 +110,14 @@ public:
 	void GradientBackPropagation();
 	void WeightsUpdate();
 
-	double m_error;//error
+	double m_error;
+	double m_average_error;
 	double m_learning_rate;
 	double m_momentum;
 	FunctionType m_function;
 	int m_attempts;
+	int m_overall_attempts;
+	int m_success;
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);
