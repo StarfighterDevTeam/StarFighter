@@ -116,6 +116,8 @@ Layer::Layer(int nb_neuron, LayerType type)
 NeuralNetwork::NeuralNetwork()
 {
 	m_nb_layers = 0;
+	m_attempts = 0;
+	m_error = 0.f;
 
 	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 	m_momentum = NEURAL_NETWORK_MOMENTUM;
@@ -145,6 +147,7 @@ void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
 			{
 				double weight = Neuron::RandomizeWeight();
 				previousLayer.m_neurons[i].m_weights.push_back(weight);
+				previousLayer.m_neurons[i].m_deltaWeights.push_back(0.f);
 			}
 		}
 	}
@@ -184,16 +187,24 @@ void NeuralNetwork::Training()
 	//Supervised training data
 	for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
 	{
+		m_attempts = 0;
 		InitInputLayer(m_dataset[d]);
 
-		FeedForward();
+		while (m_error > NEURAL_NETWORK_ERROR_MARGIN || m_attempts < 1000)
+		{
+			m_attempts++;
+			printf("\nAttempt n°: %d.\n", m_attempts);
+			FeedForward();
 
-		ErrorCalculation(m_dataset[d]);
+			ErrorCalculation(m_dataset[d]);
 
-		BackPropagation();
+			GradientBackPropagation();
 
-		this->DoNothing();
+			WeightsUpdate();
+		}
 	}
+
+	this->DoNothing();
 }
 
 void NeuralNetwork::InitInputLayer(const Data &data)
@@ -284,7 +295,7 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	printf("RMSE: %f\n", m_error);
 }
 
-void NeuralNetwork::BackPropagation()
+void NeuralNetwork::GradientBackPropagation()
 {
 	printf("Back propagation.\n");
 
@@ -297,7 +308,7 @@ void NeuralNetwork::BackPropagation()
 		printf("Layer: %d, neuron: %d, gradient: %f\n", m_nb_layers - 1, n, outputLayer.m_neurons[n].m_gradient);
 	}
 
-	//Backpropagation
+	//Propagation of the gradient
 	for (int i = m_nb_layers - 2; i >= 0; i--)
 	{
 		Layer &currentLayer = m_layers[i];
@@ -316,8 +327,38 @@ void NeuralNetwork::BackPropagation()
 				}
 
 				currentLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(currentLayer.m_neurons[n].m_input_value, m_function);
-
 				printf("Layer: %d, neuron: %d, gradient: %f\n", i, n, currentLayer.m_neurons[n].m_gradient);
+		}
+	}
+}
+
+void NeuralNetwork::WeightsUpdate()
+{
+	//Weights update
+	printf("Weights update.\n");
+	for (int i = m_nb_layers - 2; i >= 0; i--)
+	{
+		Layer &currentLayer = m_layers[i];
+		Layer &nextLayer = m_layers[i + 1];
+
+		for (int n = 0; n < currentLayer.m_nb_neurons; n++)
+		{
+			//update each weight towards the next layer's neurons
+			for (int w = 0; w < nextLayer.m_nb_neurons; w++)
+			{
+				if (w < nextLayer.m_nb_neurons - 1 || nextLayer.m_type == OutpuLayer)
+				{
+					Neuron &currentNeuron = currentLayer.m_neurons[n];
+					Neuron &connectedNeuron = nextLayer.m_neurons[w];
+
+					double newDeltaWeight = currentNeuron.m_value * connectedNeuron.m_gradient * m_learning_rate;
+					newDeltaWeight += currentNeuron.m_deltaWeights[w] * m_momentum;
+
+					currentNeuron.m_deltaWeights[w] = newDeltaWeight;
+					currentNeuron.m_weights[w] += newDeltaWeight;
+					printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight);
+				}
+			}
 		}
 	}
 }

@@ -20,11 +20,12 @@ using namespace std;
 
 #define NEURAL_NETWORK_DEPTH						2
 #define NEURAL_NETWORK_HEIGHT						4
-#define NEURAL_NETWORK_ERROR_MARGIN					0.002
+#define NEURAL_NETWORK_ERROR_MARGIN					0.02
 #define NEURAL_NETWORK_LEARNING_RATE				0.01
-#define NEURAL_NETWORK_MOMENTUM						0.01
+#define NEURAL_NETWORK_MOMENTUM						0.5
+#define NEURAL_NETWORK_MAX_ATTEMPTS					1000
 
-#define DATASET_SIZE									500
+#define DATASET_SIZE								500
 #define DATASET_SUPERVISED_LOT						300
 
 enum Label
@@ -74,7 +75,7 @@ public:
 	double m_value;
 	double m_input_value;
 	vector <double> m_weights;
-	vector <double> m_previous_weights;
+	vector <double> m_deltaWeights;
 	double m_error;
 	double m_gradient;
 
@@ -106,12 +107,14 @@ public:
 	void InitInputLayer(const Data &data);
 	void FeedForward();
 	void ErrorCalculation(const Data &data);
-	void BackPropagation();
+	void GradientBackPropagation();
+	void WeightsUpdate();
 
 	double m_error;//error
 	double m_learning_rate;
 	double m_momentum;
 	FunctionType m_function;
+	int m_attempts;
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);
