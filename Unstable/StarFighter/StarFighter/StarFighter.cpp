@@ -11,6 +11,29 @@ int main()
 	return 0;
 }
 
+
+//NEURAL NETWORK
+NeuralNetwork::NeuralNetwork()
+{
+	m_nb_layers = 0;
+	m_success_rate = 0.f;
+	m_loops = 0;
+
+	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
+	m_momentum = NEURAL_NETWORK_MOMENTUM;
+	m_function = TANH;
+
+	//Input layer
+	AddLayer(NB_FEATURES, InputLayer);
+
+	//Hidden layers
+	AddLayer(1, HiddenLayer);
+	//AddLayer(2, HiddenLayer);
+
+	//Output layer
+	AddLayer(NB_LABELS, OutpuLayer);
+}
+
 void NeuralNetwork::Run()
 {
 	//Input labelled data
@@ -37,7 +60,7 @@ void NeuralNetwork::Run()
 		Data example2({ 0, 250, 0 }, UNLABELLED);
 		Label label2 = TestSample(example2);
 
-		printf("End of loop %d.\n.", m_loops);
+		printf("End of loop %d.\n", m_loops);
 		//cin.get();
 	}
 
@@ -130,29 +153,6 @@ Layer::Layer(int nb_neuron, LayerType type)
 	}
 
 	m_type = type;
-}
-
-
-//NEURAL NETWORK
-NeuralNetwork::NeuralNetwork()
-{
-	m_nb_layers = 0;
-	m_success_rate = 0.f;
-	m_loops = 0;
-
-	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
-	m_momentum = NEURAL_NETWORK_MOMENTUM;
-	m_function = TANH;
-
-	//Input layer
-	AddLayer(NB_FEATURES, InputLayer);
-
-	//Hidden layers
-	AddLayer(3, HiddenLayer);
-	AddLayer(2, HiddenLayer);
-
-	//Output layer
-	AddLayer(NB_LABELS, OutpuLayer);
 }
 
 void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
