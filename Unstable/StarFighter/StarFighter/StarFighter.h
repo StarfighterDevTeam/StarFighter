@@ -15,18 +15,24 @@ using namespace std;
 #include <cstdlib>
 #include <stdio.h>      /* printf, scanf, puts, NULL */
 #include <stdlib.h>     /* srand, rand */
+#include <iostream>		/* cin */
 
 #include "Globals.h"
 
-#define NEURAL_NETWORK_DEPTH							2
-#define NEURAL_NETWORK_HEIGHT						4
 #define NEURAL_NETWORK_ERROR_MARGIN					0.02
 #define NEURAL_NETWORK_LEARNING_RATE					0.01
 #define NEURAL_NETWORK_MOMENTUM						0.5
 #define NEURAL_NETWORK_MAX_ATTEMPTS					300
 
-#define DATASET_SIZE									500
-#define DATASET_SUPERVISED_LOT						300
+#define DATASET_SIZE									300
+#define DATASET_SUPERVISED_LOT						200
+#define DATASET_TESTING_LOT							(DATASET_SIZE - DATASET_SUPERVISED_LOT)
+
+#define PRINT_ALL				false
+#define PRINT_FF					true//feed forward
+#define PRINT_EC					true//erorr caculation
+#define PRINT_BP					false//gradient back propagation
+#define PRINT_WU					true//weights update
 
 enum Label
 {
@@ -50,6 +56,7 @@ enum FunctionType
 	SIGMOID,		//1
 	THRESHOLD,	//2
 	TANH,		//3
+	TANSIG,		//4
 };
 
 enum LayerType
@@ -98,16 +105,20 @@ public:
 	NeuralNetwork();
 
 	void AddLayer(int nb_neuron, LayerType type);
+	double GetTargetValue(const Data &data);
 	vector<Layer> m_layers;
 	int m_nb_layers;
 	vector<Data> m_dataset;
 
 	void Training();
+	void Testing();
+	void Creating();
+	Label TestSample(Data &data);
 
 	void InitInputLayer(const Data &data);
 	void FeedForward();
 	void ErrorCalculation(const Data &data);
-	void GradientBackPropagation();
+	void GradientBackPropagation(const Data &data);
 	void WeightsUpdate();
 
 	double m_error;

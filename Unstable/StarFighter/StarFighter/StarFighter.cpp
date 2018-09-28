@@ -7,8 +7,25 @@ int main()
 	//Input labelled data
 	NeuralNetwork.CreateDataset();
 
-	//Train on labelled data
-	NeuralNetwork.Training();
+	while (1)
+	{
+		//Train on labelled data
+		NeuralNetwork.Training();
+		system("pause");
+
+		//Test model on known data
+		NeuralNetwork.Testing();
+		system("pause");
+
+		//Create artificial data
+		//NeuralNetwork.Creating();
+
+		Data example({ 200, 50, 200 }, UNLABELLED);
+		Label label = NeuralNetwork.TestSample(example);
+
+		printf("End.");
+		system("pause");
+	}
 
 	//Wait
 	bool dejavu = false;
@@ -182,6 +199,8 @@ void NeuralNetwork::CreateDataset()
 
 void NeuralNetwork::Training()
 {
+	printf("\n*** Training. ***\n");
+
 	m_average_error = 0.f;
 	m_overall_attempts = 0;
 	m_success = 0;
@@ -192,7 +211,7 @@ void NeuralNetwork::Training()
 		m_attempts = 0;
 		m_error = NEURAL_NETWORK_ERROR_MARGIN;
 		
-		printf("Input data %d.\n", d);
+		printf("\nInput data %d.\n", d);
 		InitInputLayer(m_dataset[d]);
 
 		while (m_error > NEURAL_NETWORK_ERROR_MARGIN || m_attempts < NEURAL_NETWORK_MAX_ATTEMPTS)
@@ -204,23 +223,110 @@ void NeuralNetwork::Training()
 
 			ErrorCalculation(m_dataset[d]);
 
-			GradientBackPropagation();
-
-			WeightsUpdate();
-
 			if (m_error <= NEURAL_NETWORK_ERROR_MARGIN)
 			{
+				printf("Success.\n");
 				m_success++;
 				break;
 			}
+			else
+			{
+				printf("Fail.\n");
+			}
+
+			GradientBackPropagation(m_dataset[d]);
+
+			WeightsUpdate();
+
+			//system("pause");
 		}
 	}
 
 	m_average_error = m_average_error / m_overall_attempts;
 	printf("\nOverall attempts: %d for %d data (Average attempts per data: %d). Success: %d/%d (%.2f%%).\n", m_overall_attempts, DATASET_SUPERVISED_LOT, m_overall_attempts / DATASET_SUPERVISED_LOT, m_success, DATASET_SUPERVISED_LOT, 100.f*m_success / DATASET_SUPERVISED_LOT);
-	printf("AVERAGE RMSE: %f.\n", m_average_error);
+	printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN);
 
 	this->DoNothing();
+}
+
+void NeuralNetwork::Testing()
+{
+	printf("\n*** Testing. ***\n");
+
+	m_average_error = 0.f;
+	m_success = 0;
+
+	//Supervised training data
+	for (int d = DATASET_SUPERVISED_LOT; d < DATASET_SIZE; d++)
+	{
+		printf("\nInput data %d.\n", d);
+
+		InitInputLayer(m_dataset[d]);
+		
+		FeedForward();
+
+		ErrorCalculation(m_dataset[d]);
+
+		if (m_error <= NEURAL_NETWORK_ERROR_MARGIN)
+		{
+			printf("Success.\n");
+			m_success++;
+		}
+		else
+		{
+			printf("Fail.\n");
+		}
+	}
+
+	m_average_error = m_average_error / m_overall_attempts;
+	printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, 100.f*m_success / DATASET_TESTING_LOT);
+	printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN);
+
+	this->DoNothing();
+}
+
+Label NeuralNetwork::TestSample(Data &data)
+{
+	InitInputLayer(data);
+	FeedForward();
+	
+	double target_value = 1.f;
+
+	m_error = 0.f;
+	Layer &outputLayer = m_layers.back();
+
+	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
+	{
+		double delta = target_value - outputLayer.m_neurons[n].m_value;
+		m_error += delta * delta;
+	}
+	m_error *= 1.f / outputLayer.m_nb_neurons;
+	m_error = sqrt(m_error);//Root Means Square Error
+
+	Label label;
+	if (m_error < 0.5f)
+	{
+		label = IS_GREEN;
+	}
+	else
+	{
+		label = NOT_GREEN;
+	}
+	return label;
+
+}
+
+void NeuralNetwork::Creating()
+{
+	printf("\n*** Creating. ***\n");
+	printf("Enter 0 for green, 1 for NOT-green.\n");
+	int user_input;
+	cin >> user_input;
+	if (user_input == IS_GREEN)
+	{
+
+	}
+
 }
 
 void NeuralNetwork::InitInputLayer(const Data &data)
@@ -245,11 +351,11 @@ void NeuralNetwork::InitInputLayer(const Data &data)
 void NeuralNetwork::FeedForward()
 {
 	//For display purposes
-	printf("Feed forward.\n");
+	if (PRINT_FF){ printf("Feed forward.\n"); }
 	Layer &inputLayer = m_layers.front();
 	for (int n = 0; n < inputLayer.m_nb_neurons; n++)
 	{
-		printf("Layer: %d, neuron: %d, value: %f\n", 0, n, inputLayer.m_neurons[n].m_value);
+		if (PRINT_FF){ printf("Layer: %d, neuron: %d, value: %f\n", 0, n, inputLayer.m_neurons[n].m_value); }
 	}
 	
 	//Feed forward
@@ -270,19 +376,19 @@ void NeuralNetwork::FeedForward()
 				}
 				nextLayer.m_neurons[n].m_input_value = sum;
 				nextLayer.m_neurons[n].m_value = TransferFunction(sum, m_function);
-				printf("Layer: %d, neuron: %d, input: %f, value: %f\n", i + 1, n, nextLayer.m_neurons[n].m_input_value, nextLayer.m_neurons[n].m_value);
+				if (PRINT_FF){ printf("Layer: %d, neuron: %d, input: %f, value: %f\n", i + 1, n, nextLayer.m_neurons[n].m_input_value, nextLayer.m_neurons[n].m_value); }
 			}
 			else
 			{
-				m_layers[0].m_neurons[n].m_value = 1.f;//bias neuron
+				nextLayer.m_neurons[n].m_value = 1.f;//bias neuron
+				nextLayer.m_neurons[n].m_input_value = nextLayer.m_neurons[n].m_value;
 			}
 		}
 	}
 }
 
-void NeuralNetwork::ErrorCalculation(const Data &data)
+double NeuralNetwork::GetTargetValue(const Data &data)
 {
-	//Target value
 	double target_value;
 	if (data.m_label == IS_GREEN)
 	{
@@ -292,47 +398,50 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	{
 		target_value = 0.f;
 	}
+	return target_value;
+}
 
+void NeuralNetwork::ErrorCalculation(const Data &data)
+{
 	//Error
-	printf("Error calculation.\n");
+	if (PRINT_EC){ printf("Error calculation.\n"); }
 	double previous_error = m_attempts == 1 ? 0.f : m_error;
 	m_error = 0.f;
 	Layer &outputLayer = m_layers.back();
 
 	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
 	{
-		double delta = target_value - outputLayer.m_neurons[n].m_value;
-		outputLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(outputLayer.m_neurons[n].m_value, m_function);
+		double delta = GetTargetValue(data) - outputLayer.m_neurons[n].m_value;
 		m_error += delta * delta;
-		printf("Neuron: %d, output: %f, target: %f (delta: %f).\n", n, outputLayer.m_neurons[n].m_value, target_value, delta);
+		if (PRINT_EC){ printf("Neuron: %d, output: %f, target: %f (delta: %f).\n", n, outputLayer.m_neurons[n].m_value, GetTargetValue(data), delta); }
 	}
 	m_error *= 1.f / outputLayer.m_nb_neurons;
 	m_error = sqrt(m_error);//Root Means Square Error
 	
 	if (m_attempts == 1)
 	{
-		printf("RMSE: %f\n", m_error);
+		if (PRINT_EC){ printf("RMSE: %f\n", m_error);}
 	}
 	else
 	{
-		printf("RMSE: %f (previous RMSE: %f). Progression: %f (%.2f%%).\n", m_error, previous_error, previous_error - m_error, (previous_error - m_error) / previous_error);
+		if (PRINT_EC){ printf("RMSE: %f (previous RMSE: %f). Progression: %f (%f%%).\n", m_error, previous_error, previous_error - m_error, (previous_error - m_error) / previous_error); }
 	}
-	
 
 	m_average_error += m_error;
 }
 
-void NeuralNetwork::GradientBackPropagation()
+void NeuralNetwork::GradientBackPropagation(const Data &data)
 {
-	printf("Back propagation.\n");
-
+	if (PRINT_BP){ printf("Back propagation.\n"); }
 	Layer &outputLayer = m_layers.back();
 
-	//For display purposes
+	//Calcuation of the gradient in the output layer
 	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
 	{
-		//Calculation already made in NeuralNetwork::ErrorCalculation(const Data &data)
-		printf("Layer: %d, neuron: %d, gradient: %f\n", m_nb_layers - 1, n, outputLayer.m_neurons[n].m_gradient);
+		double delta = GetTargetValue(data) - outputLayer.m_neurons[n].m_value;
+		outputLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(outputLayer.m_neurons[n].m_value, m_function);
+
+		if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f\n", m_nb_layers - 1, n, outputLayer.m_neurons[n].m_gradient); }
 	}
 
 	//Propagation of the gradient
@@ -354,7 +463,7 @@ void NeuralNetwork::GradientBackPropagation()
 				}
 
 				currentLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(currentLayer.m_neurons[n].m_input_value, m_function);
-				printf("Layer: %d, neuron: %d, gradient: %f\n", i, n, currentLayer.m_neurons[n].m_gradient);
+				if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f\n", i, n, currentLayer.m_neurons[n].m_gradient); }
 		}
 	}
 }
@@ -362,7 +471,7 @@ void NeuralNetwork::GradientBackPropagation()
 void NeuralNetwork::WeightsUpdate()
 {
 	//Weights update
-	printf("Weights update.\n");
+	if (PRINT_WU){ printf("Weights update.\n"); }
 	for (int i = m_nb_layers - 2; i >= 0; i--)
 	{
 		Layer &currentLayer = m_layers[i];
@@ -383,311 +492,12 @@ void NeuralNetwork::WeightsUpdate()
 
 					currentNeuron.m_deltaWeights[w] = newDeltaWeight;
 					currentNeuron.m_weights[w] += newDeltaWeight;
-					printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight);
+					if (PRINT_WU){ printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight); }
 				}
 			}
 		}
 	}
 }
-
-/*
-
-void NeuralNetwork::Train()
-{
-	double learning_rate = NEURAL_NETWORK_LEARNING_RATE;
-
-	for (int d = 0; d < DATASET_SIZE; d++)
-	{
-		Label input_label;
-		if (d < DATASET_SUPERVISED_LOT)
-		{
-			input_label = m_labelled_dataset[d].m_label;
-		}
-		else if (d < DATASET_SUPERVISED_LOT + DATASET_TESTING_LOT)
-		{
-			input_label = m_labelled_dataset[d].m_label;
-			printf("\nTesting model on labelled data: %d/%d.\n", d - DATASET_SUPERVISED_LOT, DATASET_TESTING_LOT - 1);
-		}
-		else
-		{
-			break;//todo : test unlabelled examples
-		}
-
-		double error = -1;
-		double previous_error = -1;
-		double learning_rate = NEURAL_NETWORK_LEARNING_RATE;
-		int attempt = 0;
-
-		while (abs(error) > NEURAL_NETWORK_ERROR_MARGIN)
-		{
-			attempt++;
-			previous_error = error;
-			printf("\nAttempt %d\n", attempt);
-
-			//Convert data into Input features between 0 and 1
-			for (int f = 0; f < NB_FEATURES; f++)
-			{
-				//clamping values on entropy and feeding them into the Input layer
-				if (d < DATASET_SUPERVISED_LOT)
-				{
-					m_input_layer[f]->m_value = Lerp(m_labelled_dataset[d].m_features[f], 0.f, 255.f, 0.f, 1.f);
-				}
-				else
-				{
-					m_input_layer[f]->m_value = Lerp(m_unlabelled_dataset[d - DATASET_SUPERVISED_LOT].m_features[f], 0.f, 255.f, 0.f, 1.f);
-				}
-			}
-			m_input_layer[NB_FEATURES]->m_value = 1.f;//"1" channel
-
-			//Input layer -> Hidden layers
-			printf("Feed-forward|Input->Hidden 0:\n");
-			for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-			{
-				printf("Neuron %d: ", j);
-				m_hidden_layers[0][j]->m_value = 0;
-				for (int f = 0; f < NB_FEATURES + 1; f++)
-				{
-					m_hidden_layers[0][j]->m_value += m_input_layer[f]->m_value * m_input_layer[f]->m_weight[j];
-					printf("%.3f * %.3f", m_input_layer[f]->m_value, m_input_layer[f]->m_weight[j]);
-					if (f < NB_FEATURES)
-						printf(" + ");
-				}
-				printf(" = %.3f", m_hidden_layers[0][j]->m_value);
-
-				//m_hidden_layers[0][j]->m_value *= (1.f / (NB_FEATURES + 1));
-				m_hidden_layers[0][j]->m_value = ActivationFunction(m_hidden_layers[0][j]->m_value);
-				printf(" |->activation: %.3f\n", m_hidden_layers[0][j]->m_value);
-			}
-
-			//Hidden layers
-			for (int i = 1; i < NEURAL_NETWORK_DEPTH; i++)
-			{
-				printf("Feed-forward|Hidden %d->Hidden %d:\n", i, i + 1);
-				for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-				{
-					printf("Neuron %d: ", j);
-					m_hidden_layers[i][j]->m_value = 0;
-					for (int k = 0; k < NEURAL_NETWORK_HEIGHT; k++)
-					{
-						m_hidden_layers[i][j]->m_value += m_hidden_layers[i - 1][k]->m_value * m_hidden_layers[i - 1][k]->m_weight[j];
-						printf("%.3f * %.3f", m_hidden_layers[i - 1][k]->m_value, m_hidden_layers[i - 1][k]->m_weight[j]);
-						if (k < NEURAL_NETWORK_HEIGHT - 1)
-							printf(" + ");
-					}
-					printf(" = %.3f", m_hidden_layers[i][j]->m_value);
-
-					//m_hidden_layers[i][j]->m_value *= (1.f / NEURAL_NETWORK_HEIGHT);
-					m_hidden_layers[i][j]->m_value = ActivationFunction(m_hidden_layers[i][j]->m_value);
-					printf(" |->activation: %.3f\n", m_hidden_layers[i][j]->m_value);
-				}
-			}
-
-			//Hidden layers -> output layer
-			printf("Feed-forward|Hidden %d->Output:\n", NEURAL_NETWORK_DEPTH - 1);
-			m_output_layer[0]->m_value = 0;
-			for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-			{
-				m_output_layer[0]->m_value += m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_value * m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0];
-				printf("%.3f * %.3f", m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_value, m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0]);
-				if (j < NEURAL_NETWORK_HEIGHT - 1)
-					printf(" + ");
-			}
-			printf(" = %.3f", m_output_layer[0]->m_value);
-
-			//m_output_layer[0]->m_value *= (1.f / NEURAL_NETWORK_HEIGHT);
-			m_output_layer[0]->m_value = ActivationFunction(m_output_layer[0]->m_value);
-			printf(" |->activation: %.3f\n", m_output_layer[0]->m_value);
-
-			//Label recognition
-			if (d < DATASET_SUPERVISED_LOT)
-			{
-				if (input_label == IS_GREEN)
-				{
-					error = 1 - m_output_layer[0]->m_value;
-				}
-				else if (input_label == NOT_GREEN)
-				{
-					error = -m_output_layer[0]->m_value;
-				}
-			}
-			else if (d < DATASET_SUPERVISED_LOT + DATASET_TESTING_LOT)
-			{
-				//Control of predicted labels
-				if (input_label == IS_GREEN)
-				{
-					if (m_output_layer[0]->m_value > 1 - NEURAL_NETWORK_ERROR_MARGIN && m_output_layer[0]->m_value < 1 + NEURAL_NETWORK_ERROR_MARGIN)
-					{
-						printf("\nTest data %d labelled as %s = SUCCESS.\n\n", d, GetLabelString(m_labelled_dataset[d].m_label).c_str());
-						break;
-					}
-					else
-					{
-						printf("\nTest data %d wrongfully labelled as %s = FAIL. Rebooting supervised data evaluation.\n\n", d, "NOT_GREEN");
-						//error = - m_output_layer[0]->m_value;
-						d = 0;
-						break;
-					}
-				}
-				else if (input_label == NOT_GREEN)
-				{
-					if (abs(m_output_layer[0]->m_value) < NEURAL_NETWORK_ERROR_MARGIN)
-					{
-						printf("\nTest data %d labelled as %s = SUCCESS.\n\n", d, GetLabelString(m_labelled_dataset[d].m_label).c_str());
-						break;
-					}
-					else
-					{
-						printf("\nTest data %d wrongfully labelled as %s = FAIL. Rebooting supervised data evaluation.\n\n", d, "IS_GREEN");
-						d = 0;
-						break;
-						//error = 1 - m_output_layer[0]->m_value;
-					}
-				}
-			}
-
-			//Success?
-			if (abs(error) < NEURAL_NETWORK_ERROR_MARGIN)
-			{
-				printf("\nSupervised data %d successfully recognized as %s (%d attempt(s)).\n\n", d, GetLabelString(input_label).c_str(), attempt);
-				break;
-			}
-			//Error backpropagation
-			else
-			{
-				m_output_layer[0]->m_error = error;
-
-				//Learning rate moderation
-				if (abs(error) < abs(previous_error))
-				{
-					learning_rate *= (1 + NEURAL_NETWORK_MOMENTUM);
-					printf("\nERROR decreased: %f (Previous error: %f). Learning rate increased: %f\n\n", error, previous_error, learning_rate);
-				}
-				else
-				{
-					RestorePreviousWeight();
-					if (learning_rate > NEURAL_NETWORK_LEARNING_RATE)
-					{
-						learning_rate = NEURAL_NETWORK_LEARNING_RATE;
-					}
-					else
-					{
-						learning_rate *= (1 - NEURAL_NETWORK_MOMENTUM);
-					}
-					printf("\nERROR increased <!>: %f (Previous error: %f). Restoring old weights. Learning rate decreased: %f\n\n", error, previous_error, learning_rate);
-					continue;
-				}
-
-				//Hidden layers -> output layer
-				printf("Backpropagation|Output->Hidden %d:\n", NEURAL_NETWORK_DEPTH - 1);
-				double total_weight = 0;
-				double previous_weight[NEURAL_NETWORK_HEIGHT];
-				for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-				{
-					previous_weight[j] = m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0];
-					total_weight += previous_weight[j];
-				}
-				for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-				{
-					double synaptic_weight = total_weight == 0 ? 0 : previous_weight[j] / total_weight;
-
-					m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_error = m_output_layer[0]->m_error * synaptic_weight * learning_rate;
-
-					double new_weight = previous_weight[j] * (1 + m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_error);
-					new_weight = Bound(new_weight, 0.f, 1.f);
-					m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_previous_weight[0] = m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0];
-					m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[0] = new_weight;
-					printf("weight: %d, neuron output, old_weight: %.3f | synaptic: %.1f | parent_error: %.3f | error: %.3f | new_weight: %.3f\n", j, previous_weight[j], synaptic_weight, m_output_layer[0]->m_error, m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_error, new_weight);
-				}
-
-				//Hidden layers
-				for (int i = NEURAL_NETWORK_DEPTH - 1; i > 0; i--)
-				{
-					printf("Backpropagation|Hidden %d->Hidden %d:\n", i, i - 1);
-					for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-					{
-						total_weight = 0;
-						for (int k = 0; k < NEURAL_NETWORK_HEIGHT; k++)
-						{
-							previous_weight[k] = m_hidden_layers[i - 1][k]->m_weight[j];
-							total_weight += previous_weight[k];
-						}
-						for (int k = 0; k < NEURAL_NETWORK_HEIGHT; k++)
-						{
-							double synaptic_weight = total_weight == 0 ? 0 : previous_weight[k] / total_weight;
-
-							m_hidden_layers[i - 1][k]->m_error = m_hidden_layers[i][j]->m_error * synaptic_weight * learning_rate;
-
-							double new_weight = previous_weight[k] * (1 + m_hidden_layers[i - 1][j]->m_error);
-							new_weight = Bound(new_weight, 0.f, 1.f);
-							m_hidden_layers[i - 1][k]->m_previous_weight[j] = m_hidden_layers[i - 1][k]->m_weight[j];
-							m_hidden_layers[i - 1][k]->m_weight[j] = new_weight;
-							printf("weight %d, neuron %d, old_weight:%.3f | synaptic: %.1f | parent_error: %.3f | error: %.3f | new_weight: %.3f\n", k, j, previous_weight[j], synaptic_weight, m_hidden_layers[i][j]->m_error, m_hidden_layers[i - 1][k]->m_error, new_weight);
-						}
-					}
-				}
-
-				//Hidden layers -> input_layer
-				printf("Backpropagation|Hidden 0->Input:\n");
-				for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-				{
-					total_weight = 0;
-					for (int f = 0; f < NB_FEATURES + 1; f++)
-					{
-						previous_weight[f] = m_input_layer[f]->m_weight[j];
-						total_weight += previous_weight[j];
-					}
-					for (int f = 0; f < NB_FEATURES + 1; f++)
-					{
-						double synaptic_weight = total_weight == 0 ? 0 : previous_weight[f] / total_weight;
-
-						m_input_layer[f]->m_error = m_hidden_layers[0][j]->m_error * synaptic_weight * learning_rate;
-
-						double new_weight = previous_weight[f] * (1 + m_input_layer[f]->m_error);
-						new_weight = Bound(new_weight, 0.f, 1.f);
-						m_input_layer[f]->m_previous_weight[j] = m_input_layer[f]->m_weight[j];
-						m_input_layer[f]->m_weight[j] = new_weight;
-						printf("weight %d, neuron: %d, old_weight:%.3f | synaptic: %.1f | parent_error: %.3f | error: %.3f | new_weight: %.3f\n", f, j, previous_weight[j], synaptic_weight, m_hidden_layers[0][j]->m_error, m_input_layer[f]->m_error, new_weight);
-					}
-				}
-			}
-		}
-	}
-
-	printf("End.\n");
-}
-
-void NeuralNetwork::RestorePreviousWeight()
-{
-	for (int f = 0; f < NB_FEATURES + 1; f++)
-	{
-		for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-		{
-			m_input_layer[f]->m_weight[j] = m_input_layer[f]->m_previous_weight[j];
-		}
-	}
-
-	for (int i = 0; i < NEURAL_NETWORK_DEPTH - 1; i++)
-	{
-		for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-		{
-			for (int k = 0; k < NEURAL_NETWORK_HEIGHT; k++)
-			{
-				m_hidden_layers[i][j]->m_weight[k] = m_hidden_layers[i][j]->m_previous_weight[k];
-			}
-
-		}
-	}
-
-	for (int i = 0; i < NB_LABELS; i++)
-	{
-		for (int j = 0; j < NEURAL_NETWORK_HEIGHT; j++)
-		{
-			m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_weight[i] = m_hidden_layers[NEURAL_NETWORK_DEPTH - 1][j]->m_previous_weight[i];
-		}
-	}
-}
-
-*/
 
 double NeuralNetwork::TransferFunction(double x, FunctionType function)
 {
@@ -715,13 +525,19 @@ double NeuralNetwork::TransferFunction(double x, FunctionType function)
 	//SIGMOID
 	if (function == SIGMOID)
 	{
-		output_value = 1.f / (1 + pow((1 / 2, 71828), x));
+		output_value = 1.f / (1 + exp(-x));
 	}
 
 	//TANH
 	if (function == TANH)
 	{
 		output_value = tanh(x);
+	}
+
+	//TANSIG ~ equivalent of TANH but faster to compute
+	if (function == TANSIG)
+	{
+		output_value = (2.f / (1 + exp(-2.f * x))) - 1;
 	}
 
 	return output_value;
@@ -734,7 +550,7 @@ double NeuralNetwork::TransferFunctionDerivative(double x, FunctionType function
 	//LINEAR
 	if (function == LINEAR)
 	{
-		return x;//todo
+		output_value = 1.f;//todo
 	}
 
 	//THRESHOLD
@@ -746,13 +562,19 @@ double NeuralNetwork::TransferFunctionDerivative(double x, FunctionType function
 	//SIGMOID
 	if (function == SIGMOID)
 	{
-		return x;//todo
+		output_value = TransferFunction(x, SIGMOID) * (1 - TransferFunction(x, SIGMOID));
 	}
 
 	//TANH
 	if (function == TANH)
 	{		
 		output_value = 1.f - tanh(x)*tanh(x);
+	}
+
+	//TANSIG ~ equivalent of TANH but faster to compute
+	if (function == TANSIG)
+	{
+		output_value = 1.f - x*x;
 	}
 
 	return output_value;
