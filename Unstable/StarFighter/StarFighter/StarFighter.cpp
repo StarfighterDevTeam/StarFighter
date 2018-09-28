@@ -4,41 +4,45 @@ int main()
 {
 	NeuralNetwork NeuralNetwork;
 
-	//Input labelled data
-	NeuralNetwork.CreateDataset();
+	NeuralNetwork.Run();
+	
+	printf("Exit program?\n");
+	cin.get();
+	return 0;
+}
 
-	while (1)
+void NeuralNetwork::Run()
+{
+	//Input labelled data
+	CreateDataset();
+
+	while (m_success_rate < 100.f - NEURAL_NETWORK_ERROR_MARGIN)
 	{
+		m_loops++;
+
 		//Train on labelled data
-		NeuralNetwork.Training();
-		system("pause");
+		Training();
+		//cin.get();
 
 		//Test model on known data
-		NeuralNetwork.Testing();
-		system("pause");
+		Testing();
+		//cin.get();
 
 		//Create artificial data
 		//NeuralNetwork.Creating();
 
 		Data example({ 200, 50, 200 }, UNLABELLED);
-		Label label = NeuralNetwork.TestSample(example);
+		Label label = TestSample(example);
 
-		printf("End.");
-		system("pause");
+		Data example2({ 0, 250, 0 }, UNLABELLED);
+		Label label2 = TestSample(example2);
+
+		printf("End of loop %d.\n.", m_loops);
+		//cin.get();
 	}
 
-	//Wait
-	bool dejavu = false;
-	while (1)
-	{
-		if (dejavu = false)
-		{
-			printf("End\n");
-			dejavu = true;
-		}
-	}
-
-	return 0;
+	printf("Training complete and validated on test data. Now ready to predict labels and create artificial examples.\n");
+	cin.get();
 }
 
 Data::Data(vector<double> features, Label label)
@@ -133,6 +137,8 @@ Layer::Layer(int nb_neuron, LayerType type)
 NeuralNetwork::NeuralNetwork()
 {
 	m_nb_layers = 0;
+	m_success_rate = 0.f;
+	m_loops = 0;
 
 	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 	m_momentum = NEURAL_NETWORK_MOMENTUM;
@@ -214,7 +220,7 @@ void NeuralNetwork::Training()
 		printf("\nInput data %d.\n", d);
 		InitInputLayer(m_dataset[d]);
 
-		while (m_error > NEURAL_NETWORK_ERROR_MARGIN || m_attempts < NEURAL_NETWORK_MAX_ATTEMPTS)
+		while (m_error >= NEURAL_NETWORK_ERROR_MARGIN && m_attempts < NEURAL_NETWORK_MAX_ATTEMPTS)
 		{
 			m_attempts++;
 			m_overall_attempts++;
@@ -223,7 +229,7 @@ void NeuralNetwork::Training()
 
 			ErrorCalculation(m_dataset[d]);
 
-			if (m_error <= NEURAL_NETWORK_ERROR_MARGIN)
+			if (m_error < NEURAL_NETWORK_ERROR_MARGIN)
 			{
 				printf("Success.\n");
 				m_success++;
@@ -237,16 +243,12 @@ void NeuralNetwork::Training()
 			GradientBackPropagation(m_dataset[d]);
 
 			WeightsUpdate();
-
-			//system("pause");
 		}
 	}
 
 	m_average_error = m_average_error / m_overall_attempts;
 	printf("\nOverall attempts: %d for %d data (Average attempts per data: %d). Success: %d/%d (%.2f%%).\n", m_overall_attempts, DATASET_SUPERVISED_LOT, m_overall_attempts / DATASET_SUPERVISED_LOT, m_success, DATASET_SUPERVISED_LOT, 100.f*m_success / DATASET_SUPERVISED_LOT);
 	printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN);
-
-	this->DoNothing();
 }
 
 void NeuralNetwork::Testing()
@@ -255,6 +257,7 @@ void NeuralNetwork::Testing()
 
 	m_average_error = 0.f;
 	m_success = 0;
+	m_attempts = 0;
 
 	//Supervised training data
 	for (int d = DATASET_SUPERVISED_LOT; d < DATASET_SIZE; d++)
@@ -267,7 +270,7 @@ void NeuralNetwork::Testing()
 
 		ErrorCalculation(m_dataset[d]);
 
-		if (m_error <= NEURAL_NETWORK_ERROR_MARGIN)
+		if (m_error < NEURAL_NETWORK_ERROR_MARGIN)
 		{
 			printf("Success.\n");
 			m_success++;
@@ -279,10 +282,9 @@ void NeuralNetwork::Testing()
 	}
 
 	m_average_error = m_average_error / m_overall_attempts;
-	printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, 100.f*m_success / DATASET_TESTING_LOT);
+	m_success_rate = 100.f * m_success / DATASET_TESTING_LOT;
+	printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, m_success_rate);
 	printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN);
-
-	this->DoNothing();
 }
 
 Label NeuralNetwork::TestSample(Data &data)
@@ -418,9 +420,9 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	m_error *= 1.f / outputLayer.m_nb_neurons;
 	m_error = sqrt(m_error);//Root Means Square Error
 	
-	if (m_attempts == 1)
+	if (m_attempts <= 1)
 	{
-		if (PRINT_EC){ printf("RMSE: %f\n", m_error);}
+		if (PRINT_EC){ printf("RMSE: %f (target: %f)\n", m_error, NEURAL_NETWORK_ERROR_MARGIN);}
 	}
 	else
 	{

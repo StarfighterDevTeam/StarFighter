@@ -22,17 +22,17 @@ using namespace std;
 #define NEURAL_NETWORK_ERROR_MARGIN					0.02
 #define NEURAL_NETWORK_LEARNING_RATE					0.01
 #define NEURAL_NETWORK_MOMENTUM						0.5
-#define NEURAL_NETWORK_MAX_ATTEMPTS					300
+#define NEURAL_NETWORK_MAX_ATTEMPTS					1000
 
 #define DATASET_SIZE									300
 #define DATASET_SUPERVISED_LOT						200
 #define DATASET_TESTING_LOT							(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
 #define PRINT_ALL				false
-#define PRINT_FF					true//feed forward
+#define PRINT_FF					false//feed forward
 #define PRINT_EC					true//erorr caculation
 #define PRINT_BP					false//gradient back propagation
-#define PRINT_WU					true//weights update
+#define PRINT_WU					false//weights update
 
 enum Label
 {
@@ -110,6 +110,7 @@ public:
 	int m_nb_layers;
 	vector<Data> m_dataset;
 
+	void Run();
 	void Training();
 	void Testing();
 	void Creating();
@@ -129,6 +130,8 @@ public:
 	int m_attempts;
 	int m_overall_attempts;
 	int m_success;
+	double m_success_rate;
+	int m_loops;
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);
