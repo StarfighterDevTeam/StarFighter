@@ -20,7 +20,7 @@ using namespace std;
 #include "Globals.h"
 
 #define NEURAL_NETWORK_ERROR_MARGIN					0.02
-#define NEURAL_NETWORK_LEARNING_RATE					0.01
+#define NEURAL_NETWORK_LEARNING_RATE				0.05
 #define NEURAL_NETWORK_MOMENTUM						0.5
 #define NEURAL_NETWORK_MAX_ATTEMPTS					1000
 
@@ -76,6 +76,18 @@ public:
 	Label m_label;
 };
 
+struct Performance
+{
+public:
+	double m_average_error;
+	double m_learning_rate;
+	double m_momentum;
+	FunctionType m_function;
+	int m_overall_attempts;
+	int m_loops;
+	vector<int> m_hidden_layers;
+};
+
 class Neuron
 {
 public:
@@ -124,6 +136,7 @@ public:
 
 	double m_error;
 	double m_average_error;
+
 	double m_learning_rate;
 	double m_momentum;
 	FunctionType m_function;
@@ -132,6 +145,9 @@ public:
 	int m_success;
 	double m_success_rate;
 	int m_loops;
+
+	vector<Performance> m_perf_records;
+	bool RecordPerf();
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);

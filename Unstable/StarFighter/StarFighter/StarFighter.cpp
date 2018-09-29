@@ -18,6 +18,7 @@ NeuralNetwork::NeuralNetwork()
 	m_nb_layers = 0;
 	m_success_rate = 0.f;
 	m_loops = 0;
+	m_overall_attempts = 0;
 
 	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 	m_momentum = NEURAL_NETWORK_MOMENTUM;
@@ -39,33 +40,75 @@ void NeuralNetwork::Run()
 	//Input labelled data
 	CreateDataset();
 
-	while (m_success_rate < 100.f - NEURAL_NETWORK_ERROR_MARGIN)
+	bool improving_model = true;
+	while (improving_model)
 	{
-		m_loops++;
+		m_learning_rate += 0.05;
+		m_success_rate = 0.f;
+		m_loops = 0;
+		m_overall_attempts = 0;
 
-		//Train on labelled data
-		Training();
-		//cin.get();
+		while (m_success_rate < 100.f)
+		{
+			m_loops++;
 
-		//Test model on known data
-		Testing();
-		//cin.get();
+			//Train on labelled data
+			Training();
+			//cin.get();
 
-		//Create artificial data
-		//NeuralNetwork.Creating();
+			//Test model on known data
+			Testing();
+			//cin.get();
 
-		Data example({ 200, 50, 200 }, UNLABELLED);
-		Label label = TestSample(example);
+			//Create artificial data
+			//NeuralNetwork.Creating();
 
-		Data example2({ 0, 250, 0 }, UNLABELLED);
-		Label label2 = TestSample(example2);
+			Data example({ 200, 50, 200 }, UNLABELLED);
+			Label label = TestSample(example);
 
-		printf("End of loop %d.\n", m_loops);
-		//cin.get();
+			Data example2({ 0, 250, 0 }, UNLABELLED);
+			Label label2 = TestSample(example2);
+
+			printf("End of loop %d.\n", m_loops);
+			//cin.get();
+		}
+
+		improving_model = RecordPerf();
 	}
 
 	printf("Training complete and validated on test data. Now ready to predict labels and create artificial examples.\n");
 	cin.get();
+}
+
+bool NeuralNetwork::RecordPerf()
+{
+	Performance perf;
+
+	perf.m_function = m_function;
+	perf.m_momentum = m_momentum;
+	perf.m_learning_rate = m_learning_rate;
+	perf.m_overall_attempts = m_overall_attempts;
+	perf.m_loops = m_loops;
+
+	for (int i = 0; i < m_nb_layers; i++)
+	{
+		if (i > 0 && i < m_nb_layers - 1)
+		{
+			perf.m_hidden_layers.push_back(m_layers[i].m_nb_neurons - 1);//-1 for the bias neuron
+		}
+	}
+
+	if (m_perf_records.empty())
+	{
+		m_perf_records.push_back(perf);
+		return true;
+	}
+	else
+	{
+		int previous_attempts = m_perf_records.back().m_overall_attempts;
+		m_perf_records.push_back(perf);
+		return perf.m_overall_attempts < previous_attempts;
+	}
 }
 
 Data::Data(vector<double> features, Label label)
@@ -208,7 +251,6 @@ void NeuralNetwork::Training()
 	printf("\n*** Training. ***\n");
 
 	m_average_error = 0.f;
-	m_overall_attempts = 0;
 	m_success = 0;
 
 	//Supervised training data
