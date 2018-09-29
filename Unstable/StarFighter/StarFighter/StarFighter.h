@@ -20,9 +20,10 @@ using namespace std;
 #include "Globals.h"
 
 #define NEURAL_NETWORK_ERROR_MARGIN					0.02
-#define NEURAL_NETWORK_LEARNING_RATE				0.05
-#define NEURAL_NETWORK_MOMENTUM						0.5
-#define NEURAL_NETWORK_MAX_ATTEMPTS					1000
+#define NEURAL_NETWORK_LEARNING_RATE					1.0
+#define NEURAL_NETWORK_MOMENTUM						0.6
+#define NEURAL_NETWORK_MAX_ATTEMPTS					500
+#define NEURAL_NETWORK_MAX_OVERALL_ATTEMPTS			100000
 
 #define DATASET_SIZE									300
 #define DATASET_SUPERVISED_LOT						200
@@ -30,7 +31,7 @@ using namespace std;
 
 #define PRINT_ALL				false
 #define PRINT_FF					false//feed forward
-#define PRINT_EC					true//erorr caculation
+#define PRINT_EC					false//erorr caculation
 #define PRINT_BP					false//gradient back propagation
 #define PRINT_WU					false//weights update
 
@@ -86,6 +87,7 @@ public:
 	int m_overall_attempts;
 	int m_loops;
 	vector<int> m_hidden_layers;
+	double m_success_rate;
 };
 
 class Neuron
@@ -97,8 +99,6 @@ public:
 	vector <double> m_deltaWeights;
 	double m_error;
 	double m_gradient;
-
-	static float RandomizeWeight();
 };
 
 class Layer
@@ -148,13 +148,17 @@ public:
 
 	vector<Performance> m_perf_records;
 	bool RecordPerf();
+	Performance& GetBestPerf();
+	vector<double> m_weightsStart;
+	void RestoreWeights(vector<double>& weights);
+	void SaveWeights(vector<double>& weights);
+	vector<double> m_weightsBest;
+	void LoadBestWeights();
+	Performance m_best_perf;
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);
 	void CreateDataset();
-	//void Train();
-	void RestorePreviousWeight();
-	void DoNothing(){};
 	static string GetLabelString(Label label)
 	{
 		if (label == IS_GREEN)

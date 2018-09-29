@@ -35,46 +35,81 @@ NeuralNetwork::NeuralNetwork()
 	AddLayer(NB_LABELS, OutpuLayer);
 }
 
+void NeuralNetwork::RestoreWeights(vector<double>& weights)
+{
+	int index = 0;
+
+	for (int i = 0; i < m_nb_layers; i++)
+	{
+		for (int n = 0; n < m_layers[i].m_nb_neurons; n++)
+		{
+			int weightsSize = m_layers[i].m_neurons[n].m_weights.size();
+			for (int w = 0; w < weightsSize; w++)
+			{
+				m_layers[i].m_neurons[n].m_weights[w] = weights[index];
+				index++;
+			}
+		}
+	}
+}
+
+void NeuralNetwork::SaveWeights(vector<double>& weights)
+{
+	for (int i = 0; i < m_nb_layers; i++)
+	{
+		for (int n = 0; n < m_layers[i].m_nb_neurons; n++)
+		{
+			int weightsSize = m_layers[i].m_neurons[n].m_weights.size();
+			for (int w = 0; w < weightsSize; w++)
+			{
+				weights.push_back(m_layers[i].m_neurons[n].m_weights[w]);
+			}
+		}
+	}
+}
+
 void NeuralNetwork::Run()
 {
 	//Input labelled data
 	CreateDataset();
 
-	bool improving_model = true;
-	while (improving_model)
-	{
-		m_learning_rate += 0.05;
-		m_success_rate = 0.f;
-		m_loops = 0;
-		m_overall_attempts = 0;
+	//m_momentum = NEURAL_NETWORK_MOMENTUM;
+	//while (m_momentum < 0.8f)
+	//{
+		m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 
-		while (m_success_rate < 100.f)
-		{
-			m_loops++;
+	//	while (m_learning_rate < 1.3f)
+	//	{
+			if (!m_perf_records.empty())
+			{
+				RestoreWeights(m_weightsStart);
+			}
 
-			//Train on labelled data
-			Training();
-			//cin.get();
+			m_success_rate = 0.f;
+			m_loops = 0;
+			m_overall_attempts = 0;
 
-			//Test model on known data
-			Testing();
-			//cin.get();
+			while (m_success_rate < 100.f && m_overall_attempts < NEURAL_NETWORK_MAX_OVERALL_ATTEMPTS)
+			{
+				m_loops++;
 
-			//Create artificial data
-			//NeuralNetwork.Creating();
+				//Train on labelled data
+				Training();
 
-			Data example({ 200, 50, 200 }, UNLABELLED);
-			Label label = TestSample(example);
+				//Test model on known data
+				Testing();
+			}
 
-			Data example2({ 0, 250, 0 }, UNLABELLED);
-			Label label2 = TestSample(example2);
+			RecordPerf();
+			m_best_perf = GetBestPerf();
 
-			printf("End of loop %d.\n", m_loops);
-			//cin.get();
-		}
+			//m_learning_rate += 0.1;
+		//}
 
-		improving_model = RecordPerf();
-	}
+		//m_momentum += 0.1;
+	//}
+
+	SaveWeights(m_weightsBest);
 
 	printf("Training complete and validated on test data. Now ready to predict labels and create artificial examples.\n");
 	cin.get();
@@ -89,6 +124,7 @@ bool NeuralNetwork::RecordPerf()
 	perf.m_learning_rate = m_learning_rate;
 	perf.m_overall_attempts = m_overall_attempts;
 	perf.m_loops = m_loops;
+	perf.m_success_rate = m_success_rate;
 
 	for (int i = 0; i < m_nb_layers; i++)
 	{
@@ -107,8 +143,36 @@ bool NeuralNetwork::RecordPerf()
 	{
 		int previous_attempts = m_perf_records.back().m_overall_attempts;
 		m_perf_records.push_back(perf);
-		return perf.m_overall_attempts < previous_attempts;
+	
+		if (perf.m_overall_attempts < previous_attempts)	
+		{
+			SaveWeights(m_weightsBest);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
+}
+
+Performance& NeuralNetwork::GetBestPerf()
+{
+	assert(!m_perf_records.empty());
+	
+	int perfSize = m_perf_records.size();
+	int best_perf = 0;
+	int min_attempts = -1;
+	for (int i = 0; i < perfSize; i++)
+	{
+		if (min_attempts < 0 || m_perf_records[i].m_overall_attempts < min_attempts)
+		{
+			min_attempts = m_perf_records[i].m_overall_attempts;
+			best_perf = i;
+		}
+	}
+
+	return m_perf_records[best_perf];
 }
 
 Data::Data(vector<double> features, Label label)
@@ -173,13 +237,6 @@ Data::Data(Label label)
 	//}
 }
 
-
-float Neuron::RandomizeWeight()
-{
-	float random_weight = RandomizeFloatBetweenValues(0.f, 1.f);
-	return random_weight;
-}
-
 Layer::Layer(int nb_neuron, LayerType type)
 {
 	for (int i = 0; i < nb_neuron; i++)
@@ -209,9 +266,10 @@ void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
 		{
 			for (int j = 0; j < nb_neuron; j++)
 			{
-				double weight = Neuron::RandomizeWeight();
+				double weight = RandomizeFloatBetweenValues(0.f, 1.f);
 				previousLayer.m_neurons[i].m_weights.push_back(weight);
 				previousLayer.m_neurons[i].m_deltaWeights.push_back(0.f);
+				m_weightsStart.push_back(weight);
 			}
 		}
 	}
