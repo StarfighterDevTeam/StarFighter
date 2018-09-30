@@ -87,6 +87,7 @@ public:
 	int m_overall_attempts;
 	int m_loops;
 	vector<int> m_hidden_layers;
+	vector<double> m_weights;
 	double m_success_rate;
 };
 
@@ -131,7 +132,7 @@ public:
 	void InitInputLayer(const Data &data);
 	void FeedForward();
 	void ErrorCalculation(const Data &data);
-	void GradientBackPropagation(const Data &data);
+	void BackPropagationGradient(const Data &data);
 	void WeightsUpdate();
 
 	double m_error;
@@ -147,8 +148,9 @@ public:
 	int m_loops;
 
 	vector<Performance> m_perf_records;
+	
 	bool RecordPerf();
-	Performance& GetBestPerf();
+	bool UpdateBestPerf();
 	vector<double> m_weightsStart;
 	void RestoreWeights(vector<double>& weights);
 	void SaveWeights(vector<double>& weights);

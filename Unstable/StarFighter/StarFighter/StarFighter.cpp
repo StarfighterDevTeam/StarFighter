@@ -86,6 +86,7 @@ void NeuralNetwork::Run()
 			}
 
 			m_success_rate = 0.f;
+			m_average_error = 0.f;
 			m_loops = 0;
 			m_overall_attempts = 0;
 
@@ -101,7 +102,6 @@ void NeuralNetwork::Run()
 			}
 
 			RecordPerf();
-			m_best_perf = GetBestPerf();
 
 			//m_learning_rate += 0.1;
 		//}
@@ -109,23 +109,20 @@ void NeuralNetwork::Run()
 		//m_momentum += 0.1;
 	//}
 
-	SaveWeights(m_weightsBest);
-
 	printf("Training complete and validated on test data. Now ready to predict labels and create artificial examples.\n");
 	cin.get();
 }
 
 bool NeuralNetwork::RecordPerf()
 {
+	//Get Perf
 	Performance perf;
-
 	perf.m_function = m_function;
 	perf.m_momentum = m_momentum;
 	perf.m_learning_rate = m_learning_rate;
 	perf.m_overall_attempts = m_overall_attempts;
 	perf.m_loops = m_loops;
 	perf.m_success_rate = m_success_rate;
-
 	for (int i = 0; i < m_nb_layers; i++)
 	{
 		if (i > 0 && i < m_nb_layers - 1)
@@ -133,46 +130,45 @@ bool NeuralNetwork::RecordPerf()
 			perf.m_hidden_layers.push_back(m_layers[i].m_nb_neurons - 1);//-1 for the bias neuron
 		}
 	}
+	SaveWeights(perf.m_weights);
 
-	if (m_perf_records.empty())
+	//Save perf
+	m_perf_records.push_back(perf);
+	if (UpdateBestPerf())
 	{
-		m_perf_records.push_back(perf);
+		printf("New best perf: loops: %d loops, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NEURAL_NETWORK_ERROR_MARGIN, m_perf_records.size() - 1);
+		SaveWeights(m_weightsBest);
 		return true;
 	}
-	else
-	{
-		int previous_attempts = m_perf_records.back().m_overall_attempts;
-		m_perf_records.push_back(perf);
-	
-		if (perf.m_overall_attempts < previous_attempts)	
-		{
-			SaveWeights(m_weightsBest);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+	return false;
 }
 
-Performance& NeuralNetwork::GetBestPerf()
+bool NeuralNetwork::UpdateBestPerf()
 {
 	assert(!m_perf_records.empty());
 	
 	int perfSize = m_perf_records.size();
 	int best_perf = 0;
 	int min_attempts = -1;
+	double max_success_rate = -1.f;
+
+	//Best perf = 1) best success rate 2) min overall attempts
 	for (int i = 0; i < perfSize; i++)
 	{
 		if (min_attempts < 0 || m_perf_records[i].m_overall_attempts < min_attempts)
 		{
-			min_attempts = m_perf_records[i].m_overall_attempts;
-			best_perf = i;
+			if (m_success_rate < 0 || m_perf_records[i].m_success_rate > max_success_rate)
+			{
+				min_attempts = m_perf_records[i].m_overall_attempts;
+				max_success_rate = m_perf_records[i].m_success_rate;
+				best_perf = i;
+			}
 		}
 	}
 
-	return m_perf_records[best_perf];
+	m_best_perf = m_perf_records[best_perf];
+
+	return best_perf == perfSize - 1;//return true if the latest perf is the best one
 }
 
 Data::Data(vector<double> features, Label label)
@@ -308,7 +304,6 @@ void NeuralNetwork::Training()
 {
 	printf("\n*** Training. ***\n");
 
-	m_average_error = 0.f;
 	m_success = 0;
 
 	//Supervised training data
@@ -340,15 +335,11 @@ void NeuralNetwork::Training()
 				printf("Fail.\n");
 			}
 
-			GradientBackPropagation(m_dataset[d]);
+			BackPropagationGradient(m_dataset[d]);
 
 			WeightsUpdate();
 		}
 	}
-
-	m_average_error = m_average_error / m_overall_attempts;
-	printf("\nOverall attempts: %d for %d data (Average attempts per data: %d). Success: %d/%d (%.2f%%).\n", m_overall_attempts, DATASET_SUPERVISED_LOT, m_overall_attempts / DATASET_SUPERVISED_LOT, m_success, DATASET_SUPERVISED_LOT, 100.f*m_success / DATASET_SUPERVISED_LOT);
-	printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN);
 }
 
 void NeuralNetwork::Testing()
@@ -362,6 +353,7 @@ void NeuralNetwork::Testing()
 	//Supervised training data
 	for (int d = DATASET_SUPERVISED_LOT; d < DATASET_SIZE; d++)
 	{
+		m_attempts++;
 		printf("\nInput data %d.\n", d);
 
 		InitInputLayer(m_dataset[d]);
@@ -381,7 +373,7 @@ void NeuralNetwork::Testing()
 		}
 	}
 
-	m_average_error = m_average_error / m_overall_attempts;
+	m_average_error = m_average_error / m_attempts;
 	m_success_rate = 100.f * m_success / DATASET_TESTING_LOT;
 	printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, m_success_rate);
 	printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN);
@@ -532,7 +524,7 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	m_average_error += m_error;
 }
 
-void NeuralNetwork::GradientBackPropagation(const Data &data)
+void NeuralNetwork::BackPropagationGradient(const Data &data)
 {
 	if (PRINT_BP){ printf("Back propagation.\n"); }
 	Layer &outputLayer = m_layers.back();
