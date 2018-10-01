@@ -4,7 +4,13 @@ int main()
 {
 	NeuralNetwork NeuralNetwork;
 
-	NeuralNetwork.Run();
+	//NeuralNetwork.CreateDataset();
+	NeuralNetwork.LoadDatasetFromFile();
+	//NeuralNetwork.SaveDatasetIntoFile();
+
+	//NeuralNetwork.Run(PerfFromScratch);
+	NeuralNetwork.Run(LearnHyperparameters);
+	//NeuralNetwork.Run(Prod);
 	
 	printf("Exit program?\n");
 	cin.get();
@@ -19,10 +25,14 @@ NeuralNetwork::NeuralNetwork()
 	m_success_rate = 0.f;
 	m_loops = 0;
 	m_overall_attempts = 0;
+	m_weightLoadIndex = 0;
+
+	//Use the same random weights every run
+	LoadWeightsFromFile();
 
 	m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
 	m_momentum = NEURAL_NETWORK_MOMENTUM;
-	m_function = TANH;
+	m_function = LEAKY_RELU;
 
 	//Input layer
 	AddLayer(NB_FEATURES, InputLayer);
@@ -53,7 +63,7 @@ void NeuralNetwork::RestoreWeights(vector<double>& weights)
 	}
 }
 
-void NeuralNetwork::SaveWeights(vector<double>& weights)
+void NeuralNetwork::CopyWeightsInto(vector<double>& weights)
 {
 	for (int i = 0; i < m_nb_layers; i++)
 	{
@@ -68,49 +78,79 @@ void NeuralNetwork::SaveWeights(vector<double>& weights)
 	}
 }
 
-void NeuralNetwork::Run()
+void NeuralNetwork::Run(NeuralNetworkMode mode)
 {
-	//Input labelled data
-	CreateDataset();
+	// ******* Mode 0 *******
+	if (mode == PerfFromScratch)
+	{
+		m_success_rate = 0.f;
+		m_average_error = 0.f;
+		m_loops = 0;
+		m_overall_attempts = 0;
 
-	//m_momentum = NEURAL_NETWORK_MOMENTUM;
-	//while (m_momentum < 0.8f)
-	//{
-		m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
+		while (m_success_rate < 100.f && m_overall_attempts < NEURAL_NETWORK_MAX_OVERALL_ATTEMPTS)
+		{
+			m_loops++;
 
-	//	while (m_learning_rate < 1.3f)
-	//	{
-			if (!m_perf_records.empty())
+			//Train on labelled data
+			Training();
+
+			//Test model on known data
+			Testing();
+		}
+
+		RecordPerf();
+
+		while (this->DoNothing()){}// <<< put breakpoint here to read values
+	}
+
+	// ******* Mode 1 *******
+	if (mode == LearnHyperparameters)
+	{
+		m_function = TANH;
+		while (m_function < NB_FUNCTIONS)
+		{
+			m_momentum = NEURAL_NETWORK_MOMENTUM;
+			while (m_momentum < 0.6f)
 			{
-				RestoreWeights(m_weightsStart);
+				m_learning_rate = NEURAL_NETWORK_LEARNING_RATE;
+
+				while (m_learning_rate < 1.1f)
+				{
+					if (!m_perf_records.empty())
+					{
+						RestoreWeights(m_weightsStart);
+					}
+
+					m_success_rate = 0.f;
+					m_average_error = 0.f;
+					m_loops = 0;
+					m_overall_attempts = 0;
+
+					while (m_success_rate < 100.f && m_overall_attempts < NEURAL_NETWORK_MAX_OVERALL_ATTEMPTS)
+					{
+						m_loops++;
+
+						//Train on labelled data
+						Training();
+
+						//Test model on known data
+						Testing();
+					}
+
+					RecordPerf();
+
+					m_learning_rate += 0.1;
+				}
+
+				m_momentum += 0.1;
 			}
 
-			m_success_rate = 0.f;
-			m_average_error = 0.f;
-			m_loops = 0;
-			m_overall_attempts = 0;
+			m_function = (FunctionType)((int)(m_function) + 1);
+		}
 
-			while (m_success_rate < 100.f && m_overall_attempts < NEURAL_NETWORK_MAX_OVERALL_ATTEMPTS)
-			{
-				m_loops++;
-
-				//Train on labelled data
-				Training();
-
-				//Test model on known data
-				Testing();
-			}
-
-			RecordPerf();
-
-			//m_learning_rate += 0.1;
-		//}
-
-		//m_momentum += 0.1;
-	//}
-
-	printf("Training complete and validated on test data. Now ready to predict labels and create artificial examples.\n");
-	cin.get();
+		while (this->DoNothing()){}// <<< put breakpoint here to read values
+	}
 }
 
 bool NeuralNetwork::RecordPerf()
@@ -130,14 +170,14 @@ bool NeuralNetwork::RecordPerf()
 			perf.m_hidden_layers.push_back(m_layers[i].m_nb_neurons - 1);//-1 for the bias neuron
 		}
 	}
-	SaveWeights(perf.m_weights);
+	CopyWeightsInto(perf.m_weights);
 
 	//Save perf
 	m_perf_records.push_back(perf);
 	if (UpdateBestPerf())
 	{
-		printf("New best perf: loops: %d loops, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NEURAL_NETWORK_ERROR_MARGIN, m_perf_records.size() - 1);
-		SaveWeights(m_weightsBest);
+		printf("New best perf: loops: %d, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NEURAL_NETWORK_ERROR_MARGIN, m_perf_records.size() - 1);
+		CopyWeightsInto(m_weightsBest);
 		return true;
 	}
 	return false;
@@ -262,10 +302,25 @@ void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
 		{
 			for (int j = 0; j < nb_neuron; j++)
 			{
-				double weight = RandomizeFloatBetweenValues(0.f, 1.f);
+				double weight;
+				//Load values from file if they exist
+				if (m_weightLoadIndex < m_weightsStart.size())
+				{
+					weight = m_weightsStart[m_weightLoadIndex];
+				}
+				else
+				{
+					weight = RandomizeFloatBetweenValues(-1.f, 1.f);
+					m_weightsStart.push_back(weight);
+					if (j == nb_neuron - 1)
+					{
+						SaveWeightsIntoFile();
+					}
+				}
+
+				m_weightLoadIndex++;
 				previousLayer.m_neurons[i].m_weights.push_back(weight);
 				previousLayer.m_neurons[i].m_deltaWeights.push_back(0.f);
-				m_weightsStart.push_back(weight);
 			}
 		}
 	}
@@ -275,76 +330,58 @@ void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
 	m_nb_layers++;
 }
 
-void NeuralNetwork::CreateDataset()
-{
-	for (int d = 0; d < DATASET_SIZE; d++)
-	{
-		int r = RandomizeIntBetweenValues(0, 1);
-		if (r % 2 == 0)
-		{
-			m_dataset.push_back(Data(IS_GREEN));
-		}
-		else
-		{
-			m_dataset.push_back(Data(NOT_GREEN));
-		}
-		
-		//{
-		//	m_dataset.push_back(Data(UNLABELLED));
-		//}
-
-		if (d == DATASET_SIZE - 1)
-		{
-			printf("Dataset created: %d data items.\n", d + 1);
-		}
-	}
-}
-
 void NeuralNetwork::Training()
 {
-	printf("\n*** Training. ***\n");
+	if (PRINT_TR){ printf("\n*** Training. ***\n"); }
 
 	m_success = 0;
-
+	int training_attempts = 0;
 	//Supervised training data
-	for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
+	while (m_success_rate < 100.f && training_attempts < NEURAL_NETWORK_MAX_ATTEMPTS)
 	{
-		m_attempts = 0;
-		m_error = NEURAL_NETWORK_ERROR_MARGIN;
-		
-		printf("\nInput data %d.\n", d);
-		InitInputLayer(m_dataset[d]);
+		training_attempts++;
 
-		while (m_error >= NEURAL_NETWORK_ERROR_MARGIN && m_attempts < NEURAL_NETWORK_MAX_ATTEMPTS)
+		for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
 		{
-			m_attempts++;
-			m_overall_attempts++;
-			printf("\nAttempts: %d (overall attempts: %d).\n", m_attempts, m_overall_attempts);
-			FeedForward();
+			m_attempts = 0;
+			m_error = NEURAL_NETWORK_ERROR_MARGIN;
 
-			ErrorCalculation(m_dataset[d]);
+			if (PRINT_TR){ printf("\nInput data %d.\n", d); }
+			InitInputLayer(m_dataset[d]);
 
-			if (m_error < NEURAL_NETWORK_ERROR_MARGIN)
+			while (m_error >= NEURAL_NETWORK_ERROR_MARGIN && m_attempts < NEURAL_NETWORK_MAX_ATTEMPTS)
 			{
-				printf("Success.\n");
-				m_success++;
-				break;
-			}
-			else
-			{
-				printf("Fail.\n");
-			}
+				m_attempts++;
+				m_overall_attempts++;
+				if (PRINT_TR){ printf("\nAttempts: %d (overall attempts: %d).\n", m_attempts, m_overall_attempts); }
+				FeedForward();
 
-			BackPropagationGradient(m_dataset[d]);
+				ErrorCalculation(m_dataset[d]);
 
-			WeightsUpdate();
+				if (m_error < NEURAL_NETWORK_ERROR_MARGIN)
+				{
+					if (PRINT_TR){ printf("Success.\n"); }
+					m_success++;
+					break;
+				}
+				else
+				{
+					if (PRINT_TR){ printf("Fail.\n"); }
+				}
+
+				BackPropagationGradient(m_dataset[d]);
+
+				WeightsUpdate();
+			}
 		}
+
+		m_success_rate = 100.f * m_success / DATASET_SUPERVISED_LOT;
 	}
 }
 
 void NeuralNetwork::Testing()
 {
-	printf("\n*** Testing. ***\n");
+	if (PRINT_TE){ printf("\n*** Testing. ***\n"); }
 
 	m_average_error = 0.f;
 	m_success = 0;
@@ -354,7 +391,7 @@ void NeuralNetwork::Testing()
 	for (int d = DATASET_SUPERVISED_LOT; d < DATASET_SIZE; d++)
 	{
 		m_attempts++;
-		printf("\nInput data %d.\n", d);
+		if (PRINT_TE){ printf("\nInput data %d.\n", d); }
 
 		InitInputLayer(m_dataset[d]);
 		
@@ -364,19 +401,19 @@ void NeuralNetwork::Testing()
 
 		if (m_error < NEURAL_NETWORK_ERROR_MARGIN)
 		{
-			printf("Success.\n");
+			if (PRINT_TE){ printf("Success.\n"); }
 			m_success++;
 		}
 		else
 		{
-			printf("Fail.\n");
+			if (PRINT_TE){ printf("Fail.\n"); }
 		}
 	}
 
 	m_average_error = m_average_error / m_attempts;
 	m_success_rate = 100.f * m_success / DATASET_TESTING_LOT;
-	printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, m_success_rate);
-	printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN);
+	if (PRINT_TE){ printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, m_success_rate); }
+	if (PRINT_TE){ printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NEURAL_NETWORK_ERROR_MARGIN); }
 }
 
 Label NeuralNetwork::TestSample(Data &data)
@@ -556,7 +593,7 @@ void NeuralNetwork::BackPropagationGradient(const Data &data)
 					}
 				}
 
-				currentLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(currentLayer.m_neurons[n].m_input_value, m_function);
+				currentLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(currentLayer.m_neurons[n].m_value, m_function);
 				if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f\n", i, n, currentLayer.m_neurons[n].m_gradient); }
 		}
 	}
@@ -634,6 +671,18 @@ double NeuralNetwork::TransferFunction(double x, FunctionType function)
 		output_value = (2.f / (1 + exp(-2.f * x))) - 1;
 	}
 
+	//RELU
+	if (function == RELU)
+	{
+		output_value = MaxBetweenValues(0, x);
+	}
+
+	//LEAKY RELU
+	if (function == LEAKY_RELU)
+	{
+		output_value = MaxBetweenValues(0.1f * x, x);
+	}
+
 	return output_value;
 }
 
@@ -671,5 +720,180 @@ double NeuralNetwork::TransferFunctionDerivative(double x, FunctionType function
 		output_value = 1.f - x*x;
 	}
 
+	//RELU
+	if (function == RELU)
+	{
+		if (x > 0)
+			output_value = 1;
+		else
+			output_value = 0;
+	}
+
+	//LEAKY RELU
+	if (function == LEAKY_RELU)
+	{
+		if (x > 0)
+			output_value = 1;
+		else
+			output_value = 0.1f;
+	}
+
 	return output_value;
+}
+
+//DATASET
+
+void NeuralNetwork::CreateDataset()
+{
+	for (int d = 0; d < DATASET_SIZE; d++)
+	{
+
+		int r = RandomizeIntBetweenValues(0, 1);
+		if (r % 2 == 0)
+		{
+			m_dataset.push_back(Data(IS_GREEN));
+		}
+		else
+		{
+			m_dataset.push_back(Data(NOT_GREEN));
+		}
+
+		if (d == DATASET_SIZE - 1)
+		{
+			printf("Dataset created: %d data items.\n", d + 1);
+		}
+	}
+}
+
+bool NeuralNetwork::SaveDatasetIntoFile()
+{
+	ofstream data(DATASET_FILE, ios::in | ios::trunc);
+
+	if (data)
+	{
+		int nb_features = -1;
+		for (int d = 0; d < DATASET_SIZE; d++)
+		{
+			Data &current_data = m_dataset[d];
+			if (nb_features < 0)
+			{
+				nb_features = current_data.m_features.size();
+			}
+
+			data << d << " ";
+			for (int i = 0; i < nb_features; i++)
+			{
+				data << current_data.m_features[i] << " ";
+			}
+			data << current_data.m_label;
+			data << endl;
+		}
+		data.close();  // on ferme le fichier
+		return true;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No save file found for known scenes. A new file is going to be created.\n" << endl;
+		return false;
+	}
+}
+
+bool NeuralNetwork::LoadDatasetFromFile()
+{
+	std::ifstream data(DATASET_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+
+		m_dataset.clear();
+		int d = 0;
+		while (std::getline(data, line))
+		{
+			std::istringstream ss(line);
+
+			vector<double> features;
+			for (int i = 0; i < NB_FEATURES; i++)
+			{
+				double feature;
+				features.push_back(feature);
+			}
+			int label;
+
+			ss >> d;
+			for (int i = 0; i < NB_FEATURES; i++)
+			{
+				ss >> features[i];
+			}
+			ss >> label;
+
+			m_dataset.push_back(Data(features, (Label)label));
+
+			if (d >= DATASET_SIZE - 1)
+			{
+				break;
+			}
+		}
+
+		data.close();  // on ferme le fichier
+		return true;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No MONEY SAVE FILE found. A new file is going to be created.\n" << endl;
+		return false;
+	}
+}
+
+
+
+bool NeuralNetwork::SaveWeightsIntoFile()
+{
+	ofstream data(RANDOM_WEIGHTS_FILE, ios::in | ios::trunc);
+
+	if (data)
+	{
+		int weightsSize = m_weightsStart.size();
+		for (int i = 0; i < weightsSize; i++)
+		{
+			data << m_weightsStart[i] << " ";
+			data << endl;
+		}
+		data.close();  // on ferme le fichier
+		return true;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No save file found for known scenes. A new file is going to be created.\n" << endl;
+		return false;
+	}
+}
+
+bool NeuralNetwork::LoadWeightsFromFile()
+{
+	std::ifstream data(RANDOM_WEIGHTS_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+
+		m_weightsStart.clear();
+
+		while (std::getline(data, line))
+		{
+			std::istringstream ss(line);
+
+			double weight;
+			ss >> weight;
+			m_weightsStart.push_back(weight);
+		}
+
+		data.close();  // on ferme le fichier
+		return true;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No MONEY SAVE FILE found. A new file is going to be created.\n" << endl;
+		return false;
+	}
 }

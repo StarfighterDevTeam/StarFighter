@@ -16,55 +16,72 @@ using namespace std;
 #include <stdio.h>      /* printf, scanf, puts, NULL */
 #include <stdlib.h>     /* srand, rand */
 #include <iostream>		/* cin */
+#include <fstream>		/* ofstream */
+#include <sstream>		/*istringstream */
 
 #include "Globals.h"
 
 #define NEURAL_NETWORK_ERROR_MARGIN					0.02
-#define NEURAL_NETWORK_LEARNING_RATE					1.0
-#define NEURAL_NETWORK_MOMENTUM						0.6
+#define NEURAL_NETWORK_LEARNING_RATE				1.0
+#define NEURAL_NETWORK_MOMENTUM						0.5
 #define NEURAL_NETWORK_MAX_ATTEMPTS					500
 #define NEURAL_NETWORK_MAX_OVERALL_ATTEMPTS			100000
 
-#define DATASET_SIZE									300
+#define DATASET_SIZE								300
 #define DATASET_SUPERVISED_LOT						200
 #define DATASET_TESTING_LOT							(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
-#define PRINT_ALL				false
+#define PRINT_ALL					false
 #define PRINT_FF					false//feed forward
-#define PRINT_EC					false//erorr caculation
+#define PRINT_EC					true//erorr caculation
 #define PRINT_BP					false//gradient back propagation
 #define PRINT_WU					false//weights update
+#define PRINT_TR					true//training
+#define PRINT_TE					true//testing
+
+#define DATASET_FILE				"Saves/DataSet.txt"
+#define RANDOM_WEIGHTS_FILE			"Saves/RandomWeights.txt"
 
 enum Label
 {
-	IS_GREEN,	//0
-	NB_LABELS,	//1
-	NOT_GREEN,	//2
-	UNLABELLED,	//3
+	IS_GREEN,		//0
+	NB_LABELS,		//1
+	NOT_GREEN,		//2
+	UNLABELLED,		//3
 };
 
 enum Features
 {
-	RED,				//0
+	RED,			//0
 	GREEN,			//1
 	BLUE,			//2
-	NB_FEATURES,		//3
+	NB_FEATURES,	//3
 };
 
 enum FunctionType
 {
-	LINEAR,		//0
+	LINEAR,			//0
 	SIGMOID,		//1
-	THRESHOLD,	//2
-	TANH,		//3
-	TANSIG,		//4
+	THRESHOLD,		//2
+	TANH,			//3
+	TANSIG,			//4
+	RELU,			//5
+	LEAKY_RELU,		//6
+	NB_FUNCTIONS,	//7
 };
 
 enum LayerType
 {
 	InputLayer,		//0
-	HiddenLayer,		//1
+	HiddenLayer,	//1
 	OutpuLayer,		//2
+};
+
+enum NeuralNetworkMode
+{
+	PerfFromScratch,		//0: run one time with given hyperparameters and default weights
+	LearnHyperparameters,	//1: run in loop with default weights, tuning hyperparameters every time
+	Prod,					//2: load best-known weights and hyperparameters and get ready to produce results
 };
 
 class Data
@@ -123,11 +140,12 @@ public:
 	int m_nb_layers;
 	vector<Data> m_dataset;
 
-	void Run();
+	void Run(NeuralNetworkMode mode);
 	void Training();
 	void Testing();
 	void Creating();
 	Label TestSample(Data &data);
+	bool DoNothing(){ return true; };
 
 	void InitInputLayer(const Data &data);
 	void FeedForward();
@@ -147,20 +165,30 @@ public:
 	double m_success_rate;
 	int m_loops;
 
+	//Record perfs
 	vector<Performance> m_perf_records;
-	
 	bool RecordPerf();
 	bool UpdateBestPerf();
 	vector<double> m_weightsStart;
 	void RestoreWeights(vector<double>& weights);
-	void SaveWeights(vector<double>& weights);
+	void CopyWeightsInto(vector<double>& weights);
 	vector<double> m_weightsBest;
 	void LoadBestWeights();
 	Performance m_best_perf;
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);
+
+	//Dataset
 	void CreateDataset();
+	bool SaveDatasetIntoFile();
+	bool LoadDatasetFromFile();
+
+	bool SaveWeightsIntoFile();
+	bool LoadWeightsFromFile();
+	bool GetRandomWeightFromFile();
+	int m_weightLoadIndex;
+
 	static string GetLabelString(Label label)
 	{
 		if (label == IS_GREEN)
