@@ -21,26 +21,31 @@ using namespace std;
 
 #include "Globals.h"
 
-#define NEURAL_NETWORK_ERROR_MARGIN					0.02
-#define NEURAL_NETWORK_LEARNING_RATE				1.0
-#define NEURAL_NETWORK_MOMENTUM						0.5
-#define NEURAL_NETWORK_MAX_ATTEMPTS					500
-#define NEURAL_NETWORK_MAX_OVERALL_ATTEMPTS			100000
+#define NN_LEARNING_RATE				1.0
+#define NN_MOMENTUM						0.5
+#define NN_ACTIVATION_FUNCTION			TANH
 
-#define DATASET_SIZE								300
-#define DATASET_SUPERVISED_LOT						200
-#define DATASET_TESTING_LOT							(DATASET_SIZE - DATASET_SUPERVISED_LOT)
+#define NN_ERROR_MARGIN					0.02
+#define NN_MAX_ATTEMPTS					500
+#define NN_MAX_OVERALL_ATTEMPTS			100000
 
-#define PRINT_ALL					false
-#define PRINT_FF					false//feed forward
-#define PRINT_EC					true//erorr caculation
-#define PRINT_BP					false//gradient back propagation
-#define PRINT_WU					false//weights update
-#define PRINT_TR					true//training
-#define PRINT_TE					true//testing
+#define DATASET_SIZE					300
+#define DATASET_SUPERVISED_LOT			200
+#define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
-#define DATASET_FILE				"Saves/DataSet.txt"
-#define RANDOM_WEIGHTS_FILE			"Saves/RandomWeights.txt"
+#define PRINT_ALL						false
+#define PRINT_FF						false//feed forward
+#define PRINT_EC						true//erorr caculation
+#define PRINT_BP						false//gradient back propagation
+#define PRINT_WU						false//weights update
+#define PRINT_TR						true//training
+#define PRINT_TE						true//testing
+
+#define DATASET_FILE					"Saves/DataSet.txt"
+#define RANDOM_WEIGHTS_FILE				"Saves/RandomWeights.txt"
+#define PERF_RECORDS_FILE				"Saves/PerfRecords.csv"
+#define PERF_BEST_FILE					"Saves/PerfBest.csv"
+#define PERF_BEST_WEIGHTS_FILE			"Saves/PerfBestWeights.txt"
 
 enum Label
 {
@@ -63,8 +68,8 @@ enum FunctionType
 	LINEAR,			//0
 	SIGMOID,		//1
 	THRESHOLD,		//2
-	TANH,			//3
-	TANSIG,			//4
+	TANSIG,			//3
+	TANH,			//4
 	RELU,			//5
 	LEAKY_RELU,		//6
 	NB_FUNCTIONS,	//7
@@ -81,7 +86,8 @@ enum NeuralNetworkMode
 {
 	PerfFromScratch,		//0: run one time with given hyperparameters and default weights
 	LearnHyperparameters,	//1: run in loop with default weights, tuning hyperparameters every time
-	Prod,					//2: load best-known weights and hyperparameters and get ready to produce results
+	ImproveWeights,			//2: load best-known weights and hyperparameters and iterate to improve weights
+	Prod,					//3: load best-known weights and hyperparameters and get ready to produce results
 };
 
 class Data
@@ -106,6 +112,7 @@ public:
 	vector<int> m_hidden_layers;
 	vector<double> m_weights;
 	double m_success_rate;
+	int m_index;
 };
 
 class Neuron
@@ -172,7 +179,6 @@ public:
 	vector<double> m_weightsStart;
 	void RestoreWeights(vector<double>& weights);
 	void CopyWeightsInto(vector<double>& weights);
-	vector<double> m_weightsBest;
 	void LoadBestWeights();
 	Performance m_best_perf;
 
@@ -181,12 +187,16 @@ public:
 
 	//Dataset
 	void CreateDataset();
+
+	//Save and Load files
 	bool SaveDatasetIntoFile();
 	bool LoadDatasetFromFile();
-
 	bool SaveWeightsIntoFile();
-	bool LoadWeightsFromFile();
-	bool GetRandomWeightFromFile();
+	bool LoadWeightsFromFile(string filename);
+	bool LoadHyperParametersFromFile(string filename);
+	bool SavePerfIntoFile();
+	bool SaveBestPerfIntoFile();
+
 	int m_weightLoadIndex;
 
 	static string GetLabelString(Label label)
