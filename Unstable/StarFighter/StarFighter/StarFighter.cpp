@@ -139,10 +139,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 				while (m_learning_rate < 1.1f)
 				{
-					if (!m_perf_records.empty())
-					{
-						RestoreWeights(m_weightsStart);
-					}
+					RestoreWeights(m_weightsStart);
 
 					m_success_rate = 0.f;
 					m_average_error = 0.f;
