@@ -90,12 +90,16 @@ void NeuralNetwork::CopyWeightsInto(vector<double>& weights)
 
 void NeuralNetwork::Run(NeuralNetworkMode mode)
 {
+	clock_t begin = clock();
+
 	// ******* Mode 0 *******
 	if (mode == PerfFromScratch)
 	{
 		m_function = NN_ACTIVATION_FUNCTION;
 		m_learning_rate = NN_LEARNING_RATE;
 		m_momentum = NN_MOMENTUM;
+
+		RestoreWeights(m_weightsStart);
 
 		m_success_rate = 0.f;
 		m_average_error = 0.f;
@@ -109,8 +113,11 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 			//Train on labelled data
 			Training();
 
-			//Test model on known data
-			Testing();
+			//Test model on known data if training set successful or last attempt
+			if (m_success == DATASET_SUPERVISED_LOT || m_overall_attempts == NN_MAX_OVERALL_ATTEMPTS - 1)
+			{
+				Testing();
+			}
 		}
 
 		RecordPerf();
@@ -124,10 +131,10 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 		m_function = NN_ACTIVATION_FUNCTION;
 		while (m_function < NB_FUNCTIONS)
 		{
-			m_momentum = NN_MOMENTUM;
+			m_momentum = 0.0f;
 			while (m_momentum < 0.6f)
 			{
-				m_learning_rate = NN_LEARNING_RATE;
+				m_learning_rate = 0.1f;
 
 				while (m_learning_rate < 1.1f)
 				{
@@ -197,6 +204,10 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
 	}
+
+	clock_t end = clock();
+	double elapsed = (double)((end - begin) / CLOCKS_PER_SEC);
+	printf("TIme elpased: %fs.\n", elapsed);
 }
 
 bool NeuralNetwork::RecordPerf()
@@ -363,7 +374,7 @@ void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
 					m_weightsStart.push_back(weight);
 					if (j == nb_neuron - 1)
 					{
-						SaveWeightsIntoFile();
+						SaveStartingWeightsIntoFile();
 					}
 				}
 
@@ -385,46 +396,40 @@ void NeuralNetwork::Training()
 
 	m_success = 0;
 	int training_attempts = 0;
+	
 	//Supervised training data
-	while (m_success_rate < 100.f && training_attempts < NN_MAX_ATTEMPTS)
+	for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
 	{
-		training_attempts++;
+		m_attempts = 0;
+		m_error = NN_ERROR_MARGIN;
 
-		for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
+		if (PRINT_TR){ printf("\nInput data %d.\n", d); }
+		InitInputLayer(m_dataset[d]);
+
+		while (m_error >= NN_ERROR_MARGIN && m_attempts < NN_MAX_ATTEMPTS)
 		{
-			m_attempts = 0;
-			m_error = NN_ERROR_MARGIN;
+			m_attempts++;
+			m_overall_attempts++;
+			if (PRINT_TR){ printf("\nAttempts: %d (overall attempts: %d).\n", m_attempts, m_overall_attempts); }
+			FeedForward();
 
-			if (PRINT_TR){ printf("\nInput data %d.\n", d); }
-			InitInputLayer(m_dataset[d]);
+			ErrorCalculation(m_dataset[d]);
 
-			while (m_error >= NN_ERROR_MARGIN && m_attempts < NN_MAX_ATTEMPTS)
+			if (m_error < NN_ERROR_MARGIN)
 			{
-				m_attempts++;
-				m_overall_attempts++;
-				if (PRINT_TR){ printf("\nAttempts: %d (overall attempts: %d).\n", m_attempts, m_overall_attempts); }
-				FeedForward();
-
-				ErrorCalculation(m_dataset[d]);
-
-				if (m_error < NN_ERROR_MARGIN)
-				{
-					if (PRINT_TR){ printf("Success.\n"); }
-					m_success++;
-					break;
-				}
-				else
-				{
-					if (PRINT_TR){ printf("Fail.\n"); }
-				}
-
-				BackPropagationGradient(m_dataset[d]);
-
-				WeightsUpdate();
+				if (PRINT_TR){ printf("Success.\n"); }
+				m_success++;
+				break;
 			}
-		}
+			else
+			{
+				if (PRINT_TR){ printf("Fail.\n"); }
+			}
 
-		m_success_rate = 100.f * m_success / DATASET_SUPERVISED_LOT;
+			BackPropagationGradient(m_dataset[d]);
+
+			WeightsUpdate();
+		}
 	}
 }
 
@@ -461,8 +466,8 @@ void NeuralNetwork::Testing()
 
 	m_average_error = m_average_error / m_attempts;
 	m_success_rate = 100.f * m_success / DATASET_TESTING_LOT;
-	if (PRINT_TE){ printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, m_success_rate); }
-	if (PRINT_TE){ printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NN_ERROR_MARGIN); }
+	if (PRINT_LO){ printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, m_success_rate); }
+	if (PRINT_LO){ printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NN_ERROR_MARGIN); }
 }
 
 Label NeuralNetwork::TestSample(Data &data)
@@ -535,7 +540,7 @@ void NeuralNetwork::FeedForward()
 	Layer &inputLayer = m_layers.front();
 	for (int n = 0; n < inputLayer.m_nb_neurons; n++)
 	{
-		if (PRINT_FF){ printf("Layer: %d, neuron: %d, value: %f\n", 0, n, inputLayer.m_neurons[n].m_value); }
+		if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f\n", 0, n, inputLayer.m_neurons[n].m_value); }
 	}
 	
 	//Feed forward
@@ -556,7 +561,7 @@ void NeuralNetwork::FeedForward()
 				}
 				nextLayer.m_neurons[n].m_input_value = sum;
 				nextLayer.m_neurons[n].m_value = TransferFunction(sum, m_function);
-				if (PRINT_FF){ printf("Layer: %d, neuron: %d, input: %f, value: %f\n", i + 1, n, nextLayer.m_neurons[n].m_input_value, nextLayer.m_neurons[n].m_value); }
+				if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f, output value: %f\n", i + 1, n, nextLayer.m_neurons[n].m_input_value, nextLayer.m_neurons[n].m_value); }
 			}
 			else
 			{
@@ -576,7 +581,7 @@ double NeuralNetwork::GetTargetValue(const Data &data)
 	}
 	else
 	{
-		target_value = 0.f;
+		target_value = -1.f;
 	}
 	return target_value;
 }
@@ -604,7 +609,7 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	}
 	else
 	{
-		if (PRINT_EC){ printf("RMSE: %f (previous RMSE: %f). Progression: %f (%f%%).\n", m_error, previous_error, previous_error - m_error, (previous_error - m_error) / previous_error); }
+		if (PRINT_EC){ printf("RMSE: %f (previous RMSE: %f). Progression: %f (%f%%).\n", m_error, previous_error, previous_error - m_error, 100.f*(previous_error - m_error)) / previous_error; }
 	}
 
 	m_average_error += m_error;
@@ -619,7 +624,7 @@ void NeuralNetwork::BackPropagationGradient(const Data &data)
 	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
 	{
 		double delta = GetTargetValue(data) - outputLayer.m_neurons[n].m_value;
-		outputLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(outputLayer.m_neurons[n].m_value, m_function);
+		outputLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(outputLayer.m_neurons[n].m_input_value, m_function);
 
 		if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f\n", m_nb_layers - 1, n, outputLayer.m_neurons[n].m_gradient); }
 	}
@@ -642,7 +647,7 @@ void NeuralNetwork::BackPropagationGradient(const Data &data)
 					}
 				}
 
-				currentLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(currentLayer.m_neurons[n].m_value, m_function);
+				currentLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(currentLayer.m_neurons[n].m_input_value, m_function);
 				if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f\n", i, n, currentLayer.m_neurons[n].m_gradient); }
 		}
 	}
@@ -894,7 +899,7 @@ bool NeuralNetwork::LoadDatasetFromFile()
 	}
 }
 
-bool NeuralNetwork::SaveWeightsIntoFile()
+bool NeuralNetwork::SaveStartingWeightsIntoFile()
 {
 	ofstream data(RANDOM_WEIGHTS_FILE, ios::in | ios::trunc);
 

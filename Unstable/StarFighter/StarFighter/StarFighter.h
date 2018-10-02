@@ -18,30 +18,32 @@ using namespace std;
 #include <iostream>		/* cin */
 #include <fstream>		/* ofstream */
 #include <sstream>		/*istringstream */
+#include <ctime>			/* clock */
 
 #include "Globals.h"
 
-#define NN_LEARNING_RATE				1.0
+#define NN_LEARNING_RATE					0.2
 #define NN_MOMENTUM						0.5
 #define NN_ACTIVATION_FUNCTION			TANH
 
 #define NN_ERROR_MARGIN					0.02
 #define NN_MAX_ATTEMPTS					500
-#define NN_MAX_OVERALL_ATTEMPTS			100000
+#define NN_MAX_OVERALL_ATTEMPTS			200000
 
-#define DATASET_SIZE					300
+#define DATASET_SIZE						300
 #define DATASET_SUPERVISED_LOT			200
 #define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
 #define PRINT_ALL						false
-#define PRINT_FF						false//feed forward
-#define PRINT_EC						true//erorr caculation
-#define PRINT_BP						false//gradient back propagation
-#define PRINT_WU						false//weights update
-#define PRINT_TR						true//training
-#define PRINT_TE						true//testing
+#define PRINT_FF							true//feed forward
+#define PRINT_EC							true//erorr caculation
+#define PRINT_BP							true//gradient back propagation
+#define PRINT_WU							true//weights update
+#define PRINT_TR							true//training
+#define PRINT_TE							false//testing
+#define PRINT_LO							true//result of the loop
 
-#define DATASET_FILE					"Saves/DataSet.txt"
+#define DATASET_FILE						"Saves/DataSet.txt"
 #define RANDOM_WEIGHTS_FILE				"Saves/RandomWeights.txt"
 #define PERF_RECORDS_FILE				"Saves/PerfRecords.csv"
 #define PERF_BEST_FILE					"Saves/PerfBest.csv"
@@ -146,6 +148,8 @@ public:
 	vector<Layer> m_layers;
 	int m_nb_layers;
 	vector<Data> m_dataset;
+	struct tm timer;
+
 
 	void Run(NeuralNetworkMode mode);
 	void Training();
@@ -191,7 +195,7 @@ public:
 	//Save and Load files
 	bool SaveDatasetIntoFile();
 	bool LoadDatasetFromFile();
-	bool SaveWeightsIntoFile();
+	bool SaveStartingWeightsIntoFile();
 	bool LoadWeightsFromFile(string filename);
 	bool LoadHyperParametersFromFile(string filename);
 	bool SavePerfIntoFile();
