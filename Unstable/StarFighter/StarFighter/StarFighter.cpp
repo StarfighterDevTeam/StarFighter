@@ -67,6 +67,7 @@ void NeuralNetwork::RestoreWeights(vector<double>& weights)
 			for (int w = 0; w < weightsSize; w++)
 			{
 				m_layers[i].m_neurons[n].m_weights[w] = weights[index];
+				m_layers[i].m_neurons[n].m_deltaWeights[w] = 0;
 				index++;
 			}
 		}
@@ -207,7 +208,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 	clock_t end = clock();
 	double elapsed = (double)((end - begin) / CLOCKS_PER_SEC);
-	printf("TIme elpased: %fs.\n", elapsed);
+	printf("Time elpased: %fs.\n", elapsed);
 }
 
 bool NeuralNetwork::RecordPerf()
@@ -239,6 +240,10 @@ bool NeuralNetwork::RecordPerf()
 		printf("New best perf: loops: %d, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NN_ERROR_MARGIN, m_perf_records.size() - 1);
 		SaveBestPerfIntoFile();
 		return true;
+	}
+	else
+	{
+		printf("Perf: loops: %d, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NN_ERROR_MARGIN, m_perf_records.size() - 1);
 	}
 	return false;
 }
@@ -417,13 +422,13 @@ void NeuralNetwork::Training()
 
 			if (m_error < NN_ERROR_MARGIN)
 			{
-				if (PRINT_TR){ printf("Success.\n"); }
+				if (PRINT_TR){ printf("\nSuccess.\n"); }
 				m_success++;
 				break;
 			}
 			else
 			{
-				if (PRINT_TR){ printf("Fail.\n"); }
+				if (PRINT_TR){ printf("\nFail.\n"); }
 			}
 
 			BackPropagationGradient(m_dataset[d]);
@@ -553,15 +558,16 @@ void NeuralNetwork::FeedForward()
 		{
 			if (n < nextLayer.m_nb_neurons - 1 || nextLayer.m_type == OutpuLayer)//Output layer doesn't have a bias neuron
 			{
+				if (PRINT_FF){ printf("\nSum calculation:\n");}
 				double sum = 0;
 				for (int w = 0; w < currentLayer.m_nb_neurons; w++)
 				{
 					sum += currentLayer.m_neurons[w].m_value * currentLayer.m_neurons[w].m_weights[n];
-					//printf("value * weight : %f * %f = %f\n", currentLayer.m_neurons[w].m_value, currentLayer.m_neurons[w].m_weights[n], sum);
+					if (PRINT_FF){ printf("   value * weight : %f * %f = %f\n", currentLayer.m_neurons[w].m_value, currentLayer.m_neurons[w].m_weights[n], sum);}
 				}
 				nextLayer.m_neurons[n].m_input_value = sum;
 				nextLayer.m_neurons[n].m_value = TransferFunction(sum, m_function);
-				if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f, output value: %f\n", i + 1, n, nextLayer.m_neurons[n].m_input_value, nextLayer.m_neurons[n].m_value); }
+				if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f -> output value: %f\n", i + 1, n, nextLayer.m_neurons[n].m_input_value, nextLayer.m_neurons[n].m_value); }
 			}
 			else
 			{
@@ -624,9 +630,10 @@ void NeuralNetwork::BackPropagationGradient(const Data &data)
 	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
 	{
 		double delta = GetTargetValue(data) - outputLayer.m_neurons[n].m_value;
-		outputLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(outputLayer.m_neurons[n].m_input_value, m_function);
+		double derivative = TransferFunctionDerivative(outputLayer.m_neurons[n].m_value, m_function);
+		outputLayer.m_neurons[n].m_gradient = delta * derivative;
 
-		if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f\n", m_nb_layers - 1, n, outputLayer.m_neurons[n].m_gradient); }
+		if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f (delta: %f, derivative: %f)\n", m_nb_layers - 1, n, outputLayer.m_neurons[n].m_gradient, delta, derivative); }
 	}
 
 	//Propagation of the gradient
@@ -647,8 +654,9 @@ void NeuralNetwork::BackPropagationGradient(const Data &data)
 					}
 				}
 
-				currentLayer.m_neurons[n].m_gradient = delta * TransferFunctionDerivative(currentLayer.m_neurons[n].m_input_value, m_function);
-				if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f\n", i, n, currentLayer.m_neurons[n].m_gradient); }
+				double derivative = TransferFunctionDerivative(currentLayer.m_neurons[n].m_value, m_function);
+				currentLayer.m_neurons[n].m_gradient = delta * derivative;
+				if (PRINT_BP){ printf("Layer: %d, neuron: %d, gradient: %f (delta: %f, derivative: %f)\n", i, n, currentLayer.m_neurons[n].m_gradient, delta, derivative); }
 		}
 	}
 }
@@ -677,6 +685,7 @@ void NeuralNetwork::WeightsUpdate()
 
 					currentNeuron.m_deltaWeights[w] = newDeltaWeight;
 					currentNeuron.m_weights[w] += newDeltaWeight;
+
 					if (PRINT_WU){ printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight); }
 				}
 			}
