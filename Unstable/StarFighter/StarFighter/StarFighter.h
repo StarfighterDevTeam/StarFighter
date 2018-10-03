@@ -22,8 +22,8 @@ using namespace std;
 
 #include "Globals.h"
 
-#define NN_LEARNING_RATE					0.2
-#define NN_MOMENTUM						0.5
+#define NN_LEARNING_RATE					0.7
+#define NN_MOMENTUM						0.6
 #define NN_ACTIVATION_FUNCTION			TANH
 
 #define NN_ERROR_MARGIN					0.02
@@ -35,18 +35,19 @@ using namespace std;
 #define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
 #define PRINT_ALL						false
-#define PRINT_FF							true//feed forward
-#define PRINT_EC							true//erorr caculation
-#define PRINT_BP							true//gradient back propagation
-#define PRINT_WU							true//weights update
-#define PRINT_TR							true//training
+#define PRINT_FF							false//feed forward
+#define PRINT_EC							false//erorr caculation
+#define PRINT_BP							false//gradient back propagation
+#define PRINT_WU							false//weights update
+#define PRINT_FB							false//feed backward
+#define PRINT_TR							false//training
 #define PRINT_TE							false//testing
 #define PRINT_LO							true//result of the loop
 
 #define DATASET_FILE						"Saves/DataSet.txt"
 #define RANDOM_WEIGHTS_FILE				"Saves/RandomWeights.txt"
 #define PERF_RECORDS_FILE				"Saves/PerfRecords.csv"
-#define PERF_BEST_FILE					"Saves/PerfBest.csv"
+#define PERF_BEST_FILE					"Saves/PerfBest.txt"
 #define PERF_BEST_WEIGHTS_FILE			"Saves/PerfBestWeights.txt"
 
 enum Label
@@ -144,12 +145,12 @@ public:
 	NeuralNetwork();
 
 	void AddLayer(int nb_neuron, LayerType type);
-	double GetTargetValue(const Data &data);
+	double GetTargetValue(const Label label);
 	vector<Layer> m_layers;
 	int m_nb_layers;
 	vector<Data> m_dataset;
 	struct tm timer;
-
+	Data CreateDataWithManualInputs();
 
 	void Run(NeuralNetworkMode mode);
 	void Training();
@@ -163,6 +164,7 @@ public:
 	void ErrorCalculation(const Data &data);
 	void BackPropagationGradient(const Data &data);
 	void WeightsUpdate();
+	void FeedBackward(Label label);
 
 	double m_error;
 	double m_average_error;
@@ -181,13 +183,13 @@ public:
 	bool RecordPerf();
 	bool UpdateBestPerf();
 	vector<double> m_weightsStart;
-	void RestoreWeights(vector<double>& weights);
+	void RestoreWeights();
 	void CopyWeightsInto(vector<double>& weights);
-	void LoadBestWeights();
 	Performance m_best_perf;
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);
+	double TransferFunctionInverse(double x, FunctionType function);
 
 	//Dataset
 	void CreateDataset();

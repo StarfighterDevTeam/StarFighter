@@ -15,7 +15,7 @@ int main()
 		printf("0 = perform from scratch with given parameters\n");
 		printf("1 = loop to find the best hyper parameters\n");
 		printf("2 = load best-known weights and hyperparameters and iterate to improve weights\n");
-		printf("3 = load best known parameters and weights and test the model\n\n");
+		printf("3 = input manual values to test the model\n\n");
 
 		cin >> mode;
 		NeuralNetwork.Run((NeuralNetworkMode)mode);
@@ -55,7 +55,7 @@ NeuralNetwork::NeuralNetwork()
 	AddLayer(NB_LABELS, OutpuLayer);
 }
 
-void NeuralNetwork::RestoreWeights(vector<double>& weights)
+void NeuralNetwork::RestoreWeights()
 {
 	int index = 0;
 
@@ -66,7 +66,7 @@ void NeuralNetwork::RestoreWeights(vector<double>& weights)
 			int weightsSize = m_layers[i].m_neurons[n].m_weights.size();
 			for (int w = 0; w < weightsSize; w++)
 			{
-				m_layers[i].m_neurons[n].m_weights[w] = weights[index];
+				m_layers[i].m_neurons[n].m_weights[w] = m_weightsStart[index];
 				m_layers[i].m_neurons[n].m_deltaWeights[w] = 0;
 				index++;
 			}
@@ -100,7 +100,8 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 		m_learning_rate = NN_LEARNING_RATE;
 		m_momentum = NN_MOMENTUM;
 
-		RestoreWeights(m_weightsStart);
+		LoadWeightsFromFile(RANDOM_WEIGHTS_FILE);
+		RestoreWeights();
 
 		m_success_rate = 0.f;
 		m_average_error = 0.f;
@@ -139,7 +140,8 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 				while (m_learning_rate < 1.1f)
 				{
-					RestoreWeights(m_weightsStart);
+					LoadWeightsFromFile(RANDOM_WEIGHTS_FILE);
+					RestoreWeights();
 
 					m_success_rate = 0.f;
 					m_average_error = 0.f;
@@ -174,13 +176,14 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 	// ******* Mode 2 *******
 	if (mode == ImproveWeights)
 	{
-		LoadHyperParametersFromFile(PERF_BEST_FILE);
-		LoadWeightsFromFile(PERF_BEST_WEIGHTS_FILE);
+		m_function = NN_ACTIVATION_FUNCTION;
+		m_learning_rate = NN_LEARNING_RATE;
+		m_momentum = NN_MOMENTUM;
 
 		m_average_error = 0.f;
 		m_overall_attempts = 0;
 
-		//Test model on known data
+		Training();
 		Testing();
 
 		RecordPerf();
@@ -191,14 +194,30 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 	// ******* Mode 3 *******
 	if (mode == Prod)
 	{
-		LoadHyperParametersFromFile(PERF_BEST_FILE);
+		m_function = NN_ACTIVATION_FUNCTION;
+		m_learning_rate = NN_LEARNING_RATE;
+		m_momentum = NN_MOMENTUM;
+
 		LoadWeightsFromFile(PERF_BEST_WEIGHTS_FILE);
+		RestoreWeights();
 
 		m_average_error = 0.f;
 		m_overall_attempts = 0;
 
-		//Test model on known data
-		Testing();
+		
+		Data data = CreateDataWithManualInputs();
+		InitInputLayer(data);
+		FeedForward();
+		
+		Layer &outputLayer = m_layers.back();
+		if (outputLayer.m_neurons[0].m_value > 1.f - NN_ERROR_MARGIN)
+		{
+			printf("GREEN detected\n");
+		}
+		else
+		{
+			printf("NOT GREEN detected\n");
+		}
 
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
 	}
@@ -257,13 +276,16 @@ bool NeuralNetwork::UpdateBestPerf()
 	//Best perf = 1) best success rate 2) min overall attempts
 	for (int i = 0; i < perfSize; i++)
 	{
-		if (min_attempts < 0 || m_perf_records[i].m_overall_attempts < min_attempts)
+		if (min_attempts < 0 || m_perf_records[i].m_overall_attempts <= min_attempts)
 		{
-			if (m_success_rate < 0 || m_perf_records[i].m_success_rate > max_success_rate)
+			if (max_success_rate < 0 || m_perf_records[i].m_success_rate >= max_success_rate)
 			{
-				min_attempts = m_perf_records[i].m_overall_attempts;
-				max_success_rate = m_perf_records[i].m_success_rate;
-				best_perf = i;
+				if (!(m_perf_records[i].m_overall_attempts == min_attempts && m_perf_records[i].m_success_rate == max_success_rate))
+				{
+					min_attempts = m_perf_records[i].m_overall_attempts;
+					max_success_rate = m_perf_records[i].m_success_rate;
+					best_perf = i;
+				}
 			}
 		}
 	}
@@ -333,6 +355,30 @@ Data::Data(Label label)
 	//{
 	//	printf("Data created: %d, %d, %d, unlabelled.\n", red, green, blue);
 	//}
+}
+
+Data NeuralNetwork::CreateDataWithManualInputs()
+{
+	vector<double> features;
+	int red;
+	printf("Input red value between 0 and 255.\n");
+	cin >> red;
+	features.push_back((double)((1.f * red / 255 * 2) - 1));
+
+	int green;
+	printf("Input green value between 0 and 255.\n");
+	cin >> green;
+	features.push_back((double)((1.f * green / 255 * 2) - 1));
+
+	int blue;
+	printf("Input blue value between 0 and 255.\n");
+	cin >> blue;
+	features.push_back((double)((1.f * blue / 255 * 2) - 1));
+
+	Label label = IS_GREEN;
+
+	Data data(features, label);
+	return data;
 }
 
 Layer::Layer(int nb_neuron, LayerType type)
@@ -575,10 +621,10 @@ void NeuralNetwork::FeedForward()
 	}
 }
 
-double NeuralNetwork::GetTargetValue(const Data &data)
+double NeuralNetwork::GetTargetValue(const Label label)
 {
 	double target_value;
-	if (data.m_label == IS_GREEN)
+	if (label == IS_GREEN)
 	{
 		target_value = 1.f;
 	}
@@ -599,9 +645,9 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 
 	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
 	{
-		double delta = GetTargetValue(data) - outputLayer.m_neurons[n].m_value;
+		double delta = GetTargetValue(data.m_label) - outputLayer.m_neurons[n].m_value;
 		m_error += delta * delta;
-		if (PRINT_EC){ printf("Neuron: %d, output: %f, target: %f (delta: %f).\n", n, outputLayer.m_neurons[n].m_value, GetTargetValue(data), delta); }
+		if (PRINT_EC){ printf("Neuron: %d, output: %f, target: %f (delta: %f).\n", n, outputLayer.m_neurons[n].m_value, GetTargetValue(data.m_label), delta); }
 	}
 	m_error *= 1.f / outputLayer.m_nb_neurons;
 	m_error = sqrt(m_error);//Root Means Square Error
@@ -626,7 +672,7 @@ void NeuralNetwork::BackPropagationGradient(const Data &data)
 	//Calcuation of the gradient in the output layer
 	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
 	{
-		double delta = GetTargetValue(data) - outputLayer.m_neurons[n].m_value;
+		double delta = GetTargetValue(data.m_label) - outputLayer.m_neurons[n].m_value;
 		double derivative = TransferFunctionDerivative(outputLayer.m_neurons[n].m_value, m_function);
 		outputLayer.m_neurons[n].m_gradient = delta * derivative;
 
@@ -684,6 +730,45 @@ void NeuralNetwork::WeightsUpdate()
 					currentNeuron.m_weights[w] += newDeltaWeight;
 
 					if (PRINT_WU){ printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight); }
+				}
+			}
+		}
+	}
+}
+
+
+void NeuralNetwork::FeedBackward(Label label)
+{
+	if (PRINT_FB){ printf("Feed backward.\n"); }
+	double output_value = GetTargetValue(label);
+
+	//Output layer
+	Layer &outputLayer = m_layers.back();
+	for (int n = 0; n < outputLayer.m_nb_neurons; n++)
+	{
+		outputLayer.m_neurons[n].m_input_value = output_value;
+		if (PRINT_FB){ printf("Layer: %d, neuron: %d, input value: %f\n", 0, n, outputLayer.m_neurons[n].m_input_value); }
+	}
+	
+	//Feed Backward
+	for (int i = 0; i < m_nb_layers - 1; i++)//output layer doesn't feed forward
+	{
+		Layer &currentLayer = m_layers[i];
+		Layer &nextLayer = m_layers[i + 1];
+
+		for (int n = 0; n < nextLayer.m_nb_neurons; n++)
+		{
+			double preactivation_value = TransferFunctionInverse(nextLayer.m_neurons[n].m_input_value, m_function);
+			if (n < currentLayer.m_nb_neurons - 1 || currentLayer.m_type == OutpuLayer)//No need to feed bias neuron backward
+			{
+				double sum_weights = 0;
+				for (int w = 0; w < currentLayer.m_nb_neurons; w++)
+				{
+					sum_weights += currentLayer.m_neurons[w].m_weights[n];
+				}
+				for (int w = 0; w < currentLayer.m_nb_neurons; w++)
+				{
+					currentLayer.m_neurons[w].m_value = currentLayer.m_neurons[w].m_weights[n] / sum_weights * preactivation_value;
 				}
 			}
 		}
@@ -801,13 +886,61 @@ double NeuralNetwork::TransferFunctionDerivative(double x, FunctionType function
 	return output_value;
 }
 
+double NeuralNetwork::TransferFunctionInverse(double x, FunctionType function)
+{
+	double output_value = 0.f;
+
+	//LINEAR
+	if (function == LINEAR)
+	{
+		output_value = x;
+	}
+
+	//THRESHOLD
+	if (function == THRESHOLD)
+	{
+		output_value = x;//todo
+	}
+
+	//SIGMOID
+	if (function == SIGMOID)
+	{
+		output_value = x;//todo
+	}
+
+	//TANH
+	if (function == TANH)
+	{
+		output_value = atanh(x);
+	}
+
+	//TANSIG ~ equivalent of TANH but faster to compute
+	if (function == TANSIG)
+	{
+		output_value = x;//todo
+	}
+
+	//RELU
+	if (function == RELU)
+	{
+		output_value = x;//todo
+	}
+
+	//LEAKY RELU
+	if (function == LEAKY_RELU)
+	{
+		output_value = x;//todo
+	}
+
+	return output_value;
+}
+
 //DATASET
 
 void NeuralNetwork::CreateDataset()
 {
 	for (int d = 0; d < DATASET_SIZE; d++)
 	{
-
 		int r = RandomizeIntBetweenValues(0, 1);
 		if (r % 2 == 0)
 		{
@@ -931,12 +1064,12 @@ bool NeuralNetwork::LoadWeightsFromFile(string filename)
 {
 	std::ifstream data(filename, ios::in);
 
+	vector<double> weights;
 	if (data) // si ouverture du fichier réussie
 	{
 		std::string line;
 
 		m_weightsStart.clear();
-
 		while (std::getline(data, line))
 		{
 			std::istringstream ss(line);
@@ -945,6 +1078,8 @@ bool NeuralNetwork::LoadWeightsFromFile(string filename)
 			ss >> weight;
 			m_weightsStart.push_back(weight);
 		}
+
+		RestoreWeights();
 
 		data.close();  // on ferme le fichier
 		return true;
