@@ -86,11 +86,15 @@
     <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Data.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Neuron.cpp" />
     <ClCompile Include="StarFighter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Data.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Neuron.h" />
     <ClInclude Include="StarFighter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -212,11 +212,13 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 		Layer &outputLayer = m_layers.back();
 		if (outputLayer.m_neurons[0].m_value > 1.f - NN_ERROR_MARGIN)
 		{
-			printf("GREEN detected\n");
+			data.m_label = IS_GREEN;
+			printf("GREEN detected (%f = %.2f%% certainty.)\n", outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
 		}
 		else
 		{
-			printf("NOT GREEN detected\n");
+			data.m_label = NOT_GREEN;
+			printf("NOT GREEN detected (%f = %.2f%% certainty.)\n", outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
 		}
 
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
@@ -295,68 +297,6 @@ bool NeuralNetwork::UpdateBestPerf()
 	return best_perf == perfSize - 1;//return true if the latest perf is the best one
 }
 
-Data::Data(vector<double> features, Label label)
-{
-	m_features = features;
-	m_label = label;
-}
-
-Data::Data(Label label)
-{
-	int red, blue, green = 0;
-
-	if (label == IS_GREEN)
-	{
-		red = RandomizeIntBetweenValues(0, (int)(NN_ERROR_MARGIN * 255));
-		green = RandomizeIntBetweenValues((int)(255 * (1 - NN_ERROR_MARGIN)), 255);
-		blue = RandomizeIntBetweenValues(0, (int)(NN_ERROR_MARGIN * 255));
-	}
-	else if (label == NOT_GREEN)
-	{
-		red = RandomizeIntBetweenValues(0, 255);
-		green = RandomizeIntBetweenValues(0, (int)((1 - NN_ERROR_MARGIN) * 255));
-		blue = RandomizeIntBetweenValues(0, 255);
-	}
-	else
-	{
-		int r = RandomizeIntBetweenValues(0, 1);
-		if (r % 2 == 0)
-		{
-			//green examples
-			red = RandomizeIntBetweenValues(0, (int)(NN_ERROR_MARGIN * 255));
-			green = RandomizeIntBetweenValues((int)(255 * (1 - NN_ERROR_MARGIN)), 255);
-			blue = RandomizeIntBetweenValues(0, (int)(NN_ERROR_MARGIN * 255));
-		}
-		else
-		{
-			//not green examples
-			red = RandomizeIntBetweenValues(0, 255);
-			green = RandomizeIntBetweenValues(0, (int)((1 - NN_ERROR_MARGIN) * 255));
-			blue = RandomizeIntBetweenValues(0, 255);
-		}
-	}
-
-	//Normalize data between -1 and 1
-	double r = (1.f * red / 255 * 2) - 1;
-	double g = (1.f * green / 255 * 2) - 1;
-	double b = (1.f * blue / 255 * 2) - 1;
-
-	m_features.push_back(r);
-	m_features.push_back(g);
-	m_features.push_back(b);
-
-	m_label = label;
-
-	//if (label != UNLABELLED)
-	//{
-	//	printf("Data created: %d, %d, %d, labelled as %s.\n", red, green, blue, NeuralNetwork::GetLabelString(label).c_str());
-	//}
-	//else
-	//{
-	//	printf("Data created: %d, %d, %d, unlabelled.\n", red, green, blue);
-	//}
-}
-
 Data NeuralNetwork::CreateDataWithManualInputs()
 {
 	vector<double> features;
@@ -375,28 +315,10 @@ Data NeuralNetwork::CreateDataWithManualInputs()
 	cin >> blue;
 	features.push_back((double)((1.f * blue / 255 * 2) - 1));
 
-	Label label = IS_GREEN;
+	Label label = UNLABELLED;
 
 	Data data(features, label);
 	return data;
-}
-
-Layer::Layer(int nb_neuron, LayerType type)
-{
-	for (int i = 0; i < nb_neuron; i++)
-	{
-		m_neurons.push_back(Neuron());
-	}
-	m_nb_neurons = nb_neuron;
-
-	if (type != OutpuLayer)//bias neuron
-	{
-		m_neurons.push_back(Neuron());
-		m_neurons.back().m_value = 1.f;
-		m_nb_neurons++;
-	}
-
-	m_type = type;
 }
 
 void NeuralNetwork::AddLayer(int nb_neuron, LayerType type)
@@ -944,11 +866,11 @@ void NeuralNetwork::CreateDataset()
 		int r = RandomizeIntBetweenValues(0, 1);
 		if (r % 2 == 0)
 		{
-			m_dataset.push_back(Data(IS_GREEN));
+			m_dataset.push_back(Data(IS_GREEN, NN_ERROR_MARGIN));
 		}
 		else
 		{
-			m_dataset.push_back(Data(NOT_GREEN));
+			m_dataset.push_back(Data(NOT_GREEN, NN_ERROR_MARGIN));
 		}
 
 		if (d == DATASET_SIZE - 1)
