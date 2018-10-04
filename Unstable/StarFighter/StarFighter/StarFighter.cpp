@@ -6,6 +6,7 @@ int main()
 
 	//NeuralNetwork.CreateDataset();
 	NeuralNetwork.LoadDatasetFromFile();
+	NeuralNetwork.MixDataSet();
 	//NeuralNetwork.SaveDatasetIntoFile();
 
 	int mode = 0;
@@ -48,7 +49,7 @@ NeuralNetwork::NeuralNetwork()
 	AddLayer(NB_FEATURES, InputLayer);
 
 	//Hidden layers
-	AddLayer(3, HiddenLayer);
+	AddLayer(1, HiddenLayer);
 	//AddLayer(2, HiddenLayer);
 
 	//Output layer
@@ -136,7 +137,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 			m_momentum = 0.0f;
 			while (m_momentum < 0.6f)
 			{
-				m_learning_rate = 0.1f;
+				m_learning_rate = 0.5f;
 
 				while (m_learning_rate < 1.1f)
 				{
@@ -203,7 +204,6 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 		m_average_error = 0.f;
 		m_overall_attempts = 0;
-
 		
 		Data data = CreateDataWithManualInputs();
 		InitInputLayer(data);
@@ -212,21 +212,21 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 		Layer &outputLayer = m_layers.back();
 		if (outputLayer.m_neurons[0].m_value > 1.f - NN_ERROR_MARGIN)
 		{
-			data.m_label = IS_GREEN;
-			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(IS_GREEN), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
+			data.m_label = IS_YELLOW;
+			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(IS_YELLOW).c_str(), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
 		}
 		else
 		{
 			data.m_label = NB_LABELS;
-			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(NB_LABELS), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
+			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(NB_LABELS).c_str(), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
 		}
 
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
 	}
 
 	clock_t end = clock();
-	double elapsed = (double)((end - begin) / CLOCKS_PER_SEC);
-	printf("Time elpased: %fs.\n", elapsed);
+	//double elapsed = (double)((end - begin) / CLOCKS_PER_SEC);
+	//printf("Time elpased: %fs.\n", elapsed);
 }
 
 bool NeuralNetwork::RecordPerf()
@@ -365,17 +365,12 @@ void NeuralNetwork::Training()
 	if (PRINT_TR){ printf("\n*** Training. ***\n"); }
 
 	m_success = 0;
-	int training_attempts = 0;
-	
+
 	//Supervised training data
 	for (int i = 0; i < DATASET_SIZE; i++)
 	{
 		int d = RandomizeIntBetweenValues(0, DATASET_SIZE - 1);
 
-		if (d > 225)
-		{
-			printf("");
-		}
 		m_attempts = 0;
 		m_error = NN_ERROR_MARGIN;
 
@@ -407,6 +402,7 @@ void NeuralNetwork::Training()
 			WeightsUpdate();
 		}
 	}
+	
 }
 
 void NeuralNetwork::Testing()
@@ -467,7 +463,7 @@ Label NeuralNetwork::TestSample(Data &data)
 	Label label;
 	if (m_error < 0.5f)
 	{
-		label = IS_GREEN;
+		label = IS_YELLOW;
 	}
 	else
 	{
@@ -483,7 +479,7 @@ void NeuralNetwork::Creating()
 	printf("Enter 0 for green, 1 for NOT-green.\n");
 	int user_input;
 	cin >> user_input;
-	if (user_input == IS_GREEN)
+	if (user_input == IS_YELLOW)
 	{
 
 	}
@@ -518,23 +514,23 @@ void NeuralNetwork::FeedForward()
 	{
 		if (PRINT_FF){ printf("Layer: %d, neuron: %d, input value: %f\n", 0, n, inputLayer.m_neurons[n].m_value); }
 	}
-	
+
 	//Feed forward
 	for (int i = 0; i < m_nb_layers - 1; i++)//output layer doesn't feed forward
 	{
 		Layer &currentLayer = m_layers[i];
-		Layer &nextLayer = m_layers[i +1];
+		Layer &nextLayer = m_layers[i + 1];
 
 		for (int n = 0; n < nextLayer.m_nb_neurons; n++)
 		{
 			if (n < nextLayer.m_nb_neurons - 1 || nextLayer.m_type == OutpuLayer)//Output layer doesn't have a bias neuron
 			{
-				if (PRINT_FF){ printf("\nSum calculation:\n");}
+				if (PRINT_FF){ printf("\nSum calculation:\n"); }
 				double sum = 0;
 				for (int w = 0; w < currentLayer.m_nb_neurons; w++)
 				{
 					sum += currentLayer.m_neurons[w].m_value * currentLayer.m_neurons[w].m_weights[n];
-					if (PRINT_FF){ printf("   value * weight : %f * %f = %f\n", currentLayer.m_neurons[w].m_value, currentLayer.m_neurons[w].m_weights[n], sum);}
+					if (PRINT_FF){ printf("   value * weight : %f * %f = %f\n", currentLayer.m_neurons[w].m_value, currentLayer.m_neurons[w].m_weights[n], sum); }
 				}
 				nextLayer.m_neurons[n].m_input_value = sum;
 				nextLayer.m_neurons[n].m_value = TransferFunction(sum, m_function);
@@ -552,7 +548,7 @@ void NeuralNetwork::FeedForward()
 double NeuralNetwork::GetTargetValue(const Label label)
 {
 	double target_value;
-	if (label == IS_GREEN)
+	if (label == IS_YELLOW)
 	{
 		target_value = 1.f;
 	}
@@ -579,14 +575,18 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 	}
 	m_error *= 1.f / outputLayer.m_nb_neurons;
 	m_error = sqrt(m_error);//Root Means Square Error
-	
+
 	if (m_attempts <= 1)
 	{
-		if (PRINT_EC){ printf("RMSE: %f (target: %f)\n", m_error, NN_ERROR_MARGIN);}
+		if (PRINT_EC){ printf("RMSE: %f (target: %f)\n", m_error, NN_ERROR_MARGIN); }
 	}
 	else
 	{
 		if (PRINT_EC){ printf("RMSE: %f (previous RMSE: %f). Progression: %f (%f%%).\n", m_error, previous_error, previous_error - m_error, 100.f*(previous_error - m_error)) / previous_error; }
+		if (100.f*(previous_error - m_error) / previous_error < 0)
+		{
+			printf("");
+		}
 	}
 
 	m_average_error += m_error;
@@ -872,7 +872,7 @@ void NeuralNetwork::CreateDataset()
 		int r = RandomizeIntBetweenValues(0, 1);
 		if (r % 2 == 0)
 		{
-			m_dataset.push_back(Data(IS_GREEN, NN_ERROR_MARGIN));
+			m_dataset.push_back(Data(IS_YELLOW, NN_ERROR_MARGIN));
 		}
 		else
 		{
@@ -939,16 +939,17 @@ bool NeuralNetwork::LoadDatasetFromFile()
 				double feature;
 				features.push_back(feature);
 			}
-			int label;
+			int label_flag;
 
 			ss >> d;
 			for (int i = 0; i < NB_FEATURES; i++)
 			{
 				ss >> features[i];
 			}
-			ss >> label;
+			ss >> label_flag;
+			Label label = label_flag == 1 ? IS_YELLOW : NB_LABELS;
 
-			m_dataset.push_back(Data(features, (Label)label));
+			m_dataset.push_back(Data(features, label));
 
 			if (d >= DATASET_SIZE - 1)
 			{
@@ -963,6 +964,39 @@ bool NeuralNetwork::LoadDatasetFromFile()
 	{
 		cerr << "DEBUG: No DATASET SAVE FILE found. A new file is going to be created.\n" << endl;
 		return false;
+	}
+}
+
+void NeuralNetwork::MixDataSet()
+{
+	vector<Data> yellow_data;
+	vector<Data> not_yellow_data;
+
+	for (int d = 0; d < DATASET_SIZE; d++)
+	{
+		if (m_dataset[d].m_label == IS_YELLOW)
+		{
+			yellow_data.push_back(m_dataset[d]);
+		}
+		else
+		{
+			not_yellow_data.push_back(m_dataset[d]);
+		}
+	}
+
+	m_dataset.clear();
+
+	for (int d = 0; d < DATASET_SIZE; d++)
+	{
+		if (d < yellow_data.size())
+		{
+			m_dataset.push_back(yellow_data[d]);
+		}
+
+		if (d < not_yellow_data.size())
+		{
+			m_dataset.push_back(not_yellow_data[d]);
+		}
 	}
 }
 

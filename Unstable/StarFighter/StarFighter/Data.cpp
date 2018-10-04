@@ -11,7 +11,7 @@ Data::Data(Label label, double error_margin)
 {
 	int red, blue, green = 0;
 
-	if (label == IS_GREEN)
+	if (label == IS_YELLOW)
 	{
 		red = RandomizeIntBetweenValues(0, (int)(error_margin * 255));
 		green = RandomizeIntBetweenValues((int)(255 * (1 - error_margin)), 255);

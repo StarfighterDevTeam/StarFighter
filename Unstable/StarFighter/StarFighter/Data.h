@@ -24,7 +24,7 @@ using namespace std;
 
 enum Label
 {
-	IS_GREEN,		//0
+	IS_YELLOW,		//0
 	NB_LABELS,		//1
 	NOT_GREEN,		//2
 	UNLABELLED,		//3

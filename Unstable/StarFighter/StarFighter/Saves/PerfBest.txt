@@ -1,2 +1,2 @@
 index activation_function momentum learning_rate attempts loops success_rate RMSE topology 
-13 4 0.4 0.2 730 0 91.1894 91.1894 3 
+1 4 0.6 0.8 100 4 100 100 1 

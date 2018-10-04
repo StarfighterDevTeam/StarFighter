@@ -23,23 +23,23 @@ using namespace std;
 #include "Globals.h"
 #include "Neuron.h"
 
-#define NN_LEARNING_RATE					0.2//0.7
-#define NN_MOMENTUM						0.4//0.6
+#define NN_LEARNING_RATE				0.8//0.7
+#define NN_MOMENTUM						0.6//0.6
 #define NN_ACTIVATION_FUNCTION			TANH
 
 #define NN_ERROR_MARGIN					0.02f
 #define NN_MAX_ATTEMPTS					500
 #define NN_MAX_OVERALL_ATTEMPTS			200000
 
-#define DATASET_SIZE						227//300
+#define DATASET_SIZE					100//300
 #define DATASET_SUPERVISED_LOT			180//200
 #define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
-#define PRINT_ALL					false
+#define PRINT_ALL						false
 #define PRINT_FF						false//feed forward
 #define PRINT_EC						true//erorr caculation
 #define PRINT_BP						false//gradient back propagation
-#define PRINT_WU						false//weights update
+#define PRINT_WU						true//weights update
 #define PRINT_FB						false//feed backward
 #define PRINT_TR						false//training
 #define PRINT_TE						true//testing
@@ -140,6 +140,7 @@ public:
 
 	//Dataset
 	void CreateDataset();
+	void MixDataSet();
 
 	//Save and Load files
 	bool SaveDatasetIntoFile();
@@ -154,7 +155,7 @@ public:
 
 	static string GetLabelString(Label label)
 	{
-		if (label == IS_GREEN)
+		if (label == IS_YELLOW)
 			return "YELLOW";
 		if (label == NB_LABELS)
 			return "NOT YELLOW";
