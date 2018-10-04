@@ -376,10 +376,8 @@ void NeuralNetwork::Training()
 	m_success = 0;
 
 	//Supervised training data
-	for (int i = 0; i < DATASET_SIZE; i++)
+	for (int d = 0; d < DATASET_SIZE; d++)
 	{
-		int d = RandomizeIntBetweenValues(0, DATASET_SIZE - 1);
-
 		m_attempts = 0;
 		m_error = NN_ERROR_MARGIN;
 
