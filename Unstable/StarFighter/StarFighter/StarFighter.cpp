@@ -177,6 +177,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 	// ******* Mode 2 *******
 	if (mode == ImproveWeights)
 	{
+		m_loops = 1;
 		m_function = NN_ACTIVATION_FUNCTION;
 		m_learning_rate = NN_LEARNING_RATE;
 		m_momentum = NN_MOMENTUM;
@@ -255,9 +256,17 @@ bool NeuralNetwork::RecordPerf()
 	SavePerfIntoFile();
 	if (UpdateBestPerf())
 	{
-		printf("New best perf: loops: %d, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NN_ERROR_MARGIN, m_perf_records.size() - 1);
-		SaveBestPerfIntoFile();
-		return true;
+		if (IsBetterPerfThanSaveFile(perf))
+		{
+			printf("New best perf: loops: %d, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NN_ERROR_MARGIN, m_perf_records.size() - 1);
+			SaveBestPerfIntoFile();
+			return true;
+		}
+		else
+		{
+			printf("Perf: loops: %d, attempts: %d, success rate: %f, RMSE: %f (target: %f) [perf index: %d]\n", m_loops, m_overall_attempts, m_success_rate, m_average_error, NN_ERROR_MARGIN, m_perf_records.size() - 1);
+			return false;
+		}
 	}
 	else
 	{
@@ -1127,7 +1136,7 @@ bool NeuralNetwork::SaveBestPerfIntoFile()
 
 	if (data)
 	{
-		data << "index " << "activation_function " << "momentum " << "learning_rate " << "attempts " << "loops " << "success_rate " << "RMSE " << "topology " << endl;
+		data << "index " << "activation_function " << "momentum " << "learning_rate " << "attempts " << "loops " << "success_rate " << "RMSE " << endl;
 		data << m_best_perf.m_index << " ";
 		data << m_best_perf.m_function << " ";
 		data << m_best_perf.m_momentum << " ";
@@ -1135,12 +1144,7 @@ bool NeuralNetwork::SaveBestPerfIntoFile()
 		data << m_best_perf.m_overall_attempts << " ";
 		data << m_best_perf.m_loops << " ";
 		data << m_best_perf.m_success_rate << " ";
-		data << m_best_perf.m_success_rate << " ";
-
-		for (int j = 0; j < m_best_perf.m_hidden_layers.size(); j++)
-		{
-			data << m_best_perf.m_hidden_layers[j] << " ";
-		}
+		data << m_best_perf.m_average_error << " ";
 
 		data << endl;
 		
@@ -1176,5 +1180,57 @@ bool NeuralNetwork::SaveBestPerfIntoFile()
 	{
 		cerr << "DEBUG: No save file found for best perf. A new file is going to be created.\n" << endl;
 		return false;
+	}
+}
+
+bool NeuralNetwork::IsBetterPerfThanSaveFile(Performance &perf)
+{
+	std::ifstream data(PERF_BEST_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+
+		int index;
+		int activation_function = 0;
+		double momentum;
+		double learning_rate;
+		int overall_attempts;
+		int loops;
+		double success_rate;
+		double average_error;
+
+		bool better_perf = false;
+		int i = 0;
+		while (std::getline(data, line))
+		{
+			if (i == 0)
+			{
+				i++;
+				continue;//skip first line
+			}
+			std::istringstream ss(line);
+
+			ss >> index >> activation_function >> momentum >> learning_rate >> overall_attempts >> loops >> success_rate >> average_error;
+			
+			if (perf.m_overall_attempts <= overall_attempts)
+			{
+				if (perf.m_success_rate <= success_rate)
+				{
+					if (!(perf.m_overall_attempts == overall_attempts && perf.m_success_rate == success_rate))
+					{
+						better_perf = true;
+					}
+				}
+			}
+		}
+
+		data.close();  // on ferme le fichier
+		return better_perf;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "DEBUG: No BEST PERF FILE found. A new file is going to be created.\n" << endl;
+		return true;
 	}
 }

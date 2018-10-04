@@ -150,6 +150,7 @@ public:
 	bool LoadHyperParametersFromFile(string filename);
 	bool SavePerfIntoFile();
 	bool SaveBestPerfIntoFile();
+	bool IsBetterPerfThanSaveFile(Performance &perf);
 
 	int m_weightLoadIndex;
 
