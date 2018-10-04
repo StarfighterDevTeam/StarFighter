@@ -48,7 +48,7 @@ NeuralNetwork::NeuralNetwork()
 	AddLayer(NB_FEATURES, InputLayer);
 
 	//Hidden layers
-	AddLayer(1, HiddenLayer);
+	AddLayer(3, HiddenLayer);
 	//AddLayer(2, HiddenLayer);
 
 	//Output layer
@@ -116,7 +116,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 			Training();
 
 			//Test model on known data if training set successful or last attempt
-			if (m_success == DATASET_SUPERVISED_LOT || m_overall_attempts == NN_MAX_OVERALL_ATTEMPTS - 1)
+			if (m_success >= DATASET_SIZE || m_overall_attempts == NN_MAX_OVERALL_ATTEMPTS - 1)
 			{
 				Testing();
 			}
@@ -131,8 +131,8 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 	if (mode == LearnHyperparameters)
 	{
 		m_function = NN_ACTIVATION_FUNCTION;
-		while (m_function < NB_FUNCTIONS)
-		{
+		//while (m_function < NB_FUNCTIONS)
+		//{
 			m_momentum = 0.0f;
 			while (m_momentum < 0.6f)
 			{
@@ -167,8 +167,8 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 				m_momentum += 0.1;
 			}
 
-			m_function = (FunctionType)((int)(m_function) + 1);
-		}
+			//m_function = (FunctionType)((int)(m_function) + 1);
+		//}
 
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
 	}
@@ -213,12 +213,12 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 		if (outputLayer.m_neurons[0].m_value > 1.f - NN_ERROR_MARGIN)
 		{
 			data.m_label = IS_GREEN;
-			printf("GREEN detected (%f = %.2f%% certainty.)\n", outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
+			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(IS_GREEN), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
 		}
 		else
 		{
-			data.m_label = NOT_GREEN;
-			printf("NOT GREEN detected (%f = %.2f%% certainty.)\n", outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
+			data.m_label = NB_LABELS;
+			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(NB_LABELS), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
 		}
 
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
@@ -368,8 +368,14 @@ void NeuralNetwork::Training()
 	int training_attempts = 0;
 	
 	//Supervised training data
-	for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
+	for (int i = 0; i < DATASET_SIZE; i++)
 	{
+		int d = RandomizeIntBetweenValues(0, DATASET_SIZE - 1);
+
+		if (d > 225)
+		{
+			printf("");
+		}
 		m_attempts = 0;
 		m_error = NN_ERROR_MARGIN;
 
@@ -412,10 +418,10 @@ void NeuralNetwork::Testing()
 	m_attempts = 0;
 
 	//Supervised training data
-	for (int d = DATASET_SUPERVISED_LOT; d < DATASET_SIZE; d++)
+	for (int d = 0; d < DATASET_SIZE; d++)
 	{
 		m_attempts++;
-		if (PRINT_TE){ printf("\nInput data %d.\n", d); }
+		if (PRINT_TE){ printf("\nInput data %d (%d, %d, %d).\n", d, Data::InputIntoRGB(m_dataset[d].m_features[0]), Data::InputIntoRGB(m_dataset[d].m_features[1]), Data::InputIntoRGB(m_dataset[d].m_features[2])); }
 
 		InitInputLayer(m_dataset[d]);
 		
@@ -435,8 +441,8 @@ void NeuralNetwork::Testing()
 	}
 
 	m_average_error = m_average_error / m_attempts;
-	m_success_rate = 100.f * m_success / DATASET_TESTING_LOT;
-	if (PRINT_LO){ printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_TESTING_LOT, m_success_rate); }
+	m_success_rate = 100.f * m_success / DATASET_SIZE;
+	if (PRINT_LO){ printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_SIZE, m_success_rate); }
 	if (PRINT_LO){ printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NN_ERROR_MARGIN); }
 }
 
@@ -649,7 +655,7 @@ void NeuralNetwork::WeightsUpdate()
 					newDeltaWeight += currentNeuron.m_deltaWeights[w] * m_momentum;
 
 					currentNeuron.m_deltaWeights[w] = newDeltaWeight;
-					currentNeuron.m_weights[w] += newDeltaWeight;
+					currentNeuron.m_weights[w] += newDeltaWeight - 0.005 * currentNeuron.m_weights[w];
 
 					if (PRINT_WU){ printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight); }
 				}

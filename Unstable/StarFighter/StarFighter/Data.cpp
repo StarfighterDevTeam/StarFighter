@@ -43,9 +43,9 @@ Data::Data(Label label, double error_margin)
 	}
 
 	//Normalize data between -1 and 1
-	double r = (1.f * red / 255 * 2) - 1;
-	double g = (1.f * green / 255 * 2) - 1;
-	double b = (1.f * blue / 255 * 2) - 1;
+	double r = Data::RGBIntoInput(red);// (1.f * red / 255 * 2) - 1;
+	double g = Data::RGBIntoInput(green);// (1.f * green / 255 * 2) - 1;
+	double b = Data::RGBIntoInput(blue);// (1.f * blue / 255 * 2) - 1;
 
 	m_features.push_back(r);
 	m_features.push_back(g);
@@ -61,4 +61,15 @@ Data::Data(Label label, double error_margin)
 	//{
 	//	printf("Data created: %d, %d, %d, unlabelled.\n", red, green, blue);
 	//}
+}
+
+
+int Data::InputIntoRGB(double input_value)
+{
+	return 255 * (1.f * (input_value + 1) / 2);
+}
+
+double Data::RGBIntoInput(int rgb_value)
+{
+	return (1.f * rgb_value / 255 * 2) - 1;
 }

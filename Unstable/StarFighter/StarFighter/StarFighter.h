@@ -23,29 +23,29 @@ using namespace std;
 #include "Globals.h"
 #include "Neuron.h"
 
-#define NN_LEARNING_RATE				0.7
-#define NN_MOMENTUM						0.6
+#define NN_LEARNING_RATE					0.2//0.7
+#define NN_MOMENTUM						0.4//0.6
 #define NN_ACTIVATION_FUNCTION			TANH
 
 #define NN_ERROR_MARGIN					0.02f
 #define NN_MAX_ATTEMPTS					500
 #define NN_MAX_OVERALL_ATTEMPTS			200000
 
-#define DATASET_SIZE					300
-#define DATASET_SUPERVISED_LOT			200
+#define DATASET_SIZE						227//300
+#define DATASET_SUPERVISED_LOT			180//200
 #define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
-#define PRINT_ALL						false
+#define PRINT_ALL					false
 #define PRINT_FF						false//feed forward
-#define PRINT_EC						false//erorr caculation
+#define PRINT_EC						true//erorr caculation
 #define PRINT_BP						false//gradient back propagation
 #define PRINT_WU						false//weights update
 #define PRINT_FB						false//feed backward
 #define PRINT_TR						false//training
-#define PRINT_TE						false//testing
+#define PRINT_TE						true//testing
 #define PRINT_LO						true//result of the loop
 
-#define DATASET_FILE					"Saves/DataSet.txt"//"Saves/DataSetYellow.txt"
+#define DATASET_FILE					"Saves/DataSetYellow.txt"//"Saves/DataSet.txt"//
 #define RANDOM_WEIGHTS_FILE				"Saves/RandomWeights.txt"
 #define PERF_RECORDS_FILE				"Saves/PerfRecords.csv"
 #define PERF_BEST_FILE					"Saves/PerfBest.txt"
@@ -155,7 +155,9 @@ public:
 	static string GetLabelString(Label label)
 	{
 		if (label == IS_GREEN)
-			return "IS_GREEN";
+			return "YELLOW";
+		if (label == NB_LABELS)
+			return "NOT YELLOW";
 		if (label == NOT_GREEN)
 			return "NOT GREEN";
 		if (label == UNLABELLED)

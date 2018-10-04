@@ -44,6 +44,9 @@ public:
 	Data(vector<double> features, Label label);
 	Data(Label label, double error_margin);
 
+	static int InputIntoRGB(double input_value);
+	static double RGBIntoInput(int rgb_value);
+
 	vector<double> m_features;
 	Label m_label;
 };
