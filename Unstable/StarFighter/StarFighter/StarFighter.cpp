@@ -6,6 +6,7 @@ int main()
 
 	//NeuralNetwork.CreateDataset();
 	NeuralNetwork.LoadDatasetFromFile();
+	NeuralNetwork.BalanceDataset();//cutting examples so that we have a perfect parity between green examples and not green examples, mixed alternatively
 	//NeuralNetwork.SaveDatasetIntoFile();
 
 	int mode = 0;
@@ -369,7 +370,8 @@ void NeuralNetwork::Training()
 	int training_attempts = 0;
 	
 	//Supervised training data
-	for (int d = 0; d < DATASET_SUPERVISED_LOT; d++)
+	int datasetSize = m_dataset.size();
+	for (int d = 0; d < datasetSize; d++)
 	{
 		m_attempts = 0;
 		m_error = NN_ERROR_MARGIN;
@@ -413,7 +415,8 @@ void NeuralNetwork::Testing()
 	m_attempts = 0;
 
 	//Supervised training data
-	for (int d = DATASET_SUPERVISED_LOT; d < DATASET_SIZE; d++)
+	int datasetSize = m_dataset.size();
+	for (int d = 0; d < datasetSize; d++)
 	{
 		m_attempts++;
 		if (PRINT_TE){ printf("\nInput data %d.\n", d); }
@@ -944,11 +947,6 @@ bool NeuralNetwork::LoadDatasetFromFile()
 			ss >> label;
 
 			m_dataset.push_back(Data(features, (Label)label));
-
-			if (d >= DATASET_SIZE - 1)
-			{
-				break;
-			}
 		}
 
 		data.close();  // on ferme le fichier
@@ -958,6 +956,50 @@ bool NeuralNetwork::LoadDatasetFromFile()
 	{
 		cerr << "DEBUG: No DATASET SAVE FILE found. A new file is going to be created.\n" << endl;
 		return false;
+	}
+}
+
+void NeuralNetwork::BalanceDataset()
+{
+	vector<Data> green_dataset;
+	vector<Data> not_green_dataset;
+
+	//sorting examples into 2 categories
+	int datasetSize = m_dataset.size();
+	for (int d = 0; d < datasetSize; d++)
+	{
+		if (m_dataset[d].m_label == IS_GREEN)
+		{
+			green_dataset.push_back(m_dataset[d]);
+		}
+		else
+		{
+			not_green_dataset.push_back(m_dataset[d]);
+		}
+	}
+
+	m_dataset.clear();
+
+	//putting them back in the dataset alternatively, and cutting everything beyond examples parity
+	int greenDatasetSize = green_dataset.size();
+	int notgreenDatasetSize = not_green_dataset.size();
+
+	for (int d = 0; d < datasetSize; d++)
+	{
+		if (d >= greenDatasetSize || d >= notgreenDatasetSize)
+		{
+			break;
+		}
+
+		if (d < greenDatasetSize)
+		{
+			m_dataset.push_back(green_dataset[d]);
+		}
+
+		if (d < notgreenDatasetSize)
+		{
+			m_dataset.push_back(not_green_dataset[d]);
+		}
 	}
 }
 

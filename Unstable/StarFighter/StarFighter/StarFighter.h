@@ -140,6 +140,7 @@ public:
 
 	//Dataset
 	void CreateDataset();
+	void BalanceDataset();
 
 	//Save and Load files
 	bool SaveDatasetIntoFile();
