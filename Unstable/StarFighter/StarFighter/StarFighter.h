@@ -23,29 +23,29 @@ using namespace std;
 #include "Globals.h"
 #include "Neuron.h"
 
-#define NN_LEARNING_RATE				0.8//0.7
-#define NN_MOMENTUM						0.6//0.6
+#define NN_LEARNING_RATE					1.0//0.7
+#define NN_MOMENTUM						0.5//0.6
 #define NN_ACTIVATION_FUNCTION			TANH
 
 #define NN_ERROR_MARGIN					0.02f
 #define NN_MAX_ATTEMPTS					500
-#define NN_MAX_OVERALL_ATTEMPTS			200000
+#define NN_MAX_OVERALL_ATTEMPTS			150000
 
-#define DATASET_SIZE					100//300
+#define DATASET_SIZE						100//300
 #define DATASET_SUPERVISED_LOT			180//200
 #define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
-#define PRINT_ALL						false
+#define PRINT_ALL					false
 #define PRINT_FF						false//feed forward
 #define PRINT_EC						true//erorr caculation
 #define PRINT_BP						false//gradient back propagation
 #define PRINT_WU						true//weights update
 #define PRINT_FB						false//feed backward
-#define PRINT_TR						false//training
+#define PRINT_TR						true//training
 #define PRINT_TE						true//testing
 #define PRINT_LO						true//result of the loop
 
-#define DATASET_FILE					"Saves/DataSetYellow.txt"//"Saves/DataSet.txt"//
+#define DATASET_FILE						"Saves/DataSetYellow_source.txt"//"Saves/DataSet.txt"//
 #define RANDOM_WEIGHTS_FILE				"Saves/RandomWeights.txt"
 #define PERF_RECORDS_FILE				"Saves/PerfRecords.csv"
 #define PERF_BEST_FILE					"Saves/PerfBest.txt"
@@ -65,10 +65,11 @@ enum FunctionType
 
 enum NeuralNetworkMode
 {
-	PerfFromScratch,		//0: run one time with given hyperparameters and default weights
+	PerfFromScratch,			//0: run one time with given hyperparameters and default weights
 	LearnHyperparameters,	//1: run in loop with default weights, tuning hyperparameters every time
 	ImproveWeights,			//2: load best-known weights and hyperparameters and iterate to improve weights
-	Prod,					//3: load best-known weights and hyperparameters and get ready to produce results
+	ManualInputs,			//3: load best-known weights and hyperparameters and get ready to produce results
+	ListDataset,			//4: scroll one time through all unique examples of the dataset
 };
 
 struct Performance
@@ -96,13 +97,13 @@ public:
 	vector<Layer> m_layers;
 	int m_nb_layers;
 	vector<Data> m_dataset;
+	vector<Data> m_training_dataset;
 	struct tm timer;
 	Data CreateDataWithManualInputs();
 
 	void Run(NeuralNetworkMode mode);
 	void Training();
 	void Testing();
-	void Creating();
 	Label TestSample(Data &data);
 	bool DoNothing(){ return true; };
 
@@ -151,7 +152,7 @@ public:
 	bool SavePerfIntoFile();
 	bool SaveBestPerfIntoFile();
 	bool IsBetterPerfThanSaveFile(Performance &perf);
-
+	int m_datasetSize;
 	int m_weightLoadIndex;
 
 	static string GetLabelString(Label label)

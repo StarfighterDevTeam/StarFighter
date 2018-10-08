@@ -16,12 +16,12 @@ int main()
 		printf("0 = perform from scratch with given parameters\n");
 		printf("1 = loop to find the best hyper parameters\n");
 		printf("2 = load best-known weights and hyperparameters and iterate to improve weights\n");
-		printf("3 = input manual values to test the model\n\n");
+		printf("3 = input manual values to test the model\n");
+		printf("4 = list dataset and display trained labels vs actual labels\n\n");
 
 		cin >> mode;
 		NeuralNetwork.Run((NeuralNetworkMode)mode);
-	}
-	
+	}	
 	
 	printf("Exit program?\n");
 	cin.get();
@@ -43,14 +43,13 @@ NeuralNetwork::NeuralNetwork()
 
 	m_learning_rate = NN_LEARNING_RATE;
 	m_momentum = NN_MOMENTUM;
-	m_function = LEAKY_RELU;
+	m_function = TANH;
 
 	//Input layer
 	AddLayer(NB_FEATURES, InputLayer);
 
 	//Hidden layers
-	AddLayer(1, HiddenLayer);
-	//AddLayer(2, HiddenLayer);
+	AddLayer(3, HiddenLayer);
 
 	//Output layer
 	AddLayer(NB_LABELS, OutpuLayer);
@@ -103,7 +102,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 
 		LoadWeightsFromFile(RANDOM_WEIGHTS_FILE);
 		RestoreWeights();
-
+		
 		m_success_rate = 0.f;
 		m_average_error = 0.f;
 		m_loops = 0;
@@ -117,7 +116,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 			Training();
 
 			//Test model on known data if training set successful or last attempt
-			if (m_success >= DATASET_SIZE || m_overall_attempts == NN_MAX_OVERALL_ATTEMPTS - 1)
+			if (m_success >= m_datasetSize || m_overall_attempts == NN_MAX_OVERALL_ATTEMPTS - 1)
 			{
 				Testing();
 			}
@@ -134,10 +133,10 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 		m_function = NN_ACTIVATION_FUNCTION;
 		//while (m_function < NB_FUNCTIONS)
 		//{
-			m_momentum = 0.0f;
-			while (m_momentum < 0.6f)
+			m_momentum = 0.4f;
+			while (m_momentum < 0.7f)
 			{
-				m_learning_rate = 0.5f;
+				m_learning_rate = 0.9f;
 
 				while (m_learning_rate < 1.1f)
 				{
@@ -194,7 +193,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 	}
 
 	// ******* Mode 3 *******
-	if (mode == Prod)
+	if (mode == ManualInputs)
 	{
 		m_function = NN_ACTIVATION_FUNCTION;
 		m_learning_rate = NN_LEARNING_RATE;
@@ -211,7 +210,7 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 		FeedForward();
 		
 		Layer &outputLayer = m_layers.back();
-		if (outputLayer.m_neurons[0].m_value > 1.f - NN_ERROR_MARGIN)
+		if (outputLayer.m_neurons[0].m_value > 0.f)
 		{
 			data.m_label = IS_YELLOW;
 			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(IS_YELLOW).c_str(), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
@@ -222,6 +221,50 @@ void NeuralNetwork::Run(NeuralNetworkMode mode)
 			printf("%s detected (%f = %.2f%% certainty.)\n", GetLabelString(NB_LABELS).c_str(), outputLayer.m_neurons[0].m_value, 100.f * (1.f - abs((GetTargetValue(data.m_label) - outputLayer.m_neurons[0].m_value))));
 		}
 
+		//while (this->DoNothing()){}// <<< put breakpoint here to read values
+	}
+
+	// ******* Mode 4 *******
+	if (mode == ListDataset)
+	{
+		m_function = NN_ACTIVATION_FUNCTION;
+		m_learning_rate = NN_LEARNING_RATE;
+		m_momentum = NN_MOMENTUM;
+
+		LoadWeightsFromFile(PERF_BEST_WEIGHTS_FILE);
+		RestoreWeights();
+
+		m_average_error = 0.f;
+
+		for (int d = 0; d < m_datasetSize; d++)
+		{
+			InitInputLayer(m_dataset[d]);
+
+			FeedForward();
+
+			ErrorCalculation(m_dataset[d]);
+
+			printf("%d, %d, %d ", (int)m_dataset[d].m_features[0], (int)m_dataset[d].m_features[1], (int)m_dataset[d].m_features[2]);
+			Layer &outputLayer = m_layers.back();
+			if (outputLayer.m_neurons[0].m_value > 0.f)
+			{
+				printf(" ----> jaune");
+
+				if (m_dataset[d].m_label != IS_YELLOW)
+				{
+					printf(" (FAUX)");
+				}
+			}
+			else
+			{
+				if (m_dataset[d].m_label == IS_YELLOW)
+				{
+					printf("         (FAUX)");
+				}
+			}
+			printf("\n");
+		}
+	
 		//while (this->DoNothing()){}// <<< put breakpoint here to read values
 	}
 
@@ -376,13 +419,13 @@ void NeuralNetwork::Training()
 	m_success = 0;
 
 	//Supervised training data
-	for (int d = 0; d < DATASET_SIZE; d++)
+	for (int d = 0; d < m_training_dataset.size(); d++)
 	{
 		m_attempts = 0;
 		m_error = NN_ERROR_MARGIN;
 
 		if (PRINT_TR){ printf("\nInput data %d.\n", d); }
-		InitInputLayer(m_dataset[d]);
+		InitInputLayer(m_training_dataset[d]);
 
 		while (m_error >= NN_ERROR_MARGIN && m_attempts < NN_MAX_ATTEMPTS)
 		{
@@ -391,12 +434,14 @@ void NeuralNetwork::Training()
 			if (PRINT_TR){ printf("\nAttempts: %d (overall attempts: %d).\n", m_attempts, m_overall_attempts); }
 			FeedForward();
 
-			ErrorCalculation(m_dataset[d]);
+			ErrorCalculation(m_training_dataset[d]);
 
 			if (m_error < NN_ERROR_MARGIN)
 			{
 				if (PRINT_TR){ printf("\nSuccess.\n"); }
 				m_success++;
+
+				//cin.get();
 				break;
 			}
 			else
@@ -404,12 +449,16 @@ void NeuralNetwork::Training()
 				if (PRINT_TR){ printf("\nFail.\n"); }
 			}
 
-			BackPropagationGradient(m_dataset[d]);
+			BackPropagationGradient(m_training_dataset[d]);
 
 			WeightsUpdate();
+
+			//cin.get();
 		}
 	}
 	
+	m_average_error = m_average_error / m_attempts;
+	m_success_rate = 100.f * m_success / m_training_dataset.size();
 }
 
 void NeuralNetwork::Testing()
@@ -418,13 +467,15 @@ void NeuralNetwork::Testing()
 
 	m_average_error = 0.f;
 	m_success = 0;
-	m_attempts = 0;
+	m_attempts = 1;
+
+	int attempts = 0;
 
 	//Supervised training data
-	for (int d = 0; d < DATASET_SIZE; d++)
+	for (int d = 0; d < m_datasetSize; d++)
 	{
-		m_attempts++;
-		if (PRINT_TE){ printf("\nInput data %d (%d, %d, %d).\n", d, Data::InputIntoRGB(m_dataset[d].m_features[0]), Data::InputIntoRGB(m_dataset[d].m_features[1]), Data::InputIntoRGB(m_dataset[d].m_features[2])); }
+		attempts++;
+		if (PRINT_TE){ printf("\nInput data %d (%d, %d, %d).\n", d, (int)m_dataset[d].m_features[0], (int)m_dataset[d].m_features[1], (int)m_dataset[d].m_features[2]); }
 
 		InitInputLayer(m_dataset[d]);
 		
@@ -432,7 +483,7 @@ void NeuralNetwork::Testing()
 
 		ErrorCalculation(m_dataset[d]);
 
-		if (m_error < NN_ERROR_MARGIN)
+		if (m_error < 1.0f)
 		{
 			if (PRINT_TE){ printf("Success.\n"); }
 			m_success++;
@@ -443,9 +494,9 @@ void NeuralNetwork::Testing()
 		}
 	}
 
-	m_average_error = m_average_error / m_attempts;
-	m_success_rate = 100.f * m_success / DATASET_SIZE;
-	if (PRINT_LO){ printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, DATASET_SIZE, m_success_rate); }
+	m_average_error = m_average_error / attempts;
+	m_success_rate = 100.f * m_success / m_datasetSize;
+	if (PRINT_LO){ printf("\nTesting data success: %d/%d (%.2f%%).\n", m_success, m_datasetSize, m_success_rate); }
 	if (PRINT_LO){ printf("AVERAGE RMSE: %f (target: %f).\n", m_average_error, NN_ERROR_MARGIN); }
 }
 
@@ -480,19 +531,6 @@ Label NeuralNetwork::TestSample(Data &data)
 
 }
 
-void NeuralNetwork::Creating()
-{
-	printf("\n*** Creating. ***\n");
-	printf("Enter 0 for green, 1 for NOT-green.\n");
-	int user_input;
-	cin >> user_input;
-	if (user_input == IS_YELLOW)
-	{
-
-	}
-
-}
-
 void NeuralNetwork::InitInputLayer(const Data &data)
 {
 	Layer &inputLayer = m_layers.front();
@@ -501,7 +539,7 @@ void NeuralNetwork::InitInputLayer(const Data &data)
 	{
 		if (n < inputLayer.m_nb_neurons - 1)
 		{
-			inputLayer.m_neurons[n].m_value = data.m_features[n];
+			inputLayer.m_neurons[n].m_value = Data::RGBIntoInput(data.m_features[n]);
 			inputLayer.m_neurons[n].m_input_value = inputLayer.m_neurons[n].m_value;
 		}
 		else
@@ -592,7 +630,7 @@ void NeuralNetwork::ErrorCalculation(const Data &data)
 		if (PRINT_EC){ printf("RMSE: %f (previous RMSE: %f). Progression: %f (%f%%).\n", m_error, previous_error, previous_error - m_error, 100.f*(previous_error - m_error)) / previous_error; }
 		if (100.f*(previous_error - m_error) / previous_error < 0)
 		{
-			printf("");
+			printf("<!> Regression in the error. Previous weight update must be wrong.\n");
 		}
 	}
 
@@ -659,10 +697,14 @@ void NeuralNetwork::WeightsUpdate()
 					Neuron &connectedNeuron = nextLayer.m_neurons[w];
 
 					double newDeltaWeight = currentNeuron.m_value * connectedNeuron.m_gradient * m_learning_rate;
-					newDeltaWeight += currentNeuron.m_deltaWeights[w] * m_momentum;
+					//momentum applies from the second try on
+					if (m_attempts > 1)
+					{
+						newDeltaWeight += currentNeuron.m_deltaWeights[w] * m_momentum;
+					}
 
 					currentNeuron.m_deltaWeights[w] = newDeltaWeight;
-					currentNeuron.m_weights[w] += newDeltaWeight - 0.005 * currentNeuron.m_weights[w];
+					currentNeuron.m_weights[w] += newDeltaWeight;
 
 					if (PRINT_WU){ printf("Layer: %d, neuron: %d, old weight: %f, new weight: %f (delta: %f).\n", i, n, currentNeuron.m_weights[w] - newDeltaWeight, currentNeuron.m_weights[w], newDeltaWeight); }
 				}
@@ -891,6 +933,8 @@ void NeuralNetwork::CreateDataset()
 			printf("Dataset created: %d data items.\n", d + 1);
 		}
 	}
+
+	m_datasetSize = DATASET_SIZE;
 }
 
 bool NeuralNetwork::SaveDatasetIntoFile()
@@ -900,7 +944,7 @@ bool NeuralNetwork::SaveDatasetIntoFile()
 	if (data)
 	{
 		int nb_features = -1;
-		for (int d = 0; d < DATASET_SIZE; d++)
+		for (int d = 0; d < m_datasetSize; d++)
 		{
 			Data &current_data = m_dataset[d];
 			if (nb_features < 0)
@@ -935,7 +979,6 @@ bool NeuralNetwork::LoadDatasetFromFile()
 		std::string line;
 
 		m_dataset.clear();
-		int d = 0;
 		while (std::getline(data, line))
 		{
 			std::istringstream ss(line);
@@ -948,7 +991,6 @@ bool NeuralNetwork::LoadDatasetFromFile()
 			}
 			int label_flag;
 
-			ss >> d;
 			for (int i = 0; i < NB_FEATURES; i++)
 			{
 				ss >> features[i];
@@ -957,12 +999,9 @@ bool NeuralNetwork::LoadDatasetFromFile()
 			Label label = label_flag == 1 ? IS_YELLOW : NB_LABELS;
 
 			m_dataset.push_back(Data(features, label));
-
-			if (d >= DATASET_SIZE - 1)
-			{
-				break;
-			}
 		}
+
+		m_datasetSize = m_dataset.size();
 
 		data.close();  // on ferme le fichier
 		return true;
@@ -979,7 +1018,7 @@ void NeuralNetwork::MixDataSet()
 	vector<Data> yellow_data;
 	vector<Data> not_yellow_data;
 
-	for (int d = 0; d < DATASET_SIZE; d++)
+	for (int d = 0; d < m_datasetSize; d++)
 	{
 		if (m_dataset[d].m_label == IS_YELLOW)
 		{
@@ -991,18 +1030,15 @@ void NeuralNetwork::MixDataSet()
 		}
 	}
 
-	m_dataset.clear();
-
-	for (int d = 0; d < DATASET_SIZE; d++)
+	for (int d = 0; d < m_datasetSize; d++)
 	{
-		if (d < yellow_data.size())
+		m_training_dataset.push_back(yellow_data[d % yellow_data.size()]);
+		
+		m_training_dataset.push_back(not_yellow_data[d % not_yellow_data.size()]);
+	
+		if (d >= yellow_data.size() - 1 && d >= not_yellow_data.size() - 1)
 		{
-			m_dataset.push_back(yellow_data[d]);
-		}
-
-		if (d < not_yellow_data.size())
-		{
-			m_dataset.push_back(not_yellow_data[d]);
+			break;
 		}
 	}
 }
