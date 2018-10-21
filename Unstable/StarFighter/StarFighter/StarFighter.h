@@ -23,9 +23,9 @@ using namespace std;
 #include "Globals.h"
 #include "Neuron.h"
 
-#define NN_LEARNING_RATE					1.0//0.7
+#define NN_LEARNING_RATE				1.0//0.7
 #define NN_MOMENTUM						0.5//0.6
-#define NN_ACTIVATION_FUNCTION			TANH
+#define NN_ACTIVATION_FUNCTION			SIGMOID
 
 #define NN_ERROR_MARGIN					0.02f
 #define NN_MAX_ATTEMPTS					500
@@ -72,21 +72,6 @@ enum NeuralNetworkMode
 	ListDataset,			//4: scroll one time through all unique examples of the dataset
 };
 
-struct Performance
-{
-public:
-	double m_average_error;
-	double m_learning_rate;
-	double m_momentum;
-	FunctionType m_function;
-	int m_overall_attempts;
-	int m_loops;
-	vector<int> m_hidden_layers;
-	vector<double> m_weights;
-	double m_success_rate;
-	int m_index;
-};
-
 class NeuralNetwork
 {
 public:
@@ -99,9 +84,8 @@ public:
 	vector<Data> m_dataset;
 	vector<Data> m_training_dataset;
 	struct tm timer;
-	Data CreateDataWithManualInputs();
 
-	void Run(NeuralNetworkMode mode);
+	void Run();
 	void Training();
 	void Testing();
 	Label TestSample(Data &data);
@@ -112,7 +96,6 @@ public:
 	void ErrorCalculation(const Data &data);
 	void BackPropagationGradient(const Data &data);
 	void WeightsUpdate();
-	void FeedBackward(Label label);
 
 	double m_error;
 	double m_average_error;
@@ -127,13 +110,8 @@ public:
 	int m_loops;
 
 	//Record perfs
-	vector<Performance> m_perf_records;
-	bool RecordPerf();
-	bool UpdateBestPerf();
 	vector<double> m_weightsStart;
 	void RestoreWeights();
-	void CopyWeightsInto(vector<double>& weights);
-	Performance m_best_perf;
 
 	double TransferFunction(double x, FunctionType function);
 	double TransferFunctionDerivative(double x, FunctionType function);
@@ -144,16 +122,11 @@ public:
 	void MixDataSet();
 
 	//Save and Load files
-	bool SaveDatasetIntoFile();
-	bool LoadDatasetFromFile();
-	bool SaveStartingWeightsIntoFile();
-	bool LoadWeightsFromFile(string filename);
-	bool LoadHyperParametersFromFile(string filename);
-	bool SavePerfIntoFile();
-	bool SaveBestPerfIntoFile();
-	bool IsBetterPerfThanSaveFile(Performance &perf);
 	int m_datasetSize;
 	int m_weightLoadIndex;
+	bool SaveStartingWeightsIntoFile();
+	bool LoadWeightsFromFile(string filename);
+	bool LoadDatasetFromFile();
 
 	static string GetLabelString(Label label)
 	{
