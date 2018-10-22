@@ -25,21 +25,21 @@ using namespace std;
 
 #define NN_LEARNING_RATE				1.0//0.7
 #define NN_MOMENTUM						0.5//0.6
-#define NN_ACTIVATION_FUNCTION			SIGMOID
+#define NN_ACTIVATION_FUNCTION			TANH
 
 #define NN_ERROR_MARGIN					0.02f
 #define NN_MAX_ATTEMPTS					500
 #define NN_MAX_OVERALL_ATTEMPTS			150000
 
-#define DATASET_SIZE						100//300
+#define DATASET_SIZE					100//300
 #define DATASET_SUPERVISED_LOT			180//200
 #define DATASET_TESTING_LOT				(DATASET_SIZE - DATASET_SUPERVISED_LOT)
 
-#define PRINT_ALL					false
+#define PRINT_ALL						false
 #define PRINT_FF						false//feed forward
 #define PRINT_EC						true//erorr caculation
 #define PRINT_BP						false//gradient back propagation
-#define PRINT_WU						true//weights update
+#define PRINT_WU						false//weights update
 #define PRINT_FB						false//feed backward
 #define PRINT_TR						true//training
 #define PRINT_TE						true//testing
@@ -86,10 +86,6 @@ public:
 	struct tm timer;
 
 	void Run();
-	void Training();
-	void Testing();
-	Label TestSample(Data &data);
-	bool DoNothing(){ return true; };
 
 	void InitInputLayer(const Data &data);
 	void FeedForward();
@@ -119,7 +115,7 @@ public:
 
 	//Dataset
 	void CreateDataset();
-	void MixDataSet();
+	void MixDataSet(bool mix_or_not);
 
 	//Save and Load files
 	int m_datasetSize;
