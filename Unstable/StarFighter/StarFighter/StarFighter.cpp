@@ -38,8 +38,8 @@ NeuralNetwork::NeuralNetwork()
 
 	//Hidden layers
 	AddLayer(2, HiddenLayer);
-	AddLayer(5, HiddenLayer);
-	AddLayer(3, HiddenLayer);
+	AddLayer(2, HiddenLayer);
+	AddLayer(2, HiddenLayer);
 
 	//Output layer
 	AddLayer(NB_LABELS, OutpuLayer);
