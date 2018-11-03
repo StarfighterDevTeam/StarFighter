@@ -160,7 +160,7 @@ Module::Module(ModuleType moduleType, PlayerTeams team)
 			m_flux_max_after_construction = 30;
 			//m_isAutogeneratingFlux = true;
 			//m_flux_autogeneration_time = 0.5f;
-			m_needs_flux_source = true;
+			//m_needs_flux_source = true;
 			m_isGeneratingFluxor = true;
 			m_fluxor_generated_type = FluxorType_Blue;
 			m_fluxor_generation_time = 3.f;// 0.5f;

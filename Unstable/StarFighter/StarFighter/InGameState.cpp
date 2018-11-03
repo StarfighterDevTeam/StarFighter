@@ -189,21 +189,21 @@ void InGameState::Initialize(Player player)
 	}
 
 	//Flux sources
-	for (size_t p = 0; p < NBVAL_PlayerTeams; p++)
-	{
-		//default source
-		CreateFluxSource((*CurrentGame).m_startingGeneratorGridIndex[p], 0);
-		
-		//additional random sources
-		//if ((*CurrentGame).playerShips[p])
-		if (p != PlayerNeutral)
-		{
-			for (size_t i = 0; i < FLUX_SOURCES_NUMBER; i++)
-			{
-				CreateFluxSource((*CurrentGame).m_startingGeneratorGridIndex[p], MINIMUM_TILES_FROM_FLUX_SOURCE);
-			}
-		}
-	}
+	//for (size_t p = 0; p < NBVAL_PlayerTeams; p++)
+	//{
+	//	//default source
+	//	CreateFluxSource((*CurrentGame).m_startingGeneratorGridIndex[p], 0);
+	//	
+	//	//additional random sources
+	//	//if ((*CurrentGame).playerShips[p])
+	//	if (p != PlayerNeutral)
+	//	{
+	//		for (size_t i = 0; i < FLUX_SOURCES_NUMBER; i++)
+	//		{
+	//			CreateFluxSource((*CurrentGame).m_startingGeneratorGridIndex[p], MINIMUM_TILES_FROM_FLUX_SOURCE);
+	//		}
+	//	}
+	//}
 	
 	//Spawning Fluxors
 	//m_fluxor_spawn_zones.push_back(FluxorSpawnZone(sf::FloatRect(0, 0, W / 2, H / 2), FLUXOR_MAX_POPULATION / 6));
