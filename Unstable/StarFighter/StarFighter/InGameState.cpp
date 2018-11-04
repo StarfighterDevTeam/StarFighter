@@ -9,14 +9,14 @@ void InGameState::Initialize(Player player)
 	
 	Ship* playerShip = new Ship(sf::Vector2f(SHIP_START_X, SHIP_START_Y), sf::Vector2f(0, 0), "2D/natalia.png", sf::Vector2f(64, 64), sf::Vector2f(32, 32), 3);
 	(*CurrentGame).m_playerShip = playerShip;
-	(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
+	//(*CurrentGame).addToScene((*CurrentGame).m_playerShip, PlayerShipLayer, PlayerShip);
 
 	//Load saved file
-	if (!Ship::LoadShip(playerShip))
-	{
-		//or create a new save file
-		Ship::SaveShip(playerShip);
-	}
+	//if (!Ship::LoadShip(playerShip))
+	//{
+	//	//or create a new save file
+	//	Ship::SaveShip(playerShip);
+	//}
 
 	//Loading scripts
 	LoadCSVFile(SHIP_CSV_FILE);
@@ -25,8 +25,18 @@ void InGameState::Initialize(Player player)
 	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = background->m_size;
-	(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
-	(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
+	//(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
+	//(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
+
+	//BIG BOOK
+	m_mage.InitCards();
+	m_mage.ShuffleLibrary();
+	m_mage.DrawCard(5);
+	for (int i = 0; i < NB_CARDS_ALTAR; i++) 
+	{ 
+		m_mage.m_altar_slots[i].m_status = CardSlot_Free; 
+	}
+
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -124,4 +134,137 @@ void InGameState::LoadCSVFile(string scenes_file)
 	}
 
 	allConfigs.clear();
+}
+
+
+//BIG BOOK
+void Mage::InitCards()
+{
+	m_cards.push_back(Card(Mana_Fire, Mana_1));
+	m_cards.push_back(Card(Mana_Fire, Mana_1));
+	m_cards.push_back(Card(Mana_Fire, Mana_2));
+	//m_cards.push_back(Card(Mana_Fire, Mana_2));	//weakness
+
+	m_cards.push_back(Card(Mana_Water, Mana_1));
+	m_cards.push_back(Card(Mana_Water, Mana_1));
+	m_cards.push_back(Card(Mana_Water, Mana_1));	//specialty
+	m_cards.push_back(Card(Mana_Water, Mana_2));
+	m_cards.push_back(Card(Mana_Water, Mana_2));
+
+	m_cards.push_back(Card(Mana_Earth, Mana_1));
+	m_cards.push_back(Card(Mana_Earth, Mana_1));
+	m_cards.push_back(Card(Mana_Earth, Mana_2));
+	//m_cards.push_back(Card(Mana_Earth, Mana_2));	//weakness
+
+	m_cards.push_back(Card(Mana_Air, Mana_1));
+	m_cards.push_back(Card(Mana_Air, Mana_1));
+	m_cards.push_back(Card(Mana_Air, Mana_1));		//specialty
+	m_cards.push_back(Card(Mana_Air, Mana_2));
+	m_cards.push_back(Card(Mana_Air, Mana_2));
+
+	for (vector<Card>::iterator it = m_cards.begin(); it < m_cards.end(); it++)
+	{
+		m_libary.push_back(*it);
+	}
+}
+
+void Mage::ShuffleLibrary()
+{
+	int library_size = m_libary.size();
+
+	vector<Card> old_library;
+
+	for (int i = 0; i < library_size; i++)
+	{
+		old_library.push_back(m_libary[i]);
+	}
+
+	m_libary.clear();
+
+	for (int i = 0; i < library_size; i++)
+	{
+		int n = RandomizeIntBetweenValues(0, library_size - 1);
+		m_libary.push_back(old_library[n]);
+	}
+
+	old_library.clear();
+}
+
+void Mage::DrawCard(int nb_cards)
+{
+	for (int k = 0; k < nb_cards; k++)
+	{
+		//libray empty = put graveyard into library then shuffle
+		if (m_libary.empty())
+		{
+			int graveyard_size = m_graveyard.size();
+
+			for (int i = 0; i < graveyard_size; i++)
+			{
+				m_libary.push_back(m_graveyard[i]);
+			}
+
+			m_graveyard.clear();
+
+			ShuffleLibrary();
+		}
+
+		//draw card if not > max allowed
+		int free_slot = GetFreeHandCardSlot();
+		if (free_slot >= 0)
+		{
+			m_hand_slots[free_slot].GetCard(m_libary.back());
+			m_hand_slots[free_slot].m_status = CardSlot_Occupied;
+			m_libary.pop_back();
+		}
+		else
+		{
+			printf("No free slot in hand.\n");
+		}
+	}
+}
+
+int Mage::GetFreeHandCardSlot()
+{
+	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	{
+		if (m_hand_slots[i].m_status == CardSlot_Free)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+int Mage::GetFreeAltarCardSlot()
+{
+	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	{
+		if (m_altar_slots[i].m_status == CardSlot_Free)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+bool Mage::PlayCard(int hand_slot)
+{
+	int free_slot = GetFreeAltarCardSlot();
+	if (free_slot >= 0)
+	{
+		m_altar_slots[free_slot].GetCard(m_hand_slots[hand_slot].m_card);
+		m_altar_slots[free_slot].m_status = CardSlot_Occupied;
+
+		m_hand_slots[hand_slot].m_status = CardSlot_Free;
+
+		return true;
+	}
+	else
+	{
+		printf("No free slot in altar.\n");
+		return false;
+	}
 }
