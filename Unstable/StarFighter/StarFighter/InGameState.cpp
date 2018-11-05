@@ -140,7 +140,7 @@ void InGameState::InitTable()
 
 	m_mage.m_graveyard_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_mage.m_graveyard_slot.m_text.setCharacterSize(18);
-	m_mage.m_graveyard_slot.m_text.setColor(sf::Color(255, 255, 255, 255));
+	m_mage.m_graveyard_slot.m_text.setColor(sf::Color(0, 0, 0, 255));
 	m_mage.m_graveyard_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
 	m_mage.m_graveyard_slot.m_text.setString("");
 }
@@ -190,29 +190,21 @@ void InGameState::Update(sf::Time deltaTime)
 	m_mage.m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
 
 	//Actions
+	bool played = false;
 	if ((*CurrentGame).m_play_card_slot != NULL)
 	{
-		m_mage.PlayCard((*CurrentGame).m_play_card_slot->m_index, (*CurrentGame).m_target_slot->m_index);
+		played = m_mage.PlayCard((*CurrentGame).m_play_card_slot->m_index, (*CurrentGame).m_target_slot->m_index);
 	}
 
-	//Test
-	//m_mage.m_timer += deltaTime.asSeconds();
-	//
-	//if (m_mage.m_timer > 5.f && m_mage.m_timer < 6.f)
-	//{
-	//	m_mage.PlayCard(3);
-	//	m_mage.m_timer += 1.f;
-	//}
-	//if (m_mage.m_timer > 10.f && m_mage.m_timer < 11.f)
-	//{
-	//	m_mage.DrawCard(1);
-	//	m_mage.m_timer += 1.f;
-	//}
-	//if (m_mage.m_timer > 15.f && m_mage.m_timer < 16.f)
-	//{
-	//	m_mage.DrawCard(3);
-	//	m_mage.m_timer += 1.f;
-	//}
+	if (m_mage.GetFreeAltarCardSlot() == -1)
+	{
+		m_mage.Attack();
+	}
+
+	if (played)
+	{
+		m_mage.DrawCard();
+	}
 
 	//Cards UI update
 	m_mage.m_library_slot.m_text.setString(to_string((int)m_mage.m_libary.size()));
@@ -224,8 +216,7 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 	else
 	{
-		m_mage.m_graveyard_slot.GetManaColor(m_mage.m_graveyard.back().m_type);
-		m_mage.m_graveyard_slot.m_text.setString(to_string((int)m_mage.m_graveyard.back().m_value));
+		m_mage.m_graveyard_slot.GetCard(m_mage.m_graveyard.back());
 	}
 
 	//useless?
@@ -489,6 +480,8 @@ bool Mage::PlayCard(int hand_slot, int altar_slot)
 			m_hand_slots[hand_slot].m_text.setString("");
 			m_hand_slots[hand_slot].m_status = CardSlot_Free;
 
+			m_hand_slots[hand_slot].m_selected = false;
+
 			return true;
 		}
 		else
@@ -587,6 +580,19 @@ void CardSlot::Update(MouseAction mouse_click)
 	{
 		(*CurrentGame).m_play_card_slot = (*CurrentGame).m_selected_slot;
 		(*CurrentGame).m_target_slot = this;
-		(*CurrentGame).m_selected_slot->m_selected = false;
+	}
+}
+
+void Mage::Attack()
+{
+	//todo: attack
+
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		m_graveyard.push_back(m_altar_slots[i].m_card);
+
+		m_altar_slots[i].m_status = CardSlot_Free;
+		m_altar_slots[i].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+		m_altar_slots[i].m_text.setString("");
 	}
 }

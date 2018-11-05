@@ -30,6 +30,7 @@ public:
 	int GetFreeHandCardSlot();
 	int GetFreeAltarCardSlot();
 	bool PlayCard(int hand_slot, int altar_slot);
+	void Attack();
 
 	CardSlot m_hand_slots[NB_CARDS_HAND_MAX];
 	CardSlot m_library_slot;
