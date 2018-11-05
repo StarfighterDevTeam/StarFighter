@@ -47,16 +47,20 @@ enum CardSlotStatus
 class CardSlot
 {
 public:
-	CardSlot(){ m_status = CardSlot_Free; }
+	CardSlot(){ m_status = CardSlot_Free; m_hovered = false; m_selected = false; }
 	CardSlotStatus m_status;
 	Card m_card;
 	void GetCard(Card& card);
 	static sf::Color GetManaColor(ManaType type);
 	static sf::Color GetStatusColor(CardSlotStatus status);
+	void Update(bool left_click, CardSlot* selected_slot = NULL);
 
 	RectangleShape m_shape_container;
 	RectangleShape m_shape;
 	SFText m_text;
+
+	bool m_hovered;
+	bool m_selected;
 };
 
 #define NB_CARDS_HAND		5
@@ -104,6 +108,7 @@ public:
 
 	Mage m_mage;
 	void InitTable();
+	CardSlot* m_selected_slot;
 
 private:
 	sf::RenderWindow* mainWindow;

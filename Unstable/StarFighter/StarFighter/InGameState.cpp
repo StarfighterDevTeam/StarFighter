@@ -38,18 +38,22 @@ void InGameState::Initialize(Player player)
 
 void InGameState::InitTable()
 {
+	m_selected_slot = NULL;
+
 	//Hand
 	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
 	{
 		m_mage.m_hand_slots[i].m_status = CardSlot_Free;
 
 		m_mage.m_hand_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 700));
+		m_mage.m_hand_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 		m_mage.m_hand_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 		m_mage.m_hand_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 		m_mage.m_hand_slots[i].m_shape_container.setOutlineThickness(2);
 		m_mage.m_hand_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
 		m_mage.m_hand_slots[i].m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 700));
+		m_mage.m_hand_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 		m_mage.m_hand_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 		m_mage.m_hand_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 		m_mage.m_hand_slots[i].m_shape.setOutlineThickness(0);
@@ -68,12 +72,14 @@ void InGameState::InitTable()
 		m_mage.m_altar_slots[i].m_status = CardSlot_Free;
 
 		m_mage.m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_mage.m_altar_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 		m_mage.m_altar_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 		m_mage.m_altar_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 		m_mage.m_altar_slots[i].m_shape_container.setOutlineThickness(2);
 		m_mage.m_altar_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
 		m_mage.m_altar_slots[i].m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_mage.m_altar_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 		m_mage.m_altar_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 		m_mage.m_altar_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 		m_mage.m_altar_slots[i].m_shape.setOutlineThickness(0);
@@ -87,10 +93,18 @@ void InGameState::InitTable()
 	}
 
 	//Library
+	m_mage.m_library_slot.m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2, 800));
+	m_mage.m_library_slot.m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
+	m_mage.m_library_slot.m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+	m_mage.m_library_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_mage.m_library_slot.m_shape_container.setOutlineThickness(2);
+	m_mage.m_library_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
 	m_mage.m_library_slot.m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2, 800));
+	m_mage.m_library_slot.m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 	m_mage.m_library_slot.m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-	m_mage.m_library_slot.m_shape.setOutlineColor(sf::Color(255, 255, 255, 255));
-	m_mage.m_library_slot.m_shape.setOutlineThickness(2);
+	m_mage.m_library_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+	m_mage.m_library_slot.m_shape.setOutlineThickness(0);
 	m_mage.m_library_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
 
 	m_mage.m_library_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -100,10 +114,18 @@ void InGameState::InitTable()
 	m_mage.m_library_slot.m_text.setString("");
 
 	//Graveyard
+	m_mage.m_graveyard_slot.m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
+	m_mage.m_graveyard_slot.m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
+	m_mage.m_graveyard_slot.m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+	m_mage.m_graveyard_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_mage.m_graveyard_slot.m_shape_container.setOutlineThickness(2);
+	m_mage.m_graveyard_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
 	m_mage.m_graveyard_slot.m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
+	m_mage.m_graveyard_slot.m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 	m_mage.m_graveyard_slot.m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-	m_mage.m_graveyard_slot.m_shape.setOutlineColor(sf::Color(255, 255, 255, 255));
-	m_mage.m_graveyard_slot.m_shape.setOutlineThickness(2);
+	m_mage.m_graveyard_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+	m_mage.m_graveyard_slot.m_shape.setOutlineThickness(0);
 	m_mage.m_graveyard_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
 
 	m_mage.m_graveyard_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -115,6 +137,30 @@ void InGameState::InitTable()
 
 void InGameState::Update(sf::Time deltaTime)
 {
+	//Get mouse input
+	//get mouse coordinates
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
+	(*CurrentGame).m_mouse_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
+
+	//Cards slots update
+	bool left_click = InputGuy::isSelecting() && (*CurrentGame).m_window_has_focus;
+	if (left_click)
+	{
+		m_selected_slot = NULL;
+	}
+
+	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	{
+		m_mage.m_hand_slots[i].Update(left_click);
+	}
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		m_mage.m_altar_slots[i].Update(left_click);
+	}
+	m_mage.m_library_slot.Update(left_click);
+	m_mage.m_graveyard_slot.Update(left_click);
+
+	//Test
 	m_mage.m_timer += deltaTime.asSeconds();
 
 	if (m_mage.m_timer > 5.f && m_mage.m_timer < 6.f)
@@ -132,7 +178,8 @@ void InGameState::Update(sf::Time deltaTime)
 		m_mage.DrawCard(3);
 		m_mage.m_timer += 1.f;
 	}
-	
+
+	//Cards update
 	m_mage.m_library_slot.m_text.setString(to_string((int)m_mage.m_libary.size()));
 
 	if (m_mage.m_graveyard.empty())
@@ -202,9 +249,11 @@ void InGameState::Draw()
 		}
 	}
 
+	(*CurrentGame).m_mainScreen.draw(m_mage.m_library_slot.m_shape_container);
 	(*CurrentGame).m_mainScreen.draw(m_mage.m_library_slot.m_shape);
 	(*CurrentGame).m_mainScreen.draw(m_mage.m_library_slot.m_text);
 
+	(*CurrentGame).m_mainScreen.draw(m_mage.m_graveyard_slot.m_shape_container);
 	(*CurrentGame).m_mainScreen.draw(m_mage.m_graveyard_slot.m_shape);
 	(*CurrentGame).m_mainScreen.draw(m_mage.m_graveyard_slot.m_text);
 
@@ -459,5 +508,41 @@ sf::Color CardSlot::GetStatusColor(CardSlotStatus status)
 	else// if (status == CardSlot_Burnt)
 	{
 		return sf::Color(255, 255, 0, 255);
+	}
+}
+
+void CardSlot::Update(bool left_click, CardSlot* selected_slot)
+{
+	if ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - CARD_WIDTH / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + CARD_WIDTH / 2
+		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - CARD_HEIGHT / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + CARD_HEIGHT / 2)
+	{
+		m_hovered = true;
+	}
+	else
+	{
+		m_hovered = false;
+	}
+
+	if (left_click)
+	{
+		if (m_hovered)
+		{
+			m_selected = true;
+			selected_slot = this;
+		}
+		else
+		{
+			m_selected = false;
+		}
+	}
+
+	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	if (m_hovered)
+	{
+		m_shape_container.setOutlineColor(sf::Color(255, 0, 0, 255));
+	}
+	if (m_selected)
+	{
+		m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
 	}
 }
