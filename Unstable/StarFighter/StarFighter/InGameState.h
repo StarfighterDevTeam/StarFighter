@@ -50,18 +50,25 @@ public:
 	CardSlot(){ m_status = CardSlot_Free; }
 	CardSlotStatus m_status;
 	Card m_card;
-	void GetCard(Card& card){ m_card.m_value = card.m_value; m_card.m_type = card.m_type; };
+	void GetCard(Card& card);
+	static sf::Color GetManaColor(ManaType type);
+	static sf::Color GetStatusColor(CardSlotStatus status);
+
+	RectangleShape m_shape_container;
+	RectangleShape m_shape;
+	SFText m_text;
 };
 
 #define NB_CARDS_HAND		5
 #define NB_CARDS_HAND_MAX	7
-#define NB_CARDS_INIT		16
 #define NB_CARDS_ALTAR		4
+#define CARD_WIDTH			32
+#define CARD_HEIGHT			64
 
 class Mage
 {
 public:
-	Mage(){ for (int i = 0; i < NB_CARDS_HAND_MAX; i++) { m_hand_slots[i].m_status = CardSlot_Free; } };
+	Mage(){ m_timer = 0.f; for (int i = 0; i < NB_CARDS_HAND_MAX; i++) { m_hand_slots[i].m_status = CardSlot_Free; } };
 
 	void InitCards();
 	void ShuffleLibrary();
@@ -74,8 +81,9 @@ public:
 	vector<Card> m_libary;
 	vector<Card> m_graveyard;
 	vector<Card> m_cards;
-
 	CardSlot m_altar_slots[NB_CARDS_ALTAR];//to be shared among players
+
+	float m_timer;
 };
 
 class InGameState : public GameState

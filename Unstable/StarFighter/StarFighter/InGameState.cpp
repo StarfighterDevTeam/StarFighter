@@ -22,57 +22,147 @@ void InGameState::Initialize(Player player)
 	LoadCSVFile(SHIP_CSV_FILE);
 
 	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
-	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+	//(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = background->m_size;
 	//(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
 	//(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
 	//BIG BOOK
+	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	{
+		m_mage.m_hand_slots[i].m_status = CardSlot_Free;
+
+		m_mage.m_hand_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 700));
+		m_mage.m_hand_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+		m_mage.m_hand_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		m_mage.m_hand_slots[i].m_shape_container.setOutlineThickness(2);
+		m_mage.m_hand_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+		m_mage.m_hand_slots[i].m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 700));
+		m_mage.m_hand_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+		m_mage.m_hand_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+		m_mage.m_hand_slots[i].m_shape.setOutlineThickness(0);
+		m_mage.m_hand_slots[i].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
+
+		m_mage.m_hand_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_mage.m_hand_slots[i].m_text.setCharacterSize(18);
+		m_mage.m_hand_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
+		m_mage.m_hand_slots[i].m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 700));
+		m_mage.m_hand_slots[i].m_text.setString("");
+	}
+
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		m_mage.m_altar_slots[i].m_status = CardSlot_Free;
+
+		m_mage.m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_mage.m_altar_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+		m_mage.m_altar_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		m_mage.m_altar_slots[i].m_shape_container.setOutlineThickness(2);
+		m_mage.m_altar_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+		m_mage.m_altar_slots[i].m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_mage.m_altar_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+		m_mage.m_altar_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+		m_mage.m_altar_slots[i].m_shape.setOutlineThickness(0);
+		m_mage.m_altar_slots[i].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
+		
+		m_mage.m_altar_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_mage.m_altar_slots[i].m_text.setCharacterSize(18);
+		m_mage.m_altar_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
+		m_mage.m_altar_slots[i].m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_mage.m_altar_slots[i].m_text.setString("");
+	}
+
 	m_mage.InitCards();
 	m_mage.ShuffleLibrary();
 	m_mage.DrawCard(5);
-	for (int i = 0; i < NB_CARDS_ALTAR; i++) 
-	{ 
-		m_mage.m_altar_slots[i].m_status = CardSlot_Free; 
-	}
-
 }
 
 void InGameState::Update(sf::Time deltaTime)
 {
+	m_mage.m_timer += deltaTime.asSeconds();
+
+	if (m_mage.m_timer > 5.f && m_mage.m_timer < 6.f)
+	{
+		m_mage.PlayCard(3);
+		m_mage.m_timer += 1.f;
+	}
+	if (m_mage.m_timer > 10.f && m_mage.m_timer < 11.f)
+	{
+		m_mage.DrawCard(1);
+		m_mage.m_timer += 1.f;
+	}
+	if (m_mage.m_timer > 15.f && m_mage.m_timer < 16.f)
+	{
+		m_mage.DrawCard(3);
+		m_mage.m_timer += 1.f;
+	}
+	
+
 	(*CurrentGame).updateScene(deltaTime);
 
 	//move camera
-	UpdateCamera(deltaTime);
-
-	//Create and destroy HUD panels
-	//case 1: destroying a panel
-	if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).m_playerShip->m_SFTargetPanel)
-	{
-		DestroySFPanel((*CurrentGame).m_playerShip);
-	}
-	else if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel != SFPanel_None)
-	{
-		//case 2: creating a panel
-		if (!(*CurrentGame).m_playerShip->m_SFTargetPanel)
-		{
-			CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
-		}
-		//case 3: changing panel
-		else if ((*CurrentGame).m_playerShip->m_SFTargetPanel->m_panel_type != (*CurrentGame).m_playerShip->m_is_asking_SFPanel)
-		{
-			DestroySFPanel((*CurrentGame).m_playerShip);
-			CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
-		}
-	}
+	//UpdateCamera(deltaTime);
+	//
+	////Create and destroy HUD panels
+	////case 1: destroying a panel
+	//if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).m_playerShip->m_SFTargetPanel)
+	//{
+	//	DestroySFPanel((*CurrentGame).m_playerShip);
+	//}
+	//else if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel != SFPanel_None)
+	//{
+	//	//case 2: creating a panel
+	//	if (!(*CurrentGame).m_playerShip->m_SFTargetPanel)
+	//	{
+	//		CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
+	//	}
+	//	//case 3: changing panel
+	//	else if ((*CurrentGame).m_playerShip->m_SFTargetPanel->m_panel_type != (*CurrentGame).m_playerShip->m_is_asking_SFPanel)
+	//	{
+	//		DestroySFPanel((*CurrentGame).m_playerShip);
+	//		CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
+	//	}
+	//}
 
 	this->mainWindow->clear();
 }
 
 void InGameState::Draw()
 {
-	(*CurrentGame).drawScene();
+	(*CurrentGame).m_mainScreen.clear();
+
+	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	{
+		(*CurrentGame).m_mainScreen.draw(m_mage.m_hand_slots[i].m_shape_container);
+
+		if (m_mage.m_hand_slots[i].m_status != CardSlot_Free)
+			(*CurrentGame).m_mainScreen.draw(m_mage.m_hand_slots[i].m_shape);
+
+		if (m_mage.m_hand_slots[i].m_status == CardSlot_Occupied)
+		(*CurrentGame).m_mainScreen.draw(m_mage.m_hand_slots[i].m_text);
+	}
+
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		(*CurrentGame).m_mainScreen.draw(m_mage.m_altar_slots[i].m_shape_container);
+
+		if (m_mage.m_altar_slots[i].m_status != CardSlot_Free)
+		{
+			(*CurrentGame).m_mainScreen.draw(m_mage.m_altar_slots[i].m_shape);
+			(*CurrentGame).m_mainScreen.draw(m_mage.m_altar_slots[i].m_text);
+		}
+	}
+
+	(*CurrentGame).m_mainScreen.display();
+	sf::Sprite temp((*CurrentGame).m_mainScreen.getTexture());
+	temp.scale((*CurrentGame).m_scale_factor.x, (*CurrentGame).m_scale_factor.y);
+	temp.setPosition(sf::Vector2f(0, 0));
+	(*CurrentGame).getMainWindow()->draw(temp);
+
+	//(*CurrentGame).drawScene();
 }
 
 void InGameState::Release()
@@ -142,24 +232,22 @@ void Mage::InitCards()
 {
 	m_cards.push_back(Card(Mana_Fire, Mana_1));
 	m_cards.push_back(Card(Mana_Fire, Mana_1));
+	//m_cards.push_back(Card(Mana_Fire, Mana_1));	//weakness
 	m_cards.push_back(Card(Mana_Fire, Mana_2));
-	//m_cards.push_back(Card(Mana_Fire, Mana_2));	//weakness
 
 	m_cards.push_back(Card(Mana_Water, Mana_1));
 	m_cards.push_back(Card(Mana_Water, Mana_1));
-	m_cards.push_back(Card(Mana_Water, Mana_1));	//specialty
-	m_cards.push_back(Card(Mana_Water, Mana_2));
+	m_cards.push_back(Card(Mana_Water, Mana_1));
 	m_cards.push_back(Card(Mana_Water, Mana_2));
 
 	m_cards.push_back(Card(Mana_Earth, Mana_1));
 	m_cards.push_back(Card(Mana_Earth, Mana_1));
+	//m_cards.push_back(Card(Mana_Earth, Mana_1));	//weakness
 	m_cards.push_back(Card(Mana_Earth, Mana_2));
-	//m_cards.push_back(Card(Mana_Earth, Mana_2));	//weakness
 
 	m_cards.push_back(Card(Mana_Air, Mana_1));
 	m_cards.push_back(Card(Mana_Air, Mana_1));
-	m_cards.push_back(Card(Mana_Air, Mana_1));		//specialty
-	m_cards.push_back(Card(Mana_Air, Mana_2));
+	m_cards.push_back(Card(Mana_Air, Mana_1));
 	m_cards.push_back(Card(Mana_Air, Mana_2));
 
 	for (vector<Card>::iterator it = m_cards.begin(); it < m_cards.end(); it++)
@@ -219,7 +307,7 @@ void Mage::DrawCard(int nb_cards)
 		}
 		else
 		{
-			printf("No free slot in hand.\n");
+			printf("Cannot draw card: no free slot in hand.\n");
 		}
 	}
 }
@@ -252,19 +340,71 @@ int Mage::GetFreeAltarCardSlot()
 
 bool Mage::PlayCard(int hand_slot)
 {
-	int free_slot = GetFreeAltarCardSlot();
-	if (free_slot >= 0)
+	if (m_hand_slots[hand_slot].m_status == CardSlot_Occupied)
 	{
-		m_altar_slots[free_slot].GetCard(m_hand_slots[hand_slot].m_card);
-		m_altar_slots[free_slot].m_status = CardSlot_Occupied;
+		int free_slot = GetFreeAltarCardSlot();
+		if (free_slot >= 0)
+		{
+			m_altar_slots[free_slot].GetCard(m_hand_slots[hand_slot].m_card);
+			m_altar_slots[free_slot].m_status = CardSlot_Occupied;
 
-		m_hand_slots[hand_slot].m_status = CardSlot_Free;
+			m_hand_slots[hand_slot].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+			m_hand_slots[hand_slot].m_text.setString("");
+			m_hand_slots[hand_slot].m_status = CardSlot_Free;
 
-		return true;
+			return true;
+		}
+		else
+		{
+			printf("No free slot in altar.\n");
+			return false;
+		}
 	}
 	else
 	{
-		printf("No free slot in altar.\n");
+		printf("No card in this hand slot.\n");
 		return false;
+	}
+}
+
+void CardSlot::GetCard(Card& card)
+{
+	m_card.m_value = card.m_value; 
+	m_card.m_type = card.m_type;
+
+	//display
+	m_shape.setFillColor(GetManaColor(card.m_type));
+	m_text.setString(std::to_string((int)(card.m_value) + 1));
+}
+
+sf::Color CardSlot::GetManaColor(ManaType type)
+{
+	if (type == Mana_Fire)
+	{
+		return sf::Color(255, 0, 0, 255);
+	}
+	else if (type == Mana_Water)
+	{
+		return sf::Color(0, 0, 255, 255);
+	}
+	else if (type == Mana_Air)
+	{
+		return sf::Color(230, 230, 255, 255);
+	}
+	else// if (type == Mana_Earth)
+	{
+		return sf::Color(0, 255, 0, 255);
+	}
+}
+
+sf::Color CardSlot::GetStatusColor(CardSlotStatus status)
+{
+	if (status == CardSlot_Free)
+	{
+		return sf::Color(0, 0, 0, 0);
+	}
+	else// if (status == CardSlot_Burnt)
+	{
+		return sf::Color(255, 255, 0, 255);
 	}
 }
