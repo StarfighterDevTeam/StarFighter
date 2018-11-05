@@ -12,56 +12,6 @@
 
 class GameObject;
 
-enum ManaType
-{
-	Mana_Fire,		//0
-	Mana_Water,		//1
-	Mana_Air,		//2
-	Mana_Earth,		//3
-};
-
-enum ManaValue
-{
-	Mana_1,			//0
-	Mana_2,			//1
-	Mana_3,			//2
-};
-
-class Card
-{
-public:
-	Card(){};
-	Card(ManaType type, ManaValue value) { m_type = type; m_value = value; }
-
-	ManaType m_type;
-	ManaValue m_value;
-};
-
-enum CardSlotStatus
-{
-	CardSlot_Free,		//0
-	CardSlot_Occupied,	//1
-	CardSlot_Burnt,		//2
-};
-
-class CardSlot
-{
-public:
-	CardSlot(){ m_status = CardSlot_Free; m_hovered = false; m_selected = false; }
-	CardSlotStatus m_status;
-	Card m_card;
-	void GetCard(Card& card);
-	static sf::Color GetManaColor(ManaType type);
-	static sf::Color GetStatusColor(CardSlotStatus status);
-	void Update(bool left_click, CardSlot* selected_slot = NULL);
-
-	RectangleShape m_shape_container;
-	RectangleShape m_shape;
-	SFText m_text;
-
-	bool m_hovered;
-	bool m_selected;
-};
 
 #define NB_CARDS_HAND		5
 #define NB_CARDS_HAND_MAX	7
@@ -79,7 +29,7 @@ public:
 	void DrawCard(int nb_cards = 1);
 	int GetFreeHandCardSlot();
 	int GetFreeAltarCardSlot();
-	bool PlayCard(int hand_slot);
+	bool PlayCard(int hand_slot, int altar_slot);
 
 	CardSlot m_hand_slots[NB_CARDS_HAND_MAX];
 	CardSlot m_library_slot;
@@ -108,7 +58,6 @@ public:
 
 	Mage m_mage;
 	void InitTable();
-	CardSlot* m_selected_slot;
 
 private:
 	sf::RenderWindow* mainWindow;

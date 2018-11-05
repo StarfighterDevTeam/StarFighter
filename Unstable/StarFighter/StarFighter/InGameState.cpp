@@ -38,12 +38,16 @@ void InGameState::Initialize(Player player)
 
 void InGameState::InitTable()
 {
-	m_selected_slot = NULL;
+	(*CurrentGame).m_selected_slot = NULL;
+	(*CurrentGame).m_play_card_slot = NULL;
+	(*CurrentGame).m_target_slot = NULL;
 
 	//Hand
 	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
 	{
 		m_mage.m_hand_slots[i].m_status = CardSlot_Free;
+		m_mage.m_hand_slots[i].m_stack = Stack_Hand;
+		m_mage.m_hand_slots[i].m_index = i;
 
 		m_mage.m_hand_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 700));
 		m_mage.m_hand_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
@@ -70,6 +74,8 @@ void InGameState::InitTable()
 	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
 		m_mage.m_altar_slots[i].m_status = CardSlot_Free;
+		m_mage.m_altar_slots[i].m_stack = Stack_Altar;
+		m_mage.m_altar_slots[i].m_index = i;
 
 		m_mage.m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
 		m_mage.m_altar_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
@@ -93,6 +99,8 @@ void InGameState::InitTable()
 	}
 
 	//Library
+	m_mage.m_library_slot.m_stack = Stack_Altar;
+
 	m_mage.m_library_slot.m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2, 800));
 	m_mage.m_library_slot.m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 	m_mage.m_library_slot.m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
@@ -114,6 +122,8 @@ void InGameState::InitTable()
 	m_mage.m_library_slot.m_text.setString("");
 
 	//Graveyard
+	m_mage.m_graveyard_slot.m_stack = Stack_Graveyard;
+
 	m_mage.m_graveyard_slot.m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
 	m_mage.m_graveyard_slot.m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 	m_mage.m_graveyard_slot.m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
@@ -137,49 +147,74 @@ void InGameState::InitTable()
 
 void InGameState::Update(sf::Time deltaTime)
 {
-	//Get mouse input
-	//get mouse coordinates
+	//Get mouse inputs
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
 	(*CurrentGame).m_mouse_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
 
-	//Cards slots update
-	bool left_click = InputGuy::isSelecting() && (*CurrentGame).m_window_has_focus;
-	if (left_click)
+	if ((*CurrentGame).m_mouse_click_timer > 0)
 	{
-		m_selected_slot = NULL;
+		(*CurrentGame).m_mouse_click_timer -= deltaTime.asSeconds();
 	}
 
+	(*CurrentGame).m_mouse_click = Mouse_None;
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (*CurrentGame).m_window_has_focus && (*CurrentGame).m_mouse_click_timer <= 0)
+	{
+		(*CurrentGame).m_mouse_click = Mouse_LeftClick;
+		(*CurrentGame).m_mouse_click_timer = 0.2f;
+	}
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && (*CurrentGame).m_window_has_focus && (*CurrentGame).m_mouse_click_timer <= 0)
+	{
+		(*CurrentGame).m_mouse_click = Mouse_RightClick;
+		(*CurrentGame).m_mouse_click_timer = 0.2f;
+	}
+
+	//Reset flags
+	(*CurrentGame).m_play_card_slot = NULL;
+	(*CurrentGame).m_target_slot = NULL;
+
+	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
+	{
+		(*CurrentGame).m_selected_slot = NULL;
+	}
+
+	//Cards slots selection
 	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
 	{
-		m_mage.m_hand_slots[i].Update(left_click);
+		m_mage.m_hand_slots[i].Update((*CurrentGame).m_mouse_click);
 	}
 	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
-		m_mage.m_altar_slots[i].Update(left_click);
+		m_mage.m_altar_slots[i].Update((*CurrentGame).m_mouse_click);
 	}
-	m_mage.m_library_slot.Update(left_click);
-	m_mage.m_graveyard_slot.Update(left_click);
+	m_mage.m_library_slot.Update((*CurrentGame).m_mouse_click);
+	m_mage.m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
+
+	//Actions
+	if ((*CurrentGame).m_play_card_slot != NULL)
+	{
+		m_mage.PlayCard((*CurrentGame).m_play_card_slot->m_index, (*CurrentGame).m_target_slot->m_index);
+	}
 
 	//Test
-	m_mage.m_timer += deltaTime.asSeconds();
+	//m_mage.m_timer += deltaTime.asSeconds();
+	//
+	//if (m_mage.m_timer > 5.f && m_mage.m_timer < 6.f)
+	//{
+	//	m_mage.PlayCard(3);
+	//	m_mage.m_timer += 1.f;
+	//}
+	//if (m_mage.m_timer > 10.f && m_mage.m_timer < 11.f)
+	//{
+	//	m_mage.DrawCard(1);
+	//	m_mage.m_timer += 1.f;
+	//}
+	//if (m_mage.m_timer > 15.f && m_mage.m_timer < 16.f)
+	//{
+	//	m_mage.DrawCard(3);
+	//	m_mage.m_timer += 1.f;
+	//}
 
-	if (m_mage.m_timer > 5.f && m_mage.m_timer < 6.f)
-	{
-		m_mage.PlayCard(3);
-		m_mage.m_timer += 1.f;
-	}
-	if (m_mage.m_timer > 10.f && m_mage.m_timer < 11.f)
-	{
-		m_mage.DrawCard(1);
-		m_mage.m_timer += 1.f;
-	}
-	if (m_mage.m_timer > 15.f && m_mage.m_timer < 16.f)
-	{
-		m_mage.DrawCard(3);
-		m_mage.m_timer += 1.f;
-	}
-
-	//Cards update
+	//Cards UI update
 	m_mage.m_library_slot.m_text.setString(to_string((int)m_mage.m_libary.size()));
 
 	if (m_mage.m_graveyard.empty())
@@ -193,6 +228,7 @@ void InGameState::Update(sf::Time deltaTime)
 		m_mage.m_graveyard_slot.m_text.setString(to_string((int)m_mage.m_graveyard.back().m_value));
 	}
 
+	//useless?
 	(*CurrentGame).updateScene(deltaTime);
 
 	//move camera
@@ -429,7 +465,7 @@ int Mage::GetFreeHandCardSlot()
 
 int Mage::GetFreeAltarCardSlot()
 {
-	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
 		if (m_altar_slots[i].m_status == CardSlot_Free)
 		{
@@ -440,15 +476,14 @@ int Mage::GetFreeAltarCardSlot()
 	return -1;
 }
 
-bool Mage::PlayCard(int hand_slot)
+bool Mage::PlayCard(int hand_slot, int altar_slot)
 {
 	if (m_hand_slots[hand_slot].m_status == CardSlot_Occupied)
 	{
-		int free_slot = GetFreeAltarCardSlot();
-		if (free_slot >= 0)
+		if (m_altar_slots[altar_slot].m_status == CardSlot_Free)
 		{
-			m_altar_slots[free_slot].GetCard(m_hand_slots[hand_slot].m_card);
-			m_altar_slots[free_slot].m_status = CardSlot_Occupied;
+			m_altar_slots[altar_slot].GetCard(m_hand_slots[hand_slot].m_card);
+			m_altar_slots[altar_slot].m_status = CardSlot_Occupied;
 
 			m_hand_slots[hand_slot].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
 			m_hand_slots[hand_slot].m_text.setString("");
@@ -458,13 +493,13 @@ bool Mage::PlayCard(int hand_slot)
 		}
 		else
 		{
-			printf("No free slot in altar.\n");
+			printf("Cannot play card: altar slot occupied.\n");
 			return false;
 		}
 	}
 	else
 	{
-		printf("No card in this hand slot.\n");
+		printf("Cannot play card: no card in hand at this slot.\n");
 		return false;
 	}
 }
@@ -511,7 +546,7 @@ sf::Color CardSlot::GetStatusColor(CardSlotStatus status)
 	}
 }
 
-void CardSlot::Update(bool left_click, CardSlot* selected_slot)
+void CardSlot::Update(MouseAction mouse_click)
 {
 	if ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - CARD_WIDTH / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + CARD_WIDTH / 2
 		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - CARD_HEIGHT / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + CARD_HEIGHT / 2)
@@ -523,12 +558,12 @@ void CardSlot::Update(bool left_click, CardSlot* selected_slot)
 		m_hovered = false;
 	}
 
-	if (left_click)
+	if (mouse_click == Mouse_LeftClick)
 	{
 		if (m_hovered)
 		{
 			m_selected = true;
-			selected_slot = this;
+			(*CurrentGame).m_selected_slot = this;
 		}
 		else
 		{
@@ -544,5 +579,14 @@ void CardSlot::Update(bool left_click, CardSlot* selected_slot)
 	if (m_selected)
 	{
 		m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
+	}
+
+	//Actions
+	//PLAY CARD
+	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Hand && (*CurrentGame).m_selected_slot->m_status == CardSlot_Occupied && m_stack == Stack_Altar)
+	{
+		(*CurrentGame).m_play_card_slot = (*CurrentGame).m_selected_slot;
+		(*CurrentGame).m_target_slot = this;
+		(*CurrentGame).m_selected_slot->m_selected = false;
 	}
 }

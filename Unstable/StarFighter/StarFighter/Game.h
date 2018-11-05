@@ -41,6 +41,75 @@ enum FontsStyle
 
 using namespace sf;
 
+
+enum ManaType
+{
+	Mana_Fire,		//0
+	Mana_Water,		//1
+	Mana_Air,		//2
+	Mana_Earth,		//3
+};
+
+enum ManaValue
+{
+	Mana_1,			//0
+	Mana_2,			//1
+	Mana_3,			//2
+};
+
+class Card
+{
+public:
+	Card(){};
+	Card(ManaType type, ManaValue value) { m_type = type; m_value = value; }
+
+	ManaType m_type;
+	ManaValue m_value;
+};
+
+enum CardSlotStatus
+{
+	CardSlot_Free,		//0
+	CardSlot_Occupied,	//1
+	CardSlot_Burnt,		//2
+};
+
+enum MouseAction
+{
+	Mouse_None,
+	Mouse_LeftClick,
+	Mouse_RightClick,
+};
+
+enum CardStack
+{
+	Stack_Hand,
+	Stack_Altar,
+	Stack_Library,
+	Stack_Graveyard,
+};
+
+class CardSlot
+{
+public:
+	CardSlot(){ m_status = CardSlot_Free; m_hovered = false; m_selected = false; }
+	CardSlotStatus m_status;
+	Card m_card;
+	CardStack m_stack;
+	int m_index;
+	void GetCard(Card& card);
+	static sf::Color GetManaColor(ManaType type);
+	static sf::Color GetStatusColor(CardSlotStatus status);
+	void Update(MouseAction mouse_click);
+
+	RectangleShape m_shape_container;
+	RectangleShape m_shape;
+	SFText m_text;
+
+	bool m_hovered;
+	bool m_selected;
+};
+
 struct Game
 {
 public:
@@ -74,6 +143,8 @@ public:
 	bool m_window_has_focus;
 
 	sf::Vector2f m_mouse_pos;
+	MouseAction m_mouse_click;
+	float m_mouse_click_timer;
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;
@@ -109,6 +180,11 @@ public:
 
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
+
+	//BIG BOOK
+	CardSlot* m_selected_slot;
+	CardSlot* m_play_card_slot;
+	CardSlot* m_target_slot;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

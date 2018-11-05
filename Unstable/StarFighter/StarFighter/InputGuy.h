@@ -29,7 +29,6 @@ public:
 	static bool isRestartingScript();
 	static bool isMuting();
 	static bool isPausing();
-	static bool isSelecting();
 };
 
 

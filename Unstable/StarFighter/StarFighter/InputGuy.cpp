@@ -167,8 +167,3 @@ Vector2f InputGuy::getDirections(ControlerType device)
 
 	return Vector2f(x, y);
 }
-
-bool InputGuy::isSelecting()
-{
-	return sf::Mouse::isButtonPressed(sf::Mouse::Left);
-}
