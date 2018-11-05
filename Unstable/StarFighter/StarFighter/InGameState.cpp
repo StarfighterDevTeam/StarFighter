@@ -29,6 +29,16 @@ void InGameState::Initialize(Player player)
 	//(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
 	//BIG BOOK
+	InitTable();
+
+	m_mage.InitCards();
+	m_mage.ShuffleLibrary();
+	m_mage.DrawCard(5);
+}
+
+void InGameState::InitTable()
+{
+	//Hand
 	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
 	{
 		m_mage.m_hand_slots[i].m_status = CardSlot_Free;
@@ -52,6 +62,7 @@ void InGameState::Initialize(Player player)
 		m_mage.m_hand_slots[i].m_text.setString("");
 	}
 
+	//Altar
 	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
 		m_mage.m_altar_slots[i].m_status = CardSlot_Free;
@@ -67,7 +78,7 @@ void InGameState::Initialize(Player player)
 		m_mage.m_altar_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 		m_mage.m_altar_slots[i].m_shape.setOutlineThickness(0);
 		m_mage.m_altar_slots[i].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
-		
+
 		m_mage.m_altar_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_mage.m_altar_slots[i].m_text.setCharacterSize(18);
 		m_mage.m_altar_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
@@ -75,9 +86,31 @@ void InGameState::Initialize(Player player)
 		m_mage.m_altar_slots[i].m_text.setString("");
 	}
 
-	m_mage.InitCards();
-	m_mage.ShuffleLibrary();
-	m_mage.DrawCard(5);
+	//Library
+	m_mage.m_library_slot.m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2, 800));
+	m_mage.m_library_slot.m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+	m_mage.m_library_slot.m_shape.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_mage.m_library_slot.m_shape.setOutlineThickness(2);
+	m_mage.m_library_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+	m_mage.m_library_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_mage.m_library_slot.m_text.setCharacterSize(18);
+	m_mage.m_library_slot.m_text.setColor(sf::Color(255, 255, 255, 255));
+	m_mage.m_library_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2, 800));
+	m_mage.m_library_slot.m_text.setString("");
+
+	//Graveyard
+	m_mage.m_graveyard_slot.m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
+	m_mage.m_graveyard_slot.m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+	m_mage.m_graveyard_slot.m_shape.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_mage.m_graveyard_slot.m_shape.setOutlineThickness(2);
+	m_mage.m_graveyard_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+	m_mage.m_graveyard_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_mage.m_graveyard_slot.m_text.setCharacterSize(18);
+	m_mage.m_graveyard_slot.m_text.setColor(sf::Color(255, 255, 255, 255));
+	m_mage.m_graveyard_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
+	m_mage.m_graveyard_slot.m_text.setString("");
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -100,6 +133,18 @@ void InGameState::Update(sf::Time deltaTime)
 		m_mage.m_timer += 1.f;
 	}
 	
+	m_mage.m_library_slot.m_text.setString(to_string((int)m_mage.m_libary.size()));
+
+	if (m_mage.m_graveyard.empty())
+	{
+		m_mage.m_graveyard_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+		m_mage.m_graveyard_slot.m_text.setString("");
+	}
+	else
+	{
+		m_mage.m_graveyard_slot.GetManaColor(m_mage.m_graveyard.back().m_type);
+		m_mage.m_graveyard_slot.m_text.setString(to_string((int)m_mage.m_graveyard.back().m_value));
+	}
 
 	(*CurrentGame).updateScene(deltaTime);
 
@@ -134,6 +179,7 @@ void InGameState::Draw()
 {
 	(*CurrentGame).m_mainScreen.clear();
 
+	//Draw
 	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
 	{
 		(*CurrentGame).m_mainScreen.draw(m_mage.m_hand_slots[i].m_shape_container);
@@ -156,6 +202,13 @@ void InGameState::Draw()
 		}
 	}
 
+	(*CurrentGame).m_mainScreen.draw(m_mage.m_library_slot.m_shape);
+	(*CurrentGame).m_mainScreen.draw(m_mage.m_library_slot.m_text);
+
+	(*CurrentGame).m_mainScreen.draw(m_mage.m_graveyard_slot.m_shape);
+	(*CurrentGame).m_mainScreen.draw(m_mage.m_graveyard_slot.m_text);
+
+	//Display
 	(*CurrentGame).m_mainScreen.display();
 	sf::Sprite temp((*CurrentGame).m_mainScreen.getTexture());
 	temp.scale((*CurrentGame).m_scale_factor.x, (*CurrentGame).m_scale_factor.y);

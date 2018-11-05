@@ -78,6 +78,8 @@ public:
 	bool PlayCard(int hand_slot);
 
 	CardSlot m_hand_slots[NB_CARDS_HAND_MAX];
+	CardSlot m_library_slot;
+	CardSlot m_graveyard_slot;
 	vector<Card> m_libary;
 	vector<Card> m_graveyard;
 	vector<Card> m_cards;
@@ -101,6 +103,7 @@ public:
 	static void LoadCSVFile(string scenes_file);
 
 	Mage m_mage;
+	void InitTable();
 
 private:
 	sf::RenderWindow* mainWindow;
