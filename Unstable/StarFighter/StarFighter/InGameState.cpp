@@ -22,7 +22,7 @@ void InGameState::Initialize(Player player)
 	LoadCSVFile(SHIP_CSV_FILE);
 
 	GameObject* background = new GameObject(sf::Vector2f(990, 540), sf::Vector2f(0, 0), "2D/background.png", sf::Vector2f(1980, 1080), sf::Vector2f(990, 540));
-	//(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
+	(*CurrentGame).addToScene(background, BackgroundLayer, BackgroundObject);
 
 	(*CurrentGame).m_map_size = background->m_size;
 	//(*CurrentGame).m_view.setCenter((*CurrentGame).m_playerShip->getPosition());
@@ -124,14 +124,14 @@ void InGameState::InitTable()
 	//Graveyard
 	m_mage.m_graveyard_slot.m_stack = Stack_Graveyard;
 
-	m_mage.m_graveyard_slot.m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
+	m_mage.m_graveyard_slot.m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 6, 800));
 	m_mage.m_graveyard_slot.m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 	m_mage.m_graveyard_slot.m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 	m_mage.m_graveyard_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 	m_mage.m_graveyard_slot.m_shape_container.setOutlineThickness(2);
 	m_mage.m_graveyard_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
-	m_mage.m_graveyard_slot.m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
+	m_mage.m_graveyard_slot.m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 6, 800));
 	m_mage.m_graveyard_slot.m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 	m_mage.m_graveyard_slot.m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 	m_mage.m_graveyard_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
@@ -141,7 +141,7 @@ void InGameState::InitTable()
 	m_mage.m_graveyard_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_mage.m_graveyard_slot.m_text.setCharacterSize(18);
 	m_mage.m_graveyard_slot.m_text.setColor(sf::Color(0, 0, 0, 255));
-	m_mage.m_graveyard_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20), 800));
+	m_mage.m_graveyard_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 6, 800));
 	m_mage.m_graveyard_slot.m_text.setString("");
 }
 
@@ -254,6 +254,8 @@ void InGameState::Draw()
 	(*CurrentGame).m_mainScreen.clear();
 
 	//Draw
+	(*CurrentGame).drawScene();//background
+
 	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
 	{
 		(*CurrentGame).m_mainScreen.draw(m_mage.m_hand_slots[i].m_shape_container);
@@ -291,7 +293,7 @@ void InGameState::Draw()
 	temp.setPosition(sf::Vector2f(0, 0));
 	(*CurrentGame).getMainWindow()->draw(temp);
 
-	//(*CurrentGame).drawScene();
+	
 }
 
 void InGameState::Release()
