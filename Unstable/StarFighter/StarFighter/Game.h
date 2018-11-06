@@ -87,7 +87,7 @@ enum CardStack
 	Stack_Altar,
 	Stack_Library,
 	Stack_Graveyard,
-	Stack_MonsterSpells,
+	Stack_MonsterCurses,
 };
 
 class CardSlot

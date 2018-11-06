@@ -42,17 +42,17 @@ public:
 	vector<Card> m_graveyard;
 	vector<Card> m_cards;
 	CardSlot m_altar_slots[NB_CARDS_ALTAR];//to be shared among players
-	CardSlot m_monster_spells_slots[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];//to be shared among players
-	SFText m_monster_spells_names[NB_MONSTER_SPELLS_MAX];
-	SFText m_monster_spells_descriptions[NB_MONSTER_SPELLS_MAX];
+	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];//to be shared among players
+	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];
+	SFText m_monster_curses_descriptions[NB_MONSTER_SPELLS_MAX];
 
 	float m_timer;
 };
 
-class Spell
+class Curse
 {
 public:
-	Spell(int cost, int nb_costs);
+	Curse(int cost, int nb_costs);
 	bool Effect();
 	vector<Card> m_costs;
 	string m_display_name;
@@ -68,7 +68,7 @@ public:
 
 	void Attack();
 
-	vector<Spell> m_spells;// [NB_MONSTER_SPELLS_MAX];
+	vector<Curse> m_curses;// [NB_MONSTER_SPELLS_MAX];
 };
 
 class InGameState : public GameState
