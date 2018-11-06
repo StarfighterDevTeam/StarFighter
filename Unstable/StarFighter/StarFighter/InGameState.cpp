@@ -35,7 +35,11 @@ void InGameState::Initialize(Player player)
 	m_mage.ShuffleLibrary();
 	m_mage.DrawCard(5);
 
-	m_monsters.push_back(Monster());
+	for (int i = 0; i < NB_MONSTERS; i++)
+	{
+		m_monsters.push_back(Monster());
+	}
+	
 	SummonMonster();
 }
 
@@ -340,16 +344,31 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		m_mage.DrawCard();
 
-		if (!m_monsters.empty() && !m_monsters.back().m_spells.empty())
+		if (!m_monsters.empty())
 		{
-			m_monsters.back().Attack();
-
-			for (int i = 0; i < m_monsters.back().m_spells.back().m_costs.size(); i++)
+			if (!m_monsters.back().m_spells.empty())
 			{
-				m_mage.m_monster_spells_slots[m_monsters.back().m_spells.size() - 1][i].m_status = CardSlot_Free;
+				//attack with current spell
+				m_monsters.back().Attack();
+
+				for (int i = 0; i < m_monsters.back().m_spells.back().m_costs.size(); i++)
+				{
+					m_mage.m_monster_spells_slots[m_monsters.back().m_spells.size() - 1][i].m_status = CardSlot_Free;
+				}
+
+				//go to next spell
+				m_monsters.back().m_spells.pop_back();
 			}
 
-			m_monsters.back().m_spells.pop_back();
+			//go to next monster if all spells have been used
+			if (m_monsters.back().m_spells.empty())
+			{
+				m_monsters.pop_back();
+				if (!m_monsters.empty())
+				{
+					SummonMonster();
+				}
+			}
 		}
 	}
 

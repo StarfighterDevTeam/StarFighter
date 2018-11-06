@@ -20,6 +20,7 @@ class GameObject;
 #define CARD_HEIGHT				64
 #define NB_MONSTER_SPELLS_MAX	6
 #define SPELL_NB_COSTS_MAX		6
+#define NB_MONSTERS				6
 
 class Mage
 {
