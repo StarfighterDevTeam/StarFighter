@@ -43,6 +43,23 @@ public:
 	float m_timer;
 };
 
+class Spell
+{
+public:
+	Spell(int cost, int nb_costs);
+	vector<Card> m_costs;
+	string m_display_name;
+	string m_description;
+};
+
+class Monster
+{
+public:
+	Monster();
+
+	vector<Spell> m_spells;
+};
+
 class InGameState : public GameState
 {
 public:
@@ -59,6 +76,8 @@ public:
 
 	Mage m_mage;
 	void InitTable();
+
+	vector<Monster> m_monsters;
 
 private:
 	sf::RenderWindow* mainWindow;

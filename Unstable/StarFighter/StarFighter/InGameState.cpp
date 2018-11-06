@@ -34,6 +34,8 @@ void InGameState::Initialize(Player player)
 	m_mage.InitCards();
 	m_mage.ShuffleLibrary();
 	m_mage.DrawCard(5);
+
+	m_monsters.push_back(Monster());
 }
 
 void InGameState::InitTable()
@@ -143,6 +145,45 @@ void InGameState::InitTable()
 	m_mage.m_graveyard_slot.m_text.setColor(sf::Color(0, 0, 0, 255));
 	m_mage.m_graveyard_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 6, 800));
 	m_mage.m_graveyard_slot.m_text.setString("");
+}
+
+Spell::Spell(int cost, int nb_costs)
+{
+	if (nb_costs > cost)
+	{
+		nb_costs = cost;
+		printf("Creating a spell with more nb_costs than cost possible. (%d, %d)\n", nb_costs, cost);
+	}
+
+	int half = nb_costs % cost == 0 ? 0 : nb_costs / 2;
+	int avg_cost = cost / nb_costs;;
+	
+	for (int i = 0; i < nb_costs; i++)
+	{
+		int type = RandomizeIntBetweenValues((int)Mana_Fire, (int)Mana_Earth);
+
+		if (i < half)
+		{
+			int cost = avg_cost > 2 ? 2 : avg_cost;
+			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost)));
+		}
+		else
+		{
+			int cost = avg_cost - 1 > 2 ? 3 : avg_cost;
+			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost - 1)));
+		}
+	}
+
+	m_display_name = "Spell";
+	m_description = "Burns one card slot at random in player hand.";
+}
+
+Monster::Monster()
+{
+	m_spells.push_back(Spell(2, 2));
+	m_spells.push_back(Spell(3, 2));
+	m_spells.push_back(Spell(3, 2));
+	m_spells.push_back(Spell(4, 3));
 }
 
 void InGameState::Update(sf::Time deltaTime)
