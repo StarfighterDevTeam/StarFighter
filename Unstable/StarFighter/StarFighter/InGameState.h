@@ -90,9 +90,9 @@ public:
 
 	vector<Monster> m_monsters;
 
-	CardSlot m_altar_slots[NB_CARDS_ALTAR];//to be shared among players
-	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];//to be shared among players
-	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX];//to be shared among players
+	CardSlot m_altar_slots[NB_CARDS_ALTAR];
+	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];
+	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX];
 	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];
 	SFText m_monster_curses_descriptions[NB_MONSTER_SPELLS_MAX];
 

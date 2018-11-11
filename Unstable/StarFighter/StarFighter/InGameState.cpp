@@ -57,6 +57,8 @@ void InGameState::SummonMonster()
 		m_monster_curses_names[i].setColor(sf::Color(255, 255, 255, 255));
 		m_monster_curses_descriptions[i].setColor(sf::Color(255, 255, 255, 255));
 
+		m_monster_curses_slots[i].m_status = CardSlot_Occupied;
+
 		for (int j = 0; j < SPELL_NB_COSTS_MAX; j++)
 		{
 			m_monster_curses_costs[i][j].m_status = CardSlot_Free;
@@ -129,28 +131,29 @@ void InGameState::InitTable()
 		m_monster_curses_descriptions[i].setPosition(sf::Vector2f(1100, 100 - CARD_HEIGHT / 2 - 30 + (CARD_HEIGHT + 70) * i));
 		m_monster_curses_descriptions[i].setString("");
 		
-		//m_monster_curses_slots[i].m_shape.setPosition(sf::Vector2f(1100 + CARD_WIDTH / 2, 200 + (CARD_HEIGHT + 70) * i));
-		//m_monster_curses_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-		//m_monster_curses_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-		//m_monster_curses_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
-		//m_monster_curses_slots[i].m_shape.setOutlineThickness(0);
-		//m_monster_curses_slots[i].m_shape.setFillColor(sf::Color(0, 0, 0, 255));
-		//m_monster_curses_slots[i].m_status = CardSlot_Free;
-		//m_monster_curses_slots[i].m_stack = Stack_MonsterCurses;
-		//m_monster_curses_slots[i].m_index = i;
+		m_monster_curses_slots[i].m_status = CardSlot_Free;
+		m_monster_curses_slots[i].m_stack = Stack_MonsterCurses;
+		m_monster_curses_slots[i].m_index = i;
+
+		m_monster_curses_slots[i].m_shape.setPosition(sf::Vector2f(1100 + ((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX) * 0.5, 100 + (CARD_HEIGHT + 70) * i));
+		m_monster_curses_slots[i].m_shape.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10) * 0.5, CARD_HEIGHT / 2 + 5));
+		m_monster_curses_slots[i].m_shape.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10, CARD_HEIGHT + 10));
+		m_monster_curses_slots[i].m_shape.setOutlineColor(sf::Color(255, 255, 255, 0));
+		m_monster_curses_slots[i].m_shape.setOutlineThickness(0);
+		m_monster_curses_slots[i].m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+		m_monster_curses_slots[i].m_shape_container.setPosition(sf::Vector2f(1100 + ((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX) * 0.5, 100 + (CARD_HEIGHT + 70) * i));
+		m_monster_curses_slots[i].m_shape_container.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10) * 0.5, CARD_HEIGHT / 2 + 5));
+		m_monster_curses_slots[i].m_shape_container.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10, CARD_HEIGHT + 10));
+		m_monster_curses_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		m_monster_curses_slots[i].m_shape_container.setOutlineThickness(2);
+		m_monster_curses_slots[i].m_shape_container.setFillColor(sf::Color(255, 255, 255, 0));
 
 		for (int j = 0; j < SPELL_NB_COSTS_MAX; j++)
 		{
 			m_monster_curses_costs[i][j].m_status = CardSlot_Free;
 			m_monster_curses_costs[i][j].m_stack = Stack_None;
 			m_monster_curses_costs[i][j].m_index = i;
-
-			//m_monster_curses_costs[i][j].m_shape_container.setPosition(sf::Vector2f(1100 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 200 + (CARD_HEIGHT + 70) * i));
-			//m_monster_curses_costs[i][j].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-			//m_monster_curses_costs[i][j].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-			//m_monster_curses_costs[i][j].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-			//m_monster_curses_costs[i][j].m_shape_container.setOutlineThickness(2);
-			//m_monster_curses_costs[i][j].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
 			m_monster_curses_costs[i][j].m_shape.setPosition(sf::Vector2f(1100 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
 			m_monster_curses_costs[i][j].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
@@ -170,7 +173,14 @@ void InGameState::InitTable()
 
 Curse::Curse(int cost, int nb_costs)
 {
-	m_status = CardSlot_Free;
+	m_status = CardSlot_Occupied;
+
+	if (cost == 0 || nb_costs == 0)
+	{
+		m_display_name = "No curse";
+		m_description = "";
+		return;
+	}
 
 	if (nb_costs > SPELL_NB_COSTS_MAX)
 	{
@@ -220,11 +230,15 @@ Monster::Monster()
 	m_curses.push_back(Curse(3, 2));
 	m_curses.push_back(Curse(3, 2));
 	m_curses.push_back(Curse(2, 2));
+	m_curses.push_back(Curse(0, 0));
 }
 
 void Monster::Attack()
 {
-	m_curses.back().Effect();
+	if (m_curses.back().m_status == CardSlot_Occupied)
+	{
+		m_curses.back().Effect();
+	}
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -277,6 +291,11 @@ void InGameState::Update(sf::Time deltaTime)
 		m_mages[p].m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
 	}
 
+	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
+	{
+		m_monster_curses_slots[i].Update((*CurrentGame).m_mouse_click);
+	}
+
 	//Actions
 	bool played = false;
 	if ((*CurrentGame).m_play_card_slot != NULL)
@@ -298,22 +317,26 @@ void InGameState::Update(sf::Time deltaTime)
 
 		if (!m_monsters.empty())
 		{
-			if (!m_monsters.back().m_curses.empty())
+			Monster& monster = m_monsters.back();
+			if (!monster.m_curses.empty())
 			{
 				//attack with current curse
-				m_monsters.back().Attack();
+				monster.Attack();
 
-				for (int i = 0; i < m_monsters.back().m_curses.back().m_costs.size(); i++)
-				{
-					m_monster_curses_costs[m_monsters.back().m_curses.size() - 1][i].m_status = CardSlot_Free;
-				}
+				m_monster_curses_slots[monster.m_curses.size() - 1].m_status = CardSlot_Free;
+
+				//clean current curse from display
+				//for (int i = 0; i < m_monsters.back().m_curses.back().m_costs.size(); i++)
+				//{
+				//	m_monster_curses_costs[m_monsters.back().m_curses.size() - 1][i].m_status = CardSlot_Free;
+				//}
 
 				//go to next curse
-				m_monsters.back().m_curses.pop_back();
+				monster.m_curses.pop_back();
 			}
 
 			//go to next monster if all curses have been used
-			if (m_monsters.back().m_curses.empty())
+			if (monster.m_curses.empty())
 			{
 				m_monsters.pop_back();
 				if (!m_monsters.empty())
@@ -417,21 +440,23 @@ void InGameState::Draw()
 		}
 	}
 
-
 	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
 	{
-		for (int j = 0; j < SPELL_NB_COSTS_MAX; j++)
+		if (m_monster_curses_slots[i].m_status != CardSlot_Free)
 		{
-			if (m_monster_curses_costs[i][j].m_status != CardSlot_Free)
-			{
-				if (j == 0)
-				{
-					(*CurrentGame).m_mainScreen.draw(m_monster_curses_names[i]);
-					(*CurrentGame).m_mainScreen.draw(m_monster_curses_descriptions[i]);
-				}
+			(*CurrentGame).m_mainScreen.draw(m_monster_curses_slots[i].m_shape);
+			(*CurrentGame).m_mainScreen.draw(m_monster_curses_slots[i].m_shape_container);
 
-				(*CurrentGame).m_mainScreen.draw(m_monster_curses_costs[i][j].m_shape);
-				(*CurrentGame).m_mainScreen.draw(m_monster_curses_costs[i][j].m_text);
+			(*CurrentGame).m_mainScreen.draw(m_monster_curses_names[i]);
+			(*CurrentGame).m_mainScreen.draw(m_monster_curses_descriptions[i]);
+
+			for (int j = 0; j < SPELL_NB_COSTS_MAX; j++)
+			{
+				if (m_monster_curses_costs[i][j].m_status != CardSlot_Free)
+				{
+					(*CurrentGame).m_mainScreen.draw(m_monster_curses_costs[i][j].m_shape);
+					(*CurrentGame).m_mainScreen.draw(m_monster_curses_costs[i][j].m_text);
+				}
 			}
 		}
 	}
@@ -786,8 +811,8 @@ sf::Color CardSlot::GetStatusColor(CardSlotStatus status)
 
 void CardSlot::Update(MouseAction mouse_click)
 {
-	if ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - CARD_WIDTH / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + CARD_WIDTH / 2
-		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - CARD_HEIGHT / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + CARD_HEIGHT / 2)
+	if ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
+		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
 	{
 		m_hovered = true;
 	}
