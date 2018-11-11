@@ -23,6 +23,13 @@ class GameObject;
 #define NB_MONSTERS				6
 #define NB_PLAYERS_MAX			2
 
+enum Actions
+{
+	Action_None,
+	Action_HandToAltar,
+	Action_AltarToCurse,
+};
+	
 class Mage
 {
 public:
@@ -85,12 +92,13 @@ public:
 	void InitTable();
 	void SummonMonster();
 	int GetFreeAltarCardSlot();
-	bool PlayCard(int player_index, int hand_slot, int altar_slot);
-	void Attack(int player_index);
+	Actions PlayCard(int player_index, int hand_slot, int altar_slot);
+	Actions AltarAttack(int player_index, int curse_slot);
 
 	vector<Monster> m_monsters;
 
 	CardSlot m_altar_slots[NB_CARDS_ALTAR];
+	CardSlot m_altar_slot;
 	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];
 	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX];
 	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];

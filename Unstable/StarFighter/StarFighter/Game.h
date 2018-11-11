@@ -48,13 +48,15 @@ enum ManaType
 	Mana_Water,		//1
 	Mana_Air,		//2
 	Mana_Earth,		//3
+	NB_MANATYPES,	//4
 };
 
 enum ManaValue
 {
-	Mana_1,			//0
-	Mana_2,			//1
-	Mana_3,			//2
+	Mana_0,		//0
+	Mana_1,			//1
+	Mana_2,			//2
+	Mana_3,			//3
 };
 
 class Card
@@ -86,6 +88,7 @@ enum CardStack
 	Stack_None,
 	Stack_Hand,
 	Stack_Altar,
+	Stack_AltarSlot,
 	Stack_Library,
 	Stack_Graveyard,
 	Stack_MonsterCurses,
@@ -184,6 +187,7 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//BIG BOOK
+	CardSlot* m_hovered_slot;
 	CardSlot* m_selected_slot;
 	CardSlot* m_play_card_slot;
 	CardSlot* m_target_slot;

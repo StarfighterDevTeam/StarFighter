@@ -83,16 +83,33 @@ void InGameState::SummonMonster()
 
 void InGameState::InitTable()
 {
+	(*CurrentGame).m_hovered_slot = NULL;
 	(*CurrentGame).m_selected_slot = NULL;
 	(*CurrentGame).m_play_card_slot = NULL;
 	(*CurrentGame).m_target_slot = NULL;
 	m_current_player = 0;
 	
 	//Altar
+	m_altar_slot.m_stack = Stack_Altar;
+
+	m_altar_slot.m_shape_container.setPosition(sf::Vector2f(500 + ((CARD_WIDTH +20) * NB_CARDS_ALTAR) * 0.5, 500));
+	m_altar_slot.m_shape_container.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
+	m_altar_slot.m_shape_container.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
+	m_altar_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_altar_slot.m_shape_container.setOutlineThickness(2);
+	m_altar_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+	m_altar_slot.m_shape.setPosition(sf::Vector2f(500 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
+	m_altar_slot.m_shape.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
+	m_altar_slot.m_shape.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
+	m_altar_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+	m_altar_slot.m_shape.setOutlineThickness(0);
+	m_altar_slot.m_shape.setFillColor(sf::Color(255, 255, 255, 0));
+
 	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
 		m_altar_slots[i].m_status = CardSlot_Free;
-		m_altar_slots[i].m_stack = Stack_Altar;
+		m_altar_slots[i].m_stack = Stack_AltarSlot;
 		m_altar_slots[i].m_index = i;
 
 		m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
@@ -193,8 +210,8 @@ Curse::Curse(int cost, int nb_costs)
 		printf("Creating a curse with more nb_costs than cost possible. (%d, %d)\n", nb_costs, cost);
 	}
 
-	int half = nb_costs % cost == 0 ? 0 : nb_costs / 2;
-	int avg_cost = cost / nb_costs;;
+	int half = cost % nb_costs;
+	int avg_cost = cost / nb_costs;
 	
 	for (int i = 0; i < nb_costs; i++)
 	{
@@ -203,12 +220,12 @@ Curse::Curse(int cost, int nb_costs)
 		if (i < half)
 		{
 			int cost = avg_cost > 2 ? 2 : avg_cost;
-			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost)));
+			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost + 1)));
 		}
 		else
 		{
 			int cost = avg_cost - 1 > 2 ? 3 : avg_cost;
-			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost - 1)));
+			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost)));
 		}
 	}
 
@@ -265,6 +282,7 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//Reset flags
+	(*CurrentGame).m_hovered_slot = NULL;
 	(*CurrentGame).m_play_card_slot = NULL;
 	(*CurrentGame).m_target_slot = NULL;
 
@@ -284,6 +302,7 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		m_altar_slots[i].Update((*CurrentGame).m_mouse_click);
 	}
+	m_altar_slot.Update((*CurrentGame).m_mouse_click);
 
 	for (int p = 0; p < NB_PLAYERS_MAX; p++)
 	{
@@ -297,19 +316,19 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//Actions
-	bool played = false;
+	Actions played = Action_None;
 	if ((*CurrentGame).m_play_card_slot != NULL)
 	{
 		played = PlayCard(p, (*CurrentGame).m_play_card_slot->m_index, (*CurrentGame).m_target_slot->m_index);
 	}
 
-	if (GetFreeAltarCardSlot() == -1)
+	if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_MonsterCurses)
 	{
-		Attack(p);
+		played = AltarAttack(p, (*CurrentGame).m_target_slot->m_index);
 	}
 
-	//= simuation of one turn for now, later it should be at the end of a turn
-	if (played)
+	//End of turn
+	if (played == Action_HandToAltar)
 	{
 		p = (m_current_player + 1) % NB_PLAYERS_MAX;
 		m_current_player = p;
@@ -428,6 +447,9 @@ void InGameState::Draw()
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_graveyard_slot.m_text);
 	}
 	
+	//Altar
+	(*CurrentGame).m_mainScreen.draw(m_altar_slot.m_shape);
+	(*CurrentGame).m_mainScreen.draw(m_altar_slot.m_shape_container);
 
 	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
@@ -440,6 +462,7 @@ void InGameState::Draw()
 		}
 	}
 
+	//Monster
 	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
 	{
 		if (m_monster_curses_slots[i].m_status != CardSlot_Free)
@@ -546,7 +569,7 @@ int InGameState::GetFreeAltarCardSlot()
 	return -1;
 }
 
-bool InGameState::PlayCard(int player_index, int hand_slot, int altar_slot)
+Actions InGameState::PlayCard(int player_index, int hand_slot, int altar_slot)
 {
 	if (m_mages[player_index].m_hand_slots[hand_slot].m_status == CardSlot_Occupied)
 	{
@@ -562,33 +585,60 @@ bool InGameState::PlayCard(int player_index, int hand_slot, int altar_slot)
 			m_mages[player_index].m_hand_slots[hand_slot].m_selected = false;
 			m_mages[player_index].m_hand_slots[hand_slot].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 
-			return true;
+			return Action_HandToAltar;
 		}
 		else
 		{
 			printf("Cannot play card: altar slot occupied.\n");
-			return false;
+			return Action_None;
 		}
 	}
 	else
 	{
 		printf("Cannot play card: no card in hand at this slot.\n");
-		return false;
+		return Action_None;
 	}
 }
 
-void InGameState::Attack(int player_index)
+Actions InGameState::AltarAttack(int player_index, int curse_slot)
 {
-	//todo: attack
-
+	//Get altar mana
+	bool altar_empty = true;
+	int mana[NB_MANATYPES] = { 0, 0, 0, 0 };
 	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
-		m_mages[player_index].m_graveyard.push_back(m_altar_slots[i].m_card);
-
-		m_altar_slots[i].m_status = CardSlot_Free;
-		m_altar_slots[i].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
-		m_altar_slots[i].m_text.setString("");
+		if (m_altar_slots[i].m_status == CardSlot_Occupied)
+		{
+			altar_empty = false;
+			mana[m_altar_slots[i].m_card.m_type] += m_altar_slots[i].m_card.m_value;
+		}
 	}
+	if (altar_empty)
+	{
+		printf("Altar is empty\n");
+		return Action_None;
+	}
+
+	//Get curse cost
+	int cost[NB_MANATYPES] = { 0, 0, 0, 0 };
+	for (int i = 0; i < m_monsters.back().m_curses.back().m_costs.size(); i++)
+	{
+		Card& curse_cost = m_monsters.back().m_curses.back().m_costs[i];
+		cost[curse_cost.m_type] += curse_cost.m_value;
+	}
+
+	//Compare mana and cost
+	for (int i = 0; i < NB_MANATYPES; i++)
+	{
+		if (mana[i] < cost[i])
+		{
+			printf("Insufficient mana in Altar to dispell this curse.\n");
+			return Action_None;
+		}
+	}
+	
+	//Dispell
+	return Action_AltarToCurse;
 }
 
 void Mage::InitSlots(int player_index)
@@ -622,7 +672,7 @@ void Mage::InitSlots(int player_index)
 	}
 
 	//Library
-	m_library_slot.m_stack = Stack_Altar;
+	m_library_slot.m_stack = Stack_Library;
 
 	m_library_slot.m_shape_container.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + player_index * 700, 1000));
 	m_library_slot.m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
@@ -774,7 +824,7 @@ void CardSlot::GetCard(Card& card)
 
 	//display
 	m_shape.setFillColor(GetManaColor(card.m_type));
-	m_text.setString(std::to_string((int)(card.m_value) + 1));
+	m_text.setString(std::to_string((int)(card.m_value)));
 }
 
 sf::Color CardSlot::GetManaColor(ManaType type)
@@ -811,10 +861,12 @@ sf::Color CardSlot::GetStatusColor(CardSlotStatus status)
 
 void CardSlot::Update(MouseAction mouse_click)
 {
-	if ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
+	if ((*CurrentGame).m_hovered_slot == NULL &&
+		(*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
 		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
 	{
 		m_hovered = true;
+		(*CurrentGame).m_hovered_slot = this;
 	}
 	else
 	{
@@ -846,9 +898,13 @@ void CardSlot::Update(MouseAction mouse_click)
 
 	//Actions
 	//PLAY CARD
-	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Hand && (*CurrentGame).m_selected_slot->m_status == CardSlot_Occupied && m_stack == Stack_Altar)
+	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Hand && (*CurrentGame).m_selected_slot->m_status == CardSlot_Occupied && m_stack == Stack_AltarSlot)
 	{
 		(*CurrentGame).m_play_card_slot = (*CurrentGame).m_selected_slot;
+		(*CurrentGame).m_target_slot = this;
+	}
+	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Altar && m_stack == Stack_MonsterCurses)
+	{
 		(*CurrentGame).m_target_slot = this;
 	}
 }
