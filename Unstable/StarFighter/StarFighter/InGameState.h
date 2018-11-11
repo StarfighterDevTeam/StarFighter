@@ -28,6 +28,7 @@ enum Actions
 	Action_None,
 	Action_HandToAltar,
 	Action_AltarToCurse,
+	Action_DrawCard,
 };
 	
 class Mage
@@ -38,7 +39,7 @@ public:
 	void InitSlots(int player_index);
 	void InitCards();
 	void ShuffleLibrary();
-	void DrawCard(int nb_cards = 1);
+	Actions DrawCard(int nb_cards = 1);
 	int GetFreeHandCardSlot();
 
 	CardSlot m_hand_slots[NB_CARDS_HAND_MAX];
@@ -55,13 +56,14 @@ public:
 class Curse
 {
 public:
-	Curse(int cost, int nb_costs);
+	Curse(int cost, int nb_costs, int index);
 	bool Effect();
 	vector<Card> m_costs;
 	string m_display_name;
 	string m_description;
 
 	CardSlotStatus m_status;
+	int m_index;
 };
 
 class Monster

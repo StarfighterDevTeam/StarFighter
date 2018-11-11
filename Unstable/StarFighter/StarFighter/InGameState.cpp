@@ -188,8 +188,9 @@ void InGameState::InitTable()
 	}
 }
 
-Curse::Curse(int cost, int nb_costs)
+Curse::Curse(int cost, int nb_costs, int index)
 {
+	m_index = index;
 	m_status = CardSlot_Occupied;
 
 	if (cost == 0 || nb_costs == 0)
@@ -236,18 +237,19 @@ Curse::Curse(int cost, int nb_costs)
 bool Curse::Effect()
 {
 	//do something
+	printf("Monster attack (%d).\n", m_index);
 	return true;
 }
 
 Monster::Monster()
 {
 	//first curses to trigger to last in the vector
-	m_curses.push_back(Curse(5, 3));
-	m_curses.push_back(Curse(4, 3));
-	m_curses.push_back(Curse(3, 2));
-	m_curses.push_back(Curse(3, 2));
-	m_curses.push_back(Curse(2, 2));
-	m_curses.push_back(Curse(0, 0));
+	m_curses.push_back(Curse(5, 3, m_curses.size() + 1));
+	m_curses.push_back(Curse(4, 3, m_curses.size() + 1));
+	m_curses.push_back(Curse(3, 2, m_curses.size() + 1));
+	m_curses.push_back(Curse(3, 2, m_curses.size() + 1));
+	m_curses.push_back(Curse(2, 2, m_curses.size() + 1));
+	m_curses.push_back(Curse(0, 0, m_curses.size() + 1));
 }
 
 void Monster::Attack()
@@ -321,18 +323,43 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		played = PlayCard(p, (*CurrentGame).m_play_card_slot->m_index, (*CurrentGame).m_target_slot->m_index);
 	}
-
-	if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_MonsterCurses)
+	else if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_MonsterCurses)
 	{
 		played = AltarAttack(p, (*CurrentGame).m_target_slot->m_index);
 	}
+	else if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_Library)
+	{
+		played = m_mages[p].DrawCard();
+	}
+
+	//Cards UI update
+	for (int i = 0; i < NB_PLAYERS_MAX; i++)
+	{
+		m_mages[p].m_library_slot.m_text.setString(to_string((int)m_mages[p].m_libary.size()));
+
+		if (m_mages[p].m_graveyard.empty())
+		{
+			m_mages[p].m_graveyard_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+			m_mages[p].m_graveyard_slot.m_text.setString("");
+		}
+		else
+		{
+			m_mages[p].m_graveyard_slot.GetCard(m_mages[p].m_graveyard.back());
+		}
+	}
+	
+	if (!m_monsters.empty() && !m_monsters.back().m_curses.empty())
+	{
+		m_monster_curses_names[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
+		m_monster_curses_descriptions[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
+	}
 
 	//End of turn
-	if (played == Action_HandToAltar)
+	if (played == Action_DrawCard)
 	{
 		p = (m_current_player + 1) % NB_PLAYERS_MAX;
 		m_current_player = p;
-		m_mages[p].DrawCard();
+		//m_mages[p].DrawCard();
 
 		if (!m_monsters.empty())
 		{
@@ -364,28 +391,6 @@ void InGameState::Update(sf::Time deltaTime)
 				}
 			}
 		}
-	}
-
-	//Cards UI update
-	for (int i = 0; i < NB_PLAYERS_MAX; i++)
-	{
-		m_mages[p].m_library_slot.m_text.setString(to_string((int)m_mages[p].m_libary.size()));
-
-		if (m_mages[p].m_graveyard.empty())
-		{
-			m_mages[p].m_graveyard_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
-			m_mages[p].m_graveyard_slot.m_text.setString("");
-		}
-		else
-		{
-			m_mages[p].m_graveyard_slot.GetCard(m_mages[p].m_graveyard.back());
-		}
-	}
-	
-	if (!m_monsters.empty() && !m_monsters.back().m_curses.empty())
-	{
-		m_monster_curses_names[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
-		m_monster_curses_descriptions[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
 	}
 
 	//useless?
@@ -438,10 +443,12 @@ void InGameState::Draw()
 				(*CurrentGame).m_mainScreen.draw(m_mages[p].m_hand_slots[i].m_text);
 		}
 
+		//Library
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_library_slot.m_shape_container);
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_library_slot.m_shape);
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_library_slot.m_text);
 
+		//Graveyard
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_graveyard_slot.m_shape_container);
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_graveyard_slot.m_shape);
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_graveyard_slot.m_text);
@@ -621,9 +628,9 @@ Actions InGameState::AltarAttack(int player_index, int curse_slot)
 
 	//Get curse cost
 	int cost[NB_MANATYPES] = { 0, 0, 0, 0 };
-	for (int i = 0; i < m_monsters.back().m_curses.back().m_costs.size(); i++)
+	for (int i = 0; i < m_monsters.back().m_curses[curse_slot].m_costs.size(); i++)
 	{
-		Card& curse_cost = m_monsters.back().m_curses.back().m_costs[i];
+		Card& curse_cost = m_monsters.back().m_curses[curse_slot].m_costs[i];
 		cost[curse_cost.m_type] += curse_cost.m_value;
 	}
 
@@ -636,8 +643,22 @@ Actions InGameState::AltarAttack(int player_index, int curse_slot)
 			return Action_None;
 		}
 	}
-	
+
 	//Dispell
+	m_monster_curses_slots[curse_slot].m_status = CardSlot_Burnt;
+	m_monster_curses_names[curse_slot].setColor(sf::Color(128, 128, 128, 255));
+	m_monster_curses_descriptions[curse_slot].setColor(sf::Color(128, 128, 128, 255));
+
+	//Clear altar
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		m_mages[player_index].m_graveyard.push_back(m_altar_slots[i].m_card);
+		m_altar_slots[i].m_status = CardSlot_Free;
+		m_altar_slots[i].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+		m_altar_slots[i].m_text.setString("");
+	}
+	
+
 	return Action_AltarToCurse;
 }
 
@@ -691,7 +712,7 @@ void Mage::InitSlots(int player_index)
 	m_library_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_library_slot.m_text.setCharacterSize(18);
 	m_library_slot.m_text.setColor(sf::Color(255, 255, 255, 255));
-	m_library_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2, 1000));
+	m_library_slot.m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + player_index * 700, 1000));
 	m_library_slot.m_text.setString("");
 
 	//Graveyard
@@ -714,7 +735,7 @@ void Mage::InitSlots(int player_index)
 	m_graveyard_slot.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_graveyard_slot.m_text.setCharacterSize(18);
 	m_graveyard_slot.m_text.setColor(sf::Color(0, 0, 0, 255));
-	m_graveyard_slot.m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 6, 1000));
+	m_graveyard_slot.m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 6 + player_index * 700, 1000));
 	m_graveyard_slot.m_text.setString("");
 }
 
@@ -769,7 +790,7 @@ void Mage::ShuffleLibrary()
 	old_library.clear();
 }
 
-void Mage::DrawCard(int nb_cards)
+Actions Mage::DrawCard(int nb_cards)
 {
 	for (int k = 0; k < nb_cards; k++)
 	{
@@ -801,6 +822,8 @@ void Mage::DrawCard(int nb_cards)
 			printf("Cannot draw card: no free slot in hand.\n");
 		}
 	}
+
+	return Action_DrawCard;
 }
 
 int Mage::GetFreeHandCardSlot()
@@ -904,6 +927,10 @@ void CardSlot::Update(MouseAction mouse_click)
 		(*CurrentGame).m_target_slot = this;
 	}
 	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Altar && m_stack == Stack_MonsterCurses)
+	{
+		(*CurrentGame).m_target_slot = this;
+	}
+	else if (m_hovered && mouse_click == Mouse_RightClick && m_stack == Stack_Library)
 	{
 		(*CurrentGame).m_target_slot = this;
 	}
