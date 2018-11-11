@@ -592,7 +592,7 @@ void Mage::InitSlots(int player_index)
 		m_hand_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_hand_slots[i].m_text.setCharacterSize(18);
 		m_hand_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
-		m_hand_slots[i].m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 900));
+		m_hand_slots[i].m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i + player_index * 700, 900));
 		m_hand_slots[i].m_text.setString("");
 	}
 
