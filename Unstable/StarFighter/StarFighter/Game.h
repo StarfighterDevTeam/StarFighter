@@ -63,10 +63,11 @@ class Card
 {
 public:
 	Card(){};
-	Card(ManaType type, ManaValue value) { m_type = type; m_value = value; }
+	Card(ManaType type, ManaValue value, int owner) { m_type = type; m_value = value; m_owner = owner; }
 
 	ManaType m_type;
 	ManaValue m_value;
+	int m_owner;
 };
 
 enum CardSlotStatus

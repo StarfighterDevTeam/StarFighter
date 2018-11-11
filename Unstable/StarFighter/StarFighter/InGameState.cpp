@@ -221,12 +221,12 @@ Curse::Curse(int cost, int nb_costs, int index)
 		if (i < half)
 		{
 			int cost = avg_cost > 2 ? 2 : avg_cost;
-			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost + 1)));
+			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost + 1), -1));
 		}
 		else
 		{
 			int cost = avg_cost - 1 > 2 ? 3 : avg_cost;
-			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost)));
+			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost), -1));
 		}
 	}
 
@@ -335,16 +335,16 @@ void InGameState::Update(sf::Time deltaTime)
 	//Cards UI update
 	for (int i = 0; i < NB_PLAYERS_MAX; i++)
 	{
-		m_mages[p].m_library_slot.m_text.setString(to_string((int)m_mages[p].m_libary.size()));
+		m_mages[i].m_library_slot.m_text.setString(to_string((int)m_mages[i].m_libary.size()));
 
-		if (m_mages[p].m_graveyard.empty())
+		if (m_mages[i].m_graveyard.empty())
 		{
-			m_mages[p].m_graveyard_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
-			m_mages[p].m_graveyard_slot.m_text.setString("");
+			m_mages[i].m_graveyard_slot.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+			m_mages[i].m_graveyard_slot.m_text.setString("");
 		}
 		else
 		{
-			m_mages[p].m_graveyard_slot.GetCard(m_mages[p].m_graveyard.back());
+			m_mages[i].m_graveyard_slot.GetCard(m_mages[i].m_graveyard.back());
 		}
 	}
 	
@@ -644,21 +644,53 @@ Actions InGameState::AltarAttack(int player_index, int curse_slot)
 		}
 	}
 
+	//Select optimal mana consumption to match cost automatically
+	int mana_optim[NB_MANATYPES] = { 0, 0, 0, 0 };
+	for (int i = 0; i < NB_MANATYPES; i++)
+	{
+		if (cost[i] > 0)
+		{
+			for (int j = 1; j <= Mana_3; j++)
+			{
+				for (int k = 0; k < NB_CARDS_ALTAR; k++)
+				{
+					if (m_altar_slots[k].m_status == CardSlot_Occupied && m_altar_slots[k].m_card.m_type == i && m_altar_slots[k].m_card.m_value == j)//mana 1, then 2, then 3...
+					{
+						mana_optim[i] += j;
+
+						//discard card
+						m_altar_slots[k].m_status = CardSlot_Free;
+						m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
+						m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+						m_altar_slots[k].m_text.setString("");
+
+						//go to next mana_type?
+						if (mana_optim[i] >= cost[i])
+						{
+							//exit loop
+							k = NB_CARDS_ALTAR;
+							j = Mana_3 + 1;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	//Dispell
 	m_monster_curses_slots[curse_slot].m_status = CardSlot_Burnt;
 	m_monster_curses_names[curse_slot].setColor(sf::Color(128, 128, 128, 255));
 	m_monster_curses_descriptions[curse_slot].setColor(sf::Color(128, 128, 128, 255));
 
 	//Clear altar
-	for (int i = 0; i < NB_CARDS_ALTAR; i++)
-	{
-		m_mages[player_index].m_graveyard.push_back(m_altar_slots[i].m_card);
-		m_altar_slots[i].m_status = CardSlot_Free;
-		m_altar_slots[i].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
-		m_altar_slots[i].m_text.setString("");
-	}
+	//for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	//{
+	//	m_mages[player_index].m_graveyard.push_back(m_altar_slots[i].m_card);
+	//	m_altar_slots[i].m_status = CardSlot_Free;
+	//	m_altar_slots[i].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+	//	m_altar_slots[i].m_text.setString("");
+	//}
 	
-
 	return Action_AltarToCurse;
 }
 
@@ -742,25 +774,25 @@ void Mage::InitSlots(int player_index)
 
 void Mage::InitCards()
 {
-	m_cards.push_back(Card(Mana_Fire, Mana_1));
-	m_cards.push_back(Card(Mana_Fire, Mana_1));
-	//m_cards.push_back(Card(Mana_Fire, Mana_1));	//weakness
-	m_cards.push_back(Card(Mana_Fire, Mana_2));
+	m_cards.push_back(Card(Mana_Fire, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Fire, Mana_1, m_index));
+	//m_cards.push_back(Card(Mana_Fire, Mana_1, m_index));	//weakness
+	m_cards.push_back(Card(Mana_Fire, Mana_2, m_index));
 
-	m_cards.push_back(Card(Mana_Water, Mana_1));
-	m_cards.push_back(Card(Mana_Water, Mana_1));
-	m_cards.push_back(Card(Mana_Water, Mana_1));
-	m_cards.push_back(Card(Mana_Water, Mana_2));
+	m_cards.push_back(Card(Mana_Water, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Water, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Water, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Water, Mana_2, m_index));
 
-	m_cards.push_back(Card(Mana_Earth, Mana_1));
-	m_cards.push_back(Card(Mana_Earth, Mana_1));
-	//m_cards.push_back(Card(Mana_Earth, Mana_1));	//weakness
-	m_cards.push_back(Card(Mana_Earth, Mana_2));
+	m_cards.push_back(Card(Mana_Earth, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Earth, Mana_1, m_index));
+	//m_cards.push_back(Card(Mana_Earth, Mana_1, m_index));	//weakness
+	m_cards.push_back(Card(Mana_Earth, Mana_2, m_index));
 
-	m_cards.push_back(Card(Mana_Air, Mana_1));
-	m_cards.push_back(Card(Mana_Air, Mana_1));
-	m_cards.push_back(Card(Mana_Air, Mana_1));
-	m_cards.push_back(Card(Mana_Air, Mana_2));
+	m_cards.push_back(Card(Mana_Air, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Air, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Air, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Air, Mana_2, m_index));
 
 	for (vector<Card>::iterator it = m_cards.begin(); it < m_cards.end(); it++)
 	{
@@ -844,6 +876,7 @@ void CardSlot::GetCard(Card& card)
 {
 	m_card.m_value = card.m_value; 
 	m_card.m_type = card.m_type;
+	m_card.m_owner = card.m_owner;
 
 	//display
 	m_shape.setFillColor(GetManaColor(card.m_type));
