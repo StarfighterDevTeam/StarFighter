@@ -21,19 +21,18 @@ class GameObject;
 #define NB_MONSTER_SPELLS_MAX	6
 #define SPELL_NB_COSTS_MAX		6
 #define NB_MONSTERS				6
+#define NB_PLAYERS_MAX			2
 
 class Mage
 {
 public:
-	Mage(){ m_timer = 0.f; for (int i = 0; i < NB_CARDS_HAND_MAX; i++) { m_hand_slots[i].m_status = CardSlot_Free; } };
+	Mage(int index){ m_timer = 0.f; for (int i = 0; i < NB_CARDS_HAND_MAX; i++) { m_hand_slots[i].m_status = CardSlot_Free; m_index = index; } };
 
+	void InitSlots(int player_index);
 	void InitCards();
 	void ShuffleLibrary();
 	void DrawCard(int nb_cards = 1);
 	int GetFreeHandCardSlot();
-	int GetFreeAltarCardSlot();
-	bool PlayCard(int hand_slot, int altar_slot);
-	void Attack();
 
 	CardSlot m_hand_slots[NB_CARDS_HAND_MAX];
 	CardSlot m_library_slot;
@@ -41,12 +40,9 @@ public:
 	vector<Card> m_libary;
 	vector<Card> m_graveyard;
 	vector<Card> m_cards;
-	CardSlot m_altar_slots[NB_CARDS_ALTAR];//to be shared among players
-	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];//to be shared among players
-	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];
-	SFText m_monster_curses_descriptions[NB_MONSTER_SPELLS_MAX];
 
 	float m_timer;
+	int m_index;
 };
 
 class Curse
@@ -85,11 +81,22 @@ public:
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFile(string scenes_file);
 
-	Mage m_mage;
+	vector<Mage> m_mages;
 	void InitTable();
 	void SummonMonster();
+	int GetFreeAltarCardSlot();
+	bool PlayCard(int player_index, int hand_slot, int altar_slot);
+	void Attack(int player_index);
 
 	vector<Monster> m_monsters;
+
+	CardSlot m_altar_slots[NB_CARDS_ALTAR];//to be shared among players
+	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];//to be shared among players
+	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX];//to be shared among players
+	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];
+	SFText m_monster_curses_descriptions[NB_MONSTER_SPELLS_MAX];
+
+	int m_current_player;
 
 private:
 	sf::RenderWindow* mainWindow;

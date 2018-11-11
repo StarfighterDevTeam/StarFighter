@@ -83,6 +83,7 @@ enum MouseAction
 
 enum CardStack
 {
+	Stack_None,
 	Stack_Hand,
 	Stack_Altar,
 	Stack_Library,
