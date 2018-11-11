@@ -680,6 +680,9 @@ Actions InGameState::AltarAttack(int player_index, int curse_slot)
 	m_monster_curses_names[curse_slot].setColor(sf::Color(128, 128, 128, 255));
 	m_monster_curses_descriptions[curse_slot].setColor(sf::Color(128, 128, 128, 255));
 
+	m_altar_slot.m_selected = false;
+	(*CurrentGame).m_selected_slot = NULL;
+
 	//Clear altar
 	//for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	//{
