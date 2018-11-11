@@ -244,20 +244,17 @@ bool Curse::Effect()
 Monster::Monster()
 {
 	//first curses to trigger to last in the vector
-	m_curses.push_back(Curse(5, 3, m_curses.size() + 1));
-	m_curses.push_back(Curse(4, 3, m_curses.size() + 1));
-	m_curses.push_back(Curse(3, 2, m_curses.size() + 1));
-	m_curses.push_back(Curse(3, 2, m_curses.size() + 1));
-	m_curses.push_back(Curse(2, 2, m_curses.size() + 1));
-	m_curses.push_back(Curse(0, 0, m_curses.size() + 1));
+	m_curses.push_back(Curse(5, 3, m_curses.size()));
+	m_curses.push_back(Curse(4, 3, m_curses.size()));
+	m_curses.push_back(Curse(3, 2, m_curses.size()));
+	m_curses.push_back(Curse(3, 2, m_curses.size()));
+	m_curses.push_back(Curse(2, 2, m_curses.size()));
+	m_curses.push_back(Curse(0, 0, m_curses.size()));
 }
 
 void Monster::Attack()
-{
-	if (m_curses.back().m_status == CardSlot_Occupied)
-	{
-		m_curses.back().Effect();
-	}
+{	
+	m_curses.back().Effect();
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -306,11 +303,8 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 	m_altar_slot.Update((*CurrentGame).m_mouse_click);
 
-	for (int p = 0; p < NB_PLAYERS_MAX; p++)
-	{
-		m_mages[p].m_library_slot.Update((*CurrentGame).m_mouse_click);
-		m_mages[p].m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
-	}
+	m_mages[p].m_library_slot.Update((*CurrentGame).m_mouse_click);
+	m_mages[p].m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
 
 	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
 	{
@@ -350,8 +344,16 @@ void InGameState::Update(sf::Time deltaTime)
 	
 	if (!m_monsters.empty() && !m_monsters.back().m_curses.empty())
 	{
-		m_monster_curses_names[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
-		m_monster_curses_descriptions[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
+		if (m_monster_curses_slots[m_monsters.back().m_curses.size() - 1].m_status == CardSlot_Occupied)
+		{
+			m_monster_curses_names[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
+			m_monster_curses_descriptions[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(255, 0, 0, 255));
+		}
+		else
+		{
+			m_monster_curses_names[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(0, 255, 0, 255));
+			m_monster_curses_descriptions[m_monsters.back().m_curses.size() - 1].setColor(sf::Color(0, 255, 0, 255));
+		}
 	}
 
 	//End of turn
@@ -367,17 +369,13 @@ void InGameState::Update(sf::Time deltaTime)
 			if (!monster.m_curses.empty())
 			{
 				//attack with current curse
-				monster.Attack();
+				if (m_monster_curses_slots[monster.m_curses.back().m_index].m_status == CardSlot_Occupied)
+				{
+					monster.Attack();
+				}
 
+				//get rid of current curse and go to next curse
 				m_monster_curses_slots[monster.m_curses.size() - 1].m_status = CardSlot_Free;
-
-				//clean current curse from display
-				//for (int i = 0; i < m_monsters.back().m_curses.back().m_costs.size(); i++)
-				//{
-				//	m_monster_curses_costs[m_monsters.back().m_curses.size() - 1][i].m_status = CardSlot_Free;
-				//}
-
-				//go to next curse
 				monster.m_curses.pop_back();
 			}
 
@@ -691,6 +689,14 @@ Actions InGameState::AltarAttack(int player_index, int curse_slot)
 	//	m_altar_slots[i].m_text.setString("");
 	//}
 	
+	printf("Dispelled curse. New altar: %d, %d, %d, %d. Graveyard size: %d, %d.\n",
+		m_altar_slots[0].m_status == CardSlot_Occupied,
+		m_altar_slots[1].m_status == CardSlot_Occupied,
+		m_altar_slots[2].m_status == CardSlot_Occupied,
+		m_altar_slots[3].m_status == CardSlot_Occupied,
+		m_mages[0].m_graveyard.size(),
+		m_mages[1].m_graveyard.size());
+
 	return Action_AltarToCurse;
 }
 
@@ -966,5 +972,6 @@ void CardSlot::Update(MouseAction mouse_click)
 	else if (m_hovered && mouse_click == Mouse_RightClick && m_stack == Stack_Library)
 	{
 		(*CurrentGame).m_target_slot = this;
+		m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 	}
 }
