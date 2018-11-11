@@ -34,7 +34,7 @@ enum Actions
 class Mage
 {
 public:
-	Mage(int index){ m_timer = 0.f; for (int i = 0; i < NB_CARDS_HAND_MAX; i++) { m_hand_slots[i].m_status = CardSlot_Free; m_index = index; } };
+	Mage(int index){ m_timer = 0.f; for (int i = 0; i < NB_CARDS_HAND_MAX; i++) { m_hand_slots[i].m_status = CardSlot_Free; m_index = index; m_is_alive = true; } };
 
 	void InitSlots(int player_index);
 	void InitCards();
@@ -51,6 +51,7 @@ public:
 
 	float m_timer;
 	int m_index;
+	bool m_is_alive;
 };
 
 class Curse
@@ -70,8 +71,6 @@ class Monster
 {
 public:
 	Monster();
-
-	void Attack();
 
 	vector<Curse> m_curses;// [NB_MONSTER_SPELLS_MAX];
 };
@@ -96,6 +95,7 @@ public:
 	int GetFreeAltarCardSlot();
 	Actions PlayCard(int player_index, int hand_slot, int altar_slot);
 	Actions AltarAttack(int player_index, int curse_slot);
+	bool BurnPlayer(int player_index);
 
 	vector<Monster> m_monsters;
 

@@ -237,7 +237,10 @@ Curse::Curse(int cost, int nb_costs, int index)
 bool Curse::Effect()
 {
 	//do something
-	printf("Monster attack (%d).\n", m_index);
+	//printf("Monster attack (%d).\n", m_index);
+
+	//int r = RandomizeIntBetweenValues(0, NB_PLAYERS_MAX);
+
 	return true;
 }
 
@@ -250,11 +253,6 @@ Monster::Monster()
 	m_curses.push_back(Curse(3, 2, m_curses.size()));
 	m_curses.push_back(Curse(2, 2, m_curses.size()));
 	m_curses.push_back(Curse(0, 0, m_curses.size()));
-}
-
-void Monster::Attack()
-{	
-	m_curses.back().Effect();
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -363,15 +361,30 @@ void InGameState::Update(sf::Time deltaTime)
 		m_current_player = p;
 		//m_mages[p].DrawCard();
 
+		//Monster attack
 		if (!m_monsters.empty())
 		{
 			Monster& monster = m_monsters.back();
 			if (!monster.m_curses.empty())
 			{
 				//attack with current curse
-				if (m_monster_curses_slots[monster.m_curses.back().m_index].m_status == CardSlot_Occupied)
+				Curse& curse = monster.m_curses.back();
+				if (m_monster_curses_slots[curse.m_index].m_status == CardSlot_Occupied)
 				{
-					monster.Attack();
+					//pick a random player alive
+					vector<int> alive_players;
+					for (int i = 0; i < NB_PLAYERS_MAX; i++)
+					{
+						if (m_mages[i].m_is_alive)
+						{
+							alive_players.push_back(i);
+						}
+					}
+					int r = RandomizeIntBetweenValues(0, alive_players.size() - 1);
+					int index = alive_players[r];
+
+					//Burn the random player
+					BurnPlayer(index);
 				}
 
 				//get rid of current curse and go to next curse
@@ -419,6 +432,56 @@ void InGameState::Update(sf::Time deltaTime)
 	//}
 
 	this->mainWindow->clear();
+}
+
+bool InGameState::BurnPlayer(int player_index)
+{
+	Mage& player = m_mages[player_index];
+
+	//Pick an unburnt card at random
+	vector<int> clean_cards;
+	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	{
+		if (player.m_hand_slots[i].m_status != CardSlot_Burnt)
+		{
+			clean_cards.push_back(i);
+		}
+	}
+
+	int r = RandomizeIntBetweenValues(0, clean_cards.size() - 1);
+	int index = clean_cards[r];
+	//Burn card
+
+	player.m_hand_slots[index].m_status = CardSlot_Burnt;
+	player.m_hand_slots[index].m_shape.setFillColor(sf::Color(128, 128, 128, 255));
+
+
+	printf("Monster attack. Burning player %d (slot: %d).\n", player_index, index);
+
+	if (clean_cards.size() == 1)
+	{
+		player.m_is_alive = false;
+		printf("Player %d is dead.\n", player.m_index);
+
+		bool all_players_dead = true;
+		for (int i = 0; i < NB_PLAYERS_MAX; i++)
+		{
+			if (m_mages[i].m_is_alive)
+			{
+				all_players_dead = false;
+				break;
+			}
+		}
+
+		if (all_players_dead)
+		{
+			printf("GAME OVER !!! All players are dead.\n");
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 void InGameState::Draw()
