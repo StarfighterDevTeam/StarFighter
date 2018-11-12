@@ -95,6 +95,7 @@ public:
 	int GetFreeAltarCardSlot();
 	Actions PlayCard(int player_index, int hand_slot, int altar_slot);
 	Actions AltarAttack(int player_index, int curse_slot);
+	void UseAltarCard(int index);
 	bool BurnPlayer(int player_index);
 
 	vector<Monster> m_monsters;

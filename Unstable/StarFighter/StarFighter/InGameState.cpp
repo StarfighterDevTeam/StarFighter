@@ -92,14 +92,14 @@ void InGameState::InitTable()
 	//Altar
 	m_altar_slot.m_stack = Stack_Altar;
 
-	m_altar_slot.m_shape_container.setPosition(sf::Vector2f(500 + ((CARD_WIDTH +20) * NB_CARDS_ALTAR) * 0.5, 500));
+	m_altar_slot.m_shape_container.setPosition(sf::Vector2f(800 + ((CARD_WIDTH +20) * NB_CARDS_ALTAR) * 0.5, 500));
 	m_altar_slot.m_shape_container.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
 	m_altar_slot.m_shape_container.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
 	m_altar_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 	m_altar_slot.m_shape_container.setOutlineThickness(2);
 	m_altar_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
-	m_altar_slot.m_shape.setPosition(sf::Vector2f(500 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
+	m_altar_slot.m_shape.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
 	m_altar_slot.m_shape.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
 	m_altar_slot.m_shape.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
 	m_altar_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
@@ -112,14 +112,14 @@ void InGameState::InitTable()
 		m_altar_slots[i].m_stack = Stack_AltarSlot;
 		m_altar_slots[i].m_index = i;
 
-		m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
 		m_altar_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 		m_altar_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 		m_altar_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 		m_altar_slots[i].m_shape_container.setOutlineThickness(2);
 		m_altar_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
-		m_altar_slots[i].m_shape.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_altar_slots[i].m_shape.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
 		m_altar_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 		m_altar_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 		m_altar_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
@@ -129,7 +129,7 @@ void InGameState::InitTable()
 		m_altar_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_altar_slots[i].m_text.setCharacterSize(18);
 		m_altar_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
-		m_altar_slots[i].m_text.setPosition(sf::Vector2f(500 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+		m_altar_slots[i].m_text.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
 		m_altar_slots[i].m_text.setString("");
 	}
 
@@ -139,27 +139,27 @@ void InGameState::InitTable()
 		m_monster_curses_names[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_monster_curses_names[i].setCharacterSize(18);
 		m_monster_curses_names[i].setColor(sf::Color(255, 255, 255, 255));
-		m_monster_curses_names[i].setPosition(sf::Vector2f(1100, 100 - CARD_HEIGHT / 2 - 50 + (CARD_HEIGHT + 70) * i));
+		m_monster_curses_names[i].setPosition(sf::Vector2f(1400, 100 - CARD_HEIGHT / 2 - 50 + (CARD_HEIGHT + 70) * i));
 		m_monster_curses_names[i].setString("");
 
 		m_monster_curses_descriptions[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_monster_curses_descriptions[i].setCharacterSize(18);
 		m_monster_curses_descriptions[i].setColor(sf::Color(255, 255, 255, 255));
-		m_monster_curses_descriptions[i].setPosition(sf::Vector2f(1100, 100 - CARD_HEIGHT / 2 - 30 + (CARD_HEIGHT + 70) * i));
+		m_monster_curses_descriptions[i].setPosition(sf::Vector2f(1400, 100 - CARD_HEIGHT / 2 - 30 + (CARD_HEIGHT + 70) * i));
 		m_monster_curses_descriptions[i].setString("");
 		
 		m_monster_curses_slots[i].m_status = CardSlot_Free;
 		m_monster_curses_slots[i].m_stack = Stack_MonsterCurses;
 		m_monster_curses_slots[i].m_index = i;
 
-		m_monster_curses_slots[i].m_shape.setPosition(sf::Vector2f(1100 + ((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX) * 0.5, 100 + (CARD_HEIGHT + 70) * i));
+		m_monster_curses_slots[i].m_shape.setPosition(sf::Vector2f(1400 + ((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX) * 0.5, 100 + (CARD_HEIGHT + 70) * i));
 		m_monster_curses_slots[i].m_shape.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10) * 0.5, CARD_HEIGHT / 2 + 5));
 		m_monster_curses_slots[i].m_shape.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10, CARD_HEIGHT + 10));
 		m_monster_curses_slots[i].m_shape.setOutlineColor(sf::Color(255, 255, 255, 0));
 		m_monster_curses_slots[i].m_shape.setOutlineThickness(0);
 		m_monster_curses_slots[i].m_shape.setFillColor(sf::Color(0, 0, 0, 255));
 
-		m_monster_curses_slots[i].m_shape_container.setPosition(sf::Vector2f(1100 + ((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX) * 0.5, 100 + (CARD_HEIGHT + 70) * i));
+		m_monster_curses_slots[i].m_shape_container.setPosition(sf::Vector2f(1400 + ((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX) * 0.5, 100 + (CARD_HEIGHT + 70) * i));
 		m_monster_curses_slots[i].m_shape_container.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10) * 0.5, CARD_HEIGHT / 2 + 5));
 		m_monster_curses_slots[i].m_shape_container.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_MONSTER_SPELLS_MAX + 10, CARD_HEIGHT + 10));
 		m_monster_curses_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
@@ -172,7 +172,7 @@ void InGameState::InitTable()
 			m_monster_curses_costs[i][j].m_stack = Stack_None;
 			m_monster_curses_costs[i][j].m_index = i;
 
-			m_monster_curses_costs[i][j].m_shape.setPosition(sf::Vector2f(1100 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
+			m_monster_curses_costs[i][j].m_shape.setPosition(sf::Vector2f(1400 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
 			m_monster_curses_costs[i][j].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 			m_monster_curses_costs[i][j].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
 			m_monster_curses_costs[i][j].m_shape.setOutlineColor(sf::Color(0, 0, 0, 255));
@@ -182,7 +182,7 @@ void InGameState::InitTable()
 			m_monster_curses_costs[i][j].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 			m_monster_curses_costs[i][j].m_text.setCharacterSize(18);
 			m_monster_curses_costs[i][j].m_text.setColor(sf::Color(0, 0, 0, 255));
-			m_monster_curses_costs[i][j].m_text.setPosition(sf::Vector2f(1100 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
+			m_monster_curses_costs[i][j].m_text.setPosition(sf::Vector2f(1400 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
 			m_monster_curses_costs[i][j].m_text.setString("");
 		}
 	}
@@ -216,7 +216,7 @@ Curse::Curse(int cost, int nb_costs, int index)
 	
 	for (int i = 0; i < nb_costs; i++)
 	{
-		int type = RandomizeIntBetweenValues((int)Mana_Fire, (int)Mana_Earth);
+		int type = RandomizeIntBetweenValues((int)Mana_Fire, (int)NB_MANATYPES);
 
 		if (i < half)
 		{
@@ -295,12 +295,6 @@ void InGameState::Update(sf::Time deltaTime)
 		m_mages[p].m_hand_slots[i].Update((*CurrentGame).m_mouse_click);
 	}
 
-	for (int i = 0; i < NB_CARDS_ALTAR; i++)
-	{
-		m_altar_slots[i].Update((*CurrentGame).m_mouse_click);
-	}
-	m_altar_slot.Update((*CurrentGame).m_mouse_click);
-
 	m_mages[p].m_library_slot.Update((*CurrentGame).m_mouse_click);
 	m_mages[p].m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
 
@@ -308,6 +302,26 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		m_monster_curses_slots[i].Update((*CurrentGame).m_mouse_click);
 	}
+
+	bool altar_selection[NB_CARDS_ALTAR];
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		altar_selection[i] = m_altar_slots[i].m_selected;
+	}
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		m_altar_slots[i].Update((*CurrentGame).m_mouse_click);
+	}
+	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	{
+		//cumulative selection in altar
+		if (altar_selection[i] && !m_altar_slots[i].m_selected && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_AltarSlot)
+		{
+			m_altar_slots[i].m_selected = true;
+		}
+	}
+
+	m_altar_slot.Update((*CurrentGame).m_mouse_click);
 
 	//Actions
 	Actions played = Action_None;
@@ -668,75 +682,253 @@ Actions InGameState::PlayCard(int player_index, int hand_slot, int altar_slot)
 	}
 }
 
+void InGameState::UseAltarCard(int index)
+{
+	m_altar_slots[index].m_status = CardSlot_Free;
+	m_mages[m_altar_slots[index].m_card.m_owner].m_graveyard.push_back(m_altar_slots[index].m_card);
+	m_altar_slots[index].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+	m_altar_slots[index].m_text.setString("");
+}
+
 Actions InGameState::AltarAttack(int player_index, int curse_slot)
 {
-	//Get altar mana
-	bool altar_empty = true;
-	int mana[NB_MANATYPES] = { 0, 0, 0, 0 };
+	int nb_possibilities = NB_CARDS_ALTAR;
+	vector <vector<int> > possibilites;
+
 	for (int i = 0; i < NB_CARDS_ALTAR; i++)
 	{
-		if (m_altar_slots[i].m_status == CardSlot_Occupied)
-		{
-			altar_empty = false;
-			mana[m_altar_slots[i].m_card.m_type] += m_altar_slots[i].m_card.m_value;
-		}
-	}
-	if (altar_empty)
-	{
-		printf("Altar is empty\n");
-		return Action_None;
-	}
+		vector<int> possibility;
+		possibility.push_back(i);
+		possibilites.push_back(possibility);
+		possibility.clear();
 
-	//Get curse cost
-	int cost[NB_MANATYPES] = { 0, 0, 0, 0 };
-	for (int i = 0; i < m_monsters.back().m_curses[curse_slot].m_costs.size(); i++)
-	{
-		Card& curse_cost = m_monsters.back().m_curses[curse_slot].m_costs[i];
-		cost[curse_cost.m_type] += curse_cost.m_value;
-	}
-
-	//Compare mana and cost
-	for (int i = 0; i < NB_MANATYPES; i++)
-	{
-		if (mana[i] < cost[i])
+		for (int j = 1; j < NB_CARDS_ALTAR; j++)
 		{
-			printf("Insufficient mana in Altar to dispell this curse.\n");
-			return Action_None;
-		}
-	}
-
-	//Select optimal mana consumption to match cost automatically
-	int mana_optim[NB_MANATYPES] = { 0, 0, 0, 0 };
-	for (int i = 0; i < NB_MANATYPES; i++)
-	{
-		if (cost[i] > 0)
-		{
-			for (int j = 1; j <= Mana_3; j++)
+			for (int k = j; k < NB_CARDS_ALTAR; k++)
 			{
-				for (int k = 0; k < NB_CARDS_ALTAR; k++)
-				{
-					if (m_altar_slots[k].m_status == CardSlot_Occupied && m_altar_slots[k].m_card.m_type == i && m_altar_slots[k].m_card.m_value == j)//mana 1, then 2, then 3...
-					{
-						mana_optim[i] += j;
-
-						//discard card
-						m_altar_slots[k].m_status = CardSlot_Free;
-						m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
-						m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
-						m_altar_slots[k].m_text.setString("");
-
-						//go to next mana_type?
-						if (mana_optim[i] >= cost[i])
-						{
-							//exit loop
-							k = NB_CARDS_ALTAR;
-							j = Mana_3 + 1;
-						}
-					}
-				}
+				possibility.push_back(i);
+				possibility.push_back(k);
+				possibilites.push_back(possibility);
+				possibility.clear();
 			}
 		}
 	}
+
+	
+
+
+	for (int i = NB_CARDS_ALTAR - 1; i > 0; i--)
+	{
+		nb_possibilities += i * (NB_CARDS_ALTAR - i);
+	}
+
+	printf("");
+
+	//for (int i = 0; i < m_monsters.back().m_curses[curse_slot].m_costs.size(); i++)
+	//{
+	//	Card& cost = m_monsters.back().m_curses[curse_slot].m_costs[i];
+	//
+	//	//Mana colored
+	//	if (cost.m_type != NB_MANATYPES)
+	//	{
+	//		int added_value = 0;
+	//		bool adding_value = false;
+	//		bool looking_for_three = false;
+	//		for (int k = 0; k < NB_CARDS_ALTAR; k++)
+	//		{
+	//			if (m_altar_slots[k].m_status == CardSlot_Occupied)
+	//			{
+	//				if (m_altar_slots[k].m_card.m_type == cost.m_type)
+	//				{
+	//					//Prererence 1 : matching exaclty
+	//					if (m_altar_slots[k].m_card.m_value == cost.m_value)
+	//					{
+	//						UseAltarCard(k);
+	//						break;
+	//					}
+	//
+	//					//Prererence 2 : value 1 -> lowest value possible
+	//					if (cost.m_value == 1)
+	//					{
+	//						if (m_altar_slots[k].m_card.m_value == 2)
+	//						{
+	//							UseAltarCard(k);
+	//							break;
+	//						}
+	//						else if (m_altar_slots[k].m_card.m_value == 3)
+	//						{
+	//							UseAltarCard(k);
+	//							break;
+	//						}
+	//					}
+	//
+	//					//Preference 3 : value 2 -> 2x 1 if possible
+	//					if (cost.m_value == 2)
+	//					{
+	//						if (looking_for_three == false)
+	//						{
+	//							if (m_altar_slots[k].m_card.m_value == 1)
+	//							{
+	//								if (adding_value)
+	//								{
+	//									added_value++;
+	//									UseAltarCard(k);
+	//									if (added_value == 2)
+	//									{
+	//										break;
+	//									}
+	//								}
+	//								else
+	//								{
+	//									added_value++;
+	//									if (added_value == 2)
+	//									{
+	//										adding_value = true;
+	//										added_value = 0;
+	//										k = -1;
+	//										continue;
+	//									}
+	//								}
+	//
+	//							}
+	//							else if (m_altar_slots[k].m_card.m_value == 3)
+	//							{
+	//								UseAltarCard(k);
+	//								break;
+	//							}
+	//
+	//							if (k == NB_CARDS_ALTAR - 1)
+	//							{
+	//								looking_for_three = true;
+	//								k = -1;
+	//								continue;
+	//							}
+	//						}
+	//						else
+	//						{
+	//							if (m_altar_slots[k].m_card.m_value == 3)
+	//							{
+	//								UseAltarCard(k);
+	//								break;
+	//							}
+	//						}
+	//
+	//						if (k == NB_CARDS_ALTAR - 1)
+	//						{
+	//							printf("Insufficient mana %d in Altar to dispell this curse (required: %d).\n", (int)cost.m_type, (int)cost.m_value);
+	//							return Action_None;
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//	//Mana uncolored
+	//	else
+	//	{
+	//
+	//	}
+	//	
+	//}
+	
+
+
+
+	//Get altar mana
+	//bool altar_empty = true;
+	//int mana[NB_MANATYPES] = { 0, 0, 0, 0 };
+	//int mana_left[NB_MANATYPES] = { 0, 0, 0, 0 };
+	//for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	//{
+	//	if (m_altar_slots[i].m_status == CardSlot_Occupied)
+	//	{
+	//		altar_empty = false;
+	//		mana[m_altar_slots[i].m_card.m_type] += m_altar_slots[i].m_card.m_value;
+	//		mana_left[m_altar_slots[i].m_card.m_type] += m_altar_slots[i].m_card.m_value;
+	//	}
+	//}
+	//if (altar_empty)
+	//{
+	//	printf("Altar is empty\n");
+	//	return Action_None;
+	//}
+	//
+	////Get curse cost
+	//int cost[NB_MANATYPES + 1] = { 0, 0, 0, 0, 0 };
+	//for (int i = 0; i < m_monsters.back().m_curses[curse_slot].m_costs.size(); i++)
+	//{
+	//	Card& curse_cost = m_monsters.back().m_curses[curse_slot].m_costs[i];
+	//	cost[curse_cost.m_type] += curse_cost.m_value;
+	//}
+	//
+	////Compare mana and cost
+	//for (int i = 0; i < NB_MANATYPES; i++)
+	//{
+	//	if (mana[i] < cost[i])
+	//	{
+	//		printf("Insufficient mana in Altar to dispell this curse.\n");
+	//		return Action_None;
+	//	}
+	//	else
+	//	{
+	//		mana_left[i] -= cost[i];
+	//	}
+	//}
+	//int incolor_mana = 0;
+	//for (int i = 0; i < NB_MANATYPES; i++)
+	//{
+	//	incolor_mana += mana_left[i];
+	//}
+	//if (incolor_mana < cost[NB_MANATYPES])
+	//{
+	//	printf("Insufficient mana in Altar to dispell this curse.\n");
+	//	return Action_None;
+	//}
+	//
+	////Select optimal mana consumption to match cost automatically
+	//int mana_optim[NB_MANATYPES + 1] = { 0, 0, 0, 0, 0 };
+	//for (int i = 0; i < NB_MANATYPES + 1; i++)
+	//{
+	//	if (cost[i] > 0)
+	//	{
+	//		for (int k = 0; k < NB_CARDS_ALTAR; k++)
+	//		{
+	//			if (m_altar_slots[k].m_status == CardSlot_Occupied && (m_altar_slots[k].m_card.m_type == i || i == NB_MANATYPES) && m_altar_slots[k].m_card.m_value == cost[i])
+	//			{
+	//				mana_optim[i] += cost[i];
+	//
+	//				//discard card
+	//				m_altar_slots[k].m_status = CardSlot_Free;
+	//				m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
+	//				m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+	//				m_altar_slots[k].m_text.setString("");
+	//				break;
+	//			}
+	//
+	//			for (int j = Mana_3; j > 0; j--)
+	//			{
+	//				if (m_altar_slots[k].m_status == CardSlot_Occupied && (m_altar_slots[k].m_card.m_type == i || i == NB_MANATYPES) && m_altar_slots[k].m_card.m_value == j)//mana 1, then 2, then 3...
+	//				{
+	//					mana_optim[i] += j;
+	//
+	//					//discard card
+	//					m_altar_slots[k].m_status = CardSlot_Free;
+	//					m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
+	//					m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+	//					m_altar_slots[k].m_text.setString("");
+	//
+	//					//go to next mana_type?
+	//					if (mana_optim[i] >= cost[i])
+	//					{
+	//						//exit loop
+	//						k = NB_CARDS_ALTAR;
+	//						j = 0;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	//Dispell
 	m_monster_curses_slots[curse_slot].m_status = CardSlot_Burnt;
@@ -969,9 +1161,13 @@ sf::Color CardSlot::GetManaColor(ManaType type)
 	{
 		return sf::Color(230, 230, 255, 255);
 	}
-	else// if (type == Mana_Earth)
+	else if (type == Mana_Earth)
 	{
 		return sf::Color(0, 255, 0, 255);
+	}
+	else
+	{
+		return sf::Color(100, 100, 100, 255);
 	}
 }
 
