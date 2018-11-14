@@ -54,9 +54,9 @@ enum ManaType
 enum ManaValue
 {
 	Mana_0,		//0
-	Mana_1,			//1
-	Mana_2,			//2
-	Mana_3,			//3
+	Mana_1,		//1
+	Mana_2,		//2
+	Mana_3,		//3
 };
 
 class Card

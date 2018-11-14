@@ -200,11 +200,6 @@ Curse::Curse(int cost, int nb_costs, int index)
 		return;
 	}
 
-	m_costs.push_back(Card(Mana_Air, Mana_2, -1));
-	m_costs.push_back(Card(NB_MANATYPES, Mana_1, -1));
-	m_costs.push_back(Card(Mana_Air, Mana_1, -1));
-	return;
-
 	if (nb_costs > SPELL_NB_COSTS_MAX)
 	{
 		nb_costs = SPELL_NB_COSTS_MAX;
@@ -225,12 +220,12 @@ Curse::Curse(int cost, int nb_costs, int index)
 
 		if (i < half)
 		{
-			int cost = avg_cost > 2 ? 2 : avg_cost;
+			int cost = avg_cost > 3 ? 3 : avg_cost;
 			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost + 1), -1));
 		}
 		else
 		{
-			int cost = avg_cost - 1 > 2 ? 3 : avg_cost;
+			int cost = avg_cost - 1 > 3 ? 4 : avg_cost;
 			m_costs.push_back(Card((ManaType)type, (ManaValue)(cost), -1));
 		}
 	}
@@ -256,7 +251,7 @@ Monster::Monster()
 	m_curses.push_back(Curse(4, 3, m_curses.size()));
 	m_curses.push_back(Curse(3, 2, m_curses.size()));
 	m_curses.push_back(Curse(3, 2, m_curses.size()));
-	m_curses.push_back(Curse(2, 2, m_curses.size()));
+	m_curses.push_back(Curse(1, 2, m_curses.size()));
 	m_curses.push_back(Curse(0, 0, m_curses.size()));
 }
 
