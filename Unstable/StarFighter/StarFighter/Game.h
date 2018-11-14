@@ -75,6 +75,7 @@ enum CardSlotStatus
 	CardSlot_Free,		//0
 	CardSlot_Occupied,	//1
 	CardSlot_Burnt,		//2
+	CardSlot_Temp,		//3
 };
 
 enum MouseAction

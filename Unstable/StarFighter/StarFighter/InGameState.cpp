@@ -200,6 +200,11 @@ Curse::Curse(int cost, int nb_costs, int index)
 		return;
 	}
 
+	m_costs.push_back(Card(Mana_Air, Mana_2, -1));
+	m_costs.push_back(Card(NB_MANATYPES, Mana_1, -1));
+	m_costs.push_back(Card(Mana_Air, Mana_1, -1));
+	return;
+
 	if (nb_costs > SPELL_NB_COSTS_MAX)
 	{
 		nb_costs = SPELL_NB_COSTS_MAX;
@@ -692,243 +697,279 @@ void InGameState::UseAltarCard(int index)
 
 Actions InGameState::AltarAttack(int player_index, int curse_slot)
 {
-	int nb_possibilities = NB_CARDS_ALTAR;
-	vector <vector<int> > possibilites;
+	vector<int> mana[NB_MANATYPES];
 
-	for (int i = 0; i < NB_CARDS_ALTAR; i++)
+	//Colored mana first, then uncolored
+	for (int colored = 1; colored >= 0; colored--)
 	{
-		vector<int> possibility;
-		possibility.push_back(i);
-		possibilites.push_back(possibility);
-		possibility.clear();
-
-		for (int j = 1; j < NB_CARDS_ALTAR; j++)
+		//Checking cost
+		for (int i = 0; i < m_monsters.back().m_curses[curse_slot].m_costs.size(); i++)
 		{
-			for (int k = j; k < NB_CARDS_ALTAR; k++)
+			Card& cost = m_monsters.back().m_curses[curse_slot].m_costs[i];
+
+			//Gathering remaining mana
+			for (int m = 0; m < NB_MANATYPES; m++)
 			{
-				possibility.push_back(i);
-				possibility.push_back(k);
-				possibilites.push_back(possibility);
-				possibility.clear();
+				mana[m].clear();
+				for (int k = 0; k < NB_CARDS_ALTAR; k++)
+				{
+					if (m_altar_slots[k].m_status == CardSlot_Occupied)
+					{
+						if (m_altar_slots[k].m_selected == true || m_altar_slot.m_selected == true)
+						{
+							if (m_altar_slots[k].m_card.m_type == (ManaType)m)
+							{
+								mana[m].push_back(k);
+							}
+						}
+					}
+				}
+			}
+
+			if (cost.m_type == NB_MANATYPES && colored == 1)
+			{
+				continue;
+			}
+
+			if (cost.m_type != NB_MANATYPES && colored == 0)
+			{
+				continue;
+			}
+
+			//Get all combinations possible
+			int index = -1;
+			int mana_waste = -1;
+			int nb_cards = -1;
+			int slot = -1;
+			vector<vector<int> > possibilities;
+			vector<int> possibility;
+
+			for (int j = 0; j < NB_MANATYPES; j++)//for uncolored
+			{
+				if (colored == 1)
+				{
+					j = cost.m_type;// and will break at the end of the loop
+				}
+
+				//insert loop here
+				int comb_size = mana[j].size();
+				if (comb_size == 0)
+				{
+					if (colored == 1)
+					{
+						printf("Cannot dispell curse. Insufficient mana (0 mana of type %d).\n", cost.m_type);
+						for (int k = 0; k < NB_CARDS_ALTAR; k++)
+						{
+							if (m_altar_slots[k].m_status == CardSlot_Temp)
+							{
+								m_altar_slots[k].m_status = CardSlot_Occupied;
+							}
+						}
+
+						return Action_None;
+					}
+					else
+					{
+						continue;
+					}
+				}
+
+				switch (comb_size)
+				{
+				case 1:
+					possibilities.push_back(mana[j]);
+					possibility.clear();
+					break;
+				case 2:
+
+					possibility.push_back(mana[j][0]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][1]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][1]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					break;
+				case 3:
+					possibility.push_back(mana[j][0]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][1]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][1]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					break;
+				case 4:
+					possibility.push_back(mana[j][0]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][1]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][1]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][2]);
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][2]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][2]);
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][2]);
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					possibility.push_back(mana[j][0]);
+					possibility.push_back(mana[j][1]);
+					possibility.push_back(mana[j][2]);
+					possibility.push_back(mana[j][3]);
+					possibilities.push_back(possibility);
+					possibility.clear();
+					break;
+				default:
+					break;
+				}
+
+				if (colored == 1)
+				{
+					break;//only for colored costs
+				}
+			}
+
+			//Assess all combinations
+			int pb_size = possibilities.size();
+
+			for (int p = 0; p < pb_size; p++)
+			{
+				int mana_sum = 0;
+				int vector_size = possibilities[p].size();
+				int min_slot = possibilities[p].front();
+				for (int m = 0; m < vector_size; m++)
+				{
+					int k = possibilities[p][m];
+					mana_sum += m_altar_slots[k].m_card.m_value;
+				}
+
+				//we're looking for the lowest mana waste, then the lowest number of cards possible, that fits the cost
+				if (mana_sum >= cost.m_value && (mana_waste < 0 || mana_sum - cost.m_value <= mana_waste) && (nb_cards < 0 || vector_size <= nb_cards))
+				{
+					if (mana_sum - cost.m_value == mana_waste && vector_size == nb_cards && slot >= 0 && min_slot > slot)
+					{
+						continue;//for ex-aequo, we keep the solution on the most left
+					}
+
+					index = p;
+					mana_waste = mana_sum - cost.m_value;
+					nb_cards = vector_size;
+					slot = min_slot;
+				}
+			}
+
+			if (index < 0)
+			{
+				printf("Cannot dispell curse. Insufficient mana (%d mana of type %d).\n", cost.m_value, cost.m_type);
+
+				if (colored == 1)
+				{
+					printf("Altar slots indexes for selected cards of this type of mana: ");
+					for (int k = 0; k < mana[k].size(); k++)
+					{
+						printf("%d ", mana[cost.m_type][k]);
+					}
+					printf("\n");
+				}
+
+				for (int k = 0; k < NB_CARDS_ALTAR; k++)
+				{
+					if (m_altar_slots[k].m_status == CardSlot_Temp)
+					{
+						m_altar_slots[k].m_status = CardSlot_Occupied;
+					}
+
+				}
+
+				return Action_None;
+			}
+
+			//Execute the choice of combination
+			for (int m = 0; m < possibilities[index].size(); m++)
+			{
+				int k = possibilities[index][m];
+				m_altar_slots[k].m_status = CardSlot_Temp;
 			}
 		}
 	}
 
-	
-
-
-	for (int i = NB_CARDS_ALTAR - 1; i > 0; i--)
+	//Discard used cards
+	for (int k = 0; k < NB_CARDS_ALTAR; k++)
 	{
-		nb_possibilities += i * (NB_CARDS_ALTAR - i);
+		if (m_altar_slots[k].m_status == CardSlot_Temp)
+		{
+			m_altar_slots[k].m_status = CardSlot_Free;
+			m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
+			m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+			m_altar_slots[k].m_text.setString("");
+		}
 	}
-
-	printf("");
-
-	//for (int i = 0; i < m_monsters.back().m_curses[curse_slot].m_costs.size(); i++)
-	//{
-	//	Card& cost = m_monsters.back().m_curses[curse_slot].m_costs[i];
-	//
-	//	//Mana colored
-	//	if (cost.m_type != NB_MANATYPES)
-	//	{
-	//		int added_value = 0;
-	//		bool adding_value = false;
-	//		bool looking_for_three = false;
-	//		for (int k = 0; k < NB_CARDS_ALTAR; k++)
-	//		{
-	//			if (m_altar_slots[k].m_status == CardSlot_Occupied)
-	//			{
-	//				if (m_altar_slots[k].m_card.m_type == cost.m_type)
-	//				{
-	//					//Prererence 1 : matching exaclty
-	//					if (m_altar_slots[k].m_card.m_value == cost.m_value)
-	//					{
-	//						UseAltarCard(k);
-	//						break;
-	//					}
-	//
-	//					//Prererence 2 : value 1 -> lowest value possible
-	//					if (cost.m_value == 1)
-	//					{
-	//						if (m_altar_slots[k].m_card.m_value == 2)
-	//						{
-	//							UseAltarCard(k);
-	//							break;
-	//						}
-	//						else if (m_altar_slots[k].m_card.m_value == 3)
-	//						{
-	//							UseAltarCard(k);
-	//							break;
-	//						}
-	//					}
-	//
-	//					//Preference 3 : value 2 -> 2x 1 if possible
-	//					if (cost.m_value == 2)
-	//					{
-	//						if (looking_for_three == false)
-	//						{
-	//							if (m_altar_slots[k].m_card.m_value == 1)
-	//							{
-	//								if (adding_value)
-	//								{
-	//									added_value++;
-	//									UseAltarCard(k);
-	//									if (added_value == 2)
-	//									{
-	//										break;
-	//									}
-	//								}
-	//								else
-	//								{
-	//									added_value++;
-	//									if (added_value == 2)
-	//									{
-	//										adding_value = true;
-	//										added_value = 0;
-	//										k = -1;
-	//										continue;
-	//									}
-	//								}
-	//
-	//							}
-	//							else if (m_altar_slots[k].m_card.m_value == 3)
-	//							{
-	//								UseAltarCard(k);
-	//								break;
-	//							}
-	//
-	//							if (k == NB_CARDS_ALTAR - 1)
-	//							{
-	//								looking_for_three = true;
-	//								k = -1;
-	//								continue;
-	//							}
-	//						}
-	//						else
-	//						{
-	//							if (m_altar_slots[k].m_card.m_value == 3)
-	//							{
-	//								UseAltarCard(k);
-	//								break;
-	//							}
-	//						}
-	//
-	//						if (k == NB_CARDS_ALTAR - 1)
-	//						{
-	//							printf("Insufficient mana %d in Altar to dispell this curse (required: %d).\n", (int)cost.m_type, (int)cost.m_value);
-	//							return Action_None;
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//	//Mana uncolored
-	//	else
-	//	{
-	//
-	//	}
-	//	
-	//}
-	
-
-
-
-	//Get altar mana
-	//bool altar_empty = true;
-	//int mana[NB_MANATYPES] = { 0, 0, 0, 0 };
-	//int mana_left[NB_MANATYPES] = { 0, 0, 0, 0 };
-	//for (int i = 0; i < NB_CARDS_ALTAR; i++)
-	//{
-	//	if (m_altar_slots[i].m_status == CardSlot_Occupied)
-	//	{
-	//		altar_empty = false;
-	//		mana[m_altar_slots[i].m_card.m_type] += m_altar_slots[i].m_card.m_value;
-	//		mana_left[m_altar_slots[i].m_card.m_type] += m_altar_slots[i].m_card.m_value;
-	//	}
-	//}
-	//if (altar_empty)
-	//{
-	//	printf("Altar is empty\n");
-	//	return Action_None;
-	//}
-	//
-	////Get curse cost
-	//int cost[NB_MANATYPES + 1] = { 0, 0, 0, 0, 0 };
-	//for (int i = 0; i < m_monsters.back().m_curses[curse_slot].m_costs.size(); i++)
-	//{
-	//	Card& curse_cost = m_monsters.back().m_curses[curse_slot].m_costs[i];
-	//	cost[curse_cost.m_type] += curse_cost.m_value;
-	//}
-	//
-	////Compare mana and cost
-	//for (int i = 0; i < NB_MANATYPES; i++)
-	//{
-	//	if (mana[i] < cost[i])
-	//	{
-	//		printf("Insufficient mana in Altar to dispell this curse.\n");
-	//		return Action_None;
-	//	}
-	//	else
-	//	{
-	//		mana_left[i] -= cost[i];
-	//	}
-	//}
-	//int incolor_mana = 0;
-	//for (int i = 0; i < NB_MANATYPES; i++)
-	//{
-	//	incolor_mana += mana_left[i];
-	//}
-	//if (incolor_mana < cost[NB_MANATYPES])
-	//{
-	//	printf("Insufficient mana in Altar to dispell this curse.\n");
-	//	return Action_None;
-	//}
-	//
-	////Select optimal mana consumption to match cost automatically
-	//int mana_optim[NB_MANATYPES + 1] = { 0, 0, 0, 0, 0 };
-	//for (int i = 0; i < NB_MANATYPES + 1; i++)
-	//{
-	//	if (cost[i] > 0)
-	//	{
-	//		for (int k = 0; k < NB_CARDS_ALTAR; k++)
-	//		{
-	//			if (m_altar_slots[k].m_status == CardSlot_Occupied && (m_altar_slots[k].m_card.m_type == i || i == NB_MANATYPES) && m_altar_slots[k].m_card.m_value == cost[i])
-	//			{
-	//				mana_optim[i] += cost[i];
-	//
-	//				//discard card
-	//				m_altar_slots[k].m_status = CardSlot_Free;
-	//				m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
-	//				m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
-	//				m_altar_slots[k].m_text.setString("");
-	//				break;
-	//			}
-	//
-	//			for (int j = Mana_3; j > 0; j--)
-	//			{
-	//				if (m_altar_slots[k].m_status == CardSlot_Occupied && (m_altar_slots[k].m_card.m_type == i || i == NB_MANATYPES) && m_altar_slots[k].m_card.m_value == j)//mana 1, then 2, then 3...
-	//				{
-	//					mana_optim[i] += j;
-	//
-	//					//discard card
-	//					m_altar_slots[k].m_status = CardSlot_Free;
-	//					m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
-	//					m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
-	//					m_altar_slots[k].m_text.setString("");
-	//
-	//					//go to next mana_type?
-	//					if (mana_optim[i] >= cost[i])
-	//					{
-	//						//exit loop
-	//						k = NB_CARDS_ALTAR;
-	//						j = 0;
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
 
 	//Dispell
 	m_monster_curses_slots[curse_slot].m_status = CardSlot_Burnt;
@@ -936,16 +977,11 @@ Actions InGameState::AltarAttack(int player_index, int curse_slot)
 	m_monster_curses_descriptions[curse_slot].setColor(sf::Color(128, 128, 128, 255));
 
 	m_altar_slot.m_selected = false;
+	for (int k = 0; k < NB_CARDS_ALTAR; k++)
+	{
+		m_altar_slots[k].m_selected = false;
+	}
 	(*CurrentGame).m_selected_slot = NULL;
-
-	//Clear altar
-	//for (int i = 0; i < NB_CARDS_ALTAR; i++)
-	//{
-	//	m_mages[player_index].m_graveyard.push_back(m_altar_slots[i].m_card);
-	//	m_altar_slots[i].m_status = CardSlot_Free;
-	//	m_altar_slots[i].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
-	//	m_altar_slots[i].m_text.setString("");
-	//}
 	
 	printf("Dispelled curse. New altar: %d, %d, %d, %d. Graveyard size: %d, %d.\n",
 		m_altar_slots[0].m_status == CardSlot_Occupied,
@@ -1225,6 +1261,10 @@ void CardSlot::Update(MouseAction mouse_click)
 	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Hand && (*CurrentGame).m_selected_slot->m_status == CardSlot_Occupied && m_stack == Stack_AltarSlot)
 	{
 		(*CurrentGame).m_play_card_slot = (*CurrentGame).m_selected_slot;
+		(*CurrentGame).m_target_slot = this;
+	}
+	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_AltarSlot && m_stack == Stack_MonsterCurses)
+	{
 		(*CurrentGame).m_target_slot = this;
 	}
 	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Altar && m_stack == Stack_MonsterCurses)
