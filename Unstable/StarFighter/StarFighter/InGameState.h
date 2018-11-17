@@ -26,9 +26,17 @@ class GameObject;
 enum Actions
 {
 	Action_None,
+	Action_ManaSuccess,
 	Action_HandToAltar,
 	Action_AltarToCurse,
 	Action_DrawCard,
+	Action_AltarToBlessing,
+};
+
+enum BlessingType
+{
+	Blessing_Heal,
+	NB_BLESSING_TYPES,
 };
 	
 class Mage
@@ -67,6 +75,20 @@ public:
 	int m_index;
 };
 
+class Blessing
+{
+public:
+	Blessing(BlessingType type, int index);
+	vector<Card> m_costs;
+	string m_display_name;
+	string m_description;
+
+	CardSlotStatus m_status;
+	int m_index;
+
+	BlessingType m_type;
+};
+
 class Monster
 {
 public:
@@ -92,20 +114,27 @@ public:
 	vector<Mage> m_mages;
 	void InitTable();
 	void SummonMonster();
+	void InitBlessings();
 	int GetFreeAltarCardSlot();
 	Actions PlayCard(int player_index, int hand_slot, int altar_slot);
-	Actions AltarAttack(int player_index, int curse_slot);
+	Actions AltarSpendMana(int player_index, CardStack stack, int slot);
 	void UseAltarCard(int index);
 	bool BurnPlayer(int player_index);
+	bool BlessingPlayer(int player_index, BlessingType type);
 
 	vector<Monster> m_monsters;
+	vector<Blessing> m_blessings;
 
 	CardSlot m_altar_slots[NB_CARDS_ALTAR];
 	CardSlot m_altar_slot;
-	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];
 	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX];
+	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];
 	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];
 	SFText m_monster_curses_descriptions[NB_MONSTER_SPELLS_MAX];
+	CardSlot m_blessing_slots[NB_BLESSING_TYPES];
+	CardSlot m_blessing_costs[NB_BLESSING_TYPES][SPELL_NB_COSTS_MAX];
+	SFText m_blessing_names[NB_BLESSING_TYPES];
+	SFText m_blessing_descriptions[NB_BLESSING_TYPES];
 
 	int m_current_player;
 
