@@ -46,7 +46,7 @@ enum ManaType
 {
 	Mana_Fire,		//0
 	Mana_Water,		//1
-	Mana_Air,		//2
+	Mana_Lightning,	//2
 	Mana_Earth,		//3
 	NB_MANATYPES,	//4
 };

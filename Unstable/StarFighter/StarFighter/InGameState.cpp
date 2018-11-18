@@ -49,8 +49,11 @@ void InGameState::Initialize(Player player)
 	SummonMonster();
 
 	//Blessings
-	m_blessings.push_back(Blessing(Blessing_Heal, m_blessings.size()));
-
+	for (int i = 0; i < NB_BLESSING_TYPES; i++)
+	{
+		m_blessings.push_back(Blessing((BlessingType)i, i));
+	}
+	
 	InitBlessings();	
 }
 
@@ -91,8 +94,6 @@ void InGameState::InitBlessings()
 	for (int i = 0; i < m_blessings.size(); i++)
 	{
 		Blessing& blessing = m_blessings[i];
-
-		//blessing.m_status = CardSlot_Occupied;
 
 		m_blessing_names[i].setString(blessing.m_display_name);
 		m_blessing_descriptions[i].setString(blessing.m_description);
@@ -212,7 +213,6 @@ void InGameState::InitTable()
 	}
 
 	//Blessings
-	//Monster curses
 	for (int i = 0; i < NB_BLESSING_TYPES; i++)
 	{
 		m_blessing_names[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -337,6 +337,24 @@ Blessing::Blessing(BlessingType type, int index)
 
 			m_display_name = "Healing";
 			m_description = "Heals a burnt slot in your hand.";
+
+			break;
+		}
+		case Blessing_Draw:
+		{
+			m_costs.push_back(Card((ManaType)NB_MANATYPES, (ManaValue)2, -1));
+
+			m_display_name = "Drawing";
+			m_description = "Draw one card.";
+
+			break;
+		}
+		case Blessing_Telepathy:
+		{
+			m_costs.push_back(Card((ManaType)NB_MANATYPES, (ManaValue)2, -1));
+
+			m_display_name = "Telepathy";
+			m_description = "Pass on your turn to another mage.";
 
 			break;
 		}
@@ -1239,10 +1257,10 @@ void Mage::InitCards()
 	//m_cards.push_back(Card(Mana_Earth, Mana_1, m_index));	//weakness
 	m_cards.push_back(Card(Mana_Earth, Mana_2, m_index));
 
-	m_cards.push_back(Card(Mana_Air, Mana_1, m_index));
-	m_cards.push_back(Card(Mana_Air, Mana_1, m_index));
-	m_cards.push_back(Card(Mana_Air, Mana_1, m_index));
-	m_cards.push_back(Card(Mana_Air, Mana_2, m_index));
+	m_cards.push_back(Card(Mana_Lightning, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Lightning, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Lightning, Mana_1, m_index));
+	m_cards.push_back(Card(Mana_Lightning, Mana_2, m_index));
 
 	for (vector<Card>::iterator it = m_cards.begin(); it < m_cards.end(); it++)
 	{
@@ -1343,9 +1361,9 @@ sf::Color CardSlot::GetManaColor(ManaType type)
 	{
 		return sf::Color(0, 0, 255, 255);
 	}
-	else if (type == Mana_Air)
+	else if (type == Mana_Lightning)
 	{
-		return sf::Color(230, 230, 255, 255);
+		return sf::Color(230, 230, 0, 255);
 	}
 	else if (type == Mana_Earth)
 	{
@@ -1452,6 +1470,16 @@ bool InGameState::BlessingPlayer(int player_index, BlessingType type)
 					return true;
 				}
 			}
+			break;
+		}
+		case Blessing_Draw:
+		{
+			mage.DrawCard();
+			break;
+		}
+		case Blessing_Telepathy:
+		{
+			m_current_player = (m_current_player + 1) % NB_PLAYERS_MAX;
 			break;
 		}
 	}

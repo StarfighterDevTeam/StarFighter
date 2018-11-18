@@ -36,6 +36,8 @@ enum Actions
 enum BlessingType
 {
 	Blessing_Heal,
+	Blessing_Draw,
+	Blessing_Telepathy,
 	NB_BLESSING_TYPES,
 };
 	
