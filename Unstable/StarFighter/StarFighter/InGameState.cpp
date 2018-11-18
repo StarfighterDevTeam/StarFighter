@@ -87,6 +87,19 @@ void InGameState::SummonMonster()
 			m_monster_curses_costs[i][j].m_status = CardSlot_Occupied;
 		}
 	}
+
+	//display monster
+	m_monster_name.setString(monster.m_display_name);
+	int textWidth = m_monster_name.getGlobalBounds().width;
+	m_monster_name.setPosition(sf::Vector2f(m_monster_slot.m_shape.getPosition().x - textWidth * 0.5f, 24));
+
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	string filename;
+	GetMonsterFilename(filename, (int)monster.m_type);
+
+	sf::Texture* texture = loader->getTexture(filename);
+	m_monster_slot.m_shape.setTexture(texture);
 }
 
 void InGameState::InitBlessings()
@@ -104,6 +117,14 @@ void InGameState::InitBlessings()
 			m_blessing_costs[i][j].m_status = CardSlot_Occupied;
 		}
 	}
+}
+
+void InGameState::GetMonsterFilename(string& filename, int monster_type)
+{
+	ostringstream ss;
+	ss << "2D/monster_" << monster_type << ".png";
+	string textureName = ss.str();
+	filename = ss.str();
 }
 
 void InGameState::InitTable()
@@ -158,7 +179,39 @@ void InGameState::InitTable()
 		m_altar_slots[i].m_text.setString("");
 	}
 
-	//Monster curses
+	//Monster
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+
+	for (int i = 0; i < NB_MONSTER_TYPES; i++)
+	{
+		string textureName;
+		GetMonsterFilename(textureName, i);
+		sf::Texture* texture = loader->loadTexture(textureName, MONSTER_WIDTH, MONSTER_HEIGHT);
+	}
+
+	m_monster_name.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_monster_name.setCharacterSize(24);
+	m_monster_name.setColor(sf::Color(255, 255, 255, 255));
+	m_monster_name.setPosition(sf::Vector2f(800, 24));
+	m_monster_name.setString("");
+	
+	m_monster_slot.m_stack = Stack_None;
+
+	m_monster_slot.m_shape_container.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 200));
+	m_monster_slot.m_shape_container.setOrigin(sf::Vector2f(MONSTER_WIDTH * 0.5f, MONSTER_HEIGHT * 0.5f));
+	m_monster_slot.m_shape_container.setSize(sf::Vector2f(MONSTER_WIDTH, MONSTER_HEIGHT));
+	m_monster_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_monster_slot.m_shape_container.setOutlineThickness(2);
+	m_monster_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+	m_monster_slot.m_shape.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 200));
+	m_monster_slot.m_shape.setOrigin(sf::Vector2f(MONSTER_WIDTH * 0.5f, MONSTER_HEIGHT * 0.5f));
+	m_monster_slot.m_shape.setSize(sf::Vector2f(MONSTER_WIDTH, MONSTER_HEIGHT));
+	m_monster_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+	m_monster_slot.m_shape.setOutlineThickness(0);
+	m_monster_slot.m_shape.setTextureRect(sf::IntRect(0, 0, 256, 256));
+
 	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
 	{
 		m_monster_curses_names[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -361,15 +414,58 @@ Blessing::Blessing(BlessingType type, int index)
 	}
 }
 
-Monster::Monster()
+Monster::Monster(MonsterType type)
 {
+	if (type == NB_MONSTER_TYPES)
+	{
+		type = (MonsterType)RandomizeIntBetweenValues(0, NB_MONSTER_TYPES - 1);
+	}
+	m_type = type;
+
+	switch (m_type)
+	{
+		case Monster_Squale:
+			m_display_name = "The Squale";
+			break;
+		case Monster_Kraken:
+			m_display_name = "The Kraken";
+			break;
+		case Monster_Spiky:
+			m_display_name = "The Spiked Demon";
+			break;
+		case Monster_Golem:
+			m_display_name = "Stone Golem";
+			break;
+		case Monster_Ogre:
+			m_display_name = "Axe Ogre";
+			break;
+		case Monster_Yeti:
+			m_display_name = "Snow King";
+			break;
+		case Monster_Blademaster:
+			m_display_name = "The Blademaster";
+			break;
+		case Monster_Wolf:
+			m_display_name = "Night Wolf";
+			break;
+		case Monster_Tatoo:
+			m_display_name = "Armored Tatoo";
+			break;
+		case Monster_Frankenstein:
+			m_display_name = "Frankenstein";
+			break;
+		default:
+			m_display_name = "Unkown";
+			break;
+	}
+
 	//first curses to trigger to last in the vector
-	m_curses.push_back(Curse(5, 3, m_curses.size()));
-	m_curses.push_back(Curse(4, 3, m_curses.size()));
-	m_curses.push_back(Curse(3, 2, m_curses.size()));
-	m_curses.push_back(Curse(3, 2, m_curses.size()));
-	m_curses.push_back(Curse(2, 1, m_curses.size()));
-	m_curses.push_back(Curse(0, 0, m_curses.size()));
+	m_curses.push_back(Curse(5, 3, m_curses.size()));//curse 5
+	m_curses.push_back(Curse(4, 3, m_curses.size()));//curse 4
+	m_curses.push_back(Curse(3, 2, m_curses.size()));//curse 3
+	m_curses.push_back(Curse(3, 2, m_curses.size()));//curse 2
+	m_curses.push_back(Curse(2, 1, m_curses.size()));//curse 1
+	m_curses.push_back(Curse(0, 0, m_curses.size()));//curse 0
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -687,6 +783,10 @@ void InGameState::Draw()
 	}
 
 	//Monster
+	(*CurrentGame).m_mainScreen.draw(m_monster_name);
+	(*CurrentGame).m_mainScreen.draw(m_monster_slot.m_shape);
+	(*CurrentGame).m_mainScreen.draw(m_monster_slot.m_shape_container);
+
 	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
 	{
 		if (m_monster_curses_slots[i].m_status != CardSlot_Free)

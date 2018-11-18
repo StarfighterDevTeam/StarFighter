@@ -18,6 +18,8 @@ class GameObject;
 #define NB_CARDS_ALTAR			4
 #define CARD_WIDTH				32
 #define CARD_HEIGHT				64
+#define MONSTER_WIDTH			256
+#define MONSTER_HEIGHT			256
 #define NB_MONSTER_SPELLS_MAX	6
 #define SPELL_NB_COSTS_MAX		6
 #define NB_MONSTERS				6
@@ -39,6 +41,21 @@ enum BlessingType
 	Blessing_Draw,
 	Blessing_Telepathy,
 	NB_BLESSING_TYPES,
+};
+
+enum MonsterType
+{
+	Monster_Squale,
+	Monster_Kraken,
+	Monster_Spiky,
+	Monster_Golem,
+	Monster_Ogre,
+	Monster_Yeti,
+	Monster_Blademaster,
+	Monster_Wolf,
+	Monster_Tatoo,
+	Monster_Frankenstein,
+	NB_MONSTER_TYPES,
 };
 	
 class Mage
@@ -94,9 +111,11 @@ public:
 class Monster
 {
 public:
-	Monster();
+	Monster(MonsterType type = NB_MONSTER_TYPES);
 
 	vector<Curse> m_curses;// [NB_MONSTER_SPELLS_MAX];
+	MonsterType m_type;
+	string m_display_name;
 };
 
 class InGameState : public GameState
@@ -115,6 +134,7 @@ public:
 
 	vector<Mage> m_mages;
 	void InitTable();
+	void GetMonsterFilename(string& filename, int monster_type);
 	void SummonMonster();
 	void InitBlessings();
 	int GetFreeAltarCardSlot();
@@ -129,6 +149,8 @@ public:
 
 	CardSlot m_altar_slots[NB_CARDS_ALTAR];
 	CardSlot m_altar_slot;
+	CardSlot m_monster_slot;
+	SFText m_monster_name;
 	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX];
 	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];
 	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];
