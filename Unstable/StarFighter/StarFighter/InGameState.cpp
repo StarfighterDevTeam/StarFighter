@@ -329,6 +329,7 @@ Curse::Curse(int cost, int nb_costs, int index)
 	{
 		m_display_name = "No curse";
 		m_description = "";
+		m_status = CardSlot_Free;
 		return;
 	}
 
@@ -556,8 +557,24 @@ void InGameState::Update(sf::Time deltaTime)
 		{
 			//Dispell
 			m_monster_curses_slots[index].m_status = CardSlot_Burnt;
-			m_monster_curses_names[index].setColor(sf::Color(128, 128, 128, 255));
-			m_monster_curses_descriptions[index].setColor(sf::Color(128, 128, 128, 255));
+
+			//int costSize = m_monsters.back().m_curses[index].m_costs.size();
+			//for (int i = 0; i < SPELL_NB_COSTS_MAX; i++)
+			//{
+			//	//m_monster_curses_costs[index]
+			//}
+
+			m_monster_curses_names[index].setString("Curse dispelled");
+			m_monster_curses_names[index].setColor(sf::Color(0, 255, 0, 255));
+
+			m_monster_curses_descriptions[index].setString("Choose a reward before the end of the turn");
+			m_monster_curses_descriptions[index].setColor(sf::Color(0, 255, 0, 255));
+
+			//Reward
+			//for (int i = 0; i < NB_MANATYPES; i++)
+			//{
+			//	
+			//}
 		}
 	}
 	else if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_Blessings)
@@ -963,6 +980,11 @@ Actions InGameState::AltarSpendMana(int player_index, CardStack stack, int slot)
 	{
 		case Stack_MonsterCurses:
 		{
+			if (m_monsters.back().m_curses[slot].m_status == CardSlot_Free)
+			{
+				return Action_None;
+			}
+
 			for (int i = 0; i < m_monsters.back().m_curses[slot].m_costs.size(); i++)
 			{
 				costs.push_back(m_monsters.back().m_curses[slot].m_costs[i]);
