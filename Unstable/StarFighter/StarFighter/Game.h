@@ -94,6 +94,7 @@ enum CardStack
 	Stack_Library,
 	Stack_Graveyard,
 	Stack_MonsterCurses,
+	Stack_MonsterCosts,
 	Stack_Blessings,
 };
 

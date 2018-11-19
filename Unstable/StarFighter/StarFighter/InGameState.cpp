@@ -80,6 +80,10 @@ void InGameState::SummonMonster()
 	{
 		m_monster_curses_names[i].setString(monster.m_curses[i].m_display_name);
 		m_monster_curses_descriptions[i].setString(monster.m_curses[i].m_description);
+		if (monster.m_curses[i].m_costs.empty())
+		{
+			m_monster_curses_names[i].setColor(sf::Color(0, 255, 0, 255));
+		}
 
 		for (int j = 0; j < monster.m_curses[i].m_costs.size(); j++)
 		{
@@ -247,7 +251,7 @@ void InGameState::InitTable()
 		for (int j = 0; j < SPELL_NB_COSTS_MAX; j++)
 		{
 			m_monster_curses_costs[i][j].m_status = CardSlot_Free;
-			m_monster_curses_costs[i][j].m_stack = Stack_None;
+			m_monster_curses_costs[i][j].m_stack = Stack_MonsterCosts;
 			m_monster_curses_costs[i][j].m_index = i;
 
 			m_monster_curses_costs[i][j].m_shape.setPosition(sf::Vector2f(1400 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
@@ -577,7 +581,7 @@ void InGameState::Update(sf::Time deltaTime)
 		{
 			//Dispell
 			m_monster_curses_slots[index].m_status = CardSlot_Burnt;
-			m_monster_curses_slots[index].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+			//m_monster_curses_slots[index].m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 0));
 
 			for (int i = 0; i < SPELL_NB_COSTS_MAX; i++)
 			{
@@ -598,15 +602,36 @@ void InGameState::Update(sf::Time deltaTime)
 			m_monster_curses_names[index].setString("Curse dispelled");
 			m_monster_curses_names[index].setColor(sf::Color(0, 255, 0, 255));
 
-			m_monster_curses_descriptions[index].setString("Choose a reward before the end of the turn");
+			m_monster_curses_descriptions[index].setString("Choose a reward that will go in your graveyard");
 			m_monster_curses_descriptions[index].setColor(sf::Color(0, 255, 0, 255));
-
-			//Reward
-			//for (int i = 0; i < NB_MANATYPES; i++)
-			//{
-			//	
-			//}
 		}
+	}
+	else if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_MonsterCosts)
+	{
+		//get reward
+		m_mages[p].m_graveyard.push_back((*CurrentGame).m_target_slot->m_card);
+
+		//clean rewards
+		int index = (*CurrentGame).m_target_slot->m_index;
+		for (int i = 0; i < NB_MANATYPES; i++)
+		{
+			m_monster_curses_costs[index][i].m_status = CardSlot_Free;
+
+				//m_monster_curses_costs[index][i].m_status = CardSlot_Burnt;
+				//	m_monster_curses_costs[index][i].m_card.m_type = (ManaType)i;
+				//	m_monster_curses_costs[index][i].m_shape.setFillColor(CardSlot::GetManaColor((ManaType)i));
+				//	m_monster_curses_costs[index][i].m_card.m_value = (ManaValue)2;
+				//	m_monster_curses_costs[index][i].m_text.setString(std::to_string(2));
+		}
+
+		m_monster_curses_slots[index].m_status = CardSlot_Occupied;
+		m_monster_curses_descriptions[index].setString("");
+
+		//(*CurrentGame).m_target_slot->m_status = CardSlot_Free;
+		//m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
+		//m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
+		//m_altar_slots[k].m_text.setString("");
+
 	}
 	else if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_Blessings)
 	{
@@ -840,7 +865,10 @@ void InGameState::Draw()
 		if (m_monster_curses_slots[i].m_status != CardSlot_Free)
 		{
 			(*CurrentGame).m_mainScreen.draw(m_monster_curses_slots[i].m_shape);
-			(*CurrentGame).m_mainScreen.draw(m_monster_curses_slots[i].m_shape_container);
+			if (m_monster_curses_slots[i].m_status == CardSlot_Occupied)
+			{
+				(*CurrentGame).m_mainScreen.draw(m_monster_curses_slots[i].m_shape_container);
+			}
 
 			(*CurrentGame).m_mainScreen.draw(m_monster_curses_names[i]);
 			(*CurrentGame).m_mainScreen.draw(m_monster_curses_descriptions[i]);
@@ -1593,6 +1621,10 @@ void CardSlot::Update(MouseAction mouse_click)
 		(*CurrentGame).m_target_slot = this;
 	}
 	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Altar && m_stack == Stack_MonsterCurses)
+	{
+		(*CurrentGame).m_target_slot = this;
+	}
+	else if (m_hovered && mouse_click == Mouse_RightClick && m_stack == Stack_MonsterCosts)
 	{
 		(*CurrentGame).m_target_slot = this;
 	}
