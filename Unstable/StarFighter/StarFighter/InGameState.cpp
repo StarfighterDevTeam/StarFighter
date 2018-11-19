@@ -29,8 +29,14 @@ void InGameState::Initialize(Player player)
 	//(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
 	//BIG BOOK
+	NewGame();
+}
+
+void InGameState::NewGame()
+{
 	InitTable();
 
+	m_mages.clear();
 	for (int i = 0; i < NB_PLAYERS_MAX; i++)
 	{
 		m_mages.push_back(Mage(i));
@@ -39,22 +45,22 @@ void InGameState::Initialize(Player player)
 		m_mages.back().ShuffleLibrary();
 		m_mages.back().DrawCard(5);
 	}
-	
+
 	//Monsters
+	m_monsters.clear();
 	for (int i = 0; i < NB_MONSTERS; i++)
 	{
 		m_monsters.push_back(Monster());
 	}
-
 	SummonMonster();
 
 	//Blessings
+	m_blessings.clear();
 	for (int i = 0; i < NB_BLESSING_TYPES; i++)
 	{
 		m_blessings.push_back(Blessing((BlessingType)i, i));
 	}
-	
-	InitBlessings();	
+	InitBlessings();
 }
 
 void InGameState::SummonMonster()
@@ -520,9 +526,10 @@ void InGameState::Update(sf::Time deltaTime)
 		m_mages[p].m_hand_slots[i].Update((*CurrentGame).m_mouse_click);
 	}
 
-	m_mages[p].m_library_slot.Update((*CurrentGame).m_mouse_click);
-	m_mages[p].m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
-
+	//m_mages[p].m_library_slot.Update((*CurrentGame).m_mouse_click);
+	//m_mages[p].m_graveyard_slot.Update((*CurrentGame).m_mouse_click);
+	m_mages[p].m_end_of_turn.Update((*CurrentGame).m_mouse_click);
+	
 	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
 	{
 		for (int j = 0; j < SPELL_NB_COSTS_MAX; j++)
@@ -581,7 +588,6 @@ void InGameState::Update(sf::Time deltaTime)
 		{
 			//Dispell
 			m_monster_curses_slots[index].m_status = CardSlot_Burnt;
-			//m_monster_curses_slots[index].m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 0));
 
 			for (int i = 0; i < SPELL_NB_COSTS_MAX; i++)
 			{
@@ -616,21 +622,10 @@ void InGameState::Update(sf::Time deltaTime)
 		for (int i = 0; i < NB_MANATYPES; i++)
 		{
 			m_monster_curses_costs[index][i].m_status = CardSlot_Free;
-
-				//m_monster_curses_costs[index][i].m_status = CardSlot_Burnt;
-				//	m_monster_curses_costs[index][i].m_card.m_type = (ManaType)i;
-				//	m_monster_curses_costs[index][i].m_shape.setFillColor(CardSlot::GetManaColor((ManaType)i));
-				//	m_monster_curses_costs[index][i].m_card.m_value = (ManaValue)2;
-				//	m_monster_curses_costs[index][i].m_text.setString(std::to_string(2));
 		}
 
 		m_monster_curses_slots[index].m_status = CardSlot_Occupied;
 		m_monster_curses_descriptions[index].setString("");
-
-		//(*CurrentGame).m_target_slot->m_status = CardSlot_Free;
-		//m_mages[m_altar_slots[k].m_card.m_owner].m_graveyard.push_back(m_altar_slots[k].m_card);
-		//m_altar_slots[k].m_shape.setFillColor(CardSlot::GetStatusColor(CardSlot_Free));
-		//m_altar_slots[k].m_text.setString("");
 
 	}
 	else if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_Blessings)
@@ -648,8 +643,19 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		played = m_mages[p].DrawCard();
 	}
+	else if ((*CurrentGame).m_target_slot != NULL && (*CurrentGame).m_target_slot->m_stack == Stack_EndOfTurn)
+	{
+		if ((*CurrentGame).m_target_slot->m_status != CardSlot_Burnt)
+		{
+			EndOfTurn();
+		}
+		else
+		{
+			NewGame();
+		}
+	}
 
-	//Cards UI update
+	//Cards UI automatic update
 	for (int i = 0; i < NB_PLAYERS_MAX; i++)
 	{
 		m_mages[i].m_library_slot.m_text.setString(to_string((int)m_mages[i].m_libary.size()));
@@ -679,91 +685,105 @@ void InGameState::Update(sf::Time deltaTime)
 		}
 	}
 
-	//End of turn
-	if (played == Action_DrawCard)
-	{
-		p = (m_current_player + 1) % NB_PLAYERS_MAX;
-		m_current_player = p;
-		//m_mages[p].DrawCard();
-
-		//Monster attack
-		if (!m_monsters.empty())
-		{
-			Monster& monster = m_monsters.back();
-			if (!monster.m_curses.empty())
-			{
-				//attack with current curse
-				Curse& curse = monster.m_curses.back();
-				if (m_monster_curses_slots[curse.m_index].m_status == CardSlot_Occupied)
-				{
-					//pick a random player alive
-					vector<int> alive_players;
-					for (int i = 0; i < NB_PLAYERS_MAX; i++)
-					{
-						if (m_mages[i].m_is_alive)
-						{
-							alive_players.push_back(i);
-						}
-					}
-					int r = RandomizeIntBetweenValues(0, alive_players.size() - 1);
-					int index = alive_players[r];
-
-					//Burn the random player
-					BurnPlayer(index);
-				}
-
-				//get rid of current curse and go to next curse
-				m_monster_curses_slots[monster.m_curses.size() - 1].m_status = CardSlot_Free;
-				monster.m_curses.pop_back();
-			}
-
-			//go to next monster if all curses have been used
-			if (monster.m_curses.empty())
-			{
-				m_monsters.pop_back();
-				if (!m_monsters.empty())
-				{
-					SummonMonster();
-				}
-			}
-		}
-	}
-
 	//useless?
 	(*CurrentGame).updateScene(deltaTime);
 
-	//move camera
-	//UpdateCamera(deltaTime);
-	//
-	////Create and destroy HUD panels
-	////case 1: destroying a panel
-	//if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel == SFPanel_None && (*CurrentGame).m_playerShip->m_SFTargetPanel)
-	//{
-	//	DestroySFPanel((*CurrentGame).m_playerShip);
-	//}
-	//else if ((*CurrentGame).m_playerShip->m_is_asking_SFPanel != SFPanel_None)
-	//{
-	//	//case 2: creating a panel
-	//	if (!(*CurrentGame).m_playerShip->m_SFTargetPanel)
-	//	{
-	//		CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
-	//	}
-	//	//case 3: changing panel
-	//	else if ((*CurrentGame).m_playerShip->m_SFTargetPanel->m_panel_type != (*CurrentGame).m_playerShip->m_is_asking_SFPanel)
-	//	{
-	//		DestroySFPanel((*CurrentGame).m_playerShip);
-	//		CreateSFPanel((*CurrentGame).m_playerShip->m_is_asking_SFPanel, (*CurrentGame).m_playerShip);
-	//	}
-	//}
 
 	this->mainWindow->clear();
+}
+
+bool InGameState::AllPlayersDead()
+{
+	bool all_players_dead = true;
+	for (int i = 0; i < NB_PLAYERS_MAX; i++)
+	{
+		if (m_mages[i].m_is_alive)
+		{
+			all_players_dead = false;
+			break;
+		}
+	}
+
+	return all_players_dead;
+}
+
+void InGameState::EndOfTurn()
+{
+	//Reset selection
+	(*CurrentGame).m_selected_slot = NULL;
+
+	//Monster attack
+	if (!m_monsters.empty())
+	{
+		Monster& monster = m_monsters.back();
+		if (!monster.m_curses.empty())
+		{
+			//attack with current curse
+			Curse& curse = monster.m_curses.back();
+			if (m_monster_curses_slots[curse.m_index].m_status == CardSlot_Occupied)
+			{
+				//pick a random player alive
+				vector<int> alive_players;
+				for (int i = 0; i < NB_PLAYERS_MAX; i++)
+				{
+					if (m_mages[i].m_is_alive)
+					{
+						alive_players.push_back(i);
+					}
+				}
+				int r = RandomizeIntBetweenValues(0, alive_players.size() - 1);
+				int index = alive_players[r];
+
+				//Burn the random player
+				BurnPlayer(index);
+			}
+
+			//get rid of current curse and go to next curse
+			m_monster_curses_slots[monster.m_curses.size() - 1].m_status = CardSlot_Free;
+			monster.m_curses.pop_back();
+		}
+
+		//go to next monster if all curses have been used
+		if (monster.m_curses.empty())
+		{
+			m_monsters.pop_back();
+			if (!m_monsters.empty())
+			{
+				SummonMonster();
+			}
+		}
+
+		//setting next turn
+		if (AllPlayersDead() == false)
+		{
+			//pass on turn to next alive player
+			int p = (m_current_player + 1) % NB_PLAYERS_MAX;
+			while (m_mages[p].m_is_alive == false)
+			{
+				p = (p + 1) % NB_PLAYERS_MAX;
+			}
+			m_current_player = p;
+			//draw cards to complete hand
+			int cards_to_draw = NB_CARDS_HAND - m_mages[m_current_player].GetHandCount();
+			m_mages[m_current_player].DrawCard(cards_to_draw);
+		}
+		else
+		{
+			//GAME OVER
+			m_mages[m_current_player].m_end_of_turn.m_text.setString("RESTART NEW GAME");
+			m_mages[m_current_player].m_end_of_turn.m_text.setColor(sf::Color(255, 255, 255, 255));
+			m_mages[m_current_player].m_end_of_turn.m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 3 - m_mages[m_current_player].m_end_of_turn.m_text.getGlobalBounds().width / 2 + m_current_player * 700, m_mages[m_current_player].m_end_of_turn.m_text.getPosition().y));//- 1 for pixel perfection
+			m_mages[m_current_player].m_end_of_turn.m_status = CardSlot_Burnt;
+			//player.m_end_of_turn.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		}
+	}
 }
 
 bool InGameState::BurnPlayer(int player_index)
 {
 	Mage& player = m_mages[player_index];
 
-	//Pick an unburnt card at random
+	//Pick an unburnt card at random. this card slot is going to be burnt.
 	vector<int> clean_cards;
 	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
 	{
@@ -775,33 +795,22 @@ bool InGameState::BurnPlayer(int player_index)
 
 	int r = RandomizeIntBetweenValues(0, clean_cards.size() - 1);
 	int index = clean_cards[r];
+	
 	//Burn card
-
 	player.m_hand_slots[index].m_status = CardSlot_Burnt;
 	player.m_hand_slots[index].m_shape.setFillColor(sf::Color(128, 128, 128, 255));
-
 
 	printf("Monster attack. Burning player %d (slot: %d).\n", player_index, index);
 
 	if (clean_cards.size() == 1)
 	{
 		player.m_is_alive = false;
+		player.m_end_of_turn.m_text.setString("DEAD");
+		player.m_end_of_turn.m_text.setColor(sf::Color(255, 0, 0, 255));
+		player.m_end_of_turn.m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 3 - player.m_end_of_turn.m_text.getGlobalBounds().width / 2 + player_index * 700, player.m_end_of_turn.m_text.getPosition().y));//- 1 for pixel perfection
+		player.m_end_of_turn.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+
 		printf("Player %d is dead.\n", player.m_index);
-
-		bool all_players_dead = true;
-		for (int i = 0; i < NB_PLAYERS_MAX; i++)
-		{
-			if (m_mages[i].m_is_alive)
-			{
-				all_players_dead = false;
-				break;
-			}
-		}
-
-		if (all_players_dead)
-		{
-			printf("GAME OVER !!! All players are dead.\n");
-		}
 
 		return true;
 	}
@@ -838,6 +847,14 @@ void InGameState::Draw()
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_graveyard_slot.m_shape_container);
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_graveyard_slot.m_shape);
 		(*CurrentGame).m_mainScreen.draw(m_mages[p].m_graveyard_slot.m_text);
+
+		//"End turn" button
+		if (m_current_player == p || m_mages[p].m_is_alive == false)
+		{
+			(*CurrentGame).m_mainScreen.draw(m_mages[p].m_end_of_turn.m_shape_container);
+			(*CurrentGame).m_mainScreen.draw(m_mages[p].m_end_of_turn.m_shape);
+			(*CurrentGame).m_mainScreen.draw(m_mages[p].m_end_of_turn.m_text);
+		}
 	}
 	
 	//Altar
@@ -1422,11 +1439,35 @@ void Mage::InitSlots(int player_index)
 	m_graveyard_slot.m_text.setColor(sf::Color(0, 0, 0, 255));
 	m_graveyard_slot.m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 6 + player_index * 700, 1000));
 	m_graveyard_slot.m_text.setString("");
-}
 
+	//End of turn
+	m_end_of_turn.m_stack = Stack_EndOfTurn;
+
+	m_end_of_turn.m_shape_container.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 3 + player_index * 700, 1000));
+	m_end_of_turn.m_shape_container.setOrigin(sf::Vector2f((CARD_WIDTH * 5 + 20 * 4) / 2, CARD_HEIGHT / 2));
+	m_end_of_turn.m_shape_container.setSize(sf::Vector2f(CARD_WIDTH*5 + 20*4, CARD_HEIGHT));
+	m_end_of_turn.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_end_of_turn.m_shape_container.setOutlineThickness(2);
+	m_end_of_turn.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+	m_end_of_turn.m_shape.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 3 + player_index * 700, 1000));
+	m_end_of_turn.m_shape.setOrigin(sf::Vector2f((CARD_WIDTH * 5 + 20 * 4) / 2, CARD_HEIGHT / 2));
+	m_end_of_turn.m_shape.setSize(sf::Vector2f(CARD_WIDTH*5 + 20*4, CARD_HEIGHT));
+	m_end_of_turn.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+	m_end_of_turn.m_shape.setOutlineThickness(0);
+	m_end_of_turn.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+	m_end_of_turn.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_end_of_turn.m_text.setCharacterSize(18);
+	m_end_of_turn.m_text.setColor(sf::Color(255, 255, 255, 255));
+	m_end_of_turn.m_text.setString("END TURN");
+	m_end_of_turn.m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * 3 - m_end_of_turn.m_text.getGlobalBounds().width / 2 + player_index * 700, 1000 - m_end_of_turn.m_text.getCharacterSize() / 2 - 1));//- 1 for pixel perfection
+}
 
 void Mage::InitCards()
 {
+	m_cards.clear();
+
 	m_cards.push_back(Card(Mana_Fire, Mana_1, m_index));
 	m_cards.push_back(Card(Mana_Fire, Mana_1, m_index));
 	//m_cards.push_back(Card(Mana_Fire, Mana_1, m_index));	//weakness
@@ -1447,10 +1488,13 @@ void Mage::InitCards()
 	m_cards.push_back(Card(Mana_Lightning, Mana_1, m_index));
 	m_cards.push_back(Card(Mana_Lightning, Mana_2, m_index));
 
+	m_libary.clear();
 	for (vector<Card>::iterator it = m_cards.begin(); it < m_cards.end(); it++)
 	{
 		m_libary.push_back(*it);
 	}
+
+	m_graveyard.clear();
 }
 
 void Mage::ShuffleLibrary()
@@ -1524,6 +1568,19 @@ int Mage::GetFreeHandCardSlot()
 	return -1;
 }
 
+int Mage::GetHandCount()
+{
+	int count = 0;
+	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
+	{
+		if (m_hand_slots[i].m_status == CardSlot_Occupied)
+		{
+			count++;
+		}
+	}
+
+	return count;
+}
 
 void CardSlot::GetCard(Card& card)
 {
@@ -1640,6 +1697,10 @@ void CardSlot::Update(MouseAction mouse_click)
 	{
 		(*CurrentGame).m_target_slot = this;
 		m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	}
+	else if (m_hovered && mouse_click == Mouse_RightClick && m_stack == Stack_EndOfTurn)
+	{
+		(*CurrentGame).m_target_slot = this;
 	}
 }
 

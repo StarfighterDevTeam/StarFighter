@@ -91,6 +91,7 @@ enum CardStack
 	Stack_Hand,
 	Stack_Altar,
 	Stack_AltarSlot,
+	Stack_EndOfTurn,
 	Stack_Library,
 	Stack_Graveyard,
 	Stack_MonsterCurses,

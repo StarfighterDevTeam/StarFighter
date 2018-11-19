@@ -68,10 +68,12 @@ public:
 	void ShuffleLibrary();
 	Actions DrawCard(int nb_cards = 1);
 	int GetFreeHandCardSlot();
+	int GetHandCount();
 
 	CardSlot m_hand_slots[NB_CARDS_HAND_MAX];
 	CardSlot m_library_slot;
 	CardSlot m_graveyard_slot;
+	CardSlot m_end_of_turn;
 	vector<Card> m_libary;
 	vector<Card> m_graveyard;
 	vector<Card> m_cards;
@@ -143,6 +145,9 @@ public:
 	void UseAltarCard(int index);
 	bool BurnPlayer(int player_index);
 	bool BlessingPlayer(int player_index, BlessingType type);
+	void EndOfTurn();
+	void NewGame();
+	bool AllPlayersDead();
 
 	vector<Monster> m_monsters;
 	vector<Blessing> m_blessings;
