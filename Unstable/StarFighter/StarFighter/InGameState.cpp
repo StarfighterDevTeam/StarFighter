@@ -253,9 +253,16 @@ void InGameState::InitTable()
 			m_monster_curses_costs[i][j].m_shape.setPosition(sf::Vector2f(1400 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
 			m_monster_curses_costs[i][j].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
 			m_monster_curses_costs[i][j].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-			m_monster_curses_costs[i][j].m_shape.setOutlineColor(sf::Color(0, 0, 0, 255));
-			m_monster_curses_costs[i][j].m_shape.setOutlineThickness(2);
+			m_monster_curses_costs[i][j].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+			m_monster_curses_costs[i][j].m_shape.setOutlineThickness(0);
 			m_monster_curses_costs[i][j].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
+
+			m_monster_curses_costs[i][j].m_shape_container.setPosition(sf::Vector2f(1400 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * j, 100 + (CARD_HEIGHT + 70) * i));
+			m_monster_curses_costs[i][j].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
+			m_monster_curses_costs[i][j].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+			m_monster_curses_costs[i][j].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+			m_monster_curses_costs[i][j].m_shape_container.setOutlineThickness(2);
+			m_monster_curses_costs[i][j].m_shape_container.setFillColor(sf::Color(255, 255, 255, 0));
 
 			m_monster_curses_costs[i][j].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 			m_monster_curses_costs[i][j].m_text.setCharacterSize(18);
@@ -514,7 +521,20 @@ void InGameState::Update(sf::Time deltaTime)
 
 	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
 	{
-		m_monster_curses_slots[i].Update((*CurrentGame).m_mouse_click);
+		for (int j = 0; j < SPELL_NB_COSTS_MAX; j++)
+		{
+			if (m_monster_curses_costs[i][j].m_status == CardSlot_Burnt)//costs slot burnt = collect reward
+			{
+				m_monster_curses_costs[i][j].Update((*CurrentGame).m_mouse_click);
+			}
+		}
+	}
+	for (int i = 0; i < NB_MONSTER_SPELLS_MAX; i++)
+	{
+		if (m_monster_curses_slots[i].m_status != CardSlot_Burnt)//curse slot burnt = cannot be dispelled anymore
+		{
+			m_monster_curses_slots[i].Update((*CurrentGame).m_mouse_click);
+		}
 	}
 
 	for (int i = 0; i < NB_BLESSING_TYPES; i++)
@@ -557,12 +577,23 @@ void InGameState::Update(sf::Time deltaTime)
 		{
 			//Dispell
 			m_monster_curses_slots[index].m_status = CardSlot_Burnt;
+			m_monster_curses_slots[index].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 
-			//int costSize = m_monsters.back().m_curses[index].m_costs.size();
-			//for (int i = 0; i < SPELL_NB_COSTS_MAX; i++)
-			//{
-			//	//m_monster_curses_costs[index]
-			//}
+			for (int i = 0; i < SPELL_NB_COSTS_MAX; i++)
+			{
+				if (i < NB_MANATYPES)
+				{
+					m_monster_curses_costs[index][i].m_status = CardSlot_Burnt;
+					m_monster_curses_costs[index][i].m_card.m_type = (ManaType)i;
+					m_monster_curses_costs[index][i].m_shape.setFillColor(CardSlot::GetManaColor((ManaType)i));
+					m_monster_curses_costs[index][i].m_card.m_value = (ManaValue)2;
+					m_monster_curses_costs[index][i].m_text.setString(std::to_string(2));
+				}
+				else
+				{
+					m_monster_curses_costs[index][i].m_status = CardSlot_Free;
+				}
+			}
 
 			m_monster_curses_names[index].setString("Curse dispelled");
 			m_monster_curses_names[index].setColor(sf::Color(0, 255, 0, 255));
@@ -818,6 +849,10 @@ void InGameState::Draw()
 			{
 				if (m_monster_curses_costs[i][j].m_status != CardSlot_Free)
 				{
+					if (m_monster_curses_costs[i][j].m_status == CardSlot_Burnt)
+					{
+						(*CurrentGame).m_mainScreen.draw(m_monster_curses_costs[i][j].m_shape_container);
+					}
 					(*CurrentGame).m_mainScreen.draw(m_monster_curses_costs[i][j].m_shape);
 					(*CurrentGame).m_mainScreen.draw(m_monster_curses_costs[i][j].m_text);
 				}
