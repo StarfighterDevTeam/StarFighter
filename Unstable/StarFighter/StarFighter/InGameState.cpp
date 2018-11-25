@@ -337,10 +337,11 @@ void InGameState::InitTable()
 	}
 }
 
-Curse::Curse(int cost, int nb_costs, int index)
+Curse::Curse(int cost, int nb_costs, int index, CurseType type)
 {
 	m_index = index;
 	m_status = CardSlot_Occupied;
+	m_type = type;
 
 	if (cost == 0 || nb_costs == 0)
 	{
@@ -478,12 +479,12 @@ Monster::Monster(MonsterType type)
 	}
 
 	//first curses to trigger to last in the vector
-	m_curses.push_back(Curse(5, 3, m_curses.size()));//curse 5
-	m_curses.push_back(Curse(4, 3, m_curses.size()));//curse 4
-	m_curses.push_back(Curse(3, 2, m_curses.size()));//curse 3
-	m_curses.push_back(Curse(3, 2, m_curses.size()));//curse 2
-	m_curses.push_back(Curse(2, 1, m_curses.size()));//curse 1
-	m_curses.push_back(Curse(0, 0, m_curses.size()));//curse 0
+	m_curses.push_back(Curse(5, 3, m_curses.size(), Curse_BurnRandomPlayer));//curse 5
+	m_curses.push_back(Curse(4, 3, m_curses.size(), Curse_BurnRandomPlayer));//curse 4
+	m_curses.push_back(Curse(3, 2, m_curses.size(), Curse_BurnRandomPlayer));//curse 3
+	m_curses.push_back(Curse(3, 2, m_curses.size(), Curse_BurnRandomPlayer));//curse 2
+	m_curses.push_back(Curse(2, 1, m_curses.size(), Curse_BurnRandomPlayer));//curse 1
+	m_curses.push_back(Curse(0, 0, m_curses.size(), Curse_NoEffect));//curse 0
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -720,22 +721,33 @@ void InGameState::EndOfTurn()
 		{
 			//attack with current curse
 			Curse& curse = monster.m_curses.back();
-			if (m_monster_curses_slots[curse.m_index].m_status == CardSlot_Occupied)
+			if (m_monster_curses_slots[curse.m_index].m_status == CardSlot_Occupied && m_monster_curses_costs[curse.m_index][0].m_status != CardSlot_Free)
 			{
-				//pick a random player alive
-				vector<int> alive_players;
-				for (int i = 0; i < NB_PLAYERS_MAX; i++)
+				switch (monster.m_curses.back().m_type)
 				{
-					if (m_mages[i].m_is_alive)
+					case Curse_NoEffect:
 					{
-						alive_players.push_back(i);
+						break;
 					}
-				}
-				int r = RandomizeIntBetweenValues(0, alive_players.size() - 1);
-				int index = alive_players[r];
+					case Curse_BurnRandomPlayer:
+					{
+						//pick a random player alive
+						vector<int> alive_players;
+						for (int i = 0; i < NB_PLAYERS_MAX; i++)
+						{
+							if (m_mages[i].m_is_alive)
+							{
+								alive_players.push_back(i);
+							}
+						}
+						int r = RandomizeIntBetweenValues(0, alive_players.size() - 1);
+						int index = alive_players[r];
 
-				//Burn the random player
-				BurnPlayer(index);
+						//Burn the random player
+						BurnPlayer(index);
+						break;
+					}
+				}	
 			}
 
 			//get rid of current curse and go to next curse

@@ -57,6 +57,13 @@ enum MonsterType
 	Monster_Frankenstein,
 	NB_MONSTER_TYPES,
 };
+
+enum CurseType
+{
+	Curse_NoEffect,
+	Curse_BurnRandomPlayer,
+	NB_CURSE_TYPES,
+};
 	
 class Mage
 {
@@ -86,7 +93,7 @@ public:
 class Curse
 {
 public:
-	Curse(int cost, int nb_costs, int index);
+	Curse(int cost, int nb_costs, int index, CurseType type);
 	bool Effect();
 	vector<Card> m_costs;
 	string m_display_name;
@@ -94,6 +101,7 @@ public:
 
 	CardSlotStatus m_status;
 	int m_index;
+	CurseType m_type;
 };
 
 class Blessing
