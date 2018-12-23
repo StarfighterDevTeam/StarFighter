@@ -73,6 +73,91 @@ public:
 	bool m_selected;
 };
 
+//ROBOT
+#define MAX_ROBOT_WEIGHT			25
+
+enum SlotIndex
+{
+	Index_Head,
+	Index_LegL,
+	Index_LegR,
+	Index_FootL,
+	Index_FootR,
+	Index_ShoulderL,
+	Index_ShoulderR,
+	Index_ForearmL,
+	Index_ForearmR,
+	Index_BodyU,
+	Index_BodyM,
+	Index_BodyD,
+	NB_SLOT_INDEX,
+};
+
+enum CrewType
+{
+	Crew_Captain,
+	Crew_Scientist,
+	Crew_Mechanic,
+	Crew_Pilot,
+	Crew_Engineer,
+	Crew_Warrior,
+	Crew_Medic,
+	Crew_Gunner,
+	NB_CREW_TYPES,
+};
+
+enum ModuleType
+{
+	Module_Infirmary,
+	Module_Generator,
+	Module_Sensors,
+	Module_Stabilizers,
+	Module_Head,
+	Module_Radar,
+	Module_Weapon,
+	Module_CrewQuarter,
+	Module_Deflectors,
+	Module_Gadget,
+	NB_MODULE_TYPES,
+};
+enum EquipmentType
+{
+	Equipment_EnergeticWeapon,
+	Equipment_HeavyPlate,
+	Equipment_LightPlate,
+	Equipment_GeneratorBooster,
+	Equipment_CQExtension,
+	Equipment_GadgetJammer,
+	Equipment_WeaponsScope,
+	Equipment_GadgetEMP,
+	NB_EQUIPMENT_TYPES,
+};
+
+enum WeaponType
+{
+	Weapon_Fist,
+	Weapon_Grab,
+	Weapon_Guard,
+	Weapon_BlasterRifle,
+	Weapon_LaserCannon,
+	Weapon_FireSword,
+	Weapon_Hammer,
+	Weapon_Gun,
+	NB_WEAPON_TYPES,
+};
+
+enum SlotType
+{
+	Slot_Head,
+	Slot_Leg,
+	Slot_Foot,
+	Slot_Shoulder,
+	Slot_Forearm,
+	Slot_Body,
+	NB_SLOT_TYPES,
+};
+
+
 struct Game
 {
 public:
