@@ -18,7 +18,7 @@ public:
 	int m_coord_x;
 	int m_coord_y;
 
-	vector<CrewMember> m_crew;
+	vector<CrewMember*> m_crew;//destroyed in class Robot
 	Module* m_module;
 	vector<Equipment*> m_equipments;
 	Weapon* m_weapon;
@@ -34,7 +34,7 @@ public:
 
 	int m_index;
 
-	vector<CrewMember> m_crew;
+	vector<CrewMember*> m_crew;
 	vector<RobotSlot> m_slots;
 
 	bool SetModule(ModuleType type, SlotIndex index);
@@ -67,10 +67,13 @@ public:
 	void DestroySlot(SlotIndex index);
 
 	int GenerateEnergyCells();
-	bool HealCrewMembers();
-	bool RepairModules();
+	int HealCrewMembers();
+	int RepairModules();
 	void UpdateFirePropagation();
 	void UpdateCooldowns();
+	int GetGunnerRangeBonus();
+	int GetWarriorBalanceBonus();
+	bool MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index);
 };
 
 #endif //ROBOT_H_INCLUDED

@@ -35,14 +35,14 @@ Robot::Robot()
 	SetModule(Module_Stabilizers, Index_FootR);
 
 	//Crew members
-	m_crew.push_back(CrewMember(Crew_Captain));//0
-	m_crew.push_back(CrewMember(Crew_Scientist));//1
-	m_crew.push_back(CrewMember(Crew_Mechanic));//2
-	m_crew.push_back(CrewMember(Crew_Pilot));//3
-	m_crew.push_back(CrewMember(Crew_Engineer));//4
-	m_crew.push_back(CrewMember(Crew_Warrior));//5
-	m_crew.push_back(CrewMember(Crew_Medic));//6
-	m_crew.push_back(CrewMember(Crew_Gunner));//7
+	m_crew.push_back(new CrewMember(Crew_Captain));//0
+	m_crew.push_back(new CrewMember(Crew_Scientist));//1
+	m_crew.push_back(new CrewMember(Crew_Mechanic));//2
+	m_crew.push_back(new CrewMember(Crew_Pilot));//3
+	m_crew.push_back(new CrewMember(Crew_Engineer));//4
+	m_crew.push_back(new CrewMember(Crew_Warrior));//5
+	m_crew.push_back(new CrewMember(Crew_Medic));//6
+	m_crew.push_back(new CrewMember(Crew_Gunner));//7
 }
 
 Robot::~Robot()
@@ -50,6 +50,12 @@ Robot::~Robot()
 	for (int k = 0; k < m_slots.size(); k++)
 	{
 		delete m_slots[k].m_module;
+	}
+
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		delete *it;
+		*it = NULL;
 	}
 }
 
@@ -63,7 +69,7 @@ bool Robot::SetCrewMember(CrewType type, SlotIndex index)
 	else
 	{
 		m_slots[index].m_crew.push_back(m_crew[(int)type]);
-		m_crew[(int)type].m_slot_index = index;
+		m_crew[(int)type]->m_slot_index = index;
 
 		m_crew_nb++;
 		return true;
@@ -326,6 +332,13 @@ void Robot::Update()
 		case Phase_CrewMovement:
 		{
 			//todo
+			//pas de délplacement si stunned
+
+			//TEST
+			//if (m_index == 1)
+			//{
+			//	MoveCrewMemberToSlot(m_slots[Index_Head].m_crew.back(), Index_ShoulderR);
+			//}
 
 			m_ready_to_change_phase = true;
 			break;
@@ -335,7 +348,7 @@ void Robot::Update()
 			if (m_shutdown_global == false)
 			{
 				//verifier que le module / equipement utilisé n'est pas détruit
-
+				//verifier que le crew member requis n'est pas stunned - notamment les gadgets requirent un Ingenieur
 
 				//repartition armes que l'on veut utiliser parmi les emplacements weapon mod
 				//+ répartition actions des modules
@@ -422,9 +435,9 @@ int Robot::GenerateEnergyCells()
 		{
 			int cells = 3;
 
-			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+			for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
 			{
-				if ((*it2).m_type == Crew_Scientist)
+				if ((*it2)->m_type == Crew_Scientist && (*it2)->m_stun_counter == 0)//checking if not stunned
 				{
 					cells++;
 				}
@@ -445,93 +458,88 @@ int Robot::GenerateEnergyCells()
 	return energy_cells_generated;
 }
 
-bool Robot::HealCrewMembers()
+int Robot::HealCrewMembers()
 {
-	bool healed = false;
+	int health_healed = 0;
 
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
-		for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)		
-		{
-			int health_missing = (*it2).m_health_max - (*it2).m_health;
+		int health = 0;
 
-			//Infirmary
-			if ((*it).m_module && (*it).m_module->m_type == Module_Infirmary)
+		Module* module = it->m_module;
+		//Infirmary heals 1pv/energy cell
+		if (module != NULL && module->m_type == Module_Infirmary && module->m_is_shutdown == false && module->m_health > 0)
+		{
+			health += module->m_energy_cells;
+		}
+
+		for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+		{
+			//Target of a Medic heals 2pv
+			int health_medic = 0;
+			if ((*it2)->m_is_healed_by_medic)
 			{
-				if (health_missing > 0)
-				{
-					(*it2).m_health++;
-					healed = true;
-				}
+				health_medic = 2;
+				(*it2)->m_is_healed_by_medic = false;
 			}
 
-			//Medic
-			if ((*it2).m_is_healed_by_medic)
+			for (int i = 0; i < health + health_medic; i++)
 			{
-				if (health_missing > 0)
+				if (m_health < m_health_max)
 				{
-					if (health_missing == 1)
-					{
-						(*it2).m_health++;
-					}
-					else
-					{
-						(*it2).m_health += 2;
-					}
-					healed = true;
+					m_health++;
+					health_healed++;
 				}
-
-				(*it2).m_is_healed_by_medic = false;
 			}
 		}
 	}
-
-	return healed;
+			
+	return health_healed;
 }
 
 
-bool Robot::RepairModules()
+int Robot::RepairModules()
 {
-	bool repaired = false;
+	int health_repaired = 0;
 
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
 		Module* module = (*it).m_module;
 		if (module != NULL)
-		{
-			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+		{ 
+			//Repair modules
+			int health = 0;
+			for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
 			{
-				int health_missing = module->m_health_max - module->m_health;
+				health++;
 
-				if (health_missing > 0)
+				//Mechanic passive effect heals +1pv
+				if ((*it2)->m_type == Crew_Mechanic && (*it2)->m_stun_counter == 0)
 				{
-					if ((*it2).m_type != Crew_Mechanic)
-					{
-						module->m_health++;
-					}
-					else
-					{
-						if (health_missing == 1)
-						{
-							module->m_health++;
-						}
-						else
-						{
-							module->m_health += 2;
-						}
-					}
-					repaired = true;
+					health++;
 				}
 			}
 
-			if ((*it).m_crew.empty() == false)
+			for (int i = 0; i < health; i++)
 			{
+				if (module->m_health < module->m_health_max)
+				{
+					module->m_health++;
+					health_repaired++;
+				}
+			}
+
+			//Ends fire and shutdown status
+			if (it->m_crew.empty() == false)
+			{
+				//Ends fire status
 				if (module->m_fire_counter >= 0)
 				{
 					module->m_fire_counter = -1;
 					printf("Fire extinguished.\n");
 				}
 				
+				//Ends shutdown status
 				if (module->m_is_shutdown)
 				{
 					module->m_is_shutdown = false;
@@ -541,7 +549,7 @@ bool Robot::RepairModules()
 		}
 	}
 
-	return repaired;
+	return health_repaired;
 }
 
 
@@ -572,11 +580,11 @@ void Robot::UpdateFirePropagation()
 				}
 
 				//Damage to crew
-				for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+				for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
 				{
-					(*it2).m_health--;
+					(*it2)->m_health--;
 				}
-				(*it).UpdateCrew();
+				it->UpdateCrew();
 				UpdateShudownGlobal();
 			}
 
@@ -631,11 +639,11 @@ void Robot::UpdateCooldowns()
 		}
 
 		//Crew members stunned
-		for (vector<CrewMember>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
+		for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
 		{
-			if (it2->m_stun_counter > 0)
+			if ((*it2)->m_stun_counter > 0)
 			{
-				it2->m_stun_counter--;
+				(*it2)->m_stun_counter--;
 			}
 		}
 	}
@@ -654,14 +662,14 @@ bool Robot::CheckShudownGlobalConditions()
 		//Captain or pilot are alive and not stunned in the head?
 		if (it->m_type == Module_Head)
 		{
-			for (vector<CrewMember>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
+			for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
 			{
-				if (it2->m_type == Crew_Captain && it2->m_health > 0 && it2->m_stun_counter == 0)
+				if ((*it2)->m_type == Crew_Captain && (*it2)->m_health > 0 && (*it2)->m_stun_counter == 0)
 				{
 					return false;
 				}
 
-				if (it2->m_type == Crew_Pilot && it2->m_health > 0 && it2->m_stun_counter == false)
+				if ((*it2)->m_type == Crew_Pilot && (*it2)->m_health > 0 && (*it2)->m_stun_counter == 0)
 				{
 					return false;
 				}
@@ -719,6 +727,98 @@ void Robot::DestroySlot(SlotIndex index)
 			(*it)->m_energy_cells = 0;
 		}
 	}
+}
+
+int Robot::GetGunnerRangeBonus()
+{
+	int gunner_bonus = 0;
+
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		Module* module = it->m_module;
+		if (module != NULL && module->m_type == Module_Weapon)
+		{
+			for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
+			{
+				if ((*it2)->m_type == Crew_Gunner && (*it2)->m_stun_counter == 0)
+				{
+					gunner_bonus++;
+				}
+			}
+		}
+	}	
+
+	return gunner_bonus;
+}
+
+int Robot::GetWarriorBalanceBonus()
+{
+	int warrior_bonus = 0;
+
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		Module* module = it->m_module;
+		if (module != NULL && module->m_type == Module_Weapon)
+		{
+			for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
+			{
+				if ((*it2)->m_type == Crew_Warrior && (*it2)->m_stun_counter == 0)
+				{
+					warrior_bonus += 2;
+				}
+			}
+		}
+	}
+
+	return warrior_bonus;
+}
+
+bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
+{
+	RobotSlot& current_slot = m_slots[crew->m_slot_index];
+	RobotSlot& target_slot = m_slots[target_index];
+
+	int distance = abs(current_slot.m_coord_x - target_slot.m_coord_x) + abs(current_slot.m_coord_y - target_slot.m_coord_y);
+
+	if (target_index == crew->m_slot_index)
+	{
+		printf("Move cancelled: crew member is already on this position.\n");
+		return false;
+	}
+	else if (crew->m_stun_counter > 0)
+	{
+		printf("Cannot move crew member because he's stunned.\n");
+		return false;
+	}
+	else if (distance > crew->m_steps)
+	{
+		printf("Cannot move crew member to slot %d because the distance to cross (%d) exceeds his movement ability (%d)\n", (int)target_index, distance, crew->m_steps);
+		return false;
+	}
+
+	//Movement
+	vector<CrewMember*> old_crew;
+	for (vector<CrewMember*>::iterator it = current_slot.m_crew.begin(); it != current_slot.m_crew.end(); it++)
+	{
+		old_crew.push_back(*it);
+	}
+
+	current_slot.m_crew.clear();
+
+	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+	{
+		if (*it != crew)
+		{
+			current_slot.m_crew.push_back(*it);
+		}
+	}
+
+	target_slot.m_crew.push_back(crew);
+	crew->m_slot_index = current_slot.m_index;
+
+	printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
+
+	return true;
 }
 
 //ROBOT SLOT
@@ -831,24 +931,24 @@ RobotSlot::RobotSlot(SlotIndex index)
 
 void RobotSlot::UpdateCrew()
 {
-	vector<CrewMember> old_crew;
-	for (vector<CrewMember>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	vector<CrewMember*> old_crew;
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
 	{
 		old_crew.push_back(*it);
 	}
 
 	m_crew.clear();
 
-	for (vector<CrewMember>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
 	{
-		if ((*it).m_health > 0)
+		if ((*it)->m_health > 0)
 		{
 			m_crew.push_back(*it);
 		}
 		else
 		{
 			printf("Crew member dead.\n");
-			if ((*it).m_type == Crew_Captain)
+			if ((*it)->m_type == Crew_Captain)
 			{
 				printf("Captain was killed. GAME OVER.\n");
 			}

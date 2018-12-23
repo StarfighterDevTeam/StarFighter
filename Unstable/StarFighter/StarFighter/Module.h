@@ -19,9 +19,9 @@ public:
 	int m_size;
 	bool m_unique;
 	int m_cooldown;
-	int m_cooldown_timer;
+	int m_cooldown_timer;//ready when cooldown_timer = cooldown. Increasing every turn.
 	int m_crew_max;
-	int m_fire_counter;
+	int m_fire_counter;//-1: not burning; 0= burning and ready to propagate; 1= burning but not propagating
 	bool m_is_shutdown;
 };
 

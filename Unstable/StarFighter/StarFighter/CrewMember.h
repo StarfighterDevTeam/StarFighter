@@ -13,7 +13,7 @@ public:
 	int m_health;
 	int m_steps;
 	SlotIndex m_slot_index;
-	int m_stun_counter;
+	int m_stun_counter;//0= not stunned; 1= stunned
 	bool m_is_healed_by_medic;
 
 	void Update();

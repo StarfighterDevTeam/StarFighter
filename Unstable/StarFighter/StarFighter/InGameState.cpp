@@ -475,14 +475,18 @@ void InGameState::AttackResolutions()
 			}
 
 			//Randomization of resolutions
-			//Melee weapons always hit. Ranged weapon have a -1 malus on chances to hit if aiming at the head
-			bool hit_success = weapon->m_ranged == false || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + (target_slot.m_type == Slot_Head ? 1 : 0) ? true : false;
+			int gunner_bonus = robot.GetGunnerRangeBonus();
+			bool hit_success = weapon->m_ranged == false || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
+			
 			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
+			
 			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
-			bool unbalance_success = attack->m_chance_of_unbalance > 0 && attack->GetUnbalanceScore() > opponent.GetBalance();
+			
+			int warrior_bonus = robot.GetWarriorBalanceBonus();
+			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent.GetBalance();
 
 			vector<bool> stun_success;
-			for (vector<CrewMember>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+			for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
 			{
 				bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
 				stun_success.push_back(stun_roll);
@@ -606,7 +610,7 @@ void InGameState::AttackResolutions()
 				//Randomization of damage to crew
 				if (module_damaged)
 				{
-					for (vector<CrewMember>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+					for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
 					{
 						bool hit_roll = RandomizeIntBetweenValues(1, 6) >= 4;
 						crew_hit_success.push_back(hit_roll);
@@ -632,7 +636,7 @@ void InGameState::AttackResolutions()
 			{
 				if ((*it) == true)
 				{
-					target_slot.m_crew[i].m_stun_counter = 2;
+					target_slot.m_crew[i]->m_stun_counter = 2;
 				}
 				i++;
 			}
@@ -643,7 +647,7 @@ void InGameState::AttackResolutions()
 			{
 				if ((*it) == true)
 				{
-					target_slot.m_crew[j].m_health--;
+					target_slot.m_crew[j]->m_health--;
 				}
 				j++;
 			}
@@ -666,7 +670,6 @@ void InGameState::AttackResolutions()
 			//Distance update
 			(*CurrentGame).m_distance_temp = ranged ? Distance_Ranged : Distance_Close;
 		}
-
 	}
 
 	//UI update
