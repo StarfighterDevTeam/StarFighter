@@ -42,34 +42,6 @@ enum FontsStyle
 using namespace sf;
 
 
-enum ManaType
-{
-	Mana_Fire,		//0
-	Mana_Water,		//1
-	Mana_Lightning,	//2
-	Mana_Earth,		//3
-	NB_MANATYPES,	//4
-};
-
-enum ManaValue
-{
-	Mana_0,		//0
-	Mana_1,		//1
-	Mana_2,		//2
-	Mana_3,		//3
-};
-
-class Card
-{
-public:
-	Card(){};
-	Card(ManaType type, ManaValue value, int owner) { m_type = type; m_value = value; m_owner = owner; }
-
-	ManaType m_type;
-	ManaValue m_value;
-	int m_owner;
-};
-
 enum CardSlotStatus
 {
 	CardSlot_Free,		//0
@@ -85,31 +57,12 @@ enum MouseAction
 	Mouse_RightClick,
 };
 
-enum CardStack
-{
-	Stack_None,
-	Stack_Hand,
-	Stack_Altar,
-	Stack_AltarSlot,
-	Stack_EndOfTurn,
-	Stack_Library,
-	Stack_Graveyard,
-	Stack_MonsterCurses,
-	Stack_MonsterCosts,
-	Stack_Blessings,
-};
-
 class CardSlot
 {
 public:
 	CardSlot(){ m_status = CardSlot_Free; m_hovered = false; m_selected = false; }
 	CardSlotStatus m_status;
-	Card m_card;
-	CardStack m_stack;
 	int m_index;
-	void GetCard(Card& card);
-	static sf::Color GetManaColor(ManaType type);
-	static sf::Color GetStatusColor(CardSlotStatus status);
 	void Update(MouseAction mouse_click);
 
 	RectangleShape m_shape_container;

@@ -12,121 +12,219 @@
 
 class GameObject;
 
+#define MAX_ROBOT_WEIGHT			25
 
-#define NB_CARDS_HAND			5
-#define NB_CARDS_HAND_MAX		7
-#define NB_CARDS_ALTAR			4
-#define CARD_WIDTH				32
-#define CARD_HEIGHT				64
-#define MONSTER_WIDTH			256
-#define MONSTER_HEIGHT			256
-#define NB_MONSTER_SPELLS_MAX	6
-#define SPELL_NB_COSTS_MAX		6
-#define NB_MONSTERS				6
-#define NB_PLAYERS_MAX			2
 
-enum Actions
+enum SlotIndex
 {
-	Action_None,
-	Action_ManaSuccess,
-	Action_HandToAltar,
-	Action_AltarToCurse,
-	Action_DrawCard,
-	Action_AltarToBlessing,
+	Index_Head,
+	Index_LegL,
+	Index_LegR,
+	Index_FootL,
+	Index_FootR,
+	Index_ShoulderL,
+	Index_ShoulderR,
+	Index_ForearmL,
+	Index_ForearmR,
+	Index_BodyU,
+	Index_BodyM,
+	Index_BodyD,
+	NB_SLOT_INDEX,
 };
 
-enum BlessingType
+enum CrewType
 {
-	Blessing_Heal,
-	Blessing_Draw,
-	Blessing_Telepathy,
-	NB_BLESSING_TYPES,
+	Crew_Captain,
+	Crew_Scientist,
+	Crew_Mechanic,
+	Crew_Pilot,
+	Crew_Engineer,
+	Crew_Warrior,
+	Crew_Medic,
+	Crew_Gunner,
+	NB_CREW_TYPES,
 };
 
-enum MonsterType
+class CrewMember
 {
-	Monster_Squale,
-	Monster_Kraken,
-	Monster_Spiky,
-	Monster_Golem,
-	Monster_Ogre,
-	Monster_Yeti,
-	Monster_Blademaster,
-	Monster_Wolf,
-	Monster_Tatoo,
-	Monster_Frankenstein,
-	NB_MONSTER_TYPES,
+public:
+	CrewMember(CrewType type);
+
+	CrewType m_type;
+	int m_health_max;
+	int m_health;
+	int m_steps;
+	SlotIndex m_slot_index;
+
+	void Update();
 };
 
-enum CurseType
+enum ModuleType
 {
-	Curse_NoEffect,
-	Curse_BurnRandomPlayer,
-	NB_CURSE_TYPES,
+	Module_Infirmary,
+	Module_Generator,
+	Module_Sensors,
+	Module_Stabilizers,
+	Module_Head,
+	Module_Radar,
+	Module_Weapon,
+	Module_CrewQuarter,
+	Module_Deflectors,
+	Module_Gadget,
+	NB_MODULE_TYPES,
 };
+
+class Module
+{
+public:
+	Module(ModuleType type);
+
+	ModuleType m_type;
+
+	int m_health;
+	int m_health_max;
+	int m_weight;
+	int m_cells;
+	int m_cells_max;
+	int m_size;
+	bool m_unique;
+	int m_cooldown;
+	int m_cooldown_timer;
+	int m_crew_max;
+};
+
+enum EquipmentType
+{
+	Equipment_EnergeticWeapon,
+	Equipment_HeavyPlate,
+	Equipment_LightPlate,
+	Equipment_GeneratorBooster,
+	Equipment_CQExtension,
+	Equipment_GadgetJammer,
+	Equipment_WeaponsScope,
+	Equipment_GadgetEMP,
+	NB_EQUIPMENT_TYPES,
+};
+
+class Equipment
+{
+public:
+	Equipment(EquipmentType type);
+
+	EquipmentType m_type;
+	ModuleType m_module_equipable;
+
+	int m_health;
+	int m_health_max;
+	int m_weight;
+	int m_cells;
+	int m_cells_max;
+	int m_size;
+	bool m_unique;
+	int m_cooldown;
+	int m_cooldown_timer;
+	int m_crew_max;
+};
+
+enum WeaponType
+{
+	Weapon_Fist,
+	Weapon_Grab,
+	Weapon_Guard,
+	Weapon_BlasterRifle,
+	Weapon_LaserCannon,
+	Weapon_FireSword,
+	Weapon_Hammer,
+	Weapon_Gun,
+	NB_WEAPON_TYPES,
+};
+
+class WeaponAttack
+{
+public:
+	WeaponAttack();
+	int m_speed;
+	int m_damage;
+	int m_energy_cost;
+	int m_chance_of_hit;
+	int m_chance_of_fire;
+	int m_chance_of_electricity;
+	int m_chance_of_stun;
+	int m_balance;
+	CrewType m_crew_required;
+};
+
+class Weapon
+{
+public:
+	Weapon(WeaponType type);
+
+	WeaponType m_type;
+
+	vector<WeaponAttack> m_attacks;
+
+	int m_weight;
+	bool m_energetic;
+	bool m_ranged;
+};
+
+enum SlotType
+{
+	Slot_Head,
+	Slot_Leg,
+	Slot_Foot,
+	Slot_Shoulder,
+	Slot_Forearm,
+	Slot_Body,
+	NB_SLOT_TYPES,
+};
+
+class RobotSlot
+{
+public:
+	RobotSlot(SlotType type, int size, SlotIndex index){ m_size = size; m_type = type; m_index = index; m_module = NULL; m_weapon = NULL; };
+
+	int m_size;
+	SlotType m_type;
+	SlotIndex m_index;
+
+	vector<CrewMember> m_crew;
+	Module* m_module;
+	vector<Equipment*> m_equipments;
+	Weapon* m_weapon;
+};
+
+
+class Robot
+{
+public:
+	Robot();
+	~Robot();
+
+	vector<CrewMember> m_crew;
+	vector<RobotSlot> m_slots;
+
+	bool SetModule(ModuleType type, SlotIndex index);
+	bool SetEquipment(EquipmentType type, SlotIndex index);
+	bool SetCrewMember(CrewType type, SlotIndex index);
+	bool SetWeapon(WeaponType type, SlotIndex index);
+
+	int m_health;
+	int m_health_max;
+	int GetHealthMax();
+	int m_weight;
+	int m_crew_max;
+	int m_crew_nb;
+	int GetCrewMax();
+	int m_balance;
+	int m_balance_bonus;
+	int m_attack_speed_bonus;
+	void GetWeightModifiers(int &balance_bonus, int &attack_speed_bonus);
 	
-class Mage
-{
-public:
-	Mage(int index){ m_timer = 0.f; for (int i = 0; i < NB_CARDS_HAND_MAX; i++) { m_hand_slots[i].m_status = CardSlot_Free; m_index = index; m_is_alive = true; } };
-
-	void InitSlots(int player_index);
-	void InitCards();
-	void ShuffleLibrary();
-	Actions DrawCard(int nb_cards = 1);
-	int GetFreeHandCardSlot();
-	int GetHandCount();
-
-	CardSlot m_hand_slots[NB_CARDS_HAND_MAX];
-	CardSlot m_library_slot;
-	CardSlot m_graveyard_slot;
-	CardSlot m_end_of_turn;
-	vector<Card> m_libary;
-	vector<Card> m_graveyard;
-	vector<Card> m_cards;
-
-	float m_timer;
-	int m_index;
-	bool m_is_alive;
+	void Initialize();
+	void Update();
 };
 
-class Curse
-{
-public:
-	Curse(int cost, int nb_costs, int index, CurseType type);
-	bool Effect();
-	vector<Card> m_costs;
-	string m_display_name;
-	string m_description;
-
-	CardSlotStatus m_status;
-	int m_index;
-	CurseType m_type;
-};
-
-class Blessing
-{
-public:
-	Blessing(BlessingType type, int index);
-	vector<Card> m_costs;
-	string m_display_name;
-	string m_description;
-
-	CardSlotStatus m_status;
-	int m_index;
-
-	BlessingType m_type;
-};
-
-class Monster
-{
-public:
-	Monster(MonsterType type = NB_MONSTER_TYPES);
-
-	vector<Curse> m_curses;// [NB_MONSTER_SPELLS_MAX];
-	MonsterType m_type;
-	string m_display_name;
-};
 
 class InGameState : public GameState
 {
@@ -142,38 +240,10 @@ public:
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFile(string scenes_file);
 
-	vector<Mage> m_mages;
-	void InitTable();
-	void GetMonsterFilename(string& filename, int monster_type);
-	void SummonMonster();
-	void InitBlessings();
-	int GetFreeAltarCardSlot();
-	Actions PlayCard(int player_index, int hand_slot, int altar_slot);
-	Actions AltarSpendMana(int player_index, CardStack stack, int slot);
-	void UseAltarCard(int index);
-	bool BurnPlayer(int player_index);
-	bool BlessingPlayer(int player_index, BlessingType type);
-	void EndOfTurn();
-	void NewGame();
-	bool AllPlayersDead();
+	//ROBOT
+	Robot m_robots[2];
 
-	vector<Monster> m_monsters;
-	vector<Blessing> m_blessings;
-
-	CardSlot m_altar_slots[NB_CARDS_ALTAR];
-	CardSlot m_altar_slot;
-	CardSlot m_monster_slot;
-	SFText m_monster_name;
-	CardSlot m_monster_curses_slots[NB_MONSTER_SPELLS_MAX];
-	CardSlot m_monster_curses_costs[NB_MONSTER_SPELLS_MAX][SPELL_NB_COSTS_MAX];
-	SFText m_monster_curses_names[NB_MONSTER_SPELLS_MAX];
-	SFText m_monster_curses_descriptions[NB_MONSTER_SPELLS_MAX];
-	CardSlot m_blessing_slots[NB_BLESSING_TYPES];
-	CardSlot m_blessing_costs[NB_BLESSING_TYPES][SPELL_NB_COSTS_MAX];
-	SFText m_blessing_names[NB_BLESSING_TYPES];
-	SFText m_blessing_descriptions[NB_BLESSING_TYPES];
-
-	int m_current_player;
+	void InitRobots();
 
 private:
 	sf::RenderWindow* mainWindow;
