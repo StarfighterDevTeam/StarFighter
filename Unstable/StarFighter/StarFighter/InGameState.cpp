@@ -67,6 +67,7 @@ void InGameState::InitRobots()
 	robot.SetModule(Module_Weapon, Index_ShoulderR);
 	robot.SetEquipment(Equipment_WeaponsScope, Index_ShoulderR);
 
+	robot.SetCrewMember(Crew_Captain, Index_Head);
 	robot.SetCrewMember(Crew_Pilot, Index_Head);
 	robot.SetCrewMember(Crew_Mechanic, Index_BodyM);
 	robot.SetCrewMember(Crew_Scientist, Index_LegR);
@@ -112,6 +113,7 @@ void InGameState::InitRobots()
 	robot.SetModule(Module_Weapon, Index_ForearmR);
 	robot.SetEquipment(Equipment_EnergeticWeapon, Index_ForearmR);
 
+	robot.SetCrewMember(Crew_Captain, Index_Head);
 	robot.SetCrewMember(Crew_Pilot, Index_Head);
 	robot.SetCrewMember(Crew_Medic, Index_BodyU);
 	robot.SetCrewMember(Crew_Scientist, Index_BodyU);
@@ -216,7 +218,7 @@ void InGameState::Update(sf::Time deltaTime)
 	//ROBOT
 	m_robots[0].Update();
 	m_robots[1].Update();
-	if ((*CurrentGame).m_phase >= Phase_AttackResolution_1 && (*CurrentGame).m_phase <= Phase_AttackResolution_10)
+	if ((*CurrentGame).m_phase <= Phase_AttackResolution_12 && (*CurrentGame).m_phase >= Phase_AttackResolution_1)
 	{
 		AttackResolutions();
 	}
@@ -427,34 +429,72 @@ void CardSlot::Update(MouseAction mouse_click)
 void InGameState::AttackResolutions()
 {
 	int speed = (int)((*CurrentGame).m_phase) - (int)(Phase_AttackResolution_1) + 1;
+	bool ranged = true;
 
 	//Resolve actions
+	if ((*CurrentGame).m_actions_list[speed].empty() == false)
+	{
+		printf("Resolution of attack speed %d.\n", speed);
+	}
+
 	for (vector<Action>::iterator it = (*CurrentGame).m_actions_list[speed].begin(); it != (*CurrentGame).m_actions_list[speed].end(); it++)
 	{
-		//Weapons
 		Robot& robot = m_robots[(*it).m_robot_index];
 		Robot& opponent = m_robots[(*it).m_robot_index + 1 % 2];
 
 		Module* module = robot.m_slots[(*it).m_slot_index].m_module;
-		Module* target_module = opponent.m_slots[(*it).m_target_index].m_module;
 
-		if (module->m_type == Module_Weapon)
+		RobotSlot& target_slot = opponent.m_slots[(*it).m_target_index];
+		Module* target_module = target_slot.m_module;
+
+		if (module->m_health == 0)
+		{
+			printf("Module cannot be used because it's been destroyed.\n");
+		}
+		else if (module->m_is_shutdown == true)
+		{
+			printf("Module cannot be used because it's been shut down.\n");
+		}
+		else if (robot.m_unbalanced == true)
+		{
+			printf("Module cannot be used because robot is unbalanced.\n");
+		}
+		else if (robot.m_shutdown_global == true)
+		{
+			printf("Module cannot be used because robot is undergoing a global shutdown.\n");
+		}
+		else if (module->m_type == Module_Weapon)//Weapons
 		{
 			Weapon* weapon = robot.m_slots[(*it).m_slot_index].m_weapon;
 			WeaponAttack* attack = robot.m_slots[(*it).m_slot_index].m_weapon->m_attack_selected;
 
+			//if there are both a ranged and a close-combat weapon on this attack speed, the close-combat is prioritary to determine the position at the end of the turn
+			if (weapon->m_ranged == false)
+			{
+				ranged = false;
+			}
+
 			//Randomization of resolutions
 			//Melee weapons always hit. Ranged weapon have a -1 malus on chances to hit if aiming at the head
-			bool hit_success = weapon->m_ranged == false || (RandomizeIntBetweenValues(1, 6) - (target_module->m_type == Module_Head ? 1 : 0)) >= attack->m_chance_of_hit ? true : false;
-			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire ? true : false;
-			bool stun_success = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun ? true : false;
+			bool hit_success = weapon->m_ranged == false || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + (target_slot.m_type == Slot_Head ? 1 : 0) ? true : false;
+			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
+			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
 			bool unbalance_success = attack->m_chance_of_unbalance > 0 && attack->GetUnbalanceScore() > opponent.GetBalance();
 
+			vector<bool> stun_success;
+			for (vector<CrewMember>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+			{
+				bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
+				stun_success.push_back(stun_roll);
+			}
+			vector<bool> crew_hit_success;
+			
 			//Hit resolution
 			if (hit_success)
 			{
 				int damage = attack->m_damage;
-				
+				bool module_damaged = false;
+
 				//Energetical damage
 				if (weapon->m_energetic)
 				{
@@ -471,7 +511,7 @@ void InGameState::AttackResolutions()
 									(*it).m_module->m_health -= damage;
 									damage = 0;
 								}
-								else //damage overkill
+								else 
 								{
 									(*it).m_module->m_health = 0;
 									damage -= (*it).m_module->m_health;
@@ -480,59 +520,135 @@ void InGameState::AttackResolutions()
 						}
 					}
 
-					//Applying damage directly to target module
+					//Damage to target module
 					if (damage > 0)
 					{
-						if (target_module->m_health > damage)
+						if (target_module != NULL)
 						{
-							target_module->m_health -= damage;
-						}
-						else
-						{
-							target_module->m_health = 0;
+							module_damaged = true;
+							if (target_module->m_health > damage)
+							{
+								target_module->m_health -= damage;
+							}
+							else
+							{
+								target_module->m_health = 0;
+							}
 						}
 					}
 				}
 				else //Physical damage
 				{
-					for (vector<RobotSlot>::iterator it = opponent.m_slots.begin(); it != opponent.m_slots.end(); it++)
+					if (target_module != NULL)
 					{
-						for (vector<Equipment*>::iterator it2 = (*it).m_equipments.begin(); it2 != (*it).m_equipments.end(); it2++)
-							if ((*it2)->m_type == Equipment_LightPlate || (*it2)->m_type == Equipment_HeavyPlate)
+						//Plate absorption (equipement of the target module)
+						for (vector<Equipment*>::iterator it = target_slot.m_equipments.begin(); it != target_slot.m_equipments.end(); it++)
+						{
+							if ((*it)->m_type == Equipment_LightPlate || (*it)->m_type == Equipment_HeavyPlate)
 							{
-								if ((*it2)->m_health > 0)
+								if ((*it)->m_health > 0)
 								{
 									//Damage absorbed
-									if ((*it2)->m_health >= damage)
+									if ((*it)->m_health >= damage)
 									{
-										(*it2)->m_health -= damage;
+										(*it)->m_health -= damage;
 										damage = 0;
 									}
-									else //damage overkill
+									else
 									{
-										(*it2)->m_health = 0;
-										damage -= (*it2)->m_health;
+										(*it)->m_health = 0;
+										damage -= (*it)->m_health;
 									}
 								}
 							}
+						}
+
+						//Damage to module
+						if (damage > 0)
+						{
+							module_damaged = true;
+							if (target_module->m_health > damage)
+							{
+								target_module->m_health -= damage;
+							}
+							else
+							{
+								target_module->m_health = 0;
+							}
+						}
+					}
+				}
+
+				//Randomization of damage to crew
+				if (module_damaged)
+				{
+					for (vector<CrewMember>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+					{
+						bool hit_roll = RandomizeIntBetweenValues(1, 6) >= 4;
+						crew_hit_success.push_back(hit_roll);
 					}
 				}
 			}
 			
 			//Fire resolution
-
+			if (fire_success && target_module != NULL)
+			{
+				target_module->m_is_burning = true;
+			}
 
 			//Electric resolution
-
+			if (electricity_sucess && target_module != NULL)
+			{
+				target_module->m_is_shutdown = true;
+			}
 
 			//Stun resolution
+			int i = 0;
+			for (vector<bool>::iterator it = stun_success.begin(); it != stun_success.end(); it++)
+			{
+				if ((*it) == true)
+				{
+					target_slot.m_crew[i].m_is_stunned = true;
+				}
+				i++;
+			}
 
+			//Damage to crew resolution
+			int j = 0;
+			for (vector<bool>::iterator it = crew_hit_success.begin(); it != crew_hit_success.end(); it++)
+			{
+				if ((*it) == true)
+				{
+					target_slot.m_crew[j].m_health--;
+				}
+				j++;
+			}
+			//Death of crew member?
+			target_slot.UpdateCrew();
+
+			//Balance resolution
+			if (unbalance_success)
+			{
+				if (opponent.m_unbalanced == false)
+				{
+					opponent.m_unbalanced = true;
+					printf("Robot %d gets unbalanced.\n", opponent.m_index);
+				}
+			}
+
+			//Check global shutdown conditions
+			opponent.UpdateShudownGlobal();
 
 			//Distance update
-			(*CurrentGame).m_distance_temp = weapon->m_ranged ? Distance_Ranged : Distance_Close;
+			(*CurrentGame).m_distance_temp = ranged ? Distance_Ranged : Distance_Close;
 		}
-		//Other modules
 
+	}
+
+	//UI update
+	if ((*CurrentGame).m_actions_list[speed].empty() == false)
+	{
+		//do something
 	}
 
 	//Updating placement (depends on the last attack of the turn)

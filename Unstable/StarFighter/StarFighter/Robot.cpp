@@ -8,29 +8,25 @@ Robot::Robot()
 	m_weight = 0;
 	m_crew_nb = 0;
 	m_crew_max = 0;
-	m_cells = 0;
+	m_energy_cells = 0;
 	m_unbalanced = false;
+	m_shutdown_global = false;
 
 	m_ready_to_change_phase = false;
 
 	//Robot slots
-	m_slots.push_back(RobotSlot(Slot_Head, 1, Index_Head));//0
-
-	m_slots.push_back(RobotSlot(Slot_Leg, 2, Index_LegL));//1
-	m_slots.push_back(RobotSlot(Slot_Leg, 2, Index_LegR));//2
-
-	m_slots.push_back(RobotSlot(Slot_Foot, 2, Index_FootL));//3
-	m_slots.push_back(RobotSlot(Slot_Foot, 2, Index_FootR));//4
-
-	m_slots.push_back(RobotSlot(Slot_Shoulder, 2, Index_ShoulderL));//5
-	m_slots.push_back(RobotSlot(Slot_Shoulder, 2, Index_ShoulderR));//6
-
-	m_slots.push_back(RobotSlot(Slot_Forearm, 2, Index_ForearmL));//7
-	m_slots.push_back(RobotSlot(Slot_Forearm, 2, Index_ForearmR));//8
-
-	m_slots.push_back(RobotSlot(Slot_Body, 3, Index_BodyU));//9
-	m_slots.push_back(RobotSlot(Slot_Body, 3, Index_BodyM));//10
-	m_slots.push_back(RobotSlot(Slot_Body, 2, Index_BodyD));//11
+	m_slots.push_back(RobotSlot(Index_Head));//0
+	m_slots.push_back(RobotSlot(Index_LegL));//1
+	m_slots.push_back(RobotSlot(Index_LegR));//2
+	m_slots.push_back(RobotSlot(Index_FootL));//3
+	m_slots.push_back(RobotSlot(Index_FootR));//4
+	m_slots.push_back(RobotSlot(Index_ShoulderL));//5
+	m_slots.push_back(RobotSlot(Index_ShoulderR));//6
+	m_slots.push_back(RobotSlot(Index_ForearmL));//7
+	m_slots.push_back(RobotSlot(Index_ForearmR));//8
+	m_slots.push_back(RobotSlot(Index_BodyU));//9
+	m_slots.push_back(RobotSlot(Index_BodyM));//10
+	m_slots.push_back(RobotSlot(Index_BodyD));//11
 
 	//Mandatory slots
 	SetModule(Module_Head, Index_Head);
@@ -46,9 +42,6 @@ Robot::Robot()
 	m_crew.push_back(CrewMember(Crew_Warrior));//5
 	m_crew.push_back(CrewMember(Crew_Medic));//6
 	m_crew.push_back(CrewMember(Crew_Gunner));//7
-
-	//Mandatory crew member
-	SetCrewMember(Crew_Captain, Index_Head);
 }
 
 Robot::~Robot()
@@ -310,7 +303,7 @@ void Robot::Update()
 	{
 		case Phase_GenerateEC:
 		{
-			m_cells += GenerateCells();
+			m_energy_cells += Generateenergy_cells();
 
 			m_ready_to_change_phase = true;
 			break;
@@ -324,14 +317,64 @@ void Robot::Update()
 		}
 		case Phase_AttackPlanning:
 		{
-			//repartition armes que l'on veut utiliser parmi les emplacements weapon mod
-			//+ répartition actions des modules
-			//les armes de CaC ne peuvent viser que les parties basses
-			//appliquer +2 de speed aux armes ranged si distance de combat ranged (max 10)
+			if (m_shutdown_global == false)
+			{
+				//repartition armes que l'on veut utiliser parmi les emplacements weapon mod
+				//+ répartition actions des modules
+				//les armes de CaC ne peuvent viser que les parties basses
+				//appliquer +2 de speed aux armes ranged si distance de combat ranged (max 10)
 
-			//depense des EC pour attaque ( choisir attaque 1 ou 2 de l'arme)
+				//depense des EC pour attaque ( choisir attaque 1 ou 2 de l'arme)
 
-			//choix des cibles (module)
+				//choix des cibles (module)
+
+				//choix de cible du medic (heald by medic au sein du même module)
+
+			}
+			
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_HealCrew:
+		{
+			HealCrewMembers();
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_RepairModules:
+		{
+			RepairModules();
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_EquipmentResolution:
+		{
+			//todo , jetpacks
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_GrabResolution:
+		{
+			//todo
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_GuardResolution:
+		{
+			//todo
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_FireResolution://after the attack resolutions
+		{
+			UpdateFirePropagation();
+
+			UpdateShudownGlobal();//in case fire destroys the generator or kills the captain or the pilot
 
 			m_ready_to_change_phase = true;
 			break;
@@ -339,27 +382,367 @@ void Robot::Update()
 	}
 }
 
-int Robot::GenerateCells()
+int Robot::Generateenergy_cells()
 {
-	int cells = 0;
+	int energy_cells = 0;
 
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
 		if ((*it).m_module && (*it).m_module->m_type == Module_Generator)
 		{
-			cells += 3;
+			energy_cells += 3;
 
 			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
 			{
 				if ((*it2).m_type == Crew_Scientist)
 				{
-					cells++;
+					energy_cells++;
 				}
 			}
 		}
 	}
 
-	return cells;
+	return energy_cells;
+}
+
+bool Robot::HealCrewMembers()
+{
+	bool healed = false;
+
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)		
+		{
+			int health_missing = (*it2).m_health_max - (*it2).m_health;
+
+			//Infirmary
+			if ((*it).m_module && (*it).m_module->m_type == Module_Infirmary)
+			{
+				if (health_missing > 0)
+				{
+					(*it2).m_health++;
+					healed = true;
+				}
+			}
+
+			//Medic
+			if ((*it2).m_is_healed_by_medic)
+			{
+				if (health_missing > 0)
+				{
+					if (health_missing == 1)
+					{
+						(*it2).m_health++;
+					}
+					else
+					{
+						(*it2).m_health += 2;
+					}
+					healed = true;
+				}
+
+				(*it2).m_is_healed_by_medic = false;
+			}
+		}
+	}
+
+	return healed;
 }
 
 
+bool Robot::RepairModules()
+{
+	bool repaired = false;
+
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		Module* module = (*it).m_module;
+		if (module != NULL)
+		{
+			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+			{
+				int health_missing = module->m_health_max - module->m_health;
+
+				if (health_missing > 0)
+				{
+					if ((*it2).m_type != Crew_Mechanic)
+					{
+						module->m_health++;
+					}
+					else
+					{
+						if (health_missing == 1)
+						{
+							module->m_health++;
+						}
+						else
+						{
+							module->m_health += 2;
+						}
+					}
+					repaired = true;
+				}
+			}
+
+			if ((*it).m_crew.empty() == false)
+			{
+				if (module->m_is_burning)
+				{
+					module->m_is_burning = false;
+					printf("Fire extinguished.\n");
+				}
+				
+				if (module->m_is_shutdown)
+				{
+					module->m_is_shutdown = false;
+					printf("Shutdown repaired.\n");
+				}
+			}
+		}
+	}
+
+	return repaired;
+}
+
+
+void Robot::UpdateFirePropagation()
+{
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		Module* module = (*it).m_module;
+		if (module != NULL && module->m_is_burning)
+		{
+			//Damage to module
+			if (module->m_health > 0)
+			{
+				module->m_health--;
+			}
+
+			//Damage to crew
+			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+			{
+				(*it2).m_health--;
+			}
+			(*it).UpdateCrew();
+			UpdateShudownGlobal();
+
+			//Fire propagation
+			for (vector<RobotSlot>::iterator it2 = m_slots.begin(); it2 != m_slots.end(); it2++)
+			{
+				if (it2->m_module != NULL && it2->m_module->m_is_burning == false)
+				{
+					//adjacent slots
+					if ((abs(it2->m_coord_x - it->m_coord_x) == 1 && abs(it2->m_coord_y - it->m_coord_y) == 0) 
+						|| (abs(it2->m_coord_x - it->m_coord_x) == 0 && abs(it2->m_coord_y - it->m_coord_y) == 1))
+					{
+						bool propagation_sucess = RandomizeIntBetweenValues(1, 6) >= 4;
+
+						if (propagation_sucess)
+						{
+							it2->m_module->m_is_burning = true;
+							printf("Fire propagated from slot %d to slot %d.\n", (int)it->m_index, (int)it2->m_index);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+bool Robot::CheckShudownGlobalConditions()
+{
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		//Generator destroyed?
+		if (it->m_module && it->m_module->m_type == Module_Generator && it->m_module->m_health == 0)
+		{
+			return true;
+		}
+
+		//Captain or pilot are alive and not stunned in the head?
+		if (it->m_type == Module_Head)
+		{
+			for (vector<CrewMember>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
+			{
+				if (it2->m_type == Crew_Captain && it2->m_health > 0 && it2->m_is_stunned == false)
+				{
+					return false;
+				}
+
+				if (it2->m_type == Crew_Pilot && it2->m_health > 0 && it2->m_is_stunned == false)
+				{
+					return false;
+				}
+			}
+		}
+	}	
+
+	return true;
+}
+
+bool Robot::UpdateShudownGlobal()
+{
+	//Start of a shutdown?
+	if (m_shutdown_global == false)
+	{
+		if (CheckShudownGlobalConditions() == true)
+		{
+			m_shutdown_global = true;
+			printf("Global shutdown triggered on robot %d.\n", m_index);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	//End of a shutdown?
+	else
+	{
+		if (CheckShudownGlobalConditions() == false)
+		{
+			m_shutdown_global = false;
+			printf("Global shutdown ended on robot %d.\n", m_index);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+
+//ROBOT SLOT
+RobotSlot::RobotSlot(SlotIndex index)
+{
+	m_index = index;
+	m_module = NULL;
+	m_weapon = NULL;
+
+	switch (index)
+	{
+		case Index_Head:
+		{
+			m_size = 1;
+			m_type = Slot_Head;
+			m_coord_x = 0;
+			m_coord_y = 3;
+			break;
+		}
+		case Index_BodyU:
+		{
+			m_size = 3;
+			m_type = Slot_Body;
+			m_coord_x = 0;
+			m_coord_y = 2;
+			break;
+		}
+		case Index_BodyM:
+		{
+			m_size = 3;
+			m_type = Slot_Body;
+			m_coord_x = 0;
+			m_coord_y = 1;
+			break;
+		}
+		case Index_BodyD:
+		{
+			m_size = 2;
+			m_type = Slot_Body;
+			m_coord_x = 0;
+			m_coord_y = 0;
+			break;
+		}
+		case Index_LegL:
+		{
+			m_size = 2;
+			m_type = Slot_Leg;
+			m_coord_x = -1;
+			m_coord_y = 0;
+			break;
+		}
+		case Index_LegR:
+		{
+			m_size = 2;
+			m_type = Slot_Leg;
+			m_coord_x = 1;
+			m_coord_y = 0;
+			break;
+		}
+		case Index_FootL:
+		{
+			m_size = 2;
+			m_type = Slot_Foot;
+			m_coord_x = -2;
+			m_coord_y = 0;
+			break;
+		}
+		case Index_FootR:
+		{
+			m_size = 2;
+			m_type = Slot_Foot;
+			m_coord_x = 2;
+			m_coord_y = 0;
+			break;
+		}
+		case Index_ShoulderL:
+		{
+			m_size = 2;
+			m_type = Slot_Shoulder;
+			m_coord_x = -1;
+			m_coord_y = 2;
+			break;
+		}
+		case Index_ShoulderR:
+		{
+			m_size = 2;
+			m_type = Slot_Shoulder;
+			m_coord_x = 1;
+			m_coord_y = 2;
+			break;
+		}
+		case Index_ForearmL:
+		{
+			m_size = 2;
+			m_type = Slot_Forearm;
+			m_coord_x = -2;
+			m_coord_y = 2;
+			break;
+		}
+		case Index_ForearmR:
+		{
+			m_size = 2;
+			m_type = Slot_Forearm;
+			m_coord_x = 2;
+			m_coord_y = 2;
+			break;
+		}
+	}
+}
+
+void RobotSlot::UpdateCrew()
+{
+	vector<CrewMember> old_crew;
+	for (vector<CrewMember>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		old_crew.push_back(*it);
+	}
+
+	m_crew.clear();
+
+	for (vector<CrewMember>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+	{
+		if ((*it).m_health > 0)
+		{
+			m_crew.push_back(*it);
+		}
+		else
+		{
+			printf("Crew member dead.\n");
+			if ((*it).m_type == Crew_Captain)
+			{
+				printf("Captain was killed. GAME OVER.\n");
+			}
+		}
+	}
+}

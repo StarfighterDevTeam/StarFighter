@@ -81,6 +81,13 @@ enum GamePhase
 	Phase_GenerateEC,
 	Phase_CrewMovement,
 	Phase_AttackPlanning,
+	Phase_HealCrew,
+	Phase_RepairModules,
+	Phase_EquipmentResolution,
+	Phase_GrabResolution,
+	Phase_GuardResolution,
+	Phase_AttackResolution_12,
+	Phase_AttackResolution_11,
 	Phase_AttackResolution_10,
 	Phase_AttackResolution_9,
 	Phase_AttackResolution_8,
@@ -91,6 +98,7 @@ enum GamePhase
 	Phase_AttackResolution_3,
 	Phase_AttackResolution_2,
 	Phase_AttackResolution_1,
+	Phase_FireResolution,
 	NB_GAME_PHASES,
 };
 

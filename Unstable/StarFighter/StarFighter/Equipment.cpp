@@ -7,8 +7,8 @@ Equipment::Equipment(EquipmentType type)
 	m_type = type;
 
 	m_weight = 0;
-	m_cells = 0;
-	m_cells_max = 0;
+	m_energy_cells = 0;
+	m_energy_cells_max = 0;
 	m_unique = false;
 	m_size = 1;
 	m_crew_max = 0;
@@ -18,7 +18,7 @@ Equipment::Equipment(EquipmentType type)
 	{
 		case Equipment_EnergeticWeapon:
 		{
-			m_cells_max = 1;
+			m_energy_cells_max = 1;
 			m_module_equipable = Module_Weapon;
 			break;
 		}
@@ -65,8 +65,8 @@ Equipment::Equipment(EquipmentType type)
 		case Equipment_WeaponsScope:
 		{
 			m_weight = 1;
-			m_cells_max = 1;
-			m_cells = 0;
+			m_energy_cells_max = 1;
+			m_energy_cells = 0;
 			m_module_equipable = Module_Weapon;
 			break;
 		}

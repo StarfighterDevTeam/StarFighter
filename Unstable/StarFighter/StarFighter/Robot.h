@@ -10,18 +10,21 @@
 class RobotSlot
 {
 public:
-	RobotSlot(SlotType type, int size, SlotIndex index){ m_size = size; m_type = type; m_index = index; m_module = NULL; m_weapon = NULL; };
+	RobotSlot(SlotIndex index);
 
 	int m_size;
 	SlotType m_type;
 	SlotIndex m_index;
+	int m_coord_x;
+	int m_coord_y;
 
 	vector<CrewMember> m_crew;
 	Module* m_module;
 	vector<Equipment*> m_equipments;
 	Weapon* m_weapon;
-};
 
+	void UpdateCrew();
+};
 
 class Robot
 {
@@ -50,15 +53,21 @@ public:
 	int m_balance_bonus;
 	int m_attack_speed_bonus;
 	void GetWeightModifiers(int &balance_bonus, int &attack_speed_bonus);
-	int m_cells;
+	int m_energy_cells;
 	bool m_unbalanced;
+	bool m_shutdown_global;
 
 	bool m_ready_to_change_phase;
 
 	void Initialize();
 	void Update();
+	bool UpdateShudownGlobal();
+	bool CheckShudownGlobalConditions();
 
-	int GenerateCells();
+	int Generateenergy_cells();
+	bool HealCrewMembers();
+	bool RepairModules();
+	void UpdateFirePropagation();
 };
 
 

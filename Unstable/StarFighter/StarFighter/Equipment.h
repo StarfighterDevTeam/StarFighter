@@ -15,8 +15,8 @@ public:
 	int m_health;
 	int m_health_max;
 	int m_weight;
-	int m_cells;
-	int m_cells_max;
+	int m_energy_cells;
+	int m_energy_cells_max;
 	int m_size;
 	bool m_unique;
 	int m_cooldown;
