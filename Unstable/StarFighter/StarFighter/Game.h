@@ -98,6 +98,7 @@ enum GamePhase
 	Phase_AttackResolution_3,
 	Phase_AttackResolution_2,
 	Phase_AttackResolution_1,
+	Phase_CooldownResolution,
 	Phase_FireResolution,
 	NB_GAME_PHASES,
 };

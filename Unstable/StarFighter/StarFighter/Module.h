@@ -21,8 +21,7 @@ public:
 	int m_cooldown;
 	int m_cooldown_timer;
 	int m_crew_max;
-
-	bool m_is_burning;
+	int m_fire_counter;
 	bool m_is_shutdown;
 };
 

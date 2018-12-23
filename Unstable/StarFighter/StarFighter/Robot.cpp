@@ -160,7 +160,6 @@ bool Robot::SetEquipment(EquipmentType type, SlotIndex index)
 	}
 }
 
-
 bool Robot::SetWeapon(WeaponType type, SlotIndex index)
 {
 	Weapon* weapon = new Weapon(type);
@@ -370,7 +369,19 @@ void Robot::Update()
 			m_ready_to_change_phase = true;
 			break;
 		}
-		case Phase_FireResolution://after the attack resolutions
+
+		// ****************************************************
+		//					ATTACK RESOLUTION
+		// ****************************************************
+
+		case Phase_CooldownResolution:
+		{
+			UpdateCooldowns();
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_FireResolution:
 		{
 			UpdateFirePropagation();
 
@@ -486,9 +497,9 @@ bool Robot::RepairModules()
 
 			if ((*it).m_crew.empty() == false)
 			{
-				if (module->m_is_burning)
+				if (module->m_fire_counter >= 0)
 				{
-					module->m_is_burning = false;
+					module->m_fire_counter = -1;
 					printf("Fire extinguished.\n");
 				}
 				
@@ -510,40 +521,92 @@ void Robot::UpdateFirePropagation()
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
 		Module* module = (*it).m_module;
-		if (module != NULL && module->m_is_burning)
-		{
-			//Damage to module
-			if (module->m_health > 0)
+		if (module != NULL)
+		{		
+			if (module->m_fire_counter >= 0)
 			{
-				module->m_health--;
-			}
+				//Damage to module
+				if (module->m_health > 0)
+				{
+					module->m_health--;
+					if (module->m_health == 0)
+					{
+						it->DestroySlot();
+					}
 
-			//Damage to crew
-			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
-			{
-				(*it2).m_health--;
+					//Damage to robot
+					m_health--;
+					if (m_health == 0)
+					{
+						printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", m_index);
+					}
+				}
+
+				//Damage to crew
+				for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+				{
+					(*it2).m_health--;
+				}
+				(*it).UpdateCrew();
+				UpdateShudownGlobal();
 			}
-			(*it).UpdateCrew();
-			UpdateShudownGlobal();
 
 			//Fire propagation
-			for (vector<RobotSlot>::iterator it2 = m_slots.begin(); it2 != m_slots.end(); it2++)
+			if (module->m_fire_counter > 0)
 			{
-				if (it2->m_module != NULL && it2->m_module->m_is_burning == false)
+				for (vector<RobotSlot>::iterator it2 = m_slots.begin(); it2 != m_slots.end(); it2++)
 				{
-					//adjacent slots
-					if ((abs(it2->m_coord_x - it->m_coord_x) == 1 && abs(it2->m_coord_y - it->m_coord_y) == 0) 
-						|| (abs(it2->m_coord_x - it->m_coord_x) == 0 && abs(it2->m_coord_y - it->m_coord_y) == 1))
+					if (it2->m_module != NULL && it2->m_module->m_fire_counter < 0)//propagation to a module that is not burning yet
 					{
-						bool propagation_sucess = RandomizeIntBetweenValues(1, 6) >= 4;
-
-						if (propagation_sucess)
+						//adjacent slots
+						if ((abs(it2->m_coord_x - it->m_coord_x) == 1 && abs(it2->m_coord_y - it->m_coord_y) == 0)
+							|| (abs(it2->m_coord_x - it->m_coord_x) == 0 && abs(it2->m_coord_y - it->m_coord_y) == 1))
 						{
-							it2->m_module->m_is_burning = true;
-							printf("Fire propagated from slot %d to slot %d.\n", (int)it->m_index, (int)it2->m_index);
+							bool propagation_sucess = RandomizeIntBetweenValues(1, 6) >= 4;
+
+							if (propagation_sucess)
+							{
+								it2->m_module->m_fire_counter = 0;
+								printf("Fire propagated from slot %d to slot %d.\n", (int)it->m_index, (int)it2->m_index);
+							}
 						}
 					}
 				}
+			}
+		}
+	}
+}
+
+void Robot::UpdateCooldowns()
+{
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		//Module cooldown and fire propagation cooldown
+		if (it->m_module != NULL && it->m_module->m_cooldown > 0 && it->m_module->m_cooldown_timer < it->m_module->m_cooldown)
+		{
+			it->m_module->m_cooldown_timer++;
+
+			if (it->m_module->m_fire_counter > 0)
+			{
+				it->m_module->m_fire_counter = 0;//starting fire propagation
+			}
+		}
+
+		//Equipments cooldown
+		for (vector<Equipment*>::iterator it2 = it->m_equipments.begin(); it2 != it->m_equipments.end(); it2++)
+		{
+			if ((*it2)->m_cooldown > 0 && (*it2)->m_cooldown_timer < (*it2)->m_cooldown)
+			{
+				(*it2)->m_cooldown_timer++;
+			}
+		}
+
+		//Crew members stunned
+		for (vector<CrewMember>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
+		{
+			if (it2->m_stun_counter > 0)
+			{
+				it2->m_stun_counter--;
 			}
 		}
 	}
@@ -564,12 +627,12 @@ bool Robot::CheckShudownGlobalConditions()
 		{
 			for (vector<CrewMember>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
 			{
-				if (it2->m_type == Crew_Captain && it2->m_health > 0 && it2->m_is_stunned == false)
+				if (it2->m_type == Crew_Captain && it2->m_health > 0 && it2->m_stun_counter == 0)
 				{
 					return false;
 				}
 
-				if (it2->m_type == Crew_Pilot && it2->m_health > 0 && it2->m_is_stunned == false)
+				if (it2->m_type == Crew_Pilot && it2->m_health > 0 && it2->m_stun_counter == false)
 				{
 					return false;
 				}
@@ -743,6 +806,21 @@ void RobotSlot::UpdateCrew()
 			{
 				printf("Captain was killed. GAME OVER.\n");
 			}
+		}
+	}
+}
+
+
+void RobotSlot::DestroySlot()
+{
+	if (m_module != NULL)
+	{
+		//Loss of energy cells
+		m_module->m_energy_cells = 0;
+
+		for (vector<Equipment*>::iterator it = m_equipments.begin(); it != m_equipments.end(); it++)
+		{
+			(*it)->m_energy_cells = 0;
 		}
 	}
 }

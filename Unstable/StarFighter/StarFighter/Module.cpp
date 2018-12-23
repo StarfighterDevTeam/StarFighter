@@ -14,7 +14,7 @@ Module::Module(ModuleType type)
 	m_health_max = 0;
 	m_cooldown = -1;
 	m_crew_max = 0;
-	m_is_burning = false;
+	m_fire_counter = -1;
 	m_is_shutdown = false;
 
 	switch (type)

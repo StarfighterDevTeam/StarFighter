@@ -533,6 +533,18 @@ void InGameState::AttackResolutions()
 							else
 							{
 								target_module->m_health = 0;
+								target_slot.DestroySlot();
+							}
+
+							//Damage to robot
+							if (opponent.m_health > damage)
+							{
+								opponent.m_health -= damage;
+							}
+							else
+							{
+								opponent.m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent.m_index);
 							}
 						}
 					}
@@ -548,7 +560,7 @@ void InGameState::AttackResolutions()
 							{
 								if ((*it)->m_health > 0)
 								{
-									//Damage absorbed
+									//Damage absorbed by plates
 									if ((*it)->m_health >= damage)
 									{
 										(*it)->m_health -= damage;
@@ -574,6 +586,18 @@ void InGameState::AttackResolutions()
 							else
 							{
 								target_module->m_health = 0;
+								target_slot.DestroySlot();
+							}
+
+							//Damage to robot
+							if (opponent.m_health > damage)
+							{
+								opponent.m_health -= damage;
+							}
+							else
+							{
+								opponent.m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent.m_index);
 							}
 						}
 					}
@@ -593,7 +617,7 @@ void InGameState::AttackResolutions()
 			//Fire resolution
 			if (fire_success && target_module != NULL)
 			{
-				target_module->m_is_burning = true;
+				target_module->m_fire_counter = 1;
 			}
 
 			//Electric resolution
@@ -608,7 +632,7 @@ void InGameState::AttackResolutions()
 			{
 				if ((*it) == true)
 				{
-					target_slot.m_crew[i].m_is_stunned = true;
+					target_slot.m_crew[i].m_stun_counter = 2;
 				}
 				i++;
 			}

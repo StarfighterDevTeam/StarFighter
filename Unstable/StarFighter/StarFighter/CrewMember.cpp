@@ -5,7 +5,7 @@ CrewMember::CrewMember(CrewType type)
 {
 	m_type = type;
 	m_slot_index = NB_SLOT_INDEX;
-	m_is_stunned = false;
+	m_stun_counter = 0;
 	m_is_healed_by_medic = false;
 
 	switch (type)

@@ -24,6 +24,7 @@ public:
 	Weapon* m_weapon;
 
 	void UpdateCrew();
+	void DestroySlot();
 };
 
 class Robot
@@ -68,8 +69,7 @@ public:
 	bool HealCrewMembers();
 	bool RepairModules();
 	void UpdateFirePropagation();
+	void UpdateCooldowns();
 };
-
-
 
 #endif //ROBOT_H_INCLUDED
