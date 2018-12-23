@@ -55,6 +55,11 @@ void Game::init(RenderWindow* window)
 	m_Music_Activated = false;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
+
+	//Robot
+	m_phase = Phase_GenerateEC;
+	m_turn = 0;
+	m_distance = Distance_Ranged;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -767,4 +772,25 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 	pop_feedback->setPosition(sf::Vector2f(pop_feedback->getPosition().x - pop_feedback->getGlobalBounds().width / 2, pop_feedback->getPosition().y));
 	delete text_feedback;
 	addToFeedbacks(pop_feedback);
+}
+
+//ROBOT
+WeaponAttack::WeaponAttack()
+{
+	m_speed = 0;
+	m_damage = 0;
+	m_energy_cost = 0;
+	m_chance_of_hit = 0;
+	m_chance_of_fire = 0;
+	m_chance_of_electricity = 0;
+	m_chance_of_stun = 0;
+	m_chance_of_unbalance = 0;
+	m_crew_required = NB_CREW_TYPES;
+}
+
+int WeaponAttack::GetUnbalanceScore()
+{
+	int balance = RandomizeIntBetweenValues(1, 20) + m_chance_of_unbalance;
+
+	return balance;
 }

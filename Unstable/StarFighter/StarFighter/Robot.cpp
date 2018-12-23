@@ -8,6 +8,10 @@ Robot::Robot()
 	m_weight = 0;
 	m_crew_nb = 0;
 	m_crew_max = 0;
+	m_cells = 0;
+	m_unbalanced = false;
+
+	m_ready_to_change_phase = false;
 
 	//Robot slots
 	m_slots.push_back(RobotSlot(Slot_Head, 1, Index_Head));//0
@@ -241,6 +245,25 @@ int Robot::GetHealthMax()
 	return health_max;
 }
 
+int Robot::GetBalance()
+{
+	int balance = 0;
+
+	if (m_slots[Index_FootL].m_module && m_slots[Index_FootL].m_module->m_type == Module_Stabilizers)
+	{
+		balance += m_slots[Index_FootL].m_module->m_health;
+	}
+	
+	if (m_slots[Index_FootR].m_module && m_slots[Index_FootR].m_module->m_type == Module_Stabilizers)
+	{
+		balance += m_slots[Index_FootR].m_module->m_health;
+	}
+
+	balance += m_balance_bonus;
+
+	return balance;
+}
+
 void Robot::GetWeightModifiers(int &balance_bonus, int &attack_speed_bonus)
 {
 	balance_bonus = 0;
@@ -283,8 +306,60 @@ void Robot::Initialize()
 
 void Robot::Update()
 {
-	printf("");
-	printf("");
+	switch ((*CurrentGame).m_phase)
+	{
+		case Phase_GenerateEC:
+		{
+			m_cells += GenerateCells();
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_CrewMovement:
+		{
+			//todo
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+		case Phase_AttackPlanning:
+		{
+			//repartition armes que l'on veut utiliser parmi les emplacements weapon mod
+			//+ répartition actions des modules
+			//les armes de CaC ne peuvent viser que les parties basses
+			//appliquer +2 de speed aux armes ranged si distance de combat ranged (max 10)
+
+			//depense des EC pour attaque ( choisir attaque 1 ou 2 de l'arme)
+
+			//choix des cibles (module)
+
+			m_ready_to_change_phase = true;
+			break;
+		}
+	}
+}
+
+int Robot::GenerateCells()
+{
+	int cells = 0;
+
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		if ((*it).m_module && (*it).m_module->m_type == Module_Generator)
+		{
+			cells += 3;
+
+			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+			{
+				if ((*it2).m_type == Crew_Scientist)
+				{
+					cells++;
+				}
+			}
+		}
+	}
+
+	return cells;
 }
 
 

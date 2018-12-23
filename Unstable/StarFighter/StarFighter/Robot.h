@@ -29,6 +29,8 @@ public:
 	Robot();
 	~Robot();
 
+	int m_index;
+
 	vector<CrewMember> m_crew;
 	vector<RobotSlot> m_slots;
 
@@ -43,14 +45,20 @@ public:
 	int m_weight;
 	int m_crew_max;
 	int m_crew_nb;
-	int GetCrewMax();
 	int m_balance;
+	int GetBalance();
 	int m_balance_bonus;
 	int m_attack_speed_bonus;
 	void GetWeightModifiers(int &balance_bonus, int &attack_speed_bonus);
+	int m_cells;
+	bool m_unbalanced;
+
+	bool m_ready_to_change_phase;
 
 	void Initialize();
 	void Update();
+
+	int GenerateCells();
 };
 
 

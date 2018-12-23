@@ -14,7 +14,6 @@
 
 class GameObject;
 
-
 class InGameState : public GameState
 {
 public:
@@ -33,6 +32,8 @@ public:
 	Robot m_robots[2];
 
 	void InitRobots();
+
+	void AttackResolutions();
 
 private:
 	sf::RenderWindow* mainWindow;

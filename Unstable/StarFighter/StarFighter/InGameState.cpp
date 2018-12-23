@@ -37,6 +37,7 @@ void InGameState::InitRobots()
 	Robot& robot = m_robots[0];
 
 	//Robot 1
+	robot.m_index = 0;
 	robot.SetModule(Module_Infirmary, Index_BodyU);
 
 	robot.SetModule(Module_Deflectors, Index_BodyM);
@@ -79,6 +80,7 @@ void InGameState::InitRobots()
 	robot = m_robots[1];
 
 	//Robot 2
+	robot.m_index = 1;
 	robot.SetModule(Module_Generator, Index_BodyU);
 	robot.SetEquipment(Equipment_GeneratorBooster, Index_BodyU);
 	robot.SetEquipment(Equipment_LightPlate, Index_BodyU);
@@ -212,7 +214,25 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//ROBOT
-	//m_robots[0].Update();
+	m_robots[0].Update();
+	m_robots[1].Update();
+	if ((*CurrentGame).m_phase >= Phase_AttackResolution_1 && (*CurrentGame).m_phase <= Phase_AttackResolution_10)
+	{
+		AttackResolutions();
+	}
+
+	//Phase shift
+	if (m_robots[0].m_ready_to_change_phase && m_robots[1].m_ready_to_change_phase)
+	{
+		(*CurrentGame).m_phase = (GamePhase)(((*CurrentGame).m_phase + 1) % NB_GAME_PHASES);
+		if ((int)(*CurrentGame).m_phase == 0)
+		{
+			(*CurrentGame).m_turn++;
+		}
+		
+		m_robots[0].m_ready_to_change_phase = false;
+		m_robots[1].m_ready_to_change_phase = false;
+	}
 }
 
 void InGameState::Draw()
@@ -403,3 +423,125 @@ void CardSlot::Update(MouseAction mouse_click)
 }
 
 */
+
+void InGameState::AttackResolutions()
+{
+	int speed = (int)((*CurrentGame).m_phase) - (int)(Phase_AttackResolution_1) + 1;
+
+	//Resolve actions
+	for (vector<Action>::iterator it = (*CurrentGame).m_actions_list[speed].begin(); it != (*CurrentGame).m_actions_list[speed].end(); it++)
+	{
+		//Weapons
+		Robot& robot = m_robots[(*it).m_robot_index];
+		Robot& opponent = m_robots[(*it).m_robot_index + 1 % 2];
+
+		Module* module = robot.m_slots[(*it).m_slot_index].m_module;
+		Module* target_module = opponent.m_slots[(*it).m_target_index].m_module;
+
+		if (module->m_type == Module_Weapon)
+		{
+			Weapon* weapon = robot.m_slots[(*it).m_slot_index].m_weapon;
+			WeaponAttack* attack = robot.m_slots[(*it).m_slot_index].m_weapon->m_attack_selected;
+
+			//Randomization of resolutions
+			//Melee weapons always hit. Ranged weapon have a -1 malus on chances to hit if aiming at the head
+			bool hit_success = weapon->m_ranged == false || (RandomizeIntBetweenValues(1, 6) - (target_module->m_type == Module_Head ? 1 : 0)) >= attack->m_chance_of_hit ? true : false;
+			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire ? true : false;
+			bool stun_success = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun ? true : false;
+			bool unbalance_success = attack->m_chance_of_unbalance > 0 && attack->GetUnbalanceScore() > opponent.GetBalance();
+
+			//Hit resolution
+			if (hit_success)
+			{
+				int damage = attack->m_damage;
+				
+				//Energetical damage
+				if (weapon->m_energetic)
+				{
+					//Deflector absorption
+					for (vector<RobotSlot>::iterator it = opponent.m_slots.begin(); it != opponent.m_slots.end(); it++)
+					{
+						if ((*it).m_module->m_type == Module_Deflectors)
+						{
+							if ((*it).m_module->m_health > 0)
+							{
+								//Damage absorbed
+								if ((*it).m_module->m_health >= damage)
+								{
+									(*it).m_module->m_health -= damage;
+									damage = 0;
+								}
+								else //damage overkill
+								{
+									(*it).m_module->m_health = 0;
+									damage -= (*it).m_module->m_health;
+								}	 
+							}
+						}
+					}
+
+					//Applying damage directly to target module
+					if (damage > 0)
+					{
+						if (target_module->m_health > damage)
+						{
+							target_module->m_health -= damage;
+						}
+						else
+						{
+							target_module->m_health = 0;
+						}
+					}
+				}
+				else //Physical damage
+				{
+					for (vector<RobotSlot>::iterator it = opponent.m_slots.begin(); it != opponent.m_slots.end(); it++)
+					{
+						for (vector<Equipment*>::iterator it2 = (*it).m_equipments.begin(); it2 != (*it).m_equipments.end(); it2++)
+							if ((*it2)->m_type == Equipment_LightPlate || (*it2)->m_type == Equipment_HeavyPlate)
+							{
+								if ((*it2)->m_health > 0)
+								{
+									//Damage absorbed
+									if ((*it2)->m_health >= damage)
+									{
+										(*it2)->m_health -= damage;
+										damage = 0;
+									}
+									else //damage overkill
+									{
+										(*it2)->m_health = 0;
+										damage -= (*it2)->m_health;
+									}
+								}
+							}
+					}
+				}
+			}
+			
+			//Fire resolution
+
+
+			//Electric resolution
+
+
+			//Stun resolution
+
+
+			//Distance update
+			(*CurrentGame).m_distance_temp = weapon->m_ranged ? Distance_Ranged : Distance_Close;
+		}
+		//Other modules
+
+	}
+
+	//Updating placement (depends on the last attack of the turn)
+	if ((*CurrentGame).m_phase == Phase_AttackResolution_1)
+	{
+		(*CurrentGame).m_distance = (*CurrentGame).m_distance_temp;
+	}
+
+	m_robots[0].m_ready_to_change_phase = true;
+	m_robots[1].m_ready_to_change_phase = true;
+}
+	

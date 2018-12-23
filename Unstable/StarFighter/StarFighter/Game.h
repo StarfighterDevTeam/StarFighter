@@ -76,6 +76,24 @@ public:
 //ROBOT
 #define MAX_ROBOT_WEIGHT			25
 
+enum GamePhase
+{
+	Phase_GenerateEC,
+	Phase_CrewMovement,
+	Phase_AttackPlanning,
+	Phase_AttackResolution_10,
+	Phase_AttackResolution_9,
+	Phase_AttackResolution_8,
+	Phase_AttackResolution_7,
+	Phase_AttackResolution_6,
+	Phase_AttackResolution_5,
+	Phase_AttackResolution_4,
+	Phase_AttackResolution_3,
+	Phase_AttackResolution_2,
+	Phase_AttackResolution_1,
+	NB_GAME_PHASES,
+};
+
 enum SlotIndex
 {
 	Index_Head,
@@ -146,6 +164,24 @@ enum WeaponType
 	NB_WEAPON_TYPES,
 };
 
+
+class WeaponAttack
+{
+public:
+	WeaponAttack();
+	int m_speed;
+	int m_damage;
+	int m_energy_cost;
+	int m_chance_of_hit;
+	int m_chance_of_fire;
+	int m_chance_of_electricity;
+	int m_chance_of_stun;
+	int m_chance_of_unbalance;
+	CrewType m_crew_required;
+
+	int GetUnbalanceScore();
+};
+
 enum SlotType
 {
 	Slot_Head,
@@ -157,6 +193,18 @@ enum SlotType
 	NB_SLOT_TYPES,
 };
 
+struct Action
+{
+	SlotIndex m_slot_index;
+	int m_robot_index;
+	SlotIndex m_target_index;
+};
+
+enum DistanceCombat
+{
+	Distance_Ranged,
+	Distance_Close,
+};
 
 struct Game
 {
@@ -229,11 +277,17 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
-	//BIG BOOK
+	//ROBOT
 	CardSlot* m_hovered_slot;
 	CardSlot* m_selected_slot;
 	CardSlot* m_play_card_slot;
 	CardSlot* m_target_slot;
+
+	GamePhase m_phase;
+	int m_turn;
+	vector<vector<Action> > m_actions_list;
+	DistanceCombat m_distance;
+	DistanceCombat m_distance_temp;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
