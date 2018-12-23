@@ -74,7 +74,8 @@ public:
 };
 
 //ROBOT
-#define MAX_ROBOT_WEIGHT			25
+#define MAX_ROBOT_WEIGHT				25
+#define MAX_ROBOT_ENERGY_CELLS		17
 
 enum GamePhase
 {

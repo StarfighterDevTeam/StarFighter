@@ -533,7 +533,7 @@ void InGameState::AttackResolutions()
 							else
 							{
 								target_module->m_health = 0;
-								target_slot.DestroySlot();
+								opponent.DestroySlot(target_slot.m_index);
 							}
 
 							//Damage to robot
@@ -586,7 +586,7 @@ void InGameState::AttackResolutions()
 							else
 							{
 								target_module->m_health = 0;
-								target_slot.DestroySlot();
+								opponent.DestroySlot(target_slot.m_index);
 							}
 
 							//Damage to robot

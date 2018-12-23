@@ -24,7 +24,6 @@ public:
 	Weapon* m_weapon;
 
 	void UpdateCrew();
-	void DestroySlot();
 };
 
 class Robot
@@ -47,6 +46,8 @@ public:
 	int m_health_max;
 	int GetHealthMax();
 	int m_weight;
+	int m_energy_cells;
+	int m_energy_cells_available;
 	int m_crew_max;
 	int m_crew_nb;
 	int m_balance;
@@ -54,7 +55,6 @@ public:
 	int m_balance_bonus;
 	int m_attack_speed_bonus;
 	void GetWeightModifiers(int &balance_bonus, int &attack_speed_bonus);
-	int m_energy_cells;
 	bool m_unbalanced;
 	bool m_shutdown_global;
 
@@ -64,8 +64,9 @@ public:
 	void Update();
 	bool UpdateShudownGlobal();
 	bool CheckShudownGlobalConditions();
+	void DestroySlot(SlotIndex index);
 
-	int Generateenergy_cells();
+	int GenerateEnergyCells();
 	bool HealCrewMembers();
 	bool RepairModules();
 	void UpdateFirePropagation();

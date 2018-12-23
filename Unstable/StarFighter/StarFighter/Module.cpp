@@ -28,7 +28,6 @@ Module::Module(ModuleType type)
 		{
 			m_health_max = 10;
 			m_energy_cells_max = 1;
-			m_energy_cells = 1;
 			break;
 		}
 		case Module_Generator:
@@ -42,14 +41,12 @@ Module::Module(ModuleType type)
 		{
 			m_health_max = 10;
 			m_energy_cells_max = 1;
-			m_energy_cells = 1;
 			break;
 		}
 		case Module_Gadget:
 		{
 			m_health_max = 6;
 			m_energy_cells_max = 2;
-			m_energy_cells = 1;
 			break;
 		}
 		case Module_CrewQuarter:
@@ -67,7 +64,6 @@ Module::Module(ModuleType type)
 			m_unique = true;
 			m_size = 2;
 			m_energy_cells_max = 2;
-			m_energy_cells = 1;
 			break;
 		}
 		case Module_Infirmary:
@@ -75,7 +71,6 @@ Module::Module(ModuleType type)
 			m_health_max = 6;
 			m_weight = 1;
 			m_energy_cells_max = 2;
-			m_energy_cells = 1;
 			break;
 		}
 		case Module_Radar:
@@ -84,7 +79,6 @@ Module::Module(ModuleType type)
 			m_weight = 1;
 			m_unique = true;
 			m_energy_cells_max = 1;
-			m_energy_cells = 1;
 			m_cooldown = 2;
 			break;
 		}
@@ -94,7 +88,6 @@ Module::Module(ModuleType type)
 			m_weight = 1;
 			m_unique = true;
 			m_energy_cells_max = 1;
-			m_energy_cells = 1;
 			m_cooldown = 2;
 			break;
 		}

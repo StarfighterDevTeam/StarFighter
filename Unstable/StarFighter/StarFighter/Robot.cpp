@@ -9,6 +9,7 @@ Robot::Robot()
 	m_crew_nb = 0;
 	m_crew_max = 0;
 	m_energy_cells = 0;
+	m_energy_cells_available = 0;
 	m_unbalanced = false;
 	m_shutdown_global = false;
 
@@ -290,10 +291,25 @@ void Robot::GetWeightModifiers(int &balance_bonus, int &attack_speed_bonus)
 
 void Robot::Initialize()
 {
+	//Health
 	m_health_max = GetHealthMax();
 	m_health = m_health_max;
 
+	//Balance and attack speed bonus/malus
 	GetWeightModifiers(m_balance_bonus, m_attack_speed_bonus);
+
+	//Energy cells
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		if (it->m_module != NULL && it->m_module->m_energy_cells_max > 0)
+		{
+			if (m_energy_cells < MAX_ROBOT_ENERGY_CELLS)
+			{
+				it->m_module->m_energy_cells = 1;
+				m_energy_cells++;
+			}
+		}
+	}
 }
 
 void Robot::Update()
@@ -302,7 +318,7 @@ void Robot::Update()
 	{
 		case Phase_GenerateEC:
 		{
-			m_energy_cells += Generateenergy_cells();
+			GenerateEnergyCells();
 
 			m_ready_to_change_phase = true;
 			break;
@@ -318,12 +334,15 @@ void Robot::Update()
 		{
 			if (m_shutdown_global == false)
 			{
+				//verifier que le module / equipement utilisé n'est pas détruit
+
+
 				//repartition armes que l'on veut utiliser parmi les emplacements weapon mod
 				//+ répartition actions des modules
 				//les armes de CaC ne peuvent viser que les parties basses
 				//appliquer +2 de speed aux armes ranged si distance de combat ranged (max 10)
 
-				//depense des EC pour attaque ( choisir attaque 1 ou 2 de l'arme)
+				//depense des EC  ( + choisir attaque 1 ou 2 de l'arme)
 
 				//choix des cibles (module)
 
@@ -393,27 +412,37 @@ void Robot::Update()
 	}
 }
 
-int Robot::Generateenergy_cells()
+int Robot::GenerateEnergyCells()
 {
-	int energy_cells = 0;
+	int energy_cells_generated = 0;
 
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
 		if ((*it).m_module && (*it).m_module->m_type == Module_Generator)
 		{
-			energy_cells += 3;
+			int cells = 3;
 
 			for (vector<CrewMember>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
 			{
 				if ((*it2).m_type == Crew_Scientist)
 				{
-					energy_cells++;
+					cells++;
+				}
+			}
+
+			for (int i = 0; i < cells; i++)
+			{
+				if (m_energy_cells < MAX_ROBOT_ENERGY_CELLS)
+				{
+					m_energy_cells++;
+					m_energy_cells_available++;
+					energy_cells_generated++;
 				}
 			}
 		}
 	}
 
-	return energy_cells;
+	return energy_cells_generated;
 }
 
 bool Robot::HealCrewMembers()
@@ -531,7 +560,7 @@ void Robot::UpdateFirePropagation()
 					module->m_health--;
 					if (module->m_health == 0)
 					{
-						it->DestroySlot();
+						DestroySlot(it->m_index);
 					}
 
 					//Damage to robot
@@ -675,6 +704,23 @@ bool Robot::UpdateShudownGlobal()
 	}
 }
 
+void Robot::DestroySlot(SlotIndex index)
+{
+	Module* module = m_slots[index].m_module;
+	if (module != NULL)
+	{
+		//Loss of energy cells
+		m_energy_cells -= module->m_energy_cells;
+		module->m_energy_cells = 0;
+
+		for (vector<Equipment*>::iterator it = m_slots[index].m_equipments.begin(); it != m_slots[index].m_equipments.end(); it++)
+		{
+			m_energy_cells -= (*it)->m_energy_cells;
+			(*it)->m_energy_cells = 0;
+		}
+	}
+}
+
 //ROBOT SLOT
 RobotSlot::RobotSlot(SlotIndex index)
 {
@@ -806,21 +852,6 @@ void RobotSlot::UpdateCrew()
 			{
 				printf("Captain was killed. GAME OVER.\n");
 			}
-		}
-	}
-}
-
-
-void RobotSlot::DestroySlot()
-{
-	if (m_module != NULL)
-	{
-		//Loss of energy cells
-		m_module->m_energy_cells = 0;
-
-		for (vector<Equipment*>::iterator it = m_equipments.begin(); it != m_equipments.end(); it++)
-		{
-			(*it)->m_energy_cells = 0;
 		}
 	}
 }
