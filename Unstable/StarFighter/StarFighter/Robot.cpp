@@ -15,6 +15,11 @@ Robot::Robot()
 	m_ready_to_change_phase = false;
 
 	//Robot slots
+	for (int i = 0; i < NB_SLOT_INDEX; i++)
+	{
+		m_slots.push_back(RobotSlot((SlotIndex)i, this));
+	}
+	/*
 	m_slots.push_back(RobotSlot(Index_Head, this));//0
 	m_slots.push_back(RobotSlot(Index_LegL, this));//1
 	m_slots.push_back(RobotSlot(Index_LegR, this));//2
@@ -27,6 +32,7 @@ Robot::Robot()
 	m_slots.push_back(RobotSlot(Index_BodyU, this));//9
 	m_slots.push_back(RobotSlot(Index_BodyM, this));//10
 	m_slots.push_back(RobotSlot(Index_BodyD, this));//11
+	*/
 
 	//Mandatory slots
 	SetModule(Module_Head, Index_Head);
