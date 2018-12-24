@@ -17,8 +17,6 @@ public:
 	int m_size;
 	SlotType m_type;
 	SlotIndex m_index;
-	int m_coord_x;
-	int m_coord_y;
 
 	vector<CrewMember*> m_crew;//destroyed in class Robot
 	Module* m_module;

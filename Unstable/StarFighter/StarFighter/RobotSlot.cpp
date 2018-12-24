@@ -16,96 +16,72 @@ RobotSlot::RobotSlot(SlotIndex index, Robot* owner)
 		{
 			m_size = 1;
 			m_type = Slot_Head;
-			m_coord_x = 0;
-			m_coord_y = 3;
 			break;
 		}
 		case Index_BodyU:
 		{
 			m_size = 3;
 			m_type = Slot_Body;
-			m_coord_x = 0;
-			m_coord_y = 2;
 			break;
 		}
 		case Index_BodyM:
 		{
 			m_size = 3;
 			m_type = Slot_Body;
-			m_coord_x = 0;
-			m_coord_y = 1;
 			break;
 		}
 		case Index_BodyD:
 		{
 			m_size = 2;
 			m_type = Slot_Body;
-			m_coord_x = 0;
-			m_coord_y = 0;
 			break;
 		}
 		case Index_LegL:
 		{
 			m_size = 2;
 			m_type = Slot_Leg;
-			m_coord_x = -1;
-			m_coord_y = 0;
 			break;
 		}
 		case Index_LegR:
 		{
 			m_size = 2;
 			m_type = Slot_Leg;
-			m_coord_x = 1;
-			m_coord_y = 0;
 			break;
 		}
 		case Index_FootL:
 		{
 			m_size = 2;
 			m_type = Slot_Foot;
-			m_coord_x = -2;
-			m_coord_y = 0;
 			break;
 		}
 		case Index_FootR:
 		{
 			m_size = 2;
 			m_type = Slot_Foot;
-			m_coord_x = 2;
-			m_coord_y = 0;
 			break;
 		}
 		case Index_ShoulderL:
 		{
 			m_size = 2;
 			m_type = Slot_Shoulder;
-			m_coord_x = -1;
-			m_coord_y = 2;
 			break;
 		}
 		case Index_ShoulderR:
 		{
 			m_size = 2;
 			m_type = Slot_Shoulder;
-			m_coord_x = 1;
-			m_coord_y = 2;
 			break;
 		}
 		case Index_ForearmL:
 		{
 			m_size = 2;
 			m_type = Slot_Forearm;
-			m_coord_x = -2;
-			m_coord_y = 2;
 			break;
 		}
 		case Index_ForearmR:
 		{
 			m_size = 2;
 			m_type = Slot_Forearm;
-			m_coord_x = 2;
-			m_coord_y = 2;
 			break;
 		}
 	}

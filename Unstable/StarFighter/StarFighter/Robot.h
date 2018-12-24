@@ -16,6 +16,8 @@ public:
 	vector<CrewMember*> m_crew;
 	vector<RobotSlot> m_slots;
 
+	int m_robot_map[NB_SLOT_INDEX][NB_SLOT_INDEX];
+
 	bool SetModule(ModuleType type, SlotIndex index);
 	bool SetEquipment(EquipmentType type, SlotIndex index);
 	bool SetCrewMember(CrewType type, SlotIndex index);
@@ -45,6 +47,7 @@ public:
 	void DestroySlot(SlotIndex index);
 	void ShutdownSlot(SlotIndex index);
 	void UpdateCrew(SlotIndex index);
+	int GetDistanceFromSlotToSlot(SlotIndex index, SlotIndex target_index);
 
 	int GenerateEnergyCells();
 	int HealCrewMembers();

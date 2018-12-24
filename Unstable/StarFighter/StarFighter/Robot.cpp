@@ -38,6 +38,28 @@ Robot::Robot()
 	SetModule(Module_Head, Index_Head);
 	SetModule(Module_Stabilizers, Index_FootL);
 	SetModule(Module_Stabilizers, Index_FootR);
+
+	//Map the distance between slots
+	int robot_map[NB_SLOT_INDEX][NB_SLOT_INDEX] = {
+		{ 0, 4, 4, 5, 5, 2, 2, 3, 3, 1, 2, 3 },
+		{ 4, 0, 2, 1, 3, 4, 4, 5, 5, 3, 2, 1 },
+		{ 4, 2, 0, 3, 1, 4, 4, 5, 5, 3, 2, 1 },
+		{ 5, 1, 3, 0, 4, 5, 5, 6, 6, 4, 3, 2 },
+		{ 5, 3, 1, 4, 0, 5, 5, 6, 6, 4, 3, 2 },
+		{ 2, 4, 4, 5, 5, 0, 2, 1, 3, 1, 2, 3 },
+		{ 2, 4, 4, 5, 5, 2, 0, 3, 1, 1, 2, 3 },
+		{ 3, 5, 5, 6, 6, 1, 3, 0, 4, 2, 3, 4 },
+		{ 3, 5, 5, 6, 6, 3, 1, 4, 0, 2, 3, 4 },
+		{ 1, 3, 3, 4, 4, 1, 1, 2, 2, 0, 1, 2 },
+		{ 2, 2, 2, 3, 3, 2, 2, 3, 3, 1, 0, 1 },
+		{ 3, 1, 1, 2, 2, 3, 3, 4, 4, 2, 1, 0 } };
+	for (int i = 0; i < NB_SLOT_INDEX; i++)
+	{
+		for (int j = 0; j < NB_SLOT_INDEX; j++)
+		{
+			m_robot_map[i][j] = robot_map[i][j];
+		}
+	}
 }
 
 Robot::~Robot()
@@ -341,10 +363,6 @@ void Robot::Update()
 		}
 		case Phase_CrewMovement:
 		{
-			//todo
-			//pas de délplacement si stunned
-			//déplacements gratuits sur slots vides + cheminement
-
 			//TEST
 			//if (m_index == 1)
 			//{
@@ -620,11 +638,11 @@ void Robot::UpdateFirePropagation()
 			{
 				for (vector<RobotSlot>::iterator it2 = m_slots.begin(); it2 != m_slots.end(); it2++)
 				{
-					if (it2->m_module != NULL && it2->m_module->m_fire_counter != 1)//propagation to a module that is not burning yet
+					//Propagation to a module that is not burning yet
+					if (it2->m_module != NULL && it2->m_module->m_fire_counter != 1)
 					{
-						//adjacent slots
-						if ((abs(it2->m_coord_x - it->m_coord_x) == 1 && abs(it2->m_coord_y - it->m_coord_y) == 0)
-							|| (abs(it2->m_coord_x - it->m_coord_x) == 0 && abs(it2->m_coord_y - it->m_coord_y) == 1))
+						//Get adjacent slots
+						if (GetDistanceFromSlotToSlot(it->m_index, it2->m_index) == 1)
 						{
 							bool propagation_sucess = RandomizeIntBetweenValues(1, 6) >= 4;
 
@@ -792,8 +810,6 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
 	RobotSlot& current_slot = m_slots[crew->m_index];
 	RobotSlot& target_slot = m_slots[target_index];
 
-	int distance = abs(current_slot.m_coord_x - target_slot.m_coord_x) + abs(current_slot.m_coord_y - target_slot.m_coord_y);
-
 	if (target_index == crew->m_index)
 	{
 		printf("Move cancelled: crew member is already on this position.\n");
@@ -804,37 +820,43 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
 		printf("Cannot move crew member because he's stunned.\n");
 		return false;
 	}
-	else if (distance > crew->m_steps)
+	else if (GetDistanceFromSlotToSlot(crew->m_index, target_index) > crew->m_steps)
 	{
-		printf("Cannot move crew member to slot %d because the distance to cross (%d) exceeds his movement ability (%d)\n", (int)target_index, distance, crew->m_steps);
+		printf("Cannot move crew member to slot %d because the distance to cross exceeds his movement ability (%d)\n", (int)target_index, crew->m_steps);
 		return false;
 	}
-
-	//Movement
-	vector<CrewMember*> old_crew;
-	for (vector<CrewMember*>::iterator it = current_slot.m_crew.begin(); it != current_slot.m_crew.end(); it++)
+	else if (m_slots[target_index].m_module == NULL)
 	{
-		old_crew.push_back(*it);
+		printf("Cannot move crew member to slot %d because it's empty, it cannot be inhabited.\n", (int)target_index);
+		return false;
 	}
-
-	current_slot.m_crew.clear();
-
-	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+	else
 	{
-		if (*it != crew)
+		//Movement
+		vector<CrewMember*> old_crew;
+		for (vector<CrewMember*>::iterator it = current_slot.m_crew.begin(); it != current_slot.m_crew.end(); it++)
 		{
-			current_slot.m_crew.push_back(*it);
+			old_crew.push_back(*it);
 		}
+
+		current_slot.m_crew.clear();
+
+		for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+		{
+			if (*it != crew)
+			{
+				current_slot.m_crew.push_back(*it);
+			}
+		}
+
+		target_slot.m_crew.push_back(crew);
+		crew->m_index = current_slot.m_index;
+
+		printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
+
+		return true;
 	}
-
-	target_slot.m_crew.push_back(crew);
-	crew->m_index = current_slot.m_index;
-
-	printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
-
-	return true;
 }
-
 
 void Robot::UpdateCrew(SlotIndex index)
 {
@@ -868,6 +890,52 @@ void Robot::UpdateCrew(SlotIndex index)
 			}
 		}
 	}
+}
+
+int Robot::GetDistanceFromSlotToSlot(SlotIndex index, SlotIndex target_index)
+{
+	int distance_to_cross = m_robot_map[index][target_index];
+	int distance = 0;
+	
+	SlotIndex temp_index = index;
+
+	while (distance_to_cross > 0)
+	{
+		for (int i = 0; i < NB_SLOT_INDEX; i++)
+		{
+			int dst = m_robot_map[i][target_index];
+			
+			int a = Index_Head;
+			int a1 = Index_LegL;
+			int a2 = Index_LegR;
+			int a3 = Index_FootL;	
+			int a4 = Index_FootR;
+			int a5 = Index_ShoulderL;
+			int a6 = Index_ShoulderR;
+			int a7 = Index_ForearmL;
+			int a11 = Index_ForearmR;
+			int a12= Index_BodyU;
+			int a13 = Index_BodyM;
+			int a14 = Index_BodyD;
+
+			//Looking for the slot that gets us 1 step closer to the destination, while being at 1 step away from our current 
+			if (m_robot_map[i][target_index] == distance_to_cross - 1 && m_robot_map[i][temp_index] == 1)
+			{
+				distance_to_cross--;
+				temp_index = (SlotIndex)i;
+
+				//Module empty? (in this case, movement is free and doesn't increase the distance)
+				if (m_slots[temp_index].m_module != NULL)
+				{
+					distance++;
+				}
+
+				break;
+			}
+		}
+	}
+
+	return distance;
 }
 
 bool Robot::SetEnergyCell(Module* module)
