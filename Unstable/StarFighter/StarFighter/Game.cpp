@@ -787,7 +787,6 @@ WeaponAttack::WeaponAttack(Weapon* owner)
 	m_chance_of_stun = 0;
 	m_chance_of_unbalance = 0;
 	m_crew_required = NB_CREW_TYPES;
-
 	m_energy_cells = 0;
 }
 

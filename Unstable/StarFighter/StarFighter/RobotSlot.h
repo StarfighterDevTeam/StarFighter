@@ -29,6 +29,7 @@ public:
 	void UpdateCrew();
 	int GetGunnerRangeBonus();
 	int GetWarriorBalanceBonus();
+	bool HasCrewRequired(CrewType type);
 };
 
 #endif //ROBOTSLOT_H_INCLUDED

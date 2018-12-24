@@ -173,3 +173,16 @@ int RobotSlot::GetWarriorBalanceBonus()
 
 	return warrior_bonus;
 }
+
+bool RobotSlot::HasCrewRequired(CrewType type)
+{
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		if ((*it)->m_type == type && (*it)->m_stun_counter == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}

@@ -174,11 +174,32 @@ enum WeaponType
 	NB_WEAPON_TYPES,
 };
 
+enum WeaponAttackType
+{
+	WeaponAttack_Fist_1,
+	WeaponAttack_Fist_2,
+	WeaponAttack_Grab_1,
+	WeaponAttack_Guard_1,
+	WeaponAttack_BlasterRifle_1,
+	WeaponAttack_BlasterRifle_2,
+	WeaponAttack_LaserCannon_1,
+	WeaponAttack_LaserCannon_2,
+	WeaponAttack_FireSword_1,
+	WeaponAttack_FireSword_2,
+	WeaponAttack_Hammer_1,
+	WeaponAttack_Hammer_2,
+	WeaponAttack_Gun_1,
+	WeaponAttack_Gun_2,
+	NB_WEAPON_ATTACK_TYPES,
+};
+
 class Weapon;//foreward declaration
 class WeaponAttack
 {
 public:
 	WeaponAttack(Weapon* owner);
+
+	WeaponAttackType m_type;
 	int m_speed;
 	int m_damage;
 	int m_energy_cost;
