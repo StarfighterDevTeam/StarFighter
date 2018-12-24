@@ -769,7 +769,7 @@ bool Robot::CheckShudownGlobalConditions()
 		}
 
 		//Captain or pilot are alive and not stunned in the head?
-		if (it->m_type == Module_Head)
+		if (it->m_type == Index_Head)
 		{
 			for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
 			{
