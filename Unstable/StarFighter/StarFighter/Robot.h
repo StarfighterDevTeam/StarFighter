@@ -44,6 +44,7 @@ public:
 	bool CheckShudownGlobalConditions();
 	void DestroySlot(SlotIndex index);
 	void ShutdownSlot(SlotIndex index);
+	void UpdateCrew(SlotIndex index);
 
 	int GenerateEnergyCells();
 	int HealCrewMembers();
@@ -54,7 +55,7 @@ public:
 	bool SetEnergyCell(Module* module);
 	bool SetEnergyCell(Equipment* equipment);
 	bool SetEnergyCell(WeaponAttack* attack);
-	bool SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index);
+	bool SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index);
 };
 
 #endif //ROBOT_H_INCLUDED

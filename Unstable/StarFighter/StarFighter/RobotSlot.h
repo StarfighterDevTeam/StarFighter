@@ -26,7 +26,6 @@ public:
 	Weapon* m_weapon;
 	Robot* m_owner;
 
-	void UpdateCrew();
 	int GetGunnerRangeBonus();
 	int GetWarriorBalanceBonus();
 	bool HasCrewRequired(CrewType type);

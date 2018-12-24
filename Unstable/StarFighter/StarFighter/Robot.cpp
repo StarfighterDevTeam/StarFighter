@@ -364,8 +364,9 @@ void Robot::Update()
 					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
 					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
 					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
+				
+					SetWeaponAttackOnSlot(m_slots[Index_ForearmL].m_weapon->m_attacks.front(), Index_Head);
 				}
-
 
 				//verifier que le module / equipement utilisé n'est pas détruit
 				//verifier que le crew member requis n'est pas stunned - notamment les gadgets requirent un Ingenieur
@@ -528,7 +529,7 @@ int Robot::RepairModules()
 		if (module != NULL)
 		{ 
 			//Shutdown update
-			if (module->m_shutdown_counter >= 0)
+			if (module->m_shutdown_counter > 0)
 			{
 				module->m_shutdown_counter--;
 			}
@@ -558,16 +559,16 @@ int Robot::RepairModules()
 					}
 
 					//Ends fire status
-					if (module->m_fire_counter >= 0)
+					if (module->m_fire_counter > 0)
 					{
-						module->m_fire_counter = -1;
+						module->m_fire_counter = 0;
 						printf("Fire extinguished.\n");
 					}
 
 					//Ends shutdown status
-					if (module->m_shutdown_counter >= 0)
+					if (module->m_shutdown_counter > 0)
 					{
-						module->m_shutdown_counter = -1;
+						module->m_shutdown_counter = 0;
 						printf("Shutdown repaired.\n");
 					}
 				}
@@ -586,7 +587,7 @@ void Robot::UpdateFirePropagation()
 		Module* module = (*it).m_module;
 		if (module != NULL)
 		{		
-			if (module->m_fire_counter >= 0)
+			if (module->m_fire_counter > 0)
 			{
 				//Damage to module
 				if (module->m_health > 0)
@@ -610,16 +611,16 @@ void Robot::UpdateFirePropagation()
 				{
 					(*it2)->m_health--;
 				}
-				it->UpdateCrew();
+				UpdateCrew(it->m_index);
 				UpdateShudownGlobal();
 			}
 
 			//Fire propagation
-			if (module->m_fire_counter > 0)
+			if (module->m_fire_counter == 1)
 			{
 				for (vector<RobotSlot>::iterator it2 = m_slots.begin(); it2 != m_slots.end(); it2++)
 				{
-					if (it2->m_module != NULL && it2->m_module->m_fire_counter < 0)//propagation to a module that is not burning yet
+					if (it2->m_module != NULL && it2->m_module->m_fire_counter != 1)//propagation to a module that is not burning yet
 					{
 						//adjacent slots
 						if ((abs(it2->m_coord_x - it->m_coord_x) == 1 && abs(it2->m_coord_y - it->m_coord_y) == 0)
@@ -629,7 +630,7 @@ void Robot::UpdateFirePropagation()
 
 							if (propagation_sucess)
 							{
-								it2->m_module->m_fire_counter = 0;
+								it2->m_module->m_fire_counter = 1;
 								printf("Fire propagated from slot %d to slot %d.\n", (int)it->m_index, (int)it2->m_index);
 							}
 						}
@@ -659,7 +660,7 @@ void Robot::UpdateCooldowns()
 			}
 		}
 
-		//Crew members stunned and captain overcharge
+		//Crew members stun status and captain overcharge
 		for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
 		{
 			if ((*it2)->m_stun_counter > 0)
@@ -673,8 +674,8 @@ void Robot::UpdateCooldowns()
 			}
 		}
 
-		//Fire propagation
-		if (it->m_module != NULL && it->m_module->m_fire_counter > 0)
+		//Fire update
+		if (it->m_module != NULL && it->m_module->m_fire_counter > 1)
 		{
 			it->m_module->m_fire_counter--;
 		}
@@ -772,7 +773,7 @@ void Robot::ShutdownSlot(SlotIndex index)
 	Module* module = m_slots[index].m_module;
 	if (module != NULL)
 	{
-		module->m_shutdown_counter = 1;
+		module->m_shutdown_counter = 2;
 
 		//Loss of energy cells
 		m_energy_cells -= module->m_energy_cells;
@@ -832,6 +833,41 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
 	printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
 
 	return true;
+}
+
+
+void Robot::UpdateCrew(SlotIndex index)
+{
+	//Remove dead crew members
+	vector<CrewMember*> old_crew;
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		old_crew.push_back(*it);
+	}
+
+	m_crew.clear();
+	m_slots[index].m_crew.clear();
+
+	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+	{
+		if ((*it)->m_health > 0)
+		{
+			m_crew.push_back(*it);
+
+			if ((*it)->m_index == index)
+			{
+				m_slots[index].m_crew.push_back(*it);
+			}
+		}
+		else
+		{
+			printf("Crew member dead.\n");
+			if ((*it)->m_type == Crew_Captain)
+			{
+				printf("Captain was killed. GAME OVER.\n");
+			}
+		}
+	}
 }
 
 bool Robot::SetEnergyCell(Module* module)
@@ -901,7 +937,7 @@ bool Robot::SetEnergyCell(WeaponAttack* attack)
 }
 
 
-bool Robot::SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
+bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 {
 	Module* module = attack->m_owner->m_owner->m_module;
 
@@ -910,7 +946,7 @@ bool Robot::SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		printf("Cannot attack: not enough Enery Cells to use this attack: (current cells: %d ; cost: %d)\n", attack->m_energy_cells, attack->m_energy_cost);
 		return false;
 	}
-	else if (module->m_shutdown_counter >= 0)
+	else if (module->m_shutdown_counter > 0)
 	{
 		printf("Cannot attack: weapon module is shut down.\n");
 		return false;

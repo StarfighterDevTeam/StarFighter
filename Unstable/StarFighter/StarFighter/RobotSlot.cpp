@@ -111,33 +111,6 @@ RobotSlot::RobotSlot(SlotIndex index, Robot* owner)
 	}
 }
 
-void RobotSlot::UpdateCrew()
-{
-	vector<CrewMember*> old_crew;
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-	{
-		old_crew.push_back(*it);
-	}
-
-	m_crew.clear();
-
-	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-	{
-		if ((*it)->m_health > 0)
-		{
-			m_crew.push_back(*it);
-		}
-		else
-		{
-			printf("Crew member dead.\n");
-			if ((*it)->m_type == Crew_Captain)
-			{
-				printf("Captain was killed. GAME OVER.\n");
-			}
-		}
-	}
-}
-
 int RobotSlot::GetGunnerRangeBonus()
 {
 	int gunner_bonus = 0;

@@ -15,8 +15,8 @@ Module::Module(ModuleType type, RobotSlot* owner)
 	m_health_max = 0;
 	m_cooldown = -1;
 	m_crew_max = 0;
-	m_fire_counter = -1;
-	m_shutdown_counter = -1;
+	m_fire_counter = 0;
+	m_shutdown_counter = 0;
 
 	switch (type)
 	{
@@ -102,7 +102,7 @@ bool Module::IsOperationnal()
 {
 	bool operational = false;
 
-	bool not_shutdown = m_shutdown_counter < 0;
+	bool not_shutdown = m_shutdown_counter == 0;
 	bool not_destroyed = m_health > 0;
 	bool powered_with_energy = m_energy_cells >= 1;
 

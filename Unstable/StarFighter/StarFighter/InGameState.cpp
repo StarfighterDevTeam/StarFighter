@@ -78,54 +78,54 @@ void InGameState::InitRobots()
 
 	robot.Initialize();
 
-	robot = m_robots[1];
+	Robot& robot2 = m_robots[1];
 
 	//Robot 2
-	robot.m_index = 1;
-	robot.SetModule(Module_Generator, Index_BodyU);
-	robot.SetEquipment(Equipment_GeneratorBooster, Index_BodyU);
-	robot.SetEquipment(Equipment_LightPlate, Index_BodyU);
+	robot2.m_index = 1;
+	robot2.SetModule(Module_Generator, Index_BodyU);
+	robot2.SetEquipment(Equipment_GeneratorBooster, Index_BodyU);
+	robot2.SetEquipment(Equipment_LightPlate, Index_BodyU);
 
-	robot.SetModule(Module_CrewQuarter, Index_BodyM);
-	robot.SetEquipment(Equipment_CQExtension, Index_BodyM);
-	robot.SetEquipment(Equipment_CQExtension, Index_BodyM);
+	robot2.SetModule(Module_CrewQuarter, Index_BodyM);
+	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
+	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
 
-	robot.SetModule(Module_Sensors, Index_BodyD);
+	robot2.SetModule(Module_Sensors, Index_BodyD);
 
-	robot.SetModule(Module_Deflectors, Index_LegR);
+	robot2.SetModule(Module_Deflectors, Index_LegR);
 
-	robot.SetModule(Module_Gadget, Index_LegL);
-	robot.SetEquipment(Equipment_GadgetJammer, Index_LegL);
+	robot2.SetModule(Module_Gadget, Index_LegL);
+	robot2.SetEquipment(Equipment_GadgetJammer, Index_LegL);
 
-	robot.SetEquipment(Equipment_LightPlate, Index_FootL);
+	robot2.SetEquipment(Equipment_LightPlate, Index_FootL);
 
-	robot.SetEquipment(Equipment_LightPlate, Index_FootR);
+	robot2.SetEquipment(Equipment_LightPlate, Index_FootR);
 
-	robot.SetModule(Module_Weapon, Index_ForearmL);
-	robot.SetEquipment(Equipment_HeavyPlate, Index_ForearmL);
+	robot2.SetModule(Module_Weapon, Index_ForearmL);
+	robot2.SetEquipment(Equipment_HeavyPlate, Index_ForearmL);
 
-	robot.SetModule(Module_Weapon, Index_ShoulderL);
-	robot.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderL);
+	robot2.SetModule(Module_Weapon, Index_ShoulderL);
+	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderL);
 
-	robot.SetModule(Module_Weapon, Index_ShoulderR);
-	robot.SetEquipment(Equipment_HeavyPlate, Index_ShoulderR);
+	robot2.SetModule(Module_Weapon, Index_ShoulderR);
+	robot2.SetEquipment(Equipment_HeavyPlate, Index_ShoulderR);
 
-	robot.SetModule(Module_Weapon, Index_ForearmR);
-	robot.SetEquipment(Equipment_EnergeticWeapon, Index_ForearmR);
+	robot2.SetModule(Module_Weapon, Index_ForearmR);
+	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ForearmR);
 
-	robot.SetCrewMember(Crew_Captain, Index_Head);
-	robot.SetCrewMember(Crew_Pilot, Index_Head);
-	robot.SetCrewMember(Crew_Medic, Index_BodyU);
-	robot.SetCrewMember(Crew_Scientist, Index_BodyU);
-	robot.SetCrewMember(Crew_Gunner, Index_ShoulderR);
-	robot.SetCrewMember(Crew_Warrior, Index_ForearmR);
-	robot.SetCrewMember(Crew_Mechanic, Index_BodyM);
-	robot.SetCrewMember(Crew_Engineer, Index_LegL);
+	robot2.SetCrewMember(Crew_Captain, Index_Head);
+	robot2.SetCrewMember(Crew_Pilot, Index_Head);
+	robot2.SetCrewMember(Crew_Medic, Index_BodyU);
+	robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
+	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
+	robot2.SetCrewMember(Crew_Warrior, Index_ForearmR);
+	robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
+	robot2.SetCrewMember(Crew_Engineer, Index_LegL);
 
-	robot.SetWeapon(Weapon_Gun, Index_ShoulderR);
-	robot.SetWeapon(Weapon_Hammer, Index_ForearmR);
+	robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
+	robot2.SetWeapon(Weapon_Hammer, Index_ForearmR);
 
-	robot.Initialize();
+	robot2.Initialize();
 }
 
 /*
@@ -218,9 +218,11 @@ void InGameState::Update(sf::Time deltaTime)
 	//ROBOT
 	m_robots[0].Update();
 	m_robots[1].Update();
-	if ((*CurrentGame).m_phase <= Phase_AttackResolution_12 && (*CurrentGame).m_phase >= Phase_AttackResolution_1)
+	if ((*CurrentGame).m_phase >= Phase_AttackResolution_12 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
 	{
 		AttackResolutions();
+		m_robots[0].m_ready_to_change_phase = true;
+		m_robots[1].m_ready_to_change_phase = true;
 	}
 
 	//Phase shift
@@ -428,18 +430,18 @@ void CardSlot::Update(MouseAction mouse_click)
 
 void InGameState::AttackResolutions()
 {
-	int speed = (int)((*CurrentGame).m_phase) - (int)(Phase_AttackResolution_1) + 1;
+	int speed = (int)(Phase_AttackResolution_1) - (int)(*CurrentGame).m_phase + 1;
 	bool ranged = true;
 
 	//Resolve actions
-	printf("Resolution of attack speed %d.\n", speed);
-
 	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_actions_list.begin(); it != (*CurrentGame).m_actions_list.end(); it++)
 	{
 		if (it->m_attack->m_speed != speed)
 		{
 			continue;
 		}
+
+		printf("Attack resolution (speed %d).\n", speed);
 
 		Robot* robot = it->m_attack->m_owner->m_owner->m_owner;
 		RobotSlot& robot_slot = *it->m_attack->m_owner->m_owner;
@@ -456,7 +458,7 @@ void InGameState::AttackResolutions()
 		{
 			printf("Module cannot be used because it's been destroyed.\n");
 		}
-		else if (module->m_shutdown_counter >= 0)
+		else if (module->m_shutdown_counter > 0)
 		{
 			printf("Module cannot be used because it's been shut down.\n");
 		}
@@ -495,14 +497,6 @@ void InGameState::AttackResolutions()
 			int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
 			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent->GetBalanceScore();
 
-			vector<bool> stun_success;
-			for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
-			{
-				bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
-				stun_success.push_back(stun_roll);
-			}
-			vector<bool> crew_hit_success;
-			
 			//Hit resolution
 			if (hit_success)
 			{
@@ -618,21 +612,30 @@ void InGameState::AttackResolutions()
 					}
 				}
 
-				//Randomization of damage to crew
+				//Randomization of damage to crew if module has been damaged
 				if (module_damaged)
 				{
 					for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
 					{
 						bool hit_roll = RandomizeIntBetweenValues(1, 6) >= 4;
-						crew_hit_success.push_back(hit_roll);
+						if (hit_roll == true)
+						{
+							(*it)->m_health--;
+						}
 					}
+					
+					opponent->UpdateCrew(target_slot.m_index);
 				}
 			}
 			
 			//Fire resolution
 			if (fire_success && target_module != NULL)
 			{
-				target_module->m_fire_counter = 1;
+				if (target_module->m_fire_counter < 2)
+				{
+					printf("Fire started.\n");
+					target_module->m_fire_counter = 2;
+				}
 			}
 
 			//Electric resolution
@@ -642,28 +645,18 @@ void InGameState::AttackResolutions()
 			}
 
 			//Stun resolution
-			int i = 0;
-			for (vector<bool>::iterator it = stun_success.begin(); it != stun_success.end(); it++)
+			for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
 			{
-				if ((*it) == true)
+				bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
+				if (stun_roll == true)
 				{
-					target_slot.m_crew[i]->m_stun_counter = 2;
+					if ((*it)->m_stun_counter < 2)
+					{
+						(*it)->m_stun_counter = 2;
+						printf("Crew member stunned.\n");
+					}
 				}
-				i++;
 			}
-
-			//Damage to crew resolution
-			int j = 0;
-			for (vector<bool>::iterator it = crew_hit_success.begin(); it != crew_hit_success.end(); it++)
-			{
-				if ((*it) == true)
-				{
-					target_slot.m_crew[j]->m_health--;
-				}
-				j++;
-			}
-			//Death of crew member?
-			target_slot.UpdateCrew();
 
 			//Balance resolution
 			if (unbalance_success)
