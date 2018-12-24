@@ -627,7 +627,7 @@ void InGameState::AttackResolutions()
 			//Electric resolution
 			if (electricity_sucess && target_module != NULL)
 			{
-				target_module->m_is_shutdown = true;
+				opponent.ShutdownSlot(target_slot.m_index);
 			}
 
 			//Stun resolution

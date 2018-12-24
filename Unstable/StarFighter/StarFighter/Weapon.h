@@ -7,10 +7,11 @@ class Weapon
 {
 public:
 	Weapon(WeaponType type);
+	~Weapon();
 
 	WeaponType m_type;
 
-	vector<WeaponAttack> m_attacks;
+	vector<WeaponAttack*> m_attacks;
 
 	int m_weight;
 	bool m_energetic;

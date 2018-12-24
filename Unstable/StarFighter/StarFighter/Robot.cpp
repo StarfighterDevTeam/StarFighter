@@ -333,6 +333,7 @@ void Robot::Update()
 		{
 			//todo
 			//pas de délplacement si stunned
+			//déplacements gratuits sur slots vides + cheminement
 
 			//TEST
 			//if (m_index == 1)
@@ -347,6 +348,15 @@ void Robot::Update()
 		{
 			if (m_shutdown_global == false)
 			{
+				//TEST
+				if (m_index == 0)
+				{
+					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
+					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
+					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
+				}
+
+
 				//verifier que le module / equipement utilisé n'est pas détruit
 				//verifier que le crew member requis n'est pas stunned - notamment les gadgets requirent un Ingenieur
 
@@ -638,12 +648,17 @@ void Robot::UpdateCooldowns()
 			}
 		}
 
-		//Crew members stunned
+		//Crew members stunned and captain overcharge
 		for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
 		{
 			if ((*it2)->m_stun_counter > 0)
 			{
 				(*it2)->m_stun_counter--;
+			}
+
+			if ((*it2)->m_type == Crew_Captain)
+			{
+				(*it2)->m_overcharge++;
 			}
 		}
 	}
@@ -726,6 +741,25 @@ void Robot::DestroySlot(SlotIndex index)
 			m_energy_cells -= (*it)->m_energy_cells;
 			(*it)->m_energy_cells = 0;
 		}
+	}
+}
+
+void Robot::ShutdownSlot(SlotIndex index)
+{
+	Module* module = m_slots[index].m_module;
+	if (module != NULL)
+	{
+		module->m_is_shutdown = true;
+
+		//Loss of energy cells
+		m_energy_cells -= module->m_energy_cells;
+		module->m_energy_cells = 0;
+
+		//for (vector<Equipment*>::iterator it = m_slots[index].m_equipments.begin(); it != m_slots[index].m_equipments.end(); it++)
+		//{
+		//	m_energy_cells -= (*it)->m_energy_cells;
+		//	(*it)->m_energy_cells = 0;
+		//}
 	}
 }
 
@@ -821,137 +855,68 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
 	return true;
 }
 
-//ROBOT SLOT
-RobotSlot::RobotSlot(SlotIndex index)
+bool Robot::SetEnergyCell(Module* module)
 {
-	m_index = index;
-	m_module = NULL;
-	m_weapon = NULL;
-
-	switch (index)
+	if (m_energy_cells_available > 0)
 	{
-		case Index_Head:
+		if (module->m_energy_cells < module->m_energy_cells_max)
 		{
-			m_size = 1;
-			m_type = Slot_Head;
-			m_coord_x = 0;
-			m_coord_y = 3;
-			break;
-		}
-		case Index_BodyU:
-		{
-			m_size = 3;
-			m_type = Slot_Body;
-			m_coord_x = 0;
-			m_coord_y = 2;
-			break;
-		}
-		case Index_BodyM:
-		{
-			m_size = 3;
-			m_type = Slot_Body;
-			m_coord_x = 0;
-			m_coord_y = 1;
-			break;
-		}
-		case Index_BodyD:
-		{
-			m_size = 2;
-			m_type = Slot_Body;
-			m_coord_x = 0;
-			m_coord_y = 0;
-			break;
-		}
-		case Index_LegL:
-		{
-			m_size = 2;
-			m_type = Slot_Leg;
-			m_coord_x = -1;
-			m_coord_y = 0;
-			break;
-		}
-		case Index_LegR:
-		{
-			m_size = 2;
-			m_type = Slot_Leg;
-			m_coord_x = 1;
-			m_coord_y = 0;
-			break;
-		}
-		case Index_FootL:
-		{
-			m_size = 2;
-			m_type = Slot_Foot;
-			m_coord_x = -2;
-			m_coord_y = 0;
-			break;
-		}
-		case Index_FootR:
-		{
-			m_size = 2;
-			m_type = Slot_Foot;
-			m_coord_x = 2;
-			m_coord_y = 0;
-			break;
-		}
-		case Index_ShoulderL:
-		{
-			m_size = 2;
-			m_type = Slot_Shoulder;
-			m_coord_x = -1;
-			m_coord_y = 2;
-			break;
-		}
-		case Index_ShoulderR:
-		{
-			m_size = 2;
-			m_type = Slot_Shoulder;
-			m_coord_x = 1;
-			m_coord_y = 2;
-			break;
-		}
-		case Index_ForearmL:
-		{
-			m_size = 2;
-			m_type = Slot_Forearm;
-			m_coord_x = -2;
-			m_coord_y = 2;
-			break;
-		}
-		case Index_ForearmR:
-		{
-			m_size = 2;
-			m_type = Slot_Forearm;
-			m_coord_x = 2;
-			m_coord_y = 2;
-			break;
-		}
-	}
-}
-
-void RobotSlot::UpdateCrew()
-{
-	vector<CrewMember*> old_crew;
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-	{
-		old_crew.push_back(*it);
-	}
-
-	m_crew.clear();
-
-	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-	{
-		if ((*it)->m_health > 0)
-		{
-			m_crew.push_back(*it);
+			module->m_energy_cells++;
+			m_energy_cells_available--;
+			return true;
 		}
 		else
 		{
-			printf("Crew member dead.\n");
-			if ((*it)->m_type == Crew_Captain)
-			{
-				printf("Captain was killed. GAME OVER.\n");
-			}
+			printf("Cannot add Energy Cell: no slot available.\n");
 		}
+	}
+	else
+	{
+		printf("No Energy Cell available.\n");
+		return false;
+	}
+}
+
+bool Robot::SetEnergyCell(Equipment* equipment)
+{
+	if (m_energy_cells_available > 0)
+	{
+		if (equipment->m_energy_cells < equipment->m_energy_cells_max)
+		{
+			equipment->m_energy_cells++;
+			m_energy_cells_available--;
+			return true;
+		}
+		else
+		{
+			printf("Cannot add Energy Cell: no slot available.\n");
+		}
+	}
+	else
+	{
+		printf("No Energy Cell available.\n");
+		return false;
+	}
+}
+
+bool Robot::SetEnergyCell(WeaponAttack* attack)
+{
+	if (m_energy_cells_available > 0)
+	{
+		if (attack->m_energy_cells < attack->m_energy_cost)
+		{
+			attack->m_energy_cells++;
+			m_energy_cells_available--;
+			return true;
+		}
+		else
+		{
+			printf("Cannot add Energy Cell: no slot available.\n");
+		}
+	}
+	else
+	{
+		printf("No Energy Cell available.\n");
+		return false;
 	}
 }

@@ -2,29 +2,8 @@
 #define ROBOT_H_INCLUDED
 
 #include "Game.h"
-#include "Weapon.h"
-#include "Module.h"
-#include "Equipment.h"
-#include "CrewMember.h"
 
-class RobotSlot
-{
-public:
-	RobotSlot(SlotIndex index);
-
-	int m_size;
-	SlotType m_type;
-	SlotIndex m_index;
-	int m_coord_x;
-	int m_coord_y;
-
-	vector<CrewMember*> m_crew;//destroyed in class Robot
-	Module* m_module;
-	vector<Equipment*> m_equipments;
-	Weapon* m_weapon;
-
-	void UpdateCrew();
-};
+#include "RobotSlot.h"
 
 class Robot
 {
@@ -65,6 +44,7 @@ public:
 	bool UpdateShudownGlobal();
 	bool CheckShudownGlobalConditions();
 	void DestroySlot(SlotIndex index);
+	void ShutdownSlot(SlotIndex index);
 
 	int GenerateEnergyCells();
 	int HealCrewMembers();
@@ -74,6 +54,9 @@ public:
 	int GetGunnerRangeBonus();
 	int GetWarriorBalanceBonus();
 	bool MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index);
+	bool SetEnergyCell(Module* module);
+	bool SetEnergyCell(Equipment* equipment);
+	bool SetEnergyCell(WeaponAttack* attack);
 };
 
 #endif //ROBOT_H_INCLUDED

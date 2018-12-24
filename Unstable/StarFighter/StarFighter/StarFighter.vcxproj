@@ -103,6 +103,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Robot.cpp" />
+    <ClCompile Include="RobotSlot.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFPanelSpecific.cpp" />
     <ClCompile Include="SFText.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Robot.h" />
+    <ClInclude Include="RobotSlot.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFPanelSpecific.h" />
     <ClInclude Include="SFText.h" />

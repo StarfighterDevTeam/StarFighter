@@ -189,6 +189,8 @@ public:
 	int m_chance_of_unbalance;
 	CrewType m_crew_required;
 
+	int m_energy_cells;
+
 	int GetUnbalanceScore();
 };
 
