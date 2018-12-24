@@ -8,7 +8,7 @@ CrewMember::CrewMember(CrewType type, RobotSlot* owner)
 	m_owner = owner;
 
 	m_stun_counter = 0;
-	m_is_healed_by_medic = false;
+	m_medic_target = NULL;
 	m_overcharge = 0;
 
 	switch (type)

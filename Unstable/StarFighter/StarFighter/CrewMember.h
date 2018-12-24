@@ -15,7 +15,7 @@ public:
 	int m_steps;
 	SlotIndex m_index;
 	int m_stun_counter;//0= not stunned; 1=stunned until next turn; 2=gets stunned
-	bool m_is_healed_by_medic;
+	CrewMember* m_medic_target;
 	int m_overcharge;
 	RobotSlot* m_owner;
 

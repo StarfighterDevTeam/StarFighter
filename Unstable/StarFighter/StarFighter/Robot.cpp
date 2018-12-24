@@ -503,39 +503,52 @@ int Robot::HealCrewMembers()
 
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
-		int health = 0;
-
-		Module* module = it->m_module;
 		//Infirmary heals 1pv/energy cell
+		int health = 0;
+		Module* module = it->m_module;
 		if (module != NULL && module->m_type == Module_Infirmary && module->IsOperationnal())
 		{
 			health += module->m_energy_cells;
+
+			for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
+			{
+				//Healing every crew member in the Infirmary
+				for (int i = 0; i < health; i++)
+				{
+					if (m_health < m_health_max)
+					{
+						m_health++;
+						health_healed++;
+					}
+				}
+			}
 		}
 
+		//Medic can heal up to 2pv to a targeted crew member
 		for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
-		{
-			//Target of a Medic heals 2pv
-			int health_medic = 0;
-			if ((*it2)->m_is_healed_by_medic)
+		{	
+			if ((*it2)->m_type == Crew_Medic)
 			{
-				health_medic = 2;
-				(*it2)->m_is_healed_by_medic = false;
-			}
-
-			for (int i = 0; i < health + health_medic; i++)
-			{
-				if (m_health < m_health_max)
+				if ((*it2)->m_stun_counter == 0 && (*it2)->m_medic_target != NULL)
 				{
-					m_health++;
-					health_healed++;
+					int health_medic = 2;
+					for (int i = 0; i < health_medic; i++)
+					{
+						if ((*it2)->m_medic_target->m_health < (*it2)->m_medic_target->m_health_max)
+						{
+							(*it2)->m_medic_target->m_health++;
+							health_healed++;
+						}
+					}
 				}
+
+				(*it2)->m_medic_target = NULL;
 			}
 		}
 	}
 			
 	return health_healed;
 }
-
 
 int Robot::RepairModules()
 {
@@ -552,7 +565,7 @@ int Robot::RepairModules()
 				module->m_shutdown_counter--;
 			}
 
-			//Repair modules
+			//Crew reparairing
 			int health = 0;
 			for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
 			{
@@ -565,15 +578,6 @@ int Robot::RepairModules()
 					if ((*it2)->m_type == Crew_Mechanic)
 					{
 						health++;
-					}
-
-					for (int i = 0; i < health; i++)
-					{
-						if (module->m_health < module->m_health_max)
-						{
-							module->m_health++;
-							health_repaired++;
-						}
 					}
 
 					//Ends fire status
@@ -589,6 +593,22 @@ int Robot::RepairModules()
 						module->m_shutdown_counter = 0;
 						printf("Shutdown repaired.\n");
 					}
+				}
+			}
+
+			//Deflector auto-regen
+			if (module->m_type == Module_Deflectors && module->IsOperationnal() && module->m_energy_cells == 2)
+			{
+				health += 2;
+			}
+
+			//Apply reparations
+			for (int i = 0; i < health; i++)
+			{
+				if (module->m_health < module->m_health_max)
+				{
+					module->m_health++;
+					health_repaired++;
 				}
 			}
 		}
@@ -1004,7 +1024,6 @@ bool Robot::SetEnergyCell(WeaponAttack* attack)
 	}
 }
 
-
 bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 {
 	Module* module = attack->m_owner->m_owner->m_module;
@@ -1054,6 +1073,25 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 
 		(*CurrentGame).m_actions_list.push_back(action);
 
+		return true;
+	}
+}
+
+bool Robot::SetMedicTarget(CrewMember* medic, CrewMember* target)
+{
+	if (medic->m_type != Crew_Medic)
+	{
+		printf("Crew member selected to heal is not a Medic.\n");
+		return false;
+	}
+	else if (medic->m_stun_counter > 0)
+	{
+		printf("Medic is stunned and cannot use his active ability to heal other crew members.\n");
+		return false;
+	}
+	else
+	{
+		medic->m_medic_target = target;
 		return true;
 	}
 }

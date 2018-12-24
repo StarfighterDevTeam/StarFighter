@@ -104,7 +104,7 @@ bool Module::IsOperationnal()
 
 	bool not_shutdown = m_shutdown_counter == 0;
 	bool not_destroyed = m_health > 0;
-	bool powered_with_energy = m_energy_cells >= 1;
+	bool powered_with_energy = m_energy_cells_max == 0 || m_energy_cells >= 1;
 
 	operational = not_shutdown && not_destroyed && powered_with_energy;
 

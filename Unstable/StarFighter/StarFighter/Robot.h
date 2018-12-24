@@ -59,6 +59,7 @@ public:
 	bool SetEnergyCell(Equipment* equipment);
 	bool SetEnergyCell(WeaponAttack* attack);
 	bool SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index);
+	bool SetMedicTarget(CrewMember* medic, CrewMember* target);
 };
 
 #endif //ROBOT_H_INCLUDED
