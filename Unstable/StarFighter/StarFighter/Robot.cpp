@@ -967,13 +967,20 @@ bool Robot::SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		printf("Cannot attack: weapon already is attacking.\n");
 		return false;
 	}
+	else if (attack->m_owner->m_ranged == false && target_index == Index_Head)
+	{
+		printf("Cannot attack: Head cannot be targeted by a close-combat attack.\n");
+		return false;
+	}
 	else
 	{	
 		attack->m_owner->m_attack_selected = attack;
 
-		//Action action;
-		//todo : action can accept weaponattack*, equipment*, module*, overcharge*, etc...
-		//(*CurrentGame).m_actions_list.push_back(action);
+		ActionAttack action;
+		action.m_attack = attack;
+		action.m_target_index = target_index;
+
+		(*CurrentGame).m_actions_list.push_back(action);
 
 		return true;
 	}

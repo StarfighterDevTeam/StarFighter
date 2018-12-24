@@ -207,11 +207,10 @@ enum SlotType
 	NB_SLOT_TYPES,
 };
 
-struct Action
+struct ActionAttack
 {
-	SlotIndex m_index;
-	int m_robot_index;
 	SlotIndex m_target_index;
+	WeaponAttack* m_attack;
 };
 
 enum DistanceCombat
@@ -299,7 +298,7 @@ public:
 
 	GamePhase m_phase;
 	int m_turn;
-	vector<vector<Action> > m_actions_list;
+	vector<ActionAttack> m_actions_list;
 	DistanceCombat m_distance;
 	DistanceCombat m_distance_temp;
 

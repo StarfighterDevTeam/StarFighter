@@ -432,19 +432,20 @@ void InGameState::AttackResolutions()
 	bool ranged = true;
 
 	//Resolve actions
-	if ((*CurrentGame).m_actions_list[speed].empty() == false)
+	printf("Resolution of attack speed %d.\n", speed);
+
+	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_actions_list.begin(); it != (*CurrentGame).m_actions_list.end(); it++)
 	{
-		printf("Resolution of attack speed %d.\n", speed);
-	}
+		if (it->m_attack->m_speed != speed)
+		{
+			continue;
+		}
 
-	for (vector<Action>::iterator it = (*CurrentGame).m_actions_list[speed].begin(); it != (*CurrentGame).m_actions_list[speed].end(); it++)
-	{
-		Robot& robot = m_robots[(*it).m_robot_index];
-		Robot& opponent = m_robots[(*it).m_robot_index + 1 % 2];
+		Robot* robot = it->m_attack->m_owner->m_owner->m_owner;
+		Module* module = it->m_attack->m_owner->m_owner->m_module;
 
-		Module* module = robot.m_slots[(*it).m_index].m_module;
-
-		RobotSlot& target_slot = opponent.m_slots[(*it).m_target_index];
+		Robot* opponent = &m_robots[robot->m_index + 1 % 2];
+		RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
 		Module* target_module = target_slot.m_module;
 
 		if (module->m_health == 0)
@@ -455,18 +456,18 @@ void InGameState::AttackResolutions()
 		{
 			printf("Module cannot be used because it's been shut down.\n");
 		}
-		else if (robot.m_unbalanced == true)
+		else if (robot->m_unbalanced == true)
 		{
 			printf("Module cannot be used because robot is unbalanced.\n");
 		}
-		else if (robot.m_shutdown_global == true)
+		else if (robot->m_shutdown_global == true)
 		{
 			printf("Module cannot be used because robot is undergoing a global shutdown.\n");
 		}
 		else if (module->m_type == Module_Weapon)//Weapons
 		{
-			Weapon* weapon = robot.m_slots[(*it).m_index].m_weapon;
-			WeaponAttack* attack = robot.m_slots[(*it).m_index].m_weapon->m_attack_selected;
+			Weapon* weapon = it->m_attack->m_owner;
+			WeaponAttack* attack = it->m_attack;
 
 			//if there are both a ranged and a close-combat weapon on this attack speed, the close-combat is prioritary to determine the position at the end of the turn
 			if (weapon->m_ranged == false)
@@ -475,15 +476,15 @@ void InGameState::AttackResolutions()
 			}
 
 			//Randomization of resolutions
-			int gunner_bonus = robot.GetGunnerRangeBonus();
+			int gunner_bonus = robot->GetGunnerRangeBonus();
 			bool hit_success = weapon->m_ranged == false || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
 			
 			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
 			
 			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
 			
-			int warrior_bonus = robot.GetWarriorBalanceBonus();
-			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent.GetBalanceScore();
+			int warrior_bonus = robot->GetWarriorBalanceBonus();
+			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent->GetBalanceScore();
 
 			vector<bool> stun_success;
 			for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
@@ -503,7 +504,7 @@ void InGameState::AttackResolutions()
 				if (weapon->m_energetic)
 				{
 					//Deflector absorption
-					for (vector<RobotSlot>::iterator it = opponent.m_slots.begin(); it != opponent.m_slots.end(); it++)
+					for (vector<RobotSlot>::iterator it = opponent->m_slots.begin(); it != opponent->m_slots.end(); it++)
 					{
 						if ((*it).m_module->m_type == Module_Deflectors)
 						{
@@ -537,18 +538,18 @@ void InGameState::AttackResolutions()
 							else
 							{
 								target_module->m_health = 0;
-								opponent.DestroySlot(target_slot.m_index);
+								opponent->DestroySlot(target_slot.m_index);
 							}
 
 							//Damage to robot
-							if (opponent.m_health > damage)
+							if (opponent->m_health > damage)
 							{
-								opponent.m_health -= damage;
+								opponent->m_health -= damage;
 							}
 							else
 							{
-								opponent.m_health = 0;
-								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent.m_index);
+								opponent->m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
 							}
 						}
 					}
@@ -590,18 +591,18 @@ void InGameState::AttackResolutions()
 							else
 							{
 								target_module->m_health = 0;
-								opponent.DestroySlot(target_slot.m_index);
+								opponent->DestroySlot(target_slot.m_index);
 							}
 
 							//Damage to robot
-							if (opponent.m_health > damage)
+							if (opponent->m_health > damage)
 							{
-								opponent.m_health -= damage;
+								opponent->m_health -= damage;
 							}
 							else
 							{
-								opponent.m_health = 0;
-								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent.m_index);
+								opponent->m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
 							}
 						}
 					}
@@ -627,7 +628,7 @@ void InGameState::AttackResolutions()
 			//Electric resolution
 			if (electricity_sucess && target_module != NULL)
 			{
-				opponent.ShutdownSlot(target_slot.m_index);
+				opponent->ShutdownSlot(target_slot.m_index);
 			}
 
 			//Stun resolution
@@ -657,31 +658,29 @@ void InGameState::AttackResolutions()
 			//Balance resolution
 			if (unbalance_success)
 			{
-				if (opponent.m_unbalanced == false)
+				if (opponent->m_unbalanced == false)
 				{
-					opponent.m_unbalanced = true;
-					printf("Robot %d gets unbalanced.\n", opponent.m_index);
+					opponent->m_unbalanced = true;
+					printf("Robot %d gets unbalanced.\n", opponent->m_index);
 				}
 			}
 
 			//Check global shutdown conditions
-			opponent.UpdateShudownGlobal();
+			opponent->UpdateShudownGlobal();
 
 			//Distance update
 			(*CurrentGame).m_distance_temp = ranged ? Distance_Ranged : Distance_Close;
 		}
 	}
 
-	//UI update
-	if ((*CurrentGame).m_actions_list[speed].empty() == false)
-	{
-		//do something
-	}
-
-	//Updating placement (depends on the last attack of the turn)
+	//End of the Attack resolution phases
 	if ((*CurrentGame).m_phase == Phase_AttackResolution_1)
 	{
+		//Updating placement (depends on the last attack of the turn)
 		(*CurrentGame).m_distance = (*CurrentGame).m_distance_temp;
+
+		//Clearing the actions list
+		(*CurrentGame).m_actions_list.clear();
 	}
 
 	m_robots[0].m_ready_to_change_phase = true;
