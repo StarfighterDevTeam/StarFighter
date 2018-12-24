@@ -24,6 +24,8 @@ public:
 	int m_fire_counter;//0: not burning; 1= burning and ready to propagate; 2= burning but not propagating
 	int m_shutdown_counter;//0: no shutdown; 1=shutdown will end next turn; 2= shutdown just started
 	RobotSlot* m_owner;
+	bool m_used;
+	CrewType m_crew_required;
 
 	bool IsOperationnal();
 };

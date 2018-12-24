@@ -434,7 +434,7 @@ void InGameState::AttackResolutions()
 	bool ranged = true;
 
 	//Resolve actions
-	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_actions_list.begin(); it != (*CurrentGame).m_actions_list.end(); it++)
+	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
 	{
 		if (it->m_attack->m_speed != speed)
 		{
@@ -470,7 +470,7 @@ void InGameState::AttackResolutions()
 		{
 			printf("Attack cancelled: the attack requires a specific type of crew member in the module (currently not present or stunned).\n");
 		}
-		else if (robot->m_unbalanced == true)
+		else if (robot->m_unbalanced_counter > 0)
 		{
 			printf("Module cannot be used because robot is unbalanced.\n");
 		}
@@ -495,7 +495,7 @@ void InGameState::AttackResolutions()
 			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
 			
 			int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
-			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent->GetBalanceScore();
+			int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + RandomizeIntBetweenValues(1, 20) - opponent->GetBalanceScore();
 
 			//Hit resolution
 			if (hit_success)
@@ -659,11 +659,12 @@ void InGameState::AttackResolutions()
 			}
 
 			//Balance resolution
-			if (unbalance_success)
+			if (unbalanced_score > 0)
 			{
-				if (opponent->m_unbalanced == false)
+				if (opponent->m_unbalanced_counter < 2)
 				{
-					opponent->m_unbalanced = true;
+					opponent->m_unbalanced_counter = 2;
+					opponent->m_unbalanced_value = unbalanced_score;
 					printf("Robot %d gets unbalanced.\n", opponent->m_index);
 				}
 			}
@@ -687,7 +688,7 @@ void InGameState::AttackResolutions()
 		(*CurrentGame).m_distance = (*CurrentGame).m_distance_temp;
 
 		//Clearing the actions list
-		(*CurrentGame).m_actions_list.clear();
+		(*CurrentGame).m_attacks_list.clear();
 	}
 
 	m_robots[0].m_ready_to_change_phase = true;

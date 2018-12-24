@@ -6,6 +6,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 {
 	m_type = type;
 	m_owner = owner;
+	m_used = false;
 
 	m_weight = 0;
 	m_energy_cells = 0;
@@ -17,6 +18,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 	m_crew_max = 0;
 	m_fire_counter = 0;
 	m_shutdown_counter = 0;
+	m_crew_required = NB_CREW_TYPES;
 
 	switch (type)
 	{
@@ -81,6 +83,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_unique = true;
 			m_energy_cells_max = 1;
 			m_cooldown = 2;
+			m_crew_required = Crew_Any;
 			break;
 		}
 		case Module_Sensors:

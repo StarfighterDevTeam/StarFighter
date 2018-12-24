@@ -131,6 +131,7 @@ enum CrewType
 	Crew_Warrior,
 	Crew_Medic,
 	Crew_Gunner,
+	Crew_Any,
 	NB_CREW_TYPES,
 };
 
@@ -197,7 +198,7 @@ class Weapon;//foreward declaration
 class WeaponAttack
 {
 public:
-	WeaponAttack(Weapon* owner);
+	WeaponAttack(WeaponAttackType type, Weapon* owner);
 
 	WeaponAttackType m_type;
 	int m_speed;
@@ -212,9 +213,33 @@ public:
 
 	int m_energy_cells;
 
-	int GetUnbalanceScore();
-
 	Weapon* m_owner;
+};
+
+enum EquipmentEffectType
+{
+	Effect_Radar,
+	Effect_EMP,
+	Effect_Jammer,
+	Effect_JetPack,
+	Effect_Repulsion,
+	Effect_WeaponScopes,
+	Effect_GeneratorBooster,
+	NB_EQUIPMENT_ACTION_TYPES,
+};
+
+class Module;
+class Equipment;
+class EquipmentEffect
+{
+public:
+	EquipmentEffect(EquipmentEffectType type, Module* owner_module, Equipment* owner_equipment);
+
+	EquipmentEffectType m_type;
+	Module* m_owner_module;
+	Equipment* m_owner_equipment;
+	CrewType m_crew_required;
+	int m_energy_cost;
 };
 
 enum SlotType
@@ -232,6 +257,12 @@ struct ActionAttack
 {
 	SlotIndex m_target_index;
 	WeaponAttack* m_attack;
+};
+
+struct ActionEffect
+{
+	SlotIndex m_target_index;
+	EquipmentEffect* m_effect;
 };
 
 enum DistanceCombat
@@ -319,7 +350,8 @@ public:
 
 	GamePhase m_phase;
 	int m_turn;
-	vector<ActionAttack> m_actions_list;
+	vector<ActionAttack> m_attacks_list;
+	vector<ActionEffect> m_effects_list;
 	DistanceCombat m_distance;
 	DistanceCombat m_distance_temp;
 

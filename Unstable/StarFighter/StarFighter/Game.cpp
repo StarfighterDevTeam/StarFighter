@@ -775,8 +775,9 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 }
 
 //ROBOT
-WeaponAttack::WeaponAttack(Weapon* owner)
+WeaponAttack::WeaponAttack(WeaponAttackType type, Weapon* owner)
 {
+	m_type = type;
 	m_owner = owner;
 	m_speed = 0;
 	m_damage = 0;
@@ -790,9 +791,11 @@ WeaponAttack::WeaponAttack(Weapon* owner)
 	m_energy_cells = 0;
 }
 
-int WeaponAttack::GetUnbalanceScore()
+EquipmentEffect::EquipmentEffect(EquipmentEffectType type, Module* owner_module, Equipment* owner_equipment)
 {
-	int balance = RandomizeIntBetweenValues(1, 20) + m_chance_of_unbalance;
-
-	return balance;
+	m_type = type;
+	m_owner_module = owner_module;
+	m_owner_equipment = owner_equipment;
+	m_crew_required = NB_CREW_TYPES;
+	m_energy_cost = 0;
 }

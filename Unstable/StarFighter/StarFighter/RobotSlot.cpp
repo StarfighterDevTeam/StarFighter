@@ -127,7 +127,20 @@ bool RobotSlot::HasCrewRequired(CrewType type)
 {
 	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
 	{
-		if ((*it)->m_type == type && (*it)->m_stun_counter == 0)
+		if (((*it)->m_type == type || type == Crew_Any) && (*it)->m_stun_counter == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool RobotSlot::CanEquipEnergeticWeapon()
+{
+	for (vector<Equipment*>::iterator it = m_equipments.begin(); it != m_equipments.end(); it++)
+	{
+		if ((*it)->m_type == Equipment_EnergeticWeapon && (*it)->m_energy_cells > 0)
 		{
 			return true;
 		}

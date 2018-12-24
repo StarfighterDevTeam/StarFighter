@@ -8,6 +8,7 @@ class Equipment
 {
 public:
 	Equipment(EquipmentType type, RobotSlot* owner);
+	~Equipment();
 
 	EquipmentType m_type;
 	ModuleType m_module_equipable;
@@ -23,6 +24,9 @@ public:
 	int m_cooldown_timer;
 	int m_crew_max;
 	RobotSlot* m_owner;
+	bool m_used;
+
+	EquipmentEffect* m_effect;
 };
 
 #endif //EQUIPMENT_H_INCLUDED

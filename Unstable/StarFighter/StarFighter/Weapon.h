@@ -18,8 +18,7 @@ public:
 	bool m_energetic;
 	bool m_ranged;
 	RobotSlot* m_owner;
-
-	WeaponAttack* m_attack_selected;
+	bool m_used;
 };
 
 

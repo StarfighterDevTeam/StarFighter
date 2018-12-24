@@ -9,7 +9,8 @@ Robot::Robot()
 	m_crew_max = 0;
 	m_energy_cells = 0;
 	m_energy_cells_available = 0;
-	m_unbalanced = false;
+	m_unbalanced_counter = 0;
+	m_unbalanced_value = 0;
 	m_shutdown_global = false;
 
 	m_ready_to_change_phase = false;
@@ -379,11 +380,18 @@ void Robot::Update()
 				//TEST
 				if (m_index == 0)
 				{
-					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
-					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
-					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks.front());
+					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
+					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
+					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
 				
+					SetEnergyCell(m_slots[Index_ForearmL].m_equipments[0]);
+
 					SetWeaponAttackOnSlot(m_slots[Index_ForearmL].m_weapon->m_attacks.front(), Index_Head);
+
+					//SetMedicTarget(medic, target);
+
+					//SetEquipmentEffectOnSlot(effect, target_index);
+
 				}
 
 				//verifier que le module / equipement utilisé n'est pas détruit
@@ -689,6 +697,12 @@ void Robot::UpdateCooldowns()
 			it->m_module->m_cooldown_timer++;
 		}
 
+		//Reset module
+		if (it->m_module != NULL)
+		{
+			it->m_module->m_used = false;
+		}
+
 		//Equipments cooldown
 		for (vector<Equipment*>::iterator it2 = it->m_equipments.begin(); it2 != it->m_equipments.end(); it2++)
 		{
@@ -696,6 +710,12 @@ void Robot::UpdateCooldowns()
 			{
 				(*it2)->m_cooldown_timer++;
 			}
+		}
+
+		//Reset equipments
+		for (vector<Equipment*>::iterator it2 = it->m_equipments.begin(); it2 != it->m_equipments.end(); it2++)
+		{
+			(*it2)->m_used = false;
 		}
 
 		//Crew members stun status and captain overcharge
@@ -718,10 +738,22 @@ void Robot::UpdateCooldowns()
 			it->m_module->m_fire_counter--;
 		}
 
-		//Resets weapon attack choice
+		//Reset weapon
 		if (it->m_weapon)
 		{
-			it->m_weapon->m_attack_selected = NULL;
+			it->m_weapon->m_used = false;
+		}
+
+		//Unbalanced status update
+		if (m_unbalanced_counter > 0)
+		{
+			m_unbalanced_counter--;
+
+			//Gets balanced again
+			if (m_unbalanced_counter == 0)
+			{
+				m_unbalanced_value = 0;
+			}
 		}
 	}
 }
@@ -1028,7 +1060,12 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 {
 	Module* module = attack->m_owner->m_owner->m_module;
 
-	if (attack->m_energy_cells < attack->m_energy_cost)
+	if (attack->m_owner->m_used == true)
+	{
+		printf("Weapon already used during this turn.\n");
+		return false;
+	}
+	else if (attack->m_energy_cells < attack->m_energy_cost)
 	{
 		printf("Cannot attack: not enough Enery Cells to use this attack: (current cells: %d ; cost: %d)\n", attack->m_energy_cells, attack->m_energy_cost);
 		return false;
@@ -1043,14 +1080,9 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		printf("Cannot attack: weapon module is destroyed and must be repaired first in order to be used.\n");
 		return false;
 	}
-	else if (m_unbalanced == true)
+	else if (m_unbalanced_counter > 0)
 	{
 		printf("Cannot attack: robot is unbalanced.\n");
-		return false;
-	}
-	else if (attack->m_owner->m_attack_selected != NULL)
-	{
-		printf("Cannot attack: weapon already is attacking.\n");
 		return false;
 	}
 	else if (attack->m_owner->m_ranged == false && (target_index == Index_FootL || target_index == Index_FootR || target_index == Index_LegL || target_index == Index_LegR))
@@ -1058,23 +1090,118 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		printf("Cannot attack: lower parts (legs and feet) can't be targeted by close-combat attacks.\n");
 		return false;
 	}
-	else if (attack->m_crew_required != NB_CREW_TYPES && attack->m_owner->m_owner->HasCrewRequired(attack->m_crew_required) == false)
+	else if (attack->m_crew_required != NB_CREW_TYPES && attack->m_crew_required != Crew_Any && attack->m_owner->m_owner->HasCrewRequired(attack->m_crew_required) == false)
 	{
-		printf("Cannot attack: the attack requires a specific type of crew member in the module (currently not present or stunned).\n");
+		printf("Cannot attack: the attack requires a specific type of valid crew member in the module (not stunned).\n");
+		return false;
+	}
+	else if (attack->m_crew_required == Crew_Any && attack->m_owner->m_owner->HasCrewRequired(attack->m_crew_required) == false)
+	{
+		printf("Cannot attack: the attack requires a valid crew member in the module (not stunned).\n");
+		return false;
+	}
+	else if (attack->m_owner->m_energetic == true && module->m_owner->CanEquipEnergeticWeapon() == false)
+	{
+		printf("Cannot attack: energetic weapons require an operational Energetic weapon equipement (powered with 1 EC) to be used.\n");
 		return false;
 	}
 	else
 	{
-		attack->m_owner->m_attack_selected = attack;
+		attack->m_owner->m_used = true;
 
 		ActionAttack action;
 		action.m_attack = attack;
 		action.m_target_index = target_index;
 
-		(*CurrentGame).m_actions_list.push_back(action);
+		(*CurrentGame).m_attacks_list.push_back(action);
 
 		return true;
 	}
+}
+
+bool Robot::SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_index)
+{
+	Module* module = effect->m_owner_module->m_owner->m_module;
+	if (module != NULL)
+	{
+		if (module->m_used == true)
+		{
+			printf("Module already used during this turn.\n");
+			return false;
+		}
+		else if (module->IsOperationnal() == false)
+		{
+			printf("Cannot use module ability: module is not operational (destroyed, shutdown, or not powered by an Energy Cell.\n");
+			return false;
+		}
+		else if (module->m_cooldown > 0 && module->m_cooldown_timer < module->m_cooldown)
+		{
+			printf("Cannot use module ability: cooldown is not over (%d turns remaining for cooldown).\n", module->m_cooldown - module->m_cooldown_timer);
+			return false;
+		}
+		else if (module->m_crew_required != NB_CREW_TYPES && module->m_crew_required != Crew_Any && module->m_owner->HasCrewRequired(module->m_crew_required) == false)
+		{
+			printf("Cannot use module ability: the module requires a specific type of valid crew member in the module (not stunned).\n");
+			return false;
+		}
+		else if (module->m_crew_required == Crew_Any && module->m_owner->HasCrewRequired(module->m_crew_required) == false)
+		{
+			printf("Cannot use module ability: the module requires a valid crew member in the module (not stunned).\n");
+			return false;
+		}
+	}
+
+	Equipment* equipment = effect->m_owner_equipment;
+	if (equipment != NULL)
+	{
+		if (equipment->m_used == true)
+		{
+			printf("Equipment already used during this turn.\n");
+			return false;
+		}
+		else if (equipment->m_owner->m_module->IsOperationnal() == false)
+		{
+			printf("Cannot use equipment ability: parent module is not operational (destroyed, shutdown, or not powered by an Energy Cell.\n");
+			return false;
+		}
+		else if (equipment->m_cooldown > 0 && equipment->m_cooldown_timer < equipment->m_cooldown)
+		{
+			printf("Cannot use equipment ability: cooldown is not over (%d turns remaining for cooldown).\n", equipment->m_cooldown - equipment->m_cooldown_timer);
+			return false;
+		}
+		else if (equipment->m_owner->m_module->m_type == Module_Gadget && equipment->m_owner->HasCrewRequired(Crew_Engineer) == false)
+		{
+			printf("Gadgets need an Engineer (not stunned) in the Gadget module in order to be used.\n");
+			return false;
+		}
+		else if (equipment->m_energy_cells_max > 0 && equipment->m_energy_cells == 0)
+		{
+			printf("Cannot use equipment ability: cooldown is not over (%d turns remaining for cooldown).\n", equipment->m_cooldown - equipment->m_cooldown_timer);
+			return false;
+		}
+		else if (equipment->m_energy_cells < effect->m_energy_cost)
+		{
+			printf("Cannot use equipment ability: not enough Enery Cells to use this ability: (current cells: %d ; cost: %d)\n", equipment->m_energy_cells, effect->m_energy_cost);
+			return false;
+		}
+	}
+	
+	if (module != NULL)
+	{
+		module->m_used = true;
+	}
+
+	if (equipment != NULL)
+	{
+		equipment->m_used = true;
+	}
+
+	ActionEffect action;
+	action.m_effect = effect;
+	action.m_target_index = target_index;
+	(*CurrentGame).m_effects_list.push_back(action);
+
+	return true;
 }
 
 bool Robot::SetMedicTarget(CrewMember* medic, CrewMember* target)
@@ -1092,6 +1219,27 @@ bool Robot::SetMedicTarget(CrewMember* medic, CrewMember* target)
 	else
 	{
 		medic->m_medic_target = target;
+		return true;
+	}
+}
+
+bool Robot::SetEnergyCellsOnBalance()
+{
+	if (m_unbalanced_counter == 0)
+	{
+		printf("Robot is already balanced.\n");
+		return false;
+	}
+	else if (m_energy_cells_available < m_unbalanced_value)
+	{
+		printf("Insufficient Energy Cells available (%d) to cancel unbalance (%d).\n", m_energy_cells_available, m_unbalanced_value);
+		return false;
+	}
+	else
+	{
+		//Spend Energy Cells to cancel the unbalance of the robot
+		m_energy_cells_available -= m_unbalanced_value;
+		m_unbalanced_counter = 0;
 		return true;
 	}
 }

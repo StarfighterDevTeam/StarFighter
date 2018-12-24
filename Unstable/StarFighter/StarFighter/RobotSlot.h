@@ -27,6 +27,7 @@ public:
 	int GetGunnerRangeBonus();
 	int GetWarriorBalanceBonus();
 	bool HasCrewRequired(CrewType type);
+	bool CanEquipEnergeticWeapon();
 };
 
 #endif //ROBOTSLOT_H_INCLUDED
