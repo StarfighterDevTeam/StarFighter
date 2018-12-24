@@ -2,9 +2,11 @@
 
 extern Game* CurrentGame;
 
-RobotSlot::RobotSlot(SlotIndex index)
+RobotSlot::RobotSlot(SlotIndex index, Robot* owner)
 {
 	m_index = index;
+	m_owner = owner;
+
 	m_module = NULL;
 	m_weapon = NULL;
 

@@ -6,7 +6,6 @@ extern Game* CurrentGame;
 Robot::Robot()
 {
 	m_weight = 0;
-	m_crew_nb = 0;
 	m_crew_max = 0;
 	m_energy_cells = 0;
 	m_energy_cells_available = 0;
@@ -16,33 +15,23 @@ Robot::Robot()
 	m_ready_to_change_phase = false;
 
 	//Robot slots
-	m_slots.push_back(RobotSlot(Index_Head));//0
-	m_slots.push_back(RobotSlot(Index_LegL));//1
-	m_slots.push_back(RobotSlot(Index_LegR));//2
-	m_slots.push_back(RobotSlot(Index_FootL));//3
-	m_slots.push_back(RobotSlot(Index_FootR));//4
-	m_slots.push_back(RobotSlot(Index_ShoulderL));//5
-	m_slots.push_back(RobotSlot(Index_ShoulderR));//6
-	m_slots.push_back(RobotSlot(Index_ForearmL));//7
-	m_slots.push_back(RobotSlot(Index_ForearmR));//8
-	m_slots.push_back(RobotSlot(Index_BodyU));//9
-	m_slots.push_back(RobotSlot(Index_BodyM));//10
-	m_slots.push_back(RobotSlot(Index_BodyD));//11
+	m_slots.push_back(RobotSlot(Index_Head, this));//0
+	m_slots.push_back(RobotSlot(Index_LegL, this));//1
+	m_slots.push_back(RobotSlot(Index_LegR, this));//2
+	m_slots.push_back(RobotSlot(Index_FootL, this));//3
+	m_slots.push_back(RobotSlot(Index_FootR, this));//4
+	m_slots.push_back(RobotSlot(Index_ShoulderL, this));//5
+	m_slots.push_back(RobotSlot(Index_ShoulderR, this));//6
+	m_slots.push_back(RobotSlot(Index_ForearmL, this));//7
+	m_slots.push_back(RobotSlot(Index_ForearmR, this));//8
+	m_slots.push_back(RobotSlot(Index_BodyU, this));//9
+	m_slots.push_back(RobotSlot(Index_BodyM, this));//10
+	m_slots.push_back(RobotSlot(Index_BodyD, this));//11
 
 	//Mandatory slots
 	SetModule(Module_Head, Index_Head);
 	SetModule(Module_Stabilizers, Index_FootL);
 	SetModule(Module_Stabilizers, Index_FootR);
-
-	//Crew members
-	m_crew.push_back(new CrewMember(Crew_Captain));//0
-	m_crew.push_back(new CrewMember(Crew_Scientist));//1
-	m_crew.push_back(new CrewMember(Crew_Mechanic));//2
-	m_crew.push_back(new CrewMember(Crew_Pilot));//3
-	m_crew.push_back(new CrewMember(Crew_Engineer));//4
-	m_crew.push_back(new CrewMember(Crew_Warrior));//5
-	m_crew.push_back(new CrewMember(Crew_Medic));//6
-	m_crew.push_back(new CrewMember(Crew_Gunner));//7
 }
 
 Robot::~Robot()
@@ -61,24 +50,40 @@ Robot::~Robot()
 
 bool Robot::SetCrewMember(CrewType type, SlotIndex index)
 {
-	if (m_crew_nb >= m_crew_max)
+	CrewMember* crew_member = new CrewMember(type, &m_slots[index]);
+
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		if ((*it)->m_type == Crew_Captain && type == Crew_Captain)
+		{
+			printf("Cannot have 2 Captains on a robot.\n");
+			delete crew_member;
+			crew_member = NULL;
+			return false;
+		}
+	}
+
+	if (m_crew.size() >= m_crew_max)
 	{
 		printf("Cannnot add crew member. Max crew size reached (%d)\n", m_crew_max);
+		delete crew_member;
+		crew_member = NULL;
 		return false;
 	}
 	else
 	{
-		m_slots[index].m_crew.push_back(m_crew[(int)type]);
-		m_crew[(int)type]->m_slot_index = index;
+		crew_member->m_index = index;
 
-		m_crew_nb++;
+		m_crew.push_back(crew_member);
+		m_slots[index].m_crew.push_back(crew_member);
+
 		return true;
 	}
 }
 
 bool Robot::SetModule(ModuleType type, SlotIndex index)
 {
-	Module* module = new Module(type);
+	Module* module = new Module(type, &m_slots[index]);
 
 	if (m_weight + module->m_weight > MAX_ROBOT_WEIGHT)
 	{
@@ -121,7 +126,7 @@ bool Robot::SetModule(ModuleType type, SlotIndex index)
 
 bool Robot::SetEquipment(EquipmentType type, SlotIndex index)
 {
-	Equipment* equipment = new Equipment(type);
+	Equipment* equipment = new Equipment(type, &m_slots[index]);
 
 	int current_equipment_size = 0;
 	for (vector<Equipment*>::iterator it = m_slots[index].m_equipments.begin(); it != m_slots[index].m_equipments.end(); it++)
@@ -169,7 +174,7 @@ bool Robot::SetEquipment(EquipmentType type, SlotIndex index)
 
 bool Robot::SetWeapon(WeaponType type, SlotIndex index)
 {
-	Weapon* weapon = new Weapon(type);
+	Weapon* weapon = new Weapon(type, &m_slots[index]);
 
 	if (m_weight + weapon->m_weight > MAX_ROBOT_WEIGHT)
 	{
@@ -244,21 +249,20 @@ int Robot::GetHealthMax()
 	return health_max;
 }
 
-int Robot::GetBalance()
+int Robot::GetBalanceScore()
 {
 	int balance = 0;
 
-	if (m_slots[Index_FootL].m_module && m_slots[Index_FootL].m_module->m_type == Module_Stabilizers)
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
-		balance += m_slots[Index_FootL].m_module->m_health;
-	}
-	
-	if (m_slots[Index_FootR].m_module && m_slots[Index_FootR].m_module->m_type == Module_Stabilizers)
-	{
-		balance += m_slots[Index_FootR].m_module->m_health;
+		Module* module = it->m_module;
+		if (module != NULL && module->m_type == Module_Stabilizers && module->m_is_shutdown == false && module->m_energy_cells == module->m_energy_cells_max)
+		{
+			balance += module->m_health;
+		}
 	}
 
-	balance += m_balance_bonus;
+	balance += m_balance_bonus;//bonus from weight modifier
 
 	return balance;
 }
@@ -661,6 +665,12 @@ void Robot::UpdateCooldowns()
 				(*it2)->m_overcharge++;
 			}
 		}
+
+		//Resets weapon attack choice
+		if (it->m_weapon)
+		{
+			it->m_weapon->m_attack_selected = NULL;
+		}
 	}
 }
 
@@ -809,12 +819,12 @@ int Robot::GetWarriorBalanceBonus()
 
 bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
 {
-	RobotSlot& current_slot = m_slots[crew->m_slot_index];
+	RobotSlot& current_slot = m_slots[crew->m_index];
 	RobotSlot& target_slot = m_slots[target_index];
 
 	int distance = abs(current_slot.m_coord_x - target_slot.m_coord_x) + abs(current_slot.m_coord_y - target_slot.m_coord_y);
 
-	if (target_index == crew->m_slot_index)
+	if (target_index == crew->m_index)
 	{
 		printf("Move cancelled: crew member is already on this position.\n");
 		return false;
@@ -848,7 +858,7 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
 	}
 
 	target_slot.m_crew.push_back(crew);
-	crew->m_slot_index = current_slot.m_index;
+	crew->m_index = current_slot.m_index;
 
 	printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
 
@@ -918,5 +928,47 @@ bool Robot::SetEnergyCell(WeaponAttack* attack)
 	{
 		printf("No Energy Cell available.\n");
 		return false;
+	}
+}
+
+
+bool Robot::SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
+{
+	Module* module = attack->m_owner->m_owner->m_module;
+
+	if (attack->m_energy_cells < attack->m_energy_cost)
+	{
+		printf("Cannot attack: not enough Enery Cells to use this attack: (current cells: %d ; cost: %d)\n", attack->m_energy_cells, attack->m_energy_cost);
+		return false;
+	}
+	else if (module->m_is_shutdown == true)
+	{
+		printf("Cannot attack: weapon module is shut down.\n");
+		return false;
+	}
+	else if (module->m_health == 0)
+	{
+		printf("Cannot attack: weapon module is destroyed.\n");
+		return false;
+	}
+	else if (m_unbalanced == true)
+	{
+		printf("Cannot attack: robot is unbalanced.\n");
+		return false;
+	}
+	else if (attack->m_owner->m_attack_selected != NULL)
+	{
+		printf("Cannot attack: weapon already is attacking.\n");
+		return false;
+	}
+	else
+	{	
+		attack->m_owner->m_attack_selected = attack;
+
+		//Action action;
+		//todo : action can accept weaponattack*, equipment*, module*, overcharge*, etc...
+		//(*CurrentGame).m_actions_list.push_back(action);
+
+		return true;
 	}
 }

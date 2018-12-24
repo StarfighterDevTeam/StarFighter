@@ -3,11 +3,11 @@
 
 #include "Game.h"
 
-
+class RobotSlot;
 class Module
 {
 public:
-	Module(ModuleType type);
+	Module(ModuleType type, RobotSlot* owner);
 
 	ModuleType m_type;
 
@@ -23,6 +23,7 @@ public:
 	int m_crew_max;
 	int m_fire_counter;//-1: not burning; 0= burning and ready to propagate; 1= burning but not propagating
 	bool m_is_shutdown;
+	RobotSlot* m_owner;
 };
 
 #endif //MODULE_H_INCLUDED

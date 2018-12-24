@@ -1,10 +1,12 @@
 #include "CrewMember.h"
 
 extern Game* CurrentGame;
-CrewMember::CrewMember(CrewType type)
+
+CrewMember::CrewMember(CrewType type, RobotSlot* owner)
 {
 	m_type = type;
-	m_slot_index = NB_SLOT_INDEX;
+	m_owner = owner;
+
 	m_stun_counter = 0;
 	m_is_healed_by_medic = false;
 	m_overcharge = 0;

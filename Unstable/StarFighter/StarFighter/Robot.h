@@ -28,9 +28,8 @@ public:
 	int m_energy_cells;
 	int m_energy_cells_available;
 	int m_crew_max;
-	int m_crew_nb;
 	int m_balance;
-	int GetBalance();
+	int GetBalanceScore();
 	int m_balance_bonus;
 	int m_attack_speed_bonus;
 	void GetWeightModifiers(int &balance_bonus, int &attack_speed_bonus);
@@ -57,6 +56,7 @@ public:
 	bool SetEnergyCell(Module* module);
 	bool SetEnergyCell(Equipment* equipment);
 	bool SetEnergyCell(WeaponAttack* attack);
+	bool SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index);
 };
 
 #endif //ROBOT_H_INCLUDED

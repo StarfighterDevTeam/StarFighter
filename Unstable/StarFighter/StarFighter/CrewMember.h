@@ -3,19 +3,21 @@
 
 #include "Game.h"
 
+class RobotSlot;
 class CrewMember
 {
 public:
-	CrewMember(CrewType type);
+	CrewMember(CrewType type, RobotSlot* owner);
 
 	CrewType m_type;
 	int m_health_max;
 	int m_health;
 	int m_steps;
-	SlotIndex m_slot_index;
+	SlotIndex m_index;
 	int m_stun_counter;//0= not stunned; 1= stunned
 	bool m_is_healed_by_medic;
 	int m_overcharge;
+	RobotSlot* m_owner;
 
 	void Update();
 };

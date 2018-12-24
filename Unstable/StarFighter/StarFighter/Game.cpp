@@ -775,8 +775,9 @@ void Game::CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::
 }
 
 //ROBOT
-WeaponAttack::WeaponAttack()
+WeaponAttack::WeaponAttack(Weapon* owner)
 {
+	m_owner = owner;
 	m_speed = 0;
 	m_damage = 0;
 	m_energy_cost = 0;

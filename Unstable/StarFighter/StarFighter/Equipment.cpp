@@ -2,9 +2,10 @@
 
 extern Game* CurrentGame;
 
-Equipment::Equipment(EquipmentType type)
+Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 {
 	m_type = type;
+	m_owner = owner;
 
 	m_weight = 0;
 	m_energy_cells = 0;

@@ -3,11 +3,11 @@
 
 #include "Game.h"
 
-
+class RobotSlot;
 class Equipment
 {
 public:
-	Equipment(EquipmentType type);
+	Equipment(EquipmentType type, RobotSlot* owner);
 
 	EquipmentType m_type;
 	ModuleType m_module_equipable;
@@ -22,6 +22,7 @@ public:
 	int m_cooldown;
 	int m_cooldown_timer;
 	int m_crew_max;
+	RobotSlot* m_owner;
 };
 
 #endif //EQUIPMENT_H_INCLUDED

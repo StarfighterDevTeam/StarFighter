@@ -8,10 +8,11 @@
 #include "Equipment.h"
 #include "CrewMember.h"
 
+class Robot;
 class RobotSlot
 {
 public:
-	RobotSlot(SlotIndex index);
+	RobotSlot(SlotIndex index, Robot* owner);
 
 	int m_size;
 	SlotType m_type;
@@ -23,6 +24,7 @@ public:
 	Module* m_module;
 	vector<Equipment*> m_equipments;
 	Weapon* m_weapon;
+	Robot* m_owner;
 
 	void UpdateCrew();
 };

@@ -442,7 +442,7 @@ void InGameState::AttackResolutions()
 		Robot& robot = m_robots[(*it).m_robot_index];
 		Robot& opponent = m_robots[(*it).m_robot_index + 1 % 2];
 
-		Module* module = robot.m_slots[(*it).m_slot_index].m_module;
+		Module* module = robot.m_slots[(*it).m_index].m_module;
 
 		RobotSlot& target_slot = opponent.m_slots[(*it).m_target_index];
 		Module* target_module = target_slot.m_module;
@@ -465,8 +465,8 @@ void InGameState::AttackResolutions()
 		}
 		else if (module->m_type == Module_Weapon)//Weapons
 		{
-			Weapon* weapon = robot.m_slots[(*it).m_slot_index].m_weapon;
-			WeaponAttack* attack = robot.m_slots[(*it).m_slot_index].m_weapon->m_attack_selected;
+			Weapon* weapon = robot.m_slots[(*it).m_index].m_weapon;
+			WeaponAttack* attack = robot.m_slots[(*it).m_index].m_weapon->m_attack_selected;
 
 			//if there are both a ranged and a close-combat weapon on this attack speed, the close-combat is prioritary to determine the position at the end of the turn
 			if (weapon->m_ranged == false)
@@ -483,7 +483,7 @@ void InGameState::AttackResolutions()
 			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
 			
 			int warrior_bonus = robot.GetWarriorBalanceBonus();
-			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent.GetBalance();
+			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent.GetBalanceScore();
 
 			vector<bool> stun_success;
 			for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)

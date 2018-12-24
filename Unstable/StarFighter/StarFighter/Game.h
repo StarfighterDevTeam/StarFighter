@@ -174,11 +174,11 @@ enum WeaponType
 	NB_WEAPON_TYPES,
 };
 
-
+class Weapon;//foreward declaration
 class WeaponAttack
 {
 public:
-	WeaponAttack();
+	WeaponAttack(Weapon* owner);
 	int m_speed;
 	int m_damage;
 	int m_energy_cost;
@@ -192,6 +192,8 @@ public:
 	int m_energy_cells;
 
 	int GetUnbalanceScore();
+
+	Weapon* m_owner;
 };
 
 enum SlotType
@@ -207,7 +209,7 @@ enum SlotType
 
 struct Action
 {
-	SlotIndex m_slot_index;
+	SlotIndex m_index;
 	int m_robot_index;
 	SlotIndex m_target_index;
 };

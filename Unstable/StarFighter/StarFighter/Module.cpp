@@ -2,9 +2,10 @@
 
 extern Game* CurrentGame;
 
-Module::Module(ModuleType type)
+Module::Module(ModuleType type, RobotSlot* owner)
 {
 	m_type = type;
+	m_owner = owner;
 
 	m_weight = 0;
 	m_energy_cells = 0;
