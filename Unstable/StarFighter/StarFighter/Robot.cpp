@@ -203,14 +203,14 @@ bool Robot::SetWeapon(WeaponType type, SlotIndex index)
 		weapon = NULL;
 		return false;
 	}
-	else if (weapon->m_ranged && m_slots[index].m_type != Slot_Shoulder)
+	else if (weapon->m_ranged == true && m_slots[index].m_type != Slot_Shoulder && m_slots[index].m_type != Slot_Forearm)
 	{
-		printf("Cannot equip a ranged weapon on slot %d because it must be equipped on Shoulders.\n", (int)index);
+		printf("Cannot equip a ranged weapon on slot %d because it must be equipped on Shoulders or Forearms.\n", (int)index);
 		delete weapon;
 		weapon = NULL;
 		return false;
 	}
-	else if (!weapon->m_ranged && m_slots[index].m_type != Slot_Forearm)
+	else if (weapon->m_ranged == false && m_slots[index].m_type != Slot_Forearm)
 	{
 		printf("Cannot equip a close-combat weapon on slot %d because it must be equipped on Forearms.\n", (int)index);
 		delete weapon;
@@ -262,7 +262,7 @@ int Robot::GetBalanceScore()
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
 		Module* module = it->m_module;
-		if (module != NULL && module->m_type == Module_Stabilizers && module->m_is_shutdown == false && module->m_energy_cells == module->m_energy_cells_max)
+		if (module != NULL && module->m_type == Module_Stabilizers && module->IsOperationnal())
 		{
 			balance += module->m_health;
 		}
@@ -488,7 +488,7 @@ int Robot::HealCrewMembers()
 
 		Module* module = it->m_module;
 		//Infirmary heals 1pv/energy cell
-		if (module != NULL && module->m_type == Module_Infirmary && module->m_is_shutdown == false && module->m_health > 0)
+		if (module != NULL && module->m_type == Module_Infirmary && module->IsOperationnal())
 		{
 			health += module->m_energy_cells;
 		}
@@ -527,43 +527,49 @@ int Robot::RepairModules()
 		Module* module = (*it).m_module;
 		if (module != NULL)
 		{ 
+			//Shutdown update
+			if (module->m_shutdown_counter >= 0)
+			{
+				module->m_shutdown_counter--;
+			}
+
 			//Repair modules
 			int health = 0;
 			for (vector<CrewMember*>::iterator it2 = (*it).m_crew.begin(); it2 != (*it).m_crew.end(); it2++)
 			{
-				health++;
-
-				//Mechanic passive effect heals +1pv
-				if ((*it2)->m_type == Crew_Mechanic && (*it2)->m_stun_counter == 0)
+				//Crew member must not be stunned in order to repair
+				if ((*it2)->m_stun_counter == 0)
 				{
 					health++;
-				}
-			}
 
-			for (int i = 0; i < health; i++)
-			{
-				if (module->m_health < module->m_health_max)
-				{
-					module->m_health++;
-					health_repaired++;
-				}
-			}
+					//Mechanic passive effect heals +1pv
+					if ((*it2)->m_type == Crew_Mechanic)
+					{
+						health++;
+					}
 
-			//Ends fire and shutdown status
-			if (it->m_crew.empty() == false)
-			{
-				//Ends fire status
-				if (module->m_fire_counter >= 0)
-				{
-					module->m_fire_counter = -1;
-					printf("Fire extinguished.\n");
-				}
-				
-				//Ends shutdown status
-				if (module->m_is_shutdown)
-				{
-					module->m_is_shutdown = false;
-					printf("Shutdown repaired.\n");
+					for (int i = 0; i < health; i++)
+					{
+						if (module->m_health < module->m_health_max)
+						{
+							module->m_health++;
+							health_repaired++;
+						}
+					}
+
+					//Ends fire status
+					if (module->m_fire_counter >= 0)
+					{
+						module->m_fire_counter = -1;
+						printf("Fire extinguished.\n");
+					}
+
+					//Ends shutdown status
+					if (module->m_shutdown_counter >= 0)
+					{
+						module->m_shutdown_counter = -1;
+						printf("Shutdown repaired.\n");
+					}
 				}
 			}
 		}
@@ -638,15 +644,10 @@ void Robot::UpdateCooldowns()
 {
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
-		//Module cooldown and fire propagation cooldown
+		//Module cooldown
 		if (it->m_module != NULL && it->m_module->m_cooldown > 0 && it->m_module->m_cooldown_timer < it->m_module->m_cooldown)
 		{
 			it->m_module->m_cooldown_timer++;
-
-			if (it->m_module->m_fire_counter > 0)
-			{
-				it->m_module->m_fire_counter = 0;//starting fire propagation
-			}
 		}
 
 		//Equipments cooldown
@@ -670,6 +671,12 @@ void Robot::UpdateCooldowns()
 			{
 				(*it2)->m_overcharge++;
 			}
+		}
+
+		//Fire propagation
+		if (it->m_module != NULL && it->m_module->m_fire_counter > 0)
+		{
+			it->m_module->m_fire_counter--;
 		}
 
 		//Resets weapon attack choice
@@ -765,62 +772,18 @@ void Robot::ShutdownSlot(SlotIndex index)
 	Module* module = m_slots[index].m_module;
 	if (module != NULL)
 	{
-		module->m_is_shutdown = true;
+		module->m_shutdown_counter = 1;
 
 		//Loss of energy cells
 		m_energy_cells -= module->m_energy_cells;
 		module->m_energy_cells = 0;
 
-		//for (vector<Equipment*>::iterator it = m_slots[index].m_equipments.begin(); it != m_slots[index].m_equipments.end(); it++)
-		//{
-		//	m_energy_cells -= (*it)->m_energy_cells;
-		//	(*it)->m_energy_cells = 0;
-		//}
-	}
-}
-
-int Robot::GetGunnerRangeBonus()
-{
-	int gunner_bonus = 0;
-
-	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
-	{
-		Module* module = it->m_module;
-		if (module != NULL && module->m_type == Module_Weapon)
+		for (vector<Equipment*>::iterator it = m_slots[index].m_equipments.begin(); it != m_slots[index].m_equipments.end(); it++)
 		{
-			for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
-			{
-				if ((*it2)->m_type == Crew_Gunner && (*it2)->m_stun_counter == 0)
-				{
-					gunner_bonus++;
-				}
-			}
-		}
-	}	
-
-	return gunner_bonus;
-}
-
-int Robot::GetWarriorBalanceBonus()
-{
-	int warrior_bonus = 0;
-
-	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
-	{
-		Module* module = it->m_module;
-		if (module != NULL && module->m_type == Module_Weapon)
-		{
-			for (vector<CrewMember*>::iterator it2 = it->m_crew.begin(); it2 != it->m_crew.end(); it2++)
-			{
-				if ((*it2)->m_type == Crew_Warrior && (*it2)->m_stun_counter == 0)
-				{
-					warrior_bonus += 2;
-				}
-			}
+			m_energy_cells -= (*it)->m_energy_cells;
+			(*it)->m_energy_cells = 0;
 		}
 	}
-
-	return warrior_bonus;
 }
 
 bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
@@ -947,14 +910,14 @@ bool Robot::SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		printf("Cannot attack: not enough Enery Cells to use this attack: (current cells: %d ; cost: %d)\n", attack->m_energy_cells, attack->m_energy_cost);
 		return false;
 	}
-	else if (module->m_is_shutdown == true)
+	else if (module->m_shutdown_counter >= 0)
 	{
 		printf("Cannot attack: weapon module is shut down.\n");
 		return false;
 	}
 	else if (module->m_health == 0)
 	{
-		printf("Cannot attack: weapon module is destroyed.\n");
+		printf("Cannot attack: weapon module is destroyed and must be repaired first in order to be used.\n");
 		return false;
 	}
 	else if (m_unbalanced == true)
@@ -967,13 +930,18 @@ bool Robot::SetAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		printf("Cannot attack: weapon already is attacking.\n");
 		return false;
 	}
-	else if (attack->m_owner->m_ranged == false && target_index == Index_Head)
+	else if (attack->m_owner->m_ranged == false && (target_index == Index_FootL || target_index == Index_FootR || target_index == Index_LegL || target_index == Index_LegR))
 	{
-		printf("Cannot attack: Head cannot be targeted by a close-combat attack.\n");
+		printf("Cannot attack: lower parts (legs and feet) can't be targeted by close-combat attacks.\n");
+		return false;
+	}
+	else if (attack->m_crew_required != NB_CREW_TYPES && attack->m_owner->m_owner->HasCrewRequired(attack->m_crew_required) == false)
+	{
+		printf("Cannot attack: the attack requires a specific type of crew member in the module (currently not present or stunned).\n");
 		return false;
 	}
 	else
-	{	
+	{
 		attack->m_owner->m_attack_selected = attack;
 
 		ActionAttack action;

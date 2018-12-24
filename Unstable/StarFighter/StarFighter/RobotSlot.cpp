@@ -137,3 +137,39 @@ void RobotSlot::UpdateCrew()
 		}
 	}
 }
+
+int RobotSlot::GetGunnerRangeBonus()
+{
+	int gunner_bonus = 0;
+
+	if (m_module != NULL && m_module->m_type == Module_Weapon && m_weapon != NULL && m_weapon->m_ranged == true) 
+	{
+		for (vector<CrewMember*>::iterator it2 = m_crew.begin(); it2 != m_crew.end(); it2++)
+		{
+			if ((*it2)->m_type == Crew_Gunner && (*it2)->m_stun_counter == 0)
+			{
+				gunner_bonus++;
+			}
+		}
+	}
+
+	return gunner_bonus;
+}
+
+int RobotSlot::GetWarriorBalanceBonus()
+{
+	int warrior_bonus = 0;
+	
+	if (m_module != NULL && m_module->m_type == Module_Weapon && m_weapon != NULL && m_weapon->m_ranged == false)
+	{
+		for (vector<CrewMember*>::iterator it2 = m_crew.begin(); it2 != m_crew.end(); it2++)
+		{
+			if ((*it2)->m_type == Crew_Warrior && (*it2)->m_stun_counter == 0)
+			{
+				warrior_bonus += 2;
+			}
+		}
+	}
+
+	return warrior_bonus;
+}

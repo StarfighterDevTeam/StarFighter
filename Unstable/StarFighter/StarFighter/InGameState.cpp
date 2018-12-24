@@ -442,7 +442,11 @@ void InGameState::AttackResolutions()
 		}
 
 		Robot* robot = it->m_attack->m_owner->m_owner->m_owner;
+		RobotSlot& robot_slot = *it->m_attack->m_owner->m_owner;
 		Module* module = it->m_attack->m_owner->m_owner->m_module;
+
+		Weapon* weapon = it->m_attack->m_owner;
+		WeaponAttack* attack = it->m_attack;
 
 		Robot* opponent = &m_robots[robot->m_index + 1 % 2];
 		RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
@@ -452,9 +456,17 @@ void InGameState::AttackResolutions()
 		{
 			printf("Module cannot be used because it's been destroyed.\n");
 		}
-		else if (module->m_is_shutdown == true)
+		else if (module->m_shutdown_counter >= 0)
 		{
 			printf("Module cannot be used because it's been shut down.\n");
+		}
+		else if (attack->m_energy_cells < attack->m_energy_cost)
+		{
+			printf("Attack cancelled: not enough Energy Cells left in weapon (available: %d; cost: %d).\n", attack->m_energy_cells, attack->m_energy_cost);
+		}
+		else if (attack->m_crew_required != NB_CREW_TYPES && robot_slot.HasCrewRequired(attack->m_crew_required) == false)
+		{
+			printf("Attack cancelled: the attack requires a specific type of crew member in the module (currently not present or stunned).\n");
 		}
 		else if (robot->m_unbalanced == true)
 		{
@@ -464,11 +476,8 @@ void InGameState::AttackResolutions()
 		{
 			printf("Module cannot be used because robot is undergoing a global shutdown.\n");
 		}
-		else if (module->m_type == Module_Weapon)//Weapons
+		else//Attack resolution
 		{
-			Weapon* weapon = it->m_attack->m_owner;
-			WeaponAttack* attack = it->m_attack;
-
 			//if there are both a ranged and a close-combat weapon on this attack speed, the close-combat is prioritary to determine the position at the end of the turn
 			if (weapon->m_ranged == false)
 			{
@@ -476,14 +485,14 @@ void InGameState::AttackResolutions()
 			}
 
 			//Randomization of resolutions
-			int gunner_bonus = robot->GetGunnerRangeBonus();
+			int gunner_bonus = robot_slot.GetGunnerRangeBonus();
 			bool hit_success = weapon->m_ranged == false || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
 			
 			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
 			
 			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
 			
-			int warrior_bonus = robot->GetWarriorBalanceBonus();
+			int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
 			bool unbalance_success = attack->m_chance_of_unbalance + warrior_bonus > 0 && attack->GetUnbalanceScore() > opponent->GetBalanceScore();
 
 			vector<bool> stun_success;
@@ -506,20 +515,21 @@ void InGameState::AttackResolutions()
 					//Deflector absorption
 					for (vector<RobotSlot>::iterator it = opponent->m_slots.begin(); it != opponent->m_slots.end(); it++)
 					{
-						if ((*it).m_module->m_type == Module_Deflectors)
+						if (it->m_module->m_type == Module_Deflectors && it->m_module->IsOperationnal())
 						{
-							if ((*it).m_module->m_health > 0)
+							Module* deflector = it->m_module;
+							if (deflector->m_health > 0)
 							{
 								//Damage absorbed
-								if ((*it).m_module->m_health >= damage)
+								if (deflector->m_health >= damage)
 								{
-									(*it).m_module->m_health -= damage;
+									deflector->m_health -= damage;
 									damage = 0;
 								}
 								else 
 								{
-									(*it).m_module->m_health = 0;
-									damage -= (*it).m_module->m_health;
+									deflector->m_health = 0;
+									damage -= deflector->m_health;
 								}	 
 							}
 						}
@@ -668,6 +678,10 @@ void InGameState::AttackResolutions()
 			//Check global shutdown conditions
 			opponent->UpdateShudownGlobal();
 
+			//Consumption of the Energy Cells
+			robot->m_energy_cells -= attack->m_energy_cells;
+			attack->m_energy_cells = 0;
+			
 			//Distance update
 			(*CurrentGame).m_distance_temp = ranged ? Distance_Ranged : Distance_Close;
 		}

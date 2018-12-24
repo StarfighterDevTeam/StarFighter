@@ -50,8 +50,6 @@ public:
 	int RepairModules();
 	void UpdateFirePropagation();
 	void UpdateCooldowns();
-	int GetGunnerRangeBonus();
-	int GetWarriorBalanceBonus();
 	bool MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index);
 	bool SetEnergyCell(Module* module);
 	bool SetEnergyCell(Equipment* equipment);

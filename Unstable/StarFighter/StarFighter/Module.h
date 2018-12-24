@@ -22,8 +22,10 @@ public:
 	int m_cooldown_timer;//ready when cooldown_timer = cooldown. Increasing every turn.
 	int m_crew_max;
 	int m_fire_counter;//-1: not burning; 0= burning and ready to propagate; 1= burning but not propagating
-	bool m_is_shutdown;
+	int m_shutdown_counter;//-1: no shutdown; 0=shutdown will end next turn; 1= shutdown just started
 	RobotSlot* m_owner;
+
+	bool IsOperationnal();
 };
 
 #endif //MODULE_H_INCLUDED

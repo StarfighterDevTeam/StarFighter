@@ -27,6 +27,8 @@ public:
 	Robot* m_owner;
 
 	void UpdateCrew();
+	int GetGunnerRangeBonus();
+	int GetWarriorBalanceBonus();
 };
 
 #endif //ROBOTSLOT_H_INCLUDED
