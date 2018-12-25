@@ -12,6 +12,7 @@ Robot::Robot()
 	m_unbalanced_value = 0;
 	m_shutdown_global = false;
 	m_grounded = false;
+	m_grabbed = NULL;
 
 	m_ready_to_change_phase = false;
 
@@ -28,8 +29,8 @@ Robot::Robot()
 	m_slots.push_back(RobotSlot(Index_FootR, this));//4
 	m_slots.push_back(RobotSlot(Index_ShoulderL, this));//5
 	m_slots.push_back(RobotSlot(Index_ShoulderR, this));//6
-	m_slots.push_back(RobotSlot(Index_ForearmL, this));//7
-	m_slots.push_back(RobotSlot(Index_ForearmR, this));//8
+	m_slots.push_back(RobotSlot(Index_HandL, this));//7
+	m_slots.push_back(RobotSlot(Index_HandR, this));//8
 	m_slots.push_back(RobotSlot(Index_BodyU, this));//9
 	m_slots.push_back(RobotSlot(Index_BodyM, this));//10
 	m_slots.push_back(RobotSlot(Index_BodyD, this));//11
@@ -135,7 +136,7 @@ bool Robot::SetModule(ModuleType type, SlotIndex index)
 		module = NULL;
 		return false;
 	}
-	else if (module->m_type == Module_Weapon && m_slots[index].m_type != Slot_Forearm && m_slots[index].m_type != Slot_Shoulder)
+	else if (module->m_type == Module_Weapon && m_slots[index].m_type != Slot_Hand && m_slots[index].m_type != Slot_Shoulder)
 	{
 		printf("Cannot equip weapon on this slot. Weapons go on arms and shoulders only.\n");
 		delete module;
@@ -226,16 +227,16 @@ bool Robot::SetWeapon(WeaponType type, SlotIndex index)
 		weapon = NULL;
 		return false;
 	}
-	else if (weapon->m_ranged == true && m_slots[index].m_type != Slot_Shoulder && m_slots[index].m_type != Slot_Forearm)
+	else if (weapon->m_ranged == true && m_slots[index].m_type != Slot_Shoulder && m_slots[index].m_type != Slot_Hand)
 	{
-		printf("Cannot equip a ranged weapon on slot %d because it must be equipped on Shoulders or Forearms.\n", (int)index);
+		printf("Cannot equip a ranged weapon on slot %d because it must be equipped on Shoulders or Hands.\n", (int)index);
 		delete weapon;
 		weapon = NULL;
 		return false;
 	}
-	else if (weapon->m_ranged == false && m_slots[index].m_type != Slot_Forearm)
+	else if (weapon->m_ranged == false && m_slots[index].m_type != Slot_Hand)
 	{
-		printf("Cannot equip a close-combat weapon on slot %d because it must be equipped on Forearms.\n", (int)index);
+		printf("Cannot equip a close-combat weapon on slot %d because it must be equipped on Hands.\n", (int)index);
 		delete weapon;
 		weapon = NULL;
 		return false;
@@ -273,7 +274,7 @@ int Robot::GetHealthMax()
 		}
 	}
 
-	health_max = health_max / 4;
+	health_max /= 4;
 
 	return health_max;
 }
@@ -380,13 +381,13 @@ void Robot::Update()
 				//TEST
 				if (m_index == 0)
 				{
-					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
-					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
-					SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
+					SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+					SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+					SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
 				
-					SetEnergyCell(m_slots[Index_ForearmL].m_equipments[0]);
+					SetEnergyCell(m_slots[Index_HandL].m_equipments[0]);
 
-					SetWeaponAttackOnSlot(m_slots[Index_ForearmL].m_weapon->m_attacks.front(), Index_Head);
+					SetWeaponAttackOnSlot(m_slots[Index_HandL].m_weapon->m_attacks.front(), Index_Head);
 
 					//SetMedicTarget(medic, target);
 
@@ -445,11 +446,6 @@ void Robot::Update()
 
 			UpdateShudownGlobal();//in case fire destroys the generator or kills the captain or the pilot
 
-			m_ready_to_change_phase = true;
-			break;
-		}
-		default:
-		{
 			m_ready_to_change_phase = true;
 			break;
 		}
@@ -819,6 +815,13 @@ void Robot::DestroySlot(SlotIndex index)
 			m_energy_cells -= (*it)->m_energy_cells;
 			(*it)->m_energy_cells = 0;
 		}
+
+		//Release the grab?
+		if (m_opponent->m_grabbed == module)
+		{
+			m_opponent->m_grabbed = NULL;
+			printf("Hand destroyed. Grab has been released.\n");
+		}
 	}
 }
 
@@ -948,8 +951,8 @@ int Robot::GetDistanceFromSlotToSlot(SlotIndex index, SlotIndex target_index)
 			int a4 = Index_FootR;
 			int a5 = Index_ShoulderL;
 			int a6 = Index_ShoulderR;
-			int a7 = Index_ForearmL;
-			int a11 = Index_ForearmR;
+			int a7 = Index_HandL;
+			int a11 = Index_HandR;
 			int a12= Index_BodyU;
 			int a13 = Index_BodyM;
 			int a14 = Index_BodyD;
@@ -1087,6 +1090,11 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 	else if (attack->m_owner->m_energetic == true && module->m_owner->CanEquipEnergeticWeapon() == false)
 	{
 		printf("Cannot attack: energetic weapons require an operational Energetic weapon equipement (powered with 1 EC) to be used.\n");
+		return false;
+	}
+	else if (attack->m_owner->m_requires_close_distance == true && (*CurrentGame).m_distance == Distance_Ranged)
+	{
+		printf("Cannot attack: this attack requires to start the turn in close-combat position.\n");
 		return false;
 	}
 	else
@@ -1237,13 +1245,13 @@ bool Robot::SetEnergyCellsOnBalance()
 
 ActionAttack Robot::GetExecutionAttack()
 {
-	//SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
-	//SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
-	//SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
+	//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+	//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+	//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
 
-	//SetEnergyCell(m_slots[Index_ForearmL].m_equipments[0]);
+	//SetEnergyCell(m_slots[Index_HandL].m_equipments[0]);
 
-	//SetWeaponAttackOnSlot(m_slots[Index_ForearmL].m_weapon->m_attacks.front(), Index_Head);
+	//SetWeaponAttackOnSlot(m_slots[Index_HandL].m_weapon->m_attacks.front(), Index_Head);
 	ActionAttack action;
 	action.m_attack = NULL;
 	action.m_target_index = NB_SLOT_INDEX;

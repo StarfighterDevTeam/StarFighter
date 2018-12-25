@@ -8,6 +8,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 	m_owner = owner;
 	m_used = false;
 
+	m_health_max = 0;
 	m_weight = 0;
 	m_energy_cells = 0;
 	m_energy_cells_max = 0;

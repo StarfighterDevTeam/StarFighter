@@ -56,11 +56,11 @@ void InGameState::InitRobots()
 
 	robot.SetEquipment(Equipment_LightPlate, Index_FootR);
 
-	robot.SetModule(Module_Weapon, Index_ForearmL);
-	robot.SetEquipment(Equipment_EnergeticWeapon, Index_ForearmL);
+	robot.SetModule(Module_Weapon, Index_HandL);
+	robot.SetEquipment(Equipment_EnergeticWeapon, Index_HandL);
 
-	robot.SetModule(Module_Weapon, Index_ForearmR);
-	robot.SetEquipment(Equipment_LightPlate, Index_ForearmR);
+	robot.SetModule(Module_Weapon, Index_HandR);
+	robot.SetEquipment(Equipment_LightPlate, Index_HandR);
 
 	robot.SetModule(Module_Radar, Index_ShoulderL);
 	
@@ -72,9 +72,9 @@ void InGameState::InitRobots()
 	robot.SetCrewMember(Crew_Mechanic, Index_BodyM);
 	robot.SetCrewMember(Crew_Scientist, Index_LegR);
 	robot.SetCrewMember(Crew_Engineer, Index_LegL);
-	robot.SetCrewMember(Crew_Warrior, Index_ForearmL);
+	robot.SetCrewMember(Crew_Warrior, Index_HandL);
 
-	robot.SetWeapon(Weapon_FireSword, Index_ForearmL);
+	robot.SetWeapon(Weapon_FireSword, Index_HandL);
 
 	robot.Initialize();
 
@@ -101,8 +101,8 @@ void InGameState::InitRobots()
 
 	robot2.SetEquipment(Equipment_LightPlate, Index_FootR);
 
-	robot2.SetModule(Module_Weapon, Index_ForearmL);
-	robot2.SetEquipment(Equipment_HeavyPlate, Index_ForearmL);
+	robot2.SetModule(Module_Weapon, Index_HandL);
+	robot2.SetEquipment(Equipment_HeavyPlate, Index_HandL);
 
 	robot2.SetModule(Module_Weapon, Index_ShoulderL);
 	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderL);
@@ -110,22 +110,27 @@ void InGameState::InitRobots()
 	robot2.SetModule(Module_Weapon, Index_ShoulderR);
 	robot2.SetEquipment(Equipment_HeavyPlate, Index_ShoulderR);
 
-	robot2.SetModule(Module_Weapon, Index_ForearmR);
-	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ForearmR);
+	robot2.SetModule(Module_Weapon, Index_HandR);
+	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_HandR);
 
 	robot2.SetCrewMember(Crew_Captain, Index_Head);
 	robot2.SetCrewMember(Crew_Pilot, Index_Head);
 	robot2.SetCrewMember(Crew_Medic, Index_BodyU);
 	robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
 	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
-	robot2.SetCrewMember(Crew_Warrior, Index_ForearmR);
+	robot2.SetCrewMember(Crew_Warrior, Index_HandR);
 	robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
 	robot2.SetCrewMember(Crew_Engineer, Index_LegL);
 
 	robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
-	robot2.SetWeapon(Weapon_Hammer, Index_ForearmR);
+	robot2.SetWeapon(Weapon_Hammer, Index_HandR);
 
 	robot2.Initialize();
+
+	//Opposition
+	robot.m_opponent = &robot2;
+
+	robot2.m_opponent = &robot;
 }
 
 /*
@@ -218,6 +223,15 @@ void InGameState::Update(sf::Time deltaTime)
 	//ROBOT
 	m_robots[0].Update();
 	m_robots[1].Update();
+
+	if ((*CurrentGame).m_phase == Phase_GrabResolution)
+	{
+
+	}
+	else if ((*CurrentGame).m_phase == Phase_GuardResolution)
+	{
+
+	}
 	if ((*CurrentGame).m_phase >= Phase_AttackResolution_12 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
 	{
 		AttackResolutions();
@@ -475,7 +489,8 @@ void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 		//Randomization of resolutions
 		int gunner_bonus = robot_slot.GetGunnerRangeBonus();
 		int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
-		bool hit_success = weapon->m_ranged == false || is_execution == true || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
+		bool hit_success = weapon->m_ranged == false || is_execution == true || opponent->m_grabbed != NULL ||
+			RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
 
 		bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
 
@@ -489,7 +504,7 @@ void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 		{
 			int damage = attack->m_damage;
 			//Damage on grounded robot x2
-			if (opponent->m_grounded == true || is_execution == true)
+			if (opponent->m_grounded == true || is_execution == true || opponent->m_grabbed != NULL)
 			{
 				damage *= 2;
 			}
@@ -719,7 +734,7 @@ void InGameState::AttackResolutions()
 	if ((*CurrentGame).m_phase == Phase_AttackResolution_1)
 	{
 		//Updating placement (depends on the last attack of the turn)
-		(*CurrentGame).m_distance = (*CurrentGame).m_distance_temp;
+		(*CurrentGame).m_distance = (m_robots[0].m_grabbed != NULL || m_robots[1].m_grabbed != NULL) ? Distance_Close : (*CurrentGame).m_distance_temp;
 
 		//Clearing the actions list
 		(*CurrentGame).m_attacks_list.clear();
@@ -781,4 +796,57 @@ void InGameState::EffectsResolution()
 
 	m_robots[0].m_ready_to_change_phase = true;
 	m_robots[1].m_ready_to_change_phase = true;
+}
+
+void InGameState::GrabResolution()
+{
+	vector<ActionAttack> old_attacks_list;
+	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
+	{
+		old_attacks_list.push_back(*it);
+	}
+
+	//clear game list
+	(*CurrentGame).m_attacks_list.clear();
+
+	//Resolve grabs of robot 0, then robot 1
+	for (int r = 0; r < 2; r++)
+	{
+		for (vector<ActionAttack>::iterator it = old_attacks_list.begin(); it != old_attacks_list.end(); it++)
+		{
+			if (it->m_attack->m_owner->m_owner->m_owner->m_index != r)
+			{
+				continue;
+			}
+
+			if (it->m_attack->m_type != WeaponAttack_Grab_1)
+			{
+				(*CurrentGame).m_attacks_list.push_back(*it);
+				continue;
+			}
+
+			Robot* robot = it->m_attack->m_owner->m_owner->m_owner;
+			RobotSlot& robot_slot = *it->m_attack->m_owner->m_owner;
+			Module* module = it->m_attack->m_owner->m_owner->m_module;
+
+			Weapon* weapon = it->m_attack->m_owner;
+
+			Robot* opponent = &m_robots[robot->m_index + 1 % 2];
+			RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
+			Module* target_module = target_slot.m_module;
+
+			//Resolve grab
+			bool hit_success = opponent->m_shutdown_global == true || (target_module != NULL && (target_module->m_shutdown_counter > 0 || target_module->m_health == 0));
+
+			if (hit_success)
+			{
+				opponent->m_grabbed = module;//record which Hand did the grab, because only destroying that hand will release the grab
+				printf("Grab successful.\n");
+			}
+			else
+			{
+				printf("Grab missed. Possible counter-attack.\n");
+			}
+		}
+	}
 }

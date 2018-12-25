@@ -12,6 +12,7 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 	m_weight = 0;
 	m_energetic = false;
 	m_ranged = false;
+	m_requires_close_distance = false;
 
 	switch (type)
 	{
@@ -104,6 +105,17 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_secondary->m_energy_cost = 1;
 			m_attacks.push_back(attack_secondary);
 
+			break;
+		}
+		case Weapon_Grab:
+		{
+			m_requires_close_distance = true;
+			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_Grab_1, this);
+			break;
+		}
+		case Weapon_Guard:
+		{
+			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_Guard_1, this);
 			break;
 		}
 	}

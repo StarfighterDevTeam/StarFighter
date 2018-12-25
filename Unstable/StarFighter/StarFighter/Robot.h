@@ -39,6 +39,9 @@ public:
 	int m_unbalanced_value;
 	bool m_shutdown_global;
 	bool m_grounded;
+	Module* m_grabbed;
+
+	Robot* m_opponent;
 
 	bool m_ready_to_change_phase;
 

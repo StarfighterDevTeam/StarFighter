@@ -73,16 +73,16 @@ RobotSlot::RobotSlot(SlotIndex index, Robot* owner)
 			m_type = Slot_Shoulder;
 			break;
 		}
-		case Index_ForearmL:
+		case Index_HandL:
 		{
 			m_size = 2;
-			m_type = Slot_Forearm;
+			m_type = Slot_Hand;
 			break;
 		}
-		case Index_ForearmR:
+		case Index_HandR:
 		{
 			m_size = 2;
-			m_type = Slot_Forearm;
+			m_type = Slot_Hand;
 			break;
 		}
 	}

@@ -19,6 +19,7 @@ public:
 	bool m_ranged;
 	RobotSlot* m_owner;
 	bool m_used;
+	bool m_requires_close_distance;
 };
 
 
