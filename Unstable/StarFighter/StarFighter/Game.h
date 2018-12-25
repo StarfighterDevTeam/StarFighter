@@ -175,6 +175,7 @@ enum WeaponType
 	Weapon_FireSword,
 	Weapon_Hammer,
 	Weapon_Gun,
+	Weapon_Shield,
 	NB_WEAPON_TYPES,
 };
 

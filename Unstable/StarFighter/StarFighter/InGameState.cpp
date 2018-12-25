@@ -226,15 +226,19 @@ void InGameState::Update(sf::Time deltaTime)
 
 	if ((*CurrentGame).m_phase == Phase_GrabResolution)
 	{
-
+		GrabResolution();
+		m_robots[0].m_ready_to_change_phase = true;
+		m_robots[1].m_ready_to_change_phase = true;
 	}
 	else if ((*CurrentGame).m_phase == Phase_GuardResolution)
 	{
-
+		GuardResolution();
+		m_robots[0].m_ready_to_change_phase = true;
+		m_robots[1].m_ready_to_change_phase = true;
 	}
 	if ((*CurrentGame).m_phase >= Phase_AttackResolution_12 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
 	{
-		AttackResolutions();
+		AttackResolution();
 		m_robots[0].m_ready_to_change_phase = true;
 		m_robots[1].m_ready_to_change_phase = true;
 	}
@@ -702,7 +706,7 @@ void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 	}
 }
 
-void InGameState::AttackResolutions()
+void InGameState::AttackResolution()
 {
 	int speed = (int)(Phase_AttackResolution_1) - (int)(*CurrentGame).m_phase + 1;
 	bool range_weapon_used = true;
@@ -811,7 +815,6 @@ void InGameState::GrabResolution()
 		old_attacks_list.push_back(*it);
 	}
 
-	//clear game list
 	(*CurrentGame).m_attacks_list.clear();
 
 	//Resolve grabs of robot 0, then robot 1
@@ -887,5 +890,81 @@ void InGameState::GrabResolution()
 				}
 			}
 		}
+	}
+}
+
+void InGameState::GuardResolution()
+{
+	vector<ActionAttack> old_attacks_list;
+	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
+	{
+		old_attacks_list.push_back(*it);
+	}
+
+	(*CurrentGame).m_attacks_list.clear();
+
+	//Resolve grabs of robot 0, then robot 1
+	for (int r = 0; r < 2; r++)
+	{
+		//Check if there is a Guard in the list
+		bool guard_found = false;
+		for (vector<ActionAttack>::iterator it = old_attacks_list.begin(); it != old_attacks_list.end(); it++)
+		{
+			if (it->m_attack->m_owner->m_owner->m_owner->m_index != r)
+			{
+				continue;
+			}
+
+			if (it->m_attack->m_type != WeaponAttack_Guard_1)
+			{
+				continue;
+			}
+
+			guard_found = true;
+			break;
+		}
+
+		//If yes, keep it and clear all other attacks from this robot, else do nothing and just keep the whole list
+		for (vector<ActionAttack>::iterator it = old_attacks_list.begin(); it != old_attacks_list.end(); it++)
+		{
+			if (it->m_attack->m_owner->m_owner->m_owner->m_index != r)
+			{
+				continue;
+			}
+
+			if (guard_found == false)
+			{
+				(*CurrentGame).m_attacks_list.push_back(*it);
+			}
+			else
+			{
+				//Discard all attacks that are not the Guard (from this robot)
+				if (it->m_attack->m_type != WeaponAttack_Guard_1)
+				{
+					continue;
+				}
+
+				//Resolve the Guard
+				Robot* robot = it->m_attack->m_owner->m_owner->m_owner;
+				RobotSlot& robot_slot = *it->m_attack->m_owner->m_owner;
+				Module* module = it->m_attack->m_owner->m_owner->m_module;
+
+				Weapon* weapon = it->m_attack->m_owner;
+
+				Robot* opponent = &m_robots[robot->m_index + 1 % 2];
+				RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
+				Module* target_module = target_slot.m_module;
+
+				//Get Guard speed
+				printf("Choose a Guard speed between 1 and 10.\n");
+				int speed = 3;//get guard speed here
+				if (speed < 1 || speed > 10)
+				{
+					printf("Guard speed must be between 1 and 10. Choose again.\n");
+				}
+				
+				robot->m_guard_speed = speed;
+			}
+		}	
 	}
 }

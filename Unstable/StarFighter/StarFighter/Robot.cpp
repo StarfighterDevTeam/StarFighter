@@ -13,6 +13,7 @@ Robot::Robot()
 	m_shutdown_global = false;
 	m_grounded = false;
 	m_grabbed = NULL;
+	m_guard_speed = 0;
 
 	m_ready_to_change_phase = false;
 
@@ -735,6 +736,9 @@ void Robot::UpdateCooldowns()
 				m_grounded = false;
 			}
 		}
+
+		//Reset Guard speed
+		m_guard_speed = 0;
 	}
 }
 

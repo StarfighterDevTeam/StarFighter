@@ -40,6 +40,7 @@ public:
 	bool m_shutdown_global;
 	bool m_grounded;
 	Module* m_grabbed;
+	int m_guard_speed;
 
 	Robot* m_opponent;
 
