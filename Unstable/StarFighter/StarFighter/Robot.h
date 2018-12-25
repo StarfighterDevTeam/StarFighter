@@ -38,6 +38,7 @@ public:
 	int m_unbalanced_counter;//0: balanced; 1: unbalanced until next turn; 2: unbalanced for 2 turns
 	int m_unbalanced_value;
 	bool m_shutdown_global;
+	bool m_grounded;
 
 	bool m_ready_to_change_phase;
 
@@ -63,6 +64,9 @@ public:
 	bool SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_index);
 	bool SetMedicTarget(CrewMember* medic, CrewMember* target);
 	bool SetEnergyCellsOnBalance();
+
+	ActionAttack GetExecutionAttack();
+	void CounterAttackUpdate();
 };
 
 #endif //ROBOT_H_INCLUDED

@@ -102,6 +102,8 @@ enum GamePhase
 	Phase_CooldownResolution,
 	Phase_FireResolution,
 	NB_GAME_PHASES,
+	Phase_Execution,
+	Phase_CounterAttack,
 };
 
 enum SlotIndex

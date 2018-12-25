@@ -11,6 +11,7 @@ Robot::Robot()
 	m_unbalanced_counter = 0;
 	m_unbalanced_value = 0;
 	m_shutdown_global = false;
+	m_grounded = false;
 
 	m_ready_to_change_phase = false;
 
@@ -374,7 +375,7 @@ void Robot::Update()
 		}
 		case Phase_AttackPlanning:
 		{
-			if (m_shutdown_global == false)
+			if (m_shutdown_global == false && m_grounded == false)
 			{
 				//TEST
 				if (m_index == 0)
@@ -444,6 +445,11 @@ void Robot::Update()
 
 			UpdateShudownGlobal();//in case fire destroys the generator or kills the captain or the pilot
 
+			m_ready_to_change_phase = true;
+			break;
+		}
+		default:
+		{
 			m_ready_to_change_phase = true;
 			break;
 		}
@@ -730,6 +736,7 @@ void Robot::UpdateCooldowns()
 			if (m_unbalanced_counter == 0)
 			{
 				m_unbalanced_value = 0;
+				m_grounded = false;
 			}
 		}
 	}
@@ -1226,4 +1233,25 @@ bool Robot::SetEnergyCellsOnBalance()
 		m_unbalanced_counter = 0;
 		return true;
 	}
+}
+
+ActionAttack Robot::GetExecutionAttack()
+{
+	//SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
+	//SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
+	//SetEnergyCell(m_slots[Index_ForearmL].m_weapon->m_attacks[0]);
+
+	//SetEnergyCell(m_slots[Index_ForearmL].m_equipments[0]);
+
+	//SetWeaponAttackOnSlot(m_slots[Index_ForearmL].m_weapon->m_attacks.front(), Index_Head);
+	ActionAttack action;
+	action.m_attack = NULL;
+	action.m_target_index = NB_SLOT_INDEX;
+
+	return action;
+}
+
+void Robot::CounterAttackUpdate()
+{
+
 }
