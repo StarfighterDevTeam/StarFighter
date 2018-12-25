@@ -271,7 +271,16 @@ void InGameState::Draw()
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
 		{
 			//visible by this player?
-			if (r == (int)it->m_team || it->m_team == AllianceNeutral)
+			if (r == 0 || it->m_team == AllianceNeutral)
+			{
+				it->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
+		//modules
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
+		{
+			//visible by this player?
+			if (r == 0 || it->m_team == AllianceNeutral)
 			{
 				it->Draw((*CurrentGame).m_mainScreen);
 			}

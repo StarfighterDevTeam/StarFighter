@@ -416,6 +416,59 @@ void Robot::InitializeUI()
 		ui.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
 
 		m_UI_slots.push_back(ui);
+
+		//Modules
+		for (int j = 0; j < m_slots[i].m_size; j++)
+		{
+			UI_Element ui2;
+
+			ui2.m_type = UI_Module;
+			ui2.m_team = (TeamAlliances)m_index;
+
+			//quick hardcoding, known that vertical slots have max 2 modules and horizontal slots have max 3 modules
+			bool vertical = slot_size[i][1] > slot_size[i][0];
+			bool odd_size = m_slots[i].m_size % 2 == 1;
+			float offset_module_x = 0;
+			float offset_module_y = 0;
+			if (vertical == true)
+			{
+				offset_module_y = j == 0 ? -size_y * 0.5 : size_y * 0.5f;
+			}
+			else
+			{
+				if (odd_size == false)
+				{
+					offset_module_x = j == 0 ? -size_x * 0.5 : size_x * 0.5f;
+				}
+				else if (m_slots[i].m_size > 1)
+				{
+					if (j == 0)
+					{
+						offset_module_x = -size_x;
+					}
+					else if (j == 2)
+					{
+						offset_module_x = size_x;
+					}
+				}
+			}
+
+			ui2.m_shape_container.setPosition(sf::Vector2f(offset_x + slot_coord[i][0] + offset_module_x, offset_y + slot_coord[i][1] + offset_module_y));
+			ui2.m_shape_container.setSize(sf::Vector2f(size_x, size_y));
+			ui2.m_shape_container.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5f));
+			ui2.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+			ui2.m_shape_container.setOutlineThickness(2);
+			ui2.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+			ui2.m_shape.setPosition(sf::Vector2f(offset_x + slot_coord[i][0] + offset_module_x, offset_y + slot_coord[i][1] + offset_module_y));
+			ui2.m_shape.setSize(sf::Vector2f(size_x, size_y));
+			ui2.m_shape.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5f));
+			ui2.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+			ui2.m_shape.setOutlineThickness(0);
+			ui2.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+			m_UI_modules.push_back(ui2);
+		}
 	}
 }
 

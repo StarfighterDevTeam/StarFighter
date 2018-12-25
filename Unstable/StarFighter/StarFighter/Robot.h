@@ -9,6 +9,7 @@ enum UI_Type
 {
 	UI_Crew,
 	UI_Slot,
+	UI_Module,
 	UI_Button,
 	NB_UI_TYPES,
 };
@@ -100,6 +101,7 @@ public:
 	void InitializeUI();
 
 	vector<UI_Element> m_UI_slots;
+	vector<UI_Element> m_UI_modules;
 	vector<UI_Element> m_UI_crew;
 };
 
