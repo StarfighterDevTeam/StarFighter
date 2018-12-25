@@ -2,7 +2,6 @@
 
 extern Game* CurrentGame;
 
-
 Robot::Robot()
 {
 	m_weight = 0;
@@ -427,27 +426,6 @@ void Robot::Update()
 			m_ready_to_change_phase = true;
 			break;
 		}
-		case Phase_EquipmentResolution:
-		{
-			//todo , jetpacks
-
-			m_ready_to_change_phase = true;
-			break;
-		}
-		case Phase_GrabResolution:
-		{
-			//todo
-
-			m_ready_to_change_phase = true;
-			break;
-		}
-		case Phase_GuardResolution:
-		{
-			//todo
-
-			m_ready_to_change_phase = true;
-			break;
-		}
 
 		// ****************************************************
 		//					ATTACK RESOLUTION
@@ -624,7 +602,6 @@ int Robot::RepairModules()
 
 	return health_repaired;
 }
-
 
 void Robot::UpdateFirePropagation()
 {
@@ -1189,11 +1166,18 @@ bool Robot::SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_i
 	if (module != NULL)
 	{
 		module->m_used = true;
+		if (module->m_cooldown > 0)
+		{
+			module->m_cooldown_timer = 0;
+		}
 	}
-
 	if (equipment != NULL)
 	{
 		equipment->m_used = true;
+		if (equipment->m_cooldown > 0)
+		{
+			equipment->m_cooldown_timer = 0;
+		}
 	}
 
 	ActionEffect action;

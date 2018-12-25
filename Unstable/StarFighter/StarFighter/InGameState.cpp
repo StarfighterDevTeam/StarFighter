@@ -433,7 +433,7 @@ void InGameState::AttackResolutions()
 	int speed = (int)(Phase_AttackResolution_1) - (int)(*CurrentGame).m_phase + 1;
 	bool ranged = true;
 
-	//Resolve actions
+	//Resolve attacks
 	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
 	{
 		if (it->m_attack->m_speed != speed)
@@ -488,7 +488,8 @@ void InGameState::AttackResolutions()
 
 			//Randomization of resolutions
 			int gunner_bonus = robot_slot.GetGunnerRangeBonus();
-			bool hit_success = weapon->m_ranged == false || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
+			int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
+			bool hit_success = weapon->m_ranged == false || RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
 			
 			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
 			
@@ -694,4 +695,57 @@ void InGameState::AttackResolutions()
 	m_robots[0].m_ready_to_change_phase = true;
 	m_robots[1].m_ready_to_change_phase = true;
 }
-	
+
+void InGameState::EffectsResolution()
+{
+	//Resolve effects of robot 0, then robot 1
+	for (int r = 0; r < 2; r++)
+	{
+		for (vector<ActionEffect>::iterator it = (*CurrentGame).m_effects_list.begin(); it != (*CurrentGame).m_effects_list.end(); it++)
+		{
+			if (it->m_effect->m_owner_equipment != NULL && it->m_effect->m_owner_equipment->m_owner->m_owner->m_index != r)
+			{
+				continue;
+			}
+			if (it->m_effect->m_owner_module != NULL && it->m_effect->m_owner_module->m_owner->m_owner->m_index != r)
+			{
+				continue;
+			}
+
+			printf("Effect resolution.\n");
+
+			Robot* robot = it->m_effect->m_owner_module != NULL ? it->m_effect->m_owner_module->m_owner->m_owner : it->m_effect->m_owner_equipment->m_owner->m_owner;
+			RobotSlot& robot_slot = it->m_effect->m_owner_module != NULL ? *it->m_effect->m_owner_module->m_owner : *it->m_effect->m_owner_equipment->m_owner;
+
+			Module* module = it->m_effect->m_owner_module != NULL ? it->m_effect->m_owner_module : NULL;
+			Equipment* equipment = it->m_effect->m_owner_equipment != NULL ? it->m_effect->m_owner_equipment : NULL;
+			EquipmentEffect* effect = it->m_effect;
+
+			Robot* opponent = &m_robots[robot->m_index + 1 % 2];
+			RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
+			Module* target_module = target_slot.m_module;
+
+			switch (effect->m_type)
+			{
+				case Effect_EMP:
+				{
+					opponent->m_energy_cells -= target_module->m_energy_cells;
+					target_module->m_energy_cells = 0;
+					break;
+				}
+				case Effect_Radar:
+				{
+					target_slot.m_is_revealed = true;
+					break;
+				}
+				case Effect_JetPack:
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	m_robots[0].m_ready_to_change_phase = true;
+	m_robots[1].m_ready_to_change_phase = true;
+}

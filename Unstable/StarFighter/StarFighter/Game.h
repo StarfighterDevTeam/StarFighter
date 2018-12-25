@@ -149,6 +149,7 @@ enum ModuleType
 	Module_Gadget,
 	NB_MODULE_TYPES,
 };
+
 enum EquipmentType
 {
 	Equipment_EnergeticWeapon,

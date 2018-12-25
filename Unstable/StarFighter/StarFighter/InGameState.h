@@ -34,6 +34,7 @@ public:
 	void InitRobots();
 
 	void AttackResolutions();
+	void EffectsResolution();
 
 private:
 	sf::RenderWindow* mainWindow;

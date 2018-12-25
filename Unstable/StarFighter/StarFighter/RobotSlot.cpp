@@ -6,6 +6,7 @@ RobotSlot::RobotSlot(SlotIndex index, Robot* owner)
 {
 	m_index = index;
 	m_owner = owner;
+	m_is_revealed = false;
 
 	m_module = NULL;
 	m_weapon = NULL;
@@ -103,6 +104,21 @@ int RobotSlot::GetGunnerRangeBonus()
 	}
 
 	return gunner_bonus;
+}
+
+int RobotSlot::GetEquipmentRangeBonus()
+{
+	int range_bonus = 0;
+
+	for (vector<Equipment*>::iterator it = m_equipments.begin(); it != m_equipments.end(); it++)
+	{
+		if ((*it)->m_effect != NULL && (*it)->m_effect->m_type == Effect_WeaponScopes && (*it)->m_energy_cells > 0)
+		{
+			range_bonus++;
+		}
+	}
+
+	return range_bonus;
 }
 
 int RobotSlot::GetWarriorBalanceBonus()

@@ -24,7 +24,10 @@ public:
 	Weapon* m_weapon;
 	Robot* m_owner;
 
+	bool m_is_revealed;
+
 	int GetGunnerRangeBonus();
+	int GetEquipmentRangeBonus();
 	int GetWarriorBalanceBonus();
 	bool HasCrewRequired(CrewType type);
 	bool CanEquipEnergeticWeapon();
