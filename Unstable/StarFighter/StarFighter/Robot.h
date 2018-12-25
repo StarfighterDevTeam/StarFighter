@@ -5,6 +5,30 @@
 
 #include "RobotSlot.h"
 
+enum UI_Type
+{
+	UI_Crew,
+	UI_Slot,
+	UI_Button,
+	NB_UI_TYPES,
+};
+
+class UI_Element
+{
+public:
+	UI_Element(){};
+	RectangleShape m_shape_container;
+	RectangleShape m_shape;
+	UI_Type m_type;
+	TeamAlliances m_team;
+
+	void Draw(sf::RenderTexture& screen)
+	{
+		screen.draw(this->m_shape_container);
+		screen.draw(this->m_shape);
+	};
+};
+
 class Robot
 {
 public:
@@ -71,6 +95,12 @@ public:
 
 	ActionAttack GetExecutionAttack();
 	ActionAttack GetCounterAttack();
+
+	//UI
+	void InitializeUI();
+
+	vector<UI_Element> m_UI_slots;
+	vector<UI_Element> m_UI_crew;
 };
 
 #endif //ROBOT_H_INCLUDED

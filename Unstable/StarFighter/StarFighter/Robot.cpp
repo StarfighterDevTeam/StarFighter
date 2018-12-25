@@ -351,6 +351,72 @@ void Robot::Initialize()
 			}
 		}
 	}
+
+	//UI
+	InitializeUI();
+}
+
+void Robot::InitializeUI()
+{
+	float robot_offset = m_index == 0 ? 0.f : 1000.f;
+
+	//Slots - distance from the faremost left part (left hand) and the faremost upper part (head) of the robot in pixels
+	float slot_coord[NB_SLOT_INDEX][2] = {
+		{ 225.f,	 0.f	 },		//Index_Head
+		{ 100.f,	 450.f },	//Index_LegL
+		{ 350.f,	 450.f },	//Index_LegR
+		{ 70.f, 600.f },		//Index_FootL
+		{ 380.f,	 600.f },	//Index_FootR
+		{ 40.f, 75.f },		//Index_ShoulderL
+		{ 410.f, 75.f },		//Index_ShoulderR
+		{ 0.f, 280.f },		//Index_HandL
+		{ 450.f, 280.f },	//Index_HandR
+		{ 225.f, 100.f },	//Index_BodyU
+		{ 225.f, 200.f },	//Index_BodyM
+		{ 225.f, 300.f } };	//Index_BodyD
+
+	int slot_size[NB_SLOT_INDEX][2] = {
+		{ 1, 1 },		//Index_Head
+		{ 1, 2 },		//Index_LegL
+		{ 1, 2 },		//Index_LegR
+		{ 2, 1 },		//Index_FootL
+		{ 2, 1 },		//Index_FootR
+		{ 1, 2 },		//Index_ShoulderL
+		{ 1, 2 },		//Index_ShoulderR
+		{ 1, 2 },		//Index_HandL
+		{ 1, 2 },		//Index_HandR
+		{ 3, 1 },		//Index_BodyU
+		{ 3, 1 },		//Index_BodyM
+		{ 2, 1 } };		//Index_BodyD
+
+	float offset_x = 275.f + robot_offset;
+	float offset_y = 215.f;
+	float size_x = 80.f;
+	float size_y = 80.f;
+
+	for (int i = 0; i < NB_SLOT_INDEX; i++)
+	{
+		UI_Element ui;
+
+		ui.m_type = UI_Slot;
+		ui.m_team = AllianceNeutral;
+
+		ui.m_shape_container.setPosition(sf::Vector2f(offset_x + slot_coord[i][0], offset_y + slot_coord[i][1]));
+		ui.m_shape_container.setSize(sf::Vector2f(size_x * slot_size[i][0], size_y * slot_size[i][1]));
+		ui.m_shape_container.setOrigin(sf::Vector2f(size_x * 0.5f * (float)slot_size[i][0], size_y * 0.5f * (float)slot_size[i][1]));
+		ui.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		ui.m_shape_container.setOutlineThickness(2);
+		ui.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+		ui.m_shape.setPosition(sf::Vector2f(offset_x + slot_coord[i][0], offset_y + slot_coord[i][1]));
+		ui.m_shape.setSize(sf::Vector2f(size_x * slot_size[i][0], size_y * slot_size[i][1]));
+		ui.m_shape.setOrigin(sf::Vector2f(size_x * 0.5f * (float)slot_size[i][0], size_y * 0.5f * (float)slot_size[i][1]));
+		ui.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+		ui.m_shape.setOutlineThickness(0);
+		ui.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+		m_UI_slots.push_back(ui);
+	}
 }
 
 void Robot::Update()
@@ -959,21 +1025,6 @@ int Robot::GetDistanceFromSlotToSlot(SlotIndex index, SlotIndex target_index)
 	{
 		for (int i = 0; i < NB_SLOT_INDEX; i++)
 		{
-			int dst = m_robot_map[i][target_index];
-			
-			int a = Index_Head;
-			int a1 = Index_LegL;
-			int a2 = Index_LegR;
-			int a3 = Index_FootL;	
-			int a4 = Index_FootR;
-			int a5 = Index_ShoulderL;
-			int a6 = Index_ShoulderR;
-			int a7 = Index_HandL;
-			int a11 = Index_HandR;
-			int a12= Index_BodyU;
-			int a13 = Index_BodyM;
-			int a14 = Index_BodyD;
-
 			//Looking for the slot that gets us 1 step closer to the destination, while being at 1 step away from our current 
 			if (m_robot_map[i][target_index] == distance_to_cross - 1 && m_robot_map[i][temp_index] == 1)
 			{

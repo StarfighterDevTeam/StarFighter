@@ -265,6 +265,18 @@ void InGameState::Draw()
 	(*CurrentGame).drawScene();//background
 
 	//ROBOT
+	for (int r = 0; r < 2; r++)
+	{
+		//slots
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
+		{
+			//visible by this player?
+			if (r == (int)it->m_team || it->m_team == AllianceNeutral)
+			{
+				it->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
+	}
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();
