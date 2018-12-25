@@ -64,7 +64,6 @@ public:
 	bool MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index);
 	bool SetEnergyCell(Module* module);
 	bool SetEnergyCell(Equipment* equipment);
-	bool SetEnergyCell(WeaponAttack* attack);
 	bool SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index);
 	bool SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_index);
 	bool SetMedicTarget(CrewMember* medic, CrewMember* target);

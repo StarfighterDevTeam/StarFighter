@@ -32,6 +32,7 @@ public:
 	Robot m_robots[2];
 
 	void InitRobots();
+	void Display();
 
 	void AttackResolution();
 	void EffectsResolution();

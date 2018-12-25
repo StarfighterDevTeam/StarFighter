@@ -382,9 +382,9 @@ void Robot::Update()
 				//TEST
 				if (m_index == 0)
 				{
-					SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
-					SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
-					SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+					//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+					//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+					//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
 				
 					SetEnergyCell(m_slots[Index_HandL].m_equipments[0]);
 
@@ -1038,28 +1038,6 @@ bool Robot::SetEnergyCell(Equipment* equipment)
 	}
 }
 
-bool Robot::SetEnergyCell(WeaponAttack* attack)
-{
-	if (m_energy_cells_available > 0)
-	{
-		if (attack->m_energy_cells < attack->m_energy_cost)
-		{
-			attack->m_energy_cells++;
-			m_energy_cells_available--;
-			return true;
-		}
-		else
-		{
-			printf("Cannot add Energy Cell: no slot available.\n");
-		}
-	}
-	else
-	{
-		printf("No Energy Cell available.\n");
-		return false;
-	}
-}
-
 bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 {
 	Module* module = attack->m_owner->m_owner->m_module;
@@ -1069,9 +1047,9 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		printf("Weapon already used during this turn.\n");
 		return false;
 	}
-	else if (attack->m_energy_cells < attack->m_energy_cost)
+	else if (m_energy_cells_available < attack->m_energy_cost)
 	{
-		printf("Cannot attack: not enough Enery Cells to use this attack: (current cells: %d ; cost: %d)\n", attack->m_energy_cells, attack->m_energy_cost);
+		printf("Cannot attack: not enough Enery Cells available (%d) to pay the cost of this attack (%d)\n", m_energy_cells_available, attack->m_energy_cost);
 		return false;
 	}
 	else if (module->m_shutdown_counter > 0)
@@ -1117,6 +1095,9 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 	else
 	{
 		attack->m_owner->m_used = true;
+
+		//Consumption of Energy Cells
+		m_energy_cells_available -= attack->m_energy_cost;
 
 		ActionAttack action;
 		action.m_attack = attack;

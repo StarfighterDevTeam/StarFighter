@@ -189,6 +189,19 @@ void InGameState::InitTable()
 */
 void InGameState::Update(sf::Time deltaTime)
 {
+	//Phase shift
+	if (m_robots[0].m_ready_to_change_phase && m_robots[1].m_ready_to_change_phase)
+	{
+		(*CurrentGame).m_phase = (GamePhase)(((*CurrentGame).m_phase + 1) % NB_GAME_PHASES);
+		if ((int)(*CurrentGame).m_phase == 0)
+		{
+			(*CurrentGame).m_turn++;
+		}
+
+		m_robots[0].m_ready_to_change_phase = false;
+		m_robots[1].m_ready_to_change_phase = false;
+	}
+
 	//Get mouse inputs
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
 	(*CurrentGame).m_mouse_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
@@ -241,19 +254,6 @@ void InGameState::Update(sf::Time deltaTime)
 		AttackResolution();
 		m_robots[0].m_ready_to_change_phase = true;
 		m_robots[1].m_ready_to_change_phase = true;
-	}
-
-	//Phase shift
-	if (m_robots[0].m_ready_to_change_phase && m_robots[1].m_ready_to_change_phase)
-	{
-		(*CurrentGame).m_phase = (GamePhase)(((*CurrentGame).m_phase + 1) % NB_GAME_PHASES);
-		if ((int)(*CurrentGame).m_phase == 0)
-		{
-			(*CurrentGame).m_turn++;
-		}
-		
-		m_robots[0].m_ready_to_change_phase = false;
-		m_robots[1].m_ready_to_change_phase = false;
 	}
 }
 
@@ -796,10 +796,6 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 
 		//Check global shutdown conditions
 		opponent->UpdateShudownGlobal();
-
-		//Consumption of the Energy Cells
-		robot->m_energy_cells -= attack->m_energy_cells;
-		attack->m_energy_cells = 0;
 
 		//Distance update
 		(*CurrentGame).m_distance_temp = range_weapon_used ? Distance_Ranged : Distance_Close;
