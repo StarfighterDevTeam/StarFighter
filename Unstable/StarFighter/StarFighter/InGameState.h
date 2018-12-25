@@ -34,7 +34,7 @@ public:
 	void InitRobots();
 
 	void AttackResolutions();
-	void ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool &range_weapon_used, bool &triggers_execution);
+	void ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution);
 	void EffectsResolution();
 	void GrabResolution();
 

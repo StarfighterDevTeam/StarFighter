@@ -1245,21 +1245,119 @@ bool Robot::SetEnergyCellsOnBalance()
 
 ActionAttack Robot::GetExecutionAttack()
 {
-	//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
-	//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
-	//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
+	WeaponAttack* execution = NULL;
+	SlotIndex target_index = NB_SLOT_INDEX;
 
-	//SetEnergyCell(m_slots[Index_HandL].m_equipments[0]);
+	//get execution attack here
+	//get target index
 
-	//SetWeaponAttackOnSlot(m_slots[Index_HandL].m_weapon->m_attacks.front(), Index_Head);
+	if (m_energy_cells_available < execution->m_energy_cost)
+	{
+		execution = NULL;
+		printf("Cannot execute: insufficient Energy Cells available (%d) to pay the energy cost of the weapon (%d).\n", m_energy_cells_available, execution->m_energy_cost);
+	}
+	else if (execution->m_owner->m_owner->m_module->m_health == 0)
+	{
+		execution = NULL;
+		printf("Cannot execute with weapon: parent module is destroyed and cannot be used.\n");
+	}
+	else if (execution->m_owner->m_owner->m_module->m_shutdown_counter > 0)
+	{
+		execution = NULL;
+		printf("Cannot execute with weapon: parent module is shut down and cannot be used.\n");
+	}
+	else if (execution->m_owner->m_energetic == true && execution->m_owner->m_owner->CanEquipEnergeticWeapon() == false)
+	{
+		execution = NULL;
+		printf("Cannot execute with weapon: energetic weapons require an operational Energetic weapon equipement (powered with 1 EC) to be used.\n");
+	}
+	else if (execution->m_owner->m_ranged == false && (target_index == Index_FootL || target_index == Index_FootR || target_index == Index_LegL || target_index == Index_LegR))
+	{
+		execution = NULL;
+		printf("Cannot execute on this target: lower parts (legs and feet) can't be targeted by close-combat attacks.\n");
+	}
+	else if (execution->m_crew_required != NB_CREW_TYPES && execution->m_crew_required != Crew_Any && execution->m_owner->m_owner->HasCrewRequired(execution->m_crew_required) == false)
+	{
+		execution = NULL;
+		printf("Cannot execute: the attack requires a specific type of valid crew member in the module (not stunned).\n");
+	}
+	else if (execution->m_crew_required == Crew_Any && execution->m_owner->m_owner->HasCrewRequired(execution->m_crew_required) == false)
+	{
+		execution = NULL;
+		printf("Cannot execute: the attack requires a valid crew member in the module (not stunned).\n");
+	}
+
+	//Consumme Energy Cells
+	if (execution != NULL)
+	{
+		m_energy_cells_available -= execution->m_energy_cost;
+	}
+
 	ActionAttack action;
-	action.m_attack = NULL;
-	action.m_target_index = NB_SLOT_INDEX;
+	action.m_attack = execution;
+	action.m_target_index = target_index;
 
 	return action;
 }
 
-void Robot::CounterAttackUpdate()
-{
+ActionAttack Robot::GetCounterAttack()
+{	
+	WeaponAttack* counter_attack = NULL;
+	SlotIndex target_index = NB_SLOT_INDEX;
 
+	//get counter attack here
+	//get target index
+	
+	if (counter_attack->m_owner->m_ranged == true)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack with a ranged weapon.\n");
+	}
+	else if (m_energy_cells_available < counter_attack->m_energy_cost)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack: insufficient Energy Cells available (%d) to pay the energy cost of the weapon (%d).\n", m_energy_cells_available, counter_attack->m_energy_cost);
+	}
+	else if (counter_attack->m_owner->m_owner->m_module->m_health == 0)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack with weapon: parent module is destroyed and cannot be used.\n");
+	}
+	else if (counter_attack->m_owner->m_owner->m_module->m_shutdown_counter > 0)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack with weapon: parent module is shut down and cannot be used.\n");
+	}
+	else if (counter_attack->m_owner->m_energetic == true && counter_attack->m_owner->m_owner->CanEquipEnergeticWeapon() == false)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack with weapon: energetic weapons require an operational Energetic weapon equipement (powered with 1 EC) to be used.\n");
+	}
+	else if (target_index == Index_FootL || target_index == Index_FootR || target_index == Index_LegL || target_index == Index_LegR)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack on this target: lower parts (legs and feet) can't be targeted by close-combat attacks.\n");
+	}
+	else if (counter_attack->m_crew_required != NB_CREW_TYPES && counter_attack->m_crew_required != Crew_Any && counter_attack->m_owner->m_owner->HasCrewRequired(counter_attack->m_crew_required) == false)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack: the attack requires a specific type of valid crew member in the module (not stunned).\n");
+	}
+	else if (counter_attack->m_crew_required == Crew_Any && counter_attack->m_owner->m_owner->HasCrewRequired(counter_attack->m_crew_required) == false)
+	{
+		counter_attack = NULL;
+		printf("Cannot counter-attack: the attack requires a valid crew member in the module (not stunned).\n");
+	}
+
+	//Consumme Energy Cells
+	if (counter_attack != NULL)
+	{
+		m_energy_cells_available -= counter_attack->m_energy_cost;
+	}
+
+	ActionAttack action;
+	action.m_attack = counter_attack;
+	action.m_target_index = target_index;
+
+	return action;
 }

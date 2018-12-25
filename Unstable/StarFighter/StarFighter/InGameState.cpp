@@ -442,7 +442,7 @@ void CardSlot::Update(MouseAction mouse_click)
 
 */
 
-void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool &range_weapon_used, bool &triggers_execution)
+void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution)
 {
 	Robot* robot = attack->m_owner->m_owner->m_owner;
 	RobotSlot& robot_slot = *attack->m_owner->m_owner;
@@ -497,7 +497,8 @@ void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 		bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
 
 		int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
-		int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + RandomizeIntBetweenValues(1, 20) - opponent->GetBalanceScore();
+		int counter_attack_bonus = is_counter_attack ? 5 : 0;
+		int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent->GetBalanceScore();
 
 		//Hit resolution
 		if (hit_success)
@@ -716,16 +717,20 @@ void InGameState::AttackResolutions()
 
 		printf("Attack resolution (speed %d).\n", speed);
 		bool triggers_execution = false;
-		ResolveAttack(it->m_attack, it->m_target_index, false, range_weapon_used, triggers_execution);
+		ResolveAttack(it->m_attack, it->m_target_index, false, false, range_weapon_used, triggers_execution);
 
 		//Execution?
 		if (triggers_execution)
 		{
-			ActionAttack execution = it->m_attack->m_owner->m_owner->m_owner->GetExecutionAttack();
-			if (execution.m_attack != NULL)
+			Robot* executioner = it->m_attack->m_owner->m_owner->m_owner;
+			if (executioner->m_unbalanced_counter == 0 && executioner->m_shutdown_global == false)
 			{
-				printf("Launching execution attack.\n");
-				ResolveAttack(execution.m_attack, execution.m_target_index, true, range_weapon_used, triggers_execution);
+				ActionAttack execution = executioner->GetExecutionAttack();
+				if (execution.m_attack != NULL)
+				{
+					printf("Launching execution attack.\n");
+					ResolveAttack(execution.m_attack, execution.m_target_index, true, false, range_weapon_used, triggers_execution);
+				}
 			}
 		}
 	}
@@ -840,12 +845,46 @@ void InGameState::GrabResolution()
 
 			if (hit_success)
 			{
-				opponent->m_grabbed = module;//record which Hand did the grab, because only destroying that hand will release the grab
+				//Grab and record which Hand did the grab, because only destroying that hand will release the grab
+				opponent->m_grabbed = module;
 				printf("Grab successful.\n");
 			}
 			else
 			{
-				printf("Grab missed. Possible counter-attack.\n");
+				//Counter-attack
+				printf("Grab missed.\n");
+				if (robot->m_unbalanced_counter == 0 && robot->m_shutdown_global == false)
+				{
+					ActionAttack counter_attack = robot->GetCounterAttack();
+					if (counter_attack.m_attack != NULL)
+					{
+						bool range_weapon_used = false;
+						bool triggers_execution = false;
+						printf("Launching counter-attack.\n");
+						ResolveAttack(counter_attack.m_attack, counter_attack.m_target_index, false, true, range_weapon_used, triggers_execution);
+
+						//Execution?
+						if (triggers_execution)
+						{
+							Robot* executioner = it->m_attack->m_owner->m_owner->m_owner;
+							if (executioner->m_unbalanced_counter == 0 && executioner->m_shutdown_global == false)
+							{
+								ActionAttack execution = executioner->GetExecutionAttack();
+								if (execution.m_attack != NULL)
+								{
+									printf("Launching execution attack.\n");
+									ResolveAttack(execution.m_attack, execution.m_target_index, true, false, range_weapon_used, triggers_execution);
+								}
+							}
+						}
+
+						//Update distance
+						if (range_weapon_used == true)
+						{
+							(*CurrentGame).m_distance_temp = Distance_Ranged;
+						}
+					}
+				}
 			}
 		}
 	}

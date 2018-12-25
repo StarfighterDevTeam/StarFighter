@@ -69,7 +69,7 @@ public:
 	bool SetEnergyCellsOnBalance();
 
 	ActionAttack GetExecutionAttack();
-	void CounterAttackUpdate();
+	ActionAttack GetCounterAttack();
 };
 
 #endif //ROBOT_H_INCLUDED
