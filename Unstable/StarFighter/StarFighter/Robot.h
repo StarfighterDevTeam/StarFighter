@@ -54,6 +54,7 @@ public:
 	void ShutdownSlot(SlotIndex index);
 	void UpdateCrew(SlotIndex index);
 	int GetDistanceFromSlotToSlot(SlotIndex index, SlotIndex target_index);
+	Module* GetShield();
 
 	int GenerateEnergyCells();
 	int HealCrewMembers();

@@ -34,10 +34,13 @@ public:
 	void InitRobots();
 
 	void AttackResolution();
-	void ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution);
 	void EffectsResolution();
 	void GrabResolution();
 	void GuardResolution();
+
+	bool ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution);
+	bool CounterAttack(Robot* attacker);
+	bool Execution(Robot* attacker);
 
 private:
 	sf::RenderWindow* mainWindow;

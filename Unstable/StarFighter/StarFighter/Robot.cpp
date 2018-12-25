@@ -935,6 +935,19 @@ void Robot::UpdateCrew(SlotIndex index)
 	}
 }
 
+Module* Robot::GetShield()
+{
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		if (it->m_module != NULL && it->m_weapon != NULL && it->m_weapon->m_type == Weapon_Shield)
+		{
+			return it->m_module;
+		}
+	}
+
+	return NULL;
+}
+
 int Robot::GetDistanceFromSlotToSlot(SlotIndex index, SlotIndex target_index)
 {
 	int distance_to_cross = m_robot_map[index][target_index];

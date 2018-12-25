@@ -446,7 +446,63 @@ void CardSlot::Update(MouseAction mouse_click)
 
 */
 
-void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution)
+bool InGameState::Execution(Robot* attacker)
+{
+	if (attacker->m_unbalanced_counter == 0 && attacker->m_shutdown_global == false)
+	{
+		ActionAttack execution = attacker->GetExecutionAttack();
+		if (execution.m_attack != NULL)
+		{
+			bool range_weapon_used = false;
+			bool triggers_execution = false;
+			printf("Launching execution attack.\n");
+			ResolveAttack(execution.m_attack, execution.m_target_index, true, false, range_weapon_used, triggers_execution);
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool InGameState::CounterAttack(Robot* attacker)
+{
+	if (attacker->m_unbalanced_counter == 0 && attacker->m_shutdown_global == false)
+	{
+		ActionAttack counter_attack = attacker->GetCounterAttack();
+		if (counter_attack.m_attack != NULL)
+		{
+			bool range_weapon_used = false;
+			bool triggers_execution = false;
+			printf("Launching counter-attack.\n");
+			ResolveAttack(counter_attack.m_attack, counter_attack.m_target_index, false, true, range_weapon_used, triggers_execution);
+
+			//Execution?
+			if (triggers_execution)
+			{
+				Execution(attacker);
+			}
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution)
 {
 	Robot* robot = attack->m_owner->m_owner->m_owner;
 	RobotSlot& robot_slot = *attack->m_owner->m_owner;
@@ -461,235 +517,279 @@ void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 	if (module->m_health == 0)
 	{
 		printf("Module cannot be used because it's been destroyed.\n");
+		return false;
 	}
 	else if (module->m_shutdown_counter > 0)
 	{
 		printf("Module cannot be used because it's been shut down.\n");
+		return false;
 	}
 	else if (attack->m_energy_cells < attack->m_energy_cost)
 	{
 		printf("Attack cancelled: not enough Energy Cells left in weapon (available: %d; cost: %d).\n", attack->m_energy_cells, attack->m_energy_cost);
+		return false;
 	}
 	else if (attack->m_crew_required != NB_CREW_TYPES && robot_slot.HasCrewRequired(attack->m_crew_required) == false)
 	{
 		printf("Attack cancelled: the attack requires a specific type of crew member in the module (currently not present or stunned).\n");
+		return false;
 	}
 	else if (robot->m_unbalanced_counter > 0)
 	{
 		printf("Module cannot be used because robot is unbalanced.\n");
+		return false;
 	}
 	else if (robot->m_shutdown_global == true)
 	{
 		printf("Module cannot be used because robot is undergoing a global shutdown.\n");
+		return false;
 	}
 	else//Attack resolution
 	{
-		//if there are both a ranged and a close-combat weapon on this attack speed, the close-combat is prioritary to determine the position at the end of the turn
-		if (weapon->m_ranged == false)
+		//Guard perfect?
+		if (opponent->m_guard_speed == attack->m_speed)
 		{
-			range_weapon_used = false;
+			//Counter attack
+			printf("Perfect guard (%d). Possible counter-attack.\n", attack->m_speed);
+			CounterAttack(robot);
 		}
-
-		//Randomization of resolutions
-		int gunner_bonus = robot_slot.GetGunnerRangeBonus();
-		int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
-		bool hit_success = weapon->m_ranged == false || is_execution == true || opponent->m_grabbed != NULL ||
-			RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
-
-		bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
-
-		bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
-
-		int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
-		int counter_attack_bonus = is_counter_attack ? 5 : 0;
-		int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent->GetBalanceScore();
-
-		//Hit resolution
-		if (hit_success)
+		else
 		{
-			int damage = attack->m_damage;
-			//Damage on grounded robot x2
-			if (opponent->m_grounded == true || is_execution == true || opponent->m_grabbed != NULL)
+			//Guard redirection
+			if (attack->m_speed <= opponent->m_guard_speed)
 			{
-				damage *= 2;
-			}
-
-			bool module_damaged = false;
-
-			//Energetical damage
-			if (weapon->m_energetic)
-			{
-				//Deflector absorption
-				for (vector<RobotSlot>::iterator it = opponent->m_slots.begin(); it != opponent->m_slots.end(); it++)
+				Module* shield = opponent->GetShield();
+				if (shield != NULL)
 				{
-					if (it->m_module->m_type == Module_Deflectors && it->m_module->IsOperationnal())
-					{
-						Module* deflector = it->m_module;
-						if (deflector->m_health > 0)
-						{
-							//Damage absorbed
-							if (deflector->m_health >= damage)
-							{
-								deflector->m_health -= damage;
-								damage = 0;
-							}
-							else
-							{
-								deflector->m_health = 0;
-								damage -= deflector->m_health;
-							}
-						}
-					}
+					target_index = shield->m_owner->m_index;
 				}
-
-				//Damage to target module
-				if (damage > 0)
+				else if (target_index == Index_FootL || target_index == Index_LegL || target_index == Index_ShoulderL)
 				{
-					if (target_module != NULL)
-					{
-						module_damaged = true;
-						if (target_module->m_health > damage)
-						{
-							target_module->m_health -= damage;
-						}
-						else
-						{
-							target_module->m_health = 0;
-							opponent->DestroySlot(target_slot.m_index);
-						}
+					target_index = Index_HandL;
+					printf("Guard redirects attack from side to hand.\n");
+				}
+				else if (target_index == Index_FootR || target_index == Index_LegR || target_index == Index_ShoulderR)
+				{
+					target_index = Index_HandR;
+					printf("Guard redirects attack from side to hand.\n");
+				}
+				else if (target_index == Index_BodyU || target_index == Index_BodyM || target_index == Index_BodyD)
+				{
+					target_index = Index_HandR;
 
-						//Damage to robot
-						if (opponent->m_health > damage)
-						{
-							opponent->m_health -= damage;
-						}
-						else
-						{
-							opponent->m_health = 0;
-							printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
-						}
-					}
+					//todo : choose hand
+
+					printf("Guard redirects attack from torso to hand.\n");
 				}
 			}
-			else //Physical damage
+
+			//if there are both a ranged and a close-combat weapon on this attack speed, the close-combat is prioritary to determine the position at the end of the turn
+			if (weapon->m_ranged == false)
 			{
-				if (target_module != NULL)
+				range_weapon_used = false;
+			}
+
+			//Randomization of resolutions
+			int gunner_bonus = robot_slot.GetGunnerRangeBonus();
+			int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
+			bool hit_success = weapon->m_ranged == false || is_execution == true || opponent->m_grabbed != NULL ||
+				RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
+
+			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
+
+			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
+
+			int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
+			int counter_attack_bonus = is_counter_attack ? 5 : 0;
+			int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent->GetBalanceScore();
+
+			//Hit resolution
+			if (hit_success)
+			{
+				int damage = attack->m_damage;
+				//Damage on grounded robot x2
+				if (opponent->m_grounded == true || is_execution == true || opponent->m_grabbed != NULL)
 				{
-					//Plate absorption (equipement of the target module)
-					for (vector<Equipment*>::iterator it = target_slot.m_equipments.begin(); it != target_slot.m_equipments.end(); it++)
+					damage *= 2;
+				}
+
+				bool module_damaged = false;
+
+				//Energetical damage
+				if (weapon->m_energetic)
+				{
+					//Deflector absorption
+					for (vector<RobotSlot>::iterator it = opponent->m_slots.begin(); it != opponent->m_slots.end(); it++)
 					{
-						if ((*it)->m_type == Equipment_LightPlate || (*it)->m_type == Equipment_HeavyPlate)
+						if (it->m_module->m_type == Module_Deflectors && it->m_module->IsOperationnal())
 						{
-							if ((*it)->m_health > 0)
+							Module* deflector = it->m_module;
+							if (deflector->m_health > 0)
 							{
-								//Damage absorbed by plates
-								if ((*it)->m_health >= damage)
+								//Damage absorbed
+								if (deflector->m_health >= damage)
 								{
-									(*it)->m_health -= damage;
+									deflector->m_health -= damage;
 									damage = 0;
 								}
 								else
 								{
-									(*it)->m_health = 0;
-									damage -= (*it)->m_health;
+									deflector->m_health = 0;
+									damage -= deflector->m_health;
 								}
 							}
 						}
 					}
 
-					//Damage to module
+					//Damage to target module
 					if (damage > 0)
 					{
-						module_damaged = true;
-						if (target_module->m_health > damage)
+						if (target_module != NULL)
 						{
-							target_module->m_health -= damage;
-						}
-						else
-						{
-							target_module->m_health = 0;
-							opponent->DestroySlot(target_slot.m_index);
-						}
+							module_damaged = true;
+							if (target_module->m_health > damage)
+							{
+								target_module->m_health -= damage;
+							}
+							else
+							{
+								target_module->m_health = 0;
+								opponent->DestroySlot(target_slot.m_index);
+							}
 
-						//Damage to robot
-						if (opponent->m_health > damage)
-						{
-							opponent->m_health -= damage;
-						}
-						else
-						{
-							opponent->m_health = 0;
-							printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
+							//Damage to robot
+							if (opponent->m_health > damage)
+							{
+								opponent->m_health -= damage;
+							}
+							else
+							{
+								opponent->m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
+							}
 						}
 					}
 				}
-			}
-
-			//Randomization of damage to crew if module has been damaged
-			if (module_damaged)
-			{
-				for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+				else //Physical damage
 				{
-					bool hit_roll = RandomizeIntBetweenValues(1, 6) >= 4;
-					if (hit_roll == true)
+					if (target_module != NULL)
 					{
-						(*it)->m_health--;
+						//Plate absorption (equipement of the target module)
+						for (vector<Equipment*>::iterator it = target_slot.m_equipments.begin(); it != target_slot.m_equipments.end(); it++)
+						{
+							if ((*it)->m_type == Equipment_LightPlate || (*it)->m_type == Equipment_HeavyPlate)
+							{
+								if ((*it)->m_health > 0)
+								{
+									//Damage absorbed by plates
+									if ((*it)->m_health >= damage)
+									{
+										(*it)->m_health -= damage;
+										damage = 0;
+									}
+									else
+									{
+										(*it)->m_health = 0;
+										damage -= (*it)->m_health;
+									}
+								}
+							}
+						}
+
+						//Damage to module
+						if (damage > 0)
+						{
+							module_damaged = true;
+							if (target_module->m_health > damage)
+							{
+								target_module->m_health -= damage;
+							}
+							else
+							{
+								target_module->m_health = 0;
+								opponent->DestroySlot(target_slot.m_index);
+							}
+
+							//Damage to robot
+							if (opponent->m_health > damage)
+							{
+								opponent->m_health -= damage;
+							}
+							else
+							{
+								opponent->m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
+							}
+						}
 					}
 				}
 
-				opponent->UpdateCrew(target_slot.m_index);
-			}
-		}
-
-		//Fire resolution
-		if (fire_success && target_module != NULL)
-		{
-			if (target_module->m_fire_counter < 2)
-			{
-				printf("Fire started.\n");
-				target_module->m_fire_counter = 2;
-			}
-		}
-
-		//Electric resolution
-		if (electricity_sucess && target_module != NULL)
-		{
-			opponent->ShutdownSlot(target_slot.m_index);
-		}
-
-		//Stun resolution
-		for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
-		{
-			bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
-			if (stun_roll == true)
-			{
-				if ((*it)->m_stun_counter < 2)
+				//Randomization of damage to crew if module has been damaged
+				if (module_damaged)
 				{
-					(*it)->m_stun_counter = 2;
-					printf("Crew member stunned.\n");
+					for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+					{
+						bool hit_roll = RandomizeIntBetweenValues(1, 6) >= 4;
+						if (hit_roll == true)
+						{
+							(*it)->m_health--;
+						}
+					}
+
+					opponent->UpdateCrew(target_slot.m_index);
 				}
 			}
-		}
 
-		//Balance resolution
-		if (unbalanced_score > 0)
-		{
-			if (opponent->m_unbalanced_counter == 0)
+			//Fire resolution
+			if (fire_success && target_module != NULL)
 			{
-				opponent->m_unbalanced_counter = 2;
-				opponent->m_unbalanced_value = unbalanced_score;
-				printf("Robot %d gets unbalanced.\n", opponent->m_index);
-			}
-			else
-			{
-				opponent->m_unbalanced_counter = 2;
-				opponent->m_unbalanced_value = unbalanced_score;
-
-				if (opponent->m_grounded == false)
+				if (target_module->m_fire_counter < 2)
 				{
-					opponent->m_grounded = true;
-					triggers_execution = true;
-					printf("Robot %d gets unbalanced again and gets grounded. Execution move possible.\n", opponent->m_index);
+					printf("Fire started.\n");
+					target_module->m_fire_counter = 2;
+				}
+			}
+
+			//Electric resolution
+			if (electricity_sucess && target_module != NULL)
+			{
+				opponent->ShutdownSlot(target_slot.m_index);
+			}
+
+			//Stun resolution
+			for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+			{
+				bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
+				if (stun_roll == true)
+				{
+					if ((*it)->m_stun_counter < 2)
+					{
+						(*it)->m_stun_counter = 2;
+						printf("Crew member stunned.\n");
+					}
+				}
+			}
+
+			//Balance resolution
+			if (unbalanced_score > 0)
+			{
+				if (opponent->m_unbalanced_counter == 0)
+				{
+					opponent->m_unbalanced_counter = 2;
+					opponent->m_unbalanced_value = unbalanced_score;
+					printf("Robot %d gets unbalanced.\n", opponent->m_index);
+				}
+				else
+				{
+					opponent->m_unbalanced_counter = 2;
+					opponent->m_unbalanced_value = unbalanced_score;
+
+					if (opponent->m_grounded == false)
+					{
+						opponent->m_grounded = true;
+						triggers_execution = true;
+						printf("Robot %d gets unbalanced again and gets grounded. Execution move possible.\n", opponent->m_index);
+					}
 				}
 			}
 		}
@@ -703,6 +803,8 @@ void InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 
 		//Distance update
 		(*CurrentGame).m_distance_temp = range_weapon_used ? Distance_Ranged : Distance_Close;
+
+		return true;
 	}
 }
 
@@ -726,16 +828,7 @@ void InGameState::AttackResolution()
 		//Execution?
 		if (triggers_execution)
 		{
-			Robot* executioner = it->m_attack->m_owner->m_owner->m_owner;
-			if (executioner->m_unbalanced_counter == 0 && executioner->m_shutdown_global == false)
-			{
-				ActionAttack execution = executioner->GetExecutionAttack();
-				if (execution.m_attack != NULL)
-				{
-					printf("Launching execution attack.\n");
-					ResolveAttack(execution.m_attack, execution.m_target_index, true, false, range_weapon_used, triggers_execution);
-				}
-			}
+			Execution(it->m_attack->m_owner->m_owner->m_owner);
 		}
 	}
 
@@ -834,14 +927,10 @@ void InGameState::GrabResolution()
 			}
 
 			Robot* robot = it->m_attack->m_owner->m_owner->m_owner;
-			RobotSlot& robot_slot = *it->m_attack->m_owner->m_owner;
 			Module* module = it->m_attack->m_owner->m_owner->m_module;
 
-			Weapon* weapon = it->m_attack->m_owner;
-
 			Robot* opponent = &m_robots[robot->m_index + 1 % 2];
-			RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
-			Module* target_module = target_slot.m_module;
+			Module* target_module = opponent->m_slots[it->m_target_index].m_module;
 
 			//Resolve grab
 			bool hit_success = opponent->m_shutdown_global == true || (target_module != NULL && (target_module->m_shutdown_counter > 0 || target_module->m_health == 0));
@@ -855,39 +944,8 @@ void InGameState::GrabResolution()
 			else
 			{
 				//Counter-attack
-				printf("Grab missed.\n");
-				if (robot->m_unbalanced_counter == 0 && robot->m_shutdown_global == false)
-				{
-					ActionAttack counter_attack = robot->GetCounterAttack();
-					if (counter_attack.m_attack != NULL)
-					{
-						bool range_weapon_used = false;
-						bool triggers_execution = false;
-						printf("Launching counter-attack.\n");
-						ResolveAttack(counter_attack.m_attack, counter_attack.m_target_index, false, true, range_weapon_used, triggers_execution);
-
-						//Execution?
-						if (triggers_execution)
-						{
-							Robot* executioner = it->m_attack->m_owner->m_owner->m_owner;
-							if (executioner->m_unbalanced_counter == 0 && executioner->m_shutdown_global == false)
-							{
-								ActionAttack execution = executioner->GetExecutionAttack();
-								if (execution.m_attack != NULL)
-								{
-									printf("Launching execution attack.\n");
-									ResolveAttack(execution.m_attack, execution.m_target_index, true, false, range_weapon_used, triggers_execution);
-								}
-							}
-						}
-
-						//Update distance
-						if (range_weapon_used == true)
-						{
-							(*CurrentGame).m_distance_temp = Distance_Ranged;
-						}
-					}
-				}
+				printf("Grab missed. Possible counter-attack.\n");
+				CounterAttack(opponent);
 			}
 		}
 	}
