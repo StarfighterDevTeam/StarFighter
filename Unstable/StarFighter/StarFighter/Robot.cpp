@@ -357,7 +357,10 @@ void Robot::Initialize()
 }
 
 void Robot::InitializeUI()
-{;
+{
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+
 	//Slots - distance from the faremost left part (left hand) and the faremost upper part (head) of the robot in pixels
 	float slot_coord[NB_SLOT_INDEX][2] = {
 		{ 225.f,	 0.f	 },		//Index_Head
@@ -487,7 +490,7 @@ void Robot::InitializeUI()
 		ui.m_shape_container.setPosition(sf::Vector2f(offset_x, offset_y + size_y * (float)c));
 		ui.m_shape_container.setSize(sf::Vector2f(size_x, size_y));
 		ui.m_shape_container.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5));
-		ui.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		ui.m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
 		ui.m_shape_container.setOutlineThickness(2);
 		ui.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
@@ -496,7 +499,55 @@ void Robot::InitializeUI()
 		ui.m_shape.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5));
 		ui.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 		ui.m_shape.setOutlineThickness(0);
-		ui.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+		ui.m_shape.setFillColor(sf::Color(255, 255, 255, 255));
+
+		string textureName;
+		switch ((*it)->m_type)
+		{
+			case Crew_Captain:
+			{
+				textureName = "2D/crew_captain.png";
+				break;
+			}
+			case Crew_Scientist:
+			{
+				textureName = "2D/crew_scientist.png";
+				break;
+			}
+			case Crew_Mechanic:
+			{
+				textureName = "2D/crew_mechanic.png";
+				break;
+			}
+			case Crew_Pilot:
+			{
+				textureName = "2D/crew_pilot.png";
+				break;
+			}
+			case Crew_Engineer:
+			{
+				textureName = "2D/crew_engineer.png";
+				break;
+			}
+			case Crew_Warrior:
+			{
+				textureName = "2D/crew_warrior.png";
+				break;
+			}
+			case Crew_Medic:
+			{
+				textureName = "2D/crew_medic.png";
+				break;
+			}
+			case Crew_Gunner:
+			{
+				textureName = "2D/crew_gunner.png";
+				break;
+			}
+		}
+
+		sf::Texture* texture = loader->loadTexture(textureName, size_x, size_y);
+		ui.m_shape.setTexture(texture);
 
 		m_UI_crew.push_back(ui);
 		c++;
