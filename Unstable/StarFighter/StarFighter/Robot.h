@@ -5,31 +5,6 @@
 
 #include "RobotSlot.h"
 
-enum UI_Type
-{
-	UI_Crew,
-	UI_Slot,
-	UI_Module,
-	UI_Button,
-	NB_UI_TYPES,
-};
-
-class UI_Element
-{
-public:
-	UI_Element(){};
-	RectangleShape m_shape_container;
-	RectangleShape m_shape;
-	UI_Type m_type;
-	TeamAlliances m_team;
-
-	void Draw(sf::RenderTexture& screen)
-	{
-		screen.draw(this->m_shape_container);
-		screen.draw(this->m_shape);
-	};
-};
-
 class Robot
 {
 public:
@@ -39,6 +14,7 @@ public:
 	int m_index;
 
 	vector<CrewMember*> m_crew;
+	vector<CrewMember*> m_crew_start;
 	vector<RobotSlot> m_slots;
 
 	int m_robot_map[NB_SLOT_INDEX][NB_SLOT_INDEX];
@@ -99,6 +75,7 @@ public:
 
 	//UI
 	void InitializeUI();
+	void UpdateUI();
 
 	vector<UI_Element> m_UI_slots;
 	vector<UI_Element> m_UI_modules;

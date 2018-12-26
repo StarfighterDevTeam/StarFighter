@@ -223,19 +223,21 @@ void InGameState::Update(sf::Time deltaTime)
 		(*CurrentGame).m_mouse_click_timer = 0.2f;
 	}
 
-	//Reset flags
-	(*CurrentGame).m_hovered_slot = NULL;
-	(*CurrentGame).m_play_card_slot = NULL;
-	(*CurrentGame).m_target_slot = NULL;
+	//Reset UI flags
+	(*CurrentGame).m_hovered_ui = NULL;
+	(*CurrentGame).m_target_ui = NULL;
 
 	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 	{
-		(*CurrentGame).m_selected_slot = NULL;
+		(*CurrentGame).m_selected_ui = NULL;
 	}
 
 	//ROBOT
 	m_robots[0].Update();
 	m_robots[1].Update();
+
+	m_robots[0].UpdateUI();
+	m_robots[1].UpdateUI();
 
 	if ((*CurrentGame).m_phase == Phase_GrabResolution)
 	{

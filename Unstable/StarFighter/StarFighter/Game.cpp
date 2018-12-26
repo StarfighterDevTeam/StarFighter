@@ -56,10 +56,16 @@ void Game::init(RenderWindow* window)
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
 
-	//Robot
+	//ROBOT
 	m_phase = Phase_GenerateEC;
 	m_turn = 0;
 	m_distance = Distance_Ranged;
+
+	//UI
+	m_selected_ui = NULL;
+	m_hovered_ui = NULL;
+	m_target_ui = NULL;
+	m_play_ui = NULL;
 }
 
 void Game::SetSFXVolume(bool activate_sfx)
@@ -798,4 +804,9 @@ EquipmentEffect::EquipmentEffect(EquipmentEffectType type, Module* owner_module,
 	m_owner_equipment = owner_equipment;
 	m_crew_required = NB_CREW_TYPES;
 	m_energy_cost = 0;
+}
+
+void UI_Element::Update()
+{
+	
 }

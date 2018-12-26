@@ -352,6 +352,12 @@ void Robot::Initialize()
 		}
 	}
 
+	//Copy the original list of crew members
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		m_crew_start.push_back(*it);
+	}
+
 	//UI
 	InitializeUI();
 }
@@ -475,7 +481,7 @@ void Robot::InitializeUI()
 
 	//Crew members
 	int c = 0;
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
 	{
 		UI_Element ui;
 
@@ -550,6 +556,29 @@ void Robot::InitializeUI()
 		ui.m_shape.setTexture(texture);
 
 		m_UI_crew.push_back(ui);
+		c++;
+	}
+}
+
+void Robot::UpdateUI()
+{
+	//Crew members status
+	int c = 0;
+	for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
+	{
+		if ((*it)->m_health == 0)
+		{
+			m_UI_crew[c].m_shape.setFillColor(sf::Color::Red);
+		}
+		else if ((*it)->m_stun_counter > 0)
+		{
+			m_UI_crew[c].m_shape.setFillColor(sf::Color::Yellow);
+		}
+		else if (m_slots[(*it)->m_index].m_module->m_fire_counter > 0)
+		{
+			m_UI_crew[c].m_shape.setFillColor(sf::Color(255, 17, 39, 255));
+		}
+
 		c++;
 	}
 }
