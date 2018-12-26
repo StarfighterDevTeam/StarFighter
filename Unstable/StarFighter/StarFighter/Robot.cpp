@@ -771,8 +771,8 @@ void Robot::UpdateUI()
 		}
 		else if (m_slots[(*it)->m_index].m_module->m_fire_counter > 0)
 		{
-			m_UI_crew[c].m_shape.setFillColor(sf::Color(255, 17, 39, 255));//orange
-			ss << "Fire";
+			m_UI_crew[c].m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange
+			ss << "On fire";
 		}
 		else
 		{
@@ -829,6 +829,53 @@ void Robot::UpdateUI()
 		m_UI_crew_sml[c].m_shape.setPosition(sf::Vector2f(pos_x + offset_x, pos_y + offset_y));
 
 		c++;
+	}
+
+	//Modules
+	for (vector<UI_Element>::iterator it = m_UI_modules.begin(); it != m_UI_modules.end(); it++)
+	{
+		Module* module = NULL;
+		if (it->m_type == UI_Equipment)
+		{
+			Equipment* equipment = (Equipment*)it->m_parent;
+			module = equipment->m_owner->m_module;
+		}
+
+		if (it->m_type == UI_Module)
+		{
+			module = (Module*)it->m_parent;
+		}
+
+		if (module != NULL)
+		{
+			if (module->m_health == 0)
+			{
+				it->m_shape.setFillColor(sf::Color::Red);
+			}
+			else if (module->m_shutdown_counter > 0)
+			{
+				it->m_shape.setFillColor(sf::Color::Yellow);
+			}
+			else if (m_shutdown_global == true)
+			{
+				it->m_shape.setFillColor(sf::Color::Yellow);
+			}
+			else if (module->m_fire_counter > 0)
+			{
+				it->m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange
+			}
+			else
+			{
+				if (it->m_type == UI_Module)
+				{
+					it->m_shape.setFillColor(sf::Color(0, 132, 232, 255));//default
+				}
+				else if (it->m_type == UI_Equipment)
+				{
+					it->m_shape.setFillColor(sf::Color(153, 217, 234, 255));//default
+				}
+			}
+		}
 	}
 
 	//Robot stats
