@@ -531,7 +531,7 @@ void Robot::InitializeUI()
 
 		float size_x = CREW_SIZE_X;
 		float size_y = CREW_SIZE_Y;
-		float offset_x = m_index == 0 ? 115.f : 1920.f - 115.f;
+		float offset_x = m_index == 0 ? 135.f : 1920.f - 135.f;
 		float offset_y = 180.f;
 
 		ui.m_shape_container.setPosition(sf::Vector2f(offset_x, offset_y + size_y * (float)c));
@@ -595,6 +595,18 @@ void Robot::InitializeUI()
 
 		sf::Texture* texture = loader->loadTexture(textureName, size_x, size_y);
 		ui.m_shape.setTexture(texture);
+
+		//text
+		offset_x -= m_index == 0 ? CREW_SIZE_X + 28.f : - 28.f * 2.f ;
+		offset_y += 12.f;
+
+		ui.m_text.setPosition(sf::Vector2f(offset_x, offset_y + size_y * (float)c));
+		ui.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		ui.m_text.setCharacterSize(16);
+		ui.m_text.setColor(sf::Color(255, 255, 255, 255));
+		ui.m_text.setString("\n\n\n");
+
+		ui.m_text.setPosition(sf::Vector2f(ui.m_text.getPosition().x, ui.m_text.getPosition().y - ui.m_text.getGlobalBounds().height));
 
 		m_UI_crew.push_back(ui);
 		c++;
@@ -679,22 +691,77 @@ void Robot::UpdateUI()
 	for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
 	{
 		//status
+		ostringstream ss;
+		switch ((*it)->m_type)
+		{
+			case Crew_Captain:
+			{
+				ss << "Captain\n";
+				break;
+			}
+			case Crew_Warrior:
+			{
+				ss << "Warrior\n";
+				break;
+			}
+			case Crew_Gunner:
+			{
+				ss << "Pilot\n";
+				break;
+			}
+			case Crew_Pilot:
+			{
+				ss << "Pilot\n";
+				break;
+			}
+			case Crew_Mechanic:
+			{
+				ss << "Mechanic\n";
+				break;
+			}
+			case Crew_Medic:
+			{
+				ss << "Medic\n";
+				break;
+			}
+			case Crew_Scientist:
+			{
+				ss << "Scientist\n";
+				break;
+			}
+			case Crew_Engineer:
+			{
+				ss << "Engineer\n";
+				break;
+			}
+		}
+
+		ss << "PV: " << (*it)->m_health << "/" << (*it)->m_health_max << "\n";
+		ss << "Move: " << (*it)->m_steps_remaining << "/" << (*it)->m_steps << "\n";
+		
 		if ((*it)->m_health == 0)
 		{
 			m_UI_crew[c].m_shape.setFillColor(sf::Color::Red);
+			ss << "Dead";
 		}
 		else if ((*it)->m_stun_counter > 0)
 		{
 			m_UI_crew[c].m_shape.setFillColor(sf::Color::Yellow);
+			ss << "K.O.";
 		}
 		else if (m_slots[(*it)->m_index].m_module->m_fire_counter > 0)
 		{
 			m_UI_crew[c].m_shape.setFillColor(sf::Color(255, 17, 39, 255));//orange
+			ss << "Fire";
 		}
 		else
 		{
 			m_UI_crew[c].m_shape.setFillColor(sf::Color::White);
+			ss << "OK";
 		}
+
+		//text update
+		m_UI_crew[c].m_text.setString(ss.str());
 
 		//position
 		float pos_x = m_UI_slots[(*it)->m_index].m_shape.getPosition().x;

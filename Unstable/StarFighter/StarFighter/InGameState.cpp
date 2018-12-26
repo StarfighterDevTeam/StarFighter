@@ -193,7 +193,6 @@ void InGameState::UI_GetAction(sf::Time deltaTime)
 	//Get UI action
 	int r1 = m_robots[0].m_ready_to_change_phase == true ? 1 : 0;
 	int r2 = (r1 + 1) % 2;
-	printf("Robot %d's turn to play.\n", r1);
 		
 	//Get mouse inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
@@ -307,7 +306,9 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 
 	if (mouse_click == Mouse_LeftClick)
 	{
-		if (m_hovered && m_team == (TeamAlliances)robot_index)
+		if (m_hovered && m_team == (TeamAlliances)robot_index 
+			//cannot select something else than a crew member during crew movement phase
+			&& ((*CurrentGame).m_phase != Phase_CrewMovement || m_type == UI_Crew))
 		{
 			m_selected = true;
 			(*CurrentGame).m_selected_ui = this;
@@ -332,12 +333,12 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 	//MOVE CREW
 	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
 	{
-		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_team == Alliance1)
+		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_team == (TeamAlliances)robot_index)
 		{
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
 		}
-		else if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Equipment && (*CurrentGame).m_hovered_ui->m_team == Alliance1)
+		else if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Equipment && (*CurrentGame).m_hovered_ui->m_team == (TeamAlliances)robot_index)
 		{
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
