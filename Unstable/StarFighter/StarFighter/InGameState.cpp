@@ -465,6 +465,9 @@ void InGameState::Draw()
 				}
 			}
 		}
+
+		//Robot stats
+		(*CurrentGame).m_mainScreen.draw(m_robots[r].m_UI_stats);
 	}
 
 	//Display

@@ -415,7 +415,7 @@ void Robot::InitializeUI()
 		UI_Element ui(&m_slots[i]);
 
 		ui.m_type = UI_Slot;
-		ui.m_team = AllianceNeutral;
+		ui.m_team = (TeamAlliances)m_index;//AllianceNeutral;
 
 		ui.m_shape_container.setPosition(sf::Vector2f(offset_x + slot_coord[i][0], offset_y + slot_coord[i][1]));
 		ui.m_shape_container.setSize(sf::Vector2f(size_x * slot_size[i][0], size_y * slot_size[i][1]));
@@ -514,6 +514,17 @@ void Robot::InitializeUI()
 			ui2.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 			ui2.m_shape.setOutlineThickness(0);
 			ui2.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+			if (entity != NULL)
+			{
+				if (is_equipment == false)
+				{
+					ui2.m_shape.setFillColor(sf::Color(0, 132, 232, 255));
+				}
+				else
+				{
+					ui2.m_shape.setFillColor(sf::Color(153, 217, 234, 255));
+				}
+			}
 
 			m_UI_modules.push_back(ui2);
 		}
@@ -682,6 +693,15 @@ void Robot::InitializeUI()
 	ui.m_text.setPosition(sf::Vector2f(ui.m_text.getPosition().x - global_bounds_x * 0.5f, ui.m_text.getPosition().y - global_bounds_y * 0.6f));
 
 	m_UI_buttons.push_back(ui);
+
+	//Robot stats
+	float offsettext_x = 20.f - robot_offset;
+	float offsettext_y = 900.f;
+	m_UI_stats.setPosition(sf::Vector2f(slot_coord[0][0] - offsettext_x, offsettext_y));
+	m_UI_stats.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_UI_stats.setCharacterSize(24);
+	m_UI_stats.setColor(sf::Color(255, 255, 255, 255));
+	m_UI_stats.setString("HEALTH POINTS\nENERGY CELLS\nBALANCE\nWEIGHT\nSTATUS");
 }
 
 void Robot::UpdateUI()
@@ -810,6 +830,62 @@ void Robot::UpdateUI()
 
 		c++;
 	}
+
+	//Robot stats
+	ostringstream sr;
+	sr << "HEALTH: " << m_health << "/" << m_health_max << "\n";
+	sr << "BALANCE: " << GetBalanceScore() << "\n";
+	sr << "ENERGY CELLS: " << m_energy_cells << "/" << MAX_ROBOT_ENERGY_CELLS << " ";
+	for (int i = 0; i < m_energy_cells_available; i++)
+	{
+		sr << "+";
+	}
+	sr << "\n";
+	sr << "WEIGHT: " << m_weight;
+	m_balance_bonus = 2;
+	m_attack_speed_bonus = -2;
+	if (m_balance_bonus > 0 && m_attack_speed_bonus < 0)
+	{
+		sr << " (BALANCE +" << m_balance_bonus << ", SPEED " << m_attack_speed_bonus << ")";
+	}
+	sr << "\n";
+	sr << "STATUS: ";
+	bool ok = true;
+	if (m_shutdown_global == true)
+	{
+		sr << "GLOBAL SHUTDOWN! ";
+		ok = false;
+	}
+	if (m_unbalanced_counter > 0)
+	{
+		if (m_grounded == true)
+		{
+			sr << "ON GROUND (" << m_unbalanced_value << ")!";
+		}
+		else
+		{
+			sr << "UNBALANCED (" << m_unbalanced_value << ")!";
+		}
+		ok = false;
+	}
+	if (m_grabbed != NULL)
+	{
+		if (m_grabbed->m_owner->m_index == Index_HandL)
+		{
+			sr << "GRABBED by Left Hand (x2 damage)! ";
+		}
+		else if (m_grabbed->m_owner->m_index == Index_HandR)
+		{
+			sr << "GRABBED by Right Hand (x2 damage)! ";
+		}
+		ok = false;
+	}
+	if (ok == true)
+	{
+		sr << "OK";
+	}
+
+	m_UI_stats.setString(sr.str());
 }
 
 void Robot::Update()

@@ -31,7 +31,6 @@ public:
 	int m_energy_cells;
 	int m_energy_cells_available;
 	int m_crew_max;
-	int m_balance;
 	int GetBalanceScore();
 	int m_balance_bonus;
 	int m_attack_speed_bonus;
@@ -82,6 +81,7 @@ public:
 	vector<UI_Element> m_UI_crew;
 	vector<UI_Element> m_UI_crew_sml;
 	vector<UI_Element> m_UI_buttons;
+	SFText m_UI_stats;
 };
 
 #endif //ROBOT_H_INCLUDED
