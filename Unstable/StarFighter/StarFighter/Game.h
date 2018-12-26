@@ -275,6 +275,34 @@ enum DistanceCombat
 	Distance_Close,
 };
 
+
+enum UI_Type
+{
+	UI_Crew,
+	UI_Slot,
+	UI_Module,
+	UI_Button,
+	NB_UI_TYPES,
+};
+
+class UI_Element
+{
+public:
+	UI_Element(){};
+	RectangleShape m_shape_container;
+	RectangleShape m_shape;
+	UI_Type m_type;
+	TeamAlliances m_team;
+
+	void Update();
+
+	void Draw(sf::RenderTexture& screen)
+	{
+		screen.draw(this->m_shape_container);
+		screen.draw(this->m_shape);
+	};
+};
+
 struct Game
 {
 public:
@@ -347,10 +375,10 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//ROBOT
-	CardSlot* m_hovered_slot;
-	CardSlot* m_selected_slot;
-	CardSlot* m_play_card_slot;
-	CardSlot* m_target_slot;
+	UI_Element* m_selected_ui;
+	UI_Element* m_hovered_ui;
+	UI_Element* m_target_ui;
+	UI_Element* m_play_ui;
 
 	GamePhase m_phase;
 	int m_turn;

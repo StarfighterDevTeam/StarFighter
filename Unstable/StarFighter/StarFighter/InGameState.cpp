@@ -226,10 +226,31 @@ void InGameState::Update(sf::Time deltaTime)
 	//Reset UI flags
 	(*CurrentGame).m_hovered_ui = NULL;
 	(*CurrentGame).m_target_ui = NULL;
-
+	(*CurrentGame).m_play_ui = NULL;
 	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 	{
 		(*CurrentGame).m_selected_ui = NULL;
+	}
+
+	//Get UI action
+	for (int r = 0; r < 2; r++)
+	{
+		//slots
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
+		{
+			it->Update();
+		}
+		//modules
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
+		{
+			it->Update();
+		}
+
+		//crew members
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew.begin(); it != m_robots[r].m_UI_crew.end(); it++)
+		{
+			it->Update();
+		}
 	}
 
 	//ROBOT
