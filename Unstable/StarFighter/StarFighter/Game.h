@@ -20,6 +20,13 @@
 
 class Ship;
 
+//Empty class for virtual override purposes
+class GameEntity
+{
+public:
+	GameEntity(){};
+};
+
 enum SFX_Bank
 {
 	SFX_Laser,
@@ -199,7 +206,7 @@ enum WeaponAttackType
 };
 
 class Weapon;//foreward declaration
-class WeaponAttack
+class WeaponAttack : public GameEntity
 {
 public:
 	WeaponAttack(WeaponAttackType type, Weapon* owner);
@@ -288,13 +295,18 @@ enum UI_Type
 class UI_Element
 {
 public:
-	UI_Element(){};
+	UI_Element(GameEntity* parent){ m_hovered = false; m_selected = false; m_parent = parent; };
 	RectangleShape m_shape_container;
 	RectangleShape m_shape;
 	UI_Type m_type;
 	TeamAlliances m_team;
 
-	void Update();
+	GameEntity* m_parent;
+
+	bool m_hovered;
+	bool m_selected;
+
+	void Update(MouseAction mouse_click, int robot_index);
 
 	void Draw(sf::RenderTexture& screen)
 	{
@@ -375,17 +387,17 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//ROBOT
-	UI_Element* m_selected_ui;
-	UI_Element* m_hovered_ui;
-	UI_Element* m_target_ui;
-	UI_Element* m_play_ui;
-
 	GamePhase m_phase;
 	int m_turn;
 	vector<ActionAttack> m_attacks_list;
 	vector<ActionEffect> m_effects_list;
 	DistanceCombat m_distance;
 	DistanceCombat m_distance_temp;
+
+	UI_Element* m_selected_ui;
+	UI_Element* m_hovered_ui;
+	UI_Element* m_target_ui;
+	UI_Element* m_play_ui;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

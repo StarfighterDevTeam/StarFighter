@@ -404,7 +404,7 @@ void Robot::InitializeUI()
 
 	for (int i = 0; i < NB_SLOT_INDEX; i++)
 	{
-		UI_Element ui;
+		UI_Element ui(&m_slots[i]);
 
 		ui.m_type = UI_Slot;
 		ui.m_team = AllianceNeutral;
@@ -428,7 +428,19 @@ void Robot::InitializeUI()
 		//Modules
 		for (int j = 0; j < m_slots[i].m_size; j++)
 		{
-			UI_Element ui2;
+			GameEntity* entity = NULL;
+			if (j == 0)
+			{
+				entity = (GameEntity*)m_slots[i].m_module;
+			}
+			else
+			{
+				if (j - 1 < m_slots[i].m_equipments.size())
+				{
+					entity = (GameEntity*)m_slots[i].m_equipments[j - 1];
+				}
+			}
+			UI_Element ui2(entity);
 
 			ui2.m_type = UI_Module;
 			ui2.m_team = (TeamAlliances)m_index;
@@ -483,10 +495,10 @@ void Robot::InitializeUI()
 	int c = 0;
 	for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
 	{
-		UI_Element ui;
+		UI_Element ui(*it);
 
 		ui.m_type = UI_Crew;
-		ui.m_team = AllianceNeutral;// (TeamAlliances)m_index;
+		ui.m_team = (TeamAlliances)m_index;
 
 		float size_x = 100.f;
 		float size_y = 80.f;
@@ -1078,10 +1090,10 @@ void Robot::ShutdownSlot(SlotIndex index)
 	}
 }
 
-bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
+bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 {
 	RobotSlot& current_slot = m_slots[crew->m_index];
-	RobotSlot& target_slot = m_slots[target_index];
+	SlotIndex target_index = target_slot->m_index;
 
 	if (target_index == crew->m_index)
 	{
@@ -1122,8 +1134,8 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index)
 			}
 		}
 
-		target_slot.m_crew.push_back(crew);
-		crew->m_index = current_slot.m_index;
+		target_slot->m_crew.push_back(crew);
+		crew->m_index = target_index;
 
 		printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
 

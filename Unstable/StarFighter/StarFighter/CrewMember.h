@@ -4,7 +4,7 @@
 #include "Game.h"
 
 class RobotSlot;
-class CrewMember
+class CrewMember : public GameEntity
 {
 public:
 	CrewMember(CrewType type, RobotSlot* owner);

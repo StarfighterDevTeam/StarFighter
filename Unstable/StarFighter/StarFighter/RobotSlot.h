@@ -9,7 +9,7 @@
 #include "CrewMember.h"
 
 class Robot;
-class RobotSlot
+class RobotSlot : public GameEntity
 {
 public:
 	RobotSlot(SlotIndex index, Robot* owner);

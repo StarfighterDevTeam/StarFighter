@@ -62,7 +62,7 @@ public:
 	int RepairModules();
 	void UpdateFirePropagation();
 	void UpdateCooldowns();
-	bool MoveCrewMemberToSlot(CrewMember* crew, SlotIndex target_index);
+	bool MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot);
 	bool SetEnergyCell(Module* module);
 	bool SetEnergyCell(Equipment* equipment);
 	bool SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index);

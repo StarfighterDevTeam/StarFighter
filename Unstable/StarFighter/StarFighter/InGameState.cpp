@@ -187,21 +187,9 @@ void InGameState::InitTable()
 	}
 }
 */
-void InGameState::Update(sf::Time deltaTime)
+
+void InGameState::UI_GetAction(sf::Time deltaTime)
 {
-	//Phase shift
-	if (m_robots[0].m_ready_to_change_phase && m_robots[1].m_ready_to_change_phase)
-	{
-		(*CurrentGame).m_phase = (GamePhase)(((*CurrentGame).m_phase + 1) % NB_GAME_PHASES);
-		if ((int)(*CurrentGame).m_phase == 0)
-		{
-			(*CurrentGame).m_turn++;
-		}
-
-		m_robots[0].m_ready_to_change_phase = false;
-		m_robots[1].m_ready_to_change_phase = false;
-	}
-
 	//Get mouse inputs
 	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
 	(*CurrentGame).m_mouse_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
@@ -238,20 +226,97 @@ void InGameState::Update(sf::Time deltaTime)
 		//slots
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
 		{
-			it->Update();
+			it->Update((*CurrentGame).m_mouse_click, r);
 		}
 		//modules
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
 		{
-			it->Update();
+			it->Update((*CurrentGame).m_mouse_click,r );
 		}
 
 		//crew members
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew.begin(); it != m_robots[r].m_UI_crew.end(); it++)
 		{
-			it->Update();
+			it->Update((*CurrentGame).m_mouse_click, r);
 		}
 	}
+
+	//Do action
+	if ((*CurrentGame).m_play_ui != NULL)
+	{
+		CrewMember* crew_member = (CrewMember*)(*CurrentGame).m_play_ui->m_parent;
+		Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
+		RobotSlot* robot_slot = module->m_owner;
+		m_robots[0].MoveCrewMemberToSlot(crew_member, robot_slot);
+	}
+}
+
+void UI_Element::Update(MouseAction mouse_click, int robot_index)
+{
+	if ((*CurrentGame).m_window_has_focus == true &&
+		(*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
+		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
+	{
+		m_hovered = true;
+		(*CurrentGame).m_hovered_ui = this;
+	}
+	else
+	{
+		m_hovered = false;
+	}
+
+	if (mouse_click == Mouse_LeftClick)
+	{
+		if (m_hovered)
+		{
+			m_selected = true;
+			(*CurrentGame).m_selected_ui = this;
+		}
+		else
+		{
+			m_selected = false;
+		}
+	}
+
+	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	if (m_hovered)
+	{
+		m_shape_container.setOutlineColor(sf::Color(255, 0, 0, 255));
+	}
+	if (m_selected)
+	{
+		m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
+	}
+
+	//Actions
+	//MOVE CREW
+	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
+	{
+		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_team == Alliance1)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+	}
+}
+
+void InGameState::Update(sf::Time deltaTime)
+{
+	//Phase shift
+	if (m_robots[0].m_ready_to_change_phase && m_robots[1].m_ready_to_change_phase)
+	{
+		(*CurrentGame).m_phase = (GamePhase)(((*CurrentGame).m_phase + 1) % NB_GAME_PHASES);
+		if ((int)(*CurrentGame).m_phase == 0)
+		{
+			(*CurrentGame).m_turn++;
+		}
+
+		m_robots[0].m_ready_to_change_phase = false;
+		m_robots[1].m_ready_to_change_phase = false;
+	}
+
+	//Get action from UI
+	UI_GetAction(deltaTime);
 
 	//ROBOT
 	m_robots[0].Update();
@@ -394,111 +459,11 @@ void InGameState::LoadCSVFile(string scenes_file)
 
 //ROBOT
 /*
-void Mage::InitSlots(int player_index)
-{
-	//Hand
-	for (int i = 0; i < NB_CARDS_HAND_MAX; i++)
-	{
-		m_hand_slots[i].m_status = CardSlot_Free;
-		m_hand_slots[i].m_stack = Stack_Hand;
-		m_hand_slots[i].m_index = i;
-
-		m_hand_slots[i].m_shape_container.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i + player_index * 700, 900));
-		m_hand_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-		m_hand_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-		m_hand_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-		m_hand_slots[i].m_shape_container.setOutlineThickness(2);
-		m_hand_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
-
-		m_hand_slots[i].m_shape.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i + player_index * 700, 900));
-		m_hand_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-		m_hand_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-		m_hand_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
-		m_hand_slots[i].m_shape.setOutlineThickness(0);
-		m_hand_slots[i].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
-
 		m_hand_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_hand_slots[i].m_text.setCharacterSize(18);
 		m_hand_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
 		m_hand_slots[i].m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i + player_index * 700, 900));
 		m_hand_slots[i].m_text.setString("");
-	}
-
-void CardSlot::Update(MouseAction mouse_click)
-{
-	if ((*CurrentGame).m_hovered_slot == NULL &&
-		(*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
-		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
-	{
-		m_hovered = true;
-		(*CurrentGame).m_hovered_slot = this;
-	}
-	else
-	{
-		m_hovered = false;
-	}
-
-	if (mouse_click == Mouse_LeftClick)
-	{
-		if (m_hovered)
-		{
-			m_selected = true;
-			(*CurrentGame).m_selected_slot = this;
-		}
-		else
-		{
-			m_selected = false;
-		}
-	}
-
-	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-	if (m_hovered)
-	{
-		m_shape_container.setOutlineColor(sf::Color(255, 0, 0, 255));
-	}
-	if (m_selected)
-	{
-		m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
-	}
-
-	//Actions
-	//PLAY CARD
-	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Hand && (*CurrentGame).m_selected_slot->m_status == CardSlot_Occupied && m_stack == Stack_AltarSlot)
-	{
-		(*CurrentGame).m_play_card_slot = (*CurrentGame).m_selected_slot;
-		(*CurrentGame).m_target_slot = this;
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_AltarSlot && m_stack == Stack_MonsterCurses)
-	{
-		(*CurrentGame).m_target_slot = this;
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Altar && m_stack == Stack_MonsterCurses)
-	{
-		(*CurrentGame).m_target_slot = this;
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && m_stack == Stack_MonsterCosts)
-	{
-		(*CurrentGame).m_target_slot = this;
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_AltarSlot && m_stack == Stack_Blessings)
-	{
-		(*CurrentGame).m_target_slot = this;
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_slot && (*CurrentGame).m_selected_slot->m_stack == Stack_Altar && m_stack == Stack_Blessings)
-	{
-		(*CurrentGame).m_target_slot = this;
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && m_stack == Stack_Library)
-	{
-		(*CurrentGame).m_target_slot = this;
-		m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && m_stack == Stack_EndOfTurn)
-	{
-		(*CurrentGame).m_target_slot = this;
-	}
-}
-
 */
 
 bool InGameState::Execution(Robot* attacker)

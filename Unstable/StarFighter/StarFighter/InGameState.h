@@ -42,6 +42,9 @@ public:
 	bool CounterAttack(Robot* attacker);
 	bool Execution(Robot* attacker);
 
+	//UI
+	void UI_GetAction(sf::Time deltaTime);
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;
