@@ -44,6 +44,7 @@ public:
 
 	//UI
 	void UI_GetAction(sf::Time deltaTime);
+	void UI_SyncSml(int crew_index, int robot_index);
 
 private:
 	sf::RenderWindow* mainWindow;

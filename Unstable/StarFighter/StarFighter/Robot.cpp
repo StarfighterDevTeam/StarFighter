@@ -362,45 +362,53 @@ void Robot::Initialize()
 	InitializeUI();
 }
 
+
+//Slots - distance from the faremost left part (left hand) and the faremost upper part (head) of the robot in pixels
+float slot_coord[NB_SLOT_INDEX][2] = {
+	{ 225.f, 0.f },		//Index_Head
+	{ 100.f, 450.f },	//Index_LegL
+	{ 350.f, 450.f },	//Index_LegR
+	{ 70.f, 600.f },		//Index_FootL
+	{ 380.f, 600.f },	//Index_FootR
+	{ 40.f, 75.f },		//Index_ShoulderL
+	{ 410.f, 75.f },		//Index_ShoulderR
+	{ 0.f, 280.f },		//Index_HandL
+	{ 450.f, 280.f },	//Index_HandR
+	{ 225.f, 100.f },	//Index_BodyU
+	{ 225.f, 200.f },	//Index_BodyM
+	{ 225.f, 300.f } };	//Index_BodyD
+
+int slot_size[NB_SLOT_INDEX][2] = {
+	{ 1, 1 },		//Index_Head
+	{ 1, 2 },		//Index_LegL
+	{ 1, 2 },		//Index_LegR
+	{ 2, 1 },		//Index_FootL
+	{ 2, 1 },		//Index_FootR
+	{ 1, 2 },		//Index_ShoulderL
+	{ 1, 2 },		//Index_ShoulderR
+	{ 1, 2 },		//Index_HandL
+	{ 1, 2 },		//Index_HandR
+	{ 3, 1 },		//Index_BodyU
+	{ 3, 1 },		//Index_BodyM
+	{ 2, 1 } };		//Index_BodyD
+
+#define CREW_SIZE_X		100.f
+#define CREW_SIZE_Y		80.f
+#define CREWSML_SIZE_X	25.f
+#define CREWSML_SIZE_Y	20.f
+#define MODULE_SIZE_X	80.f
+#define MODULE_SIZE_Y	80.f
+
 void Robot::InitializeUI()
 {
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 
-	//Slots - distance from the faremost left part (left hand) and the faremost upper part (head) of the robot in pixels
-	float slot_coord[NB_SLOT_INDEX][2] = {
-		{ 225.f,	 0.f	 },		//Index_Head
-		{ 100.f,	 450.f },	//Index_LegL
-		{ 350.f,	 450.f },	//Index_LegR
-		{ 70.f, 600.f },		//Index_FootL
-		{ 380.f,	 600.f },	//Index_FootR
-		{ 40.f, 75.f },		//Index_ShoulderL
-		{ 410.f, 75.f },		//Index_ShoulderR
-		{ 0.f, 280.f },		//Index_HandL
-		{ 450.f, 280.f },	//Index_HandR
-		{ 225.f, 100.f },	//Index_BodyU
-		{ 225.f, 200.f },	//Index_BodyM
-		{ 225.f, 300.f } };	//Index_BodyD
-
-	int slot_size[NB_SLOT_INDEX][2] = {
-		{ 1, 1 },		//Index_Head
-		{ 1, 2 },		//Index_LegL
-		{ 1, 2 },		//Index_LegR
-		{ 2, 1 },		//Index_FootL
-		{ 2, 1 },		//Index_FootR
-		{ 1, 2 },		//Index_ShoulderL
-		{ 1, 2 },		//Index_ShoulderR
-		{ 1, 2 },		//Index_HandL
-		{ 1, 2 },		//Index_HandR
-		{ 3, 1 },		//Index_BodyU
-		{ 3, 1 },		//Index_BodyM
-		{ 2, 1 } };		//Index_BodyD
-
 	float robot_offset = m_index == 0 ? 0.f : 970;//1920 - 250*2 - 450
 	float offset_x = 250.f + robot_offset;
 	float offset_y = 215.f;
-	float size_x = 80.f;
-	float size_y = 80.f;
+	float size_x = MODULE_SIZE_X;
+	float size_y = MODULE_SIZE_Y;
 
 	for (int i = 0; i < NB_SLOT_INDEX; i++)
 	{
@@ -501,8 +509,8 @@ void Robot::InitializeUI()
 		ui.m_type = UI_Crew;
 		ui.m_team = (TeamAlliances)m_index;
 
-		float size_x = 100.f;
-		float size_y = 80.f;
+		float size_x = CREW_SIZE_X;
+		float size_y = CREW_SIZE_Y;
 		float offset_x = m_index == 0 ? 115.f : 1920.f - 115.f;
 		float offset_y = 180.f;
 
@@ -570,15 +578,50 @@ void Robot::InitializeUI()
 
 		m_UI_crew.push_back(ui);
 		c++;
+
+		//crew on board
+		UI_Element ui2(*it);
+
+		ui2.m_type = UI_Crew;
+		ui2.m_team = (TeamAlliances)m_index;
+
+		float sizesml_x = CREWSML_SIZE_X;
+		float sizesml_y = CREWSML_SIZE_Y;
+
+		float pos_x = m_UI_slots[(*it)->m_index].m_shape.getPosition().x;
+		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y;
+
+		ui2.m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
+		ui2.m_shape_container.setSize(sf::Vector2f(sizesml_x, sizesml_y));
+		ui2.m_shape_container.setOrigin(sf::Vector2f(sizesml_x * 0.5f, sizesml_y * 0.5));
+		ui2.m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
+		ui2.m_shape_container.setOutlineThickness(2);
+		ui2.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+		ui2.m_shape.setPosition(sf::Vector2f(pos_x, pos_y));
+		ui2.m_shape.setSize(sf::Vector2f(sizesml_x, sizesml_y));
+		ui2.m_shape.setOrigin(sf::Vector2f(sizesml_x * 0.5f, sizesml_y * 0.5));
+		ui2.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+		ui2.m_shape.setOutlineThickness(0);
+		ui2.m_shape.setFillColor(sf::Color(255, 255, 255, 255));
+
+		string textureName_sml;
+		textureName_sml = ReplaceAll(textureName, ".png", "_sml.png");
+
+		sf::Texture* texture_sml = loader->loadTexture(textureName_sml, size_x, size_y);
+		ui2.m_shape.setTexture(texture_sml);
+
+		m_UI_crew_sml.push_back(ui2);
 	}
 }
 
 void Robot::UpdateUI()
 {
-	//Crew members status
+	//Crew members
 	int c = 0;
 	for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
 	{
+		//status
 		if ((*it)->m_health == 0)
 		{
 			m_UI_crew[c].m_shape.setFillColor(sf::Color::Red);
@@ -591,6 +634,51 @@ void Robot::UpdateUI()
 		{
 			m_UI_crew[c].m_shape.setFillColor(sf::Color(255, 17, 39, 255));
 		}
+
+		//position
+		float pos_x = m_UI_slots[(*it)->m_index].m_shape.getPosition().x;
+		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y;
+
+		float offset_x = 0;
+		float offset_y = 0;
+
+		int nb_crew_in_module = (*it)->m_owner->m_crew.size();
+		if (nb_crew_in_module > 1)
+		{
+			int c2 = 0;
+			for (vector<CrewMember*>::iterator it2 = (*it)->m_owner->m_crew.begin(); it2 != (*it)->m_owner->m_crew.end(); it2++)
+			{
+				if ((*it2) == (*it))
+				{
+					offset_x = -(CREWSML_SIZE_X * 0.5) + (CREWSML_SIZE_X * c2);
+					break;//crew member found
+				}
+				c2++;
+			}
+		}
+
+		//quick hardcoding, known that vertical slots have max 2 modules and horizontal slots have max 3 modules
+		bool vertical = slot_size[(*it)->m_index][1] > slot_size[(*it)->m_index][0];
+		bool odd_size = m_slots[(*it)->m_index].m_size % 2 == 1;
+
+		if (vertical == true)
+		{
+			offset_y -= MODULE_SIZE_Y * 0.5;
+		}
+		else
+		{
+			if (odd_size == false)
+			{
+				offset_x -= MODULE_SIZE_X * 0.5;
+			}
+			else if (m_slots[(*it)->m_index].m_size > 1)
+			{
+				offset_x -= MODULE_SIZE_X;
+			}
+		}
+
+		m_UI_crew_sml[c].m_shape_container.setPosition(sf::Vector2f(pos_x + offset_x, pos_y + offset_y));
+		m_UI_crew_sml[c].m_shape.setPosition(sf::Vector2f(pos_x + offset_x, pos_y + offset_y));
 
 		c++;
 	}

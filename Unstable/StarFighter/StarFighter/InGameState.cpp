@@ -235,9 +235,12 @@ void InGameState::UI_GetAction(sf::Time deltaTime)
 		}
 
 		//crew members
+		int c = 0;
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew.begin(); it != m_robots[r].m_UI_crew.end(); it++)
 		{
 			it->Update((*CurrentGame).m_mouse_click, r);
+			UI_SyncSml(c, r);//sync small portraits with the big ones
+			c++;
 		}
 	}
 
@@ -248,6 +251,23 @@ void InGameState::UI_GetAction(sf::Time deltaTime)
 		Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
 		RobotSlot* robot_slot = module->m_owner;
 		m_robots[0].MoveCrewMemberToSlot(crew_member, robot_slot);
+	}
+}
+
+void InGameState::UI_SyncSml(int crew_index, int robot_index)
+{
+	UI_Element& ui = m_robots[robot_index].m_UI_crew[crew_index];
+	UI_Element& ui_sml = m_robots[robot_index].m_UI_crew_sml[crew_index];
+
+	ui_sml.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+
+	if (ui.m_hovered)
+	{
+		ui_sml.m_shape_container.setOutlineColor(sf::Color(255, 0, 0, 255));
+	}
+	if (ui.m_selected)
+	{
+		ui_sml.m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
 	}
 }
 
@@ -377,6 +397,14 @@ void InGameState::Draw()
 
 		//crew members
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew.begin(); it != m_robots[r].m_UI_crew.end(); it++)
+		{
+			//visible by this player?
+			if (r == 0 || it->m_team == AllianceNeutral)
+			{
+				it->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew_sml.begin(); it != m_robots[r].m_UI_crew_sml.end(); it++)
 		{
 			//visible by this player?
 			if (r == 0 || it->m_team == AllianceNeutral)
