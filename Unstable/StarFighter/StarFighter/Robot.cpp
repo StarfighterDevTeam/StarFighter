@@ -357,9 +357,7 @@ void Robot::Initialize()
 }
 
 void Robot::InitializeUI()
-{
-	float robot_offset = m_index == 0 ? 0.f : 1000.f;
-
+{;
 	//Slots - distance from the faremost left part (left hand) and the faremost upper part (head) of the robot in pixels
 	float slot_coord[NB_SLOT_INDEX][2] = {
 		{ 225.f,	 0.f	 },		//Index_Head
@@ -389,7 +387,8 @@ void Robot::InitializeUI()
 		{ 3, 1 },		//Index_BodyM
 		{ 2, 1 } };		//Index_BodyD
 
-	float offset_x = 275.f + robot_offset;
+	float robot_offset = m_index == 0 ? 0.f : 970;//1920 - 250*2 - 450
+	float offset_x = 250.f + robot_offset;
 	float offset_y = 215.f;
 	float size_x = 80.f;
 	float size_y = 80.f;
@@ -469,6 +468,38 @@ void Robot::InitializeUI()
 
 			m_UI_modules.push_back(ui2);
 		}
+	}
+
+	//Crew members
+	int c = 0;
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		UI_Element ui;
+
+		ui.m_type = UI_Crew;
+		ui.m_team = AllianceNeutral;// (TeamAlliances)m_index;
+
+		float size_x = 100.f;
+		float size_y = 80.f;
+		float offset_x = m_index == 0 ? 115.f : 1920.f - 115.f;
+		float offset_y = 180.f;
+
+		ui.m_shape_container.setPosition(sf::Vector2f(offset_x, offset_y + size_y * (float)c));
+		ui.m_shape_container.setSize(sf::Vector2f(size_x, size_y));
+		ui.m_shape_container.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5));
+		ui.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		ui.m_shape_container.setOutlineThickness(2);
+		ui.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+		ui.m_shape.setPosition(sf::Vector2f(offset_x, offset_y + size_y * (float)c));
+		ui.m_shape.setSize(sf::Vector2f(size_x, size_y));
+		ui.m_shape.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5));
+		ui.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+		ui.m_shape.setOutlineThickness(0);
+		ui.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+		m_UI_crew.push_back(ui);
+		c++;
 	}
 }
 
