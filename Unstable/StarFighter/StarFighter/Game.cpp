@@ -805,3 +805,26 @@ EquipmentEffect::EquipmentEffect(EquipmentEffectType type, Module* owner_module,
 	m_crew_required = NB_CREW_TYPES;
 	m_energy_cost = 0;
 }
+
+void Game::GetMouseInputs(sf::Time deltaTime)
+{
+	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*getMainWindow());
+	m_mouse_pos = getMainWindow()->mapPixelToCoords(mousepos2i, m_view);
+
+	if (m_mouse_click_timer > 0)
+	{
+		m_mouse_click_timer -= deltaTime.asSeconds();
+	}
+
+	m_mouse_click = Mouse_None;
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_window_has_focus && m_mouse_click_timer <= 0)
+	{
+		m_mouse_click = Mouse_LeftClick;
+		m_mouse_click_timer = 0.2f;
+	}
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && m_window_has_focus && m_mouse_click_timer <= 0)
+	{
+		m_mouse_click = Mouse_RightClick;
+		m_mouse_click_timer = 0.2f;
+	}
+}

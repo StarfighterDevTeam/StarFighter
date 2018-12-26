@@ -5,7 +5,7 @@
 
 #include "RobotSlot.h"
 
-class Robot
+class Robot : public GameEntity
 {
 public:
 	Robot();
@@ -81,6 +81,7 @@ public:
 	vector<UI_Element> m_UI_modules;
 	vector<UI_Element> m_UI_crew;
 	vector<UI_Element> m_UI_crew_sml;
+	vector<UI_Element> m_UI_buttons;
 };
 
 #endif //ROBOT_H_INCLUDED

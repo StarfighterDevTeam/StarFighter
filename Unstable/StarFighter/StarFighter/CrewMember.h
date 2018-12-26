@@ -13,6 +13,7 @@ public:
 	int m_health_max;
 	int m_health;
 	int m_steps;
+	int m_steps_remaining;
 	SlotIndex m_index;
 	int m_stun_counter;//0= not stunned; 1=stunned until next turn; 2=gets stunned
 	CrewMember* m_medic_target;

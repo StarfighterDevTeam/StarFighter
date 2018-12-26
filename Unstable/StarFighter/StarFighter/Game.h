@@ -91,7 +91,7 @@ enum GamePhase
 	Phase_AttackPlanning,
 	Phase_HealCrew,
 	Phase_RepairModules,
-	Phase_EquipmentResolution,
+	Phase_EffectsResolution,
 	Phase_GrabResolution,
 	Phase_GuardResolution,
 	Phase_AttackResolution_12,
@@ -289,7 +289,7 @@ enum UI_Type
 	UI_Slot,
 	UI_Module,
 	UI_Equipment,
-	UI_Button,
+	UI_EndTurn,
 	NB_UI_TYPES,
 };
 
@@ -307,12 +307,16 @@ public:
 	bool m_hovered;
 	bool m_selected;
 
-	void Update(MouseAction mouse_click, int robot_index);
+	SFText m_text;
 
+	void ResetFillColor(){ m_shape_container.setFillColor(sf::Color::White); };
+
+	void Update(MouseAction mouse_click, int robot_index);
 	void Draw(sf::RenderTexture& screen)
 	{
 		screen.draw(this->m_shape_container);
 		screen.draw(this->m_shape);
+		screen.draw(this->m_text);
 	};
 };
 
@@ -351,6 +355,7 @@ public:
 	sf::Vector2f m_mouse_pos;
 	MouseAction m_mouse_click;
 	float m_mouse_click_timer;
+	void GetMouseInputs(sf::Time deltaTime);
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;

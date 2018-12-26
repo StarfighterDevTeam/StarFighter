@@ -64,4 +64,5 @@ CrewMember::CrewMember(CrewType type, RobotSlot* owner)
 	}
 
 	m_health = m_health_max;
+	m_steps_remaining = m_steps;
 }

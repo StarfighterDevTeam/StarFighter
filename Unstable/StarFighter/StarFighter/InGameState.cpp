@@ -190,26 +190,13 @@ void InGameState::InitTable()
 
 void InGameState::UI_GetAction(sf::Time deltaTime)
 {
+	//Get UI action
+	int r1 = m_robots[0].m_ready_to_change_phase == true ? 1 : 0;
+	int r2 = (r1 + 1) % 2;
+	printf("Robot %d's turn to play.\n", r1);
+		
 	//Get mouse inputs
-	sf::Vector2i mousepos2i = sf::Mouse::getPosition(*(*CurrentGame).getMainWindow());
-	(*CurrentGame).m_mouse_pos = (*CurrentGame).getMainWindow()->mapPixelToCoords(mousepos2i, (*CurrentGame).m_view);
-
-	if ((*CurrentGame).m_mouse_click_timer > 0)
-	{
-		(*CurrentGame).m_mouse_click_timer -= deltaTime.asSeconds();
-	}
-
-	(*CurrentGame).m_mouse_click = Mouse_None;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (*CurrentGame).m_window_has_focus && (*CurrentGame).m_mouse_click_timer <= 0)
-	{
-		(*CurrentGame).m_mouse_click = Mouse_LeftClick;
-		(*CurrentGame).m_mouse_click_timer = 0.2f;
-	}
-	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && (*CurrentGame).m_window_has_focus && (*CurrentGame).m_mouse_click_timer <= 0)
-	{
-		(*CurrentGame).m_mouse_click = Mouse_RightClick;
-		(*CurrentGame).m_mouse_click_timer = 0.2f;
-	}
+	(*CurrentGame).GetMouseInputs(deltaTime);
 
 	//Reset UI flags
 	(*CurrentGame).m_hovered_ui = NULL;
@@ -220,47 +207,65 @@ void InGameState::UI_GetAction(sf::Time deltaTime)
 		(*CurrentGame).m_selected_ui = NULL;
 	}
 
-	//Get UI action
+	//slots
 	for (int r = 0; r < 2; r++)
 	{
-		//slots
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, r);
+			it->Update((*CurrentGame).m_mouse_click, r2);
 		}
+
 		//modules
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click,r );
+			it->Update((*CurrentGame).m_mouse_click, r1);
 		}
 
 		//crew members
 		int c = 0;
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew.begin(); it != m_robots[r].m_UI_crew.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, r);
-			UI_SyncSml(c, r);//sync small portraits with the big ones
+			it->Update((*CurrentGame).m_mouse_click, r1);
+			if (r == r1)
+			{
+				UI_SyncSml(c, r1);//sync small portraits with the big ones
+			}
 			c++;
 		}
-	}
 
+		//buttons
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_buttons.begin(); it != m_robots[r].m_UI_buttons.end(); it++)
+		{
+			it->Update((*CurrentGame).m_mouse_click, r1);
+		}
+	}
+	
 	//Do action
 	if ((*CurrentGame).m_play_ui != NULL)
 	{
-		CrewMember* crew_member = (CrewMember*)(*CurrentGame).m_play_ui->m_parent;
-		RobotSlot* robot_slot = NULL;
-		if ((*CurrentGame).m_target_ui->m_type == UI_Module)
+		if ((*CurrentGame).m_play_ui->m_type == UI_EndTurn)
 		{
-			Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
-			robot_slot = module != NULL ? module->m_owner : NULL;
+			m_robots[r1].m_ready_to_change_phase = true;
+			//m_robots[r1].m_UI_buttons[0].m_selected = false;
+			printf("Robot %d has played.\n", r1);
 		}
-		else if ((*CurrentGame).m_target_ui->m_type == UI_Equipment)
+		else if ((*CurrentGame).m_play_ui->m_type == UI_Crew)
 		{
-			Equipment* equipment = (Equipment*)(*CurrentGame).m_target_ui->m_parent;
-			robot_slot = equipment != NULL ? equipment->m_owner : NULL;
-		}
+			CrewMember* crew_member = (CrewMember*)(*CurrentGame).m_play_ui->m_parent;
+			RobotSlot* robot_slot = NULL;
+			if ((*CurrentGame).m_target_ui->m_type == UI_Module)
+			{
+				Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
+				robot_slot = module != NULL ? module->m_owner : NULL;
+			}
+			else if ((*CurrentGame).m_target_ui->m_type == UI_Equipment)
+			{
+				Equipment* equipment = (Equipment*)(*CurrentGame).m_target_ui->m_parent;
+				robot_slot = equipment != NULL ? equipment->m_owner : NULL;
+			}
 
-		m_robots[0].MoveCrewMemberToSlot(crew_member, robot_slot);
+			m_robots[r1].MoveCrewMemberToSlot(crew_member, robot_slot);
+		}
 	}
 }
 
@@ -295,9 +300,14 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 		m_hovered = false;
 	}
 
+	if (m_selected && m_team != (TeamAlliances)robot_index)
+	{
+		m_selected = false;
+	}
+
 	if (mouse_click == Mouse_LeftClick)
 	{
-		if (m_hovered)
+		if (m_hovered && m_team == (TeamAlliances)robot_index)
 		{
 			m_selected = true;
 			(*CurrentGame).m_selected_ui = this;
@@ -333,12 +343,19 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 			(*CurrentGame).m_target_ui = this;
 		}
 	}
+	else if (m_hovered && mouse_click == Mouse_LeftClick && (*CurrentGame).m_hovered_ui->m_team == (TeamAlliances)robot_index)
+	{
+		if ((*CurrentGame).m_hovered_ui->m_type == UI_EndTurn)
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
+	}
 }
 
 void InGameState::Update(sf::Time deltaTime)
 {
 	//Phase shift
-	if (m_robots[0].m_ready_to_change_phase && m_robots[1].m_ready_to_change_phase)
+	if (m_robots[0].m_ready_to_change_phase == true && m_robots[1].m_ready_to_change_phase == true)
 	{
 		(*CurrentGame).m_phase = (GamePhase)(((*CurrentGame).m_phase + 1) % NB_GAME_PHASES);
 		if ((int)(*CurrentGame).m_phase == 0)
@@ -360,7 +377,17 @@ void InGameState::Update(sf::Time deltaTime)
 	m_robots[0].UpdateUI();
 	m_robots[1].UpdateUI();
 
-	if ((*CurrentGame).m_phase == Phase_GrabResolution)
+	if ((*CurrentGame).m_phase == Phase_CrewMovement)
+	{
+		UI_GetAction(deltaTime);
+	}
+	else if ((*CurrentGame).m_phase == Phase_EffectsResolution)
+	{
+		EffectsResolution();
+		m_robots[0].m_ready_to_change_phase = true;
+		m_robots[1].m_ready_to_change_phase = true;
+	}
+	else if ((*CurrentGame).m_phase == Phase_GrabResolution)
 	{
 		GrabResolution();
 		m_robots[0].m_ready_to_change_phase = true;
@@ -372,7 +399,7 @@ void InGameState::Update(sf::Time deltaTime)
 		m_robots[0].m_ready_to_change_phase = true;
 		m_robots[1].m_ready_to_change_phase = true;
 	}
-	if ((*CurrentGame).m_phase >= Phase_AttackResolution_12 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
+	else if ((*CurrentGame).m_phase >= Phase_AttackResolution_12 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
 	{
 		AttackResolution();
 		m_robots[0].m_ready_to_change_phase = true;
@@ -388,23 +415,23 @@ void InGameState::Draw()
 	(*CurrentGame).drawScene();//background
 
 	//ROBOT
+	GamePhase& phase = (*CurrentGame).m_phase;
+	bool async_phase = phase == Phase_CrewMovement || phase == Phase_AttackPlanning;
+
+	int r1 = m_robots[0].m_ready_to_change_phase == true ? 1 : 0;
+	int r2 = (r1 + 1) % 2;
 	for (int r = 0; r < 2; r++)
 	{
 		//slots
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
 		{
-			//visible by this player?
-			if (r == 0 || it->m_team == AllianceNeutral)
-			{
-				it->Draw((*CurrentGame).m_mainScreen);
-			}
+			it->Draw((*CurrentGame).m_mainScreen);		
 		}
 
 		//modules
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
 		{
-			//visible by this player?
-			if (r == 0 || it->m_team == AllianceNeutral)
+			if (async_phase == false || r == r1)
 			{
 				it->Draw((*CurrentGame).m_mainScreen);
 			}
@@ -413,18 +440,28 @@ void InGameState::Draw()
 		//crew members
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew.begin(); it != m_robots[r].m_UI_crew.end(); it++)
 		{
-			//visible by this player?
-			if (r == 0 || it->m_team == AllianceNeutral)
+			if (async_phase == false || r == r1)
 			{
 				it->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew_sml.begin(); it != m_robots[r].m_UI_crew_sml.end(); it++)
 		{
-			//visible by this player?
-			if (r == 0 || it->m_team == AllianceNeutral)
+			if (async_phase == false || r == r1)
 			{
 				it->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
+
+		//Buttons
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_buttons.begin(); it != m_robots[r].m_UI_buttons.end(); it++)
+		{
+			if (async_phase == false || r == r1)
+			{
+				if (it->m_type == UI_EndTurn)
+				{
+					it->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 		}
 	}

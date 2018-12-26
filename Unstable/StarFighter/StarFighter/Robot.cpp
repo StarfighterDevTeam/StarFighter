@@ -633,6 +633,43 @@ void Robot::InitializeUI()
 
 		m_UI_crew_sml.push_back(ui2);
 	}
+
+	//"End turn" button
+	UI_Element ui(this);
+
+	ui.m_type = UI_EndTurn;
+	ui.m_team = (TeamAlliances)m_index;
+
+	float offset_eot_x = 250.f + robot_offset;
+	float offset_eot_y = 80.f;
+	float sizeeot_x = 250;
+	float sizeeot_y = 50;
+
+	ui.m_shape_container.setPosition(sf::Vector2f(slot_coord[0][0] + offset_eot_x, slot_coord[0][1] + offset_eot_y));
+	ui.m_shape_container.setSize(sf::Vector2f(sizeeot_x, sizeeot_y));
+	ui.m_shape_container.setOrigin(sf::Vector2f(sizeeot_x * 0.5f, sizeeot_y * 0.5));
+	ui.m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
+	ui.m_shape_container.setOutlineThickness(2);
+	ui.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+	ui.m_shape.setPosition(sf::Vector2f(slot_coord[0][0] + offset_eot_x, slot_coord[0][1] + offset_eot_y));
+	ui.m_shape.setSize(sf::Vector2f(sizeeot_x, sizeeot_y));
+	ui.m_shape.setOrigin(sf::Vector2f(sizeeot_x * 0.5f, sizeeot_y * 0.5));
+	ui.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+	ui.m_shape.setOutlineThickness(0);
+	ui.m_shape.setFillColor(sf::Color(255, 255, 255, 255));
+
+	ui.m_text.setPosition(sf::Vector2f(slot_coord[0][0] + offset_eot_x, slot_coord[0][1] + offset_eot_y));
+	ui.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	ui.m_text.setCharacterSize(26);
+	ui.m_text.setColor(sf::Color(0, 0, 0, 255));
+	ui.m_text.setString("END OF TURN");
+
+	float global_bounds_x = ui.m_text.getGlobalBounds().width;
+	float global_bounds_y = ui.m_text.getCharacterSize();//ui.m_text.getGlobalBounds().height;
+	ui.m_text.setPosition(sf::Vector2f(ui.m_text.getPosition().x - global_bounds_x * 0.5f, ui.m_text.getPosition().y - global_bounds_y * 0.6f));
+
+	m_UI_buttons.push_back(ui);
 }
 
 void Robot::UpdateUI()
@@ -652,7 +689,11 @@ void Robot::UpdateUI()
 		}
 		else if (m_slots[(*it)->m_index].m_module->m_fire_counter > 0)
 		{
-			m_UI_crew[c].m_shape.setFillColor(sf::Color(255, 17, 39, 255));
+			m_UI_crew[c].m_shape.setFillColor(sf::Color(255, 17, 39, 255));//orange
+		}
+		else
+		{
+			m_UI_crew[c].m_shape.setFillColor(sf::Color::White);
 		}
 
 		//position
@@ -715,17 +756,7 @@ void Robot::Update()
 			m_ready_to_change_phase = true;
 			break;
 		}
-		case Phase_CrewMovement:
-		{
-			//TEST
-			//if (m_index == 1)
-			//{
-			//	MoveCrewMemberToSlot(m_slots[Index_Head].m_crew.back(), Index_ShoulderR);
-			//}
-
-			m_ready_to_change_phase = true;
-			break;
-		}
+		// ***** PHASE CREW MOVEMENT *****
 		case Phase_AttackPlanning:
 		{
 			if (m_shutdown_global == false && m_grounded == false)
@@ -1061,6 +1092,8 @@ void Robot::UpdateCooldowns()
 			{
 				(*it2)->m_overcharge++;
 			}
+
+			(*it2)->m_steps_remaining = (*it2)->m_steps;
 		}
 
 		//Fire update
@@ -1221,9 +1254,9 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 		printf("Cannot move crew member because he's stunned.\n");
 		return false;
 	}
-	else if (distance_to_cross > crew->m_steps)
+	else if (distance_to_cross > crew->m_steps_remaining)
 	{
-		printf("Cannot move crew member to slot %d because the distance to cross (%d) exceeds his movement ability (%d)\n", (int)target_index, distance_to_cross, crew->m_steps);
+		printf("Cannot move crew member to slot %d because the distance to cross (%d) exceeds his remaining movement points (%d)\n", (int)target_index, distance_to_cross, crew->m_steps_remaining);
 		return false;
 	}
 	else if (m_slots[target_index].m_module == NULL)
@@ -1253,6 +1286,8 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 		target_slot->m_crew.push_back(crew);
 		crew->m_index = target_index;
 		crew->m_owner = target_slot;
+
+		crew->m_steps_remaining -= distance_to_cross;
 
 		printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
 
