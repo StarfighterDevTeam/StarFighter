@@ -80,6 +80,7 @@ public:
 	vector<UI_Element> m_UI_slots;
 	vector<UI_Element> m_UI_modules;
 	vector<UI_Element> m_UI_crew;
+	vector<UI_Element> m_UI_crew_sml;
 };
 
 #endif //ROBOT_H_INCLUDED

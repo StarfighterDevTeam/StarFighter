@@ -495,6 +495,7 @@ void Robot::InitializeUI()
 	int c = 0;
 	for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
 	{
+		//selection tab
 		UI_Element ui(*it);
 
 		ui.m_type = UI_Crew;
