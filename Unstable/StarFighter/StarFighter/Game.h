@@ -288,6 +288,7 @@ enum UI_Type
 	UI_Crew,
 	UI_Slot,
 	UI_Module,
+	UI_Equipment,
 	UI_Button,
 	NB_UI_TYPES,
 };

@@ -436,21 +436,41 @@ void Robot::InitializeUI()
 		//Modules
 		for (int j = 0; j < m_slots[i].m_size; j++)
 		{
+			bool is_equipment = false;
 			GameEntity* entity = NULL;
 			if (j == 0)
 			{
 				entity = (GameEntity*)m_slots[i].m_module;
 			}
-			else
+			else if (j == 1)
 			{
-				if (j - 1 < m_slots[i].m_equipments.size())
+				if (m_slots[i].m_module != NULL && m_slots[i].m_module->m_size == 2)
 				{
-					entity = (GameEntity*)m_slots[i].m_equipments[j - 1];
+					entity = (GameEntity*)m_slots[i].m_module;
+				}
+				else if (m_slots[i].m_equipments.size() > 0)
+				{
+					entity = (GameEntity*)m_slots[i].m_equipments[0];
+					is_equipment = true;
 				}
 			}
+			else if (j == 2)
+			{
+				if (m_slots[i].m_module != NULL && m_slots[i].m_module->m_size == 2 && m_slots[i].m_equipments.size() > 0)
+				{
+					entity = (GameEntity*)m_slots[i].m_equipments[0];
+					is_equipment = true;
+				}
+				else if (m_slots[i].m_equipments.size() > 1)
+				{
+					entity = (GameEntity*)m_slots[i].m_equipments[1];
+					is_equipment = true;
+				}
+			}
+			
 			UI_Element ui2(entity);
 
-			ui2.m_type = UI_Module;
+			ui2.m_type = is_equipment == true ? UI_Equipment : UI_Module;
 			ui2.m_team = (TeamAlliances)m_index;
 
 			//quick hardcoding, known that vertical slots have max 2 modules and horizontal slots have max 3 modules
@@ -1181,8 +1201,15 @@ void Robot::ShutdownSlot(SlotIndex index)
 
 bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 {
+	if (target_slot == NULL)
+	{
+		printf("Cannot move crew to empty modules and equipment slots. Choose an existing module.\n");
+		return false;
+	}
+
 	RobotSlot& current_slot = m_slots[crew->m_index];
 	SlotIndex target_index = target_slot->m_index;
+	int distance_to_cross = GetDistanceFromSlotToSlot(crew->m_index, target_index);
 
 	if (target_index == crew->m_index)
 	{
@@ -1194,9 +1221,9 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 		printf("Cannot move crew member because he's stunned.\n");
 		return false;
 	}
-	else if (GetDistanceFromSlotToSlot(crew->m_index, target_index) > crew->m_steps)
+	else if (distance_to_cross > crew->m_steps)
 	{
-		printf("Cannot move crew member to slot %d because the distance to cross exceeds his movement ability (%d)\n", (int)target_index, crew->m_steps);
+		printf("Cannot move crew member to slot %d because the distance to cross (%d) exceeds his movement ability (%d)\n", (int)target_index, distance_to_cross, crew->m_steps);
 		return false;
 	}
 	else if (m_slots[target_index].m_module == NULL)
@@ -1225,6 +1252,7 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 
 		target_slot->m_crew.push_back(crew);
 		crew->m_index = target_index;
+		crew->m_owner = target_slot;
 
 		printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
 

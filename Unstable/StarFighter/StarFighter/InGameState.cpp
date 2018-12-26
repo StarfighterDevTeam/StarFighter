@@ -248,8 +248,18 @@ void InGameState::UI_GetAction(sf::Time deltaTime)
 	if ((*CurrentGame).m_play_ui != NULL)
 	{
 		CrewMember* crew_member = (CrewMember*)(*CurrentGame).m_play_ui->m_parent;
-		Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
-		RobotSlot* robot_slot = module->m_owner;
+		RobotSlot* robot_slot = NULL;
+		if ((*CurrentGame).m_target_ui->m_type == UI_Module)
+		{
+			Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
+			robot_slot = module != NULL ? module->m_owner : NULL;
+		}
+		else if ((*CurrentGame).m_target_ui->m_type == UI_Equipment)
+		{
+			Equipment* equipment = (Equipment*)(*CurrentGame).m_target_ui->m_parent;
+			robot_slot = equipment != NULL ? equipment->m_owner : NULL;
+		}
+
 		m_robots[0].MoveCrewMemberToSlot(crew_member, robot_slot);
 	}
 }
@@ -313,6 +323,11 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
 	{
 		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_team == Alliance1)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+		else if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Equipment && (*CurrentGame).m_hovered_ui->m_team == Alliance1)
 		{
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
