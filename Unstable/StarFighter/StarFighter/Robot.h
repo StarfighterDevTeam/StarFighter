@@ -100,6 +100,7 @@ public:
 	vector<UI_Element> m_UI_crew;
 	vector<UI_Element> m_UI_crew_sml;
 	vector<UI_Element> m_UI_buttons;
+	vector<UI_Element> m_UI_ec_available;
 	SFText m_UI_stats;
 	vector<vector<UI_Element> > m_UI_focus;
 };

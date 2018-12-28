@@ -682,7 +682,7 @@ void Robot::InitializeUI()
 		float sizesml_y = CREWSML_SIZE_Y;
 
 		float pos_x = m_UI_slots[(*it)->m_index].m_shape.getPosition().x;
-		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y + 10.f;
+		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y + 8.f;
 
 		ui2.m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
 		ui2.m_shape_container.setSize(sf::Vector2f(sizesml_x, sizesml_y));
@@ -835,7 +835,7 @@ void Robot::UpdateUI()
 
 		//position
 		float pos_x = m_UI_slots[(*it)->m_index].m_shape.getPosition().x;
-		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y + 10.f;
+		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y + 8.f;
 
 		float offset_x = 0;
 		float offset_y = 0;
@@ -932,12 +932,7 @@ void Robot::UpdateUI()
 	ostringstream sr;
 	sr << "HEALTH: " << m_health << "/" << m_health_max << "\n";
 	sr << "BALANCE: " << GetBalanceScore() << "\n";
-	sr << "ENERGY CELLS: " << m_energy_cells << "/" << MAX_ROBOT_ENERGY_CELLS << " ";
-	for (int i = 0; i < m_energy_cells_available; i++)
-	{
-		sr << "+";
-	}
-	sr << "\n";
+	sr << "ENERGY CELLS: " << m_energy_cells << "/" << MAX_ROBOT_ENERGY_CELLS << "\n";
 	sr << "WEIGHT: " << m_weight;
 	m_balance_bonus = 2;
 	m_attack_speed_bonus = -2;
@@ -1266,6 +1261,31 @@ void Robot::UpdateUI()
 			m_UI_slots[it->m_target_index].m_shape.setFillColor(sf::Color::White);
 		}
 	}
+
+	//EC available
+	m_UI_ec_available.clear();
+	for (int e = 0; e < m_energy_cells_available; e++)
+	{
+		UI_Element ui_ec(this);
+
+		ui_ec.m_type = UI_EC_Available;
+		ui_ec.m_team = (TeamAlliances)m_index;
+
+		float sizeec_x = 16.f;
+		float sizeec_y = 16.f;
+		float offset_ec_x = 490.f + (m_index == 0 ? 0.f : 970.f) + e * (sizeec_x + 8.f);
+		float offset_ec_y = 970.f;
+
+		ui_ec.m_shape_container.setPosition(sf::Vector2f(offset_ec_x, offset_ec_y));
+		ui_ec.m_shape_container.setSize(sf::Vector2f(sizeec_x, sizeec_y));
+		ui_ec.m_shape_container.setOrigin(sf::Vector2f(sizeec_x * 0.5f, sizeec_y * 0.5f));
+		ui_ec.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+		ui_ec.m_shape_container.setOutlineThickness(2);
+		ui_ec.m_shape_container.setFillColor(sf::Color(0, 255, 0, 255));
+
+		m_UI_ec_available.push_back(ui_ec);
+	}
+
 }
 
 void Robot::Update()

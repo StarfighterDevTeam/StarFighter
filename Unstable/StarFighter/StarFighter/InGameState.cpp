@@ -514,6 +514,15 @@ void InGameState::Draw()
 				}
 			}
 		}
+
+		//EC available
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_ec_available.begin(); it != m_robots[r].m_UI_ec_available.end(); it++)
+		{
+			if (async_phase == false || r == r1)
+			{
+				it->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
 	}
 
 	//Display
