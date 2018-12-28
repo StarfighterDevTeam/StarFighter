@@ -1900,6 +1900,7 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 
 		//Consumption of Energy Cells
 		m_energy_cells_available -= attack->m_energy_cost;
+		m_energy_cells -= attack->m_energy_cost;
 
 		ActionAttack action;
 		action.m_attack = attack;
@@ -2046,7 +2047,9 @@ bool Robot::SetEnergyCellsOnBalance()
 	{
 		//Spend Energy Cells to cancel the unbalance of the robot
 		m_energy_cells_available -= m_unbalanced_value;
+		m_energy_cells -= m_unbalanced_value;
 		m_unbalanced_counter = 0;
+		m_unbalanced_value = 0;
 		return true;
 	}
 }
@@ -2099,6 +2102,7 @@ ActionAttack Robot::GetExecutionAttack()
 	if (execution != NULL)
 	{
 		m_energy_cells_available -= execution->m_energy_cost;
+		m_energy_cells -= execution->m_energy_cost;
 	}
 
 	ActionAttack action;
@@ -2161,6 +2165,7 @@ ActionAttack Robot::GetCounterAttack()
 	if (counter_attack != NULL)
 	{
 		m_energy_cells_available -= counter_attack->m_energy_cost;
+		m_energy_cells -= counter_attack->m_energy_cost;
 	}
 
 	ActionAttack action;
