@@ -207,58 +207,54 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 	}
 
 	//Update buttons
-	//for (int r = 0; r < 2; r++)
-	//{
-		//slots
-		for (vector<UI_Element>::iterator it = m_robots[r2].m_UI_slots.begin(); it != m_robots[r2].m_UI_slots.end(); it++)
-		{
-			RobotSlot* slot = (RobotSlot*)it->m_parent;
-			if (slot != NULL && slot->m_module != NULL)
-			{
-				it->Update((*CurrentGame).m_mouse_click, robot_index);
-			}
-		}
-
-		//modules
-		for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_modules.begin(); it != m_robots[r1].m_UI_modules.end(); it++)
-		{
-			Module* module = (Module*)it->m_parent;
-			if (module != NULL)
-			{
-				it->Update((*CurrentGame).m_mouse_click, robot_index);
-			}
-		}
-
-		//crew members
-		int c = 0;
-		for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_crew.begin(); it != m_robots[r1].m_UI_crew.end(); it++)
-		{
-			it->Update((*CurrentGame).m_mouse_click, robot_index);
-			//if (r == r1)
-			//{
-				UI_SyncSml(c, robot_index);//sync small portraits with the big ones
-			//}
-			c++;
-		}
-
-		//buttons
-		for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_buttons.begin(); it != m_robots[r1].m_UI_buttons.end(); it++)
+	//slots
+	for (vector<UI_Element>::iterator it = m_robots[r2].m_UI_slots.begin(); it != m_robots[r2].m_UI_slots.end(); it++)
+	{
+		RobotSlot* slot = (RobotSlot*)it->m_parent;
+		if (slot != NULL && slot->m_module != NULL)
 		{
 			it->Update((*CurrentGame).m_mouse_click, robot_index);
 		}
+	}
 
-		//weapon attacks
-		for (vector<vector<UI_Element> >::iterator it = m_robots[r1].m_UI_focus.begin(); it != m_robots[r1].m_UI_focus.end(); it++)
+	//modules
+	for (vector<vector<UI_Element> >::iterator it = m_robots[r1].m_UI_modules.begin(); it != m_robots[r1].m_UI_modules.end(); it++)
+	{
+		for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			if (it2->m_parent != NULL)
 			{
-				if (it2->m_type == UI_WeaponAttack)
-				{
-					it2->Update((*CurrentGame).m_mouse_click, robot_index);
-				}
+				it2->Update((*CurrentGame).m_mouse_click, robot_index);
 			}
 		}
-	//}
+	}
+
+	//crew members
+	int c = 0;
+	for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_crew.begin(); it != m_robots[r1].m_UI_crew.end(); it++)
+	{
+		it->Update((*CurrentGame).m_mouse_click, robot_index);
+		UI_SyncSml(c, robot_index);//sync small portraits with the big ones
+		c++;
+	}
+
+	//buttons
+	for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_buttons.begin(); it != m_robots[r1].m_UI_buttons.end(); it++)
+	{
+		it->Update((*CurrentGame).m_mouse_click, robot_index);
+	}
+
+	//weapon attacks
+	for (vector<vector<UI_Element> >::iterator it = m_robots[r1].m_UI_focus.begin(); it != m_robots[r1].m_UI_focus.end(); it++)
+	{
+		for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		{
+			if (it2->m_type == UI_WeaponAttack)
+			{
+				it2->Update((*CurrentGame).m_mouse_click, robot_index);
+			}
+		}
+	}
 
 	//Global shutdown or grounded -> skip turn
 	if (m_robots[robot_index].m_shutdown_global == true)
@@ -282,6 +278,27 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 		{
 			m_robots[r1].m_ready_to_change_phase = true;
 			printf("Robot %d has played.\n", r1);
+		}
+		//Energy Cells attribution
+		if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Module && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
+		{
+			Module* module = (Module*)(*CurrentGame).m_play_ui->m_parent;
+			m_robots[r1].SetEnergyCell(module);
+		}
+		else if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Equipment && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
+		{
+			Equipment* equipment = (Equipment*)(*CurrentGame).m_play_ui->m_parent;
+			m_robots[r1].SetEnergyCell(equipment);
+		}
+		else if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Module && (*CurrentGame).m_mouse_click == Mouse_RightClick)
+		{
+			Module* module = (Module*)(*CurrentGame).m_play_ui->m_parent;
+			m_robots[r1].RemoveEnergyCell(module);
+		}
+		else if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Equipment && (*CurrentGame).m_mouse_click == Mouse_RightClick)
+		{
+			Equipment* equipment = (Equipment*)(*CurrentGame).m_play_ui->m_parent;
+			m_robots[r1].RemoveEnergyCell(equipment);
 		}
 		//Move crew member
 		else if ((*CurrentGame).m_play_ui->m_type == UI_Crew && (*CurrentGame).m_target_ui != NULL)
@@ -461,11 +478,14 @@ void InGameState::Draw()
 		}
 
 		//modules
-		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
+		for (vector<vector<UI_Element> >::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
 		{
-			if (async_phase == false || r == r1)
+			for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 			{
-				it->Draw((*CurrentGame).m_mainScreen);
+				if (async_phase == false || r == r1)
+				{
+					it2->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 		}
 

@@ -297,7 +297,8 @@ enum UI_Type
 	UI_Effect,
 	UI_Equipment,
 	UI_EndTurn,
-	UI_EC_Module,
+	UI_EC_Slot_Module,
+	UI_EC_Slot_Equipment,
 	UI_EC_Available,
 	NB_UI_TYPES,
 };

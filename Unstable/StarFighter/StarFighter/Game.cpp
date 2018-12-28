@@ -855,8 +855,8 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 	if (mouse_click == Mouse_LeftClick)
 	{
 		if (m_hovered && m_team == (TeamAlliances)robot_index &&
-			((*CurrentGame).m_phase == Phase_CrewMovement && m_type == UI_Crew
-			|| (*CurrentGame).m_phase == Phase_AttackPlanning && (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment)))
+			((*CurrentGame).m_phase == Phase_CrewMovement && (m_type == UI_Crew || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))
+			|| ((*CurrentGame).m_phase == Phase_AttackPlanning && (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module)))
 		{
 			m_selected = true;
 			(*CurrentGame).m_selected_ui = this;
@@ -878,7 +878,15 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 	}
 
 	//Actions
-	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
+	if (m_hovered && mouse_click == Mouse_RightClick)
+	{
+		//EC SLOTS -> REMOVE EC
+		if (((*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Equipment || (*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Module))
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
+	}
+	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
 	{
 		//MOVE CREW
 		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_phase == Phase_CrewMovement)
@@ -913,6 +921,11 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 		}
 		//SELECT WEAPON ATTACK
 		else if (m_hovered && mouse_click == Mouse_LeftClick && (*CurrentGame).m_hovered_ui->m_type == UI_WeaponAttack && (*CurrentGame).m_phase == Phase_AttackPlanning)
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
+		//EC SLOTS -> ADD EC
+		else if (m_hovered && mouse_click == Mouse_LeftClick && ((*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Equipment || (*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Module))
 		{
 			(*CurrentGame).m_play_ui = this;
 		}

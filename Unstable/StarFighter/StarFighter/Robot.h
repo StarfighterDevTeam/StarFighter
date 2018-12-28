@@ -82,6 +82,8 @@ public:
 	bool MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot);
 	bool SetEnergyCell(Module* module);
 	bool SetEnergyCell(Equipment* equipment);
+	bool RemoveEnergyCell(Module* module);
+	bool RemoveEnergyCell(Equipment* equipment);
 	bool SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index);
 	bool SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_index);
 	bool SetMedicTarget(CrewMember* medic, CrewMember* target);
@@ -96,7 +98,7 @@ public:
 	string GetCrewMemberName(CrewType type);
 
 	vector<UI_Element> m_UI_slots;
-	vector<UI_Element> m_UI_modules;
+	vector<vector<UI_Element> >m_UI_modules;
 	vector<UI_Element> m_UI_crew;
 	vector<UI_Element> m_UI_crew_sml;
 	vector<UI_Element> m_UI_buttons;

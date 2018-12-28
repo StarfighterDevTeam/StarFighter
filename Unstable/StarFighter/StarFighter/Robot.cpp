@@ -22,20 +22,6 @@ Robot::Robot()
 	{
 		m_slots.push_back(RobotSlot((SlotIndex)i, this));
 	}
-	/*
-	m_slots.push_back(RobotSlot(Index_Head, this));//0
-	m_slots.push_back(RobotSlot(Index_LegL, this));//1
-	m_slots.push_back(RobotSlot(Index_LegR, this));//2
-	m_slots.push_back(RobotSlot(Index_FootL, this));//3
-	m_slots.push_back(RobotSlot(Index_FootR, this));//4
-	m_slots.push_back(RobotSlot(Index_ShoulderL, this));//5
-	m_slots.push_back(RobotSlot(Index_ShoulderR, this));//6
-	m_slots.push_back(RobotSlot(Index_HandL, this));//7
-	m_slots.push_back(RobotSlot(Index_HandR, this));//8
-	m_slots.push_back(RobotSlot(Index_BodyU, this));//9
-	m_slots.push_back(RobotSlot(Index_BodyM, this));//10
-	m_slots.push_back(RobotSlot(Index_BodyD, this));//11
-	*/
 
 	//Mandatory slots
 	SetModule(Module_Head, Index_Head);
@@ -398,6 +384,8 @@ int slot_size[NB_SLOT_INDEX][2] = {
 #define CREWSML_SIZE_Y	20.f
 #define MODULE_SIZE_X	80.f
 #define MODULE_SIZE_Y	80.f
+#define EC_SIZE_X		16.f
+#define EC_SIZE_Y		16.f
 
 void Robot::InitializeUI()
 {
@@ -479,6 +467,7 @@ void Robot::InitializeUI()
 				}
 			}
 			
+			vector<UI_Element> ui_module;
 			UI_Element ui2(entity);
 
 			ui2.m_type = is_equipment == true ? UI_Equipment : UI_Module;
@@ -532,7 +521,7 @@ void Robot::InitializeUI()
 			else
 			{
 				//empty slots' module & equipement greyed out
-				if (j == 0 || m_UI_modules.back().m_shape_container.getFillColor() == sf::Color(128, 128, 128, 255))
+				if (j == 0 || m_UI_modules.back().front().m_shape_container.getFillColor() == sf::Color(128, 128, 128, 255))
 				{
 					ui2.m_shape_container.setFillColor(sf::Color(128, 128, 128, 255));
 				}
@@ -549,6 +538,8 @@ void Robot::InitializeUI()
 			ui2.m_shape.setOutlineThickness(0);
 			ui2.m_shape.setFillColor(sf::Color(0, 0, 0, 0));
 
+			int energy_cells_max = 0;
+			UI_Type ec_slot_type;
 			if (entity != NULL)
 			{
 				if (is_equipment == false)
@@ -557,17 +548,34 @@ void Robot::InitializeUI()
 					Weapon* weapon = module->m_owner->m_weapon;
 					if (weapon == NULL)
 					{
+						//Non-weapon module
 						ui2.m_text.setString(module->m_UI_display_name_short);
+
+						if (j == 0)
+						{
+							energy_cells_max = module->m_energy_cells_max;
+							ec_slot_type = UI_EC_Slot_Module;
+						}
 					}
 					else
 					{
+						//Weapon
 						ui2.m_text.setString(weapon->m_UI_display_name_short);
+
+						if (j == 0)
+						{
+							energy_cells_max = module->m_energy_cells_max;
+							ec_slot_type = UI_EC_Slot_Module;
+						}
 					}
 				}
 				else
 				{
+					//Equipment
 					Equipment* equipment = (Equipment*)entity;
 					ui2.m_text.setString(equipment->m_UI_display_name_short);
+					energy_cells_max = equipment->m_energy_cells_max;
+					ec_slot_type = UI_EC_Slot_Equipment;
 				}
 
 				ui2.m_text.setPosition(sf::Vector2f(offset_x + slot_coord[i][0] + offset_module_x - MODULE_SIZE_X * 0.5f + 2.f, offset_y + slot_coord[i][1] + offset_module_y - MODULE_SIZE_Y * 0.5f + 2.f));
@@ -576,7 +584,29 @@ void Robot::InitializeUI()
 				ui2.m_text.setColor(sf::Color(0, 0, 0, 255));
 			}
 			
-			m_UI_modules.push_back(ui2);
+			ui_module.push_back(ui2);
+
+			//EC slots
+			for (int e = 0; e < energy_cells_max; e++)
+			{
+				UI_Element ui_ec(entity);
+
+				ui_ec.m_type = ec_slot_type;
+				ui_ec.m_team = (TeamAlliances)m_index;
+
+				float offset_ec_x = offset_x + slot_coord[i][0] + offset_module_x - 30.f + (e * (EC_SIZE_X + 8.f));
+				float offset_ec_y = offset_y + slot_coord[i][1] + offset_module_y + 30.f;
+				ui_ec.m_shape_container.setPosition(sf::Vector2f(offset_ec_x, offset_ec_y));
+				ui_ec.m_shape_container.setSize(sf::Vector2f(EC_SIZE_X, EC_SIZE_Y));
+				ui_ec.m_shape_container.setOrigin(sf::Vector2f(EC_SIZE_X * 0.5f, EC_SIZE_Y * 0.5f));
+				ui_ec.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+				ui_ec.m_shape_container.setOutlineThickness(2);
+				ui_ec.m_shape_container.setFillColor(sf::Color(0, 0, 0, 255));
+
+				ui_module.push_back(ui_ec);
+			}
+
+			m_UI_modules.push_back(ui_module);
 		}
 	}
 
@@ -799,7 +829,7 @@ string Robot::GetCrewMemberName(CrewType type)
 
 void Robot::UpdateUI()
 {
-	//Crew members
+	//Crew members selection tab
 	int c = 0;
 	for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
 	{
@@ -882,47 +912,83 @@ void Robot::UpdateUI()
 	}
 
 	//Modules
-	for (vector<UI_Element>::iterator it = m_UI_modules.begin(); it != m_UI_modules.end(); it++)
-	{
+	for (vector<vector<UI_Element> >::iterator it = m_UI_modules.begin(); it != m_UI_modules.end(); it++)
+	{	
 		Module* module = NULL;
-		if (it->m_type == UI_Equipment)
+		if (it->front().m_type == UI_Equipment)
 		{
-			Equipment* equipment = (Equipment*)it->m_parent;
+			Equipment* equipment = (Equipment*)it->front().m_parent;
 			module = equipment->m_owner->m_module;
+
+			//EC slots
+			int ecs = 0;
+			for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			{
+				if (ecs > 0)
+				{
+					if (ecs <= equipment->m_energy_cells)
+					{
+						it2->m_shape_container.setFillColor(sf::Color::Green);
+					}
+					else
+					{
+						it2->m_shape_container.setFillColor(sf::Color::Black);
+					}
+				}
+				ecs++;
+			}
 		}
 
-		if (it->m_type == UI_Module)
+		if (it->front().m_type == UI_Module)
 		{
-			module = (Module*)it->m_parent;
+			module = (Module*)it->front().m_parent;
+
+			//EC slots
+			int ecs = 0;
+			for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			{
+				if (ecs > 0)
+				{
+					if (ecs <= module->m_energy_cells)
+					{
+						it2->m_shape_container.setFillColor(sf::Color::Green);
+					}
+					else
+					{
+						it2->m_shape_container.setFillColor(sf::Color::Black);
+					}
+				}
+				ecs++;
+			}
 		}
 
 		if (module != NULL)
 		{
 			if (module->m_health == 0)
 			{
-				it->m_shape_container.setFillColor(sf::Color::Red);
+				it->front().m_shape_container.setFillColor(sf::Color::Red);
 			}
 			else if (module->m_shutdown_counter > 0)
 			{
-				it->m_shape_container.setFillColor(sf::Color::Yellow);
+				it->front().m_shape_container.setFillColor(sf::Color::Yellow);
 			}
 			else if (m_shutdown_global == true)
 			{
-				it->m_shape_container.setFillColor(sf::Color::Yellow);
+				it->front().m_shape_container.setFillColor(sf::Color::Yellow);
 			}
 			else if (module->m_fire_counter > 0)
 			{
-				it->m_shape_container.setFillColor(sf::Color(255, 201, 14, 255));//orange
+				it->front().m_shape_container.setFillColor(sf::Color(255, 201, 14, 255));//orange
 			}
 			else
 			{
-				if (it->m_type == UI_Module)
+				if (it->front().m_type == UI_Module)
 				{
-					it->m_shape_container.setFillColor(sf::Color(0, 132, 232, 255));//default blue
+					it->front().m_shape_container.setFillColor(sf::Color(0, 132, 232, 255));//default blue
 				}
-				else if (it->m_type == UI_Equipment)
+				else if (it->front().m_type == UI_Equipment)
 				{
-					it->m_shape_container.setFillColor(sf::Color(153, 217, 234, 255));//default lighter blue
+					it->front().m_shape_container.setFillColor(sf::Color(153, 217, 234, 255));//default lighter blue
 				}
 			}
 		}
@@ -1153,21 +1219,19 @@ void Robot::UpdateUI()
 						ui_stat.m_type = UI_WeaponAttackStat;
 						ui_stat.m_team = (TeamAlliances)m_index;//AllianceNeutral;
 
-						float sizestat_x = 16.f;
-						float sizestat_y = 16.f;
-						float offset_stat_x = offset_weapon_x - sizeweapon_x * 0.5f + 8.f + sizestat_x + s * 55.f;
+						float offset_stat_x = offset_weapon_x - sizeweapon_x * 0.5f + 8.f + EC_SIZE_X + s * 55.f;
 						float offset_stat_y = offset_attack_y + 20.f;
 
 						ui_stat.m_shape_container.setPosition(sf::Vector2f(offset_stat_x, offset_stat_y));
-						ui_stat.m_shape_container.setSize(sf::Vector2f(sizestat_x, sizestat_y));
-						ui_stat.m_shape_container.setOrigin(sf::Vector2f(sizestat_x * 0.5f, sizestat_y * 0.5f));
+						ui_stat.m_shape_container.setSize(sf::Vector2f(EC_SIZE_X, EC_SIZE_Y));
+						ui_stat.m_shape_container.setOrigin(sf::Vector2f(EC_SIZE_X * 0.5f, EC_SIZE_Y * 0.5f));
 						ui_stat.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 						ui_stat.m_shape_container.setOutlineThickness(2);
 						ui_stat.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
 						ui_stat.m_shape.setPosition(sf::Vector2f(offset_stat_x, offset_stat_y));
-						ui_stat.m_shape.setSize(sf::Vector2f(sizestat_x, sizestat_y));
-						ui_stat.m_shape.setOrigin(sf::Vector2f(sizestat_x * 0.5f, sizestat_y * 0.5f));
+						ui_stat.m_shape.setSize(sf::Vector2f(EC_SIZE_X, EC_SIZE_Y));
+						ui_stat.m_shape.setOrigin(sf::Vector2f(EC_SIZE_X * 0.5f, EC_SIZE_Y * 0.5f));
 						ui_stat.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 						ui_stat.m_shape.setOutlineThickness(0);
 						
@@ -1205,7 +1269,7 @@ void Robot::UpdateUI()
 							}
 						}
 
-						ui_stat.m_text.setPosition(sf::Vector2f(offset_stat_x + sizestat_x * 0.5f + 4.f, offset_stat_y - sizestat_y * 0.5f - 4.f));
+						ui_stat.m_text.setPosition(sf::Vector2f(offset_stat_x + EC_SIZE_X * 0.5f + 4.f, offset_stat_y - EC_SIZE_Y * 0.5f - 4.f));
 						ui_stat.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 						ui_stat.m_text.setCharacterSize(20);
 						ui_stat.m_text.setColor(sf::Color(255, 255, 255, 255));
@@ -1271,21 +1335,18 @@ void Robot::UpdateUI()
 		ui_ec.m_type = UI_EC_Available;
 		ui_ec.m_team = (TeamAlliances)m_index;
 
-		float sizeec_x = 16.f;
-		float sizeec_y = 16.f;
-		float offset_ec_x = 490.f + (m_index == 0 ? 0.f : 970.f) + e * (sizeec_x + 8.f);
+		float offset_ec_x = 490.f + (m_index == 0 ? 0.f : 970.f) + e * (EC_SIZE_X + 8.f);
 		float offset_ec_y = 970.f;
 
 		ui_ec.m_shape_container.setPosition(sf::Vector2f(offset_ec_x, offset_ec_y));
-		ui_ec.m_shape_container.setSize(sf::Vector2f(sizeec_x, sizeec_y));
-		ui_ec.m_shape_container.setOrigin(sf::Vector2f(sizeec_x * 0.5f, sizeec_y * 0.5f));
+		ui_ec.m_shape_container.setSize(sf::Vector2f(EC_SIZE_X, EC_SIZE_Y));
+		ui_ec.m_shape_container.setOrigin(sf::Vector2f(EC_SIZE_X * 0.5f, EC_SIZE_Y * 0.5f));
 		ui_ec.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 		ui_ec.m_shape_container.setOutlineThickness(2);
-		ui_ec.m_shape_container.setFillColor(sf::Color(0, 255, 0, 255));
+		ui_ec.m_shape_container.setFillColor(sf::Color::Green);
 
 		m_UI_ec_available.push_back(ui_ec);
 	}
-
 }
 
 void Robot::Update()
@@ -1902,7 +1963,7 @@ bool Robot::SetEnergyCell(Module* module)
 		}
 		else
 		{
-			printf("Cannot add Energy Cell: no slot available.\n");
+			printf("All Energy Cell slots are already full on this module.\n");
 		}
 	}
 	else
@@ -1924,12 +1985,41 @@ bool Robot::SetEnergyCell(Equipment* equipment)
 		}
 		else
 		{
-			printf("Cannot add Energy Cell: no slot available.\n");
+			printf("All Energy Cell slots are already full on this equipment.\n");
 		}
 	}
 	else
 	{
 		printf("No Energy Cell available.\n");
+		return false;
+	}
+}
+
+bool Robot::RemoveEnergyCell(Module* module)
+{
+	if (module->m_energy_cells > 0)
+	{
+		module->m_energy_cells--;
+		m_energy_cells_available++;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+bool Robot::RemoveEnergyCell(Equipment* equipment)
+{
+	if (equipment->m_energy_cells > 0)
+	{
+		equipment->m_energy_cells--;
+		m_energy_cells_available++;
+		return true;
+	}
+	else
+	{
 		return false;
 	}
 }
