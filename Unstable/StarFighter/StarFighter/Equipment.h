@@ -26,6 +26,10 @@ public:
 	RobotSlot* m_owner;
 	bool m_used;
 
+	string m_UI_display_name;
+	string m_UI_display_name_short;
+	string m_UI_description;
+
 	EquipmentEffect* m_effect;
 };
 

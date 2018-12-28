@@ -745,9 +745,9 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 			bool hit_success = weapon->m_ranged == false || is_execution == true || opponent.m_grabbed != NULL ||
 				RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
 
-			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
+			bool fire_success = target_index != Index_Head && attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
 
-			bool electricity_sucess = attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
+			bool electricity_sucess = target_index != Index_Head && attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
 
 			int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
 			int counter_attack_bonus = is_counter_attack ? 5 : 0;

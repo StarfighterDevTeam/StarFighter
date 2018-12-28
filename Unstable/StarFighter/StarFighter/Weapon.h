@@ -22,6 +22,7 @@ public:
 	bool m_requires_close_distance;
 	
 	string m_UI_display_name;
+	string m_UI_display_name_short;
 };
 
 

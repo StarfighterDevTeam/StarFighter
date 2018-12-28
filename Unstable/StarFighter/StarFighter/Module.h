@@ -27,6 +27,10 @@ public:
 	bool m_used;
 	CrewType m_crew_required;
 
+	string m_UI_display_name;
+	string m_UI_display_name_short;
+	string m_UI_description;
+
 	bool IsOperationnal();
 };
 

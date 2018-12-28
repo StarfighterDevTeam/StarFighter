@@ -549,6 +549,33 @@ void Robot::InitializeUI()
 			ui2.m_shape.setOutlineThickness(0);
 			ui2.m_shape.setFillColor(sf::Color(0, 0, 0, 0));
 
+			if (entity != NULL)
+			{
+				if (is_equipment == false)
+				{
+					Module* module = (Module*)entity;
+					Weapon* weapon = module->m_owner->m_weapon;
+					if (weapon == NULL)
+					{
+						ui2.m_text.setString(module->m_UI_display_name_short);
+					}
+					else
+					{
+						ui2.m_text.setString(weapon->m_UI_display_name_short);
+					}
+				}
+				else
+				{
+					Equipment* equipment = (Equipment*)entity;
+					ui2.m_text.setString(equipment->m_UI_display_name_short);
+				}
+
+				ui2.m_text.setPosition(sf::Vector2f(offset_x + slot_coord[i][0] + offset_module_x - MODULE_SIZE_X * 0.5f + 2.f, offset_y + slot_coord[i][1] + offset_module_y - MODULE_SIZE_Y * 0.5f + 2.f));
+				ui2.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+				ui2.m_text.setCharacterSize(14);
+				ui2.m_text.setColor(sf::Color(0, 0, 0, 255));
+			}
+			
 			m_UI_modules.push_back(ui2);
 		}
 	}
@@ -655,7 +682,7 @@ void Robot::InitializeUI()
 		float sizesml_y = CREWSML_SIZE_Y;
 
 		float pos_x = m_UI_slots[(*it)->m_index].m_shape.getPosition().x;
-		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y;
+		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y + 10.f;
 
 		ui2.m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
 		ui2.m_shape_container.setSize(sf::Vector2f(sizesml_x, sizesml_y));
@@ -779,7 +806,7 @@ void Robot::UpdateUI()
 		//status
 		ostringstream ss;
 		ss << GetCrewMemberName((*it)->m_type);
-		ss << "PV: " << (*it)->m_health << "/" << (*it)->m_health_max << "\n";
+		ss << "HP: " << (*it)->m_health << "/" << (*it)->m_health_max << "\n";
 		ss << "Move: " << (*it)->m_steps_remaining << "/" << (*it)->m_steps << "\n";
 		
 		if ((*it)->m_health == 0)
@@ -808,7 +835,7 @@ void Robot::UpdateUI()
 
 		//position
 		float pos_x = m_UI_slots[(*it)->m_index].m_shape.getPosition().x;
-		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y;
+		float pos_y = m_UI_slots[(*it)->m_index].m_shape.getPosition().y + 10.f;
 
 		float offset_x = 0;
 		float offset_y = 0;
@@ -1312,7 +1339,7 @@ int Robot::GenerateEnergyCells()
 
 			for (vector<Equipment*>::iterator it2 = (*it).m_equipments.begin(); it2 != (*it).m_equipments.end(); it2++)
 			{
-				if ((*it2)->m_type == Equipment_GeneratorBooster)
+				if ((*it2)->m_type == Equipment_GeneratorBooster && ((*it2)->m_cooldown == 0 || (*it2)->m_cooldown_timer == (*it2)->m_cooldown))
 				{
 					cells += 3;
 				}

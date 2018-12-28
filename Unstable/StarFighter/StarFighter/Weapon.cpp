@@ -21,6 +21,7 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			m_ranged = true;
 			m_weight = 3;
 			m_UI_display_name = "BLASTER RIFLE";
+			m_UI_display_name_short = "Blaster\nRifle";
 			
 			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_BlasterRifle_1, this);
 			attack_primary->m_damage = 4;
@@ -51,6 +52,7 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			m_weight = 2;
 			m_energetic = true;
 			m_UI_display_name = "FIRE SWORD";
+			m_UI_display_name_short = "Fire Sword";
 
 			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_FireSword_1, this);
 			attack_primary->m_damage = 3;
@@ -77,6 +79,7 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 		{
 			m_weight = 4;
 			m_UI_display_name = "HAMMER";
+			m_UI_display_name_short = "Hammer";
 
 			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_Hammer_1, this);
 			attack_primary->m_damage = 3;
@@ -106,6 +109,7 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			m_weight = 1;
 			m_ranged = true;
 			m_UI_display_name = "GUN";
+			m_UI_display_name_short = "Gun";
 
 			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_Gun_1, this);
 			attack_primary->m_damage = 3;
@@ -155,6 +159,10 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 	}
 
 	m_selected_attack = m_attacks.front();
+	if (m_UI_display_name_short.empty() == true)
+	{
+		m_UI_display_name_short = m_UI_display_name;
+	}
 }
 
 Weapon::~Weapon()

@@ -25,12 +25,18 @@ Module::Module(ModuleType type, RobotSlot* owner)
 		case Module_Head:
 		{
 			m_health_max = 20;
+
+			m_UI_display_name = "Head";
+			m_UI_description = "Requires a Captain or a Pilot to active the robot.\nYou LOSE the game if the Head is destroyed.";
 			break;
 		}
 		case Module_Stabilizers:
 		{
 			m_health_max = 10;
 			m_energy_cells_max = 1;
+			
+			m_UI_display_name = "Stabilizer";
+			m_UI_description = "1EC = +1 Balance";
 			break;
 		}
 		case Module_Generator:
@@ -38,18 +44,28 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_health_max = 10;
 			m_weight = 1;
 			m_unique = true;
+			
+			m_UI_display_name = "Generator";
+			m_UI_description = "Generates 3EC per turn";
 			break;
 		}
 		case Module_Weapon:
 		{
 			m_health_max = 10;
 			m_energy_cells_max = 1;
+
+			m_UI_display_name = "Weapon mod";
+			m_UI_display_name_short = "Weapon\nmod";
+			m_UI_description = "Weapon slot";
 			break;
 		}
 		case Module_Gadget:
 		{
 			m_health_max = 6;
 			m_energy_cells_max = 2;
+
+			m_UI_display_name = "Gadget";
+			m_UI_description = "Requires an Egineer to use active equipment";
 			break;
 		}
 		case Module_CrewQuarter:
@@ -58,6 +74,10 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_weight = 1;
 			m_unique = true;
 			m_crew_max = 4;
+
+			m_UI_display_name = "Crew Quarter";
+			m_UI_display_name_short = "Crew\nQuarter";
+			m_UI_description = "Allows 4 crew members to live in the robot";
 			break;
 		}
 		case Module_Deflectors:
@@ -67,6 +87,9 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_unique = true;
 			m_size = 2;
 			m_energy_cells_max = 2;
+
+			m_UI_display_name = "Deflectors";
+			m_UI_description = "Shield Generator.\n1EC = 10hp shield.\n1EC = 2hp regen per turn";
 			break;
 		}
 		case Module_Infirmary:
@@ -74,6 +97,9 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_health_max = 6;
 			m_weight = 1;
 			m_energy_cells_max = 2;
+
+			m_UI_display_name = "Infirmary";
+			m_UI_description = "Heals crew members present in the module each turn.\n1 EC = 3hp regent per turn";
 			break;
 		}
 		case Module_Radar:
@@ -84,6 +110,9 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_energy_cells_max = 1;
 			m_cooldown = 2;
 			m_crew_required = Crew_Any;
+
+			m_UI_display_name = "Radar";
+			m_UI_description = "Reveals a target enemy module and its equipments";
 			break;
 		}
 		case Module_Sensors:
@@ -93,12 +122,21 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_unique = true;
 			m_energy_cells_max = 1;
 			m_cooldown = 2;
+			m_crew_required = Crew_Any;
+
+			m_UI_display_name = "Sensors";
+			m_UI_description = "Reveals a target enemy module and its equipments";
+
 			break;
 		}
 	}
 
 	m_health = m_health_max;
 	m_cooldown_timer = m_cooldown;
+	if (m_UI_display_name_short.empty() == true)
+	{
+		m_UI_display_name_short = m_UI_display_name;
+	}
 }
 
 bool Module::IsOperationnal()
