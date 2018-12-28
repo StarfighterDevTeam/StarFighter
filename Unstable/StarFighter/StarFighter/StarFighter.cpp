@@ -28,7 +28,7 @@ int main()
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	//Title
-	renderWindow.setTitle("StarFighter Engine");
+	renderWindow.setTitle("Giant Robot People - Prototype");
 
 	//Game initialization
 	CurrentGame = new Game();
