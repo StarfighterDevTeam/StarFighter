@@ -278,6 +278,7 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 		{
 			m_robots[r1].m_ready_to_change_phase = true;
 			printf("Robot %d has played.\n", r1);
+			(*CurrentGame).m_play_ui->m_hovered = false;
 		}
 		//Energy Cells attribution
 		if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Module && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
@@ -331,30 +332,15 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 		//Weapon attack target selection
 		else if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Slot)
 		{
-			/*RobotSlot* target_slot = NULL;
-			if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Module && (*CurrentGame).m_target_ui->m_team == (TeamAlliances)r2)
+			RobotSlot* target_slot = (RobotSlot*)(*CurrentGame).m_target_ui->m_parent;
+			if (target_slot != NULL)
 			{
-				Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
-				target_slot = module->m_owner;
-			}
-			else if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Equipment && (*CurrentGame).m_target_ui->m_team == (TeamAlliances)r2)
-			{
-				Equipment* equipment = (Equipment*)(*CurrentGame).m_target_ui->m_parent;
-				target_slot = equipment->m_owner;
-			}
-			*/
-			if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Slot)
-			{
-				RobotSlot* target_slot = (RobotSlot*)(*CurrentGame).m_target_ui->m_parent;
-				if (target_slot != NULL)
-				{
-					Module* module = (Module*)(*CurrentGame).m_play_ui->m_parent;
-					WeaponAttack* attack = module->m_owner->m_weapon->m_selected_attack;
-					SlotIndex target_index = target_slot->m_index;
+				Module* module = (Module*)(*CurrentGame).m_play_ui->m_parent;
+				WeaponAttack* attack = module->m_owner->m_weapon->m_selected_attack;
+				SlotIndex target_index = target_slot->m_index;
 
-					m_robots[r1].SetWeaponAttackOnSlot(attack, target_index);
-				}
-			}
+				m_robots[r1].SetWeaponAttackOnSlot(attack, target_index);
+			}	
 		}
 		//Weapon attack selection
 		else if ((*CurrentGame).m_play_ui->m_type == UI_WeaponAttack)

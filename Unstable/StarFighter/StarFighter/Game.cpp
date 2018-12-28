@@ -15,6 +15,7 @@ void Game::init(RenderWindow* window)
 	m_playerShip = NULL;
 	m_pause = false;
 	m_window_has_focus = true;
+	m_mouse_click_timer = 0.2f;
 
 	m_window = window;
 	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
@@ -854,9 +855,10 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 
 	if (mouse_click == Mouse_LeftClick)
 	{
-		if (m_hovered && m_team == (TeamAlliances)robot_index &&
-			((*CurrentGame).m_phase == Phase_CrewMovement && (m_type == UI_Crew || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))
-			|| ((*CurrentGame).m_phase == Phase_AttackPlanning && (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module)))
+		if (m_hovered 
+			&& m_team == (TeamAlliances)robot_index 
+			&& (((*CurrentGame).m_phase == Phase_CrewMovement && (m_type == UI_Crew || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))
+			|| ((*CurrentGame).m_phase == Phase_AttackPlanning && (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))))
 		{
 			m_selected = true;
 			(*CurrentGame).m_selected_ui = this;
@@ -867,14 +869,14 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 		}
 	}
 
-	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	m_shape_container.setOutlineColor(sf::Color::White);
 	if (m_hovered)
 	{
-		m_shape_container.setOutlineColor(sf::Color(255, 0, 0, 255));
+		m_shape_container.setOutlineColor(sf::Color::Red);
 	}
 	if (m_selected)
 	{
-		m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
+		m_shape_container.setOutlineColor(sf::Color::Green);
 	}
 
 	//Actions
