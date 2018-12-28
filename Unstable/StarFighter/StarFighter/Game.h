@@ -220,9 +220,13 @@ public:
 	int m_chance_of_electricity;
 	int m_chance_of_stun;
 	int m_chance_of_unbalance;
+	int m_nb_hits;
+	int m_nb_targets;
+	int m_nb_targets_remaining;
 	CrewType m_crew_required;
 
-	int m_energy_cells;
+	string m_UI_display_name;
+	string m_UI_description;
 
 	Weapon* m_owner;
 };
@@ -282,12 +286,15 @@ enum DistanceCombat
 	Distance_Close,
 };
 
-
 enum UI_Type
 {
 	UI_Crew,
 	UI_Slot,
 	UI_Module,
+	UI_WeaponAttack,
+	UI_Focus,
+	UI_WeaponAttackStat,
+	UI_Effect,
 	UI_Equipment,
 	UI_EndTurn,
 	NB_UI_TYPES,

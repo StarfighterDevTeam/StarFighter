@@ -116,84 +116,84 @@ void InGameState::InitRobots()
 	robot2.SetCrewMember(Crew_Captain, Index_Head);
 	robot2.SetCrewMember(Crew_Pilot, Index_Head);
 	robot2.SetCrewMember(Crew_Medic, Index_BodyU);
-	robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
-	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
-	robot2.SetCrewMember(Crew_Warrior, Index_HandR);
-	robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
-	robot2.SetCrewMember(Crew_Engineer, Index_LegL);
+robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
+robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
+robot2.SetCrewMember(Crew_Warrior, Index_HandR);
+robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
+robot2.SetCrewMember(Crew_Engineer, Index_LegL);
 
-	robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
-	robot2.SetWeapon(Weapon_Hammer, Index_HandR);
+robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
+robot2.SetWeapon(Weapon_Hammer, Index_HandR);
 
-	robot2.Initialize();
+robot2.Initialize();
 
-	//Opposition
-	robot.m_opponent = &robot2;
+//Opposition
+robot.m_opponent = &robot2;
 
-	robot2.m_opponent = &robot;
+robot2.m_opponent = &robot;
 }
 
 /*
 void InGameState::InitTable()
 {
-	(*CurrentGame).m_hovered_slot = NULL;
-	(*CurrentGame).m_selected_slot = NULL;
-	(*CurrentGame).m_play_card_slot = NULL;
-	(*CurrentGame).m_target_slot = NULL;
-	m_current_player = 0;
+(*CurrentGame).m_hovered_slot = NULL;
+(*CurrentGame).m_selected_slot = NULL;
+(*CurrentGame).m_play_card_slot = NULL;
+(*CurrentGame).m_target_slot = NULL;
+m_current_player = 0;
 
-	//Altar
-	m_altar_slot.m_stack = Stack_Altar;
+//Altar
+m_altar_slot.m_stack = Stack_Altar;
 
-	m_altar_slot.m_shape_container.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
-	m_altar_slot.m_shape_container.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
-	m_altar_slot.m_shape_container.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
-	m_altar_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-	m_altar_slot.m_shape_container.setOutlineThickness(2);
-	m_altar_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+m_altar_slot.m_shape_container.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
+m_altar_slot.m_shape_container.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
+m_altar_slot.m_shape_container.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
+m_altar_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+m_altar_slot.m_shape_container.setOutlineThickness(2);
+m_altar_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
-	m_altar_slot.m_shape.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
-	m_altar_slot.m_shape.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
-	m_altar_slot.m_shape.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
-	m_altar_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
-	m_altar_slot.m_shape.setOutlineThickness(0);
-	m_altar_slot.m_shape.setFillColor(sf::Color(255, 255, 255, 0));
+m_altar_slot.m_shape.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
+m_altar_slot.m_shape.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
+m_altar_slot.m_shape.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
+m_altar_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+m_altar_slot.m_shape.setOutlineThickness(0);
+m_altar_slot.m_shape.setFillColor(sf::Color(255, 255, 255, 0));
 
-	for (int i = 0; i < NB_CARDS_ALTAR; i++)
-	{
-		m_altar_slots[i].m_status = CardSlot_Free;
-		m_altar_slots[i].m_stack = Stack_AltarSlot;
-		m_altar_slots[i].m_index = i;
+for (int i = 0; i < NB_CARDS_ALTAR; i++)
+{
+m_altar_slots[i].m_status = CardSlot_Free;
+m_altar_slots[i].m_stack = Stack_AltarSlot;
+m_altar_slots[i].m_index = i;
 
-		m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
-		m_altar_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-		m_altar_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-		m_altar_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-		m_altar_slots[i].m_shape_container.setOutlineThickness(2);
-		m_altar_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+m_altar_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
+m_altar_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+m_altar_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+m_altar_slots[i].m_shape_container.setOutlineThickness(2);
+m_altar_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
-		m_altar_slots[i].m_shape.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
-		m_altar_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-		m_altar_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-		m_altar_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
-		m_altar_slots[i].m_shape.setOutlineThickness(0);
-		m_altar_slots[i].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
+m_altar_slots[i].m_shape.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+m_altar_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
+m_altar_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
+m_altar_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+m_altar_slots[i].m_shape.setOutlineThickness(0);
+m_altar_slots[i].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
 
-		m_altar_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		m_altar_slots[i].m_text.setCharacterSize(18);
-		m_altar_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
-		m_altar_slots[i].m_text.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
-		m_altar_slots[i].m_text.setString("");
-	}
+m_altar_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+m_altar_slots[i].m_text.setCharacterSize(18);
+m_altar_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
+m_altar_slots[i].m_text.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
+m_altar_slots[i].m_text.setString("");
+}
 }
 */
 
-void InGameState::UI_GetAction(sf::Time deltaTime)
+void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 {
 	//Get UI action
-	int r1 = m_robots[0].m_ready_to_change_phase == true ? 1 : 0;
+	int r1 = robot_index;
 	int r2 = (r1 + 1) % 2;
-		
+
 	//Get mouse inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
 
@@ -201,54 +201,83 @@ void InGameState::UI_GetAction(sf::Time deltaTime)
 	(*CurrentGame).m_hovered_ui = NULL;
 	(*CurrentGame).m_target_ui = NULL;
 	(*CurrentGame).m_play_ui = NULL;
-	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
+	UI_Element* previous_selected_ui = (*CurrentGame).m_selected_ui;
+	if ((*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
 	{
 		(*CurrentGame).m_selected_ui = NULL;
 	}
 
-	//slots
-	for (int r = 0; r < 2; r++)
-	{
-		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
+	//Update buttons
+	//for (int r = 0; r < 2; r++)
+	//{
+		//slots
+		for (vector<UI_Element>::iterator it = m_robots[r2].m_UI_slots.begin(); it != m_robots[r2].m_UI_slots.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, r2);
+			it->Update((*CurrentGame).m_mouse_click, robot_index);
 		}
 
 		//modules
-		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
+		for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_modules.begin(); it != m_robots[r1].m_UI_modules.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, r1);
+			it->Update((*CurrentGame).m_mouse_click, robot_index);
 		}
 
 		//crew members
 		int c = 0;
-		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_crew.begin(); it != m_robots[r].m_UI_crew.end(); it++)
+		for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_crew.begin(); it != m_robots[r1].m_UI_crew.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, r1);
-			if (r == r1)
-			{
-				UI_SyncSml(c, r1);//sync small portraits with the big ones
-			}
+			it->Update((*CurrentGame).m_mouse_click, robot_index);
+			//if (r == r1)
+			//{
+				UI_SyncSml(c, robot_index);//sync small portraits with the big ones
+			//}
 			c++;
 		}
 
 		//buttons
-		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_buttons.begin(); it != m_robots[r].m_UI_buttons.end(); it++)
+		for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_buttons.begin(); it != m_robots[r1].m_UI_buttons.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, r1);
+			it->Update((*CurrentGame).m_mouse_click, robot_index);
 		}
+
+		//weapon attacks
+		for (vector<vector<UI_Element> >::iterator it = m_robots[r1].m_UI_focus.begin(); it != m_robots[r1].m_UI_focus.end(); it++)
+		{
+			for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			{
+				if (it2->m_type == UI_WeaponAttack)
+				{
+					it2->Update((*CurrentGame).m_mouse_click, robot_index);
+				}
+			}
+		}
+	//}
+
+	//Global shutdown or grounded -> skip turn
+	if (m_robots[robot_index].m_shutdown_global == true)
+	{
+		m_robots[robot_index].m_ready_to_change_phase = true;
+		printf("Robot %d cannot plan any attack because he's under a global shutdown.\n", r1);
+		return;
+	}
+	else if (m_robots[robot_index].m_grounded == true)
+	{
+		m_robots[robot_index].m_ready_to_change_phase = true;
+		printf("Robot %d cannot plan any attack because he's on ground.\n", r1);
+		return;
 	}
 	
 	//Do action
 	if ((*CurrentGame).m_play_ui != NULL)
 	{
+		//End turn
 		if ((*CurrentGame).m_play_ui->m_type == UI_EndTurn)
 		{
 			m_robots[r1].m_ready_to_change_phase = true;
-			//m_robots[r1].m_UI_buttons[0].m_selected = false;
 			printf("Robot %d has played.\n", r1);
 		}
-		else if ((*CurrentGame).m_play_ui->m_type == UI_Crew)
+		//Move crew member
+		else if ((*CurrentGame).m_play_ui->m_type == UI_Crew && (*CurrentGame).m_target_ui != NULL)
 		{
 			CrewMember* crew_member = (CrewMember*)(*CurrentGame).m_play_ui->m_parent;
 			RobotSlot* robot_slot = NULL;
@@ -256,14 +285,62 @@ void InGameState::UI_GetAction(sf::Time deltaTime)
 			{
 				Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
 				robot_slot = module != NULL ? module->m_owner : NULL;
+
+				m_robots[r1].MoveCrewMemberToSlot(crew_member, robot_slot);
 			}
 			else if ((*CurrentGame).m_target_ui->m_type == UI_Equipment)
 			{
 				Equipment* equipment = (Equipment*)(*CurrentGame).m_target_ui->m_parent;
 				robot_slot = equipment != NULL ? equipment->m_owner : NULL;
-			}
 
-			m_robots[r1].MoveCrewMemberToSlot(crew_member, robot_slot);
+				m_robots[r1].MoveCrewMemberToSlot(crew_member, robot_slot);
+			}
+			//[Medic] Heal crew member
+			else if ((*CurrentGame).m_target_ui->m_type == UI_Crew)
+			{
+				CrewMember* medic = (CrewMember*)(*CurrentGame).m_play_ui->m_parent;
+				CrewMember* target = (CrewMember*)(*CurrentGame).m_target_ui->m_parent;
+
+				m_robots[r1].SetMedicTarget(medic, target);
+			}
+		}
+		//Weapon attack target selection
+		else if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Slot)
+		{
+			/*RobotSlot* target_slot = NULL;
+			if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Module && (*CurrentGame).m_target_ui->m_team == (TeamAlliances)r2)
+			{
+				Module* module = (Module*)(*CurrentGame).m_target_ui->m_parent;
+				target_slot = module->m_owner;
+			}
+			else if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Equipment && (*CurrentGame).m_target_ui->m_team == (TeamAlliances)r2)
+			{
+				Equipment* equipment = (Equipment*)(*CurrentGame).m_target_ui->m_parent;
+				target_slot = equipment->m_owner;
+			}
+			*/
+			if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Slot)
+			{
+				RobotSlot* target_slot = (RobotSlot*)(*CurrentGame).m_target_ui->m_parent;
+				if (target_slot != NULL)
+				{
+					Module* module = (Module*)(*CurrentGame).m_play_ui->m_parent;
+					WeaponAttack* attack = module->m_owner->m_weapon->m_selected_attack;
+					SlotIndex target_index = target_slot->m_index;
+
+					m_robots[r1].SetWeaponAttackOnSlot(attack, target_index);
+				}
+			}
+		}
+		//Weapon attack selection
+		else if ((*CurrentGame).m_play_ui->m_type == UI_WeaponAttack)
+		{
+			WeaponAttack* attack = (WeaponAttack*)(*CurrentGame).m_play_ui->m_parent;
+			attack->m_owner->m_selected_attack = attack;
+
+			//give selection back to owner weapon
+			(*CurrentGame).m_selected_ui = previous_selected_ui;
+			previous_selected_ui->m_selected = true;
 		}
 	}
 }
@@ -285,74 +362,6 @@ void InGameState::UI_SyncSml(int crew_index, int robot_index)
 	}
 }
 
-void UI_Element::Update(MouseAction mouse_click, int robot_index)
-{
-	if ((*CurrentGame).m_window_has_focus == true &&
-		(*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
-		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
-	{
-		m_hovered = true;
-		(*CurrentGame).m_hovered_ui = this;
-	}
-	else
-	{
-		m_hovered = false;
-	}
-
-	if (m_selected && m_team != (TeamAlliances)robot_index)
-	{
-		m_selected = false;
-	}
-
-	if (mouse_click == Mouse_LeftClick)
-	{
-		if (m_hovered && m_team == (TeamAlliances)robot_index 
-			//cannot select something else than a crew member during crew movement phase
-			&& ((*CurrentGame).m_phase != Phase_CrewMovement || m_type == UI_Crew))
-		{
-			m_selected = true;
-			(*CurrentGame).m_selected_ui = this;
-		}
-		else
-		{
-			m_selected = false;
-		}
-	}
-
-	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-	if (m_hovered)
-	{
-		m_shape_container.setOutlineColor(sf::Color(255, 0, 0, 255));
-	}
-	if (m_selected)
-	{
-		m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
-	}
-
-	//Actions
-	//MOVE CREW
-	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
-	{
-		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_team == (TeamAlliances)robot_index)
-		{
-			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
-			(*CurrentGame).m_target_ui = this;
-		}
-		else if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Equipment && (*CurrentGame).m_hovered_ui->m_team == (TeamAlliances)robot_index)
-		{
-			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
-			(*CurrentGame).m_target_ui = this;
-		}
-	}
-	else if (m_hovered && mouse_click == Mouse_LeftClick && (*CurrentGame).m_hovered_ui->m_team == (TeamAlliances)robot_index)
-	{
-		if ((*CurrentGame).m_hovered_ui->m_type == UI_EndTurn)
-		{
-			(*CurrentGame).m_play_ui = this;
-		}
-	}
-}
-
 void InGameState::Update(sf::Time deltaTime)
 {
 	//Phase shift
@@ -368,9 +377,6 @@ void InGameState::Update(sf::Time deltaTime)
 		m_robots[1].m_ready_to_change_phase = false;
 	}
 
-	//Get action from UI
-	UI_GetAction(deltaTime);
-
 	//ROBOT
 	m_robots[0].Update();
 	m_robots[1].Update();
@@ -380,7 +386,25 @@ void InGameState::Update(sf::Time deltaTime)
 
 	if ((*CurrentGame).m_phase == Phase_CrewMovement)
 	{
-		UI_GetAction(deltaTime);
+		if (m_robots[0].m_ready_to_change_phase == false)
+		{
+			UI_GetAction(deltaTime, 0);
+		}
+		else
+		{
+			UI_GetAction(deltaTime, 1);
+		}
+	}
+	else if ((*CurrentGame).m_phase == Phase_AttackPlanning)
+	{
+		if (m_robots[0].m_ready_to_change_phase == false)
+		{
+			UI_GetAction(deltaTime, 0);
+		}
+		else
+		{
+			UI_GetAction(deltaTime, 1);
+		}
 	}
 	else if ((*CurrentGame).m_phase == Phase_EffectsResolution)
 	{
@@ -454,7 +478,7 @@ void InGameState::Draw()
 			}
 		}
 
-		//Buttons
+		//buttons
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_buttons.begin(); it != m_robots[r].m_UI_buttons.end(); it++)
 		{
 			if (async_phase == false || r == r1)
@@ -466,8 +490,23 @@ void InGameState::Draw()
 			}
 		}
 
-		//Robot stats
+		//robot stats
 		(*CurrentGame).m_mainScreen.draw(m_robots[r].m_UI_stats);
+
+		//focused element details
+		for (vector<vector<UI_Element> >::iterator it = m_robots[r].m_UI_focus.begin(); it != m_robots[r].m_UI_focus.end(); it++)
+		{
+			for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			{
+				if (async_phase == false || r == r1)
+				{
+					//if (it2->m_type == UI_EndTurn)
+					//{
+						it2->Draw((*CurrentGame).m_mainScreen);
+					//}
+				}
+			}
+		}
 	}
 
 	//Display
@@ -628,9 +667,9 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 		printf("Module cannot be used because it's been shut down.\n");
 		return false;
 	}
-	else if (attack->m_energy_cells < attack->m_energy_cost)
+	else if (robot->m_energy_cells_available < attack->m_energy_cost)
 	{
-		printf("Attack cancelled: not enough Energy Cells left in weapon (available: %d; cost: %d).\n", attack->m_energy_cells, attack->m_energy_cost);
+		printf("Attack cancelled: not enough Energy Cells available (%d) to pay the cost in EC (%d).\n", robot->m_energy_cells_available, attack->m_energy_cost);
 		return false;
 	}
 	else if (attack->m_crew_required != NB_CREW_TYPES && robot_slot.HasCrewRequired(attack->m_crew_required) == false)
@@ -916,6 +955,12 @@ void InGameState::AttackResolution()
 	//Resolve attacks
 	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
 	{
+		//Bonus for ranged weapons if combat starts from a Ranged distance
+		if ((*CurrentGame).m_distance == Distance_Ranged && it->m_attack->m_owner->m_ranged == true)
+		{
+			it->m_attack->m_speed += 2;
+		}
+
 		if (it->m_attack->m_speed != speed)
 		{
 			continue;

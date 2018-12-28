@@ -43,7 +43,7 @@ public:
 	bool Execution(Robot* attacker);
 
 	//UI
-	void UI_GetAction(sf::Time deltaTime);
+	void UI_GetAction(sf::Time deltaTime, int robot_index);
 	void UI_SyncSml(int crew_index, int robot_index);
 
 private:

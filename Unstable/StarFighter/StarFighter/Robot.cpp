@@ -704,6 +704,49 @@ void Robot::InitializeUI()
 	m_UI_stats.setString("HEALTH POINTS\nENERGY CELLS\nBALANCE\nWEIGHT\nSTATUS");
 }
 
+string Robot::GetCrewMemberName(CrewType type)
+{
+	switch (type)
+	{
+		case Crew_Captain:
+		{
+			return "Captain\n";
+		}
+		case Crew_Warrior:
+		{
+			return "Warrior\n";
+		}
+		case Crew_Gunner:
+		{
+			return "Pilot\n";
+		}
+		case Crew_Pilot:
+		{
+			return "Pilot\n";
+		}
+		case Crew_Mechanic:
+		{
+			return "Mechanic\n";
+		}
+		case Crew_Medic:
+		{
+			return "Medic\n";
+		}
+		case Crew_Scientist:
+		{
+			return "Scientist\n";
+		}
+		case Crew_Engineer:
+		{
+			return "Engineer\n";
+		}
+		case Crew_Any:
+		{
+			return "crew member";
+		}
+	}
+}
+
 void Robot::UpdateUI()
 {
 	//Crew members
@@ -712,50 +755,7 @@ void Robot::UpdateUI()
 	{
 		//status
 		ostringstream ss;
-		switch ((*it)->m_type)
-		{
-			case Crew_Captain:
-			{
-				ss << "Captain\n";
-				break;
-			}
-			case Crew_Warrior:
-			{
-				ss << "Warrior\n";
-				break;
-			}
-			case Crew_Gunner:
-			{
-				ss << "Pilot\n";
-				break;
-			}
-			case Crew_Pilot:
-			{
-				ss << "Pilot\n";
-				break;
-			}
-			case Crew_Mechanic:
-			{
-				ss << "Mechanic\n";
-				break;
-			}
-			case Crew_Medic:
-			{
-				ss << "Medic\n";
-				break;
-			}
-			case Crew_Scientist:
-			{
-				ss << "Scientist\n";
-				break;
-			}
-			case Crew_Engineer:
-			{
-				ss << "Engineer\n";
-				break;
-			}
-		}
-
+		ss << GetCrewMemberName((*it)->m_type);
 		ss << "PV: " << (*it)->m_health << "/" << (*it)->m_health_max << "\n";
 		ss << "Move: " << (*it)->m_steps_remaining << "/" << (*it)->m_steps << "\n";
 		
@@ -766,7 +766,7 @@ void Robot::UpdateUI()
 		}
 		else if ((*it)->m_stun_counter > 0)
 		{
-			m_UI_crew[c].m_shape.setFillColor(sf::Color::Yellow);
+			m_UI_crew[c].m_shape.setFillColor(sf::Color::Cyan);
 			ss << "K.O.";
 		}
 		else if (m_slots[(*it)->m_index].m_module->m_fire_counter > 0)
@@ -868,11 +868,11 @@ void Robot::UpdateUI()
 			{
 				if (it->m_type == UI_Module)
 				{
-					it->m_shape.setFillColor(sf::Color(0, 132, 232, 255));//default
+					it->m_shape.setFillColor(sf::Color(0, 132, 232, 255));//default blue
 				}
 				else if (it->m_type == UI_Equipment)
 				{
-					it->m_shape.setFillColor(sf::Color(153, 217, 234, 255));//default
+					it->m_shape.setFillColor(sf::Color(153, 217, 234, 255));//default lighter blue
 				}
 			}
 		}
@@ -933,6 +933,265 @@ void Robot::UpdateUI()
 	}
 
 	m_UI_stats.setString(sr.str());
+
+	//Focused module (including weapons)
+	for (vector<vector<UI_Element> >::iterator it = m_UI_focus.begin(); it != m_UI_focus.end(); it++)
+	{
+		it->clear();
+	}
+	m_UI_focus.clear();
+
+	UI_Element* focused_ui = NULL;
+	if ((*CurrentGame).m_hovered_ui != NULL && ((*CurrentGame).m_hovered_ui->m_type == UI_Module || (*CurrentGame).m_hovered_ui->m_type == UI_Equipment))
+	{
+		focused_ui = (*CurrentGame).m_hovered_ui;
+	}
+	else if ((*CurrentGame).m_selected_ui != NULL && ((*CurrentGame).m_selected_ui->m_type == UI_Module || (*CurrentGame).m_selected_ui->m_type == UI_Equipment))
+	{
+		focused_ui = (*CurrentGame).m_selected_ui;
+	}
+
+	if (focused_ui != NULL)
+	{
+		//Module focused
+		if (focused_ui->m_type == UI_Module && focused_ui->m_parent != NULL)
+		{
+			Module* module = (Module*)focused_ui->m_parent;
+			Weapon* weapon = module->m_owner->m_weapon;
+
+			//Weapon focused
+			if (weapon != NULL)
+			{
+				vector<UI_Element> ui;
+				UI_Element ui_weapon(weapon);
+
+				ui_weapon.m_type = UI_Focus;
+				ui_weapon.m_team = (TeamAlliances)m_index;//AllianceNeutral;
+
+				float offset_weapon_x = 960.f;
+				float offset_weapon_y = 550.f;
+				float sizeweapon_x = 300.f;
+				float sizeweapon_y = 154.f;
+
+				ui_weapon.m_shape_container.setPosition(sf::Vector2f(offset_weapon_x, offset_weapon_y));
+				ui_weapon.m_shape_container.setSize(sf::Vector2f(sizeweapon_x, sizeweapon_y));
+				ui_weapon.m_shape_container.setOrigin(sf::Vector2f(sizeweapon_x * 0.5f, sizeweapon_y * 0.5f));
+				ui_weapon.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+				ui_weapon.m_shape_container.setOutlineThickness(2);
+				ui_weapon.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+				ui_weapon.m_shape.setPosition(sf::Vector2f(offset_weapon_x, offset_weapon_y));
+				ui_weapon.m_shape.setSize(sf::Vector2f(sizeweapon_x, sizeweapon_y));
+				ui_weapon.m_shape.setOrigin(sf::Vector2f(sizeweapon_x * 0.5f, sizeweapon_y * 0.5f));
+				ui_weapon.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+				ui_weapon.m_shape.setOutlineThickness(0);
+				ui_weapon.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+				ui_weapon.m_text.setPosition(sf::Vector2f(offset_weapon_x - sizeweapon_x * 0.5f + 8.f, offset_weapon_y - sizeweapon_y * 0.5f + 8.f));
+				ui_weapon.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+				ui_weapon.m_text.setCharacterSize(20);
+				ui_weapon.m_text.setColor(sf::Color(255, 255, 255, 255));
+
+				ostringstream sw;
+				sw << weapon->m_UI_display_name;
+
+				if (weapon->m_energetic == true)
+				{
+					sw << "\nEnergetic weapon";
+				}
+				else
+				{
+					sw << "\nPhysical weapon";
+				}
+
+				if (weapon->m_ranged == true)
+				{
+					sw << "\nRanged";
+				}
+				else
+				{
+					sw << "\nClose-Combat";
+				}
+
+				sw << "\nWeight: " << weapon->m_weight;
+
+				ui_weapon.m_text.setString(sw.str());
+
+				ui.push_back(ui_weapon);
+				m_UI_focus.push_back(ui);
+
+				//weapon attacks
+				int w = 1;
+				for (vector<WeaponAttack*>::iterator it = weapon->m_attacks.begin(); it != weapon->m_attacks.end(); it++)
+				{
+					vector<UI_Element> ui2;
+					UI_Element ui_attack(*it);
+
+					ui_attack.m_type = UI_WeaponAttack;
+					ui_attack.m_team = (TeamAlliances)m_index;//AllianceNeutral;
+
+					float sizeattack_x = sizeweapon_x;
+					float sizeattack_y = 160.f;
+					float offset_attack_x = offset_weapon_x;
+					float offset_attack_y = ui_weapon.m_text.getPosition().y + 68.f + sizeattack_y * w; //750.f;
+
+					ui_attack.m_shape_container.setPosition(sf::Vector2f(offset_attack_x, offset_attack_y));
+					ui_attack.m_shape_container.setSize(sf::Vector2f(sizeattack_x, sizeattack_y));
+					ui_attack.m_shape_container.setOrigin(sf::Vector2f(sizeattack_x * 0.5f, sizeattack_y * 0.5f));
+					ui_attack.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+					ui_attack.m_shape_container.setOutlineThickness(2);
+					ui_attack.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+					ui_attack.m_shape.setPosition(sf::Vector2f(offset_attack_x, offset_attack_y));
+					ui_attack.m_shape.setSize(sf::Vector2f(sizeattack_x, sizeattack_y));
+					ui_attack.m_shape.setOrigin(sf::Vector2f(sizeattack_x * 0.5f, sizeattack_y * 0.5f));
+					ui_attack.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+					ui_attack.m_shape.setOutlineThickness(0);
+					if (*it == weapon->m_selected_attack)
+					{
+						ui_attack.m_shape.setFillColor(sf::Color(0, 132, 232, 255));//blue (module)
+					}
+					else
+					{
+						ui_attack.m_shape.setFillColor(sf::Color(0, 0, 0, 255));//blue (module)
+					}
+					
+					ui_attack.m_text.setPosition(sf::Vector2f(offset_attack_x - sizeattack_x * 0.5f + 8.f, offset_attack_y - sizeattack_y * 0.5f + 8.f));
+					ui_attack.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+					ui_attack.m_text.setCharacterSize(20);
+					ui_attack.m_text.setColor(sf::Color(255, 255, 255, 255));
+
+					ostringstream sa;
+					sa << (*it)->m_UI_display_name;
+					sa << "\n" << (*it)->m_UI_description;
+					sa << "\n" << "Speed: " << (*it)->m_speed << ", EC: " << (*it)->m_energy_cost;
+					if ((*it)->m_crew_required != NB_CREW_TYPES)
+					{
+						sa << "\n\n\n" << "Requires a " << GetCrewMemberName((*it)->m_crew_required);
+					}
+
+					ui_attack.m_text.setString(sa.str());
+					ui2.push_back(ui_attack);
+					
+					//attack stats
+					vector<pair<int, int> > stats;
+					if ((*it)->m_damage > 0)
+					{
+						stats.push_back(pair<int, int>((*it)->m_damage, UI_Weapon_Damage));
+					}
+					if ((*it)->m_chance_of_hit > 0)
+					{
+						stats.push_back(pair<int, int>((*it)->m_chance_of_hit, UI_Weapon_HitChance));
+					}
+					if ((*it)->m_chance_of_unbalance > 0)
+					{
+						stats.push_back(pair<int, int>((*it)->m_chance_of_unbalance, UI_Weapon_Unbalance));
+					}
+					if ((*it)->m_chance_of_fire > 0)
+					{
+						stats.push_back(pair<int, int>((*it)->m_chance_of_fire, UI_Weapon_Fire));
+					}
+					if ((*it)->m_chance_of_electricity > 0)
+					{
+						stats.push_back(pair<int, int>((*it)->m_chance_of_electricity, UI_Weapon_Electricity));
+					}
+					if ((*it)->m_chance_of_stun > 0)
+					{
+						stats.push_back(pair<int, int>((*it)->m_chance_of_stun, UI_Weapon_Stun));
+					}
+
+					int s = 0;
+					for (vector<pair<int, int> >::iterator it2 = stats.begin(); it2 != stats.end(); it2++)
+					{
+						UI_Element ui_stat(*it);
+
+						ui_stat.m_type = UI_WeaponAttackStat;
+						ui_stat.m_team = (TeamAlliances)m_index;//AllianceNeutral;
+
+						float sizestat_x = 16.f;
+						float sizestat_y = 16.f;
+						float offset_stat_x = offset_weapon_x - sizeweapon_x * 0.5f + 8.f + sizestat_x + s * 55.f;
+						float offset_stat_y = offset_attack_y + 20.f;
+
+						ui_stat.m_shape_container.setPosition(sf::Vector2f(offset_stat_x, offset_stat_y));
+						ui_stat.m_shape_container.setSize(sf::Vector2f(sizestat_x, sizestat_y));
+						ui_stat.m_shape_container.setOrigin(sf::Vector2f(sizestat_x * 0.5f, sizestat_y * 0.5f));
+						ui_stat.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+						ui_stat.m_shape_container.setOutlineThickness(2);
+						ui_stat.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+						ui_stat.m_shape.setPosition(sf::Vector2f(offset_stat_x, offset_stat_y));
+						ui_stat.m_shape.setSize(sf::Vector2f(sizestat_x, sizestat_y));
+						ui_stat.m_shape.setOrigin(sf::Vector2f(sizestat_x * 0.5f, sizestat_y * 0.5f));
+						ui_stat.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+						ui_stat.m_shape.setOutlineThickness(0);
+						
+						switch (it2->second)
+						{
+							case UI_Weapon_Damage:
+							{
+								ui_stat.m_shape.setFillColor(sf::Color::Red);
+								break;
+							}
+							case UI_Weapon_HitChance:
+							{
+								ui_stat.m_shape.setFillColor(sf::Color::White);
+								break;
+							}
+							case UI_Weapon_Unbalance:
+							{
+								ui_stat.m_shape.setFillColor(sf::Color::Magenta);
+								break;
+							}
+							case UI_Weapon_Fire:
+							{
+								ui_stat.m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange
+								break;
+							}
+							case UI_Weapon_Electricity:
+							{
+								ui_stat.m_shape.setFillColor(sf::Color::Yellow);
+								break;
+							}
+							case UI_Weapon_Stun:
+							{
+								ui_stat.m_shape.setFillColor(sf::Color::Cyan);
+								break;
+							}
+						}
+
+						ui_stat.m_text.setPosition(sf::Vector2f(offset_stat_x + sizestat_x * 0.5f + 4.f, offset_stat_y - sizestat_y * 0.5f - 4.f));
+						ui_stat.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+						ui_stat.m_text.setCharacterSize(20);
+						ui_stat.m_text.setColor(sf::Color(255, 255, 255, 255));
+
+						ostringstream ss;
+						ss << it2->second << "+";
+						
+						ui_stat.m_text.setString(ss.str());
+						ui2.push_back(ui_stat);
+
+						s++;
+					}
+
+					m_UI_focus.push_back(ui2);
+
+					w++;
+				}
+			}
+			//Non-weapon focused
+			else
+			{
+
+			}
+		}
+		//Equipment focused
+		else if (focused_ui->m_type == UI_Equipment)
+		{
+			Equipment* equipment = (Equipment*)focused_ui->m_parent;
+
+		}
+	}
 }
 
 void Robot::Update()
@@ -947,46 +1206,7 @@ void Robot::Update()
 			break;
 		}
 		// ***** PHASE CREW MOVEMENT *****
-		case Phase_AttackPlanning:
-		{
-			if (m_shutdown_global == false && m_grounded == false)
-			{
-				//TEST
-				if (m_index == 0)
-				{
-					//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
-					//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
-					//SetEnergyCell(m_slots[Index_HandL].m_weapon->m_attacks[0]);
-				
-					SetEnergyCell(m_slots[Index_HandL].m_equipments[0]);
-
-					SetWeaponAttackOnSlot(m_slots[Index_HandL].m_weapon->m_attacks.front(), Index_Head);
-
-					//SetMedicTarget(medic, target);
-
-					//SetEquipmentEffectOnSlot(effect, target_index);
-
-				}
-
-				//verifier que le module / equipement utilisé n'est pas détruit
-				//verifier que le crew member requis n'est pas stunned - notamment les gadgets requirent un Ingenieur
-
-				//repartition armes que l'on veut utiliser parmi les emplacements weapon mod
-				//+ répartition actions des modules
-				//les armes de CaC ne peuvent viser que les parties basses
-				//appliquer +2 de speed aux armes ranged si distance de combat ranged (max 10)
-
-				//depense des EC  ( + choisir attaque 1 ou 2 de l'arme)
-
-				//choix des cibles (module)
-
-				//choix de cible du medic (heald by medic au sein du même module)
-
-			}
-			
-			m_ready_to_change_phase = true;
-			break;
-		}
+		// **** PHASE ATTACK PLANNING ****
 		case Phase_HealCrew:
 		{
 			HealCrewMembers();
@@ -1031,7 +1251,7 @@ int Robot::GenerateEnergyCells()
 
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
-		if ((*it).m_module && (*it).m_module->m_type == Module_Generator)
+		if ((*it).m_module && (*it).m_module->m_type == Module_Generator && (*it).m_module->IsOperationnal())
 		{
 			int cells = 3;
 
@@ -1040,6 +1260,14 @@ int Robot::GenerateEnergyCells()
 				if ((*it2)->m_type == Crew_Scientist && (*it2)->m_stun_counter == 0)//checking if not stunned
 				{
 					cells++;
+				}
+			}
+
+			for (vector<Equipment*>::iterator it2 = (*it).m_equipments.begin(); it2 != (*it).m_equipments.end(); it2++)
+			{
+				if ((*it2)->m_type == Equipment_GeneratorBooster)
+				{
+					cells += 3;
 				}
 			}
 
@@ -1292,10 +1520,13 @@ void Robot::UpdateCooldowns()
 			it->m_module->m_fire_counter--;
 		}
 
-		//Reset weapon
-		if (it->m_weapon)
+		//Reset weapon attacks
+		if (it->m_weapon != NULL)
 		{
-			it->m_weapon->m_used = false;
+			for (vector<WeaponAttack*>::iterator it2 = it->m_weapon->m_attacks.begin(); it2 != it->m_weapon->m_attacks.end(); it2++)
+			{
+				(*it2)->m_nb_targets_remaining = (*it2)->m_nb_targets;
+			}
 		}
 
 		//Unbalanced status update
@@ -1479,6 +1710,8 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 
 		crew->m_steps_remaining -= distance_to_cross;
 
+		UpdateShudownGlobal();
+
 		printf("Crew moved from slot %d to slot %d.\n", (int)current_slot.m_index, (int)target_index);
 
 		return true;
@@ -1611,9 +1844,9 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 {
 	Module* module = attack->m_owner->m_owner->m_module;
 
-	if (attack->m_owner->m_used == true)
+	if (attack->m_nb_targets_remaining == 0)
 	{
-		printf("Weapon already used during this turn.\n");
+		printf("Targets already assigned for this weapon during this turn.\n");
 		return false;
 	}
 	else if (m_energy_cells_available < attack->m_energy_cost)
@@ -1663,7 +1896,7 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 	}
 	else
 	{
-		attack->m_owner->m_used = true;
+		attack->m_nb_targets_remaining--;
 
 		//Consumption of Energy Cells
 		m_energy_cells_available -= attack->m_energy_cost;
@@ -1672,8 +1905,11 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		action.m_attack = attack;
 		action.m_target_index = target_index;
 
-		(*CurrentGame).m_attacks_list.push_back(action);
-
+		for (int i = 0; i < attack->m_nb_hits; i++)
+		{
+			(*CurrentGame).m_attacks_list.push_back(action);
+		}
+		
 		return true;
 	}
 }
@@ -1780,6 +2016,11 @@ bool Robot::SetMedicTarget(CrewMember* medic, CrewMember* target)
 	else if (medic->m_stun_counter > 0)
 	{
 		printf("Medic is stunned and cannot use his active ability to heal other crew members.\n");
+		return false;
+	}
+	else if (target->m_health == 0)
+	{
+		printf("Targeted crew member is already dead and cannot be healed.\n");
 		return false;
 	}
 	else

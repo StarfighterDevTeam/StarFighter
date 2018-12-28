@@ -4,7 +4,7 @@
 #include "Game.h"
 
 class RobotSlot;
-class Weapon
+class Weapon : public GameEntity
 {
 public:
 	Weapon(WeaponType type, RobotSlot* owner);
@@ -13,13 +13,15 @@ public:
 	WeaponType m_type;
 
 	vector<WeaponAttack*> m_attacks;
+	WeaponAttack* m_selected_attack;
 
 	int m_weight;
 	bool m_energetic;
 	bool m_ranged;
 	RobotSlot* m_owner;
-	bool m_used;
 	bool m_requires_close_distance;
+	
+	string m_UI_display_name;
 };
 
 

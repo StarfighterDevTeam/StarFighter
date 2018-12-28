@@ -5,6 +5,24 @@
 
 #include "RobotSlot.h"
 
+enum UI_ButtonType
+{
+	UI_Button_EndTurn,
+	UI_Button_WeaponAttack_1,
+	UI_Button_WeaponAttack_2,
+	NB_UI_BUTTON_TYPES,
+};
+
+enum UI_WeaponStats
+{
+	UI_Weapon_Damage,
+	UI_Weapon_HitChance,
+	UI_Weapon_Unbalance,
+	UI_Weapon_Fire,
+	UI_Weapon_Electricity,
+	UI_Weapon_Stun,
+};
+
 class Robot : public GameEntity
 {
 public:
@@ -75,6 +93,7 @@ public:
 	//UI
 	void InitializeUI();
 	void UpdateUI();
+	string GetCrewMemberName(CrewType type);
 
 	vector<UI_Element> m_UI_slots;
 	vector<UI_Element> m_UI_modules;
@@ -82,6 +101,7 @@ public:
 	vector<UI_Element> m_UI_crew_sml;
 	vector<UI_Element> m_UI_buttons;
 	SFText m_UI_stats;
+	vector<vector<UI_Element> > m_UI_focus;
 };
 
 #endif //ROBOT_H_INCLUDED

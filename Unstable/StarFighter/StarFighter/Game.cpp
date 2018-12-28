@@ -793,8 +793,10 @@ WeaponAttack::WeaponAttack(WeaponAttackType type, Weapon* owner)
 	m_chance_of_electricity = 0;
 	m_chance_of_stun = 0;
 	m_chance_of_unbalance = 0;
+	m_nb_hits = 1;
+	m_nb_targets = 1;
+	m_nb_targets_remaining = m_nb_targets;
 	m_crew_required = NB_CREW_TYPES;
-	m_energy_cells = 0;
 }
 
 EquipmentEffect::EquipmentEffect(EquipmentEffectType type, Module* owner_module, Equipment* owner_equipment)
@@ -826,5 +828,93 @@ void Game::GetMouseInputs(sf::Time deltaTime)
 	{
 		m_mouse_click = Mouse_RightClick;
 		m_mouse_click_timer = 0.2f;
+	}
+}
+
+extern Game* CurrentGame;
+
+void UI_Element::Update(MouseAction mouse_click, int robot_index)
+{
+	if ((*CurrentGame).m_window_has_focus == true
+		&& (*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
+		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
+	{
+		m_hovered = true;
+		(*CurrentGame).m_hovered_ui = this;
+	}
+	else
+	{
+		m_hovered = false;
+	}
+
+	if (m_selected && m_team != (TeamAlliances)robot_index)
+	{
+		m_selected = false;
+	}
+
+	if (mouse_click == Mouse_LeftClick)
+	{
+		if (m_hovered && m_team == (TeamAlliances)robot_index &&
+			((*CurrentGame).m_phase == Phase_CrewMovement && m_type == UI_Crew
+			|| (*CurrentGame).m_phase == Phase_AttackPlanning && (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment)))
+		{
+			m_selected = true;
+			(*CurrentGame).m_selected_ui = this;
+		}
+		else
+		{
+			m_selected = false;
+		}
+	}
+
+	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+	if (m_hovered)
+	{
+		m_shape_container.setOutlineColor(sf::Color(255, 0, 0, 255));
+	}
+	if (m_selected)
+	{
+		m_shape_container.setOutlineColor(sf::Color(0, 255, 0, 255));
+	}
+
+	//Actions
+	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
+	{
+		//MOVE CREW
+		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_phase == Phase_CrewMovement)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+		else if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Equipment && (*CurrentGame).m_phase == Phase_CrewMovement)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+		//ATTACK
+		else if ((*CurrentGame).m_selected_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_type == UI_Slot && (*CurrentGame).m_phase == Phase_AttackPlanning)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+		//MEDIC HEAL
+		else if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Crew && (*CurrentGame).m_phase == Phase_AttackPlanning)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+	}
+	else if (m_hovered && mouse_click == Mouse_LeftClick)
+	{
+		//END TURN
+		if ((*CurrentGame).m_hovered_ui->m_type == UI_EndTurn)
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
+		//SELECT WEAPON ATTACK
+		else if (m_hovered && mouse_click == Mouse_LeftClick && (*CurrentGame).m_hovered_ui->m_type == UI_WeaponAttack && (*CurrentGame).m_phase == Phase_AttackPlanning)
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
 	}
 }
