@@ -1160,11 +1160,18 @@ void Robot::UpdateUI()
 					ui_attack.m_shape.setOutlineThickness(0);
 					if (*it == weapon->m_selected_attack)
 					{
-						ui_attack.m_shape.setFillColor(sf::Color(0, 132, 232, 255));//blue (module)
+						if (weapon->m_selected_attack->m_nb_targets_remaining < weapon->m_selected_attack->m_nb_targets)
+						{
+							ui_attack.m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange = selected and locked
+						}
+						else
+						{
+							ui_attack.m_shape.setFillColor(sf::Color(0, 132, 232, 255));//blue (module) = selection
+						}
 					}
 					else
 					{
-						ui_attack.m_shape.setFillColor(sf::Color(0, 0, 0, 255));//blue (module)
+						ui_attack.m_shape.setFillColor(sf::Color(0, 0, 0, 255));//black = default
 					}
 					
 					ui_attack.m_text.setPosition(sf::Vector2f(offset_attack_x - sizeattack_x * 0.5f + 8.f, offset_attack_y - sizeattack_y * 0.5f + 8.f));

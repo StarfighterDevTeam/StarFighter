@@ -346,7 +346,24 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 		else if ((*CurrentGame).m_play_ui->m_type == UI_WeaponAttack)
 		{
 			WeaponAttack* attack = (WeaponAttack*)(*CurrentGame).m_play_ui->m_parent;
-			attack->m_owner->m_selected_attack = attack;
+			bool weapon_not_used = true;
+			Weapon* weapon = attack->m_owner;
+			for (vector<WeaponAttack*>::iterator it = weapon->m_attacks.begin(); it != weapon->m_attacks.end(); it++)
+			{
+				if ((*it)->m_nb_targets_remaining < (*it)->m_nb_targets && (*it)->m_nb_targets > 0)
+				{
+					weapon_not_used = false;
+				}
+			}
+
+			if (weapon_not_used == true)
+			{
+				attack->m_owner->m_selected_attack = attack;
+			}
+			else
+			{
+				printf("This weapon already attacked. Cannot change weapon attack until next turn.");
+			}
 
 			//give selection back to owner weapon
 			(*CurrentGame).m_selected_ui = previous_selected_ui;

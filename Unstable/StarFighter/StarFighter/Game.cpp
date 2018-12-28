@@ -880,15 +880,7 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 	}
 
 	//Actions
-	if (m_hovered && mouse_click == Mouse_RightClick)
-	{
-		//EC SLOTS -> REMOVE EC
-		if (((*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Equipment || (*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Module))
-		{
-			(*CurrentGame).m_play_ui = this;
-		}
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
+	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui && (*CurrentGame).m_selected_ui->m_team == (TeamAlliances)robot_index)
 	{
 		//MOVE CREW
 		if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Module && (*CurrentGame).m_phase == Phase_CrewMovement)
@@ -912,6 +904,14 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 		{
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
+		}
+	}
+	else if (m_hovered && mouse_click == Mouse_RightClick)
+	{
+		//EC SLOTS -> REMOVE EC
+		if (((*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Equipment || (*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Module))
+		{
+			(*CurrentGame).m_play_ui = this;
 		}
 	}
 	else if (m_hovered && mouse_click == Mouse_LeftClick)
