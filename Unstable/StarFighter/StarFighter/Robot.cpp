@@ -404,6 +404,7 @@ void Robot::InitializeUI()
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 
+	//Slots
 	float robot_offset = m_index == 0 ? 0.f : 970;//1920 - 250*2 - 450
 	float offset_x = 250.f + robot_offset;
 	float offset_y = 215.f;
@@ -422,14 +423,24 @@ void Robot::InitializeUI()
 		ui.m_shape_container.setOrigin(sf::Vector2f(size_x * 0.5f * (float)slot_size[i][0], size_y * 0.5f * (float)slot_size[i][1]));
 		ui.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 		ui.m_shape_container.setOutlineThickness(2);
-		ui.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
-
+		if (m_slots[i].m_module != NULL)
+		{
+			ui.m_shape_container.setFillColor(sf::Color(0, 0, 0, 255));
+		}
+		else
+		{
+			ui.m_shape_container.setFillColor(sf::Color(128, 128, 128, 255));
+		}
+		
 		ui.m_shape.setPosition(sf::Vector2f(offset_x + slot_coord[i][0], offset_y + slot_coord[i][1]));
 		ui.m_shape.setSize(sf::Vector2f(size_x * slot_size[i][0], size_y * slot_size[i][1]));
 		ui.m_shape.setOrigin(sf::Vector2f(size_x * 0.5f * (float)slot_size[i][0], size_y * 0.5f * (float)slot_size[i][1]));
 		ui.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 		ui.m_shape.setOutlineThickness(0);
-		ui.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+		ui.m_shape.setFillColor(sf::Color(0, 0, 0, 0));
+
+		sf::Texture* texture_target = loader->loadTexture("2D/ui_target.png", 80, 80);
+		ui.m_shape.setTexture(texture_target);
 
 		m_UI_slots.push_back(ui);
 
@@ -506,25 +517,37 @@ void Robot::InitializeUI()
 			ui2.m_shape_container.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5f));
 			ui2.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 			ui2.m_shape_container.setOutlineThickness(2);
-			ui2.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+			ui2.m_shape_container.setFillColor(sf::Color(0, 0, 0, 255));
+			if (entity != NULL)
+			{
+				if (is_equipment == false)
+				{
+					ui2.m_shape_container.setFillColor(sf::Color(0, 132, 232, 255));//blue module
+				}
+				else
+				{
+					ui2.m_shape_container.setFillColor(sf::Color(153, 217, 234, 255));//lighter blue
+				}
+			}
+			else
+			{
+				//empty slots' module & equipement greyed out
+				if (j == 0 || m_UI_modules.back().m_shape_container.getFillColor() == sf::Color(128, 128, 128, 255))
+				{
+					ui2.m_shape_container.setFillColor(sf::Color(128, 128, 128, 255));
+				}
+				else
+				{
+					ui2.m_shape_container.setFillColor(sf::Color(0, 0, 0, 255));
+				}
+			}
 
 			ui2.m_shape.setPosition(sf::Vector2f(offset_x + slot_coord[i][0] + offset_module_x, offset_y + slot_coord[i][1] + offset_module_y));
 			ui2.m_shape.setSize(sf::Vector2f(size_x, size_y));
 			ui2.m_shape.setOrigin(sf::Vector2f(size_x * 0.5f, size_y * 0.5f));
 			ui2.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 			ui2.m_shape.setOutlineThickness(0);
-			ui2.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
-			if (entity != NULL)
-			{
-				if (is_equipment == false)
-				{
-					ui2.m_shape.setFillColor(sf::Color(0, 132, 232, 255));
-				}
-				else
-				{
-					ui2.m_shape.setFillColor(sf::Color(153, 217, 234, 255));
-				}
-			}
+			ui2.m_shape.setFillColor(sf::Color(0, 0, 0, 0));
 
 			m_UI_modules.push_back(ui2);
 		}
@@ -850,29 +873,29 @@ void Robot::UpdateUI()
 		{
 			if (module->m_health == 0)
 			{
-				it->m_shape.setFillColor(sf::Color::Red);
+				it->m_shape_container.setFillColor(sf::Color::Red);
 			}
 			else if (module->m_shutdown_counter > 0)
 			{
-				it->m_shape.setFillColor(sf::Color::Yellow);
+				it->m_shape_container.setFillColor(sf::Color::Yellow);
 			}
 			else if (m_shutdown_global == true)
 			{
-				it->m_shape.setFillColor(sf::Color::Yellow);
+				it->m_shape_container.setFillColor(sf::Color::Yellow);
 			}
 			else if (module->m_fire_counter > 0)
 			{
-				it->m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange
+				it->m_shape_container.setFillColor(sf::Color(255, 201, 14, 255));//orange
 			}
 			else
 			{
 				if (it->m_type == UI_Module)
 				{
-					it->m_shape.setFillColor(sf::Color(0, 132, 232, 255));//default blue
+					it->m_shape_container.setFillColor(sf::Color(0, 132, 232, 255));//default blue
 				}
 				else if (it->m_type == UI_Equipment)
 				{
-					it->m_shape.setFillColor(sf::Color(153, 217, 234, 255));//default lighter blue
+					it->m_shape_container.setFillColor(sf::Color(153, 217, 234, 255));//default lighter blue
 				}
 			}
 		}
@@ -1166,8 +1189,12 @@ void Robot::UpdateUI()
 						ui_stat.m_text.setColor(sf::Color(255, 255, 255, 255));
 
 						ostringstream ss;
-						ss << it2->second << "+";
-						
+						ss << it2->first;
+						if (it2->second != UI_Weapon_Damage && it2->second != UI_Weapon_Unbalance)
+						{
+							ss << "+";
+						}
+
 						ui_stat.m_text.setString(ss.str());
 						ui2.push_back(ui_stat);
 
@@ -1190,6 +1217,26 @@ void Robot::UpdateUI()
 		{
 			Equipment* equipment = (Equipment*)focused_ui->m_parent;
 
+		}
+	}
+
+	//Slots
+	for (vector<UI_Element>::iterator it = m_UI_slots.begin(); it != m_UI_slots.end(); it++)
+	{
+		it->m_shape.setFillColor(sf::Color(0, 0, 0, 0));
+	}
+
+	//are we the target of a planned attack?
+	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
+	{
+		WeaponAttack* attack = it->m_attack;
+		int robot_index = attack->m_owner->m_owner->m_owner->m_index;
+		robot_index = (robot_index + 1) % 2;
+
+		if (robot_index == m_index)
+		{
+			//Display target on the targeted slot
+			m_UI_slots[it->m_target_index].m_shape.setFillColor(sf::Color::White);
 		}
 	}
 }
@@ -1657,7 +1704,7 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 {
 	if (target_slot == NULL)
 	{
-		printf("Cannot move crew to empty modules and equipment slots. Choose an existing module.\n");
+		printf("Cannot move crew to empty modules.\n");
 		return false;
 	}
 
@@ -1844,7 +1891,12 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 {
 	Module* module = attack->m_owner->m_owner->m_module;
 
-	if (attack->m_nb_targets_remaining == 0)
+	if (module == NULL)
+	{
+		printf("Cannot attack empty modules.\n");
+		return false;
+	}
+	else if (attack->m_nb_targets_remaining == 0)
 	{
 		printf("Targets already assigned for this weapon during this turn.\n");
 		return false;
@@ -1896,11 +1948,15 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 	}
 	else
 	{
-		attack->m_nb_targets_remaining--;
 
 		//Consumption of Energy Cells
-		m_energy_cells_available -= attack->m_energy_cost;
-		m_energy_cells -= attack->m_energy_cost;
+		if (attack->m_nb_targets_remaining == attack->m_nb_targets)
+		{
+			m_energy_cells_available -= attack->m_energy_cost;
+			m_energy_cells -= attack->m_energy_cost;
+		}
+		
+		attack->m_nb_targets_remaining--;
 
 		ActionAttack action;
 		action.m_attack = attack;

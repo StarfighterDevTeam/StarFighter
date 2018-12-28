@@ -90,7 +90,7 @@ void InGameState::InitRobots()
 	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
 	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
 
-	robot2.SetModule(Module_Sensors, Index_BodyD);
+	//robot2.SetModule(Module_Sensors, Index_BodyD);
 
 	robot2.SetModule(Module_Deflectors, Index_LegR);
 
@@ -116,21 +116,20 @@ void InGameState::InitRobots()
 	robot2.SetCrewMember(Crew_Captain, Index_Head);
 	robot2.SetCrewMember(Crew_Pilot, Index_Head);
 	robot2.SetCrewMember(Crew_Medic, Index_BodyU);
-robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
-robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
-robot2.SetCrewMember(Crew_Warrior, Index_HandR);
-robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
-robot2.SetCrewMember(Crew_Engineer, Index_LegL);
+	robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
+	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
+	robot2.SetCrewMember(Crew_Warrior, Index_HandR);
+	robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
+	robot2.SetCrewMember(Crew_Engineer, Index_LegL);
 
-robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
-robot2.SetWeapon(Weapon_Hammer, Index_HandR);
+	robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
+	robot2.SetWeapon(Weapon_Hammer, Index_HandR);
 
-robot2.Initialize();
+	robot2.Initialize();
 
-//Opposition
-robot.m_opponent = &robot2;
-
-robot2.m_opponent = &robot;
+	//Opposition
+	robot.m_opponent = &robot2;
+	robot2.m_opponent = &robot;
 }
 
 /*
@@ -213,13 +212,21 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 		//slots
 		for (vector<UI_Element>::iterator it = m_robots[r2].m_UI_slots.begin(); it != m_robots[r2].m_UI_slots.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, robot_index);
+			RobotSlot* slot = (RobotSlot*)it->m_parent;
+			if (slot != NULL && slot->m_module != NULL)
+			{
+				it->Update((*CurrentGame).m_mouse_click, robot_index);
+			}
 		}
 
 		//modules
 		for (vector<UI_Element>::iterator it = m_robots[r1].m_UI_modules.begin(); it != m_robots[r1].m_UI_modules.end(); it++)
 		{
-			it->Update((*CurrentGame).m_mouse_click, robot_index);
+			Module* module = (Module*)it->m_parent;
+			if (module != NULL)
+			{
+				it->Update((*CurrentGame).m_mouse_click, robot_index);
+			}
 		}
 
 		//crew members
@@ -653,8 +660,8 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 
 	Weapon* weapon = attack->m_owner;
 
-	Robot* opponent = &m_robots[robot->m_index + 1 % 2];
-	RobotSlot& target_slot = opponent->m_slots[target_index];
+	Robot& opponent = m_robots[(robot->m_index + 1) % 2];
+	RobotSlot& target_slot = opponent.m_slots[target_index];
 	Module* target_module = target_slot.m_module;
 
 	if (module->m_health == 0)
@@ -690,7 +697,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 	else//Attack resolution
 	{
 		//Guard perfect?
-		if (opponent->m_guard_speed == attack->m_speed)
+		if (opponent.m_guard_speed == attack->m_speed)
 		{
 			//Counter attack
 			printf("Perfect guard (%d). Possible counter-attack.\n", attack->m_speed);
@@ -699,9 +706,9 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 		else
 		{
 			//Guard redirection
-			if (attack->m_speed <= opponent->m_guard_speed)
+			if (attack->m_speed <= opponent.m_guard_speed)
 			{
-				Module* shield = opponent->GetShield();
+				Module* shield = opponent.GetShield();
 				if (shield != NULL)
 				{
 					target_index = shield->m_owner->m_index;
@@ -735,7 +742,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 			//Randomization of resolutions
 			int gunner_bonus = robot_slot.GetGunnerRangeBonus();
 			int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
-			bool hit_success = weapon->m_ranged == false || is_execution == true || opponent->m_grabbed != NULL ||
+			bool hit_success = weapon->m_ranged == false || is_execution == true || opponent.m_grabbed != NULL ||
 				RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
 
 			bool fire_success = attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
@@ -744,14 +751,14 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 
 			int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
 			int counter_attack_bonus = is_counter_attack ? 5 : 0;
-			int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent->GetBalanceScore();
+			int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent.GetBalanceScore();
 
 			//Hit resolution
 			if (hit_success)
 			{
 				int damage = attack->m_damage;
 				//Damage on grounded robot x2
-				if (opponent->m_grounded == true || is_execution == true || opponent->m_grabbed != NULL)
+				if (opponent.m_grounded == true || is_execution == true || opponent.m_grabbed != NULL)
 				{
 					damage *= 2;
 				}
@@ -762,7 +769,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 				if (weapon->m_energetic)
 				{
 					//Deflector absorption
-					for (vector<RobotSlot>::iterator it = opponent->m_slots.begin(); it != opponent->m_slots.end(); it++)
+					for (vector<RobotSlot>::iterator it = opponent.m_slots.begin(); it != opponent.m_slots.end(); it++)
 					{
 						if (it->m_module->m_type == Module_Deflectors && it->m_module->IsOperationnal())
 						{
@@ -797,18 +804,18 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 							else
 							{
 								target_module->m_health = 0;
-								opponent->DestroySlot(target_slot.m_index);
+								opponent.DestroySlot(target_slot.m_index);
 							}
 
 							//Damage to robot
-							if (opponent->m_health > damage)
+							if (opponent.m_health > damage)
 							{
-								opponent->m_health -= damage;
+								opponent.m_health -= damage;
 							}
 							else
 							{
-								opponent->m_health = 0;
-								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
+								opponent.m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent.m_index);
 							}
 						}
 					}
@@ -850,18 +857,18 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 							else
 							{
 								target_module->m_health = 0;
-								opponent->DestroySlot(target_slot.m_index);
+								opponent.DestroySlot(target_slot.m_index);
 							}
 
 							//Damage to robot
-							if (opponent->m_health > damage)
+							if (opponent.m_health > damage)
 							{
-								opponent->m_health -= damage;
+								opponent.m_health -= damage;
 							}
 							else
 							{
-								opponent->m_health = 0;
-								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent->m_index);
+								opponent.m_health = 0;
+								printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", opponent.m_index);
 							}
 						}
 					}
@@ -879,7 +886,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 						}
 					}
 
-					opponent->UpdateCrew(target_slot.m_index);
+					opponent.UpdateCrew(target_slot.m_index);
 				}
 			}
 
@@ -896,7 +903,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 			//Electric resolution
 			if (electricity_sucess && target_module != NULL)
 			{
-				opponent->ShutdownSlot(target_slot.m_index);
+				opponent.ShutdownSlot(target_slot.m_index);
 			}
 
 			//Stun resolution
@@ -916,29 +923,29 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 			//Balance resolution
 			if (unbalanced_score > 0)
 			{
-				if (opponent->m_unbalanced_counter == 0)
+				if (opponent.m_unbalanced_counter == 0)
 				{
-					opponent->m_unbalanced_counter = 2;
-					opponent->m_unbalanced_value = unbalanced_score;
-					printf("Robot %d gets unbalanced.\n", opponent->m_index);
+					opponent.m_unbalanced_counter = 2;
+					opponent.m_unbalanced_value = unbalanced_score;
+					printf("Robot %d gets unbalanced.\n", opponent.m_index);
 				}
 				else
 				{
-					opponent->m_unbalanced_counter = 2;
-					opponent->m_unbalanced_value = unbalanced_score;
+					opponent.m_unbalanced_counter = 2;
+					opponent.m_unbalanced_value = unbalanced_score;
 
-					if (opponent->m_grounded == false)
+					if (opponent.m_grounded == false)
 					{
-						opponent->m_grounded = true;
+						opponent.m_grounded = true;
 						triggers_execution = true;
-						printf("Robot %d gets unbalanced again and gets grounded. Execution move possible.\n", opponent->m_index);
+						printf("Robot %d gets unbalanced again and gets grounded. Execution move possible.\n", opponent.m_index);
 					}
 				}
 			}
 		}
 
 		//Check global shutdown conditions
-		opponent->UpdateShudownGlobal();
+		opponent.UpdateShudownGlobal();
 
 		//Distance update
 		(*CurrentGame).m_distance_temp = range_weapon_used ? Distance_Ranged : Distance_Close;
