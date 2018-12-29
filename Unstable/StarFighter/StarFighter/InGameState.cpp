@@ -30,6 +30,22 @@ void InGameState::Initialize(Player player)
 
 	//ROBOT
 	InitRobots();
+	InitUI();
+}
+
+void InGameState::InitUI()
+{
+	//Turn display
+	m_UI_turn.setPosition(sf::Vector2f(1920.f * 0.5, 50.f));
+	m_UI_turn.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_UI_turn.setCharacterSize(30);
+	m_UI_turn.setColor(sf::Color(255, 255, 255, 255));
+
+	//Phase display
+	m_UI_phase.setPosition(sf::Vector2f(1920.f * 0.5, 100.f));
+	m_UI_phase.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_UI_phase.setCharacterSize(30);
+	m_UI_phase.setColor(sf::Color(255, 255, 255, 255));
 }
 
 void InGameState::InitRobots()
@@ -411,6 +427,8 @@ void InGameState::Update(sf::Time deltaTime)
 	m_robots[0].UpdateUI();
 	m_robots[1].UpdateUI();
 
+	UpdateUI(deltaTime);
+
 	if ((*CurrentGame).m_phase == Phase_CrewMovement)
 	{
 		if (m_robots[0].m_ready_to_change_phase == false)
@@ -457,6 +475,100 @@ void InGameState::Update(sf::Time deltaTime)
 		m_robots[0].m_ready_to_change_phase = true;
 		m_robots[1].m_ready_to_change_phase = true;
 	}
+}
+
+
+void InGameState::UpdateUI(sf::Time deltaTime)
+{
+	ostringstream s_turn;
+	s_turn << "Turn " << (*CurrentGame).m_turn;
+	m_UI_turn.setString(s_turn.str());
+	m_UI_turn.setPosition(sf::Vector2f(1920.f * 0.5 - m_UI_turn.getGlobalBounds().width * 0.5f, 50.f));
+
+	ostringstream s_phase;
+	s_phase << "Phase: ";
+	switch ((*CurrentGame).m_phase)
+	{
+		case Phase_GenerateEC:
+		{
+			s_phase << "EC generation";
+			break;
+		}
+		case Phase_CrewMovement:
+		{
+			s_phase << "Crew movement";
+			break;
+		}
+		case Phase_AttackPlanning:
+		{
+			s_phase << "Attack planning";
+			break;
+		}
+		case Phase_HealCrew:
+		{
+			s_phase << "Crew healing";
+			break;
+		}
+		case Phase_RepairModules:
+		{
+			s_phase << "Module repairing";
+			break;
+		}
+		case Phase_EffectsResolution:
+		{
+			s_phase << "Effects resolution";
+			break;
+		}
+		case Phase_GrabResolution:
+		{
+			s_phase << "Grab resolution";
+			break;
+		}
+		case Phase_GuardResolution:
+		{
+			s_phase << "Guard resolution";
+			break;
+		}
+		case Phase_AttackResolution_12:
+		case Phase_AttackResolution_11:
+		case Phase_AttackResolution_10:
+		case Phase_AttackResolution_9:
+		case Phase_AttackResolution_8:
+		case Phase_AttackResolution_7:
+		case Phase_AttackResolution_6:
+		case Phase_AttackResolution_5:
+		case Phase_AttackResolution_4:
+		case Phase_AttackResolution_3:
+		case Phase_AttackResolution_2:
+		case Phase_AttackResolution_1:
+		{
+			s_phase << "Attacks resolution";
+			break;
+		}
+		case Phase_CooldownResolution:
+		{
+			s_phase << "Cooldowns update";
+			break;
+		}
+		case Phase_FireResolution:
+		{
+			s_phase << "Fire resolution";
+			break;
+		}
+		case Phase_Execution:
+		{
+			s_phase << "Execution (contextual)";
+			break;
+		}
+		case Phase_CounterAttack:
+		{
+			s_phase << "Counter-attack (contextual)";
+			break;
+		}
+	}
+
+	m_UI_phase.setString(s_phase.str());
+	m_UI_phase.setPosition(sf::Vector2f(1920.f * 0.5 - m_UI_phase.getGlobalBounds().width * 0.5f, 100.f));
 }
 
 void InGameState::Draw()
@@ -547,6 +659,10 @@ void InGameState::Draw()
 			}
 		}
 	}
+
+	//Turn & phase display
+	(*CurrentGame).m_mainScreen.draw(m_UI_turn);
+	(*CurrentGame).m_mainScreen.draw(m_UI_phase);
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();

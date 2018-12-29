@@ -21,6 +21,7 @@ public:
 
 	void Initialize(Player player);
 	void Update(sf::Time deltaTime);
+	void UpdateUI(sf::Time deltaTime);
 	void Draw();
 	void Release();
 	void UpdateCamera(sf::Time deltaTime);
@@ -32,6 +33,7 @@ public:
 	Robot m_robots[2];
 
 	void InitRobots();
+	void InitUI();
 
 	void AttackResolution();
 	void EffectsResolution();
@@ -45,6 +47,8 @@ public:
 	//UI
 	void UI_GetAction(sf::Time deltaTime, int robot_index);
 	void UI_SyncSml(int crew_index, int robot_index);
+	SFText m_UI_turn;
+	SFText m_UI_phase;
 
 private:
 	sf::RenderWindow* mainWindow;
