@@ -232,6 +232,14 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 	}
 	
 	//Do action
+	//Debug shortcut
+	if ((*CurrentGame).m_playerShip->m_inputs_states[Action_Firing] == Input_Tap)
+	{
+		m_robots[r1].m_ready_to_change_phase = true;
+		(*CurrentGame).m_UI_events_log.clear();
+		(*CurrentGame).UI_AddEventLog(" has played.", Event_Neutral, r1);
+	}
+
 	if ((*CurrentGame).m_play_ui != NULL)
 	{
 		//End turn
@@ -242,9 +250,9 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 
 			(*CurrentGame).m_UI_events_log.clear();
 			(*CurrentGame).UI_AddEventLog(" has played.", Event_Neutral, r1);
-		}
+		}	 
 		//Energy Cells attribution
-		if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Module && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
+		else if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Module && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
 			Module* module = (Module*)(*CurrentGame).m_play_ui->m_parent;
 			m_robots[r1].SetEnergyCell(module);
@@ -381,6 +389,8 @@ void InGameState::UI_SyncSml(int crew_index, int robot_index)
 
 void InGameState::Update(sf::Time deltaTime)
 {
+	(*CurrentGame).m_playerShip->update(deltaTime);
+
 	//Phase shift
 	if (m_robots[0].m_ready_to_change_phase == true && m_robots[1].m_ready_to_change_phase == true)
 	{

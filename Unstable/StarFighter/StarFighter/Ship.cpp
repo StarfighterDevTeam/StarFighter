@@ -69,7 +69,7 @@ void Ship::update(sf::Time deltaTime)
 	if (m_inputs_states[Action_Firing] == Input_Tap)
 	{
 		//do some action
-		(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
+		//(*CurrentGame).CreateSFTextPop("action", Font_Arial, 20, sf::Color::Blue, getPosition(), PlayerBlue, 100, 50, 3, NULL, -m_size.y/2 - 20);
 	}
 
 	MaxSpeedConstraints();
