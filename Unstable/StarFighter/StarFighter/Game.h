@@ -83,6 +83,7 @@ public:
 //ROBOT
 #define MAX_ROBOT_WEIGHT				25
 #define MAX_ROBOT_ENERGY_CELLS		17
+#define MAX_EVENTS_LOG_LINES			7
 
 enum GamePhase
 {

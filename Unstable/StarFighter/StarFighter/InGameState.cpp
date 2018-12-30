@@ -148,61 +148,6 @@ void InGameState::InitRobots()
 	robot2.m_opponent = &robot;
 }
 
-/*
-void InGameState::InitTable()
-{
-(*CurrentGame).m_hovered_slot = NULL;
-(*CurrentGame).m_selected_slot = NULL;
-(*CurrentGame).m_play_card_slot = NULL;
-(*CurrentGame).m_target_slot = NULL;
-m_current_player = 0;
-
-//Altar
-m_altar_slot.m_stack = Stack_Altar;
-
-m_altar_slot.m_shape_container.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
-m_altar_slot.m_shape_container.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
-m_altar_slot.m_shape_container.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
-m_altar_slot.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-m_altar_slot.m_shape_container.setOutlineThickness(2);
-m_altar_slot.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
-
-m_altar_slot.m_shape.setPosition(sf::Vector2f(800 + ((CARD_WIDTH + 20) * NB_CARDS_ALTAR) * 0.5, 500));
-m_altar_slot.m_shape.setOrigin(sf::Vector2f(((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10) * 0.5, CARD_HEIGHT / 2 + 5));
-m_altar_slot.m_shape.setSize(sf::Vector2f((CARD_WIDTH + 20) * NB_CARDS_ALTAR + 10, CARD_HEIGHT + 10));
-m_altar_slot.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
-m_altar_slot.m_shape.setOutlineThickness(0);
-m_altar_slot.m_shape.setFillColor(sf::Color(255, 255, 255, 0));
-
-for (int i = 0; i < NB_CARDS_ALTAR; i++)
-{
-m_altar_slots[i].m_status = CardSlot_Free;
-m_altar_slots[i].m_stack = Stack_AltarSlot;
-m_altar_slots[i].m_index = i;
-
-m_altar_slots[i].m_shape_container.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
-m_altar_slots[i].m_shape_container.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-m_altar_slots[i].m_shape_container.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-m_altar_slots[i].m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
-m_altar_slots[i].m_shape_container.setOutlineThickness(2);
-m_altar_slots[i].m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
-
-m_altar_slots[i].m_shape.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
-m_altar_slots[i].m_shape.setOrigin(sf::Vector2f(CARD_WIDTH / 2, CARD_HEIGHT / 2));
-m_altar_slots[i].m_shape.setSize(sf::Vector2f(CARD_WIDTH, CARD_HEIGHT));
-m_altar_slots[i].m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
-m_altar_slots[i].m_shape.setOutlineThickness(0);
-m_altar_slots[i].m_shape.setFillColor(sf::Color(255, 255, 255, 0));
-
-m_altar_slots[i].m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-m_altar_slots[i].m_text.setCharacterSize(18);
-m_altar_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
-m_altar_slots[i].m_text.setPosition(sf::Vector2f(800 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i, 500));
-m_altar_slots[i].m_text.setString("");
-}
-}
-*/
-
 void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 {
 	//Get UI action
@@ -480,11 +425,13 @@ void InGameState::Update(sf::Time deltaTime)
 
 void InGameState::UpdateUI(sf::Time deltaTime)
 {
+	//Turn display
 	ostringstream s_turn;
 	s_turn << "Turn " << (*CurrentGame).m_turn;
 	m_UI_turn.setString(s_turn.str());
-	m_UI_turn.setPosition(sf::Vector2f(1920.f * 0.5 - m_UI_turn.getGlobalBounds().width * 0.5f, 50.f));
+	m_UI_turn.setPosition(sf::Vector2f(1920.f * 0.5 - m_UI_turn.getGlobalBounds().width * 0.5f, 40.f));
 
+	//Phase display
 	ostringstream s_phase;
 	s_phase << "Phase: ";
 	switch ((*CurrentGame).m_phase)
@@ -569,6 +516,36 @@ void InGameState::UpdateUI(sf::Time deltaTime)
 
 	m_UI_phase.setString(s_phase.str());
 	m_UI_phase.setPosition(sf::Vector2f(1920.f * 0.5 - m_UI_phase.getGlobalBounds().width * 0.5f, 100.f));
+
+	//Events log update - keep only a limited number of lines (the most recents ones)
+	int events_log_size = m_UI_events_log.size();
+	if (events_log_size > MAX_EVENTS_LOG_LINES)
+	{
+		vector<SFText> old_events_log;
+		for (vector<SFText>::iterator it = m_UI_events_log.begin(); it != m_UI_events_log.end(); it++)
+		{
+			old_events_log.push_back(*it);
+		}
+
+		m_UI_events_log.clear();
+
+		int n = 0;
+		for (vector<SFText>::iterator it = old_events_log.begin(); it != old_events_log.end(); it++)
+		{
+			if (n >= events_log_size - MAX_EVENTS_LOG_LINES)
+			{
+				old_events_log.push_back(*it);
+			}
+			n++;
+		}
+	}
+	
+	int l = 0;
+	for (vector<SFText>::iterator it = m_UI_events_log.begin(); it != m_UI_events_log.end(); it++)
+	{
+		it->setPosition(sf::Vector2f(1920.f * 0.5f - 180.f, 180.f + (l * 40.f)));
+		l++;
+	}
 }
 
 void InGameState::Draw()
@@ -664,14 +641,18 @@ void InGameState::Draw()
 	(*CurrentGame).m_mainScreen.draw(m_UI_turn);
 	(*CurrentGame).m_mainScreen.draw(m_UI_phase);
 
+	//Events log display
+	for (vector<SFText>::iterator it = m_UI_events_log.begin(); it != m_UI_events_log.end(); it++)
+	{
+		(*CurrentGame).m_mainScreen.draw(*it);
+	}
+
 	//Display
 	(*CurrentGame).m_mainScreen.display();
 	sf::Sprite temp((*CurrentGame).m_mainScreen.getTexture());
 	temp.scale((*CurrentGame).m_scale_factor.x, (*CurrentGame).m_scale_factor.y);
 	temp.setPosition(sf::Vector2f(0, 0));
 	(*CurrentGame).getMainWindow()->draw(temp);
-
-	
 }
 
 void InGameState::Release()
@@ -1325,4 +1306,64 @@ void InGameState::GuardResolution()
 			}
 		}	
 	}
+}
+
+void InGameState::UI_AddEventLog(string message, UI_EventsLogType type, int robot_index)
+{
+	SFText text;
+
+	text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	text.setCharacterSize(18);
+	
+	switch (type)
+	{
+		case Event_Neutral:
+		{
+			text.setColor(sf::Color::White);
+			break;
+		}
+		case Event_Balance:
+		{
+			text.setColor(sf::Color::Magenta);
+			break;
+		}
+		case Event_Shutdown:
+		{
+			text.setColor(sf::Color::Yellow);
+			break;
+		}
+		case Event_Damage:
+		case Event_Error:
+		{
+			text.setColor(sf::Color::Red);
+			break;
+		}
+		case Event_Fire:
+		{
+			text.setColor(sf::Color(255, 201, 14, 255));//orange
+			break;
+		}
+		case Event_EC:
+		{
+			text.setColor(sf::Color::Green);
+			break;
+		}
+	}
+
+	ostringstream s_log;
+	if (robot_index == 0)
+	{
+		s_log << "<<";
+	}
+
+	s_log << message;
+	
+	if (robot_index == 1)
+	{
+		s_log << ">>";
+	}
+
+	text.setString(s_log.str());
+
+	m_UI_events_log.push_back(text);
 }
