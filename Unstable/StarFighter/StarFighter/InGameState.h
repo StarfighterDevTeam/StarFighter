@@ -14,17 +14,6 @@
 
 class GameObject;
 
-enum UI_EventsLogType
-{
-	Event_Neutral,
-	Event_Shutdown,
-	Event_Balance,
-	Event_Fire,
-	Event_EC,
-	Event_Damage,
-	Event_Error,
-};
-
 class InGameState : public GameState
 {
 public:
@@ -60,8 +49,6 @@ public:
 	void UI_SyncSml(int crew_index, int robot_index);
 	SFText m_UI_turn;
 	SFText m_UI_phase;
-	vector<SFText> m_UI_events_log;
-	void UI_AddEventLog(string message, UI_EventsLogType type, int robot_index);
 
 private:
 	sf::RenderWindow* mainWindow;

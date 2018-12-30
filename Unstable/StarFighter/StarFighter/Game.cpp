@@ -832,6 +832,66 @@ void Game::GetMouseInputs(sf::Time deltaTime)
 	}
 }
 
+
+void Game::UI_AddEventLog(string message, UI_EventsLogType type, int robot_index)
+{
+	SFText text;
+
+	text.setFont(*m_font[Font_Arial]);
+	text.setCharacterSize(18);
+
+	switch (type)
+	{
+		case Event_Neutral:
+		{
+			text.setColor(sf::Color::White);
+			break;
+		}
+		case Event_Balance:
+		{
+			text.setColor(sf::Color::Magenta);
+			break;
+		}
+		case Event_Shutdown:
+		{
+			text.setColor(sf::Color::Yellow);
+			break;
+		}
+		case Event_Damage:
+		case Event_Error:
+		{
+			text.setColor(sf::Color::Red);
+			break;
+		}
+		case Event_Fire:
+		{
+			text.setColor(sf::Color(255, 201, 14, 255));//orange
+			break;
+		}
+		case Event_EC:
+		{
+			text.setColor(sf::Color::Green);
+			break;
+		}
+	}
+
+	ostringstream s_log;
+	if (robot_index == 0)
+	{
+		s_log << "[P1] ";
+	}
+	else if (robot_index == 1)
+	{
+		s_log << "[P2] ";
+	}
+
+	s_log << message;
+
+	text.setString(s_log.str());
+
+	m_UI_events_log.push_back(text);
+}
+
 extern Game* CurrentGame;
 
 void UI_Element::Update(MouseAction mouse_click, int robot_index)

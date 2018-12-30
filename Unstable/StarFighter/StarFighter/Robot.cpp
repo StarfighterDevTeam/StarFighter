@@ -1748,7 +1748,7 @@ bool Robot::UpdateShudownGlobal()
 		if (CheckShudownGlobalConditions() == true)
 		{
 			m_shutdown_global = true;
-			printf("Global shutdown triggered on robot %d.\n", m_index);
+			(*CurrentGame).UI_AddEventLog("is now facing a global shutdown of his systems.\n", Event_Shutdown, m_index);
 			return true;
 		}
 		else
@@ -1762,7 +1762,7 @@ bool Robot::UpdateShudownGlobal()
 		if (CheckShudownGlobalConditions() == false)
 		{
 			m_shutdown_global = false;
-			printf("Global shutdown ended on robot %d.\n", m_index);
+			(*CurrentGame).UI_AddEventLog("has now ended the global shutdown of his systems.\n", Event_Shutdown, m_index);
 			return true;
 		}
 		else

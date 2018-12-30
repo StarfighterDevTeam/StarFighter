@@ -218,16 +218,16 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 	}
 
 	//Global shutdown or grounded -> skip turn
-	if (m_robots[robot_index].m_shutdown_global == true)
+	if (m_robots[robot_index].m_shutdown_global == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
 	{
 		m_robots[robot_index].m_ready_to_change_phase = true;
-		printf("Robot %d cannot plan any attack because he's under a global shutdown.\n", r1);
+		(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's under a global shutdown.\n", Event_Shutdown, robot_index);
 		return;
 	}
-	else if (m_robots[robot_index].m_grounded == true)
+	else if (m_robots[robot_index].m_grounded == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
 	{
 		m_robots[robot_index].m_ready_to_change_phase = true;
-		printf("Robot %d cannot plan any attack because he's on ground.\n", r1);
+		(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's stuck on ground.\n", Event_Shutdown, robot_index);
 		return;
 	}
 	
@@ -518,32 +518,32 @@ void InGameState::UpdateUI(sf::Time deltaTime)
 	m_UI_phase.setPosition(sf::Vector2f(1920.f * 0.5 - m_UI_phase.getGlobalBounds().width * 0.5f, 100.f));
 
 	//Events log update - keep only a limited number of lines (the most recents ones)
-	int events_log_size = m_UI_events_log.size();
+	int events_log_size = (*CurrentGame).m_UI_events_log.size();
 	if (events_log_size > MAX_EVENTS_LOG_LINES)
 	{
 		vector<SFText> old_events_log;
-		for (vector<SFText>::iterator it = m_UI_events_log.begin(); it != m_UI_events_log.end(); it++)
+		for (vector<SFText>::iterator it = (*CurrentGame).m_UI_events_log.begin(); it != (*CurrentGame).m_UI_events_log.end(); it++)
 		{
 			old_events_log.push_back(*it);
 		}
 
-		m_UI_events_log.clear();
+		(*CurrentGame).m_UI_events_log.clear();
 
 		int n = 0;
 		for (vector<SFText>::iterator it = old_events_log.begin(); it != old_events_log.end(); it++)
 		{
 			if (n >= events_log_size - MAX_EVENTS_LOG_LINES)
 			{
-				old_events_log.push_back(*it);
+				(*CurrentGame).m_UI_events_log.push_back(*it);
 			}
 			n++;
 		}
 	}
 	
 	int l = 0;
-	for (vector<SFText>::iterator it = m_UI_events_log.begin(); it != m_UI_events_log.end(); it++)
+	for (vector<SFText>::iterator it = (*CurrentGame).m_UI_events_log.begin(); it != (*CurrentGame).m_UI_events_log.end(); it++)
 	{
-		it->setPosition(sf::Vector2f(1920.f * 0.5f - 180.f, 180.f + (l * 40.f)));
+		it->setPosition(sf::Vector2f(1920.f * 0.5f - 170.f, 180.f + (l * 40.f)));
 		l++;
 	}
 }
@@ -642,7 +642,7 @@ void InGameState::Draw()
 	(*CurrentGame).m_mainScreen.draw(m_UI_phase);
 
 	//Events log display
-	for (vector<SFText>::iterator it = m_UI_events_log.begin(); it != m_UI_events_log.end(); it++)
+	for (vector<SFText>::iterator it = (*CurrentGame).m_UI_events_log.begin(); it != (*CurrentGame).m_UI_events_log.end(); it++)
 	{
 		(*CurrentGame).m_mainScreen.draw(*it);
 	}
@@ -1306,64 +1306,4 @@ void InGameState::GuardResolution()
 			}
 		}	
 	}
-}
-
-void InGameState::UI_AddEventLog(string message, UI_EventsLogType type, int robot_index)
-{
-	SFText text;
-
-	text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	text.setCharacterSize(18);
-	
-	switch (type)
-	{
-		case Event_Neutral:
-		{
-			text.setColor(sf::Color::White);
-			break;
-		}
-		case Event_Balance:
-		{
-			text.setColor(sf::Color::Magenta);
-			break;
-		}
-		case Event_Shutdown:
-		{
-			text.setColor(sf::Color::Yellow);
-			break;
-		}
-		case Event_Damage:
-		case Event_Error:
-		{
-			text.setColor(sf::Color::Red);
-			break;
-		}
-		case Event_Fire:
-		{
-			text.setColor(sf::Color(255, 201, 14, 255));//orange
-			break;
-		}
-		case Event_EC:
-		{
-			text.setColor(sf::Color::Green);
-			break;
-		}
-	}
-
-	ostringstream s_log;
-	if (robot_index == 0)
-	{
-		s_log << "<<";
-	}
-
-	s_log << message;
-	
-	if (robot_index == 1)
-	{
-		s_log << ">>";
-	}
-
-	text.setString(s_log.str());
-
-	m_UI_events_log.push_back(text);
 }

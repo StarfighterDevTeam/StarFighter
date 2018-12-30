@@ -85,6 +85,18 @@ public:
 #define MAX_ROBOT_ENERGY_CELLS		17
 #define MAX_EVENTS_LOG_LINES			7
 
+
+enum UI_EventsLogType
+{
+	Event_Neutral,
+	Event_Shutdown,
+	Event_Balance,
+	Event_Fire,
+	Event_EC,
+	Event_Damage,
+	Event_Error,
+};
+
 enum GamePhase
 {
 	Phase_GenerateEC,
@@ -415,6 +427,9 @@ public:
 	UI_Element* m_hovered_ui;
 	UI_Element* m_target_ui;
 	UI_Element* m_play_ui;
+
+	vector<SFText> m_UI_events_log;
+	void UI_AddEventLog(string message, UI_EventsLogType type, int robot_index);
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);
