@@ -296,14 +296,41 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 		else if ((*CurrentGame).m_target_ui != NULL && (*CurrentGame).m_target_ui->m_type == UI_Slot)
 		{
 			RobotSlot* target_slot = (RobotSlot*)(*CurrentGame).m_target_ui->m_parent;
-			if (target_slot != NULL)
+			if ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui->m_type == UI_Module)
 			{
-				Module* module = (Module*)(*CurrentGame).m_play_ui->m_parent;
-				WeaponAttack* attack = module->m_owner->m_weapon->m_selected_attack;
-				SlotIndex target_index = target_slot->m_index;
+				Module* module = (Module*)(*CurrentGame).m_selected_ui->m_parent;
 
-				m_robots[r1].SetWeaponAttackOnSlot(attack, target_index);
-			}	
+				if (module != NULL && target_slot != NULL)
+				{
+					//Weapon attack
+					if (module->m_owner->m_weapon != NULL)
+					{
+						WeaponAttack* attack = module->m_owner->m_weapon->m_selected_attack;
+						SlotIndex target_index = target_slot->m_index;
+						m_robots[r1].SetWeaponAttackOnSlot(attack, target_index);
+					}
+					//Active ability
+					else if (module->m_effect != NULL)
+					{
+						EquipmentEffect* effect = module->m_effect;
+						SlotIndex target_index = target_slot->m_index;
+						m_robots[r1].SetEquipmentEffectOnSlot(effect, target_index);
+					}
+				}
+			}
+			else if ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui->m_type == UI_Equipment)
+			{
+				Equipment* equipment = (Equipment*)(*CurrentGame).m_selected_ui->m_parent;
+				if (equipment != NULL && target_slot != NULL)
+				{
+					if (equipment->m_effect != NULL)
+					{
+						EquipmentEffect* effect = equipment->m_effect;
+						SlotIndex target_index = target_slot->m_index;
+						m_robots[r1].SetEquipmentEffectOnSlot(effect, target_index);
+					}
+				}
+			}
 		}
 		//Weapon attack selection
 		else if ((*CurrentGame).m_play_ui->m_type == UI_WeaponAttack)
@@ -871,7 +898,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 			int gunner_bonus = robot_slot.GetGunnerRangeBonus();
 			int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
 			bool hit_success = weapon->m_ranged == false || is_execution == true || opponent.m_grabbed != NULL ||
-				RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_hit + gunner_bonus + equipment_bonus + (target_slot.m_type == Slot_Head ? 1 : 0);
+				RandomizeIntBetweenValues(1, 6) + gunner_bonus + equipment_bonus >= attack->m_chance_of_hit + (target_slot.m_type == Slot_Head ? 1 : 0) + opponent.m_jammer_bonus;
 
 			bool fire_success = target_index != Index_Head && attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
 
@@ -1204,7 +1231,17 @@ void InGameState::EffectsResolution()
 				continue;
 			}
 
-			printf("Effect resolution.\n");
+			ostringstream s_effect;
+			if (it->m_effect->m_owner_module != NULL)
+			{
+				s_effect << it->m_effect->m_owner_module->m_UI_display_name;
+			}
+			else if (it->m_effect->m_owner_equipment != NULL)
+			{
+				s_effect << it->m_effect->m_owner_equipment->m_UI_display_name;
+			}
+			s_effect << " used.";
+			(*CurrentGame).UI_AddEventLog(s_effect.str(), Event_Neutral, r);
 
 			Robot* robot = it->m_effect->m_owner_module != NULL ? it->m_effect->m_owner_module->m_owner->m_owner : it->m_effect->m_owner_equipment->m_owner->m_owner;
 			RobotSlot& robot_slot = it->m_effect->m_owner_module != NULL ? *it->m_effect->m_owner_module->m_owner : *it->m_effect->m_owner_equipment->m_owner;
@@ -1234,9 +1271,17 @@ void InGameState::EffectsResolution()
 				{
 					break;
 				}
+				case Effect_Jammer:
+				{
+					m_robots[r].m_jammer_bonus = 1;
+					break;
+				}
 			}
 		}
 	}
+
+	//Clearing the actions list
+	(*CurrentGame).m_effects_list.clear();
 
 	m_robots[0].m_ready_to_change_phase = true;
 	m_robots[1].m_ready_to_change_phase = true;

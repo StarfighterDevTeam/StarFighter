@@ -80,10 +80,11 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 			m_module_equipable = Module_Gadget;
 
 			m_effect = new EquipmentEffect(Effect_Jammer, NULL, this);
+			m_effect->m_energy_cost = 2;
 
 			m_UI_display_name = "Gadget Jammer";
 			m_UI_display_name_short = "Gadget\nJammer";
-			m_UI_description = "Unknown";
+			m_UI_description = "-1 chance to be hit by enemy ranged weapons";
 			break;
 		}
 		case Equipment_GadgetEMP:

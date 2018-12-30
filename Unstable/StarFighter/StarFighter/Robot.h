@@ -59,6 +59,7 @@ public:
 	bool m_grounded;
 	Module* m_grabbed;
 	int m_guard_speed;
+	int m_jammer_bonus;
 
 	Robot* m_opponent;
 

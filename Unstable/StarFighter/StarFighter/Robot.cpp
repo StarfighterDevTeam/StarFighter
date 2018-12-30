@@ -14,6 +14,7 @@ Robot::Robot()
 	m_grounded = false;
 	m_grabbed = NULL;
 	m_guard_speed = 0;
+	m_jammer_bonus = 0;
 
 	m_ready_to_change_phase = false;
 
@@ -1064,6 +1065,13 @@ void Robot::UpdateUI()
 
 	if (focused_ui != NULL)
 	{
+		EquipmentEffect* effect = NULL;
+
+		float offset_focus_x = 960.f;
+		float offset_focus_y = 550.f;
+		float sizefocus_x = 370.f;
+		float sizefocus_y = 154.f;
+
 		//Module focused
 		if (focused_ui->m_type == UI_Module && focused_ui->m_parent != NULL)
 		{
@@ -1079,26 +1087,21 @@ void Robot::UpdateUI()
 				ui_weapon.m_type = UI_Focus;
 				ui_weapon.m_team = (TeamAlliances)m_index;//AllianceNeutral;
 
-				float offset_weapon_x = 960.f;
-				float offset_weapon_y = 550.f;
-				float sizeweapon_x = 300.f;
-				float sizeweapon_y = 154.f;
-
-				ui_weapon.m_shape_container.setPosition(sf::Vector2f(offset_weapon_x, offset_weapon_y));
-				ui_weapon.m_shape_container.setSize(sf::Vector2f(sizeweapon_x, sizeweapon_y));
-				ui_weapon.m_shape_container.setOrigin(sf::Vector2f(sizeweapon_x * 0.5f, sizeweapon_y * 0.5f));
+				ui_weapon.m_shape_container.setPosition(sf::Vector2f(offset_focus_x, offset_focus_y));
+				ui_weapon.m_shape_container.setSize(sf::Vector2f(sizefocus_x, sizefocus_y));
+				ui_weapon.m_shape_container.setOrigin(sf::Vector2f(sizefocus_x * 0.5f, sizefocus_y * 0.5f));
 				ui_weapon.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
 				ui_weapon.m_shape_container.setOutlineThickness(2);
 				ui_weapon.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 
-				ui_weapon.m_shape.setPosition(sf::Vector2f(offset_weapon_x, offset_weapon_y));
-				ui_weapon.m_shape.setSize(sf::Vector2f(sizeweapon_x, sizeweapon_y));
-				ui_weapon.m_shape.setOrigin(sf::Vector2f(sizeweapon_x * 0.5f, sizeweapon_y * 0.5f));
+				ui_weapon.m_shape.setPosition(sf::Vector2f(offset_focus_x, offset_focus_y));
+				ui_weapon.m_shape.setSize(sf::Vector2f(sizefocus_x, sizefocus_y));
+				ui_weapon.m_shape.setOrigin(sf::Vector2f(sizefocus_x * 0.5f, sizefocus_y * 0.5f));
 				ui_weapon.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
 				ui_weapon.m_shape.setOutlineThickness(0);
 				ui_weapon.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
 
-				ui_weapon.m_text.setPosition(sf::Vector2f(offset_weapon_x - sizeweapon_x * 0.5f + 8.f, offset_weapon_y - sizeweapon_y * 0.5f + 8.f));
+				ui_weapon.m_text.setPosition(sf::Vector2f(offset_focus_x - sizefocus_x * 0.5f + 8.f, offset_focus_y - sizefocus_y * 0.5f + 8.f));
 				ui_weapon.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 				ui_weapon.m_text.setCharacterSize(20);
 				ui_weapon.m_text.setColor(sf::Color(255, 255, 255, 255));
@@ -1141,9 +1144,9 @@ void Robot::UpdateUI()
 					ui_attack.m_type = UI_WeaponAttack;
 					ui_attack.m_team = (TeamAlliances)m_index;//AllianceNeutral;
 
-					float sizeattack_x = sizeweapon_x;
+					float sizeattack_x = sizefocus_x;
 					float sizeattack_y = 160.f;
-					float offset_attack_x = offset_weapon_x;
+					float offset_attack_x = offset_focus_x;
 					float offset_attack_y = ui_weapon.m_text.getPosition().y + 68.f + sizeattack_y * w; //750.f;
 
 					ui_attack.m_shape_container.setPosition(sf::Vector2f(offset_attack_x, offset_attack_y));
@@ -1226,7 +1229,7 @@ void Robot::UpdateUI()
 						ui_stat.m_type = UI_WeaponAttackStat;
 						ui_stat.m_team = (TeamAlliances)m_index;//AllianceNeutral;
 
-						float offset_stat_x = offset_weapon_x - sizeweapon_x * 0.5f + 8.f + EC_SIZE_X + s * 55.f;
+						float offset_stat_x = offset_focus_x - sizefocus_x * 0.5f + 8.f + EC_SIZE_X + s * 55.f;
 						float offset_stat_y = offset_attack_y + 20.f;
 
 						ui_stat.m_shape_container.setPosition(sf::Vector2f(offset_stat_x, offset_stat_y));
@@ -1302,7 +1305,48 @@ void Robot::UpdateUI()
 			//Non-weapon focused
 			else
 			{
+				vector<UI_Element> ui;
+				UI_Element ui_module(module);
 
+				effect = module->m_effect;
+
+				ui_module.m_type = UI_Focus;
+				ui_module.m_team = (TeamAlliances)m_index;//AllianceNeutral;
+
+				ui_module.m_shape_container.setPosition(sf::Vector2f(offset_focus_x, offset_focus_y));
+				ui_module.m_shape_container.setSize(sf::Vector2f(sizefocus_x, sizefocus_y));
+				ui_module.m_shape_container.setOrigin(sf::Vector2f(sizefocus_x * 0.5f, sizefocus_y * 0.5f));
+				ui_module.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+				ui_module.m_shape_container.setOutlineThickness(2);
+				ui_module.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+				ui_module.m_shape.setPosition(sf::Vector2f(offset_focus_x, offset_focus_y));
+				ui_module.m_shape.setSize(sf::Vector2f(sizefocus_x, sizefocus_y));
+				ui_module.m_shape.setOrigin(sf::Vector2f(sizefocus_x * 0.5f, sizefocus_y * 0.5f));
+				ui_module.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+				ui_module.m_shape.setOutlineThickness(0);
+				ui_module.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+				ui_module.m_text.setPosition(sf::Vector2f(offset_focus_x - sizefocus_x * 0.5f + 8.f, offset_focus_y - sizefocus_y * 0.5f + 8.f));
+				ui_module.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+				ui_module.m_text.setCharacterSize(20);
+				ui_module.m_text.setColor(sf::Color(255, 255, 255, 255));
+
+				ostringstream sm;
+				sm << module->m_UI_display_name;
+				
+				sm << "\nHP: " << module->m_health << "/" << module->m_health_max;
+				sm << "\nWeight: " << module->m_weight;
+				if (module->m_cooldown > 0)
+				{
+					sm << "\nCooldown: " << module->m_cooldown_timer << "/" << module->m_cooldown;
+				}
+				sm << "\n" << module->m_UI_description;
+
+				ui_module.m_text.setString(sm.str());
+
+				ui.push_back(ui_module);
+				m_UI_focus.push_back(ui);
 			}
 		}
 		//Equipment focused
@@ -1310,6 +1354,123 @@ void Robot::UpdateUI()
 		{
 			Equipment* equipment = (Equipment*)focused_ui->m_parent;
 
+			effect = equipment->m_effect;
+
+			vector<UI_Element> ui;
+			UI_Element ui_equipment(equipment);
+
+			effect = equipment->m_effect;
+
+			ui_equipment.m_type = UI_Focus;
+			ui_equipment.m_team = (TeamAlliances)m_index;//AllianceNeutral;
+
+			float offset_equipment_x = 960.f;
+			float offset_equipment_y = 550.f;
+			float sizeequipment_x = sizefocus_x;
+			float sizeequipment_y = sizefocus_y;
+
+			ui_equipment.m_shape_container.setPosition(sf::Vector2f(offset_equipment_x, offset_equipment_y));
+			ui_equipment.m_shape_container.setSize(sf::Vector2f(sizeequipment_x, sizeequipment_y));
+			ui_equipment.m_shape_container.setOrigin(sf::Vector2f(sizeequipment_x * 0.5f, sizeequipment_y * 0.5f));
+			ui_equipment.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+			ui_equipment.m_shape_container.setOutlineThickness(2);
+			ui_equipment.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+			ui_equipment.m_shape.setPosition(sf::Vector2f(offset_equipment_x, offset_equipment_y));
+			ui_equipment.m_shape.setSize(sf::Vector2f(sizeequipment_x, sizeequipment_y));
+			ui_equipment.m_shape.setOrigin(sf::Vector2f(sizeequipment_x * 0.5f, sizeequipment_y * 0.5f));
+			ui_equipment.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+			ui_equipment.m_shape.setOutlineThickness(0);
+			ui_equipment.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+			ui_equipment.m_text.setPosition(sf::Vector2f(offset_equipment_x - sizeequipment_x * 0.5f + 8.f, offset_equipment_y - sizeequipment_y * 0.5f + 8.f));
+			ui_equipment.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+			ui_equipment.m_text.setCharacterSize(20);
+			ui_equipment.m_text.setColor(sf::Color(255, 255, 255, 255));
+
+			ostringstream sm;
+			sm << equipment->m_UI_display_name;
+
+			if (equipment->m_health_max > 0)
+			{
+				sm << "\nHP: " << equipment->m_health << "/" << equipment->m_health_max;
+			}
+			sm << "\nWeight: " << equipment->m_weight;
+			if (equipment->m_cooldown > 0)
+			{
+				sm << "\nCooldown: " << equipment->m_cooldown_timer << "/" << equipment->m_cooldown;
+			}
+			sm << "\n" << equipment->m_UI_description;
+
+			ui_equipment.m_text.setString(sm.str());
+
+			ui.push_back(ui_equipment);
+			m_UI_focus.push_back(ui);
+		}
+
+		//Active ability of module or equipment
+		if (effect != NULL)
+		{
+			vector<UI_Element> ui2;
+			UI_Element ui_effect(effect);
+
+			ui_effect.m_type = UI_Effect;
+			ui_effect.m_team = (TeamAlliances)m_index;//AllianceNeutral;
+
+
+			float sizeeffect_x = sizefocus_x;
+			float sizeeffect_y = 160.f;
+			float offset_effect_x = offset_focus_x;
+			float offset_effect_y = offset_focus_y + 5.f + sizefocus_y;
+
+			ui_effect.m_shape_container.setPosition(sf::Vector2f(offset_effect_x, offset_effect_y));
+			ui_effect.m_shape_container.setSize(sf::Vector2f(sizeeffect_x, sizeeffect_y));
+			ui_effect.m_shape_container.setOrigin(sf::Vector2f(sizeeffect_x * 0.5f, sizeeffect_y * 0.5f));
+			ui_effect.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+			ui_effect.m_shape_container.setOutlineThickness(2);
+			ui_effect.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+			ui_effect.m_shape.setPosition(sf::Vector2f(offset_effect_x, offset_effect_y));
+			ui_effect.m_shape.setSize(sf::Vector2f(sizeeffect_x, sizeeffect_y));
+			ui_effect.m_shape.setOrigin(sf::Vector2f(sizeeffect_x * 0.5f, sizeeffect_y * 0.5f));
+			ui_effect.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+			ui_effect.m_shape.setOutlineThickness(0);
+
+			if (effect->m_owner_equipment != NULL && (effect->m_owner_equipment->m_used == true || effect->m_owner_equipment->m_cooldown_timer < effect->m_owner_equipment->m_cooldown))
+			{
+				ui_effect.m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange = selected and locked
+			}
+			else if (effect->m_owner_module != NULL && (effect->m_owner_module->m_used == true || effect->m_owner_module->m_cooldown_timer < effect->m_owner_module->m_cooldown))
+			{
+				ui_effect.m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange = selected and locked
+			}
+			else
+			{
+				ui_effect.m_shape.setFillColor(sf::Color(0, 132, 232, 255));//blue (module) = selection
+			}
+			
+			ui_effect.m_text.setPosition(sf::Vector2f(offset_effect_x - sizefocus_x * 0.5f + 4.f, offset_effect_y - sizeeffect_y * 0.5f + 8.f));
+			ui_effect.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+			ui_effect.m_text.setCharacterSize(20);
+			ui_effect.m_text.setColor(sf::Color(255, 255, 255, 255));
+
+			ostringstream ss_effect;
+
+			ss_effect << "Use ";
+			if (effect->m_owner_module != NULL)
+			{
+				ss_effect << effect->m_owner_module->m_UI_display_name << "\n";
+			}
+			if (effect->m_owner_equipment != NULL)
+			{
+				ss_effect << effect->m_owner_equipment->m_UI_display_name << "\n";
+			}
+			ss_effect << "Cost: " << effect->m_energy_cost << " EC";
+
+			ui_effect.m_text.setString(ss_effect.str());
+
+			ui2.push_back(ui_effect);
+			m_UI_focus.push_back(ui2);
 		}
 	}
 
@@ -1324,6 +1485,19 @@ void Robot::UpdateUI()
 	{
 		WeaponAttack* attack = it->m_attack;
 		int robot_index = attack->m_owner->m_owner->m_owner->m_index;
+		robot_index = (robot_index + 1) % 2;
+
+		if (robot_index == m_index)
+		{
+			//Display target on the targeted slot
+			m_UI_slots[it->m_target_index].m_shape.setFillColor(sf::Color::White);
+		}
+	}
+
+	for (vector<ActionEffect>::iterator it = (*CurrentGame).m_effects_list.begin(); it != (*CurrentGame).m_effects_list.end(); it++)
+	{
+		EquipmentEffect* effect = it->m_effect;
+		int robot_index = effect->m_owner_module != NULL ? effect->m_owner_module->m_owner->m_owner->m_index : effect->m_owner_equipment->m_owner->m_owner->m_index;
 		robot_index = (robot_index + 1) % 2;
 
 		if (robot_index == m_index)
@@ -1646,6 +1820,9 @@ void Robot::UpdateFirePropagation()
 
 void Robot::UpdateCooldowns()
 {
+	//buff & debuff reset
+	m_jammer_bonus = 0;
+
 	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
 	{
 		//Module cooldown
@@ -2111,7 +2288,6 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 	}
 	else
 	{
-
 		//Consumption of Energy Cells
 		if (attack->m_nb_targets_remaining == attack->m_nb_targets)
 		{
@@ -2136,32 +2312,34 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 
 bool Robot::SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_index)
 {
-	Module* module = effect->m_owner_module->m_owner->m_module;
+	Module* module = effect->m_owner_module;
 	if (module != NULL)
 	{
 		if (module->m_used == true)
 		{
-			printf("Module already used during this turn.\n");
+			(*CurrentGame).UI_AddEventLog("Module already used during this turn.", Event_Error, m_index);
 			return false;
 		}
 		else if (module->IsOperationnal() == false)
 		{
-			printf("Cannot use module ability: module is not operational (destroyed, shutdown, or not powered by an Energy Cell.\n");
+			(*CurrentGame).UI_AddEventLog("Module is not operational (destroyed, shutdown, or not powered by an Energy Cell.", Event_Error, m_index);
 			return false;
 		}
 		else if (module->m_cooldown > 0 && module->m_cooldown_timer < module->m_cooldown)
 		{
+
+			(*CurrentGame).UI_AddEventLog("Cooldown is not ready.", Event_Error, m_index);
 			printf("Cannot use module ability: cooldown is not over (%d turns remaining for cooldown).\n", module->m_cooldown - module->m_cooldown_timer);
 			return false;
 		}
 		else if (module->m_crew_required != NB_CREW_TYPES && module->m_crew_required != Crew_Any && module->m_owner->HasCrewRequired(module->m_crew_required) == false)
 		{
-			printf("Cannot use module ability: the module requires a specific type of valid crew member in the module (not stunned).\n");
+			(*CurrentGame).UI_AddEventLog("Specific crew member required missing or stunned to use this ability.", Event_Error, m_index);
 			return false;
 		}
 		else if (module->m_crew_required == Crew_Any && module->m_owner->HasCrewRequired(module->m_crew_required) == false)
 		{
-			printf("Cannot use module ability: the module requires a valid crew member in the module (not stunned).\n");
+			(*CurrentGame).UI_AddEventLog("Crew member missing or stunned to use this ability.", Event_Error, m_index);
 			return false;
 		}
 	}
@@ -2171,32 +2349,34 @@ bool Robot::SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_i
 	{
 		if (equipment->m_used == true)
 		{
-			printf("Equipment already used during this turn.\n");
+			(*CurrentGame).UI_AddEventLog("Ability already used during this turn.", Event_Error, m_index);
 			return false;
 		}
 		else if (equipment->m_owner->m_module->IsOperationnal() == false)
 		{
-			printf("Cannot use equipment ability: parent module is not operational (destroyed, shutdown, or not powered by an Energy Cell.\n");
+			(*CurrentGame).UI_AddEventLog("Required module is not operational (destroyed, shutdown, or not powered by an Energy Cell.", Event_Error, m_index);
 			return false;
 		}
 		else if (equipment->m_cooldown > 0 && equipment->m_cooldown_timer < equipment->m_cooldown)
 		{
+
+			(*CurrentGame).UI_AddEventLog("Cooldown is not ready.", Event_Error, m_index);
 			printf("Cannot use equipment ability: cooldown is not over (%d turns remaining for cooldown).\n", equipment->m_cooldown - equipment->m_cooldown_timer);
 			return false;
 		}
 		else if (equipment->m_owner->m_module->m_type == Module_Gadget && equipment->m_owner->HasCrewRequired(Crew_Engineer) == false)
 		{
-			printf("Gadgets need an Engineer (not stunned) in the Gadget module in order to be used.\n");
+			(*CurrentGame).UI_AddEventLog("Engineer missing or stunned in the Gadget module.", Event_Error, m_index);
 			return false;
 		}
-		else if (equipment->m_energy_cells_max > 0 && equipment->m_energy_cells == 0)
+		else if (equipment->m_cooldown_timer < equipment->m_cooldown)
 		{
-			printf("Cannot use equipment ability: cooldown is not over (%d turns remaining for cooldown).\n", equipment->m_cooldown - equipment->m_cooldown_timer);
+			(*CurrentGame).UI_AddEventLog("Cooldown is not ready.", Event_Error, m_index);
 			return false;
 		}
-		else if (equipment->m_energy_cells < effect->m_energy_cost)
+		else if (m_energy_cells_available < effect->m_energy_cost)
 		{
-			printf("Cannot use equipment ability: not enough Enery Cells to use this ability: (current cells: %d ; cost: %d)\n", equipment->m_energy_cells, effect->m_energy_cost);
+			(*CurrentGame).UI_AddEventLog("Not enough Energy Cells available to use this ability.", Event_Error, m_index);
 			return false;
 		}
 	}
@@ -2217,6 +2397,10 @@ bool Robot::SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_i
 			equipment->m_cooldown_timer = 0;
 		}
 	}
+
+	//EC consumption
+	m_energy_cells_available -= effect->m_energy_cost;
+	m_energy_cells -= effect->m_energy_cost;
 
 	ActionEffect action;
 	action.m_effect = effect;

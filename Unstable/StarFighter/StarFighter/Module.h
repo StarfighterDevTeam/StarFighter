@@ -26,6 +26,7 @@ public:
 	RobotSlot* m_owner;
 	bool m_used;
 	CrewType m_crew_required;
+	EquipmentEffect* m_effect;
 
 	string m_UI_display_name;
 	string m_UI_display_name_short;

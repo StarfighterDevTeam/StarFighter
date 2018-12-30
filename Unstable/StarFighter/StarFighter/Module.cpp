@@ -19,6 +19,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 	m_fire_counter = 0;
 	m_shutdown_counter = 0;
 	m_crew_required = NB_CREW_TYPES;
+	m_effect = NULL;
 
 	switch (type)
 	{
@@ -110,9 +111,11 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_energy_cells_max = 1;
 			m_cooldown = 2;
 			m_crew_required = Crew_Any;
+			m_effect = new EquipmentEffect(Effect_Radar, this, NULL);
+			m_effect->m_energy_cost = 1;
 
 			m_UI_display_name = "Radar";
-			m_UI_description = "Reveals a target enemy module and its equipments";
+			m_UI_description = "Reveals a target enemy module and its equipments for 1 EC";
 			break;
 		}
 		case Module_Sensors:

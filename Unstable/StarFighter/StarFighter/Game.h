@@ -261,7 +261,7 @@ enum EquipmentEffectType
 
 class Module;
 class Equipment;
-class EquipmentEffect
+class EquipmentEffect : public GameEntity
 {
 public:
 	EquipmentEffect(EquipmentEffectType type, Module* owner_module, Equipment* owner_equipment);

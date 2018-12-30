@@ -960,8 +960,13 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
 		}
-		//ATTACK
+		//ATTACK and EQUIPMENT ABILITY
 		else if ((*CurrentGame).m_selected_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_type == UI_Slot && (*CurrentGame).m_phase == Phase_AttackPlanning)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+		else if ((*CurrentGame).m_selected_ui->m_type == UI_Equipment && (*CurrentGame).m_hovered_ui->m_type == UI_Slot && (*CurrentGame).m_phase == Phase_AttackPlanning)
 		{
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
