@@ -852,6 +852,7 @@ void Game::UI_AddEventLog(string message, UI_EventsLogType type, int robot_index
 			text.setColor(sf::Color::Magenta);
 			break;
 		}
+		case Event_Grab:
 		case Event_Shutdown:
 		{
 			text.setColor(sf::Color::Yellow);
@@ -871,6 +872,12 @@ void Game::UI_AddEventLog(string message, UI_EventsLogType type, int robot_index
 		case Event_EC:
 		{
 			text.setColor(sf::Color::Green);
+			break;
+		}
+		case Event_Stun:
+		case Event_ContextualChoice:
+		{
+			text.setColor(sf::Color::Cyan);
 			break;
 		}
 	}

@@ -83,7 +83,7 @@ public:
 //ROBOT
 #define MAX_ROBOT_WEIGHT				25
 #define MAX_ROBOT_ENERGY_CELLS		17
-#define MAX_EVENTS_LOG_LINES			7
+#define MAX_EVENTS_LOG_LINES			20
 
 
 enum UI_EventsLogType
@@ -92,8 +92,11 @@ enum UI_EventsLogType
 	Event_Shutdown,
 	Event_Balance,
 	Event_Fire,
+	Event_Stun,
+	Event_Grab,
 	Event_EC,
 	Event_Damage,
+	Event_ContextualChoice,
 	Event_Error,
 };
 

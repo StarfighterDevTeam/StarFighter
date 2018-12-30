@@ -1442,8 +1442,13 @@ int Robot::GenerateEnergyCells()
 					energy_cells_generated++;
 				}
 			}
+
 		}
 	}
+
+	ostringstream s_ec;
+	s_ec << energy_cells_generated << " EC generated.";
+	(*CurrentGame).UI_AddEventLog(s_ec.str(), Event_EC, m_index);
 
 	return energy_cells_generated;
 }
@@ -1535,14 +1540,16 @@ int Robot::RepairModules()
 					if (module->m_fire_counter > 0)
 					{
 						module->m_fire_counter = 0;
-						printf("Fire extinguished.\n");
+
+						(*CurrentGame).UI_AddEventLog("Fire extinguished.", Event_Fire, m_index);
 					}
 
 					//Ends shutdown status
 					if (module->m_shutdown_counter > 0)
 					{
 						module->m_shutdown_counter = 0;
-						printf("Shutdown repaired.\n");
+						
+						(*CurrentGame).UI_AddEventLog("Shutdown repaired.", Event_Shutdown, m_index);
 					}
 				}
 			}
@@ -1551,6 +1558,8 @@ int Robot::RepairModules()
 			if (module->m_type == Module_Deflectors && module->IsOperationnal() && module->m_energy_cells == 2)
 			{
 				health += 2;
+
+				(*CurrentGame).UI_AddEventLog("Deflectors regain 2 health points.", Event_Neutral, m_index);
 			}
 
 			//Apply reparations
@@ -1583,14 +1592,19 @@ void Robot::UpdateFirePropagation()
 					module->m_health--;
 					if (module->m_health == 0)
 					{
+						(*CurrentGame).UI_AddEventLog("Fire deals 1 damage to the module and destroys it.", Event_Fire, m_index);
 						DestroySlot(it->m_index);
+					}
+					else
+					{
+						(*CurrentGame).UI_AddEventLog("Fire deals 1 damage to the module.", Event_Fire, m_index);
 					}
 
 					//Damage to robot
 					m_health--;
 					if (m_health == 0)
 					{
-						printf("Robot %d's health reached 0 and is destroyed. GAME OVER.\n", m_index);
+						(*CurrentGame).UI_AddEventLog("Robot is destroyed.\nGAME OVER", Event_Damage, m_index);
 					}
 				}
 
@@ -1620,6 +1634,7 @@ void Robot::UpdateFirePropagation()
 							{
 								it2->m_module->m_fire_counter = 1;
 								printf("Fire propagated from slot %d to slot %d.\n", (int)it->m_index, (int)it2->m_index);
+								(*CurrentGame).UI_AddEventLog("Fire propagates to an gadjacent module.", Event_Fire, m_index);
 							}
 						}
 					}
@@ -1791,7 +1806,8 @@ void Robot::DestroySlot(SlotIndex index)
 		if (m_opponent->m_grabbed == module)
 		{
 			m_opponent->m_grabbed = NULL;
-			printf("Hand destroyed. Grab has been released.\n");
+
+			(*CurrentGame).UI_AddEventLog("Hand destroyed. Grab has been released", Event_Shutdown, m_index);
 		}
 	}
 }
@@ -1905,10 +1921,13 @@ void Robot::UpdateCrew(SlotIndex index)
 		}
 		else
 		{
-			printf("Crew member dead.\n");
 			if ((*it)->m_type == Crew_Captain)
 			{
-				printf("Captain was killed. GAME OVER.\n");
+				(*CurrentGame).UI_AddEventLog("Captain killed.\nGAME OVER", Event_Damage, m_index);
+			}
+			else
+			{
+				(*CurrentGame).UI_AddEventLog("Crew member killed.", Event_Damage, m_index);
 			}
 		}
 	}
@@ -2211,22 +2230,23 @@ bool Robot::SetMedicTarget(CrewMember* medic, CrewMember* target)
 {
 	if (medic->m_type != Crew_Medic)
 	{
-		printf("Crew member selected to heal is not a Medic.\n");
+		(*CurrentGame).UI_AddEventLog("Crew member selected to heal is not a Medic.", Event_Error, m_index);
 		return false;
 	}
 	else if (medic->m_stun_counter > 0)
 	{
-		printf("Medic is stunned and cannot use his active ability to heal other crew members.\n");
+		(*CurrentGame).UI_AddEventLog("Medic is stunned and cannot use his active ability to heal other crew members.", Event_Error, m_index);
 		return false;
 	}
 	else if (target->m_health == 0)
 	{
-		printf("Targeted crew member is already dead and cannot be healed.\n");
+		(*CurrentGame).UI_AddEventLog("Targeted crew member is already dead and cannot be healed.", Event_Error, m_index);
 		return false;
 	}
 	else
 	{
 		medic->m_medic_target = target;
+		(*CurrentGame).UI_AddEventLog("Medic's heal target assigned.", Event_Neutral, m_index);
 		return true;
 	}
 }
@@ -2241,6 +2261,7 @@ bool Robot::SetEnergyCellsOnBalance()
 	else if (m_energy_cells_available < m_unbalanced_value)
 	{
 		printf("Insufficient Energy Cells available (%d) to cancel unbalance (%d).\n", m_energy_cells_available, m_unbalanced_value);
+		(*CurrentGame).UI_AddEventLog("Insufficient EC available to balance the robot.", Event_Error, m_index);
 		return false;
 	}
 	else
