@@ -7,6 +7,7 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
 	m_room = room;
+	m_crew = NULL;
 	m_position = sf::Vector2f(ROOMTILE_OFFSET_X + coord_x * ROOMTILE_SIZE, ROOMTILE_OFFSET_Y + coord_y * ROOMTILE_SIZE);
 
 	//UI

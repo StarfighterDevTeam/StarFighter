@@ -146,7 +146,7 @@ public:
 	GameEntity* m_target_ui;
 	GameEntity* m_play_ui;
 
-	vector<RoomTile> m_tiles;
+	vector<RoomTile*> m_tiles;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

@@ -37,6 +37,13 @@ void InGameState::Update(sf::Time deltaTime)
 	//Get mouse & keyboard inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
 	(*CurrentGame).m_playerShip->update(deltaTime);
+
+	//Interaction with rooms
+	Warship& ship = m_warships[0];
+	for (vector<Room*>::iterator it = ship.m_rooms.begin(); it != ship.m_rooms.end(); it++)
+	{
+		(*it)->Update();
+	}
 }
 
 void InGameState::Draw()
@@ -47,13 +54,22 @@ void InGameState::Draw()
 	(*CurrentGame).drawScene();//background
 
 	//PIRATES
-	for (vector<RoomTile>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+
+	//tiles
+	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 	{
-		it->Draw((*CurrentGame).m_mainScreen);
+		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
+	//rooms
 	Warship& ship = m_warships[0];
 	for (vector<Room*>::iterator it = ship.m_rooms.begin(); it != ship.m_rooms.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//crew
+	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}

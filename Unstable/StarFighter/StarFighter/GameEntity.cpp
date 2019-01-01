@@ -14,8 +14,16 @@ GameEntity::GameEntity(sf::Vector2f size) : GameEntity()
 }
 
 
-void GameEntity::Update(MouseAction mouse_click)
+void GameEntity::Update()
 {
+	//update position
+	m_shape_container.setPosition(m_position);
+	m_shape.setPosition(m_position);
+	m_text.SetPosition(m_position);
+
+	//get inputs
+	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+
 	if ((*CurrentGame).m_window_has_focus == true
 		&& (*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
 		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)

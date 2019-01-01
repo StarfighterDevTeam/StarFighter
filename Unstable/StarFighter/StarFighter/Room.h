@@ -30,6 +30,11 @@ public:
 	~Room();
 
 	RoomType m_type;
+
+	vector<RoomTile*> m_tiles;
+	vector<CrewMember*> m_crew;
+	RoomTile* GetFreeRoomTile();
+
 };
 
 #endif //ROOM_H_INCLUDED

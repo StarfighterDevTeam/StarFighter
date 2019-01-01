@@ -22,6 +22,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 {
 	m_type = type;
 
+	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
 	m_position.x = ROOMTILE_OFFSET_X + (2.f * upcorner_x + width - 1) * 0.5f * ROOMTILE_SIZE;
 	m_position.y = ROOMTILE_OFFSET_Y + (2.f * upcorner_y + height - 1) * 0.5f * ROOMTILE_SIZE;
 
@@ -30,14 +31,16 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	{
 		for (int x = upcorner_x; x < upcorner_x + width; x++)
 		{
-			(*CurrentGame).m_tiles.push_back(RoomTile(x, y, this));
+			RoomTile* tile = new RoomTile(x, y, this);
+			(*CurrentGame).m_tiles.push_back(tile);
+			m_tiles.push_back(tile);
 		}
 	}
 
 	//UI
 	m_shape_container.setPosition(m_position);
-	m_shape_container.setSize(sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height));
-	m_shape_container.setOrigin(sf::Vector2f(ROOMTILE_SIZE * width * 0.5f, ROOMTILE_SIZE * height * 0.5f));
+	m_shape_container.setSize(m_size);
+	m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
 	m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 	m_shape_container.setOutlineThickness(2.f);
 	m_shape_container.setOutlineColor(sf::Color::Magenta);
@@ -52,4 +55,17 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 Room::~Room()
 {
 	
+}
+
+RoomTile* Room::GetFreeRoomTile()
+{
+	for (vector<RoomTile*>::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
+	{
+		if ((*it)->m_crew == NULL)
+		{
+			return *it;
+		}
+	}
+
+	return NULL;
 }

@@ -19,7 +19,7 @@ public:
 	RectangleShape m_shape;
 	SFText m_text;
 
-	void Update(MouseAction mouse_click);
+	void Update();
 	void Draw(sf::RenderTexture& screen);
 };
 

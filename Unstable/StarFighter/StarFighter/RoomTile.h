@@ -6,6 +6,7 @@
 #include "GameEntity.h"
 
 class Room;//forward declaration
+class CrewMember;
 
 #define ROOMTILE_SIZE		32.f
 #define ROOMTILE_OFFSET_X	200.f
@@ -18,6 +19,7 @@ public:
 	~RoomTile();
 
 	Room* m_room;
+	CrewMember* m_crew;
 	int m_coord_x;
 	int m_coord_y;
 };
