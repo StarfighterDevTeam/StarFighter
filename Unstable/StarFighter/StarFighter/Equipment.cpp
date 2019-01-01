@@ -27,7 +27,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 
 			m_UI_display_name = "Energetic weapon";
 			m_UI_display_name_short = "Energetic\nweapon";
-			m_UI_description = "Allows an Energetic weapon to be equipped in the Weapon module";
+			m_UI_description = "Allows an Energetic weapon to be\nequipped in the Weapon module";
 			break;
 		}
 		case Equipment_CQExtension:
@@ -38,7 +38,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 
 			m_UI_display_name = "CQ Extension";
 			m_UI_display_name_short = "CQ\nExtension";
-			m_UI_description = "Allows 2 additional crew members to live in the robot";
+			m_UI_description = "Allows 2 additional crew members\nto live in the robot";
 			break;
 		}
 		case Equipment_LightPlate:
@@ -47,7 +47,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 			m_weight = 1;
 			
 			m_UI_display_name = "Light plate";
-			m_UI_description = "Physical attacks hit the armor plate instead of the module";
+			m_UI_description = "Physical attacks hit the armor plate\ninstead of the module";
 			break;
 		}
 		case Equipment_HeavyPlate:
@@ -56,7 +56,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 			m_weight = 2;
 			
 			m_UI_display_name = "Heavy plate";
-			m_UI_description = "Physical attacks hit the armor plate instead of the module";
+			m_UI_description = "Physical attacks hit the armor plate\ninstead of the module";
 			break;
 		}
 		case Equipment_GeneratorBooster:
@@ -64,12 +64,10 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 			m_weight = 1;
 			m_cooldown = 3;
 			m_module_equipable = Module_Generator;
-
-			m_effect = new EquipmentEffect(Effect_GeneratorBooster, NULL, this);
 			
 			m_UI_display_name = "Generator booster";
 			m_UI_display_name_short = "Generator\nbooster";
-			m_UI_description = "Generates automatically 3 EC when every 4 turns";
+			m_UI_description = "Generates automatically 3 EC\nevery 4 turns";
 
 			break;
 		}
@@ -84,7 +82,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 
 			m_UI_display_name = "Gadget Jammer";
 			m_UI_display_name_short = "Gadget\nJammer";
-			m_UI_description = "-1 chance to be hit by enemy ranged weapons";
+			m_UI_description = "-1 chance to be hit by\nenemy ranged weapons";
 			break;
 		}
 		case Equipment_GadgetEMP:
@@ -98,7 +96,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 
 			m_UI_display_name = "Gadget E.M.P.";
 			m_UI_display_name_short = "Gadget\nE.M.P.";
-			m_UI_description = "Removes all EC from an opponent module";
+			m_UI_description = "Removes all EC from\nan opponent module";
 			break;
 		}
 		case Equipment_WeaponsScope:
@@ -111,7 +109,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 
 			m_UI_display_name = "Weapon Scope";
 			m_UI_display_name_short = "Weapon\nScope";
-			m_UI_description = "+1 chance to hit on this ranged weapon";
+			m_UI_description = "+1 chance to hit for\nthis ranged weapon";
 			break;
 		}
 	}

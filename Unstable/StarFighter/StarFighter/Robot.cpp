@@ -1604,9 +1604,10 @@ int Robot::GenerateEnergyCells()
 
 			for (vector<Equipment*>::iterator it2 = (*it).m_equipments.begin(); it2 != (*it).m_equipments.end(); it2++)
 			{
-				if ((*it2)->m_type == Equipment_GeneratorBooster && ((*it2)->m_cooldown == 0 || (*it2)->m_cooldown_timer == (*it2)->m_cooldown))
+				if ((*it2)->m_type == Equipment_GeneratorBooster && (*it2)->m_cooldown == (*it2)->m_cooldown_timer)
 				{
 					cells += 3;
+					(*it2)->m_cooldown_timer = 0;
 				}
 			}
 
