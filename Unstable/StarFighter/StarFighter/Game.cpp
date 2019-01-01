@@ -996,6 +996,11 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 		{
 			(*CurrentGame).m_play_ui = this;
 		}
+		//BALANCE
+		else if ((*CurrentGame).m_hovered_ui->m_type == UI_Balance)
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
 		//SELECT WEAPON ATTACK
 		else if (m_hovered && mouse_click == Mouse_LeftClick && (*CurrentGame).m_hovered_ui->m_type == UI_WeaponAttack && (*CurrentGame).m_phase == Phase_AttackPlanning)
 		{

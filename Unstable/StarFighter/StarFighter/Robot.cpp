@@ -783,6 +783,72 @@ void Robot::InitializeUI()
 	m_UI_stats.setCharacterSize(24);
 	m_UI_stats.setColor(sf::Color(255, 255, 255, 255));
 	m_UI_stats.setString("HEALTH POINTS\nENERGY CELLS\nBALANCE\nWEIGHT\nSTATUS");
+
+	//"Balance" button
+	UI_Element ui_b(this);
+
+	ui_b.m_type = UI_Balance;
+	ui_b.m_team = (TeamAlliances)m_index;
+
+	float offset_bal_x = 660.f + robot_offset;
+	float offset_bal_y = 935.f;
+	float sizebal_x = 180;
+	float sizebal_y = 30.f;
+
+	ui_b.m_shape_container.setPosition(sf::Vector2f(offset_bal_x, offset_bal_y));
+	ui_b.m_shape_container.setSize(sf::Vector2f(sizebal_x, sizebal_y));
+	ui_b.m_shape_container.setOrigin(sf::Vector2f(sizebal_x * 0.5f, sizebal_y * 0.5));
+	ui_b.m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
+	ui_b.m_shape_container.setOutlineThickness(2);
+	ui_b.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+	ui_b.m_shape.setPosition(sf::Vector2f(offset_bal_x, offset_bal_y));
+	ui_b.m_shape.setSize(sf::Vector2f(sizebal_x, sizebal_y));
+	ui_b.m_shape.setOrigin(sf::Vector2f(sizebal_x * 0.5f, sizebal_y * 0.5));
+	ui_b.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+	ui_b.m_shape.setOutlineThickness(0);
+	ui_b.m_shape.setFillColor(sf::Color(255, 255, 255, 255));
+
+	ui_b.m_text.setPosition(sf::Vector2f(offset_bal_x, offset_bal_y));
+	ui_b.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	ui_b.m_text.setCharacterSize(16);
+	ui_b.m_text.setColor(sf::Color(0, 0, 0, 255));
+	ui_b.m_text.setString("GET BALANCED: -10 EC");
+	ui_b.m_text.setPosition(sf::Vector2f(offset_bal_x - ui_b.m_text.getGlobalBounds().width * 0.5f + 8.f, offset_bal_y - ui_b.m_text.getGlobalBounds().height * 0.5f - 4.f));
+
+	m_UI_buttons.push_back(ui_b);
+}
+
+RobotSlot* Robot::GetEntityParentSlot(GameEntity* entity, UI_Type type)
+{
+	if (type == UI_Module)
+	{
+		Module* module = (Module*)entity;
+		if (module == NULL)
+		{
+			return NULL;
+		}
+		else
+		{
+			return module->m_owner;
+		}
+	}
+	else if (type == UI_Equipment)
+	{
+		Equipment* equipment = (Equipment*)entity;
+		if (equipment == NULL)
+		{
+			return NULL;
+		}
+		else
+		{
+			return equipment->m_owner;
+		}
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 string Robot::GetCrewMemberName(CrewType type)
@@ -1530,6 +1596,18 @@ void Robot::UpdateUI()
 		ui_ec.m_shape_container.setFillColor(sf::Color::Green);
 
 		m_UI_ec_available.push_back(ui_ec);
+	}
+
+
+	//"Balance" button
+	for (vector<UI_Element>::iterator it = m_UI_buttons.begin(); it != m_UI_buttons.end(); it++)
+	{
+		if (it->m_type == UI_Balance)
+		{
+			ostringstream ss_bal;
+			ss_bal << "GET BALANCED: " << m_unbalanced_value << " EC";
+			it->m_text.setString(ss_bal.str());
+		}
 	}
 }
 
@@ -2464,7 +2542,7 @@ bool Robot::SetEnergyCellsOnBalance()
 {
 	if (m_unbalanced_counter == 0)
 	{
-		printf("Robot is already balanced.\n");
+		(*CurrentGame).UI_AddEventLog("is already balanced", Event_Error, m_index);
 		return false;
 	}
 	else if (m_energy_cells_available < m_unbalanced_value)
@@ -2480,6 +2558,8 @@ bool Robot::SetEnergyCellsOnBalance()
 		m_energy_cells -= m_unbalanced_value;
 		m_unbalanced_counter = 0;
 		m_unbalanced_value = 0;
+
+		(*CurrentGame).UI_AddEventLog("'s balance restored by using ECs.", Event_Balance, m_index);
 		return true;
 	}
 }

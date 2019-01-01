@@ -258,6 +258,10 @@ void InGameState::UI_GetAction(int robot_index)
 			(*CurrentGame).m_UI_events_log.clear();
 			(*CurrentGame).UI_AddEventLog(" has played.", Event_Neutral, r1);
 		}	 
+		else if ((*CurrentGame).m_play_ui->m_type == UI_Balance)
+		{
+			m_robots[r1].SetEnergyCellsOnBalance();
+		}
 		//Energy Cells attribution
 		else if ((*CurrentGame).m_play_ui->m_type == UI_EC_Slot_Module && (*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
@@ -739,11 +743,15 @@ void InGameState::Draw()
 		}
 
 		//modules
+		//<weapon>
+		//<weapon attack, cost, cost, ...>
+		//<weapon attack, cost, cost, ...>
 		for (vector<vector<UI_Element> >::iterator it = m_robots[r].m_UI_modules.begin(); it != m_robots[r].m_UI_modules.end(); it++)
 		{
 			for (vector<UI_Element>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 			{
-				if (async_phase == false || r == r1)
+				RobotSlot* slot = m_robots[r].GetEntityParentSlot(it2->m_parent, it2->m_type);
+				if (r == r1 || (slot != NULL && slot->m_is_revealed == true))
 				{
 					it2->Draw((*CurrentGame).m_mainScreen);
 				}
@@ -775,6 +783,10 @@ void InGameState::Draw()
 				{
 					it->Draw((*CurrentGame).m_mainScreen);
 				}
+				else if (it->m_type == UI_Balance && m_robots[r].m_unbalanced_counter > 0)
+				{
+					it->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 		}
 
@@ -788,10 +800,7 @@ void InGameState::Draw()
 			{
 				if (async_phase == false || r == r1)
 				{
-					//if (it2->m_type == UI_EndTurn)
-					//{
-						it2->Draw((*CurrentGame).m_mainScreen);
-					//}
+					it2->Draw((*CurrentGame).m_mainScreen);
 				}
 			}
 		}

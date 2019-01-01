@@ -28,7 +28,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_health_max = 20;
 
 			m_UI_display_name = "Head";
-			m_UI_description = "Requires a Captain or a Pilot to active the robot.\nYou LOSE the game if the Head is destroyed.";
+			m_UI_description = "Requires a Captain or a Pilot to\nactivate the robot.\nYou LOSE the game if it gets destroyed.";
 			break;
 		}
 		case Module_Stabilizers:
@@ -100,7 +100,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_energy_cells_max = 2;
 
 			m_UI_display_name = "Infirmary";
-			m_UI_description = "Heals crew members present in the module each turn.\n1 EC = 3hp regent per turn";
+			m_UI_description = "Heals crew members present in the module.\n1 EC = 3hp regent per turn";
 			break;
 		}
 		case Module_Radar:
@@ -115,7 +115,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_effect->m_energy_cost = 1;
 
 			m_UI_display_name = "Radar";
-			m_UI_description = "Reveals a target enemy module and its equipments for 1 EC";
+			m_UI_description = "Reveals a target enemy slot for 1 EC.\nRequires a crew member to use.";
 			break;
 		}
 		case Module_Sensors:

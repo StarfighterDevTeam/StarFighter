@@ -90,6 +90,7 @@ public:
 	bool SetMedicTarget(CrewMember* medic, CrewMember* target);
 	bool SetEnergyCellsOnBalance();
 	void ReloadWeapons();
+	RobotSlot* GetEntityParentSlot(GameEntity* entity, UI_Type type);
 
 	ActionAttack GetExecutionAttack();
 	ActionAttack GetCounterAttack();

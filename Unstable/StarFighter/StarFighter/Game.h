@@ -82,8 +82,8 @@ public:
 
 //ROBOT
 #define MAX_ROBOT_WEIGHT				25
-#define MAX_ROBOT_ENERGY_CELLS		17
-#define MAX_EVENTS_LOG_LINES			20
+#define MAX_ROBOT_ENERGY_CELLS			17
+#define MAX_EVENTS_LOG_LINES			23
 
 
 enum UI_EventsLogType
@@ -325,6 +325,7 @@ enum UI_Type
 	UI_EC_Slot_Module,
 	UI_EC_Slot_Equipment,
 	UI_EC_Available,
+	UI_Balance,
 	NB_UI_TYPES,
 };
 
