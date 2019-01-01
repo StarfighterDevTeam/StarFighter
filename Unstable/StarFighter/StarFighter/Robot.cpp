@@ -998,11 +998,14 @@ void Robot::UpdateUI()
 	//Robot stats
 	ostringstream sr;
 	sr << "HEALTH: " << m_health << "/" << m_health_max << "\n";
-	sr << "BALANCE: " << GetBalanceScore() << "\n";
+	sr << "BALANCE: " << GetBalanceScore();
+	if (m_unbalanced_counter > 0)
+	{
+		sr << ", UNBALANCE: -" << m_unbalanced_value;
+	}
+	sr << "\n";
 	sr << "ENERGY CELLS: " << m_energy_cells << "/" << MAX_ROBOT_ENERGY_CELLS << "\n";
 	sr << "WEIGHT: " << m_weight;
-	m_balance_bonus = 2;
-	m_attack_speed_bonus = -2;
 	if (m_balance_bonus > 0 && m_attack_speed_bonus < 0)
 	{
 		sr << " (BALANCE +" << m_balance_bonus << ", SPEED " << m_attack_speed_bonus << ")";
@@ -1474,7 +1477,7 @@ void Robot::UpdateUI()
 		}
 	}
 
-	//Slots
+	//Targets on slots
 	for (vector<UI_Element>::iterator it = m_UI_slots.begin(); it != m_UI_slots.end(); it++)
 	{
 		it->m_shape.setFillColor(sf::Color(0, 0, 0, 0));
@@ -1882,22 +1885,37 @@ void Robot::UpdateCooldowns()
 				(*it2)->m_nb_targets_remaining = (*it2)->m_nb_targets;
 			}
 		}
+	}
 
-		//Unbalanced status update
-		if (m_unbalanced_counter > 0)
+	//Unbalanced status update
+	if (m_unbalanced_counter > 0)
+	{
+		m_unbalanced_counter--;
+
+		//Gets balanced again
+		if (m_unbalanced_counter == 0)
 		{
-			m_unbalanced_counter--;
+			m_unbalanced_value = 0;
+			m_grounded = false;
+			(*CurrentGame).UI_AddEventLog("gets balanced again.", Event_Balance, m_index);
+		}
+	}
 
-			//Gets balanced again
-			if (m_unbalanced_counter == 0)
+	//Reset Guard speed
+	m_guard_speed = 0;
+}
+
+void Robot::ReloadWeapons()
+{
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
+		if (it->m_weapon != NULL)
+		{
+			for (vector<WeaponAttack*>::iterator it2 = it->m_weapon->m_attacks.begin(); it2 != it->m_weapon->m_attacks.end(); it2++)
 			{
-				m_unbalanced_value = 0;
-				m_grounded = false;
+				(*it2)->m_nb_targets_remaining = (*it2)->m_nb_targets;
 			}
 		}
-
-		//Reset Guard speed
-		m_guard_speed = 0;
 	}
 }
 
@@ -2233,57 +2251,62 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 
 	if (module == NULL)
 	{
-		printf("Cannot attack empty modules.\n");
+		(*CurrentGame).UI_AddEventLog("Cannot attack empty modules.", Event_Error, m_index);
 		return false;
 	}
 	else if (attack->m_nb_targets_remaining == 0)
 	{
-		printf("Targets already assigned for this weapon during this turn.\n");
+		(*CurrentGame).UI_AddEventLog("All targets already assigned for this weapon during this turn.", Event_Error, m_index);
 		return false;
 	}
 	else if (m_energy_cells_available < attack->m_energy_cost)
 	{
-		printf("Cannot attack: not enough Enery Cells available (%d) to pay the cost of this attack (%d)\n", m_energy_cells_available, attack->m_energy_cost);
+		(*CurrentGame).UI_AddEventLog("Insufficient Energy Cells to pay the cost of this attack.", Event_Error, m_index);
 		return false;
 	}
 	else if (module->m_shutdown_counter > 0)
 	{
-		printf("Cannot attack: weapon module is shut down.\n");
+		(*CurrentGame).UI_AddEventLog("Weapon module is shut down.", Event_Error, m_index);
 		return false;
 	}
 	else if (module->m_health == 0)
 	{
-		printf("Cannot attack: weapon module is destroyed and must be repaired first in order to be used.\n");
+		(*CurrentGame).UI_AddEventLog("Weapon module is destroyed.", Event_Error, m_index);
 		return false;
 	}
 	else if (m_unbalanced_counter > 0)
 	{
-		printf("Cannot attack: robot is unbalanced.\n");
+		(*CurrentGame).UI_AddEventLog("Robot cannot attack because he's unbalanced.", Event_Error, m_index);
 		return false;
 	}
 	else if (attack->m_owner->m_ranged == false && (target_index == Index_FootL || target_index == Index_FootR || target_index == Index_LegL || target_index == Index_LegR))
 	{
-		printf("Cannot attack: lower parts (legs and feet) can't be targeted by close-combat attacks.\n");
+		(*CurrentGame).UI_AddEventLog("Cannot attack lower parts (lets and feet) with close-combat attacks.", Event_Error, m_index);
 		return false;
 	}
 	else if (attack->m_crew_required != NB_CREW_TYPES && attack->m_crew_required != Crew_Any && attack->m_owner->m_owner->HasCrewRequired(attack->m_crew_required) == false)
 	{
-		printf("Cannot attack: the attack requires a specific type of valid crew member in the module (not stunned).\n");
+		(*CurrentGame).UI_AddEventLog("Specific crew member required missing or stunned.", Event_Error, m_index);
 		return false;
 	}
 	else if (attack->m_crew_required == Crew_Any && attack->m_owner->m_owner->HasCrewRequired(attack->m_crew_required) == false)
 	{
-		printf("Cannot attack: the attack requires a valid crew member in the module (not stunned).\n");
+		(*CurrentGame).UI_AddEventLog("Crew member missing or stunned, can't execute this attack.", Event_Error, m_index);
 		return false;
 	}
 	else if (attack->m_owner->m_energetic == true && module->m_owner->CanEquipEnergeticWeapon() == false)
 	{
-		printf("Cannot attack: energetic weapons require an operational Energetic weapon equipement (powered with 1 EC) to be used.\n");
+		(*CurrentGame).UI_AddEventLog("Energetic weapons require an operational Energy weapon equipment\n(powered with 1 Energy Cell).", Event_Error, m_index);
 		return false;
 	}
 	else if (attack->m_owner->m_requires_close_distance == true && (*CurrentGame).m_distance == Distance_Ranged)
 	{
-		printf("Cannot attack: this attack requires to start the turn in close-combat position.\n");
+		(*CurrentGame).UI_AddEventLog("This attack requires to be in close-combat.", Event_Error, m_index);
+		return false;
+	}
+	else if (attack->m_owner->m_ranged == false && (*CurrentGame).m_phase == Phase_CounterAttack)
+	{
+		(*CurrentGame).UI_AddEventLog("Counter-attack must use a close-combat weapon.", Event_Error, m_index);
 		return false;
 	}
 	else
@@ -2300,6 +2323,7 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		ActionAttack action;
 		action.m_attack = attack;
 		action.m_target_index = target_index;
+		action.m_resolved = false;
 
 		for (int i = 0; i < attack->m_nb_hits; i++)
 		{

@@ -40,12 +40,14 @@ public:
 	void GrabResolution();
 	void GuardResolution();
 
-	bool ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution);
-	bool CounterAttack(Robot* attacker);
-	bool Execution(Robot* attacker);
+	bool ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution, bool &triggers_counterattack);
+	void ClearAttacksListResolved();
+	int GetRobotIndexOfLastAttackResolved();
+
+	int m_nb_attacks_becore_contextual;
 
 	//UI
-	void UI_GetAction(sf::Time deltaTime, int robot_index);
+	void UI_GetAction(int robot_index);
 	void UI_SyncSml(int crew_index, int robot_index);
 	SFText m_UI_turn;
 	SFText m_UI_phase;

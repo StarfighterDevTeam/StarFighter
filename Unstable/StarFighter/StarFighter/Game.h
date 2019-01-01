@@ -221,6 +221,13 @@ enum WeaponAttackType
 	NB_WEAPON_ATTACK_TYPES,
 };
 
+enum Hit_Mode
+{
+	Hit_OneSlot,
+	Hit_AdjacentSlots,
+	Hit_Line,
+};
+
 class Weapon;//foreward declaration
 class WeaponAttack : public GameEntity
 {
@@ -239,6 +246,7 @@ public:
 	int m_nb_hits;
 	int m_nb_targets;
 	int m_nb_targets_remaining;
+	Hit_Mode m_hitmode;
 	CrewType m_crew_required;
 
 	string m_UI_display_name;
@@ -288,6 +296,7 @@ struct ActionAttack
 {
 	SlotIndex m_target_index;
 	WeaponAttack* m_attack;
+	bool m_resolved;
 };
 
 struct ActionEffect

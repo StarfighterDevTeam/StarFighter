@@ -89,6 +89,7 @@ public:
 	bool SetEquipmentEffectOnSlot(EquipmentEffect* effect, SlotIndex target_index);
 	bool SetMedicTarget(CrewMember* medic, CrewMember* target);
 	bool SetEnergyCellsOnBalance();
+	void ReloadWeapons();
 
 	ActionAttack GetExecutionAttack();
 	ActionAttack GetCounterAttack();

@@ -98,6 +98,7 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_secondary->m_speed = 5;
 			attack_secondary->m_energy_cost = 3;
 			attack_secondary->m_crew_required = Crew_Warrior;
+			attack_secondary->m_hitmode = Hit_AdjacentSlots;
 			attack_secondary->m_UI_display_name = "Explosive smash";
 			attack_secondary->m_UI_description = "Hit 1 target and all adjacents";
 			m_attacks.push_back(attack_secondary);

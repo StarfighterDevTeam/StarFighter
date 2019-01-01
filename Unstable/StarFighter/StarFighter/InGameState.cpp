@@ -148,14 +148,11 @@ void InGameState::InitRobots()
 	robot2.m_opponent = &robot;
 }
 
-void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
+void InGameState::UI_GetAction(int robot_index)
 {
 	//Get UI action
 	int r1 = robot_index;
 	int r2 = (r1 + 1) % 2;
-
-	//Get mouse inputs
-	(*CurrentGame).GetMouseInputs(deltaTime);
 
 	//Reset UI flags
 	(*CurrentGame).m_hovered_ui = NULL;
@@ -227,7 +224,7 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 	else if (m_robots[robot_index].m_grounded == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
 	{
 		m_robots[robot_index].m_ready_to_change_phase = true;
-		(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's stuck on ground.\n", Event_Shutdown, robot_index);
+		(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's stuck on ground (x2 damage).\n", Event_Shutdown, robot_index);
 		return;
 	}
 	
@@ -237,7 +234,12 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 	{
 		m_robots[r1].m_ready_to_change_phase = true;
 		(*CurrentGame).m_UI_events_log.clear();
-		(*CurrentGame).UI_AddEventLog(" has played.", Event_Neutral, r1);
+		if ((*CurrentGame).m_selected_ui != NULL)
+		{
+			(*CurrentGame).m_selected_ui->m_selected = false;
+			(*CurrentGame).m_selected_ui = NULL;
+		}
+		(*CurrentGame).UI_AddEventLog("has played.", Event_Neutral, r1);
 	}
 
 	if ((*CurrentGame).m_play_ui != NULL)
@@ -247,7 +249,12 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 		{
 			m_robots[r1].m_ready_to_change_phase = true;
 			(*CurrentGame).m_play_ui->m_hovered = false;
-
+			if ((*CurrentGame).m_selected_ui != NULL)
+			{
+				(*CurrentGame).m_selected_ui->m_selected = false;
+				(*CurrentGame).m_selected_ui = NULL;
+			}
+			
 			(*CurrentGame).m_UI_events_log.clear();
 			(*CurrentGame).UI_AddEventLog(" has played.", Event_Neutral, r1);
 		}	 
@@ -316,6 +323,12 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 						WeaponAttack* attack = module->m_owner->m_weapon->m_selected_attack;
 						SlotIndex target_index = target_slot->m_index;
 						m_robots[r1].SetWeaponAttackOnSlot(attack, target_index);
+
+						if (attack->m_nb_targets_remaining == 0)
+						{
+							(*CurrentGame).m_selected_ui->m_selected = false;
+							(*CurrentGame).m_selected_ui = NULL;
+						}
 					}
 					//Active ability
 					else if (module->m_effect != NULL)
@@ -323,6 +336,12 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 						EquipmentEffect* effect = module->m_effect;
 						SlotIndex target_index = target_slot->m_index;
 						m_robots[r1].SetEquipmentEffectOnSlot(effect, target_index);
+
+						if (module->m_used == true)
+						{
+							(*CurrentGame).m_selected_ui->m_selected = false;
+							(*CurrentGame).m_selected_ui = NULL;
+						}
 					}
 				}
 			}
@@ -336,6 +355,12 @@ void InGameState::UI_GetAction(sf::Time deltaTime, int robot_index)
 						EquipmentEffect* effect = equipment->m_effect;
 						SlotIndex target_index = target_slot->m_index;
 						m_robots[r1].SetEquipmentEffectOnSlot(effect, target_index);
+
+						if (equipment->m_used == true)
+						{
+							(*CurrentGame).m_selected_ui->m_selected = false;
+							(*CurrentGame).m_selected_ui = NULL;
+						}
 					}
 				}
 			}
@@ -389,6 +414,8 @@ void InGameState::UI_SyncSml(int crew_index, int robot_index)
 
 void InGameState::Update(sf::Time deltaTime)
 {
+	//Get mouse & keyboard inputs
+	(*CurrentGame).GetMouseInputs(deltaTime);
 	(*CurrentGame).m_playerShip->update(deltaTime);
 
 	//Phase shift
@@ -417,22 +444,22 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		if (m_robots[0].m_ready_to_change_phase == false)
 		{
-			UI_GetAction(deltaTime, 0);
+			UI_GetAction(0);
 		}
 		else
 		{
-			UI_GetAction(deltaTime, 1);
+			UI_GetAction(1);
 		}
 	}
 	else if ((*CurrentGame).m_phase == Phase_AttackPlanning)
 	{
 		if (m_robots[0].m_ready_to_change_phase == false)
 		{
-			UI_GetAction(deltaTime, 0);
+			UI_GetAction(0);
 		}
 		else
 		{
-			UI_GetAction(deltaTime, 1);
+			UI_GetAction(1);
 		}
 	}
 	else if ((*CurrentGame).m_phase == Phase_EffectsResolution)
@@ -456,11 +483,114 @@ void InGameState::Update(sf::Time deltaTime)
 	else if ((*CurrentGame).m_phase >= Phase_AttackResolution_12 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
 	{
 		AttackResolution();
-		m_robots[0].m_ready_to_change_phase = true;
-		m_robots[1].m_ready_to_change_phase = true;
+		if ((*CurrentGame).m_phase != Phase_Execution && (*CurrentGame).m_phase != Phase_CounterAttack)
+		{
+			m_robots[0].m_ready_to_change_phase = true;
+			m_robots[1].m_ready_to_change_phase = true;
+		}
+	}
+	else if ((*CurrentGame).m_phase == Phase_Execution)
+	{
+		int r1 = GetRobotIndexOfLastAttackResolved();
+		int r2 = (r1 + 1) % 2;
+
+		m_robots[r2].m_ready_to_change_phase = true;
+
+		UI_GetAction(r1);
+
+		if (m_robots[r1].m_ready_to_change_phase == true && m_robots[r2].m_ready_to_change_phase == true)
+		{
+			//resolve the execution if used
+			if ((*CurrentGame).m_attacks_list.size() > m_nb_attacks_becore_contextual)
+			{
+				(*CurrentGame).UI_AddEventLog("launchs an execution (x2 damage, can't miss).", Event_Neutral, r1);
+				bool a, b, c;
+				ResolveAttack((*CurrentGame).m_attacks_list.back().m_attack, (*CurrentGame).m_attacks_list.back().m_target_index, true, false, a, b, c);
+				(*CurrentGame).m_attacks_list.back().m_resolved = true;
+			}
+			else
+			{
+				(*CurrentGame).UI_AddEventLog("declines to launch an execution.", Event_Neutral, r1);
+			}
+			
+			//remove all attacks already resolved from the list
+			ClearAttacksListResolved();
+			
+			//get back to resolving the remaining attacks
+			(*CurrentGame).m_phase = (GamePhase)(Phase_AttackResolution_12 - 1);
+		}
+	}
+	else if ((*CurrentGame).m_phase == Phase_CounterAttack)
+	{
+		int r1 = GetRobotIndexOfLastAttackResolved();
+		int r2 = (r1 + 1) % 2;
+
+		m_robots[r2].m_ready_to_change_phase = true;
+
+		UI_GetAction(r1);
+
+		if (m_robots[r1].m_ready_to_change_phase == true && m_robots[r2].m_ready_to_change_phase == true)
+		{
+			//resolve the execution if used
+			if ((*CurrentGame).m_attacks_list.size() > m_nb_attacks_becore_contextual)
+			{
+				(*CurrentGame).UI_AddEventLog("launchs a counter-attack.", Event_Neutral, r1);
+				bool a, b, c;
+				ResolveAttack((*CurrentGame).m_attacks_list.back().m_attack, (*CurrentGame).m_attacks_list.back().m_target_index, false, true, a, b, c);
+				(*CurrentGame).m_attacks_list.back().m_resolved = true;
+			}
+			else
+			{
+				(*CurrentGame).UI_AddEventLog("declines to launch a counter-attack.", Event_Neutral, r1);
+			}
+
+			//remove all attacks already resolved from the list
+			ClearAttacksListResolved();
+
+			//get back to resolving the remaining attacks
+			(*CurrentGame).m_phase = (GamePhase)(Phase_AttackResolution_12 - 1);
+		}
 	}
 }
 
+void InGameState::ClearAttacksListResolved()
+{
+	GamePhase phase = Phase_AttackResolution_12;
+
+	vector<ActionAttack> old_attacks_list;
+	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
+	{
+		old_attacks_list.push_back(*it);
+	}
+
+	(*CurrentGame).m_attacks_list.clear();
+
+	for (vector<ActionAttack>::iterator it = old_attacks_list.begin(); it != old_attacks_list.end(); it++)
+	{
+		if (it->m_resolved == false)
+		{
+			(*CurrentGame).m_attacks_list.push_back(*it);;
+		}
+	}
+}
+
+int InGameState::GetRobotIndexOfLastAttackResolved()
+{
+	int robot_index = 0;
+	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
+	{
+		if (it->m_resolved == true)
+		{
+			robot_index = it->m_attack->m_owner->m_owner->m_owner->m_index;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	return robot_index;
+}
 
 void InGameState::UpdateUI(sf::Time deltaTime)
 {
@@ -596,7 +726,7 @@ void InGameState::Draw()
 
 	//ROBOT
 	GamePhase& phase = (*CurrentGame).m_phase;
-	bool async_phase = phase == Phase_CrewMovement || phase == Phase_AttackPlanning;
+	bool async_phase = phase == Phase_CrewMovement || phase == Phase_AttackPlanning || phase == Phase_Execution || phase == Phase_CounterAttack;
 
 	int r1 = m_robots[0].m_ready_to_change_phase == true ? 1 : 0;
 	int r2 = (r1 + 1) % 2;
@@ -762,12 +892,19 @@ void InGameState::LoadCSVFile(string scenes_file)
 		m_hand_slots[i].m_text.setColor(sf::Color(0, 0, 0, 255));
 		m_hand_slots[i].m_text.setPosition(sf::Vector2f(200 + CARD_WIDTH / 2 + (CARD_WIDTH + 20) * i + player_index * 700, 900));
 		m_hand_slots[i].m_text.setString("");
-*/
+
 
 bool InGameState::Execution(Robot* attacker)
 {
 	if (attacker->m_unbalanced_counter == 0 && attacker->m_shutdown_global == false)
 	{
+		if (attacker->m_index == 1)
+		{
+			m_robots[0].m_ready_to_change_phase = true;
+		}
+
+		UI_GetAction(attacker->m_index);
+
 		ActionAttack execution = attacker->GetExecutionAttack();
 		if (execution.m_attack != NULL)
 		{
@@ -788,7 +925,8 @@ bool InGameState::Execution(Robot* attacker)
 		return false;
 	}
 }
-
+*/
+/*
 bool InGameState::CounterAttack(Robot* attacker)
 {
 	if (attacker->m_unbalanced_counter == 0 && attacker->m_shutdown_global == false)
@@ -804,7 +942,7 @@ bool InGameState::CounterAttack(Robot* attacker)
 			//Execution?
 			if (triggers_execution)
 			{
-				Execution(attacker);
+				CounterAttack(attacker);
 			}
 
 			return true;
@@ -819,8 +957,9 @@ bool InGameState::CounterAttack(Robot* attacker)
 		return false;
 	}
 }
+*/
 
-bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution)
+bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution, bool &triggers_counterattack)
 {
 	Robot* robot = attack->m_owner->m_owner->m_owner;
 	RobotSlot& robot_slot = *attack->m_owner->m_owner;
@@ -832,8 +971,13 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 	RobotSlot& target_slot = opponent.m_slots[target_index];
 	Module* target_module = target_slot.m_module;
 
+	int speed = (int)(Phase_AttackResolution_1)-(int)(*CurrentGame).m_phase + 1;
+
+	triggers_execution = false;
+	triggers_counterattack = false;
+
 	ostringstream s_attack;
-	s_attack << "is launching attack '" << attack->m_UI_display_name << "' at speed " << attack->m_speed;
+	s_attack << "is launching attack '" << attack->m_UI_display_name << "' at speed " << speed;
 	(*CurrentGame).UI_AddEventLog(s_attack.str(), Event_Neutral, robot->m_index);
 	if (module->m_health == 0)
 	{
@@ -863,16 +1007,18 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 	else//Attack resolution
 	{
 		//Guard perfect?
-		if (opponent.m_guard_speed == attack->m_speed)
+		if (opponent.m_guard_speed == speed && is_execution == false && is_counter_attack == false)
 		{
 			//Counter attack
 			(*CurrentGame).UI_AddEventLog("Attack countered by a perfect guard.\nDo you want to counter-attack?", Event_ContextualChoice, opponent.m_index);
-			CounterAttack(robot);
+
+			(*CurrentGame).m_phase = Phase_CounterAttack;
+			triggers_counterattack = true;
 		}
 		else
 		{
 			//Guard redirection
-			if (attack->m_speed <= opponent.m_guard_speed)
+			if (speed <= opponent.m_guard_speed && is_execution == false && is_counter_attack == false)
 			{
 				Module* shield = opponent.GetShield();
 				if (shield != NULL)
@@ -904,140 +1050,194 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 				range_weapon_used = false;
 			}
 
-			//Randomization of resolutions
-			int gunner_bonus = robot_slot.GetGunnerRangeBonus();
-			int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
-			bool hit_success = weapon->m_ranged == false || is_execution == true || opponent.m_grabbed != NULL ||
-				RandomizeIntBetweenValues(1, 6) + gunner_bonus + equipment_bonus >= attack->m_chance_of_hit + (target_slot.m_type == Slot_Head ? 1 : 0) + opponent.m_jammer_bonus;
-
-			bool fire_success = target_index != Index_Head && attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
-
-			bool electricity_sucess = target_index != Index_Head && attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
-
-			int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
-			int counter_attack_bonus = is_counter_attack ? 5 : 0;
-			int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent.GetBalanceScore();
-
-			//Hit resolution
-			if (hit_success)
+			//Randomization of resolutions (check for any slot if it's been targeted)
+			for (int i = 0; i < NB_SLOT_INDEX; i++)
 			{
-				int damage = attack->m_damage;
-				//Damage on grounded robot x2
-				if (opponent.m_grounded == true || is_execution == true || opponent.m_grabbed != NULL)
+				if (i == target_index || (attack->m_hitmode == Hit_AdjacentSlots && opponent.GetDistanceFromSlotToSlot(target_index, (SlotIndex)i) == 1))
 				{
-					damage *= 2;
-				}
+					target_slot = opponent.m_slots[i];
+					target_module = target_slot.m_module;
 
-				ostringstream s_dmg;
-				s_dmg << "Opponent's attack hits with " << damage << " damage.";
-				(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+					int gunner_bonus = robot_slot.GetGunnerRangeBonus();
+					int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
+					bool hit_success = weapon->m_ranged == false || is_execution == true || opponent.m_grabbed != NULL ||
+						RandomizeIntBetweenValues(1, 6) + gunner_bonus + equipment_bonus >= attack->m_chance_of_hit + (target_slot.m_type == Slot_Head ? 1 : 0) + opponent.m_jammer_bonus;
 
-				bool module_damaged = false;
+					bool fire_success = i != Index_Head && attack->m_chance_of_fire > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_fire;
 
-				//Energetical damage
-				if (weapon->m_energetic)
-				{
-					//Deflector absorption
-					for (vector<RobotSlot>::iterator it = opponent.m_slots.begin(); it != opponent.m_slots.end(); it++)
+					bool electricity_sucess = i != Index_Head && attack->m_chance_of_electricity > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_electricity;
+
+					int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
+					int counter_attack_bonus = is_counter_attack ? 5 : 0;
+					int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent.GetBalanceScore();
+
+					//Hit resolution
+					if (hit_success)
 					{
-						if (it->m_module != NULL && it->m_module->m_type == Module_Deflectors && it->m_module->IsOperationnal())
+						int damage = attack->m_damage;
+						//Damage on grounded robot x2
+						if (opponent.m_grounded == true || is_execution == true || opponent.m_grabbed != NULL)
 						{
-							Module* deflector = it->m_module;
-							if (deflector->m_health > 0)
-							{
-								//Damage absorbed
-								if (deflector->m_health >= damage)
-								{
-									ostringstream s_deflector;
-									s_deflector << "Deflectors absorb " << damage << " damage.";
-
-									deflector->m_health -= damage;
-									damage = 0;
-
-									(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Damage, opponent.m_index);
-								}
-								else
-								{
-									ostringstream s_deflector;
-									s_deflector << "Deflectors absorb " << damage << " damage and are disabled.";
-
-									deflector->m_health = 0;
-									damage -= deflector->m_health;
-
-									(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Damage, opponent.m_index);
-								}
-							}
+							damage *= 2;
 						}
-					}
 
-					//Damage to target module
-					if (damage > 0)
-					{
-						if (target_module != NULL)
+						ostringstream s_dmg;
+						s_dmg << "is successfully hit with " << damage << " damage.";
+						(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+
+						bool module_damaged = false;
+
+						//Energetical damage
+						if (weapon->m_energetic)
 						{
-							module_damaged = true;
-							if (target_module->m_health > damage)
+							//Deflector absorption
+							for (vector<RobotSlot>::iterator it = opponent.m_slots.begin(); it != opponent.m_slots.end(); it++)
 							{
-								ostringstream s_dmg;
-								s_dmg << "Module takes " << damage << " damage.";
-
-								target_module->m_health -= damage;
-
-								(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
-							}
-							else
-							{
-								ostringstream s_dmg;
-								s_dmg << "Module takes " << damage << " damage and is destroyed.";
-
-								target_module->m_health = 0;
-								opponent.DestroySlot(target_slot.m_index);
-
-								(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
-							}
-
-							//Damage to robot
-							if (opponent.m_health > damage)
-							{
-								opponent.m_health -= damage;
-							}
-							else
-							{
-								opponent.m_health = 0;
-								(*CurrentGame).UI_AddEventLog("'s health reached 0 and is destroyed.\nGAME OVER.", Event_Damage, opponent.m_index);
-							}
-						}
-					}
-				}
-				else //Physical damage
-				{
-					if (target_module != NULL)
-					{
-						//Plate absorption (equipement of the target module)
-						for (vector<Equipment*>::iterator it = target_slot.m_equipments.begin(); it != target_slot.m_equipments.end(); it++)
-						{
-							if ((*it)->m_type == Equipment_LightPlate || (*it)->m_type == Equipment_HeavyPlate)
-							{
-								if ((*it)->m_health > 0)
+								if (it->m_module != NULL && it->m_module->m_type == Module_Deflectors && it->m_module->IsOperationnal())
 								{
-									//Damage absorbed by plates
-									if ((*it)->m_health >= damage)
+									Module* deflector = it->m_module;
+									if (deflector->m_health > 0)
+									{
+										//Damage absorbed
+										if (deflector->m_health >= damage)
+										{
+											ostringstream s_deflector;
+											s_deflector << "Deflectors absorb " << damage << " damage.";
+
+											deflector->m_health -= damage;
+											damage = 0;
+
+											(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Damage, opponent.m_index);
+										}
+										else
+										{
+											ostringstream s_deflector;
+											s_deflector << "Deflectors absorb " << damage << " damage and are disabled.";
+
+											deflector->m_health = 0;
+											damage -= deflector->m_health;
+
+											(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Damage, opponent.m_index);
+										}
+									}
+								}
+							}
+
+							//Damage to target module
+							if (damage > 0)
+							{
+								if (target_module != NULL)
+								{
+									module_damaged = true;
+									if (target_module->m_health > damage)
 									{
 										ostringstream s_dmg;
-										s_dmg << "Plates take " << damage << " damage.";
+										s_dmg << "Module takes " << damage << " damage.";
 
-										(*it)->m_health -= damage;
-										damage = 0;
+										target_module->m_health -= damage;
 
 										(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
 									}
 									else
 									{
 										ostringstream s_dmg;
-										s_dmg << "Plates take " << damage << " damage and are destroyed.";
+										s_dmg << "Module takes " << damage << " damage and is destroyed.";
 
-										(*it)->m_health = 0;
-										damage -= (*it)->m_health;
+										target_module->m_health = 0;
+										opponent.DestroySlot((SlotIndex)i);
+
+										(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+									}
+
+									//Damage to robot
+									if (opponent.m_health > damage)
+									{
+										opponent.m_health -= damage;
+									}
+									else
+									{
+										opponent.m_health = 0;
+										(*CurrentGame).UI_AddEventLog("'s health reached 0 and is destroyed.\nGAME OVER.", Event_Damage, opponent.m_index);
+									}
+								}
+							}
+						}
+						else //Physical damage
+						{
+							if (target_module != NULL)
+							{
+								//Plate absorption (equipement of the target module)
+								for (vector<Equipment*>::iterator it = target_slot.m_equipments.begin(); it != target_slot.m_equipments.end(); it++)
+								{
+									if ((*it)->m_type == Equipment_LightPlate || (*it)->m_type == Equipment_HeavyPlate)
+									{
+										if ((*it)->m_health > 0)
+										{
+											//Damage absorbed by plates
+											if ((*it)->m_health >= damage)
+											{
+												ostringstream s_dmg;
+												s_dmg << "Plates take " << damage << " damage.";
+
+												(*it)->m_health -= damage;
+												damage = 0;
+
+												(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+											}
+											else
+											{
+												ostringstream s_dmg;
+												s_dmg << "Plates take " << damage << " damage and are destroyed.";
+
+												(*it)->m_health = 0;
+												damage -= (*it)->m_health;
+
+												(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+											}
+										}
+									}
+								}
+
+								//Damage to module
+								if (damage > 0)
+								{
+									module_damaged = true;
+									if (target_module->m_health > damage)
+									{
+										ostringstream s_dmg;
+										s_dmg << "Module takes " << damage << " damage.";
+
+										target_module->m_health -= damage;
+
+										(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+									}
+									else
+									{
+										ostringstream s_dmg;
+										s_dmg << "Module takes " << damage << " damage and is destroyed.";
+
+										target_module->m_health = 0;
+										opponent.DestroySlot(target_slot.m_index);
+
+										(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+									}
+
+									//Damage to robot
+									if (opponent.m_health > damage)
+									{
+										ostringstream s_dmg;
+										s_dmg << damage << " damage are inflicted to the robot.";
+
+										opponent.m_health -= damage;
+
+										(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+									}
+									else
+									{
+										ostringstream s_dmg;
+										s_dmg << damage << " damage are inflicted to the robot, which is destroyed.\nGAME OVER";
+
+										opponent.m_health = 0;
 
 										(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
 									}
@@ -1045,134 +1245,96 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 							}
 						}
 
-						//Damage to module
-						if (damage > 0)
+						//ONLY IF module has been actually damaged, apply secondary effects
+						if (module_damaged)
 						{
-							module_damaged = true;
-							if (target_module->m_health > damage)
+							//Randomization of damage to crew if module has been damaged
+							for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
 							{
-								ostringstream s_dmg;
-								s_dmg << "Module takes " << damage << " damage.";
+								bool hit_roll = RandomizeIntBetweenValues(1, 6) >= 4;
+								if (hit_roll == true)
+								{
+									(*it)->m_health--;
 
-								target_module->m_health -= damage;
-
-								(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
-							}
-							else
-							{
-								ostringstream s_dmg;
-								s_dmg << "Module takes " << damage << " damage and is destroyed.";
-
-								target_module->m_health = 0;
-								opponent.DestroySlot(target_slot.m_index);
-
-								(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+									(*CurrentGame).UI_AddEventLog("1 damage to crew member in the module.", Event_Damage, opponent.m_index);
+								}
 							}
 
-							//Damage to robot
-							if (opponent.m_health > damage)
+							opponent.UpdateCrew(target_slot.m_index);
+
+							//Fire resolution
+							if (fire_success && target_module != NULL)
 							{
-								ostringstream s_dmg;
-								s_dmg << damage << " damage are inflicted to the robot.";
+								if (target_module->m_fire_counter < 2)
+								{
+									target_module->m_fire_counter = 2;
 
-								opponent.m_health -= damage;
-
-								(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+									(*CurrentGame).UI_AddEventLog("Fire started in module.", Event_Fire, opponent.m_index);
+								}
 							}
-							else
+
+							//Electric resolution
+							if (electricity_sucess && target_module != NULL)
 							{
-								ostringstream s_dmg;
-								s_dmg << damage << " damage are inflicted to the robot, which is destroyed.\nGAME OVER";
+								opponent.ShutdownSlot(target_slot.m_index);
 
-								opponent.m_health = 0;
-
-								(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
+								(*CurrentGame).UI_AddEventLog("Module is shutdown by the hit.", Event_Shutdown, opponent.m_index);
 							}
+
+							//Stun resolution
+							for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+							{
+								bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
+								if (stun_roll == true)
+								{
+									if ((*it)->m_stun_counter < 2)
+									{
+										(*it)->m_stun_counter = 2;
+
+										(*CurrentGame).UI_AddEventLog("Crew member stunned by the hit.", Event_Fire, opponent.m_index);
+									}
+								}
+							}
+
+							//Balance resolution
+							if (unbalanced_score > 0)
+							{
+								if (opponent.m_unbalanced_counter == 0)
+								{
+									opponent.m_unbalanced_counter = 2;
+									opponent.m_unbalanced_value = unbalanced_score;
+
+									(*CurrentGame).UI_AddEventLog("Robot gets unbalaced.", Event_Balance, opponent.m_index);
+								}
+								else
+								{
+									opponent.m_unbalanced_counter = 2;
+									opponent.m_unbalanced_value = unbalanced_score;
+
+									if (opponent.m_grounded == false)
+									{
+										opponent.m_grounded = true;
+										triggers_execution = true;
+
+										(*CurrentGame).UI_AddEventLog("Robot gets unbalanced again and is put on ground.", Event_Balance, opponent.m_index);
+										(*CurrentGame).UI_AddEventLog("Do you want to launch an Execution?", Event_ContextualChoice, robot->m_index);
+									}
+								}
+							}
+
+							//Check global shutdown conditions
+							opponent.UpdateShudownGlobal();
 						}
 					}
-				}
-
-				//Randomization of damage to crew if module has been damaged
-				if (module_damaged)
-				{
-					for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
+					else
 					{
-						bool hit_roll = RandomizeIntBetweenValues(1, 6) >= 4;
-						if (hit_roll == true)
-						{
-							(*it)->m_health--;
-
-							(*CurrentGame).UI_AddEventLog("1 damage to crew member in the module.", Event_Damage, opponent.m_index);
-						}
-					}
-
-					opponent.UpdateCrew(target_slot.m_index);
-				}
-			}
-
-			//Fire resolution
-			if (fire_success && target_module != NULL)
-			{
-				if (target_module->m_fire_counter < 2)
-				{
-					target_module->m_fire_counter = 2;
-
-					(*CurrentGame).UI_AddEventLog("Fire started in module.", Event_Fire, opponent.m_index);
-				}
-			}
-
-			//Electric resolution
-			if (electricity_sucess && target_module != NULL)
-			{
-				opponent.ShutdownSlot(target_slot.m_index);
-
-				(*CurrentGame).UI_AddEventLog("Module is shutdown by the hit.", Event_Shutdown, opponent.m_index);
-			}
-
-			//Stun resolution
-			for (vector<CrewMember*>::iterator it = target_slot.m_crew.begin(); it != target_slot.m_crew.end(); it++)
-			{
-				bool stun_roll = attack->m_chance_of_stun > 0 && RandomizeIntBetweenValues(1, 6) >= attack->m_chance_of_stun;
-				if (stun_roll == true)
-				{
-					if ((*it)->m_stun_counter < 2)
-					{
-						(*it)->m_stun_counter = 2;
-						
-						(*CurrentGame).UI_AddEventLog("Crew member stunned by the hit.", Event_Fire, opponent.m_index);
-					}
-				}
-			}
-
-			//Balance resolution
-			if (unbalanced_score > 0)
-			{
-				if (opponent.m_unbalanced_counter == 0)
-				{
-					opponent.m_unbalanced_counter = 2;
-					opponent.m_unbalanced_value = unbalanced_score;
-
-					(*CurrentGame).UI_AddEventLog("Robot gets unbalaced.", Event_Balance, opponent.m_index);
-				}
-				else
-				{
-					opponent.m_unbalanced_counter = 2;
-					opponent.m_unbalanced_value = unbalanced_score;
-
-					if (opponent.m_grounded == false)
-					{
-						opponent.m_grounded = true;
-						triggers_execution = true;
-
-						(*CurrentGame).UI_AddEventLog("Robot gets unbalanced again and is put on ground.", Event_Balance, opponent.m_index);
-						(*CurrentGame).UI_AddEventLog("Do you want to launch an Execution?", Event_ContextualChoice, robot->m_index);
+						ostringstream s_miss;
+						s_miss << attack->m_UI_display_name << "'s attack dodged";
+						(*CurrentGame).UI_AddEventLog(s_miss.str(), Event_Neutral, opponent.m_index);
 					}
 				}
 			}
 		}
-
-		//Check global shutdown conditions
-		opponent.UpdateShudownGlobal();
 
 		//Distance update
 		(*CurrentGame).m_distance_temp = range_weapon_used ? Distance_Ranged : Distance_Close;
@@ -1190,24 +1352,52 @@ void InGameState::AttackResolution()
 	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
 	{
 		//Bonus for ranged weapons if combat starts from a Ranged distance
+		int speed_bonus = 0;
 		if ((*CurrentGame).m_distance == Distance_Ranged && it->m_attack->m_owner->m_ranged == true)
 		{
-			it->m_attack->m_speed += 2;
+			speed_bonus = 2;
 		}
 
-		if (it->m_attack->m_speed != speed)
+		if (it->m_attack->m_speed + speed_bonus != speed)
 		{
 			continue;
 		}
 
 		printf("Attack resolution (speed %d).\n", speed);
 		bool triggers_execution = false;
-		ResolveAttack(it->m_attack, it->m_target_index, false, false, range_weapon_used, triggers_execution);
+		bool triggers_counterattack = false;
+		ResolveAttack(it->m_attack, it->m_target_index, false, false, range_weapon_used, triggers_execution, triggers_counterattack);
+		it->m_resolved = true;
 
 		//Execution?
-		if (triggers_execution)
+		if (triggers_execution == true)
 		{
-			Execution(it->m_attack->m_owner->m_owner->m_owner);
+			(*CurrentGame).m_phase = Phase_Execution;
+		}
+		//Counter-attack?
+		else if (triggers_counterattack == true)
+		{
+			(*CurrentGame).m_phase = Phase_CounterAttack;
+		}
+
+		if (triggers_execution == true || triggers_counterattack == true)
+		{
+			//lay down a flag that will let us know if the player chooses to launch the contextual attack or decline it
+			m_nb_attacks_becore_contextual = (*CurrentGame).m_attacks_list.size();
+
+			//reload weapons
+			int robot_index = it->m_attack->m_owner->m_owner->m_owner->m_index;
+			m_robots[robot_index].ReloadWeapons();
+
+			//clear targets displayed sooner than usual
+			for (int r = 0; r < 2; r++)
+			{
+				for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
+				{
+					it->m_shape.setFillColor(sf::Color(0, 0, 0, 0));
+				}
+			}
+			return;
 		}
 	}
 
@@ -1344,7 +1534,9 @@ void InGameState::GrabResolution()
 				//Counter-attack
 				(*CurrentGame).UI_AddEventLog("Grab dodged. Do you want to counter-attack?", Event_Grab, opponent.m_index);
 
-				CounterAttack(&opponent);
+				(*CurrentGame).m_phase = Phase_CounterAttack;
+				return;
+				//CounterAttack(&opponent);
 			}
 		}
 	}

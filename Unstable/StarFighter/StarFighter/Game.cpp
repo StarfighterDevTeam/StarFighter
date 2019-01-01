@@ -798,6 +798,7 @@ WeaponAttack::WeaponAttack(WeaponAttackType type, Weapon* owner)
 	m_nb_targets = 1;
 	m_nb_targets_remaining = m_nb_targets;
 	m_crew_required = NB_CREW_TYPES;
+	m_hitmode = Hit_OneSlot;
 }
 
 EquipmentEffect::EquipmentEffect(EquipmentEffectType type, Module* owner_module, Equipment* owner_equipment)
@@ -924,8 +925,10 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 	{
 		if (m_hovered 
 			&& m_team == (TeamAlliances)robot_index 
-			&& (((*CurrentGame).m_phase == Phase_CrewMovement && (m_type == UI_Crew || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))
-			|| ((*CurrentGame).m_phase == Phase_AttackPlanning && (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))))
+			&& (
+			((*CurrentGame).m_phase == Phase_CrewMovement && (m_type == UI_Crew || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))
+			|| (((*CurrentGame).m_phase == Phase_AttackPlanning || (*CurrentGame).m_phase == Phase_Execution || (*CurrentGame).m_phase == Phase_CounterAttack) 
+				&& (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))))
 		{
 			m_selected = true;
 			(*CurrentGame).m_selected_ui = this;
@@ -961,7 +964,7 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 			(*CurrentGame).m_target_ui = this;
 		}
 		//ATTACK and EQUIPMENT ABILITY
-		else if ((*CurrentGame).m_selected_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_type == UI_Slot && (*CurrentGame).m_phase == Phase_AttackPlanning)
+		else if ((*CurrentGame).m_selected_ui->m_type == UI_Module && (*CurrentGame).m_hovered_ui->m_type == UI_Slot && ((*CurrentGame).m_phase == Phase_AttackPlanning || (*CurrentGame).m_phase == Phase_Execution || (*CurrentGame).m_phase == Phase_CounterAttack))
 		{
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
