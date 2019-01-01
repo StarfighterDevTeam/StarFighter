@@ -18,14 +18,11 @@
 #include "SFPanel.h"
 #include "SFTextPop.h"
 
-class Ship;
+using namespace sf;
 
-//Empty class for virtual override purposes
-class GameEntity
-{
-public:
-	GameEntity(){};
-};
+class GameEntity;//forward declaration
+class RoomTile;
+class Ship;
 
 enum SFX_Bank
 {
@@ -46,269 +43,11 @@ enum FontsStyle
 	NBVAL_FontsStyle,//2
 };
 
-using namespace sf;
-
-
-enum CardSlotStatus
-{
-	CardSlot_Free,		//0
-	CardSlot_Occupied,	//1
-	CardSlot_Burnt,		//2
-	CardSlot_Temp,		//3
-};
-
 enum MouseAction
 {
 	Mouse_None,
 	Mouse_LeftClick,
 	Mouse_RightClick,
-};
-
-class CardSlot
-{
-public:
-	CardSlot(){ m_status = CardSlot_Free; m_hovered = false; m_selected = false; }
-	CardSlotStatus m_status;
-	int m_index;
-	void Update(MouseAction mouse_click);
-
-	RectangleShape m_shape_container;
-	RectangleShape m_shape;
-	SFText m_text;
-
-	bool m_hovered;
-	bool m_selected;
-};
-
-//ROBOT
-#define MAX_ROBOT_WEIGHT				25
-#define MAX_ROBOT_ENERGY_CELLS		17
-#define MAX_EVENTS_LOG_LINES			20
-
-
-enum UI_EventsLogType
-{
-	Event_Neutral,
-	Event_Shutdown,
-	Event_Balance,
-	Event_Fire,
-	Event_Stun,
-	Event_Grab,
-	Event_EC,
-	Event_Damage,
-	Event_ContextualChoice,
-	Event_Error,
-};
-
-enum GamePhase
-{
-	Phase_GenerateEC,
-	Phase_CrewMovement,
-	Phase_AttackPlanning,
-	Phase_HealCrew,
-	Phase_RepairModules,
-	Phase_EffectsResolution,
-	Phase_GrabResolution,
-	Phase_GuardResolution,
-	Phase_AttackResolution_12,
-	Phase_AttackResolution_11,
-	Phase_AttackResolution_10,
-	Phase_AttackResolution_9,
-	Phase_AttackResolution_8,
-	Phase_AttackResolution_7,
-	Phase_AttackResolution_6,
-	Phase_AttackResolution_5,
-	Phase_AttackResolution_4,
-	Phase_AttackResolution_3,
-	Phase_AttackResolution_2,
-	Phase_AttackResolution_1,
-	Phase_CooldownResolution,
-	Phase_FireResolution,
-	NB_GAME_PHASES,
-	Phase_Execution,
-	Phase_CounterAttack,
-};
-
-enum SlotIndex
-{
-	Index_Head,
-	Index_LegL,
-	Index_LegR,
-	Index_FootL,
-	Index_FootR,
-	Index_ShoulderL,
-	Index_ShoulderR,
-	Index_HandL,
-	Index_HandR,
-	Index_BodyU,
-	Index_BodyM,
-	Index_BodyD,
-	NB_SLOT_INDEX,
-};
-
-enum CrewType
-{
-	Crew_Captain,
-	Crew_Scientist,
-	Crew_Mechanic,
-	Crew_Pilot,
-	Crew_Engineer,
-	Crew_Warrior,
-	Crew_Medic,
-	Crew_Gunner,
-	Crew_Any,
-	NB_CREW_TYPES,
-};
-
-enum ModuleType
-{
-	Module_Infirmary,
-	Module_Generator,
-	Module_Sensors,
-	Module_Stabilizers,
-	Module_Head,
-	Module_Radar,
-	Module_Weapon,
-	Module_CrewQuarter,
-	Module_Deflectors,
-	Module_Gadget,
-	NB_MODULE_TYPES,
-};
-
-enum EquipmentType
-{
-	Equipment_EnergeticWeapon,
-	Equipment_HeavyPlate,
-	Equipment_LightPlate,
-	Equipment_GeneratorBooster,
-	Equipment_CQExtension,
-	Equipment_GadgetJammer,
-	Equipment_WeaponsScope,
-	Equipment_GadgetEMP,
-	NB_EQUIPMENT_TYPES,
-};
-
-enum WeaponType
-{
-	Weapon_Fist,
-	Weapon_Grab,
-	Weapon_Guard,
-	Weapon_BlasterRifle,
-	Weapon_LaserCannon,
-	Weapon_FireSword,
-	Weapon_Hammer,
-	Weapon_Gun,
-	Weapon_Shield,
-	NB_WEAPON_TYPES,
-};
-
-enum WeaponAttackType
-{
-	WeaponAttack_Fist_1,
-	WeaponAttack_Fist_2,
-	WeaponAttack_Grab_1,
-	WeaponAttack_Guard_1,
-	WeaponAttack_BlasterRifle_1,
-	WeaponAttack_BlasterRifle_2,
-	WeaponAttack_LaserCannon_1,
-	WeaponAttack_LaserCannon_2,
-	WeaponAttack_FireSword_1,
-	WeaponAttack_FireSword_2,
-	WeaponAttack_Hammer_1,
-	WeaponAttack_Hammer_2,
-	WeaponAttack_Gun_1,
-	WeaponAttack_Gun_2,
-	NB_WEAPON_ATTACK_TYPES,
-};
-
-enum Hit_Mode
-{
-	Hit_OneSlot,
-	Hit_AdjacentSlots,
-	Hit_Line,
-};
-
-class Weapon;//foreward declaration
-class WeaponAttack : public GameEntity
-{
-public:
-	WeaponAttack(WeaponAttackType type, Weapon* owner);
-
-	WeaponAttackType m_type;
-	int m_speed;
-	int m_damage;
-	int m_energy_cost;
-	int m_chance_of_hit;
-	int m_chance_of_fire;
-	int m_chance_of_electricity;
-	int m_chance_of_stun;
-	int m_chance_of_unbalance;
-	int m_nb_hits;
-	int m_nb_targets;
-	int m_nb_targets_remaining;
-	Hit_Mode m_hitmode;
-	CrewType m_crew_required;
-
-	string m_UI_display_name;
-	string m_UI_description;
-
-	Weapon* m_owner;
-};
-
-enum EquipmentEffectType
-{
-	Effect_Radar,
-	Effect_EMP,
-	Effect_Jammer,
-	Effect_JetPack,
-	Effect_Repulsion,
-	Effect_WeaponScopes,
-	Effect_GeneratorBooster,
-	NB_EQUIPMENT_ACTION_TYPES,
-};
-
-class Module;
-class Equipment;
-class EquipmentEffect : public GameEntity
-{
-public:
-	EquipmentEffect(EquipmentEffectType type, Module* owner_module, Equipment* owner_equipment);
-
-	EquipmentEffectType m_type;
-	Module* m_owner_module;
-	Equipment* m_owner_equipment;
-	CrewType m_crew_required;
-	int m_energy_cost;
-};
-
-enum SlotType
-{
-	Slot_Head,
-	Slot_Leg,
-	Slot_Foot,
-	Slot_Shoulder,
-	Slot_Hand,
-	Slot_Body,
-	NB_SLOT_TYPES,
-};
-
-struct ActionAttack
-{
-	SlotIndex m_target_index;
-	WeaponAttack* m_attack;
-	bool m_resolved;
-};
-
-struct ActionEffect
-{
-	SlotIndex m_target_index;
-	EquipmentEffect* m_effect;
-};
-
-enum DistanceCombat
-{
-	Distance_Ranged,
-	Distance_Close,
 };
 
 enum UI_Type
@@ -328,32 +67,6 @@ enum UI_Type
 	NB_UI_TYPES,
 };
 
-class UI_Element
-{
-public:
-	UI_Element(GameEntity* parent){ m_hovered = false; m_selected = false; m_parent = parent; };
-	RectangleShape m_shape_container;
-	RectangleShape m_shape;
-	UI_Type m_type;
-	TeamAlliances m_team;
-
-	GameEntity* m_parent;
-
-	bool m_hovered;
-	bool m_selected;
-
-	SFText m_text;
-
-	void ResetFillColor(){ m_shape_container.setFillColor(sf::Color::White); };
-
-	void Update(MouseAction mouse_click, int robot_index);
-	void Draw(sf::RenderTexture& screen)
-	{
-		screen.draw(this->m_shape_container);
-		screen.draw(this->m_shape);
-		screen.draw(this->m_text);
-	};
-};
 
 struct Game
 {
@@ -428,20 +141,12 @@ public:
 	map<string, vector<string> > m_gameObjectsConfig;
 
 	//ROBOT
-	GamePhase m_phase;
-	int m_turn;
-	vector<ActionAttack> m_attacks_list;
-	vector<ActionEffect> m_effects_list;
-	DistanceCombat m_distance;
-	DistanceCombat m_distance_temp;
+	GameEntity* m_selected_ui;
+	GameEntity* m_hovered_ui;
+	GameEntity* m_target_ui;
+	GameEntity* m_play_ui;
 
-	UI_Element* m_selected_ui;
-	UI_Element* m_hovered_ui;
-	UI_Element* m_target_ui;
-	UI_Element* m_play_ui;
-
-	vector<SFText> m_UI_events_log;
-	void UI_AddEventLog(string message, UI_EventsLogType type, int robot_index);
+	vector<RoomTile> m_tiles;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

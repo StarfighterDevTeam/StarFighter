@@ -36,6 +36,7 @@ public:
 	PlayerTeams m_team;
 	TeamAlliances m_alliance;
 	bool m_GarbageMe;
+	void SetPosition(sf::Vector2f position);
 };
 
 class SFRectangle : public sf::RectangleShape

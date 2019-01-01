@@ -19,6 +19,14 @@ void SFText::update(Time deltaTime)
 	//see override function in class SFTextPop
 }
 
+void SFText::SetPosition(sf::Vector2f position)
+{
+	float globalBounds_x = getGlobalBounds().width;
+	float globalBounds_y = getGlobalBounds().height;
+
+	setPosition(sf::Vector2f(position.x - globalBounds_x * 0.5f, position.y - globalBounds_y * 0.5f));
+}
+
 SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team)
 {
 	setSize(size);

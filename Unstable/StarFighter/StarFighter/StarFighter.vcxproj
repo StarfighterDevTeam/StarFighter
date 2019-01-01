@@ -89,9 +89,8 @@
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
-    <ClCompile Include="CrewMember.cpp" />
-    <ClCompile Include="Equipment.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -99,11 +98,11 @@
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="InGameState.cpp" />
-    <ClCompile Include="Module.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
-    <ClCompile Include="Robot.cpp" />
-    <ClCompile Include="RobotSlot.cpp" />
+    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="RoomTile.cpp" />
+    <ClCompile Include="Warship.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFPanelSpecific.cpp" />
     <ClCompile Include="SFText.cpp" />
@@ -112,16 +111,14 @@
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
-    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="CollisionUtils.h" />
-    <ClInclude Include="CrewMember.h" />
-    <ClInclude Include="Equipment.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameEntity.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
@@ -131,12 +128,12 @@
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="InGameState.h" />
-    <ClInclude Include="Module.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PrefsManager.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Robot.h" />
-    <ClInclude Include="RobotSlot.h" />
+    <ClInclude Include="Room.h" />
+    <ClInclude Include="RoomTile.h" />
+    <ClInclude Include="Warship.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFPanelSpecific.h" />
     <ClInclude Include="SFText.h" />
@@ -145,7 +142,6 @@
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
-    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />

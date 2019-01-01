@@ -10,7 +10,7 @@
 #include "SFPanelSpecific.h"
 #include "FileLoadUtils.h"
 
-#include "Robot.h"
+#include "Warship.h"
 
 class GameObject;
 
@@ -29,28 +29,8 @@ public:
 	static void DestroySFPanel(Ship* playerShip);
 	static void LoadCSVFile(string scenes_file);
 
-	//ROBOT
-	Robot m_robots[2];
-
-	void InitRobots();
-	void InitUI();
-
-	void AttackResolution();
-	void EffectsResolution();
-	void GrabResolution();
-	void GuardResolution();
-
-	bool ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bool is_execution, bool is_counter_attack, bool &range_weapon_used, bool &triggers_execution, bool &triggers_counterattack);
-	void ClearAttacksListResolved();
-	int GetRobotIndexOfLastAttackResolved();
-
-	int m_nb_attacks_becore_contextual;
-
-	//UI
-	void UI_GetAction(int robot_index);
-	void UI_SyncSml(int crew_index, int robot_index);
-	SFText m_UI_turn;
-	SFText m_UI_phase;
+	//PIRATES
+	Warship m_warships[2];
 
 private:
 	sf::RenderWindow* mainWindow;
