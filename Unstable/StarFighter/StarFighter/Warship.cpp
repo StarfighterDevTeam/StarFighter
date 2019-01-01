@@ -34,8 +34,6 @@ void Warship::InitWarship()
 	Room* room = AddRoom(12, 19, 4, 3, Room_Lifeboat);
 
 	//doors
-	//AddConnexion(3, 5, 4, 5);
-	//AddConnexion(8, 2, 8, 3);
 	ConnectRooms();
 
 	//crew
@@ -139,29 +137,6 @@ Room* Warship::ConnectRooms()
 			if ((*it2)->m_upcorner_x == (*it)->m_upcorner_x + (*it)->m_width || (*it2)->m_upcorner_y == (*it)->m_upcorner_y + (*it)->m_height
 				|| (*it)->m_upcorner_x == (*it2)->m_upcorner_x + (*it2)->m_width || (*it)->m_upcorner_y == (*it2)->m_upcorner_y + (*it2)->m_height)
 			{
-
-				if ((*it2)->m_upcorner_x == (*it)->m_upcorner_x + (*it)->m_width)
-					printf("a");
-
-				if ((*it2)->m_upcorner_y == (*it)->m_upcorner_y + (*it)->m_height)
-					printf("b");
-
-				if ((*it)->m_upcorner_x == (*it2)->m_upcorner_x + (*it2)->m_width)
-					printf("c");
-
-				if ((*it)->m_upcorner_y == (*it2)->m_upcorner_y + (*it2)->m_height)
-					printf("d");
-				
-
-				int up2x = (*it2)->m_upcorner_x;
-				int upx = (*it)->m_upcorner_x;
-				int width = (*it)->m_width;
-				int up2y = (*it2)->m_upcorner_y;
-				int upy = (*it)->m_upcorner_y;
-				int height = (*it)->m_height;
-				int width2 = (*it2)->m_width;
-				int height2 = (*it2)->m_height;
-
 				//find connected tiles
 				vector<RoomTile*> connected_tiles;
 
