@@ -68,6 +68,12 @@ void InGameState::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
+	//doors
+	for (vector<RoomConnexion*>::iterator it = ship.m_connexions.begin(); it != ship.m_connexions.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
+
 	//crew
 	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
 	{

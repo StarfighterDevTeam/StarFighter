@@ -35,6 +35,12 @@ public:
 	vector<CrewMember*> m_crew;
 	RoomTile* GetFreeRoomTile();
 
+	int m_upcorner_x;
+	int m_upcorner_y;
+	int m_width;
+	int m_height;
+
+	vector<RoomConnexion*> m_connexions;
 };
 
 #endif //ROOM_H_INCLUDED

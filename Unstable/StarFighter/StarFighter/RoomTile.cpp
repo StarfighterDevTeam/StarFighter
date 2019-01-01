@@ -2,6 +2,31 @@
 
 extern Game* CurrentGame;
 
+RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open)
+{
+	m_tiles = tiles; 
+	m_open = open;
+
+	if (tiles.first->m_coord_x == tiles.second->m_coord_x)//horizontal connexion = vertical door
+	{
+		
+		m_size = sf::Vector2f(ROOMTILE_SIZE, CONNEXION_WIDTH);
+	}
+	else//vertical connexion = horizontal door
+	{
+		m_size = sf::Vector2f(CONNEXION_WIDTH, ROOMTILE_SIZE);
+	}
+
+	m_position = sf::Vector2f(0.5f * (tiles.first->m_position.x + tiles.second->m_position.x), 0.5f * (tiles.first->m_position.y + tiles.second->m_position.y));
+
+	m_shape_container.setPosition(m_position);
+	m_shape_container.setSize(m_size);
+	m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
+	m_shape_container.setFillColor(sf::Color::Red);
+	m_shape_container.setOutlineThickness(1.f);
+	m_shape_container.setOutlineColor(sf::Color::White);
+}
+
 RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntity(sf::Vector2f(size, size))
 {
 	m_coord_x = coord_x;
@@ -27,4 +52,18 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 RoomTile::~RoomTile()
 {
 	
+}
+
+
+RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y)
+{
+	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+	{
+		if ((*it)->m_coord_x == coord_x && (*it)->m_coord_y == coord_y)
+		{
+			return *it;
+		}
+	}
+
+	return NULL;
 }
