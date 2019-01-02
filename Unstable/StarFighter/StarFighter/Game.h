@@ -50,24 +50,6 @@ enum MouseAction
 	Mouse_RightClick,
 };
 
-enum UI_Type
-{
-	UI_Crew,
-	UI_Slot,
-	UI_Module,
-	UI_WeaponAttack,
-	UI_Focus,
-	UI_WeaponAttackStat,
-	UI_Effect,
-	UI_Equipment,
-	UI_EndTurn,
-	UI_EC_Slot_Module,
-	UI_EC_Slot_Equipment,
-	UI_EC_Available,
-	NB_UI_TYPES,
-};
-
-
 struct Game
 {
 public:

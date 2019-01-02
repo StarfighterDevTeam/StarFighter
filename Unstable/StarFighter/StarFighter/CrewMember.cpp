@@ -13,9 +13,12 @@ string dico_crew[NB_CREW_TYPES] = {
 CrewMember::CrewMember(CrewMemberType type)
 {
 	m_type = type;
+	m_UI_type = UI_CrewMember;
 	m_speed_max = CREWMEMBER_SPEED;
 	m_speed = sf::Vector2f(0, 0);
 	m_size = sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE);
+	m_pathfind_cooldown_timer = 0.f;
+	m_destination = NULL;
 
 	//UI
 	m_shape_container.setSize(sf::Vector2f(m_size));
@@ -53,6 +56,24 @@ CrewMember::CrewMember(CrewMemberType type)
 	//m_text.setString(dico_crew[type]);
 }
 
+CrewMember::~CrewMember()
+{
+	
+}
+
+RoomTile* CrewMember::GetFreeRoomTile(Room* room)
+{
+	for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
+	{
+		if ((*it)->m_crew == NULL || (*it)->m_crew == this)
+		{
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
 bool CrewMember::MoveToRoom(Room* room)
 {
 	if (room == m_tile->m_room)
@@ -60,14 +81,27 @@ bool CrewMember::MoveToRoom(Room* room)
 		return false;//already in that room
 	}
 
-	RoomTile* tile = room->GetFreeRoomTile();
+	//look for a free tile
+	RoomTile* tile = GetFreeRoomTile(room);
 
 	if (tile == NULL)
 	{
-		return false;//room is already full
+		return false;
 	}
 	else
 	{
+		//destination changed?
+		if (m_destination != NULL && tile != m_destination)
+		{
+			//...free the previous booking
+			m_destination->m_crew = NULL;
+		}
+
+		//assign tile
+		tile->m_crew = this;
+		m_destination = tile;
+
+		//search pathfind (this will update m_current_path)
 		MoveToRoomTile(tile);
 		return true;
 	}
@@ -81,12 +115,51 @@ void CrewMember::MoveToRoomTile(RoomTile* tile)
 
 void CrewMember::Update(Time deltaTime)
 {
-	//arrived at waypoint? (pathfind) -> get next waypoint
+	//update cooldown timer
+	if (m_pathfind_cooldown_timer > 0)
+	{
+		m_pathfind_cooldown_timer -= deltaTime.asSeconds();
+	}
+
+	//get new move order
+	if (m_current_path.empty() == true && m_destination != NULL)
+	{
+		//free departure tile
+		m_tile->m_crew = NULL;
+
+		//search pathfind
+		MoveToRoom(m_destination->m_room);
+		m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+	}
+	//order changed
+	else if (m_current_path.empty() == false && m_destination != NULL && m_destination != m_current_path.front())
+	{
+		//refresh order (only after a given cooldown)
+		if (m_pathfind_cooldown_timer > CREWMEMBER_MOVEORDER_COOLDOWN_TIMER)
+		{
+			m_pathfind_cooldown_timer = CREWMEMBER_MOVEORDER_COOLDOWN_TIMER;
+		}
+		if (m_pathfind_cooldown_timer <= 0)
+		{
+			MoveToRoom(m_destination->m_room);
+			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+		}
+	}
+		
+	//arrived at waypoint? get next waypoint
 	if (m_current_path.empty() == false)
 	{
+		//refresh route (every X seconds) <!> this will possibly change m_destination
+		if (m_pathfind_cooldown_timer <= 0)
+		{
+			MoveToRoom(m_destination->m_room);
+			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+		}
+
 		RoomTile* waypoint = m_current_path.back();
 		sf::Vector2f vec = waypoint->m_position - m_position;
 		
+		//arrived at waypoint?
 		if (vec.x * vec.x + vec.y * vec.y < 8.f)
 		{
 			m_tile = waypoint;
@@ -97,6 +170,7 @@ void CrewMember::Update(Time deltaTime)
 			{
 				vec = sf::Vector2f(0, 0);
 				m_position = waypoint->m_position;
+				m_destination = NULL;
 			}
 		}
 
@@ -108,6 +182,7 @@ void CrewMember::Update(Time deltaTime)
 	//apply movement
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
+
 	GameEntity::Update(deltaTime);
 }
 
@@ -130,7 +205,7 @@ void CrewMember::IteratePathFindingOnIndex(RoomTile* tileA, RoomTile* tileB)
 	}
 	
 	//looks through all tiles to find the best next waypoint. 
-	//we try to reduce as soon as possible the number of tiles to iterate on, by filtering same room and connecte rooms only.
+	//we try to reduce as soon as possible the number of tiles to iterate on, by filtering same room and connected rooms only.
 	vector<Room*> search_rooms;
 	search_rooms.push_back(tileA->m_room);
 	for (vector<RoomConnexion*>::iterator it = tileA->m_room->m_connexions.begin(); it != tileA->m_room->m_connexions.end(); it++)

@@ -5,8 +5,10 @@
 
 #include "Room.h"
 
-#define CREWMEMBER_SIZE		16.f
-#define CREWMEMBER_SPEED	70.f
+#define CREWMEMBER_SIZE							16.f
+#define CREWMEMBER_SPEED						70.f
+#define CREWMEMBER_ROUTE_REFRESH_TIMER			5.f
+#define CREWMEMBER_MOVEORDER_COOLDOWN_TIMER		0.5f
 
 enum CrewMemberType
 {
@@ -27,13 +29,17 @@ public:
 	CrewMemberType m_type;
 
 	void Update(Time deltaTime);
+
+	RoomTile* GetFreeRoomTile(Room* room);
 	bool MoveToRoom(Room* room);
 	void MoveToRoomTile(RoomTile* tile);
 
 	sf::Vector2f m_speed;
 	float m_speed_max;
+	float m_pathfind_cooldown_timer;
 
 	RoomTile* m_tile;
+	RoomTile* m_destination;
 	vector<RoomTile*> m_current_path;
 
 private:

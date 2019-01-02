@@ -34,9 +34,23 @@ void InGameState::Initialize(Player player)
 
 void InGameState::Update(sf::Time deltaTime)
 {
+	GameEntity* selection = (*CurrentGame).m_selected_ui;
+	GameEntity* previous_selection = selection;
+	GameEntity* hovered = (*CurrentGame).m_hovered_ui;
+	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+
 	//Get mouse & keyboard inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
 	(*CurrentGame).m_playerShip->update(deltaTime);
+
+	//Reset flags
+	(*CurrentGame).m_hovered_ui = NULL;
+	if ((*CurrentGame).m_selected_ui != NULL && mouse_click == Mouse_LeftClick)
+	{
+		(*CurrentGame).m_selected_ui->m_selected = false;
+		(*CurrentGame).m_selected_ui->m_shape_container.setOutlineColor(sf::Color::White);
+		(*CurrentGame).m_selected_ui = NULL;
+	}
 
 	//Interaction with rooms
 	Warship& ship = m_warships[0];
@@ -55,9 +69,45 @@ void InGameState::Update(sf::Time deltaTime)
 	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
 	{
 		(*it)->Update(deltaTime);
+
 	}
 
-	
+	//TEMP DEBUG
+	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+	{
+		(*it)->m_shape_container.setFillColor(sf::Color::Black);
+		for (vector<CrewMember*>::iterator it2 = ship.m_crew.begin(); it2 != ship.m_crew.end(); it2++)
+		{
+			if ((*it2)->m_destination == (*it))
+			{
+				(*it)->m_shape_container.setFillColor(sf::Color::Green);
+			}
+		}
+	}
+
+	//ACTIONS
+	//Crew move to room
+	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_Room)
+	{
+		CrewMember* crew = (CrewMember*)selection;
+		Room* room = (Room*)hovered;
+
+		RoomTile* previous_destination = crew->m_destination;
+		RoomTile* destination = crew->GetFreeRoomTile(room);
+
+		//if destination is valid (it exists and we're not already ont it), book the tile
+		if (destination != NULL && destination->m_crew != crew)
+		{
+			crew->m_destination = destination;
+			destination->m_crew = crew;
+
+			//...and free the previous booking (if any)
+			if (previous_destination != NULL && previous_destination->m_crew != NULL)
+			{
+				previous_destination->m_crew = NULL;
+			}
+		}
+	}
 }
 
 void InGameState::Draw()

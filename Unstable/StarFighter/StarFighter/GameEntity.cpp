@@ -6,6 +6,7 @@ GameEntity::GameEntity()
 {
 	m_hovered = false;
 	m_selected = false;
+	m_default_color = sf::Color::White;
 }
 
 GameEntity::GameEntity(sf::Vector2f size) : GameEntity()
@@ -23,10 +24,16 @@ void GameEntity::Update(Time deltaTime)
 	//get inputs
 	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
 
+	//get hovered state
 	if ((*CurrentGame).m_window_has_focus == true
 		&& (*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
 		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
 	{
+		if ((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui != this)
+		{
+			(*CurrentGame).m_hovered_ui->m_hovered = false;
+			(*CurrentGame).m_hovered_ui->m_shape_container.setOutlineColor(sf::Color::White);
+		}
 		m_hovered = true;
 		(*CurrentGame).m_hovered_ui = this;
 	}
@@ -35,12 +42,19 @@ void GameEntity::Update(Time deltaTime)
 		m_hovered = false;
 	}
 
+	//get selected state
 	if (mouse_click == Mouse_LeftClick)
 	{
-		if (m_hovered)
+		if (m_hovered == true)
 		{
-			m_selected = true;
+			if ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui != this)
+			{
+				(*CurrentGame).m_selected_ui->m_selected = false;
+				(*CurrentGame).m_selected_ui->m_shape_container.setOutlineColor(sf::Color::White);
+			}
+			
 			(*CurrentGame).m_selected_ui = this;
+			m_selected = true;
 		}
 		else
 		{
@@ -48,7 +62,9 @@ void GameEntity::Update(Time deltaTime)
 		}
 	}
 
-	m_shape_container.setOutlineColor(sf::Color::White);
+	//apply color feedback
+	m_shape_container.setOutlineColor(m_default_color);
+
 	if (m_hovered)
 	{
 		m_shape_container.setOutlineColor(sf::Color::Red);
@@ -56,20 +72,6 @@ void GameEntity::Update(Time deltaTime)
 	if (m_selected)
 	{
 		m_shape_container.setOutlineColor(sf::Color::Green);
-	}
-
-	//Actions
-	if (m_hovered && mouse_click == Mouse_RightClick && (*CurrentGame).m_selected_ui != NULL)
-	{
-
-	}
-	else if (m_hovered && mouse_click == Mouse_RightClick)
-	{
-
-	}
-	else if (m_hovered && mouse_click == Mouse_LeftClick)
-	{
-		
 	}
 }
 

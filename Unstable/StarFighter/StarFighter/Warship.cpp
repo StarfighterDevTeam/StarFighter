@@ -9,7 +9,20 @@ Warship::Warship()
 
 Warship::~Warship()
 {
-	
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		delete *it;
+	}
 }
 
 void Warship::InitWarship()
@@ -22,14 +35,14 @@ void Warship::InitWarship()
 
 	//mid
 	AddRoom(6, 0, 4, 3, Room_Weapon);
-	Room* room2 = AddRoom(4, 3, 8, 6, Room_Navigation);
+	AddRoom(4, 3, 8, 6, Room_Navigation);
 	AddRoom(4, 9, 8, 10, Room_Crewquarter);
 	AddRoom(4, 19, 8, 3, Room_Ammo);
 	AddRoom(5, 22, 6, 3, Room_Engine);
 
 	//right
 	AddRoom(12, 3, 3, 4, Room_Weapon);
-	AddRoom(12, 7, 4, 6, Room_Fishing);
+	Room* room2 = AddRoom(12, 7, 4, 6, Room_Fishing);
 	AddRoom(12, 13, 4, 6, Room_Kitchen);
 	Room* room = AddRoom(12, 19, 4, 3, Room_Lifeboat);
 
@@ -45,8 +58,8 @@ void Warship::InitWarship()
 	CrewMember* crew2 = new CrewMember(Crew_Civilian);
 	AddCrewMember(crew2, room2);
 
-	crew->MoveToRoom(room2);
-	crew2->MoveToRoom(room);
+	//crew->MoveToRoom(room2);
+	//crew2->MoveToRoom(room);
 }
 
 Room* Warship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
@@ -65,18 +78,23 @@ CrewMember* Warship::AddCrewMember(CrewMember* crew, Room* room)
 		return NULL;
 	}
 
-	RoomTile* tile = room->GetFreeRoomTile();
+	RoomTile* tile = crew->GetFreeRoomTile(room);
 
 	if (tile == NULL)
 	{
 		return NULL;
 	}
 
+	//position
 	crew->m_position = tile->m_position;
 
+	//add to crew lists
 	m_crew.push_back(crew);
 	room->m_crew.push_back(crew);
+
+	//assign crew to tile
 	crew->m_tile = tile;
+	tile->m_crew = crew;
 
 	//UI
 	crew->m_shape_container.setPosition(crew->m_position);

@@ -7,10 +7,11 @@ RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open)
 	m_tiles = tiles; 
 	m_open = open;
 	m_locked = false;
+	m_UI_type = UI_Connexion;
+	m_default_color = sf::Color::Green;
 
 	if (tiles.first->m_coord_x == tiles.second->m_coord_x)//horizontal connexion = vertical door
 	{
-		
 		m_size = sf::Vector2f(ROOMTILE_SIZE, CONNEXION_WIDTH);
 	}
 	else//vertical connexion = horizontal door
@@ -35,16 +36,18 @@ void RoomConnexion::SetLock(bool locked)
 	if (locked == false)
 	{
 		m_shape_container.setFillColor(sf::Color::Green);
+		m_default_color = sf::Color::Green;
 	}
 	else
 	{
 		m_shape_container.setFillColor(sf::Color::Red);
+		m_default_color = sf::Color::Red;
 	}
 }
 
 void RoomConnexion::Update(Time deltaTime)
 {
-	
+	GameEntity::Update(deltaTime);
 }
 
 RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntity(sf::Vector2f(size, size))

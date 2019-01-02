@@ -25,7 +25,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	m_width = width;
 	m_height = height;
 	m_type = type;
-
+	m_UI_type = UI_Room;
 
 	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
 	m_position.x = ROOMTILE_OFFSET_X + (2.f * upcorner_x + width - 1) * 0.5f * ROOMTILE_SIZE;
@@ -59,20 +59,10 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 
 Room::~Room()
 {
-	
-}
-
-RoomTile* Room::GetFreeRoomTile()
-{
 	for (vector<RoomTile*>::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
 	{
-		if ((*it)->m_crew == NULL)
-		{
-			return *it;
-		}
+		delete *it;
 	}
-
-	return NULL;
 }
 
 bool Room::IsConnectedToRoom(Room* room)
