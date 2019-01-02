@@ -31,16 +31,17 @@ public:
 
 	RoomType m_type;
 
-	vector<RoomTile*> m_tiles;
-	vector<CrewMember*> m_crew;
-	RoomTile* GetFreeRoomTile();
-
 	int m_upcorner_x;
 	int m_upcorner_y;
 	int m_width;
 	int m_height;
 
 	vector<RoomConnexion*> m_connexions;
+	vector<RoomTile*> m_tiles;
+	vector<CrewMember*> m_crew;
+
+	RoomTile* GetFreeRoomTile();
+	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 };
 
 #endif //ROOM_H_INCLUDED

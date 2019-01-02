@@ -19,7 +19,7 @@ public:
 	RectangleShape m_shape;
 	SFText m_text;
 
-	void Update();
+	void Update(Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 };
 

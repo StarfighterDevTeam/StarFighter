@@ -22,7 +22,7 @@ void Warship::InitWarship()
 
 	//mid
 	AddRoom(6, 0, 4, 3, Room_Weapon);
-	AddRoom(4, 3, 8, 6, Room_Navigation);
+	Room* room2 = AddRoom(4, 3, 8, 6, Room_Navigation);
 	AddRoom(4, 9, 8, 10, Room_Crewquarter);
 	AddRoom(4, 19, 8, 3, Room_Ammo);
 	AddRoom(5, 22, 6, 3, Room_Engine);
@@ -30,7 +30,7 @@ void Warship::InitWarship()
 	//right
 	AddRoom(12, 3, 3, 4, Room_Weapon);
 	AddRoom(12, 7, 4, 6, Room_Fishing);
-	Room* room2 = AddRoom(12, 13, 4, 6, Room_Kitchen);
+	AddRoom(12, 13, 4, 6, Room_Kitchen);
 	Room* room = AddRoom(12, 19, 4, 3, Room_Lifeboat);
 
 	//doors
@@ -42,6 +42,9 @@ void Warship::InitWarship()
 
 	CrewMember* crew2 = new CrewMember(Crew_Civilian);
 	AddCrewMember(crew2, room2);
+
+	crew->MoveToRoom(room2);
+	crew2->MoveToRoom(room);
 }
 
 Room* Warship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
@@ -71,6 +74,7 @@ CrewMember* Warship::AddCrewMember(CrewMember* crew, Room* room)
 
 	m_crew.push_back(crew);
 	room->m_crew.push_back(crew);
+	crew->m_tile = tile;
 
 	//UI
 	crew->m_shape_container.setPosition(crew->m_position);
@@ -82,7 +86,7 @@ CrewMember* Warship::AddCrewMember(CrewMember* crew, Room* room)
 bool Warship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 {
 	//Checking connexion requirements
-	bool can_be_connected = (abs(tileA_x - tileB_x) == 1 && abs(tileA_y - tileB_y)) == 0 || (abs(tileA_x - tileB_x) == 0 && abs(tileA_y - tileB_y) == 1);
+	bool can_be_connected = (abs(tileA_x - tileB_x) == 1 && abs(tileA_y - tileB_y) == 0) || (abs(tileA_x - tileB_x) == 0 && abs(tileA_y - tileB_y) == 1);
 
 	if (can_be_connected == false)
 	{

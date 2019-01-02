@@ -42,7 +42,13 @@ void InGameState::Update(sf::Time deltaTime)
 	Warship& ship = m_warships[0];
 	for (vector<Room*>::iterator it = ship.m_rooms.begin(); it != ship.m_rooms.end(); it++)
 	{
-		(*it)->Update();
+		(*it)->Update(deltaTime);
+	}
+
+	//Crew movement
+	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
+	{
+		(*it)->Update(deltaTime);
 	}
 }
 

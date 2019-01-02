@@ -74,3 +74,33 @@ RoomTile* Room::GetFreeRoomTile()
 
 	return NULL;
 }
+
+
+bool Room::IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB)
+{
+	const int tileA_x = tileA->m_coord_x;
+	const int tileA_y = tileA->m_coord_y;
+	const int tileB_x = tileB->m_coord_x;
+	const int tileB_y = tileB->m_coord_y;
+
+	//adjacent
+	if ((abs(tileA_x - tileB_x) == 1 && abs(tileA_y - tileB_y) == 0) || (abs(tileA_x - tileB_x) == 0 && abs(tileA_y - tileB_y) == 1))
+	{
+		//same room ...
+		if (tileA->m_room == tileB->m_room)
+		{
+			return true;
+		}
+
+		//...or connected by a door
+		for (vector<RoomConnexion*>::iterator it = tileA->m_room->m_connexions.begin(); it != tileA->m_room->m_connexions.end(); it++)
+		{
+			if (((*it)->m_tiles.first == tileA && ((*it)->m_tiles.second == tileB)) || ((*it)->m_tiles.first == tileB && ((*it)->m_tiles.second == tileA)))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

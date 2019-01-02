@@ -37,6 +37,13 @@ public:
 	int m_coord_y;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y);
+	bool IsConnectedToRoomTile(RoomTile* tile);
+
+	//pathfinding
+	int m_heuristic;
+	int m_movement_cost;
+	int m_G_value;
+	RoomTile* m_parent;
 };
 
 #endif //ROOMTILE_H_INCLUDED

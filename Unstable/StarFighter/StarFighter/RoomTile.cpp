@@ -35,6 +35,12 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 	m_crew = NULL;
 	m_position = sf::Vector2f(ROOMTILE_OFFSET_X + coord_x * ROOMTILE_SIZE, ROOMTILE_OFFSET_Y + coord_y * ROOMTILE_SIZE);
 
+	//pathfinding
+	m_heuristic = 0;
+	m_movement_cost = 0;
+	m_G_value = 0;
+	m_parent = NULL;
+
 	//UI
 	m_shape_container.setPosition(m_position);
 	m_shape_container.setSize(sf::Vector2f(size, size));
