@@ -75,6 +75,18 @@ RoomTile* Room::GetFreeRoomTile()
 	return NULL;
 }
 
+bool Room::IsConnectedToRoom(Room* room)
+{
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		if (((*it)->m_tiles.first->m_room == this && ((*it)->m_tiles.second->m_room == room)) || ((*it)->m_tiles.first->m_room == room && ((*it)->m_tiles.second->m_room == this)))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 bool Room::IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB)
 {

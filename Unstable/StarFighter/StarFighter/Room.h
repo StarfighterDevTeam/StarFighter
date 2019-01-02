@@ -42,6 +42,7 @@ public:
 
 	RoomTile* GetFreeRoomTile();
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
+	bool IsConnectedToRoom(Room* room);
 };
 
 #endif //ROOM_H_INCLUDED

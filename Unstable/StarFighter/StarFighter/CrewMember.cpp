@@ -109,8 +109,6 @@ void CrewMember::Update(Time deltaTime)
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
 	GameEntity::Update(deltaTime);
-
-	printf("posx : %f, posy : %f\n", m_position.x, m_position.y);
 }
 
 
@@ -131,8 +129,32 @@ void CrewMember::IteratePathFindingOnIndex(RoomTile* tileA, RoomTile* tileB)
 		return;
 	}
 	
-	//looks to all adjacent tiles to find the best
-	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+	//looks through all tiles to find the best next waypoint. 
+	//we try to reduce as soon as possible the number of tiles to iterate on, by filtering same room and connecte rooms only.
+	vector<Room*> search_rooms;
+	search_rooms.push_back(tileA->m_room);
+	for (vector<RoomConnexion*>::iterator it = tileA->m_room->m_connexions.begin(); it != tileA->m_room->m_connexions.end(); it++)
+	{
+		if ((*it)->m_tiles.first->m_room != tileA->m_room)
+		{
+			search_rooms.push_back((*it)->m_tiles.first->m_room);
+		}
+		else if ((*it)->m_tiles.second->m_room != tileA->m_room)
+		{
+			search_rooms.push_back((*it)->m_tiles.second->m_room);
+		}
+	}
+
+	vector<RoomTile*> search_tiles;
+	for (vector<Room*>::iterator it = search_rooms.begin(); it != search_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			search_tiles.push_back(*it2);
+		}
+	}
+
+	for (vector<RoomTile*>::iterator it = search_tiles.begin(); it != search_tiles.end(); it++)
 	{
 		if (Room::IsConnectedToRoomTile(tileA, *it))
 		{
@@ -164,15 +186,6 @@ void CrewMember::IteratePathFindingOnIndex(RoomTile* tileA, RoomTile* tileB)
 					//parent node
 					(*it)->m_parent = tileA;
 				}
-				//else
-				//{
-				//	//CASE where the tile is already on the open list
-				//	int movement_cost = 10;//movement cost
-				//	if (tileA->m_movement_cost + movement_cost < (*it)->m_movement_cost)
-				//	{
-				//		//(*it)->m_parent = tileA;//comment to remove diagonal movements
-				//	}
-				//}
 			}
 		}
 	}
@@ -211,10 +224,6 @@ void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 	while (way_point != tileA)
 	{
 		m_current_path.push_back(way_point);
-		if (way_point->m_parent == NULL)
-		{
-			printf("BUG waypoint = 0, child tile: %d\n", way_point);
-		}
 		way_point = way_point->m_parent;
 	}
 	
