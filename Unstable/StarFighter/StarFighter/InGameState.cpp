@@ -45,11 +45,19 @@ void InGameState::Update(sf::Time deltaTime)
 		(*it)->Update(deltaTime);
 	}
 
+	//Room connexions
+	for (vector<RoomConnexion*>::iterator it = ship.m_connexions.begin(); it != ship.m_connexions.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
+
 	//Crew movement
 	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
 	{
 		(*it)->Update(deltaTime);
 	}
+
+	
 }
 
 void InGameState::Draw()

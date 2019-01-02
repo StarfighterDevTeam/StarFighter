@@ -36,6 +36,8 @@ void Warship::InitWarship()
 	//doors
 	ConnectRooms();
 
+	room->m_connexions.front()->SetLock(true);
+
 	//crew
 	CrewMember* crew = new CrewMember(Crew_Pirate);
 	AddCrewMember(crew, room);

@@ -17,8 +17,13 @@ class RoomConnexion : public GameEntity
 {
 public:
 	RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open);
+	
 	pair<RoomTile*, RoomTile*> m_tiles;
 	bool m_open;
+	bool m_locked;
+
+	void Update(Time deltaTime);
+	void SetLock(bool locked);
 };
 
 #define ROOMTILE_SIZE			32.f

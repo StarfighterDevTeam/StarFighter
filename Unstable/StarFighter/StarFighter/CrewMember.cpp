@@ -135,11 +135,11 @@ void CrewMember::IteratePathFindingOnIndex(RoomTile* tileA, RoomTile* tileB)
 	search_rooms.push_back(tileA->m_room);
 	for (vector<RoomConnexion*>::iterator it = tileA->m_room->m_connexions.begin(); it != tileA->m_room->m_connexions.end(); it++)
 	{
-		if ((*it)->m_tiles.first->m_room != tileA->m_room)
+		if ((*it)->m_locked == false && (*it)->m_tiles.first->m_room != tileA->m_room)
 		{
 			search_rooms.push_back((*it)->m_tiles.first->m_room);
 		}
-		else if ((*it)->m_tiles.second->m_room != tileA->m_room)
+		else if ((*it)->m_locked == false && (*it)->m_tiles.second->m_room != tileA->m_room)
 		{
 			search_rooms.push_back((*it)->m_tiles.second->m_room);
 		}
