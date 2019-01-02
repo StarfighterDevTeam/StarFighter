@@ -2109,7 +2109,7 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 {
 	if (target_slot == NULL)
 	{
-		printf("Cannot move crew to empty modules.\n");
+		(*CurrentGame).UI_AddEventLog("Cannot move crew to empty modules.", Event_Error, m_index);
 		return false;
 	}
 
@@ -2119,22 +2119,23 @@ bool Robot::MoveCrewMemberToSlot(CrewMember* crew, RobotSlot* target_slot)
 
 	if (target_index == crew->m_index)
 	{
-		printf("Move cancelled: crew member is already on this position.\n");
+		(*CurrentGame).UI_AddEventLog("Crew member is already on this position.", Event_Error, m_index);
 		return false;
 	}
 	else if (crew->m_stun_counter > 0)
 	{
-		printf("Cannot move crew member because he's stunned.\n");
+		(*CurrentGame).UI_AddEventLog("Crew member is stunned and cannot move.", Event_Error, m_index);
 		return false;
 	}
 	else if (distance_to_cross > crew->m_steps_remaining)
 	{
+		(*CurrentGame).UI_AddEventLog("Not enough mouvement points left for this move.", Event_Error, m_index);
 		printf("Cannot move crew member to slot %d because the distance to cross (%d) exceeds his remaining movement points (%d)\n", (int)target_index, distance_to_cross, crew->m_steps_remaining);
 		return false;
 	}
 	else if (m_slots[target_index].m_module == NULL)
 	{
-		printf("Cannot move crew member to slot %d because it's empty, it cannot be inhabited.\n", (int)target_index);
+		(*CurrentGame).UI_AddEventLog("Cannot move to empty modules", Event_Error, m_index);
 		return false;
 	}
 	else
