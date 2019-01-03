@@ -55,6 +55,7 @@ struct Game
 {
 public:
 	void init(RenderWindow* window);
+	void destructor();
 	RenderWindow* getMainWindow();
 	void addToScene(GameObject *object, LayerType layer, GameObjectType type);
 	void addToFeedbacks(RectangleShape* feedback);

@@ -186,5 +186,7 @@ int main()
 		}
 	}
 
+	(*CurrentGame).destructor();
+
 	return 0;
 }

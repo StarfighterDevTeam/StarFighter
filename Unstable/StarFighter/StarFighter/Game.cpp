@@ -62,7 +62,17 @@ void Game::init(RenderWindow* window)
 	m_hovered_ui = NULL;
 	m_target_ui = NULL;
 	m_play_ui = NULL;
+}
 
+void Game::destructor()
+{
+	for (vector<vector<WaterZone*> >::iterator it = m_waterzones.begin(); it != m_waterzones.end(); it++)
+	{
+		for (vector<WaterZone*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		{
+			delete *it2;
+		}
+	}
 }
 
 void Game::SetSFXVolume(bool activate_sfx)

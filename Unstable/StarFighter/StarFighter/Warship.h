@@ -18,7 +18,10 @@ public:
 
 	WaterZone* m_zone;
 	WaterTile* m_tile;
+	
 	DMS_Coord m_DMS;
+	float m_angle;
+
 	bool SetDMSCoord(DMS_Coord coord);
 	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool IsWaterTileInViewRange(WaterTile* tile);

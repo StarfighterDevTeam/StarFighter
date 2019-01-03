@@ -151,17 +151,15 @@ void InGameState::Draw()
 
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			//if ((*it2)->m_coord_y < ship.m_tile->m_coord_y - NB_WATERTILE_VIEW_RANGE || (*it2)->m_coord_y > ship.m_tile->m_coord_y + NB_WATERTILE_VIEW_RANGE)
-			//{
-			//	continue;
-			//}
-
 			if (ship.IsWaterTileInViewRange(*it2))
 			{
 				(*it2)->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
 	}
+
+	//boat
+	ship.Draw((*CurrentGame).m_mainScreen);
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();

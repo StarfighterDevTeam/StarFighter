@@ -4,7 +4,15 @@ extern Game* CurrentGame;
 
 Warship::Warship()
 {
-	
+	m_angle = -90.f;
+
+	//shape for water tiles
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture("2D/boat_icon_L.png", WATERTILE_SIZE, WATERTILE_SIZE);
+	m_shape.setTexture(texture);
+	m_shape.setSize(sf::Vector2f(WATERTILE_SIZE, WATERTILE_SIZE));
+	m_shape.setOrigin(sf::Vector2f(WATERTILE_SIZE * 0.5f, WATERTILE_SIZE * 0.5f));
 }
 
 Warship::~Warship()
@@ -98,6 +106,14 @@ void Warship::Update(Time deltaTime)
 			}
 		}
 	}
+
+	//WATER PART
+	
+	//rotation
+	m_angle += 1.f;
+	m_shape.setRotation(fmod(m_angle, 180.f) - 90.f);
+
+	GameEntity::Update(deltaTime);
 }
 
 Room* Warship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
@@ -332,6 +348,7 @@ bool Warship::SetDMSCoord(DMS_Coord coord)
 	m_tile = tile;
 	m_DMS = coord;
 	m_zone = tile->m_zone;
+	m_position = sf::Vector2f(m_tile->m_position.x - WATERTILE_SIZE * 0.5f, m_tile->m_position.y - WATERTILE_SIZE * 0.5f);
 
 	return true;
 }
