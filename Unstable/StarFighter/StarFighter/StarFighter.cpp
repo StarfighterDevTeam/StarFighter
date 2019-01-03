@@ -28,7 +28,7 @@ int main()
 	renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	//Title
-	renderWindow.setTitle("Giant Robot People - Prototype");
+	renderWindow.setTitle("Pirates of the Seven Seas");
 
 	//Game initialization
 	CurrentGame = new Game();
