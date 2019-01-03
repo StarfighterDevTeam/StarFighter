@@ -3,7 +3,7 @@
 extern Game* CurrentGame;
 
 string dico_crew[NB_CREW_TYPES] = {
-	"",			//Crew_Unknown,
+	"All",			//Crew_All,
 	"Pirate",	//Crew_Pirate,
 	"Civilian",	//Crew_Civilian,
 	"Slave",	//Crew_Slave,

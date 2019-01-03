@@ -10,16 +10,6 @@
 #define CREWMEMBER_ROUTE_REFRESH_TIMER			5.f
 #define CREWMEMBER_MOVEORDER_COOLDOWN_TIMER		0.5f
 
-enum CrewMemberType
-{
-	Crew_Unknown,
-	Crew_Pirate,
-	Crew_Civilian,
-	Crew_Slave,
-	Crew_Mecha,
-	NB_CREW_TYPES,
-};
-
 class CrewMember : public GameEntity
 {
 public:

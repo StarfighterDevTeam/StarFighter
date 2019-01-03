@@ -62,6 +62,41 @@ void Warship::InitWarship()
 	//crew2->MoveToRoom(room);
 }
 
+void Warship::Update(Time deltaTime)
+{
+	//Interaction with rooms
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		UpdateCrewMembersCountPerRoom(*it);
+		(*it)->Update(deltaTime);
+	}
+
+	//Room connexions
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
+
+	//Crew movement
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
+
+	//TEMP DEBUG: crew movement feedback
+	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+	{
+		(*it)->m_shape_container.setFillColor(sf::Color::Black);
+		for (vector<CrewMember*>::iterator it2 = m_crew.begin(); it2 != m_crew.end(); it2++)
+		{
+			if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
+			{
+				(*it)->m_shape_container.setFillColor(sf::Color::Green);
+			}
+		}
+	}
+}
+
 Room* Warship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 {
 	Room* room = new Room(upcorner_x, upcorner_y, width, height, type);
@@ -244,3 +279,32 @@ Room* Warship::ConnectRooms()
 	return unconnected_room;
 }
 
+void Warship::UpdateCrewMembersCountPerRoom(Room* room)
+{
+	for (int i = 0; i < NB_CREW_TYPES; i++)
+	{
+		room->m_nb_crew[i] = 0;
+		room->m_nb_crew_working[i] = 0;
+	}
+		
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		if ((*it)->m_destination != NULL && (*it)->m_destination->m_room == room)
+		{
+			//present
+			room->m_nb_crew[(*it)->m_type]++;
+			room->m_nb_crew[Crew_All]++;
+		}
+
+		if ((*it)->m_tile->m_room == room && (*it)->m_destination == NULL)
+		{
+			//working
+			room->m_nb_crew_working[(*it)->m_type]++;
+			room->m_nb_crew_working[Crew_All]++;
+
+			//present
+			room->m_nb_crew[(*it)->m_type]++;
+			room->m_nb_crew[Crew_All]++;
+		}
+	}
+}

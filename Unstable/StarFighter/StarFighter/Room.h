@@ -23,6 +23,16 @@ enum RoomType
 	NB_ROOM_TYPES,
 };
 
+enum CrewMemberType
+{
+	Crew_All,
+	Crew_Pirate,
+	Crew_Civilian,
+	Crew_Slave,
+	Crew_Mecha,
+	NB_CREW_TYPES,
+};
+
 class Room : public GameEntity
 {
 public:
@@ -38,8 +48,12 @@ public:
 
 	vector<RoomConnexion*> m_connexions;
 	vector<RoomTile*> m_tiles;
-	//vector<CrewMember*> m_crew;
+	
+	int m_nb_crew[NB_CREW_TYPES];
+	int m_nb_crew_working[NB_CREW_TYPES];
+	int m_nb_crew_max;
 
+	void Update(Time deltaTime);
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
 };

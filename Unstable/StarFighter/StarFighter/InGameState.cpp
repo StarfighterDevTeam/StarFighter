@@ -52,38 +52,8 @@ void InGameState::Update(sf::Time deltaTime)
 		(*CurrentGame).m_selected_ui = NULL;
 	}
 
-	//Interaction with rooms
-	Warship& ship = m_warships[0];
-	for (vector<Room*>::iterator it = ship.m_rooms.begin(); it != ship.m_rooms.end(); it++)
-	{
-		(*it)->Update(deltaTime);
-	}
+	m_warships[0].Update(deltaTime);
 
-	//Room connexions
-	for (vector<RoomConnexion*>::iterator it = ship.m_connexions.begin(); it != ship.m_connexions.end(); it++)
-	{
-		(*it)->Update(deltaTime);
-	}
-
-	//Crew movement
-	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
-	{
-		(*it)->Update(deltaTime);
-
-	}
-
-	//TEMP DEBUG: crew movement feedback
-	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
-	{
-		(*it)->m_shape_container.setFillColor(sf::Color::Black);
-		for (vector<CrewMember*>::iterator it2 = ship.m_crew.begin(); it2 != ship.m_crew.end(); it2++)
-		{
-			if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
-			{
-				(*it)->m_shape_container.setFillColor(sf::Color::Green);
-			}
-		}
-	}
 
 	//ACTIONS
 	//Crew move to room
@@ -94,8 +64,8 @@ void InGameState::Update(sf::Time deltaTime)
 		RoomTile* previous_destination = crew->m_destination;
 		RoomTile* destination = crew->GetFreeRoomTile(room);
 
-		//if destination is valid (it exists and we're not already on it), book the tile
-		if (destination != NULL && destination->m_crew != crew)
+		//if destination is valid (it exists and we're not already on it and the room is not full), book the tile
+		if (destination != NULL && destination->m_crew != crew && room->m_nb_crew[Crew_All] < room->m_nb_crew_max)
 		{
 			crew->m_destination = destination;
 			destination->m_crew = crew;

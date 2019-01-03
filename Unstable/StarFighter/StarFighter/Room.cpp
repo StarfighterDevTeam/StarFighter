@@ -26,6 +26,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	m_height = height;
 	m_type = type;
 	m_UI_type = UI_Room;
+	m_nb_crew_max = width * height / 4;
 
 	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
 	m_position.x = ROOMTILE_OFFSET_X + (2.f * upcorner_x + width - 1) * 0.5f * ROOMTILE_SIZE;
@@ -40,6 +41,13 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 			(*CurrentGame).m_tiles.push_back(tile);
 			m_tiles.push_back(tile);
 		}
+	}
+
+	//init crew count
+	for (int i = 0; i < NB_CREW_TYPES; i++)
+	{
+		m_nb_crew[i] = 0;
+		m_nb_crew_working[i] = 0;
 	}
 
 	//UI
@@ -63,6 +71,15 @@ Room::~Room()
 	{
 		delete *it;
 	}
+}
+
+void Room::Update(Time deltaTime)
+{
+	ostringstream ss;
+	ss << dico_rooms[m_type] << "\n(" << m_nb_crew[Crew_All] << "/" << m_nb_crew_max << ")";
+	m_text.setString(ss.str());
+
+	GameEntity::Update(deltaTime);
 }
 
 bool Room::IsConnectedToRoom(Room* room)
