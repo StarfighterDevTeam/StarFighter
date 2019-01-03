@@ -113,6 +113,11 @@ CrewMember* Warship::AddCrewMember(CrewMember* crew, Room* room)
 		return NULL;
 	}
 
+	if (room->m_nb_crew[Crew_All] >= room->m_nb_crew_max)
+	{
+		return NULL;
+	}
+
 	RoomTile* tile = crew->GetFreeRoomTile(room);
 
 	if (tile == NULL)
