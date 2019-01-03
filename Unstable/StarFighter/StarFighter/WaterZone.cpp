@@ -14,10 +14,10 @@ WaterZone::WaterZone(int coord_x, int coord_y)
 	m_parent = NULL;
 
 	//water tiles
-	for (int y = 0; y < NB_WATER_TILE_Y; y++)
+	for (int x = 0; x < NB_WATERTILE_X; x++)
 	{
 		vector<WaterTile*> vec;
-		for (int x = 0; x < NB_WATER_TILE_X; x++)
+		for (int y = 0; y < NB_WATERTILE_Y; y++)
 		{
 			WaterTile* tile = new WaterTile(x, y, Water_Empty, this, m_coord_x, m_coord_y);
 			vec.push_back(tile);

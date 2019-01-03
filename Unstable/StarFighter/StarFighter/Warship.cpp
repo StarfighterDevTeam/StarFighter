@@ -60,6 +60,9 @@ void Warship::InitWarship()
 
 	//crew->MoveToRoom(room2);
 	//crew2->MoveToRoom(room);
+
+	//assign to world map
+	SetDMSCoord(DMS_Coord(0, 6, 0, 0, 6, 0));
 }
 
 void Warship::Update(Time deltaTime)
@@ -313,3 +316,43 @@ void Warship::UpdateCrewMembersCountPerRoom(Room* room)
 		}
 	}
 }
+
+//WATER PART
+WaterTile* Warship::GetWaterTileAtDMSCoord(DMS_Coord coord)
+{
+	WaterTile* tile = (*CurrentGame).m_waterzones[coord.m_degree_x][coord.m_degree_y]->m_watertiles[coord.m_minute_x][coord.m_minute_y];
+
+	return tile;
+}
+
+bool Warship::SetDMSCoord(DMS_Coord coord)
+{
+	WaterTile* tile = GetWaterTileAtDMSCoord(coord);
+
+	m_tile = tile;
+	m_DMS = coord;
+	m_zone = tile->m_zone;
+
+	return true;
+}
+
+bool Warship::IsWaterTileInViewRange(WaterTile* tile)
+{
+	if (tile->m_zone != m_zone)
+	{
+		return false;
+	}
+
+	int diff_x = tile->m_coord_x - m_DMS.m_minute_x;
+	int diff_y = tile->m_coord_y - m_DMS.m_minute_y;
+
+	if (diff_x * diff_x + diff_y * diff_y > NB_WATERTILE_VIEW_RANGE * NB_WATERTILE_VIEW_RANGE * 1.05f)//+5% radius to allow tiles that are not 100% strictly inside the radius to be seen
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+

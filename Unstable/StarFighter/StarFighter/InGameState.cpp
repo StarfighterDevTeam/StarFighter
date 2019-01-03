@@ -29,14 +29,17 @@ void InGameState::Initialize(Player player)
 	//(*CurrentGame).m_playerShip->SetControllerType(AllControlDevices);
 
 	//PIRATES
-	m_warships[0].InitWarship();
 	InitWaterZones();
+	m_warships[0].InitWarship();
+	
 }
 
 void InGameState::InitWaterZones()
 {
+	vector<WaterZone*> vec;
 	WaterZone* zone = new WaterZone(0, 0);
-	m_waterzones.push_back(zone);
+	vec.push_back(zone);
+	(*CurrentGame).m_waterzones.push_back(vec);
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -84,6 +87,21 @@ void InGameState::Update(sf::Time deltaTime)
 			}
 		}
 	}
+
+	//WATER PART
+	Warship& ship = m_warships[0];
+	for (vector<vector<WaterTile*> >::iterator it = ship.m_zone->m_watertiles.begin(); it != ship.m_zone->m_watertiles.end(); it++)
+	{
+		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		{
+			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (ship.m_DMS.m_minute_x - NB_WATERTILE_VIEW_RANGE) + (*it2)->m_coord_x);
+			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f + (ship.m_DMS.m_minute_y - NB_WATERTILE_VIEW_RANGE) - (*it2)->m_coord_y + 2.f * NB_WATERTILE_VIEW_RANGE);//from bottom to top
+			float a = (*it2)->m_position.x;
+			float b = (*it2)->m_position.y;
+
+			(*it2)->GameEntity::Update(deltaTime);
+		}
+	}
 }
 
 void InGameState::Draw()
@@ -118,6 +136,31 @@ void InGameState::Draw()
 	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//WATER PART
+
+	//water tiles
+	for (vector<vector<WaterTile*> >::iterator it = ship.m_zone->m_watertiles.begin(); it != ship.m_zone->m_watertiles.end(); it++)
+	{
+		//preliminary check that takes away a whole vector to check
+		if (it->front()->m_coord_x < ship.m_tile->m_coord_x - NB_WATERTILE_VIEW_RANGE || it->front()->m_coord_x > ship.m_tile->m_coord_x + NB_WATERTILE_VIEW_RANGE)
+		{
+			continue;
+		}
+
+		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		{
+			//if ((*it2)->m_coord_y < ship.m_tile->m_coord_y - NB_WATERTILE_VIEW_RANGE || (*it2)->m_coord_y > ship.m_tile->m_coord_y + NB_WATERTILE_VIEW_RANGE)
+			//{
+			//	continue;
+			//}
+
+			if (ship.IsWaterTileInViewRange(*it2))
+			{
+				(*it2)->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
 	}
 
 	//Display

@@ -22,6 +22,7 @@ using namespace sf;
 
 class GameEntity;//forward declaration
 class RoomTile;
+class WaterZone;
 class Ship;
 
 enum SFX_Bank
@@ -122,13 +123,14 @@ public:
 	//CSV data
 	map<string, vector<string> > m_gameObjectsConfig;
 
-	//ROBOT
+	//PIRATE
 	GameEntity* m_selected_ui;
 	GameEntity* m_hovered_ui;
 	GameEntity* m_target_ui;
 	GameEntity* m_play_ui;
 
 	vector<RoomTile*> m_tiles;
+	vector<vector<WaterZone*> > m_waterzones;
 
 private:
 	void AddGameObjectToVector(GameObject* pGameObject, vector<GameObject*>* vector);

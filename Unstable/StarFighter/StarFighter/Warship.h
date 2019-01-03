@@ -16,6 +16,13 @@ public:
 	vector<RoomConnexion*> m_connexions;
 	vector<CrewMember*> m_crew;
 
+	WaterZone* m_zone;
+	WaterTile* m_tile;
+	DMS_Coord m_DMS;
+	bool SetDMSCoord(DMS_Coord coord);
+	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
+	bool IsWaterTileInViewRange(WaterTile* tile);
+
 	void InitWarship();
 	void Update(Time deltaTime);
 	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);

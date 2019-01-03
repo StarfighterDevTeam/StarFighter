@@ -21,7 +21,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_shape_container.setPosition(m_position);
 	m_shape_container.setSize(sf::Vector2f(size, size));
 	m_shape_container.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
-	m_shape_container.setFillColor(sf::Color::Blue);
+	m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));
 	m_shape_container.setOutlineThickness(2.f);
 	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 120));
 

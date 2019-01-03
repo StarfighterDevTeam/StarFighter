@@ -31,7 +31,6 @@ public:
 
 	//PIRATES
 	Warship m_warships[2];
-	vector<WaterZone*> m_waterzones;
 
 	void InitWaterZones();
 
