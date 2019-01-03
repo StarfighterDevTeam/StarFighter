@@ -4,6 +4,7 @@
 #include "Game.h"
 
 #include "CrewMember.h"
+#include "WaterZone.h"
 
 class Warship : public GameEntity
 {

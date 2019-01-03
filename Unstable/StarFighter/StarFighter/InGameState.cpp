@@ -30,6 +30,13 @@ void InGameState::Initialize(Player player)
 
 	//PIRATES
 	m_warships[0].InitWarship();
+	InitWaterZones();
+}
+
+void InGameState::InitWaterZones()
+{
+	WaterZone* zone = new WaterZone(0, 0);
+	m_waterzones.push_back(zone);
 }
 
 void InGameState::Update(sf::Time deltaTime)

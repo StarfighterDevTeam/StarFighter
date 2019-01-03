@@ -103,6 +103,7 @@
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="RoomTile.cpp" />
+    <ClCompile Include="WaterTile.cpp" />
     <ClCompile Include="Warship.cpp" />
     <ClCompile Include="SFPanel.cpp" />
     <ClCompile Include="SFPanelSpecific.cpp" />
@@ -112,6 +113,7 @@
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
+    <ClCompile Include="WaterZone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
@@ -135,6 +137,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="RoomTile.h" />
+    <ClInclude Include="WaterTile.h" />
     <ClInclude Include="Warship.h" />
     <ClInclude Include="SFPanel.h" />
     <ClInclude Include="SFPanelSpecific.h" />
@@ -144,6 +147,7 @@
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
+    <ClInclude Include="WaterZone.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />
