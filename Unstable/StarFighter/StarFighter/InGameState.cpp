@@ -72,13 +72,13 @@ void InGameState::Update(sf::Time deltaTime)
 
 	}
 
-	//TEMP DEBUG
+	//TEMP DEBUG: crew movement feedback
 	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 	{
 		(*it)->m_shape_container.setFillColor(sf::Color::Black);
 		for (vector<CrewMember*>::iterator it2 = ship.m_crew.begin(); it2 != ship.m_crew.end(); it2++)
 		{
-			if ((*it2)->m_destination == (*it))
+			if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
 			{
 				(*it)->m_shape_container.setFillColor(sf::Color::Green);
 			}
@@ -91,11 +91,10 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		CrewMember* crew = (CrewMember*)selection;
 		Room* room = (Room*)hovered;
-
 		RoomTile* previous_destination = crew->m_destination;
 		RoomTile* destination = crew->GetFreeRoomTile(room);
 
-		//if destination is valid (it exists and we're not already ont it), book the tile
+		//if destination is valid (it exists and we're not already on it), book the tile
 		if (destination != NULL && destination->m_crew != crew)
 		{
 			crew->m_destination = destination;

@@ -38,7 +38,7 @@ public:
 
 	vector<RoomConnexion*> m_connexions;
 	vector<RoomTile*> m_tiles;
-	vector<CrewMember*> m_crew;
+	//vector<CrewMember*> m_crew;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);

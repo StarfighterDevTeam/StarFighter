@@ -90,7 +90,6 @@ CrewMember* Warship::AddCrewMember(CrewMember* crew, Room* room)
 
 	//add to crew lists
 	m_crew.push_back(crew);
-	room->m_crew.push_back(crew);
 
 	//assign crew to tile
 	crew->m_tile = tile;
