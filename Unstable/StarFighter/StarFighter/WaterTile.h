@@ -14,25 +14,26 @@ class Island;
 #define WATERTILE_OFFSET_Y				100.f
 #define NB_WATERTILE_X					60
 #define NB_WATERTILE_Y					60
+#define NB_WATERTILE_SUBDIVISION		60
 #define NB_WATERTILE_VIEW_RANGE			5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
 
 struct DMS_Coord
 {
 	DMS_Coord(){};
-	DMS_Coord(int degree_x, int minute_x, int second_x, int degree_y, int minute_y, int second_y)
+	DMS_Coord(int degree_x, int minute_x, float second_x, int degree_y, int minute_y, float second_y)
 	{
 		SetCoord(degree_x, minute_x, second_x, degree_y, minute_y, second_y);
 	}
 
 	int m_degree_x;
 	int m_minute_x;
-	int m_second_x;
+	float m_second_x;
 
 	int m_degree_y;
 	int m_minute_y;
-	int m_second_y;
+	float m_second_y;
 
-	void SetCoord(int degree_x, int minute_x, int second_x, int degree_y, int minute_y, int second_y){
+	void SetCoord(int degree_x, int minute_x, float second_x, int degree_y, int minute_y, float second_y){
 		m_degree_x = degree_x;
 		m_minute_x = minute_x;
 		m_second_x = second_x;

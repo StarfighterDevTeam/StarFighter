@@ -5,6 +5,8 @@ extern Game* CurrentGame;
 Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 {
 	m_angle = 90.f;
+	m_destination = NULL;
+	m_speed = sf::Vector2f(0, 0);
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -85,17 +87,42 @@ Warship::~Warship()
 void Warship::Update(Time deltaTime)
 {
 	//position
-	m_position = m_tile->m_position;
+	if (m_destination == NULL)
+	{
+		m_position = m_tile->m_position;
+	}
 
 	//rotation
 	UpdateRotation();
 
+	//apply movement
+	m_DMS.m_second_x += m_speed.x * deltaTime.asSeconds();
+	m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
+
+	//sexadecimal system
+	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
+	{
+		int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
+		m_DMS.m_minute_x += minutes;
+		m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
+	}
+	if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
+	{
+		int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
+		m_DMS.m_minute_y += minutes;
+		m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
+	}
+
 	//UI
 	ostringstream ss;
+	ss << std::fixed;
+	ss.precision(0);
 	ss << "\n\n\n";
-	ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << m_DMS.m_second_x << "\"\N";
+	ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' ";
+	ss << m_DMS.m_second_y << "\"\N";
 	ss << "\n";
-	ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' " << m_DMS.m_second_y << "\"\E";
+	ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' ";
+	ss << m_DMS.m_second_x << "\"\E";
 	m_text.setString(ss.str());
 
 	GameEntity::Update(deltaTime);
@@ -357,9 +384,13 @@ int Warship::GetDistanceToWaterTile(WaterTile* tile)
 	int diff_y = tile->m_coord_y - m_DMS.m_minute_y;
 	float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y);
 
+	//int diff_x = NB_WATERTILE_SUBDIVISION * (tile->m_coord_x - m_DMS.m_minute_x) - m_DMS.m_second_x;
+	//int diff_y = NB_WATERTILE_SUBDIVISION * (tile->m_coord_y - m_DMS.m_minute_y) - m_DMS.m_second_y;
+	//float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y) * 1.f / NB_WATERTILE_SUBDIVISION;
+
 	int distance_i = (int)distance_f;
 
-	if (distance_f - distance_i > 0.15f)//custom round-up rule
+	if (distance_f - distance_i > 0.10f)//custom round-up rule
 	{
 		distance_i++;
 	}
@@ -379,3 +410,18 @@ bool Warship::CanViewWaterTile(WaterTile* tile)
 	return distance <= NB_WATERTILE_VIEW_RANGE;
 }
 
+bool Warship::SetSailsToWaterTile(WaterTile* tile)
+{
+	if (m_destination != NULL)
+	{
+		return false;
+	}
+
+	sf::Vector2f move_vector = tile->m_position - m_position;
+	GameObject::ScaleVector(&move_vector, CRUISE_SPEED);
+	m_speed = move_vector;
+
+	m_destination = tile;
+
+	return true;
+}

@@ -128,8 +128,8 @@ void InGameState::Update(sf::Time deltaTime)
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
 			//position on "radar"
-			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - m_warship->m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
-			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
+			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (m_warship->m_DMS.m_minute_x + m_warship->m_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
+			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y - m_warship->m_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
 
 			//can be seen? no need to update other tiles because they won't be drawn anyway
 			int distance = m_warship->GetDistanceToWaterTile(*it2);
@@ -185,7 +185,8 @@ void InGameState::Update(sf::Time deltaTime)
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection == m_warship && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
 	{
 		WaterTile* tile = (WaterTile*)hovered;
-		printf("distance: %d\n", m_warship->GetDistanceToWaterTile(tile));
+		//printf("distance: %d\n", m_warship->GetDistanceToWaterTile(tile));
+		m_warship->SetSailsToWaterTile(tile);
 	}
 }
 
@@ -227,8 +228,8 @@ void InGameState::Draw()
 	//water tiles
 	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_zone->m_watertiles.begin(); it != m_warship->m_zone->m_watertiles.end(); it++)
 	{
-		//preliminary check that takes away a whole vector to check
-		if (it->front()->m_coord_x < m_warship->m_tile->m_coord_x - NB_WATERTILE_VIEW_RANGE || it->front()->m_coord_x > m_warship->m_tile->m_coord_x + NB_WATERTILE_VIEW_RANGE)
+		//preliminary check that takes away a whole vector to check + 1 margin
+		if (it->front()->m_coord_x < m_warship->m_DMS.m_minute_x - NB_WATERTILE_VIEW_RANGE - 1 || it->front()->m_coord_x > m_warship->m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + 1)
 		{
 			continue;
 		}
