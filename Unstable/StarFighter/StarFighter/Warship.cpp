@@ -84,6 +84,9 @@ void Warship::InitWarship()
 
 void Warship::Update(Time deltaTime)
 {
+	//position
+	m_position = m_tile->m_position;
+
 	//rotation
 	UpdateRotation();
 
@@ -336,7 +339,6 @@ bool Warship::SetDMSCoord(DMS_Coord coord)
 	m_tile = tile;
 	m_DMS = coord;
 	m_zone = tile->m_zone;
-	m_position = sf::Vector2f(m_tile->m_position.x - WATERTILE_SIZE * 0.5f, m_tile->m_position.y - WATERTILE_SIZE * 0.5f);
 
 	return true;
 }

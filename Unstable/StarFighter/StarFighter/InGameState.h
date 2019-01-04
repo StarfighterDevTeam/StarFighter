@@ -31,6 +31,7 @@ public:
 
 	//PIRATES
 	Warship m_warships[2];
+	Island* m_island;
 
 	void InitWaterZones();
 

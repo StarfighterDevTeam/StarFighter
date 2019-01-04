@@ -43,7 +43,7 @@ void InGameState::InitWaterZones()
 	(*CurrentGame).m_waterzones.push_back(vec);
 
 	//islands
-	Island* island = new Island(7, 8, 2, 2, zone, 0, 0);
+	m_island = new Island(8, 9, 2, 2, zone, 0, 0);
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -101,12 +101,6 @@ void InGameState::Update(sf::Time deltaTime)
 		}
 	}
 
-	//boat
-	ship.Update(deltaTime);
-
-	//islands
-	ship.Update(deltaTime);
-
 	//ACTIONS
 	//Crew move to room
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_Room)
@@ -130,40 +124,19 @@ void InGameState::Update(sf::Time deltaTime)
 		}
 	}
 
-	//WATER PART
+	//water tiles
 	for (vector<vector<WaterTile*> >::iterator it = ship.m_zone->m_watertiles.begin(); it != ship.m_zone->m_watertiles.end(); it++)
 	{
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (ship.m_DMS.m_minute_x - NB_WATERTILE_VIEW_RANGE) + (*it2)->m_coord_x);
-			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f + (ship.m_DMS.m_minute_y - NB_WATERTILE_VIEW_RANGE) - (*it2)->m_coord_y + 2.f * NB_WATERTILE_VIEW_RANGE);//from bottom to top
-			float a = (*it2)->m_position.x;
-			float b = (*it2)->m_position.y;
+			//position on "radar"
+			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - ship.m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
+			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (60-ship.m_DMS.m_minute_y) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
 
-			//vector<Island*> islands_on_screen;
 			//can be seen? no need to update other tiles because they won't be drawn anyway
 			int distance = ship.GetDistanceToWaterTile(*it2);
 			if (distance <= NB_WATERTILE_VIEW_RANGE)
 			{
-				//get islands (if any)
-				//if ((*it2)->m_type == Water_Island)
-				//{
-				//	Island* island = (Island*)(*it2);
-				//	bool island_found = false;
-				//	for (vector<Island*>::iterator it3 = islands_on_screen.begin(); it3 != islands_on_screen.end(); it3++)
-				//	{
-				//		if (island == *it3)
-				//		{
-				//			island_found = true;
-				//			break;
-				//		}
-				//	}
-				//	if (island_found == false)
-				//	{
-				//		islands_on_screen.push_back(island);
-				//	}
-				//}
-
 				//selection
 				if (selection == &ship)
 				{
@@ -192,6 +165,22 @@ void InGameState::Update(sf::Time deltaTime)
 				}
 			}
 		}
+	}
+
+	//boat - must be done after water tiles update because it's attached to a tile
+	ship.Update(deltaTime);
+
+	//island
+	if (m_island != NULL)
+	{
+		//position on "radar"
+		WaterTile* tileUpLeft = ship.m_zone->m_watertiles[m_island->m_upcorner_x][m_island->m_upcorner_y];
+		WaterTile* tileDownRight = ship.m_zone->m_watertiles[m_island->m_upcorner_x + m_island->m_width - 1][m_island->m_upcorner_y - m_island->m_height + 1];
+		float pos_x = 0.5f * (tileDownRight->m_position.x + tileUpLeft->m_position.x);
+		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
+		m_island->m_position = sf::Vector2f(pos_x, pos_y);
+	
+		m_island->Update(deltaTime);
 	}
 
 	//Actions
@@ -258,6 +247,12 @@ void InGameState::Draw()
 
 	//boat
 	ship.Draw((*CurrentGame).m_mainScreen);
+
+	//island
+	if (m_island != NULL)
+	{
+		m_island->Draw((*CurrentGame).m_mainScreen);
+	}
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();

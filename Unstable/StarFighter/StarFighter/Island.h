@@ -7,11 +7,16 @@
 
 class Warship;//forward declaration
 
-class Island : public WaterTile
+class Island : public GameEntity
 {
 public:
 	Island(int upcorner_x, int upcorner_y, int width, int height, WaterZone* zone, int zone_coord_x, int zone_coord_y);
 	~Island();
+
+	int m_upcorner_x;
+	int m_upcorner_y;
+	int m_width;
+	int m_height;
 
 	vector<WaterTile*> m_tiles;
 

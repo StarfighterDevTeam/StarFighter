@@ -2,10 +2,15 @@
 
 extern Game* CurrentGame;
 
-Island::Island(int upcorner_x, int upcorner_y, int width, int height, WaterZone* zone, int zone_coord_x, int zone_coord_y) : WaterTile(upcorner_x, upcorner_y, Water_Island, zone, zone_coord_x, zone_coord_y)
+Island::Island(int upcorner_x, int upcorner_y, int width, int height, WaterZone* zone, int zone_coord_x, int zone_coord_y) : GameEntity(sf::Vector2f(width * WATERTILE_SIZE, height * WATERTILE_SIZE), UI_WaterTile)
 {
+	m_upcorner_x = upcorner_x;
+	m_upcorner_y = upcorner_y;
+	m_width = width;
+	m_height = height;
+
 	//associating island tiles to island
-	for (int y = upcorner_y; y < upcorner_y + height; y++)
+	for (int y = upcorner_y; y > upcorner_y - height; y--)//y : from top to bottom
 	{
 		for (int x = upcorner_x; x < upcorner_x + width; x++)
 		{
@@ -18,12 +23,11 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, WaterZone*
 		}
 	}
 
-	//text
+	//UI
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);
-	m_text.setColor(sf::Color::White);
-	m_text.SetPosition(m_position);
-	m_text.setString("Island of Death");
+	m_text.setColor(sf::Color::Black);
+	m_text.setString("Turtle Island");
 }
 
 Island::~Island()
