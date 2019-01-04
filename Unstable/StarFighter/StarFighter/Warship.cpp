@@ -4,15 +4,14 @@ extern Game* CurrentGame;
 
 Warship::Warship()
 {
-	m_angle = -90.f;
+	m_angle = 90.f;
 
 	//shape for water tiles
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/boat_icon_L.png", WATERTILE_SIZE, WATERTILE_SIZE);
-	m_shape.setTexture(texture);
-	m_shape.setSize(sf::Vector2f(WATERTILE_SIZE, WATERTILE_SIZE));
-	m_shape.setOrigin(sf::Vector2f(WATERTILE_SIZE * 0.5f, WATERTILE_SIZE * 0.5f));
+	sf::Texture* texture = loader->loadTexture("2D/boat_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
+
+	setAnimation(texture, 1, 2);
 }
 
 Warship::~Warship()
@@ -110,8 +109,16 @@ void Warship::Update(Time deltaTime)
 	//WATER PART
 	
 	//rotation
-	m_angle += 1.f;
-	m_shape.setRotation(fmod(m_angle, 180.f) - 90.f);
+	m_angle = fmod(m_angle, 360.f);
+	if (m_angle > 0.f && m_angle < 180.f)
+	{
+		setAnimationLine(0);//Boat facing right
+	}
+	else if (m_angle > 180.f)
+	{
+		setAnimationLine(1);//Boat facing left
+	}
+	setRotation(m_angle);
 
 	GameEntity::Update(deltaTime);
 }

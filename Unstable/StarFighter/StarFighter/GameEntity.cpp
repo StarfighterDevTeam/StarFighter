@@ -20,6 +20,7 @@ void GameEntity::Update(Time deltaTime)
 	m_shape_container.setPosition(m_position);
 	m_shape.setPosition(m_position);
 	m_text.SetPosition(m_position);
+	setPosition(m_position);
 
 	//get inputs
 	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
@@ -73,6 +74,8 @@ void GameEntity::Update(Time deltaTime)
 	{
 		m_shape_container.setOutlineColor(sf::Color::Green);
 	}
+
+	AnimatedSprite::update(deltaTime);
 }
 
 void GameEntity::Draw(sf::RenderTexture& screen)
@@ -80,4 +83,71 @@ void GameEntity::Draw(sf::RenderTexture& screen)
 	screen.draw(this->m_shape_container);
 	screen.draw(this->m_shape);
 	screen.draw(this->m_text);
+	screen.draw(*this);
 };
+
+void GameEntity::setAnimation(sf::Texture *texture, int frameNumber, int animationNumber)
+{
+	m_animationNumber = animationNumber;
+	m_frameNumber = frameNumber;
+
+	m_size.x = ((*texture).getSize().x / frameNumber);
+	m_size.y = ((*texture).getSize().y / animationNumber);
+	setOrigin(sf::Vector2f(m_size.x / 2, m_size.y / 2));
+
+	m_defaultAnimation.setSpriteSheet(*texture);
+
+	for (int j = 0; j < animationNumber; j++)
+	{
+		for (int i = 0; i < frameNumber; i++)
+		{
+			int x = ((*texture).getSize().x / frameNumber)*(i);
+			int y = ((*texture).getSize().y / animationNumber)*(j);
+			m_defaultAnimation.addFrame(sf::IntRect(x, y, m_size.x, m_size.y));
+		}
+	}
+
+	m_currentAnimation = NULL;
+	setAnimationLine(0);//default starting animation is line 0 (top of the sprite sheet)
+}
+
+void GameEntity::setAnimationLine(int animation, bool keep_frame_index)
+{
+	//are we already playing this animation?
+	if (m_currentAnimationIndex == animation && (keep_frame_index || (m_currentAnimation && m_currentAnimation->getSize() == 1)))
+	{
+		return;
+	}
+
+	//bulletproof verifications
+	if (animation >= m_animationNumber)
+	{
+		printf("Requesting an animation line (%d) that exceeds what is allowed (%d) for this item", animation, m_animationNumber);
+		animation = m_animationNumber - 1;
+		if (animation < 0)
+		{
+			animation = 0;
+		}
+	}
+
+	//now let's load the new animation
+	Animation* anim = new Animation();
+	anim->setSpriteSheet(*this->m_defaultAnimation.getSpriteSheet());
+	for (size_t j = 0; j < m_defaultAnimation.getSize(); j++)
+	{
+		size_t n = j / m_frameNumber;
+		//when we have reached out to the correct line of animation frames, we put this line into the animation
+		if (n == animation)
+		{
+			anim->addFrame(m_defaultAnimation.getFrame(j));
+		}
+	}
+
+	if (m_currentAnimation)
+		delete m_currentAnimation;
+
+	m_currentAnimation = anim;
+	anim = NULL;
+	play(*m_currentAnimation, keep_frame_index);
+	m_currentAnimationIndex = animation;
+}

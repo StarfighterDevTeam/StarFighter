@@ -10,7 +10,7 @@ enum UI_Type
 	UI_Connexion,
 };
 
-class GameEntity
+class GameEntity : public AnimatedSprite
 {
 public:
 	GameEntity();
@@ -31,6 +31,15 @@ public:
 
 	void Update(Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
+
+	Animation m_defaultAnimation;
+	Animation* m_currentAnimation;
+	int m_animationNumber;
+	int m_frameNumber;
+	int m_currentAnimationIndex;
+
+	void setAnimation(sf::Texture *texture, int frameNumber, int animationNumber);
+	void setAnimationLine(int animation, bool keep_frame_index = false);
 };
 
 #endif //GAMEENTITY_H_INCLUDED
