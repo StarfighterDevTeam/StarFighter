@@ -134,29 +134,32 @@ void InGameState::Update(sf::Time deltaTime)
 			float b = (*it2)->m_position.y;
 
 			int distance = ship.GetDistanceToWaterTile(*it2);
-			if (selection == &ship && distance <= NB_WATERTILE_VIEW_RANGE) //ship.CanViewWaterTile(*it2))
+			if (distance <= NB_WATERTILE_VIEW_RANGE) //no need to update other tiles because they won't be drawn anyway
 			{
-				//display distances to the boat
-				if (distance != 0)
+				if (selection == &ship)
 				{
-					ostringstream ss;
-					ss << distance;
-					(*it2)->m_text.setString(ss.str());
-				}
-				
-				(*it2)->GameEntity::Update(deltaTime);
-			}
-			else
-			{
-				(*it2)->GameEntity::UpdatePosition();
-				(*it2)->m_text.setString("");
+					//display distances to the boat
+					if (distance != 0)
+					{
+						ostringstream ss;
+						ss << distance;
+						(*it2)->m_text.setString(ss.str());
+					}
 
-				//selection of water tiles is forbidden
-				if ((*it2)->m_selected == true)
+					(*it2)->GameEntity::Update(deltaTime);
+				}
+				else
 				{
-					(*it2)->m_selected = false;
-					(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
-					(*CurrentGame).m_selected_ui = NULL;
+					(*it2)->GameEntity::UpdatePosition();
+					(*it2)->m_text.setString("");
+
+					//selection of water tiles is forbidden
+					if ((*it2)->m_selected == true)
+					{
+						(*it2)->m_selected = false;
+						(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+						(*CurrentGame).m_selected_ui = NULL;
+					}
 				}
 			}
 		}
