@@ -5,16 +5,19 @@
 
 enum UI_Type
 {
+	UI_None,
 	UI_CrewMember,
 	UI_Room,
 	UI_Connexion,
+	UI_Warship,
+	UI_WaterTile,
 };
 
 class GameEntity : public AnimatedSprite
 {
 public:
-	GameEntity();
-	GameEntity(sf::Vector2f size);
+	GameEntity(UI_Type ui_type);
+	GameEntity(sf::Vector2f size, UI_Type ui_type);
 
 	sf::Vector2f m_size;
 	sf::Vector2f m_position;

@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open)
+RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open) : GameEntity(UI_Connexion)
 {
 	m_tiles = tiles; 
 	m_open = open;
@@ -50,7 +50,7 @@ void RoomConnexion::Update(Time deltaTime)
 	GameEntity::Update(deltaTime);
 }
 
-RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntity(sf::Vector2f(size, size))
+RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntity(sf::Vector2f(size, size), UI_None)
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;

@@ -18,7 +18,7 @@ string dico_rooms[NB_ROOM_TYPES] = {
 	"Mecha",			//Room_Mecha
 };
 
-Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
+Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type) : GameEntity(UI_Room)
 {
 	m_upcorner_x = upcorner_x;
 	m_upcorner_y = upcorner_y;

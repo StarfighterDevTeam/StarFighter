@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zone, int zone_coord_x, int zone_coord_y, float size) : GameEntity(sf::Vector2f(size, size))
+WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zone, int zone_coord_x, int zone_coord_y, float size) : GameEntity(sf::Vector2f(size, size), UI_WaterTile)
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
@@ -30,6 +30,11 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_shape.setSize(sf::Vector2f(size, size));
 	m_shape.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
 	m_shape.setFillColor(sf::Color(0, 0, 0, 0));
+
+	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_text.setCharacterSize(20);
+	m_text.setColor(sf::Color::White);
+	m_text.SetPosition(m_position);
 }
 
 WaterTile::~WaterTile()

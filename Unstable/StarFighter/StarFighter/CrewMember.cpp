@@ -10,7 +10,7 @@ string dico_crew[NB_CREW_TYPES] = {
 	"Mecha",	//Crew_Mecha,
 };
 
-CrewMember::CrewMember(CrewMemberType type)
+CrewMember::CrewMember(CrewMemberType type) : GameEntity(UI_CrewMember)
 {
 	m_type = type;
 	m_UI_type = UI_CrewMember;

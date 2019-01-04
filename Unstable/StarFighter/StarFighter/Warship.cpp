@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Warship::Warship()
+Warship::Warship() : GameEntity(UI_Warship)
 {
 	m_angle = 90.f;
 
@@ -12,6 +12,16 @@ Warship::Warship()
 	sf::Texture* texture = loader->loadTexture("2D/boat_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
 
 	setAnimation(texture, 1, 2);
+
+	//water tile outline
+	m_default_color = sf::Color(0, 0, 0, 0);
+
+	m_shape_container.setPosition(m_position);
+	m_shape_container.setSize(sf::Vector2f(WATERTILE_SIZE, WATERTILE_SIZE));
+	m_shape_container.setOrigin(sf::Vector2f(WATERTILE_SIZE * 0.5f, WATERTILE_SIZE * 0.5f));
+	m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+	m_shape_container.setOutlineThickness(2.f);
+	m_shape_container.setOutlineColor(m_default_color);
 }
 
 Warship::~Warship()
@@ -74,40 +84,6 @@ void Warship::InitWarship()
 
 void Warship::Update(Time deltaTime)
 {
-	//Interaction with rooms
-	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	{
-		UpdateCrewMembersCountPerRoom(*it);
-		(*it)->Update(deltaTime);
-	}
-
-	//Room connexions
-	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
-	{
-		(*it)->Update(deltaTime);
-	}
-
-	//Crew movement
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-	{
-		(*it)->Update(deltaTime);
-	}
-
-	//TEMP DEBUG: crew movement feedback
-	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
-	{
-		(*it)->m_shape_container.setFillColor(sf::Color::Black);
-		for (vector<CrewMember*>::iterator it2 = m_crew.begin(); it2 != m_crew.end(); it2++)
-		{
-			if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
-			{
-				(*it)->m_shape_container.setFillColor(sf::Color::Green);
-			}
-		}
-	}
-
-	//WATER PART
-	
 	//rotation
 	UpdateRotation();
 
@@ -365,23 +341,31 @@ bool Warship::SetDMSCoord(DMS_Coord coord)
 	return true;
 }
 
-bool Warship::IsWaterTileInViewRange(WaterTile* tile)
+int Warship::GetDistanceToWaterTile(WaterTile* tile)
+{
+	int diff_x = tile->m_coord_x - m_DMS.m_minute_x;
+	int diff_y = tile->m_coord_y - m_DMS.m_minute_y;
+	float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y);
+
+	int distance_i = (int)distance_f;
+
+	if (distance_f - distance_i > 0.15f)//custom round-up rule
+	{
+		distance_i++;
+	}
+
+	return distance_i;
+}
+
+bool Warship::CanViewWaterTile(WaterTile* tile)
 {
 	if (tile->m_zone != m_zone)
 	{
 		return false;
 	}
 
-	int diff_x = tile->m_coord_x - m_DMS.m_minute_x;
-	int diff_y = tile->m_coord_y - m_DMS.m_minute_y;
+	int distance = GetDistanceToWaterTile(tile);
 
-	if (diff_x * diff_x + diff_y * diff_y > NB_WATERTILE_VIEW_RANGE * NB_WATERTILE_VIEW_RANGE * 1.05f)//+5% radius to allow tiles that are not 100% strictly inside the radius to be seen
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return distance <= NB_WATERTILE_VIEW_RANGE;
 }
 

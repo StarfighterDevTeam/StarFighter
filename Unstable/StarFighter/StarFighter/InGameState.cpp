@@ -58,11 +58,47 @@ void InGameState::Update(sf::Time deltaTime)
 	if ((*CurrentGame).m_selected_ui != NULL && mouse_click == Mouse_LeftClick)
 	{
 		(*CurrentGame).m_selected_ui->m_selected = false;
-		(*CurrentGame).m_selected_ui->m_shape_container.setOutlineColor(sf::Color::White);
+		(*CurrentGame).m_selected_ui->m_shape_container.setOutlineColor((*CurrentGame).m_selected_ui->m_default_color);
 		(*CurrentGame).m_selected_ui = NULL;
 	}
 
-	m_warships[0].Update(deltaTime);
+	//Updating game entities
+	Warship& ship = m_warships[0];
+
+	//Interaction with rooms
+	for (vector<Room*>::iterator it = ship.m_rooms.begin(); it != ship.m_rooms.end(); it++)
+	{
+		ship.UpdateCrewMembersCountPerRoom(*it);
+		(*it)->Update(deltaTime);
+	}
+
+	//Room connexions
+	for (vector<RoomConnexion*>::iterator it = ship.m_connexions.begin(); it != ship.m_connexions.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
+
+	//Crew movement
+	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
+
+	//TEMP DEBUG: crew movement feedback
+	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+	{
+		(*it)->m_shape_container.setFillColor(sf::Color::Black);
+		for (vector<CrewMember*>::iterator it2 = ship.m_crew.begin(); it2 != ship.m_crew.end(); it2++)
+		{
+			if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
+			{
+				(*it)->m_shape_container.setFillColor(sf::Color::Green);
+			}
+		}
+	}
+
+	//boat
+	ship.Update(deltaTime);
 
 	//ACTIONS
 	//Crew move to room
@@ -88,7 +124,6 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//WATER PART
-	Warship& ship = m_warships[0];
 	for (vector<vector<WaterTile*> >::iterator it = ship.m_zone->m_watertiles.begin(); it != ship.m_zone->m_watertiles.end(); it++)
 	{
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
@@ -98,8 +133,40 @@ void InGameState::Update(sf::Time deltaTime)
 			float a = (*it2)->m_position.x;
 			float b = (*it2)->m_position.y;
 
-			(*it2)->GameEntity::Update(deltaTime);
+			int distance = ship.GetDistanceToWaterTile(*it2);
+			if (selection == &ship && distance <= NB_WATERTILE_VIEW_RANGE) //ship.CanViewWaterTile(*it2))
+			{
+				//display distances to the boat
+				if (distance != 0)
+				{
+					ostringstream ss;
+					ss << distance;
+					(*it2)->m_text.setString(ss.str());
+				}
+				
+				(*it2)->GameEntity::Update(deltaTime);
+			}
+			else
+			{
+				(*it2)->GameEntity::UpdatePosition();
+				(*it2)->m_text.setString("");
+
+				//selection of water tiles is forbidden
+				if ((*it2)->m_selected == true)
+				{
+					(*it2)->m_selected = false;
+					(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+					(*CurrentGame).m_selected_ui = NULL;
+				}
+			}
 		}
+	}
+
+	//Actions
+	if (mouse_click == Mouse_RightClick && selection != NULL && selection == &ship && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
+	{
+		WaterTile* tile = (WaterTile*)hovered;
+		printf("distance: %d\n", ship.GetDistanceToWaterTile(tile));
 	}
 }
 
@@ -150,7 +217,7 @@ void InGameState::Draw()
 
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			if (ship.IsWaterTileInViewRange(*it2))
+			if (ship.CanViewWaterTile(*it2))
 			{
 				(*it2)->Draw((*CurrentGame).m_mainScreen);
 			}
