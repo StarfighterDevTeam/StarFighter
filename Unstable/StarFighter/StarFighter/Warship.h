@@ -25,6 +25,7 @@ public:
 	bool SetDMSCoord(DMS_Coord coord);
 	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool IsWaterTileInViewRange(WaterTile* tile);
+	void UpdateRotation();
 
 	void InitWarship();
 	void Update(Time deltaTime);

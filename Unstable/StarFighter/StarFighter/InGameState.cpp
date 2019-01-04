@@ -64,7 +64,6 @@ void InGameState::Update(sf::Time deltaTime)
 
 	m_warships[0].Update(deltaTime);
 
-
 	//ACTIONS
 	//Crew move to room
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_Room)

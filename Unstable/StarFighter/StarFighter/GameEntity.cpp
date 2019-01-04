@@ -14,13 +14,18 @@ GameEntity::GameEntity(sf::Vector2f size) : GameEntity()
 	m_size = size;
 }
 
-void GameEntity::Update(Time deltaTime)
+void GameEntity::UpdatePosition()
 {
-	//update position
 	m_shape_container.setPosition(m_position);
 	m_shape.setPosition(m_position);
 	m_text.SetPosition(m_position);
 	setPosition(m_position);
+}
+
+void GameEntity::Update(Time deltaTime)
+{
+	//update position
+	UpdatePosition();
 
 	//get inputs
 	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;

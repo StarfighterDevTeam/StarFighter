@@ -109,6 +109,13 @@ void Warship::Update(Time deltaTime)
 	//WATER PART
 	
 	//rotation
+	UpdateRotation();
+
+	GameEntity::Update(deltaTime);
+}
+
+void Warship::UpdateRotation()
+{
 	m_angle = fmod(m_angle, 360.f);
 	if (m_angle > 0.f && m_angle < 180.f)
 	{
@@ -119,8 +126,6 @@ void Warship::Update(Time deltaTime)
 		setAnimationLine(1);//Boat facing left
 	}
 	setRotation(m_angle);
-
-	GameEntity::Update(deltaTime);
 }
 
 Room* Warship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)

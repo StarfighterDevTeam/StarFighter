@@ -30,6 +30,7 @@ public:
 	sf::Color m_default_color;
 
 	void Update(Time deltaTime);
+	void UpdatePosition();
 	void Draw(sf::RenderTexture& screen);
 
 	Animation m_defaultAnimation;
