@@ -27,9 +27,11 @@ public:
 	bool m_is_revealed;
 
 	int GetGunnerRangeBonus();
+	int GetPilotSpeedBonus();
 	int GetEquipmentRangeBonus();
+	int GetEquipmentSpeedBonus();
 	int GetWarriorBalanceBonus();
-	bool HasCrewRequired(CrewType type);
+	CrewMember* HasCrewRequired(CrewType type);
 	bool CanEquipEnergeticWeapon();
 };
 

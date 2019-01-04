@@ -54,19 +54,20 @@ void InGameState::InitRobots()
 
 	//Robot 1
 	robot.m_index = 0;
-	robot.SetModule(Module_Infirmary, Index_BodyU);
+	robot.SetModule(Module_Generator, Index_BodyU);
+	robot.SetEquipment(Equipment_HeavyPlate, Index_BodyU);
+	robot.SetEquipment(Equipment_GeneratorBooster, Index_BodyU);
 
-	robot.SetModule(Module_Deflectors, Index_BodyM);
-	robot.SetEquipment(Equipment_LightPlate, Index_BodyM);
+	robot.SetModule(Module_Gadget, Index_BodyM);
+	robot.SetEquipment(Equipment_GadgetEMP, Index_BodyM);
+	robot.SetEquipment(Equipment_GadgetJammer, Index_BodyM);
 
-	robot.SetModule(Module_CrewQuarter, Index_BodyD);
-	robot.SetEquipment(Equipment_CQExtension, Index_BodyD);
+	//robot.SetModule(Module_CrewQuarter, Index_BodyD);
 
-	robot.SetModule(Module_Generator, Index_LegR);
-	robot.SetEquipment(Equipment_GeneratorBooster, Index_LegR);
+	robot.SetModule(Module_Deflectors, Index_LegR);
 
-	robot.SetModule(Module_Gadget, Index_LegL);
-	robot.SetEquipment(Equipment_GadgetEMP, Index_LegL);
+	robot.SetModule(Module_CrewQuarter, Index_LegL);
+	robot.SetEquipment(Equipment_CQExtension, Index_LegL);
 
 	robot.SetEquipment(Equipment_LightPlate, Index_FootL);
 
@@ -76,21 +77,23 @@ void InGameState::InitRobots()
 	robot.SetEquipment(Equipment_EnergeticWeapon, Index_HandL);
 
 	robot.SetModule(Module_Weapon, Index_HandR);
-	robot.SetEquipment(Equipment_LightPlate, Index_HandR);
+	robot.SetEquipment(Equipment_WeaponReactor, Index_HandR);
 
 	robot.SetModule(Module_Radar, Index_ShoulderL);
 	
 	robot.SetModule(Module_Weapon, Index_ShoulderR);
-	robot.SetEquipment(Equipment_WeaponsScope, Index_ShoulderR);
+	robot.SetEquipment(Equipment_LightPlate, Index_ShoulderR);
 
 	robot.SetCrewMember(Crew_Captain, Index_Head);
 	robot.SetCrewMember(Crew_Pilot, Index_Head);
-	robot.SetCrewMember(Crew_Mechanic, Index_BodyM);
-	robot.SetCrewMember(Crew_Scientist, Index_LegR);
-	robot.SetCrewMember(Crew_Engineer, Index_LegL);
-	robot.SetCrewMember(Crew_Warrior, Index_HandL);
+	robot.SetCrewMember(Crew_Mechanic, Index_ShoulderL);
+	robot.SetCrewMember(Crew_Scientist, Index_BodyU);
+	robot.SetCrewMember(Crew_Engineer, Index_BodyM);
+	robot.SetCrewMember(Crew_Medic, Index_BodyM);
 
 	robot.SetWeapon(Weapon_FireSword, Index_HandL);
+	robot.SetWeapon(Weapon_Hammer, Index_HandR);
+	robot.SetWeapon(Weapon_Gun, Index_ShoulderR);
 
 	robot.Initialize();
 
@@ -98,48 +101,47 @@ void InGameState::InitRobots()
 
 	//Robot 2
 	robot2.m_index = 1;
-	robot2.SetModule(Module_Generator, Index_BodyU);
-	robot2.SetEquipment(Equipment_GeneratorBooster, Index_BodyU);
+	robot2.SetModule(Module_Deflectors, Index_BodyU);
 	robot2.SetEquipment(Equipment_LightPlate, Index_BodyU);
 
-	robot2.SetModule(Module_CrewQuarter, Index_BodyM);
-	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
-	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
+	robot2.SetModule(Module_Generator, Index_BodyM);
+	robot2.SetEquipment(Equipment_LightPlate, Index_BodyM);
+	robot2.SetEquipment(Equipment_GeneratorBooster, Index_BodyM);
 
-	//robot2.SetModule(Module_Sensors, Index_BodyD);
+	robot2.SetModule(Module_CrewQuarter, Index_BodyD);
+	robot2.SetEquipment(Equipment_CQExtension, Index_BodyD);
 
-	robot2.SetModule(Module_Deflectors, Index_LegR);
+	robot2.SetModule(Module_Radar, Index_LegR);
+	robot2.SetEquipment(Equipment_LightPlate, Index_LegR);
 
-	robot2.SetModule(Module_Gadget, Index_LegL);
-	robot2.SetEquipment(Equipment_GadgetJammer, Index_LegL);
+	robot2.SetModule(Module_Infirmary, Index_LegL);
 
 	robot2.SetEquipment(Equipment_LightPlate, Index_FootL);
 
 	robot2.SetEquipment(Equipment_LightPlate, Index_FootR);
 
 	robot2.SetModule(Module_Weapon, Index_HandL);
-	robot2.SetEquipment(Equipment_HeavyPlate, Index_HandL);
+	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_HandL);
 
 	robot2.SetModule(Module_Weapon, Index_ShoulderL);
-	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderL);
+	robot2.SetEquipment(Equipment_WeaponsScope, Index_ShoulderL);
 
 	robot2.SetModule(Module_Weapon, Index_ShoulderR);
-	robot2.SetEquipment(Equipment_HeavyPlate, Index_ShoulderR);
+	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderR);
 
-	robot2.SetModule(Module_Weapon, Index_HandR);
-	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_HandR);
+	robot2.SetModule(Module_Gadget, Index_HandR);
+	robot2.SetEquipment(Equipment_GadgetEMP, Index_HandR);
 
 	robot2.SetCrewMember(Crew_Captain, Index_Head);
 	robot2.SetCrewMember(Crew_Pilot, Index_Head);
-	robot2.SetCrewMember(Crew_Medic, Index_BodyU);
-	robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
-	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
-	robot2.SetCrewMember(Crew_Warrior, Index_HandR);
-	robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
-	robot2.SetCrewMember(Crew_Engineer, Index_LegL);
+	robot2.SetCrewMember(Crew_Engineer, Index_HandR);
+	robot2.SetCrewMember(Crew_Scientist, Index_BodyM);
+	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderL);
+	robot2.SetCrewMember(Crew_Mechanic, Index_LegR);
 
-	robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
-	robot2.SetWeapon(Weapon_Hammer, Index_HandR);
+	robot2.SetWeapon(Weapon_MachineGun, Index_ShoulderL);
+	robot2.SetWeapon(Weapon_BlasterRifle, Index_ShoulderR);
+	robot2.SetWeapon(Weapon_StunFist, Index_HandL);
 
 	robot2.Initialize();
 
@@ -215,18 +217,18 @@ void InGameState::UI_GetAction(int robot_index)
 	}
 
 	//Global shutdown or grounded -> skip turn
-	if (m_robots[robot_index].m_shutdown_global == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
-	{
-		m_robots[robot_index].m_ready_to_change_phase = true;
-		(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's under a global shutdown.\n", Event_Shutdown, robot_index);
-		return;
-	}
-	else if (m_robots[robot_index].m_grounded == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
-	{
-		m_robots[robot_index].m_ready_to_change_phase = true;
-		(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's stuck on ground (x2 damage).\n", Event_Shutdown, robot_index);
-		return;
-	}
+	//if (m_robots[robot_index].m_shutdown_global == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
+	//{
+	//	m_robots[robot_index].m_ready_to_change_phase = true;
+	//	(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's under a global shutdown.\n", Event_Shutdown, robot_index);
+	//	return;
+	//}
+	//else if (m_robots[robot_index].m_grounded == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
+	//{
+	//	m_robots[robot_index].m_ready_to_change_phase = true;
+	//	(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's stuck on ground (x2 damage).\n", Event_Shutdown, robot_index);
+	//	return;
+	//}
 	
 	//Do action
 	//Debug shortcut
@@ -444,18 +446,7 @@ void InGameState::Update(sf::Time deltaTime)
 
 	UpdateUI(deltaTime);
 
-	if ((*CurrentGame).m_phase == Phase_CrewMovement)
-	{
-		if (m_robots[0].m_ready_to_change_phase == false)
-		{
-			UI_GetAction(0);
-		}
-		else
-		{
-			UI_GetAction(1);
-		}
-	}
-	else if ((*CurrentGame).m_phase == Phase_AttackPlanning)
+	if ((*CurrentGame).m_phase == Phase_AttackPlanning)
 	{
 		if (m_robots[0].m_ready_to_change_phase == false)
 		{
@@ -484,7 +475,7 @@ void InGameState::Update(sf::Time deltaTime)
 		m_robots[0].m_ready_to_change_phase = true;
 		m_robots[1].m_ready_to_change_phase = true;
 	}
-	else if ((*CurrentGame).m_phase >= Phase_AttackResolution_12 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
+	else if ((*CurrentGame).m_phase >= Phase_AttackResolution_14 && (*CurrentGame).m_phase <= Phase_AttackResolution_1)
 	{
 		AttackResolution();
 		if ((*CurrentGame).m_phase != Phase_Execution && (*CurrentGame).m_phase != Phase_CounterAttack)
@@ -521,7 +512,7 @@ void InGameState::Update(sf::Time deltaTime)
 			ClearAttacksListResolved();
 			
 			//get back to resolving the remaining attacks
-			(*CurrentGame).m_phase = (GamePhase)(Phase_AttackResolution_12 - 1);
+			(*CurrentGame).m_phase = (GamePhase)(Phase_AttackResolution_14 - 1);
 		}
 	}
 	else if ((*CurrentGame).m_phase == Phase_CounterAttack)
@@ -552,14 +543,14 @@ void InGameState::Update(sf::Time deltaTime)
 			ClearAttacksListResolved();
 
 			//get back to resolving the remaining attacks
-			(*CurrentGame).m_phase = (GamePhase)(Phase_AttackResolution_12 - 1);
+			(*CurrentGame).m_phase = (GamePhase)(Phase_AttackResolution_14 - 1);
 		}
 	}
 }
 
 void InGameState::ClearAttacksListResolved()
 {
-	GamePhase phase = Phase_AttackResolution_12;
+	GamePhase phase = Phase_AttackResolution_14;
 
 	vector<ActionAttack> old_attacks_list;
 	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
@@ -614,11 +605,11 @@ void InGameState::UpdateUI(sf::Time deltaTime)
 			s_phase << "EC generation";
 			break;
 		}
-		case Phase_CrewMovement:
-		{
-			s_phase << "Crew movement";
-			break;
-		}
+		//case Phase_CrewMovement:
+		//{
+		//	s_phase << "Crew movement";
+		//	break;
+		//}
 		case Phase_AttackPlanning:
 		{
 			s_phase << "Attack planning";
@@ -729,8 +720,14 @@ void InGameState::Draw()
 	(*CurrentGame).drawScene();//background
 
 	//ROBOT
+	//Events log display
+	for (vector<SFText>::iterator it = (*CurrentGame).m_UI_events_log.begin(); it != (*CurrentGame).m_UI_events_log.end(); it++)
+	{
+		(*CurrentGame).m_mainScreen.draw(*it);
+	}
+
 	GamePhase& phase = (*CurrentGame).m_phase;
-	bool async_phase = phase == Phase_CrewMovement || phase == Phase_AttackPlanning || phase == Phase_Execution || phase == Phase_CounterAttack;
+	bool async_phase = phase == Phase_AttackPlanning || phase == Phase_Execution || phase == Phase_CounterAttack;
 
 	int r1 = m_robots[0].m_ready_to_change_phase == true ? 1 : 0;
 	int r2 = (r1 + 1) % 2;
@@ -739,7 +736,10 @@ void InGameState::Draw()
 		//slots
 		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
 		{
-			it->Draw((*CurrentGame).m_mainScreen);		
+			if (async_phase == false || r == r2)
+			{
+				it->Draw((*CurrentGame).m_mainScreen);
+			}
 		}
 
 		//modules
@@ -818,12 +818,6 @@ void InGameState::Draw()
 	//Turn & phase display
 	(*CurrentGame).m_mainScreen.draw(m_UI_turn);
 	(*CurrentGame).m_mainScreen.draw(m_UI_phase);
-
-	//Events log display
-	for (vector<SFText>::iterator it = (*CurrentGame).m_UI_events_log.begin(); it != (*CurrentGame).m_UI_events_log.end(); it++)
-	{
-		(*CurrentGame).m_mainScreen.draw(*it);
-	}
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();
@@ -998,7 +992,12 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 		(*CurrentGame).UI_AddEventLog("Attack cancelled: weapon module has been shut down.", Event_Neutral, robot->m_index);
 		return false;
 	}
-	else if (attack->m_crew_required != NB_CREW_TYPES && robot_slot.HasCrewRequired(attack->m_crew_required) == false)
+	else if (module->m_energy_cells_max > 0 && module->m_energy_cells == 0)
+	{
+		(*CurrentGame).UI_AddEventLog("Attack cancelled: weapon module not powered by 1 EC.", Event_Neutral, robot->m_index);
+		return false;
+	}
+	else if (attack->m_crew_required != NB_CREW_TYPES && robot_slot.HasCrewRequired(attack->m_crew_required) == NULL)
 	{
 		(*CurrentGame).UI_AddEventLog("Attack cancelled: crew member required is missing or stunned.", Event_Neutral, robot->m_index);
 		return false;
@@ -1016,7 +1015,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 	else//Attack resolution
 	{
 		//Guard perfect?
-		if (opponent.m_guard_speed == speed && is_execution == false && is_counter_attack == false)
+		if (opponent.m_guard_speed == speed && is_execution == false && is_counter_attack == false && opponent.m_shutdown_global == false && opponent.m_grounded == false && opponent.m_unbalanced_counter == 0)
 		{
 			//Counter attack
 			(*CurrentGame).UI_AddEventLog("Attack countered by a perfect guard.\nDo you want to counter-attack?", Event_ContextualChoice, opponent.m_index);
@@ -1078,7 +1077,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 
 					int warrior_bonus = robot_slot.GetWarriorBalanceBonus();
 					int counter_attack_bonus = is_counter_attack ? 5 : 0;
-					int unbalanced_score = attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent.GetBalanceScore();
+					int unbalanced_score = i == target_index ? attack->m_chance_of_unbalance + warrior_bonus + counter_attack_bonus + RandomizeIntBetweenValues(1, 20) - opponent.GetBalanceScore() : 0;
 
 					//Hit resolution
 					if (hit_success)
@@ -1105,28 +1104,28 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 								if (it->m_module != NULL && it->m_module->m_type == Module_Deflectors && it->m_module->IsOperationnal())
 								{
 									Module* deflector = it->m_module;
-									if (deflector->m_health > 0)
+									if (deflector->m_shield > 0)
 									{
 										//Damage absorbed
-										if (deflector->m_health >= damage)
+										if (deflector->m_shield >= damage)
 										{
 											ostringstream s_deflector;
 											s_deflector << "Deflectors absorb " << damage << " damage.";
 
-											deflector->m_health -= damage;
+											deflector->m_shield -= damage;
 											damage = 0;
 
-											(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Damage, opponent.m_index);
+											(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Shield, opponent.m_index);
 										}
 										else
 										{
 											ostringstream s_deflector;
-											s_deflector << "Deflectors absorb " << damage << " damage and are disabled.";
+											s_deflector << "Deflectors absorb " << deflector->m_shield << " damage and are DISABLED.";
 
-											deflector->m_health = 0;
-											damage -= deflector->m_health;
+											damage -= deflector->m_shield;
+											deflector->m_shield = 0;
 
-											(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Damage, opponent.m_index);
+											(*CurrentGame).UI_AddEventLog(s_deflector.str(), Event_Shield, opponent.m_index);
 										}
 									}
 								}
@@ -1150,7 +1149,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 									else
 									{
 										ostringstream s_dmg;
-										s_dmg << "Module takes " << damage << " damage and is destroyed.";
+										s_dmg << "Module takes " << damage << " damage and is DESTROYED.";
 
 										target_module->m_health = 0;
 										opponent.DestroySlot((SlotIndex)i);
@@ -1166,7 +1165,7 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 									else
 									{
 										opponent.m_health = 0;
-										(*CurrentGame).UI_AddEventLog("'s health reached 0 and is destroyed.\nGAME OVER.", Event_Damage, opponent.m_index);
+										(*CurrentGame).UI_AddEventLog("'s health reached 0 and is DESTROYED.\nGAME OVER.", Event_Damage, opponent.m_index);
 									}
 								}
 							}
@@ -1196,10 +1195,10 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 											else
 											{
 												ostringstream s_dmg;
-												s_dmg << "Plates take " << damage << " damage and are destroyed.";
+												s_dmg << "Plates take " << (*it)->m_health << " damage and are DESTROYED.";
 
-												(*it)->m_health = 0;
 												damage -= (*it)->m_health;
+												(*it)->m_health = 0;
 
 												(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
 											}
@@ -1305,32 +1304,35 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 								}
 							}
 
-							//Balance resolution
-							if (unbalanced_score > 0)
+							//Balance resolution - this one is tested only once per hit, on the targeted module
+							if (i == target_index)
 							{
-								if (opponent.m_unbalanced_counter == 0)
+								if (unbalanced_score > 0)
 								{
-									opponent.m_unbalanced_counter = 2;
-									opponent.m_unbalanced_value = unbalanced_score;
-
-									(*CurrentGame).UI_AddEventLog("Robot gets unbalaced.", Event_Balance, opponent.m_index);
-								}
-								else
-								{
-									opponent.m_unbalanced_counter = 2;
-									opponent.m_unbalanced_value = unbalanced_score;
-
-									if (opponent.m_grounded == false)
+									if (opponent.m_unbalanced_counter == 0)
 									{
-										opponent.m_grounded = true;
-										triggers_execution = true;
+										opponent.m_unbalanced_counter = 2;
+										opponent.m_unbalanced_value = unbalanced_score;
 
-										(*CurrentGame).UI_AddEventLog("Robot gets unbalanced again and is put on ground.", Event_Balance, opponent.m_index);
-										(*CurrentGame).UI_AddEventLog("Do you want to launch an Execution?", Event_ContextualChoice, robot->m_index);
+										(*CurrentGame).UI_AddEventLog("Robot gets unbalaced.", Event_Balance, opponent.m_index);
+									}
+									else
+									{
+										opponent.m_unbalanced_counter = 2;
+										opponent.m_unbalanced_value = unbalanced_score;
+
+										if (opponent.m_grounded == false)
+										{
+											opponent.m_grounded = true;
+											triggers_execution = true;
+
+											(*CurrentGame).UI_AddEventLog("Robot gets unbalanced again and is put on ground.", Event_Balance, opponent.m_index);
+											(*CurrentGame).UI_AddEventLog("Do you want to launch an Execution?", Event_ContextualChoice, robot->m_index);
+										}
 									}
 								}
 							}
-
+							
 							//Check global shutdown conditions
 							opponent.UpdateShudownGlobal();
 						}
@@ -1360,11 +1362,23 @@ void InGameState::AttackResolution()
 	//Resolve attacks
 	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
 	{
+		if (it->m_resolved == true)
+		{
+			continue;
+		}
+
 		//Bonus for ranged weapons if combat starts from a Ranged distance
 		int speed_bonus = 0;
 		if ((*CurrentGame).m_distance == Distance_Ranged && it->m_attack->m_owner->m_ranged == true)
 		{
 			speed_bonus = 2;
+		}
+
+		if ((*it).m_attack->m_owner->m_ranged == false)
+		{
+			RobotSlot* slot = (*it).m_attack->m_owner->m_owner;
+			speed_bonus += slot->GetEquipmentSpeedBonus();
+			speed_bonus += slot->GetPilotSpeedBonus();
 		}
 
 		if (it->m_attack->m_speed + speed_bonus != speed)
@@ -1459,7 +1473,7 @@ void InGameState::EffectsResolution()
 			Equipment* equipment = it->m_effect->m_owner_equipment != NULL ? it->m_effect->m_owner_equipment : NULL;
 			EquipmentEffect* effect = it->m_effect;
 
-			Robot* opponent = &m_robots[robot->m_index + 1 % 2];
+			Robot* opponent = &m_robots[(robot->m_index + 1) % 2];
 			RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
 			Module* target_module = target_slot.m_module;
 
@@ -1469,6 +1483,11 @@ void InGameState::EffectsResolution()
 				{
 					opponent->m_energy_cells -= target_module->m_energy_cells;
 					target_module->m_energy_cells = 0;
+					for (vector<Equipment*>::iterator it2 = target_module->m_owner->m_equipments.begin(); it2 != target_module->m_owner->m_equipments.end(); it2++)
+					{
+						opponent->m_energy_cells -= (*it2)->m_energy_cells;
+						(*it2)->m_energy_cells = 0;
+					}
 					break;
 				}
 				case Effect_Radar:
@@ -1538,7 +1557,7 @@ void InGameState::GrabResolution()
 
 				(*CurrentGame).UI_AddEventLog("Grab successful. Enemy gets grabbed.\n(x2 damage and can't get away from close-combat)", Event_Grab, robot->m_index);
 			}
-			else
+			else if (opponent.m_shutdown_global == false && opponent.m_grounded == false && opponent.m_unbalanced_counter == 0)
 			{
 				//Counter-attack
 				(*CurrentGame).UI_AddEventLog("Grab dodged. Do you want to counter-attack?", Event_Grab, opponent.m_index);
@@ -1609,7 +1628,7 @@ void InGameState::GuardResolution()
 
 				Weapon* weapon = it->m_attack->m_owner;
 
-				Robot* opponent = &m_robots[robot->m_index + 1 % 2];
+				Robot* opponent = &m_robots[(robot->m_index + 1) % 2];
 				RobotSlot& target_slot = opponent->m_slots[it->m_target_index];
 				Module* target_module = target_slot.m_module;
 

@@ -82,8 +82,9 @@ public:
 
 //ROBOT
 #define MAX_ROBOT_WEIGHT				25
-#define MAX_ROBOT_ENERGY_CELLS			17
+#define MAX_ROBOT_ENERGY_CELLS		17
 #define MAX_EVENTS_LOG_LINES			23
+#define TIME_BETWEEN_RESOLUTIONS		2.f
 
 
 enum UI_EventsLogType
@@ -96,6 +97,7 @@ enum UI_EventsLogType
 	Event_Grab,
 	Event_EC,
 	Event_Damage,
+	Event_Shield,
 	Event_ContextualChoice,
 	Event_Error,
 };
@@ -103,13 +105,15 @@ enum UI_EventsLogType
 enum GamePhase
 {
 	Phase_GenerateEC,
-	Phase_CrewMovement,
+	//Phase_CrewMovement,
 	Phase_AttackPlanning,
 	Phase_HealCrew,
 	Phase_RepairModules,
 	Phase_EffectsResolution,
 	Phase_GrabResolution,
 	Phase_GuardResolution,
+	Phase_AttackResolution_14,
+	Phase_AttackResolution_13,
 	Phase_AttackResolution_12,
 	Phase_AttackResolution_11,
 	Phase_AttackResolution_10,
@@ -122,8 +126,8 @@ enum GamePhase
 	Phase_AttackResolution_3,
 	Phase_AttackResolution_2,
 	Phase_AttackResolution_1,
-	Phase_CooldownResolution,
 	Phase_FireResolution,
+	Phase_CooldownResolution,
 	NB_GAME_PHASES,
 	Phase_Execution,
 	Phase_CounterAttack,
@@ -164,7 +168,6 @@ enum ModuleType
 {
 	Module_Infirmary,
 	Module_Generator,
-	Module_Sensors,
 	Module_Stabilizers,
 	Module_Head,
 	Module_Radar,
@@ -185,12 +188,14 @@ enum EquipmentType
 	Equipment_GadgetJammer,
 	Equipment_WeaponsScope,
 	Equipment_GadgetEMP,
+	Equipment_WeaponReactor,
 	NB_EQUIPMENT_TYPES,
 };
 
 enum WeaponType
 {
 	Weapon_Fist,
+	Weapon_StunFist,
 	Weapon_Grab,
 	Weapon_Guard,
 	Weapon_BlasterRifle,
@@ -198,6 +203,7 @@ enum WeaponType
 	Weapon_FireSword,
 	Weapon_Hammer,
 	Weapon_Gun,
+	Weapon_MachineGun,
 	Weapon_Shield,
 	NB_WEAPON_TYPES,
 };
@@ -206,6 +212,8 @@ enum WeaponAttackType
 {
 	WeaponAttack_Fist_1,
 	WeaponAttack_Fist_2,
+	WeaponAttack_StunFist_1,
+	WeaponAttack_StunFist_2,
 	WeaponAttack_Grab_1,
 	WeaponAttack_Guard_1,
 	WeaponAttack_BlasterRifle_1,
@@ -218,6 +226,8 @@ enum WeaponAttackType
 	WeaponAttack_Hammer_2,
 	WeaponAttack_Gun_1,
 	WeaponAttack_Gun_2,
+	WeaponAttack_MachineGun_1,
+	WeaponAttack_MachineGun_2,
 	NB_WEAPON_ATTACK_TYPES,
 };
 

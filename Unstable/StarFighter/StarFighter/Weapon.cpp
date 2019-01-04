@@ -15,6 +15,65 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 
 	switch (type)
 	{
+		case Weapon_Fist:
+		{
+			m_weight = 1;
+			m_ranged = false;
+			m_UI_display_name = "FIST";
+			m_UI_display_name_short = "Fist";
+
+			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_Fist_1, this);
+			attack_primary->m_damage = 5;
+			attack_primary->m_chance_of_unbalance = 2;
+			attack_primary->m_speed = 9;
+			attack_primary->m_energy_cost = 1;
+			attack_primary->m_UI_display_name = "Punch";
+			attack_primary->m_UI_description = "Hit 1 target";
+			m_attacks.push_back(attack_primary);
+
+			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_Fist_2, this);
+			attack_secondary->m_damage = 2;
+			attack_secondary->m_nb_targets = 3;
+			attack_secondary->m_nb_targets_remaining = attack_primary->m_nb_targets;
+			attack_secondary->m_speed = 9;
+			attack_secondary->m_energy_cost = 1;
+			attack_secondary->m_UI_display_name = "Chain kicks";
+			attack_secondary->m_UI_description = "Hit 3 targets";
+			m_attacks.push_back(attack_secondary);
+
+			break;
+		}
+		case Weapon_StunFist:
+		{
+			m_weight = 1;
+			m_ranged = false;
+			m_energetic = true;
+			m_UI_display_name = "STUN FIST";
+			m_UI_display_name_short = "Stun Fist";
+
+			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_StunFist_1, this);
+			attack_primary->m_damage = 5;
+			attack_primary->m_chance_of_unbalance = 2;
+			attack_primary->m_chance_of_electricity = 4;
+			attack_primary->m_speed = 9;
+			attack_primary->m_energy_cost = 3;
+			attack_primary->m_UI_display_name = "Punch";
+			attack_primary->m_UI_description = "Hit 1 target";
+			m_attacks.push_back(attack_primary);
+
+			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_StunFist_2, this);
+			attack_secondary->m_damage = 2;
+			attack_secondary->m_chance_of_electricity = 5;
+			attack_secondary->m_nb_targets = 3;
+			attack_secondary->m_nb_targets_remaining = attack_primary->m_nb_targets;
+			attack_secondary->m_speed = 9;
+			attack_secondary->m_energy_cost = 3;
+			attack_secondary->m_UI_display_name = "Chain kicks";
+			attack_secondary->m_UI_description = "Hit 3 targets";
+			m_attacks.push_back(attack_secondary);
+
+			break;
+		}
 		case Weapon_BlasterRifle:
 		{
 			m_energetic = true;
@@ -24,7 +83,7 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			m_UI_display_name_short = "Blaster\nRifle";
 			
 			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_BlasterRifle_1, this);
-			attack_primary->m_damage = 4;
+			attack_primary->m_damage = 3;
 			attack_primary->m_chance_of_hit = 4;
 			attack_primary->m_chance_of_fire = 5;
 			attack_primary->m_speed = 7;
@@ -35,14 +94,16 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			m_attacks.push_back(attack_primary);
 
 			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_BlasterRifle_2, this);
-			attack_secondary->m_damage = 4;
+			attack_secondary->m_damage = 3;
 			attack_secondary->m_chance_of_hit = 4;
 			attack_secondary->m_chance_of_fire = 5;
 			attack_secondary->m_speed = 7;
 			attack_secondary->m_energy_cost = 3;
+			attack_secondary->m_nb_targets = 3;
+			attack_secondary->m_nb_targets_remaining = attack_secondary->m_nb_targets;
 			attack_secondary->m_crew_required = Crew_Gunner;
 			attack_secondary->m_UI_display_name = "Barrage";
-			attack_secondary->m_UI_description = "Hit all targets on a line";
+			attack_secondary->m_UI_description = "Hit 3 targets";
 			m_attacks.push_back(attack_secondary);
 
 			break;
@@ -55,17 +116,19 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			m_UI_display_name_short = "Fire Sword";
 
 			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_FireSword_1, this);
-			attack_primary->m_damage = 3;
+			attack_primary->m_damage = 2;
 			attack_primary->m_chance_of_fire = 5;
 			attack_primary->m_speed = 8;
 			attack_primary->m_energy_cost = 3;
+			attack_primary->m_nb_targets = 3;
+			attack_primary->m_nb_targets_remaining = attack_primary->m_nb_targets;
 			attack_primary->m_UI_display_name = "Lateral strike";
-			attack_primary->m_UI_description = "Hit all targets on a line";
+			attack_primary->m_UI_description = "Hit 3 targets";
 			m_attacks.push_back(attack_primary);
 
 			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_FireSword_2, this);
 			attack_secondary->m_damage = 5;
-			attack_secondary->m_chance_of_fire = 4;
+			attack_secondary->m_chance_of_fire = 3;
 			attack_secondary->m_speed = 8;
 			attack_secondary->m_energy_cost = 3;
 			attack_secondary->m_crew_required = Crew_Warrior;
@@ -83,8 +146,8 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 
 			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_Hammer_1, this);
 			attack_primary->m_damage = 3;
-			attack_primary->m_chance_of_stun = 5;
-			attack_primary->m_chance_of_unbalance = 3;
+			attack_primary->m_chance_of_stun = 4;
+			attack_primary->m_chance_of_unbalance = 4;
 			attack_primary->m_speed = 5;
 			attack_primary->m_energy_cost = 1;
 			attack_primary->m_UI_display_name = "Hammer smash";
@@ -94,9 +157,9 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_Hammer_2, this);
 			attack_secondary->m_damage = 1;
 			attack_secondary->m_chance_of_stun = 5;
-			attack_secondary->m_chance_of_unbalance = 1;
+			attack_secondary->m_chance_of_unbalance = 2;
 			attack_secondary->m_speed = 5;
-			attack_secondary->m_energy_cost = 3;
+			attack_secondary->m_energy_cost = 2;
 			attack_secondary->m_crew_required = Crew_Warrior;
 			attack_secondary->m_hitmode = Hit_AdjacentSlots;
 			attack_secondary->m_UI_display_name = "Explosive smash";
@@ -128,10 +191,41 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_secondary->m_chance_of_hit = 4;
 			attack_secondary->m_speed = 8;
 			attack_secondary->m_energy_cost = 1;
-			attack_secondary->m_nb_targets = 6;
+			attack_secondary->m_nb_targets = 5;
 			attack_secondary->m_nb_targets_remaining = attack_secondary->m_nb_targets;
 			attack_secondary->m_UI_display_name = "One-mag";
-			attack_secondary->m_UI_description = "Hit 6 targets";
+			attack_secondary->m_UI_description = "Hit 5 targets";
+			m_attacks.push_back(attack_secondary);
+
+			break;
+		}
+		case Weapon_MachineGun:
+		{
+			m_weight = 3;
+			m_ranged = true;
+			m_UI_display_name = "MACHINE GUN";
+			m_UI_display_name_short = "Machine Gun";
+
+			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_MachineGun_1, this);
+			attack_primary->m_damage = 3;
+			attack_primary->m_chance_of_hit = 4;
+			attack_primary->m_speed = 7;
+			attack_primary->m_energy_cost = 1;
+			attack_primary->m_nb_hits = 3;
+			attack_primary->m_UI_display_name = "Three-shots";
+			attack_primary->m_UI_description = "Hit 1 target, 3 times";
+			m_attacks.push_back(attack_primary);
+
+			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_MachineGun_2, this);
+			attack_secondary->m_damage = 3;
+			attack_secondary->m_chance_of_hit = 4;
+			attack_secondary->m_speed = 7;
+			attack_secondary->m_energy_cost = 1;
+			attack_secondary->m_nb_targets = 3;
+			attack_secondary->m_nb_targets_remaining = attack_secondary->m_nb_targets;
+			attack_secondary->m_crew_required = Crew_Gunner;
+			attack_secondary->m_UI_display_name = "Barrage";
+			attack_secondary->m_UI_description = "Hit 3 targets";
 			m_attacks.push_back(attack_secondary);
 
 			break;

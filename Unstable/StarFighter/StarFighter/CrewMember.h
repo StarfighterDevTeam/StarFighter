@@ -19,6 +19,7 @@ public:
 	CrewMember* m_medic_target;
 	int m_overcharge;
 	RobotSlot* m_owner;
+	bool m_used;
 
 	void Update();
 };

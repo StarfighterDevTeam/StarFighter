@@ -13,6 +13,8 @@ public:
 
 	int m_health;
 	int m_health_max;
+	int m_shield;
+	int m_shield_max;
 	int m_weight;
 	int m_energy_cells;
 	int m_energy_cells_max;

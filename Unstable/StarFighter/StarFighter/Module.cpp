@@ -20,6 +20,8 @@ Module::Module(ModuleType type, RobotSlot* owner)
 	m_shutdown_counter = 0;
 	m_crew_required = NB_CREW_TYPES;
 	m_effect = NULL;
+	m_shield = 0;
+	m_shield_max = 0;
 
 	switch (type)
 	{
@@ -56,7 +58,7 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_energy_cells_max = 1;
 
 			m_UI_display_name = "Weapon mod";
-			m_UI_display_name_short = "Weapon\nmod";
+			m_UI_display_name_short = "Weapon";
 			m_UI_description = "Weapon slot";
 			break;
 		}
@@ -88,9 +90,11 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_unique = true;
 			m_size = 2;
 			m_energy_cells_max = 2;
+			m_shield_max = 10;
+			m_shield = 5;
 
 			m_UI_display_name = "Deflectors";
-			m_UI_description = "Shield Generator.\n1EC = 10hp shield.\n1EC = 2hp regen per turn";
+			m_UI_description = "Shield Generator.\n1EC = activate shield.\n1EC = 2hp shield regen per turn (max 10)";
 			break;
 		}
 		case Module_Infirmary:
@@ -113,23 +117,10 @@ Module::Module(ModuleType type, RobotSlot* owner)
 			m_crew_required = Crew_Any;
 			m_effect = new EquipmentEffect(Effect_Radar, this, NULL);
 			m_effect->m_energy_cost = 1;
+			m_effect->m_crew_required = Crew_Any;
 
 			m_UI_display_name = "Radar";
 			m_UI_description = "Reveals a target enemy slot for 1 EC.\nRequires a crew member to use.";
-			break;
-		}
-		case Module_Sensors:
-		{
-			m_health_max = 6;
-			m_weight = 1;
-			m_unique = true;
-			m_energy_cells_max = 1;
-			m_cooldown = 2;
-			m_crew_required = Crew_Any;
-
-			m_UI_display_name = "Sensors";
-			m_UI_description = "Reveals a target enemy module and its equipments";
-
 			break;
 		}
 	}

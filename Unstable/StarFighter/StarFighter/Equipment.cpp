@@ -64,10 +64,12 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 			m_weight = 1;
 			m_cooldown = 3;
 			m_module_equipable = Module_Generator;
+
+			m_effect = new EquipmentEffect(Effect_GeneratorBooster, NULL, this);
 			
 			m_UI_display_name = "Generator booster";
 			m_UI_display_name_short = "Generator\nbooster";
-			m_UI_description = "Generates automatically 3 EC\nevery 4 turns";
+			m_UI_description = "Generates 3 EC";
 
 			break;
 		}
@@ -79,6 +81,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 
 			m_effect = new EquipmentEffect(Effect_Jammer, NULL, this);
 			m_effect->m_energy_cost = 2;
+			m_effect->m_crew_required = Crew_Engineer;
 
 			m_UI_display_name = "Gadget Jammer";
 			m_UI_display_name_short = "Gadget\nJammer";
@@ -93,6 +96,7 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 
 			m_effect = new EquipmentEffect(Effect_EMP, NULL, this);
 			m_effect->m_energy_cost = 1;
+			m_effect->m_crew_required = Crew_Engineer;
 
 			m_UI_display_name = "Gadget E.M.P.";
 			m_UI_display_name_short = "Gadget\nE.M.P.";
@@ -110,6 +114,18 @@ Equipment::Equipment(EquipmentType type, RobotSlot* owner)
 			m_UI_display_name = "Weapon Scope";
 			m_UI_display_name_short = "Weapon\nScope";
 			m_UI_description = "+1 chance to hit for\nthis ranged weapon";
+			break;
+		}
+		case Equipment_WeaponReactor:
+		{
+			m_weight = 1;
+			m_energy_cells_max = 1;
+			m_energy_cells = 0;
+			m_module_equipable = Module_Weapon;
+
+			m_UI_display_name = "Weapon Reactor";
+			m_UI_display_name_short = "Weapon\nReactor";
+			m_UI_description = "+2 speed for\nthis close-combat weapon";
 			break;
 		}
 	}

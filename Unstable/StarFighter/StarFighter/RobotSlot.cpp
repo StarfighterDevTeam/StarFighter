@@ -106,6 +106,24 @@ int RobotSlot::GetGunnerRangeBonus()
 	return gunner_bonus;
 }
 
+int RobotSlot::GetPilotSpeedBonus()
+{
+	int pilot_bonus = 0;
+
+	if (m_module != NULL && m_module->m_type == Module_Weapon && m_weapon != NULL && m_weapon->m_ranged == true)
+	{
+		for (vector<CrewMember*>::iterator it2 = m_crew.begin(); it2 != m_crew.end(); it2++)
+		{
+			if ((*it2)->m_type == Crew_Pilot && (*it2)->m_stun_counter == 0)
+			{
+				pilot_bonus+= 2;
+			}
+		}
+	}
+
+	return pilot_bonus;
+}
+
 int RobotSlot::GetEquipmentRangeBonus()
 {
 	int range_bonus = 0;
@@ -119,6 +137,21 @@ int RobotSlot::GetEquipmentRangeBonus()
 	}
 
 	return range_bonus;
+}
+
+int RobotSlot::GetEquipmentSpeedBonus()
+{
+	int speed_bonus = 0;
+
+	for (vector<Equipment*>::iterator it = m_equipments.begin(); it != m_equipments.end(); it++)
+	{
+		if ((*it)->m_type == Equipment_WeaponReactor && (*it)->m_energy_cells > 0)
+		{
+			speed_bonus+= 2;
+		}
+	}
+
+	return speed_bonus;
 }
 
 int RobotSlot::GetWarriorBalanceBonus()
@@ -139,17 +172,17 @@ int RobotSlot::GetWarriorBalanceBonus()
 	return warrior_bonus;
 }
 
-bool RobotSlot::HasCrewRequired(CrewType type)
+CrewMember* RobotSlot::HasCrewRequired(CrewType type)
 {
 	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
 	{
 		if (((*it)->m_type == type || type == Crew_Any) && (*it)->m_stun_counter == 0)
 		{
-			return true;
+			return *it;
 		}
 	}
 
-	return false;
+	return NULL;
 }
 
 bool RobotSlot::CanEquipEnergeticWeapon()

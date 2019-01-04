@@ -92,9 +92,6 @@ public:
 	void ReloadWeapons();
 	RobotSlot* GetEntityParentSlot(GameEntity* entity, UI_Type type);
 
-	ActionAttack GetExecutionAttack();
-	ActionAttack GetCounterAttack();
-
 	//UI
 	void InitializeUI();
 	void UpdateUI();
