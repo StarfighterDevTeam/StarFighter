@@ -30,8 +30,7 @@ void InGameState::Initialize(Player player)
 
 	//PIRATES
 	InitWaterZones();
-	m_warships[0].InitWarship();
-	
+	m_warship = new Warship(DMS_Coord{0, 6, 0, 0, 6, 0 });
 }
 
 void InGameState::InitWaterZones()
@@ -66,24 +65,23 @@ void InGameState::Update(sf::Time deltaTime)
 		(*CurrentGame).m_selected_ui = NULL;
 	}
 
-	//Updating game entities
-	Warship& ship = m_warships[0];
+	//UPDATING GAME ENTITIES
 
 	//Interaction with rooms
-	for (vector<Room*>::iterator it = ship.m_rooms.begin(); it != ship.m_rooms.end(); it++)
+	for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
 	{
-		ship.UpdateCrewMembersCountPerRoom(*it);
+		m_warship->UpdateCrewMembersCountPerRoom(*it);
 		(*it)->Update(deltaTime);
 	}
 
 	//Room connexions
-	for (vector<RoomConnexion*>::iterator it = ship.m_connexions.begin(); it != ship.m_connexions.end(); it++)
+	for (vector<RoomConnexion*>::iterator it = m_warship->m_connexions.begin(); it != m_warship->m_connexions.end(); it++)
 	{
 		(*it)->Update(deltaTime);
 	}
 
 	//Crew movement
-	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
+	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
 	{
 		(*it)->Update(deltaTime);
 	}
@@ -92,7 +90,7 @@ void InGameState::Update(sf::Time deltaTime)
 	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 	{
 		(*it)->m_shape_container.setFillColor(sf::Color::Black);
-		for (vector<CrewMember*>::iterator it2 = ship.m_crew.begin(); it2 != ship.m_crew.end(); it2++)
+		for (vector<CrewMember*>::iterator it2 = m_warship->m_crew.begin(); it2 != m_warship->m_crew.end(); it2++)
 		{
 			if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
 			{
@@ -125,20 +123,20 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//water tiles
-	for (vector<vector<WaterTile*> >::iterator it = ship.m_zone->m_watertiles.begin(); it != ship.m_zone->m_watertiles.end(); it++)
+	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_zone->m_watertiles.begin(); it != m_warship->m_zone->m_watertiles.end(); it++)
 	{
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
 			//position on "radar"
-			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - ship.m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
-			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (60-ship.m_DMS.m_minute_y) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
+			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - m_warship->m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
+			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
 
 			//can be seen? no need to update other tiles because they won't be drawn anyway
-			int distance = ship.GetDistanceToWaterTile(*it2);
+			int distance = m_warship->GetDistanceToWaterTile(*it2);
 			if (distance <= NB_WATERTILE_VIEW_RANGE)
 			{
 				//selection
-				if (selection == &ship)
+				if (selection == m_warship && (*it2)->m_type != Water_Island)
 				{
 					//display distances to the boat
 					if (distance != 0)
@@ -168,14 +166,14 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//boat - must be done after water tiles update because it's attached to a tile
-	ship.Update(deltaTime);
+	m_warship->Update(deltaTime);
 
 	//island
 	if (m_island != NULL)
 	{
 		//position on "radar"
-		WaterTile* tileUpLeft = ship.m_zone->m_watertiles[m_island->m_upcorner_x][m_island->m_upcorner_y];
-		WaterTile* tileDownRight = ship.m_zone->m_watertiles[m_island->m_upcorner_x + m_island->m_width - 1][m_island->m_upcorner_y - m_island->m_height + 1];
+		WaterTile* tileUpLeft = m_warship->m_zone->m_watertiles[m_island->m_upcorner_x][m_island->m_upcorner_y];
+		WaterTile* tileDownRight = m_warship->m_zone->m_watertiles[m_island->m_upcorner_x + m_island->m_width - 1][m_island->m_upcorner_y - m_island->m_height + 1];
 		float pos_x = 0.5f * (tileDownRight->m_position.x + tileUpLeft->m_position.x);
 		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
 		m_island->m_position = sf::Vector2f(pos_x, pos_y);
@@ -184,10 +182,10 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//Actions
-	if (mouse_click == Mouse_RightClick && selection != NULL && selection == &ship && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
+	if (mouse_click == Mouse_RightClick && selection != NULL && selection == m_warship && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
 	{
 		WaterTile* tile = (WaterTile*)hovered;
-		printf("distance: %d\n", ship.GetDistanceToWaterTile(tile));
+		printf("distance: %d\n", m_warship->GetDistanceToWaterTile(tile));
 	}
 }
 
@@ -207,20 +205,19 @@ void InGameState::Draw()
 	}
 
 	//rooms
-	Warship& ship = m_warships[0];
-	for (vector<Room*>::iterator it = ship.m_rooms.begin(); it != ship.m_rooms.end(); it++)
+	for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//doors
-	for (vector<RoomConnexion*>::iterator it = ship.m_connexions.begin(); it != ship.m_connexions.end(); it++)
+	for (vector<RoomConnexion*>::iterator it = m_warship->m_connexions.begin(); it != m_warship->m_connexions.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//crew
-	for (vector<CrewMember*>::iterator it = ship.m_crew.begin(); it != ship.m_crew.end(); it++)
+	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
@@ -228,17 +225,17 @@ void InGameState::Draw()
 	//WATER PART
 
 	//water tiles
-	for (vector<vector<WaterTile*> >::iterator it = ship.m_zone->m_watertiles.begin(); it != ship.m_zone->m_watertiles.end(); it++)
+	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_zone->m_watertiles.begin(); it != m_warship->m_zone->m_watertiles.end(); it++)
 	{
 		//preliminary check that takes away a whole vector to check
-		if (it->front()->m_coord_x < ship.m_tile->m_coord_x - NB_WATERTILE_VIEW_RANGE || it->front()->m_coord_x > ship.m_tile->m_coord_x + NB_WATERTILE_VIEW_RANGE)
+		if (it->front()->m_coord_x < m_warship->m_tile->m_coord_x - NB_WATERTILE_VIEW_RANGE || it->front()->m_coord_x > m_warship->m_tile->m_coord_x + NB_WATERTILE_VIEW_RANGE)
 		{
 			continue;
 		}
 
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			if (ship.CanViewWaterTile(*it2))
+			if (m_warship->CanViewWaterTile(*it2))
 			{
 				(*it2)->Draw((*CurrentGame).m_mainScreen);
 			}
@@ -246,7 +243,7 @@ void InGameState::Draw()
 	}
 
 	//boat
-	ship.Draw((*CurrentGame).m_mainScreen);
+	m_warship->Draw((*CurrentGame).m_mainScreen);
 
 	//island
 	if (m_island != NULL)

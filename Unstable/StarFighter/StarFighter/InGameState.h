@@ -30,7 +30,7 @@ public:
 	static void LoadCSVFile(string scenes_file);
 
 	//PIRATES
-	Warship m_warships[2];
+	Warship* m_warship;
 	Island* m_island;
 
 	void InitWaterZones();

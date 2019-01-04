@@ -9,7 +9,7 @@
 class Warship : public GameEntity
 {
 public:
-	Warship();
+	Warship(DMS_Coord coord);
 	~Warship();
 
 	vector<Room*> m_rooms;
@@ -28,7 +28,6 @@ public:
 	int GetDistanceToWaterTile(WaterTile* tile);
 	void UpdateRotation();
 
-	void InitWarship();
 	void Update(Time deltaTime);
 	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);

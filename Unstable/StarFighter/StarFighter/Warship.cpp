@@ -2,9 +2,12 @@
 
 extern Game* CurrentGame;
 
-Warship::Warship() : GameEntity(UI_Warship)
+Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 {
 	m_angle = 90.f;
+
+	//get on tile
+	SetDMSCoord(coord);
 
 	//shape for water tiles
 	TextureLoader *loader;
@@ -22,28 +25,13 @@ Warship::Warship() : GameEntity(UI_Warship)
 	m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 	m_shape_container.setOutlineThickness(2.f);
 	m_shape_container.setOutlineColor(m_default_color);
-}
 
-Warship::~Warship()
-{
-	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	{
-		delete *it;
-	}
+	//DMS coordinates display
+	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_text.setCharacterSize(24);
+	m_text.setColor(sf::Color::Black);
 
-	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
-	{
-		delete *it;
-	}
-
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-	{
-		delete *it;
-	}
-}
-
-void Warship::InitWarship()
-{
+	//ROOMS
 	//left
 	AddRoom(1, 3, 3, 4, Room_Weapon);
 	AddRoom(0, 7, 4, 6, Room_Gold);
@@ -68,18 +56,30 @@ void Warship::InitWarship()
 
 	room->m_connexions.front()->SetLock(true);
 
-	//crew
+	//CREW
 	CrewMember* crew = new CrewMember(Crew_Pirate);
 	AddCrewMember(crew, room);
 
 	CrewMember* crew2 = new CrewMember(Crew_Civilian);
 	AddCrewMember(crew2, room2);
+}
 
-	//crew->MoveToRoom(room2);
-	//crew2->MoveToRoom(room);
+Warship::~Warship()
+{
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		delete *it;
+	}
 
-	//assign to world map
-	SetDMSCoord(DMS_Coord(0, 6, 0, 0, 6, 0));
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		delete *it;
+	}
 }
 
 void Warship::Update(Time deltaTime)
@@ -89,6 +89,14 @@ void Warship::Update(Time deltaTime)
 
 	//rotation
 	UpdateRotation();
+
+	//UI
+	ostringstream ss;
+	ss << "\n\n\n";
+	ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << m_DMS.m_second_x << "\"\N";
+	ss << "\n";
+	ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' " << m_DMS.m_second_y << "\"\E";
+	m_text.setString(ss.str());
 
 	GameEntity::Update(deltaTime);
 }
