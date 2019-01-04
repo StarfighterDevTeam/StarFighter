@@ -36,10 +36,14 @@ void InGameState::Initialize(Player player)
 
 void InGameState::InitWaterZones()
 {
+	//zones and water
 	vector<WaterZone*> vec;
 	WaterZone* zone = new WaterZone(0, 0);
 	vec.push_back(zone);
 	(*CurrentGame).m_waterzones.push_back(vec);
+
+	//islands
+	Island* island = new Island(7, 8, 2, 2, zone, 0, 0);
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -100,6 +104,9 @@ void InGameState::Update(sf::Time deltaTime)
 	//boat
 	ship.Update(deltaTime);
 
+	//islands
+	ship.Update(deltaTime);
+
 	//ACTIONS
 	//Crew move to room
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_Room)
@@ -133,9 +140,31 @@ void InGameState::Update(sf::Time deltaTime)
 			float a = (*it2)->m_position.x;
 			float b = (*it2)->m_position.y;
 
+			//vector<Island*> islands_on_screen;
+			//can be seen? no need to update other tiles because they won't be drawn anyway
 			int distance = ship.GetDistanceToWaterTile(*it2);
-			if (distance <= NB_WATERTILE_VIEW_RANGE) //no need to update other tiles because they won't be drawn anyway
+			if (distance <= NB_WATERTILE_VIEW_RANGE)
 			{
+				//get islands (if any)
+				//if ((*it2)->m_type == Water_Island)
+				//{
+				//	Island* island = (Island*)(*it2);
+				//	bool island_found = false;
+				//	for (vector<Island*>::iterator it3 = islands_on_screen.begin(); it3 != islands_on_screen.end(); it3++)
+				//	{
+				//		if (island == *it3)
+				//		{
+				//			island_found = true;
+				//			break;
+				//		}
+				//	}
+				//	if (island_found == false)
+				//	{
+				//		islands_on_screen.push_back(island);
+				//	}
+				//}
+
+				//selection
 				if (selection == &ship)
 				{
 					//display distances to the boat

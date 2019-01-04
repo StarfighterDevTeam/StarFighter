@@ -18,6 +18,9 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_G_value = 0;
 	m_parent = NULL;
 
+	//locations
+	m_island = NULL;
+
 	//UI
 	m_shape_container.setPosition(m_position);
 	m_shape_container.setSize(sf::Vector2f(size, size));

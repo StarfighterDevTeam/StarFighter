@@ -7,6 +7,7 @@
 
 class Warship;//forward declaration
 class WaterZone;
+class Island;
 
 #define WATERTILE_SIZE					64.f
 #define WATERTILE_OFFSET_X				1100.f
@@ -44,6 +45,7 @@ struct DMS_Coord
 enum WaterTileType
 {
 	Water_Empty,
+	Water_Island,
 };
 
 class WaterTile : public GameEntity
@@ -63,6 +65,8 @@ public:
 	int m_movement_cost;
 	int m_G_value;
 	WaterTile* m_parent;
+
+	Island* m_island;
 };
 
 #endif //WATERTILE_H_INCLUDED
