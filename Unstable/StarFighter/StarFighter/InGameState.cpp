@@ -143,7 +143,7 @@ void InGameState::Update(sf::Time deltaTime)
 				(*it2)->m_can_be_seen = true;
 
 				//selection
-				if (selection == m_warship && (*it2)->m_type != Water_Island)
+				if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
 				{
 					//display distances to the boat
 					if (distance != 0)

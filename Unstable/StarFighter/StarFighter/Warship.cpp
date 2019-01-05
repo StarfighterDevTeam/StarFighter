@@ -92,6 +92,17 @@ void Warship::Update(Time deltaTime)
 		m_position = m_tile->m_position;
 	}
 
+	//arrived at destination?
+	if (m_destination != NULL)
+	{
+		if (GetDistanceFloatToWaterTile(m_destination) < 1.f / NB_WATERTILE_SUBDIVISION)
+		{
+			SetDMSCoord(m_destination->m_DMS);
+			m_destination = NULL;
+			m_speed = sf::Vector2f(0, 0);
+		}
+	}
+
 	//apply movement
 	m_DMS.m_second_x += m_speed.x * deltaTime.asSeconds();
 	m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
@@ -108,7 +119,7 @@ void Warship::Update(Time deltaTime)
 	}
 	else if (m_DMS.m_second_x < 0)
 	{
-		int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION;
+		int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION + 1;
 		m_DMS.m_minute_x -= minutes;
 		m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
 	}
@@ -165,6 +176,11 @@ void Warship::UpdateRotation()
 				m_angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f + 180.f;
 			}
 		}
+	}
+	else
+	{
+		//default value
+		m_angle == m_currentAnimationIndex == 0 ? 90.f : 270.f;
 	}
 
 	//flip the sprite according to the direction
