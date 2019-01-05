@@ -104,6 +104,7 @@
     <ClCompile Include="PrefsManager.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="RoomTile.cpp" />
+    <ClCompile Include="Seaport.cpp" />
     <ClCompile Include="WaterTile.cpp" />
     <ClCompile Include="Warship.cpp" />
     <ClCompile Include="SFPanel.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="RoomTile.h" />
+    <ClInclude Include="Seaport.h" />
     <ClInclude Include="WaterTile.h" />
     <ClInclude Include="Warship.h" />
     <ClInclude Include="SFPanel.h" />

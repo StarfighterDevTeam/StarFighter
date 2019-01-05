@@ -21,6 +21,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 
 	//locations
 	m_island = NULL;
+	m_seaport = NULL;
 
 	//UI
 	m_shape_container.setPosition(m_position);

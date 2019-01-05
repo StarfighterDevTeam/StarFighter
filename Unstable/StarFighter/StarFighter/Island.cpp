@@ -2,12 +2,13 @@
 
 extern Game* CurrentGame;
 
-Island::Island(int upcorner_x, int upcorner_y, int width, int height, WaterZone* zone, int zone_coord_x, int zone_coord_y) : GameEntity(sf::Vector2f(width * WATERTILE_SIZE, height * WATERTILE_SIZE), UI_WaterTile)
+Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y) : GameEntity(sf::Vector2f(width * WATERTILE_SIZE, height * WATERTILE_SIZE), UI_WaterTile)
 {
 	m_upcorner_x = upcorner_x;
 	m_upcorner_y = upcorner_y;
 	m_width = width;
 	m_height = height;
+	m_seaport = NULL;
 
 	//associating island tiles to island
 	for (int y = upcorner_y; y > upcorner_y - height; y--)//y : from top to bottom
@@ -33,4 +34,65 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, WaterZone*
 Island::~Island()
 {
 	
+}
+
+Seaport* Island::AddSeaport(SeaportType type)
+{
+	int zone_coord_x = m_tiles.front()->m_zone->m_coord_x;
+	int zone_coord_y = m_tiles.front()->m_zone->m_coord_y;
+
+	//find automatically a location around the island to place the seaport
+	vector<WaterTile*> candidates;
+	for (vector<WaterTile*>::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
+	{
+		int x = (*it)->m_coord_x;
+		int y = (*it)->m_coord_x;
+		
+		//right
+		if (x < NB_WATERTILE_X - 1)
+		{
+			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x + 1][y];
+			if (tile->m_type == Water_Empty)
+			{
+				candidates.push_back(tile);
+			}
+		}
+		//left
+		if (x > 0)
+		{
+			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x - 1][y];
+			if (tile->m_type == Water_Empty)
+			{
+				candidates.push_back(tile);
+			}
+		}
+		//up
+		if (y < NB_WATERTILE_Y - 1)
+		{
+			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y + 1];
+			if (tile->m_type == Water_Empty)
+			{
+				candidates.push_back(tile);
+			}
+		}
+		//down
+		if (y > 0)
+		{
+			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y - 1];
+			if (tile->m_type == Water_Empty)
+			{
+				candidates.push_back(tile);
+			}
+		}
+	}
+
+	int candidates_size = candidates.size();
+	int random = RandomizeIntBetweenValues(0, candidates_size - 1);
+	WaterTile* random_tile = candidates[random];
+
+	//create the port
+	Seaport* port = new Seaport(random_tile->m_coord_x, random_tile->m_coord_y, zone_coord_x, zone_coord_y, type);
+	m_seaport = port;
+
+	return port;
 }

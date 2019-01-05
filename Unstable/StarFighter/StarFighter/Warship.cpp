@@ -7,6 +7,7 @@ Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 	m_angle = 90.f;
 	m_destination = NULL;
 	m_speed = sf::Vector2f(0, 0);
+	m_seaport = NULL;
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -180,7 +181,7 @@ void Warship::UpdateRotation()
 	else
 	{
 		//default value
-		m_angle == m_currentAnimationIndex == 0 ? 90.f : 270.f;
+		m_angle = m_currentAnimationIndex == 0 ? 90.f : 270.f;
 	}
 
 	//flip the sprite according to the direction
@@ -429,6 +430,13 @@ bool Warship::SetDMSCoord(DMS_Coord coord)
 	m_DMS = coord;
 	m_zone = tile->m_zone;
 
+	//new seaport?
+	if (tile->m_seaport != NULL && tile != (WaterTile*)m_seaport)
+	{
+		m_seaport = tile->m_seaport;
+		m_seaport->m_ships.push_back(this);
+	}
+
 	return true;
 }
 
@@ -485,16 +493,23 @@ bool Warship::CanViewWaterTile(WaterTile* tile)
 
 bool Warship::SetSailsToWaterTile(WaterTile* tile)
 {
-	//if (m_destination != NULL)
-	//{
-	//	return false;
-	//}
+	if (tile->m_type != Water_Empty)
+	{
+		return false;
+	}
 
 	sf::Vector2f move_vector = tile->m_position - m_position;
 	GameObject::ScaleVector(&move_vector, CRUISE_SPEED);
 	m_speed = move_vector;
 
 	m_destination = tile;
+
+	//leaving port?
+	if (m_seaport != NULL && m_destination != (WaterTile*)m_seaport)
+	{
+		m_seaport->RemoveShip(this);
+		m_seaport = NULL;
+	}
 
 	return true;
 }

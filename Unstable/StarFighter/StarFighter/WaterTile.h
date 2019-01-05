@@ -8,6 +8,7 @@
 class Warship;//forward declaration
 class WaterZone;
 class Island;
+class Seaport;
 
 #define WATERTILE_SIZE					64.f
 #define WATERTILE_OFFSET_X				1100.f
@@ -45,7 +46,7 @@ struct DMS_Coord
 
 enum WaterTileType
 {
-	Water_Empty,
+	Water_Empty,//below this = navigable
 	Water_Island,
 };
 
@@ -69,6 +70,7 @@ public:
 	WaterTile* m_parent;
 
 	Island* m_island;
+	Seaport* m_seaport;
 };
 
 #endif //WATERTILE_H_INCLUDED

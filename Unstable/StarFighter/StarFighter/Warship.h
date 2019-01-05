@@ -21,6 +21,7 @@ public:
 	WaterZone* m_zone;
 	WaterTile* m_tile;
 	WaterTile* m_destination;
+	Seaport* m_seaport;
 
 	DMS_Coord m_DMS;
 	float m_angle;

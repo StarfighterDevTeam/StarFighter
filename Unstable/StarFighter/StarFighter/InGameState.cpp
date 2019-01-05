@@ -41,8 +41,14 @@ void InGameState::InitWaterZones()
 	vec.push_back(zone);
 	(*CurrentGame).m_waterzones.push_back(vec);
 
+	//icons
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture("2D/seaport_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
+
 	//islands
-	m_island = new Island(8, 9, 2, 2, zone, 0, 0);
+	m_island = new Island(8, 9, 2, 2, 0, 0);
+	m_island->AddSeaport(Seaport_Small);
 }
 
 void InGameState::Update(sf::Time deltaTime)
@@ -190,13 +196,20 @@ void InGameState::Update(sf::Time deltaTime)
 		m_island->m_position = sf::Vector2f(pos_x, pos_y);
 	
 		m_island->Update(deltaTime);
+
+		if (m_island->m_seaport != NULL)
+		{
+			Seaport* port = m_island->m_seaport;
+
+			port->m_position = port->m_tile->m_position;
+			port->UpdatePosition();
+		}
 	}
 
 	//Actions
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection == m_warship && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
 	{
 		WaterTile* tile = (WaterTile*)hovered;
-		//printf("distance: %d\n", m_warship->GetDistanceToWaterTile(tile));
 		m_warship->SetSailsToWaterTile(tile);
 	}
 }
@@ -261,6 +274,11 @@ void InGameState::Draw()
 	if (m_island != NULL)
 	{
 		m_island->Draw((*CurrentGame).m_mainScreen);
+
+		if (m_island->m_seaport != NULL)
+		{
+			m_island->m_seaport->Draw((*CurrentGame).m_mainScreen);
+		}
 	}
 
 	//Display
