@@ -6,7 +6,7 @@
 #include "CrewMember.h"
 #include "Island.h"
 
-#define	CRUISE_SPEED				5
+#define	CRUISE_SPEED				10
 
 class Warship : public GameEntity
 {
@@ -28,13 +28,17 @@ public:
 	sf::Vector2f m_speed;
 
 	bool SetDMSCoord(DMS_Coord coord);
+	DMS_Coord GetDMSCoord(sf::Vector2f position);
 	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
 	void UpdateRotation();
+	static float GetAngleForVector(sf::Vector2f vector);
 	bool SetSailsToWaterTile(WaterTile* tile);
-
+	bool CheckPathfindToWaterTile(WaterTile* tile);
+	bool IsPositionCollidingWithIsland(sf::Vector2f position);
+	
 	void Update(Time deltaTime);
 	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
