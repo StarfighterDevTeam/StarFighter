@@ -7,7 +7,6 @@
 #include "Island.h"
 
 #define	CRUISE_SPEED				5
-#define MAP_REVEAL_FLOATING		false
 
 class Warship : public GameEntity
 {

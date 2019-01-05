@@ -132,13 +132,8 @@ void InGameState::Update(sf::Time deltaTime)
 			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y - m_warship->m_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
 
 			//can be seen? no need to update other tiles because they won't be drawn anyway
-#if !defined MAP_REVEAL_FLOATING
 			float distance = m_warship->GetDistanceFloatToWaterTile(*it2);
-			if (distance <= NB_WATERTILE_VIEW_RANGE + 0.3f || ((*it2)->m_can_be_seen == true && distance <= NB_WATERTILE_VIEW_RANGE + 0.95f))
-#else
-			int distance = m_warship->GetDistanceToWaterTile(*it2);
-			if (distance <= NB_WATERTILE_VIEW_RANGE)
-#endif
+			if (distance <= NB_WATERTILE_VIEW_RANGE + 0.15f || ((*it2)->m_can_be_seen == true && m_warship->m_destination != NULL && distance <= NB_WATERTILE_VIEW_RANGE + 0.99f))//custom round-up system
 			{
 				(*it2)->m_can_be_seen = true;
 
@@ -149,7 +144,12 @@ void InGameState::Update(sf::Time deltaTime)
 					if (distance != 0)
 					{
 						ostringstream ss;
-						ss << distance;
+						int dst = (int)distance;
+						if (dst < distance)
+						{
+							dst++;
+						}
+						ss << dst;
 						(*it2)->m_text.setString(ss.str());
 					}
 
