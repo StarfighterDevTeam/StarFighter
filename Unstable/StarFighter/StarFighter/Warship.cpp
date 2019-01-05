@@ -8,6 +8,7 @@ Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 	m_destination = NULL;
 	m_speed = sf::Vector2f(0, 0);
 	m_seaport = NULL;
+	m_pathfind_cooldown_timer = 0.f;
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -87,21 +88,65 @@ Warship::~Warship()
 
 void Warship::Update(Time deltaTime)
 {
-	//position
-	if (m_destination == NULL)
+	//update cooldown timer
+	if (m_pathfind_cooldown_timer > 0)
 	{
-		m_position = m_tile->m_position;
+		m_pathfind_cooldown_timer -= deltaTime.asSeconds();
 	}
 
-	//arrived at destination?
-	if (m_destination != NULL)
+	//get new move order
+	if (m_current_path.empty() && m_destination != NULL)
 	{
-		if (GetDistanceFloatToWaterTile(m_destination) < 1.f / NB_WATERTILE_SUBDIVISION)
+		FindShortestPath(m_tile, m_destination);
+		m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+	}
+	//order changed
+	else if (!m_current_path.empty() && m_destination != NULL && m_destination != m_current_path.front())
+	{
+		//refresh order (only after a given cooldown)
+		if (m_pathfind_cooldown_timer > CREWMEMBER_MOVEORDER_COOLDOWN_TIMER)
 		{
-			SetDMSCoord(m_destination->m_DMS);
-			m_destination = NULL;
-			m_speed = sf::Vector2f(0, 0);
+			m_pathfind_cooldown_timer = CREWMEMBER_MOVEORDER_COOLDOWN_TIMER;
 		}
+		if (m_pathfind_cooldown_timer <= 0)
+		{
+			FindShortestPath(m_tile, m_destination);
+			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+		}
+	}
+
+	//arrived at waypoint? get next waypoint
+	if (!m_current_path.empty())
+	{
+		//refresh route (every X seconds) <!> this will possibly change m_destination
+		if (m_pathfind_cooldown_timer <= 0)
+		{
+			FindShortestPath(m_tile, m_destination);
+			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+		}
+
+		WaterTile* waypoint = m_current_path.back();
+		sf::Vector2f vec = waypoint->m_position - m_position;
+
+		//arrived at waypoint?
+		if (vec.x * vec.x + vec.y * vec.y < 8.f)
+		{
+			m_tile = waypoint;
+			m_current_path.pop_back();
+
+			//arrived at final destination
+			if (m_current_path.empty())
+			{
+				vec = sf::Vector2f(0, 0);
+				//m_position = waypoint->m_position;
+				SetDMSCoord(m_destination->m_DMS);
+				m_destination = NULL;
+			}
+		}
+
+		//set speed to waypoint
+		GameObject::ScaleVector(&vec, CRUISE_SPEED);
+		m_speed = vec;
 	}
 
 	//apply movement
@@ -136,6 +181,13 @@ void Warship::Update(Time deltaTime)
 		int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
 		m_DMS.m_minute_y -= minutes;
 		m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
+	}
+
+	//update tile information
+	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
+	if (m_destination == NULL)
+	{
+		m_position = m_tile->m_position;
 	}
 
 	//UI
@@ -429,6 +481,7 @@ bool Warship::SetDMSCoord(DMS_Coord coord)
 	m_tile = tile;
 	m_DMS = coord;
 	m_zone = tile->m_zone;
+	m_position = tile->m_position;
 
 	//new seaport?
 	if (tile->m_seaport != NULL && tile != (WaterTile*)m_seaport)
@@ -531,4 +584,115 @@ bool Warship::SetSailsToWaterTile(WaterTile* tile)
 	}
 
 	return true;
+}
+
+void Warship::IteratePathFindingOnIndex(WaterTile* tileA, WaterTile* tileB)
+{
+	m_closed_list_pathfind.push_back(tileA);
+	m_open_list_pathfind.remove(tileA);
+
+	const int tileA_x = tileA->m_coord_x;
+	const int tileA_y = tileA->m_coord_y;
+	const int tileB_x = tileB->m_coord_x;
+	const int tileB_y = tileB->m_coord_y;
+
+	//are we arrived at destination? (1 tile away from destination)
+	if ((abs(tileA_x - tileB_x) == 1 && abs(tileA_y - tileB_y) == 0) || (abs(tileA_x - tileB_x) == 0 && abs(tileA_y - tileB_y) == 1))
+	{
+		tileB->m_parent = tileA;
+		return;
+	}
+
+	//looks through all tiles to find the best next waypoint.
+	//for (vector<vector<WaterTile*> >::iterator it = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.begin(); it != (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.end(); it++)
+	//{
+	//	for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+	//	{
+
+	for (vector<WaterTile*>::iterator it = m_tiles_can_be_seen.begin(); it != m_tiles_can_be_seen.end(); it++)
+	{
+		if ((*it)->m_type == Water_Empty)
+		{
+			//tiles that are legitimate to compute	
+			if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), *it) == m_closed_list_pathfind.end())//tile unknown until now
+			{
+				if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), *it) == m_open_list_pathfind.end())
+				{
+					//CASE where the tile is not on the closed list nor on the open list
+					m_open_list_pathfind.push_back(*it);
+					
+					//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
+					const int pos2_x = tileB->m_coord_x;
+					const int pos2_y = tileB->m_coord_y;
+					const int posit_x = tileB->m_coord_x;
+					const int posit_y = tileB->m_coord_y;
+					
+					int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
+					int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
+					(*it)->m_heuristic = H_value_x + H_value_y;
+					
+					//compute Movement cost
+					(*it)->m_movement_cost = 10;
+					(*it)->m_movement_cost += tileA->m_movement_cost;
+					
+					//G value
+					(*it)->m_G_value = (*it)->m_heuristic + (*it)->m_movement_cost;
+					
+					//parent node
+					(*it)->m_parent = tileA;
+				}
+			}
+		}
+	}
+}
+
+void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
+{
+	if (tileA == tileB)
+	{
+		return;
+	}
+
+	//start
+	m_open_list_pathfind.push_back(tileA);
+	while (m_open_list_pathfind.empty() == false && tileB->m_parent == NULL)
+	{
+		//choose next best tile to compute
+		size_t min_G_value = 0;
+		WaterTile* next_tile = NULL;
+		for (list<WaterTile*>::iterator it = m_open_list_pathfind.begin(); it != m_open_list_pathfind.end(); it++)
+		{
+			if ((*it)->m_G_value < min_G_value || min_G_value == 0)
+			{
+				min_G_value = (*it)->m_G_value;
+				next_tile = *it;
+			}
+		}
+
+		//compute this tile
+		IteratePathFindingOnIndex(next_tile, tileB);
+	}
+
+	//path found -> save all waypoints into a member path
+	m_current_path.clear();
+	WaterTile* way_point = tileB;
+	while (way_point != tileA)
+	{
+		m_current_path.push_back(way_point);
+		way_point = way_point->m_parent;
+	}
+
+	//clear data
+	for (vector<vector<WaterTile*> >::iterator it = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.begin(); it != (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.end(); it++)
+	{
+		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		{
+			(*it2)->m_heuristic = 0;
+			(*it2)->m_movement_cost = 0;
+			(*it2)->m_G_value = 0;
+			(*it2)->m_parent = NULL;
+		}
+	}
+	m_open_list_pathfind.clear();
+	m_closed_list_pathfind.clear();
 }

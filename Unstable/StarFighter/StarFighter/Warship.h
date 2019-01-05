@@ -21,7 +21,10 @@ public:
 	WaterZone* m_zone;
 	WaterTile* m_tile;
 	WaterTile* m_destination;
+	vector<WaterTile*> m_tiles_can_be_seen;
+	vector<WaterTile*> m_current_path;
 	Seaport* m_seaport;
+	float m_pathfind_cooldown_timer;
 
 	DMS_Coord m_DMS;
 	float m_angle;
@@ -42,6 +45,12 @@ public:
 	Room* ConnectRooms();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	void UpdateCrewMembersCountPerRoom(Room* room);
+
+private:
+	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);
+	void IteratePathFindingOnIndex(WaterTile* tileA, WaterTile* tileB);
+	list<WaterTile*> m_closed_list_pathfind;
+	list<WaterTile*> m_open_list_pathfind;
 };
 
 #endif //WARSHIP_H_INCLUDED

@@ -129,6 +129,7 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 
 	//water tiles
+	m_warship->m_tiles_can_be_seen.clear();
 	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_zone->m_watertiles.begin(); it != m_warship->m_zone->m_watertiles.end(); it++)
 	{
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
@@ -137,6 +138,7 @@ void InGameState::Update(sf::Time deltaTime)
 			if (m_warship->CanViewWaterTile(*it2))
 			{
 				(*it2)->m_can_be_seen = true;
+				m_warship->m_tiles_can_be_seen.push_back(*it2);
 
 				//position on "radar"
 				(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (m_warship->m_DMS.m_minute_x + m_warship->m_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
@@ -182,7 +184,7 @@ void InGameState::Update(sf::Time deltaTime)
 		}
 	}
 
-	//boat - must be done after water tiles update because it's attached to a tile
+	//boat
 	m_warship->Update(deltaTime);
 
 	//island
@@ -250,21 +252,9 @@ void InGameState::Draw()
 	//WATER PART
 
 	//water tiles
-	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_zone->m_watertiles.begin(); it != m_warship->m_zone->m_watertiles.end(); it++)
+	for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
 	{
-		//preliminary check that takes away a whole vector to check + 1 margin
-		if (it->front()->m_coord_x < m_warship->m_DMS.m_minute_x - NB_WATERTILE_VIEW_RANGE - 1 || it->front()->m_coord_x > m_warship->m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + 1)
-		{
-			continue;
-		}
-
-		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-		{
-			if ((*it2)->m_can_be_seen == true)
-			{
-				(*it2)->Draw((*CurrentGame).m_mainScreen);
-			}
-		}
+		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//boat
