@@ -92,25 +92,38 @@ void Warship::Update(Time deltaTime)
 		m_position = m_tile->m_position;
 	}
 
-	//rotation
-	UpdateRotation();
-
 	//apply movement
 	m_DMS.m_second_x += m_speed.x * deltaTime.asSeconds();
 	m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
 
-	//sexadecimal system
+	//rotation
+	UpdateRotation();
+
+	//sexadecimal position system
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 	{
 		int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
 		m_DMS.m_minute_x += minutes;
 		m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
 	}
+	else if (m_DMS.m_second_x < 0)
+	{
+		int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION;
+		m_DMS.m_minute_x -= minutes;
+		m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
+	}
+
 	if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
 	{
 		int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
 		m_DMS.m_minute_y += minutes;
 		m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
+	}
+	else if (m_DMS.m_second_y < 0)
+	{
+		int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
+		m_DMS.m_minute_y -= minutes;
+		m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
 	}
 
 	//UI
@@ -130,6 +143,31 @@ void Warship::Update(Time deltaTime)
 
 void Warship::UpdateRotation()
 {
+	//find angle for speed vector
+	if (m_speed.x != 0 || m_speed.y != 0)
+	{
+		if (m_speed.x == 0)
+		{
+			m_angle = m_speed.y >= 0 ? 180.f : 0.f;
+		}
+		else if (m_speed.y == 0)
+		{
+			m_angle = m_speed.x >= 0 ? 90.f : 270.f;
+		}
+		else
+		{
+			if (m_speed.x >= 0)
+			{
+				m_angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f;
+			}
+			else
+			{
+				m_angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f + 180.f;
+			}
+		}
+	}
+
+	//flip the sprite according to the direction
 	m_angle = fmod(m_angle, 360.f);
 	if (m_angle > 0.f && m_angle < 180.f)
 	{
@@ -412,10 +450,10 @@ bool Warship::CanViewWaterTile(WaterTile* tile)
 
 bool Warship::SetSailsToWaterTile(WaterTile* tile)
 {
-	if (m_destination != NULL)
-	{
-		return false;
-	}
+	//if (m_destination != NULL)
+	//{
+	//	return false;
+	//}
 
 	sf::Vector2f move_vector = tile->m_position - m_position;
 	GameObject::ScaleVector(&move_vector, CRUISE_SPEED);
