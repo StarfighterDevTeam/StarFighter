@@ -28,6 +28,7 @@ public:
 	sf::Vector2f m_speed;
 
 	bool SetDMSCoord(DMS_Coord coord);
+	DMS_Coord GetDMSCoord(sf::Vector2f position);
 	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
