@@ -463,10 +463,24 @@ bool Warship::CanViewWaterTile(WaterTile* tile)
 	{
 		return false;
 	}
+	else if (tile->m_coord_x > m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + 1 || tile->m_coord_x < m_DMS.m_minute_x - NB_WATERTILE_VIEW_RANGE - 1)
+	{
+		return false;
+	}
+	else if (tile->m_coord_y > m_DMS.m_minute_y + NB_WATERTILE_VIEW_RANGE + 1 || tile->m_coord_y < m_DMS.m_minute_y - NB_WATERTILE_VIEW_RANGE - 1)
+	{
+		return false;
+	}
 
-	int distance = GetDistanceToWaterTile(tile);
-
-	return distance <= NB_WATERTILE_VIEW_RANGE;
+	float distance = GetDistanceFloatToWaterTile(tile);
+	if (distance <= NB_WATERTILE_VIEW_RANGE + 0.15f || (tile->m_can_be_seen == true && m_destination != NULL && distance <= NB_WATERTILE_VIEW_RANGE + 0.99f))//custom round-up system
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool Warship::SetSailsToWaterTile(WaterTile* tile)

@@ -127,25 +127,25 @@ void InGameState::Update(sf::Time deltaTime)
 	{
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			//position on "radar"
-			(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (m_warship->m_DMS.m_minute_x + m_warship->m_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
-			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y - m_warship->m_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
-
 			//can be seen? no need to update other tiles because they won't be drawn anyway
-			float distance = m_warship->GetDistanceFloatToWaterTile(*it2);
-			if (distance <= NB_WATERTILE_VIEW_RANGE + 0.15f || ((*it2)->m_can_be_seen == true && m_warship->m_destination != NULL && distance <= NB_WATERTILE_VIEW_RANGE + 0.99f))//custom round-up system
+			if (m_warship->CanViewWaterTile(*it2))
 			{
 				(*it2)->m_can_be_seen = true;
+
+				//position on "radar"
+				(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (m_warship->m_DMS.m_minute_x + m_warship->m_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
+				(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y - m_warship->m_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
 
 				//selection
 				if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
 				{
 					//display distances to the boat
-					if (distance != 0)
+					float distance = m_warship->GetDistanceFloatToWaterTile(*it2);
+					if (distance != 0.f)
 					{
 						ostringstream ss;
 						int dst = (int)distance;
-						if (dst < distance)
+						if (dst < distance)//round up
 						{
 							dst++;
 						}
