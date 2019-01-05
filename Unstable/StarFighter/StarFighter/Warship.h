@@ -6,7 +6,8 @@
 #include "CrewMember.h"
 #include "Island.h"
 
-#define	CRUISE_SPEED		15
+#define	CRUISE_SPEED				5
+#define MAP_REVEAL_FLOATING		false
 
 class Warship : public GameEntity
 {
@@ -30,6 +31,7 @@ public:
 	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
+	float GetDistanceFloatToWaterTile(WaterTile* tile);
 	void UpdateRotation();
 	bool SetSailsToWaterTile(WaterTile* tile);
 

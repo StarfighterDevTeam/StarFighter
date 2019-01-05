@@ -132,9 +132,16 @@ void InGameState::Update(sf::Time deltaTime)
 			(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y - m_warship->m_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
 
 			//can be seen? no need to update other tiles because they won't be drawn anyway
+#if !defined MAP_REVEAL_FLOATING
+			float distance = m_warship->GetDistanceFloatToWaterTile(*it2);
+			if (distance <= NB_WATERTILE_VIEW_RANGE + 0.3f || ((*it2)->m_can_be_seen == true && distance <= NB_WATERTILE_VIEW_RANGE + 0.95f))
+#else
 			int distance = m_warship->GetDistanceToWaterTile(*it2);
 			if (distance <= NB_WATERTILE_VIEW_RANGE)
+#endif
 			{
+				(*it2)->m_can_be_seen = true;
+
 				//selection
 				if (selection == m_warship && (*it2)->m_type != Water_Island)
 				{
@@ -161,6 +168,10 @@ void InGameState::Update(sf::Time deltaTime)
 						(*CurrentGame).m_selected_ui = NULL;
 					}
 				}
+			}
+			else
+			{
+				(*it2)->m_can_be_seen = false;
 			}
 		}
 	}
@@ -236,7 +247,7 @@ void InGameState::Draw()
 
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			if (m_warship->CanViewWaterTile(*it2))
+			if ((*it2)->m_can_be_seen == true)
 			{
 				(*it2)->Draw((*CurrentGame).m_mainScreen);
 			}

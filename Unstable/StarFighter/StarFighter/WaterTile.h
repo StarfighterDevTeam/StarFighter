@@ -60,6 +60,7 @@ public:
 	WaterTileType m_type;
 	WaterZone* m_zone;
 	DMS_Coord m_DMS;//degree/min/sec
+	bool m_can_be_seen;
 
 	//pathfinding
 	int m_heuristic;

@@ -213,10 +213,6 @@ void Ship::UpdateInputStates()
 	{
 		GetInputState(InputGuy::isFiring(), Action_Firing);
 	}
-	else
-	{
-		GetInputState(false, Action_Firing);
-	}
 }
 
 bool Ship::UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition)

@@ -422,10 +422,6 @@ int Warship::GetDistanceToWaterTile(WaterTile* tile)
 	int diff_y = tile->m_coord_y - m_DMS.m_minute_y;
 	float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y);
 
-	//int diff_x = NB_WATERTILE_SUBDIVISION * (tile->m_coord_x - m_DMS.m_minute_x) - m_DMS.m_second_x;
-	//int diff_y = NB_WATERTILE_SUBDIVISION * (tile->m_coord_y - m_DMS.m_minute_y) - m_DMS.m_second_y;
-	//float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y) * 1.f / NB_WATERTILE_SUBDIVISION;
-
 	int distance_i = (int)distance_f;
 
 	if (distance_f - distance_i > 0.10f)//custom round-up rule
@@ -434,6 +430,15 @@ int Warship::GetDistanceToWaterTile(WaterTile* tile)
 	}
 
 	return distance_i;
+}
+
+float Warship::GetDistanceFloatToWaterTile(WaterTile* tile)
+{
+	int diff_x = NB_WATERTILE_SUBDIVISION * (tile->m_coord_x - m_DMS.m_minute_x) - m_DMS.m_second_x;
+	int diff_y = NB_WATERTILE_SUBDIVISION * (tile->m_coord_y - m_DMS.m_minute_y) - m_DMS.m_second_y;
+	float distance_f = sqrt(diff_x * diff_x + diff_y * diff_y) * 1.f / NB_WATERTILE_SUBDIVISION;
+
+	return distance_f;
 }
 
 bool Warship::CanViewWaterTile(WaterTile* tile)

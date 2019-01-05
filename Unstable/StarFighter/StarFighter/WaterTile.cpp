@@ -11,6 +11,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_zone = zone;
 	m_DMS.SetCoord(zone_coord_x, coord_x, 0, zone_coord_y, coord_y, 0);
 	m_default_color = sf::Color(255, 255, 255, 120);
+	m_can_be_seen = false;
 
 	//pathfinding
 	m_heuristic = 0;
