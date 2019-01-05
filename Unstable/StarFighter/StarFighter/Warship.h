@@ -6,7 +6,7 @@
 #include "CrewMember.h"
 #include "Island.h"
 
-#define	CRUISE_SPEED				5
+#define	CRUISE_SPEED				15
 
 class Warship : public GameEntity
 {

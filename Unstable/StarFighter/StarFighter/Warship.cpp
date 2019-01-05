@@ -613,33 +613,36 @@ void Warship::IteratePathFindingOnIndex(WaterTile* tileA, WaterTile* tileB)
 	{
 		if ((*it)->m_type == Water_Empty)
 		{
-			//tiles that are legitimate to compute	
-			if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), *it) == m_closed_list_pathfind.end())//tile unknown until now
+			if ((abs(tileA_x - (*it)->m_coord_x) == 1 && abs(tileA_y - (*it)->m_coord_y) == 0) || (abs(tileA_x - (*it)->m_coord_x) == 0 && abs(tileA_y - (*it)->m_coord_y) == 1))
 			{
-				if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), *it) == m_open_list_pathfind.end())
+				//tiles that are legitimate to compute	
+				if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), *it) == m_closed_list_pathfind.end())//tile unknown until now
 				{
-					//CASE where the tile is not on the closed list nor on the open list
-					m_open_list_pathfind.push_back(*it);
-					
-					//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
-					const int pos2_x = tileB->m_coord_x;
-					const int pos2_y = tileB->m_coord_y;
-					const int posit_x = tileB->m_coord_x;
-					const int posit_y = tileB->m_coord_y;
-					
-					int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
-					int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
-					(*it)->m_heuristic = H_value_x + H_value_y;
-					
-					//compute Movement cost
-					(*it)->m_movement_cost = 10;
-					(*it)->m_movement_cost += tileA->m_movement_cost;
-					
-					//G value
-					(*it)->m_G_value = (*it)->m_heuristic + (*it)->m_movement_cost;
-					
-					//parent node
-					(*it)->m_parent = tileA;
+					if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), *it) == m_open_list_pathfind.end())
+					{
+						//CASE where the tile is not on the closed list nor on the open list
+						m_open_list_pathfind.push_back(*it);
+
+						//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
+						const int pos2_x = tileB->m_coord_x;
+						const int pos2_y = tileB->m_coord_y;
+						const int posit_x = tileB->m_coord_x;
+						const int posit_y = tileB->m_coord_y;
+
+						int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
+						int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
+						(*it)->m_heuristic = H_value_x + H_value_y;
+
+						//compute Movement cost
+						(*it)->m_movement_cost = 10;
+						(*it)->m_movement_cost += tileA->m_movement_cost;
+
+						//G value
+						(*it)->m_G_value = (*it)->m_heuristic + (*it)->m_movement_cost;
+
+						//parent node
+						(*it)->m_parent = tileA;
+					}
 				}
 			}
 		}
@@ -683,16 +686,14 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	}
 
 	//clear data
-	for (vector<vector<WaterTile*> >::iterator it = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.begin(); it != (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.end(); it++)
+	for (vector<WaterTile*>::iterator it = m_tiles_can_be_seen.begin(); it != m_tiles_can_be_seen.end(); it++)
 	{
-		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-		{
-			(*it2)->m_heuristic = 0;
-			(*it2)->m_movement_cost = 0;
-			(*it2)->m_G_value = 0;
-			(*it2)->m_parent = NULL;
-		}
+		(*it)->m_heuristic = 0;
+		(*it)->m_movement_cost = 0;
+		(*it)->m_G_value = 0;
+		(*it)->m_parent = NULL;
 	}
+	
 	m_open_list_pathfind.clear();
 	m_closed_list_pathfind.clear();
 }
