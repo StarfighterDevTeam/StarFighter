@@ -95,24 +95,15 @@ void Warship::Update(Time deltaTime)
 	}
 
 	//get new move order
-	if (m_current_path.empty() && m_destination != NULL)
+	if (m_current_path.empty() == true && m_destination != NULL)
 	{
 		FindShortestPath(m_tile, m_destination);
 		m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
 	}
 	//order changed
-	else if (!m_current_path.empty() && m_destination != NULL && m_destination != m_current_path.front())
+	else if (m_current_path.empty() == false && m_destination != NULL && m_destination != m_current_path.front())
 	{
-		//refresh order (only after a given cooldown)
-		if (m_pathfind_cooldown_timer > CREWMEMBER_MOVEORDER_COOLDOWN_TIMER)
-		{
-			m_pathfind_cooldown_timer = CREWMEMBER_MOVEORDER_COOLDOWN_TIMER;
-		}
-		if (m_pathfind_cooldown_timer <= 0)
-		{
-			FindShortestPath(m_tile, m_destination);
-			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
-		}
+		FindShortestPath(m_tile, m_destination);
 	}
 
 	//travel management (needs to be refreshed? arrived?)
@@ -131,8 +122,15 @@ void Warship::Update(Time deltaTime)
 			if (m_current_path.empty() == true)
 			{
 				vec = sf::Vector2f(0, 0);
-				m_DMS = m_destination->m_DMS;
-				m_destination = NULL;
+				m_DMS = waypoint->m_DMS;
+				if (waypoint == m_destination)
+				{
+					m_destination = NULL;
+				}
+				else
+				{
+					m_pathfind_cooldown_timer = 0;//new route has to be computed urgently
+				}
 			}
 		}
 
