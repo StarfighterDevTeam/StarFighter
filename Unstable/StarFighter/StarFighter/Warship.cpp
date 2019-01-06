@@ -690,7 +690,7 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	}
 
 	//path found -> save all waypoints into a member path
-	//m_current_path.clear();
+	m_current_path.clear();
 	vector<WaterTile*> temp_path;
 	WaterTile* way_point = tileB;
 	while (way_point != tileA)
@@ -712,9 +712,7 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	m_open_list_pathfind.clear();
 	m_closed_list_pathfind.clear();
 
-	
 	//compute the best diagonals and eliminate useless waypoints
-	m_current_path.clear();
 	temp_path.push_back(tileA);
 	int path_size = temp_path.size();
 	int index = 0;

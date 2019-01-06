@@ -295,10 +295,11 @@ void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 
 	//path found -> save all waypoints into a member path
 	m_current_path.clear();
+	vector<RoomTile*> temp_path;
 	RoomTile* way_point = tileB;
 	while (way_point != tileA)
 	{
-		m_current_path.push_back(way_point);
+		temp_path.push_back(way_point);
 		way_point = way_point->m_parent;
 	}
 	
@@ -312,4 +313,17 @@ void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 	}
 	m_open_list_pathfind.clear();
 	m_closed_list_pathfind.clear();
+
+	//compute the best diagonals and eliminate useless waypoints
+	int path_size = temp_path.size();
+	int index = 0;
+	while (index < path_size)
+	{
+		if (index == 0 || temp_path[index - 1]->m_room != temp_path[index]->m_room || (index != path_size - 1 && temp_path[index + 1]->m_room != temp_path[index]->m_room))
+		{
+			m_current_path.push_back(temp_path[index]);
+		}
+		
+		index++;
+	}
 }
