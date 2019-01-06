@@ -115,31 +115,23 @@ void Warship::Update(Time deltaTime)
 		}
 	}
 
-	//arrived at waypoint? get next waypoint
+	//travel management (needs to be refreshed? arrived?)
 	if (!m_current_path.empty())
 	{
-		//refresh route (every X seconds) <!> this will possibly change m_destination
-		if (m_pathfind_cooldown_timer <= 0)
-		{
-			FindShortestPath(m_tile, m_destination);
-			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
-		}
-
 		WaterTile* waypoint = m_current_path.back();
 		sf::Vector2f vec = waypoint->m_position - m_position;
 
 		//arrived at waypoint?
-		if (vec.x * vec.x + vec.y * vec.y < 8.f)
+		if (IsOneSecondOrLessAway(waypoint) == true)
 		{
-			m_tile = waypoint;
+			m_DMS = waypoint->m_DMS;
 			m_current_path.pop_back();
 
 			//arrived at final destination
-			if (m_current_path.empty())
+			if (m_current_path.empty() == true)
 			{
 				vec = sf::Vector2f(0, 0);
-				//m_position = waypoint->m_position;
-				SetDMSCoord(m_destination->m_DMS);
+				m_DMS = m_destination->m_DMS;
 				m_destination = NULL;
 			}
 		}
@@ -157,17 +149,20 @@ void Warship::Update(Time deltaTime)
 	UpdateRotation();
 
 	//sexadecimal position system
+	bool minute_changed = false;
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 	{
 		int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
 		m_DMS.m_minute_x += minutes;
 		m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
+		minute_changed = true;
 	}
 	else if (m_DMS.m_second_x < 0)
 	{
 		int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION + 1;
 		m_DMS.m_minute_x -= minutes;
 		m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
+		minute_changed = true;
 	}
 
 	if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
@@ -175,12 +170,21 @@ void Warship::Update(Time deltaTime)
 		int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
 		m_DMS.m_minute_y += minutes;
 		m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
+		minute_changed = true;
 	}
 	else if (m_DMS.m_second_y < 0)
 	{
 		int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
 		m_DMS.m_minute_y -= minutes;
 		m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
+		minute_changed = true;
+	}
+
+	//refresh route (only after a certain cooldown)
+	if (minute_changed == true && m_pathfind_cooldown_timer <= 0)
+	{
+		FindShortestPath(m_tile, m_destination);
+		m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
 	}
 
 	//update tile information
@@ -192,14 +196,10 @@ void Warship::Update(Time deltaTime)
 
 	//UI
 	ostringstream ss;
-	ss << std::fixed;
-	ss.precision(0);
 	ss << "\n\n\n";
-	ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' ";
-	ss << m_DMS.m_second_y << "\"\N";
+	ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' " << (int)m_DMS.m_second_y << "\"\N";
 	ss << "\n";
-	ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' ";
-	ss << m_DMS.m_second_x << "\"\E";
+	ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << (int)m_DMS.m_second_x << "\"\E";
 	m_text.setString(ss.str());
 
 	GameEntity::Update(deltaTime);
@@ -528,6 +528,19 @@ DMS_Coord Warship::GetDMSCoord(sf::Vector2f position)
 	return dms;
 }
 
+bool Warship::IsOneSecondOrLessAway(WaterTile* tile)
+{
+	float xA = m_DMS.m_minute_x * NB_WATERTILE_SUBDIVISION + m_DMS.m_second_x;
+	float yA = m_DMS.m_minute_y * NB_WATERTILE_SUBDIVISION + m_DMS.m_second_y;
+
+	float xB = tile->m_DMS.m_minute_x * NB_WATERTILE_SUBDIVISION + tile->m_DMS.m_second_x;
+	float yB = tile->m_DMS.m_minute_y * NB_WATERTILE_SUBDIVISION + tile->m_DMS.m_second_y;
+
+	bool one_second_close = (xA - xB) * (xA - xB) + (yA - yB) * (yA - yB) < 1.f;
+
+	return one_second_close;
+}
+
 float Warship::GetDistanceFloatToWaterTile(WaterTile* tile)
 {
 	int diff_x = NB_WATERTILE_SUBDIVISION * (tile->m_coord_x - m_DMS.m_minute_x) - m_DMS.m_second_x;
@@ -677,11 +690,13 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	}
 
 	//path found -> save all waypoints into a member path
-	m_current_path.clear();
+	//m_current_path.clear();
+	vector<WaterTile*> temp_path;
 	WaterTile* way_point = tileB;
 	while (way_point != tileA)
 	{
-		m_current_path.push_back(way_point);
+		//m_current_path.push_back(way_point);
+		temp_path.push_back(way_point);
 		way_point = way_point->m_parent;
 	}
 
@@ -696,4 +711,76 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	
 	m_open_list_pathfind.clear();
 	m_closed_list_pathfind.clear();
+
+	
+	//compute the best diagonals and eliminate useless waypoints
+	m_current_path.clear();
+	temp_path.push_back(tileA);
+	int path_size = temp_path.size();
+	int index = 0;
+	while (index < path_size)
+	{
+		if (index == path_size - 1)//we don't want to add TileA to m_current_path because it's our current position already, but we need it in temp_path to compute shortcuts
+		{
+			break;
+		}
+
+		m_current_path.push_back(temp_path[index]);
+
+		int temp_index = index;
+
+		for (int i = index + 1; i < path_size; i++)
+		{
+			if (index == path_size - 2)
+			{
+				break;
+			}
+			int x_min = Min(temp_path[index]->m_coord_x, temp_path[i]->m_coord_x);
+			int x_max = Max(temp_path[index]->m_coord_x, temp_path[i]->m_coord_x);
+			int y_min = Min(temp_path[index]->m_coord_y, temp_path[i]->m_coord_y);
+			int y_max = Max(temp_path[index]->m_coord_y, temp_path[i]->m_coord_y);
+
+			//way points in line = cannot optimize
+			if (x_min == x_max || y_min == y_max)
+			{
+				continue;
+			}
+
+			bool only_water = true;
+			for (int j = x_min; j <= x_max; j++)
+			{
+				for (int k = y_min; k <= y_max; k++)
+				{
+					if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[j][k]->m_type != Water_Empty)
+					{
+						only_water = false;
+						break;
+					}
+				}
+
+				if (only_water == false)
+				{
+					break;
+				}
+			}
+
+			//chance of optimization
+			if (only_water == true)
+			{
+				//skip all other waypoints
+				temp_index = i;
+			}
+		}
+
+		//we found a shortcut? continue from this waypoint on...
+		if (index != temp_index)
+		{
+			index = temp_index;
+		}
+		//...otherwise, continue with the next waypoint
+		else
+		{
+			index++;
+		}
+	}
 }

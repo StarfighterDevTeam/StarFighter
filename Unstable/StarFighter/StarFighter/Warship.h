@@ -6,7 +6,7 @@
 #include "CrewMember.h"
 #include "Island.h"
 
-#define	CRUISE_SPEED				15
+#define	CRUISE_SPEED				40
 
 class Warship : public GameEntity
 {
@@ -32,6 +32,7 @@ public:
 
 	bool SetDMSCoord(DMS_Coord coord);
 	DMS_Coord GetDMSCoord(sf::Vector2f position);
+	bool IsOneSecondOrLessAway(WaterTile* tile);
 	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);

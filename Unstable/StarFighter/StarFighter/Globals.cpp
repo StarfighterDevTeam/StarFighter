@@ -128,6 +128,16 @@ float MinBetweenValues(sf::Vector2f values)
 	return min;
 }
 
+int Min(int a, int b)
+{
+	return a <= b ? a : b;
+}
+
+int Max(int a, int b)
+{
+	return a > b ? a : b;
+}
+
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to)
 {
 	size_t start_pos = 0;
