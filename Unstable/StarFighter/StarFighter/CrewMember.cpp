@@ -204,42 +204,19 @@ void CrewMember::IteratePathFindingOnIndex(RoomTile* tileA, RoomTile* tileB)
 		return;
 	}
 	
-	//looks through all tiles to find the best next waypoint. 
-	//we try to reduce as soon as possible the number of tiles to iterate on, by filtering same room and connected rooms only.
-	vector<Room*> search_rooms;
-	search_rooms.push_back(tileA->m_room);
-	for (vector<RoomConnexion*>::iterator it = tileA->m_room->m_connexions.begin(); it != tileA->m_room->m_connexions.end(); it++)
+	//looks through all tiles to find the best next waypoint.
+	size_t vector_size = (*CurrentGame).m_tiles.size();
+	for (size_t i = 0; i < vector_size; i++)
 	{
-		if ((*it)->m_locked == false && (*it)->m_tiles.first->m_room != tileA->m_room)
-		{
-			search_rooms.push_back((*it)->m_tiles.first->m_room);
-		}
-		else if ((*it)->m_locked == false && (*it)->m_tiles.second->m_room != tileA->m_room)
-		{
-			search_rooms.push_back((*it)->m_tiles.second->m_room);
-		}
-	}
-
-	vector<RoomTile*> search_tiles;
-	for (vector<Room*>::iterator it = search_rooms.begin(); it != search_rooms.end(); it++)
-	{
-		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-		{
-			search_tiles.push_back(*it2);
-		}
-	}
-
-	for (vector<RoomTile*>::iterator it = search_tiles.begin(); it != search_tiles.end(); it++)
-	{
-		if (Room::IsConnectedToRoomTile(tileA, *it))
+		if (Room::IsConnectedToRoomTile(tileA, (*CurrentGame).m_tiles[i]))
 		{
 			//tiles that are legitimate to compute	
-			if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), *it) == m_closed_list_pathfind.end())//tile unknown until now
+			if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), (*CurrentGame).m_tiles[i]) == m_closed_list_pathfind.end())//tile unknown until now
 			{
-				if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), *it) == m_open_list_pathfind.end())
+				if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), (*CurrentGame).m_tiles[i]) == m_open_list_pathfind.end())
 				{
 					//CASE where the tile is not on the closed list nor on the open list
-					m_open_list_pathfind.push_back(*it);
+					m_open_list_pathfind.push_back((*CurrentGame).m_tiles[i]);
 
 					//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
 					const int pos2_x = tileB->m_coord_x;
@@ -249,17 +226,17 @@ void CrewMember::IteratePathFindingOnIndex(RoomTile* tileA, RoomTile* tileB)
 
 					int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
 					int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
-					(*it)->m_heuristic = H_value_x + H_value_y;
+					(*CurrentGame).m_tiles[i]->m_heuristic = H_value_x + H_value_y;
 
 					//compute Movement cost
-					(*it)->m_movement_cost = 10;
-					(*it)->m_movement_cost += tileA->m_movement_cost;
+					(*CurrentGame).m_tiles[i]->m_movement_cost = 10;
+					(*CurrentGame).m_tiles[i]->m_movement_cost += tileA->m_movement_cost;
 
 					//G value
-					(*it)->m_G_value = (*it)->m_heuristic + (*it)->m_movement_cost;
+					(*CurrentGame).m_tiles[i]->m_G_value = (*CurrentGame).m_tiles[i]->m_heuristic + (*CurrentGame).m_tiles[i]->m_movement_cost;
 
 					//parent node
-					(*it)->m_parent = tileA;
+					(*CurrentGame).m_tiles[i]->m_parent = tileA;
 				}
 			}
 		}

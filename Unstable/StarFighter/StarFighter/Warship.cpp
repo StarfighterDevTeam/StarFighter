@@ -122,7 +122,7 @@ void Warship::Update(Time deltaTime)
 		sf::Vector2f vec = waypoint->m_position - m_position;
 
 		//arrived at waypoint?
-		if (IsOneSecondOrLessAway(waypoint) == true)
+		if (GetDistanceSquaredInSecondsDMS(waypoint) < 1.f)
 		{
 			m_DMS = waypoint->m_DMS;
 			m_current_path.pop_back();
@@ -528,7 +528,7 @@ DMS_Coord Warship::GetDMSCoord(sf::Vector2f position)
 	return dms;
 }
 
-bool Warship::IsOneSecondOrLessAway(WaterTile* tile)
+float Warship::GetDistanceSquaredInSecondsDMS(WaterTile* tile)
 {
 	float xA = m_DMS.m_minute_x * NB_WATERTILE_SUBDIVISION + m_DMS.m_second_x;
 	float yA = m_DMS.m_minute_y * NB_WATERTILE_SUBDIVISION + m_DMS.m_second_y;
@@ -536,9 +536,9 @@ bool Warship::IsOneSecondOrLessAway(WaterTile* tile)
 	float xB = tile->m_DMS.m_minute_x * NB_WATERTILE_SUBDIVISION + tile->m_DMS.m_second_x;
 	float yB = tile->m_DMS.m_minute_y * NB_WATERTILE_SUBDIVISION + tile->m_DMS.m_second_y;
 
-	bool one_second_close = (xA - xB) * (xA - xB) + (yA - yB) * (yA - yB) < 1.f;
+	float distance_squared = (xA - xB) * (xA - xB) + (yA - yB) * (yA - yB);
 
-	return one_second_close;
+	return distance_squared;
 }
 
 float Warship::GetDistanceFloatToWaterTile(WaterTile* tile)
@@ -617,24 +617,21 @@ void Warship::IteratePathFindingOnIndex(WaterTile* tileA, WaterTile* tileB)
 	}
 
 	//looks through all tiles to find the best next waypoint.
-	//for (vector<vector<WaterTile*> >::iterator it = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.begin(); it != (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles.end(); it++)
-	//{
-	//	for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-	//	{
-
-	for (vector<WaterTile*>::iterator it = m_tiles_can_be_seen.begin(); it != m_tiles_can_be_seen.end(); it++)
+	size_t vector_size = m_tiles_can_be_seen.size();
+	for (size_t i = 0; i < vector_size; i++)
 	{
-		if ((*it)->m_type == Water_Empty)
+		if (m_tiles_can_be_seen[i]->m_type == Water_Empty)
 		{
-			if ((abs(tileA_x - (*it)->m_coord_x) == 1 && abs(tileA_y - (*it)->m_coord_y) == 0) || (abs(tileA_x - (*it)->m_coord_x) == 0 && abs(tileA_y - (*it)->m_coord_y) == 1))
+			if ((abs(tileA_x - m_tiles_can_be_seen[i]->m_coord_x) == 1 && abs(tileA_y - m_tiles_can_be_seen[i]->m_coord_y) == 0) 
+				|| (abs(tileA_x - m_tiles_can_be_seen[i]->m_coord_x) == 0 && abs(tileA_y - m_tiles_can_be_seen[i]->m_coord_y) == 1))
 			{
 				//tiles that are legitimate to compute	
-				if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), *it) == m_closed_list_pathfind.end())//tile unknown until now
+				if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), m_tiles_can_be_seen[i]) == m_closed_list_pathfind.end())//tile unknown until now
 				{
-					if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), *it) == m_open_list_pathfind.end())
+					if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), m_tiles_can_be_seen[i]) == m_open_list_pathfind.end())
 					{
 						//CASE where the tile is not on the closed list nor on the open list
-						m_open_list_pathfind.push_back(*it);
+						m_open_list_pathfind.push_back(m_tiles_can_be_seen[i]);
 
 						//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
 						const int pos2_x = tileB->m_coord_x;
@@ -644,17 +641,17 @@ void Warship::IteratePathFindingOnIndex(WaterTile* tileA, WaterTile* tileB)
 
 						int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
 						int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
-						(*it)->m_heuristic = H_value_x + H_value_y;
+						m_tiles_can_be_seen[i]->m_heuristic = H_value_x + H_value_y;
 
 						//compute Movement cost
-						(*it)->m_movement_cost = 10;
-						(*it)->m_movement_cost += tileA->m_movement_cost;
+						m_tiles_can_be_seen[i]->m_movement_cost = 10;
+						m_tiles_can_be_seen[i]->m_movement_cost += tileA->m_movement_cost;
 
 						//G value
-						(*it)->m_G_value = (*it)->m_heuristic + (*it)->m_movement_cost;
+						m_tiles_can_be_seen[i]->m_G_value = m_tiles_can_be_seen[i]->m_heuristic + m_tiles_can_be_seen[i]->m_movement_cost;
 
 						//parent node
-						(*it)->m_parent = tileA;
+						m_tiles_can_be_seen[i]->m_parent = tileA;
 					}
 				}
 			}

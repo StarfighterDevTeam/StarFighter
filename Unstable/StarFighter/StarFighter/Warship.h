@@ -32,7 +32,7 @@ public:
 
 	bool SetDMSCoord(DMS_Coord coord);
 	DMS_Coord GetDMSCoord(sf::Vector2f position);
-	bool IsOneSecondOrLessAway(WaterTile* tile);
+	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
 	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
