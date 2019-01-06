@@ -91,8 +91,9 @@ Seaport* Island::AddSeaport(SeaportType type)
 	WaterTile* random_tile = candidates[random];
 
 	//create the port
-	Seaport* port = new Seaport(random_tile->m_coord_x, random_tile->m_coord_y, zone_coord_x, zone_coord_y, type);
+	Seaport* port = new Seaport(random_tile->m_coord_x, random_tile->m_coord_y, zone_coord_x, zone_coord_y, type, this);
 	m_seaport = port;
+	m_seaport->m_tile->m_seaport = port;
 
 	return port;
 }

@@ -6,6 +6,7 @@
 #include "WaterZone.h"
 
 class Warship;//forward declaration
+class Island;
 
 enum SeaportType
 {
@@ -15,7 +16,7 @@ enum SeaportType
 class Seaport : public GameEntity
 {
 public:
-	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type);
+	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type, Island* island);
 	~Seaport();
 
 	int m_coord_x;
@@ -23,6 +24,7 @@ public:
 	SeaportType m_type;
 
 	WaterTile* m_tile;
+	Island* m_island;
 	vector<Warship*> m_ships;
 
 	void RemoveShip(Warship* ship);

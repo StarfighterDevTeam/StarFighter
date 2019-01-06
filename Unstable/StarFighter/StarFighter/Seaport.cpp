@@ -2,11 +2,12 @@
 
 extern Game* CurrentGame;
 
-Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type) : GameEntity(sf::Vector2f(WATERTILE_SIZE, WATERTILE_SIZE), UI_Seaport)
+Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type, Island* island) : GameEntity(sf::Vector2f(WATERTILE_SIZE, WATERTILE_SIZE), UI_Seaport)
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
 	m_type = type;
+	m_island = island;
 
 	m_tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[coord_x][coord_y];
 	m_tile->m_seaport = this;

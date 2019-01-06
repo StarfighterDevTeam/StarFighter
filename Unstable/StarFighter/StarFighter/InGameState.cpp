@@ -225,7 +225,7 @@ void InGameState::Draw()
 
 	//PIRATES
 
-	//tiles
+	//room tiles
 	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
@@ -252,24 +252,31 @@ void InGameState::Draw()
 	//WATER PART
 
 	//water tiles
+	vector<Island*> islands;
 	for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
+		
+		if ((*it)->m_island != NULL)
+		{
+			islands.push_back((*it)->m_island);
+		}
+	}
+
+	//islands and ports
+	for (vector<Island*>::iterator it = islands.begin(); it != islands.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+
+		//seaport
+		if ((*it)->m_seaport != NULL && (*it)->m_seaport->m_tile->m_can_be_seen == true)
+		{
+			(*it)->m_seaport->Draw((*CurrentGame).m_mainScreen);
+		}
 	}
 
 	//boat
 	m_warship->Draw((*CurrentGame).m_mainScreen);
-
-	//island
-	if (m_island != NULL)
-	{
-		m_island->Draw((*CurrentGame).m_mainScreen);
-
-		if (m_island->m_seaport != NULL)
-		{
-			m_island->m_seaport->Draw((*CurrentGame).m_mainScreen);
-		}
-	}
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();
