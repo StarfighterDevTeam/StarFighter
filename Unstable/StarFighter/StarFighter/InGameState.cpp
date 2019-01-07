@@ -54,20 +54,19 @@ void InGameState::InitRobots()
 
 	//Robot 1
 	robot.m_index = 0;
-	robot.SetModule(Module_Generator, Index_BodyU);
-	robot.SetEquipment(Equipment_HeavyPlate, Index_BodyU);
-	robot.SetEquipment(Equipment_GeneratorBooster, Index_BodyU);
+	robot.SetModule(Module_Infirmary, Index_BodyU);
 
-	robot.SetModule(Module_Gadget, Index_BodyM);
-	robot.SetEquipment(Equipment_GadgetEMP, Index_BodyM);
-	robot.SetEquipment(Equipment_GadgetJammer, Index_BodyM);
+	robot.SetModule(Module_Deflectors, Index_BodyM);
+	robot.SetEquipment(Equipment_LightPlate, Index_BodyM);
 
-	//robot.SetModule(Module_CrewQuarter, Index_BodyD);
+	robot.SetModule(Module_CrewQuarter, Index_BodyD);
+	robot.SetEquipment(Equipment_CQExtension, Index_BodyD);
 
-	robot.SetModule(Module_Deflectors, Index_LegR);
+	robot.SetModule(Module_Generator, Index_LegR);
+	robot.SetEquipment(Equipment_GeneratorBooster, Index_LegR);
 
-	robot.SetModule(Module_CrewQuarter, Index_LegL);
-	robot.SetEquipment(Equipment_CQExtension, Index_LegL);
+	robot.SetModule(Module_Gadget, Index_LegL);
+	robot.SetEquipment(Equipment_GadgetEMP, Index_LegL);
 
 	robot.SetEquipment(Equipment_LightPlate, Index_FootL);
 
@@ -77,23 +76,23 @@ void InGameState::InitRobots()
 	robot.SetEquipment(Equipment_EnergeticWeapon, Index_HandL);
 
 	robot.SetModule(Module_Weapon, Index_HandR);
-	robot.SetEquipment(Equipment_WeaponReactor, Index_HandR);
+	robot.SetEquipment(Equipment_LightPlate, Index_HandR);
 
 	robot.SetModule(Module_Radar, Index_ShoulderL);
 	
 	robot.SetModule(Module_Weapon, Index_ShoulderR);
-	robot.SetEquipment(Equipment_LightPlate, Index_ShoulderR);
+	robot.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderR);
 
 	robot.SetCrewMember(Crew_Captain, Index_Head);
 	robot.SetCrewMember(Crew_Pilot, Index_Head);
-	robot.SetCrewMember(Crew_Mechanic, Index_ShoulderL);
-	robot.SetCrewMember(Crew_Scientist, Index_BodyU);
-	robot.SetCrewMember(Crew_Engineer, Index_BodyM);
-	robot.SetCrewMember(Crew_Medic, Index_BodyM);
+	robot.SetCrewMember(Crew_Mechanic, Index_BodyM);
+	robot.SetCrewMember(Crew_Scientist, Index_LegR);
+	robot.SetCrewMember(Crew_Engineer, Index_LegL);
+	robot.SetCrewMember(Crew_Warrior, Index_HandL);
 
 	robot.SetWeapon(Weapon_FireSword, Index_HandL);
-	robot.SetWeapon(Weapon_Hammer, Index_HandR);
-	robot.SetWeapon(Weapon_Gun, Index_ShoulderR);
+	robot.SetWeapon(Weapon_Fist, Index_HandR);
+	robot.SetWeapon(Weapon_BlasterRifle, Index_ShoulderR);
 
 	robot.Initialize();
 
@@ -101,47 +100,50 @@ void InGameState::InitRobots()
 
 	//Robot 2
 	robot2.m_index = 1;
-	robot2.SetModule(Module_Deflectors, Index_BodyU);
+	robot2.SetModule(Module_Generator, Index_BodyU);
+	robot2.SetEquipment(Equipment_GeneratorBooster, Index_BodyU);
 	robot2.SetEquipment(Equipment_LightPlate, Index_BodyU);
 
-	robot2.SetModule(Module_Generator, Index_BodyM);
-	robot2.SetEquipment(Equipment_LightPlate, Index_BodyM);
-	robot2.SetEquipment(Equipment_GeneratorBooster, Index_BodyM);
+	robot2.SetModule(Module_CrewQuarter, Index_BodyM);
+	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
+	robot2.SetEquipment(Equipment_CQExtension, Index_BodyM);
 
-	robot2.SetModule(Module_CrewQuarter, Index_BodyD);
-	robot2.SetEquipment(Equipment_CQExtension, Index_BodyD);
+	robot2.SetModule(Module_Radar, Index_BodyD);
 
-	robot2.SetModule(Module_Radar, Index_LegR);
-	robot2.SetEquipment(Equipment_LightPlate, Index_LegR);
+	robot2.SetModule(Module_Deflectors, Index_LegR);
 
-	robot2.SetModule(Module_Infirmary, Index_LegL);
+	robot2.SetModule(Module_Gadget, Index_LegL);
+	robot2.SetEquipment(Equipment_GadgetEMP, Index_LegL);
 
 	robot2.SetEquipment(Equipment_LightPlate, Index_FootL);
 
 	robot2.SetEquipment(Equipment_LightPlate, Index_FootR);
 
 	robot2.SetModule(Module_Weapon, Index_HandL);
-	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_HandL);
+	robot2.SetEquipment(Equipment_HeavyPlate, Index_HandL);
 
 	robot2.SetModule(Module_Weapon, Index_ShoulderL);
-	robot2.SetEquipment(Equipment_WeaponsScope, Index_ShoulderL);
+	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderL);
 
 	robot2.SetModule(Module_Weapon, Index_ShoulderR);
-	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_ShoulderR);
+	robot2.SetEquipment(Equipment_HeavyPlate, Index_ShoulderR);
 
-	robot2.SetModule(Module_Gadget, Index_HandR);
-	robot2.SetEquipment(Equipment_GadgetEMP, Index_HandR);
+	robot2.SetModule(Module_Weapon, Index_HandR);
+	robot2.SetEquipment(Equipment_EnergeticWeapon, Index_HandR);
 
 	robot2.SetCrewMember(Crew_Captain, Index_Head);
 	robot2.SetCrewMember(Crew_Pilot, Index_Head);
-	robot2.SetCrewMember(Crew_Engineer, Index_HandR);
-	robot2.SetCrewMember(Crew_Scientist, Index_BodyM);
-	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderL);
-	robot2.SetCrewMember(Crew_Mechanic, Index_LegR);
+	robot2.SetCrewMember(Crew_Engineer, Index_LegL);
+	robot2.SetCrewMember(Crew_Scientist, Index_BodyU);
+	robot2.SetCrewMember(Crew_Gunner, Index_ShoulderR);
+	robot2.SetCrewMember(Crew_Mechanic, Index_BodyM);
+	robot2.SetCrewMember(Crew_Medic, Index_BodyU);
+	robot2.SetCrewMember(Crew_Warrior, Index_HandR);
 
-	robot2.SetWeapon(Weapon_MachineGun, Index_ShoulderL);
-	robot2.SetWeapon(Weapon_BlasterRifle, Index_ShoulderR);
-	robot2.SetWeapon(Weapon_StunFist, Index_HandL);
+	robot2.SetWeapon(Weapon_LaserCannon, Index_ShoulderL);
+	robot2.SetWeapon(Weapon_Gun, Index_ShoulderR);
+	robot2.SetWeapon(Weapon_StunFist, Index_HandR);
+	robot2.SetWeapon(Weapon_Hammer, Index_HandL);
 
 	robot2.Initialize();
 
@@ -1160,7 +1162,10 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 									//Damage to robot
 									if (opponent.m_health > damage)
 									{
+										ostringstream s_dmg;
+										s_dmg << "Robot takes " << damage << " damage.";
 										opponent.m_health -= damage;
+										(*CurrentGame).UI_AddEventLog(s_dmg.str(), Event_Damage, opponent.m_index);
 									}
 									else
 									{

@@ -34,7 +34,6 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_Fist_2, this);
 			attack_secondary->m_damage = 2;
 			attack_secondary->m_nb_targets = 3;
-			attack_secondary->m_nb_targets_remaining = attack_primary->m_nb_targets;
 			attack_secondary->m_speed = 9;
 			attack_secondary->m_energy_cost = 1;
 			attack_secondary->m_UI_display_name = "Chain kicks";
@@ -65,7 +64,6 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_secondary->m_damage = 2;
 			attack_secondary->m_chance_of_electricity = 5;
 			attack_secondary->m_nb_targets = 3;
-			attack_secondary->m_nb_targets_remaining = attack_primary->m_nb_targets;
 			attack_secondary->m_speed = 9;
 			attack_secondary->m_energy_cost = 3;
 			attack_secondary->m_UI_display_name = "Chain kicks";
@@ -100,10 +98,42 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_secondary->m_speed = 7;
 			attack_secondary->m_energy_cost = 3;
 			attack_secondary->m_nb_targets = 3;
-			attack_secondary->m_nb_targets_remaining = attack_secondary->m_nb_targets;
 			attack_secondary->m_crew_required = Crew_Gunner;
 			attack_secondary->m_UI_display_name = "Barrage";
 			attack_secondary->m_UI_description = "Hit 3 targets";
+			m_attacks.push_back(attack_secondary);
+
+			break;
+		}
+		case Weapon_LaserCannon:
+		{
+			m_energetic = true;
+			m_ranged = true;
+			m_weight = 4;
+			m_UI_display_name = "LASER CANNON";
+			m_UI_display_name_short = "Laser\nCannon";
+
+			WeaponAttack* attack_primary = new WeaponAttack(WeaponAttack_LaserCannon_1, this);
+			attack_primary->m_damage = 6;
+			attack_primary->m_chance_of_hit = 2;
+			attack_primary->m_chance_of_fire = 5;
+			attack_primary->m_speed = 5;
+			attack_primary->m_energy_cost = 3;
+			attack_primary->m_nb_hits = 1;
+			attack_primary->m_UI_display_name = "Charge Shot";
+			attack_primary->m_UI_description = "Hit 1 target";
+			m_attacks.push_back(attack_primary);
+
+			WeaponAttack* attack_secondary = new WeaponAttack(WeaponAttack_LaserCannon_2, this);
+			attack_secondary->m_damage = 6;
+			attack_secondary->m_chance_of_hit = 3;
+			attack_secondary->m_chance_of_fire = 5;
+			attack_secondary->m_speed = 5;
+			attack_secondary->m_energy_cost = 5;
+			attack_secondary->m_nb_targets = 2;
+			attack_secondary->m_crew_required = Crew_Gunner;
+			attack_secondary->m_UI_display_name = "Double Shots";
+			attack_secondary->m_UI_description = "Hit 2 targets";
 			m_attacks.push_back(attack_secondary);
 
 			break;
@@ -121,7 +151,6 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_primary->m_speed = 8;
 			attack_primary->m_energy_cost = 3;
 			attack_primary->m_nb_targets = 3;
-			attack_primary->m_nb_targets_remaining = attack_primary->m_nb_targets;
 			attack_primary->m_UI_display_name = "Lateral strike";
 			attack_primary->m_UI_description = "Hit 3 targets";
 			m_attacks.push_back(attack_primary);
@@ -181,7 +210,6 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_primary->m_speed = 8;
 			attack_primary->m_energy_cost = 1;
 			attack_primary->m_nb_targets = 2;
-			attack_primary->m_nb_targets_remaining = attack_primary->m_nb_targets;
 			attack_primary->m_UI_display_name = "Two-shots";
 			attack_primary->m_UI_description = "Hit 2 targets";
 			m_attacks.push_back(attack_primary);
@@ -192,7 +220,6 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_secondary->m_speed = 8;
 			attack_secondary->m_energy_cost = 1;
 			attack_secondary->m_nb_targets = 5;
-			attack_secondary->m_nb_targets_remaining = attack_secondary->m_nb_targets;
 			attack_secondary->m_UI_display_name = "One-mag";
 			attack_secondary->m_UI_description = "Hit 5 targets";
 			m_attacks.push_back(attack_secondary);
@@ -222,7 +249,6 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_secondary->m_speed = 7;
 			attack_secondary->m_energy_cost = 1;
 			attack_secondary->m_nb_targets = 3;
-			attack_secondary->m_nb_targets_remaining = attack_secondary->m_nb_targets;
 			attack_secondary->m_crew_required = Crew_Gunner;
 			attack_secondary->m_UI_display_name = "Barrage";
 			attack_secondary->m_UI_description = "Hit 3 targets";
@@ -250,6 +276,15 @@ Weapon::Weapon(WeaponType type, RobotSlot* owner)
 			attack_primary->m_UI_description = "Choose guard speed`between 1 and 10.\nRedirects slower attack speeds to hand.";
 			m_attacks.push_back(attack_primary);
 			break;
+		}
+	}
+
+	//reset targets available
+	for (vector<WeaponAttack*>::iterator it = m_attacks.begin(); it != m_attacks.end(); it++)
+	{
+		if ((*it)->m_nb_targets > 1)
+		{
+			(*it)->m_nb_targets_remaining = (*it)->m_nb_targets;
 		}
 	}
 

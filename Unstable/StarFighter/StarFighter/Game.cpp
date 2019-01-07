@@ -984,6 +984,11 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
 		}
+		//EC SLOTS -> REMOVE EC
+		else if (((*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Equipment || (*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Module))
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
 	}
 	else if (m_hovered && mouse_click == Mouse_RightClick)
 	{

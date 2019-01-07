@@ -1152,7 +1152,7 @@ void Robot::UpdateUI()
 
 	m_UI_stats.setString(sr.str());
 
-	//Focused module (including weapons)
+	//Focused element (including weapons)
 	for (vector<vector<UI_Element> >::iterator it = m_UI_focus.begin(); it != m_UI_focus.end(); it++)
 	{
 		it->clear();
@@ -1160,11 +1160,11 @@ void Robot::UpdateUI()
 	m_UI_focus.clear();
 
 	UI_Element* focused_ui = NULL;
-	if ((*CurrentGame).m_hovered_ui != NULL && ((*CurrentGame).m_hovered_ui->m_type == UI_Module || (*CurrentGame).m_hovered_ui->m_type == UI_Equipment))
+	if ((*CurrentGame).m_hovered_ui != NULL && ((*CurrentGame).m_hovered_ui->m_type == UI_Module || (*CurrentGame).m_hovered_ui->m_type == UI_Equipment))// || (*CurrentGame).m_hovered_ui->m_type == UI_Crew))
 	{
 		focused_ui = (*CurrentGame).m_hovered_ui;
 	}
-	else if ((*CurrentGame).m_selected_ui != NULL && ((*CurrentGame).m_selected_ui->m_type == UI_Module || (*CurrentGame).m_selected_ui->m_type == UI_Equipment))
+	else if ((*CurrentGame).m_selected_ui != NULL && ((*CurrentGame).m_selected_ui->m_type == UI_Module || (*CurrentGame).m_selected_ui->m_type == UI_Equipment))// || (*CurrentGame).m_hovered_ui->m_type == UI_Crew))
 	{
 		focused_ui = (*CurrentGame).m_selected_ui;
 	}
@@ -1461,7 +1461,7 @@ void Robot::UpdateUI()
 			}
 		}
 		//Equipment focused
-		else if (focused_ui->m_type == UI_Equipment)
+		else if (focused_ui->m_type == UI_Equipment && focused_ui->m_parent != NULL)
 		{
 			Equipment* equipment = (Equipment*)focused_ui->m_parent;
 
@@ -1516,6 +1516,106 @@ void Robot::UpdateUI()
 			ui_equipment.m_text.setString(sm.str());
 
 			ui.push_back(ui_equipment);
+			m_UI_focus.push_back(ui);
+		}
+		//crew member
+		else if (focused_ui->m_type == UI_Crew && focused_ui->m_parent != NULL)
+		{
+			CrewMember* crew = (CrewMember*)focused_ui->m_parent;
+
+			vector<UI_Element> ui;
+			UI_Element ui_crew(crew);
+
+			ui_crew.m_type = UI_Focus;
+			ui_crew.m_team = (TeamAlliances)m_index;//AllianceNeutral;
+
+			float offset_crew_x = 960.f;
+			float offset_crew_y = 550.f;
+			float sizecrew_x = sizefocus_x;
+			float sizecrew_y = sizefocus_y;
+
+			ui_crew.m_shape_container.setPosition(sf::Vector2f(offset_crew_x, offset_crew_y));
+			ui_crew.m_shape_container.setSize(sf::Vector2f(sizecrew_x, sizecrew_y));
+			ui_crew.m_shape_container.setOrigin(sf::Vector2f(sizecrew_x * 0.5f, sizecrew_y * 0.5f));
+			ui_crew.m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 255));
+			ui_crew.m_shape_container.setOutlineThickness(2);
+			ui_crew.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+			ui_crew.m_shape.setPosition(sf::Vector2f(offset_crew_x, offset_crew_y));
+			ui_crew.m_shape.setSize(sf::Vector2f(sizecrew_x, sizecrew_y));
+			ui_crew.m_shape.setOrigin(sf::Vector2f(sizecrew_x * 0.5f, sizecrew_y * 0.5f));
+			ui_crew.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+			ui_crew.m_shape.setOutlineThickness(0);
+			ui_crew.m_shape.setFillColor(sf::Color(0, 0, 0, 255));
+
+			ui_crew.m_text.setPosition(sf::Vector2f(offset_crew_x - sizecrew_x * 0.5f + 8.f, offset_crew_y - sizecrew_y * 0.5f + 8.f));
+			ui_crew.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+			ui_crew.m_text.setCharacterSize(20);
+			ui_crew.m_text.setColor(sf::Color(255, 255, 255, 255));
+			
+			ostringstream sm;
+			string name;
+			int c = 0;
+			for (vector<CrewMember*>::iterator it = m_crew_start.begin(); it != m_crew_start.end(); it++)
+			{
+				if (*it == crew)
+				{
+					name = m_UI_crew[c].m_text.getString();
+					break;
+				}
+				c++;
+			}
+
+			sm << "\n";
+			switch (crew->m_type)
+			{
+				case Crew_Medic:
+				{
+					sm << "+2 hp to a target crew member \npresent in the module.";
+					break;
+				}
+				case Crew_Gunner:
+				{
+					sm << "+1 precision to Range Weapons. \n(must be in the WEAPON'S MODULE)";
+					break;
+				}
+				case Crew_Scientist:
+				{
+					sm << "+1 Energy cell per turn. (Must be \n in the GENERATOR)";
+					break;
+				}
+				case Crew_Pilot:
+				{
+					sm << "Replace the Captain in the HEAD.\n+1 Speed attack. (must be in the HEAD)";
+					break;
+				}
+				case Crew_Mechanic:
+				{
+					sm << "+1 module life point repaired per turn.";
+					break;
+				}
+				case Crew_Warrior:
+				{
+					sm << "+2 Unbalance to Close Combat Weapons. \n(Must be in the WEAPON'S MODULE)";
+					break;
+				}
+				case Crew_Engineer:
+				{
+					sm << "Required to use the equipements of \nthe GADGET MODULE.";
+					break;
+				}
+				case Crew_Captain:
+				{
+					sm << "Required in the head to pilot the Robot \n3 turns in a module => OVERCHARGE.";
+					break;
+				}
+
+			}
+			
+
+			ui_crew.m_text.setString(name + sm.str());
+
+			ui.push_back(ui_crew);
 			m_UI_focus.push_back(ui);
 		}
 

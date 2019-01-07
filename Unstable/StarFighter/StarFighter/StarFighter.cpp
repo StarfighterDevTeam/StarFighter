@@ -145,22 +145,6 @@ int main()
 				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
 				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
 			}
-
-			//Pausing
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isPausing(), Action_Pausing);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Pausing, Input_Tap, true))
-			{
-				(*CurrentGame).m_pause = (*CurrentGame).m_playerShip->m_actions_states[Action_Pausing];
-
-				if ((*CurrentGame).m_pause)
-				{
-					(*CurrentGame).m_curMusic.pause();
-				}
-				else
-				{
-					(*CurrentGame).m_curMusic.play();
-				}
-			}
 		}
 
 		dt = deltaClock.restart();
