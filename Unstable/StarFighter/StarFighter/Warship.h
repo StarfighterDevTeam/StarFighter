@@ -24,7 +24,6 @@ public:
 	vector<WaterTile*> m_tiles_can_be_seen;
 	vector<WaterTile*> m_current_path;
 	Seaport* m_seaport;
-	float m_pathfind_cooldown_timer;
 
 	DMS_Coord m_DMS;
 	float m_angle;

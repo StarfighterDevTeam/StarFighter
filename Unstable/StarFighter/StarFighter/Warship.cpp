@@ -8,7 +8,6 @@ Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 	m_destination = NULL;
 	m_speed = sf::Vector2f(0, 0);
 	m_seaport = NULL;
-	m_pathfind_cooldown_timer = 0.f;
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -88,55 +87,34 @@ Warship::~Warship()
 
 void Warship::Update(Time deltaTime)
 {
-	//update cooldown timer
-	if (m_pathfind_cooldown_timer > 0)
-	{
-		m_pathfind_cooldown_timer -= deltaTime.asSeconds();
-	}
-
-	//get new move order
-	if (m_current_path.empty() == true && m_destination != NULL)
-	{
-		FindShortestPath(m_tile, m_destination);
-		m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
-	}
-	//order changed
-	else if (m_current_path.empty() == false && m_destination != NULL && m_destination != m_current_path.front())
-	{
-		FindShortestPath(m_tile, m_destination);
-	}
-
 	//travel management (needs to be refreshed? arrived?)
-	if (!m_current_path.empty())
+	if (m_current_path.empty() == false)
 	{
 		WaterTile* waypoint = m_current_path.back();
-		sf::Vector2f vec = waypoint->m_position - m_position;
 
 		//arrived at waypoint?
 		if (GetDistanceSquaredInSecondsDMS(waypoint) < 1.f)
 		{
-			m_DMS = waypoint->m_DMS;
+			m_DMS = waypoint->m_DMS;//snap boat to position
+			waypoint->UpdatePosition(m_DMS);//snap tile to boat 
 			m_current_path.pop_back();
 
 			//arrived at final destination
 			if (m_current_path.empty() == true)
 			{
-				vec = sf::Vector2f(0, 0);
-				m_DMS = waypoint->m_DMS;
-				if (waypoint == m_destination)
-				{
-					m_destination = NULL;
-				}
-				else
-				{
-					m_pathfind_cooldown_timer = 0;//new route has to be computed urgently
-				}
+				m_speed = sf::Vector2f(0, 0);
+				m_destination = NULL;
+			}
+			//go to next waypoint
+			else
+			{
+				waypoint = m_current_path.back();
+				waypoint->UpdatePosition(m_DMS);//update waypoint position (because of the previous snap)
+				sf::Vector2f vec = waypoint->m_position - m_position;
+				GameObject::ScaleVector(&vec, CRUISE_SPEED);
+				m_speed = vec;
 			}
 		}
-
-		//set speed to waypoint
-		GameObject::ScaleVector(&vec, CRUISE_SPEED);
-		m_speed = vec;
 	}
 
 	//apply movement
@@ -178,19 +156,12 @@ void Warship::Update(Time deltaTime)
 		minute_changed = true;
 	}
 
-	//refresh route (only after a certain cooldown)
-	if (minute_changed == true && m_pathfind_cooldown_timer <= 0)
-	{
-		FindShortestPath(m_tile, m_destination);
-		m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
-	}
-
 	//update tile information
 	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
-	if (m_destination == NULL)
-	{
-		m_position = m_tile->m_position;
-	}
+	//if (m_destination == NULL)
+	//{
+	//	m_position = m_tile->m_position;
+	//}
 
 	//UI
 	ostringstream ss;
@@ -476,10 +447,11 @@ bool Warship::SetDMSCoord(DMS_Coord coord)
 {
 	WaterTile* tile = GetWaterTileAtDMSCoord(coord);
 
-	m_tile = tile;
 	m_DMS = coord;
-	m_zone = tile->m_zone;
+	m_tile = tile;
+	m_tile->UpdatePosition(coord);
 	m_position = tile->m_position;
+	m_zone = tile->m_zone;
 
 	//new seaport?
 	if (tile->m_seaport != NULL && tile != (WaterTile*)m_seaport)
@@ -586,6 +558,13 @@ bool Warship::SetSailsToWaterTile(WaterTile* tile)
 	m_speed = move_vector;
 
 	m_destination = tile;
+
+	//Find path and set speed
+	FindShortestPath(m_tile, m_destination);
+	WaterTile* waypoint = m_current_path.back();
+	sf::Vector2f vec = waypoint->m_position - m_position;
+	GameObject::ScaleVector(&vec, CRUISE_SPEED);
+	m_speed = vec;
 
 	//leaving port?
 	if (m_seaport != NULL && m_destination != (WaterTile*)m_seaport)

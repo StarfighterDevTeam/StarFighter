@@ -46,3 +46,11 @@ WaterTile::~WaterTile()
 {
 	
 }
+
+void WaterTile::UpdatePosition(DMS_Coord warship_DMS)
+{
+	m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (warship_DMS.m_minute_x + warship_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE + m_coord_x);
+	m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - warship_DMS.m_minute_y - warship_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE - m_coord_y + NB_WATERTILE_Y);//from bottom to top
+
+	GameEntity::UpdatePosition();
+}

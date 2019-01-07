@@ -63,6 +63,8 @@ public:
 	DMS_Coord m_DMS;//degree/min/sec
 	bool m_can_be_seen;
 
+	void UpdatePosition(DMS_Coord warship_DMS);
+
 	//pathfinding
 	int m_heuristic;
 	int m_movement_cost;

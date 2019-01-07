@@ -128,6 +128,9 @@ void InGameState::Update(sf::Time deltaTime)
 		}
 	}
 
+	//boat
+	m_warship->Update(deltaTime);
+
 	//water tiles
 	m_warship->m_tiles_can_be_seen.clear();
 	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_zone->m_watertiles.begin(); it != m_warship->m_zone->m_watertiles.end(); it++)
@@ -141,8 +144,7 @@ void InGameState::Update(sf::Time deltaTime)
 				m_warship->m_tiles_can_be_seen.push_back(*it2);
 
 				//position on "radar"
-				(*it2)->m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (m_warship->m_DMS.m_minute_x + m_warship->m_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE + (*it2)->m_coord_x);
-				(*it2)->m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - m_warship->m_DMS.m_minute_y - m_warship->m_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE - (*it2)->m_coord_y + NB_WATERTILE_Y);//from bottom to top
+				(*it2)->UpdatePosition(m_warship->m_DMS);
 
 				//selection
 				if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
@@ -183,9 +185,6 @@ void InGameState::Update(sf::Time deltaTime)
 			}
 		}
 	}
-
-	//boat
-	m_warship->Update(deltaTime);
 
 	//island
 	if (m_island != NULL)
