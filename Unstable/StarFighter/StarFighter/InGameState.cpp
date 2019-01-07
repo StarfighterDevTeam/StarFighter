@@ -30,7 +30,7 @@ void InGameState::Initialize(Player player)
 
 	//PIRATES
 	InitWaterZones();
-	m_warship = new Warship(DMS_Coord{0, 6, 0, 0, 6, 0 });
+	m_warship = new Warship(DMS_Coord{0, 5, 0, 0, 10, 0 });
 }
 
 void InGameState::InitWaterZones()

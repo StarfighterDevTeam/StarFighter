@@ -125,20 +125,17 @@ void Warship::Update(Time deltaTime)
 	UpdateRotation();
 
 	//sexadecimal position system
-	bool minute_changed = false;
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 	{
 		int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
 		m_DMS.m_minute_x += minutes;
 		m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
-		minute_changed = true;
 	}
 	else if (m_DMS.m_second_x < 0)
 	{
 		int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION + 1;
 		m_DMS.m_minute_x -= minutes;
 		m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
-		minute_changed = true;
 	}
 
 	if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
@@ -146,22 +143,16 @@ void Warship::Update(Time deltaTime)
 		int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
 		m_DMS.m_minute_y += minutes;
 		m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
-		minute_changed = true;
 	}
 	else if (m_DMS.m_second_y < 0)
 	{
 		int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
 		m_DMS.m_minute_y -= minutes;
 		m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
-		minute_changed = true;
 	}
-
+	
 	//update tile information
 	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
-	//if (m_destination == NULL)
-	//{
-	//	m_position = m_tile->m_position;
-	//}
 
 	//UI
 	ostringstream ss;
@@ -682,59 +673,161 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 		(*it)->m_G_value = 0;
 		(*it)->m_parent = NULL;
 	}
-	
+
 	m_open_list_pathfind.clear();
 	m_closed_list_pathfind.clear();
 
 	//compute the best diagonals and eliminate useless waypoints
 	temp_path.push_back(tileA);
 	int path_size = temp_path.size();
+
+	//left and down moves "fix" (because of the degree/minute/second metric system)
+	int patch_x = 0;
+	int patch_y = 0;
+
+	//patch x
+	if (m_DMS.m_second_x > 0)
+	{
+		for (int i = path_size - 1; i >= 0; i--)
+		{
+			//going up or down?
+			if (temp_path[i]->m_DMS.m_minute_y != tileA->m_DMS.m_minute_y)
+			{
+				patch_x = 1;
+				break;
+			}
+			//going right = stop
+			else if (temp_path[i]->m_DMS.m_minute_x > tileA->m_DMS.m_minute_x)
+			{
+				break;
+			}
+		}
+	}
+
+	//patch y
+	if (m_DMS.m_second_y > 0)
+	{
+		for (int i = path_size - 1; i >= 0; i--)
+		{
+			//going left or right?
+			if (temp_path[i]->m_DMS.m_minute_x != tileA->m_DMS.m_minute_x)
+			{
+				patch_y = 1;
+				break;
+			}
+			//going up = stop
+			else if (temp_path[i]->m_DMS.m_minute_y > tileA->m_DMS.m_minute_y)
+			{
+				break;
+			}
+		}
+	}
+
+
+	
+	//if (m_DMS.m_second_x > 0 || m_DMS.m_second_y > 0)
+	//{
+	//	for (int i = path_size - 1; i >= 0; i--)
+	//	{
+	//		//going left?
+	//		if (temp_path[i]->m_DMS.m_minute_x < tileA->m_DMS.m_minute_x)
+	//		{
+	//			if (m_DMS.m_second_x > 0)
+	//			{
+	//				patch_x = 1;
+	//			}
+	//			if (m_DMS.m_second_y > 0)
+	//			{
+	//				patch_y = 1;
+	//			}
+	//		}
+	//
+	//		//going down?
+	//		if (temp_path[i]->m_DMS.m_minute_y < tileA->m_DMS.m_minute_y)
+	//		{
+	//			if (m_DMS.m_second_x > 0)
+	//			{
+	//				patch_x = 1;
+	//			}
+	//			if (m_DMS.m_second_y > 0)
+	//			{
+	//				patch_y = 1;
+	//			}
+	//		}
+	//
+	//		//fix ready!
+	//		if (patch_x > 0 || patch_y > 0)
+	//		{
+	//			break;
+	//		}
+	//	}
+	//}
+	//
+	//apply fix
+	if (patch_x > 0 || patch_y > 0)
+	{
+		WaterTile* tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x + patch_x][m_DMS.m_minute_y + patch_y];
+		temp_path.push_back(tile);
+	}
+
+	path_size = temp_path.size();
 	int index = 0;
 	while (index < path_size)
 	{
-		if (index == path_size - 1)//we don't want to add TileA to m_current_path because it's our current position already, but we need it in temp_path to compute shortcuts
+		//we don't want to add TileA to m_current_path because it's our current position already, but we need it in temp_path to compute shortcuts
+		//but because of the DMS coordinates that only increment when we complete a move on the right (1 tile = 1 minute), we still have to add it when moving to the left or down
+		if (index == path_size - 1)
 		{
 			break;
+			//if (path_size == 1)
+			//{
+			//	break;
+			//}
+			//else if (m_current_path.back()->m_coord_x > temp_path[index]->m_coord_x)//current tile and going to the right? remove it (vs going to the left: keep it)
+			//{
+			//	break;
+			//}
+			//else if (m_current_path.back()->m_coord_y > temp_path[index]->m_coord_y)//current tile and going to the up? remove it (vs going to the down: keep it)
+			//{
+			//	break;
+			//}
+			//else//going left or down: still a chance to remove it if the zone is island-free
+			//{
+			//	bool only_water = IsOnlyWaterInsideRectangle(m_current_path.back(), temp_path[index]);
+			//	if (only_water == true)
+			//	{
+			//		break;
+			//	}
+			//}
 		}
-
+		//else if (temp_path[index]->m_coord_x == temp_path[index + 1]->m_coord_x && temp_path[index]->m_coord_y == temp_path[index + 1]->m_coord_y)//eliminate doublons
+		//{
+		//	break;
+		//}
+	
 		m_current_path.push_back(temp_path[index]);
 
 		int temp_index = index;
 
+		bool straight_line = true;
 		for (int i = index + 1; i < path_size; i++)
 		{
 			if (index == path_size - 2)
 			{
 				break;
 			}
-			int x_min = Min(temp_path[index]->m_coord_x, temp_path[i]->m_coord_x);
-			int x_max = Max(temp_path[index]->m_coord_x, temp_path[i]->m_coord_x);
-			int y_min = Min(temp_path[index]->m_coord_y, temp_path[i]->m_coord_y);
-			int y_max = Max(temp_path[index]->m_coord_y, temp_path[i]->m_coord_y);
 
-			//way points in line = cannot optimize
-			if (x_min == x_max || y_min == y_max)
+			//waypoints in line = cannot optimize
+			if (straight_line == true && (temp_path[index]->m_coord_x == temp_path[i]->m_coord_x || temp_path[index]->m_coord_y == temp_path[i]->m_coord_y))
 			{
 				continue;
 			}
-
-			bool only_water = true;
-			for (int j = x_min; j <= x_max; j++)
+			else
 			{
-				for (int k = y_min; k <= y_max; k++)
-				{
-					if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[j][k]->m_type != Water_Empty)
-					{
-						only_water = false;
-						break;
-					}
-				}
-
-				if (only_water == false)
-				{
-					break;
-				}
+				straight_line = false;
 			}
+
+			bool only_water = IsOnlyWaterInsideRectangle(temp_path[index], temp_path[i]);
 
 			//chance of optimization
 			if (only_water == true)
@@ -755,4 +848,32 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 			index++;
 		}
 	}
+}
+
+bool Warship::IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB)
+{
+	int x_min = Min(tileA->m_coord_x, tileB->m_coord_x);
+	int x_max = Max(tileA->m_coord_x, tileB->m_coord_x);
+	int y_min = Min(tileA->m_coord_y, tileB->m_coord_y);
+	int y_max = Max(tileA->m_coord_y, tileB->m_coord_y);
+
+	bool only_water = true;
+	for (int j = x_min; j <= x_max; j++)
+	{
+		for (int k = y_min; k <= y_max; k++)
+		{
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[j][k]->m_type != Water_Empty)
+			{
+				only_water = false;
+				break;
+			}
+		}
+
+		if (only_water == false)
+		{
+			break;
+		}
+	}
+
+	return only_water;
 }

@@ -6,7 +6,7 @@
 #include "CrewMember.h"
 #include "Island.h"
 
-#define	CRUISE_SPEED				40
+#define	CRUISE_SPEED				20
 
 class Warship : public GameEntity
 {
@@ -38,6 +38,7 @@ public:
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
 	void UpdateRotation();
 	bool SetSailsToWaterTile(WaterTile* tile);
+	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
 	void Update(Time deltaTime);
 	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
