@@ -187,7 +187,7 @@ void CrewMember::Update(Time deltaTime)
 }
 
 
-void CrewMember::IteratePathFindingOnIndex(RoomTile* tileA, RoomTile* tileB)
+void CrewMember::IteratePathFinding(RoomTile* tileA, RoomTile* tileB)
 {
 	m_closed_list_pathfind.push_back(tileA);
 	m_open_list_pathfind.remove(tileA);
@@ -267,7 +267,7 @@ void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 		}
 
 		//compute this tile
-		IteratePathFindingOnIndex(next_tile, tileB);
+		IteratePathFinding(next_tile, tileB);
 	}
 
 	//path found -> save all waypoints into a member path

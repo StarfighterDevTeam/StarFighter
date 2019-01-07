@@ -526,10 +526,20 @@ bool Warship::CanViewWaterTile(WaterTile* tile)
 		return false;
 	}
 
+	//custom round-up system for visibility distance
 	float distance = GetDistanceFloatToWaterTile(tile);
-	if (distance <= NB_WATERTILE_VIEW_RANGE + 0.15f || (tile->m_can_be_seen == true && m_destination != NULL && distance <= NB_WATERTILE_VIEW_RANGE + 0.99f))//custom round-up system
+	if (distance <= NB_WATERTILE_VIEW_RANGE + 0.15f || (tile->m_can_be_seen == true && m_destination != NULL && distance <= NB_WATERTILE_VIEW_RANGE + 0.99f))
 	{
-		return true;
+		//return true;
+		//line of sight blocked by islands
+		if (RayTracingContainsIsland(m_tile, tile) == false)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{
@@ -547,16 +557,16 @@ bool Warship::SetSailsToWaterTile(WaterTile* tile)
 	sf::Vector2f move_vector = tile->m_position - m_position;
 	GameObject::ScaleVector(&move_vector, CRUISE_SPEED);
 	m_speed = move_vector;
-
+	
 	m_destination = tile;
-
+	
 	//Find path and set speed
 	FindShortestPath(m_tile, m_destination);
 	WaterTile* waypoint = m_current_path.back();
 	sf::Vector2f vec = waypoint->m_position - m_position;
 	GameObject::ScaleVector(&vec, CRUISE_SPEED);
 	m_speed = vec;
-
+	
 	//leaving port?
 	if (m_seaport != NULL && m_destination != (WaterTile*)m_seaport)
 	{
@@ -564,67 +574,17 @@ bool Warship::SetSailsToWaterTile(WaterTile* tile)
 		m_seaport = NULL;
 	}
 
+	//bool test = RayTracingContainsIsland(m_tile, tile);
+	//if (test == true)
+	//{
+	//	printf("not visible\n");
+	//}
+	//else
+	//{
+	//	printf("visible\n");
+	//}
+
 	return true;
-}
-
-void Warship::IteratePathFindingOnIndex(WaterTile* tileA, WaterTile* tileB)
-{
-	m_closed_list_pathfind.push_back(tileA);
-	m_open_list_pathfind.remove(tileA);
-
-	const int tileA_x = tileA->m_coord_x;
-	const int tileA_y = tileA->m_coord_y;
-	const int tileB_x = tileB->m_coord_x;
-	const int tileB_y = tileB->m_coord_y;
-
-	//are we arrived at destination? (1 tile away from destination)
-	if ((abs(tileA_x - tileB_x) == 1 && abs(tileA_y - tileB_y) == 0) || (abs(tileA_x - tileB_x) == 0 && abs(tileA_y - tileB_y) == 1))
-	{
-		tileB->m_parent = tileA;
-		return;
-	}
-
-	//looks through all tiles to find the best next waypoint.
-	size_t vector_size = m_tiles_can_be_seen.size();
-	for (size_t i = 0; i < vector_size; i++)
-	{
-		if (m_tiles_can_be_seen[i]->m_type == Water_Empty)
-		{
-			if ((abs(tileA_x - m_tiles_can_be_seen[i]->m_coord_x) == 1 && abs(tileA_y - m_tiles_can_be_seen[i]->m_coord_y) == 0) 
-				|| (abs(tileA_x - m_tiles_can_be_seen[i]->m_coord_x) == 0 && abs(tileA_y - m_tiles_can_be_seen[i]->m_coord_y) == 1))
-			{
-				//tiles that are legitimate to compute	
-				if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), m_tiles_can_be_seen[i]) == m_closed_list_pathfind.end())//tile unknown until now
-				{
-					if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), m_tiles_can_be_seen[i]) == m_open_list_pathfind.end())
-					{
-						//CASE where the tile is not on the closed list nor on the open list
-						m_open_list_pathfind.push_back(m_tiles_can_be_seen[i]);
-
-						//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
-						const int pos2_x = tileB->m_coord_x;
-						const int pos2_y = tileB->m_coord_y;
-						const int posit_x = tileB->m_coord_x;
-						const int posit_y = tileB->m_coord_y;
-
-						int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
-						int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
-						m_tiles_can_be_seen[i]->m_heuristic = H_value_x + H_value_y;
-
-						//compute Movement cost
-						m_tiles_can_be_seen[i]->m_movement_cost = 10;
-						m_tiles_can_be_seen[i]->m_movement_cost += tileA->m_movement_cost;
-
-						//G value
-						m_tiles_can_be_seen[i]->m_G_value = m_tiles_can_be_seen[i]->m_heuristic + m_tiles_can_be_seen[i]->m_movement_cost;
-
-						//parent node
-						m_tiles_can_be_seen[i]->m_parent = tileA;
-					}
-				}
-			}
-		}
-	}
 }
 
 void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
@@ -666,7 +626,7 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 		}
 
 		//compute this tile
-		IteratePathFindingOnIndex(next_tile, tileB);
+		IteratePathFinding(next_tile, tileB);
 	}
 
 	//path found -> save all waypoints into a member path
@@ -675,7 +635,6 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	WaterTile* way_point = tileB;
 	while (way_point != tileA)
 	{
-		//m_current_path.push_back(way_point);
 		temp_path.push_back(way_point);
 		way_point = way_point->m_parent;
 	}
@@ -801,6 +760,66 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 	}
 }
 
+void Warship::IteratePathFinding(WaterTile* tileA, WaterTile* tileB)
+{
+	m_closed_list_pathfind.push_back(tileA);
+	m_open_list_pathfind.remove(tileA);
+
+	const int tileA_x = tileA->m_coord_x;
+	const int tileA_y = tileA->m_coord_y;
+	const int tileB_x = tileB->m_coord_x;
+	const int tileB_y = tileB->m_coord_y;
+
+	//are we arrived at destination? (1 tile away from destination)
+	if ((abs(tileA_x - tileB_x) == 1 && abs(tileA_y - tileB_y) == 0) || (abs(tileA_x - tileB_x) == 0 && abs(tileA_y - tileB_y) == 1))
+	{
+		tileB->m_parent = tileA;
+		return;
+	}
+
+	//looks through all tiles to find the best next waypoint.
+	size_t vector_size = m_tiles_can_be_seen.size();
+	for (size_t i = 0; i < vector_size; i++)
+	{
+		if (m_tiles_can_be_seen[i]->m_type == Water_Empty)
+		{
+			if ((abs(tileA_x - m_tiles_can_be_seen[i]->m_coord_x) == 1 && abs(tileA_y - m_tiles_can_be_seen[i]->m_coord_y) == 0)
+				|| (abs(tileA_x - m_tiles_can_be_seen[i]->m_coord_x) == 0 && abs(tileA_y - m_tiles_can_be_seen[i]->m_coord_y) == 1))
+			{
+				//tiles that are legitimate to compute	
+				if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), m_tiles_can_be_seen[i]) == m_closed_list_pathfind.end())//tile unknown until now
+				{
+					if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), m_tiles_can_be_seen[i]) == m_open_list_pathfind.end())
+					{
+						//CASE where the tile is not on the closed list nor on the open list
+						m_open_list_pathfind.push_back(m_tiles_can_be_seen[i]);
+
+						//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
+						const int pos2_x = tileB->m_coord_x;
+						const int pos2_y = tileB->m_coord_y;
+						const int posit_x = tileB->m_coord_x;
+						const int posit_y = tileB->m_coord_y;
+
+						int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
+						int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
+						m_tiles_can_be_seen[i]->m_heuristic = H_value_x + H_value_y;
+
+						//compute Movement cost
+						m_tiles_can_be_seen[i]->m_movement_cost = 10;
+						m_tiles_can_be_seen[i]->m_movement_cost += tileA->m_movement_cost;
+
+						//G value
+						m_tiles_can_be_seen[i]->m_G_value = m_tiles_can_be_seen[i]->m_heuristic + m_tiles_can_be_seen[i]->m_movement_cost;
+
+						//parent node
+						m_tiles_can_be_seen[i]->m_parent = tileA;
+					}
+				}
+			}
+		}
+	}
+}
+
 bool Warship::IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB)
 {
 	int x_min = Min(tileA->m_coord_x, tileB->m_coord_x);
@@ -827,4 +846,65 @@ bool Warship::IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB)
 	}
 
 	return only_water;
+}
+
+bool Warship::RayTracingContainsIsland(WaterTile* tileA, WaterTile* tileB)
+{
+	if (tileA == tileB)
+	{
+		return false;
+	}
+
+	int coord_x = tileA->m_coord_x;
+	int coord_y = tileA->m_coord_y;
+
+	bool contains_island = false;
+
+	//Bresenham line-drawing algorithm
+	int X = abs(tileA->m_coord_x - tileB->m_coord_x);
+	int Y = abs(tileA->m_coord_y - tileB->m_coord_y);
+	int sum = X + Y;
+
+	int tx = 1;
+	int ty = 1;
+
+	for (int i = 0; i < sum; i++)
+	{
+		//going horizontally is shorter?
+		if (Y == 0 || 1.f * tx/X < 1.f * ty/Y)
+		{
+			tx++;
+			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
+		}//going vertically is shorter?
+		else if (X == 0 || 1.f * tx / X > 1.f * ty / Y)
+		{
+			ty++;
+			coord_y = tileA->m_coord_y < tileB->m_coord_y ? coord_y + 1 : coord_y - 1;
+		}
+		else//perfect diagonal
+		{
+			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
+			coord_y = tileA->m_coord_y < tileB->m_coord_y ? coord_y + 1 : coord_y - 1;
+			tx++;
+			ty++;
+			i++;
+		}
+
+		//island?
+		if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+		{
+			contains_island = true;
+		}
+		else
+		{
+			//water-island-water? = water cannot be seen
+			if (contains_island == true)
+			{
+				return true;
+			}
+		}
+		
+	}
+
+	return false;
 }
