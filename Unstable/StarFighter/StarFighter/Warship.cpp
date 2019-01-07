@@ -631,7 +631,22 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 {
 	if (tileA == tileB)
 	{
-		return;
+		//left and down moves "fix" (because of the degree/minute/second metric system): we can be on the same tile (same minute) but not the same position (same seconds)
+		int patch_x = 0;
+		int patch_y = 0;
+		if (m_DMS.m_second_x > 0)
+		{
+			patch_x = 1;
+		}
+		if (m_DMS.m_second_y > 0)
+		{
+			patch_y = 1;
+		}
+
+		if (patch_x > 0 || patch_y > 0)
+		{
+			tileA = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x + patch_x][m_DMS.m_minute_y + patch_y];
+		}
 	}
 
 	//start
@@ -723,46 +738,6 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 		}
 	}
 
-
-	
-	//if (m_DMS.m_second_x > 0 || m_DMS.m_second_y > 0)
-	//{
-	//	for (int i = path_size - 1; i >= 0; i--)
-	//	{
-	//		//going left?
-	//		if (temp_path[i]->m_DMS.m_minute_x < tileA->m_DMS.m_minute_x)
-	//		{
-	//			if (m_DMS.m_second_x > 0)
-	//			{
-	//				patch_x = 1;
-	//			}
-	//			if (m_DMS.m_second_y > 0)
-	//			{
-	//				patch_y = 1;
-	//			}
-	//		}
-	//
-	//		//going down?
-	//		if (temp_path[i]->m_DMS.m_minute_y < tileA->m_DMS.m_minute_y)
-	//		{
-	//			if (m_DMS.m_second_x > 0)
-	//			{
-	//				patch_x = 1;
-	//			}
-	//			if (m_DMS.m_second_y > 0)
-	//			{
-	//				patch_y = 1;
-	//			}
-	//		}
-	//
-	//		//fix ready!
-	//		if (patch_x > 0 || patch_y > 0)
-	//		{
-	//			break;
-	//		}
-	//	}
-	//}
-	//
 	//apply fix
 	if (patch_x > 0 || patch_y > 0)
 	{
@@ -779,31 +754,7 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 		if (index == path_size - 1)
 		{
 			break;
-			//if (path_size == 1)
-			//{
-			//	break;
-			//}
-			//else if (m_current_path.back()->m_coord_x > temp_path[index]->m_coord_x)//current tile and going to the right? remove it (vs going to the left: keep it)
-			//{
-			//	break;
-			//}
-			//else if (m_current_path.back()->m_coord_y > temp_path[index]->m_coord_y)//current tile and going to the up? remove it (vs going to the down: keep it)
-			//{
-			//	break;
-			//}
-			//else//going left or down: still a chance to remove it if the zone is island-free
-			//{
-			//	bool only_water = IsOnlyWaterInsideRectangle(m_current_path.back(), temp_path[index]);
-			//	if (only_water == true)
-			//	{
-			//		break;
-			//	}
-			//}
 		}
-		//else if (temp_path[index]->m_coord_x == temp_path[index + 1]->m_coord_x && temp_path[index]->m_coord_y == temp_path[index + 1]->m_coord_y)//eliminate doublons
-		//{
-		//	break;
-		//}
 	
 		m_current_path.push_back(temp_path[index]);
 
