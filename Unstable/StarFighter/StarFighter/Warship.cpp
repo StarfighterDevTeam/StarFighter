@@ -740,7 +740,15 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 			bool only_water = IsOnlyWaterInsideRectangle(temp_path[index], temp_path[i]);
 			if (only_water == false)
 			{
-				only_water = RayTracingContainsIslandForPathfind(temp_path[index], temp_path[i]) == false;
+				//ray-tracing should not take in account the "patch" on position but it's true position
+				WaterTile* true_tile = new WaterTile(temp_path[i]->m_coord_x, temp_path[i]->m_coord_y, temp_path[i]->m_type, temp_path[i]->m_zone, temp_path[i]->m_zone->m_coord_x, temp_path[i]->m_zone->m_coord_y);
+				if (i == path_size - 1)
+				{
+					true_tile->m_coord_x -= patch_x;
+					true_tile->m_coord_y -= patch_y;
+				}
+				only_water = RayTracingContainsIslandForPathfind(temp_path[index], true_tile) == false;
+				delete true_tile;
 			}
 
 			//chance of optimization
@@ -836,7 +844,8 @@ bool Warship::IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB)
 	{
 		for (int k = y_min; k <= y_max; k++)
 		{
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[j][k]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[j][k]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[j][k]->m_can_be_seen == false)
 			{
 				only_water = false;
 				break;
@@ -930,28 +939,32 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 		//PRELIMINARY CHECKS
 		if (tileA->m_coord_x < tileB->m_coord_x)//going right, checking right
 		{
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x + 1][coord_y]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x + 1][coord_y]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x + 1][coord_y]->m_can_be_seen == false)
 			{
 				return true;
 			}
 		}
 		if (tileA->m_coord_x > tileB->m_coord_x)//going left, checking left
 		{
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_can_be_seen == false)
 			{
 				return true;
 			}
 		}
 		if (tileA->m_coord_y < tileB->m_coord_y)//going up, checking up
 		{
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y + 1]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y + 1]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y + 1]->m_can_be_seen == false)
 			{
 				return true;
 			}
 		}
 		if (tileA->m_coord_y > tileB->m_coord_y)//going down, checking down
 		{
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y - 1]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y - 1]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y - 1]->m_can_be_seen)
 			{
 				return true;
 			}
@@ -964,7 +977,8 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			tx++;
 			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
 
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
 				return true;
 			}
@@ -975,7 +989,8 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			ty++;
 			coord_y = tileA->m_coord_y < tileB->m_coord_y ? coord_y + 1 : coord_y - 1;
 
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
 				return true;
 			}
@@ -989,19 +1004,22 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			int old_coord_x = coord_x;
 			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
 
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
 				return true;
 			}
 
 			coord_y = tileA->m_coord_y < tileB->m_coord_y ? coord_y + 1 : coord_y - 1;
 
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
 				return true;
 			}
 
-			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[old_coord_x][coord_y]->m_type != Water_Empty)
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[old_coord_x][coord_y]->m_type != Water_Empty
+				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[old_coord_x][coord_y]->m_can_be_seen == false)
 			{
 				return true;
 			}
