@@ -874,9 +874,9 @@ bool Warship::RayTracingContainsIsland(WaterTile* tileA, WaterTile* tileB)
 	bool contains_island = false;
 
 	//Bresenham line-drawing algorithm
-	int X = abs(tileA->m_coord_x - tileB->m_coord_x);
-	int Y = abs(tileA->m_coord_y - tileB->m_coord_y);
-	int sum = X + Y;
+	int X = abs(tileA->m_coord_x - tileB->m_coord_x) + 1;
+	int Y = abs(tileA->m_coord_y - tileB->m_coord_y) + 1;
+	int sum = X + Y - 2;
 
 	int tx = 1;
 	int ty = 1;
