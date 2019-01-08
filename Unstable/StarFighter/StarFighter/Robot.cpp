@@ -2165,7 +2165,10 @@ bool Robot::CheckShudownGlobalConditions()
 		{
 			return true;
 		}
+	}
 
+	for (vector<RobotSlot>::iterator it = m_slots.begin(); it != m_slots.end(); it++)
+	{
 		//Captain or pilot are alive and not stunned in the head?
 		if (it->m_type == Index_Head)
 		{
@@ -2737,12 +2740,22 @@ bool Robot::SetMedicTarget(CrewMember* medic, CrewMember* target)
 	}
 	else if (medic->m_stun_counter > 0)
 	{
-		(*CurrentGame).UI_AddEventLog("Medic is stunned and cannot use his active ability to heal other crew members.", Event_Error, m_index);
+		(*CurrentGame).UI_AddEventLog("Medic is stunned and cannot use his\nactive ability to heal other crew members.", Event_Error, m_index);
 		return false;
 	}
 	else if (target->m_health == 0)
 	{
 		(*CurrentGame).UI_AddEventLog("Targeted crew member is already dead and cannot be healed.", Event_Error, m_index);
+		return false;
+	}
+	else if (target->m_health == target->m_health_max)
+	{
+		(*CurrentGame).UI_AddEventLog("Targeted crew member already has full health.", Event_Error, m_index);
+		return false;
+	}
+	else if (medic->m_owner->m_index != target->m_owner->m_index)
+	{
+		(*CurrentGame).UI_AddEventLog("Medic must be in the same module as the target to heal.", Event_Error, m_index);
 		return false;
 	}
 	else
