@@ -704,12 +704,11 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 		temp_path.push_back(tile);
 	}
 
+	//look for shortcuts
 	path_size = temp_path.size();
 	int index = 0;
 	while (index < path_size)
 	{
-		//we don't want to add TileA to m_current_path because it's our current position already, but we need it in temp_path to compute shortcuts
-		//but because of the DMS coordinates that only increment when we complete a move on the right (1 tile = 1 minute), we still have to add it when moving to the left or down
 		if (index == path_size - 1)
 		{
 			break;
@@ -737,7 +736,12 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 				straight_line = false;
 			}
 
+			//shortcut conditions: the rectangle is filled with water, OR it has a width and height > 1
 			bool only_water = IsOnlyWaterInsideRectangle(temp_path[index], temp_path[i]);
+			if (only_water == false)
+			{
+				only_water = RayTracingContainsIslandForPathfind(temp_path[index], temp_path[i]) == false;
+			}
 
 			//chance of optimization
 			if (only_water == true)
@@ -903,7 +907,105 @@ bool Warship::RayTracingContainsIsland(WaterTile* tileA, WaterTile* tileB)
 				return true;
 			}
 		}
-		
+	}
+
+	return false;
+}
+
+bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* tileB)
+{
+	int coord_x = tileA->m_coord_x;
+	int coord_y = tileA->m_coord_y;
+
+	//Bresenham line-drawing algorithm
+	int X = abs(tileA->m_coord_x - tileB->m_coord_x);
+	int Y = abs(tileA->m_coord_y - tileB->m_coord_y);
+	int sum = X + Y;
+
+	int tx = 1;
+	int ty = 1;
+
+	for (int i = 0; i < sum; i++)
+	{
+		//PRELIMINARY CHECKS
+		if (tileA->m_coord_x < tileB->m_coord_x)//going right, checking right
+		{
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x + 1][coord_y]->m_type != Water_Empty)
+			{
+				return true;
+			}
+		}
+		if (tileA->m_coord_x > tileB->m_coord_x)//going left, checking left
+		{
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_type != Water_Empty)
+			{
+				return true;
+			}
+		}
+		if (tileA->m_coord_y < tileB->m_coord_y)//going up, checking up
+		{
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y + 1]->m_type != Water_Empty)
+			{
+				return true;
+			}
+		}
+		if (tileA->m_coord_y > tileB->m_coord_y)//going down, checking down
+		{
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y - 1]->m_type != Water_Empty)
+			{
+				return true;
+			}
+		}
+
+		//RAY TRACING
+		//going horizontally is shorter?
+		if (Y == 0 || 1.f * tx / X < 1.f * ty / Y)
+		{
+			tx++;
+			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
+
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			{
+				return true;
+			}
+
+		}//going vertically is shorter?
+		else if (X == 0 || 1.f * tx / X > 1.f * ty / Y)
+		{
+			ty++;
+			coord_y = tileA->m_coord_y < tileB->m_coord_y ? coord_y + 1 : coord_y - 1;
+
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			{
+				return true;
+			}
+		}
+		else//perfect diagonal
+		{
+			tx++;
+			ty++;
+			i++;
+
+			int old_coord_x = coord_x;
+			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
+
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			{
+				return true;
+			}
+
+			coord_y = tileA->m_coord_y < tileB->m_coord_y ? coord_y + 1 : coord_y - 1;
+
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty)
+			{
+				return true;
+			}
+
+			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[old_coord_x][coord_y]->m_type != Water_Empty)
+			{
+				return true;
+			}
+		}
 	}
 
 	return false;

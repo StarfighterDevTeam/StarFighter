@@ -6,7 +6,7 @@
 #include "CrewMember.h"
 #include "Island.h"
 
-#define	CRUISE_SPEED				40
+#define	CRUISE_SPEED				60
 
 class Warship : public GameEntity
 {
@@ -54,6 +54,7 @@ private:
 	list<WaterTile*> m_open_list_pathfind;
 
 	bool RayTracingContainsIsland(WaterTile* tileA, WaterTile* tileB);
+	bool RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* tileB);
 };
 
 #endif //WARSHIP_H_INCLUDED
