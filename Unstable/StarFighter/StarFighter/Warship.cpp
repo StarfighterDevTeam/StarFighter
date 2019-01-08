@@ -736,7 +736,7 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 				straight_line = false;
 			}
 
-			//shortcut conditions: the rectangle is filled with water, OR it has a width and height > 1
+			//shortcut conditions: the rectangle is filled with only water, OR we can cast a ray to the tile without meeting islands
 			bool only_water = IsOnlyWaterInsideRectangle(temp_path[index], temp_path[i]);
 			if (only_water == false)
 			{
