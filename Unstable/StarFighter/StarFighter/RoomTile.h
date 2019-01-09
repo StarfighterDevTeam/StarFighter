@@ -28,7 +28,7 @@ public:
 
 #define ROOMTILE_SIZE			32.f
 #define ROOMTILE_OFFSET_X		200.f
-#define ROOMTILE_OFFSET_Y		100.f
+#define ROOMTILE_OFFSET_Y		50.f
 
 class RoomTile : public GameEntity
 {

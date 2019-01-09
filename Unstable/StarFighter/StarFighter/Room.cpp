@@ -29,8 +29,8 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	m_nb_crew_max = width * height / 4;
 
 	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
-	m_position.x = ROOMTILE_OFFSET_X + (2.f * upcorner_x + width - 1) * 0.5f * ROOMTILE_SIZE;
-	m_position.y = ROOMTILE_OFFSET_Y + (2.f * upcorner_y + height - 1) * 0.5f * ROOMTILE_SIZE;
+	m_position.x = ROOMTILE_OFFSET_X + (-0.5f + upcorner_x + width * 0.5f) * ROOMTILE_SIZE;
+	m_position.y = ROOMTILE_OFFSET_Y + (-0.5f + upcorner_y + height * 0.5f) * ROOMTILE_SIZE;
 
 	//create tiles
 	for (int y = upcorner_y; y < upcorner_y + height; y++)
@@ -51,7 +51,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	}
 
 	//UI
-	m_shape_container.setPosition(m_position);
+	m_shape_container.setPosition(m_position);//264, 244
 	m_shape_container.setSize(m_size);
 	m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
 	m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
