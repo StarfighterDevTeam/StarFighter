@@ -747,7 +747,7 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 					true_tile->m_coord_x -= patch_x;
 					true_tile->m_coord_y -= patch_y;
 				}
-				only_water = RayTracingContainsIslandForPathfind(temp_path[index], true_tile) == false;
+				only_water = RayTracingContainsIslandForPathfind(true_tile, temp_path[index]) == false;
 				delete true_tile;
 			}
 
@@ -976,6 +976,7 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 	int tx = 1;
 	int ty = 1;
 
+	//RAY TRACING
 	for (int i = 0; i < sum; i++)
 	{
 		//PRELIMINARY CHECKS
@@ -989,8 +990,6 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 		}
 		if (tileA->m_coord_x > tileB->m_coord_x)//going left, checking left
 		{
-
-
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_can_be_seen == false)
 			{
@@ -1014,7 +1013,6 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			}
 		}
 
-		//RAY TRACING
 		//going horizontally is shorter?
 		if (Y == 0 || 1.f * tx / X < 1.f * ty / Y)
 		{
