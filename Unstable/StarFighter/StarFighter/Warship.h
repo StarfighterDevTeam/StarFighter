@@ -55,6 +55,7 @@ private:
 
 	bool RayTracingContainsIsland(WaterTile* tileA, WaterTile* tileB);
 	bool RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* tileB);
+	void RayTracingGetPath(WaterTile* tileA, WaterTile* tileB);
 };
 
 #endif //WARSHIP_H_INCLUDED
