@@ -741,14 +741,14 @@ void Warship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
 			if (only_water == false)
 			{
 				//ray-tracing should not take in account the "patch" on position but it's true position
-				WaterTile* true_tile = new WaterTile(temp_path[i]->m_coord_x, temp_path[i]->m_coord_y, temp_path[i]->m_type, temp_path[i]->m_zone, temp_path[i]->m_zone->m_coord_x, temp_path[i]->m_zone->m_coord_y);
-				if (i == path_size - 1)
-				{
-					true_tile->m_coord_x -= patch_x;
-					true_tile->m_coord_y -= patch_y;
-				}
-				only_water = RayTracingContainsIslandForPathfind(true_tile, temp_path[index]) == false;
-				delete true_tile;
+				//WaterTile* true_tile = new WaterTile(temp_path[i]->m_coord_x, temp_path[i]->m_coord_y, temp_path[i]->m_type, temp_path[i]->m_zone, temp_path[i]->m_zone->m_coord_x, temp_path[i]->m_zone->m_coord_y);
+				//if (i == path_size - 1)
+				//{
+				//	true_tile->m_coord_x -= patch_x;
+				//	true_tile->m_coord_y -= patch_y;
+				//}
+				//only_water = RayTracingContainsIslandForPathfind(true_tile, temp_path[index]) == false;
+				//delete true_tile;
 			}
 
 			//chance of optimization
@@ -985,6 +985,7 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x + 1][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x + 1][coord_y]->m_can_be_seen == false)
 			{
+				printf("prelim check right: NOK %d, %d\n", coord_x + 1, coord_y);
 				return true;
 			}
 		}
@@ -993,6 +994,7 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_can_be_seen == false)
 			{
+				printf("prelim check left: NOK %d, %d\n", coord_x - 1, coord_y);
 				return true;
 			}
 		}
@@ -1001,6 +1003,7 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y + 1]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y + 1]->m_can_be_seen == false)
 			{
+				printf("prelim check up: NOK %d, %d\n", coord_x, coord_y + 1);
 				return true;
 			}
 		}
@@ -1009,6 +1012,7 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y - 1]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y - 1]->m_can_be_seen == false)
 			{
+				printf("prelim check down: NOK %d, %d\n", coord_x, coord_y - 1);
 				return true;
 			}
 		}
@@ -1018,10 +1022,12 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 		{
 			tx++;
 			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
+			printf("going horizontal: %d, %d\n", coord_x, coord_y);
 
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
+				printf("FAILED\n", coord_x, coord_y);
 				return true;
 			}
 
@@ -1030,10 +1036,12 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 		{
 			ty++;
 			coord_y = tileA->m_coord_y < tileB->m_coord_y ? coord_y + 1 : coord_y - 1;
+			printf("going vertical: %d, %d\n", coord_x, coord_y);
 
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
+				printf("FAILED: %d, %d\n", coord_x, coord_y);
 				return true;
 			}
 		}
@@ -1042,13 +1050,14 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			tx++;
 			ty++;
 			i++;
-
+			printf("going diagonal: %d, %d\n", coord_x, coord_y);
 			int old_coord_x = coord_x;
 			coord_x = tileA->m_coord_x < tileB->m_coord_x ? coord_x + 1 : coord_x - 1;
 
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
+				printf("FAILED: %d, %d\n", coord_x, coord_y);
 				return true;
 			}
 
@@ -1057,12 +1066,14 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y]->m_can_be_seen == false)
 			{
+				printf("FAILED: %d, %d\n", coord_x, coord_y);
 				return true;
 			}
 
 			if ((*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[old_coord_x][coord_y]->m_type != Water_Empty
 				|| (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[old_coord_x][coord_y]->m_can_be_seen == false)
 			{
+				printf("FAILED: %d, %d\n", coord_x, coord_y);
 				return true;
 			}
 		}
