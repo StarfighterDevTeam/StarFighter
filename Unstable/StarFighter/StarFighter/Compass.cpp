@@ -14,6 +14,7 @@ Compass::Compass()
 	m_cadran->m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
 	sf::Vector2f cadran_pos = m_cadran->m_shape_container.getPosition();
 
+
 	//cursor
 	m_cursor = new GameEntity(UI_None);
 	m_cursor->m_shape_container.setSize(sf::Vector2f(COMPASS_CURSOR_SIZE_X, COMPASS_CURSOR_SIZE_Y));
@@ -109,11 +110,20 @@ Compass::~Compass()
 	}
 }
 
-void Compass::Update(sf::Time deltaTime, float angle)
+void Compass::Update(sf::Time deltaTime, float angle, float desired_angle)
 {
+	//cadran
 	m_cadran->update(deltaTime);
+
+	//cursor
+	float xC = m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f + ((desired_angle - angle) * COMPASS_CADRAN_SIZE_X / COMPASS_DEGREES_IN_CADRAN);//i0 = north
+	xC = max(xC, m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f);
+	xC = min(xC, m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f + COMPASS_CADRAN_SIZE_X);
+	m_cursor->m_shape_container.setPosition(sf::Vector2f(xC, m_cursor->m_shape_container.getPosition().y));
+	m_cursor->m_shape.setPosition(sf::Vector2f(xC, m_cursor->m_shape.getPosition().y));
 	m_cursor->update(deltaTime);
 
+	//markers
 	for (int i = 0; i < 72; i++)
 	{
 		float x = m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f - m_marker_offset * (-i + (angle / COMPASS_DEGREES_PER_MARKER));//i0 = north
@@ -130,6 +140,7 @@ void Compass::Update(sf::Time deltaTime, float angle)
 		m_degree_markers[i]->m_text.SetPosition(sf::Vector2f(m_degree_markers[i]->m_shape.getPosition().x + 4.f, m_degree_markers[i]->m_shape.getPosition().y - m_degree_markers[i]->m_text.getCharacterSize() - 4.f));
 		m_degree_markers[i]->update(deltaTime);
 
+		//cardinal points
 		if (i % 9 == 0)
 		{
 			m_cardinal_pts[i / 9]->m_text.SetPosition(sf::Vector2f(m_degree_markers[i]->m_shape.getPosition().x + 2.f, m_degree_markers[i]->m_shape.getPosition().y - m_degree_markers[i]->m_text.getCharacterSize() - 22.f));
@@ -163,4 +174,38 @@ void Compass::Draw(sf::RenderTexture& screen, float angle)
 	}
 
 	m_cursor->Draw(screen);
+}
+
+bool Compass::GetInput(float angle, float& desired_angle)
+{
+	if ((*CurrentGame).m_window_has_focus == false)
+	{
+		return false;
+	}
+
+	float xA = m_cadran->m_shape_container.getPosition().x - m_cadran->m_shape_container.getSize().x / 2;
+	float xB = m_cadran->m_shape_container.getPosition().x + m_cadran->m_shape_container.getSize().x / 2;
+	float yA = m_cadran->m_shape_container.getPosition().y - m_cadran->m_shape_container.getSize().y / 2;
+	float yB = m_cadran->m_shape_container.getPosition().y + m_cadran->m_shape_container.getSize().y / 2;
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) &&
+		((*CurrentGame).m_mouse_pos.x > xA && (*CurrentGame).m_mouse_pos.x < xB && (*CurrentGame).m_mouse_pos.y > yA && (*CurrentGame).m_mouse_pos.y < yB))
+	{
+		float delta_angle = ((*CurrentGame).m_mouse_pos.x - m_cadran->m_shape_container.getPosition().x) * COMPASS_DEGREES_IN_CADRAN / COMPASS_CADRAN_SIZE_X;
+		if (delta_angle > 80.f)
+		{
+			delta_angle = 80.f;
+		}
+		else if (delta_angle < -80.f)
+		{
+			delta_angle = -80.f;
+		}
+
+		desired_angle = angle + delta_angle;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

@@ -8,6 +8,7 @@
 #include "Compass.h"
 
 #define	CRUISE_SPEED					60.f
+#define ANGLE_SPEED						30.f
 
 class Warship : public GameEntity
 {
@@ -30,6 +31,7 @@ public:
 	sf::Vector2f m_speed;
 	float m_angle;
 	float m_desired_angle;
+	float m_angle_speed;
 	struct Compass m_compass;
 
 	bool SetDMSCoord(DMS_Coord coord);
@@ -40,6 +42,7 @@ public:
 	int GetDistanceToWaterTile(WaterTile* tile);
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
 	void UpdateRotation();
+	void UpdateAnimation();
 	bool SetSailsToWaterTile(WaterTile* tile);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 

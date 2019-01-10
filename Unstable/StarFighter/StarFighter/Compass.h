@@ -29,8 +29,9 @@ struct Compass
 	float m_marker_offset;
 	sf::Vector2f m_marker_pos0;
 
-	void Update(sf::Time deltaTime, float angle);
+	void Update(sf::Time deltaTime, float angle, float desired_angle);
 	void Draw(sf::RenderTexture& screen, float angle);
+	bool GetInput(float angle, float& desired_angle);
 };
 
 #endif //COMPASS_H_INCLUDED

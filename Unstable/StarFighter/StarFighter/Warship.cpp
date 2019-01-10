@@ -6,6 +6,7 @@ Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 {
 	m_angle = 90.f;
 	m_desired_angle = m_angle;
+	m_angle_speed = ANGLE_SPEED;
 	m_destination = NULL;
 	m_speed = sf::Vector2f(0, 0);
 	m_seaport = NULL;
@@ -88,6 +89,32 @@ Warship::~Warship()
 
 void Warship::Update(Time deltaTime)
 {
+	//Compass
+	m_compass.GetInput(m_angle, m_desired_angle);
+	m_compass.Update(deltaTime, m_angle, m_desired_angle);
+	
+	//Turn boat to desired angle
+	if (m_angle != m_desired_angle)
+	{
+		//float delta = m_angle - m_desired_angle;
+		//if (delta > 180)
+		//	delta -= 360;
+		//else if (delta < -180)
+		//	delta += 360;
+		//
+		//if (abs(delta) > abs(m_angle_speed)*deltaTime.asSeconds())
+		//{
+		//	m_angle -= delta >= 0 ? m_angle_speed * deltaTime.asSeconds() : -m_angle_speed * deltaTime.asSeconds();
+		//}
+		//else
+		//{
+		//	m_angle = m_desired_angle;
+		//}
+		//
+		////flip the sprite according to the direction
+		//UpdateAnimation();
+	}
+
 	//travel management (needs to be refreshed? arrived?)
 	if (m_current_path.empty() == false)
 	{
@@ -124,14 +151,7 @@ void Warship::Update(Time deltaTime)
 
 	//rotation
 	UpdateRotation();
-
-	//m_angle -= 30.f * deltaTime.asSeconds();
-	//if (m_angle < 0)
-	//	m_angle += 360.f;
-	//if (m_angle > 360)
-	//	m_angle -= 360;
 	
-
 	//sexadecimal position system
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 	{
@@ -171,9 +191,6 @@ void Warship::Update(Time deltaTime)
 	m_text.setString(ss.str());
 
 	GameEntity::Update(deltaTime);
-
-	//Compass
-	m_compass.Update(deltaTime, m_angle);
 }
 
 void Warship::UpdateRotation()
@@ -208,6 +225,11 @@ void Warship::UpdateRotation()
 	}
 
 	//flip the sprite according to the direction
+	UpdateAnimation();
+}
+
+void Warship::UpdateAnimation()
+{
 	m_angle = fmod(m_angle, 360.f);
 	if (m_angle > 0.f && m_angle < 180.f)
 	{
