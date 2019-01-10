@@ -117,7 +117,7 @@ void Compass::Update(sf::Time deltaTime, float angle, float desired_angle)
 
 	//cursor
 	float xC = m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f + ((desired_angle - angle) * COMPASS_CADRAN_SIZE_X / COMPASS_DEGREES_IN_CADRAN);//i0 = north
-	xC = max(xC, m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f);
+	//xC = max(xC, m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f);
 	xC = min(xC, m_marker_pos0.x + COMPASS_CADRAN_SIZE_X * 0.5f + COMPASS_CADRAN_SIZE_X);
 	m_cursor->m_shape_container.setPosition(sf::Vector2f(xC, m_cursor->m_shape_container.getPosition().y));
 	m_cursor->m_shape.setPosition(sf::Vector2f(xC, m_cursor->m_shape.getPosition().y));

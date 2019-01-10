@@ -94,26 +94,29 @@ void Warship::Update(Time deltaTime)
 	m_compass.Update(deltaTime, m_angle, m_desired_angle);
 	
 	//Turn boat to desired angle
-	if (m_angle != m_desired_angle)
+	if (m_angle != m_desired_angle && sf::Mouse::isButtonPressed(sf::Mouse::Left) == false)
 	{
-		//float delta = m_angle - m_desired_angle;
-		//if (delta > 180)
-		//	delta -= 360;
-		//else if (delta < -180)
-		//	delta += 360;
-		//
-		//if (abs(delta) > abs(m_angle_speed)*deltaTime.asSeconds())
-		//{
-		//	m_angle -= delta >= 0 ? m_angle_speed * deltaTime.asSeconds() : -m_angle_speed * deltaTime.asSeconds();
-		//}
-		//else
-		//{
-		//	m_angle = m_desired_angle;
-		//}
-		//
-		////flip the sprite according to the direction
-		//UpdateAnimation();
+		float delta = m_angle - m_desired_angle;
+		if (delta > 180)
+			delta -= 360;
+		else if (delta < -180)
+			delta += 360;
+		
+		if (abs(delta) > abs(m_angle_speed)*deltaTime.asSeconds())
+		{
+			m_angle -= delta >= 0 ? m_angle_speed * deltaTime.asSeconds() : -m_angle_speed * deltaTime.asSeconds();
+		}
+		else
+		{
+			m_angle = m_desired_angle;
+		}
 	}
+
+	//flip the sprite according to the direction
+	UpdateAnimation();
+
+	m_speed.x = CRUISE_SPEED * sin(m_angle * M_PI / 180.f);
+	m_speed.y = -CRUISE_SPEED * cos(m_angle * M_PI / 180.f);
 
 	//travel management (needs to be refreshed? arrived?)
 	if (m_current_path.empty() == false)
@@ -150,7 +153,7 @@ void Warship::Update(Time deltaTime)
 	m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
 
 	//rotation
-	UpdateRotation();
+	//UpdateRotation();
 	
 	//sexadecimal position system
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)

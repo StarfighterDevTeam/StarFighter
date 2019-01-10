@@ -7,8 +7,8 @@
 #include "Island.h"
 #include "Compass.h"
 
-#define	CRUISE_SPEED					60.f
-#define ANGLE_SPEED						30.f
+#define	CRUISE_SPEED					40.f
+#define ANGLE_SPEED						40.f
 
 class Warship : public GameEntity
 {
