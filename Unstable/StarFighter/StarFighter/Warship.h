@@ -5,8 +5,9 @@
 
 #include "CrewMember.h"
 #include "Island.h"
+#include "Compass.h"
 
-#define	CRUISE_SPEED				60
+#define	CRUISE_SPEED					60.f
 
 class Warship : public GameEntity
 {
@@ -26,8 +27,10 @@ public:
 	Seaport* m_seaport;
 
 	DMS_Coord m_DMS;
-	float m_angle;
 	sf::Vector2f m_speed;
+	float m_angle;
+	float m_desired_angle;
+	struct Compass m_compass;
 
 	bool SetDMSCoord(DMS_Coord coord);
 	DMS_Coord GetDMSCoord(sf::Vector2f position);

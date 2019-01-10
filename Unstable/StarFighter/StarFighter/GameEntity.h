@@ -12,6 +12,7 @@ enum UI_Type
 	UI_Warship,
 	UI_WaterTile,
 	UI_Seaport,
+	UI_Compass,
 };
 
 class GameEntity : public AnimatedSprite

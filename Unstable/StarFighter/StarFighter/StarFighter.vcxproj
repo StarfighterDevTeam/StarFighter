@@ -89,6 +89,7 @@
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
+    <ClCompile Include="Compass.cpp" />
     <ClCompile Include="CrewMember.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameEntity.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="CollisionUtils.h" />
+    <ClInclude Include="Compass.h" />
     <ClInclude Include="CrewMember.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="Game.h" />

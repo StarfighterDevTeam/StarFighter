@@ -5,6 +5,7 @@ extern Game* CurrentGame;
 Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 {
 	m_angle = 90.f;
+	m_desired_angle = m_angle;
 	m_destination = NULL;
 	m_speed = sf::Vector2f(0, 0);
 	m_seaport = NULL;
@@ -124,6 +125,13 @@ void Warship::Update(Time deltaTime)
 	//rotation
 	UpdateRotation();
 
+	//m_angle -= 30.f * deltaTime.asSeconds();
+	//if (m_angle < 0)
+	//	m_angle += 360.f;
+	//if (m_angle > 360)
+	//	m_angle -= 360;
+	
+
 	//sexadecimal position system
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 	{
@@ -163,6 +171,9 @@ void Warship::Update(Time deltaTime)
 	m_text.setString(ss.str());
 
 	GameEntity::Update(deltaTime);
+
+	//Compass
+	m_compass.Update(deltaTime, m_angle);
 }
 
 void Warship::UpdateRotation()

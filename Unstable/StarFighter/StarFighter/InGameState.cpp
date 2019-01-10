@@ -207,7 +207,7 @@ void InGameState::Update(sf::Time deltaTime)
 		}
 	}
 
-	//Actions
+	//Move order
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection == m_warship && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
 	{
 		WaterTile* tile = (WaterTile*)hovered;
@@ -276,6 +276,9 @@ void InGameState::Draw()
 
 	//boat
 	m_warship->Draw((*CurrentGame).m_mainScreen);
+
+	//compass
+	m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();
