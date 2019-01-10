@@ -57,7 +57,6 @@ public :
 	void GetInputState(bool input_guy_boolean, PlayerActions action);
 	void UpdateInputStates();
 	bool UpdateAction(PlayerActions action, PlayerInputStates state_required, bool condition);
-	void PlayStroboscopicEffect(Time effect_duration, sf::Time time_between_poses);
 
 	static int Ship::SaveShip(Ship* ship);
 	static bool Ship::LoadShip(Ship* ship);

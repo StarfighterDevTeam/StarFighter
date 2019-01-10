@@ -6,8 +6,6 @@
 #include <iostream>
 #include <sstream>
 #include "Game.h"
-#include "Ship.h"
-#include "SFPanelSpecific.h"
 #include "FileLoadUtils.h"
 
 #include "Warship.h"
@@ -24,12 +22,9 @@ public:
 	void UpdateUI(sf::Time deltaTime);
 	void Draw();
 	void Release();
-	void UpdateCamera(sf::Time deltaTime);
-	static void CreateSFPanel(SFPanelTypes panel_type, Ship* playerShip);
-	static void DestroySFPanel(Ship* playerShip);
-	static void LoadCSVFile(string scenes_file);
 
 	//PIRATES
+	GameEntity* m_background;
 	Warship* m_warship;
 	Island* m_island;
 

@@ -199,3 +199,13 @@ sf::Color GrayScaleColor(sf::Color input_color, float ratio)
 
 	return sf::Color(r2, g2, b2, input_color.a);
 }
+
+void ScaleVector(sf::Vector2f* vector, float target_value)
+{
+	if (vector->x == 0 && vector->y == 0)
+		return;
+
+	float p = target_value / sqrt(vector->x * vector->x + vector->y * vector->y);
+	vector->x *= p;
+	vector->y *= p;
+}

@@ -175,7 +175,7 @@ void CrewMember::Update(Time deltaTime)
 		}
 
 		//set speed to waypoint
-		GameObject::ScaleVector(&vec, m_speed_max);
+		ScaleVector(&vec, m_speed_max);
 		m_speed = vec;
 	}
 

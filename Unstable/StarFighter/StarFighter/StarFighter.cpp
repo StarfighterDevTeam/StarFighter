@@ -8,14 +8,12 @@ Game* CurrentGame;
 
 int main()
 {
-	LOGGER_START(Logger::DEBUG, "");
-
 	//Load Configuration
-	LOGGER_WRITE(Logger::DEBUG, "Loading Configurations");
+	printf("Loading Configurations");
 	PREFS = new PrefsManager();
 
 	//Init SFML Window
-	LOGGER_WRITE(Logger::DEBUG, "Initializing SFML Window");
+	printf("Initializing SFML Window");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
 
@@ -41,12 +39,12 @@ int main()
 	sf::Clock deltaClock;
 
 	//Initializing player
-	LOGGER_WRITE(Logger::DEBUG, "Initializing player");
+	printf("Initializing player");
 	Player player;
 	player.Init(&renderWindow);
 
 	//Loading InGame state
-	LOGGER_WRITE(Logger::DEBUG, "Starting game");
+	printf("Starting game");
 	GameManager gameManager;
 	InGameState inGameState;
 	gameManager.PushState(inGameState, player);
@@ -62,7 +60,7 @@ int main()
 	};
 	bool fullscreen = false;
 	WindowResolutions resolution = RESOLUTION_1600x900;
-	LOGGER_WRITE(Logger::DEBUG, "Initialization complete. Starting main loop...");
+	printf("Initialization complete. Starting main loop...");
 
 	//Main loop
 	while (renderWindow.isOpen())
@@ -77,12 +75,12 @@ int main()
 			else if (event.type == sf::Event::GainedFocus)
 			{
 				(*CurrentGame).m_window_has_focus = true;
-				LOGGER_WRITE(Logger::DEBUG, "Window focus gained");
+				printf("Window focus gained");
 			}
 			else if (event.type == sf::Event::LostFocus)
 			{
 				(*CurrentGame).m_window_has_focus = false;
-				LOGGER_WRITE(Logger::DEBUG, "Window focus lost");
+				printf("Window focus lost");
 			}
 		}
 
@@ -136,37 +134,23 @@ int main()
 			renderWindow.setTitle("StarFighter Engine");
 		}
 
-		if ((*CurrentGame).m_playerShip)
-		{
-			//Muting
-			(*CurrentGame).m_playerShip->GetInputState(InputGuy::isMuting(), Action_Muting);
-			if ((*CurrentGame).m_playerShip->UpdateAction(Action_Muting, Input_Tap, true))
-			{
-				(*CurrentGame).SetMusicVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-				(*CurrentGame).SetSFXVolume(!(*CurrentGame).m_playerShip->m_actions_states[Action_Muting]);
-			}
-		}
-
 		dt = deltaClock.restart();
 
 		if (dt.asSeconds() < 0.3f)
 		{
-			if (!(*CurrentGame).m_pause)
-			{
-				//Update
-				gameManager.GetCurrentState()->Update(dt);
+			//Update
+			gameManager.GetCurrentState()->Update(dt);
 
-				//Draw
-				gameManager.GetCurrentState()->Draw();
-				//sfgui.Display(renderWindow);
+			//Draw
+			gameManager.GetCurrentState()->Draw();
+			//sfgui.Display(renderWindow);
 
-				//Diplay
-				renderWindow.display();
-			}
+			//Diplay
+			renderWindow.display();
 		}
 		else
 		{
-			LOGGER_WRITE(Logger::DEBUG, "FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT");
+			printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT");
 		}
 	}
 

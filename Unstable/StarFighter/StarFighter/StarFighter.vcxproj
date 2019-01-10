@@ -95,11 +95,8 @@
     <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="Glow.cpp" />
     <ClCompile Include="InputGuy.cpp" />
     <ClCompile Include="Island.cpp" />
-    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="InGameState.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PrefsManager.cpp" />
@@ -108,13 +105,9 @@
     <ClCompile Include="Seaport.cpp" />
     <ClCompile Include="WaterTile.cpp" />
     <ClCompile Include="Warship.cpp" />
-    <ClCompile Include="SFPanel.cpp" />
-    <ClCompile Include="SFPanelSpecific.cpp" />
     <ClCompile Include="SFText.cpp" />
     <ClCompile Include="SFTextPop.cpp" />
-    <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StarFighter.cpp" />
-    <ClCompile Include="Stroboscopic.cpp" />
     <ClCompile Include="TextureLoader.h" />
     <ClCompile Include="WaterZone.cpp" />
   </ItemGroup>
@@ -130,12 +123,9 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="Glow.h" />
     <ClInclude Include="Includes\SimpleCollision.hpp" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputGuy.h" />
     <ClInclude Include="Island.h" />
-    <ClInclude Include="Logger.h" />
     <ClInclude Include="InGameState.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PrefsManager.h" />
@@ -145,13 +135,9 @@
     <ClInclude Include="Seaport.h" />
     <ClInclude Include="WaterTile.h" />
     <ClInclude Include="Warship.h" />
-    <ClInclude Include="SFPanel.h" />
-    <ClInclude Include="SFPanelSpecific.h" />
     <ClInclude Include="SFText.h" />
     <ClInclude Include="SFTextPop.h" />
-    <ClInclude Include="Ship.h" />
     <ClInclude Include="StarFighter.h" />
-    <ClInclude Include="Stroboscopic.h" />
     <ClInclude Include="TextUtils.h" />
     <ClInclude Include="WaterZone.h" />
   </ItemGroup>

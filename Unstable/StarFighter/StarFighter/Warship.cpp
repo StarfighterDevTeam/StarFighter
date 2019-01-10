@@ -142,7 +142,7 @@ void Warship::Update(Time deltaTime)
 				waypoint = m_current_path.back();
 				waypoint->UpdatePosition(m_DMS);//update waypoint position (because of the previous snap)
 				sf::Vector2f vec = waypoint->m_position - m_position;
-				GameObject::ScaleVector(&vec, CRUISE_SPEED);
+				ScaleVector(&vec, CRUISE_SPEED);
 				m_speed = vec;
 			}
 		}
@@ -233,6 +233,10 @@ void Warship::UpdateRotation()
 
 void Warship::UpdateAnimation()
 {
+	if (m_angle < 0.f)
+	{
+		m_angle += 360.f;
+	}
 	m_angle = fmod(m_angle, 360.f);
 	if (m_angle > 0.f && m_angle < 180.f)
 	{
@@ -591,7 +595,7 @@ bool Warship::SetSailsToWaterTile(WaterTile* tile)
 	}
 
 	sf::Vector2f move_vector = tile->m_position - m_position;
-	GameObject::ScaleVector(&move_vector, CRUISE_SPEED);
+	ScaleVector(&move_vector, CRUISE_SPEED);
 	m_speed = move_vector;
 	
 	m_destination = tile;
@@ -600,7 +604,7 @@ bool Warship::SetSailsToWaterTile(WaterTile* tile)
 	FindShortestPath(m_tile, m_destination);
 	WaterTile* waypoint = m_current_path.back();
 	sf::Vector2f vec = waypoint->m_position - m_position;
-	GameObject::ScaleVector(&vec, CRUISE_SPEED);
+	ScaleVector(&vec, CRUISE_SPEED);
 	m_speed = vec;
 	
 	//leaving port?

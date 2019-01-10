@@ -2,7 +2,6 @@
 #define CREWMEMBER_H_INCLUDED
 
 #include "Game.h"
-
 #include "Room.h"
 
 #define CREWMEMBER_SIZE							16.f
