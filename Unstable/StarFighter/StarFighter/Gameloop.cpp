@@ -1,12 +1,9 @@
-#include "InGameState.h"
+#include "Gameloop.h"
 
 extern Game* CurrentGame;
 
-void InGameState::Initialize(Player player)
+Gameloop::Gameloop()
 {
-	this->mainWindow = player.m_playerWindow;
-	(*CurrentGame).init(this->mainWindow);
-
 	//background
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
@@ -22,7 +19,14 @@ void InGameState::Initialize(Player player)
 	m_warship = new Warship(DMS_Coord{0, 12, 0, 0, 8, 0 });
 }
 
-void InGameState::InitWaterZones()
+Gameloop::~Gameloop()
+{
+	delete m_background;
+	delete m_warship;
+	delete m_island;
+}
+
+void Gameloop::InitWaterZones()
 {
 	//zones and water
 	vector<WaterZone*> vec;
@@ -40,7 +44,7 @@ void InGameState::InitWaterZones()
 	m_island->AddSeaport(Seaport_Small);
 }
 
-void InGameState::Update(sf::Time deltaTime)
+void Gameloop::Update(sf::Time deltaTime)
 {
 	GameEntity* selection = (*CurrentGame).m_selected_ui;
 	GameEntity* previous_selection = selection;
@@ -203,7 +207,7 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 }
 
-void InGameState::Draw()
+void Gameloop::Draw()
 {
 	(*CurrentGame).m_mainScreen.clear();
 
@@ -276,7 +280,7 @@ void InGameState::Draw()
 	(*CurrentGame).getMainWindow()->draw(temp);
 }
 
-void InGameState::Release()
+void Gameloop::Release()
 {
 	//TODO
 }

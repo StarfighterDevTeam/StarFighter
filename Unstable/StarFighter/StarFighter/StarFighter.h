@@ -6,12 +6,9 @@
 #include <cmath>
 #include <SFML/Audio.hpp>
 #include "Globals.h"
-#include "PrefsManager.h"
 #include "TextureLoader.h"
 #include "Game.h"
-#include "InGameState.h"
-#include "GameManager.h"
-#include "Player.h"
+#include "Gameloop.h"
 
 
 //Initialize TextureLoader Singleton

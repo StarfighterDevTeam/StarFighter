@@ -1,7 +1,6 @@
-#ifndef METAGAME_H_INCLUDED
-#define METAGAME_H_INCLUDED
+#ifndef GAMELOOP_H_INCLUDED
+#define GAMELOOP_H_INCLUDED
 
-#include "GameState.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -10,14 +9,12 @@
 
 #include "Warship.h"
 
-class GameObject;
-
-class InGameState : public GameState
+class Gameloop
 {
 public:
-	GameObject* playerShip;
-
-	void Initialize(Player player);
+	Gameloop();
+	~Gameloop();
+	
 	void Update(sf::Time deltaTime);
 	void UpdateUI(sf::Time deltaTime);
 	void Draw();
@@ -35,4 +32,4 @@ private:
 	sf::Text* framerate;
 };
 
-#endif //METAGAME_H_INCLUDED
+#endif //GAMELOOP_H_INCLUDED

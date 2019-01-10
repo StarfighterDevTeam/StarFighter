@@ -48,8 +48,8 @@ enum MouseAction
 struct Game
 {
 public:
-	void init(RenderWindow* window);
-	void destructor();
+	Game(RenderWindow& window);
+	~Game();
 	RenderWindow* getMainWindow();
 	void CreateSFTextPop(string text, FontsStyle font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team, float distance_not_faded, float distance_faded, float total_pop_time, GameObject* follow_target, float offset_positionY);
 

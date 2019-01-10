@@ -10,12 +10,12 @@ const char* GameObjectTypeValues[] =
 	stringify(EnemyObject)
 };
 
-void Game::init(RenderWindow* window)
+Game::Game(RenderWindow& window)
 {
 	m_window_has_focus = true;
 	m_mouse_click_timer = 0.2f;
 
-	m_window = window;
+	m_window = &window;
 	m_mainScreen.create(REF_WINDOW_RESOLUTION_X, REF_WINDOW_RESOLUTION_Y, false);
 	m_mainScreen.setSmooth(true);
 
@@ -50,7 +50,7 @@ void Game::init(RenderWindow* window)
 	LoadSFX();
 
 	//Music
-	printf("Loading Musics");
+	printf("Loading Musics\n");
 	m_Music_Activated = false;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
@@ -62,7 +62,7 @@ void Game::init(RenderWindow* window)
 	m_play_ui = NULL;
 }
 
-void Game::destructor()
+Game::~Game()
 {
 	for (vector<vector<WaterZone*> >::iterator it = m_waterzones.begin(); it != m_waterzones.end(); it++)
 	{

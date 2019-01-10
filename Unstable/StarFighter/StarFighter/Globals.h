@@ -5,7 +5,6 @@
 #include <SFML/OpenGL.hpp>
 #include "TextureLoader.h"
 #include "TextUtils.h"
-#include "Logger.h"
 #include <assert.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -15,7 +14,7 @@ using namespace sf;
 std::string makePath(const std::string& srcPath);
 void createSavesDirectory();
 const char* getSavesPath();
-std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
+std::string StringReplace(std::string str, const std::string& from, const std::string& to);
 
 #ifdef __APPLE__
 	#define PLAYER_SAVE_FILE						"SaveFile.txt"

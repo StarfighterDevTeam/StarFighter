@@ -8,17 +8,13 @@ Game* CurrentGame;
 
 int main()
 {
-	//Load Configuration
-	printf("Loading Configurations");
-	PREFS = new PrefsManager();
-
 	//Init SFML Window
 	printf("Initializing SFML Window");
 	sf::RenderWindow renderWindow(sf::VideoMode(WINDOW_RESOLUTION_X, WINDOW_RESOLUTION_Y), "Starfighter");
 	renderWindow.setKeyRepeatEnabled(false);
 
 	//Refresh rate
-	renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+	renderWindow.setFramerateLimit(60);
 
 	//Icon
 	sf::Image icon = sf::Image();
@@ -28,26 +24,19 @@ int main()
 	//Title
 	renderWindow.setTitle("Pirates of the Seven Seas");
 
-	//Game initialization
-	CurrentGame = new Game();
-
 	//Random seed
 	srand(time(NULL));
 
-	//update
+	//Game initialization
+	CurrentGame = new Game(renderWindow);
+
+	//Elapsed time
 	sf::Time dt;
 	sf::Clock deltaClock;
 
-	//Initializing player
-	printf("Initializing player");
-	Player player;
-	player.Init(&renderWindow);
-
 	//Loading InGame state
-	printf("Starting game");
-	GameManager gameManager;
-	InGameState inGameState;
-	gameManager.PushState(inGameState, player);
+	printf("Starting game\n");
+	Gameloop gameloop;
 
 	//Handling various window resolutions
 	enum WindowResolutions
@@ -60,7 +49,7 @@ int main()
 	};
 	bool fullscreen = false;
 	WindowResolutions resolution = RESOLUTION_1600x900;
-	printf("Initialization complete. Starting main loop...");
+	printf("Initialization complete. Starting main loop...\n");
 
 	//Main loop
 	while (renderWindow.isOpen())
@@ -75,12 +64,12 @@ int main()
 			else if (event.type == sf::Event::GainedFocus)
 			{
 				(*CurrentGame).m_window_has_focus = true;
-				printf("Window focus gained");
+				printf("Window focus gained\n");
 			}
 			else if (event.type == sf::Event::LostFocus)
 			{
 				(*CurrentGame).m_window_has_focus = false;
-				printf("Window focus lost");
+				printf("Window focus lost\n");
 			}
 		}
 
@@ -127,7 +116,7 @@ int main()
 
 			//setting parameters again, because they are lost on calling renderWindow.create
 			renderWindow.setKeyRepeatEnabled(false);
-			renderWindow.setFramerateLimit(PREFS->m_gameRefreshRateHz);
+			renderWindow.setFramerateLimit(60);
 			sf::Image icon = sf::Image();
 			icon.loadFromFile(makePath(ICON_SHIP_PNG));
 			renderWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -139,11 +128,10 @@ int main()
 		if (dt.asSeconds() < 0.3f)
 		{
 			//Update
-			gameManager.GetCurrentState()->Update(dt);
+			gameloop.Update(dt);
 
 			//Draw
-			gameManager.GetCurrentState()->Draw();
-			//sfgui.Display(renderWindow);
+			gameloop.Draw();
 
 			//Diplay
 			renderWindow.display();
@@ -153,8 +141,6 @@ int main()
 			printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT");
 		}
 	}
-
-	(*CurrentGame).destructor();
 
 	return 0;
 }
