@@ -6,13 +6,14 @@
 #include "CrewMember.h"
 #include "Island.h"
 #include "Compass.h"
+#include "Ship.h"
 
-#define	CRUISE_SPEED					40.f
+#define	CRUISE_SPEED					60.f
 #define ANGLE_SPEED						30.f
 
 #define COMPASS_MODE					false
 
-class Warship : public GameEntity
+class Warship : public Ship
 {
 public:
 	Warship(DMS_Coord coord);
@@ -22,29 +23,15 @@ public:
 	vector<RoomConnexion*> m_connexions;
 	vector<CrewMember*> m_crew;
 
-	WaterZone* m_zone;
-	WaterTile* m_tile;
-	WaterTile* m_destination;
-	vector<WaterTile*> m_tiles_can_be_seen;
-	vector<WaterTile*> m_current_path;
-	Seaport* m_seaport;
-
-	DMS_Coord m_DMS;
-	sf::Vector2f m_speed;
-	float m_angle;
 	float m_desired_angle;
 	float m_angle_speed;
 	struct Compass m_compass;
 
-	bool SetDMSCoord(DMS_Coord coord);
 	DMS_Coord GetDMSCoord(sf::Vector2f position);
 	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
-	WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
-	void GetAngleForSpeed(float& angle);
-	void UpdateAnimation();
 	bool SetSailsToWaterTile(WaterTile* tile);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 

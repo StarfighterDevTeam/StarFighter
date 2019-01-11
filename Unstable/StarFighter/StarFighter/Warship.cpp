@@ -2,24 +2,20 @@
 
 extern Game* CurrentGame;
 
-Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
+Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship)
 {
 	m_angle = 90.f;
 	m_desired_angle = m_angle;
 	m_angle_speed = ANGLE_SPEED;
 	m_destination = NULL;
-	m_speed = sf::Vector2f(0, 0);
 	m_seaport = NULL;
 	m_position.x = WATERTILE_OFFSET_X - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 
-	//get on tile
-	SetDMSCoord(coord);
-
 	//shape for water tiles
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/boat_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
+	sf::Texture* texture = loader->loadTexture("2D/warship_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
 
 	setAnimation(texture, 1, 2);
 
@@ -206,56 +202,6 @@ void Warship::Update(Time deltaTime)
 	m_compass.Update(deltaTime, m_angle, m_desired_angle);
 
 	GameEntity::Update(deltaTime);
-}
-
-void Warship::GetAngleForSpeed(float& angle)
-{
-	//find angle for speed vector
-	if (m_speed.x != 0 || m_speed.y != 0)
-	{
-		if (m_speed.x == 0)
-		{
-			angle = m_speed.y >= 0 ? 180.f : 0.f;
-		}
-		else if (m_speed.y == 0)
-		{
-			angle = m_speed.x >= 0 ? 90.f : 270.f;
-		}
-		else
-		{
-			if (m_speed.x >= 0)
-			{
-				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f;
-			}
-			else
-			{
-				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f + 180.f;
-			}
-		}
-	}
-	else
-	{
-		//default value
-		angle = m_currentAnimationIndex == 0 ? 90.f : 270.f;
-	}
-}
-
-void Warship::UpdateAnimation()
-{
-	if (m_angle < 0.f)
-	{
-		m_angle += 360.f;
-	}
-	m_angle = fmod(m_angle, 360.f);
-	if (m_angle > 0.f && m_angle < 180.f)
-	{
-		setAnimationLine(0);//Boat facing right
-	}
-	else if (m_angle > 180.f)
-	{
-		setAnimationLine(1);//Boat facing left
-	}
-	setRotation(m_angle);
 }
 
 Room* Warship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
@@ -476,33 +422,6 @@ void Warship::UpdateCrewMembersCountPerRoom(Room* room)
 }
 
 //WATER PART
-WaterTile* Warship::GetWaterTileAtDMSCoord(DMS_Coord coord)
-{
-	WaterTile* tile = (*CurrentGame).m_waterzones[coord.m_degree_x][coord.m_degree_y]->m_watertiles[coord.m_minute_x][coord.m_minute_y];
-
-	return tile;
-}
-
-bool Warship::SetDMSCoord(DMS_Coord coord)
-{
-	WaterTile* tile = GetWaterTileAtDMSCoord(coord);
-
-	m_DMS = coord;
-	m_tile = tile;
-	//m_tile->UpdatePosition(coord);
-	//m_position = tile->m_position;
-	m_zone = tile->m_zone;
-
-	//new seaport?
-	if (tile->m_seaport != NULL && tile != (WaterTile*)m_seaport)
-	{
-		m_seaport = tile->m_seaport;
-		m_seaport->m_ships.push_back(this);
-	}
-
-	return true;
-}
-
 int Warship::GetDistanceToWaterTile(WaterTile* tile)
 {
 	int diff_x = tile->m_coord_x - m_DMS.m_minute_x;
@@ -562,11 +481,7 @@ float Warship::GetDistanceFloatToWaterTile(WaterTile* tile)
 
 bool Warship::CanViewWaterTile(WaterTile* tile)
 {
-	if (tile->m_zone != m_zone)
-	{
-		return false;
-	}
-	else if (tile->m_coord_x > m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + 1 || tile->m_coord_x < m_DMS.m_minute_x - NB_WATERTILE_VIEW_RANGE - 1)
+	if (tile->m_coord_x > m_DMS.m_minute_x + NB_WATERTILE_VIEW_RANGE + 1 || tile->m_coord_x < m_DMS.m_minute_x - NB_WATERTILE_VIEW_RANGE - 1)
 	{
 		return false;
 	}

@@ -29,18 +29,18 @@ Seaport::~Seaport()
 	
 }
 
-void Seaport::RemoveShip(Warship* ship)
+void Seaport::RemoveShip(Ship* ship)
 {
-	vector<Warship*> old_vector;
+	vector<Ship*> old_vector;
 
-	for (vector<Warship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 	{
 		old_vector.push_back(ship);
 	}
 
 	m_ships.clear();
 
-	for (vector<Warship*>::iterator it = old_vector.begin(); it != old_vector.end(); it++)
+	for (vector<Ship*>::iterator it = old_vector.begin(); it != old_vector.end(); it++)
 	{
 		if (*it != ship)
 		{

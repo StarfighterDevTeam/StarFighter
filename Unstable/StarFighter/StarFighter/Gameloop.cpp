@@ -12,11 +12,10 @@ Gameloop::Gameloop()
 	m_background->setAnimation(texture, 1, 1);
 	m_background->setPosition(sf::Vector2f(960, 540));
 
-	//(*CurrentGame).m_map_size = background->m_size;
-
 	//PIRATES
 	InitWaterZones();
 	m_warship = new Warship(DMS_Coord{0, 12, 0, 0, 8, 0 });
+	m_enemy = new Ship(DMS_Coord{ 0, 15, 0, 0, 8, 0 }, Ship_Goellete);
 }
 
 Gameloop::~Gameloop()
@@ -125,7 +124,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//water tiles
 	m_warship->m_tiles_can_be_seen.clear();
-	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_zone->m_watertiles.begin(); it != m_warship->m_zone->m_watertiles.end(); it++)
+	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
 	{
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
@@ -178,12 +177,15 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
+	//enemy
+	m_enemy->Update(deltaTime, m_warship->m_DMS);
+
 	//island
 	if (m_island != NULL)
 	{
 		//position on "radar"
-		WaterTile* tileUpLeft = m_warship->m_zone->m_watertiles[m_island->m_upcorner_x][m_island->m_upcorner_y];
-		WaterTile* tileDownRight = m_warship->m_zone->m_watertiles[m_island->m_upcorner_x + m_island->m_width - 1][m_island->m_upcorner_y - m_island->m_height + 1];
+		WaterTile* tileUpLeft = m_warship->m_tile->m_zone->m_watertiles[m_island->m_upcorner_x][m_island->m_upcorner_y];
+		WaterTile* tileDownRight = m_warship->m_tile->m_zone->m_watertiles[m_island->m_upcorner_x + m_island->m_width - 1][m_island->m_upcorner_y - m_island->m_height + 1];
 		float pos_x = 0.5f * (tileDownRight->m_position.x + tileUpLeft->m_position.x);
 		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
 		m_island->m_position = sf::Vector2f(pos_x, pos_y);
@@ -268,6 +270,12 @@ void Gameloop::Draw()
 
 	//boat
 	m_warship->Draw((*CurrentGame).m_mainScreen);
+
+	//enemy
+	if (m_enemy->m_can_be_seen == true)
+	{
+		m_enemy->Draw((*CurrentGame).m_mainScreen);
+	}
 
 	//compass
 	m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);

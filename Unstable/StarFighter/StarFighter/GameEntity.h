@@ -9,6 +9,7 @@ enum UI_Type
 	UI_CrewMember,
 	UI_Room,
 	UI_Connexion,
+	UI_EnemyShip,
 	UI_Warship,
 	UI_WaterTile,
 	UI_Seaport,

@@ -24,6 +24,7 @@ public:
 	GameEntity* m_background;
 	Warship* m_warship;
 	Island* m_island;
+	Ship* m_enemy;
 
 	void InitWaterZones();
 

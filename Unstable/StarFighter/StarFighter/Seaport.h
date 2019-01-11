@@ -25,9 +25,9 @@ public:
 
 	WaterTile* m_tile;
 	Island* m_island;
-	vector<Warship*> m_ships;
+	vector<Ship*> m_ships;
 
-	void RemoveShip(Warship* ship);
+	void RemoveShip(Ship* ship);
 
 	//bool CreateIsland(int upcorner_x, int upcorner_y, int width, int height, WaterZone* zone, int zone_coord_x, int zone_coord_y);
 	
