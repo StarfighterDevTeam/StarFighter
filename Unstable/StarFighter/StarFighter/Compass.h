@@ -5,7 +5,7 @@
 
 #include "GameEntity.h"
 
-#define COMPASS_OFFSET_X				400.f
+#define COMPASS_OFFSET_X				1252.f//1452-(400/2)
 #define COMPASS_OFFSET_Y				1000.f
 #define COMPASS_CADRAN_SIZE_X			400.f
 #define COMPASS_CADRAN_SIZE_Y			50.f

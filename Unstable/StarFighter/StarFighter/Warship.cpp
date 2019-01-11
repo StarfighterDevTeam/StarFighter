@@ -10,6 +10,8 @@ Warship::Warship(DMS_Coord coord) : GameEntity(UI_Warship)
 	m_destination = NULL;
 	m_speed = sf::Vector2f(0, 0);
 	m_seaport = NULL;
+	m_position.x = WATERTILE_OFFSET_X - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
+	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -89,34 +91,36 @@ Warship::~Warship()
 
 void Warship::Update(Time deltaTime)
 {
-	//Compass
+	//Compass input
 	m_compass.GetInput(m_angle, m_desired_angle);
-	m_compass.Update(deltaTime, m_angle, m_desired_angle);
 	
 	//Turn boat to desired angle
-	if (m_angle != m_desired_angle && sf::Mouse::isButtonPressed(sf::Mouse::Left) == false)
+	if (COMPASS_MODE == true)//mode compass
 	{
-		float delta = m_angle - m_desired_angle;
-		if (delta > 180)
-			delta -= 360;
-		else if (delta < -180)
-			delta += 360;
-		
-		if (abs(delta) > abs(m_angle_speed)*deltaTime.asSeconds())
+		if (m_angle != m_desired_angle && sf::Mouse::isButtonPressed(sf::Mouse::Left) == false)
 		{
-			m_angle -= delta >= 0 ? m_angle_speed * deltaTime.asSeconds() : -m_angle_speed * deltaTime.asSeconds();
+			float delta = m_angle - m_desired_angle;
+			if (delta > 180)
+				delta -= 360;
+			else if (delta < -180)
+				delta += 360;
+
+			if (abs(delta) > abs(m_angle_speed)*deltaTime.asSeconds())
+			{
+				m_angle -= delta >= 0 ? m_angle_speed * deltaTime.asSeconds() : -m_angle_speed * deltaTime.asSeconds();
+			}
+			else
+			{
+				m_angle = m_desired_angle;
+			}
 		}
-		else
-		{
-			m_angle = m_desired_angle;
-		}
+
+		//flip the sprite according to the direction
+		UpdateAnimation();
+
+		m_speed.x = CRUISE_SPEED * sin(m_angle * M_PI / 180.f);
+		m_speed.y = -CRUISE_SPEED * cos(m_angle * M_PI / 180.f);
 	}
-
-	//flip the sprite according to the direction
-	UpdateAnimation();
-
-	m_speed.x = CRUISE_SPEED * sin(m_angle * M_PI / 180.f);
-	m_speed.y = -CRUISE_SPEED * cos(m_angle * M_PI / 180.f);
 
 	//travel management (needs to be refreshed? arrived?)
 	if (m_current_path.empty() == false)
@@ -153,7 +157,12 @@ void Warship::Update(Time deltaTime)
 	m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
 
 	//rotation
-	//UpdateRotation();
+	if (COMPASS_MODE == false)
+	{
+		GetAngleForSpeed(m_angle);
+		m_desired_angle = m_angle;
+		UpdateAnimation();
+	}
 	
 	//sexadecimal position system
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
@@ -193,42 +202,42 @@ void Warship::Update(Time deltaTime)
 	ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << (int)m_DMS.m_second_x << "\"\E";
 	m_text.setString(ss.str());
 
+	//Compass UI update
+	m_compass.Update(deltaTime, m_angle, m_desired_angle);
+
 	GameEntity::Update(deltaTime);
 }
 
-void Warship::UpdateRotation()
+void Warship::GetAngleForSpeed(float& angle)
 {
 	//find angle for speed vector
 	if (m_speed.x != 0 || m_speed.y != 0)
 	{
 		if (m_speed.x == 0)
 		{
-			m_angle = m_speed.y >= 0 ? 180.f : 0.f;
+			angle = m_speed.y >= 0 ? 180.f : 0.f;
 		}
 		else if (m_speed.y == 0)
 		{
-			m_angle = m_speed.x >= 0 ? 90.f : 270.f;
+			angle = m_speed.x >= 0 ? 90.f : 270.f;
 		}
 		else
 		{
 			if (m_speed.x >= 0)
 			{
-				m_angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f;
+				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f;
 			}
 			else
 			{
-				m_angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f + 180.f;
+				angle = (atan(m_speed.y / m_speed.x) * 180.f / M_PI) + 90.f + 180.f;
 			}
 		}
 	}
 	else
 	{
 		//default value
-		m_angle = m_currentAnimationIndex == 0 ? 90.f : 270.f;
+		angle = m_currentAnimationIndex == 0 ? 90.f : 270.f;
 	}
-
-	//flip the sprite according to the direction
-	UpdateAnimation();
 }
 
 void Warship::UpdateAnimation()
@@ -480,8 +489,8 @@ bool Warship::SetDMSCoord(DMS_Coord coord)
 
 	m_DMS = coord;
 	m_tile = tile;
-	m_tile->UpdatePosition(coord);
-	m_position = tile->m_position;
+	//m_tile->UpdatePosition(coord);
+	//m_position = tile->m_position;
 	m_zone = tile->m_zone;
 
 	//new seaport?
@@ -570,16 +579,16 @@ bool Warship::CanViewWaterTile(WaterTile* tile)
 	float distance = GetDistanceFloatToWaterTile(tile);
 	if (distance <= NB_WATERTILE_VIEW_RANGE + 0.15f || (tile->m_can_be_seen == true && m_destination != NULL && distance <= NB_WATERTILE_VIEW_RANGE + 0.99f))
 	{
-		//return true;
+		return true;
 		//line of sight blocked by islands
-		if (RayTracingContainsIsland(m_tile, tile) == false)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		//if (RayTracingContainsIsland(m_tile, tile) == false)
+		//{
+		//	return true;
+		//}
+		//else
+		//{
+		//	return false;
+		//}
 	}
 	else
 	{
@@ -613,16 +622,6 @@ bool Warship::SetSailsToWaterTile(WaterTile* tile)
 		m_seaport->RemoveShip(this);
 		m_seaport = NULL;
 	}
-
-	//bool test = RayTracingContainsIsland(m_tile, tile);
-	//if (test == true)
-	//{
-	//	printf("not visible\n");
-	//}
-	//else
-	//{
-	//	printf("visible\n");
-	//}
 
 	return true;
 }

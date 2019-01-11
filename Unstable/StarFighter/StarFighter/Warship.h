@@ -10,6 +10,8 @@
 #define	CRUISE_SPEED					40.f
 #define ANGLE_SPEED						30.f
 
+#define COMPASS_MODE					false
+
 class Warship : public GameEntity
 {
 public:
@@ -41,7 +43,7 @@ public:
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
-	void UpdateRotation();
+	void GetAngleForSpeed(float& angle);
 	void UpdateAnimation();
 	bool SetSailsToWaterTile(WaterTile* tile);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
