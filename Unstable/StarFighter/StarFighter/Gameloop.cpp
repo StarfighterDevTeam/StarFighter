@@ -125,9 +125,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 	//Fire weapon
-	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_Weapon)
+	if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
 	{
-		Weapon* weapon = (Weapon*)selection;
+		Weapon* weapon = (Weapon*)hovered;
 		m_warship->FireWeapon(weapon, deltaTime);
 	}
 
@@ -162,19 +162,20 @@ void Gameloop::Update(sf::Time deltaTime)
 				if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
 				{
 					//display distances to the boat
-					float distance = m_warship->GetDistanceFloatToWaterTile(*it2);
-					if (distance != 0.f)
-					{
+					//float distance = m_warship->GetDistanceFloatToWaterTile(*it2);
+					//if (distance != 0.f)
+					//{
 						ostringstream ss;
 						ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
 						(*it2)->m_text.setString(ss.str());
-					}
+					//}
 
 					(*it2)->GameEntity::Update(deltaTime);
 				}
 				else
 				{
-					(*it2)->GameEntity::UpdatePosition();
+					(*it2)->GameEntity::Update(deltaTime);
+					//(*it2)->GameEntity::UpdatePosition();
 					(*it2)->m_text.setString("");
 
 					//selection of water tiles is forbidden
@@ -218,7 +219,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//Move order
-	if (mouse_click == Mouse_RightClick && selection != NULL && selection == m_warship && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
+	if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
 	{
 		WaterTile* tile = (WaterTile*)hovered;
 		m_warship->SetSailsToWaterTile(tile);
