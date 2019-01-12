@@ -64,6 +64,7 @@ public:
 	bool m_can_be_seen;
 
 	void UpdatePosition(DMS_Coord warship_DMS);
+	static DMS_Coord GetDMSCoord(sf::Vector2f position, DMS_Coord warship_DMS);
 
 	//pathfinding
 	int m_heuristic;

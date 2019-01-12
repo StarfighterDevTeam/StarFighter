@@ -5,7 +5,8 @@ extern Game* CurrentGame;
 Weapon::Weapon(WeaponType type) : GameEntity(UI_Weapon)
 {
 	m_type = type;
-	m_angle = 90.f;
+	m_bord = Babord;
+	m_angle = m_bord == Babord ? 90.f : 270.f;
 
 	//shape for water tiles
 	TextureLoader *loader;
@@ -50,31 +51,15 @@ RoomTile* Weapon::GetFreeRoomTile(Room* room)
 	return NULL;
 }
 
-bool Weapon::Fire(Time deltaTime)
+bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle)
 {
-	//Create bullet
-	Ammo* new_ammo = new Ammo(Ammo_CannonBall);
-	m_angle = 90.f;
-	new_ammo->m_angle = m_angle;
-	new_ammo->setRotation(m_angle);
-
-	float angle_rad = m_angle * M_PI / 180.f;
-	new_ammo->m_speed = sf::Vector2f(new_ammo->m_ref_speed * sin(angle_rad), new_ammo->m_ref_speed * cos(angle_rad));
-
-	//Fire from cannon
-	float weapon_offset_x = (ROOMTILE_SIZE + new_ammo->m_size.x) * 0.5f * sin(angle_rad);
-	float weapon_offset_y = (ROOMTILE_SIZE + new_ammo->m_size.y) * 0.5f * cos(angle_rad);
-	new_ammo->m_position = getPosition() + sf::Vector2f(weapon_offset_x, weapon_offset_y);
-	
+	//Fire from room tile
+	Ammo* new_ammo = new Ammo(Ammo_CannonBall, m_position, m_angle, Map_Rooms);
 	(*CurrentGame).m_bullets.push_back(new_ammo);
 
-	//Fire from map
-	//float map_offset_x = (ROOMTILE_SIZE * 0.5f) * sin(angle_rad) + new_ammo->m_size.x * 0.5f * sin(angle_rad);
-	//float map_offset_y = (ROOMTILE_SIZE * 0.5f) * cos(angle_rad) + new_ammo->m_size.y * 0.5f * cos(angle_rad);
-	//new_ammo->m_position = getPosition() + sf::Vector2f(bullet_offset_x, bullet_offset_y);
+	//Fire from water tile
+	Ammo* new_ammo2 = new Ammo(Ammo_CannonBall, ship_position, m_angle + ship_angle, Map_Water);
+	(*CurrentGame).m_bullets.push_back(new_ammo2);
 
-	//(*CurrentGame).m_bullets.push_back(new_ammo);
-
-
-	return new_ammo;
+	return true;
 }

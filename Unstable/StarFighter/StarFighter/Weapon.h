@@ -2,10 +2,17 @@
 #define WEAPON_H_INCLUDED
 
 #include "Game.h"
-#include "Room.h"
 #include "Ammo.h"
+#include "Room.h"
+#include "WaterZone.h"
 
 class Ship;//forward declaration
+
+enum Bord
+{
+	Babord,
+	Tribord,
+};
 
 enum WeaponType
 {
@@ -20,13 +27,14 @@ public:
 
 	WeaponType m_type;
 	RoomTile* m_tile;
+	Bord m_bord;
 
 	float m_angle;
 	bool m_direct_fire;
 
 	void Update(Time deltaTime);
 
-	bool Fire(Time deltaTime);
+	bool Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle);
 
 	RoomTile* GetFreeRoomTile(Room* room);
 

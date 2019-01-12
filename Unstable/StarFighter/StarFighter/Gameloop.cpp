@@ -128,13 +128,16 @@ void Gameloop::Update(sf::Time deltaTime)
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_Weapon)
 	{
 		Weapon* weapon = (Weapon*)selection;
-		weapon->Fire(deltaTime);
+		m_warship->FireWeapon(weapon, deltaTime);
 	}
 
 	//Bullets
 	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
 	{
-		(*it)->Update(deltaTime);
+		if ((*it)->m_can_be_seen == true)
+		{
+			(*it)->Update(deltaTime, m_warship->m_DMS);
+		}
 	}
 
 	//boat
@@ -220,6 +223,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		WaterTile* tile = (WaterTile*)hovered;
 		m_warship->SetSailsToWaterTile(tile);
 	}
+
+	//Clean bullets that cannot be seen anymore
+	CleanOldBullets();
 }
 
 void Gameloop::Draw()
@@ -313,7 +319,22 @@ void Gameloop::Draw()
 	(*CurrentGame).getMainWindow()->draw(temp);
 }
 
-void Gameloop::Release()
+void Gameloop::CleanOldBullets()
 {
-	//TODO
+	vector<Ammo*> old_bullets;
+
+	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
+	{
+		old_bullets.push_back(*it);
+	}
+
+	(*CurrentGame).m_bullets.clear();
+
+	for (vector<Ammo*>::iterator it = old_bullets.begin(); it != old_bullets.end(); it++)
+	{
+		if ((*it)->m_can_be_seen == true)
+		{
+			(*CurrentGame).m_bullets.push_back(*it);
+		}
+	}
 }

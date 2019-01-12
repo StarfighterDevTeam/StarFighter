@@ -242,25 +242,6 @@ int Warship::GetDistanceToWaterTile(WaterTile* tile)
 	return distance_i;
 }
 
-DMS_Coord Warship::GetDMSCoord(sf::Vector2f position)
-{
-	DMS_Coord dms;
-	float f_minute_x;
-	float f_minute_y;
-
-	f_minute_x = (position.x - WATERTILE_OFFSET_X - WATERTILE_SIZE * (0.5f - (this->m_DMS.m_minute_x + this->m_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE)) / WATERTILE_SIZE;
-	f_minute_y = (position.y - WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - this->m_DMS.m_minute_y - this->m_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE + NB_WATERTILE_Y)) / (-WATERTILE_SIZE);
-
-	int minute_x = (int)f_minute_x;
-	int minute_y = (int)f_minute_y;
-
-	float second_x = (f_minute_x - minute_x) * NB_WATERTILE_SUBDIVISION;
-	float second_y = (f_minute_y - minute_y) * NB_WATERTILE_SUBDIVISION;
-
-	dms = { 0, minute_x, second_x, 0, minute_y, second_y };
-	return dms;
-}
-
 float Warship::GetDistanceSquaredInSecondsDMS(WaterTile* tile)
 {
 	float xA = m_DMS.m_minute_x * NB_WATERTILE_SUBDIVISION + m_DMS.m_second_x;

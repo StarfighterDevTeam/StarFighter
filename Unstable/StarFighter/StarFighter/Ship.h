@@ -53,6 +53,7 @@ public:
 	Room* ConnectRooms();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
+	bool FireWeapon(Weapon* weapon, Time deltaTime);
 
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 };

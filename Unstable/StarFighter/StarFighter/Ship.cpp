@@ -89,6 +89,9 @@ void Ship::UpdatePosition(DMS_Coord warship_DMS)
 
 void Ship::Update(Time deltaTime, DMS_Coord warship_DMS)
 {
+	//update tile information
+	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
+
 	m_can_be_seen = m_tile->m_can_be_seen;
 
 	UpdatePosition(warship_DMS);
@@ -365,4 +368,9 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 	weapon->m_text.SetPosition(weapon->m_position);
 
 	return weapon;
+}
+
+bool Ship::FireWeapon(Weapon* weapon, Time deltaTime)
+{
+	return weapon->Fire(deltaTime, m_position, m_angle);
 }

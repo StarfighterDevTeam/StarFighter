@@ -8,7 +8,7 @@
 #include "Compass.h"
 #include "Ship.h"
 
-#define	CRUISE_SPEED					60.f
+#define	CRUISE_SPEED					30.f
 #define ANGLE_SPEED						30.f
 
 #define COMPASS_MODE					false
@@ -23,7 +23,6 @@ public:
 	float m_angle_speed;
 	struct Compass m_compass;
 
-	DMS_Coord GetDMSCoord(sf::Vector2f position);
 	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);

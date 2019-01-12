@@ -18,7 +18,6 @@ public:
 	void Update(sf::Time deltaTime);
 	void UpdateUI(sf::Time deltaTime);
 	void Draw();
-	void Release();
 
 	//PIRATES
 	GameEntity* m_background;
@@ -27,6 +26,7 @@ public:
 	Ship* m_enemy;
 
 	void InitWaterZones();
+	void CleanOldBullets();
 
 private:
 	sf::RenderWindow* mainWindow;
