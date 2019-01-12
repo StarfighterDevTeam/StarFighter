@@ -138,7 +138,7 @@ int main()
 		}
 		else
 		{
-			printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT");
+			printf("FRAME RATE TOO LOW - GAME WAS PAUSED FOR A MOMENT\n");
 		}
 	}
 

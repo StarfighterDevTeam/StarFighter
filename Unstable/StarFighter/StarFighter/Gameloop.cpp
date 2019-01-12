@@ -14,10 +14,25 @@ Gameloop::Gameloop()
 
 	//PIRATES
 	InitWaterZones();
+
+	//Init ships
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete));
 
 	m_scale = Scale_Strategic;
+
+	//Init Tactical zone
+	for (int x = 0; x < (TACTICAL_RANGE + 1) * NB_WATERTILE_SUBDIVISION; x++)
+	{
+		vector<WaterTile*> vec;
+		for (int y = 0; y < (TACTICAL_RANGE + 1) * NB_WATERTILE_SUBDIVISION; y++)
+		{
+			WaterTile* tile = new WaterTile(0, 0, Water_Empty, NULL, 0, 0);
+			tile->m_can_be_seen = true;
+			vec.push_back(tile);
+		}
+		(*CurrentGame).m_tactical_tiles.push_back(vec);
+	}
 }
 
 Gameloop::~Gameloop()
@@ -155,46 +170,53 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//water tiles
 	m_warship->m_tiles_can_be_seen.clear();
-	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
+	if (m_scale == Scale_Strategic)
 	{
-		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
 		{
-			//can be seen? no need to update other tiles because they won't be drawn anyway
-			if (m_warship->CanViewWaterTile(*it2))
+			for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 			{
-				(*it2)->m_can_be_seen = true;
-				m_warship->m_tiles_can_be_seen.push_back(*it2);
-
-				//position on "radar"
-				(*it2)->UpdatePosition(m_warship->m_DMS);
-
-				//selection
-				if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
+				//can be seen? no need to update other tiles because they won't be drawn anyway
+				if (m_warship->CanViewWaterTile(*it2))
 				{
-					ostringstream ss;
-					ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
-					(*it2)->m_text.setString(ss.str());
-					(*it2)->GameEntity::Update(deltaTime);
+					(*it2)->m_can_be_seen = true;
+					m_warship->m_tiles_can_be_seen.push_back(*it2);
+
+					//position on "radar"
+					(*it2)->UpdatePosition(m_warship->m_DMS);
+
+					//selection
+					if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
+					{
+						ostringstream ss;
+						ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
+						(*it2)->m_text.setString(ss.str());
+						(*it2)->GameEntity::Update(deltaTime);
+					}
+					else
+					{
+						(*it2)->GameEntity::Update(deltaTime);
+						(*it2)->m_text.setString("");
+
+						//selection of water tiles is forbidden
+						if ((*it2)->m_selected == true)
+						{
+							(*it2)->m_selected = false;
+							(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+							(*CurrentGame).m_selected_ui = NULL;
+						}
+					}
 				}
 				else
 				{
-					(*it2)->GameEntity::Update(deltaTime);
-					(*it2)->m_text.setString("");
-
-					//selection of water tiles is forbidden
-					if ((*it2)->m_selected == true)
-					{
-						(*it2)->m_selected = false;
-						(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
-						(*CurrentGame).m_selected_ui = NULL;
-					}
+					(*it2)->m_can_be_seen = false;
 				}
 			}
-			else
-			{
-				(*it2)->m_can_be_seen = false;
-			}
 		}
+	}
+	else
+	{
+		printf("FIN UPDATE TILES\n");
 	}
 
 	//other ships
@@ -281,6 +303,10 @@ void Gameloop::Draw()
 			islands.push_back((*it)->m_island);
 		}
 	}
+	if (m_warship->m_tiles_can_be_seen.empty() == true)
+	{
+		printf("DRAW NULL\n");
+	}
 
 	//islands and ports
 	for (vector<Island*>::iterator it = islands.begin(); it != islands.end(); it++)
@@ -358,15 +384,6 @@ bool Gameloop::UpdateTacticalScale()
 		{
 			m_scale = Scale_Strategic;
 
-			//clear tactical tiles
-			for (vector<vector<WaterTile*> >::iterator it = (*CurrentGame).m_tactical_tiles.begin(); it != (*CurrentGame).m_tactical_tiles.end(); it++)
-			{
-				for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-				{
-					delete *it2;
-				}
-			}
-
 			//clear tactical ships
 			m_tactical_ships.clear();
 
@@ -400,6 +417,8 @@ bool Gameloop::UpdateTacticalScale()
 		{
 			continue;
 		}
+
+		printf("UPDATE SCALE\n");
 
 		//position X on tactical scale
 		if (posxA < posxB)
@@ -520,11 +539,13 @@ bool Gameloop::UpdateTacticalScale()
 				}
 
 				//create tactical tile
-				WaterTile* tile = new WaterTile(x, y, type, m_warship->m_tile->m_zone, m_warship->m_DMS.m_minute_x - xA, m_warship->m_DMS.m_minute_y - yA);
-				vec.push_back(tile);
+				WaterTile* tile = (*CurrentGame).m_tactical_tiles[x][y];
+				tile->m_type = type;
+				tile->m_coord_x = coord_x;
+				tile->m_coord_y = coord_y;
+				tile->m_zone = m_warship->m_tile->m_zone;
+				tile->m_DMS.SetCoord(m_warship->m_DMS.m_degree_x, coord_x, x % NB_WATERTILE_SUBDIVISION, m_warship->m_DMS.m_degree_y, coord_y, y % NB_WATERTILE_SUBDIVISION);
 			}
-
-			(*CurrentGame).m_tactical_tiles.push_back(vec);
 		}
 	}
 
