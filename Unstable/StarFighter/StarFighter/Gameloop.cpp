@@ -354,6 +354,23 @@ bool Gameloop::UpdateTacticalScale()
 {
 	if (m_scale == Scale_Tactical)
 	{
+		if (0)//exit conditions todo
+		{
+			m_scale = Scale_Strategic;
+
+			//clear tactical tiles
+			for (vector<vector<WaterTile*> >::iterator it = (*CurrentGame).m_tactical_tiles.begin(); it != (*CurrentGame).m_tactical_tiles.end(); it++)
+			{
+				for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+				{
+					delete *it2;
+				}
+			}
+
+			//clear tactical ships
+			m_tactical_ships.clear();
+
+		}
 		return true;
 	}
 
@@ -372,52 +389,50 @@ bool Gameloop::UpdateTacticalScale()
 		//in range for combat?
 		float posxA = m_warship->m_DMS.m_minute_x * 60.f + m_warship->m_DMS.m_second_x;
 		float posxB = (*it)->m_DMS.m_minute_x * 60.f + (*it)->m_DMS.m_second_x;
-		if (abs(posxA - posxB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		if (abs(posxA - posxB) > TACTICAL_RANGE * NB_WATERTILE_SUBDIVISION)
 		{
 			continue;
 		}
 
 		float posyA = m_warship->m_DMS.m_minute_y * 60.f + m_warship->m_DMS.m_second_y;
 		float posyB = (*it)->m_DMS.m_minute_y * 60.f + (*it)->m_DMS.m_second_y;
-		if (abs(posyA - posyB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		if (abs(posyA - posyB) > TACTICAL_RANGE * NB_WATERTILE_SUBDIVISION)
 		{
 			continue;
 		}
-
-		//if (m_warship->m_DMS.m_minute_x * 60.f + m_warship->m_DMS.m_seconds.x (*it)->m_DMS.m_minute_x + )
 
 		//position X on tactical scale
 		if (posxA < posxB)
 		{
 			xA = 0;
-			xB = 2;
+			xB = TACTICAL_RANGE;
 		}
 		else if (posxA > posxB)
 		{
-			xA = 2;
+			xA = TACTICAL_RANGE;
 			xB = 0;
 		}
 		else
 		{
-			xA = 1;
-			xB = 1;
+			xA = TACTICAL_RANGE / 2;
+			xB = TACTICAL_RANGE / 2;
 		}
 
 		//position Y on tactical scale
 		if (posyA < posyB)
 		{
 			yA = 0;
-			yB = 2;
+			yB = TACTICAL_RANGE;
 		}
 		else if (posyA > posyB)
 		{
-			yA = 2;
+			yA = TACTICAL_RANGE;
 			yB = 0;
 		}
 		else
 		{
-			yA = 1;
-			yB = 1;
+			yA = TACTICAL_RANGE / 2;
+			yB = TACTICAL_RANGE / 2;
 		}
 
 		//attack from behind? = start 1 step closer
@@ -425,22 +440,22 @@ bool Gameloop::UpdateTacticalScale()
 		{
 			if (m_warship->m_speed.x > (*it)->m_speed.x)//ship A overspeeding ship B from behind
 			{
-				xB--;
+				xB = TACTICAL_RANGE / 2;
 			}
 			else if (m_warship->m_speed.x < (*it)->m_speed.x)//ship B overspeeding ship A from behind
 			{
-				xA--;
+				xA = TACTICAL_RANGE / 2;
 			}
 		}
 		else if (m_warship->m_speed.x < 0 && (*it)->m_speed.x < 0)//going left
 		{
 			if (m_warship->m_speed.x < (*it)->m_speed.x)//ship A overspeeding ship B from behind
 			{
-				xB++;
+				xB = TACTICAL_RANGE / 2;
 			}
 			else if (m_warship->m_speed.x > (*it)->m_speed.x)//ship B overspeeding ship A from behind
 			{
-				xA++;
+				xA = TACTICAL_RANGE / 2;
 			}
 		}
 		
@@ -448,27 +463,69 @@ bool Gameloop::UpdateTacticalScale()
 		{
 			if (m_warship->m_speed.y > (*it)->m_speed.y)//ship A overspeeding ship B from behind
 			{
-				yB--;
+				yB = TACTICAL_RANGE / 2;
 			}
 			else if (m_warship->m_speed.y < (*it)->m_speed.y)//ship B overspeeding ship A from behind
 			{
-				yA--;
+				yA = TACTICAL_RANGE / 2;
 			}
 		}
 		else if (m_warship->m_speed.y < 0 && (*it)->m_speed.y < 0)//going down
 		{
 			if (m_warship->m_speed.y < (*it)->m_speed.y)//ship A overspeeding ship B from behind
 			{
-				yB++;
+				yB = TACTICAL_RANGE / 2;
 			}
 			else if (m_warship->m_speed.y >(*it)->m_speed.y)//ship B overspeeding ship A from behind
 			{
-				yA++;
+				yA = TACTICAL_RANGE / 2;
 			}
 		}
 
 		m_tactical_ships.push_back(*it);
 		m_scale = Scale_Tactical;
+	}
+
+	//Build tactical map
+	if (m_scale == Scale_Tactical)
+	{
+		//tactical tiles
+		for (int x = 0; x < (TACTICAL_RANGE + 1) * NB_WATERTILE_SUBDIVISION; x++)
+		{
+			vector<WaterTile*> vec;
+			for (int y = 0; y < (TACTICAL_RANGE + 1) * NB_WATERTILE_SUBDIVISION; y++)
+			{
+				int coord_x = m_warship->m_DMS.m_minute_x + (x / NB_WATERTILE_SUBDIVISION) - xA;
+				int coord_y = m_warship->m_DMS.m_minute_y + (y / NB_WATERTILE_SUBDIVISION) - yA;
+				WaterTile* tile_minute = (*CurrentGame).m_waterzones[m_warship->m_DMS.m_degree_x][m_warship->m_DMS.m_degree_y]->m_watertiles[coord_x][coord_y];
+				WaterTileType type = tile_minute->m_type;
+
+				//adjacent islands representation on borders of the map
+				if (coord_x > 0 && x < NB_TACTICALTILES_FOR_ADJACENT_WATERTILE)//left
+				{
+					type = (*CurrentGame).m_waterzones[m_warship->m_DMS.m_degree_x][m_warship->m_DMS.m_degree_y]->m_watertiles[coord_x - 1][coord_y]->m_type;
+				}
+				else if (coord_x < NB_WATERTILE_X - 1 && x > (TACTICAL_RANGE * NB_WATERTILE_SUBDIVISION) + (NB_WATERTILE_SUBDIVISION - NB_TACTICALTILES_FOR_ADJACENT_WATERTILE - 1))//right
+				{
+					type = (*CurrentGame).m_waterzones[m_warship->m_DMS.m_degree_x][m_warship->m_DMS.m_degree_y]->m_watertiles[coord_x + 1][coord_y]->m_type;
+				}
+
+				if (coord_y > 0 && y < NB_TACTICALTILES_FOR_ADJACENT_WATERTILE)//down
+				{
+					type = (*CurrentGame).m_waterzones[m_warship->m_DMS.m_degree_y][m_warship->m_DMS.m_degree_y]->m_watertiles[coord_y - 1][coord_y]->m_type;
+				}
+				else if (coord_y < NB_WATERTILE_Y - 1 && y >(TACTICAL_RANGE * NB_WATERTILE_SUBDIVISION) + (NB_WATERTILE_SUBDIVISION - NB_TACTICALTILES_FOR_ADJACENT_WATERTILE - 1))//up
+				{
+					type = (*CurrentGame).m_waterzones[m_warship->m_DMS.m_degree_y][m_warship->m_DMS.m_degree_y]->m_watertiles[coord_y + 1][coord_y]->m_type;
+				}
+
+				//create tactical tile
+				WaterTile* tile = new WaterTile(x, y, type, m_warship->m_tile->m_zone, m_warship->m_DMS.m_minute_x - xA, m_warship->m_DMS.m_minute_y - yA);
+				vec.push_back(tile);
+			}
+
+			(*CurrentGame).m_tactical_tiles.push_back(vec);
+		}
 	}
 
 	return (m_scale == Scale_Tactical);

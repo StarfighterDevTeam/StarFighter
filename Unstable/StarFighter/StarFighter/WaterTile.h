@@ -10,13 +10,16 @@ class WaterZone;
 class Island;
 class Seaport;
 
-#define WATERTILE_SIZE					64.f
-#define WATERTILE_OFFSET_X				1100.f
-#define WATERTILE_OFFSET_Y				100.f
-#define NB_WATERTILE_X					60
-#define NB_WATERTILE_Y					60
-#define NB_WATERTILE_SUBDIVISION		60
-#define NB_WATERTILE_VIEW_RANGE			5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
+#define WATERTILE_SIZE								64.f
+#define WATERTILE_OFFSET_X							1100.f
+#define WATERTILE_OFFSET_Y							100.f
+#define NB_WATERTILE_X								60
+#define NB_WATERTILE_Y								60
+#define NB_WATERTILE_SUBDIVISION					60
+#define NB_WATERTILE_VIEW_RANGE						5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
+
+#define TACTICAL_RANGE								2 // recommanded not-odd number for finding easy middle-ground of the tactical map (size divided by 2)
+#define NB_TACTICALTILES_FOR_ADJACENT_WATERTILE		3
 
 struct DMS_Coord
 {
