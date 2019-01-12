@@ -333,7 +333,7 @@ Room* Ship::ConnectRooms()
 	return unconnected_room;
 }
 
-Weapon* Ship::AddWeapon(Weapon* weapon, Room* room)
+Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 {
 	if (room == NULL)
 	{
@@ -356,6 +356,9 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room)
 	//assign crew to tile
 	weapon->m_tile = tile;
 	tile->m_weapon = weapon;
+
+	//save owner ship
+	weapon->m_ship = this;
 
 	//UI
 	weapon->m_shape_container.setPosition(weapon->m_position);

@@ -18,6 +18,7 @@ class GameEntity;//forward declaration
 class RoomTile;
 class WaterZone;
 class Ship;
+class Ammo;
 
 enum SFX_Bank
 {
@@ -103,6 +104,7 @@ public:
 
 	vector<RoomTile*> m_tiles;
 	vector<vector<WaterZone*> > m_waterzones;
+	vector<Ammo*> m_bullets;
 
 private:
 

@@ -52,7 +52,7 @@ public:
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
-	Weapon* AddWeapon(Weapon* weapon, Room* room);
+	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
 
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 };

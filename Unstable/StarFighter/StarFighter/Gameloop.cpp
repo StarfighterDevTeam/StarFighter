@@ -124,6 +124,18 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 	}
+	//Fire weapon
+	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_Weapon)
+	{
+		Weapon* weapon = (Weapon*)selection;
+		weapon->Fire(deltaTime);
+	}
+
+	//Bullets
+	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
 
 	//boat
 	m_warship->Update(deltaTime);
@@ -243,12 +255,6 @@ void Gameloop::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
-	//weapons
-	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
-	{
-		(*it)->Draw((*CurrentGame).m_mainScreen);
-	}
-
 	//WATER PART
 
 	//water tiles
@@ -282,6 +288,18 @@ void Gameloop::Draw()
 	if (m_enemy->m_can_be_seen == true)
 	{
 		m_enemy->Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//Bullets
+	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//weapons
+	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//compass

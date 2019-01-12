@@ -3,6 +3,9 @@
 
 #include "Game.h"
 #include "Room.h"
+#include "Ammo.h"
+
+class Ship;//forward declaration
 
 enum WeaponType
 {
@@ -23,7 +26,12 @@ public:
 
 	void Update(Time deltaTime);
 
+	bool Fire(Time deltaTime);
+
 	RoomTile* GetFreeRoomTile(Room* room);
+
+	Ammo* m_ammo;
+	Ship* m_ship;
 };
 
 #endif //SHIP_H_INCLUDED
