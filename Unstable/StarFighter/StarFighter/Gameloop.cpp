@@ -15,7 +15,9 @@ Gameloop::Gameloop()
 	//PIRATES
 	InitWaterZones();
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
-	m_enemy = new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete);
+	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete));
+
+	m_scale = Scale_Strategic;
 }
 
 Gameloop::~Gameloop()
@@ -23,6 +25,10 @@ Gameloop::~Gameloop()
 	delete m_background;
 	delete m_warship;
 	delete m_island;
+	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+	{
+		delete (*it);
+	}
 }
 
 void Gameloop::InitWaterZones()
@@ -63,6 +69,9 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//UPDATING GAME ENTITIES
+
+	//change of scale?
+	UpdateTacticalScale();
 
 	//Interaction with rooms
 	for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
@@ -124,6 +133,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 	}
+
 	//Fire weapon
 	if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
 	{
@@ -161,21 +171,14 @@ void Gameloop::Update(sf::Time deltaTime)
 				//selection
 				if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
 				{
-					//display distances to the boat
-					//float distance = m_warship->GetDistanceFloatToWaterTile(*it2);
-					//if (distance != 0.f)
-					//{
-						ostringstream ss;
-						ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
-						(*it2)->m_text.setString(ss.str());
-					//}
-
+					ostringstream ss;
+					ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
+					(*it2)->m_text.setString(ss.str());
 					(*it2)->GameEntity::Update(deltaTime);
 				}
 				else
 				{
 					(*it2)->GameEntity::Update(deltaTime);
-					//(*it2)->GameEntity::UpdatePosition();
 					(*it2)->m_text.setString("");
 
 					//selection of water tiles is forbidden
@@ -194,8 +197,11 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//enemy
-	m_enemy->Update(deltaTime, m_warship->m_DMS);
+	//other ships
+	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+	{
+		(*it)->Update(deltaTime, m_warship->m_DMS);
+	}
 
 	//island
 	if (m_island != NULL)
@@ -292,10 +298,14 @@ void Gameloop::Draw()
 	m_warship->Draw((*CurrentGame).m_mainScreen);
 
 	//enemy
-	if (m_enemy->m_can_be_seen == true)
+	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 	{
-		m_enemy->Draw((*CurrentGame).m_mainScreen);
+		if ((*it)->m_can_be_seen == true)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
 	}
+	
 
 	//Bullets
 	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
@@ -338,4 +348,128 @@ void Gameloop::CleanOldBullets()
 			(*CurrentGame).m_bullets.push_back(*it);
 		}
 	}
+}
+
+bool Gameloop::UpdateTacticalScale()
+{
+	if (m_scale == Scale_Tactical)
+	{
+		return true;
+	}
+
+	int xA = 0;
+	int yA = 0;
+	int xB = 0;
+	int yB = 0;
+
+	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+	{
+		if ((*it)->m_can_be_seen == false)
+		{
+			continue;
+		}
+
+		//in range for combat?
+		float posxA = m_warship->m_DMS.m_minute_x * 60.f + m_warship->m_DMS.m_second_x;
+		float posxB = (*it)->m_DMS.m_minute_x * 60.f + (*it)->m_DMS.m_second_x;
+		if (abs(posxA - posxB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		{
+			continue;
+		}
+
+		float posyA = m_warship->m_DMS.m_minute_y * 60.f + m_warship->m_DMS.m_second_y;
+		float posyB = (*it)->m_DMS.m_minute_y * 60.f + (*it)->m_DMS.m_second_y;
+		if (abs(posyA - posyB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		{
+			continue;
+		}
+
+		//if (m_warship->m_DMS.m_minute_x * 60.f + m_warship->m_DMS.m_seconds.x (*it)->m_DMS.m_minute_x + )
+
+		//position X on tactical scale
+		if (posxA < posxB)
+		{
+			xA = 0;
+			xB = 2;
+		}
+		else if (posxA > posxB)
+		{
+			xA = 2;
+			xB = 0;
+		}
+		else
+		{
+			xA = 1;
+			xB = 1;
+		}
+
+		//position Y on tactical scale
+		if (posyA < posyB)
+		{
+			yA = 0;
+			yB = 2;
+		}
+		else if (posyA > posyB)
+		{
+			yA = 2;
+			yB = 0;
+		}
+		else
+		{
+			yA = 1;
+			yB = 1;
+		}
+
+		//attack from behind? = start 1 step closer
+		if (m_warship->m_speed.x > 0 && (*it)->m_speed.x > 0)//going right
+		{
+			if (m_warship->m_speed.x > (*it)->m_speed.x)//ship A overspeeding ship B from behind
+			{
+				xB--;
+			}
+			else if (m_warship->m_speed.x < (*it)->m_speed.x)//ship B overspeeding ship A from behind
+			{
+				xA--;
+			}
+		}
+		else if (m_warship->m_speed.x < 0 && (*it)->m_speed.x < 0)//going left
+		{
+			if (m_warship->m_speed.x < (*it)->m_speed.x)//ship A overspeeding ship B from behind
+			{
+				xB++;
+			}
+			else if (m_warship->m_speed.x > (*it)->m_speed.x)//ship B overspeeding ship A from behind
+			{
+				xA++;
+			}
+		}
+		
+		if (m_warship->m_speed.y > 0 && (*it)->m_speed.y > 0)//going up
+		{
+			if (m_warship->m_speed.y > (*it)->m_speed.y)//ship A overspeeding ship B from behind
+			{
+				yB--;
+			}
+			else if (m_warship->m_speed.y < (*it)->m_speed.y)//ship B overspeeding ship A from behind
+			{
+				yA--;
+			}
+		}
+		else if (m_warship->m_speed.y < 0 && (*it)->m_speed.y < 0)//going down
+		{
+			if (m_warship->m_speed.y < (*it)->m_speed.y)//ship A overspeeding ship B from behind
+			{
+				yB++;
+			}
+			else if (m_warship->m_speed.y >(*it)->m_speed.y)//ship B overspeeding ship A from behind
+			{
+				yA++;
+			}
+		}
+
+		m_tactical_ships.push_back(*it);
+		m_scale = Scale_Tactical;
+	}
+
+	return (m_scale == Scale_Tactical);
 }

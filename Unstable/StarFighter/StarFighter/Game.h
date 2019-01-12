@@ -17,6 +17,7 @@ using namespace sf;
 class GameEntity;//forward declaration
 class RoomTile;
 class WaterZone;
+class WaterTile;
 class Ship;
 class Ammo;
 
@@ -104,6 +105,7 @@ public:
 
 	vector<RoomTile*> m_tiles;
 	vector<vector<WaterZone*> > m_waterzones;
+	vector<vector<WaterTile*> > m_tactical_tiles;
 	vector<Ammo*> m_bullets;
 
 private:

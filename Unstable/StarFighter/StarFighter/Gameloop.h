@@ -9,6 +9,12 @@
 
 #include "Warship.h"
 
+enum Scale
+{
+	Scale_Tactical,
+	Scale_Strategic,
+};
+
 class Gameloop
 {
 public:
@@ -23,10 +29,14 @@ public:
 	GameEntity* m_background;
 	Warship* m_warship;
 	Island* m_island;
-	Ship* m_enemy;
+	vector<Ship*> m_ships;
+	vector<Ship*> m_tactical_ships;
+	Scale m_scale;
 
 	void InitWaterZones();
 	void CleanOldBullets();
+
+	bool UpdateTacticalScale();
 
 private:
 	sf::RenderWindow* mainWindow;
