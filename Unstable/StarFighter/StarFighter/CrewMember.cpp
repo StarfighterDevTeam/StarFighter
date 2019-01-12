@@ -61,19 +61,6 @@ CrewMember::~CrewMember()
 	
 }
 
-RoomTile* CrewMember::GetFreeRoomTile(Room* room)
-{
-	for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
-	{
-		if ((*it)->m_crew == NULL || (*it)->m_crew == this)
-		{
-			return *it;
-		}
-	}
-
-	return NULL;
-}
-
 bool CrewMember::MoveToRoom(Room* room)
 {
 	if (room == m_tile->m_room)
@@ -303,4 +290,17 @@ void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 		
 		index++;
 	}
+}
+
+RoomTile* CrewMember::GetFreeRoomTile(Room* room)
+{
+	for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
+	{
+		if (((*it)->m_crew == NULL && (*it)->m_weapon == NULL) || (*it)->m_crew == this)
+		{
+			return *it;
+		}
+	}
+
+	return NULL;
 }

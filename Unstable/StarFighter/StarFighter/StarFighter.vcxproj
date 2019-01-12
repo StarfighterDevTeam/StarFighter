@@ -108,6 +108,7 @@
     <ClCompile Include="StarFighter.cpp" />
     <ClCompile Include="TextureLoader.h" />
     <ClCompile Include="WaterZone.cpp" />
+    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="StarFighter.h" />
     <ClInclude Include="TextUtils.h" />
     <ClInclude Include="WaterZone.h" />
+    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StarFighter.rc" />

@@ -1,8 +1,6 @@
 #ifndef SHIP_H_INCLUDED
 #define SHIP_H_INCLUDED
 
-#include "Game.h"
-
 #include "CrewMember.h"
 #include "WaterZone.h"
 #include "Island.h"
@@ -33,9 +31,10 @@ public:
 	void UpdateAnimation();
 	void GetAngleForSpeed(float& angle);
 
-	//vector<Room*> m_rooms;
-	//vector<RoomConnexion*> m_connexions;
-	//vector<CrewMember*> m_crew;
+	vector<Room*> m_rooms;
+	vector<RoomConnexion*> m_connexions;
+	vector<CrewMember*> m_crew;
+	vector<Weapon*> m_weapons;
 	
 	//int m_nb_crew[NB_CREW_TYPES];
 	//int m_nb_crew_working[NB_CREW_TYPES];
@@ -49,6 +48,11 @@ public:
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
+	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
+	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
+	Room* ConnectRooms();
+	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
+	Weapon* AddWeapon(Weapon* weapon, Room* room);
 
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 };

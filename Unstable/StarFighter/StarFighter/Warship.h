@@ -19,10 +19,6 @@ public:
 	Warship(DMS_Coord coord);
 	~Warship();
 
-	vector<Room*> m_rooms;
-	vector<RoomConnexion*> m_connexions;
-	vector<CrewMember*> m_crew;
-
 	float m_desired_angle;
 	float m_angle_speed;
 	struct Compass m_compass;
@@ -36,10 +32,6 @@ public:
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
 	void Update(Time deltaTime);
-	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
-	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
-	Room* ConnectRooms();
-	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	void UpdateCrewMembersCountPerRoom(Room* room);
 
 private:

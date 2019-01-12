@@ -2,8 +2,9 @@
 #define ROOM_H_INCLUDED
 
 #include "Game.h"
-
 #include "RoomTile.h"
+
+class Weapon;
 
 enum RoomType
 {

@@ -12,7 +12,6 @@ class CrewMember;
 #define CONNEXION_WIDTH			4.f
 #define CONNEXION_OPEN_LENGTH	4.f		
 
-
 class RoomConnexion : public GameEntity
 {
 public:
@@ -49,6 +48,7 @@ public:
 	int m_movement_cost;
 	int m_G_value;
 	RoomTile* m_parent;
+	Weapon* m_weapon;
 };
 
 #endif //ROOMTILE_H_INCLUDED

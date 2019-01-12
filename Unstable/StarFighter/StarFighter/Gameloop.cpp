@@ -14,8 +14,8 @@ Gameloop::Gameloop()
 
 	//PIRATES
 	InitWaterZones();
-	m_warship = new Warship(DMS_Coord{0, 12, 0, 0, 8, 0 });
-	m_enemy = new Ship(DMS_Coord{ 0, 15, 0, 0, 8, 0 }, Ship_Goellete);
+	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
+	m_enemy = new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete);
 }
 
 Gameloop::~Gameloop()
@@ -83,6 +83,12 @@ void Gameloop::Update(sf::Time deltaTime)
 		(*it)->Update(deltaTime);
 	}
 
+	//Weapons
+	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
+
 	//TEMP DEBUG: crew movement feedback
 	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 	{
@@ -145,12 +151,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					if (distance != 0.f)
 					{
 						ostringstream ss;
-						int dst = (int)distance;
-						if (dst < distance)//round up
-						{
-							dst++;
-						}
-						ss << dst;
+						ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
 						(*it2)->m_text.setString(ss.str());
 					}
 
@@ -238,6 +239,12 @@ void Gameloop::Draw()
 
 	//crew
 	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//weapons
+	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
