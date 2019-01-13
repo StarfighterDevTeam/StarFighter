@@ -12,12 +12,6 @@ class CrewMember;
 #define CONNEXION_WIDTH			4.f
 #define CONNEXION_OPEN_LENGTH	4.f		
 
-#define ROOMTILE_SIZE			32.f
-#define ROOMTILE_OFFSET_X		200.f
-#define ROOMTILE_OFFSET_Y		50.f
-
-#define ROOMS_RIGHT_CORNER_X	1000.f
-
 class RoomConnexion : public GameEntity
 {
 public:
@@ -31,7 +25,9 @@ public:
 	void SetLock(bool locked);
 };
 
-
+#define ROOMTILE_SIZE			32.f
+#define ROOMTILE_OFFSET_X		200.f
+#define ROOMTILE_OFFSET_Y		50.f
 
 class RoomTile : public GameEntity
 {

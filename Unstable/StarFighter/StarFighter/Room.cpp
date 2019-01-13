@@ -15,7 +15,7 @@ string dico_rooms[NB_ROOM_TYPES] = {
 	"Life boats",		//Room_Lifeboat,
 	"Ammo",				//Room_Ammo,
 	"Engine",			//Room_Engine,
-	"Prison",			//Room_Prison
+	"Mecha",			//Room_Mecha
 };
 
 Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type) : GameEntity(UI_Room)

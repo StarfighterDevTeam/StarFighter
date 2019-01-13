@@ -5,11 +5,6 @@
 #include "WaterZone.h"
 #include "Island.h"
 
-#define SHIP_TEXTURE_NAME				"2D/enemy_icon.png"
-#define SHIP_TACTICAL_TEXTURE_NAME		"2D/enemy_icon_tactical.png"
-#define WARSHIP_TEXTURE_NAME			"2D/warship_icon.png"
-#define WARSHIP_TACTICAL_TEXTURE_NAME	"2D/warship_icon_tactical.png"
-
 enum ShipType
 {
 	Ship_Goellete,
@@ -30,9 +25,7 @@ public:
 	bool m_can_be_seen;
 
 	void Update(Time deltaTime, DMS_Coord warship_DMS);
-	void Draw(sf::RenderTexture& screen);
-
-	void UpdatePositionOnMap(DMS_Coord warship_DMS);
+	void UpdatePosition(DMS_Coord warship_DMS);
 	bool SetDMSCoord(DMS_Coord coord);
 
 	void UpdateAnimation();
@@ -49,8 +42,9 @@ public:
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;
+	vector<WaterTile*> m_tiles_can_be_seen;
 	vector<WaterTile*> m_current_path;
-	Seaport* m_seaport;
+	Seaport* m_seaport;	
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
@@ -60,14 +54,8 @@ public:
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
 	bool FireWeapon(Weapon* weapon, Time deltaTime);
-	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
-	//tactical scale
-	float m_tactical_posx;
-	float m_tactical_posy;
-	GameEntity* m_tactical_icon;//link between tactical and strategic representation of the ship
-	
-	void UpdateTacticalPositionOnMap();
+	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 };
 
 #endif //SHIP_H_INCLUDED

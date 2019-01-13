@@ -23,9 +23,6 @@ public:
 	float m_angle_speed;
 	struct Compass m_compass;
 
-	vector<WaterTile*> m_tiles_can_be_seen;
-	vector<TacticalTile*> m_tactical_tiles_can_be_seen;
-
 	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
@@ -35,8 +32,6 @@ public:
 
 	void Update(Time deltaTime);
 	void UpdateCrewMembersCountPerRoom(Room* room);
-
-	bool CanViewTacticalTile(TacticalTile* tile);
 
 private:
 	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);

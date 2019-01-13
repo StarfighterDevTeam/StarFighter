@@ -7,14 +7,14 @@ Ship::Ship(DMS_Coord coord, ShipType type) : GameEntity(UI_EnemyShip)
 	m_type = type;
 	m_destination = NULL;
 	m_seaport = NULL;
-	m_tactical_icon = NULL;
 
 	//get on tile
 	SetDMSCoord(coord);
 
 	//shape for water tiles
-	sf::Texture* texture = TextureLoader::getInstance()->loadTexture(SHIP_TEXTURE_NAME, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
-	sf::Texture* texture2 = TextureLoader::getInstance()->loadTexture(SHIP_TACTICAL_TEXTURE_NAME, (int)TACTICALTILE_SIZE * 4, (int)TACTICALTILE_SIZE * 8);
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture("2D/enemy_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
 
 	setAnimation(texture, 1, 2);
 
@@ -53,8 +53,6 @@ Ship::~Ship()
 	{
 		delete *it;
 	}
-
-	delete m_tactical_icon;
 }
 
 WaterTile* Ship::GetWaterTileAtDMSCoord(DMS_Coord coord)
@@ -81,21 +79,10 @@ bool Ship::SetDMSCoord(DMS_Coord coord)
 	return true;
 }
 
-void Ship::UpdatePositionOnMap(DMS_Coord warship_DMS)
+void Ship::UpdatePosition(DMS_Coord warship_DMS)
 {
-	float diff_x = (m_DMS.m_minute_x + m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION) - (warship_DMS.m_minute_x + warship_DMS.m_second_x / NB_WATERTILE_SUBDIVISION);
-	float diff_y = (m_DMS.m_minute_y + m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION) - (warship_DMS.m_minute_y + warship_DMS.m_second_y / NB_WATERTILE_SUBDIVISION);
-
-	m_position.x = WARSHIP_MAP_OFFSET_X + WATERTILE_SIZE * diff_x;
-	m_position.y = WARSHIP_MAP_OFFSET_Y - WATERTILE_SIZE * diff_y;//from bottom to top
-
-	//tactical scale representation
-	if (m_tactical_icon != NULL)
-	{
-		m_tactical_icon->setPosition(m_position);
-		m_tactical_icon->setRotation(m_angle);
-		m_tactical_icon->setAnimationLine(m_currentAnimationIndex);
-	}
+	m_position.x = WATERTILE_OFFSET_X + WATERTILE_SIZE * (0.5f - (warship_DMS.m_minute_x + warship_DMS.m_second_x / 60) + NB_WATERTILE_VIEW_RANGE + (m_DMS.m_minute_x + m_DMS.m_second_x / 60));
+	m_position.y = WATERTILE_OFFSET_Y + WATERTILE_SIZE * (0.5f - (NB_WATERTILE_Y - warship_DMS.m_minute_y - warship_DMS.m_second_y / 60) + NB_WATERTILE_VIEW_RANGE + NB_WATERTILE_Y - (m_DMS.m_minute_y + m_DMS.m_second_y / 60));//from bottom to top
 
 	GameEntity::UpdatePosition();
 }
@@ -107,37 +94,8 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS)
 
 	m_can_be_seen = m_tile->m_can_be_seen;
 
-	//tactical scale representation
-	if (m_tactical_icon != NULL)
-	{
-		UpdateTacticalPositionOnMap();
-
-		m_tactical_icon->setPosition(m_position);
-		m_tactical_icon->setRotation(m_angle);
-		m_tactical_icon->setAnimationLine(m_currentAnimationIndex);
-	}
-	else
-	{
-		UpdatePositionOnMap(warship_DMS);
-	}
-	
+	UpdatePosition(warship_DMS);
 	UpdateAnimation();
-}
-
-void Ship::Draw(sf::RenderTexture& screen)
-{
-	if (m_tactical_icon == NULL)
-	{
-		GameEntity::Draw(screen);
-	}
-	else//tactical scale
-	{
-		screen.draw(m_shape_container);
-		screen.draw(m_shape);
-		screen.draw(m_text);
-		m_tactical_icon->Draw(screen);
-	}
-	
 }
 
 void Ship::UpdateAnimation()
@@ -415,13 +373,4 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime)
 {
 	return weapon->Fire(deltaTime, m_position, m_angle);
-}
-
-void Ship::UpdateTacticalPositionOnMap()
-{
-	float delta_pox_x = - NB_TACTILAL_TILES_VIEW_RANGE + m_tactical_posx;
-	float delta_pox_y = - NB_TACTILAL_TILES_VIEW_RANGE + m_tactical_posy;
-
-	m_position.x = WARSHIP_TACTICALMAP_OFFSET_X + TACTICALTILE_SIZE * (0.5f + delta_pox_x);
-	m_position.y = WARSHIP_TACTICALMAP_OFFSET_Y - TACTICALTILE_SIZE * (0.5f + delta_pox_y);
 }

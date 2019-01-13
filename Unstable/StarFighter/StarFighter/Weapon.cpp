@@ -9,7 +9,9 @@ Weapon::Weapon(WeaponType type) : GameEntity(UI_Weapon)
 	m_angle = m_bord == Babord ? 90.f : 270.f;
 
 	//shape for water tiles
-	sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/cannon_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	sf::Texture* texture = loader->loadTexture("2D/cannon_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
 
 	setAnimation(texture, 1, 2);
 
