@@ -5,6 +5,7 @@
 #include "GameEntity.h"
 #include "Room.h"
 #include "WaterZone.h"
+#include "FX.h"
 
 #define CANNONBALL_SIZE						16.f
 #define CANNONBALL_SPEED					800.f
@@ -27,6 +28,7 @@ class Ammo : public GameEntity
 {
 public:
 	Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, RoomTile* target_tile);
+	~Ammo();
 
 	AmmoType m_type;
 	ShootPhase m_phase;
@@ -37,10 +39,11 @@ public:
 	float m_ref_speed;
 	float m_distance_combat;
 	float m_warp_timer;
+	FX* m_FX_hit;
 
 	bool m_can_be_seen;
 
-	void Update(Time deltaTime, DMS_Coord warship_DMS);
+	void Update(Time deltaTime);
 };
 
 #endif //AMMO_H_INCLUDED

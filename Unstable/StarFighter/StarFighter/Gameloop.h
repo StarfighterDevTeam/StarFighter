@@ -35,6 +35,7 @@ public:
 
 	void InitWaterZones();
 	void CleanOldBullets();
+	void CleanOldFX();
 
 	bool UpdateTacticalScale();
 

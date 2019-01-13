@@ -92,6 +92,7 @@
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="Compass.cpp" />
     <ClCompile Include="CrewMember.cpp" />
+    <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="Compass.h" />
     <ClInclude Include="CrewMember.h" />
     <ClInclude Include="FileLoadUtils.h" />
+    <ClInclude Include="FX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="Globals.h" />

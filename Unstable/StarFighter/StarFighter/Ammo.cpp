@@ -10,6 +10,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 	m_distance_combat = distance_combat;
 	m_target_tile = target_tile;
 	m_phase = Shoot_Ougoing;
+	m_FX_hit = new FX();
 
 	m_ref_speed = CANNONBALL_SPEED;
 
@@ -30,7 +31,12 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 	m_position = position + sf::Vector2f(weapon_offset_x, weapon_offset_y);
 }
 
-void Ammo::Update(Time deltaTime, DMS_Coord warship_DMS)
+Ammo::~Ammo()
+{
+	delete m_FX_hit;
+}
+
+void Ammo::Update(Time deltaTime)
 {
 	//apply movement
 	m_position.x += m_speed.x * deltaTime.asSeconds();
@@ -68,8 +74,13 @@ void Ammo::Update(Time deltaTime, DMS_Coord warship_DMS)
 			//hitting target
 			if (abs(m_position.x - m_target_tile->m_position.x) < 16.f && abs(m_position.y - m_target_tile->m_position.y) < 16.f)
 			{
-				//boom
+				//"boom"
 				m_can_be_seen = false;
+
+				FX* FX_hit = m_FX_hit->Clone();
+				FX_hit->m_position = m_target_tile->m_position;
+				FX_hit->UpdatePosition();
+				(*CurrentGame).m_FX.push_back(FX_hit);
 			}
 
 			break;

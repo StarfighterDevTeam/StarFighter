@@ -172,7 +172,16 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		if ((*it)->m_can_be_seen == true)
 		{
-			(*it)->Update(deltaTime, m_warship->m_DMS);
+			(*it)->Update(deltaTime);
+		}
+	}
+
+	//FX
+	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
+	{
+		if ((*it)->m_can_be_seen == true)
+		{
+			(*it)->Update(deltaTime);
 		}
 	}
 
@@ -257,8 +266,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		m_warship->SetSailsToWaterTile(tile);
 	}
 
-	//Clean bullets that cannot be seen anymore
+	//Clean objects that are "dead" and won't be seen anymore
 	CleanOldBullets();
+	CleanOldFX();
 }
 
 void Gameloop::Draw()
@@ -384,6 +394,12 @@ void Gameloop::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
+	//FX
+	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
+	{
+		(*it)->FX::Draw((*CurrentGame).m_mainScreen);
+	}
+
 	//Display
 	(*CurrentGame).m_mainScreen.display();
 	sf::Sprite temp((*CurrentGame).m_mainScreen.getTexture());
@@ -412,6 +428,32 @@ void Gameloop::CleanOldBullets()
 		else
 		{
 			delete *it;
+		}
+	}
+}
+
+void Gameloop::CleanOldFX()
+{
+	vector<FX*> old_fx;
+
+	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
+	{
+		old_fx.push_back(*it);
+	}
+
+	(*CurrentGame).m_FX.clear();
+
+	for (vector<FX*>::iterator it = old_fx.begin(); it != old_fx.end(); it++)
+	{
+		bool cbs = (*it)->m_can_be_seen;
+		if ((*it)->m_can_be_seen)
+		{
+			(*CurrentGame).m_FX.push_back(*it);
+		}
+		else
+		{
+			printf("");
+			//delete *it;
 		}
 	}
 }

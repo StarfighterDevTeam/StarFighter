@@ -20,6 +20,7 @@ class WaterZone;
 class WaterTile;
 class Ship;
 class Ammo;
+class FX;
 
 enum SFX_Bank
 {
@@ -108,6 +109,7 @@ public:
 	vector<vector<WaterZone*> > m_waterzones;
 	vector<vector<WaterTile*> > m_tactical_tiles;
 	vector<Ammo*> m_bullets;
+	vector<FX*> m_FX;
 
 private:
 
