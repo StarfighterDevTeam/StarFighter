@@ -13,8 +13,6 @@
 
 #define COMPASS_MODE					false
 
-#define	TACTICAL_SPEED_FACTOR			1.f
-
 class Warship : public Ship
 {
 public:
