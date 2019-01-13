@@ -44,18 +44,21 @@ public:
 	WaterTile* m_destination;
 	vector<WaterTile*> m_tiles_can_be_seen;
 	vector<WaterTile*> m_current_path;
-	Seaport* m_seaport;	
+	Seaport* m_seaport;
+	bool m_is_minimized;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
-	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
+	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type, bool minimized = false);
+	Room* AddRoomMinimized(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
 	bool FireWeapon(Weapon* weapon, Time deltaTime);
-
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
+
+	void BuildShip(bool minimized);
 };
 
 #endif //SHIP_H_INCLUDED

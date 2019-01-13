@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open) : GameEntity(UI_Connexion)
+RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open, bool minimized) : GameEntity(UI_Connexion)
 {
 	m_tiles = tiles; 
 	m_open = open;
@@ -10,13 +10,15 @@ RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open) : Game
 	m_UI_type = UI_Connexion;
 	m_default_color = sf::Color::Green;
 
+	float size = minimized == false ? ROOMTILE_SIZE : ROOMTILE_MINI_SIZE;
+
 	if (tiles.first->m_coord_x == tiles.second->m_coord_x)//horizontal connexion = vertical door
 	{
-		m_size = sf::Vector2f(ROOMTILE_SIZE, CONNEXION_WIDTH);
+		m_size = sf::Vector2f(size, CONNEXION_WIDTH);
 	}
 	else//vertical connexion = horizontal door
 	{
-		m_size = sf::Vector2f(CONNEXION_WIDTH, ROOMTILE_SIZE);
+		m_size = sf::Vector2f(CONNEXION_WIDTH, size);
 	}
 
 	m_position = sf::Vector2f(0.5f * (tiles.first->m_position.x + tiles.second->m_position.x), 0.5f * (tiles.first->m_position.y + tiles.second->m_position.y));
@@ -50,14 +52,17 @@ void RoomConnexion::Update(Time deltaTime)
 	GameEntity::Update(deltaTime);
 }
 
-RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntity(sf::Vector2f(size, size), UI_None)
+RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimized) : GameEntity(sf::Vector2f(size, size), UI_None)
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
 	m_room = room;
 	m_crew = NULL;
 	m_weapon = NULL;
-	m_position = sf::Vector2f(ROOMTILE_OFFSET_X + coord_x * ROOMTILE_SIZE, ROOMTILE_OFFSET_Y + coord_y * ROOMTILE_SIZE);
+
+	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
+	float offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
+	m_position = sf::Vector2f(offset_x + coord_x * size, offset_y + coord_y * size);
 
 	//pathfinding
 	m_heuristic = 0;
@@ -85,13 +90,26 @@ RoomTile::~RoomTile()
 }
 
 
-RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y)
+RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized)
 {
-	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+	if (minimized == false)
 	{
-		if ((*it)->m_coord_x == coord_x && (*it)->m_coord_y == coord_y)
+		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 		{
-			return *it;
+			if ((*it)->m_coord_x == coord_x && (*it)->m_coord_y == coord_y)
+			{
+				return *it;
+			}
+		}
+	}
+	else
+	{
+		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_enemy_tiles.begin(); it != (*CurrentGame).m_enemy_tiles.end(); it++)
+		{
+			if ((*it)->m_coord_x == coord_x && (*it)->m_coord_y == coord_y)
+			{
+				return *it;
+			}
 		}
 	}
 

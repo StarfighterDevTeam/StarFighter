@@ -15,7 +15,7 @@ class CrewMember;
 class RoomConnexion : public GameEntity
 {
 public:
-	RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open);
+	RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open, bool minimized);
 	
 	pair<RoomTile*, RoomTile*> m_tiles;
 	bool m_open;
@@ -25,14 +25,18 @@ public:
 	void SetLock(bool locked);
 };
 
-#define ROOMTILE_SIZE			32.f
-#define ROOMTILE_OFFSET_X		200.f
-#define ROOMTILE_OFFSET_Y		50.f
+#define ROOMTILE_SIZE				32.f
+#define ROOMTILE_OFFSET_X			200.f
+#define ROOMTILE_OFFSET_Y			50.f
+
+#define ROOMTILE_MINI_SIZE			24.f
+#define ROOMTILE_MINI_OFFSET_X		1350.f
+#define ROOMTILE_MINI_OFFSET_Y		150.f
 
 class RoomTile : public GameEntity
 {
 public:
-	RoomTile(int coord_x, int coord_y, Room* room, float size = ROOMTILE_SIZE);
+	RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimized);
 	~RoomTile();
 
 	Room* m_room;
@@ -40,7 +44,7 @@ public:
 	int m_coord_x;
 	int m_coord_y;
 
-	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y);
+	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized);
 	bool IsConnectedToRoomTile(RoomTile* tile);
 
 	//pathfinding

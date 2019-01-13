@@ -67,6 +67,12 @@ DMS_Coord WaterTile::GetDMSCoord(sf::Vector2f position, DMS_Coord warship_DMS)
 	int minute_x = (int)f_minute_x;
 	int minute_y = (int)f_minute_y;
 
+	while (minute_y < 0)
+	{
+		minute_y--;
+
+	}
+
 	float second_x = (f_minute_x - minute_x) * NB_WATERTILE_SUBDIVISION;
 	float second_y = (f_minute_y - minute_y) * NB_WATERTILE_SUBDIVISION;
 

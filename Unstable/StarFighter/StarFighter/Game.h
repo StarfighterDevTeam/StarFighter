@@ -104,6 +104,7 @@ public:
 	GameEntity* m_play_ui;
 
 	vector<RoomTile*> m_tiles;
+	vector<RoomTile*> m_enemy_tiles;
 	vector<vector<WaterZone*> > m_waterzones;
 	vector<vector<WaterTile*> > m_tactical_tiles;
 	vector<Ammo*> m_bullets;

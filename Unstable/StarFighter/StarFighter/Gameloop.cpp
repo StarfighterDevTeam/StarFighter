@@ -73,7 +73,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	//change of scale?
 	UpdateTacticalScale();
 
-	//Interaction with rooms
+	//Rooms
 	for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
 	{
 		m_warship->UpdateCrewMembersCountPerRoom(*it);
@@ -96,6 +96,28 @@ void Gameloop::Update(sf::Time deltaTime)
 	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 	{
 		(*it)->Update(deltaTime);
+	}
+
+	//Enemy rooms
+	if (m_tactical_ships.empty() == false)
+	{
+		//Rooms
+		for (vector<Room*>::iterator it = m_tactical_ships.front()->m_rooms.begin(); it != m_tactical_ships.front()->m_rooms.end(); it++)
+		{
+			(*it)->Update(deltaTime);
+		}
+
+		//Rooms connexions
+		for (vector<RoomConnexion*>::iterator it = m_tactical_ships.front()->m_connexions.begin(); it != m_tactical_ships.front()->m_connexions.end(); it++)
+		{
+			(*it)->Update(deltaTime);
+		}
+
+		//Crew movement
+		for (vector<CrewMember*>::iterator it = m_tactical_ships.front()->m_crew.begin(); it != m_tactical_ships.front()->m_crew.end(); it++)
+		{
+			(*it)->Update(deltaTime);
+		}
 	}
 
 	//TEMP DEBUG: crew movement feedback
@@ -160,7 +182,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
 			//can be seen? no need to update other tiles because they won't be drawn anyway
-			if (m_warship->CanViewWaterTile(*it2))
+			if (m_warship->CanViewWaterTile(*it2) && m_scale == Scale_Strategic)
 			{
 				(*it2)->m_can_be_seen = true;
 				m_warship->m_tiles_can_be_seen.push_back(*it2);
@@ -262,59 +284,95 @@ void Gameloop::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
+	//weapons
+	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
+
 	//crew
 	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
-	//WATER PART
-
-	//water tiles
-	vector<Island*> islands;
-	for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
+	//enemy rooms
+	if (m_tactical_ships.empty() == false)
 	{
-		(*it)->Draw((*CurrentGame).m_mainScreen);
-		
-		if ((*it)->m_island != NULL)
+		//room tiles
+		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_enemy_tiles.begin(); it != (*CurrentGame).m_enemy_tiles.end(); it++)
 		{
-			islands.push_back((*it)->m_island);
+			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
-	}
 
-	//islands and ports
-	for (vector<Island*>::iterator it = islands.begin(); it != islands.end(); it++)
-	{
-		(*it)->Draw((*CurrentGame).m_mainScreen);
-
-		//seaport
-		if ((*it)->m_seaport != NULL && (*it)->m_seaport->m_tile->m_can_be_seen == true)
+		//rooms
+		for (vector<Room*>::iterator it = m_tactical_ships.front()->m_rooms.begin(); it != m_tactical_ships.front()->m_rooms.end(); it++)
 		{
-			(*it)->m_seaport->Draw((*CurrentGame).m_mainScreen);
+			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
-	}
 
-	//boat
-	m_warship->Draw((*CurrentGame).m_mainScreen);
+		//doors
+		for (vector<RoomConnexion*>::iterator it = m_tactical_ships.front()->m_connexions.begin(); it != m_tactical_ships.front()->m_connexions.end(); it++)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
 
-	//enemy
-	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
-	{
-		if ((*it)->m_can_be_seen == true)
+		//weapons
+		for (vector<Weapon*>::iterator it = m_tactical_ships.front()->m_weapons.begin(); it != m_tactical_ships.front()->m_weapons.end(); it++)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
+
+		//crew
+		for (vector<CrewMember*>::iterator it = m_tactical_ships.front()->m_crew.begin(); it != m_tactical_ships.front()->m_crew.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
 	}
-	
 
+	//WATER PART
+	//boat
+	if (m_scale == Scale_Strategic)
+	{
+		//water tiles
+		vector<Island*> islands;
+		for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+
+			if ((*it)->m_island != NULL)
+			{
+				islands.push_back((*it)->m_island);
+			}
+		}
+
+		//islands and ports
+		for (vector<Island*>::iterator it = islands.begin(); it != islands.end(); it++)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+
+			//seaport
+			if ((*it)->m_seaport != NULL && (*it)->m_seaport->m_tile->m_can_be_seen == true)
+			{
+				(*it)->m_seaport->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
+
+		//player boat
+		m_warship->Draw((*CurrentGame).m_mainScreen);
+
+		//enemy
+		for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+		{
+			if ((*it)->m_can_be_seen == true)
+			{
+				(*it)->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
+	}
+	
 	//Bullets
 	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
-	{
-		(*it)->Draw((*CurrentGame).m_mainScreen);
-	}
-
-	//weapons
-	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
@@ -469,6 +527,7 @@ bool Gameloop::UpdateTacticalScale()
 
 		m_tactical_ships.push_back(*it);
 		m_scale = Scale_Tactical;
+		break;
 	}
 
 	return (m_scale == Scale_Tactical);

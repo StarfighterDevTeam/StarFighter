@@ -7,7 +7,7 @@
 #include "WaterZone.h"
 
 #define CANNONBALL_SIZE			16.f
-#define CANNONBALL_SPEED		200.f
+#define CANNONBALL_SPEED		800.f
 
 enum MapView
 {

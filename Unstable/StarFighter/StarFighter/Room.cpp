@@ -18,7 +18,7 @@ string dico_rooms[NB_ROOM_TYPES] = {
 	"Mecha",			//Room_Mecha
 };
 
-Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type) : GameEntity(UI_Room)
+Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type, bool minimized) : GameEntity(UI_Room)
 {
 	m_upcorner_x = upcorner_x;
 	m_upcorner_y = upcorner_y;
@@ -28,18 +28,30 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	m_UI_type = UI_Room;
 	m_nb_crew_max = width * height / 4;
 
-	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
-	m_position.x = ROOMTILE_OFFSET_X + (-0.5f + upcorner_x + width * 0.5f) * ROOMTILE_SIZE;
-	m_position.y = ROOMTILE_OFFSET_Y + (-0.5f + upcorner_y + height * 0.5f) * ROOMTILE_SIZE;
+	float size = minimized == false ? ROOMTILE_SIZE : ROOMTILE_MINI_SIZE;
+	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
+	float offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
+
+	m_size = sf::Vector2f(size * width, size * height);
+	m_position.x = offset_x + (-0.5f + upcorner_x + width * 0.5f) * size;
+	m_position.y = offset_y + (-0.5f + upcorner_y + height * 0.5f) * size;
 
 	//create tiles
 	for (int y = upcorner_y; y < upcorner_y + height; y++)
 	{
 		for (int x = upcorner_x; x < upcorner_x + width; x++)
 		{
-			RoomTile* tile = new RoomTile(x, y, this);
-			(*CurrentGame).m_tiles.push_back(tile);
+			RoomTile* tile = new RoomTile(x, y, this, size, minimized);
 			m_tiles.push_back(tile);
+
+			if (minimized == false)
+			{
+				(*CurrentGame).m_tiles.push_back(tile);
+			}
+			else
+			{
+				(*CurrentGame).m_enemy_tiles.push_back(tile);
+			}
 		}
 	}
 

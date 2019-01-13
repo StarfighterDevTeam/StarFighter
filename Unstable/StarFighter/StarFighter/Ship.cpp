@@ -7,6 +7,7 @@ Ship::Ship(DMS_Coord coord, ShipType type) : GameEntity(UI_EnemyShip)
 	m_type = type;
 	m_destination = NULL;
 	m_seaport = NULL;
+	m_is_minimized = true;
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -20,16 +21,13 @@ Ship::Ship(DMS_Coord coord, ShipType type) : GameEntity(UI_EnemyShip)
 
 	m_can_be_seen = false;
 
-	//m_nb_crew[NB_CREW_TYPES];
-	//m_nb_crew_working[NB_CREW_TYPES];
-	//m_nb_crew_max;
-
-	//vector<Room*> m_rooms;
-	//vector<RoomConnexion*> m_connexions;
-	//vector<CrewMember*> m_crew;
-
 	m_speed = sf::Vector2f(0, 0);
 	m_angle = -90;
+
+	if (m_type == Ship_Goellete)
+	{
+		BuildShip(true);
+	}
 }
 
 Ship::~Ship()
@@ -149,13 +147,18 @@ void Ship::GetAngleForSpeed(float& angle)
 }
 
 
-Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
+Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type, bool minimized)
 {
-	Room* room = new Room(upcorner_x, upcorner_y, width, height, type);
+	Room* room = new Room(upcorner_x, upcorner_y, width, height, type, minimized);
 
 	m_rooms.push_back(room);
 
 	return room;
+}
+
+Room* Ship::AddRoomMinimized(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
+{
+	return AddRoom(upcorner_x, upcorner_y, width, height, type, true);
 }
 
 CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
@@ -204,8 +207,8 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 		return false;
 	}
 
-	RoomTile* tileA = RoomTile::GetRoomTileAtCoord(tileA_x, tileA_y);
-	RoomTile* tileB = RoomTile::GetRoomTileAtCoord(tileB_x, tileB_y);
+	RoomTile* tileA = RoomTile::GetRoomTileAtCoord(tileA_x, tileA_y, m_is_minimized);
+	RoomTile* tileB = RoomTile::GetRoomTileAtCoord(tileB_x, tileB_y, m_is_minimized);
 
 	if (tileA == NULL || tileB == NULL || tileA->m_room == tileB->m_room)
 	{
@@ -225,7 +228,7 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 	}
 
 	//Create the connexion
-	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false);
+	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false, m_is_minimized);
 
 	m_connexions.push_back(connexion);
 	tileA->m_room->m_connexions.push_back(connexion);
@@ -373,4 +376,30 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime)
 {
 	return weapon->Fire(deltaTime, m_position, m_angle);
+}
+
+void Ship::BuildShip(bool minimized)
+{
+	//ROOMS
+	//left
+	AddRoomMinimized(0, 3, 4, 4, Room_Weapon);
+	AddRoomMinimized(0, 7, 4, 6, Room_Gold);
+	AddRoomMinimized(0, 13, 4, 6, Room_Relic);
+	AddRoomMinimized(0, 19, 4, 3, Room_Sword);
+
+	//mid
+	AddRoomMinimized(6, 0, 4, 3, Room_Weapon);
+	AddRoomMinimized(4, 3, 8, 6, Room_Navigation);
+	AddRoomMinimized(4, 9, 8, 10, Room_Crewquarter);
+	AddRoomMinimized(4, 19, 8, 3, Room_Ammo);
+	AddRoomMinimized(5, 22, 6, 3, Room_Engine);
+
+	//right
+	AddRoomMinimized(12, 3, 4, 4, Room_Weapon);
+	AddRoomMinimized(12, 7, 4, 6, Room_Fishing);
+	AddRoomMinimized(12, 13, 4, 6, Room_Kitchen);
+	AddRoomMinimized(12, 19, 4, 3, Room_Lifeboat);
+
+	//doors
+	ConnectRooms();
 }
