@@ -60,6 +60,8 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_crew = NULL;
 	m_weapon = NULL;
 	m_connexion = NULL;
+	m_hull = Hull_None;
+	m_pierced = false;
 
 	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
 	float offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
@@ -115,4 +117,16 @@ RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized)
 	}
 
 	return NULL;
+}
+
+bool RoomTile::Pierce()
+{
+	if (m_pierced == true)
+	{
+		return false;
+	}
+
+	m_pierced = true;
+
+	return true;
 }

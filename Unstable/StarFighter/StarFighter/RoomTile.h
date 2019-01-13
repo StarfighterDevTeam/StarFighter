@@ -33,6 +33,15 @@ public:
 #define ROOMTILE_MINI_OFFSET_X		1550.f
 #define ROOMTILE_MINI_OFFSET_Y		500.f
 
+enum Hull
+{
+	Hull_None,
+	Hull_Left,
+	Hull_Right,
+	Hull_Up,
+	Hull_Down,
+};
+
 class RoomTile : public GameEntity
 {
 public:
@@ -44,9 +53,13 @@ public:
 	int m_coord_x;
 	int m_coord_y;
 	RoomConnexion* m_connexion;
+	Hull m_hull;
+	bool m_pierced;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized);
 	bool IsConnectedToRoomTile(RoomTile* tile);
+
+	bool Pierce();
 
 	//pathfinding
 	int m_heuristic;

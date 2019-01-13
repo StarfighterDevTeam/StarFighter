@@ -368,7 +368,58 @@ Room* Ship::ConnectRooms()
 		}
 	}
 
-	//everything ok
+	//flag hull (i.e. tiles that are the exterior border of the ship)
+	vector<vector<RoomTile*> > hull_tiles;
+	for (int i = 0; i < m_rooms_size.x; i++)
+	{
+		vector<RoomTile*> vec;
+		for (int j = 0; j < m_rooms_size.y; j++)
+		{
+			RoomTile* tile = NULL;
+			vec.push_back(tile);
+		}
+		hull_tiles.push_back(vec);
+	}
+
+	//fill all room tiles in an array with NULL pointer for holes
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			hull_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
+		}
+	}
+
+	//look out for room tiles adjacent to holes
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			(*it2)->m_hull = Hull_None;
+
+			int x = (*it2)->m_coord_x;
+			int y = (*it2)->m_coord_y;
+
+			if (x == 0 || hull_tiles[x - 1][y] == NULL)
+			{
+				(*it2)->m_hull = Hull_Left;
+			}
+			if (x == m_rooms_size.x - 1 || hull_tiles[x + 1][y] == NULL)
+			{
+				(*it2)->m_hull = Hull_Right;
+			}
+			if (y == 0 || hull_tiles[x][y - 1] == NULL)
+			{
+				(*it2)->m_hull = Hull_Up;
+			}
+			if (y == m_rooms_size.y - 1 || hull_tiles[x][y + 1] == NULL)
+			{
+				(*it2)->m_hull = Hull_Down;
+			}
+		}
+	}
+
+	//everything ok if this pointer is still NULL. Otherwise, it points out to the unlinked room
 	return unconnected_room;
 }
 

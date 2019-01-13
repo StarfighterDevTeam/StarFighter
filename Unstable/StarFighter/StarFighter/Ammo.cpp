@@ -88,7 +88,10 @@ void Ammo::Update(Time deltaTime)
 				}
 
 				//piercing hull?
-				
+				if (m_target_tile->m_hull != Hull_None)
+				{
+					m_target_tile->Pierce();
+				}
 			}
 
 			break;
