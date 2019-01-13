@@ -10,7 +10,7 @@ class WaterZone;
 class Island;
 class Seaport;
 
-#define WARSHIP_MAP_OFFSET_X						1500.f
+#define WARSHIP_MAP_OFFSET_X						1300.f
 #define WARSHIP_MAP_OFFSET_Y						550.f
 #define WATERTILE_SIZE								64.f
 #define NB_WATERTILE_X								60
