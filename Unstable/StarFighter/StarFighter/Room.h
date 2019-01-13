@@ -20,7 +20,7 @@ enum RoomType
 	Room_Lifeboat,
 	Room_Ammo,
 	Room_Engine,
-	Room_Mecha,
+	Room_Prison,
 	NB_ROOM_TYPES,
 };
 

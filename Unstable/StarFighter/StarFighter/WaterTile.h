@@ -10,16 +10,21 @@ class WaterZone;
 class Island;
 class Seaport;
 
+#define WARSHIP_MAP_OFFSET_X						1500.f
+#define WARSHIP_MAP_OFFSET_Y						550.f
 #define WATERTILE_SIZE								64.f
-#define WATERTILE_OFFSET_X							1100.f
-#define WATERTILE_OFFSET_Y							100.f
 #define NB_WATERTILE_X								60
 #define NB_WATERTILE_Y								60
 #define NB_WATERTILE_SUBDIVISION					60
 #define NB_WATERTILE_VIEW_RANGE						5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
 
-#define TACTICAL_RANGE								2 // recommanded not-odd number for finding easy middle-ground of the tactical map (size divided by 2)
-#define NB_TACTICALTILES_FOR_ADJACENT_WATERTILE		3
+#define WARSHIP_TACTICALMAP_OFFSET_X				1300.f
+#define WARSHIP_TACTICALMAP_OFFSET_Y				550.f
+#define RANGE_FOR_TACTICAL_COMBAT					2 // recommanded not-odd number for finding easy middle-ground of the tactical map (size divided by 2).
+#define NB_TACTICALTILE_SUBDIVISION					10
+#define TACTICALTILE_SIZE							32.f
+#define NB_TACTILAL_TILES_VIEW_RANGE				15 // in tactical tiles
+#define NB_TACTICALTILES_FOR_ADJACENT_WATERTILE		1
 
 struct DMS_Coord
 {
@@ -66,7 +71,7 @@ public:
 	DMS_Coord m_DMS;//degree/min/sec
 	bool m_can_be_seen;
 
-	void UpdatePosition(DMS_Coord warship_DMS);
+	void UpdatePositionOnMap(DMS_Coord warship_DMS);
 	static DMS_Coord GetDMSCoord(sf::Vector2f position, DMS_Coord warship_DMS);
 
 	//pathfinding
@@ -77,6 +82,17 @@ public:
 
 	Island* m_island;
 	Seaport* m_seaport;
+};
+
+class TacticalTile : public WaterTile
+{
+public:
+	TacticalTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zone, int zone_coord_x, int zone_coord_y, float size = TACTICALTILE_SIZE);
+
+	void UpdateTacticalPositionOnMap();
+
+	float m_tactical_posx;
+	float m_tactical_posy;
 };
 
 #endif //WATERTILE_H_INCLUDED

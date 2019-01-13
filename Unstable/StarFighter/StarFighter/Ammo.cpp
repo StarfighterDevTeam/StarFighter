@@ -14,9 +14,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, MapView view) : Ga
 	m_can_be_seen = true;
 
 	//shape for water tiles
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/cannonball.png", (int)CANNONBALL_SIZE, (int)CANNONBALL_SIZE);
+	sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/cannonball.png", (int)CANNONBALL_SIZE, (int)CANNONBALL_SIZE);
 
 	setAnimation(texture, 1, 1);
 
@@ -52,7 +50,7 @@ void Ammo::Update(Time deltaTime, DMS_Coord warship_DMS)
 	}
 	else if (m_view == Map_Rooms)
 	{
-		if (m_position.x + m_size.x * 0.5f >= WATERTILE_OFFSET_X || m_position.x < -m_size.x * 0.5f || m_position.y < -m_size.y * 0.5f || m_position.y + m_size.y * 0.5f >(*CurrentGame).m_screen_size.y)
+		if (m_position.x + m_size.x * 0.5f >= ROOMS_RIGHT_CORNER_X || m_position.x < -m_size.x * 0.5f || m_position.y < -m_size.y * 0.5f || m_position.y + m_size.y * 0.5f >(*CurrentGame).m_screen_size.y)
 		{
 			m_can_be_seen = false;
 		}

@@ -9,13 +9,12 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship)
 	m_angle_speed = ANGLE_SPEED;
 	m_destination = NULL;
 	m_seaport = NULL;
-	m_position.x = WATERTILE_OFFSET_X - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
-	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
+	m_position.x = WARSHIP_MAP_OFFSET_X;
+	m_position.y = WARSHIP_MAP_OFFSET_Y;
 
 	//shape for water tiles
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/warship_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
+	sf::Texture* texture = TextureLoader::getInstance()->loadTexture(WARSHIP_TEXTURE_NAME, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
+	sf::Texture* texture2 = TextureLoader::getInstance()->loadTexture(WARSHIP_TACTICAL_TEXTURE_NAME, (int)TACTICALTILE_SIZE * 4, (int)TACTICALTILE_SIZE * 8);
 
 	setAnimation(texture, 1, 2);
 
@@ -118,7 +117,7 @@ void Warship::Update(Time deltaTime)
 		if (GetDistanceSquaredInSecondsDMS(waypoint) < 1.f)
 		{
 			m_DMS = waypoint->m_DMS;//snap boat to position
-			waypoint->UpdatePosition(m_DMS);//snap tile to boat 
+			waypoint->UpdatePositionOnMap(m_DMS);//snap tile to boat 
 			m_current_path.pop_back();
 
 			//arrived at final destination
@@ -131,7 +130,7 @@ void Warship::Update(Time deltaTime)
 			else
 			{
 				waypoint = m_current_path.back();
-				waypoint->UpdatePosition(m_DMS);//update waypoint position (because of the previous snap)
+				waypoint->UpdatePositionOnMap(m_DMS);//update waypoint position (because of the previous snap)
 				sf::Vector2f vec = waypoint->m_position - m_position;
 				ScaleVector(&vec, CRUISE_SPEED);
 				m_speed = vec;
@@ -191,6 +190,16 @@ void Warship::Update(Time deltaTime)
 
 	//Compass UI update
 	m_compass.Update(deltaTime, m_angle, m_desired_angle);
+
+	//tactical scale representation
+	if (m_tactical_icon != NULL)
+	{
+		UpdateTacticalPositionOnMap();
+
+		m_tactical_icon->setPosition(m_position);
+		m_tactical_icon->setRotation(m_angle);
+		m_tactical_icon->setAnimationLine(m_currentAnimationIndex);
+	}
 
 	GameEntity::Update(deltaTime);
 }
@@ -822,4 +831,21 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 	}
 
 	return false;
+}
+
+bool Warship::CanViewTacticalTile(TacticalTile* tile)
+{
+	int diff_x = tile->m_tactical_posx - m_tactical_posx;
+	int diff_y = tile->m_tactical_posy - m_tactical_posy;
+
+	return true;
+
+	//if (abs(diff_x) <= NB_TACTILAL_TILES_VIEW_RANGE && abs(diff_y) <= NB_TACTILAL_TILES_VIEW_RANGE)
+	//{
+	//	return true;
+	//}
+	//else
+	//{
+	//	return false;
+	//}
 }
