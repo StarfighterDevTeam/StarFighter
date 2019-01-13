@@ -76,11 +76,19 @@ void Ammo::Update(Time deltaTime)
 			{
 				//"boom"
 				m_can_be_seen = false;
-
 				FX* FX_hit = m_FX_hit->Clone();
 				FX_hit->m_position = m_target_tile->m_position;
 				FX_hit->UpdatePosition();
 				(*CurrentGame).m_FX.push_back(FX_hit);
+
+				//damaging a door?
+				if (m_target_tile->m_connexion != NULL)
+				{
+					m_target_tile->m_connexion->SetLock(true);
+				}
+
+				//piercing hull?
+				
 			}
 
 			break;

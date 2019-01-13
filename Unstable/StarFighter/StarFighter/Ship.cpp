@@ -259,6 +259,9 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 	tileA->m_room->m_connexions.push_back(connexion);
 	tileB->m_room->m_connexions.push_back(connexion);
 
+	tileA->m_connexion = connexion;
+	tileB->m_connexion = connexion;
+
 	return true;
 }
 
@@ -270,6 +273,11 @@ Room* Ship::ConnectRooms()
 
 	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
+		for (vector<RoomTile*>::iterator it3 = (*it)->m_tiles.begin(); it3 != (*it)->m_tiles.end(); it3++)
+		{
+			(*it3)->m_connexion = NULL;
+		}
+
 		bool found = false;
 		for (vector<Room*>::iterator it2 = m_rooms.begin(); it2 != m_rooms.end(); it2++)
 		{

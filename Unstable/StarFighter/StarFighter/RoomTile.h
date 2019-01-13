@@ -43,6 +43,7 @@ public:
 	CrewMember* m_crew;
 	int m_coord_x;
 	int m_coord_y;
+	RoomConnexion* m_connexion;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized);
 	bool IsConnectedToRoomTile(RoomTile* tile);
