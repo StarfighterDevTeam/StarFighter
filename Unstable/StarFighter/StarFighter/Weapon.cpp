@@ -51,15 +51,11 @@ RoomTile* Weapon::GetFreeRoomTile(Room* room)
 	return NULL;
 }
 
-bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat)
+bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat, RoomTile* target_tile)
 {
 	//Fire from room tile
-	Ammo* new_ammo = new Ammo(Ammo_CannonBall, m_position, m_angle, distance_combat);
+	Ammo* new_ammo = new Ammo(Ammo_CannonBall, m_position, m_angle, distance_combat, target_tile);
 	(*CurrentGame).m_bullets.push_back(new_ammo);
-
-	//Fire from water tile
-	//Ammo* new_ammo2 = new Ammo(Ammo_CannonBall, ship_position, m_angle + ship_angle, Map_Water);
-	//(*CurrentGame).m_bullets.push_back(new_ammo2);
 
 	return true;
 }

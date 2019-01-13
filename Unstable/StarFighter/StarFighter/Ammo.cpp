@@ -2,12 +2,13 @@
 
 extern Game* CurrentGame;
 
-Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat) : GameEntity(UI_None)
+Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, RoomTile* target_tile) : GameEntity(UI_None)
 {
 	m_type = type;
 	m_angle = angle;
 	setRotation(angle);
 	m_distance_combat = distance_combat;
+	m_target_tile = target_tile;
 	m_phase = Shoot_Ougoing;
 
 	m_ref_speed = CANNONBALL_SPEED;
@@ -57,42 +58,23 @@ void Ammo::Update(Time deltaTime, DMS_Coord warship_DMS)
 			{
 				m_phase = Shoot_Incoming;
 
-				m_position.x = ROOMTILE_MINI_OFFSET_X;
+				m_position.x = m_target_tile->m_position.x;// ROOMTILE_MINI_OFFSET_X;
 				m_position.y = (*CurrentGame).m_screen_size.y + m_size.y * 0.5f;
 			}
 			break;
 		}
 		case Shoot_Incoming:
 		{
+			//hitting target
+			if (abs(m_position.x - m_target_tile->m_position.x) < 16.f && abs(m_position.y - m_target_tile->m_position.y) < 16.f)
+			{
+				//boom
+				m_can_be_seen = false;
+			}
+
 			break;
 		}
 	}
-
-	//out of sight? = destroy it.
-	/*
-	if (m_view == Map_Water)
-	{
-		DMS_Coord coord = WaterTile::GetDMSCoord(m_position, warship_DMS);
-		if (coord.m_minute_x > 0 && m_speed.x < 0)//going left? check one "minute" further if possible
-		{
-			coord.m_minute_x++;
-		}
-		if (coord.m_minute_y > 0 && m_speed.y > 0)//going down? check one "minute" further if possible
-		{
-			coord.m_minute_y++;
-		}
-
-		WaterTile* tile = (*CurrentGame).m_waterzones[coord.m_degree_x][coord.m_degree_y]->m_watertiles[coord.m_minute_x][coord.m_minute_y];
-		m_can_be_seen = tile->m_can_be_seen;
-	}
-	else if (m_view == Map_Rooms)
-	{
-		if (m_position.x + m_size.x * 0.5f >= WATERTILE_OFFSET_X || m_position.x < -m_size.x * 0.5f || m_position.y < -m_size.y * 0.5f || m_position.y + m_size.y * 0.5f >(*CurrentGame).m_screen_size.y)
-		{
-			m_can_be_seen = false;
-		}
-	}
-	*/
 
 	GameEntity::Update(deltaTime);
 }

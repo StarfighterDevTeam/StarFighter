@@ -398,9 +398,19 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 	return weapon;
 }
 
-bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, float distance_combat)
+bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 {
-	return weapon->Fire(deltaTime, m_position, m_angle, distance_combat);
+	if (0)//chance of miss
+	{
+		return false;
+	}
+
+	int r = RandomizeIntBetweenValues(0, target->m_rooms.size() - 1);
+	Room* target_room = target->m_rooms[r];
+	int t = RandomizeIntBetweenValues(0, target->m_rooms[r]->m_tiles.size() - 1);
+	RoomTile* target_tile = target->m_rooms[r]->m_tiles[t];
+	
+	return weapon->Fire(deltaTime, m_position, m_angle, target->m_distance_combat, target_tile);
 }
 
 void Ship::BuildShip(bool minimized)

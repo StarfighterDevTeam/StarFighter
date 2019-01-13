@@ -60,7 +60,7 @@ public:
 	Room* ConnectRooms();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
-	bool FireWeapon(Weapon* weapon, Time deltaTime, float distance_combat);
+	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
 	void BuildShip(bool minimized);

@@ -163,7 +163,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
 		{
 			Weapon* weapon = (Weapon*)hovered;
-			m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship->m_distance_combat);
+			m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
 		}
 	}
 
@@ -408,6 +408,10 @@ void Gameloop::CleanOldBullets()
 		if ((*it)->m_can_be_seen == true)
 		{
 			(*CurrentGame).m_bullets.push_back(*it);
+		}
+		else
+		{
+			delete *it;
 		}
 	}
 }
