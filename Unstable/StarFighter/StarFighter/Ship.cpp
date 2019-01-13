@@ -443,17 +443,38 @@ void Ship::CenterRoomPositions(bool minimized)
 	room_offset_x -= 1.f * m_rooms_size.x / 2 * size;
 	room_offset_y -= 1.f * m_rooms_size.y / 2 * size;
 
+	//enemy (minimized) = flip the ship (180°)
+
 	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
-		(*it)->m_position.x = room_offset_x + ((*it)->m_upcorner_x + (*it)->m_width * 0.5f) * size;
-		(*it)->m_position.y = room_offset_y + ((*it)->m_upcorner_y + (*it)->m_height * 0.5f) * size;
+		if (minimized == false)
+		{
+			(*it)->m_position.x = room_offset_x + ((*it)->m_upcorner_x + (*it)->m_width * 0.5f) * size;
+			(*it)->m_position.y = room_offset_y + ((*it)->m_upcorner_y + (*it)->m_height * 0.5f) * size;
+		}
+		else
+		{
+			(*it)->m_position.x = room_offset_x + (m_rooms_size.x - ((*it)->m_upcorner_x + (*it)->m_width * 0.5f)) * size;
+			(*it)->m_position.y = room_offset_y + (m_rooms_size.y - ((*it)->m_upcorner_y + (*it)->m_height * 0.5f)) * size;
+		}
+		
 
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
 			int upcorner = (*it)->m_upcorner_x;
 			int coord = (*it2)->m_coord_x;
-			(*it2)->m_position.x = room_offset_x + (0.5f + (*it2)->m_coord_x) * size;
-			(*it2)->m_position.y = room_offset_y + (0.5f + (*it2)->m_coord_y) * size;
+
+			if (minimized == false)
+			{
+				(*it2)->m_position.x = room_offset_x + (0.5f + (*it2)->m_coord_x) * size;
+				(*it2)->m_position.y = room_offset_y + (0.5f + (*it2)->m_coord_y) * size;
+			}
+			else
+			{
+				(*it2)->m_position.x = room_offset_x + (- 0.5f + m_rooms_size.x - (*it2)->m_coord_x) * size;
+				(*it2)->m_position.y = room_offset_y + (- 0.5f + m_rooms_size.y - (*it2)->m_coord_y) * size;
+			}
+			
 			(*it2)->UpdatePosition();
 		}
 	}

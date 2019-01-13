@@ -5,7 +5,7 @@
 #include "WaterZone.h"
 #include "Island.h"
 
-#define DISTANCE_COMBAT_INIT			400.f
+#define DISTANCE_COMBAT_INIT			800.f
 
 enum ShipType
 {
