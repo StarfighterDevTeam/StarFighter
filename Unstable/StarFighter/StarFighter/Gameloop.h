@@ -30,7 +30,7 @@ public:
 	Warship* m_warship;
 	Island* m_island;
 	vector<Ship*> m_ships;
-	vector<Ship*> m_tactical_ships;
+	Ship* m_tactical_ship;
 	Scale m_scale;
 
 	void InitWaterZones();

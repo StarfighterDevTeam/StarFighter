@@ -16,6 +16,7 @@ Gameloop::Gameloop()
 	InitWaterZones();
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete));
+	m_tactical_ship = NULL;
 
 	m_scale = Scale_Strategic;
 }
@@ -99,22 +100,22 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//Enemy rooms
-	if (m_tactical_ships.empty() == false)
+	if (m_tactical_ship != NULL)
 	{
 		//Rooms
-		for (vector<Room*>::iterator it = m_tactical_ships.front()->m_rooms.begin(); it != m_tactical_ships.front()->m_rooms.end(); it++)
+		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
 		{
 			(*it)->Update(deltaTime);
 		}
 
 		//Rooms connexions
-		for (vector<RoomConnexion*>::iterator it = m_tactical_ships.front()->m_connexions.begin(); it != m_tactical_ships.front()->m_connexions.end(); it++)
+		for (vector<RoomConnexion*>::iterator it = m_tactical_ship->m_connexions.begin(); it != m_tactical_ship->m_connexions.end(); it++)
 		{
 			(*it)->Update(deltaTime);
 		}
 
 		//Crew movement
-		for (vector<CrewMember*>::iterator it = m_tactical_ships.front()->m_crew.begin(); it != m_tactical_ships.front()->m_crew.end(); it++)
+		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
 		{
 			(*it)->Update(deltaTime);
 		}
@@ -297,7 +298,7 @@ void Gameloop::Draw()
 	}
 
 	//enemy rooms
-	if (m_tactical_ships.empty() == false)
+	if (m_tactical_ship != NULL)
 	{
 		//room tiles
 		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_enemy_tiles.begin(); it != (*CurrentGame).m_enemy_tiles.end(); it++)
@@ -306,25 +307,25 @@ void Gameloop::Draw()
 		}
 
 		//rooms
-		for (vector<Room*>::iterator it = m_tactical_ships.front()->m_rooms.begin(); it != m_tactical_ships.front()->m_rooms.end(); it++)
+		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
 
 		//doors
-		for (vector<RoomConnexion*>::iterator it = m_tactical_ships.front()->m_connexions.begin(); it != m_tactical_ships.front()->m_connexions.end(); it++)
+		for (vector<RoomConnexion*>::iterator it = m_tactical_ship->m_connexions.begin(); it != m_tactical_ship->m_connexions.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
 
 		//weapons
-		for (vector<Weapon*>::iterator it = m_tactical_ships.front()->m_weapons.begin(); it != m_tactical_ships.front()->m_weapons.end(); it++)
+		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
 
 		//crew
-		for (vector<CrewMember*>::iterator it = m_tactical_ships.front()->m_crew.begin(); it != m_tactical_ships.front()->m_crew.end(); it++)
+		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
@@ -412,6 +413,13 @@ bool Gameloop::UpdateTacticalScale()
 {
 	if (m_scale == Scale_Tactical)
 	{
+		//todo: exit conditions
+		if (0)
+		{
+			m_tactical_ship = NULL;
+			m_scale = Scale_Strategic;
+		}
+
 		return true;
 	}
 
@@ -525,8 +533,12 @@ bool Gameloop::UpdateTacticalScale()
 			}
 		}
 
-		m_tactical_ships.push_back(*it);
+		m_tactical_ship = *it;
 		m_scale = Scale_Tactical;
+
+		//todo: stop ship and cancel destination on strategic scale
+
+
 		break;
 	}
 
