@@ -81,10 +81,6 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//UPDATING GAME ENTITIES
-
-	//change of scale?
-	UpdateTacticalScale();
-
 	//Interaction with rooms
 	for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
 	{
@@ -286,6 +282,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		m_warship->SetSailsToWaterTile(tile);
 	}
 
+	//change of scale?
+	UpdateTacticalScale();
+
 	//Clean bullets that cannot be seen anymore
 	CleanOldBullets();
 }
@@ -384,9 +383,6 @@ void Gameloop::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
-	//compass
-	m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
-
 	//Display
 	(*CurrentGame).m_mainScreen.display();
 	sf::Sprite temp((*CurrentGame).m_mainScreen.getTexture());
@@ -436,10 +432,8 @@ bool Gameloop::UpdateTacticalScale()
 		return true;
 	}
 
-	int xA = 0;
-	int yA = 0;
-	int xB = 0;
-	int yB = 0;
+	int xA, xB, yA, yB;
+	float speedxA, speedxB, speedyA, speedyB;
 
 	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 	{
@@ -468,16 +462,22 @@ bool Gameloop::UpdateTacticalScale()
 		{
 			xA = 0;
 			xB = RANGE_FOR_TACTICAL_COMBAT;
+			speedxA = TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
+			speedxB = - TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
 		}
 		else if (posxA > posxB)
 		{
 			xA = RANGE_FOR_TACTICAL_COMBAT;
 			xB = 0;
+			speedxA = - TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
+			speedxB = TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
 		}
 		else
 		{
 			xA = RANGE_FOR_TACTICAL_COMBAT / 2;
 			xB = RANGE_FOR_TACTICAL_COMBAT / 2;
+			speedxA = 0.f;
+			speedxB = 0.f;
 		}
 
 		//position Y on tactical scale
@@ -485,16 +485,22 @@ bool Gameloop::UpdateTacticalScale()
 		{
 			yA = 0;
 			yB = RANGE_FOR_TACTICAL_COMBAT;
+			speedyA = TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
+			speedyB = -TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
 		}
 		else if (posyA > posyB)
 		{
 			yA = RANGE_FOR_TACTICAL_COMBAT;
 			yB = 0;
+			speedyA = - TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
+			speedyB = TACTICAL_SPEED_FACTOR * CRUISE_SPEED;
 		}
 		else
 		{
 			yA = RANGE_FOR_TACTICAL_COMBAT / 2;
 			yB = RANGE_FOR_TACTICAL_COMBAT / 2;
+			speedyA = 0;
+			speedyB = 0;
 		}
 
 		//attack from behind? = start 1 step closer
@@ -545,11 +551,17 @@ bool Gameloop::UpdateTacticalScale()
 		}
 
 		//initial position on tactical map
-		m_warship->m_tactical_posx = (xA + 0.5f) * NB_TACTICALTILE_SUBDIVISION;
-		m_warship->m_tactical_posy = (yA + 0.5f) * NB_TACTICALTILE_SUBDIVISION;
+		if (m_tactical_ships.empty() == true)
+		{
+			m_warship->m_tactical_posx = (xA + 0.5f) * NB_TACTICALTILE_SUBDIVISION;
+			m_warship->m_tactical_posy = (yA + 0.5f) * NB_TACTICALTILE_SUBDIVISION;
+			m_warship->m_speed = sf::Vector2f(speedxA, speedyA);
+		}
+		
 
 		(*it)->m_tactical_posx = (xB + 0.5f) * NB_TACTICALTILE_SUBDIVISION;
 		(*it)->m_tactical_posy = (yB + 0.5f) * NB_TACTICALTILE_SUBDIVISION;
+		(*it)->m_speed = sf::Vector2f(speedxB, speedyB);
 
 		//set tactical scale
 		(*it)->m_tactical_icon = new GameEntity(sf::Vector2f(128, 128), UI_EnemyShip);
@@ -562,9 +574,15 @@ bool Gameloop::UpdateTacticalScale()
 	//Build tactical map
 	if (m_scale == Scale_Tactical)
 	{
+		//init warship
 		m_warship->m_tactical_icon = new GameEntity(sf::Vector2f(128, 128), UI_Warship);
 		m_warship->m_tactical_icon->setAnimation(TextureLoader::getInstance()->getTexture(WARSHIP_TACTICAL_TEXTURE_NAME), 1, 2);
 		m_tactical_ships.push_back(m_warship);
+		m_warship->m_selected = false;
+		if ((*CurrentGame).m_selected_ui == m_warship)
+		{
+			(*CurrentGame).m_selected_ui = false;
+		}
 
 		//for each water tile (= 1 "minute"), we get the charateristics (coord and type) of the water tile and inject it into tactical subdivisions
 		for (int i = 0; i < RANGE_FOR_TACTICAL_COMBAT + 1; i++)

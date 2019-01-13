@@ -8,13 +8,6 @@
 #include "Compass.h"
 #include "Ship.h"
 
-#define	CRUISE_SPEED					30.f
-#define ANGLE_SPEED						30.f
-
-#define COMPASS_MODE					false
-
-#define	TACTICAL_SPEED_FACTOR			1.f
-
 class Warship : public Ship
 {
 public:
@@ -28,6 +21,9 @@ public:
 	vector<WaterTile*> m_tiles_can_be_seen;
 	vector<TacticalTile*> m_tactical_tiles_can_be_seen;
 
+	void Update(Time deltaTime);
+	void Draw(sf::RenderTexture& screen);
+
 	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
 	bool CanViewWaterTile(WaterTile* tile);
 	int GetDistanceToWaterTile(WaterTile* tile);
@@ -35,11 +31,10 @@ public:
 	bool SetSailsToWaterTile(WaterTile* tile);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
-	void Update(Time deltaTime);
-	void UpdateCrewMembersCountPerRoom(Room* room);
-
 	bool CanViewTacticalTile(TacticalTile* tile);
-
+	
+	void UpdateCrewMembersCountPerRoom(Room* room);
+	
 private:
 	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);
 	void IteratePathFinding(WaterTile* tileA, WaterTile* tileB);
