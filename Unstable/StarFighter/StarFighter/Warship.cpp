@@ -77,56 +77,12 @@ Warship::~Warship()
 
 void Warship::Update(Time deltaTime)
 {
-	//strategic scale
-	if (m_tactical_icon == NULL)
+	//Compass input
+	m_compass.GetInput(m_angle, m_desired_angle);
+	
+	//Turn boat to desired angle
+	if (COMPASS_MODE == true)//mode compass
 	{
-		//travel management (needs to be refreshed? arrived?)
-		if (m_current_path.empty() == false)
-		{
-			WaterTile* waypoint = m_current_path.back();
-
-			//arrived at waypoint?
-			if (GetDistanceSquaredInSecondsDMS(waypoint) < 1.f)
-			{
-				m_DMS = waypoint->m_DMS;//snap boat to position
-				waypoint->UpdatePositionOnMap(m_DMS);//snap tile to boat 
-				m_current_path.pop_back();
-
-				//arrived at final destination
-				if (m_current_path.empty() == true)
-				{
-					m_speed = sf::Vector2f(0, 0);
-					m_destination = NULL;
-				}
-				//go to next waypoint
-				else
-				{
-					waypoint = m_current_path.back();
-					waypoint->UpdatePositionOnMap(m_DMS);//update waypoint position (because of the previous snap)
-					sf::Vector2f vec = waypoint->m_position - m_position;
-					ScaleVector(&vec, CRUISE_SPEED);
-					m_speed = vec;
-				}
-			}
-		}
-
-		//apply movement
-		m_DMS.m_second_x += m_speed.x * deltaTime.asSeconds();
-		m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
-
-		//rotation
-		GetAngleForSpeed(m_angle);
-		m_desired_angle = m_angle;
-		UpdateAnimation();
-		
-	}
-	//tactical scale
-	else
-	{
-		//Compass input
-		m_compass.GetInput(m_angle, m_desired_angle);
-
-		//Turn boat to desired angle
 		if (m_angle != m_desired_angle && sf::Mouse::isButtonPressed(sf::Mouse::Left) == false)
 		{
 			float delta = m_angle - m_desired_angle;
@@ -148,21 +104,52 @@ void Warship::Update(Time deltaTime)
 		//flip the sprite according to the direction
 		UpdateAnimation();
 
-		//apply movement
-		m_speed.x = TACTICAL_SPEED_FACTOR * CRUISE_SPEED * sin(m_angle * M_PI / 180.f);
-		m_speed.y = - TACTICAL_SPEED_FACTOR * CRUISE_SPEED * cos(m_angle * M_PI / 180.f);
-
-		m_tactical_posx += m_speed.x * deltaTime.asSeconds();
-		m_tactical_posy -= m_speed.y * deltaTime.asSeconds();
-
-		//tactical icon representation
-		UpdateTacticalPositionOnMap();
-		m_tactical_icon->setPosition(m_position);
-		m_tactical_icon->setRotation(m_angle);
-		m_tactical_icon->setAnimationLine(m_currentAnimationIndex);
-		
+		m_speed.x = CRUISE_SPEED * sin(m_angle * M_PI / 180.f);
+		m_speed.y = -CRUISE_SPEED * cos(m_angle * M_PI / 180.f);
 	}
 
+	//travel management (needs to be refreshed? arrived?)
+	if (m_current_path.empty() == false)
+	{
+		WaterTile* waypoint = m_current_path.back();
+
+		//arrived at waypoint?
+		if (GetDistanceSquaredInSecondsDMS(waypoint) < 1.f)
+		{
+			m_DMS = waypoint->m_DMS;//snap boat to position
+			waypoint->UpdatePositionOnMap(m_DMS);//snap tile to boat 
+			m_current_path.pop_back();
+
+			//arrived at final destination
+			if (m_current_path.empty() == true)
+			{
+				m_speed = sf::Vector2f(0, 0);
+				m_destination = NULL;
+			}
+			//go to next waypoint
+			else
+			{
+				waypoint = m_current_path.back();
+				waypoint->UpdatePositionOnMap(m_DMS);//update waypoint position (because of the previous snap)
+				sf::Vector2f vec = waypoint->m_position - m_position;
+				ScaleVector(&vec, CRUISE_SPEED);
+				m_speed = vec;
+			}
+		}
+	}
+
+	//apply movement
+	m_DMS.m_second_x += m_speed.x * deltaTime.asSeconds();
+	m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
+
+	//rotation
+	if (COMPASS_MODE == false)
+	{
+		GetAngleForSpeed(m_angle);
+		m_desired_angle = m_angle;
+		UpdateAnimation();
+	}
+	
 	//sexadecimal position system
 	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
 	{
@@ -204,14 +191,17 @@ void Warship::Update(Time deltaTime)
 	//Compass UI update
 	m_compass.Update(deltaTime, m_angle, m_desired_angle);
 
+	//tactical scale representation
+	if (m_tactical_icon != NULL)
+	{
+		UpdateTacticalPositionOnMap();
+
+		m_tactical_icon->setPosition(m_position);
+		m_tactical_icon->setRotation(m_angle);
+		m_tactical_icon->setAnimationLine(m_currentAnimationIndex);
+	}
+
 	GameEntity::Update(deltaTime);
-}
-
-void Warship::Draw(sf::RenderTexture& screen)
-{
-	Ship::Draw(screen);
-
-	m_compass.Draw(screen, m_angle);
 }
 
 void Warship::UpdateCrewMembersCountPerRoom(Room* room)

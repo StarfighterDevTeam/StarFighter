@@ -10,10 +10,6 @@
 #define WARSHIP_TEXTURE_NAME			"2D/warship_icon.png"
 #define WARSHIP_TACTICAL_TEXTURE_NAME	"2D/warship_icon_tactical.png"
 
-#define	CRUISE_SPEED					30.f
-#define ANGLE_SPEED						30.f
-#define	TACTICAL_SPEED_FACTOR			0.03f
-
 enum ShipType
 {
 	Ship_Goellete,

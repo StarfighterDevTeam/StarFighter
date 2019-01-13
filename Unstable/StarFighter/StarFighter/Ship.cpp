@@ -102,48 +102,42 @@ void Ship::UpdatePositionOnMap(DMS_Coord warship_DMS)
 
 void Ship::Update(Time deltaTime, DMS_Coord warship_DMS)
 {
+	//update tile information
+	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
+
+	m_can_be_seen = m_tile->m_can_be_seen;
+
 	//tactical scale representation
 	if (m_tactical_icon != NULL)
 	{
-		//apply movement
-		m_speed.x = TACTICAL_SPEED_FACTOR * CRUISE_SPEED * sin(m_angle * M_PI / 180.f);
-		m_speed.y = -TACTICAL_SPEED_FACTOR * CRUISE_SPEED * cos(m_angle * M_PI / 180.f);
-
-		m_tactical_posx += m_speed.x * deltaTime.asSeconds();
-		m_tactical_posy -= m_speed.y * deltaTime.asSeconds();
-
 		UpdateTacticalPositionOnMap();
 
 		m_tactical_icon->setPosition(m_position);
 		m_tactical_icon->setRotation(m_angle);
 		m_tactical_icon->setAnimationLine(m_currentAnimationIndex);
 	}
-	//strategic scale
 	else
 	{
 		UpdatePositionOnMap(warship_DMS);
 	}
-
-	UpdateAnimation();
-
-	//update tile information
-	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
-	m_can_be_seen = m_tile->m_can_be_seen;
-
 	
+	UpdateAnimation();
 }
 
 void Ship::Draw(sf::RenderTexture& screen)
 {
-	//strategic scale
 	if (m_tactical_icon == NULL)
 	{
 		GameEntity::Draw(screen);
 	}
 	else//tactical scale
 	{
+		screen.draw(m_shape_container);
+		screen.draw(m_shape);
+		screen.draw(m_text);
 		m_tactical_icon->Draw(screen);
 	}
+	
 }
 
 void Ship::UpdateAnimation()
