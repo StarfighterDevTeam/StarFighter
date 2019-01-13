@@ -43,6 +43,18 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define GRAZE_DISTANCE									30
 #define RECTANGLE_INSIDE_ALPHA							100
 
+//PIRATES
+#define ROOMTILE_SIZE				32.f
+#define ROOMTILE_OFFSET_X			400.f
+#define ROOMTILE_OFFSET_Y			500.f
+
+#define ROOMTILE_MINI_SIZE			24.f
+#define ROOMTILE_MINI_OFFSET_X		1550.f
+#define ROOMTILE_MINI_OFFSET_Y		500.f
+
+
+#define DISTANCE_COMBAT_INIT			800.f
+
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
 #define DEFAULT_SFX_VOLUME							100

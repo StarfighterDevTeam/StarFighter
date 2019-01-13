@@ -2,6 +2,7 @@
 #define ROOM_H_INCLUDED
 
 #include "Game.h"
+#include "RoomConnexion.h"
 #include "RoomTile.h"
 
 class Weapon;

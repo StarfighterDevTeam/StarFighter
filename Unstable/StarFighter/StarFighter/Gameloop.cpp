@@ -156,6 +156,15 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 	}
+	//Close/open doors
+	if (mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion)
+	{
+		RoomConnexion* connexion = (RoomConnexion*)hovered;
+		if (connexion->m_ship == m_warship)
+		{
+			connexion->SetLock(!connexion->m_locked);
+		}
+	}
 
 	//Fire weapon
 	if (m_scale == Scale_Tactical)

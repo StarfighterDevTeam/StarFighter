@@ -253,7 +253,7 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 	}
 
 	//Create the connexion
-	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false, m_is_minimized);
+	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false, m_is_minimized, this);
 
 	m_connexions.push_back(connexion);
 	tileA->m_room->m_connexions.push_back(connexion);

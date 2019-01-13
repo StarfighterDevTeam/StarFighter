@@ -7,31 +7,7 @@
 
 class Room;//forward declaration
 class CrewMember;
-
-
-#define CONNEXION_WIDTH			4.f
-#define CONNEXION_OPEN_LENGTH	4.f		
-
-class RoomConnexion : public GameEntity
-{
-public:
-	RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open, bool minimized);
-	
-	pair<RoomTile*, RoomTile*> m_tiles;
-	bool m_open;
-	bool m_locked;
-
-	void Update(Time deltaTime);
-	void SetLock(bool locked);
-};
-
-#define ROOMTILE_SIZE				32.f
-#define ROOMTILE_OFFSET_X			400.f
-#define ROOMTILE_OFFSET_Y			500.f
-
-#define ROOMTILE_MINI_SIZE			24.f
-#define ROOMTILE_MINI_OFFSET_X		1550.f
-#define ROOMTILE_MINI_OFFSET_Y		500.f
+class RoomConnexion;
 
 enum Hull
 {

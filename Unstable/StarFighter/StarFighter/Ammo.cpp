@@ -84,7 +84,7 @@ void Ammo::Update(Time deltaTime)
 				//damaging a door?
 				if (m_target_tile->m_connexion != NULL)
 				{
-					m_target_tile->m_connexion->SetLock(true);
+					m_target_tile->m_connexion->Destroy();
 				}
 
 				//piercing hull?
