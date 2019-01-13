@@ -27,7 +27,7 @@ public:
 
 #define ROOMTILE_SIZE				32.f
 #define ROOMTILE_OFFSET_X			200.f
-#define ROOMTILE_OFFSET_Y			50.f
+#define ROOMTILE_OFFSET_Y			120.f
 
 #define ROOMTILE_MINI_SIZE			24.f
 #define ROOMTILE_MINI_OFFSET_X		1350.f

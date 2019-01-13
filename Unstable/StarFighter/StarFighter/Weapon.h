@@ -8,12 +8,6 @@
 
 class Ship;//forward declaration
 
-enum Bord
-{
-	Babord,
-	Tribord,
-};
-
 enum WeaponType
 {
 	Weapon_Cannon,
@@ -27,14 +21,13 @@ public:
 
 	WeaponType m_type;
 	RoomTile* m_tile;
-	Bord m_bord;
 
 	float m_angle;
 	bool m_direct_fire;
 
 	void Update(Time deltaTime);
 
-	bool Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle);
+	bool Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat);
 
 	RoomTile* GetFreeRoomTile(Room* room);
 

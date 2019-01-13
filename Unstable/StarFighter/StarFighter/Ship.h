@@ -5,6 +5,8 @@
 #include "WaterZone.h"
 #include "Island.h"
 
+#define DISTANCE_COMBAT_INIT			400.f
+
 enum ShipType
 {
 	Ship_Goellete,
@@ -45,7 +47,9 @@ public:
 	vector<WaterTile*> m_tiles_can_be_seen;
 	vector<WaterTile*> m_current_path;
 	Seaport* m_seaport;
+
 	bool m_is_minimized;
+	float m_distance_combat;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
@@ -55,7 +59,7 @@ public:
 	Room* ConnectRooms();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
-	bool FireWeapon(Weapon* weapon, Time deltaTime);
+	bool FireWeapon(Weapon* weapon, Time deltaTime, float distance_combat);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
 	void BuildShip(bool minimized);

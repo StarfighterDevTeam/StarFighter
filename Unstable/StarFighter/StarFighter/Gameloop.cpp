@@ -158,10 +158,13 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//Fire weapon
-	if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
+	if (m_scale == Scale_Tactical)
 	{
-		Weapon* weapon = (Weapon*)hovered;
-		m_warship->FireWeapon(weapon, deltaTime);
+		if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
+		{
+			Weapon* weapon = (Weapon*)hovered;
+			m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship->m_distance_combat);
+		}
 	}
 
 	//Bullets
@@ -362,6 +365,9 @@ void Gameloop::Draw()
 		//player boat
 		m_warship->Draw((*CurrentGame).m_mainScreen);
 
+		//compass
+		m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
+
 		//enemy
 		for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 		{
@@ -377,9 +383,6 @@ void Gameloop::Draw()
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
-
-	//compass
-	m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
 
 	//Display
 	(*CurrentGame).m_mainScreen.display();

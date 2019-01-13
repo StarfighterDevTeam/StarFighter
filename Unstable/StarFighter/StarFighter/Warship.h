@@ -8,7 +8,7 @@
 #include "Compass.h"
 #include "Ship.h"
 
-#define	CRUISE_SPEED					30.f
+#define	CRUISE_SPEED					50.f
 #define ANGLE_SPEED						30.f
 
 #define COMPASS_MODE					false

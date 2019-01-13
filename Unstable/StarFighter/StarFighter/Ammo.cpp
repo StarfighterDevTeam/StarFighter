@@ -2,12 +2,13 @@
 
 extern Game* CurrentGame;
 
-Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, MapView view) : GameEntity(UI_None)
+Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat) : GameEntity(UI_None)
 {
 	m_type = type;
 	m_angle = angle;
 	setRotation(angle);
-	m_view = view;
+	m_distance_combat = distance_combat;
+	m_phase = Shoot_Ougoing;
 
 	m_ref_speed = CANNONBALL_SPEED;
 
@@ -20,7 +21,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, MapView view) : Ga
 
 	setAnimation(texture, 1, 1);
 
-	float tile_size = view == Map_Rooms ? ROOMTILE_SIZE : WATERTILE_SIZE;
+	float tile_size = ROOMTILE_SIZE;
 	float angle_rad = angle * M_PI / 180.f;
 	m_speed = sf::Vector2f(m_ref_speed * sin(angle_rad), - m_ref_speed * cos(angle_rad));
 	float weapon_offset_x = (tile_size + m_size.x) * 0.5f * sin(angle_rad);
@@ -34,7 +35,41 @@ void Ammo::Update(Time deltaTime, DMS_Coord warship_DMS)
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
 
+	switch (m_phase)
+	{
+		case Shoot_Ougoing:
+		{
+			if (m_position.y < -m_size.y * 0.5f)
+			{
+				m_phase = Shoot_Warping;
+				m_warp_timer = m_distance_combat / AMMO_WARP_DISTANCE_PER_SECOND * m_ref_speed / CANNONBALL_SPEED;
+			}
+			break;
+		}
+		case Shoot_Warping:
+		{
+			if (m_warp_timer > 0)
+			{
+				m_warp_timer -= deltaTime.asSeconds();
+			}
+
+			if (m_warp_timer < 0)
+			{
+				m_phase = Shoot_Incoming;
+
+				m_position.x = 1500.f;
+				m_position.y = 1000.f;
+			}
+			break;
+		}
+		case Shoot_Incoming:
+		{
+			break;
+		}
+	}
+
 	//out of sight? = destroy it.
+	/*
 	if (m_view == Map_Water)
 	{
 		DMS_Coord coord = WaterTile::GetDMSCoord(m_position, warship_DMS);
@@ -57,6 +92,7 @@ void Ammo::Update(Time deltaTime, DMS_Coord warship_DMS)
 			m_can_be_seen = false;
 		}
 	}
+	*/
 
 	GameEntity::Update(deltaTime);
 }

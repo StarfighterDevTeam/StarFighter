@@ -8,6 +8,7 @@ Ship::Ship(DMS_Coord coord, ShipType type) : GameEntity(UI_EnemyShip)
 	m_destination = NULL;
 	m_seaport = NULL;
 	m_is_minimized = true;
+	m_distance_combat = DISTANCE_COMBAT_INIT;
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -373,9 +374,9 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 	return weapon;
 }
 
-bool Ship::FireWeapon(Weapon* weapon, Time deltaTime)
+bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, float distance_combat)
 {
-	return weapon->Fire(deltaTime, m_position, m_angle);
+	return weapon->Fire(deltaTime, m_position, m_angle, distance_combat);
 }
 
 void Ship::BuildShip(bool minimized)

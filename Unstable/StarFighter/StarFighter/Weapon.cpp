@@ -5,8 +5,7 @@ extern Game* CurrentGame;
 Weapon::Weapon(WeaponType type) : GameEntity(UI_Weapon)
 {
 	m_type = type;
-	m_bord = Babord;
-	m_angle = m_bord == Babord ? 90.f : 270.f;
+	m_angle = 0.f;
 
 	//shape for water tiles
 	TextureLoader *loader;
@@ -14,6 +13,7 @@ Weapon::Weapon(WeaponType type) : GameEntity(UI_Weapon)
 	sf::Texture* texture = loader->loadTexture("2D/cannon_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
 
 	setAnimation(texture, 1, 2);
+	setRotation(-90.f);
 
 	//UI
 	m_default_color = sf::Color(0, 0, 0, 0);
@@ -51,15 +51,15 @@ RoomTile* Weapon::GetFreeRoomTile(Room* room)
 	return NULL;
 }
 
-bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle)
+bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat)
 {
 	//Fire from room tile
-	Ammo* new_ammo = new Ammo(Ammo_CannonBall, m_position, m_angle, Map_Rooms);
+	Ammo* new_ammo = new Ammo(Ammo_CannonBall, m_position, m_angle, distance_combat);
 	(*CurrentGame).m_bullets.push_back(new_ammo);
 
 	//Fire from water tile
-	Ammo* new_ammo2 = new Ammo(Ammo_CannonBall, ship_position, m_angle + ship_angle, Map_Water);
-	(*CurrentGame).m_bullets.push_back(new_ammo2);
+	//Ammo* new_ammo2 = new Ammo(Ammo_CannonBall, ship_position, m_angle + ship_angle, Map_Water);
+	//(*CurrentGame).m_bullets.push_back(new_ammo2);
 
 	return true;
 }
