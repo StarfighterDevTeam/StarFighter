@@ -70,6 +70,9 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship)
 	//WEAPONS
 	Weapon* weapon = new Weapon(Weapon_Cannon);
 	AddWeapon(weapon, room, this);
+
+	//center position of each room & room tiles
+	CenterRoomPositions(m_is_minimized);
 }
 
 Warship::~Warship()

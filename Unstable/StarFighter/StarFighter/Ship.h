@@ -50,6 +50,7 @@ public:
 
 	bool m_is_minimized;
 	float m_distance_combat;
+	sf::Vector2i m_rooms_size;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
@@ -63,6 +64,13 @@ public:
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
 	void BuildShip(bool minimized);
+	void CenterRoomPositions(bool minimized);
+
+private:
+	int m_rooms_min_upcorner_x;
+	int m_rooms_min_upcorner_y;
+	int m_rooms_max_offset_x;
+	int m_rooms_max_offset_y;
 };
 
 #endif //SHIP_H_INCLUDED

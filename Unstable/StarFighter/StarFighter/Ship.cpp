@@ -10,6 +10,11 @@ Ship::Ship(DMS_Coord coord, ShipType type) : GameEntity(UI_EnemyShip)
 	m_is_minimized = true;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
 
+	m_rooms_min_upcorner_x = 0;
+	m_rooms_min_upcorner_y = 0;
+	m_rooms_max_offset_x = 0;
+	m_rooms_max_offset_y = 0;
+
 	//get on tile
 	SetDMSCoord(coord);
 
@@ -151,8 +156,27 @@ void Ship::GetAngleForSpeed(float& angle)
 Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type, bool minimized)
 {
 	Room* room = new Room(upcorner_x, upcorner_y, width, height, type, minimized);
-
 	m_rooms.push_back(room);
+
+	if (upcorner_x < m_rooms_min_upcorner_x)
+	{
+		m_rooms_min_upcorner_x = upcorner_x;
+	}
+	if (upcorner_y < m_rooms_min_upcorner_y)
+	{
+		m_rooms_min_upcorner_y = upcorner_y;
+	}
+	if (upcorner_x + width - 1 > m_rooms_max_offset_x)
+	{
+		m_rooms_max_offset_x = upcorner_x + width - 1;
+	}
+	if (upcorner_y + height - 1 > m_rooms_max_offset_y)
+	{
+		m_rooms_max_offset_y = upcorner_y + height - 1;
+	}
+
+	m_rooms_size.x = m_rooms_max_offset_x - m_rooms_min_upcorner_x + 1;
+	m_rooms_size.y = m_rooms_max_offset_y - m_rooms_min_upcorner_y + 1;
 
 	return room;
 }
@@ -403,4 +427,49 @@ void Ship::BuildShip(bool minimized)
 
 	//doors
 	ConnectRooms();
+
+	//center position of each room & room tiles
+	CenterRoomPositions(m_is_minimized);
+}
+
+void Ship::CenterRoomPositions(bool minimized)
+{
+	float size = minimized == false ? ROOMTILE_SIZE : ROOMTILE_MINI_SIZE;
+	float room_offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
+	float room_offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
+	float tile_offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
+	float tile_offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
+
+	room_offset_x -= 1.f * m_rooms_size.x / 2 * size;
+	room_offset_y -= 1.f * m_rooms_size.y / 2 * size;
+
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		(*it)->m_position.x = room_offset_x + ((*it)->m_upcorner_x + (*it)->m_width * 0.5f) * size;
+		(*it)->m_position.y = room_offset_y + ((*it)->m_upcorner_y + (*it)->m_height * 0.5f) * size;
+
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			int upcorner = (*it)->m_upcorner_x;
+			int coord = (*it2)->m_coord_x;
+			(*it2)->m_position.x = room_offset_x + (0.5f + (*it2)->m_coord_x) * size;
+			(*it2)->m_position.y = room_offset_y + (0.5f + (*it2)->m_coord_y) * size;
+			(*it2)->UpdatePosition();
+		}
+	}
+
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		(*it)->m_position = sf::Vector2f(0.5f * ((*it)->m_tiles.first->m_position.x + (*it)->m_tiles.second->m_position.x), 0.5f * ((*it)->m_tiles.first->m_position.y + (*it)->m_tiles.second->m_position.y));
+	}
+
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		(*it)->m_position = (*it)->m_tile->m_position;
+	}
+
+	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+	{
+		(*it)->m_position = (*it)->m_tile->m_position;
+	}
 }

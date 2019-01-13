@@ -26,12 +26,12 @@ public:
 };
 
 #define ROOMTILE_SIZE				32.f
-#define ROOMTILE_OFFSET_X			200.f
-#define ROOMTILE_OFFSET_Y			120.f
+#define ROOMTILE_OFFSET_X			400.f
+#define ROOMTILE_OFFSET_Y			500.f
 
 #define ROOMTILE_MINI_SIZE			24.f
-#define ROOMTILE_MINI_OFFSET_X		1350.f
-#define ROOMTILE_MINI_OFFSET_Y		150.f
+#define ROOMTILE_MINI_OFFSET_X		1550.f
+#define ROOMTILE_MINI_OFFSET_Y		500.f
 
 class RoomTile : public GameEntity
 {

@@ -57,8 +57,8 @@ void Ammo::Update(Time deltaTime, DMS_Coord warship_DMS)
 			{
 				m_phase = Shoot_Incoming;
 
-				m_position.x = 1500.f;
-				m_position.y = 1000.f;
+				m_position.x = ROOMTILE_MINI_OFFSET_X;
+				m_position.y = (*CurrentGame).m_screen_size.y + m_size.y * 0.5f;
 			}
 			break;
 		}

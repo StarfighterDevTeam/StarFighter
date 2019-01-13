@@ -4,11 +4,12 @@
 #include "Game.h"
 
 #include "GameEntity.h"
+#include "RoomTile.h"
 
-#define COMPASS_OFFSET_X				240.f
-#define COMPASS_OFFSET_Y				1030.f
 #define COMPASS_CADRAN_SIZE_X			400.f
 #define COMPASS_CADRAN_SIZE_Y			50.f
+#define COMPASS_OFFSET_X				(ROOMTILE_OFFSET_X - COMPASS_CADRAN_SIZE_X * 0.5f)
+#define COMPASS_OFFSET_Y				1030.f
 #define COMPASS_CURSOR_SIZE_X			45.f
 #define COMPASS_CURSOR_SIZE_Y			90.f
 #define COMPASS_CURSOR_TIP_SIZE_X		8.f
