@@ -213,6 +213,13 @@ void Gameloop::Update(sf::Time deltaTime)
 							{
 								(*it)->m_target_tile->Pierce();
 							}
+
+							//killing crew
+							if ((*it)->m_target_tile->m_crew != NULL && (*it)->m_target_tile->m_crew->m_tile == (*it)->m_target_tile)
+							{
+								CrewMember* crew = (*it)->m_target_tile->m_crew;
+								//todo: hurt crew
+							}
 						}
 					}
 				}
