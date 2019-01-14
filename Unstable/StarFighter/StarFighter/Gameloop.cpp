@@ -660,6 +660,7 @@ bool Gameloop::UpdateTacticalScale()
 		}
 
 		m_tactical_ship = *it;
+		m_warship->m_combat_interface.Init(*it);
 		m_scale = Scale_Tactical;
 
 		//todo: stop ship and cancel destination on strategic scale
