@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Ship::Ship(DMS_Coord coord, ShipType type) : GameEntity(UI_EnemyShip)
+Ship::Ship(DMS_Coord coord, ShipType type, bool is_player) : GameEntity(UI_EnemyShip)
 {
 	m_type = type;
 	m_destination = NULL;
@@ -30,10 +30,12 @@ Ship::Ship(DMS_Coord coord, ShipType type) : GameEntity(UI_EnemyShip)
 	m_speed = sf::Vector2f(0, 0);
 	m_angle = -90;
 
-	if (m_type == Ship_Goellete)
+	if (is_player == false)
 	{
-		BuildShip(true);
+		BuildShip();
 	}
+
+	
 }
 
 Ship::~Ship()
@@ -177,6 +179,8 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 
 	m_rooms_size.x = m_rooms_max_offset_x - m_rooms_min_upcorner_x + 1;
 	m_rooms_size.y = m_rooms_max_offset_y - m_rooms_min_upcorner_y + 1;
+
+	m_health_max += room->m_tiles.size() * ROOMTILE_HEALTH;
 
 	return room;
 }
@@ -369,7 +373,6 @@ Room* Ship::ConnectRooms()
 	}
 
 	//flag hull (i.e. tiles that are the exterior border of the ship)
-	vector<vector<RoomTile*> > hull_tiles;
 	for (int i = 0; i < m_rooms_size.x; i++)
 	{
 		vector<RoomTile*> vec;
@@ -378,7 +381,7 @@ Room* Ship::ConnectRooms()
 			RoomTile* tile = NULL;
 			vec.push_back(tile);
 		}
-		hull_tiles.push_back(vec);
+		m_tiles.push_back(vec);
 	}
 
 	//fill all room tiles in an array with NULL pointer for holes
@@ -386,7 +389,7 @@ Room* Ship::ConnectRooms()
 	{
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
-			hull_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
+			m_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
 		}
 	}
 
@@ -400,19 +403,19 @@ Room* Ship::ConnectRooms()
 			int x = (*it2)->m_coord_x;
 			int y = (*it2)->m_coord_y;
 
-			if (x == 0 || hull_tiles[x - 1][y] == NULL)
+			if (x == 0 || m_tiles[x - 1][y] == NULL)
 			{
 				(*it2)->m_hull = Hull_Left;
 			}
-			if (x == m_rooms_size.x - 1 || hull_tiles[x + 1][y] == NULL)
+			if (x == m_rooms_size.x - 1 || m_tiles[x + 1][y] == NULL)
 			{
 				(*it2)->m_hull = Hull_Right;
 			}
-			if (y == 0 || hull_tiles[x][y - 1] == NULL)
+			if (y == 0 || m_tiles[x][y - 1] == NULL)
 			{
 				(*it2)->m_hull = Hull_Up;
 			}
-			if (y == m_rooms_size.y - 1 || hull_tiles[x][y + 1] == NULL)
+			if (y == m_rooms_size.y - 1 || m_tiles[x][y + 1] == NULL)
 			{
 				(*it2)->m_hull = Hull_Down;
 			}
@@ -469,11 +472,12 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 	int t = RandomizeIntBetweenValues(0, target->m_rooms[r]->m_tiles.size() - 1);
 	RoomTile* target_tile = target->m_rooms[r]->m_tiles[t];
 	
-	return weapon->Fire(deltaTime, m_position, m_angle, target->m_distance_combat, target_tile);
+	return weapon->Fire(deltaTime, m_position, m_angle, target->m_distance_combat, target, target_tile);
 }
 
-void Ship::BuildShip(bool minimized)
+void Ship::BuildShip()
 {
+	m_health_max = 0;
 	//ROOMS
 	//left
 	AddRoomMinimized(0, 3, 4, 4, Room_Weapon);
@@ -496,6 +500,19 @@ void Ship::BuildShip(bool minimized)
 
 	//doors
 	ConnectRooms();
+
+	m_health = m_health_max;
+
+	//crew
+	m_nb_crew_max = 10;
+	m_nb_crew = m_nb_crew_max;
+
+	for (int i = 0; i < m_nb_crew_max; i++)
+	{
+		int r = RandomizeIntBetweenValues(0, m_rooms.size() - 1);
+		CrewMember* crew = new CrewMember(Crew_Civilian);
+		AddCrewMember(crew, m_rooms[r]);
+	}
 
 	//center position of each room & room tiles
 	CenterRoomPositions(m_is_minimized);

@@ -15,7 +15,7 @@ Gameloop::Gameloop()
 	//PIRATES
 	InitWaterZones();
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
-	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete));
+	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete, false));
 	m_tactical_ship = NULL;
 
 	m_scale = Scale_Strategic;
@@ -182,6 +182,66 @@ void Gameloop::Update(sf::Time deltaTime)
 		if ((*it)->m_can_be_seen == true)
 		{
 			(*it)->Update(deltaTime);
+
+			//Hit effects
+			if ((*it)->m_phase == Shoot_Hit)
+			{
+				//compute hit tiles
+				int x = (*it)->m_target_tile->m_coord_x;
+				int y = (*it)->m_target_tile->m_coord_y;
+
+				int radius = (*it)->m_radius - 1;
+
+				int a = x - radius;
+				int b = x + radius;
+				for (int i = x - radius; i < x + radius + 1; i++)
+				{
+					for (int j = y - radius; j < y + radius + 1; j++)
+					{
+						if (i >= 0 && i <= (*it)->m_target_ship->m_rooms_size.x - 1 && j >= 0 && j <= (*it)->m_target_ship->m_rooms_size.y - 1 && (*it)->m_target_ship->m_tiles[i][j] != NULL)
+						{
+							//apply damage and side effects:
+
+							//damage
+							int damage = (*it)->m_target_ship->m_tiles[i][j]->m_health;
+							(*it)->m_target_ship->m_health -= damage;
+							(*it)->m_target_ship->m_tiles[i][j]->m_health = 0;
+							(*it)->m_target_ship->m_tiles[i][j]->m_shape.setFillColor(sf::Color(255, 0, 0, 120));//red "damaged"
+
+							//piercing hull
+							if ((*it)->m_target_tile->m_hull != Hull_None)
+							{
+								(*it)->m_target_tile->Pierce();
+							}
+						}
+					}
+				}
+
+				//damaging a door?
+				//if ((*it)->m_target_tile->m_connexion != NULL)
+				//{
+					//(*it)->m_target_tile->m_connexion->Destroy();
+
+					//radius? apply affect to all squares around the radius
+					//if ((*it)->m_radius > 1)
+					//{
+						
+					//}
+				//}
+
+				//killing crew
+				//for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
+				//{
+				//	(*it)->Update(deltaTime);
+				//}
+				//
+				////piercing hull?
+				//if ((*it)->m_target_tile->m_hull != Hull_None)
+				//{
+				//	(*it)->m_target_tile->Pierce();
+				//}
+			}
+			
 		}
 	}
 

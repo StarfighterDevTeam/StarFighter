@@ -14,7 +14,7 @@ enum ShipType
 class Ship : public GameEntity
 {
 public:
-	Ship(DMS_Coord coord, ShipType type);
+	Ship(DMS_Coord coord, ShipType type, bool is_player);
 	~Ship();
 
 	ShipType m_type;
@@ -35,10 +35,14 @@ public:
 	vector<RoomConnexion*> m_connexions;
 	vector<CrewMember*> m_crew;
 	vector<Weapon*> m_weapons;
+	vector<vector<RoomTile*> > m_tiles;
 	
 	//int m_nb_crew[NB_CREW_TYPES];
 	//int m_nb_crew_working[NB_CREW_TYPES];
-	//int m_nb_crew_max;
+	int m_nb_crew;
+	int m_nb_crew_max;
+	int m_health_max;
+	int m_health;
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;
@@ -61,7 +65,7 @@ public:
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
-	void BuildShip(bool minimized);
+	void BuildShip();
 	void CenterRoomPositions(bool minimized);
 
 private:

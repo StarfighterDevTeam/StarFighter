@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, RoomTile* target_tile) : GameEntity(UI_None)
+Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile) : GameEntity(UI_None)
 {
 	m_type = type;
 	m_angle = angle;
@@ -11,8 +11,10 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 	m_target_tile = target_tile;
 	m_phase = Shoot_Ougoing;
 	m_FX_hit = new FX();
+	m_target_ship = target_ship;
 
 	m_ref_speed = CANNONBALL_SPEED;
+	m_radius = CANNONBALL_RADIUS;
 
 	m_can_be_seen = true;
 
@@ -81,17 +83,7 @@ void Ammo::Update(Time deltaTime)
 				FX_hit->UpdatePosition();
 				(*CurrentGame).m_FX.push_back(FX_hit);
 
-				//damaging a door?
-				if (m_target_tile->m_connexion != NULL)
-				{
-					m_target_tile->m_connexion->Destroy();
-				}
-
-				//piercing hull?
-				if (m_target_tile->m_hull != Hull_None)
-				{
-					m_target_tile->Pierce();
-				}
+				m_phase = Shoot_Hit;
 			}
 
 			break;

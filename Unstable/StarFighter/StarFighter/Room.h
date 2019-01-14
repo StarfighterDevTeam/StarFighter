@@ -55,6 +55,8 @@ public:
 	int m_nb_crew_working[NB_CREW_TYPES];
 	int m_nb_crew_max;
 
+	int m_flooding;//0-100
+
 	void Update(Time deltaTime);
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);

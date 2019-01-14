@@ -27,7 +27,7 @@ public:
 
 	void Update(Time deltaTime);
 
-	bool Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat, RoomTile* target_tile);
+	bool Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
 
 	RoomTile* GetFreeRoomTile(Room* room);
 

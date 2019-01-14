@@ -53,7 +53,10 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ROOMTILE_MINI_OFFSET_Y		500.f
 
 
-#define DISTANCE_COMBAT_INIT			800.f
+#define DISTANCE_COMBAT_INIT		800.f
+
+#define ROOMTILE_HEALTH				100
+#define ROOMTILE_FLOODING			100
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50

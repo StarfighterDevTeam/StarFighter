@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship)
+Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 {
 	m_angle = 90.f;
 	m_desired_angle = m_angle;
@@ -35,6 +35,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship)
 	m_text.setCharacterSize(24);
 	m_text.setColor(sf::Color::Black);
 
+	m_health_max = 0;
 	//ROOMS
 	//left
 	AddRoom(0, 3, 4, 4, Room_Weapon);
@@ -54,6 +55,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship)
 	Room* room2 = AddRoom(12, 7, 4, 6, Room_Fishing);
 	AddRoom(12, 13, 4, 6, Room_Kitchen);
 	AddRoom(12, 19, 4, 3, Room_Lifeboat);
+
+	m_health = m_health_max;
 
 	//doors
 	ConnectRooms();

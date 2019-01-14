@@ -12,6 +12,8 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_connexion = NULL;
 	m_hull = Hull_None;
 	m_pierced = false;
+	m_health_max = ROOMTILE_HEALTH;
+	m_health = m_health_max;
 
 	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
 	float offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
