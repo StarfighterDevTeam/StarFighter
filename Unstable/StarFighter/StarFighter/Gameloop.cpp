@@ -201,23 +201,24 @@ void Gameloop::Update(sf::Time deltaTime)
 						if (i >= 0 && i <= (*it)->m_target_ship->m_rooms_size.x - 1 && j >= 0 && j <= (*it)->m_target_ship->m_rooms_size.y - 1 && (*it)->m_target_ship->m_tiles[i][j] != NULL)
 						{
 							//apply damage and side effects:
+							RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
 
 							//damage
-							int damage = (*it)->m_target_ship->m_tiles[i][j]->m_health;
+							int damage = tile->m_health;
 							(*it)->m_target_ship->m_health -= damage;
-							(*it)->m_target_ship->m_tiles[i][j]->m_health = 0;
-							(*it)->m_target_ship->m_tiles[i][j]->m_shape.setFillColor(sf::Color(255, 0, 0, 120));//red "damaged"
+							tile->m_health = 0;
+							tile->m_shape.setFillColor(sf::Color(255, 0, 0, 120));//red "damaged"
 
 							//piercing hull
-							if ((*it)->m_target_tile->m_hull != Hull_None)
+							if (tile->m_hull != Hull_None)
 							{
-								(*it)->m_target_tile->Pierce();
+								tile->Pierce();
 							}
 
 							//killing crew
-							if ((*it)->m_target_tile->m_crew != NULL && (*it)->m_target_tile->m_crew->m_tile == (*it)->m_target_tile)
+							if (tile->m_crew != NULL && tile->m_crew->m_tile == tile)
 							{
-								CrewMember* crew = (*it)->m_target_tile->m_crew;
+								CrewMember* crew = tile->m_crew;
 								//todo: hurt crew
 							}
 						}
