@@ -107,7 +107,6 @@ public:
 	vector<RoomTile*> m_tiles;
 	vector<RoomTile*> m_enemy_tiles;
 	vector<vector<WaterZone*> > m_waterzones;
-	vector<vector<WaterTile*> > m_tactical_tiles;
 	vector<Ammo*> m_bullets;
 	vector<FX*> m_FX;
 

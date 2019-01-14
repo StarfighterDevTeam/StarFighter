@@ -71,6 +71,26 @@ Game::~Game()
 			delete *it2;
 		}
 	}
+
+	for (vector<Ammo*>::iterator it = m_bullets.begin(); it != m_bullets.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<FX*>::iterator it = m_FX.begin(); it != m_FX.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<RoomTile*>::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
+	{
+		delete *it;
+	}
+
+	for (vector<RoomTile*>::iterator it = m_enemy_tiles.begin(); it != m_enemy_tiles.end(); it++)
+	{
+		delete *it;
+	}
 }
 
 void Game::SetSFXVolume(bool activate_sfx)

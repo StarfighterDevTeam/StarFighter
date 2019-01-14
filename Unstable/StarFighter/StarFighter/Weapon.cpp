@@ -5,7 +5,7 @@ extern Game* CurrentGame;
 Weapon::Weapon(WeaponType type) : GameEntity(UI_Weapon)
 {
 	m_type = type;
-	m_angle = 0.f;
+	m_angle = 90.f;
 
 	//shape for water tiles
 	TextureLoader *loader;
@@ -13,7 +13,6 @@ Weapon::Weapon(WeaponType type) : GameEntity(UI_Weapon)
 	sf::Texture* texture = loader->loadTexture("2D/cannon_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
 
 	setAnimation(texture, 1, 2);
-	setRotation(-90.f);
 
 	//UI
 	m_default_color = sf::Color(0, 0, 0, 0);

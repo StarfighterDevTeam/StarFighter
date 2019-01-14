@@ -34,8 +34,6 @@ Ship::Ship(DMS_Coord coord, ShipType type, bool is_player) : GameEntity(UI_Enemy
 	{
 		BuildShip();
 	}
-
-	
 }
 
 Ship::~Ship()
