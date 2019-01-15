@@ -46,17 +46,25 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 //PIRATES
 #define ROOMTILE_SIZE				32.f
 #define ROOMTILE_OFFSET_X			400.f
-#define ROOMTILE_OFFSET_Y			500.f
+#define ROOMTILE_OFFSET_Y			550.f
 
 #define ROOMTILE_MINI_SIZE			24.f
 #define ROOMTILE_MINI_OFFSET_X		1550.f
-#define ROOMTILE_MINI_OFFSET_Y		500.f
+#define ROOMTILE_MINI_OFFSET_Y		(ROOMTILE_OFFSET_Y	)
 
 #define DISTANCE_COMBAT_INIT		800.f
 #define WARP_AMMO_OFFSET_X			1100.f
 
 #define ROOMTILE_HEALTH				100
 #define ROOMTILE_FLOODING			100
+
+#define WATERTILE_SIZE					64.f
+#define WATERTILE_OFFSET_X				1100.f
+#define WATERTILE_OFFSET_Y				150.f
+#define NB_WATERTILE_X					60
+#define NB_WATERTILE_Y					60
+#define NB_WATERTILE_SUBDIVISION		60
+#define NB_WATERTILE_VIEW_RANGE			5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
