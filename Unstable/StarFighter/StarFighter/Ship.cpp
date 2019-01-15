@@ -15,6 +15,10 @@ Ship::Ship(DMS_Coord coord, ShipType type, bool is_player) : GameEntity(UI_Enemy
 	m_rooms_max_offset_x = 0;
 	m_rooms_max_offset_y = 0;
 
+	m_health_max = 0;
+	m_flood_max = 0;
+	m_flood = 0;
+
 	//get on tile
 	SetDMSCoord(coord);
 
@@ -179,6 +183,7 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 	m_rooms_size.y = m_rooms_max_offset_y - m_rooms_min_upcorner_y + 1;
 
 	m_health_max += room->m_tiles.size() * ROOMTILE_HEALTH;
+	m_flood_max += room->m_tiles.size() * ROOMTILE_FLOODING;
 
 	return room;
 }
@@ -475,7 +480,6 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 
 void Ship::BuildShip()
 {
-	m_health_max = 0;
 	//ROOMS
 	//left
 	AddRoomMinimized(0, 3, 4, 4, Room_Weapon);

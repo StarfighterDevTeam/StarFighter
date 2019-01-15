@@ -6,12 +6,21 @@
 #include "GameEntity.h"
 #include "Ship.h"
 
+#define COMBAT_LIFEBAR_SIZE_X			400.f
+#define COMBAT_LIFEBAR_SIZE_Y			20.f
+#define COMBAT_LIFEBAR_OFFSET_X			200.f
+#define COMBAT_LIFEBAR_MINI_OFFSET_X	1350.f
+#define COMBAT_LIFEBAR_OFFSET_Y			50.f
+#define COMBAT_FLOODBAR_SIZE_X			(COMBAT_LIFEBAR_SIZE_X)
+#define COMBAT_FLOODBAR_SIZE_Y			10.f
+
 struct CombatInterface
 {
 	CombatInterface();
 	~CombatInterface();
 
-	void Init(Ship* enemy_ship);
+	void Init(Ship* ship, Ship* enemy_ship);
+	Ship* m_ship;
 	Ship* m_enemy_ship;
 	GameEntity* m_enemy_ui;//warp border + enemy ship info (name, class, alliance, volume, crew size)
 	GameEntity* m_lifebars[2];

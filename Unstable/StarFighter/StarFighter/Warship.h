@@ -32,7 +32,7 @@ public:
 	bool SetSailsToWaterTile(WaterTile* tile);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
-	void Update(Time deltaTime);
+	void Update(Time deltaTime, bool tactical_combat);
 	void UpdateCrewMembersCountPerRoom(Room* room);
 
 private:

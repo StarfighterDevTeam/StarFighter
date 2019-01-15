@@ -14,7 +14,7 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_pierced = false;
 	m_health_max = ROOMTILE_HEALTH;
 	m_health = m_health_max;
-	m_flooding = 0;
+	m_flood = 0;
 
 	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
 	float offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
@@ -69,18 +69,4 @@ RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized)
 	}
 
 	return NULL;
-}
-
-bool RoomTile::Pierce()
-{
-	if (m_pierced == true)
-	{
-		return false;
-	}
-
-	m_pierced = true;
-	m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
-	m_flooding = ROOMTILE_FLOODING;
-
-	return true;
 }

@@ -33,12 +33,10 @@ public:
 	bool m_pierced;
 	int m_health_max;
 	int m_health;
-	int m_flooding;
+	int m_flood;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized);
 	bool IsConnectedToRoomTile(RoomTile* tile);
-
-	bool Pierce();
 
 	//pathfinding
 	int m_heuristic;

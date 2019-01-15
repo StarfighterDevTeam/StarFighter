@@ -210,9 +210,12 @@ void Gameloop::Update(sf::Time deltaTime)
 							tile->m_shape.setFillColor(sf::Color(255, 0, 0, 120));//red "damaged"
 
 							//piercing hull
-							if (tile->m_hull != Hull_None)
+							if (tile->m_hull != Hull_None && tile->m_pierced == false)
 							{
-								tile->Pierce();
+								tile->m_pierced = true;
+								tile->m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+								tile->m_flood = ROOMTILE_FLOODING;
+								(*it)->m_target_ship->m_flood += ROOMTILE_FLOODING;
 							}
 
 							//killing crew
@@ -263,7 +266,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//boat
-	m_warship->Update(deltaTime);
+	m_warship->Update(deltaTime, m_scale == Scale_Tactical);
 
 	//water tiles
 	m_warship->m_tiles_can_be_seen.clear();
@@ -464,6 +467,12 @@ void Gameloop::Draw()
 			}
 		}
 	}
+	//Tactical scale only
+	else
+	{
+		//combat interface
+		m_warship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
+	}
 	
 	//Bullets
 	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
@@ -660,7 +669,7 @@ bool Gameloop::UpdateTacticalScale()
 		}
 
 		m_tactical_ship = *it;
-		m_warship->m_combat_interface.Init(*it);
+		m_warship->m_combat_interface.Init(m_warship, *it);
 		m_scale = Scale_Tactical;
 
 		//todo: stop ship and cancel destination on strategic scale

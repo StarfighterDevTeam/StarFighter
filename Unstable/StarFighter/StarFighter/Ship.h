@@ -43,6 +43,8 @@ public:
 	int m_nb_crew_max;
 	int m_health_max;
 	int m_health;
+	int m_flood;
+	int m_flood_max;
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;

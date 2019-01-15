@@ -108,26 +108,6 @@ int RandomizeSign()
 	return sign;
 }
 
-float MaxBetweenValues(sf::Vector2f values)
-{
-	float max = values.x;
-	if (values.y > max)
-	{
-		max = values.y;
-	}
-	return max;
-}
-
-float MinBetweenValues(sf::Vector2f values)
-{
-	float min = values.x;
-	if (values.y < min)
-	{
-		min = values.y;
-	}
-	return min;
-}
-
 int Min(int a, int b)
 {
 	return a <= b ? a : b;
@@ -136,6 +116,30 @@ int Min(int a, int b)
 int Max(int a, int b)
 {
 	return a > b ? a : b;
+}
+
+void Bound(float& value, sf::Vector2f min_max_values)
+{
+	if (value < min_max_values.x)
+	{
+		value = min_max_values.x;
+	}
+	else if (value > min_max_values.y)
+	{
+		value = min_max_values.y;
+	}
+}
+
+void Bound(int& value, sf::Vector2i min_max_values)
+{
+	if (value < min_max_values.x)
+	{
+		value = min_max_values.x;
+	}
+	else if (value > min_max_values.y)
+	{
+		value = min_max_values.y;
+	}
 }
 
 std::string StringReplace(std::string str, const std::string& from, const std::string& to)

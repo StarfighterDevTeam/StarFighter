@@ -35,7 +35,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	m_text.setCharacterSize(24);
 	m_text.setColor(sf::Color::Black);
 
-	m_health_max = 0;
 	//ROOMS
 	//left
 	AddRoom(0, 3, 4, 4, Room_Weapon);
@@ -83,7 +82,7 @@ Warship::~Warship()
 	
 }
 
-void Warship::Update(Time deltaTime)
+void Warship::Update(Time deltaTime, bool tactical_combat)
 {
 	//Compass input
 	m_compass.GetInput(m_angle, m_desired_angle);
@@ -198,6 +197,12 @@ void Warship::Update(Time deltaTime)
 
 	//Compass UI update
 	m_compass.Update(deltaTime, m_angle, m_desired_angle);
+
+	//Combat interface
+	if (tactical_combat == true)
+	{
+		m_combat_interface.Update(deltaTime);
+	}
 
 	GameEntity::Update(deltaTime);
 }
