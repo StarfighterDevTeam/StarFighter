@@ -789,6 +789,22 @@ void InGameState::Draw()
 				{
 					it->Draw((*CurrentGame).m_mainScreen);
 				}
+				else if (it->m_type == UI_GrabL)
+				{
+					it->Draw((*CurrentGame).m_mainScreen);
+				}
+				else if (it->m_type == UI_GrabR)
+				{
+					it->Draw((*CurrentGame).m_mainScreen);
+				}
+				else if (it->m_type == UI_GuardL)
+				{
+					it->Draw((*CurrentGame).m_mainScreen);
+				}
+				else if (it->m_type == UI_GuardR)
+				{
+					it->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 		}
 

@@ -739,7 +739,8 @@ void Robot::InitializeUI()
 	ui.m_type = UI_EndTurn;
 	ui.m_team = (TeamAlliances)m_index;
 
-	float offset_eot_x = 250.f + robot_offset;
+	float end_of_turn_offset = m_index == 0 ? 0.f : 200.f;
+	float offset_eot_x = 150.f + robot_offset + end_of_turn_offset;
 	float offset_eot_y = 80.f;
 	float sizeeot_x = 250;
 	float sizeeot_y = 50;
@@ -770,6 +771,95 @@ void Robot::InitializeUI()
 
 	m_UI_buttons.push_back(ui);
 
+	//"Grab" button
+	for (int g = 0; g < 2; g++)
+	{
+		UI_Element ui_grab(this);
+
+		ui_grab.m_type = g == 0 ? UI_GrabL : UI_GrabR;
+
+		float offset_grab_x = g == 0 ? 180.f + robot_offset + end_of_turn_offset : 570.f + robot_offset + end_of_turn_offset;
+		float size_grab_x = 100.f;
+
+		ui_grab.m_shape_container.setPosition(sf::Vector2f(offset_grab_x, slot_coord[0][1] + offset_eot_y));
+		ui_grab.m_shape_container.setSize(sf::Vector2f(size_grab_x, sizeeot_y));
+		ui_grab.m_shape_container.setOrigin(sf::Vector2f(size_grab_x * 0.5f, sizeeot_y * 0.5));
+		ui_grab.m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
+		ui_grab.m_shape_container.setOutlineThickness(2);
+		ui_grab.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+		ui_grab.m_shape.setPosition(sf::Vector2f(offset_grab_x, slot_coord[0][1] + offset_eot_y));
+		ui_grab.m_shape.setSize(sf::Vector2f(size_grab_x, sizeeot_y));
+		ui_grab.m_shape.setOrigin(sf::Vector2f(size_grab_x * 0.5f, sizeeot_y * 0.5));
+		ui_grab.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+		ui_grab.m_shape.setOutlineThickness(0);
+		ui_grab.m_shape.setFillColor(sf::Color(255, 255, 255, 255));
+
+		if (g == 0)
+		{
+			ui_grab.m_text.setString("GRAB Left");
+		}
+		else
+		{
+			ui_grab.m_text.setString("GRAB Right");
+		}
+		ui_grab.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		ui_grab.m_text.setCharacterSize(18);
+		ui_grab.m_text.setColor(sf::Color(0, 0, 0, 255));
+		ui_grab.m_text.setPosition(sf::Vector2f(offset_grab_x - ui_grab.m_text.getGlobalBounds().width * 0.5f, slot_coord[0][1] + offset_eot_y - ui_grab.m_text.getGlobalBounds().height * 0.5f));
+
+		float global_bounds_x = ui_grab.m_text.getGlobalBounds().width;
+		float global_bounds_y = ui_grab.m_text.getCharacterSize();//ui.m_text.getGlobalBounds().height;
+		ui.m_text.setPosition(sf::Vector2f(ui_grab.m_text.getPosition().x - global_bounds_x * 0.5f, ui_grab.m_text.getPosition().y - global_bounds_y * 0.6f));
+
+		m_UI_buttons.push_back(ui_grab);
+
+	}
+
+	//"Guard" button
+	for (int g = 0; g < 2; g++)
+	{
+		UI_Element ui_guard(this);
+
+		ui_guard.m_type = g == 0 ? UI_GuardL : UI_GuardR;
+
+		float offset_guard_x = g == 0 ? 60.f + robot_offset + end_of_turn_offset : 690.f + robot_offset + end_of_turn_offset;
+		float size_guard_x = 100.f;
+
+		ui_guard.m_shape_container.setPosition(sf::Vector2f(offset_guard_x, slot_coord[0][1] + offset_eot_y));
+		ui_guard.m_shape_container.setSize(sf::Vector2f(size_guard_x, sizeeot_y));
+		ui_guard.m_shape_container.setOrigin(sf::Vector2f(size_guard_x * 0.5f, sizeeot_y * 0.5));
+		ui_guard.m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
+		ui_guard.m_shape_container.setOutlineThickness(2);
+		ui_guard.m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
+
+		ui_guard.m_shape.setPosition(sf::Vector2f(offset_guard_x, slot_coord[0][1] + offset_eot_y));
+		ui_guard.m_shape.setSize(sf::Vector2f(size_guard_x, sizeeot_y));
+		ui_guard.m_shape.setOrigin(sf::Vector2f(size_guard_x * 0.5f, sizeeot_y * 0.5));
+		ui_guard.m_shape.setOutlineColor(sf::Color(0, 0, 0, 0));
+		ui_guard.m_shape.setOutlineThickness(0);
+		ui_guard.m_shape.setFillColor(sf::Color(255, 255, 255, 255));
+
+		if (g == 0)
+		{
+			ui_guard.m_text.setString("Guard Left\n(14)");
+		}
+		else
+		{
+			ui_guard.m_text.setString("Guard Right\n(14)");
+		}
+		ui_guard.m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		ui_guard.m_text.setCharacterSize(18);
+		ui_guard.m_text.setColor(sf::Color(0, 0, 0, 255));
+		ui_guard.m_text.setPosition(sf::Vector2f(offset_guard_x - ui_guard.m_text.getGlobalBounds().width * 0.5f, slot_coord[0][1] + offset_eot_y - ui_guard.m_text.getGlobalBounds().height * 0.5f));
+
+		float global_bounds_x = ui_guard.m_text.getGlobalBounds().width;
+		float global_bounds_y = ui_guard.m_text.getCharacterSize();//ui.m_text.getGlobalBounds().height;
+		ui.m_text.setPosition(sf::Vector2f(ui_guard.m_text.getPosition().x - global_bounds_x * 0.5f, ui_guard.m_text.getPosition().y - global_bounds_y * 0.6f));
+
+		m_UI_buttons.push_back(ui_guard);
+	}
+	
 	//Robot stats
 	float offsettext_x = 20.f - robot_offset;
 	float offsettext_y = 900.f;
