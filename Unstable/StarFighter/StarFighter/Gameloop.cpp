@@ -87,12 +87,51 @@ void Gameloop::Update(sf::Time deltaTime)
 		(*it)->Update(deltaTime);
 	}
 
-	//Crew movement
+	//Crew movement (and removing the dead);
+	vector<CrewMember*> old_crew;
 	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
 	{
-		(*it)->Update(deltaTime);
+		old_crew.push_back(*it);
+	}
+	m_warship->m_crew.clear();
+	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+	{
+		if ((*it)->m_health > 0)
+		{
+			m_warship->m_crew.push_back(*it);
+			(*it)->Update(deltaTime);
+		}
+		else
+		{
+			m_warship->m_nb_crew--;
+			delete *it;
+		}
 	}
 
+	//enemy crew movement
+	if (m_tactical_ship != NULL)
+	{
+		old_crew.clear();
+		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
+		{
+			old_crew.push_back(*it);
+		}
+		m_tactical_ship->m_crew.clear();
+		for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+		{
+			if ((*it)->m_health > 0)
+			{
+				m_tactical_ship->m_crew.push_back(*it);
+				(*it)->Update(deltaTime);
+			}
+			else
+			{
+				m_tactical_ship->m_nb_crew--;
+				delete *it;
+			}
+		}
+	}
+	
 	//Weapons
 	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 	{
@@ -176,11 +215,18 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//Bullets
+	//Bullets + cleaning old bullets
+	vector<Ammo*> old_bullets;
 	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
+	{
+		old_bullets.push_back(*it);
+	}
+	(*CurrentGame).m_bullets.clear();
+	for (vector<Ammo*>::iterator it = old_bullets.begin(); it != old_bullets.end(); it++)
 	{
 		if ((*it)->m_can_be_seen == true)
 		{
+			(*CurrentGame).m_bullets.push_back(*it);
 			(*it)->Update(deltaTime);
 
 			//Hit effects
@@ -222,46 +268,39 @@ void Gameloop::Update(sf::Time deltaTime)
 							if (tile->m_crew != NULL && tile->m_crew->m_tile == tile)
 							{
 								CrewMember* crew = tile->m_crew;
-								//todo: hurt crew
+								if (crew->m_health > 0)
+								{
+									crew->m_health--;
+								}
 							}
 						}
 					}
 				}
-
-				//damaging a door?
-				//if ((*it)->m_target_tile->m_connexion != NULL)
-				//{
-					//(*it)->m_target_tile->m_connexion->Destroy();
-
-					//radius? apply affect to all squares around the radius
-					//if ((*it)->m_radius > 1)
-					//{
-						
-					//}
-				//}
-
-				//killing crew
-				//for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
-				//{
-				//	(*it)->Update(deltaTime);
-				//}
-				//
-				////piercing hull?
-				//if ((*it)->m_target_tile->m_hull != Hull_None)
-				//{
-				//	(*it)->m_target_tile->Pierce();
-				//}
 			}
-			
+		}
+		else
+		{
+			delete *it;
 		}
 	}
 
-	//FX
+	//FX + clean old FX
+	vector<FX*> old_FX;
 	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
+	{
+		old_FX.push_back(*it);
+	}
+	(*CurrentGame).m_FX.clear();
+	for (vector<FX*>::iterator it = old_FX.begin(); it != old_FX.end(); it++)
 	{
 		if ((*it)->m_can_be_seen == true)
 		{
+			(*CurrentGame).m_FX.push_back(*it);
 			(*it)->Update(deltaTime);
+		}
+		else
+		{
+			delete *it;
 		}
 	}
 
@@ -345,10 +384,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		WaterTile* tile = (WaterTile*)hovered;
 		m_warship->SetSailsToWaterTile(tile);
 	}
-
-	//Clean objects that are "dead" and won't be seen anymore
-	CleanOldBullets();
-	CleanOldFX();
 }
 
 void Gameloop::Draw()
@@ -492,56 +527,6 @@ void Gameloop::Draw()
 	temp.scale((*CurrentGame).m_scale_factor.x, (*CurrentGame).m_scale_factor.y);
 	temp.setPosition(sf::Vector2f(0, 0));
 	(*CurrentGame).getMainWindow()->draw(temp);
-}
-
-void Gameloop::CleanOldBullets()
-{
-	vector<Ammo*> old_bullets;
-
-	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
-	{
-		old_bullets.push_back(*it);
-	}
-
-	(*CurrentGame).m_bullets.clear();
-
-	for (vector<Ammo*>::iterator it = old_bullets.begin(); it != old_bullets.end(); it++)
-	{
-		if ((*it)->m_can_be_seen == true)
-		{
-			(*CurrentGame).m_bullets.push_back(*it);
-		}
-		else
-		{
-			delete *it;
-		}
-	}
-}
-
-void Gameloop::CleanOldFX()
-{
-	vector<FX*> old_fx;
-
-	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
-	{
-		old_fx.push_back(*it);
-	}
-
-	(*CurrentGame).m_FX.clear();
-
-	for (vector<FX*>::iterator it = old_fx.begin(); it != old_fx.end(); it++)
-	{
-		bool cbs = (*it)->m_can_be_seen;
-		if ((*it)->m_can_be_seen)
-		{
-			(*CurrentGame).m_FX.push_back(*it);
-		}
-		else
-		{
-			printf("");
-			//delete *it;
-		}
-	}
 }
 
 bool Gameloop::UpdateTacticalScale()

@@ -34,8 +34,6 @@ public:
 	Scale m_scale;
 
 	void InitWaterZones();
-	void CleanOldBullets();
-	void CleanOldFX();
 
 	bool UpdateTacticalScale();
 
