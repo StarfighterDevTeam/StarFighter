@@ -224,6 +224,8 @@ CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 	crew->m_tile = tile;
 	tile->m_crew = crew;
 
+	m_nb_crew_max++;
+
 	//UI
 	crew->m_shape_container.setPosition(crew->m_position);
 	crew->m_text.SetPosition(crew->m_position);
@@ -450,15 +452,15 @@ void Ship::BuildShip()
 	m_health = m_health_max;
 
 	//crew
-	m_nb_crew_max = 10;
-	m_nb_crew = m_nb_crew_max;
-
-	for (int i = 0; i < m_nb_crew_max; i++)
+	m_nb_crew_max = 0;
+	for (int i = 0; i < 10; i++)
 	{
 		int r = RandomizeIntBetweenValues(0, m_rooms.size() - 1);
 		CrewMember* crew = new CrewMember(Crew_Civilian);
 		AddCrewMember(crew, m_rooms[r]);
 	}
+
+	m_nb_crew = m_nb_crew_max;
 
 	//center position of each room & room tiles
 	CenterRoomPositions(m_is_minimized);

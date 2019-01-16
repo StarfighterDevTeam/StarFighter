@@ -27,6 +27,8 @@ public:
 	sf::Vector2f m_speed;
 	float m_speed_max;
 	float m_pathfind_cooldown_timer;
+	int m_health;
+	int m_health_max;
 
 	RoomTile* m_tile;
 	RoomTile* m_destination;

@@ -58,11 +58,13 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	m_health = m_health_max;
 
 	//CREW
+	m_nb_crew_max = 0;
 	CrewMember* crew = new CrewMember(Crew_Pirate);
 	AddCrewMember(crew, room);
 
 	CrewMember* crew2 = new CrewMember(Crew_Civilian);
 	AddCrewMember(crew2, room2);
+	m_nb_crew = m_nb_crew_max;
 
 	//WEAPONS
 	Weapon* weapon = new Weapon(Weapon_Cannon);

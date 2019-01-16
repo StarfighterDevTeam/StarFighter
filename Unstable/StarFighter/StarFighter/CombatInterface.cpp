@@ -17,6 +17,8 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 	m_ship = ship;
 	m_enemy_ship = enemy_ship;
 	
+	Texture* texture = TextureLoader::getInstance()->loadTexture("2D/crew_icon.png", 32, 32);
+
 	for (int i = 0; i < 2; i++)
 	{
 		//life bars
@@ -53,6 +55,16 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		m_floodbars[i]->m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 		m_floodbars[i]->m_shape.setOutlineThickness(2.f);
 		m_floodbars[i]->m_shape.setOutlineColor(sf::Color::Black);
+
+		//crew bars
+		m_crewbars[i] = new GameEntity(UI_None);
+		m_crewbars[i]->setAnimation(texture, 1, 1);
+		m_crewbars[i]->setPosition(sf::Vector2f(offset + 16, floodbar_pos.y + COMBAT_LIFEBAR_SIZE_Y * 0.5f + 16));
+
+		m_crewbars[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_crewbars[i]->m_text.setCharacterSize(20);
+		m_crewbars[i]->m_text.setColor(sf::Color::White);
+		m_crewbars[i]->m_text.setPosition(sf::Vector2f(m_crewbars[i]->getPosition().x + 20, m_crewbars[i]->getPosition().y - 14));
 	}
 }
 
@@ -92,6 +104,13 @@ void CombatInterface::Update(sf::Time deltaTime)
 		float flood_ratio = i == 0 ? 1.0f * flood / m_ship->m_flood_max : 1.0f * flood / m_enemy_ship->m_flood_max;
 
 		m_floodbars[i]->m_shape.setSize(sf::Vector2f(flood_ratio * COMBAT_FLOODBAR_SIZE_X, COMBAT_FLOODBAR_SIZE_Y));
+
+		//crew
+		ostringstream ss_crew;
+		int crew_nb = i == 0 ? m_ship->m_nb_crew : m_enemy_ship->m_nb_crew;
+		int crew_nb_max = i == 0 ? m_ship->m_nb_crew_max : m_enemy_ship->m_nb_crew_max;
+		ss_crew << crew_nb << "/" << crew_nb_max;
+		m_crewbars[i]->m_text.setString(ss_crew.str());
 	}
 }
 
@@ -100,8 +119,8 @@ void CombatInterface::Draw(sf::RenderTexture& screen)
 	//life bars
 	for (int i = 0; i < 2; i++)
 	{
+		m_crewbars[i]->Draw(screen);
 		m_floodbars[i]->Draw(screen);
 		m_lifebars[i]->Draw(screen);
-		
 	}
 }

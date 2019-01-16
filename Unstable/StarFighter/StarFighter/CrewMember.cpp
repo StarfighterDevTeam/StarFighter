@@ -20,6 +20,9 @@ CrewMember::CrewMember(CrewMemberType type) : GameEntity(UI_CrewMember)
 	m_pathfind_cooldown_timer = 0.f;
 	m_destination = NULL;
 
+	m_health_max = 2;
+	m_health = m_health_max;
+
 	//UI
 	m_shape_container.setSize(sf::Vector2f(m_size));
 	m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
