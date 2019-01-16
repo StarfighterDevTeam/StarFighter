@@ -57,11 +57,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 
 	m_health = m_health_max;
 
-	//doors
-	ConnectRooms();
-
-	room->m_connexions.front()->SetLock(true);
-
 	//CREW
 	CrewMember* crew = new CrewMember(Crew_Pirate);
 	AddCrewMember(crew, room);
@@ -75,6 +70,11 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 
 	//center position of each room & room tiles
 	CenterRoomPositions(m_is_minimized);
+
+	//doors
+	ConnectRooms();
+
+	room->m_connexions.front()->SetLock(true);
 }
 
 Warship::~Warship()
@@ -202,6 +202,8 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 	if (tactical_combat == true)
 	{
 		m_combat_interface.Update(deltaTime);
+
+		UpdateFlooding(deltaTime, false);
 	}
 
 	GameEntity::Update(deltaTime);

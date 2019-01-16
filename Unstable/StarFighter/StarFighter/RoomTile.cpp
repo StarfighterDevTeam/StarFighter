@@ -12,9 +12,14 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_connexion = NULL;
 	m_hull = Hull_None;
 	m_pierced = false;
-	m_health_max = ROOMTILE_HEALTH;
+	m_health_max = ROOMTILE_HEALTH_MAX;
 	m_health = m_health_max;
 	m_flood = 0;
+	m_flooding_timer = 0.f;
+	for (int i = 0; i < 4; i++)
+	{
+		m_flood_dir[i] = false;
+	}
 
 	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
 	float offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
@@ -38,6 +43,10 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_shape.setSize(sf::Vector2f(size, size));
 	m_shape.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
 	m_shape.setFillColor(sf::Color(0, 0, 0, 0));
+
+	//m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	//m_text.setCharacterSize(14);
+	//m_text.setColor(sf::Color::Black);
 }
 
 RoomTile::~RoomTile()

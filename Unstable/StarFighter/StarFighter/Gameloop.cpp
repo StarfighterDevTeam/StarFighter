@@ -207,15 +207,15 @@ void Gameloop::Update(sf::Time deltaTime)
 							int damage = tile->m_health;
 							(*it)->m_target_ship->m_health -= damage;
 							tile->m_health = 0;
-							tile->m_shape.setFillColor(sf::Color(255, 0, 0, 120));//red "damaged"
+							//tile->m_shape.setFillColor(sf::Color(255, 0, 0, 120));//red "damaged"
 
 							//piercing hull
 							if (tile->m_hull != Hull_None && tile->m_pierced == false)
 							{
 								tile->m_pierced = true;
 								tile->m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
-								tile->m_flood = ROOMTILE_FLOODING;
-								(*it)->m_target_ship->m_flood += ROOMTILE_FLOODING;
+								tile->m_flood = ROOMTILE_FLOODING_GENERATION;//ROOMTILE_FLOODING_MAX;
+								(*it)->m_target_ship->m_flood += ROOMTILE_FLOODING_MAX;
 							}
 
 							//killing crew
@@ -315,7 +315,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	//other ships
 	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 	{
-		(*it)->Update(deltaTime, m_warship->m_DMS);
+		(*it)->Update(deltaTime, m_warship->m_DMS, m_scale == Scale_Tactical);
 	}
 
 	//island

@@ -11,11 +11,11 @@ class RoomConnexion;
 
 enum Hull
 {
-	Hull_None,
 	Hull_Left,
-	Hull_Right,
 	Hull_Up,
+	Hull_Right,
 	Hull_Down,
+	Hull_None,
 };
 
 class RoomTile : public GameEntity
@@ -34,6 +34,8 @@ public:
 	int m_health_max;
 	int m_health;
 	int m_flood;
+	bool m_flood_dir[4];
+	float m_flooding_timer;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized);
 	bool IsConnectedToRoomTile(RoomTile* tile);
@@ -44,6 +46,7 @@ public:
 	int m_G_value;
 	RoomTile* m_parent;
 	Weapon* m_weapon;
+
 };
 
 #endif //ROOMTILE_H_INCLUDED

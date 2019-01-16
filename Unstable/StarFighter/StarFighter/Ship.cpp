@@ -95,7 +95,7 @@ void Ship::UpdatePosition(DMS_Coord warship_DMS)
 	GameEntity::UpdatePosition();
 }
 
-void Ship::Update(Time deltaTime, DMS_Coord warship_DMS)
+void Ship::Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat)
 {
 	//update tile information
 	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
@@ -104,6 +104,8 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS)
 
 	UpdatePosition(warship_DMS);
 	UpdateAnimation();
+
+	UpdateFlooding(deltaTime, true);
 }
 
 void Ship::UpdateAnimation()
@@ -182,8 +184,8 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 	m_rooms_size.x = m_rooms_max_offset_x - m_rooms_min_upcorner_x + 1;
 	m_rooms_size.y = m_rooms_max_offset_y - m_rooms_min_upcorner_y + 1;
 
-	m_health_max += room->m_tiles.size() * ROOMTILE_HEALTH;
-	m_flood_max += room->m_tiles.size() * ROOMTILE_FLOODING;
+	m_health_max += room->m_tiles.size() * ROOMTILE_HEALTH_MAX;
+	m_flood_max += room->m_tiles.size();
 
 	return room;
 }
@@ -280,11 +282,6 @@ Room* Ship::ConnectRooms()
 
 	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
-		for (vector<RoomTile*>::iterator it3 = (*it)->m_tiles.begin(); it3 != (*it)->m_tiles.end(); it3++)
-		{
-			(*it3)->m_connexion = NULL;
-		}
-
 		bool found = false;
 		for (vector<Room*>::iterator it2 = m_rooms.begin(); it2 != m_rooms.end(); it2++)
 		{
@@ -375,56 +372,6 @@ Room* Ship::ConnectRooms()
 		}
 	}
 
-	//flag hull (i.e. tiles that are the exterior border of the ship)
-	for (int i = 0; i < m_rooms_size.x; i++)
-	{
-		vector<RoomTile*> vec;
-		for (int j = 0; j < m_rooms_size.y; j++)
-		{
-			RoomTile* tile = NULL;
-			vec.push_back(tile);
-		}
-		m_tiles.push_back(vec);
-	}
-
-	//fill all room tiles in an array with NULL pointer for holes
-	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	{
-		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-		{
-			m_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
-		}
-	}
-
-	//look out for room tiles adjacent to holes
-	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	{
-		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-		{
-			(*it2)->m_hull = Hull_None;
-
-			int x = (*it2)->m_coord_x;
-			int y = (*it2)->m_coord_y;
-
-			if (x == 0 || m_tiles[x - 1][y] == NULL)
-			{
-				(*it2)->m_hull = Hull_Left;
-			}
-			if (x == m_rooms_size.x - 1 || m_tiles[x + 1][y] == NULL)
-			{
-				(*it2)->m_hull = Hull_Right;
-			}
-			if (y == 0 || m_tiles[x][y - 1] == NULL)
-			{
-				(*it2)->m_hull = Hull_Up;
-			}
-			if (y == m_rooms_size.y - 1 || m_tiles[x][y + 1] == NULL)
-			{
-				(*it2)->m_hull = Hull_Down;
-			}
-		}
-	}
-
 	//everything ok if this pointer is still NULL. Otherwise, it points out to the unlinked room
 	return unconnected_room;
 }
@@ -500,9 +447,6 @@ void Ship::BuildShip()
 	AddRoomMinimized(12, 13, 4, 6, Room_Kitchen);
 	AddRoomMinimized(12, 19, 4, 3, Room_Lifeboat);
 
-	//doors
-	ConnectRooms();
-
 	m_health = m_health_max;
 
 	//crew
@@ -518,6 +462,9 @@ void Ship::BuildShip()
 
 	//center position of each room & room tiles
 	CenterRoomPositions(m_is_minimized);
+
+	//doors
+	ConnectRooms();
 }
 
 void Ship::CenterRoomPositions(bool minimized)
@@ -531,38 +478,57 @@ void Ship::CenterRoomPositions(bool minimized)
 	room_offset_x -= 1.f * m_rooms_size.x / 2 * size;
 	room_offset_y -= 1.f * m_rooms_size.y / 2 * size;
 
+	//fill hull array with NULL pointers
+	for (int i = 0; i < m_rooms_size.x; i++)
+	{
+		vector<RoomTile*> vec;
+		for (int j = 0; j < m_rooms_size.y; j++)
+		{
+			RoomTile* tile = NULL;
+			vec.push_back(tile);
+		}
+		m_tiles.push_back(vec);
+	}
+
 	//enemy (minimized) = flip the ship (180°)
+	if (minimized == true)
+	{
+		for (vector<vector<RoomTile*> >::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
+		{
+			for (vector<RoomTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			{
+				*it2 = NULL;
+			}
+		}
+	}
 
 	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
-		if (minimized == false)
+		if (minimized == true)
 		{
-			(*it)->m_position.x = room_offset_x + ((*it)->m_upcorner_x + (*it)->m_width * 0.5f) * size;
-			(*it)->m_position.y = room_offset_y + ((*it)->m_upcorner_y + (*it)->m_height * 0.5f) * size;
-		}
-		else
-		{
-			(*it)->m_position.x = room_offset_x + (m_rooms_size.x - ((*it)->m_upcorner_x + (*it)->m_width * 0.5f)) * size;
-			(*it)->m_position.y = room_offset_y + (m_rooms_size.y - ((*it)->m_upcorner_y + (*it)->m_height * 0.5f)) * size;
+			//flip it
+			(*it)->m_upcorner_x = m_rooms_size.x - (*it)->m_upcorner_x - (*it)->m_width;
+			(*it)->m_upcorner_y = m_rooms_size.y - (*it)->m_upcorner_y - (*it)->m_height;
 		}
 		
-
+		(*it)->m_position.x = room_offset_x + ((*it)->m_upcorner_x + (*it)->m_width * 0.5f) * size;
+		(*it)->m_position.y = room_offset_y + ((*it)->m_upcorner_y + (*it)->m_height * 0.5f) * size;
+		
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
 			int upcorner = (*it)->m_upcorner_x;
 			int coord = (*it2)->m_coord_x;
 
-			if (minimized == false)
+			if (minimized == true)
 			{
-				(*it2)->m_position.x = room_offset_x + (0.5f + (*it2)->m_coord_x) * size;
-				(*it2)->m_position.y = room_offset_y + (0.5f + (*it2)->m_coord_y) * size;
-			}
-			else
-			{
-				(*it2)->m_position.x = room_offset_x + (- 0.5f + m_rooms_size.x - (*it2)->m_coord_x) * size;
-				(*it2)->m_position.y = room_offset_y + (- 0.5f + m_rooms_size.y - (*it2)->m_coord_y) * size;
+				//flip it
+				(*it2)->m_coord_x = m_rooms_size.x - 1 - (*it2)->m_coord_x;
+				(*it2)->m_coord_y = m_rooms_size.y - 1 - (*it2)->m_coord_y;
 			}
 			
+			(*it2)->m_position.x = room_offset_x + (0.5f + (*it2)->m_coord_x) * size;
+			(*it2)->m_position.y = room_offset_y + (0.5f + (*it2)->m_coord_y) * size;
+
 			(*it2)->UpdatePosition();
 		}
 	}
@@ -580,5 +546,149 @@ void Ship::CenterRoomPositions(bool minimized)
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
 		(*it)->m_position = (*it)->m_tile->m_position;
+	}
+
+	//fill all room tiles in the array
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			m_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
+		}
+	}
+
+	//look out for room tiles adjacent to holes
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			(*it2)->m_hull = Hull_None;
+
+			int x = (*it2)->m_coord_x;
+			int y = (*it2)->m_coord_y;
+
+			if (x == 0 || m_tiles[x - 1][y] == NULL)
+			{
+				(*it2)->m_hull = Hull_Left;
+			}
+			if (x == m_rooms_size.x - 1 || m_tiles[x + 1][y] == NULL)
+			{
+				(*it2)->m_hull = Hull_Right;
+			}
+			if (y == 0 || m_tiles[x][y - 1] == NULL)
+			{
+				(*it2)->m_hull = Hull_Up;
+			}
+			if (y == m_rooms_size.y - 1 || m_tiles[x][y + 1] == NULL)
+			{
+				(*it2)->m_hull = Hull_Down;
+			}
+		}
+	}
+}
+
+void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
+{
+	m_flood = 0;
+
+	for (vector<vector<RoomTile*> >::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+		{
+			if ((*it2) == NULL || (*it2)->m_flood == 0)
+			{
+				continue;
+			}
+
+			//ostringstream ss;
+			//ss << (*it2)->m_flood;
+			//(*it2)->m_text.setString(ss.str());
+
+			if ((*it2)->m_flooding_timer > 0)
+			{
+				(*it2)->m_flooding_timer -= deltaTime.asSeconds();
+			}
+
+			if ((*it2)->m_flooding_timer <= 0)
+			{
+				(*it2)->m_flooding_timer = FLOODING_TIMER;
+
+				//update flooding algo
+				//Flood dir:
+				//0: Hull_Left,
+				//1: Hull_Up,
+				//2: Hull_Right,
+				//3: Hull_Down,
+
+				//1. "Generate"
+				if ((*it2)->m_pierced == true)
+				{
+					//if hull is pierced here, open a stream of water entering, that constantly generates a flow
+					(*it2)->m_flood_dir[((*it2)->m_hull + 2) % 4] = true;
+					for (int i = 0; i < ROOMTILE_FLOODING_GENERATION; i++)
+					{
+						if ((*it2)->m_flood < ROOMTILE_FLOODING_MAX)
+						{
+							(*it2)->m_flood++;
+						}
+					}
+				}
+
+				//2. "Flow"
+				int x = (*it2)->m_coord_x;
+				int y = (*it2)->m_coord_y;
+
+				if ((*it2)->m_flood >= FLOOD_MIN_VALUE_FOR_TRANSFER)
+				{
+					//for each flood direction (left, up, right, down)
+					for (int i = 0; i < 4; i++)
+					{
+						RoomTile* tile = NULL;
+						if ((*it2)->m_flood_dir[i] == true)
+						{
+							switch (i)
+							{
+								case 0://check on the left
+									if (x > 0)
+										tile = m_tiles[x - 1][y];
+									break;
+
+								case 1://check below
+									if (y < m_rooms_size.y - 1)
+										tile = m_tiles[x][y + 1];
+									break;
+
+								case 2://check on the right
+									if (x < m_rooms_size.x - 1)
+										tile = m_tiles[x + 1][y];
+									break;
+
+								case 3://check above
+									if (y > 0)
+										tile = m_tiles[x][y - 1];
+									break;
+							}
+
+							//tile next to us that is not full of water, is in the same room or in a connected room tile (door not locked)?
+							if (tile != NULL && tile->m_flood < ROOMTILE_FLOODING_MAX && (tile->m_room == (*it2)->m_room || ((*it2)->m_connexion != NULL && (*it2)->m_connexion->m_locked == false && ((*it2)->m_connexion->m_tiles.first == tile || (*it2)->m_connexion->m_tiles.second == tile))))
+							{
+								tile->m_flood++;//transfer
+								(*it2)->m_flood--;
+								tile->m_flood_dir[i] = true;//keep the same momentum direction in the receiving tile
+
+								tile->m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+							}
+						}
+					}
+
+					//3. "Expand"
+					int r = RandomizeIntBetweenValues(0, 3);
+					(*it2)->m_flood_dir[r] = true;
+				}
+			}
+
+			//Update ship flood total value (1 point per tile flooded)
+			m_flood++;
+		}
 	}
 }

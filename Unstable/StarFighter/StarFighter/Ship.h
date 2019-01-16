@@ -24,7 +24,7 @@ public:
 	float m_angle;
 	bool m_can_be_seen;
 
-	void Update(Time deltaTime, DMS_Coord warship_DMS);
+	void Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat);
 	void UpdatePosition(DMS_Coord warship_DMS);
 	bool SetDMSCoord(DMS_Coord coord);
 
@@ -69,6 +69,8 @@ public:
 
 	void BuildShip();
 	void CenterRoomPositions(bool minimized);
+
+	void UpdateFlooding(Time deltaTime, bool is_minimized);
 
 private:
 	int m_rooms_min_upcorner_x;

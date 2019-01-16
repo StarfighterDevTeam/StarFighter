@@ -9,7 +9,7 @@
 
 #define CANNONBALL_SIZE						16.f
 #define CANNONBALL_SPEED					800.f
-#define CANNONBALL_RADIUS					2
+#define CANNONBALL_RADIUS					1
 
 #define AMMO_WARP_DISTANCE_PER_SECOND		400.f
 
