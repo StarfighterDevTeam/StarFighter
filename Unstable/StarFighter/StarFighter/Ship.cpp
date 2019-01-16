@@ -682,8 +682,9 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 					}
 
 					//3. "Expand"
-					int r = RandomizeIntBetweenValues(0, 3);
-					(*it2)->m_flood_dir[r] = true;
+					int r = RandomizeIntBetweenValues(0, 16);
+					if (r < 4)
+						(*it2)->m_flood_dir[r] = true;
 				}
 			}
 
