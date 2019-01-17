@@ -61,7 +61,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 
 #define ROOMTILE_FLOODING_MAX			100
 #define ROOMTILE_FLOODING_GENERATION	1
-#define FLOODING_TIMER					0.05f
+#define FLOODING_TIMER					0.07f
 #define FLOOD_MIN_VALUE_FOR_TRANSFER	20
 
 #define WATERTILE_SIZE					64.f

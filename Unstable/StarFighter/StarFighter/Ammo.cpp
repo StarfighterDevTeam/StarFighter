@@ -13,6 +13,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 	m_FX_hit = new FX();
 	m_target_ship = target_ship;
 
+	m_damage = CANNONBALL_DAMAGE;
 	m_ref_speed = CANNONBALL_SPEED;
 	m_radius = CANNONBALL_RADIUS;
 

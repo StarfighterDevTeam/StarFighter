@@ -12,8 +12,6 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_connexion = NULL;
 	m_hull = Hull_None;
 	m_pierced = false;
-	m_health_max = ROOMTILE_HEALTH_MAX;
-	m_health = m_health_max;
 	m_flood = 0;
 	m_flooding_timer = 0.f;
 	for (int i = 0; i < 4; i++)

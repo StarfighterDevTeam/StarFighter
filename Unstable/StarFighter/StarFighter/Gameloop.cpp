@@ -160,25 +160,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//TEMP DEBUG: crew movement feedback
-	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
-	{
-		(*it)->m_shape_container.setFillColor(sf::Color::Black);
-		
-		if ((*it)->m_crew != NULL)
-			(*it)->m_shape_container.setFillColor(sf::Color::Green);
-
-		if ((*it)->m_crew != NULL && (*it)->m_crew->m_tile != NULL)
-			(*it)->m_crew->m_tile->m_shape_container.setFillColor(sf::Color::Blue);
-		//for (vector<CrewMember*>::iterator it2 = m_warship->m_crew.begin(); it2 != m_warship->m_crew.end(); it2++)
-		//{
-		//	if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
-		//	{
-		//		(*it)->m_shape_container.setFillColor(sf::Color::Green);
-		//	}
-		//}
-	}
-
 	//ACTIONS
 	//Crew move to room
 	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_Room)
@@ -256,10 +237,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
 
 							//damage
-							int damage = tile->m_health;
-							(*it)->m_target_ship->m_health -= damage;
-							tile->m_health = 0;
-							//tile->m_shape.setFillColor(sf::Color(255, 0, 0, 120));//red "damaged"
+							(*it)->m_target_ship->m_health -= (*it)->m_damage;
 
 							//piercing hull
 							if (tile->m_hull != Hull_None && tile->m_pierced == false)
@@ -271,12 +249,27 @@ void Gameloop::Update(sf::Time deltaTime)
 							}
 
 							//killing crew
-							if (tile->m_crew != NULL && tile->m_crew->m_tile == tile)
+							for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
 							{
-								CrewMember* crew = tile->m_crew;
-								if (crew->m_health > 0)
+								float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
+								float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
+								float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
+								float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
+								float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
+								float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
+								float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
+								float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
+
+								//collision?
+								if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
+									|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
+									|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
+									|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
 								{
-									crew->m_health--;
+									if ((*it2)->m_health > 0)
+									{
+										(*it2)->m_health--;
+									}
 								}
 							}
 						}
@@ -662,10 +655,6 @@ bool Gameloop::UpdateTacticalScale()
 		m_tactical_ship = *it;
 		m_warship->m_combat_interface.Init(m_warship, *it);
 		m_scale = Scale_Tactical;
-
-		//todo: stop ship and cancel destination on strategic scale
-
-
 		break;
 	}
 

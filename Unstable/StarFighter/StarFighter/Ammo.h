@@ -8,6 +8,8 @@
 #include "FX.h"
 
 #define CANNONBALL_SIZE						16.f
+
+#define CANNONBALL_DAMAGE					10
 #define CANNONBALL_SPEED					800.f
 #define CANNONBALL_RADIUS					1
 
@@ -44,6 +46,7 @@ public:
 	float m_warp_timer;
 	FX* m_FX_hit;
 
+	int m_damage;
 	float m_radius;
 
 	bool m_can_be_seen;

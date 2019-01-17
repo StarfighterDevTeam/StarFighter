@@ -597,8 +597,14 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 	{
 		for (vector<RoomTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
 		{
-			if ((*it2) == NULL || (*it2)->m_flood == 0)
+			if ((*it2) == NULL)
 			{
+				continue;
+			}
+
+			if ((*it2)->m_flood == 0)
+			{
+				(*it2)->m_shape.setFillColor(sf::Color::Black);
 				continue;
 			}
 

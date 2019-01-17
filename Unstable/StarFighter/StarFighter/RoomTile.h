@@ -31,8 +31,6 @@ public:
 	RoomConnexion* m_connexion;
 	Hull m_hull;
 	bool m_pierced;
-	int m_health_max;
-	int m_health;
 	int m_flood;
 	bool m_flood_dir[4];
 	float m_flooding_timer;
