@@ -164,13 +164,19 @@ void Gameloop::Update(sf::Time deltaTime)
 	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 	{
 		(*it)->m_shape_container.setFillColor(sf::Color::Black);
-		for (vector<CrewMember*>::iterator it2 = m_warship->m_crew.begin(); it2 != m_warship->m_crew.end(); it2++)
-		{
-			if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
-			{
-				(*it)->m_shape_container.setFillColor(sf::Color::Green);
-			}
-		}
+		
+		if ((*it)->m_crew != NULL)
+			(*it)->m_shape_container.setFillColor(sf::Color::Green);
+
+		if ((*it)->m_crew != NULL && (*it)->m_crew->m_tile != NULL)
+			(*it)->m_crew->m_tile->m_shape_container.setFillColor(sf::Color::Blue);
+		//for (vector<CrewMember*>::iterator it2 = m_warship->m_crew.begin(); it2 != m_warship->m_crew.end(); it2++)
+		//{
+		//	if ((*it2)->m_destination == (*it) && (*it2)->m_selected == true)
+		//	{
+		//		(*it)->m_shape_container.setFillColor(sf::Color::Green);
+		//	}
+		//}
 	}
 
 	//ACTIONS
@@ -246,7 +252,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					{
 						if (i >= 0 && i <= (*it)->m_target_ship->m_rooms_size.x - 1 && j >= 0 && j <= (*it)->m_target_ship->m_rooms_size.y - 1 && (*it)->m_target_ship->m_tiles[i][j] != NULL)
 						{
-							//apply damage and side effects:
+							//"boom": apply bullet damage and side effects
 							RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
 
 							//damage
