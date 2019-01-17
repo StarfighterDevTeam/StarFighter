@@ -51,6 +51,7 @@ public:
 	void UI_SyncSml(int crew_index, int robot_index);
 	SFText m_UI_turn;
 	SFText m_UI_phase;
+	float m_guard_timer;
 
 private:
 	sf::RenderWindow* mainWindow;

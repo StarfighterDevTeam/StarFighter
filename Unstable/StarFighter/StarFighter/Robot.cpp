@@ -64,6 +64,11 @@ Robot::~Robot()
 		delete *it;
 		*it = NULL;
 	}
+
+	delete m_grab_slot->m_weapon;
+	delete m_guard_slot->m_weapon;
+	delete m_grab_slot;
+	delete m_guard_slot;
 }
 
 bool Robot::SetCrewMember(CrewType type, SlotIndex index)
@@ -339,6 +344,21 @@ void Robot::Initialize()
 	{
 		m_crew_start.push_back(*it);
 	}
+
+	//Grab and guard
+	m_grab_slot = new RobotSlot(Index_HandL, this);
+	m_guard_slot = new RobotSlot(Index_HandL, this);
+	Weapon* grab_weapon = new Weapon(Weapon_Grab, &m_slots[NB_SLOT_INDEX - 1]);
+	Weapon* guard_weapon = new Weapon(Weapon_Guard, &m_slots[NB_SLOT_INDEX - 1]);
+	m_grab_slot->m_weapon = grab_weapon;
+	m_guard_slot->m_weapon = guard_weapon;
+
+	m_has_attacked = false;
+	m_has_attacked_RightHand = false;
+	m_has_attacked_LeftHand = false;
+	m_has_guarded = false;
+	m_has_grabbed_LeftHand = false;
+	m_has_attacked_RightHand = false;
 
 	//UI
 	InitializeUI();
@@ -2228,8 +2248,14 @@ void Robot::UpdateCooldowns()
 		}
 	}
 
-	//Reset Guard speed
+	//Reset Guard and Grab cooldowns and speed
 	m_guard_speed = 0;
+	m_has_attacked = false;
+	m_has_attacked_RightHand = false;
+	m_has_attacked_LeftHand = false;
+	m_has_guarded = false;
+	m_has_grabbed_LeftHand = false;
+	m_has_attacked_RightHand = false;
 }
 
 void Robot::ReloadWeapons()
@@ -2655,6 +2681,21 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		(*CurrentGame).UI_AddEventLog("Counter-attack must use a close-combat weapon.", Event_Error, m_index);
 		return false;
 	}
+	else if (m_has_guarded == true)
+	{
+		(*CurrentGame).UI_AddEventLog("Cannot attack when using Guard.", Event_Error, m_index);
+		return false;
+	}
+	else if (attack->m_owner->m_owner->m_index == Index_HandL && m_has_grabbed_LeftHand == true)
+	{
+		(*CurrentGame).UI_AddEventLog("Cannot attack with Left Hand when using Grab with this hand.", Event_Error, m_index);
+		return false;
+	}
+	else if (attack->m_owner->m_owner->m_index == Index_HandR && m_has_grabbed_RightHand == true)
+	{
+		(*CurrentGame).UI_AddEventLog("Cannot attack with Right Hand when using Grab with this hand.", Event_Error, m_index);
+		return false;
+	}
 	else
 	{
 		//Consumption of Energy Cells
@@ -2682,7 +2723,17 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		{
 			(*CurrentGame).m_attacks_list.push_back(action);
 		}
-		
+
+		m_has_attacked = true;
+		if (target_index == Index_HandL)
+		{
+			m_has_attacked_LeftHand = true;
+		}
+		if (target_index == Index_HandR)
+		{
+			m_has_attacked_RightHand = true;
+		}
+
 		return true;
 	}
 }
@@ -2879,5 +2930,56 @@ bool Robot::SetEnergyCellsOnBalance()
 
 		(*CurrentGame).UI_AddEventLog("'s balance restored by using ECs.", Event_Balance, m_index);
 		return true;
+	}
+}
+
+bool Robot::SetGuard(int speed, bool left)
+{
+	if (m_has_attacked == true)
+	{
+		(*CurrentGame).UI_AddEventLog("Cannot Guard if robot already attacked during this turn.", Event_Error, m_index);
+		return false;
+	}
+
+	m_guard_speed = speed;
+	m_guard_index = left == true ? Index_HandL : Index_HandR;
+	m_has_guarded = true;
+}
+
+bool Robot::SetGrab(bool left, SlotIndex target_index)
+{
+	if (left == true && m_has_attacked_LeftHand == true)
+	{
+		(*CurrentGame).UI_AddEventLog("Cannot Grab wih Left Hand if robot already attacked with this hand.", Event_Error, m_index);
+		return false;
+	}
+	else if (left == false && m_has_attacked_RightHand == true)
+	{
+		(*CurrentGame).UI_AddEventLog("Cannot Grab wih Right Hand if robot already attacked with this hand.", Event_Error, m_index);
+		return false;
+	}
+	else if (m_has_guarded == true)
+	{
+		(*CurrentGame).UI_AddEventLog("Cannot Grab after a Guard during this same turn.", Event_Error, m_index);
+		return false;
+	}
+
+	//setting hand
+	m_grab_slot->m_index = left == true ? Index_HandL : Index_HandR;
+
+	ActionAttack action;
+	action.m_attack = m_grab_slot->m_weapon->m_attacks.front();
+	action.m_target_index = target_index;
+	action.m_resolved = false;
+	
+	(*CurrentGame).m_attacks_list.push_back(action);
+
+	if (left == true)
+	{
+		m_has_grabbed_LeftHand = true;
+	}
+	else
+	{
+		m_has_grabbed_RightHand = true;
 	}
 }

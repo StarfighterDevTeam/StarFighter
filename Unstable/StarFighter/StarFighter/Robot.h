@@ -91,6 +91,18 @@ public:
 	bool SetEnergyCellsOnBalance();
 	void ReloadWeapons();
 	RobotSlot* GetEntityParentSlot(GameEntity* entity, UI_Type type);
+	bool SetGuard(int speed, bool left);
+	bool SetGrab(bool left, SlotIndex target_index);
+
+	RobotSlot* m_grab_slot;
+	RobotSlot* m_guard_slot;
+	bool m_has_attacked;
+	bool m_has_attacked_RightHand;
+	bool m_has_attacked_LeftHand;
+	bool m_has_guarded;
+	bool m_has_grabbed_RightHand;
+	bool m_has_grabbed_LeftHand;
+	SlotIndex m_guard_index;
 
 	//UI
 	void InitializeUI();

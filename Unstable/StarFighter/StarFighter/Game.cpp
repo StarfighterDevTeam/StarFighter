@@ -932,7 +932,7 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 			&& m_team == (TeamAlliances)robot_index 
 			&&
 			((*CurrentGame).m_phase == Phase_AttackPlanning || (*CurrentGame).m_phase == Phase_Execution || (*CurrentGame).m_phase == Phase_CounterAttack) 
-				&& (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module))
+				&& (m_type == UI_Crew || m_type == UI_Module || m_type == UI_Equipment || m_type == UI_EC_Slot_Equipment || m_type == UI_EC_Slot_Module || m_type == UI_GrabL || m_type == UI_GrabR))
 		{
 			m_selected = true;
 			(*CurrentGame).m_selected_ui = this;
@@ -963,6 +963,12 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 			(*CurrentGame).m_target_ui = this;
 		}
 		else if ((*CurrentGame).m_selected_ui->m_type == UI_Crew && (*CurrentGame).m_hovered_ui->m_type == UI_Equipment && (*CurrentGame).m_phase == Phase_AttackPlanning)
+		{
+			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
+			(*CurrentGame).m_target_ui = this;
+		}
+		//GRAB
+		else if (((*CurrentGame).m_selected_ui->m_type == UI_GrabL || (*CurrentGame).m_selected_ui->m_type == UI_GrabR) && (*CurrentGame).m_hovered_ui->m_type == UI_Slot && (*CurrentGame).m_phase == Phase_AttackPlanning)
 		{
 			(*CurrentGame).m_play_ui = (*CurrentGame).m_selected_ui;
 			(*CurrentGame).m_target_ui = this;
@@ -1017,6 +1023,16 @@ void UI_Element::Update(MouseAction mouse_click, int robot_index)
 		}
 		//EC SLOTS -> ADD EC
 		else if (m_hovered && mouse_click == Mouse_LeftClick && ((*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Equipment || (*CurrentGame).m_hovered_ui->m_type == UI_EC_Slot_Module))
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
+		//GUARD L
+		else if (m_hovered && mouse_click == Mouse_LeftClick && (*CurrentGame).m_hovered_ui->m_type == UI_GuardL)
+		{
+			(*CurrentGame).m_play_ui = this;
+		}
+		//GUARD R
+		else if (m_hovered && mouse_click == Mouse_LeftClick && (*CurrentGame).m_hovered_ui->m_type == UI_GuardR)
 		{
 			(*CurrentGame).m_play_ui = this;
 		}

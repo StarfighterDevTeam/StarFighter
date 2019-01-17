@@ -31,6 +31,8 @@ void InGameState::Initialize(Player player)
 	//ROBOT
 	InitRobots();
 	InitUI();
+
+	m_guard_timer = 0.f;
 }
 
 void InGameState::InitUI()
@@ -218,20 +220,6 @@ void InGameState::UI_GetAction(int robot_index)
 		}
 	}
 
-	//Global shutdown or grounded -> skip turn
-	//if (m_robots[robot_index].m_shutdown_global == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
-	//{
-	//	m_robots[robot_index].m_ready_to_change_phase = true;
-	//	(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's under a global shutdown.\n", Event_Shutdown, robot_index);
-	//	return;
-	//}
-	//else if (m_robots[robot_index].m_grounded == true && (*CurrentGame).m_phase == Phase_AttackPlanning)
-	//{
-	//	m_robots[robot_index].m_ready_to_change_phase = true;
-	//	(*CurrentGame).UI_AddEventLog("Cannot plan any attack because\nhe's stuck on ground (x2 damage).\n", Event_Shutdown, robot_index);
-	//	return;
-	//}
-	
 	//Do action
 	//Debug shortcut
 	if ((*CurrentGame).m_playerShip->m_inputs_states[Action_Firing] == Input_Tap)
@@ -262,6 +250,35 @@ void InGameState::UI_GetAction(int robot_index)
 			(*CurrentGame).m_UI_events_log.clear();
 			(*CurrentGame).UI_AddEventLog(" has played.", Event_Neutral, r1);
 		}	 
+		//Guard
+		else if ((*CurrentGame).m_play_ui->m_type == UI_GuardL)
+		{
+			m_robots[r1].SetGuard((int)m_guard_timer, true);
+		}
+		else if ((*CurrentGame).m_play_ui->m_type == UI_GuardR)
+		{
+			m_robots[r1].SetGuard((int)m_guard_timer, false);
+		}
+		//Grab
+		else if ((*CurrentGame).m_play_ui->m_type == UI_GrabL)
+		{
+			RobotSlot* target_slot = (RobotSlot*)(*CurrentGame).m_target_ui;
+			SlotIndex target_index = target_slot->m_index;
+			m_robots[r1].SetGrab(true, target_index);
+
+			(*CurrentGame).m_selected_ui->m_selected = false;
+			(*CurrentGame).m_selected_ui = NULL;
+		}
+		else if ((*CurrentGame).m_play_ui->m_type == UI_GrabR)
+		{
+			RobotSlot* target_slot = (RobotSlot*)(*CurrentGame).m_target_ui;
+			SlotIndex target_index = target_slot->m_index;
+			m_robots[r1].SetGrab(false, target_index);
+
+			(*CurrentGame).m_selected_ui->m_selected = false;
+			(*CurrentGame).m_selected_ui = NULL;
+		}
+		//Set balance
 		else if ((*CurrentGame).m_play_ui->m_type == UI_Balance)
 		{
 			m_robots[r1].SetEnergyCellsOnBalance();
@@ -422,6 +439,12 @@ void InGameState::UI_SyncSml(int crew_index, int robot_index)
 
 void InGameState::Update(sf::Time deltaTime)
 {
+	m_guard_timer -= deltaTime.asSeconds();
+	if (m_guard_timer < 0)
+	{
+		m_guard_timer += Phase_AttackResolution_1 - Phase_AttackResolution_14 + 2;
+	}
+
 	//Get mouse & keyboard inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
 	(*CurrentGame).m_playerShip->update(deltaTime);
@@ -473,7 +496,7 @@ void InGameState::Update(sf::Time deltaTime)
 	}
 	else if ((*CurrentGame).m_phase == Phase_GuardResolution)
 	{
-		GuardResolution();
+		//GuardResolution();
 		m_robots[0].m_ready_to_change_phase = true;
 		m_robots[1].m_ready_to_change_phase = true;
 	}
@@ -546,6 +569,28 @@ void InGameState::Update(sf::Time deltaTime)
 
 			//get back to resolving the remaining attacks
 			(*CurrentGame).m_phase = (GamePhase)(Phase_AttackResolution_14 - 1);
+		}
+	}
+	
+	//Guard button (choose speed)
+	for (int r = 0; r < 2; r++)
+	{
+		for (vector<UI_Element>::iterator it = m_robots[r].m_UI_buttons.begin(); it != m_robots[r].m_UI_buttons.end(); it++)
+		{
+			if (it->m_type == UI_GuardL || it->m_type == UI_GuardR)
+			{
+				ostringstream ss;
+				if (it->m_type == UI_GuardL)
+				{
+					ss << "Guard Left\nSpeed: ";
+				}
+				else if (it->m_type == UI_GuardR)
+				{
+					ss << "Guard Right\nSpeed: ";
+				}
+				ss << (int)m_guard_timer;
+				it->m_text.setString(ss.str());
+			}
 		}
 	}
 }
@@ -1046,27 +1091,15 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 			//Guard redirection
 			if (speed <= opponent.m_guard_speed && is_execution == false && is_counter_attack == false)
 			{
-				Module* shield = opponent.GetShield();
-				if (shield != NULL)
+				target_index = opponent.m_guard_index;
+				if (opponent.m_guard_index == Index_HandL)
 				{
-					target_index = shield->m_owner->m_index;
-				}
-				else if (target_index == Index_FootL || target_index == Index_LegL || target_index == Index_ShoulderL)
-				{
-					target_index = Index_HandL;
-					(*CurrentGame).UI_AddEventLog("Guard redirects attack from side to hand.", Event_Neutral, opponent.m_index);
-				}
-				else if (target_index == Index_FootR || target_index == Index_LegR || target_index == Index_ShoulderR)
-				{
-					target_index = Index_HandR;
-					(*CurrentGame).UI_AddEventLog("Guard redirects attack from side to hand.", Event_Neutral, opponent.m_index);
-				}
-				else if (target_index == Index_BodyU || target_index == Index_BodyM || target_index == Index_BodyD)
-				{
-					target_index = Index_HandR;
+					(*CurrentGame).UI_AddEventLog("Guard redirects attack to Left hand.", Event_Neutral, opponent.m_index);
 
-					//todo : choose hand
-					(*CurrentGame).UI_AddEventLog("Guard redirects attack from torso to hand.\nChoose which hand?", Event_ContextualChoice, opponent.m_index);
+				}
+				else
+				{
+					(*CurrentGame).UI_AddEventLog("Guard redirects attack to Right hand.", Event_Neutral, opponent.m_index);
 				}
 			}
 
