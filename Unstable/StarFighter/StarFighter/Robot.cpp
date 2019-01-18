@@ -2728,11 +2728,11 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		}
 
 		m_has_attacked = true;
-		if (target_index == Index_HandL)
+		if (module->m_owner->m_index == Index_HandL)
 		{
 			m_has_attacked_LeftHand = true;
 		}
-		if (target_index == Index_HandR)
+		if (module->m_owner->m_index == Index_HandR)
 		{
 			m_has_attacked_RightHand = true;
 		}

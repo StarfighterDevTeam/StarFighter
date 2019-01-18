@@ -767,8 +767,30 @@ void InGameState::UpdateUI(sf::Time deltaTime)
 					ss << m_robots[r].m_guard_speed;
 					it->m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange
 				}
-				
+
 				it->m_text.setString(ss.str());
+			}
+			else if (it->m_type == UI_GrabL)
+			{
+				if (m_robots[r].m_has_grabbed_LeftHand == false)
+				{
+					it->m_shape.setFillColor(sf::Color::White);
+				}
+				else
+				{
+					it->m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange
+				}
+			}
+			else if (it->m_type == UI_GrabR)
+			{
+				if (m_robots[r].m_has_grabbed_RightHand == false)
+				{
+					it->m_shape.setFillColor(sf::Color::White);
+				}
+				else
+				{
+					it->m_shape.setFillColor(sf::Color(255, 201, 14, 255));//orange
+				}
 			}
 		}
 	}
