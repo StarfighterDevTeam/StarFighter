@@ -795,6 +795,7 @@ void Robot::InitializeUI()
 	for (int g = 0; g < 2; g++)
 	{
 		UI_Element ui_grab(this);
+		ui_grab.m_team = (TeamAlliances)m_index;
 
 		ui_grab.m_type = g == 0 ? UI_GrabL : UI_GrabR;
 
@@ -840,6 +841,8 @@ void Robot::InitializeUI()
 	for (int g = 0; g < 2; g++)
 	{
 		UI_Element ui_guard(this);
+
+		ui_guard.m_team = (TeamAlliances)m_index;
 
 		ui_guard.m_type = g == 0 ? UI_GuardL : UI_GuardR;
 
