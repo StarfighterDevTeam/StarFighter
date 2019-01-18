@@ -358,7 +358,7 @@ void Robot::Initialize()
 	m_has_attacked_LeftHand = false;
 	m_has_guarded = false;
 	m_has_grabbed_LeftHand = false;
-	m_has_attacked_RightHand = false;
+	m_has_grabbed_RightHand = false;
 
 	//UI
 	InitializeUI();
@@ -2258,7 +2258,7 @@ void Robot::UpdateCooldowns()
 	m_has_attacked_LeftHand = false;
 	m_has_guarded = false;
 	m_has_grabbed_LeftHand = false;
-	m_has_attacked_RightHand = false;
+	m_has_grabbed_RightHand = false;
 }
 
 void Robot::ReloadWeapons()
@@ -2679,7 +2679,7 @@ bool Robot::SetWeaponAttackOnSlot(WeaponAttack* attack, SlotIndex target_index)
 		(*CurrentGame).UI_AddEventLog("This attack requires to be in close-combat.", Event_Error, m_index);
 		return false;
 	}
-	else if (attack->m_owner->m_ranged == false && (*CurrentGame).m_phase == Phase_CounterAttack)
+	else if (attack->m_owner->m_ranged == true && (*CurrentGame).m_phase == Phase_CounterAttack)
 	{
 		(*CurrentGame).UI_AddEventLog("Counter-attack must use a close-combat weapon.", Event_Error, m_index);
 		return false;

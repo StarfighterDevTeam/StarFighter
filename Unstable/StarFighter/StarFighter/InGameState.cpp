@@ -1586,18 +1586,10 @@ void InGameState::EffectsResolution()
 
 void InGameState::GrabResolution()
 {
-	vector<ActionAttack> old_attacks_list;
-	for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
-	{
-		old_attacks_list.push_back(*it);
-	}
-
-	(*CurrentGame).m_attacks_list.clear();
-
 	//Resolve grabs of robot 0, then robot 1
 	for (int r = 0; r < 2; r++)
 	{
-		for (vector<ActionAttack>::iterator it = old_attacks_list.begin(); it != old_attacks_list.end(); it++)
+		for (vector<ActionAttack>::iterator it = (*CurrentGame).m_attacks_list.begin(); it != (*CurrentGame).m_attacks_list.end(); it++)
 		{
 			if (it->m_resolved == true)
 			{
@@ -1637,6 +1629,25 @@ void InGameState::GrabResolution()
 				(*CurrentGame).UI_AddEventLog("Grab dodged. Do you want to counter-attack?", Event_Grab, opponent.m_index);
 
 				(*CurrentGame).m_phase = Phase_CounterAttack;
+			}
+
+			if ((*CurrentGame).m_phase == Phase_CounterAttack)
+			{
+				//lay down a flag that will let us know if the player chooses to launch the contextual attack or decline it
+				m_nb_attacks_becore_contextual = (*CurrentGame).m_attacks_list.size();
+
+				//reload weapons
+				int robot_index = it->m_attack->m_owner->m_owner->m_owner->m_index;
+				m_robots[robot_index].ReloadWeapons();
+
+				//clear targets displayed sooner than usual
+				for (int r = 0; r < 2; r++)
+				{
+					for (vector<UI_Element>::iterator it = m_robots[r].m_UI_slots.begin(); it != m_robots[r].m_UI_slots.end(); it++)
+					{
+						it->m_shape.setFillColor(sf::Color(0, 0, 0, 0));
+					}
+				}
 			}
 
 			it->m_resolved = true;
