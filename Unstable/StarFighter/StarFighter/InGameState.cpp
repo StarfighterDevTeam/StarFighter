@@ -1071,8 +1071,8 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 	Weapon* weapon = attack->m_owner;
 
 	Robot& opponent = m_robots[(robot->m_index + 1) % 2];
-	RobotSlot& target_slot = opponent.m_slots[target_index];
-	Module* target_module = target_slot.m_module;
+	//RobotSlot& target_slot = opponent.m_slots[target_index];
+	//Module* target_module = target_slot.m_module;
 
 	int speed = (int)(Phase_AttackResolution_1)-(int)(*CurrentGame).m_phase + 1;
 
@@ -1151,8 +1151,8 @@ bool InGameState::ResolveAttack(WeaponAttack* attack, SlotIndex target_index, bo
 			{
 				if (i == target_index || (attack->m_hitmode == Hit_AdjacentSlots && opponent.GetDistanceFromSlotToSlot(target_index, (SlotIndex)i) == 1))
 				{
-					target_slot = opponent.m_slots[i];
-					target_module = target_slot.m_module;
+					RobotSlot& target_slot = opponent.m_slots[i];
+					Module* target_module = target_slot.m_module;
 
 					int gunner_bonus = robot_slot.GetGunnerRangeBonus();
 					int equipment_bonus = robot_slot.GetEquipmentRangeBonus();
@@ -1625,7 +1625,6 @@ void InGameState::GrabResolution()
 
 			if (it->m_attack->m_type != WeaponAttack_Grab_1)
 			{
-				(*CurrentGame).m_attacks_list.push_back(*it);
 				continue;
 			}
 

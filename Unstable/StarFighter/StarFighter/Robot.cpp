@@ -348,8 +348,8 @@ void Robot::Initialize()
 	//Grab and guard
 	m_grab_slot = new RobotSlot(Index_HandL, this);
 	m_guard_slot = new RobotSlot(Index_HandL, this);
-	Weapon* grab_weapon = new Weapon(Weapon_Grab, &m_slots[NB_SLOT_INDEX - 1]);
-	Weapon* guard_weapon = new Weapon(Weapon_Guard, &m_slots[NB_SLOT_INDEX - 1]);
+	Weapon* grab_weapon = new Weapon(Weapon_Grab, m_grab_slot);
+	Weapon* guard_weapon = new Weapon(Weapon_Guard, m_guard_slot);
 	m_grab_slot->m_weapon = grab_weapon;
 	m_guard_slot->m_weapon = guard_weapon;
 
