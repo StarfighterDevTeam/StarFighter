@@ -13,6 +13,7 @@ enum UI_Type
 	UI_EnemyShip,
 	UI_Warship,
 	UI_WaterTile,
+	UI_Island,
 	UI_Seaport,
 	UI_Compass,
 	UI_Weapon,

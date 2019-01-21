@@ -329,9 +329,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//boat
-	m_warship->Update(deltaTime, m_scale == Scale_Tactical);
-
 	//water tiles
 	m_warship->m_tiles_can_be_seen.clear();
 	for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
@@ -357,15 +354,22 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 				else
 				{
-					(*it2)->GameEntity::Update(deltaTime);
-					(*it2)->m_text.setString("");
-
-					//selection of water tiles is forbidden
-					if ((*it2)->m_selected == true)
+					if ((*it2)->m_type == Water_Empty)
 					{
-						(*it2)->m_selected = false;
-						(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
-						(*CurrentGame).m_selected_ui = NULL;
+						(*it2)->GameEntity::Update(deltaTime);
+						(*it2)->m_text.setString("");
+
+						//selection of water tiles is forbidden
+						if ((*it2)->m_selected == true)
+						{
+							(*it2)->m_selected = false;
+							(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+							(*CurrentGame).m_selected_ui = NULL;
+						}
+					}
+					else
+					{
+						(*it2)->GameEntity::UpdatePosition();
 					}
 				}
 			}
@@ -375,6 +379,9 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 	}
+
+	//boat
+	m_warship->Update(deltaTime, m_scale == Scale_Tactical);
 
 	//other ships
 	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
@@ -500,16 +507,29 @@ void Gameloop::Draw()
 	//boat
 	if (m_scale == Scale_Strategic)
 	{
+		
 		//water tiles
 		vector<Island*> islands;
+		GameEntity* focused_water_tile = NULL;
 		for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
 		{
-			(*it)->Draw((*CurrentGame).m_mainScreen);
+			if (((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui == *it) || ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui == *it))
+			{
+				focused_water_tile = *it;
+			}
+			else
+			{
+				(*it)->Draw((*CurrentGame).m_mainScreen);
+			}
 
 			if ((*it)->m_island != NULL)
 			{
 				islands.push_back((*it)->m_island);
 			}
+		}
+		if (focused_water_tile != NULL)
+		{
+			focused_water_tile->Draw((*CurrentGame).m_mainScreen);
 		}
 
 		//islands and ports

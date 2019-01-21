@@ -54,7 +54,7 @@ void GameEntity::Update(Time deltaTime)
 	//get selected state
 	if (mouse_click == Mouse_LeftClick)
 	{
-		if (m_hovered == true && m_UI_type != UI_WaterTile && m_UI_type != UI_Room && m_UI_type != UI_RoomTile)//types that cannot be selected
+		if (m_hovered == true && m_UI_type != UI_WaterTile && m_UI_type != UI_Room && m_UI_type != UI_RoomTile && m_UI_type != UI_Island)//types that cannot be selected
 		{
 			if ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui != this)
 			{
