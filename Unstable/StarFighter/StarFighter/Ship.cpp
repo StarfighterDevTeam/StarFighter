@@ -23,9 +23,10 @@ Ship::Ship(DMS_Coord coord, ShipType type, bool is_player) : GameEntity(UI_Enemy
 	SetDMSCoord(coord);
 
 	//shape for water tiles
+	m_textureName = "2D/enemy_icon.png";
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/enemy_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
+	sf::Texture* texture = loader->loadTexture(m_textureName, (int)WATERTILE_SIZE, (int)WATERTILE_SIZE * 2);
 
 	setAnimation(texture, 1, 2);
 

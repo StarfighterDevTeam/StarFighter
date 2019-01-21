@@ -9,10 +9,13 @@
 #define COMBAT_LIFEBAR_SIZE_X			400.f
 #define COMBAT_LIFEBAR_SIZE_Y			20.f
 #define COMBAT_LIFEBAR_OFFSET_X			200.f
-#define COMBAT_LIFEBAR_MINI_OFFSET_X	1350.f
+#define COMBAT_LIFEBAR_MINI_OFFSET_X		1350.f
 #define COMBAT_LIFEBAR_OFFSET_Y			100.f
 #define COMBAT_FLOODBAR_SIZE_X			(COMBAT_LIFEBAR_SIZE_X)
 #define COMBAT_FLOODBAR_SIZE_Y			10.f
+#define COMBAT_DISTANCE_SIZE_X			400.f
+#define COMBAT_DISTANCE_OFFSET_X			1010.f
+#define COMBAT_DISTANCE_OFFSET_Y			1000.f
 
 struct CombatInterface
 {
@@ -27,6 +30,7 @@ struct CombatInterface
 	GameEntity* m_floodbars[2];
 	GameEntity* m_crewbars[2];
 	GameEntity* m_distance_line;
+	GameEntity* m_distance_markers[5];
 	GameEntity* m_distance_ships[2];
 
 	void Update(sf::Time deltaTime);

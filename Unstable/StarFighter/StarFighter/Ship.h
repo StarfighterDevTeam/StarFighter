@@ -55,6 +55,7 @@ public:
 	bool m_is_minimized;
 	float m_distance_combat;
 	sf::Vector2i m_rooms_size;
+	string m_textureName;
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);

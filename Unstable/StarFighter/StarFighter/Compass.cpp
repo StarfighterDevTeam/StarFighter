@@ -14,7 +14,6 @@ Compass::Compass()
 	m_cadran->m_shape_container.setOutlineColor(sf::Color(0, 0, 0, 255));
 	sf::Vector2f cadran_pos = m_cadran->m_shape_container.getPosition();
 
-
 	//cursor
 	m_cursor = new GameEntity(UI_None);
 	m_cursor->m_shape_container.setSize(sf::Vector2f(COMPASS_CURSOR_SIZE_X, COMPASS_CURSOR_SIZE_Y));

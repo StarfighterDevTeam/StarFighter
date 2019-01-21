@@ -54,7 +54,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 
 
 
-#define DISTANCE_COMBAT_INIT		800.f
+#define DISTANCE_COMBAT_INIT			1000.f
 #define WARP_AMMO_OFFSET_X			1100.f
 
 #define ROOMTILE_HEALTH_MAX				100
