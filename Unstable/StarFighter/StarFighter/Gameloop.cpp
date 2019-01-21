@@ -97,7 +97,14 @@ void Gameloop::Update(sf::Time deltaTime)
 			
 			if ((*it2)->m_weapon_gunner != NULL)
 			{
-				(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
+				if ((*it2)->m_weapon_gunner->m_crew != NULL && (*it2)->m_weapon_gunner->m_crew->m_tile == (*it2)->m_weapon_gunner)
+				{
+					(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color::Green);
+				}
+				else
+				{
+					(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
+				}
 			}
 
 			//crew move order (hover tile) feedback
@@ -221,7 +228,10 @@ void Gameloop::Update(sf::Time deltaTime)
 		if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
 		{
 			Weapon* weapon = (Weapon*)hovered;
-			m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
+			if (weapon->m_tile->m_weapon_gunner->m_crew != NULL && weapon->m_tile->m_weapon_gunner->m_crew->m_tile == weapon->m_tile->m_weapon_gunner)
+			{
+				m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
+			}
 		}
 	}
 
