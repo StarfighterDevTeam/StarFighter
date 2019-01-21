@@ -17,7 +17,6 @@ CrewMember::CrewMember(CrewMemberType type) : GameEntity(UI_CrewMember)
 	m_ref_speed = CREWMEMBER_SPEED;
 	m_speed = sf::Vector2f(0, 0);
 	m_size = sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE);
-	m_pathfind_cooldown_timer = 0.f;
 	m_destination = NULL;
 
 	m_health_max = 2;
@@ -105,12 +104,6 @@ void CrewMember::MoveToRoomTile(RoomTile* tile)
 
 void CrewMember::Update(Time deltaTime)
 {
-	//update cooldown timer
-	if (m_pathfind_cooldown_timer > 0)
-	{
-		m_pathfind_cooldown_timer -= deltaTime.asSeconds();
-	}
-
 	//get new move order
 	if (m_current_path.empty() == true && m_destination != NULL)
 	{
@@ -119,36 +112,17 @@ void CrewMember::Update(Time deltaTime)
 		{
 			//free departure tile
 			m_tile->m_crew = NULL;
-			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
 		}
 	}
 	//order changed
 	else if (m_current_path.empty() == false && m_destination != NULL && m_destination != m_current_path.front())
 	{
-		//refresh order (only after a given cooldown)
-		if (m_pathfind_cooldown_timer > CREWMEMBER_MOVEORDER_COOLDOWN_TIMER)
-		{
-			m_pathfind_cooldown_timer = CREWMEMBER_MOVEORDER_COOLDOWN_TIMER;
-		}
-		if (m_pathfind_cooldown_timer <= 0)
-		{
-			if (FindShortestPath(m_tile, m_destination) == true)
-			{
-				m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
-			}
-		}
+		FindShortestPath(m_tile, m_destination);
 	}
 		
 	//arrived at waypoint? get next waypoint
 	if (m_current_path.empty() == false)
 	{
-		////refresh route (every X seconds) <!> this will possibly change m_destination
-		//if (m_pathfind_cooldown_timer <= 0)
-		//{
-		//	MoveToRoom(m_destination->m_room);
-		//	m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
-		//}
-
 		RoomTile* waypoint = m_current_path.back();
 		sf::Vector2f vec = waypoint->m_position - m_position;
 		

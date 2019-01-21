@@ -7,8 +7,6 @@
 
 #define CREWMEMBER_SIZE							16.f
 #define CREWMEMBER_SPEED						70.f
-#define CREWMEMBER_ROUTE_REFRESH_TIMER			5.f
-#define CREWMEMBER_MOVEORDER_COOLDOWN_TIMER		0.5f
 
 class CrewMember : public GameEntity
 {
@@ -26,7 +24,6 @@ public:
 
 	sf::Vector2f m_speed;
 	float m_ref_speed;
-	float m_pathfind_cooldown_timer;
 	int m_health;
 	int m_health_max;
 
