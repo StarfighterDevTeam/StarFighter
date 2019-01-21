@@ -84,6 +84,8 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Room tiles
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
+			(*it2)->m_shape_container.setFillColor(sf::Color::Black);
+
 			if ((*it2)->m_crew != NULL)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color::Green);
@@ -178,34 +180,29 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			(*it)->Update(deltaTime);
 		}
-
-		//Crew movement
-		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
-		{
-			(*it)->Update(deltaTime);
-		}
 	}
 
 	//ACTIONS
 	//Crew move to room
-	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_Room)
+	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_RoomTile)
 	{
 		CrewMember* crew = (CrewMember*)selection;
-		Room* room = (Room*)hovered;
-		RoomTile* previous_destination = crew->m_destination;
-		RoomTile* destination = crew->GetFreeRoomTile(room);
+		RoomTile* destination = (RoomTile*)hovered;
 
-		//if destination is valid (it exists and we're not already on it and the room is not full), book the tile
-		if (destination != NULL && destination->m_crew != crew && room->m_nb_crew[Crew_All] < room->m_nb_crew_max)
+		//tile is free?
+		if (destination->m_crew == NULL && destination->m_weapon == NULL)
 		{
-			crew->m_destination = destination;
+			//free previous destination's booking (if any)
+			if (crew->m_destination != NULL)
+			{
+				crew->m_destination->m_crew = NULL;
+			}
+
+			//book new destination
 			destination->m_crew = crew;
 
-			//...and free the previous booking (if any)
-			if (previous_destination != NULL && previous_destination->m_crew != NULL)
-			{
-				previous_destination->m_crew = NULL;
-			}
+			//assign destination for pathfind
+			crew->m_destination = destination;
 		}
 	}
 	//Close/open doors

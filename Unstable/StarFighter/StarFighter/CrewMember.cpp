@@ -14,7 +14,7 @@ CrewMember::CrewMember(CrewMemberType type) : GameEntity(UI_CrewMember)
 {
 	m_type = type;
 	m_UI_type = UI_CrewMember;
-	m_speed_max = CREWMEMBER_SPEED;
+	m_ref_speed = CREWMEMBER_SPEED;
 	m_speed = sf::Vector2f(0, 0);
 	m_size = sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE);
 	m_pathfind_cooldown_timer = 0.f;
@@ -114,12 +114,13 @@ void CrewMember::Update(Time deltaTime)
 	//get new move order
 	if (m_current_path.empty() == true && m_destination != NULL)
 	{
-		//free departure tile
-		m_tile->m_crew = NULL;
-
 		//search pathfind
-		MoveToRoom(m_destination->m_room);
-		m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+		if (FindShortestPath(m_tile, m_destination) == true)
+		{
+			//free departure tile
+			m_tile->m_crew = NULL;
+			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+		}
 	}
 	//order changed
 	else if (m_current_path.empty() == false && m_destination != NULL && m_destination != m_current_path.front())
@@ -131,28 +132,33 @@ void CrewMember::Update(Time deltaTime)
 		}
 		if (m_pathfind_cooldown_timer <= 0)
 		{
-			MoveToRoom(m_destination->m_room);
-			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+			if (FindShortestPath(m_tile, m_destination) == true)
+			{
+				m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+			}
 		}
 	}
 		
 	//arrived at waypoint? get next waypoint
 	if (m_current_path.empty() == false)
 	{
-		//refresh route (every X seconds) <!> this will possibly change m_destination
-		if (m_pathfind_cooldown_timer <= 0)
-		{
-			MoveToRoom(m_destination->m_room);
-			m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
-		}
+		////refresh route (every X seconds) <!> this will possibly change m_destination
+		//if (m_pathfind_cooldown_timer <= 0)
+		//{
+		//	MoveToRoom(m_destination->m_room);
+		//	m_pathfind_cooldown_timer = CREWMEMBER_ROUTE_REFRESH_TIMER;
+		//}
 
 		RoomTile* waypoint = m_current_path.back();
 		sf::Vector2f vec = waypoint->m_position - m_position;
 		
 		//arrived at waypoint?
-		if (vec.x * vec.x + vec.y * vec.y < 8.f)
+		if (vec.x * vec.x + vec.y * vec.y < m_ref_speed * deltaTime.asSeconds() * 8.f)
 		{
+			//update his tile reference
 			m_tile = waypoint;
+
+			//set next waypoint
 			m_current_path.pop_back();
 
 			//arrived at final destination
@@ -162,10 +168,27 @@ void CrewMember::Update(Time deltaTime)
 				m_position = waypoint->m_position;
 				m_destination = NULL;
 			}
+			//set speed vector to next waypoint
+			else
+			{
+				waypoint = m_current_path.back();
+
+				//clean 90° turns with a snap on one axis
+				if (m_tile->m_coord_x != waypoint->m_coord_x && m_speed.y != 0)
+				{
+					m_position.y = m_tile->m_position.y;
+				}
+				else if (m_tile->m_coord_y != waypoint->m_coord_y && m_speed.x != 0)
+				{
+					m_position.x = m_tile->m_position.x;
+				}
+
+				vec = waypoint->m_position - m_position;
+			}
 		}
 
 		//set speed to waypoint
-		ScaleVector(&vec, m_speed_max);
+		ScaleVector(&vec, m_ref_speed);
 		m_speed = vec;
 	}
 
@@ -233,11 +256,11 @@ void CrewMember::IteratePathFinding(RoomTile* tileA, RoomTile* tileB)
 	}
 }
 
-void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
+bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 {
 	if (tileA == tileB)
 	{
-		return;
+		return false;
 	}
 
 	//start
@@ -262,11 +285,10 @@ void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 
 	//path found -> save all waypoints into a member path
 	m_current_path.clear();
-	vector<RoomTile*> temp_path;
 	RoomTile* way_point = tileB;
 	while (way_point != tileA)
 	{
-		temp_path.push_back(way_point);
+		m_current_path.push_back(way_point);
 		way_point = way_point->m_parent;
 	}
 	
@@ -282,17 +304,19 @@ void CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 	m_closed_list_pathfind.clear();
 
 	//compute the best diagonals and eliminate useless waypoints
-	int path_size = temp_path.size();
-	int index = 0;
-	while (index < path_size)
-	{
-		if (index == 0 || temp_path[index - 1]->m_room != temp_path[index]->m_room || (index != path_size - 1 && temp_path[index + 1]->m_room != temp_path[index]->m_room))
-		{
-			m_current_path.push_back(temp_path[index]);
-		}
-		
-		index++;
-	}
+	//int path_size = temp_path.size();
+	//int index = 0;
+	//while (index < path_size)
+	//{
+	//	if (index == 0 || temp_path[index - 1]->m_room != temp_path[index]->m_room || (index != path_size - 1 && temp_path[index + 1]->m_room != temp_path[index]->m_room))
+	//	{
+	//		m_current_path.push_back(temp_path[index]);
+	//	}
+	//	
+	//	index++;
+	//}
+
+	return true;
 }
 
 RoomTile* CrewMember::GetFreeRoomTile(Room* room)

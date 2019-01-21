@@ -25,7 +25,7 @@ public:
 	void MoveToRoomTile(RoomTile* tile);
 
 	sf::Vector2f m_speed;
-	float m_speed_max;
+	float m_ref_speed;
 	float m_pathfind_cooldown_timer;
 	int m_health;
 	int m_health_max;
@@ -35,7 +35,7 @@ public:
 	vector<RoomTile*> m_current_path;
 
 private:
-	void FindShortestPath(RoomTile* tileA, RoomTile* tileB);
+	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);
 	void IteratePathFinding(RoomTile* tileA, RoomTile* tileB);
 	list<RoomTile*> m_closed_list_pathfind;
 	list<RoomTile*> m_open_list_pathfind;

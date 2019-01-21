@@ -74,7 +74,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	AddCrewMember(crew, room);
 
 	CrewMember* crew2 = new CrewMember(Crew_Civilian);
-	AddCrewMember(crew2, room2);
+	//AddCrewMember(crew2, room2);
 	m_nb_crew = m_nb_crew_max;
 
 	//WEAPONS
