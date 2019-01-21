@@ -277,6 +277,38 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 	return true;
 }
 
+void Ship::FlagHullRoomTiles()
+{
+	//look out for room tiles adjacent to holes
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			(*it2)->m_hull = Hull_None;
+
+			int x = (*it2)->m_coord_x;
+			int y = (*it2)->m_coord_y;
+
+			if (x == 0 || m_tiles[x - 1][y] == NULL)
+			{
+				(*it2)->m_hull = Hull_Left;
+			}
+			else if (x == m_rooms_size.x - 1 || m_tiles[x + 1][y] == NULL)
+			{
+				(*it2)->m_hull = Hull_Right;
+			}
+			else if (y == 0 || m_tiles[x][y - 1] == NULL)
+			{
+				(*it2)->m_hull = Hull_Up;
+			}
+			else if (y == m_rooms_size.y - 1 || m_tiles[x][y + 1] == NULL)
+			{
+				(*it2)->m_hull = Hull_Down;
+			}
+		}
+	}
+}
+
 Room* Ship::ConnectRooms()
 {
 	m_connexions.clear();
@@ -386,7 +418,7 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 		return NULL;
 	}
 
-	RoomTile* tile = weapon->GetFreeRoomTile(room);
+	RoomTile* tile = weapon->GetFreeWeaponTile(room);
 
 	if (tile == NULL)
 	{
@@ -405,6 +437,24 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 
 	//save owner ship
 	weapon->m_ship = this;
+
+	//gunner tile
+	if (tile->m_hull == Hull_Left && m_tiles[tile->m_coord_x + 1][tile->m_coord_y] != NULL)
+	{
+		tile->m_weapon_gunner = m_tiles[tile->m_coord_x + 1][tile->m_coord_y];
+	}
+	else if (tile->m_hull == Hull_Right && m_tiles[tile->m_coord_x - 1][tile->m_coord_y] != NULL)
+	{
+		tile->m_weapon_gunner = m_tiles[tile->m_coord_x - 1][tile->m_coord_y];
+	}
+	else if (tile->m_hull == Hull_Up && m_tiles[tile->m_coord_x][tile->m_coord_y + 1] != NULL)
+	{
+		tile->m_weapon_gunner = m_tiles[tile->m_coord_x][tile->m_coord_y + 1];
+	}
+	else if (tile->m_hull == Hull_Down && m_tiles[tile->m_coord_x][tile->m_coord_y - 1] != NULL)
+	{
+		tile->m_weapon_gunner = m_tiles[tile->m_coord_x][tile->m_coord_y - 1];
+	}
 
 	//UI
 	weapon->m_shape_container.setPosition(weapon->m_position);
@@ -452,6 +502,15 @@ void Ship::BuildShip()
 
 	m_health = m_health_max;
 
+	//center position of each room & room tiles
+	CenterRoomPositions(m_is_minimized);
+
+	//doors
+	ConnectRooms();
+
+	//hull
+	FlagHullRoomTiles();
+
 	//crew
 	m_nb_crew_max = 0;
 	for (int i = 0; i < 10; i++)
@@ -462,12 +521,6 @@ void Ship::BuildShip()
 	}
 
 	m_nb_crew = m_nb_crew_max;
-
-	//center position of each room & room tiles
-	CenterRoomPositions(m_is_minimized);
-
-	//doors
-	ConnectRooms();
 }
 
 void Ship::CenterRoomPositions(bool minimized)
@@ -557,35 +610,6 @@ void Ship::CenterRoomPositions(bool minimized)
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
 			m_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
-		}
-	}
-
-	//look out for room tiles adjacent to holes
-	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	{
-		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-		{
-			(*it2)->m_hull = Hull_None;
-
-			int x = (*it2)->m_coord_x;
-			int y = (*it2)->m_coord_y;
-
-			if (x == 0 || m_tiles[x - 1][y] == NULL)
-			{
-				(*it2)->m_hull = Hull_Left;
-			}
-			if (x == m_rooms_size.x - 1 || m_tiles[x + 1][y] == NULL)
-			{
-				(*it2)->m_hull = Hull_Right;
-			}
-			if (y == 0 || m_tiles[x][y - 1] == NULL)
-			{
-				(*it2)->m_hull = Hull_Up;
-			}
-			if (y == m_rooms_size.y - 1 || m_tiles[x][y + 1] == NULL)
-			{
-				(*it2)->m_hull = Hull_Down;
-			}
 		}
 	}
 }

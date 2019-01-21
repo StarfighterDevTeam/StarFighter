@@ -82,9 +82,24 @@ void Gameloop::Update(sf::Time deltaTime)
 		(*it)->UpdatePosition();
 
 		//Room tiles
-		if (selection != NULL && selection->m_UI_type == UI_CrewMember)
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
-			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			if ((*it2)->m_crew != NULL)
+			{
+				(*it2)->m_shape_container.setFillColor(sf::Color::Green);
+			}
+			else if ((*it2)->m_weapon != NULL)
+			{
+				(*it2)->m_shape_container.setFillColor(sf::Color::Red);
+			}
+			
+			if ((*it2)->m_weapon_gunner != NULL)
+			{
+				(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
+			}
+
+			//crew move order (hover tile) feedback
+			if (selection != NULL && selection->m_UI_type == UI_CrewMember)
 			{
 				(*it2)->Update(deltaTime);
 			}

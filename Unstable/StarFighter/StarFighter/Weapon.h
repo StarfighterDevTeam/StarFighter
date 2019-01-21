@@ -30,6 +30,7 @@ public:
 	bool Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
 
 	RoomTile* GetFreeRoomTile(Room* room);
+	RoomTile* GetFreeWeaponTile(Room* room);
 
 	Ammo* m_ammo;
 	Ship* m_ship;

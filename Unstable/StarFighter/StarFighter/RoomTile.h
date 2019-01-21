@@ -26,6 +26,8 @@ public:
 
 	Room* m_room;
 	CrewMember* m_crew;
+	Weapon* m_weapon;
+	RoomTile* m_weapon_gunner;
 	int m_coord_x;
 	int m_coord_y;
 	RoomConnexion* m_connexion;
@@ -43,7 +45,6 @@ public:
 	int m_movement_cost;
 	int m_G_value;
 	RoomTile* m_parent;
-	Weapon* m_weapon;
 
 };
 

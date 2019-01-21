@@ -58,3 +58,16 @@ bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, 
 
 	return true;
 }
+
+RoomTile* Weapon::GetFreeWeaponTile(Room* room)
+{
+	for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
+	{
+		if (((*it)->m_hull == Hull_Left || (*it)->m_hull == Hull_Right) && ((*it)->m_crew == NULL && (*it)->m_weapon == NULL))
+		{
+			return *it;
+		}
+	}
+
+	return NULL;
+}

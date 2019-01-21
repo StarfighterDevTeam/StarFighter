@@ -58,6 +58,16 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 
 	m_health = m_health_max;
 
+	//center position of each room & room tiles
+	CenterRoomPositions(m_is_minimized);
+
+	//doors
+	ConnectRooms();
+	room->m_connexions.front()->SetLock(true);
+
+	//hull
+	FlagHullRoomTiles();
+
 	//CREW
 	m_nb_crew_max = 0;
 	CrewMember* crew = new CrewMember(Crew_Pirate);
@@ -70,14 +80,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	//WEAPONS
 	Weapon* weapon = new Weapon(Weapon_Cannon);
 	AddWeapon(weapon, room, this);
-
-	//center position of each room & room tiles
-	CenterRoomPositions(m_is_minimized);
-
-	//doors
-	ConnectRooms();
-
-	room->m_connexions.front()->SetLock(true);
 }
 
 Warship::~Warship()

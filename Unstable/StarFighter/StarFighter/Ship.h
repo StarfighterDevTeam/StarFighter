@@ -63,6 +63,7 @@ public:
 	Room* AddRoomMinimized(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
+	void FlagHullRoomTiles();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
