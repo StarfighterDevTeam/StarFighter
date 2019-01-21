@@ -52,13 +52,10 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ROOMTILE_MINI_OFFSET_X		1550.f
 #define ROOMTILE_MINI_OFFSET_Y		(ROOMTILE_OFFSET_Y	)
 
-
-
 #define DISTANCE_COMBAT_INIT			1000.f
 #define WARP_AMMO_OFFSET_X			1100.f
 
 #define ROOMTILE_HEALTH_MAX				100
-
 #define ROOMTILE_FLOODING_MAX			100
 #define ROOMTILE_FLOODING_GENERATION	1
 #define FLOODING_TIMER					0.07f

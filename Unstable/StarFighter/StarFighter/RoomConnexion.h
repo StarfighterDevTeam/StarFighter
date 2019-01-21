@@ -10,8 +10,7 @@ class Room;//forward declaration
 class CrewMember;
 
 
-#define CONNEXION_WIDTH			4.f
-#define CONNEXION_OPEN_LENGTH	4.f		
+#define CONNEXION_WIDTH			8.f	
 
 class RoomConnexion : public GameEntity
 {
