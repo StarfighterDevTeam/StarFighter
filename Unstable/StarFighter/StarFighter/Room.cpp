@@ -69,7 +69,8 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type,
 	m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
 	m_shape_container.setFillColor(sf::Color(0, 0, 0, 0));
 	m_shape_container.setOutlineThickness(2.f);
-	m_shape_container.setOutlineColor(sf::Color::Magenta);
+	m_shape_container.setOutlineColor(sf::Color::White);
+	m_default_color = sf::Color::White;
 
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);

@@ -78,7 +78,17 @@ void Gameloop::Update(sf::Time deltaTime)
 	for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
 	{
 		m_warship->UpdateCrewMembersCountPerRoom(*it);
-		(*it)->Update(deltaTime);
+		//(*it)->Update(deltaTime);
+		(*it)->UpdatePosition();
+
+		//Room tiles
+		if (selection != NULL && selection->m_UI_type == UI_CrewMember)
+		{
+			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			{
+				(*it2)->Update(deltaTime);
+			}
+		}
 	}
 
 	//Room connexions
@@ -144,7 +154,8 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Rooms
 		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
 		{
-			(*it)->Update(deltaTime);
+			//(*it)->Update(deltaTime);
+			(*it)->UpdatePosition();
 		}
 
 		//Rooms connexions
@@ -243,7 +254,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							if (tile->m_hull != Hull_None && tile->m_pierced == false)
 							{
 								tile->m_pierced = true;
-								tile->m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+								tile->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 								tile->m_flood = ROOMTILE_FLOODING_GENERATION;//ROOMTILE_FLOODING_MAX;
 								(*it)->m_target_ship->m_flood += ROOMTILE_FLOODING_MAX;
 							}
@@ -395,9 +406,21 @@ void Gameloop::Draw()
 	m_background->Draw((*CurrentGame).m_mainScreen);
 
 	//room tiles
+	GameEntity* focused_room_tile = NULL;
 	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
 	{
-		(*it)->Draw((*CurrentGame).m_mainScreen);
+		if (((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui == *it) || ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui == *it))
+		{
+			focused_room_tile = *it;
+		}
+		else
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
+	}
+	if (focused_room_tile != NULL)
+	{
+		focused_room_tile->Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//rooms

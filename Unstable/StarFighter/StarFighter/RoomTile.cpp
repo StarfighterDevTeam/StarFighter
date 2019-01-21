@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimized) : GameEntity(sf::Vector2f(size, size), UI_None)
+RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimized) : GameEntity(sf::Vector2f(size, size), UI_RoomTile)
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
@@ -34,13 +34,14 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_shape_container.setSize(sf::Vector2f(size, size));
 	m_shape_container.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
 	m_shape_container.setFillColor(sf::Color::Black);
-	m_shape_container.setOutlineThickness(2.f);
+	m_shape_container.setOutlineThickness(-1.f);
 	m_shape_container.setOutlineColor(sf::Color(255, 255, 255, 120));
+	m_default_color = sf::Color(255, 255, 255, 120);
 
-	m_shape.setPosition(sf::Vector2f(m_position));
-	m_shape.setSize(sf::Vector2f(size, size));
-	m_shape.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
-	m_shape.setFillColor(sf::Color(0, 0, 0, 0));
+	//m_shape.setPosition(sf::Vector2f(m_position));
+	//m_shape.setSize(sf::Vector2f(size, size));
+	//m_shape.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
+	//m_shape.setFillColor(sf::Color(0, 0, 0, 0));
 
 	//m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	//m_text.setCharacterSize(14);

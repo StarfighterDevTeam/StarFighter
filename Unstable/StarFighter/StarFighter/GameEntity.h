@@ -8,6 +8,7 @@ enum UI_Type
 	UI_None,
 	UI_CrewMember,
 	UI_Room,
+	UI_RoomTile,
 	UI_Connexion,
 	UI_EnemyShip,
 	UI_Warship,

@@ -54,7 +54,7 @@ void GameEntity::Update(Time deltaTime)
 	//get selected state
 	if (mouse_click == Mouse_LeftClick)
 	{
-		if (m_hovered == true && m_UI_type != UI_WaterTile && m_UI_type != UI_Room)
+		if (m_hovered == true && m_UI_type != UI_WaterTile && m_UI_type != UI_Room && m_UI_type != UI_RoomTile)//types that cannot be selected
 		{
 			if ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui != this)
 			{
@@ -73,14 +73,17 @@ void GameEntity::Update(Time deltaTime)
 
 	//apply color feedback
 	m_shape_container.setOutlineColor(m_default_color);
+	m_shape_container.setOutlineThickness(-1.f);
 
 	if (m_hovered)
 	{
 		m_shape_container.setOutlineColor(sf::Color::Red);
+		m_shape_container.setOutlineThickness(2.f);
 	}
 	if (m_selected)
 	{
 		m_shape_container.setOutlineColor(sf::Color::Green);
+		m_shape_container.setOutlineThickness(2.f);
 	}
 
 	AnimatedSprite::update(deltaTime);
