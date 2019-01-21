@@ -86,7 +86,15 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			(*it2)->m_shape_container.setFillColor(sf::Color::Black);
 
-			if ((*it2)->m_crew != NULL)
+			if ((*it2)->m_pierced == true)
+			{
+				(*it2)->m_shape_container.setFillColor(sf::Color(0, 50, 255, 255));//blue "deep water"
+			}
+			else if ((*it2)->m_flood > 0)
+			{
+				(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+			}
+			else if ((*it2)->m_crew != NULL)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color::Green);
 			}
@@ -180,6 +188,21 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			//(*it)->Update(deltaTime);
 			(*it)->UpdatePosition();
+
+			//Room tiles
+			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			{
+				(*it2)->m_shape_container.setFillColor(sf::Color::Black);
+
+				if ((*it2)->m_pierced == true)
+				{
+					(*it2)->m_shape_container.setFillColor(sf::Color(0, 50, 255, 255));//blue "deep water"
+				}
+				else if ((*it2)->m_flood > 0)
+				{
+					(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+				}
+			}
 		}
 
 		//Rooms connexions
@@ -276,7 +299,6 @@ void Gameloop::Update(sf::Time deltaTime)
 							if (tile->m_hull != Hull_None && tile->m_pierced == false)
 							{
 								tile->m_pierced = true;
-								tile->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 								tile->m_flood = ROOMTILE_FLOODING_GENERATION;//ROOMTILE_FLOODING_MAX;
 								(*it)->m_target_ship->m_flood += ROOMTILE_FLOODING_MAX;
 							}

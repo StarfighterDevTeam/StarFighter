@@ -629,7 +629,6 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 
 			if ((*it2)->m_flood == 0)
 			{
-				//(*it2)->m_shape_container.setFillColor(sf::Color::Black);
 				continue;
 			}
 
@@ -708,8 +707,6 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 								tile->m_flood++;//transfer
 								(*it2)->m_flood--;
 								tile->m_flood_dir[i] = true;//keep the same momentum direction in the receiving tile
-
-								tile->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 							}
 						}
 					}
