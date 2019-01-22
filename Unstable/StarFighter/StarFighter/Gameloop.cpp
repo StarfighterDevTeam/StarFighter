@@ -251,7 +251,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
 		{
 			Weapon* weapon = (Weapon*)hovered;
-			if (weapon->m_tile->m_weapon_gunner->m_crew != NULL && weapon->m_tile->m_weapon_gunner->m_crew->m_tile == weapon->m_tile->m_weapon_gunner)
+			if (weapon->m_tile->m_weapon_gunner->m_crew != NULL && weapon->m_tile->m_weapon_gunner->m_crew->m_tile == weapon->m_tile->m_weapon_gunner && weapon->m_tile->m_weapon_gunner->m_pierced == false)
 			{
 				m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
 			}
@@ -293,14 +293,17 @@ void Gameloop::Update(sf::Time deltaTime)
 							RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
 
 							//damage
-							(*it)->m_target_ship->m_health -= (*it)->m_damage;
+							(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
+							tile->m_health -= Min((*it)->m_damage, tile->m_health);
 
 							//piercing hull
-							if (tile->m_hull != Hull_None && tile->m_pierced == false)
+							if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0)
 							{
 								tile->m_pierced = true;
-								tile->m_flood = ROOMTILE_FLOODING_GENERATION;//ROOMTILE_FLOODING_MAX;
-								(*it)->m_target_ship->m_flood += ROOMTILE_FLOODING_MAX;
+								if (tile->m_crew != NULL)
+								{
+									tile->m_crew->m_repair_timer = HULL_REPAIR_TIMER;
+								}
 							}
 
 							//killing crew

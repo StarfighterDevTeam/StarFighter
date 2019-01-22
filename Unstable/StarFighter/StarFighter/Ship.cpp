@@ -627,34 +627,22 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 				continue;
 			}
 
-			if ((*it2)->m_flood == 0)
-			{
-				continue;
-			}
-
-			//ostringstream ss;
-			//ss << (*it2)->m_flood;
-			//(*it2)->m_text.setString(ss.str());
-
 			if ((*it2)->m_flooding_timer > 0)
 			{
 				(*it2)->m_flooding_timer -= deltaTime.asSeconds();
 			}
 
-			if ((*it2)->m_flooding_timer <= 0)
+			//1. "Generate"
+			if ((*it2)->m_pierced == true)
 			{
-				(*it2)->m_flooding_timer = FLOODING_TIMER;
-
-				//update flooding algo
-				//Flood dir:
-				//0: Hull_Left,
-				//1: Hull_Up,
-				//2: Hull_Right,
-				//3: Hull_Down,
-
-				//1. "Generate"
-				if ((*it2)->m_pierced == true)
+				if ((*it2)->m_flooding_timer <= 0)
 				{
+					(*it2)->m_flooding_timer = FLOODING_TIMER;
+
+					if ((*it2)->m_flood < ROOMTILE_FLOODING_GENERATION)
+					{
+						(*it2)->m_flood = ROOMTILE_FLOODING_GENERATION;
+					}
 					//if hull is pierced here, open a stream of water entering, that constantly generates a flow
 					(*it2)->m_flood_dir[((*it2)->m_hull + 2) % 4] = true;
 					for (int i = 0; i < ROOMTILE_FLOODING_GENERATION; i++)
@@ -665,57 +653,69 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 						}
 					}
 				}
+			}
 
-				//2. "Flow"
-				int x = (*it2)->m_coord_x;
-				int y = (*it2)->m_coord_y;
+			//update flooding algo
+			//Flood dir:
+			//0: Hull_Left,
+			//1: Hull_Up,
+			//2: Hull_Right,
+			//3: Hull_Down,
 
-				if ((*it2)->m_flood >= FLOOD_MIN_VALUE_FOR_TRANSFER)
+			if ((*it2)->m_flood == 0)
+			{
+				continue;
+			}
+
+			//2. "Flow"
+			int x = (*it2)->m_coord_x;
+			int y = (*it2)->m_coord_y;
+
+			if ((*it2)->m_flood >= FLOOD_MIN_VALUE_FOR_TRANSFER)
+			{
+				//for each flood direction (left, up, right, down)
+				for (int i = 0; i < 4; i++)
 				{
-					//for each flood direction (left, up, right, down)
-					for (int i = 0; i < 4; i++)
+					RoomTile* tile = NULL;
+					if ((*it2)->m_flood_dir[i] == true)
 					{
-						RoomTile* tile = NULL;
-						if ((*it2)->m_flood_dir[i] == true)
+						switch (i)
 						{
-							switch (i)
-							{
-								case 0://check on the left
-									if (x > 0)
-										tile = m_tiles[x - 1][y];
-									break;
+							case 0://check on the left
+								if (x > 0)
+									tile = m_tiles[x - 1][y];
+								break;
 
-								case 1://check below
-									if (y < m_rooms_size.y - 1)
-										tile = m_tiles[x][y + 1];
-									break;
+							case 1://check below
+								if (y < m_rooms_size.y - 1)
+									tile = m_tiles[x][y + 1];
+								break;
 
-								case 2://check on the right
-									if (x < m_rooms_size.x - 1)
-										tile = m_tiles[x + 1][y];
-									break;
+							case 2://check on the right
+								if (x < m_rooms_size.x - 1)
+									tile = m_tiles[x + 1][y];
+								break;
 
-								case 3://check above
-									if (y > 0)
-										tile = m_tiles[x][y - 1];
-									break;
-							}
+							case 3://check above
+								if (y > 0)
+									tile = m_tiles[x][y - 1];
+								break;
+						}
 
-							//tile next to us that is not full of water, is in the same room or in a connected room tile (door not locked)?
-							if (tile != NULL && tile->m_flood < ROOMTILE_FLOODING_MAX && (tile->m_room == (*it2)->m_room || ((*it2)->m_connexion != NULL && (*it2)->m_connexion->m_locked == false && ((*it2)->m_connexion->m_tiles.first == tile || (*it2)->m_connexion->m_tiles.second == tile))))
-							{
-								tile->m_flood++;//transfer
-								(*it2)->m_flood--;
-								tile->m_flood_dir[i] = true;//keep the same momentum direction in the receiving tile
-							}
+						//tile next to us that is not full of water, is in the same room or in a connected room tile (door not locked)?
+						if (tile != NULL && tile->m_flood < ROOMTILE_FLOODING_MAX && (tile->m_room == (*it2)->m_room || ((*it2)->m_connexion != NULL && (*it2)->m_connexion->m_locked == false && ((*it2)->m_connexion->m_tiles.first == tile || (*it2)->m_connexion->m_tiles.second == tile))))
+						{
+							tile->m_flood++;//transfer
+							(*it2)->m_flood--;
+							tile->m_flood_dir[i] = true;//keep the same momentum direction in the receiving tile
 						}
 					}
-
-					//3. "Expand"
-					int r = RandomizeIntBetweenValues(0, 16);
-					if (r < 4)
-						(*it2)->m_flood_dir[r] = true;
 				}
+
+				//3. "Expand"
+				int r = RandomizeIntBetweenValues(0, 16);
+				if (r < 4)
+					(*it2)->m_flood_dir[r] = true;
 			}
 
 			//Update ship flood total value (1 point per tile flooded)

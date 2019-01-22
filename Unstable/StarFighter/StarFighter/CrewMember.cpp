@@ -104,6 +104,12 @@ void CrewMember::MoveToRoomTile(RoomTile* tile)
 
 void CrewMember::Update(Time deltaTime)
 {
+	//update cooldowns
+	if (m_repair_timer > 0)
+	{
+		m_repair_timer -= deltaTime.asSeconds();
+	}
+
 	//get new move order
 	if (m_current_path.empty() == true && m_destination != NULL)
 	{
@@ -112,6 +118,7 @@ void CrewMember::Update(Time deltaTime)
 		{
 			//free departure tile
 			m_tile->m_crew = NULL;
+			m_repair_timer = HULL_REPAIR_TIMER;
 		}
 	}
 	//order changed
@@ -131,6 +138,7 @@ void CrewMember::Update(Time deltaTime)
 		{
 			//update his tile reference
 			m_tile = waypoint;
+			m_repair_timer = HULL_REPAIR_TIMER;
 
 			//set next waypoint
 			m_current_path.pop_back();
@@ -169,6 +177,22 @@ void CrewMember::Update(Time deltaTime)
 	//apply movement
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
+
+	//assignement: repair
+	if (m_tile != NULL && m_tile->m_pierced == true)
+	{
+		if (m_repair_timer <= 0)
+		{
+			m_tile->m_health++;
+			m_repair_timer = HULL_REPAIR_TIMER;
+			printf("repair\n");
+		}
+
+		if (m_tile->m_health == m_tile->m_health_max)
+		{
+			m_tile->m_pierced = false;
+		}
+	}
 
 	GameEntity::Update(deltaTime);
 }

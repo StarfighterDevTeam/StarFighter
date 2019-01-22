@@ -36,6 +36,8 @@ public:
 	int m_flood;
 	bool m_flood_dir[4];
 	float m_flooding_timer;
+	int m_health;
+	int m_health_max;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized);
 	bool IsConnectedToRoomTile(RoomTile* tile);

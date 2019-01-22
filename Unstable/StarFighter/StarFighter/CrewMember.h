@@ -31,6 +31,8 @@ public:
 	RoomTile* m_destination;
 	vector<RoomTile*> m_current_path;
 
+	float m_repair_timer;
+
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);
 	void IteratePathFinding(RoomTile* tileA, RoomTile* tileB);

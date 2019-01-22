@@ -53,9 +53,9 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ROOMTILE_MINI_OFFSET_Y		(ROOMTILE_OFFSET_Y	)
 
 #define DISTANCE_COMBAT_INIT			1000.f
-#define WARP_AMMO_OFFSET_X			1100.f
+#define WARP_AMMO_OFFSET_X				1100.f
 
-#define ROOMTILE_HEALTH_MAX				100
+#define ROOMTILE_HEALTH_MAX				10
 #define ROOMTILE_FLOODING_MAX			100
 #define ROOMTILE_FLOODING_GENERATION	1
 #define FLOODING_TIMER					0.07f
@@ -68,6 +68,8 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define NB_WATERTILE_Y					60
 #define NB_WATERTILE_SUBDIVISION		60
 #define NB_WATERTILE_VIEW_RANGE			5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
+
+#define HULL_REPAIR_TIMER				0.2f
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME						50
