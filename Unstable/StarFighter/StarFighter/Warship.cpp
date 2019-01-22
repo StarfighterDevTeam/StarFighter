@@ -80,6 +80,10 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	//WEAPONS
 	Weapon* weapon = new Weapon(Weapon_Cannon);
 	AddWeapon(weapon, room, this);
+
+	//FLOOD
+	m_tiles[0][3]->m_pierced = true;
+	m_tiles[0][3]->m_health = 0;
 }
 
 Warship::~Warship()

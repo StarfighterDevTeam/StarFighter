@@ -77,6 +77,8 @@ void Gameloop::Update(sf::Time deltaTime)
 	//Rooms
 	for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
 	{
+		int flood = 0;
+
 		m_warship->UpdateCrewMembersCountPerRoom(*it);
 		//(*it)->Update(deltaTime);
 		(*it)->UpdatePosition();
@@ -84,6 +86,11 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Room tiles
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
+			if ((*it2)->m_flood > 0)
+			{
+				flood++;
+			}
+
 			(*it2)->m_shape_container.setFillColor(sf::Color::Black);
 
 			if ((*it2)->m_pierced == true)
@@ -126,6 +133,8 @@ void Gameloop::Update(sf::Time deltaTime)
 				(*it2)->m_shape_container.setOutlineThickness(-1.f);
 			}
 		}
+
+		(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
 	}
 
 	//Room connexions
@@ -133,6 +142,48 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		(*it)->Update(deltaTime);
 	}
+
+	//Enemy rooms
+	if (m_tactical_ship != NULL)
+	{
+		//Rooms
+		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
+		{
+			int flood = 0;
+			//(*it)->Update(deltaTime);
+			(*it)->UpdatePosition();
+
+			//Room tiles
+			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			{
+				if ((*it2)->m_flood > 0)
+				{
+					flood++;
+				}
+
+				(*it2)->m_shape_container.setFillColor(sf::Color::Black);
+
+				if ((*it2)->m_pierced == true)
+				{
+					(*it2)->m_shape_container.setFillColor(sf::Color(0, 50, 255, 255));//blue "deep water"
+				}
+				else if ((*it2)->m_flood > 0)
+				{
+					(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+				}
+			}
+
+			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
+		}
+
+		//Rooms connexions
+		for (vector<RoomConnexion*>::iterator it = m_tactical_ship->m_connexions.begin(); it != m_tactical_ship->m_connexions.end(); it++)
+		{
+			(*it)->Update(deltaTime);
+		}
+	}
+
+
 
 	//Crew movement (and removing the dead);
 	vector<CrewMember*> old_crew;
@@ -145,8 +196,12 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		if ((*it)->m_health > 0)
 		{
-			m_warship->m_crew.push_back(*it);
 			(*it)->Update(deltaTime);
+		}
+
+		if ((*it)->m_health > 0)//second check because he could drown during the update
+		{
+			m_warship->m_crew.push_back(*it);
 		}
 		else
 		{
@@ -168,8 +223,12 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			if ((*it)->m_health > 0)
 			{
-				m_tactical_ship->m_crew.push_back(*it);
 				(*it)->Update(deltaTime);
+			}
+
+			if ((*it)->m_health > 0)
+			{
+				m_tactical_ship->m_crew.push_back(*it);
 			}
 			else
 			{
@@ -185,37 +244,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		(*it)->Update(deltaTime);
 	}
 
-	//Enemy rooms
-	if (m_tactical_ship != NULL)
-	{
-		//Rooms
-		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
-		{
-			//(*it)->Update(deltaTime);
-			(*it)->UpdatePosition();
-
-			//Room tiles
-			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-			{
-				(*it2)->m_shape_container.setFillColor(sf::Color::Black);
-
-				if ((*it2)->m_pierced == true)
-				{
-					(*it2)->m_shape_container.setFillColor(sf::Color(0, 50, 255, 255));//blue "deep water"
-				}
-				else if ((*it2)->m_flood > 0)
-				{
-					(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
-				}
-			}
-		}
-
-		//Rooms connexions
-		for (vector<RoomConnexion*>::iterator it = m_tactical_ship->m_connexions.begin(); it != m_tactical_ship->m_connexions.end(); it++)
-		{
-			(*it)->Update(deltaTime);
-		}
-	}
+	
 
 	//ACTIONS
 	//Crew move to room

@@ -18,8 +18,10 @@ CrewMember::CrewMember(CrewMemberType type) : GameEntity(UI_CrewMember)
 	m_speed = sf::Vector2f(0, 0);
 	m_size = sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE);
 	m_destination = NULL;
+	m_repair_timer = HULL_REPAIR_TIMER;
+	m_drowning_timer = DROWNING_TIMER;
 
-	m_health_max = 2;
+	m_health_max = CREWMEMBER_HEALTH_MAX;
 	m_health = m_health_max;
 
 	//UI
@@ -60,7 +62,16 @@ CrewMember::CrewMember(CrewMemberType type) : GameEntity(UI_CrewMember)
 
 CrewMember::~CrewMember()
 {
-	
+	//free tile (if any)
+	if (m_tile != NULL && m_tile->m_crew == this)
+	{
+		m_tile->m_crew = NULL;
+	}
+
+	if (m_destination != NULL && m_destination->m_crew == this)
+	{
+		m_destination->m_crew = NULL;
+	}
 }
 
 void CrewMember::MoveToRoomTile(RoomTile* tile)
@@ -75,6 +86,10 @@ void CrewMember::Update(Time deltaTime)
 	if (m_repair_timer > 0)
 	{
 		m_repair_timer -= deltaTime.asSeconds();
+	}
+	if (m_drowning_timer > 0)
+	{
+		m_drowning_timer -= deltaTime.asSeconds();
 	}
 
 	//get new move order
@@ -178,6 +193,15 @@ void CrewMember::Update(Time deltaTime)
 		{
 			m_tile->m_pierced = false;
 		}
+	}
+
+	//drowning
+	if (m_tile->m_room->m_is_flooded == true && m_drowning_timer <= 0)
+	{
+		m_drowning_timer = DROWNING_TIMER;
+
+		m_health--;
+		printf("health: %d\n", m_health);
 	}
 
 	GameEntity::Update(deltaTime);

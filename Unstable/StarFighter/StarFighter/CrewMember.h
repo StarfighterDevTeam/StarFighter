@@ -7,6 +7,7 @@
 
 #define CREWMEMBER_SIZE							16.f
 #define CREWMEMBER_SPEED						70.f
+#define CREWMEMBER_HEALTH_MAX					20
 
 class CrewMember : public GameEntity
 {
@@ -31,6 +32,7 @@ public:
 	vector<RoomTile*> m_current_path;
 
 	float m_repair_timer;
+	float m_drowning_timer;
 
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);

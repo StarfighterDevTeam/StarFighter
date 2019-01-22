@@ -27,7 +27,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type,
 	m_type = type;
 	m_UI_type = UI_Room;
 	m_nb_crew_max = width * height / 4;
-	m_flooding = 0;
+	m_is_flooded = false;
 
 	float size = minimized == false ? ROOMTILE_SIZE : ROOMTILE_MINI_SIZE;
 	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
