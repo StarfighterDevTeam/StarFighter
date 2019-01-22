@@ -632,12 +632,18 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 				(*it2)->m_flooding_timer -= deltaTime.asSeconds();
 			}
 
+			if ((*it2)->m_evaporation_timer > 0)
+			{
+				(*it2)->m_evaporation_timer -= deltaTime.asSeconds();
+			}
+
 			//1. "Generate"
 			if ((*it2)->m_pierced == true)
 			{
 				if ((*it2)->m_flooding_timer <= 0)
 				{
 					(*it2)->m_flooding_timer = FLOODING_TIMER;
+					(*it2)->m_evaporation_timer = FLOOD_EVAPORATION_TIME;
 
 					if ((*it2)->m_flood < ROOMTILE_FLOODING_GENERATION)
 					{
@@ -665,6 +671,13 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 			if ((*it2)->m_flood == 0)
 			{
 				continue;
+			}
+
+			//Evaporation
+			if ((*it2)->m_evaporation_timer <= 0)
+			{
+				(*it2)->m_evaporation_timer = FLOOD_EVAPORATION_TIME;
+				(*it2)->m_flood--;
 			}
 
 			//2. "Flow"
@@ -708,6 +721,7 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 							tile->m_flood++;//transfer
 							(*it2)->m_flood--;
 							tile->m_flood_dir[i] = true;//keep the same momentum direction in the receiving tile
+							tile->m_evaporation_timer = FLOOD_EVAPORATION_TIME;
 						}
 					}
 				}

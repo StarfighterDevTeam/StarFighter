@@ -60,6 +60,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ROOMTILE_FLOODING_GENERATION	1
 #define FLOODING_TIMER					0.07f
 #define FLOOD_MIN_VALUE_FOR_TRANSFER	20
+#define FLOOD_EVAPORATION_TIME			1.f
 
 #define WATERTILE_SIZE					64.f
 #define WATERTILE_OFFSET_X				1100.f
