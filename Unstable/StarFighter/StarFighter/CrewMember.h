@@ -19,7 +19,6 @@ public:
 	void Update(Time deltaTime);
 
 	RoomTile* GetFreeRoomTile(Room* room);
-	bool MoveToRoom(Room* room);
 	void MoveToRoomTile(RoomTile* tile);
 
 	sf::Vector2f m_speed;

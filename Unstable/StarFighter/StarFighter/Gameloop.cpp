@@ -120,6 +120,11 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				(*it2)->Update(deltaTime);
 			}
+			else
+			{
+				(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+				(*it2)->m_shape_container.setOutlineThickness(-1.f);
+			}
 		}
 	}
 

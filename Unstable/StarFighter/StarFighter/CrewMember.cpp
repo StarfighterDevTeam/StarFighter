@@ -63,39 +63,6 @@ CrewMember::~CrewMember()
 	
 }
 
-bool CrewMember::MoveToRoom(Room* room)
-{
-	if (room == m_tile->m_room)
-	{
-		return false;//already in that room
-	}
-
-	//look for a free tile
-	RoomTile* tile = GetFreeRoomTile(room);
-
-	if (tile == NULL)
-	{
-		return false;
-	}
-	else
-	{
-		//destination changed?
-		if (m_destination != NULL && tile != m_destination)
-		{
-			//...free the previous booking
-			m_destination->m_crew = NULL;
-		}
-
-		//assign tile
-		tile->m_crew = this;
-		m_destination = tile;
-
-		//search pathfind (this will update m_current_path)
-		MoveToRoomTile(tile);
-		return true;
-	}
-}
-
 void CrewMember::MoveToRoomTile(RoomTile* tile)
 {
 	//pathfind
@@ -119,6 +86,13 @@ void CrewMember::Update(Time deltaTime)
 			//free departure tile
 			m_tile->m_crew = NULL;
 			m_repair_timer = HULL_REPAIR_TIMER;
+		}
+		else
+		{
+			//no path found => cancel
+			m_destination->m_crew = NULL;
+			m_destination = NULL;
+			m_speed = sf::Vector2f(0, 0);
 		}
 	}
 	//order changed
@@ -155,17 +129,30 @@ void CrewMember::Update(Time deltaTime)
 			{
 				waypoint = m_current_path.back();
 
-				//clean 90° turns with a snap on one axis
-				if (m_tile->m_coord_x != waypoint->m_coord_x && m_speed.y != 0)
+				//check if waypoint is stil accessible (door locked?)
+				if (waypoint->m_connexion != NULL && (waypoint->m_connexion->m_tiles.first == m_tile || waypoint->m_connexion->m_tiles.second == m_tile) && waypoint->m_connexion->m_locked == true)
 				{
-					m_position.y = m_tile->m_position.y;
+					//cancel destination, stay where we are
+					vec = sf::Vector2f(0, 0);
+					m_position = m_tile->m_position;
+					m_destination->m_crew = NULL;
+					m_destination = NULL;
+					m_current_path.clear();
 				}
-				else if (m_tile->m_coord_y != waypoint->m_coord_y && m_speed.x != 0)
+				else
 				{
-					m_position.x = m_tile->m_position.x;
-				}
+					//clean 90° turns with a snap on one axis
+					if (m_tile->m_coord_x != waypoint->m_coord_x && m_speed.y != 0)
+					{
+						m_position.y = m_tile->m_position.y;
+					}
+					else if (m_tile->m_coord_y != waypoint->m_coord_y && m_speed.x != 0)
+					{
+						m_position.x = m_tile->m_position.x;
+					}
 
-				vec = waypoint->m_position - m_position;
+					vec = waypoint->m_position - m_position;
+				}
 			}
 		}
 
@@ -185,7 +172,6 @@ void CrewMember::Update(Time deltaTime)
 		{
 			m_tile->m_health++;
 			m_repair_timer = HULL_REPAIR_TIMER;
-			printf("repair\n");
 		}
 
 		if (m_tile->m_health == m_tile->m_health_max)
@@ -287,7 +273,23 @@ bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 	while (way_point != tileA)
 	{
 		m_current_path.push_back(way_point);
-		way_point = way_point->m_parent;
+		//path not existing?
+		if (way_point->m_parent == NULL)
+		{
+			//clear data
+			for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+			{
+				(*it)->m_heuristic = 0;
+				(*it)->m_movement_cost = 0;
+				(*it)->m_G_value = 0;
+				(*it)->m_parent = NULL;
+			}
+			m_open_list_pathfind.clear();
+			m_closed_list_pathfind.clear();
+			m_current_path.clear();
+			return false;
+		}
+		way_point = way_point->m_parent;	
 	}
 	
 	//clear data
