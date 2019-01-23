@@ -82,6 +82,8 @@ void CrewMember::MoveToRoomTile(RoomTile* tile)
 
 void CrewMember::Update(Time deltaTime)
 {
+	float speed = m_tile->m_flood == 0 ? m_ref_speed : m_ref_speed * CREWMEMBER_SPEED_FLOOD_FACTOR;
+
 	//update cooldowns
 	if (m_repair_timer > 0)
 	{
@@ -123,7 +125,7 @@ void CrewMember::Update(Time deltaTime)
 		sf::Vector2f vec = waypoint->m_position - m_position;
 		
 		//arrived at waypoint?
-		if (vec.x * vec.x + vec.y * vec.y < m_ref_speed * deltaTime.asSeconds() * 8.f)
+		if (vec.x * vec.x + vec.y * vec.y < speed * deltaTime.asSeconds() * 8.f)
 		{
 			//update his tile reference
 			m_tile = waypoint;
@@ -172,7 +174,7 @@ void CrewMember::Update(Time deltaTime)
 		}
 
 		//set speed to waypoint
-		ScaleVector(&vec, m_ref_speed);
+		ScaleVector(&vec, speed);
 		m_speed = vec;
 	}
 

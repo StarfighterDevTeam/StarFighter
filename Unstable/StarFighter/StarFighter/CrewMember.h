@@ -7,7 +7,9 @@
 
 #define CREWMEMBER_SIZE							16.f
 #define CREWMEMBER_SPEED						70.f
+#define CREWMEMBER_SPEED_FLOOD_FACTOR			0.5f
 #define CREWMEMBER_HEALTH_MAX					20
+
 
 class CrewMember : public GameEntity
 {
