@@ -242,6 +242,48 @@ void Gameloop::Update(sf::Time deltaTime)
 				(*it)->Update(deltaTime);
 
 				//Crew AI
+				if ((*it)->m_destination == NULL)
+				{
+					//first look into current room if there is any interesting task to do. Then we'll do the same search across all rooms
+					RoomTile* hull_to_repair = NULL;
+					RoomTile* gunner_missing = NULL;
+
+					for (int i = 0; i < 2; i++)
+					{
+						vector<RoomTile*>::iterator begin = i == 0 ? (*it)->m_tile->m_room->m_tiles.begin() : (*CurrentGame).m_enemy_tiles.begin();
+						vector<RoomTile*>::iterator end = i == 0 ? (*it)->m_tile->m_room->m_tiles.end() : (*CurrentGame).m_enemy_tiles.end();
+
+						//Hull to repair?
+						for (vector<RoomTile*>::iterator it2 = begin; it2 != end; it2++)
+						{
+							if ((*it2)->m_pierced == true && (*it2)->m_crew == NULL)
+							{
+								hull_to_repair = (*it2);
+								break;
+							}
+						}
+
+						if (hull_to_repair != NULL)
+						{
+							(*it)->MoveToRoomTile(hull_to_repair);
+						}
+
+						//Weapon to fire
+						for (vector<RoomTile*>::iterator it2 = begin; it2 != end; it2++)
+						{
+							if ((*it2)->m_weapon_gunner != NULL && (*it2)->m_weapon_gunner->m_crew == NULL)
+							{
+								gunner_missing = (*it2)->m_weapon_gunner;
+								break;
+							}
+						}
+
+						if (gunner_missing != NULL)
+						{
+							(*it)->MoveToRoomTile(gunner_missing);
+						}
+					}
+				}
 			}
 
 			if ((*it)->m_health > 0)
