@@ -244,6 +244,21 @@ void Gameloop::Update(sf::Time deltaTime)
 		(*it)->Update(deltaTime);
 	}
 
+	//Enemy weapons
+	if (m_tactical_ship != NULL)
+	{
+		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
+		{
+			(*it)->UpdateRof(deltaTime);
+
+			if ((*it)->m_rof_timer <= 0)
+			{
+				int random_room = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
+				int random_tile = RandomizeIntBetweenValues(0, m_warship->m_rooms[9]->m_tiles.size() - 1);
+				(*it)->Fire(deltaTime, m_tactical_ship->m_position, m_tactical_ship->m_angle, m_tactical_ship->m_distance_combat, m_warship, m_warship->m_rooms[9]->m_tiles[random_tile]);
+			}
+		}
+	}
 	
 
 	//ACTIONS
@@ -285,7 +300,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
 		{
 			Weapon* weapon = (Weapon*)hovered;
-			if (weapon->m_tile->m_weapon_gunner->m_crew != NULL && weapon->m_tile->m_weapon_gunner->m_crew->m_tile == weapon->m_tile->m_weapon_gunner && weapon->m_tile->m_weapon_gunner->m_pierced == false)
+			if (weapon->m_tile->m_weapon_gunner->m_crew != NULL && weapon->m_tile->m_weapon_gunner->m_crew->m_tile == weapon->m_tile->m_weapon_gunner && weapon->m_tile->m_weapon_gunner->m_pierced == false && weapon->m_health > 0)
 			{
 				m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
 			}
@@ -329,6 +344,17 @@ void Gameloop::Update(sf::Time deltaTime)
 							//damage
 							(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
 							tile->m_health -= Min((*it)->m_damage, tile->m_health);
+
+							//damage to weapon
+							if (tile->m_weapon != NULL)
+							{
+								Weapon* weapon = tile->m_weapon;
+								weapon->m_health -= Min((*it)->m_damage, weapon->m_health);
+								if (weapon->m_health == 0)
+								{
+									weapon->setColor(sf::Color::Red);
+								}
+							}
 
 							//piercing hull
 							if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0)
@@ -780,6 +806,12 @@ bool Gameloop::UpdateTacticalScale()
 		m_warship->m_combat_interface.Init(m_warship, *it);
 		m_scale = Scale_Tactical;
 		break;
+	}
+
+	if (m_scale == Scale_Tactical)
+	{
+		m_warship->InitCombat();
+		m_tactical_ship->InitCombat();
 	}
 
 	return (m_scale == Scale_Tactical);

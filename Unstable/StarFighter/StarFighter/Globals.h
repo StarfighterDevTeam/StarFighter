@@ -48,7 +48,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ROOMTILE_OFFSET_X			400.f
 #define ROOMTILE_OFFSET_Y			550.f
 
-#define ROOMTILE_MINI_SIZE			24.f
+#define ROOMTILE_MINI_SIZE			32.f
 #define ROOMTILE_MINI_OFFSET_X		1550.f
 #define ROOMTILE_MINI_OFFSET_Y		(ROOMTILE_OFFSET_Y	)
 

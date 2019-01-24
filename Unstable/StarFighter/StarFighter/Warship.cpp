@@ -78,8 +78,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	m_nb_crew = m_nb_crew_max;
 
 	//WEAPONS
-	Weapon* weapon = new Weapon(Weapon_Cannon);
-	AddWeapon(weapon, room, this);
+	Weapon* weapon = new Weapon(Weapon_Cannon, false);
+	AddWeapon(weapon, room, this, false);
 
 	//FLOOD
 	m_tiles[0][3]->m_pierced = true;

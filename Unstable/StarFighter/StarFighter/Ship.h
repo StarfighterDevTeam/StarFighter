@@ -65,7 +65,7 @@ public:
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
-	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship);
+	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy);
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
@@ -73,6 +73,8 @@ public:
 	void CenterRoomPositions(bool minimized);
 
 	void UpdateFlooding(Time deltaTime, bool is_minimized);
+
+	void InitCombat();
 
 private:
 	int m_rooms_min_upcorner_x;

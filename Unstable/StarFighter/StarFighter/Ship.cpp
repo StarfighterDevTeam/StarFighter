@@ -411,14 +411,14 @@ Room* Ship::ConnectRooms()
 	return unconnected_room;
 }
 
-Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
+Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy)
 {
 	if (room == NULL)
 	{
 		return NULL;
 	}
 
-	RoomTile* tile = weapon->GetFreeWeaponTile(room);
+	RoomTile* tile = weapon->GetFreeWeaponTile(room, is_enemy);
 
 	if (tile == NULL)
 	{
@@ -456,15 +456,18 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship)
 		tile->m_weapon_gunner = m_tiles[tile->m_coord_x][tile->m_coord_y - 1];
 	}
 
-	//UI
-	weapon->m_shape_container.setPosition(weapon->m_position);
-	weapon->m_text.SetPosition(weapon->m_position);
+	weapon->UpdatePosition();
 
 	return weapon;
 }
 
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 {
+	if (weapon->m_rof_timer > 0)
+	{
+		return false;
+	}
+
 	if (0)//chance of miss
 	{
 		return false;
@@ -521,6 +524,16 @@ void Ship::BuildShip()
 	}
 
 	m_nb_crew = m_nb_crew_max;
+
+	//weapons
+	Weapon* weapon = new Weapon(Weapon_Cannon, true);
+	AddWeapon(weapon, m_rooms.back(), this, true);
+
+	Weapon* weapon2 = new Weapon(Weapon_Cannon, true);
+	AddWeapon(weapon2, m_rooms.back(), this, true);
+
+	Weapon* weapon3 = new Weapon(Weapon_Cannon, true);
+	AddWeapon(weapon3, m_rooms.back(), this, true);
 }
 
 void Ship::CenterRoomPositions(bool minimized)
@@ -611,6 +624,16 @@ void Ship::CenterRoomPositions(bool minimized)
 		{
 			m_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
 		}
+	}
+}
+
+
+void Ship::InitCombat()
+{
+	//reset weapon rof timers
+	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+	{
+		(*it)->m_rof_timer = (*it)->m_rof;
 	}
 }
 
