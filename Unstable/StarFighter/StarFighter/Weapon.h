@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "Ammo.h"
 #include "Room.h"
+#include "CrewMember.h"
 #include "WaterZone.h"
 
 class Ship;//forward declaration

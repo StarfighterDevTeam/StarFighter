@@ -101,10 +101,10 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 			}
-			else if ((*it2)->m_crew != NULL)
-			{
-				(*it2)->m_shape_container.setFillColor(sf::Color::Green);
-			}
+			//else if ((*it2)->m_crew != NULL)
+			//{
+			//	(*it2)->m_shape_container.setFillColor(sf::Color::Green);
+			//}
 			else if ((*it2)->m_weapon != NULL)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color::Red);
@@ -171,6 +171,22 @@ void Gameloop::Update(sf::Time deltaTime)
 				{
 					(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 				}
+				else if ((*it2)->m_weapon != NULL)
+				{
+					(*it2)->m_shape_container.setFillColor(sf::Color::Red);
+				}
+
+				if ((*it2)->m_weapon_gunner != NULL)
+				{
+					if ((*it2)->m_weapon_gunner->m_crew != NULL && (*it2)->m_weapon_gunner->m_crew->m_tile == (*it2)->m_weapon_gunner)
+					{
+						(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color::Green);
+					}
+					else
+					{
+						(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
+					}
+				}
 			}
 
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
@@ -224,6 +240,8 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->m_health > 0)
 			{
 				(*it)->Update(deltaTime);
+
+				//Crew AI
 			}
 
 			if ((*it)->m_health > 0)
@@ -238,7 +256,16 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 	
-	//Weapons
+	//Fire weapon
+	if (m_scale == Scale_Tactical)
+	{
+		if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
+		{
+			Weapon* weapon = (Weapon*)hovered;
+			m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
+		}
+	}
+
 	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 	{
 		(*it)->Update(deltaTime);
@@ -253,9 +280,9 @@ void Gameloop::Update(sf::Time deltaTime)
 
 			if ((*it)->m_rof_timer <= 0)
 			{
-				int random_room = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
-				int random_tile = RandomizeIntBetweenValues(0, m_warship->m_rooms[9]->m_tiles.size() - 1);
-				(*it)->Fire(deltaTime, m_tactical_ship->m_position, m_tactical_ship->m_angle, m_tactical_ship->m_distance_combat, m_warship, m_warship->m_rooms[9]->m_tiles[random_tile]);
+				int random_room = 9;// RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
+				int random_tile = RandomizeIntBetweenValues(0, m_warship->m_rooms[random_room]->m_tiles.size() - 1);
+				(*it)->Fire(deltaTime, m_tactical_ship->m_position, m_tactical_ship->m_angle, m_tactical_ship->m_distance_combat, m_warship, m_warship->m_rooms[random_room]->m_tiles[random_tile]);
 			}
 		}
 	}
@@ -291,19 +318,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		if (connexion->m_ship == m_warship)
 		{
 			connexion->SetLock(!connexion->m_locked);
-		}
-	}
-
-	//Fire weapon
-	if (m_scale == Scale_Tactical)
-	{
-		if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
-		{
-			Weapon* weapon = (Weapon*)hovered;
-			if (weapon->m_tile->m_weapon_gunner->m_crew != NULL && weapon->m_tile->m_weapon_gunner->m_crew->m_tile == weapon->m_tile->m_weapon_gunner && weapon->m_tile->m_weapon_gunner->m_pierced == false && weapon->m_health > 0)
-			{
-				m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
-			}
 		}
 	}
 

@@ -1,6 +1,7 @@
 #ifndef SHIP_H_INCLUDED
 #define SHIP_H_INCLUDED
 
+#include "Weapon.h"
 #include "CrewMember.h"
 #include "WaterZone.h"
 #include "Island.h"

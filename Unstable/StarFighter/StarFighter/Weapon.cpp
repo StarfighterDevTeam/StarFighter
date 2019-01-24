@@ -73,6 +73,11 @@ bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, 
 		return false;
 	}
 
+	if (m_tile->m_weapon_gunner->m_crew == NULL || m_tile->m_weapon_gunner->m_crew->m_tile != m_tile->m_weapon_gunner || m_tile->m_weapon_gunner->m_pierced == true || m_health <= 0)
+	{
+		return false;
+	}
+
 	m_rof_timer = m_rof;
 
 	//Fire from room tile

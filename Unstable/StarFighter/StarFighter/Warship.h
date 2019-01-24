@@ -4,6 +4,7 @@
 #include "Game.h"
 
 #include "CrewMember.h"
+#include "Weapon.h"
 #include "Island.h"
 #include "Compass.h"
 #include "CombatInterface.h"
