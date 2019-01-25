@@ -10,6 +10,7 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_crew = NULL;
 	m_weapon = NULL;
 	m_weapon_gunner = NULL;
+	m_weapon_tile = NULL;
 	m_connexion = NULL;
 	m_hull = Hull_None;
 	m_pierced = false;

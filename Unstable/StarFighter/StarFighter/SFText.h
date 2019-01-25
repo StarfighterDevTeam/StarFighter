@@ -7,34 +7,14 @@
 
 using namespace sf;
 
-enum PlayerTeams
-{
-	PlayerBlue,
-	PlayerRed,
-	PlayerBlue2,
-	PlayerRed2,
-	PlayerNeutral,
-	NBVAL_PlayerTeams,
-};
-
-enum TeamAlliances
-{
-	Alliance1,
-	Alliance2,
-	AllianceNeutral,
-	NBVAL_TeamAlliances,
-};
-
 class SFText : public Text
 {
 public:
 	SFText() {};
-	SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team);
+	SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position);
 	~SFText() {};
 	virtual void update(Time deltaTime);
 	bool m_visible;
-	PlayerTeams m_team;
-	TeamAlliances m_alliance;
 	bool m_GarbageMe;
 	void SetPosition(sf::Vector2f position);
 };
@@ -43,11 +23,9 @@ class SFRectangle : public sf::RectangleShape
 {
 public:
 	SFRectangle() {};
-	SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team);
+	SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color);
 	~SFRectangle() {};
 	bool m_visible;
-	PlayerTeams m_team;
-	TeamAlliances m_alliance;
 	bool m_GarbageMe;
 };
 

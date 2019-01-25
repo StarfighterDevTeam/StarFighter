@@ -19,6 +19,12 @@ enum UI_Type
 	UI_Weapon,
 };
 
+enum ShipAlliance
+{
+	Alliance_Player,
+	Alliance_Enemy,
+};
+
 class GameEntity : public AnimatedSprite
 {
 public:

@@ -15,7 +15,7 @@ Gameloop::Gameloop()
 	//PIRATES
 	InitWaterZones();
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
-	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete, false));
+	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete, Alliance_Enemy));
 	m_tactical_ship = NULL;
 
 	m_scale = Scale_Strategic;
@@ -175,16 +175,15 @@ void Gameloop::Update(sf::Time deltaTime)
 				{
 					(*it2)->m_shape_container.setFillColor(sf::Color::Red);
 				}
-
-				if ((*it2)->m_weapon_gunner != NULL)
+				else if ((*it2)->m_weapon_tile != NULL)//position of a weapon gunner?
 				{
-					if ((*it2)->m_weapon_gunner->m_crew != NULL && (*it2)->m_weapon_gunner->m_crew->m_tile == (*it2)->m_weapon_gunner)
+					if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 					{
-						(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color::Green);
+						(*it2)->m_shape_container.setFillColor(sf::Color::Green);//occupied by a crew
 					}
 					else
 					{
-						(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
+						(*it2)->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner" = empty crew
 					}
 				}
 			}
@@ -198,8 +197,6 @@ void Gameloop::Update(sf::Time deltaTime)
 			(*it)->Update(deltaTime);
 		}
 	}
-
-
 
 	//Crew movement (and removing the dead);
 	vector<CrewMember*> old_crew;
@@ -245,47 +242,48 @@ void Gameloop::Update(sf::Time deltaTime)
 				if ((*it)->m_destination == NULL)
 				{
 					//first look into current room if there is any interesting task to do. Then we'll do the same search across all rooms
-					RoomTile* hull_to_repair = NULL;
-					RoomTile* gunner_missing = NULL;
+					RoomTile* destination = NULL;
 
-					for (int i = 0; i < 2; i++)
+					//Hull to repair?
+					for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
 					{
-						vector<RoomTile*>::iterator begin = i == 0 ? (*it)->m_tile->m_room->m_tiles.begin() : (*CurrentGame).m_enemy_tiles.begin();
-						vector<RoomTile*>::iterator end = i == 0 ? (*it)->m_tile->m_room->m_tiles.end() : (*CurrentGame).m_enemy_tiles.end();
-
-						//Hull to repair?
-						for (vector<RoomTile*>::iterator it2 = begin; it2 != end; it2++)
+						if ((*it2)->m_pierced == true && (*it2)->m_crew == NULL)
 						{
-							if ((*it2)->m_pierced == true && (*it2)->m_crew == NULL)
+							destination = (*it2);
+							break;
+						}
+					}
+
+					//Weapon to fire
+					if (destination == NULL && ((*it)->m_tile->m_weapon_tile != NULL && (*it)->m_tile->m_crew == *it) == false)//not already busy as a weapon gunner?
+					{
+						for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
+						{
+							if ((*it2)->m_weapon_gunner != NULL && (*it2)->m_weapon_gunner->m_crew == NULL && (*it2)->m_weapon->m_health > 0)
 							{
-								hull_to_repair = (*it2);
+								destination = (*it2)->m_weapon_gunner;
 								break;
 							}
 						}
-
-						if (hull_to_repair != NULL)
+					}
+						
+					//Give move order
+					if (destination != NULL)
+					{
+						//tile is free?
+						if (destination->m_crew == NULL && destination->m_weapon == NULL)
 						{
-							(*it)->MoveToRoomTile(hull_to_repair);
-						}
+							//book new destination
+							destination->m_crew = *it;
 
-						//Weapon to fire
-						for (vector<RoomTile*>::iterator it2 = begin; it2 != end; it2++)
-						{
-							if ((*it2)->m_weapon_gunner != NULL && (*it2)->m_weapon_gunner->m_crew == NULL)
-							{
-								gunner_missing = (*it2)->m_weapon_gunner;
-								break;
-							}
-						}
-
-						if (gunner_missing != NULL)
-						{
-							(*it)->MoveToRoomTile(gunner_missing);
+							//assign destination for pathfind
+							(*it)->m_destination = destination;
 						}
 					}
 				}
 			}
 
+			//remove the dead
 			if ((*it)->m_health > 0)
 			{
 				m_tactical_ship->m_crew.push_back(*it);
@@ -866,8 +864,9 @@ bool Gameloop::UpdateTacticalScale()
 
 	if (m_scale == Scale_Tactical)
 	{
-		m_warship->InitCombat();
-		m_tactical_ship->InitCombat();
+		m_warship->InitCombat();//init cooldowns
+		m_tactical_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
+		m_tactical_ship->InitCombat();//init cooldowns
 	}
 
 	return (m_scale == Scale_Tactical);

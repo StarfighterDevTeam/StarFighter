@@ -2,12 +2,12 @@
 
 extern Game* CurrentGame;
 
-Ship::Ship(DMS_Coord coord, ShipType type, bool is_player) : GameEntity(UI_EnemyShip)
+Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(UI_EnemyShip)
 {
 	m_type = type;
+	m_alliance = alliance;
 	m_destination = NULL;
 	m_seaport = NULL;
-	m_is_minimized = true;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
 
 	m_rooms_min_upcorner_x = 0;
@@ -34,11 +34,6 @@ Ship::Ship(DMS_Coord coord, ShipType type, bool is_player) : GameEntity(UI_Enemy
 
 	m_speed = sf::Vector2f(0, 0);
 	m_angle = -90;
-
-	if (is_player == false)
-	{
-		BuildShip();
-	}
 }
 
 Ship::~Ship()
@@ -244,8 +239,8 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 		return false;
 	}
 
-	RoomTile* tileA = RoomTile::GetRoomTileAtCoord(tileA_x, tileA_y, m_is_minimized);
-	RoomTile* tileB = RoomTile::GetRoomTileAtCoord(tileB_x, tileB_y, m_is_minimized);
+	RoomTile* tileA = RoomTile::GetRoomTileAtCoord(tileA_x, tileA_y, m_alliance != Alliance_Player);
+	RoomTile* tileB = RoomTile::GetRoomTileAtCoord(tileB_x, tileB_y, m_alliance != Alliance_Player);
 
 	if (tileA == NULL || tileB == NULL || tileA->m_room == tileB->m_room)
 	{
@@ -265,7 +260,7 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 	}
 
 	//Create the connexion
-	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false, m_is_minimized, this);
+	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false, m_alliance != Alliance_Player, this);
 
 	m_connexions.push_back(connexion);
 	tileA->m_room->m_connexions.push_back(connexion);
@@ -456,6 +451,8 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy)
 		tile->m_weapon_gunner = m_tiles[tile->m_coord_x][tile->m_coord_y - 1];
 	}
 
+	tile->m_weapon_gunner->m_weapon_tile = tile;
+
 	weapon->UpdatePosition();
 
 	return weapon;
@@ -506,7 +503,7 @@ void Ship::BuildShip()
 	m_health = m_health_max;
 
 	//center position of each room & room tiles
-	CenterRoomPositions(m_is_minimized);
+	CenterRoomPositions(m_alliance != Alliance_Player);
 
 	//doors
 	ConnectRooms();
@@ -520,7 +517,7 @@ void Ship::BuildShip()
 	{
 		int r = RandomizeIntBetweenValues(0, m_rooms.size() - 1);
 		r = 12;
-		CrewMember* crew = new CrewMember(Crew_Civilian);
+		CrewMember* crew = new CrewMember(Crew_Civilian, m_alliance);
 		AddCrewMember(crew, m_rooms[r]);
 	}
 

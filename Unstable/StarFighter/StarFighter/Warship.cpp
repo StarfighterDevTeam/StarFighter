@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
+Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player)
 {
 	m_angle = 90.f;
 	m_desired_angle = m_angle;
@@ -11,7 +11,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	m_seaport = NULL;
 	m_position.x = WATERTILE_OFFSET_X - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
-	m_is_minimized = false;
 
 	//shape for water tiles
 	m_textureName = "2D/warship_icon.png";
@@ -59,7 +58,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 	m_health = m_health_max;
 
 	//center position of each room & room tiles
-	CenterRoomPositions(m_is_minimized);
+	CenterRoomPositions(false);
 
 	//doors
 	ConnectRooms();
@@ -70,10 +69,10 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, true)
 
 	//CREW
 	m_nb_crew_max = 0;
-	CrewMember* crew = new CrewMember(Crew_Pirate);
+	CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);
 	AddCrewMember(crew, room);
 
-	CrewMember* crew2 = new CrewMember(Crew_Civilian);
+	CrewMember* crew2 = new CrewMember(Crew_Civilian, m_alliance);
 	//AddCrewMember(crew2, room2);
 	m_nb_crew = m_nb_crew_max;
 

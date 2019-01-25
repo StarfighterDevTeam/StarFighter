@@ -10,9 +10,10 @@ string dico_crew[NB_CREW_TYPES] = {
 	"Mecha",	//Crew_Mecha,
 };
 
-CrewMember::CrewMember(CrewMemberType type) : GameEntity(UI_CrewMember)
+CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance) : GameEntity(UI_CrewMember)
 {
 	m_type = type;
+	m_alliance = alliance;
 	m_UI_type = UI_CrewMember;
 	m_ref_speed = CREWMEMBER_SPEED;
 	m_speed = sf::Vector2f(0, 0);
@@ -209,7 +210,6 @@ void CrewMember::Update(Time deltaTime)
 	GameEntity::Update(deltaTime);
 }
 
-
 void CrewMember::IteratePathFinding(RoomTile* tileA, RoomTile* tileB)
 {
 	m_closed_list_pathfind.push_back(tileA);
@@ -266,6 +266,62 @@ void CrewMember::IteratePathFinding(RoomTile* tileA, RoomTile* tileB)
 	}
 }
 
+void CrewMember::IterateEnemyPathFinding(RoomTile* tileA, RoomTile* tileB)
+{
+	m_closed_list_pathfind.push_back(tileA);
+	m_open_list_pathfind.remove(tileA);
+
+	const int tileA_x = tileA->m_coord_x;
+	const int tileA_y = tileA->m_coord_y;
+	const int tileB_x = tileB->m_coord_x;
+	const int tileB_y = tileB->m_coord_y;
+
+	//are we arrived at destination? (1 tile away from destination)
+	if (Room::IsConnectedToRoomTile(tileA, tileB))
+	{
+		tileB->m_parent = tileA;
+		return;
+	}
+
+	//looks through all tiles to find the best next waypoint.
+	size_t vector_size = (*CurrentGame).m_enemy_tiles.size();
+	for (size_t i = 0; i < vector_size; i++)
+	{
+		if (Room::IsConnectedToRoomTile(tileA, (*CurrentGame).m_enemy_tiles[i]))
+		{
+			//tiles that are legitimate to compute	
+			if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), (*CurrentGame).m_enemy_tiles[i]) == m_closed_list_pathfind.end())//tile unknown until now
+			{
+				if (find(m_open_list_pathfind.begin(), m_open_list_pathfind.end(), (*CurrentGame).m_enemy_tiles[i]) == m_open_list_pathfind.end())
+				{
+					//CASE where the tile is not on the closed list nor on the open list
+					m_open_list_pathfind.push_back((*CurrentGame).m_enemy_tiles[i]);
+
+					//compute Heuristic value (distance between the computed tile and the target) - we avoid using square root here
+					const int pos2_x = tileB->m_coord_x;
+					const int pos2_y = tileB->m_coord_y;
+					const int posit_x = tileB->m_coord_x;
+					const int posit_y = tileB->m_coord_y;
+
+					int H_value_x = posit_x > pos2_x ? posit_x - pos2_x : pos2_x - posit_x;
+					int H_value_y = posit_y > pos2_y ? posit_y - pos2_y : pos2_y - posit_y;
+					(*CurrentGame).m_enemy_tiles[i]->m_heuristic = H_value_x + H_value_y;
+
+					//compute Movement cost
+					(*CurrentGame).m_enemy_tiles[i]->m_movement_cost = 10;
+					(*CurrentGame).m_enemy_tiles[i]->m_movement_cost += tileA->m_movement_cost;
+
+					//G value
+					(*CurrentGame).m_enemy_tiles[i]->m_G_value = (*CurrentGame).m_enemy_tiles[i]->m_heuristic + (*CurrentGame).m_enemy_tiles[i]->m_movement_cost;
+
+					//parent node
+					(*CurrentGame).m_enemy_tiles[i]->m_parent = tileA;
+				}
+			}
+		}
+	}
+}
+
 bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 {
 	if (tileA == tileB)
@@ -290,10 +346,20 @@ bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 		}
 
 		//compute this tile
-		IteratePathFinding(next_tile, tileB);
+		if (m_alliance == Alliance_Player)
+		{
+			IteratePathFinding(next_tile, tileB);
+		}
+		else
+		{
+			IterateEnemyPathFinding(next_tile, tileB);
+		}
 	}
 
 	//path found -> save all waypoints into a member path
+	vector<RoomTile*>::iterator begin = m_alliance == Alliance_Player ? (*CurrentGame).m_tiles.begin() : (*CurrentGame).m_enemy_tiles.begin();
+	vector<RoomTile*>::iterator end = m_alliance == Alliance_Player ? (*CurrentGame).m_tiles.end() : (*CurrentGame).m_enemy_tiles.end();
+	
 	m_current_path.clear();
 	RoomTile* way_point = tileB;
 	while (way_point != tileA)
@@ -303,7 +369,8 @@ bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 		if (way_point->m_parent == NULL)
 		{
 			//clear data
-			for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+
+			for (vector<RoomTile*>::iterator it = begin; it != end; it++)
 			{
 				(*it)->m_heuristic = 0;
 				(*it)->m_movement_cost = 0;
@@ -319,7 +386,7 @@ bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 	}
 	
 	//clear data
-	for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+	for (vector<RoomTile*>::iterator it = begin; it != end; it++)
 	{
 		(*it)->m_heuristic = 0;
 		(*it)->m_movement_cost = 0;

@@ -28,6 +28,7 @@ public:
 	CrewMember* m_crew;
 	Weapon* m_weapon;
 	RoomTile* m_weapon_gunner;
+	RoomTile* m_weapon_tile;
 	int m_coord_x;
 	int m_coord_y;
 	RoomConnexion* m_connexion;

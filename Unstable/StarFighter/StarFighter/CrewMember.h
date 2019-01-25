@@ -12,10 +12,11 @@
 class CrewMember : public GameEntity
 {
 public:
-	CrewMember(CrewMemberType type);
+	CrewMember(CrewMemberType type, ShipAlliance alliance);
 	~CrewMember();
 
 	CrewMemberType m_type;
+	ShipAlliance m_alliance;
 
 	void Update(Time deltaTime);
 
@@ -37,6 +38,7 @@ public:
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);
 	void IteratePathFinding(RoomTile* tileA, RoomTile* tileB);
+	void IterateEnemyPathFinding(RoomTile* tileA, RoomTile* tileB);
 	list<RoomTile*> m_closed_list_pathfind;
 	list<RoomTile*> m_open_list_pathfind;
 };

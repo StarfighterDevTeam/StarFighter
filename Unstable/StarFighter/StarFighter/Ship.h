@@ -15,10 +15,11 @@ enum ShipType
 class Ship : public GameEntity
 {
 public:
-	Ship(DMS_Coord coord, ShipType type, bool is_player);
+	Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance);
 	~Ship();
 
 	ShipType m_type;
+	ShipAlliance m_alliance;
 
 	DMS_Coord m_DMS;//degree/min/sec
 	sf::Vector2f m_speed;
@@ -53,7 +54,6 @@ public:
 	vector<WaterTile*> m_current_path;
 	Seaport* m_seaport;
 
-	bool m_is_minimized;
 	float m_distance_combat;
 	sf::Vector2i m_rooms_size;
 	string m_textureName;

@@ -8,8 +8,6 @@ SFTextPop::SFTextPop(SFText* text, float distance_not_faded, float distance_fade
 	setPosition(sf::Vector2f(text->getPosition().x, text->getPosition().y + offset_positionY));
 
 	m_visible = text->m_visible;
-	m_team = text->m_team;
-	m_alliance = text->m_alliance;
 	m_offset_positionY = offset_positionY;
 
 	m_GarbageMe = false;

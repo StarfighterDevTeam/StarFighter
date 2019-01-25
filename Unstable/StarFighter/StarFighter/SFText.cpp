@@ -1,6 +1,6 @@
 #include "SFText.h"
 
-SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position, PlayerTeams team)
+SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f position)
 {
 	setFont(*font);
 	setCharacterSize(size);
@@ -8,8 +8,6 @@ SFText::SFText(sf::Font* font, unsigned int size, sf::Color color, sf::Vector2f 
 	setPosition(position);
 
 	m_visible = true;
-	m_team = team;
-	m_alliance = AllianceNeutral;
 
 	m_GarbageMe = false;
 }
@@ -27,7 +25,7 @@ void SFText::SetPosition(sf::Vector2f position)
 	setPosition(sf::Vector2f(position.x - globalBounds_x * 0.5f, position.y - globalBounds_y * 0.5f));
 }
 
-SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color, PlayerTeams team)
+SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color color, float outline_thickness, sf::Color outline_color)
 {
 	setSize(size);
 	setOrigin(size.x / 2, size.y/2);
@@ -36,8 +34,6 @@ SFRectangle::SFRectangle(sf::Vector2f position, sf::Vector2f size, sf::Color col
 	setOutlineColor(outline_color);
 
 	m_visible = true;
-	m_team = team;
-	m_alliance = (TeamAlliances)0;
 
 	m_GarbageMe = false;
 }
