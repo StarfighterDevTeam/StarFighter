@@ -470,10 +470,25 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 		return false;
 	}
 
-	int r = RandomizeIntBetweenValues(0, target->m_rooms.size() - 1);
-	Room* target_room = target->m_rooms[r];
-	int t = RandomizeIntBetweenValues(0, target->m_rooms[r]->m_tiles.size() - 1);
-	RoomTile* target_tile = target->m_rooms[r]->m_tiles[t];
+	//int r = RandomizeIntBetweenValues(0, target->m_rooms.size() - 1);
+	//Room* target_room = target->m_rooms[r];
+	//int t = RandomizeIntBetweenValues(0, target->m_rooms[r]->m_tiles.size() - 1);
+	//RoomTile* target_tile = target->m_rooms[r]->m_tiles[t];
+
+	//pick an enemy tile with the same Y coordinate, but a random X coordinate among existing room tiles
+	int y = weapon->m_tile->m_coord_y;
+	vector<int> tiles_index;
+	for (int i = 0; i < target->m_rooms_size.x - 1; i++)
+	{
+		if (target->m_tiles[i][y] != NULL)
+		{
+			tiles_index.push_back(i);
+		}
+	}
+	int r = RandomizeIntBetweenValues(0, tiles_index.size() - 1);
+	int x = tiles_index[r];
+
+	RoomTile* target_tile = target->m_tiles[x][y];
 	
 	return weapon->Fire(deltaTime, m_position, m_angle, target->m_distance_combat, target, target_tile);
 }

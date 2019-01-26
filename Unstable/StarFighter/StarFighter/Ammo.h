@@ -18,8 +18,6 @@
 enum ShootPhase
 {
 	Shoot_Ougoing,
-	Shoot_Warping,
-	Shoot_Incoming,
 	Shoot_Hit,
 };
 

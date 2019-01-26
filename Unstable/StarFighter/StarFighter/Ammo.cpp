@@ -45,51 +45,17 @@ void Ammo::Update(Time deltaTime)
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
 
-	switch (m_phase)
+	//hitting target
+	if (abs(m_position.x - m_target_tile->m_position.x) < 16.f && abs(m_position.y - m_target_tile->m_position.y) < 16.f)
 	{
-		case Shoot_Ougoing:
-		{
-			if ((m_speed.x > 0 && m_position.x > WARP_AMMO_OFFSET_X) || (m_speed.x < 0 && m_position.x < WARP_AMMO_OFFSET_X))//warping to the right
-			{
-				m_phase = Shoot_Warping;
-				m_warp_timer = m_distance_combat / AMMO_WARP_DISTANCE_PER_SECOND * m_ref_speed / CANNONBALL_SPEED;
-				m_position.y = -500.f;//disappearing
-			}
-			break;
-		}
-		case Shoot_Warping:
-		{
-			if (m_warp_timer > 0)
-			{
-				m_warp_timer -= deltaTime.asSeconds();
-			}
+		//"boom"
+		m_can_be_seen = false;
+		FX* FX_hit = m_FX_hit->Clone();
+		FX_hit->m_position = m_target_tile->m_position;
+		FX_hit->UpdatePosition();
+		(*CurrentGame).m_FX.push_back(FX_hit);
 
-			if (m_warp_timer < 0)
-			{
-				m_phase = Shoot_Incoming;
-
-				m_position.x = m_speed.x > 0 ? WARP_AMMO_OFFSET_X - m_size.x * 0.5f : WARP_AMMO_OFFSET_X + m_size.x * 0.5f;
-				m_position.y = m_target_tile->m_position.y;
-			}
-			break;
-		}
-		case Shoot_Incoming:
-		{
-			//hitting target
-			if (abs(m_position.x - m_target_tile->m_position.x) < 16.f && abs(m_position.y - m_target_tile->m_position.y) < 16.f)
-			{
-				//"boom"
-				m_can_be_seen = false;
-				FX* FX_hit = m_FX_hit->Clone();
-				FX_hit->m_position = m_target_tile->m_position;
-				FX_hit->UpdatePosition();
-				(*CurrentGame).m_FX.push_back(FX_hit);
-
-				m_phase = Shoot_Hit;
-			}
-
-			break;
-		}
+		m_phase = Shoot_Hit;
 	}
 
 	GameEntity::Update(deltaTime);

@@ -326,7 +326,9 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				int random_room = 9;// RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
 				int random_tile = RandomizeIntBetweenValues(0, m_warship->m_rooms[random_room]->m_tiles.size() - 1);
-				(*it)->Fire(deltaTime, m_tactical_ship->m_position, m_tactical_ship->m_angle, m_tactical_ship->m_distance_combat, m_warship, m_warship->m_rooms[random_room]->m_tiles[random_tile]);
+				//(*it)->Fire(deltaTime, m_tactical_ship->m_position, m_tactical_ship->m_angle, m_tactical_ship->m_distance_combat, m_warship, m_warship->m_rooms[random_room]->m_tiles[random_tile]);
+
+				m_tactical_ship->FireWeapon(*it, deltaTime, m_warship);
 			}
 		}
 	}

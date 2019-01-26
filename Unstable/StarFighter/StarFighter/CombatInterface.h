@@ -26,7 +26,6 @@ struct CombatInterface
 	void Init(Ship* ship, Ship* enemy_ship);
 	Ship* m_ship;
 	Ship* m_enemy_ship;
-	GameEntity* m_warp_zone;//warp border + enemy ship info (name, class, alliance, volume, crew size)
 	GameEntity* m_lifebars[2];
 	GameEntity* m_floodbars[2];
 	GameEntity* m_crewbars[2];

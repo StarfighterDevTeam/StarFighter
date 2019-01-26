@@ -15,8 +15,6 @@ CombatInterface::CombatInterface()
 	{
 		m_distance_ships[i] = NULL;
 	}
-
-	m_warp_zone = NULL;
 }
 
 CombatInterface::~CombatInterface()
@@ -32,8 +30,6 @@ CombatInterface::~CombatInterface()
 	{
 		delete m_distance_ships[i];
 	}
-
-	delete m_warp_zone;
 }
 
 void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
@@ -135,15 +131,6 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 			m_distance_ships[i]->m_text.setPosition(m_distance_ships[i]->m_position);
 		}
 	}
-
-	//warp window
-	m_warp_zone = new GameEntity(UI_None);
-	m_warp_zone->m_shape.setSize(sf::Vector2f(REF_WINDOW_RESOLUTION_X - WARP_AMMO_OFFSET_X, COMBAT_WARPZONE_SIZE_Y));
-	m_warp_zone->m_shape.setOrigin(sf::Vector2f((REF_WINDOW_RESOLUTION_X - WARP_AMMO_OFFSET_X) * 0.5f, COMBAT_WARPZONE_SIZE_Y * 0.5f));
-	m_warp_zone->m_shape.setPosition(sf::Vector2f((REF_WINDOW_RESOLUTION_X + WARP_AMMO_OFFSET_X) * 0.5f, COMBAT_WARPZONE_SIZE_Y * 0.5f));
-	m_warp_zone->m_shape.setFillColor(sf::Color(0, 0, 0, 0));
-	m_warp_zone->m_shape.setOutlineColor(sf::Color::Black);
-	m_warp_zone->m_shape.setOutlineThickness(8.f);
 }
 
 
@@ -203,9 +190,6 @@ void CombatInterface::Update(sf::Time deltaTime)
 
 void CombatInterface::Draw(sf::RenderTexture& screen)
 {
-	//warp window
-	m_warp_zone->Draw(screen);
-
 	//life bars
 	for (int i = 0; i < 2; i++)
 	{
