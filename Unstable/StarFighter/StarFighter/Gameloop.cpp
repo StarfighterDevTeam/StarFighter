@@ -244,40 +244,44 @@ void Gameloop::Update(sf::Time deltaTime)
 					//first look into current room if there is any interesting task to do. Then we'll do the same search across all rooms
 					RoomTile* destination = NULL;
 
-					//Hull to repair?
-					for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
+					//not already busy reparing?
+					if (((*it)->m_tile != NULL && (*it)->m_tile->m_crew == *it && (*it)->m_tile->m_pierced == true) == false)
 					{
-						if ((*it2)->m_pierced == true && (*it2)->m_crew == NULL)
-						{
-							destination = (*it2);
-							break;
-						}
-					}
-
-					//Weapon to fire
-					if (destination == NULL && ((*it)->m_tile->m_weapon_tile != NULL && (*it)->m_tile->m_crew == *it) == false)//not already busy as a weapon gunner?
-					{
+						//Hull to repair?
 						for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
 						{
-							if ((*it2)->m_weapon_gunner != NULL && (*it2)->m_weapon_gunner->m_crew == NULL && (*it2)->m_weapon->m_health > 0)
+							if ((*it2)->m_pierced == true && (*it2)->m_crew == NULL)
 							{
-								destination = (*it2)->m_weapon_gunner;
+								destination = (*it2);
 								break;
 							}
 						}
-					}
-						
-					//Give move order
-					if (destination != NULL)
-					{
-						//tile is free?
-						if (destination->m_crew == NULL && destination->m_weapon == NULL)
-						{
-							//book new destination
-							destination->m_crew = *it;
 
-							//assign destination for pathfind
-							(*it)->m_destination = destination;
+						//Weapon to fire
+						if (destination == NULL && ((*it)->m_tile->m_weapon_tile != NULL && (*it)->m_tile->m_crew == *it) == false)//not already busy as a weapon gunner?
+						{
+							for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
+							{
+								if ((*it2)->m_weapon_gunner != NULL && (*it2)->m_weapon_gunner->m_crew == NULL && (*it2)->m_weapon->m_health > 0)
+								{
+									destination = (*it2)->m_weapon_gunner;
+									break;
+								}
+							}
+						}
+
+						//Give move order
+						if (destination != NULL)
+						{
+							//tile is free?
+							if (destination->m_crew == NULL && destination->m_weapon == NULL)
+							{
+								//book new destination
+								destination->m_crew = *it;
+
+								//assign destination for pathfind
+								(*it)->m_destination = destination;
+							}
 						}
 					}
 				}
@@ -708,16 +712,16 @@ void Gameloop::Draw()
 	//Tactical scale only
 	else
 	{
+		//Bullets
+		for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
+
 		//combat interface
 		m_warship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 	
-	//Bullets
-	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
-	{
-		(*it)->Draw((*CurrentGame).m_mainScreen);
-	}
-
 	//FX
 	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
 	{
