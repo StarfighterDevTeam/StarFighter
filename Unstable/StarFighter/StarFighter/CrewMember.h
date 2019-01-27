@@ -9,6 +9,10 @@
 #define CREWMEMBER_SPEED_FLOOD_FACTOR			0.5f
 #define CREWMEMBER_HEALTH_MAX					20
 
+#define CREWMEMBER_LIFEBAR_SIZE_X				20.f
+#define CREWMEMBER_LIFEBAR_SIZE_Y				4.f
+#define CREWMEMBER_LIFEBAR_OFFSET_Y				8.f
+
 class CrewMember : public GameEntity
 {
 public:
@@ -34,6 +38,8 @@ public:
 
 	float m_repair_timer;
 	float m_drowning_timer;
+
+	GameEntity* m_lifebar;
 
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);

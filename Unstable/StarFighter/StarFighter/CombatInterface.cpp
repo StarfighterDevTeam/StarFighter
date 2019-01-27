@@ -56,8 +56,6 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		m_lifebars[i]->m_shape.setOrigin(sf::Vector2f(COMBAT_LIFEBAR_SIZE_X * 0.5f, COMBAT_LIFEBAR_SIZE_Y * 0.5f));
 		m_lifebars[i]->m_shape.setPosition(lifebar_pos);
 		m_lifebars[i]->m_shape.setFillColor(sf::Color::Green);
-		m_lifebars[i]->m_shape.setOutlineThickness(2.f);
-		m_lifebars[i]->m_shape.setOutlineColor(sf::Color::Black);
 
 		//flood bars
 		m_floodbars[i] = new GameEntity(UI_None);
@@ -73,8 +71,6 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		m_floodbars[i]->m_shape.setOrigin(sf::Vector2f(COMBAT_FLOODBAR_SIZE_X * 0.5f, COMBAT_FLOODBAR_SIZE_Y * 0.5f));
 		m_floodbars[i]->m_shape.setPosition(floodbar_pos);
 		m_floodbars[i]->m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
-		m_floodbars[i]->m_shape.setOutlineThickness(2.f);
-		m_floodbars[i]->m_shape.setOutlineColor(sf::Color::Black);
 
 		//crew bars
 		m_crewbars[i] = new GameEntity(UI_None);

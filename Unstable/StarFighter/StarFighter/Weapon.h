@@ -28,7 +28,7 @@ public:
 	RoomTile* m_tile;
 	Room* m_target_room;
 	int m_health;
-	int m_healt_max;
+	int m_health_max;
 
 	float m_angle;
 	bool m_direct_fire;
@@ -37,6 +37,7 @@ public:
 	float m_angle_speed;
 
 	void Update(Time deltaTime);
+
 	void UpdateRof(Time deltaTime);
 
 	bool Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
@@ -46,6 +47,8 @@ public:
 
 	AmmoType m_ammo_type;
 	Ship* m_ship;
+
+	GameEntity* m_lifebar;
 };
 
 #endif //SHIP_H_INCLUDED

@@ -378,12 +378,12 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
-			(*it)->UpdateRof(deltaTime);
-			//(*it)->Update(deltaTime);
+			//(*it)->UpdateRof(deltaTime);
+			(*it)->Update(deltaTime);
 			if (m_tactical_ship->CanWeaponFire(*it))
 			{
 				//randomly change target sometimes
-				if ((*it)->m_target_room == NULL || RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f)) < AI_CHANGE_TARGETROOM_PERCENTAGE)
+				if ((*it)->m_target_room == NULL || ((*it)->m_rof_timer <= 0 && RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f)) < AI_CHANGE_TARGETROOM_PERCENTAGE))
 				{
 					int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
 					(*it)->m_target_room = m_warship->m_rooms[r];
@@ -477,7 +477,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							}
 
 							//piercing hull
-							if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0)
+							if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
 							{
 								tile->m_pierced = true;
 								if (tile->m_crew != NULL)
@@ -681,6 +681,16 @@ void Gameloop::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
+	//lifebars
+	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+	{
+		(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+	}
+	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+	{
+		(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+	}
+
 	//enemy rooms
 	if (m_tactical_ship != NULL)
 	{
@@ -713,6 +723,16 @@ void Gameloop::Draw()
 		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
+
+		//lifebars
+		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
+		{
+			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+		}
+		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
+		{
+			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 		}
 	}
 
@@ -803,11 +823,33 @@ bool Gameloop::UpdateTacticalScale()
 {
 	if (m_scale == Scale_Tactical)
 	{
-		//todo: exit conditions
-		if (0)
+		if (0)//todo: exit conditions, enemy destroyed
 		{
 			m_tactical_ship = NULL;
 			m_scale = Scale_Strategic;
+
+			//restore health
+			for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
+			{
+				for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+				{
+					(*it2)->m_health = (*it2)->m_health_max;
+					(*it2)->m_pierced = false;
+
+					if ((*it2)->m_weapon != NULL)
+					{
+						(*it2)->m_weapon->m_health = (*it2)->m_weapon->m_health_max;
+					}
+				}
+			}
+			for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+			{
+				(*it)->m_health = (*it)->m_health_max;
+			}
+		}
+		else if (0)//todo: exit conditions, player destroyed
+		{
+
 		}
 
 		return true;
