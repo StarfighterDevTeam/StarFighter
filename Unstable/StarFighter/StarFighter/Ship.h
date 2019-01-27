@@ -15,11 +15,12 @@ enum ShipType
 class Ship : public GameEntity
 {
 public:
-	Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance);
+	Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display_name);
 	~Ship();
 
 	ShipType m_type;
 	ShipAlliance m_alliance;
+	string m_display_name;
 
 	DMS_Coord m_DMS;//degree/min/sec
 	sf::Vector2f m_speed;

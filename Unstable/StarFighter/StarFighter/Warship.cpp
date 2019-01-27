@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player)
+Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "Default_name")
 {
 	m_angle = 90.f;
 	m_desired_angle = m_angle;

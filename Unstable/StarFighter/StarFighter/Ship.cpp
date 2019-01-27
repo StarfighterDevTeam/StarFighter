@@ -2,13 +2,14 @@
 
 extern Game* CurrentGame;
 
-Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(UI_EnemyShip)
+Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display_name) : GameEntity(UI_EnemyShip)
 {
 	m_type = type;
 	m_alliance = alliance;
 	m_destination = NULL;
 	m_seaport = NULL;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
+	m_display_name = display_name;
 
 	m_rooms_min_upcorner_x = 0;
 	m_rooms_min_upcorner_y = 0;
@@ -681,6 +682,7 @@ void Ship::InitCombat()
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
 		(*it)->m_rof_timer = (*it)->m_rof;
+		(*it)->m_target_room = NULL;
 	}
 }
 

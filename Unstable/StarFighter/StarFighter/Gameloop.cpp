@@ -15,7 +15,8 @@ Gameloop::Gameloop()
 	//PIRATES
 	InitWaterZones();
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
-	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete, Alliance_Enemy));
+	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_Goellete, Alliance_Enemy, "L'Esquif"));
+	m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_Goellete, Alliance_Enemy, "Le Goelan"));
 	m_tactical_ship = NULL;
 
 	m_scale = Scale_Strategic;
@@ -694,7 +695,6 @@ void Gameloop::Draw()
 		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_enemy_tiles.begin(); it != (*CurrentGame).m_enemy_tiles.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
-			(*it)->m_shape.setFillColor(sf::Color(0, 0, 0, 0));//reset feedback
 		}
 
 		//rooms
@@ -823,7 +823,7 @@ bool Gameloop::UpdateTacticalScale()
 	if (m_scale == Scale_Tactical)
 	{
 		//win conditions
-		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.3f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3)
+		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.9f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3)
 		{
 			//delete enemy from ships existing
 			vector<Ship*> old_ships;
@@ -990,6 +990,16 @@ bool Gameloop::UpdateTacticalScale()
 		m_warship->InitCombat();//init cooldowns
 		m_tactical_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
 		m_tactical_ship->InitCombat();//init cooldowns
+
+		//fill enemy ship room tiles for pathfind
+		(*CurrentGame).m_enemy_tiles.clear();
+		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
+		{
+			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			{
+				(*CurrentGame).m_enemy_tiles.push_back(*it2);
+			}
+		}
 	}
 
 	return (m_scale == Scale_Tactical);
