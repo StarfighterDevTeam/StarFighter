@@ -13,6 +13,16 @@
 #define CREWMEMBER_LIFEBAR_SIZE_Y				4.f
 #define CREWMEMBER_LIFEBAR_OFFSET_Y				8.f
 
+enum CrewSkills
+{
+	Skill_Gunner,
+	Skill_Fishing,
+	Skill_Melee,
+	Skill_Navigation,
+	Skill_Cooking,
+	NB_CREW_SKILLS,
+};
+
 class CrewMember : public GameEntity
 {
 public:
@@ -21,6 +31,8 @@ public:
 
 	CrewMemberType m_type;
 	ShipAlliance m_alliance;
+
+	int m_skills[NB_CREW_SKILLS];
 
 	void Update(Time deltaTime);
 

@@ -114,6 +114,30 @@ void Weapon::UpdateRof(Time deltaTime)
 	}
 }
 
+float Weapon::GetRof()
+{
+	float rof = m_rof;
+	if (CanFire() == true)
+	{
+		printf("rof before: %f, ", rof);
+		rof = 1.f / ((1.f / rof) * (100 + m_tile->m_weapon_gunner->m_crew->m_skills[Skill_Gunner]) / 100);
+		//rof = 1.f / 1.f / (rof * (100 + m_tile->m_weapon_gunner->m_crew->m_skills[Skill_Gunner]) / 100);
+		printf("bonus: %d, rof after: %f\n", m_tile->m_weapon_gunner->m_crew->m_skills[Skill_Gunner], rof);
+	}
+
+	return rof;
+}
+
+bool Weapon::CanFire()
+{
+	if (m_tile->m_weapon_gunner->m_crew == NULL || m_tile->m_weapon_gunner->m_crew->m_tile != m_tile->m_weapon_gunner || m_tile->m_weapon_gunner->m_pierced == true || m_health <= 0)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 RoomTile* Weapon::GetFreeRoomTile(Room* room)
 {
 	for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
@@ -130,7 +154,7 @@ RoomTile* Weapon::GetFreeRoomTile(Room* room)
 bool Weapon::Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile)
 {
 	//reset rate of fire cooldown
-	m_rof_timer = m_rof;
+	m_rof_timer = GetRof();
 
 	//Fire from room tile
 	Ammo* new_ammo = new Ammo(m_ammo_type, m_position, angle, distance_combat, target_ship, target_tile);

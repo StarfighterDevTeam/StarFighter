@@ -350,7 +350,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 		{
 			(*it)->Update(deltaTime);
-			if (m_warship->CanWeaponFire(*it))
+			if ((*it)->CanFire() == true)
 			{
 				if ((*it)->m_target_room == NULL)
 				{
@@ -367,7 +367,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
 			(*it)->Update(deltaTime);
-			if (m_tactical_ship->CanWeaponFire(*it))
+			if ((*it)->CanFire() == true)
 			{
 				//randomly change target sometimes
 				if ((*it)->m_target_room == NULL || ((*it)->m_rof_timer <= 0 && RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f)) < AI_CHANGE_TARGETROOM_PERCENTAGE))
@@ -839,8 +839,8 @@ bool Gameloop::UpdateTacticalScale()
 				}
 			}
 
-			//restore health
-			m_warship->RestoreHealth();
+			//restore destroyed weapons
+			m_warship->RestoreWeaponsHealth();
 
 			//switch back to strategic scale
 			m_scale = Scale_Strategic;
@@ -853,6 +853,7 @@ bool Gameloop::UpdateTacticalScale()
 
 			//switch back to strategic scale
 			m_scale = Scale_Strategic;
+			m_tactical_ship = NULL;
 		}
 
 		return true;

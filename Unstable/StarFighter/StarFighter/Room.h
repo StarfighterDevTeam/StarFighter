@@ -31,7 +31,7 @@ enum CrewMemberType
 	Crew_Pirate,
 	Crew_Civilian,
 	Crew_Slave,
-	Crew_Mecha,
+	Crew_Undead,
 	NB_CREW_TYPES,
 };
 

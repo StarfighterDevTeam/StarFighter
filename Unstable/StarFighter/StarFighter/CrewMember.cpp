@@ -32,28 +32,40 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance) : GameEntity(
 	m_shape_container.setOutlineThickness(1.f);
 	m_shape_container.setOutlineColor(sf::Color::White);
 
+	int skill_max_value = 0;
 	switch (type)
 	{
 		case Crew_Pirate:
 		{
 			m_shape_container.setFillColor(sf::Color::Red);
+			skill_max_value = 20;
 			break;
 		}
 		case Crew_Civilian:
 		{
 			m_shape_container.setFillColor(sf::Color::Cyan);
+			skill_max_value = 10;
 			break;
 		}
 		case Crew_Slave:
 		{
 			m_shape_container.setFillColor(sf::Color::Magenta);
+			skill_max_value = 5;
 			break;
 		}
-		case Crew_Mecha:
+		case Crew_Undead:
 		{
 			m_shape_container.setFillColor(sf::Color::Green);
+			skill_max_value = 15;
 			break;
 		}
+	}
+
+	//randomization of skill values
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		int skill_value = RandomizeIntBetweenValues(skill_max_value / 2, skill_max_value);
+		m_skills[i] = skill_value;
 	}
 
 	//m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);

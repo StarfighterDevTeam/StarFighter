@@ -39,6 +39,8 @@ public:
 	void Update(Time deltaTime);
 
 	void UpdateRof(Time deltaTime);
+	float GetRof();
+	bool CanFire();
 
 	bool Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
 

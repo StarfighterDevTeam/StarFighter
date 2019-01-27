@@ -517,17 +517,6 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 	return weapon->Fire(angle2, target->m_distance_combat, target, target_tile);
 }
 
-bool Ship::CanWeaponFire(Weapon* weapon)
-{
-	if (weapon->m_tile->m_weapon_gunner->m_crew == NULL || weapon->m_tile->m_weapon_gunner->m_crew->m_tile != weapon->m_tile->m_weapon_gunner || weapon->m_tile->m_weapon_gunner->m_pierced == true || weapon->m_health <= 0)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-
 void Ship::BuildShip()
 {
 	//ROOMS
@@ -681,7 +670,7 @@ void Ship::InitCombat()
 	//reset weapon rof timers
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
-		(*it)->m_rof_timer = (*it)->m_rof;
+		(*it)->m_rof_timer = (*it)->GetRof();
 		(*it)->m_target_room = NULL;
 	}
 }
@@ -702,6 +691,14 @@ void Ship::RestoreHealth()
 		}
 	}
 	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		(*it)->m_health = (*it)->m_health_max;
+	}
+}
+
+void Ship::RestoreWeaponsHealth()
+{
+	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
 		(*it)->m_health = (*it)->m_health_max;
 	}
