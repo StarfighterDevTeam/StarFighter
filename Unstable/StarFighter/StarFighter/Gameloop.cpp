@@ -101,10 +101,6 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 			}
-			else if ((*it2)->m_weapon != NULL)
-			{
-				(*it2)->m_shape_container.setFillColor(sf::Color::Red);
-			}
 			
 			if ((*it2)->m_weapon_gunner != NULL)
 			{
@@ -187,10 +183,6 @@ void Gameloop::Update(sf::Time deltaTime)
 					else if ((*it2)->m_flood > 0)
 					{
 						(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
-					}
-					else if ((*it2)->m_weapon != NULL)
-					{
-						(*it2)->m_shape_container.setFillColor(sf::Color::Red);
 					}
 					else if ((*it2)->m_weapon_tile != NULL)//position of a weapon gunner?
 					{
@@ -681,14 +673,18 @@ void Gameloop::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
-	//lifebars
-	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+	//lifebars & rofbars
+	if (m_scale == Scale_Tactical)
 	{
-		(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-	}
-	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
-	{
-		(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+		{
+			(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
+			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+		}
+		for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+		{
+			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+		}
 	}
 
 	//enemy rooms
@@ -725,14 +721,18 @@ void Gameloop::Draw()
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
 
-		//lifebars
-		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
+		//lifebars & rofbars
+		if (m_scale == Scale_Tactical)
 		{
-			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-		}
-		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
-		{
-			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+			for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
+			{
+				(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
+				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+			}
+			for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
+			{
+				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+			}
 		}
 	}
 
@@ -740,7 +740,6 @@ void Gameloop::Draw()
 	//boat
 	if (m_scale == Scale_Strategic)
 	{
-		
 		//water tiles
 		vector<Island*> islands;
 		GameEntity* focused_water_tile = NULL;

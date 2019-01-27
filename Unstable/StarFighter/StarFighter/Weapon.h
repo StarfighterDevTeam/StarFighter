@@ -49,6 +49,7 @@ public:
 	Ship* m_ship;
 
 	GameEntity* m_lifebar;
+	GameEntity* m_rofbar;
 };
 
 #endif //SHIP_H_INCLUDED
