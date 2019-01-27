@@ -11,6 +11,7 @@ class Ship;//forward declaration
 
 #define CANNON_HEALTH_MAX		30
 #define CANNON_RATE_OF_FIRE		2.f
+#define CANNON_ANGLESPEED		20.f
 
 enum WeaponType
 {
@@ -25,6 +26,7 @@ public:
 
 	WeaponType m_type;
 	RoomTile* m_tile;
+	Room* m_target_room;
 	int m_health;
 	int m_healt_max;
 
@@ -32,11 +34,12 @@ public:
 	bool m_direct_fire;
 	float m_rof;//rate of fire
 	float m_rof_timer;
+	float m_angle_speed;
 
 	void Update(Time deltaTime);
 	void UpdateRof(Time deltaTime);
 
-	bool Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
+	bool Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
 
 	RoomTile* GetFreeRoomTile(Room* room);
 	RoomTile* GetFreeWeaponTile(Room* room, bool is_enemy);

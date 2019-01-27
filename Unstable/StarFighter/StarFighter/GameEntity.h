@@ -48,6 +48,8 @@ public:
 	void UpdatePosition();
 	void Draw(sf::RenderTexture& screen);
 
+	bool IsHoveredByMouse();
+
 	Animation m_defaultAnimation;
 	Animation* m_currentAnimation;
 	int m_animationNumber;

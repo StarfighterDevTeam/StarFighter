@@ -53,31 +53,33 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ROOMTILE_MINI_OFFSET_Y		(ROOMTILE_OFFSET_Y	)
 
 #define DISTANCE_COMBAT_INIT				1000.f
-#define WARP_AMMO_OFFSET_X				1000.f
+#define WARP_AMMO_OFFSET_X					1000.f
 
-#define ROOMTILE_HEALTH_MAX				10
-#define ROOMTILE_FLOODING_MAX			100
-#define ROOMTILE_FLOODING_GENERATION	1
-#define FLOODING_TIMER					0.07f
-#define FLOOD_MIN_VALUE_FOR_TRANSFER	20
-#define FLOOD_EVAPORATION_TIME			1.f
+#define ROOMTILE_HEALTH_MAX					10
+#define ROOMTILE_FLOODING_MAX				100
+#define ROOMTILE_FLOODING_GENERATION		1
+#define FLOODING_TIMER						0.07f
+#define FLOOD_MIN_VALUE_FOR_TRANSFER		20
+#define FLOOD_EVAPORATION_TIME				1.f
 
-#define WATERTILE_SIZE					64.f
-#define WATERTILE_OFFSET_X				1100.f
-#define WATERTILE_OFFSET_Y				150.f
-#define NB_WATERTILE_X					60
-#define NB_WATERTILE_Y					60
-#define NB_WATERTILE_SUBDIVISION		60
-#define NB_WATERTILE_VIEW_RANGE			5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
+#define WATERTILE_SIZE						64.f
+#define WATERTILE_OFFSET_X					1100.f
+#define WATERTILE_OFFSET_Y					150.f
+#define NB_WATERTILE_X						60
+#define NB_WATERTILE_Y						60
+#define NB_WATERTILE_SUBDIVISION			60
+#define NB_WATERTILE_VIEW_RANGE				5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
 
-#define HULL_REPAIR_TIMER				0.5f
-#define DROWNING_TIMER					1.f
+#define HULL_REPAIR_TIMER					0.5f
+#define DROWNING_TIMER						1.f
+
+#define AI_CHANGE_TARGETROOM_PERCENTAGE		0.15f
 
 //MUSIC
-#define DEFAULT_MUSIC_VOLUME						50
-#define DEFAULT_SFX_VOLUME							100
-#define MUSIC_FADE_IN_TIME						2.f
-#define MUSIC_FADE_OUT_TIME						2.f
+#define DEFAULT_MUSIC_VOLUME				50
+#define DEFAULT_SFX_VOLUME					100
+#define MUSIC_FADE_IN_TIME					2.f
+#define MUSIC_FADE_OUT_TIME					2.f
 
 //TEXT POP FEEDBACK
 #define TEXT_POP_OFFSET_Y							10
@@ -112,5 +114,6 @@ float Lerp(float value, float input_min, float input_max, float output_min, floa
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);
 void ScaleVector(sf::Vector2f* vector, float target_value);
+void GetAngleForVector(sf::Vector2f vector, float& angle);
 
 #endif // GLOBALS_H_INCLUDED

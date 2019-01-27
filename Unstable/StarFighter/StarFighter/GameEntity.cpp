@@ -32,11 +32,7 @@ void GameEntity::Update(Time deltaTime)
 	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
 
 	//get hovered state
-	if ((*CurrentGame).m_window_has_focus == true
-		&& ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
-				&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
-				|| ((*CurrentGame).m_mouse_pos.x > getPosition().x - m_size.x / 2 && (*CurrentGame).m_mouse_pos.x < getPosition().x + m_size.x / 2
-				&& (*CurrentGame).m_mouse_pos.y > getPosition().y - m_size.y / 2 && (*CurrentGame).m_mouse_pos.y < getPosition().y + m_size.y / 2))
+	if (IsHoveredByMouse() == true)
 	{
 		if ((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui != this)
 		{
@@ -96,6 +92,22 @@ void GameEntity::Draw(sf::RenderTexture& screen)
 	screen.draw(this->m_text);
 	screen.draw(*this);
 };
+
+bool GameEntity::IsHoveredByMouse()
+{
+	if ((*CurrentGame).m_window_has_focus == true
+		&& ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
+		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
+		|| ((*CurrentGame).m_mouse_pos.x > getPosition().x - m_size.x / 2 && (*CurrentGame).m_mouse_pos.x < getPosition().x + m_size.x / 2
+		&& (*CurrentGame).m_mouse_pos.y > getPosition().y - m_size.y / 2 && (*CurrentGame).m_mouse_pos.y < getPosition().y + m_size.y / 2))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 void GameEntity::setAnimation(sf::Texture *texture, int frameNumber, int animationNumber)
 {

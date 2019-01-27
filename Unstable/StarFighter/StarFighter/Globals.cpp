@@ -213,3 +213,34 @@ void ScaleVector(sf::Vector2f* vector, float target_value)
 	vector->x *= p;
 	vector->y *= p;
 }
+
+void GetAngleForVector(sf::Vector2f vector, float& angle)
+{
+	//find angle for speed vector
+	if (vector.x != 0 || vector.y != 0)
+	{
+		if (vector.x == 0)
+		{
+			angle = vector.y >= 0 ? 180.f : 0.f;
+		}
+		else if (vector.y == 0)
+		{
+			angle = vector.x >= 0 ? 90.f : 270.f;
+		}
+		else
+		{
+			if (vector.x >= 0)
+			{
+				angle = (atan(vector.y / vector.x) * 180.f / M_PI) + 90.f;
+			}
+			else
+			{
+				angle = (atan(vector.y / vector.x) * 180.f / M_PI) + 90.f + 180.f;
+			}
+		}
+	}
+	else
+	{
+		angle = 90.f;//default value
+	}
+}

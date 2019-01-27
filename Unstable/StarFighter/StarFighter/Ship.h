@@ -68,6 +68,7 @@ public:
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy);
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
+	bool CanWeaponFire(Weapon* weapon);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
 	void BuildShip();

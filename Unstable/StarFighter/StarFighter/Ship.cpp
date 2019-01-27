@@ -460,6 +460,41 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy)
 
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 {
+	//turn angle towards target (get room center as a target)
+	Room* room = weapon->m_target_room;
+	int width = room->m_width % 2 == 0 ? room->m_width - 1 : room->m_width;
+	int height = room->m_height % 2 == 0 ? room->m_height - 1 : room->m_height;
+	int x = (2 * room->m_upcorner_x + width - 1) / 2;
+	int y = (2 * room->m_upcorner_y + height - 1) / 2;
+
+	RoomTile* virtual_target_tile = target->m_tiles[x][y];
+	sf::Vector2f vec = virtual_target_tile->m_position - weapon->m_position;
+	float angle;
+	GetAngleForVector(vec, angle);
+	float current_rotation = weapon->getRotation();
+
+	if (current_rotation != angle)
+	{
+		float delta = (current_rotation + weapon->m_angle) - angle;
+		if (delta > 180)
+			delta -= 360;
+		else if (delta < -180)
+			delta += 360;
+
+		if (abs(delta) > abs(weapon->m_angle_speed)*deltaTime.asSeconds())
+		{
+			weapon->rotate(delta >= 0 ? - weapon->m_angle_speed * deltaTime.asSeconds() : weapon->m_angle_speed * deltaTime.asSeconds());
+			return false;//not aligned = not ready to fire
+		}
+		else
+		{
+			weapon->setRotation(angle - weapon->m_angle);
+		}
+	}
+
+	//weapon->setRotation(angle - weapon->m_angle);
+
+	//cooldown ready?
 	if (weapon->m_rof_timer > 0)
 	{
 		return false;
@@ -470,28 +505,27 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 		return false;
 	}
 
-	//int r = RandomizeIntBetweenValues(0, target->m_rooms.size() - 1);
-	//Room* target_room = target->m_rooms[r];
-	//int t = RandomizeIntBetweenValues(0, target->m_rooms[r]->m_tiles.size() - 1);
-	//RoomTile* target_tile = target->m_rooms[r]->m_tiles[t];
+	//pick a random enemy tile within the targeted room
+	int r = RandomizeIntBetweenValues(0, weapon->m_target_room->m_tiles.size() - 1);
+	RoomTile* target_tile = weapon->m_target_room->m_tiles[r];
+	sf::Vector2f vec2 = target_tile->m_position - weapon->m_position;
+	float angle2;
+	GetAngleForVector(vec2, angle2);
+	//weapon->setRotation(angle2 - weapon->m_angle);
 
-	//pick an enemy tile with the same Y coordinate, but a random X coordinate among existing room tiles
-	int y = weapon->m_tile->m_coord_y;
-	vector<int> tiles_index;
-	for (int i = 0; i < target->m_rooms_size.x - 1; i++)
-	{
-		if (target->m_tiles[i][y] != NULL)
-		{
-			tiles_index.push_back(i);
-		}
-	}
-	int r = RandomizeIntBetweenValues(0, tiles_index.size() - 1);
-	int x = tiles_index[r];
-
-	RoomTile* target_tile = target->m_tiles[x][y];
-	
-	return weapon->Fire(deltaTime, m_position, m_angle, target->m_distance_combat, target, target_tile);
+	return weapon->Fire(angle2, target->m_distance_combat, target, target_tile);
 }
+
+bool Ship::CanWeaponFire(Weapon* weapon)
+{
+	if (weapon->m_tile->m_weapon_gunner->m_crew == NULL || weapon->m_tile->m_weapon_gunner->m_crew->m_tile != weapon->m_tile->m_weapon_gunner || weapon->m_tile->m_weapon_gunner->m_pierced == true || weapon->m_health <= 0)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 
 void Ship::BuildShip()
 {
@@ -541,10 +575,10 @@ void Ship::BuildShip()
 	//weapons
 	Weapon* weapon = new Weapon(Weapon_Cannon, true);
 	AddWeapon(weapon, m_rooms.back(), this, true);
-
+	
 	Weapon* weapon2 = new Weapon(Weapon_Cannon, true);
 	AddWeapon(weapon2, m_rooms.back(), this, true);
-
+	
 	Weapon* weapon3 = new Weapon(Weapon_Cannon, true);
 	AddWeapon(weapon3, m_rooms.back(), this, true);
 }

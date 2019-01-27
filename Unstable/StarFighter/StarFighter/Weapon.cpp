@@ -11,6 +11,10 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 	m_ammo_type = Ammo_CannonBall;
 	m_rof = CANNON_RATE_OF_FIRE;
 	m_rof_timer = CANNON_RATE_OF_FIRE;
+	m_angle_speed = CANNON_ANGLESPEED;
+	m_target_room = NULL;
+	m_tile = NULL;
+	m_ship = NULL;
 
 	//shape for water tiles
 	TextureLoader *loader;
@@ -35,7 +39,7 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 
 Weapon::~Weapon()
 {
-
+	
 }
 
 void Weapon::Update(Time deltaTime)
@@ -66,22 +70,13 @@ RoomTile* Weapon::GetFreeRoomTile(Room* room)
 	return NULL;
 }
 
-bool Weapon::Fire(Time deltaTime, sf::Vector2f ship_position, float ship_angle, float distance_combat, Ship* target_ship, RoomTile* target_tile)
+bool Weapon::Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile)
 {
-	if (m_rof_timer > 0)
-	{
-		return false;
-	}
-
-	if (m_tile->m_weapon_gunner->m_crew == NULL || m_tile->m_weapon_gunner->m_crew->m_tile != m_tile->m_weapon_gunner || m_tile->m_weapon_gunner->m_pierced == true || m_health <= 0)
-	{
-		return false;
-	}
-
+	//reset rate of fire cooldown
 	m_rof_timer = m_rof;
 
 	//Fire from room tile
-	Ammo* new_ammo = new Ammo(m_ammo_type, m_position, m_angle, distance_combat, target_ship, target_tile);
+	Ammo* new_ammo = new Ammo(m_ammo_type, m_position, angle, distance_combat, target_ship, target_tile);
 	(*CurrentGame).m_bullets.push_back(new_ammo);
 
 	return true;
