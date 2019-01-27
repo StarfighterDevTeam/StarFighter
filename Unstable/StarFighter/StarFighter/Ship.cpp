@@ -531,20 +531,20 @@ void Ship::BuildShip()
 {
 	//ROOMS
 	//left
-	AddRoomMinimized(0, 3, 4, 4, Room_Weapon);
+	//AddRoomMinimized(0, 3, 4, 4, Room_Weapon);
 	AddRoomMinimized(0, 7, 4, 6, Room_Gold);
 	AddRoomMinimized(0, 13, 4, 6, Room_Relic);
 	AddRoomMinimized(0, 19, 4, 3, Room_Sword);
 
 	//mid
-	AddRoomMinimized(6, 0, 4, 3, Room_Weapon);
+	//AddRoomMinimized(6, 0, 4, 3, Room_Weapon);
 	AddRoomMinimized(4, 3, 8, 6, Room_Navigation);
 	AddRoomMinimized(4, 9, 8, 10, Room_Crewquarter);
 	AddRoomMinimized(4, 19, 8, 3, Room_Ammo);
 	AddRoomMinimized(5, 22, 6, 3, Room_Engine);
 
 	//right
-	AddRoomMinimized(12, 3, 4, 4, Room_Weapon);
+	//AddRoomMinimized(12, 3, 4, 4, Room_Weapon);
 	AddRoomMinimized(12, 7, 4, 6, Room_Fishing);
 	AddRoomMinimized(12, 13, 4, 6, Room_Kitchen);
 	AddRoomMinimized(12, 19, 4, 3, Room_Lifeboat);
@@ -565,7 +565,7 @@ void Ship::BuildShip()
 	for (int i = 0; i < 3; i++)
 	{
 		int r = RandomizeIntBetweenValues(0, m_rooms.size() - 1);
-		r = 12;
+		//r = 12;
 		CrewMember* crew = new CrewMember(Crew_Civilian, m_alliance);
 		AddCrewMember(crew, m_rooms[r]);
 	}
@@ -681,6 +681,27 @@ void Ship::InitCombat()
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
 		(*it)->m_rof_timer = (*it)->m_rof;
+	}
+}
+
+void Ship::RestoreHealth()
+{
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			(*it2)->m_health = (*it2)->m_health_max;
+			(*it2)->m_pierced = false;
+
+			if ((*it2)->m_weapon != NULL)
+			{
+				(*it2)->m_weapon->m_health = (*it2)->m_weapon->m_health_max;
+			}
+		}
+	}
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		(*it)->m_health = (*it)->m_health_max;
 	}
 }
 

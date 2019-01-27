@@ -344,30 +344,30 @@ void Gameloop::Update(sf::Time deltaTime)
 	//}
 
 	//Player Weapons
-	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+	if (m_tactical_ship != NULL)
 	{
-		//(*it)->Update(deltaTime);
-
 		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 		{
-			(*it)->Update(deltaTime);
-			if (m_warship->CanWeaponFire(*it))
+			//(*it)->Update(deltaTime);
+
+			for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 			{
-				if ((*it)->m_target_room == NULL)
+				(*it)->Update(deltaTime);
+				if (m_warship->CanWeaponFire(*it))
 				{
-					//do nothing
-				}
-				else
-				{
-					m_warship->FireWeapon(*it, deltaTime, m_tactical_ship);
+					if ((*it)->m_target_room == NULL)
+					{
+						//do nothing
+					}
+					else
+					{
+						m_warship->FireWeapon(*it, deltaTime, m_tactical_ship);
+					}
 				}
 			}
 		}
-	}
 
 	//Enemy weapons
-	if (m_tactical_ship != NULL)
-	{
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
 			//(*it)->UpdateRof(deltaTime);
@@ -822,33 +822,43 @@ bool Gameloop::UpdateTacticalScale()
 {
 	if (m_scale == Scale_Tactical)
 	{
-		if (0)//todo: exit conditions, enemy destroyed
+		//win conditions
+		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.3f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3)
 		{
-			m_tactical_ship = NULL;
-			m_scale = Scale_Strategic;
-
-			//restore health
-			for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
+			//delete enemy from ships existing
+			vector<Ship*> old_ships;
+			for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 			{
-				for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+				old_ships.push_back(*it);
+			}
+			m_ships.clear();
+			for (vector<Ship*>::iterator it = old_ships.begin(); it != old_ships.end(); it++)
+			{
+				if (*it != m_tactical_ship)
 				{
-					(*it2)->m_health = (*it2)->m_health_max;
-					(*it2)->m_pierced = false;
-
-					if ((*it2)->m_weapon != NULL)
-					{
-						(*it2)->m_weapon->m_health = (*it2)->m_weapon->m_health_max;
-					}
+					m_ships.push_back(*it);
+				}
+				else
+				{
+					delete m_tactical_ship;
+					m_tactical_ship = NULL;
 				}
 			}
-			for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
-			{
-				(*it)->m_health = (*it)->m_health_max;
-			}
-		}
-		else if (0)//todo: exit conditions, player destroyed
-		{
 
+			//restore health
+			m_warship->RestoreHealth();
+
+			//switch back to strategic scale
+			m_scale = Scale_Strategic;
+		}
+		//lose conditions
+		else if (m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_flood > m_warship->m_flood_max * 0.5f)
+		{
+			//restore health
+			m_warship->RestoreHealth();
+
+			//switch back to strategic scale
+			m_scale = Scale_Strategic;
 		}
 
 		return true;
@@ -972,6 +982,11 @@ bool Gameloop::UpdateTacticalScale()
 
 	if (m_scale == Scale_Tactical)
 	{
+		//stop strategic movement
+		m_warship->m_destination = NULL;
+		m_warship->m_speed = sf::Vector2f(0, 0);
+		m_warship->m_current_path.clear();
+
 		m_warship->InitCombat();//init cooldowns
 		m_tactical_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
 		m_tactical_ship->InitCombat();//init cooldowns

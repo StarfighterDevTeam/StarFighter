@@ -77,6 +77,7 @@ public:
 	void UpdateFlooding(Time deltaTime, bool is_minimized);
 
 	void InitCombat();
+	void RestoreHealth();
 
 private:
 	int m_rooms_min_upcorner_x;

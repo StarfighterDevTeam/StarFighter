@@ -140,7 +140,7 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 
 void CombatInterface::Update(sf::Time deltaTime)
 {
-	float threshold[3] = { 0.7, 0.5, 0.2 };
+	float threshold[3] = { 0.7, 0.5, 0.3 };
 
 	for (int i = 0; i < 2; i++)
 	{

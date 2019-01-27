@@ -252,7 +252,7 @@ void CrewMember::Update(Time deltaTime)
 
 	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * CREWMEMBER_LIFEBAR_SIZE_X, CREWMEMBER_LIFEBAR_SIZE_Y));
 
-	float threshold[3] = { 0.7, 0.5, 0.2 };
+	float threshold[3] = { 0.7, 0.5, 0.3 };
 	if (life_ratio >= threshold[1])
 	{
 		m_lifebar->m_shape.setFillColor(sf::Color::Green);
