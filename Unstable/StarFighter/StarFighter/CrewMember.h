@@ -38,6 +38,7 @@ public:
 
 	float m_repair_timer;
 	float m_drowning_timer;
+	float m_healing_timer;
 
 	GameEntity* m_lifebar;
 

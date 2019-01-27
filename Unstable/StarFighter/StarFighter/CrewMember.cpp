@@ -21,6 +21,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance) : GameEntity(
 	m_destination = NULL;
 	m_repair_timer = HULL_REPAIR_TIMER;
 	m_drowning_timer = DROWNING_TIMER;
+	m_healing_timer = HEALING_TIMER;
 
 	m_health_max = CREWMEMBER_HEALTH_MAX;
 	m_health = m_health_max;
@@ -106,6 +107,10 @@ void CrewMember::Update(Time deltaTime)
 	if (m_drowning_timer > 0)
 	{
 		m_drowning_timer -= deltaTime.asSeconds();
+	}
+	if (m_healing_timer > 0)
+	{
+		m_healing_timer -= deltaTime.asSeconds();
 	}
 
 	//get new move order
@@ -196,12 +201,19 @@ void CrewMember::Update(Time deltaTime)
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();
 
-	//assignement: repair
+	//repair hull
 	if (m_tile != NULL && m_tile->m_pierced == true)
 	{
 		if (m_repair_timer <= 0)
 		{
-			m_tile->m_health++;
+			for (int i = 0; i < 2; i++)
+			{
+				if (m_tile->m_health < m_tile->m_health_max)
+				{
+					m_tile->m_health++;
+				}
+			}
+			
 			m_repair_timer = HULL_REPAIR_TIMER;
 		}
 
@@ -217,6 +229,14 @@ void CrewMember::Update(Time deltaTime)
 		m_drowning_timer = DROWNING_TIMER;
 
 		m_health--;
+	}
+
+	//healing in Crew quarter
+	if (m_tile->m_room->m_type == Room_Crewquarter && m_healing_timer <= 0)
+	{
+		m_healing_timer = HEALING_TIMER;
+
+		m_health++;
 	}
 
 	GameEntity::Update(deltaTime);

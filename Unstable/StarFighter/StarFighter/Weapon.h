@@ -10,7 +10,7 @@
 class Ship;//forward declaration
 
 #define CANNON_HEALTH_MAX		30
-#define CANNON_RATE_OF_FIRE		2.f
+#define CANNON_RATE_OF_FIRE		4.f
 #define CANNON_ANGLESPEED		20.f
 
 enum WeaponType
