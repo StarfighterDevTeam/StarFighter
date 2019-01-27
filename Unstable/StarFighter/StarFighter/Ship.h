@@ -6,12 +6,6 @@
 #include "WaterZone.h"
 #include "Island.h"
 
-enum ShipType
-{
-	Ship_Goellete,
-	Ship_Warship,
-};
-
 class Ship : public GameEntity
 {
 public:

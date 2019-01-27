@@ -48,6 +48,14 @@ enum MouseAction
 	Mouse_RightClick,
 };
 
+enum ShipType
+{
+	Ship_Warship,
+	Ship_FirstClass,
+	Ship_SecondClass,
+	NB_SHIP_TYPES,
+};
+
 struct Game
 {
 public:
@@ -109,6 +117,8 @@ public:
 	vector<vector<WaterZone*> > m_waterzones;
 	vector<Ammo*> m_bullets;
 	vector<FX*> m_FX;
+
+	string dico_ship_class[NB_SHIP_TYPES];
 
 private:
 

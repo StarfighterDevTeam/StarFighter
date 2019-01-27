@@ -29,6 +29,9 @@ CombatInterface::~CombatInterface()
 	for (int i = 0; i < 2; i++)
 	{
 		delete m_distance_ships[i];
+
+		delete m_ships_name[i];
+		delete m_ships_info[i];
 	}
 }
 
@@ -89,6 +92,22 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		m_crewbars[i]->m_text.setCharacterSize(20);
 		m_crewbars[i]->m_text.setColor(sf::Color::White);
 		m_crewbars[i]->m_text.setPosition(sf::Vector2f(m_crewbars[i]->getPosition().x + 20, m_crewbars[i]->getPosition().y - 14));
+
+		//enemy iname & info
+		m_ships_name[i] = new GameEntity(UI_None);
+		m_ships_name[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_ships_name[i]->m_text.setCharacterSize(20);
+		m_ships_name[i]->m_text.setColor(sf::Color::Black);
+		m_ships_name[i]->m_text.setString(i == 0 ? m_ship->m_display_name : m_enemy_ship->m_display_name);
+		m_ships_name[i]->m_text.setPosition(sf::Vector2f(offset + COMBAT_LIFEBAR_SIZE_X * 0.5f - m_ships_name[i]->m_text.getGlobalBounds().width * 0.5f, COMBAT_ENEMY_INFO_OFFSET_Y));
+
+		m_ships_info[i] = new GameEntity(UI_None);
+		m_ships_info[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_ships_info[i]->m_text.setCharacterSize(18);
+		m_ships_info[i]->m_text.setStyle(sf::Text::Italic);
+		m_ships_info[i]->m_text.setColor(sf::Color::Black);
+		m_ships_info[i]->m_text.setString((*CurrentGame).dico_ship_class[i == 0 ? m_ship->m_type : m_enemy_ship->m_type]);
+		m_ships_info[i]->m_text.setPosition(sf::Vector2f(offset + COMBAT_LIFEBAR_SIZE_X * 0.5f - m_ships_info[i]->m_text.getGlobalBounds().width * 0.5f, COMBAT_ENEMY_INFO_OFFSET_Y + m_ships_info[i]->m_text.getCharacterSize() + 8.f));
 	}
 
 	//distance interface
@@ -136,7 +155,6 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		}
 	}
 }
-
 
 void CombatInterface::Update(sf::Time deltaTime)
 {
@@ -201,6 +219,13 @@ void CombatInterface::Update(sf::Time deltaTime)
 
 void CombatInterface::Draw(sf::RenderTexture& screen)
 {
+	//enemy name & info
+	for (int i = 0; i < 2; i++)
+	{
+		m_ships_name[i]->Draw(screen);
+		m_ships_info[i]->Draw(screen);
+	}
+
 	//life bars
 	for (int i = 0; i < 2; i++)
 	{

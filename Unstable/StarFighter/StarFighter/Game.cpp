@@ -60,6 +60,10 @@ Game::Game(RenderWindow& window)
 	m_hovered_ui = NULL;
 	m_target_ui = NULL;
 	m_play_ui = NULL;
+
+	dico_ship_class[Ship_Warship] = "Pirate Warship";
+	dico_ship_class[Ship_FirstClass] = "First Class";
+	dico_ship_class[Ship_SecondClass] = "Second Class";
 }
 
 Game::~Game()
