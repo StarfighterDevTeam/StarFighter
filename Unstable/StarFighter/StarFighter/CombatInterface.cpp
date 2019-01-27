@@ -14,6 +14,8 @@ CombatInterface::CombatInterface()
 	for (int i = 0; i < 2; i++)
 	{
 		m_distance_ships[i] = NULL;
+		m_ships_name[i] = NULL;
+		m_ships_info[i] = NULL;
 	}
 }
 
@@ -29,7 +31,6 @@ CombatInterface::~CombatInterface()
 	for (int i = 0; i < 2; i++)
 	{
 		delete m_distance_ships[i];
-
 		delete m_ships_name[i];
 		delete m_ships_info[i];
 	}

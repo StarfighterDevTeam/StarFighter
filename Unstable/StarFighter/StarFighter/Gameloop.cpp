@@ -244,6 +244,18 @@ void Gameloop::Update(sf::Time deltaTime)
 		if ((*it)->m_health > 0)
 		{
 			(*it)->Update(deltaTime);
+
+			//create or update HUD for crew details
+			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
+			{
+				m_warship->m_crew_interface.Init(*it);
+				printf("Create crew interface (hover)\n");
+			}
+			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (*it)->m_hovered == false)
+			{
+				m_warship->m_crew_interface.Init(*it);
+				printf("Create crew interface (delete)\n");
+			}
 		}
 
 		if ((*it)->m_health > 0)//second check because he could drown during the update
@@ -796,6 +808,12 @@ void Gameloop::Draw()
 
 		//combat interface
 		m_warship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//crew interface
+	if (((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui->m_UI_type == UI_CrewMember) || ((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui->m_UI_type == UI_CrewMember))
+	{
+		m_warship->m_crew_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 	
 	//FX

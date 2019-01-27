@@ -45,6 +45,8 @@ public:
 
 	GameEntity* m_lifebar;
 	string m_display_name;
+	string m_texture_name;
+	string m_texture_big_name;
 
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);

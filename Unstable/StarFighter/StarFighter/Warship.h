@@ -8,6 +8,7 @@
 #include "Island.h"
 #include "Compass.h"
 #include "CombatInterface.h"
+#include "CrewInterface.h"
 #include "Ship.h"
 
 #define	CRUISE_SPEED					50.f
@@ -25,6 +26,7 @@ public:
 	float m_angle_speed;
 	struct Compass m_compass;
 	struct CombatInterface m_combat_interface;
+	struct CrewInterface m_crew_interface;
 
 	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
 	bool CanViewWaterTile(WaterTile* tile);

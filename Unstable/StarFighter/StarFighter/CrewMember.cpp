@@ -2,14 +2,6 @@
 
 extern Game* CurrentGame;
 
-string dico_crew[NB_CREW_TYPES] = {
-	"All",			//Crew_All,
-	"Pirate",	//Crew_Pirate,
-	"Civilian",	//Crew_Civilian,
-	"Slave",	//Crew_Slave,
-	"Mecha",	//Crew_Mecha,
-};
-
 CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRace race) : GameEntity(UI_CrewMember)
 {
 	m_type = type;
@@ -31,6 +23,9 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
 	m_shape_container.setOutlineThickness(1.f);
 	m_shape_container.setOutlineColor(sf::Color::White);
+
+	m_texture_name = "2D/crew_icon.png";
+	m_texture_big_name = "2D/crew_icon_big.png";
 
 	int skill_max_value = 0;
 	switch (type)
@@ -97,7 +92,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 
 	//randomization of gender and name
 	int gender = RandomizeIntBetweenValues(0, 1);
-	string m_display_name = (*CurrentGame).GetRandomCrewMemberName(gender);
+	m_display_name = (*CurrentGame).GetRandomCrewMemberName(gender);
 }
 
 CrewMember::~CrewMember()
