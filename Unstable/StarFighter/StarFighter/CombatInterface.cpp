@@ -57,6 +57,12 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		m_lifebars[i]->m_shape.setPosition(lifebar_pos);
 		m_lifebars[i]->m_shape.setFillColor(sf::Color::Green);
 
+		m_lifebars[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_lifebars[i]->m_text.setCharacterSize(14);
+		m_lifebars[i]->m_text.setColor(sf::Color::Black);
+
+		m_lifebars[i]->m_position = lifebar_pos;
+
 		//flood bars
 		m_floodbars[i] = new GameEntity(UI_None);
 		m_floodbars[i]->m_shape_container.setSize(sf::Vector2f(COMBAT_FLOODBAR_SIZE_X, COMBAT_FLOODBAR_SIZE_Y));
@@ -71,6 +77,8 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		m_floodbars[i]->m_shape.setOrigin(sf::Vector2f(COMBAT_FLOODBAR_SIZE_X * 0.5f, COMBAT_FLOODBAR_SIZE_Y * 0.5f));
 		m_floodbars[i]->m_shape.setPosition(floodbar_pos);
 		m_floodbars[i]->m_shape.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+
+		m_floodbars[i]->m_position = floodbar_pos;
 
 		//crew bars
 		m_crewbars[i] = new GameEntity(UI_None);
@@ -138,9 +146,10 @@ void CombatInterface::Update(sf::Time deltaTime)
 	{
 		//size of life bar
 		int health = i == 0 ? m_ship->m_health : m_enemy_ship->m_health;
-		Bound(health, sf::Vector2i(0, m_ship->m_health_max));
+		int health_max = i == 0 ? m_ship->m_health_max : m_enemy_ship->m_health_max;
+		Bound(health, sf::Vector2i(0, health_max));
 
-		float life_ratio = i == 0 ? 1.0f * health / m_ship->m_health_max : 1.0f * m_enemy_ship->m_health / m_enemy_ship->m_health_max;
+		float life_ratio = 1.0f * health / health_max;
 
 		m_lifebars[i]->m_shape.setSize(sf::Vector2f(life_ratio * COMBAT_LIFEBAR_SIZE_X, COMBAT_LIFEBAR_SIZE_Y));
 
@@ -158,11 +167,17 @@ void CombatInterface::Update(sf::Time deltaTime)
 			m_lifebars[i]->m_shape.setFillColor(sf::Color::Red);
 		}
 
+		ostringstream ss_life;
+		ss_life << health << "/" << health_max;
+		m_lifebars[i]->m_text.setString(ss_life.str());
+		m_lifebars[i]->m_text.SetPosition(sf::Vector2f(m_lifebars[i]->m_position.x, m_lifebars[i]->m_position.y - 3.f));
+
 		//size of flood bar
 		int flood = i == 0 ? m_ship->m_flood : m_enemy_ship->m_flood;
-		Bound(flood, sf::Vector2i(0, m_ship->m_flood_max));
+		int flood_max = i == 0 ? m_ship->m_flood_max : m_enemy_ship->m_flood_max;
+		Bound(flood, sf::Vector2i(0, flood_max));
 
-		float flood_ratio = i == 0 ? 1.0f * flood / m_ship->m_flood_max : 1.0f * flood / m_enemy_ship->m_flood_max;
+		float flood_ratio = 1.0f * flood / flood_max;
 
 		m_floodbars[i]->m_shape.setSize(sf::Vector2f(flood_ratio * COMBAT_FLOODBAR_SIZE_X, COMBAT_FLOODBAR_SIZE_Y));
 

@@ -562,7 +562,7 @@ void Ship::BuildShip()
 
 	//crew
 	m_nb_crew_max = 0;
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		int r = RandomizeIntBetweenValues(0, m_rooms.size() - 1);
 		r = 12;
