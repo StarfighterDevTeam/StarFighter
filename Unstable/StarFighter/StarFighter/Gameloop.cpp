@@ -101,10 +101,6 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 			}
-			//else if ((*it2)->m_crew != NULL)
-			//{
-			//	(*it2)->m_shape_container.setFillColor(sf::Color::Green);
-			//}
 			else if ((*it2)->m_weapon != NULL)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color::Red);
@@ -213,15 +209,25 @@ void Gameloop::Update(sf::Time deltaTime)
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
 		}
 
-		//by default, if no room is highlighted, we highlight the current targeted room
-		if (selection != NULL && selection->m_UI_type == UI_Weapon && one_room_hovered == false)
+		//by default, if no room is highlighted, we highlight the current targeted room. Else, we keep the current targeted room highlighted in grey while hovering other rooms in yellow
+		if (selection != NULL && selection->m_UI_type == UI_Weapon)
 		{
 			Weapon* weapon = (Weapon*)selection;
 			if (weapon->m_target_room != NULL)
 			{
-				for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+				if (one_room_hovered == false)
 				{
-					(*it2)->m_shape_container.setFillColor((sf::Color(255, 242, 39, 255)));//yellow "target"
+					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+					{
+						(*it2)->m_shape_container.setFillColor((sf::Color(255, 242, 39, 255)));//yellow "target"
+					}
+				}
+				else if (weapon->m_target_room->IsHoveredByMouse() == false)
+				{
+					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+					{
+						(*it2)->m_shape_container.setFillColor((sf::Color(128, 128, 128, 255)));//grey "previous target"
+					}
 				}
 			}
 		}
