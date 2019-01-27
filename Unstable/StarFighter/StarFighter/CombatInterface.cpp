@@ -106,7 +106,7 @@ void CombatInterface::Init(Ship* ship, Ship* enemy_ship)
 		m_ships_info[i]->m_text.setCharacterSize(18);
 		m_ships_info[i]->m_text.setStyle(sf::Text::Italic);
 		m_ships_info[i]->m_text.setColor(sf::Color::Black);
-		m_ships_info[i]->m_text.setString((*CurrentGame).dico_ship_class[i == 0 ? m_ship->m_type : m_enemy_ship->m_type]);
+		m_ships_info[i]->m_text.setString((*CurrentGame).m_dico_ship_class[i == 0 ? m_ship->m_type : m_enemy_ship->m_type]);
 		m_ships_info[i]->m_text.setPosition(sf::Vector2f(offset + COMBAT_LIFEBAR_SIZE_X * 0.5f - m_ships_info[i]->m_text.getGlobalBounds().width * 0.5f, COMBAT_ENEMY_INFO_OFFSET_Y + m_ships_info[i]->m_text.getCharacterSize() + 8.f));
 	}
 

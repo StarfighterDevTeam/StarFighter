@@ -61,9 +61,70 @@ Game::Game(RenderWindow& window)
 	m_target_ui = NULL;
 	m_play_ui = NULL;
 
-	dico_ship_class[Ship_Warship] = "Pirate Warship";
-	dico_ship_class[Ship_FirstClass] = "First Class";
-	dico_ship_class[Ship_SecondClass] = "Second Class";
+	//dico
+	m_dico_ship_class[Ship_Warship] = "Pirate Warship";
+	m_dico_ship_class[Ship_FirstClass] = "First Class";
+	m_dico_ship_class[Ship_SecondClass] = "Second Class";
+
+	m_dico_room_types[Room_Crewquarter] = "Crew Quarter";
+	m_dico_room_types[Room_Navigation] = "Navigation";
+	m_dico_room_types[Room_Weapon] = "Weapon";
+	m_dico_room_types[Room_Gold] = "Gold";
+	m_dico_room_types[Room_Fishing] = "Fishing";
+	m_dico_room_types[Room_Kitchen] = "Kitchen";
+	m_dico_room_types[Room_Relic] = "Relic";
+	m_dico_room_types[Room_Sword] = "Sword";
+	m_dico_room_types[Room_Lifeboat] = "Lifeboat";
+	m_dico_room_types[Room_Ammo] = "Ammo";
+	m_dico_room_types[Room_Engine] = "Engine";
+
+	m_dico_crew_types[Crew_Pirate] = "Pirate";
+	m_dico_crew_types[Crew_Civilian] = "Civilian";
+	m_dico_crew_types[Crew_Slave] = "Slave";
+	m_dico_crew_types[Crew_Undead] = "Undead";
+
+	m_dico_crew_skills[Skill_Gunner] = "Gunner";
+	m_dico_crew_skills[Skill_Fishing] = "Fishing";
+	m_dico_crew_skills[Skill_Melee] = "Melee";
+	m_dico_crew_skills[Skill_Navigation] = "Navigation";
+	m_dico_crew_skills[Skill_Cooking] = "Cooking";
+
+	m_dico_crew_races[Race_Human] = "Human";
+	m_dico_crew_races[Race_Fishman] = "Fishman";
+	m_dico_crew_races[Race_Mecha] = "Mechanoid";
+
+	m_dico_crew_names[0].push_back("Joe");
+	m_dico_crew_names[0].push_back("Bill");
+	m_dico_crew_names[0].push_back("Daniel");
+	m_dico_crew_names[0].push_back("Thomas");
+
+	m_dico_crew_names[1].push_back("Leandra");
+	m_dico_crew_names[1].push_back("Serena");
+	m_dico_crew_names[1].push_back("Lucy");
+	m_dico_crew_names[1].push_back("Angela");
+}
+
+string Game::GetRandomCrewMemberName(int gender)
+{
+	//get a name at random in the list
+	int r = RandomizeIntBetweenValues(0, m_dico_crew_names[gender].size() - 1);
+	string name = m_dico_crew_names[gender][r];
+
+	//remove from the list and keep it stored in the "used" list
+	m_dico_crew_names_used[gender].push_back(m_dico_crew_names[gender][r]);
+	m_dico_crew_names[gender].erase(m_dico_crew_names[gender].begin() + r);
+
+	//all names are alreay used? recycle the list
+	if (m_dico_crew_names[gender].empty() == true)
+	{
+		for (vector<string>::iterator it = m_dico_crew_names_used[gender].begin(); it != m_dico_crew_names_used[gender].end(); it++)
+		{
+			m_dico_crew_names[gender].push_back(*it);
+		}
+		m_dico_crew_names_used[gender].clear();
+	}
+
+	return name;
 }
 
 Game::~Game()

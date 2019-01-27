@@ -56,6 +56,51 @@ enum ShipType
 	NB_SHIP_TYPES,
 };
 
+enum CrewSkills
+{
+	Skill_Gunner,
+	Skill_Fishing,
+	Skill_Melee,
+	Skill_Navigation,
+	Skill_Cooking,
+	NB_CREW_SKILLS,
+};
+
+enum CrewMemberRace
+{
+	Race_Human,
+	Race_Fishman,
+	Race_Mecha,
+	NB_CREW_RACES,
+};
+
+enum RoomType
+{
+	Room_Empty,
+	Room_Crewquarter,
+	Room_Navigation,
+	Room_Weapon,
+	Room_Gold,
+	Room_Fishing,
+	Room_Kitchen,
+	Room_Relic,
+	Room_Sword,
+	Room_Lifeboat,
+	Room_Ammo,
+	Room_Engine,
+	NB_ROOM_TYPES,
+};
+
+enum CrewMemberType
+{
+	Crew_All,
+	Crew_Pirate,
+	Crew_Civilian,
+	Crew_Slave,
+	Crew_Undead,
+	NB_CREW_TYPES,
+};
+
 struct Game
 {
 public:
@@ -118,7 +163,14 @@ public:
 	vector<Ammo*> m_bullets;
 	vector<FX*> m_FX;
 
-	string dico_ship_class[NB_SHIP_TYPES];
+	string m_dico_ship_class[NB_SHIP_TYPES];
+	string m_dico_room_types[NB_ROOM_TYPES];
+	vector<string> m_dico_crew_names[2];
+	vector<string> m_dico_crew_names_used[2];
+	string m_dico_crew_types[NB_CREW_TYPES];
+	string m_dico_crew_skills[NB_CREW_SKILLS];
+	string m_dico_crew_races[NB_CREW_RACES];
+	string GetRandomCrewMemberName(int gender);
 
 private:
 

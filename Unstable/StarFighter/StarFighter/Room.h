@@ -7,34 +7,6 @@
 
 class Weapon;
 
-enum RoomType
-{
-	Room_Empty,
-	Room_Crewquarter,
-	Room_Navigation,
-	Room_Weapon,
-	Room_Gold,
-	Room_Fishing,
-	Room_Kitchen,
-	Room_Relic,
-	Room_Sword,
-	Room_Lifeboat,
-	Room_Ammo,
-	Room_Engine,
-	Room_Mecha,
-	NB_ROOM_TYPES,
-};
-
-enum CrewMemberType
-{
-	Crew_All,
-	Crew_Pirate,
-	Crew_Civilian,
-	Crew_Slave,
-	Crew_Undead,
-	NB_CREW_TYPES,
-};
-
 class Room : public GameEntity
 {
 public:

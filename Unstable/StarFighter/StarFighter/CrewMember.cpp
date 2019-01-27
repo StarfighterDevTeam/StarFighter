@@ -10,7 +10,7 @@ string dico_crew[NB_CREW_TYPES] = {
 	"Mecha",	//Crew_Mecha,
 };
 
-CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance) : GameEntity(UI_CrewMember)
+CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRace race) : GameEntity(UI_CrewMember)
 {
 	m_type = type;
 	m_alliance = alliance;
@@ -68,6 +68,17 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance) : GameEntity(
 		m_skills[i] = skill_value;
 	}
 
+	//race
+	if (race != NB_CREW_RACES)
+	{
+		m_race = race;
+	}
+	else
+	{
+		int r = RandomizeIntBetweenValues(0, NB_CREW_RACES - 1);
+		m_race = (CrewMemberRace)r;
+	}
+
 	//m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	//m_text.setCharacterSize(20);
 	//m_text.setColor(sf::Color::White);
@@ -83,6 +94,10 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance) : GameEntity(
 	m_lifebar->m_shape.setSize(sf::Vector2f(CREWMEMBER_LIFEBAR_SIZE_X, CREWMEMBER_LIFEBAR_SIZE_Y));
 	m_lifebar->m_shape.setOrigin(sf::Vector2f(CREWMEMBER_LIFEBAR_SIZE_X * 0.5f, CREWMEMBER_LIFEBAR_SIZE_Y * 0.5f));
 	m_lifebar->m_shape.setFillColor(sf::Color::Green);
+
+	//randomization of gender and name
+	int gender = RandomizeIntBetweenValues(0, 1);
+	string m_display_name = (*CurrentGame).GetRandomCrewMemberName(gender);
 }
 
 CrewMember::~CrewMember()

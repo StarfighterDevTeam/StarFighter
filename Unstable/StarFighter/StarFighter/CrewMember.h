@@ -13,24 +13,15 @@
 #define CREWMEMBER_LIFEBAR_SIZE_Y				4.f
 #define CREWMEMBER_LIFEBAR_OFFSET_Y				8.f
 
-enum CrewSkills
-{
-	Skill_Gunner,
-	Skill_Fishing,
-	Skill_Melee,
-	Skill_Navigation,
-	Skill_Cooking,
-	NB_CREW_SKILLS,
-};
-
 class CrewMember : public GameEntity
 {
 public:
-	CrewMember(CrewMemberType type, ShipAlliance alliance);
+	CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRace race = NB_CREW_RACES);
 	~CrewMember();
 
 	CrewMemberType m_type;
 	ShipAlliance m_alliance;
+	CrewMemberRace m_race;
 
 	int m_skills[NB_CREW_SKILLS];
 
@@ -53,6 +44,7 @@ public:
 	float m_healing_timer;
 
 	GameEntity* m_lifebar;
+	string m_display_name;
 
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);

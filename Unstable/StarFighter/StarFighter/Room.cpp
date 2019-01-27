@@ -2,22 +2,6 @@
 
 extern Game* CurrentGame;
 
-string dico_rooms[NB_ROOM_TYPES] = {
-	"",					//Room_Empty,
-	"Crew Quarters",	//Room_Crewquarter,
-	"Navigation",		//Room_Navigation,
-	"Weapon",			//Room_Weapon,
-	"Gold",				//Room_Gold,
-	"Fishing",			//Room_Fishing,
-	"Kitchen",			//Room_Kitchen,
-	"Relic",			//Room_Relic,
-	"Sword",			//Room_Sword,
-	"Life boats",		//Room_Lifeboat,
-	"Ammo",				//Room_Ammo,
-	"Engine",			//Room_Engine,
-	"Mecha",			//Room_Mecha
-};
-
 Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type, bool minimized) : GameEntity(UI_Room)
 {
 	m_upcorner_x = upcorner_x;
@@ -75,7 +59,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type,
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);
 	m_text.setColor(sf::Color::White);
-	m_text.setString(dico_rooms[type]);
+	m_text.setString((*CurrentGame).m_dico_room_types[type]);
 	m_text.SetPosition(m_position);
 }
 
@@ -90,7 +74,7 @@ Room::~Room()
 void Room::Update(Time deltaTime)
 {
 	ostringstream ss;
-	ss << dico_rooms[m_type] << "\n(" << m_nb_crew[Crew_All] << "/" << m_nb_crew_max << ")";
+	ss << (*CurrentGame).m_dico_room_types[m_type] << "\n(" << m_nb_crew[Crew_All] << "/" << m_nb_crew_max << ")";
 	m_text.setString(ss.str());
 
 	GameEntity::Update(deltaTime);
