@@ -86,10 +86,9 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 	Weapon* weapon2 = new Weapon(Weapon_Cannon, false);
 	AddWeapon(weapon2, room, this, false);
-
+	
 	Weapon* weapon3 = new Weapon(Weapon_Cannon, false);
 	AddWeapon(weapon3, room, this, false);
-
 
 	//FLOOD
 	m_tiles[0][3]->m_pierced = true;

@@ -349,21 +349,16 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 		{
-			//(*it)->Update(deltaTime);
-
-			for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+			(*it)->Update(deltaTime);
+			if (m_warship->CanWeaponFire(*it))
 			{
-				(*it)->Update(deltaTime);
-				if (m_warship->CanWeaponFire(*it))
+				if ((*it)->m_target_room == NULL)
 				{
-					if ((*it)->m_target_room == NULL)
-					{
-						//do nothing
-					}
-					else
-					{
-						m_warship->FireWeapon(*it, deltaTime, m_tactical_ship);
-					}
+					//do nothing
+				}
+				else
+				{
+					m_warship->FireWeapon(*it, deltaTime, m_tactical_ship);
 				}
 			}
 		}
@@ -371,7 +366,6 @@ void Gameloop::Update(sf::Time deltaTime)
 	//Enemy weapons
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
-			//(*it)->UpdateRof(deltaTime);
 			(*it)->Update(deltaTime);
 			if (m_tactical_ship->CanWeaponFire(*it))
 			{
