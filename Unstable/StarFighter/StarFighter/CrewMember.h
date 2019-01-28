@@ -24,6 +24,7 @@ public:
 	CrewMemberRace m_race;
 
 	int m_skills[NB_CREW_SKILLS];
+	int m_skills_max[NB_CREW_SKILLS];
 
 	void Update(Time deltaTime);
 

@@ -59,8 +59,9 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	//randomization of skill values
 	for (int i = 0; i < NB_CREW_SKILLS; i++)
 	{
-		int skill_value = RandomizeIntBetweenValues(skill_max_value / 2, skill_max_value);
+		int skill_value = RandomizeIntBetweenValues(skill_max_value / 4, skill_max_value);
 		m_skills[i] = skill_value;
+		m_skills_max[i] = skill_max_value;;
 	}
 
 	//race

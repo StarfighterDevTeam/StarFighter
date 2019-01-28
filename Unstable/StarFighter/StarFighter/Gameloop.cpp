@@ -249,12 +249,10 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
 			{
 				m_warship->m_crew_interface.Init(*it);
-				printf("Create crew interface (hover)\n");
 			}
-			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (*it)->m_hovered == false)
+			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && m_warship->m_crew_interface.m_crew->m_hovered == false)
 			{
 				m_warship->m_crew_interface.Init(*it);
-				printf("Create crew interface (delete)\n");
 			}
 		}
 
