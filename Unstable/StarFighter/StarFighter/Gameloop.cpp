@@ -249,12 +249,10 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
 			{
 				m_warship->m_crew_interface.Init(*it);
-				printf("Create crew interface (hover)\n");
 			}
 			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (*it)->m_hovered == false)
 			{
 				m_warship->m_crew_interface.Init(*it);
-				printf("Create crew interface (delete)\n");
 			}
 		}
 
@@ -357,11 +355,12 @@ void Gameloop::Update(sf::Time deltaTime)
 	//}
 
 	//Player Weapons
-	if (m_tactical_ship != NULL)
+	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 	{
-		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+		(*it)->Update(deltaTime);
+
+		if (m_tactical_ship != NULL)
 		{
-			(*it)->Update(deltaTime);
 			if ((*it)->CanFire() == true)
 			{
 				if ((*it)->m_target_room == NULL)
@@ -374,7 +373,9 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 		}
-
+	}
+	if (m_tactical_ship != NULL)
+	{
 	//Enemy weapons
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
@@ -681,14 +682,21 @@ void Gameloop::Draw()
 	}
 
 	//lifebars & rofbars
-	if (m_scale == Scale_Tactical)
+	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 	{
-		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+		if (m_scale == Scale_Tactical)
 		{
 			(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
+		}
+
+		if ((*it)->m_health < (*it)->m_health_max)
+		{
 			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 		}
-		for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+	}
+	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+	{
+		if ((*it)->m_health < (*it)->m_health_max)
 		{
 			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 		}
@@ -733,11 +741,17 @@ void Gameloop::Draw()
 			for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 			{
 				(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
-				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+				if ((*it)->m_health < (*it)->m_health_max)
+				{
+					(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 			for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
 			{
-				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+				if ((*it)->m_health < (*it)->m_health_max)
+				{
+					(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 		}
 	}
