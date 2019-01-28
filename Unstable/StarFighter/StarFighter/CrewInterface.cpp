@@ -9,6 +9,11 @@ CrewInterface::CrewInterface()
 	m_panel = NULL;
 	m_portrait = NULL;
 	m_lifebar = NULL;
+
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		m_skillbars[i] = NULL;
+	}
 }
 
 CrewInterface::~CrewInterface()
@@ -16,6 +21,11 @@ CrewInterface::~CrewInterface()
 	delete m_panel;
 	delete m_portrait;
 	delete m_lifebar;
+
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		delete m_skillbars[i];
+	}
 }
 
 void CrewInterface::Init(CrewMember* crew)
@@ -92,6 +102,46 @@ void CrewInterface::Init(CrewMember* crew)
 	m_lifebar->m_text.setCharacterSize(14);
 	m_lifebar->m_text.setStyle(sf::Text::Bold);
 	m_lifebar->m_text.setColor(sf::Color::Black);
+
+	//status
+	offset_y += 14.f;
+	m_status_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_status_text.setCharacterSize(16);
+	//m_status_text.setStyle(sf::Text::Bold);
+	m_status_text.setColor(sf::Color::Black);
+	m_status_text.setPosition(sf::Vector2f(0, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y));
+
+	//skills
+	offset_y += 12.f;
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		offset_y += 10.f;
+		m_skillbar_names[i].setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_skillbar_names[i].setCharacterSize(16);
+		m_skillbar_names[i].setStyle(sf::Text::Italic);
+		m_skillbar_names[i].setColor(sf::Color::Black);
+		m_skillbar_names[i].setString((*CurrentGame).m_dico_crew_skills[i]);
+		m_skillbar_names[i].setPosition(sf::Vector2f(CREWINTERFACE_TEXT_OFFSET_X, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y));
+
+		offset_y += 26.f;
+		m_skillbars[i] = new GameEntity(UI_None);
+		m_skillbars[i]->m_shape_container.setSize(sf::Vector2f(CREWINTERFACE_SKILLBAR_SIZE_X, CREWINTERFACE_LIFEBAR_SIZE_Y));
+		m_skillbars[i]->m_shape_container.setOrigin(sf::Vector2f(CREWINTERFACE_SKILLBAR_SIZE_X * 0.5f, CREWINTERFACE_LIFEBAR_SIZE_Y * 0.5f));
+		m_skillbars[i]->m_shape_container.setFillColor(sf::Color(100, 100, 100, 255));//dark grey
+		//m_skillbars[i]->m_shape_container.setOutlineThickness(1.f);
+		//m_skillbars[i]->m_shape_container.setOutlineColor(sf::Color::Black);
+		m_skillbars[i]->m_position = sf::Vector2f(CREWINTERFACE_SKILLBAR_SIZE_X * 0.5f + 4.f, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y + offset_y);
+		m_skillbars[i]->m_shape_container.setPosition(m_skillbars[i]->m_position);
+
+		m_skillbars[i]->m_shape.setSize(sf::Vector2f(CREWINTERFACE_SKILLBAR_SIZE_X, CREWINTERFACE_LIFEBAR_SIZE_Y));
+		m_skillbars[i]->m_shape.setOrigin(sf::Vector2f(CREWINTERFACE_SKILLBAR_SIZE_X * 0.5f, CREWINTERFACE_LIFEBAR_SIZE_Y * 0.5f));
+		m_skillbars[i]->m_shape.setFillColor(sf::Color(255, 127, 39, 255));//orange "skill"
+		m_skillbars[i]->m_shape.setPosition(m_skillbars[i]->m_position);
+
+		m_skillbars[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_skillbars[i]->m_text.setCharacterSize(14);
+		m_skillbars[i]->m_text.setColor(sf::Color::Black);
+	}
 }
 
 void CrewInterface::Update()
@@ -123,11 +173,51 @@ void CrewInterface::Update()
 		m_lifebar->m_shape.setFillColor(sf::Color::Red);
 	}
 
-	//value text
 	ostringstream ss_life;
 	ss_life << m_crew->m_health << "/" << m_crew->m_health_max;
 	m_lifebar->m_text.setString(ss_life.str());
-	m_lifebar->m_text.setPosition(sf::Vector2f(m_lifebar->m_position.x + m_lifebar->m_shape_container.getSize().x * 0.5f + 8.f, m_lifebar->m_position.y - m_lifebar->m_text.getGlobalBounds().height * 0.5f - 4.f));
+	m_lifebar->m_text.setPosition(sf::Vector2f(m_lifebar->m_position.x + m_lifebar->m_shape_container.getSize().x * 0.5f + CREWINTERFACE_TEXT_OFFSET_X, m_lifebar->m_position.y - m_lifebar->m_text.getGlobalBounds().height * 0.5f - 4.f));
+
+	//status
+	string status = "";
+	RoomTile* tile = m_crew->m_destination != NULL ? m_crew->m_destination : m_crew->m_tile;
+	if (tile == NULL)
+	{
+		//do nothing
+	}
+	else if (tile->m_pierced == true && tile->m_health < tile->m_health_max)
+	{
+		status = "Repairing hull";
+		m_status_text.setColor(sf::Color::Black);
+	}
+	else if (tile->m_weapon_tile != NULL && tile->m_weapon_tile->m_weapon != NULL && tile->m_weapon_tile->m_weapon->m_health > 0)
+	{
+		status = "Gunner";
+		m_status_text.setColor(sf::Color::Red);
+	}
+	else
+	{
+		status = "Idle";
+		m_status_text.setColor(sf::Color::Black);
+	}
+
+	m_status_text.setString(status);
+	m_status_text.setPosition(sf::Vector2f(CREWINTERFACE_SIZE_X * 0.5f - m_status_text.getGlobalBounds().width * 0.5f, m_status_text.getPosition().y));
+
+	//skills
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		int skill_value = m_crew->m_skills[i];
+		Bound(skill_value, sf::Vector2i(0, m_crew->m_skills_max[i]));
+
+		float skill_ratio = 1.0f * skill_value / m_crew->m_skills_max[i];
+		m_skillbars[i]->m_shape.setSize(sf::Vector2f(skill_ratio * CREWINTERFACE_SKILLBAR_SIZE_X, CREWINTERFACE_LIFEBAR_SIZE_Y));
+
+		ostringstream ss_skill;
+		ss_skill << m_crew->m_skills[i] << "%";
+		m_skillbars[i]->m_text.setString(ss_skill.str());
+		m_skillbars[i]->m_text.setPosition(sf::Vector2f(m_skillbars[i]->m_position.x + m_skillbars[i]->m_shape_container.getSize().x * 0.5f + 14.f, m_skillbars[i]->m_position.y - m_skillbars[i]->m_text.getGlobalBounds().height * 0.5f - 5.f));
+	}
 }
 
 void CrewInterface::Draw(sf::RenderTexture& screen)
@@ -138,4 +228,11 @@ void CrewInterface::Draw(sf::RenderTexture& screen)
 	screen.draw(m_type_text);
 	screen.draw(m_race_text);
 	m_lifebar->Draw(screen);
+	screen.draw(m_status_text);
+
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		screen.draw(m_skillbar_names[i]);
+		m_skillbars[i]->Draw(screen);
+	}
 }
