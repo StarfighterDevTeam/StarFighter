@@ -1,5 +1,5 @@
-#ifndef CREWINTERFACE_H_INCLUDED
-#define CREWINTERFACE_H_INCLUDED
+#ifndef WEAPONINTERFACE_H_INCLUDED
+#define WEAPONINTERFACE_H_INCLUDED
 
 #include "Game.h"
 
@@ -15,10 +15,10 @@
 #define CREWINTERFACE_SKILLBAR_SIZE_X		70.f
 #define CREWINTERFACE_TEXT_OFFSET_X			8.f
 
-struct CrewInterface
+struct WeaponInterface
 {
-	CrewInterface();
-	~CrewInterface();
+	WeaponInterface();
+	~WeaponInterface();
 
 	void Init(CrewMember* crew);
 	CrewMember* m_crew;
@@ -37,4 +37,4 @@ struct CrewInterface
 	GameEntity* m_skillbars[NB_CREW_SKILLS];
 };
 
-#endif //CREWINTERFACE_H_INCLUDED
+#endif //WEAPONINTERFACE_H_INCLUDED
