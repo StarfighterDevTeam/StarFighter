@@ -263,6 +263,10 @@ void Gameloop::Update(sf::Time deltaTime)
 		else
 		{
 			m_warship->m_nb_crew--;
+			if (m_warship->m_crew_interface.m_crew == *it)//remove from interface before destroying object
+			{
+				m_warship->m_crew_interface.m_crew = NULL;
+			}
 			delete *it;
 		}
 	}
