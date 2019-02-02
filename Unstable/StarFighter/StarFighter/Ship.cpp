@@ -521,23 +521,19 @@ void Ship::BuildShip()
 {
 	//ROOMS
 	//left
-	//AddRoomMinimized(0, 3, 4, 4, Room_Weapon);
-	AddRoomMinimized(0, 7, 4, 6, Room_Gold);
-	AddRoomMinimized(0, 13, 4, 6, Room_Relic);
-	AddRoomMinimized(0, 19, 4, 3, Room_Sword);
+	//left
+	Room* room = AddRoomMinimized(0, 1, 3, 4, Room_Weapon);
+	AddRoomMinimized(0, 5, 3, 4, Room_Weapon);
 
 	//mid
-	//AddRoomMinimized(6, 0, 4, 3, Room_Weapon);
-	AddRoomMinimized(4, 3, 8, 6, Room_Navigation);
-	AddRoomMinimized(4, 9, 8, 10, Room_Crewquarter);
-	AddRoomMinimized(4, 19, 8, 3, Room_Ammo);
-	AddRoomMinimized(5, 22, 6, 3, Room_Engine);
+	AddRoomMinimized(3, 0, 5, 2, Room_Navigation);
+	AddRoomMinimized(3, 2, 5, 5, Room_Crewquarter);
+	AddRoomMinimized(3, 7, 5, 2, Room_Engine);
+	AddRoomMinimized(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
-	//AddRoomMinimized(12, 3, 4, 4, Room_Weapon);
-	AddRoomMinimized(12, 7, 4, 6, Room_Fishing);
-	AddRoomMinimized(12, 13, 4, 6, Room_Kitchen);
-	AddRoomMinimized(12, 19, 4, 3, Room_Lifeboat);
+	AddRoomMinimized(8, 1, 3, 4, Room_Weapon);
+	AddRoomMinimized(8, 5, 3, 4, Room_Weapon);
 
 	m_health = m_health_max;
 

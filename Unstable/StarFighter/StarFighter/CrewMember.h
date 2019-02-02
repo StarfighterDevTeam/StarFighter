@@ -4,8 +4,8 @@
 #include "Game.h"
 #include "Room.h"
 
-#define CREWMEMBER_SIZE							16.f
-#define CREWMEMBER_SPEED						70.f
+#define CREWMEMBER_SIZE							24.f
+#define CREWMEMBER_SPEED						100.f
 #define CREWMEMBER_SPEED_FLOOD_FACTOR			0.5f
 #define CREWMEMBER_HEALTH_MAX					20
 

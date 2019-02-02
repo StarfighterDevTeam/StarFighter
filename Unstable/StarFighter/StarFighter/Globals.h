@@ -44,12 +44,12 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define RECTANGLE_INSIDE_ALPHA							100
 
 //PIRATES
-#define ROOMTILE_SIZE				32.f
-#define ROOMTILE_OFFSET_X			400.f
+#define ROOMTILE_SIZE				48.f
+#define ROOMTILE_OFFSET_X			450.f
 #define ROOMTILE_OFFSET_Y			550.f
 
-#define ROOMTILE_MINI_SIZE			32.f
-#define ROOMTILE_MINI_OFFSET_X		1550.f
+#define ROOMTILE_MINI_SIZE			48.f
+#define ROOMTILE_MINI_OFFSET_X		1600.f
 #define ROOMTILE_MINI_OFFSET_Y		(ROOMTILE_OFFSET_Y	)
 
 #define DISTANCE_COMBAT_INIT				1000.f
@@ -58,7 +58,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ROOMTILE_HEALTH_MAX					10
 #define ROOMTILE_FLOODING_MAX				100
 #define ROOMTILE_FLOODING_GENERATION		1
-#define FLOODING_TIMER						0.07f
+#define FLOODING_TIMER						0.15f
 #define FLOOD_MIN_VALUE_FOR_TRANSFER		20
 #define FLOOD_EVAPORATION_TIME				1.f
 

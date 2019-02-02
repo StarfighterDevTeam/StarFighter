@@ -102,16 +102,16 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
 			}
-			
-			if ((*it2)->m_weapon_gunner != NULL)
+
+			if ((*it2)->m_weapon_tile != NULL)
 			{
-				if ((*it2)->m_weapon_gunner->m_crew != NULL && (*it2)->m_weapon_gunner->m_crew->m_tile == (*it2)->m_weapon_gunner)
+				if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 				{
-					(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color::Green);
+					(*it2)->m_shape_container.setFillColor(sf::Color::Green);
 				}
 				else
 				{
-					(*it2)->m_weapon_gunner->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
+					(*it2)->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
 				}
 			}
 
