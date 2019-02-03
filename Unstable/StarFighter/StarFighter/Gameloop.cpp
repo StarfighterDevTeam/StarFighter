@@ -109,22 +109,22 @@ void Gameloop::Update(sf::Time deltaTime)
 
 			if ((*it2)->m_pierced == true)
 			{
-				(*it2)->m_shape_container.setFillColor(sf::Color(0, 50, 255, 255));//blue "deep water"
+				(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
 			}
 			else if ((*it2)->m_flood > 0)
 			{
-				(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+				(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
 			}
 
 			if ((*it2)->m_weapon_tile != NULL)
 			{
 				if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 				{
-					(*it2)->m_shape_container.setFillColor(sf::Color::Green);
+					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_Tile]);
 				}
 				else
 				{
-					(*it2)->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner"
+					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_Tile]);
 				}
 			}
 
@@ -184,7 +184,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 				if (room_hovered == true)
 				{
-					(*it2)->m_shape_container.setFillColor((sf::Color(255, 242, 39, 255)));//yellow "target"
+					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
 				}
 				else
 				{
@@ -192,21 +192,21 @@ void Gameloop::Update(sf::Time deltaTime)
 
 					if ((*it2)->m_pierced == true)
 					{
-						(*it2)->m_shape_container.setFillColor(sf::Color(0, 50, 255, 255));//blue "deep water"
+						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
 					}
 					else if ((*it2)->m_flood > 0)
 					{
-						(*it2)->m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
 					}
 					else if ((*it2)->m_weapon_tile != NULL)//position of a weapon gunner?
 					{
 						if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 						{
-							(*it2)->m_shape_container.setFillColor(sf::Color::Green);//occupied by a crew
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_Tile]);//occupied by a crew
 						}
 						else
 						{
-							(*it2)->m_shape_container.setFillColor(sf::Color(255, 127, 39, 255));//orange "gunner" = empty crew
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_Tile]);
 						}
 					}
 				}
@@ -225,14 +225,14 @@ void Gameloop::Update(sf::Time deltaTime)
 				{
 					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
 					{
-						(*it2)->m_shape_container.setFillColor((sf::Color(255, 242, 39, 255)));//yellow "target"
+						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
 					}
 				}
 				else if (weapon->m_target_room->IsHoveredByMouse() == false)
 				{
 					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
 					{
-						(*it2)->m_shape_container.setFillColor((sf::Color(128, 128, 128, 255)));//grey "previous target"
+						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Target]);
 					}
 				}
 			}

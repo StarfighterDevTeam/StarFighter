@@ -114,6 +114,17 @@ enum Input_Actions
 	NB_INPUT_ACTIONS,
 };
 
+enum Color_Chart
+{
+	Color_Yellow_Target,
+	Color_Grey_Target,
+	Color_Orange_Tile,
+	Color_Green_Tile,
+	Color_Blue_Flood,
+	Color_Blue_Pierced,
+	NB_COLOR_CHART,
+};
+
 struct Game
 {
 public:
@@ -187,6 +198,7 @@ public:
 	string m_dico_crew_skills[NB_CREW_SKILLS];
 	string m_dico_crew_races[NB_CREW_RACES];
 	string GetRandomCrewMemberName(int gender);
+	sf::Color m_dico_colors[NB_COLOR_CHART];
 
 private:
 
