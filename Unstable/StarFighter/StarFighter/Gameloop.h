@@ -32,6 +32,7 @@ public:
 	vector<Ship*> m_ships;
 	Ship* m_tactical_ship;
 	Scale m_scale;
+	sf::Text m_pause_text;
 
 	void InitWaterZones();
 

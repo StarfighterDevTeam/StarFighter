@@ -101,6 +101,19 @@ enum CrewMemberType
 	NB_CREW_TYPES,
 };
 
+enum Input_Status
+{
+	Input_Tap,
+	Input_Hold,
+	Input_Release
+};
+
+enum Input_Actions
+{
+	Action_Pause,
+	NB_INPUT_ACTIONS,
+};
+
 struct Game
 {
 public:
@@ -123,6 +136,8 @@ public:
 	MouseAction m_mouse_click;
 	float m_mouse_click_timer;
 	void GetMouseInputs(sf::Time deltaTime);
+	Input_Status m_input_actions[NB_INPUT_ACTIONS];
+	void GetControllerInputs();
 
 	sf::View m_view;
 	sf::Vector2f m_map_size;
@@ -162,6 +177,7 @@ public:
 	vector<vector<WaterZone*> > m_waterzones;
 	vector<Ammo*> m_bullets;
 	vector<FX*> m_FX;
+	bool m_pause;
 
 	string m_dico_ship_class[NB_SHIP_TYPES];
 	string m_dico_room_types[NB_ROOM_TYPES];

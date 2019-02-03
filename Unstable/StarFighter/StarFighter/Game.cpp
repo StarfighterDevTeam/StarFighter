@@ -60,6 +60,11 @@ Game::Game(RenderWindow& window)
 	m_hovered_ui = NULL;
 	m_target_ui = NULL;
 	m_play_ui = NULL;
+	m_pause = false;
+	for (int i = 0; i < NB_INPUT_ACTIONS; i++)
+	{
+		m_input_actions[i] = Input_Release;
+	}
 
 	//dico
 	m_dico_ship_class[Ship_Warship] = "Pirate Warship";
@@ -289,5 +294,17 @@ void Game::GetMouseInputs(sf::Time deltaTime)
 	{
 		m_mouse_click = Mouse_RightClick;
 		m_mouse_click_timer = 0.2f;
+	}
+}
+
+void Game::GetControllerInputs()
+{
+	if (InputGuy::isPausing() == true)
+	{
+		m_input_actions[Action_Pause] = m_input_actions[Action_Pause] == Input_Release ? Input_Tap : Input_Hold;
+	}
+	else
+	{
+		m_input_actions[Action_Pause] = Input_Release;
 	}
 }

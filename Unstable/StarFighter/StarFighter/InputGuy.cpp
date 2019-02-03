@@ -95,7 +95,7 @@ bool InputGuy::isMuting()
 
 bool InputGuy::isPausing()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
 		return true;
 	}

@@ -20,6 +20,12 @@ Gameloop::Gameloop()
 	m_tactical_ship = NULL;
 
 	m_scale = Scale_Strategic;
+
+	m_pause_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_pause_text.setCharacterSize(50);
+	m_pause_text.setColor(sf::Color::Black);
+	m_pause_text.setString("P A U S E");
+	m_pause_text.setPosition(sf::Vector2f(WINDOW_RESOLUTION_X * 0.5f, WINDOW_RESOLUTION_Y * 0.5f));
 }
 
 Gameloop::~Gameloop()
@@ -60,6 +66,13 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//Get mouse & keyboard inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
+	(*CurrentGame).GetControllerInputs();
+
+	//Pause
+	if ((*CurrentGame).m_input_actions[Action_Pause] == Input_Tap)
+	{
+		(*CurrentGame).m_pause = !(*CurrentGame).m_pause;
+	}
 
 	//Reset flags
 	(*CurrentGame).m_hovered_ui = NULL;
@@ -838,6 +851,12 @@ void Gameloop::Draw()
 	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
 	{
 		(*it)->FX::Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//PAUSE
+	if ((*CurrentGame).m_pause == true)
+	{
+		(*CurrentGame).m_mainScreen.draw(m_pause_text);
 	}
 
 	//Display
