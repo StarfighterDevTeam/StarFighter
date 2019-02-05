@@ -156,9 +156,9 @@ void Ship::GetAngleForSpeed(float& angle)
 }
 
 
-Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type, bool minimized)
+Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 {
-	Room* room = new Room(upcorner_x, upcorner_y, width, height, type, minimized);
+	Room* room = new Room(upcorner_x, upcorner_y, width, height, type);
 	m_rooms.push_back(room);
 
 	if (upcorner_x < m_rooms_min_upcorner_x)
@@ -185,11 +185,6 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 	m_flood_max += room->m_tiles.size();
 
 	return room;
-}
-
-Room* Ship::AddRoomMinimized(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
-{
-	return AddRoom(upcorner_x, upcorner_y, width, height, type, true);
 }
 
 CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
@@ -409,11 +404,6 @@ Room* Ship::ConnectRooms()
 
 Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy)
 {
-	if (room == NULL)
-	{
-		return NULL;
-	}
-
 	RoomTile* tile = weapon->GetFreeWeaponTile(room, is_enemy);
 
 	if (tile == NULL)
@@ -421,6 +411,13 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy)
 		return NULL;
 	}
 
+	AddWeaponToTile(weapon, tile);
+
+	return weapon;
+}
+
+void Ship::AddWeaponToTile(Weapon* weapon, RoomTile* tile)
+{
 	//position
 	weapon->m_position = tile->m_position;
 
@@ -434,29 +431,7 @@ Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy)
 	//save owner ship
 	weapon->m_ship = this;
 
-	//gunner tile
-	if (tile->m_hull == Hull_Left && m_tiles[tile->m_coord_x + 1][tile->m_coord_y] != NULL)
-	{
-		tile->m_weapon_gunner = m_tiles[tile->m_coord_x + 1][tile->m_coord_y];
-	}
-	else if (tile->m_hull == Hull_Right && m_tiles[tile->m_coord_x - 1][tile->m_coord_y] != NULL)
-	{
-		tile->m_weapon_gunner = m_tiles[tile->m_coord_x - 1][tile->m_coord_y];
-	}
-	else if (tile->m_hull == Hull_Up && m_tiles[tile->m_coord_x][tile->m_coord_y + 1] != NULL)
-	{
-		tile->m_weapon_gunner = m_tiles[tile->m_coord_x][tile->m_coord_y + 1];
-	}
-	else if (tile->m_hull == Hull_Down && m_tiles[tile->m_coord_x][tile->m_coord_y - 1] != NULL)
-	{
-		tile->m_weapon_gunner = m_tiles[tile->m_coord_x][tile->m_coord_y - 1];
-	}
-
-	tile->m_weapon_gunner->m_weapon_tile = tile;
-
 	weapon->UpdatePosition();
-
-	return weapon;
 }
 
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
@@ -522,22 +497,22 @@ void Ship::BuildShip()
 	//ROOMS
 	//left
 	//left
-	Room* room = AddRoomMinimized(0, 1, 3, 4, Room_Weapon);
-	AddRoomMinimized(0, 5, 3, 4, Room_Weapon);
+	Room* weapon_room = AddRoom(0, 1, 3, 4, Room_Weapon);
+	AddRoom(0, 5, 3, 4, Room_Weapon);
 
 	//mid
-	AddRoomMinimized(3, 0, 5, 2, Room_Navigation);
-	AddRoomMinimized(3, 2, 5, 5, Room_Crewquarter);
-	AddRoomMinimized(3, 7, 5, 2, Room_Engine);
-	AddRoomMinimized(3, 9, 5, 1, Room_Lifeboat);
+	AddRoom(3, 0, 5, 2, Room_Navigation);
+	AddRoom(3, 2, 5, 5, Room_Crewquarter);
+	AddRoom(3, 7, 5, 2, Room_Engine);
+	AddRoom(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
-	AddRoomMinimized(8, 1, 3, 4, Room_Weapon);
-	AddRoomMinimized(8, 5, 3, 4, Room_Weapon);
+	AddRoom(8, 1, 3, 4, Room_Weapon);
+	AddRoom(8, 5, 3, 4, Room_Weapon);
 
 	m_health = m_health_max;
 
-	//center position of each room & room tiles
+	//center position of each room & room tiles, fill m_tiles and (*CurrentGame).m_tiles / m_enemy_tiles.
 	CenterRoomPositions(m_alliance != Alliance_Player);
 
 	//doors
@@ -545,6 +520,22 @@ void Ship::BuildShip()
 
 	//hull
 	FlagHullRoomTiles();
+
+	//gunner tiles
+	int size = weapon_room->m_tiles.size() - 1;
+	for (int i = 0; i < 3; i++)
+	{
+		int x = i * weapon_room->m_width;
+		weapon_room->m_tiles[x]->m_operator_tile = weapon_room->m_tiles[x + 1];
+		weapon_room->m_tiles[x + 1]->m_system_tile = weapon_room->m_tiles[x];
+
+		weapon_room->m_tiles[x]->m_operator_tile->m_system = System_Weapon;
+
+		Weapon* weapon = new Weapon(Weapon_Cannon, false);
+		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
+		weapon->setAnimationLine(1);//horizontal mirroring
+		weapon->m_angle = 270.f;
+	}
 
 	//crew
 	m_nb_crew_max = 0;
@@ -557,28 +548,15 @@ void Ship::BuildShip()
 	}
 
 	m_nb_crew = m_nb_crew_max;
-
-	//weapons
-	Weapon* weapon = new Weapon(Weapon_Cannon, true);
-	AddWeapon(weapon, m_rooms.back(), this, true);
-	
-	Weapon* weapon2 = new Weapon(Weapon_Cannon, true);
-	AddWeapon(weapon2, m_rooms.back(), this, true);
-	
-	Weapon* weapon3 = new Weapon(Weapon_Cannon, true);
-	AddWeapon(weapon3, m_rooms.back(), this, true);
 }
 
-void Ship::CenterRoomPositions(bool minimized)
+void Ship::CenterRoomPositions(bool is_enemy)
 {
-	float size = minimized == false ? ROOMTILE_SIZE : ROOMTILE_MINI_SIZE;
-	float room_offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
-	float room_offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
-	float tile_offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
-	float tile_offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
+	float room_offset_x = is_enemy == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
+	float room_offset_y = is_enemy == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
 
-	room_offset_x -= 1.f * m_rooms_size.x / 2 * size;
-	room_offset_y -= 1.f * m_rooms_size.y / 2 * size;
+	room_offset_x -= 1.f * m_rooms_size.x / 2 * ROOMTILE_SIZE;
+	room_offset_y -= 1.f * m_rooms_size.y / 2 * ROOMTILE_SIZE;
 
 	//fill hull array with NULL pointers
 	for (int i = 0; i < m_rooms_size.x; i++)
@@ -586,55 +564,41 @@ void Ship::CenterRoomPositions(bool minimized)
 		vector<RoomTile*> vec;
 		for (int j = 0; j < m_rooms_size.y; j++)
 		{
-			RoomTile* tile = NULL;
-			vec.push_back(tile);
+			vec.push_back(NULL);
 		}
 		m_tiles.push_back(vec);
 	}
 
-	//enemy (minimized) = flip the ship (180°)
-	if (minimized == true)
-	{
-		for (vector<vector<RoomTile*> >::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
-		{
-			for (vector<RoomTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-			{
-				*it2 = NULL;
-			}
-		}
-	}
-
+	//set centered postion for each room and tiles, and fill the existing tiles into Ship m_tiles and (*CurrentGame).m_tiles / m_enemy_tiles
 	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	{
-		if (minimized == true)
-		{
-			//flip it
-			(*it)->m_upcorner_x = m_rooms_size.x - (*it)->m_upcorner_x - (*it)->m_width;
-			(*it)->m_upcorner_y = m_rooms_size.y - (*it)->m_upcorner_y - (*it)->m_height;
-		}
-		
-		(*it)->m_position.x = room_offset_x + ((*it)->m_upcorner_x + (*it)->m_width * 0.5f) * size;
-		(*it)->m_position.y = room_offset_y + ((*it)->m_upcorner_y + (*it)->m_height * 0.5f) * size;
+	{	
+		(*it)->m_position.x = room_offset_x + ((*it)->m_upcorner_x + (*it)->m_width * 0.5f) * ROOMTILE_SIZE;
+		(*it)->m_position.y = room_offset_y + ((*it)->m_upcorner_y + (*it)->m_height * 0.5f) * ROOMTILE_SIZE;
 		
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
 			int upcorner = (*it)->m_upcorner_x;
 			int coord = (*it2)->m_coord_x;
-
-			if (minimized == true)
-			{
-				//flip it
-				(*it2)->m_coord_x = m_rooms_size.x - 1 - (*it2)->m_coord_x;
-				(*it2)->m_coord_y = m_rooms_size.y - 1 - (*it2)->m_coord_y;
-			}
 			
-			(*it2)->m_position.x = room_offset_x + (0.5f + (*it2)->m_coord_x) * size;
-			(*it2)->m_position.y = room_offset_y + (0.5f + (*it2)->m_coord_y) * size;
+			(*it2)->m_position.x = room_offset_x + (0.5f + (*it2)->m_coord_x) * ROOMTILE_SIZE;
+			(*it2)->m_position.y = room_offset_y + (0.5f + (*it2)->m_coord_y) * ROOMTILE_SIZE;
 
 			(*it2)->UpdatePosition();
+
+			m_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
+
+			if (is_enemy == false)
+			{
+				(*CurrentGame).m_tiles.push_back(*it2);
+			}
+			else
+			{
+				(*CurrentGame).m_enemy_tiles.push_back(*it2);
+			}
 		}
 	}
 
+	//update connexion, crew, and weapon positions
 	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
 	{
 		(*it)->m_position = sf::Vector2f(0.5f * ((*it)->m_tiles.first->m_position.x + (*it)->m_tiles.second->m_position.x), 0.5f * ((*it)->m_tiles.first->m_position.y + (*it)->m_tiles.second->m_position.y));
@@ -648,15 +612,6 @@ void Ship::CenterRoomPositions(bool minimized)
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
 		(*it)->m_position = (*it)->m_tile->m_position;
-	}
-
-	//fill all room tiles in the array
-	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	{
-		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-		{
-			m_tiles[(*it2)->m_coord_x][(*it2)->m_coord_y] = (*it2);
-		}
 	}
 }
 

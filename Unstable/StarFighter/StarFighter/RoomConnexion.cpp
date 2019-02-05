@@ -12,15 +12,13 @@ RoomConnexion::RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open, bool m
 	m_destroyed = false;
 	m_ship = ship;
 
-	float size = minimized == false ? ROOMTILE_SIZE : ROOMTILE_MINI_SIZE;
-
 	if (tiles.first->m_coord_x == tiles.second->m_coord_x)//horizontal connexion = vertical door
 	{
-		m_size = sf::Vector2f(size, CONNEXION_WIDTH);
+		m_size = sf::Vector2f(ROOMTILE_SIZE, CONNEXION_WIDTH);
 	}
 	else//vertical connexion = horizontal door
 	{
-		m_size = sf::Vector2f(CONNEXION_WIDTH, size);
+		m_size = sf::Vector2f(CONNEXION_WIDTH, ROOMTILE_SIZE);
 	}
 
 	m_position = sf::Vector2f(0.5f * (tiles.first->m_position.x + tiles.second->m_position.x), 0.5f * (tiles.first->m_position.y + tiles.second->m_position.y));

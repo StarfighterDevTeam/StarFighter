@@ -55,20 +55,20 @@ public:
 
 	static bool IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB);
 	bool IsConnectedToRoom(Room* room);
-	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type, bool minimized = false);
-	Room* AddRoomMinimized(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
+	Room* AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy);
+	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
 	void BuildShip();
-	void CenterRoomPositions(bool minimized);
+	void CenterRoomPositions(bool is_enemy);
 
-	void UpdateFlooding(Time deltaTime, bool is_minimized);
+	void UpdateFlooding(Time deltaTime, bool is_enemy);
 
 	void InitCombat();
 	void RestoreHealth();

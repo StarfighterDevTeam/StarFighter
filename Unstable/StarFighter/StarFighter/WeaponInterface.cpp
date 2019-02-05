@@ -190,7 +190,7 @@ void WeaponInterface::Update()
 		status = "Repairing hull";
 		m_status_text.setColor(sf::Color::Black);
 	}
-	else if (tile->m_weapon_tile != NULL && tile->m_weapon_tile->m_weapon != NULL && tile->m_weapon_tile->m_weapon->m_health > 0)
+	else if (tile->m_system_tile != NULL && tile->m_system_tile->m_weapon != NULL && tile->m_system_tile->m_weapon->m_health > 0)
 	{
 		status = "Gunner";
 		m_status_text.setColor(sf::Color::Red);

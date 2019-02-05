@@ -116,15 +116,27 @@ void Gameloop::Update(sf::Time deltaTime)
 				(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
 			}
 
-			if ((*it2)->m_weapon_tile != NULL)
+			if ((*it2)->m_system_tile != NULL)
 			{
 				if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 				{
-					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_Tile]);
+					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);
 				}
 				else
 				{
-					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_Tile]);
+					switch ((*it2)->m_system)
+					{
+						case System_Weapon:
+						{
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+							break;
+						}
+						case System_Navigation:
+						{
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
+							break;
+						}
+					}
 				}
 			}
 
@@ -198,15 +210,27 @@ void Gameloop::Update(sf::Time deltaTime)
 					{
 						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
 					}
-					else if ((*it2)->m_weapon_tile != NULL)//position of a weapon gunner?
+					else if ((*it2)->m_system_tile != NULL)//position of a weapon gunner?
 					{
 						if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_Tile]);//occupied by a crew
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);//occupied by a crew
 						}
 						else
 						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_Tile]);
+							switch ((*it2)->m_system)
+							{
+								case System_Weapon:
+								{
+									(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+									break;
+								}
+								case System_Navigation:
+								{
+									(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -319,13 +343,13 @@ void Gameloop::Update(sf::Time deltaTime)
 						}
 
 						//Weapon to fire
-						if (destination == NULL && ((*it)->m_tile->m_weapon_tile != NULL && (*it)->m_tile->m_crew == *it) == false)//not already busy as a weapon gunner?
+						if (destination == NULL && ((*it)->m_tile->m_system_tile != NULL && (*it)->m_tile->m_crew == *it) == false)//not already busy as a weapon gunner?
 						{
 							for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
 							{
-								if ((*it2)->m_weapon_gunner != NULL && (*it2)->m_weapon_gunner->m_crew == NULL && (*it2)->m_weapon->m_health > 0)
+								if ((*it2)->m_operator_tile != NULL && (*it2)->m_operator_tile->m_crew == NULL && (*it2)->m_weapon != NULL && (*it2)->m_weapon->m_health > 0)
 								{
-									destination = (*it2)->m_weapon_gunner;
+									destination = (*it2)->m_operator_tile;
 									break;
 								}
 							}

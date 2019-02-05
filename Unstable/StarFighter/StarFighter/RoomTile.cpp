@@ -2,15 +2,13 @@
 
 extern Game* CurrentGame;
 
-RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimized) : GameEntity(sf::Vector2f(size, size), UI_RoomTile)
+RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntity(sf::Vector2f(size, size), UI_RoomTile)
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
 	m_room = room;
 	m_crew = NULL;
 	m_weapon = NULL;
-	m_weapon_gunner = NULL;
-	m_weapon_tile = NULL;
 	m_connexion = NULL;
 	m_hull = Hull_None;
 	m_pierced = false;
@@ -23,9 +21,13 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimi
 	m_health_max = ROOMTILE_HEALTH_MAX;
 	m_health = m_health_max;
 
-	float offset_x = minimized == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
-	float offset_y = minimized == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
+	float offset_x = ROOMTILE_OFFSET_X;
+	float offset_y = ROOMTILE_OFFSET_Y;
 	m_position = sf::Vector2f(offset_x + coord_x * size, offset_y + coord_y * size);
+
+	m_system = System_None;
+	m_system_tile = NULL;
+	m_operator_tile = NULL;
 
 	//pathfinding
 	m_heuristic = 0;
@@ -57,28 +59,19 @@ RoomTile::~RoomTile()
 	
 }
 
-RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized)
+RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy)
 {
-	if (minimized == false)
+	vector<RoomTile*>::iterator begin = is_enemy == false ? (*CurrentGame).m_tiles.begin() : (*CurrentGame).m_enemy_tiles.begin();
+	vector<RoomTile*>::iterator end = is_enemy == false ? (*CurrentGame).m_tiles.end() : (*CurrentGame).m_enemy_tiles.end();
+
+	for (vector<RoomTile*>::iterator it = begin; it != end; it++)
 	{
-		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+		if ((*it)->m_coord_x == coord_x && (*it)->m_coord_y == coord_y)
 		{
-			if ((*it)->m_coord_x == coord_x && (*it)->m_coord_y == coord_y)
-			{
-				return *it;
-			}
+			return *it;
 		}
 	}
-	else
-	{
-		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_enemy_tiles.begin(); it != (*CurrentGame).m_enemy_tiles.end(); it++)
-		{
-			if ((*it)->m_coord_x == coord_x && (*it)->m_coord_y == coord_y)
-			{
-				return *it;
-			}
-		}
-	}
+	
 
 	return NULL;
 }

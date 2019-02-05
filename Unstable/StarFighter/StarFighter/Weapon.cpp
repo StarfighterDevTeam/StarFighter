@@ -119,7 +119,7 @@ float Weapon::GetRof()
 	float rof = m_rof;
 	if (CanFire() == true)
 	{
-		rof = 1.f / ((1.f / rof) * (100 + m_tile->m_weapon_gunner->m_crew->m_skills[Skill_Gunner]) / 100);
+		rof = 1.f / ((1.f / rof) * (100 + m_tile->m_operator_tile->m_crew->m_skills[Skill_Gunner]) / 100);
 	}
 
 	return rof;
@@ -127,7 +127,7 @@ float Weapon::GetRof()
 
 bool Weapon::CanFire()
 {
-	if (m_tile->m_weapon_gunner->m_crew == NULL || m_tile->m_weapon_gunner->m_crew->m_tile != m_tile->m_weapon_gunner || m_tile->m_weapon_gunner->m_pierced == true || m_health <= 0)
+	if (m_tile->m_operator_tile->m_crew == NULL || m_tile->m_operator_tile->m_crew->m_tile != m_tile->m_operator_tile || m_tile->m_operator_tile->m_pierced == true || m_health <= 0)
 	{
 		return false;
 	}

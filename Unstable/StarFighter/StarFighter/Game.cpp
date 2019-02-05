@@ -76,8 +76,8 @@ Game::Game(RenderWindow& window)
 	m_dico_room_types[Room_Weapon] = "Weapon";
 	m_dico_room_types[Room_Gold] = "Gold";
 	m_dico_room_types[Room_Fishing] = "Fishing";
-	m_dico_room_types[Room_Kitchen] = "Kitchen";
-	m_dico_room_types[Room_Relic] = "Relic";
+	m_dico_room_types[Room_Diving] = "Diving";
+	m_dico_room_types[Room_Prison] = "Prison";
 	m_dico_room_types[Room_Sword] = "Sword";
 	m_dico_room_types[Room_Lifeboat] = "Lifeboat";
 	m_dico_room_types[Room_Ammo] = "Ammo";
@@ -110,8 +110,9 @@ Game::Game(RenderWindow& window)
 
 	m_dico_colors[Color_Yellow_Target] = sf::Color(255, 242, 39, 255);
 	m_dico_colors[Color_Grey_Target] = sf::Color(128, 128, 128, 255);
-	m_dico_colors[Color_Orange_Tile] = sf::Color(255, 127, 39, 255);
-	m_dico_colors[Color_Green_Tile] = sf::Color::Green;
+	m_dico_colors[Color_Orange_System] = sf::Color(255, 127, 39, 255);
+	m_dico_colors[Color_Green_System] = sf::Color::Green;
+	m_dico_colors[Color_Cyan_System] = sf::Color::Cyan;
 	m_dico_colors[Color_Blue_Flood] = sf::Color(0, 100, 170, 255);
 	m_dico_colors[Color_Blue_Pierced] = sf::Color(0, 50, 255, 255);
 }

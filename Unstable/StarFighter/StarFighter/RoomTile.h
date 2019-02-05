@@ -18,17 +18,22 @@ enum Hull
 	Hull_None,
 };
 
+enum ShipSystem
+{
+	System_None,
+	System_Weapon,
+	System_Navigation,
+	NB_SHIP_SYSTEMS,
+};
+
 class RoomTile : public GameEntity
 {
 public:
-	RoomTile(int coord_x, int coord_y, Room* room, float size, bool minimized);
+	RoomTile(int coord_x, int coord_y, Room* room, float size);
 	~RoomTile();
 
 	Room* m_room;
 	CrewMember* m_crew;
-	Weapon* m_weapon;
-	RoomTile* m_weapon_gunner;
-	RoomTile* m_weapon_tile;
 	int m_coord_x;
 	int m_coord_y;
 	RoomConnexion* m_connexion;
@@ -41,8 +46,17 @@ public:
 	int m_health;
 	int m_health_max;
 
-	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool minimized);
+	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy);
 	bool IsConnectedToRoomTile(RoomTile* tile);
+
+	//systems
+	ShipSystem m_system;
+	RoomTile* m_system_tile;
+	RoomTile* m_operator_tile;
+	Weapon* m_weapon;
+
+
+
 
 	//pathfinding
 	int m_heuristic;

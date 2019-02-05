@@ -37,38 +37,18 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 	//ROOMS
 	//left
-	Room* room = AddRoom(0, 1, 3, 4, Room_Weapon);
-	AddRoom(0, 5, 3, 4, Room_Weapon);
+	AddRoom(0, 1, 3, 4, Room_Prison);
+	AddRoom(0, 5, 3, 4, Room_Diving);
 
 	//mid
-	AddRoom(3, 0, 5, 2, Room_Navigation);
+	Room* nav_room = AddRoom(3, 0, 5, 2, Room_Navigation);
 	AddRoom(3, 2, 5, 5, Room_Crewquarter);
 	AddRoom(3, 7, 5, 2, Room_Engine);
 	AddRoom(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
 	AddRoom(8, 1, 3, 4, Room_Weapon);
-	AddRoom(8, 5, 3, 4, Room_Weapon);
-
-
-	//left
-	//AddRoom(0, 3, 4, 4, Room_Weapon);
-	//AddRoom(0, 7, 4, 6, Room_Gold);
-	//AddRoom(0, 13, 4, 6, Room_Relic);
-	//AddRoom(0, 19, 4, 3, Room_Sword);
-	//
-	////mid
-	//AddRoom(6, 0, 4, 3, Room_Weapon);
-	//AddRoom(4, 3, 8, 6, Room_Navigation);
-	//AddRoom(4, 9, 8, 10, Room_Crewquarter);
-	//AddRoom(4, 19, 8, 3, Room_Ammo);
-	//AddRoom(5, 22, 6, 3, Room_Engine);
-	//
-	////right
-	//Room* room = AddRoom(12, 3, 4, 4, Room_Weapon);
-	//Room* room2 = AddRoom(12, 7, 4, 6, Room_Fishing);
-	//AddRoom(12, 13, 4, 6, Room_Kitchen);
-	//AddRoom(12, 19, 4, 3, Room_Lifeboat);
+	Room* weapon_room = AddRoom(8, 5, 3, 4, Room_Weapon);
 
 	m_health = m_health_max;
 
@@ -81,32 +61,48 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	//hull
 	FlagHullRoomTiles();
 
+	//WEAPONS
+	//gunner tiles
+	for (int i = 0; i < 3; i++)
+	{
+		int x = i * weapon_room->m_width + weapon_room->m_width - 1;
+		weapon_room->m_tiles[x]->m_operator_tile = weapon_room->m_tiles[x - 1];
+		weapon_room->m_tiles[x - 1]->m_system_tile = weapon_room->m_tiles[x];
+
+		weapon_room->m_tiles[x]->m_operator_tile->m_system = System_Weapon;
+
+		Weapon* weapon = new Weapon(Weapon_Cannon, false);
+		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
+	}
+
+	//navigation tiles
+	for (int j = 0; j < 5; j+=2)
+	{
+		if (nav_room->m_tiles[j]->m_coord_y == nav_room->m_upcorner_y)
+		{
+			nav_room->m_tiles[j]->m_operator_tile = nav_room->m_tiles[j + nav_room->m_width];
+			nav_room->m_tiles[j + nav_room->m_width]->m_system_tile = nav_room->m_tiles[j];
+
+			nav_room->m_tiles[j]->m_operator_tile->m_system = System_Navigation;
+		}
+	}
+
 	//CREW
 	m_nb_crew_max = 0;
 	CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);
-	AddCrewMember(crew, room);
+	AddCrewMember(crew, weapon_room);
 
 	CrewMember* crew2 = new CrewMember(Crew_Pirate, m_alliance);
-	AddCrewMember(crew2, room);
+	AddCrewMember(crew2, weapon_room);
 
 	CrewMember* crew3 = new CrewMember(Crew_Pirate, m_alliance);
-	AddCrewMember(crew3, room);
+	AddCrewMember(crew3, weapon_room);
 
 	m_nb_crew = m_nb_crew_max;
 
-	//WEAPONS
-	Weapon* weapon = new Weapon(Weapon_Cannon, false);
-	AddWeapon(weapon, room, this, false);
-
-	Weapon* weapon2 = new Weapon(Weapon_Cannon, false);
-	AddWeapon(weapon2, room, this, false);
-	
-	Weapon* weapon3 = new Weapon(Weapon_Cannon, false);
-	AddWeapon(weapon3, room, this, false);
-
 	//FLOOD
-	m_tiles[0][3]->m_pierced = true;
-	m_tiles[0][3]->m_health = 0;
+	m_tiles[8][1]->m_pierced = true;
+	m_tiles[8][1]->m_health = 0;
 }
 
 Warship::~Warship()
@@ -234,9 +230,9 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 	if (tactical_combat == true)
 	{
 		m_combat_interface.Update(deltaTime);
-
-		UpdateFlooding(deltaTime, false);
 	}
+
+	UpdateFlooding(deltaTime, false);
 
 	//Crew interface
 	m_crew_interface.Update();
