@@ -62,6 +62,7 @@ public:
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
 	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy);
 	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
+	void AddSystemToTile(ShipSystem system, RoomTile* tile);
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 

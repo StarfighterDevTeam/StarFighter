@@ -311,7 +311,7 @@ void CrewMember::IteratePathFinding(RoomTile* tileA, RoomTile* tileB)
 	size_t vector_size = (*CurrentGame).m_tiles.size();
 	for (size_t i = 0; i < vector_size; i++)
 	{
-		if (Room::IsConnectedToRoomTile(tileA, (*CurrentGame).m_tiles[i]))
+		if (Room::IsConnectedToRoomTile(tileA, (*CurrentGame).m_tiles[i]) && (*CurrentGame).m_tiles[i]->m_system == NULL)//tiles that are not blocking (tile systems are blocking pathfind)
 		{
 			//tiles that are legitimate to compute	
 			if (find(m_closed_list_pathfind.begin(), m_closed_list_pathfind.end(), (*CurrentGame).m_tiles[i]) == m_closed_list_pathfind.end())//tile unknown until now
@@ -404,7 +404,7 @@ void CrewMember::IterateEnemyPathFinding(RoomTile* tileA, RoomTile* tileB)
 
 bool CrewMember::FindShortestPath(RoomTile* tileA, RoomTile* tileB)
 {
-	if (tileA == tileB)
+	if (tileA == tileB || tileB->m_system != NULL)
 	{
 		return false;
 	}

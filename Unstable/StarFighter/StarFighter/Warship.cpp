@@ -82,6 +82,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
 
 		nav_room->m_tiles[2]->m_system = System_Navigation;
+
+		AddSystemToTile(System_Navigation, nav_room->m_tiles[2]);
 	}
 
 	//CREW

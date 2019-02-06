@@ -434,6 +434,22 @@ void Ship::AddWeaponToTile(Weapon* weapon, RoomTile* tile)
 	weapon->UpdatePosition();
 }
 
+void Ship::AddSystemToTile(ShipSystem system, RoomTile* tile)
+{
+	sf::Texture* texture;
+	switch (system)
+	{
+		case System_Navigation:
+		{
+			texture = TextureLoader::getInstance()->loadTexture("2D/rudder_icon.png", 48, 48);
+			break;
+		}
+	}
+
+	tile->setAnimation(texture, 1, 1);
+	tile->setPosition(tile->m_position);
+}
+
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 {
 	//turn angle towards target (get room center as a target)
