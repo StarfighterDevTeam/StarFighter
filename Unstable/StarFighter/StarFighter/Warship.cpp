@@ -75,16 +75,13 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
 	}
 
-	//navigation tiles
-	for (int j = 0; j < 5; j+=2)
+	//navigation tile
+	if (nav_room->m_tiles[2]->m_coord_y == nav_room->m_upcorner_y)
 	{
-		if (nav_room->m_tiles[j]->m_coord_y == nav_room->m_upcorner_y)
-		{
-			nav_room->m_tiles[j]->m_operator_tile = nav_room->m_tiles[j + nav_room->m_width];
-			nav_room->m_tiles[j + nav_room->m_width]->m_system_tile = nav_room->m_tiles[j];
+		nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
+		nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
 
-			nav_room->m_tiles[j]->m_system = System_Navigation;
-		}
+		nav_room->m_tiles[2]->m_system = System_Navigation;
 	}
 
 	//CREW

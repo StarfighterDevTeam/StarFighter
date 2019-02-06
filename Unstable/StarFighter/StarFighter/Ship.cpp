@@ -800,7 +800,7 @@ float Ship::GetDodgeChances()
 			{
 				if (IsSystemOperational(System_Navigation, *it2))
 				{
-					dodge += NAVIGATION_DODGE_CHANCE;
+					dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it2)->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
 				}
 			}
 		}
