@@ -35,8 +35,8 @@ public:
 	sf::Text m_pause_text;
 
 	void InitWaterZones();
-
 	bool UpdateTacticalScale();
+	void UpdateRoomTileFeedback(RoomTile* tile);
 
 private:
 	sf::RenderWindow* mainWindow;

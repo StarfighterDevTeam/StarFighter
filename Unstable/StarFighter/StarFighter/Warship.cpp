@@ -93,20 +93,14 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	
 	//CREW
 	m_nb_crew_max = 0;
-	CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);
-	AddCrewMember(crew, weapon_room);
 
-	CrewMember* crew2 = new CrewMember(Crew_Pirate, m_alliance);
-	AddCrewMember(crew2, weapon_room);
-
-	CrewMember* crew3 = new CrewMember(Crew_Pirate, m_alliance);
-	AddCrewMember(crew3, weapon_room);
+	for (int i = 0; i < 6; i++)
+	{
+		CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);
+		AddCrewMember(crew, weapon_room);
+	}
 
 	m_nb_crew = m_nb_crew_max;
-
-	//FLOOD
-	//m_tiles[8][1]->m_pierced = true;
-	//m_tiles[8][1]->m_health = 0;
 }
 
 Warship::~Warship()

@@ -94,7 +94,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		int flood = 0;
 
 		m_warship->UpdateCrewMembersCountPerRoom(*it);
-		//(*it)->Update(deltaTime);
 		(*it)->UpdatePosition();
 
 		//Room tiles
@@ -105,47 +104,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				flood++;
 			}
 
-			(*it2)->m_shape_container.setFillColor(sf::Color::Black);
-
-			if ((*it2)->m_pierced == true)
-			{
-				(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
-			}
-			else if ((*it2)->m_flood > 0)
-			{
-				(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
-			}
-
-			if ((*it2)->m_system_tile != NULL)
-			{
-				if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
-				{
-					if ((*it2)->m_system_tile->m_weapon == NULL || (*it2)->m_system_tile->m_weapon->m_health > 0)
-					{
-						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);
-					}
-				}
-				else
-				{
-					switch ((*it2)->m_system_tile->m_system)
-					{
-						case System_Weapon:
-						{
-							if ((*it2)->m_system_tile->m_weapon != NULL && (*it2)->m_system_tile->m_weapon->m_health > 0)
-							{
-								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
-							}
-							break;
-						}
-						case System_Navigation:
-						case System_Engine:
-						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
-							break;
-						}
-					}
-				}
-			}
+			UpdateRoomTileFeedback(*it2);
 
 			//crew move order (hover tile) feedback
 			if (selection != NULL && selection->m_UI_type == UI_CrewMember)
@@ -201,53 +160,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					flood++;
 				}
 
-				if (room_hovered == true)
-				{
-					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
-				}
-				else
-				{
-					(*it2)->m_shape_container.setFillColor(sf::Color::Black);
-
-					if ((*it2)->m_pierced == true)
-					{
-						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
-					}
-					else if ((*it2)->m_flood > 0)
-					{
-						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
-					}
-					else if ((*it2)->m_system_tile != NULL)//position of a weapon gunner?
-					{
-						if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
-						{
-							if ((*it2)->m_system_tile->m_weapon == NULL || (*it2)->m_system_tile->m_weapon->m_health > 0)
-							{
-								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);//occupied by a crew
-							}
-						}
-						else
-						{
-							switch ((*it2)->m_system_tile->m_system)
-							{
-								case System_Weapon:
-								{
-									if ((*it2)->m_system_tile->m_weapon != NULL && (*it2)->m_system_tile->m_weapon->m_health > 0)
-									{
-										(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
-									}
-									break;
-								}
-								case System_Navigation:
-								case System_Engine:
-								{
-									(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
-									break;
-								}
-							}
-						}
-					}
-				}
+				UpdateRoomTileFeedback(*it2);
 			}
 
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
@@ -356,15 +269,18 @@ void Gameloop::Update(sf::Time deltaTime)
 							}
 						}
 
-						//Weapon to fire
-						if (destination == NULL && ((*it)->m_tile->m_system_tile != NULL && (*it)->m_tile->m_crew == *it) == false)//not already busy as a weapon gunner?
+						//Systems to use
+						if (destination == NULL && ((*it)->m_tile->m_system_tile != NULL && (*it)->m_tile->m_crew == *it) == false)
 						{
 							for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
 							{
-								if ((*it2)->m_operator_tile != NULL && (*it2)->m_operator_tile->m_crew == NULL && (*it2)->m_weapon != NULL && (*it2)->m_weapon->m_health > 0)
+								if ((*it2)->m_operator_tile != NULL && (*it2)->m_operator_tile->m_crew == NULL)
 								{
-									destination = (*it2)->m_operator_tile;
-									break;
+									if ((*it2)->m_weapon == NULL || (*it2)->m_weapon->m_health > 0)
+									{
+										destination = (*it2)->m_operator_tile;
+										break;
+									}
 								}
 							}
 						}
@@ -910,7 +826,7 @@ bool Gameloop::UpdateTacticalScale()
 	if (m_scale == Scale_Tactical)
 	{
 		//win conditions
-		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.9f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3)
+		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3)
 		{
 			//delete enemy from ships existing
 			vector<Ship*> old_ships;
@@ -1091,4 +1007,67 @@ bool Gameloop::UpdateTacticalScale()
 	}
 
 	return (m_scale == Scale_Tactical);
+}
+
+void Gameloop::UpdateRoomTileFeedback(RoomTile* tile)
+{
+	tile->m_shape_container.setFillColor(sf::Color::Black);
+
+	if (tile->m_pierced == true)
+	{
+		tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
+	}
+	else if (tile->m_flood > 0)
+	{
+		tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
+	}
+
+	if (tile->m_system_tile != NULL)
+	{
+		if (tile->m_crew != NULL && tile->m_crew->m_tile == tile)
+		{
+			if (tile->m_system_tile->m_weapon == NULL || tile->m_system_tile->m_weapon->m_health > 0)
+			{
+				tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);
+			}
+		}
+		else
+		{
+			switch (tile->m_system_tile->m_system)
+			{
+			case System_Weapon:
+			{
+				if (tile->m_system_tile->m_weapon != NULL && tile->m_system_tile->m_weapon->m_health > 0)
+				{
+					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+				}
+				break;
+			}
+			case System_Navigation:
+			case System_Engine:
+			{
+				tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
+				break;
+			}
+			}
+		}
+	}
+
+	//systems animations
+	if (tile->m_system == System_Engine)
+	{
+		if (Ship::IsSystemOperational(System_Engine, tile) == true)
+		{
+			if (tile->m_rotation_speed < ENGINE_ROTATION_SPEED)
+			{
+				tile->m_rotation_speed++;
+			}
+		}
+		else if (tile->m_rotation_speed > 0)
+		{
+			tile->m_rotation_speed--;
+		}
+
+		tile->rotate((float)tile->m_rotation_speed);
+	}
 }

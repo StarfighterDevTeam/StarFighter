@@ -79,6 +79,8 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ENGINE_DODGE_CHANCE					0.05f
 #define DODGE_CHANCE_HARDCAP				0.75f
 
+#define ENGINE_ROTATION_SPEED				10
+
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME				50
 #define DEFAULT_SFX_VOLUME					100
