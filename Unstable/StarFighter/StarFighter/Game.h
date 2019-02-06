@@ -62,7 +62,7 @@ enum CrewSkills
 	Skill_Fishing,
 	Skill_Melee,
 	Skill_Navigation,
-	Skill_Cooking,
+	Skill_Engine,
 	NB_CREW_SKILLS,
 };
 

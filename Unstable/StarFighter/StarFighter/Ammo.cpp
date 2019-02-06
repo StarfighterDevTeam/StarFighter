@@ -2,15 +2,17 @@
 
 extern Game* CurrentGame;
 
-Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile) : GameEntity(UI_None)
+Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile, sf::Vector2f target_position) : GameEntity(UI_None)
 {
 	m_type = type;
 	m_angle = angle;
 	setRotation(angle);
 	m_distance_combat = distance_combat;
 	m_target_tile = target_tile;
+	m_target_position = target_position;
 	m_phase = Shoot_Ougoing;
-	m_FX_hit = new FX();
+	m_FX_hit = new FX(FX_Explosion);
+	m_FX_miss = new FX(FX_Splash);
 	m_target_ship = target_ship;
 
 	m_damage = CANNONBALL_DAMAGE;
@@ -37,6 +39,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 Ammo::~Ammo()
 {
 	delete m_FX_hit;
+	delete m_FX_miss;
 }
 
 void Ammo::Update(Time deltaTime)
@@ -46,16 +49,26 @@ void Ammo::Update(Time deltaTime)
 	m_position.y += m_speed.y * deltaTime.asSeconds();
 
 	//hitting target
-	if (abs(m_position.x - m_target_tile->m_position.x) < 16.f && abs(m_position.y - m_target_tile->m_position.y) < 16.f)
+	if (abs(m_position.x - m_target_position.x) < 16.f && abs(m_position.y - m_target_position.y) < 16.f)
 	{
 		//"boom"
 		m_can_be_seen = false;
-		FX* FX_hit = m_FX_hit->Clone();
-		FX_hit->m_position = m_target_tile->m_position;
-		FX_hit->UpdatePosition();
-		(*CurrentGame).m_FX.push_back(FX_hit);
-
-		m_phase = Shoot_Hit;
+		
+		if (m_target_tile != NULL)
+		{
+			FX* FX_hit = m_FX_hit->Clone();
+			FX_hit->m_position = m_target_position;
+			FX_hit->UpdatePosition();
+			(*CurrentGame).m_FX.push_back(FX_hit);
+			m_phase = Shoot_Hit;
+		}
+		else
+		{
+			FX* FX_miss = m_FX_miss->Clone();
+			FX_miss->m_position = m_target_position;
+			FX_miss->UpdatePosition();
+			(*CurrentGame).m_FX.push_back(FX_miss);
+		}
 	}
 
 	GameEntity::Update(deltaTime);

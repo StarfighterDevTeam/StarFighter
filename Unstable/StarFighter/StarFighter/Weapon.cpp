@@ -148,16 +148,14 @@ RoomTile* Weapon::GetFreeRoomTile(Room* room)
 	return NULL;
 }
 
-bool Weapon::Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile)
+void Weapon::Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile, sf::Vector2f target_position)
 {
 	//reset rate of fire cooldown
 	m_rof_timer = GetRof();
 
 	//Fire from room tile
-	Ammo* new_ammo = new Ammo(m_ammo_type, m_position, angle, distance_combat, target_ship, target_tile);
+	Ammo* new_ammo = new Ammo(m_ammo_type, m_position, angle, distance_combat, target_ship, target_tile, target_position);
 	(*CurrentGame).m_bullets.push_back(new_ammo);
-
-	return true;
 }
 
 RoomTile* Weapon::GetFreeWeaponTile(Room* room, bool is_enemy)

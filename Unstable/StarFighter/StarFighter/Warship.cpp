@@ -43,7 +43,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	//mid
 	Room* nav_room = AddRoom(3, 0, 5, 2, Room_Navigation);
 	AddRoom(3, 2, 5, 5, Room_Crewquarter);
-	AddRoom(3, 7, 5, 2, Room_Engine);
+	Room* engine_room = AddRoom(3, 7, 5, 2, Room_Engine);
 	AddRoom(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
@@ -76,16 +76,21 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	}
 
 	//navigation tile
-	if (nav_room->m_tiles[2]->m_coord_y == nav_room->m_upcorner_y)
+	nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
+	nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
+	nav_room->m_tiles[2]->m_system = System_Navigation;
+	AddSystemToTile(System_Navigation, nav_room->m_tiles[2]);
+	
+	//engine tiles
+	for (int i = 0; i < 2; i++)
 	{
-		nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
-		nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
-
-		nav_room->m_tiles[2]->m_system = System_Navigation;
-
-		AddSystemToTile(System_Navigation, nav_room->m_tiles[2]);
+		i *= engine_room->m_width - 1;
+		engine_room->m_tiles[i + engine_room->m_width]->m_operator_tile = engine_room->m_tiles[i];
+		engine_room->m_tiles[i]->m_system_tile = engine_room->m_tiles[i + engine_room->m_width];
+		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
+		AddSystemToTile(System_Engine, engine_room->m_tiles[i + engine_room->m_width]);
 	}
-
+	
 	//CREW
 	m_nb_crew_max = 0;
 	CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);

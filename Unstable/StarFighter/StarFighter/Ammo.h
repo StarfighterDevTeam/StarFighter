@@ -29,13 +29,14 @@ enum AmmoType
 class Ammo : public GameEntity
 {
 public:
-	Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
+	Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile, sf::Vector2f target_position);
 	~Ammo();
 
 	AmmoType m_type;
 	ShootPhase m_phase;
 
 	Ship* m_target_ship;
+	sf::Vector2f m_target_position;
 	RoomTile* m_target_tile;
 	float m_angle;
 	sf::Vector2f m_speed;
@@ -43,6 +44,7 @@ public:
 	float m_distance_combat;
 	float m_warp_timer;
 	FX* m_FX_hit;
+	FX* m_FX_miss;
 
 	int m_damage;
 	float m_radius;

@@ -23,6 +23,7 @@ enum ShipSystem
 	System_None,
 	System_Weapon,
 	System_Navigation,
+	System_Engine,
 	NB_SHIP_SYSTEMS,
 };
 

@@ -444,6 +444,11 @@ void Ship::AddSystemToTile(ShipSystem system, RoomTile* tile)
 			texture = TextureLoader::getInstance()->loadTexture("2D/rudder_icon.png", 48, 48);
 			break;
 		}
+		case System_Engine:
+		{
+			texture = TextureLoader::getInstance()->loadTexture("2D/engine_icon.png", 48, 48);
+			break;
+		}
 	}
 
 	tile->setAnimation(texture, 1, 1);
@@ -493,9 +498,10 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 	}
 
 	float hit_success = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f));
+	bool hit = true;
 	if (hit_success < target->GetDodgeChances())//chance of miss
 	{
-		return false;//todo: shot missing target
+		hit = false;
 	}
 
 	//pick a random enemy tile within the targeted room
@@ -506,7 +512,10 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 	GetAngleForVector(vec2, angle2);
 	//weapon->setRotation(angle2 - weapon->m_angle);
 
-	return weapon->Fire(angle2, target->m_distance_combat, target, target_tile);
+	sf::Vector2f target_position = hit == true ? target_tile->m_position : (weapon->m_position + target_tile->m_position) * 0.5f;
+
+	weapon->Fire(angle2, target->m_distance_combat, target, hit == true ? target_tile : NULL, target_position);
+	return true;
 }
 
 void Ship::BuildShip()
@@ -518,9 +527,9 @@ void Ship::BuildShip()
 	AddRoom(0, 5, 3, 4, Room_Weapon);
 
 	//mid
-	AddRoom(3, 0, 5, 2, Room_Navigation);
+	Room* nav_room = AddRoom(3, 0, 5, 2, Room_Navigation);
 	AddRoom(3, 2, 5, 5, Room_Crewquarter);
-	AddRoom(3, 7, 5, 2, Room_Engine);
+	Room* engine_room = AddRoom(3, 7, 5, 2, Room_Engine);
 	AddRoom(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
@@ -552,6 +561,27 @@ void Ship::BuildShip()
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
 		weapon->setAnimationLine(1);//horizontal mirroring
 		weapon->m_angle = 270.f;
+	}
+
+	//navigation tile
+	if (nav_room->m_tiles[2]->m_coord_y == nav_room->m_upcorner_y)
+	{
+		nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
+		nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
+
+		nav_room->m_tiles[2]->m_system = System_Navigation;
+
+		AddSystemToTile(System_Navigation, nav_room->m_tiles[2]);
+	}
+
+	//engine tiles
+	for (int i = 0; i < 2; i++)
+	{
+		i *= engine_room->m_width - 1;
+		engine_room->m_tiles[i + engine_room->m_width]->m_operator_tile = engine_room->m_tiles[i];
+		engine_room->m_tiles[i]->m_system_tile = engine_room->m_tiles[i + engine_room->m_width];
+		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
+		AddSystemToTile(System_Engine, engine_room->m_tiles[i + engine_room->m_width]);
 	}
 
 	//crew
@@ -817,6 +847,16 @@ float Ship::GetDodgeChances()
 				if (IsSystemOperational(System_Navigation, *it2))
 				{
 					dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it2)->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
+				}
+			}
+		}
+		else if ((*it)->m_type == Room_Engine)
+		{
+			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			{
+				if (IsSystemOperational(System_Engine, *it2))
+				{
+					dodge += ENGINE_DODGE_CHANCE;
 				}
 			}
 		}

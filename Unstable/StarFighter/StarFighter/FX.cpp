@@ -2,11 +2,27 @@
 
 extern Game* CurrentGame;
 
-FX::FX() : GameEntity(UI_None)
+FX::FX(FX_Type type) : GameEntity(UI_None)
 {
-	m_texturename = "2D/FX_explosion.png";
-	Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, 1600, 295);
-	setAnimation(texture, 4, 1);
+	m_type = type;
+
+	switch (type)
+	{
+		case FX_Explosion:
+		{
+			m_texturename = "2D/FX_explosion.png";
+			Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, 1600, 295);
+			setAnimation(texture, 4, 1);
+			break;
+		}
+		case FX_Splash:
+		{
+			m_texturename = "2D/FX_splash.png";
+			Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, 1360, 51);
+			setAnimation(texture, 10, 1);
+			break;
+		}
+	}
 
 	m_FX_timer = TIME_BETWEEN_ANIMATION_FRAMES * m_frameNumber;
 	m_can_be_seen = true;
@@ -14,7 +30,7 @@ FX::FX() : GameEntity(UI_None)
 
 FX* FX::Clone()
 {
-	FX* new_FX = new FX();
+	FX* new_FX = new FX(m_type);
 	new_FX->m_texturename = m_texturename;
 	Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, m_size.x, m_size.y);
 	new_FX->setAnimation(texture, m_frameNumber, m_animationNumber);

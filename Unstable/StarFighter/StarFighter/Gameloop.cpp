@@ -138,6 +138,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							break;
 						}
 						case System_Navigation:
+						case System_Engine:
 						{
 							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
 							break;
@@ -238,6 +239,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									break;
 								}
 								case System_Navigation:
+								case System_Engine:
 								{
 									(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
 									break;

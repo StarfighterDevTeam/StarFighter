@@ -255,7 +255,7 @@ void CrewMember::Update(Time deltaTime)
 	}
 
 	//healing in Crew quarter
-	if (m_tile->m_room->m_type == Room_Crewquarter && m_healing_timer <= 0)
+	if (m_tile->m_room->m_type == Room_Crewquarter && m_healing_timer <= 0 && m_health < m_health_max)
 	{
 		m_healing_timer = HEALING_TIMER;
 

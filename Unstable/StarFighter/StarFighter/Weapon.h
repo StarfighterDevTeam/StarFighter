@@ -42,7 +42,7 @@ public:
 	float GetRof();
 	bool CanFire();
 
-	bool Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile);
+	void Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile, sf::Vector2f target_position);
 
 	RoomTile* GetFreeRoomTile(Room* room);
 	RoomTile* GetFreeWeaponTile(Room* room, bool is_enemy);

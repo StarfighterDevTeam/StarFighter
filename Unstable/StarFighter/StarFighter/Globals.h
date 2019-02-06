@@ -76,6 +76,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define AI_CHANGE_TARGETROOM_PERCENTAGE		0.15f
 
 #define NAVIGATION_DODGE_CHANCE				0.1f
+#define ENGINE_DODGE_CHANCE					0.05f
 #define DODGE_CHANCE_HARDCAP				0.75f
 
 //MUSIC
