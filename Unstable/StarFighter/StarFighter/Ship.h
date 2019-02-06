@@ -74,6 +74,10 @@ public:
 	void RestoreHealth();
 	void RestoreWeaponsHealth();
 
+	//systems
+	static bool IsSystemOperational(ShipSystem system, RoomTile* tile);
+	float GetDodgeChances();
+
 private:
 	int m_rooms_min_upcorner_x;
 	int m_rooms_min_upcorner_y;

@@ -47,16 +47,12 @@ public:
 	int m_health_max;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy);
-	bool IsConnectedToRoomTile(RoomTile* tile);
 
 	//systems
 	ShipSystem m_system;
 	RoomTile* m_system_tile;
 	RoomTile* m_operator_tile;
 	Weapon* m_weapon;
-
-
-
 
 	//pathfinding
 	int m_heuristic;

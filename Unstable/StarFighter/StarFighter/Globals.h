@@ -75,6 +75,9 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 
 #define AI_CHANGE_TARGETROOM_PERCENTAGE		0.15f
 
+#define NAVIGATION_DODGE_CHANCE				0.1f
+#define DODGE_CHANCE_HARDCAP				0.75f
+
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME				50
 #define DEFAULT_SFX_VOLUME					100
@@ -110,6 +113,8 @@ void Bound(float& value, sf::Vector2f min_max_values);
 void Bound(int& value, sf::Vector2i min_max_values);
 int Min(int a, int b);
 int Max(int a, int b);
+float Minf(float a, float b);
+float Maxf(float a, float b);
 float Lerp(float value, float input_min, float input_max, float output_min, float output_max);
 float CosInterpolation(float value, float input_min, float input_max, float output_min, float output_max);
 sf::Color GrayScaleColor(sf::Color input_color, float ratio);

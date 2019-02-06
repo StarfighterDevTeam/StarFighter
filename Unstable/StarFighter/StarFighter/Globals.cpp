@@ -118,6 +118,16 @@ int Max(int a, int b)
 	return a > b ? a : b;
 }
 
+float Minf(float a, float b)
+{
+	return a <= b ? a : b;
+}
+
+float Maxf(float a, float b)
+{
+	return a > b ? a : b;
+}
+
 void Bound(float& value, sf::Vector2f min_max_values)
 {
 	if (value < min_max_values.x)

@@ -120,15 +120,21 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 				{
-					(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);
+					if ((*it2)->m_system_tile->m_weapon == NULL || (*it2)->m_system_tile->m_weapon->m_health > 0)
+					{
+						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);
+					}
 				}
 				else
 				{
-					switch ((*it2)->m_system)
+					switch ((*it2)->m_system_tile->m_system)
 					{
 						case System_Weapon:
 						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+							if ((*it2)->m_system_tile->m_weapon != NULL && (*it2)->m_system_tile->m_weapon->m_health > 0)
+							{
+								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+							}
 							break;
 						}
 						case System_Navigation:
@@ -214,15 +220,21 @@ void Gameloop::Update(sf::Time deltaTime)
 					{
 						if ((*it2)->m_crew != NULL && (*it2)->m_crew->m_tile == *it2)
 						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);//occupied by a crew
+							if ((*it2)->m_system_tile->m_weapon == NULL || (*it2)->m_system_tile->m_weapon->m_health > 0)
+							{
+								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Green_System]);//occupied by a crew
+							}
 						}
 						else
 						{
-							switch ((*it2)->m_system)
+							switch ((*it2)->m_system_tile->m_system)
 							{
 								case System_Weapon:
 								{
-									(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+									if ((*it2)->m_system_tile->m_weapon != NULL && (*it2)->m_system_tile->m_weapon->m_health > 0)
+									{
+										(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+									}
 									break;
 								}
 								case System_Navigation:

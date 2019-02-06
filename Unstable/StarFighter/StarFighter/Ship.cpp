@@ -476,9 +476,10 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 		return false;
 	}
 
-	if (0)//chance of miss
+	float hit_success = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f));
+	if (hit_success < target->GetDodgeChances())//chance of miss
 	{
-		return false;
+		return false;//todo: shot missing target
 	}
 
 	//pick a random enemy tile within the targeted room
@@ -529,7 +530,7 @@ void Ship::BuildShip()
 		weapon_room->m_tiles[x]->m_operator_tile = weapon_room->m_tiles[x + 1];
 		weapon_room->m_tiles[x + 1]->m_system_tile = weapon_room->m_tiles[x];
 
-		weapon_room->m_tiles[x]->m_operator_tile->m_system = System_Weapon;
+		weapon_room->m_tiles[x]->m_system = System_Weapon;
 
 		Weapon* weapon = new Weapon(Weapon_Cannon, false);
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
@@ -777,4 +778,35 @@ void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
 			m_flood++;
 		}
 	}
+}
+
+bool Ship::IsSystemOperational(ShipSystem system, RoomTile* tile)
+{
+	bool is_system = tile->m_system == system;
+	bool is_operational = tile->m_operator_tile != NULL && tile->m_operator_tile->m_crew != NULL && tile->m_operator_tile->m_crew->m_tile == tile->m_operator_tile;
+	bool is_weapon_alive = tile->m_weapon == NULL || tile->m_weapon->m_health > 0;
+
+	return is_system && is_operational && is_weapon_alive;
+}
+
+float Ship::GetDodgeChances()
+{
+	float dodge = 0.f;
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		if ((*it)->m_type == Room_Navigation)
+		{
+			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			{
+				if (IsSystemOperational(System_Navigation, *it2))
+				{
+					dodge += NAVIGATION_DODGE_CHANCE;
+				}
+			}
+		}
+	}
+
+	Minf(dodge, DODGE_CHANCE_HARDCAP);
+
+	return dodge;
 }

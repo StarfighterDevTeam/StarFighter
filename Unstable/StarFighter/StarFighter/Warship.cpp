@@ -69,7 +69,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		weapon_room->m_tiles[x]->m_operator_tile = weapon_room->m_tiles[x - 1];
 		weapon_room->m_tiles[x - 1]->m_system_tile = weapon_room->m_tiles[x];
 
-		weapon_room->m_tiles[x]->m_operator_tile->m_system = System_Weapon;
+		weapon_room->m_tiles[x]->m_system = System_Weapon;
 
 		Weapon* weapon = new Weapon(Weapon_Cannon, false);
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
@@ -83,7 +83,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 			nav_room->m_tiles[j]->m_operator_tile = nav_room->m_tiles[j + nav_room->m_width];
 			nav_room->m_tiles[j + nav_room->m_width]->m_system_tile = nav_room->m_tiles[j];
 
-			nav_room->m_tiles[j]->m_operator_tile->m_system = System_Navigation;
+			nav_room->m_tiles[j]->m_system = System_Navigation;
 		}
 	}
 
@@ -101,8 +101,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_nb_crew = m_nb_crew_max;
 
 	//FLOOD
-	m_tiles[8][1]->m_pierced = true;
-	m_tiles[8][1]->m_health = 0;
+	//m_tiles[8][1]->m_pierced = true;
+	//m_tiles[8][1]->m_health = 0;
 }
 
 Warship::~Warship()
