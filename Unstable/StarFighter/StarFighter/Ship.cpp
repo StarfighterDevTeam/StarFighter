@@ -497,7 +497,7 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 		return false;
 	}
 
-	float hit_success = RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f));
+	float hit_success = RandomizeFloatBetweenValues(0.f, 1.f);
 	bool hit = true;
 	if (hit_success < target->GetDodgeChances())//chance of miss
 	{

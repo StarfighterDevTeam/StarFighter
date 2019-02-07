@@ -79,7 +79,12 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define ENGINE_DODGE_CHANCE					0.05f
 #define DODGE_CHANCE_HARDCAP				0.75f
 
-#define ENGINE_ROTATION_SPEED				10
+#define ENGINE_ROTATION_SPEED				10.f
+
+#define RUDDER_ROTATION_TIMER_MIN			2.f
+#define RUDDER_ROTATION_TIMER_MAX			7.f
+#define RUDDER_ROTATION_SPEED_MIN			0.1f
+#define RUDDER_ROTATION_SPEED_MAX			0.4f
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME				50
@@ -110,7 +115,7 @@ float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);
 float ProrataBetweenThreshold(float m_value, sf::Vector2f min_max_threshold);
 int RandomizeIntBetweenValues(int min_value, int max_value);
 int RandomizeIntBetweenFloats(sf::Vector2f min_max_values);
-float RandomizeFloatBetweenValues(sf::Vector2f min_max_values);
+float RandomizeFloatBetweenValues(float min, float max);
 int RandomizeSign();
 void Bound(float& value, sf::Vector2f min_max_values);
 void Bound(int& value, sf::Vector2i min_max_values);

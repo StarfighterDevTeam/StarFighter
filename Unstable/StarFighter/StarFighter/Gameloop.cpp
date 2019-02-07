@@ -104,7 +104,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				flood++;
 			}
 
-			UpdateRoomTileFeedback(*it2);
+			UpdateRoomTileFeedback(*it2, deltaTime);
 
 			//crew move order (hover tile) feedback
 			if (selection != NULL && selection->m_UI_type == UI_CrewMember)
@@ -160,7 +160,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					flood++;
 				}
 
-				UpdateRoomTileFeedback(*it2);
+				UpdateRoomTileFeedback(*it2, deltaTime);
 			}
 
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
@@ -354,7 +354,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->CanFire() == true)
 			{
 				//randomly change target sometimes
-				if ((*it)->m_target_room == NULL || ((*it)->m_rof_timer <= 0 && RandomizeFloatBetweenValues(sf::Vector2f(0.f, 1.f)) < AI_CHANGE_TARGETROOM_PERCENTAGE))
+				if ((*it)->m_target_room == NULL || ((*it)->m_rof_timer <= 0 && RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE))
 				{
 					int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
 					(*it)->m_target_room = m_warship->m_rooms[r];
@@ -1009,7 +1009,7 @@ bool Gameloop::UpdateTacticalScale()
 	return (m_scale == Scale_Tactical);
 }
 
-void Gameloop::UpdateRoomTileFeedback(RoomTile* tile)
+void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime)
 {
 	tile->m_shape_container.setFillColor(sf::Color::Black);
 
@@ -1035,39 +1035,68 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile)
 		{
 			switch (tile->m_system_tile->m_system)
 			{
-			case System_Weapon:
-			{
-				if (tile->m_system_tile->m_weapon != NULL && tile->m_system_tile->m_weapon->m_health > 0)
+				case System_Weapon:
 				{
-					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+					if (tile->m_system_tile->m_weapon != NULL && tile->m_system_tile->m_weapon->m_health > 0)
+					{
+						tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Orange_System]);
+					}
+					break;
 				}
-				break;
-			}
-			case System_Navigation:
-			case System_Engine:
-			{
-				tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
-				break;
-			}
+				case System_Navigation:
+				case System_Engine:
+				{
+					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
+					break;
+				}
 			}
 		}
 	}
 
 	//systems animations
-	if (tile->m_system == System_Engine)
+	switch (tile->m_system)
 	{
-		if (Ship::IsSystemOperational(System_Engine, tile) == true)
+		case System_Navigation:
 		{
-			if (tile->m_rotation_speed < ENGINE_ROTATION_SPEED)
+			if (tile->m_rotation_timer > 0)
 			{
-				tile->m_rotation_speed++;
+				tile->m_rotation_timer -= deltaTime.asSeconds();
 			}
-		}
-		else if (tile->m_rotation_speed > 0)
-		{
-			tile->m_rotation_speed--;
-		}
 
-		tile->rotate((float)tile->m_rotation_speed);
+			if (Ship::IsSystemOperational(System_Navigation, tile) == true)
+			{
+				if (tile->m_rotation_timer <= 0.f)
+				{
+					tile->m_rotation_timer = RandomizeFloatBetweenValues(RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX);
+					int sign = tile->m_rotation_speed > 0 ? 1 : -1;
+					tile->m_rotation_speed = Lerp(tile->m_rotation_timer, RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX, RUDDER_ROTATION_SPEED_MAX, RUDDER_ROTATION_SPEED_MIN) * (-sign);
+				}
+			}
+			else 
+			{
+				tile->m_rotation_speed = 0.f;
+				tile->m_rotation_timer = 0.f;
+			}
+
+			tile->rotate((float)tile->m_rotation_speed);
+			break;
+		}
+		case System_Engine:
+		{
+			if (Ship::IsSystemOperational(System_Engine, tile) == true)
+			{
+				if (tile->m_rotation_speed < ENGINE_ROTATION_SPEED)
+				{
+					tile->m_rotation_speed++;
+				}
+			}
+			else if (tile->m_rotation_speed > 0.f)
+			{
+				tile->m_rotation_speed--;
+			}
+
+			tile->rotate(tile->m_rotation_speed);
+			break;
+		}
 	}
 }

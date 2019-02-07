@@ -46,7 +46,8 @@ public:
 	float m_evaporation_timer;
 	int m_health;
 	int m_health_max;
-	int m_rotation_speed;
+	float m_rotation_speed;
+	float m_rotation_timer;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy);
 

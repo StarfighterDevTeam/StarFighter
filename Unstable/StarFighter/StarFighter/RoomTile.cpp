@@ -14,7 +14,8 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 	m_pierced = false;
 	m_flood = 0;
 	m_flooding_timer = 0.f;
-	m_rotation_speed = 0.f;//for rotor blades
+	m_rotation_speed = 0.f;
+	m_rotation_timer = 0.f;
 	for (int i = 0; i < 4; i++)
 	{
 		m_flood_dir[i] = false;

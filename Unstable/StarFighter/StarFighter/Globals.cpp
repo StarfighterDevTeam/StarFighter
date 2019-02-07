@@ -85,11 +85,11 @@ int RandomizeIntBetweenFloats(sf::Vector2f min_max_values)
 	return random_value;
 }
 
-float RandomizeFloatBetweenValues(sf::Vector2f min_max_values)
+float RandomizeFloatBetweenValues(float min, float max)
 {
 	float random_value = (float) ((double) rand() / RAND_MAX);
-	random_value *= (min_max_values.y - min_max_values.x);
-	random_value += min_max_values.x;
+	random_value *= (max - min);
+	random_value += min;
 
 	return random_value;
 }
