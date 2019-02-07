@@ -131,7 +131,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	if (m_tactical_ship != NULL)
 	{
 		//Rooms
-		bool one_room_hovered = false;
+		Room* room_hovered = NULL;
 		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
 		{
 			int flood = 0;
@@ -139,11 +139,9 @@ void Gameloop::Update(sf::Time deltaTime)
 			(*it)->UpdatePosition();
 
 			//weapon selected? highlight targeted room
-			bool room_hovered = false;
 			if (selection != NULL && selection->m_UI_type == UI_Weapon && (*it)->IsHoveredByMouse() == true)
 			{
-				room_hovered = true;
-				one_room_hovered = true;
+				room_hovered = *it;
 
 				if (mouse_click == Mouse_RightClick)
 				{
@@ -166,24 +164,25 @@ void Gameloop::Update(sf::Time deltaTime)
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
 		}
 
-		//by default, if no room is highlighted, we highlight the current targeted room. Else, we keep the current targeted room highlighted in grey while hovering other rooms in yellow
+		//highlighting in Yellow the room hovered while selectin one of our weapons. Highlighting in Grey the room currently targeted, if any (and if not hovered).
 		if (selection != NULL && selection->m_UI_type == UI_Weapon)
 		{
 			Weapon* weapon = (Weapon*)selection;
-			if (weapon->m_target_room != NULL)
+			if (weapon->m_ship->m_alliance == Alliance_Player)
 			{
-				if (one_room_hovered == false)
-				{
-					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
-					{
-						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
-					}
-				}
-				else if (weapon->m_target_room->IsHoveredByMouse() == false)
+				if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
 				{
 					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
 					{
 						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Target]);
+					}
+				}
+
+				if (room_hovered != NULL)
+				{
+					for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
+					{
+						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
 					}
 				}
 			}
