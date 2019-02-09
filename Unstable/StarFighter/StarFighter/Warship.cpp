@@ -12,6 +12,10 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_position.x = WATERTILE_OFFSET_X - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 	m_position.y = WATERTILE_OFFSET_Y - WATERTILE_SIZE * (0.5f - NB_WATERTILE_VIEW_RANGE - 1);
 
+	m_flee_timer = 0.f;
+	m_flee_count = 0.f;
+	m_is_fleeing = true;
+
 	//shape for water tiles
 	m_textureName = "2D/warship_icon.png";
 	TextureLoader *loader;
@@ -227,10 +231,13 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 	//Combat interface
 	if (tactical_combat == true)
 	{
+		UpdateFleeingBar(deltaTime);
+
+		//UI combat
 		m_combat_interface.Update(deltaTime);
 	}
 
-	UpdateFlooding(deltaTime, false);
+	UpdateFlooding(deltaTime);
 
 	//Crew interface
 	m_crew_interface.Update();

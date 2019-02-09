@@ -19,6 +19,9 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display
 	m_health_max = 0;
 	m_flood_max = 0;
 	m_flood = 0;
+	m_flee_timer = 0.f;
+	m_flee_count = 0.f;
+	m_is_fleeing = false;
 
 	//get on tile
 	SetDMSCoord(coord);
@@ -102,7 +105,13 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat)
 	UpdatePosition(warship_DMS);
 	UpdateAnimation();
 
-	UpdateFlooding(deltaTime, true);
+	UpdateFlooding(deltaTime);
+
+	m_is_fleeing = true;
+	if (m_is_fleeing == true)
+	{
+		UpdateFleeingBar(deltaTime);
+	}
 }
 
 void Ship::UpdateAnimation()
@@ -402,20 +411,6 @@ Room* Ship::ConnectRooms()
 	return unconnected_room;
 }
 
-Weapon* Ship::AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy)
-{
-	RoomTile* tile = weapon->GetFreeWeaponTile(room, is_enemy);
-
-	if (tile == NULL)
-	{
-		return NULL;
-	}
-
-	AddWeaponToTile(weapon, tile);
-
-	return weapon;
-}
-
 void Ship::AddWeaponToTile(Weapon* weapon, RoomTile* tile)
 {
 	//position
@@ -436,6 +431,8 @@ void Ship::AddWeaponToTile(Weapon* weapon, RoomTile* tile)
 
 void Ship::AddSystemToTile(ShipSystem system, RoomTile* tile)
 {
+	bool lifebar = false;
+	bool systembar = false;
 	sf::Texture* texture;
 	switch (system)
 	{
@@ -447,12 +444,50 @@ void Ship::AddSystemToTile(ShipSystem system, RoomTile* tile)
 		case System_Engine:
 		{
 			texture = TextureLoader::getInstance()->loadTexture("2D/engine_icon.png", 48, 48);
+			systembar = true;
 			break;
 		}
 	}
 
 	tile->setAnimation(texture, 1, 1);
 	tile->setPosition(tile->m_position);
+	m_systems[system].push_back(tile);
+
+	//UI system
+	
+	//m_default_color = sf::Color(0, 0, 0, 0);
+	//m_shape_container.setSize(sf::Vector2f(m_size));
+	//m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
+	//m_shape_container.setOutlineThickness(1.f);
+	//m_shape_container.setOutlineColor(m_default_color);
+	//m_shape_container.setFillColor(m_default_color);
+	
+	if (lifebar == true)
+	{
+		tile->m_lifebar = new GameEntity(UI_None);
+		tile->m_lifebar->m_shape_container.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
+		tile->m_lifebar->m_shape_container.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
+		tile->m_lifebar->m_shape_container.setFillColor(sf::Color(100, 100, 100, 255));//dark grey
+		tile->m_lifebar->m_shape_container.setOutlineThickness(1.f);
+		tile->m_lifebar->m_shape_container.setOutlineColor(sf::Color::Black);
+
+		tile->m_lifebar->m_shape.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
+		tile->m_lifebar->m_shape.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
+		tile->m_lifebar->m_shape.setFillColor(sf::Color::Green);
+	}
+
+	if (systembar == true)
+	{
+		tile->m_systembar = new GameEntity(UI_None);
+		tile->m_systembar->m_shape_container.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
+		tile->m_systembar->m_shape_container.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
+		tile->m_systembar->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Background]);
+		tile->m_systembar->m_shape_container.setOutlineThickness(1.f);
+		tile->m_systembar->m_shape_container.setOutlineColor(sf::Color::Black);
+
+		tile->m_systembar->m_shape.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
+		tile->m_systembar->m_shape.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
+	}
 }
 
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
@@ -671,6 +706,10 @@ void Ship::InitCombat()
 		(*it)->m_rof_timer = (*it)->GetRof();
 		(*it)->m_target_room = NULL;
 	}
+
+	//reset flee timer and counter
+	m_flee_timer = 0.f;
+	m_flee_count = 0.f;
 }
 
 void Ship::RestoreHealth()
@@ -702,7 +741,7 @@ void Ship::RestoreWeaponsHealth()
 	}
 }
 
-void Ship::UpdateFlooding(Time deltaTime, bool is_minimized)
+void Ship::UpdateFlooding(Time deltaTime)
 {
 	m_flood = 0;
 
@@ -838,31 +877,108 @@ bool Ship::IsSystemOperational(ShipSystem system, RoomTile* tile)
 float Ship::GetDodgeChances()
 {
 	float dodge = 0.f;
-	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+
+	for (vector<RoomTile*>::iterator it = m_systems[System_Navigation].begin(); it != m_systems[System_Navigation].end(); it++)
 	{
-		if ((*it)->m_type == Room_Navigation)
+		if (IsSystemOperational(System_Navigation, *it))
 		{
-			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it)->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
+		}
+	}
+
+	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	{
+		if (IsSystemOperational(System_Engine, *it))
+		{
+			dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it)->m_operator_tile->m_crew->m_skills[Skill_Engine] / 100);
+		}
+	}
+
+	//for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	//{
+		//if ((*it)->m_type == Room_Navigation)
+		//{
+		//	for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		//	{
+		//		if (IsSystemOperational(System_Navigation, *it2))
+		//		{
+		//			dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it2)->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
+		//		}
+		//	}
+		//}
+		//else if ((*it)->m_type == Room_Engine)
+		//{
+		//	for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		//	{
+		//		if (IsSystemOperational(System_Engine, *it2))
+		//		{
+		//			dodge += ENGINE_DODGE_CHANCE;
+		//		}
+		//	}
+		//}
+
+		
+	//}
+
+	dodge = Minf(dodge, DODGE_CHANCE_HARDCAP);
+
+	return dodge;
+}
+
+void Ship::UpdateFleeingBar(Time deltaTime)
+{
+	//flee charge
+	if (m_flee_count < ENGINE_FLEE_COUNT)
+	{
+		if (m_flee_timer > 0)
+		{
+			m_flee_timer -= deltaTime.asSeconds();
+		}
+		if (m_flee_timer <= 0)
+		{
+			m_flee_timer = 1.f;
+
+			for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
 			{
-				if (IsSystemOperational(System_Navigation, *it2))
+				if (IsSystemOperational(System_Engine, *it) == true)
 				{
-					dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it2)->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
+					m_flee_count += 1.f + (1.f * (*it)->m_operator_tile->m_crew->m_skills[Skill_Engine] / 100);
 				}
 			}
-		}
-		else if ((*it)->m_type == Room_Engine)
-		{
-			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+
+			m_flee_count = Minf(m_flee_count, ENGINE_FLEE_COUNT);
+
+			for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
 			{
-				if (IsSystemOperational(System_Engine, *it2))
-				{
-					dodge += ENGINE_DODGE_CHANCE;
-				}
+				(*it)->m_systembar->m_shape_container.setPosition((*it)->m_position.x, (*it)->m_position.y - (*it)->m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
+				(*it)->m_systembar->m_shape.setPosition((*it)->m_position.x, (*it)->m_position.y - (*it)->m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
+
+				float flee_ratio = 1.0f * m_flee_count / ENGINE_FLEE_COUNT;
+				(*it)->m_systembar->m_shape.setSize(sf::Vector2f(flee_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
 			}
 		}
 	}
 
-	Minf(dodge, DODGE_CHANCE_HARDCAP);
 
-	return dodge;
+	bool one_is_operational = false;
+	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	{
+		if (IsSystemOperational(System_Engine, *it) == true)
+		{
+			one_is_operational = true;
+			break;
+		}
+	}
+
+	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	{
+		if (m_flee_count == ENGINE_FLEE_COUNT && one_is_operational == true)
+		{
+			(*it)->m_systembar->m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Full]);
+		}
+		else
+		{
+			(*it)->m_systembar->m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
+		}
+	}
 }

@@ -80,11 +80,18 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define DODGE_CHANCE_HARDCAP				0.75f
 
 #define ENGINE_ROTATION_SPEED				10.f
+#define ENGINE_FLEE_COUNT					100.f
 
 #define RUDDER_ROTATION_TIMER_MIN			2.f
 #define RUDDER_ROTATION_TIMER_MAX			7.f
 #define RUDDER_ROTATION_SPEED_MIN			0.1f
 #define RUDDER_ROTATION_SPEED_MAX			0.4f
+
+#define SYSTEM_HEALTH_MAX					50
+
+#define LIFEBAR_SIZE_X						20.f
+#define LIFEBAR_SIZE_Y						4.f
+#define LIFEBAR_OFFSET_Y					8.f
 
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME				50

@@ -17,6 +17,7 @@ enum UI_Type
 	UI_Seaport,
 	UI_Compass,
 	UI_Weapon,
+	UI_System,
 };
 
 enum ShipAlliance

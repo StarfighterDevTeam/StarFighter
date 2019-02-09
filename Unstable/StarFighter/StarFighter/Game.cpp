@@ -108,11 +108,14 @@ Game::Game(RenderWindow& window)
 	m_dico_crew_names[1].push_back("Lucy");
 	m_dico_crew_names[1].push_back("Angela");
 
+	m_dico_colors[Color_Red_Destroyed] = sf::Color::Red;
 	m_dico_colors[Color_Yellow_Target] = sf::Color(255, 242, 39, 255);
 	m_dico_colors[Color_Grey_Target] = sf::Color(128, 128, 128, 255);
+	m_dico_colors[Color_Grey_Background] = sf::Color(100, 100, 100, 255);
 	m_dico_colors[Color_Orange_System] = sf::Color(255, 127, 39, 255);
 	m_dico_colors[Color_Green_System] = sf::Color::Green;
 	m_dico_colors[Color_Cyan_System] = sf::Color::Cyan;
+	m_dico_colors[Color_Magenta_Full] = sf::Color::Magenta;
 	m_dico_colors[Color_Blue_Flood] = sf::Color(0, 100, 170, 255);
 	m_dico_colors[Color_Blue_Pierced] = sf::Color(0, 50, 255, 255);
 }

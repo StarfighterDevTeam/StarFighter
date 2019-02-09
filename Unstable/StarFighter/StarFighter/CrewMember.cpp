@@ -81,14 +81,14 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	//m_text.setString(dico_crew[type]);
 
 	m_lifebar = new GameEntity(UI_None);
-	m_lifebar->m_shape_container.setSize(sf::Vector2f(CREWMEMBER_LIFEBAR_SIZE_X, CREWMEMBER_LIFEBAR_SIZE_Y));
-	m_lifebar->m_shape_container.setOrigin(sf::Vector2f(CREWMEMBER_LIFEBAR_SIZE_X * 0.5f, CREWMEMBER_LIFEBAR_SIZE_Y * 0.5f));
+	m_lifebar->m_shape_container.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
+	m_lifebar->m_shape_container.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
 	m_lifebar->m_shape_container.setFillColor(sf::Color(100, 100, 100, 255));//dark grey
 	m_lifebar->m_shape_container.setOutlineThickness(1.f);
 	m_lifebar->m_shape_container.setOutlineColor(sf::Color::Black);
 
-	m_lifebar->m_shape.setSize(sf::Vector2f(CREWMEMBER_LIFEBAR_SIZE_X, CREWMEMBER_LIFEBAR_SIZE_Y));
-	m_lifebar->m_shape.setOrigin(sf::Vector2f(CREWMEMBER_LIFEBAR_SIZE_X * 0.5f, CREWMEMBER_LIFEBAR_SIZE_Y * 0.5f));
+	m_lifebar->m_shape.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
+	m_lifebar->m_shape.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
 	m_lifebar->m_shape.setFillColor(sf::Color::Green);
 
 	//randomization of gender and name
@@ -265,15 +265,15 @@ void CrewMember::Update(Time deltaTime)
 	GameEntity::Update(deltaTime);
 
 	//UI lifebar
-	m_lifebar->m_shape_container.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - CREWMEMBER_LIFEBAR_OFFSET_Y);
-	m_lifebar->m_shape.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - CREWMEMBER_LIFEBAR_OFFSET_Y);
+	m_lifebar->m_shape_container.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
+	m_lifebar->m_shape.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
 
 	int health = m_health;
 	Bound(health, sf::Vector2i(0, m_health_max));
 
 	float life_ratio = 1.0f * health / m_health_max;
 
-	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * CREWMEMBER_LIFEBAR_SIZE_X, CREWMEMBER_LIFEBAR_SIZE_Y));
+	m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
 
 	float threshold[3] = { 0.7, 0.5, 0.3 };
 	if (life_ratio >= threshold[1])

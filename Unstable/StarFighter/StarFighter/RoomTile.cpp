@@ -27,9 +27,12 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 	float offset_y = ROOMTILE_OFFSET_Y;
 	m_position = sf::Vector2f(offset_x + coord_x * size, offset_y + coord_y * size);
 
+	//system
 	m_system = System_None;
 	m_system_tile = NULL;
 	m_operator_tile = NULL;
+	m_lifebar = NULL;
+	m_systembar = NULL;
 
 	//pathfinding
 	m_heuristic = 0;
@@ -58,7 +61,8 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 
 RoomTile::~RoomTile()
 {
-	
+	delete m_lifebar;
+	delete m_systembar;
 }
 
 RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy)
@@ -73,7 +77,6 @@ RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy)
 			return *it;
 		}
 	}
-	
 
 	return NULL;
 }

@@ -615,7 +615,7 @@ void Gameloop::Draw()
 	{
 		if (((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui == *it) || ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui == *it))
 		{
-			focused_room_tile = *it;
+			focused_room_tile = *it;//draw focused tile in last, so its outline appears above others
 		}
 		else
 		{
@@ -671,6 +671,14 @@ void Gameloop::Draw()
 			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 		}
 	}
+	//systems bars
+	if (m_warship->m_flee_count > 0)
+	{
+		for (vector<RoomTile*>::iterator it = m_warship->m_systems[System_Engine].begin(); it != m_warship->m_systems[System_Engine].end(); it++)
+		{
+			(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
+		}
+	}
 
 	//enemy rooms
 	if (m_tactical_ship != NULL)
@@ -722,6 +730,15 @@ void Gameloop::Draw()
 				{
 					(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 				}
+			}
+		}
+
+		//systems bars
+		if (m_tactical_ship->m_flee_count > 0)
+		{
+			for (vector<RoomTile*>::iterator it = m_tactical_ship->m_systems[System_Engine].begin(); it != m_tactical_ship->m_systems[System_Engine].end(); it++)
+			{
+				(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
 	}
@@ -824,8 +841,9 @@ bool Gameloop::UpdateTacticalScale()
 {
 	if (m_scale == Scale_Tactical)
 	{
-		//win conditions
-		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3)
+		//win-lose conditions
+		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3
+			|| m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_flood > m_warship->m_flood_max * 0.5f)
 		{
 			//delete enemy from ships existing
 			vector<Ship*> old_ships;
@@ -852,16 +870,6 @@ bool Gameloop::UpdateTacticalScale()
 
 			//switch back to strategic scale
 			m_scale = Scale_Strategic;
-		}
-		//lose conditions
-		else if (m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_flood > m_warship->m_flood_max * 0.5f)
-		{
-			//restore health
-			m_warship->RestoreHealth();
-
-			//switch back to strategic scale
-			m_scale = Scale_Strategic;
-			m_tactical_ship = NULL;
 		}
 
 		return true;

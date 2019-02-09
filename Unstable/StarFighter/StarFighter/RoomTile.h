@@ -18,15 +18,6 @@ enum Hull
 	Hull_None,
 };
 
-enum ShipSystem
-{
-	System_None,
-	System_Weapon,
-	System_Navigation,
-	System_Engine,
-	NB_SHIP_SYSTEMS,
-};
-
 class RoomTile : public GameEntity
 {
 public:
@@ -56,13 +47,14 @@ public:
 	RoomTile* m_system_tile;
 	RoomTile* m_operator_tile;
 	Weapon* m_weapon;
+	GameEntity* m_lifebar;
+	GameEntity* m_systembar;
 
 	//pathfinding
 	int m_heuristic;
 	int m_movement_cost;
 	int m_G_value;
 	RoomTile* m_parent;
-
 };
 
 #endif //ROOMTILE_H_INCLUDED

@@ -115,15 +115,27 @@ enum Input_Actions
 };
 
 enum Color_Chart
-{
+{	
+	Color_Red_Destroyed,
 	Color_Yellow_Target,
 	Color_Grey_Target,
+	Color_Grey_Background,
 	Color_Orange_System,
 	Color_Green_System,
 	Color_Cyan_System,
+	Color_Magenta_Full,
 	Color_Blue_Flood,
 	Color_Blue_Pierced,
 	NB_COLOR_CHART,
+};
+
+enum ShipSystem
+{
+	System_None,
+	System_Weapon,
+	System_Navigation,
+	System_Engine,
+	NB_SHIP_SYSTEMS,
 };
 
 struct Game

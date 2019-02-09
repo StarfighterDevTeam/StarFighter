@@ -33,6 +33,8 @@ public:
 	vector<CrewMember*> m_crew;
 	vector<Weapon*> m_weapons;
 	vector<vector<RoomTile*> > m_tiles;
+
+	vector<RoomTile*> m_systems[NB_SHIP_SYSTEMS];
 	
 	//int m_nb_crew[NB_CREW_TYPES];
 	//int m_nb_crew_working[NB_CREW_TYPES];
@@ -42,6 +44,11 @@ public:
 	int m_health;
 	int m_flood;
 	int m_flood_max;
+
+	float m_flee_timer;
+	float m_flee_count;
+	bool m_is_fleeing;
+	void UpdateFleeingBar(Time deltaTime);
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;
@@ -60,7 +67,6 @@ public:
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
-	Weapon* AddWeapon(Weapon* weapon, Room* room, Ship* ship, bool is_enemy);
 	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
 	void AddSystemToTile(ShipSystem system, RoomTile* tile);
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
@@ -69,7 +75,7 @@ public:
 	void BuildShip();
 	void CenterRoomPositions(bool is_enemy);
 
-	void UpdateFlooding(Time deltaTime, bool is_enemy);
+	void UpdateFlooding(Time deltaTime);
 
 	void InitCombat();
 	void RestoreHealth();
