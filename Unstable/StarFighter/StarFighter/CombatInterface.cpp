@@ -223,28 +223,35 @@ void CombatInterface::Draw(sf::RenderTexture& screen)
 	//enemy name & info
 	for (int i = 0; i < 2; i++)
 	{
-		m_ships_name[i]->Draw(screen);
-		m_ships_info[i]->Draw(screen);
+		if ((i == 0 && m_ship->m_is_fleeing == false) || (i == 1 && m_enemy_ship->m_is_fleeing == false))
+		{
+			m_ships_name[i]->Draw(screen);
+			m_ships_info[i]->Draw(screen);
+		}
+		
 	}
 
 	//life bars
 	for (int i = 0; i < 2; i++)
 	{
-		m_crewbars[i]->Draw(screen);
-		m_floodbars[i]->Draw(screen);
-		m_lifebars[i]->Draw(screen);
+		if ((i == 0 && m_ship->m_is_fleeing == false) || (i == 1 && m_enemy_ship->m_is_fleeing == false))
+		{
+			m_crewbars[i]->Draw(screen);
+			m_floodbars[i]->Draw(screen);
+			m_lifebars[i]->Draw(screen);
+		}
 	}
 
 	//distance
-	m_distance_line->Draw(screen);
-
-	for (int i = 0; i < 5; i++)
-	{
-		m_distance_markers[i]->Draw(screen);
-	}
-
-	for (int i = 0; i < 2; i++)
-	{
-		m_distance_ships[i]->Draw(screen);
-	}
+	//m_distance_line->Draw(screen);
+	//
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	m_distance_markers[i]->Draw(screen);
+	//}
+	//
+	//for (int i = 0; i < 2; i++)
+	//{
+	//	m_distance_ships[i]->Draw(screen);
+	//}
 }

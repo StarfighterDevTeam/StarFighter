@@ -76,11 +76,14 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define AI_CHANGE_TARGETROOM_PERCENTAGE		0.15f
 
 #define NAVIGATION_DODGE_CHANCE				0.1f
-#define ENGINE_DODGE_CHANCE					0.05f
 #define DODGE_CHANCE_HARDCAP				0.75f
 
+#define ENGINE_DODGE_CHANCE					0.05f
 #define ENGINE_ROTATION_SPEED				10.f
-#define ENGINE_FLEE_COUNT					100.f
+#define ENGINE_FLEE_ROTATION_SPEED			30.f
+#define ENGINE_FLEE_COUNT					10.f
+#define SHIP_FLEE_SPEED_MAX					20.f
+#define SHIP_FLEE_ACCELERATION				1.f
 
 #define RUDDER_ROTATION_TIMER_MIN			2.f
 #define RUDDER_ROTATION_TIMER_MAX			7.f

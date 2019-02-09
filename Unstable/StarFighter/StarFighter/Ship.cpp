@@ -21,6 +21,7 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display
 	m_flood = 0;
 	m_flee_timer = 0.f;
 	m_flee_count = 0.f;
+	m_is_charging_flee_count = false;
 	m_is_fleeing = false;
 
 	//get on tile
@@ -107,10 +108,10 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat)
 
 	UpdateFlooding(deltaTime);
 
-	m_is_fleeing = true;
-	if (m_is_fleeing == true)
+	m_is_charging_flee_count = true;
+	if (m_is_charging_flee_count == true)
 	{
-		UpdateFleeingBar(deltaTime);
+		UpdateFleeing(deltaTime);
 	}
 }
 
@@ -925,9 +926,17 @@ float Ship::GetDodgeChances()
 	return dodge;
 }
 
-void Ship::UpdateFleeingBar(Time deltaTime)
+void Ship::UpdateFleeing(Time deltaTime)
 {
-	//flee charge
+	//position
+	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	{
+		sf::Vector2f position = (*it)->m_position + m_ship_offset;
+		(*it)->m_systembar->m_shape_container.setPosition(position.x, position.y - (*it)->m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
+		(*it)->m_systembar->m_shape.setPosition(position.x, position.y - (*it)->m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
+	}
+
+	//charging
 	if (m_flee_count < ENGINE_FLEE_COUNT)
 	{
 		if (m_flee_timer > 0)
@@ -950,16 +959,13 @@ void Ship::UpdateFleeingBar(Time deltaTime)
 
 			for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
 			{
-				(*it)->m_systembar->m_shape_container.setPosition((*it)->m_position.x, (*it)->m_position.y - (*it)->m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
-				(*it)->m_systembar->m_shape.setPosition((*it)->m_position.x, (*it)->m_position.y - (*it)->m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
-
 				float flee_ratio = 1.0f * m_flee_count / ENGINE_FLEE_COUNT;
 				(*it)->m_systembar->m_shape.setSize(sf::Vector2f(flee_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
 			}
 		}
 	}
 
-
+	//color
 	bool one_is_operational = false;
 	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
 	{
@@ -980,5 +986,53 @@ void Ship::UpdateFleeingBar(Time deltaTime)
 		{
 			(*it)->m_systembar->m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_Cyan_System]);
 		}
+	}
+
+	//FOR DEBUG
+	if (m_flee_count == ENGINE_FLEE_COUNT && m_alliance == Alliance_Player)
+	{
+		m_is_fleeing = true;
+	}
+
+	//fleeing?
+	if (m_is_fleeing == true)
+	{
+		if (m_speed.y > -SHIP_FLEE_SPEED_MAX)
+		{
+			m_speed.y -= deltaTime.asSeconds() * SHIP_FLEE_ACCELERATION;
+		}
+		m_ship_offset.y += m_speed.y;
+
+		//rooms
+		for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+		{
+			(*it)->m_ship_offset = m_ship_offset;
+
+			//room tiles
+			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+			{
+				(*it2)->m_ship_offset = m_ship_offset;
+			}
+		}
+
+		//doors
+		for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+		{
+			(*it)->m_ship_offset = m_ship_offset;
+		}
+
+		//weapons
+		for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+		{
+			(*it)->m_ship_offset = m_ship_offset;
+		}
+
+		//crew
+		for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+		{
+			(*it)->m_ship_offset = m_ship_offset;
+		}
+
+		printf("speed y : %f | ship offset y : %f\n", m_speed.y, m_ship_offset.y);
 	}
 }

@@ -72,8 +72,9 @@ void Weapon::Update(Time deltaTime)
 	GameEntity::Update(deltaTime);
 
 	//UI lifebar
-	m_lifebar->m_shape_container.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
-	m_lifebar->m_shape.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
+	sf::Vector2f position = m_position + m_ship_offset;
+	m_lifebar->m_shape_container.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
+	m_lifebar->m_shape.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
 
 	int health = m_health;
 	Bound(health, sf::Vector2i(0, m_health_max));
@@ -96,8 +97,8 @@ void Weapon::Update(Time deltaTime)
 	}
 
 	//UI rofbar
-	m_rofbar->m_shape_container.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
-	m_rofbar->m_shape.setPosition(m_position.x, m_position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
+	m_rofbar->m_shape_container.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
+	m_rofbar->m_shape.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
 
 	float rof = m_rof - m_rof_timer;
 	Bound(rof, sf::Vector2f(0, m_rof));

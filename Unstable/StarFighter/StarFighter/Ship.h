@@ -47,8 +47,10 @@ public:
 
 	float m_flee_timer;
 	float m_flee_count;
+	bool m_is_charging_flee_count;
 	bool m_is_fleeing;
-	void UpdateFleeingBar(Time deltaTime);
+
+	void UpdateFleeing(Time deltaTime);
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;

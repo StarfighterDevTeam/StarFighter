@@ -14,7 +14,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 	m_flee_timer = 0.f;
 	m_flee_count = 0.f;
-	m_is_fleeing = true;
+	m_is_charging_flee_count = true;
 
 	//shape for water tiles
 	m_textureName = "2D/warship_icon.png";
@@ -231,7 +231,7 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 	//Combat interface
 	if (tactical_combat == true)
 	{
-		UpdateFleeingBar(deltaTime);
+		UpdateFleeing(deltaTime);
 
 		//UI combat
 		m_combat_interface.Update(deltaTime);

@@ -99,12 +99,14 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Room tiles
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
+			(*it2)->UpdatePosition();
+
 			if ((*it2)->m_flood > 0)
 			{
 				flood++;
 			}
 
-			UpdateRoomTileFeedback(*it2, deltaTime);
+			UpdateRoomTileFeedback(*it2, deltaTime, m_warship);
 
 			//crew move order (hover tile) feedback
 			if (selection != NULL && selection->m_UI_type == UI_CrewMember)
@@ -153,12 +155,14 @@ void Gameloop::Update(sf::Time deltaTime)
 			//Room tiles
 			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 			{
+				(*it2)->UpdatePosition();
+
 				if ((*it2)->m_flood > 0)
 				{
 					flood++;
 				}
 
-				UpdateRoomTileFeedback(*it2, deltaTime);
+				UpdateRoomTileFeedback(*it2, deltaTime, m_tactical_ship);
 			}
 
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
@@ -652,34 +656,35 @@ void Gameloop::Draw()
 	}
 
 	//lifebars & rofbars
-	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
+	if (m_scale == Scale_Tactical && m_warship->m_is_fleeing == false)
 	{
-		if (m_scale == Scale_Tactical)
+		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 		{
 			(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
+
+			if ((*it)->m_health < (*it)->m_health_max)
+			{
+				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+			}
+		}
+		for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+		{
+			if ((*it)->m_health < (*it)->m_health_max)
+			{
+				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+			}
 		}
 
-		if ((*it)->m_health < (*it)->m_health_max)
+		//systems bars
+		if (m_warship->m_flee_count > 0)
 		{
-			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+			for (vector<RoomTile*>::iterator it = m_warship->m_systems[System_Engine].begin(); it != m_warship->m_systems[System_Engine].end(); it++)
+			{
+				(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
+			}
 		}
 	}
-	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
-	{
-		if ((*it)->m_health < (*it)->m_health_max)
-		{
-			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-		}
-	}
-	//systems bars
-	if (m_warship->m_flee_count > 0)
-	{
-		for (vector<RoomTile*>::iterator it = m_warship->m_systems[System_Engine].begin(); it != m_warship->m_systems[System_Engine].end(); it++)
-		{
-			(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
-		}
-	}
-
+	
 	//enemy rooms
 	if (m_tactical_ship != NULL)
 	{
@@ -714,7 +719,7 @@ void Gameloop::Draw()
 		}
 
 		//lifebars & rofbars
-		if (m_scale == Scale_Tactical)
+		if (m_scale == Scale_Tactical && m_tactical_ship->m_is_fleeing == false)
 		{
 			for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 			{
@@ -731,14 +736,14 @@ void Gameloop::Draw()
 					(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 				}
 			}
-		}
 
-		//systems bars
-		if (m_tactical_ship->m_flee_count > 0)
-		{
-			for (vector<RoomTile*>::iterator it = m_tactical_ship->m_systems[System_Engine].begin(); it != m_tactical_ship->m_systems[System_Engine].end(); it++)
+			//systems bars
+			if (m_tactical_ship->m_flee_count > 0)
 			{
-				(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
+				for (vector<RoomTile*>::iterator it = m_tactical_ship->m_systems[System_Engine].begin(); it != m_tactical_ship->m_systems[System_Engine].end(); it++)
+				{
+					(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
+				}
 			}
 		}
 	}
@@ -1016,7 +1021,7 @@ bool Gameloop::UpdateTacticalScale()
 	return (m_scale == Scale_Tactical);
 }
 
-void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime)
+void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* ship)
 {
 	tile->m_shape_container.setFillColor(sf::Color::Black);
 
@@ -1090,16 +1095,26 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime)
 		}
 		case System_Engine:
 		{
-			if (Ship::IsSystemOperational(System_Engine, tile) == true)
+			if (ship->m_is_fleeing == false)
 			{
-				if (tile->m_rotation_speed < ENGINE_ROTATION_SPEED)
+				if (Ship::IsSystemOperational(System_Engine, tile) == true)
+				{
+					if (tile->m_rotation_speed < ENGINE_ROTATION_SPEED)
+					{
+						tile->m_rotation_speed++;
+					}
+				}
+				else if (tile->m_rotation_speed > 0.f)
+				{
+					tile->m_rotation_speed--;
+				}
+			}
+			else
+			{
+				if (tile->m_rotation_speed < ENGINE_FLEE_ROTATION_SPEED)
 				{
 					tile->m_rotation_speed++;
 				}
-			}
-			else if (tile->m_rotation_speed > 0.f)
-			{
-				tile->m_rotation_speed--;
 			}
 
 			tile->rotate(tile->m_rotation_speed);

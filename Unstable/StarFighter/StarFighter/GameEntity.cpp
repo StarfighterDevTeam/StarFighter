@@ -8,6 +8,7 @@ GameEntity::GameEntity(UI_Type ui_type)
 	m_hovered = false;
 	m_selected = false;
 	m_default_color = sf::Color::White;
+	m_ship_offset = sf::Vector2f(0.f, 0.f);
 }
 
 GameEntity::GameEntity(sf::Vector2f size, UI_Type ui_type) : GameEntity(ui_type)
@@ -17,10 +18,10 @@ GameEntity::GameEntity(sf::Vector2f size, UI_Type ui_type) : GameEntity(ui_type)
 
 void GameEntity::UpdatePosition()
 {
-	m_shape_container.setPosition(m_position);
-	m_shape.setPosition(m_position);
-	m_text.SetPosition(m_position);
-	setPosition(m_position);
+	m_shape_container.setPosition(m_position + m_ship_offset);
+	m_shape.setPosition(m_position + m_ship_offset);
+	m_text.SetPosition(m_position + m_ship_offset);
+	setPosition(m_position + m_ship_offset);
 }
 
 void GameEntity::Update(Time deltaTime)

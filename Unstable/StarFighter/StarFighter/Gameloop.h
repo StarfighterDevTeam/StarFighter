@@ -36,7 +36,7 @@ public:
 
 	void InitWaterZones();
 	bool UpdateTacticalScale();
-	void UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime);
+	void UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* ship);
 
 private:
 	sf::RenderWindow* mainWindow;

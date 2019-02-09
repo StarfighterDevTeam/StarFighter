@@ -44,6 +44,7 @@ public:
 	SFText m_text;
 
 	sf::Color m_default_color;
+	sf::Vector2f m_ship_offset;
 
 	void Update(Time deltaTime);
 	void UpdatePosition();
