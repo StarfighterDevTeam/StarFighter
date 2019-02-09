@@ -2,6 +2,8 @@
 #define SHIP_H_INCLUDED
 
 #include "Weapon.h"
+#include "Engine.h"
+#include "Rudder.h"
 #include "CrewMember.h"
 #include "WaterZone.h"
 #include "Island.h"
@@ -33,8 +35,8 @@ public:
 	vector<CrewMember*> m_crew;
 	vector<Weapon*> m_weapons;
 	vector<vector<RoomTile*> > m_tiles;
-
-	vector<RoomTile*> m_systems[NB_SHIP_SYSTEMS];
+	vector<Engine*> m_engines;
+	Rudder* m_rudder;
 	
 	//int m_nb_crew[NB_CREW_TYPES];
 	//int m_nb_crew_working[NB_CREW_TYPES];
@@ -69,8 +71,11 @@ public:
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
 	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
+
 	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
-	void AddSystemToTile(ShipSystem system, RoomTile* tile);
+	void AddEngineToTile(RoomTile* tile);
+	void AddRudderToTile(RoomTile* tile);
+
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 
@@ -78,6 +83,7 @@ public:
 	void CenterRoomPositions(bool is_enemy);
 
 	void UpdateFlooding(Time deltaTime);
+	void UpdateShipOffset();
 
 	void InitCombat();
 	void RestoreHealth();

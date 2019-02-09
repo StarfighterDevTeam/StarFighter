@@ -9,13 +9,14 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 	m_room = room;
 	m_crew = NULL;
 	m_weapon = NULL;
+	m_engine = NULL;
+	m_rudder = NULL;
 	m_connexion = NULL;
 	m_hull = Hull_None;
 	m_pierced = false;
 	m_flood = 0;
 	m_flooding_timer = 0.f;
-	m_rotation_speed = 0.f;
-	m_rotation_timer = 0.f;
+	
 	for (int i = 0; i < 4; i++)
 	{
 		m_flood_dir[i] = false;
@@ -31,8 +32,6 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 	m_system = System_None;
 	m_system_tile = NULL;
 	m_operator_tile = NULL;
-	m_lifebar = NULL;
-	m_systembar = NULL;
 
 	//pathfinding
 	m_heuristic = 0;
@@ -61,8 +60,7 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 
 RoomTile::~RoomTile()
 {
-	delete m_lifebar;
-	delete m_systembar;
+	
 }
 
 RoomTile* RoomTile::GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy)

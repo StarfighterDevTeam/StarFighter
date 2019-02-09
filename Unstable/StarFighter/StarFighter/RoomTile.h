@@ -2,12 +2,13 @@
 #define ROOMTILE_H_INCLUDED
 
 #include "Game.h"
-
 #include "GameEntity.h"
 
 class Room;//forward declaration
 class CrewMember;
 class RoomConnexion;
+class Engine;
+class Rudder;
 
 enum Hull
 {
@@ -37,8 +38,6 @@ public:
 	float m_evaporation_timer;
 	int m_health;
 	int m_health_max;
-	float m_rotation_speed;
-	float m_rotation_timer;
 
 	static RoomTile* GetRoomTileAtCoord(int coord_x, int coord_y, bool is_enemy);
 
@@ -47,8 +46,8 @@ public:
 	RoomTile* m_system_tile;
 	RoomTile* m_operator_tile;
 	Weapon* m_weapon;
-	GameEntity* m_lifebar;
-	GameEntity* m_systembar;
+	Engine* m_engine;
+	Rudder* m_rudder;
 
 	//pathfinding
 	int m_heuristic;

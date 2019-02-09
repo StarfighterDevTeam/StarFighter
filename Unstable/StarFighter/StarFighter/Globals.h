@@ -80,7 +80,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 
 #define ENGINE_DODGE_CHANCE					0.05f
 #define ENGINE_ROTATION_SPEED				10.f
-#define ENGINE_FLEE_ROTATION_SPEED			30.f
+#define ENGINE_FLEE_ROTATION_SPEED			20.f
 #define ENGINE_FLEE_COUNT					10.f
 #define SHIP_FLEE_SPEED_MAX					20.f
 #define SHIP_FLEE_ACCELERATION				1.f
@@ -90,7 +90,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define RUDDER_ROTATION_SPEED_MIN			0.1f
 #define RUDDER_ROTATION_SPEED_MAX			0.4f
 
-#define SYSTEM_HEALTH_MAX					50
+#define ENGINE_HEALTH_MAX					50
 
 #define LIFEBAR_SIZE_X						20.f
 #define LIFEBAR_SIZE_Y						4.f

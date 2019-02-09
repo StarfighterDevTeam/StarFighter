@@ -83,7 +83,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	nav_room->m_tiles[2]->m_operator_tile = nav_room->m_tiles[2 + nav_room->m_width];
 	nav_room->m_tiles[2 + nav_room->m_width]->m_system_tile = nav_room->m_tiles[2];
 	nav_room->m_tiles[2]->m_system = System_Navigation;
-	AddSystemToTile(System_Navigation, nav_room->m_tiles[2]);
+	AddRudderToTile(nav_room->m_tiles[2]);
 	
 	//engine tiles
 	for (int i = 0; i < 2; i++)
@@ -92,7 +92,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		engine_room->m_tiles[i + engine_room->m_width]->m_operator_tile = engine_room->m_tiles[i];
 		engine_room->m_tiles[i]->m_system_tile = engine_room->m_tiles[i + engine_room->m_width];
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
-		AddSystemToTile(System_Engine, engine_room->m_tiles[i + engine_room->m_width]);
+		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
 	
 	//CREW
@@ -243,6 +243,8 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 
 	//Crew interface
 	m_crew_interface.Update();
+
+	UpdateShipOffset();
 
 	GameEntity::Update(deltaTime);
 }

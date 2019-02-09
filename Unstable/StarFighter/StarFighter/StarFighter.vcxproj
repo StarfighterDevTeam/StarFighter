@@ -94,6 +94,7 @@
     <ClCompile Include="Compass.cpp" />
     <ClCompile Include="CrewInterface.cpp" />
     <ClCompile Include="CrewMember.cpp" />
+    <ClCompile Include="Engine.cpp" />
     <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameEntity.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="RoomConnexion.cpp" />
     <ClCompile Include="RoomTile.cpp" />
+    <ClCompile Include="Rudder.cpp" />
     <ClCompile Include="Seaport.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="WaterTile.cpp" />
@@ -125,6 +127,7 @@
     <ClInclude Include="Compass.h" />
     <ClInclude Include="CrewInterface.h" />
     <ClInclude Include="CrewMember.h" />
+    <ClInclude Include="Engine.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="FX.h" />
     <ClInclude Include="Game.h" />
@@ -138,6 +141,7 @@
     <ClInclude Include="Room.h" />
     <ClInclude Include="RoomConnexion.h" />
     <ClInclude Include="RoomTile.h" />
+    <ClInclude Include="Rudder.h" />
     <ClInclude Include="Seaport.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="WaterTile.h" />

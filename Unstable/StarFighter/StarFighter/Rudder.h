@@ -1,16 +1,16 @@
-#ifndef ENGINE_H_INCLUDED
-#define ENGINE_H_INCLUDED
+#ifndef RUDDER_H_INCLUDED
+#define RUDDER_H_INCLUDED
 
 #include "Game.h"
 #include "Room.h"
 
 class Ship;//forward declaration
 
-class Engine : public GameEntity
+class Rudder : public GameEntity
 {
 public:
-	Engine();
-	~Engine();
+	Rudder();
+	~Rudder();
 
 	void Update(Time deltaTime);
 
@@ -26,4 +26,4 @@ public:
 	GameEntity* m_systembar;
 };
 
-#endif //ENGINE_H_INCLUDED
+#endif //RUDDER_H_INCLUDED

@@ -6,6 +6,7 @@
 #include "RoomTile.h"
 
 class Weapon;
+class Engine;
 
 class Room : public GameEntity
 {

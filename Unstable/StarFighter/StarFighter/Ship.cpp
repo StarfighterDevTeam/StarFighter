@@ -24,6 +24,8 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display
 	m_is_charging_flee_count = false;
 	m_is_fleeing = false;
 
+	m_rudder = NULL;
+
 	//get on tile
 	SetDMSCoord(coord);
 
@@ -62,6 +64,13 @@ Ship::~Ship()
 	{
 		delete *it;
 	}
+
+	for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
+	{
+		delete *it;
+	}
+
+	delete m_rudder;
 }
 
 WaterTile* Ship::GetWaterTileAtDMSCoord(DMS_Coord coord)
@@ -113,6 +122,8 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat)
 	{
 		UpdateFleeing(deltaTime);
 	}
+
+	UpdateShipOffset();
 }
 
 void Ship::UpdateAnimation()
@@ -430,65 +441,41 @@ void Ship::AddWeaponToTile(Weapon* weapon, RoomTile* tile)
 	weapon->UpdatePosition();
 }
 
-void Ship::AddSystemToTile(ShipSystem system, RoomTile* tile)
+void Ship::AddEngineToTile(RoomTile* tile)
 {
-	bool lifebar = false;
-	bool systembar = false;
-	sf::Texture* texture;
-	switch (system)
-	{
-		case System_Navigation:
-		{
-			texture = TextureLoader::getInstance()->loadTexture("2D/rudder_icon.png", 48, 48);
-			break;
-		}
-		case System_Engine:
-		{
-			texture = TextureLoader::getInstance()->loadTexture("2D/engine_icon.png", 48, 48);
-			systembar = true;
-			break;
-		}
-	}
+	Engine* engine = new Engine();
 
-	tile->setAnimation(texture, 1, 1);
-	tile->setPosition(tile->m_position);
-	m_systems[system].push_back(tile);
+	//position
+	engine->m_position = tile->m_position;
 
-	//UI system
-	
-	//m_default_color = sf::Color(0, 0, 0, 0);
-	//m_shape_container.setSize(sf::Vector2f(m_size));
-	//m_shape_container.setOrigin(sf::Vector2f(m_size.x * 0.5f, m_size.y * 0.5f));
-	//m_shape_container.setOutlineThickness(1.f);
-	//m_shape_container.setOutlineColor(m_default_color);
-	//m_shape_container.setFillColor(m_default_color);
-	
-	if (lifebar == true)
-	{
-		tile->m_lifebar = new GameEntity(UI_None);
-		tile->m_lifebar->m_shape_container.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
-		tile->m_lifebar->m_shape_container.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
-		tile->m_lifebar->m_shape_container.setFillColor(sf::Color(100, 100, 100, 255));//dark grey
-		tile->m_lifebar->m_shape_container.setOutlineThickness(1.f);
-		tile->m_lifebar->m_shape_container.setOutlineColor(sf::Color::Black);
+	//add to crew lists
+	m_engines.push_back(engine);
 
-		tile->m_lifebar->m_shape.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
-		tile->m_lifebar->m_shape.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
-		tile->m_lifebar->m_shape.setFillColor(sf::Color::Green);
-	}
+	//assign crew to tile
+	engine->m_tile = tile;
+	tile->m_engine = engine;
 
-	if (systembar == true)
-	{
-		tile->m_systembar = new GameEntity(UI_None);
-		tile->m_systembar->m_shape_container.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
-		tile->m_systembar->m_shape_container.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
-		tile->m_systembar->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Background]);
-		tile->m_systembar->m_shape_container.setOutlineThickness(1.f);
-		tile->m_systembar->m_shape_container.setOutlineColor(sf::Color::Black);
+	//save owner ship
+	engine->m_ship = this;
 
-		tile->m_systembar->m_shape.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
-		tile->m_systembar->m_shape.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
-	}
+	engine->UpdatePosition();
+}
+
+void Ship::AddRudderToTile(RoomTile* tile)
+{
+	m_rudder = new Rudder();
+
+	//position
+	m_rudder->m_position = tile->m_position;
+
+	//assign crew to tile
+	m_rudder->m_tile = tile;
+	tile->m_rudder = m_rudder;
+
+	//save owner ship
+	m_rudder->m_ship = this;
+
+	m_rudder->UpdatePosition();
 }
 
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
@@ -607,7 +594,7 @@ void Ship::BuildShip()
 
 		nav_room->m_tiles[2]->m_system = System_Navigation;
 
-		AddSystemToTile(System_Navigation, nav_room->m_tiles[2]);
+		AddRudderToTile(nav_room->m_tiles[2]);
 	}
 
 	//engine tiles
@@ -617,7 +604,7 @@ void Ship::BuildShip()
 		engine_room->m_tiles[i + engine_room->m_width]->m_operator_tile = engine_room->m_tiles[i];
 		engine_room->m_tiles[i]->m_system_tile = engine_room->m_tiles[i + engine_room->m_width];
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
-		AddSystemToTile(System_Engine, engine_room->m_tiles[i + engine_room->m_width]);
+		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
 
 	//crew
@@ -879,57 +866,76 @@ float Ship::GetDodgeChances()
 {
 	float dodge = 0.f;
 
-	for (vector<RoomTile*>::iterator it = m_systems[System_Navigation].begin(); it != m_systems[System_Navigation].end(); it++)
+	if (m_rudder != NULL)
 	{
-		if (IsSystemOperational(System_Navigation, *it))
+		if (IsSystemOperational(System_Navigation, m_rudder->m_tile))
 		{
-			dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it)->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
+			dodge += NAVIGATION_DODGE_CHANCE + (1.f * m_rudder->m_tile->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
 		}
 	}
 
-	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
 	{
-		if (IsSystemOperational(System_Engine, *it))
+		if (IsSystemOperational(System_Engine, (*it)->m_tile))
 		{
-			dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it)->m_operator_tile->m_crew->m_skills[Skill_Engine] / 100);
+			dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it)->m_tile->m_operator_tile->m_crew->m_skills[Skill_Engine] / 100);
 		}
 	}
-
-	//for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-	//{
-		//if ((*it)->m_type == Room_Navigation)
-		//{
-		//	for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-		//	{
-		//		if (IsSystemOperational(System_Navigation, *it2))
-		//		{
-		//			dodge += NAVIGATION_DODGE_CHANCE + (1.f * (*it2)->m_operator_tile->m_crew->m_skills[Skill_Navigation] / 100);
-		//		}
-		//	}
-		//}
-		//else if ((*it)->m_type == Room_Engine)
-		//{
-		//	for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-		//	{
-		//		if (IsSystemOperational(System_Engine, *it2))
-		//		{
-		//			dodge += ENGINE_DODGE_CHANCE;
-		//		}
-		//	}
-		//}
-
-		
-	//}
 
 	dodge = Minf(dodge, DODGE_CHANCE_HARDCAP);
 
 	return dodge;
 }
 
+void Ship::UpdateShipOffset()
+{
+	//rooms
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		(*it)->m_ship_offset = m_ship_offset;
+
+		//room tiles
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			(*it2)->m_ship_offset = m_ship_offset;
+		}
+	}
+
+	//doors
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		(*it)->m_ship_offset = m_ship_offset;
+	}
+
+	//weapons
+	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+	{
+		(*it)->m_ship_offset = m_ship_offset;
+	}
+
+	//engines
+	for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
+	{
+		(*it)->m_ship_offset = m_ship_offset;
+	}
+
+	//rudder
+	if (m_rudder != NULL)
+	{
+		m_rudder->m_ship_offset = m_ship_offset;
+	}
+
+	//crew
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		(*it)->m_ship_offset = m_ship_offset;
+	}
+}
+
 void Ship::UpdateFleeing(Time deltaTime)
 {
 	//position
-	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
 	{
 		sf::Vector2f position = (*it)->m_position + m_ship_offset;
 		(*it)->m_systembar->m_shape_container.setPosition(position.x, position.y - (*it)->m_size.y * 0.5f - LIFEBAR_OFFSET_Y - (LIFEBAR_SIZE_Y * 0.5f * 2));
@@ -947,17 +953,17 @@ void Ship::UpdateFleeing(Time deltaTime)
 		{
 			m_flee_timer = 1.f;
 
-			for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+			for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
 			{
-				if (IsSystemOperational(System_Engine, *it) == true)
+				if (IsSystemOperational(System_Engine, (*it)->m_tile) == true)
 				{
-					m_flee_count += 1.f + (1.f * (*it)->m_operator_tile->m_crew->m_skills[Skill_Engine] / 100);
+					m_flee_count += 1.f + (1.f * (*it)->m_tile->m_operator_tile->m_crew->m_skills[Skill_Engine] / 100);
 				}
 			}
 
 			m_flee_count = Minf(m_flee_count, ENGINE_FLEE_COUNT);
 
-			for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+			for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
 			{
 				float flee_ratio = 1.0f * m_flee_count / ENGINE_FLEE_COUNT;
 				(*it)->m_systembar->m_shape.setSize(sf::Vector2f(flee_ratio * LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
@@ -967,16 +973,16 @@ void Ship::UpdateFleeing(Time deltaTime)
 
 	//color
 	bool one_is_operational = false;
-	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
 	{
-		if (IsSystemOperational(System_Engine, *it) == true)
+		if (IsSystemOperational(System_Engine, (*it)->m_tile) == true)
 		{
 			one_is_operational = true;
 			break;
 		}
 	}
 
-	for (vector<RoomTile*>::iterator it = m_systems[System_Engine].begin(); it != m_systems[System_Engine].end(); it++)
+	for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
 	{
 		if (m_flee_count == ENGINE_FLEE_COUNT && one_is_operational == true)
 		{
@@ -988,12 +994,6 @@ void Ship::UpdateFleeing(Time deltaTime)
 		}
 	}
 
-	//FOR DEBUG
-	if (m_flee_count == ENGINE_FLEE_COUNT && m_alliance == Alliance_Player)
-	{
-		m_is_fleeing = true;
-	}
-
 	//fleeing?
 	if (m_is_fleeing == true)
 	{
@@ -1002,35 +1002,5 @@ void Ship::UpdateFleeing(Time deltaTime)
 			m_speed.y -= deltaTime.asSeconds() * SHIP_FLEE_ACCELERATION;
 		}
 		m_ship_offset.y += m_speed.y;
-
-		//rooms
-		for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
-		{
-			(*it)->m_ship_offset = m_ship_offset;
-
-			//room tiles
-			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
-			{
-				(*it2)->m_ship_offset = m_ship_offset;
-			}
-		}
-
-		//doors
-		for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
-		{
-			(*it)->m_ship_offset = m_ship_offset;
-		}
-
-		//weapons
-		for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
-		{
-			(*it)->m_ship_offset = m_ship_offset;
-		}
-
-		//crew
-		for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-		{
-			(*it)->m_ship_offset = m_ship_offset;
-		}
 	}
 }

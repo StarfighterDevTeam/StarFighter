@@ -338,9 +338,22 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 	}
+
+	//Player Engines
+	for (vector<Engine*>::iterator it = m_warship->m_engines.begin(); it != m_warship->m_engines.end(); it++)
+	{
+		(*it)->Update(deltaTime);
+	}
+
+	//Player rudder
+	if (m_warship->m_rudder != NULL)
+	{
+		m_warship->m_rudder->Update(deltaTime);
+	}
+
 	if (m_tactical_ship != NULL)
 	{
-	//Enemy weapons
+		//Enemy weapons
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
 			(*it)->Update(deltaTime);
@@ -381,14 +394,21 @@ void Gameloop::Update(sf::Time deltaTime)
 			crew->m_destination = destination;
 		}
 	}
+
 	//Close/open doors
-	if (mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion)
+	else if (mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion)
 	{
 		RoomConnexion* connexion = (RoomConnexion*)hovered;
 		if (connexion->m_ship == m_warship)
 		{
 			connexion->SetLock(!connexion->m_locked);
 		}
+	}
+
+	//Fleeing
+	else if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Engine && m_warship->m_is_fleeing == false && m_warship->m_flee_count == ENGINE_FLEE_COUNT && m_scale == Scale_Tactical)
+	{
+		m_warship->m_is_fleeing = true;
 	}
 
 	//Bullets + cleaning old bullets
@@ -639,6 +659,18 @@ void Gameloop::Draw()
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
 
+	//engines
+	for (vector<Engine*>::iterator it = m_warship->m_engines.begin(); it != m_warship->m_engines.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
+
+	//rudder
+	if (m_warship->m_rudder != NULL)
+	{
+		m_warship->m_rudder->Draw((*CurrentGame).m_mainScreen);
+	}
+
 	//crew
 	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
 	{
@@ -665,10 +697,10 @@ void Gameloop::Draw()
 			}
 		}
 
-		//systems bars
+		//engine bars
 		if (m_warship->m_flee_count > 0)
 		{
-			for (vector<RoomTile*>::iterator it = m_warship->m_systems[System_Engine].begin(); it != m_warship->m_systems[System_Engine].end(); it++)
+			for (vector<Engine*>::iterator it = m_warship->m_engines.begin(); it != m_warship->m_engines.end(); it++)
 			{
 				(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
 			}
@@ -702,6 +734,18 @@ void Gameloop::Draw()
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
 
+		//engines
+		for (vector<Engine*>::iterator it = m_tactical_ship->m_engines.begin(); it != m_tactical_ship->m_engines.end(); it++)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
+
+		//rudder
+		if (m_tactical_ship->m_rudder != NULL)
+		{
+			m_tactical_ship->m_rudder->Draw((*CurrentGame).m_mainScreen);
+		}
+
 		//crew
 		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
 		{
@@ -730,7 +774,7 @@ void Gameloop::Draw()
 			//systems bars
 			if (m_tactical_ship->m_flee_count > 0)
 			{
-				for (vector<RoomTile*>::iterator it = m_tactical_ship->m_systems[System_Engine].begin(); it != m_tactical_ship->m_systems[System_Engine].end(); it++)
+				for (vector<Engine*>::iterator it = m_tactical_ship->m_engines.begin(); it != m_tactical_ship->m_engines.end(); it++)
 				{
 					(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
 				}
@@ -867,6 +911,7 @@ bool Gameloop::UpdateTacticalScale()
 			//reset speed and offset
 			m_warship->m_ship_offset = sf::Vector2f(0.f, 0.f);
 			m_warship->m_speed = sf::Vector2f(0.f, 0.f);
+			m_warship->m_is_fleeing = false;
 
 			//switch back to strategic scale
 			m_scale = Scale_Strategic;
@@ -1013,60 +1058,64 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* 
 		}
 	}
 
-	//systems animations
-	switch (tile->m_system)
+	//rudder animations
+	if (tile->m_rudder != NULL)
 	{
-		case System_Navigation:
+		Rudder* rudder = (Rudder*)tile->m_rudder;
+		if (rudder->m_rotation_timer > 0)
 		{
-			if (tile->m_rotation_timer > 0)
-			{
-				tile->m_rotation_timer -= deltaTime.asSeconds();
-			}
-
-			if (Ship::IsSystemOperational(System_Navigation, tile) == true)
-			{
-				if (tile->m_rotation_timer <= 0.f)
-				{
-					tile->m_rotation_timer = RandomizeFloatBetweenValues(RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX);
-					int sign = tile->m_rotation_speed > 0 ? 1 : -1;
-					tile->m_rotation_speed = Lerp(tile->m_rotation_timer, RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX, RUDDER_ROTATION_SPEED_MAX, RUDDER_ROTATION_SPEED_MIN) * (-sign);
-				}
-			}
-			else 
-			{
-				tile->m_rotation_speed = 0.f;
-				tile->m_rotation_timer = 0.f;
-			}
-
-			tile->rotate((float)tile->m_rotation_speed);
-			break;
+			rudder->m_rotation_timer -= deltaTime.asSeconds();
 		}
-		case System_Engine:
+
+		if (Ship::IsSystemOperational(System_Navigation, tile) == true)
 		{
-			if (ship->m_is_fleeing == false)
+			if (rudder->m_rotation_timer <= 0.f)
 			{
-				if (Ship::IsSystemOperational(System_Engine, tile) == true)
-				{
-					if (tile->m_rotation_speed < ENGINE_ROTATION_SPEED)
-					{
-						tile->m_rotation_speed++;
-					}
-				}
-				else if (tile->m_rotation_speed > 0.f)
-				{
-					tile->m_rotation_speed--;
-				}
+				rudder->m_rotation_timer = RandomizeFloatBetweenValues(RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX);
+				int sign = rudder->m_rotation_speed > 0 ? 1 : -1;
+				rudder->m_rotation_speed = Lerp(rudder->m_rotation_timer, RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX, RUDDER_ROTATION_SPEED_MAX, RUDDER_ROTATION_SPEED_MIN) * (-sign);
 			}
-			else
-			{
-				if (tile->m_rotation_speed < ENGINE_FLEE_ROTATION_SPEED)
-				{
-					tile->m_rotation_speed++;
-				}
-			}
-
-			tile->rotate(tile->m_rotation_speed);
-			break;
 		}
+		else
+		{
+			rudder->m_rotation_speed = 0.f;
+			rudder->m_rotation_timer = 0.f;
+		}
+
+		rudder->rotate((float)rudder->m_rotation_speed);
+	}
+
+	//engine animations
+	if (tile->m_engine != NULL)
+	{
+		Engine* engine = (Engine*)tile->m_engine;
+
+		if (ship->m_is_fleeing == false)
+		{
+			if (Ship::IsSystemOperational(System_Engine, tile) == true)
+			{
+				if (engine->m_rotation_speed < ENGINE_ROTATION_SPEED)
+				{
+					engine->m_rotation_speed++;
+				}
+				else if (engine->m_rotation_speed > ENGINE_ROTATION_SPEED)
+				{
+					engine->m_rotation_speed = ENGINE_ROTATION_SPEED;
+				}
+			}
+			else if (engine->m_rotation_speed > 0.f)
+			{
+				engine->m_rotation_speed--;
+			}
+		}
+		else
+		{
+			if (engine->m_rotation_speed < ENGINE_FLEE_ROTATION_SPEED)
+			{
+				engine->m_rotation_speed++;
+			}
+		}
+
+		engine->rotate(engine->m_rotation_speed);
 	}
 }
