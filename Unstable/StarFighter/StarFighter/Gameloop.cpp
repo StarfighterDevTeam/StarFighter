@@ -100,7 +100,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
 			(*it2)->UpdatePosition();
-
+			
 			if ((*it2)->m_flood > 0)
 			{
 				flood++;
@@ -317,16 +317,6 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 	}
-	
-	//Fire weapon
-	//if (m_scale == Scale_Tactical)
-	//{
-	//	if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Weapon)
-	//	{
-	//		Weapon* weapon = (Weapon*)hovered;
-	//		m_warship->FireWeapon(weapon, deltaTime, m_tactical_ship);
-	//	}
-	//}
 
 	//Player Weapons
 	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
@@ -416,7 +406,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			(*it)->Update(deltaTime);
 
 			//Hit effects
-			if ((*it)->m_phase == Shoot_Hit)
+			if ((*it)->m_phase == Shoot_Hit && (*it)->m_target_ship->m_is_fleeing == false)
 			{
 				//compute hit tiles
 				int x = (*it)->m_target_tile->m_coord_x;
@@ -846,9 +836,10 @@ bool Gameloop::UpdateTacticalScale()
 {
 	if (m_scale == Scale_Tactical)
 	{
-		//win-lose conditions
-		if (m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3
-			|| m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_flood > m_warship->m_flood_max * 0.5f)
+		//win-lose conditions: low health, high flood, too many crew dead, fleeing out of screen
+		bool win = m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3 || m_tactical_ship->m_ship_offset.y < -m_tactical_ship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
+		bool lose = m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_flood > m_warship->m_flood_max * 0.5f || m_warship->m_ship_offset.y < -m_warship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
+		if (win == true || lose == true) 
 		{
 			//delete enemy from ships existing
 			vector<Ship*> old_ships;
@@ -872,6 +863,10 @@ bool Gameloop::UpdateTacticalScale()
 
 			//restore destroyed weapons
 			m_warship->RestoreWeaponsHealth();
+
+			//reset speed and offset
+			m_warship->m_ship_offset = sf::Vector2f(0.f, 0.f);
+			m_warship->m_speed = sf::Vector2f(0.f, 0.f);
 
 			//switch back to strategic scale
 			m_scale = Scale_Strategic;
@@ -941,53 +936,6 @@ bool Gameloop::UpdateTacticalScale()
 		{
 			yA = 1;
 			yB = 1;
-		}
-
-		//attack from behind? = start 1 step closer
-		if (m_warship->m_speed.x > 0 && (*it)->m_speed.x > 0)//going right
-		{
-			if (m_warship->m_speed.x > (*it)->m_speed.x)//ship A overspeeding ship B from behind
-			{
-				xB--;
-			}
-			else if (m_warship->m_speed.x < (*it)->m_speed.x)//ship B overspeeding ship A from behind
-			{
-				xA--;
-			}
-		}
-		else if (m_warship->m_speed.x < 0 && (*it)->m_speed.x < 0)//going left
-		{
-			if (m_warship->m_speed.x < (*it)->m_speed.x)//ship A overspeeding ship B from behind
-			{
-				xB++;
-			}
-			else if (m_warship->m_speed.x > (*it)->m_speed.x)//ship B overspeeding ship A from behind
-			{
-				xA++;
-			}
-		}
-		
-		if (m_warship->m_speed.y > 0 && (*it)->m_speed.y > 0)//going up
-		{
-			if (m_warship->m_speed.y > (*it)->m_speed.y)//ship A overspeeding ship B from behind
-			{
-				yB--;
-			}
-			else if (m_warship->m_speed.y < (*it)->m_speed.y)//ship B overspeeding ship A from behind
-			{
-				yA--;
-			}
-		}
-		else if (m_warship->m_speed.y < 0 && (*it)->m_speed.y < 0)//going down
-		{
-			if (m_warship->m_speed.y < (*it)->m_speed.y)//ship A overspeeding ship B from behind
-			{
-				yB++;
-			}
-			else if (m_warship->m_speed.y >(*it)->m_speed.y)//ship B overspeeding ship A from behind
-			{
-				yA++;
-			}
 		}
 
 		m_tactical_ship = *it;

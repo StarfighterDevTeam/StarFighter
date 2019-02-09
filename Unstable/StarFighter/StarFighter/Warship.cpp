@@ -175,61 +175,63 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 		}
 	}
 
-	//apply movement
-	m_DMS.m_second_x += m_speed.x * deltaTime.asSeconds();
-	m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
-
-	//rotation
-	if (COMPASS_MODE == false)
+	//apply movement on water tiles
+	if (tactical_combat == false)
 	{
-		GetAngleForSpeed(m_angle);
-		m_desired_angle = m_angle;
-		UpdateAnimation();
-	}
-	
-	//sexadecimal position system
-	if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
-	{
-		int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
-		m_DMS.m_minute_x += minutes;
-		m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
-	}
-	else if (m_DMS.m_second_x < 0)
-	{
-		int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION + 1;
-		m_DMS.m_minute_x -= minutes;
-		m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
-	}
+		m_DMS.m_second_x += m_speed.x * deltaTime.asSeconds();
+		m_DMS.m_second_y -= m_speed.y * deltaTime.asSeconds();
 
-	if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
-	{
-		int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
-		m_DMS.m_minute_y += minutes;
-		m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
+		//rotation
+		if (COMPASS_MODE == false)
+		{
+			GetAngleForSpeed(m_angle);
+			m_desired_angle = m_angle;
+			UpdateAnimation();
+		}
+
+		//sexadecimal position system
+		if (m_DMS.m_second_x >= NB_WATERTILE_SUBDIVISION)
+		{
+			int minutes = m_DMS.m_second_x / NB_WATERTILE_SUBDIVISION;
+			m_DMS.m_minute_x += minutes;
+			m_DMS.m_second_x -= minutes * NB_WATERTILE_SUBDIVISION;
+		}
+		else if (m_DMS.m_second_x < 0)
+		{
+			int minutes = (-m_DMS.m_second_x) / NB_WATERTILE_SUBDIVISION + 1;
+			m_DMS.m_minute_x -= minutes;
+			m_DMS.m_second_x += minutes * NB_WATERTILE_SUBDIVISION;
+		}
+
+		if (m_DMS.m_second_y >= NB_WATERTILE_SUBDIVISION)
+		{
+			int minutes = m_DMS.m_second_y / NB_WATERTILE_SUBDIVISION;
+			m_DMS.m_minute_y += minutes;
+			m_DMS.m_second_y -= minutes * NB_WATERTILE_SUBDIVISION;
+		}
+		else if (m_DMS.m_second_y < 0)
+		{
+			int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
+			m_DMS.m_minute_y -= minutes;
+			m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
+		}
+
+		//update tile information
+		m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
+
+		//UI
+		ostringstream ss;
+		ss << "\n\n\n";
+		ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' " << (int)m_DMS.m_second_y << "\"\N";
+		ss << "\n";
+		ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << (int)m_DMS.m_second_x << "\"\E";
+		m_text.setString(ss.str());
+
+		//Compass UI update
+		m_compass.Update(deltaTime, m_angle, m_desired_angle);
 	}
-	else if (m_DMS.m_second_y < 0)
-	{
-		int minutes = (-m_DMS.m_second_y) / NB_WATERTILE_SUBDIVISION + 1;
-		m_DMS.m_minute_y -= minutes;
-		m_DMS.m_second_y += minutes * NB_WATERTILE_SUBDIVISION;
-	}
-	
-	//update tile information
-	m_tile = (*CurrentGame).m_waterzones[m_DMS.m_degree_x][m_DMS.m_degree_y]->m_watertiles[m_DMS.m_minute_x][m_DMS.m_minute_y];
-
-	//UI
-	ostringstream ss;
-	ss << "\n\n\n";
-	ss << m_DMS.m_degree_y << "°" << m_DMS.m_minute_y << "' " << (int)m_DMS.m_second_y << "\"\N";
-	ss << "\n";
-	ss << m_DMS.m_degree_x << "°" << m_DMS.m_minute_x << "' " << (int)m_DMS.m_second_x << "\"\E";
-	m_text.setString(ss.str());
-
-	//Compass UI update
-	m_compass.Update(deltaTime, m_angle, m_desired_angle);
-
 	//Combat interface
-	if (tactical_combat == true)
+	else
 	{
 		UpdateFleeing(deltaTime);
 

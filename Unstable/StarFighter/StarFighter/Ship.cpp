@@ -1032,7 +1032,5 @@ void Ship::UpdateFleeing(Time deltaTime)
 		{
 			(*it)->m_ship_offset = m_ship_offset;
 		}
-
-		printf("speed y : %f | ship offset y : %f\n", m_speed.y, m_ship_offset.y);
 	}
 }
