@@ -353,6 +353,21 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	if (m_tactical_ship != NULL)
 	{
+		//Enemy Engines
+		for (vector<Engine*>::iterator it = m_tactical_ship->m_engines.begin(); it != m_tactical_ship->m_engines.end(); it++)
+		{
+			(*it)->Update(deltaTime);
+		}
+
+		//Enemy rudder
+		if (m_tactical_ship->m_rudder != NULL)
+		{
+			m_tactical_ship->m_rudder->Update(deltaTime);
+		}
+	}
+	
+	if (m_tactical_ship != NULL)
+	{
 		//Enemy weapons
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 		{
@@ -1082,7 +1097,7 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* 
 			rudder->m_rotation_timer = 0.f;
 		}
 
-		rudder->rotate((float)rudder->m_rotation_speed);
+		rudder->rotate(rudder->m_rotation_speed);
 	}
 
 	//engine animations
