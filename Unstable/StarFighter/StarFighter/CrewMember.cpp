@@ -120,146 +120,149 @@ void CrewMember::MoveToRoomTile(RoomTile* tile)
 
 void CrewMember::Update(Time deltaTime)
 {
-	float speed = m_tile->m_flood == 0 ? m_ref_speed : m_ref_speed * CREWMEMBER_SPEED_FLOOD_FACTOR;
+	if ((*CurrentGame).m_pause == false)
+	{
+		float speed = m_tile->m_flood == 0 ? m_ref_speed : m_ref_speed * CREWMEMBER_SPEED_FLOOD_FACTOR;
 
-	//update cooldowns
-	if (m_repair_timer > 0)
-	{
-		m_repair_timer -= deltaTime.asSeconds();
-	}
-	if (m_drowning_timer > 0)
-	{
-		m_drowning_timer -= deltaTime.asSeconds();
-	}
-	if (m_healing_timer > 0)
-	{
-		m_healing_timer -= deltaTime.asSeconds();
-	}
-
-	//get new move order
-	if (m_current_path.empty() == true && m_destination != NULL)
-	{
-		//search pathfind
-		if (FindShortestPath(m_tile, m_destination) == true)
+		//update cooldowns
+		if (m_repair_timer > 0)
 		{
-			//free departure tile
-			m_tile->m_crew = NULL;
-			m_repair_timer = HULL_REPAIR_TIMER;
+			m_repair_timer -= deltaTime.asSeconds();
 		}
-		else
+		if (m_drowning_timer > 0)
 		{
-			//no path found => cancel
-			m_destination->m_crew = NULL;
-			m_destination = NULL;
-			m_speed = sf::Vector2f(0, 0);
+			m_drowning_timer -= deltaTime.asSeconds();
 		}
-	}
-	//order changed
-	else if (m_current_path.empty() == false && m_destination != NULL && m_destination != m_current_path.front())
-	{
-		FindShortestPath(m_tile, m_destination);
-	}
-		
-	//arrived at waypoint? get next waypoint
-	if (m_current_path.empty() == false)
-	{
-		RoomTile* waypoint = m_current_path.back();
-		sf::Vector2f vec = waypoint->m_position - m_position;
-		
-		//arrived at waypoint?
-		if (vec.x * vec.x + vec.y * vec.y < speed * deltaTime.asSeconds() * 8.f)
+		if (m_healing_timer > 0)
 		{
-			//update his tile reference
-			m_tile = waypoint;
-			m_repair_timer = HULL_REPAIR_TIMER;
+			m_healing_timer -= deltaTime.asSeconds();
+		}
 
-			//set next waypoint
-			m_current_path.pop_back();
-
-			//arrived at final destination
-			if (m_current_path.empty() == true)
+		//get new move order
+		if (m_current_path.empty() == true && m_destination != NULL)
+		{
+			//search pathfind
+			if (FindShortestPath(m_tile, m_destination) == true)
 			{
-				vec = sf::Vector2f(0, 0);
-				m_position = waypoint->m_position;
-				m_destination = NULL;
+				//free departure tile
+				m_tile->m_crew = NULL;
+				m_repair_timer = HULL_REPAIR_TIMER;
 			}
-			//set speed vector to next waypoint
 			else
 			{
-				waypoint = m_current_path.back();
+				//no path found => cancel
+				m_destination->m_crew = NULL;
+				m_destination = NULL;
+				m_speed = sf::Vector2f(0, 0);
+			}
+		}
+		//order changed
+		else if (m_current_path.empty() == false && m_destination != NULL && m_destination != m_current_path.front())
+		{
+			FindShortestPath(m_tile, m_destination);
+		}
 
-				//check if waypoint is stil accessible (door locked?)
-				if (waypoint->m_connexion != NULL && (waypoint->m_connexion->m_tiles.first == m_tile || waypoint->m_connexion->m_tiles.second == m_tile) && waypoint->m_connexion->m_locked == true)
+		//arrived at waypoint? get next waypoint
+		if (m_current_path.empty() == false)
+		{
+			RoomTile* waypoint = m_current_path.back();
+			sf::Vector2f vec = waypoint->m_position - m_position;
+
+			//arrived at waypoint?
+			if (vec.x * vec.x + vec.y * vec.y < speed * deltaTime.asSeconds() * 8.f)
+			{
+				//update his tile reference
+				m_tile = waypoint;
+				m_repair_timer = HULL_REPAIR_TIMER;
+
+				//set next waypoint
+				m_current_path.pop_back();
+
+				//arrived at final destination
+				if (m_current_path.empty() == true)
 				{
-					//cancel destination, stay where we are
 					vec = sf::Vector2f(0, 0);
-					m_position = m_tile->m_position;
-					m_destination->m_crew = NULL;
+					m_position = waypoint->m_position;
 					m_destination = NULL;
-					m_current_path.clear();
 				}
+				//set speed vector to next waypoint
 				else
 				{
-					//clean 90° turns with a snap on one axis
-					if (m_tile->m_coord_x != waypoint->m_coord_x && m_speed.y != 0)
-					{
-						m_position.y = m_tile->m_position.y;
-					}
-					else if (m_tile->m_coord_y != waypoint->m_coord_y && m_speed.x != 0)
-					{
-						m_position.x = m_tile->m_position.x;
-					}
+					waypoint = m_current_path.back();
 
-					vec = waypoint->m_position - m_position;
+					//check if waypoint is stil accessible (door locked?)
+					if (waypoint->m_connexion != NULL && (waypoint->m_connexion->m_tiles.first == m_tile || waypoint->m_connexion->m_tiles.second == m_tile) && waypoint->m_connexion->m_locked == true)
+					{
+						//cancel destination, stay where we are
+						vec = sf::Vector2f(0, 0);
+						m_position = m_tile->m_position;
+						m_destination->m_crew = NULL;
+						m_destination = NULL;
+						m_current_path.clear();
+					}
+					else
+					{
+						//clean 90° turns with a snap on one axis
+						if (m_tile->m_coord_x != waypoint->m_coord_x && m_speed.y != 0)
+						{
+							m_position.y = m_tile->m_position.y;
+						}
+						else if (m_tile->m_coord_y != waypoint->m_coord_y && m_speed.x != 0)
+						{
+							m_position.x = m_tile->m_position.x;
+						}
+
+						vec = waypoint->m_position - m_position;
+					}
 				}
 			}
+
+			//set speed to waypoint
+			ScaleVector(&vec, speed);
+			m_speed = vec;
 		}
 
-		//set speed to waypoint
-		ScaleVector(&vec, speed);
-		m_speed = vec;
-	}
+		//apply movement
+		m_position.x += m_speed.x * deltaTime.asSeconds();
+		m_position.y += m_speed.y * deltaTime.asSeconds();
 
-	//apply movement
-	m_position.x += m_speed.x * deltaTime.asSeconds();
-	m_position.y += m_speed.y * deltaTime.asSeconds();
-
-	//repair hull
-	if (m_tile != NULL && m_tile->m_pierced == true)
-	{
-		if (m_repair_timer <= 0)
+		//repair hull
+		if (m_tile != NULL && m_tile->m_pierced == true)
 		{
-			for (int i = 0; i < 2; i++)
+			if (m_repair_timer <= 0)
 			{
-				if (m_tile->m_health < m_tile->m_health_max)
+				for (int i = 0; i < 2; i++)
 				{
-					m_tile->m_health++;
+					if (m_tile->m_health < m_tile->m_health_max)
+					{
+						m_tile->m_health++;
+					}
 				}
+
+				m_repair_timer = HULL_REPAIR_TIMER;
 			}
-			
-			m_repair_timer = HULL_REPAIR_TIMER;
+
+			if (m_tile->m_health == m_tile->m_health_max)
+			{
+				m_tile->m_pierced = false;
+			}
 		}
 
-		if (m_tile->m_health == m_tile->m_health_max)
+		//drowning
+		if (m_tile->m_room->m_is_flooded == true && m_drowning_timer <= 0)
 		{
-			m_tile->m_pierced = false;
+			m_drowning_timer = DROWNING_TIMER;
+
+			m_health--;
 		}
-	}
 
-	//drowning
-	if (m_tile->m_room->m_is_flooded == true && m_drowning_timer <= 0)
-	{
-		m_drowning_timer = DROWNING_TIMER;
+		//healing in Crew quarter
+		if (m_tile->m_room->m_type == Room_Crewquarter && m_healing_timer <= 0 && m_health < m_health_max)
+		{
+			m_healing_timer = HEALING_TIMER;
 
-		m_health--;
-	}
-
-	//healing in Crew quarter
-	if (m_tile->m_room->m_type == Room_Crewquarter && m_healing_timer <= 0 && m_health < m_health_max)
-	{
-		m_healing_timer = HEALING_TIMER;
-
-		m_health++;
+			m_health++;
+		}
 	}
 
 	GameEntity::Update(deltaTime);

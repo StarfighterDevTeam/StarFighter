@@ -210,10 +210,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		if ((*it)->m_health > 0)
 		{
-			if ((*CurrentGame).m_pause == false)
-			{
-				(*it)->Update(deltaTime);//crew movement/heal/repair...
-			}
+			(*it)->Update(deltaTime);//crew movement/heal/repair...
 
 			//create or update HUD for crew details
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
@@ -254,10 +251,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			if ((*it)->m_health > 0)
 			{
-				if ((*CurrentGame).m_pause == false)
-				{
-					(*it)->Update(deltaTime);//crew movement/heal/repair...
-				}
+				(*it)->Update(deltaTime);//crew movement/heal/repair...
 
 				//Crew AI
 				if ((*it)->m_destination == NULL)
