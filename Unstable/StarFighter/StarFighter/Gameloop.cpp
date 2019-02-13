@@ -210,7 +210,10 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		if ((*it)->m_health > 0)
 		{
-			(*it)->Update(deltaTime);
+			if ((*CurrentGame).m_pause == false)
+			{
+				(*it)->Update(deltaTime);//crew movement/heal/repair...
+			}
 
 			//create or update HUD for crew details
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
@@ -251,7 +254,10 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			if ((*it)->m_health > 0)
 			{
-				(*it)->Update(deltaTime);
+				if ((*CurrentGame).m_pause == false)
+				{
+					(*it)->Update(deltaTime);//crew movement/heal/repair...
+				}
 
 				//Crew AI
 				if ((*it)->m_destination == NULL)
@@ -333,7 +339,10 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 				else
 				{
-					m_warship->FireWeapon(*it, deltaTime, m_tactical_ship);
+					if ((*CurrentGame).m_pause == false)
+					{
+						m_warship->FireWeapon(*it, deltaTime, m_tactical_ship);
+					}
 				}
 			}
 		}
@@ -374,14 +383,17 @@ void Gameloop::Update(sf::Time deltaTime)
 			(*it)->Update(deltaTime);
 			if ((*it)->CanFire() == true)
 			{
-				//randomly change target sometimes
-				if ((*it)->m_target_room == NULL || ((*it)->m_rof_timer <= 0 && RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE))
+				if ((*CurrentGame).m_pause == false)
 				{
-					int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
-					(*it)->m_target_room = m_warship->m_rooms[r];
-				}
+					//randomly change target sometimes
+					if ((*it)->m_target_room == NULL || ((*it)->m_rof_timer <= 0 && RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE))
+					{
+						int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
+						(*it)->m_target_room = m_warship->m_rooms[r];
+					}
 
-				m_tactical_ship->FireWeapon(*it, deltaTime, m_warship);
+					m_tactical_ship->FireWeapon(*it, deltaTime, m_warship);
+				}
 			}
 		}
 	}
@@ -427,85 +439,88 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//Bullets + cleaning old bullets
-	vector<Ammo*> old_bullets;
-	for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
+	if ((*CurrentGame).m_pause == false)
 	{
-		old_bullets.push_back(*it);
-	}
-	(*CurrentGame).m_bullets.clear();
-	for (vector<Ammo*>::iterator it = old_bullets.begin(); it != old_bullets.end(); it++)
-	{
-		if ((*it)->m_can_be_seen == true)
+		vector<Ammo*> old_bullets;
+		for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
 		{
-			(*CurrentGame).m_bullets.push_back(*it);
-			(*it)->Update(deltaTime);
-
-			//Hit effects
-			if ((*it)->m_phase == Shoot_Hit && (*it)->m_target_ship->m_is_fleeing == false)
+			old_bullets.push_back(*it);
+		}
+		(*CurrentGame).m_bullets.clear();
+		for (vector<Ammo*>::iterator it = old_bullets.begin(); it != old_bullets.end(); it++)
+		{
+			if ((*it)->m_can_be_seen == true)
 			{
-				//compute hit tiles
-				int x = (*it)->m_target_tile->m_coord_x;
-				int y = (*it)->m_target_tile->m_coord_y;
+				(*CurrentGame).m_bullets.push_back(*it);
+				(*it)->Update(deltaTime);
 
-				int radius = (*it)->m_radius - 1;
-
-				int a = x - radius;
-				int b = x + radius;
-				for (int i = x - radius; i < x + radius + 1; i++)
+				//Hit effects
+				if ((*it)->m_phase == Shoot_Hit && (*it)->m_target_ship->m_is_fleeing == false)
 				{
-					for (int j = y - radius; j < y + radius + 1; j++)
+					//compute hit tiles
+					int x = (*it)->m_target_tile->m_coord_x;
+					int y = (*it)->m_target_tile->m_coord_y;
+
+					int radius = (*it)->m_radius - 1;
+
+					int a = x - radius;
+					int b = x + radius;
+					for (int i = x - radius; i < x + radius + 1; i++)
 					{
-						if (i >= 0 && i <= (*it)->m_target_ship->m_rooms_size.x - 1 && j >= 0 && j <= (*it)->m_target_ship->m_rooms_size.y - 1 && (*it)->m_target_ship->m_tiles[i][j] != NULL)
+						for (int j = y - radius; j < y + radius + 1; j++)
 						{
-							//"boom": apply bullet damage and side effects
-							RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
-
-							//damage
-							(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
-							tile->m_health -= Min((*it)->m_damage, tile->m_health);
-
-							//damage to weapon
-							if (tile->m_weapon != NULL)
+							if (i >= 0 && i <= (*it)->m_target_ship->m_rooms_size.x - 1 && j >= 0 && j <= (*it)->m_target_ship->m_rooms_size.y - 1 && (*it)->m_target_ship->m_tiles[i][j] != NULL)
 							{
-								Weapon* weapon = tile->m_weapon;
-								weapon->m_health -= Min((*it)->m_damage, weapon->m_health);
-								if (weapon->m_health == 0)
-								{
-									weapon->setColor(sf::Color::Red);
-								}
-							}
+								//"boom": apply bullet damage and side effects
+								RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
 
-							//piercing hull
-							if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
-							{
-								tile->m_pierced = true;
-								if (tile->m_crew != NULL)
-								{
-									tile->m_crew->m_repair_timer = HULL_REPAIR_TIMER;
-								}
-							}
+								//damage
+								(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
+								tile->m_health -= Min((*it)->m_damage, tile->m_health);
 
-							//killing crew
-							for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
-							{
-								float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
-								float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
-								float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
-								float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
-								float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
-								float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
-								float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
-								float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
-
-								//collision?
-								if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
-									|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
-									|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
-									|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
+								//damage to weapon
+								if (tile->m_weapon != NULL)
 								{
-									if ((*it2)->m_health > 0)
+									Weapon* weapon = tile->m_weapon;
+									weapon->m_health -= Min((*it)->m_damage, weapon->m_health);
+									if (weapon->m_health == 0)
 									{
-										(*it2)->m_health--;
+										weapon->setColor(sf::Color::Red);
+									}
+								}
+
+								//piercing hull
+								if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
+								{
+									tile->m_pierced = true;
+									if (tile->m_crew != NULL)
+									{
+										tile->m_crew->m_repair_timer = HULL_REPAIR_TIMER;
+									}
+								}
+
+								//killing crew
+								for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
+								{
+									float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
+									float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
+									float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
+									float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
+									float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
+									float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
+									float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
+									float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
+
+									//collision?
+									if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
+										|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
+										|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
+										|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
+									{
+										if ((*it2)->m_health > 0)
+										{
+											(*it2)->m_health--;
+										}
 									}
 								}
 							}
@@ -513,30 +528,30 @@ void Gameloop::Update(sf::Time deltaTime)
 					}
 				}
 			}
+			else
+			{
+				delete *it;
+			}
 		}
-		else
-		{
-			delete *it;
-		}
-	}
 
-	//FX + clean old FX
-	vector<FX*> old_FX;
-	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
-	{
-		old_FX.push_back(*it);
-	}
-	(*CurrentGame).m_FX.clear();
-	for (vector<FX*>::iterator it = old_FX.begin(); it != old_FX.end(); it++)
-	{
-		if ((*it)->m_can_be_seen == true)
+		//FX + clean old FX
+		vector<FX*> old_FX;
+		for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
 		{
-			(*CurrentGame).m_FX.push_back(*it);
-			(*it)->Update(deltaTime);
+			old_FX.push_back(*it);
 		}
-		else
+		(*CurrentGame).m_FX.clear();
+		for (vector<FX*>::iterator it = old_FX.begin(); it != old_FX.end(); it++)
 		{
-			delete *it;
+			if ((*it)->m_can_be_seen == true)
+			{
+				(*CurrentGame).m_FX.push_back(*it);
+				(*it)->Update(deltaTime);
+			}
+			else
+			{
+				delete *it;
+			}
 		}
 	}
 
@@ -591,13 +606,16 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//boat
-	m_warship->Update(deltaTime, m_scale == Scale_Tactical);
-
-	//other ships
-	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+	//boats
+	if ((*CurrentGame).m_pause == false)
 	{
-		(*it)->Update(deltaTime, m_warship->m_DMS, m_scale == Scale_Tactical);
+		m_warship->Update(deltaTime, m_scale == Scale_Tactical);
+
+		//other ships
+		for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+		{
+			(*it)->Update(deltaTime, m_warship->m_DMS, m_scale == Scale_Tactical);
+		}
 	}
 
 	//island
@@ -1074,64 +1092,67 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* 
 		}
 	}
 
-	//rudder animations
-	if (tile->m_rudder != NULL)
+	if ((*CurrentGame).m_pause == false)
 	{
-		Rudder* rudder = (Rudder*)tile->m_rudder;
-		if (rudder->m_rotation_timer > 0)
+		//rudder animations
+		if (tile->m_rudder != NULL)
 		{
-			rudder->m_rotation_timer -= deltaTime.asSeconds();
-		}
-
-		if (Ship::IsSystemOperational(System_Navigation, tile) == true)
-		{
-			if (rudder->m_rotation_timer <= 0.f)
+			Rudder* rudder = (Rudder*)tile->m_rudder;
+			if (rudder->m_rotation_timer > 0)
 			{
-				rudder->m_rotation_timer = RandomizeFloatBetweenValues(RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX);
-				int sign = rudder->m_rotation_speed > 0 ? 1 : -1;
-				rudder->m_rotation_speed = Lerp(rudder->m_rotation_timer, RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX, RUDDER_ROTATION_SPEED_MAX, RUDDER_ROTATION_SPEED_MIN) * (-sign);
+				rudder->m_rotation_timer -= deltaTime.asSeconds();
 			}
-		}
-		else
-		{
-			rudder->m_rotation_speed = 0.f;
-			rudder->m_rotation_timer = 0.f;
-		}
 
-		rudder->rotate(rudder->m_rotation_speed);
-	}
-
-	//engine animations
-	if (tile->m_engine != NULL)
-	{
-		Engine* engine = (Engine*)tile->m_engine;
-
-		if (ship->m_is_fleeing == false)
-		{
-			if (Ship::IsSystemOperational(System_Engine, tile) == true)
+			if (Ship::IsSystemOperational(System_Navigation, tile) == true)
 			{
-				if (engine->m_rotation_speed < ENGINE_ROTATION_SPEED)
+				if (rudder->m_rotation_timer <= 0.f)
+				{
+					rudder->m_rotation_timer = RandomizeFloatBetweenValues(RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX);
+					int sign = rudder->m_rotation_speed > 0 ? 1 : -1;
+					rudder->m_rotation_speed = Lerp(rudder->m_rotation_timer, RUDDER_ROTATION_TIMER_MIN, RUDDER_ROTATION_TIMER_MAX, RUDDER_ROTATION_SPEED_MAX, RUDDER_ROTATION_SPEED_MIN) * (-sign);
+				}
+			}
+			else
+			{
+				rudder->m_rotation_speed = 0.f;
+				rudder->m_rotation_timer = 0.f;
+			}
+
+			rudder->rotate(rudder->m_rotation_speed);
+		}
+
+		//engine animations
+		if (tile->m_engine != NULL)
+		{
+			Engine* engine = (Engine*)tile->m_engine;
+
+			if (ship->m_is_fleeing == false)
+			{
+				if (Ship::IsSystemOperational(System_Engine, tile) == true)
+				{
+					if (engine->m_rotation_speed < ENGINE_ROTATION_SPEED)
+					{
+						engine->m_rotation_speed++;
+					}
+					else if (engine->m_rotation_speed > ENGINE_ROTATION_SPEED)
+					{
+						engine->m_rotation_speed = ENGINE_ROTATION_SPEED;
+					}
+				}
+				else if (engine->m_rotation_speed > 0.f)
+				{
+					engine->m_rotation_speed--;
+				}
+			}
+			else
+			{
+				if (engine->m_rotation_speed < ENGINE_FLEE_ROTATION_SPEED)
 				{
 					engine->m_rotation_speed++;
 				}
-				else if (engine->m_rotation_speed > ENGINE_ROTATION_SPEED)
-				{
-					engine->m_rotation_speed = ENGINE_ROTATION_SPEED;
-				}
 			}
-			else if (engine->m_rotation_speed > 0.f)
-			{
-				engine->m_rotation_speed--;
-			}
-		}
-		else
-		{
-			if (engine->m_rotation_speed < ENGINE_FLEE_ROTATION_SPEED)
-			{
-				engine->m_rotation_speed++;
-			}
-		}
 
-		engine->rotate(engine->m_rotation_speed);
+			engine->rotate(engine->m_rotation_speed);
+		}
 	}
 }
