@@ -693,7 +693,7 @@ void Gameloop::Draw()
 	}
 
 	//lifebars & rofbars
-	if (m_scale == Scale_Tactical && m_warship->m_is_fleeing == false)
+	if (m_scale == Scale_Tactical && m_warship->m_is_fleeing == false && m_warship->m_sinking_timer == 0.f)
 	{
 		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
 		{
@@ -768,7 +768,7 @@ void Gameloop::Draw()
 		}
 
 		//lifebars & rofbars
-		if (m_scale == Scale_Tactical && m_tactical_ship->m_is_fleeing == false)
+		if (m_scale == Scale_Tactical && m_tactical_ship->m_is_fleeing == false && m_tactical_ship->m_sinking_timer == 0.f)
 		{
 			for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
 			{
@@ -896,8 +896,8 @@ bool Gameloop::UpdateTacticalScale()
 	if (m_scale == Scale_Tactical)
 	{
 		//win-lose conditions: low health, high flood, too many crew dead, fleeing out of screen
-		bool win = m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_flood > m_tactical_ship->m_flood_max * 0.5f || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3 || m_tactical_ship->m_ship_offset.y < -m_tactical_ship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
-		bool lose = m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_flood > m_warship->m_flood_max * 0.5f || m_warship->m_ship_offset.y < -m_warship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
+		bool win = m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_sinking_timer >= SHIP_SINKING_TIME || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3 || m_tactical_ship->m_ship_offset.y < -m_tactical_ship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
+		bool lose = m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_sinking_timer >= SHIP_SINKING_TIME || m_warship->m_ship_offset.y < -m_warship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
 		if (win == true || lose == true) 
 		{
 			//delete enemy from ships existing
@@ -927,6 +927,7 @@ bool Gameloop::UpdateTacticalScale()
 			m_warship->m_ship_offset = sf::Vector2f(0.f, 0.f);
 			m_warship->m_speed = sf::Vector2f(0.f, 0.f);
 			m_warship->m_is_fleeing = false;
+			m_warship->m_sinking_timer = 0.f;//if sunk, reset it
 
 			//switch back to strategic scale
 			m_scale = Scale_Strategic;

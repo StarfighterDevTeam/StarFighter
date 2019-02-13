@@ -230,10 +230,15 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 		//Compass UI update
 		m_compass.Update(deltaTime, m_angle, m_desired_angle);
 	}
-	//Combat interface
+	//Tactical combat
 	else
 	{
 		UpdateFleeing(deltaTime);
+
+		if (IsFlooded() == true)
+		{
+			UpdateSinking(deltaTime);
+		}
 
 		//UI combat
 		m_combat_interface.Update(deltaTime);

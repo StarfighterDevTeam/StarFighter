@@ -52,7 +52,10 @@ public:
 	bool m_is_charging_flee_count;
 	bool m_is_fleeing;
 
+	float m_sinking_timer;
+
 	void UpdateFleeing(Time deltaTime);
+	void UpdateSinking(Time deltaTime);
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;
@@ -78,6 +81,7 @@ public:
 
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
+	bool IsFlooded();
 
 	void BuildShip();
 	void CenterRoomPositions(bool is_enemy);

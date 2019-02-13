@@ -228,7 +228,6 @@ void CombatInterface::Draw(sf::RenderTexture& screen)
 			m_ships_name[i]->Draw(screen);
 			m_ships_info[i]->Draw(screen);
 		}
-		
 	}
 
 	//life bars

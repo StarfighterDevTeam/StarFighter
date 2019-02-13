@@ -26,6 +26,8 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display
 
 	m_rudder = NULL;
 
+	m_sinking_timer = 0.f;
+
 	//get on tile
 	SetDMSCoord(coord);
 
@@ -124,6 +126,11 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat)
 	}
 
 	UpdateShipOffset();
+
+	if (tactical_combat == true && IsFlooded() == true)
+	{
+		UpdateSinking(deltaTime);
+	}
 }
 
 void Ship::UpdateAnimation()
@@ -480,6 +487,11 @@ void Ship::AddRudderToTile(RoomTile* tile)
 
 bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 {
+	if (m_sinking_timer > 0.f || m_is_fleeing == true)
+	{
+		return false;
+	}
+
 	//turn angle towards target (get room center as a target)
 	Room* room = weapon->m_target_room;
 	int width = room->m_width % 2 == 0 ? room->m_width - 1 : room->m_width;
@@ -1003,4 +1015,68 @@ void Ship::UpdateFleeing(Time deltaTime)
 		}
 		m_ship_offset.y += m_speed.y;
 	}
+}
+
+void Ship::UpdateSinking(Time deltaTime)
+{
+	if (m_sinking_timer < SHIP_SINKING_TIME)
+	{
+		m_sinking_timer += deltaTime.asSeconds();
+	}
+
+	Uint8 alpha = (Uint8)Lerp(m_sinking_timer, 0, SHIP_SINKING_TIME, 255, 0);
+
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		sf::Color c = (*it)->m_shape_container.getOutlineColor();
+		(*it)->m_shape_container.setOutlineColor(sf::Color(c.r, c.g, c.b, alpha));
+
+		sf::Color c4 = (*it)->m_text.getColor();
+		(*it)->m_text.setColor(sf::Color(c4.r, c4.g, c4.b, alpha));
+
+		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
+		{
+			sf::Color c2 = (*it2)->m_shape_container.getFillColor();
+			(*it2)->m_shape_container.setFillColor(sf::Color(c2.r, c2.g, c2.b, alpha));
+
+			sf::Color c3 = (*it2)->m_shape_container.getOutlineColor();
+			(*it2)->m_shape_container.setOutlineColor(sf::Color(c3.r, c3.g, c3.b, alpha));
+		}
+	}
+
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		sf::Color c = (*it)->m_shape_container.getFillColor();
+		(*it)->m_shape_container.setFillColor(sf::Color(c.r, c.g, c.b, alpha));
+
+		sf::Color c2 = (*it)->m_shape_container.getOutlineColor();
+		(*it)->m_shape_container.setOutlineColor(sf::Color(c2.r, c2.g, c2.b, alpha));
+	}
+
+	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
+	{
+		(*it)->setColor(sf::Color(255, 255, 255, alpha));
+	}
+
+	for (vector<Engine*>::iterator it = m_engines.begin(); it != m_engines.end(); it++)
+	{
+		(*it)->setColor(sf::Color(255, 255, 255, alpha));
+	}
+
+	if (m_rudder != NULL)
+	{
+		m_rudder->setColor(sf::Color(255, 255, 255, alpha));
+	}
+
+	//stop crew members
+	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	{
+		(*it)->m_destination = NULL;
+		(*it)->m_speed = sf::Vector2f(0.f, 0.f);
+	}
+}
+
+bool Ship::IsFlooded()
+{
+	return m_flood > m_flood_max * 0.5f;
 }
