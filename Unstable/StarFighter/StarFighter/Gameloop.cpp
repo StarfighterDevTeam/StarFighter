@@ -493,6 +493,12 @@ void Gameloop::Update(sf::Time deltaTime)
 									}
 								}
 
+								//destroying door
+								if (tile->m_connexion != NULL)
+								{
+									tile->m_connexion->Destroy();
+								}
+
 								//killing crew
 								for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
 								{
