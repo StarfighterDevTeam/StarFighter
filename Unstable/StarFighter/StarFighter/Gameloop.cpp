@@ -938,8 +938,7 @@ bool Gameloop::UpdateTacticalScale()
 				}
 			}
 
-			//restore destroyed weapons
-			m_warship->RestoreWeaponsHealth();
+			m_warship->RestoreHealth();
 
 			//reset speed and offset
 			m_warship->m_ship_offset = sf::Vector2f(0.f, 0.f);

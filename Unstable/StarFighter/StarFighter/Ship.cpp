@@ -714,16 +714,25 @@ void Ship::InitCombat()
 
 void Ship::RestoreHealth()
 {
+	m_health = m_health_max;
+	m_flood = 0;
+
 	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
 	{
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
 			(*it2)->m_health = (*it2)->m_health_max;
 			(*it2)->m_pierced = false;
+			(*it2)->m_flood = 0;
 
 			if ((*it2)->m_weapon != NULL)
 			{
 				(*it2)->m_weapon->m_health = (*it2)->m_weapon->m_health_max;
+			}
+
+			if ((*it2)->m_connexion != NULL)
+			{
+				(*it2)->m_connexion->m_destroyed = false;
 			}
 		}
 	}
@@ -731,6 +740,12 @@ void Ship::RestoreHealth()
 	{
 		(*it)->m_health = (*it)->m_health_max;
 	}
+
+	//reset sinking
+	m_sinking_timer = 0.f;
+	UpdateSinking(sf::seconds(0.f));
+
+	m_is_fleeing = false;
 }
 
 void Ship::RestoreWeaponsHealth()

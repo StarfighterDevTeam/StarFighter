@@ -41,8 +41,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 	//ROOMS
 	//left
-	AddRoom(0, 1, 3, 4, Room_Prison);
-	AddRoom(0, 5, 3, 4, Room_Diving);
+	AddRoom(0, 1, 3, 4, Room_Diving);
+	AddRoom(0, 5, 3, 4, Room_Prison);
 
 	//mid
 	Room* nav_room = AddRoom(3, 0, 5, 2, Room_Navigation);
