@@ -11,7 +11,8 @@
 
 #define CANNONBALL_DAMAGE					10
 #define CANNONBALL_SPEED					800.f
-#define CANNONBALL_RADIUS					1
+
+#define TORPEDO_SPEED						400.f
 
 #define AMMO_WARP_DISTANCE_PER_SECOND		400.f
 
@@ -24,6 +25,7 @@ enum ShootPhase
 enum AmmoType
 {
 	Ammo_CannonBall,
+	Ammo_Torpedo,
 };
 
 class Ammo : public GameEntity

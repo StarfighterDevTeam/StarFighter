@@ -492,7 +492,7 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 		return false;
 	}
 
-	//turn angle towards target (get room center as a target)
+	//turn angle towards the center of the targeted room
 	Room* room = weapon->m_target_room;
 	int width = room->m_width % 2 == 0 ? room->m_width - 1 : room->m_width;
 	int height = room->m_height % 2 == 0 ? room->m_height - 1 : room->m_height;
@@ -524,8 +524,6 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 		}
 	}
 
-	//weapon->setRotation(angle - weapon->m_angle);
-
 	//cooldown ready?
 	if (weapon->m_rof_timer > 0)
 	{
@@ -540,12 +538,38 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 	}
 
 	//pick a random enemy tile within the targeted room
-	int r = RandomizeIntBetweenValues(0, weapon->m_target_room->m_tiles.size() - 1);
-	RoomTile* target_tile = weapon->m_target_room->m_tiles[r];
+	int r;
+	RoomTile* target_tile;
+
+	if (weapon->m_type == Weapon_Cannon)
+	{
+		r = RandomizeIntBetweenValues(0, weapon->m_target_room->m_tiles.size() - 1);
+		target_tile = weapon->m_target_room->m_tiles[r];
+	}
+	else if (weapon->m_type == Weapon_Torpedo)
+	{
+		vector<RoomTile*> possible_targets;
+		for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
+		{
+			//hull tiles occupied by a weapon cannot be pierced, so cannot be targeted by torpedoes
+			if ((*it)->m_weapon == NULL && (((*it)->m_hull == Hull_Left && target->m_alliance != Alliance_Player) || ((*it)->m_hull == Hull_Right && target->m_alliance == Alliance_Player)))
+			{
+				possible_targets.push_back(*it);
+			}
+		}
+
+		if (possible_targets.empty() == true)
+		{
+			weapon->m_target_room = NULL;//weapon should choose a new target
+			return false;
+		}
+		r = RandomizeIntBetweenValues(0, possible_targets.size() - 1);
+		target_tile = possible_targets[r];
+	}
+	
 	sf::Vector2f vec2 = target_tile->m_position - weapon->m_position;
 	float angle2;
 	GetAngleForVector(vec2, angle2);
-	//weapon->setRotation(angle2 - weapon->m_angle);
 
 	sf::Vector2f target_position = hit == true ? target_tile->m_position : (weapon->m_position + target_tile->m_position) * 0.5f;
 
@@ -592,7 +616,16 @@ void Ship::BuildShip()
 
 		weapon_room->m_tiles[x]->m_system = System_Weapon;
 
-		Weapon* weapon = new Weapon(Weapon_Cannon, false);
+		Weapon* weapon = NULL;
+		if (i == 0 || i == 1)
+		{
+			weapon = new Weapon(Weapon_Cannon, false);
+		}
+		else
+		{
+			weapon = new Weapon(Weapon_Torpedo, false);
+		}
+		
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
 		weapon->setAnimationLine(1);//horizontal mirroring
 		weapon->m_angle = 270.f;

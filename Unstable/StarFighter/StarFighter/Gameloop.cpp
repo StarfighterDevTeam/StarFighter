@@ -174,19 +174,47 @@ void Gameloop::Update(sf::Time deltaTime)
 			Weapon* weapon = (Weapon*)selection;
 			if (weapon->m_ship->m_alliance == Alliance_Player)
 			{
-				if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
+				if (weapon->m_type == Weapon_Cannon)
 				{
-					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+					if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
+					//if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
 					{
-						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Target]);
+						for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+						{
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Target]);
+						}
+					}
+
+					if (room_hovered != NULL)
+					{
+						for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
+						{
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
+						}
 					}
 				}
-
-				if (room_hovered != NULL)
+				else if (weapon->m_type == Weapon_Torpedo)
 				{
-					for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
+					if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
 					{
-						(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
+						for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+						{
+							if ((*it2)->m_hull == Hull_Left && (*it2)->m_weapon == NULL)
+							{
+								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Target]);
+							}
+						}
+					}
+
+					if (room_hovered != NULL)
+					{
+						for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
+						{
+							if ((*it2)->m_hull == Hull_Left && (*it2)->m_weapon == NULL)
+							{
+								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
+							}
+						}
 					}
 				}
 			}
@@ -379,14 +407,48 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				if ((*CurrentGame).m_pause == false)
 				{
-					//randomly change target sometimes
-					if ((*it)->m_target_room == NULL || ((*it)->m_rof_timer <= 0 && RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE))
+					//Assign targeted room
+					if ((*it)->m_target_room == NULL)
 					{
-						int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
-						(*it)->m_target_room = m_warship->m_rooms[r];
+						if ((*it)->m_type == Weapon_Cannon)
+						{
+							int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
+							(*it)->m_target_room = m_warship->m_rooms[r];
+						}
+						else if((*it)->m_type == Weapon_Torpedo)
+						{
+							vector<Room*> possible_rooms;
+							for (vector<Room*>::iterator it2 = m_warship->m_rooms.begin(); it2 != m_warship->m_rooms.end(); it2++)
+							{
+								for (vector<RoomTile*>::iterator it3 = (*it2)->m_tiles.begin(); it3 != (*it2)->m_tiles.end(); it3++)
+								{
+									if ((*it3)->m_hull == Hull_Right && (*it3)->m_pierced == false && (*it3)->m_weapon == NULL)
+									{
+										possible_rooms.push_back(*it2);
+										break;
+									}
+								}
+							}
+
+							if (possible_rooms.empty() == false)
+							{
+								int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
+								(*it)->m_target_room = possible_rooms[r];
+							}
+						}
 					}
 
-					m_tactical_ship->FireWeapon(*it, deltaTime, m_warship);
+					//Fire
+					bool fired = m_tactical_ship->FireWeapon(*it, deltaTime, m_warship);
+
+					//Change targeted room at times (randomly, or each type if the weapon is a torpedo-type)
+					if (fired == true)
+					{
+						if ((*it)->m_type == Weapon_Torpedo || RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE)
+						{
+							(*it)->m_target_room = NULL;
+						}
+					}
 				}
 			}
 		}
@@ -484,7 +546,7 @@ void Gameloop::Update(sf::Time deltaTime)
 								}
 
 								//piercing hull
-								if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
+								if (tile->m_hull != Hull_None && tile->m_pierced == false && (tile->m_health == 0 || (*it)->m_type == Ammo_Torpedo) && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
 								{
 									tile->m_pierced = true;
 									if (tile->m_crew != NULL)

@@ -8,10 +8,6 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 	m_angle = is_enemy == false ? 90.f : -90.f;
 	m_health_max = CANNON_HEALTH_MAX;
 	m_health = m_health_max;
-	m_ammo_type = Ammo_CannonBall;
-	m_rof = CANNON_RATE_OF_FIRE;
-	m_rof_timer = CANNON_RATE_OF_FIRE;
-	m_angle_speed = CANNON_ANGLESPEED;
 	m_target_room = NULL;
 	m_tile = NULL;
 	m_ship = NULL;
@@ -19,8 +15,28 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 	//shape for water tiles
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/cannon_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
+	sf::Texture* texture;
+	switch (type)
+	{
+		case Weapon_Cannon:
+			texture = loader->loadTexture("2D/cannon_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
+			m_rof = CANNON_RATE_OF_FIRE;
+			m_rof_timer = CANNON_RATE_OF_FIRE;
+			m_angle_speed = CANNON_ANGLESPEED;
 
+			m_ammo_type = Ammo_CannonBall;
+			break;
+
+		case Weapon_Torpedo:
+			texture = loader->loadTexture("2D/torpedo_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
+			m_rof = TORPEDO_RATE_OF_FIRE;
+			m_rof_timer = TORPEDO_RATE_OF_FIRE;
+			m_angle_speed = TORPEDO_ANGLESPEED;
+
+			m_ammo_type = Ammo_Torpedo;
+			break;
+	}
+	
 	setAnimation(texture, 1, 2);
 	setAnimationLine(is_enemy == false ? 0 : 1);
 

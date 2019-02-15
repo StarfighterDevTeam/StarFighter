@@ -6,7 +6,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 {
 	m_type = type;
 	m_angle = angle;
-	setRotation(angle);
+	setRotation(angle - 90.f);
 	m_distance_combat = distance_combat;
 	m_target_tile = target_tile;
 	m_target_position = target_position;
@@ -14,18 +14,33 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 	m_FX_hit = new FX(FX_Explosion);
 	m_FX_miss = new FX(FX_Splash);
 	m_target_ship = target_ship;
-
-	m_damage = CANNONBALL_DAMAGE;
-	m_ref_speed = CANNONBALL_SPEED;
-	m_radius = CANNONBALL_RADIUS;
+	m_radius = 1;
 
 	m_can_be_seen = true;
 
 	//shape for water tiles
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/cannonball.png", (int)CANNONBALL_SIZE, (int)CANNONBALL_SIZE);
+	sf::Texture* texture;
 
+	switch (type)
+	{
+		case Ammo_CannonBall:
+		{
+			texture = loader->loadTexture("2D/cannonball.png", (int)CANNONBALL_SIZE, (int)CANNONBALL_SIZE);
+			m_damage = CANNONBALL_DAMAGE;
+			m_ref_speed = CANNONBALL_SPEED;
+			break;
+		}
+		case Ammo_Torpedo:
+		{
+			texture = loader->loadTexture("2D/torpedo.png", 32, 16);
+			m_damage = 0;
+			m_ref_speed = TORPEDO_SPEED;
+			break;
+		}
+	}
+	
 	setAnimation(texture, 1, 1);
 
 	float tile_size = ROOMTILE_SIZE;
