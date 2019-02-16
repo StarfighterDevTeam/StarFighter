@@ -181,7 +181,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					{
 						for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
 						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Target]);
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Target_Locked]);
 						}
 					}
 
@@ -189,7 +189,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					{
 						for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
 						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
+							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target_Hovered]);
 						}
 					}
 				}
@@ -201,7 +201,7 @@ void Gameloop::Update(sf::Time deltaTime)
 						{
 							if ((*it2)->m_hull == Hull_Left && (*it2)->m_weapon == NULL)
 							{
-								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Target]);
+								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Target_Locked]);
 							}
 						}
 					}
@@ -212,7 +212,7 @@ void Gameloop::Update(sf::Time deltaTime)
 						{
 							if ((*it2)->m_hull == Hull_Left && (*it2)->m_weapon == NULL)
 							{
-								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target]);
+								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target_Hovered]);
 							}
 						}
 					}

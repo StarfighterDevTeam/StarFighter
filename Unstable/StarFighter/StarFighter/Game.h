@@ -117,8 +117,8 @@ enum Input_Actions
 enum Color_Chart
 {	
 	Color_Red_Destroyed,
-	Color_Yellow_Target,
-	Color_Grey_Target,
+	Color_Yellow_Target_Hovered,
+	Color_Red_Target_Locked,
 	Color_Grey_Background,
 	Color_Orange_System,
 	Color_Green_System,
