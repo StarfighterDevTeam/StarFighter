@@ -530,9 +530,8 @@ void Gameloop::Update(sf::Time deltaTime)
 								//"boom": apply bullet damage and side effects
 								RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
 
-								//damage
+								//damage to ship
 								(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
-								tile->m_health -= Min((*it)->m_damage, tile->m_health);
 
 								//damage to weapon
 								if (tile->m_weapon != NULL)
@@ -545,8 +544,11 @@ void Gameloop::Update(sf::Time deltaTime)
 									}
 								}
 
+								//hull damage
+								tile->m_health -= Min((*it)->m_hull_damage, tile->m_health);
+
 								//piercing hull
-								if (tile->m_hull != Hull_None && tile->m_pierced == false && (tile->m_health == 0 || (*it)->m_type == Ammo_Torpedo) && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
+								if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
 								{
 									tile->m_pierced = true;
 									if (tile->m_crew != NULL)
@@ -561,7 +563,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									tile->m_connexion->Destroy();
 								}
 
-								//killing crew
+								//sharpnel damage: killing crew
 								for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
 								{
 									float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
@@ -581,7 +583,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									{
 										if ((*it2)->m_health > 0)
 										{
-											(*it2)->m_health--;
+											(*it2)->m_health -= Min((*it)->m_sharpnel_damage, (*it2)->m_health);
 										}
 									}
 								}

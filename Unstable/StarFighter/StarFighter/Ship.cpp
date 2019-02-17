@@ -530,9 +530,10 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 		return false;
 	}
 
+	//hit or miss?
 	float hit_success = RandomizeFloatBetweenValues(0.f, 1.f);
 	bool hit = true;
-	if (hit_success < target->GetDodgeChances())//chance of miss
+	if (weapon->m_is_guided == false && hit_success < target->GetDodgeChances())//chance of miss
 	{
 		hit = false;
 	}

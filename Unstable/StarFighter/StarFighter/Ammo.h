@@ -10,8 +10,9 @@
 #define CANNONBALL_SIZE						16.f
 
 #define CANNONBALL_DAMAGE					10
-#define CANNONBALL_SPEED					800.f
+#define CANNONBALL_SPEED						800.f
 
+#define TORPEDO_HULL_DAMAGE					50
 #define TORPEDO_SPEED						1000.f
 #define TORPEDO_INITIAL_SPEED				10.f
 #define TORPEDO_ACCELERATION					100.f
@@ -54,6 +55,8 @@ public:
 	FX* m_FX_miss;
 
 	int m_damage;
+	int m_hull_damage;
+	int m_sharpnel_damage;
 	float m_radius;
 
 	bool m_can_be_seen;

@@ -23,6 +23,7 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 			m_rof = CANNON_RATE_OF_FIRE;
 			m_rof_timer = CANNON_RATE_OF_FIRE;
 			m_angle_speed = CANNON_ANGLESPEED;
+			m_is_guided = false;
 
 			m_ammo_type = Ammo_CannonBall;
 			break;
@@ -32,6 +33,7 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 			m_rof = TORPEDO_RATE_OF_FIRE;
 			m_rof_timer = TORPEDO_RATE_OF_FIRE;
 			m_angle_speed = TORPEDO_ANGLESPEED;
+			m_is_guided = true;
 
 			m_ammo_type = Ammo_Torpedo;
 			break;
@@ -70,9 +72,6 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 	m_rofbar->m_shape.setSize(sf::Vector2f(LIFEBAR_SIZE_X, LIFEBAR_SIZE_Y));
 	m_rofbar->m_shape.setOrigin(sf::Vector2f(LIFEBAR_SIZE_X * 0.5f, LIFEBAR_SIZE_Y * 0.5f));
 	m_rofbar->m_shape.setFillColor(sf::Color(255, 242, 39, 255));//yellow "rof");
-
-	//weapon stats
-	m_direct_fire = true;
 }
 
 Weapon::~Weapon()

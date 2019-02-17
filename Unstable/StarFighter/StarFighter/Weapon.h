@@ -36,10 +36,11 @@ public:
 	int m_health_max;
 
 	float m_angle;
-	bool m_direct_fire;
 	float m_rof;//rate of fire
 	float m_rof_timer;
 	float m_angle_speed;
+
+	bool m_is_guided;//true=cannot miss
 
 	void Update(Time deltaTime);
 
