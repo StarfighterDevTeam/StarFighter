@@ -7,8 +7,8 @@
 #include "Weapon.h"
 #include "Island.h"
 #include "Compass.h"
-#include "CombatInterface.h"
 #include "CrewInterface.h"
+#include "CombatInterface.h"
 #include "Ship.h"
 
 #define	CRUISE_SPEED					50.f
@@ -25,7 +25,6 @@ public:
 	float m_desired_angle;
 	float m_angle_speed;
 	struct Compass m_compass;
-	struct CombatInterface m_combat_interface;
 	struct CrewInterface m_crew_interface;
 
 	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
@@ -37,6 +36,8 @@ public:
 
 	void Update(Time deltaTime, bool tactical_combat);
 	void UpdateCrewMembersCountPerRoom(Room* room);
+
+	struct CombatInterface m_combat_interface[2];
 
 private:
 	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);

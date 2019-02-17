@@ -118,6 +118,9 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	}
 
 	m_nb_crew = m_nb_crew_max;
+
+	//Interface
+	m_combat_interface[0].Init(this);
 }
 
 Warship::~Warship()
@@ -252,9 +255,13 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 		{
 			UpdateSinking(deltaTime);
 		}
+	}
 
-		//UI combat
-		m_combat_interface.Update(deltaTime);
+	//UI combat
+	m_combat_interface[0].Update(deltaTime);
+	if (tactical_combat == true)
+	{
+		m_combat_interface[1].Update(deltaTime);
 	}
 
 	UpdateFlooding(deltaTime);

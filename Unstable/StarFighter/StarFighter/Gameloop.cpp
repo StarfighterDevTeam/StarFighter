@@ -235,7 +235,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	m_warship->m_crew.clear();
 	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
 	{
-		if ((*it)->m_health > 0)
+		if ((*it)->m_health > 0 && m_warship->m_sinking_timer == 0.f)
 		{
 			(*it)->Update(deltaTime);//crew movement/heal/repair...
 
@@ -276,7 +276,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		m_tactical_ship->m_crew.clear();
 		for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
 		{
-			if ((*it)->m_health > 0)
+			if ((*it)->m_health > 0 && m_tactical_ship->m_sinking_timer == 0.f)
 			{
 				(*it)->Update(deltaTime);//crew movement/heal/repair...
 
@@ -992,9 +992,13 @@ void Gameloop::Draw()
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
+	}
 
-		//combat interface
-		m_warship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
+	//combat interface
+	m_warship->m_combat_interface[0].Draw((*CurrentGame).m_mainScreen);
+	if (m_tactical_ship != NULL)
+	{
+		m_warship->m_combat_interface[1].Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//crew interface
@@ -1052,6 +1056,7 @@ bool Gameloop::UpdateTacticalScale()
 				{
 					delete m_tactical_ship;
 					m_tactical_ship = NULL;
+					m_warship->m_combat_interface[1].Destroy();
 				}
 			}
 
@@ -1134,7 +1139,6 @@ bool Gameloop::UpdateTacticalScale()
 		}
 
 		m_tactical_ship = *it;
-		m_warship->m_combat_interface.Init(m_warship, *it);
 		m_scale = Scale_Tactical;
 		break;
 	}
@@ -1149,6 +1153,7 @@ bool Gameloop::UpdateTacticalScale()
 		m_warship->InitCombat();//init cooldowns
 		m_tactical_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
 		m_tactical_ship->InitCombat();//init cooldowns
+		m_warship->m_combat_interface[1].Init(m_tactical_ship);//init enemy interface
 
 		//fill enemy ship room tiles for pathfind
 		(*CurrentGame).m_enemy_tiles.clear();

@@ -9,7 +9,7 @@
 #define COMBAT_LIFEBAR_SIZE_X			400.f
 #define COMBAT_LIFEBAR_SIZE_Y			20.f
 #define COMBAT_LIFEBAR_OFFSET_X			200.f
-#define COMBAT_LIFEBAR_MINI_OFFSET_X	1350.f
+#define COMBAT_LIFEBAR_ENEMY_OFFSET_X	1350.f
 #define COMBAT_LIFEBAR_OFFSET_Y			100.f
 #define COMBAT_FLOODBAR_SIZE_X			(COMBAT_LIFEBAR_SIZE_X)
 #define COMBAT_FLOODBAR_SIZE_Y			10.f
@@ -24,17 +24,18 @@ struct CombatInterface
 	CombatInterface();
 	~CombatInterface();
 
-	void Init(Ship* ship, Ship* enemy_ship);
+	void Init(Ship* ship);
+	void Destroy();
 	Ship* m_ship;
 	Ship* m_enemy_ship;
-	GameEntity* m_lifebars[2];
-	GameEntity* m_floodbars[2];
-	GameEntity* m_crewbars[2];
-	GameEntity* m_distance_line;
-	GameEntity* m_distance_markers[5];
-	GameEntity* m_distance_ships[2];
-	GameEntity* m_ships_name[2];
-	GameEntity* m_ships_info[2];
+	GameEntity* m_lifebar;
+	GameEntity* m_floodbar;
+	GameEntity* m_crewbar;
+	//GameEntity* m_distance_line;
+	//GameEntity* m_distance_markers[5];
+	//GameEntity* m_distance_ships[2];
+	GameEntity* m_ship_name;
+	GameEntity* m_ship_info;
 
 	void Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
