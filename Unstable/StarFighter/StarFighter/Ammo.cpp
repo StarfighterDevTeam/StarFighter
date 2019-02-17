@@ -30,6 +30,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 			texture = loader->loadTexture("2D/cannonball.png", (int)CANNONBALL_SIZE, (int)CANNONBALL_SIZE);
 			m_damage = CANNONBALL_DAMAGE;
 			m_ref_speed = CANNONBALL_SPEED;
+			m_initial_speed = CANNONBALL_SPEED;
 			break;
 		}
 		case Ammo_Torpedo:
@@ -37,15 +38,19 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 			texture = loader->loadTexture("2D/torpedo.png", 32, 16);
 			m_damage = 0;
 			m_ref_speed = TORPEDO_SPEED;
+			m_initial_speed = TORPEDO_INITIAL_SPEED;
+			m_acceleration = TORPEDO_ACCELERATION;
 			break;
 		}
 	}
 	
+	m_current_speed = m_initial_speed;
+
 	setAnimation(texture, 1, 1);
 
 	float tile_size = ROOMTILE_SIZE;
 	float angle_rad = angle * M_PI / 180.f;
-	m_speed = sf::Vector2f(m_ref_speed * sin(angle_rad), - m_ref_speed * cos(angle_rad));
+	m_speed = sf::Vector2f(m_initial_speed * sin(angle_rad), - m_initial_speed * cos(angle_rad));
 	float weapon_offset_x = (tile_size + m_size.x) * 0.5f * sin(angle_rad);
 	float weapon_offset_y = -(tile_size + m_size.y) * 0.5f * cos(angle_rad);
 	m_position = position + sf::Vector2f(weapon_offset_x, weapon_offset_y);
@@ -59,6 +64,14 @@ Ammo::~Ammo()
 
 void Ammo::Update(Time deltaTime)
 {
+	//acceleration
+	if (m_initial_speed < m_ref_speed && m_current_speed < m_ref_speed)
+	{
+		m_current_speed += m_acceleration * deltaTime.asSeconds();
+		m_current_speed = Minf(m_current_speed, m_ref_speed);
+		ScaleVector(&m_speed, m_current_speed);
+	}
+
 	//apply movement
 	m_position.x += m_speed.x * deltaTime.asSeconds();
 	m_position.y += m_speed.y * deltaTime.asSeconds();

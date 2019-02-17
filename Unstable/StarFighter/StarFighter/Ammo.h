@@ -12,7 +12,9 @@
 #define CANNONBALL_DAMAGE					10
 #define CANNONBALL_SPEED					800.f
 
-#define TORPEDO_SPEED						400.f
+#define TORPEDO_SPEED						1000.f
+#define TORPEDO_INITIAL_SPEED				10.f
+#define TORPEDO_ACCELERATION					100.f
 
 #define AMMO_WARP_DISTANCE_PER_SECOND		400.f
 
@@ -43,6 +45,9 @@ public:
 	float m_angle;
 	sf::Vector2f m_speed;
 	float m_ref_speed;
+	float m_initial_speed;
+	float m_current_speed;
+	float m_acceleration;
 	float m_distance_combat;
 	float m_warp_timer;
 	FX* m_FX_hit;
