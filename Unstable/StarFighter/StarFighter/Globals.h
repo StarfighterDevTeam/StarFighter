@@ -101,8 +101,8 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME				50
 #define DEFAULT_SFX_VOLUME					100
-#define MUSIC_FADE_IN_TIME					2.f
-#define MUSIC_FADE_OUT_TIME					2.f
+#define MUSIC_FADE_IN_TIME					0.1f
+#define MUSIC_FADE_OUT_TIME					0.1f
 
 //TEXT POP FEEDBACK
 #define TEXT_POP_OFFSET_Y							10

@@ -759,6 +759,8 @@ void Gameloop::Update(sf::Time deltaTime)
 		WaterTile* tile = (WaterTile*)hovered;
 		m_warship->SetSailsToWaterTile(tile);
 	}
+
+	(*CurrentGame).ManageMusicTransitions(deltaTime);
 }
 
 void Gameloop::Draw()
@@ -1164,6 +1166,8 @@ bool Gameloop::UpdateTacticalScale()
 				(*CurrentGame).m_enemy_tiles.push_back(*it2);
 			}
 		}
+
+		(*CurrentGame).PlayMusic(Music_Combat);
 	}
 
 	return (m_scale == Scale_Tactical);

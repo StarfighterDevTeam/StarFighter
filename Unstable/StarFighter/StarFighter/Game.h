@@ -31,6 +31,7 @@ enum SFX_Bank
 enum Music_Bank
 {
 	Music_Main,
+	Music_Combat,
 	NBVAL_MUSIC_BANK,
 };
 

@@ -51,7 +51,7 @@ Game::Game(RenderWindow& window)
 
 	//Music
 	printf("Loading Musics\n");
-	m_Music_Activated = false;
+	m_Music_Activated = true;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
 
@@ -226,9 +226,9 @@ void Game::PlayMusic(Music_Bank music, string specific_filename)
 		//choose the right music file
 		switch (music)
 		{
-			case Music_Main:
+			case Music_Combat:
 			{
-				m_next_music_name = makePath("Music/Main.ogg");
+				m_next_music_name = makePath("Music/Pirate_GoingToWar.ogg");
 				break;
 			}
 		}

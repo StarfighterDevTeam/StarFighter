@@ -17,6 +17,11 @@ CombatInterface::CombatInterface()
 	//	m_ships_name[i] = NULL;
 	//	m_ships_info[i] = NULL;
 	//}
+	m_lifebar = NULL;
+	m_floodbar = NULL;
+	m_crewbar = NULL;
+	m_ship_name = NULL;
+	m_ship_info = NULL;
 }
 
 CombatInterface::~CombatInterface()
