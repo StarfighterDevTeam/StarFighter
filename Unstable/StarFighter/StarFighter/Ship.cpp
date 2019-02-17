@@ -618,16 +618,20 @@ void Ship::BuildShip()
 		weapon_room->m_tiles[x]->m_system = System_Weapon;
 
 		Weapon* weapon = NULL;
-		if (i == 0 || i == 1)
+		if (i == 0)
 		{
 			weapon = new Weapon(Weapon_Cannon, false);
 		}
-		else
+		else if (i == 1)
 		{
 			weapon = new Weapon(Weapon_Torpedo, false);
 		}
+		else if (i == 2)
+		{
+			weapon = new Weapon(Weapon_Sharpnel, false);
+		}
 		
-		//AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
+		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
 		weapon->setAnimationLine(1);//horizontal mirroring
 		weapon->m_angle = 270.f;
 	}

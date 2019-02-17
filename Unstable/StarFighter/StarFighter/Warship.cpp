@@ -76,11 +76,15 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		weapon_room->m_tiles[x]->m_system = System_Weapon;
 
 		Weapon* weapon = NULL;
-		if (i == 0 | i == 1)
+		if (i == 0)
 		{
-			weapon = new Weapon(Weapon_Sharpnel, false);
+			weapon = new Weapon(Weapon_Cannon, false);
 		}
-		else
+		else if (i == 1)
+		{
+			weapon = new Weapon(Weapon_Torpedo, false);
+		}
+		else if (i == 2)
 		{
 			weapon = new Weapon(Weapon_Sharpnel, false);
 		}
