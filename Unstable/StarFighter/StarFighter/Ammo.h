@@ -10,14 +10,15 @@
 #define CANNONBALL_SIZE						16.f
 
 #define CANNONBALL_DAMAGE					10
-#define CANNONBALL_SPEED						800.f
+#define CANNONBALL_SPEED					800.f
 
 #define TORPEDO_HULL_DAMAGE					50
 #define TORPEDO_SPEED						1000.f
 #define TORPEDO_INITIAL_SPEED				10.f
-#define TORPEDO_ACCELERATION					100.f
+#define TORPEDO_ACCELERATION				100.f
 
 #define SHARPNEL_DAMAGE						15
+#define SHARPNEL_DELAY						0.1f
 
 #define AMMO_WARP_DISTANCE_PER_SECOND		400.f
 

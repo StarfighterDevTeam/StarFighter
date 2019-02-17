@@ -520,6 +520,8 @@ void Gameloop::Update(sf::Time deltaTime)
 
 					int a = x - radius;
 					int b = x + radius;
+
+					vector<RoomTile*> tiles_hit;
 					for (int i = x - radius; i < x + radius + 1; i++)
 					{
 						for (int j = y - radius; j < y + radius + 1; j++)
@@ -531,20 +533,16 @@ void Gameloop::Update(sf::Time deltaTime)
 
 								if (tile == NULL)
 								{
-									break;
+									continue;
 								}
 
 								//walls block splash damage
 								if ((*it)->m_radius > 1 && tile->m_room != (*it)->m_target_tile->m_room)
 								{
-									break;
+									continue;
 								}
 
-								//FX of the explosion
-								FX* FX_hit = (*it)->m_FX_hit->Clone();
-								FX_hit->m_position = tile->m_position;
-								FX_hit->UpdatePosition();
-								(*CurrentGame).m_FX.push_back(FX_hit);
+								tiles_hit.push_back(tile);
 
 								//damage to ship
 								(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
@@ -605,6 +603,42 @@ void Gameloop::Update(sf::Time deltaTime)
 								}
 							}
 						}
+					}
+
+					//FX of the explosion
+					int nb_hits = tiles_hit.size();
+					//shuffle possible fx hits for a "random" carpet bombing
+					if (nb_hits > 1)
+					{
+						vector<int> hits_order;
+						for (int h = 0; h < nb_hits; h++)
+						{
+							hits_order.push_back(h);
+						}
+						for (int h = 0; h < nb_hits; h++)
+						{
+							int k = hits_order[h];
+							int r = RandomizeIntBetweenValues(0, nb_hits - 1);
+							hits_order[h] = hits_order[r];
+							hits_order[r] = k;
+						}
+
+						for (int h = 0; h < nb_hits; h++)
+						{
+							RoomTile* k = tiles_hit[h];
+							tiles_hit[h] = tiles_hit[hits_order[h]];
+							tiles_hit[hits_order[h]] = k;
+						}
+					}
+
+					//set FX positions
+					for (int h = 0; h < nb_hits; h++)
+					{
+						FX* FX_hit = (*it)->m_FX_hit->Clone();
+						FX_hit->m_position = tiles_hit[h]->m_position;
+						FX_hit->UpdatePosition();
+						FX_hit->m_delay_timer = h * SHARPNEL_DELAY;
+						(*CurrentGame).m_FX.push_back(FX_hit);
 					}
 				}
 			}
@@ -972,7 +1006,10 @@ void Gameloop::Draw()
 	//FX
 	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
 	{
-		(*it)->FX::Draw((*CurrentGame).m_mainScreen);
+		if ((*it)->m_delay_timer <= 0)
+		{
+			(*it)->FX::Draw((*CurrentGame).m_mainScreen);
+		}
 	}
 
 	//PAUSE

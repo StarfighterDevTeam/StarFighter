@@ -5,6 +5,7 @@ extern Game* CurrentGame;
 FX::FX(FX_Type type) : GameEntity(UI_None)
 {
 	m_type = type;
+	m_delay_timer = 0.f;
 
 	switch (type)
 	{
@@ -47,17 +48,25 @@ FX* FX::Clone()
 
 void FX::Update(Time deltaTime)
 {
-	if (m_FX_timer > 0)
+	if (m_delay_timer > 0)
 	{
-		m_FX_timer -= deltaTime.asSeconds();
+		m_delay_timer -= deltaTime.asSeconds();
 	}
 
-	if (m_FX_timer <= 0)
+	if (m_delay_timer <= 0)
 	{
-		m_can_be_seen = false;
-	}
+		if (m_FX_timer > 0)
+		{
+			m_FX_timer -= deltaTime.asSeconds();
+		}
 
-	AnimatedSprite::update(deltaTime);
+		if (m_FX_timer <= 0)
+		{
+			m_can_be_seen = false;
+		}
+
+		AnimatedSprite::update(deltaTime);
+	}
 }
 
 void FX::Draw(sf::RenderTexture& screen)

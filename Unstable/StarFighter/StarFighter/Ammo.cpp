@@ -95,10 +95,9 @@ void Ammo::Update(Time deltaTime)
 
 	//hitting target
 	if (abs(m_position.x - m_target_position.x) < 16.f && abs(m_position.y - m_target_position.y) < 16.f)
-	{
-		//"boom"
+	{	
 		m_can_be_seen = false;
-		
+
 		if (m_target_tile != NULL)
 		{
 			m_phase = Shoot_Hit;

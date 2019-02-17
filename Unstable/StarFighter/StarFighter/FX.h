@@ -20,6 +20,7 @@ public:
 	bool m_can_be_seen;
 	string m_texturename;
 	FX_Type m_type;
+	float m_delay_timer;
 
 	void Update(Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
