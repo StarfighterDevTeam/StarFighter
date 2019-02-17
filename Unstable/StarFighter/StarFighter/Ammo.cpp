@@ -11,7 +11,6 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 	m_target_tile = target_tile;
 	m_target_position = target_position;
 	m_phase = Shoot_Ougoing;
-	m_FX_hit = new FX(FX_Explosion);
 	m_FX_miss = new FX(FX_Splash);
 	m_target_ship = target_ship;
 	m_radius = 1;
@@ -27,16 +26,18 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 	{
 		case Ammo_CannonBall:
 		{
+			m_FX_hit = new FX(FX_Explosion);
 			texture = loader->loadTexture("2D/cannonball.png", (int)CANNONBALL_SIZE, (int)CANNONBALL_SIZE);
 			m_damage = CANNONBALL_DAMAGE;
 			m_hull_damage = CANNONBALL_DAMAGE;
 			m_sharpnel_damage = CANNONBALL_DAMAGE;
 			m_ref_speed = CANNONBALL_SPEED;
-			m_initial_speed = CANNONBALL_SPEED;
+			m_initial_speed = m_ref_speed;
 			break;
 		}
 		case Ammo_Torpedo:
 		{
+			m_FX_hit = new FX(FX_Explosion);
 			texture = loader->loadTexture("2D/torpedo.png", 32, 16);
 			m_damage = 0;
 			m_hull_damage = TORPEDO_HULL_DAMAGE;
@@ -44,6 +45,18 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 			m_ref_speed = TORPEDO_SPEED;
 			m_initial_speed = TORPEDO_INITIAL_SPEED;
 			m_acceleration = TORPEDO_ACCELERATION;
+			break;
+		}
+		case Ammo_Sharpnel:
+		{
+			m_FX_hit = new FX(FX_Sharpnel);
+			texture = loader->loadTexture("2D/sharpnel.png", 32, 16);
+			m_damage = 0;
+			m_hull_damage = 0;
+			m_sharpnel_damage = SHARPNEL_DAMAGE;
+			m_ref_speed = CANNONBALL_SPEED;
+			m_initial_speed = m_ref_speed;
+			m_radius = 2;
 			break;
 		}
 	}
@@ -88,10 +101,6 @@ void Ammo::Update(Time deltaTime)
 		
 		if (m_target_tile != NULL)
 		{
-			FX* FX_hit = m_FX_hit->Clone();
-			FX_hit->m_position = m_target_position;
-			FX_hit->UpdatePosition();
-			(*CurrentGame).m_FX.push_back(FX_hit);
 			m_phase = Shoot_Hit;
 		}
 		else

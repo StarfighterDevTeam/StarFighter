@@ -17,6 +17,8 @@
 #define TORPEDO_INITIAL_SPEED				10.f
 #define TORPEDO_ACCELERATION					100.f
 
+#define SHARPNEL_DAMAGE						15
+
 #define AMMO_WARP_DISTANCE_PER_SECOND		400.f
 
 enum ShootPhase
@@ -29,6 +31,7 @@ enum AmmoType
 {
 	Ammo_CannonBall,
 	Ammo_Torpedo,
+	Ammo_Sharpnel,
 };
 
 class Ammo : public GameEntity

@@ -22,6 +22,13 @@ FX::FX(FX_Type type) : GameEntity(UI_None)
 			setAnimation(texture, 10, 1);
 			break;
 		}
+		case FX_Sharpnel:
+		{
+			m_texturename = "2D/FX_sharpnel.png";
+			Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, 400, 74);
+			setAnimation(texture, 4, 1);
+			break;
+		}
 	}
 
 	m_FX_timer = TIME_BETWEEN_ANIMATION_FRAMES * m_frameNumber;

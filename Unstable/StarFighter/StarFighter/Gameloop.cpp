@@ -174,10 +174,9 @@ void Gameloop::Update(sf::Time deltaTime)
 			Weapon* weapon = (Weapon*)selection;
 			if (weapon->m_ship->m_alliance == Alliance_Player)
 			{
-				if (weapon->m_type == Weapon_Cannon)
+				if (weapon->m_type != Weapon_Torpedo)
 				{
 					if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
-					//if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
 					{
 						for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
 						{
@@ -410,7 +409,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					//Assign targeted room
 					if ((*it)->m_target_room == NULL)
 					{
-						if ((*it)->m_type == Weapon_Cannon)
+						if ((*it)->m_type != Weapon_Torpedo)
 						{
 							int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
 							(*it)->m_target_room = m_warship->m_rooms[r];
@@ -530,6 +529,23 @@ void Gameloop::Update(sf::Time deltaTime)
 								//"boom": apply bullet damage and side effects
 								RoomTile* tile = (*it)->m_target_ship->m_tiles[i][j];
 
+								if (tile == NULL)
+								{
+									break;
+								}
+
+								//walls block splash damage
+								if ((*it)->m_radius > 1 && tile->m_room != (*it)->m_target_tile->m_room)
+								{
+									break;
+								}
+
+								//FX of the explosion
+								FX* FX_hit = (*it)->m_FX_hit->Clone();
+								FX_hit->m_position = tile->m_position;
+								FX_hit->UpdatePosition();
+								(*CurrentGame).m_FX.push_back(FX_hit);
+
 								//damage to ship
 								(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
 
@@ -558,7 +574,7 @@ void Gameloop::Update(sf::Time deltaTime)
 								}
 
 								//destroying door
-								if (tile->m_connexion != NULL)
+								if (tile->m_connexion != NULL && (*it)->m_damage > 0)
 								{
 									tile->m_connexion->Destroy();
 								}

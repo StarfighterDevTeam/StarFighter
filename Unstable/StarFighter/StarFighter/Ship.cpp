@@ -542,7 +542,7 @@ bool Ship::FireWeapon(Weapon* weapon, Time deltaTime, Ship* target)
 	int r;
 	RoomTile* target_tile;
 
-	if (weapon->m_type == Weapon_Cannon)
+	if (weapon->m_type != Weapon_Torpedo)
 	{
 		r = RandomizeIntBetweenValues(0, weapon->m_target_room->m_tiles.size() - 1);
 		target_tile = weapon->m_target_room->m_tiles[r];
@@ -627,7 +627,7 @@ void Ship::BuildShip()
 			weapon = new Weapon(Weapon_Torpedo, false);
 		}
 		
-		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
+		//AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
 		weapon->setAnimationLine(1);//horizontal mirroring
 		weapon->m_angle = 270.f;
 	}
