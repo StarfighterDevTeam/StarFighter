@@ -57,10 +57,10 @@ Ship::~Ship()
 		delete *it;
 	}
 
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-	{
-		delete *it;
-	}
+	//for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	//{
+	//	delete *it;
+	//}
 
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
@@ -659,7 +659,7 @@ void Ship::BuildShip()
 
 	//crew
 	m_nb_crew_max = 0;
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 11; i++)
 	{
 		int r = RandomizeIntBetweenValues(0, m_rooms.size() - 1);
 		//r = 12;
@@ -668,6 +668,9 @@ void Ship::BuildShip()
 	}
 
 	m_nb_crew = m_nb_crew_max;
+
+	//CHEAT DEBUG
+	m_health = m_health_max * 0.2 + 8;
 }
 
 void Ship::CenterRoomPositions(bool is_enemy)

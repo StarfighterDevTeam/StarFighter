@@ -51,7 +51,7 @@ Game::Game(RenderWindow& window)
 
 	//Music
 	printf("Loading Musics\n");
-	m_Music_Activated = true;
+	m_Music_Activated = false;
 	m_music_fader = 0;
 	PlayMusic(Music_Main);
 

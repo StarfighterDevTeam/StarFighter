@@ -31,6 +31,7 @@ CrewInterface::~CrewInterface()
 void CrewInterface::Init(CrewMember* crew)
 {
 	m_crew = crew;
+	m_position = sf::Vector2f(CREWINTERFACE_SIZE_X * 0.5f, REF_WINDOW_RESOLUTION_Y - CREWINTERFACE_SIZE_Y * 0.5f);
 
 	//background panel
 	m_panel = new GameEntity(UI_None);
@@ -102,6 +103,8 @@ void CrewInterface::Init(CrewMember* crew)
 	m_lifebar->m_text.setCharacterSize(14);
 	m_lifebar->m_text.setStyle(sf::Text::Bold);
 	m_lifebar->m_text.setColor(sf::Color::Black);
+	m_lifebar->m_text.setString("??/??");
+	m_lifebar->m_text.setPosition(sf::Vector2f(m_lifebar->m_position.x + m_lifebar->m_shape_container.getSize().x * 0.5f + CREWINTERFACE_TEXT_OFFSET_X, m_lifebar->m_position.y - m_lifebar->m_text.getGlobalBounds().height * 0.5f - 4.f));
 
 	//status
 	offset_y += 14.f;
@@ -218,6 +221,31 @@ void CrewInterface::Update()
 		m_skillbars[i]->m_text.setString(ss_skill.str());
 		m_skillbars[i]->m_text.setPosition(sf::Vector2f(m_skillbars[i]->m_position.x + m_skillbars[i]->m_shape_container.getSize().x * 0.5f + 14.f, m_skillbars[i]->m_position.y - m_skillbars[i]->m_text.getGlobalBounds().height * 0.5f - 5.f));
 	}
+}
+
+void CrewInterface::SetPosition(sf::Vector2f position)
+{
+	sf::Vector2f offset = position - m_position;
+
+	m_panel->m_shape_container.setPosition(m_panel->m_shape_container.getPosition() + offset);
+	m_display_name.setPosition(sf::Vector2f(m_display_name.getPosition() + offset));
+	m_portrait->setPosition(m_portrait->getPosition() + offset);
+	m_portrait->m_shape_container.setPosition(m_portrait->m_shape_container.getPosition() + offset);
+	m_type_text.setPosition(m_type_text.getPosition() + offset);
+	m_race_text.setPosition(sf::Vector2f(m_race_text.getPosition() + offset));
+	m_lifebar->m_shape_container.setPosition(m_lifebar->m_shape_container.getPosition() + offset);
+	m_lifebar->m_shape.setPosition(m_lifebar->m_shape.getPosition() + offset);
+	m_lifebar->m_text.setPosition(m_lifebar->m_text.getPosition() + offset);
+	m_status_text.setPosition(sf::Vector2f(m_status_text.getPosition() + offset));
+
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		m_skillbar_names[i].setPosition(m_skillbar_names[i].getPosition() + offset);
+		m_skillbars[i]->m_shape_container.setPosition(m_skillbars[i]->m_shape_container.getPosition() + offset);
+		m_skillbars[i]->m_shape.setPosition(m_skillbars[i]->m_shape.getPosition() + offset);
+	}
+
+	m_position = position;
 }
 
 void CrewInterface::Draw(sf::RenderTexture& screen)

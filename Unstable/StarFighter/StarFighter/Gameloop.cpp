@@ -20,6 +20,7 @@ Gameloop::Gameloop()
 	m_tactical_ship = NULL;
 
 	m_scale = Scale_Strategic;
+	m_menu = Menu_None;
 
 	m_pause_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_pause_text.setCharacterSize(50);
@@ -760,6 +761,27 @@ void Gameloop::Update(sf::Time deltaTime)
 		m_warship->SetSailsToWaterTile(tile);
 	}
 
+	//MENUS
+	//Prisoners Choice Menu
+	if (m_menu == Menu_PrisonersChoice)
+	{
+		//for (vector<CrewMember*>::iterator it = m_warship->m_prisoners_choice_interface.m_crew.begin(); it != m_warship->m_prisoners_choice_interface.m_crew.end(); it++)
+		//{
+		//	(*it)->Update(deltaTime);
+		//
+		//	//create or update HUD for crew details
+		//	if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
+		//	{
+		//		m_warship->m_crew_interface.Init(*it);
+		//	}
+		//	else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && m_warship->m_crew_interface.m_crew->m_hovered == false)
+		//	{
+		//		m_warship->m_crew_interface.Init(*it);
+		//	}
+		//}
+	}
+
+	//Music
 	(*CurrentGame).ManageMusicTransitions(deltaTime);
 }
 
@@ -1018,6 +1040,12 @@ void Gameloop::Draw()
 		}
 	}
 
+	//Menus
+	if (m_menu == Menu_PrisonersChoice)
+	{
+		m_warship->m_prisoners_choice_interface.Draw((*CurrentGame).m_mainScreen);
+	}
+
 	//PAUSE
 	if ((*CurrentGame).m_pause == true)
 	{
@@ -1041,6 +1069,10 @@ bool Gameloop::UpdateTacticalScale()
 		bool lose = m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_sinking_timer >= SHIP_SINKING_TIME || m_warship->m_ship_offset.y < -m_warship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
 		if (win == true || lose == true) 
 		{
+			//make prisoners
+			m_menu = Menu_PrisonersChoice;
+			m_warship->m_prisoners_choice_interface.Init(m_tactical_ship);
+
 			//delete enemy from ships existing
 			vector<Ship*> old_ships;
 			for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
@@ -1072,6 +1104,7 @@ bool Gameloop::UpdateTacticalScale()
 
 			//switch back to strategic scale
 			m_scale = Scale_Strategic;
+			
 		}
 
 		return true;

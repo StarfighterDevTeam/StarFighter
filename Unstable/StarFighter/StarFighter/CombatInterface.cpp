@@ -53,6 +53,11 @@ void CombatInterface::Destroy()
 	delete m_crewbar;
 	delete m_ship_name;
 	delete m_ship_info;
+	m_lifebar = NULL;
+	m_floodbar = NULL;
+	m_crewbar = NULL;
+	m_ship_name = NULL;
+	m_ship_info = NULL;
 }
 
 void CombatInterface::Init(Ship* ship)

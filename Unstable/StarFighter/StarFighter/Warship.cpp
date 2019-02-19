@@ -82,7 +82,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		}
 		else if (i == 1)
 		{
-			weapon = new Weapon(Weapon_Torpedo, false);
+			weapon = new Weapon(Weapon_Cannon, false);
 		}
 		else if (i == 2)
 		{

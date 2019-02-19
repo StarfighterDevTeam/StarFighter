@@ -15,6 +15,12 @@ enum Scale
 	Scale_Strategic,
 };
 
+enum ContextualMenu
+{
+	Menu_None,
+	Menu_PrisonersChoice,
+};
+
 class Gameloop
 {
 public:
@@ -33,6 +39,7 @@ public:
 	Ship* m_tactical_ship;
 	Scale m_scale;
 	sf::Text m_pause_text;
+	ContextualMenu m_menu;
 
 	void InitWaterZones();
 	bool UpdateTacticalScale();

@@ -32,13 +32,13 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	{
 		case Crew_Pirate:
 		{
-			m_shape_container.setFillColor(sf::Color::Red);
+			m_shape_container.setFillColor(sf::Color::Magenta);
 			skill_max_value = 20;
 			break;
 		}
 		case Crew_Civilian:
 		{
-			m_shape_container.setFillColor(sf::Color::Cyan);
+			m_shape_container.setFillColor(sf::Color::Magenta);
 			skill_max_value = 10;
 			break;
 		}
@@ -50,7 +50,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 		}
 		case Crew_Undead:
 		{
-			m_shape_container.setFillColor(sf::Color::Green);
+			m_shape_container.setFillColor(sf::Color::Magenta);
 			skill_max_value = 15;
 			break;
 		}

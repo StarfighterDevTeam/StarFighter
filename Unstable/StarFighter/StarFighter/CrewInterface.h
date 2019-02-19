@@ -22,9 +22,11 @@ struct CrewInterface
 
 	void Init(CrewMember* crew);
 	CrewMember* m_crew;
+	sf::Vector2f m_position;
 
 	void Update();
 	void Draw(sf::RenderTexture& screen);
+	void SetPosition(sf::Vector2f position);
 
 	GameEntity* m_panel;
 	sf::Text m_display_name;

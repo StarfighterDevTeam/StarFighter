@@ -9,6 +9,7 @@
 #include "Compass.h"
 #include "CrewInterface.h"
 #include "CombatInterface.h"
+#include "PrisonersChoiceInterface.h"
 #include "Ship.h"
 
 #define	CRUISE_SPEED					50.f
@@ -26,6 +27,7 @@ public:
 	float m_angle_speed;
 	struct Compass m_compass;
 	struct CrewInterface m_crew_interface;
+	struct PrisonersChoiceInterface m_prisoners_choice_interface;
 
 	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
 	bool CanViewWaterTile(WaterTile* tile);
