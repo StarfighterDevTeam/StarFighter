@@ -239,19 +239,15 @@ void CombatInterface::Update(sf::Time deltaTime)
 
 void CombatInterface::Draw(sf::RenderTexture& screen)
 {
-	if (m_ship->m_is_fleeing == false)
-	{
-		//name & info
-		m_ship_name->Draw(screen);
-		m_ship_info->Draw(screen);
+	//name & info
+	m_ship_name->Draw(screen);
+	m_ship_info->Draw(screen);
 
-		//life bar
-		m_crewbar->Draw(screen);
-		m_floodbar->Draw(screen);
-		m_lifebar->Draw(screen);
-	}
+	//life bar
+	m_crewbar->Draw(screen);
+	m_floodbar->Draw(screen);
+	m_lifebar->Draw(screen);
 	
-
 	//distance
 	//m_distance_line->Draw(screen);
 	//

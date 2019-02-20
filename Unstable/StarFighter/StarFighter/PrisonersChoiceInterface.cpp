@@ -5,6 +5,8 @@ extern Game* CurrentGame;
 PrisonersChoiceInterface::PrisonersChoiceInterface()
 {
 	m_panel = NULL;
+	m_crew_focused = NULL;
+	m_current_choice = 0;
 }
 
 PrisonersChoiceInterface::~PrisonersChoiceInterface()
@@ -34,7 +36,7 @@ void PrisonersChoiceInterface::Init(Ship* enemy_ship)
 	m_panel = new GameEntity(UI_None);
 	m_panel->m_shape_container.setSize(sf::Vector2f(PRISONERSCHOICEINTERFACE_SIZE_X, PRISONERSCHOICEINTERFACE_SIZE_Y));
 	m_panel->m_shape_container.setOrigin(sf::Vector2f(PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f, PRISONERSCHOICEINTERFACE_SIZE_Y * 0.5f));
-	m_panel->m_shape_container.setFillColor(sf::Color(0, 0, 0, 255));
+	m_panel->m_shape_container.setFillColor(sf::Color::Black);
 	m_panel->m_shape_container.setOutlineThickness(2.f);
 	m_panel->m_shape_container.setOutlineColor(sf::Color::Black);
 	m_panel->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f, REF_WINDOW_RESOLUTION_Y * 0.5f));
@@ -55,10 +57,12 @@ void PrisonersChoiceInterface::Init(Ship* enemy_ship)
 	//prisoners
 	offset_y +=	100.f;
 	int prisoners_per_line = 10;
+	float prisoners_offset_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + 230;
 	for (int i = 0; i < crew_size; i++)
 	{
-		float pos_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + 230 + ((i % prisoners_per_line) * (CREWMEMBER_SIZE + 10));
+		float pos_x = prisoners_offset_x + (CREWMEMBER_SIZE * 0.5f) + ((i % prisoners_per_line) * (CREWMEMBER_SIZE + 10));
 		float pos_y = offset_y + ((i / prisoners_per_line) * (CREWMEMBER_SIZE + 10));
+		offset_y = Maxf(offset_y, pos_y);
 		m_crew[i]->m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
 	}
 
@@ -97,11 +101,35 @@ void PrisonersChoiceInterface::Init(Ship* enemy_ship)
 	ostringstream ss_life;
 	ss_life << m_crew_focused->m_health << "/" << m_crew_focused->m_health_max;
 	m_crew_interface.m_lifebar->m_text.setString(ss_life.str());
+
+	//choices
+	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 50.f;
+	for (int i = 0; i < 3; i++)
+	{
+		if (i == 0)
+		{
+			m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png");
+		}
+		else if (i == 1)
+		{
+			m_choices[i].Init(i, "En prison.", "2D/choice_prisoner_2.png");
+		}
+		else if (i == 2)
+		{
+			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png");
+		}
+		
+		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
+	}
+	//m_choices[0].m_picture->setAnimationLine(0);
 }
 
 void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 {
-	
+	for (int i = 0; i < 3; i++)
+	{
+		m_choices[i].Update(deltaTime);
+	}
 }
 
 void PrisonersChoiceInterface::Draw(sf::RenderTexture& screen)
@@ -116,4 +144,9 @@ void PrisonersChoiceInterface::Draw(sf::RenderTexture& screen)
 	}
 
 	m_crew_interface.Draw(screen);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_choices[i].Draw(screen);
+	}
 }

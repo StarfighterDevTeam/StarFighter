@@ -89,6 +89,7 @@
     <ClCompile Include="Ammo.cpp" />
     <ClCompile Include="AnimatedSprite.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Choice.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CombatInterface.cpp" />
     <ClCompile Include="Compass.cpp" />
@@ -123,6 +124,7 @@
     <ClInclude Include="Ammo.h" />
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="Choice.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="CombatInterface.h" />
     <ClInclude Include="Compass.h" />

@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "Ship.h"
 #include "CrewInterface.h"
+#include "Choice.h"
 
 #define	PRISONERSCHOICEINTERFACE_SIZE_X							900
 #define PRISONERSCHOICEINTERFACE_SIZE_Y							800
@@ -24,6 +25,9 @@ struct PrisonersChoiceInterface
 
 	GameEntity* m_panel;
 	sf::Text m_narrative_text;
+
+	int m_current_choice;
+	Choice m_choices[3];
 };
 
 #endif //PRISONERSCHOICEINTERFACE_H_INCLUDED
