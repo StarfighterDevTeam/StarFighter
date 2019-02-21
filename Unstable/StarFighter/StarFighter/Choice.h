@@ -14,8 +14,9 @@ struct Choice
 	~Choice();
 
 	void Init(int index, string text, string portrait_filename);
+	void Destroy();
 
-	void Update(sf::Time deltaTime);
+	bool Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 	void SetPosition(sf::Vector2f position);
 

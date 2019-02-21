@@ -243,10 +243,12 @@ void Gameloop::Update(sf::Time deltaTime)
 			//create or update HUD for crew details
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
 			{
+				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
 			}
 			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && m_warship->m_crew_interface.m_crew->m_hovered == false)
 			{
+				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
 			}
 		}
@@ -766,20 +768,12 @@ void Gameloop::Update(sf::Time deltaTime)
 	if (m_menu == Menu_PrisonersChoice)
 	{
 		m_warship->m_prisoners_choice_interface.Update(deltaTime);
-		//for (vector<CrewMember*>::iterator it = m_warship->m_prisoners_choice_interface.m_crew.begin(); it != m_warship->m_prisoners_choice_interface.m_crew.end(); it++)
-		//{
-		//	(*it)->Update(deltaTime);
-		//
-		//	//create or update HUD for crew details
-		//	if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
-		//	{
-		//		m_warship->m_crew_interface.Init(*it);
-		//	}
-		//	else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && m_warship->m_crew_interface.m_crew->m_hovered == false)
-		//	{
-		//		m_warship->m_crew_interface.Init(*it);
-		//	}
-		//}
+
+		if (m_warship->m_prisoners_choice_interface.m_crew.empty() == true)
+		{
+			m_warship->m_prisoners_choice_interface.Destroy();
+			m_menu = Menu_None;
+		}
 	}
 
 	//Music
@@ -1074,7 +1068,7 @@ bool Gameloop::UpdateTacticalScale()
 		if (win == true || lose == true)
 		{
 			//make prisoners
-			if (m_menu != Menu_PrisonersChoice)
+			if (m_menu != Menu_PrisonersChoice && m_tactical_ship != NULL)
 			{
 				m_menu = Menu_PrisonersChoice;
 				m_warship->m_prisoners_choice_interface.Init(m_tactical_ship);

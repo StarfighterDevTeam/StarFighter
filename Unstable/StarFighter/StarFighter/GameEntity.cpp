@@ -97,10 +97,10 @@ void GameEntity::Draw(sf::RenderTexture& screen)
 bool GameEntity::IsHoveredByMouse()
 {
 	if ((*CurrentGame).m_window_has_focus == true
-		&& ((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
-		&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
-		|| ((*CurrentGame).m_mouse_pos.x > getPosition().x - m_size.x / 2 && (*CurrentGame).m_mouse_pos.x < getPosition().x + m_size.x / 2
-		&& (*CurrentGame).m_mouse_pos.y > getPosition().y - m_size.y / 2 && (*CurrentGame).m_mouse_pos.y < getPosition().y + m_size.y / 2))
+		&& (((*CurrentGame).m_mouse_pos.x > m_shape_container.getPosition().x - m_shape_container.getSize().x / 2 && (*CurrentGame).m_mouse_pos.x < m_shape_container.getPosition().x + m_shape_container.getSize().x / 2
+				&& (*CurrentGame).m_mouse_pos.y > m_shape_container.getPosition().y - m_shape_container.getSize().y / 2 && (*CurrentGame).m_mouse_pos.y < m_shape_container.getPosition().y + m_shape_container.getSize().y / 2)
+			|| ((*CurrentGame).m_mouse_pos.x > getPosition().x - m_size.x / 2 && (*CurrentGame).m_mouse_pos.x < getPosition().x + m_size.x / 2
+				&& (*CurrentGame).m_mouse_pos.y > getPosition().y - m_size.y / 2 && (*CurrentGame).m_mouse_pos.y < getPosition().y + m_size.y / 2)))
 	{
 		return true;
 	}

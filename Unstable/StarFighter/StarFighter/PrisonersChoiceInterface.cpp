@@ -5,13 +5,34 @@ extern Game* CurrentGame;
 PrisonersChoiceInterface::PrisonersChoiceInterface()
 {
 	m_panel = NULL;
-	m_crew_focused = NULL;
+	m_crew_selected = NULL;
+	m_crew_hovered = NULL;
 	m_current_choice = 0;
 }
 
 PrisonersChoiceInterface::~PrisonersChoiceInterface()
 {
 	
+}
+
+void PrisonersChoiceInterface::Destroy()
+{
+	m_crew_interface.Destroy();
+
+	vector<CrewMember*> m_crew;
+	m_crew_selected = NULL;
+	m_crew_hovered = NULL;
+
+	delete m_panel;
+	for (int i = 0; i < 3; i++)
+	{
+		m_choices[i].Destroy();
+	}
+
+	m_panel = NULL;
+	m_crew_selected = NULL;
+	m_crew_hovered = NULL;
+	m_current_choice = 0;
 }
 
 void PrisonersChoiceInterface::Init(Ship* enemy_ship)
@@ -22,6 +43,7 @@ void PrisonersChoiceInterface::Init(Ship* enemy_ship)
 		if ((*it)->m_health > 0)
 		{
 			m_crew.push_back(*it);
+			(*it)->m_tile = NULL;
 		}
 	}
 
@@ -67,40 +89,15 @@ void PrisonersChoiceInterface::Init(Ship* enemy_ship)
 	}
 
 	//prisoner card (focus)
-	m_crew_focused = m_crew.front();
-	m_crew_interface.Init(m_crew_focused);
-
-	m_crew_focused->m_shape_container.setOutlineThickness(2.f);
-	m_crew_focused->m_shape_container.setOutlineColor(sf::Color::Green);
+	m_crew_selected = m_crew.front();
+	m_crew_interface.Init(m_crew_selected);
+	m_crew_interface.Update();
+	m_crew_selected->m_shape_container.setOutlineThickness(2.f);
+	m_crew_selected->m_shape_container.setOutlineColor(sf::Color::Green);
 
 	float pos_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 20;
 	m_crew_interface.SetPosition(sf::Vector2f(pos_x, offset_y + m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5f - CREWMEMBER_SIZE * 0.5f));
-
-	//life bar update
-	int health = m_crew_focused->m_health;
-	Bound(health, sf::Vector2i(0, m_crew_focused->m_health_max));
-
-	float life_ratio = 1.0f * health / m_crew_focused->m_health_max;
-
-	m_crew_interface.m_lifebar->m_shape.setSize(sf::Vector2f(life_ratio * CREWINTERFACE_LIFEBAR_SIZE_X, CREWINTERFACE_LIFEBAR_SIZE_Y));
-
-	float threshold[3] = { 0.7, 0.5, 0.3 };
-	if (life_ratio >= threshold[1])
-	{
-		m_crew_interface.m_lifebar->m_shape.setFillColor(sf::Color::Green);
-	}
-	else if (life_ratio >= threshold[2])
-	{
-		m_crew_interface.m_lifebar->m_shape.setFillColor(sf::Color(255, 127, 39, 255));//orange "damaged"
-	}
-	else
-	{
-		m_crew_interface.m_lifebar->m_shape.setFillColor(sf::Color::Red);
-	}
-
-	ostringstream ss_life;
-	ss_life << m_crew_focused->m_health << "/" << m_crew_focused->m_health_max;
-	m_crew_interface.m_lifebar->m_text.setString(ss_life.str());
+	
 
 	//choices
 	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 50.f;
@@ -121,14 +118,109 @@ void PrisonersChoiceInterface::Init(Ship* enemy_ship)
 		
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
 	}
-	//m_choices[0].m_picture->setAnimationLine(0);
 }
 
 void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 {
 	for (int i = 0; i < 3; i++)
 	{
-		m_choices[i].Update(deltaTime);
+		if (m_choices[i].Update(deltaTime) == true)//if left click
+		{
+			sf::Vector2f prisoner_offset = m_crew_selected->m_shape_container.getPosition();
+			if (m_crew_selected == m_crew_hovered)
+			{
+				m_crew_hovered = NULL;
+			}
+			delete m_crew_selected;
+
+			if (m_crew.size() > 1)
+			{
+				//update prisoners list
+				vector<CrewMember*> old_crew;
+				for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+				{
+					old_crew.push_back(*it);
+				}
+				m_crew.clear();
+				int j = -1;
+				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+				{
+					j++;
+					if (j == 0)
+					{
+						continue;
+					}
+					m_crew.push_back(*it);
+					
+				}
+
+				m_crew_selected = m_crew.front();
+				sf::Vector2f position = m_crew_interface.m_position;
+				m_crew_interface.Init(m_crew_selected);
+				m_crew_interface.Update();
+				m_crew_interface.SetPosition(position);
+				m_crew_selected->m_shape_container.setOutlineThickness(2.f);
+				m_crew_selected->m_shape_container.setOutlineColor(sf::Color::Green);
+
+				//reorder remaining prisoners
+				int crew_size = m_crew.size();
+				int prisoners_per_line = 10;
+				for (int i = 0; i < crew_size; i++)
+				{
+					float pos_x = prisoner_offset.x + ((i % prisoners_per_line) * (CREWMEMBER_SIZE + 10));
+					float pos_y = prisoner_offset.y + ((i / prisoners_per_line) * (CREWMEMBER_SIZE + 10));
+					m_crew[i]->m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
+				}
+			}
+			else
+			{
+				m_crew.clear();
+			}
+
+			break;
+		}
+	}
+
+	//create prisoner card for hovered prisoner
+	int crew_size = m_crew.size();
+	if (crew_size > 1)
+	{
+		bool was_hovered = m_crew_hovered != NULL;
+		bool is_hovered = false;
+
+		for (int i = 0; i < crew_size; i++)
+		{
+			if (m_crew[i]->IsHoveredByMouse() == true)
+			{
+				m_crew_hovered = m_crew[i];
+				sf::Vector2f position = m_crew_interface.m_position;
+				m_crew_interface.Init(m_crew_hovered);
+				m_crew_interface.Update();
+				m_crew_interface.SetPosition(position);
+				is_hovered = true;
+				m_crew_hovered->m_shape_container.setOutlineThickness(2.f);
+				m_crew_hovered->m_shape_container.setOutlineColor(sf::Color::Red);
+			}
+			else if (m_crew[i] != m_crew_selected)
+			{
+				m_crew[i]->m_shape_container.setOutlineColor(m_crew[i]->m_default_color);
+				m_crew[i]->m_shape_container.setOutlineThickness(-1.f);
+			}
+			else
+			{
+				m_crew[i]->m_shape_container.setOutlineColor(sf::Color::Green);
+				m_crew[i]->m_shape_container.setOutlineThickness(2.f);
+			}
+		}
+
+		//recreate prisoner card selected after hovering is over
+		if (was_hovered == true && is_hovered == false)
+		{
+			sf::Vector2f position = m_crew_interface.m_position;
+			m_crew_interface.Init(m_crew_selected);
+			m_crew_interface.Update();
+			m_crew_interface.SetPosition(position);
+		}
 	}
 }
 

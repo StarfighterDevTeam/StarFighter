@@ -21,6 +21,8 @@ struct CrewInterface
 	~CrewInterface();
 
 	void Init(CrewMember* crew);
+	void Destroy();
+
 	CrewMember* m_crew;
 	sf::Vector2f m_position;
 

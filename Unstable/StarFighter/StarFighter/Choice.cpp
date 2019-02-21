@@ -14,6 +14,15 @@ Choice::~Choice()
 	delete m_picture;
 }
 
+void Choice::Destroy()
+{
+	delete m_panel;
+	delete m_picture;
+
+	m_panel = NULL;
+	m_picture = NULL;
+}
+
 void Choice::Init(int index, string text, string portrait_filename)
 {
 	m_position = sf::Vector2f(0, 0);
@@ -67,16 +76,23 @@ void Choice::SetPosition(sf::Vector2f position)
 	m_body.setPosition(m_body.getPosition() + offset);
 }
 
-void Choice::Update(sf::Time deltaTime)
+bool Choice::Update(sf::Time deltaTime)
 {
 	if (m_panel->IsHoveredByMouse() == true)
 	{
 		m_picture->setAnimationLine(0);
+
+		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
+		{
+			return true;
+		}
 	}
 	else if (m_picture->m_currentAnimationIndex == 0)
 	{
 		m_picture->setAnimationLine(1);
 	}
+
+	return false;
 }
 
 void Choice::Draw(sf::RenderTexture& screen)

@@ -15,12 +15,14 @@ struct PrisonersChoiceInterface
 	~PrisonersChoiceInterface();
 
 	void Init(Ship* enemy_ship);
+	void Destroy();
 
 	void Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 
 	vector<CrewMember*> m_crew;
-	CrewMember* m_crew_focused;
+	CrewMember* m_crew_selected;
+	CrewMember* m_crew_hovered;
 	struct CrewInterface m_crew_interface;
 
 	GameEntity* m_panel;

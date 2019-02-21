@@ -26,6 +26,39 @@ CrewInterface::~CrewInterface()
 	{
 		delete m_skillbars[i];
 	}
+
+	m_crew = NULL;
+
+	m_panel = NULL;
+	m_portrait = NULL;
+	m_lifebar = NULL;
+
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		m_skillbars[i] = NULL;
+	}
+}
+
+void CrewInterface::Destroy()
+{
+	delete m_panel;
+	delete m_portrait;
+	delete m_lifebar;
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		delete m_skillbars[i];
+	}
+
+	m_crew = NULL;
+
+	m_panel = NULL;
+	m_portrait = NULL;
+	m_lifebar = NULL;
+
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		m_skillbars[i] = NULL;
+	}
 }
 
 void CrewInterface::Init(CrewMember* crew)
@@ -243,6 +276,7 @@ void CrewInterface::SetPosition(sf::Vector2f position)
 		m_skillbar_names[i].setPosition(m_skillbar_names[i].getPosition() + offset);
 		m_skillbars[i]->m_shape_container.setPosition(m_skillbars[i]->m_shape_container.getPosition() + offset);
 		m_skillbars[i]->m_shape.setPosition(m_skillbars[i]->m_shape.getPosition() + offset);
+		m_skillbars[i]->m_text.setPosition(m_skillbars[i]->m_text.getPosition() + offset);
 	}
 
 	m_position = position;
