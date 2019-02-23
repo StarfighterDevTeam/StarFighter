@@ -38,14 +38,14 @@ Weapon::Weapon(WeaponType type, bool is_enemy) : GameEntity(UI_Weapon)
 			m_ammo_type = Ammo_Torpedo;
 			break;
 
-		case Weapon_Sharpnel:
-			texture = loader->loadTexture("2D/sharpnel_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
-			m_rof = SHARPNEL_RATE_OF_FIRE;
-			m_rof_timer = SHARPNEL_RATE_OF_FIRE;
-			m_angle_speed = SHARPNEL_ANGLESPEED;
+		case Weapon_Shrapnel:
+			texture = loader->loadTexture("2D/shrapnel_icon.png", (int)ROOMTILE_SIZE, (int)ROOMTILE_SIZE * 2);
+			m_rof = SHRAPNEL_RATE_OF_FIRE;
+			m_rof_timer = SHRAPNEL_RATE_OF_FIRE;
+			m_angle_speed = SHRAPNEL_ANGLESPEED;
 			m_is_guided = false;
 
-			m_ammo_type = Ammo_Sharpnel;
+			m_ammo_type = Ammo_Shrapnel;
 			break;
 	}
 	

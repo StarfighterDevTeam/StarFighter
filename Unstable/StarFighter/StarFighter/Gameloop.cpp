@@ -142,7 +142,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			(*it)->UpdatePosition();
 
 			//weapon selected? highlight targeted room
-			if (selection != NULL && selection->m_UI_type == UI_Weapon && (*it)->IsHoveredByMouse() == true)
+			if (selection != NULL && selection->m_UI_type == UI_Weapon && hovered == NULL && (*it)->IsHoveredByMouse() == true && (*it)->m_type != Room_PrisonCell)//prison cells can't be targeted
 			{
 				room_hovered = *it;
 
@@ -476,15 +476,15 @@ void Gameloop::Update(sf::Time deltaTime)
 					//Assign targeted room
 					if ((*it)->m_target_room == NULL)
 					{
-						if ((*it)->m_type != Weapon_Torpedo)
+						vector<Room*> possible_rooms;
+						for (vector<Room*>::iterator it2 = m_warship->m_rooms.begin(); it2 != m_warship->m_rooms.end(); it2++)
 						{
-							int r = RandomizeIntBetweenValues(0, m_warship->m_rooms.size() - 1);
-							(*it)->m_target_room = m_warship->m_rooms[r];
-						}
-						else if((*it)->m_type == Weapon_Torpedo)
-						{
-							vector<Room*> possible_rooms;
-							for (vector<Room*>::iterator it2 = m_warship->m_rooms.begin(); it2 != m_warship->m_rooms.end(); it2++)
+							if ((*it2)->m_type == Room_PrisonCell)
+							{
+								continue;
+							}
+
+							if ((*it)->m_type == Weapon_Torpedo)
 							{
 								for (vector<RoomTile*>::iterator it3 = (*it2)->m_tiles.begin(); it3 != (*it2)->m_tiles.end(); it3++)
 								{
@@ -495,12 +495,16 @@ void Gameloop::Update(sf::Time deltaTime)
 									}
 								}
 							}
-
-							if (possible_rooms.empty() == false)
+							else
 							{
-								int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
-								(*it)->m_target_room = possible_rooms[r];
+								possible_rooms.push_back(*it2);
 							}
+						}
+
+						if (possible_rooms.empty() == false)
+						{
+							int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
+							(*it)->m_target_room = possible_rooms[r];
 						}
 					}
 
@@ -644,7 +648,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									tile->m_connexion->Destroy();
 								}
 
-								//sharpnel damage: killing crew
+								//shrapnel damage: killing crew
 								for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
 								{
 									float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
@@ -664,7 +668,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									{
 										if ((*it2)->m_health > 0)
 										{
-											(*it2)->m_health -= Min((*it)->m_sharpnel_damage, (*it2)->m_health);
+											(*it2)->m_health -= Min((*it)->m_SHRAPNEL_DAMAGE, (*it2)->m_health);
 										}
 									}
 								}
@@ -704,7 +708,7 @@ void Gameloop::Update(sf::Time deltaTime)
 						FX* FX_hit = (*it)->m_FX_hit->Clone();
 						FX_hit->m_position = tiles_hit[h]->m_position;
 						FX_hit->UpdatePosition();
-						FX_hit->m_delay_timer = h * SHARPNEL_DELAY;
+						FX_hit->m_delay_timer = h * SHRAPNEL_DELAY;
 						(*CurrentGame).m_FX.push_back(FX_hit);
 					}
 				}

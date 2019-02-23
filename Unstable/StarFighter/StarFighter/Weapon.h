@@ -16,14 +16,14 @@ class Ship;//forward declaration
 #define TORPEDO_RATE_OF_FIRE		10.f
 #define TORPEDO_ANGLESPEED		10.f
 
-#define SHARPNEL_RATE_OF_FIRE	12.f
-#define SHARPNEL_ANGLESPEED		30.f
+#define SHRAPNEL_RATE_OF_FIRE	12.f
+#define SHRAPNEL_ANGLESPEED		30.f
 
 enum WeaponType
 {
 	Weapon_Cannon,
 	Weapon_Torpedo,
-	Weapon_Sharpnel,
+	Weapon_Shrapnel,
 };
 
 class Weapon : public GameEntity

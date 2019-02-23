@@ -17,8 +17,8 @@
 #define TORPEDO_INITIAL_SPEED				10.f
 #define TORPEDO_ACCELERATION				100.f
 
-#define SHARPNEL_DAMAGE						15
-#define SHARPNEL_DELAY						0.1f
+#define SHRAPNEL_DAMAGE						15
+#define SHRAPNEL_DELAY						0.1f
 
 #define AMMO_WARP_DISTANCE_PER_SECOND		400.f
 
@@ -32,7 +32,7 @@ enum AmmoType
 {
 	Ammo_CannonBall,
 	Ammo_Torpedo,
-	Ammo_Sharpnel,
+	Ammo_Shrapnel,
 };
 
 class Ammo : public GameEntity
@@ -60,7 +60,7 @@ public:
 
 	int m_damage;
 	int m_hull_damage;
-	int m_sharpnel_damage;
+	int m_SHRAPNEL_DAMAGE;
 	float m_radius;
 
 	bool m_can_be_seen;

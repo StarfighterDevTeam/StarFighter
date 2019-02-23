@@ -8,7 +8,7 @@ enum FX_Type
 {
 	FX_Explosion,
 	FX_Splash,
-	FX_Sharpnel,
+	FX_shrapnel,
 };
 
 class FX : public GameEntity

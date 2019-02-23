@@ -23,9 +23,9 @@ FX::FX(FX_Type type) : GameEntity(UI_None)
 			setAnimation(texture, 10, 1);
 			break;
 		}
-		case FX_Sharpnel:
+		case FX_shrapnel:
 		{
-			m_texturename = "2D/FX_sharpnel.png";
+			m_texturename = "2D/FX_shrapnel.png";
 			Texture* texture = TextureLoader::getInstance()->loadTexture(m_texturename, 400, 74);
 			setAnimation(texture, 4, 1);
 			break;

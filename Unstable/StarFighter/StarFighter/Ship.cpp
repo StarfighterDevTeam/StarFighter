@@ -606,9 +606,21 @@ void Ship::BuildShip()
 	AddRoom(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
-	AddRoom(8, 1, 3, 4, Room_Weapon);
-	AddRoom(8, 5, 3, 4, Room_Weapon);
+	Room* prison_room = AddRoom(8, 1, 2, 4, Room_Prison);
+	Room* prison_cell = NULL;
+	for (int i = 0; i < 4; i++)
+	{
+		Room* cell = AddRoom(10, 1 + i, 1, 1, Room_PrisonCell);
+		if (i == 0)
+		{
+			prison_cell = cell;
+		}
+		cell->m_tiles.front()->m_is_prison = true;
+		m_prison_cells.push_back(cell->m_tiles.front());
+	}
 
+	AddRoom(8, 5, 3, 4, Room_Diving);
+	
 	m_health = m_health_max;
 
 	//center position of each room & room tiles, fill m_tiles and (*CurrentGame).m_tiles / m_enemy_tiles.
@@ -616,6 +628,17 @@ void Ship::BuildShip()
 
 	//doors
 	ConnectRooms();
+
+	//hardcode to add and lock doors of prison cells
+	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(prison_cell->m_tiles[0], prison_room->m_tiles[prison_room->m_width - 1]), true, this);
+	m_connexions.push_back(connexion);
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		if ((*it)->m_tiles.second->m_room->m_type == Room_PrisonCell)
+		{
+			(*it)->SetLock(true);
+		}
+	}
 
 	//hull
 	FlagHullRoomTiles();
@@ -641,7 +664,7 @@ void Ship::BuildShip()
 		}
 		else if (i == 2)
 		{
-			weapon = new Weapon(Weapon_Sharpnel, false);
+			weapon = new Weapon(Weapon_Shrapnel, false);
 		}
 		
 		AddWeaponToTile(weapon, weapon_room->m_tiles[x]);
