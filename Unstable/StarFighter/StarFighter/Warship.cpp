@@ -74,11 +74,10 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	ConnectRooms();
 
 	//hardcode to add and lock doors of prison cells
-	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(prison_cell->m_tiles[0], prison_room->m_tiles[0]), true, this);
-	m_connexions.push_back(connexion);
+	AddConnexion(prison_cell->m_tiles[0]->m_coord_x, prison_cell->m_tiles[0]->m_coord_y, prison_room->m_tiles[0]->m_coord_x, prison_room->m_tiles[0]->m_coord_y);
 	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
 	{
-		if ((*it)->m_tiles.second->m_room->m_type == Room_PrisonCell)
+		if ((*it)->m_tiles.second->m_room->m_type == Room_PrisonCell || (*it)->m_tiles.first->m_room->m_type == Room_PrisonCell)
 		{
 			(*it)->SetLock(true);
 		}

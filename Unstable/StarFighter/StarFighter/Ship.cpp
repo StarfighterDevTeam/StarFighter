@@ -630,11 +630,10 @@ void Ship::BuildShip()
 	ConnectRooms();
 
 	//hardcode to add and lock doors of prison cells
-	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(prison_cell->m_tiles[0], prison_room->m_tiles[prison_room->m_width - 1]), true, this);
-	m_connexions.push_back(connexion);
+	AddConnexion(prison_cell->m_tiles[0]->m_coord_x, prison_cell->m_tiles[0]->m_coord_y, prison_room->m_tiles[prison_room->m_width - 1]->m_coord_x, prison_room->m_tiles[prison_room->m_width - 1]->m_coord_y);
 	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
 	{
-		if ((*it)->m_tiles.second->m_room->m_type == Room_PrisonCell)
+		if ((*it)->m_tiles.second->m_room->m_type == Room_PrisonCell || (*it)->m_tiles.first->m_room->m_type == Room_PrisonCell)
 		{
 			(*it)->SetLock(true);
 		}
@@ -1219,4 +1218,34 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 	crew->m_alliance = m_alliance;
 
 	return true;
+}
+
+void Ship::UpdatePrisonerEscape(CrewMember* crew)
+{
+	if (crew->m_tile != NULL && crew->m_tile->m_room->m_type == Room_PrisonCell && crew->m_tile->m_connexion->m_locked == false)
+	{
+		vector<Room*> possible_rooms;
+		for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+		{
+			if ((*it)->m_type != Room_PrisonCell)
+			{
+				possible_rooms.push_back(*it);
+			}
+		}
+
+		int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
+
+		vector<RoomTile*> possible_tiles;
+		for (vector<RoomTile*>::iterator it = possible_rooms[r]->m_tiles.begin(); it != possible_rooms[r]->m_tiles.end(); it++)
+		{
+			if ((*it)->m_system == System_None && (*it)->m_crew == NULL && (*it)->m_weapon == NULL)
+			{
+				possible_tiles.push_back(*it);
+			}
+		}
+
+		int r2 = RandomizeIntBetweenValues(0, possible_tiles.size() - 1);
+
+		crew->m_destination = possible_tiles[r2];
+	}
 }

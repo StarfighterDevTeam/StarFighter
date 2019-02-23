@@ -87,6 +87,7 @@ public:
 
 	bool ImprisonCrew(CrewMember* crew);
 	bool IsPrisonCellFree();
+	void UpdatePrisonerEscape(CrewMember* crew);
 
 	void BuildShip();
 	void CenterRoomPositions(bool is_enemy);
