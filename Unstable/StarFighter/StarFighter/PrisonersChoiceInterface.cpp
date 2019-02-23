@@ -51,6 +51,16 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 			(*it)->m_speed = sf::Vector2f(0, 0);
 		}
 	}
+	for (vector<CrewMember*>::iterator it = enemy_ship->m_prisoners.begin(); it != enemy_ship->m_prisoners.end(); it++)
+	{
+		if ((*it)->m_health > 0)
+		{
+			m_crew.push_back(*it);
+			(*it)->m_tile = NULL;
+			(*it)->m_destination = NULL;
+			(*it)->m_speed = sf::Vector2f(0, 0);
+		}
+	}
 
 	//no prisoner = no need for a menu
 	int crew_size = m_crew.size();

@@ -705,6 +705,9 @@ void Ship::BuildShip()
 		AddCrewMember(crew, m_rooms[r]);
 	}
 
+	CrewMember* prisoner = new CrewMember(Crew_Civilian, m_alliance);
+	ImprisonCrew(prisoner);
+
 	//CHEAT DEBUG
 	m_health = m_health_max * 0.2 + 8;
 }
