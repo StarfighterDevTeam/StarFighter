@@ -217,9 +217,21 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 
 CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 {
-	if (room == NULL)
+	if (m_nb_crew >= m_nb_crew_max)
 	{
 		return NULL;
+	}
+
+	if (room == NULL)
+	{
+		for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+		{
+			if ((*it)->m_type == Room_Crewquarter)
+			{
+				room = *it;
+				break;
+			}
+		}
 	}
 
 	if (room->m_nb_crew[Crew_All] >= room->m_nb_crew_max)
@@ -244,7 +256,7 @@ CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 	crew->m_tile = tile;
 	tile->m_crew = crew;
 
-	m_nb_crew_max++;
+	m_nb_crew++;
 
 	//UI
 	crew->m_shape_container.setPosition(crew->m_position);
@@ -658,7 +670,9 @@ void Ship::BuildShip()
 	}
 
 	//crew
-	m_nb_crew_max = 0;
+	m_nb_crew_max = 12;
+	m_nb_crew = 0;
+
 	for (int i = 0; i < 11; i++)
 	{
 		int r = RandomizeIntBetweenValues(0, m_rooms.size() - 1);
@@ -666,8 +680,6 @@ void Ship::BuildShip()
 		CrewMember* crew = new CrewMember(Crew_Civilian, m_alliance);
 		AddCrewMember(crew, m_rooms[r]);
 	}
-
-	m_nb_crew = m_nb_crew_max;
 
 	//CHEAT DEBUG
 	m_health = m_health_max * 0.2 + 8;

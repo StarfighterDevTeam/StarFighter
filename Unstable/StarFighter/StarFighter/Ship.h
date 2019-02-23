@@ -75,7 +75,7 @@ public:
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
-	CrewMember* AddCrewMember(CrewMember* crew, Room* room);
+	CrewMember* AddCrewMember(CrewMember* crew, Room* room = NULL);
 
 	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
 	void AddEngineToTile(RoomTile* tile);

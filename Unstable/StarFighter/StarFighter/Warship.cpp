@@ -140,15 +140,14 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	//}
 
 	//CREW
-	m_nb_crew_max = 0;
+	m_nb_crew_max = 8;
+	m_nb_crew = 0;
 
 	for (int i = 0; i < 6; i++)
 	{
 		CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);
 		AddCrewMember(crew, weapon_room);
 	}
-
-	m_nb_crew = m_nb_crew_max;
 
 	//Interface
 	m_combat_interface[0].Init(this);

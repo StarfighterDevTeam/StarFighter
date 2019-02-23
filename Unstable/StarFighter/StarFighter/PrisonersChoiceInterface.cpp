@@ -47,6 +47,8 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 		{
 			m_crew.push_back(*it);
 			(*it)->m_tile = NULL;
+			(*it)->m_destination = NULL;
+			(*it)->m_speed = sf::Vector2f(0, 0);
 		}
 	}
 
@@ -132,16 +134,24 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 			continue;
 		}
 		
-		//conditions
+		//checking conditions
+		bool condition = true;
 		if (i == 1)//imprison
 		{
-			if (m_ship->IsPrisonCellFree() == false)
-			{
-				m_choices[i].m_picture->setAnimationLine(1);
-				break;
-			}
+			condition = m_ship->IsPrisonCellFree() == true;
+		}
+		else if (i == 2)//hiring crew
+		{
+			condition = m_ship->m_nb_crew < m_ship->m_nb_crew_max;
 		}
 
+		if (condition == false)
+		{
+			m_choices[i].m_picture->setAnimationLine(1);
+			break;
+		}
+
+		//click = action
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
 			sf::Vector2f prisoner_offset = m_crew_selected->m_shape_container.getPosition();
@@ -158,9 +168,12 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 			{
 				if (m_ship->ImprisonCrew(m_crew_selected) == false)
 				{
-					printf("Prison slots are full\n");
 					break;
 				}
+			}
+			else if (i == 2)//hire
+			{
+				m_ship->AddCrewMember(m_crew_selected);
 			}
 
 			//update prisoners list
