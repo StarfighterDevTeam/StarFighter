@@ -14,6 +14,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_repair_timer = HULL_REPAIR_TIMER;
 	m_drowning_timer = DROWNING_TIMER;
 	m_healing_timer = HEALING_TIMER;
+	m_is_prisoner = false;
 
 	m_health_max = CREWMEMBER_HEALTH_MAX;
 	m_health = m_health_max;
@@ -507,4 +508,21 @@ RoomTile* CrewMember::GetFreeRoomTile(Room* room)
 	}
 
 	return NULL;
+}
+
+bool CrewMember::Imprison(RoomTile* prison_cell)
+{
+	if (prison_cell->m_crew != NULL)
+	{
+		//printf("Prison cell already full");
+		return false;
+	}
+
+	m_is_prisoner = true;
+	m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Prisoner]);
+
+	prison_cell->m_crew = this;
+	m_tile = prison_cell;
+	m_position = prison_cell->m_position;
+	m_speed = sf::Vector2f(0, 0);
 }

@@ -37,7 +37,9 @@ public:
 	vector<vector<RoomTile*> > m_tiles;
 	vector<Engine*> m_engines;
 	Rudder* m_rudder;
-	
+	vector<RoomTile*> m_prison_cells;
+	vector<CrewMember*> m_prisoners;
+
 	//int m_nb_crew[NB_CREW_TYPES];
 	//int m_nb_crew_working[NB_CREW_TYPES];
 	int m_nb_crew;
@@ -82,6 +84,8 @@ public:
 	bool FireWeapon(Weapon* weapon, Time deltaTime, Ship* target);
 	static WaterTile* GetWaterTileAtDMSCoord(DMS_Coord coord);
 	bool IsFlooded();
+
+	bool ImprisonCrew(CrewMember* crew);
 
 	void BuildShip();
 	void CenterRoomPositions(bool is_enemy);

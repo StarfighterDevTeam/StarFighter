@@ -42,7 +42,18 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	//ROOMS
 	//left
 	AddRoom(0, 1, 3, 4, Room_Diving);
-	AddRoom(0, 5, 3, 4, Room_Prison);
+	Room* prison_room = AddRoom(1, 5, 2, 4, Room_Prison);
+	Room* prison_cell = NULL;
+	for (int i = 0; i < 4; i++)
+	{
+		Room* cell = AddRoom(0, 5 + i, 1, 1, Room_PrisonCell);
+		if (i == 0)
+		{
+			prison_cell = cell;
+		}
+		cell->m_tiles.front()->m_is_prison = true;
+		m_prison_cells.push_back(cell->m_tiles.front());
+	}
 
 	//mid
 	Room* nav_room = AddRoom(3, 0, 5, 2, Room_Navigation);
@@ -61,6 +72,17 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 	//doors
 	ConnectRooms();
+
+	//hardcode to add and lock doors of prison cells
+	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(prison_cell->m_tiles[0], prison_room->m_tiles[0]), true, this);
+	m_connexions.push_back(connexion);
+	for (vector<RoomConnexion*>::iterator it = m_connexions.begin(); it != m_connexions.end(); it++)
+	{
+		if ((*it)->m_tiles.second->m_room->m_type == Room_PrisonCell)
+		{
+			(*it)->SetLock(true);
+		}
+	}
 
 	//hull
 	FlagHullRoomTiles();
@@ -107,7 +129,16 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
 		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
-	
+
+	//prison tiles
+	//for (int j = 0; j < 4; j++)
+	//{
+	//	prison_room->m_tiles[j * (prison_room->m_width)]->m_is_prison = true;
+	//	//prison_room->m_tiles[j * (prison_room->m_width)]->m_room = NULL;
+	//	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(prison_room->m_tiles[j * (prison_room->m_width)], prison_room->m_tiles[(j * prison_room->m_width) + 1]), true, this);
+	//	m_connexions.push_back(connexion);
+	//}
+
 	//CREW
 	m_nb_crew_max = 0;
 

@@ -284,7 +284,7 @@ bool Ship::AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y)
 	}
 
 	//Create the connexion
-	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false, m_alliance != Alliance_Player, this);
+	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(tileA, tileB), false, this);
 
 	m_connexions.push_back(connexion);
 	tileA->m_room->m_connexions.push_back(connexion);
@@ -1054,7 +1054,7 @@ void Ship::UpdateFleeing(Time deltaTime)
 	{
 		if (m_flee_count == ENGINE_FLEE_COUNT && one_is_operational == true)
 		{
-			(*it)->m_systembar->m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Full]);
+			(*it)->m_systembar->m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_EngineCharged]);
 		}
 		else
 		{
@@ -1135,4 +1135,32 @@ void Ship::UpdateSinking(Time deltaTime)
 bool Ship::IsFlooded()
 {
 	return m_flood > m_flood_max * 0.5f;
+}
+
+bool Ship::ImprisonCrew(CrewMember* crew)
+{
+	int i = 0;
+	for (vector<RoomTile*>::iterator it = m_prison_cells.begin(); it != m_prison_cells.end(); it++)
+	{
+		if ((*it)->m_crew == NULL)
+		{
+			if (crew->Imprison(*it) == false)
+			{
+				return false;
+			}
+			
+			m_prisoners.push_back(crew);
+			break;
+		}
+		else if (i == m_prison_cells.size() - 1)
+		{
+			return false;
+		}
+		else
+		{
+			i++;
+		}
+	}
+
+	return true;
 }

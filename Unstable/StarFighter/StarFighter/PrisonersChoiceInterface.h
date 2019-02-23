@@ -14,7 +14,7 @@ struct PrisonersChoiceInterface
 	PrisonersChoiceInterface();
 	~PrisonersChoiceInterface();
 
-	void Init(Ship* enemy_ship);
+	void Init(Ship* ship, Ship* enemy_ship);
 	void Destroy();
 
 	void Update(sf::Time deltaTime);
@@ -25,6 +25,7 @@ struct PrisonersChoiceInterface
 	CrewMember* m_crew_hovered;
 	struct CrewInterface m_crew_interface;
 
+	Ship* m_ship;
 	GameEntity* m_panel;
 	sf::Text m_narrative_text;
 

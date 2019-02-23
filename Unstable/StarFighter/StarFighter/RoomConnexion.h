@@ -15,10 +15,9 @@ class CrewMember;
 class RoomConnexion : public GameEntity
 {
 public:
-	RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool open, bool minimized, Ship* ship);
+	RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool locked, Ship* ship);
 	
 	pair<RoomTile*, RoomTile*> m_tiles;
-	bool m_open;
 	bool m_locked;
 	bool m_destroyed;
 

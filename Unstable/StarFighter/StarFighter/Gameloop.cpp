@@ -268,6 +268,46 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
+	//prisoners
+	vector<CrewMember*> old_prisoners;
+	for (vector<CrewMember*>::iterator it = m_warship->m_prisoners.begin(); it != m_warship->m_prisoners.end(); it++)
+	{
+		old_prisoners.push_back(*it);
+	}
+	m_warship->m_prisoners.clear();
+	for (vector<CrewMember*>::iterator it = old_prisoners.begin(); it != old_prisoners.end(); it++)
+	{
+		if ((*it)->m_health > 0 && m_warship->m_sinking_timer == 0.f)
+		{
+			(*it)->Update(deltaTime);//crew movement/heal/repair...
+
+			//create or update HUD for crew details
+			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
+			{
+				m_warship->m_crew_interface.Destroy();
+				m_warship->m_crew_interface.Init(*it);
+			}
+			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && m_warship->m_crew_interface.m_crew->m_hovered == false)
+			{
+				m_warship->m_crew_interface.Destroy();
+				m_warship->m_crew_interface.Init(*it);
+			}
+		}
+
+		if ((*it)->m_health > 0)//second check because he could drown during the update
+		{
+			m_warship->m_prisoners.push_back(*it);
+		}
+		else
+		{
+			if (m_warship->m_crew_interface.m_crew == *it)//remove from interface before destroying object
+			{
+				m_warship->m_crew_interface.m_crew = NULL;
+			}
+			delete *it;
+		}
+	}
+
 	//enemy crew movement
 	if (m_tactical_ship != NULL)
 	{
@@ -842,6 +882,10 @@ void Gameloop::Draw()
 	{
 		(*it)->Draw((*CurrentGame).m_mainScreen);
 	}
+	for (vector<CrewMember*>::iterator it = m_warship->m_prisoners.begin(); it != m_warship->m_prisoners.end(); it++)
+	{
+		(*it)->Draw((*CurrentGame).m_mainScreen);
+	}
 
 	//lifebars & rofbars
 	if (m_scale == Scale_Tactical && m_warship->m_is_fleeing == false && m_warship->m_sinking_timer == 0.f)
@@ -1071,7 +1115,7 @@ bool Gameloop::UpdateTacticalScale()
 			if (m_menu != Menu_PrisonersChoice && m_tactical_ship != NULL)
 			{
 				m_menu = Menu_PrisonersChoice;
-				m_warship->m_prisoners_choice_interface.Init(m_tactical_ship);
+				m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
 
 				//delete enemy from ships existing
 				vector<Ship*> old_ships;
@@ -1220,6 +1264,10 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* 
 	else if (tile->m_flood > 0)
 	{
 		tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
+	}
+	else if (tile->m_is_prison == true)
+	{
+		tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Prison]);
 	}
 
 	if (tile->m_system_tile != NULL)

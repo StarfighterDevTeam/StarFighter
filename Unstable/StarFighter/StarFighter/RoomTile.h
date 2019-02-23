@@ -48,6 +48,7 @@ public:
 	Weapon* m_weapon;
 	Engine* m_engine;
 	Rudder* m_rudder;
+	bool m_is_prison;
 
 	//pathfinding
 	int m_heuristic;

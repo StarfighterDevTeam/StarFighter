@@ -16,6 +16,7 @@ RoomTile::RoomTile(int coord_x, int coord_y, Room* room, float size) : GameEntit
 	m_pierced = false;
 	m_flood = 0;
 	m_flooding_timer = 0.f;
+	m_is_prison = false;
 	
 	for (int i = 0; i < 4; i++)
 	{

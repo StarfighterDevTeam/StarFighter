@@ -84,6 +84,7 @@ enum RoomType
 	Room_Gold,
 	Room_Fishing,
 	Room_Prison,
+	Room_PrisonCell,
 	Room_Diving,
 	Room_Sword,
 	Room_Lifeboat,
@@ -124,9 +125,11 @@ enum Color_Chart
 	Color_Orange_System,
 	Color_Green_System,
 	Color_Cyan_System,
-	Color_Magenta_Full,
+	Color_Magenta_EngineCharged,
 	Color_Blue_Flood,
 	Color_Blue_Pierced,
+	Color_Red_Prison,
+	Color_Yellow_Prisoner,
 	NB_COLOR_CHART,
 };
 

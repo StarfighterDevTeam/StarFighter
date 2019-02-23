@@ -115,9 +115,11 @@ Game::Game(RenderWindow& window)
 	m_dico_colors[Color_Orange_System] = sf::Color(255, 127, 39, 255);
 	m_dico_colors[Color_Green_System] = sf::Color::Green;
 	m_dico_colors[Color_Cyan_System] = sf::Color::Cyan;
-	m_dico_colors[Color_Magenta_Full] = sf::Color::Magenta;
+	m_dico_colors[Color_Magenta_EngineCharged] = sf::Color::Magenta;
 	m_dico_colors[Color_Blue_Flood] = sf::Color(0, 100, 170, 255);
 	m_dico_colors[Color_Blue_Pierced] = sf::Color(0, 50, 255, 255);
+	m_dico_colors[Color_Red_Prison] = sf::Color(237, 22, 33, 255);
+	m_dico_colors[Color_Yellow_Prisoner] = sf::Color(255, 242, 39, 255);
 }
 
 string Game::GetRandomCrewMemberName(int gender)

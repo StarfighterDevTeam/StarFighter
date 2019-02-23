@@ -8,6 +8,7 @@ PrisonersChoiceInterface::PrisonersChoiceInterface()
 	m_crew_selected = NULL;
 	m_crew_hovered = NULL;
 	m_current_choice = 0;
+	m_ship = NULL;
 }
 
 PrisonersChoiceInterface::~PrisonersChoiceInterface()
@@ -35,8 +36,10 @@ void PrisonersChoiceInterface::Destroy()
 	m_current_choice = 0;
 }
 
-void PrisonersChoiceInterface::Init(Ship* enemy_ship)
+void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 {
+	m_ship = ship;
+
 	//get prisoners among survivors
 	for (vector<CrewMember*>::iterator it = enemy_ship->m_crew.begin(); it != enemy_ship->m_crew.end(); it++)
 	{
@@ -131,11 +134,23 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 			{
 				m_crew_hovered = NULL;
 			}
-			delete m_crew_selected;
 
+			if (i == 0)//kill crew
+			{
+				delete m_crew_selected;
+			}
+			else if (i == 1)//imprison
+			{
+				if (m_ship->ImprisonCrew(m_crew_selected) == false)
+				{
+					printf("Prison slots are full\n");
+					break;
+				}
+			}
+
+			//update prisoners list
 			if (m_crew.size() > 1)
 			{
-				//update prisoners list
 				vector<CrewMember*> old_crew;
 				for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
 				{
@@ -151,7 +166,6 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 						continue;
 					}
 					m_crew.push_back(*it);
-					
 				}
 
 				m_crew_selected = m_crew.front();
@@ -171,13 +185,13 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 					float pos_y = prisoner_offset.y + ((i / prisoners_per_line) * (CREWMEMBER_SIZE + 10));
 					m_crew[i]->m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
 				}
+
+				break;
 			}
 			else
 			{
 				m_crew.clear();
 			}
-
-			break;
 		}
 	}
 

@@ -27,6 +27,8 @@ public:
 	RoomTile* GetFreeRoomTile(Room* room);
 	void MoveToRoomTile(RoomTile* tile);
 
+	bool Imprison(RoomTile* prison_cell);
+
 	sf::Vector2f m_speed;
 	float m_ref_speed;
 	int m_health;
@@ -39,6 +41,8 @@ public:
 	float m_repair_timer;
 	float m_drowning_timer;
 	float m_healing_timer;
+
+	bool m_is_prisoner;
 
 	GameEntity* m_lifebar;
 	string m_display_name;
