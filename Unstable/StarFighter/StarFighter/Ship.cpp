@@ -1137,6 +1137,19 @@ bool Ship::IsFlooded()
 	return m_flood > m_flood_max * 0.5f;
 }
 
+bool Ship::IsPrisonCellFree()
+{
+	for (vector<RoomTile*>::iterator it = m_prison_cells.begin(); it != m_prison_cells.end(); it++)
+	{
+		if ((*it)->m_crew == NULL)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool Ship::ImprisonCrew(CrewMember* crew)
 {
 	int i = 0;

@@ -76,16 +76,12 @@ void Choice::SetPosition(sf::Vector2f position)
 	m_body.setPosition(m_body.getPosition() + offset);
 }
 
-bool Choice::Update(sf::Time deltaTime)
+bool Choice::Update()
 {
 	if (m_panel->IsHoveredByMouse() == true)
 	{
 		m_picture->setAnimationLine(0);
-
-		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
-		{
-			return true;
-		}
+		return true;
 	}
 	else if (m_picture->m_currentAnimationIndex == 0)
 	{

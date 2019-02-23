@@ -127,7 +127,22 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 {
 	for (int i = 0; i < 3; i++)
 	{
-		if (m_choices[i].Update(deltaTime) == true)//if left click
+		if (m_choices[i].Update() == false)//is choice hovered?
+		{
+			continue;
+		}
+		
+		//conditions
+		if (i == 1)//imprison
+		{
+			if (m_ship->IsPrisonCellFree() == false)
+			{
+				m_choices[i].m_picture->setAnimationLine(1);
+				break;
+			}
+		}
+
+		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
 			sf::Vector2f prisoner_offset = m_crew_selected->m_shape_container.getPosition();
 			if (m_crew_selected == m_crew_hovered)

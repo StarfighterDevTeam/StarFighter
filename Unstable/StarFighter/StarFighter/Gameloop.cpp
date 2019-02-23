@@ -268,7 +268,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//prisoners
+	//player prisoners
 	vector<CrewMember*> old_prisoners;
 	for (vector<CrewMember*>::iterator it = m_warship->m_prisoners.begin(); it != m_warship->m_prisoners.end(); it++)
 	{
@@ -383,6 +383,30 @@ void Gameloop::Update(sf::Time deltaTime)
 			else
 			{
 				m_tactical_ship->m_nb_crew--;
+				delete *it;
+			}
+		}
+
+		//enemy prisoners
+		old_prisoners.clear();
+		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_prisoners.begin(); it != m_tactical_ship->m_prisoners.end(); it++)
+		{
+			old_prisoners.push_back(*it);
+		}
+		m_tactical_ship->m_prisoners.clear();
+		for (vector<CrewMember*>::iterator it = old_prisoners.begin(); it != old_prisoners.end(); it++)
+		{
+			if ((*it)->m_health > 0 && m_tactical_ship->m_sinking_timer == 0.f)
+			{
+				(*it)->Update(deltaTime);//crew movement/heal/repair...
+			}
+
+			if ((*it)->m_health > 0)//second check because he could drown during the update
+			{
+				m_tactical_ship->m_prisoners.push_back(*it);
+			}
+			else
+			{
 				delete *it;
 			}
 		}
@@ -958,6 +982,10 @@ void Gameloop::Draw()
 
 		//crew
 		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew.begin(); it != m_tactical_ship->m_crew.end(); it++)
+		{
+			(*it)->Draw((*CurrentGame).m_mainScreen);
+		}
+		for (vector<CrewMember*>::iterator it = m_tactical_ship->m_prisoners.begin(); it != m_tactical_ship->m_prisoners.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}

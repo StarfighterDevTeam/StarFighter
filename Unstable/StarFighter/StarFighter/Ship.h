@@ -86,6 +86,7 @@ public:
 	bool IsFlooded();
 
 	bool ImprisonCrew(CrewMember* crew);
+	bool IsPrisonCellFree();
 
 	void BuildShip();
 	void CenterRoomPositions(bool is_enemy);

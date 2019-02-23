@@ -46,7 +46,9 @@ enum MouseAction
 {
 	Mouse_None,
 	Mouse_LeftClick,
+	Mouse_LeftClickHold,
 	Mouse_RightClick,
+	Mouse_RightClickHold,
 };
 
 enum ShipType
@@ -162,7 +164,6 @@ public:
 
 	sf::Vector2f m_mouse_pos;
 	MouseAction m_mouse_click;
-	float m_mouse_click_timer;
 	void GetMouseInputs(sf::Time deltaTime);
 	Input_Status m_input_actions[NB_INPUT_ACTIONS];
 	void GetControllerInputs();
