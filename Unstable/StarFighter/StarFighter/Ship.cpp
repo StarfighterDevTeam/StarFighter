@@ -257,6 +257,7 @@ CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 	tile->m_crew = crew;
 
 	m_nb_crew++;
+	crew->m_alliance = m_alliance;
 
 	//UI
 	crew->m_shape_container.setPosition(crew->m_position);
@@ -1173,8 +1174,7 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 			{
 				return false;
 			}
-			
-			m_prisoners.push_back(crew);
+
 			break;
 		}
 		else if (i == m_prison_cells.size() - 1)
@@ -1186,6 +1186,11 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 			i++;
 		}
 	}
+
+
+	//free cell found
+	m_prisoners.push_back(crew);
+	crew->m_alliance = m_alliance;
 
 	return true;
 }
