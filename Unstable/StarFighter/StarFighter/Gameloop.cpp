@@ -280,7 +280,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		if ((*it)->m_health > 0 && m_warship->m_sinking_timer == 0.f)
 		{
 			(*it)->Update(deltaTime);//crew movement/heal/repair...
-			m_warship->UpdatePrisonerEscape(*it);
+			m_warship->UpdatePrisonerEscape(*it, deltaTime);
 
 			//create or update HUD for crew details
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
@@ -400,7 +400,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->m_health > 0 && m_tactical_ship->m_sinking_timer == 0.f)
 			{
 				(*it)->Update(deltaTime);//crew movement/heal/repair...
-				m_tactical_ship->UpdatePrisonerEscape(*it);
+				m_tactical_ship->UpdatePrisonerEscape(*it, deltaTime);
 			}
 
 			if ((*it)->m_health > 0)//second check because he could drown during the update

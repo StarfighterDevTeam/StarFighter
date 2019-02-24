@@ -1220,32 +1220,70 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 	return true;
 }
 
-void Ship::UpdatePrisonerEscape(CrewMember* crew)
+void Ship::UpdatePrisonerEscape(CrewMember* crew, sf::Time deltaTime)
 {
+	//escaping the prison cell?
 	if (crew->m_tile != NULL && crew->m_tile->m_room->m_type == Room_PrisonCell && crew->m_tile->m_connexion->m_locked == false)
 	{
-		vector<Room*> possible_rooms;
-		for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+		EscapeToRandomRoom(crew);
+	}
+	else if (crew->m_tile->m_room->m_type != Room_PrisonCell && crew->m_destination == NULL)//already escaped, now roaming
+	{
+		if (crew->m_prisoner_roaming_timer > 0)
 		{
-			if ((*it)->m_type != Room_PrisonCell)
-			{
-				possible_rooms.push_back(*it);
-			}
+			crew->m_prisoner_roaming_timer -= deltaTime.asSeconds();
 		}
 
+		//Updating roaming
+		if (crew->m_prisoner_roaming_timer <= 0)
+		{
+			//same room
+			if (RandomizeFloatBetweenValues(0.f, 1.f) > PRISONER_CHANGING_ROOM_PROBA)
+			{
+				EscapeToRandomTileInRoom(crew, crew->m_tile->m_room);
+			}
+			else//changing room
+			{
+				EscapeToRandomRoom(crew);
+			}
+		}
+	}
+}
+
+void Ship::EscapeToRandomRoom(CrewMember* crew)
+{
+	vector<Room*> possible_rooms;
+	for (vector<Room*>::iterator it = m_rooms.begin(); it != m_rooms.end(); it++)
+	{
+		if ((*it)->m_type != Room_PrisonCell && (*it)->m_is_flooded == false)
+		{
+			possible_rooms.push_back(*it);
+		}
+	}
+
+	if (possible_rooms.empty() == false)
+	{
 		int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
 
-		vector<RoomTile*> possible_tiles;
-		for (vector<RoomTile*>::iterator it = possible_rooms[r]->m_tiles.begin(); it != possible_rooms[r]->m_tiles.end(); it++)
+		EscapeToRandomTileInRoom(crew, possible_rooms[r]);
+	}
+}
+
+void Ship::EscapeToRandomTileInRoom(CrewMember* crew, Room* room)
+{
+	vector<RoomTile*> possible_tiles;
+	for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
+	{
+		if ((*it)->m_system == System_None && (*it)->m_crew == NULL && (*it)->m_weapon == NULL && *it != crew->m_tile)
 		{
-			if ((*it)->m_system == System_None && (*it)->m_crew == NULL && (*it)->m_weapon == NULL)
-			{
-				possible_tiles.push_back(*it);
-			}
+			possible_tiles.push_back(*it);
 		}
+	}
 
+	if (possible_tiles.empty() == false)
+	{
 		int r2 = RandomizeIntBetweenValues(0, possible_tiles.size() - 1);
-
 		crew->m_destination = possible_tiles[r2];
+		crew->m_prisoner_roaming_timer = RandomizeFloatBetweenValues(PRISONER_ROAM_TIMER_MIN, PRISONER_ROAM_TIMER_MAX);
 	}
 }

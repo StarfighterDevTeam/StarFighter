@@ -7,6 +7,7 @@
 #define CREWMEMBER_SIZE							24.f
 #define CREWMEMBER_SPEED						100.f
 #define CREWMEMBER_SPEED_FLOOD_FACTOR			0.5f
+#define CREWMEMBER_SPEED_PRISONER_FACTOR		0.5f
 #define CREWMEMBER_HEALTH_MAX					20
 
 class CrewMember : public GameEntity
@@ -43,6 +44,7 @@ public:
 	float m_healing_timer;
 
 	bool m_is_prisoner;
+	float m_prisoner_roaming_timer;
 
 	GameEntity* m_lifebar;
 	string m_display_name;

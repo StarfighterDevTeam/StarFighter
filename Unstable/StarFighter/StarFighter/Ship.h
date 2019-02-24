@@ -87,7 +87,9 @@ public:
 
 	bool ImprisonCrew(CrewMember* crew);
 	bool IsPrisonCellFree();
-	void UpdatePrisonerEscape(CrewMember* crew);
+	void UpdatePrisonerEscape(CrewMember* crew, sf::Time deltaTime);
+	void EscapeToRandomTileInRoom(CrewMember* crew, Room* room);
+	void EscapeToRandomRoom(CrewMember* crew);
 
 	void BuildShip();
 	void CenterRoomPositions(bool is_enemy);

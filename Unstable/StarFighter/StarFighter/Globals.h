@@ -98,6 +98,10 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define LIFEBAR_SIZE_Y						4.f
 #define LIFEBAR_OFFSET_Y					8.f
 
+#define PRISONER_ROAM_TIMER_MIN				3.f
+#define PRISONER_ROAM_TIMER_MAX				8.f
+#define PRISONER_CHANGING_ROOM_PROBA		0.25f
+
 //MUSIC
 #define DEFAULT_MUSIC_VOLUME				50
 #define DEFAULT_SFX_VOLUME					100

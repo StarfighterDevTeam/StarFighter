@@ -18,6 +18,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 
 	m_health_max = CREWMEMBER_HEALTH_MAX;
 	m_health = m_health_max;
+	m_prisoner_roaming_timer = RandomizeFloatBetweenValues(PRISONER_ROAM_TIMER_MIN, PRISONER_ROAM_TIMER_MAX);
 
 	//UI
 	m_shape_container.setSize(sf::Vector2f(m_size));
@@ -124,6 +125,8 @@ void CrewMember::Update(Time deltaTime)
 	if ((*CurrentGame).m_pause == false)
 	{
 		float speed = m_tile->m_flood == 0 ? m_ref_speed : m_ref_speed * CREWMEMBER_SPEED_FLOOD_FACTOR;
+		float speed2 = m_is_prisoner == false ? m_ref_speed : m_ref_speed * CREWMEMBER_SPEED_PRISONER_FACTOR;
+		speed = Minf(speed, speed2);
 
 		//update cooldowns
 		if (m_repair_timer > 0)
