@@ -238,7 +238,45 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		if ((*it)->m_health > 0 && m_warship->m_sinking_timer == 0.f)
 		{
-			(*it)->Update(deltaTime);//crew movement/heal/repair...
+			//melee opponent?
+			if ((*it)->m_melee_opponent == NULL)
+			{
+				for (vector<CrewMember*>::iterator it2 = m_warship->m_prisoners.begin(); it2 != m_warship->m_prisoners.end(); it2++)
+				{
+					if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
+					//if (abs((*it)->m_position.x - (*it2)->m_position.x) <= ROOMTILE_SIZE && abs((*it)->m_position.y - (*it2)->m_position.y) <= ROOMTILE_SIZE && (*it2)->m_health > 0 && (*it2)->m_tile->m_room->m_type != Room_PrisonCell)
+					{
+						(*it)->m_melee_opponent = *it2;
+						if ((*it2)->m_melee_opponent == NULL)
+						{
+							(*it2)->m_melee_opponent = *it;
+						}
+						break;
+					}
+				}
+			}
+
+			if ((*it)->m_melee_opponent != NULL)
+			{
+				//cancel movement
+				if ((*it)->m_destination != NULL)
+				{
+					(*it)->m_destination->m_crew = NULL;
+				}
+				(*it)->m_destination = NULL;
+				(*it)->m_speed = sf::Vector2f(0, 0);
+
+				//fight
+				(*it)->UpdateMelee(deltaTime);
+
+				//update feedbacks and life bar
+				(*it)->GameEntity::Update(deltaTime);
+				(*it)->UpdateLifeBar();
+			}
+			else
+			{
+				(*it)->Update(deltaTime);//crew movement/heal/repair...
+			}
 
 			//create or update HUD for crew details
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
@@ -246,7 +284,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
 			}
-			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && m_warship->m_crew_interface.m_crew->m_hovered == false)
+			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (m_warship->m_crew_interface.m_crew == NULL || m_warship->m_crew_interface.m_crew->m_hovered == false))
 			{
 				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
@@ -279,8 +317,46 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		if ((*it)->m_health > 0 && m_warship->m_sinking_timer == 0.f)
 		{
-			(*it)->Update(deltaTime);//crew movement/heal/repair...
-			m_warship->UpdatePrisonerEscape(*it, deltaTime);
+			//melee opponent?
+			if ((*it)->m_melee_opponent == NULL)
+			{
+				for (vector<CrewMember*>::iterator it2 = m_warship->m_crew.begin(); it2 != m_warship->m_crew.end(); it2++)
+				{
+					if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
+					//if ((*it)->m_tile->m_room->m_type != Room_PrisonCell && (*it2)->m_health > 0 && abs((*it)->m_position.x - (*it2)->m_position.x) <= ROOMTILE_SIZE && abs((*it)->m_position.y - (*it2)->m_position.y) <= ROOMTILE_SIZE)
+					{
+						(*it)->m_melee_opponent = *it2;
+						if ((*it2)->m_melee_opponent == NULL)
+						{
+							(*it2)->m_melee_opponent = *it;
+						}
+						break;
+					}
+				}
+			}
+
+			if ((*it)->m_melee_opponent != NULL)
+			{
+				//cancel movement
+				if ((*it)->m_destination != NULL)
+				{
+					(*it)->m_destination->m_crew = NULL;
+				}
+				(*it)->m_destination = NULL;
+				(*it)->m_speed = sf::Vector2f(0, 0);
+
+				//fight
+				(*it)->UpdateMelee(deltaTime);
+
+				//update feedbacks and life bar
+				(*it)->GameEntity::Update(deltaTime);
+				(*it)->UpdateLifeBar();
+			}
+			else
+			{
+				(*it)->Update(deltaTime);//crew movement/heal/repair...
+				m_warship->UpdatePrisonerEscape(*it, deltaTime);
+			}
 
 			//create or update HUD for crew details
 			if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
@@ -288,7 +364,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
 			}
-			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && m_warship->m_crew_interface.m_crew->m_hovered == false)
+			else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (m_warship->m_crew_interface.m_crew == NULL || m_warship->m_crew_interface.m_crew->m_hovered == false))
 			{
 				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
@@ -929,13 +1005,6 @@ void Gameloop::Draw()
 				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
-		for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
-		{
-			if ((*it)->m_health < (*it)->m_health_max)
-			{
-				(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-			}
-		}
 
 		//engine bars
 		if (m_warship->m_flee_count > 0)
@@ -944,6 +1013,21 @@ void Gameloop::Draw()
 			{
 				(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
 			}
+		}
+	}
+
+	for (vector<CrewMember*>::iterator it = m_warship->m_crew.begin(); it != m_warship->m_crew.end(); it++)
+	{
+		if ((*it)->m_health < (*it)->m_health_max)
+		{
+			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+		}
+	}
+	for (vector<CrewMember*>::iterator it = m_warship->m_prisoners.begin(); it != m_warship->m_prisoners.end(); it++)
+	{
+		if ((*it)->m_health < (*it)->m_health_max)
+		{
+			(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
 		}
 	}
 	

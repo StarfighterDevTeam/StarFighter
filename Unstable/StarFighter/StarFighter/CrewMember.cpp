@@ -16,6 +16,11 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_healing_timer = HEALING_TIMER;
 	m_is_prisoner = false;
 
+	m_melee_opponent = NULL;
+	m_melee_rof_timer = 0;
+	m_melee_rof = CREWMEMBER_MELEE_ROF;
+	m_melee_damage = CREWMEMBER_MELEE_DAMAGE;
+
 	m_health_max = CREWMEMBER_HEALTH_MAX;
 	m_health = m_health_max;
 	m_prisoner_roaming_timer = RandomizeFloatBetweenValues(PRISONER_ROAM_TIMER_MIN, PRISONER_ROAM_TIMER_MAX);
@@ -34,25 +39,25 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	{
 		case Crew_Pirate:
 		{
-			m_shape_container.setFillColor(sf::Color::Magenta);
+			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 20;
 			break;
 		}
 		case Crew_Civilian:
 		{
-			m_shape_container.setFillColor(sf::Color::Magenta);
+			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 10;
 			break;
 		}
 		case Crew_Slave:
 		{
-			m_shape_container.setFillColor(sf::Color::Magenta);
+			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 5;
 			break;
 		}
 		case Crew_Undead:
 		{
-			m_shape_container.setFillColor(sf::Color::Magenta);
+			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 15;
 			break;
 		}
@@ -243,7 +248,7 @@ void CrewMember::Update(Time deltaTime)
 					}
 				}
 
-				m_repair_timer = HULL_REPAIR_TIMER;
+				m_repair_timer += HULL_REPAIR_TIMER;
 			}
 
 			if (m_tile->m_health == m_tile->m_health_max)
@@ -255,7 +260,7 @@ void CrewMember::Update(Time deltaTime)
 		//drowning
 		if (m_tile->m_room->m_is_flooded == true && m_drowning_timer <= 0)
 		{
-			m_drowning_timer = DROWNING_TIMER;
+			m_drowning_timer += DROWNING_TIMER;
 
 			m_health--;
 		}
@@ -263,7 +268,7 @@ void CrewMember::Update(Time deltaTime)
 		//healing in Crew quarter
 		if (m_tile->m_room->m_type == Room_Crewquarter && m_healing_timer <= 0 && m_health < m_health_max)
 		{
-			m_healing_timer = HEALING_TIMER;
+			m_healing_timer += HEALING_TIMER;
 
 			m_health++;
 		}
@@ -271,6 +276,11 @@ void CrewMember::Update(Time deltaTime)
 
 	GameEntity::Update(deltaTime);
 
+	UpdateLifeBar();
+}
+
+void CrewMember::UpdateLifeBar()
+{
 	//UI lifebar
 	sf::Vector2f position = m_position + m_ship_offset;
 	m_lifebar->m_shape_container.setPosition(position.x, position.y - m_size.y * 0.5f - LIFEBAR_OFFSET_Y);
@@ -528,4 +538,39 @@ bool CrewMember::Imprison(RoomTile* prison_cell)
 	m_tile = prison_cell;
 	m_position = prison_cell->m_position;
 	m_speed = sf::Vector2f(0, 0);
+}
+
+float CrewMember::UpdateAndGetMeleeRof()
+{
+	m_melee_rof = 1.f / ((1.f / CREWMEMBER_MELEE_ROF) * (100 + m_skills[Skill_Melee]) / 100);
+	
+	return m_melee_rof;
+}
+
+void CrewMember::UpdateMelee(sf::Time deltaTime)
+{
+	if ((*CurrentGame).m_pause == false)
+	{
+		if (m_melee_rof_timer > 0)
+		{
+			m_melee_rof_timer -= deltaTime.asSeconds();
+		}
+
+		//attack
+		if (m_melee_rof_timer <= 0)
+		{
+			m_melee_opponent->m_health -= Min(m_melee_damage, m_melee_opponent->m_health);
+
+			//opponent survived?
+			if (m_melee_opponent->m_health > 0)
+			{
+				m_melee_rof_timer += UpdateAndGetMeleeRof();
+			}
+			else//opponent killed
+			{
+				m_melee_opponent = NULL;
+			}
+			
+		}
+	}
 }

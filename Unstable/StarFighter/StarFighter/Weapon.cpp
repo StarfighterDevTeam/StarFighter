@@ -180,7 +180,7 @@ RoomTile* Weapon::GetFreeRoomTile(Room* room)
 void Weapon::Fire(float angle, float distance_combat, Ship* target_ship, RoomTile* target_tile, sf::Vector2f target_position)
 {
 	//reset rate of fire cooldown
-	m_rof_timer = GetRof();
+	m_rof_timer += GetRof();
 
 	//Fire from room tile
 	Ammo* new_ammo = new Ammo(m_ammo_type, m_position, angle, distance_combat, target_ship, target_tile, target_position);

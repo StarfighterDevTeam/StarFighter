@@ -259,6 +259,9 @@ CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 	m_nb_crew++;
 	crew->m_alliance = m_alliance;
 
+	crew->m_is_prisoner = false;
+	crew->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
+
 	//UI
 	crew->m_shape_container.setPosition(crew->m_position);
 	crew->m_text.SetPosition(crew->m_position);

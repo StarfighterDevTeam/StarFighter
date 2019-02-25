@@ -132,6 +132,7 @@ enum Color_Chart
 	Color_Blue_Pierced,
 	Color_Red_Prison,
 	Color_Yellow_Prisoner,
+	Color_Magenta_Crew,
 	NB_COLOR_CHART,
 };
 

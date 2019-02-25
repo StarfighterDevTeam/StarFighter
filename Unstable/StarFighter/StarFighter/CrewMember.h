@@ -9,6 +9,8 @@
 #define CREWMEMBER_SPEED_FLOOD_FACTOR			0.5f
 #define CREWMEMBER_SPEED_PRISONER_FACTOR		0.5f
 #define CREWMEMBER_HEALTH_MAX					20
+#define CREWMEMBER_MELEE_ROF					1.f
+#define CREWMEMBER_MELEE_DAMAGE					1
 
 class CrewMember : public GameEntity
 {
@@ -24,11 +26,14 @@ public:
 	int m_skills_max[NB_CREW_SKILLS];
 
 	void Update(Time deltaTime);
+	void UpdateLifeBar();
 
 	RoomTile* GetFreeRoomTile(Room* room);
 	void MoveToRoomTile(RoomTile* tile);
 
 	bool Imprison(RoomTile* prison_cell);
+	void UpdateMelee(sf::Time deltaTime);
+	float UpdateAndGetMeleeRof();
 
 	sf::Vector2f m_speed;
 	float m_ref_speed;
@@ -45,6 +50,11 @@ public:
 
 	bool m_is_prisoner;
 	float m_prisoner_roaming_timer;
+
+	CrewMember* m_melee_opponent;
+	float m_melee_rof_timer;
+	float m_melee_rof;
+	int m_melee_damage;
 
 	GameEntity* m_lifebar;
 	string m_display_name;
