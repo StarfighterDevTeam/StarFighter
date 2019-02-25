@@ -1,6 +1,7 @@
 #ifndef ROOMTILE_H_INCLUDED
 #define ROOMTILE_H_INCLUDED
 
+#include "SFTextPop.h"
 #include "Game.h"
 #include "GameEntity.h"
 

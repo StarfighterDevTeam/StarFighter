@@ -166,6 +166,11 @@ Game::~Game()
 		delete *it;
 	}
 
+	for (vector<SFTextPop*>::iterator it = m_texts_pop.begin(); it != m_texts_pop.end(); it++)
+	{
+		delete *it;
+	}
+
 	for (vector<RoomTile*>::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
 	{
 		delete *it;

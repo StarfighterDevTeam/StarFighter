@@ -556,10 +556,20 @@ void CrewMember::UpdateMelee(sf::Time deltaTime)
 			m_melee_rof_timer -= deltaTime.asSeconds();
 		}
 
-		//attack
-		if (m_melee_rof_timer <= 0)
+		if (m_melee_opponent->m_health == 0)//opponent already dead?
 		{
-			m_melee_opponent->m_health -= Min(m_melee_damage, m_melee_opponent->m_health);
+			m_melee_opponent = NULL;
+		}
+		else if (m_melee_rof_timer <= 0)//attack
+		{
+			//deal damage
+			int damage = Min(m_melee_damage, m_melee_opponent->m_health);
+			m_melee_opponent->m_health -= damage;
+
+			//pop feedback
+			ostringstream ss;
+			ss << damage;
+			SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 18, sf::Text::Bold, sf::Color::Red, ss.str(), 20.f, 10.f, 1.f, this, 20.f);
 
 			//opponent survived?
 			if (m_melee_opponent->m_health > 0)
@@ -570,7 +580,6 @@ void CrewMember::UpdateMelee(sf::Time deltaTime)
 			{
 				m_melee_opponent = NULL;
 			}
-			
 		}
 	}
 }

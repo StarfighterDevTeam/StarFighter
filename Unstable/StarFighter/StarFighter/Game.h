@@ -21,6 +21,7 @@ class WaterTile;
 class Ship;
 class Ammo;
 class FX;
+class SFTextPop;
 
 enum SFX_Bank
 {
@@ -207,6 +208,10 @@ public:
 	vector<vector<WaterZone*> > m_waterzones;
 	vector<Ammo*> m_bullets;
 	vector<FX*> m_FX;
+	vector<SFTextPop*> m_texts_pop;
+
+	//void CreateSFTextPop(const Font& font, unsigned int size, Uint32 style, const Color& color, string text_string, float distance_not_faded, float distance_faded, float total_pop_time, GameEntity* target, float offset_positionY);
+
 	bool m_pause;
 
 	string m_dico_ship_class[NB_SHIP_TYPES];

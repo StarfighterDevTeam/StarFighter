@@ -30,7 +30,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 			texture = loader->loadTexture("2D/cannonball.png", (int)CANNONBALL_SIZE, (int)CANNONBALL_SIZE);
 			m_damage = CANNONBALL_DAMAGE;
 			m_hull_damage = CANNONBALL_DAMAGE;
-			m_SHRAPNEL_DAMAGE = CANNONBALL_DAMAGE;
+			m_shrapnel_damage = CANNONBALL_DAMAGE;
 			m_ref_speed = CANNONBALL_SPEED;
 			m_initial_speed = m_ref_speed;
 			break;
@@ -41,7 +41,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 			texture = loader->loadTexture("2D/torpedo.png", 32, 16);
 			m_damage = 0;
 			m_hull_damage = TORPEDO_HULL_DAMAGE;
-			m_SHRAPNEL_DAMAGE = 0;
+			m_shrapnel_damage = 0;
 			m_ref_speed = TORPEDO_SPEED;
 			m_initial_speed = TORPEDO_INITIAL_SPEED;
 			m_acceleration = TORPEDO_ACCELERATION;
@@ -53,7 +53,7 @@ Ammo::Ammo(AmmoType type, sf::Vector2f position, float angle, float distance_com
 			texture = loader->loadTexture("2D/shrapnel.png", 32, 16);
 			m_damage = 0;
 			m_hull_damage = 0;
-			m_SHRAPNEL_DAMAGE = SHRAPNEL_DAMAGE;
+			m_shrapnel_damage = SHRAPNEL_DAMAGE;
 			m_ref_speed = CANNONBALL_SPEED;
 			m_initial_speed = m_ref_speed;
 			m_radius = 2;

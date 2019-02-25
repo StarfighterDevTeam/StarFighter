@@ -60,7 +60,7 @@ public:
 
 	int m_damage;
 	int m_hull_damage;
-	int m_SHRAPNEL_DAMAGE;
+	int m_shrapnel_damage;
 	float m_radius;
 
 	bool m_can_be_seen;

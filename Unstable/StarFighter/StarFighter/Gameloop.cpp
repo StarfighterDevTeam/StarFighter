@@ -694,22 +694,41 @@ void Gameloop::Update(sf::Time deltaTime)
 								tiles_hit.push_back(tile);
 
 								//damage to ship
-								(*it)->m_target_ship->m_health -= Min((*it)->m_damage, (*it)->m_target_ship->m_health);
-
-								//damage to weapon
-								if (tile->m_weapon != NULL)
+								int damage_ship = Min((*it)->m_damage, (*it)->m_target_ship->m_health);
+								if (damage_ship > 0)
 								{
-									Weapon* weapon = tile->m_weapon;
-									weapon->m_health -= Min((*it)->m_damage, weapon->m_health);
-									if (weapon->m_health == 0)
+									(*it)->m_target_ship->m_health -= damage_ship;
+
+									//pop feedback
+									ostringstream ss;
+									ss << damage_ship;
+									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 30, sf::Text::Bold, sf::Color::Red, ss.str(), 30.f, 20.f, 1.f, tile, 20.f);
+
+									//damage to weapon
+									if (tile->m_weapon != NULL)
 									{
-										weapon->setColor(sf::Color::Red);
+										Weapon* weapon = tile->m_weapon;
+										weapon->m_health -= Min((*it)->m_damage, weapon->m_health);
+										if (weapon->m_health == 0)
+										{
+											weapon->setColor(sf::Color::Red);
+										}
+									}
+
+									//destroying door
+									if (tile->m_connexion != NULL)
+									{
+										tile->m_connexion->Destroy();
 									}
 								}
-
+								
 								//hull damage
-								tile->m_health -= Min((*it)->m_hull_damage, tile->m_health);
-
+								int damage_hull = Min((*it)->m_hull_damage, tile->m_health);
+								if (damage_hull > 0)
+								{
+									tile->m_health -= damage_hull;
+								}
+								
 								//piercing hull
 								if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
 								{
@@ -718,35 +737,43 @@ void Gameloop::Update(sf::Time deltaTime)
 									{
 										tile->m_crew->m_repair_timer = HULL_REPAIR_TIMER;
 									}
+
+									//pop feedback
+									ostringstream ss_hull;
+									ss_hull << "Pierced";
+									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 30, sf::Text::Bold, sf::Color::Blue, ss_hull.str(), 30.f, 20.f, 1.f, tile, 50.f);
 								}
 
-								//destroying door
-								if (tile->m_connexion != NULL && (*it)->m_damage > 0)
+								//shrapnel damage
+								if ((*it)->m_shrapnel_damage > 0)
 								{
-									tile->m_connexion->Destroy();
-								}
-
-								//shrapnel damage: killing crew
-								for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
-								{
-									float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
-									float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
-									float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
-									float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
-									float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
-									float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
-									float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
-									float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
-
-									//collision?
-									if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
-										|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
-										|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
-										|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
+									for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
 									{
-										if ((*it2)->m_health > 0)
+										float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
+										float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
+										float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
+										float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
+										float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
+										float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
+										float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
+										float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
+
+										//collision?
+										if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
+											|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
+											|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
+											|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
 										{
-											(*it2)->m_health -= Min((*it)->m_SHRAPNEL_DAMAGE, (*it2)->m_health);
+											if ((*it2)->m_health > 0)
+											{
+												int damage_crew = Min((*it)->m_shrapnel_damage, (*it2)->m_health);
+												(*it2)->m_health -= damage_crew;
+
+												//pop feedback
+												ostringstream ss_crew;
+												ss_crew << damage_crew;
+												SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 18, sf::Text::Bold, sf::Color::Red, ss_crew.str(), 30.f, 20.f, 1.f, tile, 20.f);
+											}
 										}
 									}
 								}
@@ -809,6 +836,26 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->m_can_be_seen == true)
 			{
 				(*CurrentGame).m_FX.push_back(*it);
+				(*it)->Update(deltaTime);
+			}
+			else
+			{
+				delete *it;
+			}
+		}
+
+		//SFTextPop + clean old
+		vector<SFTextPop*> old_texts_pop;
+		for (vector<SFTextPop*>::iterator it = (*CurrentGame).m_texts_pop.begin(); it != (*CurrentGame).m_texts_pop.end(); it++)
+		{
+			old_texts_pop.push_back(*it);
+		}
+		(*CurrentGame).m_texts_pop.clear();
+		for (vector<SFTextPop*>::iterator it = old_texts_pop.begin(); it != old_texts_pop.end(); it++)
+		{
+			if ((*it)->m_alpha > 0)
+			{
+				(*CurrentGame).m_texts_pop.push_back(*it);
 				(*it)->Update(deltaTime);
 			}
 			else
@@ -1198,6 +1245,12 @@ void Gameloop::Draw()
 		{
 			(*it)->FX::Draw((*CurrentGame).m_mainScreen);
 		}
+	}
+
+	//SFTextPop
+	for (vector<SFTextPop*>::iterator it = (*CurrentGame).m_texts_pop.begin(); it != (*CurrentGame).m_texts_pop.end(); it++)
+	{
+		(*CurrentGame).m_mainScreen.draw(*(*it));
 	}
 
 	//Menus

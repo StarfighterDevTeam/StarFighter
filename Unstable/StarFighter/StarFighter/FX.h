@@ -1,6 +1,7 @@
 #ifndef FX_H_INCLUDED
 #define FX_H_INCLUDED
 
+#include "SFTextPop.h"
 #include "Game.h"
 #include "GameEntity.h"
 
