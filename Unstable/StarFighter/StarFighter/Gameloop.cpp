@@ -398,7 +398,45 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			if ((*it)->m_health > 0 && m_tactical_ship->m_sinking_timer == 0.f)
 			{
-				(*it)->Update(deltaTime);//crew movement/heal/repair...
+				//melee opponent?
+				if ((*it)->m_melee_opponent == NULL)
+				{
+					for (vector<CrewMember*>::iterator it2 = m_warship->m_prisoners.begin(); it2 != m_warship->m_prisoners.end(); it2++)
+					{
+						if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
+							//if (abs((*it)->m_position.x - (*it2)->m_position.x) <= ROOMTILE_SIZE && abs((*it)->m_position.y - (*it2)->m_position.y) <= ROOMTILE_SIZE && (*it2)->m_health > 0 && (*it2)->m_tile->m_room->m_type != Room_PrisonCell)
+						{
+							(*it)->m_melee_opponent = *it2;
+							if ((*it2)->m_melee_opponent == NULL)
+							{
+								(*it2)->m_melee_opponent = *it;
+							}
+							break;
+						}
+					}
+				}
+
+				if ((*it)->m_melee_opponent != NULL)
+				{
+					//cancel movement
+					if ((*it)->m_destination != NULL)
+					{
+						(*it)->m_destination->m_crew = NULL;
+					}
+					(*it)->m_destination = NULL;
+					(*it)->m_speed = sf::Vector2f(0, 0);
+
+					//fight
+					(*it)->UpdateMelee(deltaTime);
+
+					//update feedbacks and life bar
+					(*it)->GameEntity::Update(deltaTime);
+					(*it)->UpdateLifeBar();
+				}
+				else
+				{
+					(*it)->Update(deltaTime);//crew movement/heal/repair...
+				}
 
 				//Crew AI
 				if ((*it)->m_destination == NULL)
@@ -475,8 +513,45 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			if ((*it)->m_health > 0 && m_tactical_ship->m_sinking_timer == 0.f)
 			{
-				(*it)->Update(deltaTime);//crew movement/heal/repair...
-				m_tactical_ship->UpdatePrisonerEscape(*it, deltaTime);
+				//melee opponent?
+				if ((*it)->m_melee_opponent == NULL)
+				{
+					for (vector<CrewMember*>::iterator it2 = m_tactical_ship->m_crew.begin(); it2 != m_tactical_ship->m_crew.end(); it2++)
+					{
+						if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
+						{
+							(*it)->m_melee_opponent = *it2;
+							if ((*it2)->m_melee_opponent == NULL)
+							{
+								(*it2)->m_melee_opponent = *it;
+							}
+							break;
+						}
+					}
+				}
+
+				if ((*it)->m_melee_opponent != NULL)
+				{
+					//cancel movement
+					if ((*it)->m_destination != NULL)
+					{
+						(*it)->m_destination->m_crew = NULL;
+					}
+					(*it)->m_destination = NULL;
+					(*it)->m_speed = sf::Vector2f(0, 0);
+
+					//fight
+					(*it)->UpdateMelee(deltaTime);
+
+					//update feedbacks and life bar
+					(*it)->GameEntity::Update(deltaTime);
+					(*it)->UpdateLifeBar();
+				}
+				else
+				{
+					(*it)->Update(deltaTime);//crew movement/heal/repair...
+					m_tactical_ship->UpdatePrisonerEscape(*it, deltaTime);
+				}
 			}
 
 			if ((*it)->m_health > 0)//second check because he could drown during the update
@@ -747,32 +822,38 @@ void Gameloop::Update(sf::Time deltaTime)
 								//shrapnel damage
 								if ((*it)->m_shrapnel_damage > 0)
 								{
-									for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew.begin(); it2 != (*it)->m_target_ship->m_crew.end(); it2++)
+									for (int c = 0; c < 2; c++)
 									{
-										float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
-										float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
-										float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
-										float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
-										float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
-										float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
-										float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
-										float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
+										vector<CrewMember*>::iterator begin = c == 0 ? (*it)->m_target_ship->m_crew.begin() : (*it)->m_target_ship->m_prisoners.begin();
+										vector<CrewMember*>::iterator end = c == 0 ? (*it)->m_target_ship->m_crew.end() : (*it)->m_target_ship->m_prisoners.end();
 
-										//collision?
-										if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
-											|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
-											|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
-											|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
+										for (vector<CrewMember*>::iterator it2 = begin; it2 != end; it2++)
 										{
-											if ((*it2)->m_health > 0)
-											{
-												int damage_crew = Min((*it)->m_shrapnel_damage, (*it2)->m_health);
-												(*it2)->m_health -= damage_crew;
+											float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
+											float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
+											float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
+											float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
+											float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
+											float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
+											float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
+											float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
 
-												//pop feedback
-												ostringstream ss_crew;
-												ss_crew << damage_crew;
-												SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_1, sf::Text::Bold, sf::Color::Red, ss_crew.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_SIZE_1);
+											//collision?
+											if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
+												|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
+												|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
+												|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
+											{
+												if ((*it2)->m_health > 0)
+												{
+													int damage_crew = Min((*it)->m_shrapnel_damage, (*it2)->m_health);
+													(*it2)->m_health -= damage_crew;
+
+													//pop feedback
+													ostringstream ss_crew;
+													ss_crew << damage_crew;
+													SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_1, sf::Text::Bold, sf::Color::Red, ss_crew.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_SIZE_1);
+												}
 											}
 										}
 									}
@@ -1278,16 +1359,31 @@ bool Gameloop::UpdateTacticalScale()
 	if (m_scale == Scale_Tactical)
 	{
 		//win-lose conditions: low health, high flood, too many crew dead, fleeing out of screen
-		bool win = m_tactical_ship == NULL || m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f || m_tactical_ship->m_sinking_timer >= SHIP_SINKING_TIME || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3 || m_tactical_ship->m_ship_offset.y < -m_tactical_ship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
-		bool lose = m_warship->m_health < m_warship->m_health_max * 0.3f || m_warship->m_sinking_timer >= SHIP_SINKING_TIME || m_warship->m_ship_offset.y < -m_warship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
+		bool win_crew = m_tactical_ship == NULL || m_tactical_ship->m_nb_crew < m_tactical_ship->m_nb_crew_max * 0.3;
+		bool win_health = m_tactical_ship == NULL || m_tactical_ship->m_health < m_tactical_ship->m_health_max * 0.2f;
+		bool win_flood = m_tactical_ship == NULL || m_tactical_ship->m_sinking_timer >= SHIP_SINKING_TIME;
+		bool win_flee = m_tactical_ship == NULL || m_tactical_ship->m_ship_offset.y < -m_tactical_ship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
+
+		bool lose_crew = m_warship->m_nb_crew < m_warship->m_nb_crew_max * 0.3;
+		bool lose_health = m_warship->m_health < m_warship->m_health_max * 0.2f;
+		bool lose_flood = m_warship->m_sinking_timer >= SHIP_SINKING_TIME;
+		bool lose_flee = m_warship->m_ship_offset.y < -m_warship->m_rooms_size.y * ROOMTILE_SIZE * 0.5f - ROOMTILE_OFFSET_Y;
+
+		bool win = m_tactical_ship == NULL || win_health == true || win_flood == true || win_crew == true || win_flee == true;
+		bool lose = lose_health == true || lose_flood == true || lose_flee == true;
 		if (win == true || lose == true)
 		{
 			//make prisoners
 			if (m_menu != Menu_PrisonersChoice && m_tactical_ship != NULL)
 			{
-				m_menu = Menu_PrisonersChoice;
-				m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
-
+				//surviving enemy crews? => open prisoners choice interface
+				//TODO: win_flood and win_health first offers a game of choosing among the survivors whom to pull out from a certain death
+				if (win_crew == true || win_flood == true || win_health == true)
+				{
+					m_menu = Menu_PrisonersChoice;
+					m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
+				}
+				
 				//delete enemy from ships existing
 				vector<Ship*> old_ships;
 				for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)

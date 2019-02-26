@@ -11,6 +11,7 @@
 #define CREWMEMBER_HEALTH_MAX					20
 #define CREWMEMBER_MELEE_ROF					1.f
 #define CREWMEMBER_MELEE_DAMAGE					1
+#define PRISONER_HEALTH_MIN_TO_ESCAPE			5
 
 class CrewMember : public GameEntity
 {

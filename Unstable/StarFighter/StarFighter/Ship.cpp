@@ -1226,7 +1226,7 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 void Ship::UpdatePrisonerEscape(CrewMember* crew, sf::Time deltaTime)
 {
 	//escaping the prison cell?
-	if (crew->m_tile != NULL && crew->m_tile->m_room->m_type == Room_PrisonCell && crew->m_tile->m_connexion->m_locked == false)
+	if (crew->m_tile != NULL && crew->m_tile->m_room->m_type == Room_PrisonCell && crew->m_tile->m_connexion->m_locked == false && m_health > PRISONER_HEALTH_MIN_TO_ESCAPE)
 	{
 		EscapeToRandomRoom(crew);
 	}
