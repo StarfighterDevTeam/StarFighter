@@ -702,7 +702,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									//pop feedback
 									ostringstream ss;
 									ss << damage_ship;
-									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 30, sf::Text::Bold, sf::Color::Red, ss.str(), 30.f, 20.f, 1.f, tile, 20.f);
+									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_2, sf::Text::Bold, sf::Color::Red, ss.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_OFFSET_2);
 
 									//damage to weapon
 									if (tile->m_weapon != NULL)
@@ -741,7 +741,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									//pop feedback
 									ostringstream ss_hull;
 									ss_hull << "Pierced";
-									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 30, sf::Text::Bold, sf::Color::Blue, ss_hull.str(), 30.f, 20.f, 1.f, tile, 50.f);
+									SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_2, sf::Text::Bold, sf::Color::Blue, ss_hull.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_OFFSET_2_BIS);
 								}
 
 								//shrapnel damage
@@ -772,7 +772,7 @@ void Gameloop::Update(sf::Time deltaTime)
 												//pop feedback
 												ostringstream ss_crew;
 												ss_crew << damage_crew;
-												SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 18, sf::Text::Bold, sf::Color::Red, ss_crew.str(), 30.f, 20.f, 1.f, tile, 20.f);
+												SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_1, sf::Text::Bold, sf::Color::Red, ss_crew.str(), 30.f, 20.f, 1.f, tile, SFTEXTPOP_SIZE_1);
 											}
 										}
 									}

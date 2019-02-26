@@ -254,6 +254,11 @@ void CrewMember::Update(Time deltaTime)
 			if (m_tile->m_health == m_tile->m_health_max)
 			{
 				m_tile->m_pierced = false;
+
+				//pop feedback
+				ostringstream ss;
+				ss << "Hull repaired";
+				SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_2, sf::Text::Bold, sf::Color::Blue, ss.str(), 20.f, 10.f, 1.f, this, SFTEXTPOP_OFFSET_2_BIS);
 			}
 		}
 
@@ -569,7 +574,7 @@ void CrewMember::UpdateMelee(sf::Time deltaTime)
 			//pop feedback
 			ostringstream ss;
 			ss << damage;
-			SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], 18, sf::Text::Bold, sf::Color::Red, ss.str(), 20.f, 10.f, 1.f, this, 20.f);
+			SFTextPop::CreateSFTextPop(*(*CurrentGame).m_font[Font_Arial], SFTEXTPOP_SIZE_1, sf::Text::Bold, sf::Color::Red, ss.str(), 20.f, 10.f, 1.f, this, SFTEXTPOP_OFFSET_2);
 
 			//opponent survived?
 			if (m_melee_opponent->m_health > 0)

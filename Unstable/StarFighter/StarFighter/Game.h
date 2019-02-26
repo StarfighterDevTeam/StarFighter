@@ -23,6 +23,13 @@ class Ammo;
 class FX;
 class SFTextPop;
 
+#define SFTEXTPOP_SIZE_1			18
+#define SFTEXTPOP_SIZE_2			30
+
+#define SFTEXTPOP_OFFSET_1			20.f
+#define SFTEXTPOP_OFFSET_2			30.f
+#define SFTEXTPOP_OFFSET_2_BIS		50.f
+
 enum SFX_Bank
 {
 	SFX_Laser,

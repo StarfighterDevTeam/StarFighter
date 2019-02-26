@@ -711,7 +711,7 @@ void Ship::BuildShip()
 	ImprisonCrew(prisoner);
 
 	//CHEAT DEBUG
-	m_health = m_health_max * 0.2 + 8;
+	m_health = m_health_max * 0.2 + 58;
 }
 
 void Ship::CenterRoomPositions(bool is_enemy)
