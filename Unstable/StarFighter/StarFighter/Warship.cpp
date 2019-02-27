@@ -295,9 +295,6 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 
 	UpdateFlooding(deltaTime);
 
-	//Crew interface
-	m_crew_interface.Update();
-
 	UpdateShipOffset();
 
 	GameEntity::Update(deltaTime);

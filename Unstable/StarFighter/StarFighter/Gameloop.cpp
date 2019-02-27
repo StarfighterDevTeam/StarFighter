@@ -133,6 +133,16 @@ void Gameloop::Update(sf::Time deltaTime)
 	//Enemy rooms
 	if (m_tactical_ship != NULL)
 	{
+		//canceling weapon target
+		if (hovered == NULL)
+		{
+			if (mouse_click == Mouse_RightClick)
+			{
+				Weapon* weapon = (Weapon*)selection;
+				weapon->m_target_room = NULL;
+			}
+		}
+
 		//Rooms
 		Room* room_hovered = NULL;
 		for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
@@ -298,10 +308,24 @@ void Gameloop::Update(sf::Time deltaTime)
 		else
 		{
 			m_warship->m_nb_crew--;
-			if (m_warship->m_crew_interface.m_crew == *it)//remove from interface before destroying object
+
+			if ((*CurrentGame).m_hovered_ui == *it)
 			{
-				m_warship->m_crew_interface.m_crew = NULL;
+				(*CurrentGame).m_hovered_ui = NULL;
+				if (m_warship->m_crew_interface.m_crew == *it)
+				{
+					m_warship->m_crew_interface.Destroy();
+				}
 			}
+			else if ((*CurrentGame).m_selected_ui == *it)
+			{
+				(*CurrentGame).m_selected_ui = NULL;
+				if (m_warship->m_crew_interface.m_crew == *it)
+				{
+					m_warship->m_crew_interface.Destroy();
+				}
+			}
+			
 			delete *it;
 		}
 	}
@@ -1009,6 +1033,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
+	//Crew interface
+	m_warship->m_crew_interface.Update();
+
 	//island
 	if (m_island != NULL)
 	{
@@ -1378,7 +1405,7 @@ bool Gameloop::UpdateTacticalScale()
 			{
 				//surviving enemy crews? => open prisoners choice interface
 				//TODO: win_flood and win_health first offers a game of choosing among the survivors whom to pull out from a certain death
-				if (win_crew == true || win_flood == true || win_health == true)
+				if (win_crew == true)
 				{
 					m_menu = Menu_PrisonersChoice;
 					m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
