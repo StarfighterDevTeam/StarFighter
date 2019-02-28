@@ -144,10 +144,11 @@ void CrewOverboardInterface::Update(sf::Time deltaTime)
 {
 	if (m_drowning_timer > 0)
 	{
-		float drowning_ratio = m_drowning_timer / OVERBOARD_DROWNING_TIME;
-		m_drowning_bar->m_shape.setSize(sf::Vector2f(drowning_ratio * OVERBOARD_DROWNINGBAR_SIZE_X, OVERBOARD_DROWNINGBAR_SIZE_Y));
-
 		m_drowning_timer -= deltaTime.asSeconds();
+		m_drowning_timer = Maxf(m_drowning_timer, 0.f);
+
+		float drowning_ratio = m_drowning_timer == 0 ? 0 : m_drowning_timer / OVERBOARD_DROWNING_TIME;
+		m_drowning_bar->m_shape.setSize(sf::Vector2f(drowning_ratio * OVERBOARD_DROWNINGBAR_SIZE_X, OVERBOARD_DROWNINGBAR_SIZE_Y));
 	}
 
 	if (m_drowning_timer <= 0)

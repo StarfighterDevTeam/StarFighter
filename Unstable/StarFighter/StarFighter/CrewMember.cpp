@@ -129,7 +129,7 @@ void CrewMember::Update(Time deltaTime)
 {
 	if ((*CurrentGame).m_pause == false)
 	{
-		float speed = m_tile->m_flood == 0 ? m_ref_speed : m_ref_speed * CREWMEMBER_SPEED_FLOOD_FACTOR;
+		float speed = m_tile->m_flood > 0 && m_race != Race_Fishman ? m_ref_speed * CREWMEMBER_SPEED_FLOOD_FACTOR : m_ref_speed;//fishmen have no penalty when moving underwater
 		float speed2 = m_is_prisoner == false ? m_ref_speed : m_ref_speed * CREWMEMBER_SPEED_PRISONER_FACTOR;
 		speed = Minf(speed, speed2);
 
@@ -263,7 +263,7 @@ void CrewMember::Update(Time deltaTime)
 		}
 
 		//drowning
-		if (m_tile->m_room->m_is_flooded == true && m_drowning_timer <= 0)
+		if (m_tile->m_room->m_is_flooded == true && m_drowning_timer <= 0 && m_race != Race_Fishman)//fishmen can breathe underwater
 		{
 			m_drowning_timer += DROWNING_TIMER;
 

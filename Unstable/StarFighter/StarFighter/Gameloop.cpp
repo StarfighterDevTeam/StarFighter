@@ -249,7 +249,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		if ((*it)->m_health > 0)
 		{
 			//melee opponent?
-			if ((*it)->m_melee_opponent == NULL && m_warship->m_sinking_timer < SHIP_SINKING_TIME)
+			if ((*it)->m_melee_opponent == NULL && m_warship->m_sinking_timer <= 0)
 			{
 				for (vector<CrewMember*>::iterator it2 = m_warship->m_prisoners.begin(); it2 != m_warship->m_prisoners.end(); it2++)
 				{
@@ -283,7 +283,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				(*it)->GameEntity::Update(deltaTime);
 				(*it)->UpdateLifeBar();
 			}
-			else if (m_warship->m_sinking_timer >= SHIP_SINKING_TIME)
+			else if (m_warship->m_sinking_timer > 0)
 			{
 				(*it)->GameEntity::Update(deltaTime);
 			}
@@ -302,6 +302,10 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
+			}
+			else if (m_warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
+			{
+				m_warship->m_crew_interface.Destroy();
 			}
 		}
 
@@ -341,7 +345,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		if ((*it)->m_health > 0)
 		{
 			//melee opponent?
-			if ((*it)->m_melee_opponent == NULL && m_warship->m_sinking_timer < SHIP_SINKING_TIME)
+			if ((*it)->m_melee_opponent == NULL && m_warship->m_sinking_timer <= 0)
 			{
 				for (vector<CrewMember*>::iterator it2 = m_warship->m_crew.begin(); it2 != m_warship->m_crew.end(); it2++)
 				{
@@ -375,7 +379,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				(*it)->GameEntity::Update(deltaTime);
 				(*it)->UpdateLifeBar();
 			}
-			else if (m_warship->m_sinking_timer >= SHIP_SINKING_TIME)
+			else if (m_warship->m_sinking_timer > 0)
 			{
 				(*it)->GameEntity::Update(deltaTime);
 			}
@@ -395,6 +399,10 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				m_warship->m_crew_interface.Destroy();
 				m_warship->m_crew_interface.Init(*it);
+			}
+			else if (m_warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
+			{
+				m_warship->m_crew_interface.Destroy();
 			}
 		}
 
@@ -434,7 +442,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->m_health > 0)
 			{
 				//melee opponent?
-				if ((*it)->m_melee_opponent == NULL && m_tactical_ship->m_sinking_timer < SHIP_SINKING_TIME)
+				if ((*it)->m_melee_opponent == NULL && m_tactical_ship->m_sinking_timer <= 0)
 				{
 					for (vector<CrewMember*>::iterator it2 = m_warship->m_prisoners.begin(); it2 != m_warship->m_prisoners.end(); it2++)
 					{
@@ -468,7 +476,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					(*it)->GameEntity::Update(deltaTime);
 					(*it)->UpdateLifeBar();
 				}
-				else if (m_tactical_ship->m_sinking_timer >= SHIP_SINKING_TIME)
+				else if (m_tactical_ship->m_sinking_timer > 0)
 				{
 					(*it)->GameEntity::Update(deltaTime);
 				}
@@ -478,7 +486,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 
 				//Crew AI
-				if (m_tactical_ship->m_sinking_timer < SHIP_SINKING_TIME)
+				if (m_tactical_ship->m_sinking_timer <= 0)
 				{
 					if ((*it)->m_destination == NULL)
 					{
@@ -556,7 +564,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			if ((*it)->m_health > 0)
 			{
 				//melee opponent?
-				if ((*it)->m_melee_opponent == NULL && m_tactical_ship->m_sinking_timer < SHIP_SINKING_TIME)
+				if ((*it)->m_melee_opponent == NULL && m_tactical_ship->m_sinking_timer <= 0)
 				{
 					for (vector<CrewMember*>::iterator it2 = m_tactical_ship->m_crew.begin(); it2 != m_tactical_ship->m_crew.end(); it2++)
 					{
@@ -589,7 +597,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					(*it)->GameEntity::Update(deltaTime);
 					(*it)->UpdateLifeBar();
 				}
-				else if (m_tactical_ship->m_sinking_timer >= SHIP_SINKING_TIME)
+				else if (m_tactical_ship->m_sinking_timer > 0)
 				{
 					(*it)->GameEntity::Update(deltaTime);
 				}
@@ -616,7 +624,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		(*it)->Update(deltaTime);
 
-		if (m_tactical_ship != NULL && m_tactical_ship->m_sinking_timer < SHIP_SINKING_TIME)
+		if (m_tactical_ship != NULL && m_tactical_ship->m_sinking_timer <= 0)
 		{
 			if ((*it)->CanFire() == true)
 			{
@@ -662,7 +670,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 	
-	if (m_tactical_ship != NULL && m_warship->m_sinking_timer < SHIP_SINKING_TIME)
+	if (m_tactical_ship != NULL && m_warship->m_sinking_timer <= 0)
 	{
 		//Enemy weapons
 		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
@@ -1385,11 +1393,17 @@ void Gameloop::Draw()
 	}
 
 	//crew interface
-	//if (m_warship->m_crew_interface.m_crew != NULL)
-	if (((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui->m_UI_type == UI_CrewMember) || ((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui->m_UI_type == UI_CrewMember))
+	if (m_warship->m_crew_interface.m_crew != NULL)
+	//if (((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui->m_UI_type == UI_CrewMember) || ((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui->m_UI_type == UI_CrewMember))
 	{
 		m_warship->m_crew_interface.Draw((*CurrentGame).m_mainScreen);
 	}
+	else
+	{
+		printf("");
+	}
+
+	
 	
 	//FX
 	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
