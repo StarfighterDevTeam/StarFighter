@@ -18,6 +18,7 @@ enum Scale
 enum ContextualMenu
 {
 	Menu_None,
+	Menu_CrewOverboard,
 	Menu_PrisonersChoice,
 };
 

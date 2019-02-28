@@ -13,14 +13,13 @@ PrisonersChoiceInterface::PrisonersChoiceInterface()
 
 PrisonersChoiceInterface::~PrisonersChoiceInterface()
 {
-	
+	delete m_panel;
 }
 
 void PrisonersChoiceInterface::Destroy()
 {
 	m_crew_interface.Destroy();
 
-	vector<CrewMember*> m_crew;
 	m_crew_selected = NULL;
 	m_crew_hovered = NULL;
 
@@ -34,6 +33,7 @@ void PrisonersChoiceInterface::Destroy()
 	m_crew_selected = NULL;
 	m_crew_hovered = NULL;
 	m_current_choice = 0;
+	m_crew.clear();
 }
 
 void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
@@ -49,6 +49,7 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 			(*it)->m_tile = NULL;
 			(*it)->m_destination = NULL;
 			(*it)->m_speed = sf::Vector2f(0, 0);
+			(*it)->m_melee_opponent = NULL;
 		}
 	}
 	enemy_ship->m_crew.clear();
@@ -61,9 +62,11 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 			(*it)->m_tile = NULL;
 			(*it)->m_destination = NULL;
 			(*it)->m_speed = sf::Vector2f(0, 0);
+			(*it)->m_melee_opponent = NULL;
 		}
 	}
 	enemy_ship->m_prisoners.clear();
+	
 
 	//no prisoner = no need for a menu
 	int crew_size = m_crew.size();

@@ -134,6 +134,7 @@ enum Color_Chart
 	Color_Grey_Background,
 	Color_Orange_System,
 	Color_Green_System,
+	Color_Green_Lifebar,
 	Color_Cyan_System,
 	Color_Magenta_EngineCharged,
 	Color_Blue_Flood,

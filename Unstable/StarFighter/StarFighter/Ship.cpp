@@ -127,7 +127,7 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat)
 
 	UpdateShipOffset();
 
-	if (tactical_combat == true && IsFlooded() == true)
+	if (tactical_combat == true && (IsFlooded() == true || m_health == 0))
 	{
 		UpdateSinking(deltaTime);
 	}
@@ -711,7 +711,7 @@ void Ship::BuildShip()
 	ImprisonCrew(prisoner);
 
 	//CHEAT DEBUG
-	m_health = m_health_max * 0.2 + 58;
+	m_health = /*m_health_max * 0.2 +*/ 18;
 }
 
 void Ship::CenterRoomPositions(bool is_enemy)

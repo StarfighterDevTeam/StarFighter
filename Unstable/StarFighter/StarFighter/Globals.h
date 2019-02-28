@@ -85,7 +85,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define SHIP_FLEE_SPEED_MAX					20.f
 #define SHIP_FLEE_ACCELERATION				1.f
 
-#define SHIP_SINKING_TIME					5.f
+#define SHIP_SINKING_TIME					4.f
 
 #define RUDDER_ROTATION_TIMER_MIN			2.f
 #define RUDDER_ROTATION_TIMER_MAX			7.f
