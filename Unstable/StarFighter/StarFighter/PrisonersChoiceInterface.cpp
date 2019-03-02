@@ -119,7 +119,6 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 	float pos_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 20;
 	m_crew_interface.SetPosition(sf::Vector2f(pos_x, offset_y + m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5f - CREWMEMBER_SIZE * 0.5f));
 	
-
 	//choices
 	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 50.f;
 	for (int i = 0; i < 3; i++)

@@ -10,10 +10,11 @@
 #define CREWOVERBOARDINTERFACE_OFFSET_X				100
 #define CREWOVERBOARDINTERFACE_OFFSET_Y				16
 
-#define OVERBOARD_DROWNINGBAR_SIZE_X				380.f
-#define OVERBOARD_DROWNINGBAR_SIZE_Y				20.f
+#define OVERBOARD_DROWNINGBAR_SIZE_X				380
+#define OVERBOARD_DROWNINGBAR_SIZE_Y				20
+#define OVERBOARD_CREW_CARD_OFFSET					20
 
-#define OVERBOARD_DROWNING_TIME						4.f
+#define OVERBOARD_DROWNING_TIME						10.f
 
 struct CrewOverboardInterface
 {
@@ -30,6 +31,9 @@ struct CrewOverboardInterface
 	vector<CrewMember*> m_rescued;
 	vector<GameEntity*> m_crew_slots;
 	Ship* m_enemy_ship;
+
+	CrewMember* m_hovered;
+	struct CrewInterface m_crew_interface;
 
 	GameEntity* m_panel;
 	GameEntity* m_drowning_bar;

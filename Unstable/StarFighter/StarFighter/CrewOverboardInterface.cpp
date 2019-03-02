@@ -6,7 +6,9 @@ CrewOverboardInterface::CrewOverboardInterface()
 {
 	m_panel = NULL;
 	m_drowning_bar = NULL;
+
 	m_enemy_ship = NULL;
+	m_hovered = NULL;
 }
 
 CrewOverboardInterface::~CrewOverboardInterface()
@@ -17,6 +19,8 @@ CrewOverboardInterface::~CrewOverboardInterface()
 
 void CrewOverboardInterface::Destroy()
 {
+	m_crew_interface.Destroy();
+
 	delete m_panel;
 	delete m_drowning_bar;
 
@@ -152,12 +156,35 @@ void CrewOverboardInterface::Update(sf::Time deltaTime)
 
 		for (vector<CrewMember*>::iterator it = begin; it != end; it++)
 		{
-			if ((*it)->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_RightClick)
+			if ((*it)->IsHoveredByMouse() == true)
 			{
-				int slot = m_rescued.size();
-				(*it)->m_position = m_crew_slots[slot]->m_position;// m_shape_container.getPosition();
-				(*it)->UpdatePosition();
-				m_rescued.push_back(*it);
+				//focused interface
+				if (m_crew_interface.m_crew != *it)
+				{
+					if (m_crew_interface.m_crew != NULL)
+					{
+						m_crew_interface.Destroy();
+					}
+
+					m_crew_interface.Init(*it);
+					m_crew_interface.Update();
+					float pos_x = (*it)->m_position.x + CREWMEMBER_SIZE * 0.5 + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5 + OVERBOARD_CREW_CARD_OFFSET;
+					float pos_y = (*it)->m_position.y + m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5 - CREWMEMBER_SIZE * 0.5;
+					m_crew_interface.SetPosition(sf::Vector2f(pos_x, pos_y));
+				}
+				
+				//action
+				if ((*CurrentGame).m_mouse_click == Mouse_RightClick)
+				{
+					int slot = m_rescued.size();
+					(*it)->m_position = m_crew_slots[slot]->m_position;// m_shape_container.getPosition();
+					(*it)->UpdatePosition();
+					m_rescued.push_back(*it);
+				}
+			}
+			else if (m_crew_interface.m_crew == *it)
+			{
+				m_crew_interface.Destroy();
 			}
 		}
 	}
@@ -222,4 +249,6 @@ void CrewOverboardInterface::Draw(sf::RenderTexture& screen)
 	{
 		m_rescued[i]->Draw(screen);
 	}
+
+	m_crew_interface.Draw(screen);
 }
