@@ -23,10 +23,6 @@ public:
 
 	vector<RoomConnexion*> m_connexions;
 	vector<RoomTile*> m_tiles;
-	
-	int m_nb_crew[NB_CREW_TYPES];
-	int m_nb_crew_working[NB_CREW_TYPES];
-	int m_nb_crew_max;
 
 	bool m_is_flooded;//0-100
 

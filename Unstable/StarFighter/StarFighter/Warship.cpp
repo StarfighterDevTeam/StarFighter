@@ -300,36 +300,6 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 	GameEntity::Update(deltaTime);
 }
 
-void Warship::UpdateCrewMembersCountPerRoom(Room* room)
-{
-	for (int i = 0; i < NB_CREW_TYPES; i++)
-	{
-		room->m_nb_crew[i] = 0;
-		room->m_nb_crew_working[i] = 0;
-	}
-		
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-	{
-		if ((*it)->m_destination != NULL && (*it)->m_destination->m_room == room)
-		{
-			//present
-			room->m_nb_crew[(*it)->m_type]++;
-			room->m_nb_crew[Crew_All]++;
-		}
-
-		if ((*it)->m_tile->m_room == room && (*it)->m_destination == NULL)
-		{
-			//working
-			room->m_nb_crew_working[(*it)->m_type]++;
-			room->m_nb_crew_working[Crew_All]++;
-
-			//present
-			room->m_nb_crew[(*it)->m_type]++;
-			room->m_nb_crew[Crew_All]++;
-		}
-	}
-}
-
 //WATER PART
 int Warship::GetDistanceToWaterTile(WaterTile* tile)
 {

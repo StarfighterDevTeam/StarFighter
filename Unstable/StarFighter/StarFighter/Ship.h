@@ -58,6 +58,7 @@ public:
 
 	void UpdateFleeing(Time deltaTime);
 	void UpdateSinking(Time deltaTime);
+	void ApplyAlphaToShip(Uint8 alpha);
 
 	WaterTile* m_tile;
 	WaterTile* m_destination;

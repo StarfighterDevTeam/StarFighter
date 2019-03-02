@@ -27,9 +27,9 @@ struct CrewOverboardInterface
 	void Draw(sf::RenderTexture& screen);
 
 	int m_slots_avaible;
-	vector<CrewMember*> m_crew;
+	vector<CrewMember*> m_rescued;
 	vector<GameEntity*> m_crew_slots;
-	Ship* m_ship;
+	Ship* m_enemy_ship;
 
 	GameEntity* m_panel;
 	GameEntity* m_drowning_bar;

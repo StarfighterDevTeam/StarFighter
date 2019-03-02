@@ -70,7 +70,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	(*CurrentGame).GetControllerInputs();
 
 	//Pause
-	if ((*CurrentGame).m_input_actions[Action_Pause] == Input_Tap)
+	if ((*CurrentGame).m_input_actions[Action_Pause] == Input_Tap && (*CurrentGame).m_window_has_focus == true)
 	{
 		(*CurrentGame).m_pause = !(*CurrentGame).m_pause;
 	}
@@ -94,7 +94,6 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		int flood = 0;
 
-		m_warship->UpdateCrewMembersCountPerRoom(*it);
 		(*it)->UpdatePosition();
 
 		//Room tiles
@@ -597,7 +596,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					(*it)->GameEntity::Update(deltaTime);
 					(*it)->UpdateLifeBar();
 				}
-				else if (m_tactical_ship->m_sinking_timer > 0)
+				else if (m_tactical_ship->m_sinking_timer > 0)//crew overboard
 				{
 					(*it)->GameEntity::Update(deltaTime);
 				}
@@ -1100,12 +1099,12 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		m_warship->m_crew_overboard_interface.Update(deltaTime);
 
-		//if (m_warship->m_crew_overboard_interface.m_sur.empty() == true)
-		//{
-		//	m_warship->m_crew_overboard_interface.Destroy();
-		//	m_menu = Menu_PrisonersChoice;
-		//}
+		if (m_warship->m_crew_overboard_interface.m_drowning_timer <= 0)
+		{
+			m_menu = Menu_None;
+		}
 	}
+
 	//Prisoners Choice Menu
 	if (m_menu == Menu_PrisonersChoice)
 	{
@@ -1387,7 +1386,7 @@ void Gameloop::Draw()
 	{
 		m_warship->m_combat_interface[0].Draw((*CurrentGame).m_mainScreen);
 	}
-	if (m_tactical_ship != NULL && m_tactical_ship->m_is_fleeing == false)
+	if (m_tactical_ship != NULL && m_tactical_ship->m_is_fleeing == false && m_tactical_ship->m_sinking_timer <= SHIP_SINKING_TIME)
 	{
 		m_warship->m_combat_interface[1].Draw((*CurrentGame).m_mainScreen);
 	}
@@ -1473,7 +1472,19 @@ bool Gameloop::UpdateTacticalScale()
 					m_menu = Menu_PrisonersChoice;
 					m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
 				}
-				else if (m_tactical_ship->m_crew.size() > 0)
+				else if (m_warship->m_crew_overboard_interface.m_rescued.empty() == false)
+				{
+					//transfer rescued crew to prisoners choice interface
+					for (vector<CrewMember*>::iterator it = m_warship->m_crew_overboard_interface.m_rescued.begin(); it != m_warship->m_crew_overboard_interface.m_rescued.end(); it++)
+					{
+						m_warship->m_prisoners_choice_interface.m_crew.push_back(*it);
+					}
+					m_warship->m_crew_overboard_interface.m_rescued.clear();
+
+					m_menu = Menu_PrisonersChoice;
+					m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
+				}
+				else if (m_tactical_ship->m_crew.empty() == false || m_tactical_ship->m_prisoners.empty() == false)
 				{
 					m_menu = Menu_CrewOverboard;
 					m_warship->m_crew_overboard_interface.Init(m_warship, m_tactical_ship);
@@ -1511,6 +1522,7 @@ bool Gameloop::UpdateTacticalScale()
 				m_warship->m_speed = sf::Vector2f(0.f, 0.f);
 				m_warship->m_is_fleeing = false;
 				m_warship->m_sinking_timer = 0.f;//if sunk, reset it
+				m_warship->ApplyAlphaToShip(255);//and cancel alpha from sinking feedback
 
 				m_scale = Scale_Strategic;
 			}

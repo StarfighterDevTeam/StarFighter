@@ -10,7 +10,6 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	m_height = height;
 	m_type = type;
 	m_UI_type = UI_Room;
-	m_nb_crew_max = width * height / 4;
 	m_is_flooded = false;
 
 	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
@@ -25,13 +24,6 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 			RoomTile* tile = new RoomTile(x, y, this, ROOMTILE_SIZE);
 			m_tiles.push_back(tile);
 		}
-	}
-
-	//init crew count
-	for (int i = 0; i < NB_CREW_TYPES; i++)
-	{
-		m_nb_crew[i] = 0;
-		m_nb_crew_working[i] = 0;
 	}
 
 	//UI
@@ -61,7 +53,7 @@ Room::~Room()
 void Room::Update(Time deltaTime)
 {
 	ostringstream ss;
-	ss << (*CurrentGame).m_dico_room_types[m_type] << "\n(" << m_nb_crew[Crew_All] << "/" << m_nb_crew_max << ")";
+	ss << (*CurrentGame).m_dico_room_types[m_type];
 	m_text.setString(ss.str());
 
 	GameEntity::Update(deltaTime);
