@@ -69,6 +69,8 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define NB_WATERTILE_SUBDIVISION			60
 #define NB_WATERTILE_VIEW_RANGE				5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
 
+#define CONTEXTUAL_ORDER_SIZE				40.f
+
 #define HULL_REPAIR_TIMER					1.f
 #define DROWNING_TIMER						1.f
 #define HEALING_TIMER						1.f

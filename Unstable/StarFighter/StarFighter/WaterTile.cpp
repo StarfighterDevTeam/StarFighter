@@ -79,3 +79,8 @@ DMS_Coord WaterTile::GetDMSCoord(sf::Vector2f position, DMS_Coord warship_DMS)
 	dms = { 0, minute_x, second_x, 0, minute_y, second_y };
 	return dms;
 }
+
+bool WaterTile::SameDMS(DMS_Coord DMS_a, DMS_Coord DMS_b)
+{
+	return DMS_a.m_degree_x == DMS_b.m_degree_x && DMS_a.m_degree_y == DMS_b.m_degree_y && DMS_a.m_minute_x == DMS_b.m_minute_x && DMS_a.m_minute_y == DMS_b.m_minute_y && DMS_a.m_second_x == DMS_b.m_second_x && DMS_a.m_second_y == DMS_b.m_second_y;
+}

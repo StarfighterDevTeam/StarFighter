@@ -13,8 +13,10 @@ CrewOverboardInterface::CrewOverboardInterface()
 
 CrewOverboardInterface::~CrewOverboardInterface()
 {
-	delete m_panel;
-	delete m_drowning_bar;
+	//delete m_panel;
+	//delete m_drowning_bar;
+
+	Destroy();
 }
 
 void CrewOverboardInterface::Destroy()

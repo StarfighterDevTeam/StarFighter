@@ -27,6 +27,9 @@ Gameloop::Gameloop()
 	m_pause_text.setColor(sf::Color::Black);
 	m_pause_text.setString("P A U S E");
 	m_pause_text.setPosition(sf::Vector2f(WINDOW_RESOLUTION_X * 0.5f, WINDOW_RESOLUTION_Y * 0.5f));
+
+	//Contextual orders
+	m_contextual_order = new ContextualOrder();
 }
 
 Gameloop::~Gameloop()
@@ -38,6 +41,8 @@ Gameloop::~Gameloop()
 	{
 		delete (*it);
 	}
+
+	delete m_contextual_order;
 }
 
 void Gameloop::InitWaterZones()
@@ -64,6 +69,8 @@ void Gameloop::Update(sf::Time deltaTime)
 	GameEntity* previous_selection = selection;
 	GameEntity* hovered = (*CurrentGame).m_hovered_ui;
 	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
+
+	m_contextual_order->SetContextualOrder(Order_None, m_contextual_order->m_position);
 
 	//Get mouse & keyboard inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
@@ -1021,6 +1028,41 @@ void Gameloop::Update(sf::Time deltaTime)
 					ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
 					(*it2)->m_text.setString(ss.str());
 					(*it2)->GameEntity::Update(deltaTime);
+
+					//contextuel order feedback
+					if ((*it2)->m_hovered == true && WaterTile::SameDMS(m_warship->m_DMS, (*it2)->m_DMS) == false)
+					{
+						Ship* ship_in_combat_range = NULL;
+						for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
+						{
+							if ((*it3)->m_can_be_seen == false)
+							{
+								continue;
+							}
+
+							ship_in_combat_range = IsDMSInCombatRange((*it2)->m_DMS, (*it3)->m_DMS);
+							if (ship_in_combat_range != NULL)
+							{
+								break;
+							}
+						}
+
+						if (ship_in_combat_range == NULL)
+						{
+							if ((*it2)->m_seaport == NULL)
+							{
+								m_contextual_order->SetContextualOrder(Order_Sail, (*it2)->m_position);
+							}
+							else
+							{
+								m_contextual_order->SetContextualOrder(Order_Dock, (*it2)->m_position);
+							}
+						}
+						else
+						{
+							m_contextual_order->SetContextualOrder(Order_Engage, (*it2)->m_position);
+						}
+					}
 				}
 				else
 				{
@@ -1397,13 +1439,7 @@ void Gameloop::Draw()
 	{
 		m_warship->m_crew_interface.Draw((*CurrentGame).m_mainScreen);
 	}
-	else
-	{
-		printf("");
-	}
 
-	
-	
 	//FX
 	for (vector<FX*>::iterator it = (*CurrentGame).m_FX.begin(); it != (*CurrentGame).m_FX.end(); it++)
 	{
@@ -1429,6 +1465,12 @@ void Gameloop::Draw()
 		m_warship->m_crew_overboard_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 
+	//HUD - contextual order
+	if (m_contextual_order->m_type != Order_None)
+	{
+		m_contextual_order->Draw((*CurrentGame).m_mainScreen);
+	}
+	
 	//PAUSE
 	if ((*CurrentGame).m_pause == true)
 	{
@@ -1531,10 +1573,10 @@ bool Gameloop::UpdateTacticalScale()
 		return true;
 	}
 
-	int xA = 0;
-	int yA = 0;
-	int xB = 0;
-	int yB = 0;
+	//int xA = 0;
+	//int yA = 0;
+	//int xB = 0;
+	//int yB = 0;
 
 	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 	{
@@ -1543,60 +1585,13 @@ bool Gameloop::UpdateTacticalScale()
 			continue;
 		}
 
-		//in range for combat?
-		float posxA = m_warship->m_DMS.m_minute_x * 60.f + m_warship->m_DMS.m_second_x;
-		float posxB = (*it)->m_DMS.m_minute_x * 60.f + (*it)->m_DMS.m_second_x;
-		if (abs(posxA - posxB) > 2.f * NB_WATERTILE_SUBDIVISION)
-		{
-			continue;
-		}
+		m_tactical_ship = IsDMSInCombatRange(m_warship->m_DMS, (*it)->m_DMS);
 
-		float posyA = m_warship->m_DMS.m_minute_y * 60.f + m_warship->m_DMS.m_second_y;
-		float posyB = (*it)->m_DMS.m_minute_y * 60.f + (*it)->m_DMS.m_second_y;
-		if (abs(posyA - posyB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		if (m_tactical_ship != NULL)
 		{
-			continue;
+			m_scale = Scale_Tactical;
+			break;
 		}
-
-		//if (m_warship->m_DMS.m_minute_x * 60.f + m_warship->m_DMS.m_seconds.x (*it)->m_DMS.m_minute_x + )
-
-		//position X on tactical scale
-		if (posxA < posxB)
-		{
-			xA = 0;
-			xB = 2;
-		}
-		else if (posxA > posxB)
-		{
-			xA = 2;
-			xB = 0;
-		}
-		else
-		{
-			xA = 1;
-			xB = 1;
-		}
-
-		//position Y on tactical scale
-		if (posyA < posyB)
-		{
-			yA = 0;
-			yB = 2;
-		}
-		else if (posyA > posyB)
-		{
-			yA = 2;
-			yB = 0;
-		}
-		else
-		{
-			yA = 1;
-			yB = 1;
-		}
-
-		m_tactical_ship = *it;
-		m_scale = Scale_Tactical;
-		break;
 	}
 
 	if (m_scale == Scale_Tactical)
@@ -1738,4 +1733,34 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* 
 			engine->rotate(engine->m_rotation_speed);
 		}
 	}
+}
+
+Ship* Gameloop::IsDMSInCombatRange(DMS_Coord DMS_a, DMS_Coord DMS_b)
+{
+	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+	{
+		if ((*it)->m_can_be_seen == false)
+		{
+			continue;
+		}
+
+		//in range for combat?
+		float posxA = DMS_a.m_minute_x * 60.f + DMS_a.m_second_x;
+		float posxB = DMS_b.m_minute_x * 60.f + DMS_b.m_second_x;
+		if (abs(posxA - posxB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		{
+			continue;
+		}
+
+		float posyA = DMS_a.m_minute_y * 60.f + DMS_a.m_second_y;
+		float posyB = DMS_b.m_minute_y * 60.f + DMS_b.m_second_y;
+		if (abs(posyA - posyB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		{
+			continue;
+		}
+
+		return *it;
+	}
+
+	return NULL;
 }

@@ -93,6 +93,7 @@
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CombatInterface.cpp" />
     <ClCompile Include="Compass.cpp" />
+    <ClCompile Include="ContextualOrder.cpp" />
     <ClCompile Include="CrewInterface.cpp" />
     <ClCompile Include="CrewMember.cpp" />
     <ClCompile Include="CrewOverboardInterface.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="CombatInterface.h" />
     <ClInclude Include="Compass.h" />
+    <ClInclude Include="ContextualOrder.h" />
     <ClInclude Include="CrewInterface.h" />
     <ClInclude Include="CrewMember.h" />
     <ClInclude Include="CrewOverboardInterface.h" />

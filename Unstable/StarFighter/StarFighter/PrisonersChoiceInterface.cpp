@@ -13,7 +13,8 @@ PrisonersChoiceInterface::PrisonersChoiceInterface()
 
 PrisonersChoiceInterface::~PrisonersChoiceInterface()
 {
-	delete m_panel;
+	//delete m_panel;
+	Destroy();
 }
 
 void PrisonersChoiceInterface::Destroy()

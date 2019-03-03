@@ -57,6 +57,7 @@ public:
 
 	void UpdatePosition(DMS_Coord warship_DMS);
 	static DMS_Coord GetDMSCoord(sf::Vector2f position, DMS_Coord warship_DMS);
+	static bool SameDMS(DMS_Coord DMS_a, DMS_Coord DMS_b);
 
 	//pathfinding
 	int m_heuristic;

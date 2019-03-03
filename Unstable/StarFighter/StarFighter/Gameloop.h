@@ -8,6 +8,7 @@
 #include "FileLoadUtils.h"
 
 #include "Warship.h"
+#include "ContextualOrder.h"
 
 enum Scale
 {
@@ -45,6 +46,10 @@ public:
 	void InitWaterZones();
 	bool UpdateTacticalScale();
 	void UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* ship);
+
+	ContextualOrder* m_contextual_order;
+
+	Ship* IsDMSInCombatRange(DMS_Coord DMS_a, DMS_Coord DMS_b);
 
 private:
 	sf::RenderWindow* mainWindow;
