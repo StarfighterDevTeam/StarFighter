@@ -166,12 +166,6 @@ void Gameloop::Update(sf::Time deltaTime)
 			if (selection != NULL && selection->m_UI_type == UI_Weapon && (hovered == NULL || hovered->m_UI_type != UI_Connexion) && (*it)->IsHoveredByMouse() == true && (*it)->m_type != Room_PrisonCell)//prison cells can't be targeted
 			{
 				room_hovered = *it;
-
-				//if (mouse_click == Mouse_RightClick)
-				//{
-				//	Weapon* weapon = (Weapon*)selection;
-				//	weapon->m_target_room = *it;
-				//}
 			}
 			
 			//Room tiles

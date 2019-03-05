@@ -719,8 +719,8 @@ void Ship::BuildShip()
 
 void Ship::CenterRoomPositions(bool is_enemy)
 {
-	float room_offset_x = is_enemy == false ? ROOMTILE_OFFSET_X : ROOMTILE_MINI_OFFSET_X;
-	float room_offset_y = is_enemy == false ? ROOMTILE_OFFSET_Y : ROOMTILE_MINI_OFFSET_Y;
+	float room_offset_x = is_enemy == false ? ROOMTILE_OFFSET_X : ROOMTILE_ENEMY_OFFSET_X;
+	float room_offset_y = is_enemy == false ? ROOMTILE_OFFSET_Y : ROOMTILE_ENEMY_OFFSET_Y;
 
 	room_offset_x -= 1.f * m_rooms_size.x / 2 * ROOMTILE_SIZE;
 	room_offset_y -= 1.f * m_rooms_size.y / 2 * ROOMTILE_SIZE;

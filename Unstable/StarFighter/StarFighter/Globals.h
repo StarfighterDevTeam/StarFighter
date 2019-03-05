@@ -45,14 +45,11 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 
 //PIRATES
 #define ROOMTILE_SIZE				48.f
-#define ROOMTILE_OFFSET_X			450.f
+#define ROOMTILE_OFFSET_X			500.f
 #define ROOMTILE_OFFSET_Y			550.f
 
-#define ROOMTILE_MINI_OFFSET_X		1600.f
-#define ROOMTILE_MINI_OFFSET_Y		(ROOMTILE_OFFSET_Y	)
-
-#define DISTANCE_COMBAT_INIT				1000.f
-#define WARP_AMMO_OFFSET_X					1000.f
+#define ROOMTILE_ENEMY_OFFSET_X		(REF_WINDOW_RESOLUTION_X - ROOMTILE_OFFSET_X);//1500.f
+#define ROOMTILE_ENEMY_OFFSET_Y		ROOMTILE_OFFSET_Y
 
 #define ROOMTILE_HEALTH_MAX					10
 #define ROOMTILE_FLOODING_MAX				100
@@ -70,6 +67,8 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 #define NB_WATERTILE_VIEW_RANGE				5 // the eye can see ~8km at 10m altitude, and ~11km at 15m (because of Earth curve). Hence ~5 nautical miles away (nm) = 5 latitude minutes
 
 #define CONTEXTUAL_ORDER_SIZE				40.f
+
+#define DISTANCE_COMBAT_INIT				1000.f
 
 #define HULL_REPAIR_TIMER					1.f
 #define DROWNING_TIMER						1.f
