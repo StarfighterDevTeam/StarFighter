@@ -937,7 +937,7 @@ void Ship::UpdateFlooding(Time deltaTime)
 						}
 
 						//tile next to us that is not full of water, is in the same room or in a connected room tile (door not locked)?
-						if (tile != NULL && tile->m_flood < ROOMTILE_FLOODING_MAX && (tile->m_room == (*it2)->m_room || ((*it2)->m_connexion != NULL && (*it2)->m_connexion->m_locked == false && ((*it2)->m_connexion->m_tiles.first == tile || (*it2)->m_connexion->m_tiles.second == tile))))
+						if (tile != NULL && tile->m_flood < ROOMTILE_FLOODING_MAX && (tile->m_room == (*it2)->m_room || ((*it2)->m_connexion != NULL && (*it2)->m_connexion->m_is_locked == false && ((*it2)->m_connexion->m_tiles.first == tile || (*it2)->m_connexion->m_tiles.second == tile))))
 						{
 							tile->m_flood++;//transfer
 							(*it2)->m_flood--;
@@ -1237,7 +1237,7 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 void Ship::UpdatePrisonerEscape(CrewMember* crew, sf::Time deltaTime)
 {
 	//escaping the prison cell?
-	if (crew->m_tile != NULL && crew->m_tile->m_room->m_type == Room_PrisonCell && crew->m_tile->m_connexion->m_locked == false && m_health > PRISONER_HEALTH_MIN_TO_ESCAPE)
+	if (crew->m_tile != NULL && crew->m_tile->m_room->m_type == Room_PrisonCell && crew->m_tile->m_connexion->m_is_locked == false && m_health > PRISONER_HEALTH_MIN_TO_ESCAPE)
 	{
 		EscapeToRandomRoom(crew);
 	}

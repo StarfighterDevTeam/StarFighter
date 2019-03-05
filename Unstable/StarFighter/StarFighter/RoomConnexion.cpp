@@ -37,7 +37,7 @@ void RoomConnexion::SetLock(bool locked)
 		return;
 	}
 
-	m_locked = locked;
+	m_is_locked = locked;
 
 	if (locked == false)
 	{
@@ -57,7 +57,7 @@ void RoomConnexion::Update(Time deltaTime)
 void RoomConnexion::Destroy()
 {
 	m_destroyed = true;
-	m_locked = false;
+	m_is_locked = false;
 	m_shape_container.setFillColor(sf::Color(100, 100, 100, 255));//dark grey
 	m_default_color = sf::Color(100, 100, 100, 255);//dark grey
 }

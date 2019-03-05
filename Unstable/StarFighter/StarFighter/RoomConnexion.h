@@ -18,7 +18,7 @@ public:
 	RoomConnexion(pair<RoomTile*, RoomTile*> tiles, bool locked, Ship* ship);
 	
 	pair<RoomTile*, RoomTile*> m_tiles;
-	bool m_locked;
+	bool m_is_locked;
 	bool m_destroyed;
 
 	void Update(Time deltaTime);

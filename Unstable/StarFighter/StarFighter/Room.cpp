@@ -91,7 +91,7 @@ bool Room::IsConnectedToRoomTile(RoomTile* tileA, RoomTile* tileB)
 		//...or connected by an unlocked door
 		for (vector<RoomConnexion*>::iterator it = tileA->m_room->m_connexions.begin(); it != tileA->m_room->m_connexions.end(); it++)
 		{
-			if ((*it)->m_locked == false && (((*it)->m_tiles.first == tileA && ((*it)->m_tiles.second == tileB)) || ((*it)->m_tiles.first == tileB && ((*it)->m_tiles.second == tileA))))
+			if ((*it)->m_is_locked == false && (((*it)->m_tiles.first == tileA && ((*it)->m_tiles.second == tileB)) || ((*it)->m_tiles.first == tileB && ((*it)->m_tiles.second == tileA))))
 			{
 				return true;
 			}

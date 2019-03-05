@@ -134,6 +134,11 @@ void Gameloop::Update(sf::Time deltaTime)
 	for (vector<RoomConnexion*>::iterator it = m_warship->m_connexions.begin(); it != m_warship->m_connexions.end(); it++)
 	{
 		(*it)->Update(deltaTime);
+
+		if ((*it)->IsHoveredByMouse() == true && (*it)->m_destroyed == false)
+		{
+			m_contextual_order->SetContextualOrder((*it)->m_is_locked == true ? Order_OpenRoomConnexion : Order_CloseRoomConnexion, (*it)->m_shape_container.getPosition());
+		}
 	}
 
 	//Enemy rooms
@@ -384,7 +389,14 @@ void Gameloop::Update(sf::Time deltaTime)
 						}
 						else
 						{
-							m_contextual_order->SetContextualOrder(Order_Move, hovered->m_position);
+							if (tile->m_crew == NULL)
+							{
+								m_contextual_order->SetContextualOrder(Order_Move, hovered->m_position);
+							}
+							else
+							{
+								m_contextual_order->SetContextualOrder(Order_MoveImpossible, hovered->m_position);
+							}
 						}
 					}
 				}
@@ -724,6 +736,24 @@ void Gameloop::Update(sf::Time deltaTime)
 	for (vector<Engine*>::iterator it = m_warship->m_engines.begin(); it != m_warship->m_engines.end(); it++)
 	{
 		(*it)->Update(deltaTime);
+
+		//Fleeing
+		if ((*it)->IsHoveredByMouse() == true && m_warship->m_is_fleeing == false && m_scale == Scale_Tactical)
+		{
+			if (m_warship->m_flee_count == ENGINE_FLEE_COUNT)
+			{
+				m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition());
+
+				if (mouse_click == Mouse_RightClick)
+				{
+					m_warship->m_is_fleeing = true;
+				}
+			}
+			else
+			{
+				m_contextual_order->SetContextualOrder(Order_FleeImpossible, (*it)->m_shape_container.getPosition());
+			}
+		}
 	}
 
 	//Player rudder
@@ -838,14 +868,8 @@ void Gameloop::Update(sf::Time deltaTime)
 		RoomConnexion* connexion = (RoomConnexion*)hovered;
 		if (connexion->m_ship == m_warship)
 		{
-			connexion->SetLock(!connexion->m_locked);
+			connexion->SetLock(!connexion->m_is_locked);
 		}
-	}
-
-	//Fleeing
-	else if (mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_Engine && m_warship->m_is_fleeing == false && m_warship->m_flee_count == ENGINE_FLEE_COUNT && m_scale == Scale_Tactical)
-	{
-		m_warship->m_is_fleeing = true;
 	}
 
 	//Bullets + cleaning old bullets
@@ -1537,7 +1561,7 @@ void Gameloop::Draw()
 	}
 
 	//HUD - contextual order
-	if (m_contextual_order->m_type != Order_None)
+	if (m_contextual_order->m_type != Order_None && m_warship->m_is_fleeing == false && m_warship->m_sinking_timer <= 0)
 	{
 		m_contextual_order->Draw((*CurrentGame).m_mainScreen);
 	}
@@ -1580,27 +1604,30 @@ bool Gameloop::UpdateTacticalScale()
 			{
 				//surviving enemy crews? => open prisoners choice interface
 				//TODO: win_flood and win_health first offers a game of choosing among the survivors whom to pull out from a certain death
-				if (win_crew == true)
+				if (win == true)
 				{
-					m_menu = Menu_PrisonersChoice;
-					m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
-				}
-				else if (m_warship->m_crew_overboard_interface.m_rescued.empty() == false)
-				{
-					//transfer rescued crew to prisoners choice interface
-					for (vector<CrewMember*>::iterator it = m_warship->m_crew_overboard_interface.m_rescued.begin(); it != m_warship->m_crew_overboard_interface.m_rescued.end(); it++)
+					if (win_crew == true)
 					{
-						m_warship->m_prisoners_choice_interface.m_crew.push_back(*it);
+						m_menu = Menu_PrisonersChoice;
+						m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
 					}
-					m_warship->m_crew_overboard_interface.m_rescued.clear();
+					else if (m_warship->m_crew_overboard_interface.m_rescued.empty() == false)
+					{
+						//transfer rescued crew to prisoners choice interface
+						for (vector<CrewMember*>::iterator it = m_warship->m_crew_overboard_interface.m_rescued.begin(); it != m_warship->m_crew_overboard_interface.m_rescued.end(); it++)
+						{
+							m_warship->m_prisoners_choice_interface.m_crew.push_back(*it);
+						}
+						m_warship->m_crew_overboard_interface.m_rescued.clear();
 
-					m_menu = Menu_PrisonersChoice;
-					m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
-				}
-				else if (m_tactical_ship->m_crew.empty() == false || m_tactical_ship->m_prisoners.empty() == false)
-				{
-					m_menu = Menu_CrewOverboard;
-					m_warship->m_crew_overboard_interface.Init(m_warship, m_tactical_ship);
+						m_menu = Menu_PrisonersChoice;
+						m_warship->m_prisoners_choice_interface.Init(m_warship, m_tactical_ship);
+					}
+					else if (m_tactical_ship->m_crew.empty() == false || m_tactical_ship->m_prisoners.empty() == false)
+					{
+						m_menu = Menu_CrewOverboard;
+						m_warship->m_crew_overboard_interface.Init(m_warship, m_tactical_ship);
+					}
 				}
 			}
 			

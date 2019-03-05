@@ -200,7 +200,7 @@ void CrewMember::Update(Time deltaTime)
 					waypoint = m_current_path.back();
 
 					//check if waypoint is stil accessible (door locked?)
-					if (waypoint->m_connexion != NULL && (waypoint->m_connexion->m_tiles.first == m_tile || waypoint->m_connexion->m_tiles.second == m_tile) && waypoint->m_connexion->m_locked == true)
+					if (waypoint->m_connexion != NULL && (waypoint->m_connexion->m_tiles.first == m_tile || waypoint->m_connexion->m_tiles.second == m_tile) && waypoint->m_connexion->m_is_locked == true)
 					{
 						//cancel destination, stay where we are
 						vec = sf::Vector2f(0, 0);

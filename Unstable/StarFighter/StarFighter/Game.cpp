@@ -110,18 +110,20 @@ Game::Game(RenderWindow& window)
 
 	m_dico_colors[Color_Red_Destroyed] = sf::Color::Red;
 	m_dico_colors[Color_Yellow_Target_Hovered] = sf::Color(255, 242, 39, 255);
-	m_dico_colors[Color_Red_Target_Locked] = sf::Color(255, 0, 0, 255);
 	m_dico_colors[Color_Grey_Background] = sf::Color(100, 100, 100, 255);
 	m_dico_colors[Color_Orange_System] = sf::Color(255, 127, 39, 255);
 	m_dico_colors[Color_Green_System] = sf::Color::Green;
-	m_dico_colors[Color_Green_Lifebar] = m_dico_colors[Color_Green_System];
 	m_dico_colors[Color_Cyan_System] = sf::Color::Cyan;
-	m_dico_colors[Color_Magenta_EngineCharged] = sf::Color::Magenta;
 	m_dico_colors[Color_Blue_Flood] = sf::Color(0, 100, 170, 255);
 	m_dico_colors[Color_Blue_Pierced] = sf::Color(0, 50, 255, 255);
 	m_dico_colors[Color_Red_Prison] = sf::Color(237, 22, 33, 255);
 	m_dico_colors[Color_Yellow_Prisoner] = sf::Color(255, 242, 39, 255);
 	m_dico_colors[Color_Magenta_Crew] = sf::Color::Magenta;
+
+	m_dico_colors[Color_Red_Target_Locked] = m_dico_colors[Color_Red_Destroyed];
+	m_dico_colors[Color_Green_Lifebar] = m_dico_colors[Color_Green_System];
+	m_dico_colors[Color_Red_Impossible] = m_dico_colors[Color_Red_Target_Locked];
+	m_dico_colors[Color_Magenta_EngineCharged] = m_dico_colors[Color_Magenta_Crew];
 }
 
 string Game::GetRandomCrewMemberName(int gender)
