@@ -162,11 +162,11 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				room_hovered = *it;
 
-				if (mouse_click == Mouse_RightClick)
-				{
-					Weapon* weapon = (Weapon*)selection;
-					weapon->m_target_room = *it;
-				}
+				//if (mouse_click == Mouse_RightClick)
+				//{
+				//	Weapon* weapon = (Weapon*)selection;
+				//	weapon->m_target_room = *it;
+				//}
 			}
 			
 			//Room tiles
@@ -180,12 +180,14 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 
 				UpdateRoomTileFeedback(*it2, deltaTime, m_tactical_ship);
-
-				//contextual order feedback
 			}
 
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
 		}
+
+		// 1. colorier en jaune la room survoleé (hovered) si c'est une cible potentielle
+		// 2. colorier en rouge si la cible actuelle et que ce n'est pas la cible survolée
+		// 3. attribuer target_room sur la room survolée si c'est une cible potentielle
 
 		//highlighting in Yellow the room hovered while selectin one of our weapons. Highlighting in Grey the room currently targeted, if any (and if not hovered).
 		if (selection != NULL && selection->m_UI_type == UI_Weapon)
@@ -193,50 +195,69 @@ void Gameloop::Update(sf::Time deltaTime)
 			Weapon* weapon = (Weapon*)selection;
 			if (weapon->m_ship->m_alliance == Alliance_Player)
 			{
-				if (weapon->m_type != Weapon_Torpedo)
+				//color hovered room if it's a legit target
+				if (room_hovered != NULL)
 				{
-					if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
+					//can be targeted?
+					bool room_can_be_targed = weapon->m_type != Weapon_Torpedo;
+					if (weapon->m_type == Weapon_Torpedo)
 					{
-						for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+						for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
+						{
+							if ((*it2)->m_hull == Hull_Left)
+							{
+								room_can_be_targed = true;
+								break;
+							}
+						}
+					}
+
+					if (room_can_be_targed == true)
+					{
+						//color the room
+						float hull_pos_feedback_x = 0;
+						float hull_pos_feedback_ymin = 0;
+						float hull_pos_feedback_ymax = 0;
+
+						for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
+						{
+							if (weapon->m_type != Weapon_Torpedo || (*it2)->m_hull == Hull_Left)
+							{
+								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target_Hovered]);
+
+								hull_pos_feedback_x = (*it2)->m_shape_container.getPosition().x;
+								hull_pos_feedback_ymin = hull_pos_feedback_ymin == 0 || hull_pos_feedback_ymin > (*it2)->m_shape_container.getPosition().y ? (*it2)->m_shape_container.getPosition().y : hull_pos_feedback_ymin;
+								hull_pos_feedback_ymax = hull_pos_feedback_ymax == 0 || hull_pos_feedback_ymax < (*it2)->m_shape_container.getPosition().y ? (*it2)->m_shape_container.getPosition().y : hull_pos_feedback_ymax;
+							}
+						}
+
+						//get order: target room
+						if (weapon->m_type != Weapon_Torpedo)
+						{
+							m_contextual_order->SetContextualOrder(Order_TargetRoom, room_hovered->m_shape_container.getPosition());
+						}
+						else
+						{
+							m_contextual_order->SetContextualOrder(Order_TargetHull, sf::Vector2f(hull_pos_feedback_x, (hull_pos_feedback_ymin + hull_pos_feedback_ymax) * 0.5));
+						}
+						
+						if (mouse_click == Mouse_RightClick)
+						{
+							Weapon* weapon = (Weapon*)selection;
+							weapon->m_target_room = room_hovered;
+						}
+					}
+				}
+
+				//color previous target
+				if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
+				{
+					for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
+					{
+						if (weapon->m_type != Weapon_Torpedo || (*it2)->m_hull == Hull_Left)
 						{
 							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Target_Locked]);
 						}
-					}
-
-					if (room_hovered != NULL)
-					{
-						for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
-						{
-							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target_Hovered]);
-						}
-
-						m_contextual_order->SetContextualOrder(Order_TargetRoom, room_hovered->m_shape_container.getPosition());
-					}
-				}
-				else if (weapon->m_type == Weapon_Torpedo)
-				{
-					if (weapon->m_target_room != NULL && weapon->m_target_room != room_hovered)
-					{
-						for (vector<RoomTile*>::iterator it2 = weapon->m_target_room->m_tiles.begin(); it2 != weapon->m_target_room->m_tiles.end(); it2++)
-						{
-							if ((*it2)->m_hull == Hull_Left && (*it2)->m_weapon == NULL)
-							{
-								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Red_Target_Locked]);
-							}
-						}
-					}
-
-					if (room_hovered != NULL)
-					{
-						for (vector<RoomTile*>::iterator it2 = room_hovered->m_tiles.begin(); it2 != room_hovered->m_tiles.end(); it2++)
-						{
-							if ((*it2)->m_hull == Hull_Left && (*it2)->m_weapon == NULL)
-							{
-								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target_Hovered]);
-							}
-						}
-
-						m_contextual_order->SetContextualOrder(Order_TargetHull, room_hovered->m_shape_container.getPosition());
 					}
 				}
 			}
