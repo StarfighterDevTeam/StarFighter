@@ -236,7 +236,7 @@ void CrewMember::Update(Time deltaTime)
 		m_position.y += m_speed.y * deltaTime.asSeconds();
 
 		//repair hull
-		if (m_tile != NULL && m_tile->m_pierced == true)
+		if (m_tile != NULL && m_tile->m_is_pierced == true)
 		{
 			if (m_repair_timer <= 0)
 			{
@@ -253,7 +253,7 @@ void CrewMember::Update(Time deltaTime)
 
 			if (m_tile->m_health == m_tile->m_health_max)
 			{
-				m_tile->m_pierced = false;
+				m_tile->m_is_pierced = false;
 
 				//pop feedback
 				ostringstream ss;

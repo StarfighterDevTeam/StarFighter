@@ -180,6 +180,8 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 
 				UpdateRoomTileFeedback(*it2, deltaTime, m_tactical_ship);
+
+				//contextual order feedback
 			}
 
 			(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
@@ -207,6 +209,8 @@ void Gameloop::Update(sf::Time deltaTime)
 						{
 							(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target_Hovered]);
 						}
+
+						m_contextual_order->SetContextualOrder(Order_TargetRoom, room_hovered->m_shape_container.getPosition());
 					}
 				}
 				else if (weapon->m_type == Weapon_Torpedo)
@@ -231,6 +235,8 @@ void Gameloop::Update(sf::Time deltaTime)
 								(*it2)->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Target_Hovered]);
 							}
 						}
+
+						m_contextual_order->SetContextualOrder(Order_TargetHull, room_hovered->m_shape_container.getPosition());
 					}
 				}
 			}
@@ -272,6 +278,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 
+			//opponent catch us on melee?
 			if ((*it)->m_melee_opponent != NULL)
 			{
 				//cancel movement
@@ -318,6 +325,49 @@ void Gameloop::Update(sf::Time deltaTime)
 		if ((*it)->m_health > 0)//second check because he could drown during the update
 		{
 			m_warship->m_crew.push_back(*it);
+
+			//contextuel order feedback
+			if ((*it)->m_selected == true && hovered != NULL)
+			{
+				if (hovered->m_UI_type == UI_RoomTile && hovered->m_position != (*it)->m_position)
+				{
+					RoomTile* tile = (RoomTile*)hovered;
+					if (tile->m_is_pierced == true)
+					{
+						m_contextual_order->SetContextualOrder(Order_RepairHull, hovered->m_position);
+					}
+					else if (tile->m_system_tile != NULL)
+					{
+						if (tile->m_system_tile->m_weapon != NULL)
+						{
+							m_contextual_order->SetContextualOrder(Order_Weapon, hovered->m_position);
+						}
+						else if (tile->m_system_tile->m_system == System_Engine)
+						{
+							m_contextual_order->SetContextualOrder(Order_Engine, hovered->m_position);
+						}
+						else if (tile->m_system_tile->m_system == System_Navigation)
+						{
+							m_contextual_order->SetContextualOrder(Order_Rudder, hovered->m_position);
+						}
+					}
+					else if (tile->m_operator_tile == NULL)
+					{
+						if (tile->m_room->m_type == Room_Crewquarter)
+						{
+							m_contextual_order->SetContextualOrder(Order_Heal, hovered->m_position);
+						}
+						else if (tile->m_flood > 0)
+						{
+							m_contextual_order->SetContextualOrder(Order_Swim, hovered->m_position);
+						}
+						else
+						{
+							m_contextual_order->SetContextualOrder(Order_Move, hovered->m_position);
+						}
+					}
+				}
+			}
 		}
 		else
 		{
@@ -500,12 +550,12 @@ void Gameloop::Update(sf::Time deltaTime)
 						RoomTile* destination = NULL;
 
 						//not already busy reparing?
-						if (((*it)->m_tile != NULL && (*it)->m_tile->m_crew == *it && (*it)->m_tile->m_pierced == true) == false)
+						if (((*it)->m_tile != NULL && (*it)->m_tile->m_crew == *it && (*it)->m_tile->m_is_pierced == true) == false)
 						{
 							//Hull to repair?
 							for (vector<RoomTile*>::iterator it2 = (*CurrentGame).m_enemy_tiles.begin(); it2 != (*CurrentGame).m_enemy_tiles.end(); it2++)
 							{
-								if ((*it2)->m_pierced == true && (*it2)->m_crew == NULL)
+								if ((*it2)->m_is_pierced == true && (*it2)->m_crew == NULL)
 								{
 									destination = (*it2);
 									break;
@@ -701,7 +751,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							{
 								for (vector<RoomTile*>::iterator it3 = (*it2)->m_tiles.begin(); it3 != (*it2)->m_tiles.end(); it3++)
 								{
-									if ((*it3)->m_hull == Hull_Right && (*it3)->m_pierced == false && (*it3)->m_weapon == NULL)
+									if ((*it3)->m_hull == Hull_Right && (*it3)->m_is_pierced == false && (*it3)->m_weapon == NULL)
 									{
 										possible_rooms.push_back(*it2);
 										break;
@@ -865,9 +915,9 @@ void Gameloop::Update(sf::Time deltaTime)
 								}
 								
 								//piercing hull
-								if (tile->m_hull != Hull_None && tile->m_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
+								if (tile->m_hull != Hull_None && tile->m_is_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
 								{
-									tile->m_pierced = true;
+									tile->m_is_pierced = true;
 									if (tile->m_crew != NULL)
 									{
 										tile->m_crew->m_repair_timer = HULL_REPAIR_TIMER;
@@ -1626,7 +1676,7 @@ void Gameloop::UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* 
 {
 	tile->m_shape_container.setFillColor(sf::Color::Black);
 
-	if (tile->m_pierced == true)
+	if (tile->m_is_pierced == true)
 	{
 		tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
 	}

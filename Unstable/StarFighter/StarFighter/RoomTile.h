@@ -32,7 +32,7 @@ public:
 	int m_coord_y;
 	RoomConnexion* m_connexion;
 	Hull m_hull;
-	bool m_pierced;
+	bool m_is_pierced;
 	int m_flood;
 	bool m_flood_dir[4];
 	float m_flooding_timer;

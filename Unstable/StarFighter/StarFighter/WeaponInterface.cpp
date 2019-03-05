@@ -185,7 +185,7 @@ void WeaponInterface::Update()
 	{
 		//do nothing
 	}
-	else if (tile->m_pierced == true && tile->m_health < tile->m_health_max)
+	else if (tile->m_is_pierced == true && tile->m_health < tile->m_health_max)
 	{
 		status = "Repairing hull";
 		m_status_text.setColor(sf::Color::Black);

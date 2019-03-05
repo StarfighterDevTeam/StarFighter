@@ -156,7 +156,7 @@ float Weapon::GetRof()
 
 bool Weapon::CanFire()
 {
-	if (m_tile->m_operator_tile->m_crew == NULL || m_tile->m_operator_tile->m_crew->m_tile != m_tile->m_operator_tile || m_tile->m_operator_tile->m_pierced == true || m_health <= 0)
+	if (m_tile->m_operator_tile->m_crew == NULL || m_tile->m_operator_tile->m_crew->m_tile != m_tile->m_operator_tile || m_tile->m_operator_tile->m_is_pierced == true || m_health <= 0)
 	{
 		return false;
 	}

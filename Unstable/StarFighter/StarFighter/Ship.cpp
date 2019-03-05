@@ -807,7 +807,7 @@ void Ship::RestoreHealth()
 		for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 		{
 			(*it2)->m_health = (*it2)->m_health_max;
-			(*it2)->m_pierced = false;
+			(*it2)->m_is_pierced = false;
 			(*it2)->m_flood = 0;
 
 			if ((*it2)->m_weapon != NULL)
@@ -859,7 +859,7 @@ void Ship::UpdateFlooding(Time deltaTime)
 			}
 
 			//1. "Generate"
-			if ((*it2)->m_pierced == true)
+			if ((*it2)->m_is_pierced == true)
 			{
 				if ((*it2)->m_flooding_timer <= 0)
 				{
