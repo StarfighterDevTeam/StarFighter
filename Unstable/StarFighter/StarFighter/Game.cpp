@@ -110,7 +110,8 @@ Game::Game(RenderWindow& window)
 
 	m_dico_colors[Color_Red_Destroyed] = sf::Color::Red;
 	m_dico_colors[Color_Yellow_Target_Hovered] = sf::Color(255, 242, 39, 255);
-	m_dico_colors[Color_Grey_Background] = sf::Color(100, 100, 100, 255);
+	m_dico_colors[Color_DarkGrey_Background] = sf::Color(100, 100, 100, 255);
+	m_dico_colors[Color_VeryDarkGrey_Background] = sf::Color(30, 30, 30, 255);
 	m_dico_colors[Color_Orange_System] = sf::Color(255, 127, 39, 255);
 	m_dico_colors[Color_Green_System] = sf::Color::Green;
 	m_dico_colors[Color_Cyan_System] = sf::Color::Cyan;

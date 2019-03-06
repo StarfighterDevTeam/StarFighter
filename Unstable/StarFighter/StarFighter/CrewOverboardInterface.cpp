@@ -103,7 +103,7 @@ void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 	m_drowning_bar = new GameEntity(UI_None);
 	m_drowning_bar->m_shape_container.setSize(sf::Vector2f(OVERBOARD_DROWNINGBAR_SIZE_X, OVERBOARD_DROWNINGBAR_SIZE_Y));
 	m_drowning_bar->m_shape_container.setOrigin(sf::Vector2f(OVERBOARD_DROWNINGBAR_SIZE_X * 0.5f, OVERBOARD_DROWNINGBAR_SIZE_Y * 0.5f));
-	m_drowning_bar->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Background]);
+	m_drowning_bar->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 	m_drowning_bar->m_shape_container.setOutlineThickness(2.f);
 	m_drowning_bar->m_shape_container.setOutlineColor(sf::Color::Black);
 	m_drowning_bar->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x - CREWOVERBOARDINTERFACE_SIZE_X * 0.5f + OVERBOARD_DROWNINGBAR_SIZE_X * 0.5f + 80, offset_y));
@@ -139,7 +139,7 @@ void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 		GameEntity* crew_slot = new GameEntity(UI_None);
 		crew_slot->m_shape_container.setSize(sf::Vector2f(CREWMEMBER_SIZE, CREWMEMBER_SIZE));
 		crew_slot->m_shape_container.setOrigin(sf::Vector2f(CREWMEMBER_SIZE * 0.5f, CREWMEMBER_SIZE * 0.5f));
-		crew_slot->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Grey_Background]);
+		crew_slot->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 		crew_slot->m_shape_container.setOutlineThickness(2.f);
 		crew_slot->m_shape_container.setOutlineColor(sf::Color::Black);
 		crew_slot->m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));

@@ -7,16 +7,13 @@ enum ContextualOrderType
 {
 	Order_None,
 	Order_Move,
-	Order_MoveImpossible,
 	Order_Swim,
-	Order_SwimImpossible,
 	Order_RepairHull,
 	Order_Weapon,
 	Order_TargetRoom,
 	Order_TargetHull,
 	Order_Engine,
 	Order_Flee,
-	Order_FleeImpossible,
 	Order_Rudder,
 	Order_Heal,
 	Order_Sail,
@@ -33,7 +30,7 @@ public:
 	~ContextualOrder();
 
 	ContextualOrderType m_type;
-	void SetContextualOrder(ContextualOrderType order, sf::Vector2f position);
+	void SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible);
 };
 
 #endif //CONTEXTUALORDER_H_INCLUDED

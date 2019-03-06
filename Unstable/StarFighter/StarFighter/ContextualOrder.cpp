@@ -9,6 +9,8 @@ ContextualOrder::ContextualOrder() : GameEntity(UI_None)
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);
 	m_text.setColor(sf::Color::Black);
+
+	m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
 }
 
 ContextualOrder::~ContextualOrder()
@@ -16,7 +18,7 @@ ContextualOrder::~ContextualOrder()
 	
 }
 
-void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f position)
+void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible)
 {
 	//change order type?
 	if (m_type != order)
@@ -25,7 +27,7 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 
 		string textureName;
 		ostringstream ss_order;
-		sf::Color text_color = sf::Color::Black;
+		sf::Color text_color = sf::Color::White;
 
 		switch (order)
 		{
@@ -37,14 +39,12 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 			{
 				ss_order << "Sail";
 				textureName = "2D/order_sail.png";
-				//text_color = (*CurrentGame).m_dico_colors[Color_Blue_Pierced];
 				break;
 			}
 			case Order_Engage:
 			{
 				ss_order << "Engage ship";
 				textureName = "2D/order_melee.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Red_Target_Locked];
 				break;
 			}
 			case Order_Dock:
@@ -58,42 +58,26 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 			{
 				ss_order << "Move";
 				textureName = "2D/order_move.png";
-				text_color = sf::Color::White;
-				break;
-			}
-			case Order_MoveImpossible:
-			{
-				ss_order << "Move";
-				textureName = "2D/order_move.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Red_Impossible];
+				text_color = is_possible == true ? text_color : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Swim:
 			{
 				ss_order << "Swim";
 				textureName = "2D/order_move.png";
-				text_color = sf::Color::White;
-				break;
-			}
-			case Order_SwimImpossible:
-			{
-				ss_order << "Swim";
-				textureName = "2D/order_move.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Red_Impossible];
+				text_color = is_possible == true ? text_color : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Heal:
 			{
 				ss_order << "Go heal";
 				textureName = "2D/order_heal.png";
-				text_color = sf::Color::White;
 				break;
 			}
 			case Order_TargetRoom:
 			{
 				ss_order << "Target room";
 				textureName = "2D/order_target.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Red_Target_Locked];
 				break;
 			}
 			case Order_TargetHull:
@@ -107,42 +91,35 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 			{
 				ss_order << "Operate weapon";
 				textureName = "2D/order_system.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Red_Target_Locked];
+				text_color = is_possible == true ? (*CurrentGame).m_dico_colors[Color_Green_System] : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Engine:
 			{
 				ss_order << "Operate engine";
 				textureName = "2D/order_system.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Green_System];
+				text_color = is_possible == true ? (*CurrentGame).m_dico_colors[Color_Green_System] : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Rudder:
 			{
 				ss_order << "Operate rudder";
 				textureName = "2D/order_system.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Green_System];
+				text_color = is_possible == true ? (*CurrentGame).m_dico_colors[Color_Green_System] : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_Flee:
 			{
 				ss_order << "Flee";
 				textureName = "2D/order_sail.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Green_System];
-				break;
-			}
-			case Order_FleeImpossible:
-			{
-				ss_order << "Flee";
-				textureName = "2D/order_sail.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Red_Impossible];
+				text_color = is_possible == true ? (*CurrentGame).m_dico_colors[Color_Green_System] : (*CurrentGame).m_dico_colors[Color_Red_Impossible];
 				break;
 			}
 			case Order_RepairHull:
 			{
 				ss_order << "Repair hull";
 				textureName = "2D/order_repair.png";
-				text_color = (*CurrentGame).m_dico_colors[Color_Blue_Pierced];
+				text_color = (*CurrentGame).m_dico_colors[Color_Green_System];
 				break;
 			}
 			case Order_OpenRoomConnexion:
@@ -169,9 +146,12 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 		
 		m_text.setColor(text_color);
 		m_text.setString(ss_order.str());
+
+		m_shape.setSize(sf::Vector2f(m_text.getGlobalBounds().width + 12.f, m_text.getCharacterSize() + 8.f));
 	}
 
 	//position
 	setPosition(sf::Vector2f(position.x, position.y + (WATERTILE_SIZE - CONTEXTUAL_ORDER_SIZE) * 0.5 - 4));
 	m_text.setPosition(sf::Vector2f(position.x - m_text.getGlobalBounds().width * 0.5, position.y - (WATERTILE_SIZE * 0.5) - 2));
+	m_shape.setPosition(sf::Vector2f(m_text.getPosition().x - 6, m_text.getPosition().y));
 }

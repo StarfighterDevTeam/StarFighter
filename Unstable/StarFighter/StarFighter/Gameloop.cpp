@@ -70,7 +70,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	GameEntity* hovered = (*CurrentGame).m_hovered_ui;
 	MouseAction& mouse_click = (*CurrentGame).m_mouse_click;
 
-	m_contextual_order->SetContextualOrder(Order_None, m_contextual_order->m_position);
+	m_contextual_order->SetContextualOrder(Order_None, m_contextual_order->m_position, true);
 
 	//Get mouse & keyboard inputs
 	(*CurrentGame).GetMouseInputs(deltaTime);
@@ -125,6 +125,50 @@ void Gameloop::Update(sf::Time deltaTime)
 				(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
 				(*it2)->m_shape_container.setOutlineThickness(-1.f);
 			}
+
+			//contextuel order feedback
+			if (selection != NULL && selection->m_UI_type == UI_CrewMember && (*it2)->IsHoveredByMouse() == true)
+			{
+				CrewMember* crew = (CrewMember*)selection;
+				//if we're not already on the tile hovered, a feedback of the possible order is displayed
+				if (crew->m_tile != *it2)
+				{
+					if ((*it2)->m_is_pierced == true)
+					{
+						m_contextual_order->SetContextualOrder(Order_RepairHull, (*it2)->m_shape_container.getPosition(), (*it2)->m_crew == NULL || (*it2)->m_crew == crew);
+					}
+					else if ((*it2)->m_system_tile != NULL)
+					{
+						if ((*it2)->m_system_tile->m_weapon != NULL)
+						{
+							m_contextual_order->SetContextualOrder(Order_Weapon, (*it2)->m_shape_container.getPosition(), ((*it2)->m_crew == NULL || (*it2)->m_crew == crew) && (*it2)->m_system_tile->m_weapon->m_health > 0);
+						}
+						else if ((*it2)->m_system_tile->m_system == System_Engine)
+						{
+							m_contextual_order->SetContextualOrder(Order_Engine, (*it2)->m_shape_container.getPosition(), (*it2)->m_crew == NULL || (*it2)->m_crew == crew);
+						}
+						else if ((*it2)->m_system_tile->m_system == System_Navigation)
+						{
+							m_contextual_order->SetContextualOrder(Order_Rudder, (*it2)->m_shape_container.getPosition(), (*it2)->m_crew == NULL || (*it2)->m_crew == crew);
+						}
+					}
+					else if ((*it2)->m_operator_tile == NULL)
+					{
+						if ((*it2)->m_room->m_type == Room_Crewquarter)
+						{
+							m_contextual_order->SetContextualOrder(Order_Heal, (*it2)->m_shape_container.getPosition(), (*it2)->m_crew == NULL || (*it2)->m_crew == crew);
+						}
+						else if ((*it2)->m_flood > 0)
+						{
+							m_contextual_order->SetContextualOrder(Order_Swim, (*it2)->m_shape_container.getPosition(), (*it2)->m_crew == NULL || (*it2)->m_crew == crew);
+						}
+						else
+						{
+							m_contextual_order->SetContextualOrder(Order_Move, (*it2)->m_shape_container.getPosition(), (*it2)->m_crew == NULL || (*it2)->m_crew == crew);
+						}
+					}
+				}
+			}
 		}
 
 		(*it)->m_is_flooded = flood == (*it)->m_tiles.size();
@@ -137,7 +181,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 		if ((*it)->IsHoveredByMouse() == true && (*it)->m_destroyed == false)
 		{
-			m_contextual_order->SetContextualOrder((*it)->m_is_locked == true ? Order_OpenRoomConnexion : Order_CloseRoomConnexion, (*it)->m_shape_container.getPosition());
+			m_contextual_order->SetContextualOrder((*it)->m_is_locked == true ? Order_OpenRoomConnexion : Order_CloseRoomConnexion, (*it)->m_shape_container.getPosition(), true);
 		}
 	}
 
@@ -233,11 +277,11 @@ void Gameloop::Update(sf::Time deltaTime)
 						//get order: target room
 						if (weapon->m_type != Weapon_Torpedo)
 						{
-							m_contextual_order->SetContextualOrder(Order_TargetRoom, room_hovered->m_shape_container.getPosition());
+							m_contextual_order->SetContextualOrder(Order_TargetRoom, room_hovered->m_shape_container.getPosition(), weapon->m_health > 0);
 						}
 						else
 						{
-							m_contextual_order->SetContextualOrder(Order_TargetHull, sf::Vector2f(hull_pos_feedback_x, (hull_pos_feedback_ymin + hull_pos_feedback_ymax) * 0.5));
+							m_contextual_order->SetContextualOrder(Order_TargetHull, sf::Vector2f(hull_pos_feedback_x, (hull_pos_feedback_ymin + hull_pos_feedback_ymax) * 0.5), weapon->m_health > 0);
 						}
 						
 						if (mouse_click == Mouse_RightClick)
@@ -345,56 +389,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		if ((*it)->m_health > 0)//second check because he could drown during the update
 		{
 			m_warship->m_crew.push_back(*it);
-
-			//contextuel order feedback
-			if ((*it)->m_selected == true && hovered != NULL)
-			{
-				if (hovered->m_UI_type == UI_RoomTile && hovered->m_position != (*it)->m_position)
-				{
-					RoomTile* tile = (RoomTile*)hovered;
-					if (tile->m_is_pierced == true)
-					{
-						m_contextual_order->SetContextualOrder(Order_RepairHull, hovered->m_position);
-					}
-					else if (tile->m_system_tile != NULL)
-					{
-						if (tile->m_system_tile->m_weapon != NULL)
-						{
-							m_contextual_order->SetContextualOrder(Order_Weapon, hovered->m_position);
-						}
-						else if (tile->m_system_tile->m_system == System_Engine)
-						{
-							m_contextual_order->SetContextualOrder(Order_Engine, hovered->m_position);
-						}
-						else if (tile->m_system_tile->m_system == System_Navigation)
-						{
-							m_contextual_order->SetContextualOrder(Order_Rudder, hovered->m_position);
-						}
-					}
-					else if (tile->m_operator_tile == NULL)
-					{
-						if (tile->m_room->m_type == Room_Crewquarter)
-						{
-							m_contextual_order->SetContextualOrder(Order_Heal, hovered->m_position);
-						}
-						else if (tile->m_flood > 0)
-						{
-							m_contextual_order->SetContextualOrder(Order_Swim, hovered->m_position);
-						}
-						else
-						{
-							if (tile->m_crew == NULL)
-							{
-								m_contextual_order->SetContextualOrder(Order_Move, hovered->m_position);
-							}
-							else
-							{
-								m_contextual_order->SetContextualOrder(Order_MoveImpossible, hovered->m_position);
-							}
-						}
-					}
-				}
-			}
 		}
 		else
 		{
@@ -734,18 +728,11 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Fleeing
 		if ((*it)->IsHoveredByMouse() == true && m_warship->m_is_fleeing == false && m_scale == Scale_Tactical)
 		{
-			if (m_warship->m_flee_count == ENGINE_FLEE_COUNT)
-			{
-				m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition());
+			m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition(), m_warship->m_flee_count == ENGINE_FLEE_COUNT);
 
-				if (mouse_click == Mouse_RightClick)
-				{
-					m_warship->m_is_fleeing = true;
-				}
-			}
-			else
+			if (mouse_click == Mouse_RightClick)
 			{
-				m_contextual_order->SetContextualOrder(Order_FleeImpossible, (*it)->m_shape_container.getPosition());
+				m_warship->m_is_fleeing = true;
 			}
 		}
 	}
@@ -1140,16 +1127,16 @@ void Gameloop::Update(sf::Time deltaTime)
 						{
 							if ((*it2)->m_seaport == NULL)
 							{
-								m_contextual_order->SetContextualOrder(Order_Sail, (*it2)->m_position);
+								m_contextual_order->SetContextualOrder(Order_Sail, (*it2)->m_position, true);
 							}
 							else
 							{
-								m_contextual_order->SetContextualOrder(Order_Dock, (*it2)->m_position);
+								m_contextual_order->SetContextualOrder(Order_Dock, (*it2)->m_position, true);
 							}
 						}
 						else
 						{
-							m_contextual_order->SetContextualOrder(Order_Engage, (*it2)->m_position);
+							m_contextual_order->SetContextualOrder(Order_Engage, (*it2)->m_position, true);
 						}
 					}
 				}
