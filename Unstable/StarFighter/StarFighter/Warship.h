@@ -42,6 +42,12 @@ public:
 
 	struct CombatInterface m_combat_interface[2];
 
+	int m_gold;
+	int m_fish;
+	int m_mech;
+	float m_fidelity;
+	int m_days;
+
 private:
 	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);
 	void IteratePathFinding(WaterTile* tileA, WaterTile* tileB);

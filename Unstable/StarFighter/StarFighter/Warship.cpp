@@ -16,6 +16,12 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_flee_count = 0.f;
 	m_is_charging_flee_count = true;
 
+	m_gold = 0;
+	m_fish = 0;
+	m_mech = 0;
+	m_fidelity = 0.5f;
+	m_days = 10;
+
 	//shape for water tiles
 	m_textureName = "2D/warship_icon.png";
 	TextureLoader *loader;
