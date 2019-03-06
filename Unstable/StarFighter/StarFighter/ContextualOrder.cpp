@@ -11,11 +11,21 @@ ContextualOrder::ContextualOrder() : GameEntity(UI_None)
 	m_text.setColor(sf::Color::Black);
 
 	m_shape.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
+
+	m_mouse_click = new GameEntity(UI_None);
+	sf::Texture* textureL = TextureLoader::getInstance()->loadTexture("2D/mouse_click.png", 10, 32);
+	m_mouse_click->setAnimation(textureL, 1, 2);
 }
 
 ContextualOrder::~ContextualOrder()
 {
-	
+	delete m_mouse_click;
+}
+
+void ContextualOrder::Draw(sf::RenderTexture& screen)
+{
+	GameEntity::Draw(screen);
+	m_mouse_click->Draw(screen);
 }
 
 void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible)
@@ -28,6 +38,7 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 		string textureName;
 		ostringstream ss_order;
 		sf::Color text_color = sf::Color::White;
+		bool right_click = true;
 
 		switch (order)
 		{
@@ -127,6 +138,7 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 				ss_order << "Open door";
 				textureName = "2D/order_open.png";
 				text_color = sf::Color::White;
+				right_click = false;
 				break;
 			}
 			case Order_CloseRoomConnexion:
@@ -134,6 +146,7 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 				ss_order << "Close door";
 				textureName = "2D/order_close.png";
 				text_color = sf::Color::White;
+				right_click = false;
 				break;
 			}
 		}
@@ -147,11 +160,14 @@ void ContextualOrder::SetContextualOrder(ContextualOrderType order, sf::Vector2f
 		m_text.setColor(text_color);
 		m_text.setString(ss_order.str());
 
-		m_shape.setSize(sf::Vector2f(m_text.getGlobalBounds().width + 12.f, m_text.getCharacterSize() + 8.f));
+		m_shape.setSize(sf::Vector2f(m_text.getGlobalBounds().width + 12 + 20, m_text.getCharacterSize() + 8.f));
+		
+		m_mouse_click->setAnimationLine(right_click == false ? 0 : 1);
 	}
 
 	//position
 	setPosition(sf::Vector2f(position.x, position.y + (WATERTILE_SIZE - CONTEXTUAL_ORDER_SIZE) * 0.5 - 4));
 	m_text.setPosition(sf::Vector2f(position.x - m_text.getGlobalBounds().width * 0.5, position.y - (WATERTILE_SIZE * 0.5) - 2));
-	m_shape.setPosition(sf::Vector2f(m_text.getPosition().x - 6, m_text.getPosition().y));
+	m_shape.setPosition(sf::Vector2f(m_text.getPosition().x - (6 + 20), m_text.getPosition().y));
+	m_mouse_click->setPosition(sf::Vector2f(m_text.getPosition().x - (6 + 20) * 0.5, m_text.getPosition().y + m_shape.getSize().y * 0.5));
 }

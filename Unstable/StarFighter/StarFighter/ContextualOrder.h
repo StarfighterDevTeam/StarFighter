@@ -29,8 +29,12 @@ public:
 	ContextualOrder();
 	~ContextualOrder();
 
+	void Draw(sf::RenderTexture& screen);
+
 	ContextualOrderType m_type;
 	void SetContextualOrder(ContextualOrderType order, sf::Vector2f position, bool is_possible);
+
+	GameEntity* m_mouse_click;
 };
 
 #endif //CONTEXTUALORDER_H_INCLUDED
