@@ -48,6 +48,7 @@ public:
 	int m_health;
 	int m_flood;
 	int m_flood_max;
+	int m_lifeboats;
 
 	float m_flee_timer;
 	float m_flee_count;

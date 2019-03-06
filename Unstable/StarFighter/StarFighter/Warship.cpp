@@ -59,7 +59,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	Room* nav_room = AddRoom(3, 0, 5, 2, Room_Navigation);
 	AddRoom(3, 2, 5, 5, Room_Crewquarter);
 	Room* engine_room = AddRoom(3, 7, 5, 2, Room_Engine);
-	AddRoom(3, 9, 5, 1, Room_Lifeboat);
+	Room* lifeboats = AddRoom(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
 	AddRoom(8, 1, 3, 4, Room_Weapon);
@@ -137,6 +137,9 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	//	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(prison_room->m_tiles[j * (prison_room->m_width)], prison_room->m_tiles[(j * prison_room->m_width) + 1]), true, this);
 	//	m_connexions.push_back(connexion);
 	//}
+
+	//lifeboats
+	m_lifeboats += lifeboats->m_tiles.size();
 
 	//CREW
 	m_nb_crew_max = 8;

@@ -10,6 +10,7 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display
 	m_seaport = NULL;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
 	m_display_name = display_name;
+	m_lifeboats = 0;
 
 	m_rooms_min_upcorner_x = 0;
 	m_rooms_min_upcorner_y = 0;
@@ -601,7 +602,7 @@ void Ship::BuildShip()
 	Room* nav_room = AddRoom(3, 0, 5, 2, Room_Navigation);
 	AddRoom(3, 2, 5, 5, Room_Crewquarter);
 	Room* engine_room = AddRoom(3, 7, 5, 2, Room_Engine);
-	AddRoom(3, 9, 5, 1, Room_Lifeboat);
+	Room* lifeboats = AddRoom(3, 9, 5, 1, Room_Lifeboat);
 
 	//right
 	Room* prison_room = AddRoom(8, 1, 2, 4, Room_Prison);
@@ -689,6 +690,9 @@ void Ship::BuildShip()
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
 		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
+
+	//lifeboats
+	m_lifeboats += lifeboats->m_tiles.size();
 
 	//crew
 	m_nb_crew_max = 12;

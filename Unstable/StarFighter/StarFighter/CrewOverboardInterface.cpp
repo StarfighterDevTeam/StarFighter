@@ -41,7 +41,7 @@ void CrewOverboardInterface::Destroy()
 void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 {
 	m_enemy_ship = enemy_ship;
-	m_slots_avaible = 4; //todo: get lifeboat numbers from ship*
+	m_slots_avaible = ship->m_lifeboats;
 	m_drowning_timer = OVERBOARD_DROWNING_TIME;
 
 	//get prisoners among survivors

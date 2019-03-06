@@ -1142,9 +1142,11 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 				else
 				{
+					(*it2)->GameEntity::UpdatePosition();
+
 					if ((*it2)->m_type == Water_Empty)
 					{
-						(*it2)->GameEntity::Update(deltaTime);
+						
 						(*it2)->m_text.setString("");
 
 						//selection of water tiles is forbidden
@@ -1154,10 +1156,6 @@ void Gameloop::Update(sf::Time deltaTime)
 							(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
 							(*CurrentGame).m_selected_ui = NULL;
 						}
-					}
-					else
-					{
-						(*it2)->GameEntity::UpdatePosition();
 					}
 				}
 			}
