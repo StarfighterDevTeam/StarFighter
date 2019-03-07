@@ -163,7 +163,10 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 
 Warship::~Warship()
 {
-	
+	for (int i = 0; i < 2; i++)
+	{
+		m_combat_interface[1].Destroy();
+	}
 }
 
 void Warship::Update(Time deltaTime, bool tactical_combat)

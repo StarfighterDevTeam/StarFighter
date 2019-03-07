@@ -68,7 +68,7 @@ void CombatInterface::Init(Ship* ship)
 
 	float offset = ship->m_alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
 
-	//enemy iname & info
+	//ship name & info
 	m_ship_name = new GameEntity(UI_None);
 	m_ship_name->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_ship_name->m_text.setCharacterSize(20);

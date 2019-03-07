@@ -15,6 +15,7 @@ Gameloop::Gameloop()
 	//PIRATES
 	InitWaterZones();
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
+	m_resources_interface.Init(m_warship);
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
 	m_tactical_ship = NULL;
@@ -43,6 +44,8 @@ Gameloop::~Gameloop()
 	}
 
 	delete m_contextual_order;
+
+	m_resources_interface.Destroy();
 }
 
 void Gameloop::InitWaterZones()
@@ -1209,6 +1212,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		m_warship->SetSailsToWaterTile(tile);
 	}
 
+	//HUD resources
+	m_resources_interface.Update();
+
 	//MENUS
 	//Crew overboard menu
 	if (m_menu == Menu_CrewOverboard)
@@ -1530,6 +1536,7 @@ void Gameloop::Draw()
 	}
 
 	//Menus
+
 	if (m_menu == Menu_PrisonersChoice)
 	{
 		m_warship->m_prisoners_choice_interface.Draw((*CurrentGame).m_mainScreen);
@@ -1538,6 +1545,9 @@ void Gameloop::Draw()
 	{
 		m_warship->m_crew_overboard_interface.Draw((*CurrentGame).m_mainScreen);
 	}
+
+	//HUD - resources interface
+	m_resources_interface.Draw((*CurrentGame).m_mainScreen);
 
 	//HUD - contextual order
 	if (m_contextual_order->m_type != Order_None && m_warship->m_is_fleeing == false && m_warship->m_sinking_timer <= 0)

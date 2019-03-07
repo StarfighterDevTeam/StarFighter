@@ -9,6 +9,7 @@
 
 #include "Warship.h"
 #include "ContextualOrder.h"
+#include "ResourcesInterface.h"
 
 enum Scale
 {
@@ -48,6 +49,8 @@ public:
 	void UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* ship);
 
 	ContextualOrder* m_contextual_order;
+
+	struct ResourcesInterface m_resources_interface;
 
 	Ship* IsDMSInCombatRange(DMS_Coord DMS_a, DMS_Coord DMS_b);
 

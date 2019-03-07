@@ -106,6 +106,7 @@
     <ClCompile Include="Island.cpp" />
     <ClCompile Include="Gameloop.cpp" />
     <ClCompile Include="PrisonersChoiceInterface.cpp" />
+    <ClCompile Include="ResourcesInterface.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="RoomConnexion.cpp" />
     <ClCompile Include="RoomTile.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Gameloop.h" />
     <ClInclude Include="PrisonersChoiceInterface.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourcesInterface.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="RoomConnexion.h" />
     <ClInclude Include="RoomTile.h" />
