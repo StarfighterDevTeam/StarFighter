@@ -58,17 +58,40 @@ void ResourcesInterface::Init(Warship* warship)
 		m_resources[i]->m_shape_container.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + RESOURCES_INTERFACE_SIZE_X * 0.5 + i * RESOURCES_INTERFACE_SIZE_X, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5f));
 		m_resources[i]->m_position = m_panel->m_shape_container.getPosition();
 
+		sf::Texture* texture;
+		switch (i)
+		{
+			case Resource_Gold:
+			{
+				texture = TextureLoader::getInstance()->loadTexture("2D/icon_gold.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+				break;
+			}
+			case Resource_Fish:
+			{
+				texture = TextureLoader::getInstance()->loadTexture("2D/icon_fish.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+				break;
+			}
+			case Resource_Mech:
+			{
+				texture = TextureLoader::getInstance()->loadTexture("2D/icon_mech.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+				break;
+			}
+			
+		}
+		m_resources[i]->setAnimation(texture, 1, 1);
+		m_resources[i]->setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5f));
+
 		m_resources[i]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_SIZE_Y));
 		m_resources[i]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_SIZE_Y * 0.5f));
-		m_resources[i]->m_shape.setFillColor(sf::Color::Red);
-		m_resources[i]->m_shape.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_SIZE_X + (4 + RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5f));
-
+		m_resources[i]->m_shape.setFillColor(sf::Color::Black);
+		m_resources[i]->m_shape.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5f));
+		
 		m_resources[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_resources[i]->m_text.setCharacterSize(16);
 		m_resources[i]->m_text.setStyle(sf::Text::Bold);
 		m_resources[i]->m_text.setColor(sf::Color::White);
 		m_resources[i]->m_text.setString("999999");
-		m_resources[i]->m_text.setPosition(sf::Vector2f(m_resources[i]->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5 + 6, m_resources[i]->m_shape.getPosition().y - m_resources[i]->m_text.getCharacterSize() * 0.60));
+		m_resources[i]->m_text.setPosition(sf::Vector2f(m_resources[i]->m_shape_container.getPosition().x - RESOURCES_INTERFACE_SIZE_X * 0.5 + RESOURCES_ICON_SIZE + 8, m_resources[i]->m_shape_container.getPosition().y - m_resources[i]->m_text.getCharacterSize() * 0.60));
 	}
 }
 

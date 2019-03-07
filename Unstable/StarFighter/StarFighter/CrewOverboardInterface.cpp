@@ -172,6 +172,7 @@ void CrewOverboardInterface::Update(sf::Time deltaTime)
 					m_crew_interface.Update();
 					float pos_x = (*it)->m_position.x + CREWMEMBER_SIZE * 0.5 + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5 + OVERBOARD_CREW_CARD_OFFSET;
 					float pos_y = (*it)->m_position.y + m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5 - CREWMEMBER_SIZE * 0.5;
+					pos_y = Minf(pos_y, REF_WINDOW_RESOLUTION_Y * 0.95 - m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5);
 					m_crew_interface.SetPosition(sf::Vector2f(pos_x, pos_y));
 				}
 				

@@ -189,7 +189,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//Enemy rooms
-	if (m_tactical_ship != NULL)
+	if (m_tactical_ship != NULL && m_tactical_ship->m_is_fleeing == false && m_tactical_ship->m_sinking_timer <= 0)
 	{
 		//canceling weapon target
 		if (selection != NULL && selection->m_UI_type == UI_Weapon && hovered == NULL)
@@ -1482,7 +1482,7 @@ void Gameloop::Draw()
 		m_warship->Draw((*CurrentGame).m_mainScreen);
 
 		//compass
-		m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
+		//m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
 
 		//enemy
 		for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
@@ -1623,6 +1623,12 @@ bool Gameloop::UpdateTacticalScale()
 			//switch back to strategic scale, after a few cleaning
 			if (m_menu == Menu_None)
 			{
+				//Get reward
+				if (win == true)
+				{
+					m_warship->m_gold += 5;
+				}
+
 				//delete enemy from ships existing
 				vector<Ship*> old_ships;
 				for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
