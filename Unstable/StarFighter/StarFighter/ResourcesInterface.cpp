@@ -137,16 +137,19 @@ void ResourcesInterface::Update()
 			case Resource_Gold:
 			{
 				ss_resource << m_warship->m_gold;
+				m_resources[i]->m_text.setColor(m_warship->m_gold > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
 			case Resource_Fish:
 			{
 				ss_resource << m_warship->m_fish;
+				m_resources[i]->m_text.setColor(m_warship->m_fish > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
 			case Resource_Mech:
 			{
 				ss_resource << m_warship->m_mech;
+				m_resources[i]->m_text.setColor(m_warship->m_mech > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
 			case Resource_Fidelity:
