@@ -11,6 +11,8 @@
 #define RESOURCES_INTERFACE_SIZE_X				110
 #define RESOURCES_INTERFACE_SIZE_Y				30
 #define RESOURCES_ICON_SIZE						30
+#define RESOURCES_CREWFIDELITY_SIZE_X			250
+#define RESOURCES_CREWFIDELITY_SIZE_Y			12
 
 enum Resource_Meta
 {
@@ -31,6 +33,7 @@ struct ResourcesInterface
 
 	GameEntity* m_panel;
 	GameEntity* m_resources[NB_RESOURCES_TYPES];
+	sf::Text m_text_royalnavy;
 
 	void Init(Warship* ship);
 	void Destroy();

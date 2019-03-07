@@ -129,6 +129,8 @@ enum Input_Actions
 enum Color_Chart
 {	
 	Color_Red_Destroyed,
+	Color_Red_CrewFidelity_Negative,
+	Color_Blue_CrewFidelity_Positive,
 	Color_Yellow_Target_Hovered,
 	Color_Red_Target_Locked,
 	Color_Red_Impossible,
