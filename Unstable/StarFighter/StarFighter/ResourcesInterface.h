@@ -14,6 +14,10 @@
 #define RESOURCES_CREWFIDELITY_SIZE_X			250
 #define RESOURCES_CREWFIDELITY_SIZE_Y			12
 
+#define RESOURCES_BUTTON_SIZE_X					100
+#define RESOURCES_BUTTON_SIZE_Y					24
+
+
 struct ResourcesInterface
 {
 	ResourcesInterface();
@@ -24,6 +28,9 @@ struct ResourcesInterface
 	GameEntity* m_panel;
 	GameEntity* m_resources[NB_RESOURCES_TYPES];
 	sf::Text m_text_royalnavy;
+
+	GameEntity* m_save_button;
+	GameEntity* m_load_button;
 
 	void Init(Warship* ship);
 	void Destroy();

@@ -81,6 +81,14 @@ void Gameloop::Update(sf::Time deltaTime)
 	{
 		SavePlayerData(m_warship);
 	}
+	else if (m_resources_interface.m_save_button->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
+	{
+		SavePlayerData(m_warship);
+	}
+	else if (m_resources_interface.m_load_button->IsHoveredByMouse() == true && (*CurrentGame).m_mouse_click == Mouse_LeftClick && (*CurrentGame).m_window_has_focus == true)
+	{
+		LoadPlayerData(m_warship);
+	}
 
 	GameEntity* selection = (*CurrentGame).m_selected_ui;
 	GameEntity* previous_selection = selection;
@@ -540,8 +548,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				{
 					for (vector<CrewMember*>::iterator it2 = m_warship->m_prisoners.begin(); it2 != m_warship->m_prisoners.end(); it2++)
 					{
-						if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
-							//if (abs((*it)->m_position.x - (*it2)->m_position.x) <= ROOMTILE_SIZE && abs((*it)->m_position.y - (*it2)->m_position.y) <= ROOMTILE_SIZE && (*it2)->m_health > 0 && (*it2)->m_tile->m_room->m_type != Room_PrisonCell)
+						if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)//opponent on adjacent tile? (<!> crew->m_tile must not be null)
 						{
 							(*it)->m_melee_opponent = *it2;
 							if ((*it2)->m_melee_opponent == NULL)
@@ -1642,6 +1649,15 @@ bool Gameloop::UpdateTacticalScale()
 				{
 					AddResource(Resource_Gold, 5);
 				}
+				else
+				{
+					LoadPlayerData(m_warship);
+					m_warship->RestoreHealth();
+					m_tactical_ship = NULL;
+					m_scale = Scale_Strategic;
+					//enemy ships to delete
+					return true;
+				}
 
 				//delete enemy from ships existing
 				vector<Ship*> old_ships;
@@ -1881,6 +1897,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
 	if (data)  // si l'ouverture a réussi
 	{
+		data << "DMS " << warship->m_DMS.m_degree_x << " " << warship->m_DMS.m_minute_x << " " << " " << warship->m_DMS.m_degree_y << " " << warship->m_DMS.m_minute_y << endl;
 		data << "Gold " << warship->m_resources[Resource_Gold] << endl;
 		data << "Fish " << warship->m_resources[Resource_Fish] << endl;
 		data << "Mech " << warship->m_resources[Resource_Mech] << endl;
@@ -1926,11 +1943,17 @@ int Gameloop::LoadPlayerData(Warship* warship)
 	if (data) // si ouverture du fichier réussie
 	{
 		std::string line;
+		std::getline(data, line);
+		string s;
+
+		int DMS_degree_x, DMS_minute_x, DMS_degree_y, DMS_minute_y;
+		std::istringstream(line) >> s >> DMS_degree_x >> DMS_minute_x >> DMS_degree_y >> DMS_minute_y;
+		warship->SetDMSCoord(DMS_Coord(DMS_degree_x, DMS_minute_x, 0.f, DMS_degree_y, DMS_minute_y, 0.f));
+
 		int i = 0;
 		for (int i = 0; i < NB_RESOURCES_TYPES; i++)
 		{
 			std::getline(data, line);
-			string s;
 			std::istringstream(line) >> s >> warship->m_resources[i];
 		}
 
@@ -1988,7 +2011,17 @@ int Gameloop::LoadPlayerData(Warship* warship)
 bool Gameloop::AddResource(Resource_Meta resource, int value)
 {
 	m_warship->m_resources[resource] += value;
-	SavePlayerData(m_warship);
 
+	if (resource == Resource_Fidelity && m_warship->m_resources[resource] > 100)
+	{
+		m_warship->m_resources[resource] = 100;
+	}
+
+	if (m_warship->m_resources[resource] < 0)
+	{
+		m_warship->m_resources[resource] = 0;
+	}
+
+	SavePlayerData(m_warship);
 	return true;
 }

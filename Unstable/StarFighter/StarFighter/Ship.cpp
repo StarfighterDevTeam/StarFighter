@@ -1173,14 +1173,14 @@ void Ship::UpdateSinking(Time deltaTime)
 		//stop crew members
 		for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
 		{
-			(*it)->m_tile = NULL;
+			//(*it)->m_tile = NULL;
 			(*it)->m_destination = NULL;
 			(*it)->m_speed = sf::Vector2f(0, 0);
 			(*it)->m_melee_opponent = NULL;
 		}
 		for (vector<CrewMember*>::iterator it = m_prisoners.begin(); it != m_prisoners.end(); it++)
 		{
-			(*it)->m_tile = NULL;
+			//(*it)->m_tile = NULL;
 			(*it)->m_destination = NULL;
 			(*it)->m_speed = sf::Vector2f(0, 0);
 			(*it)->m_melee_opponent = NULL;
