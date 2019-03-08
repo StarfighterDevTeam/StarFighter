@@ -1,1 +1,5 @@
-Save 
+Gold 105
+Fish 100
+Mech 150
+Fidelity 50
+Days 10

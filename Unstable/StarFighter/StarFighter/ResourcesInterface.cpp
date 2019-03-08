@@ -136,30 +136,30 @@ void ResourcesInterface::Update()
 		{
 			case Resource_Gold:
 			{
-				ss_resource << m_warship->m_gold;
-				m_resources[i]->m_text.setColor(m_warship->m_gold > 0 ? sf::Color::White : sf::Color::Red);
+				ss_resource << m_warship->m_resources[i];
+				m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
 			case Resource_Fish:
 			{
-				ss_resource << m_warship->m_fish;
-				m_resources[i]->m_text.setColor(m_warship->m_fish > 0 ? sf::Color::White : sf::Color::Red);
+				ss_resource << m_warship->m_resources[i];
+				m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
 			case Resource_Mech:
 			{
-				ss_resource << m_warship->m_mech;
-				m_resources[i]->m_text.setColor(m_warship->m_mech > 0 ? sf::Color::White : sf::Color::Red);
+				ss_resource << m_warship->m_resources[i];
+				m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
 			case Resource_Fidelity:
 			{
-				ss_resource << "Crew fidelity " << (int)(m_warship->m_fidelity * 100) << "%";
+				ss_resource << "Crew fidelity " << m_warship->m_resources[i] << "%";
 				break;
 			}
 			case Resource_Days:
 			{
-				ss_resource << m_warship->m_days << " DAYS";
+				ss_resource << m_warship->m_resources[i] << " DAYS";
 				break;
 			}
 		}
@@ -168,9 +168,9 @@ void ResourcesInterface::Update()
 	}
 
 	//crew fidelity ratio
-	m_resources[Resource_Fidelity]->m_shape.setSize(sf::Vector2f(RESOURCES_CREWFIDELITY_SIZE_X * m_warship->m_fidelity, RESOURCES_CREWFIDELITY_SIZE_Y));
-	m_resources[Resource_Fidelity]->m_shape.setOrigin(sf::Vector2f(RESOURCES_CREWFIDELITY_SIZE_X * 0.5f * m_warship->m_fidelity, RESOURCES_CREWFIDELITY_SIZE_Y * 0.5f));
-	m_resources[Resource_Fidelity]->m_shape.setPosition(sf::Vector2f(m_resources[Resource_Fidelity]->m_shape_container.getPosition().x - RESOURCES_CREWFIDELITY_SIZE_X * 0.5f + m_resources[Resource_Fidelity]->m_shape.getSize().x * 0.5, m_resources[Resource_Fidelity]->m_shape_container.getPosition().y));
+	m_resources[Resource_Fidelity]->m_shape.setSize(sf::Vector2f(1.0f * RESOURCES_CREWFIDELITY_SIZE_X * m_warship->m_resources[Resource_Fidelity] / 100, RESOURCES_CREWFIDELITY_SIZE_Y));
+	m_resources[Resource_Fidelity]->m_shape.setOrigin(sf::Vector2f(m_resources[Resource_Fidelity]->m_shape.getSize().x * 0.5, RESOURCES_CREWFIDELITY_SIZE_Y * 0.5));
+	m_resources[Resource_Fidelity]->m_shape.setPosition(sf::Vector2f(m_resources[Resource_Fidelity]->m_shape_container.getPosition().x - RESOURCES_CREWFIDELITY_SIZE_X * 0.5 + m_resources[Resource_Fidelity]->m_shape.getSize().x * 0.5, m_resources[Resource_Fidelity]->m_shape_container.getPosition().y));
 
 	m_resources[Resource_Fidelity]->m_text.setPosition(sf::Vector2f(m_resources[Resource_Fidelity]->m_shape_container.getPosition().x - m_resources[Resource_Fidelity]->m_text.getGlobalBounds().width * 0.5, m_resources[Resource_Fidelity]->m_shape_container.getPosition().y + RESOURCES_CREWFIDELITY_SIZE_Y * 0.5 + 2));
 }

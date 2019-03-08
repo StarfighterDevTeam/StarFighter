@@ -14,16 +14,6 @@
 #define RESOURCES_CREWFIDELITY_SIZE_X			250
 #define RESOURCES_CREWFIDELITY_SIZE_Y			12
 
-enum Resource_Meta
-{
-	Resource_Gold,
-	Resource_Fish,
-	Resource_Mech,
-	Resource_Fidelity,
-	Resource_Days,
-	NB_RESOURCES_TYPES,
-};
-
 struct ResourcesInterface
 {
 	ResourcesInterface();

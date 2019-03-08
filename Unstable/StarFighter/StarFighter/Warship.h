@@ -13,10 +13,22 @@
 #include "CrewOverboardInterface.h"
 #include "Ship.h"
 
+#include <fstream>
+
 #define	CRUISE_SPEED					50.f
 #define ANGLE_SPEED						30.f
 
 #define COMPASS_MODE					false
+
+enum Resource_Meta
+{
+	Resource_Gold,
+	Resource_Fish,
+	Resource_Mech,
+	Resource_Fidelity,
+	Resource_Days,
+	NB_RESOURCES_TYPES,
+};
 
 class Warship : public Ship
 {
@@ -42,11 +54,7 @@ public:
 
 	struct CombatInterface m_combat_interface[2];
 
-	int m_gold;
-	int m_fish;
-	int m_mech;
-	float m_fidelity;
-	int m_days;
+	int m_resources[NB_RESOURCES_TYPES];
 
 private:
 	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);

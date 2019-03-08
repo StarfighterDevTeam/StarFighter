@@ -54,6 +54,11 @@ public:
 
 	Ship* IsDMSInCombatRange(DMS_Coord DMS_a, DMS_Coord DMS_b);
 
+	int SavePlayerData(Warship* warship);
+	int LoadPlayerData(Warship* warship);
+
+	bool AddResource(Resource_Meta resource, int value);
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

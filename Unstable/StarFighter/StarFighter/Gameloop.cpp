@@ -14,8 +14,11 @@ Gameloop::Gameloop()
 
 	//PIRATES
 	InitWaterZones();
+
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
+	LoadPlayerData(m_warship);
 	m_resources_interface.Init(m_warship);
+
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
 	m_tactical_ship = NULL;
@@ -1626,7 +1629,7 @@ bool Gameloop::UpdateTacticalScale()
 				//Get reward
 				if (win == true)
 				{
-					m_warship->m_gold += 5;
+					AddResource(Resource_Gold, 5);
 				}
 
 				//delete enemy from ships existing
@@ -1856,4 +1859,67 @@ Ship* Gameloop::IsDMSInCombatRange(DMS_Coord DMS_a, DMS_Coord DMS_b)
 	}
 
 	return NULL;
+}
+
+
+//SAVING PLAYER DATA
+int Gameloop::SavePlayerData(Warship* warship)
+{
+	printf("Saving player data.\n");
+
+	ofstream data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in | ios::trunc);
+	if (data)  // si l'ouverture a réussi
+	{
+		data << "Gold " << warship->m_resources[Resource_Gold] << endl;
+		data << "Fish " << warship->m_resources[Resource_Fish] << endl;
+		data << "Mech " << warship->m_resources[Resource_Mech] << endl;
+		data << "Fidelity " << warship->m_resources[Resource_Fidelity] << endl;
+		data << "Days " << warship->m_resources[Resource_Days] << endl;
+
+		data.close();  // on ferme le fichier
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "No save file found. A new file is going to be created.\n" << endl;
+	}
+
+	return 0;
+}
+
+int Gameloop::LoadPlayerData(Warship* warship)
+{
+	printf("Loading player data.\n");
+
+	std::ifstream  data(string(getSavesPath()) + PLAYER_SAVE_FILE, ios::in);
+
+	if (data) // si ouverture du fichier réussie
+	{
+		std::string line;
+		int i = 0;
+		while (std::getline(data, line))
+		{
+			//Loading data
+			string s;
+			std::istringstream(line) >> s >> warship->m_resources[i];
+			i++;
+		}
+
+		data.close();  // on ferme le fichier
+		return true;
+	}
+	else  // si l'ouverture a échoué
+	{
+		cerr << "No save file found. A new file is going to be created.\n" << endl;
+		SavePlayerData(warship);
+	}
+
+	return 0;
+}
+
+bool Gameloop::AddResource(Resource_Meta resource, int value)
+{
+	m_warship->m_resources[resource] += value;
+	SavePlayerData(m_warship);
+
+	return true;
 }
