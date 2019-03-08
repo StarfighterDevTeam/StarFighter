@@ -94,7 +94,10 @@ void Weapon::Update(Time deltaTime)
 {
 	if ((*CurrentGame).m_pause == false)
 	{
-		UpdateRof(deltaTime);
+		if (CanFire() == true)
+		{
+			UpdateRof(deltaTime);
+		}
 	}
 
 	GameEntity::Update(deltaTime);

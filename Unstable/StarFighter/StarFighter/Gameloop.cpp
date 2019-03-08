@@ -1887,18 +1887,24 @@ int Gameloop::SavePlayerData(Warship* warship)
 		data << "Fidelity " << warship->m_resources[Resource_Fidelity] << endl;
 		data << "Days " << warship->m_resources[Resource_Days] << endl;
 
-		for (vector<CrewMember*>::iterator it = warship->m_crew.begin(); it != warship->m_crew.end(); it++)
+		for (int i = 0; i < 2; i++)
 		{
-			data << "Crew " << (*it)->m_display_name << " " << (*it)->m_type << " " << (*it)->m_race << " " << (*it)->m_health << " " << (*it)->m_health_max;
-			for (int i = 0; i < NB_CREW_SKILLS; i++)
-			{
-				data << " " << (*it)->m_skills[i];
-			}
+			vector<CrewMember*>::iterator begin = i == 0 ? warship->m_crew.begin() : warship->m_prisoners.begin();
+			vector<CrewMember*>::iterator end = i == 0 ? warship->m_crew.end() : warship->m_prisoners.end();
 
-			int prisoner = (*it)->m_is_prisoner == true ? 1 : 0;
-			data << " " << prisoner;
-			data << " " << (*it)->m_tile->m_coord_x << " " << (*it)->m_tile->m_coord_y;
-			data << endl;
+			for (vector<CrewMember*>::iterator it = begin; it != end; it++)
+			{
+				data << "Crew " << (*it)->m_display_name << " " << (*it)->m_type << " " << (*it)->m_race << " " << (*it)->m_health << " " << (*it)->m_health_max;
+				for (int i = 0; i < NB_CREW_SKILLS; i++)
+				{
+					data << " " << (*it)->m_skills[i];
+				}
+
+				int prisoner = (*it)->m_is_prisoner == true ? 1 : 0;
+				data << " " << prisoner;
+				data << " " << (*it)->m_tile->m_coord_x << " " << (*it)->m_tile->m_coord_y;
+				data << endl;
+			}
 		}
 
 		data.close();  // on ferme le fichier
@@ -1943,7 +1949,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				int health, health_max, coord_x, coord_y;
 				std::istringstream(line) >> t >> name >> type >> race >> health >> health_max >> skills[Skill_Gunner] >> skills[Skill_Fishing] >> skills[Skill_Melee] >> skills[Skill_Navigation] >> skills[Skill_Engine] >> (bool)prisoner >> coord_x >> coord_y;
 				
-				CrewMember* crew = new CrewMember((CrewMemberType)type, Alliance_Player, (CrewMemberRace)race);
+				CrewMember* crew = new CrewMember((CrewMemberType)type, Alliance_Player, (CrewMemberRace)race, prisoner);
 				
 				crew->m_display_name = name;
 				crew->m_health_max = health_max;
@@ -1952,8 +1958,8 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				{
 					crew->m_skills[i] = skills[i];
 				}
-				crew->m_is_prisoner = prisoner;
 				crew->m_tile = warship->m_tiles[coord_x][coord_y];
+				warship->m_tiles[coord_x][coord_y]->m_crew = crew;
 				crew->m_position = crew->m_tile->m_position;//sf::Vector2f(coord_x, coord_y);
 
 				if (crew->m_is_prisoner == false)
@@ -1965,6 +1971,8 @@ int Gameloop::LoadPlayerData(Warship* warship)
 					warship->m_prisoners.push_back(crew);
 				}
 			}
+
+			warship->m_nb_crew = warship->m_crew.size();
 		}
 
 		data.close();  // on ferme le fichier

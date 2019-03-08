@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRace race) : GameEntity(UI_CrewMember)
+CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRace race, bool prisoner) : GameEntity(UI_CrewMember)
 {
 	m_type = type;
 	m_alliance = alliance;
@@ -14,7 +14,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_repair_timer = HULL_REPAIR_TIMER;
 	m_drowning_timer = DROWNING_TIMER;
 	m_healing_timer = HEALING_TIMER;
-	m_is_prisoner = false;
+	m_is_prisoner = prisoner;
 	m_tile = NULL;
 
 	m_melee_opponent = NULL;
@@ -62,6 +62,11 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 			skill_max_value = 15;
 			break;
 		}
+	}
+
+	if (prisoner == true)
+	{
+		m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Prisoner]);
 	}
 
 	//randomization of skill values

@@ -1,6 +1,10 @@
-Gold 100
+Gold 120
 Fish 100
 Mech 100
 Fidelity 50
 Days 10
-Crew Leandra 1 0 20 20 19 10 17 5 13 0 5 4
+Crew Leandra 1 0 20 20 19 10 17 5 13 0 9 5
+Crew Thomas 2 0 20 20 8 4 9 5 10 0 3 2
+Crew Angela 2 0 20 20 4 4 7 10 2 0 4 2
+Crew Lucy 2 1 20 20 5 7 5 2 5 0 7 7
+Crew Lucy 2 1 20 20 4 3 6 5 10 1 0 5

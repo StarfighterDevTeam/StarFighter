@@ -16,7 +16,7 @@
 class CrewMember : public GameEntity
 {
 public:
-	CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRace race = NB_CREW_RACES);
+	CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRace race = NB_CREW_RACES, bool prisoner = false);
 	~CrewMember();
 
 	CrewMemberType m_type;

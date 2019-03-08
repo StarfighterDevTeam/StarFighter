@@ -66,6 +66,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	Room* weapon_room = AddRoom(8, 5, 3, 4, Room_Weapon);
 
 	m_health = m_health_max;
+	m_lifeboats += 4;
+	m_nb_crew_max = 8;
 
 	//center position of each room & room tiles
 	CenterRoomPositions(false);
@@ -139,11 +141,7 @@ void Warship::Init()
 	m_resources[Resource_Fidelity] = 50;
 	m_resources[Resource_Days] = 10;
 
-	//lifeboats
-	m_lifeboats += 4;
-
 	//crew
-	m_nb_crew_max = 8;
 	m_nb_crew = 0;
 
 	for (int i = 0; i < 1; i++)
