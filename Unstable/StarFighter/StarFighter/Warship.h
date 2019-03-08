@@ -54,6 +54,7 @@ public:
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
 	void Update(Time deltaTime, bool tactical_combat);
+	void Reset();
 
 	struct CombatInterface m_combat_interface[2];
 

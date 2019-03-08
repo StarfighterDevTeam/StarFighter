@@ -1957,6 +1957,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 			std::istringstream(line) >> s >> warship->m_resources[i];
 		}
 
+		warship->Reset();
 		while (std::getline(data, line))
 		{
 			string t;
