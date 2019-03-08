@@ -34,6 +34,9 @@ class Warship : public Ship
 {
 public:
 	Warship(DMS_Coord coord);
+
+	void Init();
+
 	~Warship();
 
 	float m_desired_angle;

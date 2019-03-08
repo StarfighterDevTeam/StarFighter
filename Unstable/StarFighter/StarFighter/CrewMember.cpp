@@ -15,6 +15,7 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_drowning_timer = DROWNING_TIMER;
 	m_healing_timer = HEALING_TIMER;
 	m_is_prisoner = false;
+	m_tile = NULL;
 
 	m_melee_opponent = NULL;
 	m_melee_rof_timer = 0;

@@ -16,7 +16,12 @@ Gameloop::Gameloop()
 	InitWaterZones();
 
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
-	LoadPlayerData(m_warship);
+	if (LoadPlayerData(m_warship) == 0)
+	{
+		m_warship->Init();
+		SavePlayerData(m_warship);
+	}
+	m_warship->m_combat_interface[0].Init(m_warship);
 	m_resources_interface.Init(m_warship);
 
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
@@ -71,6 +76,12 @@ void Gameloop::InitWaterZones()
 
 void Gameloop::Update(sf::Time deltaTime)
 {
+	//Saving?
+	if ((*CurrentGame).m_input_actions[Action_Saving] == Input_Tap && (*CurrentGame).m_window_has_focus == true)
+	{
+		SavePlayerData(m_warship);
+	}
+
 	GameEntity* selection = (*CurrentGame).m_selected_ui;
 	GameEntity* previous_selection = selection;
 	GameEntity* hovered = (*CurrentGame).m_hovered_ui;
@@ -1876,6 +1887,20 @@ int Gameloop::SavePlayerData(Warship* warship)
 		data << "Fidelity " << warship->m_resources[Resource_Fidelity] << endl;
 		data << "Days " << warship->m_resources[Resource_Days] << endl;
 
+		for (vector<CrewMember*>::iterator it = warship->m_crew.begin(); it != warship->m_crew.end(); it++)
+		{
+			data << "Crew " << (*it)->m_display_name << " " << (*it)->m_type << " " << (*it)->m_race << " " << (*it)->m_health << " " << (*it)->m_health_max;
+			for (int i = 0; i < NB_CREW_SKILLS; i++)
+			{
+				data << " " << (*it)->m_skills[i];
+			}
+
+			int prisoner = (*it)->m_is_prisoner == true ? 1 : 0;
+			data << " " << prisoner;
+			data << " " << (*it)->m_tile->m_coord_x << " " << (*it)->m_tile->m_coord_y;
+			data << endl;
+		}
+
 		data.close();  // on ferme le fichier
 	}
 	else  // si l'ouverture a échoué
@@ -1896,24 +1921,60 @@ int Gameloop::LoadPlayerData(Warship* warship)
 	{
 		std::string line;
 		int i = 0;
-		while (std::getline(data, line))
+		for (int i = 0; i < NB_RESOURCES_TYPES; i++)
 		{
-			//Loading data
+			std::getline(data, line);
 			string s;
 			std::istringstream(line) >> s >> warship->m_resources[i];
-			i++;
+		}
+
+		while (std::getline(data, line))
+		{
+			string t;
+			std::istringstream(line) >> t;
+
+			if (t.compare("Crew") == 0)
+			{
+				string name;
+				int type, race;
+				
+				int skills[NB_CREW_SKILLS];
+				bool prisoner;
+				int health, health_max, coord_x, coord_y;
+				std::istringstream(line) >> t >> name >> type >> race >> health >> health_max >> skills[Skill_Gunner] >> skills[Skill_Fishing] >> skills[Skill_Melee] >> skills[Skill_Navigation] >> skills[Skill_Engine] >> (bool)prisoner >> coord_x >> coord_y;
+				
+				CrewMember* crew = new CrewMember((CrewMemberType)type, Alliance_Player, (CrewMemberRace)race);
+				
+				crew->m_display_name = name;
+				crew->m_health_max = health_max;
+				crew->m_health = health;
+				for (int i = 0; i < NB_CREW_SKILLS; i++)
+				{
+					crew->m_skills[i] = skills[i];
+				}
+				crew->m_is_prisoner = prisoner;
+				crew->m_tile = warship->m_tiles[coord_x][coord_y];
+				crew->m_position = crew->m_tile->m_position;//sf::Vector2f(coord_x, coord_y);
+
+				if (crew->m_is_prisoner == false)
+				{
+					warship->m_crew.push_back(crew);
+				}
+				else
+				{
+					warship->m_prisoners.push_back(crew);
+				}
+			}
 		}
 
 		data.close();  // on ferme le fichier
-		return true;
+		return 1;
 	}
 	else  // si l'ouverture a échoué
 	{
 		cerr << "No save file found. A new file is going to be created.\n" << endl;
-		SavePlayerData(warship);
+		return 0;
 	}
-
-	return 0;
 }
 
 bool Gameloop::AddResource(Resource_Meta resource, int value)

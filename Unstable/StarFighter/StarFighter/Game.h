@@ -123,6 +123,7 @@ enum Input_Status
 enum Input_Actions
 {
 	Action_Pause,
+	Action_Saving,
 	NB_INPUT_ACTIONS,
 };
 

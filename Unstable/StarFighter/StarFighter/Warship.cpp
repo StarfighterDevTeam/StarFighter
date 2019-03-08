@@ -16,12 +16,6 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_flee_count = 0.f;
 	m_is_charging_flee_count = true;
 
-	m_resources[Resource_Gold] = 100;
-	m_resources[Resource_Fish] = 100;
-	m_resources[Resource_Mech] = 100;
-	m_resources[Resource_Fidelity] = 50;
-	m_resources[Resource_Days] = 10;
-
 	//shape for water tiles
 	m_textureName = "2D/warship_icon.png";
 	TextureLoader *loader;
@@ -134,31 +128,29 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
 		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
+}
 
-	//prison tiles
-	//for (int j = 0; j < 4; j++)
-	//{
-	//	prison_room->m_tiles[j * (prison_room->m_width)]->m_is_prison = true;
-	//	//prison_room->m_tiles[j * (prison_room->m_width)]->m_room = NULL;
-	//	RoomConnexion* connexion = new RoomConnexion(pair<RoomTile*, RoomTile*>(prison_room->m_tiles[j * (prison_room->m_width)], prison_room->m_tiles[(j * prison_room->m_width) + 1]), true, this);
-	//	m_connexions.push_back(connexion);
-	//}
+void Warship::Init()
+{
+	//resources
+	m_resources[Resource_Gold] = 100;
+	m_resources[Resource_Fish] = 100;
+	m_resources[Resource_Mech] = 100;
+	m_resources[Resource_Fidelity] = 50;
+	m_resources[Resource_Days] = 10;
 
 	//lifeboats
-	m_lifeboats += lifeboats->m_tiles.size();
+	m_lifeboats += 4;
 
-	//CREW
+	//crew
 	m_nb_crew_max = 8;
 	m_nb_crew = 0;
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		CrewMember* crew = new CrewMember(Crew_Pirate, m_alliance);
-		AddCrewMember(crew, weapon_room);
+		AddCrewMember(crew, m_rooms.front());
 	}
-
-	//Interface
-	m_combat_interface[0].Init(this);
 }
 
 Warship::~Warship()

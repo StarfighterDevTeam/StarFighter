@@ -103,6 +103,16 @@ bool InputGuy::isPausing()
 	return false;
 }
 
+bool InputGuy::isSaving()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F4))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 Vector2f InputGuy::getDirections(ControlerType device)
 {
 	short dirX = 0;

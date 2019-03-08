@@ -1,5 +1,6 @@
-Gold 105
+Gold 100
 Fish 100
-Mech 150
+Mech 100
 Fidelity 50
 Days 10
+Crew Leandra 1 0 20 20 19 10 17 5 13 0 5 4
