@@ -173,24 +173,27 @@ void Gameloop::Update(sf::Time deltaTime)
 					flood++;
 				}
 
-				UpdateRoomTileFeedback(*it2, deltaTime, m_warship);
+				UpdateRoomTileFeedback(*it2, deltaTime, ship);
 
-				//crew move order (hover tile) feedback
-				if (selection != NULL && selection->m_UI_type == UI_CrewMember)
+				//crew move order feedback (hovering tile)
+				if (i == 0)
 				{
-					(*it2)->Update(deltaTime);
-
-					//contextuel order feedback
-					if ((*it2)->IsHoveredByMouse() == true)
+					if (selection != NULL && selection->m_UI_type == UI_CrewMember)
 					{
+						(*it2)->Update(deltaTime);
+
+						//contextuel order feedback
 						CrewMember* crew = (CrewMember*)selection;
-						UpdateContextualOrderFeedback(crew, *it2);
+						if ((*it2)->IsHoveredByMouse() == true && crew->m_alliance == (*it2)->m_room->m_alliance)
+						{
+							UpdateContextualOrderFeedback(crew, *it2);
+						}
 					}
-				}
-				else
-				{
-					(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
-					(*it2)->m_shape_container.setOutlineThickness(-1.f);
+					else
+					{
+						(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+						(*it2)->m_shape_container.setOutlineThickness(-1.f);
+					}
 				}
 			}
 
@@ -207,10 +210,27 @@ void Gameloop::Update(sf::Time deltaTime)
 		//Room connexions
 		for (vector<RoomConnexion*>::iterator it = ship->m_connexions.begin(); it != ship->m_connexions.end(); it++)
 		{
-			(*it)->Update(deltaTime);
-			if ((*it)->IsHoveredByMouse() == true && (*it)->m_destroyed == false)
+			if (i == 0)
+			{ 
+				(*it)->Update(deltaTime);
+				if ((*it)->IsHoveredByMouse() == true && (*it)->m_destroyed == false && (*it)->m_tiles.first->m_room->m_alliance == Alliance_Player)
+				{
+					m_contextual_order->SetContextualOrder((*it)->m_is_locked == true ? Order_OpenRoomConnexion : Order_CloseRoomConnexion, (*it)->m_shape_container.getPosition(), true);
+				}
+			}
+			else
 			{
-				m_contextual_order->SetContextualOrder((*it)->m_is_locked == true ? Order_OpenRoomConnexion : Order_CloseRoomConnexion, (*it)->m_shape_container.getPosition(), true);
+				(*it)->UpdatePosition();
+			}
+		}
+
+		//Close/open connexion
+		if (i == 0 && mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion)
+		{
+			RoomConnexion* connexion = (RoomConnexion*)hovered;
+			if (connexion->m_ship == ship)
+			{
+				connexion->SetLock(!connexion->m_is_locked);
 			}
 		}
 
@@ -330,121 +350,49 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 		}
-	}
-	
-	//Player Weapons
-	for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
-	{
-		(*it)->Update(deltaTime);
 
-		if (m_tactical_ship != NULL && m_tactical_ship->m_sinking_timer <= 0)
+		//Move order for player's crew
+		if (i == 0 && mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_RoomTile)
 		{
-			if ((*it)->CanFire() == true)
+			CrewMember* crew = (CrewMember*)selection;
+			RoomTile* destination = (RoomTile*)hovered;
+
+			//tile is free?
+			if (destination->m_crew == NULL && destination->m_weapon == NULL)
 			{
-				if ((*it)->m_target_room == NULL)
+				//free previous destination's booking (if any)
+				if (crew->m_destination != NULL)
 				{
-					//do nothing
+					crew->m_destination->m_crew = NULL;
 				}
-				else
-				{
-					if ((*CurrentGame).m_pause == false)
-					{
-						m_warship->FireWeapon(*it, deltaTime, m_tactical_ship);
-					}
-				}
+
+				//book new destination
+				destination->m_crew = crew;
+
+				//assign destination for pathfind
+				crew->m_destination = destination;
 			}
 		}
-	}
 
-	//Player Engines
-	for (vector<Engine*>::iterator it = m_warship->m_engines.begin(); it != m_warship->m_engines.end(); it++)
-	{
-		(*it)->Update(deltaTime);
-
-		//Fleeing
-		if ((*it)->IsHoveredByMouse() == true && m_warship->m_is_fleeing == false && m_scale == Scale_Tactical)
-		{
-			m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition(), m_warship->m_flee_count == ENGINE_FLEE_COUNT);
-
-			if (mouse_click == Mouse_RightClick)
-			{
-				m_warship->m_is_fleeing = true;
-			}
-		}
-	}
-
-	//Player rudder
-	if (m_warship->m_rudder != NULL)
-	{
-		m_warship->m_rudder->Update(deltaTime);
-	}
-
-	if (m_tactical_ship != NULL)
-	{
-		//Enemy Engines
-		for (vector<Engine*>::iterator it = m_tactical_ship->m_engines.begin(); it != m_tactical_ship->m_engines.end(); it++)
+		//Weapons
+		for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
 		{
 			(*it)->Update(deltaTime);
-		}
 
-		//Enemy rudder
-		if (m_tactical_ship->m_rudder != NULL)
-		{
-			m_tactical_ship->m_rudder->Update(deltaTime);
-		}
-	}
-	
-	if (m_tactical_ship != NULL && m_warship->m_sinking_timer <= 0)
-	{
-		//Enemy weapons
-		for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
-		{
-			(*it)->Update(deltaTime);
-			if ((*it)->CanFire() == true)
+			Ship* enemy_ship = i == 0 ? m_tactical_ship : m_warship;
+			if (enemy_ship != NULL && enemy_ship->m_is_fleeing == false && enemy_ship->m_sinking_timer <= 0)
 			{
-				if ((*CurrentGame).m_pause == false)
+				if ((*it)->m_target_room == NULL && i == 1)
 				{
-					//Assign targeted room
-					if ((*it)->m_target_room == NULL)
+					//AI choosing a target for each weapon
+					UpdateAITargetRoom(*it);
+				}
+
+				if ((*it)->CanFire() == true && (*it)->m_target_room != NULL && (*CurrentGame).m_pause == false)
+				{
+					if (ship->FireWeapon(*it, deltaTime, enemy_ship) == true && i == 1)
 					{
-						vector<Room*> possible_rooms;
-						for (vector<Room*>::iterator it2 = m_warship->m_rooms.begin(); it2 != m_warship->m_rooms.end(); it2++)
-						{
-							if ((*it2)->m_type == Room_PrisonCell)
-							{
-								continue;
-							}
-
-							if ((*it)->m_type == Weapon_Torpedo)
-							{
-								for (vector<RoomTile*>::iterator it3 = (*it2)->m_tiles.begin(); it3 != (*it2)->m_tiles.end(); it3++)
-								{
-									if ((*it3)->m_hull == Hull_Right && (*it3)->m_is_pierced == false && (*it3)->m_weapon == NULL)
-									{
-										possible_rooms.push_back(*it2);
-										break;
-									}
-								}
-							}
-							else
-							{
-								possible_rooms.push_back(*it2);
-							}
-						}
-
-						if (possible_rooms.empty() == false)
-						{
-							int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
-							(*it)->m_target_room = possible_rooms[r];
-						}
-					}
-
-					//Fire
-					bool fired = m_tactical_ship->FireWeapon(*it, deltaTime, m_warship);
-
-					//Change targeted room at times (randomly, or each type if the weapon is a torpedo-type)
-					if (fired == true)
-					{
+						//After firing, it's the AI, randomly reset the target at random to change target next frame
 						if ((*it)->m_type == Weapon_Torpedo || RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE)
 						{
 							(*it)->m_target_room = NULL;
@@ -453,39 +401,31 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 		}
-	}
 
-	//ACTIONS
-	//Crew move to room
-	if (mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_RoomTile)
-	{
-		CrewMember* crew = (CrewMember*)selection;
-		RoomTile* destination = (RoomTile*)hovered;
-
-		//tile is free?
-		if (destination->m_crew == NULL && destination->m_weapon == NULL)
+		//Engines
+		for (vector<Engine*>::iterator it = ship->m_engines.begin(); it != ship->m_engines.end(); it++)
 		{
-			//free previous destination's booking (if any)
-			if (crew->m_destination != NULL)
+			(*it)->Update(deltaTime);
+
+			//Fleeing order for human
+			if (i == 0 && (*it)->IsHoveredByMouse() == true && m_scale == Scale_Tactical)
 			{
-				crew->m_destination->m_crew = NULL;
+				m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition(), ship->m_flee_count == ENGINE_FLEE_COUNT);
+				if (mouse_click == Mouse_RightClick)
+				{
+					ship->m_is_fleeing = true;
+				}
 			}
-
-			//book new destination
-			destination->m_crew = crew;
-
-			//assign destination for pathfind
-			crew->m_destination = destination;
+			else if (i == 1)
+			{
+				//IA fleeing (todo)
+			}
 		}
-	}
 
-	//Close/open doors
-	else if (mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion)
-	{
-		RoomConnexion* connexion = (RoomConnexion*)hovered;
-		if (connexion->m_ship == m_warship)
+		//Rudder
+		if (ship->m_rudder != NULL)
 		{
-			connexion->SetLock(!connexion->m_is_locked);
+			ship->m_rudder->Update(deltaTime);
 		}
 	}
 
@@ -1780,6 +1720,43 @@ void Gameloop::UpdateAICrew(CrewMember* crew)
 					crew->m_destination = destination;
 				}
 			}
+		}
+	}
+}
+
+void Gameloop::UpdateAITargetRoom(Weapon* weapon)
+{
+	if (weapon->m_target_room == NULL)
+	{
+		vector<Room*> possible_rooms;
+		for (vector<Room*>::iterator it2 = m_warship->m_rooms.begin(); it2 != m_warship->m_rooms.end(); it2++)
+		{
+			if ((*it2)->m_type == Room_PrisonCell)
+			{
+				continue;
+			}
+
+			if (weapon->m_type == Weapon_Torpedo)
+			{
+				for (vector<RoomTile*>::iterator it3 = (*it2)->m_tiles.begin(); it3 != (*it2)->m_tiles.end(); it3++)
+				{
+					if ((*it3)->m_hull == Hull_Right && (*it3)->m_is_pierced == false && (*it3)->m_weapon == NULL)
+					{
+						possible_rooms.push_back(*it2);
+						break;
+					}
+				}
+			}
+			else
+			{
+				possible_rooms.push_back(*it2);
+			}
+		}
+
+		if (possible_rooms.empty() == false)
+		{
+			int r = RandomizeIntBetweenValues(0, possible_rooms.size() - 1);
+			weapon->m_target_room = possible_rooms[r];
 		}
 	}
 }

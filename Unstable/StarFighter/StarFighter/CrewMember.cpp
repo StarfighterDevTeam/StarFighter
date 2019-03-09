@@ -285,7 +285,15 @@ void CrewMember::Update(Time deltaTime)
 		}
 	}
 
-	GameEntity::Update(deltaTime);
+	//player's crew can be selected, not enemy's
+	if (m_alliance == Alliance_Player)
+	{
+		GameEntity::Update(deltaTime);
+	}
+	else
+	{
+		GameEntity::UpdatePosition();
+	}
 
 	UpdateLifeBar();
 }

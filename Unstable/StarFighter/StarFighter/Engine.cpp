@@ -61,5 +61,12 @@ void Engine::Update(Time deltaTime)
 {
 	m_position = m_tile->m_position;
 
-	GameEntity::Update(deltaTime);
+	if (m_tile->m_room->m_alliance == Alliance_Player)
+	{
+		GameEntity::Update(deltaTime);
+	}
+	else
+	{
+		GameEntity::UpdatePosition();
+	}
 }

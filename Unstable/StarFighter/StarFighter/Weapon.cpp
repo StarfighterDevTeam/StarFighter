@@ -100,7 +100,14 @@ void Weapon::Update(Time deltaTime)
 		}
 	}
 
-	GameEntity::Update(deltaTime);
+	if (m_tile->m_room->m_alliance == Alliance_Player)
+	{
+		GameEntity::Update(deltaTime);
+	}
+	else
+	{
+		GameEntity::UpdatePosition();
+	}
 
 	//UI lifebar
 	sf::Vector2f position = m_position + m_ship_offset;
