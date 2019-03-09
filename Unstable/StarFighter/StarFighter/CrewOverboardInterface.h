@@ -24,7 +24,7 @@ struct CrewOverboardInterface
 	void Init(Ship* ship, Ship* enemy_ship);
 	void Destroy();
 
-	void Update(sf::Time deltaTime);
+	bool Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 
 	int m_slots_avaible;

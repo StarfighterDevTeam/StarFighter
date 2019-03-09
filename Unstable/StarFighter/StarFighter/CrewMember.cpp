@@ -594,3 +594,4 @@ void CrewMember::UpdateMelee(sf::Time deltaTime)
 		}
 	}
 }
+

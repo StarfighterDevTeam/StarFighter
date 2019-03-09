@@ -46,27 +46,19 @@ void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 
 	//get prisoners among survivors
 	int crew_size = 0;
-	for (vector<CrewMember*>::iterator it = enemy_ship->m_crew.begin(); it != enemy_ship->m_crew.end(); it++)
-	{
-		if ((*it)->m_health > 0)
-		{
-			(*it)->m_tile = NULL;
-			(*it)->m_destination = NULL;
-			(*it)->m_speed = sf::Vector2f(0, 0);
-			(*it)->m_melee_opponent = NULL;
-			crew_size++;
-		}
-	}
 
-	for (vector<CrewMember*>::iterator it = enemy_ship->m_prisoners.begin(); it != enemy_ship->m_prisoners.end(); it++)
+	for (int j = 0; j < 2; j++)
 	{
-		if ((*it)->m_health > 0)
+		for (vector<CrewMember*>::iterator it = enemy_ship->m_crew[j].begin(); it != enemy_ship->m_crew[j].end(); it++)
 		{
-			(*it)->m_tile = NULL;
-			(*it)->m_destination = NULL;
-			(*it)->m_speed = sf::Vector2f(0, 0);
-			(*it)->m_melee_opponent = NULL;
-			crew_size++;
+			if ((*it)->m_health > 0)
+			{
+				(*it)->m_tile = NULL;
+				(*it)->m_destination = NULL;
+				(*it)->m_speed = sf::Vector2f(0, 0);
+				(*it)->m_melee_opponent = NULL;
+				crew_size++;
+			}
 		}
 	}
 
@@ -148,15 +140,12 @@ void CrewOverboardInterface::Init(Ship* ship, Ship* enemy_ship)
 	}
 }
 
-void CrewOverboardInterface::Update(sf::Time deltaTime)
+bool CrewOverboardInterface::Update(sf::Time deltaTime)
 {
 	//rescue?
-	for (int i = 0; i < 2; i++)
+	for (int j = 0; j < 2; j++)
 	{
-		vector<CrewMember*>::iterator begin = i == 0 ? m_enemy_ship->m_crew.begin() : m_enemy_ship->m_prisoners.begin();
-		vector<CrewMember*>::iterator end = i == 0 ? m_enemy_ship->m_crew.end() : m_enemy_ship->m_prisoners.end();
-
-		for (vector<CrewMember*>::iterator it = begin; it != end; it++)
+		for (vector<CrewMember*>::iterator it = m_enemy_ship->m_crew[j].begin(); it != m_enemy_ship->m_crew[j].end(); it++)
 		{
 			if ((*it)->IsHoveredByMouse() == true)
 			{
@@ -203,18 +192,15 @@ void CrewOverboardInterface::Update(sf::Time deltaTime)
 	}
 
 	//end = exit
-	if (m_drowning_timer <= 0)
+	if (m_drowning_timer <= 0 || m_rescued.size() >= m_slots_avaible)
 	{
 		//kill leftovers
-		for (vector<CrewMember*>::iterator it = m_rescued.begin(); it != m_rescued.end(); it++)
+		for (int j = 0; j < 2; j++)
 		{
-			bool found = false;
-			for (int j = 0; j < 2; j++)
+			for (vector<CrewMember*>::iterator it = m_enemy_ship->m_crew[j].begin(); it != m_enemy_ship->m_crew[j].end(); it++)
 			{
-				vector<CrewMember*>::iterator begin = j == 0 ? m_enemy_ship->m_crew.begin() : m_enemy_ship->m_prisoners.begin();
-				vector<CrewMember*>::iterator end = j == 0 ? m_enemy_ship->m_crew.end() : m_enemy_ship->m_prisoners.end();
-
-				for (vector<CrewMember*>::iterator it2 = begin; it2 != end; it2++)
+				bool found = false;
+				for (vector<CrewMember*>::iterator it2 = m_rescued.begin(); it2 != m_rescued.end(); it2++)
 				{
 					if (*it == *it2)
 					{
@@ -222,17 +208,27 @@ void CrewOverboardInterface::Update(sf::Time deltaTime)
 						break;
 					}
 				}
-			}
 
-			if (found == false)
-			{
-				delete *it;
+				if (found == false)
+				{
+					delete *it;
+				}
 			}
 		}
 
-		m_enemy_ship->m_crew.clear();
-		m_enemy_ship->m_prisoners.clear();
-	}	
+		for (int j = 0; j < 2; j++)
+		{
+			m_enemy_ship->m_crew[j].clear();
+		}
+
+		m_crew_interface.Destroy();
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void CrewOverboardInterface::Draw(sf::RenderTexture& screen)

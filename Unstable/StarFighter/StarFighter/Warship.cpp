@@ -900,18 +900,3 @@ bool Warship::RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* t
 
 	return false;
 }
-
-void Warship::Reset()
-{
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
-	{
-		delete *it;
-	}
-	m_crew.clear();
-
-	for (vector<CrewMember*>::iterator it = m_prisoners.begin(); it != m_prisoners.end(); it++)
-	{
-		delete *it;
-	}
-	m_prisoners.clear();
-}

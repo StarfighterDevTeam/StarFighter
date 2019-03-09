@@ -56,7 +56,12 @@ public:
 
 	int SavePlayerData(Warship* warship);
 	int LoadPlayerData(Warship* warship);
+	bool GetSaveOrLoadInputs();
 
+	void UpdateContextualOrderFeedback(CrewMember* crew, RoomTile* tile);
+	void UpdateTargetRoom(Weapon* weapon, Room* room_hovered);
+
+	void UpdateAICrew(CrewMember* crew);
 	bool AddResource(Resource_Meta resource, int value);
 
 private:

@@ -1,7 +1,13 @@
-DMS 0 8  0 6
-Gold 100
+DMS 0 9  0 7
+Gold 120
 Fish 100
 Mech 100
 Fidelity 50
 Days 10
-Crew Lucy 1 1 20 20 17 20 6 9 7 0 2 1
+Crew Lucy 1 1 20 20 17 20 6 9 7 0 9 5
+Crew Serena 2 2 20 20 7 9 6 7 5 0 9 6
+Crew Lucy 2 2 20 20 8 6 9 3 2 0 3 7
+Crew Serena 2 0 20 20 7 6 4 6 10 0 7 7
+Crew Serena 2 2 20 20 6 9 6 7 4 1 0 5
+Crew Thomas 2 2 20 20 2 2 3 8 3 1 0 6
+Crew Leandra 2 0 20 20 4 4 5 3 6 1 0 7

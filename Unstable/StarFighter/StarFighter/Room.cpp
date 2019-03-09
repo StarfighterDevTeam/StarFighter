@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type) : GameEntity(UI_Room)
+Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type, ShipAlliance alliance) : GameEntity(UI_Room)
 {
 	m_upcorner_x = upcorner_x;
 	m_upcorner_y = upcorner_y;
@@ -11,6 +11,7 @@ Room::Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 	m_type = type;
 	m_UI_type = UI_Room;
 	m_is_flooded = false;
+	m_alliance = alliance;
 
 	m_size = sf::Vector2f(ROOMTILE_SIZE * width, ROOMTILE_SIZE * height);
 	m_position.x = ROOMTILE_OFFSET_X + (-0.5f + upcorner_x + width * 0.5f) * ROOMTILE_SIZE;

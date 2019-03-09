@@ -11,10 +11,11 @@ class Engine;
 class Room : public GameEntity
 {
 public:
-	Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type);
+	Room(int upcorner_x, int upcorner_y, int width, int height, RoomType type, ShipAlliance alliance);
 	~Room();
 
 	RoomType m_type;
+	ShipAlliance m_alliance;
 
 	int m_upcorner_x;
 	int m_upcorner_y;

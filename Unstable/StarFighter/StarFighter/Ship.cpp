@@ -187,7 +187,7 @@ void Ship::GetAngleForSpeed(float& angle)
 
 Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomType type)
 {
-	Room* room = new Room(upcorner_x, upcorner_y, width, height, type);
+	Room* room = new Room(upcorner_x, upcorner_y, width, height, type, m_alliance);
 	m_rooms.push_back(room);
 
 	if (upcorner_x < m_rooms_min_upcorner_x)
@@ -246,7 +246,7 @@ CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 	crew->m_position = tile->m_position;
 
 	//add to crew lists
-	m_crew.push_back(crew);
+	m_crew[0].push_back(crew);
 
 	//assign crew to tile
 	crew->m_tile = tile;
@@ -775,11 +775,16 @@ void Ship::CenterRoomPositions(bool is_enemy)
 		(*it)->m_position = sf::Vector2f(0.5f * ((*it)->m_tiles.first->m_position.x + (*it)->m_tiles.second->m_position.x), 0.5f * ((*it)->m_tiles.first->m_position.y + (*it)->m_tiles.second->m_position.y));
 	}
 
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	//crew & prisoners
+	for (int j = 0; j < 2; j++)
 	{
-		(*it)->m_position = (*it)->m_tile->m_position;
+		for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+		{
+			(*it)->m_position = (*it)->m_tile->m_position;
+		}
 	}
 
+	//weapons
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
 		(*it)->m_position = (*it)->m_tile->m_position;
@@ -789,6 +794,9 @@ void Ship::CenterRoomPositions(bool is_enemy)
 
 void Ship::InitCombat()
 {
+	m_ship_offset = sf::Vector2f(0.f, 0.f);
+	m_speed = sf::Vector2f(0.f, 0.f);
+
 	//reset weapon rof timers
 	for (vector<Weapon*>::iterator it = m_weapons.begin(); it != m_weapons.end(); it++)
 	{
@@ -799,6 +807,9 @@ void Ship::InitCombat()
 	//reset flee timer and counter
 	m_flee_timer = 0.f;
 	m_flee_count = 0.f;
+	m_is_fleeing = false;
+	m_sinking_timer = 0.f;
+	ApplyAlphaToShip(255);//and cancel alpha from sinking feedback
 }
 
 void Ship::RestoreHealth()
@@ -825,9 +836,13 @@ void Ship::RestoreHealth()
 			}
 		}
 	}
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+
+	for (int j = 0; j < 2; j++)
 	{
-		(*it)->m_health = (*it)->m_health_max;
+		for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+		{
+			(*it)->m_health = (*it)->m_health_max;
+		}
 	}
 }
 
@@ -1036,9 +1051,12 @@ void Ship::UpdateShipOffset()
 	}
 
 	//crew
-	for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+	for (int j = 0; j < 2; j++)
 	{
-		(*it)->m_ship_offset = m_ship_offset;
+		for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+		{
+			(*it)->m_ship_offset = m_ship_offset;
+		}
 	}
 }
 
@@ -1171,19 +1189,15 @@ void Ship::UpdateSinking(Time deltaTime)
 		ApplyAlphaToShip(alpha);
 
 		//stop crew members
-		for (vector<CrewMember*>::iterator it = m_crew.begin(); it != m_crew.end(); it++)
+		for (int j = 0; j < 2; j++)
 		{
-			//(*it)->m_tile = NULL;
-			(*it)->m_destination = NULL;
-			(*it)->m_speed = sf::Vector2f(0, 0);
-			(*it)->m_melee_opponent = NULL;
-		}
-		for (vector<CrewMember*>::iterator it = m_prisoners.begin(); it != m_prisoners.end(); it++)
-		{
-			//(*it)->m_tile = NULL;
-			(*it)->m_destination = NULL;
-			(*it)->m_speed = sf::Vector2f(0, 0);
-			(*it)->m_melee_opponent = NULL;
+			for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+			{
+				//(*it)->m_tile = NULL;
+				(*it)->m_destination = NULL;
+				(*it)->m_speed = sf::Vector2f(0, 0);
+				(*it)->m_melee_opponent = NULL;
+			}
 		}
 	}
 }
@@ -1232,7 +1246,7 @@ bool Ship::ImprisonCrew(CrewMember* crew)
 
 
 	//free cell found
-	m_prisoners.push_back(crew);
+	m_crew[1].push_back(crew);
 	crew->m_alliance = m_alliance;
 
 	return true;
@@ -1304,4 +1318,18 @@ void Ship::EscapeToRandomTileInRoom(CrewMember* crew, Room* room)
 		crew->m_destination = possible_tiles[r2];
 		crew->m_prisoner_roaming_timer = RandomizeFloatBetweenValues(PRISONER_ROAM_TIMER_MIN, PRISONER_ROAM_TIMER_MAX);
 	}
+}
+
+void Ship::Reset()
+{
+	for (int j = 0; j < 2; j++)
+	{
+		for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+		{
+			delete *it;
+		}
+		m_crew[j].clear();
+	}
+
+	m_speed = sf::Vector2f(0, 0);
 }

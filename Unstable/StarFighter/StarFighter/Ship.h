@@ -32,16 +32,13 @@ public:
 
 	vector<Room*> m_rooms;
 	vector<RoomConnexion*> m_connexions;
-	vector<CrewMember*> m_crew;
+	vector<CrewMember*> m_crew[2];
 	vector<Weapon*> m_weapons;
 	vector<vector<RoomTile*> > m_tiles;
 	vector<Engine*> m_engines;
 	Rudder* m_rudder;
 	vector<RoomTile*> m_prison_cells;
-	vector<CrewMember*> m_prisoners;
 
-	//int m_nb_crew[NB_CREW_TYPES];
-	//int m_nb_crew_working[NB_CREW_TYPES];
 	int m_nb_crew;
 	int m_nb_crew_max;
 	int m_health_max;
@@ -95,6 +92,7 @@ public:
 
 	void BuildShip();
 	void CenterRoomPositions(bool is_enemy);
+	void Reset();
 
 	void UpdateFlooding(Time deltaTime);
 	void UpdateShipOffset();

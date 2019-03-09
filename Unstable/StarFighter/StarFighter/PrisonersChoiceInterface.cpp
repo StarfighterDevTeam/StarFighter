@@ -42,32 +42,21 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 	m_ship = ship;
 
 	//get prisoners among survivors
-	for (vector<CrewMember*>::iterator it = enemy_ship->m_crew.begin(); it != enemy_ship->m_crew.end(); it++)
+	for (int j = 0; j < 2; j++)
 	{
-		if ((*it)->m_health > 0)
+		for (vector<CrewMember*>::iterator it = enemy_ship->m_crew[j].begin(); it != enemy_ship->m_crew[j].end(); it++)
 		{
-			m_crew.push_back(*it);
-			(*it)->m_tile = NULL;
-			(*it)->m_destination = NULL;
-			(*it)->m_speed = sf::Vector2f(0, 0);
-			(*it)->m_melee_opponent = NULL;
+			if ((*it)->m_health > 0)
+			{
+				m_crew.push_back(*it);
+				(*it)->m_tile = NULL;
+				(*it)->m_destination = NULL;
+				(*it)->m_speed = sf::Vector2f(0, 0);
+				(*it)->m_melee_opponent = NULL;
+			}
 		}
+		enemy_ship->m_crew[j].clear();
 	}
-	enemy_ship->m_crew.clear();
-
-	for (vector<CrewMember*>::iterator it = enemy_ship->m_prisoners.begin(); it != enemy_ship->m_prisoners.end(); it++)
-	{
-		if ((*it)->m_health > 0)
-		{
-			m_crew.push_back(*it);
-			(*it)->m_tile = NULL;
-			(*it)->m_destination = NULL;
-			(*it)->m_speed = sf::Vector2f(0, 0);
-			(*it)->m_melee_opponent = NULL;
-		}
-	}
-	enemy_ship->m_prisoners.clear();
-	
 
 	//no prisoner = no need for a menu
 	int crew_size = m_crew.size();
