@@ -9,6 +9,9 @@
 #include "Island.h"
 #include "CombatInterface.h"
 
+#define	CRUISE_SPEED					50.f
+#define ANGLE_SPEED						30.f
+
 class Ship : public GameEntity
 {
 public:
@@ -24,8 +27,10 @@ public:
 	float m_angle;
 	bool m_can_be_seen;
 
-	void Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat);
 	void UpdatePosition(DMS_Coord warship_DMS);
+	void UpdateTactical(Time deltaTime);
+	void UpdateStrategical(Time deltaTime);
+
 	bool SetDMSCoord(DMS_Coord coord);
 
 	void UpdateAnimation();
@@ -107,11 +112,28 @@ public:
 	static bool IsSystemOperational(ShipSystem system, RoomTile* tile);
 	float GetDodgeChances();
 
+	//navigation
+	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
+	bool CanViewWaterTile(WaterTile* tile);
+	int GetDistanceToWaterTile(WaterTile* tile);
+	float GetDistanceFloatToWaterTile(WaterTile* tile);
+	bool SetSailsToWaterTile(WaterTile* tile);
+	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
+
 private:
 	int m_rooms_min_upcorner_x;
 	int m_rooms_min_upcorner_y;
 	int m_rooms_max_offset_x;
 	int m_rooms_max_offset_y;
+
+	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);
+	void IteratePathFinding(WaterTile* tileA, WaterTile* tileB);
+	list<WaterTile*> m_closed_list_pathfind;
+	list<WaterTile*> m_open_list_pathfind;
+
+	bool RayTracingContainsIsland(WaterTile* tileA, WaterTile* tileB);
+	bool RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* tileB);
+	void RayTracingGetPath(WaterTile* tileA, WaterTile* tileB);
 };
 
 #endif //SHIP_H_INCLUDED

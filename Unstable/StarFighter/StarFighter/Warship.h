@@ -14,8 +14,7 @@
 
 #include <fstream>
 
-#define	CRUISE_SPEED					50.f
-#define ANGLE_SPEED						30.f
+
 
 #define COMPASS_MODE					false
 
@@ -45,26 +44,9 @@ public:
 	struct PrisonersChoiceInterface m_prisoners_choice_interface;
 	struct CrewOverboardInterface m_crew_overboard_interface;
 
-	float GetDistanceSquaredInSecondsDMS(WaterTile* tile);
-	bool CanViewWaterTile(WaterTile* tile);
-	int GetDistanceToWaterTile(WaterTile* tile);
-	float GetDistanceFloatToWaterTile(WaterTile* tile);
-	bool SetSailsToWaterTile(WaterTile* tile);
-	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
-
-	void Update(Time deltaTime, bool tactical_combat);
+	void UpdateOLD(Time deltaTime, bool tactical_combat);
 
 	int m_resources[NB_RESOURCES_TYPES];
-
-private:
-	void FindShortestPath(WaterTile* tileA, WaterTile* tileB);
-	void IteratePathFinding(WaterTile* tileA, WaterTile* tileB);
-	list<WaterTile*> m_closed_list_pathfind;
-	list<WaterTile*> m_open_list_pathfind;
-
-	bool RayTracingContainsIsland(WaterTile* tileA, WaterTile* tileB);
-	bool RayTracingContainsIslandForPathfind(WaterTile* tileA, WaterTile* tileB);
-	void RayTracingGetPath(WaterTile* tileA, WaterTile* tileB);
 };
 
 #endif //WARSHIP_H_INCLUDED

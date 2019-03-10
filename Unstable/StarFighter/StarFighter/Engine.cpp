@@ -69,4 +69,6 @@ void Engine::Update(Time deltaTime)
 	{
 		GameEntity::UpdatePosition();
 	}
+
+	m_systembar->UpdatePosition();
 }

@@ -533,7 +533,7 @@ RoomTile* CrewMember::GetFreeRoomTile(Room* room)
 {
 	for (vector<RoomTile*>::iterator it = room->m_tiles.begin(); it != room->m_tiles.end(); it++)
 	{
-		if (((*it)->m_crew == NULL && (*it)->m_weapon == NULL) || (*it)->m_crew == this)
+		if (((*it)->m_crew == NULL && (*it)->m_weapon == NULL && (*it)->m_system == NULL) || (*it)->m_crew == this)
 		{
 			return *it;
 		}
