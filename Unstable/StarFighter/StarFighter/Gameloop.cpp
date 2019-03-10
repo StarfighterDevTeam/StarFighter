@@ -352,25 +352,24 @@ void Gameloop::Update(sf::Time deltaTime)
 							if (i == 0)
 							{
 								//create or update HUD for crew details
-								Warship* warship = (Warship*)ship;
-								if ((*it)->m_hovered == true && warship->m_crew_interface.m_crew != *it)
+								if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
 								{
-									warship->m_crew_interface.Destroy();
-									warship->m_crew_interface.Init(*it);
+									m_warship->m_crew_interface.Destroy();
+									m_warship->m_crew_interface.Init(*it);
 								}
-								else if ((*it)->m_selected == true && warship->m_crew_interface.m_crew != *it && (warship->m_crew_interface.m_crew == NULL || warship->m_crew_interface.m_crew->m_hovered == false))
+								else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (m_warship->m_crew_interface.m_crew == NULL || m_warship->m_crew_interface.m_crew->m_hovered == false))
 								{
-									warship->m_crew_interface.Destroy();
-									warship->m_crew_interface.Init(*it);
+									m_warship->m_crew_interface.Destroy();
+									m_warship->m_crew_interface.Init(*it);
 								}
-								else if (warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
+								else if (m_warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
 								{
-									warship->m_crew_interface.Destroy();
+									m_warship->m_crew_interface.Destroy();
 								}
 
-								if (warship->m_crew_interface.m_crew == *it)
+								if (m_warship->m_crew_interface.m_crew == *it)
 								{
-									warship->m_crew_interface.Update();
+									m_warship->m_crew_interface.Update();
 								}
 							}
 							else
@@ -436,37 +435,47 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//Weapons
-			for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
+			if (m_scale == Scale_Tactical)
 			{
-				if (ship->m_is_fleeing == false)
+				for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
 				{
-					(*it)->Update(deltaTime);
-
-					Ship* enemy_ship = i == 0 ? m_tactical_ship : m_warship;
-					if (enemy_ship != NULL && enemy_ship->m_is_fleeing == false && enemy_ship->m_sinking_timer <= 0)
+					if (ship->m_is_fleeing == false)
 					{
-						if ((*it)->m_target_room == NULL && i == 1)
-						{
-							//AI choosing a target for each weapon
-							UpdateAITargetRoom(*it);
-						}
+						(*it)->Update(deltaTime);
 
-						if ((*it)->CanFire() == true && (*it)->m_target_room != NULL && (*CurrentGame).m_pause == false)
+						Ship* enemy_ship = i == 0 ? m_tactical_ship : m_warship;
+						if (enemy_ship != NULL && enemy_ship->m_is_fleeing == false && enemy_ship->m_sinking_timer <= 0)
 						{
-							if (ship->FireWeapon(*it, deltaTime, enemy_ship) == true && i == 1)
+							if ((*it)->m_target_room == NULL && i == 1)
 							{
-								//After firing, it's the AI, randomly reset the target at random to change target next frame
-								if ((*it)->m_type == Weapon_Torpedo || RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE)
+								//AI choosing a target for each weapon
+								UpdateAITargetRoom(*it);
+							}
+
+							if ((*it)->CanFire() == true && (*it)->m_target_room != NULL && (*CurrentGame).m_pause == false)
+							{
+								if (ship->FireWeapon(*it, deltaTime, enemy_ship) == true && i == 1)
 								{
-									(*it)->m_target_room = NULL;
+									//After firing, it's the AI, randomly reset the target at random to change target next frame
+									if ((*it)->m_type == Weapon_Torpedo || RandomizeFloatBetweenValues(0.f, 1.f) < AI_CHANGE_TARGETROOM_PERCENTAGE)
+									{
+										(*it)->m_target_room = NULL;
+									}
 								}
 							}
 						}
 					}
+					else
+					{
+						(*it)->UpdatePosition();
+					}
 				}
-				else
+			}
+			else
+			{
+				for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
 				{
-					(*it)->UpdatePosition();
+					(*it)->GameEntity::Update(deltaTime);
 				}
 			}
 
@@ -489,13 +498,6 @@ void Gameloop::Update(sf::Time deltaTime)
 							//remove hovering feedback
 							(*it)->m_shape_container.setOutlineColor((*it)->m_default_color);
 							(*it)->m_shape_container.setOutlineThickness(-1.f);
-
-							//destroy crew interface
-							Warship* warship = (Warship*)ship;
-							if (warship->m_crew_interface.m_crew != NULL)
-							{
-								warship->m_crew_interface.Destroy();
-							}
 						}
 					}
 					else if (i == 1)
@@ -774,7 +776,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							Ship* ship_in_combat_range = NULL;
 							for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
 							{
-								if ((*it3)->m_can_be_seen == false)
+								if ((*it3) == m_warship || (*it3)->m_can_be_seen == false)
 								{
 									continue;
 								}
@@ -883,197 +885,9 @@ void Gameloop::Draw()
 {
 	(*CurrentGame).m_mainScreen.clear();
 
-	//PIRATES
-
 	//background
 	m_background->Draw((*CurrentGame).m_mainScreen);
 
-	//room tiles
-	if (m_warship->m_sinking_timer < SHIP_SINKING_TIME)
-	{
-		GameEntity* focused_room_tile = NULL;
-		for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
-		{
-			if (((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui == *it) || ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui == *it))
-			{
-				focused_room_tile = *it;//draw focused tile in last, so its outline appears above others
-			}
-			else
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-		}
-		if (focused_room_tile != NULL)
-		{
-			focused_room_tile->Draw((*CurrentGame).m_mainScreen);
-		}
-
-		//rooms
-		for (vector<Room*>::iterator it = m_warship->m_rooms.begin(); it != m_warship->m_rooms.end(); it++)
-		{
-			(*it)->Draw((*CurrentGame).m_mainScreen);
-		}
-
-		//doors
-		for (vector<RoomConnexion*>::iterator it = m_warship->m_connexions.begin(); it != m_warship->m_connexions.end(); it++)
-		{
-			(*it)->Draw((*CurrentGame).m_mainScreen);
-		}
-
-		//weapons
-		for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
-		{
-			(*it)->Draw((*CurrentGame).m_mainScreen);
-		}
-
-		//engines
-		for (vector<Engine*>::iterator it = m_warship->m_engines.begin(); it != m_warship->m_engines.end(); it++)
-		{
-			(*it)->Draw((*CurrentGame).m_mainScreen);
-		}
-
-		//rudder
-		if (m_warship->m_rudder != NULL)
-		{
-			m_warship->m_rudder->Draw((*CurrentGame).m_mainScreen);
-		}
-
-		//crew
-		for (int j = 0; j < 2; j++)
-		{
-			for (vector<CrewMember*>::iterator it = m_warship->m_crew[j].begin(); it != m_warship->m_crew[j].end(); it++)
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-		}
-
-		//lifebars & rofbars
-		if (m_scale == Scale_Tactical && m_warship->m_is_fleeing == false && m_warship->m_sinking_timer == 0.f)
-		{
-			for (vector<Weapon*>::iterator it = m_warship->m_weapons.begin(); it != m_warship->m_weapons.end(); it++)
-			{
-				(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
-
-				if ((*it)->m_health < (*it)->m_health_max)
-				{
-					(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-				}
-			}
-
-			//engine bars
-			if (m_warship->m_flee_count > 0)
-			{
-				for (vector<Engine*>::iterator it = m_warship->m_engines.begin(); it != m_warship->m_engines.end(); it++)
-				{
-					(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
-				}
-			}
-		}
-
-		for (int j = 0; j < 2; j++)
-		{
-			for (vector<CrewMember*>::iterator it = m_warship->m_crew[j].begin(); it != m_warship->m_crew[j].end(); it++)
-			{
-				if ((*it)->m_health < (*it)->m_health_max)
-				{
-					(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-				}
-			}
-		}
-	}
-	
-	//enemy rooms
-	if (m_tactical_ship != NULL)
-	{
-		if (m_tactical_ship->m_sinking_timer < SHIP_SINKING_TIME)
-		{
-			//room tiles
-			for (vector<RoomTile*>::iterator it = (*CurrentGame).m_enemy_tiles.begin(); it != (*CurrentGame).m_enemy_tiles.end(); it++)
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-
-			//rooms
-			for (vector<Room*>::iterator it = m_tactical_ship->m_rooms.begin(); it != m_tactical_ship->m_rooms.end(); it++)
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-
-			//doors
-			for (vector<RoomConnexion*>::iterator it = m_tactical_ship->m_connexions.begin(); it != m_tactical_ship->m_connexions.end(); it++)
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-
-			//weapons
-			for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-
-			//engines
-			for (vector<Engine*>::iterator it = m_tactical_ship->m_engines.begin(); it != m_tactical_ship->m_engines.end(); it++)
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-
-			//rudder
-			if (m_tactical_ship->m_rudder != NULL)
-			{
-				m_tactical_ship->m_rudder->Draw((*CurrentGame).m_mainScreen);
-			}
-		}
-
-		//crew
-		for (int j = 0; j < 2; j++)
-		{
-			for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew[j].begin(); it != m_tactical_ship->m_crew[j].end(); it++)
-			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-		}
-
-		//lifebars & rofbars
-		if (m_tactical_ship->m_sinking_timer < SHIP_SINKING_TIME)
-		{
-			if (m_scale == Scale_Tactical && m_tactical_ship->m_is_fleeing == false && m_tactical_ship->m_sinking_timer == 0.f)
-			{
-				for (vector<Weapon*>::iterator it = m_tactical_ship->m_weapons.begin(); it != m_tactical_ship->m_weapons.end(); it++)
-				{
-					(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
-					if ((*it)->m_health < (*it)->m_health_max)
-					{
-						(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-					}
-				}
-
-				for (int j = 0; j < 2; j++)
-				{
-					for (vector<CrewMember*>::iterator it = m_tactical_ship->m_crew[j].begin(); it != m_tactical_ship->m_crew[j].end(); it++)
-					{
-						if ((*it)->m_health < (*it)->m_health_max)
-						{
-							(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
-						}
-					}
-				}
-
-				//systems bars
-				if (m_tactical_ship->m_flee_count > 0)
-				{
-					for (vector<Engine*>::iterator it = m_tactical_ship->m_engines.begin(); it != m_tactical_ship->m_engines.end(); it++)
-					{
-						(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
-					}
-				}
-			}
-		}
-	}
-
-	
-
-	//WATER PART
-	//boat
 	if (m_scale == Scale_Strategic)
 	{
 		//water tiles
@@ -1111,49 +925,138 @@ void Gameloop::Draw()
 				(*it)->m_seaport->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
+	}
 
-		//player boat
-		m_warship->Draw((*CurrentGame).m_mainScreen);
-
-		//compass
-		//m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
-
-		//enemy
-		for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+	//ships
+	int shipsVectorSize = m_ships.size();
+	for (int i = 0; i < shipsVectorSize; i++)
+	{
+		Ship* ship = m_ships[i];
+		if (m_scale == Scale_Strategic && ship->m_can_be_seen == true)
 		{
-			if ((*it)->m_can_be_seen == true)
+			ship->GameEntity::Draw((*CurrentGame).m_mainScreen);
+
+			//compass
+			//m_warship->m_compass.Draw((*CurrentGame).m_mainScreen, m_warship->m_angle);
+		}
+		
+		if (ship == m_warship || ship == m_tactical_ship)
+		{
+			if (ship->m_sinking_timer < SHIP_SINKING_TIME)
 			{
-				(*it)->Draw((*CurrentGame).m_mainScreen);
+				//room tiles
+				if (i == 0)
+				{
+					//player room tiles: draw focused tile in last, so its outline appears above others
+					GameEntity* focused_room_tile = NULL;
+					for (vector<RoomTile*>::iterator it = (*CurrentGame).m_tiles.begin(); it != (*CurrentGame).m_tiles.end(); it++)
+					{
+						if (((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui == *it) || ((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui == *it))
+						{
+							focused_room_tile = *it;
+						}
+						else
+						{
+							(*it)->Draw((*CurrentGame).m_mainScreen);
+						}
+					}
+					if (focused_room_tile != NULL)
+					{
+						focused_room_tile->Draw((*CurrentGame).m_mainScreen);
+					}
+				}
+				else
+				{
+					for (vector<RoomTile*>::iterator it = (*CurrentGame).m_enemy_tiles.begin(); it != (*CurrentGame).m_enemy_tiles.end(); it++)
+					{
+						(*it)->Draw((*CurrentGame).m_mainScreen);
+					}
+				}
+
+				//rooms
+				for (vector<Room*>::iterator it = ship->m_rooms.begin(); it != ship->m_rooms.end(); it++)
+				{
+					(*it)->Draw((*CurrentGame).m_mainScreen);
+				}
+
+				//doors
+				for (vector<RoomConnexion*>::iterator it = ship->m_connexions.begin(); it != ship->m_connexions.end(); it++)
+				{
+					(*it)->Draw((*CurrentGame).m_mainScreen);
+				}
+
+				//weapons
+				for (vector<Weapon*>::iterator it = ship->m_weapons.begin(); it != ship->m_weapons.end(); it++)
+				{
+					(*it)->Draw((*CurrentGame).m_mainScreen);
+
+					if (m_scale == Scale_Tactical)
+					{
+						if (ship->m_is_fleeing == false && ship->m_sinking_timer <= 0)
+						{
+							(*it)->m_rofbar->Draw((*CurrentGame).m_mainScreen);
+
+							if ((*it)->m_health < (*it)->m_health_max)
+							{
+								(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+							}
+						}
+					}
+				}
+
+				//engines
+				for (vector<Engine*>::iterator it = ship->m_engines.begin(); it != ship->m_engines.end(); it++)
+				{
+					(*it)->Draw((*CurrentGame).m_mainScreen);
+
+					if (ship->m_flee_count > 0)
+					{
+						(*it)->m_systembar->Draw((*CurrentGame).m_mainScreen);
+					}
+				}
+
+				//rudder
+				if (ship->m_rudder != NULL)
+				{
+					ship->m_rudder->Draw((*CurrentGame).m_mainScreen);
+				}
+			}
+
+			//crew (can be displayed even when the ship is sunk, i.e. crew overboard)
+			for (int j = 0; j < 2; j++)
+			{
+				for (vector<CrewMember*>::iterator it = ship->m_crew[j].begin(); it != ship->m_crew[j].end(); it++)
+				{
+					(*it)->Draw((*CurrentGame).m_mainScreen);
+
+					if (ship->m_is_fleeing == false && ship->m_sinking_timer <= 0 && (*it)->m_health < (*it)->m_health_max)
+					{
+						(*it)->m_lifebar->Draw((*CurrentGame).m_mainScreen);
+					}
+				}
+			}
+
+			//combat interface
+			if (ship->m_is_fleeing == false && ship->m_sinking_timer < SHIP_SINKING_TIME)
+			{
+				ship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
 			}
 		}
+
+		if (i == 0 && ship->m_is_fleeing == false)
+		{
+			m_warship->m_crew_interface.Draw((*CurrentGame).m_mainScreen);
+		}
 	}
-	//Tactical scale only
-	else
+
+	
+	if (m_scale == Scale_Tactical)
 	{
 		//Bullets
 		for (vector<Ammo*>::iterator it = (*CurrentGame).m_bullets.begin(); it != (*CurrentGame).m_bullets.end(); it++)
 		{
 			(*it)->Draw((*CurrentGame).m_mainScreen);
 		}
-	}
-
-	//Combat interface
-	for (int i = 0; i < 2; i++)
-	{
-		Ship* ship = i == 0 ? m_warship : m_tactical_ship;
-		if (ship == NULL || ship->m_is_fleeing == true || ship->m_sinking_timer > 0)//if (i == 1 && m_tactical_ship == NULL)
-		{
-			continue;
-		}
-
-		ship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
-	}
-
-	//crew interface
-	if (m_warship->m_crew_interface.m_crew != NULL)
-	//if (((*CurrentGame).m_selected_ui != NULL && (*CurrentGame).m_selected_ui->m_UI_type == UI_CrewMember) || ((*CurrentGame).m_hovered_ui != NULL && (*CurrentGame).m_hovered_ui->m_UI_type == UI_CrewMember))
-	{
-		m_warship->m_crew_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//FX
@@ -1172,7 +1075,6 @@ void Gameloop::Draw()
 	}
 
 	//Menus
-
 	if (m_menu == Menu_PrisonersChoice)
 	{
 		m_warship->m_prisoners_choice_interface.Draw((*CurrentGame).m_mainScreen);
@@ -1463,7 +1365,7 @@ Ship* Gameloop::IsDMSInCombatRange(DMS_Coord DMS_a, DMS_Coord DMS_b)
 {
 	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 	{
-		if ((*it)->m_can_be_seen == false)
+		if ((*it) == m_warship || (*it)->m_can_be_seen == false)
 		{
 			continue;
 		}
