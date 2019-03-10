@@ -175,3 +175,28 @@ void GameEntity::setAnimationLine(int animation, bool keep_frame_index)
 	play(*m_currentAnimation, keep_frame_index);
 	m_currentAnimationIndex = animation;
 }
+
+bool GameEntity::IsColliding(GameEntity* entityA, GameEntity* entityB)
+{
+	float xA1 = entityA->getPosition().x - entityA->m_size.x * 0.5f;
+	float xA2 = entityA->getPosition().x + entityA->m_size.x * 0.5f;
+	float yA1 = entityA->getPosition().y - entityA->m_size.y * 0.5f;
+	float yA2 = entityA->getPosition().y + entityA->m_size.y * 0.5f;
+	float xB1 = entityB->getPosition().x - entityB->m_size.x * 0.5f;
+	float xB2 = entityB->getPosition().x + entityB->m_size.x * 0.5f;
+	float yB1 = entityB->getPosition().y - entityB->m_size.y * 0.5f;
+	float yB2 = entityB->getPosition().y + entityB->m_size.y * 0.5f;
+
+	//collision?
+	if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
+		|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
+		|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
+		|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

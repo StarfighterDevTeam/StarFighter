@@ -8,7 +8,6 @@
 #include "Island.h"
 #include "Compass.h"
 #include "CrewInterface.h"
-#include "CombatInterface.h"
 #include "PrisonersChoiceInterface.h"
 #include "CrewOverboardInterface.h"
 #include "Ship.h"
@@ -54,8 +53,6 @@ public:
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
 	void Update(Time deltaTime, bool tactical_combat);
-
-	struct CombatInterface m_combat_interface[2];
 
 	int m_resources[NB_RESOURCES_TYPES];
 

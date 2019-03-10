@@ -24,6 +24,9 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 		}
 	}
 
+	//Adding a port
+	AddSeaport(Seaport_Small);
+
 	//UI
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);

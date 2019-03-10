@@ -4,6 +4,7 @@ extern Game* CurrentGame;
 
 CombatInterface::CombatInterface()
 {
+	m_ship = NULL;
 	//m_distance_line = NULL;
 	//
 	//for (int i = 0; i < 5; i++)
@@ -58,22 +59,24 @@ void CombatInterface::Destroy()
 	m_crewbar = NULL;
 	m_ship_name = NULL;
 	m_ship_info = NULL;
+
+	m_ship = NULL;
 }
 
-void CombatInterface::Init(Ship* ship)
+void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, ShipType ship_type)
 {
 	m_ship = ship;
 	
 	Texture* texture = TextureLoader::getInstance()->loadTexture("2D/crew_icon.png", 32, 32);
 
-	float offset = ship->m_alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
+	float offset = alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
 
 	//ship name & info
 	m_ship_name = new GameEntity(UI_None);
 	m_ship_name->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_ship_name->m_text.setCharacterSize(20);
 	m_ship_name->m_text.setColor(sf::Color::Black);
-	m_ship_name->m_text.setString(m_ship->m_display_name);
+	m_ship_name->m_text.setString(ship_name);
 	m_ship_name->m_text.setPosition(sf::Vector2f(offset - m_ship_name->m_text.getGlobalBounds().width * 0.5f, COMBAT_INTERFACE_OFFSET_Y));
 
 	m_ship_info = new GameEntity(UI_None);
@@ -81,7 +84,7 @@ void CombatInterface::Init(Ship* ship)
 	m_ship_info->m_text.setCharacterSize(18);
 	m_ship_info->m_text.setStyle(sf::Text::Italic);
 	m_ship_info->m_text.setColor(sf::Color::Black);
-	m_ship_info->m_text.setString((*CurrentGame).m_dico_ship_class[m_ship->m_type]);
+	m_ship_info->m_text.setString((*CurrentGame).m_dico_ship_class[ship_type]);
 	m_ship_info->m_text.setPosition(sf::Vector2f(offset - m_ship_info->m_text.getGlobalBounds().width * 0.5f, COMBAT_INTERFACE_OFFSET_Y + m_ship_info->m_text.getCharacterSize() + 8.f));
 	
 	//life bar
@@ -178,13 +181,16 @@ void CombatInterface::Init(Ship* ship)
 	//}
 }
 
-void CombatInterface::Update(sf::Time deltaTime)
+void CombatInterface::Update(int health, int health_max, int flood, int flood_max, int nb_crew, int nb_crew_max)
 {
+	if (m_ship == NULL)
+	{
+		return;
+	}
+
 	float threshold[3] = { 0.7, 0.5, 0.3 };
 
 	//size of life bar
-	int health = m_ship->m_health;
-	int health_max = m_ship->m_health_max;
 	Bound(health, sf::Vector2i(0, health_max));
 
 	float life_ratio = 1.0f * health / health_max;
@@ -211,8 +217,6 @@ void CombatInterface::Update(sf::Time deltaTime)
 	m_lifebar->m_text.SetPosition(sf::Vector2f(m_lifebar->m_position.x, m_lifebar->m_position.y - 3.f));
 
 	//size of flood bar
-	int flood = m_ship->m_flood;
-	int flood_max = m_ship->m_flood_max;
 	Bound(flood, sf::Vector2i(0, flood_max));
 
 	float flood_ratio = 1.0f * flood / flood_max;
@@ -221,9 +225,7 @@ void CombatInterface::Update(sf::Time deltaTime)
 
 	//crew
 	ostringstream ss_crew;
-	int crew_nb = m_ship->m_nb_crew;
-	int crew_nb_max = m_ship->m_nb_crew_max;
-	ss_crew << crew_nb << "/" << crew_nb_max;
+	ss_crew << nb_crew << "/" << nb_crew_max;
 	m_crewbar->m_text.setString(ss_crew.str());
 	
 

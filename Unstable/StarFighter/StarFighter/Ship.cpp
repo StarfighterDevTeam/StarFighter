@@ -74,6 +74,8 @@ Ship::~Ship()
 	}
 
 	delete m_rudder;
+
+	m_combat_interface.Destroy();
 }
 
 WaterTile* Ship::GetWaterTileAtDMSCoord(DMS_Coord coord)
@@ -132,6 +134,8 @@ void Ship::Update(Time deltaTime, DMS_Coord warship_DMS, bool tactical_combat)
 	{
 		UpdateSinking(deltaTime);
 	}
+
+	m_combat_interface.Update(m_health, m_health_max, m_flood, m_flood_max, m_nb_crew, m_nb_crew_max);
 }
 
 void Ship::UpdateAnimation()
@@ -1130,6 +1134,8 @@ void Ship::UpdateFleeing(Time deltaTime)
 			m_speed.y -= deltaTime.asSeconds() * SHIP_FLEE_ACCELERATION;
 		}
 		m_ship_offset.y += m_speed.y;
+
+		printf("offset: %f\n", m_ship_offset.y);
 	}
 }
 

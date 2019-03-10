@@ -21,7 +21,7 @@ Gameloop::Gameloop()
 		m_warship->Init();
 		SavePlayerData(m_warship);
 	}
-	m_warship->m_combat_interface[0].Init(m_warship);
+	
 	m_resources_interface.Init(m_warship);
 
 	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
@@ -45,7 +45,12 @@ Gameloop::~Gameloop()
 {
 	delete m_background;
 	delete m_warship;
-	delete m_island;
+	
+	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+	{
+		delete (*it);
+	}
+
 	for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
 	{
 		delete (*it);
@@ -70,8 +75,7 @@ void Gameloop::InitWaterZones()
 	sf::Texture* texture = loader->loadTexture("2D/seaport_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 
 	//islands
-	m_island = new Island(8, 9, 2, 2, 0, 0);
-	m_island->AddSeaport(Seaport_Small);
+	m_islands.push_back(new Island(8, 9, 2, 2, 0, 0));
 }
 
 bool Gameloop::GetSaveOrLoadInputs()
@@ -145,7 +149,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	for (int i = 0; i < 2; i++)
 	{
 		Ship* ship = i == 0 ? m_warship : m_tactical_ship;
-		if (ship == NULL || ship->m_is_fleeing == true || ship->m_sinking_timer > 0)//if (i == 1 && m_tactical_ship == NULL)
+		if (ship == NULL || ship->m_sinking_timer > 0)//if (i == 1 && m_tactical_ship == NULL)
 		{
 			break;
 		}
@@ -166,8 +170,6 @@ void Gameloop::Update(sf::Time deltaTime)
 			//Room tiles
 			for (vector<RoomTile*>::iterator it2 = (*it)->m_tiles.begin(); it2 != (*it)->m_tiles.end(); it2++)
 			{
-				(*it2)->UpdatePosition();
-
 				if ((*it2)->m_flood > 0)
 				{
 					flood++;
@@ -176,7 +178,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				UpdateRoomTileFeedback(*it2, deltaTime, ship);
 
 				//crew move order feedback (hovering tile)
-				if (i == 0)
+				if (i == 0 && ship->m_is_fleeing == false)
 				{
 					if (selection != NULL && selection->m_UI_type == UI_CrewMember)
 					{
@@ -193,7 +195,12 @@ void Gameloop::Update(sf::Time deltaTime)
 					{
 						(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
 						(*it2)->m_shape_container.setOutlineThickness(-1.f);
+						(*it2)->UpdatePosition();
 					}
+				}
+				else
+				{
+					(*it2)->UpdatePosition();
 				}
 			}
 
@@ -312,6 +319,11 @@ void Gameloop::Update(sf::Time deltaTime)
 						{
 							warship->m_crew_interface.Destroy();
 						}
+
+						if (warship->m_crew_interface.m_crew == *it)
+						{
+							warship->m_crew_interface.Update();
+						}
 					}
 					else
 					{
@@ -427,6 +439,9 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			ship->m_rudder->Update(deltaTime);
 		}
+
+		//Combat interface
+		ship->m_combat_interface.Update(ship->m_health, ship->m_health_max, ship->m_flood, ship->m_flood_max, ship->m_nb_crew, ship->m_nb_crew_max);
 	}
 
 	//Bullets + cleaning old bullets
@@ -538,20 +553,7 @@ void Gameloop::Update(sf::Time deltaTime)
 									{
 										for (vector<CrewMember*>::iterator it2 = (*it)->m_target_ship->m_crew[j].begin(); it2 != (*it)->m_target_ship->m_crew[j].end(); it2++)
 										{
-											float xA1 = tile->getPosition().x - tile->m_size.x * 0.5f;
-											float xA2 = tile->getPosition().x + tile->m_size.x * 0.5f;
-											float yA1 = tile->getPosition().y - tile->m_size.y * 0.5f;
-											float yA2 = tile->getPosition().y + tile->m_size.y * 0.5f;
-											float xB1 = (*it2)->getPosition().x - (*it2)->m_size.x * 0.5f;
-											float xB2 = (*it2)->getPosition().x + (*it2)->m_size.x * 0.5f;
-											float yB1 = (*it2)->getPosition().y - (*it2)->m_size.y * 0.5f;
-											float yB2 = (*it2)->getPosition().y + (*it2)->m_size.y * 0.5f;
-
-											//collision?
-											if ((xA1 < xB1 && xB1 < xA2 && yB1 > yA1 && yB1 < yA2)
-												|| (xA1 < xB2 && xB2 < xA2 && yB1 > yA1 && yB1 < yA2)
-												|| (xA1 < xB1 && xB1 < xA2 && yB2 > yA1 && yB2 < yA2)
-												|| (xA1 < xB2 && xB2 < xA2 && yB2 > yA1 && yB2 < yA2))
+											if (GameEntity::IsColliding(tile, (*it2)) == true)
 											{
 												if ((*it2)->m_health > 0)
 												{
@@ -719,7 +721,6 @@ void Gameloop::Update(sf::Time deltaTime)
 
 					if ((*it2)->m_type == Water_Empty)
 					{
-						
 						(*it2)->m_text.setString("");
 
 						//selection of water tiles is forbidden
@@ -751,24 +752,21 @@ void Gameloop::Update(sf::Time deltaTime)
 		}
 	}
 
-	//Crew interface
-	m_warship->m_crew_interface.Update();
-
 	//island
-	if (m_island != NULL)
+	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
 	{
 		//position on "radar"
-		WaterTile* tileUpLeft = m_warship->m_tile->m_zone->m_watertiles[m_island->m_upcorner_x][m_island->m_upcorner_y];
-		WaterTile* tileDownRight = m_warship->m_tile->m_zone->m_watertiles[m_island->m_upcorner_x + m_island->m_width - 1][m_island->m_upcorner_y - m_island->m_height + 1];
+		WaterTile* tileUpLeft = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x][(*it)->m_upcorner_y];
+		WaterTile* tileDownRight = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x + (*it)->m_width - 1][(*it)->m_upcorner_y - (*it)->m_height + 1];
 		float pos_x = 0.5f * (tileDownRight->m_position.x + tileUpLeft->m_position.x);
 		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
-		m_island->m_position = sf::Vector2f(pos_x, pos_y);
-	
-		m_island->Update(deltaTime);
+		(*it)->m_position = sf::Vector2f(pos_x, pos_y);
 
-		if (m_island->m_seaport != NULL)
+		(*it)->Update(deltaTime);
+
+		if ((*it)->m_seaport != NULL)
 		{
-			Seaport* port = m_island->m_seaport;
+			Seaport* port = (*it)->m_seaport;
 
 			port->m_position = port->m_tile->m_position;
 			port->UpdatePosition();
@@ -1069,14 +1067,16 @@ void Gameloop::Draw()
 		}
 	}
 
-	//combat interface
-	if (m_warship->m_is_fleeing == false)
+	//Combat interface
+	for (int i = 0; i < 2; i++)
 	{
-		m_warship->m_combat_interface[0].Draw((*CurrentGame).m_mainScreen);
-	}
-	if (m_tactical_ship != NULL && m_tactical_ship->m_is_fleeing == false && m_tactical_ship->m_sinking_timer <= SHIP_SINKING_TIME)
-	{
-		m_warship->m_combat_interface[1].Draw((*CurrentGame).m_mainScreen);
+		Ship* ship = i == 0 ? m_warship : m_tactical_ship;
+		if (ship == NULL || ship->m_is_fleeing == true || ship->m_sinking_timer > 0)//if (i == 1 && m_tactical_ship == NULL)
+		{
+			break;
+		}
+
+		ship->m_combat_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//crew interface
@@ -1198,6 +1198,7 @@ bool Gameloop::UpdateTacticalScale()
 				{
 					LoadPlayerData(m_warship);
 					m_warship->RestoreHealth();
+					m_warship->InitCombat();
 					m_tactical_ship = NULL;
 					m_scale = Scale_Strategic;
 					//enemy ships to delete
@@ -1221,7 +1222,6 @@ bool Gameloop::UpdateTacticalScale()
 					{
 						delete m_tactical_ship;
 						m_tactical_ship = NULL;
-						m_warship->m_combat_interface[1].Destroy();
 					}
 				}
 
@@ -1262,7 +1262,7 @@ bool Gameloop::UpdateTacticalScale()
 		m_warship->InitCombat();//init cooldowns
 		m_tactical_ship->BuildShip();//generate enemy ship's rooms, crew and weapons
 		m_tactical_ship->InitCombat();//init cooldowns
-		m_warship->m_combat_interface[1].Init(m_tactical_ship);//init enemy interface
+		m_tactical_ship->m_combat_interface.Init(m_tactical_ship, m_tactical_ship->m_alliance, m_tactical_ship->m_display_name, m_tactical_ship->m_type);//init enemy interface
 
 		//fill enemy ship room tiles for pathfind
 		(*CurrentGame).m_enemy_tiles.clear();

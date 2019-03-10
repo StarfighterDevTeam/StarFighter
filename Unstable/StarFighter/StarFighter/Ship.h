@@ -7,6 +7,7 @@
 #include "CrewMember.h"
 #include "WaterZone.h"
 #include "Island.h"
+#include "CombatInterface.h"
 
 class Ship : public GameEntity
 {
@@ -51,8 +52,9 @@ public:
 	float m_flee_count;
 	bool m_is_charging_flee_count;
 	bool m_is_fleeing;
-
 	float m_sinking_timer;
+
+	struct CombatInterface m_combat_interface;
 
 	void UpdateFleeing(Time deltaTime);
 	void UpdateSinking(Time deltaTime);

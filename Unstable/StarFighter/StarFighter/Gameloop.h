@@ -37,7 +37,7 @@ public:
 	//PIRATES
 	GameEntity* m_background;
 	Warship* m_warship;
-	Island* m_island;
+	vector<Island*> m_islands;
 	vector<Ship*> m_ships;
 	Ship* m_tactical_ship;
 	Scale m_scale;

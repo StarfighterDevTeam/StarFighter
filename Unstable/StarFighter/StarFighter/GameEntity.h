@@ -61,6 +61,8 @@ public:
 
 	void setAnimation(sf::Texture *texture, int frameNumber, int animationNumber);
 	void setAnimationLine(int animation, bool keep_frame_index = false);
+
+	static bool IsColliding(GameEntity* entityA, GameEntity* entityB);
 };
 
 #endif //GAMEENTITY_H_INCLUDED

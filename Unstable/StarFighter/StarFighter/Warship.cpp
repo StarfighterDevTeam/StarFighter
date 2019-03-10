@@ -130,6 +130,9 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 		engine_room->m_tiles[i + engine_room->m_width]->m_system = System_Engine;
 		AddEngineToTile(engine_room->m_tiles[i + engine_room->m_width]);
 	}
+
+	//combat interface (displaying hp, etc.)
+	m_combat_interface.Init(this, m_alliance, m_display_name, m_type);
 }
 
 void Warship::Init()
@@ -153,10 +156,10 @@ void Warship::Init()
 
 Warship::~Warship()
 {
-	for (int i = 0; i < 2; i++)
-	{
-		m_combat_interface[1].Destroy();
-	}
+	//for (int i = 0; i < 2; i++)
+	//{
+	//	m_combat_interface[1].Destroy();
+	//}
 }
 
 void Warship::Update(Time deltaTime, bool tactical_combat)
@@ -286,13 +289,6 @@ void Warship::Update(Time deltaTime, bool tactical_combat)
 		{
 			UpdateSinking(deltaTime);
 		}
-	}
-
-	//UI combat
-	m_combat_interface[0].Update(deltaTime);
-	if (tactical_combat == true)
-	{
-		m_combat_interface[1].Update(deltaTime);
 	}
 
 	UpdateFlooding(deltaTime);
