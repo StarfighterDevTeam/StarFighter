@@ -97,6 +97,7 @@
     <ClCompile Include="CrewInterface.cpp" />
     <ClCompile Include="CrewMember.cpp" />
     <ClCompile Include="CrewOverboardInterface.cpp" />
+    <ClCompile Include="CrewUnboardInterface.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="FX.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="CrewInterface.h" />
     <ClInclude Include="CrewMember.h" />
     <ClInclude Include="CrewOverboardInterface.h" />
+    <ClInclude Include="CrewUnboardInterface.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="FileLoadUtils.h" />
     <ClInclude Include="FX.h" />

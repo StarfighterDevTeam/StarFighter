@@ -89,12 +89,12 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 
 	//prisoners
 	offset_y +=	100.f;
-	int prisoners_per_line = 10;
+	int crew_per_line = 10;
 	float prisoners_offset_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + 230;
 	for (int i = 0; i < crew_size; i++)
 	{
-		float pos_x = prisoners_offset_x + (CREWMEMBER_SIZE * 0.5f) + ((i % prisoners_per_line) * (CREWMEMBER_SIZE + 10));
-		float pos_y = offset_y + ((i / prisoners_per_line) * (CREWMEMBER_SIZE + 10));
+		float pos_x = prisoners_offset_x + (CREWMEMBER_SIZE * 0.5f) + ((i % crew_per_line) * (CREWMEMBER_SIZE + 10));
+		float pos_y = offset_y + ((i / crew_per_line) * (CREWMEMBER_SIZE + 10));
 		offset_y = Maxf(offset_y, pos_y);
 		m_crew[i]->m_shape_container.setPosition(sf::Vector2f(pos_x, pos_y));
 	}

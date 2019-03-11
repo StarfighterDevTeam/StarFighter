@@ -10,6 +10,7 @@
 #include "CrewInterface.h"
 #include "PrisonersChoiceInterface.h"
 #include "CrewOverboardInterface.h"
+#include "CrewUnboardInterface.h"
 #include "Ship.h"
 
 #include <fstream>
@@ -43,6 +44,7 @@ public:
 	struct CrewInterface m_crew_interface;
 	struct PrisonersChoiceInterface m_prisoners_choice_interface;
 	struct CrewOverboardInterface m_crew_overboard_interface;
+	struct CrewUnboardInterface m_crew_unboard_interface;
 
 	void UpdateOLD(Time deltaTime, bool tactical_combat);
 

@@ -135,6 +135,9 @@ void Gameloop::Update(sf::Time deltaTime)
 	//change of scale?
 	UpdateTacticalScale();
 
+	//unboarding?
+	UpdateUnboarding();
+
 	//Canceling weapon target
 	if (selection != NULL && selection->m_UI_type == UI_Weapon && hovered == NULL)
 	{
@@ -292,95 +295,91 @@ void Gameloop::Update(sf::Time deltaTime)
 
 				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
 				{
-					if ((*it)->m_health > 0)
+					//prisoners vs non-prisoners opponent?
+					if ((*it)->m_melee_opponent == NULL)
 					{
-						//prisoners vs non-prisoners opponent?
-						if ((*it)->m_melee_opponent == NULL)
+						for (vector<CrewMember*>::iterator it2 = ship->m_crew[(j + 1) % 2].begin(); it2 != ship->m_crew[(j + 1) % 2].end(); it2++)
 						{
-							for (vector<CrewMember*>::iterator it2 = ship->m_crew[(j + 1) % 2].begin(); it2 != ship->m_crew[(j + 1) % 2].end(); it2++)
+							if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
 							{
-								if (Room::IsConnectedToRoomTile((*it)->m_tile, (*it2)->m_tile) == true)
+								(*it)->m_melee_opponent = *it2;
+								if ((*it2)->m_melee_opponent == NULL)
 								{
-									(*it)->m_melee_opponent = *it2;
-									if ((*it2)->m_melee_opponent == NULL)
-									{
-										(*it2)->m_melee_opponent = *it;
-									}
-									break;
+									(*it2)->m_melee_opponent = *it;
 								}
-							}
-						}
-
-						//opponent catch us on melee?
-						if ((*it)->m_melee_opponent != NULL)
-						{
-							//cancel movement
-							if ((*it)->m_destination != NULL)
-							{
-								(*it)->m_destination->m_crew = NULL;
-							}
-							(*it)->m_destination = NULL;
-							(*it)->m_speed = sf::Vector2f(0, 0);
-
-							//fight
-							(*it)->UpdateMelee(deltaTime);
-
-							//update feedbacks and life bar
-							(*it)->GameEntity::Update(deltaTime);
-							(*it)->UpdateLifeBar();
-						}
-						else
-						{
-							//update: crew movement/heal/repair
-							if (ship->m_is_fleeing == false)
-							{
-								(*it)->Update(deltaTime);
-								if (j == 1)
-								{
-									//prisoners only: escape and roam if the prison cell is open
-									ship->UpdatePrisonerEscape(*it, deltaTime);
-								}
-							}
-							else
-							{
-								(*it)->UpdatePosition();
-							}
-						}
-
-						if (ship->m_is_fleeing == false)
-						{
-							if (i == 0)
-							{
-								//create or update HUD for crew details
-								if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
-								{
-									m_warship->m_crew_interface.Destroy();
-									m_warship->m_crew_interface.Init(*it);
-								}
-								else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (m_warship->m_crew_interface.m_crew == NULL || m_warship->m_crew_interface.m_crew->m_hovered == false))
-								{
-									m_warship->m_crew_interface.Destroy();
-									m_warship->m_crew_interface.Init(*it);
-								}
-								else if (m_warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
-								{
-									m_warship->m_crew_interface.Destroy();
-								}
-
-								if (m_warship->m_crew_interface.m_crew == *it)
-								{
-									m_warship->m_crew_interface.Update();
-								}
-							}
-							else
-							{
-								//Enemy AI
-								UpdateAICrew(*it);
+								break;
 							}
 						}
 					}
 
-					//second check because he could drown during the update
+					//opponent catch us on melee?
+					if ((*it)->m_melee_opponent != NULL)
+					{
+						//cancel movement
+						if ((*it)->m_destination != NULL)
+						{
+							(*it)->m_destination->m_crew = NULL;
+						}
+						(*it)->m_destination = NULL;
+						(*it)->m_speed = sf::Vector2f(0, 0);
+
+						//fight
+						(*it)->UpdateMelee(deltaTime);
+
+						//update feedbacks and life bar
+						(*it)->GameEntity::Update(deltaTime);
+						(*it)->UpdateLifeBar();
+					}
+					else
+					{
+						//update: crew movement/heal/repair
+						if (ship->m_is_fleeing == false)
+						{
+							(*it)->Update(deltaTime);
+							if (j == 1)
+							{
+								//prisoners only: escape and roam if the prison cell is open
+								ship->UpdatePrisonerEscape(*it, deltaTime);
+							}
+						}
+						else
+						{
+							(*it)->UpdatePosition();
+						}
+					}
+
+					if (ship->m_is_fleeing == false)
+					{
+						if (i == 0)
+						{
+							//create or update HUD for crew details
+							if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
+							{
+								m_warship->m_crew_interface.Destroy();
+								m_warship->m_crew_interface.Init(*it);
+							}
+							else if ((*it)->m_selected == true && m_warship->m_crew_interface.m_crew != *it && (m_warship->m_crew_interface.m_crew == NULL || m_warship->m_crew_interface.m_crew->m_hovered == false))
+							{
+								m_warship->m_crew_interface.Destroy();
+								m_warship->m_crew_interface.Init(*it);
+							}
+							else if (m_warship->m_crew_interface.m_crew == *it && (*it)->m_selected == false && (*it)->m_hovered == false)
+							{
+								m_warship->m_crew_interface.Destroy();
+							}
+
+							if (m_warship->m_crew_interface.m_crew == *it)
+							{
+								m_warship->m_crew_interface.Update();
+							}
+						}
+						else
+						{
+							//Enemy AI
+							UpdateAICrew(*it);
+						}
+					}
+					
 					if ((*it)->m_health > 0)
 					{
 						ship->m_crew[j].push_back(*it);
@@ -788,20 +787,24 @@ void Gameloop::Update(sf::Time deltaTime)
 								}
 							}
 
-							if (ship_in_combat_range == NULL)
+							//Contextual orders' feedback
+							if (m_menu == Menu_None)
 							{
-								if ((*it2)->m_seaport == NULL)
+								if (ship_in_combat_range == NULL)
 								{
-									m_contextual_order->SetContextualOrder(Order_Sail, (*it2)->m_position, true);
+									if ((*it2)->m_seaport == NULL)
+									{
+										m_contextual_order->SetContextualOrder(Order_Sail, (*it2)->m_position, true);
+									}
+									else
+									{
+										m_contextual_order->SetContextualOrder(Order_Dock, (*it2)->m_position, true);
+									}
 								}
 								else
 								{
-									m_contextual_order->SetContextualOrder(Order_Dock, (*it2)->m_position, true);
+									m_contextual_order->SetContextualOrder(Order_Engage, (*it2)->m_position, true);
 								}
-							}
-							else
-							{
-								m_contextual_order->SetContextualOrder(Order_Engage, (*it2)->m_position, true);
 							}
 						}
 					}
@@ -841,7 +844,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
 		(*it)->m_position = sf::Vector2f(pos_x, pos_y);
 
-		(*it)->Update(deltaTime);
+		(*it)->UpdatePosition();
 
 		if ((*it)->m_seaport != NULL)
 		{
@@ -864,9 +867,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			m_menu = Menu_None;
 		}
 	}
-
-	//Prisoners Choice Menu
-	if (m_menu == Menu_PrisonersChoice)
+	else if (m_menu == Menu_PrisonersChoice)
 	{
 		m_warship->m_prisoners_choice_interface.Update(deltaTime);
 
@@ -874,6 +875,34 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			m_warship->m_prisoners_choice_interface.Destroy();
 			m_menu = Menu_None;
+		}
+	}
+	else if (m_menu == Menu_CrewUnboard)
+	{
+		CrewMember* crew = NULL;
+		if (hovered != NULL && hovered->m_UI_type == UI_CrewMember && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_window_has_focus == true && m_warship->m_crew_unboard_interface.m_unboarded.size() < m_warship->m_crew_unboard_interface.m_slots_avaible)
+		{
+			//add unboarded crew to unboard interface
+			crew = (CrewMember*)hovered;
+			if (crew->m_is_prisoner == false)
+			{
+				m_warship->m_crew_unboard_interface.Update(deltaTime, crew);
+
+				//remove unboarded crew from ship from ship
+				vector<CrewMember*> old_crew;
+				for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
+				{
+					old_crew.push_back(*it);
+				}
+				m_warship->m_crew[0].clear();
+				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+				{
+					if (*it != crew)
+					{
+						m_warship->m_crew[0].push_back(*it);
+					}
+				}
+			}
 		}
 	}
 
@@ -1082,6 +1111,10 @@ void Gameloop::Draw()
 	else if (m_menu == Menu_CrewOverboard)
 	{
 		m_warship->m_crew_overboard_interface.Draw((*CurrentGame).m_mainScreen);
+	}
+	else if (m_menu == Menu_CrewUnboard)
+	{
+		m_warship->m_crew_unboard_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//HUD - resources interface
@@ -1373,14 +1406,14 @@ Ship* Gameloop::IsDMSInCombatRange(DMS_Coord DMS_a, DMS_Coord DMS_b)
 		//in range for combat?
 		float posxA = DMS_a.m_minute_x * 60.f + DMS_a.m_second_x;
 		float posxB = DMS_b.m_minute_x * 60.f + DMS_b.m_second_x;
-		if (abs(posxA - posxB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		if (abs(posxA - posxB) > 1.f * NB_WATERTILE_SUBDIVISION)
 		{
 			continue;
 		}
 
 		float posyA = DMS_a.m_minute_y * 60.f + DMS_a.m_second_y;
 		float posyB = DMS_b.m_minute_y * 60.f + DMS_b.m_second_y;
-		if (abs(posyA - posyB) > 2.f * NB_WATERTILE_SUBDIVISION)
+		if (abs(posyA - posyB) > 1.f * NB_WATERTILE_SUBDIVISION)
 		{
 			continue;
 		}
@@ -1736,4 +1769,22 @@ void Gameloop::UpdateAITargetRoom(Weapon* weapon)
 			weapon->m_target_room = possible_rooms[r];
 		}
 	}
+}
+
+bool Gameloop::UpdateUnboarding()
+{
+	if (m_warship->m_seaport != NULL && m_menu != Menu_CrewUnboard)
+	{
+		m_menu = Menu_CrewUnboard;
+		
+		m_warship->m_crew_unboard_interface.Init(m_warship);
+	}
+	else if (m_warship->m_seaport == NULL && m_menu == Menu_CrewUnboard)
+	{
+		m_menu = Menu_None;
+
+		m_warship->m_crew_unboard_interface.Destroy();
+	}
+
+	return true;
 }

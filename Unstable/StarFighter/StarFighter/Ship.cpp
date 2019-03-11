@@ -144,6 +144,7 @@ void Ship::UpdateStrategical(Time deltaTime)
 			{
 				m_speed = sf::Vector2f(0, 0);
 				m_destination = NULL;
+				SetDMSCoord(m_DMS);//allows to assign a seaport if this is the final tile
 			}
 			//go to next waypoint
 			else

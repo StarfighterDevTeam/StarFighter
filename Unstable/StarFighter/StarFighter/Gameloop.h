@@ -22,6 +22,7 @@ enum ContextualMenu
 	Menu_None,
 	Menu_CrewOverboard,
 	Menu_PrisonersChoice,
+	Menu_CrewUnboard,
 };
 
 class Gameloop
@@ -46,6 +47,7 @@ public:
 
 	void InitWaterZones();
 	bool UpdateTacticalScale();
+	bool UpdateUnboarding();
 	void UpdateRoomTileFeedback(RoomTile* tile, sf::Time deltaTime, Ship* ship);
 
 	ContextualOrder* m_contextual_order;
