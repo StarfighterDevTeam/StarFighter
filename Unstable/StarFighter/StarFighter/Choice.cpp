@@ -6,21 +6,25 @@ Choice::Choice()
 {
 	m_panel = NULL;
 	m_picture = NULL;
+	m_gauge = NULL;
 }
 
 Choice::~Choice()
 {
 	delete m_panel;
 	delete m_picture;
+	delete m_gauge;
 }
 
 void Choice::Destroy()
 {
 	delete m_panel;
 	delete m_picture;
+	delete m_gauge;
 
 	m_panel = NULL;
 	m_picture = NULL;
+	m_gauge = NULL;
 }
 
 void Choice::Init(int index, string text, string portrait_filename)
@@ -41,7 +45,7 @@ void Choice::Init(int index, string text, string portrait_filename)
 	m_panel->m_text.setCharacterSize(20);
 	m_panel->m_text.setColor(sf::Color::White);
 	m_panel->m_text.setString(ss_index.str());
-	m_panel->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5f - 34.f, 0.f - m_panel->m_text.getGlobalBounds().height * 0.5f);
+	m_panel->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5f - 34, 0.f - m_panel->m_text.getGlobalBounds().height * 0.5);
 
 	m_picture = new GameEntity(UI_None);
 	m_picture->m_shape_container.setSize(sf::Vector2f(CHOICE_VIDEO_SIZE_X, CHOICE_PANEL_SIZE_Y));
@@ -49,18 +53,42 @@ void Choice::Init(int index, string text, string portrait_filename)
 	m_picture->m_shape_container.setFillColor(sf::Color::White);
 	m_picture->m_shape_container.setOutlineThickness(4.f);
 	m_picture->m_shape_container.setOutlineColor(sf::Color::Black);
-	m_picture->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5f + CHOICE_VIDEO_SIZE_X * 0.5f, 0.f));
+	m_picture->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X * 0.5, 0.f));
 
 	m_picture->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_picture->m_text.setCharacterSize(20);
 	m_picture->m_text.setColor(sf::Color::Black);
 	m_picture->m_text.setString(text);
-	m_picture->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5f + CHOICE_VIDEO_SIZE_X + 20, 0.f - CHOICE_PANEL_SIZE_Y * 0.5f + m_picture->m_text.getGlobalBounds().height * 0.5f + 10);
+	m_picture->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, 0.f - CHOICE_PANEL_SIZE_Y * 0.5 + m_picture->m_text.getGlobalBounds().height * 0.5 + 10);
 
 	Texture* texture = TextureLoader::getInstance()->loadTexture(portrait_filename, 280, 300);
 	m_picture->setAnimation(texture, 1, 2);
 	m_picture->setAnimationLine(1);
-	m_picture->setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5f + CHOICE_VIDEO_SIZE_X * 0.5f, 0.f));
+	m_picture->setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X * 0.5, 0.f));
+
+	m_gauge = new GameEntity(UI_None);
+	m_gauge->m_shape_container.setSize(sf::Vector2f(CHOICE_GAUGE_SIZE_X, CHOICE_GAUGE_SIZE_Y));
+	m_gauge->m_shape_container.setOrigin(sf::Vector2f(CHOICE_GAUGE_SIZE_X * 0.5, CHOICE_GAUGE_SIZE_Y * 0.5f));
+	m_gauge->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
+	m_gauge->m_shape_container.setOutlineThickness(4.f);
+	m_gauge->m_shape_container.setOutlineColor(sf::Color::Black);
+	m_gauge->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20 + CHOICE_GAUGE_SIZE_X * 0.5, 0.f - CHOICE_GAUGE_SIZE_Y * 0.5 + 40));
+
+	m_gauge_value_max = 10;
+	m_gauge_value = 3;
+	m_gauge->m_shape.setSize(sf::Vector2f(1.0f * CHOICE_GAUGE_SIZE_X * m_gauge_value / m_gauge_value_max, CHOICE_GAUGE_SIZE_Y));
+	m_gauge->m_shape.setOrigin(sf::Vector2f(m_gauge->m_shape.getSize().x * 0.5, CHOICE_GAUGE_SIZE_Y * 0.5f));
+	m_gauge->m_shape.setFillColor(sf::Color::Green);
+	m_gauge->m_shape.setOutlineThickness(4.f);
+	m_gauge->m_shape.setOutlineColor(sf::Color::Black);
+	m_gauge->m_shape.setPosition(sf::Vector2f(m_gauge->m_shape_container.getPosition().x - CHOICE_GAUGE_SIZE_X * 0.5 + m_gauge->m_shape.getSize().x * 0.5, m_gauge->m_shape_container.getPosition().y));
+
+	m_gauge->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+	m_gauge->m_text.setCharacterSize(20);
+	m_gauge->m_text.setColor(sf::Color::Black);
+	m_gauge->m_text.setString("Exploration");
+	m_gauge->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, 0.f - CHOICE_GAUGE_SIZE_Y + 30 - m_gauge->m_text.getCharacterSize() - 10);
+	m_gauge_string = m_gauge->m_text.getString();
 }
 
 void Choice::SetPosition(sf::Vector2f position)
@@ -74,6 +102,9 @@ void Choice::SetPosition(sf::Vector2f position)
 	m_picture->setPosition(m_picture->getPosition() + offset);
 	m_title.setPosition(m_title.getPosition() + offset);
 	m_body.setPosition(m_body.getPosition() + offset);
+	m_gauge->m_shape_container.setPosition(m_gauge->m_shape_container.getPosition() + offset);
+	m_gauge->m_shape.setPosition(m_gauge->m_shape.getPosition() + offset);
+	m_gauge->m_text.setPosition(m_gauge->m_text.getPosition() + offset);
 }
 
 bool Choice::Update()
@@ -88,6 +119,11 @@ bool Choice::Update()
 		m_picture->setAnimationLine(1);
 	}
 
+	//text
+	ostringstream ss;
+	ss << m_gauge_string << " " << m_gauge_value << "%";
+	m_gauge->m_text.setString(ss.str());
+
 	return false;
 }
 
@@ -100,4 +136,5 @@ void Choice::Draw(sf::RenderTexture& screen)
 	m_picture->Draw(screen);
 	screen.draw(m_title);
 	screen.draw(m_body);
+	m_gauge->Draw(screen);
 }

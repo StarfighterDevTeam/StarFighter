@@ -904,6 +904,10 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 		}
+		else
+		{
+			m_warship->m_crew_unboard_interface.Update(deltaTime, NULL);
+		}
 	}
 
 	//Music

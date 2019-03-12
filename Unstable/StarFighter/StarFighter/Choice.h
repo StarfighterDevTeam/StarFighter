@@ -8,6 +8,9 @@
 #define CHOICE_PANEL_SIZE_Y			150
 #define CHOICE_VIDEO_SIZE_X			280
 
+#define CHOICE_GAUGE_SIZE_X			240
+#define CHOICE_GAUGE_SIZE_Y			10
+
 struct Choice
 {
 	Choice();
@@ -26,6 +29,11 @@ struct Choice
 	GameEntity* m_picture;
 	sf::Text m_title;
 	sf::Text m_body;
+
+	GameEntity* m_gauge;
+	string m_gauge_string;
+	int m_gauge_value_max;
+	int m_gauge_value;
 };
 
 #endif //CHOICE_H_INCLUDED

@@ -32,6 +32,8 @@ struct CrewUnboardInterface
 	GameEntity* m_panel;
 	sf::Text m_narrative_text;
 	sf::Text m_crew_slot_text;
+
+	Choice m_choices[4];
 };
 
 #endif //CREWUNBOARDINTERFACE_H_INCLUDED

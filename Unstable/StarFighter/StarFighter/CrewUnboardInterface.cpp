@@ -30,6 +30,11 @@ void CrewUnboardInterface::Destroy()
 		delete m_crew_slots[i];
 	}
 	m_crew_slots.clear();
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_choices[i].Destroy();
+	}
 }
 
 void CrewUnboardInterface::Init(Ship* ship)
@@ -90,6 +95,30 @@ void CrewUnboardInterface::Init(Ship* ship)
 		crew_slot->m_position = crew_slot->m_shape_container.getPosition();
 		m_crew_slots.push_back(crew_slot);
 	}
+
+	//choices
+	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30;
+	for (int i = 0; i < 4; i++)
+	{
+		if (i == 0)
+		{
+			m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png");
+		}
+		else if (i == 1)
+		{
+			m_choices[i].Init(i, "En prison.", "2D/choice_prisoner_2.png");
+		}
+		else if (i == 2)
+		{
+			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png");
+		}
+		else if (i == 3)
+		{
+			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png");
+		}
+
+		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
+	}
 }
 
 void CrewUnboardInterface::Update(sf::Time deltaTime, CrewMember* unboarded_crew)
@@ -101,9 +130,36 @@ void CrewUnboardInterface::Update(sf::Time deltaTime, CrewMember* unboarded_crew
 		unboarded_crew->Update(deltaTime);//update position + reset hovering
 	}
 
+	//slots text
 	ostringstream ss_slots;
 	ss_slots << m_unboarded.size() << " / " << m_slots_avaible;
 	m_crew_slot_text.setString(ss_slots.str());
+
+	//choices
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_choices[i].Update() == false)//is choice hovered?
+		{
+			continue;
+		}
+
+		//checking conditions
+		bool condition = true;
+		if (i == 1)
+		{
+			//condition = m_ship->IsPrisonCellFree() == true;
+		}
+		else if (i == 2)
+		{
+			//condition = m_ship->m_nb_crew < m_ship->m_nb_crew_max;
+		}
+
+		if (condition == false)
+		{
+			m_choices[i].m_picture->setAnimationLine(1);
+			break;
+		}
+	}
 }
 
 void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
@@ -122,5 +178,10 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 	for (int i = 0; i < unboarded_size; i++)
 	{
 		m_unboarded[i]->Draw(screen);
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_choices[i].Draw(screen);
 	}
 }
