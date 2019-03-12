@@ -127,6 +127,9 @@ Game::Game(RenderWindow& window)
 	m_dico_colors[Color_Green_Lifebar] = m_dico_colors[Color_Green_System];
 	m_dico_colors[Color_Red_Impossible] = m_dico_colors[Color_Red_Target_Locked];
 	m_dico_colors[Color_Magenta_EngineCharged] = m_dico_colors[Color_Magenta_Crew];
+
+	//choices database
+	m_choices_config = *(FileLoaderUtils::FileLoader(CHOICES_CSV_FILE));
 }
 
 string Game::GetRandomCrewMemberName(int gender)

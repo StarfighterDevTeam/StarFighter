@@ -9,6 +9,7 @@
 #include "Includes/SimpleCollision.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "FileLoadUtils.h"
 
 #include "InputGuy.h"
 
@@ -222,6 +223,8 @@ public:
 	vector<Ammo*> m_bullets;
 	vector<FX*> m_FX;
 	vector<SFTextPop*> m_texts_pop;
+
+	vector<vector<string> > m_choices_config;
 
 	//void CreateSFTextPop(const Font& font, unsigned int size, Uint32 style, const Color& color, string text_string, float distance_not_faded, float distance_faded, float total_pop_time, GameEntity* target, float offset_positionY);
 

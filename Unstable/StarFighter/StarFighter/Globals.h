@@ -126,6 +126,7 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 
 //CSV DATA
 #define SHIP_CSV_FILE							"Scripts/Generated/Ship.csv"
+#define CHOICES_CSV_FILE						"Scripts/Generated/Choices.csv"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

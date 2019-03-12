@@ -115,15 +115,15 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 	{
 		if (i == 0)
 		{
-			m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png");
+			m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png", -1, 0);
 		}
 		else if (i == 1)
 		{
-			m_choices[i].Init(i, "En prison.", "2D/choice_prisoner_2.png");
+			m_choices[i].Init(i, "En prison.", "2D/choice_prisoner_2.png", -1, 0);
 		}
 		else if (i == 2)
 		{
-			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png");
+			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png", -1, 0);
 		}
 		
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
@@ -134,7 +134,7 @@ void PrisonersChoiceInterface::Update(sf::Time deltaTime)
 {
 	for (int i = 0; i < 3; i++)
 	{
-		if (m_choices[i].Update() == false)//is choice hovered?
+		if (m_choices[i].Update(0) == false)//is choice hovered?
 		{
 			continue;
 		}

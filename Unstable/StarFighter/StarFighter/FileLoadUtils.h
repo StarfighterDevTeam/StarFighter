@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 using namespace std;
 
 class FileLoaderUtils
@@ -11,7 +12,7 @@ public:
 	static vector<vector<string> >* FileLoader(string name){
 		vector<vector<string> >* fileConfig = new vector<vector<string> >;
 
-		std::ifstream  data(makePath(name));
+		std::ifstream data(makePath(name));
 
 		std::string line;
 		while(std::getline(data,line))

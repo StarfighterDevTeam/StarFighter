@@ -102,19 +102,20 @@ void CrewUnboardInterface::Init(Ship* ship)
 	{
 		if (i == 0)
 		{
-			m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png");
+			//m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png");
+			m_choices[i].Load(i, 0);
 		}
 		else if (i == 1)
 		{
-			m_choices[i].Init(i, "En prison.", "2D/choice_prisoner_2.png");
+			m_choices[i].Load(i, 1);
 		}
 		else if (i == 2)
 		{
-			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png");
+			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png", -1, 0);
 		}
 		else if (i == 3)
 		{
-			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png");
+			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png", -1, 0);
 		}
 
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
@@ -138,7 +139,17 @@ void CrewUnboardInterface::Update(sf::Time deltaTime, CrewMember* unboarded_crew
 	//choices
 	for (int i = 0; i < 4; i++)
 	{
-		if (m_choices[i].Update() == false)//is choice hovered?
+		int crew_size = m_unboarded.size();
+		int gauge_value = 0;
+		if (m_choices[i].m_skill >= 0)
+		{
+			for (int j = 0; j < crew_size; j++)
+			{
+				gauge_value += m_unboarded[j]->m_skills[m_choices[i].m_skill];
+			}
+		}
+
+		if (m_choices[i].Update(gauge_value) == false)//is choice hovered?
 		{
 			continue;
 		}

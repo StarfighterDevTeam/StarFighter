@@ -11,15 +11,26 @@
 #define CHOICE_GAUGE_SIZE_X			240
 #define CHOICE_GAUGE_SIZE_Y			10
 
+enum ChoicesData
+{
+	Choice_ID,
+	Choice_Text,
+	Choice_Picturename,
+	Choice_Skill,
+	Choice_ValueMax,
+};
+
 struct Choice
 {
 	Choice();
 	~Choice();
 
-	void Init(int index, string text, string portrait_filename);
+	void Init(int index, string text, string portrait_filename, int skill, int value_max);
 	void Destroy();
 
-	bool Update();
+	void Load(int index, int choiceID);
+
+	bool Update(int gauge_value);
 	void Draw(sf::RenderTexture& screen);
 	void SetPosition(sf::Vector2f position);
 
@@ -34,6 +45,7 @@ struct Choice
 	string m_gauge_string;
 	int m_gauge_value_max;
 	int m_gauge_value;
+	int m_skill;
 };
 
 #endif //CHOICE_H_INCLUDED
