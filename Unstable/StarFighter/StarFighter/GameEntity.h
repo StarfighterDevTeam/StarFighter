@@ -7,6 +7,7 @@ enum UI_Type
 {
 	UI_None,
 	UI_CrewMember,
+	UI_CrewMemberUnboarding,
 	UI_Room,
 	UI_RoomTile,
 	UI_Connexion,

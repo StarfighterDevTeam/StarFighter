@@ -280,10 +280,10 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 
 CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 {
-	if (m_nb_crew >= m_nb_crew_max)
-	{
-		return NULL;
-	}
+	//if (m_nb_crew >= m_nb_crew_max)
+	//{
+	//	return NULL;
+	//}
 
 	if (room == NULL)
 	{

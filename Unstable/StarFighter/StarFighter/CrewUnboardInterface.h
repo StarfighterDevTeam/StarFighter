@@ -19,8 +19,11 @@ struct CrewUnboardInterface
 	void Init(Ship* ship);
 	void Destroy();
 
-	void Update(sf::Time deltaTime, CrewMember* unboarded_crew);
+	void Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
+
+	bool AddCrewToInterface(CrewMember* crew);
+	void RemoveCrewFromInterface(CrewMember* crew);
 
 	int m_slots_avaible;
 	vector<CrewMember*> m_unboarded;
@@ -28,6 +31,8 @@ struct CrewUnboardInterface
 	Ship* m_ship;
 
 	CrewMember* m_hovered;
+
+	struct CrewInterface m_crew_interface;
 
 	GameEntity* m_panel;
 	sf::Text m_narrative_text;

@@ -22,6 +22,7 @@ enum ChoicesData
 
 struct Choice
 {
+public:
 	Choice();
 	~Choice();
 

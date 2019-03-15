@@ -880,34 +880,89 @@ void Gameloop::Update(sf::Time deltaTime)
 	else if (m_menu == Menu_CrewUnboard)
 	{
 		CrewMember* crew = NULL;
-		if (hovered != NULL && hovered->m_UI_type == UI_CrewMember && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_window_has_focus == true && m_warship->m_crew_unboard_interface.m_unboarded.size() < m_warship->m_crew_unboard_interface.m_slots_avaible)
+		if (hovered != NULL && (*CurrentGame).m_mouse_click == Mouse_RightClick && (*CurrentGame).m_window_has_focus == true)
 		{
-			//add unboarded crew to unboard interface
-			crew = (CrewMember*)hovered;
-			if (crew->m_is_prisoner == false)
+			//add crew to interface
+			if (hovered->m_UI_type == UI_CrewMember)
 			{
-				m_warship->m_crew_unboard_interface.Update(deltaTime, crew);
-
-				//remove unboarded crew from ship from ship
-				vector<CrewMember*> old_crew;
-				for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
+				CrewMember* crew = (CrewMember*)hovered;
+				if (m_warship->m_crew_unboard_interface.AddCrewToInterface(crew) == true)
 				{
-					old_crew.push_back(*it);
-				}
-				m_warship->m_crew[0].clear();
-				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-				{
-					if (*it != crew)
+					//remove from ship (since it has been added to the interface)
+					vector<CrewMember*> old_crew;
+					for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
 					{
-						m_warship->m_crew[0].push_back(*it);
+						old_crew.push_back(*it);
+					}
+					m_warship->m_crew[0].clear();
+					for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+					{
+						if (*it != crew)
+						{
+							m_warship->m_crew[0].push_back(*it);
+						}
 					}
 				}
 			}
+			//remove crew from interface
+			else if (hovered->m_UI_type == UI_CrewMemberUnboarding)
+			{
+				CrewMember* crew = (CrewMember*)hovered;
+				m_warship->m_crew_unboard_interface.RemoveCrewFromInterface(crew);
+				m_warship->AddCrewMember(crew);
+			}
 		}
-		else
-		{
-			m_warship->m_crew_unboard_interface.Update(deltaTime, NULL);
-		}
+
+		m_warship->m_crew_unboard_interface.Update(deltaTime);
+		//	bool found = false;
+		//	for (vector<CrewMember*>::iterator it = m_warship->m_crew_unboard_interface.m_unboarded.begin(); it != m_warship->m_crew_unboard_interface.m_unboarded.end(); it++)
+		//	{
+		//		if (*it == hovered)
+		//		{
+		//			found = true;
+		//			break;
+		//		}
+		//	}
+		//
+		//	if (found == false && m_warship->m_crew_unboard_interface.m_unboarded.size() < m_warship->m_crew_unboard_interface.m_slots_avaible)
+		//	{
+		//		//add unboarded crew to unboard interface
+		//		crew = (CrewMember*)hovered;
+		//		if (crew->m_is_prisoner == false)
+		//		{
+		//			m_warship->m_crew_unboard_interface.m_unboarded.push_back(crew);
+		//			crew->m_position = m_warship->m_crew_unboard_interface.m_crew_slots[m_warship->m_crew_unboard_interface.m_unboarded.size() - 1]->m_position;
+		//			crew->Update(deltaTime);//update position + reset hovering
+		//
+		//			//remove unboarded crew from ship from ship
+		//			vector<CrewMember*> old_crew;
+		//			for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
+		//			{
+		//				old_crew.push_back(*it);
+		//			}
+		//			m_warship->m_crew[0].clear();
+		//			for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+		//			{
+		//				if (*it != crew)
+		//				{
+		//					m_warship->m_crew[0].push_back(*it);
+		//				}
+		//			}
+		//		}
+		//	}
+		//	else if(found == true)
+		//	{
+		//		//remove from unboarded crew interface
+		//		m_warship->m_crew_unboard_interface.Update(deltaTime, crew);
+		//	}
+		//
+		//	//update
+		//	m_warship->m_crew_unboard_interface.Update(deltaTime, crew);
+		//}
+		//else
+		//{
+		//	m_warship->m_crew_unboard_interface.Update(deltaTime, NULL);
+		//}
 	}
 
 	//Music

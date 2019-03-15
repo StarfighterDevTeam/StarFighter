@@ -118,19 +118,12 @@ void CrewUnboardInterface::Init(Ship* ship)
 			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png", -1, 0);
 		}
 
-		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
+		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
 	}
 }
 
-void CrewUnboardInterface::Update(sf::Time deltaTime, CrewMember* unboarded_crew)
+void CrewUnboardInterface::Update(sf::Time deltaTime)
 {
-	if (unboarded_crew != NULL)
-	{
-		m_unboarded.push_back(unboarded_crew);
-		unboarded_crew->m_position = m_crew_slots[m_unboarded.size() - 1]->m_position;
-		unboarded_crew->Update(deltaTime);//update position + reset hovering
-	}
-
 	//slots text
 	ostringstream ss_slots;
 	ss_slots << m_unboarded.size() << " / " << m_slots_avaible;
@@ -171,6 +164,34 @@ void CrewUnboardInterface::Update(sf::Time deltaTime, CrewMember* unboarded_crew
 			break;
 		}
 	}
+
+	//crew slots
+	int k = 0;
+	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
+	{
+		(*it)->m_position = m_crew_slots[k]->m_shape_container.getPosition();
+		(*it)->Update(deltaTime);
+		k++;
+
+		if ((*it)->IsHoveredByMouse() == true && m_crew_interface.m_crew != *it)
+		{
+			//prisoner card (focus)
+			if (m_crew_interface.m_crew != NULL)
+			{
+				m_crew_interface.Destroy();
+			}
+			
+			m_crew_interface.Init((*it));
+			m_crew_interface.Update();
+
+			float pos_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 20;
+			m_crew_interface.SetPosition(sf::Vector2f(pos_x, (m_choices[0].m_picture->getPosition().y - CHOICE_PANEL_SIZE_Y * 0.5 + CREWINTERFACE_SIZE_Y * 0.5)));// +m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5 - CREWMEMBER_SIZE * 0.5));
+		}
+		else if ((*it)->IsHoveredByMouse() == false && m_crew_interface.m_crew == *it)
+		{
+			m_crew_interface.Destroy();
+		}
+	}
 }
 
 void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
@@ -194,5 +215,44 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 	for (int i = 0; i < 4; i++)
 	{
 		m_choices[i].Draw(screen);
+	}
+
+	if (m_crew_interface.m_crew != NULL)
+	{
+		m_crew_interface.Draw(screen);
+	}
+}
+
+bool CrewUnboardInterface::AddCrewToInterface(CrewMember* crew)
+{
+	if (crew->m_is_prisoner == false && m_unboarded.size() < m_slots_avaible)
+	{
+		m_unboarded.push_back(crew);
+		crew->m_UI_type = UI_CrewMemberUnboarding;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void CrewUnboardInterface::RemoveCrewFromInterface(CrewMember* crew)
+{
+	crew->m_UI_type = UI_CrewMember;
+
+	//remove from interface
+	vector<CrewMember*> old_crew;
+	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
+	{
+		old_crew.push_back(*it);
+	}
+	m_unboarded.clear();
+	for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+	{
+		if (*it != crew)
+		{
+			m_unboarded.push_back(*it);
+		}
 	}
 }
