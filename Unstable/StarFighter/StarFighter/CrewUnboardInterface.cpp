@@ -255,4 +255,9 @@ void CrewUnboardInterface::RemoveCrewFromInterface(CrewMember* crew)
 			m_unboarded.push_back(*it);
 		}
 	}
+
+	if (m_crew_interface.m_crew == crew)
+	{
+		m_crew_interface.Destroy();
+	}
 }

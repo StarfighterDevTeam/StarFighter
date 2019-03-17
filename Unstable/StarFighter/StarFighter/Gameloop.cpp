@@ -901,6 +901,10 @@ void Gameloop::Update(sf::Time deltaTime)
 						{
 							m_warship->m_crew[0].push_back(*it);
 						}
+						else
+						{
+							crew->m_tile->m_crew = NULL;
+						}
 					}
 				}
 			}
