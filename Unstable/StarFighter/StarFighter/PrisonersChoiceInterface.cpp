@@ -115,15 +115,15 @@ void PrisonersChoiceInterface::Init(Ship* ship, Ship* enemy_ship)
 	{
 		if (i == 0)
 		{
-			m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png", -1, 0);
+			m_choices[i].Init(i, -1, "A la planche !", "2D/choice_prisoner_1.png");
 		}
 		else if (i == 1)
 		{
-			m_choices[i].Init(i, "En prison.", "2D/choice_prisoner_2.png", -1, 0);
+			m_choices[i].Init(i, -1, "En prison.", "2D/choice_prisoner_2.png");
 		}
 		else if (i == 2)
 		{
-			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png", -1, 0);
+			m_choices[i].Init(i, -1, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png");
 		}
 		
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f, offset_y + (i * CHOICE_PANEL_SIZE_Y)));

@@ -7,6 +7,12 @@ Choice::Choice()
 	m_panel = NULL;
 	m_picture = NULL;
 	m_gauge = NULL;
+
+	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+	{
+		m_reward_resources[i] = 0;
+	}
+	m_reward_crew = 0;
 }
 
 Choice::~Choice()
@@ -27,29 +33,42 @@ void Choice::Destroy()
 	m_gauge = NULL;
 }
 
-void Choice::Load(int index, int choiceID)
+void Choice::Init(int index, int choiceID, string text, string portrait_filename)
 {
-	if (choiceID < 2)
+	//Init values
+	int skill = -1;
+	int value_max = 0;
+	int reward_resources[NB_RESOURCES_TYPES];
+	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
 	{
-		int ID = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ID]);
+		reward_resources[i] = 0;
+	}
+	int reward_crew = 0;
 
-		string text = (*CurrentGame).m_choices_config[choiceID][Choice_Text];
+	//Load from an ID?
+	if (choiceID > 0)
+	{
+		choiceID--;//ID 1 starts at line 0
+		text = (*CurrentGame).m_choices_config[choiceID][Choice_Text];
 		text = StringReplace(text, "_", " ");
 
-		string picture_name = (*CurrentGame).m_choices_config[choiceID][Choice_Picturename];
+		portrait_filename = (*CurrentGame).m_choices_config[choiceID][Choice_Picturename];
 
-		int skill = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Skill]);
+		skill = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Skill]);
+		value_max = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ValueMax]);
 
-		int value_max = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ValueMax]);
+		for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+		{
+			reward_resources[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardGold + i]);
+		}
 
-		Init(index, text, picture_name, skill, value_max);
+		reward_crew = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardCrew]);
 	}
-}
 
-void Choice::Init(int index, string text, string portrait_filename, int skill, int value_max)
-{
+	//Start building interface
 	m_position = sf::Vector2f(0, 0);
 
+	//background
 	m_panel = new GameEntity(UI_None);
 	m_panel->m_shape_container.setSize(sf::Vector2f(CHOICE_PANEL_SIZE_X, CHOICE_PANEL_SIZE_Y));
 	m_panel->m_shape_container.setOrigin(sf::Vector2f(CHOICE_PANEL_SIZE_X * 0.5f, CHOICE_PANEL_SIZE_Y * 0.5f));
@@ -58,6 +77,7 @@ void Choice::Init(int index, string text, string portrait_filename, int skill, i
 	m_panel->m_shape_container.setOutlineColor(sf::Color::Black);
 	m_panel->m_shape_container.setPosition(sf::Vector2f(0.f, 0.f));
 
+	//title of the choice
 	ostringstream ss_index;
 	ss_index << index + 1 << ".";
 	m_panel->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -66,6 +86,7 @@ void Choice::Init(int index, string text, string portrait_filename, int skill, i
 	m_panel->m_text.setString(ss_index.str());
 	m_panel->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5f - 34, 0.f - m_panel->m_text.getGlobalBounds().height * 0.5);
 
+	//texture
 	m_picture = new GameEntity(UI_None);
 	m_picture->m_shape_container.setSize(sf::Vector2f(CHOICE_VIDEO_SIZE_X, CHOICE_PANEL_SIZE_Y));
 	m_picture->m_shape_container.setOrigin(sf::Vector2f(CHOICE_VIDEO_SIZE_X * 0.5f, CHOICE_PANEL_SIZE_Y * 0.5f));
@@ -74,24 +95,26 @@ void Choice::Init(int index, string text, string portrait_filename, int skill, i
 	m_picture->m_shape_container.setOutlineColor(sf::Color::Black);
 	m_picture->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X * 0.5, 0.f));
 
+	//
 	m_picture->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_picture->m_text.setCharacterSize(20);
 	m_picture->m_text.setColor(sf::Color::Black);
 	m_picture->m_text.setString(text);
-	m_picture->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, 0.f - CHOICE_PANEL_SIZE_Y * 0.5 + m_picture->m_text.getGlobalBounds().height * 0.5 + 10);
+	m_picture->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, 0.f - CHOICE_PANEL_SIZE_Y * 0.5 + m_picture->m_text.getGlobalBounds().height * 0.5);
 
 	Texture* texture = TextureLoader::getInstance()->loadTexture(portrait_filename, 280, 300);
 	m_picture->setAnimation(texture, 1, 2);
 	m_picture->setAnimationLine(1);
 	m_picture->setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X * 0.5, 0.f));
 
+	//gauge (required skill + gauge)
 	m_gauge = new GameEntity(UI_None);
 	m_gauge->m_shape_container.setSize(sf::Vector2f(CHOICE_GAUGE_SIZE_X, CHOICE_GAUGE_SIZE_Y));
 	m_gauge->m_shape_container.setOrigin(sf::Vector2f(CHOICE_GAUGE_SIZE_X * 0.5, CHOICE_GAUGE_SIZE_Y * 0.5f));
 	m_gauge->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
 	m_gauge->m_shape_container.setOutlineThickness(4.f);
 	m_gauge->m_shape_container.setOutlineColor(sf::Color::Black);
-	m_gauge->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20 + CHOICE_GAUGE_SIZE_X * 0.5, 0.f - CHOICE_GAUGE_SIZE_Y * 0.5 + 40));
+	m_gauge->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20 + CHOICE_GAUGE_SIZE_X * 0.5, 0.f - CHOICE_GAUGE_SIZE_Y * 0.5 + 50));
 
 	m_gauge_value_max = value_max;
 	m_gauge_value = 0;
@@ -111,7 +134,7 @@ void Choice::Init(int index, string text, string portrait_filename, int skill, i
 			m_gauge->m_text.setCharacterSize(20);
 			m_gauge->m_text.setColor(sf::Color::Black);
 			m_gauge->m_text.setString((*CurrentGame).m_dico_crew_skills[skill]);
-			m_gauge->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, 0.f - CHOICE_GAUGE_SIZE_Y + 30 - m_gauge->m_text.getCharacterSize() - 10);
+			m_gauge->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, m_gauge->m_shape_container.getPosition().y - CHOICE_GAUGE_SIZE_Y * 0.5 - m_gauge->m_text.getCharacterSize() - 14);
 			m_gauge_string = m_gauge->m_text.getString();
 		}
 	}

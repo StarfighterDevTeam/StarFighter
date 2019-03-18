@@ -6,6 +6,9 @@ CrewUnboardInterface::CrewUnboardInterface()
 {
 	m_panel = NULL;
 	m_hovered = NULL;
+
+	m_ship = NULL;
+	m_island = NULL;
 }
 
 CrewUnboardInterface::~CrewUnboardInterface()
@@ -35,11 +38,15 @@ void CrewUnboardInterface::Destroy()
 	{
 		m_choices[i].Destroy();
 	}
+
+	m_ship = NULL;
+	m_island = NULL;
 }
 
-void CrewUnboardInterface::Init(Ship* ship)
+void CrewUnboardInterface::Init(Ship* ship, Island* island)
 {
 	m_ship = ship;
+	m_island = island;
 	m_slots_avaible = ship->m_lifeboats;
 
 	//background panel
@@ -100,24 +107,12 @@ void CrewUnboardInterface::Init(Ship* ship)
 	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30;
 	for (int i = 0; i < 4; i++)
 	{
-		if (i == 0)
+		if (m_island->m_choices[i] < 0)
 		{
-			//m_choices[i].Init(i, "A la planche !", "2D/choice_prisoner_1.png");
-			m_choices[i].Load(i, 0);
+			break;
 		}
-		else if (i == 1)
-		{
-			m_choices[i].Load(i, 1);
-		}
-		else if (i == 2)
-		{
-			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png", -1, 0);
-		}
-		else if (i == 3)
-		{
-			m_choices[i].Init(i, "Enrôler dans votre équipage.", "2D/choice_prisoner_3.png", -1, 0);
-		}
-
+		
+		m_choices[i].Init(i, m_island->m_choices[i]);
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
 	}
 }
@@ -132,6 +127,11 @@ void CrewUnboardInterface::Update(sf::Time deltaTime)
 	//choices
 	for (int i = 0; i < 4; i++)
 	{
+		if (m_island->m_choices[i] < 0)
+		{
+			break;
+		}
+
 		int crew_size = m_unboarded.size();
 		int gauge_value = 0;
 		if (m_choices[i].m_skill >= 0)
@@ -214,6 +214,11 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 
 	for (int i = 0; i < 4; i++)
 	{
+		if (m_island->m_choices[i] < 0)
+		{
+			break;
+		}
+
 		m_choices[i].Draw(screen);
 	}
 

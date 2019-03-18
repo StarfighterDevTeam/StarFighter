@@ -1840,7 +1840,7 @@ bool Gameloop::UpdateUnboarding()
 	{
 		m_menu = Menu_CrewUnboard;
 		
-		m_warship->m_crew_unboard_interface.Init(m_warship);
+		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
 	}
 	else if (m_warship->m_seaport == NULL && m_menu == Menu_CrewUnboard)
 	{

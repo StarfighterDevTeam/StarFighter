@@ -18,6 +18,12 @@ enum ChoicesData
 	Choice_Picturename,
 	Choice_Skill,
 	Choice_ValueMax,
+	Choice_RewardGold,
+	Choice_RewardFish,
+	Choice_RewardMech,
+	Choice_RewardDays,
+	Choice_RewardFidelity,
+	Choice_RewardCrew,
 };
 
 struct Choice
@@ -26,10 +32,8 @@ public:
 	Choice();
 	~Choice();
 
-	void Init(int index, string text, string portrait_filename, int skill, int value_max);
+	void Init(int index, int choiceID, string text = "", string portrait_filename = "");
 	void Destroy();
-
-	void Load(int index, int choiceID);
 
 	bool Update(int gauge_value);
 	void Draw(sf::RenderTexture& screen);
@@ -47,6 +51,8 @@ public:
 	int m_gauge_value_max;
 	int m_gauge_value;
 	int m_skill;
+	int m_reward_resources[NB_RESOURCES_TYPES];
+	int m_reward_crew;
 };
 
 #endif //CHOICE_H_INCLUDED

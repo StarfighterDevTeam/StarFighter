@@ -24,8 +24,7 @@ public:
 	Seaport* AddSeaport(SeaportType type);
 	Seaport* m_seaport;
 
-	//bool CreateIsland(int upcorner_x, int upcorner_y, int width, int height, WaterZone* zone, int zone_coord_x, int zone_coord_y);
-	
+	int m_choices[4];
 };
 
 #endif //ISLAND_H_INCLUDED

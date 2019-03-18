@@ -19,16 +19,6 @@
 
 #define COMPASS_MODE					false
 
-enum Resource_Meta
-{
-	Resource_Gold,
-	Resource_Fish,
-	Resource_Mech,
-	Resource_Fidelity,
-	Resource_Days,
-	NB_RESOURCES_TYPES,
-};
-
 class Warship : public Ship
 {
 public:
