@@ -113,6 +113,7 @@ Game::Game(RenderWindow& window)
 	m_dico_resources_textures[Resource_Mech] = "2D/icon_mech.png";
 	m_dico_resources_textures[Resource_Fidelity] = "2D/icon_fidelity.png";
 	m_dico_resources_textures[Resource_Days] = "2D/icon_days.png";
+	m_dico_resources_textures[Resource_Crew] = "2D/icon_crew.png";
 
 	m_dico_colors[Color_Red_Destroyed] = sf::Color::Red;
 	m_dico_colors[Color_Yellow_Target_Hovered] = sf::Color(255, 242, 39, 255);

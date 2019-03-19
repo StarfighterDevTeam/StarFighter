@@ -47,8 +47,8 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	//Init values
 	int skill = -1;
 	int value_max = 0;
-	int reward_resources[NB_RESOURCES_TYPES];
-	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+	int reward_resources[NB_RESOURCES_TYPES_TOTAL];
+	for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
 	{
 		reward_resources[i] = 0;
 	}
@@ -66,12 +66,15 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 		skill = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Skill]);
 		value_max = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ValueMax]);
 
-		for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+		for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
 		{
-			reward_resources[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardGold + i]);
-		}
+			if (i == NB_RESOURCES_TYPES)
+			{
+				continue;
+			}
 
-		reward_crew = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardCrew]);
+			reward_resources[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardGold + i - int(i > NB_RESOURCES_TYPES)]);
+		}
 	}
 
 	//Start building interface
@@ -151,9 +154,9 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 
 	//rewards
 	int r = 0;
-	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+	for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
 	{
-		if (reward_resources[i] == 0)
+		if (reward_resources[i] == 0 || i == NB_RESOURCES_TYPES)
 		{
 			continue;
 		}

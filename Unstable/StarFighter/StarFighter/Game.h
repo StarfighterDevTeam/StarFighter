@@ -94,6 +94,8 @@ enum Resource_Meta
 	Resource_Fidelity,
 	Resource_Days,
 	NB_RESOURCES_TYPES,
+	Resource_Crew,
+	NB_RESOURCES_TYPES_TOTAL,
 };
 
 enum RoomType
@@ -247,7 +249,7 @@ public:
 	string m_dico_crew_types[NB_CREW_TYPES];
 	string m_dico_crew_skills[NB_CREW_SKILLS];
 	string m_dico_crew_races[NB_CREW_RACES];
-	string m_dico_resources_textures[NB_RESOURCES_TYPES];
+	string m_dico_resources_textures[NB_RESOURCES_TYPES_TOTAL];
 	string GetRandomCrewMemberName(int gender);
 	sf::Color m_dico_colors[NB_COLOR_CHART];
 
