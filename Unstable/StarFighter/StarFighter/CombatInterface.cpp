@@ -67,7 +67,7 @@ void CombatInterface::Init(Ship* ship, ShipAlliance alliance, string ship_name, 
 {
 	m_ship = ship;
 	
-	Texture* texture = TextureLoader::getInstance()->loadTexture("2D/crew_icon.png", 32, 32);
+	Texture* texture = TextureLoader::getInstance()->loadTexture("2D/icon_crew.png", 30, 30);
 
 	float offset = alliance == Alliance_Player ? COMBAT_LIFEBAR_OFFSET_X : COMBAT_LIFEBAR_ENEMY_OFFSET_X;
 

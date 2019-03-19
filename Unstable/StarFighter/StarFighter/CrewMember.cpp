@@ -32,8 +32,8 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_shape_container.setOutlineThickness(1.f);
 	m_shape_container.setOutlineColor(sf::Color::White);
 
-	m_texture_name = "2D/crew_icon.png";
-	m_texture_big_name = "2D/crew_icon_big.png";
+	m_texture_name = "2D/icon_crew.png";
+	m_texture_big_name = "2D/icon_crew_big.png";
 
 	int skill_max_value = 0;
 	switch (type)

@@ -13,13 +13,16 @@ Choice::Choice()
 		m_reward_resources[i] = 0;
 	}
 	m_reward_crew = 0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_rewards[i] = NULL;
+	}
 }
 
 Choice::~Choice()
 {
-	delete m_panel;
-	delete m_picture;
-	delete m_gauge;
+	Destroy();
 }
 
 void Choice::Destroy()
@@ -27,6 +30,12 @@ void Choice::Destroy()
 	delete m_panel;
 	delete m_picture;
 	delete m_gauge;
+
+	for (int i = 0; i < 3; i++)
+	{
+		delete m_rewards[i];
+		m_rewards[i] = NULL;
+	}
 
 	m_panel = NULL;
 	m_picture = NULL;
@@ -77,7 +86,7 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	m_panel->m_shape_container.setOutlineColor(sf::Color::Black);
 	m_panel->m_shape_container.setPosition(sf::Vector2f(0.f, 0.f));
 
-	//title of the choice
+	//shortcut index of the choice "1.", "2.", etc...
 	ostringstream ss_index;
 	ss_index << index + 1 << ".";
 	m_panel->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -86,7 +95,7 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	m_panel->m_text.setString(ss_index.str());
 	m_panel->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5f - 34, 0.f - m_panel->m_text.getGlobalBounds().height * 0.5);
 
-	//texture
+	//texture container
 	m_picture = new GameEntity(UI_None);
 	m_picture->m_shape_container.setSize(sf::Vector2f(CHOICE_VIDEO_SIZE_X, CHOICE_PANEL_SIZE_Y));
 	m_picture->m_shape_container.setOrigin(sf::Vector2f(CHOICE_VIDEO_SIZE_X * 0.5f, CHOICE_PANEL_SIZE_Y * 0.5f));
@@ -95,17 +104,18 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	m_picture->m_shape_container.setOutlineColor(sf::Color::Black);
 	m_picture->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X * 0.5, 0.f));
 
-	//
+	//texture
+	Texture* texture = TextureLoader::getInstance()->loadTexture(portrait_filename, 280, 300);
+	m_picture->setAnimation(texture, 1, 2);
+	m_picture->setAnimationLine(1);
+	m_picture->setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X * 0.5, 0.f));
+
+	//title of the choice
 	m_picture->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_picture->m_text.setCharacterSize(20);
 	m_picture->m_text.setColor(sf::Color::Black);
 	m_picture->m_text.setString(text);
 	m_picture->m_text.setPosition(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20, 0.f - CHOICE_PANEL_SIZE_Y * 0.5 + m_picture->m_text.getGlobalBounds().height * 0.5);
-
-	Texture* texture = TextureLoader::getInstance()->loadTexture(portrait_filename, 280, 300);
-	m_picture->setAnimation(texture, 1, 2);
-	m_picture->setAnimationLine(1);
-	m_picture->setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X * 0.5, 0.f));
 
 	//gauge (required skill + gauge)
 	m_gauge = new GameEntity(UI_None);
@@ -138,6 +148,38 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 			m_gauge_string = m_gauge->m_text.getString();
 		}
 	}
+
+	//rewards
+	int r = 0;
+	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+	{
+		if (reward_resources[i] == 0)
+		{
+			continue;
+		}
+
+		m_rewards[r] = new GameEntity(UI_None);
+		float pos_x = m_gauge->m_text.getPosition().x + RESOURCES_ICON_SIZE * 0.5 + CHOICES_REWARDS_OFFSET_X * r;
+
+		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[i], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+		m_rewards[r]->setAnimation(texture, 1, 1);
+		m_rewards[r]->setPosition(sf::Vector2f(pos_x, m_gauge->m_text.getPosition().y - RESOURCES_ICON_SIZE * 0.5 - 4));
+
+		m_rewards[r]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_SIZE_Y));
+		m_rewards[r]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_SIZE_Y * 0.5f));
+		m_rewards[r]->m_shape.setFillColor(sf::Color::Black);
+		m_rewards[r]->m_shape.setPosition(m_rewards[r]->getPosition());
+
+		ostringstream ss_resource;
+		ss_resource << reward_resources[i];
+		m_rewards[r]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_rewards[r]->m_text.setCharacterSize(20);
+		m_rewards[r]->m_text.setColor(sf::Color::Black);
+		m_rewards[r]->m_text.setString(ss_resource.str());
+		m_rewards[r]->m_text.setPosition(sf::Vector2f(m_rewards[r]->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, m_rewards[r]->m_shape.getPosition().y - m_rewards[r]->m_text.getCharacterSize() * 0.65));
+
+		r++;
+	}
 }
 
 void Choice::SetPosition(sf::Vector2f position)
@@ -154,6 +196,18 @@ void Choice::SetPosition(sf::Vector2f position)
 	m_gauge->m_shape_container.setPosition(m_gauge->m_shape_container.getPosition() + offset);
 	m_gauge->m_shape.setPosition(m_gauge->m_shape.getPosition() + offset);
 	m_gauge->m_text.setPosition(m_gauge->m_text.getPosition() + offset);
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_rewards[i] == NULL)
+		{
+			break;
+		}
+
+		m_rewards[i]->setPosition(m_rewards[i]->getPosition() + offset);
+		m_rewards[i]->m_shape.setPosition(m_rewards[i]->m_shape.getPosition() + offset);
+		m_rewards[i]->m_text.setPosition(m_rewards[i]->m_text.getPosition() + offset);
+	}
 }
 
 bool Choice::Update(int gauge_value)
@@ -200,4 +254,14 @@ void Choice::Draw(sf::RenderTexture& screen)
 		screen.draw(m_gauge->m_shape);
 	}
 	screen.draw(m_gauge->m_text);
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_rewards[i] == NULL)
+		{
+			break;
+		}
+
+		m_rewards[i]->Draw(screen);
+	}
 }

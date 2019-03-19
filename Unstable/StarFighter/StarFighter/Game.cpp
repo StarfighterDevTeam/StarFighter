@@ -108,6 +108,12 @@ Game::Game(RenderWindow& window)
 	m_dico_crew_names[1].push_back("Lucy");
 	m_dico_crew_names[1].push_back("Angela");
 
+	m_dico_resources_textures[Resource_Gold] = "2D/icon_gold.png";
+	m_dico_resources_textures[Resource_Fish] = "2D/icon_fish.png";
+	m_dico_resources_textures[Resource_Mech] = "2D/icon_mech.png";
+	m_dico_resources_textures[Resource_Fidelity] = "2D/icon_fidelity.png";
+	m_dico_resources_textures[Resource_Days] = "2D/icon_days.png";
+
 	m_dico_colors[Color_Red_Destroyed] = sf::Color::Red;
 	m_dico_colors[Color_Yellow_Target_Hovered] = sf::Color(255, 242, 39, 255);
 	m_dico_colors[Color_DarkGrey_Background] = sf::Color(100, 100, 100, 255);

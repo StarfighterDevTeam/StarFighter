@@ -11,6 +11,19 @@
 #define CHOICE_GAUGE_SIZE_X			240
 #define CHOICE_GAUGE_SIZE_Y			10
 
+#define RESOURCES_INTERFACE_PANEL_SIZE_Y		40
+#define RESOURCES_INTERFACE_OFFSET_X			30
+#define RESOURCES_INTERFACE_SIZE_X				110
+#define RESOURCES_INTERFACE_SIZE_Y				30
+#define RESOURCES_ICON_SIZE						30
+#define RESOURCES_CREWFIDELITY_SIZE_X			250
+#define RESOURCES_CREWFIDELITY_SIZE_Y			12
+
+#define RESOURCES_BUTTON_SIZE_X					100
+#define RESOURCES_BUTTON_SIZE_Y					24
+
+#define CHOICES_REWARDS_OFFSET_X				80
+
 enum ChoicesData
 {
 	Choice_ID,
@@ -51,6 +64,8 @@ public:
 	int m_gauge_value_max;
 	int m_gauge_value;
 	int m_skill;
+
+	GameEntity* m_rewards[3];
 	int m_reward_resources[NB_RESOURCES_TYPES];
 	int m_reward_crew;
 };

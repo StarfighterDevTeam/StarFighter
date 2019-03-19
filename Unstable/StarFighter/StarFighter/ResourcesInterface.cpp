@@ -69,26 +69,7 @@ void ResourcesInterface::Init(Warship* warship)
 		m_resources[i]->m_shape_container.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + RESOURCES_INTERFACE_SIZE_X * 0.5 + i * RESOURCES_INTERFACE_SIZE_X, RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
 		m_resources[i]->m_position = m_panel->m_shape_container.getPosition();
 
-		sf::Texture* texture;
-		switch (i)
-		{
-			case Resource_Gold:
-			{
-				texture = TextureLoader::getInstance()->loadTexture("2D/icon_gold.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
-				break;
-			}
-			case Resource_Fish:
-			{
-				texture = TextureLoader::getInstance()->loadTexture("2D/icon_fish.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
-				break;
-			}
-			case Resource_Mech:
-			{
-				texture = TextureLoader::getInstance()->loadTexture("2D/icon_mech.png", RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
-				break;
-			}
-			
-		}
+		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[i], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
 		m_resources[i]->setAnimation(texture, 1, 1);
 		m_resources[i]->setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
 
