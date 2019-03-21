@@ -19,7 +19,7 @@ struct CrewUnboardInterface
 	void Init(Ship* ship, Island* island);
 	void Destroy();
 
-	void Update(sf::Time deltaTime);
+	bool Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 
 	bool AddCrewToInterface(CrewMember* crew);

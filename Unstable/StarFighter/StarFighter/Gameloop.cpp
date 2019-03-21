@@ -129,14 +129,13 @@ void Gameloop::Update(sf::Time deltaTime)
 		(*CurrentGame).m_selected_ui->m_shape_container.setOutlineColor((*CurrentGame).m_selected_ui->m_default_color);
 		(*CurrentGame).m_selected_ui = NULL;
 	}
+
+	bool warship_is_in_port = m_warship->m_seaport != NULL;
 	
 	//UPDATING GAME ENTITIES
 
 	//change of scale?
 	UpdateTacticalScale();
-
-	//unboarding?
-	UpdateUnboarding();
 
 	//Canceling weapon target
 	if (selection != NULL && selection->m_UI_type == UI_Weapon && hovered == NULL)
@@ -859,6 +858,14 @@ void Gameloop::Update(sf::Time deltaTime)
 	m_resources_interface.Update();
 
 	//MENUS
+	//entering a seaport?
+	if (warship_is_in_port == false && m_warship->m_seaport != NULL)
+	{
+		//unboarding?
+		m_menu = Menu_CrewUnboard;
+		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
+	}
+
 	//Crew overboard menu
 	if (m_menu == Menu_CrewOverboard)
 	{
@@ -917,7 +924,13 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 
-		m_warship->m_crew_unboard_interface.Update(deltaTime);
+		if (m_warship->m_crew_unboard_interface.Update(deltaTime) == true)
+		{
+			m_warship->m_crew_unboard_interface.Destroy();
+			m_menu = Menu_None;
+		}
+		
+		
 		//	bool found = false;
 		//	for (vector<CrewMember*>::iterator it = m_warship->m_crew_unboard_interface.m_unboarded.begin(); it != m_warship->m_crew_unboard_interface.m_unboarded.end(); it++)
 		//	{

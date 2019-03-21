@@ -21,14 +21,12 @@ CrewUnboardInterface::~CrewUnboardInterface()
 
 void CrewUnboardInterface::Destroy()
 {
-	//m_crew_interface.Destroy();
-
 	delete m_panel;
 
 	m_panel = NULL;
 	m_unboarded.clear();
 
-	for (int i = 0; i < m_slots_avaible; i++)
+	for (int i = 0; i < m_crew_slots.size(); i++)
 	{
 		delete m_crew_slots[i];
 	}
@@ -45,6 +43,11 @@ void CrewUnboardInterface::Destroy()
 
 void CrewUnboardInterface::Init(Ship* ship, Island* island)
 {
+	if (ship == NULL || island == NULL)
+	{
+		return;
+	}
+
 	m_ship = ship;
 	m_island = island;
 	m_slots_avaible = ship->m_lifeboats;
@@ -117,12 +120,39 @@ void CrewUnboardInterface::Init(Ship* ship, Island* island)
 	}
 }
 
-void CrewUnboardInterface::Update(sf::Time deltaTime)
+bool CrewUnboardInterface::Update(sf::Time deltaTime)
 {
-	//slots text
+	//crew slots
 	ostringstream ss_slots;
 	ss_slots << m_unboarded.size() << " / " << m_slots_avaible;
 	m_crew_slot_text.setString(ss_slots.str());
+
+	int k = 0;
+	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
+	{
+		(*it)->m_position = m_crew_slots[k]->m_shape_container.getPosition();
+		(*it)->Update(deltaTime);
+		k++;
+
+		if ((*it)->IsHoveredByMouse() == true && m_crew_interface.m_crew != *it)
+		{
+			//prisoner card (focus)
+			if (m_crew_interface.m_crew != NULL)
+			{
+				m_crew_interface.Destroy();
+			}
+
+			m_crew_interface.Init((*it));
+			m_crew_interface.Update();
+
+			float pos_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 20;
+			m_crew_interface.SetPosition(sf::Vector2f(pos_x, (m_choices[0].m_picture->getPosition().y - CHOICE_PANEL_SIZE_Y * 0.5 + CREWINTERFACE_SIZE_Y * 0.5)));// +m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5 - CREWMEMBER_SIZE * 0.5));
+		}
+		else if ((*it)->IsHoveredByMouse() == false && m_crew_interface.m_crew == *it)
+		{
+			m_crew_interface.Destroy();
+		}
+	}
 
 	//choices
 	for (int i = 0; i < 4; i++)
@@ -147,51 +177,32 @@ void CrewUnboardInterface::Update(sf::Time deltaTime)
 			continue;
 		}
 
+
 		//checking conditions
-		bool condition = true;
-		if (i == 1)
-		{
-			//condition = m_ship->IsPrisonCellFree() == true;
-		}
-		else if (i == 2)
-		{
-			//condition = m_ship->m_nb_crew < m_ship->m_nb_crew_max;
-		}
+		//bool condition = true;
+		//if (i == 1)
+		//{
+		//	//condition = m_ship->IsPrisonCellFree() == true;
+		//}
+		//else if (i == 2)
+		//{
+		//	//condition = m_ship->m_nb_crew < m_ship->m_nb_crew_max;
+		//}
+		//
+		//if (condition == false)
+		//{
+		//	m_choices[i].m_picture->setAnimationLine(1);
+		//	break;
+		//}
 
-		if (condition == false)
+		//click = action
+		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
-			m_choices[i].m_picture->setAnimationLine(1);
-			break;
+			return true;
 		}
 	}
 
-	//crew slots
-	int k = 0;
-	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
-	{
-		(*it)->m_position = m_crew_slots[k]->m_shape_container.getPosition();
-		(*it)->Update(deltaTime);
-		k++;
-
-		if ((*it)->IsHoveredByMouse() == true && m_crew_interface.m_crew != *it)
-		{
-			//prisoner card (focus)
-			if (m_crew_interface.m_crew != NULL)
-			{
-				m_crew_interface.Destroy();
-			}
-			
-			m_crew_interface.Init((*it));
-			m_crew_interface.Update();
-
-			float pos_x = m_panel->m_position.x - PRISONERSCHOICEINTERFACE_SIZE_X * 0.5f + m_crew_interface.m_panel->m_shape_container.getSize().x * 0.5f + 20;
-			m_crew_interface.SetPosition(sf::Vector2f(pos_x, (m_choices[0].m_picture->getPosition().y - CHOICE_PANEL_SIZE_Y * 0.5 + CREWINTERFACE_SIZE_Y * 0.5)));// +m_crew_interface.m_panel->m_shape_container.getSize().y * 0.5 - CREWMEMBER_SIZE * 0.5));
-		}
-		else if ((*it)->IsHoveredByMouse() == false && m_crew_interface.m_crew == *it)
-		{
-			m_crew_interface.Destroy();
-		}
-	}
+	return false;
 }
 
 void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
