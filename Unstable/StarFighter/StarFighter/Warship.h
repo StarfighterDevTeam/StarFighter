@@ -37,8 +37,6 @@ public:
 	struct CrewUnboardInterface m_crew_unboard_interface;
 
 	void UpdateOLD(Time deltaTime, bool tactical_combat);
-
-	int m_resources[NB_RESOURCES_TYPES];
 };
 
 #endif //WARSHIP_H_INCLUDED

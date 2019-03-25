@@ -162,6 +162,7 @@ bool CrewUnboardInterface::Update(sf::Time deltaTime)
 			break;
 		}
 
+		//update gauge
 		int crew_size = m_unboarded.size();
 		int gauge_value = 0;
 		if (m_choices[i].m_skill >= 0)
@@ -172,32 +173,39 @@ bool CrewUnboardInterface::Update(sf::Time deltaTime)
 			}
 		}
 
-		if (m_choices[i].Update(gauge_value) == false)//is choice hovered?
+		//is choice hovered?
+		if (m_choices[i].Update(gauge_value) == false)
 		{
 			continue;
 		}
-
-
+		
 		//checking conditions
-		//bool condition = true;
-		//if (i == 1)
-		//{
-		//	//condition = m_ship->IsPrisonCellFree() == true;
-		//}
-		//else if (i == 2)
-		//{
-		//	//condition = m_ship->m_nb_crew < m_ship->m_nb_crew_max;
-		//}
-		//
-		//if (condition == false)
-		//{
-		//	m_choices[i].m_picture->setAnimationLine(1);
-		//	break;
-		//}
+		if (m_choices[i].m_skill > 0 && m_choices[i].m_gauge_value == 0)
+		{
+			m_choices[i].m_picture->setAnimationLine(1);
+			continue;
+		}
 
 		//click = action
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
+			//gain reward and/or pay the cost
+			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
+			{
+				int reward_value = 0;
+				
+				if (j == Resource_Days || j == Resource_Crew)
+				{
+					reward_value = m_choices[i].m_reward_resources[j];
+				}
+				else
+				{
+					reward_value = (int)(1.0f * m_choices[i].m_reward_resources[j] * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max * RandomizeFloatBetweenValues(0.8, 1.2));
+				}
+
+				m_ship->m_resources[j] += reward_value;
+			}
+
 			return true;
 		}
 	}

@@ -70,6 +70,7 @@ public:
 	vector<WaterTile*> m_tiles_can_be_seen;
 	vector<WaterTile*> m_current_path;
 	Seaport* m_seaport;
+	int m_resources[NB_RESOURCES_TYPES];
 
 	float m_distance_combat;
 	sf::Vector2i m_rooms_size;

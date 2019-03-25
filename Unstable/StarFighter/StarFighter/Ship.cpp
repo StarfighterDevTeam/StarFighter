@@ -44,6 +44,13 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display
 
 	m_speed = sf::Vector2f(0, 0);
 	m_angle = -90;
+
+	//resources
+	m_resources[Resource_Gold] = 0;
+	m_resources[Resource_Fish] = 0;
+	m_resources[Resource_Mech] = 0;
+	m_resources[Resource_Fidelity] = 0;
+	m_resources[Resource_Days] = 0;
 }
 
 Ship::~Ship()

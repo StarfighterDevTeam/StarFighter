@@ -47,10 +47,9 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	//Init values
 	int skill = -1;
 	int value_max = 0;
-	int reward_resources[NB_RESOURCES_TYPES_TOTAL];
 	for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
 	{
-		reward_resources[i] = 0;
+		m_reward_resources[i] = 0;
 	}
 	int reward_crew = 0;
 
@@ -73,7 +72,7 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 				continue;
 			}
 
-			reward_resources[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardGold + i - int(i > NB_RESOURCES_TYPES)]);
+			m_reward_resources[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardGold + i - int(i > NB_RESOURCES_TYPES)]);
 		}
 	}
 
@@ -156,7 +155,7 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	int r = 0;
 	for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
 	{
-		if (reward_resources[i] == 0 || i == NB_RESOURCES_TYPES)
+		if (i != Resource_Days)//if (reward_resources[i] == 0 || i == NB_RESOURCES_TYPES)
 		{
 			continue;
 		}
@@ -174,7 +173,7 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 		m_rewards[r]->m_shape.setPosition(m_rewards[r]->getPosition());
 
 		ostringstream ss_resource;
-		ss_resource << reward_resources[i];
+		ss_resource << m_reward_resources[i];
 		m_rewards[r]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_rewards[r]->m_text.setCharacterSize(20);
 		m_rewards[r]->m_text.setColor(sf::Color::Black);
