@@ -1,3 +1,3 @@
-#choices_name,text,picture_name,skill,value_max,reward_gold,reward_fish,reward_mech,reward_fidelity,reward_days,reward_crew,reward_text
-1,Collect_shells,2D/choice_prisoner_1.png,1,100,0,50,0,0,-1,0,You_found_various_nutshells_that_can_make_for_a_very_good_meal
-2,Explore_the_shore,2D/choice_prisoner_1.png,2,100,50,0,0,0,-1,1,Your_crew_wandered_on_the_beach_and_actually_found_various_coins.
+#choices_name,text,picture_name,skill,value_max,reward_gold,reward_fish,reward_mech,reward_fidelity,reward_days,reward_crew
+1,Collect_shells,2D/choice_prisoner_1.png,1,100,0,50,0,0,-1,0
+2,Explore_the_shore,2D/choice_prisoner_1.png,2,100,50,0,0,0,-1,1

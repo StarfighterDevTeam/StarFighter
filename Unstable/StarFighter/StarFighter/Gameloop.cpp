@@ -924,13 +924,10 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 
-		Reward* reward = m_warship->m_crew_unboard_interface.Update(deltaTime);
-		if (reward != NULL)
+		if (m_warship->m_crew_unboard_interface.Update(deltaTime) == true)
 		{
 			m_warship->m_crew_unboard_interface.Destroy();
-
-			m_warship->m_reward_interface.Init(m_warship, reward);
-			m_menu = Menu_Reward;
+			m_menu = Menu_None;
 		}
 		
 		
@@ -1194,10 +1191,6 @@ void Gameloop::Draw()
 	else if (m_menu == Menu_CrewUnboard)
 	{
 		m_warship->m_crew_unboard_interface.Draw((*CurrentGame).m_mainScreen);
-	}
-	else if (m_menu == Menu_Reward)
-	{
-		m_warship->m_reward_interface.Draw((*CurrentGame).m_mainScreen);
 	}
 
 	//HUD - resources interface

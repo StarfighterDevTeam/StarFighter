@@ -15,13 +15,13 @@
 #define RESOURCES_INTERFACE_OFFSET_X			30
 #define RESOURCES_INTERFACE_SIZE_X				110
 #define RESOURCES_INTERFACE_SIZE_Y				30
+#define RESOURCES_ICON_SIZE						30
 #define RESOURCES_CREWFIDELITY_SIZE_X			250
 #define RESOURCES_CREWFIDELITY_SIZE_Y			12
 
 #define RESOURCES_BUTTON_SIZE_X					100
 #define RESOURCES_BUTTON_SIZE_Y					24
 
-#define RESOURCES_ICON_SIZE						30
 #define CHOICES_REWARDS_OFFSET_X				80
 
 enum ChoicesData
@@ -37,7 +37,6 @@ enum ChoicesData
 	Choice_RewardDays,
 	Choice_RewardFidelity,
 	Choice_RewardCrew,
-	Choice_RewardText,
 };
 
 struct Choice
@@ -69,7 +68,6 @@ public:
 	GameEntity* m_rewards[3];
 	int m_reward_resources[NB_RESOURCES_TYPES];
 	int m_reward_crew;
-	string m_reward_string;
 };
 
 #endif //CHOICE_H_INCLUDED

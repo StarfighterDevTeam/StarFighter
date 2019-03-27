@@ -24,7 +24,7 @@ public:
 	Seaport* AddSeaport(SeaportType type);
 	Seaport* m_seaport;
 
-	int m_choicesID[4];
+	int m_choices[4];
 };
 
 #endif //ISLAND_H_INCLUDED

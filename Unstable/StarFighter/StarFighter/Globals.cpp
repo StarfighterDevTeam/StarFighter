@@ -162,28 +162,6 @@ std::string StringReplace(std::string str, const std::string& from, const std::s
 	return str;
 }
 
-std::string StringCut(std::string str, const size_t length)
-{
-	size_t current_length = length;
-	size_t current_cut = 0;
-	size_t str_size = str.size();
-	while (str_size - current_cut > length)
-	{
-		for (size_t i = current_cut + length; i > 0; i--)
-		{
-			if (str[i] == ' ')
-			{
-				str[i] = '\n';
-				current_cut = i;
-				current_length = str_size - current_cut;
-				break;
-			}
-		}
-	}
-
-	return str;
-}
-
 float Lerp(float value, float input_min, float input_max, float output_min, float output_max)
 {
 	if (input_min == input_max)

@@ -5,7 +5,6 @@
 #include "Ship.h"
 #include "CrewInterface.h"
 #include "PrisonersChoiceInterface.h"
-#include "RewardInterface.h"
 
 #define	CREWUNBOARDINTERFACE_SIZE_X				PRISONERSCHOICEINTERFACE_SIZE_X
 #define CREWUNBOARDINTERFACE_SIZE_Y				PRISONERSCHOICEINTERFACE_SIZE_Y
@@ -20,7 +19,7 @@ struct CrewUnboardInterface
 	void Init(Ship* ship, Island* island);
 	void Destroy();
 
-	Reward* Update(sf::Time deltaTime);
+	bool Update(sf::Time deltaTime);
 	void Draw(sf::RenderTexture& screen);
 
 	bool AddCrewToInterface(CrewMember* crew);
