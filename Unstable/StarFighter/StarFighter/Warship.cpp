@@ -157,10 +157,7 @@ void Warship::Init()
 
 Warship::~Warship()
 {
-	//for (int i = 0; i < 2; i++)
-	//{
-	//	m_combat_interface[1].Destroy();
-	//}
+
 }
 
 void Warship::UpdateOLD(Time deltaTime, bool tactical_combat)
