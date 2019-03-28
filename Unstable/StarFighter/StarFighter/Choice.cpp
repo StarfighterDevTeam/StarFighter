@@ -74,6 +74,10 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 
 			m_reward_resources[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardGold + i - int(i > NB_RESOURCES_TYPES)]);
 		}
+
+		m_reward_string = (*CurrentGame).m_choices_config[choiceID][Choice_RewardText];
+		m_reward_string = StringReplace(m_reward_string, "_", " ");
+		m_reward_string = StringCut(m_reward_string, 50);
 	}
 
 	//Start building interface

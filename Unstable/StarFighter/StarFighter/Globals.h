@@ -15,6 +15,7 @@ std::string makePath(const std::string& srcPath);
 void createSavesDirectory();
 const char* getSavesPath();
 std::string StringReplace(std::string str, const std::string& from, const std::string& to);
+std::string StringCut(std::string str, const size_t length);
 
 #ifdef __APPLE__
 	#define PLAYER_SAVE_FILE						"SaveFile.txt"
