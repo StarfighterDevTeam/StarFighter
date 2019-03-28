@@ -67,9 +67,9 @@ public:
 	int m_skill;
 
 	GameEntity* m_rewards[3];
+	string m_reward_string;
 	int m_reward_resources[NB_RESOURCES_TYPES];
 	int m_reward_crew;
-	string m_reward_string;
 };
 
 #endif //CHOICE_H_INCLUDED
