@@ -67,6 +67,8 @@ public:
 
 	Island* m_island;
 	Seaport* m_seaport;
+
+	int m_cost;
 };
 
 #endif //WATERTILE_H_INCLUDED

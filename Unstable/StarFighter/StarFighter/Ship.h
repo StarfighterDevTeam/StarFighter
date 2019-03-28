@@ -120,6 +120,11 @@ public:
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
 	bool SetSailsToWaterTile(WaterTile* tile);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
+	void PayUpkeepCost(int days);
+
+	int GetShortestPathLength(WaterTile* tileA, WaterTile* tileB);
+	bool AddResource(Resource_Meta resource, int value);
+
 
 private:
 	int m_rooms_min_upcorner_x;

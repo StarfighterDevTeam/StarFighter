@@ -35,6 +35,11 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_texture_name = (*CurrentGame).m_dico_resources_textures[Resource_Crew];
 	m_texture_big_name = "2D/icon_crew_big.png";
 
+	for (int i = 0; i < 3; i++)
+	{
+		m_upkeep_cost[i] = 0;
+	}
+
 	int skill_max_value = 0;
 	switch (type)
 	{
@@ -42,18 +47,22 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 		{
 			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 20;
+			m_upkeep_cost[Resource_Gold] = 1;
+			m_upkeep_cost[Resource_Fish] = 2;
 			break;
 		}
 		case Crew_Civilian:
 		{
 			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 10;
+			m_upkeep_cost[Resource_Fish] = 2;
 			break;
 		}
 		case Crew_Slave:
 		{
 			m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_Crew]);
 			skill_max_value = 5;
+			m_upkeep_cost[Resource_Fish] = 1;
 			break;
 		}
 		case Crew_Undead:

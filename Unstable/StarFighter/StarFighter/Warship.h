@@ -16,8 +16,6 @@
 
 #include <fstream>
 
-
-
 #define COMPASS_MODE					false
 
 class Warship : public Ship

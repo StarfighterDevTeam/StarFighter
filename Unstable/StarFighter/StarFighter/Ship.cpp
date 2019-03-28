@@ -1407,11 +1407,6 @@ void Ship::Reset()
 
 bool Ship::SetSailsToWaterTile(WaterTile* tile)
 {
-	if (tile->m_type != Water_Empty)
-	{
-		return false;
-	}
-
 	sf::Vector2f move_vector = tile->m_position - m_position;
 	ScaleVector(&move_vector, CRUISE_SPEED);
 	m_speed = move_vector;
@@ -1436,6 +1431,87 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile)
 	}
 
 	return true;
+}
+
+void Ship::PayUpkeepCost(int days)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		int upkeep = 0;
+		for (int j = 0; j < 2; j++)
+		{
+			for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+			{
+				upkeep += (*it)->m_upkeep_cost[i];
+			}
+		}
+
+		AddResource((Resource_Meta)i, -upkeep * days);
+	}
+}
+
+int Ship::GetShortestPathLength(WaterTile* tileA, WaterTile* tileB)
+{
+	//save old path
+	vector<WaterTile*> old_path;
+	for (vector<WaterTile*>::iterator it = m_current_path.begin(); it != m_current_path.end(); it++)
+	{
+		old_path.push_back(*it);
+	}
+	m_current_path.clear();
+
+	//start
+	m_open_list_pathfind.push_back(tileA);
+	while (m_open_list_pathfind.empty() == false && tileB->m_parent == NULL)
+	{
+		//choose next best tile to compute
+		size_t min_G_value = 0;
+		WaterTile* next_tile = NULL;
+		for (list<WaterTile*>::iterator it = m_open_list_pathfind.begin(); it != m_open_list_pathfind.end(); it++)
+		{
+			if ((*it)->m_G_value < min_G_value || min_G_value == 0)
+			{
+				min_G_value = (*it)->m_G_value;
+				next_tile = *it;
+			}
+		}
+
+		//compute this tile
+		IteratePathFinding(next_tile, tileB);
+	}
+
+	//path found -> save all waypoints into a member path
+	WaterTile* way_point = tileB;
+	while (way_point != tileA)
+	{
+		m_current_path.push_back(way_point);
+		way_point = way_point->m_parent;
+	}
+
+	//save size found
+	int path_size = m_current_path.size();
+
+	//clear data
+	for (vector<WaterTile*>::iterator it = m_tiles_can_be_seen.begin(); it != m_tiles_can_be_seen.end(); it++)
+	{
+		(*it)->m_heuristic = 0;
+		(*it)->m_movement_cost = 0;
+		(*it)->m_G_value = 0;
+		(*it)->m_parent = NULL;
+	}
+
+	m_open_list_pathfind.clear();
+	m_closed_list_pathfind.clear();
+
+	//restore old path
+	m_current_path.clear();
+	for (vector<WaterTile*>::iterator it = old_path.begin(); it != old_path.end(); it++)
+	{
+		m_current_path.push_back(*it);
+	}
+
+	//return path size found
+	return path_size;
 }
 
 void Ship::FindShortestPath(WaterTile* tileA, WaterTile* tileB)
@@ -2002,4 +2078,21 @@ bool Ship::CanViewWaterTile(WaterTile* tile)
 	{
 		return false;
 	}
+}
+
+bool Ship::AddResource(Resource_Meta resource, int value)
+{
+	m_resources[resource] += value;
+
+	if (resource == Resource_Fidelity && m_resources[resource] > 100)
+	{
+		m_resources[resource] = 100;
+	}
+
+	if (m_resources[resource] < 0)
+	{
+		m_resources[resource] = 0;
+	}
+
+	return true;
 }

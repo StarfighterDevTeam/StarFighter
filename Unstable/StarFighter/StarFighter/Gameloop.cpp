@@ -137,6 +137,79 @@ void Gameloop::Update(sf::Time deltaTime)
 	//change of scale?
 	UpdateTacticalScale();
 
+	//Water tiles
+	m_warship->m_tiles_can_be_seen.clear();
+	if (m_scale == Scale_Strategic)
+	{
+		for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
+		{
+			for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
+			{
+				//can be seen? no need to update other tiles because they won't be drawn anyway
+				if (m_warship->CanViewWaterTile(*it2))
+				{
+					(*it2)->m_can_be_seen = true;
+					m_warship->m_tiles_can_be_seen.push_back(*it2);
+
+					//position on "radar"
+					(*it2)->UpdatePosition(m_warship->m_DMS);
+
+					//selection
+					if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
+					{
+						//display tile coords
+						//ostringstream ss;
+						//ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
+						//(*it2)->m_text.setString(ss.str());
+						(*it2)->GameEntity::Update(deltaTime);
+					}
+					else
+					{
+						(*it2)->GameEntity::UpdatePosition();
+
+						if ((*it2)->m_type == Water_Empty)
+						{
+							(*it2)->m_text.setString("");
+
+							//selection of water tiles is forbidden
+							if ((*it2)->m_selected == true)
+							{
+								(*it2)->m_selected = false;
+								(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
+								(*CurrentGame).m_selected_ui = NULL;
+							}
+						}
+					}
+				}
+				else
+				{
+					(*it2)->m_can_be_seen = false;
+				}
+			}
+		}
+	}
+
+	//Islands
+	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+	{
+		//position on "radar"
+		WaterTile* tileUpLeft = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x][(*it)->m_upcorner_y];
+		WaterTile* tileDownRight = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x + (*it)->m_width - 1][(*it)->m_upcorner_y - (*it)->m_height + 1];
+		float pos_x = 0.5f * (tileDownRight->m_position.x + tileUpLeft->m_position.x);
+		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
+		(*it)->m_position = sf::Vector2f(pos_x, pos_y);
+
+		(*it)->UpdatePosition();
+
+		if ((*it)->m_seaport != NULL)
+		{
+			Seaport* port = (*it)->m_seaport;
+
+			port->m_position = port->m_tile->m_position;
+			port->UpdatePosition();
+		}
+	}
+
 	//Canceling weapon target
 	if (selection != NULL && selection->m_UI_type == UI_Weapon && hovered == NULL)
 	{
@@ -167,12 +240,60 @@ void Gameloop::Update(sf::Time deltaTime)
 				ss << "\n";
 				ss << ship->m_DMS.m_degree_x << "°" << ship->m_DMS.m_minute_x << "' " << (int)ship->m_DMS.m_second_x << "\"\E";
 				ship->m_text.setString(ss.str());
-
-				//Sail order
-				if (ship->m_selected == true && mouse_click == Mouse_RightClick && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
+	
+				//Orders
+				if (ship->m_selected == true && hovered != NULL && hovered->m_UI_type == UI_WaterTile)
 				{
-					WaterTile* tile = (WaterTile*)hovered;
-					m_warship->SetSailsToWaterTile(tile);
+					WaterTile* tile_hovered = (WaterTile*)hovered;
+
+					//Hovering a water tile that is not our current tile?
+					if (WaterTile::SameDMS(m_warship->m_DMS, tile_hovered->m_DMS) == false)
+					{
+						//Scan all enemy ships to see if we're in range for combat with anyone
+						Ship* ship_in_combat_range = NULL;
+						for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
+						{
+							if ((*it3) == m_warship || (*it3)->m_can_be_seen == false)
+							{
+								continue;
+							}
+
+							ship_in_combat_range = IsDMSInCombatRange(tile_hovered->m_DMS, (*it3)->m_DMS);
+							if (ship_in_combat_range != NULL)
+							{
+								break;
+							}
+						}
+
+						//Contextual orders' feedback
+						if (m_menu == Menu_None && m_warship->m_speed == sf::Vector2f(0, 0))
+						{
+							int cost = m_warship->GetShortestPathLength(m_warship->m_tile, tile_hovered);
+							
+							if (ship_in_combat_range == NULL)
+							{
+								if (tile_hovered->m_seaport == NULL)
+								{
+									m_contextual_order->SetContextualOrder(Order_Sail, tile_hovered->m_position, true, cost);
+								}
+								else
+								{
+									m_contextual_order->SetContextualOrder(Order_Dock, tile_hovered->m_position, true, cost);
+								}
+							}
+							else
+							{
+								m_contextual_order->SetContextualOrder(Order_Engage, tile_hovered->m_position, true, cost);
+							}
+
+							//Sail order
+							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty)
+							{
+								ship->SetSailsToWaterTile(tile_hovered);
+								ship->PayUpkeepCost(cost);
+							}
+						}
+					}
 				}
 			}
 			else
@@ -186,7 +307,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 			ship->GameEntity::Update(deltaTime);
 		}
-		
+
 		//Tactical scale update (and player)
 		if (ship != m_warship && ship != m_tactical_ship)
 		{
@@ -378,7 +499,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							UpdateAICrew(*it);
 						}
 					}
-					
+
 					if ((*it)->m_health > 0)
 					{
 						ship->m_crew[j].push_back(*it);
@@ -609,14 +730,14 @@ void Gameloop::Update(sf::Time deltaTime)
 										tile->m_connexion->Destroy();
 									}
 								}
-								
+
 								//hull damage
 								int damage_hull = Min((*it)->m_hull_damage, tile->m_health);
 								if (damage_hull > 0)
 								{
 									tile->m_health -= damage_hull;
 								}
-								
+
 								//piercing hull
 								if (tile->m_hull != Hull_None && tile->m_is_pierced == false && tile->m_health == 0 && tile->m_weapon == NULL)//cannot pierce a tile where a weapon is standing
 								{
@@ -740,117 +861,6 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				delete *it;
 			}
-		}
-	}
-
-	//Water tiles
-	m_warship->m_tiles_can_be_seen.clear();
-	if (m_scale == Scale_Strategic)
-	{
-		for (vector<vector<WaterTile*> >::iterator it = m_warship->m_tile->m_zone->m_watertiles.begin(); it != m_warship->m_tile->m_zone->m_watertiles.end(); it++)
-		{
-			for (vector<WaterTile*>::iterator it2 = it->begin(); it2 != it->end(); it2++)
-			{
-				//can be seen? no need to update other tiles because they won't be drawn anyway
-				if (m_warship->CanViewWaterTile(*it2))
-				{
-					(*it2)->m_can_be_seen = true;
-					m_warship->m_tiles_can_be_seen.push_back(*it2);
-
-					//position on "radar"
-					(*it2)->UpdatePosition(m_warship->m_DMS);
-
-					//selection
-					if (selection == m_warship && (*it2)->m_type == Water_Empty)// && m_warship->m_destination == NULL
-					{
-						ostringstream ss;
-						ss << (*it2)->m_coord_x << ", " << (*it2)->m_coord_y;
-						(*it2)->m_text.setString(ss.str());
-						(*it2)->GameEntity::Update(deltaTime);
-
-						//contextuel order feedback
-						if ((*it2)->m_hovered == true && WaterTile::SameDMS(m_warship->m_DMS, (*it2)->m_DMS) == false)
-						{
-							Ship* ship_in_combat_range = NULL;
-							for (vector<Ship*>::iterator it3 = m_ships.begin(); it3 != m_ships.end(); it3++)
-							{
-								if ((*it3) == m_warship || (*it3)->m_can_be_seen == false)
-								{
-									continue;
-								}
-
-								ship_in_combat_range = IsDMSInCombatRange((*it2)->m_DMS, (*it3)->m_DMS);
-								if (ship_in_combat_range != NULL)
-								{
-									break;
-								}
-							}
-
-							//Contextual orders' feedback
-							if (m_menu == Menu_None)
-							{
-								if (ship_in_combat_range == NULL)
-								{
-									if ((*it2)->m_seaport == NULL)
-									{
-										m_contextual_order->SetContextualOrder(Order_Sail, (*it2)->m_position, true);
-									}
-									else
-									{
-										m_contextual_order->SetContextualOrder(Order_Dock, (*it2)->m_position, true);
-									}
-								}
-								else
-								{
-									m_contextual_order->SetContextualOrder(Order_Engage, (*it2)->m_position, true);
-								}
-							}
-						}
-					}
-					else
-					{
-						(*it2)->GameEntity::UpdatePosition();
-
-						if ((*it2)->m_type == Water_Empty)
-						{
-							(*it2)->m_text.setString("");
-
-							//selection of water tiles is forbidden
-							if ((*it2)->m_selected == true)
-							{
-								(*it2)->m_selected = false;
-								(*it2)->m_shape_container.setOutlineColor((*it2)->m_default_color);
-								(*CurrentGame).m_selected_ui = NULL;
-							}
-						}
-					}
-				}
-				else
-				{
-					(*it2)->m_can_be_seen = false;
-				}
-			}
-		}
-	}
-
-	//Islands
-	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
-	{
-		//position on "radar"
-		WaterTile* tileUpLeft = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x][(*it)->m_upcorner_y];
-		WaterTile* tileDownRight = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x + (*it)->m_width - 1][(*it)->m_upcorner_y - (*it)->m_height + 1];
-		float pos_x = 0.5f * (tileDownRight->m_position.x + tileUpLeft->m_position.x);
-		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
-		(*it)->m_position = sf::Vector2f(pos_x, pos_y);
-
-		(*it)->UpdatePosition();
-
-		if ((*it)->m_seaport != NULL)
-		{
-			Seaport* port = (*it)->m_seaport;
-
-			port->m_position = port->m_tile->m_position;
-			port->UpdatePosition();
 		}
 	}
 
@@ -1280,7 +1290,8 @@ bool Gameloop::UpdateTacticalScale()
 				//Get reward
 				if (win == true)
 				{
-					AddResource(Resource_Gold, 5);
+					m_warship->AddResource(Resource_Gold, 5);
+					SavePlayerData(m_warship);
 				}
 				//else
 				//{
@@ -1625,24 +1636,6 @@ int Gameloop::LoadPlayerData(Warship* warship)
 		cerr << "No save file found. A new file is going to be created.\n" << endl;
 		return 0;
 	}
-}
-
-bool Gameloop::AddResource(Resource_Meta resource, int value)
-{
-	m_warship->m_resources[resource] += value;
-
-	if (resource == Resource_Fidelity && m_warship->m_resources[resource] > 100)
-	{
-		m_warship->m_resources[resource] = 100;
-	}
-
-	if (m_warship->m_resources[resource] < 0)
-	{
-		m_warship->m_resources[resource] = 0;
-	}
-
-	SavePlayerData(m_warship);
-	return true;
 }
 
 void Gameloop::UpdateContextualOrderFeedback(CrewMember* crew, RoomTile* tile)

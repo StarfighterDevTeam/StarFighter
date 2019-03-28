@@ -66,7 +66,6 @@ public:
 
 	void UpdateAICrew(CrewMember* crew);
 	void UpdateAITargetRoom(Weapon* weapon);
-	bool AddResource(Resource_Meta resource, int value);
 
 private:
 	sf::RenderWindow* mainWindow;
