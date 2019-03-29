@@ -199,7 +199,7 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 				}
 				else if (j == Resource_Days)
 				{
-					m_ship->PayUpkeepCost(reward_value);
+					m_ship->PayUpkeepCost(- m_choices[i].m_reward_resources[j]);
 				}
 				else
 				{
@@ -213,8 +213,6 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 					reward->m_rewards[k].second = reward_value;
 					k++;
 				}
-
-				m_ship->m_resources[j] += reward_value;
 			}
 
 			reward->m_string = m_choices[i].m_reward_string;

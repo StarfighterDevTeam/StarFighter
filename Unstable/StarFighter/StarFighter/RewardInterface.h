@@ -7,7 +7,7 @@
 #include "Ship.h"
 
 #define REWARD_PANEL_SIZE_X			500
-#define REWARD_PANEL_SIZE_Y			120
+#define REWARD_PANEL_SIZE_Y			160
 #define REWARD_INTERFACE_OFFSET_X	20
 
 struct Reward
@@ -32,8 +32,10 @@ struct RewardInterface
 	void Init(Ship* ship, Reward* reward);
 	void Destroy();
 
-	void Update();
+	bool Update();
 	void Draw(sf::RenderTexture& screen);
+
+	GameEntity* m_ok_button;
 };
 
 #endif //REWARDINTERFACE_H_INCLUDED

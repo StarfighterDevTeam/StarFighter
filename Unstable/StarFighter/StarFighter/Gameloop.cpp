@@ -994,6 +994,15 @@ void Gameloop::Update(sf::Time deltaTime)
 		//	m_warship->m_crew_unboard_interface.Update(deltaTime, NULL);
 		//}
 	}
+	else if (m_menu == Menu_Reward)
+	{
+		if (m_warship->m_reward_interface.Update() == true)
+		{
+			m_warship->m_reward_interface.Destroy();
+
+			m_menu = Menu_None;
+		}
+	}
 
 	//Music
 	(*CurrentGame).ManageMusicTransitions(deltaTime);
