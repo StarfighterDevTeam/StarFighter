@@ -137,6 +137,7 @@ enum Input_Actions
 {
 	Action_Pause,
 	Action_Saving,
+	Action_Entering,
 	NB_INPUT_ACTIONS,
 };
 

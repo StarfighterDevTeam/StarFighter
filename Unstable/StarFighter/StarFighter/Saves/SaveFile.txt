@@ -1,8 +1,8 @@
 DMS 0 10 0 8
-Gold 135
-Fish 100
+Gold 136
+Fish 20
 Mech 100
-Fidelity 50
+Fidelity 52
 Days 10
 Crew Lucy 1 1 20 20 17 20 6 9 7 0 9 5
 Crew Serena 2 2 20 20 7 9 6 7 5 0 9 6

@@ -413,6 +413,7 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 				ship->m_crew[j].clear();
 
+				int fidelity = 0;
 				for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
 				{
 					//prisoners vs non-prisoners opponent?
@@ -503,6 +504,10 @@ void Gameloop::Update(sf::Time deltaTime)
 					if ((*it)->m_health > 0)
 					{
 						ship->m_crew[j].push_back(*it);
+						if (j == 0)
+						{
+							fidelity += (*it)->m_fidelity;
+						}
 					}
 					else
 					{
@@ -527,6 +532,11 @@ void Gameloop::Update(sf::Time deltaTime)
 
 						delete *it;
 					}
+				}
+
+				if (j == 0)
+				{
+					ship->m_resources[Resource_Fidelity] = ship->m_crew[j].empty() == true ? 50 : fidelity / ship->m_crew[j].size();
 				}
 			}
 
@@ -906,23 +916,23 @@ void Gameloop::Update(sf::Time deltaTime)
 				if (m_warship->m_crew_unboard_interface.AddCrewToInterface(crew) == true)
 				{
 					//remove from ship (since it has been added to the interface)
-					vector<CrewMember*> old_crew;
-					for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
-					{
-						old_crew.push_back(*it);
-					}
-					m_warship->m_crew[0].clear();
-					for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-					{
-						if (*it != crew)
-						{
-							m_warship->m_crew[0].push_back(*it);
-						}
-						else
-						{
-							crew->m_tile->m_crew = NULL;
-						}
-					}
+					//vector<CrewMember*> old_crew;
+					//for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
+					//{
+					//	old_crew.push_back(*it);
+					//}
+					//m_warship->m_crew[0].clear();
+					//for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
+					//{
+					//	if (*it != crew)
+					//	{
+					//		m_warship->m_crew[0].push_back(*it);
+					//	}
+					//	else
+					//	{
+					//		crew->m_tile->m_crew = NULL;
+					//	}
+					//}
 				}
 			}
 			//remove crew from interface
@@ -930,7 +940,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				CrewMember* crew = (CrewMember*)hovered;
 				m_warship->m_crew_unboard_interface.RemoveCrewFromInterface(crew);
-				m_warship->AddCrewMember(crew);
+				//m_warship->AddCrewMember(crew);
 			}
 		}
 

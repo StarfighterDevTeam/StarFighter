@@ -30,7 +30,7 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 	//Add scenariis (choices)
 	m_choicesID[0] = 1;
 	m_choicesID[1] = 2;
-	m_choicesID[2] = -1;
+	m_choicesID[2] = 3;
 	m_choicesID[3] = -1;
 
 	//UI

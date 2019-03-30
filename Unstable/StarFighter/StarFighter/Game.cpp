@@ -355,4 +355,13 @@ void Game::GetControllerInputs()
 	{
 		m_input_actions[Action_Saving] = Input_Release;
 	}
+
+	if (InputGuy::isEntering() == true)
+	{
+		m_input_actions[Action_Entering] = m_input_actions[Action_Entering] == Input_Release ? Input_Tap : Input_Hold;
+	}
+	else
+	{
+		m_input_actions[Action_Entering] = Input_Release;
+	}
 }

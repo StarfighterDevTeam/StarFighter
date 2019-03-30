@@ -16,12 +16,12 @@ CrewMember::CrewMember(CrewMemberType type, ShipAlliance alliance, CrewMemberRac
 	m_healing_timer = HEALING_TIMER;
 	m_is_prisoner = prisoner;
 	m_tile = NULL;
-
+	m_clone = NULL;
 	m_melee_opponent = NULL;
 	m_melee_rof_timer = 0;
 	m_melee_rof = CREWMEMBER_MELEE_ROF;
 	m_melee_damage = CREWMEMBER_MELEE_DAMAGE;
-
+	m_fidelity = 50;
 	m_health_max = CREWMEMBER_HEALTH_MAX;
 	m_health = m_health_max;
 	m_prisoner_roaming_timer = RandomizeFloatBetweenValues(PRISONER_ROAM_TIMER_MIN, PRISONER_ROAM_TIMER_MAX);
@@ -610,5 +610,30 @@ void CrewMember::UpdateMelee(sf::Time deltaTime)
 			}
 		}
 	}
+}
+
+CrewMember* CrewMember::Clone()
+{
+	CrewMember* clone = new CrewMember(m_type, m_alliance, m_race, m_is_prisoner);
+
+	for (int i = 0; i < NB_CREW_SKILLS; i++)
+	{
+		clone->m_skills[i] = m_skills[i];
+		clone->m_skills_max[i] = m_skills_max[i];
+	}
+	
+	
+	
+	clone->m_health = m_health;
+	clone->m_health_max = m_health_max;
+
+	clone->m_melee_rof = m_melee_rof;
+	clone->m_melee_damage = m_melee_damage;
+
+	clone->m_display_name = m_display_name;
+	clone->m_texture_name = m_texture_name;
+	clone->m_texture_big_name = m_texture_big_name;
+
+	return clone;
 }
 
