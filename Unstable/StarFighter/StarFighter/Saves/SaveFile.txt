@@ -1,8 +1,8 @@
 DMS 0 10 0 8
-Gold 236
-Fish 220
+Gold 226
+Fish 20
 Mech 100
-Fidelity 52
+Fidelity 73
 Days 10
 Crew Lucy 1 1 20 20 17 20 6 9 7 0 9 5
 Crew Serena 2 2 20 20 7 9 6 7 5 0 9 6
@@ -14,3 +14,4 @@ Crew Serena 2 2 20 20 6 9 6 7 4 1 0 5
 Crew Thomas 2 2 20 20 2 2 3 8 3 1 0 6
 Crew Leandra 2 0 20 20 4 4 5 3 6 1 0 7
 Crew Bill 2 2 20 20 10 10 7 3 3 1 0 8
+Island 8 9 2 2 0 0 White_Island 0 1 10 9 0 0

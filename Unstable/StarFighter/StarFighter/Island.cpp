@@ -8,7 +8,10 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 	m_upcorner_y = upcorner_y;
 	m_width = width;
 	m_height = height;
+	m_zone_coord_x = zone_coord_x;
+	m_zone_coord_y = zone_coord_y;
 	m_seaport = NULL;
+	m_visited_countdown = 0;
 
 	//associating island tiles to island
 	for (int y = upcorner_y; y > upcorner_y - height; y--)//y : from top to bottom
@@ -24,9 +27,6 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 		}
 	}
 
-	//Adding a port
-	AddSeaport(Seaport_Small);
-
 	//Add scenariis (choices)
 	m_choicesID[0] = 1;
 	m_choicesID[1] = 2;
@@ -37,12 +37,29 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_text.setCharacterSize(20);
 	m_text.setColor(sf::Color::Black);
-	m_text.setString("Turtle Island");
+
+	//get a name at random in the list
+	int r = RandomizeIntBetweenValues(0, (*CurrentGame).m_dico_islands_names.size() - 1);
+	m_display_name = (*CurrentGame).m_dico_islands_names[r];
+	m_text.setString(m_display_name);
 }
 
 Island::~Island()
 {
 	
+}
+
+Seaport* Island::AddSeaport(SeaportType type, int coord_x, int coord_y)
+{
+	int zone_coord_x = m_tiles.front()->m_zone->m_coord_x;
+	int zone_coord_y = m_tiles.front()->m_zone->m_coord_y;
+
+	//create the port
+	Seaport* port = new Seaport(coord_x, coord_y, zone_coord_x, zone_coord_y, type, this);
+	m_seaport = port;
+	m_seaport->m_tile->m_seaport = port;
+
+	return port;
 }
 
 Seaport* Island::AddSeaport(SeaportType type)
@@ -99,10 +116,7 @@ Seaport* Island::AddSeaport(SeaportType type)
 	int random = RandomizeIntBetweenValues(0, candidates_size - 1);
 	WaterTile* random_tile = candidates[random];
 
-	//create the port
-	Seaport* port = new Seaport(random_tile->m_coord_x, random_tile->m_coord_y, zone_coord_x, zone_coord_y, type, this);
-	m_seaport = port;
-	m_seaport->m_tile->m_seaport = port;
+	Seaport* port = AddSeaport(type, random_tile->m_coord_x, random_tile->m_coord_y);
 
 	return port;
 }

@@ -248,6 +248,7 @@ public:
 	string m_dico_room_types[NB_ROOM_TYPES];
 	vector<string> m_dico_crew_names[2];
 	vector<string> m_dico_crew_names_used[2];
+	vector<string> m_dico_islands_names;
 	string m_dico_crew_types[NB_CREW_TYPES];
 	string m_dico_crew_skills[NB_CREW_SKILLS];
 	string m_dico_crew_races[NB_CREW_RACES];

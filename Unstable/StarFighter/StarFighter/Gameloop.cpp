@@ -19,6 +19,9 @@ Gameloop::Gameloop()
 	if (LoadPlayerData(m_warship) == 0)
 	{
 		m_warship->Init();
+		Island* island = new Island(8, 9, 2, 2, 0, 0);
+		island->AddSeaport(Seaport_Small);
+		m_islands.push_back(island);
 		SavePlayerData(m_warship);
 	}
 	
@@ -73,9 +76,6 @@ void Gameloop::InitWaterZones()
 	TextureLoader *loader;
 	loader = TextureLoader::getInstance();
 	sf::Texture* texture = loader->loadTexture("2D/seaport_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
-
-	//islands
-	m_islands.push_back(new Island(8, 9, 2, 2, 0, 0));
 }
 
 bool Gameloop::GetSaveOrLoadInputs()
@@ -879,8 +879,11 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//MENUS
 	//entering a seaport?
-	if (warship_is_in_port == false && m_warship->m_seaport != NULL)
+	if (warship_is_in_port == false && m_warship->m_seaport != NULL && m_warship->m_seaport->m_visited_countdown == 0)
 	{
+		//flag as visited
+		//m_warship->m_seaport->m_visited_countdown = -1;
+
 		//unboarding?
 		m_menu = Menu_CrewUnboard;
 		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
@@ -1570,6 +1573,20 @@ int Gameloop::SavePlayerData(Warship* warship)
 			}
 		}
 
+		for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+		{
+			ostringstream island_name;
+			island_name << StringReplace((*it)->m_display_name, " ", "_");
+			data << "Island " << (*it)->m_upcorner_x << " " << (*it)->m_upcorner_y << " " << (*it)->m_width << " " << (*it)->m_height << " " << (*it)->m_zone_coord_x << " " << (*it)->m_zone_coord_y << " " << island_name.str() << " " << (*it)->m_visited_countdown;
+			
+			int has_seaport = (*it)->m_seaport == NULL ? 0 : 1;
+			data << " " << has_seaport;
+			if (has_seaport == true)
+			{
+				data << " " << (*it)->m_seaport->m_coord_x << " " << (*it)->m_seaport->m_coord_y << " " << (int)((*it)->m_seaport->m_type) << " " << (*it)->m_seaport->m_visited_countdown;
+			}
+		}
+
 		data.close();  // on ferme le fichier
 	}
 	else  // si l'ouverture a échoué
@@ -1642,6 +1659,26 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				crew->m_position = crew->m_tile->m_position;//sf::Vector2f(coord_x, coord_y);
 
 				warship->m_crew[(int)crew->m_is_prisoner].push_back(crew);
+			}
+
+			if (t.compare("Island") == 0)
+			{
+				int upcorner_x, upcorner_y, width, height, zone_coord_x, zone_coord_y, visited_countdown, has_seaport, seaport_coord_x, seaport_coord_y, seaport_type, seaport_visited_countdown;
+				string name;
+				std::istringstream(line) >> t >> upcorner_x >> upcorner_y >> width >> height >> zone_coord_x >> zone_coord_y >> name >> visited_countdown >> has_seaport >> seaport_coord_x >> seaport_coord_y >> seaport_type >> seaport_visited_countdown;
+				name = StringReplace(name, "_", " ");
+
+				Island* island = new Island(upcorner_x, upcorner_y, width, height, zone_coord_x, zone_coord_y);
+				island->m_display_name = name;
+				island->m_text.setString(name);
+				island->m_visited_countdown = visited_countdown;
+				m_islands.push_back(island);
+
+				if (has_seaport == 1)
+				{
+					Seaport* port = island->AddSeaport((SeaportType)seaport_type, seaport_coord_x, seaport_coord_y);
+					port->m_visited_countdown = seaport_visited_countdown;
+				}
 			}
 
 			warship->m_nb_crew = warship->m_crew[0].size();

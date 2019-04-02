@@ -108,6 +108,17 @@ Game::Game(RenderWindow& window)
 	m_dico_crew_names[1].push_back("Lucy");
 	m_dico_crew_names[1].push_back("Angela");
 
+	m_dico_islands_names.push_back("Turtle Island");
+	m_dico_islands_names.push_back("Dolphin Island");
+	m_dico_islands_names.push_back("Sapphire Island");
+	m_dico_islands_names.push_back("Emerald Island");
+	m_dico_islands_names.push_back("Stone Island");
+	m_dico_islands_names.push_back("Rock Island");
+	m_dico_islands_names.push_back("Death Island");
+	m_dico_islands_names.push_back("White Island");
+	m_dico_islands_names.push_back("Giants Island");
+	m_dico_islands_names.push_back("Lagoon Island");
+
 	m_dico_resources_textures[Resource_Gold] = "2D/icon_gold.png";
 	m_dico_resources_textures[Resource_Fish] = "2D/icon_fish.png";
 	m_dico_resources_textures[Resource_Mech] = "2D/icon_mech.png";
