@@ -150,6 +150,19 @@ void ResourcesInterface::Init(Warship* warship)
 
 void ResourcesInterface::Update()
 {
+	int upkeep_cost[3];
+	for (int i = 0; i < 3; i++)
+	{
+		upkeep_cost[i] = 0;
+		for (int j = 0; j < 2; j++)
+		{
+			for (vector<CrewMember*>::iterator it = m_warship->m_crew[j].begin(); it != m_warship->m_crew[j].end(); it++)
+			{
+				upkeep_cost[i] += (*it)->m_upkeep_cost[i];
+			}
+		}
+	}
+
 	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
 	{
 		ostringstream ss_resource;
@@ -157,20 +170,10 @@ void ResourcesInterface::Update()
 		switch (i)
 		{
 			case Resource_Gold:
-			{
-				ss_resource << m_warship->m_resources[i];
-				m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
-				break;
-			}
 			case Resource_Fish:
-			{
-				ss_resource << m_warship->m_resources[i];
-				m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
-				break;
-			}
 			case Resource_Mech:
 			{
-				ss_resource << m_warship->m_resources[i];
+				ss_resource << m_warship->m_resources[i] << "    (-" << upkeep_cost[i] << ")";
 				m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
