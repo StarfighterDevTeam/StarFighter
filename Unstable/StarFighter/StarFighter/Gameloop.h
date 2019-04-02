@@ -67,6 +67,8 @@ public:
 	void UpdateAICrew(CrewMember* crew);
 	void UpdateAITargetRoom(Weapon* weapon);
 
+	void GenerateRandomIslands();
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

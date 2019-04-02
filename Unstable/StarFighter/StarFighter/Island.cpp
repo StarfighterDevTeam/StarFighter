@@ -27,6 +27,11 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 		}
 	}
 
+	//assign island's reference tile
+	int mid_x = upcorner_x + (width / 2);
+	int mid_y = upcorner_y - (height / 2);
+	m_tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[mid_x][mid_y];
+
 	//Add scenariis (choices)
 	m_choicesID[0] = 1;
 	m_choicesID[1] = 2;
@@ -39,8 +44,7 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 	m_text.setColor(sf::Color::Black);
 
 	//get a name at random in the list
-	int r = RandomizeIntBetweenValues(0, (*CurrentGame).m_dico_islands_names.size() - 1);
-	m_display_name = (*CurrentGame).m_dico_islands_names[r];
+	m_display_name = (*CurrentGame).GetRandomIslandName();
 	m_text.setString(m_display_name);
 }
 
@@ -72,7 +76,7 @@ Seaport* Island::AddSeaport(SeaportType type)
 	for (vector<WaterTile*>::iterator it = m_tiles.begin(); it != m_tiles.end(); it++)
 	{
 		int x = (*it)->m_coord_x;
-		int y = (*it)->m_coord_x;
+		int y = (*it)->m_coord_y;
 		
 		//right
 		if (x < NB_WATERTILE_X - 1)

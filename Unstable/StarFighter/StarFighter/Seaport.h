@@ -11,6 +11,7 @@ class Island;
 enum SeaportType
 {
 	Seaport_Small,
+	NB_SEAPORT_TYPES,
 };
 
 class Seaport : public GameEntity

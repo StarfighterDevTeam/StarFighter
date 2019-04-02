@@ -19,10 +19,19 @@ Gameloop::Gameloop()
 	if (LoadPlayerData(m_warship) == 0)
 	{
 		m_warship->Init();
-		Island* island = new Island(8, 9, 2, 2, 0, 0);
-		island->AddSeaport(Seaport_Small);
-		m_islands.push_back(island);
+
+		GenerateRandomIslands();
+
+		//create a new save file
 		SavePlayerData(m_warship);
+	}
+	else
+	{
+		//GenerateRandomIslands();
+
+		//Island* test = new Island(8, 4, 2, 4, 0, 0);
+		//test->AddSeaport(Seaport_Small);
+		//m_islands.push_back(test);
 	}
 	
 	m_resources_interface.Init(m_warship);
@@ -43,6 +52,43 @@ Gameloop::Gameloop()
 
 	//Contextual orders
 	m_contextual_order = new ContextualOrder();
+}
+
+void Gameloop::GenerateRandomIslands()
+{
+	//init islands
+	int r = RandomizeIntBetweenValues(20, 30);
+
+	int x = 5;
+	int y = 5;
+
+	for (int i = 0; i < r; i++)
+	{
+		int width = RandomizeIntBetweenValues(2, 4);
+		int height = RandomizeIntBetweenValues(2, 4);
+
+		if (x < NB_WATERTILE_X - 10)
+		{
+			x += RandomizeIntBetweenValues(6, 9);
+			y += (RandomizeIntBetweenValues(-2, 2));
+		}
+		else
+		{
+			x = 5;
+			y += RandomizeIntBetweenValues(6, 9);
+		}
+
+		int type = RandomizeIntBetweenValues(0, NB_SEAPORT_TYPES - 1);
+
+		if (x + width < NB_WATERTILE_X - 1 && y < NB_WATERTILE_Y - 1 && x > 0 && y - height > 0)
+		{
+			Island* island = new Island(x, y, width, height, 0, 0);
+			island->AddSeaport((SeaportType)type);
+			m_islands.push_back(island);
+
+			//printf("Island: corner x: %d, corner y: %d, width: %d, height: %d\n", x, y, width, height);
+		}
+	}
 }
 
 Gameloop::~Gameloop()
@@ -71,11 +117,6 @@ void Gameloop::InitWaterZones()
 	WaterZone* zone = new WaterZone(0, 0);
 	vec.push_back(zone);
 	(*CurrentGame).m_waterzones.push_back(vec);
-
-	//icons
-	TextureLoader *loader;
-	loader = TextureLoader::getInstance();
-	sf::Texture* texture = loader->loadTexture("2D/seaport_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
 }
 
 bool Gameloop::GetSaveOrLoadInputs()
@@ -1031,7 +1072,6 @@ void Gameloop::Draw()
 	if (m_scale == Scale_Strategic)
 	{
 		//water tiles
-		vector<Island*> islands;
 		GameEntity* focused_water_tile = NULL;
 		for (vector<WaterTile*>::iterator it = m_warship->m_tiles_can_be_seen.begin(); it != m_warship->m_tiles_can_be_seen.end(); it++)
 		{
@@ -1043,11 +1083,6 @@ void Gameloop::Draw()
 			{
 				(*it)->Draw((*CurrentGame).m_mainScreen);
 			}
-
-			if ((*it)->m_island != NULL)
-			{
-				islands.push_back((*it)->m_island);
-			}
 		}
 		if (focused_water_tile != NULL)
 		{
@@ -1055,9 +1090,13 @@ void Gameloop::Draw()
 		}
 
 		//islands and ports
-		for (vector<Island*>::iterator it = islands.begin(); it != islands.end(); it++)
+		for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
 		{
-			(*it)->Draw((*CurrentGame).m_mainScreen);
+			//island name
+			if ((*it)->m_tile->m_can_be_seen == true)
+			{
+				(*it)->Draw((*CurrentGame).m_mainScreen);
+			}
 
 			//seaport
 			if ((*it)->m_seaport != NULL && (*it)->m_seaport->m_tile->m_can_be_seen == true)
@@ -1577,7 +1616,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 		{
 			ostringstream island_name;
 			island_name << StringReplace((*it)->m_display_name, " ", "_");
-			data << "Island " << (*it)->m_upcorner_x << " " << (*it)->m_upcorner_y << " " << (*it)->m_width << " " << (*it)->m_height << " " << (*it)->m_zone_coord_x << " " << (*it)->m_zone_coord_y << " " << island_name.str() << " " << (*it)->m_visited_countdown;
+			data << "Island " << (*it)->m_upcorner_x << " " << (*it)->m_upcorner_y << " " << (*it)->m_width << " " << (*it)->m_height << " " << (*it)->m_zone_coord_x << " " << (*it)->m_zone_coord_y << " " << (*it)->m_visited_countdown << " " << island_name.str();
 			
 			int has_seaport = (*it)->m_seaport == NULL ? 0 : 1;
 			data << " " << has_seaport;
@@ -1585,6 +1624,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 			{
 				data << " " << (*it)->m_seaport->m_coord_x << " " << (*it)->m_seaport->m_coord_y << " " << (int)((*it)->m_seaport->m_type) << " " << (*it)->m_seaport->m_visited_countdown;
 			}
+			data << endl;
 		}
 
 		data.close();  // on ferme le fichier
@@ -1665,7 +1705,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 			{
 				int upcorner_x, upcorner_y, width, height, zone_coord_x, zone_coord_y, visited_countdown, has_seaport, seaport_coord_x, seaport_coord_y, seaport_type, seaport_visited_countdown;
 				string name;
-				std::istringstream(line) >> t >> upcorner_x >> upcorner_y >> width >> height >> zone_coord_x >> zone_coord_y >> name >> visited_countdown >> has_seaport >> seaport_coord_x >> seaport_coord_y >> seaport_type >> seaport_visited_countdown;
+				std::istringstream(line) >> t >> upcorner_x >> upcorner_y >> width >> height >> zone_coord_x >> zone_coord_y >> visited_countdown >> name >> has_seaport >> seaport_coord_x >> seaport_coord_y >> seaport_type >> seaport_visited_countdown;
 				name = StringReplace(name, "_", " ");
 
 				Island* island = new Island(upcorner_x, upcorner_y, width, height, zone_coord_x, zone_coord_y);

@@ -26,6 +26,7 @@ public:
 	Seaport* AddSeaport(SeaportType type);
 	Seaport* AddSeaport(SeaportType type, int coord_x, int coord_y);
 	Seaport* m_seaport;
+	WaterTile* m_tile;
 
 	int m_choicesID[4];
 	string m_display_name;

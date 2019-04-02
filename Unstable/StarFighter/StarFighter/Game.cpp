@@ -174,6 +174,29 @@ string Game::GetRandomCrewMemberName(int gender)
 	return name;
 }
 
+string Game::GetRandomIslandName()
+{
+	//get a name at random in the list
+	int r = RandomizeIntBetweenValues(0, m_dico_islands_names.size() - 1);
+	string name = m_dico_islands_names[r];
+
+	//remove from the list and keep it stored in the "used" list
+	m_dico_islands_names_used.push_back(m_dico_islands_names[r]);
+	m_dico_islands_names.erase(m_dico_islands_names.begin() + r);
+
+	//all names are alreay used? recycle the list
+	if (m_dico_islands_names.empty() == true)
+	{
+		for (vector<string>::iterator it = m_dico_islands_names_used.begin(); it != m_dico_islands_names_used.end(); it++)
+		{
+			m_dico_islands_names.push_back(*it);
+		}
+		m_dico_islands_names_used.clear();
+	}
+
+	return name;
+}
+
 Game::~Game()
 {
 	for (vector<vector<WaterZone*> >::iterator it = m_waterzones.begin(); it != m_waterzones.end(); it++)
