@@ -2,14 +2,6 @@
 
 extern Game* CurrentGame;
 
-Reward::Reward()
-{
-	for (int i = 0; i < 3; i++)
-	{
-		m_rewards[i].second = 0;
-	}
-}
-
 RewardInterface::RewardInterface()
 {
 	m_ship = NULL;

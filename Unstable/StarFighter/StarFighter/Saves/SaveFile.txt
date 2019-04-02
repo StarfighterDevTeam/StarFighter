@@ -1,6 +1,6 @@
 DMS 0 10 0 8
-Gold 136
-Fish 20
+Gold 236
+Fish 220
 Mech 100
 Fidelity 52
 Days 10

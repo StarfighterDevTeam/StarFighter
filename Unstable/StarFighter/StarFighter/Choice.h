@@ -22,22 +22,53 @@
 #define RESOURCES_BUTTON_SIZE_Y					24
 
 #define RESOURCES_ICON_SIZE						30
-#define CHOICES_REWARDS_OFFSET_X				80
+#define CHOICES_REWARDS_OFFSET_X					80
 
 enum ChoicesData
 {
 	Choice_ID,
 	Choice_Text,
 	Choice_Picturename,
+	Choice_CostDays,
 	Choice_Skill,
 	Choice_ValueMax,
-	Choice_RewardGold,
-	Choice_RewardFish,
-	Choice_RewardMech,
-	Choice_RewardDays,
-	Choice_RewardFidelity,
-	Choice_RewardCrew,
-	Choice_RewardText,
+	Choice_Reward1,
+	Choice_Reward1_Proba,
+	Choice_Reward2,
+	Choice_Reward2_Proba,
+	Choice_Reward3,
+	Choice_Reward3_Proba,
+	//Choice_RewardGold,
+	//Choice_RewardFish,
+	//Choice_RewardMech,
+	//Choice_RewardDays,
+	//Choice_RewardFidelity,
+	//Choice_RewardCrew,
+	//Choice_RewardText,
+	NB_CHOICE_DATA,
+};
+
+enum RewardData
+{
+	Reward_ID,
+	Reward_Gold,
+	Reward_Fish,
+	Reward_Mech,
+	Reward_Days,
+	Reward_Fidelity,
+	Reward_Crew,
+	Reward_Text,
+	NB_REWARD_DATA,
+};
+
+#define NB_CHOICE_REWARDS_MAX				((NB_CHOICE_DATA - Choice_Reward1) / 2)
+
+
+struct Reward
+{
+	Reward();
+	pair<Resource_Meta, int> m_rewards[3];
+	string m_string;
 };
 
 struct Choice
@@ -52,6 +83,7 @@ public:
 	bool Update(int gauge_value);
 	void Draw(sf::RenderTexture& screen);
 	void SetPosition(sf::Vector2f position);
+	int RandomizeRewardID();
 
 	sf::Vector2f m_position;
 
@@ -65,11 +97,13 @@ public:
 	int m_gauge_value_max;
 	int m_gauge_value;
 	int m_skill;
+	int m_cost_days;
 
 	GameEntity* m_rewards[3];
-	string m_reward_string;
-	int m_reward_resources[NB_RESOURCES_TYPES];
-	int m_reward_crew;
+	pair<int, int> m_rewardsID[NB_CHOICE_REWARDS_MAX];
+	//string m_reward_string;
+	//int m_reward_resources[NB_RESOURCES_TYPES];
+	//int m_reward_crew;
 };
 
 #endif //CHOICE_H_INCLUDED

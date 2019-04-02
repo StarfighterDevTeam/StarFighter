@@ -192,42 +192,47 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 		//click = action
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
-			//gain reward and/or pay the cost
+			//pay upkeep cost
+			m_ship->PayUpkeepCost(m_choices[i].m_cost_days);
+
+			//randomize reward ID
+			int rewardID = m_choices[i].RandomizeRewardID();
+			
+			//read reward in the database
+			rewardID--;
 			Reward* reward = new Reward();
 			int k = 0;
 			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 			{
-				int reward_value = 0;
-				if (j == Resource_Crew)
+				int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
+
+				if (value == 0)
 				{
-					reward_value = m_choices[i].m_reward_resources[j];
+					continue;
 				}
-				else if (j == Resource_Days)
+
+				if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
 				{
-					m_ship->PayUpkeepCost(- m_choices[i].m_reward_resources[j]);
-				}
-				else
-				{
-					//gold/fish etc...: gain the max value * pro rata of skills deployed * random between 0.8 and 1.2 the reference
+					//add random + pro rata of skills invested (if any)
 					if (m_choices[i].m_gauge_value_max == 0)
 					{
-						reward_value = (int)(1.0f * m_choices[i].m_reward_resources[j] * RandomizeFloatBetweenValues(0.8, 1.2));
+						value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2));
 					}
 					else
 					{
-						reward_value = (int)(1.0f * m_choices[i].m_reward_resources[j] * (m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2));
+						value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2));
 					}
 				}
+				
+				reward->m_rewards[k].first = (Resource_Meta)j;
+				reward->m_rewards[k].second = value;
 
-				if (reward_value != 0)
-				{
-					reward->m_rewards[k].first = (Resource_Meta)j;
-					reward->m_rewards[k].second = reward_value;
-					k++;
-				}
+				k++;
 			}
 
-			reward->m_string = m_choices[i].m_reward_string;
+			reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
+			reward->m_string = StringReplace(reward->m_string, "_", " ");
+			reward->m_string = StringCut(reward->m_string, 48);
 
 			return reward;
 		}
