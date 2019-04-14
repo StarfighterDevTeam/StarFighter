@@ -126,8 +126,8 @@ std::string StringCut(std::string str, const size_t length);
 #define SFPANEL_SPECIFIC_HEIGHT					100
 
 //CSV DATA
-#define CHOICES_CSV_FILE							"Scripts/Generated/Choices.csv"
-#define REWARDS_CSV_FILE							"Scripts/Generated/Rewards.csv"
+#define SHIP_CSV_FILE							"Scripts/Generated/Ship.csv"
+#define CHOICES_CSV_FILE						"Scripts/Generated/Choices.csv"
 
 int RandomizeIntBetweenRatios(int value, sf::Vector2f min_max_values);
 float RandomizeFloatBetweenRatios(float value, sf::Vector2f min_max_ratios);

@@ -137,7 +137,6 @@ enum Input_Actions
 {
 	Action_Pause,
 	Action_Saving,
-	Action_Entering,
 	NB_INPUT_ACTIONS,
 };
 
@@ -238,7 +237,6 @@ public:
 	vector<SFTextPop*> m_texts_pop;
 
 	vector<vector<string> > m_choices_config;
-	vector<vector<string> > m_rewards_config;
 
 	//void CreateSFTextPop(const Font& font, unsigned int size, Uint32 style, const Color& color, string text_string, float distance_not_faded, float distance_faded, float total_pop_time, GameEntity* target, float offset_positionY);
 
@@ -248,14 +246,11 @@ public:
 	string m_dico_room_types[NB_ROOM_TYPES];
 	vector<string> m_dico_crew_names[2];
 	vector<string> m_dico_crew_names_used[2];
-	vector<string> m_dico_islands_names;
-	vector<string> m_dico_islands_names_used;
 	string m_dico_crew_types[NB_CREW_TYPES];
 	string m_dico_crew_skills[NB_CREW_SKILLS];
 	string m_dico_crew_races[NB_CREW_RACES];
 	string m_dico_resources_textures[NB_RESOURCES_TYPES_TOTAL];
 	string GetRandomCrewMemberName(int gender);
-	string GetRandomIslandName();
 	sf::Color m_dico_colors[NB_COLOR_CHART];
 
 private:

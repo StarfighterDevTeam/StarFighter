@@ -108,17 +108,6 @@ Game::Game(RenderWindow& window)
 	m_dico_crew_names[1].push_back("Lucy");
 	m_dico_crew_names[1].push_back("Angela");
 
-	m_dico_islands_names.push_back("Turtle Island");
-	m_dico_islands_names.push_back("Dolphin Island");
-	m_dico_islands_names.push_back("Sapphire Island");
-	m_dico_islands_names.push_back("Emerald Island");
-	m_dico_islands_names.push_back("Stone Island");
-	m_dico_islands_names.push_back("Rock Island");
-	m_dico_islands_names.push_back("Death Island");
-	m_dico_islands_names.push_back("White Island");
-	m_dico_islands_names.push_back("Giants Island");
-	m_dico_islands_names.push_back("Lagoon Island");
-
 	m_dico_resources_textures[Resource_Gold] = "2D/icon_gold.png";
 	m_dico_resources_textures[Resource_Fish] = "2D/icon_fish.png";
 	m_dico_resources_textures[Resource_Mech] = "2D/icon_mech.png";
@@ -146,9 +135,8 @@ Game::Game(RenderWindow& window)
 	m_dico_colors[Color_Red_Impossible] = m_dico_colors[Color_Red_Target_Locked];
 	m_dico_colors[Color_Magenta_EngineCharged] = m_dico_colors[Color_Magenta_Crew];
 
-	//load database files
+	//choices database
 	m_choices_config = *(FileLoaderUtils::FileLoader(CHOICES_CSV_FILE));
-	m_rewards_config = *(FileLoaderUtils::FileLoader(REWARDS_CSV_FILE));
 }
 
 string Game::GetRandomCrewMemberName(int gender)
@@ -169,29 +157,6 @@ string Game::GetRandomCrewMemberName(int gender)
 			m_dico_crew_names[gender].push_back(*it);
 		}
 		m_dico_crew_names_used[gender].clear();
-	}
-
-	return name;
-}
-
-string Game::GetRandomIslandName()
-{
-	//get a name at random in the list
-	int r = RandomizeIntBetweenValues(0, m_dico_islands_names.size() - 1);
-	string name = m_dico_islands_names[r];
-
-	//remove from the list and keep it stored in the "used" list
-	m_dico_islands_names_used.push_back(m_dico_islands_names[r]);
-	m_dico_islands_names.erase(m_dico_islands_names.begin() + r);
-
-	//all names are alreay used? recycle the list
-	if (m_dico_islands_names.empty() == true)
-	{
-		for (vector<string>::iterator it = m_dico_islands_names_used.begin(); it != m_dico_islands_names_used.end(); it++)
-		{
-			m_dico_islands_names.push_back(*it);
-		}
-		m_dico_islands_names_used.clear();
 	}
 
 	return name;
@@ -389,14 +354,5 @@ void Game::GetControllerInputs()
 	else
 	{
 		m_input_actions[Action_Saving] = Input_Release;
-	}
-
-	if (InputGuy::isEntering() == true)
-	{
-		m_input_actions[Action_Entering] = m_input_actions[Action_Entering] == Input_Release ? Input_Tap : Input_Hold;
-	}
-	else
-	{
-		m_input_actions[Action_Entering] = Input_Release;
 	}
 }

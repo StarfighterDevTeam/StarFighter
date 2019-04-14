@@ -6,9 +6,6 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
-	m_zone_coord_x = zone_coord_x;
-	m_zone_coord_y = zone_coord_y;
-	m_visited_countdown = 0;
 	m_type = type;
 	m_island = island;
 
@@ -16,7 +13,9 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 	m_tile->m_seaport = this;
 
 	//UI
-	sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/seaport_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
+	TextureLoader *loader;
+	loader = TextureLoader::getInstance();
+	Texture* texture = loader->getTexture("2D/seaport_icon.png");
 	setAnimation(texture, 1, 1);
 
 	//m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);

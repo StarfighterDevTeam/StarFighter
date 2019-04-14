@@ -63,11 +63,6 @@ public:
 	string m_texture_name;
 	string m_texture_big_name;
 
-	CrewMember* m_clone;
-	CrewMember* Clone();
-
-	int m_fidelity;
-
 private:
 	bool FindShortestPath(RoomTile* tileA, RoomTile* tileB);
 	void IteratePathFinding(RoomTile* tileA, RoomTile* tileB);

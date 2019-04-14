@@ -2,6 +2,14 @@
 
 extern Game* CurrentGame;
 
+Reward::Reward()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_rewards[i].second = 0;
+	}
+}
+
 RewardInterface::RewardInterface()
 {
 	m_ship = NULL;
@@ -127,12 +135,10 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 bool RewardInterface::Update()
 {
 	//ok button
-	if ((m_ok_button->IsHoveredByMouse() == true || (*CurrentGame).m_input_actions[Action_Entering] == Input_Tap) && (*CurrentGame).m_window_has_focus == true)
+	if (m_ok_button->IsHoveredByMouse() == true && (*CurrentGame).m_window_has_focus == true)
 	{
 		m_ok_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_CrewFidelity_Positive]);
-
-		//action
-		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick || (*CurrentGame).m_input_actions[Action_Entering] == Input_Tap)
+		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
 			//give reward
 			for (int i = 0; i < 3; i++)

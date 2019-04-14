@@ -30,7 +30,6 @@ public:
 	static bool isMuting();
 	static bool isPausing();
 	static bool isSaving();
-	static bool isEntering();
 };
 
 

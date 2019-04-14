@@ -113,16 +113,6 @@ bool InputGuy::isSaving()
 	return false;
 }
 
-bool InputGuy::isEntering()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 Vector2f InputGuy::getDirections(ControlerType device)
 {
 	short dirX = 0;

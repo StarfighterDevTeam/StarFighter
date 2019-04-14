@@ -11,7 +11,6 @@ class Island;
 enum SeaportType
 {
 	Seaport_Small,
-	NB_SEAPORT_TYPES,
 };
 
 class Seaport : public GameEntity
@@ -22,9 +21,6 @@ public:
 
 	int m_coord_x;
 	int m_coord_y;
-	int m_zone_coord_x;
-	int m_zone_coord_y;
-	int m_visited_countdown;
 	SeaportType m_type;
 
 	WaterTile* m_tile;

@@ -144,8 +144,8 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 void Warship::Init()
 {
 	//resources
-	m_resources[Resource_Gold] = 1000;
-	m_resources[Resource_Fish] = 1000;
+	m_resources[Resource_Gold] = 100;
+	m_resources[Resource_Fish] = 100;
 	m_resources[Resource_Mech] = 100;
 	m_resources[Resource_Fidelity] = 50;
 	m_resources[Resource_Days] = 10;

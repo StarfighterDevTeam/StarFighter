@@ -10,6 +10,13 @@
 #define REWARD_PANEL_SIZE_Y			160
 #define REWARD_INTERFACE_OFFSET_X	20
 
+struct Reward
+{
+	Reward();
+	pair<Resource_Meta, int> m_rewards[3];
+	string m_string;
+};
+
 struct RewardInterface
 {
 	RewardInterface();

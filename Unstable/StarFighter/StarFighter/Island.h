@@ -18,19 +18,13 @@ public:
 	int m_upcorner_y;
 	int m_width;
 	int m_height;
-	int m_zone_coord_x;
-	int m_zone_coord_y;
 
 	vector<WaterTile*> m_tiles;
 
 	Seaport* AddSeaport(SeaportType type);
-	Seaport* AddSeaport(SeaportType type, int coord_x, int coord_y);
 	Seaport* m_seaport;
-	WaterTile* m_tile;
 
 	int m_choicesID[4];
-	string m_display_name;
-	int m_visited_countdown;
 };
 
 #endif //ISLAND_H_INCLUDED
