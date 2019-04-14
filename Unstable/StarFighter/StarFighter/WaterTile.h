@@ -10,32 +10,6 @@ class WaterZone;
 class Island;
 class Seaport;
 
-struct DMS_Coord
-{
-	DMS_Coord(){};
-	DMS_Coord(int degree_x, int minute_x, float second_x, int degree_y, int minute_y, float second_y)
-	{
-		SetCoord(degree_x, minute_x, second_x, degree_y, minute_y, second_y);
-	}
-
-	int m_degree_x;
-	int m_minute_x;
-	float m_second_x;
-
-	int m_degree_y;
-	int m_minute_y;
-	float m_second_y;
-
-	void SetCoord(int degree_x, int minute_x, float second_x, int degree_y, int minute_y, float second_y){
-		m_degree_x = degree_x;
-		m_minute_x = minute_x;
-		m_second_x = second_x;
-		m_degree_y = degree_y;
-		m_minute_y = minute_y;
-		m_second_y = second_y;
-	}
-};
-
 enum WaterTileType
 {
 	Water_Empty,//below this = navigable
