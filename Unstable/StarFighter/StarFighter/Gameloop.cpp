@@ -333,7 +333,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty)
 							{
 								m_warship->SetSailsToWaterTile(tile_hovered);
-								m_warship->PayUpkeepCost(cost);
+								SpendDays(cost, false);
 							}
 						}
 					}
@@ -922,11 +922,8 @@ void Gameloop::Update(sf::Time deltaTime)
 
 	//MENUS
 	//entering a seaport?
-	if (warship_is_in_port == false && m_warship->m_seaport != NULL && m_warship->m_seaport->m_visited_countdown == 0)
+	if (warship_is_in_port == false && m_warship->m_seaport != NULL)
 	{
-		//flag as visited
-		//m_warship->m_seaport->m_visited_countdown = -1;
-
 		//unboarding?
 		m_menu = Menu_CrewUnboard;
 		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
@@ -974,12 +971,18 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			m_warship->m_crew_unboard_interface.Destroy();
 
+			//Reset island resources cooldown
+			if (m_warship->m_seaport != NULL)
+			{
+				m_warship->m_seaport->m_island->m_visited_countdown = 1;
+			}
+
 			//Pay "day" price
 			for (int i = 0; i < 3; i++)
 			{
 				if (reward->m_rewards[i].first == Resource_Days)
 				{
-					m_warship->PayUpkeepCost(reward->m_rewards[i].second);
+					SpendDays(reward->m_rewards[i].second, true);
 				}
 			}
 
@@ -1561,7 +1564,7 @@ int Gameloop::SavePlayerData(Warship* warship)
 			data << " " << has_seaport;
 			if (has_seaport == true)
 			{
-				data << " " << (*it)->m_seaport->m_coord_x << " " << (*it)->m_seaport->m_coord_y << " " << (int)((*it)->m_seaport->m_type) << " " << (*it)->m_seaport->m_visited_countdown;
+				data << " " << (*it)->m_seaport->m_coord_x << " " << (*it)->m_seaport->m_coord_y << " " << (int)((*it)->m_seaport->m_type);
 			}
 			data << endl;
 		}
@@ -1656,7 +1659,6 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				if (has_seaport == 1)
 				{
 					Seaport* port = island->AddSeaport((SeaportType)seaport_type, seaport_coord_x, seaport_coord_y);
-					port->m_visited_countdown = seaport_visited_countdown;
 				}
 			}
 
@@ -1898,4 +1900,23 @@ bool Gameloop::UpdateUnboarding()
 	}
 
 	return true;
+}
+
+void Gameloop::SpendDays(int days, bool skip_time)
+{
+	m_warship->PayUpkeepCost(days);
+
+	//refresh islands & seaports resources
+	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+	{
+		if ((*it)->m_visited_countdown > 0)
+		{
+			(*it)->m_visited_countdown += days;
+			
+			if ((*it)->m_visited_countdown >= RESOURCES_REFRESH_RATE_IN_DAYS)
+			{
+				(*it)->m_visited_countdown = 0;
+			}
+		}
+	}
 }

@@ -214,13 +214,15 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 				if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
 				{
 					//add random + pro rata of skills invested (if any)
+					float island_cooldown = m_island->m_visited_countdown == 0 ? 1.f : (1.f * m_island->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
+
 					if (m_choices[i].m_gauge_value_max == 0)
 					{
-						value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2));
+						value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
 					}
 					else
 					{
-						value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2));
+						value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
 					}
 				}
 				

@@ -8,7 +8,6 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 	m_coord_y = coord_y;
 	m_zone_coord_x = zone_coord_x;
 	m_zone_coord_y = zone_coord_y;
-	m_visited_countdown = 0;
 	m_type = type;
 	m_island = island;
 

@@ -8,6 +8,8 @@
 class Warship;//forward declaration
 class Island;
 
+#define RESOURCES_REFRESH_RATE_IN_DAYS			20
+
 enum SeaportType
 {
 	Seaport_Small,
@@ -24,7 +26,6 @@ public:
 	int m_coord_y;
 	int m_zone_coord_x;
 	int m_zone_coord_y;
-	int m_visited_countdown;
 	SeaportType m_type;
 
 	WaterTile* m_tile;

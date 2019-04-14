@@ -68,6 +68,7 @@ public:
 	void UpdateAITargetRoom(Weapon* weapon);
 
 	void GenerateRandomIslands();
+	void SpendDays(int days, bool skip_time);
 
 private:
 	sf::RenderWindow* mainWindow;
