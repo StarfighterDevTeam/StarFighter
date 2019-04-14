@@ -285,7 +285,7 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 	return room;
 }
 
-CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)//there is an override function for class Warship
+CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
 {
 	//if (m_nb_crew >= m_nb_crew_max)
 	//{
@@ -2065,17 +2065,59 @@ bool Ship::CanViewWaterTile(WaterTile* tile)
 
 bool Ship::AddResource(Resource_Meta resource, int value)
 {
-	m_resources[resource] += value;
-
-	if (resource == Resource_Fidelity && m_resources[resource] > 100)
+	if (resource != Resource_Fidelity)
 	{
-		m_resources[resource] = 100;
+		m_resources[resource] = Max(0, m_resources[resource] + value);
 	}
-
-	if (m_resources[resource] < 0)
+	else
 	{
-		m_resources[resource] = 0;
+		for (int j = 0; j < 2; j++)
+		{
+			for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+			{
+				(*it)->m_fidelity += value;
+				Bound((*it)->m_fidelity, sf::Vector2i(0, 100));
+			}
+		}
 	}
 
 	return true;
+}
+
+void Ship::PayUpkeepCost(int days)
+{
+	//pay upkeep cost crew member by crew member to know who starves, who wins or loses fidelity individually
+	for (int k = 0; k < days; k++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+			{
+				bool has_lost_fidelity = false;
+				for (int i = 0; i < NB_UPKEEP_COSTS; i++)
+				{
+					if (m_resources[i] >= (*it)->m_upkeep_cost[i])
+					{
+						//pay the cost of crew upkeep
+						AddResource((Resource_Meta)i, -(*it)->m_upkeep_cost[i]);
+					}
+					else if (has_lost_fidelity == false)
+					{
+						//pay what you can...
+						m_resources[i] = 0;
+
+						//...then lose crew fidelity
+						(*it)->m_fidelity = Max(0, (*it)->m_fidelity - 1);
+						has_lost_fidelity = true;
+					}
+				}
+
+				//cost paid fully = earn crew fidelity
+				if (has_lost_fidelity == false)
+				{
+					(*it)->m_fidelity = Min(100, (*it)->m_fidelity + 1);
+				}
+			}
+		}
+	}
 }

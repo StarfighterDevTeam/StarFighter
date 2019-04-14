@@ -24,7 +24,6 @@ void CrewUnboardInterface::Destroy()
 	delete m_panel;
 
 	m_panel = NULL;
-	m_unboarded.clear();
 
 	for (int i = 0; i < m_crew_slots.size(); i++)
 	{
@@ -34,6 +33,12 @@ void CrewUnboardInterface::Destroy()
 
 	m_ship = NULL;
 	m_island = NULL;
+
+	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
+	{
+		delete *it;
+	}
+	m_unboarded.clear();
 
 	m_crew_interface.Destroy();
 }
@@ -187,37 +192,47 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 		//click = action
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
-			//gain reward and/or pay the cost
+			//pay "days" cost
+			m_ship->PayUpkeepCost(m_choices[i].m_cost_days);
+
+			//randomize reward ID
+			int rewardID = m_choices[i].RandomizeRewardID();
+			
+			//read reward in the database
+			rewardID--;
 			Reward* reward = new Reward();
 			int k = 0;
 			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 			{
-				int reward_value = 0;
-				if (j == Resource_Crew || j == Resource_Days)
+				int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
+
+				if (value == 0)
 				{
-					reward_value = m_choices[i].m_reward_resources[j];
-				}
-				//else if (j == Resource_Days)
-				//{
-				//	//m_ship->PayUpkeepCost(- m_choices[i].m_reward_resources[j]);
-				//	reward_value = 
-				//}
-				else
-				{
-					//gold/fish etc...: gain the max value * pro rata of skills deployed * random between 0.8 and 1.2 the reference
-					reward_value = (int)(1.0f * m_choices[i].m_reward_resources[j] * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max * RandomizeFloatBetweenValues(0.8, 1.2));
+					continue;
 				}
 
-				//add reward
-				if (reward_value != 0)
+				if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
 				{
-					reward->m_rewards[k].first = (Resource_Meta)j;
-					reward->m_rewards[k].second = reward_value;
-					k++;
+					//add random + pro rata of skills invested (if any)
+					if (m_choices[i].m_gauge_value_max == 0)
+					{
+						value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2));
+					}
+					else
+					{
+						value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2));
+					}
 				}
+				
+				reward->m_rewards[k].first = (Resource_Meta)j;
+				reward->m_rewards[k].second = value;
+
+				k++;
 			}
 
-			reward->m_string = m_choices[i].m_reward_string;
+			reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
+			reward->m_string = StringReplace(reward->m_string, "_", " ");
+			reward->m_string = StringCut(reward->m_string, 48);
 
 			return reward;
 		}
@@ -264,9 +279,25 @@ bool CrewUnboardInterface::AddCrewToInterface(CrewMember* crew)
 {
 	if (crew->m_is_prisoner == false && m_unboarded.size() < m_slots_avaible)
 	{
-		m_unboarded.push_back(crew);
-		crew->m_UI_type = UI_CrewMemberUnboarding;
-		return true;
+		bool found = false;
+		for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
+		{
+			if (crew == (*it)->m_clone)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if (found == false)
+		{
+			CrewMember* clone = crew->Clone();
+			m_unboarded.push_back(clone);
+			clone->m_UI_type = UI_CrewMemberUnboarding;
+			clone->m_clone = crew;
+		}
+
+		return found == false;
 	}
 	else
 	{
@@ -276,9 +307,23 @@ bool CrewUnboardInterface::AddCrewToInterface(CrewMember* crew)
 
 void CrewUnboardInterface::RemoveCrewFromInterface(CrewMember* crew)
 {
-	crew->m_UI_type = UI_CrewMember;
+	//crew->m_UI_type = UI_CrewMember;
 
 	//remove from interface
+	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
+	{
+		if (crew == *it)
+		{
+			if (m_crew_interface.m_crew == crew)
+			{
+				m_crew_interface.Destroy();
+			}
+
+			m_unboarded.erase(it);
+			break;
+		}
+	}
+	/*
 	vector<CrewMember*> old_crew;
 	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 	{
@@ -293,8 +338,11 @@ void CrewUnboardInterface::RemoveCrewFromInterface(CrewMember* crew)
 		}
 	}
 
+
 	if (m_crew_interface.m_crew == crew)
 	{
 		m_crew_interface.Destroy();
 	}
+	*/
+
 }

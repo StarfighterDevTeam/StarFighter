@@ -16,7 +16,7 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_flee_timer = 0.f;
 	m_flee_count = 0.f;
 	m_is_charging_flee_count = true;
-	
+
 	for (int i = 0; i < NB_UPKEEP_COSTS; i++)
 	{
 		m_upkeep_costs[i] = 0;
@@ -313,13 +313,5 @@ void Warship::UpdateUpkeepCosts()
 				m_upkeep_costs[i] += (*it)->m_upkeep_cost[i];
 			}
 		}
-	}
-}
-
-void Warship::PayUpkeepCost(int days)
-{
-	for (int i = 0; i < NB_UPKEEP_COSTS; i++)
-	{
-		AddResource((Resource_Meta)i, -m_upkeep_costs[i] * days);
 	}
 }

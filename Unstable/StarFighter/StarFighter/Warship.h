@@ -39,9 +39,8 @@ public:
 	struct RewardInterface m_reward_interface;
 
 	void UpdateOLD(Time deltaTime, bool tactical_combat);
-	void UpdateUpkeepCosts();
 
-	void PayUpkeepCost(int days);
+	void UpdateUpkeepCosts();
 };
 
 #endif //WARSHIP_H_INCLUDED

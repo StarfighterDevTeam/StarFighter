@@ -84,7 +84,7 @@ public:
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
-	virtual CrewMember* AddCrewMember(CrewMember* crew, Room* room = NULL);
+	CrewMember* AddCrewMember(CrewMember* crew, Room* room = NULL);
 
 	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
 	void AddEngineToTile(RoomTile* tile);
@@ -125,7 +125,7 @@ public:
 
 	int GetShortestPathLength(WaterTile* tileA, WaterTile* tileB);
 	bool AddResource(Resource_Meta resource, int value);
-
+	void PayUpkeepCost(int days);
 
 private:
 	int m_rooms_min_upcorner_x;

@@ -92,7 +92,7 @@ void ResourcesInterface::Init(Warship* warship)
 		m_resources[i]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
 		m_resources[i]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
 		m_resources[i]->m_shape.setFillColor(sf::Color::Black);
-		m_resources[i]->m_shape.setPosition(m_resources[i]->getPosition());
+		m_resources[i]->m_shape.setPosition(sf::Vector2f(RESOURCES_INTERFACE_OFFSET_X + i * RESOURCES_INTERFACE_STOCK_SIZE_X + (RESOURCES_ICON_SIZE * 0.5), RESOURCES_INTERFACE_PANEL_SIZE_Y * 0.5));
 		
 		m_resources[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 		m_resources[i]->m_text.setCharacterSize(16);
@@ -203,19 +203,6 @@ void ResourcesInterface::Init(Warship* warship)
 
 void ResourcesInterface::Update()
 {
-	int upkeep_cost[3];
-	for (int i = 0; i < 3; i++)
-	{
-		upkeep_cost[i] = 0;
-		for (int j = 0; j < 2; j++)
-		{
-			for (vector<CrewMember*>::iterator it = m_warship->m_crew[j].begin(); it != m_warship->m_crew[j].end(); it++)
-			{
-				upkeep_cost[i] += (*it)->m_upkeep_cost[i];
-			}
-		}
-	}
-
 	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
 	{
 		ostringstream ss_resource;
@@ -226,8 +213,8 @@ void ResourcesInterface::Update()
 			case Resource_Fish:
 			case Resource_Mech:
 			{
-				ss_resource << m_warship->m_resources[i] << "    (-" << upkeep_cost[i] << ")";
-				m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
+				ss_resource << m_warship->m_resources[i];
+				//m_resources[i]->m_text.setColor(m_warship->m_resources[i] > 0 ? sf::Color::White : sf::Color::Red);
 				break;
 			}
 			case Resource_Fidelity:

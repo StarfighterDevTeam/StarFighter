@@ -18,7 +18,7 @@ Gameloop::Gameloop()
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
 	if (LoadPlayerData(m_warship) == 0)
 	{
-		//create a new save
+		//No saved game loaded => create a new save from scratch
 		m_warship->Init();
 
 		GenerateRandomIslands();
@@ -959,34 +959,13 @@ void Gameloop::Update(sf::Time deltaTime)
 			if (hovered->m_UI_type == UI_CrewMember)
 			{
 				CrewMember* crew = (CrewMember*)hovered;
-				if (m_warship->m_crew_unboard_interface.AddCrewToInterface(crew) == true)
-				{
-					//remove from ship (since it has been added to the interface)
-					//vector<CrewMember*> old_crew;
-					//for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
-					//{
-					//	old_crew.push_back(*it);
-					//}
-					//m_warship->m_crew[0].clear();
-					//for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-					//{
-					//	if (*it != crew)
-					//	{
-					//		m_warship->m_crew[0].push_back(*it);
-					//	}
-					//	else
-					//	{
-					//		crew->m_tile->m_crew = NULL;
-					//	}
-					//}
-				}
+				m_warship->m_crew_unboard_interface.AddCrewToInterface(crew);
 			}
 			//remove crew from interface
 			else if (hovered->m_UI_type == UI_CrewMemberUnboarding)
 			{
 				CrewMember* crew = (CrewMember*)hovered;
 				m_warship->m_crew_unboard_interface.RemoveCrewFromInterface(crew);
-				//m_warship->AddCrewMember(crew);
 			}
 		}
 
