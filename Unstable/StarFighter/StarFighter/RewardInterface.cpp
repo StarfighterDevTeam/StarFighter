@@ -101,8 +101,8 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 		m_rewards[i]->setAnimation(texture, 1, 1);
 		m_rewards[i]->setPosition(sf::Vector2f(pos_x, m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5 - RESOURCES_ICON_SIZE * 0.5 - 60));
 
-		m_rewards[i]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_SIZE_Y));
-		m_rewards[i]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_SIZE_Y * 0.5f));
+		m_rewards[i]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
+		m_rewards[i]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
 		m_rewards[i]->m_shape.setFillColor(sf::Color::Black);
 		m_rewards[i]->m_shape.setPosition(m_rewards[i]->getPosition());
 

@@ -285,7 +285,7 @@ Room* Ship::AddRoom(int upcorner_x, int upcorner_y, int width, int height, RoomT
 	return room;
 }
 
-CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)
+CrewMember* Ship::AddCrewMember(CrewMember* crew, Room* room)//there is an override function for class Warship
 {
 	//if (m_nb_crew >= m_nb_crew_max)
 	//{
@@ -1431,23 +1431,6 @@ bool Ship::SetSailsToWaterTile(WaterTile* tile)
 	}
 
 	return true;
-}
-
-void Ship::PayUpkeepCost(int days)
-{
-	for (int i = 0; i < 3; i++)
-	{
-		int upkeep = 0;
-		for (int j = 0; j < 2; j++)
-		{
-			for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
-			{
-				upkeep += (*it)->m_upkeep_cost[i];
-			}
-		}
-
-		AddResource((Resource_Meta)i, -upkeep * days);
-	}
 }
 
 int Ship::GetShortestPathLength(WaterTile* tileA, WaterTile* tileB)

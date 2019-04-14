@@ -12,6 +12,8 @@
 #define	CRUISE_SPEED					50.f
 #define ANGLE_SPEED						30.f
 
+#define NB_UPKEEP_COSTS					(Resource_Fish + 1)
+
 class Ship : public GameEntity
 {
 public:
@@ -82,7 +84,7 @@ public:
 	bool AddConnexion(int tileA_x, int tileA_y, int tileB_x, int tileB_y);
 	Room* ConnectRooms();
 	void FlagHullRoomTiles();
-	CrewMember* AddCrewMember(CrewMember* crew, Room* room = NULL);
+	virtual CrewMember* AddCrewMember(CrewMember* crew, Room* room = NULL);
 
 	void AddWeaponToTile(Weapon* weapon, RoomTile* tile);
 	void AddEngineToTile(RoomTile* tile);
@@ -120,7 +122,6 @@ public:
 	float GetDistanceFloatToWaterTile(WaterTile* tile);
 	bool SetSailsToWaterTile(WaterTile* tile);
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
-	void PayUpkeepCost(int days);
 
 	int GetShortestPathLength(WaterTile* tileA, WaterTile* tileB);
 	bool AddResource(Resource_Meta resource, int value);

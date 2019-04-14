@@ -193,20 +193,22 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 			{
 				int reward_value = 0;
-				if (j == Resource_Crew)
+				if (j == Resource_Crew || j == Resource_Days)
 				{
 					reward_value = m_choices[i].m_reward_resources[j];
 				}
-				else if (j == Resource_Days)
-				{
-					m_ship->PayUpkeepCost(- m_choices[i].m_reward_resources[j]);
-				}
+				//else if (j == Resource_Days)
+				//{
+				//	//m_ship->PayUpkeepCost(- m_choices[i].m_reward_resources[j]);
+				//	reward_value = 
+				//}
 				else
 				{
 					//gold/fish etc...: gain the max value * pro rata of skills deployed * random between 0.8 and 1.2 the reference
 					reward_value = (int)(1.0f * m_choices[i].m_reward_resources[j] * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max * RandomizeFloatBetweenValues(0.8, 1.2));
 				}
 
+				//add reward
 				if (reward_value != 0)
 				{
 					reward->m_rewards[k].first = (Resource_Meta)j;

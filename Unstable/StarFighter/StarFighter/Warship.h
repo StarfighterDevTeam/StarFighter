@@ -29,6 +29,8 @@ public:
 
 	float m_desired_angle;
 	float m_angle_speed;
+	int m_upkeep_costs[NB_UPKEEP_COSTS];
+
 	struct Compass m_compass;
 	struct CrewInterface m_crew_interface;
 	struct PrisonersChoiceInterface m_prisoners_choice_interface;
@@ -37,6 +39,9 @@ public:
 	struct RewardInterface m_reward_interface;
 
 	void UpdateOLD(Time deltaTime, bool tactical_combat);
+	void UpdateUpkeepCosts();
+
+	void PayUpkeepCost(int days);
 };
 
 #endif //WARSHIP_H_INCLUDED

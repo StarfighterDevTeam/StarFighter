@@ -20,6 +20,9 @@ struct ResourcesInterface
 	GameEntity* m_save_button;
 	GameEntity* m_load_button;
 
+	GameEntity* m_upkeep[NB_UPKEEP_COSTS];
+	sf::Text m_text_upkeep;
+
 	void Init(Warship* ship);
 	void Destroy();
 

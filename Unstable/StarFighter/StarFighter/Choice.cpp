@@ -171,8 +171,8 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 		m_rewards[r]->setAnimation(texture, 1, 1);
 		m_rewards[r]->setPosition(sf::Vector2f(pos_x, m_gauge->m_text.getPosition().y - RESOURCES_ICON_SIZE * 0.5 - 4));
 
-		m_rewards[r]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_SIZE_Y));
-		m_rewards[r]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_SIZE_Y * 0.5f));
+		m_rewards[r]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
+		m_rewards[r]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
 		m_rewards[r]->m_shape.setFillColor(sf::Color::Black);
 		m_rewards[r]->m_shape.setPosition(m_rewards[r]->getPosition());
 

@@ -16,6 +16,11 @@ Warship::Warship(DMS_Coord coord) : Ship(coord, Ship_Warship, Alliance_Player, "
 	m_flee_timer = 0.f;
 	m_flee_count = 0.f;
 	m_is_charging_flee_count = true;
+	
+	for (int i = 0; i < NB_UPKEEP_COSTS; i++)
+	{
+		m_upkeep_costs[i] = 0;
+	}
 
 	//shape for water tiles
 	m_textureName = "2D/warship_icon.png";
@@ -294,4 +299,27 @@ void Warship::UpdateOLD(Time deltaTime, bool tactical_combat)
 	UpdateShipOffset();
 
 	GameEntity::Update(deltaTime);
+}
+
+void Warship::UpdateUpkeepCosts()
+{
+	for (int i = 0; i < NB_UPKEEP_COSTS; i++)
+	{
+		m_upkeep_costs[i] = 0;
+		for (int j = 0; j < 2; j++)
+		{
+			for (vector<CrewMember*>::iterator it = m_crew[j].begin(); it != m_crew[j].end(); it++)
+			{
+				m_upkeep_costs[i] += (*it)->m_upkeep_cost[i];
+			}
+		}
+	}
+}
+
+void Warship::PayUpkeepCost(int days)
+{
+	for (int i = 0; i < NB_UPKEEP_COSTS; i++)
+	{
+		AddResource((Resource_Meta)i, -m_upkeep_costs[i] * days);
+	}
 }

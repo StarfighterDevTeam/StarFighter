@@ -18,6 +18,7 @@ Gameloop::Gameloop()
 	m_warship = new Warship(DMS_Coord{0, 10, 0, 0, 8, 0 });
 	if (LoadPlayerData(m_warship) == 0)
 	{
+		//create a new save
 		m_warship->Init();
 		SavePlayerData(m_warship);
 	}
@@ -133,6 +134,7 @@ void Gameloop::Update(sf::Time deltaTime)
 	bool warship_is_in_port = m_warship->m_seaport != NULL;
 	
 	//UPDATING GAME ENTITIES
+	m_warship->UpdateUpkeepCosts();
 
 	//change of scale?
 	UpdateTacticalScale();
@@ -289,8 +291,8 @@ void Gameloop::Update(sf::Time deltaTime)
 							//Sail order
 							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty)
 							{
-								ship->SetSailsToWaterTile(tile_hovered);
-								ship->PayUpkeepCost(cost);
+								m_warship->SetSailsToWaterTile(tile_hovered);
+								m_warship->PayUpkeepCost(cost);
 							}
 						}
 					}
@@ -939,60 +941,18 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			m_warship->m_crew_unboard_interface.Destroy();
 
+			//Pay "day" price
+			for (int i = 0; i < 3; i++)
+			{
+				if (reward->m_rewards[i].first == Resource_Days)
+				{
+					m_warship->PayUpkeepCost(reward->m_rewards[i].second);
+				}
+			}
+
 			m_warship->m_reward_interface.Init(m_warship, reward);
 			m_menu = Menu_Reward;
 		}
-		
-		
-		//	bool found = false;
-		//	for (vector<CrewMember*>::iterator it = m_warship->m_crew_unboard_interface.m_unboarded.begin(); it != m_warship->m_crew_unboard_interface.m_unboarded.end(); it++)
-		//	{
-		//		if (*it == hovered)
-		//		{
-		//			found = true;
-		//			break;
-		//		}
-		//	}
-		//
-		//	if (found == false && m_warship->m_crew_unboard_interface.m_unboarded.size() < m_warship->m_crew_unboard_interface.m_slots_avaible)
-		//	{
-		//		//add unboarded crew to unboard interface
-		//		crew = (CrewMember*)hovered;
-		//		if (crew->m_is_prisoner == false)
-		//		{
-		//			m_warship->m_crew_unboard_interface.m_unboarded.push_back(crew);
-		//			crew->m_position = m_warship->m_crew_unboard_interface.m_crew_slots[m_warship->m_crew_unboard_interface.m_unboarded.size() - 1]->m_position;
-		//			crew->Update(deltaTime);//update position + reset hovering
-		//
-		//			//remove unboarded crew from ship from ship
-		//			vector<CrewMember*> old_crew;
-		//			for (vector<CrewMember*>::iterator it = m_warship->m_crew[0].begin(); it != m_warship->m_crew[0].end(); it++)
-		//			{
-		//				old_crew.push_back(*it);
-		//			}
-		//			m_warship->m_crew[0].clear();
-		//			for (vector<CrewMember*>::iterator it = old_crew.begin(); it != old_crew.end(); it++)
-		//			{
-		//				if (*it != crew)
-		//				{
-		//					m_warship->m_crew[0].push_back(*it);
-		//				}
-		//			}
-		//		}
-		//	}
-		//	else if(found == true)
-		//	{
-		//		//remove from unboarded crew interface
-		//		m_warship->m_crew_unboard_interface.Update(deltaTime, crew);
-		//	}
-		//
-		//	//update
-		//	m_warship->m_crew_unboard_interface.Update(deltaTime, crew);
-		//}
-		//else
-		//{
-		//	m_warship->m_crew_unboard_interface.Update(deltaTime, NULL);
-		//}
 	}
 	else if (m_menu == Menu_Reward)
 	{
