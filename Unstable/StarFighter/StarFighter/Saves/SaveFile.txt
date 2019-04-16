@@ -1,6 +1,6 @@
 DMS 0 10 0 8
 Gold 203
-Fish 0
+Fish 500
 Mech 100
 Fidelity 50
 Days 10
@@ -38,3 +38,9 @@ Island 52 25 2 3 0 0 0 White_Island 1 51 25 0
 Island 5 34 4 4 0 0 0 Death_Island 1 6 35 0
 Island 12 35 2 3 0 0 0 Stone_Island 1 14 35 0
 Island 19 33 3 2 0 0 0 Lagoon_Island 1 21 31 0
+Wreck 0 18 0 0 4 0
+Wreck 0 59 0 0 7 0
+Wreck 0 23 0 0 53 0
+Wreck 0 39 0 0 38 0
+Wreck 0 49 0 0 54 0
+Wreck 0 29 0 0 34 0

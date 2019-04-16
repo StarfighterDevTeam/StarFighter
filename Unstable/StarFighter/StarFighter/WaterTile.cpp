@@ -12,6 +12,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_DMS.SetCoord(zone_coord_x, coord_x, 0, zone_coord_y, coord_y, 0);
 	m_default_color = sf::Color(255, 255, 255, 120);
 	m_can_be_seen = false;
+	m_is_wreck_location = false;
 
 	//pathfinding
 	m_heuristic = 0;
@@ -27,7 +28,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_shape_container.setPosition(m_position);
 	m_shape_container.setSize(sf::Vector2f(size, size));
 	m_shape_container.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
-	m_shape_container.setFillColor(sf::Color(0, 100, 170, 255));//blue "water"
+	m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
 	m_shape_container.setOutlineThickness(-1.f);
 	m_shape_container.setOutlineColor(m_default_color);
 

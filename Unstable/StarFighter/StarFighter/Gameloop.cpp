@@ -21,7 +21,8 @@ Gameloop::Gameloop()
 		//No saved game loaded => create a new save from scratch
 		m_warship->Init();
 
-		GenerateRandomIslands();
+		GenerateRandomIslands(0, 0);
+		GenerateRandomSecretWrecks(0, 0);
 
 		//create a new save file
 		SavePlayerData(m_warship);
@@ -55,43 +56,6 @@ Gameloop::Gameloop()
 	m_contextual_order = new ContextualOrder();
 }
 
-void Gameloop::GenerateRandomIslands()
-{
-	//init islands
-	int r = RandomizeIntBetweenValues(20, 30);
-
-	int x = 5;
-	int y = 5;
-
-	for (int i = 0; i < r; i++)
-	{
-		int width = RandomizeIntBetweenValues(2, 4);
-		int height = RandomizeIntBetweenValues(2, 4);
-
-		if (x < NB_WATERTILE_X - 10)
-		{
-			x += RandomizeIntBetweenValues(6, 9);
-			y += (RandomizeIntBetweenValues(-2, 2));
-		}
-		else
-		{
-			x = 5;
-			y += RandomizeIntBetweenValues(6, 9);
-		}
-
-		int type = RandomizeIntBetweenValues(0, NB_SEAPORT_TYPES - 1);
-
-		if (x + width < NB_WATERTILE_X - 1 && y < NB_WATERTILE_Y - 1 && x > 0 && y - height > 0)
-		{
-			Island* island = new Island(x, y, width, height, 0, 0);
-			island->AddSeaport((SeaportType)type);
-			m_islands.push_back(island);
-
-			//printf("Island: corner x: %d, corner y: %d, width: %d, height: %d\n", x, y, width, height);
-		}
-	}
-}
-
 Gameloop::~Gameloop()
 {
 	delete m_background;
@@ -109,6 +73,11 @@ Gameloop::~Gameloop()
 	delete m_contextual_order;
 
 	m_resources_interface.Destroy();
+
+	for (vector<DMS_Coord*>::iterator it = m_secret_wrecks.begin(); it != m_secret_wrecks.end(); it++)
+	{
+		delete (*it);
+	}
 }
 
 void Gameloop::InitWaterZones()
@@ -986,10 +955,11 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 
 				//Secret wreck location
-				if (reward->m_DMS_location != NULL)
+				if (reward->m_DMS_location != NULL && m_secret_wrecks.size() > 0)
 				{
 					//get a secret wreck location from the water zone map
-					*reward->m_DMS_location = m_warship->m_DMS;
+					int r = RandomizeIntBetweenValues(0, m_secret_wrecks.size() - 1);
+					reward->m_DMS_location = m_secret_wrecks[r];
 				}
 			}
 
@@ -1576,6 +1546,13 @@ int Gameloop::SavePlayerData(Warship* warship)
 			data << endl;
 		}
 
+		for (vector<DMS_Coord*>::iterator it = m_secret_wrecks.begin(); it != m_secret_wrecks.end(); it++)
+		{
+			ostringstream secret_wreck;
+			data << "Wreck " << (*it)->m_degree_x << " " << (*it)->m_minute_x << " " << (*it)->m_second_x << " " << (*it)->m_degree_y << " " << (*it)->m_minute_y << " " << (*it)->m_second_y;
+			data << endl;
+		}
+
 		data.close();  // on ferme le fichier
 	}
 	else  // si l'ouverture a échoué
@@ -1667,6 +1644,18 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				{
 					Seaport* port = island->AddSeaport((SeaportType)seaport_type, seaport_coord_x, seaport_coord_y);
 				}
+			}
+
+			if (t.compare("Wreck") == 0)
+			{
+				int degree_x, minute_x, degree_y, minute_y;
+				float second_x, second_y;
+				std::istringstream(line) >> t >> degree_x >> minute_x >> second_x >> degree_y >> minute_y >> second_y;
+
+				DMS_Coord* dms = new DMS_Coord(degree_x, minute_x, second_x, degree_y, minute_y, second_y);
+				m_secret_wrecks.push_back(dms);
+				(*CurrentGame).m_waterzones[degree_x][degree_y]->m_watertiles[minute_x][minute_y]->m_is_wreck_location = true;
+				(*CurrentGame).m_waterzones[degree_x][degree_y]->m_watertiles[minute_x][minute_y]->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
 			}
 
 			warship->m_nb_crew = warship->m_crew[0].size();
@@ -1925,5 +1914,66 @@ void Gameloop::SpendDays(int days, bool skip_time)
 				(*it)->m_visited_countdown = 0;
 			}
 		}
+	}
+}
+
+
+
+void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
+{
+	//init islands
+	int r = RandomizeIntBetweenValues(20, 30);
+
+	int x = 5;
+	int y = 5;
+
+	for (int i = 0; i < r; i++)
+	{
+		int width = RandomizeIntBetweenValues(2, 4);
+		int height = RandomizeIntBetweenValues(2, 4);
+
+		if (x < NB_WATERTILE_X - 10)
+		{
+			x += RandomizeIntBetweenValues(6, 9);
+			y += (RandomizeIntBetweenValues(-2, 2));
+		}
+		else
+		{
+			x = 5;
+			y += RandomizeIntBetweenValues(6, 9);
+		}
+
+		int type = RandomizeIntBetweenValues(0, NB_SEAPORT_TYPES - 1);
+
+		if (x + width < NB_WATERTILE_X - 1 && y < NB_WATERTILE_Y - 1 && x > 0 && y - height > 0)
+		{
+			Island* island = new Island(x, y, width, height, zone_coord_x, zone_coord_y);
+			island->AddSeaport((SeaportType)type);
+			m_islands.push_back(island);
+
+			//printf("Island: corner x: %d, corner y: %d, width: %d, height: %d\n", x, y, width, height);
+		}
+	}
+}
+
+void Gameloop::GenerateRandomSecretWrecks(int zone_coord_x, int zone_coord_y)
+{
+	//init wrecks
+	int r = RandomizeIntBetweenValues(5, 10);
+
+	for (int i = 0; i < r; i++)
+	{
+		int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+		int y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+
+		while ((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_type != Water_Empty)
+		{
+			x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+			y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+		}
+
+		(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_is_wreck_location = true;
+		(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
+		m_secret_wrecks.push_back(new DMS_Coord(zone_coord_x, x, 0, zone_coord_y, y, 0));
 	}
 }

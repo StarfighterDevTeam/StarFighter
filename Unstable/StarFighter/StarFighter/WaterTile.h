@@ -69,6 +69,8 @@ public:
 	Seaport* m_seaport;
 
 	int m_cost;
+
+	bool m_is_wreck_location;
 };
 
 #endif //WATERTILE_H_INCLUDED
