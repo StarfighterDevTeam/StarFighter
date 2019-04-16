@@ -57,7 +57,6 @@ enum RewardData
 	Reward_Days,
 	Reward_Fidelity,
 	Reward_Crew,
-	Reward_SecretWreck,
 	Reward_Text,
 	NB_REWARD_DATA,
 };
@@ -68,10 +67,8 @@ enum RewardData
 struct Reward
 {
 	Reward();
-	~Reward();
 	pair<Resource_Meta, int> m_rewards[3];
 	string m_string;
-	DMS_Coord* m_secret_location;
 };
 
 struct Choice

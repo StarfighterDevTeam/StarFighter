@@ -984,13 +984,6 @@ void Gameloop::Update(sf::Time deltaTime)
 				{
 					SpendDays(reward->m_rewards[i].second, true);
 				}
-
-				//Secret wreck location
-				if (reward->m_rewards[i].first == Resource_SecretWreck)
-				{
-					//get a secret wreck location from the water zone map
-					reward->m_secret_location = new DMS_Coord(1, 2, 3, 4, 5, 6);
-				}
 			}
 
 			m_warship->m_reward_interface.Init(m_warship, reward);

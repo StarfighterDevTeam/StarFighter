@@ -8,14 +8,6 @@ Reward::Reward()
 	{
 		m_rewards[i].second = 0;
 	}
-
-	m_secret_location = NULL;
-}
-
-Reward::~Reward()
-{
-	delete m_secret_location;
-	m_secret_location = NULL;
 }
 
 Choice::Choice()
@@ -28,6 +20,7 @@ Choice::Choice()
 	{
 		m_rewards[i] = NULL;
 	}
+
 
 	m_cost_days = 0;
 }

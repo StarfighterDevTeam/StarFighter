@@ -8,7 +8,7 @@
 class Warship;//forward declaration
 class Island;
 
-#define RESOURCES_REFRESH_RATE_IN_DAYS			40
+#define RESOURCES_REFRESH_RATE_IN_DAYS			20
 
 enum SeaportType
 {

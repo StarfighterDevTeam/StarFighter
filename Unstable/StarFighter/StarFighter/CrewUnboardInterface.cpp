@@ -232,16 +232,6 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 				k++;
 			}
 
-			//secret wreck location
-			int secret = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_SecretWreck]);
-			if (secret == 1)
-			{
-				reward->m_rewards[k].first = Resource_SecretWreck;
-				reward->m_rewards[k].second = 1;
-				k++;
-			}
-
-			//reward text
 			reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
 			reward->m_string = StringReplace(reward->m_string, "_", " ");
 			reward->m_string = StringCut(reward->m_string, 48);
