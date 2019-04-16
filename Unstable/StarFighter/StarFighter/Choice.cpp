@@ -8,6 +8,13 @@ Reward::Reward()
 	{
 		m_rewards[i].second = 0;
 	}
+
+	m_DMS_location = NULL;
+}
+
+Reward::~Reward()
+{
+	delete m_DMS_location;
 }
 
 Choice::Choice()

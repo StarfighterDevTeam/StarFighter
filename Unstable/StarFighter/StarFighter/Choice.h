@@ -24,6 +24,8 @@
 #define RESOURCES_ICON_SIZE							30
 #define CHOICES_REWARDS_OFFSET_X					80
 
+struct DMS_Coord;
+
 enum ChoicesData
 {
 	Choice_ID,
@@ -57,18 +59,21 @@ enum RewardData
 	Reward_Days,
 	Reward_Fidelity,
 	Reward_Crew,
+	Reward_SecretWreck,
 	Reward_Text,
 	NB_REWARD_DATA,
 };
 
 #define NB_CHOICE_REWARDS_MAX				((NB_CHOICE_DATA - Choice_Reward1) / 2)
 
-
 struct Reward
 {
+public:
 	Reward();
+	~Reward();
 	pair<Resource_Meta, int> m_rewards[3];
 	string m_string;
+	DMS_Coord* m_DMS_location;
 };
 
 struct Choice

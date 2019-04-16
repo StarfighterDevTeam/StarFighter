@@ -23,6 +23,8 @@ RewardInterface::~RewardInterface()
 
 void RewardInterface::Destroy()
 {
+	m_ship = NULL;
+
 	delete m_panel;
 	m_panel = NULL;
 
@@ -34,8 +36,6 @@ void RewardInterface::Destroy()
 
 	delete m_reward;
 	m_reward = NULL;
-
-	m_ship = NULL;
 
 	delete m_ok_button;
 	m_ok_button = NULL;
@@ -55,6 +55,7 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 	m_panel->m_shape_container.setOutlineColor(sf::Color::Black);
 	m_panel->m_shape_container.setPosition(sf::Vector2f(REF_WINDOW_RESOLUTION_X - REWARD_PANEL_SIZE_X * 0.5, REF_WINDOW_RESOLUTION_Y * 0.5));
 	m_panel->m_position = m_panel->m_shape_container.getPosition();
+	m_panel->m_size = m_panel->m_shape_container.getSize();
 
 	//text
 	m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
@@ -81,11 +82,30 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 
 	for (int i = 0; i < 3; i++)
 	{
-		if (reward->m_rewards[i].second == 0)
+		if (reward->m_DMS_location != NULL)
+		{
+			//secret location coordinates reveal
+			ostringstream ss_DMS;
+			DMS_Coord& dms = *reward->m_DMS_location;
+			ss_DMS << dms.m_degree_y << "° " << dms.m_minute_y << "' " << (int)dms.m_second_y << " \"\N";
+			ss_DMS << ", ";
+			ss_DMS << dms.m_degree_x << "° " << dms.m_minute_x << "' " << (int)dms.m_second_x << " \"\E";
+
+			m_text_DMS_location.setFont(*(*CurrentGame).m_font[Font_Arial]);
+			m_text_DMS_location.setCharacterSize(20);
+			m_text_DMS_location.setColor(sf::Color::Green);
+			m_text_DMS_location.setStyle(sf::Text::Bold);
+			m_text_DMS_location.setString(ss_DMS.str());
+			m_text_DMS_location.setPosition(sf::Vector2f(m_panel->m_position.x - m_text_DMS_location.getGlobalBounds().width * 0.5, m_panel->m_position.y - m_text_DMS_location.getGlobalBounds().height * 0.65 + 4));
+		
+			reward->m_DMS_location = NULL;
+		}
+		else if (reward->m_rewards[i].second == 0)
 		{
 			break;
 		}
 
+		//resources
 		m_rewards[i] = new GameEntity(UI_None);
 		float pos_x = m_panel->m_position.x - centering_offset + (CHOICES_REWARDS_OFFSET_X * i);// m_panel->m_shape_container.getSize().x * 0.5 + RESOURCES_ICON_SIZE * 0.5 + REWARD_INTERFACE_OFFSET_X + (CHOICES_REWARDS_OFFSET_X * i);
 
@@ -105,6 +125,7 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 		m_rewards[i]->m_text.setColor(sf::Color::White);
 		m_rewards[i]->m_text.setString(ss_resource.str());
 		m_rewards[i]->m_text.setPosition(sf::Vector2f(m_rewards[i]->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, m_rewards[i]->m_shape.getPosition().y - m_rewards[i]->m_text.getCharacterSize() * 0.65));
+		
 	}
 
 	//confirm button
@@ -114,7 +135,7 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 	m_ok_button->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_VeryDarkGrey_Background]);
 	m_ok_button->m_shape_container.setOutlineThickness(2);
 	m_ok_button->m_shape_container.setOutlineColor(sf::Color::White);
-	m_ok_button->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x, m_rewards[0]->m_shape.getPosition().y + 46));
+	m_ok_button->m_shape_container.setPosition(sf::Vector2f(m_panel->m_position.x, m_panel->m_position.y + m_panel->m_size.y * 0.5 - m_ok_button->m_shape_container.getSize().y * 0.5 - 20));
 	
 	m_ok_button->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_ok_button->m_text.setCharacterSize(18);
@@ -174,6 +195,7 @@ void RewardInterface::Draw(sf::RenderTexture& screen)
 	}
 
 	screen.draw(m_text);
+	screen.draw(m_text_DMS_location);
 
 	m_ok_button->Draw(screen);
 }

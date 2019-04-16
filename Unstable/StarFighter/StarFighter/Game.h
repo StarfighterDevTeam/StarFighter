@@ -96,6 +96,7 @@ enum Resource_Meta
 	NB_RESOURCES_TYPES,
 	Resource_Crew,
 	NB_RESOURCES_TYPES_TOTAL,
+	Resource_SecretWreck,
 };
 
 enum RoomType

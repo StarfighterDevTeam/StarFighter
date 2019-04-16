@@ -984,6 +984,13 @@ void Gameloop::Update(sf::Time deltaTime)
 				{
 					SpendDays(reward->m_rewards[i].second, true);
 				}
+
+				//Secret wreck location
+				if (reward->m_DMS_location != NULL)
+				{
+					//get a secret wreck location from the water zone map
+					*reward->m_DMS_location = m_warship->m_DMS;
+				}
 			}
 
 			m_warship->m_reward_interface.Init(m_warship, reward);

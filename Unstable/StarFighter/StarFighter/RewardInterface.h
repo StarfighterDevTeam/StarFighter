@@ -18,6 +18,7 @@ struct RewardInterface
 	Ship* m_ship;
 	Reward* m_reward;
 	sf::Text m_text;
+	sf::Text m_text_DMS_location;
 
 	GameEntity* m_panel;
 	GameEntity* m_rewards[3];

@@ -162,7 +162,7 @@ void Warship::Init()
 
 Warship::~Warship()
 {
-
+	printf("warship\n");
 }
 
 void Warship::UpdateOLD(Time deltaTime, bool tactical_combat)
