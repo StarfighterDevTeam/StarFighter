@@ -144,8 +144,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		(*CurrentGame).m_selected_ui->m_shape_container.setOutlineColor((*CurrentGame).m_selected_ui->m_default_color);
 		(*CurrentGame).m_selected_ui = NULL;
 	}
-
-	bool warship_is_in_port = m_warship->m_seaport != NULL;
 	
 	//UPDATING GAME ENTITIES
 	m_warship->UpdateUpkeepCosts();
@@ -305,8 +303,11 @@ void Gameloop::Update(sf::Time deltaTime)
 							//Sail order
 							if (mouse_click == Mouse_RightClick && tile_hovered->m_type == Water_Empty)
 							{
-								m_warship->SetSailsToWaterTile(tile_hovered);
-								SpendDays(cost, false);
+								if (m_warship->SetSailsToWaterTile(tile_hovered) == true)
+								{
+									SpendDays(cost, false);
+									m_warship->m_can_open_new_menu = true;
+								}
 							}
 						}
 					}
@@ -894,12 +895,20 @@ void Gameloop::Update(sf::Time deltaTime)
 	m_resources_interface.Update();
 
 	//MENUS
-	//entering a seaport?
-	if (warship_is_in_port == false && m_warship->m_seaport != NULL)
+	//Arriving at destination => open a new contextual menu?
+	if (m_warship->m_can_open_new_menu == true)
 	{
-		//unboarding?
-		m_menu = Menu_CrewUnboard;
-		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
+		if (m_warship->m_seaport != NULL)
+		{
+			//unboarding?
+			m_menu = Menu_CrewUnboard;
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
+			m_warship->m_can_open_new_menu = false;
+		}
+		else if (m_warship->m_tile->m_location != Location_None && m_warship->m_speed == sf::Vector2f(0, 0))
+		{
+			m_warship->m_can_open_new_menu = false;
+		}
 	}
 
 	//Crew overboard menu
@@ -1308,6 +1317,7 @@ bool Gameloop::UpdateTacticalScale()
 
 				m_warship->RestoreHealth();
 				m_warship->InitCombat();
+				m_warship->m_can_open_new_menu = false;
 				m_scale = Scale_Strategic;
 			}
 		}
