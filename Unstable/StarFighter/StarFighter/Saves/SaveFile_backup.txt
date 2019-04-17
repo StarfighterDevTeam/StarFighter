@@ -38,7 +38,7 @@ Island 52 25 2 3 0 0 0 White_Island 1 51 25 0
 Island 5 34 4 4 0 0 0 Death_Island 1 6 35 0
 Island 12 35 2 3 0 0 0 Stone_Island 1 14 35 0
 Island 19 33 3 2 0 0 0 Lagoon_Island 1 21 31 0
-Wreck 0 8 0 0 6 0
+Wreck 0 51 0 0 56 0
 Wreck 0 38 0 0 59 0
 Wreck 0 40 0 0 32 0
 Wreck 0 43 0 0 26 0

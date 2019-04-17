@@ -41,7 +41,7 @@ public:
 	Warship* m_warship;
 	vector<Island*> m_islands;
 	vector<Ship*> m_ships;
-	vector<DMS_Coord*> m_secret_wrecks;
+	vector<DMS_Coord*> m_secret_locations[NB_LOCATION_TYPES];
 	Ship* m_tactical_ship;
 	Scale m_scale;
 	sf::Text m_pause_text;
@@ -69,7 +69,7 @@ public:
 	void UpdateAITargetRoom(Weapon* weapon);
 
 	void GenerateRandomIslands(int zone_coord_x, int zone_coord_y);
-	void GenerateRandomSecretWrecks(int zone_coord_x, int zone_coord_y);
+	void GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y);
 	void SpendDays(int days, bool skip_time);
 
 private:

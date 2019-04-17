@@ -10,6 +10,14 @@ class WaterZone;
 class Island;
 class Seaport;
 
+enum LocationType
+{
+	Location_Wreck,
+	Location_SeaMonster,
+	NB_LOCATION_TYPES,
+	Location_None,
+};
+
 struct DMS_Coord
 {
 	DMS_Coord(){};
@@ -54,6 +62,7 @@ public:
 	WaterZone* m_zone;
 	DMS_Coord m_DMS;//degree/min/sec
 	bool m_can_be_seen;
+	LocationType m_location;
 
 	void UpdatePosition(DMS_Coord warship_DMS);
 	static DMS_Coord GetDMSCoord(sf::Vector2f position, DMS_Coord warship_DMS);
@@ -69,8 +78,6 @@ public:
 	Seaport* m_seaport;
 
 	int m_cost;
-
-	bool m_is_wreck_location;
 };
 
 #endif //WATERTILE_H_INCLUDED
