@@ -15,7 +15,7 @@ enum UI_Type
 	UI_Warship,
 	UI_WaterTile,
 	UI_Island,
-	UI_Seaport,
+	UI_Location,
 	UI_Compass,
 	UI_Weapon,
 	UI_Engine,

@@ -41,7 +41,7 @@ public:
 	Warship* m_warship;
 	vector<Seaport*> m_seaports;
 	vector<Ship*> m_ships;
-	vector<DMS_Coord*> m_secret_locations[NB_SECRET_LOCATION_TYPES];
+	vector<Location*> m_secret_locations[NB_SECRET_LOCATION_TYPES];
 	Ship* m_tactical_ship;
 	Scale m_scale;
 	sf::Text m_pause_text;

@@ -20,7 +20,6 @@ Island::Island(int upcorner_x, int upcorner_y, int width, int height, int zone_c
 		{
 			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
 			tile->m_type = Water_Island;
-			tile->m_island = this;
 			tile->m_shape_container.setFillColor(sf::Color(201, 180, 95, 255));
 
 			m_tiles.push_back(tile);

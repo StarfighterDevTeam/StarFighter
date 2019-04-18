@@ -5,12 +5,9 @@
 
 #include "WaterZone.h"
 #include "Island.h"
+#include "Location.h"
 
 class Warship;//forward declaration
-
-#define RESOURCES_REFRESH_RATE_IN_DAYS			40
-#define NB_CHOICES_MAX							4
-
 
 enum SeaportType
 {
@@ -18,7 +15,7 @@ enum SeaportType
 	NB_SEAPORT_TYPES,
 };
 
-class Seaport : public GameEntity
+class Seaport : public Location
 {
 public:
 	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type);

@@ -100,9 +100,9 @@ bool Ship::SetDMSCoord(DMS_Coord coord)
 	m_tile = tile;
 
 	//new seaport?
-	if (tile->m_seaport != NULL && tile != (WaterTile*)m_seaport)
+	if (tile->m_location != NULL && tile->m_location->m_type == Location_Seaport && tile != (WaterTile*)m_seaport)
 	{
-		m_seaport = tile->m_seaport;
+		m_seaport = (Seaport*)tile->m_location;
 		m_seaport->m_ships.push_back(this);
 	}
 

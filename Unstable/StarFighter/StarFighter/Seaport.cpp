@@ -2,7 +2,7 @@
 
 extern Game* CurrentGame;
 
-Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type) : GameEntity(sf::Vector2f(WATERTILE_SIZE, WATERTILE_SIZE), UI_Seaport)
+Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type) : Location(Location_Seaport, (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[coord_x][coord_y])
 {
 	m_coord_x = coord_x;
 	m_coord_y = coord_y;
@@ -12,7 +12,7 @@ Seaport::Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, S
 	m_visited_countdown = 0;
 
 	m_tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[coord_x][coord_y];
-	m_tile->m_seaport = this;
+	m_tile->m_location = this;
 
 	//UI
 	sf::Texture* texture = TextureLoader::getInstance()->loadTexture("2D/seaport_icon.png", (int)WATERTILE_SIZE, (int)WATERTILE_SIZE);
