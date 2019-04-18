@@ -4,11 +4,13 @@
 #include "Game.h"
 
 #include "WaterZone.h"
+#include "Island.h"
 
 class Warship;//forward declaration
-class Island;
 
 #define RESOURCES_REFRESH_RATE_IN_DAYS			40
+#define NB_CHOICES_MAX							4
+
 
 enum SeaportType
 {
@@ -19,7 +21,7 @@ enum SeaportType
 class Seaport : public GameEntity
 {
 public:
-	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type, Island* island);
+	Seaport(int coord_x, int coord_y, int zone_coord_x, int zone_coord_y, SeaportType type);
 	~Seaport();
 
 	int m_coord_x;
@@ -34,8 +36,11 @@ public:
 
 	void RemoveShip(Ship* ship);
 
-	//bool CreateIsland(int upcorner_x, int upcorner_y, int width, int height, WaterZone* zone, int zone_coord_x, int zone_coord_y);
-	
+	string m_display_name;
+	int m_visited_countdown;
+	int m_choicesID[NB_CHOICES_MAX];
+
+	Island* AddIsland(int upcorner_x, int upcorner_y, int width, int height);
 };
 
 #endif //SEAPORT_H_INCLUDED

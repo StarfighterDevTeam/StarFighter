@@ -14,8 +14,9 @@ enum LocationType
 {
 	Location_Wreck,
 	Location_SeaMonster,
-	NB_LOCATION_TYPES,
+	NB_SECRET_LOCATION_TYPES,
 	Location_None,
+	Location_Seaport,
 };
 
 struct DMS_Coord

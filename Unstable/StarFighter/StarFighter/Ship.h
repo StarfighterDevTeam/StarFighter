@@ -6,7 +6,7 @@
 #include "Rudder.h"
 #include "CrewMember.h"
 #include "WaterZone.h"
-#include "Island.h"
+#include "Seaport.h"
 #include "CombatInterface.h"
 
 #define	CRUISE_SPEED					50.f

@@ -39,9 +39,9 @@ public:
 	//PIRATES
 	GameEntity* m_background;
 	Warship* m_warship;
-	vector<Island*> m_islands;
+	vector<Seaport*> m_seaports;
 	vector<Ship*> m_ships;
-	vector<DMS_Coord*> m_secret_locations[NB_LOCATION_TYPES];
+	vector<DMS_Coord*> m_secret_locations[NB_SECRET_LOCATION_TYPES];
 	Ship* m_tactical_ship;
 	Scale m_scale;
 	sf::Text m_pause_text;

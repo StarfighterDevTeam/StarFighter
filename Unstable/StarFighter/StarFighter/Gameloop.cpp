@@ -60,7 +60,7 @@ Gameloop::~Gameloop()
 {
 	delete m_background;
 	
-	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+	for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
 	{
 		delete (*it);
 	}
@@ -74,7 +74,7 @@ Gameloop::~Gameloop()
 
 	m_resources_interface.Destroy();
 
-	for (int i = 0; i < NB_LOCATION_TYPES; i++)
+	for (int i = 0; i < NB_SECRET_LOCATION_TYPES; i++)
 	{
 		for (vector<DMS_Coord*>::iterator it = m_secret_locations[i].begin(); it != m_secret_locations[i].end(); it++)
 		{
@@ -204,24 +204,12 @@ void Gameloop::Update(sf::Time deltaTime)
 	}
 
 	//Islands
-	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+	for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
 	{
 		//position on "radar"
-		WaterTile* tileUpLeft = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x][(*it)->m_upcorner_y];
-		WaterTile* tileDownRight = m_warship->m_tile->m_zone->m_watertiles[(*it)->m_upcorner_x + (*it)->m_width - 1][(*it)->m_upcorner_y - (*it)->m_height + 1];
-		float pos_x = 0.5f * (tileDownRight->m_position.x + tileUpLeft->m_position.x);
-		float pos_y = 0.5f * (tileDownRight->m_position.y + tileUpLeft->m_position.y);
-		(*it)->m_position = sf::Vector2f(pos_x, pos_y);
-
+		(*it)->m_position = (*it)->m_tile->m_position;
 		(*it)->UpdatePosition();
-
-		if ((*it)->m_seaport != NULL)
-		{
-			Seaport* port = (*it)->m_seaport;
-
-			port->m_position = port->m_tile->m_position;
-			port->UpdatePosition();
-		}
+		(*it)->m_text.setPosition(sf::Vector2f((*it)->m_text.getPosition().x, (*it)->m_text.getPosition().y - (*it)->m_text.getGlobalBounds().height * 0.5 - WATERTILE_SIZE * 0.5 - 10));
 	}
 
 	//Canceling weapon target
@@ -902,7 +890,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			//unboarding?
 			m_menu = Menu_CrewUnboard;
-			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport);
 			m_warship->m_can_open_new_menu = false;
 		}
 		else if (m_warship->m_tile->m_location != Location_None && m_warship->m_speed == sf::Vector2f(0, 0))
@@ -956,7 +944,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			//Reset island resources cooldown
 			if (m_warship->m_seaport != NULL)
 			{
-				m_warship->m_seaport->m_island->m_visited_countdown = 1;
+				m_warship->m_seaport->m_visited_countdown = 1;
 			}
 
 			//Pay "day" price
@@ -1022,18 +1010,13 @@ void Gameloop::Draw()
 		}
 
 		//islands and ports
-		for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+		for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
 		{
-			//island name
 			if ((*it)->m_tile->m_can_be_seen == true)
 			{
 				(*it)->Draw((*CurrentGame).m_mainScreen);
-			}
-
-			//seaport
-			if ((*it)->m_seaport != NULL && (*it)->m_seaport->m_tile->m_can_be_seen == true)
-			{
-				(*it)->m_seaport->Draw((*CurrentGame).m_mainScreen);
+				//island name
+				(*it)->m_island->Draw((*CurrentGame).m_mainScreen);
 			}
 		}
 	}
@@ -1545,22 +1528,16 @@ int Gameloop::SavePlayerData(Warship* warship)
 			}
 		}
 
-		for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+		for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
 		{
 			ostringstream island_name;
 			island_name << StringReplace((*it)->m_display_name, " ", "_");
-			data << "Island " << (*it)->m_upcorner_x << " " << (*it)->m_upcorner_y << " " << (*it)->m_width << " " << (*it)->m_height << " " << (*it)->m_zone_coord_x << " " << (*it)->m_zone_coord_y << " " << (*it)->m_visited_countdown << " " << island_name.str();
-			
-			int has_seaport = (*it)->m_seaport == NULL ? 0 : 1;
-			data << " " << has_seaport;
-			if (has_seaport == true)
-			{
-				data << " " << (*it)->m_seaport->m_coord_x << " " << (*it)->m_seaport->m_coord_y << " " << (int)((*it)->m_seaport->m_type);
-			}
+			data << "Island " << (*it)->m_zone_coord_x << " " << (*it)->m_zone_coord_y << " " << (*it)->m_coord_x << " " << (*it)->m_coord_y << " " << (int)((*it)->m_type) << " " << (*it)->m_visited_countdown;
+			data << " " << (*it)->m_island->m_upcorner_x << " " << (*it)->m_island->m_upcorner_y << " " << (*it)->m_island->m_width << " " << (*it)->m_island->m_height << " " << island_name.str();
 			data << endl;
 		}
 
-		for (int i = 0; i < NB_LOCATION_TYPES; i++)
+		for (int i = 0; i < NB_SECRET_LOCATION_TYPES; i++)
 		{
 			for (vector<DMS_Coord*>::iterator it = m_secret_locations[i].begin(); it != m_secret_locations[i].end(); it++)
 			{
@@ -1660,21 +1637,14 @@ int Gameloop::LoadPlayerData(Warship* warship)
 
 			if (t.compare("Island") == 0)
 			{
-				int upcorner_x, upcorner_y, width, height, zone_coord_x, zone_coord_y, visited_countdown, has_seaport, seaport_coord_x, seaport_coord_y, seaport_type, seaport_visited_countdown;
+				int seaport_coord_x, seaport_coord_y, seaport_type, seaport_visited_countdown, island_upcorner_x, island_upcorner_y, island_width, island_height, zone_coord_x, zone_coord_y;
 				string name;
-				std::istringstream(line) >> t >> upcorner_x >> upcorner_y >> width >> height >> zone_coord_x >> zone_coord_y >> visited_countdown >> name >> has_seaport >> seaport_coord_x >> seaport_coord_y >> seaport_type >> seaport_visited_countdown;
+				std::istringstream(line) >> t >> zone_coord_x >> zone_coord_y >> seaport_coord_x >> seaport_coord_y >> seaport_type >> seaport_visited_countdown >> island_upcorner_x >> island_upcorner_y >> island_width >> island_height >> name;
 				name = StringReplace(name, "_", " ");
 
-				Island* island = new Island(upcorner_x, upcorner_y, width, height, zone_coord_x, zone_coord_y);
-				island->m_display_name = name;
-				island->m_text.setString(name);
-				island->m_visited_countdown = visited_countdown;
-				m_islands.push_back(island);
-
-				if (has_seaport == 1)
-				{
-					Seaport* port = island->AddSeaport((SeaportType)seaport_type, seaport_coord_x, seaport_coord_y);
-				}
+				Seaport* seaport = new Seaport(seaport_coord_x, seaport_coord_y, zone_coord_x, zone_coord_y, (SeaportType)seaport_type);
+				seaport->AddIsland(island_upcorner_x, island_upcorner_y, island_width, island_height);
+				m_seaports.push_back(seaport);
 			}
 
 			if (t.compare("Wreck") == 0 || t.compare("SeaMonster") == 0)
@@ -1928,8 +1898,8 @@ bool Gameloop::UpdateUnboarding()
 	if (m_warship->m_seaport != NULL && m_menu != Menu_CrewUnboard)
 	{
 		m_menu = Menu_CrewUnboard;
-		
-		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport->m_island);
+
+		m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport);
 	}
 	else if (m_warship->m_seaport == NULL && m_menu == Menu_CrewUnboard)
 	{
@@ -1945,13 +1915,13 @@ void Gameloop::SpendDays(int days, bool skip_time)
 {
 	m_warship->PayUpkeepCost(days);
 
-	//refresh islands & seaports resources
-	for (vector<Island*>::iterator it = m_islands.begin(); it != m_islands.end(); it++)
+	//refresh seaports resources
+	for (vector<Seaport*>::iterator it = m_seaports.begin(); it != m_seaports.end(); it++)
 	{
 		if ((*it)->m_visited_countdown > 0)
 		{
 			(*it)->m_visited_countdown += days;
-			
+
 			if ((*it)->m_visited_countdown >= RESOURCES_REFRESH_RATE_IN_DAYS)
 			{
 				(*it)->m_visited_countdown = 0;
@@ -1965,36 +1935,98 @@ void Gameloop::SpendDays(int days, bool skip_time)
 void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 {
 	//init islands
-	int r = RandomizeIntBetweenValues(20, 30);
-
-	int x = 5;
-	int y = 5;
+	int r = RandomizeIntBetweenValues(50, 70);
 
 	for (int i = 0; i < r; i++)
 	{
+		int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+		int y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+
+		while ((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_type != Water_Empty || (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location != Location_None)
+		{
+			x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+			y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+		}
+
+		//island size
 		int width = RandomizeIntBetweenValues(2, 4);
 		int height = RandomizeIntBetweenValues(2, 4);
 
-		if (x < NB_WATERTILE_X - 10)
+		//randomize the position of the island around the seaport
+		int offset_x = -RandomizeIntBetweenValues(0, width - 1);
+		int offset_y = RandomizeIntBetweenValues(0, height - 1);
+		int d = RandomizeIntBetweenValues(0, 2 * width + 2 * height - 1);
+		if (d < 2 * width)
 		{
-			x += RandomizeIntBetweenValues(6, 9);
-			y += (RandomizeIntBetweenValues(-2, 2));
+			offset_y = RandomizeSign() > 0 ? -1 : height;
 		}
 		else
 		{
-			x = 5;
-			y += RandomizeIntBetweenValues(6, 9);
+			offset_x = RandomizeSign() > 0 ? 1 : -width;
 		}
 
-		int type = RandomizeIntBetweenValues(0, NB_SEAPORT_TYPES - 1);
-
-		if (x + width < NB_WATERTILE_X - 1 && y < NB_WATERTILE_Y - 1 && x > 0 && y - height > 0)
+		//avoid to create an island off the grid
+		if (x + offset_x < 0)
 		{
-			Island* island = new Island(x, y, width, height, zone_coord_x, zone_coord_y);
-			island->AddSeaport((SeaportType)type);
-			m_islands.push_back(island);
+			offset_x = 1;
+		}
+		else if (x + offset_x + (width - 1) > NB_WATERTILE_SUBDIVISION - 1)
+		{
+			offset_x = -width;
+		}
 
-			//printf("Island: corner x: %d, corner y: %d, width: %d, height: %d\n", x, y, width, height);
+		if (y + offset_y - (height - 1) < 0)
+		{
+			offset_y = height;
+		}
+		else if (y + offset_y > NB_WATERTILE_SUBDIVISION - 1)
+		{
+			offset_y = -1;
+		}
+
+		//avoid to create an island on top of an existing island or location + allow 2 tiles at least between each island
+		bool area_is_clear = true;
+		for (int j = 0; j < width + 2; j++)
+		{
+			for (int k = 0; k < height + 2; k++)
+			{
+				int x_ = x + offset_x + j;
+				int y_ = y + offset_y - k;
+
+				if ((j >= width && x_ > NB_WATERTILE_SUBDIVISION - 1) || (k >= height && y_ < 0))
+				{
+					continue;
+				}
+
+				if ((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x_][y_]->m_type != Water_Empty || (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location != Location_None)
+				{
+					area_is_clear = false;
+				}
+			}
+		}
+
+		//create seaport and island
+		if (area_is_clear == true)
+		{
+			int t = RandomizeIntBetweenValues(0, NB_SEAPORT_TYPES - 1);
+			Seaport* seaport = new Seaport(x, y, zone_coord_x, zone_coord_y, (SeaportType)t);
+			(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location = Location_Seaport;
+			m_seaports.push_back(seaport);
+			Island* island = seaport->AddIsland(x + offset_x, y + offset_y, width, height);
+			
+			for (int j = 0; j < width + 2; j++)
+			{
+				for (int k = 0; k < height + 2; k++)
+				{
+					int x_ = island->m_upcorner_x + j;
+					int y_ = island->m_upcorner_y - k;
+
+					if (((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x_][y_]->m_type != Water_Empty && (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x_][y_]->m_island != island) || (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location != Location_None)
+					{
+						printf("");
+					}
+				}
+			}
 		}
 	}
 }
@@ -2003,7 +2035,7 @@ void Gameloop::GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y)
 {
 	int r = RandomizeIntBetweenValues(5, 10);
 
-	for (int i = 0; i < NB_LOCATION_TYPES; i++)
+	for (int i = 0; i < NB_SECRET_LOCATION_TYPES; i++)
 	{
 		for (int j = 0; j < r; j++)
 		{

@@ -8,7 +8,7 @@ CrewUnboardInterface::CrewUnboardInterface()
 	m_hovered = NULL;
 
 	m_ship = NULL;
-	m_island = NULL;
+	m_seaport = NULL;
 }
 
 CrewUnboardInterface::~CrewUnboardInterface()
@@ -34,7 +34,7 @@ void CrewUnboardInterface::Destroy()
 	m_crew_slots.clear();
 
 	m_ship = NULL;
-	m_island = NULL;
+	m_seaport = NULL;
 
 	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 	{
@@ -45,15 +45,15 @@ void CrewUnboardInterface::Destroy()
 	m_crew_interface.Destroy();
 }
 
-void CrewUnboardInterface::Init(Ship* ship, Island* island)
+void CrewUnboardInterface::Init(Ship* ship, Seaport* seaport)
 {
-	if (ship == NULL || island == NULL)
+	if (ship == NULL || seaport == NULL)
 	{
 		return;
 	}
 
 	m_ship = ship;
-	m_island = island;
+	m_seaport = seaport;
 	m_slots_avaible = ship->m_lifeboats;
 
 	//background panel
@@ -112,15 +112,15 @@ void CrewUnboardInterface::Init(Ship* ship, Island* island)
 
 	//choices
 	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_island->m_choicesID[i] < 0)
+		if (m_seaport->m_choicesID[i] < 0)
 		{
 			break;
 		}
 		
 		//m_choices[i] = new Choice();
-		m_choices[i].Init(i, m_island->m_choicesID[i]);
+		m_choices[i].Init(i, m_seaport->m_choicesID[i]);
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
 	}
 }
@@ -160,9 +160,9 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 	}
 
 	//choices
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_island->m_choicesID[i] < 0)
+		if (m_seaport->m_choicesID[i] < 0)
 		{
 			break;
 		}
@@ -216,7 +216,7 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 				if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
 				{
 					//add random + pro rata of skills invested (if any)
-					float island_cooldown = m_island->m_visited_countdown == 0 ? 1.f : (1.f * m_island->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
+					float island_cooldown = m_seaport->m_visited_countdown == 0 ? 1.f : (1.f * m_seaport->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
 
 					if (m_choices[i].m_gauge_value_max == 0)
 					{
@@ -280,9 +280,9 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 		m_unboarded[i]->Draw(screen);
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_island->m_choicesID[i] < 0)
+		if (m_seaport->m_choicesID[i] < 0)
 		{
 			break;
 		}
