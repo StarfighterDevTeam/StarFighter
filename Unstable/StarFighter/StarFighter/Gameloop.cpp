@@ -1643,6 +1643,8 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				name = StringReplace(name, "_", " ");
 
 				Seaport* seaport = new Seaport(seaport_coord_x, seaport_coord_y, zone_coord_x, zone_coord_y, (SeaportType)seaport_type);
+				seaport->m_display_name = name;
+				seaport->m_text.setString(name);
 				seaport->AddIsland(island_upcorner_x, island_upcorner_y, island_width, island_height);
 				m_seaports.push_back(seaport);
 			}
@@ -1930,13 +1932,10 @@ void Gameloop::SpendDays(int days, bool skip_time)
 	}
 }
 
-
-
 void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 {
 	//init islands
-	int r = RandomizeIntBetweenValues(50, 70);
-
+	int r = RandomizeIntBetweenValues(60, 80);
 	for (int i = 0; i < r; i++)
 	{
 		int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
@@ -1949,84 +1948,50 @@ void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 		}
 
 		//island size
-		int width = RandomizeIntBetweenValues(2, 4);
-		int height = RandomizeIntBetweenValues(2, 4);
+		int width = RandomizeIntBetweenValues(2, 3);
+		int height = RandomizeIntBetweenValues(2, 3);
 
 		//randomize the position of the island around the seaport
-		int offset_x = -RandomizeIntBetweenValues(0, width - 1);
-		int offset_y = RandomizeIntBetweenValues(0, height - 1);
-		int d = RandomizeIntBetweenValues(0, 2 * width + 2 * height - 1);
-		if (d < 2 * width)
-		{
-			offset_y = RandomizeSign() > 0 ? -1 : height;
-		}
-		else
-		{
-			offset_x = RandomizeSign() > 0 ? 1 : -width;
-		}
+		vector<WaterTile*> possible_candidates;
 
-		//avoid to create an island off the grid
-		if (x + offset_x < 0)
+		for (int j = 0; j < width; j++)
 		{
-			offset_x = 1;
-		}
-		else if (x + offset_x + (width - 1) > NB_WATERTILE_SUBDIVISION - 1)
-		{
-			offset_x = -width;
-		}
-
-		if (y + offset_y - (height - 1) < 0)
-		{
-			offset_y = height;
-		}
-		else if (y + offset_y > NB_WATERTILE_SUBDIVISION - 1)
-		{
-			offset_y = -1;
-		}
-
-		//avoid to create an island on top of an existing island or location + allow 2 tiles at least between each island
-		bool area_is_clear = true;
-		for (int j = 0; j < width + 2; j++)
-		{
-			for (int k = 0; k < height + 2; k++)
+			for (int k = 0; k < 2; k++)
 			{
-				int x_ = x + offset_x + j;
-				int y_ = y + offset_y - k;
-
-				if ((j >= width && x_ > NB_WATERTILE_SUBDIVISION - 1) || (k >= height && y_ < 0))
+				//check offgrid && not adjacent to island/port
+				int y_ = k == 0 ? -1 : height;
+				if (CanIslandBeCreatedInArea(x - j, y + y_, width, height, zone_coord_x, zone_coord_y) == true)
 				{
-					continue;
+					WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x - j][y + y_];
+					possible_candidates.push_back(tile);
 				}
+			}
+		}
 
-				if ((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x_][y_]->m_type != Water_Empty || (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location != Location_None)
+		for (int j = 0; j < height; j++)
+		{
+			for (int k = 0; k < 2; k++)
+			{
+				//check offgrid && not adjacent to island/port
+				int x_ = k == 0 ? 1 : -width;
+				if (CanIslandBeCreatedInArea(x + x_, y + j, width, height, zone_coord_x, zone_coord_y) == true)
 				{
-					area_is_clear = false;
+					WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x + x_][y + j];
+					possible_candidates.push_back(tile);
 				}
 			}
 		}
 
 		//create seaport and island
-		if (area_is_clear == true)
+		int candidates_size = possible_candidates.size();
+		if (candidates_size > 0)
 		{
+			WaterTile* candidate_tile = possible_candidates[RandomizeIntBetweenValues(0, candidates_size - 1)];
 			int t = RandomizeIntBetweenValues(0, NB_SEAPORT_TYPES - 1);
 			Seaport* seaport = new Seaport(x, y, zone_coord_x, zone_coord_y, (SeaportType)t);
 			(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location = Location_Seaport;
 			m_seaports.push_back(seaport);
-			Island* island = seaport->AddIsland(x + offset_x, y + offset_y, width, height);
-			
-			for (int j = 0; j < width + 2; j++)
-			{
-				for (int k = 0; k < height + 2; k++)
-				{
-					int x_ = island->m_upcorner_x + j;
-					int y_ = island->m_upcorner_y - k;
-
-					if (((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x_][y_]->m_type != Water_Empty && (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x_][y_]->m_island != island) || (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location != Location_None)
-					{
-						printf("");
-					}
-				}
-			}
+			seaport->AddIsland(candidate_tile->m_coord_x, candidate_tile->m_coord_y, width, height);
 		}
 	}
 }
@@ -2066,4 +2031,35 @@ void Gameloop::GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y)
 			}
 		}
 	}
+}
+
+bool Gameloop::CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y)
+{
+	//test 1: on grid
+	bool is_on_grid = (upcorner_x >= 0 && upcorner_x + width - 1 <= NB_WATERTILE_SUBDIVISION - 1 && upcorner_y <= NB_WATERTILE_SUBDIVISION - 1 && upcorner_y >= height - 1);
+	if (is_on_grid == false)
+	{
+		return false;
+	}
+
+	//test 2: area is free, with 2 tiles margins around the island
+	bool is_free = true;
+	for (int i = -2; i < width + 2; i++)
+	{
+		for (int j = -2; j < height + 2; j++)
+		{
+			WaterTile* tile = NULL;
+			if (upcorner_x + i >= 0 && upcorner_x + i <= NB_WATERTILE_SUBDIVISION - 1 && upcorner_y - j >= 0 && upcorner_y - j <= NB_WATERTILE_SUBDIVISION - 1)
+			{
+				tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[upcorner_x + i][upcorner_y - j];
+			}
+			
+			if (tile != NULL && (tile->m_type != Water_Empty || tile->m_location != Location_None))
+			{
+				is_free = false;
+			}
+		}
+	}
+
+	return is_on_grid && is_free;
 }
