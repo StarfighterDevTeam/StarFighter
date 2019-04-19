@@ -99,25 +99,45 @@ Game::Game(RenderWindow& window)
 	m_dico_crew_races[Race_Mecha] = "Mechanoid";
 
 	m_dico_crew_names[0].push_back("Joe");
+	m_dico_crew_names[0].push_back("John");
 	m_dico_crew_names[0].push_back("Bill");
 	m_dico_crew_names[0].push_back("Daniel");
 	m_dico_crew_names[0].push_back("Thomas");
+	m_dico_crew_names[0].push_back("Roger");
+	m_dico_crew_names[0].push_back("Robert");
+	m_dico_crew_names[0].push_back("Bob");
+	m_dico_crew_names[0].push_back("Peter");
+	m_dico_crew_names[0].push_back("Jamie");
 
 	m_dico_crew_names[1].push_back("Leandra");
 	m_dico_crew_names[1].push_back("Serena");
 	m_dico_crew_names[1].push_back("Lucy");
 	m_dico_crew_names[1].push_back("Angela");
+	m_dico_crew_names[1].push_back("Maria");
+	m_dico_crew_names[1].push_back("Anna");
+	m_dico_crew_names[1].push_back("Sophie");
+	m_dico_crew_names[1].push_back("Jane");
+	m_dico_crew_names[1].push_back("Zoe");
 
 	m_dico_islands_names.push_back("Turtle Island");
 	m_dico_islands_names.push_back("Dolphin Island");
+	m_dico_islands_names.push_back("Shark Island");
+	m_dico_islands_names.push_back("Snake Island");
 	m_dico_islands_names.push_back("Sapphire Island");
 	m_dico_islands_names.push_back("Emerald Island");
+	m_dico_islands_names.push_back("Quartz Island");
+	m_dico_islands_names.push_back("Onyx Island");
+	m_dico_islands_names.push_back("Ruby Island");
+	m_dico_islands_names.push_back("Diamond Island");
+	m_dico_islands_names.push_back("Topaz Island");
 	m_dico_islands_names.push_back("Stone Island");
 	m_dico_islands_names.push_back("Rock Island");
 	m_dico_islands_names.push_back("Death Island");
 	m_dico_islands_names.push_back("White Island");
 	m_dico_islands_names.push_back("Giants Island");
 	m_dico_islands_names.push_back("Lagoon Island");
+	m_dico_islands_names.push_back("Angels Island");
+	m_dico_islands_names.push_back("Paradise Island");
 
 	m_dico_resources_textures[Resource_Gold] = "2D/icon_gold.png";
 	m_dico_resources_textures[Resource_Fish] = "2D/icon_fish.png";

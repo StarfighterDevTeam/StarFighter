@@ -886,15 +886,11 @@ void Gameloop::Update(sf::Time deltaTime)
 	//Arriving at destination => open a new contextual menu?
 	if (m_warship->m_can_open_new_menu == true)
 	{
-		if (m_warship->m_seaport != NULL)
+		if (m_warship->m_tile->m_location != NULL && (m_warship->m_tile->m_location->m_type == Location_Seaport || m_warship->m_tile->m_location->m_visited_countdown == 0) && m_warship->m_speed == sf::Vector2f(0, 0))
 		{
 			//unboarding?
 			m_menu = Menu_CrewUnboard;
-			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_seaport);
-			m_warship->m_can_open_new_menu = false;
-		}
-		else if (m_warship->m_tile->m_location != NULL && m_warship->m_speed == sf::Vector2f(0, 0))
-		{
+			m_warship->m_crew_unboard_interface.Init(m_warship, m_warship->m_tile->m_location);
 			m_warship->m_can_open_new_menu = false;
 		}
 	}
@@ -941,10 +937,10 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			m_warship->m_crew_unboard_interface.Destroy();
 
-			//Reset island resources cooldown
-			if (m_warship->m_seaport != NULL)
+			//Update resources cooldown
+			if (m_warship->m_tile->m_location != NULL)
 			{
-				m_warship->m_seaport->m_visited_countdown = 1;
+				m_warship->m_tile->m_location->m_visited_countdown = 1;
 			}
 
 			//Pay "day" price
@@ -964,8 +960,17 @@ void Gameloop::Update(sf::Time deltaTime)
 				}
 			}
 
-			m_warship->m_reward_interface.Init(m_warship, reward);
-			m_menu = Menu_Reward;
+			//reward is not empty? open the reward interface.
+			if (reward->m_string.empty() == false)
+			{
+				m_warship->m_reward_interface.Init(m_warship, reward);
+				m_menu = Menu_Reward;
+			}
+			else
+			{
+				delete reward;
+				m_menu = Menu_None;
+			}
 		}
 	}
 	else if (m_menu == Menu_Reward)

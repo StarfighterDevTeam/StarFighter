@@ -22,7 +22,7 @@
 #define RESOURCES_BUTTON_SIZE_Y						24
 
 #define RESOURCES_ICON_SIZE							30
-#define CHOICES_REWARDS_OFFSET_X					80
+#define CHOICES_REWARDS_OFFSET_X					100
 
 struct DMS_Coord;
 

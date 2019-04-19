@@ -1,4 +1,6 @@
 #choices_name,text,picture_name,cost_days,skill_type,skill_max_value,reward1,reward1_proba,reward2,reward2_proba,reward3,reward3_proba
 1,Collect_shells,2D/choice_prisoner_1.png,1,1,100,1,100,0,0,0,0
-2,Explore_the_shore,2D/choice_prisoner_1.png,1,2,100,2,10,4,10,5,80
-3,Spend_quality_off_duty_time,2D/choice_prisoner_1.png,1,0,0,3,100,0,0,0,0
+2,Explore_the_shore,2D/choice_prisoner_2.png,1,0,0,2,10,4,10,5,80
+3,Spend_quality_off_duty_time,2D/choice_prisoner_3.png,1,0,0,3,100,0,0,0,0
+4,Send_divers_to_investigate,2D/choice_prisoner_1.png,1,0,0,6,50,7,50,0,0
+5,Ingore_it._Its_too_dangerous,2D/choice_prisoner_1.png,0,0,0,0,0,0,0,0,0

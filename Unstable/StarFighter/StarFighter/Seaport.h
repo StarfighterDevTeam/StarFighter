@@ -35,7 +35,6 @@ public:
 
 	string m_display_name;
 	int m_visited_countdown;
-	int m_choicesID[NB_CHOICES_MAX];
 
 	Island* AddIsland(int upcorner_x, int upcorner_y, int width, int height);
 };

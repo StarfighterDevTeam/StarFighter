@@ -14,37 +14,68 @@ Crew Serena 2 2 20 20 6 9 6 7 4 1 0 5
 Crew Thomas 2 2 20 20 2 2 3 8 3 1 0 6
 Crew Leandra 2 0 20 20 4 4 5 3 6 1 0 7
 Crew Bill 2 2 20 20 10 10 7 3 3 1 0 8
-Island 8 9 2 2 0 0 0 White_Island 1 10 9 0
-Island 13 7 2 3 0 0 0 Giants_Island 1 12 6 0
-Island 19 8 3 3 0 0 0 Emerald_Island 1 20 9 0
-Island 26 10 4 2 0 0 0 Rock_Island 1 28 11 0
-Island 33 11 2 3 0 0 0 Turtle_Island 1 34 12 0
-Island 42 11 4 2 0 0 0 Lagoon_Island 1 42 12 0
-Island 49 11 4 4 0 0 0 Sapphire_Island 1 50 7 0
-Island 5 18 3 4 0 0 0 Stone_Island 1 6 14 0
-Island 13 16 2 2 0 0 0 Death_Island 1 15 15 0
-Island 20 16 4 4 0 0 0 White_Island 1 23 12 0
-Island 27 18 4 4 0 0 0 Dolphin_Island 1 31 15 0
-Island 36 17 4 4 0 0 0 Sapphire_Island 1 40 14 0
-Island 45 15 3 2 0 0 0 Turtle_Island 1 45 16 0
-Island 54 15 3 3 0 0 0 Emerald_Island 1 57 14 0
-Island 5 23 4 3 0 0 0 Death_Island 1 9 21 0
-Island 13 25 4 3 0 0 0 Rock_Island 1 15 22 0
-Island 19 26 2 3 0 0 0 Giants_Island 1 21 25 0
-Island 26 27 3 4 0 0 0 White_Island 1 27 28 0
-Island 34 27 3 2 0 0 0 Lagoon_Island 1 34 28 0
-Island 43 27 2 4 0 0 0 Stone_Island 1 42 27 0
-Island 52 25 2 3 0 0 0 White_Island 1 51 25 0
-Island 5 34 4 4 0 0 0 Death_Island 1 6 35 0
-Island 12 35 2 3 0 0 0 Stone_Island 1 14 35 0
-Island 19 33 3 2 0 0 0 Lagoon_Island 1 21 31 0
-Wreck 0 8 0 0 6 0
-Wreck 0 38 0 0 59 0
-Wreck 0 40 0 0 32 0
-Wreck 0 43 0 0 26 0
-Wreck 0 22 0 0 38 0
-SeaMonster 0 12 0 0 11 0
-SeaMonster 0 4 0 0 1 0
-SeaMonster 0 27 0 0 16 0
-SeaMonster 0 34 0 0 6 0
-SeaMonster 0 4 0 0 0 0
+Island 0 0 10 9 0 0 8 9 2 2 Start_Island
+Island 0 0 26 57 0 0 27 59 4 4 Giants_Island
+Island 0 0 10 26 0 0 6 28 4 3 White_Island
+Island 0 0 42 16 0 0 41 15 3 2 Death_Island
+Island 0 0 36 39 0 0 36 38 4 3 Dolphin_Island
+Island 0 0 48 4 0 0 45 5 3 3 Turtle_Island
+Island 0 0 18 35 0 0 19 36 3 4 Lagoon_Island
+Island 0 0 36 29 0 0 37 31 4 4 Sapphire_Island
+Island 0 0 18 43 0 0 14 45 4 3 Emerald_Island
+Island 0 0 43 46 0 0 44 48 2 3 Stone_Island
+Island 0 0 40 46 0 0 37 50 4 4 Stone_Island
+Island 0 0 54 6 0 0 52 8 4 2 White_Island
+Island 0 0 46 15 0 0 47 15 2 3 Dolphin_Island
+Island 0 0 4 30 0 0 3 32 2 2 Lagoon_Island
+Island 0 0 12 59 0 0 11 58 2 2 Death_Island
+Island 0 0 44 21 0 0 45 23 2 3 Sapphire_Island
+Island 0 0 54 48 0 0 51 51 4 3 Emerald_Island
+Island 0 0 43 4 0 0 39 6 4 3 Rock_Island
+Island 0 0 56 29 0 0 52 29 4 4 Giants_Island
+Island 0 0 26 13 0 0 24 15 2 3 Turtle_Island
+Island 0 0 34 8 0 0 33 11 3 3 Death_Island
+Island 0 0 23 34 0 0 24 37 2 4 Sapphire_Island
+Island 0 0 26 26 0 0 23 30 4 4 Lagoon_Island
+Island 0 0 16 49 0 0 12 50 4 3 Stone_Island
+Island 0 0 8 41 0 0 6 45 3 4 Dolphin_Island
+Island 0 0 15 10 0 0 16 10 2 2 White_Island
+Island 0 0 4 55 0 0 3 54 4 3 Emerald_Island
+Island 0 0 57 41 0 0 55 42 2 4 Giants_Island
+Island 0 0 18 23 0 0 19 23 2 3 Turtle_Island
+Island 0 0 24 22 0 0 25 22 3 4 Rock_Island
+Island 0 0 25 41 0 0 22 43 4 2 Rock_Island
+Island 0 0 31 16 0 0 30 18 2 2 Emerald_Island
+Island 0 0 15 59 0 0 16 59 3 4 Sapphire_Island
+Island 0 0 30 30 0 0 29 29 2 4 Turtle_Island
+Island 0 0 32 51 0 0 30 50 4 2 Lagoon_Island
+Island 0 0 14 25 0 0 14 29 4 4 White_Island
+Island 0 0 54 11 0 0 55 12 4 2 Stone_Island
+Island 0 0 3 25 0 0 1 27 3 2 Dolphin_Island
+Island 0 0 22 51 0 0 23 52 3 2 Giants_Island
+Island 0 0 49 42 0 0 49 45 3 3 Death_Island
+Island 0 0 55 59 0 0 53 58 4 3 Emerald_Island
+Island 0 0 38 58 0 0 36 57 3 2 Death_Island
+Island 0 0 41 23 0 0 39 24 2 4 White_Island
+Island 0 0 54 24 0 0 52 23 4 3 Rock_Island
+Island 0 0 35 25 0 0 35 24 2 3 Turtle_Island
+Island 0 0 50 57 0 0 47 59 3 4 Lagoon_Island
+Island 0 0 35 3 0 0 33 5 3 2 Sapphire_Island
+Island 0 0 14 6 0 0 12 7 2 4 Dolphin_Island
+Island 0 0 27 41 0 0 28 42 4 2 Giants_Island
+Island 0 0 20 56 0 0 21 56 2 2 Stone_Island
+Island 0 0 13 15 0 0 11 16 2 2 Lagoon_Island
+Wreck 0 49 0 0 9 0
+Wreck 0 18 0 0 19 0
+Wreck 0 19 0 0 5 0
+Wreck 0 46 0 0 12 0
+Wreck 0 13 0 0 35 0
+Wreck 0 21 0 0 49 0
+Wreck 0 47 0 0 28 0
+SeaMonster 0 14 0 0 1 0
+SeaMonster 0 50 0 0 0 0
+SeaMonster 0 6 0 0 22 0
+SeaMonster 0 24 0 0 6 0
+SeaMonster 0 21 0 0 25 0
+SeaMonster 0 49 0 0 24 0
+SeaMonster 0 52 0 0 16 0

@@ -8,7 +8,7 @@ CrewUnboardInterface::CrewUnboardInterface()
 	m_hovered = NULL;
 
 	m_ship = NULL;
-	m_seaport = NULL;
+	m_location = NULL;
 }
 
 CrewUnboardInterface::~CrewUnboardInterface()
@@ -17,8 +17,6 @@ CrewUnboardInterface::~CrewUnboardInterface()
 	//delete m_drowning_bar;
 
 	Destroy();
-
-	printf("crew unboard\n");
 }
 
 void CrewUnboardInterface::Destroy()
@@ -34,7 +32,7 @@ void CrewUnboardInterface::Destroy()
 	m_crew_slots.clear();
 
 	m_ship = NULL;
-	m_seaport = NULL;
+	m_location = NULL;
 
 	for (vector<CrewMember*>::iterator it = m_unboarded.begin(); it != m_unboarded.end(); it++)
 	{
@@ -45,15 +43,15 @@ void CrewUnboardInterface::Destroy()
 	m_crew_interface.Destroy();
 }
 
-void CrewUnboardInterface::Init(Ship* ship, Seaport* seaport)
+void CrewUnboardInterface::Init(Ship* ship, Location* location)
 {
-	if (ship == NULL || seaport == NULL)
+	if (ship == NULL || location == NULL)
 	{
 		return;
 	}
 
 	m_ship = ship;
-	m_seaport = seaport;
+	m_location = location;
 	m_slots_avaible = ship->m_lifeboats;
 
 	//background panel
@@ -67,15 +65,29 @@ void CrewUnboardInterface::Init(Ship* ship, Seaport* seaport)
 	m_panel->m_position = m_panel->m_shape_container.getPosition();
 	
 	//narrative text
-	ostringstream ss_survivors;
-	ss_survivors << "Your lifeboats allow for " << m_slots_avaible << " crew members to unboard.\nRight click on crew members to select them for the mission.";
+	ostringstream ss_unboarders;
+	switch (location->m_type)
+	{
+		case Location_Seaport:
+		{
+			ss_unboarders << "Your lifeboats allow for " << m_slots_avaible << " crew members to unboard.\nRight click on crew members to select them for the mission.";
+			break;
+		}
+		case Location_SeaMonster:
+		case Location_Wreck:
+		{
+			ss_unboarders << "A massive object is detected by your sonar underneath.\nYour diving suits allow for " << m_slots_avaible << " crew members to dive.\nRight click on crew members to select them if you want to risk the dive.";
+			break;
+		}
+	}
+	
 	float offset_y = m_panel->m_position.y - CREWUNBOARDINTERFACE_SIZE_Y * 0.5;
 	offset_y += 20;
 	m_narrative_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
 	m_narrative_text.setCharacterSize(18);
 	m_narrative_text.setStyle(sf::Text::Bold);
 	m_narrative_text.setColor(sf::Color::White);
-	m_narrative_text.setString(ss_survivors.str());
+	m_narrative_text.setString(ss_unboarders.str());
 	m_narrative_text.setPosition(sf::Vector2f(m_panel->m_position.x - CREWUNBOARDINTERFACE_SIZE_X * 0.5 + 20, offset_y));
 
 	offset_y += 90;
@@ -114,13 +126,13 @@ void CrewUnboardInterface::Init(Ship* ship, Seaport* seaport)
 	offset_y += CHOICE_PANEL_SIZE_Y * 0.5f + 30;
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_seaport->m_choicesID[i] < 0)
+		if (m_location->m_choicesID[i] < 0)
 		{
 			break;
 		}
 		
 		//m_choices[i] = new Choice();
-		m_choices[i].Init(i, m_seaport->m_choicesID[i]);
+		m_choices[i].Init(i, m_location->m_choicesID[i]);
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
 	}
 }
@@ -162,7 +174,7 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 	//choices
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_seaport->m_choicesID[i] < 0)
+		if (m_location->m_choicesID[i] < 0)
 		{
 			break;
 		}
@@ -201,61 +213,68 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 			int rewardID = m_choices[i].RandomizeRewardID();
 			
 			//read reward in the database
-			rewardID--;
-			Reward* reward = new Reward();
-			int k = 0;
-			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
+			if (rewardID > 0)
 			{
-				int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
-
-				if (value == 0)
+				rewardID--;
+				Reward* reward = new Reward();
+				int k = 0;
+				for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 				{
-					continue;
-				}
+					int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
 
-				if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
-				{
-					//add random + pro rata of skills invested (if any)
-					float island_cooldown = m_seaport->m_visited_countdown == 0 ? 1.f : (1.f * m_seaport->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
-
-					if (m_choices[i].m_gauge_value_max == 0)
+					if (value == 0)
 					{
-						value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
+						continue;
 					}
-					else
+
+					if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
 					{
-						value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
+						//add random + pro rata of skills invested (if any)
+						float island_cooldown = m_location->m_visited_countdown == 0 ? 1.f : (1.f * m_location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
+
+						if (m_choices[i].m_gauge_value_max == 0)
+						{
+							value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
+						}
+						else
+						{
+							value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
+						}
 					}
+
+					if (j == Resource_SecretWreck)
+					{
+						continue;
+					}
+
+					reward->m_rewards[k].first = (Resource_Meta)j;
+					reward->m_rewards[k].second = value;
+
+					k++;
 				}
 
-				if (j == Resource_SecretWreck)
+				//secret wreck location
+				int secret = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_SecretWreck]);
+				if (secret == 1)
 				{
-					continue;
+					reward->m_DMS_location = new DMS_Coord();
+					k++;
+					//reward->m_rewards[k].first = Resource_SecretWreck;
+					//reward->m_rewards[k].second = 1;
+					//k++;
 				}
-				
-				reward->m_rewards[k].first = (Resource_Meta)j;
-				reward->m_rewards[k].second = value;
 
-				k++;
+				//reward text
+				reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
+				reward->m_string = StringReplace(reward->m_string, "_", " ");
+				reward->m_string = StringCut(reward->m_string, 48);
+
+				return reward;
 			}
-
-			//secret wreck location
-			int secret = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_SecretWreck]);
-			if (secret == 1)
+			else
 			{
-				reward->m_DMS_location = new DMS_Coord();
-				k++;
-				//reward->m_rewards[k].first = Resource_SecretWreck;
-				//reward->m_rewards[k].second = 1;
-				//k++;
+				return new Reward();
 			}
-
-			//reward text
-			reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
-			reward->m_string = StringReplace(reward->m_string, "_", " ");
-			reward->m_string = StringCut(reward->m_string, 48);
-
-			return reward;
 		}
 	}
 
@@ -282,7 +301,7 @@ void CrewUnboardInterface::Draw(sf::RenderTexture& screen)
 
 	for (int i = 0; i < NB_CHOICES_MAX; i++)
 	{
-		if (m_seaport->m_choicesID[i] < 0)
+		if (m_location->m_choicesID[i] < 0)
 		{
 			break;
 		}
