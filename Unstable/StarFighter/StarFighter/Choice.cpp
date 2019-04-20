@@ -22,14 +22,6 @@ Choice::Choice()
 	m_panel = NULL;
 	m_picture = NULL;
 	m_gauge = NULL;
-
-	for (int i = 0; i < 3; i++)
-	{
-		m_rewards[i] = NULL;
-	}
-
-
-	m_cost_days = 0;
 }
 
 Choice::~Choice()
@@ -43,10 +35,9 @@ void Choice::Destroy()
 	delete m_picture;
 	delete m_gauge;
 
-	for (int i = 0; i < 3; i++)
+	for (vector<GameEntity*>::iterator it = m_costs_displayed.begin(); it != m_costs_displayed.end(); it++)
 	{
-		delete m_rewards[i];
-		m_rewards[i] = NULL;
+		delete (*it);
 	}
 
 	m_panel = NULL;
@@ -59,11 +50,6 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 	//Init values
 	int skill = -1;
 	int value_max = 0;
-	//for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
-	//{
-	//	m_reward_resources[i] = 0;
-	//}
-	//int reward_crew = 0;
 
 	//Load from an ID?
 	if (choiceID > 0)
@@ -74,7 +60,10 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 
 		portrait_filename = (*CurrentGame).m_choices_config[choiceID][Choice_Picturename];
 
-		m_cost_days = stoi((*CurrentGame).m_choices_config[choiceID][Choice_CostDays]);
+		for (int i = 0; i < NB_RESOURCES_TYPES; i++)
+		{
+			m_cost[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_CostGold + i]);
+		}
 		skill = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Skill]);
 		value_max = stoi((*CurrentGame).m_choices_config[choiceID][Choice_ValueMax]);
 
@@ -146,18 +135,18 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 
 	//gauge (required skill + gauge)
 	m_gauge = new GameEntity(UI_None);
-	m_gauge->m_shape_container.setSize(sf::Vector2f(CHOICE_GAUGE_SIZE_X, CHOICE_GAUGE_SIZE_Y));
-	m_gauge->m_shape_container.setOrigin(sf::Vector2f(CHOICE_GAUGE_SIZE_X * 0.5, CHOICE_GAUGE_SIZE_Y * 0.5f));
-	m_gauge->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
-	m_gauge->m_shape_container.setOutlineThickness(4.f);
-	m_gauge->m_shape_container.setOutlineColor(sf::Color::Black);
-	m_gauge->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20 + CHOICE_GAUGE_SIZE_X * 0.5, 0.f - CHOICE_GAUGE_SIZE_Y * 0.5 + 50));
-
 	m_gauge_value_max = value_max;
 	m_gauge_value = 0;
 	m_skill = skill;
 	if (value_max > 0)
 	{
+		m_gauge->m_shape_container.setSize(sf::Vector2f(CHOICE_GAUGE_SIZE_X, CHOICE_GAUGE_SIZE_Y));
+		m_gauge->m_shape_container.setOrigin(sf::Vector2f(CHOICE_GAUGE_SIZE_X * 0.5, CHOICE_GAUGE_SIZE_Y * 0.5f));
+		m_gauge->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_DarkGrey_Background]);
+		m_gauge->m_shape_container.setOutlineThickness(4.f);
+		m_gauge->m_shape_container.setOutlineColor(sf::Color::Black);
+		m_gauge->m_shape_container.setPosition(sf::Vector2f(0.f - CHOICE_PANEL_SIZE_X * 0.5 + CHOICE_VIDEO_SIZE_X + 20 + CHOICE_GAUGE_SIZE_X * 0.5, 0.f - CHOICE_GAUGE_SIZE_Y * 0.5 + 50));
+
 		m_gauge->m_shape.setSize(sf::Vector2f(1.0f * CHOICE_GAUGE_SIZE_X * m_gauge_value / m_gauge_value_max, CHOICE_GAUGE_SIZE_Y));
 		m_gauge->m_shape.setOrigin(sf::Vector2f(m_gauge->m_shape.getSize().x * 0.5, CHOICE_GAUGE_SIZE_Y * 0.5f));
 		m_gauge->m_shape.setFillColor(sf::Color::Green);
@@ -176,62 +165,33 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 		}
 	}
 
-	//cost days
-	m_rewards[0] = new GameEntity(UI_None);
-	float pos_x = m_gauge->m_text.getPosition().x + RESOURCES_ICON_SIZE * 0.5;
-
-	sf::Texture* texture_days = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[Resource_Days], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
-	m_rewards[0]->setAnimation(texture_days, 1, 1);
-	m_rewards[0]->setPosition(sf::Vector2f(pos_x, m_gauge->m_text.getPosition().y - RESOURCES_ICON_SIZE * 0.5 - 4));
-
-	m_rewards[0]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
-	m_rewards[0]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
-	m_rewards[0]->m_shape.setFillColor(sf::Color::Black);
-	m_rewards[0]->m_shape.setPosition(m_rewards[0]->getPosition());
-
-	ostringstream ss_resource;
-	ss_resource << m_cost_days;
-	m_rewards[0]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-	m_rewards[0]->m_text.setCharacterSize(20);
-	m_rewards[0]->m_text.setColor(sf::Color::Black);
-	m_rewards[0]->m_text.setString(ss_resource.str());
-	m_rewards[0]->m_text.setPosition(sf::Vector2f(m_rewards[0]->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, m_rewards[0]->m_shape.getPosition().y - m_rewards[0]->m_text.getCharacterSize() * 0.65));
-
-
-
-	//rewards
-	/*
-	int r = 0;
-	for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
+	//costs displayed
+	for (int i = 0; i < NB_RESOURCES_TYPES; i++)
 	{
-		if (i != Resource_Days)//if (reward_resources[i] == 0 || i == NB_RESOURCES_TYPES)
+		if (m_cost[i] != 0)
 		{
-			continue;
+			GameEntity* cost_displayed = new GameEntity(UI_None);
+			float pos_x = m_picture->m_text.getPosition().x + RESOURCES_ICON_SIZE * 0.5 + (m_costs_displayed.size() * CHOICES_COSTS_OFFSET_X);
+			sf::Texture* texture_cost = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[i], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+			cost_displayed->setAnimation(texture_cost, 1, 1);
+			cost_displayed->setPosition(sf::Vector2f(pos_x, -RESOURCES_ICON_SIZE * 0.5));
+
+			cost_displayed->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
+			cost_displayed->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
+			cost_displayed->m_shape.setFillColor(sf::Color::Black);
+			cost_displayed->m_shape.setPosition(cost_displayed->getPosition());
+
+			ostringstream ss_resource;
+			ss_resource << m_cost[i];
+			cost_displayed->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+			cost_displayed->m_text.setCharacterSize(20);
+			cost_displayed->m_text.setColor(sf::Color::Black);
+			cost_displayed->m_text.setString(ss_resource.str());
+			cost_displayed->m_text.setPosition(sf::Vector2f(cost_displayed->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, cost_displayed->m_shape.getPosition().y - cost_displayed->m_text.getCharacterSize() * 0.65));
+			
+			m_costs_displayed.push_back(cost_displayed);
 		}
-	
-		m_rewards[r] = new GameEntity(UI_None);
-		float pos_x = m_gauge->m_text.getPosition().x + RESOURCES_ICON_SIZE * 0.5 + CHOICES_REWARDS_OFFSET_X * r;
-	
-		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[i], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
-		m_rewards[r]->setAnimation(texture, 1, 1);
-		m_rewards[r]->setPosition(sf::Vector2f(pos_x, m_gauge->m_text.getPosition().y - RESOURCES_ICON_SIZE * 0.5 - 4));
-	
-		m_rewards[r]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
-		m_rewards[r]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
-		m_rewards[r]->m_shape.setFillColor(sf::Color::Black);
-		m_rewards[r]->m_shape.setPosition(m_rewards[r]->getPosition());
-	
-		ostringstream ss_resource;
-		ss_resource << m_cost_days;
-		m_rewards[r]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		m_rewards[r]->m_text.setCharacterSize(20);
-		m_rewards[r]->m_text.setColor(sf::Color::Black);
-		m_rewards[r]->m_text.setString(ss_resource.str());
-		m_rewards[r]->m_text.setPosition(sf::Vector2f(m_rewards[r]->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, m_rewards[r]->m_shape.getPosition().y - m_rewards[r]->m_text.getCharacterSize() * 0.65));
-	
-		r++;
 	}
-	*/
 }
 
 void Choice::SetPosition(sf::Vector2f position)
@@ -249,16 +209,11 @@ void Choice::SetPosition(sf::Vector2f position)
 	m_gauge->m_shape.setPosition(m_gauge->m_shape.getPosition() + offset);
 	m_gauge->m_text.setPosition(m_gauge->m_text.getPosition() + offset);
 
-	for (int i = 0; i < 3; i++)
+	for (vector<GameEntity*>::iterator it = m_costs_displayed.begin(); it != m_costs_displayed.end(); it++)
 	{
-		if (m_rewards[i] == NULL)
-		{
-			break;
-		}
-	
-		m_rewards[i]->setPosition(m_rewards[i]->getPosition() + offset);
-		m_rewards[i]->m_shape.setPosition(m_rewards[i]->m_shape.getPosition() + offset);
-		m_rewards[i]->m_text.setPosition(m_rewards[i]->m_text.getPosition() + offset);
+		(*it)->setPosition((*it)->getPosition() + offset);
+		(*it)->m_shape.setPosition((*it)->m_shape.getPosition() + offset);
+		(*it)->m_text.setPosition((*it)->m_text.getPosition() + offset);
 	}
 }
 
@@ -307,14 +262,9 @@ void Choice::Draw(sf::RenderTexture& screen)
 	}
 	screen.draw(m_gauge->m_text);
 
-	for (int i = 0; i < 3; i++)
+	for (vector<GameEntity*>::iterator it = m_costs_displayed.begin(); it != m_costs_displayed.end(); it++)
 	{
-		if (m_rewards[i] == NULL)
-		{
-			break;
-		}
-		
-		m_rewards[i]->Draw(screen);
+		(*it)->Draw(screen);
 	}
 }
 

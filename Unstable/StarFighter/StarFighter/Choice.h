@@ -22,7 +22,8 @@
 #define RESOURCES_BUTTON_SIZE_Y						24
 
 #define RESOURCES_ICON_SIZE							30
-#define CHOICES_REWARDS_OFFSET_X					100
+#define CHOICES_REWARDS_OFFSET_X						120
+#define CHOICES_COSTS_OFFSET_X						80
 
 struct DMS_Coord;
 
@@ -31,6 +32,10 @@ enum ChoicesData
 	Choice_ID,
 	Choice_Text,
 	Choice_Picturename,
+	Choice_CostGold,
+	Choice_CostFish,
+	Choice_CostMech,
+	Choice_CostFidelity,
 	Choice_CostDays,
 	Choice_Skill,
 	Choice_ValueMax,
@@ -102,9 +107,9 @@ public:
 	int m_gauge_value_max;
 	int m_gauge_value;
 	int m_skill;
-	int m_cost_days;
+	int m_cost[NB_RESOURCES_TYPES];
 
-	GameEntity* m_rewards[3];
+	vector<GameEntity*> m_costs_displayed;
 	pair<int, int> m_rewardsID[NB_CHOICE_REWARDS_MAX];
 	//string m_reward_string;
 	//int m_reward_resources[NB_RESOURCES_TYPES];

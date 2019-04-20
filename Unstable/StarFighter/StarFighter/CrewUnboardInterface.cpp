@@ -131,7 +131,6 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location)
 			break;
 		}
 		
-		//m_choices[i] = new Choice();
 		m_choices[i].Init(i, m_location->m_choicesID[i]);
 		m_choices[i].SetPosition(sf::Vector2f(prisoners_offset_x + CHOICE_PANEL_SIZE_X * 0.5f + 50 + CREWINTERFACE_SIZE_X, offset_y + (i * CHOICE_PANEL_SIZE_Y)));
 	}
@@ -207,7 +206,7 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
 			//pay "days" cost
-			m_ship->PayUpkeepCost(m_choices[i].m_cost_days);
+			m_ship->PayUpkeepCost(m_choices[i].m_cost[Resource_Days]);
 
 			//randomize reward ID
 			int rewardID = m_choices[i].RandomizeRewardID();
