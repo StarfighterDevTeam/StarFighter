@@ -2063,8 +2063,13 @@ bool Ship::CanViewWaterTile(WaterTile* tile)
 	}
 }
 
-bool Ship::AddResource(Resource_Meta resource, int value)
+bool Ship::AddResource(ResourceType resource, int value)
 {
+	if (value == 0)
+	{
+		return false;
+	}
+
 	if (resource != Resource_Fidelity)
 	{
 		m_resources[resource] = Max(0, m_resources[resource] + value);
@@ -2099,7 +2104,7 @@ void Ship::PayUpkeepCost(int days)
 					if (m_resources[i] >= (*it)->m_upkeep_cost[i])
 					{
 						//pay the cost of crew upkeep
-						AddResource((Resource_Meta)i, -(*it)->m_upkeep_cost[i]);
+						AddResource((ResourceType)i, -(*it)->m_upkeep_cost[i]);
 					}
 					else if (has_lost_fidelity == false)
 					{

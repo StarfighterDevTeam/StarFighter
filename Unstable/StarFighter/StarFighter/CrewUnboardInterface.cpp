@@ -224,6 +224,14 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 				int k = 0;
 				for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 				{
+					//pay cost
+					if (j != Resource_Days && j != Resource_Fidelity)
+					{
+						int cost = stoi((*CurrentGame).m_choices_config[m_location->m_choicesID[i] - 1][Choice_CostGold + j]);
+						m_ship->AddResource(ResourceType(Resource_Gold + j), -cost);
+					}
+
+					//get rewards
 					int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
 
 					if (value == 0)
@@ -246,8 +254,8 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 						}
 					}
 
-					pair<Resource_Meta, int> resource;
-					resource.first = (Resource_Meta)j;
+					pair<ResourceType, int> resource;
+					resource.first = (ResourceType)j;
 					resource.second = value;
 					reward->m_resources.push_back(resource);
 

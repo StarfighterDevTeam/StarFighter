@@ -76,7 +76,7 @@ struct Reward
 public:
 	Reward();
 	~Reward();
-	vector<pair<Resource_Meta, int> > m_resources;
+	vector<pair<ResourceType, int> > m_resources;
 	string m_string;
 	DMS_Coord* m_DMS_location;
 };

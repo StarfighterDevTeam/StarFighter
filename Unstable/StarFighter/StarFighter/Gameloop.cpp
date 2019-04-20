@@ -943,8 +943,8 @@ void Gameloop::Update(sf::Time deltaTime)
 				m_warship->m_tile->m_location->m_visited_countdown = 1;
 			}
 
-			//Pay "day" price
-			for (vector<pair<Resource_Meta, int> >::iterator it = reward->m_resources.begin(); it != reward->m_resources.end(); it++)
+			//Pay choice costs
+			for (vector<pair<ResourceType, int> >::iterator it = reward->m_resources.begin(); it != reward->m_resources.end(); it++)
 			{
 				if ((*it).first == Resource_Days)
 				{

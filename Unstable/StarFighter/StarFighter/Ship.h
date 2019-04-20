@@ -124,7 +124,7 @@ public:
 	bool IsOnlyWaterInsideRectangle(WaterTile* tileA, WaterTile* tileB);
 
 	int GetShortestPathLength(WaterTile* tileA, WaterTile* tileB);
-	bool AddResource(Resource_Meta resource, int value);
+	bool AddResource(ResourceType resource, int value);
 	void PayUpkeepCost(int days);
 
 private:

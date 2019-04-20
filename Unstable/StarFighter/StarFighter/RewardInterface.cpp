@@ -139,7 +139,7 @@ bool RewardInterface::Update()
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick || (*CurrentGame).m_input_actions[Action_Entering] == Input_Tap)
 		{
 			//give reward
-			for (vector<pair<Resource_Meta, int> >::iterator it = m_reward->m_resources.begin(); it != m_reward->m_resources.end(); it++)
+			for (vector<pair<ResourceType, int> >::iterator it = m_reward->m_resources.begin(); it != m_reward->m_resources.end(); it++)
 			{
 				m_ship->AddResource((*it).first, (*it).second);
 			}

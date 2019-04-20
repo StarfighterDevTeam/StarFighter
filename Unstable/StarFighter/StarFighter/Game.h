@@ -86,7 +86,7 @@ enum CrewMemberRace
 	NB_CREW_RACES,
 };
 
-enum Resource_Meta
+enum ResourceType
 {
 	Resource_Gold,
 	Resource_Fish,
