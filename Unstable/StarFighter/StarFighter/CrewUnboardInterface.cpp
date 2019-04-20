@@ -41,6 +41,11 @@ void CrewUnboardInterface::Destroy()
 	m_unboarded.clear();
 
 	m_crew_interface.Destroy();
+
+	for (int i = 0; i < NB_CHOICES_MAX; i++)
+	{
+		m_choices[i].Destroy();
+	}
 }
 
 void CrewUnboardInterface::Init(Ship* ship, Location* location)
@@ -229,25 +234,22 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 					if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
 					{
 						//add random + pro rata of skills invested (if any)
-						float island_cooldown = m_location->m_visited_countdown == 0 ? 1.f : (1.f * m_location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
+						float cooldown = m_location->m_visited_countdown == 0 ? 1.f : (1.f * m_location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
 
 						if (m_choices[i].m_gauge_value_max == 0)
 						{
-							value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
+							value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
 						}
 						else
 						{
-							value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2) * island_cooldown);
+							value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
 						}
 					}
 
-					if (j == Resource_SecretWreck)
-					{
-						continue;
-					}
-
-					reward->m_rewards[k].first = (Resource_Meta)j;
-					reward->m_rewards[k].second = value;
+					pair<Resource_Meta, int> resource;
+					resource.first = (Resource_Meta)j;
+					resource.second = value;
+					reward->m_resources.push_back(resource);
 
 					k++;
 				}
@@ -258,9 +260,6 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 				{
 					reward->m_DMS_location = new DMS_Coord();
 					k++;
-					//reward->m_rewards[k].first = Resource_SecretWreck;
-					//reward->m_rewards[k].second = 1;
-					//k++;
 				}
 
 				//reward text

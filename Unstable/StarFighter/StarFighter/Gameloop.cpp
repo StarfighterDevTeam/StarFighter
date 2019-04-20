@@ -944,20 +944,20 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//Pay "day" price
-			for (int i = 0; i < 3; i++)
+			for (vector<pair<Resource_Meta, int> >::iterator it = reward->m_resources.begin(); it != reward->m_resources.end(); it++)
 			{
-				if (reward->m_rewards[i].first == Resource_Days)
+				if ((*it).first == Resource_Days)
 				{
-					SpendDays(reward->m_rewards[i].second, true);
+					SpendDays((*it).second, true);
 				}
+			}
 
-				//Secret wreck location
-				if (reward->m_DMS_location != NULL && m_secret_locations[Location_Wreck].size() > 0)
-				{
-					//get a secret wreck location from the water zone map
-					int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
-					reward->m_DMS_location = &m_secret_locations[Location_Wreck][r]->m_tile->m_DMS;
-				}
+			//Secret wreck location
+			if (reward->m_DMS_location != NULL && m_secret_locations[Location_Wreck].size() > 0)
+			{
+				//get a secret wreck location from the water zone map
+				int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
+				reward->m_DMS_location = &m_secret_locations[Location_Wreck][r]->m_tile->m_DMS;
 			}
 
 			//reward is not empty? open the reward interface.

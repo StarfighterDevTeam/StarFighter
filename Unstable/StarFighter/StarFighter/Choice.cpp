@@ -4,11 +4,6 @@ extern Game* CurrentGame;
 
 Reward::Reward()
 {
-	for (int i = 0; i < 3; i++)
-	{
-		m_rewards[i].second = 0;
-	}
-
 	m_DMS_location = NULL;
 }
 
@@ -39,6 +34,7 @@ void Choice::Destroy()
 	{
 		delete (*it);
 	}
+	m_costs_displayed.clear();
 
 	m_panel = NULL;
 	m_picture = NULL;
@@ -72,22 +68,6 @@ void Choice::Init(int index, int choiceID, string text, string portrait_filename
 			m_rewardsID[i].first = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Reward1 + (i * 2)]);
 			m_rewardsID[i].second = stoi((*CurrentGame).m_choices_config[choiceID][Choice_Reward1_Proba + (i * 2)]);
 		}
-
-		/*
-		for (int i = 0; i < NB_RESOURCES_TYPES_TOTAL; i++)
-		{
-			if (i == NB_RESOURCES_TYPES)
-			{
-				continue;
-			}
-
-			m_reward_resources[i] = stoi((*CurrentGame).m_choices_config[choiceID][Choice_RewardGold + i - int(i > NB_RESOURCES_TYPES)]);
-		}
-
-		m_reward_string = (*CurrentGame).m_choices_config[choiceID][Choice_RewardText];
-		m_reward_string = StringReplace(m_reward_string, "_", " ");
-		m_reward_string = StringCut(m_reward_string, 48);
-		*/
 	}
 
 	//Start building interface

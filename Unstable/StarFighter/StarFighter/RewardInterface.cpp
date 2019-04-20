@@ -6,13 +6,7 @@ RewardInterface::RewardInterface()
 {
 	m_ship = NULL;
 	m_reward = NULL;
-
 	m_panel = NULL;
-	for (int i = 0; i < 3; i++)
-	{
-		m_rewards[i] = NULL;
-	}
-
 	m_ok_button = NULL;
 }
 
@@ -28,17 +22,19 @@ void RewardInterface::Destroy()
 	delete m_panel;
 	m_panel = NULL;
 
-	for (int i = 0; i < 3; i++)
+	for (vector<GameEntity*>::iterator it = m_resources_displayed.begin(); it != m_resources_displayed.end(); it++)
 	{
-		delete m_rewards[i];
-		m_rewards[i] = NULL;
+		delete (*it);
 	}
+	m_resources_displayed.clear();
 
 	delete m_reward;
 	m_reward = NULL;
 
 	delete m_ok_button;
 	m_ok_button = NULL;
+
+	m_text_DMS_location.setString("");
 }
 
 void RewardInterface::Init(Ship* ship, Reward* reward)
@@ -66,66 +62,53 @@ void RewardInterface::Init(Ship* ship, Reward* reward)
 	m_text.setPosition(sf::Vector2f(m_panel->m_position.x - m_panel->m_shape_container.getSize().x * 0.5 + 20, m_panel->m_position.y - m_panel->m_shape_container.getSize().y * 0.5 + m_text.getCharacterSize()));
 
 	//display rewards
-	float centering_offset = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		if (reward->m_rewards[i].second == 0)
-		{
-			break;
-		}
-		else
-		{
-			centering_offset += CHOICES_REWARDS_OFFSET_X;
-		}
-	}
+	int size = m_reward->m_resources.size();
+	float centering_offset = size * CHOICES_REWARDS_OFFSET_X;
 	centering_offset *= 0.25f;
 
-	for (int i = 0; i < 3; i++)
+	if (reward->m_DMS_location != NULL)
 	{
-		if (reward->m_DMS_location != NULL)
-		{
-			//secret location coordinates reveal
-			ostringstream ss_DMS;
-			DMS_Coord& dms = *reward->m_DMS_location;
-			ss_DMS << dms.m_degree_y << "° " << dms.m_minute_y << "' " << (int)dms.m_second_y << " \"\N";
-			ss_DMS << ", ";
-			ss_DMS << dms.m_degree_x << "° " << dms.m_minute_x << "' " << (int)dms.m_second_x << " \"\E";
+		//secret location coordinates reveal
+		ostringstream ss_DMS;
+		DMS_Coord& dms = *reward->m_DMS_location;
+		ss_DMS << dms.m_degree_y << "° " << dms.m_minute_y << "' " << (int)dms.m_second_y << " \"\N";
+		ss_DMS << ", ";
+		ss_DMS << dms.m_degree_x << "° " << dms.m_minute_x << "' " << (int)dms.m_second_x << " \"\E";
 
-			m_text_DMS_location.setFont(*(*CurrentGame).m_font[Font_Arial]);
-			m_text_DMS_location.setCharacterSize(20);
-			m_text_DMS_location.setColor(sf::Color::Green);
-			m_text_DMS_location.setStyle(sf::Text::Bold);
-			m_text_DMS_location.setString(ss_DMS.str());
-			m_text_DMS_location.setPosition(sf::Vector2f(m_panel->m_position.x - m_text_DMS_location.getGlobalBounds().width * 0.5, m_panel->m_position.y - m_text_DMS_location.getGlobalBounds().height * 0.65 + 4));
-		
-			reward->m_DMS_location = NULL;
-		}
-		else if (reward->m_rewards[i].second == 0)
-		{
-			break;
-		}
+		m_text_DMS_location.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		m_text_DMS_location.setCharacterSize(20);
+		m_text_DMS_location.setColor(sf::Color::Green);
+		m_text_DMS_location.setStyle(sf::Text::Bold);
+		m_text_DMS_location.setString(ss_DMS.str());
+		m_text_DMS_location.setPosition(sf::Vector2f(m_panel->m_position.x - m_text_DMS_location.getGlobalBounds().width * 0.5, m_panel->m_position.y - m_text_DMS_location.getGlobalBounds().height * 0.65 + 4));
 
+		reward->m_DMS_location = NULL;
+	}
+
+	for (int i = 0; i < size; i++)
+	{
 		//resources
-		m_rewards[i] = new GameEntity(UI_None);
+		GameEntity* resources_displayed = new GameEntity(UI_None);
 		float pos_x = m_panel->m_position.x - centering_offset + (CHOICES_REWARDS_OFFSET_X * i);// m_panel->m_shape_container.getSize().x * 0.5 + RESOURCES_ICON_SIZE * 0.5 + REWARD_INTERFACE_OFFSET_X + (CHOICES_REWARDS_OFFSET_X * i);
 
-		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[reward->m_rewards[i].first], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
-		m_rewards[i]->setAnimation(texture, 1, 1);
-		m_rewards[i]->setPosition(sf::Vector2f(pos_x, m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5 - RESOURCES_ICON_SIZE * 0.5 - 60));
+		sf::Texture* texture = TextureLoader::getInstance()->loadTexture((*CurrentGame).m_dico_resources_textures[reward->m_resources[i].first], RESOURCES_ICON_SIZE, RESOURCES_ICON_SIZE);
+		resources_displayed->setAnimation(texture, 1, 1);
+		resources_displayed->setPosition(sf::Vector2f(pos_x, m_panel->m_position.y + m_panel->m_shape_container.getSize().y * 0.5 - RESOURCES_ICON_SIZE * 0.5 - 60));
 
-		m_rewards[i]->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
-		m_rewards[i]->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
-		m_rewards[i]->m_shape.setFillColor(sf::Color::Black);
-		m_rewards[i]->m_shape.setPosition(m_rewards[i]->getPosition());
+		resources_displayed->m_shape.setSize(sf::Vector2f(RESOURCES_ICON_SIZE, RESOURCES_INTERFACE_STOCK_SIZE_Y));
+		resources_displayed->m_shape.setOrigin(sf::Vector2f(RESOURCES_ICON_SIZE * 0.5f, RESOURCES_INTERFACE_STOCK_SIZE_Y * 0.5f));
+		resources_displayed->m_shape.setFillColor(sf::Color::Black);
+		resources_displayed->m_shape.setPosition(resources_displayed->getPosition());
 
 		ostringstream ss_resource;
-		ss_resource << reward->m_rewards[i].second;
-		m_rewards[i]->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
-		m_rewards[i]->m_text.setCharacterSize(20);
-		m_rewards[i]->m_text.setColor(sf::Color::White);
-		m_rewards[i]->m_text.setString(ss_resource.str());
-		m_rewards[i]->m_text.setPosition(sf::Vector2f(m_rewards[i]->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, m_rewards[i]->m_shape.getPosition().y - m_rewards[i]->m_text.getCharacterSize() * 0.65));
+		ss_resource << reward->m_resources[i].second;
+		resources_displayed->m_text.setFont(*(*CurrentGame).m_font[Font_Arial]);
+		resources_displayed->m_text.setCharacterSize(20);
+		resources_displayed->m_text.setColor(sf::Color::White);
+		resources_displayed->m_text.setString(ss_resource.str());
+		resources_displayed->m_text.setPosition(sf::Vector2f(resources_displayed->m_shape.getPosition().x + RESOURCES_ICON_SIZE * 0.5f + 4, resources_displayed->m_shape.getPosition().y - resources_displayed->m_text.getCharacterSize() * 0.65));
 		
+		m_resources_displayed.push_back(resources_displayed);
 	}
 
 	//confirm button
@@ -156,12 +139,9 @@ bool RewardInterface::Update()
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick || (*CurrentGame).m_input_actions[Action_Entering] == Input_Tap)
 		{
 			//give reward
-			for (int i = 0; i < 3; i++)
+			for (vector<pair<Resource_Meta, int> >::iterator it = m_reward->m_resources.begin(); it != m_reward->m_resources.end(); it++)
 			{
-				if (m_reward->m_rewards[i].second != 0)
-				{
-					m_ship->AddResource(m_reward->m_rewards[i].first, m_reward->m_rewards[i].second);
-				}
+				m_ship->AddResource((*it).first, (*it).second);
 			}
 
 			return true;
@@ -182,16 +162,9 @@ void RewardInterface::Draw(sf::RenderTexture& screen)
 {
 	m_panel->Draw(screen);
 
-	for (int i = 0; i < 3; i++)
+	for (vector<GameEntity*>::iterator it = m_resources_displayed.begin(); it != m_resources_displayed.end(); it++)
 	{
-		if (m_reward->m_rewards[i].second != 0)
-		{
-			m_rewards[i]->Draw(screen);
-		}
-		else
-		{
-			break;
-		}
+		(*it)->Draw(screen);
 	}
 
 	screen.draw(m_text);

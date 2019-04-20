@@ -21,7 +21,7 @@ struct RewardInterface
 	sf::Text m_text_DMS_location;
 
 	GameEntity* m_panel;
-	GameEntity* m_rewards[3];
+	vector<GameEntity*> m_resources_displayed;
 
 	void Init(Ship* ship, Reward* reward);
 	void Destroy();
