@@ -90,9 +90,10 @@ Game::Game(RenderWindow& window)
 
 	m_dico_crew_skills[Skill_Gunner] = "Gunner";
 	m_dico_crew_skills[Skill_Fishing] = "Fishing";
-	m_dico_crew_skills[Skill_Melee] = "Melee";
+	m_dico_crew_skills[Skill_Combat] = "Combat";
 	m_dico_crew_skills[Skill_Navigation] = "Navigation";
 	m_dico_crew_skills[Skill_Engine] = "Engine";
+	m_dico_crew_skills[Skill_Diving] = "Diving";
 
 	m_dico_crew_races[Race_Human] = "Human";
 	m_dico_crew_races[Race_Fishman] = "Fishman";

@@ -72,9 +72,10 @@ enum CrewSkills
 {
 	Skill_Gunner,
 	Skill_Fishing,
-	Skill_Melee,
+	Skill_Combat,
 	Skill_Navigation,
 	Skill_Engine,
+	Skill_Diving,
 	NB_CREW_SKILLS,
 };
 

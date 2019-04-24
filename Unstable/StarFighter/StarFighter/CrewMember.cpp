@@ -570,7 +570,7 @@ bool CrewMember::Imprison(RoomTile* prison_cell)
 
 float CrewMember::UpdateAndGetMeleeRof()
 {
-	m_melee_rof = 1.f / ((1.f / CREWMEMBER_MELEE_ROF) * (100 + m_skills[Skill_Melee]) / 100);
+	m_melee_rof = 1.f / ((1.f / CREWMEMBER_MELEE_ROF) * (100 + m_skills[Skill_Combat]) / 100);
 	
 	return m_melee_rof;
 }

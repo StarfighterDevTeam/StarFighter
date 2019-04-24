@@ -20,11 +20,19 @@ Location::Location(LocationType type, WaterTile* tile) : GameEntity(sf::Vector2f
 			break;
 		}
 
-		case Location_SeaMonster:
 		case Location_Wreck:
 		{
 			m_choicesID[0] = 4;
 			m_choicesID[1] = 5;
+			m_choicesID[2] = -1;
+			m_choicesID[3] = -1;
+			break;
+		}
+
+		case Location_SeaMonster:
+		{
+			m_choicesID[0] = 6;
+			m_choicesID[1] = 7;
 			m_choicesID[2] = -1;
 			m_choicesID[3] = -1;
 			break;

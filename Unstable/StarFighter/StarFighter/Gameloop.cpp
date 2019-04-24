@@ -937,12 +937,6 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			m_warship->m_crew_unboard_interface.Destroy();
 
-			//Update resources cooldown
-			if (m_warship->m_tile->m_location != NULL)
-			{
-				m_warship->m_tile->m_location->m_visited_countdown = 1;
-			}
-
 			//Pay choice costs
 			for (vector<pair<ResourceType, int> >::iterator it = reward->m_resources.begin(); it != reward->m_resources.end(); it++)
 			{
@@ -970,6 +964,12 @@ void Gameloop::Update(sf::Time deltaTime)
 			{
 				delete reward;
 				m_menu = Menu_None;
+			}
+
+			//Update resources cooldown
+			if (m_warship->m_tile->m_location != NULL)
+			{
+				m_warship->m_tile->m_location->m_visited_countdown = 1;
 			}
 		}
 	}
@@ -1623,7 +1623,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				int skills[NB_CREW_SKILLS];
 				bool prisoner;
 				int health, health_max, coord_x, coord_y;
-				std::istringstream(line) >> t >> name >> type >> race >> health >> health_max >> skills[Skill_Gunner] >> skills[Skill_Fishing] >> skills[Skill_Melee] >> skills[Skill_Navigation] >> skills[Skill_Engine] >> (bool)prisoner >> coord_x >> coord_y;
+				std::istringstream(line) >> t >> name >> type >> race >> health >> health_max >> skills[Skill_Gunner] >> skills[Skill_Fishing] >> skills[Skill_Combat] >> skills[Skill_Navigation] >> skills[Skill_Engine] >> skills[Skill_Diving] >> (bool)prisoner >> coord_x >> coord_y;
 				
 				CrewMember* crew = new CrewMember((CrewMemberType)type, Alliance_Player, (CrewMemberRace)race, prisoner);
 				
