@@ -140,6 +140,14 @@ Game::Game(RenderWindow& window)
 	m_dico_islands_names.push_back("Angels Island");
 	m_dico_islands_names.push_back("Paradise Island");
 
+	m_dico_ships_names.push_back("Hispanola");
+	m_dico_ships_names.push_back("Esmeralda");
+	m_dico_ships_names.push_back("Genova");
+	m_dico_ships_names.push_back("Ghost");
+	m_dico_ships_names.push_back("Le Redoutable");
+	m_dico_ships_names.push_back("Calliope");
+	m_dico_ships_names.push_back("Medusa");
+
 	m_dico_resources_textures[Resource_Gold] = "2D/icon_gold.png";
 	m_dico_resources_textures[Resource_Fish] = "2D/icon_fish.png";
 	m_dico_resources_textures[Resource_Mech] = "2D/icon_mech.png";
@@ -213,6 +221,29 @@ string Game::GetRandomIslandName()
 			m_dico_islands_names.push_back(*it);
 		}
 		m_dico_islands_names_used.clear();
+	}
+
+	return name;
+}
+
+string Game::GetRandomShipName()
+{
+	//get a name at random in the list
+	int r = RandomizeIntBetweenValues(0, m_dico_ships_names.size() - 1);
+	string name = m_dico_ships_names[r];
+
+	//remove from the list and keep it stored in the "used" list
+	m_dico_ships_names_used.push_back(m_dico_ships_names[r]);
+	m_dico_ships_names.erase(m_dico_ships_names.begin() + r);
+
+	//all names are alreay used? recycle the list
+	if (m_dico_ships_names.empty() == true)
+	{
+		for (vector<string>::iterator it = m_dico_ships_names_used.begin(); it != m_dico_ships_names_used.end(); it++)
+		{
+			m_dico_ships_names.push_back(*it);
+		}
+		m_dico_ships_names_used.clear();
 	}
 
 	return name;

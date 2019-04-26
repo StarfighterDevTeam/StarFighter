@@ -6,6 +6,12 @@
 
 #define RESOURCES_REFRESH_RATE_IN_DAYS			40
 #define NB_CHOICES_MAX							4
+#define SEAMONSTER_DEPTH_MIN					30
+#define SEAMONSTER_DEPTH_MAX					200
+#define WRECK_DEPTH_MIN							30
+#define WRECK_DEPTH_MAX							200
+#define FISH_DEPTH_MIN							5
+#define FISH_DEPTH_MAX							100
 
 //forward declaration
 class WaterTile;
@@ -14,6 +20,7 @@ enum LocationType
 {
 	Location_Wreck,
 	Location_SeaMonster,
+	Location_Fish,
 	NB_SECRET_LOCATION_TYPES,
 	Location_None,
 	Location_Seaport,
@@ -56,6 +63,7 @@ public:
 	int m_visited_countdown;
 	LocationType m_type;
 	int m_choicesID[NB_CHOICES_MAX];
+	int m_depth;
 };
 
 #endif //LOCATION_H_INCLUDED

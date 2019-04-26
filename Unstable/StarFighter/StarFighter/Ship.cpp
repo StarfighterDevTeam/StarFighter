@@ -2,15 +2,15 @@
 
 extern Game* CurrentGame;
 
-Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display_name) : GameEntity(UI_EnemyShip)
+Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance) : GameEntity(UI_EnemyShip)
 {
 	m_type = type;
 	m_alliance = alliance;
 	m_destination = NULL;
 	m_seaport = NULL;
 	m_distance_combat = DISTANCE_COMBAT_INIT;
-	m_display_name = display_name;
 	m_lifeboats = 0;
+	m_display_name = (*CurrentGame).GetRandomShipName();
 
 	m_rooms_min_upcorner_x = 0;
 	m_rooms_min_upcorner_y = 0;
@@ -51,6 +51,11 @@ Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display
 	m_resources[Resource_Mech] = 0;
 	m_resources[Resource_Fidelity] = 0;
 	m_resources[Resource_Days] = 0;
+}
+
+Ship::Ship(DMS_Coord coord, ShipType type, ShipAlliance alliance, string display_name) : Ship(coord, type, alliance)
+{
+	m_display_name = display_name;
 }
 
 Ship::~Ship()

@@ -70,6 +70,7 @@ public:
 
 	void GenerateRandomIslands(int zone_coord_x, int zone_coord_y);
 	void GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y);
+	void GenerateRandomEnemyShips(int zone_coord_x, int zone_coord_y);
 	void SpendDays(int days, bool skip_time);
 	bool CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y);
 

@@ -252,12 +252,15 @@ public:
 	vector<string> m_dico_crew_names_used[2];
 	vector<string> m_dico_islands_names;
 	vector<string> m_dico_islands_names_used;
+	vector<string> m_dico_ships_names;
+	vector<string> m_dico_ships_names_used;
 	string m_dico_crew_types[NB_CREW_TYPES];
 	string m_dico_crew_skills[NB_CREW_SKILLS];
 	string m_dico_crew_races[NB_CREW_RACES];
 	string m_dico_resources_textures[NB_RESOURCES_TYPES_TOTAL];
 	string GetRandomCrewMemberName(int gender);
 	string GetRandomIslandName();
+	string GetRandomShipName();
 	sf::Color m_dico_colors[NB_COLOR_CHART];
 
 private:

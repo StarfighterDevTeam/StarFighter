@@ -23,24 +23,17 @@ Gameloop::Gameloop()
 
 		GenerateRandomIslands(0, 0);
 		GenerateRandomSecretLocations(0, 0);
+		GenerateRandomEnemyShips(0, 0);
 
 		//create a new save file
 		SavePlayerData(m_warship);
-	}
-	else
-	{
-		//GenerateRandomIslands();
-
-		//Island* test = new Island(8, 4, 2, 4, 0, 0);
-		//test->AddSeaport(Seaport_Small);
-		//m_islands.push_back(test);
 	}
 	
 	m_resources_interface.Init(m_warship);
 
 	m_ships.push_back(m_warship);
-	m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
-	m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
+	//m_ships.push_back(new Ship(DMS_Coord{ 0, 13, 0, 0, 8, 0 }, Ship_FirstClass, Alliance_Enemy, "L'Esquif"));
+	//m_ships.push_back(new Ship(DMS_Coord{ 0, 16, 0, 0, 11, 0 }, Ship_FirstClass, Alliance_Enemy, "Le Goelan"));
 	m_tactical_ship = NULL;
 
 	m_scale = Scale_Strategic;
@@ -233,7 +226,7 @@ void Gameloop::Update(sf::Time deltaTime)
 		{
 			ship->UpdateStrategical(deltaTime);
 
-			if (i == 0)
+			if (ship == m_warship)
 			{
 				//Player ship UI
 				ostringstream ss;
@@ -345,7 +338,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					UpdateRoomTileFeedback(*it2, deltaTime, ship);
 
 					//crew move order feedback (hovering tile)
-					if (i == 0 && ship->m_is_fleeing == false)
+					if (ship == m_warship && m_warship->m_is_fleeing == false)
 					{
 						if (selection != NULL && selection->m_UI_type == UI_CrewMember)
 						{
@@ -384,7 +377,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			//Room connexions
 			for (vector<RoomConnexion*>::iterator it = ship->m_connexions.begin(); it != ship->m_connexions.end(); it++)
 			{
-				if (i == 0 && ship->m_is_fleeing == false)
+				if (ship == m_warship && m_warship->m_is_fleeing == false)
 				{
 					(*it)->Update(deltaTime);
 					if ((*it)->IsHoveredByMouse() == true && (*it)->m_destroyed == false && (*it)->m_tiles.first->m_room->m_alliance == Alliance_Player)
@@ -399,7 +392,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//Close/open connexion
-			if (i == 0 && mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion && ship->m_is_fleeing == false)
+			if (ship == m_warship && mouse_click == Mouse_LeftClick && hovered != NULL && hovered->m_UI_type == UI_Connexion && ship->m_is_fleeing == false)
 			{
 				RoomConnexion* connexion = (RoomConnexion*)hovered;
 				if (connexion->m_ship == ship)
@@ -476,7 +469,7 @@ void Gameloop::Update(sf::Time deltaTime)
 
 					if (ship->m_is_fleeing == false)
 					{
-						if (i == 0)
+						if (ship == m_warship)
 						{
 							//create or update HUD for crew details
 							if ((*it)->m_hovered == true && m_warship->m_crew_interface.m_crew != *it)
@@ -526,7 +519,7 @@ void Gameloop::Update(sf::Time deltaTime)
 							(*CurrentGame).m_hovered_ui = NULL;
 						}
 
-						if (i == 0)
+						if (ship == m_warship)
 						{
 							Warship* warship = (Warship*)ship;
 							if (warship->m_crew_interface.m_crew == *it)
@@ -546,7 +539,7 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 
 			//Move order for player's crew
-			if (i == 0 && mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_RoomTile && ship->m_is_fleeing == false)
+			if (ship == m_warship && mouse_click == Mouse_RightClick && selection != NULL && selection->m_UI_type == UI_CrewMember && hovered != NULL && hovered->m_UI_type == UI_RoomTile && ship->m_is_fleeing == false)
 			{
 				CrewMember* crew = (CrewMember*)selection;
 				RoomTile* destination = (RoomTile*)hovered;
@@ -577,7 +570,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					{
 						(*it)->Update(deltaTime);
 
-						Ship* enemy_ship = i == 0 ? m_tactical_ship : m_warship;
+						Ship* enemy_ship = ship == m_warship ? m_tactical_ship : m_warship;
 						if (enemy_ship != NULL && enemy_ship->m_is_fleeing == false && enemy_ship->m_sinking_timer <= 0)
 						{
 							if ((*it)->m_target_room == NULL && i == 1)
@@ -621,7 +614,7 @@ void Gameloop::Update(sf::Time deltaTime)
 					(*it)->Update(deltaTime);
 
 					//Fleeing order for human
-					if (i == 0 && (*it)->IsHoveredByMouse() == true && m_scale == Scale_Tactical)
+					if (ship == m_warship && (*it)->IsHoveredByMouse() == true && m_scale == Scale_Tactical)
 					{
 						bool can_flee = ship->m_flee_count == ENGINE_FLEE_COUNT && ship->IsSystemOperational(System_Engine, (*it)->m_tile);
 						m_contextual_order->SetContextualOrder(Order_Flee, (*it)->m_shape_container.getPosition(), can_flee == true);
@@ -1044,7 +1037,7 @@ void Gameloop::Draw()
 			if (ship->m_sinking_timer < SHIP_SINKING_TIME)
 			{
 				//room tiles
-				if (i == 0)
+				if (ship == m_warship)
 				{
 					//player room tiles: draw focused tile in last, so its outline appears above others
 					GameEntity* focused_room_tile = NULL;
@@ -1142,7 +1135,7 @@ void Gameloop::Draw()
 			}
 		}
 
-		if (i == 0 && ship->m_is_fleeing == false)
+		if (ship == m_warship && ship->m_is_fleeing == false)
 		{
 			m_warship->m_crew_interface.Draw((*CurrentGame).m_mainScreen);
 		}
@@ -1542,6 +1535,20 @@ int Gameloop::SavePlayerData(Warship* warship)
 			data << endl;
 		}
 
+		for (vector<Ship*>::iterator it = m_ships.begin(); it != m_ships.end(); it++)
+		{
+			if ((*it) == m_warship)
+			{
+				continue;
+			}
+
+			ostringstream ship_name;
+			ship_name << StringReplace((*it)->m_display_name, " ", "_");
+			data << "Ship " << (*it)->m_DMS.m_minute_x << " " << " " << (*it)->m_DMS.m_minute_y;
+			data << " " << (int)((*it)->m_type) << " " << (int)((*it)->m_alliance) << " " << ship_name.str();
+			data << endl;
+		}
+
 		for (int i = 0; i < NB_SECRET_LOCATION_TYPES; i++)
 		{
 			for (vector<Location*>::iterator it = m_secret_locations[i].begin(); it != m_secret_locations[i].end(); it++)
@@ -1558,10 +1565,15 @@ int Gameloop::SavePlayerData(Warship* warship)
 						data << "SeaMonster ";
 						break;
 					}
+					case Location_Fish:
+					{
+						data << "Fish ";
+						break;
+					}
 				}
 
 				DMS_Coord& dms = (*it)->m_tile->m_DMS;
-				data << dms.m_degree_x << " " << dms.m_minute_x << " " << dms.m_second_x << " " << dms.m_degree_y << " " << dms.m_minute_y << " " << dms.m_second_y;
+				data << dms.m_degree_x << " " << dms.m_minute_x << " " << dms.m_second_x << " " << dms.m_degree_y << " " << dms.m_minute_y << " " << dms.m_second_y << " " << (*it)->m_depth;
 				data << endl;
 			}
 		}
@@ -1599,7 +1611,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 
 		int DMS_degree_x, DMS_minute_x, DMS_degree_y, DMS_minute_y;
 		std::istringstream(line) >> s >> DMS_degree_x >> DMS_minute_x >> DMS_degree_y >> DMS_minute_y;
-		warship->SetDMSCoord(DMS_Coord(DMS_degree_x, DMS_minute_x, 0.f, DMS_degree_y, DMS_minute_y, 0.f));
+		warship->SetDMSCoord(DMS_Coord(DMS_degree_x, DMS_minute_x, 0, DMS_degree_y, DMS_minute_y, 0));
 
 		int i = 0;
 		for (int i = 0; i < NB_RESOURCES_TYPES; i++)
@@ -1640,8 +1652,7 @@ int Gameloop::LoadPlayerData(Warship* warship)
 
 				warship->m_crew[(int)crew->m_is_prisoner].push_back(crew);
 			}
-
-			if (t.compare("Island") == 0)
+			else if (t.compare("Island") == 0)
 			{
 				int seaport_coord_x, seaport_coord_y, seaport_type, seaport_visited_countdown, island_upcorner_x, island_upcorner_y, island_width, island_height, zone_coord_x, zone_coord_y;
 				string name;
@@ -1654,30 +1665,47 @@ int Gameloop::LoadPlayerData(Warship* warship)
 				seaport->AddIsland(island_upcorner_x, island_upcorner_y, island_width, island_height);
 				m_seaports.push_back(seaport);
 			}
-
-			if (t.compare("Wreck") == 0 || t.compare("SeaMonster") == 0)
+			else if (t.compare("Ship") == 0)
 			{
-				int degree_x, minute_x, degree_y, minute_y;
+				int minute_x, minute_y, type, alliance;
+				string name;
+				std::istringstream(line) >> t >> minute_x >> minute_y >> type >> alliance >> name;
+				name = StringReplace(name, "_", " ");
+
+				Ship* ship = new Ship(DMS_Coord{ 0, minute_x, 0, 0, minute_y, 0 }, (ShipType)type, (ShipAlliance)alliance);
+				m_ships.push_back(ship);
+			}
+			else if (t.compare("Wreck") == 0 || t.compare("SeaMonster") == 0 || t.compare("Fish") == 0)
+			{
+				int degree_x, minute_x, degree_y, minute_y, depth;
 				float second_x, second_y;
-				std::istringstream(line) >> t >> degree_x >> minute_x >> second_x >> degree_y >> minute_y >> second_y;
+				std::istringstream(line) >> t >> degree_x >> minute_x >> second_x >> degree_y >> minute_y >> second_y >> depth;
 
 				DMS_Coord* dms = new DMS_Coord(degree_x, minute_x, second_x, degree_y, minute_y, second_y);
 				WaterTile* tile = (*CurrentGame).m_waterzones[degree_x][degree_y]->m_watertiles[minute_x][minute_y];
+				Location* location;
 
 				if (t.compare("Wreck") == 0)
 				{
-					Location* location = new Location(Location_Wreck, tile);
+					location = new Location(Location_Wreck, tile);
 					m_secret_locations[Location_Wreck].push_back(location);
-					tile->m_location = location;
 					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Pierced]);
 				}
 				else if (t.compare("SeaMonster") == 0)
 				{
-					Location* location = new Location(Location_SeaMonster, tile);
+					location = new Location(Location_SeaMonster, tile);
 					m_secret_locations[Location_SeaMonster].push_back(location);
-					tile->m_location = location;
 					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_EngineCharged]);
 				}
+				else if (t.compare("Fish") == 0)
+				{
+					location = new Location(Location_Fish, tile);
+					m_secret_locations[Location_Fish].push_back(location);
+					tile->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Prisoner]);
+				}
+
+				location->m_depth = depth;
+				tile->m_location = location;
 			}
 
 			warship->m_nb_crew = warship->m_crew[0].size();
@@ -1948,10 +1976,12 @@ void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 		int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
 		int y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
 
-		while ((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_type != Water_Empty || (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location != NULL)
+		WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
+		while (tile->m_type != Water_Empty || tile->m_location != NULL)
 		{
 			x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
 			y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+			tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
 		}
 
 		//island size
@@ -1969,7 +1999,7 @@ void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 				int y_ = k == 0 ? -1 : height;
 				if (CanIslandBeCreatedInArea(x - j, y + y_, width, height, zone_coord_x, zone_coord_y) == true)
 				{
-					WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x - j][y + y_];
+					tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x - j][y + y_];
 					possible_candidates.push_back(tile);
 				}
 			}
@@ -1983,7 +2013,7 @@ void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 				int x_ = k == 0 ? 1 : -width;
 				if (CanIslandBeCreatedInArea(x + x_, y + j, width, height, zone_coord_x, zone_coord_y) == true)
 				{
-					WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x + x_][y + j];
+					tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x + x_][y + j];
 					possible_candidates.push_back(tile);
 				}
 			}
@@ -2005,22 +2035,37 @@ void Gameloop::GenerateRandomIslands(int zone_coord_x, int zone_coord_y)
 
 void Gameloop::GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y)
 {
-	int r = RandomizeIntBetweenValues(5, 10);
-
 	for (int i = 0; i < NB_SECRET_LOCATION_TYPES; i++)
 	{
+		int r = 0;
+		switch (i)
+		{
+			case Location_Wreck:
+			case Location_SeaMonster:
+			{
+				r = 10;
+				break;
+			}
+			case Location_Fish:
+			{
+				r = 250;
+				break;
+			}
+		}
+
 		for (int j = 0; j < r; j++)
 		{
 			int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
 			int y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
 
-			while ((*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_type != Water_Empty || (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_location != NULL)
+			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
+			while (tile->m_type != Water_Empty || tile->m_location != NULL || tile == m_warship->m_tile)
 			{
 				x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
 				y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+				tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
 			}
 
-			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
 			Location* location = new Location((LocationType)i, tile);
 			tile->m_location = location;
 			m_secret_locations[i].push_back(location);
@@ -2037,7 +2082,49 @@ void Gameloop::GenerateRandomSecretLocations(int zone_coord_x, int zone_coord_y)
 					(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Magenta_EngineCharged]);
 					break;
 				}
+				case Location_Fish:
+				{
+					(*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y]->m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Yellow_Prisoner]);
+					break;
+				}
 			}
+		}
+	}
+}
+
+void Gameloop::GenerateRandomEnemyShips(int zone_coord_x, int zone_coord_y)
+{
+	for (int i = Ship_FirstClass; i < NB_SHIP_TYPES; i++)
+	{
+		int r = 0;
+		switch (i)
+		{
+			case Ship_FirstClass:
+			{
+				r = 10;
+				break;
+			}
+			case Ship_SecondClass:
+			{
+				r = 40;
+				break;
+			}
+		}
+
+		for (int j = 0; j < r; j++)
+		{
+			int x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+			int y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+
+			WaterTile* tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
+			while (tile->m_type != Water_Empty || tile == m_warship->m_tile)
+			{
+				x = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+				y = RandomizeIntBetweenValues(0, NB_WATERTILE_SUBDIVISION - 1);
+				tile = (*CurrentGame).m_waterzones[zone_coord_x][zone_coord_y]->m_watertiles[x][y];
+			}
+
+			m_ships.push_back(new Ship(DMS_Coord{ 0, x, 0, 0, y, 0 }, (ShipType)i, Alliance_Enemy));
 		}
 	}
 }
