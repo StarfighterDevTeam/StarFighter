@@ -2075,11 +2075,7 @@ bool Ship::AddResource(ResourceType resource, int value)
 		return false;
 	}
 
-	if (resource != Resource_Fidelity)
-	{
-		m_resources[resource] = Max(0, m_resources[resource] + value);
-	}
-	else
+	if (resource == Resource_Fidelity)
 	{
 		for (int j = 0; j < 2; j++)
 		{
@@ -2089,6 +2085,10 @@ bool Ship::AddResource(ResourceType resource, int value)
 				Bound((*it)->m_fidelity, sf::Vector2i(0, 100));
 			}
 		}
+	}
+	else if (resource != Resource_Crew && resource != Resource_Days)
+	{
+		m_resources[resource] = Max(0, m_resources[resource] + value);
 	}
 
 	return true;

@@ -35,6 +35,9 @@ void RewardInterface::Destroy()
 	m_ok_button = NULL;
 
 	m_text_DMS_location.setString("");
+
+	m_crew_killed.clear();
+	m_crew_recruited.clear();
 }
 
 void RewardInterface::Init(Ship* ship, Reward* reward)
@@ -138,12 +141,6 @@ bool RewardInterface::Update()
 		//action
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick || (*CurrentGame).m_input_actions[Action_Entering] == Input_Tap)
 		{
-			//give reward
-			for (vector<pair<ResourceType, int> >::iterator it = m_reward->m_resources.begin(); it != m_reward->m_resources.end(); it++)
-			{
-				m_ship->AddResource((*it).first, (*it).second);
-			}
-
 			return true;
 		}
 		else

@@ -29,7 +29,7 @@ WaterTile::WaterTile(int coord_x, int coord_y, WaterTileType type, WaterZone* zo
 	m_shape_container.setPosition(m_position);
 	m_shape_container.setSize(sf::Vector2f(size, size));
 	m_shape_container.setOrigin(sf::Vector2f(size * 0.5f, size * 0.5f));
-	m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Flood]);
+	m_shape_container.setFillColor((*CurrentGame).m_dico_colors[Color_Blue_Water]);
 	m_shape_container.setOutlineThickness(-1.f);
 	m_shape_container.setOutlineColor(m_default_color);
 

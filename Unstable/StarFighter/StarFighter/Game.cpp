@@ -171,6 +171,8 @@ Game::Game(RenderWindow& window)
 	m_dico_colors[Color_Red_Target_Locked] = m_dico_colors[Color_Red_Destroyed];
 	m_dico_colors[Color_Red_CrewFidelity_Negative] = m_dico_colors[Color_Red_Destroyed];
 	m_dico_colors[Color_Blue_CrewFidelity_Positive] = m_dico_colors[Color_Blue_Flood];
+
+	m_dico_colors[Color_Blue_Water] = m_dico_colors[Color_Blue_Flood];
 	m_dico_colors[Color_Green_Lifebar] = m_dico_colors[Color_Green_System];
 	m_dico_colors[Color_Red_Impossible] = m_dico_colors[Color_Red_Target_Locked];
 	m_dico_colors[Color_Magenta_EngineCharged] = m_dico_colors[Color_Magenta_Crew];

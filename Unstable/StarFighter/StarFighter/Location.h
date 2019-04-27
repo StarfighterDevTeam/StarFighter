@@ -6,12 +6,13 @@
 
 #define RESOURCES_REFRESH_RATE_IN_DAYS			40
 #define NB_CHOICES_MAX							4
-#define SEAMONSTER_DEPTH_MIN					30
-#define SEAMONSTER_DEPTH_MAX					200
+#define SEAMONSTER_DEPTH_MIN						30
+#define SEAMONSTER_DEPTH_MAX						200
 #define WRECK_DEPTH_MIN							30
 #define WRECK_DEPTH_MAX							200
 #define FISH_DEPTH_MIN							5
 #define FISH_DEPTH_MAX							100
+#define SEAMONSTER_CREW_KILLRATIO_MIN			0.2
 
 //forward declaration
 class WaterTile;

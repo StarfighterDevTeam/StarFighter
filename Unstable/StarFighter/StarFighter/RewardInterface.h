@@ -7,7 +7,7 @@
 #include "Ship.h"
 
 #define REWARD_PANEL_SIZE_X			500
-#define REWARD_PANEL_SIZE_Y			160
+#define REWARD_PANEL_SIZE_Y			180
 #define REWARD_INTERFACE_OFFSET_X	20
 
 struct RewardInterface
@@ -22,6 +22,8 @@ struct RewardInterface
 
 	GameEntity* m_panel;
 	vector<GameEntity*> m_resources_displayed;
+	vector<CrewMember*> m_crew_killed;
+	vector<CrewMember*> m_crew_recruited;
 
 	void Init(Ship* ship, Reward* reward);
 	void Destroy();

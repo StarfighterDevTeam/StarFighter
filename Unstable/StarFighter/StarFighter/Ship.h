@@ -41,7 +41,7 @@ public:
 
 	vector<Room*> m_rooms;
 	vector<RoomConnexion*> m_connexions;
-	vector<CrewMember*> m_crew[2];
+	vector<CrewMember*> m_crew[2];//0: crew, 1: prisoner
 	vector<Weapon*> m_weapons;
 	vector<vector<RoomTile*> > m_tiles;
 	vector<Engine*> m_engines;

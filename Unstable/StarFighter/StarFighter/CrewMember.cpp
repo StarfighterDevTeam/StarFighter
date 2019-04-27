@@ -622,8 +622,6 @@ CrewMember* CrewMember::Clone()
 		clone->m_skills_max[i] = m_skills_max[i];
 	}
 	
-	
-	
 	clone->m_health = m_health;
 	clone->m_health_max = m_health_max;
 

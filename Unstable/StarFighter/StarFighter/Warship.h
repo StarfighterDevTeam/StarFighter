@@ -22,9 +22,7 @@ class Warship : public Ship
 {
 public:
 	Warship(DMS_Coord coord);
-
 	void Init();
-
 	~Warship();
 
 	float m_desired_angle;
@@ -32,6 +30,7 @@ public:
 	int m_upkeep_costs[NB_UPKEEP_COSTS];
 	bool m_can_open_new_menu;
 	int m_sonar;
+	vector<CrewMember*> m_crew_unboarding;
 
 	struct Compass m_compass;
 	struct CrewInterface m_crew_interface;

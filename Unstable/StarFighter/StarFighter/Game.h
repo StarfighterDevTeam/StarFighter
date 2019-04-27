@@ -158,6 +158,7 @@ enum Color_Chart
 	Color_Green_Lifebar,
 	Color_Cyan_System,
 	Color_Magenta_EngineCharged,
+	Color_Blue_Water,
 	Color_Blue_Flood,
 	Color_Blue_Pierced,
 	Color_Red_Prison,
