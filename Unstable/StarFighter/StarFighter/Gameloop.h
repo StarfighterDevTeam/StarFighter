@@ -74,6 +74,8 @@ public:
 	void SpendDays(int days, bool skip_time);
 	bool CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int width, int height, int zone_coord_x, int zone_coord_y);
 
+	Reward* GenerateReward(int rewardID, Location* location, int gauge, int gauge_max);
+
 private:
 	sf::RenderWindow* mainWindow;
 	sf::Text* framerate;

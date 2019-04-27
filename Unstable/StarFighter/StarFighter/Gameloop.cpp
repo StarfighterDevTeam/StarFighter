@@ -926,27 +926,29 @@ void Gameloop::Update(sf::Time deltaTime)
 			}
 		}
 
-		Reward* reward = m_warship->m_crew_unboard_interface.Update(deltaTime);
-		if (reward != NULL)
+		Choice* choice = m_warship->m_crew_unboard_interface.Update(deltaTime);
+
+		//choice made?
+		if (choice != NULL)
 		{
 			m_warship->m_crew_unboard_interface.Destroy();
 
-			//Pay choice costs
-			for (vector<pair<ResourceType, int> >::iterator it = reward->m_resources.begin(); it != reward->m_resources.end(); it++)
+			//pay costs
+			for (int j = 0; j < NB_RESOURCES_TYPES; j++)
 			{
-				if ((*it).first == Resource_Days)
+				if (j != Resource_Days && j != Resource_Fidelity)
 				{
-					SpendDays((*it).second, true);
+					m_warship->AddResource(ResourceType(j), - choice->m_cost[j]);
+				}
+				else if (j == Resource_Days)
+				{
+					SpendDays(choice->m_cost[j], true);
 				}
 			}
 
-			//Secret wreck location
-			if (reward->m_DMS_location != NULL && m_secret_locations[Location_Wreck].size() > 0)
-			{
-				//get a secret wreck location from the water zone map
-				int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
-				reward->m_DMS_location = &m_secret_locations[Location_Wreck][r]->m_tile->m_DMS;
-			}
+			//get reward
+			int rewardID = choice->RandomizeRewardID();
+			Reward* reward = GenerateReward(rewardID, m_warship->m_tile->m_location, choice->m_gauge_value, choice->m_gauge_value_max);
 
 			//reward is not empty? open the reward interface.
 			if (reward->m_string.empty() == false)
@@ -2159,4 +2161,70 @@ bool Gameloop::CanIslandBeCreatedInArea(int upcorner_x, int upcorner_y, int widt
 	}
 
 	return is_on_grid && is_free;
+}
+
+Reward* Gameloop::GenerateReward(int rewardID, Location* location, int gauge, int gauge_max)
+{
+	if (rewardID > 0)
+	{
+		rewardID--;
+		Reward* reward = new Reward();
+		int k = 0;
+		for (int j = 0; j < NB_RESOURCES_TYPES; j++)
+		{
+			//get rewards
+			int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
+
+			if (value == 0)
+			{
+				continue;
+			}
+
+			if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
+			{
+				//add random + pro rata of skills invested (if any)
+				float cooldown = location->m_visited_countdown == 0 ? 1.f : (1.f * location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
+
+				if (gauge_max == 0)
+				{
+					value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+				}
+				else
+				{
+					value = (int)(1.f * value * (1.f * gauge / gauge_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
+				}
+			}
+
+			pair<ResourceType, int> resource;
+			resource.first = (ResourceType)j;
+			resource.second = value;
+			reward->m_resources.push_back(resource);
+
+			k++;
+		}
+
+		//secret wreck location
+		int secret = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_SecretWreck]);
+		if (secret == 1)
+		{
+			if (m_secret_locations[Location_Wreck].size() > 0)
+			{
+				//get a secret wreck location from the water zone map
+				int r = RandomizeIntBetweenValues(0, m_secret_locations[Location_Wreck].size() - 1);
+				reward->m_DMS_location = new DMS_Coord(m_secret_locations[Location_Wreck][r]->m_tile->m_DMS);
+				k++;
+			}
+		}
+
+		//reward text
+		reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
+		reward->m_string = StringReplace(reward->m_string, "_", " ");
+		reward->m_string = StringCut(reward->m_string, 48);
+
+		return reward;
+	}
+	else
+	{
+		return new Reward();
+	}
 }

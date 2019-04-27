@@ -146,7 +146,7 @@ void CrewUnboardInterface::Init(Ship* ship, Location* location)
 	}
 }
 
-Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
+Choice* CrewUnboardInterface::Update(sf::Time deltaTime)
 {
 	//crew slots
 	ostringstream ss_slots;
@@ -215,77 +215,7 @@ Reward* CrewUnboardInterface::Update(sf::Time deltaTime)
 		//click = action
 		if ((*CurrentGame).m_mouse_click == Mouse_LeftClick)
 		{
-			//pay "days" cost
-			m_ship->PayUpkeepCost(m_choices[i].m_cost[Resource_Days]);
-
-			//randomize reward ID
-			int rewardID = m_choices[i].RandomizeRewardID();
-			
-			//read reward in the database
-			if (rewardID > 0)
-			{
-				rewardID--;
-				Reward* reward = new Reward();
-				int k = 0;
-				for (int j = 0; j < NB_RESOURCES_TYPES; j++)
-				{
-					//pay cost
-					if (j != Resource_Days && j != Resource_Fidelity)
-					{
-						int cost = stoi((*CurrentGame).m_choices_config[m_location->m_choicesID[i] - 1][Choice_CostGold + j]);
-						m_ship->AddResource(ResourceType(Resource_Gold + j), -cost);
-					}
-
-					//get rewards
-					int value = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_Gold + j]);
-
-					if (value == 0)
-					{
-						continue;
-					}
-
-					if (j == Resource_Gold || j == Resource_Fish || j == Resource_Mech)
-					{
-						//add random + pro rata of skills invested (if any)
-						float cooldown = m_location->m_visited_countdown == 0 ? 1.f : (1.f * m_location->m_visited_countdown / RESOURCES_REFRESH_RATE_IN_DAYS);
-
-						if (m_choices[i].m_gauge_value_max == 0)
-						{
-							value = (int)(1.f * value * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
-						}
-						else
-						{
-							value = (int)(1.f * value * (1.f * m_choices[i].m_gauge_value / m_choices[i].m_gauge_value_max) * RandomizeFloatBetweenValues(0.8, 1.2) * cooldown);
-						}
-					}
-
-					pair<ResourceType, int> resource;
-					resource.first = (ResourceType)j;
-					resource.second = value;
-					reward->m_resources.push_back(resource);
-
-					k++;
-				}
-
-				//secret wreck location
-				int secret = stoi((*CurrentGame).m_rewards_config[rewardID][Reward_SecretWreck]);
-				if (secret == 1)
-				{
-					reward->m_DMS_location = new DMS_Coord();
-					k++;
-				}
-
-				//reward text
-				reward->m_string = (*CurrentGame).m_rewards_config[rewardID][Reward_Text];
-				reward->m_string = StringReplace(reward->m_string, "_", " ");
-				reward->m_string = StringCut(reward->m_string, 48);
-
-				return reward;
-			}
-			else
-			{
-				return new Reward();
-			}
+			return &m_choices[i];			
 		}
 	}
 
